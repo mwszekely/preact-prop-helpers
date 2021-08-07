@@ -49,6 +49,7 @@ export interface UseRandomIdReturnType {
 
     // Note: Effectively lags behind by one render, then re-renders and syncs back up, when an ID is provided
     id: string | undefined;
+    getId(): string | undefined;
     useRandomIdProps: UseRandomIdProps;
     useReferencedIdProps: <K extends keyof h.JSX.HTMLAttributes<any>>(idPropName: K) => UseReferencedIdProps<K>;
 }
@@ -69,7 +70,7 @@ export function useRandomId({ prefix }: UseRandomIdParameters = {}): UseRandomId
     // TODO: This does mean that on the first render, if just the ID is provided,
     // there will be a temporary mismatch, but it's corrected before rendering finishes.
     // Is this okay?
-    const [usedId, setUsedId] = useState<string | undefined>(undefined);
+    const [usedId, setUsedId, getUsedId] = useState<string | undefined>(undefined);
 
     const useReferencedIdProps = function useReferencedIdProps<K extends keyof h.JSX.HTMLAttributes<any>>(idPropName: K) {
 
@@ -85,19 +86,6 @@ export function useRandomId({ prefix }: UseRandomIdParameters = {}): UseRandomId
         return ret;
     }
 
-
-    /*const useReferencedIdProps: UseReferencedIdProps = function useReferencedIdProps<P extends h.JSX.HTMLAttributes<any>>(p: P) {
-        return <K extends keyof P>(idProp: K) => {
-            const { [idProp]: givenId, ...props } = p;
-
-            const usedId2 = (givenId ?? usedId ?? "");
-            if (idProp === "id")
-                setUsedId(usedId2);
-
-            return useMergedProps({ [idProp]: usedId2 }, props) as MergedProps<{ [K2 in K]: string }, P>;
-        };
-    }*/
-
     const useRandomIdProps: UseRandomIdProps = function useRandomIdProps<P extends UseRandomIdPropsParameters>(p: P): UseRandomIdPropsReturnType<P> {
         return useReferencedIdProps("id")(p);
     }
@@ -105,6 +93,7 @@ export function useRandomId({ prefix }: UseRandomIdParameters = {}): UseRandomId
     return {
         randomId,
         id: usedId,
+        getId: getUsedId,
         useRandomIdProps,
         useReferencedIdProps
     };
