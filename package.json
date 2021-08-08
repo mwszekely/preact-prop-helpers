@@ -10,7 +10,7 @@
     "watch": "tsc --watch",
     "build": "tsc --build",
     "test": "jest",
-    "install": "npm run build",
+    "install": "npm run build || true",
     "clean": "tsc --build --clean"
   },
   "author": "",
