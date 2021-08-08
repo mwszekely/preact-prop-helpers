@@ -1,5 +1,6 @@
 import { Ref } from "preact";
-import { useCallback, useLayoutEffect, useRef } from "preact/hooks";
+import { useCallback, useRef } from "preact/hooks";
+import { useLayoutEffect } from "./use-layout-effect";
 import { useRefElement, UseRefElementProps, UseRefElementPropsParameters, UseRefElementPropsReturnType, UseRefElementReturnType } from "./use-ref-element";
 import { useState } from "./use-state";
 
@@ -76,14 +77,13 @@ export function useChildManager<I extends ManagedChildInfo<any>>(): UseChildMana
 
 
         // As soon as the component mounts, notify the parent and request a rerender.
-        useLayoutEffect(() => {
+        useLayoutEffect(([prevElement, prevIndex], changes) => {
             if (element) {
                 indicesByElement.current.set(element, info.index);
                 if (managedChildren.current[info.index] != undefined) {
                     console.assert(info.index == undefined, "Two children with the same index were added, which may result in unexpected behavior.");
                     debugger;   // Intentional
                 }
-
 
                 setChildUpdateIndex(c => ++c);
                 managedChildren.current[info.index] = { ...info };
@@ -104,8 +104,8 @@ export function useChildManager<I extends ManagedChildInfo<any>>(): UseChildMana
         // "onClick" updates or whatever.  The relevant child already knows,
         // and that's what matters.
         useLayoutEffect(() => {
-            managedChildren.current[info.index] = { ...info };
-            //setChildUpdateIndex(c => ++c);
+            if (managedChildren.current[info.index] != undefined)
+                managedChildren.current[info.index] = { ...info };
         }, [...Object.entries(info).flat()]);
 
         return { element, getElement, useManagedChildProps: useRefElementProps }

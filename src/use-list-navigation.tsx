@@ -10,7 +10,7 @@ import { RovingTabIndexChildInfo, useRovingTabIndex, UseRovingTabIndexChildProps
 import type { UseLinearNavigationPropsReturnType, UseTypeaheadNavigationParameters, UseTypeaheadNavigationPropsReturnType } from "./use-keyboard-navigation";
 import { useLinearNavigation, useTypeaheadNavigation } from "./use-keyboard-navigation";
 import { UseHasFocusPropsReturnType } from "./use-has-focus";
-import { UseChildManagerReturnType, UseManagedChildReturnType } from "use-child-manager";
+import { UseChildManagerReturnType, UseManagedChildReturnType } from "./use-child-manager";
 
 
 
