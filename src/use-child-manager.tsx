@@ -18,25 +18,26 @@ export interface ManagedChildInfo<T extends number | string> {
     index: T;
 }
 
-/*export interface UseManagedChildReturnType<E extends EventTarget> {
+export interface UseManagedChildReturnType<E extends EventTarget> {
     element: E | null;
-    useManagedChildProps: UseManagedChildProps<E>;
-}*/
+    getElement(): E | null;
+    useManagedChildProps: UseRefElementProps<E>;
+}
 
-export type UsedManagedChild<E extends EventTarget, I extends ManagedChildInfo<any>> = (info: I) => void; //UseManagedChildReturnType<E>;
+export type UsedManagedChild<I extends ManagedChildInfo<any>> = <E extends EventTarget>(info: I) => UseManagedChildReturnType<E>;
 //export type UseManagedChildProps<E extends EventTarget> = <P extends UseManagedChildPropsParameters<E>>(props: P) => UseManagedChildPropsReturnType<E, P>;
 //export type UseManagedChildPropsParameters<E extends EventTarget> = UseRefElementPropsParameters<E>;
 //export type UseManagedChildPropsReturnType<E extends EventTarget, P extends UseManagedChildPropsParameters<E>> = void;
 
 
-export interface UseChildManagerReturnType<ChildType extends EventTarget, I extends ManagedChildInfo<any>> {
+export interface UseChildManagerReturnType<I extends ManagedChildInfo<any>> {
     /**
      * A hook that must be called by every child component that
      * is to be managed by this one. The argument to the hook
      * is just the bag of properties to pass to the parent,
      * including the child's index.
      */
-    useManagedChild: UsedManagedChild<ChildType, I>;
+    useManagedChild: UsedManagedChild<I>;
 
     /**
      * An array of all currently managed children,
@@ -44,6 +45,8 @@ export interface UseChildManagerReturnType<ChildType extends EventTarget, I exte
      * the parent.
      */
     managedChildren: I[];
+
+    indicesByElement: Map<EventTarget, I extends ManagedChildInfo<infer K> ? K : string | number>
 }
 
 /**
@@ -59,32 +62,39 @@ export interface UseChildManagerReturnType<ChildType extends EventTarget, I exte
  * until it unmounts and retracts that information.
  * @returns 
  */
-export function useChildManager<ChildType extends EventTarget, I extends ManagedChildInfo<any>>(): UseChildManagerReturnType<ChildType, I> {
+export function useChildManager<I extends ManagedChildInfo<any>>(): UseChildManagerReturnType<I> {
 
     // This is blindly updated any time a child mounts or unmounts itself.
     // Used to make sure that any time the array of managed children updates,
     // we also re-render.
     const [childUpdateIndex, setChildUpdateIndex] = useState(0);
     const managedChildren = useRef<I[]>([]);
+    const indicesByElement = useRef<Map<EventTarget, I extends ManagedChildInfo<infer K> ? K : string | number>>(new Map());
 
-    const useManagedChild: UsedManagedChild<ChildType, I> = useCallback((info: I) => {
+    const useManagedChild: UsedManagedChild<I> = useCallback(<ChildType extends EventTarget>(info: I) => {
+        const { element, getElement, useRefElementProps } = useRefElement<ChildType>();
+
 
         // As soon as the component mounts, notify the parent and request a rerender.
         useLayoutEffect(() => {
-            if (managedChildren.current[info.index] != undefined) {
-                console.assert(info.index == undefined, "Two children with the same index were added, which may result in unexpected behavior.");
-                debugger;   // Intentional
-            }
+            if (element) {
+                indicesByElement.current.set(element, info.index);
+                if (managedChildren.current[info.index] != undefined) {
+                    console.assert(info.index == undefined, "Two children with the same index were added, which may result in unexpected behavior.");
+                    debugger;   // Intentional
+                }
 
-            
-            setChildUpdateIndex(c => ++c);
-            managedChildren.current[info.index] = { ...info };
 
-            return () => {
                 setChildUpdateIndex(c => ++c);
-                delete managedChildren.current[info.index];
+                managedChildren.current[info.index] = { ...info };
+
+                return () => {
+                    setChildUpdateIndex(c => ++c);
+                    delete managedChildren.current[info.index];
+                    indicesByElement.current.delete(element);
+                }
             }
-        }, [info.index]);
+        }, [element, info.index]);
 
         // Any time our child props change, make that information available generally.
         // *Don't re-render*, otherwise we'd be stuck in an
@@ -96,12 +106,15 @@ export function useChildManager<ChildType extends EventTarget, I extends Managed
         useLayoutEffect(() => {
             managedChildren.current[info.index] = { ...info };
             //setChildUpdateIndex(c => ++c);
-        }, [...Object.entries(info).flat()])
+        }, [...Object.entries(info).flat()]);
+
+        return { element, getElement, useManagedChildProps: useRefElementProps }
     }, []);
 
 
     return {
         useManagedChild,
-        managedChildren: managedChildren.current
+        managedChildren: managedChildren.current,
+        indicesByElement: indicesByElement.current
     }
 }

@@ -86,7 +86,7 @@ function useDroppableProps<P extends UseDroppablePropsParameters<E>>(props: P): 
 ### `useChildManager`
 ```tsx
 export function useChildManager<I extends ManagedChildInfo>(): UseChildManagerReturnType<I>;
-function useManagedChild(info: I): void;
+function useManagedChild<ChildType extends EventTarget>(info: I): void;
 ```
 Sometimes it's useful for child components to report information to their parents, especially in lists of data. This hook lets you do that.
 

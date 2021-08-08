@@ -99,7 +99,7 @@ export function useRovingTabIndex<ParentElement extends Element, I extends Rovin
     const prevTabbable = useRef(-Infinity);
 
     // Call the hook that allows us to collect information from children who provide it
-    const { managedChildren, useManagedChild } = useChildManager<Element | SVGElement, I>();
+    const { managedChildren, useManagedChild } = useChildManager<I>();
     const childCount = managedChildren.length;
 
     // Doesn't do anything, but here because there's a pretty decent chance it might in the future.
@@ -140,7 +140,7 @@ export function useRovingTabIndex<ParentElement extends Element, I extends Rovin
             setTabbable
         } as I;
 
-        useManagedChild(newInfo);
+        const { element, getElement, useManagedChildProps } = useManagedChild<ChildElement>(newInfo);
         const [tabbable, setTabbable2] = useState(getTabbableIndex() == info.index);
         const [shouldFocus, setShouldFocus] = useState(false);
 
@@ -161,7 +161,7 @@ export function useRovingTabIndex<ParentElement extends Element, I extends Rovin
 
         function useRovingTabIndexChildProps<P extends UseRovingTabIndexChildPropsParameters<ChildElement>>({ tabIndex, ...props }: P): UseRovingTabIndexChildPropsReturnType<ChildElement, P> {
 
-            const { element, useRefElementProps } = useRefElement<ChildElement>();
+            //const { element, useRefElementProps } = useRefElement<ChildElement>();
 
             useLayoutEffect(() => {
                 if (element && shouldFocus && "focus" in (element as Element as (Element & HTMLOrSVGElement))) {
@@ -177,7 +177,7 @@ export function useRovingTabIndex<ParentElement extends Element, I extends Rovin
                     tabIndex = -1;
             }
 
-            return useMergedProps<ChildElement>()(useRefElementProps({ tabIndex }), props);
+            return useMergedProps<ChildElement>()(useManagedChildProps({ tabIndex }), props);
         };
 
         return {
