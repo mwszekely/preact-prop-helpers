@@ -120,14 +120,17 @@ const DemoUseAsyncHandler1 = memo(() => {
         settleCount,
         getCurrentCapture,
         hasCapture,
-        onClick,
+        getSyncOnClick,
         currentCapture,
         pending,
         error,
         hasError,
         rejectCount,
         resolveCount
-    } = useAsyncHandler<HTMLButtonElement>()({ event: "onClick", capture: () => { }, debounce: debounce == 0 ? undefined : debounce })(async (v, e) => new Promise((resolve, reject) => window.setTimeout(() => getShouldThrow() ? reject() : resolve(), timeout)));
+    } = useAsyncHandler<HTMLButtonElement>()({ event: "onClick", capture: () => { }, debounce: debounce == 0 ? undefined : debounce });
+
+    const asyncOnClick = ((v: void, e: Event) => new Promise<void>((resolve, reject) => window.setTimeout(() => getShouldThrow() ? reject() : resolve(), timeout)));
+    const onClick = getSyncOnClick(pending? null : asyncOnClick);
 
     return (
         <div className="demo">
@@ -171,14 +174,16 @@ const DemoUseAsyncHandler2 = memo(() => {
         settleCount,
         getCurrentCapture,
         hasCapture,
-        onInput,
+        getSyncOnInput,
         currentCapture,
         pending,
         error,
         hasError,
         rejectCount,
         resolveCount
-    } = useAsyncHandler<HTMLInputElement>()({ event: "onInput", capture: e => { e.preventDefault(); return e.currentTarget.value }, debounce: debounce == 0 ? undefined : debounce })(async (v, e) => new Promise((resolve, reject) => window.setTimeout(() => {
+    } = useAsyncHandler<HTMLInputElement>()({ event: "onInput", capture: e => { e.preventDefault(); return e.currentTarget.value }, debounce: debounce == 0 ? undefined : debounce });
+    
+    const onInput = getSyncOnInput(async (v, e) => new Promise((resolve, reject) => window.setTimeout(() => {
         if (getShouldThrow()) {
             reject();
         }
