@@ -10,6 +10,7 @@ import { RovingTabIndexChildInfo, useRovingTabIndex, UseRovingTabIndexChildProps
 import type { UseLinearNavigationPropsReturnType, UseTypeaheadNavigationParameters, UseTypeaheadNavigationPropsReturnType } from "./use-keyboard-navigation";
 import { useLinearNavigation, useTypeaheadNavigation } from "./use-keyboard-navigation";
 import { UseHasFocusPropsReturnType } from "./use-has-focus";
+import { UseChildManagerReturnType, UseManagedChildReturnType } from "use-child-manager";
 
 
 
@@ -52,7 +53,7 @@ const dummy: any = null;
 
 
 
-export interface UseListNavigationReturnType<ParentElement extends Element, I extends UseListNavigationChildInfo> {
+export interface UseListNavigationReturnType<ParentElement extends Element, I extends UseListNavigationChildInfo> extends Omit<UseChildManagerReturnType<I>, "useManagedChild"> {
     useListNavigationProps: UseListNavigationProps<ParentElement>;
     useListNavigationChild: UseListNavigationChild<I>;
 
@@ -65,7 +66,7 @@ export interface UseListNavigationReturnType<ParentElement extends Element, I ex
      */
     tabbableIndex: number;
 
-    managedChildren: I[];
+    //managedChildren: I[];
 
     /**
      * Allows programmatic control of the currently tabbable index.
@@ -172,7 +173,7 @@ export function useListNavigation<ParentElement extends Element, I extends UseLi
     const setIndex = useCallback((index: number | ((prev: number) => number)) => {
         setTabbableIndex(index);
     }, [])
-    const { childCount, managedChildren, useRovingTabIndexProps, useRovingTabIndexChild, focusSelf } = useRovingTabIndex<ParentElement, I>({ tabbableIndex: tabbableIndex as any })
+    const { childCount, managedChildren, indicesByElement, useRovingTabIndexProps, useRovingTabIndexChild, focusSelf } = useRovingTabIndex<ParentElement, I>({ tabbableIndex: tabbableIndex as any })
     const { currentTypeahead, invalidTypeahead, useTypeaheadNavigationChild, useTypeaheadNavigationProps } = useTypeaheadNavigation<ParentElement, number>({ collator, getIndex: getTabbableIndex, setIndex, typeaheadTimeout: 1000 });
     const { navigateToEnd, navigateToIndex, navigateToNext, navigateToPrev, navigateToStart, useLinearNavigationProps } = useLinearNavigation<ParentElement>({ getIndex: getTabbableIndex, setIndex, managedChildren });
 
@@ -225,6 +226,7 @@ export function useListNavigation<ParentElement extends Element, I extends UseLi
         setTabbableIndex,
 
         managedChildren,
+        indicesByElement,
 
         navigateToIndex,
         navigateToNext,

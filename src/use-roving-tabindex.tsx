@@ -5,7 +5,7 @@ import { useLayoutEffect } from "./use-layout-effect";
 import { MergedProps, useMergedProps } from "./use-merged-props"
 import { useState } from "./use-state";
 import { useTimeout } from "./use-timeout";
-import { useChildManager, ManagedChildInfo } from "./use-child-manager";
+import { useChildManager, ManagedChildInfo, UseChildManagerReturnType } from "./use-child-manager";
 import { useStableGetter } from "./use-stable-getter";
 import { useHasFocus, UseHasFocusPropsReturnType } from "./use-has-focus";
 
@@ -13,11 +13,10 @@ import { useHasFocus, UseHasFocusPropsReturnType } from "./use-has-focus";
 
 
 /** Return type of `useRovingTabIndex` */
-export interface UseRovingTabIndexReturnType<ParentElement extends Element, I extends RovingTabIndexChildInfo<any>> {
+export interface UseRovingTabIndexReturnType<ParentElement extends Element, I extends RovingTabIndexChildInfo<any>> extends Omit<UseChildManagerReturnType<I>, "useManagedChild"> {
     useRovingTabIndexProps: UseRovingTabIndexProps<ParentElement>;
     useRovingTabIndexChild: UseRovingTabIndexChild<I>;
     childCount: number;
-    managedChildren: I[];
 
     // Focuses whatever is the currently tabbable element
     focusSelf(): void;
@@ -99,7 +98,7 @@ export function useRovingTabIndex<ParentElement extends Element, I extends Rovin
     const prevTabbable = useRef(-Infinity);
 
     // Call the hook that allows us to collect information from children who provide it
-    const { managedChildren, useManagedChild } = useChildManager<I>();
+    const { managedChildren, useManagedChild, indicesByElement } = useChildManager<I>();
     const childCount = managedChildren.length;
 
     // Doesn't do anything, but here because there's a pretty decent chance it might in the future.
@@ -192,6 +191,7 @@ export function useRovingTabIndex<ParentElement extends Element, I extends Rovin
         useRovingTabIndexChild,
         childCount,
         managedChildren,
+        indicesByElement,
         focusSelf
     }
 }
