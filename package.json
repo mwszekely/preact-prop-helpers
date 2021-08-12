@@ -7,10 +7,12 @@
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "watch": "tsc --watch",
-    "build": "tsc --build",
+    "build": "npm-run-all --npm-path npm -pc build:*",
+    "watch": "npm-run-all --npm-path npm -pc watch:*",
+    "watch:ts": "tsc --watch",
+    "build:ts": "tsc",
     "test": "jest",
-    "install": "npm run build || true",
+    "install": "npm run build",
     "clean": "tsc --build --clean"
   },
   "author": "",
@@ -30,9 +32,11 @@
     "jest": "^27.0.6",
     "jsdom": "^16.6.0",
     "microbundle": "^0.13.3",
+    "npm-run-all": "^4.1.5",
+    "run": "^1.4.0",
     "serve": "^12.0.0",
     "ts-jest": "^27.0.4",
-    "typescript": "^4.4.0-dev.20210729"
+    "typescript": "^4.4.0-beta"
   },
   "dependencies": {
     "@types/jsdom": "^16.2.13",
