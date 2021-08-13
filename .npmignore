@@ -1,1 +1,2 @@
 # This file intentionally left empty
+# (without it the prepare scripts don't run inside node_modules)
