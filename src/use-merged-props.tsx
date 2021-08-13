@@ -13,7 +13,7 @@ type ElementFromAttributes<A extends { ref?: Ref<any> }> = A["ref"] extends Ref<
 /**
  * A type that represents the merging of two prop objects
  */
-export type MergedProps<E extends EventTarget, T extends h.JSX.HTMLAttributes<E>, U extends h.JSX.HTMLAttributes<E>> = h.JSX.HTMLAttributes<E>;
+export type MergedProps<E extends EventTarget, T extends h.JSX.HTMLAttributes<E>, U extends h.JSX.HTMLAttributes<E>> = h.JSX.HTMLAttributes<E> & Omit<T, keyof h.JSX.HTMLAttributes<E>> & Omit<U, keyof h.JSX.HTMLAttributes<E>>;
 
 // Generally too complex
 //Pick<h.JSX.HTMLAttributes<E>, keyof h.JSX.HTMLAttributes<E> & (keyof T | keyof U)>; 
