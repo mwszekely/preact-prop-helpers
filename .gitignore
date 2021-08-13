@@ -5,6 +5,7 @@
 package-lock.json
 !rollup.config.js
 !docs/bundle.js
+!true.js
 demo/main.js
 demo/main.js.map
 demo/index.css
