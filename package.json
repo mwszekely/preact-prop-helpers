@@ -12,7 +12,7 @@
     "watch:ts": "tsc --watch",
     "build:ts": "tsc",
     "test": "jest",
-    "postinstall": "npm run build",
+    "postinstall": "npx npm-run-all --npm-path npm -pc build",
     "clean": "tsc --build --clean"
   },
   "author": "",
