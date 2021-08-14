@@ -4,8 +4,10 @@ import "blocking-elements";
 import { useLayoutEffect, useRef } from "preact/hooks";
 import { isFocusable } from "tabbable";
 import { BlockingElements } from "blocking-elements";
+import { useActiveElement } from "use-has-focus";
 
 const blockingElements = (document as any).$blockingElements as BlockingElements;
+const elementsToRestoreFocusTo = new Map<Element | null, (Node & HTMLOrSVGElement)>();
 
 /**
  * Allows an element to trap focus by applying the "inert" attribute to all sibling, aunt, and uncle nodes.
@@ -17,20 +19,18 @@ const blockingElements = (document as any).$blockingElements as BlockingElements
  */
 export function useBlockingElement<E extends Element>(target: E | null) {
 
-
-    useLayoutEffect(() => {
-        addFocusHandler();
-        return () => removeFocusHandler();
-    }, []);
+    const { getActiveElement, getLastFocusedElement } = useActiveElement();
 
     useLayoutEffect(() => {
         if (target) {
 
             // Save the currently focused element
             // to whatever's currently at the top of the stack
-            elementsToRestoreFocusTo.set(blockingElements.top, lastFocusedElement ?? document.body);
+            elementsToRestoreFocusTo.set(blockingElements.top, getLastFocusedElement() ?? document.body);
             blockingElements.push(target as Element as HTMLElement);
             let rafHandle = requestAnimationFrame(() => {
+                // TODO: This extra queueMicrotask is needed for
+                // ...reasons?
                 queueMicrotask(() => {
                     findFirstFocusable(blockingElements.top!)?.focus();
                     rafHandle = 0;
@@ -48,10 +48,11 @@ export function useBlockingElement<E extends Element>(target: E | null) {
 
             // Restore the focus to the element
             // that has returned to the top of the stack
-
             let rafHandle = requestAnimationFrame(() => {
-                elementsToRestoreFocusTo.get(blockingElements.top)?.focus();
-                rafHandle = 0;
+                queueMicrotask(() => {
+                    elementsToRestoreFocusTo.get(blockingElements.top)?.focus();
+                    rafHandle = 0;
+                });
             });
 
             return () => {
@@ -71,30 +72,6 @@ function findFirstFocusable(element: Node) {
     const firstFocusable = treeWalker.firstChild() as (Element & HTMLOrSVGElement) | null;
 
     return firstFocusable;
-}
-
-const elementsToRestoreFocusTo = new Map<Element | null, (Node & HTMLOrSVGElement)>();
-let lastFocusedElement: (Node & HTMLOrSVGElement) = document.body;
-let handlerCount = 0;
-function addFocusHandler() {
-    if (handlerCount === 0) {
-        document.addEventListener("focus", focusHandler, { capture: true })
-    }
-    ++handlerCount;
-}
-
-function removeFocusHandler() {
-    --handlerCount;
-    if (handlerCount === 0) {
-        document.removeEventListener("focus", focusHandler, { capture: true });
-    }
-}
-
-function focusHandler(e: FocusEvent) {
-    let focusedElement = e.target;
-    if (focusedElement instanceof Node && document.body != focusedElement && document.body.contains(focusedElement)) {
-        lastFocusedElement = focusedElement as (Node & HTMLOrSVGElement);
-    }
 }
 
 
