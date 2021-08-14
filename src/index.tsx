@@ -17,6 +17,7 @@ export { useDraggable } from "./use-draggable";
 export { useDroppable } from "./use-droppable";
 export { useGlobalHandler, useLocalHandler } from "./use-event-handler";
 export { useHasFocus } from "./use-has-focus";
+export { useActiveElement } from "./use-active-element";
 export { useInterval } from "./use-interval";
 export { usePersistentState } from "./use-persistent-state";
 export { useRandomId } from "./use-random-id";
