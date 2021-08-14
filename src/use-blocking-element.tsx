@@ -4,7 +4,7 @@ import "blocking-elements";
 import { useLayoutEffect, useRef } from "preact/hooks";
 import { isFocusable } from "tabbable";
 import { BlockingElements } from "blocking-elements";
-import { useActiveElement } from "use-has-focus";
+import { useActiveElement } from "./use-active-element";
 
 const blockingElements = (document as any).$blockingElements as BlockingElements;
 const elementsToRestoreFocusTo = new Map<Element | null, (Node & HTMLOrSVGElement)>();
