@@ -31,7 +31,7 @@ export function useBlockingElement<E extends Element>(target: E | null) {
             elementsToRestoreFocusTo.set(blockingElements.top, lastFocusedElement ?? document.body);
             blockingElements.push(target as Element as HTMLElement);
             let rafHandle = requestAnimationFrame(() => {
-                requestAnimationFrame(() => {
+                queueMicrotask(() => {
                     findFirstFocusable(blockingElements.top!)?.focus();
                     rafHandle = 0;
                 })
