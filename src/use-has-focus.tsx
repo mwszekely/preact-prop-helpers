@@ -197,6 +197,9 @@ function focusin(e: FocusEvent) {
     for (let f of updaters) { f(); }
 }
 
+function getActiveElement() { return currentlyFocusedElement; }
+function getLastFocusedElement() { return lastFocusedElement; }
+
 
 
 export function useActiveElement() {
@@ -221,6 +224,8 @@ export function useActiveElement() {
 
     return {
         activeElement: currentlyFocusedElement,
-        lastActiveElement: lastFocusedElement
+        lastActiveElement: lastFocusedElement,
+        getActiveElement,
+        getLastFocusedElement
     }
 }
