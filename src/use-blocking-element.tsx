@@ -76,7 +76,7 @@ let lastFocusedElement: (Node & HTMLOrSVGElement) = document.body;
 let handlerCount = 0;
 function addFocusHandler() {
     if (handlerCount === 0) {
-        document.addEventListener("focus", focusHandler)
+        document.addEventListener("focus", focusHandler, { capture: true })
     }
     ++handlerCount;
 }
@@ -84,7 +84,7 @@ function addFocusHandler() {
 function removeFocusHandler() {
     --handlerCount;
     if (handlerCount === 0) {
-        document.removeEventListener("focus", focusHandler);
+        document.removeEventListener("focus", focusHandler, { capture: true });
     }
 }
 
