@@ -202,22 +202,28 @@ function focusin(e: FocusEvent) {
     for (let f of updaters) { f(); }
 }
 
+let windowFocused = true;
+function windowFocus() {
+    windowFocused = true;
+    for (let f of updaters) { f(); }
+}
+
+function windowBlur() {
+    windowFocused = true;
+    for (let f of updaters) { f(); }
+}
 
 
 export function useActiveElement() {
     const [i, setI] = useState(0);
-    const [windowFocused, setWindowFocused] = useState(true);
-
-    const wfTrue = useCallback(() => { setWindowFocused(true);  }, [])
-    const wfFalse = useCallback(() => { setWindowFocused(false);  }, [])
 
     useLayoutEffect(() => {
         const F = () => setI(i => ++i);
         if (updaters.size === 0) {
             document.addEventListener("focusin", focusin, { passive: true });
             document.addEventListener("focusout", focusout, { passive: true });
-            window.addEventListener("focus", wfTrue, { passive: true });
-            window.addEventListener("blur", wfFalse, { passive: true });
+            window.addEventListener("focus", windowFocus, { passive: true });
+            window.addEventListener("blur", windowBlur, { passive: true });
         }
         updaters.add(F);
 
@@ -226,8 +232,8 @@ export function useActiveElement() {
             if (updaters.size === 0) {
                 document.removeEventListener("focusin", focusin);
                 document.removeEventListener("focusout", focusout);
-                window.removeEventListener("focus", wfTrue);
-                window.removeEventListener("blur", wfFalse);
+                window.removeEventListener("focus", windowFocus);
+                window.removeEventListener("blur", windowBlur);
             }
         }
     }, []);
