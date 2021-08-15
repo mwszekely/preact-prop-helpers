@@ -84,7 +84,7 @@ export function useLinearNavigation<ParentElement extends Element>({ getIndex, s
         if (index < 0) {
             setIndex(0);
         }
-        else if (childCount >= 0 && index >= childCount) {
+        else if (childCount > 0 && index >= childCount) {
             setIndex(childCount - 1);
         }
     }, [index, childCount]);
