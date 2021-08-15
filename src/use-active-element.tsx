@@ -177,7 +177,12 @@ export function useHasFocus<T extends Node>({ }: UseFocusParameters = {}): UseHa
 
 let currentlyFocusedElement: (Element & HTMLOrSVGElement) | null = null;
 let lastFocusedElement: (Element & HTMLOrSVGElement) | null = null;
-
+function getLastFocusedElement() {
+    return lastFocusedElement;
+}
+function getCurrentlyFocusedElement() {
+    return currentlyFocusedElement;
+}
 
 const updaters = new Set<() => void>();
 
@@ -230,6 +235,8 @@ export function useActiveElement() {
     return {
         activeElement: currentlyFocusedElement,
         lastActiveElement: lastFocusedElement,
+        getActiveElement: getCurrentlyFocusedElement,
+        getLastActiveElement: getLastFocusedElement,
         windowFocused
     }
 }
