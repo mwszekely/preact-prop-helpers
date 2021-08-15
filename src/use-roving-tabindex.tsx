@@ -114,7 +114,7 @@ export function useRovingTabIndex<ParentElement extends Element, I extends Rovin
 
             if (managedChildren[tabbableIndex]) {
                 managedChildren[prevTabbable.current]?.setTabbable(false, undefined);
-                managedChildren[tabbableIndex].setTabbable(true, focusOnChange? "focus" : undefined);
+                managedChildren[tabbableIndex].setTabbable(true, focusOnChange ? "focus" : undefined);
                 prevTabbable.current = tabbableIndex;
             }
         }
@@ -123,7 +123,7 @@ export function useRovingTabIndex<ParentElement extends Element, I extends Rovin
 
     const focusSelf = useCallback(() => {
         managedChildren[tabbableIndex].setTabbable(true, "focus");
-     }, [tabbableIndex]);
+    }, [tabbableIndex]);
 
     const useRovingTabIndexChild = useCallback<UseRovingTabIndexChild<I>>(<ChildElement extends Element>(info: Omit<I, "setTabbable">): UseRovingTabIndexChildReturnType<ChildElement> => {
 
@@ -164,7 +164,11 @@ export function useRovingTabIndex<ParentElement extends Element, I extends Rovin
 
             useLayoutEffect(() => {
                 if (element && shouldFocus && "focus" in (element as Element as (Element & HTMLOrSVGElement))) {
-                    (element as Element as (Element & HTMLOrSVGElement)).focus();
+                    requestAnimationFrame(() => {
+                        queueMicrotask(() => {
+                            (element as Element as (Element & HTMLOrSVGElement)).focus();
+                        });
+                    })
                     setShouldFocus(false);
                 }
             }, [element, shouldFocus])
