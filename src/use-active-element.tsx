@@ -209,7 +209,7 @@ function windowFocus() {
 }
 
 function windowBlur() {
-    windowFocused = true;
+    windowFocused = false;
     for (let f of updaters) { f(); }
 }
 
