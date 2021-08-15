@@ -415,6 +415,14 @@ export function useTypeaheadNavigation<ParentElement extends Element, I extends 
             if (e.ctrlKey || e.metaKey)
                 return;
 
+            if (!imeActive && e.key === "Backspace") {
+                // Remove the last character in a way that doesn't split UTF-16 surrogates.
+                setCurrentTypeahead(t => t === null? null : [...t].reverse().slice(1).reverse().join(""));
+                e.preventDefault();
+                e.stopPropagation();
+                return;
+            }
+
             // The key property represents the typed character OR the "named key attribute" of the key pressed.
             // There's no definite way to tell the difference, but for all intents and purposes
             // there are no one-character names, and there are no non-ASCII-alpha names.
