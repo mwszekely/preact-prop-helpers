@@ -7,6 +7,7 @@ import { DemoUseRovingTabIndex } from "./demos/use-roving-tab-index";
 import { useHasFocus } from "../use-has-focus";
 import { DemoUseInterval } from "./demos/use-interval";
 import { DemoUseTimeout } from "./demos/use-timeout";
+import { useActiveElement } from "../use-active-element";
 
 const RandomWords = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
 
@@ -224,6 +225,7 @@ const DemoUseAsyncHandler2 = memo(() => {
 
 
 const DemoFocus = memo(() => {
+    const { activeElement, getLastActiveElement, getActiveElement, lastActiveElement, windowFocused } = useActiveElement();
     const { focused, focusedInner, useHasFocusProps } = useHasFocus<HTMLDivElement>();
     return (
         <div class="demo">
@@ -233,6 +235,9 @@ const DemoFocus = memo(() => {
                 <ul>
                     <li>Strictly focused: {focused.toString()}</li>
                     <li>Inner focused: {focusedInner.toString()}</li>
+                    <li>Window focused: {windowFocused.toString()}</li>
+                    <li>activeElement: {activeElement?.tagName}</li>
+                    <li>lastActiveElement: {lastActiveElement?.tagName}</li>
                 </ul>
             </div>
         </div>

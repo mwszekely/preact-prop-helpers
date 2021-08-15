@@ -206,7 +206,7 @@ function focusin(e: FocusEvent) {
 
 export function useActiveElement() {
     const [i, setI] = useState(0);
-    const [windowFocused, setWindowFocused] = useState(false);
+    const [windowFocused, setWindowFocused] = useState(true);
 
     const wfTrue = useCallback(() => { setWindowFocused(true);  }, [])
     const wfFalse = useCallback(() => { setWindowFocused(false);  }, [])
