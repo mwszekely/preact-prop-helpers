@@ -19,14 +19,14 @@ const elementsToRestoreFocusTo = new Map<Element | null, (Node & HTMLOrSVGElemen
  */
 export function useBlockingElement<E extends Element>(target: E | null) {
 
-    const { getActiveElement, getLastFocusedElement } = useActiveElement();
+    const { getActiveElement, getLastActiveElement } = useActiveElement();
 
     useLayoutEffect(() => {
         if (target) {
 
             // Save the currently focused element
             // to whatever's currently at the top of the stack
-            elementsToRestoreFocusTo.set(blockingElements.top, getLastFocusedElement() ?? document.body);
+            elementsToRestoreFocusTo.set(blockingElements.top, getLastActiveElement() ?? document.body);
             blockingElements.push(target as Element as HTMLElement);
             let rafHandle = requestAnimationFrame(() => {
                 // TODO: This extra queueMicrotask is needed for
