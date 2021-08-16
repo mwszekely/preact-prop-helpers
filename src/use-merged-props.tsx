@@ -72,6 +72,11 @@ export function useMergedProps<E extends EventTarget>() {
                     ret[rhsKey as keyof MergedProps<E, T, U>] = rhsValue as never;
                 else if (rhsValue == null)
                     ret[rhsKey as keyof MergedProps<E, T, U>] = lhsValue as never;
+                else if ((rhsValue as any) == lhsValue) {
+                    // I mean, they're the same value at least
+                    // so we don't need to do anything.
+                    // Not really ideal though.
+                }
                 else {
                     // Ugh.
                     // No good strategies here, just log it if requested

@@ -24,74 +24,24 @@ export interface UseFocusTrapParameters { trapActive: boolean; }
 
 export interface UseFocusTrapReturnType<E extends Node> extends Omit<UseRefElementReturnType<E>, "useRefElementProps"> {
     useFocusTrapProps: UseFocusTrapProps<E>;
-    //useFocusTrapFocusable: UseFocusTrapFocusable;
 }
 
-/*interface UseFocusTrapFocusableReturnType<E extends Node> {
-    useFocusTrapFocusableProps: UseFocusTrapFocusableProps<E>;
-}*/
 
 export interface UseFocusTrapPropsParameters<E extends Node> extends UseRefElementPropsParameters<E> { }
 export type UseFocusTrapPropsReturnType<E extends Node, P extends UseRefElementPropsParameters<E>> = MergedProps<E, {}, UseRefElementPropsReturnType<E, P>>;
-
-//export interface UseFocusTrapFocusableParameters<E extends Node> extends UseRefElementPropsParameters<E> { }
-//export type UseFocusTrapFocusable = <ChildElement extends (Node & HTMLOrSVGElement), P extends FocusTrapChildInfo>(props: P) => UseFocusTrapFocusableReturnType<ChildElement>;
-//export type UseFocusTrapFocusableProps<ChildElement extends Node> = <P extends UseFocusTrapFocusablePropsParameters<ChildElement>>(props: P) => UseFocusTrapFocusablePropsReturnType<ChildElement, P>;
-//export type UseFocusTrapFocusablePropsParameters<ChildElement extends Node> = UseRefElementPropsParameters<ChildElement>;
-//export type UseFocusTrapFocusablePropsReturnType<ChildElement extends Node, P extends UseFocusTrapFocusablePropsParameters<ChildElement>> = MergedProps<UseRefElementPropsReturnType<ChildElement, { onKeyDown: (e: KeyboardEvent) => void; }>, P>;
 
 type UseFocusTrapProps<E extends Node> = <P extends UseFocusTrapPropsParameters<E>>({ ref, ...rest }: P) => UseFocusTrapPropsReturnType<E, P>;
 
 
 // Keep track of the last focused element (not including the body element)
 // Used by the focus trap to know what to restore to.
-/*
-let lastFocusedElement: HTMLOrSVGElement | null = null;
-function handler(e: FocusEvent) {
-    if (e.target instanceof Element && document.body.contains(e.target) && e.target != document.body) {
-        lastFocusedElement = e.target as HTMLElement;
-    }
-}
-let listeners = 0;
-function addListener() {
-    if (listeners === 0)
-        document.addEventListener("focusin", handler, { passive: true });
-    
-        ++listeners;
-}
-
-function removeListener() {
-    --listeners;
-
-    if (listeners === 0)
-        document.removeEventListener("focusin", handler);
-}*/
 
 
 export function useFocusTrap<E extends HTMLElement>({ trapActive }: UseFocusTrapParameters): UseFocusTrapReturnType<E> {
     const { element, useRefElementProps, getElement } = useRefElement<E>();
 
 
-    //const [elementToRestore, setElementToRestore, getElementToRestore] = useState<HTMLOrSVGElement | null>(null);
-
-    /*useLayoutEffect(() => {
-        addListener();
-        return () => removeListener();
-    }, [])
-
-    useLayoutEffect(() => {
-        if (trapActive && lastFocusedElement) {
-            setElementToRestore(lastFocusedElement ?? document.body);
-            return () => {
-                let elementToRestore = getElementToRestore()!;
-                requestAnimationFrame(() => {
-                    elementToRestore.focus();
-                })
-            }
-        }
-    }, [trapActive]);*/
-
-    let active = (trapActive /*&& !!elementToRestore*/);
+    let active = (trapActive);
     useBlockingElement(active ? element : null);
 
     const useFocusTrapProps: UseFocusTrapProps<E> = (<P extends UseFocusTrapPropsParameters<E>>(props: P): UseFocusTrapPropsReturnType<E, P> => {
