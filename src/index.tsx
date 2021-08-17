@@ -26,6 +26,6 @@ export { useChildManager, ManagedChildInfo } from "./use-child-manager";
 export { useRovingTabIndex, UseRovingTabIndexChild, UseRovingTabIndexReturnType, RovingTabIndexChildInfo, UseRovingTabIndexChildPropsReturnType, UseRovingTabIndexChildReturnType, UseRovingTabIndexParameters, UseRovingTabIndexProps, UseRovingTabIndexPropsReturnType } from "./use-roving-tabindex";
 export { useListNavigation, UseListNavigationChild, UseListNavigationChildPropsReturnType, UseListNavigationChildReturnType, UseListNavigationParameters, UseListNavigationProps, UseListNavigationPropsReturnType, UseListNavigationReturnType } from "./use-list-navigation"
 
-export { useFocusTrap, UseFocusTrapReturnType, UseFocusTrapParameters, FocusTrapChildInfo, UseFocusTrapPropsParameters, UseFocusTrapPropsReturnType } from "./use-focus-trap";
+export { useFocusTrap, UseFocusTrapReturnType, UseFocusTrapParameters, UseFocusTrapPropsParameters, UseFocusTrapPropsReturnType } from "./use-focus-trap";
 
 

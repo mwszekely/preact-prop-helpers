@@ -6,40 +6,15 @@ import { ManagedChildInfo } from "./use-child-manager";
 import { MergedProps, useMergedProps } from "./use-merged-props";
 import { useRefElement, UseRefElementPropsParameters, UseRefElementPropsReturnType, UseRefElementReturnType } from "./use-ref-element";
 
-
-export interface FocusTrapChildInfo extends Omit<ManagedChildInfo<string>, "index"> {
-    /**
-     * If true, the element will not be able to receive focus via the keyboard, 
-     * but if it is the first "focusable" descendant, then it will still receive focus on mount.  
-     * This will make it "first" in the tabIndex order, but it won't actually be focusable.
-     * 
-     * This is extremely useful if there are no elements in the focus trap that receive
-     * focus in the traditional sense (e.g. an alert without a close button where you
-     * just click the backdrop to dismiss it) or if the first element that would normally receive
-     * focus isn't at the top and would result in the page scrolling immediately on load.
-     */
-    inert?: boolean;
-}
-
 export interface UseFocusTrapParameters { trapActive: boolean; }
 
 export interface UseFocusTrapReturnType<E extends Node> extends Omit<UseRefElementReturnType<E>, "useRefElementProps"> {
     useFocusTrapProps: UseFocusTrapProps<E>;
-    //useFocusTrapFocusable: UseFocusTrapFocusable;
 }
 
-/*interface UseFocusTrapFocusableReturnType<E extends Node> {
-    useFocusTrapFocusableProps: UseFocusTrapFocusableProps<E>;
-}*/
 
 export interface UseFocusTrapPropsParameters<E extends Node> extends UseRefElementPropsParameters<E> { }
 export type UseFocusTrapPropsReturnType<E extends Node, P extends UseRefElementPropsParameters<E>> = MergedProps<E, {}, UseRefElementPropsReturnType<E, P>>;
-
-//export interface UseFocusTrapFocusableParameters<E extends Node> extends UseRefElementPropsParameters<E> { }
-//export type UseFocusTrapFocusable = <ChildElement extends (Node & HTMLOrSVGElement), P extends FocusTrapChildInfo>(props: P) => UseFocusTrapFocusableReturnType<ChildElement>;
-//export type UseFocusTrapFocusableProps<ChildElement extends Node> = <P extends UseFocusTrapFocusablePropsParameters<ChildElement>>(props: P) => UseFocusTrapFocusablePropsReturnType<ChildElement, P>;
-//export type UseFocusTrapFocusablePropsParameters<ChildElement extends Node> = UseRefElementPropsParameters<ChildElement>;
-//export type UseFocusTrapFocusablePropsReturnType<ChildElement extends Node, P extends UseFocusTrapFocusablePropsParameters<ChildElement>> = MergedProps<UseRefElementPropsReturnType<ChildElement, { onKeyDown: (e: KeyboardEvent) => void; }>, P>;
 
 type UseFocusTrapProps<E extends Node> = <P extends UseFocusTrapPropsParameters<E>>({ ref, ...rest }: P) => UseFocusTrapPropsReturnType<E, P>;
 
