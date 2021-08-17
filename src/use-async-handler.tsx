@@ -22,10 +22,8 @@ export type GenericAsyncHandler<CaptureType, Target extends EventTarget> = Async
 //const NoError = Symbol("no-error");
 //const NoCapture = Symbol("no-capture");
 
-export interface UseAsyncHandlerParameters<E extends EventTarget, A extends (`on${string}` & keyof ExtractFunction<Required<h.JSX.HTMLAttributes<E>>>), CaptureType> {
-    capture: (event: Parameters<Required<h.JSX.HTMLAttributes<E>>[A]>[0]) => CaptureType;
-
-    event: A;
+export interface UseAsyncHandlerParameters<ElementType extends EventTarget, EventType extends h.JSX.TargetedEvent<ElementType>, CaptureType> {
+    capture: (event: EventType) => CaptureType;
 
     /**
      * If provided, adds a debounce behavior *in addition* to
@@ -34,9 +32,17 @@ export interface UseAsyncHandlerParameters<E extends EventTarget, A extends (`on
     debounce?: number;
 }
 
-export type UseAsyncHandlerReturnType<E extends EventTarget, A extends (`on${string}` & keyof ExtractFunction<Required<h.JSX.HTMLAttributes<E>>>), CaptureType> = { 
-    [K in A as `getSync${Capitalize<K>}`]: (asyncHandler: ((value: CaptureType, event: Parameters<Required<h.JSX.HTMLAttributes<E>>[A]>[0]) => (Promise<void> | void)) | null | undefined) => Required<h.JSX.HTMLAttributes<E>>[A] 
-} & {
+export interface UseAsyncHandlerReturnType<ElementType extends EventTarget, EventType extends h.JSX.TargetedEvent<ElementType>, CaptureType> { 
+
+    /**
+     * Pass the actual asynchronous handler you'd like to use to this function, 
+     * and you'll get the synchronous handler back.
+     * 
+     * Passing `null` is a way to disable the handler, for example, while one is already pending, if you'd like to do so.
+     * Because 
+     * 
+     */
+    getSyncHandler: (asyncHandler: null | ((value: CaptureType, event: EventType) => (Promise<void> | void))) => h.JSX.EventHandler<EventType>;
 
     /**
      * Whether or not the handler has been called but has not completed yet.
@@ -134,8 +140,8 @@ export type UseAsyncHandlerReturnType<E extends EventTarget, A extends (`on${str
  * like `mouseX` or something, but is stale at least in regards to the
  * element it references.
  */
-export function useAsyncHandler<E extends EventTarget>() {
-    return function <A extends (`on${string}` & keyof ExtractFunction<Required<h.JSX.HTMLAttributes<E>>>), CaptureType>({ capture, event: eventName, debounce }: UseAsyncHandlerParameters<E, A, CaptureType>) {
+export function useAsyncHandler<ElementType extends EventTarget>() {
+    return function <EventType extends h.JSX.TargetedEvent<ElementType>, CaptureType>({ capture, debounce }: UseAsyncHandlerParameters<ElementType, EventType, CaptureType>) {
 
         // Always represents whatever promise is currently being waited on, or null if none.
         const [promise, setPromise, getPromise] = useState<Promise<void> | null>(null);
@@ -257,8 +263,8 @@ export function useAsyncHandler<E extends EventTarget>() {
 
 
 
-        let ret: UseAsyncHandlerReturnType<E, A, CaptureType> = {
-            ...{ [`getSync${capitalize(eventName)}`]: getSyncHandler } as unknown as { [K in A as `getSync${Capitalize<K>}`]: (asyncHandler: ((value: CaptureType, event: Parameters<Required<h.JSX.HTMLAttributes<E>>[A]>[0]) => (Promise<void> | void)) | null | undefined) => Required<h.JSX.HTMLAttributes<E>>[A] },
+        let ret: UseAsyncHandlerReturnType<ElementType, EventType, CaptureType> = {
+            getSyncHandler,
             getCurrentCapture,
             callCount: runCount,
             currentCapture,
@@ -274,14 +280,13 @@ export function useAsyncHandler<E extends EventTarget>() {
 
         return ret;
 
-        function getSyncHandler(asyncHandler: undefined | null | ((value: CaptureType, event: Parameters<Required<h.JSX.HTMLAttributes<E>>[A]>[0]) => (Promise<void> | void))): Required<h.JSX.HTMLAttributes<E>>[A] {
+        function getSyncHandler(asyncHandler: null | ((value: CaptureType, event: EventType) => (Promise<void> | void))): h.JSX.EventHandler<EventType> {
 
-            const syncHandler = useStableCallback(function syncHandler(e: Event) {
+            const syncHandler = useStableCallback<h.JSX.EventHandler<EventType>>(function syncHandler(event: EventType) {
 
                 if (asyncHandler == null)
                     return;
 
-                const event = e as Parameters<Required<h.JSX.HTMLAttributes<E>>[A]>[0];
 
                 // Get the most significant information from the event at this time,
                 // which is necessary since the promise could actually be called much later

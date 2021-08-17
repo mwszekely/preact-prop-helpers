@@ -61,7 +61,6 @@ export interface UseChildManagerReturnType<I extends ManagedChildInfo<any>> {
  * This function registers the child with the parent and provides
  * it with any requested information, but doesn't do anything else
  * until it unmounts and retracts that information.
- * @returns 
  */
 export function useChildManager<I extends ManagedChildInfo<any>>(): UseChildManagerReturnType<I> {
 
