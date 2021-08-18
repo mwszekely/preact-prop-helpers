@@ -90,28 +90,26 @@ export function useMergedProps<E extends EventTarget>() {
     }
 }
 
-function mergeFunctions<T extends (...args: any[]) => any, U extends (((...args: any[]) => any) | null | undefined)[]>(first: T | null | undefined, ...rest: U): (...args: Parameters<T>) => void {
+function mergeFunctions<T extends (...args: any[]) => any, U extends (...args: any[]) => any>(lhs: T | null | undefined, rhs: U | null | undefined) {
+
+    if (!lhs)
+        return rhs;
+    if (!rhs)
+        return lhs;
+
     return (...args: Parameters<T>) => {
-        first?.(...args);
-        for (let callback of rest) {
-            callback?.(...args);
-        }
+        lhs?.(...args);
+        rhs?.(...args);
     };
 }
-
-/*type ZipSingle<Lhs extends h.JSX.HTMLAttributes<any>, Rhs extends h.JSX.HTMLAttributes<any>, K extends (keyof Lhs | keyof Rhs)> = 
-Lhs extends { [K2 in K]: any }?;*/
-
-/*Pick<Lhs, K> extends never ? Extract<Rhs, K> extends never? undefined : Extract<Rhs, K> : Extract<Rhs, K> extends never? Extract<Lhs, K> :
-NonNullable<Lhs[K] | Rhs[K]> extends never? undefined : NonNullable<Lhs[K] | Rhs[K]>;*/
 
 /**
  * Sort of like `NonNullable<T>`,
  * but returns `undefined` instead of `never` or `unknown` on failure.
  */
-export type NonNullableOrUndefined<T> = T extends null | undefined ? undefined : T;
+type NonNullableOrUndefined<T> = T extends null | undefined ? undefined : T;
 
-export type ZipObject<Lhs, Rhs> = {
+type ZipObject<Lhs, Rhs> = {
     //[K in (keyof Lhs | keyof Rhs)]: (K extends keyof Lhs? Lhs[K & keyof Lhs] : undefined) | (K extends keyof Rhs? Rhs[K & keyof Rhs] : undefined);
     [K in (keyof Lhs | keyof Rhs)]: GenericGet<Lhs, K> | GenericGet<Rhs, K>;
 }
@@ -123,14 +121,9 @@ export type ZipObject<Lhs, Rhs> = {
  * but returns `undefined` instead of `never` or `unknown` on failure.
  * 
  */
-export type GenericGet<T, K extends string | number | symbol, ExtraNullType = never> = (K extends keyof T ? (ExtraNullType | T[K] | undefined) : ExtraNullType | undefined);
+type GenericGet<T, K extends string | number | symbol, ExtraNullType = never> = (K extends keyof T ? (ExtraNullType | T[K] | undefined) : ExtraNullType | undefined);
 
-export type GenericReplace<T, K extends string | number | symbol, ReplaceType, ExtraNullType = never> = (K extends keyof T ? (ReplaceType) : ExtraNullType | undefined);
-
-
-/*K extends keyof T? T[K] :
-K extends keyof Template ? 
-(Required<Template>[K] | undefined) : undefined;*/
+type GenericReplace<T, K extends string | number | symbol, ReplaceType, ExtraNullType = never> = (K extends keyof T ? (ReplaceType) : ExtraNullType | undefined);
 
 function genericGetTest() {
     const t1: GenericGet<{}, "id"> = null! as never;
@@ -219,7 +212,7 @@ function test<P extends h.JSX.HTMLAttributes<HTMLInputElement>>(props: P) {
     else {
         acceptsNever(p7.allowFullScreen);
     }
-    
+
 
     // Make sure it works recursively
     const r1a = useMergedProps<HTMLInputElement>()({}, p1);
