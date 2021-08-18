@@ -121,9 +121,9 @@ type ZipObject<Lhs, Rhs> = {
  * but returns `undefined` instead of `never` or `unknown` on failure.
  * 
  */
-type GenericGet<T, K extends string | number | symbol, ExtraNullType = never> = (K extends keyof T ? (ExtraNullType | T[K] | undefined) : ExtraNullType | undefined);
+export type GenericGet<T, K extends string | number | symbol, ExtraNullType = never> = (K extends keyof T ? (ExtraNullType | T[K] | undefined) : ExtraNullType | undefined);
 
-type GenericReplace<T, K extends string | number | symbol, ReplaceType, ExtraNullType = never> = (K extends keyof T ? (ReplaceType) : ExtraNullType | undefined);
+export type GenericReplace<T, K extends string | number | symbol, ReplaceType, ExtraNullType = never> = (K extends keyof T ? (ReplaceType) : ExtraNullType | undefined);
 
 function genericGetTest() {
     const t1: GenericGet<{}, "id"> = null! as never;

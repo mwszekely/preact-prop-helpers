@@ -1,5 +1,5 @@
 import { h } from "preact";
-import type { GenericGet, NonNullableOrUndefined, ZipObject } from "./use-merged-props";
+import type { GenericGet } from "./use-merged-props";
 
 
 /*type MergedNulls<T extends null | undefined, U extends | null | undefined> =

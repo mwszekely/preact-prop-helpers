@@ -48,7 +48,7 @@ export function useMergedRefs<E extends EventTarget>() {
     }
 }
 
-
+/*
 function typetest<P extends h.JSX.HTMLAttributes<HTMLInputElement>>(props: P) {
 
     const ref: RefObject<HTMLInputElement> = useRef<HTMLInputElement>(null);
@@ -83,5 +83,5 @@ function typetest<P extends h.JSX.HTMLAttributes<HTMLInputElement>>(props: P) {
     acceptsRef(c[7]);
     acceptsRef(c[8]);
 }
-
+*/
 
