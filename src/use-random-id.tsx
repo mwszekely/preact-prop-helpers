@@ -87,7 +87,7 @@ export function useRandomId({ prefix }: UseRandomIdParameters = {}): UseRandomId
         }
 
         return ret;
-    }, [usedId]);
+    }, [usedId, randomId]);
 
     const useRandomIdProps: UseRandomIdProps = useCallback(function useRandomIdProps<P extends UseRandomIdPropsParameters>(p: P): UseRandomIdPropsReturnType<P> {
         return useReferencedIdProps("id")(p);
