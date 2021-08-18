@@ -1,4 +1,5 @@
 import { h } from "preact";
+import { useCallback } from "preact/hooks";
 import { useConstant } from "./use-constant";
 import { useMergedProps } from "./use-merged-props";
 import { useState } from "./use-state"
@@ -59,7 +60,9 @@ export interface UseRandomIdReturnType {
  * 
  * If you'd like to use the ID in a property that's *not* named `id` (like `for` or `aria-labelledby` or whatnot), `useReferencedIdProps` is also provided.
  * 
- * And the randomly-generated id itself is also provided in case you want to handle the logic yourself without `useMergedProps`
+ * And the randomly-generated id itself is also provided in case you want to handle the logic yourself without `useMergedProps`.
+ * 
+ * Unlike most other `use*Props` hooks, these are mostly stable.
  */
 export function useRandomId({ prefix }: UseRandomIdParameters = {}): UseRandomIdReturnType {
     const randomId = useConstant(generateRandomId, prefix);
@@ -72,7 +75,7 @@ export function useRandomId({ prefix }: UseRandomIdParameters = {}): UseRandomId
     // Is this okay?
     const [usedId, setUsedId, getUsedId] = useState<string | undefined>(undefined);
 
-    const useReferencedIdProps = function useReferencedIdProps<K extends keyof h.JSX.HTMLAttributes<any>>(idPropName: K) {
+    const useReferencedIdProps = useCallback(function useReferencedIdProps<K extends keyof h.JSX.HTMLAttributes<any>>(idPropName: K) {
 
         const ret: UseReferencedIdProps<K> = function <P extends UseReferencedIdPropsParameters<any>>({ [idPropName]: givenId, ...props }: P): UseReferencedIdPropsReturnType<P, K> {
 
@@ -84,11 +87,11 @@ export function useRandomId({ prefix }: UseRandomIdParameters = {}): UseRandomId
         }
 
         return ret;
-    }
+    }, [usedId, randomId]);
 
-    const useRandomIdProps: UseRandomIdProps = function useRandomIdProps<P extends UseRandomIdPropsParameters>(p: P): UseRandomIdPropsReturnType<P> {
+    const useRandomIdProps: UseRandomIdProps = useCallback(function useRandomIdProps<P extends UseRandomIdPropsParameters>(p: P): UseRandomIdPropsReturnType<P> {
         return useReferencedIdProps("id")(p);
-    }
+    }, [useReferencedIdProps]);
 
     return {
         randomId,
