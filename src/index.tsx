@@ -1,5 +1,5 @@
 export { useElementSize, UseElementSizeReturnType } from "./use-element-size";
-export { useLogicalDirection, LogicalDirection, LogicalDirectionInfo, LogicalSize } from "./use-logical-direction";
+export { useLogicalDirection, PhysicalDirection, LogicalDirectionInfo, PhysicalSize, PhysicalOrientation, LogicalOrientation, LogicalElementSize } from "./use-logical-direction";
 export { useMediaQuery } from "./use-media-query";
 export { useMergedClasses } from "./use-merged-classes";
 export { useMergedProps } from "./use-merged-props";
