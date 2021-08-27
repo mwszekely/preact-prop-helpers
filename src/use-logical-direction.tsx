@@ -2,14 +2,17 @@ import { useCallback, useLayoutEffect, useRef, useState } from "preact/hooks";
 import type { ElementSize } from "./use-element-size";
 
 //export type BlockFlowDirection = "downwards" | "leftwards" | "rightwards";
-export type LogicalDirection = "ltr" | "rtl" | "ttb" | "btt";
-export type LogicalOrientation = "horizontal" | "vertical";
+export type PhysicalDirection = "ltr" | "rtl" | "ttb" | "btt";
+export type PhysicalOrientation = "horizontal" | "vertical";
+export type PhysicalSize = "width" | "height";
+
+export type LogicalOrientation = "inline" | "block";
+
 //export type LineOrientation = "upright" | "leftright" | "downright" | "rightright";
 
 type WritingMode = "horizontal-tb" | "vertical-lr" | "sideways-rl" | "vertical-rl" | "sideways-lr";
 type Direction = "ltr" | "rtl";
 type TextOrientation = "mixed" | "upright" | "sideways";
-export type LogicalSize = "width" | "height";
 
 function capitalize<T extends string>(str: T): Capitalize<T> {
     return (str[0].toUpperCase() + str.substr(1)) as Capitalize<T>;
@@ -43,6 +46,8 @@ export interface LogicalElementSize {
  * @returns An object containing the following functions:
  * * `getLogicalDirection`: retrieves a `LogicalDirectionInfo` representing the current state of the element. (Function is constant between renders)
  * * `convertElementSize`: When used in conjunction with `useElementSize`, allows you to retrieve the logical size of an element instead of the physical size. 
+ * * `convertToLogicalOrientation`: Based on the current direction, converts "horizontal" or "vertical" to "inline" or "block".
+ * * `convertToPhysicalOrientation`:  Based on the current direction, converts "inline" or "block" to "horizontal" or "vertical".
  */
 export function useLogicalDirection(element: Element | null | undefined) {
 
@@ -90,7 +95,29 @@ export function useLogicalDirection(element: Element | null | undefined) {
 
     }, [writingModeRef, directionRef, textOrientationRef]);
 
-    const convertElementSize = useCallback((elementSize: ElementSize, direction?: LogicalDirectionInfo | null): LogicalElementSize | null => {
+    const convertToLogicalOrientation = useCallback((elementOrientation: PhysicalOrientation, direction?: LogicalDirectionInfo | null | undefined) => {
+        direction ??= getLogicalDirection();
+        if (direction?.inlineOrientation === elementOrientation)
+            return "inline";
+        return "block";
+    }, [getLogicalDirection]);
+
+    const convertToPhysicalOrientation = useCallback((elementOrientation: LogicalOrientation, direction?: LogicalDirectionInfo | null | undefined) => {
+        direction ??= getLogicalDirection();
+        if (elementOrientation == "inline") {
+            if (direction?.inlineOrientation == "horizontal")
+                return "horizontal";
+            return "vertical";
+        }
+        else {
+            if (direction?.blockOrientation == "vertical")
+                return "vertical";
+
+                return "horizontal";
+        }
+    }, [getLogicalDirection]);
+
+    const convertElementSize = useCallback((elementSize: ElementSize, direction?: LogicalDirectionInfo | null | undefined): LogicalElementSize | null => {
         direction ??= getLogicalDirection();
         if (direction) {
             const { inlineSize, blockSize, inlineDirection, blockDirection } = direction;
@@ -109,8 +136,8 @@ export function useLogicalDirection(element: Element | null | undefined) {
 
             // Position requires us to sometimes use one property (like `left`)
             // or sometimes two (like `left` + `width`)
-            function getPhysicalLeftTop(dir: LogicalDirection) { if (dir === "ltr" || dir == "rtl") return "left"; return "top"; }
-            function getPhysicalRightBottom(dir: LogicalDirection) { if (dir === "rtl") return "width"; if (dir === "btt") return "height"; return null; }
+            function getPhysicalLeftTop(dir: PhysicalDirection) { if (dir === "ltr" || dir == "rtl") return "left"; return "top"; }
+            function getPhysicalRightBottom(dir: PhysicalDirection) { if (dir === "rtl") return "width"; if (dir === "btt") return "height"; return null; }
 
             const f1 = getPhysicalLeftTop(inlineDirection);
             const f2 = getPhysicalRightBottom(inlineDirection);
@@ -151,7 +178,9 @@ export function useLogicalDirection(element: Element | null | undefined) {
 
     return {
         getLogicalDirection,
-        convertElementSize
+        convertElementSize,
+        convertToLogicalOrientation,
+        convertToPhysicalOrientation
     };
 }
 
@@ -174,7 +203,7 @@ export interface LogicalDirectionInfo {
      * |`sideways-lr`|`ltr`|`btt`|
      * |`sideways-lr`|`rtl`|`ttb`|
      */
-    inlineDirection: LogicalDirection;
+    inlineDirection: PhysicalDirection;
 
     /**
      * Simplified version of `inlineDirection`:
@@ -182,7 +211,7 @@ export interface LogicalDirectionInfo {
      * * `horizontal` for `horizontal-tb`
      * * `vertical` for all others
      */
-    inlineOrientation: LogicalOrientation;
+    inlineOrientation: PhysicalOrientation;
 
     /**
      * Represents the direction text flows, line by line.
@@ -191,7 +220,7 @@ export interface LogicalDirectionInfo {
      * * `rtl` for `vertical-rl` & `sideways-rl`, regardless of direction
      * * `ltr` for `vertical-lr` & `sideways-lr`, regardless of direction
      */
-    blockDirection: LogicalDirection;
+    blockDirection: PhysicalDirection;
 
     /**
      * Simplified version of `blockDirection`:
@@ -199,7 +228,7 @@ export interface LogicalDirectionInfo {
      * * `vertical` for `horizontal-tb`
      * * `horizontal` for all others
      */
-    blockOrientation: LogicalOrientation;
+    blockOrientation: PhysicalOrientation;
 
     /**
      * Represents how you can *physically* refer to the size of the element in the *inline* size.
@@ -207,7 +236,7 @@ export interface LogicalDirectionInfo {
      * * `width` for `horizontal-tb`, regardless of direction
      * * `height` for all others
      */
-    inlineSize: LogicalSize;
+    inlineSize: PhysicalSize;
 
     /**
      * Represents how you can *physically* refer to the size of the element in the *block* size.
@@ -215,7 +244,7 @@ export interface LogicalDirectionInfo {
      * * `height` for `horizontal-tb`, regardless of direction
      * * `width` for all others
      */
-    blockSize: LogicalSize;
+    blockSize: PhysicalSize;
 
     /**
      * For each glyph, ascenders to descenders *physically* go:
@@ -224,7 +253,7 @@ export interface LogicalDirectionInfo {
      * * `rtl` for `vertical-rl`, `vertical-lr`, & `sideways-rl`
      * * `ltr` for `sideways-lr`
      */
-    overUnderDirection: LogicalDirection;
+    overUnderDirection: PhysicalDirection;
 
     /**
      * For each glyph, its "left" side (think of this relative to `writing-mode` but *not* relative to `direction`, or alternatively what `text-align: left` means) to its "right" side *physically* goes from:
@@ -233,7 +262,7 @@ export interface LogicalDirectionInfo {
      * * `ttb` for `vertical-rl`, `vertical-lr`, & `sideways-rl`
      * * `btt` for `sideways-lr`
      */
-    leftRightDirection: LogicalDirection;
+    leftRightDirection: PhysicalDirection;
 };
 
 const HorizontalTbLtr: LogicalDirectionInfo = {

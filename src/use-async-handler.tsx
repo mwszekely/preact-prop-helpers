@@ -23,6 +23,12 @@ export type GenericAsyncHandler<CaptureType, Target extends EventTarget> = Async
 //const NoCapture = Symbol("no-capture");
 
 export interface UseAsyncHandlerParameters<ElementType extends EventTarget, EventType extends h.JSX.TargetedEvent<ElementType>, CaptureType> {
+    /**
+     * What transient information is captured by this event 
+     * and presented as the first argument of the event handler?
+     * 
+     * The "capture" parameter answers this question. To implement a checkbox, for example, return `target.checked`.
+     */
     capture: (event: EventType) => CaptureType;
 
     /**
@@ -42,7 +48,7 @@ export interface UseAsyncHandlerReturnType<ElementType extends EventTarget, Even
      * Because 
      * 
      */
-    getSyncHandler: (asyncHandler: null | ((value: CaptureType, event: EventType) => (Promise<void> | void))) => h.JSX.EventHandler<EventType>;
+    getSyncHandler: (asyncHandler: undefined | null | ((value: CaptureType, event: EventType) => (Promise<void> | void))) => h.JSX.EventHandler<EventType>;
 
     /**
      * Whether or not the handler has been called but has not completed yet.
@@ -280,7 +286,7 @@ export function useAsyncHandler<ElementType extends EventTarget>() {
 
         return ret;
 
-        function getSyncHandler(asyncHandler: null | ((value: CaptureType, event: EventType) => (Promise<void> | void))): h.JSX.EventHandler<EventType> {
+        function getSyncHandler(asyncHandler: undefined | null | ((value: CaptureType, event: EventType) => (Promise<void> | void))): h.JSX.EventHandler<EventType> {
 
             const syncHandler = useStableCallback<h.JSX.EventHandler<EventType>>(function syncHandler(event: EventType) {
 
