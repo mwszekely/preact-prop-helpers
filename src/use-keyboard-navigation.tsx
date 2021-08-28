@@ -113,8 +113,6 @@ export function useLinearNavigation<ParentElement extends Element, ChildElement 
         const useLinearNavigationChildProps: UseLinearNavigationChildProps<ChildElement> = (props) => {
 
             const onKeyDown = (e: KeyboardEvent) => {
-                debugger;
-
                 // Not handled by typeahead (i.e. assume this is a keyboard shortcut)
                 if (e.ctrlKey || e.metaKey)
                     return;
