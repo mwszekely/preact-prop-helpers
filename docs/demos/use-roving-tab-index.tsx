@@ -6,10 +6,10 @@ import { useListNavigation, UseListNavigationChild } from "../../use-list-naviga
 
 const RandomWords = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
 
-const RovingChildContext = createContext<UseListNavigationChild>(null!)
+const RovingChildContext = createContext<UseListNavigationChild<HTMLLIElement>>(null!)
 export const DemoUseRovingTabIndex = memo(() => {
 
-    const { useListNavigationChild, useListNavigationProps, currentTypeahead, setTabbableIndex, tabbableIndex } = useListNavigation<HTMLUListElement>({});
+    const { useListNavigationChild, useListNavigationProps, currentTypeahead, setTabbableIndex, tabbableIndex } = useListNavigation<HTMLUListElement, HTMLLIElement>({});
     //const { useRovingTabIndexChild, useRovingTabIndexProps } = useRovingTabIndex<HTMLUListElement, RovingTabIndexChildInfo>({ tabbableIndex, focusOnChange: false });
 
     return (
@@ -62,7 +62,7 @@ const DemoUseRovingTabIndexChild = (({ index }: { index: number }) => {
     const randomWord = useConstant(() => RandomWords[index/*Math.floor(Math.random() * (RandomWords.length - 1))*/]);
     const useRovingTabIndexChild = useContext(RovingChildContext);
     const text = `${randomWord} This is item #${index + 1}`;
-    const { useListNavigationChildProps, useListNavigationSiblingProps } = useRovingTabIndexChild<HTMLLIElement>({ index, text });
+    const { useListNavigationChildProps, useListNavigationSiblingProps } = useRovingTabIndexChild({ index, text });
     
     const props = useListNavigationChildProps({});
     return (
