@@ -1,5 +1,5 @@
 import { Context, h, Ref } from "preact";
-import { useCallback, useRef } from "preact/hooks";
+import { useCallback, useEffect, useRef } from "preact/hooks";
 import { useRefElement, UseRefElementPropsReturnType } from "./use-ref-element";
 import { useLayoutEffect } from "./use-layout-effect";
 import { MergedProps, useMergedProps } from "./use-merged-props"
@@ -8,6 +8,7 @@ import { useTimeout } from "./use-timeout";
 import { useLogicalDirection } from "./use-logical-direction";
 import { RovingTabIndexChildInfo, useRovingTabIndex, UseRovingTabIndexChildPropsReturnType, UseRovingTabIndexPropsReturnType } from "./use-roving-tabindex";
 import { ManagedChildInfo } from "./use-child-manager";
+import { useStableCallback } from "./use-stable-callback";
 
 
 
@@ -319,7 +320,7 @@ export function useTypeaheadNavigation<ParentElement extends Element, ChildEleme
 
 
 
-    const comparator = useCallback((lhs: string, rhs: { text: string; unsortedIndex: I; }) => {
+    const comparator = useStableCallback((lhs: string, rhs: { text: string; unsortedIndex: I; }) => {
         let compare: number;
 
         // For the purposes of typeahead, only compare a string of the same size as our currently typed string.
@@ -333,10 +334,10 @@ export function useTypeaheadNavigation<ParentElement extends Element, ChildEleme
             compare = safeLhs.toLowerCase().localeCompare(safeRhs.toLowerCase() ?? "");
 
         return compare;
-    }, [collator]);
+    });
 
     // Handle changes in typeahead that cause changes to the tabbable index
-    useLayoutEffect(() => {
+    useEffect(() => {
         if (currentTypeahead && sortedTypeaheadInfo.current.length) {
 
 
@@ -416,13 +417,13 @@ export function useTypeaheadNavigation<ParentElement extends Element, ChildEleme
                     setIndex(sortedTypeaheadInfo.current[lowestSortedIndexAll].unsortedIndex);
             }
         }
-    }, [currentTypeahead, comparator])
+    }, [currentTypeahead])
 
     const useTypeaheadNavigationProps: UseTypeaheadNavigationProps<ParentElement> = (p) => p;
 
     const useTypeaheadNavigationChild: UseTypeaheadNavigationChild<ChildElement, I> = useCallback(({ text, ...i }: Omit<UseTypeaheadNavigationChildInfo<I>, "setTabbable">) => {
 
-        useLayoutEffect(() => {
+        useEffect(() => {
             if (text) {
 
                 // Find where to insert this item.
@@ -445,7 +446,7 @@ export function useTypeaheadNavigation<ParentElement extends Element, ChildEleme
                     }
                 }
             }
-        }, [text, comparator]);
+        }, [text]);
 
         const useTypeaheadNavigationChildProps: UseTypeaheadNavigationChildProps<ChildElement> = function <P extends h.JSX.HTMLAttributes<ChildElement>>({ ...props }: P): UseTypeaheadNavigationChildPropsReturnType<ChildElement, P> {
 
