@@ -38,7 +38,7 @@ export interface UseAsyncHandlerParameters<ElementType extends EventTarget, Even
     debounce?: number;
 }
 
-export interface UseAsyncHandlerReturnType<ElementType extends EventTarget, EventType extends h.JSX.TargetedEvent<ElementType>, CaptureType> { 
+export interface UseAsyncHandlerReturnType<ElementType extends EventTarget, EventType extends h.JSX.TargetedEvent<ElementType>, CaptureType> {
 
     /**
      * Pass the actual asynchronous handler you'd like to use to this function, 
@@ -48,7 +48,7 @@ export interface UseAsyncHandlerReturnType<ElementType extends EventTarget, Even
      * Because 
      * 
      */
-    getSyncHandler: (asyncHandler: undefined | null | ((value: CaptureType, event: EventType) => (Promise<void> | void))) => h.JSX.EventHandler<EventType>;
+    getSyncHandler: (asyncHandler: undefined | null | ((value: CaptureType, event: EventType) => (Promise<void> | void))) => (h.JSX.EventHandler<EventType> | undefined);
 
     /**
      * Whether or not the handler has been called but has not completed yet.
@@ -286,7 +286,7 @@ export function useAsyncHandler<ElementType extends EventTarget>() {
 
         return ret;
 
-        function getSyncHandler(asyncHandler: undefined | null | ((value: CaptureType, event: EventType) => (Promise<void> | void))): h.JSX.EventHandler<EventType> {
+        function getSyncHandler(asyncHandler: undefined | null | ((value: CaptureType, event: EventType) => (Promise<void> | void))): h.JSX.EventHandler<EventType> | undefined {
 
             const syncHandler = useStableCallback<h.JSX.EventHandler<EventType>>(function syncHandler(event: EventType) {
 
@@ -313,7 +313,7 @@ export function useAsyncHandler<ElementType extends EventTarget>() {
 
             })
 
-            return syncHandler;
+            return asyncHandler == null ? undefined : syncHandler;
         }
 
     }
