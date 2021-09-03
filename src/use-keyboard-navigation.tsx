@@ -441,7 +441,7 @@ export function useTypeaheadNavigation<ParentElement extends Element, ChildEleme
                     let sortedIndex = binarySearch(sortedTypeaheadInfo.current, text, comparator);
                     console.assert(sortedIndex >= 0);
 
-                    if (sortedIndex > 0) {
+                    if (sortedIndex >= 0) {
                         sortedTypeaheadInfo.current.splice(sortedIndex, 1);
                     }
                 }
