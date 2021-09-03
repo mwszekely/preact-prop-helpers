@@ -39,9 +39,9 @@ There are a few reasons:
 |`useLocalEventHandler`								|Alternate way of attaching/detaching an event handler to the component, primarily for 3rd party APIs.|
 |`useRandomId`										|Allows a component to use a randomly-generated ID. Also lets another component reference whatever ID was used, e.g. in a `for` or `aria-labelledby` prop.|
 |`useTimeout`, `useInterval`, `useAnimationFrame`	|Runs the specified function (which doesn't need to be stable) with the given delay/interval/on every frame. In particular `useTimeout` is very effective as "`useEffect` but on a delay".|
-|`useStableCallback`								|`useCallback`, but doesn't require dependencies and is always stable. __Cannot be used within `useLayoutEffect`__.|
+|`useStableCallback`								|`useCallback`, but doesn't require dependencies and is always stable. __Cannot be used within `useLayoutEffect` or during render__.|
 |`useStableGetter`									|Allows you to use some variable within `useEffect` or `useCallback` without including it in a dependency array. __Cannot be used within `useLayoutEffect`__.|
-|`useState`											|Identical to the built-in, but returns a third value, `getState`, that is stable everywhere, and __can be used inside useLayoutEffect__. In general, this is the *only* getter that can be used there.|
+|`useState`											|Identical to the built-in, but returns a third value, `getState`, that is stable everywhere, and __can be used inside useLayoutEffect or during render__. In general, this is the *only* getter that can be used there.|
 |`usePersistentState`								|Identical to `useState`, but persists across browsing sessions, separate tabs, etc.|
 |`useConstant`										|Identical to the built-in `useMemo`, but passes the dependencies to the factory function (so it's *slightly* less likely you'll need a wrapper function), but otherwise identical and `useMemo` is fine in most cases.|
 |`useEffect`, `useLayoutEffect`						|Identical to the built-ins, but provides previous dependency values as well as a list of what exactly changed (mainly useful for debugging). In most cases, the built-ins are just fine.|
@@ -276,7 +276,7 @@ Notably `useTimeout` is a very effective way to do "`useEffect`, but on a delay"
 
 ## `useStableGetter`
 
-Given a value every render, returns a callback that returns that value and, importantly, is stable across renders. This means you can use it inside of hooks like `useEffect`, `useCallback`, etc. without declaring it as a dependency, but note that __the getter must not be called during or before `useLayoutEffect`__ (its value is effectively indeterminate from the start of a render until `useLayoutEffect` has completely finished).
+Given a value every render, returns a callback that returns that value and, importantly, is stable across renders. This means you can use it inside of hooks like `useEffect`, `useCallback`, etc. without declaring it as a dependency, but note that __the getter must not be called during or before `useLayoutEffect`__ (its value is effectively indeterminate from the start of a render until `useLayoutEffect` has completely finished, so keep in mind that includes not calling it during render either).
 
 ## `useStableCallback`
 
