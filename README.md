@@ -2,16 +2,14 @@
 
 A small set of hooks related to modifying Preact props and a few other useful things.
 
-Note that many of these props return an object containing both the hook's "result", if any (e.g. an element's size), but also another "sub-hook", generally named `${originalHookName}Props`, that needs to be used to modify the props you were going to pass to the `Element`. If you don't use a sub-hook returned by some of these hooks, chances are __nothing will happen, as if you never used the hook at all.__
-
-For example:
 ```tsx 
-const { useElementSizeProps, offsetHeight } = useElementSize<HTMLDivElement>();
+const { useElementSizeProps, offsetHeight, ...otherSizes } = useElementSize<HTMLDivElement>();
 
 // Do something fun with offsetHeight here
 
 return <div {...useElementSizeProps(props)} />
 ```
+Note that many of these props return an object containing both the hook's "result", if any (e.g. `offsetHeight` above), but also another "sub-hook" (e.g. `useElementSizeProps`) that needs to be used to modify the props you were going to pass to the `Element`. If you don't use a sub-hook returned by some of these hooks, chances are __nothing will happen, as if you never used the hook at all.__
 
 There are a few reasons:
 
@@ -19,7 +17,35 @@ There are a few reasons:
 
 2. Allowing for deeper hook composition &ndash; it's not just prop-modifying hooks that can be returned.  See, for example, `useListNavigation`, which returns both a prop-modifying hook, but also a hook that's intented to be called once per child.
 
-3. Type-checking.  Avoiding JSX errors in all scenarios relating to keeping the correct `Element` type around is extremely error-prone with enough edge cases to make a circle. By having an outer function that *just* looks for an `Element` type, 95% of all obscure "ref isn't compatible with ref" errors can be prevented.
+3. Type-checking.  Avoiding JSX errors with refs and event handlers in all scenarios relating to keeping the correct `Element` type around is extremely error-prone with enough edge cases to make a circle. By having an outer function that *just* looks for an `Element` type, 95% of all obscure "ref isn't compatible with ref" errors can be prevented.
+
+## Summary of available hooks
+
+(In *rough* order of usefulness and relevance)
+
+|Hook|Description|
+|------|------|
+|`useMergedProps` (& `useMergedClasses`, `useMergedRefs`, `useMergedStyles`)	|Allows a component to use props from two (or more) separate unrelated sources.|
+|`useChildManager`									|Allows for child → parent communication, and more efficient parent → child communication (e.g. telling a single child to change itself instead of rerendering all children).|
+|`useListNavigation` (& `useRovingTabIndex`, `useLinearNavigation`, `useTypeaheadNavigation`)	|Allows a component with children (like a select menu or radio group) to be treated as *one element to be tabbed into/out of*, with arrow keys and typeahead handling the navigation *within* the component.|
+|`useAsyncHandler`									|Creates a synchronous event handler from an asynchronous one, and provides the component with the information it needs to display the current async state effectively.|
+|`useRefElement`									|Allows a component to use the `Element` that it actually renders.|
+|`useElementSize`									|Allows a component to use its size as part of the rendering process.|
+|`useLogicalDirection`								|Lets a component measure its own "text flow" direction (is the inline direction ltr or rtl? is the block direction vertical or horizontal? etc.), and convert between physical and logical dimensions (e.g. knowing that "inline-start" is equivalent to "left" in this writing mode).|
+|`useHasFocus` (& `useActiveElement`)				|Allows a component to detect if it or its children have focus, and if nothing's focused, additionally detect if it is still the *most recently* focused element.|
+|`useFocusTrap` (& `useBlockingElement`)			|Allows a component to make itself modal so that no interactions outside of it are considered, primarily for dialogs and such, restoring focus when done.|
+|`useDraggable` & `useDroppable`					|Allows a component to quickly implement the Drag & drop API, returning information about the current operation.|
+|`useGlobalEventHandler`							|Ensures an event handler is attached to `window`, `document`, etc. as long as the component is mounted.|
+|`useLocalEventHandler`								|Alternate way of attaching/detaching an event handler to the component, primarily for 3rd party APIs.|
+|`useRandomId`										|Allows a component to use a randomly-generated ID. Also lets another component reference whatever ID was used, e.g. in a `for` or `aria-labelledby` prop.|
+|`useTimeout`, `useInterval`, `useAnimationFrame`	|Runs the specified function (which doesn't need to be stable) with the given delay/interval/on every frame. In particular `useTimeout` is very effective as "`useEffect` but on a delay".|
+|`useStableCallback`								|`useCallback`, but doesn't require dependencies and is always stable. __Cannot be used within `useLayoutEffect`__.|
+|`useStableGetter`									|Allows you to use some variable within `useEffect` or `useCallback` without including it in a dependency array. __Cannot be used within `useLayoutEffect`__.|
+|`useState`											|Identical to the built-in, but returns a third value, `getState`, that is stable everywhere, and __can be used inside useLayoutEffect__. In general, this is the *only* getter that can be used there.|
+|`usePersistentState`								|Identical to `useState`, but persists across browsing sessions, separate tabs, etc.|
+|`useConstant`										|Identical to the built-in `useMemo`, but passes the dependencies to the factory function (so it's *slightly* less likely you'll need a wrapper function), but otherwise identical and `useMemo` is fine in most cases.|
+|`useEffect`, `useLayoutEffect`						|Identical to the built-ins, but provides previous dependency values as well as a list of what exactly changed (mainly useful for debugging). In most cases, the built-ins are just fine.|
+|`useMediaQuery`									|Measures if a given media query matches the device or not.
 
 
 # General Purpose Prop Hooks
@@ -35,6 +61,12 @@ function useMergedProps<E extends EventTarget>()<T, U>(lhs2: T, rhs2: U): Merged
 Virtually all hooks in this library make use of `useMergedProps`, and generally useful for making any sort of prop-modifying hook.  Given two sets of props, it merges them and returns the result.
 
 The hook is aware of and can intelligently merge `className`, `class`, `style`, `ref`, and all event handlers.
+
+Note the signature, as the first call is empty due to typing reasons, while the actual props to merge are in the second call.
+
+```tsx
+return <div {...useMergedProps<HTMLDivElement>()(props1, props2)} />
+```
 
 |Prop|Hook|Merge behavior|
 |----|----|----|
@@ -95,19 +127,13 @@ function useManagedChild<ChildType extends EventTarget>(info: I): void;
 ```
 Sometimes it's useful for child components to report information to their parents, especially in lists of data. This hook lets you do that.
 
-`useChildManager` accepts a template argument that represents the information the child will pass to the parent.  At minimum, it must be `{ index: number }`, but you can extend it to include, for example, state setting functions or other similar things.  `useRovingTabIndex` has children provide their parents with a function to set their `tabIndex` property remotely, for example.
+`useChildManager` accepts a template argument that represents the information the child will pass to the parent.  At minimum, it must be `{ index: number | string }`, but you can extend it to include, for example, state setting functions or other similar things.  `useRovingTabIndex` has children provide their parents with a function to set their `tabIndex` property remotely, for example.
 
 Unlike a lot of other hooks, the hook returned by this component, `useManagedChild`, is meant to be passed to child elements via a Context object.  The child component then calls `useContext(MyContext)` to get that hook.  When you call the `useManagedChild` hook it gives you, pass it all the information the parent has requested (which, again, will be at least `{ index: number }`).
 
 You can use this hook in multiple different ways as long as a different Context object is used to differentiate them.
 
-## `useRovingTabIndex`
-```tsx
-export function useRovingTabIndex<ParentElement extends HTMLElement>({ collator }: UseRovingTabIndexParameters): UseRovingTabIndexResult<ParentElement>;
-function useRovingTabIndexProps<P extends h.JSX.HTMLAttributes<ParentElement>>(props: P) => MergedProps<..., P>;
-function useRovingTabIndexChild<ChildElement extends HTMLElement>({ text, index, ...i }: RovingTabIndexChildInfo) => UseRovingTabIndexChildReturnType<ChildElement>;
-function useRovingTabIndexChildProps<P extends h.JSX.HTMLAttributes<ParentElement>>(props: P) => MergedProps<..., P>;
-```
+## `useListNavigation` (&amp; `useRovingTabIndex`, `useLinearNavigation`, `useTypeaheadNavigation`)
 
 (FYI: This component uses `useChildManager`, so be aware of how that works and be sure to have a Context ready.)
 
@@ -120,7 +146,7 @@ Allows for keyboard navigation of lists and other similar structures:
 
 At each point during this, the `tabIndex` attribute of these elements is modified so that pressing the `Tab` key navigates in/out of the component as a whole, as opposed to trudging through every single item.  This is the recommended accessability practice for elements that function like a Listbox or similar.
 
-It is perfectly fine for each tabbable element to also have "sub-tabbable" elements, like a list item that contains a checkbox or whatnot.  Just remember to call `useRovingTabIndexChildProps` on *both* of those elements in that case, and be sure that it's `useRovingTabIndexChildProps` you're calling twice, and not `useRovingTabIndexChild` twice.
+It is perfectly fine for each tabbable element to also have "sub-tabbable" elements, like a list item that contains a checkbox or whatnot.  In that case, the child should use `useListNavigationSiblingProps` (with the primary element just using `useListNavigationChildProps` as usual)
 
 
 ## `useElementSize`
@@ -195,12 +221,12 @@ Note that because the handler you provide may be called with a delay, and becaus
 
 
 ```tsx
-const someAsyncFunction = async (value: number, e: Event) => { 
+const syncOnInput = async (value: number, e: Event) => { 
     [...] // Ex. send to a server and setState when done
 };
 const {
     // The synchronous event handler
-    onInput,
+    getSyncHandler,
     // True while the handler is running
     pending,
     // The error thrown, if any
@@ -208,15 +234,17 @@ const {
     // And others
     ...rest
 } = useAsyncHandler<HTMLInputElement>()({ 
-    event: "onInput", 
     capture: e => { 
         e.preventDefault(); 
 
         // Save this value so that it's never stale
         return e.currentTarget.valueAsNumber;
     }, 
-})(someAsyncFunction);
+});
 
+const onInput = getSyncHandler(someAsyncFunction);
+// OR the following, if you want the input entirely disabled while pending:
+const onInput = getSyncHandler(pending? null : someAsyncFunction);
 ```
 
 The handler is automatically throttled to only run one at a time.  If the handler is called, and then before it finishes, is called again, it will be put on hold until the current one finishes, at which point the second one will run.  If the handler is called a third time before the first has finished, it will *replace* the second, so only the most recently called iteration of the handler will run.
@@ -277,7 +305,7 @@ const useMyPersistentState = usePersistentState<StorageTypes>();
 
 const [darkMode, setDarkMode, getDarkMode] = useMyPersistentState("darkMode", false);
 
-const [lastLogin, setLastLogin] = useMyPersistentState("lastLogin", new Date(), str => new Date(str), JSON.stringify);
+const [lastLogin, setLastLogin, getLastLogin] = useMyPersistentState("lastLogin", new Date(), str => new Date(str), JSON.stringify);
 ```
 
 ## `useEffect`, `useLayoutEffect`
