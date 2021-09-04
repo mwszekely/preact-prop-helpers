@@ -47,6 +47,24 @@ export interface UseChildManagerReturnType<I extends ManagedChildInfo<any>> {
      */
     managedChildren: I[];
 
+    /**
+     * The total number of children that have been mounted, regardless of if they've since unmounted themselves.
+     */
+    totalChildrenMounted: number;
+
+    /**
+     * The total number of children that have unmounted -- this is 0 until at least some time after `totalChildrenMounted` is >0.
+     */
+    totalChildrenUnounted: number;
+
+    /**
+     * Returns in what position this child mounted. If this is the most recently mounted child, it will return a value equal to `totalChildrenMounted` - 1.
+     */
+    getMountIndex(index: I): number;
+
+    /**
+     * Given the Element that the child mounts as, returns its `index` prop.
+     */
     indicesByElement: Map<EventTarget, I extends ManagedChildInfo<infer K> ? K : string | number>
 }
 
@@ -63,17 +81,28 @@ export interface UseChildManagerReturnType<I extends ManagedChildInfo<any>> {
  * until it unmounts and retracts that information.
  */
 export function useChildManager<I extends ManagedChildInfo<any>>(): UseChildManagerReturnType<I> {
+    type K = (I extends ManagedChildInfo<infer K> ? K : string | number);
 
     // This is blindly updated any time a child mounts or unmounts itself.
     // Used to make sure that any time the array of managed children updates,
     // we also re-render.
     const [childUpdateIndex, setChildUpdateIndex] = useState(0);
+    const [totalChildrenMounted, setTotalChildrenMounted, getTotalChildrenMounted] = useState(0);
+    const [totalChildrenUnounted, setTotalChildrenUnounted, getTotalChildrenUnounted] = useState(0);
     const managedChildren = useRef<I[]>([]);
-    const indicesByElement = useRef<Map<EventTarget, I extends ManagedChildInfo<infer K> ? K : string | number>>(new Map());
+    const mountOrder = useRef<Map<K, number>>(new Map());
+    const indicesByElement = useRef<Map<EventTarget, K>>(new Map());
+
+    const getMountIndex = useCallback((index: K) => { return mountOrder.current.get(index)!; }, []);
 
     const useManagedChild: UsedManagedChild<I> = useCallback(<ChildType extends EventTarget>(info: I) => {
         const { element, getElement, useRefElementProps } = useRefElement<ChildType>();
 
+        useLayoutEffect(() => {
+            mountOrder.current.set(info.index, getTotalChildrenMounted());
+            setTotalChildrenMounted(t => ++t);
+            return () => {mountOrder.current.delete(info.index); setTotalChildrenUnounted(t => ++t);};
+        }, [info.index]);
 
         // As soon as the component mounts, notify the parent and request a rerender.
         useLayoutEffect(([prevElement, prevIndex], changes) => {
@@ -114,6 +143,9 @@ export function useChildManager<I extends ManagedChildInfo<any>>(): UseChildMana
     return {
         useManagedChild,
         managedChildren: managedChildren.current,
-        indicesByElement: indicesByElement.current
+        indicesByElement: indicesByElement.current,
+        totalChildrenMounted,
+        totalChildrenUnounted,
+        getMountIndex
     }
 }
