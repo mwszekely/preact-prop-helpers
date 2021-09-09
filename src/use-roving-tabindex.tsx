@@ -99,7 +99,6 @@ export function useRovingTabIndex<ParentElement extends Element, I extends Rovin
 
     // Call the hook that allows us to collect information from children who provide it
     const { managedChildren, useManagedChild, indicesByElement, ...rest } = useChildManager<I>();
-    const childCount = managedChildren.length;
 
     // Doesn't do anything, but here because there's a pretty decent chance it might in the future.
     const useRovingTabIndexProps = useCallback(<P extends {}>(props: P) => useMergedProps<ParentElement>()(useHasFocusProps({}), props), []) as UseRovingTabIndexProps<ParentElement>;
@@ -113,7 +112,9 @@ export function useRovingTabIndex<ParentElement extends Element, I extends Rovin
         if (tabbableIndex != prevTabbable.current) {
 
             if (managedChildren[tabbableIndex]) {
-                managedChildren[prevTabbable.current]?.setTabbable(false, undefined);
+                if (typeof prevTabbable.current == typeof tabbableIndex && (typeof prevTabbable.current != "number" || isFinite(prevTabbable.current)))
+                    (managedChildren[prevTabbable.current as keyof typeof managedChildren] as any as I | undefined)?.setTabbable(false, undefined);
+
                 managedChildren[tabbableIndex].setTabbable(true, focusOnChange ? "focus" : undefined);
                 prevTabbable.current = tabbableIndex;
             }
@@ -193,7 +194,6 @@ export function useRovingTabIndex<ParentElement extends Element, I extends Rovin
     return {
         useRovingTabIndexProps,
         useRovingTabIndexChild,
-        childCount,
         managedChildren,
         indicesByElement,
         focusSelf,
