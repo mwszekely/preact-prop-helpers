@@ -30,7 +30,7 @@ export type UsedManagedChild<I extends ManagedChildInfo<any>> = <E extends Event
 //export type UseManagedChildPropsParameters<E extends EventTarget> = UseRefElementPropsParameters<E>;
 //export type UseManagedChildPropsReturnType<E extends EventTarget, P extends UseManagedChildPropsParameters<E>> = void;
 
-type InfoToKey<I extends ManagedChildInfo<any>> = I extends ManagedChildInfo<infer K> ? K : string | number;
+type InfoToKey<I extends ManagedChildInfo<any>> = I["index"];
 type ManagedChildren<T extends number | string, I extends ManagedChildInfo<T>> = T extends string ? Record<string, I> : I[];
 
 export interface UseChildManagerReturnType<I extends ManagedChildInfo<any>> {
