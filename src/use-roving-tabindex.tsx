@@ -98,7 +98,7 @@ export function useRovingTabIndex<ParentElement extends Element, I extends Rovin
     const prevTabbable = useRef(-Infinity);
 
     // Call the hook that allows us to collect information from children who provide it
-    const { managedChildren, useManagedChild, indicesByElement } = useChildManager<I>();
+    const { managedChildren, useManagedChild, indicesByElement, ...rest } = useChildManager<I>();
     const childCount = managedChildren.length;
 
     // Doesn't do anything, but here because there's a pretty decent chance it might in the future.
@@ -196,6 +196,8 @@ export function useRovingTabIndex<ParentElement extends Element, I extends Rovin
         childCount,
         managedChildren,
         indicesByElement,
-        focusSelf
+        focusSelf,
+        
+        ...rest
     }
 }

@@ -173,7 +173,7 @@ export function useListNavigation<ParentElement extends Element, ChildElement ex
     const setIndex = useCallback((index: number | ((prev: number) => number)) => {
         setTabbableIndex(index);
     }, [])
-    const { childCount, managedChildren, indicesByElement, useRovingTabIndexProps, useRovingTabIndexChild, focusSelf } = useRovingTabIndex<ParentElement, I>({ tabbableIndex: tabbableIndex as any })
+    const { managedChildren, indicesByElement, useRovingTabIndexProps, useRovingTabIndexChild, focusSelf, ...rest } = useRovingTabIndex<ParentElement, I>({ tabbableIndex: tabbableIndex as any })
     const { currentTypeahead, invalidTypeahead, useTypeaheadNavigationChild, useTypeaheadNavigationProps } = useTypeaheadNavigation<ParentElement, ChildElement, number>({ collator, getIndex: getTabbableIndex, setIndex, typeaheadTimeout: 1000 });
     const { navigateToEnd, navigateToIndex, navigateToNext, navigateToPrev, navigateToStart, useLinearNavigationChild, useLinearNavigationProps } = useLinearNavigation<ParentElement, ChildElement>({ getIndex: getTabbableIndex, setIndex, managedChildren });
 
@@ -235,7 +235,9 @@ export function useListNavigation<ParentElement extends Element, ChildElement ex
         navigateToStart,
         navigateToEnd,
 
-        focusSelf
+        focusSelf,
+
+        ...rest
     }
 }
 
