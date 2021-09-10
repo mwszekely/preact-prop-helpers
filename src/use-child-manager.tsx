@@ -181,3 +181,43 @@ export function useChildManager<I extends ManagedChildInfo<any>>(): UseChildMana
         getMountIndex
     }
 }
+
+
+/**
+ * Helper function for letting children know when they are or are not the
+ * current selected/expanded/focused/whatever child.
+ * 
+ * Automatically handles when children are mounted & unmounted and such.
+ * 
+ * @param activatedIndex What index the current selected (etc.) child is
+ * @param length How many children exist (as managedChildren.length)
+ * @param setFlag A function that probably looks like (i, flag) => managedChildren[i].setActive(flag)
+ */
+ export function useChildFlag(activatedIndex: number | null | undefined, length: number, setFlag: (i: number, set: boolean) => void) {
+
+    const [prevActivatedIndex, setPrevActivatedIndex, getPrevActivatedIndex] = useState<number | null>(null);
+    const [prevChildCount, setPrevChildCount, getPrevChildCount] = useState(length);
+
+    useLayoutEffect(() => {
+
+        // Unset any children that might have mounted (in case their initial state isn't correct)
+        for (let i = (getPrevChildCount() ?? 0); i < length; ++i) {
+            setFlag(i, i === activatedIndex);
+        }
+        setPrevChildCount(length);
+
+        // Collapse the currently activated panel
+        const prevActivatedIndex = getPrevActivatedIndex();
+        if (prevActivatedIndex != null && prevActivatedIndex <= length)
+            setFlag(prevActivatedIndex, false);
+
+        // Expand the next panel
+        if (activatedIndex != null && activatedIndex <= length) {
+            setFlag(activatedIndex, true);
+            setPrevActivatedIndex(activatedIndex);
+        }
+
+    }, [activatedIndex, length]);
+
+}
+

@@ -5,7 +5,7 @@ import { useLayoutEffect } from "./use-layout-effect";
 import { MergedProps, useMergedProps } from "./use-merged-props"
 import { useState } from "./use-state";
 import { useTimeout } from "./use-timeout";
-import { useChildManager, ManagedChildInfo, UseChildManagerReturnType } from "./use-child-manager";
+import { useChildManager, ManagedChildInfo, UseChildManagerReturnType, useChildFlag } from "./use-child-manager";
 import { useStableGetter } from "./use-stable-getter";
 import { useActiveElement } from "use-active-element";
 
@@ -13,7 +13,7 @@ import { useActiveElement } from "use-active-element";
 
 
 /** Return type of `useRovingTabIndex` */
-export interface UseRovingTabIndexReturnType<I extends RovingTabIndexChildInfo<any>> extends Omit<UseChildManagerReturnType<I>, "useManagedChild"> {
+export interface UseRovingTabIndexReturnType<I extends RovingTabIndexChildInfo> extends Omit<UseChildManagerReturnType<I>, "useManagedChild"> {
     useRovingTabIndexChild: UseRovingTabIndexChild<I>;
     childCount: number;
 
@@ -31,18 +31,18 @@ export interface UseRovingTabIndexChildReturnType<ChildElement extends Element> 
 
 
 /** Arguments passed to the parent `useRovingTabIndex` */
-export interface UseRovingTabIndexParameters<T extends (number | string)> {
-    tabbableIndex: T;
+export interface UseRovingTabIndexParameters {
+    tabbableIndex: number;
     focusOnChange: boolean;
 }
 
 /** Arguments passed to the child 'useRovingTabIndexChild` */
-export interface RovingTabIndexChildInfo<T extends number | string> extends ManagedChildInfo<T> {
+export interface RovingTabIndexChildInfo extends ManagedChildInfo<number> {
     setTabbable(tabbable: boolean, focus: "focus" | undefined): void;
 }
 
 /** Type of the child's sub-hook */
-export type UseRovingTabIndexChild<I extends RovingTabIndexChildInfo<any>> = <ChildElement extends Element>(props: Omit<I, "setTabbable">) => UseRovingTabIndexChildReturnType<ChildElement>;
+export type UseRovingTabIndexChild<I extends RovingTabIndexChildInfo> = <ChildElement extends Element>(props: Omit<I, "setTabbable">) => UseRovingTabIndexChildReturnType<ChildElement>;
 
 export type UseRovingTabIndexChildPropsParameters<ChildElement extends Element> = h.JSX.HTMLAttributes<ChildElement>;
 export type UseRovingTabIndexSiblingPropsParameters<ChildElement extends Element> = h.JSX.HTMLAttributes<ChildElement>;
@@ -82,30 +82,20 @@ export type UseRovingTabIndexSiblingProps<ChildElement extends Element> = <P ext
  * And just as well! Children should be allowed at the root, 
  * regardless of if it's the whole app or just a given component.
  */
-export function useRovingTabIndex<I extends RovingTabIndexChildInfo<any>>({ focusOnChange, tabbableIndex }: UseRovingTabIndexParameters<I extends RovingTabIndexChildInfo<infer T> ? T : string | number>): UseRovingTabIndexReturnType<I> {
+export function useRovingTabIndex<I extends RovingTabIndexChildInfo>({ focusOnChange, tabbableIndex }: UseRovingTabIndexParameters): UseRovingTabIndexReturnType<I> {
 
     const getTabbableIndex = useStableGetter(tabbableIndex);
     const prevTabbable = useRef(-Infinity);
 
     // Call the hook that allows us to collect information from children who provide it
-    const { managedChildren, useManagedChild, indicesByElement,  ...rest } = useChildManager<I>();
+    const { managedChildren, childCount, useManagedChild, indicesByElement,  ...rest } = useChildManager<I>();
 
     // Any time the tabbable index changes,
     // notify the previous child that it's no longer tabbable,
     // and notify the next child that is allowed to be tabbed to.
-    useLayoutEffect(() => {
-        if (tabbableIndex != prevTabbable.current) {
-
-            if (managedChildren[tabbableIndex]) {
-                if (typeof prevTabbable.current == typeof tabbableIndex && (typeof prevTabbable.current != "number" || isFinite(prevTabbable.current)))
-                    (managedChildren[prevTabbable.current as keyof typeof managedChildren] as any as I | undefined)?.setTabbable(false, undefined);
-
-                managedChildren[tabbableIndex].setTabbable(true, focusOnChange ? "focus" : undefined);
-                prevTabbable.current = tabbableIndex;
-            }
-        }
-
-    }, [tabbableIndex]);
+    useChildFlag(tabbableIndex, childCount, (index, tabbable) => {
+        (managedChildren[index as keyof typeof managedChildren] as I)?.setTabbable(tabbable, tabbable && focusOnChange ? "focus" : undefined);
+    })
 
     const focusSelf = useCallback(() => {
         managedChildren[tabbableIndex].setTabbable(true, "focus");
@@ -178,6 +168,7 @@ export function useRovingTabIndex<I extends RovingTabIndexChildInfo<any>>({ focu
 
     return {
         useRovingTabIndexChild,
+        childCount,
         managedChildren,
         indicesByElement,
         focusSelf,

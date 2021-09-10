@@ -88,7 +88,7 @@ export interface UseListNavigationChildReturnType<ChildElement extends Element> 
 
 
 /** Arguments passed to the parent `useListNavigation` */
-export interface UseListNavigationParameters extends Omit<UseTypeaheadNavigationParameters<number>, "getIndex" | "setIndex">, Omit<UseRovingTabIndexParameters<number>, "tabbableIndex"> {
+export interface UseListNavigationParameters extends Omit<UseTypeaheadNavigationParameters, "getIndex" | "setIndex">, Omit<UseRovingTabIndexParameters, "tabbableIndex"> {
 
     /**
      * Maps to Intl.Collator's ignorePunctuation parameter.  Whether punctuation (which is context and locale dependent) should be ignored when searching.
@@ -129,7 +129,7 @@ export interface UseListNavigationParameters extends Omit<UseTypeaheadNavigation
 }
 
 /** Arguments passed to the child 'useListNavigationChild` */
-export interface UseListNavigationChildInfo extends RovingTabIndexChildInfo<number> {
+export interface UseListNavigationChildInfo extends RovingTabIndexChildInfo {
     /**
      * If provided, allows this component to be navigated to by typing this string. 
      * It should be the same text content as whatever's displayed, ideally.
@@ -166,7 +166,7 @@ export function useListNavigation<ParentElement extends Element, ChildElement ex
         setTabbableIndex(index);
     }, [])
     const { managedChildren, indicesByElement, useRovingTabIndexChild, focusSelf, ...rest } = useRovingTabIndex<I>({ focusOnChange, tabbableIndex: tabbableIndex as any })
-    const { currentTypeahead, invalidTypeahead, useTypeaheadNavigationChild } = useTypeaheadNavigation<ParentElement, ChildElement, number>({ collator, getIndex: getTabbableIndex, setIndex, typeaheadTimeout: 1000 });
+    const { currentTypeahead, invalidTypeahead, useTypeaheadNavigationChild } = useTypeaheadNavigation<ParentElement, ChildElement>({ collator, getIndex: getTabbableIndex, setIndex, typeaheadTimeout: 1000 });
     const { navigateToEnd, navigateToIndex, navigateToNext, navigateToPrev, navigateToStart, useLinearNavigationChild } = useLinearNavigation<ParentElement, ChildElement>({ getIndex: getTabbableIndex, setIndex, managedChildren });
 
 

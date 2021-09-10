@@ -63,10 +63,10 @@ const DemoUseRovingTabIndexChild = (({ index }: { index: number }) => {
     const randomWord = useConstant(() => RandomWords[index/*Math.floor(Math.random() * (RandomWords.length - 1))*/]);
     const useRovingTabIndexChild = useContext(RovingChildContext);
     const text = `${randomWord} This is item #${index + 1}`;
-    const { useListNavigationChildProps, useListNavigationSiblingProps } = useRovingTabIndexChild({ index, text });
+    const { useListNavigationChildProps, useListNavigationSiblingProps, tabbable } = useRovingTabIndexChild({ index, text });
     
     const props = useListNavigationChildProps({});
     return (
-        <li {...props}>{text} ({props.tabIndex})<input {...useListNavigationSiblingProps({ type: "checkbox" })} /></li>
+        <li {...props}>{text} ({tabbable? "Tabbable" : "Not tabbable"})<input {...useListNavigationSiblingProps({ type: "checkbox" })} /></li>
     )
 });

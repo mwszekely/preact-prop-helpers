@@ -225,8 +225,8 @@ export function useLinearNavigation<ParentElement extends Element, ChildElement 
 
 
 
-export interface UseTypeaheadNavigationReturnType<ParentElement extends Element, ChildElement extends Element, I extends string | number> {
-    useTypeaheadNavigationChild: UseTypeaheadNavigationChild<ChildElement, I>;
+export interface UseTypeaheadNavigationReturnType<ParentElement extends Element, ChildElement extends Element> {
+    useTypeaheadNavigationChild: UseTypeaheadNavigationChild<ChildElement>;
 
 
     currentTypeahead: string | null;
@@ -240,7 +240,7 @@ export interface UseTypeaheadNavigationChildReturnType<E extends Element> {
 
 
 /** Arguments passed to the parent `useTypeaheadNavigation` */
-export interface UseTypeaheadNavigationParameters<I extends string | number> {
+export interface UseTypeaheadNavigationParameters {
 
     /**
      * A collator to use when comparing. If not provided, simply uses `localeCompare` after transforming each to lowercase, which will, at best, work okay in English.
@@ -249,13 +249,13 @@ export interface UseTypeaheadNavigationParameters<I extends string | number> {
 
     typeaheadTimeout?: number;
 
-    getIndex(): I;
-    setIndex(value: I): void;
-    setIndex(value: (previousValue: I) => I): void;
+    getIndex(): number;
+    setIndex(value: number): void;
+    setIndex(value: (previousValue: number) => number): void;
 }
 
 /** Arguments passed to the child 'useTypeaheadNavigationChild` */
-export interface UseTypeaheadNavigationChildInfo<T extends string | number> extends Pick<RovingTabIndexChildInfo<T>, "index"> {
+export interface UseTypeaheadNavigationChildInfo extends Pick<RovingTabIndexChildInfo, "index"> {
     /**
      * If provided, allows this component to be navigated to by typing this string. 
      * It should be the same text content as whatever's displayed, ideally.
@@ -265,7 +265,7 @@ export interface UseTypeaheadNavigationChildInfo<T extends string | number> exte
 
 
 /** Type of the child's sub-hook */
-export type UseTypeaheadNavigationChild<ChildElement extends Element, I extends string | number> = ({ text, index, ...i }: Omit<UseTypeaheadNavigationChildInfo<I>, "setTabbable">) => UseTypeaheadNavigationChildReturnType<ChildElement>;
+export type UseTypeaheadNavigationChild<ChildElement extends Element> = ({ text, index, ...i }: Omit<UseTypeaheadNavigationChildInfo, "setTabbable">) => UseTypeaheadNavigationChildReturnType<ChildElement>;
 
 /** Return type of the child `useTypeaheadNavigationChildProps` */
 export type UseTypeaheadNavigationChildPropsReturnType<ChildElement extends Element, P extends {}> = MergedProps<ChildElement, UseRefElementPropsReturnType<ChildElement, {
@@ -280,7 +280,7 @@ export type UseTypeaheadNavigationChildPropsReturnType<ChildElement extends Elem
  * 
  * @see useListNavigation, which packages everything up together.
  */
-export function useTypeaheadNavigation<ParentElement extends Element, ChildElement extends Element, I extends string | number>({ collator, getIndex, typeaheadTimeout, setIndex }: UseTypeaheadNavigationParameters<I>): UseTypeaheadNavigationReturnType<ParentElement, ChildElement, I> {
+export function useTypeaheadNavigation<ParentElement extends Element, ChildElement extends Element>({ collator, getIndex, typeaheadTimeout, setIndex }: UseTypeaheadNavigationParameters): UseTypeaheadNavigationReturnType<ParentElement, ChildElement> {
 
 
     // For typeahead, keep track of what our current "search" string is (if we have one)
@@ -289,7 +289,7 @@ export function useTypeaheadNavigation<ParentElement extends Element, ChildEleme
     // And, for the user's sake, let them know when their typeahead can't match anything anymore
     const [currentTypeahead, setCurrentTypeahead, getCurrentTypeahead] = useState<string | null>(null);
     useTimeout({ timeout: typeaheadTimeout ?? 1000, callback: () => { setCurrentTypeahead(null); setInvalidTypeahead(null); }, triggerIndex: currentTypeahead });
-    const sortedTypeaheadInfo = useRef<{ text: string, unsortedIndex: I }[]>([]);
+    const sortedTypeaheadInfo = useRef<{ text: string, unsortedIndex: number }[]>([]);
     const [invalidTypeahead, setInvalidTypeahead] = useState<boolean | null>(false);
 
     // Handle typeahead for input method editors as well
@@ -310,7 +310,7 @@ export function useTypeaheadNavigation<ParentElement extends Element, ChildEleme
 
 
 
-    const comparator = useStableCallback((lhs: string, rhs: { text: string; unsortedIndex: I; }) => {
+    const comparator = useStableCallback((lhs: string, rhs: { text: string; unsortedIndex: number; }) => {
         let compare: number;
 
         // For the purposes of typeahead, only compare a string of the same size as our currently typed string.
@@ -370,14 +370,14 @@ export function useTypeaheadNavigation<ParentElement extends Element, ChildEleme
 
 
                 // These are used to keep track of the candidates' positions in both our sorted array and the unsorted DOM.
-                let lowestUnsortedIndexAll: I | null = null;
+                let lowestUnsortedIndexAll: number | null = null;
                 let lowestSortedIndexAll = sortedTypeaheadIndex;
 
                 // These two are only set for elements that are ahead of us, but the principle's the same otherwise
-                let lowestUnsortedIndexNext: I | null = null;
+                let lowestUnsortedIndexNext: number | null = null;
                 let lowestSortedIndexNext = sortedTypeaheadIndex;
 
-                const updateBestFit = (u: I) => {
+                const updateBestFit = (u: number) => {
                     if (lowestUnsortedIndexAll == null || u < lowestUnsortedIndexAll) {
                         lowestUnsortedIndexAll = u;
                         lowestSortedIndexAll = i;
@@ -409,7 +409,7 @@ export function useTypeaheadNavigation<ParentElement extends Element, ChildEleme
         }
     }, [currentTypeahead]);
 
-    const useTypeaheadNavigationChild: UseTypeaheadNavigationChild<ChildElement, I> = useCallback(({ text, ...i }: Omit<UseTypeaheadNavigationChildInfo<I>, "setTabbable">) => {
+    const useTypeaheadNavigationChild: UseTypeaheadNavigationChild<ChildElement> = useCallback(({ text, ...i }: Omit<UseTypeaheadNavigationChildInfo, "setTabbable">) => {
 
         useEffect(() => {
             if (text) {
