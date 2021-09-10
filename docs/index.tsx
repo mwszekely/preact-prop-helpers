@@ -136,7 +136,6 @@ const DemoUseAsyncHandler1 = memo(() => {
     return (
         <div className="demo">
             <button disabled={pending && disableConsecutive} onClick={onClick}>Click me!</button>
-            <hr />
             <label>Sleep for: <input type="number" value={timeout} onInput={e => setTimeout(e.currentTarget.valueAsNumber)} /></label>
             <label>Throw an error <input type="checkbox" checked={shouldThrow} onInput={e => setShouldThrow(e.currentTarget.checked)} /></label>
             <label>Disabled while pending <input type="checkbox" checked={disableConsecutive} onInput={e => setDisableConsecutive(e.currentTarget.checked)} /></label>
@@ -247,17 +246,27 @@ const DemoFocus = memo(() => {
 const Component = () => {
     return <div class="flex" style={{ flexWrap: "wrap" }}>
         <DemoFocus />
+        <hr />
         <DemoUseTimeout />
+        <hr />
         <DemoUseInterval />
+        <hr />
         <DemoUseRovingTabIndex />
+        <hr />
 
 
         <DemoUseFocusTrap />
+        <hr />
         <DemoUseAsyncHandler1 />
+        <hr />
         <DemoUseAsyncHandler2 />
+        <hr />
         <DemoUseDroppable />
+        <hr />
         <DemoUseDraggable />
+        <hr />
         <DemoUseElementSizeAnimation />
+        <hr />
         <input />
     </div>
 }

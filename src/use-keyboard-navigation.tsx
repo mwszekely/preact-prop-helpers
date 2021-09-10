@@ -18,7 +18,7 @@ import { useStableCallback } from "./use-stable-callback";
 
 
 export interface UseLinearNavigationReturnType<ParentElement extends Element, ChildElement extends Element> {
-    useLinearNavigationProps: UseLinearNavigationProps<ParentElement>;
+    //useLinearNavigationProps: UseLinearNavigationProps<ParentElement>;
     useLinearNavigationChild: UseLinearNavigationChild<ChildElement>;
 
     navigateToIndex(index: number): void;
@@ -36,7 +36,7 @@ export interface UseLinearNavigationChildReturnType<E extends Element> {
     useLinearNavigationChildProps: UseLinearNavigationChildProps<E>;
 }
 
-export type UseLinearNavigationChildProps<ChildElement extends Element> = <P extends h.JSX.HTMLAttributes<ChildElement>>(props: P) => MergedProps<ChildElement, P, P>;
+export type UseLinearNavigationChildProps<ChildElement extends Element> = <P extends h.JSX.HTMLAttributes<ChildElement>>(props: P) => UseRefElementPropsReturnType<ChildElement, MergedProps<ChildElement, { onKeyDown: (e: KeyboardEvent) => void; }, P>>;
 
 
 /** Arguments passed to the parent `useLinearNavigation` */
@@ -61,12 +61,6 @@ export interface UseLinearNavigationParameters {
 
 /** Arguments passed to the child 'useLinearNavigationChild` */
 export interface UseLinearNavigationChildInfo extends ManagedChildInfo<number> { }
-
-/** Type of the parent's prop-modifying function */
-export type UseLinearNavigationProps<ParentElement extends Element> = <P extends {}>({ ...props }: P) => UseLinearNavigationPropsReturnType<ParentElement, P>;
-
-/** Return type of the parent `useLinearNavigationProps` */
-export type UseLinearNavigationPropsReturnType<ParentElement extends Element, P extends {}> = MergedProps<ParentElement, UseRefElementPropsReturnType<ParentElement, { onKeyDown: (e: KeyboardEvent) => void; }>, P>
 
 /** Return type of the child `useLinearNavigationChildProps` */
 export type UseLinearNavigationChildPropsReturnType<ChildElement extends Element, P extends {}> = MergedProps<ChildElement, UseRefElementPropsReturnType<ChildElement, { tabIndex: number; }>, Omit<P, "tabIndex">>;
@@ -103,14 +97,17 @@ export function useLinearNavigation<ParentElement extends Element, ChildElement 
     const navigateToStart = useCallback(() => { navigateToIndex(0); }, [navigateToIndex]);
     const navigateToEnd = useCallback(() => { navigateToIndex(-1); }, [navigateToIndex]);
 
-    const { useRefElementProps, getElement: getParentElement } = useRefElement<ParentElement>();
-    const { convertElementSize, getLogicalDirection } = useLogicalDirection(getParentElement());
-
-    const useLinearNavigationProps: UseLinearNavigationProps<ParentElement> = function <P extends {}>({ ...props }: P): UseLinearNavigationPropsReturnType<ParentElement, P> {
-        return useRefElementProps(props);
-    }
 
     const useLinearNavigationChild: UseLinearNavigationChild<ChildElement> = useCallback(() => {
+        const { useRefElementProps, element } = useRefElement<ChildElement>();
+
+        // Prefer the parent element's direction so that we're not calling getComputedStyle
+        // on every single individual child, which is likely redundant.
+        // TODO: Does useLogicalDirection need to hold a per-render & per-element cache to make this work?
+        // Or does the browser automatically cache the computations until something changes?
+        // Given that the values are live, it seems like it should be the latter...
+        const { convertElementSize, getLogicalDirection } = useLogicalDirection(element?.parentElement ?? element);
+
         const useLinearNavigationChildProps: UseLinearNavigationChildProps<ChildElement> = (props) => {
 
             const onKeyDown = (e: KeyboardEvent) => {
@@ -202,7 +199,7 @@ export function useLinearNavigation<ParentElement extends Element, ChildElement 
             };
 
 
-            return useMergedProps<ChildElement>()({ onKeyDown }, props);
+            return useRefElementProps(useMergedProps<ChildElement>()({ onKeyDown }, props));
 
         }
         return {
@@ -211,7 +208,6 @@ export function useLinearNavigation<ParentElement extends Element, ChildElement 
     }, [])
 
     return {
-        useLinearNavigationProps,
         useLinearNavigationChild,
 
         navigateToIndex,
@@ -230,7 +226,6 @@ export function useLinearNavigation<ParentElement extends Element, ChildElement 
 
 
 export interface UseTypeaheadNavigationReturnType<ParentElement extends Element, ChildElement extends Element, I extends string | number> {
-    useTypeaheadNavigationProps: UseTypeaheadNavigationProps<ParentElement>;
     useTypeaheadNavigationChild: UseTypeaheadNavigationChild<ChildElement, I>;
 
 
@@ -268,14 +263,9 @@ export interface UseTypeaheadNavigationChildInfo<T extends string | number> exte
     text: string | null;
 }
 
-/** Type of the parent's prop-modifying function */
-export type UseTypeaheadNavigationProps<ParentElement extends Element> = <P extends {}>({ ...props }: P) => UseTypeaheadNavigationPropsReturnType<ParentElement, P>;
 
 /** Type of the child's sub-hook */
 export type UseTypeaheadNavigationChild<ChildElement extends Element, I extends string | number> = ({ text, index, ...i }: Omit<UseTypeaheadNavigationChildInfo<I>, "setTabbable">) => UseTypeaheadNavigationChildReturnType<ChildElement>;
-
-/** Return type of the parent `useTypeaheadNavigationProps` */
-export type UseTypeaheadNavigationPropsReturnType<ParentElement extends Element, P extends {}> = MergedProps<ParentElement, UseRefElementPropsReturnType<ParentElement, { onKeyDown: (e: KeyboardEvent) => void; onCompositionStart: (e: CompositionEvent) => void; onCompositionEnd: (e: CompositionEvent) => void; }>, P>;
 
 /** Return type of the child `useTypeaheadNavigationChildProps` */
 export type UseTypeaheadNavigationChildPropsReturnType<ChildElement extends Element, P extends {}> = MergedProps<ChildElement, UseRefElementPropsReturnType<ChildElement, {
@@ -417,9 +407,7 @@ export function useTypeaheadNavigation<ParentElement extends Element, ChildEleme
                     setIndex(sortedTypeaheadInfo.current[lowestSortedIndexAll].unsortedIndex);
             }
         }
-    }, [currentTypeahead])
-
-    const useTypeaheadNavigationProps: UseTypeaheadNavigationProps<ParentElement> = (p) => p;
+    }, [currentTypeahead]);
 
     const useTypeaheadNavigationChild: UseTypeaheadNavigationChild<ChildElement, I> = useCallback(({ text, ...i }: Omit<UseTypeaheadNavigationChildInfo<I>, "setTabbable">) => {
 
@@ -516,7 +504,6 @@ export function useTypeaheadNavigation<ParentElement extends Element, ChildEleme
 
     return {
         useTypeaheadNavigationChild,
-        useTypeaheadNavigationProps,
 
         currentTypeahead,
         invalidTypeahead,
