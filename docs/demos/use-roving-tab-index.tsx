@@ -1,6 +1,6 @@
 import { createContext, h } from "preact";
 import { memo, useContext } from "preact/compat";
-import { useConstant } from "../..";
+import { useConstant, useHasFocus } from "../..";
 import { useListNavigation, UseListNavigationChild } from "../../use-list-navigation";
 
 
@@ -9,7 +9,8 @@ const RandomWords = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, se
 const RovingChildContext = createContext<UseListNavigationChild<HTMLLIElement>>(null!)
 export const DemoUseRovingTabIndex = memo(() => {
 
-    const { useListNavigationChild, useListNavigationProps, currentTypeahead, setTabbableIndex, tabbableIndex } = useListNavigation<HTMLUListElement, HTMLLIElement>({});
+    const { lastFocusedInner, useHasFocusProps } = useHasFocus<HTMLUListElement>();
+    const { useListNavigationChild, currentTypeahead, setTabbableIndex, tabbableIndex } = useListNavigation<HTMLUListElement, HTMLLIElement>({ focusOnChange: lastFocusedInner });
     //const { useRovingTabIndexChild, useRovingTabIndexProps } = useRovingTabIndex<HTMLUListElement, RovingTabIndexChildInfo>({ tabbableIndex, focusOnChange: false });
 
     return (
@@ -43,7 +44,7 @@ export const DemoUseRovingTabIndex = memo(() => {
                 Feel free to nest them too, as long as you are aware of your <code>Context</code> management (i.e. remember that you need to create a new <code>Context</code> for each use case).
             </p>
             <label>Tabbable index: <input type="number" value={tabbableIndex} onInput={e => { e.preventDefault(); setTabbableIndex(e.currentTarget.valueAsNumber); }} /></label>
-            <ul {...useListNavigationProps({})}>
+            <ul {...useHasFocusProps({})}>
                 <RovingChildContext.Provider value={useListNavigationChild}>
                     {Array.from((function* () {
                         for (let i = 0; i < 10; ++i) {

@@ -8,24 +8,18 @@ import { useTimeout } from "./use-timeout";
 import { useChildManager, ManagedChildInfo, UseChildManagerReturnType } from "./use-child-manager";
 import { useStableGetter } from "./use-stable-getter";
 import { useHasFocus, UseHasFocusPropsReturnType } from "./use-has-focus";
+import { useActiveElement } from "use-active-element";
 
 
 
 
 /** Return type of `useRovingTabIndex` */
-export interface UseRovingTabIndexReturnType<ParentElement extends Element, I extends RovingTabIndexChildInfo<any>> extends Omit<UseChildManagerReturnType<I>, "useManagedChild"> {
-    useRovingTabIndexProps: UseRovingTabIndexProps<ParentElement>;
+export interface UseRovingTabIndexReturnType<I extends RovingTabIndexChildInfo<any>> extends Omit<UseChildManagerReturnType<I>, "useManagedChild"> {
     useRovingTabIndexChild: UseRovingTabIndexChild<I>;
     childCount: number;
 
     // Focuses whatever is the currently tabbable element
     focusSelf(): void;
-
-    /*roveToIndex: (index: number, focus?: "focus" | undefined) => void;
-    roveToNext: (focus?: "focus" | undefined) => void;
-    roveToPrev: (focus?: "focus" | undefined) => void;
-    roveToStart: (focus?: "focus" | undefined) => void;
-    roveToEnd: (focus?: "focus" | undefined) => void;*/
 }
 
 /** Return type of `useRovingTabIndexChild` */
@@ -40,7 +34,7 @@ export interface UseRovingTabIndexChildReturnType<ChildElement extends Element> 
 /** Arguments passed to the parent `useRovingTabIndex` */
 export interface UseRovingTabIndexParameters<T extends (number | string)> {
     tabbableIndex: T;
-    //focusOnChange: boolean;
+    focusOnChange: boolean;
 }
 
 /** Arguments passed to the child 'useRovingTabIndexChild` */
@@ -82,28 +76,26 @@ export type UseRovingTabIndexSiblingProps<ChildElement extends Element> = <P ext
  * prop-modifying hook *that* hook returns should then be used
  * on the child's element, as well as any other elements you'd like
  * to be explicitly made untabbable too.
+ * 
+ * `focusOnChange` should be set to true if focus is 
+ * contained within whatever element contains the roving tab index.
+ * Generally as simple as the following:
+ * ```
+ * const { focused, focusedInner, useHasFocusProps } = useHasFocus<ParentElement>();
+ * const focusOnChange = (focusedInner != false);
+ * ```
+ * It's not included here because `useRovingTabIndex` doesn't know 
+ * anything about the container element, only children elements.
+ * And just as well! Children should be allowed at the root, 
+ * regardless of if it's the whole app or just a given component.
  */
-export function useRovingTabIndex<ParentElement extends Element, I extends RovingTabIndexChildInfo<any>>({ tabbableIndex }: UseRovingTabIndexParameters<I extends RovingTabIndexChildInfo<infer T> ? T : string | number>): UseRovingTabIndexReturnType<ParentElement, I> {
+export function useRovingTabIndex<I extends RovingTabIndexChildInfo<any>>({ focusOnChange, tabbableIndex }: UseRovingTabIndexParameters<I extends RovingTabIndexChildInfo<infer T> ? T : string | number>): UseRovingTabIndexReturnType<I> {
 
-    const { focused, focusedInner, useHasFocusProps } = useHasFocus<ParentElement>();
     const getTabbableIndex = useStableGetter(tabbableIndex);
-
-    // Keep track of three things related to the currently tabbable element's index:
-    // What it is,
-    // What it was the last time,
-    // Whether, when we render this component and it's changed, to also focus the element that was made tabbable.
-    // For this reason, boolean | null is semantically intentional, if technically unnecessary -- 
-    // true or false imply a change just happened and that tabbableIndex != prevTabbable.current, and null implies no change.
-    //const [tabbableIndex, setTabbableIndex, getTabbableIndex] = useState(0);
     const prevTabbable = useRef(-Infinity);
 
     // Call the hook that allows us to collect information from children who provide it
-    const { managedChildren, useManagedChild, indicesByElement, ...rest } = useChildManager<I>();
-
-    // Doesn't do anything, but here because there's a pretty decent chance it might in the future.
-    const useRovingTabIndexProps = useCallback(<P extends {}>(props: P) => useMergedProps<ParentElement>()(useHasFocusProps({}), props), []) as UseRovingTabIndexProps<ParentElement>;
-
-    const focusOnChange = (focusedInner != false);
+    const { managedChildren, useManagedChild, indicesByElement,  ...rest } = useChildManager<I>();
 
     // Any time the tabbable index changes,
     // notify the previous child that it's no longer tabbable,
@@ -120,7 +112,7 @@ export function useRovingTabIndex<ParentElement extends Element, I extends Rovin
             }
         }
 
-    }, [tabbableIndex, focusOnChange]);
+    }, [tabbableIndex]);
 
     const focusSelf = useCallback(() => {
         managedChildren[tabbableIndex].setTabbable(true, "focus");
@@ -192,7 +184,6 @@ export function useRovingTabIndex<ParentElement extends Element, I extends Rovin
     }, [useManagedChild]);
 
     return {
-        useRovingTabIndexProps,
         useRovingTabIndexChild,
         managedChildren,
         indicesByElement,
