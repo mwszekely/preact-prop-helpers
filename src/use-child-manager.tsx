@@ -47,9 +47,21 @@ export interface UseChildManagerReturnType<I extends ManagedChildInfo<any>> {
      * or rather the information they provided
      * the parent.
      * 
+     * The index that the child provided is where it is located in this structure. For numeric IDs, this is just an array, with each object at that location in the array.
+     * 
      * This is generally just an array, though it can be a Record instead if string IDs are used instead of numeric IDs.
      */
     managedChildren: ManagedChildren<InfoToKey<I>, I>;
+
+    /**
+     * Separate from `managedChildren`, this keeps track of all mounted children in the order that they mounted.
+     * `getMountIndex` will return the index into this array given the child's index.
+     *  
+     * When unmounted, its entry becomes null.
+     * 
+     * This and `managedChildren` will always have the same contents, but likely in a different order and in different locations.
+     */
+    mountedChildren: (null | I)[];
 
     /**
      * Returns the current number of children being managed 
@@ -72,7 +84,7 @@ export interface UseChildManagerReturnType<I extends ManagedChildInfo<any>> {
     /**
      * Returns in what position this child mounted. If this is the most recently mounted child, it will return a value equal to `totalChildrenMounted` - 1.
      * 
-     * Cannot be used inside useLayoutEffect. If multiple children are mounted on the same frame, their mount indices relative to each other will be arbitrary but consistent (assuming Preact's is).
+     * **On the child side, cannot be used inside useLayoutEffect** (On the parent side it's fine at any point).  If multiple children are mounted on the same frame, their mount indices relative to each other will be arbitrary but consistent (assuming Preact's is).
      */
     getMountIndex(index: InfoToKey<I>): number;
 
@@ -105,6 +117,7 @@ export function useChildManager<I extends ManagedChildInfo<any>>(): UseChildMana
     const [totalChildrenUnounted, setTotalChildrenUnounted, getTotalChildrenUnounted] = useState(0);
     const childrenCurrentlyMounted = totalChildrenMounted - totalChildrenUnounted;
     const managedChildren = useRef<ManagedChildren<InfoToKey<I>, I>>([] as any as ManagedChildren<InfoToKey<I>, I> /** TODO: Any problems caused by using an array when it should be an object? */);
+    const mountedChildren = useRef<(null | I)[]>([]);
     const mountOrder = useRef<Map<K, number>>(new Map());
     const indicesByElement = useRef<Map<EventTarget, K>>(new Map());
 
@@ -114,9 +127,11 @@ export function useChildManager<I extends ManagedChildInfo<any>>(): UseChildMana
         const { element, getElement, useRefElementProps } = useRefElement<ChildType>();
 
         useLayoutEffect(() => {
-            mountOrder.current.set(info.index, getTotalChildrenMounted());
+            let index = getTotalChildrenMounted();
+            mountOrder.current.set(info.index, index);
+            mountedChildren.current[index] = info;
             setTotalChildrenMounted(t => ++t);
-            return () => { mountOrder.current.delete(info.index); setTotalChildrenUnounted(t => ++t); };
+            return () => { mountOrder.current.delete(info.index); mountedChildren.current[index] = null; setTotalChildrenUnounted(t => ++t); };
         }, [info.index]);
 
         // As soon as the component mounts, notify the parent and request a rerender.
@@ -159,6 +174,7 @@ export function useChildManager<I extends ManagedChildInfo<any>>(): UseChildMana
         useManagedChild,
         childCount: childrenCurrentlyMounted,
         managedChildren: managedChildren.current,
+        mountedChildren: mountedChildren.current,
         indicesByElement: indicesByElement.current,
         totalChildrenMounted,
         totalChildrenUnounted,
