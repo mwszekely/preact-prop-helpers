@@ -6,9 +6,8 @@ import { MergedProps, useMergedProps } from "./use-merged-props"
 import { useState } from "./use-state";
 import { useTimeout } from "./use-timeout";
 import { useLogicalDirection } from "./use-logical-direction";
-import { RovingTabIndexChildInfo, useRovingTabIndex, UseRovingTabIndexChildPropsReturnType, UseRovingTabIndexPropsReturnType, UseRovingTabIndexSiblingProps } from "./use-roving-tabindex";
+import { RovingTabIndexChildInfo, useRovingTabIndex, UseRovingTabIndexChildPropsReturnType, UseRovingTabIndexSiblingProps } from "./use-roving-tabindex";
 import { useLinearNavigation, useTypeaheadNavigation, UseTypeaheadNavigationParameters } from "./use-keyboard-navigation";
-import { UseHasFocusPropsReturnType } from "./use-has-focus";
 import { UseChildManagerReturnType, UseManagedChildReturnType } from "./use-child-manager";
 import { UseRovingTabIndexParameters } from "index";
 
@@ -138,16 +137,10 @@ export interface UseListNavigationChildInfo extends RovingTabIndexChildInfo<numb
     text: string | null;
 }
 
-/** Type of the parent's prop-modifying function */
-export type UseListNavigationProps<ParentElement extends Element> = <P extends h.JSX.HTMLAttributes<ParentElement>>({ ...props }: P) => UseListNavigationPropsReturnType<ParentElement, P>;
-
 /** Type of the child's sub-hook */
 export type UseListNavigationChild<ChildElement extends Element, I extends UseListNavigationChildInfo = UseListNavigationChildInfo> = ({ text, index, ...i }: Omit<I, "setTabbable">) => UseListNavigationChildReturnType<ChildElement>;
 
 export type UseListNavigationChildParameters<I extends UseListNavigationChildInfo> = Omit<I, "setTabbable">;
-
-/** Return type of the parent `useListNavigationProps` */
-export type UseListNavigationPropsReturnType<ParentElement extends Element, P extends h.JSX.HTMLAttributes<ParentElement>> = MergedProps<ParentElement, UseHasFocusPropsReturnType<ParentElement, {}>, P>;
 
 /** Return type of the child `useListNavigationChildProps` */
 export type UseListNavigationChildPropsReturnType<ChildElement extends Element, P extends h.JSX.HTMLAttributes<ChildElement>> = MergedProps<ChildElement, UseRovingTabIndexChildPropsReturnType<ChildElement, { onClick: () => void; }>, P>;

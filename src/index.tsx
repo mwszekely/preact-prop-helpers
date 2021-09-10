@@ -23,8 +23,8 @@ export { usePersistentState } from "./use-persistent-state";
 export { useRandomId } from "./use-random-id";
 export { useTimeout } from "./use-timeout";
 export { useChildManager, ManagedChildInfo } from "./use-child-manager";
-export { useRovingTabIndex, UseRovingTabIndexChild, UseRovingTabIndexReturnType, RovingTabIndexChildInfo, UseRovingTabIndexChildPropsReturnType, UseRovingTabIndexChildReturnType, UseRovingTabIndexParameters, UseRovingTabIndexProps, UseRovingTabIndexPropsReturnType } from "./use-roving-tabindex";
-export { useListNavigation, UseListNavigationChild, UseListNavigationChildPropsReturnType, UseListNavigationChildReturnType, UseListNavigationParameters, UseListNavigationProps, UseListNavigationPropsReturnType, UseListNavigationReturnType } from "./use-list-navigation"
+export { useRovingTabIndex, UseRovingTabIndexChild, UseRovingTabIndexReturnType, RovingTabIndexChildInfo, UseRovingTabIndexChildPropsReturnType, UseRovingTabIndexChildReturnType, UseRovingTabIndexParameters } from "./use-roving-tabindex";
+export { useListNavigation, UseListNavigationChild, UseListNavigationChildPropsReturnType, UseListNavigationChildReturnType, UseListNavigationParameters, UseListNavigationReturnType } from "./use-list-navigation"
 
 export { useFocusTrap, UseFocusTrapReturnType, UseFocusTrapParameters, UseFocusTrapPropsParameters, UseFocusTrapPropsReturnType } from "./use-focus-trap";
 

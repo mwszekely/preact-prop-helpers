@@ -6,7 +6,7 @@ import { MergedProps, useMergedProps } from "./use-merged-props"
 import { useState } from "./use-state";
 import { useTimeout } from "./use-timeout";
 import { useLogicalDirection } from "./use-logical-direction";
-import { RovingTabIndexChildInfo, useRovingTabIndex, UseRovingTabIndexChildPropsReturnType, UseRovingTabIndexPropsReturnType } from "./use-roving-tabindex";
+import { RovingTabIndexChildInfo } from "./use-roving-tabindex";
 import { ManagedChildInfo } from "./use-child-manager";
 import { useStableCallback } from "./use-stable-callback";
 
@@ -255,7 +255,7 @@ export interface UseTypeaheadNavigationParameters<I extends string | number> {
 }
 
 /** Arguments passed to the child 'useTypeaheadNavigationChild` */
-export interface UseTypeaheadNavigationChildInfo<T extends string | number> extends RovingTabIndexChildInfo<T> {
+export interface UseTypeaheadNavigationChildInfo<T extends string | number> extends Pick<RovingTabIndexChildInfo<T>, "index"> {
     /**
      * If provided, allows this component to be navigated to by typing this string. 
      * It should be the same text content as whatever's displayed, ideally.

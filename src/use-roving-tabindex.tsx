@@ -7,7 +7,6 @@ import { useState } from "./use-state";
 import { useTimeout } from "./use-timeout";
 import { useChildManager, ManagedChildInfo, UseChildManagerReturnType } from "./use-child-manager";
 import { useStableGetter } from "./use-stable-getter";
-import { useHasFocus, UseHasFocusPropsReturnType } from "./use-has-focus";
 import { useActiveElement } from "use-active-element";
 
 
@@ -42,14 +41,8 @@ export interface RovingTabIndexChildInfo<T extends number | string> extends Mana
     setTabbable(tabbable: boolean, focus: "focus" | undefined): void;
 }
 
-/** Type of the parent's prop-modifying function */
-export type UseRovingTabIndexProps<ParentElement extends Element> = <P extends h.JSX.HTMLAttributes<ParentElement>>(props: P) => MergedProps<ParentElement, UseHasFocusPropsReturnType<ParentElement, {}>, P>;
-
 /** Type of the child's sub-hook */
 export type UseRovingTabIndexChild<I extends RovingTabIndexChildInfo<any>> = <ChildElement extends Element>(props: Omit<I, "setTabbable">) => UseRovingTabIndexChildReturnType<ChildElement>;
-
-/** Return type of the parent `useRovingTabIndexProps` */
-export type UseRovingTabIndexPropsReturnType<ParentElement extends Element, P extends h.JSX.HTMLAttributes<ParentElement>> = MergedProps<ParentElement, UseRefElementPropsReturnType<ParentElement, { /*onKeyDown: (e: KeyboardEvent) => void;*/ }>, P>
 
 export type UseRovingTabIndexChildPropsParameters<ChildElement extends Element> = h.JSX.HTMLAttributes<ChildElement>;
 export type UseRovingTabIndexSiblingPropsParameters<ChildElement extends Element> = h.JSX.HTMLAttributes<ChildElement>;
