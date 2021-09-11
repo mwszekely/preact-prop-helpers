@@ -193,26 +193,32 @@ export function useChildManager<I extends ManagedChildInfo<any>>(): UseChildMana
  * @param length How many children exist (as managedChildren.length)
  * @param setFlag A function that probably looks like (i, flag) => managedChildren[i].setActive(flag)
  */
- export function useChildFlag(activatedIndex: number | null | undefined, length: number, setFlag: (i: number, set: boolean) => void) {
+export function useChildFlag(activatedIndex: number | null | undefined, length: number, setFlag: (i: number, set: boolean) => void) {
 
     const [prevActivatedIndex, setPrevActivatedIndex, getPrevActivatedIndex] = useState<number | null>(null);
     const [prevChildCount, setPrevChildCount, getPrevChildCount] = useState(length);
 
+    // Any time the number of components changes,
+    // reset any initial, possibly incorrect state they might have had, just in case.
+    useLayoutEffect(() => {
+        const direction = Math.sign(length - getPrevChildCount());
+        if (direction !== 0) {
+            for (let i = getPrevChildCount() ?? 0; i != length; i += direction) {
+                setFlag(i, i === activatedIndex);
+            }
+            setPrevChildCount(length);
+        }
+    }, [activatedIndex, length])
+
     useLayoutEffect(() => {
 
-        // Unset any children that might have mounted (in case their initial state isn't correct)
-        for (let i = (getPrevChildCount() ?? 0); i < length; ++i) {
-            setFlag(i, i === activatedIndex);
-        }
-        setPrevChildCount(length);
-
-        // Collapse the currently activated panel
+        // Deactivate the previously activated component
         const prevActivatedIndex = getPrevActivatedIndex();
-        if (prevActivatedIndex != null && prevActivatedIndex <= length)
+        if (prevActivatedIndex != null && prevActivatedIndex >= 0 && prevActivatedIndex < length)
             setFlag(prevActivatedIndex, false);
 
-        // Expand the next panel
-        if (activatedIndex != null && activatedIndex <= length) {
+        // Activate the current component
+        if (activatedIndex != null && activatedIndex >= 0 && activatedIndex < length) {
             setFlag(activatedIndex, true);
             setPrevActivatedIndex(activatedIndex);
         }
