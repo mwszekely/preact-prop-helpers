@@ -1,4 +1,4 @@
-import { ComponentChildren, Fragment, h } from "preact";
+import { ComponentChildren, createElement, Fragment, h } from "preact";
 import { GenericReplace } from "./use-merged-props";
 
 // Generally too complex
@@ -21,7 +21,7 @@ export function useMergedChildren<Lhs extends Pick<h.JSX.HTMLAttributes<any>, "c
         return lhs as MergedChildren<Lhs, Rhs>;
     }
     else {
-        let ret = <>{lhs}{rhs}</>;
+        let ret = createElement(Fragment, {}, lhs, rhs);
         return ret as MergedChildren<Lhs, Rhs>;
     }
 }
