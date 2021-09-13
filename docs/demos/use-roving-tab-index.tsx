@@ -1,7 +1,8 @@
 import { createContext, h } from "preact";
 import { memo, useContext } from "preact/compat";
-import { useConstant, useHasFocus } from "../..";
+import { useHasFocus } from "../..";
 import { useListNavigation, UseListNavigationChild } from "../../use-list-navigation";
+import { useState } from "../../use-state";
 
 
 const RandomWords = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
@@ -60,7 +61,7 @@ export const DemoUseRovingTabIndex = memo(() => {
 
 const Prefix = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const DemoUseRovingTabIndexChild = (({ index }: { index: number }) => {
-    const randomWord = useConstant(() => RandomWords[index/*Math.floor(Math.random() * (RandomWords.length - 1))*/]);
+    const randomWord = useState(() => RandomWords[index/*Math.floor(Math.random() * (RandomWords.length - 1))*/]);
     const useRovingTabIndexChild = useContext(RovingChildContext);
     const text = `${randomWord} This is item #${index + 1}`;
     const { useListNavigationChildProps, useListNavigationSiblingProps, tabbable } = useRovingTabIndexChild({ index, text });

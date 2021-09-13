@@ -43,7 +43,6 @@ There are a few reasons:
 |`useStableGetter`									|Allows you to use some variable within `useEffect` or `useCallback` without including it in a dependency array. __Cannot be used within `useLayoutEffect`__.|
 |`useState`											|Identical to the built-in, but returns a third value, `getState`, that is stable everywhere, and __can be used inside useLayoutEffect or during render__. In general, this is the *only* getter that can be used there.|
 |`usePersistentState`								|Identical to `useState`, but persists across browsing sessions, separate tabs, etc.|
-|`useConstant`										|Identical to the built-in `useMemo`, but passes the dependencies to the factory function (so it's *slightly* less likely you'll need a wrapper function), but otherwise identical and `useMemo` is fine in most cases.|
 |`useEffect`, `useLayoutEffect`						|Identical to the built-ins, but provides previous dependency values as well as a list of what exactly changed (mainly useful for debugging). In most cases, the built-ins are just fine.|
 |`useMediaQuery`									|Measures if a given media query matches the device or not.
 
@@ -313,12 +312,3 @@ const [lastLogin, setLastLogin, getLastLogin] = useMyPersistentState("lastLogin"
 Another entirely optional drop-in replacement for the native Preact hooks.  These provide two arguments: the previous input values, and a list of which ones caused the effect to fire.  The latter is very useful for debugging.
 
 Aside from this, there is no difference between them.  Feel free to use the native ones if you don't need that information.
-
-
-## `useConstant`
-
-Given a factory function that returns a value you'd like to use, returns that value, only calling the function the first tine the component renders.
-
-Optionally, you can also pass a set of arguments that will be passed to the factory function.  Any time these arguments change, the constant will change accordingly. Regardless, it's called "constant" for the same reason `` `template-${string}` `` in the same scenario can be constant.
-
-This is effectively `useMemo`, except `useMemo` doesn't forward its inputs to the factory function.

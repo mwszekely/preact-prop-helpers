@@ -1,6 +1,5 @@
 import { h } from "preact";
-import { useCallback } from "preact/hooks";
-import { useConstant } from "./use-constant";
+import { useCallback, useLayoutEffect } from "preact/hooks";
 import { useMergedProps } from "./use-merged-props";
 import { useState } from "./use-state"
 
@@ -65,7 +64,8 @@ export interface UseRandomIdReturnType {
  * Unlike most other `use*Props` hooks, these are mostly stable.
  */
 export function useRandomId({ prefix }: UseRandomIdParameters = {}): UseRandomIdReturnType {
-    const randomId = useConstant(generateRandomId, prefix);
+    const [randomId, setRandomId] = useState<string>(() => generateRandomId(prefix));
+    useLayoutEffect(() => { setRandomId(() => generateRandomId(prefix)); }, [prefix])
 
     // Whatever ID was most recently used by the actual "id" prop.
     // Used so that any ID-referencing props don't need to provide the same value.
