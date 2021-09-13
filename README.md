@@ -59,7 +59,7 @@ function useMergedProps<E extends EventTarget>()<T, U>(lhs2: T, rhs2: U): Merged
 
 Virtually all hooks in this library make use of `useMergedProps`, and generally useful for making any sort of prop-modifying hook.  Given two sets of props, it merges them and returns the result.
 
-The hook is aware of and can intelligently merge `className`, `class`, `style`, `ref`, and all event handlers.
+The hook is aware of and can intelligently merge `className`, `class`, `style`, `children`, `ref`, and all event handlers.
 
 Note the signature, as the first call is empty due to typing reasons, while the actual props to merge are in the second call.
 
