@@ -25,7 +25,7 @@ There are a few reasons:
 
 |Hook|Description|
 |------|------|
-|`useMergedProps` (& `useMergedClasses`, `useMergedRefs`, `useMergedStyles`)	|Allows a component to use props from two (or more) separate unrelated sources.|
+|`useMergedProps` (& `useMergedClasses`, `useMergedRefs`, `useMergedStyles`, `useMergedChildren`)	|Allows a component to use props from two (or more) separate unrelated sources.|
 |`useChildManager`									|Allows for child → parent communication, and more efficient parent → child communication (e.g. telling a single child to change itself instead of rerendering all children).|
 |`useListNavigation` (& `useRovingTabIndex`, `useLinearNavigation`, `useTypeaheadNavigation`)	|Allows a component with children (like a select menu or radio group) to be treated as *one element to be tabbed into/out of*, with arrow keys and typeahead handling the navigation *within* the component.|
 |`useAsyncHandler`									|Creates a synchronous event handler from an asynchronous one, and provides the component with the information it needs to display the current async state effectively.|
@@ -55,7 +55,7 @@ These hooks can all be used to modify the props that were going to be passed to 
 ```tsx 
 function useMergedProps<E extends EventTarget>()<T, U>(lhs2: T, rhs2: U): MergedProps<T, U>;
 ```
-(Also `useMergedClasses`, `useMergedStyles`, and `useMergedRefs`, implicitly)
+(Also `useMergedClasses`, `useMergedStyles`, `useMergedChildren`, and `useMergedRefs`, implicitly)
 
 Virtually all hooks in this library make use of `useMergedProps`, and generally useful for making any sort of prop-modifying hook.  Given two sets of props, it merges them and returns the result.
 
@@ -72,6 +72,7 @@ return <div {...useMergedProps<HTMLDivElement>()(props1, props2)} />
 |`className`, `class`|`useMergedClasses`|Combined and duplicates removed.|
 |`style`|`useMergedStyles`|If objects, righthand properties overwrite lefthand ones. If strings, concatenates them. If mixed, attempts to construct an object from the string and then merges.|
 |`ref`|`useMergedRefs`|Creates a ref that references both, and uses that.|
+|`children`|Returns a `Fragment` containing the first prop's children, then the second prop's children.|
 |Event handlers (or any function)| |Calls the first event handler, then the second.|
 |Anything `null` or `undefined`| |Whichever side isn't null or undefined is kept. If both are, `null` is preferred over `undefined`.|
 |All other differences| |Since both are non-null, forcibly uses the righthand value. You can optionally set a function to run at that point that will receive a string as an error message. By default, a function that invokes the debugger is called.|

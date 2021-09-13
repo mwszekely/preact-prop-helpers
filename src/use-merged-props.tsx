@@ -1,4 +1,5 @@
-import { ClassAttributes, h, Ref, RefCallback } from "preact";
+import { ClassAttributes, Fragment, h, Ref, RefCallback } from "preact";
+import { useMergedChildren, MergedChildren } from "./use-merged-children";
 import { MergedClasses, useMergedClasses } from "./use-merged-classes";
 import { MergedRefs, useMergedRefs } from "./use-merged-refs";
 import { MergedStyles, useMergedStyles } from "./use-merged-styles";
@@ -15,10 +16,6 @@ type ElementFromAttributes<A extends { ref?: Ref<any> }> = A["ref"] extends Ref<
  */
 export type MergedProps<E extends EventTarget, T extends h.JSX.HTMLAttributes<E>, U extends h.JSX.HTMLAttributes<E>> = h.JSX.HTMLAttributes<E> & Omit<T, keyof h.JSX.HTMLAttributes<E>> & Omit<U, keyof h.JSX.HTMLAttributes<E>>;
 
-// Generally too complex
-//Pick<h.JSX.HTMLAttributes<E>, keyof h.JSX.HTMLAttributes<E> & (keyof T | keyof U)>; 
-
-
 /**
  * Given two sets of props, merges them and returns the result.
  * 
@@ -33,14 +30,15 @@ export function useMergedProps<E extends EventTarget>() {
 
         // First, put in all the properties that are easy to reason about
         // and all lhs props. We're going to merge in rhs just after.
-        const { class: lhsClass, className: lhsClassName, style: lhsStyle, ref: lhsRef, ...lhs } = lhs2;
-        const { class: rhsClass, className: rhsClassName, style: rhsStyle, ref: rhsRef, ...rhs } = rhs2;
+        const { children: lhsChildren, class: lhsClass, className: lhsClassName, style: lhsStyle, ref: lhsRef, ...lhs } = lhs2;
+        const { children: rhsChildren, class: rhsClass, className: rhsClassName, style: rhsStyle, ref: rhsRef, ...rhs } = rhs2;
 
         let ret: MergedProps<E, T, U> = {
             ...lhs,
             ref: useMergedRefs<E>()(lhs2, rhs2) as MergedRefs<E, T, U>,
             style: useMergedStyles(lhs2, rhs2) as MergedStyles<T, U>,
-            className: useMergedClasses(lhs2, rhs2) as MergedClasses<T, U>
+            className: useMergedClasses(lhs2, rhs2) as MergedClasses<T, U>,
+            children: useMergedChildren(lhs2, rhs2) as MergedChildren<T, U>
         } as any;
 
 
