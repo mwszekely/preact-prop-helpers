@@ -208,22 +208,24 @@ export function useChildFlag(activatedIndex: number | null | undefined, length: 
             }
             setPrevChildCount(length);
         }
-    }, [activatedIndex, length])
+    }, [setFlag, activatedIndex, length])
 
     useLayoutEffect(() => {
 
         // Deactivate the previously activated component
         const prevActivatedIndex = getPrevActivatedIndex();
-        if (prevActivatedIndex != null && prevActivatedIndex >= 0 && prevActivatedIndex < length)
-            setFlag(prevActivatedIndex, false);
+        if (prevActivatedIndex != activatedIndex) {
+            if (prevActivatedIndex != null && prevActivatedIndex >= 0 && prevActivatedIndex < length)
+                setFlag(prevActivatedIndex, false);
 
-        // Activate the current component
-        if (activatedIndex != null && activatedIndex >= 0 && activatedIndex < length) {
-            setFlag(activatedIndex, true);
-            setPrevActivatedIndex(activatedIndex);
+            // Activate the current component
+            if (activatedIndex != null && activatedIndex >= 0 && activatedIndex < length) {
+                setFlag(activatedIndex, true);
+                setPrevActivatedIndex(activatedIndex);
+            }
         }
 
-    }, [activatedIndex, length]);
+    }, [setFlag, activatedIndex, length]);
 
 }
 
