@@ -41,8 +41,8 @@ export type UseReferencedIdPropsParameters<K extends keyof h.JSX.HTMLAttributes<
 
 
 export type UseReferencedIdPropsReturnType<P extends UseReferencedIdPropsParameters<any>, K extends keyof h.JSX.HTMLAttributes<any>> =
-Omit<P, K> & Record<K, string>;
-    //MergedProps<Record<K, GenericGet<P, K, string>>, P>;
+    Omit<P, K> & Record<K, string>;
+//MergedProps<Record<K, GenericGet<P, K, string>>, P>;
 
 export interface UseRandomIdReturnType {
     randomId: string;
@@ -65,7 +65,13 @@ export interface UseRandomIdReturnType {
  */
 export function useRandomId({ prefix }: UseRandomIdParameters = {}): UseRandomIdReturnType {
     const [randomId, setRandomId] = useState<string>(() => generateRandomId(prefix));
-    useLayoutEffect(() => { setRandomId(() => generateRandomId(prefix)); }, [prefix])
+    const [watchPrefixUpdates, setWatchPrefixUpdates, getWatchPrefixUpdates] = useState(false);
+    useLayoutEffect(() => {
+        const watchPrefixUpdates = getWatchPrefixUpdates();
+        if (watchPrefixUpdates)
+            setRandomId(() => generateRandomId(prefix));
+        setWatchPrefixUpdates(true);
+    }, [prefix])
 
     // Whatever ID was most recently used by the actual "id" prop.
     // Used so that any ID-referencing props don't need to provide the same value.
@@ -102,9 +108,9 @@ export function useRandomId({ prefix }: UseRandomIdParameters = {}): UseRandomId
     };
 }
 
-function acceptsStringOrCssOrUndefined(u: string | h.JSX.CSSProperties | undefined) {}
-function acceptsStringOrCss(str: string | h.JSX.CSSProperties) {}
-function acceptsCss(prop: h.JSX.CSSProperties) {}
+function acceptsStringOrCssOrUndefined(u: string | h.JSX.CSSProperties | undefined) { }
+function acceptsStringOrCss(str: string | h.JSX.CSSProperties) { }
+function acceptsCss(prop: h.JSX.CSSProperties) { }
 
 function test<P extends h.JSX.HTMLAttributes<any>>(props: P) {
     const { id, randomId, useRandomIdProps, useReferencedIdProps } = useRandomId();
@@ -136,14 +142,14 @@ function test<P extends h.JSX.HTMLAttributes<any>>(props: P) {
     /// @ts-expect-error TODO: It's because it resolves to "id: undefined & string" -- this shouldn't happen
     p4b.id?.concat("");
 
-    
+
     acceptsStringOrCssOrUndefined(p1b.style);
     /// @ts-expect-error
     acceptsStringOrCss(p1b.style);
 
     /// @ts-expect-error
     p2a.style?.backgroundColor;
-    
+
     acceptsStringOrCssOrUndefined(p2b.style);
     /// @ts-expect-error
     acceptsStringOrCss(p2b.style);
@@ -151,7 +157,7 @@ function test<P extends h.JSX.HTMLAttributes<any>>(props: P) {
     /// @ts-expect-error
     p3a.style?.backgroundColor;
 
-    acceptsStringOrCssOrUndefined(p3b.style);    
+    acceptsStringOrCssOrUndefined(p3b.style);
     /// @ts-expect-error
     p4a.style.backgroundColor;
 
