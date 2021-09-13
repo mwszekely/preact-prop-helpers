@@ -98,8 +98,11 @@ function mergeFunctions<T extends (...args: any[]) => any, U extends (...args: a
         return lhs;
 
     return (...args: Parameters<T>) => {
-        lhs?.(...args);
-        rhs?.(...args);
+        let lv = lhs?.(...args);
+        let rv = rhs?.(...args);
+
+        if (lv instanceof Promise || rv instanceof Promise)
+            return Promise.all([lv, rv]);
     };
 }
 
