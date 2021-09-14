@@ -61,7 +61,7 @@ export const DemoUseRovingTabIndex = memo(() => {
 
 const Prefix = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const DemoUseRovingTabIndexChild = (({ index }: { index: number }) => {
-    const randomWord = useState(() => RandomWords[index/*Math.floor(Math.random() * (RandomWords.length - 1))*/]);
+    const [randomWord] = useState(() => RandomWords[index/*Math.floor(Math.random() * (RandomWords.length - 1))*/]);
     const useRovingTabIndexChild = useContext(RovingChildContext);
     const text = `${randomWord} This is item #${index + 1}`;
     const { useListNavigationChildProps, useListNavigationSiblingProps, tabbable } = useRovingTabIndexChild({ index, text });

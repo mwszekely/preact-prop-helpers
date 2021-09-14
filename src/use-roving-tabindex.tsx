@@ -1,5 +1,5 @@
 import { Context, h, Ref } from "preact";
-import { useCallback, useRef } from "preact/hooks";
+import { useCallback, useEffect, useRef } from "preact/hooks";
 import { useRefElement, UseRefElementPropsReturnType } from "./use-ref-element";
 import { useLayoutEffect } from "./use-layout-effect";
 import { MergedProps, useMergedProps } from "./use-merged-props"
@@ -38,7 +38,7 @@ export interface UseRovingTabIndexParameters {
 
 /** Arguments passed to the child 'useRovingTabIndexChild` */
 export interface RovingTabIndexChildInfo extends ManagedChildInfo<number> {
-    setTabbable(tabbable: boolean, focus: "focus" | undefined): void;
+    setTabbable(tabbable: boolean): void;
 }
 
 /** Type of the child's sub-hook */
@@ -82,32 +82,32 @@ export type UseRovingTabIndexSiblingProps<ChildElement extends Element> = <P ext
  * And just as well! Children should be allowed at the root, 
  * regardless of if it's the whole app or just a given component.
  */
-export function useRovingTabIndex<I extends RovingTabIndexChildInfo>({ focusOnChange, tabbableIndex }: UseRovingTabIndexParameters): UseRovingTabIndexReturnType<I> {
+export function useRovingTabIndex<I extends RovingTabIndexChildInfo>({ focusOnChange: foc, tabbableIndex }: UseRovingTabIndexParameters): UseRovingTabIndexReturnType<I> {
+
+    const getFocusOnChange = useStableGetter(foc);
 
     const getTabbableIndex = useStableGetter(tabbableIndex);
     const prevTabbable = useRef(-Infinity);
 
     // Call the hook that allows us to collect information from children who provide it
-    const { managedChildren, childCount, useManagedChild, indicesByElement,  ...rest } = useChildManager<I>();
+    const { managedChildren, childCount, useManagedChild, indicesByElement, ...rest } = useChildManager<I>();
 
     // Any time the tabbable index changes,
     // notify the previous child that it's no longer tabbable,
     // and notify the next child that is allowed to be tabbed to.
     useChildFlag(tabbableIndex, childCount, (index, tabbable) => {
-        (managedChildren[index as keyof typeof managedChildren] as I)?.setTabbable(tabbable, tabbable && focusOnChange ? "focus" : undefined);
+        (managedChildren[index as keyof typeof managedChildren] as I)?.setTabbable(tabbable);
     })
 
     const focusSelf = useCallback(() => {
-        managedChildren[tabbableIndex].setTabbable(true, "focus");
+        managedChildren[tabbableIndex].setTabbable(true);
     }, [tabbableIndex]);
 
     const useRovingTabIndexChild = useCallback<UseRovingTabIndexChild<I>>(<ChildElement extends Element>(info: Omit<I, "setTabbable">): UseRovingTabIndexChildReturnType<ChildElement> => {
 
 
-        const setTabbable = useCallback((tabbable: boolean, shouldFocus: "focus" | undefined) => {
+        const setTabbable = useCallback((tabbable: boolean) => {
             setTabbable2(tabbable);
-            if (tabbable && shouldFocus)
-                setShouldFocus(!!shouldFocus);
         }, []);
 
         let newInfo = {
@@ -117,7 +117,6 @@ export function useRovingTabIndex<I extends RovingTabIndexChildInfo>({ focusOnCh
 
         const { element, getElement, useManagedChildProps } = useManagedChild<ChildElement>(newInfo);
         const [tabbable, setTabbable2] = useState(getTabbableIndex() == info.index);
-        const [shouldFocus, setShouldFocus] = useState(false);
 
 
         function useRovingTabIndexSiblingProps<P extends UseRovingTabIndexSiblingPropsParameters<any>>({ tabIndex, ...props }: P): UseRovingTabIndexSiblingPropsReturnType<any, P> {
@@ -136,18 +135,15 @@ export function useRovingTabIndex<I extends RovingTabIndexChildInfo>({ focusOnCh
 
         function useRovingTabIndexChildProps<P extends UseRovingTabIndexChildPropsParameters<ChildElement>>({ tabIndex, ...props }: P): UseRovingTabIndexChildPropsReturnType<ChildElement, P> {
 
-            //const { element, useRefElementProps } = useRefElement<ChildElement>();
-
-            useLayoutEffect(() => {
-                if (element && shouldFocus && "focus" in (element as Element as (Element & HTMLOrSVGElement))) {
+            useEffect(() => {
+                if (element && tabbable && getFocusOnChange() && "focus" in (element as Element as (Element & HTMLOrSVGElement))) {
                     requestAnimationFrame(() => {
                         queueMicrotask(() => {
                             (element as Element as (Element & HTMLOrSVGElement)).focus();
                         });
-                    })
-                    setShouldFocus(false);
+                    });
                 }
-            }, [element, shouldFocus])
+            }, [element, tabbable]);
 
             if (tabIndex == null) {
                 if (tabbable)
@@ -172,7 +168,7 @@ export function useRovingTabIndex<I extends RovingTabIndexChildInfo>({ focusOnCh
         managedChildren,
         indicesByElement,
         focusSelf,
-        
+
         ...rest
     }
 }
