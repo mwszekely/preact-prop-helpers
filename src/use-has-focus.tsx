@@ -1,6 +1,6 @@
 
 import { useCallback, useLayoutEffect, useMemo } from "preact/hooks";
-import { useActiveElement } from "./use-active-element";
+import { ActiveElementFilterInfo, useActiveElement } from "./use-active-element";
 import { MergedProps } from "./use-merged-props";
 import { useRefElement, UseRefElementPropsParameters, UseRefElementPropsReturnType } from "./use-ref-element";
 import { useState } from "./use-state";
@@ -45,34 +45,48 @@ export interface UseHasFocusReturnType<T extends Node> {
      * Combines the implications of `lastFocused` and `focusedInner`.
      */
     lastFocusedInner: boolean;
-
-    /**
-     * The currently-focused element, for reference.
-     * 
-     * Corresponds to `focused` and `focusedInner`, though this may have a value even while those are `false`.
-     */
-    focusedElement: EventTarget | null;
-
-    /**
-     * The most recently-focused element, for reference.
-     * 
-     * Corresponds to `focused` and `focusedInner`, though this may have a value even while those are `false`.
-     */
-    lastFocusedElement: EventTarget | null;
 }
 
 export function useHasFocus<T extends Node>({ }: UseFocusParameters = {}): UseHasFocusReturnType<T> {
 
-    //const [focusedElement, setFocusedElement, getFocusedElement] = useState<EventTarget | null>(null);
-    //const [focused, setFocused] = useState(false);
-    //const [focusedInner, setFocusedInner] = useState(false);
+    // These are slightly redundant, but any time the focus changes, we need to know if it's "relevant" to us.
+    // It's "relevant" if the newly-focused element is a child of us,
+    // OR if we're focused and focus moves OUTSIDE of us our our children.
+    // Because of that second bit, we need to keep track of where the focus was the last time we checked for the filter.
+    const [hasFocus, setHasFocus, getHasFocus] = useState(false);
+    const [hasLastFocus, setHasLastFocus, getHasLastFocus] = useState(false);
 
     const { element, getElement, useRefElementProps } = useRefElement<T>();
-    const { activeElement, lastActiveElement } = useActiveElement();
+    const { activeElement, lastActiveElement } = useActiveElement(useCallback(({ current, last, windowFocused }: ActiveElementFilterInfo) => {
+        // Keep in mind that once we get our element, even if the hook and filter functions
+        // don't re-run, the currently-focused element will still be returned below, and,
+        // even if it's not us or one of our children, will still be safely filtered out at render time.
+        let element = getElement();
+        if (!element)
+            return false;
 
-    const useHasFocusProps = useCallback(<P extends UseHasFocusPropsParameters<T>>(props: P) => {
-        return useRefElementProps(props);
-    }, []);
+
+        let hasFocusNow = (element.contains(current) || element.contains(last));
+
+        if (hasFocusNow) {
+            return true;
+        }
+        else {
+            let hadFocusBeforeThis = (getHasLastFocus() || getHasFocus());
+            if (hadFocusBeforeThis) {
+                // Return true once, so that useActiveElement will return one instance of a different element having focus.
+                // Then, back outside this filter function, we'll know that we're no longer focused.
+                return true;
+            }
+            return false;
+        }
+    }, []));
+
+    // These are primarily used for bookkeeping during the filter function above.
+    useLayoutEffect(() => { setHasFocus(element?.contains(activeElement) ?? false); }, [element, activeElement]);
+    useLayoutEffect(() => { setHasLastFocus(element?.contains(lastActiveElement) ?? false); }, [element, lastActiveElement]);
+
+    const useHasFocusProps = useCallback(<P extends UseHasFocusPropsParameters<T>>(props: P) => { return useRefElementProps(props); }, [useRefElementProps]);
 
     const focused = useMemo(() => { return element == activeElement }, [element, activeElement]);
     const focusedInner = useMemo(() => { return element?.contains(activeElement) ?? false }, [element, activeElement]);
@@ -83,9 +97,6 @@ export function useHasFocus<T extends Node>({ }: UseFocusParameters = {}): UseHa
 
     return {
         useHasFocusProps,
-
-        focusedElement: activeElement,
-        lastFocusedElement: lastActiveElement,
 
         focused,
         focusedInner,

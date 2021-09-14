@@ -56,12 +56,12 @@ function getCurrentlyFocusedElement() {
     return currentlyFocusedElement;
 }
 
-const updaters = new Set<() => void>();
+const updaters = new Set<(info: ActiveElementFilterInfo) => void>();
 
 function focusout(e: FocusEvent) {
     if (e.relatedTarget == null) {
         currentlyFocusedElement = null;
-        for (let f of updaters) { f(); }
+        for (let f of updaters) { f({ current: currentlyFocusedElement, last: lastFocusedElement, windowFocused }); }
     }
     else {
         // Just wait for the focusin event.
@@ -71,27 +71,35 @@ function focusout(e: FocusEvent) {
 
 function focusin(e: FocusEvent) {
     currentlyFocusedElement = lastFocusedElement = e.target as (Element & HTMLOrSVGElement);
-    for (let f of updaters) { f(); }
+    for (let f of updaters) { f({ current: currentlyFocusedElement, last: lastFocusedElement, windowFocused }); }
 }
 
 let windowFocused = true;
 function windowFocus() {
     windowFocused = true;
-    for (let f of updaters) { f(); }
+    for (let f of updaters) { f({ current: currentlyFocusedElement, last: lastFocusedElement, windowFocused }); }
 }
 
 function windowBlur() {
     windowFocused = false;
-    for (let f of updaters) { f(); }
+    for (let f of updaters) { f({ current: currentlyFocusedElement, last: lastFocusedElement, windowFocused }); }
 }
 
+export interface ActiveElementFilterInfo {
+    current: (Element & HTMLOrSVGElement) | null;
+    last: (Element & HTMLOrSVGElement) | null;
+    windowFocused: boolean;
+}
 
-export function useActiveElement() {
-    // TODO: Is this actually better than using proper state management?
+export function useActiveElement(filter?: ((info: ActiveElementFilterInfo) => boolean)) {
     const [i, setI] = useState(0);
 
     useLayoutEffect(() => {
-        const F = () => setI(i => ++i);
+        const F = (info: ActiveElementFilterInfo) => {
+            if (filter == null || filter(info))
+                setI(i => ++i);
+        };
+        
         if (updaters.size === 0) {
             document.addEventListener("focusin", focusin, { passive: true });
             document.addEventListener("focusout", focusout, { passive: true });
@@ -109,7 +117,7 @@ export function useActiveElement() {
                 window.removeEventListener("blur", windowBlur);
             }
         }
-    }, []);
+    }, [filter]);
 
     return {
         activeElement: currentlyFocusedElement,
