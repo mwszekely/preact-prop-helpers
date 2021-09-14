@@ -217,12 +217,12 @@ export function useChildFlag(activatedIndex: number | null | undefined, length: 
         if (prevActivatedIndex != activatedIndex) {
             if (prevActivatedIndex != null && prevActivatedIndex >= 0 && prevActivatedIndex < length)
                 setFlag(prevActivatedIndex, false);
+        }
 
-            // Activate the current component
-            if (activatedIndex != null && activatedIndex >= 0 && activatedIndex < length) {
-                setFlag(activatedIndex, true);
-                setPrevActivatedIndex(activatedIndex);
-            }
+        // Activate the current component
+        if (activatedIndex != null && activatedIndex >= 0 && activatedIndex < length) {
+            setFlag(activatedIndex, true);
+            setPrevActivatedIndex(activatedIndex);
         }
 
     }, [setFlag, activatedIndex, length]);
