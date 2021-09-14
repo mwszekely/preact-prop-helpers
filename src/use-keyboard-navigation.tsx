@@ -17,8 +17,7 @@ import { useStableCallback } from "./use-stable-callback";
 
 
 
-export interface UseLinearNavigationReturnType<ParentElement extends Element, ChildElement extends Element> {
-    //useLinearNavigationProps: UseLinearNavigationProps<ParentElement>;
+export interface UseLinearNavigationReturnType<ChildElement extends Element> {
     useLinearNavigationChild: UseLinearNavigationChild<ChildElement>;
 
     navigateToIndex(index: number): void;
@@ -72,7 +71,7 @@ export type UseLinearNavigationChildPropsReturnType<ChildElement extends Element
  * 
  * @see useListNavigation, which packages everything up together.
  */
-export function useLinearNavigation<ParentElement extends Element, ChildElement extends Element>({ getIndex, setIndex, managedChildren, navigationDirection }: UseLinearNavigationParameters): UseLinearNavigationReturnType<ParentElement, ChildElement> {
+export function useLinearNavigation<ChildElement extends Element>({ getIndex, setIndex, managedChildren, navigationDirection }: UseLinearNavigationParameters): UseLinearNavigationReturnType<ChildElement> {
 
     navigationDirection ??= "either";
 
@@ -225,7 +224,7 @@ export function useLinearNavigation<ParentElement extends Element, ChildElement 
 
 
 
-export interface UseTypeaheadNavigationReturnType<ParentElement extends Element, ChildElement extends Element> {
+export interface UseTypeaheadNavigationReturnType<ChildElement extends Element> {
     useTypeaheadNavigationChild: UseTypeaheadNavigationChild<ChildElement>;
 
 
@@ -280,7 +279,7 @@ export type UseTypeaheadNavigationChildPropsReturnType<ChildElement extends Elem
  * 
  * @see useListNavigation, which packages everything up together.
  */
-export function useTypeaheadNavigation<ParentElement extends Element, ChildElement extends Element>({ collator, getIndex, typeaheadTimeout, setIndex }: UseTypeaheadNavigationParameters): UseTypeaheadNavigationReturnType<ParentElement, ChildElement> {
+export function useTypeaheadNavigation<ChildElement extends Element>({ collator, getIndex, typeaheadTimeout, setIndex }: UseTypeaheadNavigationParameters): UseTypeaheadNavigationReturnType<ChildElement> {
 
 
     // For typeahead, keep track of what our current "search" string is (if we have one)

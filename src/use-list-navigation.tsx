@@ -52,7 +52,7 @@ const dummy: any = null;
 
 
 
-export interface UseListNavigationReturnType<ParentElement extends Element, ChildElement extends Element, I extends UseListNavigationChildInfo> extends Omit<UseChildManagerReturnType<I>, "useManagedChild"> {
+export interface UseListNavigationReturnType<ChildElement extends Element, I extends UseListNavigationChildInfo> extends Omit<UseChildManagerReturnType<I>, "useManagedChild"> {
     useListNavigationChild: UseListNavigationChild<ChildElement, I>;
 
     currentTypeahead: string | null;
@@ -154,7 +154,7 @@ export type UseListNavigationChildProps<ChildElement extends Element> = <P exten
  * In the document order, there will be only one "focused" or "tabbable" element, making it act more like one complete unit in comparison to everything around it.
  * Navigating forwards/backwards can be done with the arrow keys, Home/End keys, or any any text for typeahead to focus the next item that matches.
  */
-export function useListNavigation<ParentElement extends Element, ChildElement extends Element, I extends UseListNavigationChildInfo = UseListNavigationChildInfo>({ focusOnChange, collator, keyNavigation }: UseListNavigationParameters): UseListNavigationReturnType<ParentElement, ChildElement, I> {
+export function useListNavigation<ChildElement extends Element, I extends UseListNavigationChildInfo = UseListNavigationChildInfo>({ focusOnChange, collator, keyNavigation }: UseListNavigationParameters): UseListNavigationReturnType<ChildElement, I> {
 
     keyNavigation ??= "either";
 
@@ -166,8 +166,8 @@ export function useListNavigation<ParentElement extends Element, ChildElement ex
         setTabbableIndex(index);
     }, [])
     const { managedChildren, indicesByElement, useRovingTabIndexChild, focusSelf, ...rest } = useRovingTabIndex<I>({ focusOnChange, tabbableIndex: tabbableIndex as any })
-    const { currentTypeahead, invalidTypeahead, useTypeaheadNavigationChild } = useTypeaheadNavigation<ParentElement, ChildElement>({ collator, getIndex: getTabbableIndex, setIndex, typeaheadTimeout: 1000 });
-    const { navigateToEnd, navigateToIndex, navigateToNext, navigateToPrev, navigateToStart, useLinearNavigationChild } = useLinearNavigation<ParentElement, ChildElement>({ getIndex: getTabbableIndex, setIndex, managedChildren });
+    const { currentTypeahead, invalidTypeahead, useTypeaheadNavigationChild } = useTypeaheadNavigation<ChildElement>({ collator, getIndex: getTabbableIndex, setIndex, typeaheadTimeout: 1000 });
+    const { navigateToEnd, navigateToIndex, navigateToNext, navigateToPrev, navigateToStart, useLinearNavigationChild } = useLinearNavigation<ChildElement>({ getIndex: getTabbableIndex, setIndex, managedChildren });
 
 
     const useListNavigationChild: UseListNavigationChild<ChildElement, I> = useCallback((info: UseListNavigationChildParameters<I>): UseListNavigationChildReturnType<ChildElement> => {
