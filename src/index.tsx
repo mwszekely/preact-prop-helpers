@@ -10,7 +10,8 @@ export { useStableCallback } from "./use-stable-callback";
 export { useStableGetter } from "./use-stable-getter";
 export { useState } from "./use-state";
 export { useAsyncHandler, GenericAsyncHandler, UseAsyncHandlerParameters, UseAsyncHandlerReturnType, AsyncHandler } from "./use-async-handler";
-
+export { useLinearNavigation, useTypeaheadNavigation, UseLinearNavigationChild, UseTypeaheadNavigationChild, UseLinearNavigationChildInfo, UseLinearNavigationChildProps, UseTypeaheadNavigationChildInfo, UseTypeaheadNavigationChildParameters } from "./use-keyboard-navigation"
+export { useGridNavigation, UseGridNavigationRow, UseGridNavigationCell, UseGridNavigationCellInfo, UseGridNavigationCellParameters, UseGridNavigationRowInfo, UseGridNavigationRowParameters } from "./use-grid-navigation";
 export { useAnimationFrame } from "./use-animation-frame";
 export { useDraggable } from "./use-draggable";
 export { useDroppable } from "./use-droppable";
