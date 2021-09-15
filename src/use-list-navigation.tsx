@@ -162,16 +162,11 @@ export function useListNavigation<ChildElement extends Element, I extends UseLis
 
     // Keep track of three things related to the currently tabbable element's index:
     // What it is, and whether, when we render this component and it's changed, to also focus the element that was made tabbable.
-    const [tabbableIndex, setTabbableIndex, getTabbableIndex] = useState<number | null>(initialIndex === undefined? 0 : initialIndex);
+    const [tabbableIndex, setTabbableIndex, getTabbableIndex] = useState<number | null>(initialIndex === undefined ? 0 : initialIndex);
 
 
-    const setIndex = useCallback((index: (number | null) | ((prev: number) => (number | null))) => {
-        if (index != null) {
-            if (typeof index === "function")
-                setTabbableIndex(prev => (prev != null? index(prev) : prev) ?? prev);
-            else
-                setTabbableIndex(index);
-        }
+    const setIndex = useCallback((index: (number | null) | ((prev: number | null) => (number | null))) => {
+        setTabbableIndex(index);
     }, []);
     const { managedChildren, indicesByElement, useRovingTabIndexChild, focusCurrent, ...rest } = useRovingTabIndex<I>({ focusOnChange, tabbableIndex })
     const { currentTypeahead, invalidTypeahead, useTypeaheadNavigationChild } = useTypeaheadNavigation<ChildElement, I>({ collator, getIndex: getTabbableIndex, setIndex, typeaheadTimeout: 1000 });

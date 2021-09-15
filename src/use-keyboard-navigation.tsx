@@ -55,8 +55,7 @@ export interface UseLinearNavigationParameters {
 
     getIndex(): number | null;
     setIndex(value: number): void;
-    setIndex(value: (previousValue: number) => number): void;
-    setIndex(value: (previousValue: number | null) => number): void;
+    setIndex(value: (previousValue: number | null) => number | null): void;
 }
 
 /** Arguments passed to the child 'useLinearNavigationChild` */
@@ -253,8 +252,7 @@ export interface UseTypeaheadNavigationParameters {
 
     getIndex(): number | null;
     setIndex(value: number): void;
-    setIndex(value: (previousValue: number) => number): void;
-    setIndex(value: (previousValue: number | null) => number): void;
+    setIndex(value: (previousValue: number | null) => number | null): void;
 }
 
 /** Arguments passed to the child 'useTypeaheadNavigationChild` */
