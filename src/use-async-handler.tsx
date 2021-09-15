@@ -4,6 +4,7 @@ import { useStableCallback } from "./use-stable-callback";
 import { useLayoutEffect } from "./use-layout-effect";
 import { useState } from "./use-state";
 import { useTimeout } from "./use-timeout";
+import { useCallback } from "preact/hooks";
 
 type SubType<Base, Condition> = Pick<Base, { [Key in keyof Base]: Base[Key] extends Condition ? Key : never }[keyof Base]>;
 
@@ -63,9 +64,13 @@ export interface UseAsyncHandlerReturnType<ElementType extends EventTarget, Even
      * for an input field, for example, so that the value doesn't "snap
      * back" while you're waiting for the handler to finish.
      * 
+     * Something like `value={currentCapture ?? value}` is usually good enough.
+     * 
      * @see hasCapture
      */
     currentCapture: CaptureType | undefined;
+
+    /** The above, but stable, if you need the current capture without it being an explicit dependency. */
     getCurrentCapture(): (CaptureType | undefined);
 
     /**
@@ -117,6 +122,14 @@ export interface UseAsyncHandlerReturnType<ElementType extends EventTarget, Even
      * Whether or not the current handler finished with an error.
      */
     hasError: boolean;
+
+    /**
+     * If you would like any currently debounced-but-eventually-pending promises to immediately be considered by cancelling their debounce timeout,
+     * you can call this function.  Normal procedure applies as if the debounced ended normally -- if there's no promise waiting in the queue,
+     * the debounced promise runs normally, otherwise, it waits its turn until the current one ends, potentially being overwritten later on
+     * if a new promise runs out *its* debounce timer before this one got a chance to run.
+     */
+    flushDebouncedPromise: () => void;
 }
 
 /**
@@ -167,26 +180,31 @@ export function useAsyncHandler<ElementType extends EventTarget>() {
         const [pendingPromiseStarter, setPendingPromiseStarter, getPendingPromiseStarter] = useState<(() => (Promise<void> | void)) | null>(null);
 
         // We need to differentiate between `undefined` and "no error has been thrown".
-        // We could also keep a separate boolean state to track that.
         const [error, setError, getError] = useState<unknown>(undefined);
         const [hasError, setHasError, getHasError] = useState(false);
 
+        // Same thing, we need to differentiate between "nothing captured yet" and "`undefined` was captured"
         const [currentCapture, setCurrentCapture, getCurrentCapture] = useState<CaptureType | undefined>(undefined);
         const [hasCapture, setHasCapture] = useState(false);
 
+
+        // When the debounce timer is up (or we manually request the debounce to end)
+        // run the normal "please consider running this promise" routine that we would
+        // have just run immediately if we weren't debouncing our promises.
+        const onDebounceTimeUp = useCallback(() => {
+            const debouncedPromiseStarter = getDebouncedPromiseStarter();
+            if (debouncedPromiseStarter)
+                wantToStartANewPromise(debouncedPromiseStarter);
+
+            setDebouncedPromiseStarter(null);
+        }, [wantToStartANewPromise, setDebouncedPromiseStarter])
 
         // Handle the debounce. Logically this happens before the main step as a sort of step 0.
         // Resets the timeout any time the handler was requested to be called again
         // and when it finishes, actually call the handler (or set it as the pending promise)
         useTimeout({
             timeout: debounce ?? null,
-            callback: () => {
-                if (debouncedPromiseStarter)
-                    wantToStartANewPromise(debouncedPromiseStarter);
-
-                setDebouncedPromiseStarter(null);
-
-            },
+            callback: onDebounceTimeUp,
             triggerIndex: debouncedPromiseStarter
         });
 
@@ -209,22 +227,19 @@ export function useAsyncHandler<ElementType extends EventTarget>() {
             let alreadyRunningPromise = (getPromise() != null);
 
             // Boilerplate wrapper around the given promise starter
-            let P = () => {
+            let startPromiseWithBoilerplate = () => {
                 // When it starts, notify the caller
                 setRunCount(r => ++r);
 
                 // When it completes, notify the caller
-                const onThen = () => { setResolveCount(c => ++c) };
                 // When it fails, save the error and notify the caller
-                const onCatch = (ex: any) => { setError(ex); setHasError(true); setRejectCount(c => ++c); }
-                // When it settles, reset our state so we can 
-                // run a pending promise if it exists
-                const onFinally = () => { setPromise(null); }
-
-                let sync = false;
+                // When it settles, reset our state so we can run a pending promise if it exists
+                const onThen = () => { setResolveCount(c => ++c) };
+                const onCatch = (ex: any) => { setError(ex); setHasError(true); setRejectCount(c => ++c); };
+                const onFinally = () => { setPromise(null); };
 
                 // Handle the special case where the handler is synchronous
-                let result: void | Promise<void>
+                let result: void | Promise<void>;
                 try {
                     result = startPromise();
                     if (result == undefined) {
@@ -234,12 +249,15 @@ export function useAsyncHandler<ElementType extends EventTarget>() {
                         onFinally();
                         return;
                     }
+
+                    console.assert("then" in (result as Promise<any>));
                 }
                 catch (ex) {
-                    // It's synchronous and threw an error.
+                    // It's synchronous (or asynchronous but didn't await anything yet) and threw an error.
                     // Bail out early.
                     onCatch(ex);
                     onFinally();
+                    return;
                 }
 
                 // The handler is asynchronous
@@ -249,7 +267,7 @@ export function useAsyncHandler<ElementType extends EventTarget>() {
 
             if (!alreadyRunningPromise) {
                 // Start the promise immediately, because there wasn't one running already.
-                let nextPromise = P();
+                let nextPromise = startPromiseWithBoilerplate();
                 if (nextPromise == undefined) {
                     // Hold on! The handler was actually synchronous, and already finished.
                     // Bail out early.
@@ -263,7 +281,7 @@ export function useAsyncHandler<ElementType extends EventTarget>() {
             else {
                 // Don't start the promise yet, 
                 // and allow it to start in the future instead.
-                setPendingPromiseStarter(_ => P);
+                setPendingPromiseStarter(_ => startPromiseWithBoilerplate);
             }
         }
 
@@ -278,6 +296,8 @@ export function useAsyncHandler<ElementType extends EventTarget>() {
             pending: (promise != null),
             hasError,
             error,
+
+            flushDebouncedPromise: onDebounceTimeUp,
 
             resolveCount,
             rejectCount,
@@ -319,7 +339,3 @@ export function useAsyncHandler<ElementType extends EventTarget>() {
     }
 
 }
-
-function capitalize<T extends string>(str: T): Capitalize<T> { return (str[0].toUpperCase() + str.substr(1)) as Capitalize<T> }
-
-function isVoid(v: any): v is void { return v == undefined; }

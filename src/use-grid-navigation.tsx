@@ -59,7 +59,7 @@ export function useGridNavigation<R extends Element, C extends Element>({ focusO
     useEffect(([prev]) => { console.log(`currentRow: ${prev} -> ${currentRow}`) }, [currentRow]);
 
     const { childCount, managedChildren, indicesByElement, getMountIndex, mountedChildren, totalChildrenMounted, totalChildrenUnounted, useManagedChild } = useChildManager<UseGridNavigationRowInfo>();
-    const { useLinearNavigationChild } = useLinearNavigation<R>({ managedChildren, getIndex: getCurrentRow, setIndex: useCallback(i => { console.log(`setIndex(${i})P`); setCurrentRow(i!) }, [setCurrentRow]), navigationDirection: "block" })
+    const { useLinearNavigationChild } = useLinearNavigation<R>({ managedChildren, getIndex: getCurrentRow, setIndex: setCurrentRow, navigationDirection: "block" })
 
     useChildFlag(currentRow, managedChildren.length, useCallback((index, tabbable) => managedChildren[index]?.setIsTabbableRow(tabbable, lastKnownCellIndex), [lastKnownCellIndex, managedChildren]));
 

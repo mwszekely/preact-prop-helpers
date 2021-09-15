@@ -39,7 +39,7 @@ export type UseLinearNavigationChildProps<ChildElement extends Element> = <P ext
 
 
 /** Arguments passed to the parent `useLinearNavigation` */
-export interface UseLinearNavigationParameters {
+interface UseLinearNavigationParametersBase {
     /**
      * Controls which arrow keys are used to navigate through the component.
      * Relative to the writing mode, so in English, "inline" corresponds
@@ -53,10 +53,19 @@ export interface UseLinearNavigationParameters {
 
     managedChildren: UseLinearNavigationChildInfo[];
 
-    getIndex(): number | null;
-    setIndex(value: number): void;
-    setIndex(value: (previousValue: number | null) => number | null): void;
 }
+
+interface ULNP1 extends UseLinearNavigationParametersBase {
+    getIndex(): number;
+    setIndex(value: number | ((previousValue: number) => (number))): void;
+}
+
+interface ULNP2 extends UseLinearNavigationParametersBase {
+    getIndex(): number | null;
+    setIndex(value: number | null | ((previousValue: number | null) => (number | null))): void;
+}
+
+export type UseLinearNavigationParameters = ULNP1 | ULNP2;
 
 /** Arguments passed to the child 'useLinearNavigationChild` */
 export interface UseLinearNavigationChildInfo extends ManagedChildInfo<number> { }
@@ -93,8 +102,8 @@ export function useLinearNavigation<ChildElement extends Element>({ getIndex, se
 
     // These allow us to manipulate what our current tabbable child is.
     const navigateToIndex = useCallback((index: number) => { setIndex(index < 0 ? (managedChildren.length + index) : index); }, []);
-    const navigateToNext = useCallback(() => { setIndex(i => i === null ? null : ++i); }, []);
-    const navigateToPrev = useCallback(() => { setIndex(i => i === null ? null : --i); }, []);
+    const navigateToNext = useCallback(() => { setIndex((i: number | null) => i === null? null! : ++i); }, []);
+    const navigateToPrev = useCallback(() => { setIndex((i: number | null) => i === null? null! : --i); }, []);
     const navigateToStart = useCallback(() => { navigateToIndex(0); }, [navigateToIndex]);
     const navigateToEnd = useCallback(() => { navigateToIndex(-1); }, [navigateToIndex]);
 
@@ -241,7 +250,7 @@ export interface UseTypeaheadNavigationChildReturnType<E extends Element> {
 
 
 /** Arguments passed to the parent `useTypeaheadNavigation` */
-export interface UseTypeaheadNavigationParameters {
+interface UseTypeaheadNavigationParametersBase {
 
     /**
      * A collator to use when comparing. If not provided, simply uses `localeCompare` after transforming each to lowercase, which will, at best, work okay in English.
@@ -249,11 +258,19 @@ export interface UseTypeaheadNavigationParameters {
     collator?: Intl.Collator;
 
     typeaheadTimeout?: number;
-
-    getIndex(): number | null;
-    setIndex(value: number): void;
-    setIndex(value: (previousValue: number | null) => number | null): void;
 }
+
+interface UTNP1 extends UseTypeaheadNavigationParametersBase {
+    getIndex(): number;
+    setIndex(value: number | ((previousValue: number) => (number))): void;
+}
+
+interface UTNP2 extends UseTypeaheadNavigationParametersBase {
+    getIndex(): number | null;
+    setIndex(value: number | null | ((previousValue: number | null) => (number | null))): void;
+}
+
+export type UseTypeaheadNavigationParameters = UTNP1 | UTNP2;
 
 /** Arguments passed to the child 'useTypeaheadNavigationChild` */
 export interface UseTypeaheadNavigationChildInfo extends RovingTabIndexChildInfo {
