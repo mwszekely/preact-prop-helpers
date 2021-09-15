@@ -6,7 +6,7 @@ import { MergedProps, useMergedProps } from "./use-merged-props"
 import { useState } from "./use-state";
 import { useTimeout } from "./use-timeout";
 import { useLogicalDirection } from "./use-logical-direction";
-import { RovingTabIndexChildInfo } from "./use-roving-tabindex";
+import { RovingTabIndexChildInfo, UseRovingTabIndexChildParameters } from "./use-roving-tabindex";
 import { ManagedChildInfo } from "./use-child-manager";
 import { useStableCallback } from "./use-stable-callback";
 
@@ -20,7 +20,7 @@ import { useStableCallback } from "./use-stable-callback";
 export interface UseLinearNavigationReturnType<ChildElement extends Element> {
     useLinearNavigationChild: UseLinearNavigationChild<ChildElement>;
 
-    navigateToIndex(index: number): void;
+    navigateToIndex(index: number | null): void;
     navigateToNext(): void;
     navigateToPrev(): void;
     navigateToStart(): void;
@@ -53,9 +53,10 @@ export interface UseLinearNavigationParameters {
 
     managedChildren: UseLinearNavigationChildInfo[];
 
-    getIndex(): number;
+    getIndex(): number | null;
     setIndex(value: number): void;
     setIndex(value: (previousValue: number) => number): void;
+    setIndex(value: (previousValue: number | null) => number): void;
 }
 
 /** Arguments passed to the child 'useLinearNavigationChild` */
@@ -81,11 +82,13 @@ export function useLinearNavigation<ChildElement extends Element>({ getIndex, se
     // Make sure the tabbable index never escapes the bounds of all available children
     // TODO: Keep track of the original index and keep it, at least until keyboard navigation.
     useLayoutEffect(() => {
-        if (index < 0) {
-            setIndex(0);
-        }
-        else if (childCount > 0 && index >= childCount) {
-            setIndex(childCount - 1);
+        if (index !== null) {
+            if (index < 0) {
+                setIndex(0);
+            }
+            else if (childCount > 0 && index >= childCount) {
+                setIndex(childCount - 1);
+            }
         }
     }, [index, childCount]);
 
@@ -204,7 +207,7 @@ export function useLinearNavigation<ChildElement extends Element>({ getIndex, se
         return {
             useLinearNavigationChildProps
         }
-    }, [])
+    }, [navigationDirection, navigateToNext, navigateToPrev, navigateToStart, navigateToEnd])
 
     return {
         useLinearNavigationChild,
@@ -224,8 +227,8 @@ export function useLinearNavigation<ChildElement extends Element>({ getIndex, se
 
 
 
-export interface UseTypeaheadNavigationReturnType<ChildElement extends Element> {
-    useTypeaheadNavigationChild: UseTypeaheadNavigationChild<ChildElement>;
+export interface UseTypeaheadNavigationReturnType<ChildElement extends Element, I extends UseTypeaheadNavigationChildInfo> {
+    useTypeaheadNavigationChild: UseTypeaheadNavigationChild<ChildElement, I>;
 
 
     currentTypeahead: string | null;
@@ -248,13 +251,14 @@ export interface UseTypeaheadNavigationParameters {
 
     typeaheadTimeout?: number;
 
-    getIndex(): number;
+    getIndex(): number | null;
     setIndex(value: number): void;
     setIndex(value: (previousValue: number) => number): void;
+    setIndex(value: (previousValue: number | null) => number): void;
 }
 
 /** Arguments passed to the child 'useTypeaheadNavigationChild` */
-export interface UseTypeaheadNavigationChildInfo extends Pick<RovingTabIndexChildInfo, "index"> {
+export interface UseTypeaheadNavigationChildInfo extends RovingTabIndexChildInfo {
     /**
      * If provided, allows this component to be navigated to by typing this string. 
      * It should be the same text content as whatever's displayed, ideally.
@@ -262,9 +266,10 @@ export interface UseTypeaheadNavigationChildInfo extends Pick<RovingTabIndexChil
     text: string | null;
 }
 
+export type UseTypeaheadNavigationChildParameters<I extends UseTypeaheadNavigationChildInfo> = UseRovingTabIndexChildParameters<I>;
 
 /** Type of the child's sub-hook */
-export type UseTypeaheadNavigationChild<ChildElement extends Element> = ({ text, index, ...i }: Omit<UseTypeaheadNavigationChildInfo, "setTabbable">) => UseTypeaheadNavigationChildReturnType<ChildElement>;
+export type UseTypeaheadNavigationChild<ChildElement extends Element, I extends UseTypeaheadNavigationChildInfo> = ({ text, index, ...i }: UseTypeaheadNavigationChildParameters<I>) => UseTypeaheadNavigationChildReturnType<ChildElement>;
 
 /** Return type of the child `useTypeaheadNavigationChildProps` */
 export type UseTypeaheadNavigationChildPropsReturnType<ChildElement extends Element, P extends {}> = MergedProps<ChildElement, UseRefElementPropsReturnType<ChildElement, {
@@ -279,7 +284,7 @@ export type UseTypeaheadNavigationChildPropsReturnType<ChildElement extends Elem
  * 
  * @see useListNavigation, which packages everything up together.
  */
-export function useTypeaheadNavigation<ChildElement extends Element>({ collator, getIndex, typeaheadTimeout, setIndex }: UseTypeaheadNavigationParameters): UseTypeaheadNavigationReturnType<ChildElement> {
+export function useTypeaheadNavigation<ChildElement extends Element, I extends UseTypeaheadNavigationChildInfo>({ collator, getIndex, typeaheadTimeout, setIndex }: UseTypeaheadNavigationParameters): UseTypeaheadNavigationReturnType<ChildElement, I> {
 
 
     // For typeahead, keep track of what our current "search" string is (if we have one)
@@ -309,20 +314,24 @@ export function useTypeaheadNavigation<ChildElement extends Element>({ collator,
 
 
 
-    const comparator = useStableCallback((lhs: string, rhs: { text: string; unsortedIndex: number; }) => {
+    const comparator = useStableCallback((lhs: I["text"], rhs: { text: I["text"]; unsortedIndex: number; }) => {
         let compare: number;
 
-        // For the purposes of typeahead, only compare a string of the same size as our currently typed string.
-        // By normalizing them first, we ensure this byte-by-byte handling of raw character data works out okay.
-        let safeLhs = lhs.normalize("NFD");
-        let safeRhs = rhs.text.normalize("NFD").substr(0, safeLhs.length);
+        if (typeof lhs === "string" && typeof rhs.text === "string") {
+            // For the purposes of typeahead, only compare a string of the same size as our currently typed string.
+            // By normalizing them first, we ensure this byte-by-byte handling of raw character data works out okay.
+            let safeLhs = lhs.normalize("NFD");
+            let safeRhs = rhs.text.normalize("NFD").substr(0, safeLhs.length);
 
-        if (collator)
-            compare = collator.compare(safeLhs, safeRhs)
-        else
-            compare = safeLhs.toLowerCase().localeCompare(safeRhs.toLowerCase() ?? "");
+            if (collator)
+                compare = collator.compare(safeLhs, safeRhs)
+            else
+                compare = safeLhs.toLowerCase().localeCompare(safeRhs.toLowerCase() ?? "");
 
-        return compare;
+            return compare;
+        }
+        
+        return (lhs as any) - (rhs as any);
     });
 
     // Handle changes in typeahead that cause changes to the tabbable index
@@ -381,11 +390,10 @@ export function useTypeaheadNavigation<ChildElement extends Element>({ collator,
                         lowestUnsortedIndexAll = u;
                         lowestSortedIndexAll = i;
                     }
-                    if ((lowestUnsortedIndexNext == null || u < lowestUnsortedIndexNext) && u > getIndex()) {
+                    if ((lowestUnsortedIndexNext == null || u < lowestUnsortedIndexNext) && u > (getIndex() ?? -Infinity)) {
                         lowestUnsortedIndexNext = u;
                         lowestSortedIndexNext = i;
                     }
-
                 }
 
                 let i = sortedTypeaheadIndex;
@@ -408,7 +416,7 @@ export function useTypeaheadNavigation<ChildElement extends Element>({ collator,
         }
     }, [currentTypeahead]);
 
-    const useTypeaheadNavigationChild: UseTypeaheadNavigationChild<ChildElement> = useCallback(({ text, ...i }: Omit<UseTypeaheadNavigationChildInfo, "setTabbable">) => {
+    const useTypeaheadNavigationChild = useCallback<UseTypeaheadNavigationChild<ChildElement, I>>(({ text, ...i }: UseTypeaheadNavigationChildParameters<I>) => {
 
         useEffect(() => {
             if (text) {

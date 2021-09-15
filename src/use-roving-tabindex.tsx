@@ -18,7 +18,7 @@ export interface UseRovingTabIndexReturnType<I extends RovingTabIndexChildInfo> 
     childCount: number;
 
     // Focuses whatever is the currently tabbable element
-    focusSelf(): void;
+    focusCurrent: null | (() => void);
 }
 
 /** Return type of `useRovingTabIndexChild` */
@@ -32,17 +32,24 @@ export interface UseRovingTabIndexChildReturnType<ChildElement extends Element> 
 
 /** Arguments passed to the parent `useRovingTabIndex` */
 export interface UseRovingTabIndexParameters {
-    tabbableIndex: number;
+
+    /**
+     * `null` is special-use only to indicate that the entire component is disabled and not tabbable.
+     */
+    tabbableIndex: number | null;
     focusOnChange: boolean;
 }
 
 /** Arguments passed to the child 'useRovingTabIndexChild` */
 export interface RovingTabIndexChildInfo extends ManagedChildInfo<number> {
     setTabbable(tabbable: boolean): void;
+    rerenderAndFocus(): void;
 }
 
+export type UseRovingTabIndexChildParameters<I extends RovingTabIndexChildInfo> = Omit<I, "setTabbable" | "rerenderAndFocus">;
+
 /** Type of the child's sub-hook */
-export type UseRovingTabIndexChild<I extends RovingTabIndexChildInfo> = <ChildElement extends Element>(props: Omit<I, "setTabbable">) => UseRovingTabIndexChildReturnType<ChildElement>;
+export type UseRovingTabIndexChild<I extends RovingTabIndexChildInfo> = <ChildElement extends Element>(props: UseRovingTabIndexChildParameters<I>) => UseRovingTabIndexChildReturnType<ChildElement>;
 
 export type UseRovingTabIndexChildPropsParameters<ChildElement extends Element> = h.JSX.HTMLAttributes<ChildElement>;
 export type UseRovingTabIndexSiblingPropsParameters<ChildElement extends Element> = h.JSX.HTMLAttributes<ChildElement>;
@@ -84,6 +91,7 @@ export type UseRovingTabIndexSiblingProps<ChildElement extends Element> = <P ext
  */
 export function useRovingTabIndex<I extends RovingTabIndexChildInfo>({ focusOnChange: foc, tabbableIndex }: UseRovingTabIndexParameters): UseRovingTabIndexReturnType<I> {
 
+    const [rerenderAndFocus, setRerenderAndFocus] = useState<(() => void) | null>(null);
     const getFocusOnChange = useStableGetter(foc);
 
     const getTabbableIndex = useStableGetter(tabbableIndex);
@@ -96,28 +104,44 @@ export function useRovingTabIndex<I extends RovingTabIndexChildInfo>({ focusOnCh
     // notify the previous child that it's no longer tabbable,
     // and notify the next child that is allowed to be tabbed to.
     useChildFlag(tabbableIndex, childCount, (index, tabbable) => {
-        (managedChildren[index as keyof typeof managedChildren] as I)?.setTabbable(tabbable);
+        if (index != null)
+            (managedChildren[index as keyof typeof managedChildren] as I)?.setTabbable(tabbable);
     })
 
     const focusSelf = useCallback(() => {
-        managedChildren[tabbableIndex].setTabbable(true);
+        if (tabbableIndex != null)
+            managedChildren[tabbableIndex].setTabbable(true);
     }, [tabbableIndex]);
 
-    const useRovingTabIndexChild = useCallback<UseRovingTabIndexChild<I>>(<ChildElement extends Element>(info: Omit<I, "setTabbable">): UseRovingTabIndexChildReturnType<ChildElement> => {
+    const useRovingTabIndexChild = useCallback<UseRovingTabIndexChild<I>>(<ChildElement extends Element>(info: UseRovingTabIndexChildParameters<I>): UseRovingTabIndexChildReturnType<ChildElement> => {
 
+        const [rrafIndex, setRrafIndex] = useState(1);
+        const rerenderAndFocus = useCallback(() => { setRrafIndex(i => ++i) }, [])
 
-        const setTabbable = useCallback((tabbable: boolean) => {
-            setTabbable2(tabbable);
-        }, []);
 
         let newInfo = {
             ...info,
-            setTabbable
-        } as I;
+            rerenderAndFocus,
+            setTabbable: useCallback((tabbable: boolean) => { setTabbable(tabbable); }, [])
+        } as any as I;
 
         const { element, getElement, useManagedChildProps } = useManagedChild<ChildElement>(newInfo);
-        const [tabbable, setTabbable2] = useState(getTabbableIndex() == info.index);
 
+        // TODO: Using getTabbableIndex during render phase on mount
+        const [tabbable, setTabbable] = useState(getTabbableIndex() == info.index);
+
+        useEffect(() => {
+            if (element && tabbable) {
+                setRerenderAndFocus(_ => rerenderAndFocus);
+                if (getFocusOnChange() && "focus" in (element as Element as (Element & HTMLOrSVGElement))) {
+                    requestAnimationFrame(() => {
+                        queueMicrotask(() => {
+                            (element as Element as (Element & HTMLOrSVGElement)).focus();
+                        });
+                    });
+                }
+            }
+        }, [element, tabbable, rrafIndex]);
 
         function useRovingTabIndexSiblingProps<P extends UseRovingTabIndexSiblingPropsParameters<any>>({ tabIndex, ...props }: P): UseRovingTabIndexSiblingPropsReturnType<any, P> {
 
@@ -132,18 +156,8 @@ export function useRovingTabIndex<I extends RovingTabIndexChildInfo>({ focusOnCh
         }
 
 
-
         function useRovingTabIndexChildProps<P extends UseRovingTabIndexChildPropsParameters<ChildElement>>({ tabIndex, ...props }: P): UseRovingTabIndexChildPropsReturnType<ChildElement, P> {
 
-            useEffect(() => {
-                if (element && tabbable && getFocusOnChange() && "focus" in (element as Element as (Element & HTMLOrSVGElement))) {
-                    requestAnimationFrame(() => {
-                        queueMicrotask(() => {
-                            (element as Element as (Element & HTMLOrSVGElement)).focus();
-                        });
-                    });
-                }
-            }, [element, tabbable]);
 
             if (tabIndex == null) {
                 if (tabbable)
@@ -167,7 +181,7 @@ export function useRovingTabIndex<I extends RovingTabIndexChildInfo>({ focusOnCh
         childCount,
         managedChildren,
         indicesByElement,
-        focusSelf,
+        focusCurrent: rerenderAndFocus,
 
         ...rest
     }

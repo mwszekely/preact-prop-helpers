@@ -44,7 +44,7 @@ export const DemoUseRovingTabIndex = memo(() => {
                 If the child element itself has a focusable element, like a button, it can also be wired up to disable itself
                 Feel free to nest them too, as long as you are aware of your <code>Context</code> management (i.e. remember that you need to create a new <code>Context</code> for each use case).
             </p>
-            <label>Tabbable index: <input type="number" value={tabbableIndex} onInput={e => { e.preventDefault(); setTabbableIndex(e.currentTarget.valueAsNumber); }} /></label>
+            <label>Tabbable index: <input type="number" value={tabbableIndex ?? undefined} onInput={e => { e.preventDefault(); setTabbableIndex(e.currentTarget.valueAsNumber); }} /></label>
             <ul {...useHasFocusProps({})}>
                 <RovingChildContext.Provider value={useListNavigationChild}>
                     {Array.from((function* () {

@@ -8,6 +8,7 @@ import { useHasFocus } from "../use-has-focus";
 import { DemoUseInterval } from "./demos/use-interval";
 import { DemoUseTimeout } from "./demos/use-timeout";
 import { useActiveElement } from "../use-active-element";
+import { useGridNavigation, UseGridNavigationRow, UseGridNavigationCell } from "../use-grid";
 
 const RandomWords = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
 
@@ -131,7 +132,7 @@ const DemoUseAsyncHandler1 = memo(() => {
     } = useAsyncHandler<HTMLButtonElement>()({ capture: () => { }, debounce: debounce == 0 ? undefined : debounce });
 
     const asyncOnClick = ((v: void, e: Event) => new Promise<void>((resolve, reject) => window.setTimeout(() => getShouldThrow() ? reject() : resolve(), timeout)));
-    const onClick = getSyncHandler(pending? null : asyncOnClick);
+    const onClick = getSyncHandler(pending ? null : asyncOnClick);
 
     return (
         <div className="demo">
@@ -182,7 +183,7 @@ const DemoUseAsyncHandler2 = memo(() => {
         rejectCount,
         resolveCount
     } = useAsyncHandler<HTMLInputElement>()({ capture: e => { e.preventDefault(); return e.currentTarget.value }, debounce: debounce == 0 ? undefined : debounce });
-    
+
     const onInput = getSyncHandler(async (v, e) => new Promise((resolve, reject) => window.setTimeout(() => {
         if (getShouldThrow()) {
             reject();
@@ -243,8 +244,70 @@ const DemoFocus = memo(() => {
     )
 })
 
+
+const GridRowContext = createContext<UseGridNavigationRow<HTMLDivElement, HTMLDivElement>>(null!);
+const GridCellContext = createContext<UseGridNavigationCell<HTMLDivElement>>(null!);
+export const DemoUseGrid = memo(() => {
+
+    const { lastFocusedInner, useHasFocusProps } = useHasFocus<HTMLDivElement>();
+    const { useGridNavigationRow, rowCount, cellIndex, rowIndex } = useGridNavigation<HTMLDivElement, HTMLDivElement>({ focusOnChange: lastFocusedInner });
+
+    return (
+        <div className="demo">
+            <div>{cellIndex}+{rowIndex}/{rowCount}</div>
+            <div {...useHasFocusProps({})}>
+                <GridRowContext.Provider value={useGridNavigationRow}>
+                    {Array.from((function* () {
+                        for (let i = 0; i < 10; ++i) {
+                            yield <DemoUseGridRow index={i} key={i} />
+                        }
+                    })())}
+                </GridRowContext.Provider>
+            </div>
+        </div>
+    );
+})
+
+const Prefix = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const DemoUseGridRow = (({ index }: { index: number }) => {
+    const [randomWord] = useState(() => RandomWords[index/*Math.floor(Math.random() * (RandomWords.length - 1))*/]);
+    const useGridRow = useContext(GridRowContext);
+    const { isTabbableRow, cellCount, useGridNavigationRowProps, useGridNavigationCell, tabbableCell } = useGridRow({ index });
+
+    const props = useGridNavigationRowProps({});
+    return (
+        <div {...props}>
+            <div>{isTabbableRow.toString()} ({tabbableCell}/{cellCount})</div>
+
+<div  style="display: flex">
+            <GridCellContext.Provider value={useGridNavigationCell}>
+                {Array.from((function* () {
+                    for (let i = 0; i < 3; ++i) {
+                        yield <DemoUseGridCell index={i} key={i} />
+                    }
+                })())}
+            </GridCellContext.Provider>
+            </div>
+        </div>
+    )
+});
+
+const DemoUseGridCell = (({index}: {index: number}) => {
+    const useGridCell = useContext(GridCellContext);
+    const {tabbable,  useGridNavigationCellProps } = useGridCell({ index, text: null });
+
+    const props = useGridNavigationCellProps({}) as any;
+
+    if (index === 0)
+        return <div {...props}>Grid cell #{index + 1}</div>
+    else
+        return <label><input  {...props} type="checkbox" /> Test input</label>
+})
+
 const Component = () => {
     return <div class="flex" style={{ flexWrap: "wrap" }}>
+        <DemoUseGrid />
+        {/*<hr />
         <DemoFocus />
         <hr />
         <DemoUseTimeout />
@@ -267,7 +330,7 @@ const Component = () => {
         <hr />
         <DemoUseElementSizeAnimation />
         <hr />
-        <input />
+        <input />*/}
     </div>
 }
 
