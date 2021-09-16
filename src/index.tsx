@@ -20,7 +20,7 @@ export { useHasFocus, UseHasFocusPropsReturnType, UseHasFocusReturnType } from "
 export { useActiveElement } from "./use-active-element";
 export { useInterval } from "./use-interval";
 export { usePersistentState } from "./use-persistent-state";
-export { useRandomId, UseRandomIdPropsReturnType, UseReferencedIdPropsReturnType } from "./use-random-id";
+export { useRandomId, UseRandomIdProps, UseRandomIdPropsParameters, UseRandomIdPropsReturnType, UseReferencedIdProps, UseReferencedIdPropsParameters, UseReferencedIdPropsReturnType } from "./use-random-id";
 export { useTimeout } from "./use-timeout";
 export { useChildManager, useChildFlag, ManagedChildInfo } from "./use-child-manager";
 export { useRovingTabIndex, UseRovingTabIndexChild, UseRovingTabIndexReturnType, RovingTabIndexChildInfo, UseRovingTabIndexChildPropsReturnType, UseRovingTabIndexChildReturnType, UseRovingTabIndexParameters } from "./use-roving-tabindex";
