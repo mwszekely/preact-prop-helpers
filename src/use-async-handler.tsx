@@ -130,6 +130,18 @@ export interface UseAsyncHandlerReturnType<ElementType extends EventTarget, Even
      * if a new promise runs out *its* debounce timer before this one got a chance to run.
      */
     flushDebouncedPromise: () => void;
+
+    /**
+     * Based on the type of handler passed in, this returned value will
+     * represent what type of handler it was, just in case you
+     * yourself need to know that and don't have access to the original
+     * to find out without it actually being run.
+     * 
+     * Until a handler is called, this will be null.  Naturally, if 
+     * different handlers are passed in, it can flip back and
+     * forth between "async" and "sync" as well.
+     */
+    currentType: null | "sync" | "async";
 }
 
 /**
@@ -169,6 +181,9 @@ export function useAsyncHandler<ElementType extends EventTarget>() {
         const [runCount, setRunCount] = useState(0);
         const [resolveCount, setResolveCount] = useState(0);
         const [rejectCount, setRejectCount] = useState(0);
+
+        // 
+        const [currentType, setCurrentType] = useState<null | "sync" | "async">(null);
 
         // If we're set to use a debounce, then when the timeout finishes,
         // the promise from this state object is transferred over to either 
@@ -247,6 +262,7 @@ export function useAsyncHandler<ElementType extends EventTarget>() {
                         // Bail out early.
                         onThen();
                         onFinally();
+                        setCurrentType("sync");
                         return;
                     }
 
@@ -257,10 +273,12 @@ export function useAsyncHandler<ElementType extends EventTarget>() {
                     // Bail out early.
                     onCatch(ex);
                     onFinally();
+                    setCurrentType("sync");
                     return;
                 }
 
                 // The handler is asynchronous
+                setCurrentType("async");
                 return (async () => { await result; })().then(onThen).catch(onCatch).finally(onFinally);
             }
 
@@ -296,6 +314,8 @@ export function useAsyncHandler<ElementType extends EventTarget>() {
             pending: (promise != null),
             hasError,
             error,
+
+            currentType,
 
             flushDebouncedPromise: onDebounceTimeUp,
 
