@@ -250,8 +250,8 @@ export function useAsyncHandler<ElementType extends EventTarget>() {
                 // When it fails, save the error and notify the caller
                 // When it settles, reset our state so we can run a pending promise if it exists
                 const onThen = () => { setResolveCount(c => ++c) };
-                const onCatch = (ex: any) => { setError(ex); setHasError(true); setHasCapture(false); setCurrentCapture(undefined); setRejectCount(c => ++c); };
-                const onFinally = () => { setPromise(null); };
+                const onCatch = (ex: any) => { setError(ex); setHasError(true); setRejectCount(c => ++c); };
+                const onFinally = () => { setPromise(null); setHasCapture(false); setCurrentCapture(undefined); };
 
                 // Handle the special case where the handler is synchronous
                 let result: void | Promise<void>;
