@@ -6,7 +6,7 @@ export interface Foo {
     foo: "foo";
 }
 
-function getFromLocalStorage<States extends object>() {
+export function getFromLocalStorage<States extends object>() {
     return function <Key extends (keyof States) & string>(key: Key, initialValue: States[Key], converter: (input: string) => States[Key]): States[Key] {
         try {
             const item = localStorage.getItem(key);
@@ -21,7 +21,7 @@ function getFromLocalStorage<States extends object>() {
     }
 }
 
-function storeToLocalStorage<States extends object>() {
+export function storeToLocalStorage<States extends object>() {
     return function <Key extends (keyof States) & string>(key: Key, value: States[Key], converter: (input: States[Key]) => string): void {
         try {
             localStorage.setItem(key, converter(value));
@@ -50,6 +50,11 @@ export function usePersistentState<States extends object = Record<string, unknow
 
             const value: States[Key] = typeof valueOrSetter === "function"? (valueOrSetter as Function)(getValue()) : valueOrSetter;
 
+            // Make sure this update is available to all components that use this hook,
+            // even if it's all happening during one single render.
+            setValue(valueOrSetter);
+
+            // Actually save the value to local storage.
             storeToLocalStorage<States>()(key, value, toString);
         }, [])
 
