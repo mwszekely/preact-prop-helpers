@@ -8,7 +8,7 @@ export interface Foo {
 }
 
 export function getFromLocalStorage<States extends object>() {
-    return function <Key extends (keyof States) & string>(key: Key, converter: (input: string) => States[Key]): States[Key] | undefined {
+    return function <Key extends (keyof States) & string>(key: Key, converter: ((input: string) => States[Key]) = JSON.parse): States[Key] | undefined {
         try {
             const item = localStorage.getItem(key);
             if (!item)
@@ -23,7 +23,7 @@ export function getFromLocalStorage<States extends object>() {
 }
 
 export function storeToLocalStorage<States extends object>() {
-    return function <Key extends (keyof States) & string>(key: Key, value: States[Key], converter: (input: States[Key]) => string): void {
+    return function <Key extends (keyof States) & string>(key: Key, value: States[Key], converter: ((input: States[Key]) => string) = JSON.stringify): void {
         try {
             localStorage.setItem(key, converter(value));
         }
@@ -45,7 +45,7 @@ export function usePersistentState<States extends object = Record<string, unknow
                 if (newValue != null)
                     setLocalCopy(fromString(newValue));
             }
-        })
+        });
 
         const setValueWrapper = useCallback<typeof setLocalCopy>((valueOrSetter) => {
 
@@ -56,17 +56,16 @@ export function usePersistentState<States extends object = Record<string, unknow
 
             // Actually save the value to local storage.
             storeToLocalStorage<States>()(key, value, toString);
-        }, []);
 
-        // TODO: Does not react to changes in key or fromString.
-        // But on the plus side it's as stable as a normal getState call
-        // and, like, key *probably* shouldn't change and changes in fromString *shouldn't* matter...
-        // Better to make it stable but not work in some cases, or work in all obscure cases but with a useless stability guarantee?
-        // I dunno. 🤷🏻
+            if (value instanceof Date) {
+                console.assert(fromString != JSON.parse);
+            }
+        }, [key, toString]);
+
         const getValue = useCallback(() => {
             const trueValue = getFromLocalStorage<States>()(key, fromString);
             return trueValue ?? localCopy;
-        }, []);
+        }, [key, fromString]);
 
         return [localCopy, setValueWrapper, getValue] as const;
 
