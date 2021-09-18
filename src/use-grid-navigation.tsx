@@ -127,7 +127,7 @@ export function useGridNavigation<R extends Element, C extends Element, IR exten
             return { tabbable, useGridNavigationCellProps };
         }, [useListNavigationChild2]);
 
-        return { useGridNavigationRowProps, useGridNavigationCell, cellCount, tabbableCell, isTabbableRow };
+        return { useGridNavigationRowProps, useGridNavigationCell, cellCount, tabbableCell, isTabbableRow, managedCells };
 
     }, [setLastKnownCellIndex, useLinearNavigationChild, useManagedChild]);
 
@@ -135,7 +135,8 @@ export function useGridNavigation<R extends Element, C extends Element, IR exten
         useGridNavigationRow,
         rowCount: childCount,
         cellIndex: lastKnownCellIndex,
-        rowIndex: currentRow
+        rowIndex: currentRow,
+        managedRows: managedChildren
 
     }
 
