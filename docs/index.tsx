@@ -8,7 +8,7 @@ import { useHasFocus } from "../use-has-focus";
 import { DemoUseInterval } from "./demos/use-interval";
 import { DemoUseTimeout } from "./demos/use-timeout";
 import { useActiveElement } from "../use-active-element";
-import { useGridNavigation, UseGridNavigationRow, UseGridNavigationCell } from "../use-grid-navigation";
+import { useGridNavigation, UseGridNavigationRow, UseGridNavigationCell, UseGridNavigationRowInfo, UseGridNavigationCellInfo } from "../use-grid-navigation";
 
 const RandomWords = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
 
@@ -245,12 +245,12 @@ const DemoFocus = memo(() => {
 })
 
 
-const GridRowContext = createContext<UseGridNavigationRow<HTMLDivElement, HTMLDivElement>>(null!);
-const GridCellContext = createContext<UseGridNavigationCell<HTMLDivElement>>(null!);
+const GridRowContext = createContext<UseGridNavigationRow<HTMLDivElement, HTMLDivElement, UseGridNavigationRowInfo, UseGridNavigationCellInfo>>(null!);
+const GridCellContext = createContext<UseGridNavigationCell<HTMLDivElement, UseGridNavigationCellInfo>>(null!);
 export const DemoUseGrid = memo(() => {
 
     const { lastFocusedInner, useHasFocusProps } = useHasFocus<HTMLDivElement>();
-    const { useGridNavigationRow, rowCount, cellIndex, rowIndex } = useGridNavigation<HTMLDivElement, HTMLDivElement>({ focusOnChange: lastFocusedInner });
+    const { useGridNavigationRow, rowCount, cellIndex, rowIndex } = useGridNavigation<HTMLDivElement, HTMLDivElement, UseGridNavigationRowInfo, UseGridNavigationCellInfo>({ focusOnChange: lastFocusedInner });
 
     return (
         <div className="demo">
