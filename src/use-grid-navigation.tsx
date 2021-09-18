@@ -31,6 +31,7 @@ export type UseGridNavigationRow<R extends Element, C extends Element, IR extend
     cellCount: number;
     tabbableCell: number | null;
     isTabbableRow: boolean;
+    managedCells: IC[];
 }
 
 export type UseGridNavigationCell<C extends Element, I extends UseGridNavigationCellInfo> = ({ index, text, ...info }: UseGridNavigationCellParameters<I>) => {
