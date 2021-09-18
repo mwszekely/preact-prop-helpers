@@ -47,7 +47,7 @@ export function useGridNavigation<R extends Element, C extends Element, IR exten
 
     useEffect(([prev]) => { console.log(`currentRow: ${prev} -> ${currentRow}`) }, [currentRow]);
 
-    const { childCount, managedChildren, indicesByElement, getMountIndex, mountedChildren, totalChildrenMounted, totalChildrenUnounted, useManagedChild } = useChildManager<UseGridNavigationRowInfo>();
+    const { childCount, managedChildren, indicesByElement, getMountIndex, mountedChildren, totalChildrenMounted, totalChildrenUnounted, useManagedChild } = useChildManager<IR>();
     const { useLinearNavigationChild } = useLinearNavigation<R>({ managedChildren, getIndex: getCurrentRow, setIndex: setCurrentRow, navigationDirection: "block" })
 
     useChildFlag(currentRow, managedChildren.length, useCallback((index, tabbable) => managedChildren[index]?.setIsTabbableRow(tabbable, lastKnownCellIndex), [lastKnownCellIndex, managedChildren]));
@@ -105,13 +105,15 @@ export function useGridNavigation<R extends Element, C extends Element, IR exten
 
 
         const { useManagedChildProps } = useManagedChild<R>({
-            index, setIsTabbableRow: useCallback((tabbable, newIndex) => {
+            index, 
+            setIsTabbableRow: useCallback<IR["setIsTabbableRow"]>((tabbable, newIndex) => {
                 if (tabbable) {
                     setCellIndex(newIndex);
                 }
                 setIsTabbableRow(tabbable);
-            }, []), ...info
-        });
+            }, []), 
+            ...info
+        } as any as IR);
         const { useLinearNavigationChildProps } = useLinearNavigationChild()
 
         const useGridNavigationRowProps = useCallback(<P extends h.JSX.HTMLAttributes<R>>(props: P) => useManagedChildProps(useLinearNavigationChildProps(useHasFocusProps(props))), [useManagedChildProps]);
