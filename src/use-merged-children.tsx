@@ -4,8 +4,7 @@ import { GenericReplace } from "./use-merged-props";
 // Generally too complex
 //Pick<h.JSX.HTMLAttributes<E>, keyof h.JSX.HTMLAttributes<E> & (keyof T | keyof U)>; 
 
-export type MergedChildren<Lhs extends Pick<h.JSX.HTMLAttributes<any>, "children"> | null | undefined, Rhs extends Pick<h.JSX.HTMLAttributes<any>, "children"> | null | undefined> =
-    GenericReplace<Lhs, "children", ComponentChildren> | GenericReplace<Rhs, "children", ComponentChildren>;
+export type MergedChildren<Lhs extends Pick<h.JSX.HTMLAttributes<any>, "children"> | null | undefined, Rhs extends Pick<h.JSX.HTMLAttributes<any>, "children"> | null | undefined> = undefined | ComponentChildren;
 
 export function useMergedChildren<Lhs extends Pick<h.JSX.HTMLAttributes<any>, "children"> | null | undefined, Rhs extends Pick<h.JSX.HTMLAttributes<any>, "children"> | null | undefined>(lhsProps: Lhs, rhsProps: Rhs): MergedChildren<Lhs, Rhs> {
 
