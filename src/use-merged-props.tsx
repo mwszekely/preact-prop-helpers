@@ -41,6 +41,10 @@ export function useMergedProps<E extends EventTarget>() {
             children: useMergedChildren(lhs2, rhs2) as MergedChildren<T, U>
         } as any;
 
+        if (ret.ref === undefined) delete ret.ref;
+        if (ret.style === undefined) delete ret.style;
+        if (ret.className === undefined) delete ret.className;
+        if (ret.children === undefined) delete ret.children;
 
         // Now, do *everything* else
         // Merge every remaining existing entry in lhs with what we've already put in ret.

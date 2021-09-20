@@ -64,7 +64,8 @@ export interface UseAsyncHandlerReturnType<ElementType extends EventTarget, Even
      * for an input field, for example, so that the value doesn't "snap
      * back" while you're waiting for the handler to finish.
      * 
-     * Something like `value={currentCapture ?? value}` is usually good enough.
+     * Something like `value={pending? currentCapture : value}` is good for checkboxes,
+     * something like `value={(pending || hasFocus)? currentCapture : value} for text fields.
      * 
      * @see hasCapture
      */
@@ -251,7 +252,7 @@ export function useAsyncHandler<ElementType extends EventTarget>() {
                 // When it settles, reset our state so we can run a pending promise if it exists
                 const onThen = () => { setResolveCount(c => ++c) };
                 const onCatch = (ex: any) => { setError(ex); setHasError(true); setRejectCount(c => ++c); };
-                const onFinally = () => { setPromise(null); setHasCapture(false); setCurrentCapture(undefined); };
+                const onFinally = () => { setPromise(null); };
 
                 // Handle the special case where the handler is synchronous
                 let result: void | Promise<void>;

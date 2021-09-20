@@ -15,55 +15,45 @@ import { useHasFocus, UseHasFocusPropsReturnType } from "./use-has-focus";
 import { useEffect } from "./use-effect";
 
 export interface UseGridNavigationRowInfo extends ManagedChildInfo<number> {
-    //setTabbableCellIndex(index: number): void;
     setIsTabbableRow(tabbable: boolean, newIndex: number): void;
-    //focusThisRow(wantedCellIndex: number): void;
 }
 
-export type UseGridNavigationRowParameters = Omit<UseGridNavigationRowInfo, "setIsTabbableRow">;
+export type UseGridNavigationRowParameters<I extends UseGridNavigationRowInfo> = Omit<I, "setIsTabbableRow">;
 
 export interface UseGridNavigationCellInfo extends UseListNavigationChildInfo { }
-export type UseGridNavigationCellParameters = UseListNavigationChildParameters<UseGridNavigationCellInfo>;
+export type UseGridNavigationCellParameters<I extends UseGridNavigationCellInfo> = UseListNavigationChildParameters<I>;
 
-export type UseGridNavigationRow<R extends Element, C extends Element> = ({ index, ...info }: UseGridNavigationRowParameters) => {
+export type UseGridNavigationRow<R extends Element, C extends Element, IR extends UseGridNavigationRowInfo, IC extends UseGridNavigationCellInfo> = ({ index, ...info }: UseGridNavigationRowParameters<IR>) => {
     useGridNavigationRowProps: <P extends h.JSX.HTMLAttributes<R>>(props: P) => UseRefElementPropsReturnType<R, UseRefElementPropsReturnType<R, MergedProps<R, {
         onKeyDown: (e: KeyboardEvent) => void;
     }, UseHasFocusPropsReturnType<R, P>>>>;
-    useGridNavigationCell: UseGridNavigationCell<C>;
+    useGridNavigationCell: UseGridNavigationCell<C, IC>;
     cellCount: number;
     tabbableCell: number | null;
     isTabbableRow: boolean;
+    managedCells: IC[];
 }
 
-export type UseGridNavigationCell<C extends Element> = ({ index, text, ...info }: UseGridNavigationCellParameters) => {
+export type UseGridNavigationCell<C extends Element, I extends UseGridNavigationCellInfo> = ({ index, text, ...info }: UseGridNavigationCellParameters<I>) => {
     tabbable: boolean;
     useGridNavigationCellProps: <P extends h.JSX.HTMLAttributes<C>>(props: P) => UseListNavigationChildPropsReturnType<C, P>;
 }
 
-export function useGridNavigation<R extends Element, C extends Element>({ focusOnChange: foc }: { focusOnChange: boolean }) {
+export function useGridNavigation<R extends Element, C extends Element, IR extends UseGridNavigationRowInfo, IC extends UseGridNavigationCellInfo>({ focusOnChange: foc }: { focusOnChange: boolean }) {
 
     const getFocusCellOnRowChange = useStableGetter(foc);
-
-    /*const {
-        useListNavigationChild,
-        childCount: rowCount,
-        indicesByElement: rowIndicesByElement,
-        managedChildren: managedRows,
-        navigateToIndex: setRowIndex,
-        tabbableIndex: tabbableRow
-    } = useListNavigation<R, UseGridNavigationRowInfo>({ focusOnChange, keyNavigation: "block" });*/
 
     const [currentRow, setCurrentRow, getCurrentRow] = useState(0);
     const [lastKnownCellIndex, setLastKnownCellIndex, getLastKnownCellIndex] = useState(0);
 
     useEffect(([prev]) => { console.log(`currentRow: ${prev} -> ${currentRow}`) }, [currentRow]);
 
-    const { childCount, managedChildren, indicesByElement, getMountIndex, mountedChildren, totalChildrenMounted, totalChildrenUnounted, useManagedChild } = useChildManager<UseGridNavigationRowInfo>();
+    const { childCount, managedChildren, indicesByElement, getMountIndex, mountedChildren, totalChildrenMounted, totalChildrenUnounted, useManagedChild } = useChildManager<IR>();
     const { useLinearNavigationChild } = useLinearNavigation<R>({ managedChildren, getIndex: getCurrentRow, setIndex: setCurrentRow, navigationDirection: "block" })
 
     useChildFlag(currentRow, managedChildren.length, useCallback((index, tabbable) => managedChildren[index]?.setIsTabbableRow(tabbable, lastKnownCellIndex), [lastKnownCellIndex, managedChildren]));
 
-    const useGridNavigationRow: UseGridNavigationRow<R, C> = useCallback(({ index, ...info }: UseGridNavigationRowParameters) => {
+    const useGridNavigationRow: UseGridNavigationRow<R, C, IR, IC> = useCallback(({ index, ...info }: UseGridNavigationRowParameters<IR>) => {
 
         const { useHasFocusProps, lastFocusedInner } = useHasFocus<R>();
 
@@ -80,7 +70,7 @@ export function useGridNavigation<R extends Element, C extends Element>({ focusO
             navigateToIndex: setCellIndex,
             tabbableIndex: tabbableCell,
             focusCurrent
-        } = useListNavigation<C, UseGridNavigationCellInfo>({ focusOnChange: (isTabbableRow && getFocusCellOnRowChange()), keyNavigation: "inline", initialIndex: null });
+        } = useListNavigation<C, IC>({ focusOnChange: (isTabbableRow && getFocusCellOnRowChange()), keyNavigation: "inline", initialIndex: null });
 
         // Any time we become the currently tabbable row,
         // make sure the correct cell is selected and focused.
@@ -116,13 +106,15 @@ export function useGridNavigation<R extends Element, C extends Element>({ focusO
 
 
         const { useManagedChildProps } = useManagedChild<R>({
-            index, setIsTabbableRow: useCallback((tabbable, newIndex) => {
+            index, 
+            setIsTabbableRow: useCallback<IR["setIsTabbableRow"]>((tabbable, newIndex) => {
                 if (tabbable) {
                     setCellIndex(newIndex);
                 }
                 setIsTabbableRow(tabbable);
-            }, []), ...info
-        });
+            }, []), 
+            ...info
+        } as any as IR);
         const { useLinearNavigationChildProps } = useLinearNavigationChild()
 
         const useGridNavigationRowProps = useCallback(<P extends h.JSX.HTMLAttributes<R>>(props: P) => useManagedChildProps(useLinearNavigationChildProps(useHasFocusProps(props))), [useManagedChildProps]);
@@ -130,15 +122,15 @@ export function useGridNavigation<R extends Element, C extends Element>({ focusO
 
 
 
-        const useGridNavigationCell: UseGridNavigationCell<C> = useCallback(({ index, text, ...info }: UseGridNavigationCellParameters) => {
-            const { tabbable, useListNavigationChildProps } = useListNavigationChild2({ text, index, ...info });
+        const useGridNavigationCell: UseGridNavigationCell<C, IC> = useCallback(({ index, text, ...info }: UseGridNavigationCellParameters<IC>) => {
+            const { tabbable, useListNavigationChildProps } = useListNavigationChild2({ text, index, ...info } as any);
 
             const useGridNavigationCellProps = useCallback(<P extends h.JSX.HTMLAttributes<C>>(props: P) => useListNavigationChildProps(props), [useListNavigationChildProps]);
 
             return { tabbable, useGridNavigationCellProps };
         }, [useListNavigationChild2]);
 
-        return { useGridNavigationRowProps, useGridNavigationCell, cellCount, tabbableCell, isTabbableRow };
+        return { useGridNavigationRowProps, useGridNavigationCell, cellCount, tabbableCell, isTabbableRow, managedCells };
 
     }, [setLastKnownCellIndex, useLinearNavigationChild, useManagedChild]);
 
@@ -146,7 +138,8 @@ export function useGridNavigation<R extends Element, C extends Element>({ focusO
         useGridNavigationRow,
         rowCount: childCount,
         cellIndex: lastKnownCellIndex,
-        rowIndex: currentRow
+        rowIndex: currentRow,
+        managedRows: managedChildren
 
     }
 
