@@ -66,12 +66,16 @@ export function useGlobalHandler<T extends EventTarget, EventType extends TypedE
     // It seems like it's guaranteed to always be a union of all available tupes.
     // Again, no matter what combination of sub- or sub-sub-functions used.
 
-    const stableHandler = useStableCallback(handler??(()=>{})) as EventListener;
+    let stableHandler: EventListener | null = useStableCallback(handler ?? (() => { })) as EventListener;
+    if (handler == null)
+        stableHandler = null;
 
     useEffect(() => {
-        target.addEventListener(type, stableHandler, options);
+        if (stableHandler) {
+            target.addEventListener(type, stableHandler, options);
 
-        return () => target.removeEventListener(type, stableHandler, options);
+            return () => target.removeEventListener(type, stableHandler, options);
+        }
     }, [target, type, stableHandler]);
 }
 
@@ -89,12 +93,12 @@ export function useGlobalHandler<T extends EventTarget, EventType extends TypedE
  */
 export function useLocalHandler<ElementType extends (HTMLElementTagNameMap[keyof HTMLElementTagNameMap] | SVGElementTagNameMap[keyof SVGElementTagNameMap])>() {
     return useCallback(<EventType extends Exclude<keyof h.JSX.DOMAttributes<ElementType>, keyof PreactDOMAttributes>>(type: EventType, handler: NonNullable<h.JSX.DOMAttributes<ElementType>[EventType]>) => {
-        
+
         const stableHandler = useStableCallback(handler);
 
-        type Attributes = (ElementType extends HTMLElement? h.JSX.HTMLAttributes<ElementType> : 
-            ElementType extends SVGElement? h.JSX.SVGAttributes<ElementType> : h.JSX.DOMAttributes<ElementType>)
-        
+        type Attributes = (ElementType extends HTMLElement ? h.JSX.HTMLAttributes<ElementType> :
+            ElementType extends SVGElement ? h.JSX.SVGAttributes<ElementType> : h.JSX.DOMAttributes<ElementType>)
+
         const useLocalEventHandlerProps = useCallback(<P extends Attributes>(props: P) => {
             type P2 = Required<Pick<h.JSX.DOMAttributes<ElementType>, EventType>>;
             return useMergedProps<ElementType>()({ [type]: stableHandler } as { [K in EventType]: typeof handler }, props) as MergedProps<ElementType, P2, P>;
