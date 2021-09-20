@@ -102,8 +102,8 @@ export function useLinearNavigation<ChildElement extends Element>({ getIndex, se
 
     // These allow us to manipulate what our current tabbable child is.
     const navigateToIndex = useCallback((index: number) => { setIndex(index < 0 ? (managedChildren.length + index) : index); }, []);
-    const navigateToNext = useCallback(() => { setIndex((i: number | null) => i === null? null! : ++i); }, []);
-    const navigateToPrev = useCallback(() => { setIndex((i: number | null) => i === null? null! : --i); }, []);
+    const navigateToNext = useCallback(() => { setIndex((i: number | null) => i === null? null! : i >= managedChildren.length - 1? managedChildren.length - 1 : ++i); }, []);
+    const navigateToPrev = useCallback(() => { setIndex((i: number | null) => i === null? null! : i < 0? 0 : --i); }, []);
     const navigateToStart = useCallback(() => { navigateToIndex(0); }, [navigateToIndex]);
     const navigateToEnd = useCallback(() => { navigateToIndex(-1); }, [navigateToIndex]);
 
