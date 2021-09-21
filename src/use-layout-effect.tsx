@@ -9,7 +9,7 @@ import type { EffectChange } from "./use-effect";
  * @param effect 
  * @param inputs 
  */
-export function useLayoutEffect<I extends Inputs>(effect: (prev: I, changes: EffectChange<I, number>[]) => void, inputs: I) {
+export function useLayoutEffect<I extends Inputs>(effect: (prev: I, changes: EffectChange<I, number>[]) => (void | (() => void)), inputs: I) {
 
     const prevInputs = useRef(inputs);
     const effect2 = () => {
@@ -18,8 +18,9 @@ export function useLayoutEffect<I extends Inputs>(effect: (prev: I, changes: Eff
             if (prevInputs.current[i] != inputs[i])
                 changes[i] = { from: prevInputs.current[i], to: inputs[i] }
         }
-        effect(prevInputs.current, changes);
+        const ret = effect(prevInputs.current, changes);
         prevInputs.current = inputs;
+        return ret;
     };
 
     useLayoutEffectNative(effect2, inputs);

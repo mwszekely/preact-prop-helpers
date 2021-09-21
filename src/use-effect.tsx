@@ -8,7 +8,7 @@ import { Inputs, useEffect as useEffectNative, useRef } from "preact/hooks";
  * @param effect 
  * @param inputs 
  */
-export function useEffect<I extends Inputs>(effect: (prev: I, changes: EffectChange<I, number>[]) => void, inputs: I) {
+export function useEffect<I extends Inputs>(effect: (prev: I, changes: EffectChange<I, number>[]) => (void | (() => void)), inputs: I) {
 
     const prevInputs = useRef(inputs);
     const effect2 = () => {
@@ -17,8 +17,9 @@ export function useEffect<I extends Inputs>(effect: (prev: I, changes: EffectCha
             if (prevInputs.current[i] != inputs[i])
                 changes[i] = { from: prevInputs.current[i], to: inputs[i] }
         }
-        effect(prevInputs.current, changes);
+        const ret = effect(prevInputs.current, changes);
         prevInputs.current = inputs;
+        return ret;
     };
 
     useEffectNative(effect2, inputs);
