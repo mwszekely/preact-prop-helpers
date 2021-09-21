@@ -44,6 +44,7 @@ There are a few reasons:
 |`useState`											|Identical to the built-in, but returns a third value, `getState`, that is stable everywhere, and __can be used inside useLayoutEffect or during render__. In general, this is the *only* getter that can be used there.|
 |`usePersistentState`								|Identical to `useState`, but persists across browsing sessions, separate tabs, etc.|
 |`useEffect`, `useLayoutEffect`						|Identical to the built-ins, but provides previous dependency values as well as a list of what exactly changed (mainly useful for debugging). In most cases, the built-ins are just fine.|
+|`useForceUpdate`|Returns a function that forces the component that uses it to re-render itself when called (any children just follow normal diffing rules past that point). The returned function is completely stable.|
 |`useMediaQuery`									|Measures if a given media query matches the device or not.
 
 
@@ -263,6 +264,11 @@ Allows monitoring which element is currently focused, which element was most rec
 `useGlobalHandler` lets you add an event handler to `window`, `document`, etc. with the cleanup handled for you.
 
 `useLocalHandler` does the same but for the rendered element.  Mostly useful for 3rd party libraries that expect you to add a given event listener.
+
+## `useForceUpdate`
+
+When called, returns `forceUpdate`, a function that can cause the current component to re-render itself.  Like with any other render, how deeply things are affected is decided by the usual diffing rules, meaning
+that this cannot be used to update the entire tree, just the current component and however many relevant children.
 
 ## `useMediaQuery`
 

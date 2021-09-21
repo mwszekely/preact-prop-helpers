@@ -29,5 +29,5 @@ export { useListNavigation, UseListNavigationChild, UseListNavigationChildProps,
 export { useEffect } from "./use-effect";
 export { useLayoutEffect } from "./use-layout-effect";
 export { useFocusTrap, findFirstFocusable, UseFocusTrapReturnType, UseFocusTrapParameters, UseFocusTrapPropsParameters, UseFocusTrapPropsReturnType } from "./use-focus-trap";
-
+export { useForceUpdate } from "./use-force-update";
 
