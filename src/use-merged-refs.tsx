@@ -25,9 +25,14 @@ export type MergedRefs<E extends EventTarget, Lhs extends Pick<h.JSX.HTMLAttribu
 export function useMergedRefs<E extends EventTarget>() {
     return function <Lhs extends Pick<h.JSX.HTMLAttributes<E>, "ref"> | null | undefined, Rhs extends Pick<h.JSX.HTMLAttributes<E>, "ref"> | null | undefined>(lhsProps: Lhs, rhsProps: Rhs): MergedRefs<E, Lhs, Rhs> {
 
-
         const lhs = lhsProps?.ref;
         const rhs = rhsProps?.ref;
+        let combined = useCallback((current: E | null) => {
+            processRef(current, lhs);
+            processRef(current, rhs);
+        }, [lhs, rhs]);
+
+
         if (lhs == null && rhs == null) {
             return undefined as MergedRefs<E, Lhs, Rhs>;
         }
@@ -38,12 +43,7 @@ export function useMergedRefs<E extends EventTarget>() {
             return lhs as MergedRefs<E, Lhs, Rhs>;
         }
         else {
-            let ret = useCallback((current: E | null) => {
-                processRef(current, lhs);
-                processRef(current, rhs);
-            }, [lhs, rhs]);
-
-            return ret as MergedRefs<E, Lhs, Rhs>;
+            return combined as MergedRefs<E, Lhs, Rhs>;
         }
     }
 }

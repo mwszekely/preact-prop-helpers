@@ -1,18 +1,7 @@
 import { h } from "preact";
-import type { GenericGet } from "./use-merged-props";
-
-
-/*type MergedNulls<T extends null | undefined, U extends | null | undefined> =
-    UnionIncludes<T, null> extends true ? null :
-    UnionIncludes<U, null> extends true ? null : undefined;*/
-
-type NonNullableOrUnknown<T> = T extends null | undefined ? undefined : h.JSX.CSSProperties;
 
 export type MergedStyles<Lhs extends Pick<h.JSX.HTMLAttributes<any>, "style"> | null | undefined, Rhs extends Pick<h.JSX.HTMLAttributes<any>, "style"> | null | undefined> = undefined | h.JSX.CSSProperties;
 
-//NonNullableOrUnknown<GenericGet<h.JSX.HTMLAttributes<any>, Lhs, "style"> | GenericGet<h.JSX.HTMLAttributes<any>, Rhs, "style"> | undefined>;
-
-type F = NonNullableOrUnknown<GenericGet<{}, "style">> extends string ? true : false;
 
 /**
  * Merges two style objects, returning the result.
@@ -37,6 +26,7 @@ export function useMergedStyles<Lhs extends Pick<h.JSX.HTMLAttributes<any>, "sty
         // They're both non-null but different types.
         // Convert the string type to an object bag type and run it again.
         if (lhs?.style && rhs?.style) {
+            // (useMergedStyles isn't a true hook -- this isn't a violation)
             if (typeof lhs?.style == "string")
                 return useMergedStyles({ style: Object.fromEntries((lhs?.style as string).split(";").map(statement => statement.split(":"))) as any as h.JSX.CSSProperties }, rhs) as MergedStyles<Lhs, Rhs>;
             if (typeof rhs?.style == "string")
