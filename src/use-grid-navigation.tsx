@@ -46,8 +46,6 @@ export function useGridNavigation<R extends Element, C extends Element, IR exten
     const [currentRow, setCurrentRow, getCurrentRow] = useState(0);
     const [lastKnownCellIndex, setLastKnownCellIndex, getLastKnownCellIndex] = useState(0);
 
-    useEffect(([prev]) => { console.log(`currentRow: ${prev} -> ${currentRow}`) }, [currentRow]);
-
     const { childCount, managedChildren, indicesByElement, getMountIndex, mountedChildren, totalChildrenMounted, totalChildrenUnounted, useManagedChild } = useChildManager<IR>();
     const { useLinearNavigationChild } = useLinearNavigation<R>({ managedChildren, getIndex: getCurrentRow, setIndex: setCurrentRow, navigationDirection: "block" })
 
