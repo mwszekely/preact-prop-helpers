@@ -92,6 +92,13 @@ export interface UseChildManagerReturnType<I extends ManagedChildInfo<any>> {
      * Given the Element that the child mounts as, returns its `index` prop.
      */
     indicesByElement: Map<EventTarget, InfoToKey<I>>
+
+    /**
+     * A set containing every index that has unmounted but not ever re-mounted itself.
+     * 
+     * In a numeric, linear list, this would represent either holes in the list, or spaces after the end of the list.
+     */
+    deletedIndices: Set<InfoToKey<I>>;
 }
 
 /**
@@ -107,7 +114,7 @@ export interface UseChildManagerReturnType<I extends ManagedChildInfo<any>> {
  * until it unmounts and retracts that information.
  */
 export function useChildManager<I extends ManagedChildInfo<any>>(): UseChildManagerReturnType<I> {
-    type K = (I extends ManagedChildInfo<infer K2> ? K2 : string | number);
+    type K = InfoToKey<I>
 
     // This is blindly updated any time a child mounts or unmounts itself.
     // Used to make sure that any time the array of managed children updates,
@@ -120,6 +127,7 @@ export function useChildManager<I extends ManagedChildInfo<any>>(): UseChildMana
     const mountedChildren = useRef<(null | I)[]>([]);
     const mountOrder = useRef<Map<K, number>>(new Map());
     const indicesByElement = useRef<Map<EventTarget, K>>(new Map());
+    const deletedIndices = useRef<Set<K>>(new Set<K>());
 
     const getMountIndex = useCallback((index: K) => { return mountOrder.current.get(index)!; }, []);
 
@@ -138,6 +146,7 @@ export function useChildManager<I extends ManagedChildInfo<any>>(): UseChildMana
         useLayoutEffect(([prevElement, prevIndex], changes) => {
             if (element) {
                 indicesByElement.current.set(element, info.index);
+                deletedIndices.current.delete(info.index);
                 if (managedChildren.current[info.index as keyof ManagedChildren<InfoToKey<I>, I>] != undefined) {
                     console.assert(info.index == undefined, "Two children with the same index were added, which may result in unexpected behavior.");
                     debugger;   // Intentional
@@ -149,6 +158,12 @@ export function useChildManager<I extends ManagedChildInfo<any>>(): UseChildMana
                 return () => {
                     setChildUpdateIndex(c => ++c);
                     delete managedChildren.current[info.index as keyof ManagedChildren<InfoToKey<I>, I>];
+                    deletedIndices.current.add(info.index);
+
+                    if (typeof info.index === "number") {
+                        while (managedChildren.current.length && (managedChildren.current as I[])[(managedChildren.current as I[]).length - 1] === undefined)
+                            (managedChildren.current as I[]).length -= 1;
+                    }
                     indicesByElement.current.delete(element);
                 }
             }
@@ -178,7 +193,8 @@ export function useChildManager<I extends ManagedChildInfo<any>>(): UseChildMana
         indicesByElement: indicesByElement.current,
         totalChildrenMounted,
         totalChildrenUnounted,
-        getMountIndex
+        getMountIndex,
+        deletedIndices: deletedIndices.current
     }
 }
 
