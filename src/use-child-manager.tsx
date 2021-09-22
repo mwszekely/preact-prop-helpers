@@ -224,6 +224,16 @@ export function useChildFlag(activatedIndex: number | null | undefined, length: 
             }
             setPrevChildCount(length);
         }
+
+
+        const prevActivatedIndex = getPrevActivatedIndex();
+        if (prevActivatedIndex != null && length > 0 && prevActivatedIndex >= length) {
+            // The number of children shrank below whatever the currently selected component was.
+            // Change the index to the last one still mounted.
+            setFlag(length - 1, true);
+            // (No need to unset any of them since they already unmounted themselves)
+            // (Also no way to unset them anyway for the same reason)
+        }
     }, [setFlag, activatedIndex, length])
 
     useLayoutEffect(() => {
