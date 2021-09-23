@@ -51,11 +51,11 @@ export function useGridNavigation<R extends Element, C extends Element, IR exten
     const [currentRow, setCurrentRow, getCurrentRow] = useState(0);
     const [lastKnownCellIndex, setLastKnownCellIndex, getLastKnownCellIndex] = useState(0);
 
-    const navigateToIndex = useCallback((i: number | null) => { setCurrentRow(i ?? 0); }, []);
-    const navigateToFirst = useCallback(() => { setCurrentRow(0); }, []);
-    const navigateToLast = useCallback(() => { setCurrentRow(managedChildren.length - 1); }, []);
-    const navigateToPrev = useCallback(() => { setCurrentRow(i => indexDemangler!(indexMangler!(i ?? 0) - 1)) }, [indexMangler, indexDemangler]);
-    const navigateToNext = useCallback(() => { setCurrentRow(i => indexDemangler!(indexMangler!(i ?? 0) + 1)) }, [indexMangler, indexDemangler]);
+    const navigateToIndex = useCallback((i: number | null) => { setCurrentRow(indexMangler!(i ?? 0)); }, []);
+    const navigateToFirst = useCallback(() => { setCurrentRow(indexMangler!(0)); }, []);
+    const navigateToLast = useCallback(() => { setCurrentRow(indexMangler!(managedChildren.length - 1)); }, []);
+    const navigateToPrev = useCallback(() => { setCurrentRow(i => indexMangler!(indexDemangler!(i ?? 0) - 1)) }, [indexDemangler, indexMangler]);
+    const navigateToNext = useCallback(() => { setCurrentRow(i => indexMangler!(indexDemangler!(i ?? 0) + 1)) }, [indexDemangler, indexMangler]);
 
     const { childCount, managedChildren, indicesByElement, getMountIndex, mountedChildren, totalChildrenMounted, totalChildrenUnounted, useManagedChild } = useChildManager<IR>();
     const { useLinearNavigationChild } = useLinearNavigation<R>({
