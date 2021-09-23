@@ -175,10 +175,10 @@ export function useListNavigation<ChildElement extends Element, I extends UseLis
     const { managedChildren, indicesByElement, useRovingTabIndexChild, focusCurrent, ...rest } = useRovingTabIndex<I>({ focusOnChange, tabbableIndex })
 
     const navigateToIndex = useCallback((i: number | null) => { setTabbableIndex(i); }, []);
-    const navigateToFirst = useCallback(() => { setTabbableIndex(0); }, []);
-    const navigateToLast = useCallback(() => { setTabbableIndex(managedChildren.length - 1); }, []);
-    const navigateToPrev = useCallback(() => { setTabbableIndex(i => indexDemangler!(indexMangler!(i ?? 0) - 1)) }, [indexMangler, indexDemangler]);
-    const navigateToNext = useCallback(() => { setTabbableIndex(i => indexDemangler!(indexMangler!(i ?? 0) + 1)) }, [indexMangler, indexDemangler]);
+    const navigateToFirst = useCallback(() => { setTabbableIndex(indexMangler!(0)); }, []);
+    const navigateToLast = useCallback(() => { setTabbableIndex(indexMangler!(managedChildren.length - 1)); }, []);
+    const navigateToPrev = useCallback(() => { setTabbableIndex(i => indexMangler!(indexDemangler!(i ?? 0) - 1)) }, [indexDemangler, indexMangler]);
+    const navigateToNext = useCallback(() => { setTabbableIndex(i => indexMangler!(indexDemangler!(i ?? 0) + 1)) }, [indexDemangler, indexMangler]);
 
     const setIndex = useCallback((index: (number | null) | ((prev: number | null) => (number | null))) => {
         setTabbableIndex(index);
