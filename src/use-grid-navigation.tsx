@@ -39,19 +39,43 @@ export type UseGridNavigationCell<C extends Element, I extends UseGridNavigation
     useGridNavigationCellProps: <P extends h.JSX.HTMLAttributes<C>>(props: P) => UseListNavigationChildPropsReturnType<C, P>;
 }
 
-export function useGridNavigation<R extends Element, C extends Element, IR extends UseGridNavigationRowInfo, IC extends UseGridNavigationCellInfo>({ focusOnChange: foc }: { focusOnChange: boolean }) {
+function identity<T>(t: T) { return t; }
+
+export function useGridNavigation<R extends Element, C extends Element, IR extends UseGridNavigationRowInfo, IC extends UseGridNavigationCellInfo>({ focusOnChange: foc, indexMangler, indexDemangler }: { focusOnChange: boolean, indexMangler?(unmangled: number): number, indexDemangler?(mangled: number): number }) {
+
+    indexMangler ??= identity;
+    indexDemangler ??= identity;
 
     const getFocusCellOnRowChange = useStableGetter(foc);
 
     const [currentRow, setCurrentRow, getCurrentRow] = useState(0);
     const [lastKnownCellIndex, setLastKnownCellIndex, getLastKnownCellIndex] = useState(0);
 
+    const navigateToIndex = useCallback((i: number | null) => { setCurrentRow(i ?? 0); }, []);
+    const navigateToFirst = useCallback(() => { setCurrentRow(0); }, []);
+    const navigateToLast = useCallback(() => { setCurrentRow(managedChildren.length - 1); }, []);
+    const navigateToPrev = useCallback(() => { setCurrentRow(i => indexDemangler!(indexMangler!(i ?? 0) - 1)) }, [indexMangler, indexDemangler]);
+    const navigateToNext = useCallback(() => { setCurrentRow(i => indexDemangler!(indexMangler!(i ?? 0) + 1)) }, [indexMangler, indexDemangler]);
+
     const { childCount, managedChildren, indicesByElement, getMountIndex, mountedChildren, totalChildrenMounted, totalChildrenUnounted, useManagedChild } = useChildManager<IR>();
-    const { useLinearNavigationChild } = useLinearNavigation<R>({ managedChildren, getIndex: getCurrentRow, setIndex: setCurrentRow, navigationDirection: "block" })
+    const { useLinearNavigationChild } = useLinearNavigation<R>({
+        managedChildren,
+        index: indexMangler(getCurrentRow()),
+        navigateToFirst,
+        navigateToLast,
+        navigateToNext,
+        navigateToPrev,
+        //getIndex: useCallback(() => { return indexDemangler!(getCurrentRow()); }, [indexDemangler, getCurrentRow]),
+        /*setIndex: useCallback((n: number | ((prevN: number) => number)) => { setCurrentRow(prevN => {
+            return indexMangler!(typeof n === "function"? n(prevN) : n);
+        }); }, [indexMangler, setCurrentRow]),*/
+        navigationDirection: "block"
+    })
 
     useChildFlag(currentRow, managedChildren.length, useCallback((index, tabbable) => managedChildren[index]?.setIsTabbableRow(tabbable, lastKnownCellIndex), [lastKnownCellIndex, managedChildren]));
 
     const useGridNavigationRow: UseGridNavigationRow<R, C, IR, IC> = useCallback(({ index, ...info }: UseGridNavigationRowParameters<IR>) => {
+        //index = indexMangler!(index);
 
         const { useHasFocusProps, lastFocusedInner } = useHasFocus<R>();
 
@@ -104,13 +128,13 @@ export function useGridNavigation<R extends Element, C extends Element, IR exten
 
 
         const { useManagedChildProps } = useManagedChild<R>({
-            index, 
+            index,
             setIsTabbableRow: useCallback<IR["setIsTabbableRow"]>((tabbable, newIndex) => {
                 if (tabbable) {
                     setCellIndex(newIndex);
                 }
                 setIsTabbableRow(tabbable);
-            }, []), 
+            }, []),
             ...info
         } as any as IR);
         const { useLinearNavigationChildProps } = useLinearNavigationChild()
@@ -130,7 +154,7 @@ export function useGridNavigation<R extends Element, C extends Element, IR exten
 
         return { useGridNavigationRowProps, useGridNavigationCell, cellCount, tabbableCell, isTabbableRow, managedCells };
 
-    }, [setLastKnownCellIndex, useLinearNavigationChild, useManagedChild]);
+    }, [setLastKnownCellIndex, useLinearNavigationChild, useManagedChild, indexDemangler, indexMangler]);
 
     return {
         useGridNavigationRow,

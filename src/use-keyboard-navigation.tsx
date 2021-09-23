@@ -19,12 +19,6 @@ import { useStableCallback } from "./use-stable-callback";
 
 export interface UseLinearNavigationReturnType<ChildElement extends Element> {
     useLinearNavigationChild: UseLinearNavigationChild<ChildElement>;
-
-    navigateToIndex(index: number | null): void;
-    navigateToNext(): void;
-    navigateToPrev(): void;
-    navigateToStart(): void;
-    navigateToEnd(): void;
 }
 
 
@@ -56,16 +50,14 @@ interface UseLinearNavigationParametersBase {
 }
 
 interface ULNP1 extends UseLinearNavigationParametersBase {
-    getIndex(): number;
-    setIndex(value: number | ((previousValue: number) => (number))): void;
+    navigateToNext(): void;
+    navigateToPrev(): void;
+    navigateToFirst(): void;
+    navigateToLast(): void;
+    index: number;
 }
 
-interface ULNP2 extends UseLinearNavigationParametersBase {
-    getIndex(): number | null;
-    setIndex(value: number | null | ((previousValue: number | null) => (number | null))): void;
-}
-
-export type UseLinearNavigationParameters = ULNP1 | ULNP2;
+export type UseLinearNavigationParameters = ULNP1;
 
 /** Arguments passed to the child 'useLinearNavigationChild` */
 export interface UseLinearNavigationChildInfo extends ManagedChildInfo<number> { }
@@ -80,11 +72,10 @@ export type UseLinearNavigationChildPropsReturnType<ChildElement extends Element
  * 
  * @see useListNavigation, which packages everything up together.
  */
-export function useLinearNavigation<ChildElement extends Element>({ getIndex, setIndex, managedChildren, navigationDirection }: UseLinearNavigationParameters): UseLinearNavigationReturnType<ChildElement> {
+export function useLinearNavigation<ChildElement extends Element>({ index, navigateToFirst, navigateToLast, navigateToNext, navigateToPrev, managedChildren, navigationDirection }: UseLinearNavigationParameters): UseLinearNavigationReturnType<ChildElement> {
 
     navigationDirection ??= "either";
 
-    const index = getIndex();
     const childCount = managedChildren.length;
 
     // Make sure the tabbable index never escapes the bounds of all available children
@@ -92,20 +83,20 @@ export function useLinearNavigation<ChildElement extends Element>({ getIndex, se
     useLayoutEffect(() => {
         if (index !== null) {
             if (index < 0) {
-                setIndex(0);
+                navigateToFirst();
             }
             else if (childCount > 0 && index >= childCount) {
-                setIndex(childCount - 1);
+                navigateToLast();
             }
         }
-    }, [index, childCount]);
+    }, [index, childCount, navigateToFirst, navigateToLast]);
 
     // These allow us to manipulate what our current tabbable child is.
-    const navigateToIndex = useCallback((index: number) => { setIndex(index < 0 ? (managedChildren.length + index) : index); }, []);
+    /*const navigateToIndex = useCallback((index: number) => { setIndex(index < 0 ? (managedChildren.length + index) : index); }, []);
     const navigateToNext = useCallback(() => { setIndex((i: number | null) => i === null? null! : i >= managedChildren.length - 1? managedChildren.length - 1 : ++i); }, []);
     const navigateToPrev = useCallback(() => { setIndex((i: number | null) => i === null? null! : i < 0? 0 : --i); }, []);
     const navigateToStart = useCallback(() => { navigateToIndex(0); }, [navigateToIndex]);
-    const navigateToEnd = useCallback(() => { navigateToIndex(-1); }, [navigateToIndex]);
+    const navigateToEnd = useCallback(() => { navigateToIndex(-1); }, [navigateToIndex]);*/
 
 
     const useLinearNavigationChild: UseLinearNavigationChild<ChildElement> = useCallback(() => {
@@ -195,13 +186,13 @@ export function useLinearNavigation<ChildElement extends Element>({ getIndex, se
                         break;
                     }
                     case "Home":
-                        navigateToStart();
+                        navigateToFirst();
                         e.preventDefault();
                         e.stopPropagation();
                         break;
 
                     case "End":
-                        navigateToEnd();
+                        navigateToLast();
                         e.preventDefault();
                         e.stopPropagation();
                         break;
@@ -215,16 +206,10 @@ export function useLinearNavigation<ChildElement extends Element>({ getIndex, se
         return {
             useLinearNavigationChildProps
         }
-    }, [navigationDirection, navigateToNext, navigateToPrev, navigateToStart, navigateToEnd])
+    }, [navigationDirection, navigateToNext, navigateToPrev, navigateToFirst, navigateToLast])
 
     return {
         useLinearNavigationChild,
-
-        navigateToIndex,
-        navigateToNext,
-        navigateToPrev,
-        navigateToStart,
-        navigateToEnd,
     }
 
 
