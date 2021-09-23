@@ -64,6 +64,15 @@ export function useLogicalDirection(element: Element | null | undefined) {
     useLayoutEffect(() => { directionRef.current = direction; }, [direction]);
     useLayoutEffect(() => { textOrientationRef.current = textOrientation; }, [textOrientation]);
 
+    // TODO: There's no way to refresh which writing mode we have once mounted.
+    // If the writing mode changes, the whole component needs to 
+    // mount/unmount because (more-or-less in order of importance)
+    //   A. There's no way to watch for CSS style changes
+    //   B. Calling getComputedStyle after every render for every element gets expensive fast and
+    //   C. Is not necessary for 99% of use cases that will never switch writing-mode within a single component
+    //      (Those that do will need to mount and unmount the component that uses it)
+    //
+    // Maybe there could be a context object that can be used to remotely update all components that use this hook?
     useLayoutEffect(() => {
         if (element) {
             const computedStyles = window.getComputedStyle(element);
@@ -76,7 +85,7 @@ export function useLogicalDirection(element: Element | null | undefined) {
             setTextOrientation(t || "mixed");
         }
 
-    });
+    }, [element]);
 
     const getLogicalDirection = useCallback((): LogicalDirectionInfo | null => {
         let writingMode = writingModeRef.current;
