@@ -155,6 +155,7 @@ export type UseListNavigationChildPropsReturnType<ChildElement extends Element, 
 
 export type UseListNavigationChildProps<ChildElement extends Element> = <P extends h.JSX.HTMLAttributes<ChildElement>>(p: P) => UseListNavigationChildPropsReturnType<ChildElement, P>
 
+function identity<T>(t: T) { return t; }
 
 /**
  * Implements proper keyboard navigation for components like listboxes, button groups, menus, etc.
@@ -164,6 +165,8 @@ export type UseListNavigationChildProps<ChildElement extends Element> = <P exten
  */
 export function useListNavigation<ChildElement extends Element, I extends UseListNavigationChildInfo = UseListNavigationChildInfo>({ initialIndex, focusOnChange, collator, keyNavigation, indexMangler, indexDemangler }: UseListNavigationParameters): UseListNavigationReturnType<ChildElement, I> {
 
+    indexMangler ??= identity;
+    indexDemangler ??= identity;
     keyNavigation ??= "either";
 
     // Keep track of three things related to the currently tabbable element's index:
