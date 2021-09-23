@@ -99,7 +99,19 @@ export function useGridNavigation<R extends Element, C extends Element, IR exten
         // Any other time, make sure no cell is tabbable.
         useEffect(() => {
             if (isTabbableRow) {
-                setCellIndex(getLastKnownCellIndex());
+                let cellIndex = getLastKnownCellIndex();
+                while (cellIndex >= 0 && managedCells[cellIndex] == null) {
+                    --cellIndex;
+                }
+                if (cellIndex < 0) {
+                    cellIndex = getLastKnownCellIndex();
+                    while (cellIndex < managedCells.length && managedCells[cellIndex] == null) {
+                        ++cellIndex;
+                    }
+                    if (cellIndex == managedCells.length)
+                        cellIndex = getLastKnownCellIndex();
+                }
+                setCellIndex(cellIndex);
             }
             else {
                 setCellIndex(null);
