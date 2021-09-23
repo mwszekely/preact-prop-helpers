@@ -129,6 +129,19 @@ export function useChildManager<I extends ManagedChildInfo<any>>(): UseChildMana
     const indicesByElement = useRef<Map<EventTarget, K>>(new Map());
     const deletedIndices = useRef<Set<K>>(new Set<K>());
 
+    // Used to keep track of indices that have "over-mounted" and by how much.
+    // We need this so that we don't erase saved information when a component
+    // "overmounts" over another which then, correctly, switches *itself* to something else.
+    // In general, this should only happen when components are swapping between indices.
+    // By the time they're done, this map should be all 0s again, at which point
+    // it's okay to actually run the unmount code.
+    // 
+    // TODO: throw a console.assert somewhere to make up for the lost 
+    // "are you sure you want to overwrite this child's index!" assertion.
+    // Namely, is this map all 0s when the parent element re-renders? 
+    // Probably not because of setChildUpdateIndex
+    const overmountCount = useRef(new Map<K, number>());
+
     const getMountIndex = useCallback((index: K) => { return mountOrder.current.get(index)!; }, []);
 
     const useManagedChild: UsedManagedChild<I> = useCallback(<ChildType extends EventTarget>(info: I) => {
@@ -139,7 +152,12 @@ export function useChildManager<I extends ManagedChildInfo<any>>(): UseChildMana
             mountOrder.current.set(info.index, index);
             mountedChildren.current[index] = info;
             setTotalChildrenMounted(t => ++t);
-            return () => { mountOrder.current.delete(info.index); mountedChildren.current[index] = null; setTotalChildrenUnounted(t => ++t); };
+            return () => {
+                mountOrder.current.delete(info.index);
+                mountedChildren.current[index] = null;
+                setTotalChildrenUnounted(t => ++t);
+
+            };
         }, [info.index]);
 
         // As soon as the component mounts, notify the parent and request a rerender.
@@ -148,8 +166,7 @@ export function useChildManager<I extends ManagedChildInfo<any>>(): UseChildMana
                 indicesByElement.current.set(element, info.index);
                 deletedIndices.current.delete(info.index);
                 if (managedChildren.current[info.index as keyof ManagedChildren<InfoToKey<I>, I>] != undefined) {
-                    console.assert(info.index == undefined, "Two children with the same index were added, which may result in unexpected behavior.");
-                    debugger;   // Intentional
+                    overmountCount.current.set(info.index, (overmountCount.current.get(info.index) ?? 0) + 1);
                 }
 
                 setChildUpdateIndex(c => ++c);
@@ -157,14 +174,19 @@ export function useChildManager<I extends ManagedChildInfo<any>>(): UseChildMana
 
                 return () => {
                     setChildUpdateIndex(c => ++c);
-                    delete managedChildren.current[info.index as keyof ManagedChildren<InfoToKey<I>, I>];
-                    deletedIndices.current.add(info.index);
-
-                    if (typeof info.index === "number") {
-                        while (managedChildren.current.length && (managedChildren.current as I[])[(managedChildren.current as I[]).length - 1] === undefined)
-                            (managedChildren.current as I[]).length -= 1;
+                    if ((overmountCount.current.get(info.index) ?? 0) > 0) {
+                        overmountCount.current.set(info.index, (overmountCount.current.get(info.index) ?? 0) - 1);
                     }
-                    indicesByElement.current.delete(element);
+                    else {
+                        delete managedChildren.current[info.index as keyof ManagedChildren<InfoToKey<I>, I>];
+                        deletedIndices.current.add(info.index);
+
+                        if (typeof info.index === "number") {
+                            while (managedChildren.current.length && (managedChildren.current as I[])[(managedChildren.current as I[]).length - 1] === undefined)
+                                (managedChildren.current as I[]).length -= 1;
+                        }
+                        indicesByElement.current.delete(element);
+                    }
                 }
             }
         }, [element, info.index]);
