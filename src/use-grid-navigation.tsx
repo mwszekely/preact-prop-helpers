@@ -72,7 +72,7 @@ export function useGridNavigation<R extends Element, C extends Element, IR exten
         navigationDirection: "block"
     })
 
-    useChildFlag(currentRow, managedChildren.length, useCallback((index, tabbable) => managedChildren[index]?.setIsTabbableRow(tabbable, lastKnownCellIndex), [lastKnownCellIndex, managedChildren]));
+    useChildFlag(currentRow, managedChildren.length, useCallback((index, tabbable) => managedChildren[index]?.setIsTabbableRow(tabbable, getLastKnownCellIndex()), [managedChildren]), useEffect);
 
     const useGridNavigationRow: UseGridNavigationRow<R, C, IR, IC> = useCallback(({ index, ...info }: UseGridNavigationRowParameters<IR>) => {
         //index = indexMangler!(index);
