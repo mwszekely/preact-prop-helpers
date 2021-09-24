@@ -1,4 +1,3 @@
-
 import { createContext, Fragment, h, render } from "preact";
 import { memo } from "preact/compat";
 import { useCallback, useContext, useRef } from "preact/hooks";
@@ -250,7 +249,7 @@ const GridCellContext = createContext<UseGridNavigationCell<HTMLDivElement, UseG
 export const DemoUseGrid = memo(() => {
 
     const { lastFocusedInner, useHasFocusProps } = useHasFocus<HTMLDivElement>();
-    const { useGridNavigationRow, rowCount, cellIndex, rowIndex } = useGridNavigation<HTMLDivElement, HTMLDivElement, UseGridNavigationRowInfo, UseGridNavigationCellInfo>({ focusOnChange: lastFocusedInner });
+    const { useGridNavigationRow, useGridNavigationColumn, rowCount, cellIndex, rowIndex } = useGridNavigation<HTMLDivElement, HTMLDivElement, UseGridNavigationRowInfo, UseGridNavigationCellInfo>({ focusOnChange: lastFocusedInner });
 
     return (
         <div className="demo">
@@ -269,32 +268,32 @@ export const DemoUseGrid = memo(() => {
 })
 
 const Prefix = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-const DemoUseGridRow = (({ index }: { index: number }) => {
+const DemoUseGridRow = memo((({ index }: { index: number }) => {
     const [randomWord] = useState(() => RandomWords[index/*Math.floor(Math.random() * (RandomWords.length - 1))*/]);
     const useGridRow = useContext(GridRowContext);
-    const { isTabbableRow, cellCount, useGridNavigationRowProps, useGridNavigationCell, tabbableCell } = useGridRow({ index });
+    const { isTabbableRow, cellCount, useGridNavigationRowProps, useGridNavigationCell, managedCells, currentColumn } = useGridRow({ index });
 
     const props = useGridNavigationRowProps({});
     return (
         <div {...props}>
-            <div>{isTabbableRow.toString()} ({tabbableCell}/{cellCount})</div>
+            <div>{isTabbableRow.toString()} ({currentColumn}/{cellCount})</div>
 
-<div  style="display: flex">
-            <GridCellContext.Provider value={useGridNavigationCell}>
-                {Array.from((function* () {
-                    for (let i = 0; i < 3; ++i) {
-                        yield <DemoUseGridCell index={i} key={i} />
-                    }
-                })())}
-            </GridCellContext.Provider>
+            <div style="display: flex">
+                <GridCellContext.Provider value={useGridNavigationCell}>
+                    {Array.from((function* () {
+                        for (let i = 0; i < 3; ++i) {
+                            yield <DemoUseGridCell index={i} key={i} />
+                        }
+                    })())}
+                </GridCellContext.Provider>
             </div>
         </div>
     )
-});
+}));
 
-const DemoUseGridCell = (({index}: {index: number}) => {
+const DemoUseGridCell = (({ index }: { index: number }) => {
     const useGridCell = useContext(GridCellContext);
-    const {tabbable,  useGridNavigationCellProps } = useGridCell({ index, text: null });
+    const { useGridNavigationCellProps } = useGridCell({ index, text: null });
 
     const props = useGridNavigationCellProps({}) as any;
 
@@ -307,7 +306,7 @@ const DemoUseGridCell = (({index}: {index: number}) => {
 const Component = () => {
     return <div class="flex" style={{ flexWrap: "wrap" }}>
         <DemoUseGrid />
-        {/*<hr />
+        <hr />
         <DemoFocus />
         <hr />
         <DemoUseTimeout />
@@ -330,7 +329,7 @@ const Component = () => {
         <hr />
         <DemoUseElementSizeAnimation />
         <hr />
-        <input />*/}
+        <input />
     </div>
 }
 
