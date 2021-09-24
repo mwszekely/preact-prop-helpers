@@ -116,8 +116,25 @@ export interface UseListNavigationParameters extends Omit<UseTypeaheadNavigation
      */
     noTypeahead?: boolean;
 
+    /**
+     * This and indexDemangler are used to allow children to be navigated in an order
+     * that doesn't necessarily match their child order, like if a list is sorted.
+     * 
+     * Used to turn an "absolute" index into a "sorted/filtered/mangled" one.
+     * 
+     * For example, navigateToFirst mangles 0 and navigates to that resulting row.
+     * @param rawIndex 
+     */
     indexMangler?(rawIndex: number): number;
 
+    /**
+     * Used to turn a "mangled" index into it's "unsorted" or "unmangled" index.
+     * 
+     * For example, when incrementing or decrementing the currently selected index,
+     * it needs to be demangled to do "normal" math on it, and then re-mangled
+     * to turn that absolute row index back into a mangled one.
+     * @param transformedIndex 
+     */
     indexDemangler?(transformedIndex: number): number;
 
     /**
@@ -204,9 +221,7 @@ export function useListNavigation<ChildElement extends Element, I extends UseLis
         return {
             useListNavigationChildProps,
             useListNavigationSiblingProps: useRovingTabIndexSiblingProps,
-            tabbable,
-            //roveToSelf,
-            //element
+            tabbable
         }
     }, [useTypeaheadNavigationChild, useLinearNavigationChild, useRovingTabIndexChild, navigateToIndex]);
 
