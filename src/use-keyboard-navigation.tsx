@@ -45,11 +45,29 @@ interface UseLinearNavigationParametersBase {
      */
     navigationDirection?: "inline" | "block" | "either" | "none";
 
+    /**
+     * If set to true, navigation with the arrow keys will be 
+     * disabled, but navigation with the home & end keys will
+     * be unaffected.
+     */
+    disableArrowKeys?: boolean;
+
+    /**
+     * If set to true, navigation with the home & end keys will
+     * be disabled, but navigation with the arrow keys will be
+     * unaffected.
+     */
+    disableHomeEndKeys?: boolean;
+
+    /**
+     * The managedChildren you have from useRovingTabIndex 
+     * (presumably, but it could also just be from useChildManager)
+     */
     managedChildren: UseLinearNavigationChildInfo[];
 
 }
 
-interface ULNP1 extends UseLinearNavigationParametersBase {
+export interface UseLinearNavigationParameters extends UseLinearNavigationParametersBase {
     navigateToNext(): void;
     navigateToPrev(): void;
     navigateToFirst(): void;
@@ -57,7 +75,6 @@ interface ULNP1 extends UseLinearNavigationParametersBase {
     index: number;
 }
 
-export type UseLinearNavigationParameters = ULNP1;
 
 /** Arguments passed to the child 'useLinearNavigationChild` */
 export interface UseLinearNavigationChildInfo extends ManagedChildInfo<number> { }
@@ -72,7 +89,7 @@ export type UseLinearNavigationChildPropsReturnType<ChildElement extends Element
  * 
  * @see useListNavigation, which packages everything up together.
  */
-export function useLinearNavigation<ChildElement extends Element>({ index, navigateToFirst, navigateToLast, navigateToNext, navigateToPrev, managedChildren, navigationDirection }: UseLinearNavigationParameters): UseLinearNavigationReturnType<ChildElement> {
+export function useLinearNavigation<ChildElement extends Element>({ index, navigateToFirst, navigateToLast, navigateToNext, navigateToPrev, managedChildren, navigationDirection, disableArrowKeys, disableHomeEndKeys }: UseLinearNavigationParameters): UseLinearNavigationReturnType<ChildElement> {
 
     navigationDirection ??= "either";
 
@@ -124,7 +141,7 @@ export function useLinearNavigation<ChildElement extends Element>({ index, navig
                 switch (e.key) {
                     case "ArrowUp": {
                         const propName = (info?.blockOrientation === "vertical" ? "blockDirection" : "inlineDirection");
-                        const directionAllowed = (info?.blockOrientation === "vertical" ? allowsBlockNavigation : allowsInlineNavigation);
+                        const directionAllowed = (!disableArrowKeys && (info?.blockOrientation === "vertical" ? allowsBlockNavigation : allowsInlineNavigation));
                         if (directionAllowed) {
                             if (info?.[propName] === "btt") {
                                 navigateToNext();
@@ -139,7 +156,7 @@ export function useLinearNavigation<ChildElement extends Element>({ index, navig
                     }
                     case "ArrowDown": {
                         const propName = (info?.blockOrientation === "vertical" ? "blockDirection" : "inlineDirection");
-                        const directionAllowed = (info?.blockOrientation === "vertical" ? allowsBlockNavigation : allowsInlineNavigation);
+                        const directionAllowed = (!disableArrowKeys && (info?.blockOrientation === "vertical" ? allowsBlockNavigation : allowsInlineNavigation));
                         if (directionAllowed) {
                             if (info?.[propName] === "btt") {
                                 navigateToPrev();
@@ -155,7 +172,7 @@ export function useLinearNavigation<ChildElement extends Element>({ index, navig
 
                     case "ArrowLeft": {
                         const propName = (info?.inlineOrientation === "horizontal" ? "inlineDirection" : "blockDirection");
-                        const directionAllowed = (info?.inlineOrientation === "horizontal" ? allowsInlineNavigation : allowsBlockNavigation);
+                        const directionAllowed = (!disableArrowKeys && (info?.inlineOrientation === "horizontal" ? allowsInlineNavigation : allowsBlockNavigation));
                         if (directionAllowed) {
                             if (info?.[propName] === "rtl") {
                                 navigateToNext();
@@ -170,7 +187,7 @@ export function useLinearNavigation<ChildElement extends Element>({ index, navig
                     }
                     case "ArrowRight": {
                         const propName = (info?.inlineOrientation === "horizontal" ? "inlineDirection" : "blockDirection");
-                        const directionAllowed = (info?.inlineOrientation === "horizontal" ? allowsInlineNavigation : allowsBlockNavigation);
+                        const directionAllowed = (!disableArrowKeys && (info?.inlineOrientation === "horizontal" ? allowsInlineNavigation : allowsBlockNavigation));
                         if (directionAllowed) {
                             if (info?.[propName] === "rtl") {
                                 navigateToPrev();
@@ -186,15 +203,19 @@ export function useLinearNavigation<ChildElement extends Element>({ index, navig
                         break;
                     }
                     case "Home":
-                        navigateToFirst();
-                        e.preventDefault();
-                        e.stopPropagation();
+                        if (!disableHomeEndKeys) {
+                            navigateToFirst();
+                            e.preventDefault();
+                            e.stopPropagation();
+                        }
                         break;
 
                     case "End":
-                        navigateToLast();
-                        e.preventDefault();
-                        e.stopPropagation();
+                        if (!disableHomeEndKeys) {
+                            navigateToLast();
+                            e.preventDefault();
+                            e.stopPropagation();
+                        }
                         break;
                 }
             };
@@ -206,7 +227,7 @@ export function useLinearNavigation<ChildElement extends Element>({ index, navig
         return {
             useLinearNavigationChildProps
         }
-    }, [navigationDirection, navigateToNext, navigateToPrev, navigateToFirst, navigateToLast])
+    }, [navigationDirection, navigateToNext, navigateToPrev, navigateToFirst, navigateToLast, !!disableArrowKeys, !!disableHomeEndKeys])
 
     return {
         useLinearNavigationChild,
