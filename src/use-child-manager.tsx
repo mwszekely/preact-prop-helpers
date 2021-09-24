@@ -1,5 +1,6 @@
 import { Ref } from "preact";
-import { useCallback, useRef } from "preact/hooks";
+import { Inputs, useCallback, useEffect, useRef } from "preact/hooks";
+import { EffectChange } from "use-effect";
 import { useLayoutEffect } from "./use-layout-effect";
 import { useRefElement, UseRefElementProps, UseRefElementPropsParameters, UseRefElementPropsReturnType, UseRefElementReturnType } from "./use-ref-element";
 import { useState } from "./use-state";
@@ -220,6 +221,7 @@ export function useChildManager<I extends ManagedChildInfo<any>>(): UseChildMana
     }
 }
 
+type UE = <I extends Inputs>(effect: (prev: I, changes: EffectChange<I, number>[]) => (void | (() => void)), inputs: I) => void;
 
 /**
  * Helper function for letting children know when they are or are not the
@@ -230,15 +232,16 @@ export function useChildManager<I extends ManagedChildInfo<any>>(): UseChildMana
  * @param activatedIndex What index the current selected (etc.) child is
  * @param length How many children exist (as managedChildren.length)
  * @param setFlag A function that probably looks like (i, flag) => managedChildren[i].setActive(flag)
+ * @param useEffect Which version of useEffect to use. Default is `useLayoutEffect`.
  */
-export function useChildFlag(activatedIndex: number | null | undefined, length: number, setFlag: (i: number, set: boolean) => void) {
+export function useChildFlag(activatedIndex: number | null | undefined, length: number, setFlag: (i: number, set: boolean) => void, useEffect: (<I extends Inputs>(effect: (prev: I, changes: EffectChange<I, number>[]) => (void | (() => void)), inputs: I) => void | UE) = useLayoutEffect) {
 
     const [prevActivatedIndex, setPrevActivatedIndex, getPrevActivatedIndex] = useState<number | null>(null);
     const [prevChildCount, setPrevChildCount, getPrevChildCount] = useState(length);
 
     // Any time the number of components changes,
     // reset any initial, possibly incorrect state they might have had, just in case.
-    useLayoutEffect(() => {
+    useEffect(() => {
         const direction = Math.sign(length - getPrevChildCount());
         if (direction !== 0) {
             for (let i = getPrevChildCount() ?? 0; i != length; i += direction) {
@@ -258,7 +261,7 @@ export function useChildFlag(activatedIndex: number | null | undefined, length: 
         }
     }, [setFlag, activatedIndex, length])
 
-    useLayoutEffect(() => {
+    useEffect(() => {
 
         // Deactivate the previously activated component
         const prevActivatedIndex = getPrevActivatedIndex();
