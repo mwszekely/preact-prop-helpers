@@ -13,6 +13,7 @@ import { useStableGetter } from "./use-stable-getter";
 import { useHasFocus, UseHasFocusPropsReturnType } from "./use-has-focus";
 import { useEffect } from "./use-effect";
 import { useForceUpdate } from "./use-force-update";
+import { useStableCallback } from "./use-stable-callback";
 
 export interface UseGridNavigationRowInfo extends RovingTabIndexChildInfo {
     setIsTabbableRow(tabbable: boolean): void;
@@ -69,17 +70,17 @@ function tryNavigateToIndex<I extends UseGridNavigationRowInfo | UseGridNavigati
 }
 
 export interface UseGridNavigationParameters {
-    focusOnChange: boolean,
+    shouldFocusOnChange(): boolean,
     indexMangler?(unmangled: number): number,
     indexDemangler?(mangled: number): number
 }
 
-export function useGridNavigation<R extends Element, C extends Element, IR extends UseGridNavigationRowInfo, IC extends UseGridNavigationCellInfo>({ focusOnChange: foc, indexMangler, indexDemangler }: UseGridNavigationParameters) {
+export function useGridNavigation<R extends Element, C extends Element, IR extends UseGridNavigationRowInfo, IC extends UseGridNavigationCellInfo>({ shouldFocusOnChange, indexMangler, indexDemangler }: UseGridNavigationParameters) {
 
     indexMangler ??= identity;
     indexDemangler ??= identity;
 
-    const getFocusCellOnRowChange = useStableGetter(foc);
+    const getFocusCellOnRowChange = useStableCallback(shouldFocusOnChange);
 
     // Keep track of our currently tabbable row and column.
     // These are mangled, and so relative to the DOM order, not component order.
