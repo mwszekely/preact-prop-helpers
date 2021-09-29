@@ -37,7 +37,7 @@ export interface UseRovingTabIndexParameters {
      * `null` is special-use only to indicate that the entire component is disabled and not tabbable.
      */
     tabbableIndex: number | null;
-    focusOnChange: boolean;
+    shouldFocusOnChange(): boolean;
 }
 
 /** Arguments passed to the child 'useRovingTabIndexChild` */
@@ -89,7 +89,7 @@ export type UseRovingTabIndexSiblingProps<ChildElement extends Element> = <P ext
  * And just as well! Children should be allowed at the root, 
  * regardless of if it's the whole app or just a given component.
  */
-export function useRovingTabIndex<I extends RovingTabIndexChildInfo>({ focusOnChange: foc, tabbableIndex }: UseRovingTabIndexParameters): UseRovingTabIndexReturnType<I> {
+export function useRovingTabIndex<I extends RovingTabIndexChildInfo>({ shouldFocusOnChange: foc, tabbableIndex }: UseRovingTabIndexParameters): UseRovingTabIndexReturnType<I> {
 
     const [rerenderAndFocus, setRerenderAndFocus] = useState<(() => void) | null>(null);
     const getFocusOnChange = useStableGetter(foc);

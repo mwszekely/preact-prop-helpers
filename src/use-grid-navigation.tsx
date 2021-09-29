@@ -161,7 +161,7 @@ export function useGridNavigation<R extends Element, C extends Element, IR exten
 
         // Track child cells and manage keyboard navigation among them.
         const { managedChildren: managedCells, useRovingTabIndexChild: useRovingTabIndexCell, childCount: cellCount } = useRovingTabIndex<IC>({
-            focusOnChange: isTabbableRow && getFocusCellOnRowChange(),
+            shouldFocusOnChange: getFocusCellOnRowChange,
             tabbableIndex: currentColumn
         });
 

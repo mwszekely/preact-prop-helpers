@@ -249,7 +249,7 @@ const GridCellContext = createContext<UseGridNavigationCell<HTMLDivElement, UseG
 export const DemoUseGrid = memo(() => {
 
     const { lastFocusedInner, useHasFocusProps } = useHasFocus<HTMLDivElement>();
-    const { useGridNavigationRow, useGridNavigationColumn, rowCount, cellIndex, rowIndex } = useGridNavigation<HTMLDivElement, HTMLDivElement, UseGridNavigationRowInfo, UseGridNavigationCellInfo>({ focusOnChange: lastFocusedInner });
+    const { useGridNavigationRow, useGridNavigationColumn, rowCount, cellIndex, rowIndex } = useGridNavigation<HTMLDivElement, HTMLDivElement, UseGridNavigationRowInfo, UseGridNavigationCellInfo>({ shouldFocusOnChange: () => lastFocusedInner });
 
     return (
         <div className="demo">
@@ -293,7 +293,7 @@ const DemoUseGridRow = memo((({ index }: { index: number }) => {
 
 const DemoUseGridCell = (({ index }: { index: number }) => {
     const useGridCell = useContext(GridCellContext);
-    const { useGridNavigationCellProps } = useGridCell({ index, text: null });
+    const { useGridNavigationCellProps } = useGridCell({ index });
 
     const props = useGridNavigationCellProps({}) as any;
 

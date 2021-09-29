@@ -180,7 +180,7 @@ function identity<T>(t: T) { return t; }
  * In the document order, there will be only one "focused" or "tabbable" element, making it act more like one complete unit in comparison to everything around it.
  * Navigating forwards/backwards can be done with the arrow keys, Home/End keys, or any any text for typeahead to focus the next item that matches.
  */
-export function useListNavigation<ChildElement extends Element, I extends UseListNavigationChildInfo = UseListNavigationChildInfo>({ initialIndex, focusOnChange, collator, keyNavigation, indexMangler, indexDemangler }: UseListNavigationParameters): UseListNavigationReturnType<ChildElement, I> {
+export function useListNavigation<ChildElement extends Element, I extends UseListNavigationChildInfo = UseListNavigationChildInfo>({ initialIndex, shouldFocusOnChange, collator, keyNavigation, indexMangler, indexDemangler }: UseListNavigationParameters): UseListNavigationReturnType<ChildElement, I> {
 
     indexMangler ??= identity;
     indexDemangler ??= identity;
@@ -189,7 +189,7 @@ export function useListNavigation<ChildElement extends Element, I extends UseLis
     // Keep track of three things related to the currently tabbable element's index:
     // What it is, and whether, when we render this component and it's changed, to also focus the element that was made tabbable.
     const [tabbableIndex, setTabbableIndex, getTabbableIndex] = useState<number | null>(initialIndex === undefined ? 0 : initialIndex);
-    const { managedChildren, indicesByElement, useRovingTabIndexChild, focusCurrent, ...rest } = useRovingTabIndex<I>({ focusOnChange, tabbableIndex })
+    const { managedChildren, indicesByElement, useRovingTabIndexChild, focusCurrent, ...rest } = useRovingTabIndex<I>({ shouldFocusOnChange, tabbableIndex })
 
     const navigateToIndex = useCallback((i: number | null) => { setTabbableIndex(i); }, []);
     const navigateToFirst = useCallback(() => { setTabbableIndex(indexMangler!(0)); }, []);
