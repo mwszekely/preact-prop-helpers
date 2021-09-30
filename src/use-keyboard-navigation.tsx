@@ -266,17 +266,13 @@ interface UseTypeaheadNavigationParametersBase {
     typeaheadTimeout?: number;
 }
 
-interface UTNP1 extends UseTypeaheadNavigationParametersBase {
-    getIndex(): number;
-    setIndex(value: number | ((previousValue: number) => (number))): void;
-}
 
 interface UTNP2 extends UseTypeaheadNavigationParametersBase {
     getIndex(): number | null;
     setIndex(value: number | null | ((previousValue: number | null) => (number | null))): void;
 }
 
-export type UseTypeaheadNavigationParameters = UTNP1 | UTNP2;
+export type UseTypeaheadNavigationParameters = UTNP2;
 
 /** Arguments passed to the child 'useTypeaheadNavigationChild` */
 export interface UseTypeaheadNavigationChildInfo extends RovingTabIndexChildInfo {

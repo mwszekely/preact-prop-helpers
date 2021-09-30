@@ -86,7 +86,7 @@ export function useGridNavigation<R extends Element, C extends Element, IR exten
     // These are mangled, and so relative to the DOM order, not component order.
     // Any operations done on these numbers need to be demangled first,
     // otherwise they'll be incorrect.
-    const [currentRow, setCurrentRow2, getCurrentRow] = useState(0);
+    const [currentRow, setCurrentRow2, getCurrentRow] = useState<number | null>(0);
     const [currentColumn, setCurrentColumn2, getCurrentColumn] = useState(0);
 
     // Functions used for navigating to different rows.
@@ -94,16 +94,16 @@ export function useGridNavigation<R extends Element, C extends Element, IR exten
     // current row, then all of its children are non-tabbable.
     // Otherwise, it is tabbable, with the tabbable cell being currentColumn.
     // This happens automatically when these functions are called.
-    const navigateToFirstRow = useCallback(() => { setCurrentRow2(c => tryNavigateToIndex(managedRows, c, 0, 1, indexMangler!, indexDemangler!)); }, [indexMangler, indexDemangler])
-    const navigateToLastRow = useCallback(() => { setCurrentRow2(c => tryNavigateToIndex(managedRows, c, managedRows.length - 1, -1, indexMangler!, indexDemangler!)); }, [indexMangler, indexDemangler])
-    const navigateToPrevRow = useCallback(() => { setCurrentRow2(c => { return tryNavigateToIndex(managedRows, c, indexMangler!(Math.max(0, indexDemangler!(c ?? 0) - 1)), -1, indexMangler!, indexDemangler!); }); }, [indexMangler, indexDemangler])
-    const navigateToNextRow = useCallback(() => { setCurrentRow2(c => { return tryNavigateToIndex(managedRows, c, indexMangler!(Math.min((managedRows.length - 1), indexDemangler!(c ?? 0) + 1)), 1, indexMangler!, indexDemangler!); }); }, [indexMangler, indexDemangler]);
+    const navigateToFirstRow = useCallback(() => { setCurrentRow2(c => tryNavigateToIndex(managedRows, c ?? 0, 0, 1, indexMangler!, indexDemangler!)); }, [indexMangler, indexDemangler])
+    const navigateToLastRow = useCallback(() => { setCurrentRow2(c => tryNavigateToIndex(managedRows, c ?? 0, managedRows.length - 1, -1, indexMangler!, indexDemangler!)); }, [indexMangler, indexDemangler])
+    const navigateToPrevRow = useCallback(() => { setCurrentRow2(c => { return tryNavigateToIndex(managedRows, c ?? 0, indexMangler!(Math.max(0, indexDemangler!(c ?? 0) - 1)), -1, indexMangler!, indexDemangler!); }); }, [indexMangler, indexDemangler])
+    const navigateToNextRow = useCallback(() => { setCurrentRow2(c => { return tryNavigateToIndex(managedRows, c ?? 0, indexMangler!(Math.min((managedRows.length - 1), indexDemangler!(c ?? 0) + 1)), 1, indexMangler!, indexDemangler!); }); }, [indexMangler, indexDemangler]);
 
     // Track child rows and manage keyboard navigation among them.
     const { childCount, managedChildren: managedRows, indicesByElement: rowIndicesByElement, getMountIndex: getRowMountIndex, mountedChildren: mountedRows, totalChildrenMounted: totalRowsMounted, totalChildrenUnounted: totalRowsUnmounted, useManagedChild: useManagedRow } = useChildManager<IR>();
     const { useLinearNavigationChild: useLinearNavigationChildRow } = useLinearNavigation<R>({
         managedChildren: managedRows,
-        index: indexMangler(getCurrentRow()),
+        index: indexMangler(getCurrentRow() ?? 0),
         navigateToFirst: navigateToFirstRow,
         navigateToLast: navigateToLastRow,
         navigateToNext: navigateToNextRow,

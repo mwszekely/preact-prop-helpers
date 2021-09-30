@@ -224,8 +224,15 @@ const DemoUseAsyncHandler2 = memo(() => {
 
 
 const DemoFocus = memo(() => {
-    const { activeElement, getLastActiveElement, getActiveElement, lastActiveElement, windowFocused } = useActiveElement();
-    const { focused, focusedInner, useHasFocusProps } = useHasFocus<HTMLDivElement>();
+    const [lastActiveElement, setLastActiveElement, getLastActiveElement] = useState<(Element & HTMLOrSVGElement) | null>(null);
+    const [activeElement, setActiveElement, getActiveElement] = useState<(Element & HTMLOrSVGElement) | null>(null);
+    const [windowFocused, setWindowFocused, getWindowFocused] = useState(false);
+    const [focused, setFocused, getFocused] = useState(false);
+    const [focusedInner, setFocusedInner, getFocusedInner] = useState(false);
+    const [lastFocused, setLastFocused, getLastFocused] = useState(false);
+    const [lastFdInner, setLastFocusedInner, getLastFocusedInner] = useState(false);
+    useActiveElement({ setLastActiveElement, setActiveElement, setWindowFocused });
+    const { useHasFocusProps } = useHasFocus<HTMLDivElement>({ setLastFocusedInner, setFocused, setLastFocused, setFocusedInner });
     return (
         <div class="demo">
             <h2>useHasFocus</h2>
@@ -248,8 +255,10 @@ const GridRowContext = createContext<UseGridNavigationRow<HTMLDivElement, HTMLDi
 const GridCellContext = createContext<UseGridNavigationCell<HTMLDivElement, UseGridNavigationCellInfo>>(null!);
 export const DemoUseGrid = memo(() => {
 
-    const { lastFocusedInner, useHasFocusProps } = useHasFocus<HTMLDivElement>();
-    const { useGridNavigationRow, useGridNavigationColumn, rowCount, cellIndex, rowIndex } = useGridNavigation<HTMLDivElement, HTMLDivElement, UseGridNavigationRowInfo, UseGridNavigationCellInfo>({ shouldFocusOnChange: () => lastFocusedInner });
+    const [lastFocusedInner, setLastFocusedInner, getLastFocusedInner] = useState(false);
+
+    const { useHasFocusProps } = useHasFocus<HTMLDivElement>({ setLastFocusedInner });
+    const { useGridNavigationRow, useGridNavigationColumn, rowCount, cellIndex, rowIndex } = useGridNavigation<HTMLDivElement, HTMLDivElement, UseGridNavigationRowInfo, UseGridNavigationCellInfo>({ shouldFocusOnChange: getLastFocusedInner });
 
     return (
         <div className="demo">

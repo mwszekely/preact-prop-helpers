@@ -56,12 +56,14 @@ function getCurrentlyFocusedElement() {
     return currentlyFocusedElement;
 }
 
-const updaters = new Set<(info: ActiveElementFilterInfo) => void>();
+const activeElementUpdaters = new Set<undefined | ((e: (Element & HTMLOrSVGElement) | null) => void)>();
+const lastActiveElementUpdaters = new Set<undefined | ((e: (Element & HTMLOrSVGElement)) => void)>();
+const windowFocusedUpdaters = new Set<undefined | ((focused: boolean) => void)>();
 
 function focusout(e: FocusEvent) {
     if (e.relatedTarget == null) {
         currentlyFocusedElement = null;
-        for (let f of updaters) { f({ current: currentlyFocusedElement, last: lastFocusedElement, windowFocused }); }
+        for (let f of activeElementUpdaters) f?.(currentlyFocusedElement);
     }
     else {
         // Just wait for the focusin event.
@@ -71,59 +73,55 @@ function focusout(e: FocusEvent) {
 
 function focusin(e: FocusEvent) {
     currentlyFocusedElement = lastFocusedElement = e.target as (Element & HTMLOrSVGElement);
-    for (let f of updaters) { f({ current: currentlyFocusedElement, last: lastFocusedElement, windowFocused }); }
+    activeElementUpdaters.forEach(f => f?.(currentlyFocusedElement));
+    lastActiveElementUpdaters.forEach(f => f?.(lastFocusedElement!));
+    //for (let f of updaters) { f({ current: currentlyFocusedElement, last: lastFocusedElement, windowFocused }); }
 }
 
 let windowFocused = true;
 function windowFocus() {
-    windowFocused = true;
-    for (let f of updaters) { f({ current: currentlyFocusedElement, last: lastFocusedElement, windowFocused }); }
+    windowFocusedUpdaters.forEach(f => f?.(true));
 }
 
 function windowBlur() {
-    windowFocused = false;
-    for (let f of updaters) { f({ current: currentlyFocusedElement, last: lastFocusedElement, windowFocused }); }
+    windowFocusedUpdaters.forEach(f => f?.(false));
 }
 
-export interface ActiveElementFilterInfo {
-    current: (Element & HTMLOrSVGElement) | null;
-    last: (Element & HTMLOrSVGElement) | null;
-    windowFocused: boolean;
+export interface UseActiveElementParameters {
+    setActiveElement?(e: (Element & HTMLOrSVGElement) | null): void;
+    setLastActiveElement?(e: (Element & HTMLOrSVGElement)): void;
+    setWindowFocused?(focused: boolean): void;
 }
 
-export function useActiveElement(filter?: ((info: ActiveElementFilterInfo) => boolean)) {
-    const [i, setI] = useState(0);
+export function useActiveElement({ setActiveElement, setLastActiveElement, setWindowFocused }: UseActiveElementParameters) {
 
     useLayoutEffect(() => {
-        const F = (info: ActiveElementFilterInfo) => {
-            if (filter == null || filter(info))
-                setI(i => ++i);
-        };
-        
-        if (updaters.size === 0) {
+
+        if (activeElementUpdaters.size === 0) {
             document.addEventListener("focusin", focusin, { passive: true });
             document.addEventListener("focusout", focusout, { passive: true });
             window.addEventListener("focus", windowFocus, { passive: true });
             window.addEventListener("blur", windowBlur, { passive: true });
         }
-        updaters.add(F);
+
+        // Add them even if they're undefined to more easily
+        // manage the ">0 means don't add handlers" logic.
+        activeElementUpdaters.add(setActiveElement);
+        lastActiveElementUpdaters.add(setLastActiveElement);
+        windowFocusedUpdaters.add(setWindowFocused);
 
         return () => {
-            updaters.delete(F);
-            if (updaters.size === 0) {
+            activeElementUpdaters.delete(setActiveElement);
+            lastActiveElementUpdaters.delete(setLastActiveElement);
+            windowFocusedUpdaters.delete(setWindowFocused);
+
+            if (activeElementUpdaters.size === 0) {
                 document.removeEventListener("focusin", focusin);
                 document.removeEventListener("focusout", focusout);
                 window.removeEventListener("focus", windowFocus);
                 window.removeEventListener("blur", windowBlur);
             }
         }
-    }, [filter]);
+    }, [setActiveElement, setLastActiveElement, setWindowFocused]);
 
-    return {
-        activeElement: currentlyFocusedElement,
-        lastActiveElement: lastFocusedElement,
-        getActiveElement: getCurrentlyFocusedElement,
-        getLastActiveElement: getLastFocusedElement,
-        windowFocused
-    }
 }

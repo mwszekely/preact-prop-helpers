@@ -1,5 +1,6 @@
 import { useLayoutEffect } from "preact/hooks";
 import { isFocusable } from "tabbable";
+import { useState } from "./use-state";
 import { useActiveElement } from "./use-active-element";
 import { getTopElement, useBlockingElement } from "./use-blocking-element";
 import { ManagedChildInfo } from "./use-child-manager";
@@ -24,7 +25,8 @@ const elementsToRestoreFocusTo = new Map<Element | null, (Node & HTMLOrSVGElemen
 
 export function useFocusTrap<E extends HTMLElement>({ trapActive }: UseFocusTrapParameters): UseFocusTrapReturnType<E> {
     const { element, useRefElementProps, getElement } = useRefElement<E>();
-    const { getLastActiveElement } = useActiveElement();
+    const [lastActiveElement, setLastActiveElement, getLastActiveElement] = useState<Node | null>(null);
+    useActiveElement({ setLastActiveElement });
 
 
     // When the trap becomes active, before we let the blockingElements hook run,
@@ -33,7 +35,7 @@ export function useFocusTrap<E extends HTMLElement>({ trapActive }: UseFocusTrap
         if (trapActive && element) {
             // Save the currently focused element
             // to whatever's currently at the top of the stack
-            elementsToRestoreFocusTo.set(getTopElement(), getLastActiveElement() ?? document.body);
+            elementsToRestoreFocusTo.set(getTopElement(), (getLastActiveElement() as (Node & HTMLOrSVGElement)) ?? document.body);
         }
     }, [trapActive, element])
 
