@@ -92,7 +92,7 @@ export type UseRovingTabIndexSiblingProps<ChildElement extends Element> = <P ext
 export function useRovingTabIndex<I extends RovingTabIndexChildInfo>({ shouldFocusOnChange: foc, tabbableIndex }: UseRovingTabIndexParameters): UseRovingTabIndexReturnType<I> {
 
     const [rerenderAndFocus, setRerenderAndFocus] = useState<(() => void) | null>(null);
-    const getFocusOnChange = useStableGetter(foc);
+    const getShouldFocusOnChange = useStableGetter(foc);
 
     const getTabbableIndex = useStableGetter(tabbableIndex);
     const prevTabbable = useRef(-Infinity);
@@ -133,7 +133,8 @@ export function useRovingTabIndex<I extends RovingTabIndexChildInfo>({ shouldFoc
         useEffect(() => {
             if (element && tabbable) {
                 setRerenderAndFocus(_ => rerenderAndFocus);
-                if (getFocusOnChange() && "focus" in (element as Element as (Element & HTMLOrSVGElement))) {
+                const shouldFocusOnChange = getShouldFocusOnChange();
+                if (shouldFocusOnChange() && "focus" in (element as Element as (Element & HTMLOrSVGElement))) {
                     requestAnimationFrame(() => {
                         queueMicrotask(() => {
                             (element as Element as (Element & HTMLOrSVGElement)).focus();
