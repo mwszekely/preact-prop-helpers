@@ -54,12 +54,12 @@ export function useHasFocus<T extends Node>({ setFocused, setFocusedInner, setLa
     const setActiveElement = useCallback((node: Node | null) => {
         setFocused?.(element == node && element != null);
         setFocusedInner?.(!!element?.contains(node));
-    }, [setFocused, element]);
+    }, [setFocused, setFocusedInner, element]);
 
     const setLastActiveElement = useCallback((node: Node) => {
         setLastFocused?.(element == node && element != null);
         setLastFocusedInner?.(!!element?.contains(node));
-    }, [setFocusedInner, element]);
+    }, [setLastFocused, setLastFocusedInner, element]);
 
     useActiveElement({ setActiveElement, setLastActiveElement });
 
