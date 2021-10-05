@@ -3,13 +3,15 @@
 A small set of hooks related to modifying Preact props and a few other useful things.
 
 ```tsx 
-const { useElementSizeProps, offsetHeight, ...otherSizes } = useElementSize<HTMLDivElement>();
+const [size, setSize] = useState<ElementSize | null>(null);
+const { useElementSizeProps } = useElementSize<HTMLDivElement>({ setSize });
+const { offsetHeight, ...otherSizes } = (size ?? {});
 
 // Do something fun with offsetHeight here
 
 return <div {...useElementSizeProps(props)} />
 ```
-Note that many of these props return an object containing both the hook's "result", if any (e.g. `offsetHeight` above), but also another "sub-hook" (e.g. `useElementSizeProps`) that needs to be used to modify the props you were going to pass to the `Element`. If you don't use a sub-hook returned by some of these hooks, chances are __nothing will happen, as if you never used the hook at all.__
+Note that many of these props return an object containing both the hook's "result", if any, but also another "sub-hook" (e.g. `useElementSizeProps`) that needs to be used to modify the props you were going to pass to the `Element`. If you don't use a sub-hook returned by some of these hooks, chances are __nothing will happen, as if you never used the hook at all.__
 
 There are a few reasons:
 
@@ -26,8 +28,9 @@ There are a few reasons:
 |Hook|Description|
 |------|------|
 |`useMergedProps` (& `useMergedClasses`, `useMergedRefs`, `useMergedStyles`, `useMergedChildren`)	|Allows a component to use props from two (or more) separate unrelated sources.|
-|`useChildManager`									|Allows for child → parent communication, and more efficient parent → child communication (e.g. telling a single child to change itself instead of rerendering all children).|
+|`useChildManager` (& `useChildFlag`)				|Allows for child → parent communication, and more efficient parent → child communication (e.g. telling a single child to change itself instead of rerendering all children).|
 |`useListNavigation` (& `useRovingTabIndex`, `useLinearNavigation`, `useTypeaheadNavigation`)	|Allows a component with children (like a select menu or radio group) to be treated as *one element to be tabbed into/out of*, with arrow keys and typeahead handling the navigation *within* the component.|
+|`useGridNavigation`								|Complement to `useListNavigation` that is 2-dimensional and supports sorting &amp; filtering. |
 |`useAsyncHandler`									|Creates a synchronous event handler from an asynchronous one, and provides the component with the information it needs to display the current async state effectively.|
 |`useRefElement`									|Allows a component to use the `Element` that it actually renders.|
 |`useElementSize`									|Allows a component to use its size as part of the rendering process.|
@@ -73,7 +76,7 @@ return <div {...useMergedProps<HTMLDivElement>()(props1, props2)} />
 |`className`, `class`|`useMergedClasses`|Combined and duplicates removed.|
 |`style`|`useMergedStyles`|If objects, righthand properties overwrite lefthand ones. If strings, concatenates them. If mixed, attempts to construct an object from the string and then merges.|
 |`ref`|`useMergedRefs`|Creates a ref that references both, and uses that.|
-|`children`|Returns a `Fragment` containing the first prop's children, then the second prop's children.|
+|`children`|`useMergedChildren`|Returns a `Fragment` containing the first prop's children, then the second prop's children.|
 |Event handlers (or any function)| |Calls the first event handler, then the second.|
 |Anything `null` or `undefined`| |Whichever side isn't null or undefined is kept. If both are, `null` is preferred over `undefined`.|
 |All other differences| |Since both are non-null, forcibly uses the righthand value. You can optionally set a function to run at that point that will receive a string as an error message. By default, a function that invokes the debugger is called.|
@@ -134,6 +137,9 @@ Unlike a lot of other hooks, the hook returned by this component, `useManagedChi
 
 You can use this hook in multiple different ways as long as a different Context object is used to differentiate them.
 
+`useChildManager` comes with a companion hook `useChildFlag`, which is *extremely* useful for scenarios where, among a set of children, only a single one is selected/tabbable/active/whatever.  It manages
+sending the "flag on"/"flag off" signals to the (max 2) correct children whenever the index changes, the number of children changes, etc.
+
 ## `useListNavigation` (&amp; `useRovingTabIndex`, `useLinearNavigation`, `useTypeaheadNavigation`)
 
 (FYI: This component uses `useChildManager`, so be aware of how that works and be sure to have a Context ready.)
@@ -149,15 +155,18 @@ At each point during this, the `tabIndex` attribute of these elements is modifie
 
 It is perfectly fine for each tabbable element to also have "sub-tabbable" elements, like a list item that contains a checkbox or whatnot.  In that case, the child should use `useListNavigationSiblingProps` (with the primary element just using `useListNavigationChildProps` as usual)
 
+## `useGridNavigation`
+
+Works similarly to `useListNavigation`, but for 2-dimensional grid layouts.  `useGridNavigation` supports sorting its contents via the `indexMangler` and `indexDemangler` functions in its props &ndash; `indexMangler` should be a function that turns an unsorted (row) index into a sorted one, and the reverse for `indexDemangler`.  Filtering is also supported via the `hidden` prop.
 
 ## `useElementSize`
 
 ```tsx
-export function useElementSize<E extends HTMLElement>({ observeBox }?: UseElementSizeParameters): UseElementSizeReturnType<E>;
+export function useElementSize<E extends HTMLElement>({ observeBox, setSize }: UseElementSizeParameters): UseElementSizeReturnType<E>;
 function useElementSizeProps<P extends UseElementSizePropsParameters<T>>(props: P): MergedProps<..., P>;
 ```
 
-Returns the following information related to the size of the element (On the first render, this object will be null instead, but a re-render with the information will happen before paint). 
+Any time the element size changes, your `setSize` function will be called with the following information.  You can choose to *actually* store all or none of it.
 
 ```tsx
 interface ElementSize {
@@ -269,6 +278,8 @@ Allows monitoring which element is currently focused, which element was most rec
 
 When called, returns `forceUpdate`, a function that can cause the current component to re-render itself.  Like with any other render, how deeply things are affected is decided by the usual diffing rules, meaning
 that this cannot be used to update the entire tree, just the current component and however many relevant children.
+
+Prefer alternatives if you can find them, but as an escape hatch this is occasionally useful.
 
 ## `useMediaQuery`
 

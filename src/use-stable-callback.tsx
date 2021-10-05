@@ -1,8 +1,4 @@
-
-
-
-
-import { useCallback, useImperativeHandle, useRef } from "preact/hooks"
+import { useCallback } from "preact/hooks";
 import { useStableGetter } from "./use-stable-getter";
 
 
@@ -20,10 +16,6 @@ export function useStableCallback<T extends (...args: any[]) => any>(fn: T): T {
     const currentCallbackGetter = useStableGetter<T>(fn);
 
     return useCallback((...args: Parameters<T>): ReturnType<T> => {
-        const currentFunc = currentCallbackGetter();
-        if (!currentFunc) {
-            throw new Error('Callback retrieved from useStableCallback() cannot be called from useLayoutEffect().')
-        }
-        return currentFunc(...args);
+        return currentCallbackGetter()(...args);
     }, []) as T;
 }

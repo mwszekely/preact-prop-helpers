@@ -1,15 +1,11 @@
-import { Context, h, Ref } from "preact";
-import { StateUpdater, useCallback, useRef } from "preact/hooks";
-import { useRefElement, UseRefElementPropsReturnType } from "./use-ref-element";
-import { useLayoutEffect } from "./use-layout-effect";
-import { MergedProps, useMergedProps } from "./use-merged-props"
-import { useState } from "./use-state";
-import { useTimeout } from "./use-timeout";
-import { useLogicalDirection } from "./use-logical-direction";
-import { RovingTabIndexChildInfo, useRovingTabIndex, UseRovingTabIndexChildParameters, UseRovingTabIndexChildPropsReturnType, UseRovingTabIndexSiblingProps } from "./use-roving-tabindex";
-import { useLinearNavigation, useTypeaheadNavigation, UseTypeaheadNavigationChildParameters, UseTypeaheadNavigationParameters } from "./use-keyboard-navigation";
-import { UseChildManagerReturnType, UseManagedChildReturnType } from "./use-child-manager";
 import { UseRovingTabIndexParameters } from "index";
+import { h } from "preact";
+import { StateUpdater, useCallback } from "preact/hooks";
+import { UseChildManagerReturnType } from "./use-child-manager";
+import { useLinearNavigation, useTypeaheadNavigation, UseTypeaheadNavigationParameters } from "./use-keyboard-navigation";
+import { MergedProps, useMergedProps } from "./use-merged-props";
+import { RovingTabIndexChildInfo, useRovingTabIndex, UseRovingTabIndexChildParameters, UseRovingTabIndexChildPropsReturnType, UseRovingTabIndexSiblingProps } from "./use-roving-tabindex";
+import { useState } from "./use-state";
 
 
 
@@ -83,7 +79,7 @@ export interface UseListNavigationReturnType<ChildElement extends Element, I ext
 export interface UseListNavigationChildReturnType<ChildElement extends Element> {
     useListNavigationChildProps: <P extends h.JSX.HTMLAttributes<ChildElement>>({ tabIndex, ...props }: P) => UseListNavigationChildPropsReturnType<ChildElement, P>;
     useListNavigationSiblingProps: UseRovingTabIndexSiblingProps<ChildElement>;
-    tabbable: boolean;
+    tabbable: boolean | null;
 }
 
 

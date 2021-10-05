@@ -1,5 +1,5 @@
 import { h, PreactDOMAttributes } from "preact";
-import { useCallback, useEffect, useLayoutEffect } from "preact/hooks";
+import { useCallback, useEffect } from "preact/hooks";
 import { MergedProps, useMergedProps } from "./use-merged-props";
 import { useStableCallback } from "./use-stable-callback";
 

@@ -1,15 +1,13 @@
-import { ClassAttributes, Fragment, h, Ref, RefCallback } from "preact";
-import { useMergedChildren, MergedChildren } from "./use-merged-children";
+import { h, Ref } from "preact";
+import { MergedChildren, useMergedChildren } from "./use-merged-children";
 import { MergedClasses, useMergedClasses } from "./use-merged-classes";
-import { MergedRefs, useMergedRefs } from "./use-merged-refs";
-import { MergedStyles, useMergedStyles } from "./use-merged-styles";
+import { useMergedRefs } from "./use-merged-refs";
+import { useMergedStyles } from "./use-merged-styles";
 
-let log: typeof console["log"] | undefined = (str) => { debugger;   /* Intentional */ };
+let log: typeof console["log"] | undefined = (str) => { debugger; console.warn(`Trying to merge two props with the same name: ${str}`)   /* Intentional */ };
 export function enableLoggingPropConflicts(log2: typeof console["log"]) {
     log = log2
 }
-
-type ElementFromAttributes<A extends { ref?: Ref<any> }> = A["ref"] extends Ref<infer E> ? E : EventTarget;
 
 /**
  * A type that represents the merging of two prop objects
@@ -35,8 +33,8 @@ export function useMergedProps<E extends EventTarget>() {
 
         let ret: MergedProps<E, T, U> = {
             ...lhs,
-            ref: useMergedRefs<E>()(lhs2, rhs2) as MergedRefs<E, T, U>,
-            style: useMergedStyles(lhs2, rhs2) as MergedStyles<T, U>,
+            ref: useMergedRefs<E>()(lhs2, rhs2),
+            style: useMergedStyles(lhs2, rhs2),
             className: useMergedClasses(lhs2, rhs2) as MergedClasses<T, U>,
             children: useMergedChildren(lhs2, rhs2) as MergedChildren<T, U>
         } as any;
@@ -100,47 +98,12 @@ function mergeFunctions<T extends (...args: any[]) => any, U extends (...args: a
         return lhs;
 
     return (...args: Parameters<T>) => {
-        let lv = lhs?.(...args);
-        let rv = rhs?.(...args);
+        let lv = lhs(...args);
+        let rv = rhs(...args);
 
         if (lv instanceof Promise || rv instanceof Promise)
             return Promise.all([lv, rv]);
     };
-}
-
-/**
- * Sort of like `NonNullable<T>`,
- * but returns `undefined` instead of `never` or `unknown` on failure.
- */
-type NonNullableOrUndefined<T> = T extends null | undefined ? undefined : T;
-
-type ZipObject<Lhs, Rhs> = {
-    //[K in (keyof Lhs | keyof Rhs)]: (K extends keyof Lhs? Lhs[K & keyof Lhs] : undefined) | (K extends keyof Rhs? Rhs[K & keyof Rhs] : undefined);
-    [K in (keyof Lhs | keyof Rhs)]: GenericGet<Lhs, K> | GenericGet<Rhs, K>;
-}
-
-//export type ZipSingle<Lhs, Rhs> = NonNullableOrUndefined<Lhs | Rhs>;
-
-/**
- * Sort of like doing `prop[name]`, 
- * but returns `undefined` instead of `never` or `unknown` on failure.
- * 
- */
-export type GenericGet<T, K extends string | number | symbol, ExtraNullType = never> = (K extends keyof T ? (ExtraNullType | T[K] | undefined) : ExtraNullType | undefined);
-
-export type GenericReplace<T, K extends string | number | symbol, ReplaceType, ExtraNullType = never> = (K extends keyof T ? (ReplaceType) : ExtraNullType | undefined);
-
-function genericGetTest() {
-    const t1: GenericGet<{}, "id"> = null! as never;
-    const t2: GenericGet<{ id: string }, "id"> = null! as never;
-    const t3: Pick<{ id?: string }, "id"> = null! as never;
-
-    if (t3.id == null) {
-
-    }
-    else {
-        t3.id.concat("")
-    }
 }
 
 /*

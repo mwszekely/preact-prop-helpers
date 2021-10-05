@@ -1,11 +1,6 @@
 import { useCallback } from "preact/hooks";
-import { useStableCallback } from "./use-stable-callback";
 import { useGlobalHandler } from "./use-event-handler";
 import { useState } from "./use-state";
-
-export interface Foo {
-    foo: "foo";
-}
 
 export function getFromLocalStorage<States extends object>() {
     return function <Key extends (keyof States) & string>(key: Key, converter: ((input: string) => States[Key]) = JSON.parse): States[Key] | undefined {

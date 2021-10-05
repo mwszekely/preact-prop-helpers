@@ -1,8 +1,7 @@
-import { h, Ref, RefCallback } from "preact";
+import { h, Ref } from "preact";
 import { useCallback, useRef } from "preact/hooks";
-import { useRefElement, UseRefElementPropsReturnType } from "./use-ref-element";
 import { MergedProps, useMergedProps } from "./use-merged-props";
-import { useStableGetter } from "./use-stable-getter";
+import { useRefElement, UseRefElementPropsReturnType } from "./use-ref-element";
 import { useState } from "./use-state";
 
 interface UseDraggableReturnType<E extends EventTarget> {

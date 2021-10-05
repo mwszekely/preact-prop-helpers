@@ -16,17 +16,6 @@ export function useMergedClasses<Lhs extends MergeClassesProps | null | undefine
     return mergeClasses(lhs, rhs);
 }
 
-//export type UnionIncludes<T, U> = Extract<T, U> extends never ? false : true;
-
-/*type MergedNulls<T extends null | undefined, U extends | null | undefined, V extends | null | undefined, W extends | null | undefined> =
-    UnionIncludes<T, null> extends true ? null :
-    UnionIncludes<U, null> extends true ? null :
-    UnionIncludes<V, null> extends true ? null :
-    UnionIncludes<W, null> extends true ? null : undefined;*/
-
-// A lot of boilerplate to basically say
-// "undefined/null (prefer null) if everything is, string otherwise"
-
 export type MergedClasses<Lhs extends Pick<h.JSX.HTMLAttributes<any>, "class" | "className"> | null | undefined, Rhs extends Pick<h.JSX.HTMLAttributes<any>, "class" | "className"> | null | undefined> =
     NonNullable<GetBothClasses<Lhs>> extends never ?
     NonNullable<GetBothClasses<Rhs>> extends never ?

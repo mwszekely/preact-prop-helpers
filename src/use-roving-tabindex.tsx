@@ -1,13 +1,10 @@
-import { Context, h, Ref } from "preact";
+import { h } from "preact";
 import { useCallback, useEffect, useRef } from "preact/hooks";
-import { useRefElement, UseRefElementPropsReturnType } from "./use-ref-element";
-import { useLayoutEffect } from "./use-layout-effect";
-import { MergedProps, useMergedProps } from "./use-merged-props"
-import { useState } from "./use-state";
-import { useTimeout } from "./use-timeout";
-import { useChildManager, ManagedChildInfo, UseChildManagerReturnType, useChildFlag } from "./use-child-manager";
+import { ManagedChildInfo, useChildFlag, useChildManager, UseChildManagerReturnType } from "./use-child-manager";
+import { MergedProps, useMergedProps } from "./use-merged-props";
+import { UseRefElementPropsReturnType } from "./use-ref-element";
 import { useStableGetter } from "./use-stable-getter";
-import { useActiveElement } from "use-active-element";
+import { useState } from "./use-state";
 
 
 
@@ -25,7 +22,7 @@ export interface UseRovingTabIndexReturnType<I extends RovingTabIndexChildInfo> 
 export interface UseRovingTabIndexChildReturnType<ChildElement extends Element> {
     useRovingTabIndexChildProps: UseRovingTabIndexChildProps<ChildElement>;
     useRovingTabIndexSiblingProps: UseRovingTabIndexSiblingProps<ChildElement>;
-    tabbable: boolean;
+    tabbable: boolean | null;
 }
 
 
@@ -37,6 +34,18 @@ export interface UseRovingTabIndexParameters {
      * `null` is special-use only to indicate that the entire component is disabled and not tabbable.
      */
     tabbableIndex: number | null;
+
+    /**
+     * Whenever the currently tabbable child changes, a decision needs to be made
+     * about whether the keyboard focus should follow that change because the
+     * user pressed Down in a vertical list, or alternatively if it was just
+     * something completely unrelated on the other side of the page where we WOULDN'T
+     * want to yank keyboard focus all the way back there.
+     * 
+     * In general, this should just be hooked up to a parent's "getFocusedInner"
+     * function, so that we only focus on change when the component as a whole
+     * has focus somewhere inside, but you can widen/narrow that if needed.
+     */
     shouldFocusOnChange(): boolean;
 }
 
@@ -77,11 +86,12 @@ export type UseRovingTabIndexSiblingProps<ChildElement extends Element> = <P ext
  * on the child's element, as well as any other elements you'd like
  * to be explicitly made untabbable too.
  * 
- * `focusOnChange` should be set to true if focus is 
+ * `shouldFocusOnChange` should return true if focus is 
  * contained within whatever element contains the roving tab index.
  * Generally as simple as the following:
  * ```
- * const { focused, focusedInner, useHasFocusProps } = useHasFocus<ParentElement>();
+ * const [focusedInner, setFocusedInner] = useState(false);
+ * const { useHasFocusProps } = useHasFocus<ParentElement>({ setFocusedInner });
  * const focusOnChange = (focusedInner != false);
  * ```
  * It's not included here because `useRovingTabIndex` doesn't know 
@@ -127,8 +137,7 @@ export function useRovingTabIndex<I extends RovingTabIndexChildInfo>({ shouldFoc
 
         const { element, getElement, useManagedChildProps } = useManagedChild<ChildElement>(newInfo);
 
-        // TODO: Using getTabbableIndex during render phase on mount
-        const [tabbable, setTabbable] = useState(getTabbableIndex() == info.index);
+        const [tabbable, setTabbable] = useState<boolean | null>(null);
 
         useEffect(() => {
             if (element && tabbable) {

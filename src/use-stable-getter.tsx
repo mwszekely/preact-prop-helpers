@@ -1,6 +1,6 @@
 import { useRef, useImperativeHandle, useCallback } from "preact/hooks";
 
-
+const Unset = Symbol("unset");
 
 /**
  * Given an input value, returns a constant getter function that can be used 
@@ -16,7 +16,12 @@ import { useRef, useImperativeHandle, useCallback } from "preact/hooks";
  * @returns 
  */
  export function useStableGetter<T>(value: T): () => T {
-    const ref = useRef<T>(value);
+    const ref = useRef<T>(Unset as unknown as T);
     useImperativeHandle(ref, () => value);
-    return useCallback(() => { return ref.current; }, [])
+    return useCallback(() => { 
+        if (ref.current as unknown === Unset) {
+            throw new Error('Value retrieved from useStableGetter() cannot be called from useLayoutEffect().')
+        }
+        return ref.current; 
+    }, [])
 }

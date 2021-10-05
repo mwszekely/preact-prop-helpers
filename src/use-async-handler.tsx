@@ -1,10 +1,10 @@
 
 import { h } from "preact";
-import { useStableCallback } from "./use-stable-callback";
+import { useCallback } from "preact/hooks";
 import { useLayoutEffect } from "./use-layout-effect";
+import { useStableCallback } from "./use-stable-callback";
 import { useState } from "./use-state";
 import { useTimeout } from "./use-timeout";
-import { useCallback } from "preact/hooks";
 
 type SubType<Base, Condition> = Pick<Base, { [Key in keyof Base]: Base[Key] extends Condition ? Key : never }[keyof Base]>;
 

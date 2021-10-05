@@ -1,5 +1,5 @@
 
-import { useCallback, useRef, useState as useStateP } from "preact/hooks";
+import { StateUpdater, useCallback, useRef, useState as useStateP } from "preact/hooks";
 
 /**
  * Slightly enhanced version of `useState` that includes a getter that remains constant
@@ -8,18 +8,18 @@ import { useCallback, useRef, useState as useStateP } from "preact/hooks";
  * @param initialState 
  * @returns 
  */
-export function useState<T>(initialState: T | (() => T)) {
+export function useState<T>(initialState: T | (() => T)): readonly [value: T, setValue: StateUpdater<T>, getValue: () => T] {
 
-    // We keep both
-    const [state, setState] = useStateP(initialState);
+    // We keep both, but overrride the `setState` functionality
+    const [state, setStateP] = useStateP(initialState);
     const ref = useRef(state);
 
     // Hijack the normal setter function 
     // to also set our ref to the new value
-    const set = useCallback((value: T | ((prevValue: T) => T)) => {
+    const setState = useCallback<StateUpdater<T>>(value => {
         if (typeof value === "function") {
             let callback = value as (prevValue: T) => T;
-            setState(prevValue => {
+            setStateP(prevValue => {
                 let nextValue = callback(prevValue);
                 ref.current = nextValue;
                 return nextValue;
@@ -27,13 +27,13 @@ export function useState<T>(initialState: T | (() => T)) {
         }
         else {
             ref.current = value;
-            setState(value);
+            setStateP(value);
         }
-    }, [])
+    }, []);
 
-    const get = () => { return ref.current; };
+    const getState = () => { return ref.current; };
 
 
     console.assert(ref.current === state);
-    return [state, set, get] as const;
+    return [state, setState, getState] as const;
 }

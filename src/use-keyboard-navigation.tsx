@@ -121,9 +121,6 @@ export function useLinearNavigation<ChildElement extends Element>({ index, navig
 
         // Prefer the parent element's direction so that we're not calling getComputedStyle
         // on every single individual child, which is likely redundant.
-        // TODO: Does useLogicalDirection need to hold a per-render & per-element cache to make this work?
-        // Or does the browser automatically cache the computations until something changes?
-        // Given that the values are live, it seems like it should be the latter...
         const { convertElementSize, getLogicalDirection } = useLogicalDirection(element?.parentElement ?? element);
 
         const useLinearNavigationChildProps: UseLinearNavigationChildProps<ChildElement> = (props) => {

@@ -1,8 +1,7 @@
-
+import "wicg-inert";
 import "blocking-elements";
 import { BlockingElements } from "blocking-elements";
 import { useLayoutEffect } from "preact/hooks";
-import "wicg-inert";
 
 const blockingElements = (document as any).$blockingElements as BlockingElements;
 /**

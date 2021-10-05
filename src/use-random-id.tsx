@@ -1,7 +1,7 @@
 import { h } from "preact";
 import { useCallback, useLayoutEffect } from "preact/hooks";
 import { useMergedProps } from "./use-merged-props";
-import { useState } from "./use-state"
+import { useState } from "./use-state";
 
 const Table = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-";
 

@@ -1,11 +1,6 @@
 
-import { Ref } from "preact";
-import { useCallback, useEffect, useLayoutEffect, useMemo } from "preact/hooks";
-import { useRefElement, UseRefElementPropsParameters, UseRefElementPropsReturnType, UseRefElementReturnType } from "./use-ref-element";
-import { useGlobalHandler } from "./use-event-handler";
-import { MergedProps, useMergedProps } from "./use-merged-props";
-import { useState } from "./use-state"
-import { isFocusable } from "tabbable";
+import { useLayoutEffect } from "preact/hooks";
+import { useStableCallback } from "./use-stable-callback";
 
 
 /**
@@ -46,15 +41,7 @@ import { isFocusable } from "tabbable";
  * @param callback 
  * @returns 
  */
-
-let currentlyFocusedElement: (Element & HTMLOrSVGElement) | null = null;
-let lastFocusedElement: (Element & HTMLOrSVGElement) | null = null;
-function getLastFocusedElement() {
-    return lastFocusedElement;
-}
-function getCurrentlyFocusedElement() {
-    return currentlyFocusedElement;
-}
+const dummy = 0;
 
 const activeElementUpdaters = new Set<undefined | ((e: (Element & HTMLOrSVGElement) | null) => void)>();
 const lastActiveElementUpdaters = new Set<undefined | ((e: (Element & HTMLOrSVGElement)) => void)>();
@@ -62,8 +49,7 @@ const windowFocusedUpdaters = new Set<undefined | ((focused: boolean) => void)>(
 
 function focusout(e: FocusEvent) {
     if (e.relatedTarget == null) {
-        currentlyFocusedElement = null;
-        for (let f of activeElementUpdaters) f?.(currentlyFocusedElement);
+        for (let f of activeElementUpdaters) f?.(null);
     }
     else {
         // Just wait for the focusin event.
@@ -72,13 +58,12 @@ function focusout(e: FocusEvent) {
 }
 
 function focusin(e: FocusEvent) {
-    currentlyFocusedElement = lastFocusedElement = e.target as (Element & HTMLOrSVGElement);
+    let currentlyFocusedElement = e.target as (Element & HTMLOrSVGElement);
+    let lastFocusedElement = e.target as (Element & HTMLOrSVGElement);
     activeElementUpdaters.forEach(f => f?.(currentlyFocusedElement));
     lastActiveElementUpdaters.forEach(f => f?.(lastFocusedElement!));
-    //for (let f of updaters) { f({ current: currentlyFocusedElement, last: lastFocusedElement, windowFocused }); }
 }
 
-let windowFocused = true;
 function windowFocus() {
     windowFocusedUpdaters.forEach(f => f?.(true));
 }
@@ -88,12 +73,31 @@ function windowBlur() {
 }
 
 export interface UseActiveElementParameters {
+
+    /**
+     * Called any time the active element changes. Does not need
+     * to be stable.
+     */
     setActiveElement?(e: (Element & HTMLOrSVGElement) | null): void;
+
+    /**
+     * Called any time the active element changes and is not null. 
+     * Does not need to be stable.
+     */
     setLastActiveElement?(e: (Element & HTMLOrSVGElement)): void;
+
+    /**
+     * Called any time the window gains/loses focus. Does not need
+     * to be stable.
+     */
     setWindowFocused?(focused: boolean): void;
 }
 
 export function useActiveElement({ setActiveElement, setLastActiveElement, setWindowFocused }: UseActiveElementParameters) {
+
+    const stableSetActiveElement = useStableCallback(setActiveElement ?? (() => {}));
+    const stableSetLastActiveElement = useStableCallback(setLastActiveElement ?? (() => {}));
+    const stableSetWindowFocused = useStableCallback(setWindowFocused ?? (() => {}));
 
     useLayoutEffect(() => {
 
@@ -106,14 +110,14 @@ export function useActiveElement({ setActiveElement, setLastActiveElement, setWi
 
         // Add them even if they're undefined to more easily
         // manage the ">0 means don't add handlers" logic.
-        activeElementUpdaters.add(setActiveElement);
-        lastActiveElementUpdaters.add(setLastActiveElement);
-        windowFocusedUpdaters.add(setWindowFocused);
+        activeElementUpdaters.add(stableSetActiveElement);
+        lastActiveElementUpdaters.add(stableSetLastActiveElement);
+        windowFocusedUpdaters.add(stableSetWindowFocused);
 
         return () => {
-            activeElementUpdaters.delete(setActiveElement);
-            lastActiveElementUpdaters.delete(setLastActiveElement);
-            windowFocusedUpdaters.delete(setWindowFocused);
+            activeElementUpdaters.delete(stableSetActiveElement);
+            lastActiveElementUpdaters.delete(stableSetLastActiveElement);
+            windowFocusedUpdaters.delete(stableSetWindowFocused);
 
             if (activeElementUpdaters.size === 0) {
                 document.removeEventListener("focusin", focusin);
@@ -122,6 +126,6 @@ export function useActiveElement({ setActiveElement, setLastActiveElement, setWi
                 window.removeEventListener("blur", windowBlur);
             }
         }
-    }, [setActiveElement, setLastActiveElement, setWindowFocused]);
+    }, []);
 
 }

@@ -1,19 +1,19 @@
 import { h, Ref, RefCallback, RefObject } from "preact";
 import { useCallback, useRef } from "preact/hooks";
-import type { GenericReplace } from "./use-merged-props"
 
 
 function processRef<T>(instance: T | null, ref: Ref<T> | null | undefined) {
     if (typeof ref === "function") {
         ref(instance);
-    } else if (ref != null) {
+    } 
+    else if (ref != null) {
         (ref as RefObject<T | null>).current = instance;
     }
+    else {
+        debugger; // Intentional
+        console.assert(false, "Unknown ref type found that was neither a RefCallback nor a RefObject");
+    }
 }
-
-
-export type MergedRefs<E extends EventTarget, Lhs extends Pick<h.JSX.HTMLAttributes<E>, "ref"> | null | undefined, Rhs extends Pick<h.JSX.HTMLAttributes<E>, "ref"> | null | undefined> =
-    GenericReplace<Lhs, "ref", RefCallback<E>> | GenericReplace<Rhs, "ref", RefCallback<E>>
 
 
 /**
@@ -23,27 +23,27 @@ export type MergedRefs<E extends EventTarget, Lhs extends Pick<h.JSX.HTMLAttribu
  * @returns 
  */
 export function useMergedRefs<E extends EventTarget>() {
-    return function <Lhs extends Pick<h.JSX.HTMLAttributes<E>, "ref"> | null | undefined, Rhs extends Pick<h.JSX.HTMLAttributes<E>, "ref"> | null | undefined>(lhsProps: Lhs, rhsProps: Rhs): MergedRefs<E, Lhs, Rhs> {
+    return function <Lhs extends Pick<h.JSX.HTMLAttributes<E>, "ref"> | null | undefined, Rhs extends Pick<h.JSX.HTMLAttributes<E>, "ref"> | null | undefined>(lhsProps: Lhs, rhsProps: Rhs): Ref<E> | undefined {
 
         const lhs = lhsProps?.ref;
         const rhs = rhsProps?.ref;
-        let combined = useCallback((current: E | null) => {
+        let combined: RefCallback<E> = useCallback((current: E | null) => {
             processRef(current, lhs);
             processRef(current, rhs);
         }, [lhs, rhs]);
 
 
         if (lhs == null && rhs == null) {
-            return undefined as MergedRefs<E, Lhs, Rhs>;
+            return undefined!;
         }
         else if (lhs == null) {
-            return rhs as MergedRefs<E, Lhs, Rhs>;
+            return rhs!;
         }
         else if (rhs == null) {
-            return lhs as MergedRefs<E, Lhs, Rhs>;
+            return lhs!;
         }
         else {
-            return combined as MergedRefs<E, Lhs, Rhs>;
+            return combined;
         }
     }
 }

@@ -1,6 +1,6 @@
 import { Ref } from "preact";
 import { Inputs, useCallback, useEffect, useRef } from "preact/hooks";
-import { EffectChange } from "use-effect";
+import { EffectChange } from "./use-effect";
 import { useLayoutEffect } from "./use-layout-effect";
 import { useRefElement, UseRefElementProps, UseRefElementPropsParameters, UseRefElementPropsReturnType, UseRefElementReturnType } from "./use-ref-element";
 import { useState } from "./use-state";

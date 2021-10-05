@@ -1,9 +1,8 @@
 
-import { useCallback, useLayoutEffect, useMemo } from "preact/hooks";
-import { useActiveElement, UseActiveElementParameters } from "./use-active-element";
+import { useCallback } from "preact/hooks";
+import { useActiveElement } from "./use-active-element";
 import { MergedProps } from "./use-merged-props";
 import { useRefElement, UseRefElementPropsParameters, UseRefElementPropsReturnType, UseRefElementReturnType } from "./use-ref-element";
-import { useState } from "./use-state";
 
 export interface UseFocusParameters {
     /**

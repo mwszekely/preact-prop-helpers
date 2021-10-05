@@ -1,4 +1,4 @@
-import { useEffect } from "preact/hooks";
+import { useCallback, useEffect, useRef } from "preact/hooks";
 import { useStableCallback } from "./use-stable-callback";
 import { useStableGetter } from "./use-stable-getter";
 
@@ -42,6 +42,6 @@ export function useInterval({ interval, callback }: UseInterval) {
         }
         let handle = setInterval(adjustableCallback, interval);
         return () => clearInterval(handle);
-    }, [])
+    }, []);
 }
 

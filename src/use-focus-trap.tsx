@@ -1,11 +1,10 @@
 import { useLayoutEffect } from "preact/hooks";
 import { isFocusable } from "tabbable";
-import { useState } from "./use-state";
 import { useActiveElement } from "./use-active-element";
 import { getTopElement, useBlockingElement } from "./use-blocking-element";
-import { ManagedChildInfo } from "./use-child-manager";
 import { MergedProps, useMergedProps } from "./use-merged-props";
 import { useRefElement, UseRefElementPropsParameters, UseRefElementPropsReturnType, UseRefElementReturnType } from "./use-ref-element";
+import { useState } from "./use-state";
 
 export interface UseFocusTrapParameters { trapActive: boolean; }
 

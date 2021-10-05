@@ -1,9 +1,22 @@
-import { h, Ref } from "preact"
-import { useCallback, useEffect } from "preact/hooks";
+import { useEffect } from "preact/hooks";
 import { useRefElement, UseRefElementProps, UseRefElementPropsParameters } from "./use-ref-element";
-import { useState } from "./use-state";
+import { useStableCallback } from "./use-stable-callback";
 
 interface UseElementSizeParameters {
+    /**
+     * Called any time the browser detects a size change
+     * on the element. Does not need to be stable, so you
+     * can pass an anonymous function that only sets the
+     * values you use if you'd like.
+     * @param sizeInfo 
+     */
+    setSize(sizeInfo: ElementSize): void;
+
+    /**
+     * Passed as an argument to the created ResizeObserver.
+     * 
+     * @see https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver/observe#parameters
+     */
     observeBox?: ResizeObserverOptions["box"];
 }
 
@@ -27,22 +40,20 @@ export interface ElementSize {
 
 export interface UseElementSizeReturnType<E extends HTMLElement> {
     element: E | null;
-    elementSize: ElementSize | null;
-    getElementSize: () => ElementSize | null;
+    getElement(): E | null;
     useElementSizeProps: UseElementSizeProps<E>;
 }
 
+export function useElementSize<E extends HTMLElement>({ observeBox, setSize }: UseElementSizeParameters): UseElementSizeReturnType<E> {
+    const { element, getElement, useRefElementProps } = useRefElement<E>();
 
-export function useElementSize<E extends HTMLElement>({ observeBox }: UseElementSizeParameters = { }): UseElementSizeReturnType<E> {
-    const { element, useRefElementProps } = useRefElement<E>();
-
-    const [size, setSize, getSize] = useState<ElementSize | null>(null);
+    const stableSetSize = useStableCallback(setSize);
 
     useEffect(() => {
         if (element) {
             const handleUpdate = () => {
                 const { clientWidth, scrollWidth, offsetWidth, clientHeight, scrollHeight, offsetHeight, clientLeft, scrollLeft, offsetLeft, clientTop, scrollTop, offsetTop } = element;
-                setSize({ clientWidth, scrollWidth, offsetWidth, clientHeight, scrollHeight, offsetHeight, clientLeft, scrollLeft, offsetLeft, clientTop, scrollTop, offsetTop });
+                stableSetSize({ clientWidth, scrollWidth, offsetWidth, clientHeight, scrollHeight, offsetHeight, clientLeft, scrollLeft, offsetLeft, clientTop, scrollTop, offsetTop });
             }
             if (!("ResizeObserver" in window)) {
                 document.addEventListener("resize", handleUpdate, { passive: true });
@@ -56,12 +67,11 @@ export function useElementSize<E extends HTMLElement>({ observeBox }: UseElement
                 return () => observer.disconnect();
             }
         }
-    }, [element, observeBox])
+    }, [element, observeBox]);
 
     return {
         element,
-        elementSize: size,
-        getElementSize: getSize,
+        getElement,
         useElementSizeProps: useRefElementProps
     }
 

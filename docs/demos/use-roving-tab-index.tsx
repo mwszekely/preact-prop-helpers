@@ -30,8 +30,7 @@ export const DemoUseRovingTabIndex = memo(() => {
                 at least natively, is that tabbing into the component is one action, and tabbing out is another.  Navigating <em>within</em> the component is done with the arrow keys or other methods.
             </p>
             <p>
-                This is important both for accessability, but also just for general usability.  When tabbing back and forth, the ability to skip a long list without needing to trudge through <code>every one</code> of its child elements is extremely important.
-                This is important both for accessability, but also just for general usability.  When tabbing back and forth, the ability to skip a long list without needing to trudge through <code>every one</code> of its child elements is extremely important.
+                This is important both for accessability, but also just for general usability.  When tabbing back and forth, the ability to skip a long list without needing to trudge through <em>every one</em> of its child elements is extremely important.
             </p>
 
             <p>

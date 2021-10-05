@@ -1,7 +1,7 @@
-import { h, Ref, RefCallback } from "preact";
-import { useCallback, useEffect, useRef } from "preact/hooks";
-import { useRefElement, UseRefElementPropsReturnType } from "./use-ref-element";
+import { h } from "preact";
+import { useEffect, useRef } from "preact/hooks";
 import { MergedProps, useMergedProps } from "./use-merged-props";
+import { useRefElement, UseRefElementPropsReturnType } from "./use-ref-element";
 import { useState } from "./use-state";
 
 export interface UseDroppableReturnType<E extends HTMLElement> {

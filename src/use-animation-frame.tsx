@@ -4,7 +4,7 @@ import { useStableCallback } from "./use-stable-callback";
 
 export interface UseAnimationFrameParameters {
     /**
-     * Called `timeout` ms after mount, or the last change to `triggerIndex`.
+     * Callback with effectively the same rules as `requestAnimationFrame`
      */
     callback: null | ((msSinceLast: number) => void);
 }
