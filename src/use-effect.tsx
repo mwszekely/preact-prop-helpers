@@ -7,8 +7,10 @@ import { Inputs, useEffect as useEffectNative, useRef } from "preact/hooks";
  * 
  * @param effect 
  * @param inputs 
+ * @param impl You can choose whether to use `useEffect` or `useLayoutEffect` by
+ * passing one of them as this argument. By default, it's `useEffect`.
  */
-export function useEffect<I extends Inputs>(effect: (prev: I, changes: EffectChange<I, number>[]) => (void | (() => void)), inputs: I) {
+export function useEffect<I extends Inputs>(effect: (prev: I, changes: EffectChange<I, number>[]) => (void | (() => void)), inputs: I, impl = useEffectNative) {
 
     const prevInputs = useRef(inputs);
     const effect2 = () => {
@@ -22,7 +24,7 @@ export function useEffect<I extends Inputs>(effect: (prev: I, changes: EffectCha
         return ret;
     };
 
-    useEffectNative(effect2, inputs);
+    impl(effect2, inputs);
 }
 
 export interface EffectChange<I extends Inputs, N extends number> { from: I[N], to: I[N] };

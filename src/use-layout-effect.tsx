@@ -1,5 +1,5 @@
-import { Inputs, useLayoutEffect as useLayoutEffectNative, useRef } from "preact/hooks";
-import type { EffectChange } from "./use-effect";
+import { Inputs, useLayoutEffect as useLayoutEffectNative } from "preact/hooks";
+import { EffectChange, useEffect } from "./use-effect";
 
 /**
  * Wrap the native `useLayoutEffect` to add arguments 
@@ -10,18 +10,5 @@ import type { EffectChange } from "./use-effect";
  * @param inputs 
  */
 export function useLayoutEffect<I extends Inputs>(effect: (prev: I, changes: EffectChange<I, number>[]) => (void | (() => void)), inputs: I) {
-
-    const prevInputs = useRef(inputs);
-    const effect2 = () => {
-        let changes: { from: any, to: any }[] = [];
-        for (let i = 0; i < Math.max(prevInputs.current.length, inputs.length); ++i) {
-            if (prevInputs.current[i] != inputs[i])
-                changes[i] = { from: prevInputs.current[i], to: inputs[i] }
-        }
-        const ret = effect(prevInputs.current, changes);
-        prevInputs.current = inputs;
-        return ret;
-    };
-
-    useLayoutEffectNative(effect2, inputs);
+    return useEffect(effect, inputs, useLayoutEffectNative);
 }
