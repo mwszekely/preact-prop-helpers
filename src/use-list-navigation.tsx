@@ -8,6 +8,7 @@ import { RovingTabIndexChildInfo, useRovingTabIndex, UseRovingTabIndexChildParam
 import { useState } from "./use-state";
 
 
+export type OmitStrong<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 
 
 /**
@@ -48,7 +49,7 @@ const dummy: any = null;
 
 
 
-export interface UseListNavigationReturnType<ChildElement extends Element, I extends UseListNavigationChildInfo> extends Omit<UseChildManagerReturnType<I>, "useManagedChild"> {
+export interface UseListNavigationReturnType<ChildElement extends Element, I extends UseListNavigationChildInfo> extends OmitStrong<UseChildManagerReturnType<I>, "useManagedChild"> {
     useListNavigationChild: UseListNavigationChild<ChildElement, I>;
 
     currentTypeahead: string | null;
@@ -84,7 +85,7 @@ export interface UseListNavigationChildReturnType<ChildElement extends Element> 
 
 
 /** Arguments passed to the parent `useListNavigation` */
-export interface UseListNavigationParameters extends Omit<UseTypeaheadNavigationParameters, "getIndex" | "setIndex">, Omit<UseRovingTabIndexParameters, "tabbableIndex"> {
+export interface UseListNavigationParameters extends OmitStrong<UseTypeaheadNavigationParameters, "getIndex" | "setIndex">, OmitStrong<UseRovingTabIndexParameters, "tabbableIndex"> {
 
     /**
      * Maps to Intl.Collator's ignorePunctuation parameter.  Whether punctuation (which is context and locale dependent) should be ignored when searching.

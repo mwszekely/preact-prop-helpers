@@ -1,3 +1,4 @@
+import { UseRovingTabIndexParameters } from "index";
 import { h } from "preact";
 import { useCallback } from "preact/hooks";
 import { useChildFlag, useChildManager } from "./use-child-manager";
@@ -12,6 +13,8 @@ import { useStableCallback } from "./use-stable-callback";
 import { useStableGetter } from "./use-stable-getter";
 import { useState } from "./use-state";
 
+export type OmitStrong<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
+
 export interface UseGridNavigationRowInfo extends RovingTabIndexChildInfo {
     setIsTabbableRow(tabbable: boolean): void;
 
@@ -23,15 +26,13 @@ export interface UseGridNavigationRowInfo extends RovingTabIndexChildInfo {
     hidden?: boolean;
 }
 
-export type UseGridNavigationRowParameters<I extends UseGridNavigationRowInfo> = Omit<UseRovingTabIndexChildParameters<I>, "setIsTabbableRow">; //I;
+export type UseGridNavigationRowParameters<I extends UseGridNavigationRowInfo> = UseRovingTabIndexChildParameters<OmitStrong<I, "setIsTabbableRow">>; //I;
 
-export interface UseGridNavigationCellInfo extends RovingTabIndexChildInfo {  }
-export type UseGridNavigationCellParameters<I extends UseGridNavigationCellInfo> = Omit<UseRovingTabIndexChildParameters<I>, "setIsTabbableRow">;
+export interface UseGridNavigationCellInfo extends RovingTabIndexChildInfo { }
+export type UseGridNavigationCellParameters<I extends UseGridNavigationCellInfo> = UseRovingTabIndexChildParameters<I>;
 
 export type UseGridNavigationRow<R extends Element, C extends Element, IR extends UseGridNavigationRowInfo, IC extends UseGridNavigationCellInfo> = ({ index, ...info }: UseGridNavigationRowParameters<IR>) => {
-    useGridNavigationRowProps: <P extends h.JSX.HTMLAttributes<R>>(props: P) => UseRefElementPropsReturnType<R, UseRefElementPropsReturnType<R, MergedProps<R, {
-        onKeyDown: (e: KeyboardEvent) => void;
-    }, UseHasFocusPropsReturnType<R, P>>>>;
+    useGridNavigationRowProps: <P extends h.JSX.HTMLAttributes<R>>(props: P) => UseRefElementPropsReturnType<R, UseRefElementPropsReturnType<R, MergedProps<R, { onKeyDown: (e: KeyboardEvent) => void; }, UseHasFocusPropsReturnType<R, P>>>>;
     useGridNavigationCell: UseGridNavigationCell<C, IC>;
     cellCount: number;
     isTabbableRow: boolean;
@@ -119,7 +120,7 @@ export function useGridNavigation<R extends Element, C extends Element, IR exten
         const { currentTypeahead, invalidTypeahead, useTypeaheadNavigationChild } = useTypeaheadNavigation({ getIndex: getCurrentRow, setIndex: setCurrentRow2 });
 
         const useGridNavigationColumnChild = useCallback(({ index: rowIndex, text, hidden }: { index: number, text: string, hidden?: boolean }) => {
-            useTypeaheadNavigationChild({ index: rowIndex, text: hidden? null : text });
+            useTypeaheadNavigationChild({ index: rowIndex, text: hidden ? null : text });
         }, [useTypeaheadNavigationChild]);
 
         return { useGridNavigationColumnChild, currentTypeahead, invalidTypeahead };

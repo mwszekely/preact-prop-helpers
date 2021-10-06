@@ -6,11 +6,12 @@ import { UseRefElementPropsReturnType } from "./use-ref-element";
 import { useStableGetter } from "./use-stable-getter";
 import { useState } from "./use-state";
 
+export type OmitStrong<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 
 
 
 /** Return type of `useRovingTabIndex` */
-export interface UseRovingTabIndexReturnType<I extends RovingTabIndexChildInfo> extends Omit<UseChildManagerReturnType<I>, "useManagedChild"> {
+export interface UseRovingTabIndexReturnType<I extends RovingTabIndexChildInfo> extends OmitStrong<UseChildManagerReturnType<I>, "useManagedChild"> {
     useRovingTabIndexChild: UseRovingTabIndexChild<I>;
     childCount: number;
 
@@ -55,7 +56,7 @@ export interface RovingTabIndexChildInfo extends ManagedChildInfo<number> {
     rerenderAndFocus(): void;
 }
 
-export type UseRovingTabIndexChildParameters<I extends RovingTabIndexChildInfo> = Omit<I, "setTabbable" | "rerenderAndFocus">;
+export type UseRovingTabIndexChildParameters<I extends RovingTabIndexChildInfo> = OmitStrong<I, "setTabbable" | "rerenderAndFocus">;
 
 /** Type of the child's sub-hook */
 export type UseRovingTabIndexChild<I extends RovingTabIndexChildInfo> = <ChildElement extends Element>(props: UseRovingTabIndexChildParameters<I>) => UseRovingTabIndexChildReturnType<ChildElement>;
@@ -64,8 +65,8 @@ export type UseRovingTabIndexChildPropsParameters<ChildElement extends Element> 
 export type UseRovingTabIndexSiblingPropsParameters<ChildElement extends Element> = h.JSX.HTMLAttributes<ChildElement>;
 
 /** Return type of the child `useRovingTabIndexChildProps` */
-export type UseRovingTabIndexChildPropsReturnType<ChildElement extends Element, P extends h.JSX.HTMLAttributes<ChildElement>> = MergedProps<ChildElement, UseRefElementPropsReturnType<ChildElement, { tabIndex: number; }>, Omit<P, "tabIndex">>;
-export type UseRovingTabIndexSiblingPropsReturnType<ChildElement extends Element, P extends h.JSX.HTMLAttributes<ChildElement>> = P; //MergedProps<ChildElement, { tabIndex: number; }, Omit<P, "tabIndex">>;
+export type UseRovingTabIndexChildPropsReturnType<ChildElement extends Element, P extends h.JSX.HTMLAttributes<ChildElement>> = MergedProps<ChildElement, UseRefElementPropsReturnType<ChildElement, { tabIndex: number; }>, OmitStrong<P, "tabIndex">>;
+export type UseRovingTabIndexSiblingPropsReturnType<ChildElement extends Element, P extends h.JSX.HTMLAttributes<ChildElement>> = P; //MergedProps<ChildElement, { tabIndex: number; }, OmitStrong<P, "tabIndex">>;
 
 export type UseRovingTabIndexChildProps<ChildElement extends Element> = <P extends UseRovingTabIndexChildPropsParameters<ChildElement>>(props: P) => UseRovingTabIndexChildPropsReturnType<ChildElement, P>
 export type UseRovingTabIndexSiblingProps<ChildElement extends Element> = <P extends UseRovingTabIndexSiblingPropsParameters<ChildElement>>(props: P) => UseRovingTabIndexSiblingPropsReturnType<ChildElement, P>
