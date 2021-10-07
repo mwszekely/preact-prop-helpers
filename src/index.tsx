@@ -19,7 +19,7 @@ export { useGlobalHandler, useLocalHandler } from "./use-event-handler";
 export { useHasFocus, UseHasFocusPropsReturnType, UseHasFocusReturnType } from "./use-has-focus";
 export { useActiveElement } from "./use-active-element";
 export { useInterval } from "./use-interval";
-export { usePersistentState } from "./use-persistent-state";
+export { usePersistentState, getFromLocalStorage, storeToLocalStorage } from "./use-persistent-state";
 export { useRandomId, generateRandomId, UseRandomIdProps, UseRandomIdPropsParameters, UseRandomIdPropsReturnType, UseReferencedIdProps, UseReferencedIdPropsParameters, UseReferencedIdPropsReturnType } from "./use-random-id";
 export { useTimeout } from "./use-timeout";
 export { useChildManager, useChildFlag, ManagedChildInfo } from "./use-child-manager";
