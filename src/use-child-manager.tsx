@@ -255,7 +255,9 @@ export function useChildFlag(activatedIndex: number | null | undefined, length: 
         if (prevActivatedIndex != null && length > 0 && prevActivatedIndex >= length) {
             // The number of children shrank below whatever the currently selected component was.
             // Change the index to the last one still mounted.
-            setFlag(length - 1, true);
+            // (But only if any of them are set to be activated in the first place)
+            if (activatedIndex != null)
+                setFlag(length - 1, true);
             // (No need to unset any of them since they already unmounted themselves)
             // (Also no way to unset them anyway for the same reason)
         }
@@ -263,17 +265,17 @@ export function useChildFlag(activatedIndex: number | null | undefined, length: 
 
     useEffect(() => {
 
-        // Deactivate the previously activated component
         const prevActivatedIndex = getPrevActivatedIndex();
         if (prevActivatedIndex != activatedIndex) {
+            // Deactivate the previously activated component
             if (prevActivatedIndex != null && prevActivatedIndex >= 0 && prevActivatedIndex < length)
                 setFlag(prevActivatedIndex, false);
-        }
 
-        // Activate the current component
-        if (activatedIndex != null && activatedIndex >= 0 && activatedIndex < length) {
-            setFlag(activatedIndex, true);
-            setPrevActivatedIndex(activatedIndex);
+            // Activate the current component
+            if (activatedIndex != null && activatedIndex >= 0 && activatedIndex < length)
+                setFlag(activatedIndex, true);
+
+            setPrevActivatedIndex(activatedIndex ?? null);
         }
 
     }, [setFlag, activatedIndex, length]);
