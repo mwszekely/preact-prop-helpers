@@ -1,4 +1,4 @@
-import { UseRovingTabIndexParameters } from "index";
+import { UseRovingTabIndexParameters } from "./use-roving-tabindex";
 import { h } from "preact";
 import { StateUpdater, useCallback } from "preact/hooks";
 import { UseChildManagerReturnType } from "./use-child-manager";
