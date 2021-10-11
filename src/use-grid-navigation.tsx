@@ -151,7 +151,7 @@ export function useGridNavigation<R extends Element, C extends Element, IR exten
         // consider one of its cells tabbable.  Also used to determine
         // if a change to the current selected cell should also
         // trigger focusing that cell.
-        const [isTabbableRow, setIsTabbableRow] = useState(false);
+        const [isTabbableRow, setIsTabbableRow, getIsTabbableRow] = useState(false);
 
         // If we're not the tabbable row, then for the purposes of tabIndex
         // calculations, we don't have a tabbable child cell.
@@ -159,7 +159,7 @@ export function useGridNavigation<R extends Element, C extends Element, IR exten
 
         // Track child cells and manage keyboard navigation among them.
         const { managedChildren: managedCells, useRovingTabIndexChild: useRovingTabIndexCell, childCount: cellCount } = useRovingTabIndex<IC>({
-            shouldFocusOnChange: getFocusCellOnRowChange,
+            shouldFocusOnChange: useCallback(() => { return getFocusCellOnRowChange() && getIsTabbableRow() }, []),
             tabbableIndex: currentColumn
         });
 
