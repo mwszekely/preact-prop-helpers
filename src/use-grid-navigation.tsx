@@ -17,6 +17,7 @@ export type OmitStrong<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 
 export interface UseGridNavigationRowInfo extends RovingTabIndexChildInfo {
     setIsTabbableRow(tabbable: boolean): void;
+    getIsTabbableRow(): boolean | null;
 
     /**
      * If a grid row is hidden, it will be skipped over
@@ -26,19 +27,21 @@ export interface UseGridNavigationRowInfo extends RovingTabIndexChildInfo {
     hidden?: boolean;
 }
 
-export type UseGridNavigationRowParameters<I extends UseGridNavigationRowInfo> = UseRovingTabIndexChildParameters<OmitStrong<I, "setIsTabbableRow">>; //I;
+export type UseGridNavigationRowParameters<I extends UseGridNavigationRowInfo> = UseRovingTabIndexChildParameters<OmitStrong<I, "setIsTabbableRow" | "getIsTabbableRow">>; //I;
 
 export interface UseGridNavigationCellInfo extends RovingTabIndexChildInfo { }
 export type UseGridNavigationCellParameters<I extends UseGridNavigationCellInfo> = UseRovingTabIndexChildParameters<I>;
 
-export type UseGridNavigationRow<R extends Element, C extends Element, IR extends UseGridNavigationRowInfo, IC extends UseGridNavigationCellInfo> = ({ index, ...info }: UseGridNavigationRowParameters<IR>) => {
+export interface UseGridNavigationRowReturnType<R extends Element, C extends Element, IR extends UseGridNavigationRowInfo, IC extends UseGridNavigationCellInfo> {
     useGridNavigationRowProps: <P extends h.JSX.HTMLAttributes<R>>(props: P) => UseRefElementPropsReturnType<R, UseRefElementPropsReturnType<R, MergedProps<R, { onKeyDown: (e: KeyboardEvent) => void; }, UseHasFocusPropsReturnType<R, P>>>>;
     useGridNavigationCell: UseGridNavigationCell<C, IC>;
     cellCount: number;
-    isTabbableRow: boolean;
+    isTabbableRow: boolean | null;
     currentColumn: number | null;
     managedCells: IC[];
 }
+
+export type UseGridNavigationRow<R extends Element, C extends Element, IR extends UseGridNavigationRowInfo, IC extends UseGridNavigationCellInfo> = ({ index, ...info }: UseGridNavigationRowParameters<IR>) => UseGridNavigationRowReturnType<R, C, IR, IC>
 
 export type UseGridNavigationCell<C extends Element, I extends UseGridNavigationCellInfo> = (params: UseGridNavigationCellParameters<I>) => {
     useGridNavigationCellProps: <P extends h.JSX.HTMLAttributes<C>>(props: P) => h.JSX.HTMLAttributes<C>;
@@ -111,7 +114,13 @@ export function useGridNavigation<R extends Element, C extends Element, IR exten
 
     // Actually handle notifying the relevant rows when they
     // change from untabbable to tabbable or vice-versa.
-    useChildFlag(currentRow, managedRows.length, useCallback((index, tabbable) => { managedRows[index]?.setIsTabbableRow(tabbable) }, [managedRows]), useEffect);
+    useChildFlag({
+        activatedIndex: currentRow,
+        managedChildren: managedRows,
+        setChildFlag: (index, tabbable) => { managedRows[index]?.setIsTabbableRow(tabbable) },
+        getChildFlag: (index) => (managedRows[index]?.getIsTabbableRow() ?? null),
+        useEffect: useEffect
+    });
 
     /**
      * Optional, but provides typeahead for each column in the table.
@@ -127,7 +136,7 @@ export function useGridNavigation<R extends Element, C extends Element, IR exten
     }, [])
 
     // Last thing before we return -- here's the hook for individual rows and their cells.
-    const useGridNavigationRow: UseGridNavigationRow<R, C, IR, IC> = useCallback(({ index: rowIndex, hidden, ...info }: UseGridNavigationRowParameters<IR>) => {
+    const useGridNavigationRow: UseGridNavigationRow<R, C, IR, IC> = useCallback(({ index: rowIndex, hidden, ...info }: UseGridNavigationRowParameters<IR>): UseGridNavigationRowReturnType<R, C, IR, IC> => {
 
         // When we change the current column, we send that information
         // to the parent via setState, but that doesn't do anything
@@ -151,7 +160,7 @@ export function useGridNavigation<R extends Element, C extends Element, IR exten
         // consider one of its cells tabbable.  Also used to determine
         // if a change to the current selected cell should also
         // trigger focusing that cell.
-        const [isTabbableRow, setIsTabbableRow, getIsTabbableRow] = useState(false);
+        const [isTabbableRow, setIsTabbableRow, getIsTabbableRow] = useState<boolean | null>(null);
 
         // If we're not the tabbable row, then for the purposes of tabIndex
         // calculations, we don't have a tabbable child cell.
@@ -159,7 +168,7 @@ export function useGridNavigation<R extends Element, C extends Element, IR exten
 
         // Track child cells and manage keyboard navigation among them.
         const { managedChildren: managedCells, useRovingTabIndexChild: useRovingTabIndexCell, childCount: cellCount } = useRovingTabIndex<IC>({
-            shouldFocusOnChange: useCallback(() => { return getFocusCellOnRowChange() && getIsTabbableRow() }, []),
+            shouldFocusOnChange: useCallback(() => { return !!getFocusCellOnRowChange() && !!getIsTabbableRow() }, []),
             tabbableIndex: currentColumn
         });
 
@@ -194,10 +203,16 @@ export function useGridNavigation<R extends Element, C extends Element, IR exten
         });
 
         // Notify the relevant child cells when they should/should not be tabbable
-        useChildFlag(currentColumn, managedCells.length, useCallback((cellIndex, cellIsTabbable) => {
-            if (cellIndex != null)
-                managedCells[cellIndex]?.setTabbable(cellIsTabbable);
-        }, [managedCells]), useEffect);
+        useChildFlag({
+            activatedIndex: currentColumn,
+            managedChildren: managedCells,
+            setChildFlag: (cellIndex, cellIsTabbable) => {
+                if (cellIndex != null)
+                    managedCells[cellIndex]?.setTabbable(cellIsTabbable)
+            },
+            getChildFlag: (cellIndex) => (managedCells[cellIndex]?.getTabbable() ?? null),
+            useEffect
+        });
 
         // Any time we become the currently tabbable row,
         // make sure that we're in a valid cell, and shift left/right if not to find one.
@@ -225,6 +240,7 @@ export function useGridNavigation<R extends Element, C extends Element, IR exten
         const { useManagedChildProps: useManagedRowProps } = useManagedRow<R>({
             index: rowIndex,
             setIsTabbableRow,
+            getIsTabbableRow: getIsTabbableRow,
             hidden,
             ...info
         } as any as IR);

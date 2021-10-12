@@ -1,5 +1,5 @@
 import { Ref } from "preact";
-import { Inputs, useCallback, useEffect, useRef } from "preact/hooks";
+import { Inputs, StateUpdater, useCallback, useEffect, useRef } from "preact/hooks";
 import { EffectChange } from "./use-effect";
 import { useLayoutEffect } from "./use-layout-effect";
 import { useRefElement, UseRefElementProps, UseRefElementPropsParameters, UseRefElementPropsReturnType, UseRefElementReturnType } from "./use-ref-element";
@@ -162,7 +162,7 @@ export function useChildManager<I extends ManagedChildInfo<any>>(): UseChildMana
         }, [info.index]);
 
         // As soon as the component mounts, notify the parent and request a rerender.
-        useLayoutEffect(([prevElement, prevIndex], changes) => {
+        useLayoutEffect((prev, changes) => {
             if (element) {
                 indicesByElement.current.set(element, info.index);
                 deletedIndices.current.delete(info.index);
@@ -223,62 +223,128 @@ export function useChildManager<I extends ManagedChildInfo<any>>(): UseChildMana
 
 type UE = <I extends Inputs>(effect: (prev: I, changes: EffectChange<I, number>[]) => (void | (() => void)), inputs: I) => void;
 
+export interface UseChildFlagParameters<T extends string | number, I extends ManagedChildInfo<T>> {
+
+    /**
+     * Which child index refers to the currently "active" child.
+     */
+    activatedIndex: T | null | undefined;
+
+    managedChildren: (null | undefined | I)[];
+
+    /**
+     * When provided, if the given activatedIndex doesn't map onto any
+     * provided child (either because it's too large or that child
+     * doesn't exist), the closest child to the given activatedIndex
+     * will have its flag set instead.
+     * 
+     * Use with caution, and consider how a child having its flag set
+     * while the parent thinks it shouldn't be could cause issues.
+     */
+    closestFit?: boolean;
+
+    /**
+     * Will be called once when a given child has become the "active" child.
+     * Generally, this will look like 
+     * `(i, set) => managedChildren[i].setActive(set)` 
+     * or similar.
+     */
+    setChildFlag: (i: number, set: boolean) => void;
+
+    /**
+     * Used to keep track of whether or not a child needs its flag set
+     * both in general cases but also when a child unmounts and a new child
+     * mounts in its place with the same index.
+     */
+    getChildFlag: (i: number) => boolean | null;
+
+    /**
+     * By default, the child flag setting happens during `useLayoutEffect`.  If you
+     * would prefer it to happen during `useEffect`, pass that implementation in
+     * here.
+     */
+    useEffect?: (<I extends Inputs>(effect: (prev: I | undefined, changes: EffectChange<I, number>[]) => (void | (() => void)), inputs?: I) => void | UE);
+}
+
 /**
  * Helper function for letting children know when they are or are not the
  * current selected/expanded/focused/whatever child.
  * 
  * Automatically handles when children are mounted & unmounted and such.
  * 
+ * While it will be called once for every child on mount, after that setFlag 
+ * is guaranteed to only be called once on activation and once on deactivation,
+ * so it's generally safe to put side effects inside if necessary.  
+ * It's also safe to make it non-stable.
+ * 
  * @param activatedIndex What index the current selected (etc.) child is
  * @param length How many children exist (as managedChildren.length)
  * @param setFlag A function that probably looks like (i, flag) => managedChildren[i].setActive(flag)
  * @param useEffect Which version of useEffect to use. Default is `useLayoutEffect`.
  */
-export function useChildFlag(activatedIndex: number | null | undefined, length: number, setFlag: (i: number, set: boolean) => void, useEffect: (<I extends Inputs>(effect: (prev: I, changes: EffectChange<I, number>[]) => (void | (() => void)), inputs: I) => void | UE) = useLayoutEffect) {
+export function useChildFlag<T extends string | number, I extends ManagedChildInfo<T>>({ activatedIndex, closestFit, managedChildren, setChildFlag, getChildFlag, useEffect }: UseChildFlagParameters<T, I>) {
 
-    const [prevActivatedIndex, setPrevActivatedIndex, getPrevActivatedIndex] = useState<number | null>(null);
-    const [prevChildCount, setPrevChildCount, getPrevChildCount] = useState(length);
+    useEffect ??= useLayoutEffect;
 
-    // Any time the number of components changes,
-    // reset any initial, possibly incorrect state they might have had, just in case.
+    if (closestFit)
+        console.assert(typeof activatedIndex == "number" || activatedIndex == null);
+
+    // Whenever we re-render, make sure that any children that have mounted
+    // have their flags properly set.  We know it's unset if it was null,
+    // in which case we just set it to true or false.
+    //
+    // And, I mean, as long as we're already iterating through every child
+    // on every render to check for newly mounted children, might as well
+    // just handle changed in the activatedIndex here too.
     useEffect(() => {
-        const direction = Math.sign(length - getPrevChildCount());
-        if (direction !== 0) {
-            for (let i = getPrevChildCount() ?? 0; i != length; i += direction) {
-                setFlag(i, i === activatedIndex);
+
+
+        // TODO: We have limited information about when a child mounts or unmounts
+        // and so we don't know where to look for any null entries that need changing.
+        // We know when activatedIndex changes and what it was, but not much else.
+        // Looping over every child *works*, and it's not an expensive loop by any means,
+        // but, like, eugh.
+
+
+        // Also, before we do anything, see if we need to "correct" activatedIndex.
+        // It could be pointing to a child that doesn't exist, and if closestFit is given,
+        // we need to adjust activatedIndex to point to a valid child.
+        if (typeof activatedIndex == "number" && managedChildren[activatedIndex] == null) {
+            // Oh dear. Are we actively correcting this?
+            if (closestFit) {
+                // Oh dear.
+                // Search up and down the list of children for any that actually exist.
+
+                let searchHigh = activatedIndex + 1;
+                let searchLow = activatedIndex - 1;
+
+                while ((searchLow >= 0 && managedChildren[searchLow] == null) || (searchHigh < managedChildren.length && managedChildren[searchHigh] == null)) {
+                    ++searchHigh;
+                    --searchLow;
+                }
+
+                if (searchLow >= 0 && managedChildren[searchLow] != null) {
+                    (activatedIndex as number) = searchLow;
+                }
+                else if (searchHigh < managedChildren.length && managedChildren[searchHigh] != null) {
+                    (activatedIndex as number) = searchHigh;
+                }
+
+                // Now that we've done that, if any valid children exist, we've reset activatedIndex to point to it instead.
+                // Now we'll fall through to the for loop set and unset our flags based on this "corrected" value.
+                //
+                // We don't correct it or save it anywhere because we'd very much like to return to it
+                // if the child remounts itself.
             }
-            setPrevChildCount(length);
         }
 
-
-        const prevActivatedIndex = getPrevActivatedIndex();
-        if (prevActivatedIndex != null && length > 0 && prevActivatedIndex >= length) {
-            // The number of children shrank below whatever the currently selected component was.
-            // Change the index to the last one still mounted.
-            // (But only if any of them are set to be activated in the first place)
-            if (activatedIndex != null)
-                setFlag(length - 1, true);
-            // (No need to unset any of them since they already unmounted themselves)
-            // (Also no way to unset them anyway for the same reason)
+        for (let i = 0; i < managedChildren.length; ++i) {
+            let shouldBeSet = (i == activatedIndex);
+            if (getChildFlag(i) != shouldBeSet) {
+                setChildFlag(i, shouldBeSet);
+            }
         }
-    }, [setFlag, activatedIndex, length])
-
-    useEffect(() => {
-
-        const prevActivatedIndex = getPrevActivatedIndex();
-        if (prevActivatedIndex != activatedIndex) {
-            // Deactivate the previously activated component
-            if (prevActivatedIndex != null && prevActivatedIndex >= 0 && prevActivatedIndex < length)
-                setFlag(prevActivatedIndex, false);
-
-            // Activate the current component
-            if (activatedIndex != null && activatedIndex >= 0 && activatedIndex < length)
-                setFlag(activatedIndex, true);
-
-            setPrevActivatedIndex(activatedIndex ?? null);
-        }
-
-    }, [setFlag, activatedIndex, length]);
+    });
 
 }
 

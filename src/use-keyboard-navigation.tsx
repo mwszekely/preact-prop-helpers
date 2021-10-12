@@ -272,7 +272,7 @@ interface UTNP2 extends UseTypeaheadNavigationParametersBase {
 export type UseTypeaheadNavigationParameters = UTNP2;
 
 /** Arguments passed to the child 'useTypeaheadNavigationChild` */
-export interface UseTypeaheadNavigationChildInfo extends RovingTabIndexChildInfo {
+export interface UseTypeaheadNavigationChildInfo extends ManagedChildInfo<number> {
     /**
      * If provided, allows this component to be navigated to by typing this string. 
      * It should be the same text content as whatever's displayed, ideally.
@@ -280,7 +280,7 @@ export interface UseTypeaheadNavigationChildInfo extends RovingTabIndexChildInfo
     text: string | null;
 }
 
-export type UseTypeaheadNavigationChildParameters<I extends UseTypeaheadNavigationChildInfo> = UseRovingTabIndexChildParameters<I>;
+export type UseTypeaheadNavigationChildParameters<I extends UseTypeaheadNavigationChildInfo> = I;
 
 /** Type of the child's sub-hook */
 export type UseTypeaheadNavigationChild<ChildElement extends Element, I extends UseTypeaheadNavigationChildInfo> = ({ text, index, ...i }: UseTypeaheadNavigationChildParameters<I>) => UseTypeaheadNavigationChildReturnType<ChildElement>;

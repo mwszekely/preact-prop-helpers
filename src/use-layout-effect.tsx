@@ -9,6 +9,6 @@ import { EffectChange, useEffect } from "./use-effect";
  * @param effect 
  * @param inputs 
  */
-export function useLayoutEffect<I extends Inputs>(effect: (prev: I, changes: EffectChange<I, number>[]) => (void | (() => void)), inputs: I) {
+export function useLayoutEffect<I extends Inputs>(effect: (prev: I | undefined, changes: EffectChange<I, number>[]) => (void | (() => void)), inputs?: I) {
     return useEffect(effect, inputs, useLayoutEffectNative);
 }

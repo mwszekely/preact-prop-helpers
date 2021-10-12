@@ -1,5 +1,5 @@
 import { h } from "preact";
-import { useCallback, useEffect, useRef } from "preact/hooks";
+import { StateUpdater, useCallback, useEffect, useRef } from "preact/hooks";
 import { ManagedChildInfo, useChildFlag, useChildManager, UseChildManagerReturnType } from "./use-child-manager";
 import { MergedProps, useMergedProps } from "./use-merged-props";
 import { UseRefElementPropsReturnType } from "./use-ref-element";
@@ -53,10 +53,11 @@ export interface UseRovingTabIndexParameters {
 /** Arguments passed to the child 'useRovingTabIndexChild` */
 export interface RovingTabIndexChildInfo extends ManagedChildInfo<number> {
     setTabbable(tabbable: boolean): void;
+    getTabbable(): boolean | null;
     rerenderAndFocus(): void;
 }
 
-export type UseRovingTabIndexChildParameters<I extends RovingTabIndexChildInfo> = OmitStrong<I, "setTabbable" | "rerenderAndFocus">;
+export type UseRovingTabIndexChildParameters<I extends RovingTabIndexChildInfo> = OmitStrong<I, "setTabbable" | "getTabbable" | "rerenderAndFocus">;
 
 /** Type of the child's sub-hook */
 export type UseRovingTabIndexChild<I extends RovingTabIndexChildInfo> = <ChildElement extends Element>(props: UseRovingTabIndexChildParameters<I>) => UseRovingTabIndexChildReturnType<ChildElement>;
@@ -114,9 +115,15 @@ export function useRovingTabIndex<I extends RovingTabIndexChildInfo>({ shouldFoc
     // Any time the tabbable index changes,
     // notify the previous child that it's no longer tabbable,
     // and notify the next child that is allowed to be tabbed to.
-    useChildFlag(tabbableIndex, childCount, (index, tabbable) => {
-        if (index != null)
-            (managedChildren[index as keyof typeof managedChildren] as I)?.setTabbable(tabbable);
+    useChildFlag({
+        activatedIndex: tabbableIndex,
+        managedChildren,
+        closestFit: true,
+        setChildFlag: (index, tabbable) => {
+            if (index != null)
+                (managedChildren[index as keyof typeof managedChildren] as I)?.setTabbable(tabbable);
+        },
+        getChildFlag: (index) => managedChildren[index].getTabbable()
     })
 
     const focusSelf = useCallback(() => {
@@ -127,18 +134,18 @@ export function useRovingTabIndex<I extends RovingTabIndexChildInfo>({ shouldFoc
     const useRovingTabIndexChild = useCallback<UseRovingTabIndexChild<I>>(<ChildElement extends Element>(info: UseRovingTabIndexChildParameters<I>): UseRovingTabIndexChildReturnType<ChildElement> => {
 
         const [rrafIndex, setRrafIndex] = useState(1);
-        const rerenderAndFocus = useCallback(() => { setRrafIndex(i => ++i) }, [])
+        const rerenderAndFocus = useCallback(() => { setRrafIndex(i => ++i) }, []);
+        const [tabbable, setTabbable, getTabbable] = useState<boolean | null>(null);
 
 
         let newInfo = {
             ...info,
             rerenderAndFocus,
-            setTabbable: useCallback((tabbable: boolean) => { setTabbable(tabbable); }, [])
+            setTabbable: useCallback((tabbable: boolean) => { setTabbable(tabbable); }, []),
+            getTabbable
         } as any as I;
 
         const { element, getElement, useManagedChildProps } = useManagedChild<ChildElement>(newInfo);
-
-        const [tabbable, setTabbable] = useState<boolean | null>(null);
 
         useEffect(() => {
             if (element && tabbable) {

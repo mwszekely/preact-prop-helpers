@@ -6,6 +6,7 @@ import { useLinearNavigation, useTypeaheadNavigation, UseTypeaheadNavigationPara
 import { MergedProps, useMergedProps } from "./use-merged-props";
 import { RovingTabIndexChildInfo, useRovingTabIndex, UseRovingTabIndexChildParameters, UseRovingTabIndexChildPropsReturnType, UseRovingTabIndexSiblingProps } from "./use-roving-tabindex";
 import { useState } from "./use-state";
+import { UseTypeaheadNavigationChildParameters } from "index";
 
 
 export type OmitStrong<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
@@ -160,7 +161,7 @@ export interface UseListNavigationChildInfo extends RovingTabIndexChildInfo {
 /** Type of the child's sub-hook */
 export type UseListNavigationChild<ChildElement extends Element, I extends UseListNavigationChildInfo = UseListNavigationChildInfo> = ({ text, index, ...i }: UseListNavigationChildParameters<I>) => UseListNavigationChildReturnType<ChildElement>;
 
-export type UseListNavigationChildParameters<I extends UseListNavigationChildInfo> = UseRovingTabIndexChildParameters<I> & {
+export type UseListNavigationChildParameters<I extends UseListNavigationChildInfo> = UseRovingTabIndexChildParameters<I> & UseTypeaheadNavigationChildParameters<I> & {
 
 };
 

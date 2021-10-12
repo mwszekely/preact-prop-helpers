@@ -288,7 +288,7 @@ const DemoUseGridRow = memo((({ index }: { index: number }) => {
     const props = useGridNavigationRowProps({});
     return (
         <div {...props}>
-            <div>{isTabbableRow.toString()} ({currentColumn}/{cellCount - 1})</div>
+            <div>{`${isTabbableRow}`} ({currentColumn}/{cellCount - 1})</div>
 
             <div style="display: flex">
                 <GridCellContext.Provider value={useGridNavigationCell}>
