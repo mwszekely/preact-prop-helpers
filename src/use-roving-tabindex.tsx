@@ -127,7 +127,7 @@ export function useRovingTabIndex<I extends UseRovingTabIndexChildInfo>({ should
             if (index != null)
                 (managedChildren[index as keyof typeof managedChildren] as I)?.setTabbable(tabbable);
         },
-        getChildFlag: (index) => managedChildren[index].getTabbable()
+        getChildFlag: (index) => (managedChildren[index]?.getTabbable() ?? null)
     })
 
     const focusSelf = useCallback(() => {
