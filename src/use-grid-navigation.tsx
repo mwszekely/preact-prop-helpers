@@ -1,4 +1,3 @@
-import { UseRovingTabIndexParameters } from "index";
 import { h } from "preact";
 import { useCallback } from "preact/hooks";
 import { useChildFlag, useChildManager } from "./use-child-manager";
@@ -8,14 +7,14 @@ import { UseHasFocusPropsReturnType } from "./use-has-focus";
 import { useLinearNavigation, useTypeaheadNavigation } from "./use-keyboard-navigation";
 import { MergedProps, useMergedProps } from "./use-merged-props";
 import { UseRefElementPropsReturnType } from "./use-ref-element";
-import { RovingTabIndexChildInfo, useRovingTabIndex, UseRovingTabIndexChildParameters } from "./use-roving-tabindex";
+import { UseRovingTabIndexChildInfo, useRovingTabIndex, UseRovingTabIndexChildParameters } from "./use-roving-tabindex";
 import { useStableCallback } from "./use-stable-callback";
 import { useStableGetter } from "./use-stable-getter";
 import { useState } from "./use-state";
 
 export type OmitStrong<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 
-export interface UseGridNavigationRowInfo extends RovingTabIndexChildInfo {
+export interface UseGridNavigationRowInfo extends UseRovingTabIndexChildInfo {
     setIsTabbableRow(tabbable: boolean): void;
     getIsTabbableRow(): boolean | null;
 
@@ -27,23 +26,23 @@ export interface UseGridNavigationRowInfo extends RovingTabIndexChildInfo {
     hidden?: boolean;
 }
 
-export type UseGridNavigationRowParameters<I extends UseGridNavigationRowInfo> = UseRovingTabIndexChildParameters<OmitStrong<I, "setIsTabbableRow" | "getIsTabbableRow">>; //I;
+export interface UseGridNavigationRowParameters extends UseRovingTabIndexChildParameters { hidden?: boolean }; //I;
 
-export interface UseGridNavigationCellInfo extends RovingTabIndexChildInfo { }
-export type UseGridNavigationCellParameters<I extends UseGridNavigationCellInfo> = UseRovingTabIndexChildParameters<I>;
+export interface UseGridNavigationCellInfo extends UseRovingTabIndexChildInfo { }
+export interface UseGridNavigationCellParameters extends UseRovingTabIndexChildParameters {};
 
 export interface UseGridNavigationRowReturnType<R extends Element, C extends Element, IR extends UseGridNavigationRowInfo, IC extends UseGridNavigationCellInfo> {
     useGridNavigationRowProps: <P extends h.JSX.HTMLAttributes<R>>(props: P) => UseRefElementPropsReturnType<R, UseRefElementPropsReturnType<R, MergedProps<R, { onKeyDown: (e: KeyboardEvent) => void; }, UseHasFocusPropsReturnType<R, P>>>>;
-    useGridNavigationCell: UseGridNavigationCell<C, IC>;
+    useGridNavigationCell: UseGridNavigationCell<C>;
     cellCount: number;
     isTabbableRow: boolean | null;
     currentColumn: number | null;
     managedCells: IC[];
 }
 
-export type UseGridNavigationRow<R extends Element, C extends Element, IR extends UseGridNavigationRowInfo, IC extends UseGridNavigationCellInfo> = ({ index, ...info }: UseGridNavigationRowParameters<IR>) => UseGridNavigationRowReturnType<R, C, IR, IC>
+export type UseGridNavigationRow<R extends Element, C extends Element, IR extends UseGridNavigationRowInfo, IC extends UseGridNavigationCellInfo> = ({ index, ...info }: UseGridNavigationRowParameters) => UseGridNavigationRowReturnType<R, C, IR, IC>
 
-export type UseGridNavigationCell<C extends Element, I extends UseGridNavigationCellInfo> = (params: UseGridNavigationCellParameters<I>) => {
+export type UseGridNavigationCell<C extends Element> = (params: UseGridNavigationCellParameters) => {
     useGridNavigationCellProps: <P extends h.JSX.HTMLAttributes<C>>(props: P) => h.JSX.HTMLAttributes<C>;
 }
 
@@ -136,7 +135,7 @@ export function useGridNavigation<R extends Element, C extends Element, IR exten
     }, [])
 
     // Last thing before we return -- here's the hook for individual rows and their cells.
-    const useGridNavigationRow: UseGridNavigationRow<R, C, IR, IC> = useCallback(({ index: rowIndex, hidden, ...info }: UseGridNavigationRowParameters<IR>): UseGridNavigationRowReturnType<R, C, IR, IC> => {
+    const useGridNavigationRow: UseGridNavigationRow<R, C, IR, IC> = useCallback(({ index: rowIndex, hidden, ...info }: UseGridNavigationRowParameters): UseGridNavigationRowReturnType<R, C, IR, IC> => {
 
         // When we change the current column, we send that information
         // to the parent via setState, but that doesn't do anything
@@ -244,17 +243,17 @@ export function useGridNavigation<R extends Element, C extends Element, IR exten
             hidden,
             ...info
         } as any as IR);
-        const { useLinearNavigationChildProps: useLinearNavigationChildRowProps } = useLinearNavigationChildRow()
+        const { useLinearNavigationChildProps: useLinearNavigationChildRowProps } = useLinearNavigationChildRow(info as IR)
 
         const useGridNavigationRowProps = useCallback(<P extends h.JSX.HTMLAttributes<R>>(props: P) => useManagedRowProps(useLinearNavigationChildRowProps(useMergedProps<R>()({ hidden: !!hidden, "data-index": rowIndex }, props))), [useManagedRowProps, !!hidden]);
 
 
 
         const getRowIndex = useStableGetter(rowIndex);
-        const useGridNavigationCell: UseGridNavigationCell<C, IC> = useCallback((info: UseGridNavigationCellParameters<IC>) => {
+        const useGridNavigationCell: UseGridNavigationCell<C> = useCallback((info: UseGridNavigationCellParameters) => {
             const [tabbable, setTabbable] = useState(false);
             const { useRovingTabIndexChildProps } = useRovingTabIndexCell<C>({ ...info, setTabbable } as IC);
-            const { useLinearNavigationChildProps: useLinearNavigationChildCellProps } = useLinearNavigationChildCell();
+            const { useLinearNavigationChildProps: useLinearNavigationChildCellProps } = useLinearNavigationChildCell(info as IC);
 
             // Any time we interact with this cell, set it to be
             // our "currently tabbable" cell, regardless of

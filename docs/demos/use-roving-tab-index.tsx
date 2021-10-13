@@ -1,7 +1,7 @@
 import { createContext, h } from "preact";
 import { memo, useContext } from "preact/compat";
 import { useHasFocus } from "../..";
-import { useListNavigation, UseListNavigationChild } from "../../use-list-navigation";
+import { useListNavigation, UseListNavigationChild, UseListNavigationChildInfo } from "../../use-list-navigation";
 import { useState } from "../../use-state";
 
 
@@ -12,7 +12,7 @@ export const DemoUseRovingTabIndex = memo(() => {
 
     const [lastFocusedInner, setLastFocusedInner, getLastFocusedInner] = useState(false)
     const { useHasFocusProps } = useHasFocus<HTMLUListElement>({ setLastFocusedInner });
-    const { useListNavigationChild, currentTypeahead, setTabbableIndex, tabbableIndex } = useListNavigation<HTMLLIElement>({ shouldFocusOnChange: getLastFocusedInner });
+    const { useListNavigationChild, currentTypeahead, setTabbableIndex, tabbableIndex } = useListNavigation<HTMLLIElement, UseListNavigationChildInfo>({ shouldFocusOnChange: getLastFocusedInner });
     //const { useRovingTabIndexChild, useRovingTabIndexProps } = useRovingTabIndex<HTMLUListElement, RovingTabIndexChildInfo>({ tabbableIndex, focusOnChange: false });
 
     return (

@@ -6,9 +6,9 @@ import { MergedProps, useMergedProps } from "./use-merged-props"
 import { useState } from "./use-state";
 import { useTimeout } from "./use-timeout";
 import { useLogicalDirection } from "./use-logical-direction";
-import { RovingTabIndexChildInfo, UseRovingTabIndexChildParameters } from "./use-roving-tabindex";
 import { ManagedChildInfo } from "./use-child-manager";
 import { useStableCallback } from "./use-stable-callback";
+import { useStableGetter } from "./use-stable-getter";
 
 
 
@@ -22,8 +22,8 @@ export interface UseLinearNavigationReturnType<ChildElement extends Element> {
 }
 
 
-
-export type UseLinearNavigationChild<E extends Element> = (() => UseLinearNavigationChildReturnType<E>);
+export interface UseLinearNavigationChildParameters extends ManagedChildInfo<number> { }
+export type UseLinearNavigationChild<E extends Element> = ((info: UseLinearNavigationChildParameters) => UseLinearNavigationChildReturnType<E>);
 
 export interface UseLinearNavigationChildReturnType<E extends Element> {
     useLinearNavigationChildProps: UseLinearNavigationChildProps<E>;
@@ -116,8 +116,9 @@ export function useLinearNavigation<ChildElement extends Element>({ index, navig
     const navigateToEnd = useCallback(() => { navigateToIndex(-1); }, [navigateToIndex]);*/
 
 
-    const useLinearNavigationChild: UseLinearNavigationChild<ChildElement> = useCallback(() => {
+    const useLinearNavigationChild: UseLinearNavigationChild<ChildElement> = useCallback(({ index }) => {
         const { useRefElementProps, element } = useRefElement<ChildElement>();
+        const getIndex = useStableGetter(index);
 
         // Prefer the parent element's direction so that we're not calling getComputedStyle
         // on every single individual child, which is likely redundant.
@@ -130,6 +131,7 @@ export function useLinearNavigation<ChildElement extends Element>({ index, navig
                 if (e.ctrlKey || e.metaKey)
                     return;
 
+                let index = getIndex();
                 const info = getLogicalDirection();
 
                 let allowsBlockNavigation = (navigationDirection == "block" || navigationDirection == "either");
@@ -252,8 +254,7 @@ export interface UseTypeaheadNavigationChildReturnType<E extends Element> {
 }
 
 
-/** Arguments passed to the parent `useTypeaheadNavigation` */
-interface UseTypeaheadNavigationParametersBase {
+export interface UseTypeaheadNavigationParameters {
 
     /**
      * A collator to use when comparing. If not provided, simply uses `localeCompare` after transforming each to lowercase, which will, at best, work okay in English.
@@ -261,15 +262,9 @@ interface UseTypeaheadNavigationParametersBase {
     collator?: Intl.Collator;
 
     typeaheadTimeout?: number;
-}
-
-
-interface UTNP2 extends UseTypeaheadNavigationParametersBase {
     getIndex(): number | null;
     setIndex(value: number | null | ((previousValue: number | null) => (number | null))): void;
 }
-
-export type UseTypeaheadNavigationParameters = UTNP2;
 
 /** Arguments passed to the child 'useTypeaheadNavigationChild` */
 export interface UseTypeaheadNavigationChildInfo extends ManagedChildInfo<number> {
@@ -280,10 +275,10 @@ export interface UseTypeaheadNavigationChildInfo extends ManagedChildInfo<number
     text: string | null;
 }
 
-export type UseTypeaheadNavigationChildParameters<I extends UseTypeaheadNavigationChildInfo> = I;
+export interface UseTypeaheadNavigationChildParameters extends UseTypeaheadNavigationChildInfo { }
 
 /** Type of the child's sub-hook */
-export type UseTypeaheadNavigationChild<ChildElement extends Element, I extends UseTypeaheadNavigationChildInfo> = ({ text, index, ...i }: UseTypeaheadNavigationChildParameters<I>) => UseTypeaheadNavigationChildReturnType<ChildElement>;
+export type UseTypeaheadNavigationChild<ChildElement extends Element, I extends UseTypeaheadNavigationChildInfo> = ({ text, index, ...i }: I) => UseTypeaheadNavigationChildReturnType<ChildElement>;
 
 /** Return type of the child `useTypeaheadNavigationChildProps` */
 export type UseTypeaheadNavigationChildPropsReturnType<ChildElement extends Element, P extends {}> = MergedProps<ChildElement, UseRefElementPropsReturnType<ChildElement, {
@@ -430,7 +425,7 @@ export function useTypeaheadNavigation<ChildElement extends Element, I extends U
         }
     }, [currentTypeahead]);
 
-    const useTypeaheadNavigationChild = useCallback<UseTypeaheadNavigationChild<ChildElement, I>>(({ text, ...i }: UseTypeaheadNavigationChildParameters<I>) => {
+    const useTypeaheadNavigationChild = useCallback<UseTypeaheadNavigationChild<ChildElement, I>>(({ text, ...i }: I) => {
 
         useEffect(() => {
             if (text) {

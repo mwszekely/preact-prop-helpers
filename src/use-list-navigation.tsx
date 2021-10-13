@@ -1,12 +1,11 @@
-import { UseRovingTabIndexParameters } from "./use-roving-tabindex";
 import { h } from "preact";
 import { StateUpdater, useCallback } from "preact/hooks";
 import { UseChildManagerReturnType } from "./use-child-manager";
-import { useLinearNavigation, useTypeaheadNavigation, UseTypeaheadNavigationParameters } from "./use-keyboard-navigation";
+import { useLinearNavigation, UseLinearNavigationChild, UseLinearNavigationChildInfo, useTypeaheadNavigation, UseTypeaheadNavigationChildInfo, UseTypeaheadNavigationParameters } from "./use-keyboard-navigation";
 import { MergedProps, useMergedProps } from "./use-merged-props";
-import { RovingTabIndexChildInfo, useRovingTabIndex, UseRovingTabIndexChildParameters, UseRovingTabIndexChildPropsReturnType, UseRovingTabIndexSiblingProps } from "./use-roving-tabindex";
+import { UseRovingTabIndexChildInfo, useRovingTabIndex, UseRovingTabIndexChildParameters, UseRovingTabIndexChildPropsReturnType, UseRovingTabIndexSiblingProps, UseRovingTabIndexParameters } from "./use-roving-tabindex";
 import { useState } from "./use-state";
-import { UseTypeaheadNavigationChildParameters } from "index";
+import { UseTypeaheadNavigationChildParameters, UseLinearNavigationChildParameters } from "./use-keyboard-navigation";
 
 
 export type OmitStrong<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
@@ -51,7 +50,7 @@ const dummy: any = null;
 
 
 export interface UseListNavigationReturnType<ChildElement extends Element, I extends UseListNavigationChildInfo> extends OmitStrong<UseChildManagerReturnType<I>, "useManagedChild"> {
-    useListNavigationChild: UseListNavigationChild<ChildElement, I>;
+    useListNavigationChild: UseListNavigationChild<ChildElement>;
 
     currentTypeahead: string | null;
 
@@ -150,20 +149,12 @@ export interface UseListNavigationParameters extends OmitStrong<UseTypeaheadNavi
 }
 
 /** Arguments passed to the child 'useListNavigationChild` */
-export interface UseListNavigationChildInfo extends RovingTabIndexChildInfo {
-    /**
-     * If provided, allows this component to be navigated to by typing this string. 
-     * It should be the same text content as whatever's displayed, ideally.
-     */
-    text: string | null;
-}
+export interface UseListNavigationChildInfo extends UseRovingTabIndexChildInfo, UseTypeaheadNavigationChildInfo, UseLinearNavigationChildInfo {}
+export interface UseListNavigationChildParameters extends UseRovingTabIndexChildParameters, UseTypeaheadNavigationChildParameters, UseLinearNavigationChildParameters {}
 
 /** Type of the child's sub-hook */
-export type UseListNavigationChild<ChildElement extends Element, I extends UseListNavigationChildInfo = UseListNavigationChildInfo> = ({ text, index, ...i }: UseListNavigationChildParameters<I>) => UseListNavigationChildReturnType<ChildElement>;
+export type UseListNavigationChild<ChildElement extends Element> = ({ text, index, ...i }: UseListNavigationChildParameters) => UseListNavigationChildReturnType<ChildElement>;
 
-export type UseListNavigationChildParameters<I extends UseListNavigationChildInfo> = UseRovingTabIndexChildParameters<I> & UseTypeaheadNavigationChildParameters<I> & {
-
-};
 
 /** Return type of the child `useListNavigationChildProps` */
 export type UseListNavigationChildPropsReturnType<ChildElement extends Element, P extends h.JSX.HTMLAttributes<ChildElement>> = MergedProps<ChildElement, UseRovingTabIndexChildPropsReturnType<ChildElement, { onClick: () => void; }>, P>;
@@ -178,7 +169,7 @@ function identity<T>(t: T) { return t; }
  * In the document order, there will be only one "focused" or "tabbable" element, making it act more like one complete unit in comparison to everything around it.
  * Navigating forwards/backwards can be done with the arrow keys, Home/End keys, or any any text for typeahead to focus the next item that matches.
  */
-export function useListNavigation<ChildElement extends Element, I extends UseListNavigationChildInfo = UseListNavigationChildInfo>({ initialIndex, shouldFocusOnChange, collator, keyNavigation, indexMangler, indexDemangler }: UseListNavigationParameters): UseListNavigationReturnType<ChildElement, I> {
+export function useListNavigation<ChildElement extends Element, I extends UseListNavigationChildInfo>({ initialIndex, shouldFocusOnChange, collator, keyNavigation, indexMangler, indexDemangler }: UseListNavigationParameters): UseListNavigationReturnType<ChildElement, I> {
 
     indexMangler ??= identity;
     indexDemangler ??= identity;
@@ -202,12 +193,12 @@ export function useListNavigation<ChildElement extends Element, I extends UseLis
     const { useLinearNavigationChild } = useLinearNavigation<ChildElement>({ navigationDirection: keyNavigation, index: getTabbableIndex() ?? 0, managedChildren, navigateToPrev, navigateToNext, navigateToFirst, navigateToLast });
 
 
-    const useListNavigationChild: UseListNavigationChild<ChildElement, I> = useCallback((info: UseListNavigationChildParameters<I>): UseListNavigationChildReturnType<ChildElement> => {
+    const useListNavigationChild: UseListNavigationChild<ChildElement> = useCallback((info: UseListNavigationChildParameters): UseListNavigationChildReturnType<ChildElement> => {
 
-        const { useTypeaheadNavigationChildProps } = useTypeaheadNavigationChild(info);
-        const { useLinearNavigationChildProps } = useLinearNavigationChild();
+        const { useTypeaheadNavigationChildProps } = useTypeaheadNavigationChild(info as I);
+        const { useLinearNavigationChildProps } = useLinearNavigationChild(info as I);
 
-        const { useRovingTabIndexChildProps, useRovingTabIndexSiblingProps, tabbable } = useRovingTabIndexChild<ChildElement>(info);
+        const { useRovingTabIndexChildProps, useRovingTabIndexSiblingProps, tabbable } = useRovingTabIndexChild<ChildElement>(info as I);
 
         const useListNavigationChildProps: UseListNavigationChildProps<ChildElement> = function <P extends h.JSX.HTMLAttributes<ChildElement>>({ ...props }: P) {
 

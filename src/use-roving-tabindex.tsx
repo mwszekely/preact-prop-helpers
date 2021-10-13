@@ -11,7 +11,7 @@ export type OmitStrong<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 
 
 /** Return type of `useRovingTabIndex` */
-export interface UseRovingTabIndexReturnType<I extends RovingTabIndexChildInfo> extends OmitStrong<UseChildManagerReturnType<I>, "useManagedChild"> {
+export interface UseRovingTabIndexReturnType<I extends UseRovingTabIndexChildInfo> extends OmitStrong<UseChildManagerReturnType<I>, "useManagedChild"> {
     useRovingTabIndexChild: UseRovingTabIndexChild<I>;
     childCount: number;
 
@@ -50,17 +50,21 @@ export interface UseRovingTabIndexParameters {
     shouldFocusOnChange(): boolean;
 }
 
+export interface UseRovingTabIndexChildParameters extends ManagedChildInfo<number>  {}
+
 /** Arguments passed to the child 'useRovingTabIndexChild` */
-export interface RovingTabIndexChildInfo extends ManagedChildInfo<number> {
+export interface UseRovingTabIndexChildInfo extends UseRovingTabIndexChildParameters {
     setTabbable(tabbable: boolean): void;
     getTabbable(): boolean | null;
     rerenderAndFocus(): void;
 }
 
-export type UseRovingTabIndexChildParameters<I extends RovingTabIndexChildInfo> = OmitStrong<I, "setTabbable" | "getTabbable" | "rerenderAndFocus">;
+
+
+//export type UseRovingTabIndexChildParameters<I extends RovingTabIndexChildInfo> = OmitStrong<I, "setTabbable" | "getTabbable" | "rerenderAndFocus">;
 
 /** Type of the child's sub-hook */
-export type UseRovingTabIndexChild<I extends RovingTabIndexChildInfo> = <ChildElement extends Element>(props: UseRovingTabIndexChildParameters<I>) => UseRovingTabIndexChildReturnType<ChildElement>;
+export type UseRovingTabIndexChild<I extends UseRovingTabIndexChildInfo> = <ChildElement extends Element>(props: I) => UseRovingTabIndexChildReturnType<ChildElement>;
 
 export type UseRovingTabIndexChildPropsParameters<ChildElement extends Element> = h.JSX.HTMLAttributes<ChildElement>;
 export type UseRovingTabIndexSiblingPropsParameters<ChildElement extends Element> = h.JSX.HTMLAttributes<ChildElement>;
@@ -101,7 +105,7 @@ export type UseRovingTabIndexSiblingProps<ChildElement extends Element> = <P ext
  * And just as well! Children should be allowed at the root, 
  * regardless of if it's the whole app or just a given component.
  */
-export function useRovingTabIndex<I extends RovingTabIndexChildInfo>({ shouldFocusOnChange: foc, tabbableIndex }: UseRovingTabIndexParameters): UseRovingTabIndexReturnType<I> {
+export function useRovingTabIndex<I extends UseRovingTabIndexChildInfo>({ shouldFocusOnChange: foc, tabbableIndex }: UseRovingTabIndexParameters): UseRovingTabIndexReturnType<I> {
 
     const [rerenderAndFocus, setRerenderAndFocus] = useState<(() => void) | null>(null);
     const getShouldFocusOnChange = useStableGetter(foc);
@@ -131,7 +135,7 @@ export function useRovingTabIndex<I extends RovingTabIndexChildInfo>({ shouldFoc
             managedChildren[tabbableIndex].setTabbable(true);
     }, [tabbableIndex]);
 
-    const useRovingTabIndexChild = useCallback<UseRovingTabIndexChild<I>>(<ChildElement extends Element>(info: UseRovingTabIndexChildParameters<I>): UseRovingTabIndexChildReturnType<ChildElement> => {
+    const useRovingTabIndexChild = useCallback<UseRovingTabIndexChild<I>>(<ChildElement extends Element>(info: UseRovingTabIndexChildParameters): UseRovingTabIndexChildReturnType<ChildElement> => {
 
         const [rrafIndex, setRrafIndex] = useState(1);
         const rerenderAndFocus = useCallback(() => { setRrafIndex(i => ++i) }, []);

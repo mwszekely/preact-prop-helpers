@@ -255,7 +255,7 @@ const DemoFocus = memo(() => {
 
 
 const GridRowContext = createContext<UseGridNavigationRow<HTMLDivElement, HTMLDivElement, UseGridNavigationRowInfo, UseGridNavigationCellInfo>>(null!);
-const GridCellContext = createContext<UseGridNavigationCell<HTMLDivElement, UseGridNavigationCellInfo>>(null!);
+const GridCellContext = createContext<UseGridNavigationCell<HTMLDivElement>>(null!);
 export const DemoUseGrid = memo(() => {
 
     const [lastFocusedInner, setLastFocusedInner, getLastFocusedInner] = useState(false);
