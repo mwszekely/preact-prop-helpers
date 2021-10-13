@@ -1,5 +1,6 @@
+import { h } from "preact";
 import { useEffect } from "preact/hooks";
-import { useRefElement, UseRefElementProps, UseRefElementPropsParameters } from "./use-ref-element";
+import { useRefElement, UseRefElementProps } from "./use-ref-element";
 import { useStableCallback } from "./use-stable-callback";
 
 interface UseElementSizeParameters {
@@ -21,7 +22,7 @@ interface UseElementSizeParameters {
 }
 
 export type UseElementSizeProps<E extends HTMLElement> = UseRefElementProps<E>;
-export interface UseElementSizePropsParameters<E extends HTMLElement> extends UseRefElementPropsParameters<E> { }
+export interface UseElementSizePropsParameters<E extends HTMLElement> extends h.JSX.HTMLAttributes<E> { }
 
 export interface ElementSize {
     clientWidth: number;

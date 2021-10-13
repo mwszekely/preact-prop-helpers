@@ -1,9 +1,10 @@
+import { h } from "preact";
 import { useLayoutEffect } from "preact/hooks";
 import { isFocusable } from "tabbable";
 import { useActiveElement } from "./use-active-element";
 import { getTopElement, useBlockingElement } from "./use-blocking-element";
 import { MergedProps, useMergedProps } from "./use-merged-props";
-import { useRefElement, UseRefElementPropsParameters, UseRefElementPropsReturnType, UseRefElementReturnType } from "./use-ref-element";
+import { useRefElement, UseRefElementPropsReturnType, UseRefElementReturnType } from "./use-ref-element";
 import { useState } from "./use-state";
 
 export interface UseFocusTrapParameters { trapActive: boolean; }
@@ -13,10 +14,10 @@ export interface UseFocusTrapReturnType<E extends Node> extends Omit<UseRefEleme
 }
 
 
-export interface UseFocusTrapPropsParameters<E extends Node> extends UseRefElementPropsParameters<E> { }
-export type UseFocusTrapPropsReturnType<E extends Node, P extends UseRefElementPropsParameters<E>> = MergedProps<E, {}, UseRefElementPropsReturnType<E, P>>;
+export interface UseFocusTrapPropsParameters<E extends Node> extends h.JSX.HTMLAttributes<E> { }
+export type UseFocusTrapPropsReturnType<E extends Node, P extends h.JSX.HTMLAttributes<E>> = MergedProps<E, {}, UseRefElementPropsReturnType<E, P>>;
 
-type UseFocusTrapProps<E extends Node> = <P extends UseFocusTrapPropsParameters<E>>({ ref, ...rest }: P) => UseFocusTrapPropsReturnType<E, P>;
+type UseFocusTrapProps<E extends Node> = <P extends UseFocusTrapPropsParameters<E>>(props: P) => UseFocusTrapPropsReturnType<E, P>;
 
 
 

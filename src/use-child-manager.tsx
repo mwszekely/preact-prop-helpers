@@ -1,8 +1,7 @@
-import { Ref } from "preact";
-import { Inputs, StateUpdater, useCallback, useEffect, useRef } from "preact/hooks";
+import { Inputs, useCallback, useRef } from "preact/hooks";
 import { EffectChange } from "./use-effect";
 import { useLayoutEffect } from "./use-layout-effect";
-import { useRefElement, UseRefElementProps, UseRefElementPropsParameters, UseRefElementPropsReturnType, UseRefElementReturnType } from "./use-ref-element";
+import { useRefElement, UseRefElementProps } from "./use-ref-element";
 import { useState } from "./use-state";
 
 
@@ -230,7 +229,7 @@ export interface UseChildFlagParameters<T extends string | number, I extends Man
      */
     activatedIndex: T | null | undefined;
 
-    managedChildren: (null | undefined | I)[];
+    managedChildren: ManagedChildren<T, I> | (I | null | undefined)[];
 
     /**
      * When provided, if the given activatedIndex doesn't map onto any
@@ -309,7 +308,7 @@ export function useChildFlag<T extends string | number, I extends ManagedChildIn
         // Also, before we do anything, see if we need to "correct" activatedIndex.
         // It could be pointing to a child that doesn't exist, and if closestFit is given,
         // we need to adjust activatedIndex to point to a valid child.
-        if (typeof activatedIndex == "number" && managedChildren[activatedIndex] == null) {
+        if (typeof activatedIndex == "number" && Array.isArray(managedChildren) && managedChildren[activatedIndex] == null) {
             // Oh dear. Are we actively correcting this?
             if (closestFit) {
                 // Oh dear.

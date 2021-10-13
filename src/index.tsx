@@ -5,7 +5,7 @@ export { useMergedClasses } from "./use-merged-classes";
 export { useMergedProps, MergedProps } from "./use-merged-props";
 export { useMergedRefs } from "./use-merged-refs";
 export { useMergedStyles } from "./use-merged-styles";
-export { useRefElement, UseRefElementPropsReturnType, UseRefElementReturnType, UseRefElementPropsParameters } from "./use-ref-element";
+export { useRefElement, UseRefElementPropsReturnType, UseRefElementReturnType } from "./use-ref-element";
 export { useStableCallback } from "./use-stable-callback";
 export { useStableGetter } from "./use-stable-getter";
 export { useState } from "./use-state";
