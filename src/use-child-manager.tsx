@@ -229,7 +229,7 @@ export interface UseChildFlagParameters<T extends string | number, I extends Man
      */
     activatedIndex: T | null | undefined;
 
-    managedChildren: ManagedChildren<T, I> | (I | null | undefined)[];
+    managedChildren: (null | undefined | I)[] | Record<string, null | undefined | I>;
 
     /**
      * When provided, if the given activatedIndex doesn't map onto any
@@ -248,14 +248,14 @@ export interface UseChildFlagParameters<T extends string | number, I extends Man
      * `(i, set) => managedChildren[i].setActive(set)` 
      * or similar.
      */
-    setChildFlag: (i: number, set: boolean) => void;
+    setChildFlag: (index: T, set: boolean) => void;
 
     /**
      * Used to keep track of whether or not a child needs its flag set
      * both in general cases but also when a child unmounts and a new child
      * mounts in its place with the same index.
      */
-    getChildFlag: (i: number) => boolean | null;
+    getChildFlag: (index: T) => boolean | null;
 
     /**
      * By default, the child flag setting happens during `useLayoutEffect`.  If you
@@ -337,11 +337,20 @@ export function useChildFlag<T extends string | number, I extends ManagedChildIn
             }
         }
 
+        if (Array.isArray(managedChildren)){
         for (let i = 0; i < managedChildren.length; ++i) {
             let shouldBeSet = (i == activatedIndex);
-            if (getChildFlag(i) != shouldBeSet) {
-                setChildFlag(i, shouldBeSet);
+            if (getChildFlag(i as T) != shouldBeSet) {
+                setChildFlag(i as T, shouldBeSet);
             }
+        }}
+        else {
+            Object.entries(managedChildren).forEach(([i, info]) => {
+                let shouldBeSet = (i == activatedIndex);
+                if (getChildFlag(i as T) != shouldBeSet) {
+                    setChildFlag(i as T, shouldBeSet);
+                }
+            })
         }
     });
 
