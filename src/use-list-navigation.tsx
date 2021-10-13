@@ -50,7 +50,7 @@ const dummy: any = null;
 
 
 export interface UseListNavigationReturnType<ChildElement extends Element, I extends UseListNavigationChildInfo> extends OmitStrong<UseChildManagerReturnType<I>, "useManagedChild"> {
-    useListNavigationChild: UseListNavigationChild<ChildElement>;
+    useListNavigationChild: UseListNavigationChild<ChildElement, I>;
 
     currentTypeahead: string | null;
 
@@ -147,13 +147,14 @@ export interface UseListNavigationParameters extends OmitStrong<UseTypeaheadNavi
 
     initialIndex?: number | null;
 }
+type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 
 /** Arguments passed to the child 'useListNavigationChild` */
-export interface UseListNavigationChildInfo extends UseRovingTabIndexChildInfo, UseTypeaheadNavigationChildInfo, UseLinearNavigationChildInfo {}
-export interface UseListNavigationChildParameters extends UseRovingTabIndexChildParameters, UseTypeaheadNavigationChildParameters, UseLinearNavigationChildParameters {}
+export interface UseListNavigationChildInfo extends UseRovingTabIndexChildInfo, UseTypeaheadNavigationChildInfo, UseLinearNavigationChildInfo {};
+export type UseListNavigationChildParameters<I extends UseListNavigationChildInfo> = Omit<I, "rerenderAndFocus" | "setTabbable" | "getTabbable">;
 
 /** Type of the child's sub-hook */
-export type UseListNavigationChild<ChildElement extends Element> = ({ text, index, ...i }: UseListNavigationChildParameters) => UseListNavigationChildReturnType<ChildElement>;
+export type UseListNavigationChild<ChildElement extends Element, I extends UseListNavigationChildInfo> = ({ text, index, ...i }: UseListNavigationChildParameters<I>) => UseListNavigationChildReturnType<ChildElement>;
 
 
 /** Return type of the child `useListNavigationChildProps` */
@@ -193,7 +194,7 @@ export function useListNavigation<ChildElement extends Element, I extends UseLis
     const { useLinearNavigationChild } = useLinearNavigation<ChildElement>({ navigationDirection: keyNavigation, index: getTabbableIndex() ?? 0, managedChildren, navigateToPrev, navigateToNext, navigateToFirst, navigateToLast });
 
 
-    const useListNavigationChild: UseListNavigationChild<ChildElement> = useCallback((info: UseListNavigationChildParameters): UseListNavigationChildReturnType<ChildElement> => {
+    const useListNavigationChild: UseListNavigationChild<ChildElement, I> = useCallback((info: UseListNavigationChildParameters<I>): UseListNavigationChildReturnType<ChildElement> => {
 
         const { useTypeaheadNavigationChildProps } = useTypeaheadNavigationChild(info as I);
         const { useLinearNavigationChildProps } = useLinearNavigationChild(info as I);

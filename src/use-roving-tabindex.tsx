@@ -50,10 +50,10 @@ export interface UseRovingTabIndexParameters {
     shouldFocusOnChange(): boolean;
 }
 
-export interface UseRovingTabIndexChildParameters extends ManagedChildInfo<number>  {}
+export type UseRovingTabIndexChildParameters<I extends UseRovingTabIndexChildInfo> = OmitStrong<I, "setTabbable" | "getTabbable" | "rerenderAndFocus">;
 
 /** Arguments passed to the child 'useRovingTabIndexChild` */
-export interface UseRovingTabIndexChildInfo extends UseRovingTabIndexChildParameters {
+export interface UseRovingTabIndexChildInfo extends ManagedChildInfo<number> {
     setTabbable(tabbable: boolean): void;
     getTabbable(): boolean | null;
     rerenderAndFocus(): void;
@@ -135,7 +135,7 @@ export function useRovingTabIndex<I extends UseRovingTabIndexChildInfo>({ should
             managedChildren[tabbableIndex].setTabbable(true);
     }, [tabbableIndex]);
 
-    const useRovingTabIndexChild = useCallback<UseRovingTabIndexChild<I>>(<ChildElement extends Element>(info: UseRovingTabIndexChildParameters): UseRovingTabIndexChildReturnType<ChildElement> => {
+    const useRovingTabIndexChild = useCallback<UseRovingTabIndexChild<I>>(<ChildElement extends Element>(info: UseRovingTabIndexChildParameters<I>): UseRovingTabIndexChildReturnType<ChildElement> => {
 
         const [rrafIndex, setRrafIndex] = useState(1);
         const rerenderAndFocus = useCallback(() => { setRrafIndex(i => ++i) }, []);

@@ -26,23 +26,23 @@ export interface UseGridNavigationRowInfo extends UseRovingTabIndexChildInfo {
     hidden?: boolean;
 }
 
-export interface UseGridNavigationRowParameters extends UseRovingTabIndexChildParameters { hidden?: boolean }; //I;
+export type UseGridNavigationRowParameters<I extends UseRovingTabIndexChildInfo> = Omit<UseRovingTabIndexChildParameters<I &  { hidden?: boolean }>, "setIsTabbableRow" | "getIsTabbableRow">; //I;
 
 export interface UseGridNavigationCellInfo extends UseRovingTabIndexChildInfo { }
-export interface UseGridNavigationCellParameters extends UseRovingTabIndexChildParameters {};
+export type UseGridNavigationCellParameters<IC extends UseGridNavigationCellInfo> = UseRovingTabIndexChildParameters<IC>;
 
 export interface UseGridNavigationRowReturnType<R extends Element, C extends Element, IR extends UseGridNavigationRowInfo, IC extends UseGridNavigationCellInfo> {
     useGridNavigationRowProps: <P extends h.JSX.HTMLAttributes<R>>(props: P) => UseRefElementPropsReturnType<R, UseRefElementPropsReturnType<R, MergedProps<R, { onKeyDown: (e: KeyboardEvent) => void; }, UseHasFocusPropsReturnType<R, P>>>>;
-    useGridNavigationCell: UseGridNavigationCell<C>;
+    useGridNavigationCell: UseGridNavigationCell<C, IC>;
     cellCount: number;
     isTabbableRow: boolean | null;
     currentColumn: number | null;
     managedCells: IC[];
 }
 
-export type UseGridNavigationRow<R extends Element, C extends Element, IR extends UseGridNavigationRowInfo, IC extends UseGridNavigationCellInfo> = ({ index, ...info }: UseGridNavigationRowParameters) => UseGridNavigationRowReturnType<R, C, IR, IC>
+export type UseGridNavigationRow<R extends Element, C extends Element, IR extends UseGridNavigationRowInfo, IC extends UseGridNavigationCellInfo> = ({ index, ...info }: UseGridNavigationRowParameters<IR>) => UseGridNavigationRowReturnType<R, C, IR, IC>
 
-export type UseGridNavigationCell<C extends Element> = (params: UseGridNavigationCellParameters) => {
+export type UseGridNavigationCell<C extends Element, IC extends UseGridNavigationCellInfo> = (params: UseGridNavigationCellParameters<IC>) => {
     useGridNavigationCellProps: <P extends h.JSX.HTMLAttributes<C>>(props: P) => h.JSX.HTMLAttributes<C>;
 }
 
@@ -135,7 +135,7 @@ export function useGridNavigation<R extends Element, C extends Element, IR exten
     }, [])
 
     // Last thing before we return -- here's the hook for individual rows and their cells.
-    const useGridNavigationRow: UseGridNavigationRow<R, C, IR, IC> = useCallback(({ index: rowIndex, hidden, ...info }: UseGridNavigationRowParameters): UseGridNavigationRowReturnType<R, C, IR, IC> => {
+    const useGridNavigationRow: UseGridNavigationRow<R, C, IR, IC> = useCallback(({ index: rowIndex, hidden, ...info }: UseGridNavigationRowParameters<IR>): UseGridNavigationRowReturnType<R, C, IR, IC> => {
 
         // When we change the current column, we send that information
         // to the parent via setState, but that doesn't do anything
@@ -250,7 +250,7 @@ export function useGridNavigation<R extends Element, C extends Element, IR exten
 
 
         const getRowIndex = useStableGetter(rowIndex);
-        const useGridNavigationCell: UseGridNavigationCell<C> = useCallback((info: UseGridNavigationCellParameters) => {
+        const useGridNavigationCell: UseGridNavigationCell<C, IC> = useCallback((info: UseGridNavigationCellParameters<IC>) => {
             const [tabbable, setTabbable] = useState(false);
             const { useRovingTabIndexChildProps } = useRovingTabIndexCell<C>({ ...info, setTabbable } as IC);
             const { useLinearNavigationChildProps: useLinearNavigationChildCellProps } = useLinearNavigationChildCell(info as IC);
