@@ -3,13 +3,11 @@ import { useCallback } from "preact/hooks";
 import { MergedProps, useMergedProps } from "./use-merged-props";
 import { useState } from "./use-state";
 
-export interface UseRefElementPropsParameters<T extends EventTarget> extends h.JSX.HTMLAttributes<T> { }
+export type UseRefElementPropsReturnType<T, P extends {}> = P;
 
-export type UseRefElementPropsReturnType<T extends EventTarget, P extends UseRefElementPropsParameters<T>> = MergedProps<T, { ref: RefCallback<T>; }, P>;
+export type UseRefElementProps<T> = <P extends {}>(props: P) => UseRefElementPropsReturnType<T, P>;
 
-export type UseRefElementProps<T extends EventTarget> = <P extends UseRefElementPropsParameters<T>>(props: P) => UseRefElementPropsReturnType<T, P>;
-
-export interface UseRefElementReturnType<T extends EventTarget> {
+export interface UseRefElementReturnType<T> {
     element: T | null;
     getElement: () => T | null;
     useRefElementProps: UseRefElementProps<T>;
@@ -24,7 +22,7 @@ export interface UseRefElementReturnType<T extends EventTarget> {
  * 
  * @returns The element, and the sub-hook that makes it retrievable.
  */
-export function useRefElement<T extends EventTarget>(): UseRefElementReturnType<T> {
+export function useRefElement<T>(): UseRefElementReturnType<T> {
     // Let us store the actual (reference to) the element we capture
     const [element, setElement, getElement] = useState<T | null>(null);
 
@@ -35,7 +33,7 @@ export function useRefElement<T extends EventTarget>(): UseRefElementReturnType<
             setElement(() => e);
     }, []);
 
-    const useRefElementProps = useCallback<UseRefElementProps<T>>(<P extends UseRefElementPropsParameters<T>>(props: P): UseRefElementPropsReturnType<T, P> => useMergedProps<T>()({ ref: myRef }, props), []);
+    const useRefElementProps = useCallback<UseRefElementProps<T>>(<P extends {}>(props: P): UseRefElementPropsReturnType<T, P> => useMergedProps<any>()({ ref: myRef }, props) as P, []);
 
     // Return both the element and the hook that modifies 
     // the props and allows us to actually find the element

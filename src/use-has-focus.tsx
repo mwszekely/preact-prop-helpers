@@ -1,8 +1,9 @@
 
+import { h } from "preact";
 import { useCallback } from "preact/hooks";
 import { useActiveElement } from "./use-active-element";
 import { MergedProps } from "./use-merged-props";
-import { useRefElement, UseRefElementPropsParameters, UseRefElementPropsReturnType, UseRefElementReturnType } from "./use-ref-element";
+import { useRefElement, UseRefElementPropsReturnType, UseRefElementReturnType } from "./use-ref-element";
 
 export interface UseFocusParameters {
     /**
@@ -30,7 +31,7 @@ export interface UseFocusParameters {
     setLastFocusedInner?(focused: boolean): void;
 }
 
-export interface UseHasFocusPropsParameters<T extends EventTarget> extends UseRefElementPropsParameters<T> { }
+export interface UseHasFocusPropsParameters<T extends EventTarget> extends h.JSX.HTMLAttributes<T> { }
 
 export type UseHasFocusPropsReturnType<T extends EventTarget, P extends UseHasFocusPropsParameters<T>> = MergedProps<T, UseRefElementPropsReturnType<T, { onFocus: (e: FocusEvent) => void; onBlur: (e: FocusEvent) => void; }>, P>;
 /*
