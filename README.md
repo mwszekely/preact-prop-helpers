@@ -49,7 +49,8 @@ There are a few reasons:
 |`usePersistentState`								|Identical to `useState`, but persists across browsing sessions, separate tabs, etc.|
 |`useEffect`, `useLayoutEffect`						|Identical to the built-ins, but provides previous dependency values as well as a list of what exactly changed (mainly useful for debugging). In most cases, the built-ins are just fine.|
 |`useForceUpdate`|Returns a function that forces the component that uses it to re-render itself when called (any children just follow normal diffing rules past that point). The returned function is completely stable.|
-|`useMediaQuery`									|Measures if a given media query matches the device or not.
+|`useMutationObserver`								|`MutationObserver`, but In a Hook™!|
+|`useMediaQuery`									|Measures if a given media query matches the device or not.|
 
 
 # General Purpose Prop Hooks

@@ -31,3 +31,5 @@ export { useLayoutEffect } from "./use-layout-effect";
 export { useFocusTrap, findFirstFocusable, UseFocusTrapReturnType, UseFocusTrapParameters, UseFocusTrapPropsParameters, UseFocusTrapPropsReturnType } from "./use-focus-trap";
 export { useForceUpdate } from "./use-force-update";
 
+export { useDocumentClass } from "./use-document-class";
+export { useMutationObserver } from "./use-mutation-observer";
