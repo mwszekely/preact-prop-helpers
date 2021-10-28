@@ -38,6 +38,7 @@ There are a few reasons:
 |`useHasFocus` (& `useActiveElement`)				|Allows a component to detect if it or its children have focus, and if nothing's focused, additionally detect if it is still the *most recently* focused element.|
 |`useFocusTrap` (& `useBlockingElement`)			|Allows a component to make itself modal so that no interactions outside of it are considered, primarily for dialogs and such, restoring focus when done.|
 |`useDraggable` & `useDroppable`					|Allows a component to quickly implement the Drag & drop API, returning information about the current operation.|
+|`useDocumentClass`                                 |Allows you to add a class to, e.g., the root `<html>` element, and then remove it on unmount automatically.|
 |`useGlobalEventHandler`							|Ensures an event handler is attached to `window`, `document`, etc. as long as the component is mounted.|
 |`useLocalEventHandler`								|Alternate way of attaching/detaching an event handler to the component, primarily for 3rd party APIs.|
 |`useRandomId`										|Allows a component to use a randomly-generated ID. Also lets another component reference whatever ID was used, e.g. in a `for` or `aria-labelledby` prop.|
@@ -46,9 +47,11 @@ There are a few reasons:
 |`useStableGetter`									|Allows you to use some variable within `useEffect` or `useCallback` without including it in a dependency array. __Cannot be used within `useLayoutEffect`__.|
 |`useState`											|Identical to the built-in, but returns a third value, `getState`, that is stable everywhere, and __can be used inside useLayoutEffect or during render__. In general, this is the *only* getter that can be used there.|
 |`usePersistentState`								|Identical to `useState`, but persists across browsing sessions, separate tabs, etc.|
+|`useRemoteEffect`                                  |Has semantics similar to `useEffect`, but instead of running the effect immediately after rendering, you manually call a function whenever you want to run it. |
 |`useEffect`, `useLayoutEffect`						|Identical to the built-ins, but provides previous dependency values as well as a list of what exactly changed (mainly useful for debugging). In most cases, the built-ins are just fine.|
 |`useForceUpdate`|Returns a function that forces the component that uses it to re-render itself when called (any children just follow normal diffing rules past that point). The returned function is completely stable.|
-|`useMediaQuery`									|Measures if a given media query matches the device or not.
+|`useMutationObserver`								|`MutationObserver`, but In a Hook™!|
+|`useMediaQuery`									|Measures if a given media query matches the device or not.|
 
 
 # General Purpose Prop Hooks
@@ -333,3 +336,21 @@ In other words, if you don't change the key or the `toString`/`fromString` funct
 Another entirely optional drop-in replacement for the native Preact hooks.  These provide two arguments: the previous input values, and a list of which ones caused the effect to fire.  The latter is very useful for debugging.
 
 Aside from this, there is no difference between them.  Feel free to use the native ones if you don't need that information.
+
+## `useRemoteEffect`
+
+Like `useEffect`, this function accepts a callback that optionally returns a cleanup function &ndash; it has all those same semantics. But if you don't want an effect to run on render (you'd rather it happen, say, during an event handler), this hook is for you.
+
+This hook takes no dependencies and **returns a function** that, when called, acts the same as what `useEffect` does on render, but with a single dependency you pass at that time. If that value is not the same as the value the last time it was called, your effect (and optionally the cleanup from the previous effect, if any) is run.
+
+```tsx
+const callOnChange = useRemoteEffect((dependency) => { 
+    up(dependency);
+    return () => down(dependency);
+});
+
+return <button onClick={() => callOnChange()} />
+```
+
+Note that the returned function cannot be used during `useLayoutEffect`, but in that case you probably ought to just `useLayoutEffect` directly.
+
