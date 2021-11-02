@@ -8,21 +8,23 @@ export interface UseMutationObserverParameters {
     subtree?: boolean;
     characterDataOldValue?: boolean;
     attributeOldValue?: boolean;
-    attributeFilter?: string[];
+    attributeFilter?: string | string[];
 }
 
 export function useMutationObserver(element?: HTMLElement, options: UseMutationObserverParameters = {}) {
     let { attributeFilter, subtree, onChildList, characterDataOldValue, onCharacterData, onAttributes, attributeOldValue } = options;
 
+    if (typeof attributeFilter === "string")
+        attributeFilter = [attributeFilter];
     let attributeKey = attributeFilter?.join(";");
 
     const attributes = !!onAttributes;
     const characterData = !!onCharacterData;
     const childList = !!onChildList;
 
-    const stableOnChildList = useStableCallback(onChildList ?? (() => {}));
-    const stableOnCharacterData = useStableCallback(onCharacterData ?? (() => {}));
-    const stableOnAttributes = useStableCallback(onAttributes ?? (() => {}));
+    const stableOnChildList = useStableCallback(onChildList ?? (() => { }));
+    const stableOnCharacterData = useStableCallback(onCharacterData ?? (() => { }));
+    const stableOnAttributes = useStableCallback(onAttributes ?? (() => { }));
 
     useEffect(() => {
         if (element) {
@@ -32,21 +34,21 @@ export function useMutationObserver(element?: HTMLElement, options: UseMutationO
                         case "childList":
                             stableOnChildList(mutation);
                             break;
-                            
+
                         case "attributes":
                             stableOnAttributes(mutation);
                             break;
 
                         case "characterData":
                             stableOnCharacterData(mutation);
-                            break; 
-                        ;
+                            break;
+                            ;
                     }
                 }
             });
 
             observer.observe(element, {
-                attributeFilter,
+                attributeFilter: attributeFilter as Array<string>,
                 attributeOldValue,
                 attributes,
                 characterData,
