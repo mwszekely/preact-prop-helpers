@@ -9,26 +9,26 @@ export interface UseFocusParameters {
     /**
      * Whether the element itself currently has focus.
      */
-    setFocused?(focused: boolean): void;
+    onFocusedChanged?(focused: boolean): void;
 
     /**
      * Like `focused`, but also *additionally* if any child elements are focused.
      * 
      * @see setFocused
      */
-    setFocusedInner?(focused: boolean): void;
+    onFocusedInnerChanged?(focused: boolean): void;
 
     /**
      * Similar to `setFocused`, but if there is no currently focused element, is `true` if this element that *did* have focus last.
      * 
      * This is always `true` while `focused` is `true`. If `focused` is `false`, this may be `true` or `false`.
      */
-    setLastFocused?(focused: boolean): void;
+    onLastFocusedChanged?(focused: boolean): void;
 
     /**
      * Combines the implications of `setLastFocused` and `setFocusedInner`.
      */
-    setLastFocusedInner?(focused: boolean): void;
+    onLastFocusedInnerChanged?(focused: boolean): void;
 }
 
 export interface UseHasFocusPropsParameters<T extends EventTarget> extends h.JSX.HTMLAttributes<T> { }
@@ -47,21 +47,22 @@ export interface UseHasFocusReturnType<T extends Node> extends Omit<UseRefElemen
     useHasFocusProps: <P extends UseHasFocusPropsParameters<T>>(props: P) => UseHasFocusPropsReturnType<T, P>;
 }
 
-export function useHasFocus<T extends Node>({ setFocused, setFocusedInner, setLastFocused, setLastFocusedInner }: UseFocusParameters): UseHasFocusReturnType<T> {
+export function useHasFocus<T extends Node>({ onFocusedChanged, onFocusedInnerChanged, onLastFocusedChanged, onLastFocusedInnerChanged }: UseFocusParameters): UseHasFocusReturnType<T> {
 
     const { element, getElement, useRefElementProps } = useRefElement<T>();
 
-    const setActiveElement = useCallback((node: Node | null) => {
-        setFocused?.(element == node && element != null);
-        setFocusedInner?.(!!element?.contains(node));
-    }, [setFocused, setFocusedInner, element]);
-
-    const setLastActiveElement = useCallback((node: Node) => {
-        setLastFocused?.(element == node && element != null);
-        setLastFocusedInner?.(!!element?.contains(node));
-    }, [setLastFocused, setLastFocusedInner, element]);
-
-    useActiveElement({ setActiveElement, setLastActiveElement });
+    useActiveElement({
+        onActiveElementChange: node => {
+            debugger;
+            onFocusedChanged?.(element == node && element != null);
+            onFocusedInnerChanged?.(!!element?.contains(node));
+        },
+        onLastActiveElementChange: node => {
+            debugger;
+            onLastFocusedChanged?.(element == (node as Node) && element != null);
+            onLastFocusedInnerChanged?.(!!element?.contains(node));
+        }
+    });
 
     const useHasFocusProps = useCallback(<P extends UseHasFocusPropsParameters<T>>(props: P) => { return useRefElementProps(props); }, [useRefElementProps]);
 

@@ -1,6 +1,6 @@
 
 import { useLayoutEffect } from "preact/hooks";
-import { useStableCallback } from "./use-stable-callback";
+import { OnPassiveStateChange, usePassiveState } from "./use-passive-state";
 
 
 /**
@@ -46,6 +46,7 @@ const dummy = 0;
 const activeElementUpdaters = new Set<undefined | ((e: (Element & HTMLOrSVGElement) | null) => void)>();
 const lastActiveElementUpdaters = new Set<undefined | ((e: (Element & HTMLOrSVGElement)) => void)>();
 const windowFocusedUpdaters = new Set<undefined | ((focused: boolean) => void)>();
+let windowFocused = true;
 
 function focusout(e: FocusEvent) {
     if (e.relatedTarget == null) {
@@ -65,11 +66,13 @@ function focusin(e: FocusEvent) {
 }
 
 function windowFocus() {
-    windowFocusedUpdaters.forEach(f => f?.(true));
+    windowFocused = true;
+    windowFocusedUpdaters.forEach(f => f?.(windowFocused));
 }
 
 function windowBlur() {
-    windowFocusedUpdaters.forEach(f => f?.(false));
+    windowFocused = false;
+    windowFocusedUpdaters.forEach(f => f?.(windowFocused));
 }
 
 export interface UseActiveElementParameters {
@@ -78,26 +81,26 @@ export interface UseActiveElementParameters {
      * Called any time the active element changes. Does not need
      * to be stable.
      */
-    setActiveElement?(e: (Element & HTMLOrSVGElement) | null): void;
+    onActiveElementChange?: OnPassiveStateChange<(Element & HTMLOrSVGElement) | null>;
 
     /**
      * Called any time the active element changes and is not null. 
      * Does not need to be stable.
      */
-    setLastActiveElement?(e: (Element & HTMLOrSVGElement)): void;
+    onLastActiveElementChange?: OnPassiveStateChange<(Element & HTMLOrSVGElement)>;
 
     /**
      * Called any time the window gains/loses focus. Does not need
      * to be stable.
      */
-    setWindowFocused?(focused: boolean): void;
+    onWindowFocusedChanged?: OnPassiveStateChange<boolean>;
 }
 
-export function useActiveElement({ setActiveElement, setLastActiveElement, setWindowFocused }: UseActiveElementParameters) {
+export function useActiveElement({ onActiveElementChange, onLastActiveElementChange, onWindowFocusedChanged }: UseActiveElementParameters) {
 
-    const stableSetActiveElement = useStableCallback(setActiveElement ?? (() => {}));
-    const stableSetLastActiveElement = useStableCallback(setLastActiveElement ?? (() => {}));
-    const stableSetWindowFocused = useStableCallback(setWindowFocused ?? (() => {}));
+    const [getActiveElement, setActiveElement] = usePassiveState(onActiveElementChange, undefined);
+    const [getLastActiveElement, setLastActiveElement] = usePassiveState(onLastActiveElementChange, undefined);
+    const [getWindowFocused, setWindowFocused] = usePassiveState(onWindowFocusedChanged, windowFocused);
 
     useLayoutEffect(() => {
 
@@ -110,14 +113,14 @@ export function useActiveElement({ setActiveElement, setLastActiveElement, setWi
 
         // Add them even if they're undefined to more easily
         // manage the ">0 means don't add handlers" logic.
-        activeElementUpdaters.add(stableSetActiveElement);
-        lastActiveElementUpdaters.add(stableSetLastActiveElement);
-        windowFocusedUpdaters.add(stableSetWindowFocused);
+        activeElementUpdaters.add(setActiveElement);
+        lastActiveElementUpdaters.add(setLastActiveElement);
+        windowFocusedUpdaters.add(setWindowFocused);
 
         return () => {
-            activeElementUpdaters.delete(stableSetActiveElement);
-            lastActiveElementUpdaters.delete(stableSetLastActiveElement);
-            windowFocusedUpdaters.delete(stableSetWindowFocused);
+            activeElementUpdaters.delete(setActiveElement);
+            lastActiveElementUpdaters.delete(setLastActiveElement);
+            windowFocusedUpdaters.delete(setWindowFocused);
 
             if (activeElementUpdaters.size === 0) {
                 document.removeEventListener("focusin", focusin);
@@ -128,4 +131,5 @@ export function useActiveElement({ setActiveElement, setLastActiveElement, setWi
         }
     }, []);
 
+    return { getActiveElement, getLastActiveElement, getWindowFocused };
 }

@@ -234,8 +234,7 @@ const DemoFocus = memo(() => {
     const [focusedInner, setFocusedInner, getFocusedInner] = useState(false);
     const [lastFocused, setLastFocused, getLastFocused] = useState(false);
     const [lastFdInner, setLastFocusedInner, getLastFocusedInner] = useState(false);
-    useActiveElement({ setLastActiveElement, setActiveElement, setWindowFocused });
-    const { useHasFocusProps } = useHasFocus<HTMLDivElement>({ setLastFocusedInner, setFocused, setLastFocused, setFocusedInner });
+    const { useHasFocusProps } = useHasFocus<HTMLDivElement>({ onFocusedChanged: setFocused, onFocusedInnerChanged: setFocusedInner, onLastFocusedChanged: setLastFocused, onLastFocusedInnerChanged: setLastFocusedInner });
     return (
         <div class="demo">
             <h2>useHasFocus</h2>
@@ -260,7 +259,7 @@ export const DemoUseGrid = memo(() => {
 
     const [lastFocusedInner, setLastFocusedInner, getLastFocusedInner] = useState(false);
 
-    const { useHasFocusProps } = useHasFocus<HTMLDivElement>({ setLastFocusedInner });
+    const { useHasFocusProps } = useHasFocus<HTMLDivElement>({ onLastFocusedInnerChanged: setLastFocusedInner });
     const { useGridNavigationRow, useGridNavigationColumn, rowCount, cellIndex, rowIndex } = useGridNavigation<HTMLDivElement, HTMLDivElement, UseGridNavigationRowInfo, UseGridNavigationCellInfo>({ shouldFocusOnChange: getLastFocusedInner });
 
     return (

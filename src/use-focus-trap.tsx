@@ -25,8 +25,8 @@ const elementsToRestoreFocusTo = new Map<Element | null, (Node & HTMLOrSVGElemen
 
 export function useFocusTrap<E extends HTMLElement>({ trapActive }: UseFocusTrapParameters): UseFocusTrapReturnType<E> {
     const { element, useRefElementProps, getElement } = useRefElement<E>();
-    const [lastActiveElement, setLastActiveElement, getLastActiveElement] = useState<Node | null>(null);
-    useActiveElement({ setLastActiveElement });
+    //const [lastActiveElement, setLastActiveElement, getLastActiveElement] = useState<Node | null>(null);
+    const { getActiveElement, getLastActiveElement, getWindowFocused } = useActiveElement({  });
 
 
     // When the trap becomes active, before we let the blockingElements hook run,
