@@ -28,7 +28,7 @@ export { useListNavigation, UseListNavigationChild, UseListNavigationChildProps,
 
 export { useEffect } from "./use-effect";
 export { useLayoutEffect } from "./use-layout-effect";
-export { useRemoteEffect } from "./use-remote-effect";
+export { usePassiveState } from "./use-passive-state";
 export { useFocusTrap, findFirstFocusable, UseFocusTrapReturnType, UseFocusTrapParameters, UseFocusTrapPropsParameters, UseFocusTrapPropsReturnType } from "./use-focus-trap";
 export { useForceUpdate } from "./use-force-update";
 
