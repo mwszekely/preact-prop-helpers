@@ -49,16 +49,16 @@ export interface UseHasFocusReturnType<T extends Node> extends Omit<UseRefElemen
 
 export function useHasFocus<T extends Node>({ onFocusedChanged, onFocusedInnerChanged, onLastFocusedChanged, onLastFocusedInnerChanged }: UseFocusParameters): UseHasFocusReturnType<T> {
 
-    const { element, getElement, useRefElementProps } = useRefElement<T>();
+    const { getElement, useRefElementProps } = useRefElement<T>({  });
 
     useActiveElement({
         onActiveElementChange: node => {
-            debugger;
+            const element = getElement();
             onFocusedChanged?.(element == node && element != null);
             onFocusedInnerChanged?.(!!element?.contains(node));
         },
         onLastActiveElementChange: node => {
-            debugger;
+            const element = getElement();
             onLastFocusedChanged?.(element == (node as Node) && element != null);
             onLastFocusedInnerChanged?.(!!element?.contains(node));
         }
@@ -67,5 +67,5 @@ export function useHasFocus<T extends Node>({ onFocusedChanged, onFocusedInnerCh
     const useHasFocusProps = useCallback(<P extends UseHasFocusPropsParameters<T>>(props: P) => { return useRefElementProps(props); }, [useRefElementProps]);
 
 
-    return { useHasFocusProps, element, getElement };
+    return { useHasFocusProps, getElement };
 }

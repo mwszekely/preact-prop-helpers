@@ -1,14 +1,14 @@
-import { Context, h, Ref } from "preact";
+import { h } from "preact";
 import { useCallback, useEffect, useRef } from "preact/hooks";
-import { useRefElement, UseRefElementPropsReturnType } from "./use-ref-element";
-import { useLayoutEffect } from "./use-layout-effect";
-import { MergedProps, useMergedProps } from "./use-merged-props"
-import { useState } from "./use-state";
-import { useTimeout } from "./use-timeout";
-import { useLogicalDirection } from "./use-logical-direction";
 import { ManagedChildInfo } from "./use-child-manager";
+import { useLayoutEffect } from "./use-layout-effect";
+import { useLogicalDirection } from "./use-logical-direction";
+import { MergedProps, useMergedProps } from "./use-merged-props";
+import { UseRefElementPropsReturnType } from "./use-ref-element";
 import { useStableCallback } from "./use-stable-callback";
 import { useStableGetter } from "./use-stable-getter";
+import { useState } from "./use-state";
+import { useTimeout } from "./use-timeout";
 
 
 
@@ -117,12 +117,11 @@ export function useLinearNavigation<ChildElement extends Element>({ index, navig
 
 
     const useLinearNavigationChild: UseLinearNavigationChild<ChildElement> = useCallback(({ index }) => {
-        const { useRefElementProps, element } = useRefElement<ChildElement>();
         const getIndex = useStableGetter(index);
 
         // Prefer the parent element's direction so that we're not calling getComputedStyle
         // on every single individual child, which is likely redundant.
-        const { convertElementSize, getLogicalDirection } = useLogicalDirection(element?.parentElement ?? element);
+        const { convertElementSize, getLogicalDirection, useLogicalDirectionProps } = useLogicalDirection<ChildElement>();
 
         const useLinearNavigationChildProps: UseLinearNavigationChildProps<ChildElement> = (props) => {
 
@@ -220,7 +219,7 @@ export function useLinearNavigation<ChildElement extends Element>({ index, navig
             };
 
 
-            return useRefElementProps(useMergedProps<ChildElement>()({ onKeyDown }, props));
+            return useLogicalDirectionProps(useMergedProps<ChildElement>()({ onKeyDown }, props));
 
         }
         return {
@@ -454,8 +453,6 @@ export function useTypeaheadNavigation<ChildElement extends Element, I extends U
 
         const useTypeaheadNavigationChildProps: UseTypeaheadNavigationChildProps<ChildElement> = function <P extends h.JSX.HTMLAttributes<ChildElement>>({ ...props }: P): UseTypeaheadNavigationChildPropsReturnType<ChildElement, P> {
 
-            const { useRefElementProps, element } = useRefElement<ChildElement>();
-
             const onCompositionStart = (e: CompositionEvent) => { setImeActive(true) };
             const onCompositionEnd = (e: CompositionEvent) => {
                 setNextTypeaheadChar(e.data);
@@ -508,7 +505,7 @@ export function useTypeaheadNavigation<ChildElement extends Element, I extends U
 
             };
 
-            return useMergedProps<ChildElement>()(useRefElementProps({ onKeyDown, onCompositionStart, onCompositionEnd, }), props);
+            return useMergedProps<ChildElement>()({ onKeyDown, onCompositionStart, onCompositionEnd, }, props);
         };
 
         return {

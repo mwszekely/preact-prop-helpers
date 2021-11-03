@@ -1,5 +1,5 @@
 import { h } from "preact";
-import { useEffect } from "preact/hooks";
+import { useCallback, useEffect } from "preact/hooks";
 import { useRefElement, UseRefElementProps } from "./use-ref-element";
 import { useStableCallback } from "./use-stable-callback";
 
@@ -40,17 +40,13 @@ export interface ElementSize {
 }
 
 export interface UseElementSizeReturnType<E extends HTMLElement> {
-    element: E | null;
     getElement(): E | null;
     useElementSizeProps: UseElementSizeProps<E>;
 }
 
 export function useElementSize<E extends HTMLElement>({ observeBox, setSize }: UseElementSizeParameters): UseElementSizeReturnType<E> {
-    const { element, getElement, useRefElementProps } = useRefElement<E>();
 
-    const stableSetSize = useStableCallback(setSize);
-
-    useEffect(() => {
+    const handleParamUpdate = useCallback((element: E | null, observeBox: UseElementSizeParameters["observeBox"]) => {
         if (element) {
             const handleUpdate = () => {
                 const { clientWidth, scrollWidth, offsetWidth, clientHeight, scrollHeight, offsetHeight, clientLeft, scrollLeft, offsetLeft, clientTop, scrollTop, offsetTop } = element;
@@ -68,10 +64,14 @@ export function useElementSize<E extends HTMLElement>({ observeBox, setSize }: U
                 return () => observer.disconnect();
             }
         }
-    }, [element, observeBox]);
+    }, []);
+
+    const { getElement, useRefElementProps } = useRefElement<E>({ onElementChange: e => handleParamUpdate(e, observeBox) });
+    useEffect(() => { handleParamUpdate(getElement(), observeBox); }, [observeBox])
+
+    const stableSetSize = useStableCallback(setSize);
 
     return {
-        element,
         getElement,
         useElementSizeProps: useRefElementProps
     }

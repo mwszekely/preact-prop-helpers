@@ -1,14 +1,13 @@
 import { h, RefCallback } from "preact";
 import { useCallback } from "preact/hooks";
-import { MergedProps, useMergedProps } from "./use-merged-props";
-import { useState } from "./use-state";
+import { useMergedProps } from "./use-merged-props";
+import { OnPassiveStateChange, usePassiveState } from "./use-passive-state";
 
 export type UseRefElementPropsReturnType<T, P extends {}> = P;
 
 export type UseRefElementProps<T> = <P extends {}>(props: P) => UseRefElementPropsReturnType<T, P>;
 
 export interface UseRefElementReturnType<T> {
-    element: T | null;
     getElement: () => T | null;
     useRefElementProps: UseRefElementProps<T>;
 }
@@ -22,9 +21,9 @@ export interface UseRefElementReturnType<T> {
  * 
  * @returns The element, and the sub-hook that makes it retrievable.
  */
-export function useRefElement<T>(): UseRefElementReturnType<T> {
+export function useRefElement<T>({ onElementChange }: { onElementChange?: OnPassiveStateChange<T> }): UseRefElementReturnType<T> {
     // Let us store the actual (reference to) the element we capture
-    const [element, setElement, getElement] = useState<T | null>(null);
+    const [getElement, setElement] = usePassiveState<T | null>(onElementChange as OnPassiveStateChange<T | null>, null);
 
     // Create a RefCallback that's fired when mounted 
     // and that notifies us of our element when we have it
@@ -39,7 +38,6 @@ export function useRefElement<T>(): UseRefElementReturnType<T> {
     // the props and allows us to actually find the element
     return {
         useRefElementProps,
-        element,
         getElement
     }
 }
@@ -47,12 +45,12 @@ export function useRefElement<T>(): UseRefElementReturnType<T> {
 function test<T extends HTMLElement>() {
     function foo<P extends h.JSX.HTMLAttributes<T>>(props: P) {
 
-        const { element, useRefElementProps } = useRefElement<T>();
+        const { getElement, useRefElementProps } = useRefElement<T>({});
         const p1 = useRefElementProps(props);
         if (p1.style == undefined) {
 
         }
-        else if (typeof p1.style === "string") {}
+        else if (typeof p1.style === "string") { }
         else {
             p1.style?.backgroundColor;
         }

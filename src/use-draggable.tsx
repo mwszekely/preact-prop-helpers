@@ -1,7 +1,7 @@
 import { h, Ref } from "preact";
 import { useCallback, useRef } from "preact/hooks";
 import { MergedProps, useMergedProps } from "./use-merged-props";
-import { useRefElement, UseRefElementPropsReturnType } from "./use-ref-element";
+import { UseRefElementPropsReturnType } from "./use-ref-element";
 import { useState } from "./use-state";
 
 interface UseDraggableReturnType<E extends EventTarget> {
@@ -57,7 +57,6 @@ export function useDraggable<E extends HTMLElement>({ effectAllowed, data, dragI
     const useDraggableProps = useCallback(<P extends h.JSX.HTMLAttributes<E>>(p: P) => {
 
         const ref = useRef<E>(null);
-        const { element, useRefElementProps } = useRefElement<E>();
 
         const onDragStart = (e: DragEvent) => {
             //e.preventDefault();
@@ -88,12 +87,12 @@ export function useDraggable<E extends HTMLElement>({ effectAllowed, data, dragI
         };
 
 
-        return useMergedProps<E>()(useRefElementProps({
+        return useMergedProps<E>()({
             draggable: true,
             onDragStart,
             onDragEnd,
             ref
-        }), p);
+        }, p);
 
     }, [effectAllowed, dragImage, dragImageXOffset, dragImageYOffset, ...Object.entries(data).flat()]);
 

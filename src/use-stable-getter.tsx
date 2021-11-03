@@ -7,11 +7,8 @@ const Unset = Symbol("unset");
  * Given an input value, returns a constant getter function that can be used 
  * inside of `useEffect` and friends without including it in the dependency array.
  * 
- * Use with caution, and **do not use the getter in useLayoutEffect!!**
- * `setState`'s getter does not have this problem, but then you're using your own state 
- * instead of an existing value, which might not always be feasible.
- * 
- * Weigh your options, and hopefully one of them gets the job done.
+ * This uses `options.diffed` in order to run before everything, even
+ * ref assignment. This means this getter is safe to use anywhere ***except the render phase***.
  * 
  * @param value 
  * @returns 
@@ -21,7 +18,7 @@ export function useStableGetter<T>(value: T): () => T {
     useBeforeLayoutEffect(() => { ref.current = value; }, [value]);
     return useCallback(() => {
         if (ref.current as unknown === Unset) {
-            throw new Error('Value retrieved from useStableGetter() cannot be called from useLayoutEffect().')
+            throw new Error('Value retrieved from useStableGetter() cannot be called during render.')
         }
         return ref.current;
     }, [])

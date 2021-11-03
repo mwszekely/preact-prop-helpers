@@ -43,11 +43,11 @@ There are a few reasons:
 |`useLocalEventHandler`								|Alternate way of attaching/detaching an event handler to the component, primarily for 3rd party APIs.|
 |`useRandomId`										|Allows a component to use a randomly-generated ID. Also lets another component reference whatever ID was used, e.g. in a `for` or `aria-labelledby` prop.|
 |`useTimeout`, `useInterval`, `useAnimationFrame`	|Runs the specified function (which doesn't need to be stable) with the given delay/interval/on every frame. In particular `useTimeout` is very effective as "`useEffect` but on a delay".|
-|`useStableCallback`								|`useCallback`, but doesn't require dependencies and is always stable. __Cannot be used within `useLayoutEffect` or during render__.|
-|`useStableGetter`									|Allows you to use some variable within `useEffect` or `useCallback` without including it in a dependency array. __Cannot be used within `useLayoutEffect`__.|
-|`useState`											|Identical to the built-in, but returns a third value, `getState`, that is stable everywhere, and __can be used inside useLayoutEffect or during render__. In general, this is the *only* getter that can be used there.|
+|`useStableCallback`								|`useCallback`, but doesn't require dependencies and is always stable. __Cannot be used during render__.|
+|`useStableGetter`									|Allows you to use some variable within `useEffect` or `useCallback` without including it in a dependency array. __Cannot be used during render__.|
+|`useState`											|Identical to the built-in, but returns a third value, `getState`, that is stable everywhere, and __can be used during render__. In general, this is the *only* getter that can be used there.|
 |`usePersistentState`								|Identical to `useState`, but persists across browsing sessions, separate tabs, etc.|
-|`useRemoteEffect`                                  |Has semantics similar to `useEffect`, but instead of running the effect immediately after rendering, you manually call a function whenever you want to run it. |
+|`usePassiveState`                                  |Offshoot of `useState` that, instead of re-rendering, runs a `useEffect`-esque effect & cleanup function when the state changes.|
 |`useEffect`, `useLayoutEffect`						|Identical to the built-ins, but provides previous dependency values as well as a list of what exactly changed (mainly useful for debugging). In most cases, the built-ins are just fine.|
 |`useForceUpdate`|Returns a function that forces the component that uses it to re-render itself when called (any children just follow normal diffing rules past that point). The returned function is completely stable.|
 |`useMutationObserver`								|`MutationObserver`, but In a Hook™!|
@@ -296,7 +296,7 @@ Notably `useTimeout` is a very effective way to do "`useEffect`, but on a delay"
 
 ## `useStableGetter`
 
-Given a value every render, returns a callback that returns that value and, importantly, is stable across renders. This means you can use it inside of hooks like `useEffect`, `useCallback`, etc. without declaring it as a dependency, but note that __the getter must not be called during or before `useLayoutEffect`__ (its value is effectively indeterminate from the start of a render until `useLayoutEffect` has completely finished, so keep in mind that includes not calling it during render either).
+Given a value every render, returns a callback that returns that value and, importantly, is stable across renders. This means you can use it inside of hooks like `useEffect`, `useCallback`, etc. without declaring it as a dependency, but note that __the getter must not be called during `render`__ (its value is effectively indeterminate from the start of a render until it's been committed).
 
 ## `useStableCallback`
 
@@ -304,9 +304,7 @@ Very similar to `useStableGetter`; returns a callback that is stable between ren
 
 ## `useState`
 
-Exactly the same as the normal `useState`, but returns a third `getState` function that remains stable across renders. Like `useStableGetter` and `useStableCallback`, the `getState` function doesn't need to be listed as a dependency anywhere, but unlike them, this one's fine to call at any point, essentially the best of both worlds if that's what you need.
-
-(It can do this while `useStableGetter` can't because we are able to know that the value changed *before* the component is rendering again. In `useStableGetter`, we learn about the change during render, but the earliest we're able to record it is the `useLayoutEffect` phase of rendering (components need to be pure since, theoretically, there's no guarantee that the most recently called instance is the one that ends up being rendered).  There's no way to get special treatment, unless you're `useState` and just recording it as the `setState` function is called.)
+Exactly the same as the normal `useState`, but returns a third `getState` function that remains stable across renders. Like `useStableGetter` and `useStableCallback`, the `getState` function doesn't need to be listed as a dependency anywhere, but unlike them, this one's fine to call at any point, even during the render phase.
 
 ## `usePersistentState`
 
@@ -336,21 +334,4 @@ In other words, if you don't change the key or the `toString`/`fromString` funct
 Another entirely optional drop-in replacement for the native Preact hooks.  These provide two arguments: the previous input values, and a list of which ones caused the effect to fire.  The latter is very useful for debugging.
 
 Aside from this, there is no difference between them.  Feel free to use the native ones if you don't need that information.
-
-## `useRemoteEffect`
-
-Like `useEffect`, this function accepts a callback that optionally returns a cleanup function &ndash; it has all those same semantics. But if you don't want an effect to run on render (you'd rather it happen, say, during an event handler), this hook is for you.
-
-This hook takes no dependencies and **returns a function** that, when called, acts the same as what `useEffect` does on render, but with a single dependency you pass at that time. If that value is not the same as the value the last time it was called, your effect (and optionally the cleanup from the previous effect, if any) is run.
-
-```tsx
-const callOnChange = useRemoteEffect((dependency) => { 
-    up(dependency);
-    return () => down(dependency);
-});
-
-return <button onClick={() => callOnChange()} />
-```
-
-Note that the returned function cannot be used during `useLayoutEffect`, but in that case you probably ought to just `useLayoutEffect` directly.
 

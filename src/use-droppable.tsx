@@ -1,7 +1,7 @@
 import { h } from "preact";
 import { useEffect, useRef } from "preact/hooks";
 import { MergedProps, useMergedProps } from "./use-merged-props";
-import { useRefElement, UseRefElementPropsReturnType } from "./use-ref-element";
+import { UseRefElementPropsReturnType } from "./use-ref-element";
 import { useState } from "./use-state";
 
 export interface UseDroppableReturnType<E extends HTMLElement> {
@@ -36,9 +36,6 @@ export interface UseDroppableReturnType<E extends HTMLElement> {
 
 
     dropError: unknown;
-
-    element: E | null;
-    getElement(): E | null;
 }
 
 export interface UseDroppableParameters {
@@ -91,8 +88,6 @@ export function useDroppable<E extends HTMLElement>({ effect }: UseDroppablePara
     const dropPromisesRef = useRef<Promise<null | { strings: { [mimeType: string]: string }, files: DropFile[] }>[]>([]);
     const [currentPromiseIndex, setCurrentPromiseIndex, getCurrentPromiseIndex] = useState(-1);
     const [promiseCount, setPromiseCount, getPromiseCount] = useState(0);
-
-    const { element, useRefElementProps, getElement } = useRefElement<E>();
 
     // Any time we add a new promise, if there's no current promise running, we need to start one.
     // If there is one, then we don't need to do anything, since it runs the same check.
@@ -245,7 +240,7 @@ export function useDroppable<E extends HTMLElement>({ effect }: UseDroppablePara
         }
 
 
-        return useMergedProps<E>()(useRefElementProps({ onDragEnter, onDragLeave, onDragOver, onDrop }), p);
+        return useMergedProps<E>()({ onDragEnter, onDragLeave, onDragOver, onDrop }, p);
     };
 
     return {
@@ -255,10 +250,7 @@ export function useDroppable<E extends HTMLElement>({ effect }: UseDroppablePara
         droppedFiles,
         droppedStrings,
 
-        dropError,
-
-        element,
-        getElement
+        dropError
     }
 }
 

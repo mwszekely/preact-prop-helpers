@@ -66,7 +66,7 @@ const DemoUseElementSizeAnimation = () => {
 
     const [elementSize, setElementSize] = useState<ElementSize | null>(null);
 
-    const { element, useElementSizeProps } = useElementSize<HTMLDivElement>({ setSize: setElementSize });
+    const { useElementSizeProps } = useElementSize<HTMLDivElement>({ setSize: setElementSize });
 
     return (
         <div {...useElementSizeProps({ ref: undefined, className: "demo", style: { height: `${(height * 100) + 100}px` } })}>
@@ -316,9 +316,9 @@ const DemoUseGridCell = (({ index }: { index: number }) => {
 
 const Component = () => {
     return <div class="flex" style={{ flexWrap: "wrap" }}>
+    <DemoFocus />
+    <hr />
         <DemoUseGrid />
-        <hr />
-        <DemoFocus />
         <hr />
         <DemoUseTimeout />
         <hr />

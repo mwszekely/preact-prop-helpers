@@ -1,4 +1,5 @@
 import { useCallback, useLayoutEffect, useRef, useState } from "preact/hooks";
+import { useRefElement } from "./use-ref-element";
 import type { ElementSize } from "./use-element-size";
 
 //export type BlockFlowDirection = "downwards" | "leftwards" | "rightwards";
@@ -49,8 +50,39 @@ export interface LogicalElementSize {
  * * `convertToLogicalOrientation`: Based on the current direction, converts "horizontal" or "vertical" to "inline" or "block".
  * * `convertToPhysicalOrientation`:  Based on the current direction, converts "inline" or "block" to "horizontal" or "vertical".
  */
-export function useLogicalDirection(element: Element | null | undefined) {
+export function useLogicalDirection<T extends Element>() {
 
+    // TODO: There's no way to refresh which writing mode we have once mounted.
+    // If the writing mode changes, the whole component needs to 
+    // mount/unmount because (more-or-less in order of importance)
+    //   A. There's no way to watch for CSS style changes
+    //   B. Calling getComputedStyle after every render for every element gets expensive fast and
+    //   C. Is not necessary for most use cases that will never switch writing-mode within a single component
+    //      (Those that do will need to mount and unmount the component that uses it)
+    //
+    // Maybe there could be a context object that can be used to remotely update all components that use this hook?
+    const { getElement, useRefElementProps } = useRefElement<T | null>({
+        onElementChange: (element) => {
+            if (element) {
+                // The element hasn't actually been hooked up to the document yet.
+                // Wait a moment so that we can properly use `getComputedStyle`
+                // (since we only read it on mount)
+                queueMicrotask(() => {
+                    console.assert(element!.isConnected);
+                    element = (element!.parentElement ?? element) as T;
+                    const computedStyles = window.getComputedStyle(element);
+                    const w = computedStyles.writingMode as WritingMode;
+                    const t = computedStyles.textOrientation as TextOrientation;
+                    const d = computedStyles.direction as Direction;
+
+                    setWritingMode(w || "horizontal-tb");
+                    setDirection(d || "rtl");
+                    setTextOrientation(t || "mixed");
+                })
+
+            }
+        }
+    });
 
     const [writingMode, setWritingMode] = useState<WritingMode | null>(null);
     const [direction, setDirection] = useState<Direction | null>(null);
@@ -64,28 +96,6 @@ export function useLogicalDirection(element: Element | null | undefined) {
     useLayoutEffect(() => { directionRef.current = direction; }, [direction]);
     useLayoutEffect(() => { textOrientationRef.current = textOrientation; }, [textOrientation]);
 
-    // TODO: There's no way to refresh which writing mode we have once mounted.
-    // If the writing mode changes, the whole component needs to 
-    // mount/unmount because (more-or-less in order of importance)
-    //   A. There's no way to watch for CSS style changes
-    //   B. Calling getComputedStyle after every render for every element gets expensive fast and
-    //   C. Is not necessary for 99% of use cases that will never switch writing-mode within a single component
-    //      (Those that do will need to mount and unmount the component that uses it)
-    //
-    // Maybe there could be a context object that can be used to remotely update all components that use this hook?
-    useLayoutEffect(() => {
-        if (element) {
-            const computedStyles = window.getComputedStyle(element);
-            const w = computedStyles.writingMode as WritingMode;
-            const t = computedStyles.textOrientation as TextOrientation;
-            const d = computedStyles.direction as Direction;
-
-            setWritingMode(w || "horizontal-tb");
-            setDirection(d || "rtl");
-            setTextOrientation(t || "mixed");
-        }
-
-    }, [element]);
 
     const getLogicalDirection = useCallback((): LogicalDirectionInfo | null => {
         let writingMode = writingModeRef.current;
@@ -122,7 +132,7 @@ export function useLogicalDirection(element: Element | null | undefined) {
             if (direction?.blockOrientation == "vertical")
                 return "vertical";
 
-                return "horizontal";
+            return "horizontal";
         }
     }, [getLogicalDirection]);
 
@@ -186,6 +196,8 @@ export function useLogicalDirection(element: Element | null | undefined) {
     }, [getLogicalDirection])
 
     return {
+        useLogicalDirectionProps: useRefElementProps,
+        getElement,
         getLogicalDirection,
         convertElementSize,
         convertToLogicalOrientation,

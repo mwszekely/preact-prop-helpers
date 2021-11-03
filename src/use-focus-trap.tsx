@@ -24,7 +24,8 @@ type UseFocusTrapProps<E extends Node> = <P extends UseFocusTrapPropsParameters<
 const elementsToRestoreFocusTo = new Map<Element | null, (Node & HTMLOrSVGElement)>();
 
 export function useFocusTrap<E extends HTMLElement>({ trapActive }: UseFocusTrapParameters): UseFocusTrapReturnType<E> {
-    const { element, useRefElementProps, getElement } = useRefElement<E>();
+    const [element, setElement] = useState<E | null>(null);
+    const { useRefElementProps, getElement } = useRefElement<E>({ onElementChange: setElement });
     //const [lastActiveElement, setLastActiveElement, getLastActiveElement] = useState<Node | null>(null);
     const { getActiveElement, getLastActiveElement, getWindowFocused } = useActiveElement({  });
 
@@ -89,7 +90,6 @@ export function useFocusTrap<E extends HTMLElement>({ trapActive }: UseFocusTrap
 
     return {
         useFocusTrapProps,
-        element,
         getElement
     };
 }

@@ -145,7 +145,8 @@ export function useChildManager<I extends ManagedChildInfo<any>>(): UseChildMana
     const getMountIndex = useCallback((index: K) => { return mountOrder.current.get(index)!; }, []);
 
     const useManagedChild: UsedManagedChild<I> = useCallback(<ChildType extends EventTarget>(info: I) => {
-        const { element, getElement, useRefElementProps } = useRefElement<ChildType>();
+        const [element, onElementChange] = useState<ChildType | null>(null);
+        const { getElement, useRefElementProps } = useRefElement<ChildType>({ onElementChange });
 
         useLayoutEffect(() => {
             let index = getTotalChildrenMounted();
