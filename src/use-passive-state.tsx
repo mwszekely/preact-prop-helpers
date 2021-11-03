@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useRef } from "preact/hooks";
+import { useCallback, useLayoutEffect, useRef } from "preact/hooks";
 import { useStableCallback } from "./use-stable-callback";
 
 
@@ -34,7 +34,7 @@ export function usePassiveState<T>(onChange: undefined | null | OnPassiveStateCh
             cleanupCallback();
     }, []);
 
-    const getValue = useCallback(() => valueRef.current === Unset? undefined : valueRef.current, []);
+    const getValue = useCallback(() => (valueRef.current === Unset? undefined! : valueRef.current!) as T, []);
 
     // The actual code the user calls to (possibly) run a new effect.
     const setValue = useStableCallback<PassiveStateUpdater<T>>((arg) => {
@@ -51,11 +51,10 @@ export function usePassiveState<T>(onChange: undefined | null | OnPassiveStateCh
 
     // Handle running on mount/unmount
     useLayoutEffect(() => {
-        if (initialValue !== undefined) {
+        if (valueRef.current === Unset && initialValue !== undefined) {
             cleanupCallbackRef.current = (onChange?.(initialValue, undefined) ?? undefined);
             valueRef.current = initialValue;
         }
-
 
         return onShouldCleanUp;
     }, []);

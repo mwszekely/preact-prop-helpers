@@ -1,4 +1,5 @@
-import { useRef, useImperativeHandle, useCallback } from "preact/hooks";
+import { useCallback, useRef } from "preact/hooks";
+import { useBeforeLayoutEffect } from "./use-before-layout-effect";
 
 const Unset = Symbol("unset");
 
@@ -15,13 +16,13 @@ const Unset = Symbol("unset");
  * @param value 
  * @returns 
  */
- export function useStableGetter<T>(value: T): () => T {
+export function useStableGetter<T>(value: T): () => T {
     const ref = useRef<T>(Unset as unknown as T);
-    useImperativeHandle(ref, () => value);
-    return useCallback(() => { 
+    useBeforeLayoutEffect(() => { ref.current = value; }, [value]);
+    return useCallback(() => {
         if (ref.current as unknown === Unset) {
             throw new Error('Value retrieved from useStableGetter() cannot be called from useLayoutEffect().')
         }
-        return ref.current; 
+        return ref.current;
     }, [])
 }
