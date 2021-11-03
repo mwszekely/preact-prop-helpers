@@ -11,7 +11,7 @@ export interface UseMutationObserverParameters {
     attributeFilter?: string | string[];
 }
 
-export function useMutationObserver(element?: HTMLElement, options: UseMutationObserverParameters = {}) {
+export function useMutationObserver(getElement: () => null | undefined | HTMLElement, options: UseMutationObserverParameters = {}) {
     let { attributeFilter, subtree, onChildList, characterDataOldValue, onCharacterData, onAttributes, attributeOldValue } = options;
 
     if (typeof attributeFilter === "string")
@@ -27,6 +27,7 @@ export function useMutationObserver(element?: HTMLElement, options: UseMutationO
     const stableOnAttributes = useStableCallback(onAttributes ?? (() => { }));
 
     useEffect(() => {
+        const element = getElement();
         if (element) {
             let observer = new MutationObserver((a) => {
                 for (let mutation of a) {
@@ -59,5 +60,5 @@ export function useMutationObserver(element?: HTMLElement, options: UseMutationO
 
             return () => observer.disconnect();
         }
-    }, [element, attributeKey, subtree, childList, characterDataOldValue, characterData, attributes, attributeOldValue])
+    }, [getElement, attributeKey, subtree, childList, characterDataOldValue, characterData, attributes, attributeOldValue])
 }
