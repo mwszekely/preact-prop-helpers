@@ -23,6 +23,7 @@ options.diffed = (vnode, ...args) => {
             previousInputs.set(id, inputs);
         }
     }
+    toRun.clear();
     originalDiffed?.(vnode, ...args);
 }
 /*
