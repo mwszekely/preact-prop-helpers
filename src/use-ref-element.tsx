@@ -1,6 +1,6 @@
 import { h, RefCallback } from "preact";
 import { useCallback, useState } from "preact/hooks";
-import { OnPassiveStateChange, usePassiveState } from "use-passive-state";
+import { OnPassiveStateChange, usePassiveState } from "./use-passive-state";
 import { useMergedProps } from "./use-merged-props";
 
 export type UseRefElementPropsReturnType<T, P extends {}> = P;
