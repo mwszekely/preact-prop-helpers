@@ -571,6 +571,8 @@ var bundle = (function (exports) {
     function useBeforeLayoutEffect(effect, inputs) {
         const [id] = l(() => generateRandomId());
         toRun.set(id, { effect, inputs });
+        y(() => {
+        }, [id]);
     }
     function argsChanged(oldArgs, newArgs) {
         return !!(!oldArgs ||
