@@ -98,9 +98,9 @@ export interface UseActiveElementParameters {
 
 export function useActiveElement({ onActiveElementChange, onLastActiveElementChange, onWindowFocusedChanged }: UseActiveElementParameters) {
 
-    const [getActiveElement, setActiveElement] = usePassiveState(onActiveElementChange, undefined);
-    const [getLastActiveElement, setLastActiveElement] = usePassiveState(onLastActiveElementChange, undefined);
-    const [getWindowFocused, setWindowFocused] = usePassiveState(onWindowFocusedChanged, windowFocused);
+    const [getActiveElement, setActiveElement] = usePassiveState<(Element & HTMLOrSVGElement) | null>(onActiveElementChange, undefined);
+    const [getLastActiveElement, setLastActiveElement] = usePassiveState<(Element & HTMLOrSVGElement)>(onLastActiveElementChange, undefined);
+    const [getWindowFocused, setWindowFocused] = usePassiveState<boolean>(onWindowFocusedChanged, windowFocused);
 
     useLayoutEffect(() => {
 

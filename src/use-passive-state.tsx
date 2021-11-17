@@ -23,7 +23,7 @@ export type OnPassiveStateChange<T> = ((value: T, prevValue: T | undefined) => (
  * @param initialValue If provided, the effect will be invoked once with this value on mount.
  * @returns 
  */
-export function usePassiveState<T>(onChange: undefined | null | OnPassiveStateChange<T>, initialValue?: T) {
+export function usePassiveState<T>(onChange: undefined | null | OnPassiveStateChange<T>, initialValue?: T): readonly [() => T, PassiveStateUpdater<T>] {
     const valueRef = useRef<T | typeof Unset>(initialValue === undefined? Unset : initialValue);
     const cleanupCallbackRef = useRef<undefined | (() => void)>(undefined);
 

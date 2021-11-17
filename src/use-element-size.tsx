@@ -1,7 +1,6 @@
 import { h } from "preact";
-import { useCallback, useEffect } from "preact/hooks";
+import { useEffect, useRef } from "preact/hooks";
 import { useRefElement, UseRefElementProps } from "./use-ref-element";
-import { useStableCallback } from "./use-stable-callback";
 
 interface UseElementSizeParameters {
     /**
@@ -46,11 +45,13 @@ export interface UseElementSizeReturnType<E extends HTMLElement> {
 
 export function useElementSize<E extends HTMLElement>({ observeBox, setSize }: UseElementSizeParameters): UseElementSizeReturnType<E> {
 
-    const handleParamUpdate = useCallback((element: E | null, observeBox: UseElementSizeParameters["observeBox"]) => {
+    const currentObserveBox = useRef<ResizeObserverBoxOptions | undefined>(observeBox);
+
+    const needANewObserver = (element: E | null, observeBox: ResizeObserverBoxOptions | undefined ) => {
         if (element) {
             const handleUpdate = () => {
                 const { clientWidth, scrollWidth, offsetWidth, clientHeight, scrollHeight, offsetHeight, clientLeft, scrollLeft, offsetLeft, clientTop, scrollTop, offsetTop } = element;
-                stableSetSize({ clientWidth, scrollWidth, offsetWidth, clientHeight, scrollHeight, offsetHeight, clientLeft, scrollLeft, offsetLeft, clientTop, scrollTop, offsetTop });
+                setSize({ clientWidth, scrollWidth, offsetWidth, clientHeight, scrollHeight, offsetHeight, clientLeft, scrollLeft, offsetLeft, clientTop, scrollTop, offsetTop });
             }
             if (!("ResizeObserver" in window)) {
                 document.addEventListener("resize", handleUpdate, { passive: true });
@@ -60,16 +61,19 @@ export function useElementSize<E extends HTMLElement>({ observeBox, setSize }: U
                 const observer = new ResizeObserver((entries) => { handleUpdate(); });
 
                 observer.observe(element, { box: observeBox });
+                currentObserveBox.current = observeBox;
 
                 return () => observer.disconnect();
             }
         }
-    }, []);
+    }
 
-    const { getElement, useRefElementProps } = useRefElement<E>({ onElementChange: e => handleParamUpdate(e, observeBox) });
-    useEffect(() => { handleParamUpdate(getElement(), observeBox); }, [observeBox])
+    const { getElement, useRefElementProps } = useRefElement<E>({ onElementChange: e => needANewObserver(e, observeBox) });
 
-    const stableSetSize = useStableCallback(setSize);
+    useEffect(() => {
+        if (currentObserveBox.current !== observeBox)
+            needANewObserver(getElement(), observeBox);
+    }, [observeBox]);
 
     return {
         getElement,

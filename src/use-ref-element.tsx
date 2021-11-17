@@ -1,7 +1,7 @@
 import { h, RefCallback } from "preact";
-import { useCallback } from "preact/hooks";
+import { useCallback, useState } from "preact/hooks";
+import { OnPassiveStateChange, usePassiveState } from "use-passive-state";
 import { useMergedProps } from "./use-merged-props";
-import { OnPassiveStateChange, usePassiveState } from "./use-passive-state";
 
 export type UseRefElementPropsReturnType<T, P extends {}> = P;
 
@@ -10,6 +10,10 @@ export type UseRefElementProps<T> = <P extends {}>(props: P) => UseRefElementPro
 export interface UseRefElementReturnType<T> {
     getElement: () => T | null;
     useRefElementProps: UseRefElementProps<T>;
+}
+
+export interface UseRefElementParameters<T> {
+    onElementChange?: OnPassiveStateChange<T | null>;
 }
 
 /**
@@ -21,9 +25,9 @@ export interface UseRefElementReturnType<T> {
  * 
  * @returns The element, and the sub-hook that makes it retrievable.
  */
-export function useRefElement<T>({ onElementChange }: { onElementChange?: OnPassiveStateChange<T> }): UseRefElementReturnType<T> {
+export function useRefElement<T>({ onElementChange }: UseRefElementParameters<T>): UseRefElementReturnType<T> {
     // Let us store the actual (reference to) the element we capture
-    const [getElement, setElement] = usePassiveState<T | null>(onElementChange as OnPassiveStateChange<T | null>, null);
+    const [getElement, setElement] = usePassiveState<T | null>(onElementChange, null);
 
     // Create a RefCallback that's fired when mounted 
     // and that notifies us of our element when we have it
@@ -45,7 +49,8 @@ export function useRefElement<T>({ onElementChange }: { onElementChange?: OnPass
 function test<T extends HTMLElement>() {
     function foo<P extends h.JSX.HTMLAttributes<T>>(props: P) {
 
-        const { getElement, useRefElementProps } = useRefElement<T>({});
+        const [element, setElement] = useState<T | null>(null);
+        const { useRefElementProps } = useRefElement<T>({ onElementChange: setElement });
         const p1 = useRefElementProps(props);
         if (p1.style == undefined) {
 
