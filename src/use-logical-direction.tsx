@@ -2,6 +2,7 @@ import { useCallback, useLayoutEffect, useRef, useState } from "preact/hooks";
 import { useRefElement } from "./use-ref-element";
 import { ElementSize, useElementSize } from "./use-element-size";
 import { usePassiveState } from "./use-passive-state";
+import { h } from "preact";
 
 //export type BlockFlowDirection = "downwards" | "leftwards" | "rightwards";
 export type PhysicalDirection = "ltr" | "rtl" | "ttb" | "btt";
@@ -95,7 +96,7 @@ export function useLogicalDirection<T extends Element>({ onLogicalDirectionChang
     // and if so, tests if the writing mode has changed too.
     //
     // This will work for at least some number of cases, but a better solution is still needed.
-    useElementSize({ onSizeChange: _ => updateLogicalInfo(getElement()!) })
+    const { useElementSizeProps } = useElementSize({ onSizeChange: _ => updateLogicalInfo(getElement()!) })
 
     const [getLogicalDirectionInfo, setLogicalDirectionInfo] = usePassiveState<LogicalDirectionInfo>(onLogicalDirectionChange);
 
@@ -178,10 +179,10 @@ export function useLogicalDirection<T extends Element>({ onLogicalDirectionChang
 
         return null;
 
-    }, [])
+    }, []);
 
     return {
-        useLogicalDirectionProps: useRefElementProps,
+        useLogicalDirectionProps: useCallback((props: h.JSX.HTMLAttributes<T>) => useRefElementProps(useElementSizeProps(props)), []),
         getElement,
         getLogicalDirectionInfo,
         convertElementSize,

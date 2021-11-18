@@ -6,7 +6,7 @@ export type PassiveStateUpdater<S> = (value: S | ((prevState: S | undefined) => 
 export type OnPassiveStateChange<T> = ((value: T, prevValue: T | undefined) => (void | (() => void)));
 
 /**
- * Similar to `useState`, but for values that aren't "render-important" &ndash; updates don't cause a re-render and so the value shouldn't be used during render (though it certainly can).
+ * Similar to `useState`, but for values that aren't "render-important" &ndash; updates don't cause a re-render and so the value shouldn't be used during render (though it certainly can, at least by re-rendering again).
  * 
  * To compensate for this, you should pass a `useEffect`-esque callback that is run whenever the value changes.  Just like `useEffect`, this callback can return a cleanup function that's run before the value changes.  If you would like to re-render when the value changes (or, say, when the value meets some criteria), this is where you'll want to put in a call to a `setState` function.
  * 
@@ -52,7 +52,8 @@ export function usePassiveState<T>(onChange: undefined | null | OnPassiveStateCh
         }
     });
 
-    const getValue = useCallback(() => {
+
+    const getValue = useStableCallback(() => {
         if (warningRef.current)
             console.warn("During onChange, prefer using the (value, prevValue) arguments instead of getValue -- it's ambiguous as to if you're asking for the old or new value at this point in time for this component.");
 
@@ -63,13 +64,13 @@ export function usePassiveState<T>(onChange: undefined | null | OnPassiveStateCh
             tryEnsureValue();
 
         return (valueRef.current === Unset ? undefined! : valueRef.current!) as T;
-    }, []);
+    });
 
     useLayoutEffect(() => {
         // Make sure we've run our effect at least once on mount.
         // (If we have an initial value, of course)
         tryEnsureValue();
-    }, [])
+    }, []);
 
     // The actual code the user calls to (possibly) run a new effect.
     const setValue = useStableCallback<PassiveStateUpdater<T>>((arg) => {

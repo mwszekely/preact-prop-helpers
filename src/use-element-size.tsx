@@ -55,7 +55,7 @@ function extractElementSize(element: Element | undefined | null): ElementSize {
 
 export function useElementSize<E extends HTMLElement>({ observeBox, onSizeChange }: UseElementSizeParameters): UseElementSizeReturnType<E> {
 
-    const [getSize, setSize] = usePassiveState(onSizeChange, () => extractElementSize(getElement()));
+    const [getSize, setSize] = usePassiveState(onSizeChange);
 
     const currentObserveBox = useRef<ResizeObserverBoxOptions | undefined>(observeBox);
 
