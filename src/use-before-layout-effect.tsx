@@ -1,6 +1,6 @@
 
 import { options, VNode } from "preact";
-import { EffectCallback, Inputs, useLayoutEffect, useState } from "preact/hooks";
+import { EffectCallback, Inputs, useEffect, useLayoutEffect, useState } from "preact/hooks";
 import { generateRandomId } from "./use-random-id";
 
 const previousInputs = new Map<string, Inputs | undefined>();
@@ -39,6 +39,13 @@ options.diffed = (vnode, ...args) => {
 export function useBeforeLayoutEffect(effect: EffectCallback, inputs?: Inputs) {
     const [id] = useState(() => generateRandomId());
     toRun.set(id, { effect, inputs });
+
+    useEffect(() => {
+        return () => {
+            toRun.delete(id);
+            previousInputs.delete(id);
+        }
+    }, [id])
 }
 
 function argsChanged(oldArgs?: Inputs, newArgs?: Inputs): boolean {
