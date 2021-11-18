@@ -27,7 +27,7 @@ export interface UseRefElementParameters<T> {
  */
 export function useRefElement<T>({ onElementChange }: UseRefElementParameters<T>): UseRefElementReturnType<T> {
     // Let us store the actual (reference to) the element we capture
-    const [getElement, setElement] = usePassiveState<T | null>(onElementChange, null);
+    const [getElement, setElement] = usePassiveState<T | null>(onElementChange, () => null);
 
     // Create a RefCallback that's fired when mounted 
     // and that notifies us of our element when we have it

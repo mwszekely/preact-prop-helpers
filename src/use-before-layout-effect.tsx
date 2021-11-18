@@ -26,22 +26,7 @@ options.diffed = (vnode, ...args) => {
     toRun.clear();
     originalDiffed?.(vnode, ...args);
 }
-/*
-const originalBeforeCommit = (options as any)._commit;
-(options as any)._commit = (vnode: VNode, commitQueue: any, ...args: any[]) => {
-    debugger;
-    
-    for (let [id, { effect, inputs }] of toRun) {
-        const oldInputs = previousInputs.get(id);
-        if (argsChanged(oldInputs, inputs)) {
-            effect();
-            previousInputs.set(id, inputs);
-        }
-    }
 
-    originalBeforeCommit(vnode, commitQueue, ...args);
-}
-*/
 /**
  * Semi-private function to allow stable callbacks even within `useLayoutEffect` and ref assignment.
  * 

@@ -1,6 +1,7 @@
 import { h } from "preact";
 import { useEffect, useRef } from "preact/hooks";
 import { useRefElement, UseRefElementProps } from "./use-ref-element";
+import { usePassiveState } from "./use-passive-state";
 
 interface UseElementSizeParameters {
     /**
@@ -10,7 +11,7 @@ interface UseElementSizeParameters {
      * values you use if you'd like.
      * @param sizeInfo 
      */
-    setSize(sizeInfo: ElementSize): void;
+    onSizeChange(sizeInfo: ElementSize): void;
 
     /**
      * Passed as an argument to the created ResizeObserver.
@@ -26,28 +27,39 @@ export interface UseElementSizePropsParameters<E extends HTMLElement> extends h.
 export interface ElementSize {
     clientWidth: number;
     scrollWidth: number;
-    offsetWidth: number;
+    offsetWidth: number | undefined;
     clientHeight: number;
     scrollHeight: number;
-    offsetHeight: number;
+    offsetHeight: number | undefined;
     clientLeft: number;
     scrollLeft: number;
-    offsetLeft: number;
+    offsetLeft: number | undefined;
     clientTop: number;
     scrollTop: number;
-    offsetTop: number;
+    offsetTop: number | undefined;
 }
 
 export interface UseElementSizeReturnType<E extends HTMLElement> {
     getElement(): E | null;
+    getSize(): ElementSize | null;
     useElementSizeProps: UseElementSizeProps<E>;
 }
 
-export function useElementSize<E extends HTMLElement>({ observeBox, setSize }: UseElementSizeParameters): UseElementSizeReturnType<E> {
+function extractElementSize(element: Element | undefined | null): ElementSize {
+    if (!element)
+        throw new Error("Cannot retrieve the size of an element that has not been rendered yet");
+
+    const { clientWidth, scrollWidth, offsetWidth, clientHeight, scrollHeight, offsetHeight, clientLeft, scrollLeft, offsetLeft, clientTop, scrollTop, offsetTop } = (element as (Element & Partial<HTMLElement>));
+    return ({ clientWidth, scrollWidth, offsetWidth, clientHeight, scrollHeight, offsetHeight, clientLeft, scrollLeft, offsetLeft, clientTop, scrollTop, offsetTop });
+}
+
+export function useElementSize<E extends HTMLElement>({ observeBox, onSizeChange }: UseElementSizeParameters): UseElementSizeReturnType<E> {
+
+    const [getSize, setSize] = usePassiveState(onSizeChange, () => extractElementSize(getElement()));
 
     const currentObserveBox = useRef<ResizeObserverBoxOptions | undefined>(observeBox);
 
-    const needANewObserver = (element: E | null, observeBox: ResizeObserverBoxOptions | undefined ) => {
+    const needANewObserver = (element: E | null, observeBox: ResizeObserverBoxOptions | undefined) => {
         if (element) {
             const handleUpdate = () => {
                 const { clientWidth, scrollWidth, offsetWidth, clientHeight, scrollHeight, offsetHeight, clientLeft, scrollLeft, offsetLeft, clientTop, scrollTop, offsetTop } = element;
@@ -77,6 +89,7 @@ export function useElementSize<E extends HTMLElement>({ observeBox, setSize }: U
 
     return {
         getElement,
+        getSize,
         useElementSizeProps: useRefElementProps
     }
 

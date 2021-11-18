@@ -121,7 +121,7 @@ export function useLinearNavigation<ChildElement extends Element>({ index, navig
 
         // Prefer the parent element's direction so that we're not calling getComputedStyle
         // on every single individual child, which is likely redundant.
-        const { convertElementSize, getLogicalDirection, useLogicalDirectionProps } = useLogicalDirection<ChildElement>();
+        const { convertElementSize, getLogicalDirectionInfo, useLogicalDirectionProps } = useLogicalDirection<ChildElement>({});
 
         const useLinearNavigationChildProps: UseLinearNavigationChildProps<ChildElement> = (props) => {
 
@@ -131,7 +131,7 @@ export function useLinearNavigation<ChildElement extends Element>({ index, navig
                     return;
 
                 let index = getIndex();
-                const info = getLogicalDirection();
+                const info = getLogicalDirectionInfo();
 
                 let allowsBlockNavigation = (navigationDirection == "block" || navigationDirection == "either");
                 let allowsInlineNavigation = (navigationDirection == "inline" || navigationDirection == "either");

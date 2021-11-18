@@ -66,7 +66,7 @@ const DemoUseElementSizeAnimation = () => {
 
     const [elementSize, setElementSize] = useState<ElementSize | null>(null);
 
-    const { useElementSizeProps } = useElementSize<HTMLDivElement>({ setSize: setElementSize });
+    const { useElementSizeProps } = useElementSize<HTMLDivElement>({ onSizeChange: setElementSize });
 
     return (
         <div {...useElementSizeProps({ ref: undefined, className: "demo", style: { height: `${(height * 100) + 100}px` } })}>
@@ -233,19 +233,27 @@ const DemoFocus = memo(() => {
     const [focused, setFocused, getFocused] = useState(false);
     const [focusedInner, setFocusedInner, getFocusedInner] = useState(false);
     const [lastFocused, setLastFocused, getLastFocused] = useState(false);
-    const [lastFdInner, setLastFocusedInner, getLastFocusedInner] = useState(false);
-    const { useHasFocusProps } = useHasFocus<HTMLDivElement>({ onFocusedChanged: setFocused, onFocusedInnerChanged: setFocusedInner, onLastFocusedChanged: setLastFocused, onLastFocusedInnerChanged: setLastFocusedInner });
+    const [lastFocusedInner, setLastFocusedInner, getLastFocusedInner] = useState(false);
+    const { useHasFocusProps } = useHasFocus<HTMLDivElement>({ 
+        onFocusedChanged: setFocused, 
+        onFocusedInnerChanged: setFocusedInner, 
+        onLastFocusedChanged: setLastFocused, 
+        onLastFocusedInnerChanged: setLastFocusedInner,
+        onActiveElementChange: setActiveElement,
+        onLastActiveElementChange: setLastActiveElement,
+        onWindowFocusedChange: setWindowFocused
+     });
     return (
         <div class="demo">
             <h2>useHasFocus</h2>
             <div {...useHasFocusProps({ style: { border: "1px solid black" }, tabIndex: 0 })} >Outer <div tabIndex={0} style={{ border: "1px solid black" }}>Inner element</div></div>
             <div>
                 <ul>
-                    <li>Strictly focused: {focused.toString()}</li>
-                    <li>Inner focused: {focusedInner.toString()}</li>
+                    <li>Strictly focused: {focused.toString()}, {lastFocused.toString()}</li>
+                    <li>Inner focused: {focusedInner.toString()}, {lastFocusedInner.toString()}</li>
                     <li>Window focused: {windowFocused.toString()}</li>
-                    <li>activeElement: {activeElement?.tagName}</li>
-                    <li>lastActiveElement: {lastActiveElement?.tagName}</li>
+                    <li>activeElement: {activeElement?.textContent}</li>
+                    <li>lastActiveElement: {lastActiveElement?.textContent}</li>
                 </ul>
             </div>
         </div>

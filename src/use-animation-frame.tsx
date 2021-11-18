@@ -9,7 +9,14 @@ export interface UseAnimationFrameParameters {
     callback: null | ((msSinceLast: number) => void);
 }
 
-export function useAnimationFrame({ callback }: UseAnimationFrameParameters) {
+/**
+ * The (optionally non-stable) `callback` you provide will start running every frame after the component mounts.
+ * 
+ * Passing `null` is fine and simply stops the effect until you restart it by providing a non-null callback.
+ * 
+ * **This hook does not return anything at all, including no prop-modifying hooks**
+ */
+export function useAnimationFrame({ callback }: UseAnimationFrameParameters): void {
     // Get a wrapper around the given callback that's stable
     const stableCallback = useStableCallback(callback ?? (() => { }));
     const hasCallback = (callback != null);

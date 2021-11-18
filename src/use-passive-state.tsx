@@ -23,8 +23,9 @@ export type OnPassiveStateChange<T> = ((value: T, prevValue: T | undefined) => (
  * @param initialValue If provided, the effect will be invoked once with this value on mount.
  * @returns 
  */
-export function usePassiveState<T>(onChange: undefined | null | OnPassiveStateChange<T>, initialValue?: T): readonly [() => T, PassiveStateUpdater<T>] {
-    const valueRef = useRef<T | typeof Unset>(initialValue === undefined? Unset : initialValue);
+export function usePassiveState<T>(onChange: undefined | null | OnPassiveStateChange<T>, getInitialValue?: () => T): readonly [() => T, PassiveStateUpdater<T>] {
+    const valueRef = useRef<T | typeof Unset>(Unset);
+    const warningRef = useRef(false);
     const cleanupCallbackRef = useRef<undefined | (() => void)>(undefined);
 
     // Shared between "dependency changed" and "component unmounted".
@@ -34,30 +35,61 @@ export function usePassiveState<T>(onChange: undefined | null | OnPassiveStateCh
             cleanupCallback();
     }, []);
 
-    const getValue = useCallback(() => (valueRef.current === Unset? undefined! : valueRef.current!) as T, []);
-
-    // The actual code the user calls to (possibly) run a new effect.
-    const setValue = useStableCallback<PassiveStateUpdater<T>>((arg) => {
-        const prevDep = valueRef.current === Unset ? undefined : valueRef.current;
-        const dep = arg instanceof Function? arg(prevDep!) : arg;
-
-        if (dep !== valueRef.current) {
-            onShouldCleanUp();
-            cleanupCallbackRef.current = (onChange?.(dep, prevDep) ?? undefined);
-            valueRef.current = dep;
+    // There are a couple places where we'd like to use our initial
+    // value in place of having no value at all yet.
+    // This is the shared code for that, used on mount and whenever
+    // getValue is called.
+    const tryEnsureValue = useStableCallback(() => {
+        if (valueRef.current === Unset && getInitialValue != undefined) {
+            try {
+                const initialValue = getInitialValue();
+                valueRef.current = initialValue;
+                cleanupCallbackRef.current = (onChange?.(initialValue, undefined) ?? undefined);
+            }
+            catch (ex) {
+                // Exceptions are intentional to allow bailout (without exposing the Unset symbol)
+            }
         }
     });
 
+    const getValue = useCallback(() => {
+        if (warningRef.current)
+            console.warn("During onChange, prefer using the (value, prevValue) arguments instead of getValue -- it's ambiguous as to if you're asking for the old or new value at this point in time for this component.");
 
-    // Handle running on mount/unmount
-    useLayoutEffect(() => {
-        if (valueRef.current === Unset && initialValue !== undefined) {
-            cleanupCallbackRef.current = (onChange?.(initialValue, undefined) ?? undefined);
-            valueRef.current = initialValue;
-        }
+        // The first time we call getValue, if we haven't been given a value yet,
+        // (and we were given an initial value to use)
+        // return the initial value instead of nothing.
+        if (valueRef.current === Unset)
+            tryEnsureValue();
 
-        return onShouldCleanUp;
+        return (valueRef.current === Unset ? undefined! : valueRef.current!) as T;
     }, []);
+
+    useLayoutEffect(() => {
+        // Make sure we've run our effect at least once on mount.
+        // (If we have an initial value, of course)
+        tryEnsureValue();
+    }, [])
+
+    // The actual code the user calls to (possibly) run a new effect.
+    const setValue = useStableCallback<PassiveStateUpdater<T>>((arg) => {
+        const prevDep = getValue();
+        const dep = arg instanceof Function ? arg(prevDep!) : arg;
+
+        if (dep !== valueRef.current) {
+
+            // Indicate to the user that they shouldn't call getValue during onChange
+            warningRef.current = true;
+
+            // Call any registerd cleanup function
+            onShouldCleanUp();
+            cleanupCallbackRef.current = (onChange?.(dep, prevDep) ?? undefined);
+            valueRef.current = dep;
+
+            // Allow the user to normally call getValue again
+            warningRef.current = false;
+        }
+    });
 
     return [getValue, setValue] as const;
 }

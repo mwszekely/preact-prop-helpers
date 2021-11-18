@@ -30,19 +30,13 @@ export type UseRandomIdProps = <P extends UseRandomIdPropsParameters>(p: P) => U
 export type UseRandomIdPropsParameters = UseReferencedIdPropsParameters<"id">;
 export type UseRandomIdPropsReturnType<P extends UseRandomIdPropsParameters> = UseReferencedIdPropsReturnType<P, "id">;
 
-//export type UseReferencedIdPropsParameters = { id?: string | undefined; }
-//export type UseReferencedIdPropsHelper<E extends Element, P extends UseRandomIdPropsParameters<E>> = <K extends keyof P>(idProp: K) => UseReferencedIdPropsHelperReturnType<E, P, K>;
-//export type UseReferencedIdPropsHelperReturnType<E extends Element, P extends UseRandomIdPropsParameters<E>, K extends keyof P> = MergedProps<{ [K2 in K]: string }, Omit<P, K>>;
-
 export interface UseRandomIdParameters { prefix?: string; }
 
 export type UseReferencedIdProps<K extends keyof h.JSX.HTMLAttributes<any>> = <P extends UseReferencedIdPropsParameters<any>>(props: P) => UseReferencedIdPropsReturnType<P, K>;
 export type UseReferencedIdPropsParameters<K extends keyof h.JSX.HTMLAttributes<any>> = Partial<Record<K, any>>;//<E extends Element> extends h.JSX.HTMLAttributes<E> { };
 
 
-export type UseReferencedIdPropsReturnType<P extends UseReferencedIdPropsParameters<any>, K extends keyof h.JSX.HTMLAttributes<any>> =
-    Omit<P, K> & Record<K, string>;
-//MergedProps<Record<K, GenericGet<P, K, string>>, P>;
+export type UseReferencedIdPropsReturnType<P extends UseReferencedIdPropsParameters<any>, K extends keyof h.JSX.HTMLAttributes<any>> = Omit<P, K> & Record<K, string>;
 
 export interface UseRandomIdReturnType {
     randomId: string;

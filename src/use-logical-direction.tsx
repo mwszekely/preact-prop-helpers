@@ -1,6 +1,7 @@
 import { useCallback, useLayoutEffect, useRef, useState } from "preact/hooks";
 import { useRefElement } from "./use-ref-element";
-import type { ElementSize } from "./use-element-size";
+import { ElementSize, useElementSize } from "./use-element-size";
+import { usePassiveState } from "./use-passive-state";
 
 //export type BlockFlowDirection = "downwards" | "leftwards" | "rightwards";
 export type PhysicalDirection = "ltr" | "rtl" | "ttb" | "btt";
@@ -19,19 +20,23 @@ function capitalize<T extends string>(str: T): Capitalize<T> {
     return (str[0].toUpperCase() + str.substr(1)) as Capitalize<T>;
 }
 
+export interface UseLogicalDirectionParameters {
+    onLogicalDirectionChange?(info: LogicalDirectionInfo): void;
+}
+
 export interface LogicalElementSize {
     clientInlineSize: number;
     scrollInlineSize: number;
-    offsetInlineSize: number;
+    offsetInlineSize: number | undefined;
     clientBlockSize: number;
     scrollBlockSize: number;
-    offsetBlockSize: number;
+    offsetBlockSize: number | undefined;
     clientInlineInset: number;
     scrollInlineInset: number;
-    offsetInlineInset: number;
+    offsetInlineInset: number | undefined;
     clientBlockInset: number;
     scrollBlockInset: number;
-    offsetBlockInset: number;
+    offsetBlockInset: number | undefined;
 }
 
 /**
@@ -50,17 +55,22 @@ export interface LogicalElementSize {
  * * `convertToLogicalOrientation`: Based on the current direction, converts "horizontal" or "vertical" to "inline" or "block".
  * * `convertToPhysicalOrientation`:  Based on the current direction, converts "inline" or "block" to "horizontal" or "vertical".
  */
-export function useLogicalDirection<T extends Element>() {
+export function useLogicalDirection<T extends Element>({ onLogicalDirectionChange }: UseLogicalDirectionParameters) {
 
-    // TODO: There's no way to refresh which writing mode we have once mounted.
-    // If the writing mode changes, the whole component needs to 
-    // mount/unmount because (more-or-less in order of importance)
-    //   A. There's no way to watch for CSS style changes
-    //   B. Calling getComputedStyle after every render for every element gets expensive fast and
-    //   C. Is not necessary for most use cases that will never switch writing-mode within a single component
-    //      (Those that do will need to mount and unmount the component that uses it)
-    //
-    // Maybe there could be a context object that can be used to remotely update all components that use this hook?
+    const updateLogicalInfo = useCallback((element: T) => {
+        console.assert(element.isConnected);
+        element = (element!.parentElement ?? element) as T;
+        const computedStyles = window.getComputedStyle(element);
+        let w = computedStyles.writingMode as WritingMode;
+        let d = computedStyles.direction as Direction;
+        let t = computedStyles.textOrientation as TextOrientation;
+
+        if (t == "upright")
+            d = "ltr";
+
+        setLogicalDirectionInfo({ ...WritingModes[w ?? "horizontal-tb"][d ?? "ltr"] });
+    }, []);
+
     const { getElement, useRefElementProps } = useRefElement<T | null>({
         onElementChange: (element) => {
             if (element) {
@@ -68,61 +78,36 @@ export function useLogicalDirection<T extends Element>() {
                 // Wait a moment so that we can properly use `getComputedStyle`
                 // (since we only read it on mount)
                 queueMicrotask(() => {
-                    console.assert(element!.isConnected);
-                    element = (element!.parentElement ?? element) as T;
-                    const computedStyles = window.getComputedStyle(element);
-                    const w = computedStyles.writingMode as WritingMode;
-                    const t = computedStyles.textOrientation as TextOrientation;
-                    const d = computedStyles.direction as Direction;
-
-                    setWritingMode(w || "horizontal-tb");
-                    setDirection(d || "rtl");
-                    setTextOrientation(t || "mixed");
+                    updateLogicalInfo(element!);
                 })
 
             }
         }
     });
 
-    const [writingMode, setWritingMode] = useState<WritingMode | null>(null);
-    const [direction, setDirection] = useState<Direction | null>(null);
-    const [textOrientation, setTextOrientation] = useState<TextOrientation | null>(null);
+    // TODO: There's no way to refresh which writing mode we have once mounted.
+    //   A. There's no way to watch for CSS style changes
+    //   B. Calling getComputedStyle after every render for every element gets expensive fast and
+    //   C. Is not necessary for most use cases that will never switch writing-mode within a single component
+    //      (Those that do will need to mount and unmount the component that uses it)
+    //
+    // As a solution, here's a cheap workaround that checks when the element's size has changed,
+    // and if so, tests if the writing mode has changed too.
+    //
+    // This will work for at least some number of cases, but a better solution is still needed.
+    useElementSize({ onSizeChange: _ => updateLogicalInfo(getElement()!) })
 
-    const writingModeRef = useRef<WritingMode | null>(writingMode);
-    const directionRef = useRef<Direction | null>(direction);
-    const textOrientationRef = useRef<TextOrientation | null>(textOrientation);
-
-    useLayoutEffect(() => { writingModeRef.current = writingMode; }, [writingMode]);
-    useLayoutEffect(() => { directionRef.current = direction; }, [direction]);
-    useLayoutEffect(() => { textOrientationRef.current = textOrientation; }, [textOrientation]);
-
-
-    const getLogicalDirection = useCallback((): LogicalDirectionInfo | null => {
-        let writingMode = writingModeRef.current;
-        let direction = directionRef.current;
-        let textOrientation = textOrientationRef.current;
-
-        if (!writingMode || !direction || !textOrientation)
-            return null;
-
-        if (textOrientation == "upright")
-            direction = "ltr";
-
-        return {
-            ...WritingModes[writingMode ?? "horizontal-tb"][direction ?? "ltr"]
-        }
-
-    }, [writingModeRef, directionRef, textOrientationRef]);
+    const [getLogicalDirectionInfo, setLogicalDirectionInfo] = usePassiveState<LogicalDirectionInfo>(onLogicalDirectionChange);
 
     const convertToLogicalOrientation = useCallback((elementOrientation: PhysicalOrientation, direction?: LogicalDirectionInfo | null | undefined) => {
-        direction ??= getLogicalDirection();
+        direction ??= getLogicalDirectionInfo();
         if (direction?.inlineOrientation === elementOrientation)
             return "inline";
         return "block";
-    }, [getLogicalDirection]);
+    }, []);
 
     const convertToPhysicalOrientation = useCallback((elementOrientation: LogicalOrientation, direction?: LogicalDirectionInfo | null | undefined) => {
-        direction ??= getLogicalDirection();
+        direction ??= getLogicalDirectionInfo();
         if (elementOrientation == "inline") {
             if (direction?.inlineOrientation == "horizontal")
                 return "horizontal";
@@ -134,10 +119,10 @@ export function useLogicalDirection<T extends Element>() {
 
             return "horizontal";
         }
-    }, [getLogicalDirection]);
+    }, []);
 
     const convertElementSize = useCallback((elementSize: ElementSize, direction?: LogicalDirectionInfo | null | undefined): LogicalElementSize | null => {
-        direction ??= getLogicalDirection();
+        direction ??= getLogicalDirectionInfo();
         if (direction) {
             const { inlineSize, blockSize, inlineDirection, blockDirection } = direction;
 
@@ -167,12 +152,12 @@ export function useLogicalDirection<T extends Element>() {
 
             let clientInlineInset = elementSize[`client${capitalize(f1)}`] + (!f2 ? 0 : elementSize[`client${capitalize(f2)}`]);
             let scrollInlineInset = elementSize[`scroll${capitalize(f1)}`] + (!f2 ? 0 : elementSize[`scroll${capitalize(f2)}`]);
-            let offsetInlineInset = elementSize[`offset${capitalize(f1)}`] + (!f2 ? 0 : elementSize[`offset${capitalize(f2)}`]);
+            let offsetInlineInset = elementSize[`offset${capitalize(f1)}`] == undefined ? undefined : (elementSize[`offset${capitalize(f1)}`]! + (!f2 ? 0 : elementSize[`offset${capitalize(f2)}`]!));
 
 
             let clientBlockInset = elementSize[`client${capitalize(f3)}`] + (!f4 ? 0 : elementSize[`client${capitalize(f4)}`]);
             let scrollBlockInset = elementSize[`scroll${capitalize(f3)}`] + (!f4 ? 0 : elementSize[`scroll${capitalize(f4)}`]);
-            let offsetBlockInset = elementSize[`offset${capitalize(f3)}`] + (!f4 ? 0 : elementSize[`offset${capitalize(f4)}`]);
+            let offsetBlockInset = elementSize[`offset${capitalize(f3)}`] == undefined ? undefined : (elementSize[`offset${capitalize(f3)}`]! + (!f4 ? 0 : elementSize[`offset${capitalize(f4)}`]!));
 
 
             return {
@@ -193,12 +178,12 @@ export function useLogicalDirection<T extends Element>() {
 
         return null;
 
-    }, [getLogicalDirection])
+    }, [])
 
     return {
         useLogicalDirectionProps: useRefElementProps,
         getElement,
-        getLogicalDirection,
+        getLogicalDirectionInfo,
         convertElementSize,
         convertToLogicalOrientation,
         convertToPhysicalOrientation

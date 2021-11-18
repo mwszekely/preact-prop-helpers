@@ -269,7 +269,15 @@ element it references.
 
 ## `useActiveElement`
 
-Allows monitoring which element is currently focused, which element was most recently focused (that's not `body`), and and whether or not the window overall has focus or not.
+Allows you to inspect which element in the `document` currently has focus, which was most recently focused if none are currently, and whether or not the window has focus by returning the following functions:
+* `getActiveElement()`
+* `getLastActiveElement()`
+* `getWindowFocused()`
+* **No prop-modifying hook is returned because none is necessary**
+
+(The document's body receiving focus, like it does when you click on an empty area, is counted as no element having focus for all intents and purposes)
+
+This is a passive hook, so by default it returns getter functions that report this information but the component will not re-render by default when the active element changes. If you need the component to re-render when the active element changes, use the `on*Change` arguments to set some state on your end.
 
 ## `useGlobalHandler`, `useLocalHandler`
 
@@ -301,6 +309,14 @@ Given a value every render, returns a callback that returns that value and, impo
 ## `useStableCallback`
 
 Very similar to `useStableGetter`; returns a callback that is stable between renders, but always calls your callback.  Basically just syntactic sugar to save a parantheses pair.
+
+## `usePassiveState`
+
+Like a mashup of `useEffect` and `useState`, `usePassiveEffect` lets you use state that won't (necessarily) cause a re-render when you update the state, but updating the state will cause a specified cleanup function to run.
+
+`usePassiveState` accepts a `useEffect`-esque callback that will run any time the state value changes.  If you hook that up to a normal `setState` call from a normal `useState` hook, it'll act just like regular state again.
+
+Effectively, `usePassiveState` lets you choose whether you'd like the state to be "active" (and re-render the component each time it changes), or "passive" (and just make the state available to anyone who asks during an event handler or whatever). 
 
 ## `useState`
 

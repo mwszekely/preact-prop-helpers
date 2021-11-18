@@ -75,7 +75,7 @@ export interface UseAsyncHandlerReturnType<ElementType extends EventTarget, Even
     getCurrentCapture(): (CaptureType | undefined);
 
     /**
-     * Because you're allowed have `CaptureType` extend `undefined`,
+     * Because you're allowed to have `CaptureType` extend `undefined`,
      * you might need this.
      */
     hasCapture: boolean;
@@ -150,6 +150,45 @@ export interface UseAsyncHandlerReturnType<ElementType extends EventTarget, Even
  * along with some other information related to the current state.
  * Does not modify any props.
  * 
+ * Note that because the handler you provide may be called with a delay, and 
+ * because the value of, e.g., an `<input>` element will likely be stale by the 
+ * time the delay is over, a `capture` function is necessary in order to 
+ * capture the relevant information from the DOM. Any other simple event data, 
+ * like `mouseX` or `shiftKey` can stay on the event itself and don't 
+ * need to be captured &ndash; it's never stale.
+ * 
+ * ```tsx
+ * const syncOnInput = async (value: number, e: Event) => { 
+ *     [...] // Ex. send to a server and setState when done
+ * };
+ * const {
+ *     // When called, returns the synchronous event handler
+ *     getSyncHandler,
+ *     // True while the handler is running
+ *     pending,
+ *     // The error thrown, if any
+ *     error,
+ *     // Show this value while the operation's pending
+ *     currentCapture,
+ *     // And others, see `UseAsyncHandlerReturnType`
+ *     ...rest
+ * } = useAsyncHandler<HTMLInputElement>()({ 
+ *     // Pass in the capture function that saves event data
+ *     // from being stale.  Note that the async event handler 
+ *     // isn't passed here, it's passed to `getSyncHandler` above.
+ *     capture: e => { 
+ *         e.preventDefault(); 
+ * 
+ *         // Save this value so that it's never stale
+ *         return e.currentTarget.valueAsNumber;
+ *     }
+ * });
+ * 
+ * const onInput = getSyncHandler(someAsyncFunction);
+ * // OR the following, if you want the input entirely disabled while pending:
+ * const onInput = getSyncHandler(pending? null : someAsyncFunction);
+ * ```
+ * 
  * The handler is automatically throttled to only run one at a time. 
  * If the handler is called, and then before it finishes, is called again,
  * it will be put on hold until the current one finishes, at which point
@@ -157,23 +196,15 @@ export interface UseAsyncHandlerReturnType<ElementType extends EventTarget, Even
  * the first has finished, it will *replace* the second, so only the most
  * recently called iteration of the handler will run.
  * 
+ * 
  * You may optionally *also* specify a debounce parameter that waits until the
  * syncronous handler has not been called for the specified number of
  * milliseconds, at which point we *actually* run the asyncronous handler
  * according to the logic in the previous paragraph. This is in
  * *addition* to throttling the handler, and does not replace that behavior.
- * 
- * Note that the parameters to the async handler are slightly different than
- * the sync handler &ndash; the first argument, as decided by you with the
- * `capture` parameter for this hook, is the "saved" information from the
- * event.  For example, the event's currentTarget's `value`, which may have
- * changed by the time the handler is *actually* called.  The second argument
- * is the original event, which might still have some useful fields on it
- * like `mouseX` or something, but is stale at least in regards to the
- * element it references.
  */
 export function useAsyncHandler<ElementType extends EventTarget>() {
-    return function <EventType extends h.JSX.TargetedEvent<ElementType>, CaptureType>({ capture, debounce }: UseAsyncHandlerParameters<ElementType, EventType, CaptureType>) {
+    return function <EventType extends h.JSX.TargetedEvent<ElementType>, CaptureType>({ capture, debounce }: UseAsyncHandlerParameters<ElementType, EventType, CaptureType>): UseAsyncHandlerReturnType<ElementType, EventType, CaptureType> {
 
         // Always represents whatever promise is currently being waited on, or null if none.
         const [promise, setPromise, getPromise] = useState<Promise<void> | null>(null);
