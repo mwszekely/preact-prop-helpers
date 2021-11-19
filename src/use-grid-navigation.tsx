@@ -32,7 +32,7 @@ export interface UseGridNavigationCellInfo extends UseRovingTabIndexChildInfo { 
 export type UseGridNavigationCellParameters<IC extends UseGridNavigationCellInfo> = UseRovingTabIndexChildParameters<IC>;
 
 export interface UseGridNavigationRowReturnType<R extends Element, C extends Element, IR extends UseGridNavigationRowInfo, IC extends UseGridNavigationCellInfo> {
-    useGridNavigationRowProps: <P extends h.JSX.HTMLAttributes<R>>(props: P) => UseRefElementPropsReturnType<R, UseRefElementPropsReturnType<R, MergedProps<R, { onKeyDown: (e: KeyboardEvent) => void; }, UseHasFocusPropsReturnType<R, P>>>>;
+    useGridNavigationRowProps: <P extends h.JSX.HTMLAttributes<R>>(props: P) => UseRefElementPropsReturnType<R, UseRefElementPropsReturnType<R, h.JSX.HTMLAttributes<R>>>;
     useGridNavigationCell: UseGridNavigationCell<C, IC>;
     cellCount: number;
     isTabbableRow: boolean | null;

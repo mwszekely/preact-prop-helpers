@@ -29,7 +29,7 @@ export interface UseLinearNavigationChildReturnType<E extends Element> {
     useLinearNavigationChildProps: UseLinearNavigationChildProps<E>;
 }
 
-export type UseLinearNavigationChildProps<ChildElement extends Element> = <P extends h.JSX.HTMLAttributes<ChildElement>>(props: P) => UseRefElementPropsReturnType<ChildElement, MergedProps<ChildElement, { onKeyDown: (e: KeyboardEvent) => void; }, P>>;
+export type UseLinearNavigationChildProps<ChildElement extends Element> = <P extends h.JSX.HTMLAttributes<ChildElement>>(props: P) => UseRefElementPropsReturnType<ChildElement, h.JSX.HTMLAttributes<ChildElement>>;
 
 
 /** Arguments passed to the parent `useLinearNavigation` */

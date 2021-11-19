@@ -1,7 +1,7 @@
 import { h } from "preact";
 import { useEffect, useRef } from "preact/hooks";
 import { useRefElement, UseRefElementProps } from "./use-ref-element";
-import { usePassiveState } from "./use-passive-state";
+import { OnPassiveStateChange, usePassiveState } from "./use-passive-state";
 
 interface UseElementSizeParameters {
     /**
@@ -55,27 +55,30 @@ function extractElementSize(element: Element | undefined | null): ElementSize {
 
 export function useElementSize<E extends HTMLElement>({ observeBox, onSizeChange }: UseElementSizeParameters): UseElementSizeReturnType<E> {
 
-    const [getSize, setSize] = usePassiveState(onSizeChange);
+    const [getSize, setSize] = usePassiveState<ElementSize | null>(onSizeChange as OnPassiveStateChange<ElementSize | null>, () => null);
 
     const currentObserveBox = useRef<ResizeObserverBoxOptions | undefined>(observeBox);
 
     const needANewObserver = (element: E | null, observeBox: ResizeObserverBoxOptions | undefined) => {
         if (element) {
             const handleUpdate = () => {
-                const { clientWidth, scrollWidth, offsetWidth, clientHeight, scrollHeight, offsetHeight, clientLeft, scrollLeft, offsetLeft, clientTop, scrollTop, offsetTop } = element;
-                setSize({ clientWidth, scrollWidth, offsetWidth, clientHeight, scrollHeight, offsetHeight, clientLeft, scrollLeft, offsetLeft, clientTop, scrollTop, offsetTop });
+                if (element.isConnected) {
+                    const { clientWidth, scrollWidth, offsetWidth, clientHeight, scrollHeight, offsetHeight, clientLeft, scrollLeft, offsetLeft, clientTop, scrollTop, offsetTop } = element;
+                    setSize({ clientWidth, scrollWidth, offsetWidth, clientHeight, scrollHeight, offsetHeight, clientLeft, scrollLeft, offsetLeft, clientTop, scrollTop, offsetTop });
+                }
             }
-            if (!("ResizeObserver" in window)) {
-                document.addEventListener("resize", handleUpdate, { passive: true });
-                return () => document.removeEventListener("resize", handleUpdate);
-            }
-            else {
+            currentObserveBox.current = observeBox;
+
+            if (("ResizeObserver" in window)) {
                 const observer = new ResizeObserver((entries) => { handleUpdate(); });
 
                 observer.observe(element, { box: observeBox });
-                currentObserveBox.current = observeBox;
 
                 return () => observer.disconnect();
+            }
+            else {
+                document.addEventListener("resize", handleUpdate, { passive: true });
+                return () => document.removeEventListener("resize", handleUpdate);
             }
         }
     }
