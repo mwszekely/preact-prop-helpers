@@ -20,7 +20,6 @@ export interface ManagedChildInfo<T extends number | string> {
 }
 
 export interface UseManagedChildReturnType<E extends EventTarget> {
-    element: E | null;
     getElement(): E | null;
     useManagedChildProps: UseRefElementProps<E>;
 }
@@ -145,24 +144,7 @@ export function useChildManager<I extends ManagedChildInfo<any>>(): UseChildMana
     const getMountIndex = useCallback((index: K) => { return mountOrder.current.get(index)!; }, []);
 
     const useManagedChild: UsedManagedChild<I> = useCallback(<ChildType extends EventTarget>(info: I) => {
-        const [element, onElementChange] = useState<ChildType | null>(null);
-        const { getElement, useRefElementProps } = useRefElement<ChildType>({ onElementChange });
-
-        useLayoutEffect(() => {
-            let index = getTotalChildrenMounted();
-            mountOrder.current.set(info.index, index);
-            mountedChildren.current[index] = info;
-            setTotalChildrenMounted(t => ++t);
-            return () => {
-                mountOrder.current.delete(info.index);
-                mountedChildren.current[index] = null;
-                setTotalChildrenUnounted(t => ++t);
-
-            };
-        }, [info.index]);
-
-        // As soon as the component mounts, notify the parent and request a rerender.
-        useLayoutEffect((prev, changes) => {
+        const { getElement, useRefElementProps } = useRefElement<ChildType>({ onElementChange: (element) => {
             if (element) {
                 indicesByElement.current.set(element, info.index);
                 deletedIndices.current.delete(info.index);
@@ -190,7 +172,20 @@ export function useChildManager<I extends ManagedChildInfo<any>>(): UseChildMana
                     }
                 }
             }
-        }, [element, info.index]);
+        } });
+
+        useLayoutEffect(() => {
+            let index = getTotalChildrenMounted();
+            mountOrder.current.set(info.index, index);
+            mountedChildren.current[index] = info;
+            setTotalChildrenMounted(t => ++t);
+            return () => {
+                mountOrder.current.delete(info.index);
+                mountedChildren.current[index] = null;
+                setTotalChildrenUnounted(t => ++t);
+
+            };
+        }, [info.index]);
 
         // Any time our child props change, make that information available generally.
         // *Don't re-render*, otherwise we'd be stuck in an
@@ -204,7 +199,7 @@ export function useChildManager<I extends ManagedChildInfo<any>>(): UseChildMana
                 managedChildren.current[info.index as keyof ManagedChildren<InfoToKey<I>, I>] = { ...info } as any;
         }, [...Object.entries(info).flat()]);
 
-        return { element, getElement, useManagedChildProps: useRefElementProps }
+        return { getElement, useManagedChildProps: useRefElementProps }
     }, []);
 
 

@@ -137,8 +137,8 @@ export function useRovingTabIndex<I extends UseRovingTabIndexChildInfo>({ should
 
     const useRovingTabIndexChild = useCallback<UseRovingTabIndexChild<I>>(<ChildElement extends Element>(info: UseRovingTabIndexChildParameters<I>): UseRovingTabIndexChildReturnType<ChildElement> => {
 
-        const [rrafIndex, setRrafIndex] = useState(1);
-        const rerenderAndFocus = useCallback(() => { setRrafIndex(i => ++i) }, []);
+        //const [rrafIndex, setRrafIndex] = useState(1);
+        //const rerenderAndFocus = useCallback(() => { setRrafIndex(i => ++i) }, []);
         const [tabbable, setTabbable, getTabbable] = useState<boolean | null>(null);
 
 
@@ -149,13 +149,13 @@ export function useRovingTabIndex<I extends UseRovingTabIndexChildInfo>({ should
             getTabbable
         } as any as I;
 
-        const { element, getElement, useManagedChildProps } = useManagedChild<ChildElement>(newInfo);
+        const { getElement, useManagedChildProps } = useManagedChild<ChildElement>(newInfo);
 
         useEffect(() => {
-            if (element && tabbable) {
-                setRerenderAndFocus(_ => rerenderAndFocus);
-                const shouldFocusOnChange = getShouldFocusOnChange();
-                if (shouldFocusOnChange() && "focus" in (element as Element as (Element & HTMLOrSVGElement))) {
+            const element = getElement();
+            if (tabbable) {
+                const shouldFocusOnChange = getShouldFocusOnChange()();
+                if (shouldFocusOnChange && "focus" in (element as Element as (Element & HTMLOrSVGElement))) {
                     requestAnimationFrame(() => {
                         queueMicrotask(() => {
                             (element as Element as (Element & HTMLOrSVGElement)).focus();
@@ -163,7 +163,7 @@ export function useRovingTabIndex<I extends UseRovingTabIndexChildInfo>({ should
                     });
                 }
             }
-        }, [element, tabbable, rrafIndex]);
+        }, [tabbable]);
 
         function useRovingTabIndexSiblingProps<P extends UseRovingTabIndexSiblingPropsParameters<any>>({ tabIndex, ...props }: P): UseRovingTabIndexSiblingPropsReturnType<any, P> {
 
