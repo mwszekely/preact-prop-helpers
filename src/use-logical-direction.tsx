@@ -22,7 +22,7 @@ function capitalize<T extends string>(str: T): Capitalize<T> {
 }
 
 export interface UseLogicalDirectionParameters {
-    onLogicalDirectionChange?(info: LogicalDirectionInfo): void;
+    onLogicalDirectionChange?(info: LogicalDirectionInfo | null): void;
 }
 
 export interface LogicalElementSize {
@@ -58,29 +58,19 @@ export interface LogicalElementSize {
  */
 export function useLogicalDirection<T extends Element>({ onLogicalDirectionChange }: UseLogicalDirectionParameters) {
 
-    const updateLogicalInfo = useCallback((element: T) => {
-        console.assert(element.isConnected);
-        element = (element!.parentElement ?? element) as T;
-        const computedStyles = window.getComputedStyle(element);
-        let w = computedStyles.writingMode as WritingMode;
-        let d = computedStyles.direction as Direction;
-        let t = computedStyles.textOrientation as TextOrientation;
+    const [getComputedStyles, setComputedStyles] = usePassiveState<CSSStyleDeclaration | null>(null);
 
-        if (t == "upright")
-            d = "ltr";
-
-        setLogicalDirectionInfo({ ...WritingModes[w ?? "horizontal-tb"][d ?? "ltr"] });
-    }, []);
 
     const { getElement, useRefElementProps } = useRefElement<T | null>({
         onElementChange: (element) => {
             if (element) {
+                setComputedStyles(window.getComputedStyle(element));
                 // The element hasn't actually been hooked up to the document yet.
                 // Wait a moment so that we can properly use `getComputedStyle`
                 // (since we only read it on mount)
-                queueMicrotask(() => {
+                /*queueMicrotask(() => {
                     updateLogicalInfo(element!);
-                })
+                })*/
 
             }
         }
@@ -96,9 +86,25 @@ export function useLogicalDirection<T extends Element>({ onLogicalDirectionChang
     // and if so, tests if the writing mode has changed too.
     //
     // This will work for at least some number of cases, but a better solution is still needed.
-    const { useElementSizeProps } = useElementSize({ onSizeChange: _ => updateLogicalInfo(getElement()!) })
+    const { useElementSizeProps } = useElementSize({ onSizeChange: _ => onLogicalDirectionChange?.(getLogicalDirectionInfo()) })
 
-    const [getLogicalDirectionInfo, setLogicalDirectionInfo] = usePassiveState<LogicalDirectionInfo>(onLogicalDirectionChange);
+    const getLogicalDirectionInfo = useCallback(() => {
+        const computedStyles = getComputedStyles();
+        if (computedStyles) {
+            let w = computedStyles.writingMode as WritingMode;
+            let d = computedStyles.direction as Direction;
+            let t = computedStyles.textOrientation as TextOrientation;
+
+            if (t == "upright")
+                d = "ltr";
+
+            return ({ ...WritingModes[w ?? "horizontal-tb"][d ?? "ltr"] });
+        }
+        
+        return null;
+    }, [])
+
+    //const [getLogicalDirectionInfo, setLogicalDirectionInfo] = usePassiveState<LogicalDirectionInfo>(onLogicalDirectionChange);
 
     const convertToLogicalOrientation = useCallback((elementOrientation: PhysicalOrientation, direction?: LogicalDirectionInfo | null | undefined) => {
         direction ??= getLogicalDirectionInfo();
