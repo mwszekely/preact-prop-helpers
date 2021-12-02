@@ -107,7 +107,6 @@ export type UseRovingTabIndexSiblingProps<ChildElement extends Element> = <P ext
  */
 export function useRovingTabIndex<I extends UseRovingTabIndexChildInfo>({ shouldFocusOnChange: foc, tabbableIndex }: UseRovingTabIndexParameters): UseRovingTabIndexReturnType<I> {
 
-    const [rerenderAndFocus, setRerenderAndFocus] = useState<(() => void) | null>(null);
     const getShouldFocusOnChange = useStableGetter(foc);
 
     const getTabbableIndex = useStableGetter(tabbableIndex);
@@ -137,8 +136,8 @@ export function useRovingTabIndex<I extends UseRovingTabIndexChildInfo>({ should
 
     const useRovingTabIndexChild = useCallback<UseRovingTabIndexChild<I>>(<ChildElement extends Element>(info: UseRovingTabIndexChildParameters<I>): UseRovingTabIndexChildReturnType<ChildElement> => {
 
-        //const [rrafIndex, setRrafIndex] = useState(1);
-        //const rerenderAndFocus = useCallback(() => { setRrafIndex(i => ++i) }, []);
+        const [rrafIndex, setRrafIndex] = useState(1);
+        const rerenderAndFocus = useCallback(() => { setRrafIndex(i => ++i) }, []);
         const [tabbable, setTabbable, getTabbable] = useState<boolean | null>(null);
 
 
@@ -163,7 +162,7 @@ export function useRovingTabIndex<I extends UseRovingTabIndexChildInfo>({ should
                     });
                 }
             }
-        }, [tabbable]);
+        }, [tabbable, rrafIndex]);
 
         function useRovingTabIndexSiblingProps<P extends UseRovingTabIndexSiblingPropsParameters<any>>({ tabIndex, ...props }: P): UseRovingTabIndexSiblingPropsReturnType<any, P> {
 
@@ -203,7 +202,34 @@ export function useRovingTabIndex<I extends UseRovingTabIndexChildInfo>({ should
         childCount,
         managedChildren,
         indicesByElement,
-        focusCurrent: rerenderAndFocus,
+        focusCurrent: useCallback(() => {
+            if (managedChildren[getTabbableIndex() ?? 0].getTabbable()) {
+                managedChildren[getTabbableIndex() ?? 0]?.rerenderAndFocus();
+            }
+            else {
+                // For whatever reason, the previously tabbable child
+                // is no longer tabbable without us knowing about it.
+                // Maybe it unmounted?
+                // Either way, try to find the newly-selected child.
+                debugger;
+                let i = getTabbableIndex() ?? 0;
+                let j = i + 1;
+                while (i >= 0) {
+                    --i;
+                    if (managedChildren[getTabbableIndex() ?? 0].getTabbable()) {
+                        managedChildren[getTabbableIndex() ?? 0]?.rerenderAndFocus();
+                        return;
+                    }
+                }
+                while (j < managedChildren.length) {
+                    ++j;
+                    if (managedChildren[getTabbableIndex() ?? 0].getTabbable()) {
+                        managedChildren[getTabbableIndex() ?? 0]?.rerenderAndFocus();
+                        return;
+                    }
+                }
+            }
+        }, []),
 
         ...rest
     }
