@@ -25,6 +25,7 @@ export { useTimeout } from "./use-timeout";
 export { useChildManager, useChildFlag, ManagedChildInfo } from "./use-child-manager";
 export { useRovingTabIndex, UseRovingTabIndexChild, UseRovingTabIndexReturnType, UseRovingTabIndexChildInfo, UseRovingTabIndexChildPropsReturnType, UseRovingTabIndexChildReturnType, UseRovingTabIndexParameters } from "./use-roving-tabindex";
 export { useListNavigation, UseListNavigationChild, UseListNavigationChildProps, UseListNavigationChildPropsReturnType, UseListNavigationChildReturnType, UseListNavigationParameters, UseListNavigationReturnType, UseListNavigationChildInfo, UseListNavigationChildParameters } from "./use-list-navigation"
+export { useSortableChildren, UseSortableChildrenParameters } from "./use-sortable-children";
 
 export { useEffect } from "./use-effect";
 export { useLayoutEffect } from "./use-layout-effect";

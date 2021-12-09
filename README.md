@@ -42,6 +42,7 @@ There are a few reasons:
 |`useGlobalEventHandler`							|Ensures an event handler is attached to `window`, `document`, etc. as long as the component is mounted.|
 |`useLocalEventHandler`								|Alternate way of attaching/detaching an event handler to the component, primarily for 3rd party APIs.|
 |`useRandomId`										|Allows a component to use a randomly-generated ID. Also lets another component reference whatever ID was used, e.g. in a `for` or `aria-labelledby` prop.|
+|`useSortableChildren`|                             |A component using this hook can re-order its immediate children arbitrarily in response to something.|
 |`useTimeout`, `useInterval`, `useAnimationFrame`	|Runs the specified function (which doesn't need to be stable) with the given delay/interval/on every frame. In particular `useTimeout` is very effective as "`useEffect` but on a delay".|
 |`useStableCallback`								|`useCallback`, but doesn't require dependencies and is always stable. __Cannot be used during render__.|
 |`useStableGetter`									|Allows you to use some variable within `useEffect` or `useCallback` without including it in a dependency array. __Cannot be used during render__.|
@@ -206,6 +207,12 @@ This hook returns three values:
 * `useRandomIdProps`, which modifies a set of properties to use `randomId` (below) if no `id` is provided (i.e. it's `null` or `undefined`)
 * `useReferencedIdProps`, which modifies a set of properties to use `randomId` for whatever property you specifiy (if it's not provided).  Use this to, e.g., set one element's `id` and another's `for` to be the same. `aria-labelledby` and such are also good candidates.
 * `randomId`, which is the randomly-generated ID that will be used if none is provided. Not useful unless you need to handle the ID logic yourself or just need to know what it is for some other purpose.
+
+## `useSortableChildren`
+
+This hook allows a component to easily re-order its children while keeping their identities consistent. Useful primarily for e.g. having sortable lists of things.
+
+Note that while `useChildManager` is generally a great choice for manipulating descendant children, it cannot be used here because children cannot manipulate their own `key`s, which is how `useSortableChildren` works.  Because of this, a component that uses this hook is only able to sort its **immediate descendants**, as it directly modifies those children's props.
 
 ## `useFocusTrap`
 
