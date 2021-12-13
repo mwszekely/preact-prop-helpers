@@ -13,16 +13,26 @@ const blockingElements = (document as any).$blockingElements as BlockingElements
  * @param target 
  */
 export function useBlockingElement<E extends Element>(target: E | null) {
-    
+
     /**
      * Push/pop the element from the blockingElements stack.
      */
     useLayoutEffect(() => {
         if (target) {
-            blockingElements.push(target as Element as HTMLElement);
-            return () => {
-                blockingElements.remove(target as Element as HTMLElement);
-            };
+            // Sometimes blockingElements will fail if, for example,
+            // the target element isn't connected to document.body.
+            // This is rare, but it's better to fail silently with weird tabbing behavior
+            // than to crash the entire application.
+            try {
+                blockingElements.push(target as Element as HTMLElement);
+                return () => {
+                    blockingElements.remove(target as Element as HTMLElement);
+                };
+            }
+            catch (ex) {
+                // Well, semi-silently.
+                console.error(ex);
+            }
         }
     }, [target]);
 }
