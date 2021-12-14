@@ -101,7 +101,7 @@ export function useGridNavigation<R extends Element, C extends Element, IR exten
 
     // Track child rows and manage keyboard navigation among them.
     const { childCount, managedChildren: managedRows, indicesByElement: rowIndicesByElement, getMountIndex: getRowMountIndex, mountedChildren: mountedRows, totalChildrenMounted: totalRowsMounted, totalChildrenUnounted: totalRowsUnmounted, useManagedChild: useManagedRow } = useChildManager<IR>();
-    const { useLinearNavigationProps: useLinearNavigationRowProps } = useLinearNavigation<R>({
+    const { useLinearNavigationProps: useLinearNavigationRowProps } = useLinearNavigation<any>({
         managedChildren: managedRows,
         index: indexMangler(getCurrentRow() ?? 0),
         navigateToFirst: navigateToFirstRow,
