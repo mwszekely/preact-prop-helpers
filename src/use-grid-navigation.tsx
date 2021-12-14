@@ -26,7 +26,7 @@ export interface UseGridNavigationRowInfo extends UseRovingTabIndexChildInfo {
     hidden?: boolean;
 }
 
-export type UseGridNavigationRowParameters<I extends UseRovingTabIndexChildInfo> = Omit<UseRovingTabIndexChildParameters<I &  { hidden?: boolean }>, "setIsTabbableRow" | "getIsTabbableRow">; //I;
+export type UseGridNavigationRowParameters<I extends UseRovingTabIndexChildInfo> = Omit<UseRovingTabIndexChildParameters<I & { hidden?: boolean }>, "setIsTabbableRow" | "getIsTabbableRow">; //I;
 
 export interface UseGridNavigationCellInfo extends UseRovingTabIndexChildInfo { }
 export type UseGridNavigationCellParameters<IC extends UseGridNavigationCellInfo> = UseRovingTabIndexChildParameters<IC>;
@@ -206,8 +206,12 @@ export function useGridNavigation<R extends Element, C extends Element, IR exten
             activatedIndex: currentColumn,
             managedChildren: managedCells,
             setChildFlag: (cellIndex, cellIsTabbable) => {
-                if (cellIndex != null)
-                    managedCells[cellIndex]?.setTabbable(cellIsTabbable)
+                if (cellIndex != null && managedCells[cellIndex]) {
+                    managedCells[cellIndex].setTabbable(cellIsTabbable);
+
+                    if (cellIsTabbable)
+                        managedCells[cellIndex].rerenderAndFocus();
+                }
             },
             getChildFlag: (cellIndex) => (managedCells[cellIndex]?.getTabbable() ?? null),
             useEffect
@@ -251,8 +255,8 @@ export function useGridNavigation<R extends Element, C extends Element, IR exten
 
         const getRowIndex = useStableGetter(rowIndex);
         const useGridNavigationCell: UseGridNavigationCell<C, IC> = useCallback((info: UseGridNavigationCellParameters<IC>) => {
-            const [tabbable, setTabbable] = useState(false);
-            const { useRovingTabIndexChildProps } = useRovingTabIndexCell<C>({ ...info, setTabbable } as IC);
+            const getTabbable: (() => boolean | null) = useStableCallback(() => tabbable);
+            const { tabbable, useRovingTabIndexSiblingProps, useRovingTabIndexChildProps } = useRovingTabIndexCell<C>({ ...info, getTabbable } as IC);
             //const { useLinearNavigationChildProps: useLinearNavigationChildCellProps } = useLinearNavigationChildCell(info as IC);
 
             // Any time we interact with this cell, set it to be
@@ -266,7 +270,7 @@ export function useGridNavigation<R extends Element, C extends Element, IR exten
                 setCurrentColumn2(info.index);
             }, [info.index])
 
-            const useGridNavigationCellProps = useCallback(<P extends h.JSX.HTMLAttributes<C>>(props: P) => useRovingTabIndexChildProps((useMergedProps<C>()({ onClick }, props))), []);
+            const useGridNavigationCellProps = useCallback(<P extends h.JSX.HTMLAttributes<C>>(props: P) => useRovingTabIndexChildProps((useMergedProps<C>()({ onClick }, props))), [useRovingTabIndexChildProps]);
 
             return { tabbable, useGridNavigationCellProps };
         }, []);
