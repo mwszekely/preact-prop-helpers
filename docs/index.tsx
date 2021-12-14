@@ -268,12 +268,12 @@ export const DemoUseGrid = memo(() => {
     const [lastFocusedInner, setLastFocusedInner, getLastFocusedInner] = useState(false);
 
     const { useHasFocusProps } = useHasFocus<HTMLDivElement>({ onLastFocusedInnerChanged: setLastFocusedInner });
-    const { useGridNavigationRow, useGridNavigationColumn, rowCount, cellIndex, rowIndex } = useGridNavigation<HTMLDivElement, HTMLDivElement, UseGridNavigationRowInfo, UseGridNavigationCellInfo>({ shouldFocusOnChange: getLastFocusedInner });
+    const { useGridNavigationRow, useGridNavigationColumn, rowCount, cellIndex, rowIndex, useGridNavigationProps } = useGridNavigation<HTMLDivElement, HTMLDivElement, UseGridNavigationRowInfo, UseGridNavigationCellInfo>({ shouldFocusOnChange: getLastFocusedInner });
 
     return (
         <div className="demo">
             <div>{cellIndex}+{rowIndex}/{rowCount}</div>
-            <div {...useHasFocusProps({})}>
+            <div {...useHasFocusProps(useGridNavigationProps({}))}>
                 <GridRowContext.Provider value={useGridNavigationRow}>
                     {Array.from((function* () {
                         for (let i = 0; i < 10; ++i) {

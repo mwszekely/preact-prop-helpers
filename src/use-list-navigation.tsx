@@ -1,11 +1,10 @@
 import { h } from "preact";
 import { StateUpdater, useCallback } from "preact/hooks";
 import { UseChildManagerReturnType } from "./use-child-manager";
-import { useLinearNavigation, UseLinearNavigationChild, UseLinearNavigationChildInfo, useTypeaheadNavigation, UseTypeaheadNavigationChildInfo, UseTypeaheadNavigationParameters } from "./use-keyboard-navigation";
+import { useLinearNavigation, UseLinearNavigationChildInfo, useTypeaheadNavigation, UseTypeaheadNavigationChildInfo, UseTypeaheadNavigationParameters } from "./use-keyboard-navigation";
 import { MergedProps, useMergedProps } from "./use-merged-props";
 import { UseRovingTabIndexChildInfo, useRovingTabIndex, UseRovingTabIndexChildParameters, UseRovingTabIndexChildPropsReturnType, UseRovingTabIndexSiblingProps, UseRovingTabIndexParameters } from "./use-roving-tabindex";
 import { useState } from "./use-state";
-import { UseTypeaheadNavigationChildParameters, UseLinearNavigationChildParameters } from "./use-keyboard-navigation";
 
 
 export type OmitStrong<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
@@ -50,6 +49,9 @@ const dummy: any = null;
 
 
 export interface UseListNavigationReturnType<ChildElement extends Element, I extends UseListNavigationChildInfo> extends OmitStrong<UseChildManagerReturnType<I>, "useManagedChild"> {
+   
+    useListNavigationProps: <P extends h.JSX.HTMLAttributes<any>>(props: P) => h.JSX.HTMLAttributes<any>;
+    
     useListNavigationChild: UseListNavigationChild<ChildElement, I>;
 
     currentTypeahead: string | null;
@@ -190,20 +192,23 @@ export function useListNavigation<ChildElement extends Element, I extends UseLis
     const setIndex = useCallback((index: (number | null) | ((prev: number | null) => (number | null))) => {
         setTabbableIndex(index);
     }, []);
-    const { currentTypeahead, invalidTypeahead, useTypeaheadNavigationChild } = useTypeaheadNavigation<ChildElement, I>({ collator, getIndex: getTabbableIndex, setIndex, typeaheadTimeout: 1000 });
-    const { useLinearNavigationChild } = useLinearNavigation<ChildElement>({ navigationDirection: keyNavigation, index: getTabbableIndex() ?? 0, managedChildren, navigateToPrev, navigateToNext, navigateToFirst, navigateToLast });
+    const { currentTypeahead, invalidTypeahead, useTypeaheadNavigationChild, useTypeaheadNavigationProps } = useTypeaheadNavigation<any, I>({ collator, getIndex: getTabbableIndex, setIndex, typeaheadTimeout: 1000 });
+    const { useLinearNavigationProps } = useLinearNavigation<any>({ navigationDirection: keyNavigation, index: getTabbableIndex() ?? 0, managedChildren, navigateToPrev, navigateToNext, navigateToFirst, navigateToLast });
 
+    const useListNavigationProps = useCallback(<P extends h.JSX.HTMLAttributes<ChildElement>>(props: P) => {
+        return useLinearNavigationProps(useTypeaheadNavigationProps(props));
+    }, [useLinearNavigationProps, useTypeaheadNavigationProps]);
 
     const useListNavigationChild: UseListNavigationChild<ChildElement, I> = useCallback((info: UseListNavigationChildParameters<I>): UseListNavigationChildReturnType<ChildElement> => {
 
-        const { useTypeaheadNavigationChildProps } = useTypeaheadNavigationChild(info as I);
-        const { useLinearNavigationChildProps } = useLinearNavigationChild(info as I);
+        const { ...rest } = useTypeaheadNavigationChild(info as I);
+        //const { useLinearNavigationChildProps } = useLinearNavigationChild(info as I);
 
         const { useRovingTabIndexChildProps, useRovingTabIndexSiblingProps, tabbable } = useRovingTabIndexChild<ChildElement>(info as I);
 
         const useListNavigationChildProps: UseListNavigationChildProps<ChildElement> = function <P extends h.JSX.HTMLAttributes<ChildElement>>({ ...props }: P) {
 
-            return useMergedProps<ChildElement>()(useRovingTabIndexChildProps(useTypeaheadNavigationChildProps(useLinearNavigationChildProps({ onClick: roveToSelf }))), props);
+            return useMergedProps<ChildElement>()(useRovingTabIndexChildProps((({ onClick: roveToSelf }))), props);
         }
 
         const roveToSelf = useCallback(() => { navigateToIndex(info.index); }, [])
@@ -213,10 +218,11 @@ export function useListNavigation<ChildElement extends Element, I extends UseLis
             useListNavigationSiblingProps: useRovingTabIndexSiblingProps,
             tabbable
         }
-    }, [useTypeaheadNavigationChild, useLinearNavigationChild, useRovingTabIndexChild, navigateToIndex]);
+    }, [useTypeaheadNavigationChild, useRovingTabIndexChild, navigateToIndex]);
 
     return {
         useListNavigationChild,
+        useListNavigationProps,
 
         currentTypeahead,
         invalidTypeahead,

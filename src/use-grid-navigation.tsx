@@ -101,7 +101,7 @@ export function useGridNavigation<R extends Element, C extends Element, IR exten
 
     // Track child rows and manage keyboard navigation among them.
     const { childCount, managedChildren: managedRows, indicesByElement: rowIndicesByElement, getMountIndex: getRowMountIndex, mountedChildren: mountedRows, totalChildrenMounted: totalRowsMounted, totalChildrenUnounted: totalRowsUnmounted, useManagedChild: useManagedRow } = useChildManager<IR>();
-    const { useLinearNavigationChild: useLinearNavigationChildRow } = useLinearNavigation<R>({
+    const { useLinearNavigationProps: useLinearNavigationRowProps } = useLinearNavigation<R>({
         managedChildren: managedRows,
         index: indexMangler(getCurrentRow() ?? 0),
         navigateToFirst: navigateToFirstRow,
@@ -190,7 +190,7 @@ export function useGridNavigation<R extends Element, C extends Element, IR exten
             forceUpdate();
         }, [])
 
-        const { useLinearNavigationChild: useLinearNavigationChildCell } = useLinearNavigation<C>({
+        const { useLinearNavigationProps: useLinearNavigationCellProps } = useLinearNavigation<R>({
             managedChildren: managedCells,
             navigationDirection: "inline",
             index: currentColumn ?? 0,
@@ -243,9 +243,9 @@ export function useGridNavigation<R extends Element, C extends Element, IR exten
             hidden,
             ...info
         } as any as IR);
-        const { useLinearNavigationChildProps: useLinearNavigationChildRowProps } = useLinearNavigationChildRow(info as IR)
+        //const { useLinearNavigationChildProps: useLinearNavigationChildRowProps } = useLinearNavigationChildRow(info as IR)
 
-        const useGridNavigationRowProps = useCallback(<P extends h.JSX.HTMLAttributes<R>>(props: P) => useManagedRowProps(useLinearNavigationChildRowProps(useMergedProps<R>()({ hidden: !!hidden, "data-index": rowIndex }, props))), [useManagedRowProps, !!hidden]);
+        const useGridNavigationRowProps = useCallback(<P extends h.JSX.HTMLAttributes<R>>(props: P) => useManagedRowProps(useLinearNavigationCellProps(useMergedProps<R>()({ hidden: !!hidden, "data-index": rowIndex }, props))), [useManagedRowProps, !!hidden]);
 
 
 
@@ -253,7 +253,7 @@ export function useGridNavigation<R extends Element, C extends Element, IR exten
         const useGridNavigationCell: UseGridNavigationCell<C, IC> = useCallback((info: UseGridNavigationCellParameters<IC>) => {
             const [tabbable, setTabbable] = useState(false);
             const { useRovingTabIndexChildProps } = useRovingTabIndexCell<C>({ ...info, setTabbable } as IC);
-            const { useLinearNavigationChildProps: useLinearNavigationChildCellProps } = useLinearNavigationChildCell(info as IC);
+            //const { useLinearNavigationChildProps: useLinearNavigationChildCellProps } = useLinearNavigationChildCell(info as IC);
 
             // Any time we interact with this cell, set it to be
             // our "currently tabbable" cell, regardless of
@@ -266,10 +266,10 @@ export function useGridNavigation<R extends Element, C extends Element, IR exten
                 setCurrentColumn2(info.index);
             }, [info.index])
 
-            const useGridNavigationCellProps = useCallback(<P extends h.JSX.HTMLAttributes<C>>(props: P) => useRovingTabIndexChildProps(useLinearNavigationChildCellProps(useMergedProps<C>()({ onClick }, props))), [useLinearNavigationChildCellProps]);
+            const useGridNavigationCellProps = useCallback(<P extends h.JSX.HTMLAttributes<C>>(props: P) => useRovingTabIndexChildProps((useMergedProps<C>()({ onClick }, props))), []);
 
             return { tabbable, useGridNavigationCellProps };
-        }, [useLinearNavigationChildCell]);
+        }, []);
 
         return {
             currentColumn,
@@ -280,9 +280,10 @@ export function useGridNavigation<R extends Element, C extends Element, IR exten
             managedCells: managedCells as IC[]
         };
 
-    }, [useLinearNavigationChildRow, useManagedRow, indexDemangler, indexMangler]);
+    }, [useManagedRow, indexDemangler, indexMangler]);
 
     return {
+        useGridNavigationProps: useLinearNavigationRowProps,
         useGridNavigationRow,
         useGridNavigationColumn,
         rowCount: childCount,

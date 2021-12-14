@@ -12,7 +12,7 @@ export const DemoUseRovingTabIndex = memo(() => {
 
     const [lastFocusedInner, setLastFocusedInner, getLastFocusedInner] = useState(false)
     const { useHasFocusProps } = useHasFocus<HTMLUListElement>({ onLastFocusedInnerChanged: setLastFocusedInner });
-    const { useListNavigationChild, currentTypeahead, setTabbableIndex, tabbableIndex } = useListNavigation<HTMLLIElement, UseListNavigationChildInfo>({ shouldFocusOnChange: getLastFocusedInner });
+    const { useListNavigationChild, currentTypeahead, setTabbableIndex, tabbableIndex, useListNavigationProps } = useListNavigation<HTMLLIElement, UseListNavigationChildInfo>({ shouldFocusOnChange: getLastFocusedInner });
     //const { useRovingTabIndexChild, useRovingTabIndexProps } = useRovingTabIndex<HTMLUListElement, RovingTabIndexChildInfo>({ tabbableIndex, focusOnChange: false });
 
     return (
@@ -45,7 +45,7 @@ export const DemoUseRovingTabIndex = memo(() => {
                 Feel free to nest them too, as long as you are aware of your <code>Context</code> management (i.e. remember that you need to create a new <code>Context</code> for each use case).
             </p>
             <label>Tabbable index: <input type="number" value={tabbableIndex ?? undefined} onInput={e => { e.preventDefault(); setTabbableIndex(e.currentTarget.valueAsNumber); }} /></label>
-            <ul {...useHasFocusProps({})}>
+            <ul {...useHasFocusProps(useListNavigationProps({}))}>
                 <RovingChildContext.Provider value={useListNavigationChild}>
                     {Array.from((function* () {
                         for (let i = 0; i < 10; ++i) {
