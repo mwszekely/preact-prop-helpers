@@ -61,10 +61,9 @@ function forEachUpdater<T>(element: Element | null | undefined, map: Map<Window 
 }
 
 function focusout(e: FocusEvent) {
-    const window = (e.currentTarget as Element).ownerDocument.defaultView;
 
     if (e.relatedTarget == null) {
-        forEachUpdater(e.currentTarget as Element | null, activeElementUpdaters, null);
+        forEachUpdater(e.target as Element | null, activeElementUpdaters, null);
     }
     else {
         // Just wait for the focusin event.
@@ -73,22 +72,22 @@ function focusout(e: FocusEvent) {
 }
 
 function focusin(e: FocusEvent) {
-    const window = (e.currentTarget as Element).ownerDocument.defaultView;
+    const window = (e.target as Element).ownerDocument.defaultView;
     let currentlyFocusedElement = e.target as (Element & HTMLOrSVGElement);
-    forEachUpdater(e.currentTarget as Element | null, activeElementUpdaters, currentlyFocusedElement);
-    forEachUpdater(e.currentTarget as Element | null, lastActiveElementUpdaters, currentlyFocusedElement);
+    forEachUpdater(e.target as Element | null, activeElementUpdaters, currentlyFocusedElement);
+    forEachUpdater(e.target as Element | null, lastActiveElementUpdaters, currentlyFocusedElement);
 }
 
 function windowFocus(e: FocusEvent) {
-    const window = (e.currentTarget as Element).ownerDocument.defaultView;
+    const window = (e.target as Element).ownerDocument.defaultView;
     windowsFocused.set(window, true);
-    forEachUpdater(e.currentTarget as Element | null, windowFocusedUpdaters, true);
+    forEachUpdater(e.target as Element | null, windowFocusedUpdaters, true);
 }
 
 function windowBlur(e: FocusEvent) {
-    const window = (e.currentTarget as Element).ownerDocument.defaultView;
+    const window = (e.target as Element).ownerDocument.defaultView;
     windowsFocused.set(window, false);
-    forEachUpdater(e.currentTarget as Element | null, windowFocusedUpdaters, false);
+    forEachUpdater(e.target as Element | null, windowFocusedUpdaters, false);
 }
 
 export interface UseActiveElementParameters {
