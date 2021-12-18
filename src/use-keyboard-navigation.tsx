@@ -111,14 +111,13 @@ export function useLinearNavigation<ChildElement extends Element>({ index, navig
     const navigateToEnd = useCallback(() => { navigateToIndex(-1); }, [navigateToIndex]);*/
 
     const getIndex = useStableGetter(index);
-    const { convertElementSize, getLogicalDirectionInfo, useLogicalDirectionProps } = useLogicalDirection<ChildElement>({});
+    const { getLogicalDirectionInfo, useLogicalDirectionProps } = useLogicalDirection<ChildElement>({});
 
     const onKeyDown = (e: KeyboardEvent) => {
         // Not handled by typeahead (i.e. assume this is a keyboard shortcut)
         if (e.ctrlKey || e.metaKey)
             return;
 
-        let index = getIndex();
         const info = getLogicalDirectionInfo();
 
         let allowsBlockNavigation = (navigationDirection == "block" || navigationDirection == "either");

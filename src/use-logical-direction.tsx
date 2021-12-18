@@ -56,7 +56,7 @@ export interface LogicalElementSize {
  * * `convertToLogicalOrientation`: Based on the current direction, converts "horizontal" or "vertical" to "inline" or "block".
  * * `convertToPhysicalOrientation`:  Based on the current direction, converts "inline" or "block" to "horizontal" or "vertical".
  */
-export function useLogicalDirection<T extends Element>({ onLogicalDirectionChange }: UseLogicalDirectionParameters) {
+export function useLogicalDirection<T extends Element>({ onLogicalDirectionChange }: UseLogicalDirectionParameters): UseLogicalDirectionReturnType<T> {
 
     const [getComputedStyles, setComputedStyles] = usePassiveState<CSSStyleDeclaration | null>(null);
 
@@ -100,7 +100,7 @@ export function useLogicalDirection<T extends Element>({ onLogicalDirectionChang
 
             return ({ ...WritingModes[w ?? "horizontal-tb"][d ?? "ltr"] });
         }
-        
+
         return null;
     }, [])
 
@@ -112,6 +112,57 @@ export function useLogicalDirection<T extends Element>({ onLogicalDirectionChang
             return "inline";
         return "block";
     }, []);
+
+    const convertToPhysicalSide = useCallback((side: "inline-start" | "inline-end" | "block-start" | "block-end", direction?: LogicalDirectionInfo | null | undefined): "top" | "bottom" | "left" | "right" => {
+        direction ??= getLogicalDirectionInfo();
+
+        switch (side) {
+            case "block-start":
+                return M[(direction?.blockDirection ?? "ttb")[0] as "t" | "b" | "l" | "r"];
+            case "block-end":
+                return M[(direction?.blockDirection ?? "ttb")[2] as "t" | "b" | "l" | "r"];
+
+            case "inline-start":
+                return M[(direction?.inlineDirection ?? "ltr")[0] as "t" | "b" | "l" | "r"];
+            case "inline-end":
+                return M[(direction?.inlineDirection ?? "ltr")[2] as "t" | "b" | "l" | "r"];
+        }
+    }, [])
+
+    const convertToLogicalSide = useCallback((side: "top" | "bottom" | "left" | "right", direction?: LogicalDirectionInfo | null | undefined): "inline-start" | "inline-end" | "block-start" | "block-end" => {
+        direction ??= getLogicalDirectionInfo();
+        if (direction?.inlineOrientation === "vertical") {
+            switch (side) {
+                case "top":
+                    return direction.inlineDirection === "ttb" ? "inline-start" : "inline-end";
+                case "bottom":
+                    return direction.inlineDirection === "btt" ? "inline-start" : "inline-end";
+
+                case "left":
+                    return direction.blockDirection === "ltr" ? "block-start" : "block-end";
+                case "bottom":
+                    return direction.blockDirection === "rtl" ? "block-start" : "block-end";
+            }
+        }
+        else if (direction?.inlineOrientation === "horizontal") {
+            switch (side) {
+                case "top":
+                    return direction.blockDirection === "ttb" ? "block-start" : "block-end";
+                case "bottom":
+                    return direction.blockDirection === "btt" ? "block-start" : "block-end";
+
+                case "left":
+                    return direction.inlineDirection === "ltr" ? "inline-start" : "inline-end";
+                case "bottom":
+                    return direction.inlineDirection === "rtl" ? "inline-start" : "inline-end";
+            }
+        }
+
+        debugger;
+        console.assert(false);
+        return "inline-start";
+
+    }, [])
 
     const convertToPhysicalOrientation = useCallback((elementOrientation: LogicalOrientation, direction?: LogicalDirectionInfo | null | undefined) => {
         direction ??= getLogicalDirectionInfo();
@@ -191,13 +242,53 @@ export function useLogicalDirection<T extends Element>({ onLogicalDirectionChang
         useLogicalDirectionProps: useCallback((props: h.JSX.HTMLAttributes<T>) => useRefElementProps(useElementSizeProps(props)), []),
         getElement,
         getLogicalDirectionInfo,
-        convertElementSize,
+        convertToLogicalSize: convertElementSize,
         convertToLogicalOrientation,
-        convertToPhysicalOrientation
+        convertToPhysicalOrientation,
+        convertToLogicalSide,
+        convertToPhysicalSide
     };
 }
 
+// Helper for extracting info from "ltr", "ttb", etc.
+const M = {
+    t: "top",
+    b: "bottom",
+    l: "left",
+    r: "right"
+} as const;
 
+
+export interface UseLogicalDirectionReturnType<T extends EventTarget> {
+    useLogicalDirectionProps: (props: h.JSX.HTMLAttributes<T>) => h.JSX.HTMLAttributes<T>; 
+    getElement: () => T | null; 
+    getLogicalDirectionInfo: () => LogicalDirectionInfo | null; 
+
+    /**
+     * Given the ElementSize info from useElementSize, converts all those physical properties to their logical counterparts.
+     */
+    convertToLogicalSize: (elementSize: ElementSize, direction?: LogicalDirectionInfo | null | undefined) => LogicalElementSize | null; 
+
+    /**
+     * Turns `"horizontal" | "vertical"` into `"inline" | "block"`
+     */
+    convertToLogicalOrientation: (elementOrientation: PhysicalOrientation, direction?: LogicalDirectionInfo | null | undefined) => "inline" | "block"; 
+
+    /**
+     * Turns `"inline" | "block"` into `"horizontal" | "vertical"`
+     */
+    convertToPhysicalOrientation: (elementOrientation: LogicalOrientation, direction?: LogicalDirectionInfo | null | undefined) => "horizontal" | "vertical"; 
+
+    /**
+     * Turns `"top" | "bottom" | "left" | "right"` into `"block-start" | "block-end" | "inline-start" | "inline-end"`
+     */
+    convertToLogicalSide: (side: "top" | "bottom" | "left" | "right", direction?: LogicalDirectionInfo | null | undefined) => "inline-start" | "inline-end" | "block-start" | "block-end"; 
+
+    /**
+     * Turns `"block-start" | "block-end" | "inline-start" | "inline-end"` into `"top" | "bottom" | "left" | "right"`
+     */
+    convertToPhysicalSide: (side: "inline-start" | "inline-end" | "block-start" | "block-end", direction?: LogicalDirectionInfo | null | undefined) => "top" | "bottom" | "left" | "right";
+}
 
 
 
