@@ -41,7 +41,7 @@ interface UseFocusResult<T extends EventTarget> {
     useFocusProps: <P extends UseFocusProps<T>>(props: P) => MergedProps<FocusProps, P>
 }*/
 
-export interface UseHasFocusReturnType<T extends Node> extends Omit<UseRefElementReturnType<T>, "useRefElementProps">, UseActiveElementReturnType {
+export interface UseHasFocusReturnType<T extends Node> extends Omit<UseRefElementReturnType<T>, "useRefElementProps">, Omit<UseActiveElementReturnType<T>, "useActiveElementProps"> {
 
     /**
      * Modifies the element to be able to track its own focus state
@@ -56,13 +56,12 @@ export interface UseHasFocusReturnType<T extends Node> extends Omit<UseRefElemen
 
 export function useHasFocus<T extends Node>({ onFocusedChanged, onFocusedInnerChanged, onLastFocusedChanged, onLastFocusedInnerChanged, onLastActiveElementChange, onActiveElementChange, onWindowFocusedChange }: UseFocusParameters): UseHasFocusReturnType<T> {
 
-    const { getElement, useRefElementProps } = useRefElement<T>({});
     const [getFocused, setFocused] = usePassiveState<boolean>(onFocusedChanged, () => false);
     const [getFocusedInner, setFocusedInner] = usePassiveState<boolean>(onFocusedInnerChanged, () => false);
     const [getLastFocused, setLastFocused] = usePassiveState<boolean>(onLastFocusedChanged, () => false);
     const [getLastFocusedInner, setLastFocusedInner] = usePassiveState<boolean>(onLastFocusedInnerChanged, () => false);
 
-    const { getActiveElement, getLastActiveElement, getWindowFocused } = useActiveElement({
+    const { getActiveElement, getLastActiveElement, getWindowFocused, useActiveElementProps, getElement } = useActiveElement<T>({
         onActiveElementChange: (activeElement, prevActiveElement) => {
             const selfElement = getElement();
             const focused = (selfElement != null && (selfElement == activeElement as Node | null));
@@ -82,7 +81,7 @@ export function useHasFocus<T extends Node>({ onFocusedChanged, onFocusedInnerCh
         onWindowFocusedChange
     });
 
-    const useHasFocusProps = useCallback(<P extends UseHasFocusPropsParameters<T>>(props: P) => { return useRefElementProps(props); }, [useRefElementProps]);
+    const useHasFocusProps = useCallback(<P extends UseHasFocusPropsParameters<T>>(props: P) => { return useActiveElementProps(props); }, [useActiveElementProps]);
 
 
     return { useHasFocusProps, getElement, getFocused, getFocusedInner, getLastFocused, getLastFocusedInner, getActiveElement, getLastActiveElement, getWindowFocused };

@@ -61,6 +61,9 @@ export function useElementSize<E extends HTMLElement>({ observeBox, onSizeChange
 
     const needANewObserver = (element: E | null, observeBox: ResizeObserverBoxOptions | undefined) => {
         if (element) {
+            const document = element.ownerDocument;
+            const window = document.defaultView;
+
             const handleUpdate = () => {
                 if (element.isConnected) {
                     const { clientWidth, scrollWidth, offsetWidth, clientHeight, scrollHeight, offsetHeight, clientLeft, scrollLeft, offsetLeft, clientTop, scrollTop, offsetTop } = element;
@@ -69,7 +72,7 @@ export function useElementSize<E extends HTMLElement>({ observeBox, onSizeChange
             }
             currentObserveBox.current = observeBox;
 
-            if (("ResizeObserver" in window)) {
+            if (window && ("ResizeObserver" in window)) {
                 const observer = new ResizeObserver((entries) => { handleUpdate(); });
 
                 observer.observe(element, { box: observeBox });
