@@ -49,8 +49,7 @@ const lastActiveElementUpdaters = new Map<Window | null | undefined, Set<undefin
 const windowFocusedUpdaters = new Map<Window | null | undefined, Set<undefined | ((focused: boolean) => void)>>();
 let windowsFocused = new Map<Window | null | undefined, boolean>();
 
-function forEachUpdater<T>(element: Element | null | undefined, map: Map<Window | null | undefined, Set<undefined | ((e: T) => void)>>, value: T) {
-    const window = element?.ownerDocument.defaultView;
+function forEachUpdater<T>(window: Window | null | undefined, map: Map<Window | null | undefined, Set<undefined | ((e: T) => void)>>, value: T) {
     for (let [otherWindow, updaters] of map) {
         if (window === otherWindow) {
             for (let updater of updaters) {
@@ -61,9 +60,10 @@ function forEachUpdater<T>(element: Element | null | undefined, map: Map<Window 
 }
 
 function focusout(e: FocusEvent) {
+    const window = (e.target as Element).ownerDocument.defaultView;
 
     if (e.relatedTarget == null) {
-        forEachUpdater(e.target as Element | null, activeElementUpdaters, null);
+        forEachUpdater(window, activeElementUpdaters, null);
     }
     else {
         // Just wait for the focusin event.
@@ -74,20 +74,20 @@ function focusout(e: FocusEvent) {
 function focusin(e: FocusEvent) {
     const window = (e.target as Element).ownerDocument.defaultView;
     let currentlyFocusedElement = e.target as (Element & HTMLOrSVGElement);
-    forEachUpdater(e.target as Element | null, activeElementUpdaters, currentlyFocusedElement);
-    forEachUpdater(e.target as Element | null, lastActiveElementUpdaters, currentlyFocusedElement);
+    forEachUpdater(window, activeElementUpdaters, currentlyFocusedElement);
+    forEachUpdater(window, lastActiveElementUpdaters, currentlyFocusedElement);
 }
 
 function windowFocus(e: FocusEvent) {
     const window = (e.target instanceof Window? e.target : e.currentTarget instanceof Window? e.currentTarget : (e.target as Element).ownerDocument.defaultView);
     windowsFocused.set(window, true);
-    forEachUpdater(e.target as Element | null, windowFocusedUpdaters, true);
+    forEachUpdater(window, windowFocusedUpdaters, true);
 }
 
 function windowBlur(e: FocusEvent) {
     const window = (e.target instanceof Window? e.target : e.currentTarget instanceof Window? e.currentTarget : (e.target as Element).ownerDocument.defaultView);
     windowsFocused.set(window, false);
-    forEachUpdater(e.target as Element | null, windowFocusedUpdaters, false);
+    forEachUpdater(window, windowFocusedUpdaters, false);
 }
 
 export interface UseActiveElementParameters {
