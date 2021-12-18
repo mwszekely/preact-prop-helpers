@@ -79,13 +79,13 @@ function focusin(e: FocusEvent) {
 }
 
 function windowFocus(e: FocusEvent) {
-    const window = (e.target as Element).ownerDocument.defaultView;
+    const window = (e.target instanceof Window? e.target : e.currentTarget instanceof Window? e.currentTarget : (e.target as Element).ownerDocument.defaultView);
     windowsFocused.set(window, true);
     forEachUpdater(e.target as Element | null, windowFocusedUpdaters, true);
 }
 
 function windowBlur(e: FocusEvent) {
-    const window = (e.target as Element).ownerDocument.defaultView;
+    const window = (e.target instanceof Window? e.target : e.currentTarget instanceof Window? e.currentTarget : (e.target as Element).ownerDocument.defaultView);
     windowsFocused.set(window, false);
     forEachUpdater(e.target as Element | null, windowFocusedUpdaters, false);
 }
