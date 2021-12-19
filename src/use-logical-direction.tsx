@@ -98,7 +98,7 @@ export function useLogicalDirection<T extends Element>({ onLogicalDirectionChang
             if (t == "upright")
                 d = "ltr";
 
-            return ({ ...WritingModes[w ?? "horizontal-tb"][d ?? "ltr"] });
+            return ({ ...WritingModes[w || "horizontal-tb"][d || "ltr"] });
         }
 
         return null;
@@ -140,7 +140,7 @@ export function useLogicalDirection<T extends Element>({ onLogicalDirectionChang
 
                 case "left":
                     return direction.blockDirection === "ltr" ? "block-start" : "block-end";
-                case "bottom":
+                case "right":
                     return direction.blockDirection === "rtl" ? "block-start" : "block-end";
             }
         }
@@ -153,7 +153,7 @@ export function useLogicalDirection<T extends Element>({ onLogicalDirectionChang
 
                 case "left":
                     return direction.inlineDirection === "ltr" ? "inline-start" : "inline-end";
-                case "bottom":
+                case "right":
                     return direction.inlineDirection === "rtl" ? "inline-start" : "inline-end";
             }
         }
