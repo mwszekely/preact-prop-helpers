@@ -144,7 +144,7 @@ export function useActiveElement<T extends Node>({ onActiveElementChange, onLast
                 const document = element.ownerDocument;
                 const window = document?.defaultView;
 
-                if (activeElementUpdaters.size === 0) {
+                if ((activeElementUpdaters.get(window)?.size ?? 0) === 0) {
                     document?.addEventListener("focusin", focusin, { passive: true });
                     document?.addEventListener("focusout", focusout, { passive: true });
                     window?.addEventListener("focus", windowFocus, { passive: true });
