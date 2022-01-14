@@ -12,7 +12,7 @@ interface ClassNameTesterProps {
 }
 
 export default function ClassNamesMerger({ lhsClass, lhsClassName, rhsClass, rhsClassName, callback }: ClassNameTesterProps) {
-    const p = useMergedProps({ class: lhsClass, className: lhsClassName }, { class: rhsClass, className: rhsClassName });
+    const p = useMergedProps<HTMLDivElement>()({ class: lhsClass, className: lhsClassName }, { class: rhsClass, className: rhsClassName });
 
     callback(p.className);
 
@@ -27,26 +27,11 @@ describe('useMergedProps', () => {
         const wrapper = mount(<ClassNamesMerger lhsClass={undefined} lhsClassName={undefined} rhsClass={undefined} rhsClassName={undefined} callback={callback} />);
         expect(result).toBeUndefined();
     });
-    it('should have a className of null if all class name props are null', () => {
+    it('should have a className of undefined if all class name props are null', () => {
         let result: string | null | undefined;
         const callback = (r: string | null | undefined) => result = r;
         const wrapper = mount(<ClassNamesMerger lhsClass={null} lhsClassName={null} rhsClass={null} rhsClassName={null} callback={callback} />);
-        expect(result).toBeNull();
-    });
-    it('should prefer null over undefined', () => {
-        let result: string | null | undefined;
-        const callback = (r: string | null | undefined) => result = r;
-        for (let i = 0; i < 0b10000; ++i) {
-            const lhsClass     = (i & 0b0001)? null : undefined;
-            const lhsClassName = (i & 0b0010)? null : undefined;
-            const rhsClass     = (i & 0b0100)? null : undefined;
-            const rhsClassName = (i & 0b1000)? null : undefined;
-            const wrapper = mount(<ClassNamesMerger lhsClass={lhsClass} lhsClassName={lhsClassName} rhsClass={rhsClass} rhsClassName={rhsClassName} callback={callback} />);
-            if (i === 0)
-            expect(result).toBeUndefined();
-            else
-            expect(result).toBeNull();
-        }
+        expect(result).toBeUndefined();
     });
     it('should not let null or undefined overwrite class or className', () => {
         let result: string | null | undefined;

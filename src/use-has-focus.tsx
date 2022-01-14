@@ -1,13 +1,13 @@
 
 import { h } from "preact";
 import { useCallback } from "preact/hooks";
-import { usePassiveState } from "./use-passive-state";
+import { useEnsureStability, usePassiveState } from "./use-passive-state";
 import { useActiveElement, UseActiveElementParameters, UseActiveElementReturnType } from "./use-active-element";
 import { MergedProps } from "./use-merged-props";
 import { useRefElement, UseRefElementPropsReturnType, UseRefElementReturnType } from "./use-ref-element";
 import { useStableCallback } from "./use-stable-callback";
 
-export interface UseFocusParameters extends UseActiveElementParameters {
+export interface UseFocusParameters<T extends Node> extends UseActiveElementParameters<T> {
     /**
      * Whether the element itself currently has focus.
      */
@@ -54,30 +54,35 @@ export interface UseHasFocusReturnType<T extends Node> extends Omit<UseRefElemen
     getLastFocusedInner(): boolean;
 }
 
-export function useHasFocus<T extends Node>({ onFocusedChanged, onFocusedInnerChanged, onLastFocusedChanged, onLastFocusedInnerChanged, onLastActiveElementChange, onActiveElementChange, onWindowFocusedChange }: UseFocusParameters): UseHasFocusReturnType<T> {
+function returnFalse() { return false; }
+function noop() { }
 
-    const [getFocused, setFocused] = usePassiveState<boolean>(onFocusedChanged, () => false);
-    const [getFocusedInner, setFocusedInner] = usePassiveState<boolean>(onFocusedInnerChanged, () => false);
-    const [getLastFocused, setLastFocused] = usePassiveState<boolean>(onLastFocusedChanged, () => false);
-    const [getLastFocusedInner, setLastFocusedInner] = usePassiveState<boolean>(onLastFocusedInnerChanged, () => false);
+export function useHasFocus<T extends Node>({ onFocusedChanged, onFocusedInnerChanged, onLastFocusedChanged, onLastFocusedInnerChanged, onLastActiveElementChange, onActiveElementChange, onWindowFocusedChange }: UseFocusParameters<T>): UseHasFocusReturnType<T> {
+
+    useEnsureStability(onFocusedChanged, onFocusedInnerChanged, onLastFocusedChanged, onLastFocusedInnerChanged, onLastActiveElementChange, onActiveElementChange, onWindowFocusedChange);
+
+    const [getFocused, setFocused] = usePassiveState<boolean>(onFocusedChanged, returnFalse);
+    const [getFocusedInner, setFocusedInner] = usePassiveState<boolean>(onFocusedInnerChanged, returnFalse);
+    const [getLastFocused, setLastFocused] = usePassiveState<boolean>(onLastFocusedChanged, returnFalse);
+    const [getLastFocusedInner, setLastFocusedInner] = usePassiveState<boolean>(onLastFocusedInnerChanged, returnFalse);
 
     const { getActiveElement, getLastActiveElement, getWindowFocused, useActiveElementProps, getElement } = useActiveElement<T>({
-        onActiveElementChange: (activeElement, prevActiveElement) => {
+        onActiveElementChange: useCallback<NonNullable<UseActiveElementParameters<T>["onActiveElementChange"]>>((activeElement, prevActiveElement) => {
             const selfElement = getElement();
             const focused = (selfElement != null && (selfElement == activeElement as Node | null));
             const focusedInner = (!!selfElement?.contains(activeElement as Node | null));
             setFocused(focused);
             setFocusedInner(focusedInner);
             onActiveElementChange?.(activeElement, prevActiveElement);
-        },
-        onLastActiveElementChange: (lastActiveElement, prevLastActiveElement) => {
+        }, []),
+        onLastActiveElementChange: useCallback<NonNullable<UseActiveElementParameters<T>["onLastActiveElementChange"]>>((lastActiveElement, prevLastActiveElement) => {
             const selfElement = getElement();
             const focused = (selfElement != null && (selfElement == lastActiveElement as Node | null));
             const focusedInner = (!!selfElement?.contains(lastActiveElement as Node | null));
             setLastFocused(focused);
             setLastFocusedInner(focusedInner);
             onLastActiveElementChange?.(lastActiveElement, prevLastActiveElement);
-        },
+        }, []),
         onWindowFocusedChange
     });
 

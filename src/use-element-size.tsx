@@ -1,7 +1,7 @@
 import { h } from "preact";
-import { useEffect, useRef } from "preact/hooks";
+import { useCallback, useEffect, useRef } from "preact/hooks";
 import { useRefElement, UseRefElementProps } from "./use-ref-element";
-import { OnPassiveStateChange, usePassiveState } from "./use-passive-state";
+import { OnPassiveStateChange, useEnsureStability, usePassiveState } from "./use-passive-state";
 
 interface UseElementSizeParameters {
     /**
@@ -18,7 +18,7 @@ interface UseElementSizeParameters {
      * 
      * @see https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver/observe#parameters
      */
-    observeBox?: ResizeObserverOptions["box"];
+    getObserveBox?(): ResizeObserverOptions["box"];
 }
 
 export type UseElementSizeProps<E extends HTMLElement> = UseRefElementProps<E>;
@@ -52,14 +52,16 @@ function extractElementSize(element: Element | undefined | null): ElementSize {
     const { clientWidth, scrollWidth, offsetWidth, clientHeight, scrollHeight, offsetHeight, clientLeft, scrollLeft, offsetLeft, clientTop, scrollTop, offsetTop } = (element as (Element & Partial<HTMLElement>));
     return ({ clientWidth, scrollWidth, offsetWidth, clientHeight, scrollHeight, offsetHeight, clientLeft, scrollLeft, offsetLeft, clientTop, scrollTop, offsetTop });
 }
+function returnNull() { return null; }
+export function useElementSize<E extends HTMLElement>({ getObserveBox, onSizeChange }: UseElementSizeParameters): UseElementSizeReturnType<E> {
 
-export function useElementSize<E extends HTMLElement>({ observeBox, onSizeChange }: UseElementSizeParameters): UseElementSizeReturnType<E> {
+    useEnsureStability(getObserveBox, onSizeChange);
 
-    const [getSize, setSize] = usePassiveState<ElementSize | null>(onSizeChange as OnPassiveStateChange<ElementSize | null>, () => null);
+    const [getSize, setSize] = usePassiveState<ElementSize | null>(onSizeChange as OnPassiveStateChange<ElementSize | null>, returnNull);
 
-    const currentObserveBox = useRef<ResizeObserverBoxOptions | undefined>(observeBox);
+    const currentObserveBox = useRef<ResizeObserverBoxOptions | undefined>(undefined);
 
-    const needANewObserver = (element: E | null, observeBox: ResizeObserverBoxOptions | undefined) => {
+    const needANewObserver = useCallback((element: E | null, observeBox: ResizeObserverBoxOptions | undefined) => {
         if (element) {
             const document = element.ownerDocument;
             const window = document.defaultView;
@@ -70,7 +72,7 @@ export function useElementSize<E extends HTMLElement>({ observeBox, onSizeChange
                     setSize({ clientWidth, scrollWidth, offsetWidth, clientHeight, scrollHeight, offsetHeight, clientLeft, scrollLeft, offsetLeft, clientTop, scrollTop, offsetTop });
                 }
             }
-            currentObserveBox.current = observeBox;
+
 
             if (window && ("ResizeObserver" in window)) {
                 const observer = new ResizeObserver((entries) => { handleUpdate(); });
@@ -84,14 +86,16 @@ export function useElementSize<E extends HTMLElement>({ observeBox, onSizeChange
                 return () => document.removeEventListener("resize", handleUpdate);
             }
         }
-    }
+    }, [])
 
-    const { getElement, useRefElementProps } = useRefElement<E>({ onElementChange: e => needANewObserver(e, observeBox) });
+    const { getElement, useRefElementProps } = useRefElement<E>({ onElementChange: useCallback((e: E | null) => needANewObserver(e, getObserveBox?.()), []) });
 
     useEffect(() => {
-        if (currentObserveBox.current !== observeBox)
-            needANewObserver(getElement(), observeBox);
-    }, [observeBox]);
+        if (getObserveBox) {
+            if (currentObserveBox.current !== getObserveBox())
+                needANewObserver(getElement(), getObserveBox());
+        }
+    });
 
     return {
         getElement,

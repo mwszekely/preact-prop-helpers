@@ -144,7 +144,7 @@ export function useChildManager<I extends ManagedChildInfo<any>>(): UseChildMana
     const getMountIndex = useCallback((index: K) => { return mountOrder.current.get(index)!; }, []);
 
     const useManagedChild: UsedManagedChild<I> = useCallback(<ChildType extends EventTarget>(info: I) => {
-        const { getElement, useRefElementProps } = useRefElement<ChildType>({ onElementChange: (element) => {
+        const { getElement, useRefElementProps } = useRefElement<ChildType>({ onElementChange: useCallback((element: ChildType | null) => {
             if (element) {
                 indicesByElement.current.set(element, info.index);
                 deletedIndices.current.delete(info.index);
@@ -172,7 +172,7 @@ export function useChildManager<I extends ManagedChildInfo<any>>(): UseChildMana
                     }
                 }
             }
-        } });
+        }, []) });
 
         useLayoutEffect(() => {
             let index = getTotalChildrenMounted();

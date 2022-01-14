@@ -1,7 +1,8 @@
 
-import { useCallback, useLayoutEffect } from "preact/hooks";
+import { StateUpdater, useCallback, useLayoutEffect } from "preact/hooks";
 import { useRefElement, UseRefElementReturnType } from "./use-ref-element";
-import { OnPassiveStateChange, usePassiveState } from "./use-passive-state";
+import { OnPassiveStateChange, useEnsureStability, usePassiveState } from "./use-passive-state";
+import { useStableCallback } from "./use-stable-callback";
 
 
 /**
@@ -44,8 +45,8 @@ import { OnPassiveStateChange, usePassiveState } from "./use-passive-state";
  */
 const dummy = 0;
 
-const activeElementUpdaters = new Map<Window | null | undefined, Set<undefined | ((e: (Element & HTMLOrSVGElement) | null) => void)>>();
-const lastActiveElementUpdaters = new Map<Window | null | undefined, Set<undefined | ((e: (Element & HTMLOrSVGElement)) => void)>>();
+const activeElementUpdaters = new Map<Window | null | undefined, Set<undefined | ((e: Node | null) => void)>>();
+const lastActiveElementUpdaters = new Map<Window | null | undefined, Set<undefined | ((e: Node) => void)>>();
 const windowFocusedUpdaters = new Map<Window | null | undefined, Set<undefined | ((focused: boolean) => void)>>();
 let windowsFocused = new Map<Window | null | undefined, boolean>();
 
@@ -79,30 +80,30 @@ function focusin(e: FocusEvent) {
 }
 
 function windowFocus(e: FocusEvent) {
-    const window = (e.target instanceof Window? e.target : e.currentTarget instanceof Window? e.currentTarget : (e.target as Element).ownerDocument.defaultView);
+    const window = (e.target instanceof Window ? e.target : e.currentTarget instanceof Window ? e.currentTarget : (e.target as Element).ownerDocument.defaultView);
     windowsFocused.set(window, true);
     forEachUpdater(window, windowFocusedUpdaters, true);
 }
 
 function windowBlur(e: FocusEvent) {
-    const window = (e.target instanceof Window? e.target : e.currentTarget instanceof Window? e.currentTarget : (e.target as Element).ownerDocument.defaultView);
+    const window = (e.target instanceof Window ? e.target : e.currentTarget instanceof Window ? e.currentTarget : (e.target as Element).ownerDocument.defaultView);
     windowsFocused.set(window, false);
     forEachUpdater(window, windowFocusedUpdaters, false);
 }
 
-export interface UseActiveElementParameters {
+export interface UseActiveElementParameters<T extends Node> {
 
     /**
      * Called any time the active element changes. Does not need
      * to be stable.
      */
-    onActiveElementChange?: OnPassiveStateChange<(Element & HTMLOrSVGElement) | null>;
+    onActiveElementChange?: OnPassiveStateChange<T | null>;
 
     /**
      * Called any time the active element changes and is not null. 
      * Does not need to be stable.
      */
-    onLastActiveElementChange?: OnPassiveStateChange<(Element & HTMLOrSVGElement)>;
+    onLastActiveElementChange?: OnPassiveStateChange<T>;
 
     /**
      * Called any time the window gains/loses focus. Does not need
@@ -113,9 +114,9 @@ export interface UseActiveElementParameters {
 
 export interface UseActiveElementReturnType<T extends Node> extends Omit<UseRefElementReturnType<T>, "useRefElementProps"> {
     /** Returns whatever element is currently focused, or `null` if there's no focused element */
-    getActiveElement: () => (Element & HTMLOrSVGElement) | null;
+    getActiveElement: () => T | null;
     /** Returns whatever element is currently focused, or whatever element was most recently focused if there's no focused element */
-    getLastActiveElement: () => Element & HTMLOrSVGElement;
+    getLastActiveElement: () => T;
     /** Returns if the window itself has focus or not */
     getWindowFocused: () => boolean;
 
@@ -135,7 +136,9 @@ export interface UseActiveElementReturnType<T extends Node> extends Omit<UseRefE
  * 
  * If you need the component to re-render when the active element changes, use the `on*Change` arguments to set some state on your end.
  */
-export function useActiveElement<T extends Node>({ onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange }: UseActiveElementParameters): UseActiveElementReturnType<T> {
+export function useActiveElement<T extends Node>({ onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange }: UseActiveElementParameters<T>): UseActiveElementReturnType<T> {
+
+    useEnsureStability(onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange);
 
     const { getElement, useRefElementProps } = useRefElement<T>({
         onElementChange: useCallback((element: T | null) => {
@@ -157,8 +160,8 @@ export function useActiveElement<T extends Node>({ onActiveElementChange, onLast
                 const localLastActiveElementUpdaters = lastActiveElementUpdaters.get(window) ?? new Set();
                 const localWindowFocusedUpdaters = windowFocusedUpdaters.get(window) ?? new Set();
 
-                localActiveElementUpdaters.add(setActiveElement);
-                localLastActiveElementUpdaters.add(setLastActiveElement);
+                localActiveElementUpdaters.add(setActiveElement as StateUpdater<Node | null>);
+                localLastActiveElementUpdaters.add(setLastActiveElement as StateUpdater<Node>);
                 localWindowFocusedUpdaters.add(setWindowFocused);
 
                 activeElementUpdaters.set(window, localActiveElementUpdaters);
@@ -166,8 +169,8 @@ export function useActiveElement<T extends Node>({ onActiveElementChange, onLast
                 windowFocusedUpdaters.set(window, localWindowFocusedUpdaters);
 
                 return () => {
-                    activeElementUpdaters.get(window)!.delete(setActiveElement);
-                    lastActiveElementUpdaters.get(window)!.delete(setLastActiveElement);
+                    activeElementUpdaters.get(window)!.delete(setActiveElement as StateUpdater<Node | null>);
+                    lastActiveElementUpdaters.get(window)!.delete(setLastActiveElement as StateUpdater<Node>);
                     windowFocusedUpdaters.get(window)!.delete(setWindowFocused);
 
                     if (activeElementUpdaters.size === 0) {
@@ -181,9 +184,11 @@ export function useActiveElement<T extends Node>({ onActiveElementChange, onLast
         }, [])
     })
 
-    const [getActiveElement, setActiveElement] = usePassiveState<(Element & HTMLOrSVGElement) | null>(onActiveElementChange, undefined);
-    const [getLastActiveElement, setLastActiveElement] = usePassiveState<(Element & HTMLOrSVGElement)>(onLastActiveElementChange, undefined);
-    const [getWindowFocused, setWindowFocused] = usePassiveState<boolean>(onWindowFocusedChange, () => true);
+    const [getActiveElement, setActiveElement] = usePassiveState<T | null>(onActiveElementChange, undefined);
+    const [getLastActiveElement, setLastActiveElement] = usePassiveState<T>(onLastActiveElementChange, undefined);
+    const [getWindowFocused, setWindowFocused] = usePassiveState<boolean>(onWindowFocusedChange, returnTrue);
 
     return { getElement, useActiveElementProps: useRefElementProps, getActiveElement, getLastActiveElement, getWindowFocused };
 }
+
+function returnTrue() { return true; }

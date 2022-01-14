@@ -1,9 +1,34 @@
 import { useCallback, useLayoutEffect, useRef } from "preact/hooks";
-import { useStableCallback } from "./use-stable-callback";
 
 
 export type PassiveStateUpdater<S> = (value: S | ((prevState: S | undefined) => S)) => void;
 export type OnPassiveStateChange<T> = ((value: T, prevValue: T | undefined) => (void | (() => void)));
+
+/**
+ * Debug hook.
+ * 
+ * Given a value or set of values, emits a console error if any of them change from one render to the next.
+ */
+export function useEnsureStability<T extends any[]>(...values: T) {
+    useHelper(values.length, 0);
+    values.forEach(useHelper);
+    return;
+
+
+    function useHelper<U>(value: U, index: number) {
+
+        // Make sure that the provided functions are perfectly stable across renders
+        const helperToEnsureStability = useRef(value);
+        const shownError = useRef(false);
+        if (helperToEnsureStability.current != value) {
+            if (!shownError.current) {
+                console.error(`This hook requires some or all of its arguments remain stable across each render; please check the ${index}-indexed value that was checked.`);
+                debugger;
+                shownError.current = true;
+            }
+        }
+    }
+}
 
 /**
  * Similar to `useState`, but for values that aren't "render-important" &ndash; updates don't cause a re-render and so the value shouldn't be used during render (though it certainly can, at least by re-rendering again).
@@ -19,14 +44,17 @@ export type OnPassiveStateChange<T> = ((value: T, prevValue: T | undefined) => (
  * 
  * Note that while calling `setState` doesn't cause any re-renders, you can do that within your `onChange` function, called whenever the value changes via that `setState`.
  * 
- * @param onChange The "effect" function to run when the value changes. Effectively the same as `useEffect`'s "effect" function
- * @param initialValue If provided, the effect will be invoked once with this value on mount.
+ * @param onChange The "effect" function to run when the value changes. Effectively the same as `useEffect`'s "effect" function.  MUST BE STABLE, either because it has no dependencies, or because it's from useStableCallback, but this will mean you cannot use getState or setState during render.
+ * @param getInitialValue If provided, the effect will be invoked once with this value on mount. MUST BE STABLE, either because it has no dependencies, or because it's from useStableCallback, but this will mean you cannot use getState or setState during render.
  * @returns 
  */
 export function usePassiveState<T>(onChange: undefined | null | OnPassiveStateChange<T>, getInitialValue?: () => T): readonly [() => T, PassiveStateUpdater<T>] {
     const valueRef = useRef<T | typeof Unset>(Unset);
     const warningRef = useRef(false);
     const cleanupCallbackRef = useRef<undefined | (() => void)>(undefined);
+
+    // Make sure that the provided functions are perfectly stable across renders
+    useEnsureStability(onChange, getInitialValue);
 
     // Shared between "dependency changed" and "component unmounted".
     const onShouldCleanUp = useCallback(() => {
@@ -39,7 +67,7 @@ export function usePassiveState<T>(onChange: undefined | null | OnPassiveStateCh
     // value in place of having no value at all yet.
     // This is the shared code for that, used on mount and whenever
     // getValue is called.
-    const tryEnsureValue = useStableCallback(() => {
+    const tryEnsureValue = useCallback(() => {
         if (valueRef.current === Unset && getInitialValue != undefined) {
             try {
                 const initialValue = getInitialValue();
@@ -50,10 +78,10 @@ export function usePassiveState<T>(onChange: undefined | null | OnPassiveStateCh
                 // Exceptions are intentional to allow bailout (without exposing the Unset symbol)
             }
         }
-    });
+    }, [/* getInitialValue and onChange intentionally omitted */]);
 
 
-    const getValue = useStableCallback(() => {
+    const getValue = useCallback(() => {
         if (warningRef.current)
             console.warn("During onChange, prefer using the (value, prevValue) arguments instead of getValue -- it's ambiguous as to if you're asking for the old or new value at this point in time for this component.");
 
@@ -64,17 +92,19 @@ export function usePassiveState<T>(onChange: undefined | null | OnPassiveStateCh
             tryEnsureValue();
 
         return (valueRef.current === Unset ? undefined! : valueRef.current!) as T;
-    });
+    }, []);
 
     useLayoutEffect(() => {
         // Make sure we've run our effect at least once on mount.
         // (If we have an initial value, of course)
         tryEnsureValue();
+
+
     }, []);
 
     // The actual code the user calls to (possibly) run a new effect.
-    const setValue = useStableCallback<PassiveStateUpdater<T>>((arg) => {
-        const prevDep = getValue();
+    const setValue = useCallback<PassiveStateUpdater<T>>((arg) => {
+        const prevDep = valueRef.current === Unset ? undefined : getValue();
         const dep = arg instanceof Function ? arg(prevDep!) : arg;
 
         if (dep !== valueRef.current) {
@@ -90,7 +120,7 @@ export function usePassiveState<T>(onChange: undefined | null | OnPassiveStateCh
             // Allow the user to normally call getValue again
             warningRef.current = false;
         }
-    });
+    }, []);
 
     return [getValue, setValue] as const;
 }

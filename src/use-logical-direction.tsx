@@ -1,7 +1,7 @@
 import { useCallback, useLayoutEffect, useRef, useState } from "preact/hooks";
 import { useRefElement } from "./use-ref-element";
 import { ElementSize, useElementSize } from "./use-element-size";
-import { usePassiveState } from "./use-passive-state";
+import { useEnsureStability, usePassiveState } from "./use-passive-state";
 import { h } from "preact";
 
 //export type BlockFlowDirection = "downwards" | "leftwards" | "rightwards";
@@ -58,22 +58,17 @@ export interface LogicalElementSize {
  */
 export function useLogicalDirection<T extends Element>({ onLogicalDirectionChange }: UseLogicalDirectionParameters): UseLogicalDirectionReturnType<T> {
 
+    useEnsureStability(onLogicalDirectionChange);
+
     const [getComputedStyles, setComputedStyles] = usePassiveState<CSSStyleDeclaration | null>(null);
 
 
     const { getElement, useRefElementProps } = useRefElement<T | null>({
-        onElementChange: (element) => {
+        onElementChange: useCallback((element: T | null) => {
             if (element) {
                 setComputedStyles(window.getComputedStyle(element));
-                // The element hasn't actually been hooked up to the document yet.
-                // Wait a moment so that we can properly use `getComputedStyle`
-                // (since we only read it on mount)
-                /*queueMicrotask(() => {
-                    updateLogicalInfo(element!);
-                })*/
-
             }
-        }
+        },[])
     });
 
     // TODO: There's no way to refresh which writing mode we have once mounted.
@@ -86,7 +81,7 @@ export function useLogicalDirection<T extends Element>({ onLogicalDirectionChang
     // and if so, tests if the writing mode has changed too.
     //
     // This will work for at least some number of cases, but a better solution is still needed.
-    const { useElementSizeProps } = useElementSize({ onSizeChange: _ => onLogicalDirectionChange?.(getLogicalDirectionInfo()) })
+    const { useElementSizeProps } = useElementSize({ onSizeChange: useCallback(_ => onLogicalDirectionChange?.(getLogicalDirectionInfo()), []) })
 
     const getLogicalDirectionInfo = useCallback(() => {
         const computedStyles = getComputedStyles();

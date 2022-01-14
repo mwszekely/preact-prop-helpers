@@ -44,8 +44,8 @@ There are a few reasons:
 |`useRandomId`										|Allows a component to use a randomly-generated ID. Also lets another component reference whatever ID was used, e.g. in a `for` or `aria-labelledby` prop.|
 |`useSortableChildren`|                             |A component using this hook can re-order its immediate children arbitrarily in response to something.|
 |`useTimeout`, `useInterval`, `useAnimationFrame`	|Runs the specified function (which doesn't need to be stable) with the given delay/interval/on every frame. In particular `useTimeout` is very effective as "`useEffect` but on a delay".|
-|`useStableCallback`								|`useCallback`, but doesn't require dependencies and is always stable. __Cannot be used during render__.|
-|`useStableGetter`									|Allows you to use some variable within `useEffect` or `useCallback` without including it in a dependency array. __Cannot be used during render__.|
+|`useStableCallback`								|`useCallback`, but doesn't require dependencies and is always stable. __Cannot be used during render__, only during event handlers, `useLayoutEffect`, etc.|
+|`useStableGetter`									|Allows you to use some variable within `useEffect` or `useCallback` without including it in a dependency array. __Cannot be used during render__, only during event handlers, `useLayoutEffect`, etc.|
 |`useState`											|Identical to the built-in, but returns a third value, `getState`, that is stable everywhere, and __can be used during render__. In general, this is the *only* getter that can be used there.|
 |`usePersistentState`								|Identical to `useState`, but persists across browsing sessions, separate tabs, etc.|
 |`usePassiveState`                                  |Offshoot of `useState` that, instead of re-rendering, runs a `useEffect`-esque effect & cleanup function when the state changes.|
@@ -58,6 +58,8 @@ There are a few reasons:
 # General Purpose Prop Hooks
 
 These hooks can all be used to modify the props that were going to be passed to an element to "enhance" them with special behavior.  `useElementSize`, for example, "enhances" an element with the ability to report its size during render by using its `ref` in a `ResizeObserver`.  `useDraggable` "enhances" an element with the ability to be dragged and report its dragging state during render, etc.
+
+Note that a number of the `onWhateverChange` arguments (e.g. `onElementSizeChange`) require that function to be stable across each render. This means either wrapping it in `useCallback(()=>{}, [/*empty*/])`, or wrapping it in `useStableCallback(()=>{})`.  Keep in mind that `setState` and `getState` do not ever need to be listed as dependencies for `useCallback`.
 
 ## `useMergedProps`
 ```tsx 
@@ -102,8 +104,15 @@ Returns the element referenced by a ref as soon as the element mounts, before th
 
 That being said, if you do need the element and explicitly need to leave it *out* of a dependency array, `getElement` can do that, as it is stable across all renders.
 
+You can either store the element via `setState` and re-render to do something in `useEffect`, or you can use `getElement` to just use the element during, e.g., and event handler, which won't cause a re-render.
+
+Example #1:
 ```tsx
-const { element, useRefElementProps } = useRefElement<HTMLDivElement>();
+const [element, setElement] = useState<HTMLDivElement>(null);
+
+const { getElement, useRefElementProps } = useRefElement<HTMLDivElement>({ 
+    onElementChange: setElement
+});
 
 useLayoutEffect(() => {
     if (element) {
@@ -114,6 +123,24 @@ useLayoutEffect(() => {
 }, [element]);
 
 return <div {...useRefElementProps(props)} />
+```
+
+Example #2:
+```tsx
+const { getElement, useRefElementProps } = useRefElement<HTMLDivElement>({ 
+
+    // Optional, but if onElementChange exists,
+    // the function must be stable across all renders,
+    // which the setElement from useState is.
+    onElementChange: setElement
+});
+
+return <div {...useRefElementProps({ onClick: e => {
+    const element = getElement();
+    if (element) {
+        // Do something fun with the HTMLDivElement.
+    }
+} })} />
 ```
 
 ## `useDraggable`, `useDroppable`
@@ -280,7 +307,7 @@ Allows you to inspect which element in the `document` currently has focus, which
 * `getActiveElement()`
 * `getLastActiveElement()`
 * `getWindowFocused()`
-* **No prop-modifying hook is returned because none is necessary**
+* `useActiveElementProps()`
 
 (The document's body receiving focus, like it does when you click on an empty area, is counted as no element having focus for all intents and purposes)
 
@@ -357,4 +384,6 @@ In other words, if you don't change the key or the `toString`/`fromString` funct
 Another entirely optional drop-in replacement for the native Preact hooks.  These provide two arguments: the previous input values, and a list of which ones caused the effect to fire.  The latter is very useful for debugging.
 
 Aside from this, there is no difference between them.  Feel free to use the native ones if you don't need that information.
+
+(Technically, `useStableGetter` and `useStableCallback` have a dependency on a third effect hook, but it is not exported publicly and in general should probably not be used.)
 

@@ -1,10 +1,12 @@
 
-import { options, VNode } from "preact";
+import { Component, options, VNode } from "preact";
 import { EffectCallback, Inputs, useEffect, useLayoutEffect, useState } from "preact/hooks";
 import { generateRandomId } from "./use-random-id";
 
 const previousInputs = new Map<string, Inputs | undefined>();
-const toRun = new Map<string, { effect: EffectCallback, inputs?: Inputs }>();
+const toRun = new Map<string, { effect: EffectCallback, inputs?: Inputs, cleanup: null | undefined | void | (() => void) }>();
+
+const commitName = ("__c" in options? "__c" : "commit" in options ? "commit" : "_commit" in options ? "_commit" : "__c") as keyof typeof options;
 
 // TODO: Whether this goes in options.diffed or options._commit
 // is a post-suspense question.
@@ -13,19 +15,20 @@ const toRun = new Map<string, { effect: EffectCallback, inputs?: Inputs }>();
 // so `ref={someStableFunction}` works.
 // 
 // Also it's private.
-const originalDiffed = options.diffed;
-options.diffed = (vnode, ...args) => {
-    
-    for (let [id, { effect, inputs }] of toRun) {
+const originalCommit = options[commitName] as (vnode: VNode, commitQueue: Component[]) => void;
+const newCommit: typeof originalCommit = (vnode, commitQueue) => {
+    for (let [id, effectInfo] of toRun) {
         const oldInputs = previousInputs.get(id);
-        if (argsChanged(oldInputs, inputs)) {
-            effect();
-            previousInputs.set(id, inputs);
+        if (argsChanged(oldInputs, effectInfo.inputs)) {
+            effectInfo.cleanup?.();
+            effectInfo.cleanup = effectInfo.effect();
+            previousInputs.set(id, effectInfo.inputs);
         }
     }
     toRun.clear();
-    originalDiffed?.(vnode, ...args);
+    originalCommit?.(vnode, commitQueue);
 }
+options[commitName] = newCommit as never
 
 /**
  * Semi-private function to allow stable callbacks even within `useLayoutEffect` and ref assignment.
@@ -38,7 +41,7 @@ options.diffed = (vnode, ...args) => {
  */
 export function useBeforeLayoutEffect(effect: EffectCallback, inputs?: Inputs) {
     const [id] = useState(() => generateRandomId());
-    toRun.set(id, { effect, inputs });
+    toRun.set(id, { effect, inputs, cleanup: null });
 
     useEffect(() => {
         return () => {
@@ -49,9 +52,9 @@ export function useBeforeLayoutEffect(effect: EffectCallback, inputs?: Inputs) {
 }
 
 function argsChanged(oldArgs?: Inputs, newArgs?: Inputs): boolean {
-	return !!(
-		!oldArgs ||
-		oldArgs.length !== newArgs?.length ||
-		newArgs?.some((arg, index) => arg !== oldArgs[index])
-	);
+    return !!(
+        !oldArgs ||
+        oldArgs.length !== newArgs?.length ||
+        newArgs?.some((arg, index) => arg !== oldArgs[index])
+    );
 }

@@ -36,15 +36,18 @@ export function useTimeout({ timeout, callback, triggerIndex }: UseTimeout) {
     // restart the timeout.  The timeout does NOT reset
     // when the duration or callback changes, only triggerIndex.
     useEffect(() => {
-        let timeout = getTimeout();
-        console.assert(timeoutIsNull == (timeout == null));
-
-        if (timeout != null) {
-            startTimeRef.current = +(new Date());
-
-            const handle = setTimeout(stableCallback, timeout);
-            return () => clearTimeout(handle);
+        if (!timeoutIsNull) {
+            let timeout = getTimeout();
+            console.assert(timeoutIsNull == (timeout == null));
+    
+            if (timeout != null) {
+                startTimeRef.current = +(new Date());
+    
+                const handle = setTimeout(stableCallback, timeout);
+                return () => clearTimeout(handle);
+            }
         }
+        
     }, [triggerIndex, timeoutIsNull])
 
     const getElapsedTime = useCallback(() => {

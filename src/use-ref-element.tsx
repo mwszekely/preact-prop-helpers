@@ -15,7 +15,7 @@ export interface UseRefElementReturnType<T> {
 export interface UseRefElementParameters<T> {
     onElementChange?: OnPassiveStateChange<T | null>;
 }
-
+function returnNull() { return null; }
 /**
  * Allows accessing the element a ref references as soon as it does so.
  * *This hook itself returns a hook*--useRefElementProps modifies the props that you were going to pass to an HTMLElement, 
@@ -25,9 +25,10 @@ export interface UseRefElementParameters<T> {
  * 
  * @returns The element, and the sub-hook that makes it retrievable.
  */
-export function useRefElement<T>({ onElementChange }: UseRefElementParameters<T>): UseRefElementReturnType<T> {
+export function useRefElement<T>(args?: UseRefElementParameters<T>): UseRefElementReturnType<T> {
+    const onElementChange = args?.onElementChange;
     // Let us store the actual (reference to) the element we capture
-    const [getElement, setElement] = usePassiveState<T | null>(onElementChange, () => null);
+    const [getElement, setElement] = usePassiveState<T | null>(onElementChange, returnNull);
 
     // Create a RefCallback that's fired when mounted 
     // and that notifies us of our element when we have it
