@@ -1,5 +1,6 @@
 import { h } from "preact";
 import { useCallback } from "preact/hooks";
+import { tryNavigateToIndex } from "./use-list-navigation";
 import { useChildFlag, useChildManager } from "./use-child-manager";
 import { useEffect } from "./use-effect";
 import { useForceUpdate } from "./use-force-update";
@@ -28,7 +29,7 @@ export interface UseGridNavigationRowInfo extends UseRovingTabIndexChildInfo {
 
 export type UseGridNavigationRowParameters<I extends UseRovingTabIndexChildInfo> = Omit<UseRovingTabIndexChildParameters<I & { hidden?: boolean }>, "setIsTabbableRow" | "getIsTabbableRow">; //I;
 
-export interface UseGridNavigationCellInfo extends UseRovingTabIndexChildInfo { }
+export interface UseGridNavigationCellInfo extends UseRovingTabIndexChildInfo { hidden?: boolean; }
 export type UseGridNavigationCellParameters<IC extends UseGridNavigationCellInfo> = UseRovingTabIndexChildParameters<IC>;
 
 export interface UseGridNavigationRowReturnType<R extends Element, C extends Element, IR extends UseGridNavigationRowInfo, IC extends UseGridNavigationCellInfo> {
@@ -48,26 +49,6 @@ export type UseGridNavigationCell<C extends Element, IC extends UseGridNavigatio
 
 function identity<T>(t: T) { return t; }
 
-function tryNavigateToIndex<I extends UseGridNavigationRowInfo | UseGridNavigationCellInfo>(managedCells: (I | null | undefined)[], initial: number, target: number, searchDirection: 1 | -1, indexMangler: (n: number) => number, indexDemangler: (n: number) => number) {
-    function helper() {
-        if (searchDirection === -1) {
-            while (target >= 0 && (managedCells[target] == null || !!(managedCells[target] as UseGridNavigationRowInfo | null)?.hidden))
-                target = indexMangler(indexDemangler(target) - 1);
-
-            return target < 0 ? initial : target;
-        }
-        else if (searchDirection === 1) {
-            while (target < managedCells.length && managedCells[target] == null || !!(managedCells[target] as UseGridNavigationRowInfo | null)?.hidden)
-                target = indexMangler(indexDemangler(target) + 1);
-
-            return target >= managedCells.length ? initial : target;
-        }
-        else {
-            return initial;
-        }
-    }
-    return (helper())
-}
 
 export interface UseGridNavigationParameters {
     shouldFocusOnChange(): boolean,

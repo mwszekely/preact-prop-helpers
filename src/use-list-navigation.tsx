@@ -1,5 +1,6 @@
 import { h } from "preact";
 import { StateUpdater, useCallback } from "preact/hooks";
+import { useEnsureStability } from "./use-passive-state";
 import { UseChildManagerReturnType } from "./use-child-manager";
 import { useLinearNavigation, UseLinearNavigationChildInfo, useTypeaheadNavigation, UseTypeaheadNavigationChildInfo, UseTypeaheadNavigationParameters } from "./use-keyboard-navigation";
 import { MergedProps, useMergedProps } from "./use-merged-props";
@@ -49,9 +50,9 @@ const dummy: any = null;
 
 
 export interface UseListNavigationReturnType<ChildElement extends Element, I extends UseListNavigationChildInfo> extends OmitStrong<UseChildManagerReturnType<I>, "useManagedChild"> {
-   
+
     useListNavigationProps: <P extends h.JSX.HTMLAttributes<any>>(props: P) => h.JSX.HTMLAttributes<any>;
-    
+
     useListNavigationChild: UseListNavigationChild<ChildElement, I>;
 
     currentTypeahead: string | null;
@@ -68,7 +69,7 @@ export interface UseListNavigationReturnType<ChildElement extends Element, I ext
     /**
      * Allows programmatic control of the currently tabbable index.
      */
-    setTabbableIndex: StateUpdater<number | null>;
+    //setTabbableIndex: StateUpdater<number | null>;
 
     navigateToIndex: (index: number | null) => void;
     navigateToNext: () => void;
@@ -152,7 +153,14 @@ export interface UseListNavigationParameters extends OmitStrong<UseTypeaheadNavi
 type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 
 /** Arguments passed to the child 'useListNavigationChild` */
-export interface UseListNavigationChildInfo extends UseRovingTabIndexChildInfo, UseTypeaheadNavigationChildInfo, UseLinearNavigationChildInfo {};
+export interface UseListNavigationChildInfo extends UseRovingTabIndexChildInfo, UseTypeaheadNavigationChildInfo, UseLinearNavigationChildInfo {
+    /**
+     * If a child is hidden, then it will be skipped over
+     * during keyboard navigation, and the HTML `hidden`
+     * attribute will be applied.
+     */
+    hidden?: boolean;
+};
 export type UseListNavigationChildParameters<I extends UseListNavigationChildInfo> = Omit<I, "rerenderAndFocus" | "setTabbable" | "getTabbable">;
 
 /** Type of the child's sub-hook */
@@ -178,16 +186,36 @@ export function useListNavigation<ChildElement extends Element, I extends UseLis
     indexDemangler ??= identity;
     keyNavigation ??= "either";
 
+    useEnsureStability(indexMangler, indexDemangler);
+
     // Keep track of three things related to the currently tabbable element's index:
     // What it is, and whether, when we render this component and it's changed, to also focus the element that was made tabbable.
     const [tabbableIndex, setTabbableIndex, getTabbableIndex] = useState<number | null>(initialIndex === undefined ? 0 : initialIndex);
     const { managedChildren, indicesByElement, useRovingTabIndexChild, focusCurrent, ...rest } = useRovingTabIndex<I>({ shouldFocusOnChange, tabbableIndex })
 
-    const navigateToIndex = useCallback((i: number | null) => { setTabbableIndex(i); }, []);
-    const navigateToFirst = useCallback(() => { setTabbableIndex(indexMangler!(0)); }, []);
+    /*const navigateToIndex = useCallback((i: number | null) => { setTabbableIndex(i); }, []);
+    const navigateToFirst = useCallback(() => { tryNavigateToIndex(managedChildren,) setTabbableIndex(indexMangler!(0)); }, []);
     const navigateToLast = useCallback(() => { setTabbableIndex(indexMangler!(managedChildren.length - 1)); }, []);
     const navigateToPrev = useCallback(() => { setTabbableIndex(i => indexMangler!(indexDemangler!(i ?? 0) - 1)) }, [indexDemangler, indexMangler]);
     const navigateToNext = useCallback(() => { setTabbableIndex(i => indexMangler!(indexDemangler!(i ?? 0) + 1)) }, [indexDemangler, indexMangler]);
+*/
+    const navigateToIndex = useCallback((i: number | null) => {
+        setTabbableIndex(i == null ? null : tryNavigateToIndex(managedChildren, 0, i, 1, indexMangler ?? identity, indexDemangler ?? identity));
+    }, [])
+    const navigateToFirst = useCallback(() => {
+        setTabbableIndex(tryNavigateToIndex(managedChildren, 0, 0, 1, indexMangler ?? identity, indexDemangler ?? identity));
+    }, [])
+    const navigateToLast = useCallback(() => { setTabbableIndex(tryNavigateToIndex(managedChildren, managedChildren.length, managedChildren.length, -1, indexMangler ?? identity, indexDemangler ?? identity)); }, [])
+    const navigateToPrev = useCallback(() => {
+        setTabbableIndex(c => {
+            return tryNavigateToIndex(managedChildren, c ?? 0, (c ?? 0) - 1, -1, indexMangler ?? identity, indexDemangler ?? identity)
+        })
+    }, [])
+    const navigateToNext = useCallback(() => {
+        setTabbableIndex(c => {
+            return tryNavigateToIndex(managedChildren, c ?? 0, (c ?? 0) + 1, 1, indexMangler ?? identity, indexDemangler ?? identity);
+        })
+    }, [])
 
     const setIndex = useCallback((index: (number | null) | ((prev: number | null) => (number | null))) => {
         setTabbableIndex(index);
@@ -208,7 +236,7 @@ export function useListNavigation<ChildElement extends Element, I extends UseLis
 
         const useListNavigationChildProps: UseListNavigationChildProps<ChildElement> = function <P extends h.JSX.HTMLAttributes<ChildElement>>({ ...props }: P) {
 
-            return useMergedProps<ChildElement>()(useRovingTabIndexChildProps((({ onClick: roveToSelf }))), props);
+            return useMergedProps<ChildElement>()(useRovingTabIndexChildProps((({ onClick: roveToSelf, hidden: info.hidden }))), props);
         }
 
         const roveToSelf = useCallback(() => { navigateToIndex(info.index); }, [])
@@ -228,7 +256,6 @@ export function useListNavigation<ChildElement extends Element, I extends UseLis
         invalidTypeahead,
 
         tabbableIndex,
-        setTabbableIndex,
 
         managedChildren,
         indicesByElement,
@@ -250,4 +277,25 @@ export function useListNavigation<ChildElement extends Element, I extends UseLis
 
 
 
+
+export function tryNavigateToIndex<I extends { hidden?: boolean }>(managedCells: (I | null | undefined)[], initial: number, target: number, searchDirection: 1 | -1, indexMangler: (n: number) => number, indexDemangler: (n: number) => number) {
+    function helper() {
+        if (searchDirection === -1) {
+            while (target >= 0 && (managedCells[target] == null || !!managedCells[target]?.hidden))
+                target = indexMangler(indexDemangler(target) - 1);
+
+            return target < 0 ? initial : target;
+        }
+        else if (searchDirection === 1) {
+            while (target < managedCells.length && managedCells[target] == null || !!managedCells[target]?.hidden)
+                target = indexMangler(indexDemangler(target) + 1);
+
+            return target >= managedCells.length ? initial : target;
+        }
+        else {
+            return initial;
+        }
+    }
+    return (helper())
+}
 
