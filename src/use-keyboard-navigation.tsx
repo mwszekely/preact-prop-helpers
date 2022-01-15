@@ -204,10 +204,10 @@ export function useLinearNavigation<ChildElement extends Element>({ index, navig
                 break;
         }
     };
-    
+
 
     return {
-        useLinearNavigationProps: useCallback(<P extends h.JSX.HTMLAttributes<ChildElement>>(props: P) => {return useLogicalDirectionProps(useMergedProps<ChildElement>()({ onKeyDown }, props))}, []),
+        useLinearNavigationProps: useCallback(<P extends h.JSX.HTMLAttributes<ChildElement>>(props: P) => { return useLogicalDirectionProps(useMergedProps<ChildElement>()({ onKeyDown }, props)) }, []),
     }
 
 
@@ -304,28 +304,44 @@ export function useTypeaheadNavigation<ChildElement extends Element, I extends U
     }, [nextTypeaheadChar]);
 
 
+    const comparatorShared = useStableCallback((safeLhs: string, safeRhs: string) => {
+        let compare: number;
+        // For the purposes of typeahead, only compare a string of the same size as our currently typed string.
+        // By normalizing them first, we ensure this byte-by-byte handling of raw character data works out okay.
+        safeLhs = safeLhs.normalize("NFD");
+        safeRhs = safeRhs.normalize("NFD")
 
-    const comparator = useStableCallback((lhs: I["text"], rhs: { text: I["text"]; unsortedIndex: number; }) => {
+        if (collator)
+            compare = collator.compare(safeLhs, safeRhs)
+        else
+            compare = safeLhs.toLowerCase().localeCompare(safeRhs.toLowerCase() ?? "");
+
+        return compare;
+    });
+
+    const insertingComparator = useStableCallback((lhs: I["text"], rhs: { text: I["text"]; unsortedIndex: number; }) => {
         let compare: number;
 
         if (typeof lhs === "string" && typeof rhs.text === "string") {
-            // For the purposes of typeahead, only compare a string of the same size as our currently typed string.
-            // By normalizing them first, we ensure this byte-by-byte handling of raw character data works out okay.
-            let safeLhs = lhs.normalize("NFD");
-            let safeRhs = rhs.text.normalize("NFD").substr(0, safeLhs.length);
-
-            if (collator)
-                compare = collator.compare(safeLhs, safeRhs)
-            else
-                compare = safeLhs.toLowerCase().localeCompare(safeRhs.toLowerCase() ?? "");
-
-            return compare;
+            return comparatorShared(lhs, rhs.text);
         }
 
         return (lhs as any) - (rhs as any);
     });
 
-    
+    const typeaheadComparator = useStableCallback((lhs: I["text"], rhs: { text: I["text"]; unsortedIndex: number; }) => {
+        let compare: number;
+
+        if (typeof lhs === "string" && typeof rhs.text === "string") {
+            // During typeahead, all strings longer than ours should be truncated
+            // so that they're all considered equally by that point.
+            return comparatorShared(lhs, rhs.text.substring(0, lhs.length));
+        }
+
+        return (lhs as any) - (rhs as any);
+    });
+
+
     const useTypeaheadNavigationProps: UseTypeaheadNavigationProps<ChildElement> = useCallback(function <P extends h.JSX.HTMLAttributes<ChildElement>>({ ...props }: P): UseTypeaheadNavigationPropsReturnType<ChildElement, P> {
 
         const onCompositionStart = (e: CompositionEvent) => { setImeActive(true) };
@@ -389,7 +405,7 @@ export function useTypeaheadNavigation<ChildElement extends Element, I extends U
 
 
 
-            let sortedTypeaheadIndex = binarySearch(sortedTypeaheadInfo.current, currentTypeahead, comparator);
+            let sortedTypeaheadIndex = binarySearch(sortedTypeaheadInfo.current, currentTypeahead, typeaheadComparator);
 
             if (sortedTypeaheadIndex < 0) {
                 // The user has typed an entry that doesn't exist in the list
@@ -446,13 +462,13 @@ export function useTypeaheadNavigation<ChildElement extends Element, I extends U
                 }
 
                 let i = sortedTypeaheadIndex;
-                while (i >= 0 && comparator(currentTypeahead, sortedTypeaheadInfo.current[i]) == 0) {
+                while (i >= 0 && typeaheadComparator(currentTypeahead, sortedTypeaheadInfo.current[i]) == 0) {
                     updateBestFit(sortedTypeaheadInfo.current[i].unsortedIndex);
                     --i;
                 }
 
                 i = sortedTypeaheadIndex;
-                while (i < sortedTypeaheadInfo.current.length && comparator(currentTypeahead, sortedTypeaheadInfo.current[i]) == 0) {
+                while (i < sortedTypeaheadInfo.current.length && typeaheadComparator(currentTypeahead, sortedTypeaheadInfo.current[i]) == 0) {
                     updateBestFit(sortedTypeaheadInfo.current[i].unsortedIndex);
                     ++i;
                 }
@@ -473,16 +489,19 @@ export function useTypeaheadNavigation<ChildElement extends Element, I extends U
                 // Find where to insert this item.
                 // Because all index values should be unique, the returned sortedIndex
                 // should always refer to a new location (i.e. be negative)                
-                let sortedIndex = binarySearch(sortedTypeaheadInfo.current, text, comparator);
-                console.assert(sortedIndex < 0);
+                let sortedIndex = binarySearch(sortedTypeaheadInfo.current, text, insertingComparator);
+                console.assert(sortedIndex < 0 || sortedTypeaheadInfo.current[sortedIndex].text == text);
                 if (sortedIndex < 0) {
                     sortedTypeaheadInfo.current.splice(-sortedIndex - 1, 0, { text, unsortedIndex: i.index });
+                }
+                else {
+                    sortedTypeaheadInfo.current.splice(sortedIndex, 0, { text, unsortedIndex: i.index });
                 }
 
                 return () => {
                     // When unmounting, find where we were and remove ourselves.
                     // Again, we should always find ourselves because there should be no duplicate values if each index is unique.
-                    let sortedIndex = binarySearch(sortedTypeaheadInfo.current, text, comparator);
+                    let sortedIndex = binarySearch(sortedTypeaheadInfo.current, text, insertingComparator);
                     console.assert(sortedIndex >= 0);
 
                     if (sortedIndex >= 0) {
