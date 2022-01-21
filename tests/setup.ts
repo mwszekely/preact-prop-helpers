@@ -1,7 +1,9 @@
+// @ts-ignore-error
 import { configure } from 'enzyme';
 import Adapter from 'enzyme-adapter-preact-pure';
 import { JSDOM } from 'jsdom';
 
+// @ts-ignore-error
 configure({ adapter: new Adapter() });
 
 
