@@ -1,4 +1,5 @@
-import { useEffect } from "preact/hooks";
+import { useEnsureStability } from "./use-passive-state";
+import { useRefElement } from "./use-ref-element";
 import { useStableCallback } from "./use-stable-callback";
 
 export interface UseMutationObserverParameters {
@@ -11,12 +12,14 @@ export interface UseMutationObserverParameters {
     attributeFilter?: string | string[];
 }
 
-export function useMutationObserver(getElement: () => null | undefined | HTMLElement, options: UseMutationObserverParameters = {}) {
-    let { attributeFilter, subtree, onChildList, characterDataOldValue, onCharacterData, onAttributes, attributeOldValue } = options;
+export function useMutationObserver<E extends Element>(options: UseMutationObserverParameters | null) {
+    let { attributeFilter, subtree, onChildList, characterDataOldValue, onCharacterData, onAttributes, attributeOldValue } = (options || ({} as Partial<UseMutationObserverParameters>));
 
     if (typeof attributeFilter === "string")
         attributeFilter = [attributeFilter];
     let attributeKey = attributeFilter?.join(";");
+
+    useEnsureStability(options?.subtree ?? false, options?.characterDataOldValue ?? false, options?.attributeOldValue ?? false, attributeKey ?? "");
 
     const attributes = !!onAttributes;
     const characterData = !!onCharacterData;
@@ -26,39 +29,42 @@ export function useMutationObserver(getElement: () => null | undefined | HTMLEle
     const stableOnCharacterData = useStableCallback(onCharacterData ?? (() => { }));
     const stableOnAttributes = useStableCallback(onAttributes ?? (() => { }));
 
-    useEffect(() => {
-        const element = getElement();
-        if (element) {
-            let observer = new MutationObserver((a) => {
-                for (let mutation of a) {
-                    switch (mutation.type) {
-                        case "childList":
-                            stableOnChildList(mutation);
-                            break;
+    const { getElement, useRefElementProps: useMutationObserverProps } = useRefElement<E>({
+        onElementChange: element => {
+            if (element) {
+                let observer = new MutationObserver((a) => {
+                    for (let mutation of a) {
+                        switch (mutation.type) {
+                            case "childList":
+                                stableOnChildList(mutation);
+                                break;
 
-                        case "attributes":
-                            stableOnAttributes(mutation);
-                            break;
+                            case "attributes":
+                                stableOnAttributes(mutation);
+                                break;
 
-                        case "characterData":
-                            stableOnCharacterData(mutation);
-                            break;
-                            ;
+                            case "characterData":
+                                stableOnCharacterData(mutation);
+                                break;
+                                ;
+                        }
                     }
-                }
-            });
+                });
 
-            observer.observe(element, {
-                attributeFilter: attributeFilter as Array<string>,
-                attributeOldValue,
-                attributes,
-                characterData,
-                characterDataOldValue,
-                childList,
-                subtree
-            })
+                observer.observe(element, {
+                    attributeFilter: attributeFilter as Array<string>,
+                    attributeOldValue,
+                    attributes,
+                    characterData,
+                    characterDataOldValue,
+                    childList,
+                    subtree
+                })
 
-            return () => observer.disconnect();
+                return () => observer.disconnect();
+            }
         }
-    }, [getElement, attributeKey, subtree, childList, characterDataOldValue, characterData, attributes, attributeOldValue])
+    });
+
+    return { useMutationObserverProps, getElement };
 }
