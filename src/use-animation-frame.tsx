@@ -1,6 +1,48 @@
-import { useEffect } from "preact/hooks";
+import { ComponentChildren, createContext } from "preact";
+import { useCallback, useContext, useEffect, useRef } from "preact/hooks";
 import { useStableCallback } from "./use-stable-callback";
 
+type RafCallbackType = (msSinceLast: number, tag?: any) => void;
+
+interface ContextType {
+    addCallback: (callback: RafCallbackType, tag?: any) => void;
+    removeCallback: (callback: RafCallbackType) => void;
+};
+
+const SharedAnimationFrameContext = createContext<null | ContextType>(null);
+
+export function ProvideBatchedAnimationFrames({ children }: { children: ComponentChildren }) {
+
+    const addCallback = useCallback<ContextType["addCallback"]>((callbackToBeBatched, tag) => { allCallbacks.current.set(callbackToBeBatched, tag); }, []);
+    const removeCallback = useCallback<ContextType["removeCallback"]>((callback) => { allCallbacks.current.delete(callback); }, []);
+
+    const contextInfo = useRef<ContextType>(null!);
+    if (contextInfo.current == null)
+        contextInfo.current = { addCallback, removeCallback };
+    const allCallbacks = useRef<Map<RafCallbackType, any>>(null!);
+    if (allCallbacks.current == null)
+        allCallbacks.current = new Map();
+
+    useEffect(() => {
+        let handle = -1;
+
+        function rafWithBatchedCallbacks(msSinceLast: number) {
+            for (let [batchedRafCallback, tag] of allCallbacks.current) {
+                batchedRafCallback(msSinceLast, tag);
+            }
+            handle = requestAnimationFrame(rafWithBatchedCallbacks);
+        };
+
+        handle = requestAnimationFrame(rafWithBatchedCallbacks);
+
+        return () => cancelAnimationFrame(handle);
+    }, []);
+
+    return (
+        <SharedAnimationFrameContext.Provider value={contextInfo.current}>
+            {children}
+        </SharedAnimationFrameContext.Provider>)
+}
 
 export interface UseAnimationFrameParameters {
     /**
@@ -21,16 +63,28 @@ export function useAnimationFrame({ callback }: UseAnimationFrameParameters): vo
     const stableCallback = useStableCallback(callback ?? (() => { }));
     const hasCallback = (callback != null);
 
+    const sharedAnimationFrameContext = useContext(SharedAnimationFrameContext);
+
     useEffect(() => {
-        if (hasCallback) {
-            // Get a wrapper around the wrapper around the callback
-            // that also calls `requestAnimationFrame` again.
-            const rafCallback = (ms: number) => {
-                handle = requestAnimationFrame(rafCallback);
-                stableCallback(ms);
+        if (sharedAnimationFrameContext) {
+            if (hasCallback) {
+                sharedAnimationFrameContext.addCallback(stableCallback);
             }
-            let handle = requestAnimationFrame(rafCallback);
-            return () => cancelAnimationFrame(handle);
+            else {
+                sharedAnimationFrameContext.removeCallback(stableCallback);
+            }
         }
-    }, [hasCallback])
+        else {
+            if (hasCallback) {
+                // Get a wrapper around the wrapper around the callback
+                // that also calls `requestAnimationFrame` again.
+                const rafCallback = (ms: number) => {
+                    handle = requestAnimationFrame(rafCallback);
+                    stableCallback(ms);
+                }
+                let handle = requestAnimationFrame(rafCallback);
+                return () => cancelAnimationFrame(handle);
+            }
+        }
+    }, [sharedAnimationFrameContext, hasCallback])
 }

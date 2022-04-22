@@ -1,4 +1,6 @@
-import { useEffect } from "preact/hooks";
+import { useCallback, useEffect } from "preact/hooks";
+import { useEnsureStability, usePassiveState } from "./use-passive-state";
+import { useRefElement } from "./use-ref-element";
 import { useStableCallback } from "./use-stable-callback";
 
 export interface UseMutationObserverParameters {
@@ -11,8 +13,10 @@ export interface UseMutationObserverParameters {
     attributeFilter?: string | string[];
 }
 
-export function useMutationObserver(getElement: () => null | undefined | HTMLElement, options: UseMutationObserverParameters = {}) {
-    let { attributeFilter, subtree, onChildList, characterDataOldValue, onCharacterData, onAttributes, attributeOldValue } = options;
+function returnNull() { return null; }
+
+export function useMutationObserver<E extends Element>(options: UseMutationObserverParameters | null) {
+    let { attributeFilter, subtree, onChildList, characterDataOldValue, onCharacterData, onAttributes, attributeOldValue } = (options || ({} as Partial<UseMutationObserverParameters>));
 
     if (typeof attributeFilter === "string")
         attributeFilter = [attributeFilter];
@@ -26,28 +30,9 @@ export function useMutationObserver(getElement: () => null | undefined | HTMLEle
     const stableOnCharacterData = useStableCallback(onCharacterData ?? (() => { }));
     const stableOnAttributes = useStableCallback(onAttributes ?? (() => { }));
 
-    useEffect(() => {
+    const [getMo, setMo] = usePassiveState<MutationObserver | null>(useStableCallback(observer => {
         const element = getElement();
-        if (element) {
-            let observer = new MutationObserver((a) => {
-                for (let mutation of a) {
-                    switch (mutation.type) {
-                        case "childList":
-                            stableOnChildList(mutation);
-                            break;
-
-                        case "attributes":
-                            stableOnAttributes(mutation);
-                            break;
-
-                        case "characterData":
-                            stableOnCharacterData(mutation);
-                            break;
-                            ;
-                    }
-                }
-            });
-
+        if (element && observer && (!!attributeKey || !!characterData || !!childList)) {
             observer.observe(element, {
                 attributeFilter: attributeFilter as Array<string>,
                 attributeOldValue,
@@ -60,5 +45,39 @@ export function useMutationObserver(getElement: () => null | undefined | HTMLEle
 
             return () => observer.disconnect();
         }
-    }, [getElement, attributeKey, subtree, childList, characterDataOldValue, characterData, attributes, attributeOldValue])
+    }), returnNull)
+
+    const onNeedMutationObserverReset = useCallback((element: E | null) => {
+        if (element) {
+            queueMicrotask(() => {
+                setMo(new MutationObserver((a) => {
+                    for (let mutation of a) {
+                        switch (mutation.type) {
+                            case "childList":
+                                stableOnChildList(mutation);
+                                break;
+
+                            case "attributes":
+                                stableOnAttributes(mutation);
+                                break;
+
+                            case "characterData":
+                                stableOnCharacterData(mutation);
+                                break;
+                        }
+                    }
+                }));
+            })
+        }
+    }, []);
+
+    useEffect(() => {
+        onNeedMutationObserverReset(getElement());
+    }, [attributeKey, attributeOldValue, characterDataOldValue, subtree])
+
+    const { getElement, useRefElementProps: useMutationObserverProps } = useRefElement<E>({
+        onElementChange: onNeedMutationObserverReset
+    });
+
+    return { useMutationObserverProps, getElement };
 }

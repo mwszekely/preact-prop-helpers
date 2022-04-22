@@ -385,7 +385,7 @@ export function useAsyncHandler<ElementType extends EventTarget>() {
 
             })
 
-            return asyncHandler == null ? undefined : syncHandler;
+            return syncHandler;
         }
 
     }
