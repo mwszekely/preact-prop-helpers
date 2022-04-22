@@ -3,7 +3,7 @@ import "blocking-elements";
 import { BlockingElements } from "blocking-elements";
 import { useLayoutEffect } from "preact/hooks";
 
-const blockingElements = (document as any).$blockingElements as BlockingElements;
+function blockingElements() { return (document as any).$blockingElements as BlockingElements };
 /**
  * Allows an element to trap focus by applying the "inert" attribute to all sibling, aunt, and uncle nodes.
  * 
@@ -24,9 +24,9 @@ export function useBlockingElement<E extends Element>(target: E | null) {
             // This is rare, but it's better to fail silently with weird tabbing behavior
             // than to crash the entire application.
             try {
-                blockingElements.push(target as Element as HTMLElement);
+                blockingElements().push(target as Element as HTMLElement);
                 return () => {
-                    blockingElements.remove(target as Element as HTMLElement);
+                    blockingElements().remove(target as Element as HTMLElement);
                 };
             }
             catch (ex) {
@@ -38,7 +38,7 @@ export function useBlockingElement<E extends Element>(target: E | null) {
 }
 
 export function getTopElement() {
-    return blockingElements.top;
+    return blockingElements().top;
 }
 
 
