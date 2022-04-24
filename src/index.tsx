@@ -10,6 +10,7 @@ export { useStableCallback } from "./use-stable-callback";
 export { useStableGetter } from "./use-stable-getter";
 export { useState } from "./use-state";
 export { useAsync, UseAsyncParameters, UseAsyncReturnType } from "./use-async";
+export { useAsyncEffect } from "./use-async-effect";
 export { useAsyncHandler, GenericAsyncHandler, UseAsyncHandlerParameters, UseAsyncHandlerReturnType, AsyncHandler } from "./use-async-handler";
 export { useLinearNavigation, useTypeaheadNavigation, UseTypeaheadNavigationChild, UseLinearNavigationChildInfo, UseTypeaheadNavigationChildInfo, UseTypeaheadNavigationChildParameters, UseLinearNavigationProps, UseTypeaheadNavigationProps } from "./use-keyboard-navigation"
 export { useGridNavigation, UseGridNavigationRow, UseGridNavigationCell, UseGridNavigationCellInfo, UseGridNavigationCellParameters, UseGridNavigationRowInfo, UseGridNavigationRowParameters } from "./use-grid-navigation";
