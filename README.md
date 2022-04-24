@@ -31,7 +31,7 @@ There are a few reasons:
 |`useChildManager` (& `useChildFlag`)				|Allows for child → parent communication, and more efficient parent → child communication (e.g. telling a single child to change itself instead of rerendering all children).|
 |`useListNavigation` (& `useRovingTabIndex`, `useLinearNavigation`, `useTypeaheadNavigation`)	|Allows a component with children (like a select menu or radio group) to be treated as *one element to be tabbed into/out of*, with arrow keys and typeahead handling the navigation *within* the component.|
 |`useGridNavigation`								|Complement to `useListNavigation` that is 2-dimensional and supports sorting &amp; filtering. |
-|`useAsyncHandler`									|Creates a synchronous event handler from an asynchronous one, and provides the component with the information it needs to display the current async state effectively.|
+|`useAsyncHandler` (& `useAsync`)					|Creates a synchronous event handler from an asynchronous one, and provides the component with the information it needs to display the current async state effectively. `useAsync` is a version that operates on any async function, instead of just event handlers.|
 |`useRefElement`									|Allows a component to use the `Element` that it actually renders.|
 |`useElementSize`									|Allows a component to use its size as part of the rendering process.|
 |`useLogicalDirection`								|Lets a component measure its own "text flow" direction (is the inline direction ltr or rtl? is the block direction vertical or horizontal? etc.), and convert between physical and logical dimensions (e.g. knowing that "inline-start" is equivalent to "left" in this writing mode).|
@@ -273,7 +273,7 @@ const syncOnInput = async (value: number, e: Event) => {
 };
 const {
     // The synchronous event handler
-    getSyncHandler,
+    useSyncHandler,
     // True while the handler is running
     pending,
     // The error thrown, if any
@@ -289,9 +289,10 @@ const {
     }, 
 });
 
-const onInput = getSyncHandler(someAsyncFunction);
+const onInput = useSyncHandler(someAsyncFunction);
 // OR the following, if you want the input entirely disabled while pending:
-const onInput = getSyncHandler(pending? null : someAsyncFunction);
+// (because this is a hook and needs to be called every invocation)
+const onInput = useSyncHandler(pending? null : someAsyncFunction);
 ```
 
 The handler is automatically throttled to only run one at a time.  If the handler is called, and then before it finishes, is called again, it will be put on hold until the current one finishes, at which point the second one will run.  If the handler is called a third time before the first has finished, it will *replace* the second, so only the most recently called iteration of the handler will run.
@@ -300,6 +301,8 @@ You may optionally *also* specify a debounce parameter that waits until the sync
 
 Note that the parameters to the async handler are slightly different than the sync handler &ndash; the first argument, as decided by you with the `capture` parameter for this hook, is the "saved" information from the event.  For example, the event's currentTarget's `value`, which may have changed by the time the handler is *actually* called.  The second argument is the original event, which might still have some useful fields on it like `mouseX` or something, but is stale at least in regards to the
 element it references.
+
+`useAsync` works identically to `useAsyncHandler`, but with different use semantics; `useAsyncHandler` returns functions like `(event: Event) => void`, while `useAsync`'s returns functions like `() => T`.
 
 ## `useActiveElement`
 

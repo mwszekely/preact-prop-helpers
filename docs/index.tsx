@@ -124,7 +124,7 @@ const DemoUseAsyncHandler1 = memo(() => {
         settleCount,
         getCurrentCapture,
         hasCapture,
-        getSyncHandler,
+        useSyncHandler,
         currentCapture,
         pending,
         error,
@@ -134,7 +134,7 @@ const DemoUseAsyncHandler1 = memo(() => {
     } = useAsyncHandler<HTMLButtonElement>()({ capture: () => { }, debounce: debounce == 0 ? undefined : debounce });
 
     const asyncOnClick = ((v: void, e: Event) => new Promise<void>((resolve, reject) => window.setTimeout(() => getShouldThrow() ? reject() : resolve(), timeout)));
-    const onClick = getSyncHandler(pending ? null : asyncOnClick);
+    const onClick = useSyncHandler(pending ? null : asyncOnClick);
 
     return (
         <div className="demo">
@@ -177,7 +177,7 @@ const DemoUseAsyncHandler2 = memo(() => {
         settleCount,
         getCurrentCapture,
         hasCapture,
-        getSyncHandler,
+        useSyncHandler,
         currentCapture,
         pending,
         error,
@@ -186,7 +186,7 @@ const DemoUseAsyncHandler2 = memo(() => {
         resolveCount
     } = useAsyncHandler<HTMLInputElement>()({ capture: e => { e.preventDefault(); return e.currentTarget.value }, debounce: debounce == 0 ? undefined : debounce });
 
-    const onInput = getSyncHandler(async (v, e) => new Promise((resolve, reject) => window.setTimeout(() => {
+    const onInput = useSyncHandler(async (v, e) => new Promise((resolve, reject) => window.setTimeout(() => {
         if (getShouldThrow()) {
             reject();
         }
