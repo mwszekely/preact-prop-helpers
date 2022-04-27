@@ -208,15 +208,16 @@ export function useAsync<T>({ debounce }: UseAsyncParameters): UseAsyncReturnTyp
             let result: T | Promise<T> | undefined;
             try {
                 result = startPromise();
-                if (result == null || !("then" in result)) {
+                const isPromise = (result != null && typeof result == "object" && "then" in result);
+                if (result == null || !isPromise) {
                     // It's synchronous and returned successfully.
                     // Bail out early.
-                    onThen(result);
+                    onThen((result ?? undefined) as T | undefined);
                     onFinally();
                     setCurrentType("sync");
                 }
                 else {
-                    result.then(onThen).catch(onCatch).finally(onFinally);
+                    (result as Promise<T>).then(onThen).catch(onCatch).finally(onFinally);
                     setCurrentType("async");
                 }
                 return result;
