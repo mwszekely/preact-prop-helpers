@@ -242,14 +242,15 @@ export function useAsync<T>({ debounce }: UseAsyncParameters): UseAsyncReturnTyp
         if (!alreadyRunningPromise) {
             // Start the promise immediately, because there wasn't one running already.
             let nextPromise = startPromiseWithBoilerplate();
-            if (nextPromise == null || !("then" in nextPromise)) {
+            const isPromise = (nextPromise != null && typeof nextPromise == "object" && "then" in nextPromise);
+            if (nextPromise == null || !isPromise) {
                 // Hold on! The handler was actually synchronous, and already finished.
                 // Bail out early.
             }
             else {
                 setError(undefined);
                 setHasError(false);
-                setPromise(nextPromise);
+                setPromise(nextPromise as Promise<T>);
             }
         }
         else {
