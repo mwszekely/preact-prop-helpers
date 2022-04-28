@@ -25,7 +25,7 @@ export interface UseAsyncHandlerParameters<ElementType extends EventTarget, Even
     capture: (event: EventType) => CaptureType;
 }
 
-export interface UseAsyncHandlerReturnType<ElementType extends EventTarget, EventType extends h.JSX.TargetedEvent<ElementType>, CaptureType> extends Omit<UseAsyncReturnType<CaptureType>, "useSyncHandler"> {
+export interface UseAsyncHandlerReturnType<ElementType extends EventTarget, EventType extends h.JSX.TargetedEvent<ElementType>, CaptureType> extends Omit<UseAsyncReturnType<(e: EventType) => CaptureType>, "useSyncHandler" | "promise"> {
     /**
      * Pass the actual asynchronous handler you'd like to use to this function, 
      * and you'll get the synchronous handler back.
@@ -58,6 +58,9 @@ export interface UseAsyncHandlerReturnType<ElementType extends EventTarget, Even
      * you might need this.
      */
     hasCapture: boolean;
+
+    // Same as in useAsync, but with a different type
+    promise: Promise<void> | null;
 
 }
 
@@ -121,7 +124,7 @@ export interface UseAsyncHandlerReturnType<ElementType extends EventTarget, Even
  */
 export function useAsyncHandler<ElementType extends EventTarget>() {
     return function <EventType extends h.JSX.TargetedEvent<ElementType>, CaptureType>({ capture, debounce }: UseAsyncHandlerParameters<ElementType, EventType, CaptureType>): UseAsyncHandlerReturnType<ElementType, EventType, CaptureType> {
-        const { callCount, currentType, error, flushDebouncedPromise, useSyncHandler, hasError, pending, rejectCount, resolveCount, settleCount, promise } = useAsync<CaptureType>({ debounce });
+        const { callCount, currentType, error, flushDebouncedPromise, useSyncHandler, hasError, pending, rejectCount, resolveCount, settleCount, promise } = useAsync<(capture: CaptureType, event: EventType) => void>({ debounce });
 
 
         // We need to differentiate between "nothing captured yet" and "`undefined` was captured"
@@ -129,7 +132,7 @@ export function useAsyncHandler<ElementType extends EventTarget>() {
         const [hasCapture, setHasCapture] = useState(false);
 
         let ret: UseAsyncHandlerReturnType<ElementType, EventType, CaptureType> = {
-            useSyncHandler: useSyncHandler2,
+            useSyncHandler: useSyncHandlerWithCapture,
             getCurrentCapture,
             callCount,
             currentCapture,
@@ -150,34 +153,23 @@ export function useAsyncHandler<ElementType extends EventTarget>() {
 
         return ret;
 
-        function useSyncHandler2(asyncHandler: ((value: CaptureType, event: EventType) => (Promise<void> | void)) | null | undefined): h.JSX.EventHandler<EventType> | undefined {
+        function useSyncHandlerWithCapture(asyncHandler: ((value: CaptureType, event: EventType) => (Promise<void> | void)) | null | undefined): h.JSX.EventHandler<EventType> | undefined {
 
-            let captured: CaptureType;
-            let event: EventType;
-            const syncHandler2 = useSyncHandler(asyncHandler == null ? asyncHandler : () => {
-                let ret = asyncHandler(captured, event);
-                if (!ret || !("then" in ret)) {
-                    return captured;
-                }
-                else {
-                    return ret.then(_ => captured);
-                }
-            });
+            const syncHandlerWrapper = useSyncHandler(asyncHandler);
 
             const syncHandler = useStableCallback<h.JSX.EventHandler<EventType>>(function syncHandler(e: EventType): void {
                 // Get the most significant information from the event at this time,
                 // which is necessary since the promise could actually be called much later
                 // when the element's value (etc.) has changed.
-                captured = capture(e);
-                event = e;
+                let captured = capture(e);
 
-                if (syncHandler2 == null)
+                if (syncHandlerWrapper == null)
                     return;
 
 
                 setCurrentCapture(captured);
                 setHasCapture(true);
-                syncHandler2();
+                syncHandlerWrapper(captured, e);
             });
 
             return syncHandler;

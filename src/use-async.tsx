@@ -5,6 +5,7 @@ import { useStableCallback } from "./use-stable-callback";
 import { useState } from "./use-state";
 import { useTimeout } from "./use-timeout";
 
+type Func = (...args: any) => any;
 
 export interface UseAsyncParameters {
     /**
@@ -14,9 +15,9 @@ export interface UseAsyncParameters {
     debounce?: number;
 }
 
-export interface UseAsyncReturnType<T> {
+export interface UseAsyncReturnType<F extends Func> {
 
-    promise: Promise<T> | null;
+    promise: Promise<ReturnType<F>> | null;
 
     /**
      * Whether or not the handler has been called but has not completed yet.
@@ -96,17 +97,14 @@ export interface UseAsyncReturnType<T> {
      * Because 
      * 
      */
-    useSyncHandler: (asyncHandler: undefined | null | (() => (Promise<T> | T | undefined))) => ((() => T | undefined) | undefined);
+    useSyncHandler: (asyncHandler: undefined | null | ((...args: Parameters<F>) => (Promise<ReturnType<F>> | ReturnType<F> | undefined))) => (((...args: Parameters<F>) => Awaited<ReturnType<F>> | undefined) | undefined);
 }
 
 
-
-
-
-export function useAsync<T>({ debounce }: UseAsyncParameters): UseAsyncReturnType<T> {
+export function useAsync<F extends Func>({ debounce }: UseAsyncParameters): UseAsyncReturnType<F> {
 
     // Always represents whatever promise is currently being waited on, or null if none.
-    const [promise, setPromise, getPromise] = useState<Promise<T> | null>(null);
+    const [promise, setPromise, getPromise] = useState<Promise<ReturnType<F>> | null>(null);
 
     // Keep track of how many times we've actually called the async handler
     const [runCount, setRunCount] = useState(0);
@@ -121,11 +119,11 @@ export function useAsync<T>({ debounce }: UseAsyncParameters): UseAsyncReturnTyp
     // If we're set to use a debounce, then when the timeout finishes,
     // the promise from this state object is transferred over to either 
     // the current promise or the pending promise.
-    const [debouncedPromiseStarter, setDebouncedPromiseStarter, getDebouncedPromiseStarter] = useState<(() => (Promise<T> | T | undefined)) | null>(null);
+    const [debouncedPromiseStarter, setDebouncedPromiseStarter, getDebouncedPromiseStarter] = useState<(() => (Promise<ReturnType<F>> | ReturnType<F> | undefined)) | null>(null);
 
     // When we want to start a new promise, we won't allow it to start if one is still running.
     // In that case, we store the promise (or rather, a way to start the promise) in state.
-    const [pendingPromiseStarter, setPendingPromiseStarter, getPendingPromiseStarter] = useState<(() => (Promise<T> | T | undefined)) | null>(null);
+    const [pendingPromiseStarter, setPendingPromiseStarter, getPendingPromiseStarter] = useState<(() => (Promise<ReturnType<F>> | ReturnType<F> | undefined)) | null>(null);
 
     // We need to differentiate between `undefined` and "no error has been thrown",
     // so we have two separate error state variables.
@@ -166,7 +164,7 @@ export function useAsync<T>({ debounce }: UseAsyncParameters): UseAsyncReturnTyp
 
 
 
-    let ret: UseAsyncReturnType<T> = {
+    let ret: UseAsyncReturnType<ReturnType<F>> = {
         useSyncHandler,
         callCount: runCount,
         pending: (promise != null),
@@ -189,35 +187,35 @@ export function useAsync<T>({ debounce }: UseAsyncParameters): UseAsyncReturnTyp
     // except for debounce, which comes first, as a sort of "step 0".
     // Handles all the necessary boilerplate related to choosing whether to
     // run or set as pending, resetting state variables, etc.
-    function wantToStartANewPromise(startPromise: (() => (Promise<T> | T | undefined))) {
+    function wantToStartANewPromise(startPromise: (() => (Promise<ReturnType<F>> | ReturnType<F> | undefined))) {
         let alreadyRunningPromise = (getPromise() != null);
 
         // Boilerplate wrapper around the given promise starter
-        let startPromiseWithBoilerplate = (): (T | Promise<T> | undefined) => {
+        let startPromiseWithBoilerplate = (): (ReturnType<F> | Promise<ReturnType<F>> | undefined) => {
             // When it starts, notify the caller
             setRunCount(r => ++r);
 
             // When it completes, notify the caller
             // When it fails, save the error and notify the caller
             // When it settles, reset our state so we can run a pending promise if it exists
-            const onThen = (value: T | undefined) => { setResolveCount(c => ++c); return value; };
+            const onThen = (value: ReturnType<F> | undefined) => { setResolveCount(c => ++c); return value; };
             const onCatch = (ex: any) => { setError(ex); setHasError(true); setRejectCount(c => ++c); };
             const onFinally = () => { setPromise(null); };
 
             // Handle the special case where the handler is synchronous
-            let result: T | Promise<T> | undefined;
+            let result: ReturnType<F> | Promise<ReturnType<F>> | undefined;
             try {
                 result = startPromise();
-                const isPromise = (result != null && typeof result == "object" && "then" in result);
+                const isPromise = (result != null && typeof result == "object" && "then" in (result as Promise<any>));
                 if (result == null || !isPromise) {
                     // It's synchronous and returned successfully.
                     // Bail out early.
-                    onThen((result ?? undefined) as T | undefined);
+                    onThen((result ?? undefined) as ReturnType<F> | undefined);
                     onFinally();
                     setCurrentType("sync");
                 }
                 else {
-                    (result as Promise<T>).then(onThen).catch(onCatch).finally(onFinally);
+                    (result as Promise<ReturnType<F>>).then(onThen).catch(onCatch).finally(onFinally);
                     setCurrentType("async");
                 }
                 return result;
@@ -242,7 +240,7 @@ export function useAsync<T>({ debounce }: UseAsyncParameters): UseAsyncReturnTyp
         if (!alreadyRunningPromise) {
             // Start the promise immediately, because there wasn't one running already.
             let nextPromise = startPromiseWithBoilerplate();
-            const isPromise = (nextPromise != null && typeof nextPromise == "object" && "then" in nextPromise);
+            const isPromise = (nextPromise != null && typeof nextPromise == "object" && "then" in (nextPromise as Promise<any>));
             if (nextPromise == null || !isPromise) {
                 // Hold on! The handler was actually synchronous, and already finished.
                 // Bail out early.
@@ -250,7 +248,7 @@ export function useAsync<T>({ debounce }: UseAsyncParameters): UseAsyncReturnTyp
             else {
                 setError(undefined);
                 setHasError(false);
-                setPromise(nextPromise as Promise<T>);
+                setPromise(nextPromise as Promise<ReturnType<F>>);
             }
         }
         else {
@@ -260,15 +258,15 @@ export function useAsync<T>({ debounce }: UseAsyncParameters): UseAsyncReturnTyp
         }
     }
 
-    function useSyncHandler(asyncHandler: undefined | null | (() => (Promise<T> | T | undefined))): (() => T | undefined) {
+    function useSyncHandler(asyncHandler: undefined | null | ((...args: Parameters<F>) => (Promise<ReturnType<F>> | ReturnType<F> | undefined))): (() => ReturnType<F> | undefined) {
 
-        const syncHandler = useStableCallback(function syncHandler(): T | undefined {
+        const syncHandler = useStableCallback(function syncHandler(...args: Parameters<F>): ReturnType<F> | undefined {
 
             if (asyncHandler == null)
                 return;
 
 
-            const startPromise = () => asyncHandler(/*captured, event*/);
+            const startPromise = () => asyncHandler(...args);
 
             if (debounce == null) {
                 wantToStartANewPromise(startPromise);
