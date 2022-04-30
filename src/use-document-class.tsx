@@ -1,10 +1,12 @@
 import clsx from "clsx";
 import { useEffect } from "preact/hooks";
 
+export function getDocument(element?: Node) { return (element?.ownerDocument ?? document ?? window.document ?? globalThis.document); }
+
 type P = Parameters<typeof clsx>;
 
 export function useDocumentClass(className: P[0], active?: boolean, element?: HTMLElement) {
-    element ??= document.documentElement;
+    element ??= getDocument().documentElement;
     className = clsx(className);
 
     useEffect(() => {

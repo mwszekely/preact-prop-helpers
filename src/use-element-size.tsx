@@ -2,6 +2,7 @@ import { h } from "preact";
 import { useCallback, useEffect, useRef } from "preact/hooks";
 import { useRefElement, UseRefElementProps } from "./use-ref-element";
 import { OnPassiveStateChange, useEnsureStability, usePassiveState } from "./use-passive-state";
+import { getDocument } from "./use-document-class";
 
 interface UseElementSizeParameters {
     /**
@@ -63,7 +64,7 @@ export function useElementSize<E extends HTMLElement>({ getObserveBox, onSizeCha
 
     const needANewObserver = useCallback((element: E | null, observeBox: ResizeObserverBoxOptions | undefined) => {
         if (element) {
-            const document = element.ownerDocument;
+            const document = getDocument(element);
             const window = document.defaultView;
 
             const handleUpdate = () => {

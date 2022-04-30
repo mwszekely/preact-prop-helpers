@@ -1,6 +1,7 @@
 import { h } from "preact";
 import { useLayoutEffect } from "preact/hooks";
 import { isFocusable } from "tabbable";
+import { getDocument } from "./use-document-class";
 import { useActiveElement } from "./use-active-element";
 import { getTopElement, useBlockingElement } from "./use-blocking-element";
 import { MergedProps, useMergedProps } from "./use-merged-props";
@@ -27,16 +28,16 @@ export function useFocusTrap<E extends HTMLElement>({ trapActive }: UseFocusTrap
     const [element, setElement] = useState<E | null>(null);
     const { useRefElementProps, getElement } = useRefElement<E>({ onElementChange: setElement });
     //const [lastActiveElement, setLastActiveElement, getLastActiveElement] = useState<Node | null>(null);
-    const { getActiveElement, getLastActiveElement, getWindowFocused, useActiveElementProps } = useActiveElement({  });
+    const { getActiveElement, getLastActiveElement, getWindowFocused, useActiveElementProps } = useActiveElement({});
 
 
     // When the trap becomes active, before we let the blockingElements hook run,
     // keep track of whatever's currently focused and save it.
     useLayoutEffect(() => {
         if (trapActive && element) {
-            const document = element.ownerDocument;
+            const document = getDocument(element);
             const window = document.defaultView;
-            
+
             // Save the currently focused element
             // to whatever's currently at the top of the stack
             elementsToRestoreFocusTo.set(getTopElement(), (getLastActiveElement() as (Node & HTMLOrSVGElement)) ?? document.body);
@@ -87,7 +88,7 @@ export function useFocusTrap<E extends HTMLElement>({ trapActive }: UseFocusTrap
     }, [trapActive, element]);
 
     const useFocusTrapProps: UseFocusTrapProps<E> = (<P extends UseFocusTrapPropsParameters<E>>(props: P): UseFocusTrapPropsReturnType<E, P> => {
-        return useMergedProps<E>()({ "aria-modal": trapActive? "true" : undefined } as {}, useRefElementProps(useActiveElementProps(props)));
+        return useMergedProps<E>()({ "aria-modal": trapActive ? "true" : undefined } as {}, useRefElementProps(useActiveElementProps(props)));
     });
 
 

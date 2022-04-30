@@ -1,9 +1,10 @@
 import "wicg-inert";
 import "blocking-elements";
-import { BlockingElements } from "blocking-elements";
+import { BlockingElements, DocumentWithBlockingElements } from "blocking-elements";
 import { useLayoutEffect } from "preact/hooks";
+import { getDocument } from "./use-document-class";
 
-function blockingElements() { return (document as any).$blockingElements as BlockingElements };
+function blockingElements() { return (getDocument() as DocumentWithBlockingElements).$blockingElements };
 /**
  * Allows an element to trap focus by applying the "inert" attribute to all sibling, aunt, and uncle nodes.
  * 
