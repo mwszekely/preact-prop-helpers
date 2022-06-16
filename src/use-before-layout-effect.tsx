@@ -1,12 +1,11 @@
 
 import { Component, options, VNode } from "preact";
-import { EffectCallback, Inputs, useEffect, useLayoutEffect, useState } from "preact/hooks";
+import { EffectCallback, Inputs, useEffect, useLayoutEffect, useRef, useState } from "preact/hooks";
 import { generateRandomId } from "./use-random-id";
 
 const previousInputs = new Map<string, Inputs | undefined>();
 const toRun = new Map<string, { effect: EffectCallback, inputs?: Inputs, cleanup: null | undefined | void | (() => void) }>();
 
-const commitName = ("__c" in options? "__c" : "commit" in options ? "commit" : "_commit" in options ? "_commit" : "__c") as keyof typeof options;
 
 // TODO: Whether this goes in options.diffed or options._commit
 // is a post-suspense question.
@@ -15,8 +14,16 @@ const commitName = ("__c" in options? "__c" : "commit" in options ? "commit" : "
 // so `ref={someStableFunction}` works.
 // 
 // Also it's private.
+//
+// ...
+// Well, useEvent or whatever is finally, finally 4 years later finally here
+// which is cool and means we won't need this at all soon.
+// So for now we'll stick with diff to prevent any weirdness with
+// commit being private and all.
+const commitName = "diffed";
+
 const originalCommit = options[commitName] as (vnode: VNode, commitQueue: Component[]) => void;
-const newCommit: typeof originalCommit = (vnode, commitQueue) => {
+const newCommit: typeof originalCommit = (...args) => {
     for (let [id, effectInfo] of toRun) {
         const oldInputs = previousInputs.get(id);
         if (argsChanged(oldInputs, effectInfo.inputs)) {
@@ -26,7 +33,7 @@ const newCommit: typeof originalCommit = (vnode, commitQueue) => {
         }
     }
     toRun.clear();
-    originalCommit?.(vnode, commitQueue);
+    originalCommit?.(...args);
 }
 options[commitName] = newCommit as never
 
@@ -40,6 +47,18 @@ options[commitName] = newCommit as never
  * @param inputs 
  */
 export function useBeforeLayoutEffect(effect: EffectCallback, inputs?: Inputs) {
+
+    /*(() => {
+        const cleanup = useRef<void | (() => void) | null>(null);
+        const prevArgsRef = useRef<Inputs>(null!);
+        if (argsChanged(inputs, prevArgsRef.current)) {
+            prevArgsRef.current = inputs!;
+            if (cleanup.current)
+                cleanup.current();
+            cleanup.current = effect();
+        }
+    })();*/
+
     const [id] = useState(() => generateRandomId());
     toRun.set(id, { effect, inputs, cleanup: null });
 

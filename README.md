@@ -25,6 +25,8 @@ There are a few reasons:
 
 (In *rough* order of usefulness and relevance)
 
+**`useEvent` when it finally lands is going to make some of these, like `useStableCallback` and _especially_ `useBeforeLayoutEffect` obsolete, or at least make the problems they solve obsolete.**
+
 |Hook|Description|
 |------|------|
 |`useMergedProps` (& `useMergedClasses`, `useMergedRefs`, `useMergedStyles`, `useMergedChildren`)	|Allows a component to use props from two (or more) separate unrelated sources.|
@@ -53,7 +55,6 @@ There are a few reasons:
 |`useForceUpdate`|Returns a function that forces the component that uses it to re-render itself when called (any children just follow normal diffing rules past that point). The returned function is completely stable.|
 |`useMutationObserver`								|`MutationObserver`, but In a Hook™!|
 |`useMediaQuery`									|Measures if a given media query matches the device or not.|
-
 
 # General Purpose Prop Hooks
 

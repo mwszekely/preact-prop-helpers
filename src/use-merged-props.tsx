@@ -80,7 +80,7 @@ export function useMergedProps<E extends EventTarget>() {
                 else {
                     // Ugh.
                     // No good strategies here, just log it if requested
-                    log?.(`Could not merge incompatible prop "${rhsKey}" (type: ${typeof rhsValue}, values: [${lhsValue}, ${rhsValue}])`);
+                    log?.(`Could not merge incompatible prop "${rhsKey as string}" (type: ${typeof rhsValue}, values: [${lhsValue}, ${rhsValue}])`);
                     ret[rhsKey as keyof MergedProps<E, T, U>] = rhsValue as never
                 }
             }
