@@ -63,17 +63,17 @@ export function useSortableChildren<T extends { index: number }, G extends any[]
     // Because that might not be the consumer of *this* hook directly (e.g. a table uses
     // this hook, but it's tbody that actually needs updating), we need to remotely
     // get and set a forceUpdate function.
-    const [getForceUpdate, setForceUpdate] = usePassiveState<null | (() => void)>(null);
+    const [getForceUpdate, setForceUpdate] = usePassiveState<null | (() => void)>(null, returnNull);
 
 
     // The actual sort function.
     const sort = useCallback((managedRows: T[], direction: "ascending" | "descending", ...args: G): Promise<void> | void => {
         
-        let sortedRows = managedRows.slice().sort((lhsRow, rhsRow) => {
+        const sortedRows = managedRows.slice().sort((lhsRow, rhsRow) => {
 
             const lhsValue = getValue(lhsRow, ...args) as any;
             const rhsValue = getValue(rhsRow, ...args) as any;
-            let result = compare(lhsValue, rhsValue) // lhsRow.getManagedCells()?.[column]?.value, rhsRow.getManagedCells()?.[column]?.value);
+            const result = compare(lhsValue, rhsValue) // lhsRow.getManagedCells()?.[column]?.value, rhsRow.getManagedCells()?.[column]?.value);
             if (direction[0] == "d")
                 return -result;
             return result;
@@ -96,7 +96,7 @@ export function useSortableChildren<T extends { index: number }, G extends any[]
     const useSortableProps = useCallback(<P extends Omit<h.JSX.HTMLAttributes<S>, "children"> & { children?: VNode<any>[] }>({ children, ...props }: P) => {
 
         const forceUpdate = useForceUpdate();
-        useLayoutEffect(() => { setForceUpdate(prev => forceUpdate); }, [forceUpdate])
+        useLayoutEffect(() => { setForceUpdate(_prev => forceUpdate); }, [forceUpdate])
 
         return (useMergedProps<S>()({
             role: "rowgroup",
@@ -160,3 +160,4 @@ function defaultCompare(lhs: string | number | boolean | Date | null | undefined
     }
 }
 
+function returnNull() { return null; }

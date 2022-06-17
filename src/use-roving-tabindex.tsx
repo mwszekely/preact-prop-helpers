@@ -1,5 +1,5 @@
 import { h } from "preact";
-import { StateUpdater, useCallback, useEffect, useRef } from "preact/hooks";
+import { useCallback, useEffect } from "preact/hooks";
 import { ManagedChildInfo, useChildFlag, useChildManager, UseChildManagerReturnType } from "./use-child-manager";
 import { MergedProps, useMergedProps } from "./use-merged-props";
 import { UseRefElementPropsReturnType } from "./use-ref-element";
@@ -110,7 +110,6 @@ export function useRovingTabIndex<I extends UseRovingTabIndexChildInfo>({ should
     const getShouldFocusOnChange = useStableGetter(foc);
 
     const getTabbableIndex = useStableGetter(tabbableIndex);
-    const prevTabbable = useRef(-Infinity);
 
     // Call the hook that allows us to collect information from children who provide it
     const { managedChildren, childCount, useManagedChild, indicesByElement, ...rest } = useChildManager<I>();
@@ -127,12 +126,7 @@ export function useRovingTabIndex<I extends UseRovingTabIndexChildInfo>({ should
                 (managedChildren[index as keyof typeof managedChildren] as I)?.setTabbable(tabbable);
         },
         getChildFlag: (index) => (managedChildren[index]?.getTabbable() ?? null)
-    })
-
-    const focusSelf = useCallback(() => {
-        if (tabbableIndex != null)
-            managedChildren[tabbableIndex].setTabbable(true);
-    }, [tabbableIndex]);
+    });
 
     const useRovingTabIndexChild = useCallback<UseRovingTabIndexChild<I>>(<ChildElement extends Element>(info: UseRovingTabIndexChildParameters<I>): UseRovingTabIndexChildReturnType<ChildElement> => {
 
@@ -141,7 +135,7 @@ export function useRovingTabIndex<I extends UseRovingTabIndexChildInfo>({ should
         const [tabbable, setTabbable, getTabbable] = useState<boolean | null>(null);
 
 
-        let newInfo = {
+        const newInfo = {
             ...info,
             rerenderAndFocus,
             setTabbable: useCallback((tabbable: boolean) => { setTabbable(tabbable); }, []),
@@ -188,7 +182,7 @@ export function useRovingTabIndex<I extends UseRovingTabIndexChildInfo>({ should
             }
 
             return useMergedProps<ChildElement>()(useManagedChildProps({ tabIndex }), props);
-        };
+        }
 
         return {
             useRovingTabIndexChildProps,
@@ -211,6 +205,9 @@ export function useRovingTabIndex<I extends UseRovingTabIndexChildInfo>({ should
                 // is no longer tabbable without us knowing about it.
                 // Maybe it unmounted?
                 // Either way, try to find the newly-selected child.
+
+                // (I don't think this code path has ever been run)
+                /* eslint-disable no-debugger */
                 debugger;
                 let i = getTabbableIndex() ?? 0;
                 let j = i + 1;

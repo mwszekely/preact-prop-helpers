@@ -8,7 +8,7 @@ import { useStableGetter } from "./use-stable-getter";
  * 
  * Do not use during the render phase!  `useLayoutEffect` is fine though.
  */
-export function useStableCallback<T extends (...args: any[]) => any>(fn: T): T {
+export function useStableCallback<T extends (..._args: any[]) => any>(fn: T): T {
     const currentCallbackGetter = useStableGetter<T>(fn);
 
     return useCallback((...args: Parameters<T>): ReturnType<T> => {

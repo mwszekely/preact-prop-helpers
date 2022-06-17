@@ -40,56 +40,13 @@ function mergeClasses<Lhs extends MergeClassesProps | null | undefined, Rhs exte
     const rhsClassName = rhs?.className;
 
     if (lhsClass || rhsClass || lhsClassName || rhsClassName) {
-        let lhsClasses = clsx(lhsClass, lhsClassName).split(" ");
-        let rhsClasses = clsx(rhsClass, rhsClassName).split(" ");
-        let allClasses = new Set([...Array.from(lhsClasses), ...Array.from(rhsClasses)])
+        const lhsClasses = clsx(lhsClass, lhsClassName).split(" ");
+        const rhsClasses = clsx(rhsClass, rhsClassName).split(" ");
+        const allClasses = new Set([...Array.from(lhsClasses), ...Array.from(rhsClasses)])
 
         return Array.from(allClasses).join(" ") as MergedClasses<Lhs, Rhs>;
     }
     else {
         return undefined as MergedClasses<Lhs, Rhs>;
     }
-}
-
-
-function typetest() {
-
-    const c = [
-        useMergedClasses(undefined, undefined),
-        useMergedClasses({}, undefined),
-        useMergedClasses(undefined, {}),
-        useMergedClasses({}, {}),
-        useMergedClasses({ class: "string" }, {}),
-        useMergedClasses({ class: "string" }, { class: undefined }),
-        useMergedClasses({ class: undefined }, { class: "string" }),
-        useMergedClasses({ className: "string" }, { className: undefined }),
-        useMergedClasses({ className: undefined }, { className: "string" }),
-        useMergedClasses({ class: "string" }, { className: undefined }),
-        useMergedClasses({ className: undefined }, { class: "string" }),
-        useMergedClasses({ className: "string" }, { class: undefined }),
-        useMergedClasses({ class: undefined }, { className: "string" }),
-    ] as const;
-
-    /// @ts-expect-error
-    c[0].concat("");
-    /// @ts-expect-error
-    c[1].concat("");
-    /// @ts-expect-error
-    c[2].concat("");
-    /// @ts-expect-error
-    c[3].concat("");
-
-    c[4].concat("");
-    c[5].concat("");
-    c[6].concat("");
-    c[7].concat("");
-    c[8].concat("");
-    c[9].concat("");
-    c[10].concat("");
-    c[11].concat("");
-    c[12].concat("");
-
-
-    /// @ts-expect-error
-    c[13]
 }

@@ -1,10 +1,11 @@
 import "wicg-inert";
 import "blocking-elements";
-import { BlockingElements, DocumentWithBlockingElements } from "blocking-elements";
+import { DocumentWithBlockingElements } from "blocking-elements";
 import { useLayoutEffect } from "preact/hooks";
 import { getDocument } from "./use-document-class";
+import { useStableCallback } from "./use-stable-callback";
 
-function blockingElements() { return (getDocument() as DocumentWithBlockingElements).$blockingElements };
+function blockingElements() { return (getDocument() as DocumentWithBlockingElements).$blockingElements }
 /**
  * Allows an element to trap focus by applying the "inert" attribute to all sibling, aunt, and uncle nodes.
  * 
@@ -13,13 +14,17 @@ function blockingElements() { return (getDocument() as DocumentWithBlockingEleme
  * it'll take to find its way into the spec, if ever)
  * @param target 
  */
-export function useBlockingElement<E extends Element>(target: E | null) {
+export function useBlockingElement<E extends Element>(enabled: boolean, getTarget: () => (E | null)) {
+
+    const stableGetTarget = useStableCallback(getTarget);
 
     /**
      * Push/pop the element from the blockingElements stack.
      */
     useLayoutEffect(() => {
-        if (target) {
+        const target = stableGetTarget();
+
+        if (enabled) {
             // Sometimes blockingElements will fail if, for example,
             // the target element isn't connected to document.body.
             // This is rare, but it's better to fail silently with weird tabbing behavior
@@ -35,7 +40,7 @@ export function useBlockingElement<E extends Element>(target: E | null) {
                 console.error(ex);
             }
         }
-    }, [target]);
+    }, [enabled]);
 }
 
 export function getTopElement() {

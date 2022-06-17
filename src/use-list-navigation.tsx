@@ -1,10 +1,10 @@
 import { h } from "preact";
-import { StateUpdater, useCallback } from "preact/hooks";
-import { useEnsureStability } from "./use-passive-state";
+import { useCallback } from "preact/hooks";
 import { UseChildManagerReturnType } from "./use-child-manager";
 import { useLinearNavigation, UseLinearNavigationChildInfo, useTypeaheadNavigation, UseTypeaheadNavigationChildInfo, UseTypeaheadNavigationParameters } from "./use-keyboard-navigation";
 import { MergedProps, useMergedProps } from "./use-merged-props";
-import { UseRovingTabIndexChildInfo, useRovingTabIndex, UseRovingTabIndexChildParameters, UseRovingTabIndexChildPropsReturnType, UseRovingTabIndexSiblingProps, UseRovingTabIndexParameters } from "./use-roving-tabindex";
+import { useEnsureStability } from "./use-passive-state";
+import { useRovingTabIndex, UseRovingTabIndexChildInfo, UseRovingTabIndexChildPropsReturnType, UseRovingTabIndexParameters, UseRovingTabIndexSiblingProps } from "./use-roving-tabindex";
 import { useState } from "./use-state";
 
 
@@ -45,7 +45,7 @@ export type OmitStrong<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
  * by somebody and 着 will turn back into 着.)
  * 
  */
-const dummy: any = null;
+const _dummy: any = null;
 
 
 
@@ -160,7 +160,7 @@ export interface UseListNavigationChildInfo extends UseRovingTabIndexChildInfo, 
      * attribute will be applied.
      */
     hidden?: boolean;
-};
+}
 export type UseListNavigationChildParameters<I extends UseListNavigationChildInfo> = Omit<I, "rerenderAndFocus" | "setTabbable" | "getTabbable">;
 
 /** Type of the child's sub-hook */
@@ -186,7 +186,7 @@ export function useListNavigation<ChildElement extends Element, I extends UseLis
     indexDemangler ??= identity;
     keyNavigation ??= "either";
 
-    useEnsureStability(indexMangler, indexDemangler);
+    useEnsureStability("useListNavigation", indexMangler, indexDemangler);
 
     // Keep track of three things related to the currently tabbable element's index:
     // What it is, and whether, when we render this component and it's changed, to also focus the element that was made tabbable.
@@ -229,7 +229,7 @@ export function useListNavigation<ChildElement extends Element, I extends UseLis
 
     const useListNavigationChild: UseListNavigationChild<ChildElement, I> = useCallback((info: UseListNavigationChildParameters<I>): UseListNavigationChildReturnType<ChildElement> => {
 
-        const { ...rest } = useTypeaheadNavigationChild(info as I);
+        const _v: void = useTypeaheadNavigationChild(info as I);
         //const { useLinearNavigationChildProps } = useLinearNavigationChild(info as I);
 
         const { useRovingTabIndexChildProps, useRovingTabIndexSiblingProps, tabbable } = useRovingTabIndexChild<ChildElement>(info as I);

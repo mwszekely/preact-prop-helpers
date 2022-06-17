@@ -1,6 +1,6 @@
 
 import { Component, options, VNode } from "preact";
-import { EffectCallback, Inputs, useEffect, useLayoutEffect, useRef, useState } from "preact/hooks";
+import { EffectCallback, Inputs, useEffect, useState } from "preact/hooks";
 import { generateRandomId } from "./use-random-id";
 
 const previousInputs = new Map<string, Inputs | undefined>();
@@ -24,7 +24,7 @@ const commitName = "diffed";
 
 const originalCommit = options[commitName] as (vnode: VNode, commitQueue: Component[]) => void;
 const newCommit: typeof originalCommit = (...args) => {
-    for (let [id, effectInfo] of toRun) {
+    for (const [id, effectInfo] of toRun) {
         const oldInputs = previousInputs.get(id);
         if (argsChanged(oldInputs, effectInfo.inputs)) {
             effectInfo.cleanup?.();

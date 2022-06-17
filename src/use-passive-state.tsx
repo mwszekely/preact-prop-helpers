@@ -1,4 +1,4 @@
-import { useCallback, useLayoutEffect, useRef } from "preact/hooks";
+import { useCallback, useLayoutEffect, useReducer, useRef } from "preact/hooks";
 
 
 export type PassiveStateUpdater<S> = (value: S | ((prevState: S | undefined) => S)) => void;
@@ -8,8 +8,10 @@ export type OnPassiveStateChange<T> = ((value: T, prevValue: T | undefined) => (
  * Debug hook.
  * 
  * Given a value or set of values, emits a console error if any of them change from one render to the next.
+ * 
+ * Eventually, when useEvent lands, we hopefully won't need this.
  */
-export function useEnsureStability<T extends any[]>(...values: T) {
+export function useEnsureStability<T extends any[]>(parentHookName: string, ...values: T) {
     useHelper(values.length, 0);
     values.forEach(useHelper);
     return;
@@ -22,12 +24,54 @@ export function useEnsureStability<T extends any[]>(...values: T) {
         const shownError = useRef(false);
         if (helperToEnsureStability.current != value) {
             if (!shownError.current) {
-                console.error(`This hook requires some or all of its arguments remain stable across each render; please check the ${index}-indexed value that was checked.`);
+                /* eslint-disable no-debugger */
                 debugger;
+                console.error(`The hook ${parentHookName} requires some or all of its arguments remain stable across each render; please check the ${index}-indexed argument.`);
                 shownError.current = true;
             }
         }
     }
+}
+
+
+export function usePassiveState2<T>(onChange: undefined | null | OnPassiveStateChange<T>, getInitial: () => T): [() => T, PassiveStateUpdater<T>] {
+    type StateType = { value: T | typeof Unset }
+    
+    const warningRef = useRef(false);
+    const cleanupCallbackRef = useRef<void | undefined | (() => void)>(undefined);
+
+    const [stored, setStored] = useReducer<StateType, T>((prev, action) => {
+        if (prev.value !== action) {
+            warningRef.current = true;
+            if (cleanupCallbackRef.current) 
+                cleanupCallbackRef.current();
+            
+            cleanupCallbackRef.current = onChange?.(action, prev.value === Unset? getInitial() : prev.value);
+            warningRef.current = false;
+        }
+        prev.value = action;
+        return prev;
+    }, { value: Unset });
+
+    const getState = useCallback((): T => { 
+        if (warningRef.current)
+            console.warn("During onChange, prefer using the (value, prevValue) arguments instead of getValue -- it's ambiguous as to if you're asking for the old or new value at this point in time for this component.");
+
+        return stored.value === Unset? getInitial() : stored.value;
+     }, []);
+
+    const setState = useCallback<PassiveStateUpdater<T>>((nextValueGetter) => {
+        let nextValue: T;
+        if (nextValueGetter instanceof Function)
+            nextValueGetter(getState());
+        else
+            nextValue = nextValueGetter;
+
+        setStored(nextValue!);
+
+    }, []);
+
+    return [getState, setState];
 }
 
 /**
@@ -49,16 +93,17 @@ export function useEnsureStability<T extends any[]>(...values: T) {
  * @returns 
  */
 export function usePassiveState<T>(onChange: undefined | null | OnPassiveStateChange<T>, getInitialValue?: () => T): readonly [() => T, PassiveStateUpdater<T>] {
+
     const valueRef = useRef<T | typeof Unset>(Unset);
     const warningRef = useRef(false);
     const cleanupCallbackRef = useRef<undefined | (() => void)>(undefined);
 
     // Make sure that the provided functions are perfectly stable across renders
-    useEnsureStability(onChange, getInitialValue);
+    useEnsureStability("usePassiveState", onChange, getInitialValue);
 
     // Shared between "dependency changed" and "component unmounted".
     const onShouldCleanUp = useCallback(() => {
-        let cleanupCallback = cleanupCallbackRef.current;
+        const cleanupCallback = cleanupCallbackRef.current;
         if (cleanupCallback)
             cleanupCallback();
     }, []);
@@ -126,3 +171,10 @@ export function usePassiveState<T>(onChange: undefined | null | OnPassiveStateCh
 }
 
 const Unset = Symbol();
+
+// Easy constants for getInitialValue
+export function returnTrue() { return true; }
+export function returnFalse() { return false; }
+export function returnNull() { return null; }
+export function returnUndefined() { return undefined; }
+export function returnZero() { return 0; }

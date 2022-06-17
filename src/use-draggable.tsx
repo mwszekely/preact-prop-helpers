@@ -1,7 +1,6 @@
 import { h, Ref } from "preact";
 import { useCallback, useRef } from "preact/hooks";
 import { MergedProps, useMergedProps } from "./use-merged-props";
-import { UseRefElementPropsReturnType } from "./use-ref-element";
 import { useState } from "./use-state";
 
 interface UseDraggableReturnType<E extends EventTarget> {
@@ -24,7 +23,12 @@ interface UseDraggableReturnType<E extends EventTarget> {
     getLastDropEffect: () => (DataTransfer["dropEffect"] | null);
 }
 
-type UseDraggableProps<E extends EventTarget> = <P extends h.JSX.HTMLAttributes<E>>(p: P) => MergedProps<E, UseRefElementPropsReturnType<E, { draggable: true; onDragStart: (e: DragEvent) => void; onDragEnd: (e: DragEvent) => void; ref: Ref<E>; }>, P>
+type UseDraggableProps<E extends EventTarget> = <P extends h.JSX.HTMLAttributes<E>>(p: P) => MergedProps<E, {
+    draggable: boolean;
+    onDragStart: (e: DragEvent) => void;
+    onDragEnd: (e: DragEvent) => void;
+    ref: Ref<E>;
+}, P>;
 
 export interface UseDraggableParameters {
 
@@ -66,7 +70,7 @@ export function useDraggable<E extends HTMLElement>({ effectAllowed, data, dragI
                 if (dragImage)
                     e.dataTransfer.setDragImage(dragImage, dragImageXOffset ?? 0, dragImageYOffset ?? 0)
 
-                let entries = Object.entries(data) as [mimeType: string, data: string][];
+                const entries = Object.entries(data) as [mimeType: string, data: string][];
                 for (const [mimeType, data] of entries) {
                     e.dataTransfer.setData(mimeType, data);
                 }
@@ -98,7 +102,7 @@ export function useDraggable<E extends HTMLElement>({ effectAllowed, data, dragI
 
     // Return both the element and the hook that modifies 
     // the props and allows us to actually find the element
-    let ret: UseDraggableReturnType<E> = {
+    const ret: UseDraggableReturnType<E> = {
         useDraggableProps,
         dragging,
         getDragging,

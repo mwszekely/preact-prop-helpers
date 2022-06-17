@@ -15,6 +15,7 @@ export { useAsyncHandler, GenericAsyncHandler, UseAsyncHandlerParameters, UseAsy
 export { useLinearNavigation, useTypeaheadNavigation, UseTypeaheadNavigationChild, UseLinearNavigationChildInfo, UseTypeaheadNavigationChildInfo, UseTypeaheadNavigationChildParameters, UseLinearNavigationProps, UseTypeaheadNavigationProps } from "./use-keyboard-navigation"
 export { useGridNavigation, UseGridNavigationRow, UseGridNavigationCell, UseGridNavigationCellInfo, UseGridNavigationCellParameters, UseGridNavigationRowInfo, UseGridNavigationRowParameters } from "./use-grid-navigation";
 export { useAnimationFrame, ProvideBatchedAnimationFrames } from "./use-animation-frame";
+export { useImperativeProps } from "./use-imperative-props";
 export { useDraggable } from "./use-draggable";
 export { useDroppable } from "./use-droppable";
 export { useGlobalHandler, useLocalHandler } from "./use-event-handler";
@@ -31,7 +32,7 @@ export { useSortableChildren, UseSortableChildrenParameters } from "./use-sortab
 
 export { useEffect } from "./use-effect";
 export { useLayoutEffect } from "./use-layout-effect";
-export { usePassiveState } from "./use-passive-state";
+export { usePassiveState, returnFalse, returnTrue, returnNull, returnUndefined, returnZero } from "./use-passive-state";
 export { useFocusTrap, findFirstFocusable, UseFocusTrapReturnType, UseFocusTrapParameters, UseFocusTrapPropsParameters, UseFocusTrapPropsReturnType } from "./use-focus-trap";
 export { useForceUpdate } from "./use-force-update";
 

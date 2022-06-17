@@ -48,8 +48,8 @@ export interface UseDroppableParameters {
     effect: DataTransfer["dropEffect"] | undefined;
 }
 
-export interface DropFile extends DropFileMetadata { name: string, data: ArrayBuffer, size: number | undefined, lastModified: number | undefined };
-export interface DropFileMetadata { type: string | undefined };
+export interface DropFile extends DropFileMetadata { name: string, data: ArrayBuffer, size: number | undefined, lastModified: number | undefined }
+export interface DropFileMetadata { type: string | undefined }
 
 
 type DroppableFileErrorType = "IndexSizeError" | "HierarchyRequestError" | "WrongDocumentError" | "InvalidCharacterError" | "NoModificationAllowedError" | "NotFoundError" | "NotSupportedError" | "InvalidStateError" | "InUseAttributeError" | "SyntaxError" | "InvalidModificationError" | "NamespaceError" | "InvalidAccessError" | "TypeMismatchError" | "SecurityError" | "NetworkError" | "AbortError" | "URLMismatchError" | "QuotaExceededError" | "TimeoutError" | "InvalidNodeTypeError" | "DataCloneError" | "EncodingError" | "NotReadableError" | "UnknownError" | "ConstraintError" | "DataError" | "TransactionInactiveError" | "ReadOnlyError" | "VersionError" | "OperationError" | "NotAllowedError";
@@ -152,7 +152,7 @@ export function useDroppable<E extends HTMLElement>({ effect }: UseDroppablePara
                 const newMimeTypes = new Set<string>();
                 const newFiles = new Array<DropFileMetadata>();
 
-                for (let item of e.dataTransfer?.items ?? []) {
+                for (const item of e.dataTransfer?.items ?? []) {
                     const { kind, type } = item;
 
                     if (kind === "string") {
@@ -188,16 +188,16 @@ export function useDroppable<E extends HTMLElement>({ effect }: UseDroppablePara
             setFilesForConsideration(null);
             setStringsForConsideration(null);
 
-            let allPromises = new Array<Promise<unknown>>();
+            const allPromises = new Array<Promise<unknown>>();
 
             const dropData: { [mimeType: string]: string } = {};
             const dropFile: DropFile[] = [];
 
-            for (let item of e.dataTransfer?.items ?? []) {
+            for (const item of e.dataTransfer?.items ?? []) {
                 const { kind, type } = item;
 
                 if (kind === "string") {
-                    allPromises.push((new Promise<string>((resolve, reject) => item.getAsString(resolve))).then(str => dropData[type] = str));
+                    allPromises.push((new Promise<string>((resolve, _reject) => item.getAsString(resolve))).then(str => dropData[type] = str));
                 }
                 else if (kind === "file") {
                     const file = item.getAsFile();
@@ -205,15 +205,15 @@ export function useDroppable<E extends HTMLElement>({ effect }: UseDroppablePara
                         allPromises.push(
                             new Promise<void>((resolve, reject) => {
 
-                                let reader = new FileReader();
+                                const reader = new FileReader();
 
-                                reader.onload = (e) => {
+                                reader.onload = (_) => {
                                     resolve();
                                     const data = reader.result as ArrayBuffer;
                                     dropFile.push({ data, name: file.name, type: file.type, size: data.byteLength, lastModified: file.lastModified });
                                 };
-                                reader.onerror = (e) => { reject(new DroppableFileError(file.name, reader.error)); };
-                                reader.onabort = (e) => { reject(new DroppableFileError(file.name, reader.error)); };
+                                reader.onerror = (_) => { reject(new DroppableFileError(file.name, reader.error)); };
+                                reader.onabort = (_) => { reject(new DroppableFileError(file.name, reader.error)); };
 
                                 reader.readAsArrayBuffer(file);
                             })
@@ -232,7 +232,8 @@ export function useDroppable<E extends HTMLElement>({ effect }: UseDroppablePara
                     files: dropFile
                 }
             }).catch(ex => {
-                debugger;   // Intentional
+                /* eslint-disable no-debugger */
+                debugger;
                 setPromiseCount(i => ++i);
                 setDropError(ex);
                 return null;

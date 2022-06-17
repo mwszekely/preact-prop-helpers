@@ -11,7 +11,8 @@ export function getFromLocalStorage<States extends object>() {
             return converter(item);
         }
         catch (e) {
-            debugger;   // Intentional
+            /* eslint-disable no-debugger */
+            debugger;
             return undefined;
         }
     }
@@ -23,7 +24,8 @@ export function storeToLocalStorage<States extends object>() {
             localStorage.setItem(key, converter(value));
         }
         catch (e) {
-            debugger;   // Intentional
+            /* eslint-disable no-debugger */
+            debugger;
         }
     }
 }

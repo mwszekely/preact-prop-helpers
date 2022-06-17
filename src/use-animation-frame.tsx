@@ -7,7 +7,7 @@ type RafCallbackType = (msSinceLast: number, tag?: any) => void;
 interface ContextType {
     addCallback: (callback: RafCallbackType, tag?: any) => void;
     removeCallback: (callback: RafCallbackType) => void;
-};
+}
 
 const SharedAnimationFrameContext = createContext<null | ContextType>(null);
 
@@ -27,11 +27,11 @@ export function ProvideBatchedAnimationFrames({ children }: { children: Componen
         let handle = -1;
 
         function rafWithBatchedCallbacks(msSinceLast: number) {
-            for (let [batchedRafCallback, tag] of allCallbacks.current) {
+            for (const [batchedRafCallback, tag] of allCallbacks.current) {
                 batchedRafCallback(msSinceLast, tag);
             }
             handle = requestAnimationFrame(rafWithBatchedCallbacks);
-        };
+        }
 
         handle = requestAnimationFrame(rafWithBatchedCallbacks);
 
@@ -60,7 +60,7 @@ export interface UseAnimationFrameParameters {
  */
 export function useAnimationFrame({ callback }: UseAnimationFrameParameters): void {
     // Get a wrapper around the given callback that's stable
-    const stableCallback = useStableCallback(callback ?? (() => { }));
+    const stableCallback = useStableCallback(callback ?? noop);
     const hasCallback = (callback != null);
 
     const sharedAnimationFrameContext = useContext(SharedAnimationFrameContext);
@@ -88,3 +88,6 @@ export function useAnimationFrame({ callback }: UseAnimationFrameParameters): vo
         }
     }, [sharedAnimationFrameContext, hasCallback])
 }
+
+// eslint-disable @typescript-eslint/no-empty-function
+function noop() { }

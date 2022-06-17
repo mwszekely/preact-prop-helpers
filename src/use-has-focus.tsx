@@ -1,11 +1,10 @@
 
 import { h } from "preact";
 import { useCallback } from "preact/hooks";
-import { useEnsureStability, usePassiveState } from "./use-passive-state";
 import { useActiveElement, UseActiveElementParameters, UseActiveElementReturnType } from "./use-active-element";
 import { MergedProps } from "./use-merged-props";
-import { useRefElement, UseRefElementPropsReturnType, UseRefElementReturnType } from "./use-ref-element";
-import { useStableCallback } from "./use-stable-callback";
+import { returnFalse, useEnsureStability, usePassiveState } from "./use-passive-state";
+import { UseRefElementPropsReturnType, UseRefElementReturnType } from "./use-ref-element";
 
 export interface UseFocusParameters<T extends Node> extends UseActiveElementParameters<T> {
     /**
@@ -54,12 +53,9 @@ export interface UseHasFocusReturnType<T extends Node> extends Omit<UseRefElemen
     getLastFocusedInner(): boolean;
 }
 
-function returnFalse() { return false; }
-function noop() { }
-
 export function useHasFocus<T extends Node>({ onFocusedChanged, onFocusedInnerChanged, onLastFocusedChanged, onLastFocusedInnerChanged, onLastActiveElementChange, onActiveElementChange, onWindowFocusedChange }: UseFocusParameters<T>): UseHasFocusReturnType<T> {
 
-    useEnsureStability(onFocusedChanged, onFocusedInnerChanged, onLastFocusedChanged, onLastFocusedInnerChanged, onLastActiveElementChange, onActiveElementChange, onWindowFocusedChange);
+    useEnsureStability("useHasFocus", onFocusedChanged, onFocusedInnerChanged, onLastFocusedChanged, onLastFocusedInnerChanged, onLastActiveElementChange, onActiveElementChange, onWindowFocusedChange);
 
     const [getFocused, setFocused] = usePassiveState<boolean>(onFocusedChanged, returnFalse);
     const [getFocusedInner, setFocusedInner] = usePassiveState<boolean>(onFocusedInnerChanged, returnFalse);

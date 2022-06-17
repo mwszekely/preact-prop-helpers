@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from "preact/hooks";
+import { useEffect } from "preact/hooks";
 import { useStableCallback } from "./use-stable-callback";
 import { useStableGetter } from "./use-stable-getter";
 
@@ -22,7 +22,7 @@ export function useInterval({ interval, callback }: UseInterval) {
     const getInterval = useStableGetter(interval);
 
     useEffect(() => {
-        let interval = getInterval();
+        const interval = getInterval();
         let lastDelayUsed = interval;
 
         if (interval == null)

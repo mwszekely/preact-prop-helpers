@@ -1,8 +1,8 @@
 import { h } from "preact";
 import { useCallback, useEffect, useRef } from "preact/hooks";
-import { useRefElement, UseRefElementProps } from "./use-ref-element";
-import { OnPassiveStateChange, useEnsureStability, usePassiveState } from "./use-passive-state";
 import { getDocument } from "./use-document-class";
+import { OnPassiveStateChange, returnNull, useEnsureStability, usePassiveState } from "./use-passive-state";
+import { useRefElement, UseRefElementProps } from "./use-ref-element";
 
 interface UseElementSizeParameters {
     /**
@@ -46,17 +46,10 @@ export interface UseElementSizeReturnType<E extends HTMLElement> {
     useElementSizeProps: UseElementSizeProps<E>;
 }
 
-function extractElementSize(element: Element | undefined | null): ElementSize {
-    if (!element)
-        throw new Error("Cannot retrieve the size of an element that has not been rendered yet");
 
-    const { clientWidth, scrollWidth, offsetWidth, clientHeight, scrollHeight, offsetHeight, clientLeft, scrollLeft, offsetLeft, clientTop, scrollTop, offsetTop } = (element as (Element & Partial<HTMLElement>));
-    return ({ clientWidth, scrollWidth, offsetWidth, clientHeight, scrollHeight, offsetHeight, clientLeft, scrollLeft, offsetLeft, clientTop, scrollTop, offsetTop });
-}
-function returnNull() { return null; }
 export function useElementSize<E extends HTMLElement>({ getObserveBox, onSizeChange }: UseElementSizeParameters): UseElementSizeReturnType<E> {
 
-    useEnsureStability(getObserveBox, onSizeChange);
+    useEnsureStability("useElementSize", getObserveBox, onSizeChange);
 
     const [getSize, setSize] = usePassiveState<ElementSize | null>(onSizeChange as OnPassiveStateChange<ElementSize | null>, returnNull);
 
@@ -76,7 +69,7 @@ export function useElementSize<E extends HTMLElement>({ getObserveBox, onSizeCha
 
 
             if (window && ("ResizeObserver" in window)) {
-                const observer = new ResizeObserver((entries) => { handleUpdate(); });
+                const observer = new ResizeObserver((_entries) => { handleUpdate(); });
 
                 observer.observe(element, { box: observeBox });
 

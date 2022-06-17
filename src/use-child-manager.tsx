@@ -118,9 +118,9 @@ export function useChildManager<I extends ManagedChildInfo<any>>(): UseChildMana
     // This is blindly updated any time a child mounts or unmounts itself.
     // Used to make sure that any time the array of managed children updates,
     // we also re-render.
-    const [childUpdateIndex, setChildUpdateIndex] = useState(0);
+    const [_childUpdateIndex, setChildUpdateIndex] = useState(0);
     const [totalChildrenMounted, setTotalChildrenMounted, getTotalChildrenMounted] = useState(0);
-    const [totalChildrenUnounted, setTotalChildrenUnounted, getTotalChildrenUnounted] = useState(0);
+    const [totalChildrenUnounted, setTotalChildrenUnounted, _getTotalChildrenUnounted] = useState(0);
     const childrenCurrentlyMounted = totalChildrenMounted - totalChildrenUnounted;
     const managedChildren = useRef<ManagedChildren<InfoToKey<I>, I>>([] as any as ManagedChildren<InfoToKey<I>, I> /** TODO: Any problems caused by using an array when it should be an object? */);
     const mountedChildren = useRef<(null | I)[]>([]);
@@ -175,7 +175,7 @@ export function useChildManager<I extends ManagedChildInfo<any>>(): UseChildMana
         }, []) });
 
         useLayoutEffect(() => {
-            let index = getTotalChildrenMounted();
+            const index = getTotalChildrenMounted();
             mountOrder.current.set(info.index, index);
             mountedChildren.current[index] = info;
             setTotalChildrenMounted(t => ++t);
@@ -335,14 +335,14 @@ export function useChildFlag<T extends string | number, I extends ManagedChildIn
 
         if (Array.isArray(managedChildren)){
         for (let i = 0; i < managedChildren.length; ++i) {
-            let shouldBeSet = (i == activatedIndex);
+            const shouldBeSet = (i == activatedIndex);
             if (getChildFlag(i as T) != shouldBeSet) {
                 setChildFlag(i as T, shouldBeSet);
             }
         }}
         else {
-            Object.entries(managedChildren).forEach(([i, info]) => {
-                let shouldBeSet = (i == activatedIndex);
+            Object.entries(managedChildren).forEach(([i, _info]) => {
+                const shouldBeSet = (i == activatedIndex);
                 if (getChildFlag(i as T) != shouldBeSet) {
                     setChildFlag(i as T, shouldBeSet);
                 }

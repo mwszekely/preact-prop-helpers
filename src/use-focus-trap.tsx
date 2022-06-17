@@ -1,58 +1,32 @@
 import { h } from "preact";
-import { useLayoutEffect } from "preact/hooks";
+import { useCallback, useLayoutEffect } from "preact/hooks";
 import { isFocusable } from "tabbable";
-import { getDocument } from "./use-document-class";
 import { useActiveElement } from "./use-active-element";
 import { getTopElement, useBlockingElement } from "./use-blocking-element";
+import { getDocument } from "./use-document-class";
 import { MergedProps, useMergedProps } from "./use-merged-props";
-import { useRefElement, UseRefElementPropsReturnType, UseRefElementReturnType } from "./use-ref-element";
-import { useState } from "./use-state";
+import { UseRefElementPropsReturnType, UseRefElementReturnType } from "./use-ref-element";
+import { useStableCallback } from "./use-stable-callback";
 
 export interface UseFocusTrapParameters { trapActive: boolean; }
 
-export interface UseFocusTrapReturnType<E extends Node> extends Omit<UseRefElementReturnType<E>, "useRefElementProps"> {
+export interface UseFocusTrapReturnType<E extends Element> extends Omit<UseRefElementReturnType<E>, "useRefElementProps"> {
     useFocusTrapProps: UseFocusTrapProps<E>;
 }
 
 
 export interface UseFocusTrapPropsParameters<E extends Node> extends h.JSX.HTMLAttributes<E> { }
-export type UseFocusTrapPropsReturnType<E extends Node, P extends h.JSX.HTMLAttributes<E>> = MergedProps<E, {}, UseRefElementPropsReturnType<E, P>>;
+export type UseFocusTrapPropsReturnType<E extends Node, P extends h.JSX.HTMLAttributes<E>> = MergedProps<E, UseRefElementPropsReturnType<E, P>, {  }>
 
-type UseFocusTrapProps<E extends Node> = <P extends UseFocusTrapPropsParameters<E>>(props: P) => UseFocusTrapPropsReturnType<E, P>;
+export type UseFocusTrapProps<E extends Element> = <P extends UseFocusTrapPropsParameters<E>>(props: P) => UseFocusTrapPropsReturnType<E, P>;
 
 
 
 const elementsToRestoreFocusTo = new Map<Element | null, (Node & HTMLOrSVGElement)>();
 
 export function useFocusTrap<E extends HTMLElement>({ trapActive }: UseFocusTrapParameters): UseFocusTrapReturnType<E> {
-    const [element, setElement] = useState<E | null>(null);
-    const { useRefElementProps, getElement } = useRefElement<E>({ onElementChange: setElement });
-    //const [lastActiveElement, setLastActiveElement, getLastActiveElement] = useState<Node | null>(null);
-    const { getActiveElement, getLastActiveElement, getWindowFocused, useActiveElementProps } = useActiveElement({});
-
-
-    // When the trap becomes active, before we let the blockingElements hook run,
-    // keep track of whatever's currently focused and save it.
-    useLayoutEffect(() => {
-        if (trapActive && element) {
-            const document = getDocument(element);
-            const window = document.defaultView;
-
-            // Save the currently focused element
-            // to whatever's currently at the top of the stack
-            elementsToRestoreFocusTo.set(getTopElement(), (getLastActiveElement() as (Node & HTMLOrSVGElement)) ?? document.body);
-        }
-    }, [trapActive, element])
-
-    useBlockingElement(trapActive ? element : null);
-
-    /**
-     * Any time we activate or deactivate the trap,
-     * change focus to something else (something in
-     * the trap if it's active, or whatever we've
-     * tracked in elementsToRestoreFocusTo if not)
-     */
-    useLayoutEffect(() => {
+    
+    const handleActiveChange = useCallback((trapActive: boolean, element: E | null) => {
         if (trapActive && element) {
 
             let rafHandle = requestAnimationFrame(() => {
@@ -85,10 +59,40 @@ export function useFocusTrap<E extends HTMLElement>({ trapActive }: UseFocusTrap
                     cancelAnimationFrame(rafHandle);
             };
         }
-    }, [trapActive, element]);
+    }, []);
+    
+    const { getLastActiveElement, useActiveElementProps, getElement } = useActiveElement<E>({ onMountChange: useStableCallback((element: E | null) => handleActiveChange(trapActive, element)) });
 
-    const useFocusTrapProps: UseFocusTrapProps<E> = (<P extends UseFocusTrapPropsParameters<E>>(props: P): UseFocusTrapPropsReturnType<E, P> => {
-        return useMergedProps<E>()({ "aria-modal": trapActive ? "true" : undefined } as {}, useRefElementProps(useActiveElementProps(props)));
+
+    // When the trap becomes active, before we let the blockingElements hook run,
+    // keep track of whatever's currently focused and save it.
+    useLayoutEffect(() => {
+        const element = getElement();
+        if (trapActive && element) {
+            const document = getDocument(element);
+
+            // Save the currently focused element
+            // to whatever's currently at the top of the stack
+            elementsToRestoreFocusTo.set(getTopElement(), (getLastActiveElement() as (Node & HTMLOrSVGElement)) ?? document.body);
+        }
+    }, [trapActive]);
+
+    useBlockingElement(trapActive, getElement);
+
+    /**
+     * Any time we activate or deactivate the trap,
+     * change focus to something else (something in
+     * the trap if it's active, or whatever we've
+     * tracked in elementsToRestoreFocusTo if not)
+     */
+    useLayoutEffect(() => {
+        handleActiveChange(trapActive, getElement());
+    }, [trapActive]);
+
+    const useFocusTrapProps = (<P extends UseFocusTrapPropsParameters<E>>(props: P) => {
+        const p1 = useActiveElementProps(props);
+        const p2 = { "aria-modal": trapActive ? "true" : undefined } as h.JSX.HTMLAttributes<E>;
+        return useMergedProps<E>()(p1, p2);
     });
 
 

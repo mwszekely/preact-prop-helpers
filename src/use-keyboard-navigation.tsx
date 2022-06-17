@@ -6,7 +6,6 @@ import { useLogicalDirection } from "./use-logical-direction";
 import { MergedProps, useMergedProps } from "./use-merged-props";
 import { UseRefElementPropsReturnType } from "./use-ref-element";
 import { useStableCallback } from "./use-stable-callback";
-import { useStableGetter } from "./use-stable-getter";
 import { useState } from "./use-state";
 import { useTimeout } from "./use-timeout";
 
@@ -103,14 +102,6 @@ export function useLinearNavigation<ChildElement extends Element>({ index, navig
         }
     }, [index, childCount, navigateToFirst, navigateToLast]);
 
-    // These allow us to manipulate what our current tabbable child is.
-    /*const navigateToIndex = useCallback((index: number) => { setIndex(index < 0 ? (managedChildren.length + index) : index); }, []);
-    const navigateToNext = useCallback(() => { setIndex((i: number | null) => i === null? null! : i >= managedChildren.length - 1? managedChildren.length - 1 : ++i); }, []);
-    const navigateToPrev = useCallback(() => { setIndex((i: number | null) => i === null? null! : i < 0? 0 : --i); }, []);
-    const navigateToStart = useCallback(() => { navigateToIndex(0); }, [navigateToIndex]);
-    const navigateToEnd = useCallback(() => { navigateToIndex(-1); }, [navigateToIndex]);*/
-
-    const getIndex = useStableGetter(index);
     const { getLogicalDirectionInfo, useLogicalDirectionProps } = useLogicalDirection<ChildElement>({});
 
     const onKeyDown = (e: KeyboardEvent) => {
@@ -120,8 +111,8 @@ export function useLinearNavigation<ChildElement extends Element>({ index, navig
 
         const info = getLogicalDirectionInfo();
 
-        let allowsBlockNavigation = (navigationDirection == "block" || navigationDirection == "either");
-        let allowsInlineNavigation = (navigationDirection == "inline" || navigationDirection == "either");
+        const allowsBlockNavigation = (navigationDirection == "block" || navigationDirection == "either");
+        const allowsInlineNavigation = (navigationDirection == "inline" || navigationDirection == "either");
 
         switch (e.key) {
             case "ArrowUp": {
@@ -231,9 +222,7 @@ export interface UseTypeaheadNavigationReturnType<ChildElement extends Element, 
 }
 
 export type UseTypeaheadNavigationProps<E extends Element> = <P extends h.JSX.HTMLAttributes<E>>(props: P) => MergedProps<E, P, P>
-export interface UseTypeaheadNavigationChildReturnType<E extends Element> {
-    //useTypeaheadNavigationChildProps: UseTypeaheadNavigationChildProps<E>;
-}
+export type UseTypeaheadNavigationChildReturnType<_E extends Element> = void;
 
 
 export interface UseTypeaheadNavigationParameters {
@@ -290,7 +279,7 @@ export function useTypeaheadNavigation<ChildElement extends Element, I extends U
     // Handle typeahead for input method editors as well
     // Essentially, when active, ignore further keys 
     // because we're waiting for a CompositionEnd event
-    const [imeActive, setImeActive, getImeActive] = useState(false);
+    const [, setImeActive, getImeActive] = useState(false);
 
     // Because composition events fire *after* keydown events 
     // (but within the same task, which, TODO, could be browser-dependent),
@@ -320,17 +309,15 @@ export function useTypeaheadNavigation<ChildElement extends Element, I extends U
     });
 
     const insertingComparator = useStableCallback((lhs: I["text"], rhs: { text: I["text"]; unsortedIndex: number; }) => {
-        let compare: number;
 
         if (typeof lhs === "string" && typeof rhs.text === "string") {
             return comparatorShared(lhs, rhs.text);
         }
 
-        return (lhs as any) - (rhs as any);
+        return (lhs as unknown as number) - (rhs as unknown as number);
     });
 
     const typeaheadComparator = useStableCallback((lhs: I["text"], rhs: { text: I["text"]; unsortedIndex: number; }) => {
-        let compare: number;
 
         if (typeof lhs === "string" && typeof rhs.text === "string") {
             // During typeahead, all strings longer than ours should be truncated
@@ -338,13 +325,13 @@ export function useTypeaheadNavigation<ChildElement extends Element, I extends U
             return comparatorShared(lhs, rhs.text.substring(0, lhs.length));
         }
 
-        return (lhs as any) - (rhs as any);
+        return (lhs as unknown as number) - (rhs as unknown as number);
     });
 
 
     const useTypeaheadNavigationProps: UseTypeaheadNavigationProps<ChildElement> = useCallback(function <P extends h.JSX.HTMLAttributes<ChildElement>>({ ...props }: P): UseTypeaheadNavigationPropsReturnType<ChildElement, P> {
 
-        const onCompositionStart = (e: CompositionEvent) => { setImeActive(true) };
+        const onCompositionStart = (_e: CompositionEvent) => { setImeActive(true) };
         const onCompositionEnd = (e: CompositionEvent) => {
             setNextTypeaheadChar(e.data);
             setImeActive(false);
@@ -354,7 +341,7 @@ export function useTypeaheadNavigation<ChildElement extends Element, I extends U
 
             const imeActive = getImeActive();
 
-            let key = e.key;
+            const key = e.key;
 
             // Not handled by typeahead (i.e. assume this is a keyboard shortcut)
             if (e.ctrlKey || e.metaKey)
@@ -405,7 +392,7 @@ export function useTypeaheadNavigation<ChildElement extends Element, I extends U
 
 
 
-            let sortedTypeaheadIndex = binarySearch(sortedTypeaheadInfo.current, currentTypeahead, typeaheadComparator);
+            const sortedTypeaheadIndex = binarySearch(sortedTypeaheadInfo.current, currentTypeahead, typeaheadComparator);
 
             if (sortedTypeaheadIndex < 0) {
                 // The user has typed an entry that doesn't exist in the list
@@ -489,7 +476,7 @@ export function useTypeaheadNavigation<ChildElement extends Element, I extends U
                 // Find where to insert this item.
                 // Because all index values should be unique, the returned sortedIndex
                 // should always refer to a new location (i.e. be negative)                
-                let sortedIndex = binarySearch(sortedTypeaheadInfo.current, text, insertingComparator);
+                const sortedIndex = binarySearch(sortedTypeaheadInfo.current, text, insertingComparator);
                 console.assert(sortedIndex < 0 || sortedTypeaheadInfo.current[sortedIndex].text == text);
                 if (sortedIndex < 0) {
                     sortedTypeaheadInfo.current.splice(-sortedIndex - 1, 0, { text, unsortedIndex: i.index });
@@ -501,8 +488,8 @@ export function useTypeaheadNavigation<ChildElement extends Element, I extends U
                 return () => {
                     // When unmounting, find where we were and remove ourselves.
                     // Again, we should always find ourselves because there should be no duplicate values if each index is unique.
-                    let sortedIndex = binarySearch(sortedTypeaheadInfo.current, text, insertingComparator);
-                    console.assert(sortedIndex >= 0);
+                    const sortedIndex = binarySearch(sortedTypeaheadInfo.current, text, insertingComparator);
+                    console.assert(sortedIndex < 0 || sortedTypeaheadInfo.current[sortedIndex].text == text);
 
                     if (sortedIndex >= 0) {
                         sortedTypeaheadInfo.current.splice(sortedIndex, 1);
@@ -536,11 +523,11 @@ export function useTypeaheadNavigation<ChildElement extends Element, I extends U
  * The absolute value of this number, minus one, is where `wanted` *would* be found if it *was* in `array`
  */
 export function binarySearch<T, U, F extends (lhs: U, rhs: T) => number>(array: T[], wanted: U, comparator: F): number {
-    var firstIndex = 0;
-    var lastIndex = array.length - 1;
+    let firstIndex = 0;
+    let lastIndex = array.length - 1;
     while (firstIndex <= lastIndex) {
-        var testIndex = (lastIndex + firstIndex) >> 1;
-        var comparisonResult = comparator(wanted, array[testIndex]);
+        const testIndex = (lastIndex + firstIndex) >> 1;
+        const comparisonResult = comparator(wanted, array[testIndex]);
 
         if (comparisonResult > 0) {
             firstIndex = testIndex + 1;

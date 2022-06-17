@@ -1,14 +1,13 @@
 import { h } from "preact";
 import { useCallback } from "preact/hooks";
-import { tryNavigateToIndex } from "./use-list-navigation";
 import { useChildFlag, useChildManager } from "./use-child-manager";
 import { useEffect } from "./use-effect";
 import { useForceUpdate } from "./use-force-update";
-import { UseHasFocusPropsReturnType } from "./use-has-focus";
 import { useLinearNavigation, useTypeaheadNavigation } from "./use-keyboard-navigation";
-import { MergedProps, useMergedProps } from "./use-merged-props";
+import { tryNavigateToIndex } from "./use-list-navigation";
+import { useMergedProps } from "./use-merged-props";
 import { UseRefElementPropsReturnType } from "./use-ref-element";
-import { UseRovingTabIndexChildInfo, useRovingTabIndex, UseRovingTabIndexChildParameters } from "./use-roving-tabindex";
+import { useRovingTabIndex, UseRovingTabIndexChildInfo, UseRovingTabIndexChildParameters } from "./use-roving-tabindex";
 import { useStableCallback } from "./use-stable-callback";
 import { useStableGetter } from "./use-stable-getter";
 import { useState } from "./use-state";
@@ -32,7 +31,7 @@ export type UseGridNavigationRowParameters<I extends UseRovingTabIndexChildInfo>
 export interface UseGridNavigationCellInfo extends UseRovingTabIndexChildInfo { hidden?: boolean; }
 export type UseGridNavigationCellParameters<IC extends UseGridNavigationCellInfo> = UseRovingTabIndexChildParameters<IC>;
 
-export interface UseGridNavigationRowReturnType<R extends Element, C extends Element, IR extends UseGridNavigationRowInfo, IC extends UseGridNavigationCellInfo> {
+export interface UseGridNavigationRowReturnType<R extends Element, C extends Element, _IR extends UseGridNavigationRowInfo, IC extends UseGridNavigationCellInfo> {
     useGridNavigationRowProps: <P extends h.JSX.HTMLAttributes<R>>(props: P) => UseRefElementPropsReturnType<R, UseRefElementPropsReturnType<R, h.JSX.HTMLAttributes<R>>>;
     useGridNavigationCell: UseGridNavigationCell<C, IC>;
     cellCount: number;
@@ -81,7 +80,7 @@ export function useGridNavigation<R extends Element, C extends Element, IR exten
     const navigateToNextRow = useCallback(() => { setCurrentRow2(c => { return tryNavigateToIndex(managedRows, c ?? 0, indexMangler!(Math.min((managedRows.length - 1), indexDemangler!(c ?? 0) + 1)), 1, indexMangler!, indexDemangler!); }); }, [indexMangler, indexDemangler]);
 
     // Track child rows and manage keyboard navigation among them.
-    const { childCount, managedChildren: managedRows, indicesByElement: rowIndicesByElement, getMountIndex: getRowMountIndex, mountedChildren: mountedRows, totalChildrenMounted: totalRowsMounted, totalChildrenUnounted: totalRowsUnmounted, useManagedChild: useManagedRow } = useChildManager<IR>();
+    const { childCount, managedChildren: managedRows, useManagedChild: useManagedRow } = useChildManager<IR>();
     const { useLinearNavigationProps: useLinearNavigationRowProps } = useLinearNavigation<any>({
         managedChildren: managedRows,
         index: indexMangler(getCurrentRow() ?? 0),
@@ -105,7 +104,7 @@ export function useGridNavigation<R extends Element, C extends Element, IR exten
     /**
      * Optional, but provides typeahead for each column in the table.
      */
-    const useGridNavigationColumn = useCallback(({ }: {}) => {
+    const useGridNavigationColumn = useCallback(() => {
         const { currentTypeahead, invalidTypeahead, useTypeaheadNavigationChild } = useTypeaheadNavigation({ getIndex: getCurrentRow, setIndex: setCurrentRow2 });
 
         const useGridNavigationColumnChild = useCallback(({ index: rowIndex, text, hidden }: { index: number, text: string, hidden?: boolean }) => {
@@ -144,7 +143,7 @@ export function useGridNavigation<R extends Element, C extends Element, IR exten
 
         // If we're not the tabbable row, then for the purposes of tabIndex
         // calculations, we don't have a tabbable child cell.
-        let currentColumn = isTabbableRow ? getCurrentColumn() : null;
+        const currentColumn = isTabbableRow ? getCurrentColumn() : null;
 
         // Track child cells and manage keyboard navigation among them.
         const { managedChildren: managedCells, useRovingTabIndexChild: useRovingTabIndexCell, childCount: cellCount } = useRovingTabIndex<IC>({
@@ -237,7 +236,7 @@ export function useGridNavigation<R extends Element, C extends Element, IR exten
         const getRowIndex = useStableGetter(rowIndex);
         const useGridNavigationCell: UseGridNavigationCell<C, IC> = useCallback((info: UseGridNavigationCellParameters<IC>) => {
             const getTabbable: (() => boolean | null) = useStableCallback(() => tabbable);
-            const { tabbable, useRovingTabIndexSiblingProps, useRovingTabIndexChildProps } = useRovingTabIndexCell<C>({ ...info, getTabbable } as IC);
+            const { tabbable, useRovingTabIndexChildProps } = useRovingTabIndexCell<C>({ ...info, getTabbable } as IC);
             //const { useLinearNavigationChildProps: useLinearNavigationChildCellProps } = useLinearNavigationChildCell(info as IC);
 
             // Any time we interact with this cell, set it to be

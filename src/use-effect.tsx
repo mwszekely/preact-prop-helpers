@@ -14,7 +14,7 @@ export function useEffect<I extends Inputs>(effect: (prev: I | undefined, change
 
     const prevInputs = useRef<undefined | I>(undefined);
     const effect2 = () => {
-        let changes: { from: any, to: any }[] = [];
+        const changes: { from: any, to: any }[] = [];
         if (inputs && prevInputs.current) {
             for (let i = 0; i < Math.max(prevInputs.current.length, inputs.length); ++i) {
                 if (prevInputs.current[i] != inputs[i])
@@ -29,4 +29,4 @@ export function useEffect<I extends Inputs>(effect: (prev: I | undefined, change
     impl(effect2, inputs);
 }
 
-export interface EffectChange<I extends Inputs, N extends number> { from: I[N], to: I[N] };
+export interface EffectChange<I extends Inputs, N extends number> { from: I[N], to: I[N] }

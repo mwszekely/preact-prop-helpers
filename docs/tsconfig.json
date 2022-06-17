@@ -6,7 +6,6 @@
     "jsx": "react-jsx",                       /* Specify JSX code generation: 'preserve', 'react-native', or 'react'. */
     "jsxImportSource": "preact",
     "exactOptionalPropertyTypes": false,      /* TODO: Need better DOM types (e.g. need <div className={undefined} />) */
-    "sourceMap": true,                        /* Generates corresponding '.map' file. */
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
 
     "baseUrl": "./src",

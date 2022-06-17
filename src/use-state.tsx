@@ -18,9 +18,9 @@ export function useState<T>(initialState: T | (() => T)): readonly [value: T, se
     // to also set our ref to the new value
     const setState = useCallback<StateUpdater<T>>(value => {
         if (typeof value === "function") {
-            let callback = value as (prevValue: T) => T;
+            const callback = value as ((_prevValue: T) => T);
             setStateP(prevValue => {
-                let nextValue = callback(prevValue);
+                const nextValue = callback(prevValue);
                 ref.current = nextValue;
                 return nextValue;
             });

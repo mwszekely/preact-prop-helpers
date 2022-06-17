@@ -10,7 +10,7 @@ export function useMediaQuery(query: string | null | undefined) {
         if (!query)
             return;
 
-        let q = matchMedia(query);
+        const q = matchMedia(query);
 
         const handler = (e: MediaQueryListEvent) => {
             setMatches(e.matches);

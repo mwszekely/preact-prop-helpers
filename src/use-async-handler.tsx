@@ -131,13 +131,13 @@ export function useAsyncHandler<ElementType extends EventTarget>() {
         const [currentCapture, setCurrentCapture, getCurrentCapture] = useState<CaptureType | undefined>(undefined);
         const [hasCapture, setHasCapture] = useState(false);
 
-        let ret: UseAsyncHandlerReturnType<ElementType, EventType, CaptureType> = {
+        const ret: UseAsyncHandlerReturnType<ElementType, EventType, CaptureType> = {
             useSyncHandler: useSyncHandlerWithCapture,
             getCurrentCapture,
             callCount,
             currentCapture,
             hasCapture,
-            pending: (promise != null),
+            pending,
             hasError,
             error,
             promise,
@@ -148,7 +148,7 @@ export function useAsyncHandler<ElementType extends EventTarget>() {
 
             resolveCount,
             rejectCount,
-            settleCount: rejectCount + resolveCount
+            settleCount
         };
 
         return ret;
@@ -161,7 +161,7 @@ export function useAsyncHandler<ElementType extends EventTarget>() {
                 // Get the most significant information from the event at this time,
                 // which is necessary since the promise could actually be called much later
                 // when the element's value (etc.) has changed.
-                let captured = capture(e);
+                const captured = capture(e);
 
                 if (syncHandlerWrapper == null)
                     return;

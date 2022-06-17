@@ -1,10 +1,11 @@
-import { h, Ref } from "preact";
-import { MergedChildren, useMergedChildren } from "./use-merged-children";
-import { MergedClasses, useMergedClasses } from "./use-merged-classes";
+import { h } from "preact";
+import { useMergedChildren } from "./use-merged-children";
+import { useMergedClasses } from "./use-merged-classes";
 import { useMergedRefs } from "./use-merged-refs";
 import { useMergedStyles } from "./use-merged-styles";
 
-let log: typeof console["log"] | undefined = (str) => { debugger; console.warn(`Trying to merge two props with the same name: ${str}`)   /* Intentional */ };
+let log = console.warn;
+
 export function enableLoggingPropConflicts(log2: typeof console["log"]) {
     log = log2
 }
@@ -23,20 +24,22 @@ export type MergedProps<E extends EventTarget, T extends h.JSX.HTMLAttributes<E>
  * @returns 
  */
 export function useMergedProps<E extends EventTarget>() {
-    return function <T extends h.JSX.HTMLAttributes<E>, U extends h.JSX.HTMLAttributes<E>>(lhs2: T, rhs2: U): MergedProps<E, T, U> {
+    return function <T extends h.JSX.HTMLAttributes<E>, U extends h.JSX.HTMLAttributes<E>>(lhsAll: T, rhsAll: U): MergedProps<E, T, U> {
 
 
-        // First, put in all the properties that are easy to reason about
-        // and all lhs props. We're going to merge in rhs just after.
-        const { children: lhsChildren, class: lhsClass, className: lhsClassName, style: lhsStyle, ref: lhsRef, ...lhs } = lhs2;
-        const { children: rhsChildren, class: rhsClass, className: rhsClassName, style: rhsStyle, ref: rhsRef, ...rhs } = rhs2;
+        // First, separate the props we were given into two groups:
+        // lhsAll and rhsAll contain all the props we were given, and
+        // lhsMisc and rhsMisc contain all props *except* for the easy ones
+        // like className and style that we already know how to merge.
+        const { children: _lhsChildren, class: _lhsClass, className: _lhsClassName, style: _lhsStyle, ref: _lhsRef, ...lhsMisc } = lhsAll;
+        const { children: _rhsChildren, class: _rhsClass, className: _rhsClassName, style: _rhsStyle, ref: _rhsRef, ...rhsMisc } = rhsAll;
 
-        let ret: MergedProps<E, T, U> = {
-            ...lhs,
-            ref: useMergedRefs<E>()(lhs2, rhs2),
-            style: useMergedStyles(lhs2, rhs2),
-            className: useMergedClasses(lhs2, rhs2) as MergedClasses<T, U>,
-            children: useMergedChildren(lhs2, rhs2) as MergedChildren<T, U>
+        const ret: MergedProps<E, T, U> = {
+            ...lhsMisc,
+            ref: useMergedRefs<E>()(lhsAll, rhsAll),
+            style: useMergedStyles(lhsAll, rhsAll),
+            className: useMergedClasses(lhsAll, rhsAll),
+            children: useMergedChildren(lhsAll, rhsAll),
         } as any;
 
         if (ret.ref === undefined) delete ret.ref;
@@ -47,11 +50,11 @@ export function useMergedProps<E extends EventTarget>() {
         // Now, do *everything* else
         // Merge every remaining existing entry in lhs with what we've already put in ret.
         //const lhsEntries = Object.entries(lhs) as [keyof T, T[keyof T]][];
-        const rhsEntries = Object.entries(rhs) as [keyof U, U[keyof U]][];
+        const rhsEntries = Object.entries(rhsMisc) as [keyof U, U[keyof U]][];
 
         for (const [rhsKey, rhsValue] of rhsEntries) {
 
-            const lhsValue = lhs[rhsKey as keyof typeof lhs];
+            const lhsValue = lhsMisc[rhsKey as keyof typeof lhsMisc];
 
             if (typeof lhsValue === "function" || typeof rhsValue === "function") {
 
@@ -80,7 +83,7 @@ export function useMergedProps<E extends EventTarget>() {
                 else {
                     // Ugh.
                     // No good strategies here, just log it if requested
-                    log?.(`Could not merge incompatible prop "${rhsKey as string}" (type: ${typeof rhsValue}, values: [${lhsValue}, ${rhsValue}])`);
+                    log?.(`The prop "${typeof rhsKey == "symbol" ? "<symbol>" : rhsKey as string}" cannot simultaneously be the values ${lhsValue} and ${rhsValue}. One must be chosen outside of useMergedProps.`);
                     ret[rhsKey as keyof MergedProps<E, T, U>] = rhsValue as never
                 }
             }
@@ -98,8 +101,8 @@ function mergeFunctions<T extends (...args: any[]) => any, U extends (...args: a
         return lhs;
 
     return (...args: Parameters<T>) => {
-        let lv = lhs(...args);
-        let rv = rhs(...args);
+        const lv = lhs(...args);
+        const rv = rhs(...args);
 
         if (lv instanceof Promise || rv instanceof Promise)
             return Promise.all([lv, rv]);

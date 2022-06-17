@@ -37,7 +37,7 @@ export function useTimeout({ timeout, callback, triggerIndex }: UseTimeout) {
     // when the duration or callback changes, only triggerIndex.
     useEffect(() => {
         if (!timeoutIsNull) {
-            let timeout = getTimeout();
+            const timeout = getTimeout();
             console.assert(timeoutIsNull == (timeout == null));
     
             if (timeout != null) {

@@ -1,8 +1,8 @@
-import { useCallback, useLayoutEffect, useRef, useState } from "preact/hooks";
-import { useRefElement } from "./use-ref-element";
-import { ElementSize, useElementSize } from "./use-element-size";
-import { useEnsureStability, usePassiveState } from "./use-passive-state";
 import { h } from "preact";
+import { useCallback } from "preact/hooks";
+import { ElementSize, useElementSize } from "./use-element-size";
+import { returnNull, useEnsureStability, usePassiveState } from "./use-passive-state";
+import { useRefElement } from "./use-ref-element";
 
 //export type BlockFlowDirection = "downwards" | "leftwards" | "rightwards";
 export type PhysicalDirection = "ltr" | "rtl" | "ttb" | "btt";
@@ -58,17 +58,17 @@ export interface LogicalElementSize {
  */
 export function useLogicalDirection<T extends Element>({ onLogicalDirectionChange }: UseLogicalDirectionParameters): UseLogicalDirectionReturnType<T> {
 
-    useEnsureStability(onLogicalDirectionChange);
+    useEnsureStability("useLogicalDirection", onLogicalDirectionChange);
 
-    const [getComputedStyles, setComputedStyles] = usePassiveState<CSSStyleDeclaration | null>(null);
+    const [getComputedStyles, setComputedStyles] = usePassiveState<CSSStyleDeclaration | null>(null, returnNull);
 
 
-    const { getElement, useRefElementProps } = useRefElement<T | null>({
+    const { getElement, useRefElementProps } = useRefElement<T>({
         onElementChange: useCallback((element: T | null) => {
             if (element) {
                 setComputedStyles(window.getComputedStyle(element));
             }
-        },[])
+        }, [])
     });
 
     // TODO: There's no way to refresh which writing mode we have once mounted.
@@ -86,9 +86,9 @@ export function useLogicalDirection<T extends Element>({ onLogicalDirectionChang
     const getLogicalDirectionInfo = useCallback(() => {
         const computedStyles = getComputedStyles();
         if (computedStyles) {
-            let w = computedStyles.writingMode as WritingMode;
+            const w = computedStyles.writingMode as WritingMode;
             let d = computedStyles.direction as Direction;
-            let t = computedStyles.textOrientation as TextOrientation;
+            const t = computedStyles.textOrientation as TextOrientation;
 
             if (t == "upright")
                 d = "ltr";
@@ -153,6 +153,7 @@ export function useLogicalDirection<T extends Element>({ onLogicalDirectionChang
             }
         }
 
+        /* eslint-disable no-debugger */
         debugger;
         console.assert(false);
         return "inline-start";
@@ -180,21 +181,17 @@ export function useLogicalDirection<T extends Element>({ onLogicalDirectionChang
             const { inlineSize, blockSize, inlineDirection, blockDirection } = direction;
 
             // Size is relatively simple
-            let clientInlineSize = elementSize[`client${capitalize(inlineSize)}`];
-            let clientBlockSize = elementSize[`client${capitalize(blockSize)}`];
+            const clientInlineSize = elementSize[`client${capitalize(inlineSize)}`];
+            const clientBlockSize = elementSize[`client${capitalize(blockSize)}`];
 
-            let offsetInlineSize = elementSize[`offset${capitalize(inlineSize)}`];
-            let offsetBlockSize = elementSize[`offset${capitalize(blockSize)}`];
+            const offsetInlineSize = elementSize[`offset${capitalize(inlineSize)}`];
+            const offsetBlockSize = elementSize[`offset${capitalize(blockSize)}`];
 
-            let scrollInlineSize = elementSize[`scroll${capitalize(inlineSize)}`];
-            let scrollBlockSize = elementSize[`scroll${capitalize(blockSize)}`];
+            const scrollInlineSize = elementSize[`scroll${capitalize(inlineSize)}`];
+            const scrollBlockSize = elementSize[`scroll${capitalize(blockSize)}`];
 
 
 
-            // Position requires us to sometimes use one property (like `left`)
-            // or sometimes two (like `left` + `width`)
-            function getPhysicalLeftTop(dir: PhysicalDirection) { if (dir === "ltr" || dir == "rtl") return "left"; return "top"; }
-            function getPhysicalRightBottom(dir: PhysicalDirection) { if (dir === "rtl") return "width"; if (dir === "btt") return "height"; return null; }
 
             const f1 = getPhysicalLeftTop(inlineDirection);
             const f2 = getPhysicalRightBottom(inlineDirection);
@@ -203,14 +200,14 @@ export function useLogicalDirection<T extends Element>({ onLogicalDirectionChang
             const f4 = getPhysicalRightBottom(blockDirection);
 
 
-            let clientInlineInset = elementSize[`client${capitalize(f1)}`] + (!f2 ? 0 : elementSize[`client${capitalize(f2)}`]);
-            let scrollInlineInset = elementSize[`scroll${capitalize(f1)}`] + (!f2 ? 0 : elementSize[`scroll${capitalize(f2)}`]);
-            let offsetInlineInset = elementSize[`offset${capitalize(f1)}`] == undefined ? undefined : (elementSize[`offset${capitalize(f1)}`]! + (!f2 ? 0 : elementSize[`offset${capitalize(f2)}`]!));
+           const clientInlineInset = elementSize[`client${capitalize(f1)}`] + (!f2 ? 0 : elementSize[`client${capitalize(f2)}`]);
+           const scrollInlineInset = elementSize[`scroll${capitalize(f1)}`] + (!f2 ? 0 : elementSize[`scroll${capitalize(f2)}`]);
+           const offsetInlineInset = elementSize[`offset${capitalize(f1)}`] == undefined ? undefined : (elementSize[`offset${capitalize(f1)}`]! + (!f2 ? 0 : elementSize[`offset${capitalize(f2)}`]!));
 
 
-            let clientBlockInset = elementSize[`client${capitalize(f3)}`] + (!f4 ? 0 : elementSize[`client${capitalize(f4)}`]);
-            let scrollBlockInset = elementSize[`scroll${capitalize(f3)}`] + (!f4 ? 0 : elementSize[`scroll${capitalize(f4)}`]);
-            let offsetBlockInset = elementSize[`offset${capitalize(f3)}`] == undefined ? undefined : (elementSize[`offset${capitalize(f3)}`]! + (!f4 ? 0 : elementSize[`offset${capitalize(f4)}`]!));
+            const clientBlockInset = elementSize[`client${capitalize(f3)}`] + (!f4 ? 0 : elementSize[`client${capitalize(f4)}`]);
+            const scrollBlockInset = elementSize[`scroll${capitalize(f3)}`] + (!f4 ? 0 : elementSize[`scroll${capitalize(f4)}`]);
+            const offsetBlockInset = elementSize[`offset${capitalize(f3)}`] == undefined ? undefined : (elementSize[`offset${capitalize(f3)}`]! + (!f4 ? 0 : elementSize[`offset${capitalize(f4)}`]!));
 
 
             return {
@@ -245,6 +242,11 @@ export function useLogicalDirection<T extends Element>({ onLogicalDirectionChang
     };
 }
 
+// Position requires us to sometimes use one property (like `left`)
+// or sometimes two (like `left` + `width`)
+function getPhysicalLeftTop(dir: PhysicalDirection) { if (dir === "ltr" || dir == "rtl") return "left"; return "top"; }
+function getPhysicalRightBottom(dir: PhysicalDirection) { if (dir === "rtl") return "width"; if (dir === "btt") return "height"; return null; }
+
 // Helper for extracting info from "ltr", "ttb", etc.
 const M = {
     t: "top",
@@ -255,29 +257,29 @@ const M = {
 
 
 export interface UseLogicalDirectionReturnType<T extends EventTarget> {
-    useLogicalDirectionProps: (props: h.JSX.HTMLAttributes<T>) => h.JSX.HTMLAttributes<T>; 
-    getElement: () => T | null; 
-    getLogicalDirectionInfo: () => LogicalDirectionInfo | null; 
+    useLogicalDirectionProps: (props: h.JSX.HTMLAttributes<T>) => h.JSX.HTMLAttributes<T>;
+    getElement: () => T | null;
+    getLogicalDirectionInfo: () => LogicalDirectionInfo | null;
 
     /**
      * Given the ElementSize info from useElementSize, converts all those physical properties to their logical counterparts.
      */
-    convertToLogicalSize: (elementSize: ElementSize, direction?: LogicalDirectionInfo | null | undefined) => LogicalElementSize | null; 
+    convertToLogicalSize: (elementSize: ElementSize, direction?: LogicalDirectionInfo | null | undefined) => LogicalElementSize | null;
 
     /**
      * Turns `"horizontal" | "vertical"` into `"inline" | "block"`
      */
-    convertToLogicalOrientation: (elementOrientation: PhysicalOrientation, direction?: LogicalDirectionInfo | null | undefined) => "inline" | "block"; 
+    convertToLogicalOrientation: (elementOrientation: PhysicalOrientation, direction?: LogicalDirectionInfo | null | undefined) => "inline" | "block";
 
     /**
      * Turns `"inline" | "block"` into `"horizontal" | "vertical"`
      */
-    convertToPhysicalOrientation: (elementOrientation: LogicalOrientation, direction?: LogicalDirectionInfo | null | undefined) => "horizontal" | "vertical"; 
+    convertToPhysicalOrientation: (elementOrientation: LogicalOrientation, direction?: LogicalDirectionInfo | null | undefined) => "horizontal" | "vertical";
 
     /**
      * Turns `"top" | "bottom" | "left" | "right"` into `"block-start" | "block-end" | "inline-start" | "inline-end"`
      */
-    convertToLogicalSide: (side: "top" | "bottom" | "left" | "right", direction?: LogicalDirectionInfo | null | undefined) => "inline-start" | "inline-end" | "block-start" | "block-end"; 
+    convertToLogicalSide: (side: "top" | "bottom" | "left" | "right", direction?: LogicalDirectionInfo | null | undefined) => "inline-start" | "inline-end" | "block-start" | "block-end";
 
     /**
      * Turns `"block-start" | "block-end" | "inline-start" | "inline-end"` into `"top" | "bottom" | "left" | "right"`
@@ -362,7 +364,7 @@ export interface LogicalDirectionInfo {
      * * `btt` for `sideways-lr`
      */
     leftRightDirection: PhysicalDirection;
-};
+}
 
 const HorizontalTbLtr: LogicalDirectionInfo = {
     inlineDirection: "ltr",
@@ -463,5 +465,3 @@ const WritingModes = {
     "sideways-lr": SidewaysLr,
     "sideways-rl": SidewaysRl
 } as const;
-
-

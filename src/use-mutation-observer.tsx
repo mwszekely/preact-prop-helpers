@@ -1,5 +1,5 @@
 import { useCallback, useEffect } from "preact/hooks";
-import { useEnsureStability, usePassiveState } from "./use-passive-state";
+import { returnNull, usePassiveState } from "./use-passive-state";
 import { useRefElement } from "./use-ref-element";
 import { useStableCallback } from "./use-stable-callback";
 
@@ -13,14 +13,13 @@ export interface UseMutationObserverParameters {
     attributeFilter?: string | string[];
 }
 
-function returnNull() { return null; }
-
 export function useMutationObserver<E extends Element>(options: UseMutationObserverParameters | null) {
-    let { attributeFilter, subtree, onChildList, characterDataOldValue, onCharacterData, onAttributes, attributeOldValue } = (options || ({} as Partial<UseMutationObserverParameters>));
+    /* eslint-disable prefer-const */
+    let { attributeFilter, subtree, onChildList, characterDataOldValue, onCharacterData, onAttributes, attributeOldValue } = (options || ({} as Partial<UseMutationObserverParameters>)); 
 
     if (typeof attributeFilter === "string")
         attributeFilter = [attributeFilter];
-    let attributeKey = attributeFilter?.join(";");
+    const attributeKey = attributeFilter?.join(";");
 
     const attributes = !!onAttributes;
     const characterData = !!onCharacterData;
@@ -30,7 +29,7 @@ export function useMutationObserver<E extends Element>(options: UseMutationObser
     const stableOnCharacterData = useStableCallback(onCharacterData ?? (() => { }));
     const stableOnAttributes = useStableCallback(onAttributes ?? (() => { }));
 
-    const [getMo, setMo] = usePassiveState<MutationObserver | null>(useStableCallback(observer => {
+    const [_getMo, setMo] = usePassiveState<MutationObserver | null>(useStableCallback(observer => {
         const element = getElement();
         if (element && observer && (!!attributeKey || !!characterData || !!childList)) {
             observer.observe(element, {
@@ -51,7 +50,7 @@ export function useMutationObserver<E extends Element>(options: UseMutationObser
         if (element) {
             queueMicrotask(() => {
                 setMo(new MutationObserver((a) => {
-                    for (let mutation of a) {
+                    for (const mutation of a) {
                         switch (mutation.type) {
                             case "childList":
                                 stableOnChildList(mutation);

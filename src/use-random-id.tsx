@@ -59,7 +59,7 @@ export interface UseRandomIdReturnType {
  */
 export function useRandomId({ prefix }: UseRandomIdParameters = {}): UseRandomIdReturnType {
     const [randomId, setRandomId] = useState<string>(() => generateRandomId(prefix));
-    const [watchPrefixUpdates, setWatchPrefixUpdates, getWatchPrefixUpdates] = useState(false);
+    const [_watchPrefixUpdates, setWatchPrefixUpdates, getWatchPrefixUpdates] = useState(false);
     useLayoutEffect(() => {
         const watchPrefixUpdates = getWatchPrefixUpdates();
         if (watchPrefixUpdates)
@@ -100,61 +100,4 @@ export function useRandomId({ prefix }: UseRandomIdParameters = {}): UseRandomId
         useRandomIdProps,
         useReferencedIdProps
     };
-}
-
-function acceptsStringOrCssOrUndefined(u: string | h.JSX.CSSProperties | undefined) { }
-function acceptsStringOrCss(str: string | h.JSX.CSSProperties) { }
-function acceptsCss(prop: h.JSX.CSSProperties) { }
-
-function test<P extends h.JSX.HTMLAttributes<any>>(props: P) {
-    const { id, randomId, useRandomIdProps, useReferencedIdProps } = useRandomId();
-
-    //const p1a: MergedProps<{ id: string }, {  }> = useRandomIdProps({ id: undefined })
-    const p1b = useRandomIdProps({ ...props, id: undefined })
-    const p2a = useReferencedIdProps("for")({ id: undefined });
-    const p2b = useReferencedIdProps("for")({ ...props, id: undefined });
-    const p2c = useReferencedIdProps("for")(props);
-    const p3a = useRandomIdProps(useReferencedIdProps("for")({ id: undefined }));
-    const p3b = useRandomIdProps(useReferencedIdProps("for")({ ...props, id: undefined }));
-    const p4a = useReferencedIdProps("for")(useRandomIdProps({ id: undefined }));
-    const p4b = useReferencedIdProps("for")(p1b);
-
-
-    //p1a.id;
-    p1b.id;
-    p2a["for"];
-    p2b["for"];
-    p2c["for"];
-
-    p3a.id?.concat("")
-    p3b.id?.concat("")
-    p3a["for"]?.concat("");
-    p3b["for"]?.concat("");
-    p4a["for"]?.concat("");
-    p4b["for"]?.concat("");
-    p4a.id?.concat("");
-    /// @ts-expect-error TODO: It's because it resolves to "id: undefined & string" -- this shouldn't happen
-    p4b.id?.concat("");
-
-
-    acceptsStringOrCssOrUndefined(p1b.style);
-    /// @ts-expect-error
-    acceptsStringOrCss(p1b.style);
-
-    /// @ts-expect-error
-    p2a.style?.backgroundColor;
-
-    acceptsStringOrCssOrUndefined(p2b.style);
-    /// @ts-expect-error
-    acceptsStringOrCss(p2b.style);
-
-    /// @ts-expect-error
-    p3a.style?.backgroundColor;
-
-    acceptsStringOrCssOrUndefined(p3b.style);
-    /// @ts-expect-error
-    p4a.style.backgroundColor;
-
-    acceptsStringOrCssOrUndefined(p4b.style);
-
 }
