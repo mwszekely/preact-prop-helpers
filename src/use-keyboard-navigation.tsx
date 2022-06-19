@@ -477,7 +477,7 @@ export function useTypeaheadNavigation<ChildElement extends Element, I extends U
                 // Because all index values should be unique, the returned sortedIndex
                 // should always refer to a new location (i.e. be negative)                
                 const sortedIndex = binarySearch(sortedTypeaheadInfo.current, text, insertingComparator);
-                console.assert(sortedIndex < 0 || sortedTypeaheadInfo.current[sortedIndex].text == text);
+                console.assert(sortedIndex < 0 || insertingComparator(sortedTypeaheadInfo.current[sortedIndex].text, { unsortedIndex: i.index, text}) == 0);
                 if (sortedIndex < 0) {
                     sortedTypeaheadInfo.current.splice(-sortedIndex - 1, 0, { text, unsortedIndex: i.index });
                 }
@@ -489,7 +489,7 @@ export function useTypeaheadNavigation<ChildElement extends Element, I extends U
                     // When unmounting, find where we were and remove ourselves.
                     // Again, we should always find ourselves because there should be no duplicate values if each index is unique.
                     const sortedIndex = binarySearch(sortedTypeaheadInfo.current, text, insertingComparator);
-                    console.assert(sortedIndex < 0 || sortedTypeaheadInfo.current[sortedIndex].text == text);
+                    console.assert(sortedIndex < 0 || insertingComparator(sortedTypeaheadInfo.current[sortedIndex].text, { unsortedIndex: i.index, text}) == 0);
 
                     if (sortedIndex >= 0) {
                         sortedTypeaheadInfo.current.splice(sortedIndex, 1);

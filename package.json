@@ -13,6 +13,7 @@
     "watch:ts": "tsc --watch",
     "build:ts": "tsc",
     "test": "jest",
+    "lint": "npx eslint ./src",
     "prepare": "npm run build || node ./true",
     "clean": "tsc --build --clean"
   },
