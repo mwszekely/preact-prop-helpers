@@ -1,29 +1,24 @@
-import { createContext, Fragment, h, render } from "preact";
+import { createContext, h, render } from "preact";
 import { memo } from "preact/compat";
-import { useCallback, useContext, useRef } from "preact/hooks";
-import { useAnimationFrame, useAsyncHandler, useDraggable, useDroppable, useElementSize, useFocusTrap, useListNavigation, UseListNavigationChild, useMergedProps, useState } from "..";
-import { DemoUseRovingTabIndex } from "./demos/use-roving-tab-index";
+import { useContext, useRef } from "preact/hooks";
+import { useAnimationFrame, useAsyncHandler, useDraggable, useDroppable, useElementSize, useFocusTrap, useMergedProps, useState } from "..";
+import { ElementSize } from "../use-element-size";
+import { useGridNavigation, UseGridNavigationCell, UseGridNavigationCellInfo, UseGridNavigationRow, UseGridNavigationRowInfo } from "../use-grid-navigation";
 import { useHasFocus } from "../use-has-focus";
 import { DemoUseInterval } from "./demos/use-interval";
+import { DemoUseRovingTabIndex } from "./demos/use-roving-tab-index";
 import { DemoUseTimeout } from "./demos/use-timeout";
-import { useActiveElement } from "../use-active-element";
-import { useGridNavigation, UseGridNavigationRow, UseGridNavigationCell, UseGridNavigationRowInfo, UseGridNavigationCellInfo } from "../use-grid-navigation";
-import { ElementSize } from "../use-element-size";
 
 const RandomWords = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
 
-type E = (EventTarget & HTMLInputElement);
-type E2 = E["className"]
 
 
 const DemoUseDroppable = () => {
     const { droppedFiles, droppedStrings, filesForConsideration, stringsForConsideration, useDroppableProps, dropError } = useDroppable<HTMLDivElement>({ effect: "copy" });
 
-    const { ref } = useMergedProps<HTMLInputElement>()({}, { ref: useRef<HTMLInputElement>(null!) })
+    const { ref: _ref } = useMergedProps<HTMLInputElement>()({}, { ref: useRef<HTMLInputElement>(null!) })
 
     const p = useDroppableProps({ className: "demo droppable" });
-
-    const r = p.ref;
 
     return (
         <div {...p}>
@@ -45,7 +40,7 @@ const DemoUseDroppable = () => {
 }
 
 const DemoUseDraggable = () => {
-    const { dragging, useDraggableProps, lastDropEffect, getLastDropEffect, getDragging } = useDraggable<HTMLDivElement>({ data: { "text/plain": "This is custom draggable content of type text/plain." } });
+    const { useDraggableProps } = useDraggable<HTMLDivElement>({ data: { "text/plain": "This is custom draggable content of type text/plain." } });
 
 
     return (
@@ -58,7 +53,7 @@ const DemoUseElementSizeAnimation = () => {
     const [height, setHeight] = useState(0);
     const [angle, setAngle] = useState(0);
     useAnimationFrame({
-        callback: (ms) => {
+        callback: (_ms) => {
             setAngle(a => a + 0.01)
             setHeight((Math.sin(angle) + 1) / 0.5);
         }
@@ -98,7 +93,7 @@ const DemoUseFocusTrap = memo(({ depth }: { depth?: number }) => {
 });
 
 
-const DemoUseFocusTrapChild = memo(({ setActive, active, depth }: { active: boolean, setActive: (active: boolean) => void, depth: number }) => {
+const DemoUseFocusTrapChild = memo(({ setActive, active }: { active: boolean, setActive: (active: boolean) => void, depth: number }) => {
 
 
     return (
@@ -119,22 +114,19 @@ const DemoUseAsyncHandler1 = memo(() => {
     const [shouldThrow, setShouldThrow, getShouldThrow] = useState(false);
     const [disableConsecutive, setDisableConsecutive] = useState(false);
 
+    const asyncOnClick = ((_v: void, _e: h.JSX.TargetedMouseEvent<HTMLButtonElement>) => new Promise<void>((resolve, reject) => window.setTimeout(() => getShouldThrow() ? reject() : resolve(), timeout)));
     const {
         callCount,
         settleCount,
-        getCurrentCapture,
         hasCapture,
-        useSyncHandler,
-        currentCapture,
+        syncHandler,
         pending,
-        error,
         hasError,
         rejectCount,
         resolveCount
-    } = useAsyncHandler<HTMLButtonElement>()({ capture: () => { }, debounce: debounce == 0 ? undefined : debounce });
+    } = useAsyncHandler<h.JSX.TargetedMouseEvent<HTMLButtonElement>, void>(asyncOnClick, { capture: () => { }, debounce: debounce == 0 ? undefined : debounce });
 
-    const asyncOnClick = ((v: void, e: Event) => new Promise<void>((resolve, reject) => window.setTimeout(() => getShouldThrow() ? reject() : resolve(), timeout)));
-    const onClick = useSyncHandler(pending ? null : asyncOnClick);
+    const onClick = pending ? undefined : syncHandler;
 
     return (
         <div className="demo">
@@ -172,21 +164,7 @@ const DemoUseAsyncHandler2 = memo(() => {
 
     const [text, setText] = useState("");
 
-    const {
-        callCount,
-        settleCount,
-        getCurrentCapture,
-        hasCapture,
-        useSyncHandler,
-        currentCapture,
-        pending,
-        error,
-        hasError,
-        rejectCount,
-        resolveCount
-    } = useAsyncHandler<HTMLInputElement>()({ capture: e => { e.preventDefault(); return e.currentTarget.value }, debounce: debounce == 0 ? undefined : debounce });
-
-    const onInput = useSyncHandler(async (v, e) => new Promise((resolve, reject) => window.setTimeout(() => {
+    const onInputAsync = async (v: string, _e: any) => new Promise<void>((resolve, reject) => window.setTimeout(() => {
         if (getShouldThrow()) {
             reject();
         }
@@ -194,11 +172,24 @@ const DemoUseAsyncHandler2 = memo(() => {
             setText(v);
             resolve();
         }
-    }, timeout)));
+    }, timeout));
+
+    const {
+        callCount,
+        settleCount,
+        hasCapture,
+        syncHandler,
+        currentCapture,
+        pending,
+        hasError,
+        rejectCount,
+        resolveCount
+    } = useAsyncHandler<h.JSX.TargetedEvent<HTMLInputElement>, string>(onInputAsync, { capture: (e: h.JSX.TargetedEvent<HTMLInputElement>) => { e.preventDefault(); return e.currentTarget.value }, debounce: debounce == 0 ? undefined : debounce });
+
 
     return (
         <div className="demo">
-            <label>Demo text: <input value={hasCapture ? currentCapture : text} disabled={pending && disableConsecutive} onInput={onInput} /></label>
+            <label>Demo text: <input value={hasCapture ? currentCapture : text} disabled={pending && disableConsecutive} onInput={syncHandler} /></label>
             <hr />
             <label>Sleep for: <input type="number" value={timeout} onInput={e => setTimeout(e.currentTarget.valueAsNumber)} /></label>
             <label>Throw an error <input type="checkbox" checked={shouldThrow} onInput={e => setShouldThrow(e.currentTarget.checked)} /></label>
@@ -227,13 +218,13 @@ const DemoUseAsyncHandler2 = memo(() => {
 
 
 const DemoFocus = memo(() => {
-    const [lastActiveElement, setLastActiveElement, getLastActiveElement] = useState<(Element & HTMLOrSVGElement) | null>(null);
-    const [activeElement, setActiveElement, getActiveElement] = useState<(Element & HTMLOrSVGElement) | null>(null);
-    const [windowFocused, setWindowFocused, getWindowFocused] = useState(false);
-    const [focused, setFocused, getFocused] = useState(false);
-    const [focusedInner, setFocusedInner, getFocusedInner] = useState(false);
-    const [lastFocused, setLastFocused, getLastFocused] = useState(false);
-    const [lastFocusedInner, setLastFocusedInner, getLastFocusedInner] = useState(false);
+    const [lastActiveElement, setLastActiveElement] = useState<(Element & HTMLOrSVGElement) | null>(null);
+    const [activeElement, setActiveElement] = useState<(Element & HTMLOrSVGElement) | null>(null);
+    const [windowFocused, setWindowFocused] = useState(false);
+    const [focused, setFocused] = useState(false);
+    const [focusedInner, setFocusedInner] = useState(false);
+    const [lastFocused, setLastFocused] = useState(false);
+    const [lastFocusedInner, setLastFocusedInner] = useState(false);
     const { useHasFocusProps } = useHasFocus<HTMLDivElement>({ 
         onFocusedChanged: setFocused, 
         onFocusedInnerChanged: setFocusedInner, 
@@ -265,10 +256,10 @@ const GridRowContext = createContext<UseGridNavigationRow<HTMLDivElement, HTMLDi
 const GridCellContext = createContext<UseGridNavigationCell<HTMLDivElement, UseGridNavigationCellInfo>>(null!);
 export const DemoUseGrid = memo(() => {
 
-    const [lastFocusedInner, setLastFocusedInner, getLastFocusedInner] = useState(false);
+    const [, setLastFocusedInner, getLastFocusedInner] = useState(false);
 
     const { useHasFocusProps } = useHasFocus<HTMLDivElement>({ onLastFocusedInnerChanged: setLastFocusedInner });
-    const { useGridNavigationRow, useGridNavigationColumn, rowCount, cellIndex, rowIndex, useGridNavigationProps } = useGridNavigation<HTMLDivElement, HTMLDivElement, UseGridNavigationRowInfo, UseGridNavigationCellInfo>({ shouldFocusOnChange: getLastFocusedInner });
+    const { useGridNavigationRow, rowCount, cellIndex, rowIndex, useGridNavigationProps } = useGridNavigation<HTMLDivElement, HTMLDivElement, UseGridNavigationRowInfo, UseGridNavigationCellInfo>({ shouldFocusOnChange: getLastFocusedInner });
 
     return (
         <div className="demo">
@@ -286,11 +277,11 @@ export const DemoUseGrid = memo(() => {
     );
 })
 
-const Prefix = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const _Prefix = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const DemoUseGridRow = memo((({ index }: { index: number }) => {
-    const [randomWord] = useState(() => RandomWords[index/*Math.floor(Math.random() * (RandomWords.length - 1))*/]);
+    const [_randomWord] = useState(() => RandomWords[index/*Math.floor(Math.random() * (RandomWords.length - 1))*/]);
     const useGridRow = useContext(GridRowContext);
-    const { isTabbableRow, cellCount, useGridNavigationRowProps, useGridNavigationCell, managedCells, currentColumn } = useGridRow({ index });
+    const { isTabbableRow, cellCount, useGridNavigationRowProps, useGridNavigationCell, currentColumn } = useGridRow({ index });
 
     const props = useGridNavigationRowProps({});
     return (

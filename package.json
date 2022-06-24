@@ -26,6 +26,7 @@
     "@babel/preset-typescript": "^7.17.12",
     "@types/jest": "^28.1.1",
     "@types/jsdom": "^16.2.14",
+    "@types/lodash-es": "^4.17.6",
     "@typescript-eslint/eslint-plugin": "^5.28.0",
     "@typescript-eslint/parser": "^5.28.0",
     "enzyme": "^3.11.0",
@@ -40,6 +41,7 @@
   "dependencies": {
     "blocking-elements": "^0.1.1",
     "clsx": "^1.1.1",
+    "lodash-es": "^4.17.21",
     "tabbable": "^5.3.3",
     "wicg-inert": "^3.1.2"
   },

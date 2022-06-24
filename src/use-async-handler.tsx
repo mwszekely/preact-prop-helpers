@@ -15,7 +15,7 @@ export interface AsyncHandler<CaptureType, E extends h.JSX.TargetedEvent> {
 export type GenericAsyncHandler<CaptureType, Target extends EventTarget> = AsyncHandler<CaptureType, h.JSX.TargetedEvent<Target>>;
 
 
-export interface UseAsyncHandlerParameters<ElementType extends EventTarget, EventType extends h.JSX.TargetedEvent<ElementType>, CaptureType> extends Omit<UseAsyncParameters, "handler"> {
+export interface UseAsyncHandlerParameters<EventType extends Event, CaptureType> extends Omit<UseAsyncParameters<[CaptureType, EventType], [EventType]>, "capture"> {
     /**
      * What transient information is captured by this event 
      * and presented as the first argument of the event handler?
@@ -25,16 +25,7 @@ export interface UseAsyncHandlerParameters<ElementType extends EventTarget, Even
     capture: (event: EventType) => CaptureType;
 }
 
-export interface UseAsyncHandlerReturnType<ElementType extends EventTarget, EventType extends h.JSX.TargetedEvent<ElementType>, CaptureType> extends Omit<UseAsyncReturnType<(e: EventType) => CaptureType>, "useSyncHandler" | "promise"> {
-    /**
-     * Pass the actual asynchronous handler you'd like to use to this function, 
-     * and you'll get the synchronous handler back.
-     * 
-     * Passing `null` is a way to disable the handler, for example, while one is already pending, if you'd like to do so.
-     * Because 
-     * 
-     */
-    useSyncHandler(asyncHandler: ((value: CaptureType, event: EventType) => (Promise<void> | void)) | null | undefined): h.JSX.EventHandler<EventType> | undefined;
+export interface UseAsyncHandlerReturnType<EventType extends Event, CaptureType> extends UseAsyncReturnType<[EventType], void> {
 
     /**
      * The most recently captured value. In other words, represents what
@@ -60,7 +51,7 @@ export interface UseAsyncHandlerReturnType<ElementType extends EventTarget, Even
     hasCapture: boolean;
 
     // Same as in useAsync, but with a different type
-    promise: Promise<void> | null;
+    //promise: Promise<void> | null;
 
 }
 
@@ -77,12 +68,12 @@ export interface UseAsyncHandlerReturnType<ElementType extends EventTarget, Even
  * need to be captured &ndash; it's never stale.
  * 
  * ```tsx
- * const syncOnInput = async (value: number, e: Event) => { 
+ * const asyncOnInput = async (value: number, e: Event) => { 
  *     [...] // Ex. send to a server and setState when done
  * };
  * const {
- *     // When called, returns the synchronous event handler
- *     useSyncHandler,
+ *     // A sync version of asyncOnInput
+ *     syncHandler,
  *     // True while the handler is running
  *     pending,
  *     // The error thrown, if any
@@ -91,11 +82,12 @@ export interface UseAsyncHandlerReturnType<ElementType extends EventTarget, Even
  *     currentCapture,
  *     // And others, see `UseAsyncHandlerReturnType`
  *     ...rest
- * } = useAsyncHandler<HTMLInputElement>()({ 
+ * } = useAsyncHandler<HTMLInputElement>()(asyncOnInput, { 
  *     // Pass in the capture function that saves event data
- *     // from being stale.  Note that the async event handler 
- *     // isn't passed here, it's passed to `useSyncHandler` above.
+ *     // from being stale.
  *     capture: e => { 
+ *         // `capture` can have side-effects because
+ *         // it's called exactly once per invocation
  *         e.preventDefault(); 
  * 
  *         // Save this value so that it's never stale
@@ -103,9 +95,7 @@ export interface UseAsyncHandlerReturnType<ElementType extends EventTarget, Even
  *     }
  * });
  * 
- * const onInput = useSyncHandler(someAsyncFunction);
- * // OR the following, if you want the input entirely disabled while pending:
- * const onInput = useSyncHandler(pending? null : someAsyncFunction);
+ * const onInput = pending? null : syncHandler;
  * ```
  * 
  * The handler is automatically throttled to only run one at a time. 
@@ -116,67 +106,43 @@ export interface UseAsyncHandlerReturnType<ElementType extends EventTarget, Even
  * recently called iteration of the handler will run.
  * 
  * 
- * You may optionally *also* specify a debounce parameter that waits until the
+ * You may optionally *also* specify debounce and throttle parameters that wait until the
  * syncronous handler has not been called for the specified number of
  * milliseconds, at which point we *actually* run the asyncronous handler
  * according to the logic in the previous paragraph. This is in
  * *addition* to throttling the handler, and does not replace that behavior.
+ * 
+ * @see useAsync A more general version of this hook that can work with any type of handler, not just DOM event handlers.
  */
-export function useAsyncHandler<ElementType extends EventTarget>() {
-    return function <EventType extends h.JSX.TargetedEvent<ElementType>, CaptureType>({ capture, debounce }: UseAsyncHandlerParameters<ElementType, EventType, CaptureType>): UseAsyncHandlerReturnType<ElementType, EventType, CaptureType> {
-        const { callCount, currentType, error, flushDebouncedPromise, useSyncHandler, hasError, pending, rejectCount, resolveCount, settleCount, promise } = useAsync<(capture: CaptureType, event: EventType) => void>({ debounce });
+export function useAsyncHandler<EventType extends Event, CaptureType>(asyncHandler: (c: CaptureType, e: EventType) => (Promise<void> | void), { capture: originalCapture, ...restAsyncOptions }: UseAsyncHandlerParameters<EventType, CaptureType>): UseAsyncHandlerReturnType<EventType, CaptureType> {
+    
+    // We need to differentiate between "nothing captured yet" and "`undefined` was captured"
+    const [currentCapture, setCurrentCapture, getCurrentCapture] = useState<CaptureType | undefined>(undefined);
+    const [hasCapture, setHasCapture] = useState(false);
+    
+    // Wrap around the normal `useAsync` `capture` function to also
+    // keep track of the last value the user actually input.
+    // 
+    // Without this there's no way to re-render the control with
+    // it being both controlled and also having the "correct" value,
+    // and at any rate also protects against sudden exceptions reverting
+    // your change out from under you.
+    const capture = useStableCallback((e: EventType): [CaptureType, EventType] => { 
+        const captured = originalCapture(e); 
+        setCurrentCapture(captured);
+        setHasCapture(true);
+        return [captured, e];
+    });
 
-
-        // We need to differentiate between "nothing captured yet" and "`undefined` was captured"
-        const [currentCapture, setCurrentCapture, getCurrentCapture] = useState<CaptureType | undefined>(undefined);
-        const [hasCapture, setHasCapture] = useState(false);
-
-        const ret: UseAsyncHandlerReturnType<ElementType, EventType, CaptureType> = {
-            useSyncHandler: useSyncHandlerWithCapture,
-            getCurrentCapture,
-            callCount,
-            currentCapture,
-            hasCapture,
-            pending,
-            hasError,
-            error,
-            promise,
-
-            currentType,
-
-            flushDebouncedPromise,
-
-            resolveCount,
-            rejectCount,
-            settleCount
-        };
-
-        return ret;
-
-        function useSyncHandlerWithCapture(asyncHandler: ((value: CaptureType, event: EventType) => (Promise<void> | void)) | null | undefined): h.JSX.EventHandler<EventType> | undefined {
-
-            const syncHandlerWrapper = useSyncHandler(asyncHandler);
-
-            const syncHandler = useStableCallback<h.JSX.EventHandler<EventType>>(function syncHandler(e: EventType): void {
-                // Get the most significant information from the event at this time,
-                // which is necessary since the promise could actually be called much later
-                // when the element's value (etc.) has changed.
-                const captured = capture(e);
-
-                if (syncHandlerWrapper == null)
-                    return;
-
-
-                setCurrentCapture(captured);
-                setHasCapture(true);
-                syncHandlerWrapper(captured, e);
-            });
-
-            return syncHandler;
-        }
-    }
-
+    return {
+        getCurrentCapture,
+        currentCapture,
+        hasCapture,
+        ...useAsync(asyncHandler, { capture, ...restAsyncOptions })
+    };
 }
+
+
 
 
 

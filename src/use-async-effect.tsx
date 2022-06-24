@@ -1,9 +1,8 @@
 import { Inputs, useEffect } from "preact/hooks";
-import { useAsync } from "./use-async";
+import { useAsync, UseAsyncParameters } from "./use-async";
 
-export function useAsyncEffect<I extends Inputs>(effect: () => Promise<(void | (() => void))>, inputs?: I, debounce?: number) {
-    const { useSyncHandler, ...rest } = useAsync<typeof effect>({ debounce });
-    const handler = useSyncHandler(effect);
-    useEffect(handler!, inputs);
+export function useAsyncEffect<I extends Inputs>(effect: () => Promise<(void | (() => void))>, inputs?: I, options?: Omit<UseAsyncParameters<[void], [void]>, "capture">) {
+    const { syncHandler, ...rest } = useAsync(effect, options);
+    useEffect(syncHandler, inputs);
     return rest;
 }
