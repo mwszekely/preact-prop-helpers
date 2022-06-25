@@ -114,7 +114,7 @@ export interface UseAsyncHandlerReturnType<EventType extends Event, CaptureType>
  * 
  * @see useAsync A more general version of this hook that can work with any type of handler, not just DOM event handlers.
  */
-export function useAsyncHandler<EventType extends Event, CaptureType>(asyncHandler: (c: CaptureType, e: EventType) => (Promise<void> | void), { capture: originalCapture, ...restAsyncOptions }: UseAsyncHandlerParameters<EventType, CaptureType>): UseAsyncHandlerReturnType<EventType, CaptureType> {
+export function useAsyncHandler<EventType extends Event, CaptureType>(asyncHandler: ((c: CaptureType, e: EventType) => (Promise<void> | void)) | null, { capture: originalCapture, ...restAsyncOptions }: UseAsyncHandlerParameters<EventType, CaptureType>): UseAsyncHandlerReturnType<EventType, CaptureType> {
     
     // We need to differentiate between "nothing captured yet" and "`undefined` was captured"
     const [currentCapture, setCurrentCapture, getCurrentCapture] = useState<CaptureType | undefined>(undefined);
