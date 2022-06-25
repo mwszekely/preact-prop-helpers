@@ -330,7 +330,8 @@ export function useAsync<AP extends unknown[], R, SP extends unknown[] = AP>(asy
     const executeHandlerWithDebounce = (executeHandlerWithD ?? executeHandlerWithT ?? executeHandlerWithoutDebounce);
 
     const flushDebouncedPromise = useStableCallback(() => {
-        executeHandlerWithDebounce?.flush();
+        if (executeHandlerWithDebounce && "flush" in executeHandlerWithDebounce)
+            executeHandlerWithDebounce.flush();
     });
 
     return {
