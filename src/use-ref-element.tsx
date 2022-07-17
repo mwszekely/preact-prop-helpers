@@ -1,15 +1,11 @@
-import { h, RefCallback } from "preact";
+import { h } from "preact";
 import { useCallback } from "preact/hooks";
-import { MergedProps, useMergedProps } from "./use-merged-props";
-import { OnPassiveStateChange, useEnsureStability, usePassiveState } from "./use-passive-state";
-
-export type UseRefElementPropsReturnType<T extends EventTarget, P extends {}> = MergedProps<T, P, {}>;
-
-export type UseRefElementProps<T extends EventTarget> = <P extends {}>(props: P) => UseRefElementPropsReturnType<T, P>;
+import { useMergedProps } from "./use-merged-props";
+import { OnPassiveStateChange, returnNull, useEnsureStability, usePassiveState } from "./use-passive-state";
 
 export interface UseRefElementReturnType<T extends EventTarget> {
-    getElement: () => T | null;
-    useRefElementProps: UseRefElementProps<T>;
+    getElement(): T | null;
+    useRefElementProps(props: h.JSX.HTMLAttributes<T>): h.JSX.HTMLAttributes<T>;
 }
 
 export interface UseRefElementParameters<T> {
@@ -17,7 +13,7 @@ export interface UseRefElementParameters<T> {
     onMount?: (element: T) => void;
     onUnmount?: (element: T) => void;
 }
-function returnNull() { return null; }
+
 /**
  * Allows accessing the element a ref references as soon as it does so.
  * *This hook itself returns a hook*--useRefElementProps modifies the props that you were going to pass to an HTMLElement, 
@@ -34,25 +30,19 @@ export function useRefElement<T extends EventTarget>(args?: UseRefElementParamet
 
     // Called (indirectly) by the ref that the element receives.
     const handler = useCallback<OnPassiveStateChange<T | null>>((e, prevValue) => {
-        onElementChange?.(e, prevValue);
+        let cleanup = onElementChange?.(e, prevValue);
         if (prevValue)
             onUnmount?.(prevValue!);
 
         if (e)
             onMount?.(e);
+
+        return cleanup;
     }, []);
 
     // Let us store the actual (reference to) the element we capture
     const [getElement, setElement] = usePassiveState<T | null>(handler, returnNull);
-
-    // Create a RefCallback that's fired when mounted 
-    // and that notifies us of our element when we have it
-    const myRef: RefCallback<T> = useCallback((e) => {
-        if (e)
-            setElement(() => e);
-    }, []);
-
-    const useRefElementProps = useCallback<UseRefElementProps<T>>(<P extends {}>(props: P): UseRefElementPropsReturnType<T, P> => useMergedProps<T>()({ ref: myRef }, props), []);
+    const useRefElementProps = useCallback<UseRefElementReturnType<T>["useRefElementProps"]>((props) => useMergedProps<T>({ ref: setElement }, props), []);
 
     // Return both the element and the hook that modifies 
     // the props and allows us to actually find the element

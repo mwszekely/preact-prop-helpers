@@ -1,9 +1,6 @@
-import { ComponentChildren, createElement, Fragment, h } from "preact";
+import { createElement, Fragment, h } from "preact";
 
-export function useMergedChildren<Lhs extends Pick<h.JSX.HTMLAttributes<EventTarget>, "children"> | null | undefined, Rhs extends Pick<h.JSX.HTMLAttributes<EventTarget>, "children"> | null | undefined>(lhsProps: Lhs, rhsProps: Rhs): ComponentChildren {
-
-    const lhs = lhsProps?.children;
-    const rhs = rhsProps?.children;
+export function useMergedChildren({ children: lhs }: Pick<h.JSX.HTMLAttributes<EventTarget>, "children">, { children: rhs}: Pick<h.JSX.HTMLAttributes<EventTarget>, "children">): h.JSX.HTMLAttributes<EventTarget>["children"] {
     if (lhs == null && rhs == null) {
         return undefined;
     }
@@ -14,7 +11,6 @@ export function useMergedChildren<Lhs extends Pick<h.JSX.HTMLAttributes<EventTar
         return lhs;
     }
     else {
-        const ret = createElement(Fragment, {}, lhs, rhs);
-        return ret;
+        return createElement(Fragment, {}, lhs, rhs);
     }
 }

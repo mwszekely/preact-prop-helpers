@@ -1,4 +1,4 @@
-import { Ref, RefCallback, RefObject } from "preact";
+import { h, Ref, RefCallback, RefObject } from "preact";
 import { useCallback } from "preact/hooks";
 
 
@@ -27,28 +27,22 @@ interface R<E> {
  * @param rhs 
  * @returns 
  */
-export function useMergedRefs<E extends EventTarget>() {
-    return function <Lhs extends R<E>, Rhs extends R<E>>(lhsProps: Lhs | null | undefined, rhsProps: Rhs | null | undefined): Ref<E> {
+export function useMergedRefs<E extends EventTarget>({ ref: rhs }: h.JSX.HTMLAttributes<E>, { ref: lhs }: h.JSX.HTMLAttributes<E>) {
+    const combined: RefCallback<E> = useCallback((current: E | null) => {
+        processRef(current, lhs);
+        processRef(current, rhs);
+    }, [lhs, rhs]);
 
-        const lhs = lhsProps?.ref;
-        const rhs = rhsProps?.ref;
-        const combined: RefCallback<E> = useCallback((current: E | null) => {
-            processRef(current, lhs);
-            processRef(current, rhs);
-        }, [lhs, rhs]);
-
-
-        if (lhs == null && rhs == null) {
-            return undefined!;
-        }
-        else if (lhs == null) {
-            return rhs!;
-        }
-        else if (rhs == null) {
-            return lhs!;
-        }
-        else {
-            return combined;
-        }
+    if (lhs == null && rhs == null) {
+        return undefined!;
+    }
+    else if (lhs == null) {
+        return rhs!;
+    }
+    else if (rhs == null) {
+        return lhs!;
+    }
+    else {
+        return combined;
     }
 }

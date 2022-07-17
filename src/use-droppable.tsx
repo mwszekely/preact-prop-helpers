@@ -1,7 +1,6 @@
 import { h } from "preact";
 import { useEffect, useRef } from "preact/hooks";
-import { MergedProps, useMergedProps } from "./use-merged-props";
-import { UseRefElementPropsReturnType } from "./use-ref-element";
+import { useMergedProps } from "./use-merged-props";
 import { useState } from "./use-state";
 
 export interface UseDroppableReturnType<E extends HTMLElement> {
@@ -9,7 +8,7 @@ export interface UseDroppableReturnType<E extends HTMLElement> {
     /**
      * Hook for modifying the props you were going to pass to your drop target Element.
      */
-    useDroppableProps: UseDroppableProps<E>;
+    useDroppableProps: (p: h.JSX.HTMLAttributes<E>) => h.JSX.HTMLAttributes<E>;
 
     /**
      * While something is being dragged over this element, this will contain any information about any files included in that drop.
@@ -66,11 +65,6 @@ export class DroppableFileError extends Error {
 
 }
 
-type UseDroppableProps<E extends HTMLElement> = <P extends UseDroppablePropsParameters<E>>(p: P) => UseDroppablePropsReturnType<E, P>;
-type UseDroppablePropsParameters<E extends HTMLElement> = h.JSX.HTMLAttributes<E>;
-type UseDroppablePropsReturnType<E extends HTMLElement, P extends UseDroppablePropsParameters<E>> = 
-MergedProps<E, UseRefElementPropsReturnType<E, { onDragEnter: (e: DragEvent) => void; onDragLeave: (e: DragEvent) => void; onDragOver: (e: DragEvent) => void; onDrop: (e: DragEvent) => void; }>, P>;
-//MergedProps<UseRefElementPropsReturnType<E, Pick<h.JSX.HTMLAttributes<E>, "onDragEnter" | "onDragLeave" | "onDragOver" | "onDrop">>, P>;
 
 
 export function useDroppable<E extends HTMLElement>({ effect }: UseDroppableParameters): UseDroppableReturnType<E> {
@@ -137,7 +131,7 @@ export function useDroppable<E extends HTMLElement>({ effect }: UseDroppablePara
     }, [currentPromiseIndex])
 
 
-    const useDroppableProps: UseDroppableProps<E> = <P extends UseDroppablePropsParameters<E>>(p: P): UseDroppablePropsReturnType<E, P> => {
+    const useDroppableProps: UseDroppableReturnType<E>["useDroppableProps"] = (p) => {
 
         //const ref = useRef<E>(null);
 
@@ -241,7 +235,7 @@ export function useDroppable<E extends HTMLElement>({ effect }: UseDroppablePara
         }
 
 
-        return useMergedProps<E>()({ onDragEnter, onDragLeave, onDragOver, onDrop }, p);
+        return useMergedProps<E>({ onDragEnter, onDragLeave, onDragOver, onDrop }, p);
     };
 
     return {

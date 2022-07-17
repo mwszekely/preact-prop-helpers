@@ -68,6 +68,6 @@ const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
     
     const props = useListNavigationChildProps({});
     return (
-        <li {...props}>{text} ({tabbable? "Tabbable" : "Not tabbable"})<input {...useListNavigationSiblingProps({ type: "checkbox" })} /></li>
+        <li {...props}>{text} ({tabbable? "Tabbable" : "Not tabbable"})<input {...useListNavigationSiblingProps<HTMLInputElement>({ type: "checkbox" })} /></li>
     )
 }));

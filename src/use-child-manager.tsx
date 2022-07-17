@@ -1,11 +1,8 @@
-import { Inputs, useCallback, useRef } from "preact/hooks";
+import { Inputs, useCallback, useRef, useReducer } from "preact/hooks";
 import { EffectChange } from "./use-effect";
 import { useLayoutEffect } from "./use-layout-effect";
-import { useRefElement, UseRefElementProps } from "./use-ref-element";
+import { useRefElement, UseRefElementReturnType } from "./use-ref-element";
 import { useState } from "./use-state";
-
-
-//export const IndexPending = Symbol("index-pending");
 
 export interface ManagedChildInfo<T extends number | string> {
 
@@ -21,16 +18,13 @@ export interface ManagedChildInfo<T extends number | string> {
 
 export interface UseManagedChildReturnType<E extends EventTarget> {
     getElement(): E | null;
-    useManagedChildProps: UseRefElementProps<E>;
+    useManagedChildProps: UseRefElementReturnType<E>["useRefElementProps"];
 }
 
-export type UsedManagedChild<I extends ManagedChildInfo<any>> = <E extends EventTarget>(info: I) => UseManagedChildReturnType<E>;
-//export type UseManagedChildProps<E extends EventTarget> = <P extends UseManagedChildPropsParameters<E>>(props: P) => UseManagedChildPropsReturnType<E, P>;
-//export type UseManagedChildPropsParameters<E extends EventTarget> = UseRefElementPropsParameters<E>;
-//export type UseManagedChildPropsReturnType<E extends EventTarget, P extends UseManagedChildPropsParameters<E>> = void;
+export type UseManagedChild<I extends ManagedChildInfo<any>> = <E extends EventTarget>(info: I) => UseManagedChildReturnType<E>;
 
 type InfoToKey<I extends ManagedChildInfo<any>> = I["index"];
-type ManagedChildren<T extends number | string, I extends ManagedChildInfo<T>> = T extends string ? Record<string, I> : I[];
+type ManagedChildren<T extends number | string, I extends ManagedChildInfo<T>> = T extends string ? Record<T, I> : I[];
 
 export interface UseChildManagerReturnType<I extends ManagedChildInfo<any>> {
     /**
@@ -39,7 +33,7 @@ export interface UseChildManagerReturnType<I extends ManagedChildInfo<any>> {
      * is just the bag of properties to pass to the parent,
      * including the child's index.
      */
-    useManagedChild: UsedManagedChild<I>;
+    useManagedChild: UseManagedChild<I>;
 
     /**
      * An array of all currently managed children,
@@ -143,36 +137,38 @@ export function useChildManager<I extends ManagedChildInfo<any>>(): UseChildMana
 
     const getMountIndex = useCallback((index: K) => { return mountOrder.current.get(index)!; }, []);
 
-    const useManagedChild: UsedManagedChild<I> = useCallback(<ChildType extends EventTarget>(info: I) => {
-        const { getElement, useRefElementProps } = useRefElement<ChildType>({ onElementChange: useCallback((element: ChildType | null) => {
-            if (element) {
-                indicesByElement.current.set(element, info.index);
-                deletedIndices.current.delete(info.index);
-                if (managedChildren.current[info.index as keyof ManagedChildren<InfoToKey<I>, I>] != undefined) {
-                    overmountCount.current.set(info.index, (overmountCount.current.get(info.index) ?? 0) + 1);
-                }
+    const useManagedChild: UseManagedChild<I> = useCallback(<ChildType extends EventTarget>(info: I) => {
+        const { getElement, useRefElementProps } = useRefElement<ChildType>({
+            onElementChange: useCallback((element: ChildType | null) => {
+                if (element) {
+                    indicesByElement.current.set(element, info.index);
+                    deletedIndices.current.delete(info.index);
+                    if (managedChildren.current[info.index as keyof ManagedChildren<InfoToKey<I>, I>] != undefined) {
+                        overmountCount.current.set(info.index, (overmountCount.current.get(info.index) ?? 0) + 1);
+                    }
 
-                setChildUpdateIndex(c => ++c);
-                managedChildren.current[info.index as keyof ManagedChildren<InfoToKey<I>, I>] = { ...info } as any;
-
-                return () => {
                     setChildUpdateIndex(c => ++c);
-                    if ((overmountCount.current.get(info.index) ?? 0) > 0) {
-                        overmountCount.current.set(info.index, (overmountCount.current.get(info.index) ?? 0) - 1);
-                    }
-                    else {
-                        delete managedChildren.current[info.index as keyof ManagedChildren<InfoToKey<I>, I>];
-                        deletedIndices.current.add(info.index);
+                    managedChildren.current[info.index as keyof ManagedChildren<InfoToKey<I>, I>] = { ...info } as any;
 
-                        if (typeof info.index === "number") {
-                            while (managedChildren.current.length && (managedChildren.current as I[])[(managedChildren.current as I[]).length - 1] === undefined)
-                                (managedChildren.current as I[]).length -= 1;
+                    return () => {
+                        setChildUpdateIndex(c => ++c);
+                        if ((overmountCount.current.get(info.index) ?? 0) > 0) {
+                            overmountCount.current.set(info.index, (overmountCount.current.get(info.index) ?? 0) - 1);
                         }
-                        indicesByElement.current.delete(element);
+                        else {
+                            delete managedChildren.current[info.index as keyof ManagedChildren<InfoToKey<I>, I>];
+                            deletedIndices.current.add(info.index);
+
+                            if (typeof info.index === "number") {
+                                while (managedChildren.current.length && (managedChildren.current as I[])[(managedChildren.current as I[]).length - 1] === undefined)
+                                    (managedChildren.current as I[]).length -= 1;
+                            }
+                            indicesByElement.current.delete(element);
+                        }
                     }
                 }
-            }
-        }, []) });
+            }, [])
+        });
 
         useLayoutEffect(() => {
             const index = getTotalChildrenMounted();
@@ -333,13 +329,14 @@ export function useChildFlag<T extends string | number, I extends ManagedChildIn
             }
         }
 
-        if (Array.isArray(managedChildren)){
-        for (let i = 0; i < managedChildren.length; ++i) {
-            const shouldBeSet = (i == activatedIndex);
-            if (getChildFlag(i as T) != shouldBeSet) {
-                setChildFlag(i as T, shouldBeSet);
+        if (Array.isArray(managedChildren)) {
+            for (let i = 0; i < managedChildren.length; ++i) {
+                const shouldBeSet = (i == activatedIndex);
+                if (getChildFlag(i as T) != shouldBeSet) {
+                    setChildFlag(i as T, shouldBeSet);
+                }
             }
-        }}
+        }
         else {
             Object.entries(managedChildren).forEach(([i, _info]) => {
                 const shouldBeSet = (i == activatedIndex);

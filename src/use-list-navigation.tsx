@@ -2,13 +2,10 @@ import { h } from "preact";
 import { useCallback } from "preact/hooks";
 import { UseChildManagerReturnType } from "./use-child-manager";
 import { useLinearNavigation, UseLinearNavigationChildInfo, useTypeaheadNavigation, UseTypeaheadNavigationChildInfo, UseTypeaheadNavigationParameters } from "./use-keyboard-navigation";
-import { MergedProps, useMergedProps } from "./use-merged-props";
+import { useMergedProps } from "./use-merged-props";
 import { useEnsureStability } from "./use-passive-state";
-import { useRovingTabIndex, UseRovingTabIndexChildInfo, UseRovingTabIndexChildPropsReturnType, UseRovingTabIndexParameters, UseRovingTabIndexSiblingProps } from "./use-roving-tabindex";
+import { useRovingTabIndex, UseRovingTabIndexChildInfo, UseRovingTabIndexChildReturnType, UseRovingTabIndexParameters } from "./use-roving-tabindex";
 import { useState } from "./use-state";
-
-
-export type OmitStrong<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 
 
 /**
@@ -49,7 +46,7 @@ const _dummy: any = null;
 
 
 
-export interface UseListNavigationReturnType<ChildElement extends Element, I extends UseListNavigationChildInfo> extends OmitStrong<UseChildManagerReturnType<I>, "useManagedChild"> {
+export interface UseListNavigationReturnType<ChildElement extends Element, I extends UseListNavigationChildInfo> extends Omit<UseChildManagerReturnType<I>, "useManagedChild"> {
 
     useListNavigationProps: <P extends h.JSX.HTMLAttributes<any>>(props: P) => h.JSX.HTMLAttributes<any>;
 
@@ -64,13 +61,6 @@ export interface UseListNavigationReturnType<ChildElement extends Element, I ext
      */
     tabbableIndex: number | null;
 
-    //managedChildren: I[];
-
-    /**
-     * Allows programmatic control of the currently tabbable index.
-     */
-    //setTabbableIndex: StateUpdater<number | null>;
-
     navigateToIndex: (index: number | null) => void;
     navigateToNext: () => void;
     navigateToPrev: () => void;
@@ -81,14 +71,14 @@ export interface UseListNavigationReturnType<ChildElement extends Element, I ext
 }
 
 export interface UseListNavigationChildReturnType<ChildElement extends Element> {
-    useListNavigationChildProps: <P extends h.JSX.HTMLAttributes<ChildElement>>({ tabIndex, ...props }: P) => UseListNavigationChildPropsReturnType<ChildElement, P>;
-    useListNavigationSiblingProps: UseRovingTabIndexSiblingProps<ChildElement>;
+    useListNavigationChildProps: ({ tabIndex, ...props }: h.JSX.HTMLAttributes<ChildElement>) => h.JSX.HTMLAttributes<ChildElement>;
+    useListNavigationSiblingProps: UseRovingTabIndexChildReturnType<ChildElement>["useRovingTabIndexSiblingProps"];
     tabbable: boolean | null;
 }
 
 
 /** Arguments passed to the parent `useListNavigation` */
-export interface UseListNavigationParameters extends OmitStrong<UseTypeaheadNavigationParameters, "getIndex" | "setIndex">, OmitStrong<UseRovingTabIndexParameters, "tabbableIndex"> {
+export interface UseListNavigationParameters extends Omit<UseTypeaheadNavigationParameters, "getIndex" | "setIndex">, Omit<UseRovingTabIndexParameters, "tabbableIndex"> {
 
     /**
      * Maps to Intl.Collator's ignorePunctuation parameter.  Whether punctuation (which is context and locale dependent) should be ignored when searching.
@@ -166,12 +156,6 @@ export type UseListNavigationChildParameters<I extends UseListNavigationChildInf
 /** Type of the child's sub-hook */
 export type UseListNavigationChild<ChildElement extends Element, I extends UseListNavigationChildInfo> = ({ text, index, ...i }: UseListNavigationChildParameters<I>) => UseListNavigationChildReturnType<ChildElement>;
 
-
-/** Return type of the child `useListNavigationChildProps` */
-export type UseListNavigationChildPropsReturnType<ChildElement extends Element, P extends h.JSX.HTMLAttributes<ChildElement>> = MergedProps<ChildElement, UseRovingTabIndexChildPropsReturnType<ChildElement, { onClick: () => void; }>, P>;
-
-export type UseListNavigationChildProps<ChildElement extends Element> = <P extends h.JSX.HTMLAttributes<ChildElement>>(p: P) => UseListNavigationChildPropsReturnType<ChildElement, P>
-
 function identity<T>(t: T) { return t; }
 
 /**
@@ -234,9 +218,8 @@ export function useListNavigation<ChildElement extends Element, I extends UseLis
 
         const { useRovingTabIndexChildProps, useRovingTabIndexSiblingProps, tabbable } = useRovingTabIndexChild<ChildElement>(info as I);
 
-        const useListNavigationChildProps: UseListNavigationChildProps<ChildElement> = function <P extends h.JSX.HTMLAttributes<ChildElement>>({ ...props }: P) {
-
-            return useMergedProps<ChildElement>()(useRovingTabIndexChildProps((({ onClick: roveToSelf, hidden: info.hidden }))), props);
+        const useListNavigationChildProps: (p: h.JSX.HTMLAttributes<ChildElement>) => h.JSX.HTMLAttributes<ChildElement> = function ({ ...props }) {
+            return useMergedProps<ChildElement>(useRovingTabIndexChildProps((({ onClick: roveToSelf, hidden: info.hidden }))), props);
         }
 
         const roveToSelf = useCallback(() => { navigateToIndex(info.index); }, [])

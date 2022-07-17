@@ -6,13 +6,10 @@ import { useForceUpdate } from "./use-force-update";
 import { useLinearNavigation, useTypeaheadNavigation } from "./use-keyboard-navigation";
 import { tryNavigateToIndex } from "./use-list-navigation";
 import { useMergedProps } from "./use-merged-props";
-import { UseRefElementPropsReturnType } from "./use-ref-element";
 import { useRovingTabIndex, UseRovingTabIndexChildInfo, UseRovingTabIndexChildParameters } from "./use-roving-tabindex";
 import { useStableCallback } from "./use-stable-callback";
 import { useStableGetter } from "./use-stable-getter";
 import { useState } from "./use-state";
-
-export type OmitStrong<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 
 export interface UseGridNavigationRowInfo extends UseRovingTabIndexChildInfo {
     setIsTabbableRow(tabbable: boolean): void;
@@ -32,7 +29,7 @@ export interface UseGridNavigationCellInfo extends UseRovingTabIndexChildInfo { 
 export type UseGridNavigationCellParameters<IC extends UseGridNavigationCellInfo> = UseRovingTabIndexChildParameters<IC>;
 
 export interface UseGridNavigationRowReturnType<R extends Element, C extends Element, _IR extends UseGridNavigationRowInfo, IC extends UseGridNavigationCellInfo> {
-    useGridNavigationRowProps: <P extends h.JSX.HTMLAttributes<R>>(props: P) => UseRefElementPropsReturnType<R, UseRefElementPropsReturnType<R, h.JSX.HTMLAttributes<R>>>;
+    useGridNavigationRowProps: (props: h.JSX.HTMLAttributes<R>) => h.JSX.HTMLAttributes<R>;
     useGridNavigationCell: UseGridNavigationCell<C, IC>;
     cellCount: number;
     isTabbableRow: boolean | null;
@@ -55,7 +52,7 @@ export interface UseGridNavigationParameters {
     indexDemangler?(mangled: number): number
 }
 
-export function useGridNavigation<R extends Element, C extends Element, IR extends UseGridNavigationRowInfo, IC extends UseGridNavigationCellInfo>({ shouldFocusOnChange, indexMangler, indexDemangler }: UseGridNavigationParameters) {
+export function useGridNavigation<R extends HTMLElement, C extends Element, IR extends UseGridNavigationRowInfo, IC extends UseGridNavigationCellInfo>({ shouldFocusOnChange, indexMangler, indexDemangler }: UseGridNavigationParameters) {
 
     indexMangler ??= identity;
     indexDemangler ??= identity;
@@ -227,11 +224,8 @@ export function useGridNavigation<R extends Element, C extends Element, IR exten
             hidden,
             ...info
         } as any as IR);
-        //const { useLinearNavigationChildProps: useLinearNavigationChildRowProps } = useLinearNavigationChildRow(info as IR)
 
-        const useGridNavigationRowProps = useCallback(<P extends h.JSX.HTMLAttributes<R>>(props: P) => useManagedRowProps(useLinearNavigationCellProps(useMergedProps<R>()({ hidden: !!hidden, "data-index": rowIndex }, props))), [useManagedRowProps, !!hidden]);
-
-
+        const useGridNavigationRowProps = useCallback(<P extends h.JSX.HTMLAttributes<R>>(props: P) => useManagedRowProps(useLinearNavigationCellProps(useMergedProps<R>({ hidden: !!hidden, "data-index": rowIndex } as h.JSX.HTMLAttributes<R>, props))), [useManagedRowProps, !!hidden]);
 
         const getRowIndex = useStableGetter(rowIndex);
         const useGridNavigationCell: UseGridNavigationCell<C, IC> = useCallback((info: UseGridNavigationCellParameters<IC>) => {
@@ -250,7 +244,7 @@ export function useGridNavigation<R extends Element, C extends Element, IR exten
                 setCurrentColumn2(info.index);
             }, [info.index])
 
-            const useGridNavigationCellProps = useCallback(<P extends h.JSX.HTMLAttributes<C>>(props: P) => useRovingTabIndexChildProps((useMergedProps<C>()({ onClick }, props))), [useRovingTabIndexChildProps]);
+            const useGridNavigationCellProps = useCallback(<P extends h.JSX.HTMLAttributes<C>>(props: P) => useRovingTabIndexChildProps((useMergedProps<C>({ onClick }, props))), [useRovingTabIndexChildProps]);
 
             return { tabbable, useGridNavigationCellProps };
         }, []);

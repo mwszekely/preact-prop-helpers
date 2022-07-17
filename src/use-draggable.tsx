@@ -1,10 +1,10 @@
 import { h, Ref } from "preact";
 import { useCallback, useRef } from "preact/hooks";
-import { MergedProps, useMergedProps } from "./use-merged-props";
+import { useMergedProps } from "./use-merged-props";
 import { useState } from "./use-state";
 
-interface UseDraggableReturnType<E extends EventTarget> {
-    useDraggableProps: UseDraggableProps<E>;
+export interface UseDraggableReturnType<E extends EventTarget> {
+    useDraggableProps: (p: h.JSX.HTMLAttributes<E>) => h.JSX.HTMLAttributes<E>;
 
     /**
      * Returns true if the element in question is currently being dragged
@@ -23,12 +23,6 @@ interface UseDraggableReturnType<E extends EventTarget> {
     getLastDropEffect: () => (DataTransfer["dropEffect"] | null);
 }
 
-type UseDraggableProps<E extends EventTarget> = <P extends h.JSX.HTMLAttributes<E>>(p: P) => MergedProps<E, {
-    draggable: boolean;
-    onDragStart: (e: DragEvent) => void;
-    onDragEnd: (e: DragEvent) => void;
-    ref: Ref<E>;
-}, P>;
 
 export interface UseDraggableParameters {
 
@@ -91,7 +85,7 @@ export function useDraggable<E extends HTMLElement>({ effectAllowed, data, dragI
         };
 
 
-        return useMergedProps<E>()({
+        return useMergedProps<E>({
             draggable: true,
             onDragStart,
             onDragEnd,
@@ -106,14 +100,7 @@ export function useDraggable<E extends HTMLElement>({ effectAllowed, data, dragI
         useDraggableProps,
         dragging,
         getDragging,
-
-        // Set once a drag has completed with the resulting action
-        // Useful for removing the element afterwards if it was "move"
         lastDropEffect,
-
-        /**
-         * Test
-         */
         getLastDropEffect
     };
 

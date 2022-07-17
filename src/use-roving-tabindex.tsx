@@ -1,17 +1,12 @@
 import { h } from "preact";
 import { useCallback, useEffect } from "preact/hooks";
 import { ManagedChildInfo, useChildFlag, useChildManager, UseChildManagerReturnType } from "./use-child-manager";
-import { MergedProps, useMergedProps } from "./use-merged-props";
-import { UseRefElementPropsReturnType } from "./use-ref-element";
+import { useMergedProps } from "./use-merged-props";
 import { useStableGetter } from "./use-stable-getter";
 import { useState } from "./use-state";
 
-export type OmitStrong<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
-
-
-
 /** Return type of `useRovingTabIndex` */
-export interface UseRovingTabIndexReturnType<I extends UseRovingTabIndexChildInfo> extends OmitStrong<UseChildManagerReturnType<I>, "useManagedChild"> {
+export interface UseRovingTabIndexReturnType<I extends UseRovingTabIndexChildInfo> extends Omit<UseChildManagerReturnType<I>, "useManagedChild"> {
     useRovingTabIndexChild: UseRovingTabIndexChild<I>;
     childCount: number;
 
@@ -21,8 +16,8 @@ export interface UseRovingTabIndexReturnType<I extends UseRovingTabIndexChildInf
 
 /** Return type of `useRovingTabIndexChild` */
 export interface UseRovingTabIndexChildReturnType<ChildElement extends Element> {
-    useRovingTabIndexChildProps: UseRovingTabIndexChildProps<ChildElement>;
-    useRovingTabIndexSiblingProps: UseRovingTabIndexSiblingProps<ChildElement>;
+    useRovingTabIndexChildProps: (props: h.JSX.HTMLAttributes<ChildElement>) => h.JSX.HTMLAttributes<ChildElement>;
+    useRovingTabIndexSiblingProps: <SiblingElement extends Element>(props: h.JSX.HTMLAttributes<SiblingElement>) => h.JSX.HTMLAttributes<SiblingElement>;
     tabbable: boolean | null;
 }
 
@@ -50,7 +45,7 @@ export interface UseRovingTabIndexParameters {
     shouldFocusOnChange(): boolean;
 }
 
-export type UseRovingTabIndexChildParameters<I extends UseRovingTabIndexChildInfo> = OmitStrong<I, "setTabbable" | "getTabbable" | "rerenderAndFocus">;
+export type UseRovingTabIndexChildParameters<I extends UseRovingTabIndexChildInfo> = Omit<I, "setTabbable" | "getTabbable" | "rerenderAndFocus">;
 
 /** Arguments passed to the child 'useRovingTabIndexChild` */
 export interface UseRovingTabIndexChildInfo extends ManagedChildInfo<number> {
@@ -61,20 +56,10 @@ export interface UseRovingTabIndexChildInfo extends ManagedChildInfo<number> {
 
 
 
-//export type UseRovingTabIndexChildParameters<I extends RovingTabIndexChildInfo> = OmitStrong<I, "setTabbable" | "getTabbable" | "rerenderAndFocus">;
+//export type UseRovingTabIndexChildParameters<I extends RovingTabIndexChildInfo> = Omit<I, "setTabbable" | "getTabbable" | "rerenderAndFocus">;
 
 /** Type of the child's sub-hook */
 export type UseRovingTabIndexChild<I extends UseRovingTabIndexChildInfo> = <ChildElement extends Element>(props: I) => UseRovingTabIndexChildReturnType<ChildElement>;
-
-export type UseRovingTabIndexChildPropsParameters<ChildElement extends Element> = h.JSX.HTMLAttributes<ChildElement>;
-export type UseRovingTabIndexSiblingPropsParameters<ChildElement extends Element> = h.JSX.HTMLAttributes<ChildElement>;
-
-/** Return type of the child `useRovingTabIndexChildProps` */
-export type UseRovingTabIndexChildPropsReturnType<ChildElement extends Element, P extends h.JSX.HTMLAttributes<ChildElement>> = MergedProps<ChildElement, UseRefElementPropsReturnType<ChildElement, { tabIndex: number; }>, OmitStrong<P, "tabIndex">>;
-export type UseRovingTabIndexSiblingPropsReturnType<ChildElement extends Element, P extends h.JSX.HTMLAttributes<ChildElement>> = P; //MergedProps<ChildElement, { tabIndex: number; }, OmitStrong<P, "tabIndex">>;
-
-export type UseRovingTabIndexChildProps<ChildElement extends Element> = <P extends UseRovingTabIndexChildPropsParameters<ChildElement>>(props: P) => UseRovingTabIndexChildPropsReturnType<ChildElement, P>
-export type UseRovingTabIndexSiblingProps<ChildElement extends Element> = <P extends UseRovingTabIndexSiblingPropsParameters<ChildElement>>(props: P) => UseRovingTabIndexSiblingPropsReturnType<ChildElement, P>
 
 /**
  * Implements a roving tabindex system where only one "focusable"
@@ -158,7 +143,7 @@ export function useRovingTabIndex<I extends UseRovingTabIndexChildInfo>({ should
             }
         }, [tabbable, rrafIndex]);
 
-        function useRovingTabIndexSiblingProps<P extends UseRovingTabIndexSiblingPropsParameters<any>>({ tabIndex, ...props }: P): UseRovingTabIndexSiblingPropsReturnType<any, P> {
+        function useRovingTabIndexSiblingProps<SiblingElement extends Element>({ tabIndex, ...props }: h.JSX.HTMLAttributes<SiblingElement>): h.JSX.HTMLAttributes<SiblingElement> {
 
             if (tabIndex == null) {
                 if (tabbable)
@@ -167,11 +152,11 @@ export function useRovingTabIndex<I extends UseRovingTabIndexChildInfo>({ should
                     tabIndex = -1;
             }
 
-            return useMergedProps<Element>()({ tabIndex }, props) as P;
+            return useMergedProps<SiblingElement>({ tabIndex }, props);
         }
 
 
-        function useRovingTabIndexChildProps<P extends UseRovingTabIndexChildPropsParameters<ChildElement>>({ tabIndex, ...props }: P): UseRovingTabIndexChildPropsReturnType<ChildElement, P> {
+        function useRovingTabIndexChildProps({ tabIndex, ...props }: h.JSX.HTMLAttributes<ChildElement>): h.JSX.HTMLAttributes<ChildElement> {
 
 
             if (tabIndex == null) {
@@ -181,7 +166,7 @@ export function useRovingTabIndex<I extends UseRovingTabIndexChildInfo>({ should
                     tabIndex = -1;
             }
 
-            return useMergedProps<ChildElement>()(useManagedChildProps({ tabIndex }), props);
+            return useMergedProps<ChildElement>(useManagedChildProps({ tabIndex }), props);
         }
 
         return {

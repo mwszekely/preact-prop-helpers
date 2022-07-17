@@ -4,23 +4,15 @@ import { isFocusable } from "tabbable";
 import { useActiveElement } from "./use-active-element";
 import { getTopElement, useBlockingElement } from "./use-blocking-element";
 import { getDocument } from "./use-document-class";
-import { MergedProps, useMergedProps } from "./use-merged-props";
-import { UseRefElementPropsReturnType, UseRefElementReturnType } from "./use-ref-element";
+import { useMergedProps } from "./use-merged-props";
+import { UseRefElementReturnType } from "./use-ref-element";
 import { useStableCallback } from "./use-stable-callback";
 
 export interface UseFocusTrapParameters { trapActive: boolean; }
 
 export interface UseFocusTrapReturnType<E extends Element> extends Omit<UseRefElementReturnType<E>, "useRefElementProps"> {
-    useFocusTrapProps: UseFocusTrapProps<E>;
+    useFocusTrapProps: (props: h.JSX.HTMLAttributes<E>) => h.JSX.HTMLAttributes<E>;
 }
-
-
-export interface UseFocusTrapPropsParameters<E extends Node> extends h.JSX.HTMLAttributes<E> { }
-export type UseFocusTrapPropsReturnType<E extends Node, P extends h.JSX.HTMLAttributes<E>> = MergedProps<E, UseRefElementPropsReturnType<E, P>, {  }>
-
-export type UseFocusTrapProps<E extends Element> = <P extends UseFocusTrapPropsParameters<E>>(props: P) => UseFocusTrapPropsReturnType<E, P>;
-
-
 
 const elementsToRestoreFocusTo = new Map<Element | null, (Node & HTMLOrSVGElement)>();
 
@@ -89,10 +81,10 @@ export function useFocusTrap<E extends HTMLElement>({ trapActive }: UseFocusTrap
         handleActiveChange(trapActive, getElement());
     }, [trapActive]);
 
-    const useFocusTrapProps = (<P extends UseFocusTrapPropsParameters<E>>(props: P) => {
+    const useFocusTrapProps = ((props: h.JSX.HTMLAttributes<E>) => {
         const p1 = useActiveElementProps(props);
         const p2 = { "aria-modal": trapActive ? "true" : undefined } as h.JSX.HTMLAttributes<E>;
-        return useMergedProps<E>()(p1, p2);
+        return useMergedProps<E>(p1, p2);
     });
 
 

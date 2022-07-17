@@ -3,31 +3,24 @@ import { useCallback, useEffect, useRef } from "preact/hooks";
 import { ManagedChildInfo } from "./use-child-manager";
 import { useLayoutEffect } from "./use-layout-effect";
 import { useLogicalDirection } from "./use-logical-direction";
-import { MergedProps, useMergedProps } from "./use-merged-props";
-import { UseRefElementPropsReturnType } from "./use-ref-element";
+import { useMergedProps } from "./use-merged-props";
 import { useStableCallback } from "./use-stable-callback";
 import { useState } from "./use-state";
 import { useTimeout } from "./use-timeout";
 
-
-
-
-
-
-
-
 export interface UseLinearNavigationReturnType<ChildElement extends Element> {
     // These props can be attatched either to the parent or to each individual child.
     // Whichever works better for your scenario.
-    useLinearNavigationProps: UseLinearNavigationProps<ChildElement>;
+    useLinearNavigationProps: (props: h.JSX.HTMLAttributes<ChildElement>) => h.JSX.HTMLAttributes<ChildElement>;
 }
 
-export type UseLinearNavigationProps<ChildElement extends Element> = <P extends h.JSX.HTMLAttributes<ChildElement>>(props: P) => UseRefElementPropsReturnType<ChildElement, h.JSX.HTMLAttributes<ChildElement>>
-
-
-
 /** Arguments passed to the parent `useLinearNavigation` */
-interface UseLinearNavigationParametersBase {
+export interface UseLinearNavigationParameters {
+    navigateToNext(): void;
+    navigateToPrev(): void;
+    navigateToFirst(): void;
+    navigateToLast(): void;
+    index: number;
     /**
      * Controls which arrow keys are used to navigate through the component.
      * Relative to the writing mode, so in English, "inline" corresponds
@@ -61,21 +54,9 @@ interface UseLinearNavigationParametersBase {
 
 }
 
-export interface UseLinearNavigationParameters extends UseLinearNavigationParametersBase {
-    navigateToNext(): void;
-    navigateToPrev(): void;
-    navigateToFirst(): void;
-    navigateToLast(): void;
-    index: number;
-}
-
 
 /** Arguments passed to the child 'useLinearNavigationChild` */
 export interface UseLinearNavigationChildInfo extends ManagedChildInfo<number> { }
-
-/** Return type of the child `useLinearNavigationChildProps` */
-export type UseLinearNavigationChildPropsReturnType<ChildElement extends Element, P extends {}> = MergedProps<ChildElement, UseRefElementPropsReturnType<ChildElement, { tabIndex: number; }>, Omit<P, "tabIndex">>;
-
 
 /**
  * When used in tandem with `useRovingTabIndex`, allows control of
@@ -83,7 +64,7 @@ export type UseLinearNavigationChildPropsReturnType<ChildElement extends Element
  * 
  * @see useListNavigation, which packages everything up together.
  */
-export function useLinearNavigation<ChildElement extends Element>({ index, navigateToFirst, navigateToLast, navigateToNext, navigateToPrev, managedChildren, navigationDirection, disableArrowKeys, disableHomeEndKeys }: UseLinearNavigationParameters): UseLinearNavigationReturnType<ChildElement> {
+export function useLinearNavigation<ChildElement extends HTMLElement>({ index, navigateToFirst, navigateToLast, navigateToNext, navigateToPrev, managedChildren, navigationDirection, disableArrowKeys, disableHomeEndKeys }: UseLinearNavigationParameters): UseLinearNavigationReturnType<ChildElement> {
 
     navigationDirection ??= "either";
 
@@ -198,7 +179,7 @@ export function useLinearNavigation<ChildElement extends Element>({ index, navig
 
 
     return {
-        useLinearNavigationProps: useCallback(<P extends h.JSX.HTMLAttributes<ChildElement>>(props: P) => { return useLogicalDirectionProps(useMergedProps<ChildElement>()({ onKeyDown }, props)) }, []),
+        useLinearNavigationProps: useCallback(<P extends h.JSX.HTMLAttributes<ChildElement>>(props: P) => { return useLogicalDirectionProps(useMergedProps<ChildElement>({ onKeyDown }, props)) }, []),
     }
 
 
@@ -221,7 +202,7 @@ export interface UseTypeaheadNavigationReturnType<ChildElement extends Element, 
     invalidTypeahead: boolean | null;
 }
 
-export type UseTypeaheadNavigationProps<E extends Element> = <P extends h.JSX.HTMLAttributes<E>>(props: P) => MergedProps<E, P, P>
+export type UseTypeaheadNavigationProps<E extends Element> = (props: h.JSX.HTMLAttributes<E>) => h.JSX.HTMLAttributes<E>;
 export type UseTypeaheadNavigationChildReturnType<_E extends Element> = void;
 
 
@@ -250,13 +231,6 @@ export interface UseTypeaheadNavigationChildParameters extends UseTypeaheadNavig
 
 /** Type of the child's sub-hook */
 export type UseTypeaheadNavigationChild<ChildElement extends Element, I extends UseTypeaheadNavigationChildInfo> = ({ text, index, ...i }: I) => UseTypeaheadNavigationChildReturnType<ChildElement>;
-
-/** Return type of the child `useTypeaheadNavigationChildProps` */
-export type UseTypeaheadNavigationPropsReturnType<ChildElement extends Element, P extends {}> = MergedProps<ChildElement, UseRefElementPropsReturnType<ChildElement, {
-    onKeyDown: (e: KeyboardEvent) => void;
-    onCompositionStart: (e: CompositionEvent) => void;
-    onCompositionEnd: (e: CompositionEvent) => void;
-}>, P>;
 
 
 /**
@@ -329,7 +303,7 @@ export function useTypeaheadNavigation<ChildElement extends Element, I extends U
     });
 
 
-    const useTypeaheadNavigationProps: UseTypeaheadNavigationProps<ChildElement> = useCallback(function <P extends h.JSX.HTMLAttributes<ChildElement>>({ ...props }: P): UseTypeaheadNavigationPropsReturnType<ChildElement, P> {
+    const useTypeaheadNavigationProps: UseTypeaheadNavigationProps<ChildElement> = useCallback(function ({ ...props }: h.JSX.HTMLAttributes<ChildElement>): h.JSX.HTMLAttributes<ChildElement> {
 
         const onCompositionStart = (_e: CompositionEvent) => { setImeActive(true) };
         const onCompositionEnd = (e: CompositionEvent) => {
@@ -383,7 +357,7 @@ export function useTypeaheadNavigation<ChildElement extends Element, I extends U
 
         };
 
-        return useMergedProps<ChildElement>()({ onKeyDown, onCompositionStart, onCompositionEnd, }, props);
+        return useMergedProps<ChildElement>({ onKeyDown, onCompositionStart, onCompositionEnd, }, props);
     }, []);
 
     // Handle changes in typeahead that cause changes to the tabbable index

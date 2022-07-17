@@ -16,7 +16,7 @@ const RandomWords = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, se
 const DemoUseDroppable = () => {
     const { droppedFiles, droppedStrings, filesForConsideration, stringsForConsideration, useDroppableProps, dropError } = useDroppable<HTMLDivElement>({ effect: "copy" });
 
-    const { ref: _ref } = useMergedProps<HTMLInputElement>()({}, { ref: useRef<HTMLInputElement>(null!) })
+    const { ref: _ref } = useMergedProps<HTMLInputElement>({}, { ref: useRef<HTMLInputElement>(null!) })
 
     const p = useDroppableProps({ className: "demo droppable" });
 

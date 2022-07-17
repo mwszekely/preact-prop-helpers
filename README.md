@@ -91,58 +91,40 @@ return <div {...useMergedProps<HTMLDivElement>()(props1, props2)} />
 ## `useRefElement`
 
 ```tsx
-export function useRefElement<T extends EventTarget>(): UseRefElementReturnType<T>;
-function useRefElementProps<P extends UseRefElementPropsParameters<T>>(props: P): MergedProps<..., P>;
+
+function Example() {
+    const [element, setElement] = useState<HTMLInputElement | null>(null);
+    const { useRefElementProps } = useRefElement<HTMLInputElement>({ onMount: setElement });
+    return (<input {...useRefElementProps({ type: "number" })} />)
+}
+
+
+export function useRefElement<T extends EventTarget>(params?: UseRefElementParameters<T>): UseRefElementReturnType<T>;
+
+export interface UseRefElementParameters<T extends EventTarget> {
+    onMount?: (element: T) => void;
+    onUnmount?: (element: T) => void;
+    // The two combined like useEffect -- return a cleanup function on unmount
+    onElementChange?: OnPassiveStateChange<T | null>;
+}
 
 export interface UseRefElementReturnType<T extends EventTarget> {
-    element: T | null;
-    getElement(): T | null; // Stable (w.r.t. dependency arrays)
+    // Stable
+    getElement: () => T | null;
+    // Required prop-modifying function
     useRefElementProps: UseRefElementProps<T>;
 }
 ```
+
+Lets your component be notified when the rendered `Element` has mounted/unmounted.
+
+The easiest way to use is by just hooking up a `useState`'s `setState` to the `onMount` argument, though if performance is a concern you may not need to re-render the entire component just because the element rendering it mounted. Use `onElementChange` for these cases, which allows for a `useEffect`-like callback and won't inherently cause a re-render. 
 
 Returns the element referenced by a ref as soon as the element mounts, before the first paint.  Don't forget to always include the element as a dependency argument whereever you use it, not just because it's required, but also so that you can use the `element` as soon as it's ready, which is almost always the whole point.
 
 That being said, if you do need the element and explicitly need to leave it *out* of a dependency array, `getElement` can do that, as it is stable across all renders.
 
 You can either store the element via `setState` and re-render to do something in `useEffect`, or you can use `getElement` to just use the element during, e.g., and event handler, which won't cause a re-render.
-
-Example #1:
-```tsx
-const [element, setElement] = useState<HTMLDivElement>(null);
-
-const { getElement, useRefElementProps } = useRefElement<HTMLDivElement>({ 
-    onElementChange: setElement
-});
-
-useLayoutEffect(() => {
-    if (element) {
-        // Do something fun with the HTMLDivElement.
-
-        return () => { /* Fun time's over, we're unmounting */ }
-    }
-}, [element]);
-
-return <div {...useRefElementProps(props)} />
-```
-
-Example #2:
-```tsx
-const { getElement, useRefElementProps } = useRefElement<HTMLDivElement>({ 
-
-    // Optional, but if onElementChange exists,
-    // the function must be stable across all renders,
-    // which the setElement from useState is.
-    onElementChange: setElement
-});
-
-return <div {...useRefElementProps({ onClick: e => {
-    const element = getElement();
-    if (element) {
-        // Do something fun with the HTMLDivElement.
-    }
-} })} />
-```
 
 ## `useDraggable`, `useDroppable`
 ```tsx
@@ -156,7 +138,7 @@ function useDroppableProps<P extends UseDroppablePropsParameters<E>>(props: P): 
 
 `useDroppable` lets an element accept things that are being dragged.  While a draggable object is hovering over the element, this hook will return the MIME types of the data and/or the files that are being dragged. After it's been dropped, the hook will return the actual string/file data (possibly after asynchronously waiting for it to load).
 
-## `useChildManager`
+## `useChildManager` (&amp; `useChildFlag`)
 ```tsx
 export function useChildManager<I extends ManagedChildInfo>(): UseChildManagerReturnType<I>;
 function useManagedChild<ChildType extends EventTarget>(info: I): void;

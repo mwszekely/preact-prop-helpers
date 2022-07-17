@@ -2,7 +2,7 @@ import { h } from "preact";
 import { useCallback, useEffect, useRef } from "preact/hooks";
 import { getDocument } from "./use-document-class";
 import { OnPassiveStateChange, returnNull, useEnsureStability, usePassiveState } from "./use-passive-state";
-import { useRefElement, UseRefElementProps } from "./use-ref-element";
+import { useRefElement, UseRefElementReturnType } from "./use-ref-element";
 
 interface UseElementSizeParameters {
     /**
@@ -22,9 +22,6 @@ interface UseElementSizeParameters {
     getObserveBox?(): ResizeObserverOptions["box"];
 }
 
-export type UseElementSizeProps<E extends HTMLElement> = UseRefElementProps<E>;
-export interface UseElementSizePropsParameters<E extends HTMLElement> extends h.JSX.HTMLAttributes<E> { }
-
 export interface ElementSize {
     clientWidth: number;
     scrollWidth: number;
@@ -43,7 +40,7 @@ export interface ElementSize {
 export interface UseElementSizeReturnType<E extends HTMLElement> {
     getElement(): E | null;
     getSize(): ElementSize | null;
-    useElementSizeProps: UseElementSizeProps<E>;
+    useElementSizeProps: UseRefElementReturnType<E>["useRefElementProps"];
 }
 
 
