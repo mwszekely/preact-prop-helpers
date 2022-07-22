@@ -102,7 +102,7 @@ export function useRandomId<S extends Element>({ prefix }: UseRandomIdParameters
 
     const useRandomIdReferencerElement = useCallback<UseRandomIdReferencerElement>(<R extends Element>(idPropName: keyof h.JSX.HTMLAttributes<R>) => {
         // Whatever ID was most recently used by the actual "id" prop of the source element
-        const [usedId, setUsedId, getUsedId] = useState<string | undefined>(undefined);
+        const [usedId, setUsedId, _getUsedId] = useState<string | undefined>(undefined);
         useEnsureStability(idPropName);
 
         const { useManagedChildProps } = useManagedChild<any>({ index: "referencer", sendSourceIdToReferencerElement: setUsedId })

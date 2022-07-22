@@ -30,7 +30,7 @@ export function useRefElement<T extends EventTarget>(args?: UseRefElementParamet
 
     // Called (indirectly) by the ref that the element receives.
     const handler = useCallback<OnPassiveStateChange<T | null>>((e, prevValue) => {
-        let cleanup = onElementChange?.(e, prevValue);
+        const cleanup = onElementChange?.(e, prevValue);
         if (prevValue)
             onUnmount?.(prevValue!);
 
