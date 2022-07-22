@@ -1,4 +1,4 @@
-import { Inputs, useCallback, useRef, useReducer } from "preact/hooks";
+import { Inputs, useCallback, useRef } from "preact/hooks";
 import { EffectChange } from "./use-effect";
 import { useLayoutEffect } from "./use-layout-effect";
 import { useRefElement, UseRefElementReturnType } from "./use-ref-element";
