@@ -2,7 +2,7 @@ import { h } from "preact";
 import { useCallback, useEffect, useRef } from "preact/hooks";
 import { getDocument } from "./use-document-class";
 import { OnPassiveStateChange, returnNull, useEnsureStability, usePassiveState } from "./use-passive-state";
-import { useRefElement, UseRefElementProps } from "./use-ref-element";
+import { useRefElement, UseRefElementReturnType } from "./use-ref-element";
 
 interface UseElementSizeParameters {
     /**
@@ -22,9 +22,6 @@ interface UseElementSizeParameters {
     getObserveBox?(): ResizeObserverOptions["box"];
 }
 
-export type UseElementSizeProps<E extends HTMLElement> = UseRefElementProps<E>;
-export interface UseElementSizePropsParameters<E extends HTMLElement> extends h.JSX.HTMLAttributes<E> { }
-
 export interface ElementSize {
     clientWidth: number;
     scrollWidth: number;
@@ -40,14 +37,15 @@ export interface ElementSize {
     offsetTop: number | undefined;
 }
 
-export interface UseElementSizeReturnType<E extends HTMLElement> {
+export interface UseElementSizeReturnType<E extends HTMLElement | SVGElement> {
     getElement(): E | null;
     getSize(): ElementSize | null;
-    useElementSizeProps: UseElementSizeProps<E>;
+    /** **STABLE** */
+    useElementSizeProps: UseRefElementReturnType<E>["useRefElementProps"];
 }
 
 
-export function useElementSize<E extends HTMLElement>({ getObserveBox, onSizeChange }: UseElementSizeParameters): UseElementSizeReturnType<E> {
+export function useElementSize<E extends HTMLElement | SVGElement>({ getObserveBox, onSizeChange }: UseElementSizeParameters): UseElementSizeReturnType<E> {
 
     useEnsureStability("useElementSize", getObserveBox, onSizeChange);
 
@@ -62,7 +60,7 @@ export function useElementSize<E extends HTMLElement>({ getObserveBox, onSizeCha
 
             const handleUpdate = () => {
                 if (element.isConnected) {
-                    const { clientWidth, scrollWidth, offsetWidth, clientHeight, scrollHeight, offsetHeight, clientLeft, scrollLeft, offsetLeft, clientTop, scrollTop, offsetTop } = element;
+                    const { clientWidth, scrollWidth, offsetWidth, clientHeight, scrollHeight, offsetHeight, clientLeft, scrollLeft, offsetLeft, clientTop, scrollTop, offsetTop } = (element as HTMLElement);
                     setSize({ clientWidth, scrollWidth, offsetWidth, clientHeight, scrollHeight, offsetHeight, clientLeft, scrollLeft, offsetLeft, clientTop, scrollTop, offsetTop });
                 }
             }

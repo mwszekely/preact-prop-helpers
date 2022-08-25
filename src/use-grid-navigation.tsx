@@ -1,19 +1,11 @@
 import { h } from "preact";
-import { useCallback } from "preact/hooks";
-import { useChildFlag, useChildManager } from "./use-child-manager";
-import { useEffect } from "./use-effect";
-import { useForceUpdate } from "./use-force-update";
-import { useLinearNavigation, useTypeaheadNavigation } from "./use-keyboard-navigation";
-import { tryNavigateToIndex } from "./use-list-navigation";
-import { useMergedProps } from "./use-merged-props";
-import { UseRefElementPropsReturnType } from "./use-ref-element";
-import { useRovingTabIndex, UseRovingTabIndexChildInfo, UseRovingTabIndexChildParameters } from "./use-roving-tabindex";
+import { useCallback, useEffect } from "preact/hooks";
+import { RovingTabIndexChildInfoBase } from "./use-roving-tabindex";
+import { ManagedChildren, UseManagedChildrenParameters } from "./use-child-manager";
+import { ListNavigationChildInfoBase, useListNavigation, UseListNavigationChildInfoNeeded, UseListNavigationParameters } from "./use-list-navigation";
 import { useStableCallback } from "./use-stable-callback";
-import { useStableGetter } from "./use-stable-getter";
 import { useState } from "./use-state";
-
-export type OmitStrong<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
-
+/*
 export interface UseGridNavigationRowInfo extends UseRovingTabIndexChildInfo {
     setIsTabbableRow(tabbable: boolean): void;
     getIsTabbableRow(): boolean | null;
@@ -22,7 +14,7 @@ export interface UseGridNavigationRowInfo extends UseRovingTabIndexChildInfo {
      * If a grid row is hidden, it will be skipped over
      * during keyboard navigation, and the HTML `hidden`
      * attribute will be applied.
-     */
+     *
     hidden?: boolean;
 }
 
@@ -32,7 +24,7 @@ export interface UseGridNavigationCellInfo extends UseRovingTabIndexChildInfo { 
 export type UseGridNavigationCellParameters<IC extends UseGridNavigationCellInfo> = UseRovingTabIndexChildParameters<IC>;
 
 export interface UseGridNavigationRowReturnType<R extends Element, C extends Element, _IR extends UseGridNavigationRowInfo, IC extends UseGridNavigationCellInfo> {
-    useGridNavigationRowProps: <P extends h.JSX.HTMLAttributes<R>>(props: P) => UseRefElementPropsReturnType<R, UseRefElementPropsReturnType<R, h.JSX.HTMLAttributes<R>>>;
+    useGridNavigationRowProps: (props: h.JSX.HTMLAttributes<R>) => h.JSX.HTMLAttributes<R>;
     useGridNavigationCell: UseGridNavigationCell<C, IC>;
     cellCount: number;
     isTabbableRow: boolean | null;
@@ -46,237 +38,171 @@ export type UseGridNavigationCell<C extends Element, IC extends UseGridNavigatio
     useGridNavigationCellProps: <P extends h.JSX.HTMLAttributes<C>>(props: P) => h.JSX.HTMLAttributes<C>;
 }
 
-function identity<T>(t: T) { return t; }
+*/
+
+export interface UseGridNavigationRowInfoBase<K extends string> extends ListNavigationChildInfoBase<K> {
+    /**
+     * If a child is hidden, then it will be skipped over
+     * during keyboard navigation, and the HTML `hidden`
+     * attribute will be applied.
+     */
+    //hidden?: boolean;
+}
+export interface UseGridNavigationCellInfoBase<K extends string> extends ListNavigationChildInfoBase<K> { }
+
+export type UseGridNavigationRowInfoNeeded<K extends string, I extends UseGridNavigationRowInfoBase<K>> = Omit<UseListNavigationChildInfoNeeded<K, I>, "initialIndex">;
+export type UseGridNavigationCellInfoNeeded<K extends string, I extends UseGridNavigationCellInfoBase<K>> = UseListNavigationChildInfoNeeded<K, I>;
 
 
-export interface UseGridNavigationParameters {
-    shouldFocusOnChange(): boolean,
-    indexMangler?(unmangled: number): number,
-    indexDemangler?(mangled: number): number
+export interface UseGridNavigationParameters<K extends string, IR extends UseGridNavigationRowInfoBase<K>> extends Omit<UseListNavigationParameters<K, IR>, "initialIndex" | "navigationDirection"> {
+    indexMangler?(unmangled: number): number;
+    indexDemangler?(mangled: number): number;
+    onRowMountChange?: UseManagedChildrenParameters<IR>["onChildrenMountChange"];
+    initialRow?: number;
+    initialColumn?: number;
+
+}
+/*
+export type UseGridNavigationRowParameters<K extends string, I extends UseGridNavigationRowInfoBase<K>> = Omit<UseListNavigationParameters<K, I>, "initialIndex" | "onChildrenMountChange" | "noTypeahead" | "navigationDirection"> & UseRovingTabIndexChildParametersBase<K, Omit<UseGridNavigationRowInfoBase<K>, "initialIndex" | "noTypeahead" | "navigationDirection">> & {
+    initialColumn?: number;
+    onRowMountChange?: UseManagedChildrenParameters<I>["onChildrenMountChange"];
+};*/
+
+
+export type UseGridNavigationCell<C extends HTMLElement | SVGElement, K extends string = string, IC extends UseGridNavigationRowInfoBase<K> = UseGridNavigationRowInfoBase<K>> = (p: { info: UseGridNavigationCellInfoNeeded<K, IC> }) => {
+    cellIsTabbable: boolean;
+    getCurrentColumn(): number | null;
+    useGridNavigationCellProps: <P extends h.JSX.HTMLAttributes<C>>(props: P) => h.JSX.HTMLAttributes<C>;
 }
 
-export function useGridNavigation<R extends Element, C extends Element, IR extends UseGridNavigationRowInfo, IC extends UseGridNavigationCellInfo>({ shouldFocusOnChange, indexMangler, indexDemangler }: UseGridNavigationParameters) {
+export type UseGridNavigationRowParameters<KR extends string, KC extends string, IR extends UseGridNavigationRowInfoBase<KR>, IC extends UseGridNavigationRowInfoBase<KC>> = { info: UseGridNavigationRowInfoNeeded<KR, IR> } & Omit<UseListNavigationParameters<KC, IC>, "noTypeahead" | "navigationDirection">;
+export type UseGridNavigationRow<R extends HTMLElement, C extends HTMLElement | SVGElement, KR extends string = string, KC extends string = string, IR extends UseGridNavigationRowInfoBase<KR> = UseGridNavigationRowInfoBase<KR>, IC extends UseGridNavigationRowInfoBase<KC> = UseGridNavigationRowInfoBase<KC>> = (a: UseGridNavigationRowParameters<KR, KC, IR, IC>) => {
+    rowIsTabbable: boolean;
+    cells: ManagedChildren<IC>;
+    getCurrentColumn(): number | null;
+    useGridNavigationCell: UseGridNavigationCell<C, KC, IC>;
+    useGridNavigationRowProps: <P extends h.JSX.HTMLAttributes<R>>(props: P) => h.JSX.HTMLAttributes<R>;
+}
 
-    indexMangler ??= identity;
-    indexDemangler ??= identity;
+export function useGridNavigation<ParentOrRowElement extends HTMLElement, RowElement extends HTMLElement, CellElement extends HTMLElement, KR extends string = string, KC extends string = string, IR extends UseGridNavigationRowInfoBase<KR> = UseGridNavigationRowInfoBase<KR>, IC extends UseGridNavigationRowInfoBase<KC> = UseGridNavigationRowInfoBase<KC>>({ collator, disableArrowKeys, disableHomeEndKeys, noTypeahead, onTabbableIndexChange, typeaheadTimeout, indexMangler, indexDemangler, initialRow, onRowMountChange: onRowMountChangeUser, initialColumn, onAfterChildLayoutEffect, onChildrenMountChange, onTabbableRender, onTabbedInTo, onTabbedOutOf }: UseGridNavigationParameters<KR, IR>) {
+    const [currentColumn, setCurrentColumn, getCurrentColumn] = useState<number | null>(initialColumn ?? 0);
+    initialRow ??= 0;
+    initialColumn ??= 0;
 
-    const getFocusCellOnRowChange = useStableCallback(shouldFocusOnChange);
-
-    // Keep track of our currently tabbable row and column.
-    // These are mangled, and so relative to the DOM order, not component order.
-    // Any operations done on these numbers need to be demangled first,
-    // otherwise they'll be incorrect.
-    const [currentRow, setCurrentRow2, getCurrentRow] = useState<number | null>(0);
-    const [currentColumn, setCurrentColumn2, getCurrentColumn] = useState(0);
-
-    // Functions used for navigating to different rows.
-    // Each row has its own useRovingTabIndex -- if it's not the 
-    // current row, then all of its children are non-tabbable.
-    // Otherwise, it is tabbable, with the tabbable cell being currentColumn.
-    // This happens automatically when these functions are called.
-    const navigateToFirstRow = useCallback(() => { setCurrentRow2(c => tryNavigateToIndex(managedRows, c ?? 0, 0, 1, indexMangler!, indexDemangler!)); }, [indexMangler, indexDemangler])
-    const navigateToLastRow = useCallback(() => { setCurrentRow2(c => tryNavigateToIndex(managedRows, c ?? 0, managedRows.length - 1, -1, indexMangler!, indexDemangler!)); }, [indexMangler, indexDemangler])
-    const navigateToPrevRow = useCallback(() => { setCurrentRow2(c => { return tryNavigateToIndex(managedRows, c ?? 0, indexMangler!(Math.max(0, indexDemangler!(c ?? 0) - 1)), -1, indexMangler!, indexDemangler!); }); }, [indexMangler, indexDemangler])
-    const navigateToNextRow = useCallback(() => { setCurrentRow2(c => { return tryNavigateToIndex(managedRows, c ?? 0, indexMangler!(Math.min((managedRows.length - 1), indexDemangler!(c ?? 0) + 1)), 1, indexMangler!, indexDemangler!); }); }, [indexMangler, indexDemangler]);
-
-    // Track child rows and manage keyboard navigation among them.
-    const { childCount, managedChildren: managedRows, useManagedChild: useManagedRow } = useChildManager<IR>();
-    const { useLinearNavigationProps: useLinearNavigationRowProps } = useLinearNavigation<any>({
-        managedChildren: managedRows,
-        index: indexMangler(getCurrentRow() ?? 0),
-        navigateToFirst: navigateToFirstRow,
-        navigateToLast: navigateToLastRow,
-        navigateToNext: navigateToNextRow,
-        navigateToPrev: navigateToPrevRow,
-        navigationDirection: "block"
-    })
-
-    // Actually handle notifying the relevant rows when they
-    // change from untabbable to tabbable or vice-versa.
-    useChildFlag({
-        activatedIndex: currentRow,
-        managedChildren: managedRows,
-        setChildFlag: (index, tabbable) => { managedRows[index]?.setIsTabbableRow(tabbable) },
-        getChildFlag: (index) => (managedRows[index]?.getIsTabbableRow() ?? null),
-        useEffect: useEffect
+    const {
+        children: rows,
+        currentTypeahead: currentRowTypeahead,
+        invalidTypeahead: invalidRowTypeahead,
+        useListNavigationChild: useGridNavigationRow2,
+        useListNavigationProps: useGridNavigationProps,
+        getTabbableIndex: getTabbableRow
+    } = useListNavigation<ParentOrRowElement, RowElement, KR, IR>({
+        initialIndex: initialRow,
+        collator,
+        disableArrowKeys,
+        disableHomeEndKeys,
+        indexDemangler,
+        indexMangler,
+        navigationDirection: "block",
+        noTypeahead,
+        onTabbableIndexChange,
+        typeaheadTimeout,
+        onAfterChildLayoutEffect,
+        onChildrenMountChange,
+        onTabbableRender,
+        onTabbedInTo,
+        onTabbedOutOf,
     });
 
-    /**
-     * Optional, but provides typeahead for each column in the table.
-     */
-    const useGridNavigationColumn = useCallback(() => {
-        const { currentTypeahead, invalidTypeahead, useTypeaheadNavigationChild } = useTypeaheadNavigation({ getIndex: getCurrentRow, setIndex: setCurrentRow2 });
-
-        const useGridNavigationColumnChild = useCallback(({ index: rowIndex, text, hidden }: { index: number, text: string, hidden?: boolean }) => {
-            useTypeaheadNavigationChild({ index: rowIndex, text: hidden ? null : text });
-        }, [useTypeaheadNavigationChild]);
-
-        return { useGridNavigationColumnChild, currentTypeahead, invalidTypeahead };
-    }, [])
-
-    // Last thing before we return -- here's the hook for individual rows and their cells.
-    const useGridNavigationRow: UseGridNavigationRow<R, C, IR, IC> = useCallback(({ index: rowIndex, hidden, ...info }: UseGridNavigationRowParameters<IR>): UseGridNavigationRowReturnType<R, C, IR, IC> => {
-
-        // When we change the current column, we send that information
-        // to the parent via setState, but that doesn't do anything
-        // for us.  The parent doesn't ever manage rows' cells for them.
-        // 
-        // So to get us to also update alongside the parent,
-        // we just use forceUpdate.
-        // We could also keep a copy of, like, "what this row thinks
-        // the current column is" that *should* always be kept in-
-        // sync with "getCurrentColumn()" as a state variable,
-        // but it *just* being used for that is arguably *more* confusing.
-        //
-        // Basically, information regarding the currently selected column
-        // "belongs" to *both* this row and the parent, conceptually,
-        // but for cleanliness' sake, just one of them gets it,
-        // and the other is manually updated whenever it changes.
-        const forceUpdate = useForceUpdate();
-
-
-        // "Shortcut" for any given row to know that it should or should not
-        // consider one of its cells tabbable.  Also used to determine
-        // if a change to the current selected cell should also
-        // trigger focusing that cell.
-        const [isTabbableRow, setIsTabbableRow, getIsTabbableRow] = useState<boolean | null>(null);
-
-        // If we're not the tabbable row, then for the purposes of tabIndex
-        // calculations, we don't have a tabbable child cell.
-        const currentColumn = isTabbableRow ? getCurrentColumn() : null;
-
-        // Track child cells and manage keyboard navigation among them.
-        const { managedChildren: managedCells, useRovingTabIndexChild: useRovingTabIndexCell, childCount: cellCount } = useRovingTabIndex<IC>({
-            shouldFocusOnChange: useCallback(() => { return !!getFocusCellOnRowChange() && !!getIsTabbableRow() }, []),
-            tabbableIndex: currentColumn
-        });
-
-        // More navigation stuff
-        const navigateToFirstColumn = useCallback(() => {
-            setCurrentColumn2(tryNavigateToIndex(managedCells, 0, 0, 1, identity, identity));
-            forceUpdate();
-        }, [])
-        const navigateToLastColumn = useCallback(() => { setCurrentColumn2(tryNavigateToIndex(managedCells, managedCells.length, managedCells.length, -1, identity, identity)); forceUpdate(); }, [])
-        const navigateToPrevColumn = useCallback(() => {
-            setCurrentColumn2(c => {
-                return tryNavigateToIndex(managedCells, c, c - 1, -1, identity, identity)
-            })
-            forceUpdate();
-        }, [])
-        const navigateToNextColumn = useCallback(() => {
-            setCurrentColumn2(c => {
-                return tryNavigateToIndex(managedCells, c, c + 1, 1, identity, identity);
-            })
-            forceUpdate();
-        }, [])
-
-        const { useLinearNavigationProps: useLinearNavigationCellProps } = useLinearNavigation<R>({
-            managedChildren: managedCells,
-            navigationDirection: "inline",
-            index: currentColumn ?? 0,
-            disableHomeEndKeys: true,
-            navigateToFirst: navigateToFirstColumn,
-            navigateToLast: navigateToLastColumn,
-            navigateToPrev: navigateToPrevColumn,
-            navigateToNext: navigateToNextColumn
-        });
-
-        // Notify the relevant child cells when they should/should not be tabbable
-        useChildFlag({
-            activatedIndex: currentColumn,
-            managedChildren: managedCells,
-            setChildFlag: (cellIndex, cellIsTabbable) => {
-                if (cellIndex != null && managedCells[cellIndex]) {
-                    managedCells[cellIndex].setTabbable(cellIsTabbable);
-
-                    if (cellIsTabbable)
-                        managedCells[cellIndex].rerenderAndFocus();
-                }
-            },
-            getChildFlag: (cellIndex) => (managedCells[cellIndex]?.getTabbable() ?? null),
-            useEffect
-        });
-
-        // Any time we become the currently tabbable row,
-        // make sure that we're in a valid cell, and shift left/right if not to find one.
-        // TODO: Seems kinda janky? Is there no cleaner way to accomplish this,
-        // especially since it's similar to other code?
-        useEffect(() => {
-            if (isTabbableRow) {
-                let cellIndex = getCurrentColumn();
-                while (cellIndex >= 0 && managedCells[cellIndex] == null) {
-                    --cellIndex;
-                }
-                if (cellIndex < 0) {
-                    cellIndex = getCurrentColumn();
-                    while (cellIndex < managedCells.length && managedCells[cellIndex] == null) {
-                        ++cellIndex;
-                    }
-                    if (cellIndex == managedCells.length)
-                        cellIndex = getCurrentColumn();
-                }
-                if (cellIndex != getCurrentColumn())
-                    setCurrentColumn2(cellIndex);
+    const useGridNavigationRow = useCallback<UseGridNavigationRow<RowElement, CellElement, KR, KC, IR, IC>>(({ onChildrenMountChange, info: { flags, index, text, blurSelf: bs, focusSelf: fs, hidden, ...restInfo }, initialIndex, onAfterChildLayoutEffect, collator, disableArrowKeys, disableHomeEndKeys, indexDemangler, indexMangler, onTabbableIndexChange, onTabbableRender, onTabbedInTo, onTabbedOutOf, typeaheadTimeout }) => {
+        const focusSelf = useCallback(() => {
+            if (fs) {
+                fs();
             }
-        }, [isTabbableRow]);
+            else {
+                let c1 = getCurrentColumn2();
+                let c2 = getCurrentColumn();
+                console.assert(c1 == c1);
+                columns.getAt(c2 ?? 0)?.focusSelf?.();
+            }
+        }, []);
+        const blurSelf = useCallback(() => { bs?.() }, []);
+        const { tabbable: rowIsTabbable, useListNavigationChildProps } = useGridNavigationRow2({ info: { flags, index, text, blurSelf, focusSelf, hidden, ...restInfo } as IR });
+        useEffect(() => {
+            if (!rowIsTabbable)
+                setTabbableIndex(null, false);
+        }, [rowIsTabbable])
 
-        const { useManagedChildProps: useManagedRowProps } = useManagedRow<R>({
-            index: rowIndex,
-            setIsTabbableRow,
-            getIsTabbableRow: getIsTabbableRow,
-            hidden,
-            ...info
-        } as any as IR);
-        //const { useLinearNavigationChildProps: useLinearNavigationChildRowProps } = useLinearNavigationChildRow(info as IR)
+        const {
+            children: columns,
+            currentTypeahead: currentColumnTypeahead,
+            invalidTypeahead: invalidColumnTypeahead,
+            useListNavigationChild: useGridNavigationColumn2,
+            useListNavigationProps: useGridNavigationColumnProps,
+            getTabbableIndex: getCurrentColumn2,
+            setTabbableIndex,
+        } = useListNavigation<CellElement, CellElement, KC, IC>({
+            initialIndex,
+            collator,
+            disableArrowKeys,
+            disableHomeEndKeys,
+            indexDemangler,
+            indexMangler,
+            navigationDirection: "inline",
+            noTypeahead: true,
+            onTabbableIndexChange: useStableCallback<NonNullable<typeof onTabbableIndexChange>>((i) => { if (i != null) setCurrentColumn(i); onTabbableIndexChange?.(i); }),
+            typeaheadTimeout,
+            onAfterChildLayoutEffect,
+            onChildrenMountChange,
+            onTabbableRender,
+            onTabbedInTo,
+            onTabbedOutOf
+        });
 
-        const useGridNavigationRowProps = useCallback(<P extends h.JSX.HTMLAttributes<R>>(props: P) => useManagedRowProps(useLinearNavigationCellProps(useMergedProps<R>()({ hidden: !!hidden, "data-index": rowIndex }, props))), [useManagedRowProps, !!hidden]);
+        const useGridNavigationCell = useCallback<UseGridNavigationCell<CellElement, KC, IC>>(({ info: { blurSelf: bs, focusSelf: fs, flags, index, text, hidden, ...restInfo } }) => {
+            const focusSelf = useStableCallback(() => {
+                if (fs)
+                    fs();
+                else
+                    getElement()?.focus();
+            });
+            const blurSelf = useStableCallback(() => {
+                if (bs)
+                    bs();
+                else
+                    getElement()?.blur();
+            });
+            const { tabbable: cellIsTabbable, useListNavigationChildProps, getElement } = useGridNavigationColumn2({ info: { flags, index, text, blurSelf, focusSelf, hidden, ...restInfo } as IC });
 
+            return {
+                cellIsTabbable,
+                getCurrentColumn,
+                useGridNavigationCellProps: function <P extends h.JSX.HTMLAttributes<CellElement>>(props: P) { return useListNavigationChildProps(useGridNavigationColumnProps(props)); }
+            }
 
-
-        const getRowIndex = useStableGetter(rowIndex);
-        const useGridNavigationCell: UseGridNavigationCell<C, IC> = useCallback((info: UseGridNavigationCellParameters<IC>) => {
-            const getTabbable: (() => boolean | null) = useStableCallback(() => tabbable);
-            const { tabbable, useRovingTabIndexChildProps } = useRovingTabIndexCell<C>({ ...info, getTabbable } as IC);
-            //const { useLinearNavigationChildProps: useLinearNavigationChildCellProps } = useLinearNavigationChildCell(info as IC);
-
-            // Any time we interact with this cell, set it to be
-            // our "currently tabbable" cell, regardless of
-            // any previously selected row/column.
-            //
-            // TODO: Mouseup/down might be preferable,
-            // but it doesn't fire on label elements here?????
-            const onClick = useCallback(() => {
-                setCurrentRow2(getRowIndex());
-                setCurrentColumn2(info.index);
-            }, [info.index])
-
-            const useGridNavigationCellProps = useCallback(<P extends h.JSX.HTMLAttributes<C>>(props: P) => useRovingTabIndexChildProps((useMergedProps<C>()({ onClick }, props))), [useRovingTabIndexChildProps]);
-
-            return { tabbable, useGridNavigationCellProps };
         }, []);
 
         return {
-            currentColumn,
-            useGridNavigationRowProps,
+            cells: columns,
+            rowIsTabbable,
+            getCurrentColumn,
             useGridNavigationCell,
-            cellCount,
-            isTabbableRow,
-            managedCells: managedCells as IC[]
-        };
-
-    }, [useManagedRow, indexDemangler, indexMangler]);
+            useGridNavigationRowProps: function <P extends h.JSX.HTMLAttributes<RowElement>>(props: P) {
+                let ret = useListNavigationChildProps(props);
+                ret.tabIndex = -1;
+                return ret;
+            }
+        }
+    }, []);
 
     return {
-        useGridNavigationProps: useLinearNavigationRowProps,
+        getCurrentColumn,
         useGridNavigationRow,
-        useGridNavigationColumn,
-        rowCount: childCount,
-        cellIndex: currentColumn,
-        rowIndex: currentRow,
-        managedRows
-
+        useGridNavigationProps,
+        currentColumn,
+        rows,
+        currentRowTypeahead,
+        invalidRowTypeahead,
+        getTabbableRow
     }
-
 }
-
-

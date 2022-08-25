@@ -1,8 +1,9 @@
 import { h, VNode } from "preact";
 import { useCallback, useLayoutEffect, useRef } from "preact/hooks";
+import { ManagedChildren } from "./use-child-manager";
 import { useForceUpdate } from "./use-force-update";
 import { useMergedProps } from "./use-merged-props";
-import { usePassiveState } from "./use-passive-state";
+import { returnNull, usePassiveState } from "./use-passive-state";
 
 /**
  * All of these functions **MUST** be stable across renders.
@@ -67,9 +68,9 @@ export function useSortableChildren<T extends { index: number }, G extends any[]
 
 
     // The actual sort function.
-    const sort = useCallback((managedRows: T[], direction: "ascending" | "descending", ...args: G): Promise<void> | void => {
+    const sort = useCallback((managedRows: ManagedChildren<T>, direction: "ascending" | "descending", ...args: G): Promise<void> | void => {
         
-        const sortedRows = managedRows.slice().sort((lhsRow, rhsRow) => {
+        const sortedRows = managedRows.sliceSort((lhsRow, rhsRow) => {
 
             const lhsValue = getValue(lhsRow, ...args) as any;
             const rhsValue = getValue(rhsRow, ...args) as any;
@@ -98,7 +99,7 @@ export function useSortableChildren<T extends { index: number }, G extends any[]
         const forceUpdate = useForceUpdate();
         useLayoutEffect(() => { setForceUpdate(_prev => forceUpdate); }, [forceUpdate])
 
-        return (useMergedProps<S>()({
+        return (useMergedProps<S>({
             role: "rowgroup",
             children: (children as VNode<T>[]).slice().sort((lhs, rhs) => {
 
@@ -159,5 +160,3 @@ function defaultCompare(lhs: string | number | boolean | Date | null | undefined
         return compare2(lhs, rhs);
     }
 }
-
-function returnNull() { return null; }

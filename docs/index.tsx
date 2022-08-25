@@ -1,9 +1,10 @@
 import { createContext, h, render } from "preact";
 import { memo } from "preact/compat";
 import { useContext, useRef } from "preact/hooks";
+import { tabbable } from "tabbable";
 import { useAnimationFrame, useAsyncHandler, useDraggable, useDroppable, useElementSize, useFocusTrap, useMergedProps, useState } from "..";
 import { ElementSize } from "../use-element-size";
-import { useGridNavigation, UseGridNavigationCell, UseGridNavigationCellInfo, UseGridNavigationRow, UseGridNavigationRowInfo } from "../use-grid-navigation";
+import { useGridNavigation, UseGridNavigationCell, UseGridNavigationRow } from "../use-grid-navigation";
 import { useHasFocus } from "../use-has-focus";
 import { DemoUseInterval } from "./demos/use-interval";
 import { DemoUseRovingTabIndex } from "./demos/use-roving-tab-index";
@@ -16,7 +17,7 @@ const RandomWords = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, se
 const DemoUseDroppable = () => {
     const { droppedFiles, droppedStrings, filesForConsideration, stringsForConsideration, useDroppableProps, dropError } = useDroppable<HTMLDivElement>({ effect: "copy" });
 
-    const { ref: _ref } = useMergedProps<HTMLInputElement>()({}, { ref: useRef<HTMLInputElement>(null!) })
+    const { ref: _ref } = useMergedProps<HTMLInputElement>({}, { ref: useRef<HTMLInputElement>(null!) })
 
     const p = useDroppableProps({ className: "demo droppable" });
 
@@ -225,15 +226,15 @@ const DemoFocus = memo(() => {
     const [focusedInner, setFocusedInner] = useState(false);
     const [lastFocused, setLastFocused] = useState(false);
     const [lastFocusedInner, setLastFocusedInner] = useState(false);
-    const { useHasFocusProps } = useHasFocus<HTMLDivElement>({ 
-        onFocusedChanged: setFocused, 
-        onFocusedInnerChanged: setFocusedInner, 
-        onLastFocusedChanged: setLastFocused, 
+    const { useHasFocusProps } = useHasFocus<HTMLDivElement>({
+        onFocusedChanged: setFocused,
+        onFocusedInnerChanged: setFocusedInner,
+        onLastFocusedChanged: setLastFocused,
         onLastFocusedInnerChanged: setLastFocusedInner,
         onActiveElementChange: setActiveElement,
         onLastActiveElementChange: setLastActiveElement,
         onWindowFocusedChange: setWindowFocused
-     });
+    });
     return (
         <div class="demo">
             <h2>useHasFocus</h2>
@@ -252,18 +253,18 @@ const DemoFocus = memo(() => {
 })
 
 
-const GridRowContext = createContext<UseGridNavigationRow<HTMLDivElement, HTMLDivElement, UseGridNavigationRowInfo, UseGridNavigationCellInfo>>(null!);
-const GridCellContext = createContext<UseGridNavigationCell<HTMLDivElement, UseGridNavigationCellInfo>>(null!);
+const GridRowContext = createContext<UseGridNavigationRow<HTMLDivElement, HTMLDivElement>>(null!);
+const GridCellContext = createContext<UseGridNavigationCell<HTMLDivElement>>(null!);
 export const DemoUseGrid = memo(() => {
 
     const [, setLastFocusedInner, getLastFocusedInner] = useState(false);
 
     const { useHasFocusProps } = useHasFocus<HTMLDivElement>({ onLastFocusedInnerChanged: setLastFocusedInner });
-    const { useGridNavigationRow, rowCount, cellIndex, rowIndex, useGridNavigationProps } = useGridNavigation<HTMLDivElement, HTMLDivElement, UseGridNavigationRowInfo, UseGridNavigationCellInfo>({ shouldFocusOnChange: getLastFocusedInner });
+    const { useGridNavigationRow, currentColumn, useGridNavigationProps } = useGridNavigation<HTMLDivElement, HTMLDivElement, HTMLDivElement>({});
 
     return (
         <div className="demo">
-            <div>{cellIndex}+{rowIndex}/{rowCount}</div>
+            {<div>{currentColumn}</div>}
             <div {...useHasFocusProps(useGridNavigationProps({}))}>
                 <GridRowContext.Provider value={useGridNavigationRow}>
                     {Array.from((function* () {
@@ -281,12 +282,12 @@ const _Prefix = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const DemoUseGridRow = memo((({ index }: { index: number }) => {
     const [_randomWord] = useState(() => RandomWords[index/*Math.floor(Math.random() * (RandomWords.length - 1))*/]);
     const useGridRow = useContext(GridRowContext);
-    const { isTabbableRow, cellCount, useGridNavigationRowProps, useGridNavigationCell, currentColumn } = useGridRow({ index });
+    const { useGridNavigationRowProps, useGridNavigationCell, rowIsTabbable, getCurrentColumn } = useGridRow({ info: { index, text: index.toString(), flags: {} } });
 
     const props = useGridNavigationRowProps({});
     return (
         <div {...props}>
-            <div>{`${isTabbableRow}`} ({currentColumn}/{cellCount - 1})</div>
+            <div>{`${rowIsTabbable}`} ({getCurrentColumn()})</div>
 
             <div style="display: flex">
                 <GridCellContext.Provider value={useGridNavigationCell}>
@@ -303,20 +304,22 @@ const DemoUseGridRow = memo((({ index }: { index: number }) => {
 
 const DemoUseGridCell = (({ index }: { index: number }) => {
     const useGridCell = useContext(GridCellContext);
-    const { useGridNavigationCellProps } = useGridCell({ index });
+    const { useGridNavigationCellProps, getCurrentColumn, cellIsTabbable } = useGridCell({ info: { index, text: index.toString(), flags: {} } });
 
     const props = useGridNavigationCellProps({}) as any;
 
+    const t = (cellIsTabbable ? "(Tabbable)" : "(Not tabbable)")
+
     if (index === 0)
-        return <div {...props}>Grid cell #{index + 1}</div>
+        return <div {...props}>Grid cell #{index + 1} {t}</div>
     else
-        return <label><input  {...props} type="checkbox" /> Test input</label>
+        return <label><input  {...props} type="checkbox" /> Test input {t}</label>
 })
 
 const Component = () => {
     return <div class="flex" style={{ flexWrap: "wrap" }}>
-    <DemoFocus />
-    <hr />
+        <DemoFocus />
+        <hr />
         <DemoUseGrid />
         <hr />
         <DemoUseTimeout />

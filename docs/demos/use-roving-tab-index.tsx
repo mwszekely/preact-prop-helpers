@@ -1,18 +1,20 @@
 import { createContext, h } from "preact";
-import { memo, useContext } from "preact/compat";
-import { useHasFocus } from "../..";
-import { useListNavigation, UseListNavigationChild, UseListNavigationChildInfo } from "../../use-list-navigation";
+import { memo, StateUpdater, useContext } from "preact/compat";
+import { useForceUpdate, useHasFocus } from "../..";
+import { useListNavigation, UseListNavigationChild, useListNavigationSingleSelection, UseListNavigationSingleSelectionChild } from "../../use-list-navigation";
 import { useState } from "../../use-state";
 
 
 const RandomWords = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
 
-const RovingChildContext = createContext<UseListNavigationChild<HTMLLIElement, UseListNavigationChildInfo>>(null!)
+const RovingChildContext = createContext<UseListNavigationSingleSelectionChild<HTMLOListElement, HTMLLIElement>>(null!)
 export const DemoUseRovingTabIndex = memo(() => {
 
-    const [lastFocusedInner, setLastFocusedInner, getLastFocusedInner] = useState(false)
+    const [_lastFocusedInner, setLastFocusedInner, _getLastFocusedInner] = useState(false)
     const { useHasFocusProps } = useHasFocus<HTMLUListElement>({ onLastFocusedInnerChanged: setLastFocusedInner });
-    const { useListNavigationChild, currentTypeahead, tabbableIndex, useListNavigationProps, navigateToIndex } = useListNavigation<HTMLLIElement, UseListNavigationChildInfo>({ shouldFocusOnChange: getLastFocusedInner });
+    const forceUpdate = useForceUpdate();
+    const [selectedIndex, setSelectedIndex] = useState(0);
+    const { useListNavigationSingleSelectionChild, currentTypeahead, useListNavigationSingleSelectionProps, setTabbableIndex, getTabbableIndex } = useListNavigationSingleSelection<HTMLUListElement, HTMLLIElement>({ selectedIndex });
     //const { useRovingTabIndexChild, useRovingTabIndexProps } = useRovingTabIndex<HTMLUListElement, RovingTabIndexChildInfo>({ tabbableIndex, focusOnChange: false });
 
     return (
@@ -34,7 +36,7 @@ export const DemoUseRovingTabIndex = memo(() => {
             </p>
 
             <p>
-                <code>useListNavigation</code> wraps up the functionality of a few hooks (<code>useRovingTabIndex</code>, <code>useLinearNavigation</code>, <code>useTypeaheadNavigation</code>
+                <code>useListNavigation</code> wraps up the functionality of a few hooks (<code>useRovingTabIndex</code>, <code>useLinearNavigation</code>, <code>useTypeaheadNavigation</code>)
                 to allow for ARIA-compliant navigation of lists and other similar components.  For more advanced use cases, you can use the other hooks individually.
             </p>
 
@@ -44,12 +46,12 @@ export const DemoUseRovingTabIndex = memo(() => {
                 If the child element itself has a focusable element, like a button, it can also be wired up to disable itself
                 Feel free to nest them too, as long as you are aware of your <code>Context</code> management (i.e. remember that you need to create a new <code>Context</code> for each use case).
             </p>
-            <label>Tabbable index: <input type="number" value={tabbableIndex ?? undefined} onInput={e => { e.preventDefault(); navigateToIndex(e.currentTarget.valueAsNumber); }} /></label>
-            <ul {...useHasFocusProps(useListNavigationProps({}))}>
-                <RovingChildContext.Provider value={useListNavigationChild}>
+            <label>Tabbable index: <input type="number" value={getTabbableIndex() ?? undefined} onInput={e => { e.preventDefault(); setTabbableIndex(e.currentTarget.valueAsNumber, false); }} /></label>
+            <ul {...useHasFocusProps(useListNavigationSingleSelectionProps({}))}>
+                <RovingChildContext.Provider value={useListNavigationSingleSelectionChild}>
                     {Array.from((function* () {
                         for (let i = 0; i < 10; ++i) {
-                            yield <DemoUseRovingTabIndexChild index={i} key={i} />
+                            yield <DemoUseRovingTabIndexChild index={i} key={i} setSelectedIndex={setSelectedIndex} />
                         }
                     })())}
                 </RovingChildContext.Provider>
@@ -59,15 +61,15 @@ export const DemoUseRovingTabIndex = memo(() => {
     );
 })
 
-const Prefix = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
+const _Prefix = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const DemoUseRovingTabIndexChild = memo((({ index, setSelectedIndex }: { index: number, setSelectedIndex: StateUpdater<number> }) => {
     const [randomWord] = useState(() => RandomWords[index/*Math.floor(Math.random() * (RandomWords.length - 1))*/]);
     const useRovingTabIndexChild = useContext(RovingChildContext);
     const text = `${randomWord} This is item #${index + 1}`;
-    const { useListNavigationChildProps, useListNavigationSiblingProps, tabbable } = useRovingTabIndexChild({ index, text, hidden: (index == 5) });
-    
+    const { useListNavigationChildProps, tabbable, selected } = useRovingTabIndexChild({ info: { index, text, hidden: (index == 5), flags: {} } });
+
     const props = useListNavigationChildProps({});
     return (
-        <li {...props}>{text} ({tabbable? "Tabbable" : "Not tabbable"})<input {...useListNavigationSiblingProps({ type: "checkbox" })} /></li>
+        <li {...props} onClick={() => setSelectedIndex(index)}>{text} ({tabbable ? "Tabbable" : "Not tabbable"}, {selected ? "Selected" : "Not selected"})<input {...useListNavigationChildProps({ type: "number" }) as any} style={{ width: "5ch" }} /></li>
     )
 }));

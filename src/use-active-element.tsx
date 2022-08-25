@@ -49,13 +49,24 @@ const lastActiveElementUpdaters = new Map<Window | null | undefined, Set<undefin
 const windowFocusedUpdaters = new Map<Window | null | undefined, Set<undefined | ((focused: boolean) => void)>>();
 const windowsFocusedUpdaters = new Map<Window | null | undefined, boolean>();
 
+const microtasks = new Set<Map<any, any>>();
+
+// The focusin and focusout events often fire syncronously in the middle of running code.
+// E.G. calling element.focus() can cause a focusin event handler to immediately interrupt that code.
+// For the purpose of improving stability, we debounce all focus events to the next microtask.
 function forEachUpdater<T>(window: Window | null | undefined, map: Map<Window | null | undefined, Set<undefined | ((e: T) => void)>>, value: T) {
-    for (const [otherWindow, updaters] of map) {
-        if (window === otherWindow) {
-            for (const updater of updaters) {
-                updater?.(value);
+    if (!microtasks.has(map)) {
+        microtasks.add(map);
+        queueMicrotask(() => {
+            microtasks.delete(map);
+
+            const updaters = map.get(window);
+            if (updaters) {
+                for (const updater of updaters) {
+                    updater?.(value);
+                }
             }
-        }
+        });
     }
 }
 
@@ -141,7 +152,7 @@ export function useActiveElement<T extends Node>({ onActiveElementChange, onLast
     useEnsureStability("useActiveElement", onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, onMountChange, onMount, onUnmount);
 
     const { getElement, useRefElementProps } = useRefElement<T>({
-        onMount, 
+        onMount,
         onUnmount,
         onElementChange: useCallback((element: T | null, prevValue: T | null | undefined) => {
             onMountChange?.(element, prevValue);

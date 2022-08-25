@@ -2,11 +2,10 @@
 import { h } from "preact";
 import { useCallback } from "preact/hooks";
 import { useActiveElement, UseActiveElementParameters, UseActiveElementReturnType } from "./use-active-element";
-import { MergedProps } from "./use-merged-props";
 import { returnFalse, useEnsureStability, usePassiveState } from "./use-passive-state";
-import { UseRefElementPropsReturnType, UseRefElementReturnType } from "./use-ref-element";
+import { UseRefElementReturnType } from "./use-ref-element";
 
-export interface UseFocusParameters<T extends Node> extends UseActiveElementParameters<T> {
+export interface UseHasFocusParameters<T extends Node> extends UseActiveElementParameters<T> {
     /**
      * Whether the element itself currently has focus.
      */
@@ -32,20 +31,12 @@ export interface UseFocusParameters<T extends Node> extends UseActiveElementPara
     onLastFocusedInnerChanged?(focused: boolean): void;
 }
 
-export interface UseHasFocusPropsParameters<T extends EventTarget> extends h.JSX.HTMLAttributes<T> { }
-
-export type UseHasFocusPropsReturnType<T extends EventTarget, P extends UseHasFocusPropsParameters<T>> = MergedProps<T, UseRefElementPropsReturnType<T, { onFocus: (e: FocusEvent) => void; onBlur: (e: FocusEvent) => void; }>, P>;
-/*
-interface UseFocusResult<T extends EventTarget> {
-    useFocusProps: <P extends UseFocusProps<T>>(props: P) => MergedProps<FocusProps, P>
-}*/
-
 export interface UseHasFocusReturnType<T extends Node> extends Omit<UseRefElementReturnType<T>, "useRefElementProps">, Omit<UseActiveElementReturnType<T>, "useActiveElementProps"> {
 
     /**
      * Modifies the element to be able to track its own focus state
      */
-    useHasFocusProps: <P extends UseHasFocusPropsParameters<T>>(props: P) => UseHasFocusPropsReturnType<T, P>;
+    useHasFocusProps: (props: h.JSX.HTMLAttributes<T>) => h.JSX.HTMLAttributes<T>;
 
     getFocused(): boolean;
     getFocusedInner(): boolean;
@@ -53,7 +44,7 @@ export interface UseHasFocusReturnType<T extends Node> extends Omit<UseRefElemen
     getLastFocusedInner(): boolean;
 }
 
-export function useHasFocus<T extends Node>({ onFocusedChanged, onFocusedInnerChanged, onLastFocusedChanged, onLastFocusedInnerChanged, onLastActiveElementChange, onActiveElementChange, onWindowFocusedChange }: UseFocusParameters<T>): UseHasFocusReturnType<T> {
+export function useHasFocus<T extends Node>({ onFocusedChanged, onFocusedInnerChanged, onLastFocusedChanged, onLastFocusedInnerChanged, onLastActiveElementChange, onActiveElementChange, onWindowFocusedChange }: UseHasFocusParameters<T>): UseHasFocusReturnType<T> {
 
     useEnsureStability("useHasFocus", onFocusedChanged, onFocusedInnerChanged, onLastFocusedChanged, onLastFocusedInnerChanged, onLastActiveElementChange, onActiveElementChange, onWindowFocusedChange);
 
@@ -82,7 +73,7 @@ export function useHasFocus<T extends Node>({ onFocusedChanged, onFocusedInnerCh
         onWindowFocusedChange
     });
 
-    const useHasFocusProps = useCallback(<P extends UseHasFocusPropsParameters<T>>(props: P) => { return useActiveElementProps(props); }, [useActiveElementProps]);
+    const useHasFocusProps = useCallback((props: h.JSX.HTMLAttributes<T>) => { return useActiveElementProps(props); }, [useActiveElementProps]);
 
 
     return { useHasFocusProps, getElement, getFocused, getFocusedInner, getLastFocused, getLastFocusedInner, getActiveElement, getLastActiveElement, getWindowFocused };

@@ -12,7 +12,7 @@ function styleStringToObject(style: string): h.JSX.CSSProperties {
  * @param obj The CSS properties you want added to the user-given style
  * @returns A CSS object containing the properties of both objects.
  */
-export function useMergedStyles<Lhs extends Pick<h.JSX.HTMLAttributes<any>, "style"> | null | undefined, Rhs extends Pick<h.JSX.HTMLAttributes<any>, "style"> | null | undefined>(lhs: Lhs, rhs: Rhs): undefined | string | h.JSX.CSSProperties {
+export function useMergedStyles(lhs: Pick<h.JSX.HTMLAttributes<EventTarget>, "style">, rhs: Pick<h.JSX.HTMLAttributes<EventTarget>, "style">): h.JSX.HTMLAttributes<EventTarget>["style"] {
 
     // Easy case, when there are no styles to merge return nothing.
     if (!lhs?.style && !rhs?.style)

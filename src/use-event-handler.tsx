@@ -1,6 +1,6 @@
 import { h, PreactDOMAttributes } from "preact";
 import { useCallback, useEffect } from "preact/hooks";
-import { MergedProps, useMergedProps } from "./use-merged-props";
+import { useMergedProps } from "./use-merged-props";
 import { useStableCallback } from "./use-stable-callback";
 
 /**
@@ -96,12 +96,8 @@ export function useLocalHandler<ElementType extends (HTMLElementTagNameMap[keyof
 
         const stableHandler = useStableCallback(handler);
 
-        type Attributes = (ElementType extends HTMLElement ? h.JSX.HTMLAttributes<ElementType> :
-            ElementType extends SVGElement ? h.JSX.SVGAttributes<ElementType> : h.JSX.DOMAttributes<ElementType>)
-
-        const useLocalEventHandlerProps = useCallback(<P extends Attributes>(props: P) => {
-            type P2 = Required<Pick<h.JSX.DOMAttributes<ElementType>, EventType>>;
-            return useMergedProps<ElementType>()({ [type]: stableHandler } as { [K in EventType]: typeof handler }, props) as MergedProps<ElementType, P2, P>;
+        const useLocalEventHandlerProps = useCallback((props: h.JSX.HTMLAttributes<ElementType>) => {
+            return useMergedProps<ElementType>({ [type]: stableHandler } as { [K in EventType]: typeof handler }, props) as h.JSX.HTMLAttributes<ElementType>;
         }, [type]);
 
         return { useLocalEventHandlerProps };

@@ -256,7 +256,6 @@ export function useAsync<AP extends unknown[], R, SP extends unknown[] = AP>(asy
     // Capture/transform the given parameters if applicable,
     // then run further logic that's debounced/throttled
     const captureArgsAndExecuteDebouncedHandler = useStableCallback<SyncFunctionType<SP, R>>(function onNewExecuteRequest(...newArgs2: SP) {
-        console.log("captureArgsAndExecuteDebouncedHandler");
 
         // Capture the arguments we were given.
         // We might use them immediately, or we might store them to `queued`,
@@ -275,25 +274,22 @@ export function useAsync<AP extends unknown[], R, SP extends unknown[] = AP>(asy
     // so this might not be called immediately after 
     const executeHandlerWithoutDebounce = useStableCallback<GlueFunctionType<AP, R>>(function onNewExecuteRequest2(enqueue: boolean, ...newArgs: AP) {
 
-        const onThen = (value: R) => { console.log("executeHandlerWithoutDebounce.onThen"); setResult(value); setHasResult(true); setHasError(false); setResolveCount(r => ++r); };
-        const onCatch = (ex: any) => { console.log("executeHandlerWithoutDebounce.onCatch"); setError(ex); setHasError(true); setHasResult(false); setRejectCount(r => ++r); };
+        const onThen = (value: R) => { setResult(value); setHasResult(true); setHasError(false); setResolveCount(r => ++r); };
+        const onCatch = (ex: any) => { setError(ex); setHasError(true); setHasResult(false); setRejectCount(r => ++r); };
         const onFinally = () => {
             const queued = getQueued();
             setSettleCount(s => ++s);
             if (queued) {
-                console.log("executeHandlerWithoutDebounce.onFinally (queued)");
                 setQueued(null);
                 executeHandlerWithDebounce(false, ...queued);
             }
             else {
-                console.log("executeHandlerWithoutDebounce.onFinally (empty)");
                 setPending(false);
             }
 
         };
 
         if (!enqueue) {
-            console.log("executeHandlerWithoutDebounce (immediate)");
             // Nothing is pending at the moment, so we can run our function immediately.
             setRunCount(r => ++r);
             setPending(true);
@@ -312,7 +308,6 @@ export function useAsync<AP extends unknown[], R, SP extends unknown[] = AP>(asy
             }
         }
         else {
-            console.log("executeHandlerWithoutDebounce (pending)");
             // When we're still running a previous handler,
             // just set ourselves as the next one to run and quit early.
             // Nothing more to do.

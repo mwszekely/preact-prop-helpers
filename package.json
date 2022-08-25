@@ -8,8 +8,8 @@
   "module": "index.js",
   "types": "index.d.ts",
   "scripts": {
-    "build": "npx npm-run-all --npm-path npm -pc build:*",
-    "watch": "npx npm-run-all --npm-path npm -pc watch:*",
+    "build": "npx npm-run-all --npm-path npm -pc clean build:*",
+    "watch": "npx npm-run-all --npm-path npm -pc clean watch:*",
     "watch:ts": "tsc --watch",
     "build:ts": "tsc",
     "test": "jest",

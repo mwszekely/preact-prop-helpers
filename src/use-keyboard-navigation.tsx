@@ -1,33 +1,31 @@
 import { h } from "preact";
 import { useCallback, useEffect, useRef } from "preact/hooks";
-import { ManagedChildInfo } from "./use-child-manager";
+import { useStableGetter } from "./use-stable-getter";
+import { ManagedChildInfoBase } from "./use-child-manager";
 import { useLayoutEffect } from "./use-layout-effect";
 import { useLogicalDirection } from "./use-logical-direction";
-import { MergedProps, useMergedProps } from "./use-merged-props";
-import { UseRefElementPropsReturnType } from "./use-ref-element";
+import { useMergedProps } from "./use-merged-props";
 import { useStableCallback } from "./use-stable-callback";
 import { useState } from "./use-state";
 import { useTimeout } from "./use-timeout";
+import { useEnsureStability } from "use-passive-state";
 
-
-
-
-
-
-
-
-export interface UseLinearNavigationReturnType<ChildElement extends Element> {
-    // These props can be attatched either to the parent or to each individual child.
-    // Whichever works better for your scenario.
-    useLinearNavigationProps: UseLinearNavigationProps<ChildElement>;
+export interface UseLinearNavigationReturnType<ParentOrChildElement extends Element> {
+    /** 
+     * These props can be attatched either to the parent or to each individual child.
+     * Whichever works better for your scenario.
+     * 
+     * **STABLE** 
+     * */
+    useLinearNavigationProps: (props: h.JSX.HTMLAttributes<ParentOrChildElement>) => h.JSX.HTMLAttributes<ParentOrChildElement>;
 }
 
-export type UseLinearNavigationProps<ChildElement extends Element> = <P extends h.JSX.HTMLAttributes<ChildElement>>(props: P) => UseRefElementPropsReturnType<ChildElement, h.JSX.HTMLAttributes<ChildElement>>
-
-
-
 /** Arguments passed to the parent `useLinearNavigation` */
-interface UseLinearNavigationParametersBase {
+export interface UseLinearNavigationParameters {
+    navigateToNext(): void;
+    navigateToPrev(): void;
+    navigateToFirst(): void;
+    navigateToLast(): void;
     /**
      * Controls which arrow keys are used to navigate through the component.
      * Relative to the writing mode, so in English, "inline" corresponds
@@ -53,29 +51,11 @@ interface UseLinearNavigationParametersBase {
      */
     disableHomeEndKeys?: boolean;
 
-    /**
-     * The managedChildren you have from useRovingTabIndex 
-     * (presumably, but it could also just be from useChildManager)
-     */
-    managedChildren: UseLinearNavigationChildInfo[];
-
-}
-
-export interface UseLinearNavigationParameters extends UseLinearNavigationParametersBase {
-    navigateToNext(): void;
-    navigateToPrev(): void;
-    navigateToFirst(): void;
-    navigateToLast(): void;
-    index: number;
 }
 
 
 /** Arguments passed to the child 'useLinearNavigationChild` */
-export interface UseLinearNavigationChildInfo extends ManagedChildInfo<number> { }
-
-/** Return type of the child `useLinearNavigationChildProps` */
-export type UseLinearNavigationChildPropsReturnType<ChildElement extends Element, P extends {}> = MergedProps<ChildElement, UseRefElementPropsReturnType<ChildElement, { tabIndex: number; }>, Omit<P, "tabIndex">>;
-
+export interface UseLinearNavigationChildInfo extends ManagedChildInfoBase<number> { }
 
 /**
  * When used in tandem with `useRovingTabIndex`, allows control of
@@ -83,122 +63,120 @@ export type UseLinearNavigationChildPropsReturnType<ChildElement extends Element
  * 
  * @see useListNavigation, which packages everything up together.
  */
-export function useLinearNavigation<ChildElement extends Element>({ index, navigateToFirst, navigateToLast, navigateToNext, navigateToPrev, managedChildren, navigationDirection, disableArrowKeys, disableHomeEndKeys }: UseLinearNavigationParameters): UseLinearNavigationReturnType<ChildElement> {
+export function useLinearNavigation<ParentOrChildElement extends HTMLElement | SVGElement>({ navigateToFirst: ntf, navigateToLast: ntl, navigateToNext: ntn, navigateToPrev: ntp, navigationDirection: nd, disableArrowKeys: dak, disableHomeEndKeys: dhek }: UseLinearNavigationParameters): UseLinearNavigationReturnType<ParentOrChildElement> {
 
-    navigationDirection ??= "either";
+    nd ??= "either";
 
-    const childCount = managedChildren.length;
+    const { getLogicalDirectionInfo, useLogicalDirectionProps } = useLogicalDirection<ParentOrChildElement>({});
 
-    // Make sure the tabbable index never escapes the bounds of all available children
-    // TODO: Keep track of the original index and keep it, at least until keyboard navigation.
-    useLayoutEffect(() => {
-        if (index !== null) {
-            if (index < 0) {
-                navigateToFirst();
-            }
-            else if (childCount > 0 && index >= childCount) {
-                navigateToLast();
-            }
-        }
-    }, [index, childCount, navigateToFirst, navigateToLast]);
-
-    const { getLogicalDirectionInfo, useLogicalDirectionProps } = useLogicalDirection<ChildElement>({});
-
-    const onKeyDown = (e: KeyboardEvent) => {
-        // Not handled by typeahead (i.e. assume this is a keyboard shortcut)
-        if (e.ctrlKey || e.metaKey)
-            return;
-
-        const info = getLogicalDirectionInfo();
-
-        const allowsBlockNavigation = (navigationDirection == "block" || navigationDirection == "either");
-        const allowsInlineNavigation = (navigationDirection == "inline" || navigationDirection == "either");
-
-        switch (e.key) {
-            case "ArrowUp": {
-                const propName = (info?.blockOrientation === "vertical" ? "blockDirection" : "inlineDirection");
-                const directionAllowed = (!disableArrowKeys && (info?.blockOrientation === "vertical" ? allowsBlockNavigation : allowsInlineNavigation));
-                if (directionAllowed) {
-                    if (info?.[propName] === "btt") {
-                        navigateToNext();
-                    }
-                    else {
-                        navigateToPrev();
-                    }
-                    e.preventDefault();
-                    e.stopPropagation();
-                }
-                break;
-            }
-            case "ArrowDown": {
-                const propName = (info?.blockOrientation === "vertical" ? "blockDirection" : "inlineDirection");
-                const directionAllowed = (!disableArrowKeys && (info?.blockOrientation === "vertical" ? allowsBlockNavigation : allowsInlineNavigation));
-                if (directionAllowed) {
-                    if (info?.[propName] === "btt") {
-                        navigateToPrev();
-                    }
-                    else {
-                        navigateToNext();
-                    }
-                    e.preventDefault();
-                    e.stopPropagation();
-                }
-                break;
-            }
-
-            case "ArrowLeft": {
-                const propName = (info?.inlineOrientation === "horizontal" ? "inlineDirection" : "blockDirection");
-                const directionAllowed = (!disableArrowKeys && (info?.inlineOrientation === "horizontal" ? allowsInlineNavigation : allowsBlockNavigation));
-                if (directionAllowed) {
-                    if (info?.[propName] === "rtl") {
-                        navigateToNext();
-                    }
-                    else {
-                        navigateToPrev();
-                    }
-                    e.preventDefault();
-                    e.stopPropagation();
-                }
-                break;
-            }
-            case "ArrowRight": {
-                const propName = (info?.inlineOrientation === "horizontal" ? "inlineDirection" : "blockDirection");
-                const directionAllowed = (!disableArrowKeys && (info?.inlineOrientation === "horizontal" ? allowsInlineNavigation : allowsBlockNavigation));
-                if (directionAllowed) {
-                    if (info?.[propName] === "rtl") {
-                        navigateToPrev();
-                    }
-                    else {
-                        navigateToNext();
-                    }
-                    e.preventDefault();
-                    e.stopPropagation();
-                }
-                e.preventDefault();
-                e.stopPropagation();
-                break;
-            }
-            case "Home":
-                if (!disableHomeEndKeys) {
-                    navigateToFirst();
-                    e.preventDefault();
-                    e.stopPropagation();
-                }
-                break;
-
-            case "End":
-                if (!disableHomeEndKeys) {
-                    navigateToLast();
-                    e.preventDefault();
-                    e.stopPropagation();
-                }
-                break;
-        }
-    };
+    const navigateToFirst = useStableCallback(ntf);
+    const navigateToLast = useStableCallback(ntl);
+    const navigateToNext = useStableCallback(ntn);
+    const navigateToPrev = useStableCallback(ntp);
+    const getDisableArrowKeys = useStableGetter(dak);
+    const getDisableHomeEndKeys = useStableGetter(dhek);
+    const getNavigationDirection = useStableGetter(nd);
 
 
     return {
-        useLinearNavigationProps: useCallback(<P extends h.JSX.HTMLAttributes<ChildElement>>(props: P) => { return useLogicalDirectionProps(useMergedProps<ChildElement>()({ onKeyDown }, props)) }, []),
+        useLinearNavigationProps: useCallback((props: h.JSX.HTMLAttributes<ParentOrChildElement>): h.JSX.HTMLAttributes<ParentOrChildElement> => {
+
+            const onKeyDown = (e: KeyboardEvent) => {
+                // Not handled by typeahead (i.e. assume this is a keyboard shortcut)
+                if (e.ctrlKey || e.metaKey)
+                    return;
+
+                const info = getLogicalDirectionInfo();
+                const navigationDirection = getNavigationDirection();
+                const disableArrowKeys = getDisableArrowKeys();
+                const disableHomeEndKeys = getDisableHomeEndKeys();
+
+                const allowsBlockNavigation = (navigationDirection == "block" || navigationDirection == "either");
+                const allowsInlineNavigation = (navigationDirection == "inline" || navigationDirection == "either");
+
+                switch (e.key) {
+                    case "ArrowUp": {
+                        const propName = (info?.blockOrientation === "vertical" ? "blockDirection" : "inlineDirection");
+                        const directionAllowed = (!disableArrowKeys && (info?.blockOrientation === "vertical" ? allowsBlockNavigation : allowsInlineNavigation));
+                        if (directionAllowed) {
+                            if (info?.[propName] === "btt") {
+                                navigateToNext();
+                            }
+                            else {
+                                navigateToPrev();
+                            }
+                            e.preventDefault();
+                            e.stopPropagation();
+                        }
+                        break;
+                    }
+                    case "ArrowDown": {
+                        const propName = (info?.blockOrientation === "vertical" ? "blockDirection" : "inlineDirection");
+                        const directionAllowed = (!disableArrowKeys && (info?.blockOrientation === "vertical" ? allowsBlockNavigation : allowsInlineNavigation));
+                        if (directionAllowed) {
+                            if (info?.[propName] === "btt") {
+                                navigateToPrev();
+                            }
+                            else {
+                                navigateToNext();
+                            }
+                            e.preventDefault();
+                            e.stopPropagation();
+                        }
+                        break;
+                    }
+
+                    case "ArrowLeft": {
+                        const propName = (info?.inlineOrientation === "horizontal" ? "inlineDirection" : "blockDirection");
+                        const directionAllowed = (!disableArrowKeys && (info?.inlineOrientation === "horizontal" ? allowsInlineNavigation : allowsBlockNavigation));
+                        if (directionAllowed) {
+                            if (info?.[propName] === "rtl") {
+                                navigateToNext();
+                            }
+                            else {
+                                navigateToPrev();
+                            }
+                            e.preventDefault();
+                            e.stopPropagation();
+                        }
+                        break;
+                    }
+                    case "ArrowRight": {
+                        const propName = (info?.inlineOrientation === "horizontal" ? "inlineDirection" : "blockDirection");
+                        const directionAllowed = (!disableArrowKeys && (info?.inlineOrientation === "horizontal" ? allowsInlineNavigation : allowsBlockNavigation));
+                        if (directionAllowed) {
+                            if (info?.[propName] === "rtl") {
+                                navigateToPrev();
+                            }
+                            else {
+                                navigateToNext();
+                            }
+                            e.preventDefault();
+                            e.stopPropagation();
+                        }
+                        e.preventDefault();
+                        e.stopPropagation();
+                        break;
+                    }
+                    case "Home":
+                        if (!disableHomeEndKeys) {
+                            navigateToFirst();
+                            e.preventDefault();
+                            e.stopPropagation();
+                        }
+                        break;
+
+                    case "End":
+                        if (!disableHomeEndKeys) {
+                            navigateToLast();
+                            e.preventDefault();
+                            e.stopPropagation();
+                        }
+                        break;
+                }
+            };
+            return useLogicalDirectionProps(useMergedProps<ParentOrChildElement>({ onKeyDown }, props))
+        }, []),
     }
 
 
@@ -209,20 +187,24 @@ export function useLinearNavigation<ChildElement extends Element>({ index, navig
 
 
 
-export interface UseTypeaheadNavigationReturnType<ChildElement extends Element, I extends UseTypeaheadNavigationChildInfo> {
-    // Can be used on either the parent or each child element.
-    useTypeaheadNavigationProps: UseTypeaheadNavigationProps<ChildElement>;
+export interface UseTypeaheadNavigationReturnType<ParentOrChildElement extends Element, I extends UseTypeaheadNavigationChildInfo> {
+    /**
+     * Can be used on either the parent or each child element.
+     * 
+     * **STABLE**
+     */
+    useTypeaheadNavigationProps: UseTypeaheadNavigationProps<ParentOrChildElement>;
 
     // Must be used on each child element.
-    useTypeaheadNavigationChild: UseTypeaheadNavigationChild<ChildElement, I>;
+    useTypeaheadNavigationChild: UseTypeaheadNavigationChild<I>;
 
 
     currentTypeahead: string | null;
     invalidTypeahead: boolean | null;
 }
 
-export type UseTypeaheadNavigationProps<E extends Element> = <P extends h.JSX.HTMLAttributes<E>>(props: P) => MergedProps<E, P, P>
-export type UseTypeaheadNavigationChildReturnType<_E extends Element> = void;
+export type UseTypeaheadNavigationProps<E extends Element> = (props: h.JSX.HTMLAttributes<E>) => h.JSX.HTMLAttributes<E>;
+export type UseTypeaheadNavigationChildReturnType = void;
 
 
 export interface UseTypeaheadNavigationParameters {
@@ -232,13 +214,15 @@ export interface UseTypeaheadNavigationParameters {
      */
     collator?: Intl.Collator;
 
+    noTypeahead?: boolean;
+
     typeaheadTimeout?: number;
     getIndex(): number | null;
     setIndex(value: number | null | ((previousValue: number | null) => (number | null))): void;
 }
 
 /** Arguments passed to the child 'useTypeaheadNavigationChild` */
-export interface UseTypeaheadNavigationChildInfo extends ManagedChildInfo<number> {
+export interface UseTypeaheadNavigationChildInfo extends ManagedChildInfoBase<number> {
     /**
      * If provided, allows this component to be navigated to by typing this string. 
      * It should be the same text content as whatever's displayed, ideally.
@@ -249,14 +233,7 @@ export interface UseTypeaheadNavigationChildInfo extends ManagedChildInfo<number
 export interface UseTypeaheadNavigationChildParameters extends UseTypeaheadNavigationChildInfo { }
 
 /** Type of the child's sub-hook */
-export type UseTypeaheadNavigationChild<ChildElement extends Element, I extends UseTypeaheadNavigationChildInfo> = ({ text, index, ...i }: I) => UseTypeaheadNavigationChildReturnType<ChildElement>;
-
-/** Return type of the child `useTypeaheadNavigationChildProps` */
-export type UseTypeaheadNavigationPropsReturnType<ChildElement extends Element, P extends {}> = MergedProps<ChildElement, UseRefElementPropsReturnType<ChildElement, {
-    onKeyDown: (e: KeyboardEvent) => void;
-    onCompositionStart: (e: CompositionEvent) => void;
-    onCompositionEnd: (e: CompositionEvent) => void;
-}>, P>;
+export type UseTypeaheadNavigationChild<I extends UseTypeaheadNavigationChildInfo> = ({ text, index, ...i }: Pick<I, "text" | "index">) => UseTypeaheadNavigationChildReturnType;
 
 
 /**
@@ -264,7 +241,7 @@ export type UseTypeaheadNavigationPropsReturnType<ChildElement extends Element, 
  * 
  * @see useListNavigation, which packages everything up together.
  */
-export function useTypeaheadNavigation<ChildElement extends Element, I extends UseTypeaheadNavigationChildInfo>({ collator, getIndex, typeaheadTimeout, setIndex }: UseTypeaheadNavigationParameters): UseTypeaheadNavigationReturnType<ChildElement, I> {
+export function useTypeaheadNavigation<ParentOrChildElement extends Element, I extends UseTypeaheadNavigationChildInfo>({ collator, getIndex, typeaheadTimeout, setIndex, noTypeahead }: UseTypeaheadNavigationParameters): UseTypeaheadNavigationReturnType<ParentOrChildElement, I> {
 
 
     // For typeahead, keep track of what our current "search" string is (if we have one)
@@ -328,8 +305,10 @@ export function useTypeaheadNavigation<ChildElement extends Element, I extends U
         return (lhs as unknown as number) - (rhs as unknown as number);
     });
 
+    const isDisabled = useStableGetter(noTypeahead);
 
-    const useTypeaheadNavigationProps: UseTypeaheadNavigationProps<ChildElement> = useCallback(function <P extends h.JSX.HTMLAttributes<ChildElement>>({ ...props }: P): UseTypeaheadNavigationPropsReturnType<ChildElement, P> {
+
+    const useTypeaheadNavigationProps: UseTypeaheadNavigationProps<ParentOrChildElement> = useCallback(function ({ ...props }: h.JSX.HTMLAttributes<ParentOrChildElement>): h.JSX.HTMLAttributes<ParentOrChildElement> {
 
         const onCompositionStart = (_e: CompositionEvent) => { setImeActive(true) };
         const onCompositionEnd = (e: CompositionEvent) => {
@@ -338,6 +317,8 @@ export function useTypeaheadNavigation<ChildElement extends Element, I extends U
         };
 
         const onKeyDown = (e: KeyboardEvent) => {
+            if (isDisabled())
+                return;
 
             const imeActive = getImeActive();
 
@@ -383,7 +364,7 @@ export function useTypeaheadNavigation<ChildElement extends Element, I extends U
 
         };
 
-        return useMergedProps<ChildElement>()({ onKeyDown, onCompositionStart, onCompositionEnd, }, props);
+        return useMergedProps<ParentOrChildElement>({ onKeyDown, onCompositionStart, onCompositionEnd, }, props);
     }, []);
 
     // Handle changes in typeahead that cause changes to the tabbable index
@@ -468,7 +449,7 @@ export function useTypeaheadNavigation<ChildElement extends Element, I extends U
         }
     }, [currentTypeahead]);
 
-    const useTypeaheadNavigationChild = useCallback<UseTypeaheadNavigationChild<ChildElement, I>>(({ text, ...i }: I) => {
+    const useTypeaheadNavigationChild = useCallback<UseTypeaheadNavigationChild<I>>(({ text, ...i }: Pick<I, "text" | "index">) => {
 
         useEffect(() => {
             if (text) {
@@ -477,7 +458,7 @@ export function useTypeaheadNavigation<ChildElement extends Element, I extends U
                 // Because all index values should be unique, the returned sortedIndex
                 // should always refer to a new location (i.e. be negative)                
                 const sortedIndex = binarySearch(sortedTypeaheadInfo.current, text, insertingComparator);
-                console.assert(sortedIndex < 0 || insertingComparator(sortedTypeaheadInfo.current[sortedIndex].text, { unsortedIndex: i.index, text}) == 0);
+                console.assert(sortedIndex < 0 || insertingComparator(sortedTypeaheadInfo.current[sortedIndex].text, { unsortedIndex: i.index, text }) == 0);
                 if (sortedIndex < 0) {
                     sortedTypeaheadInfo.current.splice(-sortedIndex - 1, 0, { text, unsortedIndex: i.index });
                 }
@@ -489,7 +470,7 @@ export function useTypeaheadNavigation<ChildElement extends Element, I extends U
                     // When unmounting, find where we were and remove ourselves.
                     // Again, we should always find ourselves because there should be no duplicate values if each index is unique.
                     const sortedIndex = binarySearch(sortedTypeaheadInfo.current, text, insertingComparator);
-                    console.assert(sortedIndex < 0 || insertingComparator(sortedTypeaheadInfo.current[sortedIndex].text, { unsortedIndex: i.index, text}) == 0);
+                    console.assert(sortedIndex < 0 || insertingComparator(sortedTypeaheadInfo.current[sortedIndex].text, { unsortedIndex: i.index, text }) == 0);
 
                     if (sortedIndex >= 0) {
                         sortedTypeaheadInfo.current.splice(sortedIndex, 1);
@@ -498,7 +479,7 @@ export function useTypeaheadNavigation<ChildElement extends Element, I extends U
             }
         }, [text]);
 
-        return {}
+        return;
 
     }, []);
 

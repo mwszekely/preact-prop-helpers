@@ -4,17 +4,6 @@ import { useAsync, UseAsyncParameters, UseAsyncReturnType } from "./use-async";
 import { useStableCallback } from "./use-stable-callback";
 import { useState } from "./use-state";
 
-
-export interface AsyncHandler<CaptureType, E extends h.JSX.TargetedEvent> {
-    /**
-     * The `this` keyword always points to the DOM element the event handler
-     * was invoked on. See: https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Event_handlers#Event_handlers_parameters_this_binding_and_the_return_value
-     */
-    (this: never, capturedValue: CaptureType, event: E): void;
-}
-export type GenericAsyncHandler<CaptureType, Target extends EventTarget> = AsyncHandler<CaptureType, h.JSX.TargetedEvent<Target>>;
-
-
 export interface UseAsyncHandlerParameters<EventType extends Event, CaptureType> extends Omit<UseAsyncParameters<[CaptureType, EventType], [EventType]>, "capture"> {
     /**
      * What transient information is captured by this event 

@@ -1,231 +1,234 @@
-import { Inputs, useCallback, useRef } from "preact/hooks";
-import { EffectChange } from "./use-effect";
+import { StateUpdater, useCallback, useRef } from "preact/hooks";
 import { useLayoutEffect } from "./use-layout-effect";
-import { useRefElement, UseRefElementProps } from "./use-ref-element";
+import { OnPassiveStateChange, returnFalse, returnNull, useEnsureStability, usePassiveState } from "./use-passive-state";
+import { useStableCallback } from "./use-stable-callback";
+import { useStableGetter } from "./use-stable-getter";
 import { useState } from "./use-state";
 
+/**
+ * Reminder of order of execution:
+ * 
+ * * (tree mounts)
+ * * Parent renders
+ * * Children render
+ * * Children receive ref (if applicable)
+ * * Parent receives ref (if applicable)
+ * * Children run effects
+ * * Parent runs effects
+ * 
+ * * (tree unmounts)
+ * * Parent runs effect-cleanup
+ * * Parent deletes ref (if applicable)
+ * * Child runs effect-cleanup
+ * * Child deletes ref (if applicable)
+ * 
+ * Two things to note here:
+ * * Rendering starts at the root,  but effects and refs start at the leaves.
+ * * refs are *usually* called before effects, but only when that HTMLElement renders. Basically just a reminder that a component can be mounted without it existing in the DOM.
+ */
+const _comments = void (0);
 
-//export const IndexPending = Symbol("index-pending");
-
-export interface ManagedChildInfo<T extends number | string> {
-
-    /**
-     * A key used to uniquely identify the child amongst its siblings.
-     * The indices do not *necessarily* need to be sequential (especially
-     * in the case of string indices), but other hooks that depend
-     * on `useManagedChild` may specifically want sequentially-ordered
-     * indices (e.g. `useLinearNavigation`)
-     */
-    index: T;
+export interface ManagedChildInfoBase<T extends string | number> {
+    index: T
 }
 
-export interface UseManagedChildReturnType<E extends EventTarget> {
-    getElement(): E | null;
-    useManagedChildProps: UseRefElementProps<E>;
-}
+export type UseManagedChild<I extends ManagedChildInfoBase<string | number>> = (a: { info: ManagedChildInfoNeeded<I> }) => void;
 
-export type UsedManagedChild<I extends ManagedChildInfo<any>> = <E extends EventTarget>(info: I) => UseManagedChildReturnType<E>;
-//export type UseManagedChildProps<E extends EventTarget> = <P extends UseManagedChildPropsParameters<E>>(props: P) => UseManagedChildPropsReturnType<E, P>;
-//export type UseManagedChildPropsParameters<E extends EventTarget> = UseRefElementPropsParameters<E>;
-//export type UseManagedChildPropsReturnType<E extends EventTarget, P extends UseManagedChildPropsParameters<E>> = void;
+export type ManagedChildInfoNeeded<I extends ManagedChildInfoBase<string | number>> = I & {}
 
-type InfoToKey<I extends ManagedChildInfo<any>> = I["index"];
-type ManagedChildren<T extends number | string, I extends ManagedChildInfo<T>> = T extends string ? Record<string, I> : I[];
 
-export interface UseChildManagerReturnType<I extends ManagedChildInfo<any>> {
+export interface UseManagedChildrenReturnType<I extends ManagedChildInfoBase<string | number>> {
     /**
      * A hook that must be called by every child component that
      * is to be managed by this one. The argument to the hook
      * is just the bag of properties to pass to the parent,
      * including the child's index.
      */
-    useManagedChild: UsedManagedChild<I>;
-
+    useManagedChild: UseManagedChild<I>;
     /**
-     * An array of all currently managed children,
-     * or rather the information they provided
-     * the parent.
+     * Returns information about the child that rendered itself with the requested key.
      * 
-     * The index that the child provided is where it is located in this structure. For numeric IDs, this is just an array, with each object at that location in the array.
-     * 
-     * This is generally just an array, though it can be a Record instead if string IDs are used instead of numeric IDs.
+     * **Stable, but cannot be called during render!**
      */
-    managedChildren: ManagedChildren<InfoToKey<I>, I>;
-
-    /**
-     * Separate from `managedChildren`, this keeps track of all mounted children in the order that they mounted.
-     * `getMountIndex` will return the index into this array given the child's index.
-     *  
-     * When unmounted, its entry becomes null.
-     * 
-     * This and `managedChildren` will always have the same contents, but likely in a different order and in different locations.
-     */
-    mountedChildren: (null | I)[];
-
-    /**
-     * Returns the current number of children being managed 
-     * (specifically the number of children that have mounted *and* are still mounted.).
-     * 
-     * For most array-like child structures with numeric IDs, this will match up with `managedChildren.length`.
-     */
-    childCount: number;
-
-    /**
-     * The total number of children that have been mounted, regardless of if they've since unmounted themselves.
-     */
-    totalChildrenMounted: number;
-
-    /**
-     * The total number of children that have unmounted -- this is 0 until at least some time after `totalChildrenMounted` is >0.
-     */
-    totalChildrenUnounted: number;
-
-    /**
-     * Returns in what position this child mounted. If this is the most recently mounted child, it will return a value equal to `totalChildrenMounted` - 1.
-     * 
-     * **On the child side, cannot be used inside useLayoutEffect** (On the parent side it's fine at any point).  If multiple children are mounted on the same frame, their mount indices relative to each other will be arbitrary but consistent (assuming Preact's is).
-     */
-    getMountIndex(index: InfoToKey<I>): number;
-
-    /**
-     * Given the Element that the child mounts as, returns its `index` prop.
-     */
-    indicesByElement: Map<EventTarget, InfoToKey<I>>
-
-    /**
-     * A set containing every index that has unmounted but not ever re-mounted itself.
-     * 
-     * In a numeric, linear list, this would represent either holes in the list, or spaces after the end of the list.
-     */
-    deletedIndices: Set<InfoToKey<I>>;
+    children: ManagedChildren<I>;
 }
+
+
+
+export interface ManagedChildren<I extends ManagedChildInfoBase<string | number>> {
+    getAt(index: I["index"]): I | undefined;
+    //getSize(): number;
+    getHighestIndex(): number;
+    forEach: (f: (child: I) => void) => void;
+    sliceSort: (compare: (lhs: I, rhs: I) => number) => I[];
+}
+
+
+export interface UseManagedChildrenParameters<I extends { index?: any }> {
+    /**
+     * Runs after one or more children have updated their information (index, etc.).
+     * 
+     * Only one will run per tick, just like layoutEffect, but it isn't
+     * *guaranteed* to have actually been a change.
+     */
+    onAfterChildLayoutEffect?: null | undefined | ((causers: Iterable<I["index"]>) => void);
+
+    /**
+     * Same as the above, but only for mount/unmount (or when a child changes its index)
+     */
+    onChildrenMountChange?: null | undefined | ((mounted: Set<I["index"]>, unmounted: Set<I["index"]>) => void);
+}
+
+//export type UseManagedChildParameters<I extends {}> = { info: I };
 
 /**
  * Allows a parent component to access information about certain
  * child components once they have rendered.
  * 
- * This hook is slightly more complicated in that it returns both a
- * prop-modifying hook, but also a hook that each child will need
- * to use: `useManagedChild`.  It's stable across renders, so just 
- * toss it into a `Context` so the children can have access to it.
- * This function registers the child with the parent and provides
- * it with any requested information, but doesn't do anything else
- * until it unmounts and retracts that information.
+ * This hook is designed to be lightweight, in that the parent keeps no state
+ * and runs no effects.  Each child *does* run an effect, but with no state
+ * changes unless you explicitly request them.
+ * 
+ * 
  */
-export function useChildManager<I extends ManagedChildInfo<any>>(): UseChildManagerReturnType<I> {
-    type K = InfoToKey<I>
+export function useManagedChildren<I3 extends {}>({ onAfterChildLayoutEffect, onChildrenMountChange }: UseManagedChildrenParameters<I3 & ManagedChildInfoBase<string | number>>): UseManagedChildrenReturnType<I3 & ManagedChildInfoBase<string | number>> {
+    type I = I3 & ManagedChildInfoBase<string | number>;
 
-    // This is blindly updated any time a child mounts or unmounts itself.
-    // Used to make sure that any time the array of managed children updates,
-    // we also re-render.
-    const [_childUpdateIndex, setChildUpdateIndex] = useState(0);
-    const [totalChildrenMounted, setTotalChildrenMounted, getTotalChildrenMounted] = useState(0);
-    const [totalChildrenUnounted, setTotalChildrenUnounted, _getTotalChildrenUnounted] = useState(0);
-    const childrenCurrentlyMounted = totalChildrenMounted - totalChildrenUnounted;
-    const managedChildren = useRef<ManagedChildren<InfoToKey<I>, I>>([] as any as ManagedChildren<InfoToKey<I>, I> /** TODO: Any problems caused by using an array when it should be an object? */);
-    const mountedChildren = useRef<(null | I)[]>([]);
-    const mountOrder = useRef<Map<K, number>>(new Map());
-    const indicesByElement = useRef<Map<EventTarget, K>>(new Map());
-    const deletedIndices = useRef<Set<K>>(new Set<K>());
+    useEnsureStability("useManagedChildren", onAfterChildLayoutEffect, onChildrenMountChange);
 
-    // Used to keep track of indices that have "over-mounted" and by how much.
-    // We need this so that we don't erase saved information when a component
-    // "overmounts" over another which then, correctly, switches *itself* to something else.
-    // In general, this should only happen when components are swapping between indices.
-    // By the time they're done, this map should be all 0s again, at which point
-    // it's okay to actually run the unmount code.
-    // 
-    // TODO: throw a console.assert somewhere to make up for the lost 
-    // "are you sure you want to overwrite this child's index!" assertion.
-    // Namely, is this map all 0s when the parent element re-renders? 
-    // Probably not because of setChildUpdateIndex
-    const overmountCount = useRef(new Map<K, number>());
-
-    const getMountIndex = useCallback((index: K) => { return mountOrder.current.get(index)!; }, []);
-
-    const useManagedChild: UsedManagedChild<I> = useCallback(<ChildType extends EventTarget>(info: I) => {
-        const { getElement, useRefElementProps } = useRefElement<ChildType>({ onElementChange: useCallback((element: ChildType | null) => {
-            if (element) {
-                indicesByElement.current.set(element, info.index);
-                deletedIndices.current.delete(info.index);
-                if (managedChildren.current[info.index as keyof ManagedChildren<InfoToKey<I>, I>] != undefined) {
-                    overmountCount.current.set(info.index, (overmountCount.current.get(info.index) ?? 0) + 1);
-                }
-
-                setChildUpdateIndex(c => ++c);
-                managedChildren.current[info.index as keyof ManagedChildren<InfoToKey<I>, I>] = { ...info } as any;
-
-                return () => {
-                    setChildUpdateIndex(c => ++c);
-                    if ((overmountCount.current.get(info.index) ?? 0) > 0) {
-                        overmountCount.current.set(info.index, (overmountCount.current.get(info.index) ?? 0) - 1);
-                    }
-                    else {
-                        delete managedChildren.current[info.index as keyof ManagedChildren<InfoToKey<I>, I>];
-                        deletedIndices.current.add(info.index);
-
-                        if (typeof info.index === "number") {
-                            while (managedChildren.current.length && (managedChildren.current as I[])[(managedChildren.current as I[]).length - 1] === undefined)
-                                (managedChildren.current as I[]).length -= 1;
-                        }
-                        indicesByElement.current.delete(element);
-                    }
-                }
-            }
-        }, []) });
-
-        useLayoutEffect(() => {
-            const index = getTotalChildrenMounted();
-            mountOrder.current.set(info.index, index);
-            mountedChildren.current[index] = info;
-            setTotalChildrenMounted(t => ++t);
-            return () => {
-                mountOrder.current.delete(info.index);
-                mountedChildren.current[index] = null;
-                setTotalChildrenUnounted(t => ++t);
-
-            };
-        }, [info.index]);
-
-        // Any time our child props change, make that information available generally.
-        // *Don't re-render*, otherwise we'd be stuck in an
-        // infinite loop every time an anonymous function is passed.
-        // It comes in from the props so the child was already updated by it --
-        // we don't need the parent to re-render every single child any time
-        // "onClick" updates or whatever.  The relevant child already knows,
-        // and that's what matters.
-        useLayoutEffect(() => {
-            if (managedChildren.current[info.index as keyof ManagedChildren<InfoToKey<I>, I>] != undefined)
-                managedChildren.current[info.index as keyof ManagedChildren<InfoToKey<I>, I>] = { ...info } as any;
-        }, [...Object.entries(info).flat()]);
-
-        return { getElement, useManagedChildProps: useRefElementProps }
+    const getHighestIndex = useCallback((): number => {
+        return managedChildrenArray.current.arr.length - 1;
     }, []);
 
+    // All the information we have about our children is stored in this **stable** array.
+    // Any mutations to this array **DO NOT** trigger any sort of a re-render.
+    const managedChildrenArray = useRef<{ arr: Array<I>; rec: Partial<Record<I["index"], I>>; }>({ arr: [], rec: {} });
+
+    // For indirect access to each child
+    // Compare getManagedChildInfo
+    // TODO: The primary use for this is flaggable closest fits
+    // which need to search all children for that closest fit.
+    // It would be nice if there was something better for that.
+    const forEachChild = useCallback((f: (child: I) => void) => {
+        for (const child of managedChildrenArray.current.arr) { f(child); }
+        for (const field in managedChildrenArray.current.rec) {
+            const child: I | undefined = managedChildrenArray.current.rec[field as keyof Record<I["index"], I>];
+            if (child)
+                f(child);
+        }
+    }, [])
+
+    // Retrieves the information associated with the child with the given index.
+    // `undefined` if not child there, or it's unmounted.
+    const getManagedChildInfo = useCallback<UseManagedChildrenReturnType<I>["children"]["getAt"]>((index: I["index"]) => {
+        if (typeof index == "number")
+            return managedChildrenArray.current.arr[index as number]!;
+        else
+            return managedChildrenArray.current.rec[index as I["index"]]!;
+    }, [])
+
+    // tl;dr this is a way to have run useLayoutEffect once after all N children
+    // have mounted and run *their* useLayoutEffect, but also *without* re-rendering
+    // ourselves because of having a `childCount` state or anything similar.
+    //
+    // When the child count ref updates, we want the parent to also run an effect
+    // to maybe do something with all these children that just mounted.
+    // The easiest way would be useEffect(..., [childCount]) but
+    // that would require us having a childCount state, then calling
+    // setChildCount and re-rendering every time children mount
+    // (only one re-render at a time unless children are staggered, but still)
+    // 
+    // As an alternate solution, any time a child uses ULE on mount, it queues a microtask
+    // to emulate running ULE on the parent. Only the first child will actually queue
+    // the microtask (by checking hasRemoteULE first) so that the "effect" only
+    // runs once. When it's done, hasRemoteULE is reset so it can run again if
+    // more children mount/unmount.
+    const hasRemoteULEChildMounted = useRef<{ mounts: Set<I["index"]>, unmounts: Set<I["index"]> } | null>(null);
+    const remoteULEChildChangedCausers = useRef(new Set<I["index"]>());
+    const remoteULEChildChanged = useCallback((index: I["index"]) => {
+
+        if (remoteULEChildChangedCausers.current.size == 0) {
+            queueMicrotask(() => {
+                onAfterChildLayoutEffect?.(remoteULEChildChangedCausers.current);
+                remoteULEChildChangedCausers.current.clear();
+            });
+        }
+
+        remoteULEChildChangedCausers.current.add(index);
+
+        return () => { };
+
+    }, [/* Must remain stable */]);
+
+    const remoteULEChildMounted = useCallback((index: I["index"], mounted: boolean) => {
+        if (!hasRemoteULEChildMounted.current) {
+            hasRemoteULEChildMounted.current = {
+                mounts: new Set(),
+                unmounts: new Set(),
+            };
+            queueMicrotask(() => {
+                onChildrenMountChange?.(hasRemoteULEChildMounted.current!.mounts, hasRemoteULEChildMounted.current!.unmounts)
+                hasRemoteULEChildMounted.current = null;
+            });
+        }
+
+        if (!mounted) {
+            if (typeof index == "number")
+                delete managedChildrenArray.current.arr[index as number];
+            else
+                delete managedChildrenArray.current.rec[index as I["index"]];
+        }
+
+        hasRemoteULEChildMounted.current[mounted ? "mounts" : "unmounts"].add(index);
+    }, [/* Must remain stable */]);
+
+
+    const useManagedChild: UseManagedChild<I> = useCallback(({ info }: { info: ManagedChildInfoNeeded<I> }) => {
+        // Any time our child props change, make that information available
+        // the parent if they need it.
+        // The parent can listen for all updates and only act on the ones it cares about,
+        // and multiple children updating in the same tick will all be sent at once.
+        useLayoutEffect(() => {
+            // Insert this information in-place
+            if (typeof info.index == "number")
+                managedChildrenArray.current.arr[info.index as number] = { ...info } as unknown as I;
+            else
+                managedChildrenArray.current.rec[info.index as I["index"]] = { ...info } as unknown as I;
+            return remoteULEChildChanged(info.index as I["index"]);
+        }, [...Object.entries(info).flat()]);
+
+        // When we mount, notify the parent via queueMicrotask
+        // (every child does this, so everything's coordinated to only queue a single microtask per tick)
+        // Do the same on unmount.
+        // Note: It's important that this comes AFTER remoteULEChildChanged
+        // so that remoteULEChildMounted has access to all the info on mount.
+        useLayoutEffect(() => {
+            return remoteULEChildMounted?.(info.index as I["index"], true);
+        }, [info.index]);
+    }, [/* Must remain stable */]);
+
+
+    const managedChildren = useRef<ManagedChildren<I>>({
+        ...{ _: managedChildrenArray.current } as {}, forEach: forEachChild, getAt: getManagedChildInfo, getHighestIndex: getHighestIndex, sliceSort: (compare) => {
+            return managedChildrenArray.current.arr.slice().sort(compare);
+        }
+    });
 
     return {
         useManagedChild,
-        childCount: childrenCurrentlyMounted,
-        managedChildren: managedChildren.current,
-        mountedChildren: mountedChildren.current,
-        indicesByElement: indicesByElement.current,
-        totalChildrenMounted,
-        totalChildrenUnounted,
-        getMountIndex,
-        deletedIndices: deletedIndices.current
+        children: managedChildren.current
     }
 }
 
-type UE = <I extends Inputs>(effect: (prev: I, changes: EffectChange<I, number>[]) => (void | (() => void)), inputs: I) => void;
 
-export interface UseChildFlagParameters<T extends string | number, I extends ManagedChildInfo<T>> {
+export interface UseChildrenFlagParameters<K extends string, I extends FlaggableChildInfoBase<K>> {
 
     /**
-     * Which child index refers to the currently "active" child.
+     * Which child is considered active on mount.
+     * 
+     * After mount, change the current active child with `changeIndex`.
      */
-    activatedIndex: T | null | undefined;
-
-    managedChildren: (null | undefined | I)[] | Record<string, null | undefined | I>;
+    initialIndex: I["index"] | null | undefined;
 
     /**
      * When provided, if the given activatedIndex doesn't map onto any
@@ -238,117 +241,188 @@ export interface UseChildFlagParameters<T extends string | number, I extends Man
      */
     closestFit?: boolean;
 
-    /**
-     * Will be called once when a given child has become the "active" child.
-     * Generally, this will look like 
-     * `(i, set) => managedChildren[i].setActive(set)` 
-     * or similar.
-     */
-    setChildFlag: (index: T, set: boolean) => void;
+    children: ManagedChildren<I>;
 
     /**
-     * Used to keep track of whether or not a child needs its flag set
-     * both in general cases but also when a child unmounts and a new child
-     * mounts in its place with the same index.
+     * Called whenever a new index is selected.
+     * 
+     * Notably, the value can be different than what was called with changeIndex()
+     * if the requested index didn't exist or was hidden.
      */
-    getChildFlag: (index: T) => boolean | null;
+    onIndexChange?: OnPassiveStateChange<I["index"] | null>;
 
     /**
-     * By default, the child flag setting happens during `useLayoutEffect`.  If you
-     * would prefer it to happen during `useEffect`, pass that implementation in
-     * here.
+     * When children have multiple flags, the `key` parameter controls which flag we're checking.
+     * 
+     * This can be anything you want, but must not change.
      */
-    useEffect?: (<I extends Inputs>(effect: (prev: I | undefined, changes: EffectChange<I, number>[]) => (void | (() => void)), inputs?: I) => void | UE);
+    key: K;
+
+    fitNullToZero?: boolean;
+}
+
+
+export interface ChildFlagOperations {
+
+    /**
+     * Must return whether the current child is active
+     */
+    get: () => boolean;
+    /**
+     * The child must set itself as active/inactive, whatever that entails.
+     * This could be as simple as a setState function.
+     */
+    set: (active: boolean) => void;
+    /**
+     * Must return true if this child is a valid candidate to be flagged, and false if not.
+     * Most children should return true. Returning false is only useful to mark a child as "invalid" in some way.
+     * Removing a child from the list does effectively the same thing, but this lets you keep the child around.
+     */
+    isValid(): boolean;
+}
+
+
+export interface FlaggableChildInfoBase<K extends string> extends ManagedChildInfoBase<number> {
+    flags: Partial<Record<K, ChildFlagOperations>>
+}
+
+export interface UseChildrenFlagReturnType<K extends string, I extends FlaggableChildInfoBase<K>> {
+    /** **STABLE** */
+    changeIndex: (arg: Parameters<StateUpdater<number | null>>[0]) => number | null;
+    /** **STABLE** */
+    onChildrenMountChange: (mounted: Set<I["index"]>, unmounted: Set<I["index"]>) => void;
+    /** **STABLE** */
+    getCurrentIndex: () => number | null;
 }
 
 /**
- * Helper function for letting children know when they are or are not the
- * current selected/expanded/focused/whatever child.
+ * An extension to useManagedChildren that handles the following common case:
+ * 1. You have a bunch of children
+ * 2. At any given time, only 1 of them is "selected", "activated", "focusable", whatever (or 0 of them, that's cool too, just 0 or 1 though).
+ * 3. The parent has control over who is "selected" via a numerical index.
  * 
- * Automatically handles when children are mounted & unmounted and such.
+ * This hook allows for much easier control over selection management.
  * 
- * While it will be called once for every child on mount, after that setFlag 
- * is guaranteed to only be called once on activation and once on deactivation,
- * so it's generally safe to put side effects inside if necessary.  
- * It's also safe to make it non-stable.
  * 
- * @param activatedIndex What index the current selected (etc.) child is
- * @param length How many children exist (as managedChildren.length)
- * @param setFlag A function that probably looks like (i, flag) => managedChildren[i].setActive(flag)
- * @param useEffect Which version of useEffect to use. Default is `useLayoutEffect`.
+ * @param param0 
+ * @returns 
  */
-export function useChildFlag<T extends string | number, I extends ManagedChildInfo<T>>({ activatedIndex, closestFit, managedChildren, setChildFlag, getChildFlag, useEffect }: UseChildFlagParameters<T, I>) {
+export function useChildrenFlag<K extends string, I extends FlaggableChildInfoBase<K>>({ children, initialIndex, closestFit, onIndexChange, key, fitNullToZero }: UseChildrenFlagParameters<K, I>): UseChildrenFlagReturnType<K, I> {
+    useEnsureStability("useChildrenFlag", closestFit, onIndexChange, key);
 
-    useEffect ??= useLayoutEffect;
+    const [getCurrentIndex, setCurrentIndex] = usePassiveState<null | number>(onIndexChange, useCallback(() => (initialIndex ?? (fitNullToZero ? 0 : null)), []));
 
-    if (closestFit)
-        console.assert(typeof activatedIndex == "number" || activatedIndex == null);
+    const [getRequestedIndex, setRequestedIndex] = usePassiveState<null | number>(null, useCallback(() => (initialIndex ?? (fitNullToZero ? 0 : null)), []));
 
-    // Whenever we re-render, make sure that any children that have mounted
-    // have their flags properly set.  We know it's unset if it was null,
-    // in which case we just set it to true or false.
-    //
-    // And, I mean, as long as we're already iterating through every child
-    // on every render to check for newly mounted children, might as well
-    // just handle changed in the activatedIndex here too.
-    useEffect(() => {
+    const getFitNullToZero = useStableGetter(fitNullToZero);
 
-
-        // TODO: We have limited information about when a child mounts or unmounts
-        // and so we don't know where to look for any null entries that need changing.
-        // We know when activatedIndex changes and what it was, but not much else.
-        // Looping over every child *works*, and it's not an expensive loop by any means,
-        // but, like, eugh.
-
-
-        // Also, before we do anything, see if we need to "correct" activatedIndex.
-        // It could be pointing to a child that doesn't exist, and if closestFit is given,
-        // we need to adjust activatedIndex to point to a valid child.
-        if (typeof activatedIndex == "number" && Array.isArray(managedChildren) && managedChildren[activatedIndex] == null) {
-            // Oh dear. Are we actively correcting this?
-            if (closestFit) {
-                // Oh dear.
-                // Search up and down the list of children for any that actually exist.
-
-                let searchHigh = activatedIndex + 1;
-                let searchLow = activatedIndex - 1;
-
-                while ((searchLow >= 0 && managedChildren[searchLow] == null) || (searchHigh < managedChildren.length && managedChildren[searchHigh] == null)) {
-                    ++searchHigh;
-                    --searchLow;
+    // Shared between onChildrenMountChange and changeIndex, not public (but could be I guess)
+    const getClosestFit = useCallback((requestedIndex: number) => {
+        let closestDistance = Infinity;
+        let closestIndex: number | null = null;
+        children.forEach(child => {
+            if (child.flags[key]!.isValid()) {
+                const newDistance = Math.abs(child.index - requestedIndex);
+                if (newDistance < closestDistance || (newDistance == closestDistance && child.index < requestedIndex)) {
+                    closestDistance = newDistance;
+                    closestIndex = child.index;
                 }
+            }
+        });
+        return closestIndex;
+    }, [/* Must remain stable! */]);
 
-                if (searchLow >= 0 && managedChildren[searchLow] != null) {
-                    (activatedIndex as number) = searchLow;
-                }
-                else if (searchHigh < managedChildren.length && managedChildren[searchHigh] != null) {
-                    (activatedIndex as number) = searchHigh;
-                }
+    // Any time a child mounts/unmounts, we need to double-check to see if that affects 
+    // the "currently selected" (or whatever) index.  The two cases we're looking for:
+    // 1. The currently selected child unmounted
+    // 2. A child mounted, and it mounts with the index we're looking for
+    const onChildrenMountChange = useStableCallback<NonNullable<UseManagedChildrenParameters<I>["onChildrenMountChange"]>>((mounted, unmounted) => {
+        const requestedIndex = getRequestedIndex();
+        const currentIndex = getCurrentIndex();
+        const currentChild = currentIndex == null ? null : children.getAt(currentIndex);
 
-                // Now that we've done that, if any valid children exist, we've reset activatedIndex to point to it instead.
-                // Now we'll fall through to the for loop set and unset our flags based on this "corrected" value.
-                //
-                // We don't correct it or save it anywhere because we'd very much like to return to it
-                // if the child remounts itself.
+        // We've not actually selected our requested selection.
+        // Maybe one of the children that just mounted has it?
+        if (currentIndex != requestedIndex && requestedIndex != null) {
+            if (mounted.has(requestedIndex)) {
+                currentChild?.flags[key]!.set(false);
+                children.getAt(requestedIndex)?.flags[key]!.set(true);
+            }
+        }
+        else if (currentIndex != null && unmounted.has(currentIndex)) {
+            // Whatever's currently selected has must unmounted.
+            currentChild?.flags[key]!.set(false);
+            if (!closestFit || requestedIndex == null) {
+                // If we're not in best-fit mode, or there's no index being actively requested,
+                // then our currently activated child unmounting just means we, to be safe,
+                // request it to de-select itself.
+            }
+            else {
+                // If we're in best-fit mode, then try to find another
+                // child to select.
+                const closestFitIndex = getClosestFit(requestedIndex);
+                if (closestFitIndex != null) {
+                    const closestFitChild = children.getAt(closestFitIndex)!;
+                    console.assert(closestFitChild != null, "Internal logic???");
+                    closestFitChild.flags[key]!.set(true);
+                }
             }
         }
 
-        if (Array.isArray(managedChildren)){
-        for (let i = 0; i < managedChildren.length; ++i) {
-            const shouldBeSet = (i == activatedIndex);
-            if (getChildFlag(i as T) != shouldBeSet) {
-                setChildFlag(i as T, shouldBeSet);
-            }
-        }}
-        else {
-            Object.entries(managedChildren).forEach(([i, _info]) => {
-                const shouldBeSet = (i == activatedIndex);
-                if (getChildFlag(i as T) != shouldBeSet) {
-                    setChildFlag(i as T, shouldBeSet);
-                }
-            })
-        }
     });
 
-}
 
+    const changeIndex = useCallback((arg: Parameters<StateUpdater<number | null>>[0]) => {
+        console.log(`${key}: changeIndex(${arg})`);
+        let requestedIndex = arg instanceof Function ? arg(getRequestedIndex()) : arg;
+        if (requestedIndex == null && getFitNullToZero())
+            requestedIndex = 0;
+
+        setRequestedIndex(requestedIndex);
+        const currentIndex = getCurrentIndex();
+        if (currentIndex == requestedIndex)
+            return requestedIndex;
+
+        let newMatchingChild = (requestedIndex == null ? null : children.getAt(requestedIndex));
+        const oldMatchingChild = (currentIndex == null ? null : children.getAt(currentIndex));
+        if (requestedIndex == null) {
+            // Easy case
+            console.log(`${key}: Setting #${currentIndex} to false (null)`);
+            setCurrentIndex(null);
+            oldMatchingChild?.flags[key]!.set(false);
+            return null;
+        }
+        else {
+            if (newMatchingChild && newMatchingChild.flags[key]!.isValid()) {
+                console.log(`${key}: Setting #${currentIndex} to false and #${requestedIndex} to true`);
+                setCurrentIndex(requestedIndex);
+                oldMatchingChild?.flags[key]!.set(false);
+                newMatchingChild.flags[key]!.set(true);
+                return requestedIndex;
+            }
+            else {
+                const closestFitIndex = getClosestFit(requestedIndex);
+                setCurrentIndex(closestFitIndex);
+                if (closestFitIndex != null) {
+                    newMatchingChild = children.getAt(closestFitIndex)!;
+                    console.assert(newMatchingChild != null, "Internal logic???");
+                    console.log(`${key}: Setting #${currentIndex} to false and #${closestFitIndex} to true (closest fit)`);
+                    oldMatchingChild?.flags[key]!.set(false);
+                    newMatchingChild.flags[key]!.set(true);
+                    return closestFitIndex;
+                }
+                else {
+                    oldMatchingChild?.flags[key]!.set(false);
+                    return null;
+                }
+            }
+        }
+    }, []);
+
+    useLayoutEffect(() => {
+        if (initialIndex != null)
+            children.getAt(initialIndex)?.flags[key]?.set(true);
+    }, [])
+
+    return { changeIndex, onChildrenMountChange, getCurrentIndex };
+}

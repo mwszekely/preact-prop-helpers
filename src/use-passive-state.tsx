@@ -34,31 +34,31 @@ export function useEnsureStability<T extends any[]>(parentHookName: string, ...v
 }
 
 
-export function usePassiveState2<T>(onChange: undefined | null | OnPassiveStateChange<T>, getInitial: () => T): [() => T, PassiveStateUpdater<T>] {
+function usePassiveState2<T>(onChange: undefined | null | OnPassiveStateChange<T>, getInitial: () => T): [() => T, PassiveStateUpdater<T>] {
     type StateType = { value: T | typeof Unset }
-    
+
     const warningRef = useRef(false);
     const cleanupCallbackRef = useRef<void | undefined | (() => void)>(undefined);
 
     const [stored, setStored] = useReducer<StateType, T>((prev, action) => {
         if (prev.value !== action) {
             warningRef.current = true;
-            if (cleanupCallbackRef.current) 
+            if (cleanupCallbackRef.current)
                 cleanupCallbackRef.current();
-            
-            cleanupCallbackRef.current = onChange?.(action, prev.value === Unset? getInitial() : prev.value);
+
+            cleanupCallbackRef.current = onChange?.(action, prev.value === Unset ? getInitial() : prev.value);
             warningRef.current = false;
         }
         prev.value = action;
         return prev;
     }, { value: Unset });
 
-    const getState = useCallback((): T => { 
+    const getState = useCallback((): T => {
         if (warningRef.current)
             console.warn("During onChange, prefer using the (value, prevValue) arguments instead of getValue -- it's ambiguous as to if you're asking for the old or new value at this point in time for this component.");
 
-        return stored.value === Unset? getInitial() : stored.value;
-     }, []);
+        return stored.value === Unset ? getInitial() : stored.value;
+    }, []);
 
     const setState = useCallback<PassiveStateUpdater<T>>((nextValueGetter) => {
         let nextValue: T;
@@ -148,23 +148,43 @@ export function usePassiveState<T>(onChange: undefined | null | OnPassiveStateCh
     }, []);
 
     // The actual code the user calls to (possibly) run a new effect.
+    const r = useRef({ microtaskQueued: false, arg: undefined as undefined | Parameters<PassiveStateUpdater<T>>[0], prevDep: undefined as T | undefined });
     const setValue = useCallback<PassiveStateUpdater<T>>((arg) => {
-        const prevDep = valueRef.current === Unset ? undefined : getValue();
-        const dep = arg instanceof Function ? arg(prevDep!) : arg;
+        r.current.prevDep = valueRef.current === Unset ? undefined : getValue();
+        r.current.arg = arg;
+        if (!r.current.microtaskQueued) {
+            r.current.microtaskQueued = true;
+            setTimeout(() => {
+                r.current.microtaskQueued = false;
+                const prevDep = r.current.prevDep;
+                const arg = r.current.arg!;
+                const dep = arg instanceof Function ? arg(prevDep!) : arg;
+                if (dep !== valueRef.current) {
 
-        if (dep !== valueRef.current) {
+                    // Indicate to the user that they shouldn't call getValue during onChange
+                    warningRef.current = true;
 
-            // Indicate to the user that they shouldn't call getValue during onChange
-            warningRef.current = true;
+                    try {
 
-            // Call any registerd cleanup function
-            onShouldCleanUp();
-            cleanupCallbackRef.current = (onChange?.(dep, prevDep) ?? undefined);
-            valueRef.current = dep;
+                        // Call any registered cleanup function
+                        onShouldCleanUp();
+                        cleanupCallbackRef.current = (onChange?.(dep, prevDep) ?? undefined);
+                        valueRef.current = dep;
 
-            // Allow the user to normally call getValue again
-            warningRef.current = false;
+                    }
+                    catch (ex) {
+                        throw ex;
+                    }
+                    finally {
+                        // Allow the user to normally call getValue again
+                        warningRef.current = false;
+                    }
+                }
+
+            }, 0);
         }
+
+
     }, []);
 
     return [getValue, setValue] as const;

@@ -7,7 +7,7 @@ export function useImperativeProps<T extends HTMLElement>(incomingProps: h.JSX.H
     const currentImperativeProps = useRef<{ className: DOMTokenList, style: h.JSX.CSSProperties, others: h.JSX.HTMLAttributes<T> }>({ className: new DOMTokenList(), style: {}, others: {} });
 
 
-    const { getElement, useRefElementProps } = useRefElement<T>({ });
+    const { getElement, useRefElementProps } = useRefElement<T>({});
 
     const addClass = useCallback((cls: string) => {
         getElement()?.classList.add(cls);
@@ -25,7 +25,7 @@ export function useImperativeProps<T extends HTMLElement>(incomingProps: h.JSX.H
     }, []);
 
     const removeStyle = useCallback(<T extends keyof h.JSX.CSSProperties>(prop: T) => {
-       delete currentImperativeProps.current.style[prop];
+        delete currentImperativeProps.current.style[prop];
         getElement()?.style.removeProperty(prop as string);
     }, []);
 
@@ -46,14 +46,15 @@ export function useImperativeProps<T extends HTMLElement>(incomingProps: h.JSX.H
         removeStyle,
         setAttribute,
         removeAttribute,
-        
-        props: useRefElementProps(useMergedProps<T>()(
-            incomingProps,
-            useMergedProps<T>()({
-                className: currentImperativeProps.current.className.toString(),
-                style: currentImperativeProps.current.style
-            },
-            currentImperativeProps.current.others)
-        ))
+
+        props: useRefElementProps(
+            useMergedProps<T>(
+                incomingProps,
+                useMergedProps<T>({
+                    className: currentImperativeProps.current.className.toString(),
+                    style: currentImperativeProps.current.style
+                },
+                currentImperativeProps.current.others)
+            ))
     }
 }

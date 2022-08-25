@@ -18,7 +18,7 @@ type Direction = "ltr" | "rtl";
 type TextOrientation = "mixed" | "upright" | "sideways";
 
 function capitalize<T extends string>(str: T): Capitalize<T> {
-    return (str[0].toUpperCase() + str.substr(1)) as Capitalize<T>;
+    return (str[0].toUpperCase() + str.substring(1)) as Capitalize<T>;
 }
 
 export interface UseLogicalDirectionParameters {
@@ -56,7 +56,7 @@ export interface LogicalElementSize {
  * * `convertToLogicalOrientation`: Based on the current direction, converts "horizontal" or "vertical" to "inline" or "block".
  * * `convertToPhysicalOrientation`:  Based on the current direction, converts "inline" or "block" to "horizontal" or "vertical".
  */
-export function useLogicalDirection<T extends Element>({ onLogicalDirectionChange }: UseLogicalDirectionParameters): UseLogicalDirectionReturnType<T> {
+export function useLogicalDirection<T extends HTMLElement | SVGElement>({ onLogicalDirectionChange }: UseLogicalDirectionParameters): UseLogicalDirectionReturnType<T> {
 
     useEnsureStability("useLogicalDirection", onLogicalDirectionChange);
 
@@ -81,7 +81,7 @@ export function useLogicalDirection<T extends Element>({ onLogicalDirectionChang
     // and if so, tests if the writing mode has changed too.
     //
     // This will work for at least some number of cases, but a better solution is still needed.
-    const { useElementSizeProps } = useElementSize({ onSizeChange: useCallback(_ => onLogicalDirectionChange?.(getLogicalDirectionInfo()), []) })
+    const { useElementSizeProps } = useElementSize<T>({ onSizeChange: useCallback(_ => onLogicalDirectionChange?.(getLogicalDirectionInfo()), []) })
 
     const getLogicalDirectionInfo = useCallback(() => {
         const computedStyles = getComputedStyles();
@@ -257,8 +257,10 @@ const M = {
 
 
 export interface UseLogicalDirectionReturnType<T extends EventTarget> {
+    /** **STABLE** */
     useLogicalDirectionProps: (props: h.JSX.HTMLAttributes<T>) => h.JSX.HTMLAttributes<T>;
     getElement: () => T | null;
+    /** **STABLE** */
     getLogicalDirectionInfo: () => LogicalDirectionInfo | null;
 
     /**
