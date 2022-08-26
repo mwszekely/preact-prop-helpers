@@ -27,13 +27,20 @@ import { useStableGetter } from "./use-stable-getter";
  */
 const _comments = void (0);
 
+//export interface ManagedChildInfoBase<T extends string | number> {}
+
+//export interface ManagedChildInfoNeeded<T extends string | number> {index: T; managedChild: ManagedChildInfoBase<T> }
+
 export interface ManagedChildInfoBase<T extends string | number> {
-    index: T
+    index: T;
 }
 
-export type UseManagedChild<I extends ManagedChildInfoBase<string | number>> = (a: { info: ManagedChildInfoNeeded<I> }) => void;
+export interface ManagedChildInfoNeeded<T extends string | number> {
+    index: T;
+}
 
-export type ManagedChildInfoNeeded<I extends ManagedChildInfoBase<string | number>> = I & {}
+export type UseManagedChild<I extends ManagedChildInfoBase<string | number>> = (a: { info: I }) => void;
+
 
 
 export interface UseManagedChildrenReturnType<I extends ManagedChildInfoBase<string | number>> {
@@ -56,7 +63,7 @@ export interface UseManagedChildrenReturnType<I extends ManagedChildInfoBase<str
 
 
 
-export interface ManagedChildren<I extends ManagedChildInfoBase<string | number>> {
+export interface ManagedChildren<I extends ManagedChildInfoBase<any>> {
     /** STABLE */
     getAt(index: I["index"]): I | undefined;
     /** STABLE */
@@ -64,11 +71,10 @@ export interface ManagedChildren<I extends ManagedChildInfoBase<string | number>
     /** STABLE */
     forEach: (f: (child: I) => void) => void;
     /** **UNSTABLE**, also internal-use only, also TODO need a workaround for this for sortable children */
-    sliceSort: (compare: (lhs: I, rhs: I) => number) => I[];
+    sliceSort: (compare: (lhs: I["index"], rhs: I["index"]) => number) => I[];
 }
 
-
-export interface UseManagedChildrenParameters<I extends { index?: any }> {
+interface MCsP<I extends { index?: any }> {
     /**
      * Runs after one or more children have updated their information (index, etc.).
      * 
@@ -80,8 +86,14 @@ export interface UseManagedChildrenParameters<I extends { index?: any }> {
     /**
      * Same as the above, but only for mount/unmount (or when a child changes its index)
      */
-    onChildrenMountChange?: null | undefined | ((mounted: Set<I["index"]>, unmounted: Set<I["index"]>) => void);
+    onChildrenMountChange?: null | undefined | OnChildrenMountChange<I>;
 }
+
+export interface UseManagedChildrenParameters<I extends ManagedChildInfoBase<any>, Omits extends keyof MCsP<I>> {
+    managedChildren: Omit<MCsP<I>, Omits>
+}
+
+export type OnChildrenMountChange<I extends { index?: any }> = ((mounted: Set<I["index"]>, unmounted: Set<I["index"]>) => void);
 
 //export type UseManagedChildParameters<I extends {}> = { info: I };
 
@@ -95,8 +107,8 @@ export interface UseManagedChildrenParameters<I extends { index?: any }> {
  * 
  * 
  */
-export function useManagedChildren<I3 extends {}>({ onAfterChildLayoutEffect, onChildrenMountChange }: UseManagedChildrenParameters<I3 & ManagedChildInfoBase<string | number>>): UseManagedChildrenReturnType<I3 & ManagedChildInfoBase<string | number>> {
-    type I = I3 & ManagedChildInfoBase<string | number>;
+export function useManagedChildren<I extends ManagedChildInfoBase<any>>({ managedChildren: { onAfterChildLayoutEffect, onChildrenMountChange } }: UseManagedChildrenParameters<I, never>): UseManagedChildrenReturnType<I> {
+    //type I = I3 & ManagedChildInfoBase<string | number>;
 
     useEnsureStability("useManagedChildren", onAfterChildLayoutEffect, onChildrenMountChange);
 
@@ -187,7 +199,7 @@ export function useManagedChildren<I3 extends {}>({ onAfterChildLayoutEffect, on
     }, [/* Must remain stable */]);
 
 
-    const useManagedChild: UseManagedChild<I> = useCallback(({ info }: { info: ManagedChildInfoNeeded<I> }) => {
+    const useManagedChild: UseManagedChild<I> = useCallback<UseManagedChild<I>>(({ info }) => {
         // Any time our child props change, make that information available
         // the parent if they need it.
         // The parent can listen for all updates and only act on the ones it cares about,
@@ -199,7 +211,7 @@ export function useManagedChildren<I3 extends {}>({ onAfterChildLayoutEffect, on
             else
                 managedChildrenArray.current.rec[info.index as I["index"]] = { ...info } as unknown as I;
             return remoteULEChildChanged(info.index as I["index"]);
-        }, [...Object.entries(info).flat()]);
+        }, [...Object.entries(info).flat(9)]);  // 9 is infinity, right? Sure. Unrelated: TODO.
 
         // When we mount, notify the parent via queueMicrotask
         // (every child does this, so everything's coordinated to only queue a single microtask per tick)
@@ -224,9 +236,7 @@ export function useManagedChildren<I3 extends {}>({ onAfterChildLayoutEffect, on
     }
 }
 
-
-export interface UseChildrenFlagParameters<K extends string, I extends FlaggableChildInfoBase<K>> {
-
+interface CFP<K extends string, I extends FlaggableChildInfoNeeded<K>> {
     /**
      * Which child is considered active on mount.
      * 
@@ -265,6 +275,10 @@ export interface UseChildrenFlagParameters<K extends string, I extends Flaggable
     fitNullToZero?: boolean;
 }
 
+export interface UseChildrenFlagParameters<K extends string, I extends FlaggableChildInfoNeeded<K>, Omits extends keyof CFP<K, I>> {
+    flaggableChildren: Omit<CFP<K, I>, Omits>
+}
+
 
 export interface ChildFlagOperations {
 
@@ -289,12 +303,14 @@ export interface ChildFlagOperations {
 export interface FlaggableChildInfoBase<K extends string> extends ManagedChildInfoBase<number> {
     flags: Partial<Record<K, ChildFlagOperations>>
 }
+export interface FlaggableChildInfoNeeded<_K extends string> extends ManagedChildInfoBase<number> {
+}
 
 export interface UseChildrenFlagReturnType<K extends string, I extends FlaggableChildInfoBase<K>> {
     /** **STABLE** */
     changeIndex: (arg: Parameters<StateUpdater<number | null>>[0]) => number | null;
     /** **STABLE** */
-    onChildrenMountChange: (mounted: Set<I["index"]>, unmounted: Set<I["index"]>) => void;
+    onChildrenMountChange: OnChildrenMountChange<I>;
     /** **STABLE** */
     getCurrentIndex: () => number | null;
 }
@@ -311,7 +327,7 @@ export interface UseChildrenFlagReturnType<K extends string, I extends Flaggable
  * @param param0 
  * @returns 
  */
-export function useChildrenFlag<K extends string, I extends FlaggableChildInfoBase<K>>({ children, initialIndex, closestFit, onIndexChange, key, fitNullToZero }: UseChildrenFlagParameters<K, I>): UseChildrenFlagReturnType<K, I> {
+export function useChildrenFlag<K extends string, I extends FlaggableChildInfoBase<K>>({ flaggableChildren: { children, initialIndex, closestFit, onIndexChange, key, fitNullToZero } }: UseChildrenFlagParameters<K, I, never>): UseChildrenFlagReturnType<K, I> {
     useEnsureStability("useChildrenFlag", closestFit, onIndexChange, key);
 
     const [getCurrentIndex, setCurrentIndex] = usePassiveState<null | number>(onIndexChange, useCallback(() => (initialIndex ?? (fitNullToZero ? 0 : null)), []));
@@ -340,7 +356,7 @@ export function useChildrenFlag<K extends string, I extends FlaggableChildInfoBa
     // the "currently selected" (or whatever) index.  The two cases we're looking for:
     // 1. The currently selected child unmounted
     // 2. A child mounted, and it mounts with the index we're looking for
-    const onChildrenMountChange = useStableCallback<NonNullable<UseManagedChildrenParameters<I>["onChildrenMountChange"]>>((mounted, unmounted) => {
+    const onChildrenMountChange = useStableCallback<OnChildrenMountChange<I>>((mounted, unmounted) => {
         const requestedIndex = getRequestedIndex();
         const currentIndex = getCurrentIndex();
         const currentChild = currentIndex == null ? null : children.getAt(currentIndex);

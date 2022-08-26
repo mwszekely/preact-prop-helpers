@@ -79,32 +79,6 @@ export interface UseListNavigationChildReturnType<ChildElement extends Element> 
 export interface UseListNavigationParameters<K extends string, I extends ListNavigationChildInfoBase<K>> extends UseRovingTabIndexParameters<I>, Omit<UseTypeaheadNavigationParameters, "getIndex" | "setIndex">, Omit<UseLinearNavigationParameters, (`navigateTo${string}` & keyof UseLinearNavigationParameters)> {
 
     /**
-     * Maps to Intl.Collator's ignorePunctuation parameter.  Whether punctuation (which is context and locale dependent) should be ignored when searching.
-     * 
-     * @default false
-     */
-    //ignorePunctuation?: boolean;
-
-    /**
-     * A collator to use when comparing. If not provided, simply uses `localeCompare` after transforming each to lowercase, which will, at best, work okay in English.
-     */
-    //collator?: Intl.Collator;
-
-    /**
-     * By default, pressing down at the end focuses the first element, and vice-versa.
-     * 
-     * This prop can be used to disable that behavior.
-     */
-    //noWrap?: boolean;
-
-    /**
-     * By default, any typed characters will focus the next item that starts with the typed string.
-     * 
-     * This prop can be used to disable that behavior.
-     */
-    //noTypeahead?: boolean;
-
-    /**
      * This and indexDemangler are used to allow children to be navigated in an order
      * that doesn't necessarily match their child order, like if a list is sorted.
      * 
@@ -124,17 +98,7 @@ export interface UseListNavigationParameters<K extends string, I extends ListNav
      * @param transformedIndex 
      */
     indexDemangler?(transformedIndex: number): number;
-
-    //initialIndex: number;
-
-    //onTabbableIndexChange?: UseRovingTabIndexParameters<any, any>["onTabbableIndexChange"];
-
-
-
-    /**
-     * Same as the above, but only for mount/unmount (or when a child changes its index)
-     */
-    //onChildrenMountChange?: UseManagedChildrenParameters<ListNavigationChildInfoBase<string>>;
+    
 }
 type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 
