@@ -7,6 +7,8 @@ export interface UseDroppableReturnType<E extends HTMLElement> {
 
     /**
      * Hook for modifying the props you were going to pass to your drop target Element.
+     * 
+     * *Unstable*
      */
     useDroppableProps: (p: h.JSX.HTMLAttributes<E>) => h.JSX.HTMLAttributes<E>;
 

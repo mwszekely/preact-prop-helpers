@@ -6,7 +6,7 @@ import { useMergedProps } from "./use-merged-props";
 import { useEnsureStability } from "./use-passive-state";
 import { useRefElement } from "./use-ref-element";
 import { useState } from "./use-state";
-export { generateRandomId };
+export { generateRandomId }
 
 export type UseRandomIdPropsParameters = UseReferencedIdPropsParameters<"id">;
 export type UseRandomIdPropsReturnType<P extends UseRandomIdPropsParameters> = UseReferencedIdPropsReturnType<P, "id">;
@@ -20,9 +20,12 @@ export type UseReferencedIdPropsParameters<K extends keyof h.JSX.HTMLAttributes<
 export type UseReferencedIdPropsReturnType<P extends UseReferencedIdPropsParameters<any>, K extends keyof h.JSX.HTMLAttributes<any>> = Omit<P, K> & Record<K, string>;
 
 export interface UseRandomIdReturnType<S extends Element> {
+    /** **STABLE** */
     useRandomIdSourceElement: UseRandomIdSourceElement<S>;
+    /** **STABLE** */
     useRandomIdReferencerElement: UseRandomIdReferencerElement;
     usedId: string | undefined;
+    /** **STABLE** */
     getUsedId(): string | undefined;
 }
 
@@ -35,14 +38,18 @@ export type UseRandomIdSourceElement<S extends Element> = () => UseRandomIdSourc
 
 export interface UseRandomIdSourceElementReturnType<S extends Element> {
     usedId: string | undefined;
+    /** **STABLE** */
     getUsedId(): string | undefined;
+    /** *Unstable* */
     useRandomIdSourceElementProps: (p: h.JSX.HTMLAttributes<S>) => h.JSX.HTMLAttributes<S>;
 }
 
 export type UseRandomIdReferencerElement = <R extends Element>(idPropName: keyof h.JSX.HTMLAttributes<EventTarget>) => UseRandomIdReferencerElementReturnType<R>;
 export interface UseRandomIdReferencerElementReturnType<R extends Element> {
     usedId: string | undefined;
+    /** **STABLE** */
     getUsedId(): string | undefined;
+    /** *Unstable* */
     useRandomIdReferencerElementProps: (p: h.JSX.HTMLAttributes<R>) => h.JSX.HTMLAttributes<R>;
 }
 

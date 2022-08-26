@@ -1,7 +1,7 @@
 import { h } from "preact";
 import { useCallback, useEffect } from "preact/hooks";
-import { RovingTabIndexChildInfoBase } from "./use-roving-tabindex";
-import { ManagedChildren, UseManagedChildrenParameters } from "./use-child-manager";
+import {  } from "./use-roving-tabindex";
+import { ManagedChildren } from "./use-child-manager";
 import { ListNavigationChildInfoBase, useListNavigation, UseListNavigationChildInfoNeeded, UseListNavigationParameters } from "./use-list-navigation";
 import { useStableCallback } from "./use-stable-callback";
 import { useState } from "./use-state";
@@ -57,7 +57,7 @@ export type UseGridNavigationCellInfoNeeded<K extends string, I extends UseGridN
 export interface UseGridNavigationParameters<K extends string, IR extends UseGridNavigationRowInfoBase<K>> extends Omit<UseListNavigationParameters<K, IR>, "initialIndex" | "navigationDirection"> {
     indexMangler?(unmangled: number): number;
     indexDemangler?(mangled: number): number;
-    onRowMountChange?: UseManagedChildrenParameters<IR>["onChildrenMountChange"];
+    //onRowMountChange?: UseManagedChildrenParameters<IR>["onChildrenMountChange"];
     initialRow?: number;
     initialColumn?: number;
 
@@ -84,7 +84,7 @@ export type UseGridNavigationRow<R extends HTMLElement, C extends HTMLElement | 
     useGridNavigationRowProps: <P extends h.JSX.HTMLAttributes<R>>(props: P) => h.JSX.HTMLAttributes<R>;
 }
 
-export function useGridNavigation<ParentOrRowElement extends HTMLElement, RowElement extends HTMLElement, CellElement extends HTMLElement, KR extends string = string, KC extends string = string, IR extends UseGridNavigationRowInfoBase<KR> = UseGridNavigationRowInfoBase<KR>, IC extends UseGridNavigationRowInfoBase<KC> = UseGridNavigationRowInfoBase<KC>>({ collator, disableArrowKeys, disableHomeEndKeys, noTypeahead, onTabbableIndexChange, typeaheadTimeout, indexMangler, indexDemangler, initialRow, onRowMountChange: onRowMountChangeUser, initialColumn, onAfterChildLayoutEffect, onChildrenMountChange, onTabbableRender, onTabbedInTo, onTabbedOutOf }: UseGridNavigationParameters<KR, IR>) {
+export function useGridNavigation<ParentOrRowElement extends HTMLElement, RowElement extends HTMLElement, CellElement extends HTMLElement, KR extends string = string, KC extends string = string, IR extends UseGridNavigationRowInfoBase<KR> = UseGridNavigationRowInfoBase<KR>, IC extends UseGridNavigationRowInfoBase<KC> = UseGridNavigationRowInfoBase<KC>>({ collator, disableArrowKeys, disableHomeEndKeys, noTypeahead, onTabbableIndexChange, typeaheadTimeout, indexMangler, indexDemangler, initialRow, initialColumn, onAfterChildLayoutEffect, onChildrenMountChange: onRowMountChangeUser, onTabbableRender, onTabbedInTo, onTabbedOutOf }: UseGridNavigationParameters<KR, IR>) {
     const [currentColumn, setCurrentColumn, getCurrentColumn] = useState<number | null>(initialColumn ?? 0);
     initialRow ??= 0;
     initialColumn ??= 0;
@@ -108,10 +108,10 @@ export function useGridNavigation<ParentOrRowElement extends HTMLElement, RowEle
         onTabbableIndexChange,
         typeaheadTimeout,
         onAfterChildLayoutEffect,
-        onChildrenMountChange,
+        onChildrenMountChange: onRowMountChangeUser,
         onTabbableRender,
         onTabbedInTo,
-        onTabbedOutOf,
+        onTabbedOutOf
     });
 
     const useGridNavigationRow = useCallback<UseGridNavigationRow<RowElement, CellElement, KR, KC, IR, IC>>(({ onChildrenMountChange, info: { flags, index, text, blurSelf: bs, focusSelf: fs, hidden, ...restInfo }, initialIndex, onAfterChildLayoutEffect, collator, disableArrowKeys, disableHomeEndKeys, indexDemangler, indexMangler, onTabbableIndexChange, onTabbableRender, onTabbedInTo, onTabbedOutOf, typeaheadTimeout }) => {
@@ -120,8 +120,8 @@ export function useGridNavigation<ParentOrRowElement extends HTMLElement, RowEle
                 fs();
             }
             else {
-                let c1 = getCurrentColumn2();
-                let c2 = getCurrentColumn();
+                const c1 = getCurrentColumn2();
+                const c2 = getCurrentColumn();
                 console.assert(c1 == c1);
                 columns.getAt(c2 ?? 0)?.focusSelf?.();
             }
@@ -135,8 +135,8 @@ export function useGridNavigation<ParentOrRowElement extends HTMLElement, RowEle
 
         const {
             children: columns,
-            currentTypeahead: currentColumnTypeahead,
-            invalidTypeahead: invalidColumnTypeahead,
+            currentTypeahead: _currentColumnTypeahead,
+            invalidTypeahead: _invalidColumnTypeahead,
             useListNavigationChild: useGridNavigationColumn2,
             useListNavigationProps: useGridNavigationColumnProps,
             getTabbableIndex: getCurrentColumn2,
@@ -188,7 +188,7 @@ export function useGridNavigation<ParentOrRowElement extends HTMLElement, RowEle
             getCurrentColumn,
             useGridNavigationCell,
             useGridNavigationRowProps: function <P extends h.JSX.HTMLAttributes<RowElement>>(props: P) {
-                let ret = useListNavigationChildProps(props);
+                const ret = useListNavigationChildProps(props);
                 ret.tabIndex = -1;
                 return ret;
             }

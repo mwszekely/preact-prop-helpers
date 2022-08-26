@@ -38,7 +38,9 @@ export interface ElementSize {
 }
 
 export interface UseElementSizeReturnType<E extends HTMLElement | SVGElement> {
+    /** **STABLE** */
     getElement(): E | null;
+    /** **STABLE** */
     getSize(): ElementSize | null;
     /** **STABLE** */
     useElementSizeProps: UseRefElementReturnType<E>["useRefElementProps"];

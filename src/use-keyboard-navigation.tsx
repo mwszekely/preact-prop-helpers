@@ -8,7 +8,6 @@ import { useMergedProps } from "./use-merged-props";
 import { useStableCallback } from "./use-stable-callback";
 import { useState } from "./use-state";
 import { useTimeout } from "./use-timeout";
-import { useEnsureStability } from "use-passive-state";
 
 export interface UseLinearNavigationReturnType<ParentOrChildElement extends Element> {
     /** 
@@ -195,7 +194,7 @@ export interface UseTypeaheadNavigationReturnType<ParentOrChildElement extends E
      */
     useTypeaheadNavigationProps: UseTypeaheadNavigationProps<ParentOrChildElement>;
 
-    // Must be used on each child element.
+    /** **STABLE** */
     useTypeaheadNavigationChild: UseTypeaheadNavigationChild<I>;
 
 

@@ -125,13 +125,23 @@ export interface UseActiveElementParameters<T extends Node> {
 }
 
 export interface UseActiveElementReturnType<T extends Node> extends Omit<UseRefElementReturnType<T>, "useRefElementProps"> {
-    /** Returns whatever element is currently focused, or `null` if there's no focused element */
+    /** 
+     * Returns whatever element is currently focused, or `null` if there's no focused element
+     * **STABLE**
+     */
     getActiveElement: () => T | null;
-    /** Returns whatever element is currently focused, or whatever element was most recently focused if there's no focused element */
+    /** 
+     * Returns whatever element is currently focused, or whatever element was most recently focused if there's no focused element
+     * **STABLE**
+     */
     getLastActiveElement: () => T;
-    /** Returns if the window itself has focus or not */
+    /** 
+     * Returns if the window itself has focus or not
+     * **STABLE**
+     */
     getWindowFocused: () => boolean;
 
+    /** **STABLE** */
     useActiveElementProps: UseRefElementReturnType<T>["useRefElementProps"];
 }
 

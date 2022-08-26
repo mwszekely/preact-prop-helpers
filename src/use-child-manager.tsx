@@ -1,9 +1,8 @@
 import { StateUpdater, useCallback, useRef } from "preact/hooks";
 import { useLayoutEffect } from "./use-layout-effect";
-import { OnPassiveStateChange, returnFalse, returnNull, useEnsureStability, usePassiveState } from "./use-passive-state";
+import { OnPassiveStateChange, useEnsureStability, usePassiveState } from "./use-passive-state";
 import { useStableCallback } from "./use-stable-callback";
 import { useStableGetter } from "./use-stable-getter";
-import { useState } from "./use-state";
 
 /**
  * Reminder of order of execution:
@@ -43,12 +42,14 @@ export interface UseManagedChildrenReturnType<I extends ManagedChildInfoBase<str
      * is to be managed by this one. The argument to the hook
      * is just the bag of properties to pass to the parent,
      * including the child's index.
+     * 
+     * **STABLE**
      */
     useManagedChild: UseManagedChild<I>;
     /**
      * Returns information about the child that rendered itself with the requested key.
      * 
-     * **Stable, but cannot be called during render!**
+     * **STABLE** (even though it's not a function, the identity of this object never changes)
      */
     children: ManagedChildren<I>;
 }
@@ -56,10 +57,13 @@ export interface UseManagedChildrenReturnType<I extends ManagedChildInfoBase<str
 
 
 export interface ManagedChildren<I extends ManagedChildInfoBase<string | number>> {
+    /** STABLE */
     getAt(index: I["index"]): I | undefined;
-    //getSize(): number;
+    /** STABLE */
     getHighestIndex(): number;
+    /** STABLE */
     forEach: (f: (child: I) => void) => void;
+    /** **UNSTABLE**, also internal-use only, also TODO need a workaround for this for sortable children */
     sliceSort: (compare: (lhs: I, rhs: I) => number) => I[];
 }
 

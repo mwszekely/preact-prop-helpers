@@ -35,12 +35,18 @@ export interface UseHasFocusReturnType<T extends Node> extends Omit<UseRefElemen
 
     /**
      * Modifies the element to be able to track its own focus state
+     * 
+     * **STABLE**
      */
     useHasFocusProps: (props: h.JSX.HTMLAttributes<T>) => h.JSX.HTMLAttributes<T>;
 
+    /** STABLE */
     getFocused(): boolean;
+    /** STABLE */
     getFocusedInner(): boolean;
+    /** STABLE */
     getLastFocused(): boolean;
+    /** STABLE */
     getLastFocusedInner(): boolean;
 }
 
@@ -73,8 +79,18 @@ export function useHasFocus<T extends Node>({ onFocusedChanged, onFocusedInnerCh
         onWindowFocusedChange
     });
 
-    const useHasFocusProps = useCallback((props: h.JSX.HTMLAttributes<T>) => { return useActiveElementProps(props); }, [useActiveElementProps]);
+    const useHasFocusProps = useCallback((props: h.JSX.HTMLAttributes<T>) => { return useActiveElementProps(props); }, []);
 
 
-    return { useHasFocusProps, getElement, getFocused, getFocusedInner, getLastFocused, getLastFocusedInner, getActiveElement, getLastActiveElement, getWindowFocused };
+    return { 
+        useHasFocusProps, 
+        getElement, 
+        getFocused, 
+        getFocusedInner, 
+        getLastFocused, 
+        getLastFocusedInner, 
+        getActiveElement, 
+        getLastActiveElement, 
+        getWindowFocused 
+    };
 }

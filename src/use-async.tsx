@@ -130,6 +130,8 @@ export interface UseAsyncReturnType<SP extends unknown[], R> {
      * you can call this function.  Normal procedure applies as if the debounced ended normally -- if there's no promise waiting in the queue,
      * the debounced promise runs normally, otherwise, it waits its turn until the current one ends, potentially being overwritten later on
      * if a new promise runs out *its* debounce timer before this one got a chance to run.
+     * 
+     * **Quasi-stable** (don't use during render)
      */
     flushDebouncedPromise: () => void;
 
@@ -148,6 +150,8 @@ export interface UseAsyncReturnType<SP extends unknown[], R> {
     /**
      * The transformed version of the async handler provided,
      * now synchronous and/or throttled and/or debounced
+     * 
+     * **Quasi-stable** (don't use during render)
      */
     syncHandler: SyncFunctionType<SP, R>;
 }

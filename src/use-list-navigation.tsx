@@ -1,13 +1,12 @@
 import { h } from "preact";
-import { StateUpdater, useCallback, useEffect, useLayoutEffect, useRef } from "preact/hooks";
-import { useStableCallback } from "./use-stable-callback";
-import { ManagedChildInfoBase, ManagedChildInfoNeeded, ManagedChildren, useChildrenFlag, UseChildrenFlagParameters, UseManagedChildrenParameters, UseManagedChildrenReturnType } from "./use-child-manager";
+import { StateUpdater, useCallback, useLayoutEffect, useRef } from "preact/hooks";
+import { ManagedChildren, useChildrenFlag, UseManagedChildrenParameters } from "./use-child-manager";
 import { useLinearNavigation, UseLinearNavigationChildInfo, UseLinearNavigationParameters, UseLinearNavigationReturnType, useTypeaheadNavigation, UseTypeaheadNavigationChildInfo, UseTypeaheadNavigationParameters, UseTypeaheadNavigationReturnType } from "./use-keyboard-navigation";
 import { useMergedProps } from "./use-merged-props";
 import { useEnsureStability } from "./use-passive-state";
 import { RovingTabIndexChildInfoBase, RovingTabIndexChildInfoNeeded, useRovingTabIndex, UseRovingTabIndexParameters, UseRovingTabIndexReturnType } from "./use-roving-tabindex";
+import { useStableCallback } from "./use-stable-callback";
 import { useState } from "./use-state";
-import { useForceUpdate } from "./use-force-update";
 
 
 /**
@@ -77,7 +76,7 @@ export interface UseListNavigationChildReturnType<ChildElement extends Element> 
 
 
 /** Arguments passed to the parent `useListNavigation` */
-export interface UseListNavigationParameters<K extends string, I extends ListNavigationChildInfoBase<K>> extends UseRovingTabIndexParameters<K, I>, Omit<UseTypeaheadNavigationParameters, "getIndex" | "setIndex">, Omit<UseLinearNavigationParameters, (`navigateTo${string}` & keyof UseLinearNavigationParameters)> {
+export interface UseListNavigationParameters<K extends string, I extends ListNavigationChildInfoBase<K>> extends UseRovingTabIndexParameters<I>, Omit<UseTypeaheadNavigationParameters, "getIndex" | "setIndex">, Omit<UseLinearNavigationParameters, (`navigateTo${string}` & keyof UseLinearNavigationParameters)> {
 
     /**
      * Maps to Intl.Collator's ignorePunctuation parameter.  Whether punctuation (which is context and locale dependent) should be ignored when searching.
@@ -266,6 +265,7 @@ export interface UseListNavigationReturnType<ParentOrChildElement extends HTMLEl
     Omit<UseRovingTabIndexReturnType<ChildElement, K, I>, "useRovingTabIndexChild">,
     Omit<UseTypeaheadNavigationReturnType<ParentOrChildElement, I>, "useTypeaheadNavigationProps" | "useTypeaheadNavigationChild">,
     Omit<UseLinearNavigationReturnType<ParentOrChildElement>, "useLinearNavigationProps"> {
+    /** **STABLE** */
     useListNavigationChild: UseListNavigationChild<ChildElement, K, I>;
     /** **STABLE** */
     useListNavigationProps: (props: h.JSX.HTMLAttributes<ParentOrChildElement>) => h.JSX.HTMLAttributes<ParentOrChildElement>;
@@ -281,7 +281,9 @@ export interface UseListNavigationSingleSelectionParameters<K extends string, I 
 }
 
 export interface UseListNavigationSingleSelectionReturnType<ParentOrChildElement extends HTMLElement | SVGElement, ChildElement extends HTMLElement | SVGElement, K extends string, I extends UseListNavigationSingleSelectionInfoBase<K>> extends Omit<UseListNavigationReturnType<ParentOrChildElement, ChildElement, K, I>, "useListNavigationChild" | "useListNavigationProps"> {
+    /** **STABLE** */
     useListNavigationSingleSelectionChild: UseListNavigationSingleSelectionChild<ParentOrChildElement, ChildElement, K, I>;
+    /** **STABLE** */
     useListNavigationSingleSelectionProps: UseListNavigationReturnType<ParentOrChildElement, ChildElement, K, I>["useListNavigationProps"];
 }
 
@@ -289,7 +291,7 @@ export type UseListNavigationSingleSelectionChild<ParentOrChildElement extends H
 export interface UseListNavigationSingleSelectionChildReturnType<ParentOrChildElement extends HTMLElement | SVGElement, ChildElement extends HTMLElement | SVGElement, K extends string = string, I extends UseListNavigationSingleSelectionInfoBase<K> = UseListNavigationSingleSelectionInfoBase<K>> extends ReturnType<UseListNavigationReturnType<ParentOrChildElement, ChildElement, K, I>["useListNavigationChild"]> {
     selected: boolean;
     getSelected(): boolean;
-};
+}
 
 /**
  * It's very common to combine a tabbable list of things and "selection" of one of those things.
@@ -334,14 +336,14 @@ export function useListNavigationSingleSelection<ParentOrChildElement extends HT
 
     return {
         children,
-        useListNavigationSingleSelectionChild: useCallback(({ info: { flags: { selected, ...flags }, ...info } }: Parameters<typeof useListNavigationChild>[0]) => {
+        useListNavigationSingleSelectionChild: useCallback(({ info: { flags: { ...flags }, ...info } }: Parameters<typeof useListNavigationChild>[0]) => {
             const [isSelected, setIsSelected, getIsSelected] = useState(getSelectedIndex() == info.index);
             const selectedRef = useRef({ get: getIsSelected, set: (a: Parameters<StateUpdater<boolean>>[0]) => { setIsSelected(a); console.log(`Child ${info.index} had set(${a.toString()}) called`); }, isValid: useStableCallback(() => !info.hidden) });
             const ret = useListNavigationChild({ info: { ...(info as I), flags: { ...flags, selected: selectedRef.current } } });
             console.log(`Child ${info.index} rendering with selected: ${isSelected} and tabbable: ${ret.tabbable.toString()}`);
             return { ...ret, selected: isSelected, getSelected: getIsSelected }
-        }, [useListNavigationChild]),
-        useListNavigationSingleSelectionProps: useCallback((...p: Parameters<typeof useListNavigationProps>) => { return useListNavigationProps(...p) }, [useListNavigationProps]),
+        }, []),
+        useListNavigationSingleSelectionProps: useCallback((...p: Parameters<typeof useListNavigationProps>) => { return useListNavigationProps(...p) }, []),
         ...listRest
     }
 }

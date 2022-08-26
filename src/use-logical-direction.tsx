@@ -259,32 +259,43 @@ const M = {
 export interface UseLogicalDirectionReturnType<T extends EventTarget> {
     /** **STABLE** */
     useLogicalDirectionProps: (props: h.JSX.HTMLAttributes<T>) => h.JSX.HTMLAttributes<T>;
+    /** **STABLE** */
     getElement: () => T | null;
     /** **STABLE** */
     getLogicalDirectionInfo: () => LogicalDirectionInfo | null;
 
     /**
      * Given the ElementSize info from useElementSize, converts all those physical properties to their logical counterparts.
+     * 
+     * **STABLE**
      */
     convertToLogicalSize: (elementSize: ElementSize, direction?: LogicalDirectionInfo | null | undefined) => LogicalElementSize | null;
 
     /**
      * Turns `"horizontal" | "vertical"` into `"inline" | "block"`
+     * 
+     * **STABLE**
      */
     convertToLogicalOrientation: (elementOrientation: PhysicalOrientation, direction?: LogicalDirectionInfo | null | undefined) => "inline" | "block";
 
     /**
      * Turns `"inline" | "block"` into `"horizontal" | "vertical"`
+     * 
+     * **STABLE**
      */
     convertToPhysicalOrientation: (elementOrientation: LogicalOrientation, direction?: LogicalDirectionInfo | null | undefined) => "horizontal" | "vertical";
 
     /**
      * Turns `"top" | "bottom" | "left" | "right"` into `"block-start" | "block-end" | "inline-start" | "inline-end"`
+     * 
+     * **STABLE**
      */
     convertToLogicalSide: (side: "top" | "bottom" | "left" | "right", direction?: LogicalDirectionInfo | null | undefined) => "inline-start" | "inline-end" | "block-start" | "block-end";
 
     /**
      * Turns `"block-start" | "block-end" | "inline-start" | "inline-end"` into `"top" | "bottom" | "left" | "right"`
+     * 
+     * **STABLE**
      */
     convertToPhysicalSide: (side: "inline-start" | "inline-end" | "block-start" | "block-end", direction?: LogicalDirectionInfo | null | undefined) => "top" | "bottom" | "left" | "right";
 }

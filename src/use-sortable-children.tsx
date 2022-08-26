@@ -1,5 +1,5 @@
 import { h, VNode } from "preact";
-import { useCallback, useLayoutEffect, useRef } from "preact/hooks";
+import { MutableRef, useCallback, useLayoutEffect, useRef } from "preact/hooks";
 import { ManagedChildren } from "./use-child-manager";
 import { useForceUpdate } from "./use-force-update";
 import { useMergedProps } from "./use-merged-props";
@@ -49,7 +49,7 @@ export interface UseSortableChildrenParameters<T extends { index: number }, G ex
  * Because keys are given special treatment and a child has no way of modifying its own key
  * there's no other time or place this can happen other than exactly within the parent component's render function.
  */
-export function useSortableChildren<T extends { index: number }, G extends any[], S extends Element>({ getIndex, getValue, compare: userCompare }: UseSortableChildrenParameters<T, G>) {
+export function useSortableChildren<T extends { index: number }, G extends any[], S extends Element>({ getIndex, getValue, compare: userCompare }: UseSortableChildrenParameters<T, G>): UsesortableChildrenReturnType<T, G, S> {
 
     const compare = (userCompare ?? defaultCompare)
 
@@ -112,6 +112,21 @@ export function useSortableChildren<T extends { index: number }, G extends any[]
     }, []);
 
     return { useSortableProps, sort, indexMangler, indexDemangler, mangleMap, demangleMap }
+}
+
+export interface UsesortableChildrenReturnType<T extends { index: number }, G extends any[], S extends Element> {
+    /** **STABLE** */
+    useSortableProps: (props: Omit<h.JSX.HTMLAttributes<S>, "children"> & {children?: VNode<any>[] | undefined;}) => h.JSX.HTMLAttributes<S>;
+    /** **STABLE** */
+    sort: (managedRows: ManagedChildren<T>, direction: "ascending" | "descending", ...args: G) => Promise<void> | void;
+    /** **STABLE** */
+    indexMangler: (n: number) => number;
+    /** **STABLE** */
+    indexDemangler: (n: number) => number;
+    /** **STABLE** */
+    mangleMap: MutableRef<Map<number, number>>;
+    /** **STABLE** */
+    demangleMap: MutableRef<Map<number, number>>;
 }
 
 

@@ -11,6 +11,7 @@ import { useStableCallback } from "./use-stable-callback";
 export interface UseFocusTrapParameters { trapActive: boolean; }
 
 export interface UseFocusTrapReturnType<E extends Element> extends Omit<UseRefElementReturnType<E>, "useRefElementProps"> {
+    /** *Unstable* (relies on the `trapActive` prop) */
     useFocusTrapProps: (props: h.JSX.HTMLAttributes<E>) => h.JSX.HTMLAttributes<E>;
 }
 

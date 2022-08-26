@@ -4,7 +4,9 @@ import { useMergedProps } from "./use-merged-props";
 import { OnPassiveStateChange, returnNull, useEnsureStability, usePassiveState } from "./use-passive-state";
 
 export interface UseRefElementReturnType<T extends EventTarget> {
+    /** **STABLE** */
     getElement(): T | null;
+    /** **STABLE** */
     useRefElementProps(props: h.JSX.HTMLAttributes<T>): h.JSX.HTMLAttributes<T>;
 }
 
@@ -30,7 +32,7 @@ export function useRefElement<T extends EventTarget>(args?: UseRefElementParamet
 
     // Called (indirectly) by the ref that the element receives.
     const handler = useCallback<OnPassiveStateChange<T | null>>((e, prevValue) => {
-        let cleanup = onElementChange?.(e, prevValue);
+        const cleanup = onElementChange?.(e, prevValue);
         if (prevValue)
             onUnmount?.(prevValue!);
 

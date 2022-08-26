@@ -47,6 +47,8 @@ export function ProvideBatchedAnimationFrames({ children }: { children: Componen
 export interface UseAnimationFrameParameters {
     /**
      * Callback with effectively the same rules as `requestAnimationFrame`
+     * 
+     * Doesn't need to be stable.
      */
     callback: null | ((msSinceLast: number) => void);
 }

@@ -1,15 +1,18 @@
-import { h, Ref } from "preact";
+import { h } from "preact";
 import { useCallback, useRef } from "preact/hooks";
 import { useMergedProps } from "./use-merged-props";
 import { useState } from "./use-state";
 
 export interface UseDraggableReturnType<E extends EventTarget> {
+    /** *Unstable* */
     useDraggableProps: (p: h.JSX.HTMLAttributes<E>) => h.JSX.HTMLAttributes<E>;
 
     /**
      * Returns true if the element in question is currently being dragged
      */
     dragging: boolean;
+    
+    /** **STABLE** */
     getDragging: () => boolean;
 
     /**
@@ -20,6 +23,8 @@ export interface UseDraggableReturnType<E extends EventTarget> {
      * and then what should be done with it (generally deleted if the effect was "move")
      */
     lastDropEffect: DataTransfer["dropEffect"] | null;
+
+    /** **STABLE** */
     getLastDropEffect: () => (DataTransfer["dropEffect"] | null);
 }
 

@@ -1,16 +1,16 @@
 import { h } from "preact";
 import { StateUpdater, useCallback, useEffect, useRef } from "preact/hooks";
-import { useStableCallback } from "./use-stable-callback";
 import { ChildFlagOperations, FlaggableChildInfoBase, ManagedChildInfoBase, ManagedChildInfoNeeded, ManagedChildren, useChildrenFlag, useManagedChildren, UseManagedChildrenParameters } from "./use-child-manager";
-import { useMergedProps } from "./use-merged-props";
 import { useHasFocus } from "./use-has-focus";
-import { returnFalse, returnTrue, returnZero, usePassiveState } from "./use-passive-state";
+import { useMergedProps } from "./use-merged-props";
+import { returnTrue, returnZero, usePassiveState } from "./use-passive-state";
+import { useStableCallback } from "./use-stable-callback";
 import { useState } from "./use-state";
 
 //export type UseRovingTabIndexChildInfo<K extends string, I extends RovingTabIndexChildInfoBase<K>> = Required<I> & FlaggableChildInfo<"tabbable"> & {
 //};
 
-export type UseRovingTabIndexParameters<K extends string, I extends ManagedChildInfoBase<number>> = UseManagedChildrenParameters<I> & {
+export type UseRovingTabIndexParameters<I extends ManagedChildInfoBase<number>> = UseManagedChildrenParameters<I> & {
     initialIndex?: number;
 
     // Called during an effect after the component has rendered itself in a tabbable state
@@ -25,16 +25,23 @@ export type UseRovingTabIndexParameters<K extends string, I extends ManagedChild
 //export type UseRovingTabIndexChildParametersBase<K extends string, I2 extends Partial<Pick<RovingTabIndexChildInfoBase<K>, "focusSelf" | "blurSelf">>> = UseManagedChildParameters<Omit<I2, "focusSelf" | "blurSelf" | "getElement"> & Partial<Pick<I2, "focusSelf" | "blurSelf">>>;
 export type RovingTabIndexChildInfoNeeded<K extends string, I extends Pick<RovingTabIndexChildInfoBase<K>, "index" | "focusSelf" | "blurSelf">> = ManagedChildInfoNeeded<Omit<I, "getElement" | "focusSelf" | "blurSelf"> & Partial<Pick<I, "focusSelf" | "blurSelf">>>;
 export type UseRovingTabIndexChild<ChildElement extends HTMLElement | SVGElement, K extends string, I2 extends RovingTabIndexChildInfoBase<K>> = (a: { info: RovingTabIndexChildInfoNeeded<K, I2> }) => {
+    /** *Unstable* */
     useRovingTabIndexChildProps: (props: h.JSX.HTMLAttributes<ChildElement>) => h.JSX.HTMLAttributes<ChildElement>;
     tabbable: boolean;
+    /** **STABLE** */
     getElement(): ChildElement | null;
 }
 
 export interface UseRovingTabIndexReturnType<ChildElement extends HTMLElement | SVGElement, K extends string, I2 extends RovingTabIndexChildInfoBase<K>> {
+    /** **STABLE** */
     useRovingTabIndexChild: UseRovingTabIndexChild<ChildElement, K, I2>;
+    /** **STABLE** */
     setTabbableIndex: (updater: Parameters<StateUpdater<number | null>>[0], fromUserInteraction: boolean) => void;
+    /** **STABLE** */
     getTabbableIndex: () => number | null;
+    /** **STABLE** */
     children: ManagedChildren<I2>;
+    /** **STABLE** */
     focusSelf: () => void;
 }
 
@@ -80,16 +87,15 @@ export interface RovingTabIndexChildInfoBase<K extends string> extends Flaggable
  * And just as well! Children should be allowed at the root, 
  * regardless of if it's the whole app or just a given component.
  */
-export function useRovingTabIndex<ChildElement extends HTMLElement | SVGElement, K extends string, I2 extends RovingTabIndexChildInfoBase<K>>({ initialIndex, onChildrenMountChange: onChildrenMountChangeUser, onAfterChildLayoutEffect, onTabbableRender, onTabbableIndexChange, onTabbedInTo: onAnyFocusIn, onTabbedOutOf: onAnyFocusOut }: UseRovingTabIndexParameters<K, I2>): UseRovingTabIndexReturnType<ChildElement, K, I2> {
+export function useRovingTabIndex<ChildElement extends HTMLElement | SVGElement, K extends string, I2 extends RovingTabIndexChildInfoBase<K>>({ initialIndex, onChildrenMountChange: onChildrenMountChangeUser, onAfterChildLayoutEffect, onTabbableRender, onTabbableIndexChange, onTabbedInTo: onAnyFocusIn, onTabbedOutOf: onAnyFocusOut }: UseRovingTabIndexParameters<I2>): UseRovingTabIndexReturnType<ChildElement, K, I2> {
     initialIndex ??= 0;
     const stableOnTabbableRender = useStableCallback(onTabbableRender ?? (() => { }));
-    const [getAnyFocused, setAnyFocused] = usePassiveState<number>(useStableCallback((newCount: number, oldCount: number | undefined) => {
+    const [_getAnyFocused, setAnyFocused] = usePassiveState<number>(useStableCallback((newCount: number, oldCount: number | undefined) => {
         if (oldCount == 0 && newCount > 0) {
             onAnyFocusIn?.();
         }
 
         if (newCount == 0 && (oldCount ?? 0) > 0) {
-            debugger;
             onAnyFocusOut?.();
         }
     }), returnZero);
@@ -165,7 +171,7 @@ export function useRovingTabIndex<ChildElement extends HTMLElement | SVGElement,
         const { getElement, useHasFocusProps } = useHasFocus<ChildElement>({ onFocusedInnerChanged });
 
         const [tabbable, setTabbable, getTabbable] = useState(false);
-        const tabbableFlags = useRef<ChildFlagOperations>({ get: getTabbable, set: setTabbable, isValid: returnTrue });;
+        const tabbableFlags = useRef<ChildFlagOperations>({ get: getTabbable, set: setTabbable, isValid: returnTrue });
         const _: void = useManagedChild({
             info: {
                 ...(restInfo as I2),
