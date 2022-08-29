@@ -351,7 +351,7 @@ const Component = () => {
         <hr />
         <DemoUseDraggable />
         <hr />
-        <DemoUseElementSizeAnimation />
+        {/*<DemoUseElementSizeAnimation />*/}
         <hr />
         <input />
     </div>

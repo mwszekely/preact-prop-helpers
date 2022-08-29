@@ -95,7 +95,7 @@ export function useGridNavigation<
     linearNavigation: ln,
     typeaheadNavigation: tn
 }: UseGridNavigationParameters) {
-    const [currentColumn, setCurrentColumn, getCurrentColumn] = useState<number | null>(rti.initiallyFocusable ?? 0);
+    const [currentColumn, setCurrentColumn, getCurrentColumn] = useState<number | null>(rti.initialIndex ?? 0);
     //initialRow ??= 0;
     //initialColumn ??= 0;
 

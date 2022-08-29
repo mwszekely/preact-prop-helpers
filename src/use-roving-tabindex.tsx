@@ -38,7 +38,7 @@ export interface UseRovingTabIndexParameters extends UseManagedChildrenParameter
         onTabbedInTo?: () => void;
         onTabbedOutOf?: () => void;
 
-        initiallyFocusable?: number;
+        initialIndex?: number;
     }
 }
 
@@ -65,7 +65,9 @@ export interface UseRovingTabIndexChildParameters<C, K extends string> {
     rovingTabIndex: Partial<Omit<UseRovingTabIndexSubInfo<any, C>, "getElement">> & Pick<UseRovingTabIndexSubInfo<any, C>, "subInfo">;
 }
 
-export type UseRovingTabIndexChild<ChildElement extends HTMLElement | SVGElement, C, K extends string> = (a: UseRovingTabIndexChildParameters<C, K>) => {
+export type UseRovingTabIndexChild<ChildElement extends HTMLElement | SVGElement, C, K extends string> = (a: UseRovingTabIndexChildParameters<C, K>) => UseRovingTabIndexChildReturnType<ChildElement>;
+
+export interface UseRovingTabIndexChildReturnType<ChildElement extends HTMLElement | SVGElement> {
     /** *Unstable* */
     useRovingTabIndexChildProps: (props: h.JSX.HTMLAttributes<ChildElement>) => h.JSX.HTMLAttributes<ChildElement>;
     tabbable: boolean;
@@ -104,7 +106,7 @@ export type UseRovingTabIndexChild<ChildElement extends HTMLElement | SVGElement
  * And just as well! Children should be allowed at the root, 
  * regardless of if it's the whole app or just a given component.
  */
-export function useRovingTabIndex<ChildElement extends HTMLElement | SVGElement, C, K extends string>({ managedChildren: { onAfterChildLayoutEffect, onChildrenMountChange: onChildrenMountChangeUser }, rovingTabIndex: { onTabbableIndexChange, onTabbableRender, onTabbedInTo: onAnyFocusIn, onTabbedOutOf: onAnyFocusOut, initiallyFocusable: initialIndex } }: UseRovingTabIndexParameters): UseRovingTabIndexReturnType<ChildElement, C, K> {
+export function useRovingTabIndex<ChildElement extends HTMLElement | SVGElement, C, K extends string>({ managedChildren: { onAfterChildLayoutEffect, onChildrenMountChange: onChildrenMountChangeUser }, rovingTabIndex: { onTabbableIndexChange, onTabbableRender, onTabbedInTo: onAnyFocusIn, onTabbedOutOf: onAnyFocusOut, initialIndex } }: UseRovingTabIndexParameters): UseRovingTabIndexReturnType<ChildElement, C, K> {
     //type I2 = ManagedChildInfo<number, RTI<ChildElement, C, K | "tabbable">>;
 
     initialIndex ??= 0;

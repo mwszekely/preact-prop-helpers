@@ -176,25 +176,31 @@ export function useListNavigation<ParentOrChildElement extends HTMLElement | SVG
     } = useRovingTabIndex<ChildElement, UseListNavigationSubInfo<C>, K>({
         managedChildren: mc,
         rovingTabIndex
-    })
+    });
 
     const navigateToIndex = useCallback((i: number | null, fromUserInteraction: boolean) => {
-        setTabbableIndex(i == null ? null : tryNavigateToIndex(children, 0, i, 1, indexMangler ?? identity, indexDemangler ?? identity), fromUserInteraction);
+        if (i != null) {
+            const nextIndex = tryNavigateToIndex({ children, default: 0, target: i, searchDirection: 1, indexMangler: indexMangler ?? identity, indexDemangler: indexDemangler ?? identity });
+            setTabbableIndex(i == null ? null : nextIndex, fromUserInteraction);
+        }
+        else {
+            setTabbableIndex(null, fromUserInteraction);
+        }
     }, [])
     const navigateToFirst = useCallback(() => {
-        setTabbableIndex(tryNavigateToIndex(children, 0, 0, 1, indexMangler ?? identity, indexDemangler ?? identity), true);
+        navigateToIndex(0, true);
     }, [])
     const navigateToLast = useCallback(() => {
-        setTabbableIndex(tryNavigateToIndex(children, children.getHighestIndex() + 1, children.getHighestIndex(), -1, indexMangler ?? identity, indexDemangler ?? identity), true);
+        navigateToIndex(children.getHighestIndex(), true);
     }, [])
     const navigateToPrev = useCallback(() => {
         setTabbableIndex(c => {
-            return tryNavigateToIndex(children, c ?? 0, (c ?? 0) - 1, -1, indexMangler ?? identity, indexDemangler ?? identity)
+            return tryNavigateToIndex({ children, default: c ?? 0, target: indexDemangler!(indexMangler!((c ?? 0)) - 1), searchDirection: -1, indexMangler: indexMangler ?? identity, indexDemangler: indexDemangler ?? identity })
         }, true)
     }, [])
     const navigateToNext = useCallback(() => {
         setTabbableIndex(c => {
-            return tryNavigateToIndex(children, c ?? 0, (c ?? 0) + 1, 1, indexMangler ?? identity, indexDemangler ?? identity);
+            return tryNavigateToIndex({ children, default: c ?? 0, target: indexDemangler!(indexMangler!(c ?? 0) + 1), searchDirection: 1, indexMangler: indexMangler ?? identity, indexDemangler: indexDemangler ?? identity });
         }, true)
     }, [])
 
@@ -234,7 +240,7 @@ export function useListNavigation<ParentOrChildElement extends HTMLElement | SVG
         children,
         listNavigation: { navigateToIndex },
         rovingTabIndex: { focusSelf, getTabbableIndex, setTabbableIndex },
-        linearNavigation: {  },
+        linearNavigation: {},
         typeaheadNavigation: { currentTypeahead, invalidTypeahead }
     }
 }
@@ -278,7 +284,7 @@ export function useListNavigationSingleSelection<ParentOrChildElement extends HT
     singleSelection: { selectedIndex },
     listNavigation,
     managedChildren: { onChildrenMountChange: ocmc, ...mc },
-    rovingTabIndex: { initiallyFocusable, ...rovingTabIndex },
+    rovingTabIndex: { initialIndex, ...rovingTabIndex },
     linearNavigation,
     typeaheadNavigation
 }: UseListNavigationSingleSelectionParameters): UseListNavigationSingleSelectionReturnType<ParentOrChildElement, ChildElement, C, K | "selected"> {
@@ -293,7 +299,7 @@ export function useListNavigationSingleSelection<ParentOrChildElement extends HT
             })
         },
         rovingTabIndex: {
-            initiallyFocusable: (initiallyFocusable ?? selectedIndex ?? undefined),
+            initialIndex: (initialIndex ?? selectedIndex ?? undefined),
             ...rovingTabIndex
         },
         linearNavigation,
@@ -355,24 +361,39 @@ export function useListNavigationSingleSelection<ParentOrChildElement extends HT
 
 
 
+export interface TryNavigateToIndexParameters<ChildElement extends Element, C, K extends string> {
+    children: ManagedChildren<number, UseRovingTabIndexSubInfo<ChildElement, UseListNavigationSubInfo<C>>, K>;
+    default: number;
+    target: number;
+    searchDirection: 1 | -1;
+    indexMangler: (n: number) => number;
+    indexDemangler: (n: number) => number;
 
+}
 
-export function tryNavigateToIndex<ChildElement extends Element, C, K extends string>(children: ManagedChildren<number, UseRovingTabIndexSubInfo<ChildElement, UseListNavigationSubInfo<C>>, K>, initial: number, target: number, searchDirection: 1 | -1, indexMangler: (n: number) => number, indexDemangler: (n: number) => number) {
+export function tryNavigateToIndex<ChildElement extends Element, C, K extends string>({ children, searchDirection, indexDemangler, indexMangler, default: unmangledDefault, target: unmangledTarget }: TryNavigateToIndexParameters<ChildElement, C, K>) {
+    const d = unmangledDefault; // indexMangler(unmangledDefault);
+    let target = unmangledTarget; // indexMangler(unmangledTarget);
+    console.log(`tryNavigateToIndex(target: ${unmangledTarget}, mangled: ${target})`);
+
     function helper() {
+        const upper = children.getHighestIndex();
+        const lower = 0;
+
         if (searchDirection === -1) {
-            while (target >= 0 && (children.getAt(target) == null || !!children.getAt(target)?.subInfo.subInfo.hidden))
+            while ((target >= lower && (children.getAt(target) == null) || !!children.getAt(target)?.subInfo.subInfo.hidden))
                 target = indexMangler(indexDemangler(target) - 1);
 
-            return target < 0 ? initial : target;
+            return target < 0 ? d : target;
         }
         else if (searchDirection === 1) {
-            while (target <= children.getHighestIndex() && children.getAt(target) == null || !!children.getAt(target)?.subInfo.subInfo.hidden)
+            while ((target <= upper && children.getAt(target) == null) || !!children.getAt(target)?.subInfo.subInfo.hidden)
                 target = indexMangler(indexDemangler(target) + 1);
 
-            return target > children.getHighestIndex() ? initial : target;
+            return target > children.getHighestIndex() ? d : target;
         }
         else {
-            return initial;
+            return d;
         }
     }
     return (helper())

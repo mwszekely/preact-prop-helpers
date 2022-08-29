@@ -104,8 +104,9 @@ export interface ManagedChildren<T extends number | string, C, K extends string>
     getHighestIndex(): number;
     /** STABLE */
     forEach: (f: (child: ManagedChildInfo<T, C, K>) => void) => void;
+
     /** **UNSTABLE**, also internal-use only, also TODO need a workaround for this for sortable children */
-    sliceSort: (compare: (lhs: ManagedChildInfo<T, C, K>, rhs: ManagedChildInfo<T, C, K>) => number) => ManagedChildInfo<T, C, K>[];
+    arraySlice: () => ManagedChildInfo<T, C, K>[];
 }
 
 
@@ -125,7 +126,7 @@ export interface ManagedChildren<T extends number | string, C, K extends string>
  */
 export function useManagedChildren<T extends number | string, C, K extends string>({ managedChildren: { onAfterChildLayoutEffect, onChildrenMountChange } }: UseManagedChildrenParameters<T>): UseManagedChildrenReturnType<T, C, K> {
     //type I = I3 & ManagedChildInfoBase<string | number>;
-    type I = ManagedChildInfo<T, C, K>;
+    type Info = ManagedChildInfo<T, C, K>;
 
     useEnsureStability("useManagedChildren", onAfterChildLayoutEffect, onChildrenMountChange);
 
@@ -135,17 +136,17 @@ export function useManagedChildren<T extends number | string, C, K extends strin
 
     // All the information we have about our children is stored in this **stable** array.
     // Any mutations to this array **DO NOT** trigger any sort of a re-render.
-    const managedChildrenArray = useRef<{ arr: Array<I>; rec: Partial<Record<I["index"], I>>; }>({ arr: [], rec: {} });
+    const managedChildrenArray = useRef<{ arr: Array<Info>; rec: Partial<Record<T, Info>>; }>({ arr: [], rec: {} });
 
     // For indirect access to each child
     // Compare getManagedChildInfo
     // TODO: The primary use for this is flaggable closest fits
     // which need to search all children for that closest fit.
     // It would be nice if there was something better for that.
-    const forEachChild = useCallback((f: (child: I) => void) => {
+    const forEachChild = useCallback((f: (child: Info) => void) => {
         for (const child of managedChildrenArray.current.arr) { f(child); }
         for (const field in managedChildrenArray.current.rec) {
-            const child: I | undefined = managedChildrenArray.current.rec[field as keyof Record<I["index"], I>];
+            const child: Info | undefined = managedChildrenArray.current.rec[field as keyof Record<T, Info>];
             if (child)
                 f(child);
         }
@@ -153,11 +154,11 @@ export function useManagedChildren<T extends number | string, C, K extends strin
 
     // Retrieves the information associated with the child with the given index.
     // `undefined` if not child there, or it's unmounted.
-    const getManagedChildInfo = useCallback<UseManagedChildrenReturnType<T, C, K>["children"]["getAt"]>((index: I["index"]) => {
+    const getManagedChildInfo = useCallback<UseManagedChildrenReturnType<T, C, K>["children"]["getAt"]>((index: T) => {
         if (typeof index == "number")
             return managedChildrenArray.current.arr[index as number]!;
         else
-            return managedChildrenArray.current.rec[index as I["index"]]!;
+            return managedChildrenArray.current.rec[index as T]!;
     }, [])
 
     // tl;dr this is a way to have run useLayoutEffect once after all N children
@@ -176,9 +177,9 @@ export function useManagedChildren<T extends number | string, C, K extends strin
     // the microtask (by checking hasRemoteULE first) so that the "effect" only
     // runs once. When it's done, hasRemoteULE is reset so it can run again if
     // more children mount/unmount.
-    const hasRemoteULEChildMounted = useRef<{ mounts: Set<I["index"]>, unmounts: Set<I["index"]> } | null>(null);
-    const remoteULEChildChangedCausers = useRef(new Set<I["index"]>());
-    const remoteULEChildChanged = useCallback((index: I["index"]) => {
+    const hasRemoteULEChildMounted = useRef<{ mounts: Set<T>, unmounts: Set<T> } | null>(null);
+    const remoteULEChildChangedCausers = useRef(new Set<T>());
+    const remoteULEChildChanged = useCallback((index: T) => {
 
         if (remoteULEChildChangedCausers.current.size == 0) {
             queueMicrotask(() => {
@@ -193,7 +194,7 @@ export function useManagedChildren<T extends number | string, C, K extends strin
 
     }, [/* Must remain stable */]);
 
-    const remoteULEChildMounted = useCallback((index: I["index"], mounted: boolean) => {
+    const remoteULEChildMounted = useCallback((index: T, mounted: boolean) => {
         if (!hasRemoteULEChildMounted.current) {
             hasRemoteULEChildMounted.current = {
                 mounts: new Set(),
@@ -209,7 +210,7 @@ export function useManagedChildren<T extends number | string, C, K extends strin
             if (typeof index == "number")
                 delete managedChildrenArray.current.arr[index as number];
             else
-                delete managedChildrenArray.current.rec[index as I["index"]];
+                delete managedChildrenArray.current.rec[index as T];
         }
 
         hasRemoteULEChildMounted.current[mounted ? "mounts" : "unmounts"].add(index);
@@ -226,8 +227,8 @@ export function useManagedChildren<T extends number | string, C, K extends strin
             if (typeof info.index == "number")
                 managedChildrenArray.current.arr[info.index as number] = { index: info.index, flags: info.flags ?? {}, subInfo: info.subInfo };
             else
-                managedChildrenArray.current.rec[info.index as I["index"]] = { index: info.index, flags: info.flags ?? {}, subInfo: info.subInfo };
-            return remoteULEChildChanged(info.index as I["index"]);
+                managedChildrenArray.current.rec[info.index as T] = { index: info.index, flags: info.flags ?? {}, subInfo: info.subInfo };
+            return remoteULEChildChanged(info.index as T);
         }, [...Object.entries(info).flat(9)]);  // 9 is infinity, right? Sure. Unrelated: TODO.
 
         // When we mount, notify the parent via queueMicrotask
@@ -236,7 +237,7 @@ export function useManagedChildren<T extends number | string, C, K extends strin
         // Note: It's important that this comes AFTER remoteULEChildChanged
         // so that remoteULEChildMounted has access to all the info on mount.
         useLayoutEffect(() => {
-            return remoteULEChildMounted?.(info.index as I["index"], true);
+            return remoteULEChildMounted?.(info.index as T, true);
         }, [info.index]);
     }, [/* Must remain stable */]);
 
@@ -246,8 +247,8 @@ export function useManagedChildren<T extends number | string, C, K extends strin
         forEach: forEachChild,
         getAt: getManagedChildInfo,
         getHighestIndex: getHighestIndex,
-        sliceSort: (compare) => {
-            return managedChildrenArray.current.arr.slice().sort(compare);
+        arraySlice: () => {
+            return managedChildrenArray.current.arr.slice();
         }
     });
 
