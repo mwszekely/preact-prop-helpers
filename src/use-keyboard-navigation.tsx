@@ -53,7 +53,7 @@ export interface UseLinearNavigationParameters {
 
 
 /** Arguments passed to the child 'useLinearNavigationChild` */
-export interface UseLinearNavigationChildInfo { }
+//export interface UseLinearNavigationChildInfo { }
 
 /**
  * When used in tandem with `useRovingTabIndex`, allows control of

@@ -1,7 +1,6 @@
 import { createContext, h, render } from "preact";
 import { memo } from "preact/compat";
 import { useContext, useRef } from "preact/hooks";
-import { tabbable } from "tabbable";
 import { useAnimationFrame, useAsyncHandler, useDraggable, useDroppable, useElementSize, useFocusTrap, useMergedProps, useState } from "..";
 import { ElementSize } from "../use-element-size";
 import { useGridNavigation, UseGridNavigationCell, UseGridNavigationRow } from "../use-grid-navigation";
@@ -253,14 +252,19 @@ const DemoFocus = memo(() => {
 })
 
 
-const GridRowContext = createContext<UseGridNavigationRow<HTMLDivElement, HTMLDivElement>>(null!);
-const GridCellContext = createContext<UseGridNavigationCell<HTMLDivElement>>(null!);
+const GridRowContext = createContext<UseGridNavigationRow<HTMLDivElement, HTMLDivElement, {}, {}, string, string>>(null!);
+const GridCellContext = createContext<UseGridNavigationCell<HTMLDivElement, {}, string>>(null!);
 export const DemoUseGrid = memo(() => {
 
-    const [, setLastFocusedInner, getLastFocusedInner] = useState(false);
-
+    const [, setLastFocusedInner, _getLastFocusedInner] = useState(false);
     const { useHasFocusProps } = useHasFocus<HTMLDivElement>({ onLastFocusedInnerChanged: setLastFocusedInner });
-    const { useGridNavigationRow, currentColumn, useGridNavigationProps } = useGridNavigation<HTMLDivElement, HTMLDivElement, HTMLDivElement>({});
+    const { useGridNavigationRow, currentColumn, useGridNavigationProps } = useGridNavigation<HTMLDivElement, HTMLDivElement, HTMLDivElement, {}, {}, string, string>({
+        rovingTabIndex: {  },
+        linearNavigation: {},
+        listNavigation: {},
+        typeaheadNavigation: {},
+        managedChildren: {}
+    });
 
     return (
         <div className="demo">
@@ -282,7 +286,10 @@ const _Prefix = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const DemoUseGridRow = memo((({ index }: { index: number }) => {
     const [_randomWord] = useState(() => RandomWords[index/*Math.floor(Math.random() * (RandomWords.length - 1))*/]);
     const useGridRow = useContext(GridRowContext);
-    const { useGridNavigationRowProps, useGridNavigationCell, rowIsTabbable, getCurrentColumn } = useGridRow({ info: { index, text: index.toString(), flags: {} } });
+    const { useGridNavigationRowProps, useGridNavigationCell, rowIsTabbable, getCurrentColumn } = useGridRow({ 
+        asChild: { managedChild: { index }, li: { subInfo: {}, text: "", hidden: false }, rti: {} },
+        asParent: { linearNavigation: {}, listNavigation: {}, rovingTabIndex: {}, typeaheadNavigation: {}, managedChildren: {} }
+     });
 
     const props = useGridNavigationRowProps({});
     return (
@@ -304,7 +311,11 @@ const DemoUseGridRow = memo((({ index }: { index: number }) => {
 
 const DemoUseGridCell = (({ index }: { index: number }) => {
     const useGridCell = useContext(GridCellContext);
-    const { useGridNavigationCellProps, getCurrentColumn, cellIsTabbable } = useGridCell({ info: { index, text: index.toString(), flags: {} } });
+    const { useGridNavigationCellProps, cellIsTabbable } = useGridCell({
+        li: { subInfo: {}, text: "", hidden: false },
+        managedChild: { index },
+        rti: {}
+     });
 
     const props = useGridNavigationCellProps({}) as any;
 

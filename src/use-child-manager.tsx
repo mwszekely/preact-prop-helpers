@@ -27,24 +27,45 @@ import { useStableGetter } from "./use-stable-getter";
  */
 const _comments = void (0);
 
-//export interface ManagedChildInfoBase<T extends string | number> {}
 
-//export interface ManagedChildInfoNeeded<T extends string | number> {index: T; managedChild: ManagedChildInfoBase<T> }
-
-
-export interface ManagedChildInfo<T extends string | number, C, K extends string> {
+/**
+ * Information that children and parents use to communicate with each other.
+ * 
+ * * `index` refers to which child this is.
+ * * `flags` are quick-and-easy getters and setters that you can optionally use
+ * * `subInfo` is anything used by a derived hook. `useRovingTabIndex`, for example, needs to know how to focus an arbitrary child, so the child populates `info` with an object containing a method called `focusSelf`.
+ */
+ export interface ManagedChildInfo<T extends string | number, C, K extends string> {
     index: T;
     flags?: Partial<Record<K, ChildFlagOperations>>;
-    info: C;
+    subInfo: C;
+}
+
+
+
+export type OnChildrenMountChange<T extends string | number> = ((mounted: Set<T>, unmounted: Set<T>) => void);
+export type OnAfterChildLayoutEffect<T extends string | number> = ((causers: Iterable<T>) => void);
+
+export interface UseManagedChildrenParameters<T extends number | string> {
+    managedChildren: {
+        /**
+         * Runs after one or more children have updated their information (index, etc.).
+         * 
+         * Only one will run per tick, just like layoutEffect, but it isn't
+         * *guaranteed* to have actually been a change.
+         */
+        onAfterChildLayoutEffect?: null | undefined | OnAfterChildLayoutEffect<T>;
+    
+        /**
+         * Same as the above, but only for mount/unmount (or when a child changes its index)
+         */
+        onChildrenMountChange?: null | undefined | OnChildrenMountChange<T>;
+    };
 }
 
 export interface UseManagedChildParameters<T extends number | string, C, K extends string> {
     managedChild: ManagedChildInfo<T, C, K>;
 }
-
-export type UseManagedChild<T extends number | string, C, K extends string> = (a: UseManagedChildParameters<T, C, K>) => void;
-
-
 
 export interface UseManagedChildrenReturnType<T extends number | string, C, K extends string> {
     /**
@@ -64,8 +85,18 @@ export interface UseManagedChildrenReturnType<T extends number | string, C, K ex
     children: ManagedChildren<T, C, K>;
 }
 
+export type UseManagedChildReturnType = void;
+
+export type UseManagedChild<T extends number | string, C, K extends string> = (a: UseManagedChildParameters<T, C, K>) => UseManagedChildReturnType;
 
 
+
+
+
+
+/**
+ * Abstraction over the managed children
+ */
 export interface ManagedChildren<T extends number | string, C, K extends string> {
     /** STABLE */
     getAt(index: T): ManagedChildInfo<T, C, K> | undefined;
@@ -77,26 +108,8 @@ export interface ManagedChildren<T extends number | string, C, K extends string>
     sliceSort: (compare: (lhs: ManagedChildInfo<T, C, K>, rhs: ManagedChildInfo<T, C, K>) => number) => ManagedChildInfo<T, C, K>[];
 }
 
-interface MCsP<T extends number | string, C, K extends string> {
-    /**
-     * Runs after one or more children have updated their information (index, etc.).
-     * 
-     * Only one will run per tick, just like layoutEffect, but it isn't
-     * *guaranteed* to have actually been a change.
-     */
-    onAfterChildLayoutEffect?: null | undefined | ((causers: Iterable<T>) => void);
 
-    /**
-     * Same as the above, but only for mount/unmount (or when a child changes its index)
-     */
-    onChildrenMountChange?: null | undefined | OnChildrenMountChange<T>;
-}
 
-export interface UseManagedChildrenParameters<T extends number | string, C, K extends string> {
-    managedChildren: MCsP<T, C, K>;
-}
-
-export type OnChildrenMountChange<T extends string | number> = ((mounted: Set<T>, unmounted: Set<T>) => void);
 
 //export type UseManagedChildParameters<I extends {}> = { info: I };
 
@@ -110,7 +123,7 @@ export type OnChildrenMountChange<T extends string | number> = ((mounted: Set<T>
  * 
  * 
  */
-export function useManagedChildren<T extends number | string, C, K extends string>({ managedChildren: { onAfterChildLayoutEffect, onChildrenMountChange } }: UseManagedChildrenParameters<T, C, K>): UseManagedChildrenReturnType<T, C, K> {
+export function useManagedChildren<T extends number | string, C, K extends string>({ managedChildren: { onAfterChildLayoutEffect, onChildrenMountChange } }: UseManagedChildrenParameters<T>): UseManagedChildrenReturnType<T, C, K> {
     //type I = I3 & ManagedChildInfoBase<string | number>;
     type I = ManagedChildInfo<T, C, K>;
 
@@ -203,7 +216,7 @@ export function useManagedChildren<T extends number | string, C, K extends strin
     }, [/* Must remain stable */]);
 
 
-    const useManagedChild: UseManagedChild<T, C, K> = useCallback<UseManagedChild<T, C, K>>(({ managedChild: info }) => {
+    const useManagedChild = useCallback<UseManagedChild<T, C, K>>(({ managedChild: info }) => {
         // Any time our child props change, make that information available
         // the parent if they need it.
         // The parent can listen for all updates and only act on the ones it cares about,
@@ -211,9 +224,9 @@ export function useManagedChildren<T extends number | string, C, K extends strin
         useLayoutEffect(() => {
             // Insert this information in-place
             if (typeof info.index == "number")
-                managedChildrenArray.current.arr[info.index as number] = { index: info.index, flags: {}, info: info.info };
+                managedChildrenArray.current.arr[info.index as number] = { index: info.index, flags: info.flags ?? {}, subInfo: info.subInfo };
             else
-                managedChildrenArray.current.rec[info.index as I["index"]] = { index: info.index, flags: {}, info: info.info };
+                managedChildrenArray.current.rec[info.index as I["index"]] = { index: info.index, flags: info.flags ?? {}, subInfo: info.subInfo };
             return remoteULEChildChanged(info.index as I["index"]);
         }, [...Object.entries(info).flat(9)]);  // 9 is infinity, right? Sure. Unrelated: TODO.
 
@@ -309,7 +322,7 @@ export interface ChildFlagOperations {
 //export interface FlaggableChildInfoB<K extends string> { flags: Partial<Record<K, ChildFlagOperations>> } 
 
 
-export interface UseChildrenFlagReturnType<C, K extends string> {
+export interface UseChildrenFlagReturnType {
     /** **STABLE** */
     changeIndex: (arg: Parameters<StateUpdater<number | null>>[0]) => number | null;
     /** **STABLE** */
@@ -326,11 +339,16 @@ export interface UseChildrenFlagReturnType<C, K extends string> {
  * 
  * This hook allows for much easier control over selection management.
  * 
+ * Note that because you may want to use multiple flags with the same children, this hook *does not* use `useManagedChildren`!
+ * You need to pass it the existing children, and you must pass your invocation of `useManagedChildren` the returned `onChildrenMountChange` handler!
+ * 
+ * Also because of that, the types of this function are rather odd.  It's better to start off using a hook that already uses a flag, such as `useRovingTabIndex`, as an example.
+ * 
  * 
  * @param param0 
  * @returns 
  */
-export function useChildrenFlag<C, K extends string>({ children, initialIndex, closestFit, onIndexChange, key, fitNullToZero }: UseChildrenFlagParameters<C, K>): UseChildrenFlagReturnType<C, K> {
+export function useChildrenFlag<C, K extends string>({ children, initialIndex, closestFit, onIndexChange, key, fitNullToZero }: UseChildrenFlagParameters<C, K>): UseChildrenFlagReturnType {
     useEnsureStability("useChildrenFlag", closestFit, onIndexChange, key);
 
     const [getCurrentIndex, setCurrentIndex] = usePassiveState<null | number>(onIndexChange, useCallback(() => (initialIndex ?? (fitNullToZero ? 0 : null)), []));
@@ -461,11 +479,12 @@ export function spread<A extends {}, B extends {}>(a: A, b: B): Spread<A, B> {
     }
 }*/
 
+/*
 function test() {
     type C = { foo: "bar" };
     type K = "flag2";
 
     const { children, useManagedChild } = useManagedChildren<number, C, K>({ managedChildren: { onChildrenMountChange: useStableCallback<OnChildrenMountChange<number>>((mounted, unmounted) => onChildrenMountChange(mounted, unmounted)) } });
-    useManagedChild({ managedChildren: { index: 0, info: { foo: "bar" }, flags: {  } } });
+    useManagedChild({ managedChild: { index: 0, info: { foo: "bar" }, flags: {  } } });
     const { changeIndex, getCurrentIndex, onChildrenMountChange } = useChildrenFlag<C, K>({ children, initialIndex: 0, key: "flag2" })
-}
+}*/

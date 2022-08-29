@@ -1,20 +1,32 @@
-import { createContext, h } from "preact";
+import { createContext } from "preact";
 import { memo, StateUpdater, useContext } from "preact/compat";
-import { useForceUpdate, useHasFocus } from "../..";
-import { useListNavigation, UseListNavigationChild, useListNavigationSingleSelection, UseListNavigationSingleSelectionChild } from "../../use-list-navigation";
+import { useHasFocus } from "../..";
+import { useListNavigationSingleSelection, UseListNavigationSingleSelectionChild } from "../../use-list-navigation";
 import { useState } from "../../use-state";
 
 
 const RandomWords = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
 
-const RovingChildContext = createContext<UseListNavigationSingleSelectionChild<HTMLOListElement, HTMLLIElement>>(null!)
+const RovingChildContext = createContext<UseListNavigationSingleSelectionChild<HTMLOListElement, HTMLLIElement, {}, string>>(null!)
 export const DemoUseRovingTabIndex = memo(() => {
 
     const [_lastFocusedInner, setLastFocusedInner, _getLastFocusedInner] = useState(false)
     const { useHasFocusProps } = useHasFocus<HTMLUListElement>({ onLastFocusedInnerChanged: setLastFocusedInner });
-    const forceUpdate = useForceUpdate();
+    //const forceUpdate = useForceUpdate();
     const [selectedIndex, setSelectedIndex] = useState(0);
-    const { useListNavigationSingleSelectionChild, currentTypeahead, useListNavigationSingleSelectionProps, setTabbableIndex, getTabbableIndex } = useListNavigationSingleSelection<HTMLUListElement, HTMLLIElement>({ selectedIndex });
+    const { 
+        useListNavigationSingleSelectionChild, 
+        useListNavigationSingleSelectionProps, 
+        rovingTabIndex: {setTabbableIndex, getTabbableIndex},
+        typeaheadNavigation: { currentTypeahead }
+    } = useListNavigationSingleSelection<HTMLUListElement, HTMLLIElement, {}, string>({ 
+        linearNavigation: {},
+        listNavigation: {},
+        managedChildren: {},
+        rovingTabIndex: {},
+        typeaheadNavigation: {},
+        singleSelection: { selectedIndex }
+     });
     //const { useRovingTabIndexChild, useRovingTabIndexProps } = useRovingTabIndex<HTMLUListElement, RovingTabIndexChildInfo>({ tabbableIndex, focusOnChange: false });
 
     return (
@@ -66,7 +78,7 @@ const DemoUseRovingTabIndexChild = memo((({ index, setSelectedIndex }: { index: 
     const [randomWord] = useState(() => RandomWords[index/*Math.floor(Math.random() * (RandomWords.length - 1))*/]);
     const useRovingTabIndexChild = useContext(RovingChildContext);
     const text = `${randomWord} This is item #${index + 1}`;
-    const { useListNavigationChildProps, tabbable, selected } = useRovingTabIndexChild({ info: { index, text, hidden: (index == 5), flags: {} } });
+    const { useListNavigationChildProps, tabbable, selected } = useRovingTabIndexChild({ managedChild: { index }, li: { subInfo: {}, text }, rti: {} });
 
     const props = useListNavigationChildProps({});
     return (

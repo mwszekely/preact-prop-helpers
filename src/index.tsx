@@ -16,9 +16,9 @@ export { useGridNavigation, UseGridNavigationParameters } from "./use-grid-navig
 export { useHasFocus, UseHasFocusParameters, UseHasFocusReturnType } from "./use-has-focus";
 export { useImperativeProps } from "./use-imperative-props";
 export { useInterval } from "./use-interval";
-export { useLinearNavigation, UseLinearNavigationChildInfo, UseLinearNavigationParameters, UseLinearNavigationReturnType, useTypeaheadNavigation, UseTypeaheadNavigationChild, UseTypeaheadNavigationChildInfo, UseTypeaheadNavigationChildParameters, UseTypeaheadNavigationChildReturnType, UseTypeaheadNavigationParameters, UseTypeaheadNavigationProps, UseTypeaheadNavigationReturnType } from "./use-keyboard-navigation";
+export { useLinearNavigation, UseLinearNavigationParameters, UseLinearNavigationReturnType, useTypeaheadNavigation, UseTypeaheadNavigationChild, UseTypeaheadNavigationChildParameters, UseTypeaheadNavigationChildReturnType, UseTypeaheadNavigationParameters, UseTypeaheadNavigationProps, UseTypeaheadNavigationReturnType } from "./use-keyboard-navigation";
 export { useLayoutEffect } from "./use-layout-effect";
-export { useListNavigation, UseListNavigationParameters, useListNavigationSingleSelection, UseListNavigationReturnType, UseListNavigationSingleSelectionReturnType, UseListNavigationSingleSelectionParameters, ListNavigationChildInfoBase, UseListNavigationChild, UseListNavigationSingleSelectionChild, UseListNavigationSingleSelectionChildReturnType } from "./use-list-navigation";
+export { useListNavigation, UseListNavigationParameters, useListNavigationSingleSelection, UseListNavigationReturnType, UseListNavigationSingleSelectionReturnType, UseListNavigationSingleSelectionParameters, UseListNavigationChild, UseListNavigationSingleSelectionChild, UseListNavigationSingleSelectionChildReturnType } from "./use-list-navigation";
 export { LogicalDirectionInfo, LogicalElementSize, LogicalOrientation, PhysicalDirection, PhysicalOrientation, PhysicalSize, useLogicalDirection, UseLogicalDirectionParameters, UseLogicalDirectionReturnType } from "./use-logical-direction";
 export { useMediaQuery } from "./use-media-query";
 export { useMergedClasses } from "./use-merged-classes";
