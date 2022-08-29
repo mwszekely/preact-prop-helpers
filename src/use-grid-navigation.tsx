@@ -2,7 +2,7 @@ import { h } from "preact";
 import { useCallback, useEffect } from "preact/hooks";
 import {  } from "./use-roving-tabindex";
 import { ManagedChildren } from "./use-child-manager";
-import { ListNavigationChildInfoBase, useListNavigation, UseListNavigationChildInfoNeeded, UseListNavigationParameters } from "./use-list-navigation";
+import { useListNavigation, UseListNavigationChildParameters, UseListNavigationParameters } from "./use-list-navigation";
 import { useStableCallback } from "./use-stable-callback";
 import { useState } from "./use-state";
 /*
@@ -40,28 +40,17 @@ export type UseGridNavigationCell<C extends Element, IC extends UseGridNavigatio
 
 */
 
-export interface UseGridNavigationRowInfoBase<K extends string> extends ListNavigationChildInfoBase<K> {
-    /**
-     * If a child is hidden, then it will be skipped over
-     * during keyboard navigation, and the HTML `hidden`
-     * attribute will be applied.
-     */
-    //hidden?: boolean;
-}
-export interface UseGridNavigationCellInfoBase<K extends string> extends ListNavigationChildInfoBase<K> { }
-
-export type UseGridNavigationRowInfoNeeded<K extends string, I extends UseGridNavigationRowInfoBase<K>> = Omit<UseListNavigationChildInfoNeeded<K, I>, "initialIndex">;
-export type UseGridNavigationCellInfoNeeded<K extends string, I extends UseGridNavigationCellInfoBase<K>> = UseListNavigationChildInfoNeeded<K, I>;
 
 
-export interface UseGridNavigationParameters<K extends string, IR extends UseGridNavigationRowInfoBase<K>> extends Omit<UseListNavigationParameters<K, IR>, "initialIndex" | "navigationDirection"> {
-    indexMangler?(unmangled: number): number;
-    indexDemangler?(mangled: number): number;
-    //onRowMountChange?: UseManagedChildrenParameters<IR>["onChildrenMountChange"];
-    initialRow?: number;
-    initialColumn?: number;
+//export interface UseGridNavigationCellInfoBase<K extends string> extends ListNavigationChildInfoBase<K> { }
 
-}
+//export type UseGridNavigationRowInfoNeeded<K extends string, I extends UseGridNavigationRowInfoBase<K>> = Omit<UseListNavigationChildInfoNeeded<K, I>, "initialIndex">;
+//export type UseGridNavigationCellInfoNeeded<K extends string, I extends UseGridNavigationCellInfoBase<K>> = UseListNavigationChildInfoNeeded<K, I>;
+
+
+export interface UseGridNavigationParameters<C, K extends string> extends Omit<UseListNavigationParameters<C, K>, "initialIndex" | "navigationDirection"> {}
+export interface UseGridNavigationRowParameters<C, K extends string> extends UseListNavigationChildParameters<C, K>, UseListNavigationParameters<C, K> {}
+export interface UseGridNavigationCellParameters<C, K extends string> extends UseListNavigationChildParameters<C, K> {}
 /*
 export type UseGridNavigationRowParameters<K extends string, I extends UseGridNavigationRowInfoBase<K>> = Omit<UseListNavigationParameters<K, I>, "initialIndex" | "onChildrenMountChange" | "noTypeahead" | "navigationDirection"> & UseRovingTabIndexChildParametersBase<K, Omit<UseGridNavigationRowInfoBase<K>, "initialIndex" | "noTypeahead" | "navigationDirection">> & {
     initialColumn?: number;
@@ -69,19 +58,19 @@ export type UseGridNavigationRowParameters<K extends string, I extends UseGridNa
 };*/
 
 
-export type UseGridNavigationCell<C extends HTMLElement | SVGElement, K extends string = string, IC extends UseGridNavigationRowInfoBase<K> = UseGridNavigationRowInfoBase<K>> = (p: { info: UseGridNavigationCellInfoNeeded<K, IC> }) => {
+export type UseGridNavigationCell<Cell extends HTMLElement | SVGElement, C, K extends string> = (p: UseGridNavigationCellParameters<C, K>) => {
     cellIsTabbable: boolean;
     getCurrentColumn(): number | null;
-    useGridNavigationCellProps: <P extends h.JSX.HTMLAttributes<C>>(props: P) => h.JSX.HTMLAttributes<C>;
+    useGridNavigationCellProps: <P extends h.JSX.HTMLAttributes<Cell>>(props: P) => h.JSX.HTMLAttributes<Cell>;
 }
 
-export type UseGridNavigationRowParameters<KR extends string, KC extends string, IR extends UseGridNavigationRowInfoBase<KR>, IC extends UseGridNavigationRowInfoBase<KC>> = { info: UseGridNavigationRowInfoNeeded<KR, IR> } & Omit<UseListNavigationParameters<KC, IC>, "noTypeahead" | "navigationDirection">;
-export type UseGridNavigationRow<R extends HTMLElement, C extends HTMLElement | SVGElement, KR extends string = string, KC extends string = string, IR extends UseGridNavigationRowInfoBase<KR> = UseGridNavigationRowInfoBase<KR>, IC extends UseGridNavigationRowInfoBase<KC> = UseGridNavigationRowInfoBase<KC>> = (a: UseGridNavigationRowParameters<KR, KC, IR, IC>) => {
+//export type UseGridNavigationRowParameters<KR extends string, KC extends string, IR extends UseGridNavigationRowInfoBase<KR>, IC extends UseGridNavigationRowInfoBase<KC>> = { info: UseGridNavigationRowInfoNeeded<KR, IR> } & Omit<UseListNavigationParameters<KC, IC>, "noTypeahead" | "navigationDirection">;
+export type UseGridNavigationRow<Row extends HTMLElement, Cell extends HTMLElement | SVGElement, C, K extends string> = (a: UseGridNavigationRowParameters<C, K>) => {
     rowIsTabbable: boolean;
-    cells: ManagedChildren<IC>;
+    cells: ManagedChildren<number, C, K>;
     getCurrentColumn(): number | null;
-    useGridNavigationCell: UseGridNavigationCell<C, KC, IC>;
-    useGridNavigationRowProps: <P extends h.JSX.HTMLAttributes<R>>(props: P) => h.JSX.HTMLAttributes<R>;
+    useGridNavigationCell: UseGridNavigationCell<Cell, C, K>;
+    useGridNavigationRowProps: (props: h.JSX.HTMLAttributes<Row>) => h.JSX.HTMLAttributes<Row>;
 }
 
 export function useGridNavigation<ParentOrRowElement extends HTMLElement, RowElement extends HTMLElement, CellElement extends HTMLElement, KR extends string = string, KC extends string = string, IR extends UseGridNavigationRowInfoBase<KR> = UseGridNavigationRowInfoBase<KR>, IC extends UseGridNavigationRowInfoBase<KC> = UseGridNavigationRowInfoBase<KC>>({ collator, disableArrowKeys, disableHomeEndKeys, noTypeahead, onTabbableIndexChange, typeaheadTimeout, indexMangler, indexDemangler, initialRow, initialColumn, onAfterChildLayoutEffect, onChildrenMountChange: onRowMountChangeUser, onTabbableRender, onTabbedInTo, onTabbedOutOf }: UseGridNavigationParameters<KR, IR>) {

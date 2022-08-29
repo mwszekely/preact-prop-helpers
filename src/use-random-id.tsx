@@ -1,7 +1,7 @@
 import { h } from "preact";
 import { useCallback, useEffect, useRef } from "preact/hooks";
 import { generateRandomId } from "./use-before-layout-effect";
-import { ManagedChildInfoBase, useManagedChildren, UseManagedChildrenParameters } from "./use-child-manager";
+import { ManagedChildInfo, useManagedChildren, UseManagedChildrenParameters } from "./use-child-manager";
 import { useMergedProps } from "./use-merged-props";
 import { useEnsureStability } from "./use-passive-state";
 import { useRefElement } from "./use-ref-element";
@@ -11,7 +11,7 @@ export { generateRandomId }
 export type UseRandomIdPropsParameters = UseReferencedIdPropsParameters<"id">;
 export type UseRandomIdPropsReturnType<P extends UseRandomIdPropsParameters> = UseReferencedIdPropsReturnType<P, "id">;
 
-export interface UseRandomIdParameters<I extends RandomIdChildInfoBase> extends UseManagedChildrenParameters<I> { prefix?: string; }
+export interface UseRandomIdParameters<I extends RandomIdChildInfoBase> extends UseManagedChildrenParameters<"referencer" | "source", RandomIdChildInfoBase, never> { prefix?: string; }
 
 
 export type UseReferencedIdPropsParameters<K extends keyof h.JSX.HTMLAttributes<any>> = Partial<Record<K, any>>;//<E extends Element> extends h.JSX.HTMLAttributes<E> { };
@@ -29,7 +29,7 @@ export interface UseRandomIdReturnType<S extends Element> {
     getUsedId(): string | undefined;
 }
 
-interface RandomIdChildInfoBase extends ManagedChildInfoBase<"referencer" | "source"> {
+interface RandomIdChildInfoBase {
     setUsedId(id: string): void;
     //sendSourceIdToReferencerElement(sourceId: string): void;
 }
@@ -64,13 +64,13 @@ export interface UseRandomIdReferencerElementReturnType<R extends Element> {
  * 
  * Unlike most other `use*Props` hooks, these are mostly stable.
  */
-export function useRandomId<S extends Element>({ prefix, onAfterChildLayoutEffect, onChildrenMountChange }: UseRandomIdParameters<RandomIdChildInfoBase>): UseRandomIdReturnType<S> {
+export function useRandomId<S extends Element>({ prefix, managedChildren: { onAfterChildLayoutEffect, onChildrenMountChange } }: UseRandomIdParameters<RandomIdChildInfoBase>): UseRandomIdReturnType<S> {
     const [backupRandomId, , getBackupRandomId] = useState<string>(() => generateRandomId(prefix));
     const [usedId, setUsedId, getUsedId] = useState<string | undefined>(() => getBackupRandomId());
     const mismatchErrorRef = useRef(false);
     useEnsureStability("useRandomId", prefix);
 
-    const { useManagedChild, children } = useManagedChildren<RandomIdChildInfoBase>({ onAfterChildLayoutEffect, onChildrenMountChange });
+    const { useManagedChild, children } = useManagedChildren<"referencer" | "source", RandomIdChildInfoBase, never>({ managedChildren: { onAfterChildLayoutEffect, onChildrenMountChange } });
 
     const useRandomIdSourceElement = useCallback<UseRandomIdSourceElement<S>>(() => {
         const [usedIdLocal, setUsedIdLocal, getUsedIdLocal] = useState(getUsedId());
@@ -82,12 +82,12 @@ export function useRandomId<S extends Element>({ prefix, onAfterChildLayoutEffec
             const element = getElement();
 
             if (element) {
-                children.getAt("referencer")!.setUsedId(element.id);
+                children.getAt("referencer")!.info.setUsedId(element.id);
                 setUsedId(element.id);
             }
         });
 
-        const _: void = useManagedChild({ info: { index: "source", setUsedId: setUsedIdLocal } });
+        const _: void = useManagedChild({ managedChild: { index: "source", info: { setUsedId: setUsedIdLocal } } });
 
         const useRandomIdSourceElementProps = useCallback<UseRandomIdSourceElementReturnType<S>["useRandomIdSourceElementProps"]>(function (p: h.JSX.HTMLAttributes<S>) {
             p.id ||= backupRandomId;
@@ -106,7 +106,7 @@ export function useRandomId<S extends Element>({ prefix, onAfterChildLayoutEffec
         // Whatever ID was most recently used by the actual "id" prop of the source element
         useEnsureStability(idPropName);
 
-        const _v: void = useManagedChild({ info: { index: "referencer", setUsedId: setUsedIdLocal } });
+        const _v: void = useManagedChild({ managedChild: { index: "referencer", info: { setUsedId: setUsedIdLocal } } });
 
         const useRandomIdReferencerElementProps = useCallback<UseRandomIdReferencerElementReturnType<R>["useRandomIdReferencerElementProps"]>(function <R extends Element>({ [idPropName]: givenId, ...p }: h.JSX.HTMLAttributes<R>) {
             if (givenId && usedId) {

@@ -1,6 +1,6 @@
 import { h, VNode } from "preact";
 import { MutableRef, useCallback, useLayoutEffect, useRef } from "preact/hooks";
-import { ManagedChildren } from "./use-child-manager";
+import { ManagedChildInfo, ManagedChildren } from "./use-child-manager";
 import { useForceUpdate } from "./use-force-update";
 import { useMergedProps } from "./use-merged-props";
 import { returnNull, usePassiveState } from "./use-passive-state";
@@ -8,13 +8,13 @@ import { returnNull, usePassiveState } from "./use-passive-state";
 /**
  * All of these functions **MUST** be stable across renders.
  */
-export interface UseSortableChildrenParameters<T extends { index: number }, G extends any[]> { 
+export interface UseSortableChildrenParameters<C, K extends string, G extends any[]> { 
 
     /**
      * Must return, e.g., the row index of this child
      * (Usually just an `index` prop)
      */
-    getIndex(row: T): (number | null | undefined);
+    getIndex(row: ManagedChildInfo<number, C, K>): (number | null | undefined);
 
     /**
      * Must return the value this child uses RE: sorting.
@@ -24,7 +24,7 @@ export interface UseSortableChildrenParameters<T extends { index: number }, G ex
      * @param row 
      * @param args 
      */
-    getValue(row: T, ...args: G): unknown;
+    getValue(row: ManagedChildInfo<number, C, K>, ...args: G): unknown;
 
     /**
      * Controls how values compare against each other.
@@ -49,7 +49,7 @@ export interface UseSortableChildrenParameters<T extends { index: number }, G ex
  * Because keys are given special treatment and a child has no way of modifying its own key
  * there's no other time or place this can happen other than exactly within the parent component's render function.
  */
-export function useSortableChildren<T extends { index: number }, G extends any[], S extends Element>({ getIndex, getValue, compare: userCompare }: UseSortableChildrenParameters<T, G>): UsesortableChildrenReturnType<T, G, S> {
+export function useSortableChildren<C, K extends string, G extends any[], S extends Element>({ getIndex, getValue, compare: userCompare }: UseSortableChildrenParameters<C, K, G>): UsesortableChildrenReturnType<C, K, G, S> {
 
     const compare = (userCompare ?? defaultCompare)
 
@@ -68,7 +68,7 @@ export function useSortableChildren<T extends { index: number }, G extends any[]
 
 
     // The actual sort function.
-    const sort = useCallback((managedRows: ManagedChildren<T>, direction: "ascending" | "descending", ...args: G): Promise<void> | void => {
+    const sort = useCallback((managedRows: ManagedChildren<number, C, K>, direction: "ascending" | "descending", ...args: G): Promise<void> | void => {
         
         const sortedRows = managedRows.sliceSort((lhsRow, rhsRow) => {
 
@@ -101,7 +101,7 @@ export function useSortableChildren<T extends { index: number }, G extends any[]
 
         return (useMergedProps<S>({
             role: "rowgroup",
-            children: (children as VNode<T>[]).slice().sort((lhs, rhs) => {
+            children: (children as VNode<ManagedChildInfo<number, C, K>>[]).slice().sort((lhs, rhs) => {
 
                 return (
                     (demangleMap.current.get(getIndex(lhs.props)!) ?? getIndex(lhs.props) ?? 0) -
@@ -114,11 +114,11 @@ export function useSortableChildren<T extends { index: number }, G extends any[]
     return { useSortableProps, sort, indexMangler, indexDemangler, mangleMap, demangleMap }
 }
 
-export interface UsesortableChildrenReturnType<T extends { index: number }, G extends any[], S extends Element> {
+export interface UsesortableChildrenReturnType<C, K extends string, G extends any[], S extends Element> {
     /** **STABLE** */
     useSortableProps: (props: Omit<h.JSX.HTMLAttributes<S>, "children"> & {children?: VNode<any>[] | undefined;}) => h.JSX.HTMLAttributes<S>;
     /** **STABLE** */
-    sort: (managedRows: ManagedChildren<T>, direction: "ascending" | "descending", ...args: G) => Promise<void> | void;
+    sort: (managedRows: ManagedChildren<number, C, K>, direction: "ascending" | "descending", ...args: G) => Promise<void> | void;
     /** **STABLE** */
     indexMangler: (n: number) => number;
     /** **STABLE** */

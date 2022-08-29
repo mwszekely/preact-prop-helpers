@@ -1,11 +1,10 @@
 import { h } from "preact";
 import { useCallback, useEffect, useRef } from "preact/hooks";
-import { useStableGetter } from "./use-stable-getter";
-import { ManagedChildInfoBase } from "./use-child-manager";
 import { useLayoutEffect } from "./use-layout-effect";
 import { useLogicalDirection } from "./use-logical-direction";
 import { useMergedProps } from "./use-merged-props";
 import { useStableCallback } from "./use-stable-callback";
+import { useStableGetter } from "./use-stable-getter";
 import { useState } from "./use-state";
 import { useTimeout } from "./use-timeout";
 
@@ -54,7 +53,7 @@ export interface UseLinearNavigationParameters {
 
 
 /** Arguments passed to the child 'useLinearNavigationChild` */
-export interface UseLinearNavigationChildInfo extends ManagedChildInfoBase<number> { }
+export interface UseLinearNavigationChildInfo { }
 
 /**
  * When used in tandem with `useRovingTabIndex`, allows control of
@@ -186,7 +185,7 @@ export function useLinearNavigation<ParentOrChildElement extends HTMLElement | S
 
 
 
-export interface UseTypeaheadNavigationReturnType<ParentOrChildElement extends Element, I extends UseTypeaheadNavigationChildInfo> {
+export interface UseTypeaheadNavigationReturnType<ParentOrChildElement extends Element> {
     /**
      * Can be used on either the parent or each child element.
      * 
@@ -195,7 +194,7 @@ export interface UseTypeaheadNavigationReturnType<ParentOrChildElement extends E
     useTypeaheadNavigationProps: UseTypeaheadNavigationProps<ParentOrChildElement>;
 
     /** **STABLE** */
-    useTypeaheadNavigationChild: UseTypeaheadNavigationChild<I>;
+    useTypeaheadNavigationChild: UseTypeaheadNavigationChild;
 
 
     currentTypeahead: string | null;
@@ -221,18 +220,20 @@ export interface UseTypeaheadNavigationParameters {
 }
 
 /** Arguments passed to the child 'useTypeaheadNavigationChild` */
-export interface UseTypeaheadNavigationChildInfo extends ManagedChildInfoBase<number> {
+
+
+export interface UseTypeaheadNavigationChildParameters { 
     /**
      * If provided, allows this component to be navigated to by typing this string. 
      * It should be the same text content as whatever's displayed, ideally.
      */
     text: string | null;
+
+    index: number;
 }
 
-export interface UseTypeaheadNavigationChildParameters extends UseTypeaheadNavigationChildInfo { }
-
 /** Type of the child's sub-hook */
-export type UseTypeaheadNavigationChild<I extends UseTypeaheadNavigationChildInfo> = ({ text, index, ...i }: Pick<I, "text" | "index">) => UseTypeaheadNavigationChildReturnType;
+export type UseTypeaheadNavigationChild = (args: UseTypeaheadNavigationChildParameters) => UseTypeaheadNavigationChildReturnType;
 
 
 /**
@@ -240,7 +241,7 @@ export type UseTypeaheadNavigationChild<I extends UseTypeaheadNavigationChildInf
  * 
  * @see useListNavigation, which packages everything up together.
  */
-export function useTypeaheadNavigation<ParentOrChildElement extends Element, I extends UseTypeaheadNavigationChildInfo>({ collator, getIndex, typeaheadTimeout, setIndex, noTypeahead }: UseTypeaheadNavigationParameters): UseTypeaheadNavigationReturnType<ParentOrChildElement, I> {
+export function useTypeaheadNavigation<ParentOrChildElement extends Element>({ collator, getIndex, typeaheadTimeout, setIndex, noTypeahead }: UseTypeaheadNavigationParameters): UseTypeaheadNavigationReturnType<ParentOrChildElement> {
 
 
     // For typeahead, keep track of what our current "search" string is (if we have one)
@@ -284,7 +285,7 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, I e
         return compare;
     });
 
-    const insertingComparator = useStableCallback((lhs: I["text"], rhs: { text: I["text"]; unsortedIndex: number; }) => {
+    const insertingComparator = useStableCallback((lhs: string, rhs: { text: string; unsortedIndex: number; }) => {
 
         if (typeof lhs === "string" && typeof rhs.text === "string") {
             return comparatorShared(lhs, rhs.text);
@@ -293,7 +294,7 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, I e
         return (lhs as unknown as number) - (rhs as unknown as number);
     });
 
-    const typeaheadComparator = useStableCallback((lhs: I["text"], rhs: { text: I["text"]; unsortedIndex: number; }) => {
+    const typeaheadComparator = useStableCallback((lhs: string, rhs: { text: string; unsortedIndex: number; }) => {
 
         if (typeof lhs === "string" && typeof rhs.text === "string") {
             // During typeahead, all strings longer than ours should be truncated
@@ -448,7 +449,7 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, I e
         }
     }, [currentTypeahead]);
 
-    const useTypeaheadNavigationChild = useCallback<UseTypeaheadNavigationChild<I>>(({ text, ...i }: Pick<I, "text" | "index">) => {
+    const useTypeaheadNavigationChild = useCallback<UseTypeaheadNavigationChild>(({ index, text }) => {
 
         useEffect(() => {
             if (text) {
@@ -457,19 +458,19 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, I e
                 // Because all index values should be unique, the returned sortedIndex
                 // should always refer to a new location (i.e. be negative)                
                 const sortedIndex = binarySearch(sortedTypeaheadInfo.current, text, insertingComparator);
-                console.assert(sortedIndex < 0 || insertingComparator(sortedTypeaheadInfo.current[sortedIndex].text, { unsortedIndex: i.index, text }) == 0);
+                console.assert(sortedIndex < 0 || insertingComparator(sortedTypeaheadInfo.current[sortedIndex].text, { unsortedIndex: index, text }) == 0);
                 if (sortedIndex < 0) {
-                    sortedTypeaheadInfo.current.splice(-sortedIndex - 1, 0, { text, unsortedIndex: i.index });
+                    sortedTypeaheadInfo.current.splice(-sortedIndex - 1, 0, { text, unsortedIndex: index });
                 }
                 else {
-                    sortedTypeaheadInfo.current.splice(sortedIndex, 0, { text, unsortedIndex: i.index });
+                    sortedTypeaheadInfo.current.splice(sortedIndex, 0, { text, unsortedIndex: index });
                 }
 
                 return () => {
                     // When unmounting, find where we were and remove ourselves.
                     // Again, we should always find ourselves because there should be no duplicate values if each index is unique.
                     const sortedIndex = binarySearch(sortedTypeaheadInfo.current, text, insertingComparator);
-                    console.assert(sortedIndex < 0 || insertingComparator(sortedTypeaheadInfo.current[sortedIndex].text, { unsortedIndex: i.index, text }) == 0);
+                    console.assert(sortedIndex < 0 || insertingComparator(sortedTypeaheadInfo.current[sortedIndex].text, { unsortedIndex: index, text }) == 0);
 
                     if (sortedIndex >= 0) {
                         sortedTypeaheadInfo.current.splice(sortedIndex, 1);
