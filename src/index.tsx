@@ -3,7 +3,7 @@ export { ProvideBatchedAnimationFrames, useAnimationFrame, UseAnimationFramePara
 export { useAsync, UseAsyncParameters, UseAsyncReturnType } from "./use-async";
 export { useAsyncEffect } from "./use-async-effect";
 export { useAsyncHandler, UseAsyncHandlerParameters, UseAsyncHandlerReturnType } from "./use-async-handler";
-export { useManagedChildren, useChildrenFlag, UseManagedChild } from "./use-child-manager";
+export { useManagedChildren, useChildrenFlag, UseManagedChild, ChildFlagOperations, ManagedChildInfo, ManagedChildren, OnAfterChildLayoutEffect, OnChildrenMountChange, UseChildrenFlagParameters, UseChildrenFlagReturnType, UseManagedChildParameters, UseManagedChildReturnType, UseManagedChildrenParameters, UseManagedChildrenReturnType } from "./use-child-manager";
 export { useDocumentClass } from "./use-document-class";
 export { useDraggable, UseDraggableParameters, UseDraggableReturnType } from "./use-draggable";
 export { DropFile, DropFileMetadata, DroppableFileError, useDroppable, UseDroppableParameters, UseDroppableReturnType } from "./use-droppable";
@@ -30,7 +30,7 @@ export { returnFalse, returnNull, returnTrue, returnUndefined, returnZero, usePa
 export { getFromLocalStorage, storeToLocalStorage, usePersistentState } from "./use-persistent-state";
 export { generateRandomId, useRandomId, UseRandomIdParameters, UseRandomIdPropsParameters, UseRandomIdPropsReturnType, UseRandomIdReferencerElement, UseRandomIdReferencerElementReturnType, UseRandomIdReturnType, UseRandomIdSourceElement, UseRandomIdSourceElementReturnType, UseReferencedIdPropsParameters, UseReferencedIdPropsReturnType } from "./use-random-id";
 export { useRefElement, UseRefElementParameters, UseRefElementReturnType } from "./use-ref-element";
-export { useRovingTabIndex, UseRovingTabIndexChild, UseRovingTabIndexParameters } from "./use-roving-tabindex";
+export { useRovingTabIndex, UseRovingTabIndexChild, UseRovingTabIndexParameters, OnTabbableIndexChange, UseRovingTabIndexChildParameters, UseRovingTabIndexChildReturnType, UseRovingTabIndexReturnType, UseRovingTabIndexSubInfo } from "./use-roving-tabindex";
 export { useSortableChildren, UseSortableChildrenParameters } from "./use-sortable-children";
 export { useStableCallback } from "./use-stable-callback";
 export { useStableGetter } from "./use-stable-getter";
