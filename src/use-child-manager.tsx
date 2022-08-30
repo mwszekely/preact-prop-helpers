@@ -2,7 +2,6 @@ import { StateUpdater, useCallback, useRef } from "preact/hooks";
 import { useLayoutEffect } from "./use-layout-effect";
 import { OnPassiveStateChange, useEnsureStability, usePassiveState } from "./use-passive-state";
 import { useStableCallback } from "./use-stable-callback";
-import { useStableGetter } from "./use-stable-getter";
 
 /**
  * Reminder of order of execution:
@@ -131,12 +130,12 @@ export function useManagedChildren<T extends number | string, C, K extends strin
     useEnsureStability("useManagedChildren", onAfterChildLayoutEffect, onChildrenMountChange);
 
     const getHighestIndex = useCallback((): number => {
-        return managedChildrenArray.current.arr.length - 1;
+        return managedChildrenArray.current.highestIndex;
     }, []);
 
     // All the information we have about our children is stored in this **stable** array.
     // Any mutations to this array **DO NOT** trigger any sort of a re-render.
-    const managedChildrenArray = useRef<{ arr: Array<Info>; rec: Partial<Record<T, Info>>; }>({ arr: [], rec: {} });
+    const managedChildrenArray = useRef<{ arr: Array<Info>; rec: Partial<Record<T, Info>>; highestIndex: number, lowestIndex: number }>({ arr: [], rec: {}, highestIndex: 0, lowestIndex: 0 });
 
     // For indirect access to each child
     // Compare getManagedChildInfo
@@ -194,7 +193,7 @@ export function useManagedChildren<T extends number | string, C, K extends strin
 
     }, [/* Must remain stable */]);
 
-    const remoteULEChildMounted = useCallback((index: T, mounted: boolean) => {
+    const remoteULEChildMounted = useCallback((index: T, mounted: boolean): void => {
         if (!hasRemoteULEChildMounted.current) {
             hasRemoteULEChildMounted.current = {
                 mounts: new Set(),
@@ -206,9 +205,17 @@ export function useManagedChildren<T extends number | string, C, K extends strin
             });
         }
 
-        if (!mounted) {
-            if (typeof index == "number")
+        if (mounted) {
+            managedChildrenArray.current.highestIndex = Math.max(managedChildrenArray.current.highestIndex, index as number);
+        }
+        else {
+            if (typeof index == "number"){
                 delete managedChildrenArray.current.arr[index as number];
+                let shave = 0;
+                while (managedChildrenArray.current.arr[managedChildrenArray.current.arr.length - 1 - shave] === undefined)
+                    ++shave;
+                managedChildrenArray.current.arr.splice(managedChildrenArray.current.arr.length - 1 - shave, shave);
+            }
             else
                 delete managedChildrenArray.current.rec[index as T];
         }
@@ -237,7 +244,8 @@ export function useManagedChildren<T extends number | string, C, K extends strin
         // Note: It's important that this comes AFTER remoteULEChildChanged
         // so that remoteULEChildMounted has access to all the info on mount.
         useLayoutEffect(() => {
-            return remoteULEChildMounted?.(info.index as T, true);
+            remoteULEChildMounted?.(info.index as T, true);
+            return () => remoteULEChildMounted?.(info.index as T, false);
         }, [info.index]);
     }, [/* Must remain stable */]);
 
@@ -414,7 +422,7 @@ export function useChildrenFlag<C, K extends string>({ children, initialIndex, c
 
 
     const changeIndex = useCallback((arg: Parameters<StateUpdater<number | null>>[0]) => {
-        let requestedIndex = arg instanceof Function ? arg(getRequestedIndex()) : arg;
+        const requestedIndex = arg instanceof Function ? arg(getRequestedIndex()) : arg;
         //if (requestedIndex == null && getFitNullToZero())
         //    requestedIndex = 0;
 

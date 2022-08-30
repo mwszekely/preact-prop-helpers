@@ -1,8 +1,7 @@
-import { createContext, h, VNode } from "preact";
-import { memo, StateUpdater, useCallback, useContext } from "preact/compat";
-import { useHasFocus, UseLinearNavigationParameters, useSortableChildren } from "../..";
-import { UseListNavigationSingleSelectionChild, useListNavigationSingleSelection, UseListNavigationChildReturnType, UseListNavigationSingleSelectionParameters, UseListNavigationParameters, UseListNavigationReturnType, UseListNavigationChildParameters, useListNavigation, UseListNavigationSingleSelectionChildReturnType, useSortableListNavigationSingleSelection, UseSortableListNavigationSingleSelectionChild } from "../../use-list-navigation";
-import { UseSortableChildrenReturnType } from "../../use-sortable-children";
+import { createContext } from "preact";
+import { memo, StateUpdater, useContext } from "preact/compat";
+import { useHasFocus } from "../..";
+import { useSortableListNavigationSingleSelection, UseSortableListNavigationSingleSelectionChild } from "../../use-list-navigation";
 import { useState } from "../../use-state";
 
 
@@ -13,6 +12,7 @@ const RandomWords = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, se
 const RovingChildContext = createContext<UseSortableListNavigationSingleSelectionChild<HTMLOListElement, HTMLLIElement, {}, string>>(null!)
 export const DemoUseRovingTabIndex = memo(() => {
 
+    const [count, setCount] = useState(10);
     const [_lastFocusedInner, setLastFocusedInner, _getLastFocusedInner] = useState(false)
     const { useHasFocusProps } = useHasFocus<HTMLUListElement>({ onLastFocusedInnerChanged: setLastFocusedInner });
     //const forceUpdate = useForceUpdate();
@@ -40,7 +40,7 @@ export const DemoUseRovingTabIndex = memo(() => {
         linearNavigation: {},
         listNavigation: {  },
         managedChildren: {},
-        rovingTabIndex: {},
+        rovingTabIndex: { onTabbableIndexChange: index => { if (index != null) setSelectedIndex(index); } },
         typeaheadNavigation: {},
         singleSelection: { selectedIndex }
     });
@@ -79,13 +79,14 @@ export const DemoUseRovingTabIndex = memo(() => {
                 If the child element itself has a focusable element, like a button, it can also be wired up to disable itself
                 Feel free to nest them too, as long as you are aware of your <code>Context</code> management (i.e. remember that you need to create a new <code>Context</code> for each use case).
             </p>
+            <label># of items<input type="number" value={count} min={0} onInput={e => { e.preventDefault(); setCount(e.currentTarget.valueAsNumber) }} /></label>
             <button onClick={() => shuffle(children)}>Shuffle</button>
             <label>Tabbable index: <input type="number" value={getTabbableIndex() ?? undefined} onInput={e => { e.preventDefault(); setTabbableIndex(e.currentTarget.valueAsNumber, false); }} /></label>
 
             <RovingChildContext.Provider value={useSortableListNavigationSingleSelectionChild}>
                 <ul {...useHasFocusProps(useSortableListNavigationSingleSelectionProps({
                     children: Array.from((function* () {
-                        for (let i = 0; i < 10; ++i) {
+                        for (let i = 0; i < count; ++i) {
                             yield <DemoUseRovingTabIndexChild index={i} key={i} setSelectedIndex={setSelectedIndex} />
                         }
                     })())

@@ -252,14 +252,14 @@ const DemoFocus = memo(() => {
 })
 
 
-const GridRowContext = createContext<UseGridNavigationRow<HTMLDivElement, HTMLDivElement, {}, {}, string, string>>(null!);
-const GridCellContext = createContext<UseGridNavigationCell<HTMLDivElement, {}, string>>(null!);
+const GridRowContext = createContext<UseGridNavigationRow<HTMLTableRowElement, HTMLTableCellElement, {}, {}, string, string>>(null!);
+const GridCellContext = createContext<UseGridNavigationCell<HTMLTableCellElement, {}, string>>(null!);
 export const DemoUseGrid = memo(() => {
 
     const [, setLastFocusedInner, _getLastFocusedInner] = useState(false);
-    const { useHasFocusProps } = useHasFocus<HTMLDivElement>({ onLastFocusedInnerChanged: setLastFocusedInner });
-    const { useGridNavigationRow, currentColumn, useGridNavigationProps } = useGridNavigation<HTMLDivElement, HTMLDivElement, HTMLDivElement, {}, {}, string, string>({
-        rovingTabIndex: {  },
+    const { useHasFocusProps } = useHasFocus<HTMLTableSectionElement>({ onLastFocusedInnerChanged: setLastFocusedInner });
+    const { useGridNavigationRow, currentColumn, useGridNavigationProps } = useGridNavigation<HTMLTableSectionElement, HTMLTableRowElement, HTMLTableCellElement, {}, {}, string, string>({
+        rovingTabIndex: {},
         linearNavigation: {},
         listNavigation: {},
         typeaheadNavigation: {},
@@ -267,18 +267,28 @@ export const DemoUseGrid = memo(() => {
     });
 
     return (
-        <div className="demo">
-            {<div>{currentColumn}</div>}
-            <div {...useHasFocusProps(useGridNavigationProps({}))}>
-                <GridRowContext.Provider value={useGridNavigationRow}>
-                    {Array.from((function* () {
-                        for (let i = 0; i < 10; ++i) {
-                            yield <DemoUseGridRow index={i} key={i} />
-                        }
-                    })())}
-                </GridRowContext.Provider>
-            </div>
-        </div>
+        <>
+            {<div>Current column: {currentColumn}</div>}
+            <table {...{ border: "2" } as {}} style={{ whiteSpace: "nowrap" }}>
+
+                <thead>
+                    <tr>
+                        <th>Row is tabbable?</th>
+                        <th>Column 1</th>
+                        <th>Column 2</th>
+                    </tr>
+                </thead>
+                <tbody {...useHasFocusProps(useGridNavigationProps({}))}>
+                    <GridRowContext.Provider value={useGridNavigationRow}>
+                        {Array.from((function* () {
+                            for (let i = 0; i < 10; ++i) {
+                                yield <DemoUseGridRow index={i} key={i} />
+                            }
+                        })())}
+                    </GridRowContext.Provider>
+                </tbody>
+            </table>
+        </>
     );
 })
 
@@ -286,45 +296,57 @@ const _Prefix = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const DemoUseGridRow = memo((({ index }: { index: number }) => {
     const [_randomWord] = useState(() => RandomWords[index/*Math.floor(Math.random() * (RandomWords.length - 1))*/]);
     const useGridRow = useContext(GridRowContext);
-    const { useGridNavigationRowProps, useGridNavigationCell, rowIsTabbable, getCurrentColumn } = useGridRow({ 
+    const { useGridNavigationRowProps, useGridNavigationCell } = useGridRow({
         asChild: { managedChild: { index }, li: { subInfo: {}, text: "", hidden: false }, rti: {} },
         asParent: { linearNavigation: {}, listNavigation: {}, rovingTabIndex: {}, typeaheadNavigation: {}, managedChildren: {} }
-     });
+    });
 
     const props = useGridNavigationRowProps({});
     return (
-        <div {...props}>
-            <div>{`${rowIsTabbable}`} ({getCurrentColumn()})</div>
-
-            <div style="display: flex">
-                <GridCellContext.Provider value={useGridNavigationCell}>
-                    {Array.from((function* () {
-                        for (let i = 0; i < 3; ++i) {
-                            yield <DemoUseGridCell index={i} key={i} />
-                        }
-                    })())}
-                </GridCellContext.Provider>
-            </div>
-        </div>
+        <tr {...props}>
+            <GridCellContext.Provider value={useGridNavigationCell}>
+                {Array.from((function* () {
+                    for (let i = 0; i < 3; ++i) {
+                        yield <DemoUseGridCell index={i} key={i} row={index} />
+                    }
+                })())}
+            </GridCellContext.Provider>
+        </tr>
     )
 }));
 
-const DemoUseGridCell = (({ index }: { index: number }) => {
+const DemoUseGridCell = (({ index, row }: { index: number, row: number }) => {
+    if (row >= 6 && row %2 == 0 && index > 1)
+        return null;
+
     const useGridCell = useContext(GridCellContext);
-    const { useGridNavigationCellProps, cellIsTabbable } = useGridCell({
+    const { useGridNavigationCellProps, cellIsTabbable, rowIsTabbable } = useGridCell({
         li: { subInfo: {}, text: "", hidden: false },
         managedChild: { index },
         rti: {}
-     });
+    });
 
     const props = useGridNavigationCellProps({}) as any;
 
     const t = (cellIsTabbable ? "(Tabbable)" : "(Not tabbable)")
 
     if (index === 0)
-        return <div {...props}>Grid cell #{index + 1} {t}</div>
-    else
-        return <label><input  {...props} type="checkbox" /> Test input {t}</label>
+        return <td {...props}>{rowIsTabbable.toString()}</td>
+    else {
+        if (row < 6 || row % 2 != 0) {
+            if (index === 1)
+                return <td {...props}>Grid cell #{index + 1} {t}</td>
+            else
+                return <td><label><input  {...props} type="checkbox" /> Test input {t}</label></td>
+        }
+        else {
+                if (index === 1)
+                    return <td {...props} colSpan={2}>Grid cell #{index + 1}, span 2</td>
+                else
+                    return null;
+            
+        }
+    }
 })
 
 const Component = () => {
@@ -351,7 +373,7 @@ const Component = () => {
         <hr />
         <DemoUseDraggable />
         <hr />
-        {/*<DemoUseElementSizeAnimation />*/}
+        <DemoUseElementSizeAnimation />
         <hr />
         <input />
     </div>

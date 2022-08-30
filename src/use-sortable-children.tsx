@@ -106,7 +106,12 @@ export function useRearrangeableChildren<ParentElement extends Element, C, K ext
         useLayoutEffect(() => { setForceUpdate(_prev => forceUpdate); }, [forceUpdate])
 
         return (useMergedProps<ParentElement>({
-            children: (children as VNode<ManagedChildInfo<number, C, K>>[]).slice().map(child => ({ child, mangledIndex: indexMangler(getIndex(child.props!)!), demangledIndex: getIndex(child.props) })).sort((lhs, rhs) => { return lhs.mangledIndex - rhs.mangledIndex }).map(({ child, mangledIndex, demangledIndex }) => {
+            children: 
+            (children as VNode<ManagedChildInfo<number, C, K>>[])
+            .slice()
+            .map(child => ({ child, mangledIndex: indexMangler(getIndex(child.props!)!), demangledIndex: getIndex(child.props) }))
+            .sort((lhs, rhs) => { return lhs.mangledIndex - rhs.mangledIndex })
+            .map(({ child, mangledIndex, demangledIndex }) => {
                 return h(child.type as any, { ...child.props, key: demangledIndex, "data-mangled-index": mangledIndex, "data-unmangled-index": demangledIndex });
             })
         }, props));

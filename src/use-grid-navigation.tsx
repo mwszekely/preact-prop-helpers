@@ -1,9 +1,9 @@
 import { h } from "preact";
 import { useCallback, useEffect } from "preact/hooks";
-import { useHasFocus } from "./use-has-focus";
 import { ManagedChildren } from "./use-child-manager";
-import { UseListNavigationSubInfo, useListNavigation, UseListNavigationChildParameters, UseListNavigationParameters } from "./use-list-navigation";
-import { OnTabbableIndexChange, UseRovingTabIndexSubInfo } from "./use-roving-tabindex";
+import { useHasFocus } from "./use-has-focus";
+import { useListNavigation, UseListNavigationChildParameters, UseListNavigationParameters, UseListNavigationReturnType, UseListNavigationSubInfo } from "./use-list-navigation";
+import { UseRovingTabIndexSubInfo } from "./use-roving-tabindex";
 import { useStableCallback } from "./use-stable-callback";
 import { useState } from "./use-state";
 /*
@@ -68,6 +68,9 @@ export type UseGridNavigationRowParameters<K extends string, I extends UseGridNa
 
 export type UseGridNavigationCell<Cell extends HTMLElement | SVGElement, CC, KC extends string> = (p: UseGridNavigationCellParameters<CC, KC>) => {
     cellIsTabbable: boolean;
+    rowIsTabbable: boolean;
+    getCellIsTabbable(): boolean;
+    getRowIsTabbable(): boolean;
     getCurrentColumn(): number | null;
     useGridNavigationCellProps: (props: h.JSX.HTMLAttributes<Cell>) => h.JSX.HTMLAttributes<Cell>;
 }
@@ -79,6 +82,10 @@ export type UseGridNavigationRow<Row extends HTMLElement, Cell extends HTMLEleme
     getCurrentColumn(): number | null;
     useGridNavigationCell: UseGridNavigationCell<Cell, CC, KC>;
     useGridNavigationRowProps: (props: h.JSX.HTMLAttributes<Row>) => h.JSX.HTMLAttributes<Row>;
+    typeaheadNavigation: UseListNavigationReturnType<Row, Cell, CR, KR>["typeaheadNavigation"];
+    linearNavigation: UseListNavigationReturnType<Row, Cell, CR, KR>["linearNavigation"];
+    rovingTabIndex: UseListNavigationReturnType<Row, Cell, CR, KR>["rovingTabIndex"];
+    listNavigation: UseListNavigationReturnType<Row, Cell, CR, KR>["listNavigation"];
 }
 
 export function useGridNavigation<
@@ -97,8 +104,6 @@ export function useGridNavigation<
     typeaheadNavigation: tn
 }: UseGridNavigationParameters) {
     const [currentColumn, setCurrentColumn, getCurrentColumn] = useState<number | null>(rti.initialIndex ?? 0);
-    //initialRow ??= 0;
-    //initialColumn ??= 0;
 
     const {
         children: rows,
@@ -114,27 +119,28 @@ export function useGridNavigation<
 
     const useGridNavigationRow = useCallback<UseGridNavigationRow<RowElement, CellElement, CR, CC, KR, KC>>(({ asChild, asParent }) => {
         const focusSelf = useStableCallback(() => {
-            console.log(`row #${asChild.managedChild.index} focusSelf`);
+            const c2 = getCurrentColumn();
+            console.log(`row #${asChild.managedChild.index},${c2} focusSelf`);
             if (asChild.rti.focusSelf) {
                 asChild.rti.focusSelf();
             }
             else {
                 //const c1 = getCurrentColumn2();
-                const c2 = getCurrentColumn();
                 //console.assert(c1 == c2);
-                setTabbableIndex(c2 ?? 0, false);
-                columns.getAt(c2 ?? 0)?.subInfo.focusSelf();
+                li2.navigateToIndex(c2 ?? 0, true);
+                //setTabbableIndex(c2 ?? 0, false);
+                //columns.getAt(c2 ?? 0)?.subInfo.focusSelf();
             }
         });
 
-        const { tabbable: rowIsTabbable, useListNavigationChildProps } = useGridNavigationRow2({
+        const { tabbable: rowIsTabbable, getTabbable: getRowIsTabbable, useListNavigationChildProps } = useGridNavigationRow2({
             managedChild: asChild.managedChild,
             li: asChild.li,
             rti: { ...asChild.rti, focusSelf }
         });
         useEffect(() => {
             if (!rowIsTabbable) {
-                setTabbableIndex(null, false);
+                li2.navigateToIndex(null, false);
             }
         }, [rowIsTabbable]);
 
@@ -150,10 +156,10 @@ export function useGridNavigation<
             children: columns,
             useListNavigationChild: useGridNavigationColumn2,
             useListNavigationProps: useGridNavigationColumnProps,
-            rovingTabIndex: {
-                getTabbableIndex: getCurrentColumn2,
-                setTabbableIndex,
-            }
+            rovingTabIndex: rti2,
+            listNavigation: li2,
+            linearNavigation: ln2,
+            typeaheadNavigation: tn2
         } = useListNavigation<CellElement, CellElement, CC, KC>({
             managedChildren: { ...asParent.managedChildren },
             rovingTabIndex: { ...asParent.rovingTabIndex },
@@ -169,7 +175,7 @@ export function useGridNavigation<
             const focusSelf = useStableCallback(() => {
                 console.log(`cell #${managedChild.index} focusSelf`);
                 setCurrentColumn(managedChild.index);
-                setTabbableIndex(managedChild.index, false);
+                rti2.setTabbableIndex(managedChild.index, false);
                 if (fs)
                     fs();
                 else
@@ -181,16 +187,31 @@ export function useGridNavigation<
                 else
                     getElement()?.blur();
             });
-            const { tabbable: cellIsTabbable, useListNavigationChildProps, getElement } = useGridNavigationColumn2({
+            const { 
+                tabbable, 
+                useListNavigationChildProps, 
+                getElement,
+                getTabbable
+             } = useGridNavigationColumn2({
                 managedChild: managedChild,
                 li: li,
                 rti: { blurSelf, focusSelf, ...rti }
             });
 
-            const { useHasFocusProps } = useHasFocus<CellElement>({ onLastFocusedInnerChanged: useStableCallback(() => { setCurrentColumn(managedChild.index); setTabbableIndex(managedChild.index, false); }) })
+            const { useHasFocusProps } = useHasFocus<CellElement>({
+                onLastFocusedInnerChanged: useStableCallback((focused: boolean) => {
+                    if (focused) {
+                        setCurrentColumn(managedChild.index);
+                        rti2.setTabbableIndex(managedChild.index, false);
+                    }
+                })
+            })
 
             return {
-                cellIsTabbable,
+                cellIsTabbable: tabbable,
+                getCellIsTabbable: getTabbable,
+                rowIsTabbable: getRowIsTabbable(),
+                getRowIsTabbable: getRowIsTabbable,
                 getCurrentColumn,
                 useGridNavigationCellProps: function <P extends h.JSX.HTMLAttributes<CellElement>>(props: P) { return useListNavigationChildProps(useGridNavigationColumnProps(useHasFocusProps(props))); }
             }
@@ -200,6 +221,10 @@ export function useGridNavigation<
         return {
             cells: columns,
             rowIsTabbable,
+            rovingTabIndex: rti2,
+            listNavigation: li2,
+            typeaheadNavigation: tn2,
+            linearNavigation: ln2,
             getCurrentColumn,
             useGridNavigationCell,
             useGridNavigationRowProps: function <P extends h.JSX.HTMLAttributes<RowElement>>(props: P) {

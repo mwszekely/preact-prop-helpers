@@ -1,11 +1,13 @@
 import { h, VNode } from "preact";
-import { StateUpdater, useCallback, useLayoutEffect, useRef } from "preact/hooks";
-import { useSortableChildren, UseSortableChildrenReturnType } from "./use-sortable-children";
+import { useCallback, useLayoutEffect, useRef } from "preact/hooks";
+import { useEffect } from "./use-effect";
+import { useStableGetter } from "./use-stable-getter";
 import { ChildFlagOperations, ManagedChildInfo, ManagedChildren, OnChildrenMountChange, useChildrenFlag } from "./use-child-manager";
 import { useLinearNavigation, UseLinearNavigationParameters, UseLinearNavigationReturnType, useTypeaheadNavigation, UseTypeaheadNavigationParameters, UseTypeaheadNavigationReturnType } from "./use-keyboard-navigation";
 import { useMergedProps } from "./use-merged-props";
 import { useEnsureStability } from "./use-passive-state";
-import { UseRovingTabIndexSubInfo, useRovingTabIndex, UseRovingTabIndexParameters, UseRovingTabIndexReturnType } from "./use-roving-tabindex";
+import { useRovingTabIndex, UseRovingTabIndexParameters, UseRovingTabIndexReturnType, UseRovingTabIndexSubInfo } from "./use-roving-tabindex";
+import { useSortableChildren, UseSortableChildrenReturnType } from "./use-sortable-children";
 import { useStableCallback } from "./use-stable-callback";
 import { useState } from "./use-state";
 
@@ -139,6 +141,7 @@ export type UseListNavigationChild<ChildElement extends Element, C, K extends st
 export interface UseListNavigationChildReturnType<ChildElement extends Element> {
     useListNavigationChildProps: (p: h.JSX.HTMLAttributes<ChildElement>) => h.JSX.HTMLAttributes<ChildElement>;
     tabbable: boolean;
+    getTabbable(): boolean;
     getElement: () => ChildElement | null;
 }
 
@@ -163,7 +166,8 @@ export function useListNavigation<ParentOrChildElement extends HTMLElement | SVG
 
 
     const {
-        rovingTabIndex: { getTabbableIndex,
+        rovingTabIndex: {
+            getTabbableIndex,
             setTabbableIndex,
             focusSelf
         },
@@ -220,8 +224,25 @@ export function useListNavigation<ParentOrChildElement extends HTMLElement | SVG
     const useListNavigationChild = useCallback<UseListNavigationChild<ChildElement, C, K>>(({ managedChild: { index, flags }, rti: { blurSelf, focusSelf }, li: { text, hidden, subInfo } }) => {
 
         const _v: void = useTypeaheadNavigationChild({ text, index });
+        const getIndex = useStableGetter(index);
+        useEffect(() => {
 
-        const { useRovingTabIndexChildProps, tabbable, getElement } = useRovingTabIndexChild({ managedChild: { index, flags }, rovingTabIndex: { blurSelf, focusSelf, subInfo: { text, hidden, subInfo } } });
+            return () => {
+                if (getTabbableIndex() == getIndex()) {
+                    navigateToIndex(index, false);
+                }
+            };
+        }, []);
+
+        const {
+            useRovingTabIndexChildProps,
+            tabbable,
+            getTabbable,
+            getElement
+        } = useRovingTabIndexChild({
+            managedChild: { index, flags },
+            rovingTabIndex: { blurSelf, focusSelf, subInfo: { text, hidden, subInfo } }
+        });
 
         const useListNavigationChildProps: (p: h.JSX.HTMLAttributes<ChildElement>) => h.JSX.HTMLAttributes<ChildElement> = function ({ ...props }) {
             return useMergedProps<ChildElement>(useRovingTabIndexChildProps((({ inert: hidden } as h.JSX.HTMLAttributes<ChildElement>))), props);
@@ -230,6 +251,7 @@ export function useListNavigation<ParentOrChildElement extends HTMLElement | SVG
         return {
             useListNavigationChildProps,
             tabbable,
+            getTabbable,
             getElement
         }
     }, [useTypeaheadNavigationChild, useRovingTabIndexChild, navigateToIndex]);

@@ -1,5 +1,4 @@
 import { useCallback, useLayoutEffect, useRef } from "preact/hooks";
-import { useState } from "./use-state";
 
 
 export type PassiveStateUpdater<S> = (value: S | ((prevState: S | undefined) => S)) => void;
