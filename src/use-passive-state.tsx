@@ -1,4 +1,5 @@
 import { useCallback, useLayoutEffect, useRef } from "preact/hooks";
+import { useState } from "./use-state";
 
 
 export type PassiveStateUpdater<S> = (value: S | ((prevState: S | undefined) => S)) => void;
@@ -107,14 +108,15 @@ export function usePassiveState<T>(onChange: undefined | null | OnPassiveStateCh
     }, []);
 
     // The actual code the user calls to (possibly) run a new effect.
-    const r = useRef({ microtaskQueued: false, arg: undefined as undefined | Parameters<PassiveStateUpdater<T>>[0], prevDep: undefined as T | undefined });
+    const r = useRef({ microtaskQueued: false, arg: undefined as undefined | Parameters<PassiveStateUpdater<T>>[0], prevDep: undefined as T | undefined, handle: null as number | null });
     const setValue = useCallback<PassiveStateUpdater<T>>((arg) => {
         r.current.prevDep = valueRef.current === Unset ? undefined : getValue();
         r.current.arg = arg;
         if (!r.current.microtaskQueued) {
             r.current.microtaskQueued = true;
-            setTimeout(() => {
+            r.current.handle = setTimeout(() => {
                 r.current.microtaskQueued = false;
+                r.current.handle = null;
                 const prevDep = r.current.prevDep;
                 const arg = r.current.arg!;
                 const dep = arg instanceof Function ? arg(prevDep!) : arg;

@@ -295,8 +295,6 @@ export interface UseChildrenFlagParameters<C, K extends string> {
      * This can be anything you want, but must not change.
      */
     key: K;
-
-    fitNullToZero?: boolean;
 }
 
 
@@ -349,14 +347,14 @@ export interface UseChildrenFlagReturnType {
  * @param param0 
  * @returns 
  */
-export function useChildrenFlag<C, K extends string>({ children, initialIndex, closestFit, onIndexChange, key, fitNullToZero }: UseChildrenFlagParameters<C, K>): UseChildrenFlagReturnType {
+export function useChildrenFlag<C, K extends string>({ children, initialIndex, closestFit, onIndexChange, key}: UseChildrenFlagParameters<C, K>): UseChildrenFlagReturnType {
     useEnsureStability("useChildrenFlag", closestFit, onIndexChange, key);
 
-    const [getCurrentIndex, setCurrentIndex] = usePassiveState<null | number>(onIndexChange, useCallback(() => (initialIndex ?? (fitNullToZero ? 0 : null)), []));
+    const [getCurrentIndex, setCurrentIndex] = usePassiveState<null | number>(onIndexChange, useCallback(() => (initialIndex ?? (null)), []));
 
-    const [getRequestedIndex, setRequestedIndex] = usePassiveState<null | number>(null, useCallback(() => (initialIndex ?? (fitNullToZero ? 0 : null)), []));
+    const [getRequestedIndex, setRequestedIndex] = usePassiveState<null | number>(null, useCallback(() => (initialIndex ?? (null)), []));
 
-    const getFitNullToZero = useStableGetter(fitNullToZero);
+//    const getFitNullToZero = useStableGetter(fitNullToZero);
 
     // Shared between onChildrenMountChange and changeIndex, not public (but could be I guess)
     const getClosestFit = useCallback((requestedIndex: number) => {
@@ -416,10 +414,9 @@ export function useChildrenFlag<C, K extends string>({ children, initialIndex, c
 
 
     const changeIndex = useCallback((arg: Parameters<StateUpdater<number | null>>[0]) => {
-        console.log(`${key}: changeIndex(${arg})`);
         let requestedIndex = arg instanceof Function ? arg(getRequestedIndex()) : arg;
-        if (requestedIndex == null && getFitNullToZero())
-            requestedIndex = 0;
+        //if (requestedIndex == null && getFitNullToZero())
+        //    requestedIndex = 0;
 
         setRequestedIndex(requestedIndex);
         const currentIndex = getCurrentIndex();
@@ -430,14 +427,12 @@ export function useChildrenFlag<C, K extends string>({ children, initialIndex, c
         const oldMatchingChild = (currentIndex == null ? null : children.getAt(currentIndex));
         if (requestedIndex == null) {
             // Easy case
-            console.log(`${key}: Setting #${currentIndex} to false (null)`);
             setCurrentIndex(null);
             oldMatchingChild?.flags?.[key]!.set(false);
             return null;
         }
         else {
             if (newMatchingChild && newMatchingChild.flags?.[key]!.isValid()) {
-                console.log(`${key}: Setting #${currentIndex} to false and #${requestedIndex} to true`);
                 setCurrentIndex(requestedIndex);
                 oldMatchingChild?.flags?.[key]!.set(false);
                 newMatchingChild.flags?.[key]!.set(true);
@@ -449,7 +444,6 @@ export function useChildrenFlag<C, K extends string>({ children, initialIndex, c
                 if (closestFitIndex != null) {
                     newMatchingChild = children.getAt(closestFitIndex)!;
                     console.assert(newMatchingChild != null, "Internal logic???");
-                    console.log(`${key}: Setting #${currentIndex} to false and #${closestFitIndex} to true (closest fit)`);
                     oldMatchingChild?.flags?.[key]!.set(false);
                     newMatchingChild.flags?.[key]!.set(true);
                     return closestFitIndex;

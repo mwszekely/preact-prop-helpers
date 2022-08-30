@@ -14,13 +14,19 @@ export type Compare<V> = (lhs: V, rhs: V) => number;
 /**
  * All of these functions **MUST** be stable across renders.
  */
-export interface UseSortableChildrenParameters<C, K extends string, G extends any[], V> {
+export interface UseRearrangeableChildrenParameters<C, K extends string> {
 
     /**
      * Must return, e.g., the row index of this child
      * (Usually just an `index` prop)
      */
     getIndex: GetIndex<C, K>;
+}
+
+/**
+ * All of these functions **MUST** be stable across renders.
+ */
+export interface UseSortableChildrenParameters<C, K extends string, G extends any[], V> extends UseRearrangeableChildrenParameters<C, K> {
 
     /**
      * Must return the value this child uses RE: sorting.
@@ -40,8 +46,16 @@ export interface UseSortableChildrenParameters<C, K extends string, G extends an
     compare: Compare<V>;
 }
 
+
+
 /**
  * Hook that allows for the **direct descendant** children of this component to be re-ordered and sorted.
+ * 
+ * *This is **separate** from "managed" children, which can be any level of child needed! Sortable/rearrangeable children must be **direct descendants** of the parent that uses this hook!*
+ * 
+ * It's recommended to use this in conjunction with `useListNavigation`; it takes the same `indexMangler` and `indexDemangler` 
+ * functions that this hook returns. `useListNavigation` does not directly use this hook because, as mentioned, 
+ * this hook imposes serious restrictions on child structure, while `useListNavigation` allows anything.
  * 
  * Besides the prop-modifying hook that's returned, the `sort` function that's returned will
  * sort all children according to their value from the `getValue` argument you pass in.
@@ -55,9 +69,7 @@ export interface UseSortableChildrenParameters<C, K extends string, G extends an
  * Because keys are given special treatment and a child has no way of modifying its own key
  * there's no other time or place this can happen other than exactly within the parent component's render function.
  */
-export function useSortableChildren<C, K extends string, G extends any[], V, S extends Element>({ getIndex, getValue, compare: userCompare }: UseSortableChildrenParameters<C, K, G, V>): UsesortableChildrenReturnType<C, K, G, S> {
-
-    const compare = (userCompare ?? defaultCompare)
+export function useRearrangeableChildren<ParentElement extends Element, C, K extends string>({ getIndex }: UseRearrangeableChildrenParameters<C, K>): UseRearrangeableChildrenReturnType<ParentElement, C, K> {
 
     // These are used to keep track of a mapping between unsorted index <---> sorted index.
     // These are needed for navigation with the arrow keys.
@@ -70,6 +82,7 @@ export function useSortableChildren<C, K extends string, G extends any[], V, S e
     // Because that might not be the consumer of *this* hook directly (e.g. a table uses
     // this hook, but it's tbody that actually needs updating), we need to remotely
     // get and set a forceUpdate function.
+    //const [getForceUpdate, setForceUpdate] = usePassiveState<null | (() => void)>(null, returnNull);
     const [getForceUpdate, setForceUpdate] = usePassiveState<null | (() => void)>(null, returnNull);
 
     const rearrange = useCallback((sortedRows: ManagedChildInfo<number, C, K>[]) => {
@@ -81,12 +94,54 @@ export function useSortableChildren<C, K extends string, G extends any[], V, S e
 
             mangleMap.current.set(indexAsUnsorted, indexAsSorted);
             demangleMap.current.set(indexAsSorted, indexAsUnsorted);
-            console.log(`info.index is ${indexAsUnsorted} and is being remapped to ${indexAsSorted}`);
         }
 
 
         getForceUpdate()?.();
     }, []);
+
+    const useRearrangeableProps = useCallback(({ children, ...props }: Omit<h.JSX.HTMLAttributes<ParentElement>, "children"> & { children?: VNode<any>[] }) => {
+
+        const forceUpdate = useForceUpdate();
+        useLayoutEffect(() => { setForceUpdate(_prev => forceUpdate); }, [forceUpdate])
+
+        return (useMergedProps<ParentElement>({
+            children: (children as VNode<ManagedChildInfo<number, C, K>>[]).slice().map(child => ({ child, mangledIndex: indexMangler(getIndex(child.props!)!), demangledIndex: getIndex(child.props) })).sort((lhs, rhs) => { return lhs.mangledIndex - rhs.mangledIndex }).map(({ child, mangledIndex, demangledIndex }) => {
+                return h(child.type as any, { ...child.props, key: demangledIndex, "data-mangled-index": mangledIndex, "data-unmangled-index": demangledIndex });
+            })
+        }, props));
+    }, []);
+
+    return { useRearrangeableProps, indexMangler, indexDemangler, mangleMap, demangleMap, rearrange };
+}
+
+
+/**
+ * Hook that allows for the **direct descendant** children of this component to be re-ordered and sorted.
+ * 
+ * *This is **separate** from "managed" children, which can be any level of child needed! Sortable/rearrangeable children must be **direct descendants** of the parent that uses this hook!* 
+ * 
+ * It's recommended to use this in conjunction with `useListNavigation`; it takes the same `indexMangler` and `indexDemangler` 
+ * functions that this hook returns. `useListNavigation` does not directly use this hook because, as mentioned, 
+ * this hook imposes serious restrictions on child structure, while `useListNavigation` allows anything.
+ * 
+ * Besides the prop-modifying hook that's returned, the `sort` function that's returned will
+ * sort all children according to their value from the `getValue` argument you pass in.
+ * 
+ * If you want to perform some re-ordering operation that's *not* a sort, you can manually
+ * re-map each child's position using `mangleMap` and `demangleMap`, which convert between
+ * sorted and unsorted index positions.
+ * 
+ * Again, unlike some other hooks, **these children must be direct descendants**. This is because
+ * the prop-modifying hook inspects the given children, then re-creates them with new `key`s.
+ * Because keys are given special treatment and a child has no way of modifying its own key
+ * there's no other time or place this can happen other than exactly within the parent component's render function.
+ */
+export function useSortableChildren<ParentElement extends Element, C, K extends string, G extends any[], V>({ getIndex, getValue, compare: userCompare }: UseSortableChildrenParameters<C, K, G, V>): UseSortableChildrenReturnType<ParentElement, C, K, G> {
+
+    const compare = (userCompare ?? defaultCompare);
+
+    const { rearrange, useRearrangeableProps: useSortableProps, ...rest } = useRearrangeableChildren<ParentElement, C, K>({ getIndex });
 
     // The actual sort function.
     const sort = useCallback((managedRows: ManagedChildren<number, C, K>, direction: "ascending" | "descending", ...args: G): Promise<void> | void => {
@@ -111,45 +166,20 @@ export function useSortableChildren<C, K extends string, G extends any[], V, S e
         return rearrange(shuffledRows);
     }, [/* Must remain stable */]);
 
-    const useSortableProps = useCallback(({ children, ...props }: Omit<h.JSX.HTMLAttributes<S>, "children"> & { children?: VNode<any>[] }) => {
-
-        const forceUpdate = useForceUpdate();
-        useLayoutEffect(() => { setForceUpdate(_prev => forceUpdate); }, [forceUpdate])
-
-        return (useMergedProps<S>({
-            children: (children as VNode<ManagedChildInfo<number, C, K>>[]).slice().map(child => ({ child, mangledIndex: indexMangler(getIndex(child.props!)!), demangledIndex: getIndex(child.props) })).sort((lhs, rhs) => { return lhs.mangledIndex - rhs.mangledIndex }).map(({ child, mangledIndex, demangledIndex }) => {
-                return h(child.type as any, { ...child.props, key: demangledIndex, "data-mangled-index": mangledIndex, "data-unmangled-index": demangledIndex });
-            })
-            /*.sort((lhs, rhs) => {
-
-                return (
-                    (demangleMap.current.get(getIndex(lhs.props)!) ?? getIndex(lhs.props) ?? 0) -
-                    (demangleMap.current.get(getIndex(rhs.props)!) ?? getIndex(rhs.props) ?? 0)
-                )
-            }).map(child => h(child.type as any, { ...child.props, key: getIndex(child.props) }))*/
-        }, props));
-    }, []);
-
-    return { useSortableProps, sort, indexMangler, indexDemangler, mangleMap, demangleMap, rearrange, shuffle };
+    return { useSortableProps, sort, rearrange, shuffle, ...rest };
 }
 
-export interface UsesortableChildrenReturnType<C, K extends string, G extends any[], S extends Element> {
+export interface UseRearrangeableChildrenReturnType<ParentElement extends Element, C, K extends string> {
     /** **STABLE** */
-    useSortableProps: (props: Omit<h.JSX.HTMLAttributes<S>, "children"> & { children?: VNode<any>[] | undefined; }) => h.JSX.HTMLAttributes<S>;
-    /** **STABLE** */
-    sort: (managedRows: ManagedChildren<number, C, K>, direction: "ascending" | "descending", ...args: G) => Promise<void> | void;
-    /** **STABLE** */
-    shuffle: (managedRows: ManagedChildren<number, C, K>) => Promise<void> | void;
+    useRearrangeableProps: (props: Omit<h.JSX.HTMLAttributes<ParentElement>, "children"> & { children?: VNode<any>[] | undefined; }) => h.JSX.HTMLAttributes<ParentElement>;
     /**
-     * If you don't want to sort the children, but do something more specific,
-     * you can pass an array of not-sorted child information to this function
+     * Pass an array of not-sorted child information to this function
      * and the children will re-arrange themselves to match.
-     *  
-     * (`sort` uses this internally)
      *  
      * **STABLE**
      *  
-     * */
+     * 
+     */
     rearrange: (rowsInOrder: ManagedChildInfo<number, C, K>[]) => void;
     /** **STABLE** */
     indexMangler: (n: number) => number;
@@ -159,6 +189,15 @@ export interface UsesortableChildrenReturnType<C, K extends string, G extends an
     mangleMap: MutableRef<Map<number, number>>;
     /** **STABLE** */
     demangleMap: MutableRef<Map<number, number>>;
+}
+
+export interface UseSortableChildrenReturnType<ParentElement extends Element, C, K extends string, G extends any[]> extends Omit<UseRearrangeableChildrenReturnType<ParentElement, C, K>, "useRearrangeableProps"> {
+    /** **STABLE** */
+    useSortableProps: (props: Omit<h.JSX.HTMLAttributes<ParentElement>, "children"> & { children?: VNode<any>[] | undefined; }) => h.JSX.HTMLAttributes<ParentElement>;
+    /** **STABLE** */
+    sort: (managedRows: ManagedChildren<number, C, K>, direction: "ascending" | "descending", ...args: G) => Promise<void> | void;
+    /** **STABLE** */
+    shuffle: (managedRows: ManagedChildren<number, C, K>) => Promise<void> | void;
 }
 
 

@@ -44,9 +44,9 @@ export interface UseRovingTabIndexParameters extends UseManagedChildrenParameter
 
 export interface UseRovingTabIndexReturnType<ChildElement extends HTMLElement | SVGElement, C, K extends string> {
     /** **STABLE** */
-    useRovingTabIndexChild: UseRovingTabIndexChild<ChildElement, C, K>;
+    useRovingTabIndexChild: UseRovingTabIndexChild<ChildElement, C, K | "tabbable">;
     /** **STABLE** */
-    children: ManagedChildren<number, UseRovingTabIndexSubInfo<ChildElement, C>, K>;
+    children: ManagedChildren<number, UseRovingTabIndexSubInfo<ChildElement, C>, K | "tabbable">;
 
     rovingTabIndex: {
         /** **STABLE** */
@@ -162,7 +162,7 @@ export function useRovingTabIndex<ChildElement extends HTMLElement | SVGElement,
         },
     });
 
-    const { changeIndex, onChildrenMountChange } = useChildrenFlag<UseRovingTabIndexSubInfo<ChildElement, C>, K | "tabbable">({ initialIndex, children, closestFit: true, key: "tabbable", fitNullToZero: true });
+    const { changeIndex, onChildrenMountChange } = useChildrenFlag<UseRovingTabIndexSubInfo<ChildElement, C>, K | "tabbable">({ initialIndex, children, closestFit: true, key: "tabbable" });
 
     const useRovingTabIndexChild = useCallback<UseRovingTabIndexChild<ChildElement, C, K>>(({ managedChild: { flags, index }, rovingTabIndex: { blurSelf: blurSelfOverride, focusSelf: focusSelfOverride, subInfo } }: UseRovingTabIndexChildParameters<C, K>) => {
 

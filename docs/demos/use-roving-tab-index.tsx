@@ -1,42 +1,44 @@
-import { createContext } from "preact";
-import { memo, StateUpdater, useContext } from "preact/compat";
-import { useHasFocus, useSortableChildren } from "../..";
-import { UseListNavigationSingleSelectionChild, useListNavigationSingleSelection } from "../../use-list-navigation";
+import { createContext, h, VNode } from "preact";
+import { memo, StateUpdater, useCallback, useContext } from "preact/compat";
+import { useHasFocus, UseLinearNavigationParameters, useSortableChildren } from "../..";
+import { UseListNavigationSingleSelectionChild, useListNavigationSingleSelection, UseListNavigationChildReturnType, UseListNavigationSingleSelectionParameters, UseListNavigationParameters, UseListNavigationReturnType, UseListNavigationChildParameters, useListNavigation, UseListNavigationSingleSelectionChildReturnType, useSortableListNavigationSingleSelection, UseSortableListNavigationSingleSelectionChild } from "../../use-list-navigation";
+import { UseSortableChildrenReturnType } from "../../use-sortable-children";
 import { useState } from "../../use-state";
 
 
 const RandomWords = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
 
-const RovingChildContext = createContext<UseListNavigationSingleSelectionChild<HTMLOListElement, HTMLLIElement, {}, string>>(null!)
+
+
+const RovingChildContext = createContext<UseSortableListNavigationSingleSelectionChild<HTMLOListElement, HTMLLIElement, {}, string>>(null!)
 export const DemoUseRovingTabIndex = memo(() => {
 
     const [_lastFocusedInner, setLastFocusedInner, _getLastFocusedInner] = useState(false)
     const { useHasFocusProps } = useHasFocus<HTMLUListElement>({ onLastFocusedInnerChanged: setLastFocusedInner });
     //const forceUpdate = useForceUpdate();
     const [selectedIndex, setSelectedIndex] = useState(0);
-    
-    const {
+
+    /*const {
         indexDemangler,
         indexMangler,
-        //sort,
         useSortableProps,
-        //rearrange,
         shuffle
-    } = useSortableChildren<{}, string, [], number, HTMLUListElement>({
-        getIndex: (row) => row.index,
-        getValue: (row) => row.index,
-        compare: (lhs, rhs) => { return lhs - rhs; }
-    });
+    } = useSortableChildren<HTMLUListElement, {}, string, [], number>({
+        getIndex: useCallback((row) => row.index, []),
+        getValue: useCallback((row) => row.index, []),
+        compare: useCallback((lhs, rhs) => { return lhs - rhs; }, [])
+    });*/
 
     const {
         children,
-        useListNavigationSingleSelectionChild,
-        useListNavigationSingleSelectionProps,
+        useSortableListNavigationSingleSelectionChild,
+        useSortableListNavigationSingleSelectionProps,
         rovingTabIndex: { setTabbableIndex, getTabbableIndex },
-        typeaheadNavigation: { currentTypeahead }
-    } = useListNavigationSingleSelection<HTMLUListElement, HTMLLIElement, {}, string>({
+        typeaheadNavigation: { currentTypeahead },
+        sortable: { shuffle }
+    } = useSortableListNavigationSingleSelection<HTMLUListElement, HTMLLIElement, {}, string>({
         linearNavigation: {},
-        listNavigation: { indexDemangler, indexMangler },
+        listNavigation: {  },
         managedChildren: {},
         rovingTabIndex: {},
         typeaheadNavigation: {},
@@ -80,12 +82,14 @@ export const DemoUseRovingTabIndex = memo(() => {
             <button onClick={() => shuffle(children)}>Shuffle</button>
             <label>Tabbable index: <input type="number" value={getTabbableIndex() ?? undefined} onInput={e => { e.preventDefault(); setTabbableIndex(e.currentTarget.valueAsNumber, false); }} /></label>
 
-            <RovingChildContext.Provider value={useListNavigationSingleSelectionChild}>
-                <ul {...useHasFocusProps(useListNavigationSingleSelectionProps(useSortableProps({ children: Array.from((function* () {
+            <RovingChildContext.Provider value={useSortableListNavigationSingleSelectionChild}>
+                <ul {...useHasFocusProps(useSortableListNavigationSingleSelectionProps({
+                    children: Array.from((function* () {
                         for (let i = 0; i < 10; ++i) {
                             yield <DemoUseRovingTabIndexChild index={i} key={i} setSelectedIndex={setSelectedIndex} />
                         }
-                    })()) })))}></ul>
+                    })())
+                }))}></ul>
             </RovingChildContext.Provider>
             {currentTypeahead && <div>Typeahead: {currentTypeahead}</div>}
         </div>
