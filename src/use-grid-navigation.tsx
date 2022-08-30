@@ -99,7 +99,7 @@ export function useGridNavigation<
 >({
     managedChildren: mc,
     rovingTabIndex: rti,
-    listNavigation: li,
+    listNavigation: ls,
     linearNavigation: ln,
     typeaheadNavigation: tn
 }: UseGridNavigationParameters) {
@@ -112,7 +112,7 @@ export function useGridNavigation<
     } = useListNavigation<ParentOrRowElement, RowElement, CR, KR>({
         managedChildren: mc,
         rovingTabIndex: rti,
-        listNavigation: li,
+        listNavigation: ls,
         linearNavigation: { navigationDirection: "block", ...ln },
         typeaheadNavigation: tn,
     });
@@ -135,7 +135,7 @@ export function useGridNavigation<
 
         const { tabbable: rowIsTabbable, getTabbable: getRowIsTabbable, useListNavigationChildProps } = useGridNavigationRow2({
             managedChild: asChild.managedChild,
-            li: asChild.li,
+            ls: asChild.ls,
             rti: { ...asChild.rti, focusSelf }
         });
         useEffect(() => {
@@ -171,7 +171,7 @@ export function useGridNavigation<
             listNavigation: { ...asParent.listNavigation }
         });
 
-        const useGridNavigationCell = useCallback<UseGridNavigationCell<CellElement, CC, KC>>(({ managedChild, li, rti: { blurSelf: bs, focusSelf: fs, ...rti } }) => {
+        const useGridNavigationCell = useCallback<UseGridNavigationCell<CellElement, CC, KC>>(({ managedChild, ls, rti: { blurSelf: bs, focusSelf: fs, ...rti } }) => {
             const focusSelf = useStableCallback(() => {
                 console.log(`cell #${managedChild.index} focusSelf`);
                 setCurrentColumn(managedChild.index);
@@ -187,14 +187,14 @@ export function useGridNavigation<
                 else
                     getElement()?.blur();
             });
-            const { 
-                tabbable, 
-                useListNavigationChildProps, 
+            const {
+                tabbable,
+                useListNavigationChildProps,
                 getElement,
                 getTabbable
-             } = useGridNavigationColumn2({
+            } = useGridNavigationColumn2({
                 managedChild: managedChild,
-                li: li,
+                ls: { ...ls },
                 rti: { blurSelf, focusSelf, ...rti }
             });
 

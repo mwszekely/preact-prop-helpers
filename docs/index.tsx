@@ -297,7 +297,7 @@ const DemoUseGridRow = memo((({ index }: { index: number }) => {
     const [_randomWord] = useState(() => RandomWords[index/*Math.floor(Math.random() * (RandomWords.length - 1))*/]);
     const useGridRow = useContext(GridRowContext);
     const { useGridNavigationRowProps, useGridNavigationCell } = useGridRow({
-        asChild: { managedChild: { index }, li: { subInfo: {}, text: "", hidden: false }, rti: {} },
+        asChild: { managedChild: { index }, ls: { subInfo: {}, text: "", hidden: false }, rti: {} },
         asParent: { linearNavigation: {}, listNavigation: {}, rovingTabIndex: {}, typeaheadNavigation: {}, managedChildren: {} }
     });
 
@@ -321,7 +321,7 @@ const DemoUseGridCell = (({ index, row }: { index: number, row: number }) => {
 
     const useGridCell = useContext(GridCellContext);
     const { useGridNavigationCellProps, cellIsTabbable, rowIsTabbable } = useGridCell({
-        li: { subInfo: {}, text: "", hidden: false },
+        ls: { subInfo: {}, text: "", hidden: false },
         managedChild: { index },
         rti: {}
     });

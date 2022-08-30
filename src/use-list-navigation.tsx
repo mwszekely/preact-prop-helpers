@@ -127,9 +127,9 @@ export interface UseListNavigationSubInfo<C> {
 //export type UseListNavigationChildInfoNeeded<K extends string, I extends RovingTabIndexChildInfo<K>> = RovingTabIndexChildInfoNeeded<K, I>;
 
 export interface UseListNavigationChildParameters<C, K extends string> {
+    ls: UseListNavigationSubInfo<C>;
     managedChild: Omit<ManagedChildInfo<number, C, K | "selected" | "tabbable">, "subInfo">;
     rti: Partial<Omit<UseRovingTabIndexSubInfo<any, C>, "getElement" | "subInfo">>;
-    li: UseListNavigationSubInfo<C>;
 }
 
 export interface UseListNavigationSingleSelectionChildParameters<C, K extends string> extends UseListNavigationChildParameters<C, K> {
@@ -221,7 +221,7 @@ export function useListNavigation<ParentOrChildElement extends HTMLElement | SVG
     }, [useLinearNavigationProps, useTypeaheadNavigationProps]);
 
 
-    const useListNavigationChild = useCallback<UseListNavigationChild<ChildElement, C, K>>(({ managedChild: { index, flags }, rti: { blurSelf, focusSelf }, li: { text, hidden, subInfo } }) => {
+    const useListNavigationChild = useCallback<UseListNavigationChild<ChildElement, C, K>>(({ managedChild: { index, flags }, rti: { blurSelf, focusSelf }, ls: { text, hidden, subInfo } }) => {
 
         const _v: void = useTypeaheadNavigationChild({ text, index });
         const getIndex = useStableGetter(index);
@@ -345,9 +345,9 @@ export function useListNavigationSingleSelection<ParentOrChildElement extends HT
 
     return {
         children,
-        useListNavigationSingleSelectionChild: useCallback<UseListNavigationSingleSelectionChild<ParentOrChildElement, ChildElement, C, K | "selected">>(({ managedChild: { index, flags }, rti, li }) => {
+        useListNavigationSingleSelectionChild: useCallback<UseListNavigationSingleSelectionChild<ParentOrChildElement, ChildElement, C, K | "selected">>(({ managedChild: { index, flags }, rti, ls }) => {
             const [isSelected, setIsSelected, getIsSelected] = useState(getSelectedIndex() == index);
-            const selectedRef = useRef<ChildFlagOperations>({ get: getIsSelected, set: setIsSelected, isValid: useStableCallback(() => !li.hidden) });
+            const selectedRef = useRef<ChildFlagOperations>({ get: getIsSelected, set: setIsSelected, isValid: useStableCallback(() => !ls.hidden) });
 
             const ret = useListNavigationChild({
                 managedChild: {
@@ -358,7 +358,7 @@ export function useListNavigationSingleSelection<ParentOrChildElement extends HT
                     } as Partial<Record<K | "selected" | "tabbable", ChildFlagOperations>>
                 },
                 rti,
-                li
+                ls
             });
             return { ...ret, selected: isSelected, getSelected: getIsSelected }
         }, []),
