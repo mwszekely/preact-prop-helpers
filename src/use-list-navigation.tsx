@@ -94,8 +94,8 @@ export interface UseListNavigationParameters extends UseRovingTabIndexParameters
         indexDemangler?(transformedIndex: number): number;
     }
 
-    typeaheadNavigation: Omit<UseTypeaheadNavigationParameters, "getIndex" | "setIndex">;
-    linearNavigation: Omit<UseLinearNavigationParameters, "navigateToFirst" | "navigateToLast" | "navigateToNext" | "navigateToPrev">;
+    typeaheadNavigation: Omit<UseTypeaheadNavigationParameters["typeaheadNavigation"], "getIndex" | "setIndex">;
+    linearNavigation: Omit<UseLinearNavigationParameters["linearNavigation"], "navigateToFirst" | "navigateToLast" | "navigateToNext" | "navigateToPrev">;
 }
 export interface UseListNavigationSingleSelectionParameters extends UseListNavigationParameters { singleSelection: { selectedIndex: number | null; } }
 
@@ -199,26 +199,30 @@ export function useListNavigation<ParentOrChildElement extends Element, ChildEle
             invalidTypeahead
         }
     } = useTypeaheadNavigation<ParentOrChildElement>({
-        getIndex: getTabbableIndex,
-        setIndex: useCallback((index: (number | null) | ((prev: number | null) => (number | null))) => {
-            setTabbableIndex(index, true);
-        }, []),
-        ...typeaheadNavigation
+        typeaheadNavigation: {
+            getIndex: getTabbableIndex,
+            setIndex: useCallback((index: (number | null) | ((prev: number | null) => (number | null))) => {
+                setTabbableIndex(index, true);
+            }, []),
+            ...typeaheadNavigation
+        }
     });
     const { useLinearNavigationProps } = useLinearNavigation<ParentOrChildElement>({
-        navigateToPrev: useCallback(() => {
-            setTabbableIndex(c => {
-                return tryNavigateToIndex({ children, default: c ?? 0, target: indexDemangler!(indexMangler!((c ?? 0)) - 1), searchDirection: -1, indexMangler: indexMangler ?? identity, indexDemangler: indexDemangler ?? identity })
-            }, true)
-        }, []),
-        navigateToNext: useCallback(() => {
-            setTabbableIndex(c => {
-                return tryNavigateToIndex({ children, default: c ?? 0, target: indexDemangler!(indexMangler!(c ?? 0) + 1), searchDirection: 1, indexMangler: indexMangler ?? identity, indexDemangler: indexDemangler ?? identity });
-            }, true)
-        }, []),
-        navigateToFirst: useCallback(() => { navigateToIndex(indexDemangler!(0), true); }, []),
-        navigateToLast: useCallback(() => { navigateToIndex(indexDemangler!(children.getHighestIndex()), true); }, []),
-        ...linearNavigation
+        linearNavigation: {
+            navigateToPrev: useCallback(() => {
+                setTabbableIndex(c => {
+                    return tryNavigateToIndex({ children, default: c ?? 0, target: indexDemangler!(indexMangler!((c ?? 0)) - 1), searchDirection: -1, indexMangler: indexMangler ?? identity, indexDemangler: indexDemangler ?? identity })
+                }, true)
+            }, []),
+            navigateToNext: useCallback(() => {
+                setTabbableIndex(c => {
+                    return tryNavigateToIndex({ children, default: c ?? 0, target: indexDemangler!(indexMangler!(c ?? 0) + 1), searchDirection: 1, indexMangler: indexMangler ?? identity, indexDemangler: indexDemangler ?? identity });
+                }, true)
+            }, []),
+            navigateToFirst: useCallback(() => { navigateToIndex(indexDemangler!(0), true); }, []),
+            navigateToLast: useCallback(() => { navigateToIndex(indexDemangler!(children.getHighestIndex()), true); }, []),
+            ...linearNavigation
+        }
     });
 
     const useListNavigationProps = useCallback((props: h.JSX.HTMLAttributes<ParentOrChildElement>): h.JSX.HTMLAttributes<ParentOrChildElement> => {

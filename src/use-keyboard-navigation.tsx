@@ -21,34 +21,36 @@ export interface UseLinearNavigationReturnType<ParentOrChildElement extends Elem
 
 /** Arguments passed to the parent `useLinearNavigation` */
 export interface UseLinearNavigationParameters {
-    navigateToNext(): void;
-    navigateToPrev(): void;
-    navigateToFirst(): void;
-    navigateToLast(): void;
-    /**
-     * Controls which arrow keys are used to navigate through the component.
-     * Relative to the writing mode, so in English, "inline" corresponds
-     * to the left & right arrow keys, and "block" to the up & down arrow keys.
-     * 
-     * Use "either" to allow navigation in either direction.
-     * 
-     * Use "none" to disallow navigation with the arrow keys in any direction.
-     */
-    navigationDirection?: "inline" | "block" | "either" | "none";
+    linearNavigation: {
+        navigateToNext(): void;
+        navigateToPrev(): void;
+        navigateToFirst(): void;
+        navigateToLast(): void;
+        /**
+         * Controls which arrow keys are used to navigate through the component.
+         * Relative to the writing mode, so in English, "inline" corresponds
+         * to the left & right arrow keys, and "block" to the up & down arrow keys.
+         * 
+         * Use "either" to allow navigation in either direction.
+         * 
+         * Use "none" to disallow navigation with the arrow keys in any direction.
+         */
+        navigationDirection?: "inline" | "block" | "either" | "none";
 
-    /**
-     * If set to true, navigation with the arrow keys will be 
-     * disabled, but navigation with the home & end keys will
-     * be unaffected.
-     */
-    disableArrowKeys?: boolean;
+        /**
+         * If set to true, navigation with the arrow keys will be 
+         * disabled, but navigation with the home & end keys will
+         * be unaffected.
+         */
+        disableArrowKeys?: boolean;
 
-    /**
-     * If set to true, navigation with the home & end keys will
-     * be disabled, but navigation with the arrow keys will be
-     * unaffected.
-     */
-    disableHomeEndKeys?: boolean;
+        /**
+         * If set to true, navigation with the home & end keys will
+         * be disabled, but navigation with the arrow keys will be
+         * unaffected.
+         */
+        disableHomeEndKeys?: boolean;
+    }
 
 }
 
@@ -62,7 +64,7 @@ export interface UseLinearNavigationParameters {
  * 
  * @see useListNavigation, which packages everything up together.
  */
-export function useLinearNavigation<ParentOrChildElement extends Element>({ navigateToFirst: ntf, navigateToLast: ntl, navigateToNext: ntn, navigateToPrev: ntp, navigationDirection: nd, disableArrowKeys: dak, disableHomeEndKeys: dhek }: UseLinearNavigationParameters): UseLinearNavigationReturnType<ParentOrChildElement> {
+export function useLinearNavigation<ParentOrChildElement extends Element>({ linearNavigation: { navigateToFirst: ntf, navigateToLast: ntl, navigateToNext: ntn, navigateToPrev: ntp, navigationDirection: nd, disableArrowKeys: dak, disableHomeEndKeys: dhek } }: UseLinearNavigationParameters): UseLinearNavigationReturnType<ParentOrChildElement> {
 
     nd ??= "either";
 
@@ -209,17 +211,18 @@ export type UseTypeaheadNavigationChildReturnType = void;
 
 
 export interface UseTypeaheadNavigationParameters {
+    typeaheadNavigation: {
+        /**
+         * A collator to use when comparing. If not provided, simply uses `localeCompare` after transforming each to lowercase, which will, at best, work okay in English.
+         */
+        collator?: Intl.Collator;
 
-    /**
-     * A collator to use when comparing. If not provided, simply uses `localeCompare` after transforming each to lowercase, which will, at best, work okay in English.
-     */
-    collator?: Intl.Collator;
+        noTypeahead?: boolean;
 
-    noTypeahead?: boolean;
-
-    typeaheadTimeout?: number;
-    getIndex(): number | null;
-    setIndex(value: number | null | ((previousValue: number | null) => (number | null))): void;
+        typeaheadTimeout?: number;
+        getIndex(): number | null;
+        setIndex(value: number | null | ((previousValue: number | null) => (number | null))): void;
+    }
 }
 
 /** Arguments passed to the child 'useTypeaheadNavigationChild` */
@@ -244,7 +247,7 @@ export type UseTypeaheadNavigationChild = (args: UseTypeaheadNavigationChildPara
  * 
  * @see useListNavigation, which packages everything up together.
  */
-export function useTypeaheadNavigation<ParentOrChildElement extends Element>({ collator, getIndex, typeaheadTimeout, setIndex, noTypeahead }: UseTypeaheadNavigationParameters): UseTypeaheadNavigationReturnType<ParentOrChildElement> {
+export function useTypeaheadNavigation<ParentOrChildElement extends Element>({ typeaheadNavigation: { collator, getIndex, typeaheadTimeout, setIndex, noTypeahead } }: UseTypeaheadNavigationParameters): UseTypeaheadNavigationReturnType<ParentOrChildElement> {
 
 
     // For typeahead, keep track of what our current "search" string is (if we have one)
