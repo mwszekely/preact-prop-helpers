@@ -1,10 +1,10 @@
 import { h } from "preact";
 import { StateUpdater, useCallback, useEffect, useRef } from "preact/hooks";
 import { useStableGetter } from "./use-stable-getter";
-import { ChildFlagOperations, ManagedChildInfo, ManagedChildren, OnChildrenMountChange, useChildrenFlag, useManagedChildren, UseManagedChildrenParameters } from "./use-child-manager";
+import { ChildFlagOperations, ManagedChildInfo, OnChildrenMountChange, useChildrenFlag, useManagedChildren, UseManagedChildrenParameters, UseManagedChildrenReturnType } from "./use-child-manager";
 import { useHasFocus } from "./use-has-focus";
 import { useMergedProps } from "./use-merged-props";
-import { returnTrue, returnZero, usePassiveState } from "./use-passive-state";
+import { returnZero, usePassiveState } from "./use-passive-state";
 import { useStableCallback } from "./use-stable-callback";
 import { useState } from "./use-state";
 
@@ -44,11 +44,9 @@ export interface UseRovingTabIndexParameters extends UseManagedChildrenParameter
     }
 }
 
-export interface UseRovingTabIndexReturnType<ChildElement extends Element, C, K extends string> {
+export interface UseRovingTabIndexReturnType<ChildElement extends Element, RtiSubInfo, ExtraFlagKeys extends string> extends Omit<UseManagedChildrenReturnType<number, UseRovingTabIndexSubInfo<ChildElement, RtiSubInfo>, ExtraFlagKeys | "tabbable">, "useManagedChild"> {
     /** **STABLE** */
-    useRovingTabIndexChild: UseRovingTabIndexChild<ChildElement, C, K | "tabbable">;
-    /** **STABLE** */
-    children: ManagedChildren<number, UseRovingTabIndexSubInfo<ChildElement, C>, K | "tabbable">;
+    useRovingTabIndexChild: UseRovingTabIndexChild<ChildElement, RtiSubInfo, ExtraFlagKeys>;
 
     rovingTabIndex: {
         /** **STABLE** */
@@ -62,12 +60,12 @@ export interface UseRovingTabIndexReturnType<ChildElement extends Element, C, K 
 
 
 
-export interface UseRovingTabIndexChildParameters<C, K extends string> {
-    managedChild: Omit<ManagedChildInfo<number, C, K>, "subInfo">;
-    rovingTabIndex: Partial<Omit<UseRovingTabIndexSubInfo<any, C>, "getElement">> & Pick<UseRovingTabIndexSubInfo<any, C>, "subInfo">;
+export interface UseRovingTabIndexChildParameters<RtiSubInfo, ExtraFlagKeys extends string> {
+    managedChild: Omit<ManagedChildInfo<number, UseRovingTabIndexSubInfo<any, RtiSubInfo>, ExtraFlagKeys | "tabbable">, "subInfo">;
+    rovingTabIndex: Partial<Omit<UseRovingTabIndexSubInfo<any, any>, "getElement">> & Pick<UseRovingTabIndexSubInfo<any, any>, "subInfo">;
 }
 
-export type UseRovingTabIndexChild<ChildElement extends Element, C, K extends string> = (a: UseRovingTabIndexChildParameters<C, K>) => UseRovingTabIndexChildReturnType<ChildElement>;
+export type UseRovingTabIndexChild<ChildElement extends Element, RtiSubInfo, ExtraFlagKeys extends string> = (a: UseRovingTabIndexChildParameters<RtiSubInfo, ExtraFlagKeys>) => UseRovingTabIndexChildReturnType<ChildElement>;
 
 export interface UseRovingTabIndexChildReturnType<ChildElement extends Element> {
     /** *Unstable* */
@@ -80,7 +78,6 @@ export interface UseRovingTabIndexChildReturnType<ChildElement extends Element> 
         getElement(): ChildElement | null;
     }
 }
-
 
 
 /**
@@ -112,18 +109,19 @@ export interface UseRovingTabIndexChildReturnType<ChildElement extends Element> 
  * And just as well! Children should be allowed at the root, 
  * regardless of if it's the whole app or just a given component.
  */
-export function useRovingTabIndex<ChildElement extends Element, C, K extends string>({ managedChildren: { onAfterChildLayoutEffect, onChildrenMountChange: onChildrenMountChangeUser }, rovingTabIndex: { onTabbableIndexChange, onTabbableRender, onTabbedInTo: onAnyFocusIn, onTabbedOutOf: onAnyFocusOut, initialIndex } }: UseRovingTabIndexParameters): UseRovingTabIndexReturnType<ChildElement, C, K> {
-    //type I2 = ManagedChildInfo<number, RTI<ChildElement, C, K | "tabbable">>;
+export function useRovingTabIndex<ChildElement extends Element, RtiSubInfo, ExtraFlagKeys extends string>(parentParameters: UseRovingTabIndexParameters): UseRovingTabIndexReturnType<ChildElement, RtiSubInfo, ExtraFlagKeys> {
+
+    let { rovingTabIndex: { initialIndex, onTabbedInTo, onTabbedOutOf, onTabbableRender, onTabbableIndexChange }, managedChildren: { onAfterChildLayoutEffect, onChildrenMountChange } } = parentParameters;
 
     initialIndex ??= 0;
     const stableOnTabbableRender = useStableCallback(onTabbableRender ?? (() => { }));
     const [_getAnyFocused, setAnyFocused] = usePassiveState<number>(useStableCallback((newCount: number, oldCount: number | undefined) => {
         if (oldCount == 0 && newCount > 0) {
-            onAnyFocusIn?.();
+            onTabbedInTo?.();
         }
 
         if (newCount == 0 && (oldCount ?? 0) > 0) {
-            onAnyFocusOut?.();
+            onTabbedOutOf?.();
         }
     }), returnZero);
 
@@ -142,8 +140,8 @@ export function useRovingTabIndex<ChildElement extends Element, C, K extends str
             nextIndex = changeIndex(nextIndex);
 
             if (prevIndex != nextIndex) {
-                const nextChild = nextIndex == null ? null : children.getAt(nextIndex);
-                const prevChild = prevIndex == null ? null : children.getAt(prevIndex);
+                const nextChild = nextIndex == null ? null : parentReturnType.managedChildren.children.getAt(nextIndex);
+                const prevChild = prevIndex == null ? null : parentReturnType.managedChildren.children.getAt(prevIndex);
 
                 if (prevChild != null)
                     prevChild.subInfo.blurSelf();
@@ -161,16 +159,20 @@ export function useRovingTabIndex<ChildElement extends Element, C, K extends str
     // Any time the tabbable index changes,
     // notify the previous child that it's no longer tabbable,
     // and notify the next child that is allowed to be tabbed to.
-    const { children, useManagedChild } = useManagedChildren<number, UseRovingTabIndexSubInfo<ChildElement, C>, K | "tabbable">({
+    const parentReturnType = useManagedChildren<number, UseRovingTabIndexSubInfo<ChildElement, RtiSubInfo>, ExtraFlagKeys | "tabbable">({
         managedChildren: {
             onAfterChildLayoutEffect,
-            onChildrenMountChange: useStableCallback<OnChildrenMountChange<number>>((mounted, unmounted) => { onChildrenMountChangeUser?.(mounted, unmounted); reevaluateClosestFit(); }),
+            onChildrenMountChange: useStableCallback<OnChildrenMountChange<number>>((mounted, unmounted) => { onChildrenMountChange?.(mounted, unmounted); reevaluateClosestFit(); }),
         },
     });
 
-    const { changeIndex, reevaluateClosestFit } = useChildrenFlag<UseRovingTabIndexSubInfo<ChildElement, C>, K | "tabbable">({ initialIndex, children, closestFit: true, key: "tabbable" });
+    const { useManagedChild } = parentReturnType;
 
-    const useRovingTabIndexChild = useCallback<UseRovingTabIndexChild<ChildElement, C, K>>(({ managedChild: { flags, index }, rovingTabIndex: { blurSelf: blurSelfOverride, focusSelf: focusSelfOverride, hidden, subInfo } }: UseRovingTabIndexChildParameters<C, K>) => {
+    const { changeIndex, reevaluateClosestFit } = useChildrenFlag<UseRovingTabIndexSubInfo<ChildElement, RtiSubInfo>, ExtraFlagKeys | "tabbable">({ initialIndex, children: parentReturnType.managedChildren.children, closestFit: true, key: "tabbable" });
+
+    const useRovingTabIndexChild = useCallback<UseRovingTabIndexChild<ChildElement, RtiSubInfo, ExtraFlagKeys>>((childParameters) => {
+
+        const { managedChild: { index, flags }, rovingTabIndex: { hidden, subInfo, blurSelf: blurSelfOverride, focusSelf: focusSelfOverride } } = childParameters;
 
         useEffect(() => {
             reevaluateClosestFit();
@@ -221,7 +223,7 @@ export function useRovingTabIndex<ChildElement extends Element, C, K extends str
         const _: void = useManagedChild({
             managedChild: {
                 index,
-                flags: { ...flags, tabbable: tabbableFlags.current } as Partial<Record<K | "tabbable", ChildFlagOperations>>,
+                flags: { ...flags, tabbable: tabbableFlags.current } as Partial<Record<ExtraFlagKeys | "tabbable", ChildFlagOperations>>,
                 subInfo: {
                     blurSelf,
                     focusSelf,
@@ -254,14 +256,14 @@ export function useRovingTabIndex<ChildElement extends Element, C, K extends str
         console.log(`useRovingTabIndex.focusSelf`);
         const index = getTabbableIndex();
         if (index != null)
-            children.getAt(index)?.subInfo.focusSelf?.();
+            parentReturnType.managedChildren.children.getAt(index)?.subInfo.focusSelf?.();
         else
             setTabbableIndex(null, true);
     }, []);
 
     return {
         useRovingTabIndexChild,
-        children,
+        managedChildren: { children: parentReturnType.managedChildren.children },
         rovingTabIndex: {
             setTabbableIndex,
             getTabbableIndex,

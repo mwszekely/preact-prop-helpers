@@ -258,7 +258,7 @@ export const DemoUseGrid = memo(() => {
 
     const [, setLastFocusedInner, _getLastFocusedInner] = useState(false);
     const { useHasFocusProps } = useHasFocus<HTMLTableSectionElement>({ onLastFocusedInnerChanged: setLastFocusedInner });
-    const { useGridNavigationRow, useGridNavigationProps, children, gridNavigation: { currentColumn }, linearNavigation, listNavigation, rovingTabIndex, typeaheadNavigation } = useGridNavigation<HTMLTableSectionElement, HTMLTableRowElement, HTMLTableCellElement, {}, {}, string, string>({
+    const { useGridNavigationRow, useGridNavigationProps, gridNavigation: { currentColumn } } = useGridNavigation<HTMLTableSectionElement, HTMLTableRowElement, HTMLTableCellElement, {}, {}, string, string>({
         rovingTabIndex: {},
         linearNavigation: {},
         listNavigation: {},
@@ -267,7 +267,7 @@ export const DemoUseGrid = memo(() => {
     });
 
     return (
-        <>
+        <div class="demo">
             {<div>Current column: {currentColumn}</div>}
             <table {...{ border: "2" } as {}} style={{ whiteSpace: "nowrap" }}>
 
@@ -288,7 +288,7 @@ export const DemoUseGrid = memo(() => {
                     </GridRowContext.Provider>
                 </tbody>
             </table>
-        </>
+        </div>
     );
 })
 
@@ -296,9 +296,13 @@ const _Prefix = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const DemoUseGridRow = memo((({ index }: { index: number }) => {
     const [_randomWord] = useState(() => RandomWords[index/*Math.floor(Math.random() * (RandomWords.length - 1))*/]);
     const useGridRow = useContext(GridRowContext);
-    const { useGridNavigationRowProps, useGridNavigationCell, children, gn: { getCurrentColumn }, rovingTabIndex: { getElement, getTabbable, tabbable } } = useGridRow({
-        asChild: { managedChild: { index }, listNavigation: { subInfo: {}, text: "" }, rovingTabIndex: { hidden: false } },
-        asParent: { linearNavigation: {}, listNavigation: {}, rovingTabIndex: {}, typeaheadNavigation: {}, managedChildren: {} }
+    const {
+        useGridNavigationRowProps,
+        useGridNavigationCell,
+        asChildRow: { rovingTabIndex: { tabbable } },
+    } = useGridRow({
+        asChildRow: { managedChild: { index }, listNavigation: { subInfo: {}, text: "" }, rovingTabIndex: { hidden: index == 3 }, gridNavigation: { subInfo: {} } },
+        asParentOfCells: { linearNavigation: {}, listNavigation: {}, rovingTabIndex: {}, typeaheadNavigation: {}, managedChildren: {} }
     });
 
     const props = useGridNavigationRowProps({});
@@ -319,11 +323,17 @@ const DemoUseGridCell = (({ index, row, rowIsTabbable }: { index: number, row: n
     if (row >= 6 && row % 2 == 0 && index > 1)
         return null;
 
+    let hiddenText = (row === 3)? " (row hidden)" : ""
+
     const useGridCell = useContext(GridCellContext);
-    const { useGridNavigationCellProps, gn: { getCurrentColumn }, rovingTabIndex: { getElement, getTabbable, tabbable: cellIsTabbable } } = useGridCell({
-        listNavigation: { subInfo: {}, text: "" },
+    const {
+        useGridNavigationCellProps,
+        rovingTabIndex: { tabbable: cellIsTabbable }
+    } = useGridCell({
+        listNavigation: { text: "" },
         managedChild: { index },
-        rovingTabIndex: { hidden: true }
+        rovingTabIndex: { hidden: false },
+        gridNavigation: { subInfo: {} }
     });
 
     const props = useGridNavigationCellProps({}) as any;
@@ -335,13 +345,13 @@ const DemoUseGridCell = (({ index, row, rowIsTabbable }: { index: number, row: n
     else {
         if (row < 6 || row % 2 != 0) {
             if (index === 1)
-                return <td {...props}>Grid cell #{index + 1} {t}</td>
+                return <td {...props}>Grid cell #{index + 1} {t}{hiddenText}</td>
             else
-                return <td><label><input  {...props} type="checkbox" /> Test input {t}</label></td>
+                return <td><label><input  {...props} type="checkbox" /> Test input {t}{hiddenText}</label></td>
         }
         else {
             if (index === 1)
-                return <td {...props} colSpan={2}>Grid cell #{index + 1}, span 2</td>
+                return <td {...props} colSpan={2}>Grid cell #{index + 1}, span 2 {t}{hiddenText}</td>
             else
                 return null;
 

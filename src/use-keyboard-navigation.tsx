@@ -16,6 +16,7 @@ export interface UseLinearNavigationReturnType<ParentOrChildElement extends Elem
      * **STABLE** 
      * */
     useLinearNavigationProps: (props: h.JSX.HTMLAttributes<ParentOrChildElement>) => h.JSX.HTMLAttributes<ParentOrChildElement>;
+    linearNavigation: {}
 }
 
 /** Arguments passed to the parent `useLinearNavigation` */
@@ -77,6 +78,7 @@ export function useLinearNavigation<ParentOrChildElement extends Element>({ navi
 
 
     return {
+        linearNavigation: {},
         useLinearNavigationProps: useCallback((props: h.JSX.HTMLAttributes<ParentOrChildElement>): h.JSX.HTMLAttributes<ParentOrChildElement> => {
 
             const onKeyDown = (e: KeyboardEvent) => {
@@ -196,9 +198,10 @@ export interface UseTypeaheadNavigationReturnType<ParentOrChildElement extends E
     /** **STABLE** */
     useTypeaheadNavigationChild: UseTypeaheadNavigationChild;
 
-
-    currentTypeahead: string | null;
-    invalidTypeahead: boolean | null;
+    typeaheadNavigation: {
+        currentTypeahead: string | null;
+        invalidTypeahead: boolean | null;
+    }
 }
 
 export type UseTypeaheadNavigationProps<E extends Element> = (props: h.JSX.HTMLAttributes<E>) => h.JSX.HTMLAttributes<E>;
@@ -222,7 +225,7 @@ export interface UseTypeaheadNavigationParameters {
 /** Arguments passed to the child 'useTypeaheadNavigationChild` */
 
 
-export interface UseTypeaheadNavigationChildParameters { 
+export interface UseTypeaheadNavigationChildParameters {
     /**
      * If provided, allows this component to be navigated to by typing this string. 
      * It should be the same text content as whatever's displayed, ideally.
@@ -487,8 +490,10 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element>({ c
         useTypeaheadNavigationChild,
         useTypeaheadNavigationProps,
 
-        currentTypeahead,
-        invalidTypeahead,
+        typeaheadNavigation: {
+            currentTypeahead,
+            invalidTypeahead,
+        }
     }
 }
 

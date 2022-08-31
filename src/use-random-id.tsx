@@ -70,7 +70,7 @@ export function useRandomId<S extends Element>({ prefix, managedChildren: { onAf
     const mismatchErrorRef = useRef(false);
     useEnsureStability("useRandomId", prefix);
 
-    const { useManagedChild, children } = useManagedChildren<"referencer" | "source", RandomIdChildInfoBase, never>({ managedChildren: { onAfterChildLayoutEffect, onChildrenMountChange } });
+    const { useManagedChild, managedChildren: { children } } = useManagedChildren<"referencer" | "source", RandomIdChildInfoBase, never>({ managedChildren: { onAfterChildLayoutEffect, onChildrenMountChange } });
 
     const useRandomIdSourceElement = useCallback<UseRandomIdSourceElement<S>>(() => {
         const [usedIdLocal, setUsedIdLocal, getUsedIdLocal] = useState(getUsedId());

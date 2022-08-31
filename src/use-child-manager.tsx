@@ -81,7 +81,9 @@ export interface UseManagedChildrenReturnType<T extends number | string, C, K ex
      * 
      * **STABLE** (even though it's not a function, the identity of this object never changes)
      */
-    children: ManagedChildren<T, C, K>;
+    managedChildren: {
+        children: ManagedChildren<T, C, K>;
+    }
 }
 
 export type UseManagedChildReturnType = void;
@@ -123,9 +125,11 @@ export interface ManagedChildren<T extends number | string, C, K extends string>
  * 
  * 
  */
-export function useManagedChildren<T extends number | string, C, K extends string>({ managedChildren: { onAfterChildLayoutEffect, onChildrenMountChange } }: UseManagedChildrenParameters<T>): UseManagedChildrenReturnType<T, C, K> {
+export function useManagedChildren<T extends number | string, C, K extends string>(parentParameters: UseManagedChildrenParameters<T>): UseManagedChildrenReturnType<T, C, K> {
     //type I = I3 & ManagedChildInfoBase<string | number>;
     type Info = ManagedChildInfo<T, C, K>;
+
+    const { managedChildren: { onAfterChildLayoutEffect, onChildrenMountChange } } = parentParameters;
 
     useEnsureStability("useManagedChildren", onAfterChildLayoutEffect, onChildrenMountChange);
 
@@ -153,7 +157,7 @@ export function useManagedChildren<T extends number | string, C, K extends strin
 
     // Retrieves the information associated with the child with the given index.
     // `undefined` if not child there, or it's unmounted.
-    const getManagedChildInfo = useCallback<UseManagedChildrenReturnType<T, C, K>["children"]["getAt"]>((index: T) => {
+    const getManagedChildInfo = useCallback<UseManagedChildrenReturnType<T, C, K>["managedChildren"]["children"]["getAt"]>((index: T) => {
         if (typeof index == "number")
             return managedChildrenArray.current.arr[index as number]!;
         else
@@ -224,7 +228,7 @@ export function useManagedChildren<T extends number | string, C, K extends strin
     }, [/* Must remain stable */]);
 
 
-    const useManagedChild = useCallback<UseManagedChild<T, C, K>>(({ managedChild: info }) => {
+    const useManagedChild = useCallback<UseManagedChild<T, C, K>>(({ managedChild: info, }) => {
         // Any time our child props change, make that information available
         // the parent if they need it.
         // The parent can listen for all updates and only act on the ones it cares about,
@@ -262,7 +266,7 @@ export function useManagedChildren<T extends number | string, C, K extends strin
 
     return {
         useManagedChild,
-        children: managedChildren.current
+        managedChildren: { children: managedChildren.current }
     }
 }
 
@@ -408,7 +412,7 @@ export function useChildrenFlag<C, K extends string>({ children, initialIndex, c
         }
     });
 
-    
+
 
 
     const changeIndex = useCallback((arg: Parameters<StateUpdater<number | null>>[0]) => {

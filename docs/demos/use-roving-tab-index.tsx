@@ -31,10 +31,10 @@ export const DemoUseRovingTabIndex = memo(() => {
     });*/
 
     const {
-        children,
+        managedChildren: { children },
         useSortableListNavigationSingleSelectionChild,
         useSortableListNavigationSingleSelectionProps,
-        rovingTabIndex: { setTabbableIndex, getTabbableIndex },
+        rovingTabIndex: { setTabbableIndex },
         typeaheadNavigation: { currentTypeahead },
         sortable: { shuffle }
     } = useSortableListNavigationSingleSelection<HTMLUListElement, HTMLLIElement, {}, string>({
@@ -103,8 +103,8 @@ const DemoUseRovingTabIndexChild = memo((({ index, setSelectedIndex }: { index: 
     const hidden = (index == 7);
     const [randomWord] = useState(() => RandomWords[index/*Math.floor(Math.random() * (RandomWords.length - 1))*/]);
     const useRovingTabIndexChild = useContext(RovingChildContext);
-    const text = `${randomWord} This is item #${index}${hidden? " (hidden)" : ""}`;
-    const { useListNavigationChildProps, rovingTabIndex: { getElement, getTabbable, tabbable }, singleSelection: { getSelected, selected } } = useRovingTabIndexChild({ managedChild: { index }, listNavigation: { subInfo: {}, text }, rovingTabIndex: { hidden } });
+    const text = `${randomWord} This is item #${index}${hidden ? " (hidden)" : ""}`;
+    const { useListNavigationChildProps, rovingTabIndex: { tabbable }, singleSelection: { selected } } = useRovingTabIndexChild({ managedChild: { index }, listNavigation: { subInfo: {}, text }, rovingTabIndex: { hidden } });
 
     const props = useListNavigationChildProps({});
     return (

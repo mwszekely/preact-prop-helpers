@@ -10,6 +10,7 @@ module.exports = {
     ],
     rules: {
         "@typescript-eslint/ban-types": 0,
+        "prefer-const": 0,      // this is the absolute worst i cant do it anymore
         "@typescript-eslint/no-empty-interface": [
             "warn",
             {
