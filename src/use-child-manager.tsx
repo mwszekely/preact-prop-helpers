@@ -34,7 +34,7 @@ const _comments = void (0);
  * * `flags` are quick-and-easy getters and setters that you can optionally use
  * * `subInfo` is anything used by a derived hook. `useRovingTabIndex`, for example, needs to know how to focus an arbitrary child, so the child populates `info` with an object containing a method called `focusSelf`.
  */
- export interface ManagedChildInfo<T extends string | number, C, K extends string> {
+export interface ManagedChildInfo<T extends string | number, C, K extends string> {
     index: T;
     flags?: Partial<Record<K, ChildFlagOperations>>;
     subInfo: C;
@@ -54,7 +54,7 @@ export interface UseManagedChildrenParameters<T extends number | string> {
          * *guaranteed* to have actually been a change.
          */
         onAfterChildLayoutEffect?: null | undefined | OnAfterChildLayoutEffect<T>;
-    
+
         /**
          * Same as the above, but only for mount/unmount (or when a child changes its index)
          */
@@ -209,10 +209,10 @@ export function useManagedChildren<T extends number | string, C, K extends strin
             managedChildrenArray.current.highestIndex = Math.max(managedChildrenArray.current.highestIndex, index as number);
         }
         else {
-            if (typeof index == "number"){
+            if (typeof index == "number") {
                 delete managedChildrenArray.current.arr[index as number];
                 let shave = 0;
-                while (managedChildrenArray.current.arr[managedChildrenArray.current.arr.length - 1 - shave] === undefined)
+                while (shave <= managedChildrenArray.current.arr.length && managedChildrenArray.current.arr[managedChildrenArray.current.arr.length - 1 - shave] === undefined)
                     ++shave;
                 managedChildrenArray.current.arr.splice(managedChildrenArray.current.arr.length - 1 - shave, shave);
             }
@@ -285,7 +285,8 @@ export interface UseChildrenFlagParameters<C, K extends string> {
      * Use with caution, and consider how a child having its flag set
      * while the parent thinks it shouldn't be could cause issues.
      */
-    closestFit?: boolean;
+    //closestFit?: boolean;
+    closestFit: boolean;
 
     children: ManagedChildren<number, C, K>;
 
@@ -332,8 +333,12 @@ export interface ChildFlagOperations {
 export interface UseChildrenFlagReturnType {
     /** **STABLE** */
     changeIndex: (arg: Parameters<StateUpdater<number | null>>[0]) => number | null;
-    /** **STABLE** */
-    onChildrenMountChange: OnChildrenMountChange<number>;
+    /** 
+     * **STABLE**
+     * 
+     * Call this whenever a child mounts/unmounts, or whenever calling a child's isValid() would change
+     *  */
+    reevaluateClosestFit: () => void;
     /** **STABLE** */
     getCurrentIndex: () => number | null;
 }
@@ -355,21 +360,21 @@ export interface UseChildrenFlagReturnType {
  * @param param0 
  * @returns 
  */
-export function useChildrenFlag<C, K extends string>({ children, initialIndex, closestFit, onIndexChange, key}: UseChildrenFlagParameters<C, K>): UseChildrenFlagReturnType {
-    useEnsureStability("useChildrenFlag", closestFit, onIndexChange, key);
+export function useChildrenFlag<C, K extends string>({ children, initialIndex, closestFit, onIndexChange, key }: UseChildrenFlagParameters<C, K>): UseChildrenFlagReturnType {
+    useEnsureStability("useChildrenFlag", onIndexChange, key);
 
     const [getCurrentIndex, setCurrentIndex] = usePassiveState<null | number>(onIndexChange, useCallback(() => (initialIndex ?? (null)), []));
 
     const [getRequestedIndex, setRequestedIndex] = usePassiveState<null | number>(null, useCallback(() => (initialIndex ?? (null)), []));
 
-//    const getFitNullToZero = useStableGetter(fitNullToZero);
+    //    const getFitNullToZero = useStableGetter(fitNullToZero);
 
     // Shared between onChildrenMountChange and changeIndex, not public (but could be I guess)
     const getClosestFit = useCallback((requestedIndex: number) => {
         let closestDistance = Infinity;
         let closestIndex: number | null = null;
         children.forEach(child => {
-            
+
             if (child.flags?.[key]?.isValid()) {
                 const newDistance = Math.abs(child.index - requestedIndex);
                 if (newDistance < closestDistance || (newDistance == closestDistance && child.index < requestedIndex)) {
@@ -385,40 +390,25 @@ export function useChildrenFlag<C, K extends string>({ children, initialIndex, c
     // the "currently selected" (or whatever) index.  The two cases we're looking for:
     // 1. The currently selected child unmounted
     // 2. A child mounted, and it mounts with the index we're looking for
-    const onChildrenMountChange = useStableCallback<OnChildrenMountChange<number>>((mounted, unmounted) => {
+    const reevaluateClosestFit = useStableCallback(() => {
         const requestedIndex = getRequestedIndex();
         const currentIndex = getCurrentIndex();
         const currentChild = currentIndex == null ? null : children.getAt(currentIndex);
 
-        // We've not actually selected our requested selection.
-        // Maybe one of the children that just mounted has it?
-        if (currentIndex != requestedIndex && requestedIndex != null) {
-            if (mounted.has(requestedIndex)) {
-                currentChild?.flags?.[key]!.set(false);
-                children.getAt(requestedIndex)?.flags?.[key]!.set(true);
-            }
-        }
-        else if (currentIndex != null && unmounted.has(currentIndex)) {
-            // Whatever's currently selected has must unmounted.
+        if (requestedIndex != null && closestFit && (requestedIndex != currentIndex || currentChild == null || !currentChild.flags?.[key]?.isValid())) {
             currentChild?.flags?.[key]!.set(false);
-            if (!closestFit || requestedIndex == null) {
-                // If we're not in best-fit mode, or there's no index being actively requested,
-                // then our currently activated child unmounting just means we, to be safe,
-                // request it to de-select itself.
+            const closestFitIndex = getClosestFit(requestedIndex);
+            setCurrentIndex(closestFitIndex);
+            if (closestFitIndex != null) {
+                const closestFitChild = children.getAt(closestFitIndex)!;
+                console.assert(closestFitChild != null, "Internal logic???");
+                closestFitChild.flags?.[key]!.set(true);
             }
-            else {
-                // If we're in best-fit mode, then try to find another
-                // child to select.
-                const closestFitIndex = getClosestFit(requestedIndex);
-                if (closestFitIndex != null) {
-                    const closestFitChild = children.getAt(closestFitIndex)!;
-                    console.assert(closestFitChild != null, "Internal logic???");
-                    closestFitChild.flags?.[key]!.set(true);
-                }
-            }
-        }
 
+        }
     });
+
+    
 
 
     const changeIndex = useCallback((arg: Parameters<StateUpdater<number | null>>[0]) => {
@@ -469,7 +459,7 @@ export function useChildrenFlag<C, K extends string>({ children, initialIndex, c
             children.getAt(initialIndex)?.flags?.[key]?.set(true);
     }, [])
 
-    return { changeIndex, onChildrenMountChange, getCurrentIndex };
+    return { changeIndex, reevaluateClosestFit, getCurrentIndex };
 }
 
 

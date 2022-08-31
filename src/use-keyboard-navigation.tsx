@@ -61,7 +61,7 @@ export interface UseLinearNavigationParameters {
  * 
  * @see useListNavigation, which packages everything up together.
  */
-export function useLinearNavigation<ParentOrChildElement extends HTMLElement | SVGElement>({ navigateToFirst: ntf, navigateToLast: ntl, navigateToNext: ntn, navigateToPrev: ntp, navigationDirection: nd, disableArrowKeys: dak, disableHomeEndKeys: dhek }: UseLinearNavigationParameters): UseLinearNavigationReturnType<ParentOrChildElement> {
+export function useLinearNavigation<ParentOrChildElement extends Element>({ navigateToFirst: ntf, navigateToLast: ntl, navigateToNext: ntn, navigateToPrev: ntp, navigationDirection: nd, disableArrowKeys: dak, disableHomeEndKeys: dhek }: UseLinearNavigationParameters): UseLinearNavigationReturnType<ParentOrChildElement> {
 
     nd ??= "either";
 

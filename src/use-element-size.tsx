@@ -37,7 +37,7 @@ export interface ElementSize {
     offsetTop: number | undefined;
 }
 
-export interface UseElementSizeReturnType<E extends HTMLElement | SVGElement> {
+export interface UseElementSizeReturnType<E extends Element> {
     /** **STABLE** */
     getElement(): E | null;
     /** **STABLE** */
@@ -47,7 +47,7 @@ export interface UseElementSizeReturnType<E extends HTMLElement | SVGElement> {
 }
 
 
-export function useElementSize<E extends HTMLElement | SVGElement>({ getObserveBox, onSizeChange }: UseElementSizeParameters): UseElementSizeReturnType<E> {
+export function useElementSize<E extends Element>({ getObserveBox, onSizeChange }: UseElementSizeParameters): UseElementSizeReturnType<E> {
 
     useEnsureStability("useElementSize", getObserveBox, onSizeChange);
 
@@ -62,7 +62,7 @@ export function useElementSize<E extends HTMLElement | SVGElement>({ getObserveB
 
             const handleUpdate = () => {
                 if (element.isConnected) {
-                    const { clientWidth, scrollWidth, offsetWidth, clientHeight, scrollHeight, offsetHeight, clientLeft, scrollLeft, offsetLeft, clientTop, scrollTop, offsetTop } = (element as HTMLElement);
+                    const { clientWidth, scrollWidth, offsetWidth, clientHeight, scrollHeight, offsetHeight, clientLeft, scrollLeft, offsetLeft, clientTop, scrollTop, offsetTop } = (element as Element & Partial<HTMLElement>);
                     setSize({ clientWidth, scrollWidth, offsetWidth, clientHeight, scrollHeight, offsetHeight, clientLeft, scrollLeft, offsetLeft, clientTop, scrollTop, offsetTop });
                 }
             }

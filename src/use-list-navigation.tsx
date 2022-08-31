@@ -6,7 +6,7 @@ import { ChildFlagOperations, ManagedChildInfo, ManagedChildren, OnChildrenMount
 import { useLinearNavigation, UseLinearNavigationParameters, UseLinearNavigationReturnType, useTypeaheadNavigation, UseTypeaheadNavigationParameters, UseTypeaheadNavigationReturnType } from "./use-keyboard-navigation";
 import { useMergedProps } from "./use-merged-props";
 import { useEnsureStability } from "./use-passive-state";
-import { useRovingTabIndex, UseRovingTabIndexParameters, UseRovingTabIndexReturnType, UseRovingTabIndexSubInfo } from "./use-roving-tabindex";
+import { useRovingTabIndex, UseRovingTabIndexChildReturnType, UseRovingTabIndexParameters, UseRovingTabIndexReturnType, UseRovingTabIndexSubInfo } from "./use-roving-tabindex";
 import { useSortableChildren, UseSortableChildrenReturnType } from "./use-sortable-children";
 import { useStableCallback } from "./use-stable-callback";
 import { useState } from "./use-state";
@@ -96,8 +96,8 @@ function identity<T>(t: T) { return t; }
  */
 export type NavigateToIndex = (i: number | null, fromUserInteraction: boolean) => void;
 
-// <ParentOrChildElement extends HTMLElement | SVGElement, ChildElement extends HTMLElement | SVGElement, K extends string, I extends ListNavigationChildInfo<K>>
-export interface UseListNavigationReturnType<ParentOrChildElement extends HTMLElement | SVGElement, ChildElement extends HTMLElement | SVGElement, C, K extends string> {
+// <ParentOrChildElement extends Element, ChildElement extends Element, K extends string, I extends ListNavigationChildInfo<K>>
+export interface UseListNavigationReturnType<ParentOrChildElement extends Element, ChildElement extends Element, C, K extends string> {
 
     /** **STABLE** */
     useListNavigationChild: UseListNavigationChild<ChildElement, C, K | "selected">;
@@ -114,12 +114,6 @@ export interface UseListNavigationReturnType<ParentOrChildElement extends HTMLEl
 
 export interface UseListNavigationSubInfo<C> {
     text: string;
-    /**
-     * If a child is hidden, then it will be skipped over
-     * during keyboard navigation, and the HTML `hidden`
-     * attribute will be applied.
-     */
-    hidden?: boolean;
 
     subInfo: C;
 }
@@ -127,9 +121,9 @@ export interface UseListNavigationSubInfo<C> {
 //export type UseListNavigationChildInfoNeeded<K extends string, I extends RovingTabIndexChildInfo<K>> = RovingTabIndexChildInfoNeeded<K, I>;
 
 export interface UseListNavigationChildParameters<C, K extends string> {
-    ls: UseListNavigationSubInfo<C>;
+    listNavigation: UseListNavigationSubInfo<C>;
     managedChild: Omit<ManagedChildInfo<number, C, K | "selected" | "tabbable">, "subInfo">;
-    rti: Partial<Omit<UseRovingTabIndexSubInfo<any, C>, "getElement" | "subInfo">>;
+    rovingTabIndex: Partial<Omit<UseRovingTabIndexSubInfo<any, C>, "getElement" | "subInfo">>;
 }
 
 export interface UseListNavigationSingleSelectionChildParameters<C, K extends string> extends UseListNavigationChildParameters<C, K> {
@@ -138,11 +132,8 @@ export interface UseListNavigationSingleSelectionChildParameters<C, K extends st
 
 export type UseListNavigationChild<ChildElement extends Element, C, K extends string> = (a: UseListNavigationChildParameters<C, K>) => UseListNavigationChildReturnType<ChildElement>;
 
-export interface UseListNavigationChildReturnType<ChildElement extends Element> {
+export interface UseListNavigationChildReturnType<ChildElement extends Element> extends Omit<UseRovingTabIndexChildReturnType<ChildElement>, "useRovingTabIndexChildProps"> {
     useListNavigationChildProps: (p: h.JSX.HTMLAttributes<ChildElement>) => h.JSX.HTMLAttributes<ChildElement>;
-    tabbable: boolean;
-    getTabbable(): boolean;
-    getElement: () => ChildElement | null;
 }
 
 
@@ -152,7 +143,7 @@ export interface UseListNavigationChildReturnType<ChildElement extends Element> 
  * In the document order, there will be only one "focused" or "tabbable" element, making it act more like one complete unit in comparison to everything around it.
  * Navigating forwards/backwards can be done with the arrow keys, Home/End keys, or any any text for typeahead to focus the next item that matches.
  */
-export function useListNavigation<ParentOrChildElement extends HTMLElement | SVGElement, ChildElement extends HTMLElement | SVGElement, C, K extends string>({
+export function useListNavigation<ParentOrChildElement extends Element, ChildElement extends Element, C, K extends string>({
     managedChildren: mc,
     rovingTabIndex,
     listNavigation: { indexDemangler, indexMangler },
@@ -221,7 +212,7 @@ export function useListNavigation<ParentOrChildElement extends HTMLElement | SVG
     }, [useLinearNavigationProps, useTypeaheadNavigationProps]);
 
 
-    const useListNavigationChild = useCallback<UseListNavigationChild<ChildElement, C, K>>(({ managedChild: { index, flags }, rti: { blurSelf, focusSelf }, ls: { text, hidden, subInfo } }) => {
+    const useListNavigationChild = useCallback<UseListNavigationChild<ChildElement, C, K>>(({ managedChild: { index, flags }, rovingTabIndex: { blurSelf, focusSelf, hidden }, listNavigation: { text, subInfo } }) => {
 
         const _v: void = useTypeaheadNavigationChild({ text, index });
         const getIndex = useStableGetter(index);
@@ -236,12 +227,14 @@ export function useListNavigation<ParentOrChildElement extends HTMLElement | SVG
 
         const {
             useRovingTabIndexChildProps,
-            tabbable,
-            getTabbable,
-            getElement
+            rovingTabIndex: {
+                tabbable,
+                getTabbable,
+                getElement
+            }
         } = useRovingTabIndexChild({
             managedChild: { index, flags },
-            rovingTabIndex: { blurSelf, focusSelf, subInfo: { text, hidden, subInfo } }
+            rovingTabIndex: { blurSelf, focusSelf, hidden: !!hidden, subInfo: { text, subInfo } }
         });
 
         const useListNavigationChildProps: (p: h.JSX.HTMLAttributes<ChildElement>) => h.JSX.HTMLAttributes<ChildElement> = function ({ ...props }) {
@@ -250,9 +243,11 @@ export function useListNavigation<ParentOrChildElement extends HTMLElement | SVG
 
         return {
             useListNavigationChildProps,
-            tabbable,
-            getTabbable,
-            getElement
+            rovingTabIndex: {
+                tabbable,
+                getTabbable,
+                getElement
+            }
         }
     }, [useTypeaheadNavigationChild, useRovingTabIndexChild, navigateToIndex]);
 
@@ -274,17 +269,19 @@ export interface UseListNavigationSingleSelectionParameters extends UseListNavig
     singleSelection: { selectedIndex: number | null; }
 }
 
-export interface UseListNavigationSingleSelectionReturnType<ParentOrChildElement extends HTMLElement | SVGElement, ChildElement extends HTMLElement | SVGElement, C, K extends string> extends Omit<UseListNavigationReturnType<ParentOrChildElement, ChildElement, C, K>, "useListNavigationChild" | "useListNavigationProps"> {
+export interface UseListNavigationSingleSelectionReturnType<ParentOrChildElement extends Element, ChildElement extends Element, C, K extends string> extends Omit<UseListNavigationReturnType<ParentOrChildElement, ChildElement, C, K>, "useListNavigationChild" | "useListNavigationProps"> {
     /** **STABLE** */
-    useListNavigationSingleSelectionChild: UseListNavigationSingleSelectionChild<ParentOrChildElement, ChildElement, C, K>;
+    useListNavigationSingleSelectionChild: UseListNavigationSingleSelectionChild<ChildElement, C, K>;
     /** **STABLE** */
     useListNavigationSingleSelectionProps: UseListNavigationReturnType<ParentOrChildElement, ChildElement, C, K>["useListNavigationProps"];
 }
 
-export type UseListNavigationSingleSelectionChild<ParentOrChildElement extends HTMLElement | SVGElement, ChildElement extends HTMLElement | SVGElement, C, K extends string> = (p: UseListNavigationSingleSelectionChildParameters<C, K>) => UseListNavigationSingleSelectionChildReturnType<ParentOrChildElement, ChildElement, C, K>;
-export interface UseListNavigationSingleSelectionChildReturnType<ParentOrChildElement extends HTMLElement | SVGElement, ChildElement extends HTMLElement | SVGElement, C, K extends string> extends ReturnType<UseListNavigationReturnType<ParentOrChildElement, ChildElement, C, K>["useListNavigationChild"]> {
-    selected: boolean;
-    getSelected(): boolean;
+export type UseListNavigationSingleSelectionChild<ChildElement extends Element, C, K extends string> = (p: UseListNavigationSingleSelectionChildParameters<C, K>) => UseListNavigationSingleSelectionChildReturnType<ChildElement>;
+export interface UseListNavigationSingleSelectionChildReturnType<ChildElement extends Element> extends UseListNavigationChildReturnType<ChildElement> {
+    singleSelection: {
+        selected: boolean;
+        getSelected(): boolean;
+    }
 }
 
 /**
@@ -296,10 +293,10 @@ export interface UseListNavigationSingleSelectionChildReturnType<ParentOrChildEl
  * @param param0 
  * @returns 
  */
-export function useListNavigationSingleSelection<ParentOrChildElement extends HTMLElement | SVGElement, ChildElement extends HTMLElement | SVGElement, C, K extends string>({
+export function useListNavigationSingleSelection<ParentOrChildElement extends Element, ChildElement extends Element, C, K extends string>({
     singleSelection: { selectedIndex },
     listNavigation,
-    managedChildren: { onChildrenMountChange: ocmc, ...mc },
+    managedChildren: { /*onChildrenMountChange: ocmc,*/ ...mc },
     rovingTabIndex: { initialIndex, ...rovingTabIndex },
     linearNavigation,
     typeaheadNavigation
@@ -308,10 +305,10 @@ export function useListNavigationSingleSelection<ParentOrChildElement extends HT
         listNavigation,
         managedChildren: {
             ...mc,
-            onChildrenMountChange: useStableCallback<OnChildrenMountChange<number>>((mounted, unmounted) => {
-                onChildrenMountChange(mounted, unmounted);
+            /*onChildrenMountChange: useStableCallback<OnChildrenMountChange<number>>((mounted, unmounted) => {
+                reevaluateClosestFit();
                 ocmc?.(mounted, unmounted);
-            })
+            })*/
         },
         rovingTabIndex: {
             initialIndex: (initialIndex ?? selectedIndex ?? undefined),
@@ -331,7 +328,7 @@ export function useListNavigationSingleSelection<ParentOrChildElement extends HT
     const {
         changeIndex: changeSelectedIndex,
         getCurrentIndex: getSelectedIndex,
-        onChildrenMountChange
+        //reevaluateClosestFit
     } = useChildrenFlag<UseRovingTabIndexSubInfo<ChildElement, UseListNavigationSubInfo<C>>, K | "selected">({
         children: list.children,
         initialIndex: selectedIndex,
@@ -345,11 +342,14 @@ export function useListNavigationSingleSelection<ParentOrChildElement extends HT
 
     return {
         children,
-        useListNavigationSingleSelectionChild: useCallback<UseListNavigationSingleSelectionChild<ParentOrChildElement, ChildElement, C, K | "selected">>(({ managedChild: { index, flags }, rti, ls }) => {
+        useListNavigationSingleSelectionChild: useCallback<UseListNavigationSingleSelectionChild<ChildElement, C, K | "selected">>(({ managedChild: { index, flags }, rovingTabIndex: rti, listNavigation: ls }) => {
             const [isSelected, setIsSelected, getIsSelected] = useState(getSelectedIndex() == index);
-            const selectedRef = useRef<ChildFlagOperations>({ get: getIsSelected, set: setIsSelected, isValid: useStableCallback(() => !ls.hidden) });
+            const selectedRef = useRef<ChildFlagOperations>({ get: getIsSelected, set: setIsSelected, isValid: useStableCallback(() => !rti.hidden) });
 
-            const ret = useListNavigationChild({
+            const {
+                rovingTabIndex: rti_ret,
+                useListNavigationChildProps
+            } = useListNavigationChild({
                 managedChild: {
                     index,
                     flags: {
@@ -357,10 +357,14 @@ export function useListNavigationSingleSelection<ParentOrChildElement extends HT
                         ...flags
                     } as Partial<Record<K | "selected" | "tabbable", ChildFlagOperations>>
                 },
-                rti,
-                ls
+                rovingTabIndex: rti,
+                listNavigation: ls
             });
-            return { ...ret, selected: isSelected, getSelected: getIsSelected }
+            return {
+                useListNavigationChildProps,
+                rovingTabIndex: rti_ret,
+                singleSelection: { selected: isSelected, getSelected: getIsSelected }
+            };
         }, []),
         useListNavigationSingleSelectionProps: useCallback((...p: Parameters<typeof useListNavigationProps>) => { return useListNavigationProps(...p) }, []),
         ...listRest
@@ -383,15 +387,15 @@ export interface UseSortableListNavigationParameters {
 }
 
 export type UseSortableListNavigationChildParameters<C, K extends string> = UseListNavigationChildParameters<C, K>;
-export type UseSortableListNavigationChild<ChildElement extends HTMLElement | SVGElement, C, K extends string> = (p: UseSortableListNavigationChildParameters<C, K>) => UseListNavigationChildReturnType<ChildElement>;
+export type UseSortableListNavigationChild<ChildElement extends Element, C, K extends string> = (p: UseSortableListNavigationChildParameters<C, K>) => UseListNavigationChildReturnType<ChildElement>;
 
-export interface UseSortableListNavigationReturnType<ParentElement extends HTMLElement | SVGElement, ChildElement extends HTMLElement | SVGElement, C, K extends string, G extends any[]> extends Omit<UseListNavigationReturnType<ParentElement, ChildElement, C, K>, "useListNavigationChild" | "useListNavigationProps"> {
+export interface UseSortableListNavigationReturnType<ParentElement extends Element, ChildElement extends Element, C, K extends string, G extends any[]> extends Omit<UseListNavigationReturnType<ParentElement, ChildElement, C, K>, "useListNavigationChild" | "useListNavigationProps"> {
     useSortableListNavigationProps: (props: Omit<h.JSX.HTMLAttributes<ParentElement>, "children"> & { children: VNode<any>[]; }) => h.JSX.HTMLAttributes<ParentElement>
     useSortableListNavigationChild: UseSortableListNavigationChild<ChildElement, C, K>;
     sortable: Omit<UseSortableChildrenReturnType<any, C, K, G>, "useSortableProps">;
 }
 
-export function useSortableListNavigation<ParentElement extends HTMLElement | SVGElement, ChildElement extends HTMLElement | SVGElement, C, K extends string>({ linearNavigation, listNavigation, managedChildren, rovingTabIndex, typeaheadNavigation }: UseSortableListNavigationParameters): UseSortableListNavigationReturnType<ParentElement, ChildElement, C, K, []> {
+export function useSortableListNavigation<ParentElement extends Element, ChildElement extends Element, C, K extends string>({ linearNavigation, listNavigation, managedChildren, rovingTabIndex, typeaheadNavigation }: UseSortableListNavigationParameters): UseSortableListNavigationReturnType<ParentElement, ChildElement, C, K, []> {
 
     const {
         indexDemangler,
@@ -436,7 +440,7 @@ export function useSortableListNavigation<ParentElement extends HTMLElement | SV
 
 }
 
-export type UseSortableListNavigationSingleSelectionChild<ParentElement extends HTMLElement | SVGElement, ChildElement extends HTMLElement | SVGElement, C, K extends string> = (args: UseListNavigationSingleSelectionChildParameters<C, K>) => UseListNavigationSingleSelectionChildReturnType<ParentElement, ChildElement, C, K | "selected">;
+export type UseSortableListNavigationSingleSelectionChild<ChildElement extends Element, C, K extends string> = (args: UseListNavigationSingleSelectionChildParameters<C, K>) => UseListNavigationSingleSelectionChildReturnType<ChildElement>;
 
 export interface UseSortableListNavigationSingleSelectionParameters {
     linearNavigation: UseListNavigationSingleSelectionParameters["linearNavigation"];
@@ -447,13 +451,13 @@ export interface UseSortableListNavigationSingleSelectionParameters {
     singleSelection: UseListNavigationSingleSelectionParameters["singleSelection"];
 }
 
-export interface UseSortableListNavigationSingleSelectionReturnType<ParentElement extends HTMLElement | SVGElement, ChildElement extends HTMLElement | SVGElement, C, K extends string, G extends any[]> extends Omit<UseListNavigationReturnType<ParentElement, ChildElement, C, K>, "useListNavigationChild" | "useListNavigationProps"> {
+export interface UseSortableListNavigationSingleSelectionReturnType<ParentElement extends Element, ChildElement extends Element, C, K extends string, G extends any[]> extends Omit<UseListNavigationReturnType<ParentElement, ChildElement, C, K>, "useListNavigationChild" | "useListNavigationProps"> {
     useSortableListNavigationSingleSelectionProps: (props: Omit<h.JSX.HTMLAttributes<ParentElement>, "children"> & { children: VNode<any>[]; }) => h.JSX.HTMLAttributes<ParentElement>
-    useSortableListNavigationSingleSelectionChild: UseSortableListNavigationSingleSelectionChild<ParentElement, ChildElement, C, K>;
+    useSortableListNavigationSingleSelectionChild: UseSortableListNavigationSingleSelectionChild<ChildElement, C, K>;
     sortable: Omit<UseSortableChildrenReturnType<any, C, K, G>, "useSortableProps">;
 }
 
-export function useSortableListNavigationSingleSelection<ParentElement extends HTMLElement | SVGElement, ChildElement extends HTMLElement | SVGElement, C, K extends string>({ linearNavigation, listNavigation, managedChildren, rovingTabIndex, singleSelection, typeaheadNavigation }: UseSortableListNavigationSingleSelectionParameters): UseSortableListNavigationSingleSelectionReturnType<ParentElement, ChildElement, C, K, []> {
+export function useSortableListNavigationSingleSelection<ParentElement extends Element, ChildElement extends Element, C, K extends string>({ linearNavigation, listNavigation, managedChildren, rovingTabIndex, singleSelection, typeaheadNavigation }: UseSortableListNavigationSingleSelectionParameters): UseSortableListNavigationSingleSelectionReturnType<ParentElement, ChildElement, C, K, []> {
 
     const {
         indexDemangler,
@@ -528,13 +532,13 @@ export function tryNavigateToIndex<ChildElement extends Element, C, K extends st
     const lower = 0;
 
     if (searchDirection === -1) {
-        while ((target >= lower && (children.getAt(target) == null) || !!children.getAt(target)?.subInfo.subInfo.hidden))
+        while ((target >= lower && (children.getAt(target) == null) || !!children.getAt(target)?.subInfo.hidden))
             target = indexDemangler(indexMangler(target) - 1);
 
         return target < lower ? indexDemangler(lower) : target;
     }
     else if (searchDirection === 1) {
-        while ((target <= upper && children.getAt(target) == null) || !!children.getAt(target)?.subInfo.subInfo.hidden)
+        while ((target <= upper && children.getAt(target) == null) || !!children.getAt(target)?.subInfo.hidden)
             target = indexDemangler(indexMangler(target) + 1);
 
         return target > upper ? indexDemangler(upper) : target;

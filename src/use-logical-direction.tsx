@@ -56,7 +56,7 @@ export interface LogicalElementSize {
  * * `convertToLogicalOrientation`: Based on the current direction, converts "horizontal" or "vertical" to "inline" or "block".
  * * `convertToPhysicalOrientation`:  Based on the current direction, converts "inline" or "block" to "horizontal" or "vertical".
  */
-export function useLogicalDirection<T extends HTMLElement | SVGElement>({ onLogicalDirectionChange }: UseLogicalDirectionParameters): UseLogicalDirectionReturnType<T> {
+export function useLogicalDirection<T extends Element>({ onLogicalDirectionChange }: UseLogicalDirectionParameters): UseLogicalDirectionReturnType<T> {
 
     useEnsureStability("useLogicalDirection", onLogicalDirectionChange);
 

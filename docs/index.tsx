@@ -258,7 +258,7 @@ export const DemoUseGrid = memo(() => {
 
     const [, setLastFocusedInner, _getLastFocusedInner] = useState(false);
     const { useHasFocusProps } = useHasFocus<HTMLTableSectionElement>({ onLastFocusedInnerChanged: setLastFocusedInner });
-    const { useGridNavigationRow, currentColumn, useGridNavigationProps } = useGridNavigation<HTMLTableSectionElement, HTMLTableRowElement, HTMLTableCellElement, {}, {}, string, string>({
+    const { useGridNavigationRow, useGridNavigationProps, children, gridNavigation: { currentColumn }, linearNavigation, listNavigation, rovingTabIndex, typeaheadNavigation } = useGridNavigation<HTMLTableSectionElement, HTMLTableRowElement, HTMLTableCellElement, {}, {}, string, string>({
         rovingTabIndex: {},
         linearNavigation: {},
         listNavigation: {},
@@ -296,8 +296,8 @@ const _Prefix = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const DemoUseGridRow = memo((({ index }: { index: number }) => {
     const [_randomWord] = useState(() => RandomWords[index/*Math.floor(Math.random() * (RandomWords.length - 1))*/]);
     const useGridRow = useContext(GridRowContext);
-    const { useGridNavigationRowProps, useGridNavigationCell } = useGridRow({
-        asChild: { managedChild: { index }, ls: { subInfo: {}, text: "", hidden: false }, rti: {} },
+    const { useGridNavigationRowProps, useGridNavigationCell, children, gn: { getCurrentColumn }, rovingTabIndex: { getElement, getTabbable, tabbable } } = useGridRow({
+        asChild: { managedChild: { index }, listNavigation: { subInfo: {}, text: "" }, rovingTabIndex: { hidden: false } },
         asParent: { linearNavigation: {}, listNavigation: {}, rovingTabIndex: {}, typeaheadNavigation: {}, managedChildren: {} }
     });
 
@@ -307,7 +307,7 @@ const DemoUseGridRow = memo((({ index }: { index: number }) => {
             <GridCellContext.Provider value={useGridNavigationCell}>
                 {Array.from((function* () {
                     for (let i = 0; i < 3; ++i) {
-                        yield <DemoUseGridCell index={i} key={i} row={index} />
+                        yield <DemoUseGridCell index={i} key={i} row={index} rowIsTabbable={tabbable} />
                     }
                 })())}
             </GridCellContext.Provider>
@@ -315,15 +315,15 @@ const DemoUseGridRow = memo((({ index }: { index: number }) => {
     )
 }));
 
-const DemoUseGridCell = (({ index, row }: { index: number, row: number }) => {
-    if (row >= 6 && row %2 == 0 && index > 1)
+const DemoUseGridCell = (({ index, row, rowIsTabbable }: { index: number, row: number, rowIsTabbable: boolean }) => {
+    if (row >= 6 && row % 2 == 0 && index > 1)
         return null;
 
     const useGridCell = useContext(GridCellContext);
-    const { useGridNavigationCellProps, cellIsTabbable, rowIsTabbable } = useGridCell({
-        ls: { subInfo: {}, text: "", hidden: false },
+    const { useGridNavigationCellProps, gn: { getCurrentColumn }, rovingTabIndex: { getElement, getTabbable, tabbable: cellIsTabbable } } = useGridCell({
+        listNavigation: { subInfo: {}, text: "" },
         managedChild: { index },
-        rti: {}
+        rovingTabIndex: { hidden: true }
     });
 
     const props = useGridNavigationCellProps({}) as any;
@@ -340,11 +340,11 @@ const DemoUseGridCell = (({ index, row }: { index: number, row: number }) => {
                 return <td><label><input  {...props} type="checkbox" /> Test input {t}</label></td>
         }
         else {
-                if (index === 1)
-                    return <td {...props} colSpan={2}>Grid cell #{index + 1}, span 2</td>
-                else
-                    return null;
-            
+            if (index === 1)
+                return <td {...props} colSpan={2}>Grid cell #{index + 1}, span 2</td>
+            else
+                return null;
+
         }
     }
 })
