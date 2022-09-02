@@ -11,7 +11,11 @@ export { generateRandomId }
 export type UseRandomIdPropsParameters = UseReferencedIdPropsParameters<"id">;
 export type UseRandomIdPropsReturnType<P extends UseRandomIdPropsParameters> = UseReferencedIdPropsReturnType<P, "id">;
 
-export interface UseRandomIdParameters extends UseManagedChildrenParameters<"referencer" | "source"> { prefix?: string; }
+export interface UseRandomIdParameters extends UseManagedChildrenParameters<"referencer" | "source", never> {
+    randomId: {
+        prefix?: string;
+    }
+}
 
 
 export type UseReferencedIdPropsParameters<K extends keyof h.JSX.HTMLAttributes<any>> = Partial<Record<K, any>>;//<E extends Element> extends h.JSX.HTMLAttributes<E> { };
@@ -64,7 +68,7 @@ export interface UseRandomIdReferencerElementReturnType<R extends Element> {
  * 
  * Unlike most other `use*Props` hooks, these are mostly stable.
  */
-export function useRandomId<S extends Element>({ prefix, managedChildren: { onAfterChildLayoutEffect, onChildrenMountChange } }: UseRandomIdParameters): UseRandomIdReturnType<S> {
+export function useRandomId<S extends Element>({ randomId: { prefix }, managedChildren: { onAfterChildLayoutEffect, onChildrenMountChange } }: UseRandomIdParameters): UseRandomIdReturnType<S> {
     const [backupRandomId, , getBackupRandomId] = useState<string>(() => generateRandomId(prefix));
     const [usedId, setUsedId, getUsedId] = useState<string | undefined>(() => getBackupRandomId());
     const mismatchErrorRef = useRef(false);

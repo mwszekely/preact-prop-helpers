@@ -1,7 +1,7 @@
 import { h } from "preact";
 import { StateUpdater, useCallback, useEffect, useRef } from "preact/hooks";
 import { useStableGetter } from "./use-stable-getter";
-import { ChildFlagOperations, ManagedChildInfo, OnChildrenMountChange, useChildrenFlag, useManagedChildren, UseManagedChildrenParameters, UseManagedChildrenReturnType } from "./use-child-manager";
+import { ChildFlagOperations, ManagedChildOmits, ManagedChildrenOmits, OnChildrenMountChange, useChildrenFlag, UseManagedChildParameters, useManagedChildren, UseManagedChildrenParameters, UseManagedChildrenReturnTypeInfo } from "./use-child-manager";
 import { useHasFocus } from "./use-has-focus";
 import { useMergedProps } from "./use-merged-props";
 import { returnZero, usePassiveState } from "./use-passive-state";
@@ -30,24 +30,23 @@ export interface UseRovingTabIndexSubInfo<E extends Element, C> {
     subInfo: C;
 }
 
-export interface UseRovingTabIndexParameters extends UseManagedChildrenParameters<number> {
-    rovingTabIndex: {
-        // Called during an effect after the component has rendered itself in a tabbable state
-        onTabbableRender?: (index: number) => void;
+interface RTIP {
+    // Called during an effect after the component has rendered itself in a tabbable state
+    onTabbableRender?: (index: number) => void;
 
-        onTabbableIndexChange?: OnTabbableIndexChange;
+    onTabbableIndexChange?: OnTabbableIndexChange;
 
-        onTabbedInTo?: () => void;
-        onTabbedOutOf?: () => void;
+    onTabbedInTo?: () => void;
+    onTabbedOutOf?: () => void;
 
-        initialIndex?: number;
-    }
+    initialIndex?: number;
+}
+export type RovingTabIndexParametersOmits = keyof RTIP;
+export interface UseRovingTabIndexParameters<RtiOmits extends RovingTabIndexParametersOmits, McOmits extends ManagedChildrenOmits> extends UseManagedChildrenParameters<number, McOmits> {
+    rovingTabIndex: Omit<RTIP, RtiOmits>;
 }
 
-export interface UseRovingTabIndexReturnType<ChildElement extends Element, RtiSubInfo, ExtraFlagKeys extends string> extends Omit<UseManagedChildrenReturnType<number, UseRovingTabIndexSubInfo<ChildElement, RtiSubInfo>, ExtraFlagKeys | "tabbable">, "useManagedChild"> {
-    /** **STABLE** */
-    useRovingTabIndexChild: UseRovingTabIndexChild<ChildElement, RtiSubInfo, ExtraFlagKeys>;
-
+export interface UseRovingTabIndexReturnTypeInfo {
     rovingTabIndex: {
         /** **STABLE** */
         setTabbableIndex: (updater: Parameters<StateUpdater<number | null>>[0], fromUserInteraction: boolean) => void;
@@ -58,14 +57,26 @@ export interface UseRovingTabIndexReturnType<ChildElement extends Element, RtiSu
     }
 }
 
-
-
-export interface UseRovingTabIndexChildParameters<RtiSubInfo, ExtraFlagKeys extends string> {
-    managedChild: Omit<ManagedChildInfo<number, UseRovingTabIndexSubInfo<any, RtiSubInfo>, ExtraFlagKeys | "tabbable">, "subInfo">;
-    rovingTabIndex: Partial<Omit<UseRovingTabIndexSubInfo<any, any>, "getElement">> & Pick<UseRovingTabIndexSubInfo<any, any>, "subInfo">;
+export interface UseRovingTabIndexReturnTypeWithHooks<ChildElement extends Element, RtiSubInfo, ExtraFlagKeys extends string> extends
+    UseManagedChildrenReturnTypeInfo<number, UseRovingTabIndexSubInfo<ChildElement, RtiSubInfo>, ExtraFlagKeys | "tabbable">,
+    UseRovingTabIndexReturnTypeInfo
+//Omit<UseManagedChildrenReturnType<number, UseRovingTabIndexSubInfo<ChildElement, RtiSubInfo>, ExtraFlagKeys | "tabbable">, "useManagedChild"> 
+{
+    /** **STABLE** */
+    useRovingTabIndexChild: UseRovingTabIndexChild<ChildElement, RtiSubInfo, ExtraFlagKeys>;
 }
 
-export type UseRovingTabIndexChild<ChildElement extends Element, RtiSubInfo, ExtraFlagKeys extends string> = (a: UseRovingTabIndexChildParameters<RtiSubInfo, ExtraFlagKeys>) => UseRovingTabIndexChildReturnType<ChildElement>;
+//interface MCCP<RtiSubInfo, ExtraFlagKeys extends string> extends Omit<ManagedChildInfo<number, UseRovingTabIndexSubInfo<any, RtiSubInfo>, ExtraFlagKeys | "tabbable">, "subInfo"> {}
+
+export type RovingTabIndexChildOmits = keyof UseRovingTabIndexSubInfo<any, any>;
+
+export interface UseRovingTabIndexChildParameters<RtiSubInfo, ExtraFlagKeys extends string, RticOmits extends RovingTabIndexChildOmits, McOmits extends ManagedChildOmits, SubbestInfo> extends
+    UseManagedChildParameters<number, UseRovingTabIndexSubInfo<any, RtiSubInfo>, ExtraFlagKeys | "tabbable", McOmits | "subInfo"> {
+    rovingTabIndex: Omit<Partial<Omit<UseRovingTabIndexSubInfo<any, any>, "getElement" | "subInfo">>, RticOmits>;
+    subInfo: SubbestInfo;
+}
+
+export type UseRovingTabIndexChild<ChildElement extends Element, RtiSubInfo, ExtraFlagKeys extends string> = (a: UseRovingTabIndexChildParameters<RtiSubInfo, ExtraFlagKeys, never, never, RtiSubInfo>) => UseRovingTabIndexChildReturnType<ChildElement>;
 
 export interface UseRovingTabIndexChildReturnType<ChildElement extends Element> {
     /** *Unstable* */
@@ -109,7 +120,7 @@ export interface UseRovingTabIndexChildReturnType<ChildElement extends Element> 
  * And just as well! Children should be allowed at the root, 
  * regardless of if it's the whole app or just a given component.
  */
-export function useRovingTabIndex<ChildElement extends Element, RtiSubInfo, ExtraFlagKeys extends string>(parentParameters: UseRovingTabIndexParameters): UseRovingTabIndexReturnType<ChildElement, RtiSubInfo, ExtraFlagKeys> {
+export function useRovingTabIndex<ChildElement extends Element, RtiSubInfo, ExtraFlagKeys extends string>(parentParameters: UseRovingTabIndexParameters<never, never>): UseRovingTabIndexReturnTypeWithHooks<ChildElement, RtiSubInfo, ExtraFlagKeys> {
 
     let { rovingTabIndex: { initialIndex, onTabbedInTo, onTabbedOutOf, onTabbableRender, onTabbableIndexChange }, managedChildren: { onAfterChildLayoutEffect, onChildrenMountChange } } = parentParameters;
 
@@ -172,7 +183,7 @@ export function useRovingTabIndex<ChildElement extends Element, RtiSubInfo, Extr
 
     const useRovingTabIndexChild = useCallback<UseRovingTabIndexChild<ChildElement, RtiSubInfo, ExtraFlagKeys>>((childParameters) => {
 
-        const { managedChild: { index, flags }, rovingTabIndex: { hidden, subInfo, blurSelf: blurSelfOverride, focusSelf: focusSelfOverride } } = childParameters;
+        const { subInfo, managedChild: { index, flags }, rovingTabIndex: { hidden, blurSelf: blurSelfOverride, focusSelf: focusSelfOverride } } = childParameters;
 
         useEffect(() => {
             reevaluateClosestFit();

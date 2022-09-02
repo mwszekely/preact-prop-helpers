@@ -45,37 +45,34 @@ export interface ManagedChildInfo<T extends string | number, C, K extends string
 export type OnChildrenMountChange<T extends string | number> = ((mounted: Set<T>, unmounted: Set<T>) => void);
 export type OnAfterChildLayoutEffect<T extends string | number> = ((causers: Iterable<T>) => void);
 
-export interface UseManagedChildrenParameters<T extends number | string> {
-    managedChildren: {
-        /**
-         * Runs after one or more children have updated their information (index, etc.).
-         * 
-         * Only one will run per tick, just like layoutEffect, but it isn't
-         * *guaranteed* to have actually been a change.
-         */
-        onAfterChildLayoutEffect?: null | undefined | OnAfterChildLayoutEffect<T>;
-
-        /**
-         * Same as the above, but only for mount/unmount (or when a child changes its index)
-         */
-        onChildrenMountChange?: null | undefined | OnChildrenMountChange<T>;
-    };
-}
-
-export interface UseManagedChildParameters<T extends number | string, C, K extends string> {
-    managedChild: ManagedChildInfo<T, C, K>;
-}
-
-export interface UseManagedChildrenReturnType<T extends number | string, C, K extends string> {
+interface MCP<T extends number | string> {
     /**
-     * A hook that must be called by every child component that
-     * is to be managed by this one. The argument to the hook
-     * is just the bag of properties to pass to the parent,
-     * including the child's index.
+     * Runs after one or more children have updated their information (index, etc.).
      * 
-     * **STABLE**
+     * Only one will run per tick, just like layoutEffect, but it isn't
+     * *guaranteed* to have actually been a change.
      */
-    useManagedChild: UseManagedChild<T, C, K>;
+    onAfterChildLayoutEffect?: null | undefined | OnAfterChildLayoutEffect<T>;
+
+    /**
+     * Same as the above, but only for mount/unmount (or when a child changes its index)
+     */
+    onChildrenMountChange?: null | undefined | OnChildrenMountChange<T>;
+}
+
+export type ManagedChildrenOmits = keyof MCP<any>;
+export type ManagedChildOmits = keyof ManagedChildInfo<any, any, any>;
+
+export interface UseManagedChildrenParameters<T extends number | string, Omits extends keyof MCP<T>> {
+    managedChildren: Omit<MCP<T>, Omits>;
+}
+
+export interface UseManagedChildParameters<T extends number | string, C, K extends string, McOmits extends ManagedChildOmits> {
+    managedChild: Omit<ManagedChildInfo<T, C, K>, McOmits>;
+}
+
+
+export interface UseManagedChildrenReturnTypeInfo<T extends number | string, C, K extends string> {
     /**
      * Returns information about the child that rendered itself with the requested key.
      * 
@@ -86,9 +83,21 @@ export interface UseManagedChildrenReturnType<T extends number | string, C, K ex
     }
 }
 
+export interface UseManagedChildrenReturnTypeWithHooks<T extends number | string, C, K extends string> extends UseManagedChildrenReturnTypeInfo<T, C, K> {
+    /**
+     * A hook that must be called by every child component that
+     * is to be managed by this one. The argument to the hook
+     * is just the bag of properties to pass to the parent,
+     * including the child's index.
+     * 
+     * **STABLE**
+     */
+    useManagedChild: UseManagedChild<T, C, K>;
+}
+
 export type UseManagedChildReturnType = void;
 
-export type UseManagedChild<T extends number | string, C, K extends string> = (a: UseManagedChildParameters<T, C, K>) => UseManagedChildReturnType;
+export type UseManagedChild<T extends number | string, C, K extends string> = (a: UseManagedChildParameters<T, C, K, never>) => UseManagedChildReturnType;
 
 
 
@@ -125,7 +134,7 @@ export interface ManagedChildren<T extends number | string, C, K extends string>
  * 
  * 
  */
-export function useManagedChildren<T extends number | string, C, K extends string>(parentParameters: UseManagedChildrenParameters<T>): UseManagedChildrenReturnType<T, C, K> {
+export function useManagedChildren<T extends number | string, C, K extends string>(parentParameters: UseManagedChildrenParameters<T, never>): UseManagedChildrenReturnTypeWithHooks<T, C, K> {
     //type I = I3 & ManagedChildInfoBase<string | number>;
     type Info = ManagedChildInfo<T, C, K>;
 
@@ -157,7 +166,7 @@ export function useManagedChildren<T extends number | string, C, K extends strin
 
     // Retrieves the information associated with the child with the given index.
     // `undefined` if not child there, or it's unmounted.
-    const getManagedChildInfo = useCallback<UseManagedChildrenReturnType<T, C, K>["managedChildren"]["children"]["getAt"]>((index: T) => {
+    const getManagedChildInfo = useCallback<ManagedChildren<T, C, K>["getAt"]>((index: T) => {
         if (typeof index == "number")
             return managedChildrenArray.current.arr[index as number]!;
         else
