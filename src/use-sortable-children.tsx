@@ -207,7 +207,7 @@ export interface UseRearrangeableChildrenReturnTypeWithHooks<ParentElement exten
 
 }
 
-export interface UseSortableChildrenReturnTypeInfo<C, K extends string, G extends any[]> {
+export interface UseSortableChildrenReturnTypeInfo<C, K extends string, G extends any[]> extends UseRearrangeableChildrenReturnTypeInfo<C, K> {
     sortableChildren: {/** **STABLE** */
         sort: (managedRows: ManagedChildren<number, C, K>, direction: "ascending" | "descending", ...args: G) => Promise<void> | void;
         /** **STABLE** */
@@ -215,8 +215,7 @@ export interface UseSortableChildrenReturnTypeInfo<C, K extends string, G extend
     }
 }
 export interface UseSortableChildrenReturnTypeWithHooks<ParentElement extends Element, C, K extends string, G extends any[]> extends
-    UseSortableChildrenReturnTypeInfo<C, K, G>,
-    UseRearrangeableChildrenReturnTypeInfo<C, K> {
+    UseSortableChildrenReturnTypeInfo<C, K, G> {
     /** **STABLE** */
     useSortableProps: (props: Omit<h.JSX.HTMLAttributes<ParentElement>, "children"> & { children?: VNode<any>[] | undefined; }) => h.JSX.HTMLAttributes<ParentElement>;
 }

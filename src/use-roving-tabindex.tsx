@@ -46,7 +46,7 @@ export interface UseRovingTabIndexParameters<RtiOmits extends RovingTabIndexPara
     rovingTabIndex: Omit<RTIP, RtiOmits>;
 }
 
-export interface UseRovingTabIndexReturnTypeInfo {
+export interface UseRovingTabIndexReturnTypeInfo<RtiSubInfo, ExtraFlagKeys extends string> extends UseManagedChildrenReturnTypeInfo<number, RtiSubInfo, ExtraFlagKeys> {
     rovingTabIndex: {
         /** **STABLE** */
         setTabbableIndex: (updater: Parameters<StateUpdater<number | null>>[0], fromUserInteraction: boolean) => void;
@@ -58,15 +58,11 @@ export interface UseRovingTabIndexReturnTypeInfo {
 }
 
 export interface UseRovingTabIndexReturnTypeWithHooks<ChildElement extends Element, RtiSubInfo, ExtraFlagKeys extends string> extends
-    UseManagedChildrenReturnTypeInfo<number, UseRovingTabIndexSubInfo<ChildElement, RtiSubInfo>, ExtraFlagKeys | "tabbable">,
-    UseRovingTabIndexReturnTypeInfo
-//Omit<UseManagedChildrenReturnType<number, UseRovingTabIndexSubInfo<ChildElement, RtiSubInfo>, ExtraFlagKeys | "tabbable">, "useManagedChild"> 
+    UseRovingTabIndexReturnTypeInfo<UseRovingTabIndexSubInfo<ChildElement, RtiSubInfo>, ExtraFlagKeys | "tabbable">
 {
     /** **STABLE** */
     useRovingTabIndexChild: UseRovingTabIndexChild<ChildElement, RtiSubInfo, ExtraFlagKeys>;
 }
-
-//interface MCCP<RtiSubInfo, ExtraFlagKeys extends string> extends Omit<ManagedChildInfo<number, UseRovingTabIndexSubInfo<any, RtiSubInfo>, ExtraFlagKeys | "tabbable">, "subInfo"> {}
 
 export type RovingTabIndexChildOmits = keyof UseRovingTabIndexSubInfo<any, any>;
 
@@ -76,11 +72,9 @@ export interface UseRovingTabIndexChildParameters<RtiSubInfo, ExtraFlagKeys exte
     subInfo: SubbestInfo;
 }
 
-export type UseRovingTabIndexChild<ChildElement extends Element, RtiSubInfo, ExtraFlagKeys extends string> = (a: UseRovingTabIndexChildParameters<RtiSubInfo, ExtraFlagKeys, never, never, RtiSubInfo>) => UseRovingTabIndexChildReturnType<ChildElement>;
+export type UseRovingTabIndexChild<ChildElement extends Element, RtiSubInfo, ExtraFlagKeys extends string> = (a: UseRovingTabIndexChildParameters<RtiSubInfo, ExtraFlagKeys, never, never, RtiSubInfo>) => UseRovingTabIndexChildReturnTypeWithHooks<ChildElement>;
 
-export interface UseRovingTabIndexChildReturnType<ChildElement extends Element> {
-    /** *Unstable* */
-    useRovingTabIndexChildProps: (props: h.JSX.HTMLAttributes<ChildElement>) => h.JSX.HTMLAttributes<ChildElement>;
+export interface UseRovingTabIndexChildReturnTypeInfo<ChildElement extends Element> {
     rovingTabIndex: {
         tabbable: boolean;
         /** **STABLE** */
@@ -88,6 +82,10 @@ export interface UseRovingTabIndexChildReturnType<ChildElement extends Element> 
         /** **STABLE** */
         getElement(): ChildElement | null;
     }
+}
+export interface UseRovingTabIndexChildReturnTypeWithHooks<ChildElement extends Element> extends UseRovingTabIndexChildReturnTypeInfo<ChildElement> {
+    /** *Unstable* */
+    useRovingTabIndexChildProps: (props: h.JSX.HTMLAttributes<ChildElement>) => h.JSX.HTMLAttributes<ChildElement>;
 }
 
 

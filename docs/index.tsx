@@ -301,7 +301,7 @@ const DemoUseGridRow = memo((({ index }: { index: number }) => {
         useGridNavigationCell,
         asChildRow: { rovingTabIndex: { tabbable } },
     } = useGridRow({
-        asChildRowOfSection: { managedChild: { index }, listNavigation: { text: "", subInfo: {} }, rovingTabIndex: { hidden: index == 3 } },
+        asChildRowOfSection: { managedChild: { index }, listNavigation: { text: "" }, rovingTabIndex: { hidden: index == 3 }, subInfo: {} },
         asParentRowOfCells: { linearNavigation: {}, listNavigation: {}, rovingTabIndex: {}, typeaheadNavigation: {}, managedChildren: {} },
     });
 
@@ -323,16 +323,17 @@ const DemoUseGridCell = (({ index, row, rowIsTabbable }: { index: number, row: n
     if (row >= 6 && row % 2 == 0 && index > 1)
         return null;
 
-    let hiddenText = (row === 3)? " (row hidden)" : ""
+    let hiddenText = (row === 3) ? " (row hidden)" : ""
 
     const useGridCell = useContext(GridCellContext);
     const {
         useGridNavigationCellProps,
         rovingTabIndex: { tabbable: cellIsTabbable }
     } = useGridCell({
-        listNavigation: { text: "", subInfo: {} },
+        listNavigation: { text: "" },
         managedChild: { index },
         rovingTabIndex: { hidden: false },
+        subInfo: {},
     });
 
     const props = useGridNavigationCellProps({}) as any;

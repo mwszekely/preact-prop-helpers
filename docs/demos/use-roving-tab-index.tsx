@@ -36,7 +36,7 @@ export const DemoUseRovingTabIndex = memo(() => {
         useSortableListNavigationSingleSelectionProps,
         rovingTabIndex: { setTabbableIndex },
         typeaheadNavigation: { currentTypeahead },
-        sortable: { shuffle }
+        sortableChildren: { shuffle },
     } = useSortableListNavigationSingleSelection<HTMLUListElement, HTMLLIElement, {}, string>({
         linearNavigation: {},
         listNavigation: {},
@@ -104,10 +104,10 @@ const DemoUseRovingTabIndexChild = memo((({ index, setSelectedIndex }: { index: 
     const [randomWord] = useState(() => RandomWords[index/*Math.floor(Math.random() * (RandomWords.length - 1))*/]);
     const useRovingTabIndexChild = useContext(RovingChildContext);
     const text = `${randomWord} This is item #${index}${hidden ? " (hidden)" : ""}`;
-    const { useListNavigationChildProps, rovingTabIndex: { tabbable }, singleSelection: { selected } } = useRovingTabIndexChild({ managedChild: { index }, listNavigation: { subInfo: {}, text }, rovingTabIndex: { hidden } });
+    const { useListNavigationSingleSelectionChildProps, rovingTabIndex: { tabbable }, singleSelection: { selected } } = useRovingTabIndexChild({ managedChild: { index }, listNavigation: { text }, rovingTabIndex: { hidden }, subInfo: {} });
 
-    const props = useListNavigationChildProps({});
+    const props = useListNavigationSingleSelectionChildProps({});
     return (
-        <li {...props} onClick={() => setSelectedIndex(index)}>{text} ({tabbable ? "Tabbable" : "Not tabbable"}, {selected ? "Selected" : "Not selected"})<input {...useListNavigationChildProps({ type: "number" }) as any} style={{ width: "5ch" }} /></li>
+        <li {...props} onClick={() => setSelectedIndex(index)}>{text} ({tabbable ? "Tabbable" : "Not tabbable"}, {selected ? "Selected" : "Not selected"})<input {...useListNavigationSingleSelectionChildProps({ type: "number" }) as any} style={{ width: "5ch" }} /></li>
     )
 }));
