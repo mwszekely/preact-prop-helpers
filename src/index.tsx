@@ -28,7 +28,7 @@ export { useMergedStyles } from "./use-merged-styles";
 export { useMutationObserver } from "./use-mutation-observer";
 export { returnFalse, returnNull, returnTrue, returnUndefined, returnZero, usePassiveState } from "./use-passive-state";
 export { getFromLocalStorage, storeToLocalStorage, usePersistentState } from "./use-persistent-state";
-export { generateRandomId, useRandomId, UseRandomIdParameters, UseRandomIdPropsParameters, UseRandomIdPropsReturnType, UseRandomIdReferencerElement, UseRandomIdReferencerElementReturnType, UseRandomIdReturnType, UseRandomIdSourceElement, UseRandomIdSourceElementReturnType, UseReferencedIdPropsParameters, UseReferencedIdPropsReturnType } from "./use-random-id";
+export { generateRandomId, useRandomId, UseRandomIdParameters, UseRandomIdPropsParameters, UseRandomIdPropsReturnType, UseRandomIdReferencerElement, UseRandomIdReferencerElementReturnType, UseRandomIdReturnTypeWithHooks, UseRandomIdReturnTypeInfo, UseRandomIdSourceElement, UseRandomIdSourceElementReturnType, UseReferencedIdPropsParameters, UseReferencedIdPropsReturnType } from "./use-random-id";
 export { useRefElement, UseRefElementParameters, UseRefElementReturnType } from "./use-ref-element";
 export { useRovingTabIndex, UseRovingTabIndexChild, UseRovingTabIndexParameters, OnTabbableIndexChange, UseRovingTabIndexChildParameters, UseRovingTabIndexChildReturnTypeInfo, UseRovingTabIndexChildReturnTypeWithHooks, UseRovingTabIndexReturnTypeInfo, UseRovingTabIndexReturnTypeWithHooks, UseRovingTabIndexSubInfo } from "./use-roving-tabindex";
 export { useSortableChildren, UseSortableChildrenParameters } from "./use-sortable-children";

@@ -1,7 +1,7 @@
 import { h } from "preact";
 import { useCallback, useEffect, useRef } from "preact/hooks";
 import { generateRandomId } from "./use-before-layout-effect";
-import { useManagedChildren, UseManagedChildrenParameters } from "./use-child-manager";
+import { useManagedChildren, UseManagedChildrenParameters, UseManagedChildrenReturnTypeInfo } from "./use-child-manager";
 import { useMergedProps } from "./use-merged-props";
 import { useEnsureStability } from "./use-passive-state";
 import { useRefElement } from "./use-ref-element";
@@ -23,14 +23,19 @@ export type UseReferencedIdPropsParameters<K extends keyof h.JSX.HTMLAttributes<
 
 export type UseReferencedIdPropsReturnType<P extends UseReferencedIdPropsParameters<any>, K extends keyof h.JSX.HTMLAttributes<any>> = Omit<P, K> & Record<K, string>;
 
-export interface UseRandomIdReturnType<S extends Element> {
+export interface UseRandomIdReturnTypeInfo extends UseManagedChildrenReturnTypeInfo<"referencer" | "source", {}, never> {
+    randomId: {
+        usedId: string | undefined;
+        /** **STABLE** */
+        getUsedId(): string | undefined;
+    }
+}
+
+export interface UseRandomIdReturnTypeWithHooks<S extends Element> extends UseRandomIdReturnTypeInfo {
     /** **STABLE** */
     useRandomIdSourceElement: UseRandomIdSourceElement<S>;
     /** **STABLE** */
     useRandomIdReferencerElement: UseRandomIdReferencerElement;
-    usedId: string | undefined;
-    /** **STABLE** */
-    getUsedId(): string | undefined;
 }
 
 interface RandomIdChildInfoBase {
@@ -68,13 +73,14 @@ export interface UseRandomIdReferencerElementReturnType<R extends Element> {
  * 
  * Unlike most other `use*Props` hooks, these are mostly stable.
  */
-export function useRandomId<S extends Element>({ randomId: { prefix }, managedChildren: { onAfterChildLayoutEffect, onChildrenMountChange } }: UseRandomIdParameters): UseRandomIdReturnType<S> {
+export function useRandomId<S extends Element>({ randomId: { prefix }, managedChildren: { onAfterChildLayoutEffect, onChildrenMountChange } }: UseRandomIdParameters): UseRandomIdReturnTypeWithHooks<S> {
     const [backupRandomId, , getBackupRandomId] = useState<string>(() => generateRandomId(prefix));
     const [usedId, setUsedId, getUsedId] = useState<string | undefined>(() => getBackupRandomId());
     const mismatchErrorRef = useRef(false);
     useEnsureStability("useRandomId", prefix);
 
-    const { useManagedChild, managedChildren: { children } } = useManagedChildren<"referencer" | "source", RandomIdChildInfoBase, never>({ managedChildren: { onAfterChildLayoutEffect, onChildrenMountChange } });
+    const { useManagedChild, ...managedChildrenReturnType } = useManagedChildren<"referencer" | "source", RandomIdChildInfoBase, never>({ managedChildren: { onAfterChildLayoutEffect, onChildrenMountChange } });
+    const { managedChildren: { children } } = managedChildrenReturnType;
 
     const useRandomIdSourceElement = useCallback<UseRandomIdSourceElement<S>>(() => {
         const [usedIdLocal, setUsedIdLocal, getUsedIdLocal] = useState(getUsedId());
@@ -133,8 +139,11 @@ export function useRandomId<S extends Element>({ randomId: { prefix }, managedCh
     }, []);
 
     return {
-        usedId,
-        getUsedId,
+        randomId: {
+            usedId,
+            getUsedId
+        },
+        ...managedChildrenReturnType,
         useRandomIdSourceElement,
         useRandomIdReferencerElement
     };
