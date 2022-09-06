@@ -106,13 +106,13 @@ export interface UseActiveElementParameters<T extends Node> {
     /**
      * Called any time the active element changes. Must be stable.
      */
-    onActiveElementChange?: OnPassiveStateChange<T | null>;
+    onActiveElementChange?: OnPassiveStateChange<Element | null>;
 
     /**
      * Called any time the active element changes and is not null. 
      * Must be stable.
      */
-    onLastActiveElementChange?: OnPassiveStateChange<T>;
+    onLastActiveElementChange?: OnPassiveStateChange<Element>;
 
     /**
      * Called any time the window gains/loses focus. Must be stable.
@@ -129,12 +129,12 @@ export interface UseActiveElementReturnType<T extends Node> extends Omit<UseRefE
      * Returns whatever element is currently focused, or `null` if there's no focused element
      * **STABLE**
      */
-    getActiveElement: () => T | null;
+    getActiveElement: () => Element | null;
     /** 
      * Returns whatever element is currently focused, or whatever element was most recently focused if there's no focused element
      * **STABLE**
      */
-    getLastActiveElement: () => T;
+    getLastActiveElement: () => Element;
     /** 
      * Returns if the window itself has focus or not
      * **STABLE**
@@ -207,8 +207,8 @@ export function useActiveElement<T extends Node>({ onActiveElementChange, onLast
         }, [])
     })
 
-    const [getActiveElement, setActiveElement] = usePassiveState<T | null>(onActiveElementChange, returnNull);
-    const [getLastActiveElement, setLastActiveElement] = usePassiveState<T>(onLastActiveElementChange, returnNull as () => never);
+    const [getActiveElement, setActiveElement] = usePassiveState<Element | null>(onActiveElementChange, returnNull);
+    const [getLastActiveElement, setLastActiveElement] = usePassiveState<Element>(onLastActiveElementChange, returnNull as () => never);
     const [getWindowFocused, setWindowFocused] = usePassiveState<boolean>(onWindowFocusedChange, returnTrue);
 
     return { getElement, useActiveElementProps: useRefElementProps, getActiveElement, getLastActiveElement, getWindowFocused };

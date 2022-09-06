@@ -66,7 +66,7 @@ export function useFocusTrap<E extends HTMLElement>({ trapActive }: UseFocusTrap
 
             // Save the currently focused element
             // to whatever's currently at the top of the stack
-            elementsToRestoreFocusTo.set(getTopElement(), (getLastActiveElement() as (Node & HTMLOrSVGElement)) ?? document.body);
+            elementsToRestoreFocusTo.set(getTopElement(), (getLastActiveElement() as (Element & HTMLOrSVGElement)) ?? document.body);
         }
     }, [trapActive]);
 

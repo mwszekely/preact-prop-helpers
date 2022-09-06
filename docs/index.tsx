@@ -218,8 +218,8 @@ const DemoUseAsyncHandler2 = memo(() => {
 
 
 const DemoFocus = memo(() => {
-    const [lastActiveElement, setLastActiveElement] = useState<(Element & HTMLOrSVGElement) | null>(null);
-    const [activeElement, setActiveElement] = useState<(Element & HTMLOrSVGElement) | null>(null);
+    const [lastActiveElement, setLastActiveElement] = useState<(Element) | null>(null);
+    const [activeElement, setActiveElement] = useState<(Element) | null>(null);
     const [windowFocused, setWindowFocused] = useState(false);
     const [focused, setFocused] = useState(false);
     const [focusedInner, setFocusedInner] = useState(false);
