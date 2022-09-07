@@ -32,7 +32,7 @@ export interface UseGridNavigationRowParameters<
     RtiChildOmits extends RovingTabIndexChildOmits,
     McChildOmits extends ManagedChildOmits
 
-> {
+    > {
     asParentRowOfCells: UseListNavigationParameters<LsOmits, LnOmits | "navigationDirection", TnOmits, RtiOmits, McOmits>;
     asChildRowOfSection: UseListNavigationChildParameters<CR, KR, LsChildOmits, RtiChildOmits, McChildOmits>
 
@@ -99,7 +99,11 @@ export function useGridNavigation<
 }: UseGridNavigationParameters<never, never, never, never, never>): UseGridNavigationReturnTypeWithHooks<ParentOrRowElement, RowElement, CellElement, RowSubInfo, CellSubInfo, RowExtraFlags, CellExtraFlags> {
     const [currentColumn, setCurrentColumn, getCurrentColumn] = useState<number | null>(rti.initialIndex ?? 0);
 
-    const parentLsReturnType = useListNavigation<ParentOrRowElement, RowElement, RowSubInfo, RowExtraFlags>({
+    const {
+        useListNavigationChild: useListNavigationChildAsGridRow,
+        useListNavigationProps: useListNavigationPropsAsGridParent,
+        ...parentLsReturnType
+    } = useListNavigation<ParentOrRowElement, RowElement, RowSubInfo, RowExtraFlags>({
         managedChildren: mc,
         rovingTabIndex: rti,
         listNavigation: ls,
@@ -107,7 +111,6 @@ export function useGridNavigation<
         typeaheadNavigation: tn,
     });
 
-    const { useListNavigationChild: useListNavigationChildAsGridRow, useListNavigationProps: useListNavigationPropsAsGridParent } = parentLsReturnType;
 
     const useGridNavigationRow = useCallback<UseGridNavigationRow<RowElement, CellElement, RowSubInfo, CellSubInfo, RowExtraFlags, CellExtraFlags>>(({ asChildRowOfSection: asChild, asParentRowOfCells: asParent }) => {
         // Override the focusSelf that rovingTabIndex does.
