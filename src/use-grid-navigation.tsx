@@ -30,16 +30,16 @@ export interface UseGridNavigationRowParameters<
 
     LsChildOmits extends ListNavigationChildOmits,
     RtiChildOmits extends RovingTabIndexChildOmits,
-    McChildOmits extends ManagedChildOmits
+    McChildOmits extends ManagedChildOmits,
 
+    SubbestInfo
     > {
     asParentRowOfCells: UseListNavigationParameters<LsOmits, LnOmits | "navigationDirection", TnOmits, RtiOmits, McOmits>;
-    asChildRowOfSection: UseListNavigationChildParameters<CR, KR, LsChildOmits, RtiChildOmits, McChildOmits>
+    asChildRowOfSection: UseListNavigationChildParameters<CR, KR, LsChildOmits, RtiChildOmits, McChildOmits, SubbestInfo>
 
 }
-export interface UseGridNavigationCellParameters<CC, KC extends string, LsChildOmits extends ListNavigationChildOmits, RtiChildOmits extends RovingTabIndexChildOmits, McChildOmits extends ManagedChildOmits> extends
-    UseListNavigationChildParameters<CC, KC, LsChildOmits, RtiChildOmits, McChildOmits> {
-
+export interface UseGridNavigationCellParameters<CC, KC extends string, LsChildOmits extends ListNavigationChildOmits, RtiChildOmits extends RovingTabIndexChildOmits, McChildOmits extends ManagedChildOmits, SubbestInfo> extends
+    UseListNavigationChildParameters<CC, KC, LsChildOmits, RtiChildOmits, McChildOmits, SubbestInfo> {
 }
 
 
@@ -78,8 +78,8 @@ export interface UseGridNavigationCellReturnTypeWithHooks<Cell extends Element> 
 }
 
 
-export type UseGridNavigationRow<Row extends Element, Cell extends Element, CR, CC, KR extends string, KC extends string> = (a: UseGridNavigationRowParameters<CR, KR, never, never, never, never, never, never, never, never>) => UseGridNavigationRowReturnTypeWithHooks<Row, Cell, CC, KC>;
-export type UseGridNavigationCell<Cell extends Element, CC, KC extends string> = (p: UseGridNavigationCellParameters<CC, KC, never, never, never>) => UseGridNavigationCellReturnTypeWithHooks<Cell>;
+export type UseGridNavigationRow<Row extends Element, Cell extends Element, CR, CC, KR extends string, KC extends string> = (a: UseGridNavigationRowParameters<CR, KR, never, never, never, never, never, never, never, never, CR>) => UseGridNavigationRowReturnTypeWithHooks<Row, Cell, CC, KC>;
+export type UseGridNavigationCell<Cell extends Element, CC, KC extends string> = (p: UseGridNavigationCellParameters<CC, KC, never, never, never, CC>) => UseGridNavigationCellReturnTypeWithHooks<Cell>;
 
 
 export function useGridNavigation<
