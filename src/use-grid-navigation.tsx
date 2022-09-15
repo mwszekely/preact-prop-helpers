@@ -118,7 +118,6 @@ export function useGridNavigation<
         // to our current column to focus itself.
         const focusSelf = useStableCallback(() => {
             const c2 = getCurrentColumn();
-            console.log(`row #${asChild.managedChild.index},${c2} focusSelf`);
             if (asChild.rovingTabIndex.focusSelf) {
                 asChild.rovingTabIndex.focusSelf();
             }
@@ -159,7 +158,6 @@ export function useGridNavigation<
             //rti.hidden || rowHidden;
 
             const focusSelf = useStableCallback(() => {
-                console.log(`cell #${managedChild.index} focusSelf`);
                 setCurrentColumn(managedChild.index);
                 setTabbableIndex(managedChild.index, false);
                 if (fs)

@@ -193,11 +193,9 @@ export function useRovingTabIndex<ChildElement extends Element, RtiSubInfo, Extr
         const focusSelf = useCallback(() => {
             const fs = fsOverride();
             if (fs) {
-                console.log(`useRovingTabIndexChild[${index}].focusSelf (override)`);
                 fs();
             }
             else {
-                console.log(`useRovingTabIndexChild[${index}].focusSelf (default)`);
                 const element = getElement() as (Element & Partial<HTMLElement>);
                 if (element)
                     element.focus?.();
@@ -206,11 +204,9 @@ export function useRovingTabIndex<ChildElement extends Element, RtiSubInfo, Extr
         const blurSelf = useCallback(() => {
             const bs = bsOverride();
             if (bs) {
-                console.log(`useRovingTabIndexChild[${index}].blurSelf (override)`);
                 bs();
             }
             else {
-                console.log(`useRovingTabIndexChild[${index}].blurSelf (default)`);
                 const element = getElement() as (Element & Partial<HTMLElement>);
                 if (element)
                     element.blur?.();
@@ -220,7 +216,6 @@ export function useRovingTabIndex<ChildElement extends Element, RtiSubInfo, Extr
         const onFocusedInnerChanged = useStableCallback((focused: boolean) => {
             setAnyFocused(prev => (focused ? ((prev ?? 0) + 1) : ((prev ?? 0) - 1)));
             if (focused) {
-                console.log(`Child ${index} has been focused and will set itself as the tabbable child`);
                 setTabbableIndex(index, true);
             }
         });
