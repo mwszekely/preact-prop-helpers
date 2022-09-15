@@ -1,6 +1,6 @@
 import { StateUpdater, useCallback, useRef } from "preact/hooks";
 import { useLayoutEffect } from "./use-layout-effect";
-import { OnPassiveStateChange, useEnsureStability, usePassiveState } from "./use-passive-state";
+import { OnPassiveStateChange, useEnsureStability, usePassiveState, debounceRendering } from "./use-passive-state";
 import { useStableCallback } from "./use-stable-callback";
 
 /**
@@ -194,7 +194,7 @@ export function useManagedChildren<T extends number | string, C, K extends strin
     const remoteULEChildChanged = useCallback((index: T) => {
 
         if (remoteULEChildChangedCausers.current.size == 0) {
-            queueMicrotask(() => {
+            debounceRendering(() => {
                 onAfterChildLayoutEffect?.(remoteULEChildChangedCausers.current);
                 remoteULEChildChangedCausers.current.clear();
             });
@@ -212,7 +212,7 @@ export function useManagedChildren<T extends number | string, C, K extends strin
                 mounts: new Set(),
                 unmounts: new Set(),
             };
-            queueMicrotask(() => {
+            debounceRendering(() => {
                 onChildrenMountChange?.(hasRemoteULEChildMounted.current!.mounts, hasRemoteULEChildMounted.current!.unmounts)
                 hasRemoteULEChildMounted.current = null;
             });

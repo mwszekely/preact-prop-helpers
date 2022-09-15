@@ -1,6 +1,6 @@
 
 import { StateUpdater, useCallback } from "preact/hooks";
-import { OnPassiveStateChange, returnNull, returnTrue, useEnsureStability, usePassiveState } from "./use-passive-state";
+import { debounceRendering, OnPassiveStateChange, returnNull, returnTrue, useEnsureStability, usePassiveState } from "./use-passive-state";
 import { useRefElement, UseRefElementParameters, UseRefElementReturnType } from "./use-ref-element";
 
 
@@ -57,7 +57,7 @@ const microtasks = new Set<Map<any, any>>();
 function forEachUpdater<T>(window: Window | null | undefined, map: Map<Window | null | undefined, Set<undefined | ((e: T) => void)>>, value: T) {
     if (!microtasks.has(map)) {
         microtasks.add(map);
-        queueMicrotask(() => {
+        debounceRendering(() => {
             microtasks.delete(map);
 
             const updaters = map.get(window);
