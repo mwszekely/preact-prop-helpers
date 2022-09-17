@@ -213,8 +213,9 @@ export function useRovingTabIndex<ChildElement extends Element, RtiSubInfo, Extr
             }
         }, []);
 
-        const onFocusedInnerChanged = useStableCallback((focused: boolean) => {
-            setAnyFocused(prev => (focused ? ((prev ?? 0) + 1) : ((prev ?? 0) - 1)));
+        const onFocusedInnerChanged = useStableCallback((focused: boolean, prevFocused: boolean | undefined) => {
+            if (prevFocused != undefined || focused)
+                setAnyFocused(prev => (prev ?? 0) + (focused? 1 : -1));
             if (focused) {
                 setTabbableIndex(index, true);
             }

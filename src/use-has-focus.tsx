@@ -8,27 +8,29 @@ import { UseRefElementReturnType } from "./use-ref-element";
 export interface UseHasFocusParameters<T extends Node> extends UseActiveElementParameters<T> {
     /**
      * Whether the element itself currently has focus.
-     */
-    onFocusedChanged?(focused: boolean): void;
-
-    /**
-     * Like `focused`, but also *additionally* if any child elements are focused.
      * 
-     * @see setFocused
+     * `prevFocused` is generally the opposite of `focused`, but on mount it's `undefined` while `focused` is probably false (both falsy)
      */
-    onFocusedInnerChanged?(focused: boolean): void;
+    onFocusedChanged?(focused: boolean, prevFocused: boolean | undefined): void;
 
     /**
-     * Similar to `setFocused`, but if there is no currently focused element, is `true` if this element that *did* have focus last.
+     * Like `onFocusedChanged`, but also *additionally* if any child elements are focused.
+     * 
+     * @see this.onFocusedChanged
+     */
+    onFocusedInnerChanged?(focused: boolean, prevFocused: boolean | undefined): void;
+
+    /**
+     * Similar to `onFocusedChanged`, but if there is no currently focused element, is `true` if this element that *did* have focus last.
      * 
      * This is always `true` while `focused` is `true`. If `focused` is `false`, this may be `true` or `false`.
      */
-    onLastFocusedChanged?(focused: boolean): void;
+    onLastFocusedChanged?(focused: boolean, prevFocused: boolean | undefined): void;
 
     /**
-     * Combines the implications of `setLastFocused` and `setFocusedInner`.
+     * Combines the implications of `onFocusedChanged` and `onFocusedChanged`.
      */
-    onLastFocusedInnerChanged?(focused: boolean): void;
+    onLastFocusedInnerChanged?(focused: boolean, prevFocused: boolean | undefined): void;
 }
 
 export interface UseHasFocusReturnType<T extends Node> extends Omit<UseRefElementReturnType<T>, "useRefElementProps">, Omit<UseActiveElementReturnType<T>, "useActiveElementProps"> {
