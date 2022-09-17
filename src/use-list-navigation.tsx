@@ -329,7 +329,7 @@ export function useListNavigationSingleSelection<ParentOrChildElement extends El
     singleSelection: { selectedIndex },
     listNavigation,
     managedChildren: { /*onChildrenMountChange: ocmc,*/ ...mc },
-    rovingTabIndex: { initialIndex, ...rovingTabIndex },
+    rovingTabIndex: { initialIndex, onTabbedOutOf, ...rovingTabIndex },
     linearNavigation,
     typeaheadNavigation
 }: UseListNavigationSingleSelectionParameters<never, never, never, never, never, never>): UseListNavigationSingleSelectionReturnTypeWithHooks<ParentOrChildElement, ChildElement, C, K> {
@@ -344,6 +344,7 @@ export function useListNavigationSingleSelection<ParentOrChildElement extends El
         },
         rovingTabIndex: {
             initialIndex: (initialIndex ?? selectedIndex ?? undefined),
+            onTabbedOutOf: useStableCallback(() => { onTabbedOutOf?.(); setTabbableIndex(selectedIndex, false) }),
             ...rovingTabIndex
         },
         linearNavigation,
@@ -356,7 +357,7 @@ export function useListNavigationSingleSelection<ParentOrChildElement extends El
         ...listRest
     } = parentReturnType;
 
-    const { managedChildren: { children } } = listRest;
+    const { managedChildren: { children }, rovingTabIndex: { setTabbableIndex } } = listRest;
 
     const {
         changeIndex: changeSelectedIndex,
@@ -450,9 +451,11 @@ export function useSortableListNavigation<ParentElement extends Element, ChildEl
         linearNavigation: linearNavigation,
         listNavigation: { indexDemangler, indexMangler, ...listNavigation },
         managedChildren: managedChildren,
-        rovingTabIndex: rovingTabIndex,
+        rovingTabIndex,
         typeaheadNavigation: typeaheadNavigation,
     });
+
+    const { rovingTabIndex: { setTabbableIndex } } = listNavReturnType;
 
     const useSortableListNavigationProps = (props: Omit<h.JSX.HTMLAttributes<ParentElement>, "children"> & { children: VNode<any>[]; }) => {
         return (useListNavigationProps(useSortableProps(props)))

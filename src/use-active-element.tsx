@@ -49,24 +49,29 @@ const lastActiveElementUpdaters = new Map<Window | null | undefined, Set<undefin
 const windowFocusedUpdaters = new Map<Window | null | undefined, Set<undefined | ((focused: boolean) => void)>>();
 const windowsFocusedUpdaters = new Map<Window | null | undefined, boolean>();
 
-const microtasks = new Set<Map<any, any>>();
+const microtasks = new Map<Set<any>, any>();
 
 // The focusin and focusout events often fire syncronously in the middle of running code.
 // E.G. calling element.focus() can cause a focusin event handler to immediately interrupt that code.
 // For the purpose of improving stability, we debounce all focus events to the next microtask.
 function forEachUpdater<T>(window: Window | null | undefined, map: Map<Window | null | undefined, Set<undefined | ((e: T) => void)>>, value: T) {
-    if (!microtasks.has(map)) {
-        microtasks.add(map);
-        debounceRendering(() => {
-            microtasks.delete(map);
+    const updatersKey = map.get(window);
+    if (updatersKey) {
+        if (!microtasks.has(updatersKey)) {
+            debounceRendering(() => {
+                const updatersKey = map.get(window)!;
+                const value = microtasks.get(updatersKey);
+                microtasks.delete(updatersKey);
 
-            const updaters = map.get(window);
-            if (updaters) {
-                for (const updater of updaters) {
-                    updater?.(value);
+                if (updatersKey) {
+                    for (const updater of updatersKey) {
+                        updater?.(value);
+                    }
                 }
-            }
-        });
+            });
+        }
+
+        microtasks.set(updatersKey, value);
     }
 }
 
