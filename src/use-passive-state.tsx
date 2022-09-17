@@ -111,34 +111,37 @@ export function usePassiveState<T>(onChange: undefined | null | OnPassiveStateCh
     }, []);
 
     // The actual code the user calls to (possibly) run a new effect.
-    const r = useRef({ microtaskQueued: false, arg: undefined as undefined | Parameters<PassiveStateUpdater<T>>[0], prevDep: undefined as T | undefined });
+    const r = useRef({ microtaskQueued: false, args: new Array<Parameters<PassiveStateUpdater<T>>[0]>(), prevDep: undefined as T | undefined });
     const setValue = useCallback<PassiveStateUpdater<T>>((arg) => {
         r.current.prevDep = valueRef.current === Unset ? undefined : getValue();
-        r.current.arg = arg;
+        r.current.args?.push(arg);
         if (!r.current.microtaskQueued) {
             r.current.microtaskQueued = true;
             debounceRendering(() => {
                 r.current.microtaskQueued = false;
-                //r.current.handle = null;
                 const prevDep = r.current.prevDep;
-                const arg = r.current.arg!;
-                const dep = arg instanceof Function ? arg(prevDep!) : arg;
-                if (dep !== valueRef.current) {
+                try {
+                    for (const arg of r.current.args) {
+                        const dep = arg instanceof Function ? arg(prevDep!) : arg;
+                        if (dep !== valueRef.current) {
+                            // Indicate to the user that they shouldn't call getValue during onChange
+                            warningRef.current = true;
 
-                    // Indicate to the user that they shouldn't call getValue during onChange
-                    warningRef.current = true;
-
-                    try {
-                        // Call any registered cleanup function
-                        onShouldCleanUp();
-                        cleanupCallbackRef.current = (onChange?.(dep, prevDep) ?? undefined);
-                        valueRef.current = dep;
-
+                            try {
+                                // Call any registered cleanup function
+                                onShouldCleanUp();
+                                cleanupCallbackRef.current = (onChange?.(dep, prevDep) ?? undefined);
+                                valueRef.current = dep;
+                            }
+                            finally {
+                                // Allow the user to normally call getValue again
+                                warningRef.current = false;
+                            }
+                        }
                     }
-                    finally {
-                        // Allow the user to normally call getValue again
-                        warningRef.current = false;
-                    }
+                }
+                finally {
+                    r.current.args = []
                 }
 
             });
