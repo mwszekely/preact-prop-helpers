@@ -111,42 +111,50 @@ export function usePassiveState<T>(onChange: undefined | null | OnPassiveStateCh
     }, []);
 
     // The actual code the user calls to (possibly) run a new effect.
-    const r = useRef({ microtaskQueued: false, args: new Array<Parameters<PassiveStateUpdater<T>>[0]>(), prevDep: undefined as T | undefined });
+    const r = useRef({ prevDep: Unset as T | (typeof Unset) });
     const setValue = useCallback<PassiveStateUpdater<T>>((arg) => {
-        r.current.prevDep = valueRef.current === Unset ? undefined : getValue();
-        r.current.args?.push(arg);
-        if (!r.current.microtaskQueued) {
-            r.current.microtaskQueued = true;
-            debounceRendering(() => {
-                r.current.microtaskQueued = false;
-                const prevDep = r.current.prevDep;
-                try {
-                    for (const arg of r.current.args) {
-                        const dep = arg instanceof Function ? arg(prevDep!) : arg;
-                        if (dep !== valueRef.current) {
-                            // Indicate to the user that they shouldn't call getValue during onChange
-                            warningRef.current = true;
 
-                            try {
-                                // Call any registered cleanup function
-                                onShouldCleanUp();
-                                cleanupCallbackRef.current = (onChange?.(dep, prevDep) ?? undefined);
-                                valueRef.current = dep;
-                            }
-                            finally {
-                                // Allow the user to normally call getValue again
-                                warningRef.current = false;
-                            }
-                        }
+        // Regardless of anything else, figure out what our next value is about to be.
+        const nextValue = (arg instanceof Function ? arg(valueRef.current === Unset ? undefined : valueRef.current) : arg);
+
+
+        if (r.current.prevDep === Unset) {
+            // This is the first request to change this value.
+            // Evaluate the request immediately, then queue up the onChange function
+
+            // Save our current value so that we can compare against it later
+            // (if we flip back to this state, then we won't send the onChange function)
+            r.current.prevDep = valueRef.current;
+
+            // Schedule the actual check and invocation of onChange later to let effects settle
+            debounceRendering(() => {
+                const nextDep = valueRef.current! as T;
+                const prevDep = r.current.prevDep ;
+                if (r.current.prevDep != valueRef.current) {
+                    warningRef.current = true;
+
+                    try {
+                        // Call any registered cleanup function
+                        onShouldCleanUp();
+                        cleanupCallbackRef.current = (onChange?.(nextDep, prevDep === Unset? undefined : prevDep) ?? undefined);
+                        valueRef.current = nextDep;
                     }
+                    finally {
+                        // Allow the user to normally call getValue again
+                        warningRef.current = false;
+                    }
+
                 }
-                finally {
-                    r.current.args = []
-                }
+
+                // We've finished with everything, so mark us as being on a clean slate again.
+                r.current.prevDep = Unset;
 
             });
         }
 
+        // Update the value immediately.
+        // This will be checked against prevDep to see if we should actually call onChange
+        valueRef.current = nextValue;
 
     }, []);
 

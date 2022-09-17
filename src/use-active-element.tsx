@@ -1,7 +1,8 @@
 
+import { h } from "preact";
 import { StateUpdater, useCallback } from "preact/hooks";
+import { useEffect } from "./use-effect";
 import { debounceRendering, OnPassiveStateChange, returnNull, returnTrue, useEnsureStability, usePassiveState } from "./use-passive-state";
-import { useRefElement, UseRefElementParameters, UseRefElementReturnType } from "./use-ref-element";
 
 
 /**
@@ -106,7 +107,7 @@ function windowBlur(e: FocusEvent) {
     forEachUpdater(window, windowFocusedUpdaters, false);
 }
 
-export interface UseActiveElementParameters<T extends Node> {
+export interface UseActiveElementParameters {
 
     /**
      * Called any time the active element changes. Must be stable.
@@ -124,12 +125,25 @@ export interface UseActiveElementParameters<T extends Node> {
      */
     onWindowFocusedChange?: OnPassiveStateChange<boolean>;
 
-    onMount?: UseRefElementParameters<T>["onMount"];
-    onUnmount?: UseRefElementParameters<T>["onUnmount"];
-    onMountChange?: UseRefElementParameters<T>["onElementChange"];
+    /**
+     * This must be a function that returns the document associated with whatever elements we're listening to.
+     * 
+     * E.G. someDivElement.ownerDocument
+     * 
+     * **MUST** be stable
+     */
+    getDocument(): Document;
+
+    /**
+     * By default, event handlers are attached to the document's defaultView Window.
+     * If you need something different, override it here.
+     * 
+     * **MUST** be stable
+     */
+    getWindow?(document: Document): Window;
 }
 
-export interface UseActiveElementReturnType<T extends Node> extends Omit<UseRefElementReturnType<T>, "useRefElementProps"> {
+export interface UseActiveElementReturnType {
     /** 
      * Returns whatever element is currently focused, or `null` if there's no focused element
      * **STABLE**
@@ -145,9 +159,6 @@ export interface UseActiveElementReturnType<T extends Node> extends Omit<UseRefE
      * **STABLE**
      */
     getWindowFocused: () => boolean;
-
-    /** **STABLE** */
-    useActiveElementProps: UseRefElementReturnType<T>["useRefElementProps"];
 }
 
 /**
@@ -162,59 +173,52 @@ export interface UseActiveElementReturnType<T extends Node> extends Omit<UseRefE
  * 
  * If you need the component to re-render when the active element changes, use the `on*Change` arguments to set some state on your end.
  */
-export function useActiveElement<T extends Node>({ onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, onMount, onUnmount, onMountChange }: UseActiveElementParameters<T>): UseActiveElementReturnType<T> {
+export function useActiveElement({ onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument, getWindow }: UseActiveElementParameters): UseActiveElementReturnType {
 
-    useEnsureStability("useActiveElement", onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, onMountChange, onMount, onUnmount);
+    useEnsureStability("useActiveElement", onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument, getWindow);
 
-    const { getElement, useRefElementProps } = useRefElement<T>({
-        onMount,
-        onUnmount,
-        onElementChange: useCallback((element: T | null, prevValue: T | null | undefined) => {
-            onMountChange?.(element, prevValue);
-            if (element) {
-                const document = element.ownerDocument;
-                const window = document?.defaultView;
+    useEffect(() => {
+        const document = getDocument();
+        const window = (getWindow?.(document) ?? document?.defaultView);
 
-                if ((activeElementUpdaters.get(window)?.size ?? 0) === 0) {
-                    document?.addEventListener("focusin", focusin, { passive: true });
-                    document?.addEventListener("focusout", focusout, { passive: true });
-                    window?.addEventListener("focus", windowFocus, { passive: true });
-                    window?.addEventListener("blur", windowBlur, { passive: true });
-                }
+        if ((activeElementUpdaters.get(window)?.size ?? 0) === 0) {
+            document?.addEventListener("focusin", focusin, { passive: true });
+            document?.addEventListener("focusout", focusout, { passive: true });
+            window?.addEventListener("focus", windowFocus, { passive: true });
+            window?.addEventListener("blur", windowBlur, { passive: true });
+        }
 
-                // Add them even if they're undefined to more easily
-                // manage the ">0 means don't add handlers" logic.
-                const localActiveElementUpdaters = activeElementUpdaters.get(window) ?? new Set();
-                const localLastActiveElementUpdaters = lastActiveElementUpdaters.get(window) ?? new Set();
-                const localWindowFocusedUpdaters = windowFocusedUpdaters.get(window) ?? new Set();
+        // Add them even if they're undefined to more easily
+        // manage the ">0 means don't add handlers" logic.
+        const localActiveElementUpdaters = activeElementUpdaters.get(window) ?? new Set();
+        const localLastActiveElementUpdaters = lastActiveElementUpdaters.get(window) ?? new Set();
+        const localWindowFocusedUpdaters = windowFocusedUpdaters.get(window) ?? new Set();
 
-                localActiveElementUpdaters.add(setActiveElement as StateUpdater<Node | null>);
-                localLastActiveElementUpdaters.add(setLastActiveElement as StateUpdater<Node>);
-                localWindowFocusedUpdaters.add(setWindowFocused);
+        localActiveElementUpdaters.add(setActiveElement as StateUpdater<Node | null>);
+        localLastActiveElementUpdaters.add(setLastActiveElement as StateUpdater<Node>);
+        localWindowFocusedUpdaters.add(setWindowFocused);
 
-                activeElementUpdaters.set(window, localActiveElementUpdaters);
-                lastActiveElementUpdaters.set(window, localLastActiveElementUpdaters);
-                windowFocusedUpdaters.set(window, localWindowFocusedUpdaters);
+        activeElementUpdaters.set(window, localActiveElementUpdaters);
+        lastActiveElementUpdaters.set(window, localLastActiveElementUpdaters);
+        windowFocusedUpdaters.set(window, localWindowFocusedUpdaters);
 
-                return () => {
-                    activeElementUpdaters.get(window)!.delete(setActiveElement as StateUpdater<Node | null>);
-                    lastActiveElementUpdaters.get(window)!.delete(setLastActiveElement as StateUpdater<Node>);
-                    windowFocusedUpdaters.get(window)!.delete(setWindowFocused);
+        return () => {
+            activeElementUpdaters.get(window)!.delete(setActiveElement as StateUpdater<Node | null>);
+            lastActiveElementUpdaters.get(window)!.delete(setLastActiveElement as StateUpdater<Node>);
+            windowFocusedUpdaters.get(window)!.delete(setWindowFocused);
 
-                    if (activeElementUpdaters.size === 0) {
-                        document?.removeEventListener("focusin", focusin);
-                        document?.removeEventListener("focusout", focusout);
-                        window?.removeEventListener("focus", windowFocus);
-                        window?.removeEventListener("blur", windowBlur);
-                    }
-                }
+            if (activeElementUpdaters.size === 0) {
+                document?.removeEventListener("focusin", focusin);
+                document?.removeEventListener("focusout", focusout);
+                window?.removeEventListener("focus", windowFocus);
+                window?.removeEventListener("blur", windowBlur);
             }
-        }, [])
-    })
+        }
+    }, [])
 
     const [getActiveElement, setActiveElement] = usePassiveState<Element | null>(onActiveElementChange, returnNull);
     const [getLastActiveElement, setLastActiveElement] = usePassiveState<Element>(onLastActiveElementChange, returnNull as () => never);
     const [getWindowFocused, setWindowFocused] = usePassiveState<boolean>(onWindowFocusedChange, returnTrue);
 
-    return { getElement, useActiveElementProps: useRefElementProps, getActiveElement, getLastActiveElement, getWindowFocused };
+    return { getActiveElement, getLastActiveElement, getWindowFocused };
 }

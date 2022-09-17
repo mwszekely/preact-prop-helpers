@@ -5,7 +5,7 @@ import { useActiveElement } from "./use-active-element";
 import { getTopElement, useBlockingElement } from "./use-blocking-element";
 import { getDocument } from "./use-document-class";
 import { useMergedProps } from "./use-merged-props";
-import { UseRefElementReturnType } from "./use-ref-element";
+import { useRefElement, UseRefElementReturnType } from "./use-ref-element";
 import { useStableCallback } from "./use-stable-callback";
 
 export interface UseFocusTrapParameters { trapActive: boolean; }
@@ -54,7 +54,8 @@ export function useFocusTrap<E extends HTMLElement>({ trapActive }: UseFocusTrap
         }
     }, []);
     
-    const { getLastActiveElement, useActiveElementProps, getElement } = useActiveElement<E>({ onMountChange: useStableCallback((element: E | null) => handleActiveChange(trapActive, element)) });
+    const { getElement, useRefElementProps } = useRefElement<E>({ onElementChange: useStableCallback((element: E | null) => handleActiveChange(trapActive, element)) })
+    const { getLastActiveElement } = useActiveElement({ getDocument: useStableCallback(() => getElement()?.ownerDocument! ) });
 
 
     // When the trap becomes active, before we let the blockingElements hook run,
@@ -83,7 +84,7 @@ export function useFocusTrap<E extends HTMLElement>({ trapActive }: UseFocusTrap
     }, [trapActive]);
 
     const useFocusTrapProps = ((props: h.JSX.HTMLAttributes<E>) => {
-        const p1 = useActiveElementProps(props);
+        const p1 = useRefElementProps(props);
         const p2 = { "aria-modal": trapActive ? "true" : undefined } as h.JSX.HTMLAttributes<E>;
         return useMergedProps<E>(p1, p2);
     });

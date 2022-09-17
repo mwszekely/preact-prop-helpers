@@ -1,11 +1,13 @@
 
 import { h } from "preact";
-import { useCallback } from "preact/hooks";
+import { useCallback, useRef } from "preact/hooks";
+import { useChildrenFlag, UseManagedChildParameters, useManagedChildren, UseManagedChildrenParameters, UseManagedChildrenReturnTypeInfo } from "./use-child-manager";
+import { useStableCallback } from "./use-stable-callback";
 import { useActiveElement, UseActiveElementParameters, UseActiveElementReturnType } from "./use-active-element";
 import { returnFalse, useEnsureStability, usePassiveState } from "./use-passive-state";
-import { UseRefElementReturnType } from "./use-ref-element";
+import { useRefElement, UseRefElementParameters, UseRefElementReturnType } from "./use-ref-element";
 
-export interface UseHasFocusParameters<T extends Node> extends UseActiveElementParameters<T> {
+export interface UseHasFocusParameters<T extends Node> extends UseActiveElementParameters, UseRefElementParameters<T> {
     /**
      * Whether the element itself currently has focus.
      * 
@@ -33,7 +35,7 @@ export interface UseHasFocusParameters<T extends Node> extends UseActiveElementP
     onLastFocusedInnerChanged?(focused: boolean, prevFocused: boolean | undefined): void;
 }
 
-export interface UseHasFocusReturnType<T extends Node> extends Omit<UseRefElementReturnType<T>, "useRefElementProps">, Omit<UseActiveElementReturnType<T>, "useActiveElementProps"> {
+export interface UseHasFocusReturnType<T extends Node> extends Omit<UseRefElementReturnType<T>, "useRefElementProps">, UseActiveElementReturnType {
 
     /**
      * Modifies the element to be able to track its own focus state
@@ -52,7 +54,7 @@ export interface UseHasFocusReturnType<T extends Node> extends Omit<UseRefElemen
     getLastFocusedInner(): boolean;
 }
 
-export function useHasFocus<T extends Node>({ onFocusedChanged, onFocusedInnerChanged, onLastFocusedChanged, onLastFocusedInnerChanged, onLastActiveElementChange, onActiveElementChange, onWindowFocusedChange }: UseHasFocusParameters<T>): UseHasFocusReturnType<T> {
+export function useHasFocus<T extends Node>({ onFocusedChanged, onFocusedInnerChanged, onLastFocusedChanged, onLastFocusedInnerChanged, onLastActiveElementChange, onActiveElementChange, onWindowFocusedChange, getDocument, getWindow, onElementChange, onMount, onUnmount }: UseHasFocusParameters<T>): UseHasFocusReturnType<T> {
 
     useEnsureStability("useHasFocus", onFocusedChanged, onFocusedInnerChanged, onLastFocusedChanged, onLastFocusedInnerChanged, onLastActiveElementChange, onActiveElementChange, onWindowFocusedChange);
 
@@ -61,8 +63,12 @@ export function useHasFocus<T extends Node>({ onFocusedChanged, onFocusedInnerCh
     const [getLastFocused, setLastFocused] = usePassiveState<boolean>(onLastFocusedChanged, returnFalse);
     const [getLastFocusedInner, setLastFocusedInner] = usePassiveState<boolean>(onLastFocusedInnerChanged, returnFalse);
 
-    const { getActiveElement, getLastActiveElement, getWindowFocused, useActiveElementProps, getElement } = useActiveElement<T>({
-        onActiveElementChange: useCallback<NonNullable<UseActiveElementParameters<T>["onActiveElementChange"]>>((activeElement, prevActiveElement) => {
+    const { getElement, useRefElementProps } = useRefElement<T>({ onElementChange, onMount, onUnmount });
+
+    const { getActiveElement, getLastActiveElement, getWindowFocused } = useActiveElement({
+        getDocument,
+        getWindow,
+        onActiveElementChange: useCallback<NonNullable<UseActiveElementParameters["onActiveElementChange"]>>((activeElement, prevActiveElement) => {
             const selfElement = getElement();
             const focused = (selfElement != null && (selfElement == activeElement as Node | null));
             const focusedInner = (!!selfElement?.contains(activeElement as Node | null));
@@ -70,7 +76,7 @@ export function useHasFocus<T extends Node>({ onFocusedChanged, onFocusedInnerCh
             setFocusedInner(focusedInner);
             onActiveElementChange?.(activeElement, prevActiveElement);
         }, []),
-        onLastActiveElementChange: useCallback<NonNullable<UseActiveElementParameters<T>["onLastActiveElementChange"]>>((lastActiveElement, prevLastActiveElement) => {
+        onLastActiveElementChange: useCallback<NonNullable<UseActiveElementParameters["onLastActiveElementChange"]>>((lastActiveElement, prevLastActiveElement) => {
             const selfElement = getElement();
             const focused = (selfElement != null && (selfElement == lastActiveElement as Node | null));
             const focusedInner = (!!selfElement?.contains(lastActiveElement as Node | null));
@@ -81,18 +87,108 @@ export function useHasFocus<T extends Node>({ onFocusedChanged, onFocusedInnerCh
         onWindowFocusedChange
     });
 
-    const useHasFocusProps = useCallback((props: h.JSX.HTMLAttributes<T>) => { return useActiveElementProps(props); }, []);
+    const useHasFocusProps = useCallback((props: h.JSX.HTMLAttributes<T>) => { return useRefElementProps(props); }, []);
 
 
-    return { 
-        useHasFocusProps, 
-        getElement, 
-        getFocused, 
-        getFocusedInner, 
-        getLastFocused, 
-        getLastFocusedInner, 
-        getActiveElement, 
-        getLastActiveElement, 
-        getWindowFocused 
+    return {
+        useHasFocusProps,
+        getElement,
+        getFocused,
+        getFocusedInner,
+        getLastFocused,
+        getLastFocusedInner,
+        getActiveElement,
+        getLastActiveElement,
+        getWindowFocused
     };
+}
+
+export interface UseChildrenHaveFocusParameters extends UseManagedChildrenParameters<number, never> {
+    childrenHaveFocus: {
+        onAnyGainedFocus?(): void;
+        onAllLostFocus?(): void;
+    }
+}
+
+
+
+export interface UseChildrenHaveFocusChildParameters<E extends Element> extends UseManagedChildParameters<number, FocusInfo, never, "subInfo">, UseHasFocusParameters<E> {
+}
+
+export interface UseChildrenHaveFocusChildReturnType<E extends Element> extends Omit<UseRefElementReturnType<E>, "useRefElementProps"> {
+    useChildrenHaveFocusChildProps(props: h.JSX.HTMLAttributes<E>): h.JSX.HTMLAttributes<E>;
+}
+
+interface FocusInfo {
+
+}
+
+export interface UseChildrenHaveFocusReturnTypeInfo extends UseManagedChildrenReturnTypeInfo<number, FocusInfo, never> {
+}
+
+
+export interface UseChildrenHaveFocusReturnTypeWithHooks extends UseChildrenHaveFocusReturnTypeInfo {
+    useChildrenHaveFocusChild: <E extends Element>(parameters: UseChildrenHaveFocusChildParameters<E>) => UseChildrenHaveFocusChildReturnType<E>;
+}
+
+export function useChildrenHaveFocus({ childrenHaveFocus: { onAllLostFocus, onAnyGainedFocus }, managedChildren: { onAfterChildLayoutEffect, onChildrenMountChange } }: UseChildrenHaveFocusParameters): UseChildrenHaveFocusReturnTypeWithHooks {
+    const { managedChildren, useManagedChild } = useManagedChildren<number, FocusInfo, never>({ managedChildren: { onAfterChildLayoutEffect, onChildrenMountChange } });
+    const allElementsRef = useRef<Set<Node>>(new Set());
+    const [getFocusCount, setFocusCount] = usePassiveState<number>(useStableCallback((anyFocused: number, anyPreviouslyFocused: number | undefined) => {
+        console.log(`Changing focus count from ${anyPreviouslyFocused} to ${anyFocused}`);
+        console.assert(anyFocused >= 0 && anyFocused <= 1);
+
+        if (anyFocused && !anyPreviouslyFocused)
+            onAnyGainedFocus?.();
+        if (!anyFocused && anyPreviouslyFocused)
+            onAllLostFocus?.();
+    }));
+
+    const useChildrenHaveFocusChild = useCallback(<E extends Element>({ onElementChange, onMount, onUnmount, getDocument, getWindow, onActiveElementChange, onFocusedChanged, onFocusedInnerChanged, onLastActiveElementChange, onLastFocusedChanged, onLastFocusedInnerChanged, onWindowFocusedChange, managedChild: { index, flags } }: UseChildrenHaveFocusChildParameters<E>): UseChildrenHaveFocusChildReturnType<E> => {
+        useManagedChild({ managedChild: { index, subInfo: {}, flags } });
+        const { useHasFocusProps, getElement } = useHasFocus<E>({
+            getDocument,
+            getWindow,
+            onActiveElementChange,
+            onElementChange: useCallback((e: E | null, prev: E | null | undefined) => {
+                let r = onElementChange?.(e, prev);
+                if (e) {
+                    allElementsRef.current.add(e);
+                    return () => {
+                        r?.();
+                        allElementsRef.current.delete(e);
+                    }
+                }
+            }, [onElementChange]),
+            onMount,
+            onUnmount,
+            onFocusedChanged,
+            onFocusedInnerChanged,
+            onLastActiveElementChange,
+            onLastFocusedChanged,
+            onLastFocusedInnerChanged: useStableCallback((focused: boolean, prev: boolean | undefined) => {
+                if (focused) {
+                    console.log(`Child ${index} is focused`);
+                    setFocusCount(p => (p ?? 0) + 1);
+                }
+                else if (!focused && prev) {
+                    console.log(`Child ${index} is unfocused`);
+                    setFocusCount(p => (p ?? 0) - 1);
+                }
+
+                onLastFocusedInnerChanged?.(focused, prev);
+            }),
+            onWindowFocusedChange
+        });
+
+        return {
+            useChildrenHaveFocusChildProps: useHasFocusProps,
+            getElement
+        }
+    }, []);
+
+    return {
+        managedChildren,
+        useChildrenHaveFocusChild
+    }
 }

@@ -1,5 +1,6 @@
 import { h, VNode } from "preact";
 import { useCallback, useLayoutEffect, useRef } from "preact/hooks";
+import { useChildrenHaveFocus, UseChildrenHaveFocusParameters, UseHasFocusParameters } from "./use-has-focus";
 import { ChildFlagOperations, ManagedChildOmits, ManagedChildren, ManagedChildrenOmits, useChildrenFlag } from "./use-child-manager";
 import { useEffect } from "./use-effect";
 import { LinearNavigationOmits, TypeaheadNavigationOmits, useLinearNavigation, UseLinearNavigationParameters, UseLinearNavigationReturnTypeInfo, useTypeaheadNavigation, UseTypeaheadNavigationParameters, UseTypeaheadNavigationReturnTypeInfo } from "./use-keyboard-navigation";
@@ -107,16 +108,17 @@ export type SingleSelectionOmits = keyof SSP;
 
 export interface UseListNavigationSingleSelectionParameters<SSOmits extends SingleSelectionOmits, LsOmits extends ListNavigationParametersOmits, LnOmits extends LinearNavigationOmits, TnOmits extends TypeaheadNavigationOmits, RtiOmits extends RovingTabIndexParametersOmits, McOmits extends ManagedChildrenOmits> extends UseListNavigationParameters<LsOmits, LnOmits, TnOmits, RtiOmits, McOmits> {
     singleSelection: Omit<SSP, SSOmits>;
+    childrenHaveFocus: Partial<UseChildrenHaveFocusParameters["childrenHaveFocus"]>;
 }
 export type ListNavigationChildOmits = keyof UseListNavigationSubInfo<any>;
-export interface UseListNavigationChildParameters<LsSubInfo, ExtraFlagKeys extends string, LsOmits extends ListNavigationChildOmits, RtiOmits extends RovingTabIndexChildOmits, McOmits extends ManagedChildOmits, SubbestInfo> extends
-    UseRovingTabIndexChildParameters<UseListNavigationSubInfo<LsSubInfo>, ExtraFlagKeys, RtiOmits, McOmits, SubbestInfo> {
+export interface UseListNavigationChildParameters<E extends Element, LsSubInfo, ExtraFlagKeys extends string, LsOmits extends ListNavigationChildOmits, RtiOmits extends RovingTabIndexChildOmits, McOmits extends ManagedChildOmits, SubbestInfo> extends
+    UseRovingTabIndexChildParameters<E, UseListNavigationSubInfo<LsSubInfo>, ExtraFlagKeys, RtiOmits, McOmits, SubbestInfo> {
     //rovingTabIndex: Omit<UseRovingTabIndexChildParameters<UseListNavigationSubInfo<LsSubInfo>, ExtraFlagKeys, never>["rovingTabIndex"], "subInfo">;
     listNavigation: Omit<UseListNavigationSubInfo<LsSubInfo>, LsOmits | "subInfo">;
 }
 
-export interface UseListNavigationSingleSelectionChildParameters<C, K extends string, LsOmits extends ListNavigationChildOmits, RtiOmits extends RovingTabIndexChildOmits, McOmits extends ManagedChildOmits, SubbestInfo> extends UseListNavigationChildParameters<C, K | "selected", LsOmits, RtiOmits, McOmits, SubbestInfo> {
-
+export interface UseListNavigationSingleSelectionChildParameters<E extends Element, C, K extends string, LsOmits extends ListNavigationChildOmits, RtiOmits extends RovingTabIndexChildOmits, McOmits extends ManagedChildOmits, SubbestInfo> extends UseListNavigationChildParameters<E, C, K | "selected", LsOmits, RtiOmits, McOmits, SubbestInfo> {
+    hasFocus: UseHasFocusParameters<E>;
 }
 
 
@@ -167,9 +169,9 @@ export interface UseListNavigationSingleSelectionChildReturnTypeWithHooks<ChildE
 }
 
 
-export type UseListNavigationChild<ChildElement extends Element, C, K extends string> = (a: UseListNavigationChildParameters<C, K, never, never, never, C>) => UseListNavigationChildReturnTypeWithHooks<ChildElement>;
+export type UseListNavigationChild<ChildElement extends Element, C, K extends string> = (a: UseListNavigationChildParameters<ChildElement, C, K, never, never, never, C>) => UseListNavigationChildReturnTypeWithHooks<ChildElement>;
 
-export type UseListNavigationSingleSelectionChild<ChildElement extends Element, C, K extends string> = (p: UseListNavigationSingleSelectionChildParameters<C, K, never, never, never, C>) => UseListNavigationSingleSelectionChildReturnTypeWithHooks<ChildElement>;
+export type UseListNavigationSingleSelectionChild<ChildElement extends Element, C, K extends string> = (p: UseListNavigationSingleSelectionChildParameters<ChildElement, C, K, never, never, never, C>) => UseListNavigationSingleSelectionChildReturnTypeWithHooks<ChildElement>;
 
 
 
@@ -329,9 +331,10 @@ export function useListNavigationSingleSelection<ParentOrChildElement extends El
     singleSelection: { selectedIndex },
     listNavigation,
     managedChildren: { /*onChildrenMountChange: ocmc,*/ ...mc },
-    rovingTabIndex: { initialIndex, onTabbedOutOf, ...rovingTabIndex },
+    rovingTabIndex: { initialIndex, ...rovingTabIndex },
     linearNavigation,
-    typeaheadNavigation
+    typeaheadNavigation,
+    childrenHaveFocus: { onAllLostFocus, onAnyGainedFocus }
 }: UseListNavigationSingleSelectionParameters<never, never, never, never, never, never>): UseListNavigationSingleSelectionReturnTypeWithHooks<ParentOrChildElement, ChildElement, C, K> {
     const parentReturnType = useListNavigation<ParentOrChildElement, ChildElement, C, K | "selected">({
         listNavigation,
@@ -344,11 +347,25 @@ export function useListNavigationSingleSelection<ParentOrChildElement extends El
         },
         rovingTabIndex: {
             initialIndex: (initialIndex ?? selectedIndex ?? undefined),
-            onTabbedOutOf: useStableCallback(() => { onTabbedOutOf?.(); setTabbableIndex(selectedIndex, false) }),
+            //onTabbedOutOf: useStableCallback(() => { onTabbedOutOf?.(); setTabbableIndex(selectedIndex, false) }),
             ...rovingTabIndex
         },
         linearNavigation,
         typeaheadNavigation
+    });
+
+    const { useChildrenHaveFocusChild } = useChildrenHaveFocus({
+        childrenHaveFocus: {
+            onAllLostFocus: useStableCallback(() => {
+                onAllLostFocus?.();
+                if (selectedIndex != null)
+                    setTabbableIndex(selectedIndex, false);
+            }),
+            onAnyGainedFocus
+        }, managedChildren: {
+            onAfterChildLayoutEffect: null,
+            onChildrenMountChange: null
+        }
     });
 
     const {
@@ -375,9 +392,10 @@ export function useListNavigationSingleSelection<ParentOrChildElement extends El
     }, [selectedIndex]);
 
     return {
-        useListNavigationSingleSelectionChild: useCallback<UseListNavigationSingleSelectionChild<ChildElement, C, K | "selected">>(({ managedChild: { index, flags }, rovingTabIndex: rti, listNavigation: ls, subInfo }) => {
+        useListNavigationSingleSelectionChild: useCallback<UseListNavigationSingleSelectionChild<ChildElement, C, K | "selected">>(({ managedChild: { index, flags }, rovingTabIndex: rti, listNavigation: ls, hasFocus, subInfo }) => {
             const [isSelected, setIsSelected, getIsSelected] = useState(getSelectedIndex() == index);
             const selectedRef = useRef<ChildFlagOperations>({ get: getIsSelected, set: setIsSelected, isValid: useStableCallback(() => !rti.hidden) });
+            const { useChildrenHaveFocusChildProps } = useChildrenHaveFocusChild({ ...hasFocus, managedChild: { index } })
 
             const {
                 rovingTabIndex: rti_ret,
@@ -392,10 +410,10 @@ export function useListNavigationSingleSelection<ParentOrChildElement extends El
                 },
                 rovingTabIndex: rti,
                 listNavigation: ls,
-                subInfo
+                subInfo,
             });
             return {
-                useListNavigationSingleSelectionChildProps: useListNavigationChildProps,
+                useListNavigationSingleSelectionChildProps: ((props: h.JSX.HTMLAttributes<ChildElement>) => useListNavigationChildProps(useChildrenHaveFocusChildProps(props))),
                 rovingTabIndex: rti_ret,
                 singleSelection: { selected: isSelected, getSelected: getIsSelected }
             };
@@ -418,8 +436,8 @@ export interface UseSortableListNavigationParameters<C, K extends string, G exte
     UseSortableChildrenParameters<C, K, G, V> {
 }
 
-export type UseSortableListNavigationChildParameters<C, K extends string, LsOmits extends ListNavigationChildOmits, RtiOmits extends RovingTabIndexChildOmits, McOmits extends ManagedChildOmits> = UseListNavigationChildParameters<C, K, LsOmits, RtiOmits, McOmits, C>;
-export type UseSortableListNavigationChild<ChildElement extends Element, C, K extends string> = (p: UseSortableListNavigationChildParameters<C, K, never, never, never>) => UseListNavigationChildReturnTypeWithHooks<ChildElement>;
+export type UseSortableListNavigationChildParameters<ChildElement extends Element, C, K extends string, LsOmits extends ListNavigationChildOmits, RtiOmits extends RovingTabIndexChildOmits, McOmits extends ManagedChildOmits> = UseListNavigationChildParameters<ChildElement, C, K, LsOmits, RtiOmits, McOmits, C>;
+export type UseSortableListNavigationChild<ChildElement extends Element, C, K extends string> = (p: UseSortableListNavigationChildParameters<ChildElement, C, K, never, never, never>) => UseListNavigationChildReturnTypeWithHooks<ChildElement>;
 
 export interface UseSortableListNavigationReturnTypeInfo<ChildElement extends Element, C, K extends string, G extends any[]> extends UseListNavigationReturnTypeInfo<ChildElement, C, K>,
     UseSortableChildrenReturnTypeInfo<C, K, G> {
@@ -480,7 +498,7 @@ export function useSortableListNavigation<ParentElement extends Element, ChildEl
 
 }
 
-export type UseSortableListNavigationSingleSelectionChild<ChildElement extends Element, C, K extends string> = (args: UseListNavigationSingleSelectionChildParameters<C, K, never, never, never, C>) => UseListNavigationSingleSelectionChildReturnTypeWithHooks<ChildElement>;
+export type UseSortableListNavigationSingleSelectionChild<ChildElement extends Element, C, K extends string> = (args: UseListNavigationSingleSelectionChildParameters<ChildElement, C, K, never, never, never, C>) => UseListNavigationSingleSelectionChildReturnTypeWithHooks<ChildElement>;
 
 export interface UseSortableListNavigationSingleSelectionParameters<SSOmits extends SingleSelectionOmits, LsOmits extends ListNavigationParametersOmits, LnOmits extends LinearNavigationOmits, TnOmits extends TypeaheadNavigationOmits, RtiOmits extends RovingTabIndexParametersOmits, McOmits extends ManagedChildrenOmits> extends UseListNavigationSingleSelectionParameters<SSOmits, LsOmits | "indexMangler" | "indexDemangler", LnOmits, TnOmits, RtiOmits, McOmits> {
 
@@ -496,7 +514,7 @@ export interface UseSortableListNavigationSingleSelectionReturnTypeWithHooks<Par
     useSortableListNavigationSingleSelectionChild: UseSortableListNavigationSingleSelectionChild<ChildElement, C, K>;
 }
 
-export function useSortableListNavigationSingleSelection<ParentElement extends Element, ChildElement extends Element, C, K extends string>({ linearNavigation, listNavigation, managedChildren, rovingTabIndex, singleSelection, typeaheadNavigation }: UseSortableListNavigationSingleSelectionParameters<never, never, never, never, never, never>): UseSortableListNavigationSingleSelectionReturnTypeWithHooks<ParentElement, ChildElement, C, K, []> {
+export function useSortableListNavigationSingleSelection<ParentElement extends Element, ChildElement extends Element, C, K extends string>({ linearNavigation, listNavigation, managedChildren, rovingTabIndex, singleSelection, typeaheadNavigation, childrenHaveFocus }: UseSortableListNavigationSingleSelectionParameters<never, never, never, never, never, never>): UseSortableListNavigationSingleSelectionReturnTypeWithHooks<ParentElement, ChildElement, C, K, []> {
 
     const {
         useSortableProps,
@@ -521,13 +539,14 @@ export function useSortableListNavigationSingleSelection<ParentElement extends E
         managedChildren: managedChildren,
         rovingTabIndex: rovingTabIndex,
         typeaheadNavigation: typeaheadNavigation,
-        singleSelection: singleSelection
+        singleSelection: singleSelection,
+        childrenHaveFocus: childrenHaveFocus
     });
 
     const useSortableListNavigationSingleSelectionProps = (props: Omit<h.JSX.HTMLAttributes<ParentElement>, "children"> & { children: VNode<any>[]; }) => {
         return (useListNavigationSingleSelectionProps(useSortableProps(props)));
     }
-    const useSortableListNavigationSingleSelectionChild = (p: UseListNavigationSingleSelectionChildParameters<C, K, never, never, never, C>) => {
+    const useSortableListNavigationSingleSelectionChild = (p: UseListNavigationSingleSelectionChildParameters<ChildElement, C, K, never, never, never, C>) => {
         return useListNavigationSingleSelectionChild(p);
     }
 

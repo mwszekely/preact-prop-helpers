@@ -1,7 +1,7 @@
 import { createContext, h, render } from "preact";
 import { memo } from "preact/compat";
 import { useContext, useRef } from "preact/hooks";
-import { useAnimationFrame, useAsyncHandler, useDraggable, useDroppable, useElementSize, useFocusTrap, useMergedProps, useState } from "..";
+import { useActiveElement, useAnimationFrame, useAsyncHandler, useDraggable, useDroppable, useElementSize, useFocusTrap, useMergedProps, useState } from "..";
 import { ElementSize } from "../use-element-size";
 import { useGridNavigation, UseGridNavigationCell, UseGridNavigationRow } from "../use-grid-navigation";
 import { useHasFocus } from "../use-has-focus";
@@ -216,6 +216,9 @@ const DemoUseAsyncHandler2 = memo(() => {
     );
 });
 
+function getDocument() {
+    return window.document;
+}
 
 const DemoFocus = memo(() => {
     const [lastActiveElement, setLastActiveElement] = useState<(Element) | null>(null);
@@ -226,6 +229,7 @@ const DemoFocus = memo(() => {
     const [lastFocused, setLastFocused] = useState(false);
     const [lastFocusedInner, setLastFocusedInner] = useState(false);
     const { useHasFocusProps } = useHasFocus<HTMLDivElement>({
+        getDocument,
         onFocusedChanged: setFocused,
         onFocusedInnerChanged: setFocusedInner,
         onLastFocusedChanged: setLastFocused,
@@ -257,7 +261,7 @@ const GridCellContext = createContext<UseGridNavigationCell<HTMLTableCellElement
 export const DemoUseGrid = memo(() => {
 
     const [, setLastFocusedInner, _getLastFocusedInner] = useState(false);
-    const { useHasFocusProps } = useHasFocus<HTMLTableSectionElement>({ onLastFocusedInnerChanged: setLastFocusedInner });
+    const { useHasFocusProps } = useHasFocus<HTMLTableSectionElement>({ onLastFocusedInnerChanged: setLastFocusedInner, getDocument });
     const { useGridNavigationRow, useGridNavigationProps, gridNavigation: { currentColumn } } = useGridNavigation<HTMLTableSectionElement, HTMLTableRowElement, HTMLTableCellElement, {}, {}, string, string>({
         rovingTabIndex: {},
         linearNavigation: {},
@@ -333,6 +337,7 @@ const DemoUseGridCell = (({ index, row, rowIsTabbable }: { index: number, row: n
         listNavigation: { text: "" },
         managedChild: { index },
         rovingTabIndex: { hidden: false },
+        hasFocus: { getDocument },
         subInfo: {},
     });
 

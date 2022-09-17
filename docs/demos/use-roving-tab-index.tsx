@@ -7,6 +7,9 @@ import { useState } from "../../use-state";
 
 const RandomWords = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
 
+function getDocument() {
+    return window.document;
+}
 
 
 const RovingChildContext = createContext<UseSortableListNavigationSingleSelectionChild<HTMLLIElement, {}, string>>(null!)
@@ -14,7 +17,7 @@ export const DemoUseRovingTabIndex = memo(() => {
 
     const [count, setCount] = useState(10);
     const [_lastFocusedInner, setLastFocusedInner, _getLastFocusedInner] = useState(false)
-    const { useHasFocusProps } = useHasFocus<HTMLUListElement>({ onLastFocusedInnerChanged: setLastFocusedInner });
+    const { useHasFocusProps } = useHasFocus<HTMLUListElement>({ onLastFocusedInnerChanged: setLastFocusedInner, getDocument });
     //const forceUpdate = useForceUpdate();
     const [selectedIndex, setSelectedIndex] = useState(0);
     const [tabbableIndex, setLocalTabbableIndex] = useState(0);
@@ -43,7 +46,8 @@ export const DemoUseRovingTabIndex = memo(() => {
         managedChildren: {},
         rovingTabIndex: { onTabbableIndexChange: useCallback((index: number | null) => { if (index != null) setLocalTabbableIndex(index); }, []) },
         typeaheadNavigation: {},
-        singleSelection: { selectedIndex }
+        singleSelection: { selectedIndex },
+        childrenHaveFocus: {  }
     });
 
 
@@ -104,7 +108,7 @@ const DemoUseRovingTabIndexChild = memo((({ index, setSelectedIndex }: { index: 
     const [randomWord] = useState(() => RandomWords[index/*Math.floor(Math.random() * (RandomWords.length - 1))*/]);
     const useRovingTabIndexChild = useContext(RovingChildContext);
     const text = `${randomWord} This is item #${index}${hidden ? " (hidden)" : ""}`;
-    const { useListNavigationSingleSelectionChildProps, rovingTabIndex: { tabbable }, singleSelection: { selected } } = useRovingTabIndexChild({ managedChild: { index }, listNavigation: { text }, rovingTabIndex: { hidden }, subInfo: {} });
+    const { useListNavigationSingleSelectionChildProps, rovingTabIndex: { tabbable }, singleSelection: { selected } } = useRovingTabIndexChild({ managedChild: { index }, listNavigation: { text }, rovingTabIndex: { hidden }, subInfo: {}, hasFocus: { getDocument } });
 
     const props = useListNavigationSingleSelectionChildProps({});
     return (
