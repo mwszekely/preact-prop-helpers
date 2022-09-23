@@ -32,7 +32,7 @@ export const DemoUseRovingTabIndex = memo(() => {
         managedChildren: {},
         rovingTabIndex: { onTabbableIndexChange: useCallback((index: number | null) => { if (index != null) setLocalTabbableIndex(index); }, []) },
         typeaheadNavigation: {},
-        singleSelection: { selectedIndex, selectionMode, onSelectedIndexChange: setSelectedIndex },
+        singleSelection: { selectedIndex, selectionMode, onSelectedIndexChange: (e, i) => setSelectedIndex(i) },
         childrenHaveFocus: {  }
     });
 

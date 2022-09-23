@@ -103,7 +103,7 @@ export interface UseListNavigationParameters<LsOmits extends ListNavigationParam
 
 interface SSP {
     selectedIndex: number | null;
-    onSelectedIndexChange: (newIndex: number) => void;
+    onSelectedIndexChange: (event: Event, newIndex: number) => void;
     selectionMode: "focus" | "activation";
 }
 export type SingleSelectionOmits = keyof SSP;
@@ -430,7 +430,7 @@ export function useListNavigationSingleSelection<ParentOrChildElement extends El
                 }
             }, [tabbable && selectionMode == 'focus']);*/
 
-            const usePressProps = usePress<ChildElement>(() => { stableOnChange(getIndex()); }, {});
+            const usePressProps = usePress<ChildElement>((e) => { stableOnChange(e, getIndex()); }, {});
 
             return {
                 useListNavigationSingleSelectionChildProps: (props: h.JSX.HTMLAttributes<ChildElement>) => usePressProps(useChildrenHaveFocusChildProps(useListNavigationChildProps(props))),
