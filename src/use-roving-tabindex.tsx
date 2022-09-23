@@ -66,13 +66,13 @@ export interface UseRovingTabIndexReturnTypeWithHooks<ChildElement extends Eleme
 
 export type RovingTabIndexChildOmits = keyof UseRovingTabIndexSubInfo<any, any>;
 
-export interface UseRovingTabIndexChildParameters<E extends Element, RtiSubInfo, ExtraFlagKeys extends string, RticOmits extends RovingTabIndexChildOmits, McOmits extends ManagedChildOmits, SubbestInfo> extends
+export interface UseRovingTabIndexChildParameters<RtiSubInfo, ExtraFlagKeys extends string, RticOmits extends RovingTabIndexChildOmits, McOmits extends ManagedChildOmits, SubbestInfo> extends
     UseManagedChildParameters<number, UseRovingTabIndexSubInfo<any, RtiSubInfo>, ExtraFlagKeys | "tabbable", McOmits | "subInfo"> {
     rovingTabIndex: Omit<Partial<Omit<UseRovingTabIndexSubInfo<any, any>, "getElement" | "subInfo">>, RticOmits>;
     subInfo: SubbestInfo;
 }
 
-export type UseRovingTabIndexChild<ChildElement extends Element, RtiSubInfo, ExtraFlagKeys extends string> = (a: UseRovingTabIndexChildParameters<ChildElement, RtiSubInfo, ExtraFlagKeys, never, never, RtiSubInfo>) => UseRovingTabIndexChildReturnTypeWithHooks<ChildElement>;
+export type UseRovingTabIndexChild<ChildElement extends Element, RtiSubInfo, ExtraFlagKeys extends string> = (a: UseRovingTabIndexChildParameters<RtiSubInfo, ExtraFlagKeys, never, never, RtiSubInfo>) => UseRovingTabIndexChildReturnTypeWithHooks<ChildElement>;
 
 export interface UseRovingTabIndexChildReturnTypeInfo<ChildElement extends Element> {
     rovingTabIndex: {
@@ -218,7 +218,7 @@ export function useRovingTabIndex<ChildElement extends Element, RtiSubInfo, Extr
                 setTabbableIndex(index, true);
             }
         });
-        const { getElement, useHasFocusProps } = useHasFocus<ChildElement>({ onFocusedInnerChanged, getDocument: useCallback((): Document => { return getElement()?.ownerDocument! }, []) });
+        const { getElement, useHasFocusProps } = useHasFocus<ChildElement>({ onFocusedInnerChanged, getDocument: useCallback((): Document => { return (getElement()?.ownerDocument) ?? (window.document) }, []) });
 
         const [tabbable, setTabbable, getTabbable] = useState(false);
         const tabbableFlags = useRef<ChildFlagOperations>({ get: getTabbable, set: setTabbable, isValid: useStableCallback(() => !hidden) });

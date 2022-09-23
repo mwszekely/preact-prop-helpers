@@ -240,7 +240,7 @@ let pulse = (("vibrate" in navigator) && (navigator.vibrate instanceof Function)
  * @param func The function to run when a button is tapped.
  * (Default is `() => navigator.vibrate(10)` in browsers that support it, a noop otherwise)
  */
-export function setButtonVibrate(func: () => void) {
+export function setPressVibrate(func: () => void) {
     pulse = func;
 }
 

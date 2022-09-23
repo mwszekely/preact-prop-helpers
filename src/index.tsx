@@ -32,6 +32,7 @@ export { generateRandomId, useRandomId, UseRandomIdParameters, UseRandomIdPropsP
 export { useRefElement, UseRefElementParameters, UseRefElementReturnType } from "./use-ref-element";
 export { useRovingTabIndex, UseRovingTabIndexChild, UseRovingTabIndexParameters, OnTabbableIndexChange, UseRovingTabIndexChildParameters, UseRovingTabIndexChildReturnTypeInfo, UseRovingTabIndexChildReturnTypeWithHooks, UseRovingTabIndexReturnTypeInfo, UseRovingTabIndexReturnTypeWithHooks, UseRovingTabIndexSubInfo } from "./use-roving-tabindex";
 export { useSortableChildren, UseSortableChildrenParameters } from "./use-sortable-children";
+export { usePress, setPressVibrate } from "./use-press";
 export { useStableCallback } from "./use-stable-callback";
 export { useStableGetter } from "./use-stable-getter";
 export { useState } from "./use-state";
