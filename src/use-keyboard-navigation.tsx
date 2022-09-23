@@ -1,6 +1,5 @@
 import { h } from "preact";
-import { useCallback, useEffect, useRef } from "preact/hooks";
-import { useLayoutEffect } from "./use-layout-effect";
+import { useCallback, useEffect, useLayoutEffect, useRef } from "preact/hooks";
 import { useLogicalDirection } from "./use-logical-direction";
 import { useMergedProps } from "./use-merged-props";
 import { useStableCallback } from "./use-stable-callback";

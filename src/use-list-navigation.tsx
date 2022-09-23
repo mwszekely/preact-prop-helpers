@@ -1,8 +1,8 @@
 import { h, VNode } from "preact";
-import { useCallback, useLayoutEffect, useRef } from "preact/hooks";
+import { useCallback, useEffect, useLayoutEffect, useRef } from "preact/hooks";
+import { usePress } from "./use-press";
 import { useChildrenHaveFocus, UseChildrenHaveFocusParameters, UseHasFocusParameters } from "./use-has-focus";
 import { ChildFlagOperations, ManagedChildOmits, ManagedChildren, ManagedChildrenOmits, useChildrenFlag } from "./use-child-manager";
-import { useEffect } from "./use-effect";
 import { LinearNavigationOmits, TypeaheadNavigationOmits, useLinearNavigation, UseLinearNavigationParameters, UseLinearNavigationReturnTypeInfo, useTypeaheadNavigation, UseTypeaheadNavigationParameters, UseTypeaheadNavigationReturnTypeInfo } from "./use-keyboard-navigation";
 import { useMergedProps } from "./use-merged-props";
 import { useEnsureStability } from "./use-passive-state";
@@ -103,10 +103,12 @@ export interface UseListNavigationParameters<LsOmits extends ListNavigationParam
 
 interface SSP {
     selectedIndex: number | null;
+    onSelectedIndexChange: (newIndex: number) => void;
+    selectionMode: "focus" | "activation";
 }
 export type SingleSelectionOmits = keyof SSP;
 
-export interface UseListNavigationSingleSelectionParameters<SSOmits extends SingleSelectionOmits, LsOmits extends ListNavigationParametersOmits, LnOmits extends LinearNavigationOmits, TnOmits extends TypeaheadNavigationOmits, RtiOmits extends RovingTabIndexParametersOmits, McOmits extends ManagedChildrenOmits> extends UseListNavigationParameters<LsOmits, LnOmits, TnOmits, RtiOmits, McOmits> {
+export interface UseListNavigationSingleSelectionParameters<SSOmits extends SingleSelectionOmits, LsOmits extends ListNavigationParametersOmits, LnOmits extends LinearNavigationOmits, TnOmits extends TypeaheadNavigationOmits, RtiOmits extends RovingTabIndexParametersOmits, McOmits extends ManagedChildrenOmits> extends UseListNavigationParameters<LsOmits, LnOmits, TnOmits, RtiOmits | "initialIndex", McOmits> {
     singleSelection: Omit<SSP, SSOmits>;
     childrenHaveFocus: Partial<UseChildrenHaveFocusParameters["childrenHaveFocus"]>;
 }
@@ -328,26 +330,19 @@ export function useListNavigation<ParentOrChildElement extends Element, ChildEle
  * @returns 
  */
 export function useListNavigationSingleSelection<ParentOrChildElement extends Element, ChildElement extends Element, C, K extends string>({
-    singleSelection: { selectedIndex },
+    singleSelection: { selectedIndex, selectionMode, onSelectedIndexChange },
     listNavigation,
-    managedChildren: { /*onChildrenMountChange: ocmc,*/ ...mc },
-    rovingTabIndex: { initialIndex, ...rovingTabIndex },
+    managedChildren,
+    rovingTabIndex: { ...rovingTabIndex },
     linearNavigation,
     typeaheadNavigation,
     childrenHaveFocus: { onAllLostFocus, onAnyGainedFocus }
 }: UseListNavigationSingleSelectionParameters<never, never, never, never, never, never>): UseListNavigationSingleSelectionReturnTypeWithHooks<ParentOrChildElement, ChildElement, C, K> {
     const parentReturnType = useListNavigation<ParentOrChildElement, ChildElement, C, K | "selected">({
         listNavigation,
-        managedChildren: {
-            ...mc,
-            /*onChildrenMountChange: useStableCallback<OnChildrenMountChange<number>>((mounted, unmounted) => {
-                reevaluateClosestFit();
-                ocmc?.(mounted, unmounted);
-            })*/
-        },
+        managedChildren,
         rovingTabIndex: {
-            initialIndex: (initialIndex ?? selectedIndex ?? undefined),
-            //onTabbedOutOf: useStableCallback(() => { onTabbedOutOf?.(); setTabbableIndex(selectedIndex, false) }),
+            initialIndex: (selectedIndex ?? undefined),
             ...rovingTabIndex
         },
         linearNavigation,
@@ -367,6 +362,8 @@ export function useListNavigationSingleSelection<ParentOrChildElement extends El
             onChildrenMountChange: null
         }
     });
+
+    const stableOnChange = useStableCallback(onSelectedIndexChange);
 
     const {
         useListNavigationChild,
@@ -392,7 +389,7 @@ export function useListNavigationSingleSelection<ParentOrChildElement extends El
     }, [selectedIndex]);
 
     return {
-        useListNavigationSingleSelectionChild: useCallback<UseListNavigationSingleSelectionChild<ChildElement, C, K | "selected">>(({ managedChild: { index, flags }, rovingTabIndex: rti, listNavigation: ls, hasFocus, subInfo }) => {
+        useListNavigationSingleSelectionChild: useCallback<UseListNavigationSingleSelectionChild<ChildElement, C, K | "selected">>(({ managedChild: { index, flags }, rovingTabIndex: { focusSelf, ...rti }, listNavigation: ls, hasFocus, subInfo }) => {
             const [isSelected, setIsSelected, getIsSelected] = useState(getSelectedIndex() == index);
             const selectedRef = useRef<ChildFlagOperations>({ get: getIsSelected, set: setIsSelected, isValid: useStableCallback(() => !rti.hidden) });
             const { useChildrenHaveFocusChildProps } = useChildrenHaveFocusChild({ ...hasFocus, managedChild: { index } })
@@ -408,16 +405,39 @@ export function useListNavigationSingleSelection<ParentOrChildElement extends El
                         ...flags
                     } as Partial<Record<K | "selected" | "tabbable", ChildFlagOperations>>
                 },
-                rovingTabIndex: rti,
+                rovingTabIndex: {
+                    focusSelf: useStableCallback(() => {
+                        if (focusSelf != null) {
+                            focusSelf?.();
+                        }
+                        else {
+                            (getElement() as HTMLElement | null)?.focus?.();
+                            if (selectionMode == 'focus') {
+                                changeSelectedIndex(getIndex());
+                            }
+                        }
+                    }),
+                    ...rti
+                },
                 listNavigation: ls,
                 subInfo,
             });
+            const { getElement } = rti_ret;
+            const getIndex = useStableGetter(index);
+            /*useEffect(() => {
+                if (tabbable && selectionMode == 'focus') {
+                    stableOnChange(getIndex());
+                }
+            }, [tabbable && selectionMode == 'focus']);*/
+
+            const usePressProps = usePress<ChildElement>(() => { stableOnChange(getIndex()); }, {});
+
             return {
-                useListNavigationSingleSelectionChildProps: ((props: h.JSX.HTMLAttributes<ChildElement>) => useListNavigationChildProps(useChildrenHaveFocusChildProps(props))),
+                useListNavigationSingleSelectionChildProps: (props: h.JSX.HTMLAttributes<ChildElement>) => usePressProps(useChildrenHaveFocusChildProps(useListNavigationChildProps(props))),
                 rovingTabIndex: rti_ret,
                 singleSelection: { selected: isSelected, getSelected: getIsSelected }
             };
-        }, []),
+        }, [selectionMode]),
         useListNavigationSingleSelectionProps: useCallback((...p: Parameters<typeof useListNavigationProps>) => { return useListNavigationProps(...p) }, []),
         ...listRest,
         singleSelection: {}
@@ -472,8 +492,6 @@ export function useSortableListNavigation<ParentElement extends Element, ChildEl
         rovingTabIndex,
         typeaheadNavigation: typeaheadNavigation,
     });
-
-    const { rovingTabIndex: { setTabbableIndex } } = listNavReturnType;
 
     const useSortableListNavigationProps = (props: Omit<h.JSX.HTMLAttributes<ParentElement>, "children"> & { children: VNode<any>[]; }) => {
         return (useListNavigationProps(useSortableProps(props)))

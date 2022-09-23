@@ -1,5 +1,5 @@
 import { Inputs, useLayoutEffect as useLayoutEffectNative } from "preact/hooks";
-import { EffectChange, useEffect } from "./use-effect";
+import { EffectChange, useEffectDebug } from "./use-effect-debug";
 
 /**
  * Wrap the native `useLayoutEffect` to add arguments 
@@ -9,6 +9,6 @@ import { EffectChange, useEffect } from "./use-effect";
  * @param effect 
  * @param inputs 
  */
-export function useLayoutEffect<I extends Inputs>(effect: (prev: I | undefined, changes: EffectChange<I, number>[]) => (void | (() => void)), inputs?: I) {
-    return useEffect(effect, inputs, useLayoutEffectNative);
+export function useLayoutEffectDebug<I extends Inputs>(effect: (prev: I | undefined, changes: EffectChange<I, number>[]) => (void | (() => void)), inputs?: I) {
+    return useEffectDebug(effect, inputs, useLayoutEffectNative);
 }

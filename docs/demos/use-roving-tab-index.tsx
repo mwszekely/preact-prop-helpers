@@ -1,7 +1,6 @@
 import { createContext } from "preact";
-import { memo, StateUpdater, useCallback, useContext } from "preact/compat";
-import { useHasFocus } from "../..";
-import { useSortableListNavigationSingleSelection, UseSortableListNavigationSingleSelectionChild } from "../../use-list-navigation";
+import { memo, useCallback, useContext } from "preact/compat";
+import { useSortableListNavigationSingleSelection, UseSortableListNavigationSingleSelectionChild } from "../../index";
 import { useState } from "../../use-state";
 
 
@@ -15,23 +14,10 @@ function getDocument() {
 const RovingChildContext = createContext<UseSortableListNavigationSingleSelectionChild<HTMLLIElement, {}, string>>(null!)
 export const DemoUseRovingTabIndex = memo(() => {
 
+    const [selectionMode, setSelectionMode] = useState("focus" as "focus" | "activation");
     const [count, setCount] = useState(10);
-    const [_lastFocusedInner, setLastFocusedInner, _getLastFocusedInner] = useState(false)
-    const { useHasFocusProps } = useHasFocus<HTMLUListElement>({ onLastFocusedInnerChanged: setLastFocusedInner, getDocument });
-    //const forceUpdate = useForceUpdate();
     const [selectedIndex, setSelectedIndex] = useState(0);
     const [tabbableIndex, setLocalTabbableIndex] = useState(0);
-
-    /*const {
-        indexDemangler,
-        indexMangler,
-        useSortableProps,
-        shuffle
-    } = useSortableChildren<HTMLUListElement, {}, string, [], number>({
-        getIndex: useCallback((row) => row.index, []),
-        getValue: useCallback((row) => row.index, []),
-        compare: useCallback((lhs, rhs) => { return lhs - rhs; }, [])
-    });*/
 
     const {
         managedChildren: { children },
@@ -46,14 +32,9 @@ export const DemoUseRovingTabIndex = memo(() => {
         managedChildren: {},
         rovingTabIndex: { onTabbableIndexChange: useCallback((index: number | null) => { if (index != null) setLocalTabbableIndex(index); }, []) },
         typeaheadNavigation: {},
-        singleSelection: { selectedIndex },
+        singleSelection: { selectedIndex, selectionMode, onSelectedIndexChange: setSelectedIndex },
         childrenHaveFocus: {  }
     });
-
-
-
-
-    //const { useRovingTabIndexChild, useRovingTabIndexProps } = useRovingTabIndex<HTMLUListElement, RovingTabIndexChildInfo>({ tabbableIndex, focusOnChange: false });
 
     return (
         <div className="demo">
@@ -87,12 +68,17 @@ export const DemoUseRovingTabIndex = memo(() => {
             <label># of items<input type="number" value={count} min={0} onInput={e => { e.preventDefault(); setCount(e.currentTarget.valueAsNumber) }} /></label>
             <button onClick={() => shuffle(children)}>Shuffle</button>
             <label>Tabbable index: <input type="number" value={tabbableIndex ?? undefined} onInput={e => { e.preventDefault(); setTabbableIndex(e.currentTarget.valueAsNumber, false); }} /></label>
+            <label>Selected index: <input type="number" value={selectedIndex ?? undefined} onInput={e => { e.preventDefault(); setSelectedIndex(e.currentTarget.valueAsNumber); }} /></label>
+            <label>Selection mode:
+                <label><input name="rti-demo-selection-mode" type="radio" checked={selectionMode == 'focus'} onInput={e => { e.preventDefault(); setSelectionMode("focus"); }} /> On focus</label>
+                <label><input name="rti-demo-selection-mode" type="radio" checked={selectionMode == 'activation'} onInput={e => { e.preventDefault(); setSelectionMode("activation"); }} /> On activation (click, tap, Enter, Space, etc.)</label>
+            </label>
 
             <RovingChildContext.Provider value={useSortableListNavigationSingleSelectionChild}>
-                <ul {...useHasFocusProps(useSortableListNavigationSingleSelectionProps({
+                <ul {...(useSortableListNavigationSingleSelectionProps({
                     children: Array.from((function* () {
                         for (let i = 0; i < count; ++i) {
-                            yield <DemoUseRovingTabIndexChild index={i} key={i} setSelectedIndex={setSelectedIndex} />
+                            yield <DemoUseRovingTabIndexChild index={i} key={i} />
                         }
                     })())
                 }))}></ul>
@@ -103,7 +89,7 @@ export const DemoUseRovingTabIndex = memo(() => {
 })
 
 const _Prefix = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-const DemoUseRovingTabIndexChild = memo((({ index, setSelectedIndex }: { index: number, setSelectedIndex: StateUpdater<number> }) => {
+const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
     const hidden = (index == 7);
     const [randomWord] = useState(() => RandomWords[index/*Math.floor(Math.random() * (RandomWords.length - 1))*/]);
     const useRovingTabIndexChild = useContext(RovingChildContext);
@@ -112,6 +98,6 @@ const DemoUseRovingTabIndexChild = memo((({ index, setSelectedIndex }: { index: 
 
     const props = useListNavigationSingleSelectionChildProps({});
     return (
-        <li {...props} onClick={() => setSelectedIndex(index)}>{text} ({tabbable ? "Tabbable" : "Not tabbable"}, {selected ? "Selected" : "Not selected"})<input {...useListNavigationSingleSelectionChildProps({ type: "number" }) as any} style={{ width: "5ch" }} /></li>
+        <li {...props}>{text} ({tabbable ? "Tabbable" : "Not tabbable"}, {selected ? "Selected" : "Not selected"})<input {...useListNavigationSingleSelectionChildProps({ type: "number" }) as any} style={{ width: "5ch" }} /></li>
     )
 }));

@@ -1,7 +1,7 @@
 
 import { h } from "preact";
 import { useCallback, useRef } from "preact/hooks";
-import { useChildrenFlag, UseManagedChildParameters, useManagedChildren, UseManagedChildrenParameters, UseManagedChildrenReturnTypeInfo } from "./use-child-manager";
+import { UseManagedChildParameters, useManagedChildren, UseManagedChildrenParameters, UseManagedChildrenReturnTypeInfo } from "./use-child-manager";
 import { useStableCallback } from "./use-stable-callback";
 import { useActiveElement, UseActiveElementParameters, UseActiveElementReturnType } from "./use-active-element";
 import { returnFalse, useEnsureStability, usePassiveState } from "./use-passive-state";
@@ -134,7 +134,7 @@ export interface UseChildrenHaveFocusReturnTypeWithHooks extends UseChildrenHave
 export function useChildrenHaveFocus({ childrenHaveFocus: { onAllLostFocus, onAnyGainedFocus }, managedChildren: { onAfterChildLayoutEffect, onChildrenMountChange } }: UseChildrenHaveFocusParameters): UseChildrenHaveFocusReturnTypeWithHooks {
     const { managedChildren, useManagedChild } = useManagedChildren<number, FocusInfo, never>({ managedChildren: { onAfterChildLayoutEffect, onChildrenMountChange } });
     const allElementsRef = useRef<Set<Node>>(new Set());
-    const [getFocusCount, setFocusCount] = usePassiveState<number>(useStableCallback((anyFocused: number, anyPreviouslyFocused: number | undefined) => {
+    const [_getFocusCount, setFocusCount] = usePassiveState<number>(useStableCallback((anyFocused: number, anyPreviouslyFocused: number | undefined) => {
         console.log(`Changing focus count from ${anyPreviouslyFocused} to ${anyFocused}`);
         console.assert(anyFocused >= 0 && anyFocused <= 1);
 

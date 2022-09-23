@@ -1,7 +1,7 @@
 import { createContext, h, render } from "preact";
 import { memo } from "preact/compat";
 import { useContext, useRef } from "preact/hooks";
-import { useActiveElement, useAnimationFrame, useAsyncHandler, useDraggable, useDroppable, useElementSize, useFocusTrap, useMergedProps, useState } from "..";
+import { useAnimationFrame, useAsyncHandler, useDraggable, useDroppable, useElementSize, useFocusTrap, useMergedProps, useState } from "..";
 import { ElementSize } from "../use-element-size";
 import { useGridNavigation, UseGridNavigationCell, UseGridNavigationRow } from "../use-grid-navigation";
 import { useHasFocus } from "../use-has-focus";
@@ -241,7 +241,7 @@ const DemoFocus = memo(() => {
     return (
         <div class="demo">
             <h2>useHasFocus</h2>
-            <div {...useHasFocusProps({ style: { border: "1px solid black" }, tabIndex: 0 })} >Outer <div tabIndex={0} style={{ border: "1px solid black" }}>Inner element</div></div>
+            <div {...useHasFocusProps({ style: { border: "1px solid black" }, tabIndex: 0 })}>Outer <div tabIndex={0} style={{ border: "1px solid black" }}>Inner element</div></div>
             <div>
                 <ul>
                     <li>Strictly focused: {focused.toString()}, {lastFocused.toString()}</li>

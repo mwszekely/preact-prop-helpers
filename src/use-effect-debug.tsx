@@ -10,7 +10,7 @@ import { Inputs, useEffect as useEffectNative, useRef } from "preact/hooks";
  * @param impl You can choose whether to use `useEffect` or `useLayoutEffect` by
  * passing one of them as this argument. By default, it's `useEffect`.
  */
-export function useEffect<I extends Inputs>(effect: (prev: I | undefined, changes: EffectChange<I, number>[]) => (void | (() => void)), inputs?: I, impl = useEffectNative) {
+export function useEffectDebug<I extends Inputs>(effect: (prev: I | undefined, changes: EffectChange<I, number>[]) => (void | (() => void)), inputs?: I, impl = useEffectNative) {
 
     const prevInputs = useRef<undefined | I>(undefined);
     const effect2 = () => {

@@ -1,5 +1,4 @@
-import { StateUpdater, useCallback, useRef } from "preact/hooks";
-import { useLayoutEffect } from "./use-layout-effect";
+import { StateUpdater, useCallback, useLayoutEffect, useRef } from "preact/hooks";
 import { OnPassiveStateChange, useEnsureStability, usePassiveState, debounceRendering } from "./use-passive-state";
 import { useStableCallback } from "./use-stable-callback";
 
@@ -475,22 +474,3 @@ export function useChildrenFlag<C, K extends string>({ children, initialIndex, c
     return { changeIndex, reevaluateClosestFit, getCurrentIndex };
 }
 
-
-
-/*export type Spread<A extends {}, B extends {}> = Omit<A, keyof B> & B;
-export function spread<A extends {}, B extends {}>(a: A, b: B): Spread<A, B> {
-    return {
-        ...a,
-        ...b
-    }
-}*/
-
-/*
-function test() {
-    type C = { foo: "bar" };
-    type K = "flag2";
-
-    const { children, useManagedChild } = useManagedChildren<number, C, K>({ managedChildren: { onChildrenMountChange: useStableCallback<OnChildrenMountChange<number>>((mounted, unmounted) => onChildrenMountChange(mounted, unmounted)) } });
-    useManagedChild({ managedChild: { index: 0, info: { foo: "bar" }, flags: {  } } });
-    const { changeIndex, getCurrentIndex, onChildrenMountChange } = useChildrenFlag<C, K>({ children, initialIndex: 0, key: "flag2" })
-}*/

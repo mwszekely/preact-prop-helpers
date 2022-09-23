@@ -1,7 +1,6 @@
 
 import { h } from "preact";
-import { StateUpdater, useCallback } from "preact/hooks";
-import { useEffect } from "./use-effect";
+import { StateUpdater, useEffect } from "preact/hooks";
 import { debounceRendering, OnPassiveStateChange, returnNull, returnTrue, useEnsureStability, usePassiveState } from "./use-passive-state";
 
 

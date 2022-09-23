@@ -1,5 +1,3 @@
-
-import { h } from "preact";
 import { useAsync, UseAsyncParameters, UseAsyncReturnType } from "./use-async";
 import { useStableCallback } from "./use-stable-callback";
 import { useState } from "./use-state";
