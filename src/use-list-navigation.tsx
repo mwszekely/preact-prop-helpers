@@ -389,10 +389,19 @@ export function useListNavigationSingleSelection<ParentOrChildElement extends El
     }, [selectedIndex]);
 
     return {
-        useListNavigationSingleSelectionChild: useCallback<UseListNavigationSingleSelectionChild<ChildElement, C, K | "selected">>(({ managedChild: { index, flags }, rovingTabIndex: { focusSelf, ...rti }, listNavigation: ls, hasFocus, subInfo }) => {
+        useListNavigationSingleSelectionChild: useCallback<UseListNavigationSingleSelectionChild<ChildElement, C, K | "selected">>(({ managedChild: { index, flags }, rovingTabIndex: rti, listNavigation: ls, hasFocus: { onFocusedInnerChanged, ...hasFocus }, subInfo }) => {
             const [isSelected, setIsSelected, getIsSelected] = useState(getSelectedIndex() == index);
             const selectedRef = useRef<ChildFlagOperations>({ get: getIsSelected, set: setIsSelected, isValid: useStableCallback(() => !rti.hidden) });
-            const { useChildrenHaveFocusChildProps } = useChildrenHaveFocusChild({ ...hasFocus, managedChild: { index } })
+            const { useChildrenHaveFocusChildProps, getElement } = useChildrenHaveFocusChild({ 
+                onFocusedInnerChanged: useStableCallback((focused: boolean, prev: boolean | undefined) => { 
+                    onFocusedInnerChanged?.(focused, prev);
+                    if (selectionMode == 'focus') {
+                        stableOnChange({ target: getElement(), currentTarget: getElement() } as Event, getIndex());
+                    }
+                 }),
+                ...hasFocus, 
+                managedChild: { index } 
+            });
 
             const {
                 rovingTabIndex: rti_ret,
@@ -405,30 +414,11 @@ export function useListNavigationSingleSelection<ParentOrChildElement extends El
                         ...flags
                     } as Partial<Record<K | "selected" | "tabbable", ChildFlagOperations>>
                 },
-                rovingTabIndex: {
-                    focusSelf: useStableCallback(() => {
-                        if (focusSelf != null) {
-                            focusSelf?.();
-                        }
-                        else {
-                            (getElement() as HTMLElement | null)?.focus?.();
-                            if (selectionMode == 'focus') {
-                                changeSelectedIndex(getIndex());
-                            }
-                        }
-                    }),
-                    ...rti
-                },
+                rovingTabIndex: rti,
                 listNavigation: ls,
                 subInfo,
             });
-            const { getElement } = rti_ret;
             const getIndex = useStableGetter(index);
-            /*useEffect(() => {
-                if (tabbable && selectionMode == 'focus') {
-                    stableOnChange(getIndex());
-                }
-            }, [tabbable && selectionMode == 'focus']);*/
 
             const usePressProps = usePress<ChildElement>((e) => { stableOnChange(e, getIndex()); }, {});
 
