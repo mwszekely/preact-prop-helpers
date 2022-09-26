@@ -392,15 +392,16 @@ export function useListNavigationSingleSelection<ParentOrChildElement extends El
         useListNavigationSingleSelectionChild: useCallback<UseListNavigationSingleSelectionChild<ChildElement, C, K | "selected">>(({ managedChild: { index, flags }, rovingTabIndex: rti, listNavigation: ls, hasFocus: { onFocusedInnerChanged, ...hasFocus }, subInfo }) => {
             const [isSelected, setIsSelected, getIsSelected] = useState(getSelectedIndex() == index);
             const selectedRef = useRef<ChildFlagOperations>({ get: getIsSelected, set: setIsSelected, isValid: useStableCallback(() => !rti.hidden) });
-            const { useChildrenHaveFocusChildProps, getElement } = useChildrenHaveFocusChild({ 
-                onFocusedInnerChanged: useStableCallback((focused: boolean, prev: boolean | undefined) => { 
+            const { useChildrenHaveFocusChildProps, getElement } = useChildrenHaveFocusChild({
+                onFocusedInnerChanged: useStableCallback((focused: boolean, prev: boolean | undefined) => {
                     onFocusedInnerChanged?.(focused, prev);
-                    if (selectionMode == 'focus') {
-                        stableOnChange({ target: getElement(), currentTarget: getElement() } as Event, getIndex());
+                    if (selectionMode == 'focus' && focused) {
+                            stableOnChange({ target: getElement(), currentTarget: getElement() } as Event, getIndex());
+                        
                     }
-                 }),
-                ...hasFocus, 
-                managedChild: { index } 
+                }),
+                ...hasFocus,
+                managedChild: { index }
             });
 
             const {
