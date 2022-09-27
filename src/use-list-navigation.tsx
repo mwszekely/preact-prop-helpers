@@ -2,7 +2,7 @@ import { h, VNode } from "preact";
 import { useCallback, useEffect, useLayoutEffect, useRef } from "preact/hooks";
 import { usePress } from "./use-press";
 import { useChildrenHaveFocus, UseChildrenHaveFocusParameters, UseHasFocusParameters } from "./use-has-focus";
-import { ChildFlagOperations, ManagedChildOmits, ManagedChildren, ManagedChildrenOmits, useChildrenFlag } from "./use-child-manager";
+import { ChildFlagOperations, ManagedChildOmits, ManagedChildren, ManagedChildrenOmits, OnChildrenMountChange, useChildrenFlag } from "./use-child-manager";
 import { LinearNavigationOmits, TypeaheadNavigationOmits, useLinearNavigation, UseLinearNavigationParameters, UseLinearNavigationReturnTypeInfo, useTypeaheadNavigation, UseTypeaheadNavigationParameters, UseTypeaheadNavigationReturnTypeInfo } from "./use-keyboard-navigation";
 import { useMergedProps } from "./use-merged-props";
 import { useEnsureStability } from "./use-passive-state";
@@ -184,7 +184,7 @@ export type UseListNavigationSingleSelectionChild<ChildElement extends Element, 
  * Navigating forwards/backwards can be done with the arrow keys, Home/End keys, or any any text for typeahead to focus the next item that matches.
  */
 export function useListNavigation<ParentOrChildElement extends Element, ChildElement extends Element, LsSubInfo, ExtraFlagKeys extends string>({
-    managedChildren: mc,
+    managedChildren: { onChildrenMountChange, ...mc },
     rovingTabIndex,
     listNavigation: { indexDemangler, indexMangler },
     linearNavigation,
@@ -197,7 +197,11 @@ export function useListNavigation<ParentOrChildElement extends Element, ChildEle
 
 
     const parentReturnType = useRovingTabIndex<ChildElement, UseListNavigationSubInfo<LsSubInfo>, ExtraFlagKeys>({
-        managedChildren: mc,
+        managedChildren: {
+            ...mc, onChildrenMountChange: useCallback<OnChildrenMountChange<number>>((m, u) => {
+                onChildrenMountChange?.(m, u);
+            }, [])
+        },
         rovingTabIndex
     });
 
@@ -421,7 +425,7 @@ export function useListNavigationSingleSelection<ParentOrChildElement extends El
             });
             const getIndex = useStableGetter(index);
 
-            const usePressProps = usePress<ChildElement>((e) => { stableOnChange(e, getIndex()); }, {});
+            const usePressProps = usePress<ChildElement>({ onClickSync: (e) => { stableOnChange(e, getIndex()); }, exclude: {}, hasFocus });
 
             return {
                 useListNavigationSingleSelectionChildProps: (props: h.JSX.HTMLAttributes<ChildElement>) => usePressProps(useChildrenHaveFocusChildProps(useListNavigationChildProps(props))),

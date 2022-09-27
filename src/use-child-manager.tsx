@@ -152,10 +152,13 @@ export function useManagedChildren<T extends number | string, C, K extends strin
     // For indirect access to each child
     // Compare getManagedChildInfo
     // TODO: The primary use for this is flaggable closest fits
-    // which need to search all children for that closest fit.
+    // which needs to search all children for that closest fit.
     // It would be nice if there was something better for that.
     const forEachChild = useCallback((f: (child: Info) => void) => {
-        for (const child of managedChildrenArray.current.arr) { f(child); }
+        for (const child of managedChildrenArray.current.arr) {
+            if (child)
+                f(child);
+        }
         for (const field in managedChildrenArray.current.rec) {
             const child: Info | undefined = managedChildrenArray.current.rec[field as keyof Record<T, Info>];
             if (child)
@@ -224,9 +227,10 @@ export function useManagedChildren<T extends number | string, C, K extends strin
             if (typeof index == "number") {
                 delete managedChildrenArray.current.arr[index as number];
                 let shave = 0;
-                while (shave <= managedChildrenArray.current.arr.length && managedChildrenArray.current.arr[managedChildrenArray.current.arr.length - 1 - shave] === undefined)
+                while (shave <= managedChildrenArray.current.arr.length && managedChildrenArray.current.arr[managedChildrenArray.current.arr.length - 1 - shave] === undefined) {
                     ++shave;
-                managedChildrenArray.current.arr.splice(managedChildrenArray.current.arr.length - 1 - shave, shave);
+                }
+                managedChildrenArray.current.arr.splice(managedChildrenArray.current.arr.length - shave, shave);
             }
             else
                 delete managedChildrenArray.current.rec[index as T];
@@ -243,10 +247,12 @@ export function useManagedChildren<T extends number | string, C, K extends strin
         // and multiple children updating in the same tick will all be sent at once.
         useLayoutEffect(() => {
             // Insert this information in-place
-            if (typeof info.index == "number")
+            if (typeof info.index == "number") {
                 managedChildrenArray.current.arr[info.index as number] = { index: info.index, flags: info.flags ?? {}, subInfo: info.subInfo };
-            else
+            }
+            else {
                 managedChildrenArray.current.rec[info.index as T] = { index: info.index, flags: info.flags ?? {}, subInfo: info.subInfo };
+            }
             return remoteULEChildChanged(info.index as T);
         }, [...Object.entries(info).flat(9)]);  // 9 is infinity, right? Sure. Unrelated: TODO.
 

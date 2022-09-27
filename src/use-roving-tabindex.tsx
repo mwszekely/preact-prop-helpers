@@ -215,7 +215,7 @@ export function useRovingTabIndex<ChildElement extends Element, RtiSubInfo, Extr
 
         const onFocusedInnerChanged = useStableCallback((focused: boolean, _prevFocused: boolean | undefined) => {
             if (focused) {
-                setTabbableIndex(index, true);
+                setTabbableIndex(index, false);
             }
         });
         const { getElement, useHasFocusProps } = useHasFocus<ChildElement>({ onFocusedInnerChanged, getDocument: useCallback((): Document => { return (getElement()?.ownerDocument) ?? (window.document) }, []) });

@@ -1,13 +1,17 @@
 import { h } from "preact";
 import { useEffect } from "preact/hooks";
-import { useState } from "./use-state";
 import { useGlobalHandler } from "./use-event-handler";
 import { useForceUpdate } from "./use-force-update";
-import { useRefElement } from "./use-ref-element";
-import { useStableCallback } from "./use-stable-callback";
+import { useHasFocus, UseHasFocusParameters } from "./use-has-focus";
 import { useMergedProps } from "./use-merged-props";
+import { useStableCallback } from "./use-stable-callback";
+import { useState } from "./use-state";
 
-
+interface UsePressParameters<E extends Node> {
+    onClickSync: ((e: h.JSX.TargetedEvent<E>) => void) | null | undefined;
+    exclude: undefined | { click?: "exclude" | undefined, space?: "exclude" | undefined, enter?: "exclude" | undefined };
+    hasFocus: UseHasFocusParameters<E>;
+}
 
 /**
  * Adds the necessary event handlers to create a "press"-like event for
@@ -28,9 +32,7 @@ import { useMergedProps } from "./use-merged-props";
  * @param onClickSync 
  * @param exclude Whether the polyfill shouldn't apply (can specify for specific interactions)
  */
-export function usePress<E extends EventTarget>(onClickSync: ((e: h.JSX.TargetedEvent<E>) => void) | null | undefined, exclude: undefined | { click?: "exclude" | undefined, space?: "exclude" | undefined, enter?: "exclude" | undefined }) {
-
-    const { useRefElementProps, getElement } = useRefElement<E>({});
+export function usePress<E extends Node>({ exclude, hasFocus: { onFocusedInnerChanged, ...hasFocus }, onClickSync }: UsePressParameters<E>) {
 
     // A button can be activated in multiple ways, so on the off chance
     // that multiple are triggered at once, we only *actually* register
@@ -42,6 +44,15 @@ export function usePress<E extends EventTarget>(onClickSync: ((e: h.JSX.Targeted
     // this is reset back to 0.
     const [active, setActive, getActive] = useState(0);
     const forceUpdate = useForceUpdate();
+    const { useHasFocusProps, getElement } = useHasFocus({
+        ...hasFocus,
+        onFocusedInnerChanged: useStableCallback((f: boolean, p: boolean | undefined) => {
+            onFocusedInnerChanged?.(f, p);
+            if (!f) {
+                setActive(0);
+            }
+        })
+    });
 
     // If we the current text selection changes to include this element
     // DURING e.g. a mousedown, then we don't want the mouseup to "count", as it were,
@@ -152,12 +163,11 @@ export function usePress<E extends EventTarget>(onClickSync: ((e: h.JSX.Targeted
             onActiveStop(e);
     };
 
-    const onBlur = (_: h.JSX.TargetedEvent<E>) => {
-        setActive(0);
-    }
 
-
-    const onMouseLeave = excludes("click", exclude) ? undefined : onBlur;
+    const onMouseLeave = useStableCallback(() => {
+        if (!excludes("click", exclude))
+            setActive(0);
+    });
 
     const onKeyDown = excludes("space", exclude) && excludes("enter", exclude) ? undefined : (e: h.JSX.TargetedKeyboardEvent<E>) => {
         if (e.key == " " && onClickSync && !excludes("space", exclude)) {
@@ -188,10 +198,9 @@ export function usePress<E extends EventTarget>(onClickSync: ((e: h.JSX.Targeted
     }
 
     return function usePressProps(props: h.JSX.HTMLAttributes<E>) {
-        return useMergedProps<E>(props, useRefElementProps(({
+        return useMergedProps<E>(props, useHasFocusProps(({
             onKeyDown,
             onKeyUp,
-            onBlur,
             onMouseDown,
             onMouseUp,
             onMouseLeave,

@@ -53,16 +53,17 @@ export function debounceRendering(f: () => void) {
  * 
  * @param onChange The "effect" function to run when the value changes. Effectively the same as `useEffect`'s "effect" function.  MUST BE STABLE, either because it has no dependencies, or because it's from useStableCallback, but this will mean you cannot use getState or setState during render.
  * @param getInitialValue If provided, the effect will be invoked once with this value on mount. MUST BE STABLE, either because it has no dependencies, or because it's from useStableCallback, but this will mean you cannot use getState or setState during render.
+ * @param customDebounceRendering By default, changes to passive state are delayed by one tick so that we only check for changes in a similar way to Preact. You can override this to, for example, always run immediately instead.
  * @returns 
  */
-export function usePassiveState<T>(onChange: undefined | null | OnPassiveStateChange<T>, getInitialValue?: () => T): readonly [getStateStable: () => T, setStateStable: PassiveStateUpdater<T>] {
+export function usePassiveState<T>(onChange: undefined | null | OnPassiveStateChange<T>, getInitialValue?: () => T, customDebounceRendering?: typeof debounceRendering): readonly [getStateStable: () => T, setStateStable: PassiveStateUpdater<T>] {
 
     const valueRef = useRef<T | typeof Unset>(Unset);
     const warningRef = useRef(false);
     const cleanupCallbackRef = useRef<undefined | (() => void)>(undefined);
 
     // Make sure that the provided functions are perfectly stable across renders
-    useEnsureStability("usePassiveState", onChange, getInitialValue);
+    useEnsureStability("usePassiveState", onChange, getInitialValue, customDebounceRendering);
 
     // Shared between "dependency changed" and "component unmounted".
     const onShouldCleanUp = useCallback(() => {
@@ -118,7 +119,7 @@ export function usePassiveState<T>(onChange: undefined | null | OnPassiveStateCh
         const nextValue = (arg instanceof Function ? arg(valueRef.current === Unset ? undefined : valueRef.current) : arg);
 
 
-        if (r.current.prevDep === Unset) {
+        if (r.current.prevDep === Unset && nextValue !== valueRef.current) {
             // This is the first request to change this value.
             // Evaluate the request immediately, then queue up the onChange function
 
@@ -127,7 +128,7 @@ export function usePassiveState<T>(onChange: undefined | null | OnPassiveStateCh
             r.current.prevDep = valueRef.current;
 
             // Schedule the actual check and invocation of onChange later to let effects settle
-            debounceRendering(() => {
+            (customDebounceRendering ?? debounceRendering)(() => {
                 const nextDep = valueRef.current! as T;
                 const prevDep = r.current.prevDep ;
                 if (r.current.prevDep != valueRef.current) {

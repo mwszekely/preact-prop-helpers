@@ -1,7 +1,6 @@
 
-import { h } from "preact";
 import { StateUpdater, useEffect } from "preact/hooks";
-import { debounceRendering, OnPassiveStateChange, returnNull, returnTrue, useEnsureStability, usePassiveState } from "./use-passive-state";
+import { OnPassiveStateChange, returnNull, returnTrue, useEnsureStability, usePassiveState } from "./use-passive-state";
 
 
 /**
@@ -38,40 +37,51 @@ import { debounceRendering, OnPassiveStateChange, returnNull, returnTrue, useEns
  * 3. A `blur` without a `focus` can and will occur. This means it is not possible to solely use `focus` to detect all changes.
  * 4. A `blur` event whose `relatedTarget` is null indicates that there will be no following `focus` event.
  * 
- * 
- * @param callback 
- * @returns 
  */
 const _dummy = 0;
 
+interface Foo<T> {
+    lastSent: T | undefined;
+    send: (e: T) => void;
+}
+/*
 const activeElementUpdaters = new Map<Window | null | undefined, Set<undefined | ((e: Node | null) => void)>>();
 const lastActiveElementUpdaters = new Map<Window | null | undefined, Set<undefined | ((e: Node) => void)>>();
 const windowFocusedUpdaters = new Map<Window | null | undefined, Set<undefined | ((focused: boolean) => void)>>();
+const windowsFocusedUpdaters = new Map<Window | null | undefined, boolean>();*/
+const activeElementUpdaters = new Map<Window | null | undefined, Set<Foo<Node | null>>>();
+const lastActiveElementUpdaters = new Map<Window | null | undefined, Set<Foo<Node>>>();
+const windowFocusedUpdaters = new Map<Window | null | undefined, Set<Foo<boolean>>>();
 const windowsFocusedUpdaters = new Map<Window | null | undefined, boolean>();
 
-const microtasks = new Map<Set<any>, any>();
+//const microtasks = new Map<Set<any>, any>();
 
 // The focusin and focusout events often fire syncronously in the middle of running code.
 // E.G. calling element.focus() can cause a focusin event handler to immediately interrupt that code.
 // For the purpose of improving stability, we debounce all focus events to the next microtask.
-function forEachUpdater<T>(window: Window | null | undefined, map: Map<Window | null | undefined, Set<undefined | ((e: T) => void)>>, value: T) {
-    const updatersKey = map.get(window);
-    if (updatersKey) {
-        if (!microtasks.has(updatersKey)) {
-            debounceRendering(() => {
-                const updatersKey = map.get(window)!;
-                const value = microtasks.get(updatersKey);
-                microtasks.delete(updatersKey);
+function forEachUpdater<T>(window: Window | null | undefined, map: Map<Window | null | undefined, Set<Foo<T>>>, value: T) {
+    const updaters = map.get(window);
+    if (updaters) {
+        //if (!microtasks.has(updatersKey)) {
+        //debounceRendering(() => {
+        //const updatersKey = map.get(window)!;
+        //const value = microtasks.get(updatersKey);
+        //microtasks.delete(updatersKey);
 
-                if (updatersKey) {
-                    for (const updater of updatersKey) {
-                        updater?.(value);
-                    }
+        if (updaters) {
+            for (const updater of updaters) {
+                const { lastSent, send } = updater;
+                if (value !== lastSent) {
+                    send(value);
+                    updater.lastSent = value;
                 }
-            });
-        }
 
-        microtasks.set(updatersKey, value);
+            }
+        }
+        //});
+        //}
+
+        //microtasks.set(updatersKey, value);
     }
 }
 
@@ -193,18 +203,22 @@ export function useActiveElement({ onActiveElementChange, onLastActiveElementCha
         const localLastActiveElementUpdaters = lastActiveElementUpdaters.get(window) ?? new Set();
         const localWindowFocusedUpdaters = windowFocusedUpdaters.get(window) ?? new Set();
 
-        localActiveElementUpdaters.add(setActiveElement as StateUpdater<Node | null>);
-        localLastActiveElementUpdaters.add(setLastActiveElement as StateUpdater<Node>);
-        localWindowFocusedUpdaters.add(setWindowFocused);
+        const laeu = { send: setActiveElement as StateUpdater<Node | null>, lastSent: undefined }
+        const llaeu = { send: setLastActiveElement as StateUpdater<Node>, lastSent: undefined };
+        const lwfu = { send: setWindowFocused, lastSent: undefined };
+
+        localActiveElementUpdaters.add(laeu);
+        localLastActiveElementUpdaters.add(llaeu);
+        localWindowFocusedUpdaters.add(lwfu);
 
         activeElementUpdaters.set(window, localActiveElementUpdaters);
         lastActiveElementUpdaters.set(window, localLastActiveElementUpdaters);
         windowFocusedUpdaters.set(window, localWindowFocusedUpdaters);
 
         return () => {
-            activeElementUpdaters.get(window)!.delete(setActiveElement as StateUpdater<Node | null>);
-            lastActiveElementUpdaters.get(window)!.delete(setLastActiveElement as StateUpdater<Node>);
-            windowFocusedUpdaters.get(window)!.delete(setWindowFocused);
+            activeElementUpdaters.get(window)!.delete(laeu);
+            lastActiveElementUpdaters.get(window)!.delete(laeu);
+            windowFocusedUpdaters.get(window)!.delete(lwfu);
 
             if (activeElementUpdaters.size === 0) {
                 document?.removeEventListener("focusin", focusin);

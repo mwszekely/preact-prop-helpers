@@ -43,7 +43,7 @@ export function useRefElement<T extends EventTarget>(args?: UseRefElementParamet
     }, []);
 
     // Let us store the actual (reference to) the element we capture
-    const [getElement, setElement] = usePassiveState<T | null>(handler, returnNull);
+    const [getElement, setElement] = usePassiveState<T | null>(handler, returnNull, runImmediately);
     const useRefElementProps = useCallback<UseRefElementReturnType<T>["useRefElementProps"]>((props) => useMergedProps<T>({ ref: setElement }, props), []);
 
     // Return both the element and the hook that modifies 
@@ -52,4 +52,8 @@ export function useRefElement<T extends EventTarget>(args?: UseRefElementParamet
         useRefElementProps,
         getElement
     }
+}
+
+function runImmediately(f: () => void) {
+    f();
 }

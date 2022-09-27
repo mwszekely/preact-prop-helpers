@@ -55,7 +55,7 @@ export function useFocusTrap<E extends HTMLElement>({ trapActive }: UseFocusTrap
     }, []);
     
     const { getElement, useRefElementProps } = useRefElement<E>({ onElementChange: useStableCallback((element: E | null) => handleActiveChange(trapActive, element)) })
-    const { getLastActiveElement } = useActiveElement({ getDocument: useStableCallback(() => getElement()?.ownerDocument! ) });
+    const { getLastActiveElement } = useActiveElement({ getDocument: useStableCallback(() => getElement()?.ownerDocument ?? window.document ) });
 
 
     // When the trap becomes active, before we let the blockingElements hook run,
