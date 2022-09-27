@@ -21,7 +21,7 @@ export interface UseRovingTabIndexSubInfo<E extends Element, C> {
      */
     focusSelf(): void;
 
-    blurSelf(): void;
+    //blurSelf(): void;
 
     getElement(): E | null;
 
@@ -150,10 +150,10 @@ export function useRovingTabIndex<ChildElement extends Element, RtiSubInfo, Extr
 
             if (prevIndex != nextIndex) {
                 const nextChild = nextIndex == null ? null : parentReturnType.managedChildren.children.getAt(nextIndex);
-                const prevChild = prevIndex == null ? null : parentReturnType.managedChildren.children.getAt(prevIndex);
+                //const prevChild = prevIndex == null ? null : parentReturnType.managedChildren.children.getAt(prevIndex);
 
-                if (prevChild != null)
-                    prevChild.subInfo.blurSelf();
+                //if (prevChild != null)
+                //    prevChild.subInfo.blurSelf();
 
                 if (nextChild != null && fromUserInteraction)
                     nextChild.subInfo.focusSelf();
@@ -181,14 +181,13 @@ export function useRovingTabIndex<ChildElement extends Element, RtiSubInfo, Extr
 
     const useRovingTabIndexChild = useCallback<UseRovingTabIndexChild<ChildElement, RtiSubInfo, ExtraFlagKeys>>((childParameters) => {
 
-        const { subInfo, managedChild: { index, flags }, rovingTabIndex: { hidden, blurSelf: blurSelfOverride, focusSelf: focusSelfOverride } } = childParameters;
+        const { subInfo, managedChild: { index, flags }, rovingTabIndex: { hidden, focusSelf: focusSelfOverride } } = childParameters;
 
         useEffect(() => {
             reevaluateClosestFit();
         }, [!!hidden])
 
 
-        const bsOverride = useStableGetter(blurSelfOverride);
         const fsOverride = useStableGetter(focusSelfOverride);
         const focusSelf = useCallback(() => {
             const fs = fsOverride();
@@ -201,7 +200,7 @@ export function useRovingTabIndex<ChildElement extends Element, RtiSubInfo, Extr
                     element.focus?.();
             }
         }, []);
-        const blurSelf = useCallback(() => {
+        /*const blurSelf = useCallback(() => {
             const bs = bsOverride();
             if (bs) {
                 bs();
@@ -211,7 +210,7 @@ export function useRovingTabIndex<ChildElement extends Element, RtiSubInfo, Extr
                 if (element)
                     element.blur?.();
             }
-        }, []);
+        }, []);*/
 
         const onFocusedInnerChanged = useStableCallback((focused: boolean, _prevFocused: boolean | undefined) => {
             if (focused) {
@@ -228,7 +227,7 @@ export function useRovingTabIndex<ChildElement extends Element, RtiSubInfo, Extr
                 index,
                 flags: { ...flags, tabbable: tabbableFlags.current } as Partial<Record<ExtraFlagKeys | "tabbable", ChildFlagOperations>>,
                 subInfo: {
-                    blurSelf,
+                    //blurSelf,
                     focusSelf,
                     getElement,
                     hidden: !!hidden,

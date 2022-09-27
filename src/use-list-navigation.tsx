@@ -263,7 +263,7 @@ export function useListNavigation<ParentOrChildElement extends Element, ChildEle
     }, [useLinearNavigationProps, useTypeaheadNavigationProps]);
 
 
-    const useListNavigationChild = useCallback<UseListNavigationChild<ChildElement, LsSubInfo, ExtraFlagKeys>>(({ managedChild: { index, flags }, rovingTabIndex: { blurSelf, focusSelf, hidden }, listNavigation: { text }, subInfo }) => {
+    const useListNavigationChild = useCallback<UseListNavigationChild<ChildElement, LsSubInfo, ExtraFlagKeys>>(({ managedChild: { index, flags }, rovingTabIndex: { focusSelf, hidden }, listNavigation: { text }, subInfo }) => {
 
         const _v: void = useTypeaheadNavigationChild({ text, index });
         const getIndex = useStableGetter(index);
@@ -285,7 +285,7 @@ export function useListNavigation<ParentOrChildElement extends Element, ChildEle
             }
         } = useRovingTabIndexChild({
             managedChild: { index, flags },
-            rovingTabIndex: { blurSelf, focusSelf, hidden: !!hidden },
+            rovingTabIndex: { focusSelf, hidden: !!hidden },
             subInfo: { text, subInfo }
         });
 

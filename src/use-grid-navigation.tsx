@@ -155,7 +155,7 @@ export function useGridNavigation<
 
         //const rowHidden = !!asChild.rovingTabIndex.hidden;
 
-        const useGridNavigationCell = useCallback<UseGridNavigationCell<CellElement, CellSubInfo, CellExtraFlags>>(({ subInfo, hasFocus: { onLastFocusedInnerChanged, ...hasFocus }, managedChild, listNavigation: ls, rovingTabIndex: { blurSelf: bs, focusSelf: fs, ...rti } }) => {
+        const useGridNavigationCell = useCallback<UseGridNavigationCell<CellElement, CellSubInfo, CellExtraFlags>>(({ subInfo, hasFocus: { onLastFocusedInnerChanged, ...hasFocus }, managedChild, listNavigation: ls, rovingTabIndex: { focusSelf: fs, ...rti } }) => {
             //rti.hidden || rowHidden;
 
             const focusSelf = useStableCallback(() => {
@@ -166,19 +166,19 @@ export function useGridNavigation<
                 else
                     (rti_cell_ret.getElement() as Element & Partial<HTMLElement>)?.focus?.();
             });
-            const blurSelf = useStableCallback(() => {
+            /*const blurSelf = useStableCallback(() => {
                 if (bs)
                     bs();
                 else
                     (rti_cell_ret.getElement() as Element & Partial<HTMLElement>)?.blur?.();
-            });
+            });*/
             const {
                 useListNavigationChildProps,
                 rovingTabIndex: rti_cell_ret
             } = useGridNavigationColumn2({
                 managedChild: managedChild,
                 listNavigation: { ...ls },
-                rovingTabIndex: { blurSelf, focusSelf, ...rti },
+                rovingTabIndex: { focusSelf, ...rti },
                 subInfo
             });
 
