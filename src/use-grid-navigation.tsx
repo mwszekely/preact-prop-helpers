@@ -16,7 +16,10 @@ import { useState } from "./use-state";
 
 // Parameters (parent, row, cell)
 export interface UseGridNavigationParameters<LsOmits extends ListNavigationParametersOmits, LnOmits extends LinearNavigationOmits, TnOmits extends TypeaheadNavigationOmits, RtiOmits extends RovingTabIndexParametersOmits, McOmits extends ManagedChildrenOmits> extends UseListNavigationParameters<LsOmits | "indexMangler" | "indexDemangler", LnOmits | "navigationDirection", TnOmits, RtiOmits, McOmits> {
-
+    gridNavigation: { 
+        rowIndexMangler?: UseListNavigationParameters<never, never, never, never, never>["listNavigation"]["indexMangler"];
+        rowIndexDemangler?: UseListNavigationParameters<never, never, never, never, never>["listNavigation"]["indexDemangler"];
+      }
 }
 
 export interface UseGridNavigationRowParameters<
@@ -36,7 +39,7 @@ export interface UseGridNavigationRowParameters<
     > {
     asParentRowOfCells: UseListNavigationParameters<LsOmits, LnOmits | "navigationDirection", TnOmits, RtiOmits, McOmits>;
     asChildRowOfSection: UseListNavigationChildParameters<CR, KR, LsChildOmits, RtiChildOmits, McChildOmits, SubbestInfo>
-
+        
 }
 export interface UseGridNavigationCellParameters<CellElement extends Element, CC, KC extends string, LsChildOmits extends ListNavigationChildOmits, RtiChildOmits extends RovingTabIndexChildOmits, McChildOmits extends ManagedChildOmits, SubbestInfo> extends
     UseListNavigationChildParameters<CC, KC, LsChildOmits, RtiChildOmits, McChildOmits, SubbestInfo> {
@@ -96,7 +99,8 @@ export function useGridNavigation<
     rovingTabIndex: rti,
     listNavigation: ls,
     linearNavigation: ln,
-    typeaheadNavigation: tn
+    typeaheadNavigation: tn,
+    gridNavigation: { rowIndexDemangler, rowIndexMangler }
 }: UseGridNavigationParameters<never, never, never, never, never>): UseGridNavigationReturnTypeWithHooks<ParentOrRowElement, RowElement, CellElement, RowSubInfo, CellSubInfo, RowExtraFlags, CellExtraFlags> {
     const [currentColumn, setCurrentColumn, getCurrentColumn] = useState<number | null>(rti.initialIndex ?? 0);
 
@@ -107,7 +111,7 @@ export function useGridNavigation<
     } = useListNavigation<ParentOrRowElement, RowElement, RowSubInfo, RowExtraFlags>({
         managedChildren: mc,
         rovingTabIndex: rti,
-        listNavigation: ls,
+        listNavigation: { indexDemangler: rowIndexDemangler, indexMangler: rowIndexMangler, ...ls },
         linearNavigation: { navigationDirection: "vertical", ...ln },
         typeaheadNavigation: tn,
     });

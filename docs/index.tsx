@@ -267,7 +267,8 @@ export const DemoUseGrid = memo(() => {
         linearNavigation: {},
         listNavigation: {},
         typeaheadNavigation: {},
-        managedChildren: {}
+        managedChildren: {},
+        gridNavigation: {}
     });
 
     return (
