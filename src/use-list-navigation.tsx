@@ -244,13 +244,11 @@ export function useListNavigation<ParentOrChildElement extends Element, ChildEle
         linearNavigation: {
             navigateToPrev: useCallback(() => {
                 setTabbableIndex(c => {
-                    debugger;
                     return tryNavigateToIndex({ children, default: c ?? 0, target: indexDemangler!(indexMangler!((c ?? 0)) - 1), searchDirection: -1, indexMangler: indexMangler ?? identity, indexDemangler: indexDemangler ?? identity })
                 }, true)
             }, []),
             navigateToNext: useCallback(() => {
                 setTabbableIndex(c => {
-                    debugger;
                     return tryNavigateToIndex({ children, default: c ?? 0, target: indexDemangler!(indexMangler!(c ?? 0) + 1), searchDirection: 1, indexMangler: indexMangler ?? identity, indexDemangler: indexDemangler ?? identity });
                 }, true)
             }, []),
