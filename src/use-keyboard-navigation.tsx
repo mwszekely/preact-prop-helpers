@@ -28,14 +28,13 @@ interface LNP {
     navigateToLast(): void;
     /**
      * Controls which arrow keys are used to navigate through the component.
-     * Relative to the writing mode, so in English, "inline" corresponds
-     * to the left & right arrow keys, and "block" to the up & down arrow keys.
+     * Not relative to the writing mode -- these are the literal keys that need to be pressed.
      * 
      * Use "either" to allow navigation in either direction.
      * 
      * Use "none" to disallow navigation with the arrow keys in any direction.
      */
-    navigationDirection?: "inline" | "block" | "either" | "none";
+    navigationDirection?: "horizontal" | "vertical" | "either" | "none";
 
     /**
      * If set to true, navigation with the arrow keys will be 
@@ -72,7 +71,7 @@ export function useLinearNavigation<ParentOrChildElement extends Element>({ line
 
     nd ??= "either";
 
-    const { getLogicalDirectionInfo, useLogicalDirectionProps } = useLogicalDirection<ParentOrChildElement>({});
+    //const { getLogicalDirectionInfo, useLogicalDirectionProps } = useLogicalDirection<ParentOrChildElement>({});
 
     const navigateToFirst = useStableCallback(ntf);
     const navigateToLast = useStableCallback(ntl);
@@ -92,40 +91,29 @@ export function useLinearNavigation<ParentOrChildElement extends Element>({ line
                 if (e.ctrlKey || e.metaKey)
                     return;
 
-                const info = getLogicalDirectionInfo();
+                //const info = getLogicalDirectionInfo();
                 const navigationDirection = getNavigationDirection();
                 const disableArrowKeys = getDisableArrowKeys();
                 const disableHomeEndKeys = getDisableHomeEndKeys();
 
-                const allowsBlockNavigation = (navigationDirection == "block" || navigationDirection == "either");
-                const allowsInlineNavigation = (navigationDirection == "inline" || navigationDirection == "either");
+                const allowsVerticalNavigation = (navigationDirection == "vertical" || navigationDirection == "either");
+                const allowsHorizontalNavigation = (navigationDirection == "horizontal" || navigationDirection == "either");
 
                 switch (e.key) {
                     case "ArrowUp": {
-                        const propName = (info?.blockOrientation === "vertical" ? "blockDirection" : "inlineDirection");
-                        const directionAllowed = (!disableArrowKeys && (info?.blockOrientation === "vertical" ? allowsBlockNavigation : allowsInlineNavigation));
+                        //const propName = (info?.blockOrientation === "vertical" ? "blockDirection" : "inlineDirection");
+                        const directionAllowed = (!disableArrowKeys && allowsVerticalNavigation);
                         if (directionAllowed) {
-                            if (info?.[propName] === "btt") {
-                                navigateToNext();
-                            }
-                            else {
-                                navigateToPrev();
-                            }
+                            navigateToPrev();
                             e.preventDefault();
                             e.stopPropagation();
                         }
                         break;
                     }
                     case "ArrowDown": {
-                        const propName = (info?.blockOrientation === "vertical" ? "blockDirection" : "inlineDirection");
-                        const directionAllowed = (!disableArrowKeys && (info?.blockOrientation === "vertical" ? allowsBlockNavigation : allowsInlineNavigation));
+                        const directionAllowed = (!disableArrowKeys && allowsVerticalNavigation);
                         if (directionAllowed) {
-                            if (info?.[propName] === "btt") {
-                                navigateToPrev();
-                            }
-                            else {
-                                navigateToNext();
-                            }
+                            navigateToNext();
                             e.preventDefault();
                             e.stopPropagation();
                         }
@@ -133,30 +121,18 @@ export function useLinearNavigation<ParentOrChildElement extends Element>({ line
                     }
 
                     case "ArrowLeft": {
-                        const propName = (info?.inlineOrientation === "horizontal" ? "inlineDirection" : "blockDirection");
-                        const directionAllowed = (!disableArrowKeys && (info?.inlineOrientation === "horizontal" ? allowsInlineNavigation : allowsBlockNavigation));
+                        const directionAllowed = (!disableArrowKeys && allowsHorizontalNavigation);
                         if (directionAllowed) {
-                            if (info?.[propName] === "rtl") {
-                                navigateToNext();
-                            }
-                            else {
-                                navigateToPrev();
-                            }
+                            navigateToPrev();
                             e.preventDefault();
                             e.stopPropagation();
                         }
                         break;
                     }
                     case "ArrowRight": {
-                        const propName = (info?.inlineOrientation === "horizontal" ? "inlineDirection" : "blockDirection");
-                        const directionAllowed = (!disableArrowKeys && (info?.inlineOrientation === "horizontal" ? allowsInlineNavigation : allowsBlockNavigation));
+                        const directionAllowed = (!disableArrowKeys && allowsHorizontalNavigation);
                         if (directionAllowed) {
-                            if (info?.[propName] === "rtl") {
-                                navigateToPrev();
-                            }
-                            else {
-                                navigateToNext();
-                            }
+                            navigateToNext();
                             e.preventDefault();
                             e.stopPropagation();
                         }
@@ -181,7 +157,7 @@ export function useLinearNavigation<ParentOrChildElement extends Element>({ line
                         break;
                 }
             };
-            return useLogicalDirectionProps(useMergedProps<ParentOrChildElement>({ onKeyDown }, props))
+            return useMergedProps<ParentOrChildElement>({ onKeyDown }, props);
         }, []),
     }
 

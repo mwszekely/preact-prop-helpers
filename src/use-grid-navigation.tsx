@@ -108,7 +108,7 @@ export function useGridNavigation<
         managedChildren: mc,
         rovingTabIndex: rti,
         listNavigation: ls,
-        linearNavigation: { navigationDirection: "block", ...ln },
+        linearNavigation: { navigationDirection: "vertical", ...ln },
         typeaheadNavigation: tn,
     });
 
@@ -145,7 +145,7 @@ export function useGridNavigation<
             rovingTabIndex: { ...asParent.rovingTabIndex },
             linearNavigation: {
                 ...asParent.linearNavigation,
-                navigationDirection: "inline",
+                navigationDirection: "horizontal",
             },
             typeaheadNavigation: { ...asParent.typeaheadNavigation, noTypeahead: true },
             listNavigation: { ...asParent.listNavigation }
