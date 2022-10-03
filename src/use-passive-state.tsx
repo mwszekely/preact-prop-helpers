@@ -127,6 +127,9 @@ export function usePassiveState<T>(onChange: undefined | null | OnPassiveStateCh
             // (if we flip back to this state, then we won't send the onChange function)
             r.current.prevDep = valueRef.current;
 
+            // It's important to update this here (as well as below) in case customDebounceRendering invokes this immediately
+            valueRef.current = nextValue;
+
             // Schedule the actual check and invocation of onChange later to let effects settle
             (customDebounceRendering ?? debounceRendering)(() => {
                 const nextDep = valueRef.current! as T;
