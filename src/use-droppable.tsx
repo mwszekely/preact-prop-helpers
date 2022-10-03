@@ -3,7 +3,7 @@ import { useEffect, useRef } from "preact/hooks";
 import { useMergedProps } from "./use-merged-props";
 import { useState } from "./use-state";
 
-export interface UseDroppableReturnType<E extends HTMLElement> {
+export interface UseDroppableReturnType<E extends Element> {
 
     /**
      * Hook for modifying the props you were going to pass to your drop target Element.
@@ -69,7 +69,7 @@ export class DroppableFileError extends Error {
 
 
 
-export function useDroppable<E extends HTMLElement>({ effect }: UseDroppableParameters): UseDroppableReturnType<E> {
+export function useDroppable<E extends Element>({ effect }: UseDroppableParameters): UseDroppableReturnType<E> {
 
     const [filesForConsideration, setFilesForConsideration] = useState<null | DropFileMetadata[]>(null);
     const [stringsForConsideration, setStringsForConsideration] = useState<null | Set<string>>(null);

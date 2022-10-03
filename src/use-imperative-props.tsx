@@ -3,7 +3,7 @@ import { useCallback, useRef } from "preact/hooks";
 import { useMergedProps } from "./use-merged-props";
 import { useRefElement } from "./use-ref-element";
 
-export function useImperativeProps<T extends HTMLElement>(incomingProps: h.JSX.HTMLAttributes<T>) {
+export function useImperativeProps<T extends Element>(incomingProps: h.JSX.HTMLAttributes<T>) {
     const currentImperativeProps = useRef<{ className: DOMTokenList, style: h.JSX.CSSProperties, others: h.JSX.HTMLAttributes<T> }>({ className: new DOMTokenList(), style: {}, others: {} });
 
 
@@ -21,12 +21,12 @@ export function useImperativeProps<T extends HTMLElement>(incomingProps: h.JSX.H
 
     const setStyle = useCallback(<T extends keyof h.JSX.CSSProperties>(prop: T, value: h.JSX.CSSProperties[T]) => {
         currentImperativeProps.current.style[prop] = value;
-        getElement()?.style.setProperty(prop as string, value as string ?? null);
+        (getElement() as Element as HTMLElement | undefined)?.style.setProperty(prop as string, value as string ?? null);
     }, []);
 
     const removeStyle = useCallback(<T extends keyof h.JSX.CSSProperties>(prop: T) => {
         delete currentImperativeProps.current.style[prop];
-        getElement()?.style.removeProperty(prop as string);
+        (getElement() as Element as HTMLElement | undefined)?.style.removeProperty(prop as string);
     }, []);
 
     const setAttribute = useCallback(<K extends keyof h.JSX.HTMLAttributes<T>>(prop: K, value: h.JSX.HTMLAttributes<T>[K]) => {

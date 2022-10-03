@@ -132,10 +132,10 @@ You can either store the element via `setState` and re-render to do something in
 
 ## `useDraggable`, `useDroppable`
 ```tsx
-export function useDraggable<E extends HTMLElement>(args: UseDraggableParameters): UseDraggableReturnType<E>;
+export function useDraggable<E extends Element>(args: UseDraggableParameters): UseDraggableReturnType<E>;
 function useDraggableProps<P extends UseDraggablePropsParameters<E>>(props: P): MergedProps<..., P>;
 
-export function useDroppable<E extends HTMLElement>(args: UseDroppableParameters): UseDroppableReturnType<E>;
+export function useDroppable<E extends Element>(args: UseDroppableParameters): UseDroppableReturnType<E>;
 function useDroppableProps<P extends UseDroppablePropsParameters<E>>(props: P): MergedProps<..., P>;
 ```
 `useDraggable` lets an element provide data that can be dropped somewhere else.  Returns both whether the element is currently being dragged, and the `dropEffect` of whatever it was dropped onto when that happens.  If, for example, the `dropEffect` changes to "move", it means the component should `useEffect` and delete itself however appropriate.
@@ -180,7 +180,7 @@ Works similarly to `useListNavigation`, but for 2-dimensional grid layouts.  `us
 ## `useElementSize`
 
 ```tsx
-export function useElementSize<E extends HTMLElement>({ observeBox, setSize }: UseElementSizeParameters): UseElementSizeReturnType<E>;
+export function useElementSize<E extends Element>({ observeBox, setSize }: UseElementSizeParameters): UseElementSizeReturnType<E>;
 function useElementSizeProps<P extends UseElementSizePropsParameters<T>>(props: P): MergedProps<..., P>;
 ```
 
@@ -210,7 +210,7 @@ Note that this structure can be converted from physical dimensions to logical di
 ## `useRandomId`
 
 ```tsx
-export function useElementSize<E extends HTMLElement>({ observeBox }?: UseElementSizeParameters): UseElementSizeReturnType<E>;
+export function useElementSize<E extends Element>({ observeBox }?: UseElementSizeParameters): UseElementSizeReturnType<E>;
 function useElementSizeProps<P extends UseElementSizePropsParameters<T>>(props: P): MergedProps<..., P>;
 ```
 

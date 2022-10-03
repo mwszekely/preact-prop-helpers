@@ -17,7 +17,7 @@ export interface UseFocusTrapReturnType<E extends Element> extends Omit<UseRefEl
 
 const elementsToRestoreFocusTo = new Map<Element | null, (Node & HTMLOrSVGElement)>();
 
-export function useFocusTrap<E extends HTMLElement>({ trapActive }: UseFocusTrapParameters): UseFocusTrapReturnType<E> {
+export function useFocusTrap<E extends Element>({ trapActive }: UseFocusTrapParameters): UseFocusTrapReturnType<E> {
     
     const handleActiveChange = useCallback((trapActive: boolean, element: E | null) => {
         if (trapActive && element) {
