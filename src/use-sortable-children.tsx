@@ -26,7 +26,7 @@ export interface UseRearrangeableChildrenParameters<C, K extends string> {
 /**
  * All of these functions **MUST** be stable across renders.
  */
-export interface UseSortableChildrenParameters<C, K extends string, G extends any[], V> extends UseRearrangeableChildrenParameters<C, K> {
+export interface UseSortableChildrenParameters<C, K extends string> extends UseRearrangeableChildrenParameters<C, K> {
     sortableChildren: {
         /**
          * Must return the value this child uses RE: sorting.
@@ -36,14 +36,14 @@ export interface UseSortableChildrenParameters<C, K extends string, G extends an
          * @param row 
          * @param args 
          */
-        getValue: GetValue<C, K, G, V>;
+        //getValue: GetValue<C, K, G, V>;
 
         /**
          * Controls how values compare against each other.
          * @param lhs 
          * @param rhs 
          */
-        compare: Compare<V>;
+        compare: Compare<ManagedChildInfo<number, C, K>>;
     }
 }
 
@@ -143,20 +143,20 @@ export function useRearrangeableChildren<ParentElement extends Element, C, K ext
  * Because keys are given special treatment and a child has no way of modifying its own key
  * there's no other time or place this can happen other than exactly within the parent component's render function.
  */
-export function useSortableChildren<ParentElement extends Element, C, K extends string, G extends any[], V>({ rearrangeableChildren: { getIndex }, sortableChildren: { compare: userCompare, getValue } }: UseSortableChildrenParameters<C, K, G, V>): UseSortableChildrenReturnTypeWithHooks<ParentElement, C, K, G> {
+export function useSortableChildren<ParentElement extends Element, C, K extends string>({ rearrangeableChildren: { getIndex }, sortableChildren: { compare: userCompare } }: UseSortableChildrenParameters<C, K>): UseSortableChildrenReturnTypeWithHooks<ParentElement, C, K> {
 
     const compare = (userCompare ?? defaultCompare);
 
     const { useRearrangeableProps: useSortableProps, ...rearrangeableChildrenReturnType } = useRearrangeableChildren<ParentElement, C, K>({ rearrangeableChildren: { getIndex } });
     const { rearrangeableChildren: { rearrange } } = rearrangeableChildrenReturnType;
     // The actual sort function.
-    const sort = useCallback((managedRows: ManagedChildren<number, C, K>, direction: "ascending" | "descending", ...args: G): Promise<void> | void => {
+    const sort = useCallback((managedRows: ManagedChildren<number, C, K>, direction: "ascending" | "descending"): Promise<void> | void => {
 
         const sortedRows = managedRows.arraySlice().sort((lhsRow, rhsRow) => {
 
-            const lhsValue = getValue(lhsRow, ...args) as any;
-            const rhsValue = getValue(rhsRow, ...args) as any;
-            const result = compare(lhsValue, rhsValue) // lhsRow.getManagedCells()?.[column]?.value, rhsRow.getManagedCells()?.[column]?.value);
+            const lhsValue = lhsRow;
+            const rhsValue = rhsRow;
+            const result = compare(lhsValue, rhsValue);
             if (direction[0] == "d")
                 return -result;
             return result;
@@ -207,15 +207,15 @@ export interface UseRearrangeableChildrenReturnTypeWithHooks<ParentElement exten
 
 }
 
-export interface UseSortableChildrenReturnTypeInfo<C, K extends string, G extends any[]> extends UseRearrangeableChildrenReturnTypeInfo<C, K> {
+export interface UseSortableChildrenReturnTypeInfo<C, K extends string> extends UseRearrangeableChildrenReturnTypeInfo<C, K> {
     sortableChildren: {/** **STABLE** */
-        sort: (managedRows: ManagedChildren<number, C, K>, direction: "ascending" | "descending", ...args: G) => Promise<void> | void;
+        sort: (managedRows: ManagedChildren<number, C, K>, direction: "ascending" | "descending") => Promise<void> | void;
         /** **STABLE** */
         shuffle: (managedRows: ManagedChildren<number, C, K>) => Promise<void> | void;
     }
 }
-export interface UseSortableChildrenReturnTypeWithHooks<ParentElement extends Element, C, K extends string, G extends any[]> extends
-    UseSortableChildrenReturnTypeInfo<C, K, G> {
+export interface UseSortableChildrenReturnTypeWithHooks<ParentElement extends Element, C, K extends string> extends
+    UseSortableChildrenReturnTypeInfo<C, K> {
     /** **STABLE** */
     useSortableProps: (props: Omit<h.JSX.HTMLAttributes<ParentElement>, "children"> & { children?: VNode<any>[] | undefined; }) => h.JSX.HTMLAttributes<ParentElement>;
 }

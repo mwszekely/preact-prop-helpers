@@ -446,30 +446,30 @@ export function useListNavigationSingleSelection<ParentOrChildElement extends El
 
 
 
-export interface UseSortableListNavigationParameters<C, K extends string, G extends any[], V, LsOmits extends ListNavigationParametersOmits, LnOmits extends LinearNavigationOmits, TnOmits extends TypeaheadNavigationOmits, RtiOmits extends RovingTabIndexParametersOmits, McOmits extends ManagedChildrenOmits> extends
+export interface UseSortableListNavigationParameters<C, K extends string, LsOmits extends ListNavigationParametersOmits, LnOmits extends LinearNavigationOmits, TnOmits extends TypeaheadNavigationOmits, RtiOmits extends RovingTabIndexParametersOmits, McOmits extends ManagedChildrenOmits> extends
     UseListNavigationParameters<LsOmits | "indexMangler" | "indexDemangler", LnOmits, TnOmits, RtiOmits, McOmits>,
-    UseSortableChildrenParameters<C, K, G, V> {
+    UseSortableChildrenParameters<C, K> {
 }
 
 export type UseSortableListNavigationChildParameters<C, K extends string, LsOmits extends ListNavigationChildOmits, RtiOmits extends RovingTabIndexChildOmits, McOmits extends ManagedChildOmits> = UseListNavigationChildParameters<C, K, LsOmits, RtiOmits, McOmits, C>;
 export type UseSortableListNavigationChild<ChildElement extends Element, C, K extends string> = (p: UseSortableListNavigationChildParameters<C, K, never, never, never>) => UseListNavigationChildReturnTypeWithHooks<ChildElement>;
 
-export interface UseSortableListNavigationReturnTypeInfo<ChildElement extends Element, C, K extends string, G extends any[]> extends UseListNavigationReturnTypeInfo<ChildElement, C, K>,
-    UseSortableChildrenReturnTypeInfo<C, K, G> {
+export interface UseSortableListNavigationReturnTypeInfo<ChildElement extends Element, C, K extends string> extends UseListNavigationReturnTypeInfo<ChildElement, C, K>,
+    UseSortableChildrenReturnTypeInfo<C, K> {
 
 }
 
-export interface UseSortableListNavigationReturnTypeWithHooks<ParentElement extends Element, ChildElement extends Element, C, K extends string, G extends any[]> extends UseSortableListNavigationReturnTypeInfo<ChildElement, C, K, G> {
+export interface UseSortableListNavigationReturnTypeWithHooks<ParentElement extends Element, ChildElement extends Element, C, K extends string> extends UseSortableListNavigationReturnTypeInfo<ChildElement, C, K> {
     useSortableListNavigationProps: (props: Omit<h.JSX.HTMLAttributes<ParentElement>, "children"> & { children: VNode<any>[]; }) => h.JSX.HTMLAttributes<ParentElement>
     useSortableListNavigationChild: UseSortableListNavigationChild<ChildElement, C, K>;
 }
 
-export function useSortableListNavigation<ParentElement extends Element, ChildElement extends Element, C, K extends string, G extends any[], V>({ linearNavigation, listNavigation, managedChildren, rovingTabIndex, typeaheadNavigation, rearrangeableChildren, sortableChildren }: UseSortableListNavigationParameters<C, K, G, V, never, never, never, never, never>): UseSortableListNavigationReturnTypeWithHooks<ParentElement, ChildElement, C, K, G> {
+export function useSortableListNavigation<ParentElement extends Element, ChildElement extends Element, C, K extends string>({ linearNavigation, listNavigation, managedChildren, rovingTabIndex, typeaheadNavigation, rearrangeableChildren, sortableChildren }: UseSortableListNavigationParameters<C, K, never, never, never, never, never>): UseSortableListNavigationReturnTypeWithHooks<ParentElement, ChildElement, C, K> {
 
     const {
         useSortableProps,
         ...sortableChildrenReturnType
-    } = useSortableChildren<ParentElement, C, K, G, V>({
+    } = useSortableChildren<ParentElement, C, K>({
         rearrangeableChildren,
         sortableChildren,
     });
@@ -517,26 +517,25 @@ export interface UseSortableListNavigationSingleSelectionParameters<SSOmits exte
 
 }
 
-export interface UseSortableListNavigationSingleSelectionReturnTypeInfo<ChildElement extends Element, C, K extends string, G extends any[]> extends UseSortableChildrenReturnTypeInfo<C, K, G>, UseListNavigationReturnTypeInfo<ChildElement, C, K> {
+export interface UseSortableListNavigationSingleSelectionReturnTypeInfo<ChildElement extends Element, C, K extends string> extends UseSortableChildrenReturnTypeInfo<C, K>, UseListNavigationReturnTypeInfo<ChildElement, C, K> {
 
 }
 
-export interface UseSortableListNavigationSingleSelectionReturnTypeWithHooks<ParentElement extends Element, ChildElement extends Element, C, K extends string, G extends any[]> extends
-    UseSortableListNavigationSingleSelectionReturnTypeInfo<ChildElement, C, K, G> {
+export interface UseSortableListNavigationSingleSelectionReturnTypeWithHooks<ParentElement extends Element, ChildElement extends Element, C, K extends string> extends
+    UseSortableListNavigationSingleSelectionReturnTypeInfo<ChildElement, C, K> {
     useSortableListNavigationSingleSelectionProps: (props: Omit<h.JSX.HTMLAttributes<ParentElement>, "children"> & { children: VNode<any>[]; }) => h.JSX.HTMLAttributes<ParentElement>
     useSortableListNavigationSingleSelectionChild: UseSortableListNavigationSingleSelectionChild<ChildElement, C, K>;
 }
 
-export function useSortableListNavigationSingleSelection<ParentElement extends Element, ChildElement extends Element, C, K extends string>({ linearNavigation, listNavigation, managedChildren, rovingTabIndex, singleSelection, typeaheadNavigation, childrenHaveFocus }: UseSortableListNavigationSingleSelectionParameters<never, never, never, never, never, never>): UseSortableListNavigationSingleSelectionReturnTypeWithHooks<ParentElement, ChildElement, C, K, []> {
+export function useSortableListNavigationSingleSelection<ParentElement extends Element, ChildElement extends Element, C, K extends string>({ linearNavigation, listNavigation, managedChildren, rovingTabIndex, singleSelection, typeaheadNavigation, childrenHaveFocus }: UseSortableListNavigationSingleSelectionParameters<never, never, never, never, never, never>): UseSortableListNavigationSingleSelectionReturnTypeWithHooks<ParentElement, ChildElement, C, K> {
 
     const {
         useSortableProps,
         ...sortableReturnType
-    } = useSortableChildren<ParentElement, C, K, [], number>({
+    } = useSortableChildren<ParentElement, C, K>({
         rearrangeableChildren: { getIndex: useCallback((row) => row.index, []) },
         sortableChildren: {
-            getValue: useCallback((row) => row.index, []),
-            compare: useCallback((lhs, rhs) => { return lhs - rhs; }, []),
+            compare: useCallback((lhs, rhs) => { return lhs.index - rhs.index; }, []),
         }
     });
 
