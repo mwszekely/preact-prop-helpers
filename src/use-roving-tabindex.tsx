@@ -13,7 +13,7 @@ import { useState } from "./use-state";
 
 export type OnTabbableIndexChange = (tabbableIndex: number | null) => void;
 
-export interface UseRovingTabIndexSubInfo<E extends Element, C> {
+export interface UseRovingTabIndexSubInfo<E extends Element, RtiSubInfo> {
     /**
      * By default, tabbing through this component will cause the referenced element to be focused.
      * 
@@ -21,13 +21,11 @@ export interface UseRovingTabIndexSubInfo<E extends Element, C> {
      */
     focusSelf(): void;
 
-    //blurSelf(): void;
-
     getElement(): E | null;
 
     hidden: boolean;
 
-    subInfo: C;
+    subInfo: RtiSubInfo;
 }
 
 interface RTIP {
@@ -57,9 +55,7 @@ export interface UseRovingTabIndexReturnTypeInfo<RtiSubInfo, ExtraFlagKeys exten
     }
 }
 
-export interface UseRovingTabIndexReturnTypeWithHooks<ChildElement extends Element, RtiSubInfo, ExtraFlagKeys extends string> extends
-    UseRovingTabIndexReturnTypeInfo<UseRovingTabIndexSubInfo<ChildElement, RtiSubInfo>, ExtraFlagKeys | "tabbable">
-{
+export interface UseRovingTabIndexReturnTypeWithHooks<ChildElement extends Element, RtiSubInfo, ExtraFlagKeys extends string> extends UseRovingTabIndexReturnTypeInfo<UseRovingTabIndexSubInfo<ChildElement, RtiSubInfo>, ExtraFlagKeys | "tabbable"> {
     /** **STABLE** */
     useRovingTabIndexChild: UseRovingTabIndexChild<ChildElement, RtiSubInfo, ExtraFlagKeys>;
 }
@@ -67,9 +63,8 @@ export interface UseRovingTabIndexReturnTypeWithHooks<ChildElement extends Eleme
 export type RovingTabIndexChildOmits = keyof UseRovingTabIndexSubInfo<any, any>;
 
 export interface UseRovingTabIndexChildParameters<RtiSubInfo, ExtraFlagKeys extends string, RticOmits extends RovingTabIndexChildOmits, McOmits extends ManagedChildOmits, SubbestInfo> extends
-    UseManagedChildParameters<number, UseRovingTabIndexSubInfo<any, RtiSubInfo>, ExtraFlagKeys | "tabbable", McOmits | "subInfo"> {
-    rovingTabIndex: Omit<Partial<Omit<UseRovingTabIndexSubInfo<any, any>, "getElement" | "subInfo">>, RticOmits>;
-    subInfo: SubbestInfo;
+    UseManagedChildParameters<number, UseRovingTabIndexSubInfo<any, RtiSubInfo>, ExtraFlagKeys | "tabbable", McOmits | "subInfo", SubbestInfo> {
+    rovingTabIndex: Omit<Partial<Omit<UseRovingTabIndexSubInfo<any, any>, "getElement" | "subInfo">>, RticOmits> & { noModifyTabIndex?: boolean };
 }
 
 export type UseRovingTabIndexChild<ChildElement extends Element, RtiSubInfo, ExtraFlagKeys extends string> = (a: UseRovingTabIndexChildParameters<RtiSubInfo, ExtraFlagKeys, never, never, RtiSubInfo>) => UseRovingTabIndexChildReturnTypeWithHooks<ChildElement>;
@@ -181,7 +176,7 @@ export function useRovingTabIndex<ChildElement extends Element, RtiSubInfo, Extr
 
     const useRovingTabIndexChild = useCallback<UseRovingTabIndexChild<ChildElement, RtiSubInfo, ExtraFlagKeys>>((childParameters) => {
 
-        const { subInfo, managedChild: { index, flags }, rovingTabIndex: { hidden, focusSelf: focusSelfOverride } } = childParameters;
+        const { subInfo, managedChild: { index, flags }, rovingTabIndex: { hidden, focusSelf: focusSelfOverride, noModifyTabIndex } } = childParameters;
 
         useEffect(() => {
             reevaluateClosestFit();
@@ -200,17 +195,6 @@ export function useRovingTabIndex<ChildElement extends Element, RtiSubInfo, Extr
                     element.focus?.();
             }
         }, []);
-        /*const blurSelf = useCallback(() => {
-            const bs = bsOverride();
-            if (bs) {
-                bs();
-            }
-            else {
-                const element = getElement() as (Element & Partial<HTMLElement>);
-                if (element)
-                    element.blur?.();
-            }
-        }, []);*/
 
         const onFocusedInnerChanged = useStableCallback((focused: boolean, _prevFocused: boolean | undefined) => {
             if (focused) {
@@ -226,22 +210,25 @@ export function useRovingTabIndex<ChildElement extends Element, RtiSubInfo, Extr
             managedChild: {
                 index,
                 flags: { ...flags, tabbable: tabbableFlags.current } as Partial<Record<ExtraFlagKeys | "tabbable", ChildFlagOperations>>,
-                subInfo: {
-                    //blurSelf,
-                    focusSelf,
-                    getElement,
-                    hidden: !!hidden,
-                    subInfo
-                }
+            },
+            subInfo: {
+                focusSelf,
+                getElement,
+                hidden: !!hidden,
+                subInfo
             }
         });
+        
         useEffect(() => {
             if (tabbable)
                 stableOnTabbableRender(index);
-        }, [tabbable, index])
+        }, [tabbable, index]);
+
         function useRovingTabIndexChildProps(props: h.JSX.HTMLAttributes<ChildElement>): h.JSX.HTMLAttributes<ChildElement> {
-            console.assert(props.tabIndex == null);
-            return useMergedProps<ChildElement>(useHasFocusProps({ tabIndex: tabbable ? 0 : -1 }), props);
+            if (!noModifyTabIndex)
+                console.assert(props.tabIndex == null);
+
+            return useMergedProps<ChildElement>(useHasFocusProps({ tabIndex: noModifyTabIndex? undefined : (tabbable ? 0 : -1) }), props);
         }
 
         return {

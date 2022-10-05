@@ -171,9 +171,9 @@ export interface UseListNavigationSingleSelectionChildReturnTypeWithHooks<ChildE
 }
 
 
-export type UseListNavigationChild<ChildElement extends Element, C, K extends string> = (a: UseListNavigationChildParameters<C, K, never, never, never, C>) => UseListNavigationChildReturnTypeWithHooks<ChildElement>;
+export type UseListNavigationChild<ChildElement extends Element, LsSubInfo, K extends string> = (a: UseListNavigationChildParameters<LsSubInfo, K, never, never, never, LsSubInfo>) => UseListNavigationChildReturnTypeWithHooks<ChildElement>;
 
-export type UseListNavigationSingleSelectionChild<ChildElement extends Element, C, K extends string> = (p: UseListNavigationSingleSelectionChildParameters<ChildElement, C, K, never, never, never, C>) => UseListNavigationSingleSelectionChildReturnTypeWithHooks<ChildElement>;
+export type UseListNavigationSingleSelectionChild<ChildElement extends Element, LsSubInfo, K extends string> = (p: UseListNavigationSingleSelectionChildParameters<ChildElement, LsSubInfo, K, never, never, never, LsSubInfo>) => UseListNavigationSingleSelectionChildReturnTypeWithHooks<ChildElement>;
 
 
 
@@ -379,8 +379,7 @@ export function useListNavigationSingleSelection<ParentOrChildElement extends El
 
     const {
         changeIndex: changeSelectedIndex,
-        getCurrentIndex: getSelectedIndex,
-        //reevaluateClosestFit
+        getCurrentIndex: getSelectedIndex
     } = useChildrenFlag<UseRovingTabIndexSubInfo<ChildElement, UseListNavigationSubInfo<C>>, K | "selected">({
         children: children,
         initialIndex: selectedIndex,
@@ -405,7 +404,8 @@ export function useListNavigationSingleSelection<ParentOrChildElement extends El
                     }
                 }),
                 ...hasFocus,
-                managedChild: { index }
+                managedChild: { index },
+                subInfo
             });
 
             const {
@@ -594,7 +594,6 @@ export interface TryNavigateToIndexParameters<ChildElement extends Element, C, K
     searchDirection: 1 | -1;
     indexMangler: (n: number) => number;
     indexDemangler: (n: number) => number;
-
 }
 
 export function tryNavigateToIndex<ChildElement extends Element, C, K extends string>({ children, searchDirection, indexDemangler, indexMangler, target }: TryNavigateToIndexParameters<ChildElement, C, K>) {

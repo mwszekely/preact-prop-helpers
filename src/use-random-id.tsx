@@ -74,11 +74,17 @@ export interface UseRandomIdReferencerElementReturnType<R extends Element> {
  * Unlike most other `use*Props` hooks, these are mostly stable.
  */
 export function useRandomId<S extends Element>({ randomId: { prefix }, managedChildren: { onAfterChildLayoutEffect, onChildrenMountChange } }: UseRandomIdParameters): UseRandomIdReturnTypeWithHooks<S> {
+
+    // Generate a random ID that will be used when no other ID is provided
+    useEnsureStability("useRandomId", prefix);
     const [backupRandomId, , getBackupRandomId] = useState<string>(() => generateRandomId(prefix));
+
+    // By default, we just use a random ID.
+    // But if the element already supplies its own ID, then we need to make sure whoever references it uses that instead of the random one we made.
     const [usedId, setUsedId, getUsedId] = useState<string | undefined>(() => getBackupRandomId());
     const mismatchErrorRef = useRef(false);
-    useEnsureStability("useRandomId", prefix);
 
+    // We need to be able to modify our children remotely
     const { useManagedChild, ...managedChildrenReturnType } = useManagedChildren<"referencer" | "source", RandomIdChildInfoBase, never>({ managedChildren: { onAfterChildLayoutEffect, onChildrenMountChange } });
     const { managedChildren: { children } } = managedChildrenReturnType;
 
@@ -97,7 +103,7 @@ export function useRandomId<S extends Element>({ randomId: { prefix }, managedCh
             }
         });
 
-        const _: void = useManagedChild({ managedChild: { index: "source", subInfo: { setUsedId: setUsedIdLocal } } });
+        const _: void = useManagedChild({ managedChild: { index: "source" }, subInfo: { setUsedId: setUsedIdLocal } });
 
         const useRandomIdSourceElementProps = useCallback<UseRandomIdSourceElementReturnType<S>["useRandomIdSourceElementProps"]>(function (p: h.JSX.HTMLAttributes<S>) {
             p.id ||= backupRandomId;
@@ -116,14 +122,14 @@ export function useRandomId<S extends Element>({ randomId: { prefix }, managedCh
         // Whatever ID was most recently used by the actual "id" prop of the source element
         useEnsureStability(idPropName);
 
-        const _v: void = useManagedChild({ managedChild: { index: "referencer", subInfo: { setUsedId: setUsedIdLocal } } });
+        const _v: void = useManagedChild({ managedChild: { index: "referencer" }, subInfo: { setUsedId: setUsedIdLocal } });
 
         const useRandomIdReferencerElementProps = useCallback<UseRandomIdReferencerElementReturnType<R>["useRandomIdReferencerElementProps"]>(function <R extends Element>({ [idPropName]: givenId, ...p }: h.JSX.HTMLAttributes<R>) {
             if (givenId && usedId) {
                 if (givenId != usedId) {
                     if (!mismatchErrorRef.current) {
                         mismatchErrorRef.current = true;
-                        console.error(`Multiple mis-matched IDs were provided for the ${idPropName} prop: the child explicitly specified ${givenId} in its  ${idPropName} prop, but the parent told this child to use ${usedId} (the parent's ID).`);
+                        console.error(`Multiple mis-matched IDs were provided for the ${idPropName} prop: the child explicitly specified ${givenId} in its  ${idPropName} prop, but the parent told this child to use ${usedId}.`);
                     }
                 }
             }

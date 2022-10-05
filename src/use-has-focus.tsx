@@ -112,27 +112,23 @@ export interface UseChildrenHaveFocusParameters extends UseManagedChildrenParame
 
 
 
-export interface UseChildrenHaveFocusChildParameters<E extends Element> extends UseManagedChildParameters<number, FocusInfo, never, "subInfo">, UseHasFocusParameters<E> {
+export interface UseChildrenHaveFocusChildParameters<E extends Element, C, K extends string, SubbestInfo> extends UseManagedChildParameters<number, C, K, never, SubbestInfo>, UseHasFocusParameters<E> {
 }
 
 export interface UseChildrenHaveFocusChildReturnType<E extends Element> extends Omit<UseRefElementReturnType<E>, "useRefElementProps">, Omit<UseHasFocusReturnType<E>, "useHasFocusProps"> {
     useChildrenHaveFocusChildProps(props: h.JSX.HTMLAttributes<E>): h.JSX.HTMLAttributes<E>;
 }
 
-interface FocusInfo {
-
-}
-
-export interface UseChildrenHaveFocusReturnTypeInfo extends UseManagedChildrenReturnTypeInfo<number, FocusInfo, never> {
+export interface UseChildrenHaveFocusReturnTypeInfo<C, K extends string> extends UseManagedChildrenReturnTypeInfo<number, C, K> {
 }
 
 
-export interface UseChildrenHaveFocusReturnTypeWithHooks extends UseChildrenHaveFocusReturnTypeInfo {
-    useChildrenHaveFocusChild: <E extends Element>(parameters: UseChildrenHaveFocusChildParameters<E>) => UseChildrenHaveFocusChildReturnType<E>;
+export interface UseChildrenHaveFocusReturnTypeWithHooks<C, K extends string> extends UseChildrenHaveFocusReturnTypeInfo<C, K> {
+    useChildrenHaveFocusChild: <E extends Element>(parameters: UseChildrenHaveFocusChildParameters<E, C, K, C>) => UseChildrenHaveFocusChildReturnType<E>;
 }
 
-export function useChildrenHaveFocus({ childrenHaveFocus: { onAllLostFocus, onAnyGainedFocus }, managedChildren: { onAfterChildLayoutEffect, onChildrenMountChange } }: UseChildrenHaveFocusParameters): UseChildrenHaveFocusReturnTypeWithHooks {
-    const { managedChildren, useManagedChild } = useManagedChildren<number, FocusInfo, never>({ managedChildren: { onAfterChildLayoutEffect, onChildrenMountChange } });
+export function useChildrenHaveFocus<C, K extends string>({ childrenHaveFocus: { onAllLostFocus, onAnyGainedFocus }, managedChildren: { onAfterChildLayoutEffect, onChildrenMountChange } }: UseChildrenHaveFocusParameters): UseChildrenHaveFocusReturnTypeWithHooks<C, K> {
+    const { managedChildren, useManagedChild } = useManagedChildren<number, C, K>({ managedChildren: { onAfterChildLayoutEffect, onChildrenMountChange } });
     const allElementsRef = useRef<Set<Node>>(new Set());
     const [_getFocusCount, setFocusCount] = usePassiveState<number>(useStableCallback((anyFocused: number, anyPreviouslyFocused: number | undefined) => {
         console.log(`Changing focus count from ${anyPreviouslyFocused} to ${anyFocused}`);
@@ -144,9 +140,9 @@ export function useChildrenHaveFocus({ childrenHaveFocus: { onAllLostFocus, onAn
             onAllLostFocus?.();
     }));
 
-    const useChildrenHaveFocusChild = useCallback(<E extends Element>({ onElementChange, onMount, onUnmount, getDocument, getWindow, onActiveElementChange, onFocusedChanged, onFocusedInnerChanged, onLastActiveElementChange, onLastFocusedChanged, onLastFocusedInnerChanged, onWindowFocusedChange, managedChild: { index, flags } }: UseChildrenHaveFocusChildParameters<E>): UseChildrenHaveFocusChildReturnType<E> => {
-        useManagedChild({ managedChild: { index, subInfo: {}, flags } });
-        const { useHasFocusProps, ...hasFocus  } = useHasFocus<E>({
+    const useChildrenHaveFocusChild = useCallback(<E extends Element>({ onElementChange, onMount, onUnmount, getDocument, getWindow, onActiveElementChange, onFocusedChanged, onFocusedInnerChanged, onLastActiveElementChange, onLastFocusedChanged, onLastFocusedInnerChanged, onWindowFocusedChange, managedChild: { index, flags }, subInfo }: UseChildrenHaveFocusChildParameters<E, C, K, C>): UseChildrenHaveFocusChildReturnType<E> => {
+        useManagedChild({ managedChild: { index, flags }, subInfo });
+        const { useHasFocusProps, ...hasFocus } = useHasFocus<E>({
             getDocument,
             getWindow,
             onActiveElementChange,
