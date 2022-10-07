@@ -32,7 +32,7 @@ interface UsePressParameters<E extends Node> {
  * @param onClickSync 
  * @param exclude Whether the polyfill shouldn't apply (can specify for specific interactions)
  */
-export function usePress<E extends Node>({ exclude, hasFocus: { onFocusedInnerChanged, ...hasFocus }, onClickSync }: UsePressParameters<E>) {
+export function usePress<E extends Node>({ exclude, hasFocus: { onLastFocusedInnerChanged, ...hasFocus }, onClickSync }: UsePressParameters<E>) {
 
     // A button can be activated in multiple ways, so on the off chance
     // that multiple are triggered at once, we only *actually* register
@@ -42,15 +42,16 @@ export function usePress<E extends Node>({ exclude, hasFocus: { onFocusedInnerCh
     //
     // As an emergency failsafe, when the element loses focus,
     // this is reset back to 0.
-    const [active, setActive, getActive] = useState(0);
+    const [activeDuringRender, setActive, getActive] = useState(0);
     const forceUpdate = useForceUpdate();
     const { useHasFocusProps, getElement } = useHasFocus({
         ...hasFocus,
-        onFocusedInnerChanged: useStableCallback((f: boolean, p: boolean | undefined) => {
-            onFocusedInnerChanged?.(f, p);
+        onLastFocusedInnerChanged: useStableCallback((f: boolean, p: boolean | undefined) => {
+            onLastFocusedInnerChanged?.(f, p);
             if (!f) {
                 setActive(0);
             }
+
         })
     });
 
@@ -63,17 +64,17 @@ export function usePress<E extends Node>({ exclude, hasFocus: { onFocusedInnerCh
     // The flag is reset any time the selection is empty or the button is
     // no longer active.
     const [textSelectedDuringActivationStartTime, setTextSelectedDuringActivationStartTime] = useState<Date | null>(null);
-    const pseudoActive = (active && (textSelectedDuringActivationStartTime == null));
+    const pseudoActive = (activeDuringRender && (textSelectedDuringActivationStartTime == null));
 
     useGlobalHandler(document, "selectionchange", _ => {
         setTextSelectedDuringActivationStartTime(prev => nodeSelectedTextLength(getElement()) == 0 ? null : prev != null ? prev : new Date());
     });
 
     useEffect(() => {
-        if (active == 0)
+        if (activeDuringRender == 0)
             setTextSelectedDuringActivationStartTime(null);
 
-    }, [active == 0]);
+    }, [activeDuringRender == 0]);
 
     const onActiveStart = useStableCallback<NonNullable<typeof onClickSync>>((_) => {
         setActive(a => ++a);
@@ -94,7 +95,8 @@ export function usePress<E extends Node>({ exclude, hasFocus: { onFocusedInnerCh
             return;
         }
 
-        if (getActive() <= 0) {
+        let active = getActive();   // We query if we're active *after* calling setState because we count a press iff we're now at 0.
+        if (active <= 0) {
             handlePress(e);
             forceUpdate();  // TODO: Remove when issue resolved https://github.com/preactjs/preact/issues/3731
         }
@@ -147,29 +149,37 @@ export function usePress<E extends Node>({ exclude, hasFocus: { onFocusedInnerCh
         }
     });
 
-    const onMouseDown = excludes("click", exclude) ? undefined : (e: h.JSX.TargetedMouseEvent<E>) => {
-        // Stop double clicks from selecting text in an component that's *supposed* to be acting like a button,
-        // but also don't prevent the user from selecting that text manually if they really want to
-        // (which user-select: none would do, but cancelling a double click on mouseDown doesn't)
-        if (e.detail > 1)
-            e.preventDefault();
+    const onMouseDown = useStableCallback((e: h.JSX.TargetedMouseEvent<E>) => {
+        if (!excludes("click", exclude)) {
+            // Stop double clicks from selecting text in an component that's *supposed* to be acting like a button,
+            // but also don't prevent the user from selecting that text manually if they really want to
+            // (which user-select: none would do, but cancelling a double click on mouseDown doesn't)
+            if (e.detail > 1) {
+                e.preventDefault();
+            }
 
 
-        if (e.button === 0)
-            onActiveStart(e);
-    }
-    const onMouseUp = excludes("click", exclude) ? undefined : (e: h.JSX.TargetedMouseEvent<E>) => {
-        if (e.button === 0 && active > 0)
-            onActiveStop(e);
-    };
+            if (e.button === 0) {
+                onActiveStart(e);
+            }
+        }
+    })
+    const onMouseUp = useStableCallback((e: h.JSX.TargetedMouseEvent<E>) => {
+        if (!excludes("click", exclude)) {
+            if (e.button === 0 && getActive() > 0) {
+                onActiveStop(e);
+            }
+        }
+    });
 
 
     const onMouseLeave = useStableCallback(() => {
-        if (!excludes("click", exclude))
+        if (!excludes("click", exclude)) {
             setActive(0);
+        }
     });
 
-    const onKeyDown = excludes("space", exclude) && excludes("enter", exclude) ? undefined : (e: h.JSX.TargetedKeyboardEvent<E>) => {
+    const onKeyDown = useStableCallback((e: h.JSX.TargetedKeyboardEvent<E>) => {
         if (e.key == " " && onClickSync && !excludes("space", exclude)) {
             // We don't actually activate it on a space keydown
             // but we do preventDefault to stop the page from scrolling.
@@ -182,20 +192,20 @@ export function usePress<E extends Node>({ exclude, hasFocus: { onFocusedInnerCh
             onActiveStart(e);
             onActiveStop(e);
         }
-    }
+    })
 
-    const onKeyUp = excludes("space", exclude) ? undefined : (e: h.JSX.TargetedKeyboardEvent<E>) => {
+    const onKeyUp = useStableCallback((e: h.JSX.TargetedKeyboardEvent<E>) => {
         if (e.key == " " && !excludes("space", exclude))
             onActiveStop(e);
-    }
+    })
 
-    const onClick = (e: h.JSX.TargetedMouseEvent<E>) => {
+    const onClick = useStableCallback((e: h.JSX.TargetedMouseEvent<E>) => {
         e.preventDefault();
         if (e.detail > 1) {
             e.stopImmediatePropagation();
             e.stopPropagation();
         }
-    }
+    })
 
     return function usePressProps(props: h.JSX.HTMLAttributes<E>) {
         return useMergedProps<E>(props, useHasFocusProps(({
