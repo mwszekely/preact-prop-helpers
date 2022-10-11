@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef } from "preact/hooks";
 import { useStableCallback } from "./use-stable-callback";
 import { useStableGetter } from "./use-stable-getter";
 
-export interface UseTimeout {
+export interface UseTimeoutParameters {
     /**
      * The number of ms to wait before invoking `callback`.  
      * If `null`, cancels the timeout immediately.
@@ -22,7 +22,7 @@ export interface UseTimeout {
     callback: () => void;
 }
 
-export function useTimeout({ timeout, callback, triggerIndex }: UseTimeout) {
+export function useTimeout({ timeout, callback, triggerIndex }: UseTimeoutParameters) {
     const stableCallback = useStableCallback(() => { startTimeRef.current = null; callback(); });
     const getTimeout = useStableGetter(timeout);
 

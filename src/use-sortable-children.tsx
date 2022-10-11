@@ -8,7 +8,6 @@ import { returnNull, usePassiveState } from "./use-passive-state";
 import lodashShuffle from "lodash-es/shuffle";
 
 export type GetIndex<C, K extends string> = (row: ManagedChildInfo<number, C, K>) => (number | null | undefined);
-export type GetValue<C, K extends string, G extends any[], V> = (row: ManagedChildInfo<number, C, K>, ...args: G) => V;
 export type Compare<V> = (lhs: V, rhs: V) => number;
 
 /**

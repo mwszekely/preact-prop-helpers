@@ -4,7 +4,7 @@ import { useStableGetter } from "./use-stable-getter";
 
 
 
-export interface UseInterval {
+export interface UseIntervalParameters {
     /**
      * The number of ms to wait before invoking `callback`.
      */
@@ -16,7 +16,7 @@ export interface UseInterval {
     callback: () => void;
 }
 
-export function useInterval({ interval, callback }: UseInterval) {
+export function useInterval({ interval, callback }: UseIntervalParameters) {
     // Get a wrapper around the given callback that's stable
     const stableCallback = useStableCallback(callback);
     const getInterval = useStableGetter(interval);
