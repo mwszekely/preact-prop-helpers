@@ -243,7 +243,6 @@ export function useRovingTabIndex<ChildElement extends Element, RtiSubInfo, Extr
     }, [/* Must remain stable */]);
 
     const focusSelf = useCallback(() => {
-        console.log(`useRovingTabIndex.focusSelf`);
         const index = getTabbableIndex();
         if (index != null)
             parentReturnType.managedChildren.children.getAt(index)?.subInfo.focusSelf?.();

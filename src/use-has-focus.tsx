@@ -131,7 +131,6 @@ export function useChildrenHaveFocus<C, K extends string>({ childrenHaveFocus: {
     const { managedChildren, useManagedChild } = useManagedChildren<number, C, K>({ managedChildren: { onAfterChildLayoutEffect, onChildrenMountChange } });
     const allElementsRef = useRef<Set<Node>>(new Set());
     const [_getFocusCount, setFocusCount] = usePassiveState<number>(useStableCallback((anyFocused: number, anyPreviouslyFocused: number | undefined) => {
-        console.log(`Changing focus count from ${anyPreviouslyFocused} to ${anyFocused}`);
         console.assert(anyFocused >= 0 && anyFocused <= 1);
 
         if (anyFocused && !anyPreviouslyFocused)
@@ -164,11 +163,9 @@ export function useChildrenHaveFocus<C, K extends string>({ childrenHaveFocus: {
             onLastFocusedChanged,
             onLastFocusedInnerChanged: useStableCallback((focused: boolean, prev: boolean | undefined) => {
                 if (focused) {
-                    console.log(`Child ${index} is focused`);
                     setFocusCount(p => (p ?? 0) + 1);
                 }
                 else if (!focused && prev) {
-                    console.log(`Child ${index} is unfocused`);
                     setFocusCount(p => (p ?? 0) - 1);
                 }
 
