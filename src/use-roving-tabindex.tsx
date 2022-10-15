@@ -229,7 +229,7 @@ export function useRovingTabIndex<ChildElement extends Element, RtiSubInfo, Extr
             if (!noModifyTabIndex)
                 console.assert(props.tabIndex == null);
 
-            return useMergedProps<ChildElement>(useHasFocusProps({ tabIndex: noModifyTabIndex ? undefined : (tabbable ? 0 : -1) }), props);
+            return useMergedProps<ChildElement>(useHasFocusProps({ tabIndex: noModifyTabIndex ? props.tabIndex : (tabbable ? 0 : -1) }), props);
         }
 
         return {
