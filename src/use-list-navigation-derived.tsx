@@ -142,11 +142,11 @@ export function useListNavigationSingleSelection<ParentOrChildElement extends El
     } = parentReturnType;
 
     return {
-        useListNavigationSingleSelectionChild: useCallback<UseListNavigationSingleSelectionChild<ChildElement, C, K | "selected">>(({ managedChild: { index, flags }, rovingTabIndex: rti, listNavigation: ls, hasFocus, singleSelection, subInfo }) => {
+        useListNavigationSingleSelectionChild: useCallback<UseListNavigationSingleSelectionChild<ChildElement, C, K | "selected">>(({ managedChild: { index, flags }, rovingTabIndex: rti, listNavigation: ls, hasFocus, singleSelection: { unselectable, ...ss }, subInfo }) => {
             const { useSingleSelectionChildProps, flags: ssflags, ...singleSelectionInfo } = useSingleSelectionChild({
                 managedChild: { index, flags },
                 hasFocus,
-                singleSelection
+                singleSelection: { ...ss, unselectable: (unselectable || (rti.hidden ?? false)) }
             });
 
             const {
