@@ -18,6 +18,9 @@ interface SSP<E extends Element, C, K extends string> {
     setTabbableIndex(tabbableIndex: number, fromUserInteraction: boolean): void;
     children: ManagedChildren<number, C, K | "selected">;
 }
+interface SSCP { unselectable: boolean; ariaPropName: `aria-${"pressed" | "selected" | "checked"}` | null; }
+export type SingleSelectionChildOmits = keyof SSCP;
+
 export type SingleSelectionOmits = keyof SSP<any, any, any>;
 
 
@@ -26,8 +29,8 @@ export interface UseSingleSelectionParameters<ChildElement extends Element, C, K
     childrenHaveFocus: Partial<UseChildrenHaveFocusParameters["childrenHaveFocus"]>;
 }
 
-export interface UseSingleSelectionChildParameters<E extends Element, C, K extends string> {
-    singleSelection: { unselectable: boolean; ariaPropName: `aria-${"pressed" | "selected" | "checked"}` | null; };
+export interface UseSingleSelectionChildParameters<E extends Element, C, K extends string, Omits extends SingleSelectionChildOmits> {
+    singleSelection: Omit<SSCP, Omits>;
     hasFocus: UseHasFocusParameters<E>;
     managedChild: UseManagedChildParameters<number, C, K | "selected", never, any>["managedChild"];
 }
@@ -55,7 +58,7 @@ export interface UseSingleSelectionReturnTypeWithHooks<ParentOrChildElement exte
 }
 
 
-export type UseSingleSelectionChild<E extends Element, C, K extends string> = (a: UseSingleSelectionChildParameters<E, C, K>) => UseSingleSelectionChildReturnTypeWithHooks<E, C, K>;
+export type UseSingleSelectionChild<E extends Element, C, K extends string> = (a: UseSingleSelectionChildParameters<E, C, K, never>) => UseSingleSelectionChildReturnTypeWithHooks<E, C, K>;
 
 export function useSingleSelection<ParentOrChildElement extends Element, ChildElement extends Element, C, K extends string>({
     singleSelection: { selectedIndex, selectionMode, setSelectedIndex, children, setTabbableIndex },
