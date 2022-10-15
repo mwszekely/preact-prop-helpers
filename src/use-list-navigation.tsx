@@ -100,8 +100,8 @@ export interface UseListNavigationParameters<LsOmits extends ListNavigationParam
 
 
 export type ListNavigationChildOmits = keyof UseListNavigationSubInfo<any>;
-export interface UseListNavigationChildParameters<LsSubInfo, ExtraFlagKeys extends string, LsOmits extends ListNavigationChildOmits, RtiOmits extends RovingTabIndexChildOmits, McOmits extends ManagedChildOmits, SubbestInfo> extends
-    UseRovingTabIndexChildParameters<UseListNavigationSubInfo<LsSubInfo>, ExtraFlagKeys, RtiOmits, McOmits, SubbestInfo> {
+export interface UseListNavigationChildParameters<ChildElement extends Element, LsSubInfo, ExtraFlagKeys extends string, LsOmits extends ListNavigationChildOmits, RtiOmits extends RovingTabIndexChildOmits, McOmits extends ManagedChildOmits, SubbestInfo> extends
+    UseRovingTabIndexChildParameters<ChildElement, UseListNavigationSubInfo<LsSubInfo>, ExtraFlagKeys, RtiOmits, McOmits, SubbestInfo> {
     //rovingTabIndex: Omit<UseRovingTabIndexChildParameters<UseListNavigationSubInfo<LsSubInfo>, ExtraFlagKeys, never>["rovingTabIndex"], "subInfo">;
     listNavigation: Omit<UseListNavigationSubInfo<LsSubInfo>, LsOmits | "subInfo">;
 }
@@ -130,7 +130,7 @@ export interface UseListNavigationChildReturnTypeWithHooks<ChildElement extends 
 }
 
 
-export type UseListNavigationChild<ChildElement extends Element, LsSubInfo, K extends string> = (a: UseListNavigationChildParameters<LsSubInfo, K, never, never, never, LsSubInfo>) => UseListNavigationChildReturnTypeWithHooks<ChildElement>;
+export type UseListNavigationChild<ChildElement extends Element, LsSubInfo, K extends string> = (a: UseListNavigationChildParameters<ChildElement, LsSubInfo, K, never, never, never, LsSubInfo>) => UseListNavigationChildReturnTypeWithHooks<ChildElement>;
 
 /**
  * Implements proper keyboard navigation for components like listboxes, button groups, menus, etc.

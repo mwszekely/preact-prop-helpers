@@ -94,10 +94,11 @@ const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
     const [randomWord] = useState(() => RandomWords[index/*Math.floor(Math.random() * (RandomWords.length - 1))*/]);
     const useListNavigationSingleSelectionChild = useContext(ListNavigationSingleSelectionChildContext);
     const text = `${randomWord} This is item #${index}${hidden ? " (hidden)" : ""}`;
+    const focusSelf = useCallback((e: HTMLElement) => { e.focus() }, []);
     const { useListNavigationSingleSelectionChildProps, rovingTabIndex: { tabbable }, singleSelection: { selected } } = useListNavigationSingleSelectionChild({ 
         managedChild: { index }, 
         listNavigation: { text }, 
-        rovingTabIndex: { hidden }, 
+        rovingTabIndex: { hidden, focusSelf }, 
         subInfo: {}, 
         hasFocus: { getDocument } ,
         singleSelection: { ariaPropName: "aria-selected", unselectable: hidden, focusSelf: e => e.focus() }

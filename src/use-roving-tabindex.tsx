@@ -62,12 +62,12 @@ export interface UseRovingTabIndexReturnTypeWithHooks<ChildElement extends Eleme
 
 export type RovingTabIndexChildOmits = keyof UseRovingTabIndexSubInfo<any, any>;
 
-export interface UseRovingTabIndexChildParameters<RtiSubInfo, ExtraFlagKeys extends string, RticOmits extends RovingTabIndexChildOmits, McOmits extends ManagedChildOmits, SubbestInfo> extends
+export interface UseRovingTabIndexChildParameters<ChildElement extends Element, RtiSubInfo, ExtraFlagKeys extends string, RticOmits extends RovingTabIndexChildOmits, McOmits extends ManagedChildOmits, SubbestInfo> extends
     UseManagedChildParameters<number, UseRovingTabIndexSubInfo<any, RtiSubInfo>, ExtraFlagKeys | "tabbable", McOmits | "subInfo", SubbestInfo> {
-    rovingTabIndex: Omit<Partial<Omit<UseRovingTabIndexSubInfo<any, any>, "getElement" | "subInfo">>, RticOmits> & { noModifyTabIndex?: boolean };
+    rovingTabIndex: Omit<Partial<Omit<UseRovingTabIndexSubInfo<any, any>, "getElement" | "subInfo" | "focusSelf">>, RticOmits> & Omit<{ noModifyTabIndex?: boolean, focusSelf(e: ChildElement): void; }, RticOmits>;
 }
 
-export type UseRovingTabIndexChild<ChildElement extends Element, RtiSubInfo, ExtraFlagKeys extends string> = (a: UseRovingTabIndexChildParameters<RtiSubInfo, ExtraFlagKeys, never, never, RtiSubInfo>) => UseRovingTabIndexChildReturnTypeWithHooks<ChildElement>;
+export type UseRovingTabIndexChild<ChildElement extends Element, RtiSubInfo, ExtraFlagKeys extends string> = (a: UseRovingTabIndexChildParameters<ChildElement, RtiSubInfo, ExtraFlagKeys, never, never, RtiSubInfo>) => UseRovingTabIndexChildReturnTypeWithHooks<ChildElement>;
 
 export interface UseRovingTabIndexChildReturnTypeInfo<ChildElement extends Element> {
     rovingTabIndex: {
@@ -150,8 +150,11 @@ export function useRovingTabIndex<ChildElement extends Element, RtiSubInfo, Extr
                 //if (prevChild != null)
                 //    prevChild.subInfo.blurSelf();
 
-                if (nextChild != null && fromUserInteraction)
-                    nextChild.subInfo.focusSelf();
+                if (nextChild != null && fromUserInteraction) {
+                    const element = nextChild.subInfo.getElement();
+                    if (element)
+                        nextChild.subInfo.focusSelf();
+                }
 
             }
 
@@ -183,17 +186,11 @@ export function useRovingTabIndex<ChildElement extends Element, RtiSubInfo, Extr
         }, [!!hidden])
 
 
-        const fsOverride = useStableGetter(focusSelfOverride);
+        const stableFocusSelf = useStableCallback(focusSelfOverride);
         const focusSelf = useCallback(() => {
-            const fs = fsOverride();
-            if (fs) {
-                fs();
-            }
-            else {
-                const element = getElement() as (Element & Partial<HTMLElement>);
-                if (element)
-                    element.focus?.();
-            }
+            const element = getElement();
+            if (element)
+                stableFocusSelf(element);
         }, []);
 
         const onFocusedInnerChanged = useStableCallback((focused: boolean, _prevFocused: boolean | undefined) => {
@@ -218,7 +215,7 @@ export function useRovingTabIndex<ChildElement extends Element, RtiSubInfo, Extr
                 subInfo
             }
         });
-        
+
         useEffect(() => {
             if (tabbable)
                 stableOnTabbableRender(index);
@@ -228,7 +225,7 @@ export function useRovingTabIndex<ChildElement extends Element, RtiSubInfo, Extr
             if (!noModifyTabIndex)
                 console.assert(props.tabIndex == null);
 
-            return useMergedProps<ChildElement>(useHasFocusProps({ tabIndex: noModifyTabIndex? undefined : (tabbable ? 0 : -1) }), props);
+            return useMergedProps<ChildElement>(useHasFocusProps({ tabIndex: noModifyTabIndex ? undefined : (tabbable ? 0 : -1) }), props);
         }
 
         return {

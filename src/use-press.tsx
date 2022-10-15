@@ -11,7 +11,7 @@ interface UsePressParameters<E extends Node> {
     onClickSync: ((e: h.JSX.TargetedEvent<E>) => void) | null | undefined;
     exclude: undefined | { click?: "exclude" | undefined, space?: "exclude" | undefined, enter?: "exclude" | undefined };
     hasFocus: UseHasFocusParameters<E>;
-    focusSelf(element: HTMLElement): void;
+    focusSelf(element: E): void;
 }
 
 /**
@@ -124,7 +124,7 @@ export function usePress<E extends Node>({ exclude, hasFocus: { onLastFocusedInn
             //
             const element = getElement();
             if (element && "focus" in (element as EventTarget as HTMLElement))
-                focusSelf(element as EventTarget as HTMLElement);
+                focusSelf(element as EventTarget as E);
             //(element as EventTarget as HTMLElement | null)?.focus();
 
             // Whatever the browser was going to do with this event,

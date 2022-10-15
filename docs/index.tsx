@@ -1,6 +1,6 @@
 import { createContext, h, render } from "preact";
 import { memo } from "preact/compat";
-import { useContext, useRef } from "preact/hooks";
+import { useCallback, useContext, useRef } from "preact/hooks";
 import { useAnimationFrame, useAsyncHandler, useDraggable, useDroppable, useElementSize, useFocusTrap, useMergedProps, useState } from "..";
 import { ElementSize } from "../use-element-size";
 import { useGridNavigation, UseGridNavigationCell, UseGridNavigationRow } from "../use-grid-navigation";
@@ -337,7 +337,7 @@ const DemoUseGridCell = (({ index, row, rowIsTabbable }: { index: number, row: n
     } = useGridCell({
         listNavigation: { text: "" },
         managedChild: { index },
-        rovingTabIndex: { hidden: false },
+        rovingTabIndex: { hidden: false, focusSelf: useCallback(e => e.focus(), []) },
         hasFocus: { getDocument },
         subInfo: {},
     });

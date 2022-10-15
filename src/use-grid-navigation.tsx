@@ -32,6 +32,7 @@ export interface UseGridNavigationCellSubInfo<CC> {
 }
 
 export interface UseGridNavigationRowParameters<
+    RowElement extends Element,
     CR,
     KR extends string,
     LsOmits extends ListNavigationParametersOmits,
@@ -47,11 +48,11 @@ export interface UseGridNavigationRowParameters<
     SubbestInfo
 > {
     asParentRowOfCells: UseListNavigationParameters<LsOmits, LnOmits | "navigationDirection", TnOmits, RtiOmits, McOmits>;
-    asChildRowOfSection: UseListNavigationChildParameters<UseGridNavigationRowSubInfo<CR>, KR, LsChildOmits, RtiChildOmits | "focusSelf", McChildOmits, SubbestInfo>
+    asChildRowOfSection: UseListNavigationChildParameters<RowElement, UseGridNavigationRowSubInfo<CR>, KR, LsChildOmits, RtiChildOmits | "focusSelf", McChildOmits, SubbestInfo>
 
 }
 export interface UseGridNavigationCellParameters<CellElement extends Element, CC, KC extends string, LsChildOmits extends ListNavigationChildOmits, RtiChildOmits extends RovingTabIndexChildOmits, McChildOmits extends ManagedChildOmits, SubbestInfo> extends
-    UseListNavigationChildParameters<UseGridNavigationCellSubInfo<CC>, KC, LsChildOmits, RtiChildOmits, McChildOmits, SubbestInfo> {
+    UseListNavigationChildParameters<CellElement, UseGridNavigationCellSubInfo<CC>, KC, LsChildOmits, RtiChildOmits, McChildOmits, SubbestInfo> {
     hasFocus: UseHasFocusParameters<CellElement>;
 }
 
@@ -91,7 +92,7 @@ export interface UseGridNavigationCellReturnTypeWithHooks<Cell extends Element> 
 }
 
 
-export type UseGridNavigationRow<Row extends Element, Cell extends Element, CR, CC, KR extends string, KC extends string> = (a: UseGridNavigationRowParameters<CR, KR, never, never, never, never, never, never, never, never, CR>) => UseGridNavigationRowReturnTypeWithHooks<Row, Cell, CC, KC>;
+export type UseGridNavigationRow<Row extends Element, Cell extends Element, CR, CC, KR extends string, KC extends string> = (a: UseGridNavigationRowParameters<Row, CR, KR, never, never, never, never, never, never, never, never, CR>) => UseGridNavigationRowReturnTypeWithHooks<Row, Cell, CC, KC>;
 export type UseGridNavigationCell<Cell extends Element, CC, KC extends string> = (p: UseGridNavigationCellParameters<Cell, CC, KC, never, never, never, CC>) => UseGridNavigationCellReturnTypeWithHooks<Cell>;
 
 
@@ -170,22 +171,6 @@ export function useGridNavigation<
         //const rowHidden = !!asChild.rovingTabIndex.hidden;
 
         const useGridNavigationCell = useCallback<UseGridNavigationCell<CellElement, CellSubInfo, CellExtraFlags>>(({ subInfo, hasFocus: { onLastFocusedInnerChanged, ...hasFocus }, managedChild, listNavigation: ls, rovingTabIndex: { focusSelf: fs, ...rti } }) => {
-            //rti.hidden || rowHidden;
-
-            const focusSelf = useStableCallback(() => {
-                setCurrentColumn(managedChild.index);
-                setTabbableIndex(managedChild.index, false);
-                if (fs)
-                    fs();
-                else
-                    (rti_cell_ret.getElement() as Element & Partial<HTMLElement>)?.focus?.();
-            });
-            /*const blurSelf = useStableCallback(() => {
-                if (bs)
-                    bs();
-                else
-                    (rti_cell_ret.getElement() as Element & Partial<HTMLElement>)?.blur?.();
-            });*/
             const {
                 useListNavigationChildProps,
                 rovingTabIndex: rti_cell_ret

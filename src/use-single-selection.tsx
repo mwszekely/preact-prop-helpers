@@ -18,13 +18,13 @@ interface SSP<E extends Element, C, K extends string> {
     setTabbableIndex(tabbableIndex: number, fromUserInteraction: boolean): void;
     children: ManagedChildren<number, C, K | "selected">;
 }
-interface SSCP {
+interface SSCP<E extends Element> {
     unselectable: boolean;
     ariaPropName: `aria-${"pressed" | "selected" | "checked"}` | null;
-    focusSelf(e: HTMLElement): void;
+    focusSelf(e: E): void;
 }
 
-export type SingleSelectionChildOmits = keyof SSCP;
+export type SingleSelectionChildOmits = keyof SSCP<any>;
 
 export type SingleSelectionOmits = keyof SSP<any, any, any>;
 
@@ -35,7 +35,7 @@ export interface UseSingleSelectionParameters<ChildElement extends Element, C, K
 }
 
 export interface UseSingleSelectionChildParameters<E extends Element, C, K extends string, Omits extends SingleSelectionChildOmits> {
-    singleSelection: Omit<SSCP, Omits>;
+    singleSelection: Omit<SSCP<E>, Omits>;
     hasFocus: UseHasFocusParameters<E>;
     managedChild: UseManagedChildParameters<number, C, K | "selected", never, any>["managedChild"];
 }
@@ -122,7 +122,12 @@ export function useSingleSelection<ParentOrChildElement extends Element, ChildEl
 
             const getIndex = useStableGetter(index);
 
-            const usePressProps = usePress<ChildElement>({ onClickSync: (e) => { stableOnChange(getIndex(), e); }, exclude: {}, hasFocus, focusSelf });
+            const usePressProps = usePress<ChildElement>({ 
+                onClickSync: (e) => { stableOnChange(getIndex(), e); }, 
+                exclude: {}, 
+                hasFocus, 
+                focusSelf 
+            });
 
             return {
                 flags: { ...flags, selected: selectedRef.current },

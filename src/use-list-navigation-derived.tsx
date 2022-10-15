@@ -34,7 +34,7 @@ export interface UseListNavigationSingleSelectionReturnTypeWithHooks<ParentOrChi
 
 
 export type UseListNavigationSingleSelectionChild<ChildElement extends Element, LsSubInfo, K extends string> = (p: UseListNavigationSingleSelectionChildParameters<ChildElement, LsSubInfo, K, never, never, never, never, LsSubInfo>) => UseListNavigationSingleSelectionChildReturnTypeWithHooks<ChildElement>;
-export interface UseListNavigationSingleSelectionChildParameters<E extends Element, C, K extends string, SsOmits extends SingleSelectionChildOmits, LsOmits extends ListNavigationChildOmits, RtiOmits extends RovingTabIndexChildOmits, McOmits extends ManagedChildOmits, SubbestInfo> extends UseListNavigationChildParameters<C, K | "selected", LsOmits, RtiOmits, McOmits, SubbestInfo> {
+export interface UseListNavigationSingleSelectionChildParameters<E extends Element, C, K extends string, SsOmits extends SingleSelectionChildOmits, LsOmits extends ListNavigationChildOmits, RtiOmits extends RovingTabIndexChildOmits, McOmits extends ManagedChildOmits, SubbestInfo> extends UseListNavigationChildParameters<E, C, K | "selected", LsOmits, RtiOmits, McOmits, SubbestInfo> {
     hasFocus: UseHasFocusParameters<E>;
     singleSelection: UseSingleSelectionChildParameters<E, C, K, SsOmits>["singleSelection"];
 }
@@ -62,8 +62,8 @@ export interface UseListNavigationSingleSelectionChildReturnTypeWithHooks<ChildE
 
 
 
-export type UseSortableListNavigationChildParameters<C, K extends string, LsOmits extends ListNavigationChildOmits, RtiOmits extends RovingTabIndexChildOmits, McOmits extends ManagedChildOmits> = UseListNavigationChildParameters<C, K, LsOmits, RtiOmits, McOmits, C>;
-export type UseSortableListNavigationChild<ChildElement extends Element, C, K extends string> = (p: UseSortableListNavigationChildParameters<C, K, never, never, never>) => UseListNavigationChildReturnTypeWithHooks<ChildElement>;
+export type UseSortableListNavigationChildParameters<ChildElement extends Element, C, K extends string, LsOmits extends ListNavigationChildOmits, RtiOmits extends RovingTabIndexChildOmits, McOmits extends ManagedChildOmits> = UseListNavigationChildParameters<ChildElement, C, K, LsOmits, RtiOmits, McOmits, C>;
+export type UseSortableListNavigationChild<ChildElement extends Element, C, K extends string> = (p: UseSortableListNavigationChildParameters<ChildElement, C, K, never, never, never>) => UseListNavigationChildReturnTypeWithHooks<ChildElement>;
 
 
 
