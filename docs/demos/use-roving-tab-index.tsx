@@ -11,10 +11,10 @@ function getDocument() {
 }
 
 
-const RovingChildContext = createContext<UseSortableListNavigationSingleSelectionChild<HTMLLIElement, {}, string>>(null!)
+const ListNavigationSingleSelectionChildContext = createContext<UseSortableListNavigationSingleSelectionChild<HTMLLIElement, {}, string>>(null!)
 export const DemoUseRovingTabIndex = memo(() => {
 
-    const [selectionMode, setSelectionMode] = useState("focus" as "focus" | "activation");
+    const [selectionMode, setSelectionMode] = useState("activation" as "focus" | "activation");
     const [count, setCount] = useState(10);
     const [selectedIndex, setSelectedIndex] = useState(0);
     const [tabbableIndex, setLocalTabbableIndex] = useState(0);
@@ -32,7 +32,7 @@ export const DemoUseRovingTabIndex = memo(() => {
         managedChildren: {},
         rovingTabIndex: { onTabbableIndexChange: useCallback((index: number | null) => { if (index != null) setLocalTabbableIndex(index); }, []) },
         typeaheadNavigation: {},
-        singleSelection: { selectedIndex, selectionMode, onSelectedIndexChange: (e, i) => setSelectedIndex(i) },
+        singleSelection: { selectedIndex, selectionMode, setSelectedIndex: (i, _e) => setSelectedIndex(i) },
         childrenHaveFocus: {  }
     });
 
@@ -74,7 +74,7 @@ export const DemoUseRovingTabIndex = memo(() => {
                 <label><input name="rti-demo-selection-mode" type="radio" checked={selectionMode == 'activation'} onInput={e => { e.preventDefault(); setSelectionMode("activation"); }} /> On activation (click, tap, Enter, Space, etc.)</label>
             </label>
 
-            <RovingChildContext.Provider value={useSortableListNavigationSingleSelectionChild}>
+            <ListNavigationSingleSelectionChildContext.Provider value={useSortableListNavigationSingleSelectionChild}>
                 <ul {...(useSortableListNavigationSingleSelectionProps({
                     children: Array.from((function* () {
                         for (let i = 0; i < count; ++i) {
@@ -82,7 +82,7 @@ export const DemoUseRovingTabIndex = memo(() => {
                         }
                     })())
                 }))}></ul>
-            </RovingChildContext.Provider>
+            </ListNavigationSingleSelectionChildContext.Provider>
             {currentTypeahead && <div>Typeahead: {currentTypeahead}</div>}
         </div>
     );
@@ -92,9 +92,16 @@ const _Prefix = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
     const hidden = (index == 7);
     const [randomWord] = useState(() => RandomWords[index/*Math.floor(Math.random() * (RandomWords.length - 1))*/]);
-    const useRovingTabIndexChild = useContext(RovingChildContext);
+    const useListNavigationSingleSelectionChild = useContext(ListNavigationSingleSelectionChildContext);
     const text = `${randomWord} This is item #${index}${hidden ? " (hidden)" : ""}`;
-    const { useListNavigationSingleSelectionChildProps, rovingTabIndex: { tabbable }, singleSelection: { selected } } = useRovingTabIndexChild({ managedChild: { index }, listNavigation: { text }, rovingTabIndex: { hidden }, subInfo: {}, hasFocus: { getDocument } });
+    const { useListNavigationSingleSelectionChildProps, rovingTabIndex: { tabbable }, singleSelection: { selected } } = useListNavigationSingleSelectionChild({ 
+        managedChild: { index }, 
+        listNavigation: { text }, 
+        rovingTabIndex: { hidden }, 
+        subInfo: {}, 
+        hasFocus: { getDocument } ,
+        singleSelection: { ariaPropName: "aria-selected", unselectable: hidden }
+    }); 
 
     const props = useListNavigationSingleSelectionChildProps({});
     return (
