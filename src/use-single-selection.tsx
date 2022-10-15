@@ -13,12 +13,17 @@ import { useState } from "./use-state";
 interface SSP<E extends Element, C, K extends string> {
     selectedIndex: number | null;
     setSelectedIndex: (newIndex: number, event: { target: E, currentTarget: E } | h.JSX.TargetedEvent<E>) => void;
-    selectionMode: "focus" | "activation";
+    selectionMode: "focus" | "activation" | "disabled";
 
     setTabbableIndex(tabbableIndex: number, fromUserInteraction: boolean): void;
     children: ManagedChildren<number, C, K | "selected">;
 }
-interface SSCP { unselectable: boolean; ariaPropName: `aria-${"pressed" | "selected" | "checked"}` | null; }
+interface SSCP {
+    unselectable: boolean;
+    ariaPropName: `aria-${"pressed" | "selected" | "checked"}` | null;
+    focusSelf(e: HTMLElement): void;
+}
+
 export type SingleSelectionChildOmits = keyof SSCP;
 
 export type SingleSelectionOmits = keyof SSP<any, any, any>;
@@ -100,7 +105,7 @@ export function useSingleSelection<ParentOrChildElement extends Element, ChildEl
             getSelectedIndex,
             changeSelectedIndex
         },
-        useSingleSelectionChild: useCallback<UseSingleSelectionChild<ChildElement, C, K | "selected">>(({ managedChild: { index, flags }, hasFocus: { onFocusedInnerChanged, ...hasFocus }, singleSelection: { unselectable, ariaPropName } }) => {
+        useSingleSelectionChild: useCallback<UseSingleSelectionChild<ChildElement, C, K | "selected">>(({ managedChild: { index, flags }, hasFocus: { onFocusedInnerChanged, ...hasFocus }, singleSelection: { unselectable, ariaPropName, focusSelf } }) => {
             const [isSelected, setIsSelected, getIsSelected] = useState(getSelectedIndex() == index);
             const selectedRef = useRef<ChildFlagOperations>({ get: getIsSelected, set: setIsSelected, isValid: useStableCallback(() => !unselectable) });
             const { useChildrenHaveFocusChildProps, getElement } = useChildrenHaveFocusChild({
@@ -117,7 +122,7 @@ export function useSingleSelection<ParentOrChildElement extends Element, ChildEl
 
             const getIndex = useStableGetter(index);
 
-            const usePressProps = usePress<ChildElement>({ onClickSync: (e) => { stableOnChange(getIndex(), e); }, exclude: {}, hasFocus });
+            const usePressProps = usePress<ChildElement>({ onClickSync: (e) => { stableOnChange(getIndex(), e); }, exclude: {}, hasFocus, focusSelf });
 
             return {
                 flags: { ...flags, selected: selectedRef.current },

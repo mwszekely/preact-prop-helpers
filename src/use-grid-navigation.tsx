@@ -47,7 +47,7 @@ export interface UseGridNavigationRowParameters<
     SubbestInfo
 > {
     asParentRowOfCells: UseListNavigationParameters<LsOmits, LnOmits | "navigationDirection", TnOmits, RtiOmits, McOmits>;
-    asChildRowOfSection: UseListNavigationChildParameters<UseGridNavigationRowSubInfo<CR>, KR, LsChildOmits, RtiChildOmits, McChildOmits, SubbestInfo>
+    asChildRowOfSection: UseListNavigationChildParameters<UseGridNavigationRowSubInfo<CR>, KR, LsChildOmits, RtiChildOmits | "focusSelf", McChildOmits, SubbestInfo>
 
 }
 export interface UseGridNavigationCellParameters<CellElement extends Element, CC, KC extends string, LsChildOmits extends ListNavigationChildOmits, RtiChildOmits extends RovingTabIndexChildOmits, McChildOmits extends ManagedChildOmits, SubbestInfo> extends
@@ -132,12 +132,13 @@ export function useGridNavigation<
         // to our current column to focus itself.
         const focusSelf = useStableCallback(() => {
             const c2 = getCurrentColumn();
-            if (asChild.rovingTabIndex.focusSelf) {
-                asChild.rovingTabIndex.focusSelf();
-            }
-            else {
-                navigateToIndex(c2 ?? 0, true);
-            }
+            navigateToColumn(c2 ?? 0, true);
+            //if (asChild.rovingTabIndex.focusSelf) {
+            //    asChild.rovingTabIndex.focusSelf();
+            //}
+            //else {
+            //    navigateToIndex(c2 ?? 0, true);
+            //}
         });
 
         const rowLsChildReturnType = useListNavigationChildAsGridRow({
@@ -149,7 +150,7 @@ export function useGridNavigation<
         const { rovingTabIndex: { tabbable }, useListNavigationChildProps } = rowLsChildReturnType;
         useEffect(() => {
             if (!tabbable) {
-                navigateToIndex(null, false);
+                navigateToColumn(null, false);
             }
         }, [tabbable]);
 
@@ -164,7 +165,7 @@ export function useGridNavigation<
             listNavigation: { ...asParent.listNavigation }
         });
 
-        const { rovingTabIndex: { setTabbableIndex }, useListNavigationChild: useGridNavigationColumn2, useListNavigationProps: useGridNavigationColumnProps, listNavigation: { navigateToIndex } } = rowLsReturnType;
+        const { rovingTabIndex: { setTabbableIndex }, useListNavigationChild: useGridNavigationColumn2, useListNavigationProps: useGridNavigationColumnProps, listNavigation: { navigateToIndex: navigateToColumn } } = rowLsReturnType;
 
         //const rowHidden = !!asChild.rovingTabIndex.hidden;
 

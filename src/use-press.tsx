@@ -11,6 +11,7 @@ interface UsePressParameters<E extends Node> {
     onClickSync: ((e: h.JSX.TargetedEvent<E>) => void) | null | undefined;
     exclude: undefined | { click?: "exclude" | undefined, space?: "exclude" | undefined, enter?: "exclude" | undefined };
     hasFocus: UseHasFocusParameters<E>;
+    focusSelf(element: HTMLElement): void;
 }
 
 /**
@@ -32,7 +33,7 @@ interface UsePressParameters<E extends Node> {
  * @param onClickSync 
  * @param exclude Whether the polyfill shouldn't apply (can specify for specific interactions)
  */
-export function usePress<E extends Node>({ exclude, hasFocus: { onLastFocusedInnerChanged, ...hasFocus }, onClickSync }: UsePressParameters<E>) {
+export function usePress<E extends Node>({ exclude, hasFocus: { onLastFocusedInnerChanged, ...hasFocus }, onClickSync, focusSelf }: UsePressParameters<E>) {
 
     // A button can be activated in multiple ways, so on the off chance
     // that multiple are triggered at once, we only *actually* register
@@ -123,7 +124,8 @@ export function usePress<E extends Node>({ exclude, hasFocus: { onLastFocusedInn
             //
             const element = getElement();
             if (element && "focus" in (element as EventTarget as HTMLElement))
-                (element as EventTarget as HTMLElement | null)?.focus();
+                focusSelf(element as EventTarget as HTMLElement);
+            //(element as EventTarget as HTMLElement | null)?.focus();
 
             // Whatever the browser was going to do with this event,
             // forget it. We're turning it into a "press" event.

@@ -144,11 +144,11 @@ export function useListNavigationSingleSelection<ParentOrChildElement extends El
     } = parentReturnType;
 
     return {
-        useListNavigationSingleSelectionChild: useCallback<UseListNavigationSingleSelectionChild<ChildElement, C, K | "selected">>(({ managedChild: { index, flags }, rovingTabIndex: rti, listNavigation: ls, hasFocus, singleSelection: { unselectable, ...ss }, subInfo }) => {
+        useListNavigationSingleSelectionChild: useCallback<UseListNavigationSingleSelectionChild<ChildElement, C, K | "selected">>(({ managedChild: { index, flags }, rovingTabIndex: rti, listNavigation: ls, hasFocus, singleSelection: { focusSelf, unselectable, ...ss }, subInfo }) => {
             const { useSingleSelectionChildProps, flags: ssflags, ...singleSelectionInfo } = useSingleSelectionChild({
                 managedChild: { index, flags },
                 hasFocus,
-                singleSelection: { ...ss, unselectable: (unselectable || (rti.hidden ?? false)) }
+                singleSelection: { ...ss, focusSelf, unselectable: (unselectable || (rti.hidden ?? false)) }
             });
 
             const {
@@ -173,7 +173,10 @@ export function useListNavigationSingleSelection<ParentOrChildElement extends El
                     const selectionMode = getSelectionMode();
                     if (selectionMode == "activation")
                         stableOnChange(getIndex(), e);
-                }, exclude: {}, hasFocus
+                },
+                exclude: {},
+                hasFocus,
+                focusSelf
             });
 
             return {

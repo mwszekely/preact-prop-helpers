@@ -100,7 +100,7 @@ const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
         rovingTabIndex: { hidden }, 
         subInfo: {}, 
         hasFocus: { getDocument } ,
-        singleSelection: { ariaPropName: "aria-selected", unselectable: hidden }
+        singleSelection: { ariaPropName: "aria-selected", unselectable: hidden, focusSelf: e => e.focus() }
     }); 
 
     const props = useListNavigationSingleSelectionChildProps({});
