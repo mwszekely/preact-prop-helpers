@@ -42,8 +42,10 @@ export interface UseSingleSelectionChildReturnTypeWithHooks<E extends Element, C
 }
 
 export interface UseSingleSelectionReturnTypeInfo<ChildElement extends Element, LsSubInfo, ExtraFlagKeys extends string> {
-    changeSelectedIndex: StateUpdater<number | null>;
-    getSelectedIndex(): number | null;
+    singleSelection: {
+        changeSelectedIndex: StateUpdater<number | null>;
+        getSelectedIndex(): number | null;
+    }
 }
 
 export interface UseSingleSelectionReturnTypeWithHooks<ParentOrChildElement extends Element, ChildElement extends Element, C, K extends string> extends
@@ -91,8 +93,10 @@ export function useSingleSelection<ParentOrChildElement extends Element, ChildEl
     }, [selectedIndex]);
 
     return {
-        getSelectedIndex,
-        changeSelectedIndex,
+        singleSelection: {
+            getSelectedIndex,
+            changeSelectedIndex
+        },
         useSingleSelectionChild: useCallback<UseSingleSelectionChild<ChildElement, C, K | "selected">>(({ managedChild: { index, flags }, hasFocus: { onFocusedInnerChanged, ...hasFocus }, singleSelection: { unselectable, ariaPropName } }) => {
             const [isSelected, setIsSelected, getIsSelected] = useState(getSelectedIndex() == index);
             const selectedRef = useRef<ChildFlagOperations>({ get: getIsSelected, set: setIsSelected, isValid: useStableCallback(() => !unselectable) });

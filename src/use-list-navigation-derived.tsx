@@ -6,7 +6,7 @@ import { LinearNavigationOmits, TypeaheadNavigationOmits } from "./use-keyboard-
 import { ListNavigationChildOmits, ListNavigationParametersOmits, useListNavigation, UseListNavigationChildParameters, UseListNavigationChildReturnTypeInfo, UseListNavigationChildReturnTypeWithHooks, UseListNavigationParameters, UseListNavigationReturnTypeInfo, UseListNavigationReturnTypeWithHooks, UseListNavigationSubInfo } from "./use-list-navigation";
 import { usePress } from "./use-press";
 import { RovingTabIndexChildOmits, RovingTabIndexParametersOmits, UseRovingTabIndexSubInfo } from "./use-roving-tabindex";
-import { SingleSelectionOmits, useSingleSelection, UseSingleSelectionChildParameters, UseSingleSelectionParameters } from "./use-single-selection";
+import { SingleSelectionOmits, useSingleSelection, UseSingleSelectionChildParameters, UseSingleSelectionParameters, UseSingleSelectionReturnTypeInfo } from "./use-single-selection";
 import { useSortableChildren, UseSortableChildrenParameters, UseSortableChildrenReturnTypeInfo } from "./use-sortable-children";
 import { useStableCallback } from "./use-stable-callback";
 import { useStableGetter } from "./use-stable-getter";
@@ -22,8 +22,7 @@ import { useStableGetter } from "./use-stable-getter";
 export interface UseListNavigationSingleSelectionParameters<ChildElement extends Element, C, K extends string, SSOmits extends SingleSelectionOmits, LsOmits extends ListNavigationParametersOmits, LnOmits extends LinearNavigationOmits, TnOmits extends TypeaheadNavigationOmits, RtiOmits extends RovingTabIndexParametersOmits, McOmits extends ManagedChildrenOmits> extends UseListNavigationParameters<LsOmits, LnOmits, TnOmits, RtiOmits | "initialIndex", McOmits>, UseSingleSelectionParameters<ChildElement, C, K, SSOmits | "children" | "setTabbableIndex"> {
     childrenHaveFocus: Partial<UseChildrenHaveFocusParameters["childrenHaveFocus"]>;
 }
-export interface UseListNavigationSingleSelectionReturnTypeInfo<ChildElement extends Element, LsSubInfo, ExtraFlagKeys extends string> extends UseListNavigationReturnTypeInfo<ChildElement, LsSubInfo, ExtraFlagKeys> {
-    singleSelection: {}
+export interface UseListNavigationSingleSelectionReturnTypeInfo<ChildElement extends Element, LsSubInfo, ExtraFlagKeys extends string> extends UseListNavigationReturnTypeInfo<ChildElement, LsSubInfo, ExtraFlagKeys>, UseSingleSelectionReturnTypeInfo<ChildElement, UseRovingTabIndexSubInfo<ChildElement, UseListNavigationSubInfo<LsSubInfo>>, "tabbable" | "selected" | ExtraFlagKeys> {
 }
 export interface UseListNavigationSingleSelectionReturnTypeWithHooks<ParentOrChildElement extends Element, ChildElement extends Element, C, K extends string> extends
     UseListNavigationSingleSelectionReturnTypeInfo<ChildElement, C, K> {
@@ -123,7 +122,7 @@ export function useListNavigationSingleSelection<ParentOrChildElement extends El
         typeaheadNavigation
     });
 
-    const { useSingleSelectionChild, changeSelectedIndex, getSelectedIndex } = useSingleSelection<ParentOrChildElement, ChildElement, UseRovingTabIndexSubInfo<ChildElement, UseListNavigationSubInfo<C>>, "tabbable" | "selected" | K>({
+    const { useSingleSelectionChild, ...singleSelectionInfo } = useSingleSelection<ParentOrChildElement, ChildElement, UseRovingTabIndexSubInfo<ChildElement, UseListNavigationSubInfo<C>>, "tabbable" | "selected" | K>({
         singleSelection: {
             children: parentReturnType.managedChildren.children,
             selectedIndex,
@@ -177,7 +176,7 @@ export function useListNavigationSingleSelection<ParentOrChildElement extends El
         }, [selectionMode]),
         useListNavigationSingleSelectionProps: useCallback((...p: Parameters<typeof useListNavigationProps>) => { return useListNavigationProps(...p) }, []),
         ...listRest,
-        singleSelection: {}
+        ...singleSelectionInfo
     }
 }
 
