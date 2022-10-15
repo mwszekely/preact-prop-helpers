@@ -122,6 +122,8 @@ export function useListNavigationSingleSelection<ParentOrChildElement extends El
         typeaheadNavigation
     });
 
+    const getSelectionMode = useStableGetter(selectionMode);
+
     const { useSingleSelectionChild, ...singleSelectionInfo } = useSingleSelection<ParentOrChildElement, ChildElement, UseRovingTabIndexSubInfo<ChildElement, UseListNavigationSubInfo<C>>, "tabbable" | "selected" | K>({
         singleSelection: {
             children: parentReturnType.managedChildren.children,
@@ -166,14 +168,20 @@ export function useListNavigationSingleSelection<ParentOrChildElement extends El
             });
             const getIndex = useStableGetter(index);
 
-            const usePressProps = usePress<ChildElement>({ onClickSync: (e) => { stableOnChange(getIndex(), e); }, exclude: {}, hasFocus });
+            const usePressProps = usePress<ChildElement>({
+                onClickSync: (e) => {
+                    const selectionMode = getSelectionMode();
+                    if (selectionMode == "activation")
+                        stableOnChange(getIndex(), e);
+                }, exclude: {}, hasFocus
+            });
 
             return {
                 useListNavigationSingleSelectionChildProps: (props: h.JSX.HTMLAttributes<ChildElement>) => usePressProps(useSingleSelectionChildProps(useListNavigationChildProps(props))),
                 rovingTabIndex: rti_ret,
                 singleSelection: singleSelectionInfo.singleSelection
             };
-        }, [selectionMode]),
+        }, []),
         useListNavigationSingleSelectionProps: useCallback((...p: Parameters<typeof useListNavigationProps>) => { return useListNavigationProps(...p) }, []),
         ...listRest,
         ...singleSelectionInfo
