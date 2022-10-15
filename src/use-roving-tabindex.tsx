@@ -152,8 +152,10 @@ export function useRovingTabIndex<ChildElement extends Element, RtiSubInfo, Extr
 
                 if (nextChild != null && fromUserInteraction) {
                     const element = nextChild.subInfo.getElement();
-                    if (element)
-                        nextChild.subInfo.focusSelf();
+                    if (element) {
+                        if (document.activeElement == null || !element.contains(document.activeElement))
+                            nextChild.subInfo.focusSelf();
+                    }
                 }
 
             }
@@ -189,8 +191,10 @@ export function useRovingTabIndex<ChildElement extends Element, RtiSubInfo, Extr
         const stableFocusSelf = useStableCallback(focusSelfOverride);
         const focusSelf = useCallback(() => {
             const element = getElement();
-            if (element)
-                stableFocusSelf(element);
+            if (element) {
+                if (document.activeElement == null || !element.contains(document.activeElement))
+                    stableFocusSelf(element);
+            }
         }, []);
 
         const onFocusedInnerChanged = useStableCallback((focused: boolean, _prevFocused: boolean | undefined) => {

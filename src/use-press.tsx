@@ -152,7 +152,7 @@ export function usePress<E extends Node>({ exclude, hasFocus: { onLastFocusedInn
     });
 
     const onMouseDown = useStableCallback((e: h.JSX.TargetedMouseEvent<E>) => {
-        if (!excludes("click", exclude)) {
+        if (onClickSync && !excludes("click", exclude)) {
             // Stop double clicks from selecting text in an component that's *supposed* to be acting like a button,
             // but also don't prevent the user from selecting that text manually if they really want to
             // (which user-select: none would do, but cancelling a double click on mouseDown doesn't)
@@ -167,7 +167,7 @@ export function usePress<E extends Node>({ exclude, hasFocus: { onLastFocusedInn
         }
     })
     const onMouseUp = useStableCallback((e: h.JSX.TargetedMouseEvent<E>) => {
-        if (!excludes("click", exclude)) {
+        if (onClickSync && !excludes("click", exclude)) {
             if (e.button === 0 && getActive() > 0) {
                 onActiveStop(e);
             }
@@ -176,36 +176,40 @@ export function usePress<E extends Node>({ exclude, hasFocus: { onLastFocusedInn
 
 
     const onMouseLeave = useStableCallback(() => {
-        if (!excludes("click", exclude)) {
+        if (onClickSync && !excludes("click", exclude)) {
             setActive(0);
         }
     });
 
     const onKeyDown = useStableCallback((e: h.JSX.TargetedKeyboardEvent<E>) => {
-        if (e.key == " " && onClickSync && !excludes("space", exclude)) {
-            // We don't actually activate it on a space keydown
-            // but we do preventDefault to stop the page from scrolling.
-            onActiveStart(e);
-            e.preventDefault();
-        }
+        if (onClickSync) {
+            if (e.key == " " && !excludes("space", exclude)) {
+                // We don't actually activate it on a space keydown
+                // but we do preventDefault to stop the page from scrolling.
+                onActiveStart(e);
+                e.preventDefault();
+            }
 
-        if (e.key == "Enter" && !excludes("enter", exclude)) {
-            e.preventDefault();
-            onActiveStart(e);
-            onActiveStop(e);
+            if (e.key == "Enter" && !excludes("enter", exclude)) {
+                e.preventDefault();
+                onActiveStart(e);
+                onActiveStop(e);
+            }
         }
     })
 
     const onKeyUp = useStableCallback((e: h.JSX.TargetedKeyboardEvent<E>) => {
-        if (e.key == " " && !excludes("space", exclude))
+        if (onClickSync && e.key == " " && !excludes("space", exclude))
             onActiveStop(e);
     })
 
     const onClick = useStableCallback((e: h.JSX.TargetedMouseEvent<E>) => {
-        e.preventDefault();
-        if (e.detail > 1) {
-            e.stopImmediatePropagation();
-            e.stopPropagation();
+        if (onClickSync) {
+            e.preventDefault();
+            if (e.detail > 1) {
+                e.stopImmediatePropagation();
+                e.stopPropagation();
+            }
         }
     })
 

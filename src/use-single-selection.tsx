@@ -122,11 +122,11 @@ export function useSingleSelection<ParentOrChildElement extends Element, ChildEl
 
             const getIndex = useStableGetter(index);
 
-            const usePressProps = usePress<ChildElement>({ 
-                onClickSync: (e) => { stableOnChange(getIndex(), e); }, 
-                exclude: {}, 
-                hasFocus, 
-                focusSelf 
+            const usePressProps = usePress<ChildElement>({
+                onClickSync: unselectable ? null : ((e) => { stableOnChange(getIndex(), e); }),
+                exclude: {},
+                hasFocus,
+                focusSelf
             });
 
             return {

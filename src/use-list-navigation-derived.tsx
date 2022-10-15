@@ -145,10 +145,11 @@ export function useListNavigationSingleSelection<ParentOrChildElement extends El
 
     return {
         useListNavigationSingleSelectionChild: useCallback<UseListNavigationSingleSelectionChild<ChildElement, C, K | "selected">>(({ managedChild: { index, flags }, rovingTabIndex: rti, listNavigation: ls, hasFocus, singleSelection: { focusSelf, unselectable, ...ss }, subInfo }) => {
+            unselectable ||= (rti.hidden ?? false);
             const { useSingleSelectionChildProps, flags: ssflags, ...singleSelectionInfo } = useSingleSelectionChild({
                 managedChild: { index, flags },
                 hasFocus,
-                singleSelection: { ...ss, focusSelf, unselectable: (unselectable || (rti.hidden ?? false)) }
+                singleSelection: { ...ss, focusSelf, unselectable }
             });
 
             const {
@@ -166,21 +167,9 @@ export function useListNavigationSingleSelection<ParentOrChildElement extends El
                 listNavigation: ls,
                 subInfo,
             });
-            const getIndex = useStableGetter(index);
-
-            const usePressProps = usePress<ChildElement>({
-                onClickSync: (e) => {
-                    const selectionMode = getSelectionMode();
-                    if (selectionMode == "activation")
-                        stableOnChange(getIndex(), e);
-                },
-                exclude: {},
-                hasFocus,
-                focusSelf
-            });
 
             return {
-                useListNavigationSingleSelectionChildProps: (props: h.JSX.HTMLAttributes<ChildElement>) => usePressProps(useSingleSelectionChildProps(useListNavigationChildProps(props))),
+                useListNavigationSingleSelectionChildProps: (props: h.JSX.HTMLAttributes<ChildElement>) => (useSingleSelectionChildProps(useListNavigationChildProps(props))),
                 rovingTabIndex: rti_ret,
                 singleSelection: singleSelectionInfo.singleSelection
             };
