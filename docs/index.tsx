@@ -124,7 +124,7 @@ const DemoUseAsyncHandler1 = memo(() => {
         hasError,
         rejectCount,
         resolveCount
-    } = useAsyncHandler<h.JSX.TargetedMouseEvent<HTMLButtonElement>, void>(asyncOnClick, { capture: () => { }, debounce: debounce == 0 ? undefined : debounce });
+    } = useAsyncHandler<h.JSX.TargetedMouseEvent<HTMLButtonElement>, void>({ asyncHandler: asyncOnClick, capture: () => { }, debounce: debounce == 0 ? undefined : debounce });
 
     const onClick = pending ? undefined : syncHandler;
 
@@ -184,7 +184,7 @@ const DemoUseAsyncHandler2 = memo(() => {
         hasError,
         rejectCount,
         resolveCount
-    } = useAsyncHandler<h.JSX.TargetedEvent<HTMLInputElement>, string>(onInputAsync, { capture: (e: h.JSX.TargetedEvent<HTMLInputElement>) => { e.preventDefault(); return e.currentTarget.value }, debounce: debounce == 0 ? undefined : debounce });
+    } = useAsyncHandler<h.JSX.TargetedEvent<HTMLInputElement>, string>({ asyncHandler: onInputAsync, capture: (e: h.JSX.TargetedEvent<HTMLInputElement>) => { e.preventDefault(); return e.currentTarget.value }, debounce: debounce == 0 ? undefined : debounce });
 
 
     return (

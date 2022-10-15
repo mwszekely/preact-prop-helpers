@@ -2,6 +2,8 @@ import { useAsync, UseAsyncParameters, UseAsyncReturnType } from "./use-async";
 import { useStableCallback } from "./use-stable-callback";
 import { useState } from "./use-state";
 
+export type AsyncHandler<EventType extends Event, CaptureType> = ((c: CaptureType, e: EventType) => (Promise<void> | void));
+
 export interface UseAsyncHandlerParameters<EventType extends Event, CaptureType> extends Omit<UseAsyncParameters<[CaptureType, EventType], [EventType]>, "capture"> {
     /**
      * What transient information is captured by this event 
@@ -10,6 +12,11 @@ export interface UseAsyncHandlerParameters<EventType extends Event, CaptureType>
      * The "capture" parameter answers this question. To implement a checkbox, for example, return `target.checked`.
      */
     capture: (event: EventType) => CaptureType;
+
+    /**
+     * The function (either async or sync) that you want to convert to a regular, sync event handler. 
+     */
+    asyncHandler: AsyncHandler<EventType, CaptureType> | null;
 }
 
 export interface UseAsyncHandlerReturnType<EventType extends Event, CaptureType> extends UseAsyncReturnType<[EventType], void> {
@@ -104,7 +111,7 @@ export interface UseAsyncHandlerReturnType<EventType extends Event, CaptureType>
  * 
  * @see useAsync A more general version of this hook that can work with any type of handler, not just DOM event handlers.
  */
-export function useAsyncHandler<EventType extends Event, CaptureType>(asyncHandler: ((c: CaptureType, e: EventType) => (Promise<void> | void)) | null, { capture: originalCapture, ...restAsyncOptions }: UseAsyncHandlerParameters<EventType, CaptureType>): UseAsyncHandlerReturnType<EventType, CaptureType> {
+export function useAsyncHandler<EventType extends Event, CaptureType>({ asyncHandler, capture: originalCapture, ...restAsyncOptions }: UseAsyncHandlerParameters<EventType, CaptureType>): UseAsyncHandlerReturnType<EventType, CaptureType> {
     
     // We need to differentiate between "nothing captured yet" and "`undefined` was captured"
     const [currentCapture, setCurrentCapture, getCurrentCapture] = useState<CaptureType | undefined>(undefined);
