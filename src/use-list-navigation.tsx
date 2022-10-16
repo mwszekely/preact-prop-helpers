@@ -182,7 +182,7 @@ export function useListNavigation<ParentOrChildElement extends Element, ChildEle
 
     const {
         useTypeaheadNavigationChild,
-        typeaheadNavigationProps,
+        props: typeaheadNavigationProps,
         typeaheadNavigation: {
             currentTypeahead,
             invalidTypeahead
@@ -196,7 +196,7 @@ export function useListNavigation<ParentOrChildElement extends Element, ChildEle
             ...typeaheadNavigation
         }
     });
-    const { linearNavigationProps } = useLinearNavigation<ParentOrChildElement>({
+    const { props: linearNavigationProps } = useLinearNavigation<ParentOrChildElement>({
         linearNavigation: {
             navigateToPrev: useCallback(() => {
                 setTabbableIndex(c => {

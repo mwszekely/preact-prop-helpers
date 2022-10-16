@@ -17,7 +17,8 @@ export interface UseLinearNavigationReturnTypeWithHooks<ParentOrChildElement ext
      * 
      * **STABLE** 
      * */
-    linearNavigationProps: h.JSX.HTMLAttributes<ParentOrChildElement>;
+    useProps(): h.JSX.HTMLAttributes<ParentOrChildElement>;
+    props: h.JSX.HTMLAttributes<ParentOrChildElement>;
 }
 
 interface LNP {
@@ -80,82 +81,85 @@ export function useLinearNavigation<ParentOrChildElement extends Element>({ line
     const getDisableHomeEndKeys = useStableGetter(dhek);
     const getNavigationDirection = useStableGetter(nd);
 
+    const useProps = useCallback(() => ({
+        onKeyDown: (e: KeyboardEvent) => {
+            // Not handled by typeahead (i.e. assume this is a keyboard shortcut)
+            if (e.ctrlKey || e.metaKey)
+                return;
+
+            //const info = getLogicalDirectionInfo();
+            const navigationDirection = getNavigationDirection();
+            const disableArrowKeys = getDisableArrowKeys();
+            const disableHomeEndKeys = getDisableHomeEndKeys();
+
+            const allowsVerticalNavigation = (navigationDirection == "vertical" || navigationDirection == "either");
+            const allowsHorizontalNavigation = (navigationDirection == "horizontal" || navigationDirection == "either");
+
+            switch (e.key) {
+                case "ArrowUp": {
+                    //const propName = (info?.blockOrientation === "vertical" ? "blockDirection" : "inlineDirection");
+                    const directionAllowed = (!disableArrowKeys && allowsVerticalNavigation);
+                    if (directionAllowed) {
+                        navigateToPrev();
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                    break;
+                }
+                case "ArrowDown": {
+                    const directionAllowed = (!disableArrowKeys && allowsVerticalNavigation);
+                    if (directionAllowed) {
+                        navigateToNext();
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                    break;
+                }
+
+                case "ArrowLeft": {
+                    const directionAllowed = (!disableArrowKeys && allowsHorizontalNavigation);
+                    if (directionAllowed) {
+                        navigateToPrev();
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                    break;
+                }
+                case "ArrowRight": {
+                    const directionAllowed = (!disableArrowKeys && allowsHorizontalNavigation);
+                    if (directionAllowed) {
+                        navigateToNext();
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                    e.preventDefault();
+                    e.stopPropagation();
+                    break;
+                }
+                case "Home":
+                    if (!disableHomeEndKeys) {
+                        navigateToFirst();
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                    break;
+
+                case "End":
+                    if (!disableHomeEndKeys) {
+                        navigateToLast();
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                    break;
+            }
+        }
+    }), []);
+
 
     return {
         linearNavigation: {},
-        linearNavigationProps: {
-            onKeyDown: (e: KeyboardEvent) => {
-                // Not handled by typeahead (i.e. assume this is a keyboard shortcut)
-                if (e.ctrlKey || e.metaKey)
-                    return;
-
-                //const info = getLogicalDirectionInfo();
-                const navigationDirection = getNavigationDirection();
-                const disableArrowKeys = getDisableArrowKeys();
-                const disableHomeEndKeys = getDisableHomeEndKeys();
-
-                const allowsVerticalNavigation = (navigationDirection == "vertical" || navigationDirection == "either");
-                const allowsHorizontalNavigation = (navigationDirection == "horizontal" || navigationDirection == "either");
-
-                switch (e.key) {
-                    case "ArrowUp": {
-                        //const propName = (info?.blockOrientation === "vertical" ? "blockDirection" : "inlineDirection");
-                        const directionAllowed = (!disableArrowKeys && allowsVerticalNavigation);
-                        if (directionAllowed) {
-                            navigateToPrev();
-                            e.preventDefault();
-                            e.stopPropagation();
-                        }
-                        break;
-                    }
-                    case "ArrowDown": {
-                        const directionAllowed = (!disableArrowKeys && allowsVerticalNavigation);
-                        if (directionAllowed) {
-                            navigateToNext();
-                            e.preventDefault();
-                            e.stopPropagation();
-                        }
-                        break;
-                    }
-
-                    case "ArrowLeft": {
-                        const directionAllowed = (!disableArrowKeys && allowsHorizontalNavigation);
-                        if (directionAllowed) {
-                            navigateToPrev();
-                            e.preventDefault();
-                            e.stopPropagation();
-                        }
-                        break;
-                    }
-                    case "ArrowRight": {
-                        const directionAllowed = (!disableArrowKeys && allowsHorizontalNavigation);
-                        if (directionAllowed) {
-                            navigateToNext();
-                            e.preventDefault();
-                            e.stopPropagation();
-                        }
-                        e.preventDefault();
-                        e.stopPropagation();
-                        break;
-                    }
-                    case "Home":
-                        if (!disableHomeEndKeys) {
-                            navigateToFirst();
-                            e.preventDefault();
-                            e.stopPropagation();
-                        }
-                        break;
-
-                    case "End":
-                        if (!disableHomeEndKeys) {
-                            navigateToLast();
-                            e.preventDefault();
-                            e.stopPropagation();
-                        }
-                        break;
-                }
-            }
-        }
+        props: useProps(),
+        useProps
     }
 
 
@@ -177,7 +181,8 @@ export interface UseTypeaheadNavigationReturnTypeWithHooks<ParentOrChildElement 
      * 
      * **STABLE**
      */
-    typeaheadNavigationProps: h.JSX.HTMLAttributes<ParentOrChildElement>;
+    useProps(props: h.JSX.HTMLAttributes<ParentOrChildElement>): h.JSX.HTMLAttributes<ParentOrChildElement>;
+    props: h.JSX.HTMLAttributes<ParentOrChildElement>;
 
     /** **STABLE** */
     useTypeaheadNavigationChild: UseTypeaheadNavigationChild;
@@ -294,7 +299,7 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element>({ t
     const isDisabled = useStableGetter(noTypeahead);
 
 
-    const typeaheadNavigationProps: h.JSX.HTMLAttributes<ParentOrChildElement> = {
+    const useProps = useCallback(() => ({
         onKeyDown: (e: KeyboardEvent) => {
             if (isDisabled())
                 return;
@@ -341,13 +346,13 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element>({ t
                 }
             }
 
-        }, 
+        },
         onCompositionStart: (e: CompositionEvent) => {
             setNextTypeaheadChar(e.data);
             setImeActive(false);
         },
         onCompositionEnd: (_e: CompositionEvent) => { setImeActive(true) },
-    };
+    }), []);
 
     // Handle changes in typeahead that cause changes to the tabbable index
     useEffect(() => {
@@ -467,7 +472,8 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element>({ t
 
     return {
         useTypeaheadNavigationChild,
-        typeaheadNavigationProps,
+        props: useProps(),
+        useProps,
 
         typeaheadNavigation: {
             currentTypeahead,
