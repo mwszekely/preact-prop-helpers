@@ -14,11 +14,11 @@ const RandomWords = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, se
 
 
 const DemoUseDroppable = () => {
-    const { droppedFiles, droppedStrings, filesForConsideration, stringsForConsideration, useDroppableProps, dropError } = useDroppable<HTMLDivElement>({ effect: "copy" });
+    const { droppedFiles, droppedStrings, filesForConsideration, stringsForConsideration, props, dropError } = useDroppable<HTMLDivElement>({ effect: "copy" });
 
     const { ref: _ref } = useMergedProps<HTMLInputElement>({}, { ref: useRef<HTMLInputElement>(null!) })
 
-    const p = useDroppableProps({ className: "demo droppable" });
+    const p = useMergedProps(props, { className: "demo droppable" });
 
     return (
         <div {...p}>
@@ -40,11 +40,11 @@ const DemoUseDroppable = () => {
 }
 
 const DemoUseDraggable = () => {
-    const { useDraggableProps } = useDraggable<HTMLDivElement>({ data: { "text/plain": "This is custom draggable content of type text/plain." } });
+    const { props } = useDraggable<HTMLDivElement>({ data: { "text/plain": "This is custom draggable content of type text/plain." } });
 
 
     return (
-        <div {...useDraggableProps({ className: "demo" })}>
+        <div {...useMergedProps(props, { className: "demo" })}>
             Draggable content
         </div>)
 }
@@ -61,10 +61,10 @@ const DemoUseElementSizeAnimation = () => {
 
     const [elementSize, setElementSize] = useState<ElementSize | null>(null);
 
-    const { useElementSizeProps } = useElementSize<HTMLDivElement>({ onSizeChange: setElementSize });
+    const { props } = useElementSize<HTMLDivElement>({ onSizeChange: setElementSize });
 
     return (
-        <div {...useMergedProps(useElementSizeProps, { ref: undefined, className: "demo", style: { height: `${(height * 100) + 100}px` } })}>
+        <div {...useMergedProps(props, { ref: undefined, className: "demo", style: { height: `${(height * 100) + 100}px` } })}>
             <pre>{JSON.stringify(elementSize, null, 2)}</pre>
         </div>
     );
@@ -75,10 +75,10 @@ const DemoUseFocusTrap = memo(({ depth }: { depth?: number }) => {
 
     const [active, setActive] = useState(false);
 
-    const { useFocusTrapProps } = useFocusTrap<HTMLDivElement>({ trapActive: active });
+    const { props } = useFocusTrap<HTMLDivElement>({ trapActive: active });
     //const { useRovingTabIndexChild, useRovingTabIndexProps } = useRovingTabIndex<HTMLUListElement, RovingTabIndexChildInfo>({ tabbableIndex, focusOnChange: false });
 
-    const divProps = useFocusTrapProps({ ref: undefined, className: "focus-trap-demo" });
+    const divProps = useMergedProps(props, { ref: undefined, className: "focus-trap-demo" });
     if (depth == 2)
         return <div />;
 
@@ -228,7 +228,7 @@ const DemoFocus = memo(() => {
     const [focusedInner, setFocusedInner] = useState(false);
     const [lastFocused, setLastFocused] = useState(false);
     const [lastFocusedInner, setLastFocusedInner] = useState(false);
-    const { hasFocusProps } = useHasFocus<HTMLDivElement>({
+    const { props } = useHasFocus<HTMLDivElement>({
         getDocument,
         onFocusedChanged: setFocused,
         onFocusedInnerChanged: setFocusedInner,
@@ -241,7 +241,7 @@ const DemoFocus = memo(() => {
     return (
         <div class="demo">
             <h2>useHasFocus</h2>
-            <div {...useMergedProps(hasFocusProps, { style: { border: "1px solid black" }, tabIndex: 0 })}>Outer <div tabIndex={0} style={{ border: "1px solid black" }}>Inner element</div></div>
+            <div {...useMergedProps(props, { style: { border: "1px solid black" }, tabIndex: 0 })}>Outer <div tabIndex={0} style={{ border: "1px solid black" }}>Inner element</div></div>
             <div>
                 <ul>
                     <li>Strictly focused: {focused.toString()}, {lastFocused.toString()}</li>
@@ -261,7 +261,7 @@ const GridCellContext = createContext<UseGridNavigationCell<HTMLTableCellElement
 export const DemoUseGrid = memo(() => {
 
     const [, setLastFocusedInner, _getLastFocusedInner] = useState(false);
-    const { hasFocusProps } = useHasFocus<HTMLTableSectionElement>({ onLastFocusedInnerChanged: setLastFocusedInner, getDocument });
+    const { props } = useHasFocus<HTMLTableSectionElement>({ onLastFocusedInnerChanged: setLastFocusedInner, getDocument });
     const { useGridNavigationRow, gridNavigationProps, gridNavigation: { currentColumn } } = useGridNavigation<HTMLTableSectionElement, HTMLTableRowElement, HTMLTableCellElement, {}, {}, string, string>({
         rovingTabIndex: {},
         linearNavigation: {},
@@ -283,7 +283,7 @@ export const DemoUseGrid = memo(() => {
                         <th>Column 2</th>
                     </tr>
                 </thead>
-                <tbody {...useMergedProps(hasFocusProps, gridNavigationProps)}>
+                <tbody {...useMergedProps(props, gridNavigationProps)}>
                     <GridRowContext.Provider value={useGridNavigationRow}>
                         {Array.from((function* () {
                             for (let i = 0; i < 10; ++i) {
@@ -332,7 +332,7 @@ const DemoUseGridCell = (({ index, row, rowIsTabbable }: { index: number, row: n
 
     const useGridCell = useContext(GridCellContext);
     const {
-        gridNavigationCellProps,
+        props,
         rovingTabIndex: { tabbable: cellIsTabbable }
     } = useGridCell({
         listNavigation: { text: "" },
@@ -341,8 +341,6 @@ const DemoUseGridCell = (({ index, row, rowIsTabbable }: { index: number, row: n
         hasFocus: { getDocument },
         subInfo: {},
     });
-
-    const props = gridNavigationCellProps as any;
 
     const t = (cellIsTabbable ? "(Tabbable)" : "(Not tabbable)")
 
@@ -353,7 +351,7 @@ const DemoUseGridCell = (({ index, row, rowIsTabbable }: { index: number, row: n
             if (index === 1)
                 return <td {...props}>Grid cell #{index + 1} {t}{hiddenText}</td>
             else
-                return <td><label><input  {...props} type="checkbox" /> Test input {t}{hiddenText}</label></td>
+                return <td><label><input  {...(props as any)} type="checkbox" /> Test input {t}{hiddenText}</label></td>
         }
         else {
             if (index === 1)

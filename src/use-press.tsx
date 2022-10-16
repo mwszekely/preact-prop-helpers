@@ -45,7 +45,7 @@ export function usePress<E extends Node>({ exclude, hasFocus: { onLastFocusedInn
     // this is reset back to 0.
     const [activeDuringRender, setActive, getActive] = useState(0);
     const forceUpdate = useForceUpdate();
-    const { hasFocusProps, getElement } = useHasFocus({
+    const { getElement, props: otherProps, ...restFocus } = useHasFocus({
         ...hasFocus,
         onLastFocusedInnerChanged: useStableCallback((f: boolean, p: boolean | undefined) => {
             onLastFocusedInnerChanged?.(f, p);
@@ -213,18 +213,21 @@ export function usePress<E extends Node>({ exclude, hasFocus: { onLastFocusedInn
         }
     })
 
-    return useMergedProps(
-        hasFocusProps,
-        {
-            onKeyDown,
-            onKeyUp,
-            onMouseDown,
-            onMouseUp,
-            onMouseLeave,
-            onClick,
-            style: (textSelectedDuringActivationStartTime != null) ? { cursor: "text" } : undefined,
-            ...{ "data-pseudo-active": pseudoActive ? "true" : undefined } as {}
-        });
+    return {
+        props: {
+            ...otherProps,
+            pressProps: {
+                onKeyDown,
+                onKeyUp,
+                onMouseDown,
+                onMouseUp,
+                onMouseLeave,
+                onClick,
+                style: (textSelectedDuringActivationStartTime != null) ? { cursor: "text" } : undefined,
+                ...{ "data-pseudo-active": pseudoActive ? "true" : undefined } as {}
+            }
+        }
+    };
 }
 
 

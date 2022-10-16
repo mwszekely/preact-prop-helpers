@@ -118,7 +118,7 @@ export interface UseListNavigationReturnTypeWithHooks<ParentOrChildElement exten
     /** **STABLE** */
     useListNavigationChild: UseListNavigationChild<ChildElement, LsSubInfo, ExtraFlagKeys>;
     /** **STABLE** */
-    listNavigationProps: h.JSX.HTMLAttributes<ParentOrChildElement>;
+    props: h.JSX.HTMLAttributes<ParentOrChildElement>;
 }
 
 export interface UseListNavigationChildReturnTypeInfo<ChildElement extends Element> extends UseRovingTabIndexChildReturnTypeInfo<ChildElement> {
@@ -126,7 +126,8 @@ export interface UseListNavigationChildReturnTypeInfo<ChildElement extends Eleme
 }
 
 export interface UseListNavigationChildReturnTypeWithHooks<ChildElement extends Element> extends UseListNavigationChildReturnTypeInfo<ChildElement> {
-    listNavigationChildProps: h.JSX.HTMLAttributes<ChildElement>;
+    props: h.JSX.HTMLAttributes<ChildElement>;
+    //listNavigationChildProps: h.JSX.HTMLAttributes<ChildElement>;
 }
 
 
@@ -213,9 +214,6 @@ export function useListNavigation<ParentOrChildElement extends Element, ChildEle
         }
     });
 
-    const listNavigationProps = useMergedProps(linearNavigationProps, typeaheadNavigationProps);
-
-
     const useListNavigationChild = useCallback<UseListNavigationChild<ChildElement, LsSubInfo, ExtraFlagKeys>>(({ managedChild: { index, flags }, rovingTabIndex: { focusSelf, hidden }, listNavigation: { text }, subInfo }) => {
 
         const _v: void = useTypeaheadNavigationChild({ text, index });
@@ -230,43 +228,29 @@ export function useListNavigation<ParentOrChildElement extends Element, ChildEle
         }, []);
 
         const {
-            rovingTabIndexChildProps,
-            rovingTabIndex: {
-                tabbable,
-                getTabbable,
-                getElement
-            }
+            props,
+            ...rtiRest
         } = useRovingTabIndexChild({
             managedChild: { index, flags },
             rovingTabIndex: { focusSelf, hidden: !!hidden },
             subInfo: { text, subInfo }
         });
 
-        const listNavigationChildProps = useMergedProps(rovingTabIndexChildProps, (({ inert: hidden } as h.JSX.HTMLAttributes<ChildElement>)));
-
         return {
-            listNavigationChildProps,
-            rovingTabIndex: {
-                tabbable,
-                getTabbable,
-                getElement
-            }
+            props: useMergedProps(props, (({ inert: hidden } as h.JSX.HTMLAttributes<ChildElement>))),
+            ...rtiRest
         }
     }, [useTypeaheadNavigationChild, useRovingTabIndexChild, navigateToIndex]);
 
     return {
         useListNavigationChild,
-        listNavigationProps,
+        props: useMergedProps(linearNavigationProps, typeaheadNavigationProps),
 
         listNavigation: { navigateToIndex },
         managedChildren: parentReturnType.managedChildren,
         rovingTabIndex: parentReturnType.rovingTabIndex,
         linearNavigation: {},
         typeaheadNavigation: { currentTypeahead, invalidTypeahead }
-        /*listNavigation: { navigateToIndex },
-        rovingTabIndex: { focusSelf, getTabbableIndex, setTabbableIndex },
-        linearNavigation: {},
-        typeaheadNavigation: { currentTypeahead, invalidTypeahead }*/
     }
 }
 

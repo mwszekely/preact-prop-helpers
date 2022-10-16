@@ -10,7 +10,7 @@ export interface UseDroppableReturnType<E extends Element> {
      * 
      * *Unstable*
      */
-    useDroppableProps: (p: h.JSX.HTMLAttributes<E>) => h.JSX.HTMLAttributes<E>;
+    props: h.JSX.HTMLAttributes<E>;
 
     /**
      * While something is being dragged over this element, this will contain any information about any files included in that drop.
@@ -130,118 +130,110 @@ export function useDroppable<E extends Element>({ effect }: UseDroppableParamete
                 }
             })
         }
-    }, [currentPromiseIndex])
+    }, [currentPromiseIndex]);
 
 
-    const useDroppableProps: UseDroppableReturnType<E>["useDroppableProps"] = (p) => {
+    // Handle collecting the current file metadata or MIME types.
+    const onDragEnter = (e: DragEvent) => {
+        e.preventDefault();
+        if (e.dataTransfer) {
 
-        //const ref = useRef<E>(null);
+            // Is there a default? I can't find one anywhere.
+            e.dataTransfer.dropEffect = (effect ?? "move");
 
-        // Handle collecting the current file metadata or MIME types.
-        const onDragEnter = (e: DragEvent) => {
-            e.preventDefault();
-            if (e.dataTransfer) {
-
-                // Is there a default? I can't find one anywhere.
-                e.dataTransfer.dropEffect = (effect ?? "move");
-
-                const newMimeTypes = new Set<string>();
-                const newFiles = new Array<DropFileMetadata>();
-
-                for (const item of e.dataTransfer?.items ?? []) {
-                    const { kind, type } = item;
-
-                    if (kind === "string") {
-                        newMimeTypes.add(type);
-                    }
-                    else if (kind === "file") {
-                        newFiles.push({ type: item.type });
-
-                    }
-                }
-
-                setFilesForConsideration(newFiles);
-                setStringsForConsideration(newMimeTypes);
-            }
-        };
-
-        // Handle resetting the current file metadata or MIME types
-        const onDragLeave = (e: DragEvent) => {
-            e.preventDefault();
-            setFilesForConsideration(null);
-            setStringsForConsideration(null);
-        };
-
-        // Boilerplate, I guess
-        const onDragOver = (e: DragEvent) => {
-            e.preventDefault();
-        }
-
-        // Handle getting the drop data asynchronously
-        const onDrop = (e: DragEvent) => {
-            e.preventDefault();
-
-            setFilesForConsideration(null);
-            setStringsForConsideration(null);
-
-            const allPromises = new Array<Promise<unknown>>();
-
-            const dropData: { [mimeType: string]: string } = {};
-            const dropFile: DropFile[] = [];
+            const newMimeTypes = new Set<string>();
+            const newFiles = new Array<DropFileMetadata>();
 
             for (const item of e.dataTransfer?.items ?? []) {
                 const { kind, type } = item;
 
                 if (kind === "string") {
-                    allPromises.push((new Promise<string>((resolve, _reject) => item.getAsString(resolve))).then(str => dropData[type] = str));
+                    newMimeTypes.add(type);
                 }
                 else if (kind === "file") {
-                    const file = item.getAsFile();
-                    if (file) {
-                        allPromises.push(
-                            new Promise<void>((resolve, reject) => {
+                    newFiles.push({ type: item.type });
 
-                                const reader = new FileReader();
-
-                                reader.onload = (_) => {
-                                    resolve();
-                                    const data = reader.result as ArrayBuffer;
-                                    dropFile.push({ data, name: file.name, type: file.type, size: data.byteLength, lastModified: file.lastModified });
-                                };
-                                reader.onerror = (_) => { reject(new DroppableFileError(file.name, reader.error)); };
-                                reader.onabort = (_) => { reject(new DroppableFileError(file.name, reader.error)); };
-
-                                reader.readAsArrayBuffer(file);
-                            })
-                        );
-                        dropFile.push();
-                    }
                 }
             }
 
+            setFilesForConsideration(newFiles);
+            setStringsForConsideration(newMimeTypes);
+        }
+    };
 
-            dropPromisesRef.current.push(Promise.all(allPromises).then(() => {
-                setPromiseCount(i => ++i);
-                setDropError(null);
-                return {
-                    strings: dropData,
-                    files: dropFile
+    // Handle resetting the current file metadata or MIME types
+    const onDragLeave = (e: DragEvent) => {
+        e.preventDefault();
+        setFilesForConsideration(null);
+        setStringsForConsideration(null);
+    };
+
+    // Boilerplate, I guess
+    const onDragOver = (e: DragEvent) => {
+        e.preventDefault();
+    }
+
+    // Handle getting the drop data asynchronously
+    const onDrop = (e: DragEvent) => {
+        e.preventDefault();
+
+        setFilesForConsideration(null);
+        setStringsForConsideration(null);
+
+        const allPromises = new Array<Promise<unknown>>();
+
+        const dropData: { [mimeType: string]: string } = {};
+        const dropFile: DropFile[] = [];
+
+        for (const item of e.dataTransfer?.items ?? []) {
+            const { kind, type } = item;
+
+            if (kind === "string") {
+                allPromises.push((new Promise<string>((resolve, _reject) => item.getAsString(resolve))).then(str => dropData[type] = str));
+            }
+            else if (kind === "file") {
+                const file = item.getAsFile();
+                if (file) {
+                    allPromises.push(
+                        new Promise<void>((resolve, reject) => {
+
+                            const reader = new FileReader();
+
+                            reader.onload = (_) => {
+                                resolve();
+                                const data = reader.result as ArrayBuffer;
+                                dropFile.push({ data, name: file.name, type: file.type, size: data.byteLength, lastModified: file.lastModified });
+                            };
+                            reader.onerror = (_) => { reject(new DroppableFileError(file.name, reader.error)); };
+                            reader.onabort = (_) => { reject(new DroppableFileError(file.name, reader.error)); };
+
+                            reader.readAsArrayBuffer(file);
+                        })
+                    );
+                    dropFile.push();
                 }
-            }).catch(ex => {
-                /* eslint-disable no-debugger */
-                debugger;
-                setPromiseCount(i => ++i);
-                setDropError(ex);
-                return null;
-            }));
+            }
         }
 
 
-        return useMergedProps<E>({ onDragEnter, onDragLeave, onDragOver, onDrop }, p);
-    };
+        dropPromisesRef.current.push(Promise.all(allPromises).then(() => {
+            setPromiseCount(i => ++i);
+            setDropError(null);
+            return {
+                strings: dropData,
+                files: dropFile
+            }
+        }).catch(ex => {
+            /* eslint-disable no-debugger */
+            debugger;
+            setPromiseCount(i => ++i);
+            setDropError(ex);
+            return null;
+        }));
+    }
 
     return {
-        useDroppableProps,
+        props: { onDragEnter, onDragLeave, onDragOver, onDrop },
         filesForConsideration,
         stringsForConsideration,
         droppedFiles,

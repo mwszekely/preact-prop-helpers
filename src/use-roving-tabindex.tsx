@@ -1,7 +1,7 @@
 import { h } from "preact";
 import { StateUpdater, useCallback, useEffect, useRef } from "preact/hooks";
 import { ChildFlagOperations, ManagedChildOmits, ManagedChildrenOmits, OnChildrenMountChange, useChildrenFlag, UseManagedChildParameters, useManagedChildren, UseManagedChildrenParameters, UseManagedChildrenReturnTypeInfo } from "./use-child-manager";
-import { useHasFocus } from "./use-has-focus";
+import { useHasFocus, UseHasFocusReturnType } from "./use-has-focus";
 import { useMergedProps } from "./use-merged-props";
 import { usePassiveState } from "./use-passive-state";
 import { useStableCallback } from "./use-stable-callback";
@@ -70,17 +70,17 @@ export interface UseRovingTabIndexChildParameters<ChildElement extends Element, 
 export type UseRovingTabIndexChild<ChildElement extends Element, RtiSubInfo, ExtraFlagKeys extends string> = (a: UseRovingTabIndexChildParameters<ChildElement, RtiSubInfo, ExtraFlagKeys, never, never, RtiSubInfo>) => UseRovingTabIndexChildReturnTypeWithHooks<ChildElement>;
 
 export interface UseRovingTabIndexChildReturnTypeInfo<ChildElement extends Element> {
+    hasFocus: Omit<UseHasFocusReturnType<ChildElement>, "props">;
     rovingTabIndex: {
         tabbable: boolean;
         /** **STABLE** */
         getTabbable(): boolean;
-        /** **STABLE** */
-        getElement(): ChildElement | null;
     }
 }
 export interface UseRovingTabIndexChildReturnTypeWithHooks<ChildElement extends Element> extends UseRovingTabIndexChildReturnTypeInfo<ChildElement> {
     /** *Unstable* */
-    rovingTabIndexChildProps: h.JSX.HTMLAttributes<ChildElement>;
+    props: h.JSX.HTMLAttributes<ChildElement>;
+    //rovingTabIndexChildProps: h.JSX.HTMLAttributes<ChildElement>;
 }
 
 
@@ -179,7 +179,7 @@ export function useRovingTabIndex<ChildElement extends Element, RtiSubInfo, Extr
 
     const { changeIndex, reevaluateClosestFit } = useChildrenFlag<UseRovingTabIndexSubInfo<ChildElement, RtiSubInfo>, ExtraFlagKeys | "tabbable">({ initialIndex, children: parentReturnType.managedChildren.children, closestFit: true, key: "tabbable" });
 
-    const useRovingTabIndexChild = useCallback<UseRovingTabIndexChild<ChildElement, RtiSubInfo, ExtraFlagKeys>>((childParameters) => {
+    const useRovingTabIndexChild = useCallback<UseRovingTabIndexChild<ChildElement, RtiSubInfo, ExtraFlagKeys>>((childParameters): UseRovingTabIndexChildReturnTypeWithHooks<ChildElement> => {
 
         const { subInfo, managedChild: { index, flags }, rovingTabIndex: { hidden, focusSelf: focusSelfOverride, noModifyTabIndex } } = childParameters;
 
@@ -202,7 +202,8 @@ export function useRovingTabIndex<ChildElement extends Element, RtiSubInfo, Extr
                 setTabbableIndex(index, false);
             }
         });
-        const { getElement, hasFocusProps } = useHasFocus<ChildElement>({ onFocusedInnerChanged, getDocument: useCallback((): Document => { return (getElement()?.ownerDocument) ?? (window.document) }, []) });
+        const { props: focusProps, ...focusRest } = useHasFocus<ChildElement>({ onFocusedInnerChanged, getDocument: useCallback((): Document => { return (getElement()?.ownerDocument) ?? (window.document) }, []) });
+        const { getElement } = focusRest;
 
         const [tabbable, setTabbable, getTabbable] = useState(false);
         const tabbableFlags = useRef<ChildFlagOperations>({ get: getTabbable, set: setTabbable, isValid: useStableCallback(() => !hidden) });
@@ -225,12 +226,15 @@ export function useRovingTabIndex<ChildElement extends Element, RtiSubInfo, Extr
                 stableOnTabbableRender(index);
         }, [tabbable, index]);
 
-        const rovingTabIndexChildProps = useMergedProps(hasFocusProps, { tabIndex: noModifyTabIndex ? undefined : (tabbable ? 0 : -1) })
+        //const rovingTabIndexChildProps = useMergedProps(refElementProps, { tabIndex: noModifyTabIndex ? undefined : (tabbable ? 0 : -1) })
 
         return {
-            rovingTabIndexChildProps,
+            props: useMergedProps(
+                focusProps,
+                { tabIndex: noModifyTabIndex ? undefined : (tabbable ? 0 : -1) }
+            ),
+            hasFocus: focusRest,
             rovingTabIndex: {
-                getElement,
                 tabbable,
                 getTabbable
             }

@@ -3,7 +3,7 @@ import { h } from "preact";
 import { StateUpdater, useCallback, useLayoutEffect, useRef } from "preact/hooks";
 import { useMergedProps } from "./use-merged-props";
 import { ChildFlagOperations, ManagedChildren, useChildrenFlag, UseManagedChildParameters } from "./use-child-manager";
-import { useChildrenHaveFocus, UseChildrenHaveFocusParameters, UseHasFocusParameters } from "./use-has-focus";
+import { useChildrenHaveFocus, UseChildrenHaveFocusChildReturnType, UseChildrenHaveFocusParameters, UseHasFocusParameters } from "./use-has-focus";
 import { usePress } from "./use-press";
 import { useStableCallback } from "./use-stable-callback";
 import { useStableGetter } from "./use-stable-getter";
@@ -41,13 +41,14 @@ export interface UseSingleSelectionChildParameters<E extends Element, C, K exten
     managedChild: UseManagedChildParameters<number, C, K | "selected", never, any>["managedChild"];
 }
 
-export interface UseSingleSelectionChildReturnTypeInfo<E extends Element, C, K extends string> {
+export interface UseSingleSelectionChildReturnTypeInfo<E extends Element, C, K extends string> extends UseChildrenHaveFocusChildReturnType<E> {
     flags: { selected: ChildFlagOperations }
     singleSelection: { selected: boolean, getSelected(): boolean; }
 }
 
 export interface UseSingleSelectionChildReturnTypeWithHooks<E extends Element, C, K extends string> extends UseSingleSelectionChildReturnTypeInfo<E, C, K> {
-    singleSelectionChildProps: h.JSX.HTMLAttributes<E>;
+    props: h.JSX.HTMLAttributes<E>;
+    //singleSelectionChildProps: h.JSX.HTMLAttributes<E>;
 }
 
 export interface UseSingleSelectionReturnTypeInfo<ChildElement extends Element, LsSubInfo, ExtraFlagKeys extends string> {
@@ -109,7 +110,7 @@ export function useSingleSelection<ParentOrChildElement extends Element, ChildEl
         useSingleSelectionChild: useCallback<UseSingleSelectionChild<ChildElement, C, K | "selected">>(({ managedChild: { index, flags }, hasFocus: { onFocusedInnerChanged, ...hasFocus }, singleSelection: { unselectable, ariaPropName, focusSelf } }) => {
             const [isSelected, setIsSelected, getIsSelected] = useState(getSelectedIndex() == index);
             const selectedRef = useRef<ChildFlagOperations>({ get: getIsSelected, set: setIsSelected, isValid: useStableCallback(() => !unselectable) });
-            const { childrenHaveFocusChildProps, getElement } = useChildrenHaveFocusChild({
+            const { props: props1, ...chfcRest } = useChildrenHaveFocusChild({
                 onFocusedInnerChanged: useStableCallback((focused: boolean, prev: boolean | undefined) => {
                     if (focused)
                         debugger;
@@ -122,10 +123,11 @@ export function useSingleSelection<ParentOrChildElement extends Element, ChildEl
                 managedChild: { index },
                 subInfo: undefined
             });
+            const { getElement } = chfcRest;
 
             const getIndex = useStableGetter(index);
 
-            const usePressProps = usePress<ChildElement>({
+            const { props: props2 } = usePress<ChildElement>({
                 onClickSync: unselectable ? null : ((e) => { stableOnChange(getIndex(), e); }),
                 exclude: {},
                 hasFocus,
@@ -134,8 +136,9 @@ export function useSingleSelection<ParentOrChildElement extends Element, ChildEl
 
             return {
                 flags: { ...flags, selected: selectedRef.current },
-                singleSelectionChildProps: useMergedProps(useMergedProps(usePressProps, childrenHaveFocusChildProps), { [ariaPropName as keyof h.JSX.HTMLAttributes<any>]: (isSelected ?? false).toString() }),
-                singleSelection: { selected: isSelected, getSelected: getIsSelected }
+                props: useMergedProps(useMergedProps(props1, props2), { [ariaPropName as keyof h.JSX.HTMLAttributes<any>]: (isSelected ?? false).toString() }),
+                singleSelection: { selected: isSelected, getSelected: getIsSelected },
+                ...chfcRest
             };
         }, [selectionMode]),
     }

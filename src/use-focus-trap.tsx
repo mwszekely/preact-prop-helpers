@@ -10,15 +10,17 @@ import { useStableCallback } from "./use-stable-callback";
 
 export interface UseFocusTrapParameters { trapActive: boolean; }
 
-export interface UseFocusTrapReturnType<E extends Element> extends Omit<UseRefElementReturnType<E>, "refElementProps" | "useRefElementProps"> {
-    /** *Unstable* (relies on the `trapActive` prop) */
-    useFocusTrapProps: (props: h.JSX.HTMLAttributes<E>) => h.JSX.HTMLAttributes<E>;
+export interface UseFocusTrapReturnType<E extends Element> extends Omit<UseRefElementReturnType<E>, "props" | "useProps"> {
+
+    props: UseRefElementReturnType<E>["props"] & {
+        focusTrapProps: h.JSX.HTMLAttributes<E>;
+    };
 }
 
 const elementsToRestoreFocusTo = new Map<Element | null, (Node & HTMLOrSVGElement)>();
 
 export function useFocusTrap<E extends Element>({ trapActive }: UseFocusTrapParameters): UseFocusTrapReturnType<E> {
-    
+
     const handleActiveChange = useCallback((trapActive: boolean, element: E | null) => {
         if (trapActive && element) {
 
@@ -53,9 +55,9 @@ export function useFocusTrap<E extends Element>({ trapActive }: UseFocusTrapPara
             };
         }
     }, []);
-    
-    const { getElement, refElementProps } = useRefElement<E>({ onElementChange: useStableCallback((element: E | null) => handleActiveChange(trapActive, element)) })
-    const { getLastActiveElement } = useActiveElement({ getDocument: useStableCallback(() => getElement()?.ownerDocument ?? window.document ) });
+
+    const { getElement, props: otherProps } = useRefElement<E>({ onElementChange: useStableCallback((element: E | null) => handleActiveChange(trapActive, element)) })
+    const { getLastActiveElement } = useActiveElement({ getDocument: useStableCallback(() => getElement()?.ownerDocument ?? window.document) });
 
 
     // When the trap becomes active, before we let the blockingElements hook run,
@@ -83,16 +85,13 @@ export function useFocusTrap<E extends Element>({ trapActive }: UseFocusTrapPara
         handleActiveChange(trapActive, getElement());
     }, [trapActive]);
 
-    const useFocusTrapProps = ((props: h.JSX.HTMLAttributes<E>) => {
-        const p1 = useMergedProps(refElementProps, props);
-        const p2 = { "aria-modal": trapActive ? "true" : undefined } as h.JSX.HTMLAttributes<E>;
-        return useMergedProps<E>(p1, p2);
-    });
-
 
     return {
-        useFocusTrapProps,
-        getElement
+        getElement,
+        props: {
+            focusTrapProps: { "aria-modal": trapActive ? "true" : undefined } as h.JSX.HTMLAttributes<E>,
+            ...otherProps
+        }
     };
 }
 

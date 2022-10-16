@@ -22,7 +22,7 @@ export const DemoUseRovingTabIndex = memo(() => {
     const {
         managedChildren: { children },
         useSortableListNavigationSingleSelectionChild,
-        useSortableListNavigationSingleSelectionProps,
+        useProps,
         rovingTabIndex: { setTabbableIndex },
         typeaheadNavigation: { currentTypeahead },
         sortableChildren: { shuffle },
@@ -75,7 +75,7 @@ export const DemoUseRovingTabIndex = memo(() => {
             </label>
 
             <ListNavigationSingleSelectionChildContext.Provider value={useSortableListNavigationSingleSelectionChild}>
-                <ul {...(useSortableListNavigationSingleSelectionProps({
+                <ul {...(useProps({
                     children: Array.from((function* () {
                         for (let i = 0; i < count; ++i) {
                             yield <DemoUseRovingTabIndexChild index={i} key={i} />
@@ -95,7 +95,7 @@ const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
     const useListNavigationSingleSelectionChild = useContext(ListNavigationSingleSelectionChildContext);
     const text = `${randomWord} This is item #${index}${hidden ? " (hidden)" : ""}`;
     const focusSelf = useCallback((e: HTMLElement) => { e.focus() }, []);
-    const { listNavigationSingleSelectionChildProps, rovingTabIndex: { tabbable }, singleSelection: { selected } } = useListNavigationSingleSelectionChild({ 
+    const { props, rovingTabIndex: { tabbable }, singleSelection: { selected } } = useListNavigationSingleSelectionChild({ 
         managedChild: { index }, 
         listNavigation: { text }, 
         rovingTabIndex: { hidden, focusSelf }, 
@@ -104,8 +104,7 @@ const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
         singleSelection: { ariaPropName: "aria-selected", unselectable: hidden, focusSelf: e => e.focus() }
     }); 
 
-    const props = listNavigationSingleSelectionChildProps as any;
     return (
-        <li {...props}>{text} ({tabbable ? "Tabbable" : "Not tabbable"}, {selected ? "Selected" : "Not selected"})<input {...useMergedProps(listNavigationSingleSelectionChildProps, { type: "number" }) as any} style={{ width: "5ch" }} /></li>
+        <li {...props}>{text} ({tabbable ? "Tabbable" : "Not tabbable"}, {selected ? "Selected" : "Not selected"})<input {...useMergedProps(props, { type: "number" }) as any} style={{ width: "5ch" }} /></li>
     )
 }));

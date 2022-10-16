@@ -30,7 +30,7 @@ export interface UseListNavigationSingleSelectionReturnTypeWithHooks<ParentOrChi
     /** **STABLE** */
     useListNavigationSingleSelectionChild: UseListNavigationSingleSelectionChild<ChildElement, C, K>;
     /** **STABLE** */
-    listNavigationSingleSelectionProps: UseListNavigationReturnTypeWithHooks<ParentOrChildElement, ChildElement, C, K>["listNavigationProps"];
+    props: UseListNavigationReturnTypeWithHooks<ParentOrChildElement, ChildElement, C, K>["props"];
 }
 
 
@@ -46,7 +46,7 @@ export interface UseListNavigationSingleSelectionChildReturnTypeInfo<ChildElemen
     }
 }
 export interface UseListNavigationSingleSelectionChildReturnTypeWithHooks<ChildElement extends Element> extends UseListNavigationSingleSelectionChildReturnTypeInfo<ChildElement> {
-    listNavigationSingleSelectionChildProps: UseListNavigationChildReturnTypeWithHooks<ChildElement>["listNavigationChildProps"];
+    props: UseListNavigationChildReturnTypeWithHooks<ChildElement>["props"];
 }
 
 
@@ -81,7 +81,7 @@ export interface UseSortableListNavigationParameters<C, K extends string, LsOmit
     UseSortableChildrenParameters<C, K> {
 }
 export interface UseSortableListNavigationReturnTypeWithHooks<ParentElement extends Element, ChildElement extends Element, C, K extends string> extends UseSortableListNavigationReturnTypeInfo<ChildElement, C, K> {
-    useSortableListNavigationProps: (props: Omit<h.JSX.HTMLAttributes<ParentElement>, "children"> & { children: VNode<any>[]; }) => h.JSX.HTMLAttributes<ParentElement>
+    useProps: (props: h.JSX.HTMLAttributes<ParentElement>) => h.JSX.HTMLAttributes<ParentElement>
     useSortableListNavigationChild: UseSortableListNavigationChild<ChildElement, C, K>;
 }
 export interface UseSortableListNavigationSingleSelectionParameters<ChildElement extends Element, C, K extends string, SSOmits extends SingleSelectionOmits, LsOmits extends ListNavigationParametersOmits, LnOmits extends LinearNavigationOmits, TnOmits extends TypeaheadNavigationOmits, RtiOmits extends RovingTabIndexParametersOmits, McOmits extends ManagedChildrenOmits> extends UseListNavigationSingleSelectionParameters<ChildElement, C, K, SSOmits, LsOmits | "indexMangler" | "indexDemangler", LnOmits, TnOmits, RtiOmits, McOmits> {
@@ -89,7 +89,7 @@ export interface UseSortableListNavigationSingleSelectionParameters<ChildElement
 }
 export interface UseSortableListNavigationSingleSelectionReturnTypeWithHooks<ParentElement extends Element, ChildElement extends Element, C, K extends string> extends
     UseSortableListNavigationSingleSelectionReturnTypeInfo<ChildElement, C, K> {
-    useSortableListNavigationSingleSelectionProps: (props: Omit<h.JSX.HTMLAttributes<ParentElement>, "children"> & { children: VNode<any>[]; }) => h.JSX.HTMLAttributes<ParentElement>
+    useProps: (props: h.JSX.HTMLAttributes<ParentElement>) => h.JSX.HTMLAttributes<ParentElement>
     useSortableListNavigationSingleSelectionChild: UseSortableListNavigationSingleSelectionChild<ChildElement, C, K>;
 }
 
@@ -140,22 +140,22 @@ export function useListNavigationSingleSelection<ParentOrChildElement extends El
 
     const {
         useListNavigationChild,
-        listNavigationProps,
+        props: listNavigationProps,
         ...listRest
     } = parentReturnType;
 
     return {
         useListNavigationSingleSelectionChild: useCallback<UseListNavigationSingleSelectionChild<ChildElement, C, K | "selected">>(({ managedChild: { index, flags }, rovingTabIndex: rti, listNavigation: ls, hasFocus, singleSelection: { focusSelf, unselectable, ...ss }, subInfo }) => {
             unselectable ||= (rti.hidden ?? false);
-            const { singleSelectionChildProps, flags: ssflags, ...singleSelectionInfo } = useSingleSelectionChild({
+            const { props: selectionProps, flags: ssflags, ...singleSelectionInfo } = useSingleSelectionChild({
                 managedChild: { index, flags },
                 hasFocus,
                 singleSelection: { ...ss, focusSelf, unselectable }
             });
 
             const {
-                rovingTabIndex: rti_ret,
-                listNavigationChildProps
+                props: listProsp,
+                ...rest
             } = useListNavigationChild({
                 managedChild: {
                     index,
@@ -170,12 +170,12 @@ export function useListNavigationSingleSelection<ParentOrChildElement extends El
             });
 
             return {
-                listNavigationSingleSelectionChildProps: useMergedProps(singleSelectionChildProps, listNavigationChildProps),
-                rovingTabIndex: rti_ret,
-                singleSelection: singleSelectionInfo.singleSelection
+                props: useMergedProps(selectionProps, listProsp),
+                ...rest,
+                ...singleSelectionInfo
             };
         }, [useSingleSelectionChild]),
-        listNavigationSingleSelectionProps:  listNavigationProps,
+        props:  listNavigationProps,
         ...listRest,
         ...singleSelectionInfo
     }
@@ -195,7 +195,7 @@ export function useSortableListNavigation<ParentElement extends Element, ChildEl
 
     const {
         useListNavigationChild,
-        listNavigationProps,
+        props: listNavigationProps,
         ...listNavReturnType
     } = useListNavigation<ParentElement, ChildElement, C, K>({
         linearNavigation: linearNavigation,
@@ -213,7 +213,7 @@ export function useSortableListNavigation<ParentElement extends Element, ChildEl
     }
 
     return ({
-        useSortableListNavigationProps,
+        useProps: useSortableListNavigationProps,
         useSortableListNavigationChild,
         ...listNavReturnType,
         ...sortableChildrenReturnType
@@ -238,7 +238,7 @@ export function useSortableListNavigationSingleSelection<ParentElement extends E
 
     const {
         useListNavigationSingleSelectionChild,
-        listNavigationSingleSelectionProps,
+        props: listNavigationSingleSelectionProps,
         ...listNavReturnType
     } = useListNavigationSingleSelection<ParentElement, ChildElement, C, K>({
         linearNavigation: linearNavigation,
@@ -250,7 +250,7 @@ export function useSortableListNavigationSingleSelection<ParentElement extends E
         childrenHaveFocus: childrenHaveFocus
     });
 
-    const useSortableListNavigationSingleSelectionProps = (props: Omit<h.JSX.HTMLAttributes<ParentElement>, "children"> & { children: VNode<any>[]; }) => {
+    const useSortableListNavigationSingleSelectionProps = (props: h.JSX.HTMLAttributes<ParentElement>) => {
         return useSortableProps(useMergedProps(listNavigationSingleSelectionProps, props));
     }
     const useSortableListNavigationSingleSelectionChild = (p: UseListNavigationSingleSelectionChildParameters<ChildElement, C, K, never, never, never, never, C>) => {
@@ -259,7 +259,7 @@ export function useSortableListNavigationSingleSelection<ParentElement extends E
 
     return ({
         useSortableListNavigationSingleSelectionChild,
-        useSortableListNavigationSingleSelectionProps,
+        useProps: useSortableListNavigationSingleSelectionProps,
         //sortable: { sort, shuffle, rearrange, demangleMap, indexDemangler, indexMangler, mangleMap },
         ...sortableReturnType,
         ...listNavReturnType

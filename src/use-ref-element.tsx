@@ -6,11 +6,9 @@ import { OnPassiveStateChange, returnNull, useEnsureStability, usePassiveState }
 export interface UseRefElementReturnType<T extends EventTarget> {
     /** **STABLE** */
     getElement(): T | null;
+    props: h.JSX.HTMLAttributes<T>;
     /** **STABLE** */
-    useRefElementProps: (props: h.JSX.HTMLAttributes<T>) => h.JSX.HTMLAttributes<T>;
-
-    // Same as the hook version
-    refElementProps: h.JSX.HTMLAttributes<T>;
+    useProps: (props: h.JSX.HTMLAttributes<T>) => h.JSX.HTMLAttributes<T>;
 }
 
 export interface UseRefElementParameters<T> {
@@ -53,8 +51,8 @@ export function useRefElement<T extends EventTarget>(args?: UseRefElementParamet
     // Return both the element and the hook that modifies 
     // the props and allows us to actually find the element
     return {
-        useRefElementProps,
-        refElementProps,
+        props: refElementProps, 
+        useProps: useRefElementProps,
         getElement
     }
 }

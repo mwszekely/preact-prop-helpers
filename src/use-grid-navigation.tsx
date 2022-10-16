@@ -89,7 +89,7 @@ export interface UseGridNavigationCellReturnTypeInfo<Cell extends Element> exten
 }
 
 export interface UseGridNavigationCellReturnTypeWithHooks<Cell extends Element> extends UseGridNavigationCellReturnTypeInfo<Cell> {
-    gridNavigationCellProps: h.JSX.HTMLAttributes<Cell>;
+    props: h.JSX.HTMLAttributes<Cell>;
 }
 
 
@@ -117,7 +117,7 @@ export function useGridNavigation<
 
     const {
         useListNavigationChild: useListNavigationChildAsGridRow,
-        listNavigationProps: useListNavigationPropsAsGridParent,
+        props: useListNavigationPropsAsGridParent,
         ...parentLsReturnType
     } = useListNavigation<ParentOrRowElement, RowElement, UseGridNavigationRowSubInfo<RowSubInfo>, RowExtraFlags>({
         managedChildren: mc,
@@ -144,7 +144,7 @@ export function useGridNavigation<
             rovingTabIndex: { ...asChild.rovingTabIndex, focusSelf: focusSelfRow },
             subInfo: { subInfo: asChild.subInfo },
         });
-        const { rovingTabIndex: { tabbable }, listNavigationChildProps } = rowLsChildReturnType;
+        const { rovingTabIndex: { tabbable }, props: listNavigationChildProps } = rowLsChildReturnType;
         useEffect(() => {
             if (!tabbable) {
                 navigateToColumn(null, false);
@@ -162,13 +162,13 @@ export function useGridNavigation<
             listNavigation: { ...asParent.listNavigation }
         });
 
-        const { rovingTabIndex: { setTabbableIndex }, useListNavigationChild: useGridNavigationColumn2, listNavigationProps: useGridNavigationColumnProps, listNavigation: { navigateToIndex: navigateToColumn } } = rowLsReturnType;
+        const { rovingTabIndex: { setTabbableIndex }, useListNavigationChild: useGridNavigationColumn2, props: useGridNavigationColumnProps, listNavigation: { navigateToIndex: navigateToColumn } } = rowLsReturnType;
 
         //const rowHidden = !!asChild.rovingTabIndex.hidden;
 
         const useGridNavigationCell = useCallback<UseGridNavigationCell<CellElement, CellSubInfo, CellExtraFlags>>(({ subInfo, hasFocus: { onLastFocusedInnerChanged, ...hasFocus }, managedChild, listNavigation: ls, rovingTabIndex: { focusSelf: focusSelfCell, ...rti } }) => {
             const {
-                listNavigationChildProps,
+                props: listNavigationChildProps,
                 rovingTabIndex: rti_cell_ret
             } = useGridNavigationColumn2({
                 managedChild: managedChild,
@@ -177,7 +177,7 @@ export function useGridNavigation<
                 subInfo: { subInfo }
             });
 
-            const { hasFocusProps } = useHasFocus<CellElement>({
+            const { props: hasFocusProps, ...hasFocusRet } = useHasFocus<CellElement>({
                 onLastFocusedInnerChanged: useStableCallback((focused: boolean, prev: boolean | undefined) => {
                     onLastFocusedInnerChanged?.(focused, prev);
                     if (focused) {
@@ -191,7 +191,8 @@ export function useGridNavigation<
             const ret: UseGridNavigationCellReturnTypeWithHooks<CellElement> = {
                 gridNavigation: { getCurrentColumn },
                 rovingTabIndex: rti_cell_ret,
-                gridNavigationCellProps: useMergedProps(listNavigationChildProps, hasFocusProps)
+                hasFocus: hasFocusRet,
+                props: useMergedProps(listNavigationChildProps, hasFocusProps)
             }
 
             return ret;

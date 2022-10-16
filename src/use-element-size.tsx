@@ -2,9 +2,9 @@ import { h } from "preact";
 import { useCallback, useEffect, useRef } from "preact/hooks";
 import { getDocument } from "./use-document-class";
 import { OnPassiveStateChange, returnNull, useEnsureStability, usePassiveState } from "./use-passive-state";
-import { useRefElement, UseRefElementReturnType } from "./use-ref-element";
+import { useRefElement, UseRefElementParameters, UseRefElementReturnType } from "./use-ref-element";
 
-interface UseElementSizeParameters {
+interface UseElementSizeParameters<T extends Element> extends UseRefElementParameters<T> {
     /**
      * Called any time the browser detects a size change
      * on the element. Does not need to be stable, so you
@@ -37,19 +37,17 @@ export interface ElementSize {
     offsetTop: number | undefined;
 }
 
-export interface UseElementSizeReturnType<E extends Element> {
-    /** **STABLE** */
-    getElement(): E | null;
+export interface UseElementSizeReturnType<E extends Element> extends Omit<UseRefElementReturnType<E>, "props" | "useProps"> {
     /** **STABLE** */
     getSize(): ElementSize | null;
     /** **STABLE** */
-    useElementSizeProps: UseRefElementReturnType<E>["refElementProps"];
+    props: UseRefElementReturnType<E>["props"] & { elementSizeProps: h.JSX.HTMLAttributes<E>; };
 }
 
 
-export function useElementSize<E extends Element>({ getObserveBox, onSizeChange }: UseElementSizeParameters): UseElementSizeReturnType<E> {
+export function useElementSize<E extends Element>({ getObserveBox, onSizeChange, onElementChange, onMount, onUnmount }: UseElementSizeParameters<E>): UseElementSizeReturnType<E> {
 
-    useEnsureStability("useElementSize", getObserveBox, onSizeChange);
+    useEnsureStability("useElementSize", getObserveBox, onSizeChange, onElementChange, onMount, onUnmount);
 
     const [getSize, setSize] = usePassiveState<ElementSize | null>(onSizeChange as OnPassiveStateChange<ElementSize | null>, returnNull);
 
@@ -82,7 +80,11 @@ export function useElementSize<E extends Element>({ getObserveBox, onSizeChange 
         }
     }, [])
 
-    const { getElement, refElementProps } = useRefElement<E>({ onElementChange: useCallback((e: E | null) => needANewObserver(e, getObserveBox?.()), []) });
+    const { getElement, props: otherProps } = useRefElement<E>({
+        onElementChange: useCallback((e: E | null, p: E | null | undefined) => { needANewObserver(e, getObserveBox?.()); onElementChange?.(e, p); }, []),
+        onMount,
+        onUnmount
+    });
 
     useEffect(() => {
         if (getObserveBox) {
@@ -94,7 +96,10 @@ export function useElementSize<E extends Element>({ getObserveBox, onSizeChange 
     return {
         getElement,
         getSize,
-        useElementSizeProps: refElementProps
+        props: {
+            elementSizeProps: {},
+            ...otherProps
+        }
     }
 
 

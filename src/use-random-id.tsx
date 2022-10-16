@@ -50,7 +50,7 @@ export interface UseRandomIdSourceElementReturnType<S extends Element> {
     /** **STABLE** */
     getUsedId(): string | undefined;
     /** *Unstable* */
-    useRandomIdSourceElementProps: (p: h.JSX.HTMLAttributes<S>) => h.JSX.HTMLAttributes<S>;
+    useProps: (p: h.JSX.HTMLAttributes<S>) => h.JSX.HTMLAttributes<S>;
 }
 
 export type UseRandomIdReferencerElement = <R extends Element>(idPropName: keyof h.JSX.HTMLAttributes<EventTarget>) => UseRandomIdReferencerElementReturnType<R>;
@@ -58,8 +58,11 @@ export interface UseRandomIdReferencerElementReturnType<R extends Element> {
     usedId: string | undefined;
     /** **STABLE** */
     getUsedId(): string | undefined;
+    props: {
+        useProps: (p: h.JSX.HTMLAttributes<R>) => h.JSX.HTMLAttributes<R>;
+    }
     /** *Unstable* */
-    useRandomIdReferencerElementProps: (p: h.JSX.HTMLAttributes<R>) => h.JSX.HTMLAttributes<R>;
+    //useRandomIdReferencerElementProps: (p: h.JSX.HTMLAttributes<R>) => h.JSX.HTMLAttributes<R>;
 }
 
 
@@ -90,7 +93,7 @@ export function useRandomId<S extends Element>({ randomId: { prefix }, managedCh
 
     const useRandomIdSourceElement = useCallback<UseRandomIdSourceElement<S>>(() => {
         const [usedIdLocal, setUsedIdLocal, getUsedIdLocal] = useState(getUsedId());
-        const { refElementProps, getElement } = useRefElement<S>();
+        const { getElement, useProps } = useRefElement<S>();
         // Every time the source element renders, inspect the ID it actually used
         // (whether it was ours or not isn't up to us, it's up to the component)
         // so this is how we notify the referencer component of changes
@@ -105,15 +108,15 @@ export function useRandomId<S extends Element>({ randomId: { prefix }, managedCh
 
         const _: void = useManagedChild({ managedChild: { index: "source" }, subInfo: { setUsedId: setUsedIdLocal } });
 
-        const useRandomIdSourceElementProps = useCallback<UseRandomIdSourceElementReturnType<S>["useRandomIdSourceElementProps"]>(function (p: h.JSX.HTMLAttributes<S>) {
+        const useRandomIdSourceElementProps = useCallback<UseRandomIdSourceElementReturnType<S>["useProps"]>(function (p: h.JSX.HTMLAttributes<S>) {
             p.id ||= backupRandomId;
-            return useMergedProps(refElementProps, p);
+            return useProps(p);
         }, [])
 
         return {
             usedId: usedIdLocal,
             getUsedId: getUsedIdLocal,
-            useRandomIdSourceElementProps
+            useProps: useRandomIdSourceElementProps
         };
     }, []);
 
@@ -124,7 +127,7 @@ export function useRandomId<S extends Element>({ randomId: { prefix }, managedCh
 
         const _v: void = useManagedChild({ managedChild: { index: "referencer" }, subInfo: { setUsedId: setUsedIdLocal } });
 
-        const useRandomIdReferencerElementProps = useCallback<UseRandomIdReferencerElementReturnType<R>["useRandomIdReferencerElementProps"]>(function <R extends Element>({ [idPropName]: givenId, ...p }: h.JSX.HTMLAttributes<R>) {
+        const useRandomIdReferencerElementProps = useCallback<UseRandomIdReferencerElementReturnType<R>["props"]["useProps"]>(function <R extends Element>({ [idPropName]: givenId, ...p }: h.JSX.HTMLAttributes<R>) {
             if (givenId && usedId) {
                 if (givenId != usedId) {
                     if (!mismatchErrorRef.current) {
@@ -140,7 +143,7 @@ export function useRandomId<S extends Element>({ randomId: { prefix }, managedCh
         return {
             usedId: usedIdLocal,
             getUsedId: getUsedIdLocal,
-            useRandomIdReferencerElementProps
+            props: { useProps: useRandomIdReferencerElementProps }
         }
     }, []);
 

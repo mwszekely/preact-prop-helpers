@@ -3,11 +3,15 @@ import { useCallback, useRef } from "preact/hooks";
 import { useMergedProps } from "./use-merged-props";
 import { useRefElement } from "./use-ref-element";
 
-export function useImperativeProps<T extends Element>(incomingProps: h.JSX.HTMLAttributes<T>) {
+export function useImperativeProps<T extends Element>() {
     const currentImperativeProps = useRef<{ className: DOMTokenList, style: h.JSX.CSSProperties, others: h.JSX.HTMLAttributes<T> }>({ className: new DOMTokenList(), style: {}, others: {} });
+    const cip = useMergedProps<T>(
+        { className: currentImperativeProps.current.className.toString(), style: currentImperativeProps.current.style },
+        currentImperativeProps.current.others
+    );
 
 
-    const { getElement, refElementProps } = useRefElement<T>({});
+    const { getElement, props } = useRefElement<T>({});
 
     const addClass = useCallback((cls: string) => {
         getElement()?.classList.add(cls);
@@ -48,14 +52,8 @@ export function useImperativeProps<T extends Element>(incomingProps: h.JSX.HTMLA
         removeAttribute,
 
         props: useMergedProps(
-            refElementProps,
-            useMergedProps<T>(
-                incomingProps,
-                useMergedProps<T>({
-                    className: currentImperativeProps.current.className.toString(),
-                    style: currentImperativeProps.current.style
-                },
-                    currentImperativeProps.current.others)
-            ))
+            props,
+            cip
+        )
     }
 }

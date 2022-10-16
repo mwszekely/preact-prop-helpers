@@ -5,13 +5,13 @@ import { useState } from "./use-state";
 
 export interface UseDraggableReturnType<E extends EventTarget> {
     /** *Unstable* */
-    useDraggableProps: (p: h.JSX.HTMLAttributes<E>) => h.JSX.HTMLAttributes<E>;
+    props: h.JSX.HTMLAttributes<E>;
 
     /**
      * Returns true if the element in question is currently being dragged
      */
     dragging: boolean;
-    
+
     /** **STABLE** */
     getDragging: () => boolean;
 
@@ -57,52 +57,43 @@ export function useDraggable<E extends Element>({ effectAllowed, data, dragImage
     const [dragging, setDragging, getDragging] = useState(false);
     const [lastDropEffect, setLastDropEffect, getLastDropEffect] = useState<DataTransfer["dropEffect"] | null>(null);
 
-    const useDraggableProps = useCallback(<P extends h.JSX.HTMLAttributes<E>>(p: P) => {
+    const onDragStart = (e: DragEvent) => {
+        //e.preventDefault();
+        setDragging(true);
+        if (e.dataTransfer) {
+            e.dataTransfer.effectAllowed = (effectAllowed ?? "all");
+            if (dragImage)
+                e.dataTransfer.setDragImage(dragImage, dragImageXOffset ?? 0, dragImageYOffset ?? 0)
 
-        const ref = useRef<E>(null);
-
-        const onDragStart = (e: DragEvent) => {
-            //e.preventDefault();
-            setDragging(true);
-            if (e.dataTransfer) {
-                e.dataTransfer.effectAllowed = (effectAllowed ?? "all");
-                if (dragImage)
-                    e.dataTransfer.setDragImage(dragImage, dragImageXOffset ?? 0, dragImageYOffset ?? 0)
-
-                const entries = Object.entries(data) as [mimeType: string, data: string][];
-                for (const [mimeType, data] of entries) {
-                    e.dataTransfer.setData(mimeType, data);
-                }
+            const entries = Object.entries(data) as [mimeType: string, data: string][];
+            for (const [mimeType, data] of entries) {
+                e.dataTransfer.setData(mimeType, data);
             }
-        };
+        }
+    }
 
-        const onDragEnd = (e: DragEvent) => {
-            e.preventDefault();
-            setDragging(false);
-            if (e.dataTransfer) {
-                if (e.dataTransfer.dropEffect != "none") {
-                    setLastDropEffect(e.dataTransfer.dropEffect);
-                }
-                else {
-                    setLastDropEffect(null);
-                }
+
+    const onDragEnd = (e: DragEvent) => {
+        e.preventDefault();
+        setDragging(false);
+        if (e.dataTransfer) {
+            if (e.dataTransfer.dropEffect != "none") {
+                setLastDropEffect(e.dataTransfer.dropEffect);
             }
-        };
-
-
-        return useMergedProps<E>({
-            draggable: true,
-            onDragStart,
-            onDragEnd,
-            ref
-        }, p);
-
-    }, [effectAllowed, dragImage, dragImageXOffset, dragImageYOffset, ...Object.entries(data).flat()]);
+            else {
+                setLastDropEffect(null);
+            }
+        }
+    };
 
     // Return both the element and the hook that modifies 
     // the props and allows us to actually find the element
     const ret: UseDraggableReturnType<E> = {
-        useDraggableProps,
+        props: {
+            draggable: true,
+            onDragStart,
+            onDragEnd
+        },
         dragging,
         getDragging,
         lastDropEffect,

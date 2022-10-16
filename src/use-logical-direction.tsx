@@ -1,7 +1,7 @@
 import { h } from "preact";
 import { useCallback } from "preact/hooks";
 import { useMergedProps } from "./use-merged-props";
-import { ElementSize, useElementSize } from "./use-element-size";
+import { ElementSize, useElementSize, UseElementSizeReturnType } from "./use-element-size";
 import { returnNull, useEnsureStability, usePassiveState } from "./use-passive-state";
 import { useRefElement } from "./use-ref-element";
 
@@ -63,15 +63,6 @@ export function useLogicalDirection<T extends Element>({ onLogicalDirectionChang
 
     const [getComputedStyles, setComputedStyles] = usePassiveState<CSSStyleDeclaration | null>(null, returnNull);
 
-
-    const { getElement, refElementProps } = useRefElement<T>({
-        onElementChange: useCallback((element: T | null) => {
-            if (element) {
-                setComputedStyles(window.getComputedStyle(element));
-            }
-        }, [])
-    });
-
     // TODO: There's no way to refresh which writing mode we have once mounted.
     //   A. There's no way to watch for CSS style changes
     //   B. Calling getComputedStyle after every render for every element gets expensive fast and
@@ -82,7 +73,15 @@ export function useLogicalDirection<T extends Element>({ onLogicalDirectionChang
     // and if so, tests if the writing mode has changed too.
     //
     // This will work for at least some number of cases, but a better solution is still needed.
-    const { useElementSizeProps } = useElementSize<T>({ onSizeChange: useCallback(_ => onLogicalDirectionChange?.(getLogicalDirectionInfo()), []) })
+    const { getElement, getSize, props } = useElementSize<T>({ 
+        onSizeChange: useCallback(_ => onLogicalDirectionChange?.(getLogicalDirectionInfo()), []) ,
+        onElementChange: useCallback((element: T | null) => {
+            if (element) {
+                setComputedStyles(window.getComputedStyle(element));
+            }
+        }, [])
+
+    })
 
     const getLogicalDirectionInfo = useCallback(() => {
         const computedStyles = getComputedStyles();
@@ -232,7 +231,8 @@ export function useLogicalDirection<T extends Element>({ onLogicalDirectionChang
     }, []);
 
     return {
-        useLogicalDirectionProps: (props: h.JSX.HTMLAttributes<T>) => useMergedProps(useMergedProps(refElementProps, useElementSizeProps), props),
+        props,
+        getSize,
         getElement,
         getLogicalDirectionInfo,
         convertToLogicalSize: convertElementSize,
@@ -257,11 +257,11 @@ const M = {
 } as const;
 
 
-export interface UseLogicalDirectionReturnType<T extends EventTarget> {
+export interface UseLogicalDirectionReturnType<T extends Element> extends UseElementSizeReturnType<T> {
     /** **STABLE** */
-    useLogicalDirectionProps: (props: h.JSX.HTMLAttributes<T>) => h.JSX.HTMLAttributes<T>;
+    //useLogicalDirectionProps: (props: h.JSX.HTMLAttributes<T>) => h.JSX.HTMLAttributes<T>;
     /** **STABLE** */
-    getElement: () => T | null;
+    //getElement: () => T | null;
     /** **STABLE** */
     getLogicalDirectionInfo: () => LogicalDirectionInfo | null;
 

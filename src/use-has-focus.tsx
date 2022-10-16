@@ -36,14 +36,12 @@ export interface UseHasFocusParameters<T extends Node> extends UseActiveElementP
     onLastFocusedInnerChanged?(focused: boolean, prevFocused: boolean | undefined): void;
 }
 
-export interface UseHasFocusReturnType<T extends Node> extends Omit<UseRefElementReturnType<T>, "refElementProps" | "useRefElementProps">, UseActiveElementReturnType {
+export interface UseHasFocusReturnType<T extends Node> extends Omit<UseRefElementReturnType<T>, "props" | "useProps">, UseActiveElementReturnType {
 
     /**
      * Modifies the element to be able to track its own focus state
-     * 
-     * **STABLE**
      */
-    hasFocusProps: h.JSX.HTMLAttributes<T>;
+    props: h.JSX.HTMLAttributes<T>;
 
     /** STABLE */
     getFocused(): boolean;
@@ -64,7 +62,7 @@ export function useHasFocus<T extends Node>({ onFocusedChanged, onFocusedInnerCh
     const [getLastFocused, setLastFocused] = usePassiveState<boolean>(onLastFocusedChanged, returnFalse);
     const [getLastFocusedInner, setLastFocusedInner] = usePassiveState<boolean>(onLastFocusedInnerChanged, returnFalse);
 
-    const { getElement, refElementProps } = useRefElement<T>({ onElementChange, onMount, onUnmount });
+    const { getElement, props } = useRefElement<T>({ onElementChange, onMount, onUnmount });
 
     const { getActiveElement, getLastActiveElement, getWindowFocused } = useActiveElement({
         getDocument,
@@ -88,11 +86,9 @@ export function useHasFocus<T extends Node>({ onFocusedChanged, onFocusedInnerCh
         onWindowFocusedChange
     });
 
-    const hasFocusProps = refElementProps;
-
 
     return {
-        hasFocusProps,
+        props,
         getElement,
         getFocused,
         getFocusedInner,
@@ -116,8 +112,7 @@ export interface UseChildrenHaveFocusParameters extends UseManagedChildrenParame
 export interface UseChildrenHaveFocusChildParameters<E extends Element, C, K extends string, SubbestInfo> extends UseManagedChildParameters<number, C, K, never, SubbestInfo>, UseHasFocusParameters<E> {
 }
 
-export interface UseChildrenHaveFocusChildReturnType<E extends Element> extends Omit<UseRefElementReturnType<E>, "refElementProps" | "useRefElementProps">, Omit<UseHasFocusReturnType<E>, "hasFocusProps"> {
-    childrenHaveFocusChildProps: h.JSX.HTMLAttributes<E>;
+export interface UseChildrenHaveFocusChildReturnType<E extends Element> extends Omit<UseRefElementReturnType<E>, "useProps">, Omit<UseHasFocusReturnType<E>, "hasFocusProps"> {
 }
 
 export interface UseChildrenHaveFocusReturnTypeInfo<C, K extends string> extends UseManagedChildrenReturnTypeInfo<number, C, K> {
@@ -142,7 +137,7 @@ export function useChildrenHaveFocus<C, K extends string>({ childrenHaveFocus: {
 
     const useChildrenHaveFocusChild = useCallback(<E extends Element>({ onElementChange, onMount, onUnmount, getDocument, getWindow, onActiveElementChange, onFocusedChanged, onFocusedInnerChanged, onLastActiveElementChange, onLastFocusedChanged, onLastFocusedInnerChanged, onWindowFocusedChange, managedChild: { index, flags }, subInfo }: UseChildrenHaveFocusChildParameters<E, C, K, C>): UseChildrenHaveFocusChildReturnType<E> => {
         useManagedChild({ managedChild: { index, flags }, subInfo });
-        const { hasFocusProps, ...hasFocus } = useHasFocus<E>({
+        const { props, ...hasFocus } = useHasFocus<E>({
             getDocument,
             getWindow,
             onActiveElementChange,
@@ -176,8 +171,8 @@ export function useChildrenHaveFocus<C, K extends string>({ childrenHaveFocus: {
         });
 
         return {
-            childrenHaveFocusChildProps: hasFocusProps,
-            ...hasFocus
+            ...hasFocus,
+            props
         }
     }, []);
 
