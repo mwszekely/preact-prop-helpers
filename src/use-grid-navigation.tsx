@@ -131,21 +131,16 @@ export function useGridNavigation<
         // Override the focusSelf that rovingTabIndex does.
         // Instead of focusing the entire row, we ask the cell that corresponds
         // to our current column to focus itself.
-        const focusSelf = useStableCallback(() => {
+        const focusSelfRow = useStableCallback(() => {
+            debugger;
             const c2 = getCurrentColumn();
             navigateToColumn(c2 ?? 0, true);
-            //if (asChild.rovingTabIndex.focusSelf) {
-            //    asChild.rovingTabIndex.focusSelf();
-            //}
-            //else {
-            //    navigateToIndex(c2 ?? 0, true);
-            //}
         });
 
         const rowLsChildReturnType = useListNavigationChildAsGridRow({
             managedChild: asChild.managedChild,
             listNavigation: { ...asChild.listNavigation },
-            rovingTabIndex: { ...asChild.rovingTabIndex, focusSelf },
+            rovingTabIndex: { ...asChild.rovingTabIndex, focusSelf: focusSelfRow },
             subInfo: { subInfo: asChild.subInfo },
         });
         const { rovingTabIndex: { tabbable }, useListNavigationChildProps } = rowLsChildReturnType;
@@ -170,14 +165,14 @@ export function useGridNavigation<
 
         //const rowHidden = !!asChild.rovingTabIndex.hidden;
 
-        const useGridNavigationCell = useCallback<UseGridNavigationCell<CellElement, CellSubInfo, CellExtraFlags>>(({ subInfo, hasFocus: { onLastFocusedInnerChanged, ...hasFocus }, managedChild, listNavigation: ls, rovingTabIndex: { focusSelf: fs, ...rti } }) => {
+        const useGridNavigationCell = useCallback<UseGridNavigationCell<CellElement, CellSubInfo, CellExtraFlags>>(({ subInfo, hasFocus: { onLastFocusedInnerChanged, ...hasFocus }, managedChild, listNavigation: ls, rovingTabIndex: { focusSelf: focusSelfCell, ...rti } }) => {
             const {
                 useListNavigationChildProps,
                 rovingTabIndex: rti_cell_ret
             } = useGridNavigationColumn2({
                 managedChild: managedChild,
                 listNavigation: { ...ls },
-                rovingTabIndex: { focusSelf, ...rti },
+                rovingTabIndex: { focusSelf: focusSelfCell, ...rti },
                 subInfo: { subInfo }
             });
 
