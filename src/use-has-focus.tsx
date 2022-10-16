@@ -36,7 +36,7 @@ export interface UseHasFocusParameters<T extends Node> extends UseActiveElementP
     onLastFocusedInnerChanged?(focused: boolean, prevFocused: boolean | undefined): void;
 }
 
-export interface UseHasFocusReturnType<T extends Node> extends Omit<UseRefElementReturnType<T>, "refElementProps">, UseActiveElementReturnType {
+export interface UseHasFocusReturnType<T extends Node> extends Omit<UseRefElementReturnType<T>, "refElementProps" | "useRefElementProps">, UseActiveElementReturnType {
 
     /**
      * Modifies the element to be able to track its own focus state
@@ -116,7 +116,7 @@ export interface UseChildrenHaveFocusParameters extends UseManagedChildrenParame
 export interface UseChildrenHaveFocusChildParameters<E extends Element, C, K extends string, SubbestInfo> extends UseManagedChildParameters<number, C, K, never, SubbestInfo>, UseHasFocusParameters<E> {
 }
 
-export interface UseChildrenHaveFocusChildReturnType<E extends Element> extends Omit<UseRefElementReturnType<E>, "refElementProps">, Omit<UseHasFocusReturnType<E>, "hasFocusProps"> {
+export interface UseChildrenHaveFocusChildReturnType<E extends Element> extends Omit<UseRefElementReturnType<E>, "refElementProps" | "useRefElementProps">, Omit<UseHasFocusReturnType<E>, "hasFocusProps"> {
     childrenHaveFocusChildProps: h.JSX.HTMLAttributes<E>;
 }
 
