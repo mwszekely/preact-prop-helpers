@@ -64,7 +64,7 @@ const DemoUseElementSizeAnimation = () => {
     const { useElementSizeProps } = useElementSize<HTMLDivElement>({ onSizeChange: setElementSize });
 
     return (
-        <div {...useElementSizeProps({ ref: undefined, className: "demo", style: { height: `${(height * 100) + 100}px` } })}>
+        <div {...useMergedProps(useElementSizeProps, { ref: undefined, className: "demo", style: { height: `${(height * 100) + 100}px` } })}>
             <pre>{JSON.stringify(elementSize, null, 2)}</pre>
         </div>
     );
@@ -228,7 +228,7 @@ const DemoFocus = memo(() => {
     const [focusedInner, setFocusedInner] = useState(false);
     const [lastFocused, setLastFocused] = useState(false);
     const [lastFocusedInner, setLastFocusedInner] = useState(false);
-    const { useHasFocusProps } = useHasFocus<HTMLDivElement>({
+    const { hasFocusProps } = useHasFocus<HTMLDivElement>({
         getDocument,
         onFocusedChanged: setFocused,
         onFocusedInnerChanged: setFocusedInner,
@@ -241,7 +241,7 @@ const DemoFocus = memo(() => {
     return (
         <div class="demo">
             <h2>useHasFocus</h2>
-            <div {...useHasFocusProps({ style: { border: "1px solid black" }, tabIndex: 0 })}>Outer <div tabIndex={0} style={{ border: "1px solid black" }}>Inner element</div></div>
+            <div {...useMergedProps(hasFocusProps, { style: { border: "1px solid black" }, tabIndex: 0 })}>Outer <div tabIndex={0} style={{ border: "1px solid black" }}>Inner element</div></div>
             <div>
                 <ul>
                     <li>Strictly focused: {focused.toString()}, {lastFocused.toString()}</li>
@@ -261,8 +261,8 @@ const GridCellContext = createContext<UseGridNavigationCell<HTMLTableCellElement
 export const DemoUseGrid = memo(() => {
 
     const [, setLastFocusedInner, _getLastFocusedInner] = useState(false);
-    const { useHasFocusProps } = useHasFocus<HTMLTableSectionElement>({ onLastFocusedInnerChanged: setLastFocusedInner, getDocument });
-    const { useGridNavigationRow, useGridNavigationProps, gridNavigation: { currentColumn } } = useGridNavigation<HTMLTableSectionElement, HTMLTableRowElement, HTMLTableCellElement, {}, {}, string, string>({
+    const { hasFocusProps } = useHasFocus<HTMLTableSectionElement>({ onLastFocusedInnerChanged: setLastFocusedInner, getDocument });
+    const { useGridNavigationRow, gridNavigationProps, gridNavigation: { currentColumn } } = useGridNavigation<HTMLTableSectionElement, HTMLTableRowElement, HTMLTableCellElement, {}, {}, string, string>({
         rovingTabIndex: {},
         linearNavigation: {},
         listNavigation: {},
@@ -283,7 +283,7 @@ export const DemoUseGrid = memo(() => {
                         <th>Column 2</th>
                     </tr>
                 </thead>
-                <tbody {...useHasFocusProps(useGridNavigationProps({}))}>
+                <tbody {...useMergedProps(hasFocusProps, gridNavigationProps)}>
                     <GridRowContext.Provider value={useGridNavigationRow}>
                         {Array.from((function* () {
                             for (let i = 0; i < 10; ++i) {
@@ -302,7 +302,7 @@ const DemoUseGridRow = memo((({ index }: { index: number }) => {
     const [_randomWord] = useState(() => RandomWords[index/*Math.floor(Math.random() * (RandomWords.length - 1))*/]);
     const useGridRow = useContext(GridRowContext);
     const {
-        useGridNavigationRowProps,
+        gridNavigationRowProps,
         useGridNavigationCell,
         asChildRow: { rovingTabIndex: { tabbable } },
     } = useGridRow({
@@ -310,7 +310,7 @@ const DemoUseGridRow = memo((({ index }: { index: number }) => {
         asParentRowOfCells: { linearNavigation: {}, listNavigation: {}, rovingTabIndex: {}, typeaheadNavigation: {}, managedChildren: {} },
     });
 
-    const props = useGridNavigationRowProps({});
+    const props = gridNavigationRowProps;
     return (
         <tr {...props}>
             <GridCellContext.Provider value={useGridNavigationCell}>
@@ -332,7 +332,7 @@ const DemoUseGridCell = (({ index, row, rowIsTabbable }: { index: number, row: n
 
     const useGridCell = useContext(GridCellContext);
     const {
-        useGridNavigationCellProps,
+        gridNavigationCellProps,
         rovingTabIndex: { tabbable: cellIsTabbable }
     } = useGridCell({
         listNavigation: { text: "" },
@@ -342,7 +342,7 @@ const DemoUseGridCell = (({ index, row, rowIsTabbable }: { index: number, row: n
         subInfo: {},
     });
 
-    const props = useGridNavigationCellProps({}) as any;
+    const props = gridNavigationCellProps as any;
 
     const t = (cellIsTabbable ? "(Tabbable)" : "(Not tabbable)")
 

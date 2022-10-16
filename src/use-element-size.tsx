@@ -43,7 +43,7 @@ export interface UseElementSizeReturnType<E extends Element> {
     /** **STABLE** */
     getSize(): ElementSize | null;
     /** **STABLE** */
-    useElementSizeProps: UseRefElementReturnType<E>["useRefElementProps"];
+    useElementSizeProps: UseRefElementReturnType<E>["refElementProps"];
 }
 
 
@@ -82,7 +82,7 @@ export function useElementSize<E extends Element>({ getObserveBox, onSizeChange 
         }
     }, [])
 
-    const { getElement, useRefElementProps } = useRefElement<E>({ onElementChange: useCallback((e: E | null) => needANewObserver(e, getObserveBox?.()), []) });
+    const { getElement, refElementProps } = useRefElement<E>({ onElementChange: useCallback((e: E | null) => needANewObserver(e, getObserveBox?.()), []) });
 
     useEffect(() => {
         if (getObserveBox) {
@@ -94,7 +94,7 @@ export function useElementSize<E extends Element>({ getObserveBox, onSizeChange 
     return {
         getElement,
         getSize,
-        useElementSizeProps: useRefElementProps
+        useElementSizeProps: refElementProps
     }
 
 

@@ -90,7 +90,7 @@ export function useRandomId<S extends Element>({ randomId: { prefix }, managedCh
 
     const useRandomIdSourceElement = useCallback<UseRandomIdSourceElement<S>>(() => {
         const [usedIdLocal, setUsedIdLocal, getUsedIdLocal] = useState(getUsedId());
-        const { useRefElementProps, getElement } = useRefElement<S>();
+        const { refElementProps, getElement } = useRefElement<S>();
         // Every time the source element renders, inspect the ID it actually used
         // (whether it was ours or not isn't up to us, it's up to the component)
         // so this is how we notify the referencer component of changes
@@ -107,7 +107,7 @@ export function useRandomId<S extends Element>({ randomId: { prefix }, managedCh
 
         const useRandomIdSourceElementProps = useCallback<UseRandomIdSourceElementReturnType<S>["useRandomIdSourceElementProps"]>(function (p: h.JSX.HTMLAttributes<S>) {
             p.id ||= backupRandomId;
-            return useRefElementProps(p);
+            return useMergedProps(refElementProps, p);
         }, [])
 
         return {

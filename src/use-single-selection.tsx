@@ -1,6 +1,7 @@
 
 import { h } from "preact";
 import { StateUpdater, useCallback, useLayoutEffect, useRef } from "preact/hooks";
+import { useMergedProps } from "./use-merged-props";
 import { ChildFlagOperations, ManagedChildren, useChildrenFlag, UseManagedChildParameters } from "./use-child-manager";
 import { useChildrenHaveFocus, UseChildrenHaveFocusParameters, UseHasFocusParameters } from "./use-has-focus";
 import { usePress } from "./use-press";
@@ -46,7 +47,7 @@ export interface UseSingleSelectionChildReturnTypeInfo<E extends Element, C, K e
 }
 
 export interface UseSingleSelectionChildReturnTypeWithHooks<E extends Element, C, K extends string> extends UseSingleSelectionChildReturnTypeInfo<E, C, K> {
-    useSingleSelectionChildProps(props: h.JSX.HTMLAttributes<E>): h.JSX.HTMLAttributes<E>;
+    singleSelectionChildProps: h.JSX.HTMLAttributes<E>;
 }
 
 export interface UseSingleSelectionReturnTypeInfo<ChildElement extends Element, LsSubInfo, ExtraFlagKeys extends string> {
@@ -108,8 +109,10 @@ export function useSingleSelection<ParentOrChildElement extends Element, ChildEl
         useSingleSelectionChild: useCallback<UseSingleSelectionChild<ChildElement, C, K | "selected">>(({ managedChild: { index, flags }, hasFocus: { onFocusedInnerChanged, ...hasFocus }, singleSelection: { unselectable, ariaPropName, focusSelf } }) => {
             const [isSelected, setIsSelected, getIsSelected] = useState(getSelectedIndex() == index);
             const selectedRef = useRef<ChildFlagOperations>({ get: getIsSelected, set: setIsSelected, isValid: useStableCallback(() => !unselectable) });
-            const { useChildrenHaveFocusChildProps, getElement } = useChildrenHaveFocusChild({
+            const { childrenHaveFocusChildProps, getElement } = useChildrenHaveFocusChild({
                 onFocusedInnerChanged: useStableCallback((focused: boolean, prev: boolean | undefined) => {
+                    if (focused)
+                        debugger;
                     onFocusedInnerChanged?.(focused, prev);
                     if (selectionMode == 'focus' && focused) {
                         stableOnChange(getIndex(), { target: getElement()!, currentTarget: getElement()! });
@@ -131,13 +134,7 @@ export function useSingleSelection<ParentOrChildElement extends Element, ChildEl
 
             return {
                 flags: { ...flags, selected: selectedRef.current },
-                useSingleSelectionChildProps: (props: h.JSX.HTMLAttributes<ChildElement>) => {
-
-                    if (ariaPropName)
-                        props[ariaPropName as keyof h.JSX.HTMLAttributes<any>] = (isSelected ?? false).toString();
-
-                    return usePressProps(useChildrenHaveFocusChildProps(props))
-                },
+                singleSelectionChildProps: useMergedProps(useMergedProps(usePressProps, childrenHaveFocusChildProps), { [ariaPropName as keyof h.JSX.HTMLAttributes<any>]: (isSelected ?? false).toString() }),
                 singleSelection: { selected: isSelected, getSelected: getIsSelected }
             };
         }, [selectionMode]),

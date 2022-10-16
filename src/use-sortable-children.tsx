@@ -100,7 +100,8 @@ export function useRearrangeableChildren<ParentElement extends Element, C, K ext
         getForceUpdate()?.();
     }, []);
 
-    const useRearrangeableProps = useCallback(({ children, ...props }: Omit<h.JSX.HTMLAttributes<ParentElement>, "children"> & { children?: VNode<any>[] }) => {
+    const useRearrangeableProps = useCallback(({ children, ...props }: h.JSX.HTMLAttributes<ParentElement>) => {
+        console.assert(Array.isArray(children));
 
         const forceUpdate = useForceUpdate();
         useLayoutEffect(() => { setForceUpdate(_prev => forceUpdate); }, [forceUpdate])
@@ -202,7 +203,7 @@ export interface UseRearrangeableChildrenReturnTypeInfo<C, K extends string> {
 
 export interface UseRearrangeableChildrenReturnTypeWithHooks<ParentElement extends Element, C, K extends string> extends UseRearrangeableChildrenReturnTypeInfo<C, K> {
     /** **STABLE** */
-    useRearrangeableProps: (props: Omit<h.JSX.HTMLAttributes<ParentElement>, "children"> & { children?: VNode<any>[] | undefined; }) => h.JSX.HTMLAttributes<ParentElement>;
+    useRearrangeableProps: (props: h.JSX.HTMLAttributes<ParentElement>) => h.JSX.HTMLAttributes<ParentElement>;
 
 }
 
@@ -216,7 +217,7 @@ export interface UseSortableChildrenReturnTypeInfo<C, K extends string> extends 
 export interface UseSortableChildrenReturnTypeWithHooks<ParentElement extends Element, C, K extends string> extends
     UseSortableChildrenReturnTypeInfo<C, K> {
     /** **STABLE** */
-    useSortableProps: (props: Omit<h.JSX.HTMLAttributes<ParentElement>, "children"> & { children?: VNode<any>[] | undefined; }) => h.JSX.HTMLAttributes<ParentElement>;
+    useSortableProps: (props: h.JSX.HTMLAttributes<ParentElement>) => h.JSX.HTMLAttributes<ParentElement>;
 }
 
 

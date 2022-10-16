@@ -80,7 +80,7 @@ export interface UseRovingTabIndexChildReturnTypeInfo<ChildElement extends Eleme
 }
 export interface UseRovingTabIndexChildReturnTypeWithHooks<ChildElement extends Element> extends UseRovingTabIndexChildReturnTypeInfo<ChildElement> {
     /** *Unstable* */
-    useRovingTabIndexChildProps: (props: h.JSX.HTMLAttributes<ChildElement>) => h.JSX.HTMLAttributes<ChildElement>;
+    rovingTabIndexChildProps: h.JSX.HTMLAttributes<ChildElement>;
 }
 
 
@@ -202,7 +202,7 @@ export function useRovingTabIndex<ChildElement extends Element, RtiSubInfo, Extr
                 setTabbableIndex(index, false);
             }
         });
-        const { getElement, useHasFocusProps } = useHasFocus<ChildElement>({ onFocusedInnerChanged, getDocument: useCallback((): Document => { return (getElement()?.ownerDocument) ?? (window.document) }, []) });
+        const { getElement, hasFocusProps } = useHasFocus<ChildElement>({ onFocusedInnerChanged, getDocument: useCallback((): Document => { return (getElement()?.ownerDocument) ?? (window.document) }, []) });
 
         const [tabbable, setTabbable, getTabbable] = useState(false);
         const tabbableFlags = useRef<ChildFlagOperations>({ get: getTabbable, set: setTabbable, isValid: useStableCallback(() => !hidden) });
@@ -225,15 +225,10 @@ export function useRovingTabIndex<ChildElement extends Element, RtiSubInfo, Extr
                 stableOnTabbableRender(index);
         }, [tabbable, index]);
 
-        function useRovingTabIndexChildProps(props: h.JSX.HTMLAttributes<ChildElement>): h.JSX.HTMLAttributes<ChildElement> {
-            if (!noModifyTabIndex)
-                console.assert(props.tabIndex == null);
-
-            return useMergedProps<ChildElement>(useHasFocusProps({ tabIndex: noModifyTabIndex ? props.tabIndex : (tabbable ? 0 : -1) }), props);
-        }
+        const rovingTabIndexChildProps = useMergedProps(hasFocusProps, { tabIndex: noModifyTabIndex ? undefined : (tabbable ? 0 : -1) })
 
         return {
-            useRovingTabIndexChildProps,
+            rovingTabIndexChildProps,
             rovingTabIndex: {
                 getElement,
                 tabbable,

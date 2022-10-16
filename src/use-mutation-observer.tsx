@@ -74,7 +74,7 @@ export function useMutationObserver<E extends Element>(options: UseMutationObser
         onNeedMutationObserverReset(getElement());
     }, [attributeKey, attributeOldValue, characterDataOldValue, subtree])
 
-    const { getElement, useRefElementProps: useMutationObserverProps } = useRefElement<E>({
+    const { getElement, refElementProps: useMutationObserverProps } = useRefElement<E>({
         onElementChange: onNeedMutationObserverReset
     });
 

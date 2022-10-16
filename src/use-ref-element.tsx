@@ -7,7 +7,7 @@ export interface UseRefElementReturnType<T extends EventTarget> {
     /** **STABLE** */
     getElement(): T | null;
     /** **STABLE** */
-    useRefElementProps(props: h.JSX.HTMLAttributes<T>): h.JSX.HTMLAttributes<T>;
+    refElementProps: h.JSX.HTMLAttributes<T>;
 }
 
 export interface UseRefElementParameters<T> {
@@ -44,12 +44,12 @@ export function useRefElement<T extends EventTarget>(args?: UseRefElementParamet
 
     // Let us store the actual (reference to) the element we capture
     const [getElement, setElement] = usePassiveState<T | null>(handler, returnNull, runImmediately);
-    const useRefElementProps = useCallback<UseRefElementReturnType<T>["useRefElementProps"]>((props) => useMergedProps<T>({ ref: setElement }, props), []);
+    const refElementProps = { ref: setElement };
 
     // Return both the element and the hook that modifies 
     // the props and allows us to actually find the element
     return {
-        useRefElementProps,
+        refElementProps,
         getElement
     }
 }

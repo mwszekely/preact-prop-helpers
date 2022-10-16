@@ -118,7 +118,7 @@ export interface UseListNavigationReturnTypeWithHooks<ParentOrChildElement exten
     /** **STABLE** */
     useListNavigationChild: UseListNavigationChild<ChildElement, LsSubInfo, ExtraFlagKeys>;
     /** **STABLE** */
-    useListNavigationProps: (props: h.JSX.HTMLAttributes<ParentOrChildElement>) => h.JSX.HTMLAttributes<ParentOrChildElement>;
+    listNavigationProps: h.JSX.HTMLAttributes<ParentOrChildElement>;
 }
 
 export interface UseListNavigationChildReturnTypeInfo<ChildElement extends Element> extends UseRovingTabIndexChildReturnTypeInfo<ChildElement> {
@@ -126,7 +126,7 @@ export interface UseListNavigationChildReturnTypeInfo<ChildElement extends Eleme
 }
 
 export interface UseListNavigationChildReturnTypeWithHooks<ChildElement extends Element> extends UseListNavigationChildReturnTypeInfo<ChildElement> {
-    useListNavigationChildProps: (p: h.JSX.HTMLAttributes<ChildElement>) => h.JSX.HTMLAttributes<ChildElement>;
+    listNavigationChildProps: h.JSX.HTMLAttributes<ChildElement>;
 }
 
 
@@ -181,7 +181,7 @@ export function useListNavigation<ParentOrChildElement extends Element, ChildEle
 
     const {
         useTypeaheadNavigationChild,
-        useTypeaheadNavigationProps,
+        typeaheadNavigationProps,
         typeaheadNavigation: {
             currentTypeahead,
             invalidTypeahead
@@ -195,7 +195,7 @@ export function useListNavigation<ParentOrChildElement extends Element, ChildEle
             ...typeaheadNavigation
         }
     });
-    const { useLinearNavigationProps } = useLinearNavigation<ParentOrChildElement>({
+    const { linearNavigationProps } = useLinearNavigation<ParentOrChildElement>({
         linearNavigation: {
             navigateToPrev: useCallback(() => {
                 setTabbableIndex(c => {
@@ -213,9 +213,7 @@ export function useListNavigation<ParentOrChildElement extends Element, ChildEle
         }
     });
 
-    const useListNavigationProps = useCallback((props: h.JSX.HTMLAttributes<ParentOrChildElement>): h.JSX.HTMLAttributes<ParentOrChildElement> => {
-        return useLinearNavigationProps(useTypeaheadNavigationProps(props));
-    }, [useLinearNavigationProps, useTypeaheadNavigationProps]);
+    const listNavigationProps = useMergedProps(linearNavigationProps, typeaheadNavigationProps);
 
 
     const useListNavigationChild = useCallback<UseListNavigationChild<ChildElement, LsSubInfo, ExtraFlagKeys>>(({ managedChild: { index, flags }, rovingTabIndex: { focusSelf, hidden }, listNavigation: { text }, subInfo }) => {
@@ -232,7 +230,7 @@ export function useListNavigation<ParentOrChildElement extends Element, ChildEle
         }, []);
 
         const {
-            useRovingTabIndexChildProps,
+            rovingTabIndexChildProps,
             rovingTabIndex: {
                 tabbable,
                 getTabbable,
@@ -244,12 +242,10 @@ export function useListNavigation<ParentOrChildElement extends Element, ChildEle
             subInfo: { text, subInfo }
         });
 
-        const useListNavigationChildProps: (p: h.JSX.HTMLAttributes<ChildElement>) => h.JSX.HTMLAttributes<ChildElement> = function ({ ...props }) {
-            return useMergedProps<ChildElement>(useRovingTabIndexChildProps((({ inert: hidden } as h.JSX.HTMLAttributes<ChildElement>))), props);
-        }
+        const listNavigationChildProps = useMergedProps(rovingTabIndexChildProps, (({ inert: hidden } as h.JSX.HTMLAttributes<ChildElement>)));
 
         return {
-            useListNavigationChildProps,
+            listNavigationChildProps,
             rovingTabIndex: {
                 tabbable,
                 getTabbable,
@@ -260,7 +256,7 @@ export function useListNavigation<ParentOrChildElement extends Element, ChildEle
 
     return {
         useListNavigationChild,
-        useListNavigationProps,
+        listNavigationProps,
 
         listNavigation: { navigateToIndex },
         managedChildren: parentReturnType.managedChildren,

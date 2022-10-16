@@ -1,5 +1,6 @@
 import { h } from "preact";
 import { useCallback } from "preact/hooks";
+import { useMergedProps } from "./use-merged-props";
 import { ElementSize, useElementSize } from "./use-element-size";
 import { returnNull, useEnsureStability, usePassiveState } from "./use-passive-state";
 import { useRefElement } from "./use-ref-element";
@@ -63,7 +64,7 @@ export function useLogicalDirection<T extends Element>({ onLogicalDirectionChang
     const [getComputedStyles, setComputedStyles] = usePassiveState<CSSStyleDeclaration | null>(null, returnNull);
 
 
-    const { getElement, useRefElementProps } = useRefElement<T>({
+    const { getElement, refElementProps } = useRefElement<T>({
         onElementChange: useCallback((element: T | null) => {
             if (element) {
                 setComputedStyles(window.getComputedStyle(element));
@@ -231,7 +232,7 @@ export function useLogicalDirection<T extends Element>({ onLogicalDirectionChang
     }, []);
 
     return {
-        useLogicalDirectionProps: useCallback((props: h.JSX.HTMLAttributes<T>) => useRefElementProps(useElementSizeProps(props)), []),
+        useLogicalDirectionProps: (props: h.JSX.HTMLAttributes<T>) => useMergedProps(useMergedProps(refElementProps, useElementSizeProps), props),
         getElement,
         getLogicalDirectionInfo,
         convertToLogicalSize: convertElementSize,

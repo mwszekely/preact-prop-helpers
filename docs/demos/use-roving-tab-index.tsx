@@ -1,6 +1,6 @@
 import { createContext } from "preact";
 import { memo, useCallback, useContext } from "preact/compat";
-import { useSortableListNavigationSingleSelection, UseSortableListNavigationSingleSelectionChild } from "../../index";
+import { useMergedProps, useSortableListNavigationSingleSelection, UseSortableListNavigationSingleSelectionChild } from "../../index";
 import { useState } from "../../use-state";
 
 
@@ -95,7 +95,7 @@ const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
     const useListNavigationSingleSelectionChild = useContext(ListNavigationSingleSelectionChildContext);
     const text = `${randomWord} This is item #${index}${hidden ? " (hidden)" : ""}`;
     const focusSelf = useCallback((e: HTMLElement) => { e.focus() }, []);
-    const { useListNavigationSingleSelectionChildProps, rovingTabIndex: { tabbable }, singleSelection: { selected } } = useListNavigationSingleSelectionChild({ 
+    const { listNavigationSingleSelectionChildProps, rovingTabIndex: { tabbable }, singleSelection: { selected } } = useListNavigationSingleSelectionChild({ 
         managedChild: { index }, 
         listNavigation: { text }, 
         rovingTabIndex: { hidden, focusSelf }, 
@@ -104,8 +104,8 @@ const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
         singleSelection: { ariaPropName: "aria-selected", unselectable: hidden, focusSelf: e => e.focus() }
     }); 
 
-    const props = useListNavigationSingleSelectionChildProps({});
+    const props = listNavigationSingleSelectionChildProps as any;
     return (
-        <li {...props}>{text} ({tabbable ? "Tabbable" : "Not tabbable"}, {selected ? "Selected" : "Not selected"})<input {...useListNavigationSingleSelectionChildProps({ type: "number" }) as any} style={{ width: "5ch" }} /></li>
+        <li {...props}>{text} ({tabbable ? "Tabbable" : "Not tabbable"}, {selected ? "Selected" : "Not selected"})<input {...useMergedProps(listNavigationSingleSelectionChildProps, { type: "number" }) as any} style={{ width: "5ch" }} /></li>
     )
 }));

@@ -17,7 +17,7 @@ export interface UseLinearNavigationReturnTypeWithHooks<ParentOrChildElement ext
      * 
      * **STABLE** 
      * */
-    useLinearNavigationProps: (props: h.JSX.HTMLAttributes<ParentOrChildElement>) => h.JSX.HTMLAttributes<ParentOrChildElement>;
+    linearNavigationProps: h.JSX.HTMLAttributes<ParentOrChildElement>;
 }
 
 interface LNP {
@@ -83,9 +83,8 @@ export function useLinearNavigation<ParentOrChildElement extends Element>({ line
 
     return {
         linearNavigation: {},
-        useLinearNavigationProps: useCallback((props: h.JSX.HTMLAttributes<ParentOrChildElement>): h.JSX.HTMLAttributes<ParentOrChildElement> => {
-
-            const onKeyDown = (e: KeyboardEvent) => {
+        linearNavigationProps: {
+            onKeyDown: (e: KeyboardEvent) => {
                 // Not handled by typeahead (i.e. assume this is a keyboard shortcut)
                 if (e.ctrlKey || e.metaKey)
                     return;
@@ -155,9 +154,8 @@ export function useLinearNavigation<ParentOrChildElement extends Element>({ line
                         }
                         break;
                 }
-            };
-            return useMergedProps<ParentOrChildElement>({ onKeyDown }, props);
-        }, []),
+            }
+        }
     }
 
 
@@ -179,14 +177,13 @@ export interface UseTypeaheadNavigationReturnTypeWithHooks<ParentOrChildElement 
      * 
      * **STABLE**
      */
-    useTypeaheadNavigationProps: UseTypeaheadNavigationProps<ParentOrChildElement>;
+    typeaheadNavigationProps: h.JSX.HTMLAttributes<ParentOrChildElement>;
 
     /** **STABLE** */
     useTypeaheadNavigationChild: UseTypeaheadNavigationChild;
 
 }
 
-export type UseTypeaheadNavigationProps<E extends Element> = (props: h.JSX.HTMLAttributes<E>) => h.JSX.HTMLAttributes<E>;
 export type UseTypeaheadNavigationChildReturnType = void;
 
 interface TNP {
@@ -297,15 +294,8 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element>({ t
     const isDisabled = useStableGetter(noTypeahead);
 
 
-    const useTypeaheadNavigationProps: UseTypeaheadNavigationProps<ParentOrChildElement> = useCallback(function ({ ...props }: h.JSX.HTMLAttributes<ParentOrChildElement>): h.JSX.HTMLAttributes<ParentOrChildElement> {
-
-        const onCompositionStart = (_e: CompositionEvent) => { setImeActive(true) };
-        const onCompositionEnd = (e: CompositionEvent) => {
-            setNextTypeaheadChar(e.data);
-            setImeActive(false);
-        };
-
-        const onKeyDown = (e: KeyboardEvent) => {
+    const typeaheadNavigationProps: h.JSX.HTMLAttributes<ParentOrChildElement> = {
+        onKeyDown: (e: KeyboardEvent) => {
             if (isDisabled())
                 return;
 
@@ -351,10 +341,13 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element>({ t
                 }
             }
 
-        };
-
-        return useMergedProps<ParentOrChildElement>({ onKeyDown, onCompositionStart, onCompositionEnd, }, props);
-    }, []);
+        }, 
+        onCompositionStart: (e: CompositionEvent) => {
+            setNextTypeaheadChar(e.data);
+            setImeActive(false);
+        },
+        onCompositionEnd: (_e: CompositionEvent) => { setImeActive(true) },
+    };
 
     // Handle changes in typeahead that cause changes to the tabbable index
     useEffect(() => {
@@ -474,7 +467,7 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element>({ t
 
     return {
         useTypeaheadNavigationChild,
-        useTypeaheadNavigationProps,
+        typeaheadNavigationProps,
 
         typeaheadNavigation: {
             currentTypeahead,

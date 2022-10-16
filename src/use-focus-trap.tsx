@@ -10,7 +10,7 @@ import { useStableCallback } from "./use-stable-callback";
 
 export interface UseFocusTrapParameters { trapActive: boolean; }
 
-export interface UseFocusTrapReturnType<E extends Element> extends Omit<UseRefElementReturnType<E>, "useRefElementProps"> {
+export interface UseFocusTrapReturnType<E extends Element> extends Omit<UseRefElementReturnType<E>, "refElementProps"> {
     /** *Unstable* (relies on the `trapActive` prop) */
     useFocusTrapProps: (props: h.JSX.HTMLAttributes<E>) => h.JSX.HTMLAttributes<E>;
 }
@@ -54,7 +54,7 @@ export function useFocusTrap<E extends Element>({ trapActive }: UseFocusTrapPara
         }
     }, []);
     
-    const { getElement, useRefElementProps } = useRefElement<E>({ onElementChange: useStableCallback((element: E | null) => handleActiveChange(trapActive, element)) })
+    const { getElement, refElementProps } = useRefElement<E>({ onElementChange: useStableCallback((element: E | null) => handleActiveChange(trapActive, element)) })
     const { getLastActiveElement } = useActiveElement({ getDocument: useStableCallback(() => getElement()?.ownerDocument ?? window.document ) });
 
 
@@ -84,7 +84,7 @@ export function useFocusTrap<E extends Element>({ trapActive }: UseFocusTrapPara
     }, [trapActive]);
 
     const useFocusTrapProps = ((props: h.JSX.HTMLAttributes<E>) => {
-        const p1 = useRefElementProps(props);
+        const p1 = useMergedProps(refElementProps, props);
         const p2 = { "aria-modal": trapActive ? "true" : undefined } as h.JSX.HTMLAttributes<E>;
         return useMergedProps<E>(p1, p2);
     });
