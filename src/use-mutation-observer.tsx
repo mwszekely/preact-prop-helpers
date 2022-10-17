@@ -1,21 +1,26 @@
 import { useCallback, useEffect } from "preact/hooks";
 import { returnNull, usePassiveState } from "./use-passive-state";
-import { useRefElement } from "./use-ref-element";
+import { useRefElement, UseRefElementParameters } from "./use-ref-element";
 import { useStableCallback } from "./use-stable-callback";
 
-export interface UseMutationObserverParameters {
-    onChildList?: (info: { addedNodes: NodeList, removedNodes: NodeList }) => void;
-    onAttributes?: (info: { attributeName: string | null, attributeNamespace: string | null, oldValue?: string | null }) => void;
-    onCharacterData?: (info: MutationRecord) => void;
-    subtree?: boolean;
-    characterDataOldValue?: boolean;
-    attributeOldValue?: boolean;
-    attributeFilter?: string | string[];
+export interface UseMutationObserverParameters<E extends Element> extends UseRefElementParameters<E> {
+    mutationObserverParameters: {
+        onChildList: null | ((info: { addedNodes: NodeList, removedNodes: NodeList }) => void);
+        onAttributes: null | ((info: { attributeName: string | null, attributeNamespace: string | null, oldValue?: string | null }) => void);
+        onCharacterData: null | ((info: MutationRecord) => void);
+        subtree: boolean;
+        characterDataOldValue: boolean;
+        attributeOldValue: boolean;
+        attributeFilter: string | string[];
+    }
 }
 
-export function useMutationObserver<E extends Element>(options: UseMutationObserverParameters | null) {
+export function useMutationObserver<E extends Element>(options: UseMutationObserverParameters<E>) {
     /* eslint-disable prefer-const */
-    let { attributeFilter, subtree, onChildList, characterDataOldValue, onCharacterData, onAttributes, attributeOldValue } = (options || ({} as Partial<UseMutationObserverParameters>)); 
+    let {
+        refElementParameters: { onElementChange, ...refElementParameters },
+        mutationObserverParameters: { attributeFilter, subtree, onChildList, characterDataOldValue, onCharacterData, onAttributes, attributeOldValue }
+    } = options;
 
     if (typeof attributeFilter === "string")
         attributeFilter = [attributeFilter];
@@ -74,9 +79,16 @@ export function useMutationObserver<E extends Element>(options: UseMutationObser
         onNeedMutationObserverReset(getElement());
     }, [attributeKey, attributeOldValue, characterDataOldValue, subtree])
 
-    const { getElement, props } = useRefElement<E>({
-        onElementChange: onNeedMutationObserverReset
+    const { refElementReturn } = useRefElement<E>({
+        refElementParameters: {
+            onElementChange: useStableCallback((e: E | null, p: E | null | undefined) => { onElementChange?.(e, p); onNeedMutationObserverReset(e); }),
+            ...refElementParameters
+        }
     });
+    const { getElement } = refElementReturn;
 
-    return { getElement, props };
+    return {
+        refElementReturn,
+        mutationObserverReturn: {}
+    };
 }

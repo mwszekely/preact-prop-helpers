@@ -1,7 +1,7 @@
 import { h } from "preact";
 import { StateUpdater, useCallback, useEffect, useRef } from "preact/hooks";
 import { ChildFlagOperations, ManagedChildOmits, ManagedChildrenOmits, OnChildrenMountChange, useChildrenFlag, UseManagedChildParameters, useManagedChildren, UseManagedChildrenParameters, UseManagedChildrenReturnTypeInfo } from "./use-child-manager";
-import { useHasFocus, UseHasFocusReturnType } from "./use-has-focus";
+import { useHasFocus, UseHasFocusParameters, UseHasFocusReturnType } from "./use-has-focus";
 import { useMergedProps } from "./use-merged-props";
 import { usePassiveState } from "./use-passive-state";
 import { useStableCallback } from "./use-stable-callback";
@@ -41,11 +41,11 @@ interface RTIP {
 }
 export type RovingTabIndexParametersOmits = keyof RTIP;
 export interface UseRovingTabIndexParameters<RtiOmits extends RovingTabIndexParametersOmits, McOmits extends ManagedChildrenOmits> extends UseManagedChildrenParameters<number, McOmits> {
-    rovingTabIndex: Omit<RTIP, RtiOmits>;
+    rovingTabIndexParameters: Omit<RTIP, RtiOmits>;
 }
 
 export interface UseRovingTabIndexReturnTypeInfo<RtiSubInfo, ExtraFlagKeys extends string> extends UseManagedChildrenReturnTypeInfo<number, RtiSubInfo, ExtraFlagKeys> {
-    rovingTabIndex: {
+    rovingTabIndexReturn: {
         /** **STABLE** */
         setTabbableIndex: (updater: Parameters<StateUpdater<number | null>>[0], fromUserInteraction: boolean) => void;
         /** **STABLE** */
@@ -63,23 +63,24 @@ export interface UseRovingTabIndexReturnTypeWithHooks<ChildElement extends Eleme
 export type RovingTabIndexChildOmits = keyof UseRovingTabIndexSubInfo<any, any>;
 
 export interface UseRovingTabIndexChildParameters<ChildElement extends Element, RtiSubInfo, ExtraFlagKeys extends string, RticOmits extends RovingTabIndexChildOmits, McOmits extends ManagedChildOmits, SubbestInfo> extends
-    UseManagedChildParameters<number, UseRovingTabIndexSubInfo<any, RtiSubInfo>, ExtraFlagKeys | "tabbable", McOmits | "subInfo", SubbestInfo> {
-    rovingTabIndex: Omit<Partial<Omit<UseRovingTabIndexSubInfo<any, any>, "getElement" | "subInfo" | "focusSelf">>, RticOmits> & Omit<{ noModifyTabIndex?: boolean, focusSelf(e: ChildElement): void; }, RticOmits>;
+    UseManagedChildParameters<number, UseRovingTabIndexSubInfo<ChildElement, RtiSubInfo>, ExtraFlagKeys | "tabbable", McOmits | "subInfo", SubbestInfo> {
+    rovingTabIndexChildParameters: Omit<Partial<Omit<UseRovingTabIndexSubInfo<any, any>, "getElement" | "subInfo" | "focusSelf">>, RticOmits> & Omit<{ getElement(): ChildElement | null; noModifyTabIndex: boolean, focusSelf(e: ChildElement): void; }, RticOmits>;
 }
 
 export type UseRovingTabIndexChild<ChildElement extends Element, RtiSubInfo, ExtraFlagKeys extends string> = (a: UseRovingTabIndexChildParameters<ChildElement, RtiSubInfo, ExtraFlagKeys, never, never, RtiSubInfo>) => UseRovingTabIndexChildReturnTypeWithHooks<ChildElement>;
 
 export interface UseRovingTabIndexChildReturnTypeInfo<ChildElement extends Element> {
-    hasFocus: Omit<UseHasFocusReturnType<ChildElement>, "props">;
-    rovingTabIndex: {
+    hasFocusParameters: Required<Pick<UseHasFocusParameters<ChildElement>["hasFocusParameters"], "onFocusedInnerChanged">>;
+    //onFocusedInnerChanged: (focused: boolean, _prevFocused: boolean | undefined) => void;
+    rovingTabIndexChildReturn: {
         tabbable: boolean;
         /** **STABLE** */
         getTabbable(): boolean;
+        propsUnstable: h.JSX.HTMLAttributes<ChildElement>;
     }
 }
 export interface UseRovingTabIndexChildReturnTypeWithHooks<ChildElement extends Element> extends UseRovingTabIndexChildReturnTypeInfo<ChildElement> {
     /** *Unstable* */
-    props: h.JSX.HTMLAttributes<ChildElement>;
     //rovingTabIndexChildProps: h.JSX.HTMLAttributes<ChildElement>;
 }
 
@@ -115,7 +116,7 @@ export interface UseRovingTabIndexChildReturnTypeWithHooks<ChildElement extends 
  */
 export function useRovingTabIndex<ChildElement extends Element, RtiSubInfo, ExtraFlagKeys extends string>(parentParameters: UseRovingTabIndexParameters<never, never>): UseRovingTabIndexReturnTypeWithHooks<ChildElement, RtiSubInfo, ExtraFlagKeys> {
 
-    let { rovingTabIndex: { initialIndex, onTabbableRender, onTabbableIndexChange }, managedChildren: { onAfterChildLayoutEffect, onChildrenMountChange } } = parentParameters;
+    let { managedChildrenParameters: { onAfterChildLayoutEffect, onChildrenMountChange }, rovingTabIndexParameters: { initialIndex, onTabbableIndexChange, onTabbableRender } } = parentParameters;
 
     initialIndex ??= 0;
     const stableOnTabbableRender = useStableCallback(onTabbableRender ?? (() => { }));
@@ -144,7 +145,7 @@ export function useRovingTabIndex<ChildElement extends Element, RtiSubInfo, Extr
             nextIndex = changeIndex(nextIndex);
 
             if (prevIndex != nextIndex) {
-                const nextChild = nextIndex == null ? null : parentReturnType.managedChildren.children.getAt(nextIndex);
+                const nextChild = nextIndex == null ? null : children.getAt(nextIndex);
                 //const prevChild = prevIndex == null ? null : parentReturnType.managedChildren.children.getAt(prevIndex);
 
                 //if (prevChild != null)
@@ -168,20 +169,25 @@ export function useRovingTabIndex<ChildElement extends Element, RtiSubInfo, Extr
     // Any time the tabbable index changes,
     // notify the previous child that it's no longer tabbable,
     // and notify the next child that is allowed to be tabbed to.
-    const parentReturnType = useManagedChildren<number, UseRovingTabIndexSubInfo<ChildElement, RtiSubInfo>, ExtraFlagKeys | "tabbable">({
-        managedChildren: {
+    const { managedChildrenReturn, useManagedChild } = useManagedChildren<number, UseRovingTabIndexSubInfo<ChildElement, RtiSubInfo>, ExtraFlagKeys | "tabbable">({
+        managedChildrenParameters: {
             onAfterChildLayoutEffect,
             onChildrenMountChange: useStableCallback<OnChildrenMountChange<number>>((mounted, unmounted) => { onChildrenMountChange?.(mounted, unmounted); reevaluateClosestFit(); }),
         },
     });
 
-    const { useManagedChild } = parentReturnType;
+    const { children } = managedChildrenReturn;
 
-    const { changeIndex, reevaluateClosestFit } = useChildrenFlag<UseRovingTabIndexSubInfo<ChildElement, RtiSubInfo>, ExtraFlagKeys | "tabbable">({ initialIndex, children: parentReturnType.managedChildren.children, closestFit: true, key: "tabbable" });
+    const { changeIndex, reevaluateClosestFit } = useChildrenFlag<UseRovingTabIndexSubInfo<ChildElement, RtiSubInfo>, ExtraFlagKeys | "tabbable">({ initialIndex, children, closestFit: true, key: "tabbable" });
 
     const useRovingTabIndexChild = useCallback<UseRovingTabIndexChild<ChildElement, RtiSubInfo, ExtraFlagKeys>>((childParameters): UseRovingTabIndexChildReturnTypeWithHooks<ChildElement> => {
 
-        const { subInfo, managedChild: { index, flags }, rovingTabIndex: { hidden, focusSelf: focusSelfOverride, noModifyTabIndex } } = childParameters;
+        const {
+            managedChildParameters: { index, flags },
+            rovingTabIndexChildParameters: { focusSelf: focusSelfOverride, noModifyTabIndex, hidden, getElement },
+            //hasFocusParameters: { onFocusedInnerChanged, ...hasFocusParameters },
+            subInfo
+        } = childParameters;
 
         useEffect(() => {
             reevaluateClosestFit();
@@ -197,19 +203,21 @@ export function useRovingTabIndex<ChildElement extends Element, RtiSubInfo, Extr
             }
         }, []);
 
-        const onFocusedInnerChanged = useStableCallback((focused: boolean, _prevFocused: boolean | undefined) => {
-            if (focused) {
-                setTabbableIndex(index, false);
-            }
-        });
-        const { props: focusProps, ...focusRest } = useHasFocus<ChildElement>({ onFocusedInnerChanged, getDocument: useCallback((): Document => { return (getElement()?.ownerDocument) ?? (window.document) }, []) });
-        const { getElement } = focusRest;
+        /*const { activeElementReturn, hasFocusReturn, refElementReturn } = useHasFocus<ChildElement>({
+            activeElementParameters,
+            hasFocusParameters: {
+                ,
+                ...hasFocusParameters
+            },
+            refElementParameters
+        });*/
+        //const { getElement } = refElementReturn;
 
         const [tabbable, setTabbable, getTabbable] = useState(false);
         const tabbableFlags = useRef<ChildFlagOperations>({ get: getTabbable, set: setTabbable, isValid: useStableCallback(() => !hidden) });
 
         const _: void = useManagedChild({
-            managedChild: {
+            managedChildParameters: {
                 index,
                 flags: { ...flags, tabbable: tabbableFlags.current } as Partial<Record<ExtraFlagKeys | "tabbable", ChildFlagOperations>>,
             },
@@ -229,14 +237,19 @@ export function useRovingTabIndex<ChildElement extends Element, RtiSubInfo, Extr
         //const rovingTabIndexChildProps = useMergedProps(refElementProps, { tabIndex: noModifyTabIndex ? undefined : (tabbable ? 0 : -1) })
 
         return {
-            props: useMergedProps(
-                focusProps,
-                { tabIndex: noModifyTabIndex ? undefined : (tabbable ? 0 : -1) }
-            ),
-            hasFocus: focusRest,
-            rovingTabIndex: {
+            hasFocusParameters: {
+                onFocusedInnerChanged: useStableCallback((focused: boolean, _prevFocused: boolean | undefined) => {
+                    if (focused) {
+                        setTabbableIndex(index, false);
+                    }
+                })
+            },
+
+            rovingTabIndexChildReturn: {
+                propsUnstable: { tabIndex: noModifyTabIndex ? undefined : (tabbable ? 0 : -1) },
                 tabbable,
                 getTabbable
+
             }
         }
     }, [/* Must remain stable */]);
@@ -244,15 +257,15 @@ export function useRovingTabIndex<ChildElement extends Element, RtiSubInfo, Extr
     const focusSelf = useCallback(() => {
         const index = getTabbableIndex();
         if (index != null)
-            parentReturnType.managedChildren.children.getAt(index)?.subInfo.focusSelf?.();
+            children.getAt(index)?.subInfo.focusSelf?.();
         else
             setTabbableIndex(null, true);
     }, []);
 
     return {
         useRovingTabIndexChild,
-        managedChildren: { children: parentReturnType.managedChildren.children },
-        rovingTabIndex: {
+        managedChildrenReturn,
+        rovingTabIndexReturn: {
             setTabbableIndex,
             getTabbableIndex,
             focusSelf,

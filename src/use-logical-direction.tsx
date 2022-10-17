@@ -1,9 +1,8 @@
-import { h } from "preact";
 import { useCallback } from "preact/hooks";
-import { useMergedProps } from "./use-merged-props";
-import { ElementSize, useElementSize, UseElementSizeReturnType } from "./use-element-size";
+import { ElementSize, useElementSize, UseElementSizeParameters, UseElementSizeReturnType } from "./use-element-size";
 import { returnNull, useEnsureStability, usePassiveState } from "./use-passive-state";
-import { useRefElement } from "./use-ref-element";
+import { UseRefElementReturnType } from "./use-ref-element";
+import { useStableCallback } from "./use-stable-callback";
 
 //export type BlockFlowDirection = "downwards" | "leftwards" | "rightwards";
 export type PhysicalDirection = "ltr" | "rtl" | "ttb" | "btt";
@@ -22,8 +21,8 @@ function capitalize<T extends string>(str: T): Capitalize<T> {
     return (str[0].toUpperCase() + str.substring(1)) as Capitalize<T>;
 }
 
-export interface UseLogicalDirectionParameters {
-    onLogicalDirectionChange?(info: LogicalDirectionInfo | null): void;
+export interface UseLogicalDirectionParameters<E extends Element> extends UseElementSizeParameters<E> {
+    logicalDirectionParameters: { onLogicalDirectionChange: null | ((info: LogicalDirectionInfo | null) => void); }
 }
 
 export interface LogicalElementSize {
@@ -57,7 +56,7 @@ export interface LogicalElementSize {
  * * `convertToLogicalOrientation`: Based on the current direction, converts "horizontal" or "vertical" to "inline" or "block".
  * * `convertToPhysicalOrientation`:  Based on the current direction, converts "inline" or "block" to "horizontal" or "vertical".
  */
-export function useLogicalDirection<T extends Element>({ onLogicalDirectionChange }: UseLogicalDirectionParameters): UseLogicalDirectionReturnType<T> {
+export function useLogicalDirection<T extends Element>({ elementSizeParameters: { onSizeChange, ...elementSizeParameters }, refElementParameters: { onElementChange, ...refElementParameters }, logicalDirectionParameters: { onLogicalDirectionChange } }: UseLogicalDirectionParameters<T>): UseLogicalDirectionReturnType<T> {
 
     useEnsureStability("useLogicalDirection", onLogicalDirectionChange);
 
@@ -73,14 +72,22 @@ export function useLogicalDirection<T extends Element>({ onLogicalDirectionChang
     // and if so, tests if the writing mode has changed too.
     //
     // This will work for at least some number of cases, but a better solution is still needed.
-    const { getElement, getSize, props } = useElementSize<T>({ 
-        onSizeChange: useCallback(_ => onLogicalDirectionChange?.(getLogicalDirectionInfo()), []) ,
-        onElementChange: useCallback((element: T | null) => {
-            if (element) {
-                setComputedStyles(window.getComputedStyle(element));
-            }
-        }, [])
-
+    const { elementSizeReturn, refElementReturn } = useElementSize<T>({
+        elementSizeParameters: {
+            onSizeChange: useStableCallback((i: ElementSize) => {
+                onSizeChange?.(i);
+                onLogicalDirectionChange?.(getLogicalDirectionInfo())
+            }),
+            ...elementSizeParameters
+        },
+        refElementParameters: {
+            onElementChange: useStableCallback((element: T | null, prev: T | null | undefined) => {
+                onElementChange?.(element, prev)
+                if (element) {
+                    setComputedStyles(window.getComputedStyle(element));
+                }
+            })
+        }
     })
 
     const getLogicalDirectionInfo = useCallback(() => {
@@ -200,9 +207,9 @@ export function useLogicalDirection<T extends Element>({ onLogicalDirectionChang
             const f4 = getPhysicalRightBottom(blockDirection);
 
 
-           const clientInlineInset = elementSize[`client${capitalize(f1)}`] + (!f2 ? 0 : elementSize[`client${capitalize(f2)}`]);
-           const scrollInlineInset = elementSize[`scroll${capitalize(f1)}`] + (!f2 ? 0 : elementSize[`scroll${capitalize(f2)}`]);
-           const offsetInlineInset = elementSize[`offset${capitalize(f1)}`] == undefined ? undefined : (elementSize[`offset${capitalize(f1)}`]! + (!f2 ? 0 : elementSize[`offset${capitalize(f2)}`]!));
+            const clientInlineInset = elementSize[`client${capitalize(f1)}`] + (!f2 ? 0 : elementSize[`client${capitalize(f2)}`]);
+            const scrollInlineInset = elementSize[`scroll${capitalize(f1)}`] + (!f2 ? 0 : elementSize[`scroll${capitalize(f2)}`]);
+            const offsetInlineInset = elementSize[`offset${capitalize(f1)}`] == undefined ? undefined : (elementSize[`offset${capitalize(f1)}`]! + (!f2 ? 0 : elementSize[`offset${capitalize(f2)}`]!));
 
 
             const clientBlockInset = elementSize[`client${capitalize(f3)}`] + (!f4 ? 0 : elementSize[`client${capitalize(f4)}`]);
@@ -231,15 +238,16 @@ export function useLogicalDirection<T extends Element>({ onLogicalDirectionChang
     }, []);
 
     return {
-        props,
-        getSize,
-        getElement,
-        getLogicalDirectionInfo,
-        convertToLogicalSize: convertElementSize,
-        convertToLogicalOrientation,
-        convertToPhysicalOrientation,
-        convertToLogicalSide,
-        convertToPhysicalSide
+        elementSizeReturn,
+        refElementReturn,
+        logicalDirectionReturn: {
+            getLogicalDirectionInfo,
+            convertToLogicalSize: convertElementSize,
+            convertToLogicalOrientation,
+            convertToPhysicalOrientation,
+            convertToLogicalSide,
+            convertToPhysicalSide
+        }
     };
 }
 
@@ -257,48 +265,50 @@ const M = {
 } as const;
 
 
-export interface UseLogicalDirectionReturnType<T extends Element> extends UseElementSizeReturnType<T> {
+export interface UseLogicalDirectionReturnType<T extends Element> extends UseElementSizeReturnType<T>, UseRefElementReturnType<T> {
     /** **STABLE** */
     //useLogicalDirectionProps: (props: h.JSX.HTMLAttributes<T>) => h.JSX.HTMLAttributes<T>;
     /** **STABLE** */
     //getElement: () => T | null;
     /** **STABLE** */
-    getLogicalDirectionInfo: () => LogicalDirectionInfo | null;
+    logicalDirectionReturn: {
+        getLogicalDirectionInfo: () => LogicalDirectionInfo | null;
 
-    /**
-     * Given the ElementSize info from useElementSize, converts all those physical properties to their logical counterparts.
-     * 
-     * **STABLE**
-     */
-    convertToLogicalSize: (elementSize: ElementSize, direction?: LogicalDirectionInfo | null | undefined) => LogicalElementSize | null;
+        /**
+         * Given the ElementSize info from useElementSize, converts all those physical properties to their logical counterparts.
+         * 
+         * **STABLE**
+         */
+        convertToLogicalSize: (elementSize: ElementSize, direction?: LogicalDirectionInfo | null | undefined) => LogicalElementSize | null;
 
-    /**
-     * Turns `"horizontal" | "vertical"` into `"inline" | "block"`
-     * 
-     * **STABLE**
-     */
-    convertToLogicalOrientation: (elementOrientation: PhysicalOrientation, direction?: LogicalDirectionInfo | null | undefined) => "inline" | "block";
+        /**
+         * Turns `"horizontal" | "vertical"` into `"inline" | "block"`
+         * 
+         * **STABLE**
+         */
+        convertToLogicalOrientation: (elementOrientation: PhysicalOrientation, direction?: LogicalDirectionInfo | null | undefined) => "inline" | "block";
 
-    /**
-     * Turns `"inline" | "block"` into `"horizontal" | "vertical"`
-     * 
-     * **STABLE**
-     */
-    convertToPhysicalOrientation: (elementOrientation: LogicalOrientation, direction?: LogicalDirectionInfo | null | undefined) => "horizontal" | "vertical";
+        /**
+         * Turns `"inline" | "block"` into `"horizontal" | "vertical"`
+         * 
+         * **STABLE**
+         */
+        convertToPhysicalOrientation: (elementOrientation: LogicalOrientation, direction?: LogicalDirectionInfo | null | undefined) => "horizontal" | "vertical";
 
-    /**
-     * Turns `"top" | "bottom" | "left" | "right"` into `"block-start" | "block-end" | "inline-start" | "inline-end"`
-     * 
-     * **STABLE**
-     */
-    convertToLogicalSide: (side: "top" | "bottom" | "left" | "right", direction?: LogicalDirectionInfo | null | undefined) => "inline-start" | "inline-end" | "block-start" | "block-end";
+        /**
+         * Turns `"top" | "bottom" | "left" | "right"` into `"block-start" | "block-end" | "inline-start" | "inline-end"`
+         * 
+         * **STABLE**
+         */
+        convertToLogicalSide: (side: "top" | "bottom" | "left" | "right", direction?: LogicalDirectionInfo | null | undefined) => "inline-start" | "inline-end" | "block-start" | "block-end";
 
-    /**
-     * Turns `"block-start" | "block-end" | "inline-start" | "inline-end"` into `"top" | "bottom" | "left" | "right"`
-     * 
-     * **STABLE**
-     */
-    convertToPhysicalSide: (side: "inline-start" | "inline-end" | "block-start" | "block-end", direction?: LogicalDirectionInfo | null | undefined) => "top" | "bottom" | "left" | "right";
+        /**
+         * Turns `"block-start" | "block-end" | "inline-start" | "inline-end"` into `"top" | "bottom" | "left" | "right"`
+         * 
+         * **STABLE**
+         */
+        convertToPhysicalSide: (side: "inline-start" | "inline-end" | "block-start" | "block-end", direction?: LogicalDirectionInfo | null | undefined) => "top" | "bottom" | "left" | "right";
+    }
 }
 
 

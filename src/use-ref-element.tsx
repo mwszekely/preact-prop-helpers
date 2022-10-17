@@ -1,20 +1,22 @@
 import { h } from "preact";
-import { useCallback } from "preact/hooks";
+import { useCallback, useRef } from "preact/hooks";
 import { useMergedProps } from "./use-merged-props";
 import { OnPassiveStateChange, returnNull, useEnsureStability, usePassiveState } from "./use-passive-state";
 
 export interface UseRefElementReturnType<T extends EventTarget> {
-    /** **STABLE** */
-    getElement(): T | null;
-    props: h.JSX.HTMLAttributes<T>;
-    /** **STABLE** */
-    useProps: (props: h.JSX.HTMLAttributes<T>) => h.JSX.HTMLAttributes<T>;
+    refElementReturn: {
+        /** **STABLE** */
+        getElement(): T | null;
+        propsStable: h.JSX.HTMLAttributes<T>;
+    }
 }
 
 export interface UseRefElementParameters<T> {
-    onElementChange?: OnPassiveStateChange<T | null>;
-    onMount?: (element: T) => void;
-    onUnmount?: (element: T) => void;
+    refElementParameters: {
+        onElementChange?: OnPassiveStateChange<T | null>;
+        onMount?: (element: T) => void;
+        onUnmount?: (element: T) => void;
+    }
 }
 
 /**
@@ -26,9 +28,8 @@ export interface UseRefElementParameters<T> {
  * 
  * @returns The element, and the sub-hook that makes it retrievable.
  */
-export function useRefElement<T extends EventTarget>(args?: UseRefElementParameters<T>): UseRefElementReturnType<T> {
-    const { onElementChange, onMount, onUnmount } = (args ?? {});
-
+export function useRefElement<T extends EventTarget>(args: UseRefElementParameters<T>): UseRefElementReturnType<T> {
+    const { refElementParameters: { onElementChange, onMount, onUnmount } } = args;
     useEnsureStability("useRefElement", onElementChange, onMount, onUnmount);
 
     // Called (indirectly) by the ref that the element receives.
@@ -45,15 +46,15 @@ export function useRefElement<T extends EventTarget>(args?: UseRefElementParamet
 
     // Let us store the actual (reference to) the element we capture
     const [getElement, setElement] = usePassiveState<T | null>(handler, returnNull, runImmediately);
-    const refElementProps = { ref: setElement };
-    const useRefElementProps = useCallback((props: h.JSX.HTMLAttributes<T>) => { return useMergedProps<T>({ ref: setElement }, props) }, []);
+    const propsStable = useRef<h.JSX.HTMLAttributes<T>>({ ref: setElement });
 
     // Return both the element and the hook that modifies 
     // the props and allows us to actually find the element
     return {
-        props: refElementProps, 
-        useProps: useRefElementProps,
-        getElement
+        refElementReturn: {
+            getElement,
+            propsStable: propsStable.current
+        }
     }
 }
 

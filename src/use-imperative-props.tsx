@@ -5,13 +5,11 @@ import { useRefElement } from "./use-ref-element";
 
 export function useImperativeProps<T extends Element>() {
     const currentImperativeProps = useRef<{ className: DOMTokenList, style: h.JSX.CSSProperties, others: h.JSX.HTMLAttributes<T> }>({ className: new DOMTokenList(), style: {}, others: {} });
-    const cip = useMergedProps<T>(
-        { className: currentImperativeProps.current.className.toString(), style: currentImperativeProps.current.style },
-        currentImperativeProps.current.others
-    );
 
 
-    const { getElement, props } = useRefElement<T>({});
+    const {
+        refElementReturn: { getElement, propsStable }
+    } = useRefElement<T>({ refElementParameters: { onElementChange: undefined, onMount: undefined, onUnmount: undefined } });
 
     const addClass = useCallback((cls: string) => {
         getElement()?.classList.add(cls);
@@ -44,16 +42,19 @@ export function useImperativeProps<T extends Element>() {
     }, [])
 
     return {
-        addClass,
-        removeClass,
-        setStyle,
-        removeStyle,
-        setAttribute,
-        removeAttribute,
+        imperativeProps: {
+            addClass,
+            removeClass,
+            setStyle,
+            removeStyle,
+            setAttribute,
+            removeAttribute,
 
-        props: useMergedProps(
-            props,
-            cip
+        },
+
+        propsUnstable: useMergedProps<T>(
+            { className: currentImperativeProps.current.className.toString(), style: currentImperativeProps.current.style },
+            currentImperativeProps.current.others
         )
     }
 }

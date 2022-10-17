@@ -35,7 +35,7 @@ const _comments = void (0);
  */
 export interface ManagedChildInfo<T extends string | number, MCSubInfo, K extends string> {
     index: T;
-    flags?: Partial<Record<K, ChildFlagOperations>>;
+    flags: Partial<Record<K, ChildFlagOperations>>;
     subInfo: MCSubInfo;
 }
 
@@ -63,13 +63,13 @@ export type ManagedChildrenOmits = keyof MCP<any>;
 export type ManagedChildOmits = keyof ManagedChildInfo<any, any, any>;
 
 export interface UseManagedChildrenParameters<T extends number | string, Omits extends keyof MCP<T>> {
-    managedChildren: Omit<MCP<T>, Omits>;
+    managedChildrenParameters: Omit<MCP<T>, Omits>;
 }
 
 // MCSubInfo contains the entirety of the saved data for this child.  All of it. Even types the user will never be able to pass in because they're internally derived.
 // SubbestInfo refers to the actual parameters the user passes in that could be totally unrelated. 
 export interface UseManagedChildParameters<IndexType extends number | string, MCSubInfo, K extends string, McOmits extends ManagedChildOmits, SubbestInfo> {
-    managedChild: Omit<ManagedChildInfo<IndexType, MCSubInfo, K>, McOmits | "subInfo">;
+    managedChildParameters: Omit<ManagedChildInfo<IndexType, MCSubInfo, K>, McOmits | "subInfo">;
     subInfo: SubbestInfo;
 }
 
@@ -80,7 +80,7 @@ export interface UseManagedChildrenReturnTypeInfo<T extends number | string, MCS
      * 
      * **STABLE** (even though it's not a function, the identity of this object never changes)
      */
-    managedChildren: {
+    managedChildrenReturn: {
         children: ManagedChildren<T, MCSubInfo, K>;
     }
 }
@@ -134,7 +134,7 @@ export interface ManagedChildren<IndexType extends number | string, MCSubInfo, E
 export function useManagedChildren<IndexType extends number | string, MCSubInfo, ExtraFlags extends string>(parentParameters: UseManagedChildrenParameters<IndexType, never>): UseManagedChildrenReturnTypeWithHooks<IndexType, MCSubInfo, ExtraFlags> {
     type Info = ManagedChildInfo<IndexType, MCSubInfo, ExtraFlags>;
 
-    const { managedChildren: { onAfterChildLayoutEffect, onChildrenMountChange } } = parentParameters;
+    const { managedChildrenParameters: { onAfterChildLayoutEffect, onChildrenMountChange } } = parentParameters;
 
     useEnsureStability("useManagedChildren", onAfterChildLayoutEffect, onChildrenMountChange);
 
@@ -238,7 +238,7 @@ export function useManagedChildren<IndexType extends number | string, MCSubInfo,
 
 
     const useManagedChild = useCallback<UseManagedChild<IndexType, MCSubInfo, ExtraFlags>>((info) => {
-        const { managedChild: { index, flags }, subInfo } = info;
+        const { managedChildParameters: { index, flags }, subInfo } = info;
         // Any time our child props change, make that information available
         // the parent if they need it.
         // The parent can listen for all updates and only act on the ones it cares about,
@@ -278,7 +278,7 @@ export function useManagedChildren<IndexType extends number | string, MCSubInfo,
 
     return {
         useManagedChild,
-        managedChildren: { children: managedChildren.current }
+        managedChildrenReturn: { children: managedChildren.current }
     }
 }
 

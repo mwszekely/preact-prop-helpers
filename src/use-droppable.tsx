@@ -1,6 +1,6 @@
 import { h } from "preact";
 import { useEffect, useRef } from "preact/hooks";
-import { useMergedProps } from "./use-merged-props";
+import { useStableCallback } from "./use-stable-callback";
 import { useState } from "./use-state";
 
 export interface UseDroppableReturnType<E extends Element> {
@@ -10,7 +10,7 @@ export interface UseDroppableReturnType<E extends Element> {
      * 
      * *Unstable*
      */
-    props: h.JSX.HTMLAttributes<E>;
+    propsStable: h.JSX.HTMLAttributes<E>;
 
     /**
      * While something is being dragged over this element, this will contain any information about any files included in that drop.
@@ -134,7 +134,7 @@ export function useDroppable<E extends Element>({ effect }: UseDroppableParamete
 
 
     // Handle collecting the current file metadata or MIME types.
-    const onDragEnter = (e: DragEvent) => {
+    const onDragEnter = useStableCallback((e: DragEvent) => {
         e.preventDefault();
         if (e.dataTransfer) {
 
@@ -159,22 +159,22 @@ export function useDroppable<E extends Element>({ effect }: UseDroppableParamete
             setFilesForConsideration(newFiles);
             setStringsForConsideration(newMimeTypes);
         }
-    };
+    });
 
     // Handle resetting the current file metadata or MIME types
-    const onDragLeave = (e: DragEvent) => {
+    const onDragLeave = useStableCallback((e: DragEvent) => {
         e.preventDefault();
         setFilesForConsideration(null);
         setStringsForConsideration(null);
-    };
+    });
 
     // Boilerplate, I guess
-    const onDragOver = (e: DragEvent) => {
+    const onDragOver = useStableCallback((e: DragEvent) => {
         e.preventDefault();
-    }
+    })
 
     // Handle getting the drop data asynchronously
-    const onDrop = (e: DragEvent) => {
+    const onDrop = useStableCallback((e: DragEvent) => {
         e.preventDefault();
 
         setFilesForConsideration(null);
@@ -230,10 +230,12 @@ export function useDroppable<E extends Element>({ effect }: UseDroppableParamete
             setDropError(ex);
             return null;
         }));
-    }
+    })
+
+    const propsStable = useRef({ onDragEnter, onDragLeave, onDragOver, onDrop });
 
     return {
-        props: { onDragEnter, onDragLeave, onDragOver, onDrop },
+        propsStable: propsStable.current,
         filesForConsideration,
         stringsForConsideration,
         droppedFiles,

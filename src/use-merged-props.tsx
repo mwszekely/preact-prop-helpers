@@ -1,4 +1,5 @@
 import { h } from "preact";
+import { useEnsureStability } from "./use-passive-state";
 import { useMergedChildren } from "./use-merged-children";
 import { useMergedClasses } from "./use-merged-classes";
 import { useMergedRefs } from "./use-merged-refs";
@@ -10,6 +11,16 @@ export function enableLoggingPropConflicts(log2: typeof console["log"]) {
     log = log2
 }
 
+export function useMergedProps<E extends EventTarget>(...allProps: h.JSX.HTMLAttributes<E>[]) {
+    useEnsureStability("useMergedProps", allProps.length);
+    let ret: h.JSX.HTMLAttributes<E> = {};
+    for (let nextProps of allProps) {
+        ret = useMergedProps2<E>(ret, nextProps);
+    }
+
+    return ret;
+}
+
 
 /**
  * Given two sets of props, merges them and returns the result.
@@ -19,7 +30,7 @@ export function enableLoggingPropConflicts(log2: typeof console["log"]) {
  * @param rhs2 
  * @returns 
  */
-export function useMergedProps<E extends EventTarget>(lhsAll: h.JSX.HTMLAttributes<E>, rhsAll: h.JSX.HTMLAttributes<E>): h.JSX.HTMLAttributes<E> {
+function useMergedProps2<E extends EventTarget>(lhsAll: h.JSX.HTMLAttributes<E>, rhsAll: h.JSX.HTMLAttributes<E>): h.JSX.HTMLAttributes<E> {
     // First, separate the props we were given into two groups:
     // lhsAll and rhsAll contain all the props we were given, and
     // lhsMisc and rhsMisc contain all props *except* for the easy ones

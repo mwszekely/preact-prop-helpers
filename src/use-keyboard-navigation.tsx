@@ -6,19 +6,13 @@ import { useStableGetter } from "./use-stable-getter";
 import { useState } from "./use-state";
 import { useTimeout } from "./use-timeout";
 
-export interface UseLinearNavigationReturnTypeInfo {
-    linearNavigation: {}
+export interface UseLinearNavigationReturnTypeInfo<ParentOrChildElement extends Element> {
+    linearNavigationReturn: {
+        propsStable: h.JSX.HTMLAttributes<ParentOrChildElement>;
+    }
 }
 
-export interface UseLinearNavigationReturnTypeWithHooks<ParentOrChildElement extends Element> extends UseLinearNavigationReturnTypeInfo {
-    /** 
-     * These props can be attatched either to the parent or to each individual child.
-     * Whichever works better for your scenario.
-     * 
-     * **STABLE** 
-     * */
-    useProps(): h.JSX.HTMLAttributes<ParentOrChildElement>;
-    props: h.JSX.HTMLAttributes<ParentOrChildElement>;
+export interface UseLinearNavigationReturnTypeWithHooks<ParentOrChildElement extends Element> extends UseLinearNavigationReturnTypeInfo<ParentOrChildElement> {
 }
 
 interface LNP {
@@ -54,7 +48,7 @@ export type LinearNavigationOmits = keyof LNP;
 
 /** Arguments passed to the parent `useLinearNavigation` */
 export interface UseLinearNavigationParameters<Omits extends LinearNavigationOmits> {
-    linearNavigation: Omit<LNP, Omits>
+    linearNavigationParameters: Omit<LNP, Omits>
 }
 
 
@@ -67,7 +61,7 @@ export interface UseLinearNavigationParameters<Omits extends LinearNavigationOmi
  * 
  * @see useListNavigation, which packages everything up together.
  */
-export function useLinearNavigation<ParentOrChildElement extends Element>({ linearNavigation: { navigateToFirst: ntf, navigateToLast: ntl, navigateToNext: ntn, navigateToPrev: ntp, navigationDirection: nd, disableArrowKeys: dak, disableHomeEndKeys: dhek } }: UseLinearNavigationParameters<never>): UseLinearNavigationReturnTypeWithHooks<ParentOrChildElement> {
+export function useLinearNavigation<ParentOrChildElement extends Element>({ linearNavigationParameters: { navigateToFirst: ntf, navigateToLast: ntl, navigateToNext: ntn, navigateToPrev: ntp, navigationDirection: nd, disableArrowKeys: dak, disableHomeEndKeys: dhek } }: UseLinearNavigationParameters<never>): UseLinearNavigationReturnTypeWithHooks<ParentOrChildElement> {
 
     nd ??= "either";
 
@@ -81,7 +75,8 @@ export function useLinearNavigation<ParentOrChildElement extends Element>({ line
     const getDisableHomeEndKeys = useStableGetter(dhek);
     const getNavigationDirection = useStableGetter(nd);
 
-    const useProps = useCallback(() => ({
+
+    const stableProps = useRef<h.JSX.HTMLAttributes<ParentOrChildElement>>({
         onKeyDown: (e: KeyboardEvent) => {
             // Not handled by typeahead (i.e. assume this is a keyboard shortcut)
             if (e.ctrlKey || e.metaKey)
@@ -153,43 +148,33 @@ export function useLinearNavigation<ParentOrChildElement extends Element>({ line
                     break;
             }
         }
-    }), []);
+    })
 
 
     return {
-        linearNavigation: {},
-        props: useProps(),
-        useProps
+        linearNavigationReturn: {
+            propsStable: stableProps.current
+        }
     }
 
 
 }
 
 
-export interface UseTypeaheadNavigationReturnTypeInfo {
-    typeaheadNavigation: {
+export interface UseTypeaheadNavigationReturnTypeInfo<ParentOrChildElement extends Element> {
+    typeaheadNavigationReturn: {
         currentTypeahead: string | null;
         invalidTypeahead: boolean | null;
+        propsStable: h.JSX.HTMLAttributes<ParentOrChildElement>;
     }
 }
 
 
 
-export interface UseTypeaheadNavigationReturnTypeWithHooks<ParentOrChildElement extends Element> extends UseTypeaheadNavigationReturnTypeInfo {
-    /**
-     * Can be used on either the parent or each child element.
-     * 
-     * **STABLE**
-     */
-    useProps(props: h.JSX.HTMLAttributes<ParentOrChildElement>): h.JSX.HTMLAttributes<ParentOrChildElement>;
-    props: h.JSX.HTMLAttributes<ParentOrChildElement>;
-
+export interface UseTypeaheadNavigationReturnTypeWithHooks<ParentOrChildElement extends Element> extends UseTypeaheadNavigationReturnTypeInfo<ParentOrChildElement> {
     /** **STABLE** */
     useTypeaheadNavigationChild: UseTypeaheadNavigationChild;
-
 }
-
-export type UseTypeaheadNavigationChildReturnType = void;
 
 interface TNP {
     /**
@@ -207,7 +192,7 @@ interface TNP {
 export type TypeaheadNavigationOmits = keyof TNP;
 
 export interface UseTypeaheadNavigationParameters<Omits extends TypeaheadNavigationOmits> {
-    typeaheadNavigation: Omit<TNP, Omits>
+    typeaheadNavigationParameters: Omit<TNP, Omits>
 }
 
 /** Arguments passed to the child 'useTypeaheadNavigationChild` */
@@ -224,7 +209,7 @@ export interface UseTypeaheadNavigationChildParameters {
 }
 
 /** Type of the child's sub-hook */
-export type UseTypeaheadNavigationChild = (args: UseTypeaheadNavigationChildParameters) => UseTypeaheadNavigationChildReturnType;
+export type UseTypeaheadNavigationChild = (args: UseTypeaheadNavigationChildParameters) => void;
 
 
 /**
@@ -232,7 +217,7 @@ export type UseTypeaheadNavigationChild = (args: UseTypeaheadNavigationChildPara
  * 
  * @see useListNavigation, which packages everything up together.
  */
-export function useTypeaheadNavigation<ParentOrChildElement extends Element>({ typeaheadNavigation: { collator, getIndex, typeaheadTimeout, setIndex, noTypeahead } }: UseTypeaheadNavigationParameters<never>): UseTypeaheadNavigationReturnTypeWithHooks<ParentOrChildElement> {
+export function useTypeaheadNavigation<ParentOrChildElement extends Element>({ typeaheadNavigationParameters: { collator, getIndex, typeaheadTimeout, setIndex, noTypeahead } }: UseTypeaheadNavigationParameters<never>): UseTypeaheadNavigationReturnTypeWithHooks<ParentOrChildElement> {
 
 
     // For typeahead, keep track of what our current "search" string is (if we have one)
@@ -299,8 +284,8 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element>({ t
     const isDisabled = useStableGetter(noTypeahead);
 
 
-    const useProps = useCallback(() => ({
-        onKeyDown: (e: KeyboardEvent) => {
+    const propsStable = useRef<h.JSX.HTMLAttributes<ParentOrChildElement>>({
+        onKeyDown: useStableCallback((e: KeyboardEvent) => {
             if (isDisabled())
                 return;
 
@@ -346,13 +331,13 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element>({ t
                 }
             }
 
-        },
-        onCompositionStart: (e: CompositionEvent) => {
+        }),
+        onCompositionStart: useStableCallback((e: CompositionEvent) => {
             setNextTypeaheadChar(e.data);
             setImeActive(false);
-        },
-        onCompositionEnd: (_e: CompositionEvent) => { setImeActive(true) },
-    }), []);
+        }),
+        onCompositionEnd: useStableCallback((_e: CompositionEvent) => { setImeActive(true) }),
+    });
 
     // Handle changes in typeahead that cause changes to the tabbable index
     useEffect(() => {
@@ -472,12 +457,10 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element>({ t
 
     return {
         useTypeaheadNavigationChild,
-        props: useProps(),
-        useProps,
-
-        typeaheadNavigation: {
+        typeaheadNavigationReturn: {
             currentTypeahead,
             invalidTypeahead,
+            propsStable: propsStable.current
         }
     }
 }

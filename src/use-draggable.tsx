@@ -5,7 +5,7 @@ import { useState } from "./use-state";
 
 export interface UseDraggableReturnType<E extends EventTarget> {
     /** *Unstable* */
-    props: h.JSX.HTMLAttributes<E>;
+    propsUnstable: h.JSX.HTMLAttributes<E>;
 
     /**
      * Returns true if the element in question is currently being dragged
@@ -89,7 +89,7 @@ export function useDraggable<E extends Element>({ effectAllowed, data, dragImage
     // Return both the element and the hook that modifies 
     // the props and allows us to actually find the element
     const ret: UseDraggableReturnType<E> = {
-        props: {
+        propsUnstable: {
             draggable: true,
             onDragStart,
             onDragEnd

@@ -1,5 +1,5 @@
 import { h } from "preact";
-import { useEffect } from "preact/hooks";
+import { useEffect, useRef } from "preact/hooks";
 import { useGlobalHandler } from "./use-event-handler";
 import { useForceUpdate } from "./use-force-update";
 import { useHasFocus, UseHasFocusParameters } from "./use-has-focus";
@@ -8,10 +8,23 @@ import { useStableCallback } from "./use-stable-callback";
 import { useState } from "./use-state";
 
 interface UsePressParameters<E extends Node> {
-    onClickSync: ((e: h.JSX.TargetedEvent<E>) => void) | null | undefined;
-    exclude: undefined | { click?: "exclude" | undefined, space?: "exclude" | undefined, enter?: "exclude" | undefined };
-    hasFocus: UseHasFocusParameters<E>;
-    focusSelf(element: E): void;
+    pressParameters: {
+        onClickSync: ((e: h.JSX.TargetedEvent<E>) => void) | null | undefined;
+        exclude: undefined | { click?: "exclude" | undefined, space?: "exclude" | undefined, enter?: "exclude" | undefined };
+        focusSelf(element: E): void;
+        getElement(): E | null;
+    }
+}
+
+export interface UsePressReturnType<E extends Element> {
+    hasFocusParameters: Required<Pick<UseHasFocusParameters<E>["hasFocusParameters"], "onLastFocusedInnerChanged">>;
+    pressReturn: {
+        propsStable: h.JSX.HTMLAttributes<E>;
+        propsUnstable: h.JSX.HTMLAttributes<E>;
+    }
+}
+
+interface UsePressReturnType2<E extends Element> extends UsePressReturnType<E> {
 }
 
 /**
@@ -33,7 +46,10 @@ interface UsePressParameters<E extends Node> {
  * @param onClickSync 
  * @param exclude Whether the polyfill shouldn't apply (can specify for specific interactions)
  */
-export function usePress<E extends Node>({ exclude, hasFocus: { onLastFocusedInnerChanged, ...hasFocus }, onClickSync, focusSelf }: UsePressParameters<E>) {
+export function usePress<E extends Element>(args: UsePressParameters<E>): UsePressReturnType2<E> {
+    const {
+        pressParameters: { exclude, focusSelf, getElement, onClickSync }
+    } = args;
 
     // A button can be activated in multiple ways, so on the off chance
     // that multiple are triggered at once, we only *actually* register
@@ -45,16 +61,8 @@ export function usePress<E extends Node>({ exclude, hasFocus: { onLastFocusedInn
     // this is reset back to 0.
     const [activeDuringRender, setActive, getActive] = useState(0);
     const forceUpdate = useForceUpdate();
-    const { getElement, props: otherProps, ...restFocus } = useHasFocus({
-        ...hasFocus,
-        onLastFocusedInnerChanged: useStableCallback((f: boolean, p: boolean | undefined) => {
-            onLastFocusedInnerChanged?.(f, p);
-            if (!f) {
-                setActive(0);
-            }
 
-        })
-    });
+    //const { getElement } = refElementReturn;
 
     // If we the current text selection changes to include this element
     // DURING e.g. a mousedown, then we don't want the mouseup to "count", as it were,
@@ -211,21 +219,31 @@ export function usePress<E extends Node>({ exclude, hasFocus: { onLastFocusedInn
                 e.stopPropagation();
             }
         }
-    })
+    });
+
+
+    const propsStable2 = useRef<h.JSX.HTMLAttributes<E>>({
+        onKeyDown,
+        onKeyUp,
+        onMouseDown,
+        onMouseUp,
+        onMouseLeave,
+        onClick,
+    });
 
     return {
-        props: {
-            ...otherProps,
-            pressProps: {
-                onKeyDown,
-                onKeyUp,
-                onMouseDown,
-                onMouseUp,
-                onMouseLeave,
-                onClick,
+        hasFocusParameters: {
+            onLastFocusedInnerChanged: useStableCallback((f: boolean, p: boolean | undefined) => {
+                if (!f)
+                    setActive(0);
+            })
+        },
+        pressReturn: {
+            propsStable: propsStable2.current,
+            propsUnstable: {
                 style: (textSelectedDuringActivationStartTime != null) ? { cursor: "text" } : undefined,
                 ...{ "data-pseudo-active": pseudoActive ? "true" : undefined } as {}
-            }
+            },
         }
     };
 }

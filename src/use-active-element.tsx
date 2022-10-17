@@ -118,56 +118,58 @@ function windowBlur(e: FocusEvent) {
 
 export interface UseActiveElementParameters {
 
-    /**
+    activeElementParameters: { /**
      * Called any time the active element changes. Must be stable.
      */
-    onActiveElementChange?: OnPassiveStateChange<Element | null>;
+        onActiveElementChange?: OnPassiveStateChange<Element | null>;
 
-    /**
-     * Called any time the active element changes and is not null. 
-     * Must be stable.
-     */
-    onLastActiveElementChange?: OnPassiveStateChange<Element>;
+        /**
+         * Called any time the active element changes and is not null. 
+         * Must be stable.
+         */
+        onLastActiveElementChange?: OnPassiveStateChange<Element>;
 
-    /**
-     * Called any time the window gains/loses focus. Must be stable.
-     */
-    onWindowFocusedChange?: OnPassiveStateChange<boolean>;
+        /**
+         * Called any time the window gains/loses focus. Must be stable.
+         */
+        onWindowFocusedChange?: OnPassiveStateChange<boolean>;
 
-    /**
-     * This must be a function that returns the document associated with whatever elements we're listening to.
-     * 
-     * E.G. someDivElement.ownerDocument
-     * 
-     * **MUST** be stable
-     */
-    getDocument(): Document;
+        /**
+         * This must be a function that returns the document associated with whatever elements we're listening to.
+         * 
+         * E.G. someDivElement.ownerDocument
+         * 
+         * **MUST** be stable
+         */
+        getDocument(): Document;
 
-    /**
-     * By default, event handlers are attached to the document's defaultView Window.
-     * If you need something different, override it here.
-     * 
-     * **MUST** be stable
-     */
-    getWindow?(document: Document): Window;
+        /**
+         * By default, event handlers are attached to the document's defaultView Window.
+         * If you need something different, override it here.
+         * 
+         * **MUST** be stable
+         */
+        getWindow?(document: Document): Window;
+    }
 }
 
 export interface UseActiveElementReturnType {
-    /** 
+    activeElementReturn: {/** 
      * Returns whatever element is currently focused, or `null` if there's no focused element
      * **STABLE**
      */
-    getActiveElement: () => Element | null;
-    /** 
-     * Returns whatever element is currently focused, or whatever element was most recently focused if there's no focused element
-     * **STABLE**
-     */
-    getLastActiveElement: () => Element;
-    /** 
-     * Returns if the window itself has focus or not
-     * **STABLE**
-     */
-    getWindowFocused: () => boolean;
+        getActiveElement: () => Element | null;
+        /** 
+         * Returns whatever element is currently focused, or whatever element was most recently focused if there's no focused element
+         * **STABLE**
+         */
+        getLastActiveElement: () => Element;
+        /** 
+         * Returns if the window itself has focus or not
+         * **STABLE**
+         */
+        getWindowFocused: () => boolean;
+    }
 }
 
 /**
@@ -182,7 +184,7 @@ export interface UseActiveElementReturnType {
  * 
  * If you need the component to re-render when the active element changes, use the `on*Change` arguments to set some state on your end.
  */
-export function useActiveElement({ onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument, getWindow }: UseActiveElementParameters): UseActiveElementReturnType {
+export function useActiveElement({ activeElementParameters: { onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument, getWindow } }: UseActiveElementParameters): UseActiveElementReturnType {
 
     useEnsureStability("useActiveElement", onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument, getWindow);
 
@@ -233,5 +235,5 @@ export function useActiveElement({ onActiveElementChange, onLastActiveElementCha
     const [getLastActiveElement, setLastActiveElement] = usePassiveState<Element>(onLastActiveElementChange, returnNull as () => never);
     const [getWindowFocused, setWindowFocused] = usePassiveState<boolean>(onWindowFocusedChange, returnTrue);
 
-    return { getActiveElement, getLastActiveElement, getWindowFocused };
+    return { activeElementReturn: { getActiveElement, getLastActiveElement, getWindowFocused } };
 }

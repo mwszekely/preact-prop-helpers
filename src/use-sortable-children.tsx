@@ -19,14 +19,14 @@ export interface UseRearrangeableChildrenParameters<C, K extends string> {
      * Must return, e.g., the row index of this child
      * (Usually just an `index` prop)
      */
-    rearrangeableChildren: { getIndex: GetIndex<C, K>; }
+    rearrangeableChildrenParameters: { getIndex: GetIndex<C, K>; }
 }
 
 /**
  * All of these functions **MUST** be stable across renders.
  */
 export interface UseSortableChildrenParameters<C, K extends string> extends UseRearrangeableChildrenParameters<C, K> {
-    sortableChildren: {
+    sortableChildrenParameters: {
         /**
          * Must return the value this child uses RE: sorting.
          * If you don't care about sorting (you just use 
@@ -69,7 +69,7 @@ export interface UseSortableChildrenParameters<C, K extends string> extends UseR
  * Because keys are given special treatment and a child has no way of modifying its own key
  * there's no other time or place this can happen other than exactly within the parent component's render function.
  */
-export function useRearrangeableChildren<ParentElement extends Element, C, K extends string>({ rearrangeableChildren: { getIndex } }: UseRearrangeableChildrenParameters<C, K>): UseRearrangeableChildrenReturnTypeWithHooks<ParentElement, C, K> {
+export function useRearrangeableChildren<ParentElement extends Element, C, K extends string>({ rearrangeableChildrenParameters: { getIndex } }: UseRearrangeableChildrenParameters<C, K>): UseRearrangeableChildrenReturnTypeWithHooks<ParentElement, C, K> {
 
     // These are used to keep track of a mapping between unsorted index <---> sorted index.
     // These are needed for navigation with the arrow keys.
@@ -118,7 +118,7 @@ export function useRearrangeableChildren<ParentElement extends Element, C, K ext
         }, props));
     }, []);
 
-    return { useRearrangeableProps, rearrangeableChildren: { indexMangler, indexDemangler, mangleMap, demangleMap, rearrange } };
+    return { useRearrangeableProps, rearrangeableChildrenReturn: { indexMangler, indexDemangler, mangleMap, demangleMap, rearrange } };
 }
 
 
@@ -143,12 +143,12 @@ export function useRearrangeableChildren<ParentElement extends Element, C, K ext
  * Because keys are given special treatment and a child has no way of modifying its own key
  * there's no other time or place this can happen other than exactly within the parent component's render function.
  */
-export function useSortableChildren<ParentElement extends Element, C, K extends string>({ rearrangeableChildren: { getIndex }, sortableChildren: { compare: userCompare } }: UseSortableChildrenParameters<C, K>): UseSortableChildrenReturnTypeWithHooks<ParentElement, C, K> {
+export function useSortableChildren<ParentElement extends Element, C, K extends string>({ rearrangeableChildrenParameters: { getIndex }, sortableChildrenParameters: { compare: userCompare } }: UseSortableChildrenParameters<C, K>): UseSortableChildrenReturnTypeWithHooks<ParentElement, C, K> {
 
     const compare = (userCompare ?? defaultCompare);
 
-    const { useRearrangeableProps: useSortableProps, ...rearrangeableChildrenReturnType } = useRearrangeableChildren<ParentElement, C, K>({ rearrangeableChildren: { getIndex } });
-    const { rearrangeableChildren: { rearrange } } = rearrangeableChildrenReturnType;
+    const { useRearrangeableProps: useSortableProps, ...rearrangeableChildrenReturnType } = useRearrangeableChildren<ParentElement, C, K>({ rearrangeableChildrenParameters: { getIndex } });
+    const { rearrangeableChildrenReturn: { rearrange } } = rearrangeableChildrenReturnType;
     // The actual sort function.
     const sort = useCallback((managedRows: ManagedChildren<number, C, K>, direction: "ascending" | "descending"): Promise<void> | void => {
 
@@ -174,13 +174,13 @@ export function useSortableChildren<ParentElement extends Element, C, K extends 
 
     return {
         useSortableProps,
-        sortableChildren: { sort, shuffle },
-        rearrangeableChildren: rearrangeableChildrenReturnType.rearrangeableChildren
+        sortableChildrenReturn: { sort, shuffle },
+        rearrangeableChildrenReturn: rearrangeableChildrenReturnType.rearrangeableChildrenReturn
     };
 }
 
 export interface UseRearrangeableChildrenReturnTypeInfo<C, K extends string> {
-    rearrangeableChildren: {
+    rearrangeableChildrenReturn: {
         /**
          * Pass an array of not-sorted child information to this function
          * and the children will re-arrange themselves to match.
@@ -208,7 +208,7 @@ export interface UseRearrangeableChildrenReturnTypeWithHooks<ParentElement exten
 }
 
 export interface UseSortableChildrenReturnTypeInfo<C, K extends string> extends UseRearrangeableChildrenReturnTypeInfo<C, K> {
-    sortableChildren: {/** **STABLE** */
+    sortableChildrenReturn: {/** **STABLE** */
         sort: (managedRows: ManagedChildren<number, C, K>, direction: "ascending" | "descending") => Promise<void> | void;
         /** **STABLE** */
         shuffle: (managedRows: ManagedChildren<number, C, K>) => Promise<void> | void;
