@@ -139,6 +139,7 @@ export function useGridNavigation<
         });
 
         const rowLsChildReturnType = useListNavigationChildAsGridRow({
+            refElementReturn: asChild.refElementReturn,
             managedChildParameters: asChild.managedChildParameters,
             listNavigationChildParameters: asChild.listNavigationChildParameters,
             rovingTabIndexChildParameters: { ...asChild.rovingTabIndexChildParameters, focusSelf: focusSelfRow },
@@ -175,12 +176,14 @@ export function useGridNavigation<
             subInfo,
             managedChildParameters,
             listNavigationChildParameters: ls,
+            refElementReturn,
             rovingTabIndexChildParameters: { focusSelf: focusSelfCell, ...rti }
         }) => {
             const {
                 rovingTabIndexChildReturn: rti_cell_ret,
                 hasFocusParameters
             } = useGridNavigationColumn2({
+                refElementReturn,
                 managedChildParameters: managedChildParameters,
                 listNavigationChildParameters: { ...ls },
                 rovingTabIndexChildParameters: { focusSelf: focusSelfCell, ...rti },

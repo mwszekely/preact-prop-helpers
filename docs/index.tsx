@@ -338,9 +338,10 @@ const DemoUseGridRow = memo((({ index }: { index: number }) => {
         asChildRow: { hasFocusParameters, rovingTabIndexChildReturn: { tabbable, propsUnstable: p3 } },
     } = useGridRow({
         asChildRowOfSection: {
+            refElementReturn,
             managedChildParameters: { index, flags: {} },
             listNavigationChildParameters: { text: "" },
-            rovingTabIndexChildParameters: { hidden: index == 3, noModifyTabIndex: false, getElement: refElementReturn.getElement },
+            rovingTabIndexChildParameters: { hidden: index == 3, noModifyTabIndex: false },
             subInfo: {},
         },
         asParentRowOfCells: {
@@ -397,7 +398,8 @@ const DemoUseGridCell = (({ index, row, rowIsTabbable }: { index: number, row: n
         //activeElementParameters: { getDocument },
         listNavigationChildParameters: { text: "" },
         // refElementParameters: {},
-        rovingTabIndexChildParameters: { noModifyTabIndex: false, focusSelf: e => e.focus(), hidden: false, getElement: refElementReturn.getElement },
+        refElementReturn,
+        rovingTabIndexChildParameters: { noModifyTabIndex: false, focusSelf: e => e.focus(), hidden: false },
         managedChildParameters: { index, flags: {} },
         subInfo: {},
     });

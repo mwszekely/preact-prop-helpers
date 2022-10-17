@@ -1,5 +1,6 @@
 import { h } from "preact";
 import { useEffect, useRef } from "preact/hooks";
+import { UseRefElementParameters, UseRefElementReturnType } from "use-ref-element";
 import { useGlobalHandler } from "./use-event-handler";
 import { useForceUpdate } from "./use-force-update";
 import { useHasFocus, UseHasFocusParameters } from "./use-has-focus";
@@ -8,11 +9,11 @@ import { useStableCallback } from "./use-stable-callback";
 import { useState } from "./use-state";
 
 interface UsePressParameters<E extends Node> {
+    refElementReturn: Required<Pick<UseRefElementReturnType<E>["refElementReturn"], "getElement">>;
     pressParameters: {
         onClickSync: ((e: h.JSX.TargetedEvent<E>) => void) | null | undefined;
         exclude: undefined | { click?: "exclude" | undefined, space?: "exclude" | undefined, enter?: "exclude" | undefined };
         focusSelf(element: E): void;
-        getElement(): E | null;
     }
 }
 
@@ -48,7 +49,8 @@ interface UsePressReturnType2<E extends Element> extends UsePressReturnType<E> {
  */
 export function usePress<E extends Element>(args: UsePressParameters<E>): UsePressReturnType2<E> {
     const {
-        pressParameters: { exclude, focusSelf, getElement, onClickSync }
+        refElementReturn: { getElement },
+        pressParameters: { exclude, focusSelf, onClickSync }
     } = args;
 
     // A button can be activated in multiple ways, so on the off chance

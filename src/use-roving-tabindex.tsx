@@ -1,5 +1,6 @@
 import { h } from "preact";
 import { StateUpdater, useCallback, useEffect, useRef } from "preact/hooks";
+import { UseRefElementReturnType } from "use-ref-element";
 import { ChildFlagOperations, ManagedChildOmits, ManagedChildrenOmits, OnChildrenMountChange, useChildrenFlag, UseManagedChildParameters, useManagedChildren, UseManagedChildrenParameters, UseManagedChildrenReturnTypeInfo } from "./use-child-manager";
 import { useHasFocus, UseHasFocusParameters, UseHasFocusReturnType } from "./use-has-focus";
 import { useMergedProps } from "./use-merged-props";
@@ -64,7 +65,8 @@ export type RovingTabIndexChildOmits = keyof UseRovingTabIndexSubInfo<any, any>;
 
 export interface UseRovingTabIndexChildParameters<ChildElement extends Element, RtiSubInfo, ExtraFlagKeys extends string, RticOmits extends RovingTabIndexChildOmits, McOmits extends ManagedChildOmits, SubbestInfo> extends
     UseManagedChildParameters<number, UseRovingTabIndexSubInfo<ChildElement, RtiSubInfo>, ExtraFlagKeys | "tabbable", McOmits | "subInfo", SubbestInfo> {
-    rovingTabIndexChildParameters: Omit<Partial<Omit<UseRovingTabIndexSubInfo<any, any>, "getElement" | "subInfo" | "focusSelf">>, RticOmits> & Omit<{ getElement(): ChildElement | null; noModifyTabIndex: boolean, focusSelf(e: ChildElement): void; }, RticOmits>;
+    refElementReturn: Required<Pick<UseRefElementReturnType<ChildElement>["refElementReturn"], "getElement">>;
+    rovingTabIndexChildParameters: Omit<Partial<Omit<UseRovingTabIndexSubInfo<any, any>, "getElement" | "subInfo" | "focusSelf">>, RticOmits> & Omit<{ noModifyTabIndex: boolean, focusSelf(e: ChildElement): void; }, RticOmits>;
 }
 
 export type UseRovingTabIndexChild<ChildElement extends Element, RtiSubInfo, ExtraFlagKeys extends string> = (a: UseRovingTabIndexChildParameters<ChildElement, RtiSubInfo, ExtraFlagKeys, never, never, RtiSubInfo>) => UseRovingTabIndexChildReturnTypeWithHooks<ChildElement>;
@@ -184,7 +186,8 @@ export function useRovingTabIndex<ChildElement extends Element, RtiSubInfo, Extr
 
         const {
             managedChildParameters: { index, flags },
-            rovingTabIndexChildParameters: { focusSelf: focusSelfOverride, noModifyTabIndex, hidden, getElement },
+            rovingTabIndexChildParameters: { focusSelf: focusSelfOverride, noModifyTabIndex, hidden },
+            refElementReturn: { getElement },
             //hasFocusParameters: { onFocusedInnerChanged, ...hasFocusParameters },
             subInfo
         } = childParameters;

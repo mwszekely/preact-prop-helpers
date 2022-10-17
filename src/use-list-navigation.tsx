@@ -220,8 +220,9 @@ export function useListNavigation<ParentOrChildElement extends Element, ChildEle
 
         const {
             managedChildParameters: { index, flags },
-            rovingTabIndexChildParameters: { focusSelf, hidden, noModifyTabIndex, getElement },
+            rovingTabIndexChildParameters: { focusSelf, hidden, noModifyTabIndex },
             listNavigationChildParameters: { text },
+            refElementReturn,
             subInfo
         } = args;
         
@@ -238,7 +239,8 @@ export function useListNavigation<ParentOrChildElement extends Element, ChildEle
 
         const { rovingTabIndexChildReturn, hasFocusParameters } = useRovingTabIndexChild({
             managedChildParameters: { index, flags },
-            rovingTabIndexChildParameters: { focusSelf, hidden: !!hidden, noModifyTabIndex, getElement },
+            refElementReturn,
+            rovingTabIndexChildParameters: { focusSelf, hidden: !!hidden, noModifyTabIndex },
             subInfo: { text, subInfo }
         });
 

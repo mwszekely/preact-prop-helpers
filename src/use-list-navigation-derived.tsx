@@ -164,6 +164,7 @@ export function useListNavigationSingleSelection<ParentOrChildElement extends El
                 managedChildParameters: { index, flags },
                 rovingTabIndexChildParameters,
                 singleSelectionChildParameters: { unselectable, ...ss },
+                refElementReturn,
                 subInfo
             } = args;
             let { hidden, focusSelf } = rovingTabIndexChildParameters;
@@ -178,6 +179,7 @@ export function useListNavigationSingleSelection<ParentOrChildElement extends El
      //           onLastFocusedInnerChanged,
                 pressReturn,
             } = useSingleSelectionChild({
+                refElementReturn,
                 managedChildParameters: { index, flags },
                 singleSelectionChildParameters: { ...ss, focusSelf, unselectable }
             });
@@ -186,6 +188,7 @@ export function useListNavigationSingleSelection<ParentOrChildElement extends El
                 hasFocusParameters: { onFocusedInnerChanged: ofic2 },
                 rovingTabIndexChildReturn
             } = useListNavigationChild({
+                refElementReturn,
                 listNavigationChildParameters,
                 rovingTabIndexChildParameters,
                 managedChildParameters: {

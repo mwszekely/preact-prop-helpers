@@ -124,8 +124,9 @@ const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
     } = useListNavigationSingleSelectionChild({
         managedChildParameters: { index, flags: {} },
         listNavigationChildParameters: { text: "" },
-        rovingTabIndexChildParameters: { focusSelf, noModifyTabIndex: false, hidden, getElement },
-        singleSelectionChildParameters: { selectionMode, ariaPropName: "aria-selected", unselectable: hidden, getElement },
+        refElementReturn,
+        rovingTabIndexChildParameters: { focusSelf, noModifyTabIndex: false, hidden },
+        singleSelectionChildParameters: { selectionMode, ariaPropName: "aria-selected", unselectable: hidden },
         subInfo: {},
     });
 
