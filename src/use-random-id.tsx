@@ -59,7 +59,7 @@ export interface UseRandomIdReferencerElementReturnType<R extends Element> {
 }*/
 
 export interface UseRandomIdReferencerElementParameters<R extends Element> {
-    randomIdReferencerParameters: { referencerProp: null | (keyof R) };
+    randomIdReferencerParameters: { referencerProp: null | (keyof h.JSX.HTMLAttributes<R>) };
 }
 
 export type UseRandomIdSourceElement<S extends Element> = () => UseRandomIdSourceElementReturn<S>;
