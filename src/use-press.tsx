@@ -7,7 +7,7 @@ import { useMergedProps } from "./use-merged-props";
 import { useStableCallback } from "./use-stable-callback";
 import { useState } from "./use-state";
 
-interface UsePressParameters<E extends Node> {
+export interface UsePressParameters<E extends Node> {
     refElementReturn: Required<Pick<UseRefElementReturnType<E>["refElementReturn"], "getElement">>;
     pressParameters: {
         onClickSync: ((e: h.JSX.TargetedEvent<E>) => void) | null | undefined;

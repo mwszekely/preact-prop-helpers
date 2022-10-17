@@ -31,7 +31,7 @@ export { useMergedStyles } from "./use-merged-styles";
 export { useMutationObserver, UseMutationObserverParameters } from "./use-mutation-observer";
 export { debounceRendering, OnPassiveStateChange, PassiveStateUpdater, returnFalse, returnNull, returnTrue, returnUndefined, returnZero, useEnsureStability, usePassiveState } from "./use-passive-state";
 export { getFromLocalStorage, PersistentStates, storeToLocalStorage, usePersistentState } from "./use-persistent-state";
-export { setPressVibrate, usePress, UsePressReturnType } from "./use-press";
+export { setPressVibrate, usePress, UsePressReturnType, UsePressParameters } from "./use-press";
 export { generateRandomId, useRandomId, UseRandomIdParameters, UseRandomIdReferencerElement, UseRandomIdReferencerElementParameters, UseRandomIdReferencerElementReturn, UseRandomIdReturnTypeInfo, UseRandomIdReturnTypeWithHooks, UseRandomIdSourceElement, UseRandomIdSourceElementReturn } from "./use-random-id";
 export { useRefElement, UseRefElementParameters, UseRefElementReturnType } from "./use-ref-element";
 export { OnTabbableIndexChange, RovingTabIndexChildOmits, RovingTabIndexParametersOmits, useRovingTabIndex, UseRovingTabIndexChild, UseRovingTabIndexChildParameters, UseRovingTabIndexChildReturnTypeInfo, UseRovingTabIndexChildReturnTypeWithHooks, UseRovingTabIndexParameters, UseRovingTabIndexReturnTypeInfo, UseRovingTabIndexReturnTypeWithHooks, UseRovingTabIndexSubInfo } from "./use-roving-tabindex";
