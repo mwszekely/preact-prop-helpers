@@ -43,18 +43,20 @@ export function useImperativeProps<T extends Element>() {
 
     return {
         imperativeProps: {
-            addClass,
-            removeClass,
-            setStyle,
-            removeStyle,
-            setAttribute,
-            removeAttribute,
+            propsStable: useRef({
+                addClass,
+                removeClass,
+                setStyle,
+                removeStyle,
+                setAttribute,
+                removeAttribute,
 
-        },
+            }).current,
 
-        propsUnstable: useMergedProps<T>(
-            { className: currentImperativeProps.current.className.toString(), style: currentImperativeProps.current.style },
-            currentImperativeProps.current.others
-        )
+            propsUnstable: useMergedProps<T>(
+                { className: currentImperativeProps.current.className.toString(), style: currentImperativeProps.current.style },
+                currentImperativeProps.current.others
+            )
+        }
     }
 }

@@ -58,24 +58,74 @@ export interface UseRandomIdReferencerElementReturnType<R extends Element> {
     //useRandomIdReferencerElementProps: (p: h.JSX.HTMLAttributes<R>) => h.JSX.HTMLAttributes<R>;
 }*/
 
-export function useRandomId<S extends Element, R extends Element>({ randomId: { prefix, referencerProp } }: { randomId: { prefix: string, referencerProp: keyof R } }) {
-    const idBase = (prefix + useId());
-    useEnsureStability("useRandomId", prefix, referencerProp, idBase);
+export interface UseRandomIdReferencerElementParameters<R extends Element> {
+    randomIdReferencerParameters: { referencerProp: keyof R };
+}
 
-    const useRandomIdSourceElement = useCallback(() => {
-        const sourceElementPropsStable = useRef<h.JSX.HTMLAttributes<S>>({ id: idBase });
-        return { propsStable: sourceElementPropsStable.current };
+export type UseRandomIdSourceElement<S extends Element> = () => UseRandomIdSourceElementReturn<S>;
+export type UseRandomIdReferencerElement = <R extends Element>(args: UseRandomIdReferencerElementParameters<R>) => UseRandomIdReferencerElementReturn<R>;
+
+export interface UseRandomIdSourceElementReturn<S extends Element> {
+    randomIdSourceReturn: { propsStable: h.JSX.HTMLAttributes<S>; }
+}
+
+export interface UseRandomIdReferencerElementReturn<R extends Element> {
+    randomIdReferencerReturn: { propsStable: h.JSX.HTMLAttributes<R>; }
+}
+
+export interface UseRandomIdReturnTypeInfo {
+    randomIdReturn: { id: string; };
+}
+
+export interface UseRandomIdReturnTypeWithHooks<S extends Element> extends UseRandomIdReturnTypeInfo {
+    /**
+     * **STABLE**
+     * 
+     * The element that needs a custom `id` prop must use this hook.
+     */
+    useRandomIdSourceElement: UseRandomIdSourceElement<S>;
+
+    /**
+     * **STABLE**
+     * 
+     * Any element that references the id via `for` or `aria-labelledby`, etc. must use this hook.
+     * 
+     * This hook can be used multiple times on different components.
+     */
+    useRandomIdReferencerElement: UseRandomIdReferencerElement;
+    randomIdReturn: { id: string; };
+}
+
+export interface UseRandomIdParameters {
+    randomIdParameters: {
+        /**
+         * While all IDs are unique, this can be used to more easily differentiate them.
+         * MUST REMAIN STABLE
+         */
+
+        prefix: string;
+    }
+}
+
+export function useRandomId<S extends Element>({ randomIdParameters: { prefix } }: UseRandomIdParameters): UseRandomIdReturnTypeWithHooks<S> {
+    const id = (prefix + useId());
+    useEnsureStability("useRandomId", prefix, id);
+
+    const useRandomIdSourceElement = useCallback<UseRandomIdSourceElement<S>>((): UseRandomIdSourceElementReturn<S> => {
+        const sourceElementPropsStable = useRef<h.JSX.HTMLAttributes<S>>({ id });
+        return { randomIdSourceReturn: { propsStable: sourceElementPropsStable.current } };
     }, []);
-    const useRandomIdReferencerElement = useCallback(() => {
-        const referencerElementPropsStable = useRef<h.JSX.HTMLAttributes<R>>({ [referencerProp]: idBase });
-        return { propsStable: referencerElementPropsStable.current };
+    const useRandomIdReferencerElement = useCallback<UseRandomIdReferencerElement>(<R extends Element>({ randomIdReferencerParameters: { referencerProp } }: UseRandomIdReferencerElementParameters<R>): UseRandomIdReferencerElementReturn<R> => {
+        useEnsureStability("useRandomIdReferencerElement", referencerProp);
+        const referencerElementPropsStable = useRef<h.JSX.HTMLAttributes<R>>({ [referencerProp]: id });
+        return { randomIdReferencerReturn: { propsStable: referencerElementPropsStable.current } };
     }, []);
 
     return {
         useRandomIdSourceElement,
         useRandomIdReferencerElement,
-        randomId: {
-            id: idBase
+        randomIdReturn: {
+            id: id
         }
     }
 }

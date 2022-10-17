@@ -7,6 +7,9 @@ import { useMergedStyles } from "./use-merged-styles";
 
 let log = console.warn;
 
+
+export type ExtractedProps<O extends {}> = { [K in keyof O]: Pick<O[K], ("propsStable" | "propsUnstable") & keyof O[K]> };
+
 export function enableLoggingPropConflicts(log2: typeof console["log"]) {
     log = log2
 }

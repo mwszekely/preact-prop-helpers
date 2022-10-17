@@ -118,9 +118,10 @@ function windowBlur(e: FocusEvent) {
 
 export interface UseActiveElementParameters {
 
-    activeElementParameters: { /**
-     * Called any time the active element changes. Must be stable.
-     */
+    activeElementParameters: { 
+        /**
+         * Called any time the active element changes. Must be stable.
+         */
         onActiveElementChange?: OnPassiveStateChange<Element | null>;
 
         /**
@@ -154,10 +155,11 @@ export interface UseActiveElementParameters {
 }
 
 export interface UseActiveElementReturnType {
-    activeElementReturn: {/** 
-     * Returns whatever element is currently focused, or `null` if there's no focused element
-     * **STABLE**
-     */
+    activeElementReturn: {
+        /** 
+         * Returns whatever element is currently focused, or `null` if there's no focused element
+         * **STABLE**
+         */
         getActiveElement: () => Element | null;
         /** 
          * Returns whatever element is currently focused, or whatever element was most recently focused if there's no focused element

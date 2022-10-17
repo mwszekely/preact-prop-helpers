@@ -66,7 +66,6 @@ export interface UseGridNavigationReturnTypeInfo<ParentOrRowElement extends Elem
 }
 export interface UseGridNavigationReturnTypeWithHooks<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, CR, CC, KR extends string, KC extends string> extends UseGridNavigationReturnTypeInfo<ParentOrRowElement, RowElement, CR, KR> {
     useGridNavigationRow: UseGridNavigationRow<RowElement, CellElement, CR, CC, KR, KC>;
-    //gridNavigationProps: h.JSX.HTMLAttributes<ParentOrRowElement>;
 }
 
 export interface UseGridNavigationRowReturnTypeInfo<Row extends Element, Cell extends Element, CellSubInfo, KC extends string> {
@@ -76,7 +75,6 @@ export interface UseGridNavigationRowReturnTypeInfo<Row extends Element, Cell ex
 
 export interface UseGridNavigationRowReturnTypeWithHooks<Row extends Element, Cell extends Element, CellSubInfo, KC extends string> extends UseGridNavigationRowReturnTypeInfo<Row, Cell, CellSubInfo, KC> {
     useGridNavigationCell: UseGridNavigationCell<Cell, CellSubInfo, KC>;
-    //gridNavigationRowProps: h.JSX.HTMLAttributes<Row>;
 }
 
 export interface UseGridNavigationCellReturnTypeInfo<Cell extends Element> extends UseListNavigationChildReturnTypeInfo<Cell> {
