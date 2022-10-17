@@ -59,7 +59,7 @@ export interface UseRandomIdReferencerElementReturnType<R extends Element> {
 }*/
 
 export interface UseRandomIdReferencerElementParameters<R extends Element> {
-    randomIdReferencerParameters: { referencerProp: keyof R };
+    randomIdReferencerParameters: { referencerProp: null | (keyof R) };
 }
 
 export type UseRandomIdSourceElement<S extends Element> = () => UseRandomIdSourceElementReturn<S>;
@@ -117,7 +117,7 @@ export function useRandomId<S extends Element>({ randomIdParameters: { prefix } 
     }, []);
     const useRandomIdReferencerElement = useCallback<UseRandomIdReferencerElement>(<R extends Element>({ randomIdReferencerParameters: { referencerProp } }: UseRandomIdReferencerElementParameters<R>): UseRandomIdReferencerElementReturn<R> => {
         useEnsureStability("useRandomIdReferencerElement", referencerProp);
-        const referencerElementPropsStable = useRef<h.JSX.HTMLAttributes<R>>({ [referencerProp]: id });
+        const referencerElementPropsStable = useRef<h.JSX.HTMLAttributes<R>>(referencerProp == null? {} : { [referencerProp]: id });
         return { randomIdReferencerReturn: { propsStable: referencerElementPropsStable.current } };
     }, []);
 
