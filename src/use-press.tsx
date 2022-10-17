@@ -3,7 +3,6 @@ import { useEffect, useRef } from "preact/hooks";
 import { UseRefElementParameters, UseRefElementReturnType } from "use-ref-element";
 import { useGlobalHandler } from "./use-event-handler";
 import { useForceUpdate } from "./use-force-update";
-import { useHasFocus, UseHasFocusParameters } from "./use-has-focus";
 import { useMergedProps } from "./use-merged-props";
 import { useStableCallback } from "./use-stable-callback";
 import { useState } from "./use-state";
@@ -18,7 +17,7 @@ interface UsePressParameters<E extends Node> {
 }
 
 export interface UsePressReturnType<E extends Element> {
-    hasFocusParameters: Required<Pick<UseHasFocusParameters<E>["hasFocusParameters"], "onLastFocusedInnerChanged">>;
+    //hasFocusParameters: Required<Pick<UseHasFocusParameters<E>["hasFocusParameters"], "onLastFocusedInnerChanged">>;
     pressReturn: {
         propsStable: h.JSX.HTMLAttributes<E>;
         propsUnstable: h.JSX.HTMLAttributes<E>;
@@ -223,6 +222,10 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
         }
     });
 
+    const onFocusOut = useStableCallback((e: h.JSX.TargetedFocusEvent<E>) => {
+        setActive(0);
+    })
+
 
     const propsStable2 = useRef<h.JSX.HTMLAttributes<E>>({
         onKeyDown,
@@ -231,15 +234,10 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
         onMouseUp,
         onMouseLeave,
         onClick,
+        onfocusout: onFocusOut
     });
 
     return {
-        hasFocusParameters: {
-            onLastFocusedInnerChanged: useStableCallback((f: boolean, p: boolean | undefined) => {
-                if (!f)
-                    setActive(0);
-            })
-        },
         pressReturn: {
             propsStable: propsStable2.current,
             propsUnstable: {

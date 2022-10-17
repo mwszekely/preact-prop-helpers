@@ -3,11 +3,11 @@ import { useCallback, useEffect } from "preact/hooks";
 import { ManagedChildOmits, ManagedChildrenOmits } from "./use-child-manager";
 import { LinearNavigationOmits, TypeaheadNavigationOmits } from "./use-keyboard-navigation";
 import { RovingTabIndexChildOmits, RovingTabIndexParametersOmits } from "./use-roving-tabindex";
-import { useHasFocus, UseHasFocusParameters } from "./use-has-focus";
 import { ListNavigationChildOmits, ListNavigationParametersOmits, useListNavigation, UseListNavigationChildParameters, UseListNavigationChildReturnTypeInfo, UseListNavigationParameters, UseListNavigationReturnTypeInfo } from "./use-list-navigation";
 import { useStableCallback } from "./use-stable-callback";
 import { useState } from "./use-state";
 import { useMergedProps } from "./use-merged-props";
+import { UseHasCurrentFocusParameters } from "./use-has-current-focus";
 
 /**
  * Grids are implemented using two sets of list navigation.
@@ -80,7 +80,7 @@ export interface UseGridNavigationRowReturnTypeWithHooks<Row extends Element, Ce
 }
 
 export interface UseGridNavigationCellReturnTypeInfo<Cell extends Element> extends UseListNavigationChildReturnTypeInfo<Cell> {
-    hasFocusParameters: Required<Pick<UseHasFocusParameters<Cell>["hasFocusParameters"], "onFocusedInnerChanged" | "onLastFocusedInnerChanged">>;
+    hasCurrentFocusParameters: Required<Pick<UseHasCurrentFocusParameters<Cell>["hasCurrentFocusParameters"], "onCurrentFocusedInnerChanged" | "onCurrentFocusedInnerChanged">>;
     gridNavigationReturn: {
         //rowIsTabbable: boolean;
         //getRowIsTabbable(): boolean;
@@ -133,7 +133,6 @@ export function useGridNavigation<
         // Instead of focusing the entire row, we ask the cell that corresponds
         // to our current column to focus itself.
         const focusSelfRow = useStableCallback(() => {
-            debugger;
             const c2 = getCurrentColumn();
             navigateToColumn(c2 ?? 0, true);
         });
@@ -181,7 +180,7 @@ export function useGridNavigation<
         }) => {
             const {
                 rovingTabIndexChildReturn: rti_cell_ret,
-                hasFocusParameters
+                hasCurrentFocusParameters
             } = useGridNavigationColumn2({
                 refElementReturn,
                 managedChildParameters: managedChildParameters,
@@ -191,18 +190,22 @@ export function useGridNavigation<
             });
 
             const ret: UseGridNavigationCellReturnTypeWithHooks<CellElement> = {
+
                 gridNavigationReturn: { getCurrentColumn },
                 rovingTabIndexChildReturn: rti_cell_ret,
-                hasFocusParameters: {
-                    ...hasFocusParameters,
-                    onLastFocusedInnerChanged: useStableCallback((focused: boolean, prev: boolean | undefined) => {
+                hasCurrentFocusParameters: {
+                    ...hasCurrentFocusParameters,
+                    onCurrentFocusedInnerChanged: useStableCallback((focused: boolean, prev: boolean | undefined) => {
                         if (focused) {
+                            if (managedChildParameters.index == 0)
+                                debugger;
+
                             setCurrentColumn(managedChildParameters.index);
                             setTabbableIndex(managedChildParameters.index, false);
                         }
                     })
                 },
-                
+
             }
 
             return ret;

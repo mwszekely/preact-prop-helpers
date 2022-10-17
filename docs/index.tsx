@@ -1,10 +1,9 @@
 import { createContext, h, render } from "preact";
 import { memo } from "preact/compat";
 import { useCallback, useContext, useRef } from "preact/hooks";
-import { useAnimationFrame, useAsyncHandler, useDraggable, useDroppable, useElementSize, useFocusTrap, useMergedProps, useRefElement, useState } from "..";
+import { useAnimationFrame, useAsyncHandler, useDraggable, useDroppable, useElementSize, useFocusTrap, useHasCurrentFocus, useHasLastFocus, useMergedProps, useRefElement, useState } from "..";
 import { ElementSize } from "../use-element-size";
 import { useGridNavigation, UseGridNavigationCell, UseGridNavigationRow } from "../use-grid-navigation";
-import { useHasFocus } from "../use-has-focus";
 import { DemoUseInterval } from "./demos/use-interval";
 import { DemoUseRovingTabIndex } from "./demos/use-roving-tab-index";
 import { DemoUseTimeout } from "./demos/use-timeout";
@@ -234,10 +233,19 @@ const DemoFocus = memo(() => {
     const { refElementReturn } = useRefElement<HTMLDivElement>({ refElementParameters: { onElementChange: undefined } });
     const { propsStable: p2 } = refElementReturn;
     const {
-        activeElementReturn: { },
-        hasFocusReturn: { },
+        hasCurrentFocusReturn: { propsStable: p1 }
+    } = useHasCurrentFocus<HTMLDivElement>({
+        refElementReturn,
+        hasCurrentFocusParameters: {
+            onCurrentFocusedChanged: setFocused,
+            onCurrentFocusedInnerChanged: setFocusedInner,
+        }
+    });
+    const {
+        activeElementReturn: {  },
+        hasLastFocusReturn: {  },
 
-    } = useHasFocus<HTMLDivElement>({
+    } = useHasLastFocus<HTMLDivElement>({
         refElementReturn,
         activeElementParameters: {
             getDocument,
@@ -245,9 +253,7 @@ const DemoFocus = memo(() => {
             onLastActiveElementChange: setLastActiveElement,
             onWindowFocusedChange: setWindowFocused
         },
-        hasFocusParameters: {
-            onFocusedChanged: setFocused,
-            onFocusedInnerChanged: setFocusedInner,
+        hasLastFocusParameters: {
             onLastFocusedChanged: setLastFocused,
             onLastFocusedInnerChanged: setLastFocusedInner,
         }
@@ -255,7 +261,7 @@ const DemoFocus = memo(() => {
     return (
         <div class="demo">
             <h2>useHasFocus</h2>
-            <div {...(useMergedProps(p2, { style: { border: "1px solid black" }, tabIndex: 0 }))}>Outer <div tabIndex={0} style={{ border: "1px solid black" }}>Inner element</div></div>
+            <div {...(useMergedProps(p2, p1, { style: { border: "1px solid black" }, tabIndex: 0 }))}>Outer <div tabIndex={0} style={{ border: "1px solid black" }}>Inner element</div></div>
             <div>
                 <ul>
                     <li>Strictly focused: {focused.toString()}, {lastFocused.toString()}</li>
@@ -335,7 +341,7 @@ const DemoUseGridRow = memo((({ index }: { index: number }) => {
             typeaheadNavigationReturn: { propsStable: p1, }
 
         },
-        asChildRow: { hasFocusParameters, rovingTabIndexChildReturn: { tabbable, propsUnstable: p3 } },
+        asChildRow: { hasCurrentFocusParameters, rovingTabIndexChildReturn: { tabbable, propsUnstable: p3 } },
     } = useGridRow({
         asChildRowOfSection: {
             refElementReturn,
@@ -353,16 +359,12 @@ const DemoUseGridRow = memo((({ index }: { index: number }) => {
         },
     });
     const {
-        activeElementReturn: { },
-        hasFocusReturn: { }
-    } = useHasFocus<HTMLTableRowElement>({
-        activeElementParameters: { getDocument },
+        hasCurrentFocusReturn
+    } = useHasCurrentFocus<HTMLTableRowElement>({
         refElementReturn,
-        hasFocusParameters: {
-            onFocusedChanged: null,
-            onLastFocusedChanged: null,
-            onLastFocusedInnerChanged: null,
-            ...hasFocusParameters,
+        hasCurrentFocusParameters: {
+            onCurrentFocusedChanged: null,
+            ...hasCurrentFocusParameters,
         }
     });
 
@@ -390,7 +392,7 @@ const DemoUseGridCell = (({ index, row, rowIsTabbable }: { index: number, row: n
     const { refElementReturn } = useRefElement<HTMLTableCellElement>({ refElementParameters: {} });
     const { propsStable: p1 } = refElementReturn;
     const {
-        hasFocusParameters,
+        hasCurrentFocusParameters,
         gridNavigationReturn: { },
         rovingTabIndexChildReturn: { tabbable: cellIsTabbable, propsUnstable: p2 },
     } = useGridCell({
@@ -404,15 +406,13 @@ const DemoUseGridCell = (({ index, row, rowIsTabbable }: { index: number, row: n
         subInfo: {},
     });
     const {
-        activeElementReturn: { },
-        hasFocusReturn: { },
-    } = useHasFocus<HTMLTableCellElement>({
+        hasCurrentFocusReturn: { propsStable: p3 }
+    } = useHasCurrentFocus<HTMLTableCellElement>({
         refElementReturn,
-        activeElementParameters: { getDocument },
-        hasFocusParameters: { onFocusedChanged: null, onLastFocusedChanged: null, ...hasFocusParameters }
+        hasCurrentFocusParameters: { onCurrentFocusedChanged: null, ...hasCurrentFocusParameters }
     })
 
-    const props = useMergedProps(p1, p2);
+    const props = useMergedProps(p1, p2, p3);
 
     const t = (cellIsTabbable ? "(Tabbable)" : "(Not tabbable)")
 

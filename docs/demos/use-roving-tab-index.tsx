@@ -1,6 +1,6 @@
 import { createContext } from "preact";
 import { memo, useCallback, useContext } from "preact/compat";
-import { useHasFocus, useMergedProps, useRefElement, UseRefElementParameters, useSortableListNavigationSingleSelection, UseSortableListNavigationSingleSelectionChild, useStableCallback } from "../../index";
+import { useHasCurrentFocus, useMergedProps, useRefElement, UseRefElementParameters, useSortableListNavigationSingleSelection, UseSortableListNavigationSingleSelectionChild, useStableCallback } from "../../index";
 import { useState } from "../../use-state";
 
 
@@ -106,21 +106,17 @@ const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
     const text = `${randomWord} This is item #${index}${hidden ? " (hidden)" : ""}`;
     const focusSelf = useCallback((e: HTMLElement) => { e.focus() }, []);
     const oec = useStableCallback<NonNullable<UseRefElementParameters<HTMLLIElement>["refElementParameters"]["onElementChange"]>>((a, b) => onElementChange(a, b));
-    const ofic = useStableCallback<NonNullable<typeof onFocusedInnerChanged>>((a, b) => onFocusedInnerChanged?.(a, b));
-    const olfic = useStableCallback<NonNullable<typeof onLastFocusedInnerChanged>>((a, b) => onLastFocusedInnerChanged?.(a, b));
+    //const ofic = useStableCallback<NonNullable<typeof onFocusedInnerChanged>>((a, b) => onFocusedInnerChanged?.(a, b));
+    //const olfic = useStableCallback<NonNullable<typeof onLastFocusedInnerChanged>>((a, b) => onLastFocusedInnerChanged?.(a, b));
     const { refElementReturn } = useRefElement<HTMLLIElement>({ refElementParameters: { onElementChange: oec } });
     const { getElement, propsStable: p3 } = refElementReturn;
-    const { } = useHasFocus({ 
-        activeElementParameters: { getDocument }, 
-        refElementReturn,
-        hasFocusParameters: { onFocusedChanged: null, onFocusedInnerChanged: ofic, onLastFocusedChanged: null, onLastFocusedInnerChanged: olfic } 
-    });
+
     const {
         rovingTabIndexChildReturn: { tabbable, propsUnstable: p2 },
         singleSelectionChildReturn: { selected, propsUnstable: p4 },
-        hasFocusParameters: { onFocusedInnerChanged, onLastFocusedInnerChanged },
+        hasCurrentFocusParameters: { onCurrentFocusedInnerChanged },
         refElementParameters: { onElementChange },
-        pressReturn: { propsStable, propsUnstable: p1 },
+        pressReturn: { propsStable: p5, propsUnstable: p1 },
     } = useListNavigationSingleSelectionChild({
         managedChildParameters: { index, flags: {} },
         listNavigationChildParameters: { text: "" },
@@ -130,7 +126,17 @@ const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
         subInfo: {},
     });
 
-    const props = useMergedProps(p1, p2, p3, p4, propsStable);
+    const {
+        hasCurrentFocusReturn: { propsStable: p6 }
+    } = useHasCurrentFocus({
+        refElementReturn,
+        hasCurrentFocusParameters: {
+            onCurrentFocusedChanged: null,
+            onCurrentFocusedInnerChanged
+        }
+    });
+
+    const props = useMergedProps(p1, p2, p3, p4, p5, p6);
 
     return (
         <li {...props}>{text} ({tabbable ? "Tabbable" : "Not tabbable"}, {selected ? "Selected" : "Not selected"})<input {...useMergedProps(props, { type: "number" }) as any} style={{ width: "5ch" }} /></li>

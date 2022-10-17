@@ -1,8 +1,8 @@
 import { h } from "preact";
 import { StateUpdater, useCallback, useEffect, useRef } from "preact/hooks";
+import { UseHasCurrentFocusParameters } from "use-has-current-focus";
 import { UseRefElementReturnType } from "use-ref-element";
 import { ChildFlagOperations, ManagedChildOmits, ManagedChildrenOmits, OnChildrenMountChange, useChildrenFlag, UseManagedChildParameters, useManagedChildren, UseManagedChildrenParameters, UseManagedChildrenReturnTypeInfo } from "./use-child-manager";
-import { useHasFocus, UseHasFocusParameters, UseHasFocusReturnType } from "./use-has-focus";
 import { useMergedProps } from "./use-merged-props";
 import { usePassiveState } from "./use-passive-state";
 import { useStableCallback } from "./use-stable-callback";
@@ -72,7 +72,7 @@ export interface UseRovingTabIndexChildParameters<ChildElement extends Element, 
 export type UseRovingTabIndexChild<ChildElement extends Element, RtiSubInfo, ExtraFlagKeys extends string> = (a: UseRovingTabIndexChildParameters<ChildElement, RtiSubInfo, ExtraFlagKeys, never, never, RtiSubInfo>) => UseRovingTabIndexChildReturnTypeWithHooks<ChildElement>;
 
 export interface UseRovingTabIndexChildReturnTypeInfo<ChildElement extends Element> {
-    hasFocusParameters: Required<Pick<UseHasFocusParameters<ChildElement>["hasFocusParameters"], "onFocusedInnerChanged">>;
+    hasCurrentFocusParameters: Required<Pick<UseHasCurrentFocusParameters<ChildElement>["hasCurrentFocusParameters"], "onCurrentFocusedInnerChanged">>;
     //onFocusedInnerChanged: (focused: boolean, _prevFocused: boolean | undefined) => void;
     rovingTabIndexChildReturn: {
         tabbable: boolean;
@@ -240,8 +240,8 @@ export function useRovingTabIndex<ChildElement extends Element, RtiSubInfo, Extr
         //const rovingTabIndexChildProps = useMergedProps(refElementProps, { tabIndex: noModifyTabIndex ? undefined : (tabbable ? 0 : -1) })
 
         return {
-            hasFocusParameters: {
-                onFocusedInnerChanged: useStableCallback((focused: boolean, _prevFocused: boolean | undefined) => {
+            hasCurrentFocusParameters: {
+                onCurrentFocusedInnerChanged: useStableCallback((focused: boolean, _prevFocused: boolean | undefined) => {
                     if (focused) {
                         setTabbableIndex(index, false);
                     }

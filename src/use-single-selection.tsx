@@ -3,12 +3,12 @@ import { h } from "preact";
 import { StateUpdater, useCallback, useLayoutEffect, useRef } from "preact/hooks";
 import { useMergedProps } from "./use-merged-props";
 import { ChildFlagOperations, ManagedChildOmits, ManagedChildren, useChildrenFlag, UseManagedChildParameters } from "./use-child-manager";
-import { useChildrenHaveFocus, UseChildrenHaveFocusChildReturnType, UseChildrenHaveFocusParameters, UseHasFocusParameters } from "./use-has-focus";
 import { usePress, UsePressReturnType } from "./use-press";
 import { useStableCallback } from "./use-stable-callback";
 import { useStableGetter } from "./use-stable-getter";
 import { useState } from "./use-state";
 import { UseRefElementParameters, UseRefElementReturnType } from "./use-ref-element";
+import { useChildrenHaveFocus, UseChildrenHaveFocusChildReturnType } from "./use-children-have-focus";
 
 
 
@@ -49,7 +49,7 @@ export interface UseSingleSelectionChildReturnTypeInfo<E extends Element> extend
         getSelected(): boolean;
         propsUnstable: h.JSX.HTMLAttributes<E>;
     }
-    hasFocusParameters: Required<Pick<UseHasFocusParameters<E>["hasFocusParameters"], "onFocusedInnerChanged" | "onLastFocusedInnerChanged">>;
+    //hasFocusParameters: Required<Pick<UseHasFocusParameters<E>["hasFocusParameters"], "onFocusedInnerChanged" | "onLastFocusedInnerChanged">>;
     refElementParameters: Required<Pick<UseRefElementParameters<E>["refElementParameters"], "onElementChange">>;
 }
 
@@ -121,11 +121,11 @@ export function useSingleSelection<ParentOrChildElement extends Element, ChildEl
             const { getElement } = refElementReturn;
             const [isSelected, setIsSelected, getIsSelected] = useState(getSelectedIndex() == index);
             const selectedRef = useRef<ChildFlagOperations>({ get: getIsSelected, set: setIsSelected, isValid: useStableCallback(() => !unselectable) });
-            const { hasFocusParameters: { onLastFocusedInnerChanged: olfic2 }, refElementParameters: { onElementChange } } = useChildrenHaveFocusChild({});
+            const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: olfic2 }, refElementParameters: { onElementChange } } = useChildrenHaveFocusChild({});
 
             const getIndex = useStableGetter(index);
 
-            const { pressReturn, hasFocusParameters: { onLastFocusedInnerChanged: olfic } } = usePress<ChildElement>({
+            const { pressReturn } = usePress<ChildElement>({
                 refElementReturn,
                 pressParameters: {
                     onClickSync: unselectable ? null : ((e) => { stableOnChange(getIndex(), e); }),
@@ -142,13 +142,9 @@ export function useSingleSelection<ParentOrChildElement extends Element, ChildEl
                 },
                 pressReturn,
                 flags: { ...flags, selected: selectedRef.current },
-                hasFocusParameters: {
-
-                    onLastFocusedInnerChanged: useStableCallback<NonNullable<typeof olfic>>((f, p) => {
-                        olfic?.(f, p);
-                        olfic2?.(f, p);
-                    }),
-                    onFocusedInnerChanged: useStableCallback((focused: boolean, prev: boolean | undefined) => {
+                hasCurrentFocusParameters: {
+                    onCurrentFocusedInnerChanged: useStableCallback((focused: boolean, prev: boolean | undefined) => {
+                        olfic2?.(focused, prev);
                         if (selectionMode == 'focus' && focused) {
                             debugger;
                             stableOnChange(getIndex(), { target: getElement()!, currentTarget: getElement()! });

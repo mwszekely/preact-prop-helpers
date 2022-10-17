@@ -41,7 +41,8 @@ The name (Preact Prop Hooks) comes from the fact that most of these hooks requir
 |`usePassiveState`                                  |Offshoot of `useState` that, instead of re-rendering, runs a `useEffect`-esque effect & cleanup function when the state changes.|
 |`useElementSize`									|Allows a component to measure the size of the element it renders|
 |`useLogicalDirection`								|Lets a component measure its own "text flow" direction (is the inline direction ltr or rtl? is the block direction vertical or horizontal? etc.), and convert between physical and logical dimensions (e.g. knowing that "inline-start" is equivalent to "left" in this writing mode).|
-|`useHasFocus` (& `useActiveElement`)				|Allows a component to detect if it or its children have focus, and if nothing's focused, additionally detect if it is still the *most recently* focused element.|
+|`useHasCurrentFocus`                               |Allows a component to detect if it or its children currently have focus (i.e. have received `focusIn` but not `focusOut`)|
+|`useHasLastFocus` (& `useActiveElement`)			|Allows a component to detect if it is still the *most recently* focused element, ignoring, for example, clicking on the body or non-focusable text.|
 |`useFocusTrap` (& `useBlockingElement`)			|Allows a component to make itself modal so that no interactions outside of it are considered, primarily for dialogs and such, restoring focus when done.|
 |`useDraggable` & `useDroppable`					|Allows a component to quickly implement the Drag & drop API, returning information about the current operation.|
 |`useDocumentClass`                                 |Allows you to add a class to, e.g., the root `<html>` element, and then remove it on unmount automatically.|
@@ -50,6 +51,7 @@ The name (Preact Prop Hooks) comes from the fact that most of these hooks requir
 |`useRandomId`										|Allows a component to use a randomly-generated ID. Also lets another component reference whatever ID was used, e.g. in a `for` or `aria-labelledby` prop.|
 |`useSortableChildren`                              |A component using this hook can re-order its immediate children arbitrarily in response to something.|
 |`usePress`                                         |Lets you use a more comprehensive event than `onClick` that works around common edge cases like double-clicking text selection.|
+|`useChildrenHaveFocus`|                            |Allows a component to determine if focus is contained within any of its child elements without using a parent element (i.e. if any of the given elements have focus)|
 |`useTimeout`, `useInterval`, `useAnimationFrame`	|Runs the specified function (which doesn't need to be stable) with the given delay/interval/on every frame. In particular `useTimeout` is very effective as "`useEffect` but on a delay".|
 |`useStableCallback`								|`useCallback`, but doesn't require dependencies and is always stable. __Cannot be used during render__, only during event handlers, `useLayoutEffect`, etc.|
 |`useStableGetter`									|Allows you to use some variable within `useEffect` or `useCallback` without including it in a dependency array. __Cannot be used during render__, only during event handlers, `useLayoutEffect`, etc.|
@@ -232,9 +234,11 @@ Note that while `useChildManager` is generally a great choice for manipulating d
 
 Allows an element to become modal, stopping any attempt to interact with anything not contained by the element.  Internally utilizes the `inert` attribute, for which a polyfill is provided.  Multiple focus traps can be active at once, managed with a stack based off the `blockingElements` proposal implemented as `useBlockingElement`.
 
-## `useHasFocus`
+## `useHasCurrentFocus`, `useHasLastFocus`
 
-Allows you to inspect if the given element is focused.  Also tracks focus across the page and lets you determine if an inner element instead has focus (uses `contains`, so both may be true at once).
+Allows you to inspect if the given element is focused.  "Current focus" refers to just attaching `focusIn` and `focusOut` events and literally looking at where the user's focus has moved within the element. "Last focus" refers to whatever was most recently focused, disregarding times where the element loses focus but a new element hasn't been given focus yet (e.g. when clicking on the body, "current focus" is lost, but "last focus" remains until a new non-body element is focused).
+
+In either case, you can differentiate between whether or not just the element itself is focused, or the element and/or any element inside of it is focused.
 
 ## `useLogicalDirection`
 

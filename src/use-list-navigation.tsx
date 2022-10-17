@@ -1,9 +1,7 @@
-import { h } from "preact";
 import { useCallback, useEffect } from "preact/hooks";
-import { UseHasFocusParameters } from "./use-has-focus";
 import { ManagedChildOmits, ManagedChildren, ManagedChildrenOmits, OnChildrenMountChange } from "./use-child-manager";
+import { UseHasCurrentFocusParameters } from "./use-has-current-focus";
 import { LinearNavigationOmits, TypeaheadNavigationOmits, useLinearNavigation, UseLinearNavigationParameters, UseLinearNavigationReturnTypeInfo, useTypeaheadNavigation, UseTypeaheadNavigationParameters, UseTypeaheadNavigationReturnTypeInfo } from "./use-keyboard-navigation";
-import { useMergedProps } from "./use-merged-props";
 import { useEnsureStability } from "./use-passive-state";
 import { RovingTabIndexChildOmits, RovingTabIndexParametersOmits, useRovingTabIndex, UseRovingTabIndexChildParameters, UseRovingTabIndexChildReturnTypeInfo, UseRovingTabIndexParameters, UseRovingTabIndexReturnTypeInfo, UseRovingTabIndexSubInfo } from "./use-roving-tabindex";
 import { useStableGetter } from "./use-stable-getter";
@@ -126,7 +124,7 @@ export interface UseListNavigationReturnTypeWithHooks<ParentOrChildElement exten
 }
 
 export interface UseListNavigationChildReturnTypeInfo<ChildElement extends Element> extends UseRovingTabIndexChildReturnTypeInfo<ChildElement> {
-    hasFocusParameters: Required<Pick<UseHasFocusParameters<ChildElement>["hasFocusParameters"], "onFocusedInnerChanged">>;
+    hasCurrentFocusParameters: Required<Pick<UseHasCurrentFocusParameters<ChildElement>["hasCurrentFocusParameters"], "onCurrentFocusedInnerChanged">>;
     //onFocusedInnerChanged: (focused: boolean, _prevFocused: boolean | undefined) => void;
 }
 
@@ -237,7 +235,7 @@ export function useListNavigation<ParentOrChildElement extends Element, ChildEle
             };
         }, []);
 
-        const { rovingTabIndexChildReturn, hasFocusParameters } = useRovingTabIndexChild({
+        const { rovingTabIndexChildReturn, hasCurrentFocusParameters } = useRovingTabIndexChild({
             managedChildParameters: { index, flags },
             refElementReturn,
             rovingTabIndexChildParameters: { focusSelf, hidden: !!hidden, noModifyTabIndex },
@@ -245,8 +243,8 @@ export function useListNavigation<ParentOrChildElement extends Element, ChildEle
         });
 
         return {
-            rovingTabIndexChildReturn,
-            hasFocusParameters
+            hasCurrentFocusParameters,
+            rovingTabIndexChildReturn
         }
     }, []);
 

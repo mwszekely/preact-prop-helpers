@@ -2,7 +2,7 @@ import { h, VNode } from "preact";
 import { useCallback } from "preact/hooks";
 import { useMergedProps } from "./use-merged-props";
 import { ChildFlagOperations, ManagedChildOmits, ManagedChildrenOmits } from "./use-child-manager";
-import { UseChildrenHaveFocusParameters, UseHasFocusParameters } from "./use-has-focus";
+import { UseHasCurrentFocusParameters } from "./use-has-current-focus";
 import { LinearNavigationOmits, TypeaheadNavigationOmits } from "./use-keyboard-navigation";
 import { ListNavigationChildOmits, ListNavigationParametersOmits, useListNavigation, UseListNavigationChildParameters, UseListNavigationChildReturnTypeInfo, UseListNavigationChildReturnTypeWithHooks, UseListNavigationParameters, UseListNavigationReturnTypeInfo, UseListNavigationReturnTypeWithHooks, UseListNavigationSubInfo } from "./use-list-navigation";
 import { usePress } from "./use-press";
@@ -50,7 +50,7 @@ export interface UseListNavigationSingleSelectionChildParameters<ChildElement ex
 
 export interface UseListNavigationSingleSelectionChildReturnTypeInfo<ChildElement extends Element> extends UseListNavigationChildReturnTypeInfo<ChildElement>, UseSingleSelectionChildReturnTypeInfo<ChildElement> {
 
-    hasFocusParameters: Required<Pick<UseHasFocusParameters<ChildElement>["hasFocusParameters"], "onFocusedInnerChanged" | "onLastFocusedInnerChanged">>;
+    hasCurrentFocusParameters: Required<Pick<UseHasCurrentFocusParameters<ChildElement>["hasCurrentFocusParameters"], "onCurrentFocusedInnerChanged" | "onCurrentFocusedInnerChanged">>;
     /*singleSelectionChildReturn: {
         selected: boolean;
         getSelected(): boolean;
@@ -172,7 +172,7 @@ export function useListNavigationSingleSelection<ParentOrChildElement extends El
             const {
                 flags: ssflags,
                 singleSelectionChildReturn,
-                hasFocusParameters: { onFocusedInnerChanged: ofic1, onLastFocusedInnerChanged },
+                hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ofic1, onCurrentFocusedInnerChanged: ofic3 },
                 refElementParameters: { onElementChange },
  //               onElementChange,
    //             onFocusedInnerChanged: ofic1,
@@ -185,7 +185,7 @@ export function useListNavigationSingleSelection<ParentOrChildElement extends El
             });
 
             const {
-                hasFocusParameters: { onFocusedInnerChanged: ofic2 },
+                hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ofic2 },
                 rovingTabIndexChildReturn
             } = useListNavigationChild({
                 refElementReturn,
@@ -201,14 +201,15 @@ export function useListNavigationSingleSelection<ParentOrChildElement extends El
                 subInfo,
             });
 
-            const onFocusedInnerChanged = useStableCallback((f: boolean, p: boolean | undefined) => {
+            const onCurrentFocusedInnerChanged = useStableCallback((f: boolean, p: boolean | undefined) => {
                 ofic1?.(f, p);
                 ofic2?.(f, p);
+                ofic3?.(f, p);
             });
 
             return {
                 pressReturn,
-                hasFocusParameters: { onLastFocusedInnerChanged, onFocusedInnerChanged },
+                hasCurrentFocusParameters: { onCurrentFocusedInnerChanged },
                 refElementParameters: { onElementChange },
                 rovingTabIndexChildReturn,
                 singleSelectionChildReturn,
