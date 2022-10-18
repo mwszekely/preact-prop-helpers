@@ -9,10 +9,10 @@ export default {
         file: "bundle.js",
         format: "iife",
         name: "bundle",
-        sourcemap: "inline"
+        sourcemap: true
     },
     plugins: [
-        typescript({ sourceMap: true, inlineSources: true }), 
+        typescript({  }), 
         commonjs({ sourceMap: true }), 
         resolve({ dedupe: ['preact', "preact/compat", "preact/hooks"] }), 
         sourcemaps()

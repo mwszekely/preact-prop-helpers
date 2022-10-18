@@ -6,12 +6,8 @@ package-lock.json
 !rollup.config.js
 !docs/bundle.js
 !true.js
-demo/main.js
-demo/main.js.map
-demo/index.css
-demo/index.css.map
-demo/index.d.ts
-demo/index.d.ts.map
+!docs/bundle.js
+!docs/bundle.js.map
 
 # Logs
 logs
