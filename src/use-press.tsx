@@ -7,24 +7,22 @@ import { useMergedProps } from "./use-merged-props";
 import { useStableCallback } from "./use-stable-callback";
 import { useState } from "./use-state";
 
-export interface UsePressParameters<E extends Node> {
+interface PP<E extends Node> {
+    onClickSync: ((e: h.JSX.TargetedEvent<E>) => void) | null | undefined;
+    exclude: undefined | { click?: "exclude" | undefined, space?: "exclude" | undefined, enter?: "exclude" | undefined };
+    focusSelf(element: E): void;
+}
+
+export interface UsePressParameters<E extends Node, PPOmits extends keyof PP<any>> {
     refElementReturn: Required<Pick<UseRefElementReturnType<E>["refElementReturn"], "getElement">>;
-    pressParameters: {
-        onClickSync: ((e: h.JSX.TargetedEvent<E>) => void) | null | undefined;
-        exclude: undefined | { click?: "exclude" | undefined, space?: "exclude" | undefined, enter?: "exclude" | undefined };
-        focusSelf(element: E): void;
-    }
+    pressParameters: Omit<PP<E>, PPOmits>;
 }
 
 export interface UsePressReturnType<E extends Element> {
-    //hasFocusParameters: Required<Pick<UseHasFocusParameters<E>["hasFocusParameters"], "onLastFocusedInnerChanged">>;
     pressReturn: {
         propsStable: h.JSX.HTMLAttributes<E>;
         propsUnstable: h.JSX.HTMLAttributes<E>;
     }
-}
-
-interface UsePressReturnType2<E extends Element> extends UsePressReturnType<E> {
 }
 
 /**
@@ -46,7 +44,7 @@ interface UsePressReturnType2<E extends Element> extends UsePressReturnType<E> {
  * @param onClickSync 
  * @param exclude Whether the polyfill shouldn't apply (can specify for specific interactions)
  */
-export function usePress<E extends Element>(args: UsePressParameters<E>): UsePressReturnType2<E> {
+export function usePress<E extends Element>(args: UsePressParameters<E, never>): UsePressReturnType<E> {
     const {
         refElementReturn: { getElement },
         pressParameters: { exclude, focusSelf, onClickSync }
