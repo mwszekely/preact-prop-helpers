@@ -4592,7 +4592,6 @@ var bundle = (function (exports) {
         // The flag is reset any time the selection is empty or the button is
         // no longer active.
         const [textSelectedDuringActivationStartTime, setTextSelectedDuringActivationStartTime] = useState(null);
-        const pseudoActive = (activeDuringRender && (textSelectedDuringActivationStartTime == null));
         useGlobalHandler(document, "selectionchange", _ => {
             setTextSelectedDuringActivationStartTime(prev => nodeSelectedTextLength(getElement()) == 0 ? null : prev != null ? prev : new Date());
         });
@@ -4731,10 +4730,10 @@ var bundle = (function (exports) {
         return {
             pressReturn: {
                 propsStable: propsStable2.current,
-                propsUnstable: {
+                /*propsUnstable: {
                     style: (textSelectedDuringActivationStartTime != null) ? { cursor: "text" } : undefined,
-                    ...{ "data-pseudo-active": pseudoActive ? "true" : undefined }
-                },
+                    ...{ "data-pseudo-active": pseudoActive ? "true" : undefined } as {}
+                },*/
             }
         };
     }

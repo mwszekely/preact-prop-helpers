@@ -11,6 +11,8 @@ interface PP<E extends Node> {
     onClickSync: ((e: h.JSX.TargetedEvent<E>) => void) | null | undefined;
     exclude: undefined | { click?: "exclude" | undefined, space?: "exclude" | undefined, enter?: "exclude" | undefined };
     focusSelf(element: E): void;
+    onPseudoActiveStart(): void;
+    onPseudoActiveStop(): void;
 }
 
 export interface UsePressParameters<E extends Node, PPOmits extends keyof PP<any>> {
@@ -21,7 +23,6 @@ export interface UsePressParameters<E extends Node, PPOmits extends keyof PP<any
 export interface UsePressReturnType<E extends Element> {
     pressReturn: {
         propsStable: h.JSX.HTMLAttributes<E>;
-        propsUnstable: h.JSX.HTMLAttributes<E>;
     }
 }
 
@@ -47,8 +48,11 @@ export interface UsePressReturnType<E extends Element> {
 export function usePress<E extends Element>(args: UsePressParameters<E, never>): UsePressReturnType<E> {
     const {
         refElementReturn: { getElement },
-        pressParameters: { exclude, focusSelf, onClickSync }
+        pressParameters: { exclude, focusSelf, onClickSync, onPseudoActiveStart, onPseudoActiveStop }
     } = args;
+
+    const stableOnPseudoActiveStart = useStableCallback(onPseudoActiveStart);
+    const stableOnPseudoActiveStop = useStableCallback(onPseudoActiveStop);
 
     // A button can be activated in multiple ways, so on the off chance
     // that multiple are triggered at once, we only *actually* register
@@ -73,6 +77,7 @@ export function usePress<E extends Element>(args: UsePressParameters<E, never>):
     // no longer active.
     const [textSelectedDuringActivationStartTime, setTextSelectedDuringActivationStartTime] = useState<Date | null>(null);
     const pseudoActive = (activeDuringRender && (textSelectedDuringActivationStartTime == null));
+    useEffect(() => { if (pseudoActive) { stableOnPseudoActiveStart(); } else { stableOnPseudoActiveStop(); } return () => { if (pseudoActive) stableOnPseudoActiveStop(); } }, [pseudoActive])
 
     useGlobalHandler(document, "selectionchange", _ => {
         setTextSelectedDuringActivationStartTime(prev => nodeSelectedTextLength(getElement()) == 0 ? null : prev != null ? prev : new Date());
@@ -238,10 +243,10 @@ export function usePress<E extends Element>(args: UsePressParameters<E, never>):
     return {
         pressReturn: {
             propsStable: propsStable2.current,
-            propsUnstable: {
+            /*propsUnstable: {
                 style: (textSelectedDuringActivationStartTime != null) ? { cursor: "text" } : undefined,
                 ...{ "data-pseudo-active": pseudoActive ? "true" : undefined } as {}
-            },
+            },*/
         }
     };
 }
