@@ -1,4 +1,5 @@
 import { useCallback, useEffect } from "preact/hooks";
+import { tryNavigateToIndex } from "use-sortable-children";
 import { ManagedChildOmits, ManagedChildren, ManagedChildrenOmits, OnChildrenMountChange } from "./use-child-manager";
 import { UseHasCurrentFocusParameters } from "./use-has-current-focus";
 import { LinearNavigationOmits, TypeaheadNavigationOmits, useLinearNavigation, UseLinearNavigationParameters, UseLinearNavigationReturnTypeInfo, useTypeaheadNavigation, UseTypeaheadNavigationParameters, UseTypeaheadNavigationReturnTypeInfo } from "./use-keyboard-navigation";
@@ -69,9 +70,10 @@ interface LSP {
      * Used to turn an "absolute" index into a "sorted/filtered/mangled" one.
      * 
      * For example, navigateToFirst mangles 0 and navigates to that resulting row.
+     * 
      * @param rawIndex 
      */
-    indexMangler?(rawIndex: number): number;
+    indexMangler(rawIndex: number): number;
 
     /**
      * Used to turn a "mangled" index into it's "unsorted" or "unmangled" index.
@@ -81,16 +83,15 @@ interface LSP {
      * to turn that absolute row index back into a mangled one.
      * @param transformedIndex 
      */
-    indexDemangler?(transformedIndex: number): number;
+    indexDemangler(transformedIndex: number): number;
 }
 
 export type ListNavigationParametersOmits = keyof LSP;
 
 // *** Parameters (list, list-single, list-child, list-single-child)
-export interface UseListNavigationParameters<LsOmits extends ListNavigationParametersOmits, LnOmits extends LinearNavigationOmits, TnOmits extends TypeaheadNavigationOmits, RtiOmits extends RovingTabIndexParametersOmits, McOmits extends ManagedChildrenOmits> extends
-    UseRovingTabIndexParameters<RtiOmits, McOmits>,
-    UseTypeaheadNavigationParameters<TnOmits | "getIndex" | "setIndex">,
-    UseLinearNavigationParameters<LnOmits | "navigateToFirst" | "navigateToLast" | "navigateToNext" | "navigateToPrev"> {
+export interface UseListNavigationParameters<LsOmits extends ListNavigationParametersOmits, LnOmits extends LinearNavigationOmits, TnOmits extends TypeaheadNavigationOmits> extends
+    UseTypeaheadNavigationParameters<TnOmits>,
+    UseLinearNavigationParameters<LnOmits> {
     listNavigationParameters: Omit<LSP, LsOmits>;
 }
 
@@ -143,73 +144,27 @@ export type UseListNavigationChild<ChildElement extends Element, LsSubInfo, K ex
  * Navigating forwards/backwards can be done with the arrow keys, Home/End keys, or any text for typeahead to focus the next item that matches.
  */
 export function useListNavigation<ParentOrChildElement extends Element, ChildElement extends Element, LsSubInfo, ExtraFlagKeys extends string>({
-    managedChildrenParameters: { onChildrenMountChange, ...mc },
-    rovingTabIndexParameters,
-    listNavigationParameters: { indexDemangler, indexMangler },
     linearNavigationParameters,
-    typeaheadNavigationParameters
+    typeaheadNavigationParameters,
+    listNavigationParameters,
+    managedChildrenParameters,
+    rovingTabIndexParameters,
+    rovingTabIndexReturn
 }: UseListNavigationParameters<never, never, never, never, never>): UseListNavigationReturnTypeWithHooks<ParentOrChildElement, ChildElement, LsSubInfo, ExtraFlagKeys> {
-    indexMangler ??= identity;
-    indexDemangler ??= identity;
-
-    useEnsureStability("useListNavigation", indexMangler, indexDemangler);
-
-
-    const { managedChildrenReturn, rovingTabIndexReturn, useRovingTabIndexChild } = useRovingTabIndex<ChildElement, UseListNavigationSubInfo<LsSubInfo>, ExtraFlagKeys>({
-        managedChildrenParameters: {
-            ...mc, onChildrenMountChange: useCallback<OnChildrenMountChange<number>>((m, u) => {
-                onChildrenMountChange?.(m, u);
-            }, [])
-        },
-        rovingTabIndexParameters
-    });
-
-    const { children } = managedChildrenReturn;
-    const { getTabbableIndex, setTabbableIndex } = rovingTabIndexReturn;
-
-    const navigateToIndex = useCallback((i: number | null, fromUserInteraction: boolean) => {
-        if (i != null) {
-            const nextIndex = tryNavigateToIndex({
-                children: children,
-                default: 0,
-                target: i,
-                searchDirection: 1,
-                indexMangler: indexMangler ?? identity,
-                indexDemangler: indexDemangler ?? identity
-            });
-            setTabbableIndex(i == null ? null : nextIndex, fromUserInteraction);
-        }
-        else {
-            setTabbableIndex(null, fromUserInteraction);
-        }
-    }, []);
 
     const {
         useTypeaheadNavigationChild,
-        typeaheadNavigationReturn
+        typeaheadNavigationReturn,
+        ..._void1
     } = useTypeaheadNavigation<ParentOrChildElement>({
-        typeaheadNavigationParameters: {
-            getIndex: getTabbableIndex,
-            setIndex: useCallback((index: (number | null) | ((prev: number | null) => (number | null))) => {
-                setTabbableIndex(index, true);
-            }, []),
-            ...typeaheadNavigationParameters
-        }
+        typeaheadNavigationParameters,
+        rovingTabIndexReturn
     });
-    const { linearNavigationReturn } = useLinearNavigation<ParentOrChildElement>({
+    const { 
+        linearNavigationReturn,
+        ..._void2
+     } = useLinearNavigation<ParentOrChildElement>({
         linearNavigationParameters: {
-            navigateToPrev: useCallback(() => {
-                setTabbableIndex(c => {
-                    return tryNavigateToIndex({ children, default: c ?? 0, target: indexDemangler!(indexMangler!((c ?? 0)) - 1), searchDirection: -1, indexMangler: indexMangler ?? identity, indexDemangler: indexDemangler ?? identity })
-                }, true)
-            }, []),
-            navigateToNext: useCallback(() => {
-                setTabbableIndex(c => {
-                    return tryNavigateToIndex({ children, default: c ?? 0, target: indexDemangler!(indexMangler!(c ?? 0) + 1), searchDirection: 1, indexMangler: indexMangler ?? identity, indexDemangler: indexDemangler ?? identity });
-                }, true)
-            }, []),
-            navigateToFirst: useCallback(() => { navigateToIndex(indexDemangler!(0), true); }, []),
-            navigateToLast: useCallback(() => { navigateToIndex(indexDemangler!(children.getHighestIndex()), true); }, []),
             ...linearNavigationParameters
         }
     });
@@ -225,17 +180,19 @@ export function useListNavigation<ParentOrChildElement extends Element, ChildEle
         } = args;
         
         const _v: void = useTypeaheadNavigationChild({ text, index });
-        const getIndex = useStableGetter(index);
-        useEffect(() => {
+       // const getIndex = useStableGetter(index);
+        /*useEffect(() => {
 
             return () => {
                 if (getTabbableIndex() == getIndex()) {
                     navigateToIndex(index, false);
                 }
             };
-        }, []);
+        }, []);*/
 
-        const { rovingTabIndexChildReturn, hasCurrentFocusParameters } = useRovingTabIndexChild({
+        const { 
+            rovingTabIndexChildReturn, 
+            hasCurrentFocusParameters, } = useRovingTabIndexChild({
             managedChildParameters: { index, flags },
             refElementReturn,
             rovingTabIndexChildParameters: { focusSelf, hidden: !!hidden, noModifyTabIndex },
@@ -269,36 +226,4 @@ export function useListNavigation<ParentOrChildElement extends Element, ChildEle
 
 
 
-
-
-
-export interface TryNavigateToIndexParameters<ChildElement extends Element, C, K extends string> {
-    children: ManagedChildren<number, UseRovingTabIndexSubInfo<ChildElement, UseListNavigationSubInfo<C>>, K>;
-    default: number;
-    target: number;
-    searchDirection: 1 | -1;
-    indexMangler: (n: number) => number;
-    indexDemangler: (n: number) => number;
-}
-
-export function tryNavigateToIndex<ChildElement extends Element, C, K extends string>({ children, searchDirection, indexDemangler, indexMangler, target }: TryNavigateToIndexParameters<ChildElement, C, K>) {
-    const upper = children.getHighestIndex();
-    const lower = 0;
-
-    if (searchDirection === -1) {
-        while ((target >= lower && (children.getAt(target) == null) || !!children.getAt(target)?.subInfo.hidden))
-            target = indexDemangler(indexMangler(target) - 1);
-
-        return target < lower ? indexDemangler(lower) : target;
-    }
-    else if (searchDirection === 1) {
-        while ((target <= upper && children.getAt(target) == null) || !!children.getAt(target)?.subInfo.hidden)
-            target = indexDemangler(indexMangler(target) + 1);
-
-        return target > upper ? indexDemangler(upper) : target;
-    }
-    else {
-        return lower;
-    }
-}
 

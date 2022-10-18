@@ -1,21 +1,27 @@
 import { h } from "preact";
 import { useEffect, useRef } from "preact/hooks";
-import { UseRefElementParameters, UseRefElementReturnType } from "use-ref-element";
+import { UseRefElementReturnType } from "use-ref-element";
 import { useGlobalHandler } from "./use-event-handler";
 import { useForceUpdate } from "./use-force-update";
-import { useMergedProps } from "./use-merged-props";
 import { useStableCallback } from "./use-stable-callback";
 import { useState } from "./use-state";
 
 interface PP<E extends Node> {
-    onClickSync: ((e: h.JSX.TargetedEvent<E>) => void) | null | undefined;
+    /**
+     * What should happen when this widget has been "pressed".
+     * 
+     * This must be a sync event handler; async handlers must be taken care of externally.
+     */
+    onPressSync: ((e: h.JSX.TargetedEvent<E>) => void) | null | undefined;
     exclude: undefined | { click?: "exclude" | undefined, space?: "exclude" | undefined, enter?: "exclude" | undefined };
     focusSelf(element: E): void;
     onPseudoActiveStart(): void;
     onPseudoActiveStop(): void;
 }
 
-export interface UsePressParameters<E extends Node, PPOmits extends keyof PP<any>> {
+export type UsePressParametersOmits = keyof PP<any>;
+
+export interface UsePressParameters<E extends Node, PPOmits extends UsePressParametersOmits> {
     refElementReturn: Required<Pick<UseRefElementReturnType<E>["refElementReturn"], "getElement">>;
     pressParameters: Omit<PP<E>, PPOmits>;
 }
@@ -48,7 +54,7 @@ export interface UsePressReturnType<E extends Element> {
 export function usePress<E extends Element>(args: UsePressParameters<E, never>): UsePressReturnType<E> {
     const {
         refElementReturn: { getElement },
-        pressParameters: { exclude, focusSelf, onClickSync, onPseudoActiveStart, onPseudoActiveStop }
+        pressParameters: { exclude, focusSelf, onPressSync, onPseudoActiveStart, onPseudoActiveStop }
     } = args;
 
     const stableOnPseudoActiveStart = useStableCallback(onPseudoActiveStart);
@@ -89,11 +95,11 @@ export function usePress<E extends Element>(args: UsePressParameters<E, never>):
 
     }, [activeDuringRender == 0]);
 
-    const onActiveStart = useStableCallback<NonNullable<typeof onClickSync>>((_) => {
+    const onActiveStart = useStableCallback<NonNullable<typeof onPressSync>>((_) => {
         setActive(a => ++a);
     });
 
-    const onActiveStop = useStableCallback<NonNullable<typeof onClickSync>>((e) => {
+    const onActiveStop = useStableCallback<NonNullable<typeof onPressSync>>((e) => {
         setActive(a => Math.max(0, --a));
 
         const currentTime = new Date();
@@ -115,8 +121,8 @@ export function usePress<E extends Element>(args: UsePressParameters<E, never>):
         }
     });
 
-    const handlePress = useStableCallback<NonNullable<typeof onClickSync>>((e) => {
-        if (onClickSync) {
+    const handlePress = useStableCallback<NonNullable<typeof onPressSync>>((e) => {
+        if (onPressSync) {
 
             // Note: The element is focused here because of iOS Safari.
             //
@@ -157,14 +163,14 @@ export function usePress<E extends Element>(args: UsePressParameters<E, never>):
             }
             finally {
                 // Actually call our handler.
-                onClickSync(e);
+                onPressSync(e);
             }
 
         }
     });
 
     const onMouseDown = useStableCallback((e: h.JSX.TargetedMouseEvent<E>) => {
-        if (onClickSync && !excludes("click", exclude)) {
+        if (onPressSync && !excludes("click", exclude)) {
             // Stop double clicks from selecting text in an component that's *supposed* to be acting like a button,
             // but also don't prevent the user from selecting that text manually if they really want to
             // (which user-select: none would do, but cancelling a double click on mouseDown doesn't)
@@ -179,7 +185,7 @@ export function usePress<E extends Element>(args: UsePressParameters<E, never>):
         }
     })
     const onMouseUp = useStableCallback((e: h.JSX.TargetedMouseEvent<E>) => {
-        if (onClickSync && !excludes("click", exclude)) {
+        if (onPressSync && !excludes("click", exclude)) {
             if (e.button === 0 && getActive() > 0) {
                 onActiveStop(e);
             }
@@ -188,13 +194,13 @@ export function usePress<E extends Element>(args: UsePressParameters<E, never>):
 
 
     const onMouseLeave = useStableCallback(() => {
-        if (onClickSync && !excludes("click", exclude)) {
+        if (onPressSync && !excludes("click", exclude)) {
             setActive(0);
         }
     });
 
     const onKeyDown = useStableCallback((e: h.JSX.TargetedKeyboardEvent<E>) => {
-        if (onClickSync) {
+        if (onPressSync) {
             if (e.key == " " && !excludes("space", exclude)) {
                 // We don't actually activate it on a space keydown
                 // but we do preventDefault to stop the page from scrolling.
@@ -211,12 +217,12 @@ export function usePress<E extends Element>(args: UsePressParameters<E, never>):
     })
 
     const onKeyUp = useStableCallback((e: h.JSX.TargetedKeyboardEvent<E>) => {
-        if (onClickSync && e.key == " " && !excludes("space", exclude))
+        if (onPressSync && e.key == " " && !excludes("space", exclude))
             onActiveStop(e);
     })
 
     const onClick = useStableCallback((e: h.JSX.TargetedMouseEvent<E>) => {
-        if (onClickSync) {
+        if (onPressSync) {
             e.preventDefault();
             if (e.detail > 1) {
                 e.stopImmediatePropagation();
@@ -225,7 +231,7 @@ export function usePress<E extends Element>(args: UsePressParameters<E, never>):
         }
     });
 
-    const onFocusOut = useStableCallback((e: h.JSX.TargetedFocusEvent<E>) => {
+    const onFocusOut = useStableCallback((_e: h.JSX.TargetedFocusEvent<E>) => {
         setActive(0);
     })
 

@@ -1,8 +1,5 @@
 import { useCallback } from "preact/hooks";
-import { ElementSize, useElementSize, UseElementSizeParameters, UseElementSizeReturnType } from "./use-element-size";
-import { returnNull, useEnsureStability, usePassiveState } from "./use-passive-state";
-import { UseRefElementReturnType } from "./use-ref-element";
-import { useStableCallback } from "./use-stable-callback";
+import { ElementSize } from "./use-element-size";
 
 //export type BlockFlowDirection = "downwards" | "leftwards" | "rightwards";
 export type PhysicalDirection = "ltr" | "rtl" | "ttb" | "btt";
@@ -21,8 +18,8 @@ function capitalize<T extends string>(str: T): Capitalize<T> {
     return (str[0].toUpperCase() + str.substring(1)) as Capitalize<T>;
 }
 
-export interface UseLogicalDirectionParameters<E extends Element> extends UseElementSizeParameters<E> {
-    logicalDirectionParameters: { onLogicalDirectionChange: null | ((info: LogicalDirectionInfo | null) => void); }
+export interface UseLogicalDirectionParameters {
+   // logicalDirectionParameters: { onLogicalDirectionChange: null | ((info: LogicalDirectionInfo | null) => void); }
 }
 
 export interface LogicalElementSize {
@@ -56,11 +53,11 @@ export interface LogicalElementSize {
  * * `convertToLogicalOrientation`: Based on the current direction, converts "horizontal" or "vertical" to "inline" or "block".
  * * `convertToPhysicalOrientation`:  Based on the current direction, converts "inline" or "block" to "horizontal" or "vertical".
  */
-export function useLogicalDirection<T extends Element>({ elementSizeParameters: { onSizeChange, ...elementSizeParameters }, refElementParameters: { onElementChange, ...refElementParameters }, logicalDirectionParameters: { onLogicalDirectionChange } }: UseLogicalDirectionParameters<T>): UseLogicalDirectionReturnType<T> {
+export function useLogicalDirection(): UseLogicalDirectionReturnType {
 
-    useEnsureStability("useLogicalDirection", onLogicalDirectionChange);
+//    useEnsureStability("useLogicalDirection", onLogicalDirectionChange);
 
-    const [getComputedStyles, setComputedStyles] = usePassiveState<CSSStyleDeclaration | null>(null, returnNull);
+    //const [getComputedStyles, setComputedStyles] = usePassiveState<CSSStyleDeclaration | null>(null, returnNull);
 
     // TODO: There's no way to refresh which writing mode we have once mounted.
     //   A. There's no way to watch for CSS style changes
@@ -72,7 +69,7 @@ export function useLogicalDirection<T extends Element>({ elementSizeParameters: 
     // and if so, tests if the writing mode has changed too.
     //
     // This will work for at least some number of cases, but a better solution is still needed.
-    const { elementSizeReturn, refElementReturn } = useElementSize<T>({
+    /*const { elementSizeReturn, refElementReturn } = useElementSize<T>({
         elementSizeParameters: {
             onSizeChange: useStableCallback((i: ElementSize) => {
                 onSizeChange?.(i);
@@ -88,10 +85,9 @@ export function useLogicalDirection<T extends Element>({ elementSizeParameters: 
                 }
             })
         }
-    })
+    })*/
 
-    const getLogicalDirectionInfo = useCallback(() => {
-        const computedStyles = getComputedStyles();
+    const getLogicalDirectionInfo = useCallback((computedStyles: CSSStyleDeclaration) => {
         if (computedStyles) {
             const w = computedStyles.writingMode as WritingMode;
             let d = computedStyles.direction as Direction;
@@ -108,15 +104,15 @@ export function useLogicalDirection<T extends Element>({ elementSizeParameters: 
 
     //const [getLogicalDirectionInfo, setLogicalDirectionInfo] = usePassiveState<LogicalDirectionInfo>(onLogicalDirectionChange);
 
-    const convertToLogicalOrientation = useCallback((elementOrientation: PhysicalOrientation, direction?: LogicalDirectionInfo | null | undefined) => {
-        direction ??= getLogicalDirectionInfo();
+    const convertToLogicalOrientation = useCallback((computedStyles: CSSStyleDeclaration, elementOrientation: PhysicalOrientation, direction?: LogicalDirectionInfo | null | undefined) => {
+        direction ??= getLogicalDirectionInfo(computedStyles);
         if (direction?.inlineOrientation === elementOrientation)
             return "inline";
         return "block";
     }, []);
 
-    const convertToPhysicalSide = useCallback((side: "inline-start" | "inline-end" | "block-start" | "block-end", direction?: LogicalDirectionInfo | null | undefined): "top" | "bottom" | "left" | "right" => {
-        direction ??= getLogicalDirectionInfo();
+    const convertToPhysicalSide = useCallback((computedStyles: CSSStyleDeclaration, side: "inline-start" | "inline-end" | "block-start" | "block-end", direction?: LogicalDirectionInfo | null | undefined): "top" | "bottom" | "left" | "right" => {
+        direction ??= getLogicalDirectionInfo(computedStyles);
 
         switch (side) {
             case "block-start":
@@ -131,8 +127,8 @@ export function useLogicalDirection<T extends Element>({ elementSizeParameters: 
         }
     }, [])
 
-    const convertToLogicalSide = useCallback((side: "top" | "bottom" | "left" | "right", direction?: LogicalDirectionInfo | null | undefined): "inline-start" | "inline-end" | "block-start" | "block-end" => {
-        direction ??= getLogicalDirectionInfo();
+    const convertToLogicalSide = useCallback((computedStyles: CSSStyleDeclaration, side: "top" | "bottom" | "left" | "right", direction?: LogicalDirectionInfo | null | undefined): "inline-start" | "inline-end" | "block-start" | "block-end" => {
+        direction ??= getLogicalDirectionInfo(computedStyles);
         if (direction?.inlineOrientation === "vertical") {
             switch (side) {
                 case "top":
@@ -167,8 +163,8 @@ export function useLogicalDirection<T extends Element>({ elementSizeParameters: 
 
     }, [])
 
-    const convertToPhysicalOrientation = useCallback((elementOrientation: LogicalOrientation, direction?: LogicalDirectionInfo | null | undefined) => {
-        direction ??= getLogicalDirectionInfo();
+    const convertToPhysicalOrientation = useCallback((computedStyles: CSSStyleDeclaration, elementOrientation: LogicalOrientation, direction?: LogicalDirectionInfo | null | undefined) => {
+        direction ??= getLogicalDirectionInfo(computedStyles);
         if (elementOrientation == "inline") {
             if (direction?.inlineOrientation == "horizontal")
                 return "horizontal";
@@ -182,8 +178,8 @@ export function useLogicalDirection<T extends Element>({ elementSizeParameters: 
         }
     }, []);
 
-    const convertElementSize = useCallback((elementSize: ElementSize, direction?: LogicalDirectionInfo | null | undefined): LogicalElementSize | null => {
-        direction ??= getLogicalDirectionInfo();
+    const convertElementSize = useCallback((computedStyles: CSSStyleDeclaration, elementSize: ElementSize, direction?: LogicalDirectionInfo | null | undefined): LogicalElementSize | null => {
+        direction ??= getLogicalDirectionInfo(computedStyles);
         if (direction) {
             const { inlineSize, blockSize, inlineDirection, blockDirection } = direction;
 
@@ -238,8 +234,6 @@ export function useLogicalDirection<T extends Element>({ elementSizeParameters: 
     }, []);
 
     return {
-        elementSizeReturn,
-        refElementReturn,
         logicalDirectionReturn: {
             getLogicalDirectionInfo,
             convertToLogicalSize: convertElementSize,
@@ -265,49 +259,49 @@ const M = {
 } as const;
 
 
-export interface UseLogicalDirectionReturnType<T extends Element> extends UseElementSizeReturnType<T>, UseRefElementReturnType<T> {
+export interface UseLogicalDirectionReturnType {
     /** **STABLE** */
     //useLogicalDirectionProps: (props: h.JSX.HTMLAttributes<T>) => h.JSX.HTMLAttributes<T>;
     /** **STABLE** */
     //getElement: () => T | null;
     /** **STABLE** */
     logicalDirectionReturn: {
-        getLogicalDirectionInfo: () => LogicalDirectionInfo | null;
+        getLogicalDirectionInfo: (computedStyles: CSSStyleDeclaration) => LogicalDirectionInfo | null;
 
         /**
          * Given the ElementSize info from useElementSize, converts all those physical properties to their logical counterparts.
          * 
          * **STABLE**
          */
-        convertToLogicalSize: (elementSize: ElementSize, direction?: LogicalDirectionInfo | null | undefined) => LogicalElementSize | null;
+        convertToLogicalSize: (computedStyles: CSSStyleDeclaration, elementSize: ElementSize, direction?: LogicalDirectionInfo | null | undefined) => LogicalElementSize | null;
 
         /**
          * Turns `"horizontal" | "vertical"` into `"inline" | "block"`
          * 
          * **STABLE**
          */
-        convertToLogicalOrientation: (elementOrientation: PhysicalOrientation, direction?: LogicalDirectionInfo | null | undefined) => "inline" | "block";
+        convertToLogicalOrientation: (computedStyles: CSSStyleDeclaration, elementOrientation: PhysicalOrientation, direction?: LogicalDirectionInfo | null | undefined) => "inline" | "block";
 
         /**
          * Turns `"inline" | "block"` into `"horizontal" | "vertical"`
          * 
          * **STABLE**
          */
-        convertToPhysicalOrientation: (elementOrientation: LogicalOrientation, direction?: LogicalDirectionInfo | null | undefined) => "horizontal" | "vertical";
+        convertToPhysicalOrientation: (computedStyles: CSSStyleDeclaration, elementOrientation: LogicalOrientation, direction?: LogicalDirectionInfo | null | undefined) => "horizontal" | "vertical";
 
         /**
          * Turns `"top" | "bottom" | "left" | "right"` into `"block-start" | "block-end" | "inline-start" | "inline-end"`
          * 
          * **STABLE**
          */
-        convertToLogicalSide: (side: "top" | "bottom" | "left" | "right", direction?: LogicalDirectionInfo | null | undefined) => "inline-start" | "inline-end" | "block-start" | "block-end";
+        convertToLogicalSide: (computedStyles: CSSStyleDeclaration, side: "top" | "bottom" | "left" | "right", direction?: LogicalDirectionInfo | null | undefined) => "inline-start" | "inline-end" | "block-start" | "block-end";
 
         /**
          * Turns `"block-start" | "block-end" | "inline-start" | "inline-end"` into `"top" | "bottom" | "left" | "right"`
          * 
          * **STABLE**
          */
-        convertToPhysicalSide: (side: "inline-start" | "inline-end" | "block-start" | "block-end", direction?: LogicalDirectionInfo | null | undefined) => "top" | "bottom" | "left" | "right";
+        convertToPhysicalSide: (computedStyles: CSSStyleDeclaration, side: "inline-start" | "inline-end" | "block-start" | "block-end", direction?: LogicalDirectionInfo | null | undefined) => "top" | "bottom" | "left" | "right";
     }
 }
 

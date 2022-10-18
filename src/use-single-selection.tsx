@@ -1,14 +1,15 @@
 
 import { h } from "preact";
 import { StateUpdater, useCallback, useLayoutEffect, useRef } from "preact/hooks";
-import { useMergedProps } from "./use-merged-props";
+import { returnTrue } from "use-passive-state";
+import { UsePressParameters } from "use-press";
 import { ChildFlagOperations, ManagedChildOmits, ManagedChildren, useChildrenFlag, UseManagedChildParameters } from "./use-child-manager";
-import { usePress, UsePressReturnType } from "./use-press";
+import { useChildrenHaveFocus, UseChildrenHaveFocusChildReturnType } from "./use-children-have-focus";
+//import { usePress, UsePressReturnType } from "./use-press";
+import { UseRefElementParameters, UseRefElementReturnType } from "./use-ref-element";
 import { useStableCallback } from "./use-stable-callback";
 import { useStableGetter } from "./use-stable-getter";
 import { useState } from "./use-state";
-import { UseRefElementParameters, UseRefElementReturnType } from "./use-ref-element";
-import { useChildrenHaveFocus, UseChildrenHaveFocusChildReturnType } from "./use-children-have-focus";
 
 
 
@@ -19,11 +20,11 @@ interface SSP<E extends Element, C, K extends string> {
     setTabbableIndex(tabbableIndex: number, fromUserInteraction: boolean): void;
     children: ManagedChildren<number, C, K | "selected">;
 }
-interface SSCP<E extends Element> {
-    unselectable: boolean;
+interface SSCP<_E extends Element> {
+    //unselectable: boolean;
     selectionMode: "focus" | "activation" | "disabled";
     ariaPropName: `aria-${"pressed" | "selected" | "checked"}` | null;
-    focusSelf(e: E): void;
+    //focusSelf(e: E): void;
     //getElement(): E | null;
 }
 
@@ -38,26 +39,23 @@ export interface UseSingleSelectionParameters<ChildElement extends Element, C, K
 
 export interface UseSingleSelectionChildParameters<E extends Element, C, K extends string, Omits extends SingleSelectionChildOmits, McOmits extends ManagedChildOmits, SubbestInfo>
     extends
-    Omit<UseManagedChildParameters<number, C, K, McOmits, SubbestInfo>, "subInfo"> {
+    Omit<UseManagedChildParameters<number, C, K, McOmits, SubbestInfo>, "subInfo" | "flags"> {
     refElementReturn: Required<Pick<UseRefElementReturnType<E>["refElementReturn"], "getElement">>;
     singleSelectionChildParameters: Omit<SSCP<E>, Omits>;
 }
 
-export interface UseSingleSelectionChildReturnTypeInfo<E extends Element> extends UsePressReturnType<E>, UseChildrenHaveFocusChildReturnType<E> {
+export interface UseSingleSelectionChildReturnTypeInfo<E extends Element> extends UseChildrenHaveFocusChildReturnType<E> {
     singleSelectionChildReturn: {
         selected: boolean,
         getSelected(): boolean;
         propsUnstable: h.JSX.HTMLAttributes<E>;
     }
-    //hasFocusParameters: Required<Pick<UseHasFocusParameters<E>["hasFocusParameters"], "onFocusedInnerChanged" | "onLastFocusedInnerChanged">>;
     refElementParameters: Required<Pick<UseRefElementParameters<E>["refElementParameters"], "onElementChange">>;
+    managedChildParameters: UseManagedChildParameters<number, any, "selected", "index" | "subInfo", unknown>["managedChildParameters"];
+    pressParameters: Pick<UsePressParameters<E, never>["pressParameters"], "onPressSync">;
 }
 
 export interface UseSingleSelectionChildReturnTypeWithHooks<E extends Element> extends UseSingleSelectionChildReturnTypeInfo<E> {
-}
-
-export interface UseSingleSelectionChildReturnTypeWithHooks2<E extends Element> extends UseSingleSelectionChildReturnTypeWithHooks<E> {
-    flags: { selected: ChildFlagOperations }
 }
 
 export interface UseSingleSelectionReturnTypeInfo {
@@ -67,18 +65,18 @@ export interface UseSingleSelectionReturnTypeInfo {
     }
 }
 
-export interface UseSingleSelectionReturnTypeWithHooks<ParentOrChildElement extends Element, ChildElement extends Element, C, K extends string> extends
+export interface UseSingleSelectionReturnTypeWithHooks<ChildElement extends Element, C, K extends string> extends
     UseSingleSelectionReturnTypeInfo {
     /** **STABLE** */
     useSingleSelectionChild: UseSingleSelectionChild<ChildElement, C, K | "selected">;
 }
 
 
-export type UseSingleSelectionChild<E extends Element, C, K extends string> = (a: UseSingleSelectionChildParameters<E, C, K, never, never, C>) => UseSingleSelectionChildReturnTypeWithHooks2<E>;
+export type UseSingleSelectionChild<E extends Element, C, K extends string> = (a: UseSingleSelectionChildParameters<E, C, K, never, never, C>) => UseSingleSelectionChildReturnTypeWithHooks<E>;
 
-export function useSingleSelection<ParentOrChildElement extends Element, ChildElement extends Element, C, K extends string>({
+export function useSingleSelection<ChildElement extends Element, C, K extends string>({
     singleSelectionParameters: { selectedIndex, setSelectedIndex, children, setTabbableIndex }
-}: UseSingleSelectionParameters<ChildElement, C, K, never>): UseSingleSelectionReturnTypeWithHooks<ParentOrChildElement, ChildElement, C, K> {
+}: UseSingleSelectionParameters<ChildElement, C, K, never>): UseSingleSelectionReturnTypeWithHooks<ChildElement, C, K> {
 
     const { useChildrenHaveFocusChild } = useChildrenHaveFocus({
         childrenHaveFocusParameters: {
@@ -112,27 +110,27 @@ export function useSingleSelection<ParentOrChildElement extends Element, ChildEl
             getSelectedIndex,
             changeSelectedIndex
         },
-        useSingleSelectionChild: useCallback<UseSingleSelectionChild<ChildElement, C, K | "selected">>((args): UseSingleSelectionChildReturnTypeWithHooks2<ChildElement> => {
+        useSingleSelectionChild: useCallback<UseSingleSelectionChild<ChildElement, C, K | "selected">>((args): UseSingleSelectionChildReturnTypeWithHooks<ChildElement> => {
             const {
-                managedChildParameters: { flags, index },
+                managedChildParameters: { index },
                 refElementReturn,
-                singleSelectionChildParameters: { selectionMode, unselectable, ariaPropName, focusSelf },
+                singleSelectionChildParameters: { selectionMode, ariaPropName },
             } = args;
             const { getElement } = refElementReturn;
             const [isSelected, setIsSelected, getIsSelected] = useState(getSelectedIndex() == index);
-            const selectedRef = useRef<ChildFlagOperations>({ get: getIsSelected, set: setIsSelected, isValid: useStableCallback(() => !unselectable) });
-            const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: olfic2 }, refElementParameters: { onElementChange } } = useChildrenHaveFocusChild({});
+            const selectedRef = useRef<ChildFlagOperations>({ get: getIsSelected, set: setIsSelected, isValid: returnTrue });
+            const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: olfic2 }, refElementParameters: { onElementChange } } = useChildrenHaveFocusChild();
 
             const getIndex = useStableGetter(index);
 
-            const { pressReturn } = usePress<ChildElement>({
+           /* const { pressReturn } = usePress<ChildElement>({
                 refElementReturn,
                 pressParameters: {
                     onClickSync: unselectable ? null : ((e) => { stableOnChange(getIndex(), e); }),
                     exclude: {},
                     focusSelf,
                 },
-            });
+            });*/
 
             return {
                 singleSelectionChildReturn: {
@@ -140,13 +138,12 @@ export function useSingleSelection<ParentOrChildElement extends Element, ChildEl
                     getSelected: getIsSelected,
                     propsUnstable: { [ariaPropName as keyof h.JSX.HTMLAttributes<any>]: (isSelected ?? false).toString() }
                 },
-                pressReturn,
-                flags: { ...flags, selected: selectedRef.current },
+                managedChildParameters: { flags: { selected: selectedRef.current } },
+                pressParameters: { onPressSync: ((e) => { stableOnChange(getIndex(), e); }) },
                 hasCurrentFocusParameters: {
                     onCurrentFocusedInnerChanged: useStableCallback((focused: boolean, prev: boolean | undefined) => {
                         olfic2?.(focused, prev);
                         if (selectionMode == 'focus' && focused) {
-                            debugger;
                             stableOnChange(getIndex(), { target: getElement()!, currentTarget: getElement()! });
                         }
                     }),

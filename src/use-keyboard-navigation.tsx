@@ -1,6 +1,6 @@
 import { h } from "preact";
 import { useCallback, useEffect, useLayoutEffect, useRef } from "preact/hooks";
-import { useMergedProps } from "./use-merged-props";
+import { UseRovingTabIndexReturnTypeInfo } from "use-roving-tabindex";
 import { useStableCallback } from "./use-stable-callback";
 import { useStableGetter } from "./use-stable-getter";
 import { useState } from "./use-state";
@@ -16,10 +16,10 @@ export interface UseLinearNavigationReturnTypeWithHooks<ParentOrChildElement ext
 }
 
 interface LNP {
-    navigateToNext(): void;
-    navigateToPrev(): void;
-    navigateToFirst(): void;
-    navigateToLast(): void;
+    navigateRelative(offset: number, fromUserInteraction: boolean): void;
+    navigateAbsolute(index: number, fromUserInteraction: boolean): void;
+    getHighestIndex(): number;  // [0, n], not [0, n)
+
     /**
      * Controls which arrow keys are used to navigate through the component.
      * Not relative to the writing mode -- these are the literal keys that need to be pressed.
@@ -28,21 +28,21 @@ interface LNP {
      * 
      * Use "none" to disallow navigation with the arrow keys in any direction.
      */
-    navigationDirection?: "horizontal" | "vertical" | "either" | "none";
+    navigationDirection: "horizontal" | "vertical" | "either" | "none";
 
     /**
      * If set to true, navigation with the arrow keys will be 
      * disabled, but navigation with the home & end keys will
      * be unaffected.
      */
-    disableArrowKeys?: boolean;
+    disableArrowKeys: boolean;
 
     /**
      * If set to true, navigation with the home & end keys will
      * be disabled, but navigation with the arrow keys will be
      * unaffected.
      */
-    disableHomeEndKeys?: boolean;
+    disableHomeEndKeys: boolean;
 }
 export type LinearNavigationOmits = keyof LNP;
 
@@ -61,16 +61,12 @@ export interface UseLinearNavigationParameters<Omits extends LinearNavigationOmi
  * 
  * @see useListNavigation, which packages everything up together.
  */
-export function useLinearNavigation<ParentOrChildElement extends Element>({ linearNavigationParameters: { navigateToFirst: ntf, navigateToLast: ntl, navigateToNext: ntn, navigateToPrev: ntp, navigationDirection: nd, disableArrowKeys: dak, disableHomeEndKeys: dhek } }: UseLinearNavigationParameters<never>): UseLinearNavigationReturnTypeWithHooks<ParentOrChildElement> {
+export function useLinearNavigation<ParentOrChildElement extends Element>({ linearNavigationParameters: { getHighestIndex, navigateAbsolute, navigateRelative, navigationDirection: nd, disableArrowKeys: dak, disableHomeEndKeys: dhek } }: UseLinearNavigationParameters<never>): UseLinearNavigationReturnTypeWithHooks<ParentOrChildElement> {
 
-    nd ??= "either";
-
-    //const { getLogicalDirectionInfo, useLogicalDirectionProps } = useLogicalDirection<ParentOrChildElement>({});
-
-    const navigateToFirst = useStableCallback(ntf);
-    const navigateToLast = useStableCallback(ntl);
-    const navigateToNext = useStableCallback(ntn);
-    const navigateToPrev = useStableCallback(ntp);
+    const navigateToFirst = useStableCallback((fromUserInteraction: boolean) => { navigateAbsolute(0, fromUserInteraction); });
+    const navigateToLast = useStableCallback((fromUserInteraction: boolean) => { navigateAbsolute(getHighestIndex(), fromUserInteraction); });
+    const navigateToNext = useStableCallback((fromUserInteraction: boolean) => navigateRelative(+1, fromUserInteraction));
+    const navigateToPrev = useStableCallback((fromUserInteraction: boolean) => navigateRelative(-1, fromUserInteraction));
     const getDisableArrowKeys = useStableGetter(dak);
     const getDisableHomeEndKeys = useStableGetter(dhek);
     const getNavigationDirection = useStableGetter(nd);
@@ -95,7 +91,7 @@ export function useLinearNavigation<ParentOrChildElement extends Element>({ line
                     //const propName = (info?.blockOrientation === "vertical" ? "blockDirection" : "inlineDirection");
                     const directionAllowed = (!disableArrowKeys && allowsVerticalNavigation);
                     if (directionAllowed) {
-                        navigateToPrev();
+                        navigateToPrev(true);
                         e.preventDefault();
                         e.stopPropagation();
                     }
@@ -104,7 +100,7 @@ export function useLinearNavigation<ParentOrChildElement extends Element>({ line
                 case "ArrowDown": {
                     const directionAllowed = (!disableArrowKeys && allowsVerticalNavigation);
                     if (directionAllowed) {
-                        navigateToNext();
+                        navigateToNext(true);
                         e.preventDefault();
                         e.stopPropagation();
                     }
@@ -114,7 +110,7 @@ export function useLinearNavigation<ParentOrChildElement extends Element>({ line
                 case "ArrowLeft": {
                     const directionAllowed = (!disableArrowKeys && allowsHorizontalNavigation);
                     if (directionAllowed) {
-                        navigateToPrev();
+                        navigateToPrev(true);
                         e.preventDefault();
                         e.stopPropagation();
                     }
@@ -123,7 +119,7 @@ export function useLinearNavigation<ParentOrChildElement extends Element>({ line
                 case "ArrowRight": {
                     const directionAllowed = (!disableArrowKeys && allowsHorizontalNavigation);
                     if (directionAllowed) {
-                        navigateToNext();
+                        navigateToNext(true);
                         e.preventDefault();
                         e.stopPropagation();
                     }
@@ -133,7 +129,7 @@ export function useLinearNavigation<ParentOrChildElement extends Element>({ line
                 }
                 case "Home":
                     if (!disableHomeEndKeys) {
-                        navigateToFirst();
+                        navigateToFirst(true);
                         e.preventDefault();
                         e.stopPropagation();
                     }
@@ -141,7 +137,7 @@ export function useLinearNavigation<ParentOrChildElement extends Element>({ line
 
                 case "End":
                     if (!disableHomeEndKeys) {
-                        navigateToLast();
+                        navigateToLast(true);
                         e.preventDefault();
                         e.stopPropagation();
                     }
@@ -185,14 +181,15 @@ interface TNP {
     noTypeahead?: boolean;
 
     typeaheadTimeout?: number;
-    getIndex(): number | null;
-    setIndex(value: number | null | ((previousValue: number | null) => (number | null))): void;
+    //getTabbableIndex(): number | null;
+    //setTabbableIndex(value: number | null | ((previousValue: number | null) => (number | null))): void;
 }
 
 export type TypeaheadNavigationOmits = keyof TNP;
 
 export interface UseTypeaheadNavigationParameters<Omits extends TypeaheadNavigationOmits> {
-    typeaheadNavigationParameters: Omit<TNP, Omits>
+    typeaheadNavigationParameters: Omit<TNP, Omits>;
+    rovingTabIndexReturn: Pick<UseRovingTabIndexReturnTypeInfo<any, never>["rovingTabIndexReturn"], "getTabbableIndex" | "setTabbableIndex">
 }
 
 /** Arguments passed to the child 'useTypeaheadNavigationChild` */
@@ -217,7 +214,7 @@ export type UseTypeaheadNavigationChild = (args: UseTypeaheadNavigationChildPara
  * 
  * @see useListNavigation, which packages everything up together.
  */
-export function useTypeaheadNavigation<ParentOrChildElement extends Element>({ typeaheadNavigationParameters: { collator, getIndex, typeaheadTimeout, setIndex, noTypeahead } }: UseTypeaheadNavigationParameters<never>): UseTypeaheadNavigationReturnTypeWithHooks<ParentOrChildElement> {
+export function useTypeaheadNavigation<ParentOrChildElement extends Element>({ typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead }, rovingTabIndexReturn: { getTabbableIndex: getIndex, setTabbableIndex: setIndex } }: UseTypeaheadNavigationParameters<never>): UseTypeaheadNavigationReturnTypeWithHooks<ParentOrChildElement> {
 
 
     // For typeahead, keep track of what our current "search" string is (if we have one)
@@ -414,9 +411,9 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element>({ t
                 }
 
                 if (lowestUnsortedIndexNext !== null)
-                    setIndex(sortedTypeaheadInfo.current[lowestSortedIndexNext].unsortedIndex);
+                    setIndex(sortedTypeaheadInfo.current[lowestSortedIndexNext].unsortedIndex, true);
                 else if (lowestUnsortedIndexAll !== null)
-                    setIndex(sortedTypeaheadInfo.current[lowestSortedIndexAll].unsortedIndex);
+                    setIndex(sortedTypeaheadInfo.current[lowestSortedIndexAll].unsortedIndex, true);
             }
         }
     }, [currentTypeahead]);
