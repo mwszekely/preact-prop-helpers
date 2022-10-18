@@ -10,7 +10,9 @@ export { generateRandomId }
 
 interface RIRP<R extends Element> { referencerProp: null | (keyof h.JSX.HTMLAttributes<R>) }
 
-export interface UseRandomIdReferencerElementParameters<R extends Element, RIRPOmits extends keyof RIRP<any>> {
+export type UseRandomIdReferencerElementParametersOmits = keyof RIRP<any>;
+
+export interface UseRandomIdReferencerElementParameters<R extends Element, RIRPOmits extends UseRandomIdReferencerElementParametersOmits> {
     randomIdReferencerParameters: Omit<RIRP<R>, RIRPOmits>;
 }
 
@@ -48,7 +50,7 @@ export interface UseRandomIdReturnTypeWithHooks<S extends Element> extends UseRa
     randomIdReturn: { id: string; };
 }
 
-export interface RIP {
+interface RIP {
     /**
      * While all IDs are unique, this can be used to more easily differentiate them.
      * MUST REMAIN STABLE
@@ -57,7 +59,9 @@ export interface RIP {
     prefix: string;
 }
 
-export interface UseRandomIdParameters<RIPOmits extends keyof RIP> {
+export type UseRandomIdParametersOmits = keyof RIP;
+
+export interface UseRandomIdParameters<RIPOmits extends UseRandomIdParametersOmits> {
     randomIdParameters: Omit<RIP, RIPOmits>;
 }
 
