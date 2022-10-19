@@ -1,8 +1,10 @@
 import { useCallback, useLayoutEffect, useRef } from "preact/hooks";
 import { options } from "preact"
 
-export type PassiveStateUpdater<S> = (value: S | ((prevState: S | undefined) => S)) => void;
-export type OnPassiveStateChange<T> = ((value: T, prevValue: T | undefined) => (void | (() => void)));
+/** Takes a new value or a function that updates a value, unlike `OnPassiveStateChange` which reacts to those updates */
+export type PassiveStateUpdater<S>  = ((value: S | ((prevState: S | undefined) => S)) => void);
+/** Responds to a change in a value, unlike `PassiveStateUpdater` which causes the updates */
+export type OnPassiveStateChange<S> = ((value: S, prevValue: S | undefined) => (void | (() => void)));
 
 /**
  * Debug hook.
@@ -60,6 +62,7 @@ export function usePassiveState<T>(onChange: undefined | null | OnPassiveStateCh
 
     const valueRef = useRef<T | typeof Unset>(Unset);
     const warningRef = useRef(false);
+    const dependencyToCompareAgainst = useRef<T | (typeof Unset)>(Unset);
     const cleanupCallbackRef = useRef<undefined | (() => void)>(undefined);
 
     // Make sure that the provided functions are perfectly stable across renders
@@ -112,20 +115,19 @@ export function usePassiveState<T>(onChange: undefined | null | OnPassiveStateCh
     }, []);
 
     // The actual code the user calls to (possibly) run a new effect.
-    const r = useRef({ prevDep: Unset as T | (typeof Unset) });
     const setValue = useCallback<PassiveStateUpdater<T>>((arg) => {
 
         // Regardless of anything else, figure out what our next value is about to be.
         const nextValue = (arg instanceof Function ? arg(valueRef.current === Unset ? undefined : valueRef.current) : arg);
 
 
-        if (r.current.prevDep === Unset && nextValue !== valueRef.current) {
+        if (dependencyToCompareAgainst.current === Unset && nextValue !== valueRef.current) {
             // This is the first request to change this value.
             // Evaluate the request immediately, then queue up the onChange function
 
             // Save our current value so that we can compare against it later
             // (if we flip back to this state, then we won't send the onChange function)
-            r.current.prevDep = valueRef.current;
+            dependencyToCompareAgainst.current = valueRef.current;
 
             // It's important to update this here (as well as below) in case customDebounceRendering invokes this immediately
             valueRef.current = nextValue;
@@ -133,8 +135,8 @@ export function usePassiveState<T>(onChange: undefined | null | OnPassiveStateCh
             // Schedule the actual check and invocation of onChange later to let effects settle
             (customDebounceRendering ?? debounceRendering)(() => {
                 const nextDep = valueRef.current! as T;
-                const prevDep = r.current.prevDep ;
-                if (r.current.prevDep != valueRef.current) {
+                const prevDep = dependencyToCompareAgainst.current ;
+                if (dependencyToCompareAgainst.current != valueRef.current) {
                     warningRef.current = true;
 
                     try {
@@ -151,7 +153,7 @@ export function usePassiveState<T>(onChange: undefined | null | OnPassiveStateCh
                 }
 
                 // We've finished with everything, so mark us as being on a clean slate again.
-                r.current.prevDep = Unset;
+                dependencyToCompareAgainst.current = Unset;
 
             });
         }

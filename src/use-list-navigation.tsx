@@ -1,11 +1,8 @@
-import { useCallback, useEffect } from "preact/hooks";
-import { tryNavigateToIndex } from "use-sortable-children";
-import { ManagedChildOmits, ManagedChildren, ManagedChildrenOmits, OnChildrenMountChange } from "./use-child-manager";
+import { useCallback } from "preact/hooks";
+import { ManagedChildOmits } from "./use-child-manager";
 import { UseHasCurrentFocusParameters } from "./use-has-current-focus";
 import { LinearNavigationOmits, TypeaheadNavigationOmits, useLinearNavigation, UseLinearNavigationParameters, UseLinearNavigationReturnTypeInfo, useTypeaheadNavigation, UseTypeaheadNavigationParameters, UseTypeaheadNavigationReturnTypeInfo } from "./use-keyboard-navigation";
-import { useEnsureStability } from "./use-passive-state";
-import { RovingTabIndexChildOmits, RovingTabIndexParametersOmits, useRovingTabIndex, UseRovingTabIndexChildParameters, UseRovingTabIndexChildReturnTypeInfo, UseRovingTabIndexParameters, UseRovingTabIndexReturnTypeInfo, UseRovingTabIndexSubInfo } from "./use-roving-tabindex";
-import { useStableGetter } from "./use-stable-getter";
+import { UseRovingTabIndexChildParameters, UseRovingTabIndexChildReturnTypeInfo, UseRovingTabIndexReturnTypeInfo } from "./use-roving-tabindex";
 
 
 /**
@@ -45,7 +42,7 @@ import { useStableGetter } from "./use-stable-getter";
 const _dummy: any = null;
 
 
-function identity<T>(t: T) { return t; }
+//function identity<T>(t: T) { return t; }
 type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 
 
@@ -100,15 +97,15 @@ export interface UseListNavigationParameters<LsOmits extends ListNavigationParam
 
 
 export type ListNavigationChildOmits = keyof UseListNavigationSubInfo<any>;
-export interface UseListNavigationChildParameters<ChildElement extends Element, LsSubInfo, ExtraFlagKeys extends string, LsOmits extends ListNavigationChildOmits, RtiOmits extends RovingTabIndexChildOmits, McOmits extends ManagedChildOmits, SubbestInfo> extends
-    UseRovingTabIndexChildParameters<ChildElement, UseListNavigationSubInfo<LsSubInfo>, ExtraFlagKeys, RtiOmits, McOmits, SubbestInfo> {
+export interface UseListNavigationChildParameters<ChildElement extends Element, LsSubInfo, _ExtraFlagKeys extends string, LsOmits extends ListNavigationChildOmits, RtiOmits extends RovingTabIndexChildOmits, _McOmits extends ManagedChildOmits, SubbestInfo> extends
+    UseRovingTabIndexChildParameters<ChildElement, RtiOmits> {
     //rovingTabIndex: Omit<UseRovingTabIndexChildParameters<UseListNavigationSubInfo<LsSubInfo>, ExtraFlagKeys, never>["rovingTabIndex"], "subInfo">;
     listNavigationChildParameters: Omit<UseListNavigationSubInfo<LsSubInfo>, LsOmits | "subInfo">;
 }
 
 
-export interface UseListNavigationReturnTypeInfo<ParentOrChildElement extends Element, ChildElement extends Element, LsSubInfo, ExtraFlagKeys extends string> extends
-    UseRovingTabIndexReturnTypeInfo<UseRovingTabIndexSubInfo<ChildElement, UseListNavigationSubInfo<LsSubInfo>>, "tabbable" | ExtraFlagKeys>,
+export interface UseListNavigationReturnTypeInfo<ParentOrChildElement extends Element, _ChildElement extends Element, _LsSubInfo, _ExtraFlagKeys extends string> extends
+    UseRovingTabIndexReturnTypeInfo,
     UseTypeaheadNavigationReturnTypeInfo<ParentOrChildElement>,
     UseLinearNavigationReturnTypeInfo<ParentOrChildElement> {
     listNavigationReturn: {
@@ -146,11 +143,8 @@ export type UseListNavigationChild<ChildElement extends Element, LsSubInfo, K ex
 export function useListNavigation<ParentOrChildElement extends Element, ChildElement extends Element, LsSubInfo, ExtraFlagKeys extends string>({
     linearNavigationParameters,
     typeaheadNavigationParameters,
-    listNavigationParameters,
-    managedChildrenParameters,
-    rovingTabIndexParameters,
     rovingTabIndexReturn
-}: UseListNavigationParameters<never, never, never, never, never>): UseListNavigationReturnTypeWithHooks<ParentOrChildElement, ChildElement, LsSubInfo, ExtraFlagKeys> {
+}: UseListNavigationParameters<never, never, never>): UseListNavigationReturnTypeWithHooks<ParentOrChildElement, ChildElement, LsSubInfo, ExtraFlagKeys> {
 
     const {
         useTypeaheadNavigationChild,
@@ -172,32 +166,11 @@ export function useListNavigation<ParentOrChildElement extends Element, ChildEle
     const useListNavigationChild = useCallback<UseListNavigationChild<ChildElement, LsSubInfo, ExtraFlagKeys>>((args: UseListNavigationChildParameters<ChildElement, LsSubInfo, ExtraFlagKeys, never, never, never, LsSubInfo>): UseListNavigationChildReturnTypeWithHooks<ChildElement> => {
 
         const {
-            managedChildParameters: { index, flags },
-            rovingTabIndexChildParameters: { focusSelf, hidden, noModifyTabIndex },
-            listNavigationChildParameters: { text },
-            refElementReturn,
-            subInfo
+            listNavigationChildParameters,
+            rovingTabIndexParameters
         } = args;
         
         const _v: void = useTypeaheadNavigationChild({ text, index });
-       // const getIndex = useStableGetter(index);
-        /*useEffect(() => {
-
-            return () => {
-                if (getTabbableIndex() == getIndex()) {
-                    navigateToIndex(index, false);
-                }
-            };
-        }, []);*/
-
-        const { 
-            rovingTabIndexChildReturn, 
-            hasCurrentFocusParameters, } = useRovingTabIndexChild({
-            managedChildParameters: { index, flags },
-            refElementReturn,
-            rovingTabIndexChildParameters: { focusSelf, hidden: !!hidden, noModifyTabIndex },
-            subInfo: { text, subInfo }
-        });
 
         return {
             hasCurrentFocusParameters,

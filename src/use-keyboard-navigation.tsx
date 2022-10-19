@@ -1,6 +1,6 @@
 import { h } from "preact";
 import { useCallback, useEffect, useLayoutEffect, useRef } from "preact/hooks";
-import { UseRovingTabIndexReturnTypeInfo } from "use-roving-tabindex";
+import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnTypeInfo } from "use-roving-tabindex";
 import { useStableCallback } from "./use-stable-callback";
 import { useStableGetter } from "./use-stable-getter";
 import { useState } from "./use-state";
@@ -187,9 +187,9 @@ interface TNP {
 
 export type TypeaheadNavigationOmits = keyof TNP;
 
-export interface UseTypeaheadNavigationParameters<Omits extends TypeaheadNavigationOmits> {
+export interface UseTypeaheadNavigationParameters<E extends Element, M extends UseRovingTabIndexChildInfo<E>, Omits extends TypeaheadNavigationOmits> {
     typeaheadNavigationParameters: Omit<TNP, Omits>;
-    rovingTabIndexReturn: Pick<UseRovingTabIndexReturnTypeInfo<any, never>["rovingTabIndexReturn"], "getTabbableIndex" | "setTabbableIndex">
+    rovingTabIndexReturn: Pick<UseRovingTabIndexReturnTypeInfo<E, M>["rovingTabIndexReturn"], "getTabbableIndex" | "setTabbableIndex">
 }
 
 /** Arguments passed to the child 'useTypeaheadNavigationChild` */
@@ -214,7 +214,7 @@ export type UseTypeaheadNavigationChild = (args: UseTypeaheadNavigationChildPara
  * 
  * @see useListNavigation, which packages everything up together.
  */
-export function useTypeaheadNavigation<ParentOrChildElement extends Element>({ typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead }, rovingTabIndexReturn: { getTabbableIndex: getIndex, setTabbableIndex: setIndex } }: UseTypeaheadNavigationParameters<never>): UseTypeaheadNavigationReturnTypeWithHooks<ParentOrChildElement> {
+export function useTypeaheadNavigation<ParentOrChildElement extends Element, M extends UseRovingTabIndexChildInfo<ParentOrChildElement>>({ typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead }, rovingTabIndexReturn: { getTabbableIndex: getIndex, setTabbableIndex: setIndex } }: UseTypeaheadNavigationParameters<ParentOrChildElement, M, never>): UseTypeaheadNavigationReturnTypeWithHooks<ParentOrChildElement> {
 
 
     // For typeahead, keep track of what our current "search" string is (if we have one)
