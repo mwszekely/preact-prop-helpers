@@ -1,8 +1,9 @@
 import { h } from "preact";
 import { useCallback, useEffect, useLayoutEffect, useRef } from "preact/hooks";
-import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnTypeInfo } from "use-roving-tabindex";
+import { assertEmptyObject, UseManagedChildParameters } from "./use-child-manager";
+import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnTypeInfo } from "./use-roving-tabindex";
 import { useStableCallback } from "./use-stable-callback";
-import { useStableGetter } from "./use-stable-getter";
+import { Stable, useStableGetter, useStableObject } from "./use-stable-getter";
 import { useState } from "./use-state";
 import { useTimeout } from "./use-timeout";
 
@@ -15,40 +16,39 @@ export interface UseLinearNavigationReturnTypeInfo<ParentOrChildElement extends 
 export interface UseLinearNavigationReturnTypeWithHooks<ParentOrChildElement extends Element> extends UseLinearNavigationReturnTypeInfo<ParentOrChildElement> {
 }
 
-interface LNP {
-    navigateRelative(offset: number, fromUserInteraction: boolean): void;
-    navigateAbsolute(index: number, fromUserInteraction: boolean): void;
-    getHighestIndex(): number;  // [0, n], not [0, n)
-
-    /**
-     * Controls which arrow keys are used to navigate through the component.
-     * Not relative to the writing mode -- these are the literal keys that need to be pressed.
-     * 
-     * Use "either" to allow navigation in either direction.
-     * 
-     * Use "none" to disallow navigation with the arrow keys in any direction.
-     */
-    navigationDirection: "horizontal" | "vertical" | "either" | "none";
-
-    /**
-     * If set to true, navigation with the arrow keys will be 
-     * disabled, but navigation with the home & end keys will
-     * be unaffected.
-     */
-    disableArrowKeys: boolean;
-
-    /**
-     * If set to true, navigation with the home & end keys will
-     * be disabled, but navigation with the arrow keys will be
-     * unaffected.
-     */
-    disableHomeEndKeys: boolean;
-}
-export type LinearNavigationOmits = keyof LNP;
 
 /** Arguments passed to the parent `useLinearNavigation` */
-export interface UseLinearNavigationParameters<Omits extends LinearNavigationOmits> {
-    linearNavigationParameters: Omit<LNP, Omits>
+export interface UseLinearNavigationParameters {
+    rovingTabIndexReturn: Pick<UseRovingTabIndexReturnTypeInfo<any>["rovingTabIndexReturn"], "getTabbableIndex">
+    linearNavigationParameters: {
+        navigateRelative(original: number, offset: number, fromUserInteraction: boolean): void;
+        navigateAbsolute(index: number, fromUserInteraction: boolean): void;
+        getHighestIndex(): number;  // [0, n], not [0, n)
+
+        /**
+         * Controls which arrow keys are used to navigate through the component.
+         * Not relative to the writing mode -- these are the literal keys that need to be pressed.
+         * 
+         * Use "either" to allow navigation in either direction.
+         * 
+         * Use "none" to disallow navigation with the arrow keys in any direction.
+         */
+        navigationDirection: "horizontal" | "vertical" | "either" | "none";
+
+        /**
+         * If set to true, navigation with the arrow keys will be 
+         * disabled, but navigation with the home & end keys will
+         * be unaffected.
+         */
+        disableArrowKeys: boolean;
+
+        /**
+         * If set to true, navigation with the home & end keys will
+         * be disabled, but navigation with the arrow keys will be
+         * unaffected.
+         */
+        disableHomeEndKeys: boolean;
+    }
 }
 
 
@@ -61,12 +61,18 @@ export interface UseLinearNavigationParameters<Omits extends LinearNavigationOmi
  * 
  * @see useListNavigation, which packages everything up together.
  */
-export function useLinearNavigation<ParentOrChildElement extends Element>({ linearNavigationParameters: { getHighestIndex, navigateAbsolute, navigateRelative, navigationDirection: nd, disableArrowKeys: dak, disableHomeEndKeys: dhek } }: UseLinearNavigationParameters<never>): UseLinearNavigationReturnTypeWithHooks<ParentOrChildElement> {
+export function useLinearNavigation<ParentOrChildElement extends Element>({
+    rovingTabIndexReturn,
+    linearNavigationParameters: { getHighestIndex, navigateAbsolute, navigateRelative, navigationDirection: nd, disableArrowKeys: dak, disableHomeEndKeys: dhek, ..._void1 }
+}: UseLinearNavigationParameters): UseLinearNavigationReturnTypeWithHooks<ParentOrChildElement> {
+    assertEmptyObject(_void1);
+
+    const { getTabbableIndex } = rovingTabIndexReturn;
 
     const navigateToFirst = useStableCallback((fromUserInteraction: boolean) => { navigateAbsolute(0, fromUserInteraction); });
     const navigateToLast = useStableCallback((fromUserInteraction: boolean) => { navigateAbsolute(getHighestIndex(), fromUserInteraction); });
-    const navigateToNext = useStableCallback((fromUserInteraction: boolean) => navigateRelative(+1, fromUserInteraction));
-    const navigateToPrev = useStableCallback((fromUserInteraction: boolean) => navigateRelative(-1, fromUserInteraction));
+    const navigateToNext = useStableCallback((fromUserInteraction: boolean) => navigateRelative((getTabbableIndex() ?? 0), +1, fromUserInteraction));
+    const navigateToPrev = useStableCallback((fromUserInteraction: boolean) => navigateRelative((getTabbableIndex() ?? 0), -1, fromUserInteraction));
     const getDisableArrowKeys = useStableGetter(dak);
     const getDisableHomeEndKeys = useStableGetter(dhek);
     const getNavigationDirection = useStableGetter(nd);
@@ -163,50 +169,54 @@ export interface UseTypeaheadNavigationReturnTypeInfo<ParentOrChildElement exten
         invalidTypeahead: boolean | null;
         propsStable: h.JSX.HTMLAttributes<ParentOrChildElement>;
     }
+    typeaheadNavigationChildParameters: Stable<Pick<UseTypeaheadNavigationChildParameters<ParentOrChildElement>["typeaheadNavigationChildParameters"], "_private">>;
 }
 
 
 
 export interface UseTypeaheadNavigationReturnTypeWithHooks<ParentOrChildElement extends Element> extends UseTypeaheadNavigationReturnTypeInfo<ParentOrChildElement> {
-    /** **STABLE** */
-    useTypeaheadNavigationChild: UseTypeaheadNavigationChild;
+
 }
 
-interface TNP {
-    /**
-     * A collator to use when comparing. If not provided, simply uses `localeCompare` after transforming each to lowercase, which will, at best, work okay in English.
-     */
-    collator?: Intl.Collator;
+export interface UseTypeaheadNavigationParameters<TabbableChildElement extends Element> {
+    typeaheadNavigationParameters: {
+        /**
+         * A collator to use when comparing. If not provided, simply uses `localeCompare` after transforming each to lowercase, which will, at best, work okay in English.
+         */
+        collator: null | Intl.Collator;
 
-    noTypeahead?: boolean;
+        noTypeahead: boolean;
 
-    typeaheadTimeout?: number;
-    //getTabbableIndex(): number | null;
-    //setTabbableIndex(value: number | null | ((previousValue: number | null) => (number | null))): void;
-}
+        typeaheadTimeout: number;
+    };
 
-export type TypeaheadNavigationOmits = keyof TNP;
-
-export interface UseTypeaheadNavigationParameters<E extends Element, M extends UseRovingTabIndexChildInfo<E>, Omits extends TypeaheadNavigationOmits> {
-    typeaheadNavigationParameters: Omit<TNP, Omits>;
-    rovingTabIndexReturn: Pick<UseRovingTabIndexReturnTypeInfo<E, M>["rovingTabIndexReturn"], "getTabbableIndex" | "setTabbableIndex">
+    rovingTabIndexReturn: Pick<UseRovingTabIndexReturnTypeInfo<TabbableChildElement>["rovingTabIndexReturn"], "getTabbableIndex" | "setTabbableIndex">
 }
 
 /** Arguments passed to the child 'useTypeaheadNavigationChild` */
 
 
-export interface UseTypeaheadNavigationChildParameters {
-    /**
-     * If provided, allows this component to be navigated to by typing this string. 
-     * It should be the same text content as whatever's displayed, ideally.
-     */
-    text: string | null;
+export interface UseTypeaheadNavigationChildParameters<ChildElement extends Element> {
+    managedChildParameters: Pick<UseManagedChildParameters<UseRovingTabIndexChildInfo<ChildElement>>["managedChildParameters"], "index">;
 
-    index: number;
+    typeaheadNavigationChildParameters: {
+        /**
+         * If provided, allows this component to be navigated to by typing this string. 
+         * It should be the same text content as whatever's displayed, ideally.
+         */
+        text: string | null;
+
+        _private: {
+            sortedTypeaheadInfo: Array<TypeaheadInfo>;
+            insertingComparator: (lhs: string, rhs: TypeaheadInfo) => number;
+        }
+    }
 }
 
+interface TypeaheadInfo { text: string; unsortedIndex: number; }
+
 /** Type of the child's sub-hook */
-export type UseTypeaheadNavigationChild = (args: UseTypeaheadNavigationChildParameters) => void;
+export type UseTypeaheadNavigationChild<ChildElement extends Element> = (args: UseTypeaheadNavigationChildParameters<ChildElement>) => void;
 
 
 /**
@@ -214,8 +224,15 @@ export type UseTypeaheadNavigationChild = (args: UseTypeaheadNavigationChildPara
  * 
  * @see useListNavigation, which packages everything up together.
  */
-export function useTypeaheadNavigation<ParentOrChildElement extends Element, M extends UseRovingTabIndexChildInfo<ParentOrChildElement>>({ typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead }, rovingTabIndexReturn: { getTabbableIndex: getIndex, setTabbableIndex: setIndex } }: UseTypeaheadNavigationParameters<ParentOrChildElement, M, never>): UseTypeaheadNavigationReturnTypeWithHooks<ParentOrChildElement> {
+export function useTypeaheadNavigation<ParentOrChildElement extends Element, ChildElement extends Element>({
+    typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead, ..._void3 },
+    rovingTabIndexReturn: { getTabbableIndex: getIndex, setTabbableIndex: setIndex, ..._void1 },
+    ..._void2
+}: UseTypeaheadNavigationParameters<ChildElement>): UseTypeaheadNavigationReturnTypeWithHooks<ParentOrChildElement> {
 
+    assertEmptyObject(_void1);
+    assertEmptyObject(_void2);
+    assertEmptyObject(_void3);
 
     // For typeahead, keep track of what our current "search" string is (if we have one)
     // and also clear it every 1000 ms since the last time it changed.
@@ -258,7 +275,7 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, M e
         return compare;
     });
 
-    const insertingComparator = useStableCallback((lhs: string, rhs: { text: string; unsortedIndex: number; }) => {
+    const insertingComparator = useStableCallback((lhs: string, rhs: TypeaheadInfo) => {
 
         if (typeof lhs === "string" && typeof rhs.text === "string") {
             return comparatorShared(lhs, rhs.text);
@@ -267,7 +284,7 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, M e
         return (lhs as unknown as number) - (rhs as unknown as number);
     });
 
-    const typeaheadComparator = useStableCallback((lhs: string, rhs: { text: string; unsortedIndex: number; }) => {
+    const typeaheadComparator = useStableCallback((lhs: string, rhs: TypeaheadInfo) => {
 
         if (typeof lhs === "string" && typeof rhs.text === "string") {
             // During typeahead, all strings longer than ours should be truncated
@@ -418,42 +435,15 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, M e
         }
     }, [currentTypeahead]);
 
-    const useTypeaheadNavigationChild = useCallback<UseTypeaheadNavigationChild>(({ index, text }) => {
-
-        useEffect(() => {
-            if (text) {
-
-                // Find where to insert this item.
-                // Because all index values should be unique, the returned sortedIndex
-                // should always refer to a new location (i.e. be negative)                
-                const sortedIndex = binarySearch(sortedTypeaheadInfo.current, text, insertingComparator);
-                console.assert(sortedIndex < 0 || insertingComparator(sortedTypeaheadInfo.current[sortedIndex].text, { unsortedIndex: index, text }) == 0);
-                if (sortedIndex < 0) {
-                    sortedTypeaheadInfo.current.splice(-sortedIndex - 1, 0, { text, unsortedIndex: index });
-                }
-                else {
-                    sortedTypeaheadInfo.current.splice(sortedIndex, 0, { text, unsortedIndex: index });
-                }
-
-                return () => {
-                    // When unmounting, find where we were and remove ourselves.
-                    // Again, we should always find ourselves because there should be no duplicate values if each index is unique.
-                    const sortedIndex = binarySearch(sortedTypeaheadInfo.current, text, insertingComparator);
-                    console.assert(sortedIndex < 0 || insertingComparator(sortedTypeaheadInfo.current[sortedIndex].text, { unsortedIndex: index, text }) == 0);
-
-                    if (sortedIndex >= 0) {
-                        sortedTypeaheadInfo.current.splice(sortedIndex, 1);
-                    }
-                }
-            }
-        }, [text]);
-
-        return;
-
-    }, []);
 
     return {
-        useTypeaheadNavigationChild,
+        typeaheadNavigationChildParameters: useStableObject({
+            _private: useStableObject({
+                insertingComparator,
+                sortedTypeaheadInfo: sortedTypeaheadInfo.current
+            })
+
+        }),
         typeaheadNavigationReturn: {
             currentTypeahead,
             invalidTypeahead,
@@ -462,6 +452,39 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, M e
     }
 }
 
+export function useTypeaheadNavigationChild<ChildElement extends Element>({
+    managedChildParameters: { index },
+    typeaheadNavigationChildParameters: { text, _private: { sortedTypeaheadInfo, insertingComparator } }
+}: UseTypeaheadNavigationChildParameters<ChildElement>): ReturnType<UseTypeaheadNavigationChild<ChildElement>> {
+
+    useEffect(() => {
+        if (text) {
+
+            // Find where to insert this item.
+            // Because all index values should be unique, the returned sortedIndex
+            // should always refer to a new location (i.e. be negative)                
+            const sortedIndex = binarySearch(sortedTypeaheadInfo, text, insertingComparator);
+            console.assert(sortedIndex < 0 || insertingComparator(sortedTypeaheadInfo[sortedIndex].text, { unsortedIndex: index, text }) == 0);
+            if (sortedIndex < 0) {
+                sortedTypeaheadInfo.splice(-sortedIndex - 1, 0, { text, unsortedIndex: index });
+            }
+            else {
+                sortedTypeaheadInfo.splice(sortedIndex, 0, { text, unsortedIndex: index });
+            }
+
+            return () => {
+                // When unmounting, find where we were and remove ourselves.
+                // Again, we should always find ourselves because there should be no duplicate values if each index is unique.
+                const sortedIndex = binarySearch(sortedTypeaheadInfo, text, insertingComparator);
+                console.assert(sortedIndex < 0 || insertingComparator(sortedTypeaheadInfo[sortedIndex].text, { unsortedIndex: index, text }) == 0);
+
+                if (sortedIndex >= 0) {
+                    sortedTypeaheadInfo.splice(sortedIndex, 1);
+                }
+            }
+        }
+    }, [text]);
+}
 
 /**
  * Your usual binary search implementation.

@@ -1,5 +1,5 @@
 import { useCallback } from "preact/hooks";
-import { returnZero, usePassiveState } from "use-passive-state";
+import { returnZero, usePassiveState } from "./use-passive-state";
 import { ManagedChildOmits, UseManagedChildrenReturnTypeInfo } from "./use-child-manager";
 import { UseHasCurrentFocusParameters } from "./use-has-current-focus";
 import { LinearNavigationOmits, TypeaheadNavigationOmits, useLinearNavigation, UseLinearNavigationParameters, UseLinearNavigationReturnTypeInfo, useTypeaheadNavigation, UseTypeaheadNavigationParameters, UseTypeaheadNavigationReturnTypeInfo } from "./use-keyboard-navigation";

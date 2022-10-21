@@ -2,9 +2,11 @@ import { useCallback, useLayoutEffect, useRef } from "preact/hooks";
 import { options } from "preact"
 
 /** Takes a new value or a function that updates a value, unlike `OnPassiveStateChange` which reacts to those updates */
-export type PassiveStateUpdater<S>  = ((value: S | ((prevState: S | undefined) => S)) => void);
+export type PassiveStateUpdater<S> = ((value: S | ((prevState: S | undefined) => S)) => void);
 /** Responds to a change in a value, unlike `PassiveStateUpdater` which causes the updates */
 export type OnPassiveStateChange<S> = ((value: S, prevValue: S | undefined) => (void | (() => void)));
+
+
 
 /**
  * Debug hook.
@@ -135,14 +137,14 @@ export function usePassiveState<T>(onChange: undefined | null | OnPassiveStateCh
             // Schedule the actual check and invocation of onChange later to let effects settle
             (customDebounceRendering ?? debounceRendering)(() => {
                 const nextDep = valueRef.current! as T;
-                const prevDep = dependencyToCompareAgainst.current ;
+                const prevDep = dependencyToCompareAgainst.current;
                 if (dependencyToCompareAgainst.current != valueRef.current) {
                     warningRef.current = true;
 
                     try {
                         // Call any registered cleanup function
                         onShouldCleanUp();
-                        cleanupCallbackRef.current = (onChange?.(nextDep, prevDep === Unset? undefined : prevDep) ?? undefined);
+                        cleanupCallbackRef.current = (onChange?.(nextDep, prevDep === Unset ? undefined : prevDep) ?? undefined);
                         valueRef.current = nextDep;
                     }
                     finally {

@@ -1,4 +1,5 @@
 import { StateUpdater, useCallback, useLayoutEffect, useRef } from "preact/hooks";
+import { Stable, useStableObject } from "./use-stable-getter";
 import { OnPassiveStateChange, useEnsureStability, usePassiveState, debounceRendering } from "./use-passive-state";
 import { useStableCallback } from "./use-stable-callback";
 
@@ -24,6 +25,20 @@ import { useStableCallback } from "./use-stable-callback";
  * * refs are *usually* called before effects, but only when that HTMLElement renders. Basically just a reminder that a component can be mounted without it existing in the DOM.
  */
 const _comments = void (0);
+
+
+
+/**
+ * Does nothing at runtime -- type checking only.
+ * 
+ * Throws a (Typescript compiler) error if the passed object is anything but the empty object {}.
+ * 
+ * Use this to ensure that your spread operators work correctly and cover all cases.
+ * 
+ * @param _a The remaining spread parameters of a given object that you expect to be empty (because you properly accounted for all the properties that exist in it, and want to ensure it stays that way)
+ */
+ export function assertEmptyObject<T extends {}>(_a: [keyof T] extends [never]? T : `Unhandled keys in this rest spread object!`): void {}
+
 
 
 /**
@@ -68,8 +83,9 @@ export interface UseManagedChildrenParameters<M extends ManagedChildInfo<any>> {
 
 // MCSubInfo contains the entirety of the saved data for this child.  All of it. Even types the user will never be able to pass in because they're internally derived.
 // SubbestInfo refers to the actual parameters the user passes in that could be totally unrelated. 
-export interface UseManagedChildParameters<M extends ManagedChildInfo<any>, Omits extends keyof M> {
-    managedChildParameters: Omit<M, Omits>;
+export interface UseManagedChildParameters<M extends ManagedChildInfo<any>> {
+    managedChildParameters: M;
+    managedChildrenReturn: Pick<UseManagedChildrenReturnTypeInfo<M>["managedChildrenReturn"], "_private" | "getChildren">
 }
 
 
@@ -79,7 +95,7 @@ export interface UseManagedChildrenReturnTypeInfo<M extends ManagedChildInfo<any
      * 
      * **STABLE** (even though it's not a function, the identity of this object never changes)
      */
-    managedChildrenReturn: {
+    managedChildrenReturn: Stable<{
         /** 
          * ***STABLE***
          *
@@ -88,7 +104,13 @@ export interface UseManagedChildrenReturnTypeInfo<M extends ManagedChildInfo<any
          * This is a getter instead of an object because when function calls happen out of order it's easier to just have always been passing and return getters everywhere 
          */
         getChildren(): ManagedChildren<M>;
-    }
+
+        _private: {
+            managedChildrenArray: Foo<M>;
+            remoteULEChildMounted: (index: M["index"], mounted: boolean) => void;
+            remoteULEChildChanged: (index: M["index"]) => (() => void);
+        }
+    }>
 }
 
 export interface UseManagedChildrenReturnTypeWithHooks<M extends ManagedChildInfo<any>> extends UseManagedChildrenReturnTypeInfo<M> {
@@ -100,12 +122,12 @@ export interface UseManagedChildrenReturnTypeWithHooks<M extends ManagedChildInf
      * 
      * **STABLE**
      */
-    useManagedChild: UseManagedChild<M>;
+    //useManagedChild: UseManagedChild<M>;
 }
 
 export type UseManagedChildReturnType = void;
 
-export type UseManagedChild<M extends ManagedChildInfo<any>> = (a: UseManagedChildParameters<M, never>) => UseManagedChildReturnType;
+export type UseManagedChild<M extends ManagedChildInfo<any>> = (a: UseManagedChildParameters<M>) => UseManagedChildReturnType;
 
 
 
@@ -125,6 +147,13 @@ export interface ManagedChildren<M extends ManagedChildInfo<any>> {
 
     /** **UNSTABLE**, also internal-use only, also TODO need a workaround for this for sortable children */
     arraySlice: () => M[];
+}
+
+interface Foo<M extends ManagedChildInfo<string | number>> {
+    arr: Array<M>;
+    rec: Partial<Record<M["index"], M>>;
+    highestIndex: number;
+    lowestIndex: number;
 }
 
 /**
@@ -151,7 +180,7 @@ export function useManagedChildren<M extends ManagedChildInfo<string | number>>(
 
     // All the information we have about our children is stored in this **stable** array.
     // Any mutations to this array **DO NOT** trigger any sort of a re-render.
-    const managedChildrenArray = useRef<{ arr: Array<Info>; rec: Partial<Record<IndexType, Info>>; highestIndex: number, lowestIndex: number }>({ arr: [], rec: {}, highestIndex: 0, lowestIndex: 0 });
+    const managedChildrenArray = useRef<Foo<M>>({ arr: [], rec: {}, highestIndex: 0, lowestIndex: 0 });
 
     // For indirect access to each child
     // Compare getManagedChildInfo
@@ -244,7 +273,7 @@ export function useManagedChildren<M extends ManagedChildInfo<string | number>>(
     }, [/* Must remain stable */]);
 
 
-    const useManagedChild = useCallback<UseManagedChild<M>>((info) => {
+    /*const useManagedChild = useCallback<UseManagedChild<M>>((info) => {
         const { managedChildParameters: { index } } = info;
         // Any time our child props change, make that information available
         // the parent if they need it.
@@ -270,10 +299,10 @@ export function useManagedChildren<M extends ManagedChildInfo<string | number>>(
             remoteULEChildMounted?.(index as IndexType, true);
             return () => remoteULEChildMounted?.(index as IndexType, false);
         }, [index]);
-    }, [/* Must remain stable */]);
+    }, [/* Must remain stable *\/]);*/
 
 
-    const managedChildren = useRef<ManagedChildren<M>>({
+    const managedChildren = useStableObject<ManagedChildren<M>>({
         ...{ _: managedChildrenArray.current } as {},
         forEach: forEachChild,
         getAt: getManagedChildInfo,
@@ -284,9 +313,48 @@ export function useManagedChildren<M extends ManagedChildInfo<string | number>>(
     });
 
     return {
-        useManagedChild,
-        managedChildrenReturn: { getChildren: useCallback(() => managedChildren.current, []) }
+        managedChildrenReturn: useStableObject({
+            getChildren: useCallback(() => managedChildren, []),
+            _private: useStableObject({
+                managedChildrenArray: managedChildrenArray.current,
+                remoteULEChildMounted,
+                remoteULEChildChanged
+            })
+        })
     }
+}
+
+
+
+
+export function useManagedChild<M extends ManagedChildInfo<number | string>>(info: UseManagedChildParameters<M>): UseManagedChildReturnType {
+    type IndexType = M["index"];
+
+    const { managedChildParameters: { index }, managedChildrenReturn: { _private: { managedChildrenArray, remoteULEChildMounted, remoteULEChildChanged }, getChildren } } = info;
+    // Any time our child props change, make that information available
+    // the parent if they need it.
+    // The parent can listen for all updates and only act on the ones it cares about,
+    // and multiple children updating in the same tick will all be sent at once.
+    useLayoutEffect(() => {
+        // Insert this information in-place
+        if (typeof index == "number") {
+            managedChildrenArray.arr[index as number] = { ...info.managedChildParameters };
+        }
+        else {
+            managedChildrenArray.rec[index as IndexType] = { ...info.managedChildParameters };
+        }
+        return remoteULEChildChanged(index as IndexType);
+    }, [...Object.entries(info).flat(9)]);  // 9 is infinity, right? Sure. Unrelated: TODO.
+
+    // When we mount, notify the parent via queueMicrotask
+    // (every child does this, so everything's coordinated to only queue a single microtask per tick)
+    // Do the same on unmount.
+    // Note: It's important that this comes AFTER remoteULEChildChanged
+    // so that remoteULEChildMounted has access to all the info on mount.
+    useLayoutEffect(() => {
+        remoteULEChildMounted?.(index as IndexType, true);
+        return () => remoteULEChildMounted?.(index as IndexType, false);
+    }, [index]);
 }
 
 
@@ -311,7 +379,7 @@ export interface UseChildrenFlagParameters<M extends ManagedChildInfo<any>> {
     closestFit: boolean;
 
     getChildren(): ManagedChildren<M>;
-    
+
 
     /**
      * Called whenever a new index is selected.

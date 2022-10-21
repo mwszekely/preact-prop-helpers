@@ -6,10 +6,10 @@ import { useForceUpdate } from "./use-force-update";
 import { useMergedProps } from "./use-merged-props";
 import { returnNull, usePassiveState } from "./use-passive-state";
 import lodashShuffle from "lodash-es/shuffle";
-import { UseLinearNavigationParameters } from "use-keyboard-navigation";
-import { UseRovingTabIndexReturnTypeInfo } from "use-roving-tabindex";
+import { UseLinearNavigationParameters } from "./use-keyboard-navigation";
+import { UseRovingTabIndexReturnTypeInfo } from "./use-roving-tabindex";
 
-export type GetIndex<C, K extends string> = (row: ManagedChildInfo<number, C, K>) => (number | null | undefined);
+export type GetIndex = (row: VNode<unknown>) => (number | null | undefined);
 export type GetValid = (index: number) => boolean;
 export type GetHighestChildIndex = () => number;
 export type Compare<V> = (lhs: V, rhs: V) => number;
@@ -17,34 +17,34 @@ export type Compare<V> = (lhs: V, rhs: V) => number;
 /**
  * All of these functions **MUST** be stable across renders.
  */
-export interface UseRearrangeableChildrenParameters<C, K extends string> {
+export interface UseRearrangeableChildrenParameters<M extends ManagedChildInfo<number>> {
 
     /**
      * Must return, e.g., the row index of this child
      * (Usually just an `index` prop)
      */
-    rearrangeableChildrenParameters: { getIndex: GetIndex<C, K>; getValid: GetValid; getHighestChildIndex: GetHighestChildIndex; }
+    rearrangeableChildrenParameters: { getIndex: GetIndex, getValid: GetValid; getHighestChildIndex: GetHighestChildIndex; }
 
-    rovingTabIndexReturn: Pick<UseRovingTabIndexReturnTypeInfo<C, K>["rovingTabIndexReturn"], "setTabbableIndex">;
+    //rovingTabIndexReturn: Pick<UseRovingTabIndexReturnTypeInfo<any, any>["rovingTabIndexReturn"], "setTabbableIndex">;
 }
 
 /**
  * All of these functions **MUST** be stable across renders.
  */
-export interface UseSortableChildrenParameters<C, K extends string> extends UseRearrangeableChildrenParameters<C, K> {
+export interface UseSortableChildrenParameters<M extends ManagedChildInfo<number>> extends UseRearrangeableChildrenParameters<M> {
     sortableChildrenParameters: {
         /**
          * Controls how values compare against each other.
          * @param lhs 
          * @param rhs 
          */
-        compare: Compare<ManagedChildInfo<number, C, K>>;
+        compare: Compare<M>;
     }
 }
 
 
-export interface UseRearrangeableChildrenReturnTypeInfo<C, K extends string> {
-    linearNavigationParameters: UseLinearNavigationParameters<"disableArrowKeys" | "disableHomeEndKeys" | "navigationDirection" | "getHighestIndex">["linearNavigationParameters"];
+export interface UseRearrangeableChildrenReturnTypeInfo<M extends ManagedChildInfo<number>> {
+    linearNavigationParameters: Pick<UseLinearNavigationParameters["linearNavigationParameters"], "navigateRelative" | "navigateAbsolute">;
 
     rearrangeableChildrenReturn: {
         /**
@@ -55,10 +55,10 @@ export interface UseRearrangeableChildrenReturnTypeInfo<C, K extends string> {
          *  
          * 
          */
-        rearrange: (rowsInOrder: ManagedChildInfo<number, C, K>[]) => void;
-        
+        rearrange: (rowsInOrder: M[]) => void;
+
         /** **STABLE** */
-        shuffle: (managedRows: ManagedChildren<number, C, K>) => Promise<void> | void;
+        shuffle: (managedRows: ManagedChildren<M>) => Promise<void> | void;
 
         /** 
          * **STABLE**
@@ -78,18 +78,19 @@ export interface UseRearrangeableChildrenReturnTypeInfo<C, K extends string> {
     }
 }
 
-export interface UseRearrangeableChildrenReturnTypeWithHooks<ParentElement extends Element, C, K extends string> extends UseRearrangeableChildrenReturnTypeInfo<C, K> {
+export interface UseRearrangeableChildrenReturnTypeWithHooks<ParentElement extends Element, M extends ManagedChildInfo<number>> extends UseRearrangeableChildrenReturnTypeInfo<M> {
     /** **STABLE** */
     useRearrangeableProps: (props: h.JSX.HTMLAttributes<ParentElement>) => h.JSX.HTMLAttributes<ParentElement>;
 }
 
-export interface UseSortableChildrenReturnTypeInfo<C, K extends string> extends UseRearrangeableChildrenReturnTypeInfo<C, K> {
-    sortableChildrenReturn: {/** **STABLE** */
-        sort: (managedRows: ManagedChildren<number, C, K>, direction: "ascending" | "descending") => Promise<void> | void;
+export interface UseSortableChildrenReturnTypeInfo<M extends ManagedChildInfo<number>> extends UseRearrangeableChildrenReturnTypeInfo<M> {
+    sortableChildrenReturn: {
+        /** **STABLE** */
+        sort: (managedRows: ManagedChildren<M>, direction: "ascending" | "descending") => Promise<void> | void;
     }
 }
-export interface UseSortableChildrenReturnTypeWithHooks<ParentElement extends Element, C, K extends string> extends
-    UseSortableChildrenReturnTypeInfo<C, K> {
+export interface UseSortableChildrenReturnTypeWithHooks<ParentElement extends Element, M extends ManagedChildInfo<number>> extends
+    UseSortableChildrenReturnTypeInfo<M> {
     /** **STABLE** */
     useSortableProps: (props: h.JSX.HTMLAttributes<ParentElement>) => h.JSX.HTMLAttributes<ParentElement>;
 }
@@ -116,7 +117,9 @@ export interface UseSortableChildrenReturnTypeWithHooks<ParentElement extends El
  * Because keys are given special treatment and a child has no way of modifying its own key
  * there's no other time or place this can happen other than exactly within the parent component's render function.
  */
-export function useRearrangeableChildren<ParentElement extends Element, C, K extends string>({ rovingTabIndexReturn, rearrangeableChildrenParameters: { getIndex, getValid, getHighestChildIndex } }: UseRearrangeableChildrenParameters<C, K>): UseRearrangeableChildrenReturnTypeWithHooks<ParentElement, C, K> {
+export function useRearrangeableChildren<ParentElement extends Element, M extends ManagedChildInfo<number>>({ 
+    rearrangeableChildrenParameters: { getIndex, getValid, getHighestChildIndex } 
+}: UseRearrangeableChildrenParameters<M>): UseRearrangeableChildrenReturnTypeWithHooks<ParentElement, M> {
 
     // These are used to keep track of a mapping between unsorted index <---> sorted index.
     // These are needed for navigation with the arrow keys.
@@ -124,16 +127,16 @@ export function useRearrangeableChildren<ParentElement extends Element, C, K ext
     const demangleMap = useRef(new Map<number, number>());
     const indexMangler = useCallback((n: number) => (mangleMap.current.get(n) ?? n), []);
     const indexDemangler = useCallback((n: number) => (demangleMap.current.get(n) ?? n), []);
-    const { setTabbableIndex } = rovingTabIndexReturn;
+    //const { setTabbableIndex } = rovingTabIndexReturn;
 
-    
 
-    const shuffle = useCallback((managedRows: ManagedChildren<number, C, K>): Promise<void> | void => {
+
+    const shuffle = useCallback((managedRows: ManagedChildren<M>): Promise<void> | void => {
         const shuffledRows = lodashShuffle(managedRows.arraySlice())
         return rearrange(shuffledRows);
     }, [/* Must remain stable */]);
 
-    const navigateAbsolute = useCallback((i: number | null, fromUserInteraction: boolean) => {
+    const navigateAbsolute = useCallback((i: number | null) => {
         if (i != null) {
             const nextIndex = tryNavigateToIndex({
                 highestChildIndex: getHighestChildIndex(),
@@ -143,23 +146,21 @@ export function useRearrangeableChildren<ParentElement extends Element, C, K ext
                 indexMangler: indexMangler,
                 indexDemangler: indexDemangler
             });
-            setTabbableIndex(i == null ? null : nextIndex, fromUserInteraction);
+            return (i == null ? null : nextIndex);
         }
         else {
-            setTabbableIndex(null, fromUserInteraction);
+            return null;
         }
     }, []);
-    const navigateRelative = useCallback((offset: number, fromUserInteraction: boolean) => {
-        setTabbableIndex(c => {
-            return tryNavigateToIndex({ 
-                target: indexDemangler!(indexMangler!((c ?? 0)) + offset), 
+    const navigateRelative = useCallback((original: number, offset: number) => {
+            return tryNavigateToIndex({
+                target: indexDemangler(indexMangler(original) + offset),
                 highestChildIndex: getHighestChildIndex(),
                 isValid: getValid,
-                searchDirection: -1, 
-                indexMangler: indexMangler, 
-                indexDemangler: indexDemangler 
-            })
-        }, fromUserInteraction)
+                searchDirection: -1,
+                indexMangler: indexMangler,
+                indexDemangler: indexDemangler
+            });
     }, []);
 
     // The sort function needs to be able to update whoever has all the sortable children.
@@ -169,7 +170,7 @@ export function useRearrangeableChildren<ParentElement extends Element, C, K ext
     //const [getForceUpdate, setForceUpdate] = usePassiveState<null | (() => void)>(null, returnNull);
     const [getForceUpdate, setForceUpdate] = usePassiveState<null | (() => void)>(null, returnNull);
 
-    const rearrange = useCallback((sortedRows: ManagedChildInfo<number, C, K>[]) => {
+    const rearrange = useCallback((sortedRows: M[]) => {
 
         // Update our sorted <--> unsorted indices map 
         // and rerender the whole table, basically
@@ -192,9 +193,9 @@ export function useRearrangeableChildren<ParentElement extends Element, C, K ext
 
         return (useMergedProps<ParentElement>({
             children:
-                (children as VNode<ManagedChildInfo<number, C, K>>[])
+                (children as VNode<any>[])
                     .slice()
-                    .map(child => ({ child, mangledIndex: indexMangler(getIndex(child.props!)!), demangledIndex: getIndex(child.props) }))
+                    .map(child => ({ child, mangledIndex: indexMangler(getIndex(child)!), demangledIndex: getIndex(child) }))
                     .sort((lhs, rhs) => { return lhs.mangledIndex - rhs.mangledIndex })
                     .map(({ child, mangledIndex, demangledIndex }) => {
                         return h(child.type as any, { ...child.props, key: demangledIndex, "data-mangled-index": mangledIndex, "data-unmangled-index": demangledIndex });
@@ -202,10 +203,10 @@ export function useRearrangeableChildren<ParentElement extends Element, C, K ext
         }, props));
     }, []);
 
-    return { 
-        useRearrangeableProps, 
+    return {
+        useRearrangeableProps,
         linearNavigationParameters: { navigateAbsolute, navigateRelative },
-        rearrangeableChildrenReturn: { indexMangler, indexDemangler, mangleMap, demangleMap, rearrange, shuffle } 
+        rearrangeableChildrenReturn: { indexMangler, indexDemangler, mangleMap, demangleMap, rearrange, shuffle }
     };
 }
 
@@ -231,18 +232,17 @@ export function useRearrangeableChildren<ParentElement extends Element, C, K ext
  * Because keys are given special treatment and a child has no way of modifying its own key
  * there's no other time or place this can happen other than exactly within the parent component's render function.
  */
-export function useSortableChildren<ParentElement extends Element, C, K extends string>({ 
-    rearrangeableChildrenParameters, 
-    rovingTabIndexReturn, 
-    sortableChildrenParameters: { compare: userCompare } 
-}: UseSortableChildrenParameters<C, K>): UseSortableChildrenReturnTypeWithHooks<ParentElement, C, K> {
+export function useSortableChildren<ParentElement extends Element, M extends ManagedChildInfo<number>>({
+    rearrangeableChildrenParameters,
+    sortableChildrenParameters: { compare: userCompare }
+}: UseSortableChildrenParameters<M>): UseSortableChildrenReturnTypeWithHooks<ParentElement, M> {
 
     const compare = (userCompare ?? defaultCompare);
 
-    const { linearNavigationParameters, rearrangeableChildrenReturn, useRearrangeableProps } = useRearrangeableChildren<ParentElement, C, K>({ rearrangeableChildrenParameters, rovingTabIndexReturn });
+    const { linearNavigationParameters, rearrangeableChildrenReturn, useRearrangeableProps } = useRearrangeableChildren<ParentElement, M>({ rearrangeableChildrenParameters });
     const { rearrange } = rearrangeableChildrenReturn;
     // The actual sort function.
-    const sort = useCallback((managedRows: ManagedChildren<number, C, K>, direction: "ascending" | "descending"): Promise<void> | void => {
+    const sort = useCallback((managedRows: ManagedChildren<M>, direction: "ascending" | "descending"): Promise<void> | void => {
 
         const sortedRows = managedRows.arraySlice().sort((lhsRow, rhsRow) => {
 
