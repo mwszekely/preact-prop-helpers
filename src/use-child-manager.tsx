@@ -1,7 +1,7 @@
 import { StateUpdater, useCallback, useLayoutEffect, useRef } from "preact/hooks";
-import { Stable, useStableObject } from "./use-stable-getter";
-import { OnPassiveStateChange, useEnsureStability, usePassiveState, debounceRendering } from "./use-passive-state";
+import { debounceRendering, OnPassiveStateChange, useEnsureStability, usePassiveState } from "./use-passive-state";
 import { useStableCallback } from "./use-stable-callback";
+import { Stable, useStableObject } from "./use-stable-getter";
 
 /**
  * Reminder of order of execution:
@@ -85,7 +85,7 @@ export interface UseManagedChildrenParameters<M extends ManagedChildInfo<any>> {
 // SubbestInfo refers to the actual parameters the user passes in that could be totally unrelated. 
 export interface UseManagedChildParameters<M extends ManagedChildInfo<any>> {
     managedChildParameters: M;
-    managedChildrenReturn: Pick<UseManagedChildrenReturnTypeInfo<M>["managedChildrenReturn"], "_private" | "getChildren">
+    managedChildrenReturn: Omit<UseManagedChildrenReturnTypeInfo<M>["managedChildrenReturn"], "getChildren">
 }
 
 
@@ -170,7 +170,8 @@ export function useManagedChildren<M extends ManagedChildInfo<string | number>>(
     type IndexType = M["index"];
     type Info = M;
 
-    const { managedChildrenParameters: { onAfterChildLayoutEffect, onChildrenMountChange } } = parentParameters;
+    const { managedChildrenParameters: { onAfterChildLayoutEffect, onChildrenMountChange }, ...rest } = parentParameters;
+    assertEmptyObject(rest);
 
     useEnsureStability("useManagedChildren", onAfterChildLayoutEffect, onChildrenMountChange);
 
@@ -330,7 +331,7 @@ export function useManagedChildren<M extends ManagedChildInfo<string | number>>(
 export function useManagedChild<M extends ManagedChildInfo<number | string>>(info: UseManagedChildParameters<M>): UseManagedChildReturnType {
     type IndexType = M["index"];
 
-    const { managedChildParameters: { index }, managedChildrenReturn: { _private: { managedChildrenArray, remoteULEChildMounted, remoteULEChildChanged }, getChildren } } = info;
+    const { managedChildParameters: { index }, managedChildrenReturn: { _private: { managedChildrenArray, remoteULEChildMounted, remoteULEChildChanged } } } = info;
     // Any time our child props change, make that information available
     // the parent if they need it.
     // The parent can listen for all updates and only act on the ones it cares about,

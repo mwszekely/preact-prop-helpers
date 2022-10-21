@@ -1,5 +1,5 @@
 import { h } from "preact";
-import { useCallback, useEffect, useLayoutEffect, useRef } from "preact/hooks";
+import { useEffect, useLayoutEffect, useRef } from "preact/hooks";
 import { assertEmptyObject, UseManagedChildParameters } from "./use-child-manager";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnTypeInfo } from "./use-roving-tabindex";
 import { useStableCallback } from "./use-stable-callback";

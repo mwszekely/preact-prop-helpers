@@ -18,7 +18,7 @@ export interface UseRovingTabIndexChildInfo<TabbableChildElement extends Element
      * This is used when the tabbable index changes (we auto-focus the newly tabbable element if applicable),
      * and also by the `focusSelf` value returned by the parent (i.e. `parent.focusSelf` calls one child's `focusSelf`)
      */
-    focusSelf(): void;
+    focusSelf(e: TabbableChildElement): void;
 
     getElement(): TabbableChildElement | null;
 
@@ -207,7 +207,7 @@ export function useRovingTabIndex<ChildElement extends Element, M extends UseRov
                     const element = nextChild.getElement();
                     if (element) {
                         if (document.activeElement == null || !element.contains(document.activeElement))
-                            nextChild.focusSelf();
+                            nextChild.focusSelf(element);
                     }
                 }
 
@@ -233,8 +233,10 @@ export function useRovingTabIndex<ChildElement extends Element, M extends UseRov
 
     const focusSelf = useCallback(() => {
         const index = getTabbableIndex();
-        if (index != null)
-            children.getAt(index)?.focusSelf?.();
+        if (index != null) {
+            const element = children.getAt(index)?.getElement();
+            children.getAt(index)?.focusSelf?.(element!);
+        }
         else
             setTabbableIndex(null, true);
     }, []);
@@ -261,7 +263,7 @@ export function useRovingTabIndexChild<ChildElement extends Element>({
     rovingTabIndexReturn: { setTabbableIndex, ..._void2 },
     managedChildParameters,
 }: UseRovingTabIndexChildParameters<ChildElement>): UseRovingTabIndexChildReturnTypeWithHooks<ChildElement> {
-    const { hidden, index, ..._void1 } = managedChildParameters; 
+    const { hidden, index, ..._void1 } = managedChildParameters;
     const [tabbable, setTabbable, getTabbable] = useState(false);
 
     useEffect(() => {

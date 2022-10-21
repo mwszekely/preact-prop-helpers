@@ -1,11 +1,8 @@
-import { useCallback } from "preact/hooks";
-import { useRefElement, UseRefElementReturnType } from "./use-ref-element";
-import { SelectableChildInfo, useSingleSelection, useSingleSelectionChild, UseSingleSelectionChildParameters, UseSingleSelectionChildReturnTypeInfo, UseSingleSelectionParameters, UseSingleSelectionReturnTypeInfo } from "./use-single-selection";
-import { useStableCallback } from "./use-stable-callback";
-import { assertEmptyObject, ManagedChildInfo, ManagedChildOmits, OnChildrenMountChange, useManagedChild, UseManagedChildParameters, useManagedChildren, UseManagedChildrenParameters, UseManagedChildrenReturnTypeInfo } from "./use-child-manager";
-import { useHasCurrentFocus, UseHasCurrentFocusParameters, UseHasCurrentFocusReturnType } from "./use-has-current-focus";
+import { assertEmptyObject, OnChildrenMountChange } from "./use-child-manager";
 import { useLinearNavigation, UseLinearNavigationParameters, UseLinearNavigationReturnTypeInfo, useTypeaheadNavigation, useTypeaheadNavigationChild, UseTypeaheadNavigationChildParameters, UseTypeaheadNavigationParameters, UseTypeaheadNavigationReturnTypeInfo } from "./use-keyboard-navigation";
 import { useRovingTabIndex, useRovingTabIndexChild, UseRovingTabIndexChildInfo, UseRovingTabIndexChildParameters, UseRovingTabIndexChildReturnTypeInfo, UseRovingTabIndexParameters, UseRovingTabIndexReturnTypeInfo } from "./use-roving-tabindex";
+import { SelectableChildInfo, useSingleSelection, useSingleSelectionChild, UseSingleSelectionChildParameters, UseSingleSelectionChildReturnTypeInfo, UseSingleSelectionParameters, UseSingleSelectionReturnTypeInfo } from "./use-single-selection";
+import { useStableCallback } from "./use-stable-callback";
 
 
 /**
@@ -45,9 +42,6 @@ import { useRovingTabIndex, useRovingTabIndexChild, UseRovingTabIndexChildInfo, 
 const _dummy: any = null;
 
 
-//function identity<T>(t: T) { return t; }
-type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
-
 
 
 export interface UseListNavigationChildInfo<TabbableChildElement extends Element> extends UseRovingTabIndexChildInfo<TabbableChildElement> {
@@ -67,44 +61,24 @@ export type NavigateToIndex = (i: number | null, fromUserInteraction: boolean) =
 //export type ListNavigationParametersOmits = keyof LSP;
 
 // *** Parameters (list, list-single, list-child, list-single-child)
-export interface UseListNavigationParameters<ChildElement extends Element, M extends UseListNavigationChildInfo<ChildElement>> extends UseRovingTabIndexParameters<ChildElement, M> {
-    typeaheadNavigationParameters: UseTypeaheadNavigationParameters<ChildElement>["typeaheadNavigationParameters"];
-    linearNavigationParameters: UseLinearNavigationParameters["linearNavigationParameters"];
+export interface UseListNavigationParameters<ChildElement extends Element, M extends UseListNavigationChildInfo<ChildElement>> extends UseRovingTabIndexParameters<ChildElement, M>, Omit<UseTypeaheadNavigationParameters<ChildElement>, "rovingTabIndexReturn">, Omit<UseLinearNavigationParameters, "rovingTabIndexReturn"> { }
+
+export interface UseListNavigationChildParameters<ChildElement extends Element> extends UseRovingTabIndexChildParameters<ChildElement>, UseTypeaheadNavigationChildParameters<ChildElement> {
+    managedChildParameters: UseRovingTabIndexChildParameters<ChildElement>["managedChildParameters"] & UseTypeaheadNavigationChildParameters<ChildElement>["managedChildParameters"];
 }
 
 
-type Get<T, K extends keyof T> = T[K]
-
-export interface UseListNavigationChildParameters<ChildElement extends Element, M extends UseListNavigationChildInfo<ChildElement>> extends UseRovingTabIndexChildParameters<ChildElement> {
-    managedChildrenReturn: UseManagedChildParameters<M>["managedChildrenReturn"];
-    //hasCurrentFocusParameters: UseHasCurrentFocusParameters<ChildElement>["hasCurrentFocusParameters"];
-    refElementReturn: Pick<UseRefElementReturnType<ChildElement>["refElementReturn"], "getElement">;
-    typeaheadNavigationChildParameters: UseTypeaheadNavigationChildParameters<ChildElement>["typeaheadNavigationChildParameters"];
-}
+export interface UseListNavigationReturnTypeInfo<ParentOrChildElement extends Element, ChildElement extends Element> extends UseRovingTabIndexReturnTypeInfo<ChildElement>, UseLinearNavigationReturnTypeInfo<ParentOrChildElement>, UseTypeaheadNavigationReturnTypeInfo<ParentOrChildElement> { }
 
 
-export interface UseListNavigationReturnTypeInfo<ParentOrChildElement extends Element, ChildElement extends Element> extends UseRovingTabIndexReturnTypeInfo<ChildElement> {
-    linearNavigationReturn: UseLinearNavigationReturnTypeInfo<ParentOrChildElement>["linearNavigationReturn"];
-    typeaheadNavigationChildParameters: UseTypeaheadNavigationReturnTypeInfo<ParentOrChildElement>["typeaheadNavigationChildParameters"];
-    typeaheadNavigationReturn: UseTypeaheadNavigationReturnTypeInfo<ParentOrChildElement>["typeaheadNavigationReturn"];
-}
+export interface UseListNavigationReturnTypeWithHooks<ParentOrChildElement extends Element, ChildElement extends Element> extends UseListNavigationReturnTypeInfo<ParentOrChildElement, ChildElement> { }
 
-// *** Return types (list, list-single, list-child, list-single-child)
-export interface UseListNavigationReturnTypeWithHooks<ParentOrChildElement extends Element, ChildElement extends Element> extends UseListNavigationReturnTypeInfo<ParentOrChildElement, ChildElement> {
-}
+export interface UseListNavigationChildReturnTypeInfo<ChildElement extends Element> extends UseRovingTabIndexChildReturnTypeInfo<ChildElement> { }
 
-export interface UseListNavigationChildReturnTypeInfo<ChildElement extends Element> extends UseRovingTabIndexChildReturnTypeInfo<ChildElement> {
-    //hasCurrentFocusReturn: UseHasCurrentFocusReturnType<ChildElement>["hasCurrentFocusReturn"];
-}
-
-export interface UseListNavigationChildReturnTypeWithHooks<ChildElement extends Element> extends UseListNavigationChildReturnTypeInfo<ChildElement> {
-
-    //props: h.JSX.HTMLAttributes<ChildElement>;
-    //listNavigationChildProps: h.JSX.HTMLAttributes<ChildElement>;
-}
+export interface UseListNavigationChildReturnTypeWithHooks<ChildElement extends Element> extends UseListNavigationChildReturnTypeInfo<ChildElement> { }
 
 
-export type UseListNavigationChild<ChildElement extends Element> = (a: UseListNavigationChildParameters<ChildElement, UseListNavigationChildInfo<ChildElement>>) => UseListNavigationChildReturnTypeWithHooks<ChildElement>;
+export type UseListNavigationChild<ChildElement extends Element> = (a: UseListNavigationChildParameters<ChildElement>) => UseListNavigationChildReturnTypeWithHooks<ChildElement>;
 
 
 
@@ -171,15 +145,13 @@ export function useListNavigation<ParentOrChildElement extends Element, ChildEle
     }
 }
 
-export function useListNavigationChild<ChildElement extends Element, M extends UseListNavigationChildInfo<ChildElement>>({
-    refElementReturn,
+export function useListNavigationChild<ChildElement extends Element>({
     managedChildParameters: { hidden, index, ..._void5 },
     rovingTabIndexReturn,
-    managedChildrenReturn,
     rovingTabIndexChildParameters,
     typeaheadNavigationChildParameters,
     ..._void2
-}: UseListNavigationChildParameters<ChildElement, M>): UseListNavigationChildReturnTypeWithHooks<ChildElement> {
+}: UseListNavigationChildParameters<ChildElement>): UseListNavigationChildReturnTypeWithHooks<ChildElement> {
 
     const {
         hasCurrentFocusParameters,
@@ -218,16 +190,14 @@ export interface UseListNavigationSingleSelectionParameters<ChildElement extends
     singleSelectionParameters: UseSingleSelectionParameters<ChildElement>["singleSelectionParameters"];
 }
 
-export interface UseListNavigationSingleSelectionReturnType<ParentOrChildElement extends Element, ChildElement extends Element> extends UseListNavigationReturnTypeInfo<ParentOrChildElement, ChildElement> {
-    singleSelectionReturn: UseSingleSelectionReturnTypeInfo["singleSelectionReturn"];
-}
+export interface UseListNavigationSingleSelectionReturnType<ParentOrChildElement extends Element, ChildElement extends Element> extends UseListNavigationReturnTypeInfo<ParentOrChildElement, ChildElement>, UseSingleSelectionReturnTypeInfo { }
 
 export function useListNavigationSingleSelection<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationSingleSelectionChildInfo<ChildElement>>({
     linearNavigationParameters,
     rovingTabIndexParameters,
     typeaheadNavigationParameters,
     singleSelectionParameters,
-    managedChildrenReturn: { getChildren },
+    managedChildrenReturn: { getChildren, ...void4 },
     ..._void3
 }: UseListNavigationSingleSelectionParameters<ChildElement, M>): UseListNavigationSingleSelectionReturnType<ParentOrChildElement, ChildElement> {
     const {
@@ -258,8 +228,10 @@ export function useListNavigationSingleSelection<ParentOrChildElement extends El
     assertEmptyObject(_void1);
     assertEmptyObject(_void2);
     assertEmptyObject(_void3);
+    assertEmptyObject(void4);
 
     return {
+        childrenHaveFocusParameters,
         rovingTabIndexChildParameters,
         typeaheadNavigationChildParameters,
         managedChildrenParameters,
@@ -270,7 +242,7 @@ export function useListNavigationSingleSelection<ParentOrChildElement extends El
     }
 }
 
-export interface UseListNavigationSingleSelectionChildParameters<ChildElement extends Element, M extends UseListNavigationSingleSelectionChildInfo<ChildElement>> extends UseListNavigationChildParameters<ChildElement, M> {
+export interface UseListNavigationSingleSelectionChildParameters<ChildElement extends Element> extends UseListNavigationChildParameters<ChildElement> {
     singleSelectionChildParameters: UseSingleSelectionChildParameters<ChildElement>["singleSelectionChildParameters"];
     singleSelectionReturn: UseSingleSelectionChildParameters<ChildElement>["singleSelectionReturn"];
 }
@@ -280,17 +252,15 @@ export interface UseListNavigationSingleSelectionChildReturnType<ChildElement ex
     pressParameters: UseSingleSelectionChildReturnTypeInfo<ChildElement>["pressParameters"];
 }
 
-export function useListNavigationSingleSelectionChild<ChildElement extends Element, M extends UseListNavigationSingleSelectionChildInfo<ChildElement>>({
+export function useListNavigationSingleSelectionChild<ChildElement extends Element>({
     managedChildParameters: { hidden, index, ..._void5 },
-    managedChildrenReturn,
-    refElementReturn,
     rovingTabIndexChildParameters,
     rovingTabIndexReturn,
     singleSelectionChildParameters,
     singleSelectionReturn,
     typeaheadNavigationChildParameters,
     ..._void1
-}: UseListNavigationSingleSelectionChildParameters<ChildElement, M>): UseListNavigationSingleSelectionChildReturnType<ChildElement> {
+}: UseListNavigationSingleSelectionChildParameters<ChildElement>): UseListNavigationSingleSelectionChildReturnType<ChildElement> {
 
     const {
         hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ..._void3 },
@@ -307,13 +277,11 @@ export function useListNavigationSingleSelectionChild<ChildElement extends Eleme
     const {
         managedChildParameters: mcp2,
         rovingTabIndexChildReturn,
-        hasCurrentFocusParameters,
+        hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ..._void6 },
         ..._void4
-    } = useListNavigationChild<ChildElement, M>({
+    } = useListNavigationChild<ChildElement>({
         typeaheadNavigationChildParameters,
         managedChildParameters: { hidden, index },
-        managedChildrenReturn,
-        refElementReturn,
         rovingTabIndexChildParameters,
         rovingTabIndexReturn
     });
@@ -323,9 +291,12 @@ export function useListNavigationSingleSelectionChild<ChildElement extends Eleme
     assertEmptyObject(_void3);
     assertEmptyObject(_void4);
     assertEmptyObject(_void5);
+    assertEmptyObject(_void6);
 
     return {
-        hasCurrentFocusParameters,
+        hasCurrentFocusParameters: {
+            onCurrentFocusedInnerChanged: useStableCallback<NonNullable<typeof ocfic1>>((focused, previouslyFocused) => { ocfic1?.(focused, previouslyFocused); ocfic2?.(focused, previouslyFocused); })
+        },
         singleSelectionChildReturn,
         managedChildParameters: {
             ...mcp1,
@@ -336,228 +307,40 @@ export function useListNavigationSingleSelectionChild<ChildElement extends Eleme
     }
 }
 
+
 /*
-
-function ListNavTest() {
-    type M = UseListNavigationSingleSelectionChildInfo<HTMLLIElement>;
-    const disableArrowKeys = false;
-    const disableHomeEndKeys = false;
-    const getHighestIndex = useCallback(() => { return getChildren().getHighestIndex() }, []);
-    const navigateAbsolute = useCallback((index: number, fromUserInteraction: boolean) => { rovingTabIndexReturn.setTabbableIndex(index, fromUserInteraction); }, []);
-    const navigateRelative = useCallback((from: number, offset: number, fromUserInteraction: boolean) => { rovingTabIndexReturn.setTabbableIndex(from + offset, fromUserInteraction); }, []);
-    const navigationDirection = "either" as const;
-    const managedChildrenParameters: UseManagedChildrenParameters<M>["managedChildrenParameters"] = { onAfterChildLayoutEffect: undefined, onChildrenMountChange: useStableCallback<OnChildrenMountChange<number>>((m, u) => mcmc?.(m, u)) };
-    const { managedChildrenReturn } = useManagedChildren<M>({ managedChildrenParameters });
-    const { getChildren } = managedChildrenReturn;
-    const {
-        managedChildrenParameters: { onChildrenMountChange: mcmc },
-        rovingTabIndexChildParameters,
-        typeaheadNavigationChildParameters,
-        linearNavigationReturn,
-        rovingTabIndexReturn,
-        singleSelectionReturn,
-        typeaheadNavigationReturn
-    } = useListNavigationSingleSelection<HTMLOListElement, HTMLLIElement, M>({
-        linearNavigationParameters: { disableArrowKeys, disableHomeEndKeys, getHighestIndex, navigateAbsolute, navigateRelative, navigationDirection },
-        managedChildrenReturn,
-        rovingTabIndexParameters: { initiallyTabbedIndex: 0, onTabbableIndexChange: null },
-        singleSelectionParameters: { initiallySelectedIndex: 0, onSelectedIndexChange: null },
-        typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000 }
-    });
-
-    const {
-        hasCurrentFocusParameters,
-       // managedChildParameters,
-        pressParameters,
-        rovingTabIndexChildReturn,
-        singleSelectionChildReturn
-    } = useListNavigationSingleSelectionChild({
-        managedChildParameters: { hidden, index },
-        managedChildrenReturn,
-        refElementReturn,
-        rovingTabIndexChildParameters,
-        rovingTabIndexReturn,
-        singleSelectionChildParameters: { ariaPropName: "aria-checked", selectionMode: "focus" },
-        singleSelectionReturn,
-        typeaheadNavigationChildParameters: { ...typeaheadNavigationChildParameters, text: "" }
-    })
-}*/
-
-
-export interface GridChildRowInfo<RowElement extends Element> extends UseListNavigationChildInfo<RowElement> {
-
-}
-
-export interface GridChildCellInfo<CellElement extends Element> extends UseListNavigationChildInfo<CellElement> {
-
-}
-
-export interface UseGridNavigationParameters<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, M extends GridChildRowInfo<RowElement>> extends UseListNavigationParameters<RowElement, M> {
-
-
-}
-
-export interface UseGridNavigationReturnType<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element> extends UseListNavigationReturnTypeInfo<ParentOrRowElement, RowElement> {
-
-}
-
-
-
-export interface UseGridNavigationRowParameters<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, RM extends GridChildRowInfo<RowElement>, CM extends GridChildCellInfo<CellElement>> {
-    asChildRowOfTable: UseListNavigationChildParameters<RowElement, RM>;
-    asParentRowOfCells: UseListNavigationParameters<CellElement, CM>;
-
-}
-
-export interface UseGridNavigationRowReturnType<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element> {
-    asChildRowOfTable: UseListNavigationChildReturnTypeInfo<RowElement>;
-    asParentRowOfCells: UseListNavigationReturnTypeInfo<RowElement, CellElement>;
-}
-
-export interface UseGridNavigationRowInfo<RowElement extends Element> extends UseListNavigationChildInfo<RowElement> { }
-
-
-
-
-
-
-
-export interface UseGridNavigationCellParameters<CellElement extends Element, CM extends GridChildCellInfo<CellElement>> extends UseListNavigationChildParameters<CellElement, CM> {
-}
-
-export interface UseGridNavigationCellReturnType<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element>  extends UseListNavigationChildReturnTypeInfo<CellElement> { }
-
-export interface UseGridNavigationCellInfo<CellElement extends Element> extends UseListNavigationChildInfo<CellElement> { }
-
-
-function useGridNavigation<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, M extends GridChildRowInfo<RowElement>>({
-    linearNavigationParameters,
-    managedChildrenReturn,
-    rovingTabIndexParameters,
-    typeaheadNavigationParameters,
-    ..._void2
-}: UseGridNavigationParameters<ParentOrRowElement, RowElement, CellElement, M>): UseGridNavigationReturnType<ParentOrRowElement, RowElement, CellElement> {
-    const {
-        linearNavigationReturn,
-        rovingTabIndexReturn,
-        typeaheadNavigationReturn,
-        managedChildrenParameters,
-        typeaheadNavigationChildParameters,
-        rovingTabIndexChildParameters,
-        ...void1
-    } = useListNavigation<ParentOrRowElement, RowElement, M>({
-        linearNavigationParameters,
-        managedChildrenReturn,
-        rovingTabIndexParameters,
-        typeaheadNavigationParameters
-    });
-
-    assertEmptyObject(void1);
-    assertEmptyObject(_void2);
-
-    return {
-        managedChildrenParameters,
-        typeaheadNavigationChildParameters,
-        linearNavigationReturn,
-        rovingTabIndexReturn,
-        typeaheadNavigationReturn,
-        rovingTabIndexChildParameters
-    }
-}
-
-function useGridNavigationRow<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, RM extends GridChildRowInfo<RowElement>, CM extends GridChildRowInfo<CellElement>>({
-
-    asChildRowOfTable,
-    asParentRowOfCells,
-    ..._void1
-}: UseGridNavigationRowParameters<ParentOrRowElement, RowElement, CellElement, RM, CM>): UseGridNavigationRowReturnType<ParentOrRowElement, RowElement, CellElement> {
-
-
-    const {
-        managedChildParameters,
-        rovingTabIndexChildReturn,
-        hasCurrentFocusParameters,
-        ..._void2
-    } = useListNavigationChild<RowElement, RM>(asChildRowOfTable);
-
-    const {
-        linearNavigationReturn,
-        managedChildrenParameters,
-        rovingTabIndexChildParameters,
-        rovingTabIndexReturn,
-        typeaheadNavigationChildParameters,
-        typeaheadNavigationReturn,
-        ..._void3
-    } = useListNavigation<RowElement, CellElement, CM>(asParentRowOfCells)
-
-    assertEmptyObject(_void1);
-    assertEmptyObject(_void2);
-    assertEmptyObject(_void3);
-
-
-    return {
-        asChildRowOfTable: {
-            hasCurrentFocusParameters,
-            managedChildParameters,
-            rovingTabIndexChildReturn
-        },
-        asParentRowOfCells: {
-            linearNavigationReturn,
-            managedChildrenParameters,
-            rovingTabIndexChildParameters,
-            rovingTabIndexReturn,
-            typeaheadNavigationChildParameters,
-            typeaheadNavigationReturn
-        },
-    }
-}
-
-
-function useGridNavigationCell<RowElement extends Element, CellElement extends Element, CM extends GridChildRowInfo<CellElement>>({
-    managedChildParameters,
-    managedChildrenReturn,
-    refElementReturn,
-    rovingTabIndexChildParameters,
-    rovingTabIndexReturn,
-    typeaheadNavigationChildParameters,
-    ..._void1
-}: UseGridNavigationCellParameters<CellElement, CM>): UseGridNavigationCellReturnType<ParentOrRowElement, RowElement, CellElement> {
-    const {
-        hasCurrentFocusParameters,
-        managedChildParameters,
-        rovingTabIndexChildReturn,
-        ...void2
-    } = useListNavigationChild<CellElement, CM>({ 
-        managedChildParameters, 
-        managedChildrenReturn, 
-        refElementReturn, 
-        rovingTabIndexChildParameters, 
-        rovingTabIndexReturn, 
-        typeaheadNavigationChildParameters
-     });
-
-     assertEmptyObject(_void1);
-     assertEmptyObject(void2;)
-}
-
 function foo() {
     type TableElement = HTMLTableElement;
     type RowElement = HTMLTableRowElement;
     type CellElement = HTMLTableCellElement;
+    type RM = UseGridNavigationRowInfo<RowElement>;
+    type CM = UseGridNavigationCellInfo<RowElement>;
     const { managedChildrenReturn } = useManagedChildren<UseGridNavigationRowInfo<RowElement>>({ managedChildrenParameters: { onAfterChildLayoutEffect: null, onChildrenMountChange: null } });
     const getHighestIndex = useCallback(() => managedChildrenReturn.getChildren().getHighestIndex(), []);
-    const navigateAbsolute = useCallback((index: number, fromUserInteraction: boolean) => { rovingTabIndexReturn.setTabbableIndex(index, fromUserInteraction); }, []);
-    const navigateRelative = useCallback((from: number, offset: number, fromUserInteraction: boolean) => { rovingTabIndexReturn.setTabbableIndex(from + offset, fromUserInteraction); }, []);
+    const navigateAbsolute = useCallback((index: number, fromUserInteraction: boolean) => { setTabbableIndex(index, fromUserInteraction); }, []);
+    const navigateRelative = useCallback((from: number, offset: number, fromUserInteraction: boolean) => { setTabbableIndex(from + offset, fromUserInteraction); }, []);
     const {
         linearNavigationReturn,
         rovingTabIndexReturn,
-        typeaheadNavigationReturn
-    } = useGridNavigation<TableElement, RowElement, CellElement>({
+        typeaheadNavigationReturn,
+        managedChildrenParameters,
+        rovingTabIndexChildParameters,
+        typeaheadNavigationChildParameters
+    } = useGridNavigation<TableElement, RowElement, RM>({
         linearNavigationParameters: { disableArrowKeys: false, disableHomeEndKeys: false, getHighestIndex, navigationDirection: "either", navigateAbsolute, navigateRelative },
         managedChildrenReturn,
         rovingTabIndexParameters: { initiallyTabbedIndex: 0, onTabbableIndexChange: null },
         typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000 }
     });
+    const { setTabbableIndex } = rovingTabIndexReturn;
+
+
+
+
+    const { } = useGridNavigationRow<RowElement, CellElement, RM, CM>({
+        asChildRowOfTable: { managedChildParameters: { hidden, index }, managedChildrenReturn, refElementReturn, rovingTabIndexChildParameters, rovingTabIndexReturn, typeaheadNavigationChildParameters },
+        asParentRowOfCells: { linearNavigationParameters, managedChildrenReturn, rovingTabIndexParameters, typeaheadNavigationParameters }
+    })
 }
 
 
@@ -593,7 +376,7 @@ function foo2(managedChildrenReturn: UseManagedChildrenReturnTypeInfo<UseGridNav
     })
 }
 
-
+*/
 
 
 
