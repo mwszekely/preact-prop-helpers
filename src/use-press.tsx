@@ -5,6 +5,11 @@ import { useGlobalHandler } from "./use-event-handler";
 import { useForceUpdate } from "./use-force-update";
 import { useStableCallback } from "./use-stable-callback";
 import { useState } from "./use-state";
+import { useMergedProps } from "use-merged-props";
+/*
+export function usePressProps<E extends Element>(r: UsePressReturnType<E>, ...otherProps: h.JSX.HTMLAttributes<E>[]): h.JSX.HTMLAttributes<E>[] {
+    return [r.pressReturn.propsStable, ...otherProps];
+}*/
 
 interface PP<E extends Node> {
     /**
@@ -15,8 +20,8 @@ interface PP<E extends Node> {
     onPressSync: ((e: h.JSX.TargetedEvent<E>) => void) | null | undefined;
     exclude: undefined | { click?: "exclude" | undefined, space?: "exclude" | undefined, enter?: "exclude" | undefined };
     focusSelf(element: E): void;
-    onPseudoActiveStart(): void;
-    onPseudoActiveStop(): void;
+    onPseudoActiveStart: null | undefined | (() => void);
+    onPseudoActiveStop: null | undefined | (() => void);
 }
 
 export type UsePressParametersOmits = keyof PP<any>;
@@ -57,8 +62,8 @@ export function usePress<E extends Element>(args: UsePressParameters<E, never>):
         pressParameters: { exclude, focusSelf, onPressSync, onPseudoActiveStart, onPseudoActiveStop }
     } = args;
 
-    const stableOnPseudoActiveStart = useStableCallback(onPseudoActiveStart);
-    const stableOnPseudoActiveStop = useStableCallback(onPseudoActiveStop);
+    const stableOnPseudoActiveStart = useStableCallback(onPseudoActiveStart ?? (() => {}));
+    const stableOnPseudoActiveStop = useStableCallback(onPseudoActiveStop ?? (() => {}));
 
     // A button can be activated in multiple ways, so on the off chance
     // that multiple are triggered at once, we only *actually* register

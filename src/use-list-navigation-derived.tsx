@@ -1,3 +1,4 @@
+/*
 import { h, VNode } from "preact";
 import { useCallback } from "preact/hooks";
 import { useMergedProps } from "./use-merged-props";
@@ -18,7 +19,7 @@ import { useStableGetter } from "./use-stable-getter";
  * There aren't grid-nav versions of these because, geez, look at all this boilerplate just for lists.
  * Like 3 screens worth of interface types and 6 screens of functions that just move variables around.
  * Uh...when you inevitably need to do it yourself implement it here later lol (@me, myself in the future)
- */
+ *\/
 
 export interface UseListNavigationSingleSelectionParameters<ChildElement extends Element, C, K extends string, SSOmits extends SingleSelectionOmits, LsOmits extends ListNavigationParametersOmits, LnOmits extends LinearNavigationOmits, TnOmits extends TypeaheadNavigationOmits, RtiOmits extends RovingTabIndexParametersOmits, McOmits extends ManagedChildrenOmits> extends
     UseListNavigationParameters<LsOmits, LnOmits, TnOmits, RtiOmits | "initialIndex", McOmits>,
@@ -33,9 +34,9 @@ export interface UseListNavigationSingleSelectionReturnTypeInfo<ParentOrChildEle
 }
 export interface UseListNavigationSingleSelectionReturnTypeWithHooks<ParentOrChildElement extends Element, ChildElement extends Element, C, K extends string> extends
     UseListNavigationSingleSelectionReturnTypeInfo<ParentOrChildElement, ChildElement, C, K> {
-    /** **STABLE** */
+    /** **STABLE** *\/
     useListNavigationSingleSelectionChild: UseListNavigationSingleSelectionChild<ChildElement, C, K>;
-    /** **STABLE** */
+    /** **STABLE** *\/
     //props: UseListNavigationReturnTypeWithHooks<ParentOrChildElement, ChildElement, C, K>["props"];
 }
 
@@ -54,7 +55,7 @@ export interface UseListNavigationSingleSelectionChildReturnTypeInfo<ChildElemen
     /*singleSelectionChildReturn: {
         selected: boolean;
         getSelected(): boolean;
-    }*/
+    }*\/
 }
 export interface UseListNavigationSingleSelectionChildReturnTypeWithHooks<ChildElement extends Element> extends UseListNavigationSingleSelectionChildReturnTypeInfo<ChildElement> {
     //props: UseListNavigationChildReturnTypeWithHooks<ChildElement>["props"];
@@ -115,7 +116,7 @@ export interface UseSortableListNavigationSingleSelectionReturnTypeWithHooks<Par
  * This is a shortcut that combines the two with the correct typing.
  * @param param0 
  * @returns 
- */
+ *\/
 export function useListNavigationSingleSelection<ParentOrChildElement extends Element, ChildElement extends Element, C, K extends string>({
     singleSelectionParameters: { selectedIndex, setSelectedIndex },
     listNavigationParameters,
@@ -342,4 +343,4 @@ export function useSortableListNavigationSingleSelection<ParentElement extends E
     });
 
 }
-
+*/

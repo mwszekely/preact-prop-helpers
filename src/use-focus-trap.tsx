@@ -8,6 +8,11 @@ import { useMergedProps } from "./use-merged-props";
 import { useRefElement, UseRefElementParameters, UseRefElementReturnType } from "./use-ref-element";
 import { useStableCallback } from "./use-stable-callback";
 
+/*
+export function useFocusTrapProps<E extends Element>(r: UseFocusTrapReturnType<E>, ...otherProps: h.JSX.HTMLAttributes<E>[]): h.JSX.HTMLAttributes<E>[] {
+    return [r.focusTrap.propsUnstable, ...otherProps];
+}*/
+
 export interface UseFocusTrapParameters<E extends Element> extends UseRefElementParameters<E>, UseActiveElementParameters { focusTrapParameters: { trapActive: boolean; } }
 
 export interface UseFocusTrapReturnType<E extends Element> extends UseRefElementReturnType<E>, UseActiveElementReturnType {

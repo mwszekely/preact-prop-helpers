@@ -8,6 +8,11 @@ import { returnFalse, useEnsureStability, usePassiveState } from "./use-passive-
 import { useRefElement, UseRefElementParameters, UseRefElementReturnType } from "./use-ref-element";
 import { useMergedProps } from "./use-merged-props";
 
+/*
+export function useHasCurrentFocusProps<E extends Element>(r: UseHasCurrentFocusReturnType<E>, ...otherProps: h.JSX.HTMLAttributes<E>[]) {
+    return useMergedProps<E>(r.hasCurrentFocusReturn.propsStable, ...otherProps);
+}*/
+
 export interface UseHasCurrentFocusParameters<T extends Node> {
     refElementReturn: Required<Pick<UseRefElementReturnType<T>["refElementReturn"], "getElement">>;
 

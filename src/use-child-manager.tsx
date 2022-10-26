@@ -26,6 +26,9 @@ import { Stable, useStableObject } from "./use-stable-getter";
  */
 const _comments = void (0);
 
+export interface UseManagedChildrenContext<M extends ManagedChildInfo<any>> {
+    managedChildrenReturn: UseManagedChildrenReturnTypeInfo<M>["managedChildrenReturn"]
+}
 
 
 /**
@@ -274,43 +277,14 @@ export function useManagedChildren<M extends ManagedChildInfo<string | number>>(
     }, [/* Must remain stable */]);
 
 
-    /*const useManagedChild = useCallback<UseManagedChild<M>>((info) => {
-        const { managedChildParameters: { index } } = info;
-        // Any time our child props change, make that information available
-        // the parent if they need it.
-        // The parent can listen for all updates and only act on the ones it cares about,
-        // and multiple children updating in the same tick will all be sent at once.
-        useLayoutEffect(() => {
-            // Insert this information in-place
-            if (typeof index == "number") {
-                managedChildrenArray.current.arr[index as number] = { ...info.managedChildParameters };
-            }
-            else {
-                managedChildrenArray.current.rec[index as IndexType] = { ...info.managedChildParameters };
-            }
-            return remoteULEChildChanged(index as IndexType);
-        }, [...Object.entries(info).flat(9)]);  // 9 is infinity, right? Sure. Unrelated: TODO.
-
-        // When we mount, notify the parent via queueMicrotask
-        // (every child does this, so everything's coordinated to only queue a single microtask per tick)
-        // Do the same on unmount.
-        // Note: It's important that this comes AFTER remoteULEChildChanged
-        // so that remoteULEChildMounted has access to all the info on mount.
-        useLayoutEffect(() => {
-            remoteULEChildMounted?.(index as IndexType, true);
-            return () => remoteULEChildMounted?.(index as IndexType, false);
-        }, [index]);
-    }, [/* Must remain stable *\/]);*/
-
-
     const managedChildren = useStableObject<ManagedChildren<M>>({
         ...{ _: managedChildrenArray.current } as {},
         forEach: forEachChild,
         getAt: getManagedChildInfo,
         getHighestIndex: getHighestIndex,
-        arraySlice: () => {
+        arraySlice: useCallback(() => {
             return managedChildrenArray.current.arr.slice();
-        }
+        }, [])
     });
 
     return {
@@ -449,7 +423,6 @@ export interface UseChildrenFlagReturnType {
  */
 export function useChildrenFlag<M extends ManagedChildInfo<number>>({ getChildren, initialIndex, closestFit, onIndexChange, getAt, setAt, isValid, }: UseChildrenFlagParameters<M>): UseChildrenFlagReturnType {
     useEnsureStability("useChildrenFlag", onIndexChange, getAt, setAt, isValid);
-    const children = getChildren();
 
     const [getCurrentIndex, setCurrentIndex] = usePassiveState<null | number>(onIndexChange, useCallback(() => (initialIndex ?? (null)), []));
 
@@ -459,6 +432,7 @@ export function useChildrenFlag<M extends ManagedChildInfo<number>>({ getChildre
 
     // Shared between onChildrenMountChange and changeIndex, not public (but could be I guess)
     const getClosestFit = useCallback((requestedIndex: number) => {
+        const children = getChildren();
         let closestDistance = Infinity;
         let closestIndex: number | null = null;
         children.forEach(child => {
@@ -479,6 +453,7 @@ export function useChildrenFlag<M extends ManagedChildInfo<number>>({ getChildre
     // 1. The currently selected child unmounted
     // 2. A child mounted, and it mounts with the index we're looking for
     const reevaluateClosestFit = useStableCallback(() => {
+        const children = getChildren();
         const requestedIndex = getRequestedIndex();
         const currentIndex = getCurrentIndex();
         const currentChild = currentIndex == null ? null : children.getAt(currentIndex);
@@ -502,6 +477,7 @@ export function useChildrenFlag<M extends ManagedChildInfo<number>>({ getChildre
 
 
     const changeIndex = useCallback((arg: Parameters<StateUpdater<number | null>>[0]) => {
+        const children = getChildren();
         const requestedIndex = arg instanceof Function ? arg(getRequestedIndex()) : arg;
         //if (requestedIndex == null && getFitNullToZero())
         //    requestedIndex = 0;

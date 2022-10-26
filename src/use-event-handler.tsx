@@ -66,7 +66,7 @@ export function useGlobalHandler<T extends EventTarget, EventType extends TypedE
     // It seems like it's guaranteed to always be a union of all available tupes.
     // Again, no matter what combination of sub- or sub-sub-functions used.
 
-    let stableHandler: EventListener | null = useStableCallback(handler ?? (() => { })) as EventListener;
+    let stableHandler: EventListener | null = useStableCallback<EventListener>((handler as any) ?? (() => { })) as (EventListener | null);
     if (handler == null)
         stableHandler = null;
 
@@ -97,7 +97,7 @@ export function useLocalHandler<ElementType extends (HTMLElementTagNameMap[keyof
         const stableHandler = useStableCallback(handler);
 
         const useLocalEventHandlerProps = useCallback((props: h.JSX.HTMLAttributes<ElementType>) => {
-            return useMergedProps<ElementType>({ [type]: stableHandler } as { [K in EventType]: typeof handler }, props) as h.JSX.HTMLAttributes<ElementType>;
+            return useMergedProps<ElementType>({ [type]: stableHandler } as h.JSX.HTMLAttributes<ElementType>, props) as h.JSX.HTMLAttributes<ElementType>;
         }, [type]);
 
         return { useLocalEventHandlerProps };

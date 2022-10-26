@@ -59,6 +59,7 @@ var bundle = (function (exports) {
     function usePassiveState(onChange, getInitialValue, customDebounceRendering) {
         const valueRef = A(Unset$1);
         const warningRef = A(false);
+        const dependencyToCompareAgainst = A(Unset$1);
         const cleanupCallbackRef = A(undefined);
         // Make sure that the provided functions are perfectly stable across renders
         useEnsureStability("usePassiveState", onChange, getInitialValue, customDebounceRendering);
@@ -100,23 +101,22 @@ var bundle = (function (exports) {
             tryEnsureValue();
         }, []);
         // The actual code the user calls to (possibly) run a new effect.
-        const r = A({ prevDep: Unset$1 });
         const setValue = q$1((arg) => {
             // Regardless of anything else, figure out what our next value is about to be.
             const nextValue = (arg instanceof Function ? arg(valueRef.current === Unset$1 ? undefined : valueRef.current) : arg);
-            if (r.current.prevDep === Unset$1 && nextValue !== valueRef.current) {
+            if (dependencyToCompareAgainst.current === Unset$1 && nextValue !== valueRef.current) {
                 // This is the first request to change this value.
                 // Evaluate the request immediately, then queue up the onChange function
                 // Save our current value so that we can compare against it later
                 // (if we flip back to this state, then we won't send the onChange function)
-                r.current.prevDep = valueRef.current;
+                dependencyToCompareAgainst.current = valueRef.current;
                 // It's important to update this here (as well as below) in case customDebounceRendering invokes this immediately
                 valueRef.current = nextValue;
                 // Schedule the actual check and invocation of onChange later to let effects settle
                 (customDebounceRendering ?? debounceRendering)(() => {
                     const nextDep = valueRef.current;
-                    const prevDep = r.current.prevDep;
-                    if (r.current.prevDep != valueRef.current) {
+                    const prevDep = dependencyToCompareAgainst.current;
+                    if (dependencyToCompareAgainst.current != valueRef.current) {
                         warningRef.current = true;
                         try {
                             // Call any registered cleanup function
@@ -130,7 +130,7 @@ var bundle = (function (exports) {
                         }
                     }
                     // We've finished with everything, so mark us as being on a clean slate again.
-                    r.current.prevDep = Unset$1;
+                    dependencyToCompareAgainst.current = Unset$1;
                 });
             }
             // Update the value immediately.
@@ -366,18 +366,29 @@ var bundle = (function (exports) {
             return ref.current;
         }, []);
     }
-
     /**
-     * Alternate useCallback() which always returns the same (wrapped) function reference
-     * so that it can be excluded from the dependency arrays of `useEffect` and friends.
-     *
-     * Do not use during the render phase!  `useLayoutEffect` is fine though.
+     * Like `useStableGetter`, but ***requires*** that everything in the object is also stable,
+     * and in turn returns an object that itself is stable.
+     * @param t
+     * @returns
      */
-    function useStableCallback(fn) {
-        const currentCallbackGetter = useStableGetter(fn);
-        return q$1((...args) => {
-            return currentCallbackGetter()(...args);
-        }, []);
+    function useStableObject(t) {
+        const e = Object.entries(t);
+        useEnsureStability("useStableObject", e.length, ...e.map(([k, v]) => v));
+        return A(t).current;
+    }
+
+    function useStableCallback(fn, noDeps) {
+        if (noDeps == null) {
+            const currentCallbackGetter = useStableGetter(fn);
+            return q$1((...args) => {
+                return currentCallbackGetter()(...args);
+            }, []);
+        }
+        else {
+            console.assert(noDeps.length === 0);
+            return q$1(fn, []);
+        }
     }
 
     const SharedAnimationFrameContext = B$2(null);
@@ -997,7 +1008,7 @@ var bundle = (function (exports) {
         return [state, setState, getState];
     }
 
-    function identity$1(...t) { return t; }
+    function identity(...t) { return t; }
     function useThrottled(callback, wait, options) {
         const throttled = T$1(() => {
             return callback ? throttle(callback, wait, options) : null;
@@ -1043,7 +1054,7 @@ var bundle = (function (exports) {
     function useAsync(asyncHandler, options) {
         /* eslint-disable prefer-const */
         let { throttle, debounce, capture } = (options ?? {});
-        capture ??= identity$1;
+        capture ??= identity;
         // We keep, like, a lot of render-state, but it only ever triggers a re-render
         // when we start/stop an async action.
         // Keep track of this for the caller's sake -- we don't really care.
@@ -1237,7 +1248,7 @@ var bundle = (function (exports) {
      *
      */
     function useManagedChildren(parentParameters) {
-        const { managedChildrenParameters: { onAfterChildLayoutEffect, onChildrenMountChange } } = parentParameters;
+        const { managedChildrenParameters: { onAfterChildLayoutEffect, onChildrenMountChange }, ...rest } = parentParameters;
         useEnsureStability("useManagedChildren", onAfterChildLayoutEffect, onChildrenMountChange);
         const getHighestIndex = q$1(() => {
             return managedChildrenArray.current.highestIndex;
@@ -1325,45 +1336,51 @@ var bundle = (function (exports) {
             }
             hasRemoteULEChildMounted.current[mounted ? "mounts" : "unmounts"].add(index);
         }, [ /* Must remain stable */]);
-        const useManagedChild = q$1((info) => {
-            const { managedChildParameters: { index, flags }, subInfo } = info;
-            // Any time our child props change, make that information available
-            // the parent if they need it.
-            // The parent can listen for all updates and only act on the ones it cares about,
-            // and multiple children updating in the same tick will all be sent at once.
-            _(() => {
-                // Insert this information in-place
-                if (typeof index == "number") {
-                    managedChildrenArray.current.arr[index] = { index, flags: flags ?? {}, subInfo };
-                }
-                else {
-                    managedChildrenArray.current.rec[index] = { index, flags: flags ?? {}, subInfo };
-                }
-                return remoteULEChildChanged(index);
-            }, [...Object.entries(info).flat(9)]); // 9 is infinity, right? Sure. Unrelated: TODO.
-            // When we mount, notify the parent via queueMicrotask
-            // (every child does this, so everything's coordinated to only queue a single microtask per tick)
-            // Do the same on unmount.
-            // Note: It's important that this comes AFTER remoteULEChildChanged
-            // so that remoteULEChildMounted has access to all the info on mount.
-            _(() => {
-                remoteULEChildMounted?.(index, true);
-                return () => remoteULEChildMounted?.(index, false);
-            }, [index]);
-        }, [ /* Must remain stable */]);
-        const managedChildren = A({
+        const managedChildren = useStableObject({
             ...{ _: managedChildrenArray.current },
             forEach: forEachChild,
             getAt: getManagedChildInfo,
             getHighestIndex: getHighestIndex,
-            arraySlice: () => {
+            arraySlice: q$1(() => {
                 return managedChildrenArray.current.arr.slice();
-            }
+            }, [])
         });
         return {
-            useManagedChild,
-            managedChildrenReturn: { children: managedChildren.current }
+            managedChildrenReturn: useStableObject({
+                getChildren: q$1(() => managedChildren, []),
+                _private: useStableObject({
+                    managedChildrenArray: managedChildrenArray.current,
+                    remoteULEChildMounted,
+                    remoteULEChildChanged
+                })
+            })
         };
+    }
+    function useManagedChild(info) {
+        const { managedChildParameters: { index }, managedChildrenReturn: { _private: { managedChildrenArray, remoteULEChildMounted, remoteULEChildChanged } } } = info;
+        // Any time our child props change, make that information available
+        // the parent if they need it.
+        // The parent can listen for all updates and only act on the ones it cares about,
+        // and multiple children updating in the same tick will all be sent at once.
+        _(() => {
+            // Insert this information in-place
+            if (typeof index == "number") {
+                managedChildrenArray.arr[index] = { ...info.managedChildParameters };
+            }
+            else {
+                managedChildrenArray.rec[index] = { ...info.managedChildParameters };
+            }
+            return remoteULEChildChanged(index);
+        }, [...Object.entries(info).flat(9)]); // 9 is infinity, right? Sure. Unrelated: TODO.
+        // When we mount, notify the parent via queueMicrotask
+        // (every child does this, so everything's coordinated to only queue a single microtask per tick)
+        // Do the same on unmount.
+        // Note: It's important that this comes AFTER remoteULEChildChanged
+        // so that remoteULEChildMounted has access to all the info on mount.
+        _(() => {
+            remoteULEChildMounted?.(index, true);
+            return () => remoteULEChildMounted?.(index, false);
+        }, [index]);
     }
     /**
      * An extension to useManagedChildren that handles the following common case:
@@ -1382,17 +1399,18 @@ var bundle = (function (exports) {
      * @param param0
      * @returns
      */
-    function useChildrenFlag({ children, initialIndex, closestFit, onIndexChange, key }) {
-        useEnsureStability("useChildrenFlag", onIndexChange, key);
+    function useChildrenFlag({ getChildren, initialIndex, closestFit, onIndexChange, getAt, setAt, isValid, }) {
+        useEnsureStability("useChildrenFlag", onIndexChange, getAt, setAt, isValid);
         const [getCurrentIndex, setCurrentIndex] = usePassiveState(onIndexChange, q$1(() => (initialIndex ?? (null)), []));
         const [getRequestedIndex, setRequestedIndex] = usePassiveState(null, q$1(() => (initialIndex ?? (null)), []));
         //    const getFitNullToZero = useStableGetter(fitNullToZero);
         // Shared between onChildrenMountChange and changeIndex, not public (but could be I guess)
         const getClosestFit = q$1((requestedIndex) => {
+            const children = getChildren();
             let closestDistance = Infinity;
             let closestIndex = null;
             children.forEach(child => {
-                if (child.flags?.[key]?.isValid()) {
+                if (isValid(child)) {
                     const newDistance = Math.abs(child.index - requestedIndex);
                     if (newDistance < closestDistance || (newDistance == closestDistance && child.index < requestedIndex)) {
                         closestDistance = newDistance;
@@ -1407,21 +1425,24 @@ var bundle = (function (exports) {
         // 1. The currently selected child unmounted
         // 2. A child mounted, and it mounts with the index we're looking for
         const reevaluateClosestFit = useStableCallback(() => {
+            const children = getChildren();
             const requestedIndex = getRequestedIndex();
             const currentIndex = getCurrentIndex();
             const currentChild = currentIndex == null ? null : children.getAt(currentIndex);
-            if (requestedIndex != null && closestFit && (requestedIndex != currentIndex || currentChild == null || !currentChild.flags?.[key]?.isValid())) {
-                currentChild?.flags?.[key].set(false);
+            if (requestedIndex != null && closestFit && (requestedIndex != currentIndex || currentChild == null || !isValid(currentChild))) {
+                if (currentChild)
+                    setAt(currentChild, false);
                 const closestFitIndex = getClosestFit(requestedIndex);
                 setCurrentIndex(closestFitIndex);
                 if (closestFitIndex != null) {
                     const closestFitChild = children.getAt(closestFitIndex);
                     console.assert(closestFitChild != null, "Internal logic???");
-                    closestFitChild.flags?.[key].set(true);
+                    setAt(closestFitChild, true);
                 }
             }
         });
         const changeIndex = q$1((arg) => {
+            const children = getChildren();
             const requestedIndex = arg instanceof Function ? arg(getRequestedIndex()) : arg;
             //if (requestedIndex == null && getFitNullToZero())
             //    requestedIndex = 0;
@@ -1434,14 +1455,16 @@ var bundle = (function (exports) {
             if (requestedIndex == null) {
                 // Easy case
                 setCurrentIndex(null);
-                oldMatchingChild?.flags?.[key].set(false);
+                if (oldMatchingChild)
+                    setAt(oldMatchingChild, false);
                 return null;
             }
             else {
-                if (newMatchingChild && newMatchingChild.flags?.[key].isValid()) {
+                if (newMatchingChild && isValid(newMatchingChild)) {
                     setCurrentIndex(requestedIndex);
-                    oldMatchingChild?.flags?.[key].set(false);
-                    newMatchingChild.flags?.[key].set(true);
+                    if (oldMatchingChild)
+                        setAt(oldMatchingChild, false);
+                    setAt(newMatchingChild, true);
                     return requestedIndex;
                 }
                 else {
@@ -1450,62 +1473,24 @@ var bundle = (function (exports) {
                     if (closestFitIndex != null) {
                         newMatchingChild = children.getAt(closestFitIndex);
                         console.assert(newMatchingChild != null, "Internal logic???");
-                        oldMatchingChild?.flags?.[key].set(false);
-                        newMatchingChild.flags?.[key].set(true);
+                        if (oldMatchingChild)
+                            setAt(oldMatchingChild, false);
+                        setAt(newMatchingChild, true);
                         return closestFitIndex;
                     }
                     else {
-                        oldMatchingChild?.flags?.[key].set(false);
+                        if (oldMatchingChild)
+                            setAt(oldMatchingChild, false);
                         return null;
                     }
                 }
             }
         }, []);
+        // Run once, on mount
         _(() => {
-            if (initialIndex != null)
-                children.getAt(initialIndex)?.flags?.[key]?.set(true);
+            onIndexChange?.(initialIndex ?? null, undefined);
         }, []);
         return { changeIndex, reevaluateClosestFit, getCurrentIndex };
-    }
-
-    function useChildrenHaveFocus(args) {
-        const { childrenHaveFocusParameters: { onAllLostFocus, onAnyGainedFocus } } = args;
-        ///const { managedChildrenReturn, useManagedChild } = useManagedChildren<number, C, K>({ managedChildrenParameters: { onAfterChildLayoutEffect, onChildrenMountChange } });
-        const allElementsRef = A(new Set());
-        const [_getFocusCount, setFocusCount] = usePassiveState(useStableCallback((anyFocused, anyPreviouslyFocused) => {
-            console.assert(anyFocused >= 0 && anyFocused <= 1);
-            if (anyFocused && !anyPreviouslyFocused)
-                onAnyGainedFocus?.();
-            if (!anyFocused && anyPreviouslyFocused)
-                onAllLostFocus?.();
-        }));
-        const useChildrenHaveFocusChild = q$1((args) => {
-            return {
-                hasCurrentFocusParameters: {
-                    onCurrentFocusedInnerChanged: q$1((focused, prev) => {
-                        if (focused) {
-                            setFocusCount(p => (p ?? 0) + 1);
-                        }
-                        else if (!focused && prev) {
-                            setFocusCount(p => (p ?? 0) - 1);
-                        }
-                    }, []),
-                },
-                refElementParameters: {
-                    onElementChange: q$1((e, prev) => {
-                        if (e) {
-                            allElementsRef.current.add(e);
-                            return () => {
-                                allElementsRef.current.delete(e);
-                            };
-                        }
-                    }, [])
-                }
-            };
-        }, []);
-        return {
-            useChildrenHaveFocusChild
-        };
     }
 
     function r(e){var t,f,n="";if("string"==typeof e||"number"==typeof e)n+=e;else if("object"==typeof e)if(Array.isArray(e))for(t=0;t<e.length;t++)e[t]&&(f=r(e[t]))&&(n&&(n+=" "),n+=f);else for(t in e)e[t]&&(n&&(n+=" "),n+=t);return n}function clsx(){for(var e,t,f=0,n="";f<arguments.length;)(e=arguments[f++])&&(t=r(e))&&(n&&(n+=" "),n+=t);return n}
@@ -1703,6 +1688,10 @@ var bundle = (function (exports) {
         };
     }
 
+    /*
+    export function useRefElementProps<E extends Element>(r: UseRefElementReturnType<E>, ...otherProps: h.JSX.HTMLAttributes<E>[]): h.JSX.HTMLAttributes<E>[] {
+        return [r.refElementReturn.propsStable, ...otherProps];
+    }*/
     /**
      * Allows accessing the element a ref references as soon as it does so.
      * *This hook itself returns a hook*--useRefElementProps modifies the props that you were going to pass to an HTMLElement,
@@ -1905,14 +1894,6 @@ var bundle = (function (exports) {
     }
 
     let log = console.warn;
-    function useMergedProps(...allProps) {
-        useEnsureStability("useMergedProps", allProps.length);
-        let ret = {};
-        for (let nextProps of allProps) {
-            ret = useMergedProps2(ret, nextProps);
-        }
-        return ret;
-    }
     /**
      * Given two sets of props, merges them and returns the result.
      *
@@ -1921,6 +1902,14 @@ var bundle = (function (exports) {
      * @param rhs2
      * @returns
      */
+    function useMergedProps(...allProps) {
+        useEnsureStability("useMergedProps", allProps.length);
+        let ret = {};
+        for (let nextProps of allProps) {
+            ret = useMergedProps2(ret, nextProps);
+        }
+        return ret;
+    }
     function useMergedProps2(lhsAll, rhsAll) {
         // First, separate the props we were given into two groups:
         // lhsAll and rhsAll contain all the props we were given, and
@@ -3792,13 +3781,12 @@ var bundle = (function (exports) {
      *
      * @see useListNavigation, which packages everything up together.
      */
-    function useLinearNavigation({ linearNavigationParameters: { navigateToFirst: ntf, navigateToLast: ntl, navigateToNext: ntn, navigateToPrev: ntp, navigationDirection: nd, disableArrowKeys: dak, disableHomeEndKeys: dhek } }) {
-        nd ??= "either";
-        //const { getLogicalDirectionInfo, useLogicalDirectionProps } = useLogicalDirection<ParentOrChildElement>({});
-        const navigateToFirst = useStableCallback(ntf);
-        const navigateToLast = useStableCallback(ntl);
-        const navigateToNext = useStableCallback(ntn);
-        const navigateToPrev = useStableCallback(ntp);
+    function useLinearNavigation({ rovingTabIndexReturn, linearNavigationParameters: { getHighestIndex, navigateAbsolute, navigateRelative, navigationDirection: nd, disableArrowKeys: dak, disableHomeEndKeys: dhek, ..._void1 } }) {
+        const { getTabbableIndex, setTabbableIndex } = rovingTabIndexReturn;
+        const navigateToFirst = useStableCallback((fromUserInteraction) => { setTabbableIndex(navigateAbsolute(0), fromUserInteraction); });
+        const navigateToLast = useStableCallback((fromUserInteraction) => { setTabbableIndex(navigateAbsolute(getHighestIndex()), fromUserInteraction); });
+        const navigateToNext = useStableCallback((fromUserInteraction) => setTabbableIndex(navigateRelative((getTabbableIndex() ?? 0), +1), fromUserInteraction));
+        const navigateToPrev = useStableCallback((fromUserInteraction) => setTabbableIndex(navigateRelative((getTabbableIndex() ?? 0), -1), fromUserInteraction));
         const getDisableArrowKeys = useStableGetter(dak);
         const getDisableHomeEndKeys = useStableGetter(dhek);
         const getNavigationDirection = useStableGetter(nd);
@@ -3818,7 +3806,7 @@ var bundle = (function (exports) {
                         //const propName = (info?.blockOrientation === "vertical" ? "blockDirection" : "inlineDirection");
                         const directionAllowed = (!disableArrowKeys && allowsVerticalNavigation);
                         if (directionAllowed) {
-                            navigateToPrev();
+                            navigateToPrev(true);
                             e.preventDefault();
                             e.stopPropagation();
                         }
@@ -3827,7 +3815,7 @@ var bundle = (function (exports) {
                     case "ArrowDown": {
                         const directionAllowed = (!disableArrowKeys && allowsVerticalNavigation);
                         if (directionAllowed) {
-                            navigateToNext();
+                            navigateToNext(true);
                             e.preventDefault();
                             e.stopPropagation();
                         }
@@ -3836,7 +3824,7 @@ var bundle = (function (exports) {
                     case "ArrowLeft": {
                         const directionAllowed = (!disableArrowKeys && allowsHorizontalNavigation);
                         if (directionAllowed) {
-                            navigateToPrev();
+                            navigateToPrev(true);
                             e.preventDefault();
                             e.stopPropagation();
                         }
@@ -3845,7 +3833,7 @@ var bundle = (function (exports) {
                     case "ArrowRight": {
                         const directionAllowed = (!disableArrowKeys && allowsHorizontalNavigation);
                         if (directionAllowed) {
-                            navigateToNext();
+                            navigateToNext(true);
                             e.preventDefault();
                             e.stopPropagation();
                         }
@@ -3855,14 +3843,14 @@ var bundle = (function (exports) {
                     }
                     case "Home":
                         if (!disableHomeEndKeys) {
-                            navigateToFirst();
+                            navigateToFirst(true);
                             e.preventDefault();
                             e.stopPropagation();
                         }
                         break;
                     case "End":
                         if (!disableHomeEndKeys) {
-                            navigateToLast();
+                            navigateToLast(true);
                             e.preventDefault();
                             e.stopPropagation();
                         }
@@ -3881,7 +3869,7 @@ var bundle = (function (exports) {
      *
      * @see useListNavigation, which packages everything up together.
      */
-    function useTypeaheadNavigation({ typeaheadNavigationParameters: { collator, getIndex, typeaheadTimeout, setIndex, noTypeahead } }) {
+    function useTypeaheadNavigation({ typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead, ..._void3 }, rovingTabIndexReturn: { getTabbableIndex: getIndex, setTabbableIndex: setIndex, ..._void1 }, ..._void2 }) {
         // For typeahead, keep track of what our current "search" string is (if we have one)
         // and also clear it every 1000 ms since the last time it changed.
         // Next, keep a mapping of typeahead values to indices for faster searching.
@@ -4034,47 +4022,51 @@ var bundle = (function (exports) {
                         ++i;
                     }
                     if (lowestUnsortedIndexNext !== null)
-                        setIndex(sortedTypeaheadInfo.current[lowestSortedIndexNext].unsortedIndex);
+                        setIndex(sortedTypeaheadInfo.current[lowestSortedIndexNext].unsortedIndex, true);
                     else if (lowestUnsortedIndexAll !== null)
-                        setIndex(sortedTypeaheadInfo.current[lowestSortedIndexAll].unsortedIndex);
+                        setIndex(sortedTypeaheadInfo.current[lowestSortedIndexAll].unsortedIndex, true);
                 }
             }
         }, [currentTypeahead]);
-        const useTypeaheadNavigationChild = q$1(({ index, text }) => {
-            s(() => {
-                if (text) {
-                    // Find where to insert this item.
-                    // Because all index values should be unique, the returned sortedIndex
-                    // should always refer to a new location (i.e. be negative)                
-                    const sortedIndex = binarySearch(sortedTypeaheadInfo.current, text, insertingComparator);
-                    console.assert(sortedIndex < 0 || insertingComparator(sortedTypeaheadInfo.current[sortedIndex].text, { unsortedIndex: index, text }) == 0);
-                    if (sortedIndex < 0) {
-                        sortedTypeaheadInfo.current.splice(-sortedIndex - 1, 0, { text, unsortedIndex: index });
-                    }
-                    else {
-                        sortedTypeaheadInfo.current.splice(sortedIndex, 0, { text, unsortedIndex: index });
-                    }
-                    return () => {
-                        // When unmounting, find where we were and remove ourselves.
-                        // Again, we should always find ourselves because there should be no duplicate values if each index is unique.
-                        const sortedIndex = binarySearch(sortedTypeaheadInfo.current, text, insertingComparator);
-                        console.assert(sortedIndex < 0 || insertingComparator(sortedTypeaheadInfo.current[sortedIndex].text, { unsortedIndex: index, text }) == 0);
-                        if (sortedIndex >= 0) {
-                            sortedTypeaheadInfo.current.splice(sortedIndex, 1);
-                        }
-                    };
-                }
-            }, [text]);
-            return;
-        }, []);
         return {
-            useTypeaheadNavigationChild,
+            typeaheadNavigationChildParameters: useStableObject({
+                _private: useStableObject({
+                    insertingComparator,
+                    sortedTypeaheadInfo: sortedTypeaheadInfo.current
+                })
+            }),
             typeaheadNavigationReturn: {
                 currentTypeahead,
                 invalidTypeahead,
                 propsStable: propsStable.current
             }
         };
+    }
+    function useTypeaheadNavigationChild({ managedChildParameters: { index }, typeaheadNavigationChildParameters: { text, _private: { sortedTypeaheadInfo, insertingComparator } } }) {
+        s(() => {
+            if (text) {
+                // Find where to insert this item.
+                // Because all index values should be unique, the returned sortedIndex
+                // should always refer to a new location (i.e. be negative)                
+                const sortedIndex = binarySearch(sortedTypeaheadInfo, text, insertingComparator);
+                console.assert(sortedIndex < 0 || insertingComparator(sortedTypeaheadInfo[sortedIndex].text, { unsortedIndex: index, text }) == 0);
+                if (sortedIndex < 0) {
+                    sortedTypeaheadInfo.splice(-sortedIndex - 1, 0, { text, unsortedIndex: index });
+                }
+                else {
+                    sortedTypeaheadInfo.splice(sortedIndex, 0, { text, unsortedIndex: index });
+                }
+                return () => {
+                    // When unmounting, find where we were and remove ourselves.
+                    // Again, we should always find ourselves because there should be no duplicate values if each index is unique.
+                    const sortedIndex = binarySearch(sortedTypeaheadInfo, text, insertingComparator);
+                    console.assert(sortedIndex < 0 || insertingComparator(sortedTypeaheadInfo[sortedIndex].text, { unsortedIndex: index, text }) == 0);
+                    if (sortedIndex >= 0) {
+                        sortedTypeaheadInfo.splice(sortedIndex, 1);
+                    }
+                };
+            }
+        }, [text]);
     }
     /**
      * Your usual binary search implementation.
@@ -4134,340 +4126,439 @@ var bundle = (function (exports) {
      * And just as well! Children should be allowed at the root,
      * regardless of if it's the whole app or just a given component.
      */
-    function useRovingTabIndex(parentParameters) {
-        let { managedChildrenParameters: { onAfterChildLayoutEffect, onChildrenMountChange }, rovingTabIndexParameters: { initialIndex, onTabbableIndexChange, onTabbableRender } } = parentParameters;
-        initialIndex ??= 0;
-        const stableOnTabbableRender = useStableCallback(onTabbableRender ?? (() => { }));
-        /*const [_getAnyFocused, setAnyFocused] = usePassiveState<number>(useStableCallback((newCount: number, oldCount: number | undefined) => {
-            if (oldCount == 0 && newCount > 0) {
-                onTabbedInTo?.();
-            }
-
-            if (newCount == 0 && (oldCount ?? 0) > 0) {
-                onTabbedOutOf?.();
-            }
-        }), returnZero);*/
+    function useRovingTabIndex({ managedChildrenReturn, rovingTabIndexParameters: { initiallyTabbedIndex, onTabbableIndexChange }, ..._void1 }) {
+        const { getChildren } = managedChildrenReturn;
+        //const children = getChildren();
+        initiallyTabbedIndex ??= 0;
         // Keep track of three things related to the currently tabbable element's index:
         // What it is, and whether, when we render this component and it's changed, to also focus the element that was made tabbable.
-        const [getTabbableIndex, setTabbableIndex2] = usePassiveState(onTabbableIndexChange, q$1(() => { return initialIndex ?? 0; }, []));
+        //const [getTabbableIndex, setTabbableIndex2] = usePassiveState<number | null>(onTabbableIndexChange, useCallback(() => { return initiallyTabbedIndex }, []));
         const setTabbableIndex = q$1((updater, fromUserInteraction) => {
-            setTabbableIndex2((prevIndex) => {
-                let nextIndex = prevIndex;
-                if (typeof updater === "function")
-                    nextIndex = updater(prevIndex ?? null);
-                else
-                    nextIndex = updater;
-                nextIndex = changeIndex(nextIndex);
+            const children = getChildren();
+            // Notify the relevant children that they should become tabbable/untabbable,
+            // but also handle focus management when we changed due to user interaction
+            return setTabbableIndex2(prevIndex => {
+                let nextIndex = (typeof updater === "function") ? updater(prevIndex ?? null) : updater;
                 if (prevIndex != nextIndex) {
                     const nextChild = nextIndex == null ? null : children.getAt(nextIndex);
-                    //const prevChild = prevIndex == null ? null : parentReturnType.managedChildren.children.getAt(prevIndex);
-                    //if (prevChild != null)
-                    //    prevChild.subInfo.blurSelf();
+                    if (!nextChild?.hidden) {
+                        console.assert(false);
+                        debugger;
+                    }
                     if (nextChild != null && fromUserInteraction) {
-                        const element = nextChild.subInfo.getElement();
+                        const element = nextChild.getElement();
                         if (element) {
                             if (document.activeElement == null || !element.contains(document.activeElement))
-                                nextChild.subInfo.focusSelf();
+                                nextChild.focusSelf(element);
                         }
                     }
                 }
                 return nextIndex;
             });
         }, []);
-        // Any time the tabbable index changes,
-        // notify the previous child that it's no longer tabbable,
-        // and notify the next child that is allowed to be tabbed to.
-        const { managedChildrenReturn, useManagedChild } = useManagedChildren({
-            managedChildrenParameters: {
-                onAfterChildLayoutEffect,
-                onChildrenMountChange: useStableCallback((mounted, unmounted) => { onChildrenMountChange?.(mounted, unmounted); reevaluateClosestFit(); }),
-            },
+        // Boilerplate related to notifying individual children when they become tabbable/untabbable
+        const getTabbableAt = q$1((m) => { return m.getTabbable(); }, []);
+        const setTabbableAt = q$1((m, t) => { m.setTabbable(t); }, []);
+        const isTabbableValid = q$1((m) => { return !m.hidden; }, []);
+        const { changeIndex: setTabbableIndex2, getCurrentIndex: getTabbableIndex, reevaluateClosestFit } = useChildrenFlag({
+            initialIndex: initiallyTabbedIndex,
+            onIndexChange: onTabbableIndexChange,
+            getChildren,
+            closestFit: true,
+            getAt: getTabbableAt,
+            isValid: isTabbableValid,
+            setAt: setTabbableAt
         });
-        const { children } = managedChildrenReturn;
-        const { changeIndex, reevaluateClosestFit } = useChildrenFlag({ initialIndex, children, closestFit: true, key: "tabbable" });
-        const useRovingTabIndexChild = q$1((childParameters) => {
-            const { managedChildParameters: { index, flags }, rovingTabIndexChildParameters: { focusSelf: focusSelfOverride, noModifyTabIndex, hidden }, refElementReturn: { getElement }, 
-            //hasFocusParameters: { onFocusedInnerChanged, ...hasFocusParameters },
-            subInfo } = childParameters;
-            s(() => {
-                reevaluateClosestFit();
-            }, [!!hidden]);
-            const stableFocusSelf = useStableCallback(focusSelfOverride);
-            const focusSelf = q$1(() => {
-                const element = getElement();
-                if (element) {
-                    if (document.activeElement == null || !element.contains(document.activeElement))
-                        stableFocusSelf(element);
-                }
-            }, []);
-            /*const { activeElementReturn, hasFocusReturn, refElementReturn } = useHasFocus<ChildElement>({
-                activeElementParameters,
-                hasFocusParameters: {
-                    ,
-                    ...hasFocusParameters
-                },
-                refElementParameters
-            });*/
-            //const { getElement } = refElementReturn;
-            const [tabbable, setTabbable, getTabbable] = useState(false);
-            const tabbableFlags = A({ get: getTabbable, set: setTabbable, isValid: useStableCallback(() => !hidden) });
-            useManagedChild({
-                managedChildParameters: {
-                    index,
-                    flags: { ...flags, tabbable: tabbableFlags.current },
-                },
-                subInfo: {
-                    focusSelf,
-                    getElement,
-                    hidden: !!hidden,
-                    subInfo
-                }
-            });
-            s(() => {
-                if (tabbable)
-                    stableOnTabbableRender(index);
-            }, [tabbable, index]);
-            //const rovingTabIndexChildProps = useMergedProps(refElementProps, { tabIndex: noModifyTabIndex ? undefined : (tabbable ? 0 : -1) })
-            return {
-                hasCurrentFocusParameters: {
-                    onCurrentFocusedInnerChanged: useStableCallback((focused, _prevFocused) => {
-                        if (focused) {
-                            setTabbableIndex(index, false);
-                        }
-                    })
-                },
-                rovingTabIndexChildReturn: {
-                    propsUnstable: { tabIndex: noModifyTabIndex ? undefined : (tabbable ? 0 : -1) },
-                    tabbable,
-                    getTabbable
-                }
-            };
-        }, [ /* Must remain stable */]);
         const focusSelf = q$1(() => {
+            const children = getChildren();
             const index = getTabbableIndex();
-            if (index != null)
-                children.getAt(index)?.subInfo.focusSelf?.();
+            if (index != null) {
+                const element = children.getAt(index)?.getElement();
+                children.getAt(index)?.focusSelf?.(element);
+            }
             else
                 setTabbableIndex(null, true);
         }, []);
         return {
-            useRovingTabIndexChild,
-            managedChildrenReturn,
-            rovingTabIndexReturn: {
+            managedChildrenParameters: {
+                onChildrenMountChange: reevaluateClosestFit,
+            },
+            rovingTabIndexReturn: useStableObject({
                 setTabbableIndex,
                 getTabbableIndex,
-                focusSelf,
+                focusSelf
+            }),
+            rovingTabIndexChildParameters: useStableObject({
+                _private: useStableObject({ reevaluateClosestFit })
+            })
+        };
+    }
+    function useRovingTabIndexChild({ rovingTabIndexChildParameters: { _private: { reevaluateClosestFit } }, rovingTabIndexReturn: { setTabbableIndex, ..._void2 }, managedChildParameters, }) {
+        const { hidden, index, ..._void1 } = managedChildParameters;
+        const [tabbable, setTabbable, getTabbable] = useState(false);
+        s(() => {
+            reevaluateClosestFit();
+        }, [!!hidden]);
+        return {
+            /*managedChildParameters: {
+                getTabbable,
+                setTabbable,
+                tabbable
+            },*/
+            hasCurrentFocusParameters: {
+                onCurrentFocusedInnerChanged: useStableCallback((focused, _prevFocused) => {
+                    if (focused) {
+                        setTabbableIndex(index, false);
+                    }
+                })
+            },
+            rovingTabIndexChildReturn: {
+                propsUnstable: { tabIndex: (tabbable ? 0 : -1) },
+                tabbable,
+                getTabbable,
+                setTabbable
             }
         };
     }
-    /*function test() {
-        const { children, focusSelf, getTabbableIndex, setTabbableIndex, useRovingTabIndexChild, } = useRovingTabIndex<HTMLDivElement, { "foo": "bar" }, "flag2">({ managedChildren: {}, rovingTabIndex: {} });
-        const { } = useRovingTabIndexChild({ managedChildren: { index: 0, flags: {} }, rti: { info3: { foo: "bar" } } });
-    }*/
 
-    function identity(t) { return t; }
+    function useSingleSelection({ managedChildrenReturn: { getChildren }, rovingTabIndexReturn: { setTabbableIndex }, singleSelectionParameters: { onSelectedIndexChange, initiallySelectedIndex } }) {
+        useEnsureStability("useSingleSelection", onSelectedIndexChange);
+        const getSelectedAt = q$1((m) => { return m.getSelected(); }, []);
+        const setSelectedAt = q$1((m, t) => { m.setSelected(t); }, []);
+        const isSelectedValid = q$1((m) => { return !m.hidden; }, []);
+        const { changeIndex: setSelectedIndex, getCurrentIndex: getSelectedIndex } = useChildrenFlag({
+            getChildren,
+            onIndexChange: onSelectedIndexChange,
+            initialIndex: initiallySelectedIndex,
+            getAt: getSelectedAt,
+            setAt: setSelectedAt,
+            isValid: isSelectedValid,
+            closestFit: false
+        });
+        return {
+            singleSelectionReturn: useStableObject({
+                getSelectedIndex,
+                setSelectedIndex
+            }),
+            childrenHaveFocusParameters: {
+                onCompositeFocusChange: useStableCallback((anyFocused) => {
+                    if (!anyFocused) {
+                        const selectedIndex = getSelectedIndex();
+                        if (selectedIndex != null)
+                            setTabbableIndex(selectedIndex, false);
+                    }
+                })
+            }
+        };
+    }
+    function useSingleSelectionChild(args) {
+        const { managedChildParameters: { index }, singleSelectionReturn: { getSelectedIndex, setSelectedIndex }, singleSelectionChildParameters: { ariaPropName, selectionMode }, } = args;
+        const [selected, setSelected, getSelected] = useState(getSelectedIndex() == index);
+        const getIndex = useStableGetter(index);
+        return {
+            managedChildParameters: {
+                selected,
+                setSelected,
+                getSelected,
+            },
+            singleSelectionChildReturn: {
+                propsUnstable: { [ariaPropName]: (selected ?? false).toString() }
+            },
+            pressParameters: { onPressSync: ((_e) => { setSelectedIndex(getIndex()); }) },
+            hasCurrentFocusParameters: {
+                onCurrentFocusedInnerChanged: useStableCallback((focused, _prev) => {
+                    if (selectionMode == 'focus' && focused) {
+                        setSelectedIndex(getIndex());
+                    }
+                }),
+            }
+        };
+    }
+
     /**
      * Implements proper keyboard navigation for components like listboxes, button groups, menus, etc.
      *
      * In the document order, there will be only one "focused" or "tabbable" element, making it act more like one complete unit in comparison to everything around it.
      * Navigating forwards/backwards can be done with the arrow keys, Home/End keys, or any text for typeahead to focus the next item that matches.
      */
-    function useListNavigation({ managedChildrenParameters: { onChildrenMountChange, ...mc }, rovingTabIndexParameters, listNavigationParameters: { indexDemangler, indexMangler }, linearNavigationParameters, typeaheadNavigationParameters }) {
-        indexMangler ??= identity;
-        indexDemangler ??= identity;
-        useEnsureStability("useListNavigation", indexMangler, indexDemangler);
-        const { managedChildrenReturn, rovingTabIndexReturn, useRovingTabIndexChild } = useRovingTabIndex({
-            managedChildrenParameters: {
-                ...mc, onChildrenMountChange: q$1((m, u) => {
-                    onChildrenMountChange?.(m, u);
-                }, [])
-            },
+    function useListNavigation({ linearNavigationParameters, typeaheadNavigationParameters, rovingTabIndexParameters, managedChildrenReturn, ..._void1 }) {
+        const { managedChildrenParameters, rovingTabIndexReturn, rovingTabIndexChildParameters, ..._void3 } = useRovingTabIndex({
+            managedChildrenReturn,
             rovingTabIndexParameters
         });
-        const { children } = managedChildrenReturn;
-        const { getTabbableIndex, setTabbableIndex } = rovingTabIndexReturn;
-        const navigateToIndex = q$1((i, fromUserInteraction) => {
-            if (i != null) {
-                const nextIndex = tryNavigateToIndex({
-                    children: children,
-                    default: 0,
-                    target: i,
-                    searchDirection: 1,
-                    indexMangler: indexMangler ?? identity,
-                    indexDemangler: indexDemangler ?? identity
-                });
-                setTabbableIndex(i == null ? null : nextIndex, fromUserInteraction);
-            }
-            else {
-                setTabbableIndex(null, fromUserInteraction);
-            }
-        }, []);
-        const { useTypeaheadNavigationChild, typeaheadNavigationReturn } = useTypeaheadNavigation({
-            typeaheadNavigationParameters: {
-                getIndex: getTabbableIndex,
-                setIndex: q$1((index) => {
-                    setTabbableIndex(index, true);
-                }, []),
-                ...typeaheadNavigationParameters
-            }
+        const { onChildrenMountChange } = managedChildrenParameters;
+        const { typeaheadNavigationChildParameters, typeaheadNavigationReturn, ..._void4 } = useTypeaheadNavigation({
+            typeaheadNavigationParameters,
+            rovingTabIndexReturn
         });
-        const { linearNavigationReturn } = useLinearNavigation({
-            linearNavigationParameters: {
-                navigateToPrev: q$1(() => {
-                    setTabbableIndex(c => {
-                        return tryNavigateToIndex({ children, default: c ?? 0, target: indexDemangler(indexMangler((c ?? 0)) - 1), searchDirection: -1, indexMangler: indexMangler ?? identity, indexDemangler: indexDemangler ?? identity });
-                    }, true);
-                }, []),
-                navigateToNext: q$1(() => {
-                    setTabbableIndex(c => {
-                        return tryNavigateToIndex({ children, default: c ?? 0, target: indexDemangler(indexMangler(c ?? 0) + 1), searchDirection: 1, indexMangler: indexMangler ?? identity, indexDemangler: indexDemangler ?? identity });
-                    }, true);
-                }, []),
-                navigateToFirst: q$1(() => { navigateToIndex(indexDemangler(0), true); }, []),
-                navigateToLast: q$1(() => { navigateToIndex(indexDemangler(children.getHighestIndex()), true); }, []),
-                ...linearNavigationParameters
-            }
-        });
-        const useListNavigationChild = q$1((args) => {
-            const { managedChildParameters: { index, flags }, rovingTabIndexChildParameters: { focusSelf, hidden, noModifyTabIndex }, listNavigationChildParameters: { text }, refElementReturn, subInfo } = args;
-            useTypeaheadNavigationChild({ text, index });
-            const getIndex = useStableGetter(index);
-            s(() => {
-                return () => {
-                    if (getTabbableIndex() == getIndex()) {
-                        navigateToIndex(index, false);
-                    }
-                };
-            }, []);
-            const { rovingTabIndexChildReturn, hasCurrentFocusParameters } = useRovingTabIndexChild({
-                managedChildParameters: { index, flags },
-                refElementReturn,
-                rovingTabIndexChildParameters: { focusSelf, hidden: !!hidden, noModifyTabIndex },
-                subInfo: { text, subInfo }
-            });
-            return {
-                hasCurrentFocusParameters,
-                rovingTabIndexChildReturn
-            };
-        }, []);
-        return {
-            linearNavigationReturn,
-            useListNavigationChild,
-            listNavigationReturn: { navigateToIndex },
-            managedChildrenReturn,
+        const { linearNavigationReturn, ..._void5 } = useLinearNavigation({
             rovingTabIndexReturn,
-            typeaheadNavigationReturn
+            linearNavigationParameters,
+        });
+        return {
+            typeaheadNavigationChildParameters,
+            linearNavigationReturn,
+            rovingTabIndexReturn,
+            typeaheadNavigationReturn,
+            rovingTabIndexChildParameters,
+            managedChildrenParameters: {
+                onChildrenMountChange: useStableCallback((m, u) => onChildrenMountChange?.(m, u))
+            }
         };
     }
-    function tryNavigateToIndex({ children, searchDirection, indexDemangler, indexMangler, target }) {
-        const upper = children.getHighestIndex();
-        const lower = 0;
-        if (searchDirection === -1) {
-            while ((target >= lower && (children.getAt(target) == null) || !!children.getAt(target)?.subInfo.hidden))
-                target = indexDemangler(indexMangler(target) - 1);
-            return target < lower ? indexDemangler(lower) : target;
-        }
-        else if (searchDirection === 1) {
-            while ((target <= upper && children.getAt(target) == null) || !!children.getAt(target)?.subInfo.hidden)
-                target = indexDemangler(indexMangler(target) + 1);
-            return target > upper ? indexDemangler(upper) : target;
-        }
-        else {
-            return lower;
-        }
+    function useListNavigationChild({ managedChildParameters: { hidden, index, ..._void5 }, rovingTabIndexReturn, rovingTabIndexChildParameters, typeaheadNavigationChildParameters, ..._void2 }) {
+        const { hasCurrentFocusParameters, 
+        //managedChildParameters: { getTabbable, setTabbable, tabbable, ...mcp2 },
+        rovingTabIndexChildReturn, ..._void3 } = useRovingTabIndexChild({
+            rovingTabIndexChildParameters,
+            managedChildParameters: { hidden, index },
+            rovingTabIndexReturn
+        });
+        useTypeaheadNavigationChild({
+            managedChildParameters: { index },
+            typeaheadNavigationChildParameters
+        });
+        //assertEmptyObject(mcp2);
+        return {
+            rovingTabIndexChildReturn,
+            hasCurrentFocusParameters,
+            /*managedChildParameters: {
+                setTabbable,
+                getTabbable,
+                tabbable,
+            }*/
+        };
+    }
+    function useListNavigationSingleSelection({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, managedChildrenReturn: { getChildren, ...void4 }, ..._void3 }) {
+        const { linearNavigationReturn, rovingTabIndexReturn, typeaheadNavigationReturn, managedChildrenParameters, typeaheadNavigationChildParameters, rovingTabIndexChildParameters, ..._void1 } = useListNavigation({
+            linearNavigationParameters,
+            rovingTabIndexParameters,
+            typeaheadNavigationParameters,
+            managedChildrenReturn: { getChildren }
+        });
+        const { childrenHaveFocusParameters, singleSelectionReturn, ..._void2 } = useSingleSelection({
+            rovingTabIndexReturn,
+            managedChildrenReturn: { getChildren },
+            singleSelectionParameters
+        });
+        return {
+            childrenHaveFocusParameters,
+            rovingTabIndexChildParameters,
+            typeaheadNavigationChildParameters,
+            managedChildrenParameters,
+            rovingTabIndexReturn,
+            singleSelectionReturn,
+            linearNavigationReturn,
+            typeaheadNavigationReturn,
+        };
+    }
+    function useListNavigationSingleSelectionChild({ managedChildParameters: { hidden, index, ..._void5 }, rovingTabIndexChildParameters, rovingTabIndexReturn, singleSelectionChildParameters, singleSelectionReturn, typeaheadNavigationChildParameters, ..._void1 }) {
+        const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ..._void3 }, managedChildParameters, pressParameters, singleSelectionChildReturn, ..._void2 } = useSingleSelectionChild({
+            managedChildParameters: { index },
+            singleSelectionChildParameters,
+            singleSelectionReturn
+        });
+        const { 
+        //managedChildParameters: mcp2,
+        rovingTabIndexChildReturn, hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ..._void6 }, ..._void4 } = useListNavigationChild({
+            typeaheadNavigationChildParameters,
+            managedChildParameters: { hidden, index },
+            rovingTabIndexChildParameters,
+            rovingTabIndexReturn
+        });
+        return {
+            hasCurrentFocusParameters: {
+                onCurrentFocusedInnerChanged: useStableCallback((focused, previouslyFocused) => { ocfic1?.(focused, previouslyFocused); ocfic2?.(focused, previouslyFocused); })
+            },
+            singleSelectionChildReturn,
+            managedChildParameters,
+            pressParameters,
+            rovingTabIndexChildReturn
+        };
+    }
+    /*
+    function foo() {
+        type TableElement = HTMLTableElement;
+        type RowElement = HTMLTableRowElement;
+        type CellElement = HTMLTableCellElement;
+        type RM = UseGridNavigationRowInfo<RowElement>;
+        type CM = UseGridNavigationCellInfo<RowElement>;
+        const { managedChildrenReturn } = useManagedChildren<UseGridNavigationRowInfo<RowElement>>({ managedChildrenParameters: { onAfterChildLayoutEffect: null, onChildrenMountChange: null } });
+        const getHighestIndex = useCallback(() => managedChildrenReturn.getChildren().getHighestIndex(), []);
+        const navigateAbsolute = useCallback((index: number, fromUserInteraction: boolean) => { setTabbableIndex(index, fromUserInteraction); }, []);
+        const navigateRelative = useCallback((from: number, offset: number, fromUserInteraction: boolean) => { setTabbableIndex(from + offset, fromUserInteraction); }, []);
+        const {
+            linearNavigationReturn,
+            rovingTabIndexReturn,
+            typeaheadNavigationReturn,
+            managedChildrenParameters,
+            rovingTabIndexChildParameters,
+            typeaheadNavigationChildParameters
+        } = useGridNavigation<TableElement, RowElement, RM>({
+            linearNavigationParameters: { disableArrowKeys: false, disableHomeEndKeys: false, getHighestIndex, navigationDirection: "either", navigateAbsolute, navigateRelative },
+            managedChildrenReturn,
+            rovingTabIndexParameters: { initiallyTabbedIndex: 0, onTabbableIndexChange: null },
+            typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000 }
+        });
+        const { setTabbableIndex } = rovingTabIndexReturn;
+
+
+
+
+        const { } = useGridNavigationRow<RowElement, CellElement, RM, CM>({
+            asChildRowOfTable: { managedChildParameters: { hidden, index }, managedChildrenReturn, refElementReturn, rovingTabIndexChildParameters, rovingTabIndexReturn, typeaheadNavigationChildParameters },
+            asParentRowOfCells: { linearNavigationParameters, managedChildrenReturn, rovingTabIndexParameters, typeaheadNavigationParameters }
+        })
     }
 
-    function useGridNavigation({ managedChildrenParameters: mc, rovingTabIndexParameters: rti, listNavigationParameters: ls, linearNavigationParameters: ln, typeaheadNavigationParameters: tn, gridNavigationParameters: { rowIndexDemangler, rowIndexMangler } }) {
-        const [currentColumn, setCurrentColumn, getCurrentColumn] = useState(rti.initialIndex ?? 0);
-        const { useListNavigationChild: useListNavigationChildAsGridRow, ...parentLsReturnType } = useListNavigation({
-            managedChildrenParameters: mc,
-            rovingTabIndexParameters: rti,
-            listNavigationParameters: { indexDemangler: rowIndexDemangler, indexMangler: rowIndexMangler, ...ls },
-            linearNavigationParameters: { navigationDirection: "vertical", ...ln },
-            typeaheadNavigationParameters: tn,
+
+    function foo2(managedChildrenReturn: UseManagedChildrenReturnTypeInfo<UseGridNavigationRowInfo<HTMLTableRowElement>>["managedChildrenReturn"]) {
+        type TableElement = HTMLTableElement;
+        type RowElement = HTMLTableRowElement;
+        type CellElement = HTMLTableCellElement;
+
+        const hidden = false;
+        const index = 0;
+        const text = "";
+        const { refElementReturn } = useRefElement<RowElement>({ refElementParameters: { onElementChange: undefined, onMount: undefined, onUnmount: undefined } })
+
+        const {
+            hasCurrentFocusReturn,
+            managedChildParameters: { setTabbable },
+            rovingTabIndexChildReturn: { getTabbable, propsUnstable, tabbable }
+        } = useGridNavigationRow<TableElement, RowElement, CellElement>({
+            hasCurrentFocusParameters: { onCurrentFocusedChanged: null, onCurrentFocusedInnerChanged: null },
+            managedChildParameters: { hidden, index },
+            managedChildrenReturn,
+            typeaheadNavigationChildParameters: {},
+            refElementReturn,
+            rovingTabIndexChildParameters,
+            rovingTabIndexReturn: { setTabbableIndex }
         });
-        const useGridNavigationRow = q$1(({ asChildRowOfSection: asChild, asParentRowOfCells: asParent }) => {
-            // Override the focusSelf that rovingTabIndex does.
-            // Instead of focusing the entire row, we ask the cell that corresponds
-            // to our current column to focus itself.
-            const focusSelfRow = useStableCallback(() => {
-                const c2 = getCurrentColumn();
-                navigateToColumn(c2 ?? 0, true);
-            });
-            const rowLsChildReturnType = useListNavigationChildAsGridRow({
-                refElementReturn: asChild.refElementReturn,
-                managedChildParameters: asChild.managedChildParameters,
-                listNavigationChildParameters: asChild.listNavigationChildParameters,
-                rovingTabIndexChildParameters: { ...asChild.rovingTabIndexChildParameters, focusSelf: focusSelfRow },
-                subInfo: { subInfo: asChild.subInfo },
-            });
-            const { rovingTabIndexChildReturn: { tabbable } } = rowLsChildReturnType;
-            s(() => {
-                if (!tabbable) {
-                    navigateToColumn(null, false);
-                }
-            }, [tabbable]);
-            const rowLsReturnType = useListNavigation({
-                managedChildrenParameters: { ...asParent.managedChildrenParameters },
-                rovingTabIndexParameters: { ...asParent.rovingTabIndexParameters },
-                linearNavigationParameters: {
-                    ...asParent.linearNavigationParameters,
-                    navigationDirection: "horizontal",
-                },
-                typeaheadNavigationParameters: { ...asParent.typeaheadNavigationParameters, noTypeahead: true },
-                listNavigationParameters: { ...asParent.listNavigationParameters }
-            });
-            const { rovingTabIndexReturn: { setTabbableIndex }, useListNavigationChild: useGridNavigationColumn2, listNavigationReturn: { navigateToIndex: navigateToColumn }, } = rowLsReturnType;
-            //const rowHidden = !!asChild.rovingTabIndex.hidden;
-            const useGridNavigationCell = q$1(({ subInfo, managedChildParameters, listNavigationChildParameters: ls, refElementReturn, rovingTabIndexChildParameters: { focusSelf: focusSelfCell, ...rti } }) => {
-                const { rovingTabIndexChildReturn: rti_cell_ret, hasCurrentFocusParameters } = useGridNavigationColumn2({
-                    refElementReturn,
-                    managedChildParameters: managedChildParameters,
-                    listNavigationChildParameters: { ...ls },
-                    rovingTabIndexChildParameters: { focusSelf: focusSelfCell, ...rti },
-                    subInfo: { subInfo }
-                });
-                const ret = {
-                    gridNavigationReturn: { getCurrentColumn },
-                    rovingTabIndexChildReturn: rti_cell_ret,
-                    hasCurrentFocusParameters: {
-                        ...hasCurrentFocusParameters,
-                        onCurrentFocusedInnerChanged: useStableCallback((focused, prev) => {
-                            if (focused) {
-                                if (managedChildParameters.index == 0)
-                                    debugger;
-                                setCurrentColumn(managedChildParameters.index);
-                                setTabbableIndex(managedChildParameters.index, false);
-                            }
-                        })
-                    },
-                };
-                return ret;
-            }, []);
-            const ret = {
-                asParentOfCells: {
-                    linearNavigationReturn: rowLsReturnType.linearNavigationReturn,
-                    listNavigationReturn: rowLsReturnType.listNavigationReturn,
-                    managedChildrenReturn: rowLsReturnType.managedChildrenReturn,
-                    rovingTabIndexReturn: rowLsReturnType.rovingTabIndexReturn,
-                    typeaheadNavigationReturn: rowLsReturnType.typeaheadNavigationReturn,
-                },
-                asChildRow: rowLsChildReturnType,
-                useGridNavigationCell
-            };
-            return ret;
-        }, []);
-        return {
-            gridNavigationReturn: {
-                getCurrentColumn,
-                currentColumn
+
+
+
+        useManagedChild<UseGridNavigationRowInfo<RowElement>>({
+            managedChildParameters: { focusSelf, getElement, getTabbable, hidden, index, setTabbable, tabbable, text },
+            managedChildrenReturn
+        })
+    }
+
+    */
+
+    function useGridNavigation({ gridNavigationParameters: { onTabbableColumnChange, ...void3 }, linearNavigationParameters, managedChildrenReturn, rovingTabIndexParameters: { onTabbableIndexChange, initiallyTabbedIndex, ...void4 }, typeaheadNavigationParameters, ..._void2 }) {
+        const [getCurrentColumn, setCurrentColumn] = usePassiveState(onTabbableColumnChange, useStableCallback(() => { return (initiallyTabbedIndex ?? 0); }));
+        const { getChildren } = managedChildrenReturn;
+        const { linearNavigationReturn, rovingTabIndexReturn, typeaheadNavigationReturn, managedChildrenParameters, typeaheadNavigationChildParameters, rovingTabIndexChildParameters, ...void1 } = useListNavigation({
+            linearNavigationParameters: {
+                navigationDirection: "vertical",
+                ...linearNavigationParameters
             },
-            linearNavigationReturn: parentLsReturnType.linearNavigationReturn,
-            listNavigationReturn: parentLsReturnType.listNavigationReturn,
-            rovingTabIndexReturn: parentLsReturnType.rovingTabIndexReturn,
-            typeaheadNavigationReturn: parentLsReturnType.typeaheadNavigationReturn,
-            managedChildrenReturn: parentLsReturnType.managedChildrenReturn,
-            useGridNavigationRow,
+            managedChildrenReturn,
+            rovingTabIndexParameters: {
+                onTabbableIndexChange: useStableCallback((i, p) => {
+                    const children = getChildren();
+                    onTabbableIndexChange?.(i, p);
+                    if (p != null)
+                        children.getAt(p)?.setTabbableColumnIndex(null, false);
+                    if (i != null)
+                        children.getAt(i)?.setTabbableColumnIndex(getCurrentColumn(), false);
+                }), initiallyTabbedIndex
+            },
+            typeaheadNavigationParameters
+        });
+        return {
+            managedChildrenParameters,
+            typeaheadNavigationChildParameters,
+            linearNavigationReturn,
+            rovingTabIndexReturn,
+            typeaheadNavigationReturn,
+            rovingTabIndexChildParameters,
+            gridNavigationRowParameters: useStableObject({
+                _private: useStableObject({
+                    getCurrentColumn,
+                    setCurrentColumn
+                })
+            })
+        };
+    }
+    function useGridNavigationRow({ asChildRowOfTable: { gridNavigationRowParameters: { _private: { getCurrentColumn, setCurrentColumn } }, ...asChildRowOfTable }, asParentRowOfCells: { linearNavigationParameters, managedChildrenReturn, rovingTabIndexParameters, typeaheadNavigationParameters, ...asParentRowOfCells }, ..._void1 }) {
+        const { managedChildrenReturn: { getChildren } } = asChildRowOfTable;
+        const focusSelf = useStableCallback((e) => {
+            debugger;
+            let index = (getCurrentColumn() ?? 0);
+            let child = getChildren().getAt(index);
+            while ((!child) && index > 0) {
+                --index;
+                child = getChildren().getAt(index);
+            }
+            if (child) {
+                const e = child.getElement();
+                child.focusSelf(e);
+            }
+            else {
+                debugger;
+                e?.focus?.();
+            }
+        }, []);
+        const { rovingTabIndexChildReturn, hasCurrentFocusParameters, ..._void2 } = useListNavigationChild(asChildRowOfTable);
+        const { linearNavigationReturn, managedChildrenParameters, rovingTabIndexChildParameters, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex }, typeaheadNavigationChildParameters, typeaheadNavigationReturn, ..._void3 } = useListNavigation({
+            linearNavigationParameters: {
+                navigationDirection: "horizontal",
+                ...linearNavigationParameters
+            },
+            managedChildrenReturn,
+            rovingTabIndexParameters,
+            typeaheadNavigationParameters
+        });
+        return {
+            asChildRowOfTable: {
+                hasCurrentFocusParameters,
+                managedChildParameters: { focusSelf, setTabbableColumnIndex: setTabbableIndex },
+                rovingTabIndexChildReturn
+            },
+            asParentRowOfCells: {
+                linearNavigationReturn,
+                managedChildrenParameters,
+                rovingTabIndexChildParameters,
+                rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex },
+                typeaheadNavigationChildParameters,
+                typeaheadNavigationReturn,
+                gridNavigationCellParameters: useStableObject({
+                    _private: useStableObject({
+                        getCurrentColumn,
+                        setCurrentColumn,
+                        setTabbableColumn: setTabbableIndex
+                    })
+                })
+            }
+        };
+    }
+    function useGridNavigationCell({ managedChildParameters: { hidden, index, ...void3 }, rovingTabIndexChildParameters, rovingTabIndexReturn, typeaheadNavigationChildParameters, gridNavigationCellParameters: { _private: { getCurrentColumn, setCurrentColumn, setTabbableColumn }, colSpan }, ..._void1 }) {
+        const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1 }, rovingTabIndexChildReturn, ...void2 } = useListNavigationChild({
+            managedChildParameters: { hidden, index },
+            rovingTabIndexChildParameters,
+            rovingTabIndexReturn,
+            typeaheadNavigationChildParameters
+        });
+        return {
+            hasCurrentFocusParameters: {
+                onCurrentFocusedInnerChanged: useStableCallback((focused, prev) => {
+                    ocfic1?.(focused, prev);
+                    if (focused) {
+                        if (index == 0)
+                            debugger;
+                        setCurrentColumn(index);
+                        setTabbableColumn(prev => {
+                            if (prev != null && (prev < index || prev > index + colSpan)) {
+                                return prev;
+                            }
+                            return index;
+                        }, false);
+                    }
+                })
+            },
+            rovingTabIndexChildReturn
         };
     }
 
@@ -4571,7 +4662,9 @@ var bundle = (function (exports) {
      * @param exclude Whether the polyfill shouldn't apply (can specify for specific interactions)
      */
     function usePress(args) {
-        const { refElementReturn: { getElement }, pressParameters: { exclude, focusSelf, onClickSync } } = args;
+        const { refElementReturn: { getElement }, pressParameters: { exclude, focusSelf, onPressSync, onPseudoActiveStart, onPseudoActiveStop } } = args;
+        const stableOnPseudoActiveStart = useStableCallback(onPseudoActiveStart ?? (() => { }));
+        const stableOnPseudoActiveStop = useStableCallback(onPseudoActiveStop ?? (() => { }));
         // A button can be activated in multiple ways, so on the off chance
         // that multiple are triggered at once, we only *actually* register
         // a press once all of our "on" signals have turned back to "off".
@@ -4592,6 +4685,14 @@ var bundle = (function (exports) {
         // The flag is reset any time the selection is empty or the button is
         // no longer active.
         const [textSelectedDuringActivationStartTime, setTextSelectedDuringActivationStartTime] = useState(null);
+        const pseudoActive = (activeDuringRender && (textSelectedDuringActivationStartTime == null));
+        s(() => { if (pseudoActive) {
+            stableOnPseudoActiveStart();
+        }
+        else {
+            stableOnPseudoActiveStop();
+        } return () => { if (pseudoActive)
+            stableOnPseudoActiveStop(); }; }, [pseudoActive]);
         useGlobalHandler(document, "selectionchange", _ => {
             setTextSelectedDuringActivationStartTime(prev => nodeSelectedTextLength(getElement()) == 0 ? null : prev != null ? prev : new Date());
         });
@@ -4621,7 +4722,7 @@ var bundle = (function (exports) {
             }
         });
         const handlePress = useStableCallback((e) => {
-            if (onClickSync) {
+            if (onPressSync) {
                 // Note: The element is focused here because of iOS Safari.
                 //
                 // It's always iOS Safari.
@@ -4658,12 +4759,12 @@ var bundle = (function (exports) {
                 }
                 finally {
                     // Actually call our handler.
-                    onClickSync(e);
+                    onPressSync(e);
                 }
             }
         });
         const onMouseDown = useStableCallback((e) => {
-            if (onClickSync && !excludes("click", exclude)) {
+            if (onPressSync && !excludes("click", exclude)) {
                 // Stop double clicks from selecting text in an component that's *supposed* to be acting like a button,
                 // but also don't prevent the user from selecting that text manually if they really want to
                 // (which user-select: none would do, but cancelling a double click on mouseDown doesn't)
@@ -4676,19 +4777,19 @@ var bundle = (function (exports) {
             }
         });
         const onMouseUp = useStableCallback((e) => {
-            if (onClickSync && !excludes("click", exclude)) {
+            if (onPressSync && !excludes("click", exclude)) {
                 if (e.button === 0 && getActive() > 0) {
                     onActiveStop(e);
                 }
             }
         });
         const onMouseLeave = useStableCallback(() => {
-            if (onClickSync && !excludes("click", exclude)) {
+            if (onPressSync && !excludes("click", exclude)) {
                 setActive(0);
             }
         });
         const onKeyDown = useStableCallback((e) => {
-            if (onClickSync) {
+            if (onPressSync) {
                 if (e.key == " " && !excludes("space", exclude)) {
                     // We don't actually activate it on a space keydown
                     // but we do preventDefault to stop the page from scrolling.
@@ -4703,11 +4804,11 @@ var bundle = (function (exports) {
             }
         });
         const onKeyUp = useStableCallback((e) => {
-            if (onClickSync && e.key == " " && !excludes("space", exclude))
+            if (onPressSync && e.key == " " && !excludes("space", exclude))
                 onActiveStop(e);
         });
         const onClick = useStableCallback((e) => {
-            if (onClickSync) {
+            if (onPressSync) {
                 e.preventDefault();
                 if (e.detail > 1) {
                     e.stopImmediatePropagation();
@@ -4715,7 +4816,7 @@ var bundle = (function (exports) {
                 }
             }
         });
-        const onFocusOut = useStableCallback((e) => {
+        const onFocusOut = useStableCallback((_e) => {
             setActive(0);
         });
         const propsStable2 = A({
@@ -4764,72 +4865,6 @@ var bundle = (function (exports) {
         if (exclude?.[target])
             return true;
         return false;
-    }
-
-    function useSingleSelection({ singleSelectionParameters: { selectedIndex, setSelectedIndex, children, setTabbableIndex } }) {
-        const { useChildrenHaveFocusChild } = useChildrenHaveFocus({
-            childrenHaveFocusParameters: {
-                onAllLostFocus: useStableCallback(() => {
-                    //onAllLostFocus?.();
-                    if (selectedIndex != null)
-                        setTabbableIndex(selectedIndex, false);
-                }),
-                onAnyGainedFocus: null
-            }
-        });
-        const stableOnChange = useStableCallback(setSelectedIndex);
-        const { changeIndex: changeSelectedIndex, getCurrentIndex: getSelectedIndex } = useChildrenFlag({
-            children: children,
-            initialIndex: selectedIndex,
-            key: "selected",
-            closestFit: false
-        });
-        _(() => {
-            changeSelectedIndex(selectedIndex);
-        }, [selectedIndex]);
-        return {
-            singleSelectionReturn: {
-                getSelectedIndex,
-                changeSelectedIndex
-            },
-            useSingleSelectionChild: q$1((args) => {
-                const { managedChildParameters: { flags, index }, refElementReturn, singleSelectionChildParameters: { selectionMode, unselectable, ariaPropName, focusSelf }, } = args;
-                const { getElement } = refElementReturn;
-                const [isSelected, setIsSelected, getIsSelected] = useState(getSelectedIndex() == index);
-                const selectedRef = A({ get: getIsSelected, set: setIsSelected, isValid: useStableCallback(() => !unselectable) });
-                const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: olfic2 }, refElementParameters: { onElementChange } } = useChildrenHaveFocusChild({});
-                const getIndex = useStableGetter(index);
-                const { pressReturn } = usePress({
-                    refElementReturn,
-                    pressParameters: {
-                        onClickSync: unselectable ? null : ((e) => { stableOnChange(getIndex(), e); }),
-                        exclude: {},
-                        focusSelf,
-                    },
-                });
-                return {
-                    singleSelectionChildReturn: {
-                        selected: isSelected,
-                        getSelected: getIsSelected,
-                        propsUnstable: { [ariaPropName]: (isSelected ?? false).toString() }
-                    },
-                    pressReturn,
-                    flags: { ...flags, selected: selectedRef.current },
-                    hasCurrentFocusParameters: {
-                        onCurrentFocusedInnerChanged: useStableCallback((focused, prev) => {
-                            olfic2?.(focused, prev);
-                            if (selectionMode == 'focus' && focused) {
-                                debugger;
-                                stableOnChange(getIndex(), { target: getElement(), currentTarget: getElement() });
-                            }
-                        }),
-                    },
-                    refElementParameters: {
-                        onElementChange
-                    }
-                };
-            }, []),
-        };
     }
 
     /**
@@ -5533,13 +5568,44 @@ var bundle = (function (exports) {
      * Because keys are given special treatment and a child has no way of modifying its own key
      * there's no other time or place this can happen other than exactly within the parent component's render function.
      */
-    function useRearrangeableChildren({ rearrangeableChildrenParameters: { getIndex } }) {
+    function useRearrangeableChildren({ rearrangeableChildrenParameters: { getIndex, getValid, getHighestChildIndex } }) {
         // These are used to keep track of a mapping between unsorted index <---> sorted index.
         // These are needed for navigation with the arrow keys.
         const mangleMap = A(new Map());
         const demangleMap = A(new Map());
         const indexMangler = q$1((n) => (mangleMap.current.get(n) ?? n), []);
         const indexDemangler = q$1((n) => (demangleMap.current.get(n) ?? n), []);
+        //const { setTabbableIndex } = rovingTabIndexReturn;
+        const shuffle$1 = q$1((managedRows) => {
+            const shuffledRows = shuffle(managedRows.arraySlice());
+            return rearrange(shuffledRows);
+        }, [ /* Must remain stable */]);
+        const navigateAbsolute = q$1((i) => {
+            if (i != null) {
+                const nextIndex = tryNavigateToIndex({
+                    highestChildIndex: getHighestChildIndex(),
+                    isValid: getValid,
+                    target: i,
+                    searchDirection: 1,
+                    indexMangler: indexMangler,
+                    indexDemangler: indexDemangler
+                });
+                return (i == null ? null : nextIndex);
+            }
+            else {
+                return null;
+            }
+        }, []);
+        const navigateRelative = q$1((original, offset) => {
+            return tryNavigateToIndex({
+                target: indexDemangler(indexMangler(original) + offset),
+                highestChildIndex: getHighestChildIndex(),
+                isValid: getValid,
+                searchDirection: (Math.sign(offset) || 1),
+                indexMangler: indexMangler,
+                indexDemangler: indexDemangler
+            });
+        }, []);
         // The sort function needs to be able to update whoever has all the sortable children.
         // Because that might not be the consumer of *this* hook directly (e.g. a table uses
         // this hook, but it's tbody that actually needs updating), we need to remotely
@@ -5563,14 +5629,18 @@ var bundle = (function (exports) {
             return (useMergedProps({
                 children: children
                     .slice()
-                    .map(child => ({ child, mangledIndex: indexMangler(getIndex(child.props)), demangledIndex: getIndex(child.props) }))
+                    .map(child => ({ child, mangledIndex: indexMangler(getIndex(child)), demangledIndex: getIndex(child) }))
                     .sort((lhs, rhs) => { return lhs.mangledIndex - rhs.mangledIndex; })
                     .map(({ child, mangledIndex, demangledIndex }) => {
                     return h$1(child.type, { ...child.props, key: demangledIndex, "data-mangled-index": mangledIndex, "data-unmangled-index": demangledIndex });
                 })
             }, props));
         }, []);
-        return { useRearrangeableProps, rearrangeableChildrenReturn: { indexMangler, indexDemangler, mangleMap, demangleMap, rearrange } };
+        return {
+            useRearrangeableProps,
+            linearNavigationParameters: { navigateAbsolute, navigateRelative },
+            rearrangeableChildrenReturn: { indexMangler, indexDemangler, mangleMap, demangleMap, rearrange, shuffle: shuffle$1 }
+        };
     }
     /**
      * Hook that allows for the **direct descendant** children of this component to be re-ordered and sorted.
@@ -5593,10 +5663,10 @@ var bundle = (function (exports) {
      * Because keys are given special treatment and a child has no way of modifying its own key
      * there's no other time or place this can happen other than exactly within the parent component's render function.
      */
-    function useSortableChildren({ rearrangeableChildrenParameters: { getIndex }, sortableChildrenParameters: { compare: userCompare } }) {
+    function useSortableChildren({ rearrangeableChildrenParameters, sortableChildrenParameters: { compare: userCompare } }) {
         const compare = (userCompare ?? defaultCompare);
-        const { useRearrangeableProps: useSortableProps, ...rearrangeableChildrenReturnType } = useRearrangeableChildren({ rearrangeableChildrenParameters: { getIndex } });
-        const { rearrangeableChildrenReturn: { rearrange } } = rearrangeableChildrenReturnType;
+        const { linearNavigationParameters, rearrangeableChildrenReturn, useRearrangeableProps } = useRearrangeableChildren({ rearrangeableChildrenParameters });
+        const { rearrange } = rearrangeableChildrenReturn;
         // The actual sort function.
         const sort = q$1((managedRows, direction) => {
             const sortedRows = managedRows.arraySlice().sort((lhsRow, rhsRow) => {
@@ -5609,14 +5679,11 @@ var bundle = (function (exports) {
             });
             return rearrange(sortedRows);
         }, [ /* Must remain stable */]);
-        const shuffle$1 = q$1((managedRows) => {
-            const shuffledRows = shuffle(managedRows.arraySlice());
-            return rearrange(shuffledRows);
-        }, [ /* Must remain stable */]);
         return {
-            useSortableProps,
-            sortableChildrenReturn: { sort, shuffle: shuffle$1 },
-            rearrangeableChildrenReturn: rearrangeableChildrenReturnType.rearrangeableChildrenReturn
+            useSortableProps: useRearrangeableProps,
+            linearNavigationParameters,
+            sortableChildrenReturn: { sort },
+            rearrangeableChildrenReturn
         };
     }
     function defaultCompare(lhs, rhs) {
@@ -5658,119 +5725,22 @@ var bundle = (function (exports) {
             return compare2(lhs, rhs);
         }
     }
-
-    /**
-     * It's very common to combine a tabbable list of things and "selection" of one of those things.
-     *
-     * Lists, radio buttons, tabs, etc. etc.
-     *
-     * This is a shortcut that combines the two with the correct typing.
-     * @param param0
-     * @returns
-     */
-    function useListNavigationSingleSelection({ singleSelectionParameters: { selectedIndex, setSelectedIndex }, listNavigationParameters, managedChildrenParameters, rovingTabIndexParameters: { ...rovingTabIndexParameters }, linearNavigationParameters, typeaheadNavigationParameters }) {
-        const { listNavigationReturn, managedChildrenReturn, linearNavigationReturn, rovingTabIndexReturn, typeaheadNavigationReturn, useListNavigationChild } = useListNavigation({
-            listNavigationParameters,
-            managedChildrenParameters,
-            rovingTabIndexParameters: {
-                initialIndex: (selectedIndex ?? undefined),
-                ...rovingTabIndexParameters
-            },
-            linearNavigationParameters,
-            typeaheadNavigationParameters,
-        });
-        const { children } = managedChildrenReturn;
-        const { setTabbableIndex } = rovingTabIndexReturn;
-        //    const getSelectionMode = useStableGetter(selectionMode);
-        const { useSingleSelectionChild, singleSelectionReturn } = useSingleSelection({
-            singleSelectionParameters: {
-                children: children,
-                selectedIndex,
-                setSelectedIndex,
-                setTabbableIndex
-            },
-            //childrenHaveFocusP: { onAllLostFocus, onAnyGainedFocus }
-        });
-        return {
-            useListNavigationSingleSelectionChild: q$1((args) => {
-                let { listNavigationChildParameters, managedChildParameters: { index, flags }, rovingTabIndexChildParameters, singleSelectionChildParameters: { unselectable, ...ss }, refElementReturn, subInfo } = args;
-                let { hidden, focusSelf } = rovingTabIndexChildParameters;
-                unselectable ||= (hidden ?? false);
-                const { flags: ssflags, singleSelectionChildReturn, hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ofic1, onCurrentFocusedInnerChanged: ofic3 }, refElementParameters: { onElementChange }, 
-                //               onElementChange,
-                //             onFocusedInnerChanged: ofic1,
-                //           onLastFocusedInnerChanged,
-                pressReturn, } = useSingleSelectionChild({
-                    refElementReturn,
-                    managedChildParameters: { index, flags },
-                    singleSelectionChildParameters: { ...ss, focusSelf, unselectable }
-                });
-                const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ofic2 }, rovingTabIndexChildReturn } = useListNavigationChild({
-                    refElementReturn,
-                    listNavigationChildParameters,
-                    rovingTabIndexChildParameters,
-                    managedChildParameters: {
-                        index,
-                        flags: {
-                            ...ssflags,
-                            ...flags
-                        }
-                    },
-                    subInfo,
-                });
-                const onCurrentFocusedInnerChanged = useStableCallback((f, p) => {
-                    ofic1?.(f, p);
-                    ofic2?.(f, p);
-                    ofic3?.(f, p);
-                });
-                return {
-                    pressReturn,
-                    hasCurrentFocusParameters: { onCurrentFocusedInnerChanged },
-                    refElementParameters: { onElementChange },
-                    rovingTabIndexChildReturn,
-                    singleSelectionChildReturn,
-                };
-            }, []),
-            listNavigationReturn,
-            linearNavigationReturn,
-            managedChildrenReturn,
-            rovingTabIndexReturn,
-            singleSelectionReturn,
-            typeaheadNavigationReturn
-        };
-    }
-    function useSortableListNavigationSingleSelection({ linearNavigationParameters, listNavigationParameters, managedChildrenParameters, rovingTabIndexParameters, singleSelectionParameters, typeaheadNavigationParameters }) {
-        const { useSortableProps, rearrangeableChildrenReturn, sortableChildrenReturn } = useSortableChildren({
-            rearrangeableChildrenParameters: { getIndex: q$1((row) => row.index, []) },
-            sortableChildrenParameters: {
-                compare: q$1((lhs, rhs) => { return lhs.index - rhs.index; }, []),
-            }
-        });
-        const { indexDemangler, indexMangler } = rearrangeableChildrenReturn;
-        const { useListNavigationSingleSelectionChild, listNavigationReturn, managedChildrenReturn, rovingTabIndexReturn, singleSelectionReturn, typeaheadNavigationReturn, linearNavigationReturn, } = useListNavigationSingleSelection({
-            linearNavigationParameters: linearNavigationParameters,
-            listNavigationParameters: { indexDemangler, indexMangler, ...listNavigationParameters },
-            managedChildrenParameters: managedChildrenParameters,
-            rovingTabIndexParameters: rovingTabIndexParameters,
-            typeaheadNavigationParameters: typeaheadNavigationParameters,
-            singleSelectionParameters: singleSelectionParameters
-        });
-        const useSortableListNavigationSingleSelectionProps = useSortableProps;
-        const useSortableListNavigationSingleSelectionChild = (p) => {
-            return useListNavigationSingleSelectionChild(p);
-        };
-        return ({
-            useSortableListNavigationSingleSelectionChild,
-            useProps: useSortableListNavigationSingleSelectionProps,
-            listNavigationReturn,
-            managedChildrenReturn,
-            linearNavigationReturn,
-            rearrangeableChildrenReturn,
-            rovingTabIndexReturn,
-            sortableChildrenReturn,
-            typeaheadNavigationReturn,
-            singleSelectionReturn
-        });
+    function tryNavigateToIndex({ isValid, highestChildIndex: upper, searchDirection, indexDemangler, indexMangler, target }) {
+        //const upper = children.getHighestIndex();
+        const lower = 0;
+        if (searchDirection === -1) {
+            while (target >= lower && !isValid(target))
+                target = indexDemangler(indexMangler(target) - 1);
+            return target < lower ? indexDemangler(lower) : target;
+        }
+        else if (searchDirection === 1) {
+            while (target <= upper && !isValid(target))
+                target = indexDemangler(indexMangler(target) + 1);
+            return target > upper ? indexDemangler(upper) : target;
+        }
+        else {
+            return lower;
+        }
     }
 
     const DemoUseInterval = () => {
@@ -5785,20 +5755,47 @@ var bundle = (function (exports) {
     const DemoUseRovingTabIndex = w(() => {
         const [selectionMode, setSelectionMode] = useState("activation");
         const [count, setCount] = useState(10);
-        const [selectedIndex, setSelectedIndex] = useState(0);
+        const [selectedIndex, setLocalSelectedIndex] = useState(0);
         const [tabbableIndex, setLocalTabbableIndex] = useState(0);
-        const { managedChildrenReturn: { children }, linearNavigationReturn: { propsStable: p1 }, listNavigationReturn: {}, rearrangeableChildrenReturn: {}, singleSelectionReturn: {}, useSortableListNavigationSingleSelectionChild, useProps, rovingTabIndexReturn: { setTabbableIndex }, typeaheadNavigationReturn: { currentTypeahead, propsStable: p2 }, sortableChildrenReturn: { shuffle }, } = useSortableListNavigationSingleSelection({
-            linearNavigationParameters: {},
-            listNavigationParameters: {},
-            managedChildrenParameters: {},
-            rovingTabIndexParameters: { onTabbableIndexChange: q$1((index) => { if (index != null)
-                    setLocalTabbableIndex(index); }, []) },
-            typeaheadNavigationParameters: {},
-            singleSelectionParameters: { selectedIndex, setSelectedIndex: (i, _e) => setSelectedIndex(i) },
-            //childrenHaveFocusP: {  }
+        const getHighestIndex = q$1(() => getChildren().getHighestIndex(), []);
+        const getChildren = q$1(() => { return managedChildrenReturn.getChildren(); }, []);
+        const { linearNavigationParameters, rearrangeableChildrenReturn, sortableChildrenReturn, useSortableProps, ...void8 } = useSortableChildren({
+            rearrangeableChildrenParameters: {
+                getHighestChildIndex: getHighestIndex,
+                getIndex: q$1((a) => a.props.index, []),
+                getValid: useStableCallback((index) => { return !(getChildren().getAt(index)?.hidden); })
+            },
+            sortableChildrenParameters: { compare: q$1((rhs, lhs) => { return lhs.index - rhs.index; }, []) }
+        });
+        const { childrenHaveFocusParameters, linearNavigationReturn, managedChildrenParameters, rovingTabIndexChildParameters, rovingTabIndexReturn, singleSelectionReturn, typeaheadNavigationChildParameters, typeaheadNavigationReturn, ...void7 } = useListNavigationSingleSelection({
+            linearNavigationParameters: {
+                disableArrowKeys: false,
+                disableHomeEndKeys: false,
+                getHighestIndex,
+                navigationDirection: "vertical",
+                ...linearNavigationParameters
+            },
+            managedChildrenReturn: { getChildren },
+            rovingTabIndexParameters: { initiallyTabbedIndex: tabbableIndex, onTabbableIndexChange: setLocalTabbableIndex },
+            singleSelectionParameters: { initiallySelectedIndex: selectedIndex, onSelectedIndexChange: setLocalSelectedIndex },
+            typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000 }
+        });
+        const { managedChildrenReturn, ...void5 } = useManagedChildren({ managedChildrenParameters: { onAfterChildLayoutEffect: null, onChildrenMountChange: null } });
+        const { shuffle } = rearrangeableChildrenReturn;
+        const children = getChildren();
+        const { propsStable: p1, ...void1 } = linearNavigationReturn;
+        const { focusSelf, getTabbableIndex, setTabbableIndex, ...void2 } = rovingTabIndexReturn;
+        const { getSelectedIndex, setSelectedIndex, ...void3 } = singleSelectionReturn;
+        const { propsStable: p2, currentTypeahead, invalidTypeahead, ...void4 } = typeaheadNavigationReturn;
+        const context = useStableObject({
+            rovingTabIndexChildParameters,
+            typeaheadNavigationChildParameters,
+            rovingTabIndexReturn,
+            singleSelectionReturn,
+            managedChildrenReturn
         });
         const props = useMergedProps(p1, p2);
-        return (o$1("div", { className: "demo", children: [o$1("h2", { children: "Keyboard & List Navigation" }), o$1("h3", { children: o$1("code", { children: "useRovingTabIndex" }) }), o$1("p", { children: ["Native HTML elements offer fantastic keyboard accessability, but cover a relatively limited number of use cases. There is no native HTML tree element, for example, that allows keyboard navigation of its items, nor is it possible to combine the keyboard navigation behavior of a ", o$1("code", { children: "<select>" }), " menu with the menu in a drawer component."] }), o$1("p", { children: ["When coming across a List or a Menu or a RadioGroup or a ToggleButtonGroup or any other \"one component made up of child components\", the usual expected behavior, at least natively, is that tabbing into the component is one action, and tabbing out is another.  Navigating ", o$1("em", { children: "within" }), " the component is done with the arrow keys or other methods."] }), o$1("p", { children: ["This is important both for accessability, but also just for general usability.  When tabbing back and forth, the ability to skip a long list without needing to trudge through ", o$1("em", { children: "every one" }), " of its child elements is extremely important."] }), o$1("p", { children: [o$1("code", { children: "useListNavigation" }), " wraps up the functionality of a few hooks (", o$1("code", { children: "useRovingTabIndex" }), ", ", o$1("code", { children: "useLinearNavigation" }), ", ", o$1("code", { children: "useTypeaheadNavigation" }), ") to allow for ARIA-compliant navigation of lists and other similar components.  For more advanced use cases, you can use the other hooks individually."] }), o$1("p", { children: [o$1("code", { children: "useListNavigation" }), " (and ", o$1("code", { children: "useRovingTabIndex" }), ") internally use ", o$1("code", { children: "useChildManager" }), ", which is how the child elements and the parent communicate with each other. This means there are virtually no restrictions on how the DOM is set up as long as you can provide the children with the ", o$1("code", { children: "useListNavigationChild" }), " hook that's returned, usually with a simple ", o$1("code", { children: "Context" }), ". If the child element itself has a focusable element, like a button, it can also be wired up to disable itself Feel free to nest them too, as long as you are aware of your ", o$1("code", { children: "Context" }), " management (i.e. remember that you need to create a new ", o$1("code", { children: "Context" }), " for each use case)."] }), o$1("label", { children: ["# of items", o$1("input", { type: "number", value: count, min: 0, onInput: e => { e.preventDefault(); setCount(e.currentTarget.valueAsNumber); } })] }), o$1("button", { onClick: () => shuffle(children), children: "Shuffle" }), o$1("label", { children: ["Tabbable index: ", o$1("input", { type: "number", value: tabbableIndex ?? undefined, onInput: e => { e.preventDefault(); setTabbableIndex(e.currentTarget.valueAsNumber, false); } })] }), o$1("label", { children: ["Selected index: ", o$1("input", { type: "number", value: selectedIndex ?? undefined, onInput: e => { e.preventDefault(); setSelectedIndex(e.currentTarget.valueAsNumber); } })] }), o$1("label", { children: ["Selection mode:", o$1("label", { children: [o$1("input", { name: "rti-demo-selection-mode", type: "radio", checked: selectionMode == 'focus', onInput: e => { e.preventDefault(); setSelectionMode("focus"); } }), " On focus"] }), o$1("label", { children: [o$1("input", { name: "rti-demo-selection-mode", type: "radio", checked: selectionMode == 'activation', onInput: e => { e.preventDefault(); setSelectionMode("activation"); } }), " On activation (click, tap, Enter, Space, etc.)"] })] }), o$1(SelectionModeContext.Provider, { value: selectionMode, children: o$1(ListNavigationSingleSelectionChildContext.Provider, { value: useSortableListNavigationSingleSelectionChild, children: o$1("ul", { ...(useProps(useMergedProps(props, {
+        return (o$1("div", { className: "demo", children: [o$1("h2", { children: "Keyboard & List Navigation" }), o$1("h3", { children: o$1("code", { children: "useRovingTabIndex" }) }), o$1("p", { children: ["Native HTML elements offer fantastic keyboard accessability, but cover a relatively limited number of use cases. There is no native HTML tree element, for example, that allows keyboard navigation of its items, nor is it possible to combine the keyboard navigation behavior of a ", o$1("code", { children: "<select>" }), " menu with the menu in a drawer component."] }), o$1("p", { children: ["When coming across a List or a Menu or a RadioGroup or a ToggleButtonGroup or any other \"one component made up of child components\", the usual expected behavior, at least natively, is that tabbing into the component is one action, and tabbing out is another.  Navigating ", o$1("em", { children: "within" }), " the component is done with the arrow keys or other methods."] }), o$1("p", { children: ["This is important both for accessability, but also just for general usability.  When tabbing back and forth, the ability to skip a long list without needing to trudge through ", o$1("em", { children: "every one" }), " of its child elements is extremely important."] }), o$1("p", { children: [o$1("code", { children: "useListNavigation" }), " wraps up the functionality of a few hooks (", o$1("code", { children: "useRovingTabIndex" }), ", ", o$1("code", { children: "useLinearNavigation" }), ", ", o$1("code", { children: "useTypeaheadNavigation" }), ") to allow for ARIA-compliant navigation of lists and other similar components.  For more advanced use cases, you can use the other hooks individually."] }), o$1("p", { children: [o$1("code", { children: "useListNavigation" }), " (and ", o$1("code", { children: "useRovingTabIndex" }), ") internally use ", o$1("code", { children: "useChildManager" }), ", which is how the child elements and the parent communicate with each other. This means there are virtually no restrictions on how the DOM is set up as long as you can provide the children with the ", o$1("code", { children: "useListNavigationChild" }), " hook that's returned, usually with a simple ", o$1("code", { children: "Context" }), ". If the child element itself has a focusable element, like a button, it can also be wired up to disable itself Feel free to nest them too, as long as you are aware of your ", o$1("code", { children: "Context" }), " management (i.e. remember that you need to create a new ", o$1("code", { children: "Context" }), " for each use case)."] }), o$1("label", { children: ["# of items", o$1("input", { type: "number", value: count, min: 0, onInput: e => { e.preventDefault(); setCount(e.currentTarget.valueAsNumber); } })] }), o$1("button", { onClick: () => shuffle(children), children: "Shuffle" }), o$1("label", { children: ["Tabbable index: ", o$1("input", { type: "number", value: tabbableIndex ?? undefined, onInput: e => { e.preventDefault(); setTabbableIndex(e.currentTarget.valueAsNumber, false); } })] }), o$1("label", { children: ["Selected index: ", o$1("input", { type: "number", value: selectedIndex ?? undefined, onInput: e => { e.preventDefault(); setSelectedIndex(e.currentTarget.valueAsNumber); } })] }), o$1("label", { children: ["Selection mode:", o$1("label", { children: [o$1("input", { name: "rti-demo-selection-mode", type: "radio", checked: selectionMode == 'focus', onInput: e => { e.preventDefault(); setSelectionMode("focus"); } }), " On focus"] }), o$1("label", { children: [o$1("input", { name: "rti-demo-selection-mode", type: "radio", checked: selectionMode == 'activation', onInput: e => { e.preventDefault(); setSelectionMode("activation"); } }), " On activation (click, tap, Enter, Space, etc.)"] })] }), o$1(SelectionModeContext.Provider, { value: selectionMode, children: o$1(ListNavigationSingleSelectionChildContext.Provider, { value: context, children: o$1("ul", { ...(useSortableProps(useMergedProps(props, {
                                 children: Array.from((function* () {
                                     for (let i = 0; i < count; ++i) {
                                         yield o$1(DemoUseRovingTabIndexChild, { index: i }, i);
@@ -5811,21 +5808,41 @@ var bundle = (function (exports) {
         const selectionMode = x(SelectionModeContext);
         const hidden = (index == 7);
         const [randomWord] = useState(() => RandomWords$1[index /*Math.floor(Math.random() * (RandomWords.length - 1))*/]);
-        const useListNavigationSingleSelectionChild = x(ListNavigationSingleSelectionChildContext);
+        const { rovingTabIndexChildParameters, typeaheadNavigationChildParameters, rovingTabIndexReturn, singleSelectionReturn, managedChildrenReturn } = x(ListNavigationSingleSelectionChildContext);
         const text = `${randomWord} This is item #${index}${hidden ? " (hidden)" : ""}`;
         const focusSelf = q$1((e) => { e.focus(); }, []);
-        const oec = useStableCallback((a, b) => onElementChange(a, b));
+        //const oec = useStableCallback<NonNullable<UseRefElementParameters<HTMLLIElement>["refElementParameters"]["onElementChange"]>>((a, b) => onElementChange(a, b));
         //const ofic = useStableCallback<NonNullable<typeof onFocusedInnerChanged>>((a, b) => onFocusedInnerChanged?.(a, b));
         //const olfic = useStableCallback<NonNullable<typeof onLastFocusedInnerChanged>>((a, b) => onLastFocusedInnerChanged?.(a, b));
-        const { refElementReturn } = useRefElement({ refElementParameters: { onElementChange: oec } });
+        const { refElementReturn } = useRefElement({ refElementParameters: { onElementChange: undefined } });
         const { getElement, propsStable: p3 } = refElementReturn;
-        const { rovingTabIndexChildReturn: { tabbable, propsUnstable: p2 }, singleSelectionChildReturn: { selected, propsUnstable: p4 }, hasCurrentFocusParameters: { onCurrentFocusedInnerChanged }, refElementParameters: { onElementChange }, pressReturn: { propsStable: p5, propsUnstable: p1 }, } = useListNavigationSingleSelectionChild({
-            managedChildParameters: { index, flags: {} },
+        const { 
+        /*rovingTabIndexChildReturn: { tabbable, propsUnstable: p2 },
+        singleSelectionChildReturn: { selected, propsUnstable: p4 },
+        hasCurrentFocusParameters: { onCurrentFocusedInnerChanged },
+        refElementParameters: { onElementChange },
+        pressReturn: { propsStable: p5, propsUnstable: p1 },*/
+        hasCurrentFocusParameters: { onCurrentFocusedInnerChanged, ...void5 }, managedChildParameters: { getSelected, selected, setSelected, ...void4 }, pressParameters: { onPressSync, ...void3 }, rovingTabIndexChildReturn: { setTabbable, getTabbable, propsUnstable: p2, tabbable, ...void2 }, singleSelectionChildReturn: { propsUnstable: p4, ...void1 }, ...void6 } = useListNavigationSingleSelectionChild({
+            managedChildParameters: { hidden, index },
+            rovingTabIndexChildParameters: rovingTabIndexChildParameters,
+            rovingTabIndexReturn,
+            singleSelectionChildParameters: { ariaPropName: "aria-selected", selectionMode },
+            singleSelectionReturn,
+            typeaheadNavigationChildParameters: { text, ...typeaheadNavigationChildParameters }
+            /*managedChildParameters: { index, flags: {} },
             listNavigationChildParameters: { text: "" },
             refElementReturn,
             rovingTabIndexChildParameters: { focusSelf, noModifyTabIndex: false, hidden },
             singleSelectionChildParameters: { selectionMode, ariaPropName: "aria-selected", unselectable: hidden },
-            subInfo: {},
+            subInfo: {},*/
+        });
+        const { pressReturn: { propsStable: p5 } } = usePress({
+            pressParameters: { exclude: {}, focusSelf, onPressSync, onPseudoActiveStart: null, onPseudoActiveStop: null },
+            refElementReturn
+        });
+        useManagedChild({
+            managedChildParameters: { index, focusSelf, getElement, getSelected, getTabbable, hidden, selected, setSelected, setTabbable, tabbable, text },
+            managedChildrenReturn
         });
         const { hasCurrentFocusReturn: { propsStable: p6 } } = useHasCurrentFocus({
             refElementReturn,
@@ -5834,8 +5851,8 @@ var bundle = (function (exports) {
                 onCurrentFocusedInnerChanged
             }
         });
-        const props = useMergedProps(p1, p2, p3, p4, p5, p6);
-        return (o$1("li", { ...props, children: [text, " (", tabbable ? "Tabbable" : "Not tabbable", ", ", selected ? "Selected" : "Not selected", ")", o$1("input", { ...useMergedProps(props, { type: "number" }), style: { width: "5ch" } })] }));
+        const props = useMergedProps(p2, p3, p4, p5, p6);
+        return (o$1("li", { ...props, children: [text, " (", tabbable ? "Tabbable" : "Not tabbable", ", ", selected ? "Selected" : "Not selected", ")", o$1("input", { ...useMergedProps(p2, { type: "number" }), style: { width: "5ch" } })] }));
     }));
 
     const DemoUseTimeout = () => {
@@ -5948,55 +5965,117 @@ var bundle = (function (exports) {
         });
         return (o$1("div", { class: "demo", children: [o$1("h2", { children: "useHasFocus" }), o$1("div", { ...(useMergedProps(p2, p1, { style: { border: "1px solid black" }, tabIndex: 0 })), children: ["Outer ", o$1("div", { tabIndex: 0, style: { border: "1px solid black" }, children: "Inner element" })] }), o$1("div", { children: o$1("ul", { children: [o$1("li", { children: ["Strictly focused: ", focused.toString(), ", ", lastFocused.toString()] }), o$1("li", { children: ["Inner focused: ", focusedInner.toString(), ", ", lastFocusedInner.toString()] }), o$1("li", { children: ["Window focused: ", windowFocused.toString()] }), o$1("li", { children: ["activeElement: ", activeElement?.textContent] }), o$1("li", { children: ["lastActiveElement: ", lastActiveElement?.textContent] })] }) })] }));
     });
-    const GridRowContext = B$2(null);
-    const GridCellContext = B$2(null);
+    //const GridRowContext = createContext<UseGridNavigationRow<HTMLTableRowElement, HTMLTableCellElement, {}, {}, string, string>>(null!);
+    //const GridCellContext = createContext<UseGridNavigationCell<HTMLTableCellElement, {}, string>>(null!);
     const DemoUseGrid = w(() => {
+        //return <div />;
         //const [, setLastFocusedInner, _getLastFocusedInner] = useState(false);
         //const { props } = useHasFocus<HTMLTableSectionElement>({ onLastFocusedInnerChanged: setLastFocusedInner, getDocument });
-        const { gridNavigationReturn: { currentColumn }, linearNavigationReturn: { propsStable: p2 }, listNavigationReturn: {}, managedChildrenReturn: {}, rovingTabIndexReturn: {}, typeaheadNavigationReturn: { propsStable: p1 }, useGridNavigationRow } = useGridNavigation({
-            rovingTabIndexParameters: {},
-            linearNavigationParameters: {},
-            listNavigationParameters: {},
-            typeaheadNavigationParameters: {},
-            managedChildrenParameters: {},
-            gridNavigationParameters: {}
+        const [tabbableColumn, setTabbableColumn, getTabbableColumn] = useState(null);
+        const getHighestIndex = q$1(() => getChildren().getHighestIndex(), []);
+        const getChildren = q$1(() => { return managedChildrenReturn.getChildren(); }, []);
+        const { linearNavigationParameters, rearrangeableChildrenReturn, sortableChildrenReturn, useSortableProps, ...void8 } = useSortableChildren({
+            rearrangeableChildrenParameters: {
+                getHighestChildIndex: getHighestIndex,
+                getIndex: q$1((a) => a.props.index, []),
+                getValid: useStableCallback((index) => { return !(getChildren().getAt(index)?.hidden); })
+            },
+            sortableChildrenParameters: { compare: q$1((rhs, lhs) => { return lhs.index - rhs.index; }, []) }
         });
-        return (o$1("div", { class: "demo", children: [o$1("div", { children: ["Current column: ", currentColumn] }), o$1("table", { ...{ border: "2" }, style: { whiteSpace: "nowrap" }, children: [o$1("thead", { children: o$1("tr", { children: [o$1("th", { children: "Row is tabbable?" }), o$1("th", { children: "Column 1" }), o$1("th", { children: "Column 2" })] }) }), o$1("tbody", { ...useMergedProps(p1, p2), children: o$1(GridRowContext.Provider, { value: useGridNavigationRow, children: Array.from((function* () {
+        const { gridNavigationRowParameters, linearNavigationReturn, managedChildrenParameters, rovingTabIndexChildParameters, rovingTabIndexReturn, typeaheadNavigationChildParameters, typeaheadNavigationReturn, ...void1 } = useGridNavigation({
+            gridNavigationParameters: { onTabbableColumnChange: setTabbableColumn },
+            linearNavigationParameters: { disableArrowKeys: false, disableHomeEndKeys: false, getHighestIndex, ...linearNavigationParameters },
+            managedChildrenReturn: { getChildren },
+            rovingTabIndexParameters: { initiallyTabbedIndex: null, onTabbableIndexChange: null },
+            typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000 }
+        });
+        const { managedChildrenReturn } = useManagedChildren({
+            managedChildrenParameters: {
+                onAfterChildLayoutEffect: null,
+                onChildrenMountChange: null
+            }
+        });
+        const { propsStable: p1 } = linearNavigationReturn;
+        const { propsStable: p2 } = typeaheadNavigationReturn;
+        return (o$1("div", { class: "demo", children: [o$1("div", { children: ["Current column: ", tabbableColumn] }), o$1("table", { ...{ border: "2" }, style: { whiteSpace: "nowrap" }, children: [o$1("thead", { children: o$1("tr", { children: [o$1("th", { children: "Row is tabbable?" }), o$1("th", { children: "Column 1" }), o$1("th", { children: "Column 2" })] }) }), o$1("tbody", { ...useMergedProps(p1, p2), children: o$1(GridRowContext.Provider, { value: useStableObject({ gridNavigationRowParameters, rovingTabIndexChildParameters, typeaheadNavigationChildParameters, managedChildrenReturn }), children: Array.from((function* () {
                                     for (let i = 0; i < 10; ++i) {
                                         yield o$1(DemoUseGridRow, { index: i }, i);
                                     }
                                 })()) }) })] })] }));
     });
+    const GridRowContext = B$2(null);
+    const GridCellContext = B$2(null);
     const DemoUseGridRow = w((({ index }) => {
         useState(() => RandomWords[index /*Math.floor(Math.random() * (RandomWords.length - 1))*/]);
-        const useGridRow = x(GridRowContext);
+        const [tabbableColumn, setTabbableColumn, getTabbableColumn] = useState(null);
+        const getHighestIndex = q$1(() => getChildren().getHighestIndex(), []);
+        const getChildren = q$1(() => { return getChildren2(); }, []);
+        const hidden = (index === 3);
+        const { gridNavigationRowParameters, rovingTabIndexChildParameters, typeaheadNavigationChildParameters, managedChildrenReturn: mcr } = x(GridRowContext);
+        const navigateAbsolute = q$1((n) => { return n; }, []);
+        const navigateRelative = q$1((n, o) => { return n + o; }, []);
+        //const useGridRow = useContext(GridRowContext);
         const { refElementReturn } = useRefElement({ refElementParameters: {} });
+        const { getElement, propsStable: p5 } = refElementReturn;
         const { propsStable: p4 } = refElementReturn;
-        const { useGridNavigationCell, asParentOfCells: { linearNavigationReturn: { propsStable: p2 }, listNavigationReturn: {}, managedChildrenReturn: {}, rovingTabIndexReturn: {}, typeaheadNavigationReturn: { propsStable: p1, } }, asChildRow: { hasCurrentFocusParameters, rovingTabIndexChildReturn: { tabbable, propsUnstable: p3 } }, } = useGridRow({
-            asChildRowOfSection: {
-                refElementReturn,
-                managedChildParameters: { index, flags: {} },
-                listNavigationChildParameters: { text: "" },
-                rovingTabIndexChildParameters: { hidden: index == 3, noModifyTabIndex: false },
-                subInfo: {},
+        const setTabbableIndex2 = useStableCallback((a, b) => { setTabbableIndex(a, b); });
+        const gridNavRet = useGridNavigationRow({
+            asChildRowOfTable: {
+                gridNavigationRowParameters,
+                managedChildParameters: { hidden, index },
+                managedChildrenReturn: { getChildren },
+                rovingTabIndexChildParameters,
+                rovingTabIndexReturn: { setTabbableIndex: setTabbableIndex2 },
+                typeaheadNavigationChildParameters: { text: "", ...typeaheadNavigationChildParameters }
             },
             asParentRowOfCells: {
-                linearNavigationParameters: {},
-                listNavigationParameters: {},
-                rovingTabIndexParameters: {},
-                typeaheadNavigationParameters: {},
-                managedChildrenParameters: {}
-            },
+                linearNavigationParameters: { disableArrowKeys: false, disableHomeEndKeys: false, getHighestIndex, navigateAbsolute, navigateRelative },
+                managedChildrenReturn: { getChildren },
+                rovingTabIndexParameters: { initiallyTabbedIndex: 0, onTabbableIndexChange: setTabbableColumn },
+                typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000 }
+            }
         });
-        useHasCurrentFocus({
+        const { asChildRowOfTable: { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged }, managedChildParameters: { focusSelf: focusSelfAsChildRow, setTabbableColumnIndex, ...void6 }, rovingTabIndexChildReturn: { getTabbable, propsUnstable, setTabbable, tabbable, ...void7 }, ...void5 }, asParentRowOfCells: { gridNavigationCellParameters, linearNavigationReturn: { propsStable: p3, ...void2 }, managedChildrenParameters: { onChildrenMountChange, ...void1 }, rovingTabIndexChildParameters: rticp1, rovingTabIndexReturn, typeaheadNavigationChildParameters: rncp1, typeaheadNavigationReturn, ...void4 }, ...void10 } = gridNavRet;
+        const { getTabbableIndex, setTabbableIndex, ...void3 } = rovingTabIndexReturn;
+        const { hasCurrentFocusReturn, ...void8 } = useHasCurrentFocus({
             refElementReturn,
             hasCurrentFocusParameters: {
                 onCurrentFocusedChanged: null,
-                ...hasCurrentFocusParameters,
+                onCurrentFocusedInnerChanged
             }
         });
-        const props = useMergedProps(useMergedProps(useMergedProps(p1, p2), p3), p4);
-        return (o$1("tr", { ...props, children: o$1(GridCellContext.Provider, { value: useGridNavigationCell, children: Array.from((function* () {
+        useManagedChild({
+            managedChildParameters: {
+                focusSelf: focusSelfAsChildRow,
+                getElement,
+                getTabbable,
+                hidden,
+                index,
+                setTabbable,
+                tabbable,
+                text: "",
+                setTabbableColumnIndex
+            },
+            managedChildrenReturn: mcr
+        });
+        const { managedChildrenReturn, ...void9 } = useManagedChildren({
+            managedChildrenParameters: {
+                onAfterChildLayoutEffect: null,
+                onChildrenMountChange: onChildrenMountChange
+            }
+        });
+        //const { propsStable: p1 } = linearNavigationReturn;
+        const { propsStable: p2 } = typeaheadNavigationReturn;
+        const { propsStable: p1 } = hasCurrentFocusReturn;
+        const { getChildren: getChildren2 } = managedChildrenReturn;
+        const props = useMergedProps(p1, p2, p3, p4, p5);
+        return (o$1("tr", { ...props, children: o$1(GridCellContext.Provider, { value: useStableObject({
+                    rovingTabIndexChildParameters,
+                    typeaheadNavigationChildParameters,
+                    gridNavigationCellParameters,
+                    rovingTabIndexReturn,
+                    managedChildrenReturn
+                }), children: Array.from((function* () {
                     for (let i = 0; i < 3; ++i) {
                         yield o$1(DemoUseGridCell, { index: i, row: index, rowIsTabbable: tabbable }, i);
                     }
@@ -6006,25 +6085,30 @@ var bundle = (function (exports) {
         if (row >= 6 && row % 2 == 0 && index > 1)
             return null;
         let hiddenText = (row === 3) ? " (row hidden)" : "";
-        const useGridCell = x(GridCellContext);
+        const { rovingTabIndexChildParameters, typeaheadNavigationChildParameters, gridNavigationCellParameters, rovingTabIndexReturn, managedChildrenReturn, ...void5 } = x(GridCellContext);
         const { refElementReturn } = useRefElement({ refElementParameters: {} });
-        const { propsStable: p1 } = refElementReturn;
-        const { hasCurrentFocusParameters, gridNavigationReturn: {}, rovingTabIndexChildReturn: { tabbable: cellIsTabbable, propsUnstable: p2 }, } = useGridCell({
-            //hasFocusParameters: { onFocusedChanged: null, onFocusedInnerChanged: null, onLastFocusedChanged: null, onLastFocusedInnerChanged: null },
-            //activeElementParameters: { getDocument },
-            listNavigationChildParameters: { text: "" },
-            // refElementParameters: {},
-            refElementReturn,
-            rovingTabIndexChildParameters: { noModifyTabIndex: false, focusSelf: e => e.focus(), hidden: false },
-            managedChildParameters: { index, flags: {} },
-            subInfo: {},
+        const { propsStable: p1, getElement } = refElementReturn;
+        const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged, ...void1 }, rovingTabIndexChildReturn: { getTabbable, propsUnstable: p2, setTabbable, tabbable, ...void2 }, ...void3 } = useGridNavigationCell({
+            gridNavigationCellParameters: { ...gridNavigationCellParameters, colSpan: 1 },
+            managedChildParameters: { hidden: false, index },
+            rovingTabIndexChildParameters,
+            rovingTabIndexReturn,
+            typeaheadNavigationChildParameters: {
+                text: "",
+                ...typeaheadNavigationChildParameters
+            }
         });
+        const focusSelf = q$1((e) => { e.focus(); }, []);
         const { hasCurrentFocusReturn: { propsStable: p3 } } = useHasCurrentFocus({
             refElementReturn,
-            hasCurrentFocusParameters: { onCurrentFocusedChanged: null, ...hasCurrentFocusParameters }
+            hasCurrentFocusParameters: { onCurrentFocusedChanged: null, onCurrentFocusedInnerChanged }
+        });
+        useManagedChild({
+            managedChildParameters: { index, focusSelf, getElement, getTabbable, hidden: false, setTabbable, tabbable, text: "" },
+            managedChildrenReturn
         });
         const props = useMergedProps(p1, p2, p3);
-        const t = (cellIsTabbable ? "(Tabbable)" : "(Not tabbable)");
+        const t = (tabbable ? "(Tabbable)" : "(Not tabbable)");
         if (index === 0)
             return o$1("td", { ...props, children: rowIsTabbable.toString() });
         else {

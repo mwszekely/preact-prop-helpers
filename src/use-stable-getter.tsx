@@ -5,9 +5,6 @@ import { useBeforeLayoutEffect } from "./use-before-layout-effect";
 const Unset = Symbol("unset");
 
 const STABLE = Symbol("STABLE");
-//type StableDeep<T> = T extends (number | boolean | Function | null | undefined | string)? WithStableTag<(T)> : {[K in keyof T]: WithStableTag<StableDeep<T[K]>> } ;
-//type WithStableTag<T> = T & { [STABLE]: true };
-//export type Stable<T> = WithStableTag<StableDeep<T>>
 export type Stable<T> = T & { [STABLE]: true };
 
 
@@ -41,7 +38,7 @@ export function useStableGetter<T>(value: T): Stable<() => T> {
  */
  export function useStableObject<T extends {}>(t: T): Stable<T> {
     const e = Object.entries(t);
-    useEnsureStability("useStableObject", e.length, e.map(([k, v]) => v));
+    useEnsureStability("useStableObject", e.length, ...e.map(([k, v]) => v));
     return useRef(t).current as Stable<T>;
 }
 

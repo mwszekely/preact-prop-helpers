@@ -9,7 +9,7 @@ import lodashShuffle from "lodash-es/shuffle";
 import { UseLinearNavigationParameters } from "./use-keyboard-navigation";
 import { UseRovingTabIndexReturnTypeInfo } from "./use-roving-tabindex";
 
-export type GetIndex = (row: VNode<unknown>) => (number | null | undefined);
+export type GetIndex<P> = (row: VNode<P>) => (number | null | undefined);
 export type GetValid = (index: number) => boolean;
 export type GetHighestChildIndex = () => number;
 export type Compare<V> = (lhs: V, rhs: V) => number;
@@ -23,7 +23,7 @@ export interface UseRearrangeableChildrenParameters<M extends ManagedChildInfo<n
      * Must return, e.g., the row index of this child
      * (Usually just an `index` prop)
      */
-    rearrangeableChildrenParameters: { getIndex: GetIndex, getValid: GetValid; getHighestChildIndex: GetHighestChildIndex; }
+    rearrangeableChildrenParameters: { getIndex: GetIndex<any>, getValid: GetValid; getHighestChildIndex: GetHighestChildIndex; }
 
     //rovingTabIndexReturn: Pick<UseRovingTabIndexReturnTypeInfo<any, any>["rovingTabIndexReturn"], "setTabbableIndex">;
 }
@@ -157,7 +157,7 @@ export function useRearrangeableChildren<ParentElement extends Element, M extend
                 target: indexDemangler(indexMangler(original) + offset),
                 highestChildIndex: getHighestChildIndex(),
                 isValid: getValid,
-                searchDirection: -1,
+                searchDirection: (Math.sign(offset) || 1) as 1 | -1,
                 indexMangler: indexMangler,
                 indexDemangler: indexDemangler
             });

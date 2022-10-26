@@ -1,11 +1,24 @@
 import { h } from "preact";
 import { useEffect, useLayoutEffect, useRef } from "preact/hooks";
+import { useMergedProps } from "use-merged-props";
 import { assertEmptyObject, UseManagedChildParameters } from "./use-child-manager";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnTypeInfo } from "./use-roving-tabindex";
 import { useStableCallback } from "./use-stable-callback";
 import { Stable, useStableGetter, useStableObject } from "./use-stable-getter";
 import { useState } from "./use-state";
 import { useTimeout } from "./use-timeout";
+
+/*
+export function useLinearNavigationProps<E extends Element>(r: UseLinearNavigationReturnTypeInfo<E>, ...otherProps: h.JSX.HTMLAttributes<E>[]): h.JSX.HTMLAttributes<E>[] {
+    return [r.linearNavigationReturn.propsStable, ...otherProps];
+}
+export function useTypeaheadNavigationProps<E extends Element>(r: UseTypeaheadNavigationReturnTypeInfo<E>, ...otherProps: h.JSX.HTMLAttributes<E>[]): h.JSX.HTMLAttributes<E>[] {
+    return [r.typeaheadNavigationReturn.propsStable, ...otherProps];
+}*/
+
+export interface UseTypeaheadNavigationContext<ChildElement extends Element> {
+    typeaheadNavigationChildParameters: UseTypeaheadNavigationReturnTypeInfo<ChildElement>["typeaheadNavigationChildParameters"];
+}
 
 export interface UseLinearNavigationReturnTypeInfo<ParentOrChildElement extends Element> {
     linearNavigationReturn: {
@@ -19,10 +32,10 @@ export interface UseLinearNavigationReturnTypeWithHooks<ParentOrChildElement ext
 
 /** Arguments passed to the parent `useLinearNavigation` */
 export interface UseLinearNavigationParameters {
-    rovingTabIndexReturn: Pick<UseRovingTabIndexReturnTypeInfo<any>["rovingTabIndexReturn"], "getTabbableIndex">
+    rovingTabIndexReturn: Pick<UseRovingTabIndexReturnTypeInfo<any>["rovingTabIndexReturn"], "getTabbableIndex" | "setTabbableIndex">
     linearNavigationParameters: {
-        navigateRelative(original: number, offset: number, fromUserInteraction: boolean): void;
-        navigateAbsolute(index: number, fromUserInteraction: boolean): void;
+        navigateRelative(original: number, offset: number): number | null;
+        navigateAbsolute(index: number | null): number | null;
         getHighestIndex(): number;  // [0, n], not [0, n)
 
         /**
@@ -67,12 +80,12 @@ export function useLinearNavigation<ParentOrChildElement extends Element>({
 }: UseLinearNavigationParameters): UseLinearNavigationReturnTypeWithHooks<ParentOrChildElement> {
     assertEmptyObject(_void1);
 
-    const { getTabbableIndex } = rovingTabIndexReturn;
+    const { getTabbableIndex, setTabbableIndex } = rovingTabIndexReturn;
 
-    const navigateToFirst = useStableCallback((fromUserInteraction: boolean) => { navigateAbsolute(0, fromUserInteraction); });
-    const navigateToLast = useStableCallback((fromUserInteraction: boolean) => { navigateAbsolute(getHighestIndex(), fromUserInteraction); });
-    const navigateToNext = useStableCallback((fromUserInteraction: boolean) => navigateRelative((getTabbableIndex() ?? 0), +1, fromUserInteraction));
-    const navigateToPrev = useStableCallback((fromUserInteraction: boolean) => navigateRelative((getTabbableIndex() ?? 0), -1, fromUserInteraction));
+    const navigateToFirst = useStableCallback((fromUserInteraction: boolean) => { setTabbableIndex(navigateAbsolute(0), fromUserInteraction); });
+    const navigateToLast = useStableCallback((fromUserInteraction: boolean) => { setTabbableIndex(navigateAbsolute(getHighestIndex()), fromUserInteraction); });
+    const navigateToNext = useStableCallback((fromUserInteraction: boolean) => setTabbableIndex(navigateRelative((getTabbableIndex() ?? 0), +1), fromUserInteraction));
+    const navigateToPrev = useStableCallback((fromUserInteraction: boolean) => setTabbableIndex(navigateRelative((getTabbableIndex() ?? 0), -1), fromUserInteraction));
     const getDisableArrowKeys = useStableGetter(dak);
     const getDisableHomeEndKeys = useStableGetter(dhek);
     const getNavigationDirection = useStableGetter(nd);

@@ -1,7 +1,13 @@
 import { h } from "preact";
 import { useEffect, useRef } from "preact/hooks";
+import { useMergedProps } from "./use-merged-props";
 import { useStableCallback } from "./use-stable-callback";
 import { useState } from "./use-state";
+
+/*
+export function useDroppableProps<E extends Element>(r: UseDroppableReturnType<E>, ...otherProps: h.JSX.HTMLAttributes<E>[]): h.JSX.HTMLAttributes<E>[] {
+    return [r.propsStable, ...otherProps];
+}*/
 
 export interface UseDroppableReturnType<E extends Element> {
 

@@ -8,8 +8,18 @@ import { useChildrenFlag, UseManagedChildParameters, UseManagedChildrenReturnTyp
 import { UseChildrenHaveFocusChildReturnType, UseChildrenHaveFocusParameters } from "./use-children-have-focus";
 //import { usePress, UsePressReturnType } from "./use-press";
 import { useStableCallback } from "./use-stable-callback";
-import { useStableGetter } from "./use-stable-getter";
+import { useStableGetter, useStableObject } from "./use-stable-getter";
 import { useState } from "./use-state";
+import { useMergedProps } from "use-merged-props";
+
+/*
+export function useSingleSelectionChildProps<E extends Element>(r: UseSingleSelectionChildReturnTypeInfo<E>, ...otherProps: h.JSX.HTMLAttributes<E>[]): h.JSX.HTMLAttributes<E>[] {
+    return [r.singleSelectionChildReturn.propsUnstable, ...otherProps];
+}*/
+
+export interface UseSingleSelectionContext {
+    singleSelectionReturn: UseSingleSelectionReturnTypeInfo["singleSelectionReturn"];
+}
 
 /** Anything that's selectable must be tabbable, so we DO use rovingtabindex instead of just managedchildren */
 export interface SelectableChildInfo<E extends Element> extends UseRovingTabIndexChildInfo<E> {
@@ -99,10 +109,10 @@ export function useSingleSelection<ChildElement extends Element>({
     });
 
     return {
-        singleSelectionReturn: {
+        singleSelectionReturn: useStableObject({
             getSelectedIndex,
             setSelectedIndex
-        },
+        }),
         childrenHaveFocusParameters: {
             onCompositeFocusChange: useStableCallback((anyFocused: boolean) => {
                 if (!anyFocused) {

@@ -7,21 +7,20 @@ import { useMergedStyles } from "./use-merged-styles";
 
 let log = console.warn;
 
+/*
+type IsEmptyObject<T> = [keyof T] extends [never]? true : false;
 
 export type ExtractedProps<O extends {}> = { [K in keyof O]: Pick<O[K], ("propsStable" | "propsUnstable") & keyof O[K]> };
 
+const o: ExtractedProps<UseGridNavigationRowReturnType<any, any>> = {
+    asChildRowOfTable: {
+
+    },
+    asParentRowOfCells: {}
+}*/
+
 export function enableLoggingPropConflicts(log2: typeof console["log"]) {
     log = log2
-}
-
-export function useMergedProps<E extends EventTarget>(...allProps: h.JSX.HTMLAttributes<E>[]) {
-    useEnsureStability("useMergedProps", allProps.length);
-    let ret: h.JSX.HTMLAttributes<E> = {};
-    for (let nextProps of allProps) {
-        ret = useMergedProps2<E>(ret, nextProps);
-    }
-
-    return ret;
 }
 
 
@@ -33,6 +32,16 @@ export function useMergedProps<E extends EventTarget>(...allProps: h.JSX.HTMLAtt
  * @param rhs2 
  * @returns 
  */
+export function useMergedProps<E extends EventTarget>(...allProps: h.JSX.HTMLAttributes<E>[]) {
+    useEnsureStability("useMergedProps", allProps.length);
+    let ret: h.JSX.HTMLAttributes<E> = {};
+    for (let nextProps of allProps) {
+        ret = useMergedProps2<E>(ret, nextProps);
+    }
+
+    return ret;
+}
+
 function useMergedProps2<E extends EventTarget>(lhsAll: h.JSX.HTMLAttributes<E>, rhsAll: h.JSX.HTMLAttributes<E>): h.JSX.HTMLAttributes<E> {
     // First, separate the props we were given into two groups:
     // lhsAll and rhsAll contain all the props we were given, and

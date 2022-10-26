@@ -15,9 +15,11 @@ return <div {...useElementSizeProps(props)}>I'm {offsetHeight} pixels tall!</div
 This library follows a few conventions:
 * Re-render as few times as possible.  E.G. `useElementSize` doesn't return the size of the element by re-rendering, but you can *choose* to re-render like in the example above.
     * Re-rendering is only necessary if you need the result, well, while rendering.  If you just need the result in an event handler, then re-rendering's a huge waste!
-* Break work up into sub-hooks returned from the main hook that can be called in remote locations. E.G. `useRovingTabIndex` returns a hook called `useRovingTabIndexChild` that you can toss into a `Context` for each child to use anywhere in the DOM you'd like.
-    * Sub-hooks are typed; E.G. `const c = createContext<UseRovingTabIndexChild>(null!)` is perfectly valid.
-    * There are a lot of types, but they are reliably called `Use${whatever}`, `Use${whatever}Parameters`, and `Use${whatever}ReturnType`.
+* Be composable; parameters and return types are all typed *very* specifically into single objects (like `return { useRefElementReturn: { getElement } }`) to make swizzling all these different parameters back and forth as foolproof as possible.
+    * If a hook requires information returned from another hook (lots of hooks require `getElement()`, for example), then it will *explicitly* ask for the return type of that hook, though only the parts it needs (E.G. `(useHasCurrentFocus({...useRefElement()})` works).
+* Break work up into sub-hooks returned from the main hook that can be called in remote locations. E.G. `useRovingTabIndex` returns information for a hook called `useRovingTabIndexChild` that you can toss into a `Context` for each child to use anywhere in the DOM you'd like.
+    * Sub-hook parameters are typed; E.G. `const c = createContext<UseRovingTabIndexChildContext>(...)` is perfectly valid.
+    * There are a lot of types, but they are reliably called `Use${whatever}`, `Use${whatever}Parameters`, and `Use${whatever}ReturnType`, with the occasional `use${whatever}Child` added into the mix.
 * Children provide their data to the parent, never the other way around. E.G. `useListNavigation` can filter children, but it doesn't take an array of which children to filter out; each child reports its own status as filtered/unfiltered, and the parent responds to that.
     * This means that the child data is *always* the single source of truth, and maps nicely to how components are built and diffed.
 * The stability of the things that these hooks return is documented, but in general, `use*Props` are unstable, and `use*` are stable.

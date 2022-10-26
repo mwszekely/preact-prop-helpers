@@ -3,6 +3,11 @@ import { useCallback, useRef } from "preact/hooks";
 import { useMergedProps } from "./use-merged-props";
 import { useState } from "./use-state";
 
+/*
+export function useDraggableProps<E extends EventTarget>(r: UseDraggableReturnType<E>, ...otherProps: h.JSX.HTMLAttributes<E>[]): h.JSX.HTMLAttributes<E>[] {
+    return [r.propsUnstable, ...otherProps];
+}*/
+
 export interface UseDraggableReturnType<E extends EventTarget> {
     /** *Unstable* */
     propsUnstable: h.JSX.HTMLAttributes<E>;
