@@ -1,10 +1,9 @@
 import { h } from "preact";
 import { useEffect, useLayoutEffect, useRef } from "preact/hooks";
-import { useMergedProps } from "./use-merged-props";
 import { assertEmptyObject, UseManagedChildParameters } from "./use-child-manager";
-import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnTypeInfo } from "./use-roving-tabindex";
+import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "./use-roving-tabindex";
 import { useStableCallback } from "./use-stable-callback";
-import { Stable, useStableGetter, useStableObject } from "./use-stable-getter";
+import { useStableGetter, useStableObject } from "./use-stable-getter";
 import { useState } from "./use-state";
 import { useTimeout } from "./use-timeout";
 
@@ -16,9 +15,9 @@ export function useTypeaheadNavigationProps<E extends Element>(r: UseTypeaheadNa
     return [r.typeaheadNavigationReturn.propsStable, ...otherProps];
 }*/
 
-export interface UseTypeaheadNavigationContext<ChildElement extends Element> {
+/*export interface UseTypeaheadNavigationContext<ChildElement extends Element> {
     typeaheadNavigationChildParameters: UseTypeaheadNavigationReturnTypeInfo<ChildElement>["typeaheadNavigationChildParameters"];
-}
+}*/
 
 export interface UseLinearNavigationReturnTypeInfo<ParentOrChildElement extends Element> {
     linearNavigationReturn: {
@@ -32,7 +31,8 @@ export interface UseLinearNavigationReturnTypeWithHooks<ParentOrChildElement ext
 
 /** Arguments passed to the parent `useLinearNavigation` */
 export interface UseLinearNavigationParameters {
-    rovingTabIndexReturn: Pick<UseRovingTabIndexReturnTypeInfo<any>["rovingTabIndexReturn"], "getTabbableIndex" | "setTabbableIndex">
+    
+    rovingTabIndexReturn: Pick<UseRovingTabIndexReturnType<any>["rovingTabIndexReturn"], "getTabbableIndex" | "setTabbableIndex">
     linearNavigationParameters: {
         navigateRelative(original: number, offset: number): number | null;
         navigateAbsolute(index: number | null): number | null;
@@ -76,19 +76,18 @@ export interface UseLinearNavigationParameters {
  */
 export function useLinearNavigation<ParentOrChildElement extends Element>({
     rovingTabIndexReturn,
-    linearNavigationParameters: { getHighestIndex, navigateAbsolute, navigateRelative, navigationDirection: nd, disableArrowKeys: dak, disableHomeEndKeys: dhek, ..._void1 }
+    linearNavigationParameters
 }: UseLinearNavigationParameters): UseLinearNavigationReturnTypeWithHooks<ParentOrChildElement> {
-    assertEmptyObject(_void1);
-
+    const { getHighestIndex, navigateAbsolute, navigateRelative } = linearNavigationParameters;
     const { getTabbableIndex, setTabbableIndex } = rovingTabIndexReturn;
 
     const navigateToFirst = useStableCallback((fromUserInteraction: boolean) => { setTabbableIndex(navigateAbsolute(0), fromUserInteraction); });
     const navigateToLast = useStableCallback((fromUserInteraction: boolean) => { setTabbableIndex(navigateAbsolute(getHighestIndex()), fromUserInteraction); });
     const navigateToNext = useStableCallback((fromUserInteraction: boolean) => setTabbableIndex(navigateRelative((getTabbableIndex() ?? 0), +1), fromUserInteraction));
     const navigateToPrev = useStableCallback((fromUserInteraction: boolean) => setTabbableIndex(navigateRelative((getTabbableIndex() ?? 0), -1), fromUserInteraction));
-    const getDisableArrowKeys = useStableGetter(dak);
-    const getDisableHomeEndKeys = useStableGetter(dhek);
-    const getNavigationDirection = useStableGetter(nd);
+    const getDisableArrowKeys = useStableGetter(linearNavigationParameters.disableArrowKeys);
+    const getDisableHomeEndKeys = useStableGetter(linearNavigationParameters.disableHomeEndKeys);
+    const getNavigationDirection = useStableGetter(linearNavigationParameters.navigationDirection);
 
 
     const stableProps = useRef<h.JSX.HTMLAttributes<ParentOrChildElement>>({
@@ -182,7 +181,7 @@ export interface UseTypeaheadNavigationReturnTypeInfo<ParentOrChildElement exten
         invalidTypeahead: boolean | null;
         propsStable: h.JSX.HTMLAttributes<ParentOrChildElement>;
     }
-    typeaheadNavigationChildParameters: Stable<Pick<UseTypeaheadNavigationChildParameters<ParentOrChildElement>["typeaheadNavigationChildParameters"], "_private">>;
+    typeaheadNavigationChildContext: UseTypeaheadNavigationChildParameters<ParentOrChildElement>["typeaheadNavigationChildContext"];
 }
 
 
@@ -203,7 +202,7 @@ export interface UseTypeaheadNavigationParameters<TabbableChildElement extends E
         typeaheadTimeout: number;
     };
 
-    rovingTabIndexReturn: Pick<UseRovingTabIndexReturnTypeInfo<TabbableChildElement>["rovingTabIndexReturn"], "getTabbableIndex" | "setTabbableIndex">
+    rovingTabIndexReturn: Pick<UseRovingTabIndexReturnType<TabbableChildElement>["rovingTabIndexReturn"], "getTabbableIndex" | "setTabbableIndex">
 }
 
 /** Arguments passed to the child 'useTypeaheadNavigationChild` */
@@ -218,8 +217,11 @@ export interface UseTypeaheadNavigationChildParameters<ChildElement extends Elem
          * It should be the same text content as whatever's displayed, ideally.
          */
         text: string | null;
+    }
 
-        _private: {
+    typeaheadNavigationChildContext: {
+
+        typeaheadNavigationChildParameters: {
             sortedTypeaheadInfo: Array<TypeaheadInfo>;
             insertingComparator: (lhs: string, rhs: TypeaheadInfo) => number;
         }
@@ -450,11 +452,11 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
 
 
     return {
-        typeaheadNavigationChildParameters: useStableObject({
-            _private: useStableObject({
+        typeaheadNavigationChildContext: useStableObject({
+            typeaheadNavigationChildParameters: useStableObject({
                 insertingComparator,
                 sortedTypeaheadInfo: sortedTypeaheadInfo.current
-            })
+            }),
 
         }),
         typeaheadNavigationReturn: {
@@ -466,9 +468,16 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
 }
 
 export function useTypeaheadNavigationChild<ChildElement extends Element>({
-    managedChildParameters: { index },
-    typeaheadNavigationChildParameters: { text, _private: { sortedTypeaheadInfo, insertingComparator } }
+    managedChildParameters: { index, ...void1 },
+    typeaheadNavigationChildContext: { typeaheadNavigationChildParameters: { sortedTypeaheadInfo, insertingComparator, ...void2 } },
+    typeaheadNavigationChildParameters: { text, ...void3 },
+    ...void4
 }: UseTypeaheadNavigationChildParameters<ChildElement>): ReturnType<UseTypeaheadNavigationChild<ChildElement>> {
+
+    assertEmptyObject(void1);
+    assertEmptyObject(void2);
+    assertEmptyObject(void3);
+    assertEmptyObject(void4);
 
     useEffect(() => {
         if (text) {

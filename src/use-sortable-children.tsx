@@ -7,7 +7,6 @@ import { useMergedProps } from "./use-merged-props";
 import { returnNull, usePassiveState } from "./use-passive-state";
 import lodashShuffle from "lodash-es/shuffle";
 import { UseLinearNavigationParameters } from "./use-keyboard-navigation";
-import { UseRovingTabIndexReturnTypeInfo } from "./use-roving-tabindex";
 
 export type GetIndex<P> = (row: VNode<P>) => (number | null | undefined);
 export type GetValid = (index: number) => boolean;
@@ -17,21 +16,29 @@ export type Compare<V> = (lhs: V, rhs: V) => number;
 /**
  * All of these functions **MUST** be stable across renders.
  */
-export interface UseRearrangeableChildrenParameters<M extends ManagedChildInfo<number>> {
+export interface UseRearrangeableChildrenParameters {
 
     /**
      * Must return, e.g., the row index of this child
      * (Usually just an `index` prop)
      */
-    rearrangeableChildrenParameters: { getIndex: GetIndex<any>, getValid: GetValid; getHighestChildIndex: GetHighestChildIndex; }
+    rearrangeableChildrenParameters: {
+        getIndex: GetIndex<any>;
 
-    //rovingTabIndexReturn: Pick<UseRovingTabIndexReturnTypeInfo<any, any>["rovingTabIndexReturn"], "setTabbableIndex">;
+        /** 
+         * Using rearrangeable children means we need to be able to override arrow key navigation,
+         * which also means that, somewhere down the road, we need to know which children are arrow-key-able,
+         * just like in normal linear navigation.
+         */
+        getValid: GetValid;
+        getHighestChildIndex: GetHighestChildIndex;
+    }
 }
 
 /**
  * All of these functions **MUST** be stable across renders.
  */
-export interface UseSortableChildrenParameters<M extends ManagedChildInfo<number>> extends UseRearrangeableChildrenParameters<M> {
+export interface UseSortableChildrenParameters<M extends ManagedChildInfo<number>> extends UseRearrangeableChildrenParameters {
     sortableChildrenParameters: {
         /**
          * Controls how values compare against each other.
@@ -43,7 +50,7 @@ export interface UseSortableChildrenParameters<M extends ManagedChildInfo<number
 }
 
 
-export interface UseRearrangeableChildrenReturnTypeInfo<M extends ManagedChildInfo<number>> {
+export interface UseRearrangeableChildrenReturnType<ParentElement extends Element, M extends ManagedChildInfo<number>> {
     linearNavigationParameters: Pick<UseLinearNavigationParameters["linearNavigationParameters"], "navigateRelative" | "navigateAbsolute">;
 
     rearrangeableChildrenReturn: {
@@ -75,24 +82,23 @@ export interface UseRearrangeableChildrenReturnTypeInfo<M extends ManagedChildIn
         mangleMap: MutableRef<Map<number, number>>;
         /** **STABLE** */
         demangleMap: MutableRef<Map<number, number>>;
+
+        /** 
+         * **STABLE**
+         * 
+         * Call this on your props (that contain the children to sort!!) to allow them to be sortable.
+         * 
+         */
+        useRearrangeableProps: (props: h.JSX.HTMLAttributes<ParentElement>) => h.JSX.HTMLAttributes<ParentElement>;
     }
 }
 
-export interface UseRearrangeableChildrenReturnTypeWithHooks<ParentElement extends Element, M extends ManagedChildInfo<number>> extends UseRearrangeableChildrenReturnTypeInfo<M> {
-    /** **STABLE** */
-    useRearrangeableProps: (props: h.JSX.HTMLAttributes<ParentElement>) => h.JSX.HTMLAttributes<ParentElement>;
-}
 
-export interface UseSortableChildrenReturnTypeInfo<M extends ManagedChildInfo<number>> extends UseRearrangeableChildrenReturnTypeInfo<M> {
+export interface UseSortableChildrenReturnType<ParentElement extends Element, M extends ManagedChildInfo<number>> extends UseRearrangeableChildrenReturnType<ParentElement, M> {
     sortableChildrenReturn: {
         /** **STABLE** */
         sort: (managedRows: ManagedChildren<M>, direction: "ascending" | "descending") => Promise<void> | void;
     }
-}
-export interface UseSortableChildrenReturnTypeWithHooks<ParentElement extends Element, M extends ManagedChildInfo<number>> extends
-    UseSortableChildrenReturnTypeInfo<M> {
-    /** **STABLE** */
-    useSortableProps: (props: h.JSX.HTMLAttributes<ParentElement>) => h.JSX.HTMLAttributes<ParentElement>;
 }
 
 
@@ -117,9 +123,9 @@ export interface UseSortableChildrenReturnTypeWithHooks<ParentElement extends El
  * Because keys are given special treatment and a child has no way of modifying its own key
  * there's no other time or place this can happen other than exactly within the parent component's render function.
  */
-export function useRearrangeableChildren<ParentElement extends Element, M extends ManagedChildInfo<number>>({ 
-    rearrangeableChildrenParameters: { getIndex, getValid, getHighestChildIndex } 
-}: UseRearrangeableChildrenParameters<M>): UseRearrangeableChildrenReturnTypeWithHooks<ParentElement, M> {
+export function useRearrangeableChildren<ParentElement extends Element, M extends ManagedChildInfo<number>>({
+    rearrangeableChildrenParameters: { getIndex, getValid, getHighestChildIndex }
+}: UseRearrangeableChildrenParameters): UseRearrangeableChildrenReturnType<ParentElement, M> {
 
     // These are used to keep track of a mapping between unsorted index <---> sorted index.
     // These are needed for navigation with the arrow keys.
@@ -153,14 +159,14 @@ export function useRearrangeableChildren<ParentElement extends Element, M extend
         }
     }, []);
     const navigateRelative = useCallback((original: number, offset: number) => {
-            return tryNavigateToIndex({
-                target: indexDemangler(indexMangler(original) + offset),
-                highestChildIndex: getHighestChildIndex(),
-                isValid: getValid,
-                searchDirection: (Math.sign(offset) || 1) as 1 | -1,
-                indexMangler: indexMangler,
-                indexDemangler: indexDemangler
-            });
+        return tryNavigateToIndex({
+            target: indexDemangler(indexMangler(original) + offset),
+            highestChildIndex: getHighestChildIndex(),
+            isValid: getValid,
+            searchDirection: (Math.sign(offset) || 1) as 1 | -1,
+            indexMangler: indexMangler,
+            indexDemangler: indexDemangler
+        });
     }, []);
 
     // The sort function needs to be able to update whoever has all the sortable children.
@@ -204,9 +210,8 @@ export function useRearrangeableChildren<ParentElement extends Element, M extend
     }, []);
 
     return {
-        useRearrangeableProps,
         linearNavigationParameters: { navigateAbsolute, navigateRelative },
-        rearrangeableChildrenReturn: { indexMangler, indexDemangler, mangleMap, demangleMap, rearrange, shuffle }
+        rearrangeableChildrenReturn: { indexMangler, indexDemangler, mangleMap, demangleMap, rearrange, shuffle, useRearrangeableProps, }
     };
 }
 
@@ -235,11 +240,11 @@ export function useRearrangeableChildren<ParentElement extends Element, M extend
 export function useSortableChildren<ParentElement extends Element, M extends ManagedChildInfo<number>>({
     rearrangeableChildrenParameters,
     sortableChildrenParameters: { compare: userCompare }
-}: UseSortableChildrenParameters<M>): UseSortableChildrenReturnTypeWithHooks<ParentElement, M> {
+}: UseSortableChildrenParameters<M>): UseSortableChildrenReturnType<ParentElement, M> {
 
     const compare = (userCompare ?? defaultCompare);
 
-    const { linearNavigationParameters, rearrangeableChildrenReturn, useRearrangeableProps } = useRearrangeableChildren<ParentElement, M>({ rearrangeableChildrenParameters });
+    const { linearNavigationParameters, rearrangeableChildrenReturn } = useRearrangeableChildren<ParentElement, M>({ rearrangeableChildrenParameters });
     const { rearrange } = rearrangeableChildrenReturn;
     // The actual sort function.
     const sort = useCallback((managedRows: ManagedChildren<M>, direction: "ascending" | "descending"): Promise<void> | void => {
@@ -260,7 +265,6 @@ export function useSortableChildren<ParentElement extends Element, M extends Man
     }, [ /* Must remain stable */]);
 
     return {
-        useSortableProps: useRearrangeableProps,
         linearNavigationParameters,
         sortableChildrenReturn: { sort },
         rearrangeableChildrenReturn

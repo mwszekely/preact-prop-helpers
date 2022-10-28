@@ -1,23 +1,26 @@
 import { h } from "preact";
 import { useCallback, useEffect } from "preact/hooks";
-import { useActiveElement, UseActiveElementParameters } from "./use-active-element";
+import { UseActiveElementParameters } from "./use-active-element";
 import { assertEmptyObject } from "./use-child-manager";
 import { useGlobalHandler } from "./use-event-handler";
 import { OnPassiveStateChange } from "./use-passive-state";
-import { useRefElement, UseRefElementReturnType } from "./use-ref-element";
+import { UseRefElementReturnType } from "./use-ref-element";
 import { useStableCallback } from "./use-stable-callback";
 import { useStableGetter } from "./use-stable-getter";
 
+/**
+ * In general, each soft dismiss hook takes an `open` and an `onClose` prop.
+ * 
+ * `open` in all cases referes to both whether or not the controlled surface is currently being shown,
+ * but also whether that particular method of soft dismiss is enabled or not.
+ * 
+ * E.G. If `escape` key dismissing is disabled, just have `open` false at all times for `escapeDismissParameters`.
+ */
+const _dummy = 0;
 
 export interface UseEscapeDismissParameters<SourceElement extends Element> {
     refElementReturn: Pick<UseRefElementReturnType<SourceElement>["refElementReturn"], "getElement">;
     escapeDismissParameters: {
-        /**
-         * Must be a function that returns all elements that count as "within" this component (just the parents of each, not all their children too).
-         * 
-         * Usually just a single element, but e.g. a Menu + MenuButton could have two.
-         */
-        //getElements: () => ((Element | null)[]);
 
         /**
          * Called when the component is dismissed.
@@ -26,10 +29,14 @@ export interface UseEscapeDismissParameters<SourceElement extends Element> {
          */
         onClose(reason: "escape" | "lost-focus"): void;
 
+        /** 
+         * Whether the surface controlled by the `Escape` key is currently open. 
+         * Can also be `false` to force the `Escape` key to do nothing.
+         */
         open: boolean;
 
         /**
-         * The escape key event handler is attached onto the window when 
+         * The escape key event handler is attached onto the window, so we need to know which window.
          */
         getWindow(): Window;
 
@@ -139,7 +146,7 @@ export function useEscapeDismiss<SourceElement extends Element>({ escapeDismissP
 
                         let deepestDepth = -Infinity;
                         let deepestTreeDepth = -Infinity;
-                        let deepestElement: Element | null = null;
+                        let _deepestElement: Element | null = null;
                         let deepestOnClose: (() => void) | null = null;
 
                         for (const [element, { depth, onClose, treeDepth }] of elementQueue) {
@@ -152,7 +159,7 @@ export function useEscapeDismiss<SourceElement extends Element>({ escapeDismissP
 
                             if (depth > deepestDepth || (depth == deepestDepth && tieBroken)) {
                                 deepestDepth = depth;
-                                deepestElement = element;
+                                _deepestElement = element;
                                 deepestTreeDepth = treeDepth;
                                 deepestOnClose = onClose;
                             }
@@ -174,7 +181,7 @@ export interface UseLostFocusDismissParameters<SourceElement extends Element, Po
     refElementPopupReturn: Pick<UseRefElementReturnType<PopupElement>["refElementReturn"], "getElement">;
 }
 
-export interface UseLostFocusDismissReturnType<SourceElement extends Element, PopupElement extends Element> {
+export interface UseLostFocusDismissReturnType<_SourceElement extends Element, _PopupElement extends Element> {
     activeElementParameters: Pick<UseActiveElementParameters["activeElementParameters"], "onActiveElementChange">
 }
 
@@ -192,7 +199,7 @@ export function useLostFocusDismiss<SourceElement extends Element, PopupElement 
 
     const stableOnClose = useStableCallback(onClose);
     const getOpen = useStableGetter(open);
-    const onActiveElementChange = useCallback<OnPassiveStateChange<Element | null>>((newElement, prevElement) => {
+    const onActiveElementChange = useCallback<OnPassiveStateChange<Element | null>>((newElement, _prevElement) => {
         const open = getOpen();
         const sourceElement = getSourceElement();
         const popupElement = getPopupElement();

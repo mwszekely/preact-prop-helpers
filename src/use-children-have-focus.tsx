@@ -1,4 +1,5 @@
 
+import { useStableObject } from "./use-stable-getter";
 import { UseHasCurrentFocusParameters } from "./use-has-current-focus";
 import { OnPassiveStateChange, PassiveStateUpdater, returnFalse, usePassiveState } from "./use-passive-state";
 import { useStableCallback } from "./use-stable-callback";
@@ -18,13 +19,11 @@ export interface UseChildrenHaveFocusChildReturnType<E extends Element> {
 
 export interface UseChildrenHaveFocusReturnTypeInfo {
     childrenHaveFocusReturn: { getAnyFocused(): boolean; }
-    childrenHaveFocusChildParameters: UseChildrenHaveFocusChildParameters["childrenHaveFocusChildParameters"];
+    childrenHaveFocusChildContext: UseChildrenHaveFocusChildParameters["childrenHaveFocusChildContext"];
 }
 
 
-export interface UseChildrenHaveFocusReturnTypeWithHooks extends UseChildrenHaveFocusReturnTypeInfo {
-    //useChildrenHaveFocusChild: <E extends Element>() => UseChildrenHaveFocusChildReturnType<E>;
-}
+export interface UseChildrenHaveFocusReturnTypeWithHooks extends UseChildrenHaveFocusReturnTypeInfo {}
 
 function immediate(f: () => void) { f(); }
 
@@ -39,13 +38,13 @@ export function useChildrenHaveFocus(args: UseChildrenHaveFocusParameters): UseC
 
     return {
         childrenHaveFocusReturn: { getAnyFocused, },
-        childrenHaveFocusChildParameters: { _private: { setFocusCount } },
+        childrenHaveFocusChildContext: useStableObject({ childrenHaveFocusChildParameters: useStableObject({ setFocusCount }) }),
     }
 }
 
 export interface UseChildrenHaveFocusChildParameters {
-    childrenHaveFocusChildParameters: {
-        _private: {
+    childrenHaveFocusChildContext: {
+        childrenHaveFocusChildParameters: {
             /** **STABLE** */
             setFocusCount: PassiveStateUpdater<number>;
 
@@ -55,7 +54,7 @@ export interface UseChildrenHaveFocusChildParameters {
     }
 }
 
-export function useChildrenHaveFocusChild<E extends Element>({ childrenHaveFocusChildParameters: { _private: { setFocusCount } } }: UseChildrenHaveFocusChildParameters): UseChildrenHaveFocusChildReturnType<E> {
+export function useChildrenHaveFocusChild<E extends Element>({ childrenHaveFocusChildContext: { childrenHaveFocusChildParameters: { setFocusCount } } }: UseChildrenHaveFocusChildParameters): UseChildrenHaveFocusChildReturnType<E> {
     return {
         hasCurrentFocusParameters: {
             onCurrentFocusedInnerChanged: useStableCallback((focused: boolean, prev: boolean | undefined) => {

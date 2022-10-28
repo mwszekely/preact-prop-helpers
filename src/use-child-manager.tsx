@@ -27,7 +27,7 @@ import { Stable, useStableObject } from "./use-stable-getter";
 const _comments = void (0);
 
 export interface UseManagedChildrenContext<M extends ManagedChildInfo<any>> {
-    managedChildrenReturn: UseManagedChildrenReturnTypeInfo<M>["managedChildrenReturn"]
+    managedChildrenReturn: UseManagedChildrenReturnType<M>["managedChildrenReturn"]
 }
 
 
@@ -40,7 +40,7 @@ export interface UseManagedChildrenContext<M extends ManagedChildInfo<any>> {
  * 
  * @param _a The remaining spread parameters of a given object that you expect to be empty (because you properly accounted for all the properties that exist in it, and want to ensure it stays that way)
  */
- export function assertEmptyObject<T extends {}>(_a: [keyof T] extends [never]? T : `Unhandled keys in this rest spread object!`): void {}
+export function assertEmptyObject<T extends {}>(_a: [keyof T] extends [never] ? T : `Unhandled keys in this rest spread object!`): void { }
 
 
 
@@ -77,9 +77,6 @@ interface MCP<T extends number | string> {
     onChildrenMountChange?: null | undefined | OnChildrenMountChange<T>;
 }
 
-export type ManagedChildrenOmits = keyof MCP<any>;
-export type ManagedChildOmits = keyof ManagedChildInfo<any>;
-
 export interface UseManagedChildrenParameters<M extends ManagedChildInfo<any>> {
     managedChildrenParameters: MCP<M["index"]>;
 }
@@ -88,17 +85,17 @@ export interface UseManagedChildrenParameters<M extends ManagedChildInfo<any>> {
 // SubbestInfo refers to the actual parameters the user passes in that could be totally unrelated. 
 export interface UseManagedChildParameters<M extends ManagedChildInfo<any>> {
     managedChildParameters: M;
-    managedChildrenReturn: Omit<UseManagedChildrenReturnTypeInfo<M>["managedChildrenReturn"], "getChildren">
+    managedChildContext: UseManagedChildrenReturnType<M>["managedChildContext"];
 }
 
 
-export interface UseManagedChildrenReturnTypeInfo<M extends ManagedChildInfo<any>> {
+export interface UseManagedChildrenReturnType<M extends ManagedChildInfo<any>> {
     /**
      * Returns information about the child that rendered itself with the requested key.
      * 
      * **STABLE** (even though it's not a function, the identity of this object never changes)
      */
-    managedChildrenReturn: Stable<{
+    managedChildrenReturn: {
         /** 
          * ***STABLE***
          *
@@ -108,24 +105,15 @@ export interface UseManagedChildrenReturnTypeInfo<M extends ManagedChildInfo<any
          */
         getChildren(): ManagedChildren<M>;
 
-        _private: {
+    };
+
+    managedChildContext: Stable<{
+        managedChildParameters: {
             managedChildrenArray: Foo<M>;
             remoteULEChildMounted: (index: M["index"], mounted: boolean) => void;
             remoteULEChildChanged: (index: M["index"]) => (() => void);
         }
-    }>
-}
-
-export interface UseManagedChildrenReturnTypeWithHooks<M extends ManagedChildInfo<any>> extends UseManagedChildrenReturnTypeInfo<M> {
-    /**
-     * A hook that must be called by every child component that
-     * is to be managed by this one. The argument to the hook
-     * is just the bag of properties to pass to the parent,
-     * including the child's index.
-     * 
-     * **STABLE**
-     */
-    //useManagedChild: UseManagedChild<M>;
+    }>;
 }
 
 export type UseManagedChildReturnType = void;
@@ -169,7 +157,7 @@ interface Foo<M extends ManagedChildInfo<string | number>> {
  * 
  * 
  */
-export function useManagedChildren<M extends ManagedChildInfo<string | number>>(parentParameters: UseManagedChildrenParameters<M>): UseManagedChildrenReturnTypeWithHooks<M> {
+export function useManagedChildren<M extends ManagedChildInfo<string | number>>(parentParameters: UseManagedChildrenParameters<M>): UseManagedChildrenReturnType<M> {
     type IndexType = M["index"];
     type Info = M;
 
@@ -288,14 +276,14 @@ export function useManagedChildren<M extends ManagedChildInfo<string | number>>(
     });
 
     return {
-        managedChildrenReturn: useStableObject({
-            getChildren: useCallback(() => managedChildren, []),
-            _private: useStableObject({
+        managedChildContext: useStableObject({
+            managedChildParameters: useStableObject({
                 managedChildrenArray: managedChildrenArray.current,
                 remoteULEChildMounted,
                 remoteULEChildChanged
             })
-        })
+        }),
+        managedChildrenReturn: { getChildren: useCallback(() => managedChildren, []) }
     }
 }
 
@@ -305,7 +293,7 @@ export function useManagedChildren<M extends ManagedChildInfo<string | number>>(
 export function useManagedChild<M extends ManagedChildInfo<number | string>>(info: UseManagedChildParameters<M>): UseManagedChildReturnType {
     type IndexType = M["index"];
 
-    const { managedChildParameters: { index }, managedChildrenReturn: { _private: { managedChildrenArray, remoteULEChildMounted, remoteULEChildChanged } } } = info;
+    const { managedChildParameters: { index }, managedChildContext: { managedChildParameters: { managedChildrenArray, remoteULEChildMounted, remoteULEChildChanged } } } = info;
     // Any time our child props change, make that information available
     // the parent if they need it.
     // The parent can listen for all updates and only act on the ones it cares about,
