@@ -5,7 +5,7 @@ import { useBeforeLayoutEffect } from "./use-before-layout-effect";
 const Unset = Symbol("unset");
 
 const STABLE = Symbol("STABLE");
-export type Stable<T> = T & { [STABLE]: true };
+export type Stable<T> = T;// & { [STABLE]: true };
 
 
 /**

@@ -1,12 +1,12 @@
-import { createContext, VNode } from "preact";
+import { createContext, h, VNode } from "preact";
 import { memo, useCallback, useContext } from "preact/compat";
 import { GetIndex, returnTrue, useHasCurrentFocus, useManagedChildren, useMergedProps, usePress, useRefElement, UseRefElementParameters, useSortableChildren, useStableCallback } from "../../index";
-import { assertEmptyObject, useManagedChild, UseManagedChildrenContext } from "../../use-child-manager";
-import { UseListNavigationContext, useListNavigationSingleSelection, useListNavigationSingleSelectionChild, UseListNavigationSingleSelectionChildInfo } from "../../use-list-navigation";
+import { assertEmptyObject, useManagedChild, UseManagedChildParameters, UseManagedChildrenContext, UseManagedChildrenParameters, UseManagedChildrenReturnTypeInfo } from "../../use-child-manager";
+import { UseListNavigationContext, useListNavigationSingleSelection, useListNavigationSingleSelectionChild, UseListNavigationSingleSelectionChildInfo, UseListNavigationSingleSelectionParameters, UseListNavigationSingleSelectionReturnType } from "../../use-list-navigation";
 import { useStableObject } from "../../use-stable-getter";
 import { useState } from "../../use-state";
 import { UseSingleSelectionContext } from "../../use-single-selection"
-import { GetValid } from "../../use-sortable-children";
+import { GetValid, UseSortableChildrenParameters, UseSortableChildrenReturnTypeInfo } from "../../use-sortable-children";
 
 
 const RandomWords = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
@@ -15,6 +15,213 @@ function getDocument() {
     return window.document;
 }
 
+interface UseSortableSingleSelectDemoParameters<_ListElement extends Element, ListItemElement extends Element> {
+    rearrangeableChildrenParameters: Omit<UseSortableChildrenParameters<UseListNavigationSingleSelectionChildInfo<ListItemElement>>["rearrangeableChildrenParameters"], "getHighestChildIndex">;
+    sortableChildrenParameters: UseSortableChildrenParameters<UseListNavigationSingleSelectionChildInfo<ListItemElement>>["sortableChildrenParameters"];
+    linearNavigationParameters: Omit<UseListNavigationSingleSelectionParameters<ListItemElement, UseListNavigationSingleSelectionChildInfo<ListItemElement>>["linearNavigationParameters"], "navigateAbsolute" | "navigateRelative" | "getHighestIndex">;
+    rovingTabIndexParameters: UseListNavigationSingleSelectionParameters<ListItemElement, UseListNavigationSingleSelectionChildInfo<ListItemElement>>["rovingTabIndexParameters"];
+    singleSelectionParameters: UseListNavigationSingleSelectionParameters<ListItemElement, UseListNavigationSingleSelectionChildInfo<ListItemElement>>["singleSelectionParameters"];
+    typeaheadNavigationParameters: UseListNavigationSingleSelectionParameters<ListItemElement, UseListNavigationSingleSelectionChildInfo<ListItemElement>>["typeaheadNavigationParameters"];
+}
+
+interface UseSortableSingleSelectDemoReturn<ListElement extends Element, ListItemElement extends Element> {
+    rearrangeableChildrenReturn: UseSortableChildrenReturnTypeInfo<UseListNavigationSingleSelectionChildInfo<ListItemElement>>["rearrangeableChildrenReturn"];
+    sortableChildrenReturn: UseSortableChildrenReturnTypeInfo<UseListNavigationSingleSelectionChildInfo<ListItemElement>>["sortableChildrenReturn"];
+
+    rovingTabIndexReturn: UseListNavigationSingleSelectionReturnType<ListElement, ListItemElement>["rovingTabIndexReturn"];
+    singleSelectionReturn: UseListNavigationSingleSelectionReturnType<ListElement, ListItemElement>["singleSelectionReturn"];
+    linearNavigationReturn: UseListNavigationSingleSelectionReturnType<ListElement, ListItemElement>["linearNavigationReturn"];
+    typeaheadNavigationReturn: UseListNavigationSingleSelectionReturnType<ListElement, ListItemElement>["typeaheadNavigationReturn"];
+
+    managedChildrenReturn: UseManagedChildrenReturnTypeInfo<UseListNavigationSingleSelectionChildInfo<ListItemElement>>["managedChildrenReturn"];
+
+    /** **STABLE** */
+    useSortableProps: (props: h.JSX.HTMLAttributes<ListElement>) => h.JSX.HTMLAttributes<ListElement>;
+    props: h.JSX.HTMLAttributes<ListElement>;
+    context: UseSortableSingleSelectDemoContext<ListItemElement>;
+}
+
+interface UseSortableSingleSelectChildDemoParameters<ListItemElement extends Element> {
+    managedChildParameters: UseManagedChildParameters<UseListNavigationSingleSelectionChildInfo<ListItemElement>>["managedChildParameters"];
+    managedChildrenReturn: UseManagedChildrenReturnTypeInfo<UseListNavigationSingleSelectionChildInfo<ListItemElement>>["managedChildrenReturn"];
+}
+
+type UseSortableSingleSelectDemoContext<ListItemElement extends Element> = UseListNavigationContext<ListItemElement> & UseSingleSelectionContext & UseManagedChildrenContext<UseListNavigationSingleSelectionChildInfo<ListItemElement>>;
+
+/**
+ * Example of creating a hook that combines all the list-related hooks
+ */
+function useSortableSingleSelectDemo<ListElement extends Element, ListItemElement extends Element>({
+    linearNavigationParameters: { disableArrowKeys, disableHomeEndKeys, navigationDirection, ...void6 },
+    rearrangeableChildrenParameters: { getIndex, getValid, ...void10 },
+    rovingTabIndexParameters: { initiallyTabbedIndex, onTabbableIndexChange, ...void11 },
+    singleSelectionParameters: { initiallySelectedIndex, onSelectedIndexChange, ...void12 },
+    sortableChildrenParameters: { compare, ...void13 },
+    typeaheadNavigationParameters: { collator, noTypeahead, typeaheadTimeout, ...void14 },
+    ...void15
+}: UseSortableSingleSelectDemoParameters<ListElement, ListItemElement>): UseSortableSingleSelectDemoReturn<ListElement, ListItemElement> {
+
+    type GetChildren = (typeof managedChildrenReturn)["getChildren"];
+    assertEmptyObject(void6);
+
+    const getHighestIndex = useCallback(() => getChildren().getHighestIndex(), []);
+    const getChildren = useCallback<GetChildren>(() => {
+        return getChildrenButItIsDefinedWayLaterInTheFunction();
+        //        return managedChildrenReturn.getChildren()
+    }, []);
+
+    const {
+        linearNavigationParameters: { navigateAbsolute, navigateRelative, ...void9 },
+        rearrangeableChildrenReturn,
+        sortableChildrenReturn,
+        useSortableProps,
+        ...void8
+    } = useSortableChildren<ListElement, UseListNavigationSingleSelectionChildInfo<ListItemElement>>({
+        rearrangeableChildrenParameters: {
+            getHighestChildIndex: getHighestIndex,
+            getIndex,
+            getValid,
+        },
+        sortableChildrenParameters: { compare: useCallback((rhs, lhs) => { return lhs.index - rhs.index }, []) }
+    })
+
+    const listNavigationSingleSelectionReturn: UseListNavigationSingleSelectionReturnType<ListElement, ListItemElement> = useListNavigationSingleSelection<ListElement, ListItemElement, UseListNavigationSingleSelectionChildInfo<ListItemElement>>({
+        linearNavigationParameters: {
+            disableArrowKeys,
+            disableHomeEndKeys,
+            getHighestIndex,
+            navigationDirection,
+            navigateAbsolute,
+            navigateRelative,
+        },
+        managedChildrenReturn: { getChildren },
+        rovingTabIndexParameters: { initiallyTabbedIndex, onTabbableIndexChange },
+        singleSelectionParameters: { initiallySelectedIndex, onSelectedIndexChange },
+        typeaheadNavigationParameters: { collator, noTypeahead, typeaheadTimeout }
+    });
+
+    const {
+        childrenHaveFocusParameters,
+        linearNavigationReturn,
+        managedChildrenParameters: { onChildrenMountChange },
+        rovingTabIndexChildParameters,
+        rovingTabIndexReturn,
+        singleSelectionReturn,
+        typeaheadNavigationChildParameters,
+        typeaheadNavigationReturn,
+        ...void7
+    } = listNavigationSingleSelectionReturn;
+
+    const { managedChildrenReturn, ...void5 } = useManagedChildren<UseListNavigationSingleSelectionChildInfo<ListItemElement>>({ managedChildrenParameters: { onChildrenMountChange } });
+    const { getChildren: getChildrenButItIsDefinedWayLaterInTheFunction } = managedChildrenReturn;
+
+    const { propsStable: p1, ...void1 } = linearNavigationReturn;
+    const { focusSelf, getTabbableIndex, setTabbableIndex, ...void2 } = rovingTabIndexReturn;
+    const { getSelectedIndex, setSelectedIndex, ...void3 } = singleSelectionReturn;
+    const { propsStable: p2, currentTypeahead, invalidTypeahead, ...void4 } = typeaheadNavigationReturn;
+    const context: UseSortableSingleSelectDemoContext<ListItemElement> = useStableObject({
+        rovingTabIndexChildParameters,
+        typeaheadNavigationChildParameters,
+        rovingTabIndexReturn,
+        singleSelectionReturn,
+        managedChildrenReturn
+    });
+
+    const props = useMergedProps(p1, p2);
+
+    assertEmptyObject(void1);
+    assertEmptyObject(void2);
+    assertEmptyObject(void3);
+    assertEmptyObject(void4);
+    assertEmptyObject(void5);
+    assertEmptyObject(void6);
+    assertEmptyObject(void7);
+    assertEmptyObject(void8);
+    assertEmptyObject(void9);
+    assertEmptyObject(void10);
+    assertEmptyObject(void11);
+    assertEmptyObject(void12);
+    assertEmptyObject(void13);
+    assertEmptyObject(void14);
+    assertEmptyObject(void15);
+
+    return {
+        props,
+        context,
+
+        sortableChildrenReturn,
+        rearrangeableChildrenReturn,
+        linearNavigationReturn,
+        rovingTabIndexReturn,
+        singleSelectionReturn,
+        typeaheadNavigationReturn,
+        managedChildrenReturn,
+        useSortableProps
+    }
+}
+/*
+function useSortableSingleSelectChildDemo<ListItemElement extends Element>({
+    managedChildParameters: { index, hidden },
+    managedChildrenInfo
+}: UseSortableSingleSelectChildDemoParameters<ListItemElement>) {
+    const selectionMode = useContext(SelectionModeContext);
+   // const hidden = (index == 7);
+    //const { rovingTabIndexChildParameters, typeaheadNavigationChildParameters, rovingTabIndexReturn, singleSelectionReturn, managedChildrenReturn } = useContext(ListNavigationSingleSelectionChildContext);
+   // const text = `${randomWord} This is item #${index}${hidden ? " (hidden)" : ""}`;
+   // const focusSelf = useCallback((e: HTMLElement) => { e.focus() }, []);
+    const { refElementReturn } = useRefElement<HTMLLIElement>({ refElementParameters: { onElementChange: undefined } });
+    const { getElement, propsStable: p3 } = refElementReturn;
+    const disabled = hidden;
+
+
+    const {
+        hasCurrentFocusParameters: { onCurrentFocusedInnerChanged, ...void5 },
+        managedChildParameters: { getSelected, selected, setSelected, ...void4 },
+        pressParameters: { onPressSync, ...void3 },
+        rovingTabIndexChildReturn: { setTabbable, getTabbable, propsUnstable: p2, tabbable, ...void2 },
+        singleSelectionChildReturn: { propsUnstable: p4, ...void1 },
+        ...void6
+    } = useListNavigationSingleSelectionChild<HTMLLIElement>({
+        managedChildParameters: { hidden, index, disabled },
+        rovingTabIndexChildParameters: rovingTabIndexChildParameters,
+        rovingTabIndexReturn,
+        singleSelectionChildParameters: { ariaPropName: "aria-selected", selectionMode },
+        singleSelectionReturn,
+        typeaheadNavigationChildParameters: { text, ...typeaheadNavigationChildParameters }
+    });
+
+    const {
+        pressReturn: { propsStable: p5 }
+    } = usePress<HTMLLIElement>({
+        pressParameters: { exclude: {}, focusSelf, onPressSync, onPseudoActiveStart: null, onPseudoActiveStop: null },
+        refElementReturn
+    })
+
+    useManagedChild<UseListNavigationSingleSelectionChildInfo<HTMLLIElement>>({
+        managedChildParameters: { index, focusSelf, getElement, getSelected, getTabbable, hidden, selected, setSelected, setTabbable, tabbable, disabled },
+        managedChildrenReturn
+    });
+
+    assertEmptyObject(void1);
+    assertEmptyObject(void2);
+    assertEmptyObject(void3);
+    assertEmptyObject(void4);
+    assertEmptyObject(void5);
+    assertEmptyObject(void6);
+
+    const {
+        hasCurrentFocusReturn: { propsStable: p6 }
+    } = useHasCurrentFocus({
+        refElementReturn,
+        hasCurrentFocusParameters: {
+            onCurrentFocusedChanged: null,
+            onCurrentFocusedInnerChanged
+        }
+    });
+
+    const props = useMergedProps<HTMLLIElement>(p2, p3, p4, p5, p6);
+
+}*/
 
 const ListNavigationSingleSelectionChildContext = createContext<UseListNavigationContext<HTMLLIElement> & UseSingleSelectionContext & UseManagedChildrenContext<UseListNavigationSingleSelectionChildInfo<HTMLLIElement>>>(null!)
 export const DemoUseRovingTabIndex = memo(() => {
@@ -24,10 +231,39 @@ export const DemoUseRovingTabIndex = memo(() => {
     const [selectedIndex, setLocalSelectedIndex] = useState<number | null>(0);
     const [tabbableIndex, setLocalTabbableIndex] = useState<number | null>(0);
 
-    const getHighestIndex = useCallback(() => getChildren().getHighestIndex(), []);
-    const getChildren = useCallback<typeof getChildren2>(() => { return managedChildrenReturn.getChildren() }, []);
 
+    const ret: UseSortableSingleSelectDemoReturn<HTMLUListElement, HTMLLIElement> = useSortableSingleSelectDemo<HTMLUListElement, HTMLLIElement>({
+        rearrangeableChildrenParameters: {
+            getIndex: useCallback<GetIndex<{ index: number }>>((a: VNode<{ index: number }>) => a.props.index, []),
+            getValid: useStableCallback<GetValid>((index) => { return !(getChildren().getAt(index)?.hidden) })
+        },
+        sortableChildrenParameters: { compare: useCallback((rhs, lhs) => { return lhs.index - rhs.index }, []) },
+        linearNavigationParameters: {
+            disableArrowKeys: false,
+            disableHomeEndKeys: false,
+            navigationDirection: "vertical"
+        },
+        rovingTabIndexParameters: { initiallyTabbedIndex: tabbableIndex, onTabbableIndexChange: setLocalTabbableIndex },
+        singleSelectionParameters: { initiallySelectedIndex: selectedIndex, onSelectedIndexChange: setLocalSelectedIndex },
+        typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000 }
+    });
     const {
+        context,
+        props,
+        useSortableProps,
+
+        linearNavigationReturn,
+        rearrangeableChildrenReturn: { shuffle },
+        rovingTabIndexReturn: { setTabbableIndex },
+        singleSelectionReturn: { setSelectedIndex },
+        sortableChildrenReturn: { sort },
+        typeaheadNavigationReturn: { currentTypeahead, invalidTypeahead },
+        managedChildrenReturn
+    } = ret;
+
+
+
+    /*const {
         linearNavigationParameters,
         rearrangeableChildrenReturn,
         sortableChildrenReturn,
@@ -93,7 +329,11 @@ export const DemoUseRovingTabIndex = memo(() => {
     assertEmptyObject(void5);
 
     assertEmptyObject(void7);
-    assertEmptyObject(void8);
+    assertEmptyObject(void8);*/
+
+    const { getChildren } = managedChildrenReturn;
+    const children = getChildren();
+    const { getChildren: getChildren2 } = managedChildrenReturn;
 
     return (
         <div className="demo">
@@ -160,6 +400,7 @@ const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
     const focusSelf = useCallback((e: HTMLElement) => { e.focus() }, []);
     const { refElementReturn } = useRefElement<HTMLLIElement>({ refElementParameters: { onElementChange: undefined } });
     const { getElement, propsStable: p3 } = refElementReturn;
+    const disabled = hidden;
 
 
     const {
@@ -170,7 +411,7 @@ const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
         singleSelectionChildReturn: { propsUnstable: p4, ...void1 },
         ...void6
     } = useListNavigationSingleSelectionChild<HTMLLIElement>({
-        managedChildParameters: { hidden, index },
+        managedChildParameters: { hidden, index, disabled },
         rovingTabIndexChildParameters: rovingTabIndexChildParameters,
         rovingTabIndexReturn,
         singleSelectionChildParameters: { ariaPropName: "aria-selected", selectionMode },
@@ -186,7 +427,7 @@ const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
     })
 
     useManagedChild<UseListNavigationSingleSelectionChildInfo<HTMLLIElement>>({
-        managedChildParameters: { index, focusSelf, getElement, getSelected, getTabbable, hidden, selected, setSelected, setTabbable, tabbable, text },
+        managedChildParameters: { index, focusSelf, getElement, getSelected, getTabbable, hidden, selected, setSelected, setTabbable, tabbable, disabled },
         managedChildrenReturn
     });
 

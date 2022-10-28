@@ -1,11 +1,11 @@
 import { createContext, h, render, VNode } from "preact";
 import { memo } from "preact/compat";
 import { StateUpdater, useCallback, useContext, useRef } from "preact/hooks";
-import { GetIndex, useAnimationFrame, useAsyncHandler, useDraggable, useDroppable, useElementSize, useFocusTrap, useGridNavigation, useHasCurrentFocus, useHasLastFocus, useManagedChildren, useMergedProps, useRefElement, useSortableChildren, useStableCallback, useState } from "..";
-import { assertEmptyObject, useManagedChild, UseManagedChildrenContext } from "../use-child-manager";
+import { GetIndex, useAnimationFrame, useAsyncHandler, useDraggable, useDroppable, useElementSize, useEnsureStability, useFocusTrap, useGridNavigation, useHasCurrentFocus, useHasLastFocus, useManagedChildren, useMergedProps, useRefElement, useSortableChildren, useStableCallback, useState } from "..";
+import { assertEmptyObject, useManagedChild, UseManagedChildParameters, UseManagedChildrenContext, UseManagedChildrenReturnTypeInfo } from "../use-child-manager";
 import { ElementSize } from "../use-element-size";
-import { GridChildCellInfo, GridChildRowInfo, useGridNavigationCell, UseGridNavigationContext, useGridNavigationRow, UseGridNavigationRowContext, UseGridNavigationRowReturnType } from "../use-grid-navigation";
-import { GetValid } from "../use-sortable-children";
+import { GridChildCellInfo, GridChildRowInfo, useGridNavigationCell, UseGridNavigationCellParameters, UseGridNavigationCellReturnType, UseGridNavigationContext, UseGridNavigationParameters, UseGridNavigationReturnType, useGridNavigationRow, UseGridNavigationRowContext, UseGridNavigationRowParameters, UseGridNavigationRowReturnType } from "../use-grid-navigation";
+import { GetValid, UseSortableChildrenParameters, UseSortableChildrenReturnTypeInfo, UseSortableChildrenReturnTypeWithHooks } from "../use-sortable-children";
 import { useStableObject } from "../use-stable-getter";
 //import { useGridNavigation, UseGridNavigationCell, UseGridNavigationRow } from "../use-grid-navigation";
 import { DemoUseInterval } from "./demos/use-interval";
@@ -279,6 +279,276 @@ const DemoFocus = memo(() => {
     )
 })
 
+interface GridDemoParameters<GridParentElement extends Element, GridRowElement extends Element, GridCellElement extends Element> {
+    rearrangeableChildrenParameters: Omit<UseSortableChildrenParameters<GridChildRowInfo<GridRowElement>>["rearrangeableChildrenParameters"], "getHighestChildIndex">;
+    sortableChildrenParameters: UseSortableChildrenParameters<GridChildRowInfo<GridRowElement>>["sortableChildrenParameters"];
+    gridNavigationParameters: UseGridNavigationParameters<GridRowElement, GridChildRowInfo<GridRowElement>>["gridNavigationParameters"];
+    rovingTabIndexParameters: UseGridNavigationParameters<GridRowElement, GridChildRowInfo<GridRowElement>>["rovingTabIndexParameters"];
+    typeaheadNavigationParameters: UseGridNavigationParameters<GridRowElement, GridChildRowInfo<GridRowElement>>["typeaheadNavigationParameters"];
+    linearNavigationParameters: Omit<UseGridNavigationParameters<GridRowElement, GridChildRowInfo<GridRowElement>>["linearNavigationParameters"], "getHighestIndex" | "navigateAbsolute" | "navigateRelative">;
+}
+interface GridDemoRowParameters<GridRowElement extends Element, GridCellElement extends Element> {
+    asChildRowOfTable: {
+        gridNavigationRowParameters: UseGridNavigationRowParameters<GridRowElement, GridCellElement, GridChildRowInfo<GridRowElement>, GridChildCellInfo<GridCellElement>>["asChildRowOfTable"]["gridNavigationRowParameters"];
+        managedChildParameters: UseGridNavigationRowParameters<GridRowElement, GridCellElement, GridChildRowInfo<GridRowElement>, GridChildCellInfo<GridCellElement>>["asChildRowOfTable"]["managedChildParameters"];
+        managedChildrenReturn: UseManagedChildrenReturnTypeInfo<GridChildRowInfo<GridRowElement>>["managedChildrenReturn"];
+        rovingTabIndexChildParameters: UseGridNavigationRowParameters<GridRowElement, GridCellElement, GridChildRowInfo<GridRowElement>, GridChildCellInfo<GridCellElement>>["asChildRowOfTable"]["rovingTabIndexChildParameters"];
+        typeaheadNavigationChildParameters: UseGridNavigationRowParameters<GridRowElement, GridCellElement, GridChildRowInfo<GridRowElement>, GridChildCellInfo<GridCellElement>>["asChildRowOfTable"]["typeaheadNavigationChildParameters"];
+    };
+    asParentRowOfCells: {
+        linearNavigationParameters: Omit<UseGridNavigationRowParameters<GridRowElement, GridCellElement, GridChildRowInfo<GridRowElement>, GridChildCellInfo<GridCellElement>>["asParentRowOfCells"]["linearNavigationParameters"], "getHighestIndex" | "navigateAbsolute" | "navigateRelative">;
+        typeaheadNavigationParameters: UseGridNavigationRowParameters<GridRowElement, GridCellElement, GridChildRowInfo<GridRowElement>, GridChildCellInfo<GridCellElement>>["asParentRowOfCells"]["typeaheadNavigationParameters"];
+        rovingTabIndexParameters: UseGridNavigationRowParameters<GridRowElement, GridCellElement, GridChildRowInfo<GridRowElement>, GridChildCellInfo<GridCellElement>>["asParentRowOfCells"]["rovingTabIndexParameters"];
+    }
+}
+interface GridDemoCellParameters<GridCellElement extends Element> extends UseGridNavigationCellParameters<GridCellElement> {
+    managedChildrenReturn: UseManagedChildrenReturnTypeInfo<GridChildCellInfo<GridCellElement>>["managedChildrenReturn"];
+    managedChildParameters: Pick<UseManagedChildParameters<GridChildCellInfo<GridCellElement>>["managedChildParameters"], "index" | "hidden">;
+}
+
+interface GridDemoReturn<GridParentElement extends Element, GridRowElement extends Element, GridCellElement extends Element> extends
+    Omit<UseSortableChildrenReturnTypeWithHooks<GridParentElement, GridChildRowInfo<GridRowElement>>, "linearNavigationParameters">,
+    Omit<UseGridNavigationReturnType<GridParentElement, GridRowElement>, "gridNavigationRowParameters" | "managedChildrenParameters"> {
+    props: h.JSX.HTMLAttributes<GridParentElement>;
+    context: UseGridNavigationContext<GridParentElement, GridRowElement> & UseManagedChildrenContext<GridChildRowInfo<GridRowElement>>;
+    managedChildrenReturn: UseManagedChildrenReturnTypeInfo<GridChildRowInfo<GridRowElement>>["managedChildrenReturn"];
+}
+interface GridDemoRowReturn<GridRowElement extends Element, GridCellElement extends Element> {
+    context: UseGridNavigationRowContext<GridRowElement, GridCellElement> & UseManagedChildrenContext<GridChildCellInfo<GridCellElement>>;
+    props: h.JSX.HTMLAttributes<GridRowElement>;
+
+    asChildRowOfTable: {
+        rovingTabIndexChildReturn: UseGridNavigationRowReturnType<GridRowElement, GridCellElement>["asChildRowOfTable"]["rovingTabIndexChildReturn"];
+        managedChildrenReturn: UseManagedChildrenReturnTypeInfo<GridChildRowInfo<GridRowElement>>["managedChildrenReturn"];
+    };
+    asParentRowOfCells: {
+        gridNavigationCellParameters: UseGridNavigationRowReturnType<GridRowElement, GridCellElement>["asParentRowOfCells"]["gridNavigationCellParameters"];
+        linearNavigationReturn: UseGridNavigationRowReturnType<GridRowElement, GridCellElement>["asParentRowOfCells"]["linearNavigationReturn"];
+        rovingTabIndexChildParameters: UseGridNavigationRowReturnType<GridRowElement, GridCellElement>["asParentRowOfCells"]["rovingTabIndexChildParameters"];
+        rovingTabIndexReturn: UseGridNavigationRowReturnType<GridRowElement, GridCellElement>["asParentRowOfCells"]["rovingTabIndexReturn"];
+        typeaheadNavigationChildParameters: UseGridNavigationRowReturnType<GridRowElement, GridCellElement>["asParentRowOfCells"]["typeaheadNavigationChildParameters"];
+        typeaheadNavigationReturn: UseGridNavigationRowReturnType<GridRowElement, GridCellElement>["asParentRowOfCells"]["typeaheadNavigationReturn"];
+    }
+}
+interface GridDemoCellReturn<GridCellElement extends Element> {
+    props: h.JSX.HTMLAttributes<GridCellElement>;
+    rovingTabIndexChildReturn: UseGridNavigationCellReturnType<GridCellElement>["rovingTabIndexChildReturn"];
+    //managedChildrenReturn: UseManagedChildrenReturnTypeInfo<GridChildRowInfo<GridCellElement>>["managedChildrenReturn"];
+}
+
+function useGridDemo<GridParentElement extends Element, GridRowElement extends Element, GridCellElement extends Element>({
+    rearrangeableChildrenParameters,
+    sortableChildrenParameters,
+    gridNavigationParameters,
+    linearNavigationParameters: { disableArrowKeys, disableHomeEndKeys },
+    rovingTabIndexParameters,
+    typeaheadNavigationParameters
+}: GridDemoParameters<GridParentElement, GridRowElement, GridCellElement>): GridDemoReturn<GridParentElement, GridRowElement, GridCellElement> {
+
+    const getHighestIndex = useCallback(() => getChildren().getHighestIndex(), []);
+    const getChildren = useCallback<typeof getChildren2>(() => { return getChildren2() }, []);
+
+    const { linearNavigationParameters: { navigateAbsolute, navigateRelative }, ...sortableChildrenReturn } = useSortableChildren<GridParentElement, GridChildRowInfo<GridRowElement>>({
+        rearrangeableChildrenParameters: {
+            getHighestChildIndex: getHighestIndex,
+            ...rearrangeableChildrenParameters
+        },
+        sortableChildrenParameters
+    });
+
+    const {
+        gridNavigationRowParameters,
+        linearNavigationReturn,
+        managedChildrenParameters,
+        rovingTabIndexChildParameters,
+        rovingTabIndexReturn,
+        typeaheadNavigationChildParameters,
+        typeaheadNavigationReturn,
+        ...void1
+    } = useGridNavigation<GridParentElement, GridRowElement, GridChildRowInfo<GridRowElement>>({
+        gridNavigationParameters,
+        linearNavigationParameters: { getHighestIndex, navigateAbsolute, navigateRelative, disableArrowKeys, disableHomeEndKeys },
+        managedChildrenReturn: { getChildren },
+        rovingTabIndexParameters,
+        typeaheadNavigationParameters
+    });
+
+    const {
+        managedChildrenReturn
+    } = useManagedChildren<GridChildRowInfo<GridRowElement>>({
+        managedChildrenParameters: {
+            onAfterChildLayoutEffect: null,
+            onChildrenMountChange: null
+        }
+    });
+
+    const { propsStable: p1 } = linearNavigationReturn;
+    const { propsStable: p2 } = typeaheadNavigationReturn;
+
+    const { getChildren: getChildren2 } = managedChildrenReturn;
+
+    const props = useMergedProps(p1, p2);
+    const context = useStableObject({ gridNavigationRowParameters, rovingTabIndexChildParameters, typeaheadNavigationChildParameters, managedChildrenReturn });
+
+    return {
+        context,
+        props,
+        ...sortableChildrenReturn,
+        linearNavigationReturn,
+        rovingTabIndexReturn,
+        typeaheadNavigationChildParameters,
+        typeaheadNavigationReturn,
+        rovingTabIndexChildParameters,
+        managedChildrenReturn
+    }
+
+}
+
+function useGridRowDemo<GridRowElement extends Element, GridCellElement extends Element>({
+    asChildRowOfTable: asChildRowOfTableP,
+    asParentRowOfCells: asParentRowOfCellsP
+}: GridDemoRowParameters<GridRowElement, GridCellElement>): GridDemoRowReturn<GridRowElement, GridCellElement> {
+    const getHighestIndex = useCallback(() => getChildren().getHighestIndex(), []);
+    const getChildren = useCallback(() => { return getChildren2() }, []);
+
+
+    const navigateAbsolute = useCallback((n: number) => { return n; }, [])
+    const navigateRelative = useCallback((n: number, o: number) => { return n + o; }, [])
+
+    const { refElementReturn } = useRefElement<GridRowElement>({ refElementParameters: {} });
+    const { getElement, propsStable: p5 } = refElementReturn;
+    const { propsStable: p4 } = refElementReturn;
+    const setTabbableIndex2 = useStableCallback((a: Parameters<StateUpdater<number | null>>[0], b: boolean) => { setTabbableIndex(a, b) });
+    const gridNavRet: UseGridNavigationRowReturnType<GridRowElement, GridCellElement> = useGridNavigationRow<GridRowElement, GridCellElement, GridChildRowInfo<GridRowElement>, GridChildCellInfo<GridCellElement>>({
+        asChildRowOfTable: {
+            ...asChildRowOfTableP,
+            managedChildrenReturn: { getChildren },
+            rovingTabIndexReturn: { setTabbableIndex: setTabbableIndex2 },
+        },
+        asParentRowOfCells: {
+            linearNavigationParameters: { ...asParentRowOfCellsP.linearNavigationParameters, getHighestIndex, navigateAbsolute, navigateRelative },
+            managedChildrenReturn: { getChildren },
+            rovingTabIndexParameters: asParentRowOfCellsP.rovingTabIndexParameters,
+            typeaheadNavigationParameters: asParentRowOfCellsP.typeaheadNavigationParameters,
+        }
+    });
+
+    const { asChildRowOfTable: asChildRowOfTableR, asParentRowOfCells: asParentRowOfCellsR, ...void10 } = gridNavRet;
+    const { propsStable: p3, ...void2 } = asParentRowOfCellsR.linearNavigationReturn;
+    const { getTabbableIndex, setTabbableIndex, ...void3 } = asParentRowOfCellsR.rovingTabIndexReturn;
+    const { getTabbable, propsUnstable, setTabbable, tabbable, ...void7 } = asChildRowOfTableR.rovingTabIndexChildReturn;
+
+    const { hasCurrentFocusReturn, ...void8 } = useHasCurrentFocus<GridRowElement>({ refElementReturn, hasCurrentFocusParameters: { onCurrentFocusedChanged: null, ...asChildRowOfTableR.hasCurrentFocusParameters } });
+
+    const { managedChildParameters: { hidden, index } } = asChildRowOfTableP;
+
+    useManagedChild<GridChildRowInfo<GridRowElement>>({
+        managedChildParameters: { getElement, getTabbable, hidden, index, setTabbable, tabbable, ...asChildRowOfTableR.managedChildParameters },
+        managedChildrenReturn: asChildRowOfTableP.managedChildrenReturn
+    })
+
+    const {
+        managedChildrenReturn: mcr2,
+        ...void9
+    } = useManagedChildren<GridChildCellInfo<GridCellElement>>({
+        managedChildrenParameters: {
+            onAfterChildLayoutEffect: null,
+            ...asParentRowOfCellsR.managedChildrenParameters
+        }
+    });
+
+
+    assertEmptyObject(void2);
+    assertEmptyObject(void3);
+    assertEmptyObject(void7);
+    assertEmptyObject(void8);
+    assertEmptyObject(void9);
+    assertEmptyObject(void10);
+
+    const { propsStable: p2 } = asParentRowOfCellsR.typeaheadNavigationReturn;
+    const { propsStable: p1 } = hasCurrentFocusReturn;
+
+    const { getChildren: getChildren2 } = mcr2;
+
+    const props = useMergedProps(p1, p2, p3, p4, p5);
+    const context = useStableObject<GridCellContext<GridRowElement, GridCellElement>>({
+        rovingTabIndexChildParameters: asParentRowOfCellsR.rovingTabIndexChildParameters,
+        typeaheadNavigationChildParameters: asParentRowOfCellsR.typeaheadNavigationChildParameters,
+        gridNavigationCellParameters: asParentRowOfCellsR.gridNavigationCellParameters,
+        rovingTabIndexReturn: asParentRowOfCellsR.rovingTabIndexReturn,
+        managedChildrenReturn: mcr2
+    });
+
+
+    return {
+        asChildRowOfTable: {
+            managedChildrenReturn: asChildRowOfTableP.managedChildrenReturn,
+            ...asChildRowOfTableR,
+        },
+        asParentRowOfCells: asParentRowOfCellsR,
+        context,
+        props,
+
+    }
+
+}
+
+function useGridCellDemo<CellElement extends Element>({
+    gridNavigationCellParameters,
+    managedChildrenReturn,
+    rovingTabIndexChildParameters,
+    rovingTabIndexReturn,
+    typeaheadNavigationChildParameters,
+    managedChildParameters: { index, hidden },
+    ...void4
+}: GridDemoCellParameters<CellElement>): GridDemoCellReturn<CellElement> {
+
+
+    const { refElementReturn } = useRefElement<CellElement>({ refElementParameters: {} });
+    const { propsStable: p1, getElement } = refElementReturn;
+
+    const {
+        hasCurrentFocusParameters,
+        rovingTabIndexChildReturn,
+        ...void3
+    } = useGridNavigationCell<CellElement>({
+        gridNavigationCellParameters: { ...gridNavigationCellParameters, colSpan: 1 },
+        managedChildParameters: { hidden, index },
+        rovingTabIndexChildParameters,
+        rovingTabIndexReturn,
+        typeaheadNavigationChildParameters
+    });
+
+
+    const { onCurrentFocusedInnerChanged, ...void1 } = hasCurrentFocusParameters;
+    const { getTabbable, propsUnstable: p2, setTabbable, tabbable, ...void2 } = rovingTabIndexChildReturn;
+
+    assertEmptyObject(void1);
+    assertEmptyObject(void2);
+    assertEmptyObject(void3);
+    assertEmptyObject(void4);
+    const focusSelf = useCallback((e: CellElement) => { (e as Element as HTMLElement).focus(); }, [])
+
+    const {
+        hasCurrentFocusReturn: { propsStable: p3 }
+    } = useHasCurrentFocus<CellElement>({
+        refElementReturn,
+        hasCurrentFocusParameters: { onCurrentFocusedChanged: null, onCurrentFocusedInnerChanged }
+    });
+
+    useManagedChild<GridChildCellInfo<CellElement>>({
+        managedChildParameters: { index, focusSelf, getElement, getTabbable, hidden: false, setTabbable, tabbable },
+        managedChildrenReturn
+    });
+
+    const props = useMergedProps<CellElement>(p1, p2, p3);
+
+    return {
+        props,
+        rovingTabIndexChildReturn
+    }
+}
+
 
 //const GridRowContext = createContext<UseGridNavigationRow<HTMLTableRowElement, HTMLTableCellElement, {}, {}, string, string>>(null!);
 //const GridCellContext = createContext<UseGridNavigationCell<HTMLTableCellElement, {}, string>>(null!);
@@ -289,10 +559,41 @@ export const DemoUseGrid = memo(() => {
     //const { props } = useHasFocus<HTMLTableSectionElement>({ onLastFocusedInnerChanged: setLastFocusedInner, getDocument });
 
     const [tabbableColumn, setTabbableColumn, getTabbableColumn] = useState<number | null>(null);
-    const getHighestIndex = useCallback(() => getChildren().getHighestIndex(), []);
-    const getChildren = useCallback<typeof getChildren2>(() => { return managedChildrenReturn.getChildren() }, []);
+    const [tabbableRow, setTabbableRow] = useState<number | null>(null);
+    //const getHighestIndex = useCallback(() => getChildren().getHighestIndex(), []);
+    const getChildren = useCallback<typeof getChildren2>(() => { return getChildren2() }, []);
+
+    const ret: GridDemoReturn<HTMLTableSectionElement, HTMLTableRowElement, HTMLTableCellElement> = useGridDemo<HTMLTableSectionElement, HTMLTableRowElement, HTMLTableCellElement>({
+        gridNavigationParameters: { onTabbableColumnChange: setTabbableColumn },
+        linearNavigationParameters: { disableArrowKeys: false, disableHomeEndKeys: false },
+        sortableChildrenParameters: { compare: useCallback((rhs, lhs) => { return lhs.index - rhs.index }, []) },
+        //managedChildrenReturn: { getChildren },
+        rovingTabIndexParameters: { initiallyTabbedIndex: null, onTabbableIndexChange: setTabbableRow },
+        typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000 },
+        rearrangeableChildrenParameters: {
+            getIndex: useCallback<GetIndex<{ index: number }>>((a: VNode<{ index: number }>) => a.props.index, []),
+            getValid: useStableCallback<GetValid>((index) => { return !(getChildren().getAt(index)?.hidden) })
+        },
+    });
 
     const {
+        context,
+        props,
+        linearNavigationReturn,
+        rearrangeableChildrenReturn,
+        rovingTabIndexChildParameters,
+        rovingTabIndexReturn,
+        sortableChildrenReturn,
+        typeaheadNavigationChildParameters,
+        typeaheadNavigationReturn,
+        managedChildrenReturn,
+        useSortableProps
+    } = ret;
+
+    const { getChildren: getChildren2 } = managedChildrenReturn;
+
+
+    /*const {
         linearNavigationParameters,
         rearrangeableChildrenReturn,
         sortableChildrenReturn,
@@ -338,10 +639,11 @@ export const DemoUseGrid = memo(() => {
     const { propsStable: p1 } = linearNavigationReturn;
     const { propsStable: p2 } = typeaheadNavigationReturn;
 
-    const { getChildren: getChildren2 } = managedChildrenReturn;
+    const { getChildren: getChildren2 } = managedChildrenReturn;*/
 
     return (
         <div class="demo">
+            {<div>Current row: {tabbableRow}</div>}
             {<div>Current column: {tabbableColumn}</div>}
             <table {...{ border: "2" } as {}} style={{ whiteSpace: "nowrap" }}>
 
@@ -352,150 +654,172 @@ export const DemoUseGrid = memo(() => {
                         <th>Column 2</th>
                     </tr>
                 </thead>
-                <tbody {...useMergedProps(p1, p2)}>
-                    <GridRowContext.Provider value={useStableObject({ gridNavigationRowParameters, rovingTabIndexChildParameters, typeaheadNavigationChildParameters, managedChildrenReturn })}>
-                        {Array.from((function* () {
+                <GridRowContext.Provider value={context}>
+                    <tbody {...useSortableProps({
+                        ...props,
+                        children: Array.from((function* () {
                             for (let i = 0; i < 10; ++i) {
                                 yield <DemoUseGridRow index={i} key={i} />
                             }
-                        })())}
-                    </GridRowContext.Provider>
-                </tbody>
+                        })())
+                    })} />
+                </GridRowContext.Provider>
             </table>
         </div>
     );
 })
-
-const GridRowContext = createContext<UseGridNavigationContext<HTMLTableElement, HTMLTableRowElement> & UseManagedChildrenContext<GridChildRowInfo<HTMLTableRowElement>>>(null!);
-const GridCellContext = createContext<UseGridNavigationRowContext<HTMLTableRowElement, HTMLTableCellElement> & UseManagedChildrenContext<GridChildCellInfo<HTMLTableCellElement>>>(null!);
+type GridRowContext<ParentElement extends Element, RowElement extends Element> = UseGridNavigationContext<ParentElement, RowElement> & UseManagedChildrenContext<GridChildRowInfo<RowElement>>;
+type GridCellContext<RowElement extends Element, CellElement extends Element> = UseGridNavigationRowContext<RowElement, CellElement> & UseManagedChildrenContext<GridChildCellInfo<CellElement>>;
+const GridRowContext = createContext<GridRowContext<HTMLTableSectionElement, HTMLTableRowElement>>(null!);
+const GridCellContext = createContext<GridCellContext<HTMLTableRowElement, HTMLTableCellElement>>(null!);
 
 const _Prefix = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const DemoUseGridRow = memo((({ index }: { index: number }) => {
     const [_randomWord] = useState(() => RandomWords[index/*Math.floor(Math.random() * (RandomWords.length - 1))*/]);
 
     const [tabbableColumn, setTabbableColumn, getTabbableColumn] = useState<number | null>(null);
-    const getHighestIndex = useCallback(() => getChildren().getHighestIndex(), []);
-    const getChildren = useCallback(() => { return getChildren2() }, []);
+    //const getHighestIndex = useCallback(() => getChildren().getHighestIndex(), []);
+    //const getChildren = useCallback(() => { return getChildren2() }, []);
     const hidden = (index === 3);
-
+    /*
+        const {
+            gridNavigationRowParameters,
+            rovingTabIndexChildParameters,
+            typeaheadNavigationChildParameters,
+            managedChildrenReturn: mcr
+        } = useContext(GridRowContext);
+    
+        const navigateAbsolute = useCallback((n: number) => { return n; }, [])
+        const navigateRelative = useCallback((n: number, o: number) => { return n + o; }, [])
+    
+        //const useGridRow = useContext(GridRowContext);
+        const { refElementReturn } = useRefElement<HTMLTableRowElement>({ refElementParameters: {} });
+        const { getElement, propsStable: p5 } = refElementReturn;
+        const { propsStable: p4 } = refElementReturn;
+        const setTabbableIndex2 = useStableCallback((a: Parameters<StateUpdater<number | null>>[0], b: boolean) => { setTabbableIndex(a, b) });
+        const gridNavRet: UseGridNavigationRowReturnType<HTMLTableRowElement, HTMLTableCellElement> = useGridNavigationRow<HTMLTableRowElement, HTMLTableCellElement, GridChildRowInfo<HTMLTableRowElement>, GridChildCellInfo<HTMLTableCellElement>>({
+            asChildRowOfTable: {
+                gridNavigationRowParameters,
+                managedChildParameters: { hidden, index },
+                managedChildrenReturn: { getChildren },
+                rovingTabIndexChildParameters,
+                rovingTabIndexReturn: { setTabbableIndex: setTabbableIndex2 },
+                typeaheadNavigationChildParameters: { text: "", ...typeaheadNavigationChildParameters }
+            },
+            asParentRowOfCells: {
+                linearNavigationParameters: { disableArrowKeys: false, disableHomeEndKeys: false, getHighestIndex, navigateAbsolute, navigateRelative },
+                managedChildrenReturn: { getChildren },
+                rovingTabIndexParameters: { initiallyTabbedIndex: 0, onTabbableIndexChange: setTabbableColumn },
+                typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000 }
+            }
+        });
+    
+        const {
+            asChildRowOfTable: {
+                hasCurrentFocusParameters: { onCurrentFocusedInnerChanged },
+                managedChildParameters: { focusSelf: focusSelfAsChildRow, setTabbableColumnIndex, ...void6 },
+                rovingTabIndexChildReturn: { getTabbable, propsUnstable, setTabbable, tabbable, ...void7 },
+                ...void5
+            },
+            asParentRowOfCells: {
+                gridNavigationCellParameters,
+                linearNavigationReturn: { propsStable: p3, ...void2 },
+                managedChildrenParameters: { onChildrenMountChange, ...void1 },
+                rovingTabIndexChildParameters: rticp1,
+                rovingTabIndexReturn,
+                typeaheadNavigationChildParameters: rncp1,
+                typeaheadNavigationReturn,
+                ...void4
+            },
+            ...void10
+        } = gridNavRet;
+    
+        const { getTabbableIndex, setTabbableIndex, ...void3 } = rovingTabIndexReturn;
+    
+    
+        const {
+            hasCurrentFocusReturn,
+            ...void8
+        } = useHasCurrentFocus<HTMLTableRowElement>({
+            refElementReturn,
+            hasCurrentFocusParameters: {
+                onCurrentFocusedChanged: null,
+                onCurrentFocusedInnerChanged
+            }
+        });
+    
+        useManagedChild({
+            managedChildParameters: {
+                focusSelf: focusSelfAsChildRow,
+                getElement,
+                getTabbable,
+                hidden,
+                index,
+                setTabbable,
+                tabbable,
+                setTabbableColumnIndex
+            },
+            managedChildrenReturn: mcr
+        })
+    
+        const {
+            managedChildrenReturn,
+            ...void9
+        } = useManagedChildren<GridChildCellInfo<HTMLTableCellElement>>({
+            managedChildrenParameters: {
+                onAfterChildLayoutEffect: null,
+                onChildrenMountChange: onChildrenMountChange
+            }
+        });
+    
+        assertEmptyObject(void1);
+        assertEmptyObject(void2);
+        assertEmptyObject(void3);
+        assertEmptyObject(void4);
+        assertEmptyObject(void5);
+        assertEmptyObject(void6);
+        assertEmptyObject(void7);
+        assertEmptyObject(void8);
+        assertEmptyObject(void9);
+        assertEmptyObject(void10);
+    
+        //const { propsStable: p1 } = linearNavigationReturn;
+        const { propsStable: p2 } = typeaheadNavigationReturn;
+        const { propsStable: p1 } = hasCurrentFocusReturn;
+    
+        const { getChildren: getChildren2 } = managedChildrenReturn;
+    
+        const props = useMergedProps(p1, p2, p3, p4, p5);*/
     const {
         gridNavigationRowParameters,
+        managedChildrenReturn: mcr2,
         rovingTabIndexChildParameters,
         typeaheadNavigationChildParameters,
-        managedChildrenReturn: mcr
-    } = useContext(GridRowContext);
-
-    const navigateAbsolute = useCallback((n: number) => { return n; }, [])
-    const navigateRelative = useCallback((n: number, o: number) => { return n + o; }, [])
-
-    //const useGridRow = useContext(GridRowContext);
-    const { refElementReturn } = useRefElement<HTMLTableRowElement>({ refElementParameters: {} });
-    const { getElement, propsStable: p5 } = refElementReturn;
-    const { propsStable: p4 } = refElementReturn;
-    const setTabbableIndex2 = useStableCallback((a: Parameters<StateUpdater<number | null>>[0], b: boolean) => { setTabbableIndex(a, b) });
-    const gridNavRet: UseGridNavigationRowReturnType<HTMLTableRowElement, HTMLTableCellElement> = useGridNavigationRow<HTMLTableRowElement, HTMLTableCellElement, GridChildRowInfo<HTMLTableRowElement>, GridChildCellInfo<HTMLTableCellElement>>({
+    } = useContext(GridRowContext) as GridRowContext<any, HTMLTableRowElement>;
+    const ret = useGridRowDemo<HTMLTableRowElement, HTMLTableCellElement>({
         asChildRowOfTable: {
             gridNavigationRowParameters,
             managedChildParameters: { hidden, index },
-            managedChildrenReturn: { getChildren },
+            managedChildrenReturn: mcr2,
             rovingTabIndexChildParameters,
-            rovingTabIndexReturn: { setTabbableIndex: setTabbableIndex2 },
             typeaheadNavigationChildParameters: { text: "", ...typeaheadNavigationChildParameters }
         },
         asParentRowOfCells: {
-            linearNavigationParameters: { disableArrowKeys: false, disableHomeEndKeys: false, getHighestIndex, navigateAbsolute, navigateRelative },
-            managedChildrenReturn: { getChildren },
+            linearNavigationParameters: { disableArrowKeys: false, disableHomeEndKeys: false },
             rovingTabIndexParameters: { initiallyTabbedIndex: 0, onTabbableIndexChange: setTabbableColumn },
             typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000 }
         }
     });
 
     const {
-        asChildRowOfTable: {
-            hasCurrentFocusParameters: { onCurrentFocusedInnerChanged },
-            managedChildParameters: { focusSelf: focusSelfAsChildRow, setTabbableColumnIndex, ...void6 },
-            rovingTabIndexChildReturn: { getTabbable, propsUnstable, setTabbable, tabbable, ...void7 },
-            ...void5
-        },
-        asParentRowOfCells: {
-            gridNavigationCellParameters,
-            linearNavigationReturn: { propsStable: p3, ...void2 },
-            managedChildrenParameters: { onChildrenMountChange, ...void1 },
-            rovingTabIndexChildParameters: rticp1,
-            rovingTabIndexReturn,
-            typeaheadNavigationChildParameters: rncp1,
-            typeaheadNavigationReturn,
-            ...void4
-        },
-        ...void10
-    } = gridNavRet;
+        asChildRowOfTable: { rovingTabIndexChildReturn: { tabbable } },
+        context,
+        props
+    } = ret;
 
-    const { getTabbableIndex, setTabbableIndex, ...void3 } = rovingTabIndexReturn;
-
-
-    const {
-        hasCurrentFocusReturn,
-        ...void8
-    } = useHasCurrentFocus<HTMLTableRowElement>({
-        refElementReturn,
-        hasCurrentFocusParameters: {
-            onCurrentFocusedChanged: null,
-            onCurrentFocusedInnerChanged
-        }
-    });
-
-    useManagedChild({
-        managedChildParameters: {
-            focusSelf: focusSelfAsChildRow,
-            getElement,
-            getTabbable,
-            hidden,
-            index,
-            setTabbable,
-            tabbable,
-            text: "",
-            setTabbableColumnIndex
-        },
-        managedChildrenReturn: mcr
-    })
-
-    const {
-        managedChildrenReturn,
-        ...void9
-    } = useManagedChildren<GridChildCellInfo<HTMLTableCellElement>>({
-        managedChildrenParameters: {
-            onAfterChildLayoutEffect: null,
-            onChildrenMountChange: onChildrenMountChange
-        }
-    });
-
-    assertEmptyObject(void1);
-    assertEmptyObject(void2);
-    assertEmptyObject(void3);
-    assertEmptyObject(void4);
-    assertEmptyObject(void5);
-    assertEmptyObject(void6);
-    assertEmptyObject(void7);
-    assertEmptyObject(void8);
-    assertEmptyObject(void9);
-    assertEmptyObject(void10);
-
-    //const { propsStable: p1 } = linearNavigationReturn;
-    const { propsStable: p2 } = typeaheadNavigationReturn;
-    const { propsStable: p1 } = hasCurrentFocusReturn;
-
-    const { getChildren: getChildren2 } = managedChildrenReturn;
-
-    const props = useMergedProps(p1, p2, p3, p4, p5);
     return (
         <tr {...props}>
-            <GridCellContext.Provider value={useStableObject({
-                rovingTabIndexChildParameters,
-                typeaheadNavigationChildParameters,
-                gridNavigationCellParameters,
-                rovingTabIndexReturn,
-                managedChildrenReturn
-            })}>
+            <GridCellContext.Provider value={context}>
                 {Array.from((function* () {
                     for (let i = 0; i < 3; ++i) {
                         yield <DemoUseGridCell index={i} key={i} row={index} rowIsTabbable={tabbable} />
@@ -513,7 +837,7 @@ const DemoUseGridCell = (({ index, row, rowIsTabbable }: { index: number, row: n
 
     let hiddenText = (row === 3) ? " (row hidden)" : ""
 
-    const {
+    /*const {
         rovingTabIndexChildParameters,
         typeaheadNavigationChildParameters,
         gridNavigationCellParameters,
@@ -553,11 +877,31 @@ const DemoUseGridCell = (({ index, row, rowIsTabbable }: { index: number, row: n
     });
 
     useManagedChild<GridChildCellInfo<HTMLTableCellElement>>({
-        managedChildParameters: { index, focusSelf, getElement, getTabbable, hidden: false, setTabbable, tabbable, text: "" },
+        managedChildParameters: { index, focusSelf, getElement, getTabbable, hidden: false, setTabbable, tabbable },
         managedChildrenReturn
     });
 
-    const props = useMergedProps(p1, p2, p3);
+    const props = useMergedProps(p1, p2, p3);*/
+
+    const {
+        gridNavigationCellParameters,
+        managedChildrenReturn,
+        rovingTabIndexChildParameters,
+        rovingTabIndexReturn,
+        typeaheadNavigationChildParameters
+    } = useContext(GridCellContext) as GridCellContext<HTMLTableRowElement, HTMLTableCellElement>;
+
+    const {
+        props,
+        rovingTabIndexChildReturn: { tabbable }
+    } = useGridCellDemo<HTMLTableCellElement>({
+        gridNavigationCellParameters: { colSpan: 1, ...gridNavigationCellParameters },
+        managedChildParameters: { hidden: false, index },
+        managedChildrenReturn,
+        rovingTabIndexChildParameters,
+        rovingTabIndexReturn,
+        typeaheadNavigationChildParameters: { text: "", ...typeaheadNavigationChildParameters }
+    });
 
     const t = (tabbable ? "(Tabbable)" : "(Not tabbable)")
 

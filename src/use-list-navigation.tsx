@@ -61,7 +61,7 @@ export function useListNavigationChildSingleSelectionProps<E extends Element>(r:
 
 
 export interface UseListNavigationChildInfo<TabbableChildElement extends Element> extends UseRovingTabIndexChildInfo<TabbableChildElement> {
-    text: string;
+    //text: string;
 }
 
 export interface UseListNavigationSingleSelectionChildInfo<TabbableChildElement extends Element> extends UseListNavigationChildInfo<TabbableChildElement>, SelectableChildInfo<TabbableChildElement> { }
@@ -265,6 +265,7 @@ export function useListNavigationSingleSelection<ParentOrChildElement extends El
 }
 
 export interface UseListNavigationSingleSelectionChildParameters<ChildElement extends Element> extends UseListNavigationChildParameters<ChildElement> {
+    managedChildParameters: UseListNavigationChildParameters<ChildElement>["managedChildParameters"] & UseSingleSelectionChildParameters<ChildElement>["managedChildParameters"];
     singleSelectionChildParameters: UseSingleSelectionChildParameters<ChildElement>["singleSelectionChildParameters"];
     singleSelectionReturn: UseSingleSelectionChildParameters<ChildElement>["singleSelectionReturn"];
 }
@@ -275,7 +276,7 @@ export interface UseListNavigationSingleSelectionChildReturnType<ChildElement ex
 }
 
 export function useListNavigationSingleSelectionChild<ChildElement extends Element>({
-    managedChildParameters: { hidden, index, ..._void5 },
+    managedChildParameters: { hidden, index, disabled, ..._void5 },
     rovingTabIndexChildParameters,
     rovingTabIndexReturn,
     singleSelectionChildParameters,
@@ -291,7 +292,7 @@ export function useListNavigationSingleSelectionChild<ChildElement extends Eleme
         singleSelectionChildReturn,
         ..._void2
     } = useSingleSelectionChild<ChildElement>({
-        managedChildParameters: { index },
+        managedChildParameters: { index, disabled },
         singleSelectionChildParameters,
         singleSelectionReturn
     });

@@ -1,9 +1,9 @@
-import { StateUpdater } from "preact/hooks";
+import { StateUpdater, useCallback } from "preact/hooks";
 import { assertEmptyObject, UseManagedChildParameters, UseManagedChildrenReturnTypeInfo } from "./use-child-manager";
 import { useListNavigation, useListNavigationChild, UseListNavigationChildInfo, UseListNavigationChildParameters, UseListNavigationChildReturnTypeInfo, UseListNavigationParameters, UseListNavigationReturnTypeInfo } from "./use-list-navigation";
 import { PassiveStateUpdater, usePassiveState } from "./use-passive-state";
 import { useStableCallback } from "./use-stable-callback";
-import { useStableObject } from "./use-stable-getter";
+import { useStableGetter, useStableObject } from "./use-stable-getter";
 
 /*
 export function useGridNavigationProps<ParentOrRowElement extends Element, RowElement extends Element>(r: UseGridNavigationReturnType<ParentOrRowElement, RowElement>, ...otherProps: h.JSX.HTMLAttributes<ParentOrRowElement>[]) {
@@ -36,6 +36,7 @@ export interface UseGridNavigationRowParameters<RowElement extends Element, Cell
         managedChildrenReturn: Pick<UseManagedChildrenReturnTypeInfo<CM>["managedChildrenReturn"], "getChildren">;
         gridNavigationRowParameters: {
             _private: {
+                setTabbableRow: (updater: Parameters<StateUpdater<number | null>>[0], fromUserInteraction: boolean) => void;
                 getCurrentColumn: () => (number | null);
                 setCurrentColumn: PassiveStateUpdater<number | null>;
             }
@@ -68,6 +69,7 @@ export interface UseGridNavigationCellParameters<CellElement extends Element> ex
     gridNavigationCellParameters: {
         colSpan: number;
         _private: {
+            setTabbableRow: (fromUserInteraction: boolean) => void;
             getCurrentColumn: () => (number | null);
             setCurrentColumn: PassiveStateUpdater<number | null>;
             setTabbableColumn: (updater: Parameters<StateUpdater<number | null>>[0], fromUserInteraction: boolean) => void;
@@ -77,7 +79,7 @@ export interface UseGridNavigationCellParameters<CellElement extends Element> ex
 export interface UseGridNavigationCellReturnType<CellElement extends Element> extends UseListNavigationChildReturnTypeInfo<CellElement> { }
 
 export interface UseGridNavigationContext<ParentOrRowElement extends Element, RowElement extends Element> extends Pick<UseGridNavigationReturnType<ParentOrRowElement, RowElement>, "typeaheadNavigationChildParameters" | "rovingTabIndexChildParameters" | "gridNavigationRowParameters"> { }
-export interface UseGridNavigationRowContext<ParentOrRowElement extends Element, RowElement extends Element> extends Pick<UseGridNavigationRowReturnType<ParentOrRowElement, RowElement>["asParentRowOfCells"], "rovingTabIndexReturn" | "typeaheadNavigationChildParameters" | "rovingTabIndexChildParameters" | "gridNavigationCellParameters"> { }
+export interface UseGridNavigationRowContext<RowElement extends Element, CellElement extends Element> extends Pick<UseGridNavigationRowReturnType<RowElement, CellElement>["asParentRowOfCells"], "rovingTabIndexReturn" | "typeaheadNavigationChildParameters" | "rovingTabIndexChildParameters" | "gridNavigationCellParameters"> { }
 
 export function useGridNavigation<ParentOrRowElement extends Element, RowElement extends Element, M extends GridChildRowInfo<RowElement>>({
     gridNavigationParameters: { onTabbableColumnChange, ...void3 },
@@ -133,6 +135,7 @@ export function useGridNavigation<ParentOrRowElement extends Element, RowElement
         rovingTabIndexChildParameters,
         gridNavigationRowParameters: useStableObject({
             _private: useStableObject({
+                setTabbableRow: rovingTabIndexReturn.setTabbableIndex,
                 getCurrentColumn,
                 setCurrentColumn
             })
@@ -141,13 +144,12 @@ export function useGridNavigation<ParentOrRowElement extends Element, RowElement
 }
 
 export function useGridNavigationRow<RowElement extends Element, CellElement extends Element, RM extends GridChildRowInfo<RowElement>, CM extends GridChildCellInfo<CellElement>>({
-    asChildRowOfTable: { gridNavigationRowParameters: { _private: { getCurrentColumn, setCurrentColumn } }, ...asChildRowOfTable },
+    asChildRowOfTable: { gridNavigationRowParameters: { _private: { setTabbableRow, getCurrentColumn, setCurrentColumn } }, ...asChildRowOfTable },
     asParentRowOfCells: { linearNavigationParameters, managedChildrenReturn, rovingTabIndexParameters, typeaheadNavigationParameters, ...asParentRowOfCells },
     ..._void1
 }: UseGridNavigationRowParameters<RowElement, CellElement, RM, CM>): UseGridNavigationRowReturnType<RowElement, CellElement> {
     const { managedChildrenReturn: { getChildren } } = asChildRowOfTable;
     const focusSelf = useStableCallback((e: RowElement) => {
-        debugger;
         let index = (getCurrentColumn() ?? 0);
         let child = getChildren().getAt(index);
         while ((!child) && index > 0) {
@@ -169,7 +171,7 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
         hasCurrentFocusParameters,
         ..._void2
     } = useListNavigationChild<RowElement>(asChildRowOfTable);
-
+    const getIndex = useStableGetter(asChildRowOfTable.managedChildParameters.index);
     const {
         linearNavigationReturn,
         managedChildrenParameters,
@@ -202,11 +204,12 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
             linearNavigationReturn,
             managedChildrenParameters,
             rovingTabIndexChildParameters,
-            rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex },
+            rovingTabIndexReturn: useStableObject({ getTabbableIndex, setTabbableIndex }),
             typeaheadNavigationChildParameters,
             typeaheadNavigationReturn,
             gridNavigationCellParameters: useStableObject({
                 _private: useStableObject({
+                    setTabbableRow: useCallback((fromUserInteraction: boolean) => { setTabbableRow(getIndex(), fromUserInteraction) }, []),
                     getCurrentColumn,
                     setCurrentColumn,
                     setTabbableColumn: setTabbableIndex
@@ -225,6 +228,7 @@ export function useGridNavigationCell<CellElement extends Element>({
     typeaheadNavigationChildParameters,
     gridNavigationCellParameters: {
         _private: {
+            setTabbableRow,
             getCurrentColumn,
             setCurrentColumn,
             setTabbableColumn
@@ -254,9 +258,9 @@ export function useGridNavigationCell<CellElement extends Element>({
                 ocfic1?.(focused, prev);
 
                 if (focused) {
-                    if (index == 0)
-                        debugger;
-
+                    //if (index == 0)
+                    debugger;
+                    setTabbableRow(false);
                     setCurrentColumn(index);
                     setTabbableColumn(prev => {
                         if (prev != null && (prev < index || prev > index + colSpan)) {

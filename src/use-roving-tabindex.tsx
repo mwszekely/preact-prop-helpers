@@ -217,9 +217,8 @@ export function useRovingTabIndex<ChildElement extends Element, M extends UseRov
 
             if (prevIndex != nextIndex) {
                 const nextChild = nextIndex == null ? null : children.getAt(nextIndex);
-                if (!nextChild?.hidden) {
-                    console.assert(false);
-                    debugger;
+                if (!!nextChild?.hidden) {
+                    return prevIndex;
                 }
 
                 if (nextChild != null && fromUserInteraction) {
@@ -302,6 +301,7 @@ export function useRovingTabIndexChild<ChildElement extends Element>({
         hasCurrentFocusParameters: {
             onCurrentFocusedInnerChanged: useStableCallback((focused: boolean, _prevFocused: boolean | undefined) => {
                 if (focused) {
+                    debugger;
                     setTabbableIndex(index, false);
                 }
             })
