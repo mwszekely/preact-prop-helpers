@@ -5,7 +5,7 @@ import { useGlobalHandler } from "./use-event-handler";
 import { useForceUpdate } from "./use-force-update";
 import { useStableCallback } from "./use-stable-callback";
 import { useState } from "./use-state";
-import { useMergedProps } from "use-merged-props";
+import { useMergedProps } from "./use-merged-props";
 /*
 export function usePressProps<E extends Element>(r: UsePressReturnType<E>, ...otherProps: h.JSX.HTMLAttributes<E>[]): h.JSX.HTMLAttributes<E>[] {
     return [r.pressReturn.propsStable, ...otherProps];

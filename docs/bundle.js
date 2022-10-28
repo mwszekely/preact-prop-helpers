@@ -5811,30 +5811,15 @@ var bundle = (function (exports) {
         const { rovingTabIndexChildParameters, typeaheadNavigationChildParameters, rovingTabIndexReturn, singleSelectionReturn, managedChildrenReturn } = x(ListNavigationSingleSelectionChildContext);
         const text = `${randomWord} This is item #${index}${hidden ? " (hidden)" : ""}`;
         const focusSelf = q$1((e) => { e.focus(); }, []);
-        //const oec = useStableCallback<NonNullable<UseRefElementParameters<HTMLLIElement>["refElementParameters"]["onElementChange"]>>((a, b) => onElementChange(a, b));
-        //const ofic = useStableCallback<NonNullable<typeof onFocusedInnerChanged>>((a, b) => onFocusedInnerChanged?.(a, b));
-        //const olfic = useStableCallback<NonNullable<typeof onLastFocusedInnerChanged>>((a, b) => onLastFocusedInnerChanged?.(a, b));
         const { refElementReturn } = useRefElement({ refElementParameters: { onElementChange: undefined } });
         const { getElement, propsStable: p3 } = refElementReturn;
-        const { 
-        /*rovingTabIndexChildReturn: { tabbable, propsUnstable: p2 },
-        singleSelectionChildReturn: { selected, propsUnstable: p4 },
-        hasCurrentFocusParameters: { onCurrentFocusedInnerChanged },
-        refElementParameters: { onElementChange },
-        pressReturn: { propsStable: p5, propsUnstable: p1 },*/
-        hasCurrentFocusParameters: { onCurrentFocusedInnerChanged, ...void5 }, managedChildParameters: { getSelected, selected, setSelected, ...void4 }, pressParameters: { onPressSync, ...void3 }, rovingTabIndexChildReturn: { setTabbable, getTabbable, propsUnstable: p2, tabbable, ...void2 }, singleSelectionChildReturn: { propsUnstable: p4, ...void1 }, ...void6 } = useListNavigationSingleSelectionChild({
+        const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged, ...void5 }, managedChildParameters: { getSelected, selected, setSelected, ...void4 }, pressParameters: { onPressSync, ...void3 }, rovingTabIndexChildReturn: { setTabbable, getTabbable, propsUnstable: p2, tabbable, ...void2 }, singleSelectionChildReturn: { propsUnstable: p4, ...void1 }, ...void6 } = useListNavigationSingleSelectionChild({
             managedChildParameters: { hidden, index },
             rovingTabIndexChildParameters: rovingTabIndexChildParameters,
             rovingTabIndexReturn,
             singleSelectionChildParameters: { ariaPropName: "aria-selected", selectionMode },
             singleSelectionReturn,
             typeaheadNavigationChildParameters: { text, ...typeaheadNavigationChildParameters }
-            /*managedChildParameters: { index, flags: {} },
-            listNavigationChildParameters: { text: "" },
-            refElementReturn,
-            rovingTabIndexChildParameters: { focusSelf, noModifyTabIndex: false, hidden },
-            singleSelectionChildParameters: { selectionMode, ariaPropName: "aria-selected", unselectable: hidden },
-            subInfo: {},*/
         });
         const { pressReturn: { propsStable: p5 } } = usePress({
             pressParameters: { exclude: {}, focusSelf, onPressSync, onPseudoActiveStart: null, onPseudoActiveStop: null },

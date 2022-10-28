@@ -6,7 +6,7 @@ import { assertEmptyObject, ManagedChildInfo, useChildrenFlag, UseManagedChildPa
 import { OnPassiveStateChange } from "./use-passive-state";
 import { useStableCallback } from "./use-stable-callback";
 import { useStableObject } from "./use-stable-getter";
-import { useMergedProps } from "use-merged-props";
+import { useMergedProps } from "./use-merged-props";
 
 
 /*

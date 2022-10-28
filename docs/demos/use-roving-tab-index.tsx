@@ -158,19 +158,11 @@ const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
     const { rovingTabIndexChildParameters, typeaheadNavigationChildParameters, rovingTabIndexReturn, singleSelectionReturn, managedChildrenReturn } = useContext(ListNavigationSingleSelectionChildContext);
     const text = `${randomWord} This is item #${index}${hidden ? " (hidden)" : ""}`;
     const focusSelf = useCallback((e: HTMLElement) => { e.focus() }, []);
-    //const oec = useStableCallback<NonNullable<UseRefElementParameters<HTMLLIElement>["refElementParameters"]["onElementChange"]>>((a, b) => onElementChange(a, b));
-    //const ofic = useStableCallback<NonNullable<typeof onFocusedInnerChanged>>((a, b) => onFocusedInnerChanged?.(a, b));
-    //const olfic = useStableCallback<NonNullable<typeof onLastFocusedInnerChanged>>((a, b) => onLastFocusedInnerChanged?.(a, b));
     const { refElementReturn } = useRefElement<HTMLLIElement>({ refElementParameters: { onElementChange: undefined } });
     const { getElement, propsStable: p3 } = refElementReturn;
 
 
     const {
-        /*rovingTabIndexChildReturn: { tabbable, propsUnstable: p2 },
-        singleSelectionChildReturn: { selected, propsUnstable: p4 },
-        hasCurrentFocusParameters: { onCurrentFocusedInnerChanged },
-        refElementParameters: { onElementChange },
-        pressReturn: { propsStable: p5, propsUnstable: p1 },*/
         hasCurrentFocusParameters: { onCurrentFocusedInnerChanged, ...void5 },
         managedChildParameters: { getSelected, selected, setSelected, ...void4 },
         pressParameters: { onPressSync, ...void3 },
@@ -184,12 +176,6 @@ const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
         singleSelectionChildParameters: { ariaPropName: "aria-selected", selectionMode },
         singleSelectionReturn,
         typeaheadNavigationChildParameters: { text, ...typeaheadNavigationChildParameters }
-        /*managedChildParameters: { index, flags: {} },
-        listNavigationChildParameters: { text: "" },
-        refElementReturn,
-        rovingTabIndexChildParameters: { focusSelf, noModifyTabIndex: false, hidden },
-        singleSelectionChildParameters: { selectionMode, ariaPropName: "aria-selected", unselectable: hidden },
-        subInfo: {},*/
     });
 
     const {

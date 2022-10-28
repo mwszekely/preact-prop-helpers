@@ -10,7 +10,7 @@ import { UseChildrenHaveFocusChildReturnType, UseChildrenHaveFocusParameters } f
 import { useStableCallback } from "./use-stable-callback";
 import { useStableGetter, useStableObject } from "./use-stable-getter";
 import { useState } from "./use-state";
-import { useMergedProps } from "use-merged-props";
+import { useMergedProps } from "./use-merged-props";
 
 /*
 export function useSingleSelectionChildProps<E extends Element>(r: UseSingleSelectionChildReturnTypeInfo<E>, ...otherProps: h.JSX.HTMLAttributes<E>[]): h.JSX.HTMLAttributes<E>[] {

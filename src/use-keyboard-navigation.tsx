@@ -1,6 +1,6 @@
 import { h } from "preact";
 import { useEffect, useLayoutEffect, useRef } from "preact/hooks";
-import { useMergedProps } from "use-merged-props";
+import { useMergedProps } from "./use-merged-props";
 import { assertEmptyObject, UseManagedChildParameters } from "./use-child-manager";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnTypeInfo } from "./use-roving-tabindex";
 import { useStableCallback } from "./use-stable-callback";
