@@ -11,13 +11,6 @@ import { useStableObject } from "./use-stable-getter";
 import { useManagedChild, UseManagedChildParameters, useManagedChildren, UseManagedChildrenReturnType } from "./use-child-manager";
 import { UseListNavigationSingleSelectionChildInfo } from "./use-list-navigation-single-selection";
 
-/**
- * We're just gluing together the single selection list navigation and sortable children hooks,
- * since they're so commonly paired together.
- * 
- * There could also be one that's just list nav + sortable, but single selection can be disregarded by setting `selectedIndex` to `null` anyway.
- */
-const _dummy = 0;
 
 export interface UseCompleteListNavigationParameters<ParentElement extends Element, ChildElement extends Element, M extends UseListNavigationSingleSelectionChildInfo<ChildElement>> extends Pick<UseListNavigationSingleSelectionSortableParameters<ParentElement, ChildElement, M>, "rovingTabIndexParameters" | "singleSelectionParameters" | "sortableChildrenParameters" | "typeaheadNavigationParameters"> {
     linearNavigationParameters: Omit<UseListNavigationSingleSelectionSortableParameters<ParentElement, ChildElement, M>["linearNavigationParameters"], "getHighestIndex">
@@ -44,6 +37,8 @@ export type CompleteListNavigationContext<ParentElement extends Element, ChildEl
  * 
  * Unlike most others, this hook assume's it's the final one--the "outermost" hook in the component--so it uses `useManagedChildren` and wraps everything up nicely,
  * combining event handlers that are used in multiple sub-hooks, collecting all the necessary context-related data, and merging all known DOM props together.
+ * 
+ * 
  * 
  * @returns 
  */
@@ -96,8 +91,7 @@ export function useCompleteListNavigation<ParentElement extends Element, ChildEl
 export interface UseCompleteListNavigationChildParameters<ChildElement extends Element, M extends UseListNavigationSingleSelectionChildInfo<ChildElement>> extends Pick<UseListNavigationSingleSelectionSortableChildParameters<ChildElement>, "typeaheadNavigationChildContext" | "singleSelectionChildContext" | "rovingTabIndexChildContext" | "managedChildParameters" | "singleSelectionChildParameters" | "typeaheadNavigationChildParameters"> {
     managedChildContext: UseManagedChildParameters<M>["managedChildContext"];
     pressParameters: Omit<UsePressParameters<ChildElement, never>["pressParameters"], "onPressSync">;
-    childrenHaveFocusChildContext: UseChildrenHaveFocusChildParameters["childrenHaveFocusChildContext"]
-    //childrenHaveFocusChildReturn: UseChildrenHaveFocusChildReturnType<ChildElement>["hasCurrentFocusParameters"];
+    childrenHaveFocusChildContext: UseChildrenHaveFocusChildParameters["childrenHaveFocusChildContext"];
 
 }
 
@@ -106,7 +100,6 @@ export interface UseCompleteListNavigationChildReturnType<ChildElement extends E
     pressReturn: UsePressReturnType<ChildElement>["pressReturn"];
     hasCurrentFocusReturn: UseHasCurrentFocusReturnType<ChildElement>["hasCurrentFocusReturn"];
     props: h.JSX.HTMLAttributes<ChildElement>;
-
 }
 
 export function useCompleteListNavigationChild<ChildElement extends Element>({
