@@ -10,6 +10,7 @@ import { useStableCallback } from "./use-stable-callback";
 import { useStableObject } from "./use-stable-getter";
 import { useManagedChild, UseManagedChildParameters, useManagedChildren, UseManagedChildrenReturnType } from "./use-child-manager";
 import { UseListNavigationSingleSelectionChildInfo } from "./use-list-navigation-single-selection";
+import { UseListNavigationChildParameters } from "use-list-navigation";
 
 
 export interface UseCompleteListNavigationParameters<ParentElement extends Element, ChildElement extends Element, M extends UseListNavigationSingleSelectionChildInfo<ChildElement>> extends Pick<UseListNavigationSingleSelectionSortableParameters<ParentElement, ChildElement, M>, "rovingTabIndexParameters" | "singleSelectionParameters" | "sortableChildrenParameters" | "typeaheadNavigationParameters"> {
@@ -42,12 +43,12 @@ export type CompleteListNavigationContext<ParentElement extends Element, ChildEl
  * 
  * @returns 
  */
-export function useCompleteListNavigation<ParentElement extends Element, ChildElement extends Element>({
+export function useCompleteListNavigation<ParentElement extends Element, ChildElement extends Element, M extends UseListNavigationSingleSelectionChildInfo<ChildElement>>({
     rearrangeableChildrenParameters,
     linearNavigationParameters,
     ...completeListNavigationParameters
-}: UseCompleteListNavigationParameters<ParentElement, ChildElement, UseListNavigationSingleSelectionChildInfo<ChildElement>>): UseCompleteListNavigationReturnType<ParentElement, ChildElement, UseListNavigationSingleSelectionChildInfo<ChildElement>> {
-    type M = UseListNavigationSingleSelectionChildInfo<ChildElement>;
+}: UseCompleteListNavigationParameters<ParentElement, ChildElement, M>): UseCompleteListNavigationReturnType<ParentElement, ChildElement, M> {
+    //type M = UseListNavigationSingleSelectionChildInfo<ChildElement>;
     const getChildren = useCallback(() => managedChildrenReturn.getChildren(), []);
     const getHighestChildIndex: (() => number) = useCallback<() => number>(() => getChildren().getHighestIndex(), []);
 
@@ -92,7 +93,7 @@ export interface UseCompleteListNavigationChildParameters<ChildElement extends E
     managedChildContext: UseManagedChildParameters<M>["managedChildContext"];
     pressParameters: Omit<UsePressParameters<ChildElement, never>["pressParameters"], "onPressSync">;
     childrenHaveFocusChildContext: UseChildrenHaveFocusChildParameters["childrenHaveFocusChildContext"];
-
+    completeListNavigationChildParameters: Omit<M, keyof UseListNavigationSingleSelectionChildInfo<ChildElement>>;
 }
 
 export interface UseCompleteListNavigationChildReturnType<ChildElement extends Element>
@@ -102,8 +103,9 @@ export interface UseCompleteListNavigationChildReturnType<ChildElement extends E
     props: h.JSX.HTMLAttributes<ChildElement>;
 }
 
-export function useCompleteListNavigationChild<ChildElement extends Element>({
+export function useCompleteListNavigationChild<ChildElement extends Element, M extends UseListNavigationSingleSelectionChildInfo<ChildElement>>({
     managedChildParameters: { disabled, hidden, index },
+    completeListNavigationChildParameters,
     singleSelectionChildParameters,
     typeaheadNavigationChildParameters,
     rovingTabIndexChildContext,
@@ -112,8 +114,7 @@ export function useCompleteListNavigationChild<ChildElement extends Element>({
     managedChildContext,
     childrenHaveFocusChildContext,
     pressParameters: { exclude, focusSelf, onPseudoActiveStart, onPseudoActiveStop }
-}: UseCompleteListNavigationChildParameters<ChildElement, UseListNavigationSingleSelectionChildInfo<ChildElement>>): UseCompleteListNavigationChildReturnType<ChildElement> {
-    type M = UseListNavigationSingleSelectionChildInfo<ChildElement>;
+}: UseCompleteListNavigationChildParameters<ChildElement, M>): UseCompleteListNavigationChildReturnType<ChildElement> {
 
     const { refElementReturn } = useRefElement<ChildElement>({ refElementParameters: {} });
     const { getElement } = refElementReturn;
@@ -141,23 +142,28 @@ export function useCompleteListNavigationChild<ChildElement extends Element>({
             onPseudoActiveStart,
             onPseudoActiveStop
         }, refElementReturn
-    })
+    });
+
+    const mcp1:  UseListNavigationSingleSelectionChildInfo<ChildElement> = {
+        disabled,
+        focusSelf,
+        getElement,
+        getSelected,
+        getTabbable,
+        hidden,
+        index,
+        selected,
+        setSelected,
+        setTabbable,
+        tabbable
+    }
 
     useManagedChild<M>({
         managedChildContext,
         managedChildParameters: {
-            disabled,
-            focusSelf,
-            getElement,
-            getSelected,
-            getTabbable,
-            hidden,
-            index,
-            selected,
-            setSelected,
-            setTabbable,
-            tabbable
-        }
+            ...mcp1,
+            ...completeListNavigationChildParameters
+        } as M
     })
 
     const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2 } } = useChildrenHaveFocusChild({ childrenHaveFocusChildContext });
