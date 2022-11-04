@@ -22,6 +22,7 @@
     },
     "dependencies": {
         "clsx": "^1.2.1",
-        "preact": "^10.11.1"
+        "preact": "^10.11.1",
+        "tslib": "^2.4.1"
     }
 }

@@ -230,7 +230,7 @@ export const DemoUseRovingTabIndex = memo(() => {
     const [tabbableIndex, setLocalTabbableIndex] = useState<number | null>(0);
 
 
-    const r: UseCompleteListNavigationReturnType<HTMLUListElement, HTMLLIElement, M> = useCompleteListNavigation<HTMLUListElement, HTMLLIElement>({
+    const r: UseCompleteListNavigationReturnType<HTMLUListElement, HTMLLIElement, M> = useCompleteListNavigation<HTMLUListElement, HTMLLIElement, UseListNavigationSingleSelectionChildInfo<HTMLLIElement>>({
         linearNavigationParameters: { disableArrowKeys: false, disableHomeEndKeys: false, navigationDirection: "vertical" },
         rearrangeableChildrenParameters: {
             getIndex: useCallback<GetIndex<{ index: number }>>((a: VNode<{ index: number }>) => a.props.index, []),
@@ -418,7 +418,7 @@ const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
     const selectionMode = useContext(SelectionModeContext);
     const hidden = (index == 7);
     const [randomWord] = useState(() => RandomWords[index/*Math.floor(Math.random() * (RandomWords.length - 1))*/]);
-    const { managedChildContext, rovingTabIndexChildContext, childrenHaveFocusChildContext, typeaheadNavigationChildContext, singleSelectionContext } = useContext(ListNavigationSingleSelectionChildContext);
+    const { managedChildContext, rovingTabIndexChildContext, childrenHaveFocusChildContext, typeaheadNavigationChildContext, singleSelectionContext } = useContext(ListNavigationSingleSelectionChildContext) as CompleteListNavigationContext<HTMLUListElement, HTMLLIElement, UseListNavigationSingleSelectionChildInfo<HTMLLIElement>>;
     const text = `${randomWord} This is item #${index}${hidden ? " (hidden)" : ""}`;
     const focusSelf = useCallback((e: HTMLElement) => { e.focus() }, []);
    // const { refElementReturn } = useRefElement<HTMLLIElement>({ refElementParameters: { onElementChange: undefined } });
@@ -429,7 +429,7 @@ const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
         props,
         rovingTabIndexChildReturn: { tabbable, propsUnstable: p2 },
         singleSelectionChildReturn: { selected }
-     } = useCompleteListNavigationChild<HTMLLIElement>({
+     } = useCompleteListNavigationChild<HTMLLIElement, UseListNavigationSingleSelectionChildInfo<HTMLLIElement>>({
         childrenHaveFocusChildContext,
         managedChildContext,
         managedChildParameters: { disabled, hidden, index },
@@ -438,7 +438,8 @@ const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
         singleSelectionChildContext: singleSelectionContext,
         singleSelectionChildParameters: { ariaPropName: "aria-selected", selectionMode },
         typeaheadNavigationChildContext,
-        typeaheadNavigationChildParameters: { text }
+        typeaheadNavigationChildParameters: { text },
+        completeListNavigationChildParameters: {  }
     });
 
     /*

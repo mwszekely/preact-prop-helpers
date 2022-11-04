@@ -5544,6 +5544,7 @@
      * @returns
      */
     function useCompleteListNavigation({ rearrangeableChildrenParameters, linearNavigationParameters, ...completeListNavigationParameters }) {
+        //type M = UseListNavigationSingleSelectionChildInfo<ChildElement>;
         const getChildren = T$1(() => managedChildrenReturn.getChildren(), []);
         const getHighestChildIndex = T$1(() => getChildren().getHighestIndex(), []);
         const { childrenHaveFocusParameters, managedChildrenParameters, rovingTabIndexChildContext, typeaheadNavigationChildContext, singleSelectionContext, ...listNavigationSingleSelectionSortableReturn } = useListNavigationSingleSelectionSortable({
@@ -5571,7 +5572,7 @@
             childrenHaveFocusReturn
         };
     }
-    function useCompleteListNavigationChild({ managedChildParameters: { disabled, hidden, index }, singleSelectionChildParameters, typeaheadNavigationChildParameters, rovingTabIndexChildContext, singleSelectionChildContext, typeaheadNavigationChildContext, managedChildContext, childrenHaveFocusChildContext, pressParameters: { exclude, focusSelf, onPseudoActiveStart, onPseudoActiveStop } }) {
+    function useCompleteListNavigationChild({ managedChildParameters: { disabled, hidden, index }, completeListNavigationChildParameters, singleSelectionChildParameters, typeaheadNavigationChildParameters, rovingTabIndexChildContext, singleSelectionChildContext, typeaheadNavigationChildContext, managedChildContext, childrenHaveFocusChildContext, pressParameters: { exclude, focusSelf, onPseudoActiveStart, onPseudoActiveStop } }) {
         const { refElementReturn } = useRefElement({ refElementParameters: {} });
         const { getElement } = refElementReturn;
         const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1 }, managedChildParameters: { getSelected, selected, setSelected }, pressParameters, rovingTabIndexChildReturn, singleSelectionChildReturn } = useListNavigationSingleSelectionSortableChild({
@@ -5592,20 +5593,24 @@
                 onPseudoActiveStop
             }, refElementReturn
         });
+        const mcp1 = {
+            disabled,
+            focusSelf,
+            getElement,
+            getSelected,
+            getTabbable,
+            hidden,
+            index,
+            selected,
+            setSelected,
+            setTabbable,
+            tabbable
+        };
         useManagedChild({
             managedChildContext,
             managedChildParameters: {
-                disabled,
-                focusSelf,
-                getElement,
-                getSelected,
-                getTabbable,
-                hidden,
-                index,
-                selected,
-                setSelected,
-                setTabbable,
-                tabbable
+                ...mcp1,
+                ...completeListNavigationChildParameters
             }
         });
         const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2 } } = useChildrenHaveFocusChild({ childrenHaveFocusChildContext });
@@ -5988,7 +5993,8 @@
             singleSelectionChildContext: singleSelectionContext,
             singleSelectionChildParameters: { ariaPropName: "aria-selected", selectionMode },
             typeaheadNavigationChildContext,
-            typeaheadNavigationChildParameters: { text }
+            typeaheadNavigationChildParameters: { text },
+            completeListNavigationChildParameters: {}
         });
         /*
             const {
