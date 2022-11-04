@@ -49,7 +49,7 @@ export interface UseListNavigationSingleSelectionChildReturnType<ChildElement ex
 export function useListNavigationSingleSelectionChild<ChildElement extends Element>({
     managedChildParameters: { hidden, index, disabled, ..._void5 },
     singleSelectionChildParameters,
-    singleSelectionChildContext,
+    singleSelectionContext,
     typeaheadNavigationChildParameters,
     rovingTabIndexChildContext,
     typeaheadNavigationChildContext,
@@ -62,7 +62,7 @@ export function useListNavigationSingleSelectionChild<ChildElement extends Eleme
     } = useSingleSelectionChild<ChildElement>({
         managedChildParameters: { index, disabled },
         singleSelectionChildParameters,
-        singleSelectionChildContext
+        singleSelectionContext
     });
 
     const {

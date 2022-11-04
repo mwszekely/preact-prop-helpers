@@ -25,7 +25,7 @@ export interface UseSingleSelectionContext {
 export interface SelectableChildInfo<E extends Element> extends UseRovingTabIndexChildInfo<E> {
     selected: boolean;
     getSelected(): boolean;
-    setSelected: StateUpdater<boolean>;
+    setSelected(selected: boolean): void;
 
     /**
      * This is similar to `hidden` for `useRovingTabIndex`, but for selection.
@@ -49,7 +49,7 @@ export interface UseSingleSelectionParameters<ChildElement extends Element> {
 
 export interface UseSingleSelectionChildParameters<E extends Element> {
     managedChildParameters: Pick<UseManagedChildParameters<SelectableChildInfo<E>>["managedChildParameters"], "index" | "disabled">;
-    singleSelectionChildContext: UseSingleSelectionReturnType["singleSelectionContext"];
+    singleSelectionContext: UseSingleSelectionReturnType["singleSelectionContext"];
     singleSelectionChildParameters: {
         selectionMode: "focus" | "activation" | "disabled";
         ariaPropName: `aria-${"pressed" | "selected" | "checked"}` | null;
@@ -62,7 +62,9 @@ export interface UseSingleSelectionChildReturnTypeInfo<E extends Element> extend
         // but we're keeping them because RTI does the same thing, and it's convenient.
         selected: boolean,
         getSelected(): boolean;
-        setSelected: PassiveStateUpdater<boolean>;
+        // Used to programmatically set this as the selected element;
+        // it requests the parent to actually change the numeric index to this one's.
+        setSelected: () => void;
         propsUnstable: h.JSX.HTMLAttributes<E>;
     }
     //refElementParameters: Required<Pick<UseRefElementParameters<E>["refElementParameters"], "onElementChange">>;
@@ -140,7 +142,7 @@ export function useSingleSelection<ChildElement extends Element>({
 export function useSingleSelectionChild<ChildElement extends Element>(args: UseSingleSelectionChildParameters<ChildElement>): UseSingleSelectionChildReturnTypeWithHooks<ChildElement> {
     const {
         managedChildParameters: { index, disabled },
-        singleSelectionChildContext: { getSelectedIndex, setSelectedIndex },
+        singleSelectionContext: { getSelectedIndex, setSelectedIndex },
         singleSelectionChildParameters: { ariaPropName, selectionMode },
     } = args;
 
@@ -154,11 +156,14 @@ export function useSingleSelectionChild<ChildElement extends Element>(args: UseS
         }
     });
 
-    const onPressSync = (disabled ? null : (() => { setSelectedIndex(getIndex()); }));
+    const onPressSync = useStableCallback((() => {
+        if (!disabled)
+            setSelectedIndex(getIndex());
+    }));
 
     return {
         managedChildParameters: { selected, setSelected, getSelected, },
-        singleSelectionChildReturn: { selected, setSelected, getSelected, propsUnstable: { [ariaPropName as keyof h.JSX.HTMLAttributes<any>]: (selected ?? false).toString() } },
+        singleSelectionChildReturn: { selected, setSelected: useCallback(() => { setSelectedIndex(getIndex()) }, []), getSelected, propsUnstable: { [ariaPropName as keyof h.JSX.HTMLAttributes<any>]: (selected ?? false).toString() } },
         pressParameters: { onPressSync },
         hasCurrentFocusParameters: { onCurrentFocusedInnerChanged }
     }

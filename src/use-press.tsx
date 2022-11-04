@@ -18,7 +18,15 @@ interface PP<E extends Node> {
      * This must be a sync event handler; async handlers must be taken care of externally.
      */
     onPressSync: ((e: h.JSX.TargetedEvent<E>) => void) | null | undefined;
-    exclude: undefined | { click?: "exclude" | undefined, space?: "exclude" | undefined, enter?: "exclude" | undefined };
+
+    /**
+     * Whether certain methods of pressing this component should be deactivated.
+     * 
+     * For example, during typeahead, the space key shouldn't count as a press, it should just count for the search.
+     * 
+     * If true, then all presses are disabled.  If false/undefined/null, no presses are disabled.
+     */
+    exclude: undefined | boolean | { click?: "exclude" | undefined, space?: "exclude" | undefined, enter?: "exclude" | undefined };
     focusSelf(element: E): void;
     onPseudoActiveStart: null | undefined | (() => void);
     onPseudoActiveStop: null | undefined | (() => void);
@@ -62,8 +70,8 @@ export function usePress<E extends Element>(args: UsePressParameters<E, never>):
         pressParameters: { exclude, focusSelf, onPressSync, onPseudoActiveStart, onPseudoActiveStop }
     } = args;
 
-    const stableOnPseudoActiveStart = useStableCallback(onPseudoActiveStart ?? (() => {}));
-    const stableOnPseudoActiveStop = useStableCallback(onPseudoActiveStop ?? (() => {}));
+    const stableOnPseudoActiveStart = useStableCallback(onPseudoActiveStart ?? (() => { }));
+    const stableOnPseudoActiveStop = useStableCallback(onPseudoActiveStop ?? (() => { }));
 
     // A button can be activated in multiple ways, so on the off chance
     // that multiple are triggered at once, we only *actually* register
@@ -306,8 +314,11 @@ export function setPressVibrate(func: () => void) {
 
 
 
-function excludes(target: "click" | "space" | "enter", exclude: undefined | { click?: "exclude" | undefined, space?: "exclude" | undefined, enter?: "exclude" | undefined }) {
-    if (exclude?.[target])
+function excludes(target: "click" | "space" | "enter", exclude: undefined | boolean | { click?: "exclude" | undefined, space?: "exclude" | undefined, enter?: "exclude" | undefined }) {
+    if (exclude === false)
+        return false;
+
+    if (exclude === true || exclude?.[target])
         return true;
 
     return false;

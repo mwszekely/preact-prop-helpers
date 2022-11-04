@@ -13,8 +13,10 @@ const _dummy = 0;
 export interface GridSingleSelectSortableChildRowInfo<RowElement extends Element> extends GridSingleSelectChildRowInfo<RowElement> { }
 export interface GridSingleSelectSortableChildCellInfo<CellElement extends Element> extends GridSingleSelectChildCellInfo<CellElement> { }
 
-export interface UseGridNavigationSingleSelectionSortableParameters<RowElement extends Element, M extends GridSingleSelectChildRowInfo<RowElement>> extends UseGridNavigationSingleSelectionParameters<RowElement, M>, UseSortableChildrenParameters<M> { }
-export interface UseGridNavigationSingleSelectionSortableReturnType<ParentOrRowElement extends Element, RowElement extends Element, M extends GridSingleSelectChildRowInfo<RowElement>> extends UseGridNavigationSingleSelectionReturnType<ParentOrRowElement, RowElement>, UseSortableChildrenReturnType<ParentOrRowElement, M> { }
+export interface UseGridNavigationSingleSelectionSortableParameters<RowElement extends Element, M extends GridSingleSelectChildRowInfo<RowElement>> extends Omit<UseGridNavigationSingleSelectionParameters<RowElement, M>, "linearNavigationParameters">, UseSortableChildrenParameters<M> {
+    linearNavigationParameters: Omit<UseGridNavigationSingleSelectionParameters<RowElement, M>["linearNavigationParameters"], "navigateAbsolute" | "navigateRelative">
+}
+export interface UseGridNavigationSingleSelectionSortableReturnType<ParentOrRowElement extends Element, RowElement extends Element, M extends GridSingleSelectChildRowInfo<RowElement>> extends UseGridNavigationSingleSelectionReturnType<ParentOrRowElement, RowElement>, Omit<UseSortableChildrenReturnType<ParentOrRowElement, M>, "linearNavigationParameters"> { }
 export interface UseGridNavigationSingleSelectionSortableRowParameters<RowElement extends Element, CellElement extends Element, _RM extends GridSingleSelectChildRowInfo<RowElement>, CM extends GridSingleSelectChildCellInfo<CellElement>> extends UseGridNavigationSingleSelectionRowParameters<RowElement, CellElement, _RM, CM> { }
 export interface UseGridNavigationSingleSelectionSortableRowReturnType<RowElement extends Element, CellElement extends Element> extends UseGridNavigationSingleSelectionRowReturnType<RowElement, CellElement> { }
 export interface UseGridNavigationSingleSelectionSortableCellParameters<CellElement extends Element> extends UseGridNavigationCellParameters<CellElement> { }
@@ -23,10 +25,14 @@ export interface UseGridNavigationSingleSelectionSortableCellReturnType<CellElem
 export function useGridNavigationSingleSelectionSortable<ParentOrRowElement extends Element, RowElement extends Element, M extends GridSingleSelectSortableChildRowInfo<RowElement>>({
     rearrangeableChildrenParameters,
     sortableChildrenParameters,
+    linearNavigationParameters,
     ...gridNavigationSingleSelectionParameters
 }: UseGridNavigationSingleSelectionSortableParameters<RowElement, M>): UseGridNavigationSingleSelectionSortableReturnType<ParentOrRowElement, RowElement, M> {
-    const gnr = useGridNavigationSingleSelection<ParentOrRowElement, RowElement, M>(gridNavigationSingleSelectionParameters);
-    const scr = useSortableChildren<ParentOrRowElement, M>({ rearrangeableChildrenParameters, sortableChildrenParameters });
+    const { linearNavigationParameters: { navigateAbsolute, navigateRelative }, ...scr } = useSortableChildren<ParentOrRowElement, M>({ rearrangeableChildrenParameters, sortableChildrenParameters });
+    const gnr = useGridNavigationSingleSelection<ParentOrRowElement, RowElement, M>({
+        linearNavigationParameters: { navigateAbsolute, navigateRelative, ...linearNavigationParameters },
+        ...gridNavigationSingleSelectionParameters
+    });
 
     return { ...gnr, ...scr, }
 }

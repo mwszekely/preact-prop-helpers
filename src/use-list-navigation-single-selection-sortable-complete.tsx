@@ -10,7 +10,7 @@ import { useStableCallback } from "./use-stable-callback";
 import { useStableObject } from "./use-stable-getter";
 import { useManagedChild, UseManagedChildParameters, useManagedChildren, UseManagedChildrenReturnType } from "./use-child-manager";
 import { UseListNavigationSingleSelectionChildInfo } from "./use-list-navigation-single-selection";
-import { UseListNavigationChildParameters } from "use-list-navigation";
+import { UseListNavigationChildParameters } from "./use-list-navigation";
 
 
 export interface UseCompleteListNavigationParameters<ParentElement extends Element, ChildElement extends Element, M extends UseListNavigationSingleSelectionChildInfo<ChildElement>> extends Pick<UseListNavigationSingleSelectionSortableParameters<ParentElement, ChildElement, M>, "rovingTabIndexParameters" | "singleSelectionParameters" | "sortableChildrenParameters" | "typeaheadNavigationParameters"> {
@@ -89,7 +89,7 @@ export function useCompleteListNavigation<ParentElement extends Element, ChildEl
     }
 }
 
-export interface UseCompleteListNavigationChildParameters<ChildElement extends Element, M extends UseListNavigationSingleSelectionChildInfo<ChildElement>> extends Pick<UseListNavigationSingleSelectionSortableChildParameters<ChildElement>, "typeaheadNavigationChildContext" | "singleSelectionChildContext" | "rovingTabIndexChildContext" | "managedChildParameters" | "singleSelectionChildParameters" | "typeaheadNavigationChildParameters"> {
+export interface UseCompleteListNavigationChildParameters<ChildElement extends Element, M extends UseListNavigationSingleSelectionChildInfo<ChildElement>> extends Pick<UseListNavigationSingleSelectionSortableChildParameters<ChildElement>, "typeaheadNavigationChildContext" | "singleSelectionContext" | "rovingTabIndexChildContext" | "managedChildParameters" | "singleSelectionChildParameters" | "typeaheadNavigationChildParameters"> {
     managedChildContext: UseManagedChildParameters<M>["managedChildContext"];
     pressParameters: Omit<UsePressParameters<ChildElement, never>["pressParameters"], "onPressSync">;
     childrenHaveFocusChildContext: UseChildrenHaveFocusChildParameters["childrenHaveFocusChildContext"];
@@ -109,7 +109,7 @@ export function useCompleteListNavigationChild<ChildElement extends Element, M e
     singleSelectionChildParameters,
     typeaheadNavigationChildParameters,
     rovingTabIndexChildContext,
-    singleSelectionChildContext,
+    singleSelectionContext,
     typeaheadNavigationChildContext,
     managedChildContext,
     childrenHaveFocusChildContext,
@@ -127,7 +127,7 @@ export function useCompleteListNavigationChild<ChildElement extends Element, M e
     } = useListNavigationSingleSelectionSortableChild<ChildElement>({
         managedChildParameters: { disabled, hidden, index },
         rovingTabIndexChildContext,
-        singleSelectionChildContext,
+        singleSelectionContext,
         singleSelectionChildParameters,
         typeaheadNavigationChildContext,
         typeaheadNavigationChildParameters

@@ -435,7 +435,7 @@ const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
         managedChildParameters: { disabled, hidden, index },
         pressParameters: { exclude: {}, focusSelf, onPseudoActiveStart: null, onPseudoActiveStop: null },
         rovingTabIndexChildContext,
-        singleSelectionChildContext: singleSelectionContext,
+        singleSelectionContext: singleSelectionContext,
         singleSelectionChildParameters: { ariaPropName: "aria-selected", selectionMode },
         typeaheadNavigationChildContext,
         typeaheadNavigationChildParameters: { text },

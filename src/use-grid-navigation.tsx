@@ -73,10 +73,11 @@ export interface UseGridNavigationCellParameters<CellElement extends Element> ex
     }
     gridNavigationCellContext: {
         gridNavigationCellParameters: {
-            setTabbableRow: (fromUserInteraction: boolean) => void;
+            getRowIndex: () => number;
+            setTabbableRow: (u: Parameters<StateUpdater<number | null>>[0], fromUserInteraction: boolean) => void;
             getCurrentTabbableColumn: () => (number | null);
             setCurrentTabbableColumn: PassiveStateUpdater<number | null>;
-            setTabbableColumn: (updater: Parameters<StateUpdater<number | null>>[0], fromUserInteraction: boolean) => void;
+            setTabbableCell: (updater: Parameters<StateUpdater<number | null>>[0], fromUserInteraction: boolean) => void;
         }
     }
 }
@@ -147,6 +148,7 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
     ..._void1
 }: UseGridNavigationRowParameters<RowElement, CellElement, RM, CM>): UseGridNavigationRowReturnType<RowElement, CellElement> {
     const { managedChildrenReturn: { getChildren } } = asChildRowOfTable;
+    const getIndex = useStableCallback(() => { return asChildRowOfTable.managedChildParameters.index })
     const focusSelf = useStableCallback((e: RowElement) => {
         let index = (getCurrentTabbableColumn() ?? 0);
         let child = getChildren().getAt(index);
@@ -169,20 +171,20 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
 
     assertEmptyObject(_void1);
 
-    const getIndex = useStableGetter(asChildRowOfTable.managedChildParameters.index);
     const { rovingTabIndexReturn: { setTabbableIndex } } = lnr;
     const gridNavigationCellContext = useStableObject({
         gridNavigationCellParameters: useStableObject({
-            setTabbableRow: useCallback((fromUserInteraction: boolean) => { setTabbableRow(getIndex(), fromUserInteraction) }, []),
+            setTabbableRow,
+            getRowIndex: getIndex,
             getCurrentTabbableColumn,
             setCurrentTabbableColumn,
-            setTabbableColumn: setTabbableIndex
+            setTabbableCell: setTabbableIndex
         })
     })
 
     return {
-        asChildRowReturn: { ...lncr, managedChildParameters: { focusSelf, setTabbableColumnIndex: setTabbableIndex }, },
-        asParentRowReturn: { ...lnr, gridNavigationCellContext }
+        asChildRowReturn: { managedChildParameters: { focusSelf, setTabbableColumnIndex: setTabbableIndex }, ...lncr, },
+        asParentRowReturn: { gridNavigationCellContext, ...lnr }
     }
 
 }
@@ -198,10 +200,11 @@ export function useGridNavigationCell<CellElement extends Element>({
     },
     gridNavigationCellContext: {
         gridNavigationCellParameters: {
+            getRowIndex,
             setTabbableRow,
             getCurrentTabbableColumn: _getCurrentColumn,
             setCurrentTabbableColumn,
-            setTabbableColumn
+            setTabbableCell
         }
     },
     ..._void1
@@ -227,9 +230,9 @@ export function useGridNavigationCell<CellElement extends Element>({
                 ocfic1?.(focused, prev);
 
                 if (focused) {
-                    setTabbableRow(false);
+                    setTabbableRow(getRowIndex(), false);
                     setCurrentTabbableColumn(index);
-                    setTabbableColumn(prev => {
+                    setTabbableCell(prev => {
                         if (prev != null && (prev < index || prev > index + colSpan)) {
                             return prev;
                         }
