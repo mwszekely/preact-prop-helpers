@@ -262,7 +262,7 @@ export function useBackdropDismiss<PopupElement extends Element>({ backdropDismi
     useGlobalHandler(window, "touchstart", open ? onBackdropClick : null, { capture: true });
 }
 
-type DismissListenerTypes = "backdrop" | "lost-focus" | "escape";
+export type DismissListenerTypes = "backdrop" | "lost-focus" | "escape";
 
 export interface UseDismissParameters<Listeners extends DismissListenerTypes> {
     dismissParameters: {

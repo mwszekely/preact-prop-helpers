@@ -5,6 +5,7 @@ export { useAsyncEffect } from "./use-async-effect";
 export { AsyncHandler, useAsyncHandler, UseAsyncHandlerParameters, UseAsyncHandlerReturnType } from "./use-async-handler";
 export { assertEmptyObject, ChildFlagOperations, ManagedChildInfo, ManagedChildren, OnAfterChildLayoutEffect, OnChildrenMountChange, useChildrenFlag, UseChildrenFlagParameters, UseChildrenFlagReturnType, useManagedChild, UseManagedChild, UseManagedChildParameters, useManagedChildren, UseManagedChildrenContext, UseManagedChildrenParameters, UseManagedChildrenReturnType, UseManagedChildReturnType } from "./use-child-manager";
 export { useChildrenHaveFocus, useChildrenHaveFocusChild, UseChildrenHaveFocusChildParameters, UseChildrenHaveFocusChildReturnType, UseChildrenHaveFocusParameters, UseChildrenHaveFocusReturnTypeInfo, UseChildrenHaveFocusReturnTypeWithHooks } from "./use-children-have-focus";
+export { DismissListenerTypes, useBackdropDismiss, UseBackdropDismissParameters, useDismiss, UseDismissParameters, useEscapeDismiss, UseEscapeDismissParameters, useLostFocusDismiss, UseLostFocusDismissParameters, UseLostFocusDismissReturnType } from "./use-dismiss";
 export { getDocument, useDocumentClass } from "./use-document-class";
 export { useDraggable, UseDraggableParameters, UseDraggableReturnType } from "./use-draggable";
 export { DropFile, DropFileMetadata, DroppableFileError, useDroppable, UseDroppableParameters, UseDroppableReturnType } from "./use-droppable";
@@ -42,7 +43,6 @@ export { generateRandomId, useRandomId, UseRandomIdParameters, UseRandomIdParame
 export { useRefElement, UseRefElementParameters, UseRefElementReturnType } from "./use-ref-element";
 export { OnTabbableIndexChange, RovingTabIndexChildContext, useRovingTabIndex, useRovingTabIndexChild, UseRovingTabIndexChild, UseRovingTabIndexChildInfo, UseRovingTabIndexChildParameters, UseRovingTabIndexChildReturnType, UseRovingTabIndexParameters, UseRovingTabIndexReturnType } from "./use-roving-tabindex";
 export { SelectableChildInfo, useSingleSelection, useSingleSelectionChild, UseSingleSelectionChild, UseSingleSelectionChildParameters, UseSingleSelectionChildReturnTypeInfo, UseSingleSelectionChildReturnTypeWithHooks, UseSingleSelectionParameters, UseSingleSelectionReturnType } from "./use-single-selection";
-export { useBackdropDismiss, UseBackdropDismissParameters, useDismiss, UseDismissParameters, useEscapeDismiss, UseEscapeDismissParameters, useLostFocusDismiss, UseLostFocusDismissParameters, UseLostFocusDismissReturnType } from "./use-soft-dismiss";
 export { Compare, GetHighestChildIndex, GetIndex, GetValid, tryNavigateToIndex, TryNavigateToIndexParameters, useRearrangeableChildren, UseRearrangeableChildrenParameters, UseRearrangeableChildrenReturnType, useSortableChildren, UseSortableChildrenParameters, UseSortableChildrenReturnType } from "./use-sortable-children";
 export { useStableCallback } from "./use-stable-callback";
 export { useStableGetter, useStableObject } from "./use-stable-getter";

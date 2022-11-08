@@ -1532,287 +1532,6 @@ var bundle = (function (exports) {
         };
     }
 
-    function r(e){var t,f,n="";if("string"==typeof e||"number"==typeof e)n+=e;else if("object"==typeof e)if(Array.isArray(e))for(t=0;t<e.length;t++)e[t]&&(f=r(e[t]))&&(n&&(n+=" "),n+=f);else for(t in e)e[t]&&(n&&(n+=" "),n+=t);return n}function clsx(){for(var e,t,f=0,n="";f<arguments.length;)(e=arguments[f++])&&(t=r(e))&&(n&&(n+=" "),n+=t);return n}
-
-    function getDocument$1(element) { return (element?.ownerDocument ?? document ?? window.document ?? globalThis.document); }
-
-    function useDraggable({ effectAllowed, data, dragImage, dragImageXOffset, dragImageYOffset }) {
-        const [dragging, setDragging, getDragging] = useState(false);
-        const [lastDropEffect, setLastDropEffect, getLastDropEffect] = useState(null);
-        const onDragStart = (e) => {
-            //e.preventDefault();
-            setDragging(true);
-            if (e.dataTransfer) {
-                e.dataTransfer.effectAllowed = (effectAllowed ?? "all");
-                if (dragImage)
-                    e.dataTransfer.setDragImage(dragImage, dragImageXOffset ?? 0, dragImageYOffset ?? 0);
-                const entries = Object.entries(data);
-                for (const [mimeType, data] of entries) {
-                    e.dataTransfer.setData(mimeType, data);
-                }
-            }
-        };
-        const onDragEnd = (e) => {
-            e.preventDefault();
-            setDragging(false);
-            if (e.dataTransfer) {
-                if (e.dataTransfer.dropEffect != "none") {
-                    setLastDropEffect(e.dataTransfer.dropEffect);
-                }
-                else {
-                    setLastDropEffect(null);
-                }
-            }
-        };
-        // Return both the element and the hook that modifies 
-        // the props and allows us to actually find the element
-        const ret = {
-            propsUnstable: {
-                draggable: true,
-                onDragStart,
-                onDragEnd
-            },
-            dragging,
-            getDragging,
-            lastDropEffect,
-            getLastDropEffect
-        };
-        return ret;
-    }
-
-    class DroppableFileError extends Error {
-        fileName;
-        errorType;
-        constructor(fileName, base) {
-            super(base?.message ?? "An unspecified error occurred reading the file.");
-            this.fileName = fileName;
-            this.errorType = base?.name;
-        }
-    }
-    function useDroppable({ effect }) {
-        const [filesForConsideration, setFilesForConsideration] = useState(null);
-        const [stringsForConsideration, setStringsForConsideration] = useState(null);
-        const [droppedFiles, setDroppedFiles] = useState(null);
-        const [droppedStrings, setDroppedStrings] = useState(null);
-        const [dropError, setDropError] = useState(undefined);
-        // All the promises generated from the drop events.
-        // Used to process multiple drop events in succession
-        const dropPromisesRef = A([]);
-        const [currentPromiseIndex, setCurrentPromiseIndex, getCurrentPromiseIndex] = useState(-1);
-        const [promiseCount, setPromiseCount, getPromiseCount] = useState(0);
-        // Any time we add a new promise, if there's no current promise running, we need to start one.
-        // If there is one, then we don't need to do anything, since it runs the same check.
-        s(() => {
-            const currentPromiseIndex = getCurrentPromiseIndex();
-            const promiseCount = getPromiseCount();
-            if (promiseCount > 0) {
-                if ((currentPromiseIndex + 1) < promiseCount) {
-                    setCurrentPromiseIndex(i => ++i);
-                }
-            }
-        }, [promiseCount]);
-        // Anytime our current promise changes,
-        // wait for it to finish, then set our state to its result.
-        // Finally, check to see if there are anymore promises.
-        // If there are, then increase currentPromiseCount,
-        // which will trigger this again.
-        //
-        // This shouldn't happen *often*, but maybe in the case of
-        // individually dropping a bunch of large files or something.
-        s(() => {
-            if (currentPromiseIndex >= 0) {
-                const currentPromise = dropPromisesRef.current[currentPromiseIndex];
-                currentPromise.then((info) => {
-                    if (info !== null) {
-                        const { files, strings } = info;
-                        setDroppedFiles(files);
-                        setDroppedStrings(strings);
-                    }
-                    // Now that we're done, are there more promises in the queue?
-                    const currentPromiseIndex = getCurrentPromiseIndex();
-                    const promiseCount = getPromiseCount();
-                    if ((currentPromiseIndex + 1) < promiseCount) {
-                        // Since this promise has started, more have been added.
-                        // Run this effect again.
-                        setCurrentPromiseIndex(i => ++i);
-                    }
-                });
-            }
-        }, [currentPromiseIndex]);
-        // Handle collecting the current file metadata or MIME types.
-        const onDragEnter = useStableCallback((e) => {
-            e.preventDefault();
-            if (e.dataTransfer) {
-                // Is there a default? I can't find one anywhere.
-                e.dataTransfer.dropEffect = (effect ?? "move");
-                const newMimeTypes = new Set();
-                const newFiles = new Array();
-                for (const item of e.dataTransfer?.items ?? []) {
-                    const { kind, type } = item;
-                    if (kind === "string") {
-                        newMimeTypes.add(type);
-                    }
-                    else if (kind === "file") {
-                        newFiles.push({ type: item.type });
-                    }
-                }
-                setFilesForConsideration(newFiles);
-                setStringsForConsideration(newMimeTypes);
-            }
-        });
-        // Handle resetting the current file metadata or MIME types
-        const onDragLeave = useStableCallback((e) => {
-            e.preventDefault();
-            setFilesForConsideration(null);
-            setStringsForConsideration(null);
-        });
-        // Boilerplate, I guess
-        const onDragOver = useStableCallback((e) => {
-            e.preventDefault();
-        });
-        // Handle getting the drop data asynchronously
-        const onDrop = useStableCallback((e) => {
-            e.preventDefault();
-            setFilesForConsideration(null);
-            setStringsForConsideration(null);
-            const allPromises = new Array();
-            const dropData = {};
-            const dropFile = [];
-            for (const item of e.dataTransfer?.items ?? []) {
-                const { kind, type } = item;
-                if (kind === "string") {
-                    allPromises.push((new Promise((resolve, _reject) => item.getAsString(resolve))).then(str => dropData[type] = str));
-                }
-                else if (kind === "file") {
-                    const file = item.getAsFile();
-                    if (file) {
-                        allPromises.push(new Promise((resolve, reject) => {
-                            const reader = new FileReader();
-                            reader.onload = (_) => {
-                                resolve();
-                                const data = reader.result;
-                                dropFile.push({ data, name: file.name, type: file.type, size: data.byteLength, lastModified: file.lastModified });
-                            };
-                            reader.onerror = (_) => { reject(new DroppableFileError(file.name, reader.error)); };
-                            reader.onabort = (_) => { reject(new DroppableFileError(file.name, reader.error)); };
-                            reader.readAsArrayBuffer(file);
-                        }));
-                        dropFile.push();
-                    }
-                }
-            }
-            dropPromisesRef.current.push(Promise.all(allPromises).then(() => {
-                setPromiseCount(i => ++i);
-                setDropError(null);
-                return {
-                    strings: dropData,
-                    files: dropFile
-                };
-            }).catch(ex => {
-                /* eslint-disable no-debugger */
-                debugger;
-                setPromiseCount(i => ++i);
-                setDropError(ex);
-                return null;
-            }));
-        });
-        const propsStable = A({ onDragEnter, onDragLeave, onDragOver, onDrop });
-        return {
-            propsStable: propsStable.current,
-            filesForConsideration,
-            stringsForConsideration,
-            droppedFiles,
-            droppedStrings,
-            dropError
-        };
-    }
-
-    /*
-    export function useRefElementProps<E extends Element>(r: UseRefElementReturnType<E>, ...otherProps: h.JSX.HTMLAttributes<E>[]): h.JSX.HTMLAttributes<E>[] {
-        return [r.refElementReturn.propsStable, ...otherProps];
-    }*/
-    /**
-     * Allows accessing the element a ref references as soon as it does so.
-     * *This hook itself returns a hook*--useRefElementProps modifies the props that you were going to pass to an HTMLElement,
-     * adding a RefCallback and merging it with any existing ref that existed on the props.
-     *
-     * Don't forget to provide the Element as the type argument!
-     *
-     * @returns The element, and the sub-hook that makes it retrievable.
-     */
-    function useRefElement(args) {
-        const { refElementParameters: { onElementChange, onMount, onUnmount } } = args;
-        useEnsureStability("useRefElement", onElementChange, onMount, onUnmount);
-        // Called (indirectly) by the ref that the element receives.
-        const handler = q$1((e, prevValue) => {
-            const cleanup = onElementChange?.(e, prevValue);
-            if (prevValue)
-                onUnmount?.(prevValue);
-            if (e)
-                onMount?.(e);
-            return cleanup;
-        }, []);
-        // Let us store the actual (reference to) the element we capture
-        const [getElement, setElement] = usePassiveState(handler, returnNull, runImmediately);
-        const propsStable = A({ ref: setElement });
-        // Return both the element and the hook that modifies 
-        // the props and allows us to actually find the element
-        return {
-            refElementReturn: {
-                getElement,
-                propsStable: propsStable.current
-            }
-        };
-    }
-    function runImmediately(f) {
-        f();
-    }
-
-    function useElementSize({ elementSizeParameters: { getObserveBox, onSizeChange }, refElementParameters: { onElementChange, onMount, onUnmount } }) {
-        useEnsureStability("useElementSize", getObserveBox, onSizeChange, onElementChange, onMount, onUnmount);
-        const [getSize, setSize] = usePassiveState(onSizeChange, returnNull);
-        const currentObserveBox = A(undefined);
-        const needANewObserver = q$1((element, observeBox) => {
-            if (element) {
-                const document = getDocument$1(element);
-                const window = document.defaultView;
-                const handleUpdate = () => {
-                    if (element.isConnected) {
-                        const { clientWidth, scrollWidth, offsetWidth, clientHeight, scrollHeight, offsetHeight, clientLeft, scrollLeft, offsetLeft, clientTop, scrollTop, offsetTop } = element;
-                        setSize({ clientWidth, scrollWidth, offsetWidth, clientHeight, scrollHeight, offsetHeight, clientLeft, scrollLeft, offsetLeft, clientTop, scrollTop, offsetTop });
-                    }
-                };
-                if (window && ("ResizeObserver" in window)) {
-                    const observer = new ResizeObserver((_entries) => { handleUpdate(); });
-                    observer.observe(element, { box: observeBox });
-                    return () => observer.disconnect();
-                }
-                else {
-                    document.addEventListener("resize", handleUpdate, { passive: true });
-                    return () => document.removeEventListener("resize", handleUpdate);
-                }
-            }
-        }, []);
-        const { refElementReturn } = useRefElement({
-            refElementParameters: {
-                onElementChange: q$1((e, p) => { needANewObserver(e, getObserveBox?.()); onElementChange?.(e, p); }, []),
-                onMount,
-                onUnmount
-            }
-        });
-        const { getElement } = refElementReturn;
-        s(() => {
-            if (getObserveBox) {
-                if (currentObserveBox.current !== getObserveBox())
-                    needANewObserver(getElement(), getObserveBox());
-            }
-        });
-        return {
-            elementSizeReturn: { getSize },
-            refElementReturn
-        };
-    }
-
     function useMergedChildren({ children: lhs }, { children: rhs }) {
         if (lhs == null && rhs == null) {
             return undefined;
@@ -1827,6 +1546,8 @@ var bundle = (function (exports) {
             return h$1(p$1, {}, lhs, rhs);
         }
     }
+
+    function r(e){var t,f,n="";if("string"==typeof e||"number"==typeof e)n+=e;else if("object"==typeof e)if(Array.isArray(e))for(t=0;t<e.length;t++)e[t]&&(f=r(e[t]))&&(n&&(n+=" "),n+=f);else for(t in e)e[t]&&(n&&(n+=" "),n+=t);return n}function clsx(){for(var e,t,f=0,n="";f<arguments.length;)(e=arguments[f++])&&(t=r(e))&&(n&&(n+=" "),n+=t);return n}
 
     /**
      * Given two sets of props, merges their `class` and `className` properties.
@@ -2226,6 +1947,285 @@ var bundle = (function (exports) {
                 return () => target.removeEventListener(type, stableHandler, options);
             }
         }, [target, type, stableHandler]);
+    }
+
+    /*
+    export function useRefElementProps<E extends Element>(r: UseRefElementReturnType<E>, ...otherProps: h.JSX.HTMLAttributes<E>[]): h.JSX.HTMLAttributes<E>[] {
+        return [r.refElementReturn.propsStable, ...otherProps];
+    }*/
+    /**
+     * Allows accessing the element a ref references as soon as it does so.
+     * *This hook itself returns a hook*--useRefElementProps modifies the props that you were going to pass to an HTMLElement,
+     * adding a RefCallback and merging it with any existing ref that existed on the props.
+     *
+     * Don't forget to provide the Element as the type argument!
+     *
+     * @returns The element, and the sub-hook that makes it retrievable.
+     */
+    function useRefElement(args) {
+        const { refElementParameters: { onElementChange, onMount, onUnmount } } = args;
+        useEnsureStability("useRefElement", onElementChange, onMount, onUnmount);
+        // Called (indirectly) by the ref that the element receives.
+        const handler = q$1((e, prevValue) => {
+            const cleanup = onElementChange?.(e, prevValue);
+            if (prevValue)
+                onUnmount?.(prevValue);
+            if (e)
+                onMount?.(e);
+            return cleanup;
+        }, []);
+        // Let us store the actual (reference to) the element we capture
+        const [getElement, setElement] = usePassiveState(handler, returnNull, runImmediately);
+        const propsStable = A({ ref: setElement });
+        // Return both the element and the hook that modifies 
+        // the props and allows us to actually find the element
+        return {
+            refElementReturn: {
+                getElement,
+                propsStable: propsStable.current
+            }
+        };
+    }
+    function runImmediately(f) {
+        f();
+    }
+
+    function getDocument$1(element) { return (element?.ownerDocument ?? document ?? window.document ?? globalThis.document); }
+
+    function useDraggable({ effectAllowed, data, dragImage, dragImageXOffset, dragImageYOffset }) {
+        const [dragging, setDragging, getDragging] = useState(false);
+        const [lastDropEffect, setLastDropEffect, getLastDropEffect] = useState(null);
+        const onDragStart = (e) => {
+            //e.preventDefault();
+            setDragging(true);
+            if (e.dataTransfer) {
+                e.dataTransfer.effectAllowed = (effectAllowed ?? "all");
+                if (dragImage)
+                    e.dataTransfer.setDragImage(dragImage, dragImageXOffset ?? 0, dragImageYOffset ?? 0);
+                const entries = Object.entries(data);
+                for (const [mimeType, data] of entries) {
+                    e.dataTransfer.setData(mimeType, data);
+                }
+            }
+        };
+        const onDragEnd = (e) => {
+            e.preventDefault();
+            setDragging(false);
+            if (e.dataTransfer) {
+                if (e.dataTransfer.dropEffect != "none") {
+                    setLastDropEffect(e.dataTransfer.dropEffect);
+                }
+                else {
+                    setLastDropEffect(null);
+                }
+            }
+        };
+        // Return both the element and the hook that modifies 
+        // the props and allows us to actually find the element
+        const ret = {
+            propsUnstable: {
+                draggable: true,
+                onDragStart,
+                onDragEnd
+            },
+            dragging,
+            getDragging,
+            lastDropEffect,
+            getLastDropEffect
+        };
+        return ret;
+    }
+
+    class DroppableFileError extends Error {
+        fileName;
+        errorType;
+        constructor(fileName, base) {
+            super(base?.message ?? "An unspecified error occurred reading the file.");
+            this.fileName = fileName;
+            this.errorType = base?.name;
+        }
+    }
+    function useDroppable({ effect }) {
+        const [filesForConsideration, setFilesForConsideration] = useState(null);
+        const [stringsForConsideration, setStringsForConsideration] = useState(null);
+        const [droppedFiles, setDroppedFiles] = useState(null);
+        const [droppedStrings, setDroppedStrings] = useState(null);
+        const [dropError, setDropError] = useState(undefined);
+        // All the promises generated from the drop events.
+        // Used to process multiple drop events in succession
+        const dropPromisesRef = A([]);
+        const [currentPromiseIndex, setCurrentPromiseIndex, getCurrentPromiseIndex] = useState(-1);
+        const [promiseCount, setPromiseCount, getPromiseCount] = useState(0);
+        // Any time we add a new promise, if there's no current promise running, we need to start one.
+        // If there is one, then we don't need to do anything, since it runs the same check.
+        s(() => {
+            const currentPromiseIndex = getCurrentPromiseIndex();
+            const promiseCount = getPromiseCount();
+            if (promiseCount > 0) {
+                if ((currentPromiseIndex + 1) < promiseCount) {
+                    setCurrentPromiseIndex(i => ++i);
+                }
+            }
+        }, [promiseCount]);
+        // Anytime our current promise changes,
+        // wait for it to finish, then set our state to its result.
+        // Finally, check to see if there are anymore promises.
+        // If there are, then increase currentPromiseCount,
+        // which will trigger this again.
+        //
+        // This shouldn't happen *often*, but maybe in the case of
+        // individually dropping a bunch of large files or something.
+        s(() => {
+            if (currentPromiseIndex >= 0) {
+                const currentPromise = dropPromisesRef.current[currentPromiseIndex];
+                currentPromise.then((info) => {
+                    if (info !== null) {
+                        const { files, strings } = info;
+                        setDroppedFiles(files);
+                        setDroppedStrings(strings);
+                    }
+                    // Now that we're done, are there more promises in the queue?
+                    const currentPromiseIndex = getCurrentPromiseIndex();
+                    const promiseCount = getPromiseCount();
+                    if ((currentPromiseIndex + 1) < promiseCount) {
+                        // Since this promise has started, more have been added.
+                        // Run this effect again.
+                        setCurrentPromiseIndex(i => ++i);
+                    }
+                });
+            }
+        }, [currentPromiseIndex]);
+        // Handle collecting the current file metadata or MIME types.
+        const onDragEnter = useStableCallback((e) => {
+            e.preventDefault();
+            if (e.dataTransfer) {
+                // Is there a default? I can't find one anywhere.
+                e.dataTransfer.dropEffect = (effect ?? "move");
+                const newMimeTypes = new Set();
+                const newFiles = new Array();
+                for (const item of e.dataTransfer?.items ?? []) {
+                    const { kind, type } = item;
+                    if (kind === "string") {
+                        newMimeTypes.add(type);
+                    }
+                    else if (kind === "file") {
+                        newFiles.push({ type: item.type });
+                    }
+                }
+                setFilesForConsideration(newFiles);
+                setStringsForConsideration(newMimeTypes);
+            }
+        });
+        // Handle resetting the current file metadata or MIME types
+        const onDragLeave = useStableCallback((e) => {
+            e.preventDefault();
+            setFilesForConsideration(null);
+            setStringsForConsideration(null);
+        });
+        // Boilerplate, I guess
+        const onDragOver = useStableCallback((e) => {
+            e.preventDefault();
+        });
+        // Handle getting the drop data asynchronously
+        const onDrop = useStableCallback((e) => {
+            e.preventDefault();
+            setFilesForConsideration(null);
+            setStringsForConsideration(null);
+            const allPromises = new Array();
+            const dropData = {};
+            const dropFile = [];
+            for (const item of e.dataTransfer?.items ?? []) {
+                const { kind, type } = item;
+                if (kind === "string") {
+                    allPromises.push((new Promise((resolve, _reject) => item.getAsString(resolve))).then(str => dropData[type] = str));
+                }
+                else if (kind === "file") {
+                    const file = item.getAsFile();
+                    if (file) {
+                        allPromises.push(new Promise((resolve, reject) => {
+                            const reader = new FileReader();
+                            reader.onload = (_) => {
+                                resolve();
+                                const data = reader.result;
+                                dropFile.push({ data, name: file.name, type: file.type, size: data.byteLength, lastModified: file.lastModified });
+                            };
+                            reader.onerror = (_) => { reject(new DroppableFileError(file.name, reader.error)); };
+                            reader.onabort = (_) => { reject(new DroppableFileError(file.name, reader.error)); };
+                            reader.readAsArrayBuffer(file);
+                        }));
+                        dropFile.push();
+                    }
+                }
+            }
+            dropPromisesRef.current.push(Promise.all(allPromises).then(() => {
+                setPromiseCount(i => ++i);
+                setDropError(null);
+                return {
+                    strings: dropData,
+                    files: dropFile
+                };
+            }).catch(ex => {
+                /* eslint-disable no-debugger */
+                debugger;
+                setPromiseCount(i => ++i);
+                setDropError(ex);
+                return null;
+            }));
+        });
+        const propsStable = A({ onDragEnter, onDragLeave, onDragOver, onDrop });
+        return {
+            propsStable: propsStable.current,
+            filesForConsideration,
+            stringsForConsideration,
+            droppedFiles,
+            droppedStrings,
+            dropError
+        };
+    }
+
+    function useElementSize({ elementSizeParameters: { getObserveBox, onSizeChange }, refElementParameters: { onElementChange, onMount, onUnmount } }) {
+        useEnsureStability("useElementSize", getObserveBox, onSizeChange, onElementChange, onMount, onUnmount);
+        const [getSize, setSize] = usePassiveState(onSizeChange, returnNull);
+        const currentObserveBox = A(undefined);
+        const needANewObserver = q$1((element, observeBox) => {
+            if (element) {
+                const document = getDocument$1(element);
+                const window = document.defaultView;
+                const handleUpdate = () => {
+                    if (element.isConnected) {
+                        const { clientWidth, scrollWidth, offsetWidth, clientHeight, scrollHeight, offsetHeight, clientLeft, scrollLeft, offsetLeft, clientTop, scrollTop, offsetTop } = element;
+                        setSize({ clientWidth, scrollWidth, offsetWidth, clientHeight, scrollHeight, offsetHeight, clientLeft, scrollLeft, offsetLeft, clientTop, scrollTop, offsetTop });
+                    }
+                };
+                if (window && ("ResizeObserver" in window)) {
+                    const observer = new ResizeObserver((_entries) => { handleUpdate(); });
+                    observer.observe(element, { box: observeBox });
+                    return () => observer.disconnect();
+                }
+                else {
+                    document.addEventListener("resize", handleUpdate, { passive: true });
+                    return () => document.removeEventListener("resize", handleUpdate);
+                }
+            }
+        }, []);
+        const { refElementReturn } = useRefElement({
+            refElementParameters: {
+                onElementChange: q$1((e, p) => { needANewObserver(e, getObserveBox?.()); onElementChange?.(e, p); }, []),
+                onMount,
+                onUnmount
+            }
+        });
+        const { getElement } = refElementReturn;
+        s(() => {
+            if (getObserveBox) {
+                if (currentObserveBox.current !== getObserveBox())
+                    needANewObserver(getElement(), getObserveBox());
+            }
+        });
+        return {
+            elementSizeReturn: { getSize },
+            refElementReturn
+        };
     }
 
     /*!
