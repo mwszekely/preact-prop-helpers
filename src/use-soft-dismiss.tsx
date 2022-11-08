@@ -19,7 +19,7 @@ import { useStableGetter } from "./use-stable-getter";
 const _dummy = 0;
 
 export interface UseEscapeDismissParameters<SourceElement extends Element> {
-    refElementReturn: Pick<UseRefElementReturnType<SourceElement>["refElementReturn"], "getElement">;
+    refElementSourceReturn: Pick<UseRefElementReturnType<SourceElement>["refElementReturn"], "getElement">;
     escapeDismissParameters: {
 
         /**
@@ -87,7 +87,7 @@ function getElementDepth(element: Element) {
  * @param param0 
  * @returns 
  */
-export function useEscapeDismiss<SourceElement extends Element>({ escapeDismissParameters: { onClose, open, getWindow: unstableGetWindow, parentDepth, ...void1 }, refElementReturn: { getElement, ...void2 } }: UseEscapeDismissParameters<SourceElement>) {
+export function useEscapeDismiss<SourceElement extends Element>({ escapeDismissParameters: { onClose, open, getWindow: unstableGetWindow, parentDepth, ...void1 }, refElementSourceReturn: { getElement, ...void2 } }: UseEscapeDismissParameters<SourceElement>) {
     assertEmptyObject(void1);
     assertEmptyObject(void2);
 
@@ -222,7 +222,7 @@ export function useSoftDismiss<SourceElement extends Element, PopupElement exten
 
 export interface UseBackdropDismissParameters<PopupElement extends Element> {
     backdropDismiss: { open: boolean, onClose(): void; };
-    refElementReturn: Pick<UseRefElementReturnType<PopupElement>["refElementReturn"], "getElement">;
+    refElementPopupReturn: Pick<UseRefElementReturnType<PopupElement>["refElementReturn"], "getElement">;
 }
 
 /**
@@ -230,7 +230,7 @@ export interface UseBackdropDismissParameters<PopupElement extends Element> {
  * 
  * @param param0 
  */
-export function useBackdropDismiss<PopupElement extends Element>({ backdropDismiss: {  open, onClose: onCloseUnstable, ...void1 }, refElementReturn: { getElement, ...void3 }, ...void2 }: UseBackdropDismissParameters<PopupElement>) {
+export function useBackdropDismiss<PopupElement extends Element>({ backdropDismiss: {  open, onClose: onCloseUnstable, ...void1 }, refElementPopupReturn: { getElement, ...void3 }, ...void2 }: UseBackdropDismissParameters<PopupElement>) {
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     assertEmptyObject(void3);
