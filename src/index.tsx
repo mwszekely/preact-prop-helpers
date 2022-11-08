@@ -19,6 +19,7 @@ export { GridSingleSelectSortableChildCellInfo, GridSingleSelectSortableChildRow
 export { CompleteGridNavigationContext, CompleteGridNavigationRowContext, useCompleteGridNavigation, useCompleteGridNavigationCell, UseCompleteGridNavigationCellParameters, UseCompleteGridNavigationParameters, UseCompleteGridNavigationReturnType, useCompleteGridNavigationRow, UseCompleteGridNavigationRowParameters } from "./use-grid-navigation-single-selection-sortable-complete";
 export { useHasCurrentFocus, UseHasCurrentFocusParameters, UseHasCurrentFocusReturnType } from "./use-has-current-focus";
 export { useHasLastFocus, UseHasLastFocusParameters, UseHasLastFocusReturnType } from "./use-has-last-focus";
+export { useHideScroll } from "./use-hide-scroll";
 export { useImperativeProps } from "./use-imperative-props";
 export { useInterval, UseIntervalParameters } from "./use-interval";
 export { binarySearch, useLinearNavigation, UseLinearNavigationParameters, UseLinearNavigationReturnTypeInfo, UseLinearNavigationReturnTypeWithHooks, useTypeaheadNavigation, useTypeaheadNavigationChild, UseTypeaheadNavigationChild, UseTypeaheadNavigationChildParameters, UseTypeaheadNavigationParameters, UseTypeaheadNavigationReturnTypeInfo, UseTypeaheadNavigationReturnTypeWithHooks } from "./use-keyboard-navigation";
