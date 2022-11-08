@@ -4,28 +4,58 @@ import { isFocusable } from "tabbable";
 import { useActiveElement, UseActiveElementParameters, UseActiveElementReturnType } from "./use-active-element";
 import { getTopElement, useBlockingElement } from "./use-blocking-element";
 import { getDocument } from "./use-document-class";
-import { useMergedProps } from "./use-merged-props";
 import { useRefElement, UseRefElementParameters, UseRefElementReturnType } from "./use-ref-element";
 import { useStableCallback } from "./use-stable-callback";
 
-/*
-export function useFocusTrapProps<E extends Element>(r: UseFocusTrapReturnType<E>, ...otherProps: h.JSX.HTMLAttributes<E>[]): h.JSX.HTMLAttributes<E>[] {
-    return [r.focusTrap.propsUnstable, ...otherProps];
-}*/
+export interface UseFocusTrapParameters<SourceElement extends Element, PopupElement extends Element> extends UseRefElementParameters<PopupElement>, UseActiveElementParameters {
+    focusTrapParameters: {
+        trapActive: boolean;
 
-export interface UseFocusTrapParameters<E extends Element> extends UseRefElementParameters<E>, UseActiveElementParameters { focusTrapParameters: { trapActive: boolean; } }
+
+        /**
+         * When a modal popup opens, focus must be sent to the first element that makes sense.
+         * 
+         * For example, if it's a confirmation dialog about deleting something, it's best to send focus to the "cancel" button.
+         * 
+         * In other cases, it makes more sense to focus the dialog's title, first interactive element, etc.
+         * 
+         * This is highly subjective and *almost ALWAYS* more complicated than just "focus the whole dialog element itself",
+         * because that only works if the dialog ***only contains text***, which is uncommon.
+         * 
+         * If you really, really, ***genuinely*** cannot determine what should be done in your use case,
+         * first of all, keep trying, really,
+         * then as a very last resort, use `findFirstFocusable`, and then if nothing's found focus the body.  
+         * Just please, please make sure that whatever that first focusable is **isn't** a destructive action, at the very least. 
+         */
+        focusSelf(e: PopupElement): void;
+
+        /**
+         * When the focus trap has deactivated, focus must be sent back to the element that opened it.
+         * 
+         * This is tracked for you; by default, just call `lastFocused?.focus()`, but you can also override this behavior
+         * and just do whatever you want with any element.  
+         * @param lastFocused 
+         */
+        focusOpener(lastFocused: SourceElement | null): void;
+    }
+}
 
 export interface UseFocusTrapReturnType<E extends Element> extends UseRefElementReturnType<E>, UseActiveElementReturnType {
-    focusTrap: { propsUnstable: h.JSX.HTMLAttributes<E> }
+    focusTrapReturn: { propsUnstable: h.JSX.HTMLAttributes<E> }
 }
 
 const elementsToRestoreFocusTo = new Map<Element | null, (Node & HTMLOrSVGElement)>();
 
-export function useFocusTrap<E extends Element>({
-    focusTrapParameters: { trapActive },
+export function useFocusTrap<SourceElement extends Element, PopupElement extends Element>({
+    focusTrapParameters: { trapActive, focusSelf: focusSelfUnstable, focusOpener: focusOpenerUnstable },
     activeElementParameters,
     refElementParameters: { onElementChange, ...refElementParameters }
-}: UseFocusTrapParameters<E>): UseFocusTrapReturnType<E> {
+}: UseFocusTrapParameters<SourceElement, PopupElement>): UseFocusTrapReturnType<PopupElement> {
+
+    type E = PopupElement;
+
+    const focusSelf = useStableCallback(focusSelfUnstable);
+    const focusOpener = useStableCallback(focusOpenerUnstable);
 
     const handleActiveChange = useCallback((trapActive: boolean, element: E | null) => {
         if (trapActive && element) {
@@ -34,7 +64,8 @@ export function useFocusTrap<E extends Element>({
                 // TODO: This extra queueMicrotask is needed for
                 // ...reasons?
                 queueMicrotask(() => {
-                    findFirstFocusable(element)?.focus();
+                    focusSelf(element);
+                    //findFirstFocusable(element)?.focus();
                     rafHandle = 0;
                 })
             })
@@ -50,8 +81,9 @@ export function useFocusTrap<E extends Element>({
             // that has returned to the top of the stack
             let rafHandle = requestAnimationFrame(() => {
                 queueMicrotask(() => {
-                    elementsToRestoreFocusTo.get(getTopElement())?.focus();
+                    let elementToFocus = elementsToRestoreFocusTo.get(getTopElement());
                     rafHandle = 0;
+                    focusOpener((elementToFocus ?? null) as SourceElement | null);
                 });
             });
 
@@ -105,7 +137,7 @@ export function useFocusTrap<E extends Element>({
     return {
         activeElementReturn,
         refElementReturn,
-        focusTrap: { propsUnstable: { "aria-modal": trapActive ? "true" : undefined } as h.JSX.HTMLAttributes<E> }
+        focusTrapReturn: { propsUnstable: { "aria-modal": trapActive ? "true" : undefined } as h.JSX.HTMLAttributes<E> }
     };
 }
 

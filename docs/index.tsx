@@ -1,17 +1,13 @@
 import { createContext, h, render, VNode } from "preact";
 import { memo } from "preact/compat";
-import { StateUpdater, useCallback, useContext, useRef } from "preact/hooks";
-import { GetIndex, useAnimationFrame, useAsyncHandler, useDraggable, useDroppable, useElementSize, useFocusTrap, useGridNavigation, useHasCurrentFocus, useHasLastFocus, useManagedChildren, useMergedProps, useRefElement, useSortableChildren, useStableCallback, useState } from "..";
-import { assertEmptyObject, useManagedChild, UseManagedChildParameters, UseManagedChildrenContext, UseManagedChildrenReturnType as UseManagedChildrenReturnTypeInfo } from "../use-child-manager";
+import { useCallback, useContext, useRef } from "preact/hooks";
+import { GetIndex, useAnimationFrame, useAsyncHandler, useDraggable, useDroppable, useElementSize, useFocusTrap, useHasCurrentFocus, useHasLastFocus, useMergedProps, useRefElement, useStableCallback, useState } from "..";
 import { ElementSize } from "../use-element-size";
-import { GridChildCellInfo, GridChildRowInfo, useGridNavigationCell, UseGridNavigationCellParameters, UseGridNavigationCellReturnType, UseGridNavigationParameters, UseGridNavigationReturnType, useGridNavigationRow, UseGridNavigationRowParameters, UseGridNavigationRowReturnType } from "../use-grid-navigation";
-import { GetValid, UseSortableChildrenParameters, UseSortableChildrenReturnType as UseSortableChildrenReturnTypeWithHooks } from "../use-sortable-children";
-import { useStableObject } from "../use-stable-getter";
 //import { useGridNavigation, UseGridNavigationCell, UseGridNavigationRow } from "../use-grid-navigation";
+import { CompleteGridNavigationContext, CompleteGridNavigationRowContext, useCompleteGridNavigation, useCompleteGridNavigationCell, useCompleteGridNavigationRow } from "../use-grid-navigation-single-selection-sortable-complete";
 import { DemoUseInterval } from "./demos/use-interval";
 import { DemoUseRovingTabIndex } from "./demos/use-roving-tab-index";
 import { DemoUseTimeout } from "./demos/use-timeout";
-import { CompleteGridNavigationContext, CompleteGridNavigationRowContext, useCompleteGridNavigation, useCompleteGridNavigationCell, useCompleteGridNavigationRow } from "../use-grid-navigation-single-selection-sortable-complete"
 const RandomWords = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
 
 
@@ -81,7 +77,17 @@ const DemoUseFocusTrap = memo(({ depth }: { depth?: number }) => {
 
     const [active, setActive] = useState(false);
 
-    const { activeElementReturn: { }, focusTrap: { propsUnstable }, refElementReturn: { propsStable } } = useFocusTrap<HTMLDivElement>({ focusTrapParameters: { trapActive: active }, activeElementParameters: { getDocument }, refElementParameters: { onElementChange: undefined } });
+    const focusSelf = useCallback((e: any) => e.focus(), []);
+
+    const { activeElementReturn: _activeElementReturn, focusTrapReturn: { propsUnstable }, refElementReturn: { propsStable } } = useFocusTrap<HTMLDivElement, HTMLDivElement>({
+        focusTrapParameters: {
+            trapActive: active,
+            focusOpener: focusSelf,
+            focusSelf: focusSelf,
+        }, 
+        activeElementParameters: { getDocument }, 
+        refElementParameters: { onElementChange: undefined }
+    });
     //const { useRovingTabIndexChild, useRovingTabIndexProps } = useRovingTabIndex<HTMLUListElement, RovingTabIndexChildInfo>({ tabbableIndex, focusOnChange: false });
 
     const divProps = useMergedProps(propsUnstable, propsStable, { ref: undefined, className: "focus-trap-demo" });
@@ -899,7 +905,7 @@ const DemoUseGridCell = (({ index, row, rowIsTabbable }: { index: number, row: n
         props,
         refElementReturn,
         rovingTabIndexChildReturn: { tabbable },
-        
+
     } = useCompleteGridNavigationCell<HTMLTableCellElement>({
         gridNavigationCellParameters: { colSpan: 1 },
         managedChildParameters: { hidden: false, index },

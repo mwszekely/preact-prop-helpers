@@ -35,6 +35,7 @@ export { useMergedClasses } from "./use-merged-classes";
 export { enableLoggingPropConflicts, useMergedProps } from "./use-merged-props";
 export { useMergedRefs } from "./use-merged-refs";
 export { useMergedStyles } from "./use-merged-styles";
+export { useModal, UseModalParameters } from "./use-modal";
 export { useMutationObserver, UseMutationObserverParameters } from "./use-mutation-observer";
 export { debounceRendering, OnPassiveStateChange, PassiveStateUpdater, returnFalse, returnNull, returnTrue, returnUndefined, returnZero, useEnsureStability, usePassiveState } from "./use-passive-state";
 export { getFromLocalStorage, PersistentStates, storeToLocalStorage, usePersistentState } from "./use-persistent-state";
