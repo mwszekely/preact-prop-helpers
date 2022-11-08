@@ -1,10 +1,10 @@
 import { h } from "preact";
 import { useCallback, useEffect } from "preact/hooks";
-import { UseActiveElementParameters } from "./use-active-element";
+import { useActiveElement, UseActiveElementParameters } from "./use-active-element";
 import { assertEmptyObject } from "./use-child-manager";
 import { useGlobalHandler } from "./use-event-handler";
 import { OnPassiveStateChange } from "./use-passive-state";
-import { UseRefElementReturnType } from "./use-ref-element";
+import { useRefElement, UseRefElementReturnType } from "./use-ref-element";
 import { useStableCallback } from "./use-stable-callback";
 import { useStableGetter } from "./use-stable-getter";
 
@@ -87,7 +87,7 @@ function getElementDepth(element: Element) {
  * @param param0 
  * @returns 
  */
-export function useEscapeDismiss<SourceElement extends Element>({ escapeDismissParameters: { onClose, open, getWindow: unstableGetWindow, parentDepth, ...void1 }, refElementSourceReturn: { getElement, ...void2 } }: UseEscapeDismissParameters<SourceElement>) {
+export function useEscapeDismiss<SourceElement extends Element>({ escapeDismissParameters: { onClose, open, getWindow: unstableGetWindow, parentDepth, ...void1 }, refElementSourceReturn: { getElement, ...void2 } }: UseEscapeDismissParameters<SourceElement>): void {
     assertEmptyObject(void1);
     assertEmptyObject(void2);
 
@@ -221,7 +221,7 @@ export function useSoftDismiss<SourceElement extends Element, PopupElement exten
 }*/
 
 export interface UseBackdropDismissParameters<PopupElement extends Element> {
-    backdropDismiss: { open: boolean, onClose(): void; };
+    backdropDismissParameters: { open: boolean, onClose(): void; };
     refElementPopupReturn: Pick<UseRefElementReturnType<PopupElement>["refElementReturn"], "getElement">;
 }
 
@@ -230,7 +230,7 @@ export interface UseBackdropDismissParameters<PopupElement extends Element> {
  * 
  * @param param0 
  */
-export function useBackdropDismiss<PopupElement extends Element>({ backdropDismiss: {  open, onClose: onCloseUnstable, ...void1 }, refElementPopupReturn: { getElement, ...void3 }, ...void2 }: UseBackdropDismissParameters<PopupElement>) {
+export function useBackdropDismiss<PopupElement extends Element>({ backdropDismissParameters: { open, onClose: onCloseUnstable, ...void1 }, refElementPopupReturn: { getElement, ...void3 }, ...void2 }: UseBackdropDismissParameters<PopupElement>): void {
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     assertEmptyObject(void3);
@@ -260,4 +260,73 @@ export function useBackdropDismiss<PopupElement extends Element>({ backdropDismi
 
     useGlobalHandler(window, "mousedown", open ? onBackdropClick : null, { capture: true });
     useGlobalHandler(window, "touchstart", open ? onBackdropClick : null, { capture: true });
+}
+
+type DismissListenerTypes = "backdrop" | "lost-focus" | "escape";
+
+export interface UseDismissParameters<Listeners extends DismissListenerTypes> {
+    dismissParameters: {
+
+        /** 
+         * Whether or not this component is currently open/showing itself, as opposed to hidden/closed.
+         * Event handlers are only attached when this is `true`.
+         */
+        open: boolean;
+
+        /**
+         * Called any time the user has requested the component be dismissed for the given reason.
+         * 
+         * You can choose to ignore a reason if you want, but it's better to set `closeOn${reason}` to `false` instead.
+         */
+        onClose: (reason: Listeners) => void;
+
+        /**
+         * If `true`, then this component closes when a click is detected anywhere not within the component
+         * (determined by being in a different branch of the DOM)
+         */
+        closeOnBackdrop: Listeners extends "backdrop" ? true : false;
+
+        /**
+         * If `true`, then this component closes when the Escape key is pressed, and no deeper component
+         * is listening for that same Escape press (i.e. only one Escape dismiss happens per key press)
+         */
+        closeOnEscape: Listeners extends "escape" ? true : false;
+
+        /**
+         * If `true`, then this component closes whenever focus is sent to an element not contained by this one
+         * (using the same rules as `closeOnBackdrop`)
+         */
+        closeOnLostFocus: Listeners extends "focus" ? true : false;
+    }
+    escapeDismissParameters: Pick<UseEscapeDismissParameters<any>["escapeDismissParameters"], "getWindow" | "parentDepth">;
+}
+
+/**
+ * Combines all the methods of dismissing a modal-ish or popup-ish component into one combined hook.
+ * 
+ * This is similar to the "complete" series of list/grid navigation, in that it's the "outermost" hook of its type.
+ */
+export function useDismiss<Listeners extends DismissListenerTypes, SourceElement extends Element, PopupElement extends Element>({ dismissParameters: { open: globalOpen, onClose: globalOnClose, closeOnBackdrop, closeOnEscape, closeOnLostFocus }, escapeDismissParameters: { getWindow, parentDepth } }: UseDismissParameters<Listeners>) {
+
+    const { refElementReturn: refElementSourceReturn } = useRefElement<SourceElement>({ refElementParameters: {} });
+    const { refElementReturn: refElementPopupReturn } = useRefElement<PopupElement>({ refElementParameters: {} });
+
+    const onCloseBackdrop = useCallback(() => { return globalOnClose?.("backdrop" as Listeners); }, [globalOnClose]);
+    const onCloseEscape = useCallback(() => { return globalOnClose?.("escape" as Listeners); }, [globalOnClose]);
+    const onCloseFocus = useCallback(() => { return globalOnClose?.("lost-focus" as Listeners); }, [globalOnClose]);
+    const _v1: void = useBackdropDismiss<PopupElement>({ backdropDismissParameters: { onClose: onCloseBackdrop, open: (closeOnBackdrop && globalOpen) }, refElementPopupReturn });
+    const _v2: void = useEscapeDismiss<SourceElement>({ escapeDismissParameters: { getWindow, onClose: onCloseEscape, open: (closeOnEscape && globalOpen), parentDepth }, refElementSourceReturn });
+    const { activeElementParameters } = useLostFocusDismiss<SourceElement, PopupElement>({ lostFocusDismiss: { onClose: onCloseFocus, open: (closeOnLostFocus && globalOpen) }, refElementPopupReturn, refElementSourceReturn });
+
+    const getDocument = useCallback(() => {
+        return getWindow().document;
+    }, [getWindow])
+
+    const {
+        activeElementReturn: {
+            getActiveElement: _getActiveElement,
+            getLastActiveElement: _getLastActiveElement,
+            getWindowFocused: _getWindowFocused
+        }
+    } = useActiveElement({ activeElementParameters: { ...activeElementParameters, getWindow, getDocument } });
 }

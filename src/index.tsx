@@ -42,9 +42,10 @@ export { generateRandomId, useRandomId, UseRandomIdParameters, UseRandomIdParame
 export { useRefElement, UseRefElementParameters, UseRefElementReturnType } from "./use-ref-element";
 export { OnTabbableIndexChange, RovingTabIndexChildContext, useRovingTabIndex, useRovingTabIndexChild, UseRovingTabIndexChild, UseRovingTabIndexChildInfo, UseRovingTabIndexChildParameters, UseRovingTabIndexChildReturnType, UseRovingTabIndexParameters, UseRovingTabIndexReturnType } from "./use-roving-tabindex";
 export { SelectableChildInfo, useSingleSelection, useSingleSelectionChild, UseSingleSelectionChild, UseSingleSelectionChildParameters, UseSingleSelectionChildReturnTypeInfo, UseSingleSelectionChildReturnTypeWithHooks, UseSingleSelectionParameters, UseSingleSelectionReturnType } from "./use-single-selection";
-export { useBackdropDismiss, UseBackdropDismissParameters, useEscapeDismiss, UseEscapeDismissParameters, useLostFocusDismiss, UseLostFocusDismissParameters, UseLostFocusDismissReturnType } from "./use-soft-dismiss";
+export { useBackdropDismiss, UseBackdropDismissParameters, useDismiss, UseDismissParameters, useEscapeDismiss, UseEscapeDismissParameters, useLostFocusDismiss, UseLostFocusDismissParameters, UseLostFocusDismissReturnType } from "./use-soft-dismiss";
 export { Compare, GetHighestChildIndex, GetIndex, GetValid, tryNavigateToIndex, TryNavigateToIndexParameters, useRearrangeableChildren, UseRearrangeableChildrenParameters, UseRearrangeableChildrenReturnType, useSortableChildren, UseSortableChildrenParameters, UseSortableChildrenReturnType } from "./use-sortable-children";
 export { useStableCallback } from "./use-stable-callback";
 export { useStableGetter, useStableObject } from "./use-stable-getter";
 export { useState } from "./use-state";
 export { useTimeout, UseTimeoutParameters } from "./use-timeout";
+
