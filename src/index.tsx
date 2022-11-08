@@ -47,4 +47,3 @@ export { useStableCallback } from "./use-stable-callback";
 export { useStableGetter, useStableObject } from "./use-stable-getter";
 export { useState } from "./use-state";
 export { useTimeout, UseTimeoutParameters } from "./use-timeout";
-
