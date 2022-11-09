@@ -49,9 +49,8 @@ export function useImperativeProps<T extends Element>() {
             removeStyle,
             setAttribute,
             removeAttribute,
-
         }).current,
-        
+
         propsUnstable: useMergedProps<T>(
             propsStable,
             { className: currentImperativeProps.current.className.toString(), style: currentImperativeProps.current.style },

@@ -144,7 +144,6 @@ var bundle = (function (exports) {
     function returnTrue() { return true; }
     function returnFalse() { return false; }
     function returnNull() { return null; }
-    function returnZero() { return 0; }
 
     /*
     const activeElementUpdaters = new Map<Window | null | undefined, Set<undefined | ((e: Node | null) => void)>>();
@@ -256,2148 +255,6 @@ var bundle = (function (exports) {
         const [getLastActiveElement, setLastActiveElement] = usePassiveState(onLastActiveElementChange, returnNull);
         const [getWindowFocused, setWindowFocused] = usePassiveState(onWindowFocusedChange, returnTrue);
         return { activeElementReturn: { getActiveElement, getLastActiveElement, getWindowFocused } };
-    }
-
-    const Table = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-";
-    function base64(value) {
-        return Table[value];
-    }
-    function random6Bits() {
-        return Math.floor(Math.random() * 0b1000000);
-    }
-    function random64Bits() {
-        return [random6Bits(), random6Bits(), random6Bits(), random6Bits(), random6Bits(), random6Bits(), random6Bits(), random6Bits(), random6Bits(), random6Bits(), random6Bits()];
-    }
-    /**
-     * Returns a randomly-generated ID with an optional prefix.
-     * Note that if the prefix is *explicitly* set to "", then
-     * IDs that are not valid under HTML4 may be generated. Oh no.
-     *
-     *
-     * (This is here, in this particular file, to avoid circular dependencies
-     * without also making a utilities file.
-     * Once we can remove this hook, we can put this function back with useRandomId)
-     */
-    function generateRandomId(prefix) {
-        return `${prefix ?? "id-"}${random64Bits().map(n => base64(n)).join("")}`;
-    }
-    const previousInputs = new Map();
-    const toRun = new Map();
-    // TODO: Whether this goes in options.diffed or options._commit
-    // is a post-suspense question.
-    // Right now, using options._commit has the problem of running
-    // *after* refs are applied, but we need to come before even that
-    // so `ref={someStableFunction}` works.
-    // 
-    // Also it's private.
-    //
-    // ...
-    // Well, useEvent or whatever is finally, finally 4 years later finally here
-    // which is cool and means we won't need this at all soon.
-    // So for now we'll stick with diff to prevent any weirdness with
-    // commit being private and all.
-    const commitName = "diffed";
-    const originalCommit = l$1[commitName];
-    const newCommit = (...args) => {
-        for (const [id, effectInfo] of toRun) {
-            const oldInputs = previousInputs.get(id);
-            if (argsChanged(oldInputs, effectInfo.inputs)) {
-                effectInfo.cleanup?.();
-                effectInfo.cleanup = effectInfo.effect();
-                previousInputs.set(id, effectInfo.inputs);
-            }
-        }
-        toRun.clear();
-        originalCommit?.(...args);
-    };
-    l$1[commitName] = newCommit;
-    /**
-     * Semi-private function to allow stable callbacks even within `useLayoutEffect` and ref assignment.
-     *
-     * Every render, we send the arguments to be evaluated after diffing has completed,
-     * which happens before.
-     *
-     * @param effect
-     * @param inputs
-     */
-    function useBeforeLayoutEffect(effect, inputs) {
-        /*(() => {
-            const cleanup = useRef<void | (() => void) | null>(null);
-            const prevArgsRef = useRef<Inputs>(null!);
-            if (argsChanged(inputs, prevArgsRef.current)) {
-                prevArgsRef.current = inputs!;
-                if (cleanup.current)
-                    cleanup.current();
-                cleanup.current = effect();
-            }
-        })();*/
-        const [id] = y(() => generateRandomId());
-        toRun.set(id, { effect, inputs, cleanup: null });
-        s(() => {
-            return () => {
-                toRun.delete(id);
-                previousInputs.delete(id);
-            };
-        }, [id]);
-    }
-    function argsChanged(oldArgs, newArgs) {
-        return !!(!oldArgs ||
-            oldArgs.length !== newArgs?.length ||
-            newArgs?.some((arg, index) => arg !== oldArgs[index]));
-    }
-
-    const Unset = Symbol("unset");
-    /**
-     * Given an input value, returns a constant getter function that can be used
-     * inside of `useEffect` and friends without including it in the dependency array.
-     *
-     * This uses `options.diffed` in order to run before everything, even
-     * ref assignment. This means this getter is safe to use anywhere ***except the render phase***.
-     *
-     * @param value
-     * @returns
-     */
-    function useStableGetter(value) {
-        const ref = A(Unset);
-        useBeforeLayoutEffect(() => { ref.current = value; }, [value]);
-        return q$1(() => {
-            if (ref.current === Unset) {
-                throw new Error('Value retrieved from useStableGetter() cannot be called during render.');
-            }
-            return ref.current;
-        }, []);
-    }
-    /**
-     * Like `useStableGetter`, but ***requires*** that everything in the object is also stable,
-     * and in turn returns an object that itself is stable.
-     * @param t
-     * @returns
-     */
-    function useStableObject(t) {
-        const e = Object.entries(t);
-        useEnsureStability("useStableObject", e.length, ...e.map(([k, v]) => v));
-        return A(t).current;
-    }
-
-    function useStableCallback(fn, noDeps) {
-        if (noDeps == null) {
-            const currentCallbackGetter = useStableGetter(fn);
-            return q$1((...args) => {
-                return currentCallbackGetter()(...args);
-            }, []);
-        }
-        else {
-            console.assert(noDeps.length === 0);
-            return q$1(fn, []);
-        }
-    }
-
-    const SharedAnimationFrameContext = B$2(null);
-    /**
-     * The (optionally non-stable) `callback` you provide will start running every frame after the component mounts.
-     *
-     * Passing `null` is fine and simply stops the effect until you restart it by providing a non-null callback.
-     *
-     * **This hook does not return anything at all, including no prop-modifying hooks**
-     */
-    function useAnimationFrame({ callback }) {
-        // Get a wrapper around the given callback that's stable
-        const stableCallback = useStableCallback(callback ?? noop);
-        const hasCallback = (callback != null);
-        const sharedAnimationFrameContext = x(SharedAnimationFrameContext);
-        s(() => {
-            if (sharedAnimationFrameContext) {
-                if (hasCallback) {
-                    sharedAnimationFrameContext.addCallback(stableCallback);
-                }
-                else {
-                    sharedAnimationFrameContext.removeCallback(stableCallback);
-                }
-            }
-            else {
-                if (hasCallback) {
-                    // Get a wrapper around the wrapper around the callback
-                    // that also calls `requestAnimationFrame` again.
-                    const rafCallback = (ms) => {
-                        handle = requestAnimationFrame(rafCallback);
-                        stableCallback(ms);
-                    };
-                    let handle = requestAnimationFrame(rafCallback);
-                    return () => cancelAnimationFrame(handle);
-                }
-            }
-        }, [sharedAnimationFrameContext, hasCallback]);
-    }
-    // eslint-disable @typescript-eslint/no-empty-function
-    function noop() { }
-
-    /**
-     * Checks if `value` is the
-     * [language type](http://www.ecma-international.org/ecma-262/7.0/#sec-ecmascript-language-types)
-     * of `Object`. (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
-     *
-     * @static
-     * @memberOf _
-     * @since 0.1.0
-     * @category Lang
-     * @param {*} value The value to check.
-     * @returns {boolean} Returns `true` if `value` is an object, else `false`.
-     * @example
-     *
-     * _.isObject({});
-     * // => true
-     *
-     * _.isObject([1, 2, 3]);
-     * // => true
-     *
-     * _.isObject(_.noop);
-     * // => true
-     *
-     * _.isObject(null);
-     * // => false
-     */
-    function isObject(value) {
-      var type = typeof value;
-      return value != null && (type == 'object' || type == 'function');
-    }
-
-    /** Detect free variable `global` from Node.js. */
-    var freeGlobal = typeof global == 'object' && global && global.Object === Object && global;
-
-    /** Detect free variable `self`. */
-    var freeSelf = typeof self == 'object' && self && self.Object === Object && self;
-
-    /** Used as a reference to the global object. */
-    var root = freeGlobal || freeSelf || Function('return this')();
-
-    /**
-     * Gets the timestamp of the number of milliseconds that have elapsed since
-     * the Unix epoch (1 January 1970 00:00:00 UTC).
-     *
-     * @static
-     * @memberOf _
-     * @since 2.4.0
-     * @category Date
-     * @returns {number} Returns the timestamp.
-     * @example
-     *
-     * _.defer(function(stamp) {
-     *   console.log(_.now() - stamp);
-     * }, _.now());
-     * // => Logs the number of milliseconds it took for the deferred invocation.
-     */
-    var now = function() {
-      return root.Date.now();
-    };
-
-    /** Used to match a single whitespace character. */
-    var reWhitespace = /\s/;
-
-    /**
-     * Used by `_.trim` and `_.trimEnd` to get the index of the last non-whitespace
-     * character of `string`.
-     *
-     * @private
-     * @param {string} string The string to inspect.
-     * @returns {number} Returns the index of the last non-whitespace character.
-     */
-    function trimmedEndIndex(string) {
-      var index = string.length;
-
-      while (index-- && reWhitespace.test(string.charAt(index))) {}
-      return index;
-    }
-
-    /** Used to match leading whitespace. */
-    var reTrimStart = /^\s+/;
-
-    /**
-     * The base implementation of `_.trim`.
-     *
-     * @private
-     * @param {string} string The string to trim.
-     * @returns {string} Returns the trimmed string.
-     */
-    function baseTrim(string) {
-      return string
-        ? string.slice(0, trimmedEndIndex(string) + 1).replace(reTrimStart, '')
-        : string;
-    }
-
-    /** Built-in value references. */
-    var Symbol$1 = root.Symbol;
-
-    /** Used for built-in method references. */
-    var objectProto$5 = Object.prototype;
-
-    /** Used to check objects for own properties. */
-    var hasOwnProperty$3 = objectProto$5.hasOwnProperty;
-
-    /**
-     * Used to resolve the
-     * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
-     * of values.
-     */
-    var nativeObjectToString$1 = objectProto$5.toString;
-
-    /** Built-in value references. */
-    var symToStringTag$1 = Symbol$1 ? Symbol$1.toStringTag : undefined;
-
-    /**
-     * A specialized version of `baseGetTag` which ignores `Symbol.toStringTag` values.
-     *
-     * @private
-     * @param {*} value The value to query.
-     * @returns {string} Returns the raw `toStringTag`.
-     */
-    function getRawTag(value) {
-      var isOwn = hasOwnProperty$3.call(value, symToStringTag$1),
-          tag = value[symToStringTag$1];
-
-      try {
-        value[symToStringTag$1] = undefined;
-        var unmasked = true;
-      } catch (e) {}
-
-      var result = nativeObjectToString$1.call(value);
-      if (unmasked) {
-        if (isOwn) {
-          value[symToStringTag$1] = tag;
-        } else {
-          delete value[symToStringTag$1];
-        }
-      }
-      return result;
-    }
-
-    /** Used for built-in method references. */
-    var objectProto$4 = Object.prototype;
-
-    /**
-     * Used to resolve the
-     * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
-     * of values.
-     */
-    var nativeObjectToString = objectProto$4.toString;
-
-    /**
-     * Converts `value` to a string using `Object.prototype.toString`.
-     *
-     * @private
-     * @param {*} value The value to convert.
-     * @returns {string} Returns the converted string.
-     */
-    function objectToString(value) {
-      return nativeObjectToString.call(value);
-    }
-
-    /** `Object#toString` result references. */
-    var nullTag = '[object Null]',
-        undefinedTag = '[object Undefined]';
-
-    /** Built-in value references. */
-    var symToStringTag = Symbol$1 ? Symbol$1.toStringTag : undefined;
-
-    /**
-     * The base implementation of `getTag` without fallbacks for buggy environments.
-     *
-     * @private
-     * @param {*} value The value to query.
-     * @returns {string} Returns the `toStringTag`.
-     */
-    function baseGetTag(value) {
-      if (value == null) {
-        return value === undefined ? undefinedTag : nullTag;
-      }
-      return (symToStringTag && symToStringTag in Object(value))
-        ? getRawTag(value)
-        : objectToString(value);
-    }
-
-    /**
-     * Checks if `value` is object-like. A value is object-like if it's not `null`
-     * and has a `typeof` result of "object".
-     *
-     * @static
-     * @memberOf _
-     * @since 4.0.0
-     * @category Lang
-     * @param {*} value The value to check.
-     * @returns {boolean} Returns `true` if `value` is object-like, else `false`.
-     * @example
-     *
-     * _.isObjectLike({});
-     * // => true
-     *
-     * _.isObjectLike([1, 2, 3]);
-     * // => true
-     *
-     * _.isObjectLike(_.noop);
-     * // => false
-     *
-     * _.isObjectLike(null);
-     * // => false
-     */
-    function isObjectLike(value) {
-      return value != null && typeof value == 'object';
-    }
-
-    /** `Object#toString` result references. */
-    var symbolTag = '[object Symbol]';
-
-    /**
-     * Checks if `value` is classified as a `Symbol` primitive or object.
-     *
-     * @static
-     * @memberOf _
-     * @since 4.0.0
-     * @category Lang
-     * @param {*} value The value to check.
-     * @returns {boolean} Returns `true` if `value` is a symbol, else `false`.
-     * @example
-     *
-     * _.isSymbol(Symbol.iterator);
-     * // => true
-     *
-     * _.isSymbol('abc');
-     * // => false
-     */
-    function isSymbol(value) {
-      return typeof value == 'symbol' ||
-        (isObjectLike(value) && baseGetTag(value) == symbolTag);
-    }
-
-    /** Used as references for various `Number` constants. */
-    var NAN = 0 / 0;
-
-    /** Used to detect bad signed hexadecimal string values. */
-    var reIsBadHex = /^[-+]0x[0-9a-f]+$/i;
-
-    /** Used to detect binary string values. */
-    var reIsBinary = /^0b[01]+$/i;
-
-    /** Used to detect octal string values. */
-    var reIsOctal = /^0o[0-7]+$/i;
-
-    /** Built-in method references without a dependency on `root`. */
-    var freeParseInt = parseInt;
-
-    /**
-     * Converts `value` to a number.
-     *
-     * @static
-     * @memberOf _
-     * @since 4.0.0
-     * @category Lang
-     * @param {*} value The value to process.
-     * @returns {number} Returns the number.
-     * @example
-     *
-     * _.toNumber(3.2);
-     * // => 3.2
-     *
-     * _.toNumber(Number.MIN_VALUE);
-     * // => 5e-324
-     *
-     * _.toNumber(Infinity);
-     * // => Infinity
-     *
-     * _.toNumber('3.2');
-     * // => 3.2
-     */
-    function toNumber(value) {
-      if (typeof value == 'number') {
-        return value;
-      }
-      if (isSymbol(value)) {
-        return NAN;
-      }
-      if (isObject(value)) {
-        var other = typeof value.valueOf == 'function' ? value.valueOf() : value;
-        value = isObject(other) ? (other + '') : other;
-      }
-      if (typeof value != 'string') {
-        return value === 0 ? value : +value;
-      }
-      value = baseTrim(value);
-      var isBinary = reIsBinary.test(value);
-      return (isBinary || reIsOctal.test(value))
-        ? freeParseInt(value.slice(2), isBinary ? 2 : 8)
-        : (reIsBadHex.test(value) ? NAN : +value);
-    }
-
-    /** Error message constants. */
-    var FUNC_ERROR_TEXT$1 = 'Expected a function';
-
-    /* Built-in method references for those with the same name as other `lodash` methods. */
-    var nativeMax = Math.max,
-        nativeMin = Math.min;
-
-    /**
-     * Creates a debounced function that delays invoking `func` until after `wait`
-     * milliseconds have elapsed since the last time the debounced function was
-     * invoked. The debounced function comes with a `cancel` method to cancel
-     * delayed `func` invocations and a `flush` method to immediately invoke them.
-     * Provide `options` to indicate whether `func` should be invoked on the
-     * leading and/or trailing edge of the `wait` timeout. The `func` is invoked
-     * with the last arguments provided to the debounced function. Subsequent
-     * calls to the debounced function return the result of the last `func`
-     * invocation.
-     *
-     * **Note:** If `leading` and `trailing` options are `true`, `func` is
-     * invoked on the trailing edge of the timeout only if the debounced function
-     * is invoked more than once during the `wait` timeout.
-     *
-     * If `wait` is `0` and `leading` is `false`, `func` invocation is deferred
-     * until to the next tick, similar to `setTimeout` with a timeout of `0`.
-     *
-     * See [David Corbacho's article](https://css-tricks.com/debouncing-throttling-explained-examples/)
-     * for details over the differences between `_.debounce` and `_.throttle`.
-     *
-     * @static
-     * @memberOf _
-     * @since 0.1.0
-     * @category Function
-     * @param {Function} func The function to debounce.
-     * @param {number} [wait=0] The number of milliseconds to delay.
-     * @param {Object} [options={}] The options object.
-     * @param {boolean} [options.leading=false]
-     *  Specify invoking on the leading edge of the timeout.
-     * @param {number} [options.maxWait]
-     *  The maximum time `func` is allowed to be delayed before it's invoked.
-     * @param {boolean} [options.trailing=true]
-     *  Specify invoking on the trailing edge of the timeout.
-     * @returns {Function} Returns the new debounced function.
-     * @example
-     *
-     * // Avoid costly calculations while the window size is in flux.
-     * jQuery(window).on('resize', _.debounce(calculateLayout, 150));
-     *
-     * // Invoke `sendMail` when clicked, debouncing subsequent calls.
-     * jQuery(element).on('click', _.debounce(sendMail, 300, {
-     *   'leading': true,
-     *   'trailing': false
-     * }));
-     *
-     * // Ensure `batchLog` is invoked once after 1 second of debounced calls.
-     * var debounced = _.debounce(batchLog, 250, { 'maxWait': 1000 });
-     * var source = new EventSource('/stream');
-     * jQuery(source).on('message', debounced);
-     *
-     * // Cancel the trailing debounced invocation.
-     * jQuery(window).on('popstate', debounced.cancel);
-     */
-    function debounce(func, wait, options) {
-      var lastArgs,
-          lastThis,
-          maxWait,
-          result,
-          timerId,
-          lastCallTime,
-          lastInvokeTime = 0,
-          leading = false,
-          maxing = false,
-          trailing = true;
-
-      if (typeof func != 'function') {
-        throw new TypeError(FUNC_ERROR_TEXT$1);
-      }
-      wait = toNumber(wait) || 0;
-      if (isObject(options)) {
-        leading = !!options.leading;
-        maxing = 'maxWait' in options;
-        maxWait = maxing ? nativeMax(toNumber(options.maxWait) || 0, wait) : maxWait;
-        trailing = 'trailing' in options ? !!options.trailing : trailing;
-      }
-
-      function invokeFunc(time) {
-        var args = lastArgs,
-            thisArg = lastThis;
-
-        lastArgs = lastThis = undefined;
-        lastInvokeTime = time;
-        result = func.apply(thisArg, args);
-        return result;
-      }
-
-      function leadingEdge(time) {
-        // Reset any `maxWait` timer.
-        lastInvokeTime = time;
-        // Start the timer for the trailing edge.
-        timerId = setTimeout(timerExpired, wait);
-        // Invoke the leading edge.
-        return leading ? invokeFunc(time) : result;
-      }
-
-      function remainingWait(time) {
-        var timeSinceLastCall = time - lastCallTime,
-            timeSinceLastInvoke = time - lastInvokeTime,
-            timeWaiting = wait - timeSinceLastCall;
-
-        return maxing
-          ? nativeMin(timeWaiting, maxWait - timeSinceLastInvoke)
-          : timeWaiting;
-      }
-
-      function shouldInvoke(time) {
-        var timeSinceLastCall = time - lastCallTime,
-            timeSinceLastInvoke = time - lastInvokeTime;
-
-        // Either this is the first call, activity has stopped and we're at the
-        // trailing edge, the system time has gone backwards and we're treating
-        // it as the trailing edge, or we've hit the `maxWait` limit.
-        return (lastCallTime === undefined || (timeSinceLastCall >= wait) ||
-          (timeSinceLastCall < 0) || (maxing && timeSinceLastInvoke >= maxWait));
-      }
-
-      function timerExpired() {
-        var time = now();
-        if (shouldInvoke(time)) {
-          return trailingEdge(time);
-        }
-        // Restart the timer.
-        timerId = setTimeout(timerExpired, remainingWait(time));
-      }
-
-      function trailingEdge(time) {
-        timerId = undefined;
-
-        // Only invoke if we have `lastArgs` which means `func` has been
-        // debounced at least once.
-        if (trailing && lastArgs) {
-          return invokeFunc(time);
-        }
-        lastArgs = lastThis = undefined;
-        return result;
-      }
-
-      function cancel() {
-        if (timerId !== undefined) {
-          clearTimeout(timerId);
-        }
-        lastInvokeTime = 0;
-        lastArgs = lastCallTime = lastThis = timerId = undefined;
-      }
-
-      function flush() {
-        return timerId === undefined ? result : trailingEdge(now());
-      }
-
-      function debounced() {
-        var time = now(),
-            isInvoking = shouldInvoke(time);
-
-        lastArgs = arguments;
-        lastThis = this;
-        lastCallTime = time;
-
-        if (isInvoking) {
-          if (timerId === undefined) {
-            return leadingEdge(lastCallTime);
-          }
-          if (maxing) {
-            // Handle invocations in a tight loop.
-            clearTimeout(timerId);
-            timerId = setTimeout(timerExpired, wait);
-            return invokeFunc(lastCallTime);
-          }
-        }
-        if (timerId === undefined) {
-          timerId = setTimeout(timerExpired, wait);
-        }
-        return result;
-      }
-      debounced.cancel = cancel;
-      debounced.flush = flush;
-      return debounced;
-    }
-
-    /** Error message constants. */
-    var FUNC_ERROR_TEXT = 'Expected a function';
-
-    /**
-     * Creates a throttled function that only invokes `func` at most once per
-     * every `wait` milliseconds. The throttled function comes with a `cancel`
-     * method to cancel delayed `func` invocations and a `flush` method to
-     * immediately invoke them. Provide `options` to indicate whether `func`
-     * should be invoked on the leading and/or trailing edge of the `wait`
-     * timeout. The `func` is invoked with the last arguments provided to the
-     * throttled function. Subsequent calls to the throttled function return the
-     * result of the last `func` invocation.
-     *
-     * **Note:** If `leading` and `trailing` options are `true`, `func` is
-     * invoked on the trailing edge of the timeout only if the throttled function
-     * is invoked more than once during the `wait` timeout.
-     *
-     * If `wait` is `0` and `leading` is `false`, `func` invocation is deferred
-     * until to the next tick, similar to `setTimeout` with a timeout of `0`.
-     *
-     * See [David Corbacho's article](https://css-tricks.com/debouncing-throttling-explained-examples/)
-     * for details over the differences between `_.throttle` and `_.debounce`.
-     *
-     * @static
-     * @memberOf _
-     * @since 0.1.0
-     * @category Function
-     * @param {Function} func The function to throttle.
-     * @param {number} [wait=0] The number of milliseconds to throttle invocations to.
-     * @param {Object} [options={}] The options object.
-     * @param {boolean} [options.leading=true]
-     *  Specify invoking on the leading edge of the timeout.
-     * @param {boolean} [options.trailing=true]
-     *  Specify invoking on the trailing edge of the timeout.
-     * @returns {Function} Returns the new throttled function.
-     * @example
-     *
-     * // Avoid excessively updating the position while scrolling.
-     * jQuery(window).on('scroll', _.throttle(updatePosition, 100));
-     *
-     * // Invoke `renewToken` when the click event is fired, but not more than once every 5 minutes.
-     * var throttled = _.throttle(renewToken, 300000, { 'trailing': false });
-     * jQuery(element).on('click', throttled);
-     *
-     * // Cancel the trailing throttled invocation.
-     * jQuery(window).on('popstate', throttled.cancel);
-     */
-    function throttle(func, wait, options) {
-      var leading = true,
-          trailing = true;
-
-      if (typeof func != 'function') {
-        throw new TypeError(FUNC_ERROR_TEXT);
-      }
-      if (isObject(options)) {
-        leading = 'leading' in options ? !!options.leading : leading;
-        trailing = 'trailing' in options ? !!options.trailing : trailing;
-      }
-      return debounce(func, wait, {
-        'leading': leading,
-        'maxWait': wait,
-        'trailing': trailing
-      });
-    }
-
-    /**
-     * Slightly enhanced version of `useState` that includes a getter that remains constant
-     * (i.e. you can use it in `useEffect` and friends without it being a dependency).
-     *
-     * @param initialState
-     * @returns
-     */
-    function useState(initialState) {
-        // We keep both, but overrride the `setState` functionality
-        const [state, setStateP] = y(initialState);
-        const ref = A(state);
-        // Hijack the normal setter function 
-        // to also set our ref to the new value
-        const setState = q$1(value => {
-            if (typeof value === "function") {
-                const callback = value;
-                setStateP(prevValue => {
-                    const nextValue = callback(prevValue);
-                    ref.current = nextValue;
-                    return nextValue;
-                });
-            }
-            else {
-                ref.current = value;
-                setStateP(value);
-            }
-        }, []);
-        const getState = () => { return ref.current; };
-        console.assert(ref.current === state || (typeof state === "number" && isNaN(state)));
-        return [state, setState, getState];
-    }
-
-    function identity(...t) { return t; }
-    function useThrottled(callback, wait, options) {
-        const throttled = T$1(() => {
-            return callback ? throttle(callback, wait, options) : null;
-        }, [callback, wait, options?.leading, options?.trailing]);
-        s(() => {
-            return () => throttled?.cancel();
-        }, [throttled]);
-        return throttled;
-    }
-    function useDebounced(callback, wait, options) {
-        const debounced = T$1(() => {
-            return callback ? debounce(callback, wait, options) : null;
-        }, [callback, wait, options?.leading, options?.maxWait, options?.trailing]);
-        s(() => {
-            return () => debounced?.cancel();
-        }, [debounced]);
-        return debounced;
-    }
-    /**
-     * Given an async function, returns a function that's suitable for non-async APIs,
-     * along with other information about the current run's status.
-     *
-     * See also `useAsyncHandler` for a version that's specialized for DOM event handlers.
-     *
-     * When called multiple times in quick succession, (i.e. before the handler has finished),
-     * this works like Lodash's `throttle` function with the `wait` option always
-     * set to however long the handler takes to complete. A second call to the sync function will be
-     * throttled until the first call has finished. The return value of the function is the result
-     * of the previous invocation, or `undefined` on the first call.
-     *
-     * The handler is only ever delayed if one is currently running, so, e.g. for iOS touch events the
-     * first call happens in the same event handler (which means things like calls to `element.focus()`
-     * will work as intended, since that fails when the event is "split up")
-     *
-     * Finally, because the sync handler may be invoked on a delay, any property references on the arguments
-     * provided might be stale by the time it's actually invoked (e.g. accessing `event.currentTarget.checked`
-     * is not stable across time because it's a "live" value -- you almost always want the value that it
-     * had at the original time the handler was called). The `capture` option allows you to save that kind of
-     * dynamic data at the time it runs; the `AP` and `SP` type parameters likewise control
-     * the parameters the async handler and sync handler expect respectively.
-     *
-     */
-    function useAsync(asyncHandler, options) {
-        /* eslint-disable prefer-const */
-        let { throttle, debounce, capture } = (options ?? {});
-        capture ??= identity;
-        // We keep, like, a lot of render-state, but it only ever triggers a re-render
-        // when we start/stop an async action.
-        // Keep track of this for the caller's sake -- we don't really care.
-        const [currentType, setCurrentType] = useState(null);
-        const [runCount, setRunCount] = useState(0);
-        const [settleCount, setSettleCount] = useState(0);
-        const [resolveCount, setResolveCount] = useState(0);
-        const [rejectCount, setRejectCount] = useState(0);
-        // Things related to current execution
-        // Because we can both return and throw undefined, 
-        // we need separate state to track their existance too.
-        const [pending, setPending, getPending] = useState(false);
-        const [result, setResult, getResult] = useState(undefined);
-        const [error, setError, _getError] = useState(undefined);
-        const [hasError, setHasError, _getHasError] = useState(false);
-        const [hasResult, setHasResult, _getHasResult] = useState(false);
-        // We implement our own throttling behavior in regards to waiting until the async handler finishes.
-        // These two passive state variables keep track of that, automatically queueing/dequeuing the next handler.
-        const [getQueued, setQueued] = usePassiveState(null, returnNull);
-        // The actual sync handler.
-        // Capture/transform the given parameters if applicable,
-        // then run further logic that's debounced/throttled
-        const captureArgsAndExecuteDebouncedHandler = useStableCallback(function onNewExecuteRequest(...newArgs2) {
-            // Capture the arguments we were given.
-            // We might use them immediately, or we might store them to `queued`,
-            // but in either case we do need the captured value.
-            const captured = capture(...newArgs2);
-            // This is all logic that deals with the captured value instead of the raw arguments.
-            // It's called in two separate circumstances,
-            // and has the debounce/throttle logic already applied
-            return executeHandlerWithDebounce(getPending(), ...captured);
-        });
-        // This is the logic that runs when the handler is *just* about to start.
-        // This function itself is further transformed to be throttled/debounced if requested,
-        // so this might not be called immediately after 
-        const executeHandlerWithoutDebounce = useStableCallback(function onNewExecuteRequest2(enqueue, ...newArgs) {
-            const onThen = (value) => { setResult(value); setHasResult(true); setHasError(false); setResolveCount(r => ++r); };
-            const onCatch = (ex) => { setError(ex); setHasError(true); setHasResult(false); setRejectCount(r => ++r); };
-            const onFinally = () => {
-                const queued = getQueued();
-                setSettleCount(s => ++s);
-                if (queued) {
-                    setQueued(null);
-                    executeHandlerWithDebounce(false, ...queued);
-                }
-                else {
-                    setPending(false);
-                }
-            };
-            if (!enqueue) {
-                // Nothing is pending at the moment, so we can run our function immediately.
-                setRunCount(r => ++r);
-                setPending(true);
-                const result = asyncHandler?.(...newArgs);
-                const isPromise = (result != null && typeof result == "object" && "then" in result);
-                if (result == null || !isPromise) {
-                    // It's synchronous and returned successfully.
-                    // Bail out early.
-                    onThen(result);
-                    onFinally();
-                    setCurrentType("sync");
-                }
-                else {
-                    result.then(onThen).catch(onCatch).finally(onFinally);
-                    setCurrentType("async");
-                }
-            }
-            else {
-                // When we're still running a previous handler,
-                // just set ourselves as the next one to run and quit early.
-                // Nothing more to do.
-                setQueued(newArgs);
-            }
-            return getResult();
-        });
-        const executeHandlerWithT = useThrottled(!throttle ? null : executeHandlerWithoutDebounce, throttle ?? 0);
-        const executeHandlerWithD = useDebounced(!debounce ? null : (executeHandlerWithT ?? executeHandlerWithoutDebounce), debounce ?? 0);
-        const executeHandlerWithDebounce = (executeHandlerWithD ?? executeHandlerWithT ?? executeHandlerWithoutDebounce);
-        const flushDebouncedPromise = useStableCallback(() => {
-            if (executeHandlerWithDebounce && "flush" in executeHandlerWithDebounce)
-                executeHandlerWithDebounce.flush();
-        });
-        return {
-            syncHandler: captureArgsAndExecuteDebouncedHandler,
-            currentType,
-            pending,
-            result,
-            error,
-            hasError,
-            hasResult,
-            resolveCount,
-            rejectCount,
-            settleCount,
-            callCount: runCount,
-            flushDebouncedPromise
-        };
-    }
-
-    /**
-     * Given an asyncronous event handler, returns a syncronous one that works on the DOM,
-     * along with some other information related to the current state.
-     * Does not modify any props.
-     *
-     * Note that because the handler you provide may be called with a delay, and
-     * because the value of, e.g., an `<input>` element will likely be stale by the
-     * time the delay is over, a `capture` function is necessary in order to
-     * capture the relevant information from the DOM. Any other simple event data,
-     * like `mouseX` or `shiftKey` can stay on the event itself and don't
-     * need to be captured &ndash; it's never stale.
-     *
-     * ```tsx
-     * const asyncOnInput = async (value: number, e: Event) => {
-     *     [...] // Ex. send to a server and setState when done
-     * };
-     * const {
-     *     // A sync version of asyncOnInput
-     *     syncHandler,
-     *     // True while the handler is running
-     *     pending,
-     *     // The error thrown, if any
-     *     error,
-     *     // Show this value while the operation's pending
-     *     currentCapture,
-     *     // And others, see `UseAsyncHandlerReturnType`
-     *     ...rest
-     * } = useAsyncHandler<HTMLInputElement>()(asyncOnInput, {
-     *     // Pass in the capture function that saves event data
-     *     // from being stale.
-     *     capture: e => {
-     *         // `capture` can have side-effects because
-     *         // it's called exactly once per invocation
-     *         e.preventDefault();
-     *
-     *         // Save this value so that it's never stale
-     *         return e.currentTarget.valueAsNumber;
-     *     }
-     * });
-     *
-     * const onInput = pending? null : syncHandler;
-     * ```
-     *
-     * The handler is automatically throttled to only run one at a time.
-     * If the handler is called, and then before it finishes, is called again,
-     * it will be put on hold until the current one finishes, at which point
-     * the second one will run.  If the handler is called a third time before
-     * the first has finished, it will *replace* the second, so only the most
-     * recently called iteration of the handler will run.
-     *
-     *
-     * You may optionally *also* specify debounce and throttle parameters that wait until the
-     * syncronous handler has not been called for the specified number of
-     * milliseconds, at which point we *actually* run the asyncronous handler
-     * according to the logic in the previous paragraph. This is in
-     * *addition* to throttling the handler, and does not replace that behavior.
-     *
-     * @see useAsync A more general version of this hook that can work with any type of handler, not just DOM event handlers.
-     */
-    function useAsyncHandler({ asyncHandler, capture: originalCapture, ...restAsyncOptions }) {
-        // We need to differentiate between "nothing captured yet" and "`undefined` was captured"
-        const [currentCapture, setCurrentCapture, getCurrentCapture] = useState(undefined);
-        const [hasCapture, setHasCapture] = useState(false);
-        // Wrap around the normal `useAsync` `capture` function to also
-        // keep track of the last value the user actually input.
-        // 
-        // Without this there's no way to re-render the control with
-        // it being both controlled and also having the "correct" value,
-        // and at any rate also protects against sudden exceptions reverting
-        // your change out from under you.
-        const capture = useStableCallback((e) => {
-            const captured = originalCapture(e);
-            setCurrentCapture(captured);
-            setHasCapture(true);
-            return [captured, e];
-        });
-        return {
-            getCurrentCapture,
-            currentCapture,
-            hasCapture,
-            ...useAsync(asyncHandler, { capture, ...restAsyncOptions })
-        };
-    }
-
-    /**
-     * Allows a parent component to access information about certain
-     * child components once they have rendered.
-     *
-     * This hook is designed to be lightweight, in that the parent keeps no state
-     * and runs no effects.  Each child *does* run an effect, but with no state
-     * changes unless you explicitly request them.
-     *
-     *
-     */
-    function useManagedChildren(parentParameters) {
-        const { managedChildrenParameters: { onAfterChildLayoutEffect, onChildrenMountChange }, ...rest } = parentParameters;
-        useEnsureStability("useManagedChildren", onAfterChildLayoutEffect, onChildrenMountChange);
-        const getHighestIndex = q$1(() => {
-            return managedChildrenArray.current.highestIndex;
-        }, []);
-        // All the information we have about our children is stored in this **stable** array.
-        // Any mutations to this array **DO NOT** trigger any sort of a re-render.
-        const managedChildrenArray = A({ arr: [], rec: {}, highestIndex: 0, lowestIndex: 0 });
-        // For indirect access to each child
-        // Compare getManagedChildInfo
-        // TODO: The primary use for this is flaggable closest fits
-        // which needs to search all children for that closest fit.
-        // It would be nice if there was something better for that.
-        const forEachChild = q$1((f) => {
-            for (const child of managedChildrenArray.current.arr) {
-                if (child)
-                    f(child);
-            }
-            for (const field in managedChildrenArray.current.rec) {
-                const child = managedChildrenArray.current.rec[field];
-                if (child)
-                    f(child);
-            }
-        }, []);
-        // Retrieves the information associated with the child with the given index.
-        // `undefined` if not child there, or it's unmounted.
-        const getManagedChildInfo = q$1((index) => {
-            if (typeof index == "number")
-                return managedChildrenArray.current.arr[index];
-            else
-                return managedChildrenArray.current.rec[index];
-        }, []);
-        // tl;dr this is a way to have run useLayoutEffect once after all N children
-        // have mounted and run *their* useLayoutEffect, but also *without* re-rendering
-        // ourselves because of having a `childCount` state or anything similar.
-        //
-        // When the child count ref updates, we want the parent to also run an effect
-        // to maybe do something with all these children that just mounted.
-        // The easiest way would be useEffect(..., [childCount]) but
-        // that would require us having a childCount state, then calling
-        // setChildCount and re-rendering every time children mount
-        // (only one re-render at a time unless children are staggered, but still)
-        // 
-        // As an alternate solution, any time a child uses ULE on mount, it queues a microtask
-        // to emulate running ULE on the parent. Only the first child will actually queue
-        // the microtask (by checking hasRemoteULE first) so that the "effect" only
-        // runs once. When it's done, hasRemoteULE is reset so it can run again if
-        // more children mount/unmount.
-        const hasRemoteULEChildMounted = A(null);
-        const remoteULEChildChangedCausers = A(new Set());
-        const remoteULEChildChanged = q$1((index) => {
-            if (remoteULEChildChangedCausers.current.size == 0) {
-                debounceRendering(() => {
-                    onAfterChildLayoutEffect?.(remoteULEChildChangedCausers.current);
-                    remoteULEChildChangedCausers.current.clear();
-                });
-            }
-            remoteULEChildChangedCausers.current.add(index);
-            return () => { };
-        }, [ /* Must remain stable */]);
-        const remoteULEChildMounted = q$1((index, mounted) => {
-            if (!hasRemoteULEChildMounted.current) {
-                hasRemoteULEChildMounted.current = {
-                    mounts: new Set(),
-                    unmounts: new Set(),
-                };
-                debounceRendering(() => {
-                    onChildrenMountChange?.(hasRemoteULEChildMounted.current.mounts, hasRemoteULEChildMounted.current.unmounts);
-                    hasRemoteULEChildMounted.current = null;
-                });
-            }
-            if (mounted) {
-                managedChildrenArray.current.highestIndex = Math.max(managedChildrenArray.current.highestIndex, index);
-            }
-            else {
-                if (typeof index == "number") {
-                    delete managedChildrenArray.current.arr[index];
-                    let shave = 0;
-                    while (shave <= managedChildrenArray.current.arr.length && managedChildrenArray.current.arr[managedChildrenArray.current.arr.length - 1 - shave] === undefined) {
-                        ++shave;
-                    }
-                    managedChildrenArray.current.arr.splice(managedChildrenArray.current.arr.length - shave, shave);
-                }
-                else
-                    delete managedChildrenArray.current.rec[index];
-            }
-            hasRemoteULEChildMounted.current[mounted ? "mounts" : "unmounts"].add(index);
-        }, [ /* Must remain stable */]);
-        const managedChildren = useStableObject({
-            ...{ _: managedChildrenArray.current },
-            forEach: forEachChild,
-            getAt: getManagedChildInfo,
-            getHighestIndex: getHighestIndex,
-            arraySlice: q$1(() => {
-                return managedChildrenArray.current.arr.slice();
-            }, [])
-        });
-        return {
-            managedChildContext: useStableObject({
-                managedChildParameters: useStableObject({
-                    managedChildrenArray: managedChildrenArray.current,
-                    remoteULEChildMounted,
-                    remoteULEChildChanged
-                })
-            }),
-            managedChildrenReturn: { getChildren: q$1(() => managedChildren, []) }
-        };
-    }
-    function useManagedChild(info) {
-        const { managedChildParameters: { index }, managedChildContext: { managedChildParameters: { managedChildrenArray, remoteULEChildMounted, remoteULEChildChanged } } } = info;
-        // Any time our child props change, make that information available
-        // the parent if they need it.
-        // The parent can listen for all updates and only act on the ones it cares about,
-        // and multiple children updating in the same tick will all be sent at once.
-        _(() => {
-            // Insert this information in-place
-            if (typeof index == "number") {
-                managedChildrenArray.arr[index] = { ...info.managedChildParameters };
-            }
-            else {
-                managedChildrenArray.rec[index] = { ...info.managedChildParameters };
-            }
-            return remoteULEChildChanged(index);
-        }, [...Object.entries(info).flat(9)]); // 9 is infinity, right? Sure. Unrelated: TODO.
-        // When we mount, notify the parent via queueMicrotask
-        // (every child does this, so everything's coordinated to only queue a single microtask per tick)
-        // Do the same on unmount.
-        // Note: It's important that this comes AFTER remoteULEChildChanged
-        // so that remoteULEChildMounted has access to all the info on mount.
-        _(() => {
-            remoteULEChildMounted?.(index, true);
-            return () => remoteULEChildMounted?.(index, false);
-        }, [index]);
-    }
-    /**
-     * An extension to useManagedChildren that handles the following common case:
-     * 1. You have a bunch of children
-     * 2. At any given time, only 1 of them is "selected", "activated", "focusable", whatever (or 0 of them, that's cool too, just 0 or 1 though).
-     * 3. The parent has control over who is "selected" via a numerical index.
-     *
-     * This hook allows for much easier control over selection management.
-     *
-     * Note that because you may want to use multiple flags with the same children, this hook *does not* use `useManagedChildren`!
-     * You need to pass it the existing children, and you must pass your invocation of `useManagedChildren` the returned `onChildrenMountChange` handler!
-     *
-     * Also because of that, the types of this function are rather odd.  It's better to start off using a hook that already uses a flag, such as `useRovingTabIndex`, as an example.
-     *
-     *
-     * @param param0
-     * @returns
-     */
-    function useChildrenFlag({ getChildren, initialIndex, closestFit, onIndexChange, getAt, setAt, isValid, }) {
-        useEnsureStability("useChildrenFlag", onIndexChange, getAt, setAt, isValid);
-        const [getCurrentIndex, setCurrentIndex] = usePassiveState(onIndexChange, q$1(() => (initialIndex ?? (null)), []));
-        const [getRequestedIndex, setRequestedIndex] = usePassiveState(null, q$1(() => (initialIndex ?? (null)), []));
-        //    const getFitNullToZero = useStableGetter(fitNullToZero);
-        // Shared between onChildrenMountChange and changeIndex, not public (but could be I guess)
-        const getClosestFit = q$1((requestedIndex) => {
-            const children = getChildren();
-            let closestDistance = Infinity;
-            let closestIndex = null;
-            children.forEach(child => {
-                if (isValid(child)) {
-                    const newDistance = Math.abs(child.index - requestedIndex);
-                    if (newDistance < closestDistance || (newDistance == closestDistance && child.index < requestedIndex)) {
-                        closestDistance = newDistance;
-                        closestIndex = child.index;
-                    }
-                }
-            });
-            return closestIndex;
-        }, [ /* Must remain stable! */]);
-        // Any time a child mounts/unmounts, we need to double-check to see if that affects 
-        // the "currently selected" (or whatever) index.  The two cases we're looking for:
-        // 1. The currently selected child unmounted
-        // 2. A child mounted, and it mounts with the index we're looking for
-        const reevaluateClosestFit = useStableCallback(() => {
-            const children = getChildren();
-            const requestedIndex = getRequestedIndex();
-            const currentIndex = getCurrentIndex();
-            const currentChild = currentIndex == null ? null : children.getAt(currentIndex);
-            if (requestedIndex != null && closestFit && (requestedIndex != currentIndex || currentChild == null || !isValid(currentChild))) {
-                if (currentChild)
-                    setAt(currentChild, false);
-                const closestFitIndex = getClosestFit(requestedIndex);
-                setCurrentIndex(closestFitIndex);
-                if (closestFitIndex != null) {
-                    const closestFitChild = children.getAt(closestFitIndex);
-                    console.assert(closestFitChild != null, "Internal logic???");
-                    setAt(closestFitChild, true);
-                }
-            }
-        });
-        const changeIndex = q$1((arg) => {
-            const children = getChildren();
-            const requestedIndex = arg instanceof Function ? arg(getRequestedIndex()) : arg;
-            //if (requestedIndex == null && getFitNullToZero())
-            //    requestedIndex = 0;
-            setRequestedIndex(requestedIndex);
-            const currentIndex = getCurrentIndex();
-            if (currentIndex == requestedIndex)
-                return requestedIndex;
-            let newMatchingChild = (requestedIndex == null ? null : children.getAt(requestedIndex));
-            const oldMatchingChild = (currentIndex == null ? null : children.getAt(currentIndex));
-            if (requestedIndex == null) {
-                // Easy case
-                setCurrentIndex(null);
-                if (oldMatchingChild)
-                    setAt(oldMatchingChild, false);
-                return null;
-            }
-            else {
-                if (newMatchingChild && isValid(newMatchingChild)) {
-                    setCurrentIndex(requestedIndex);
-                    if (oldMatchingChild)
-                        setAt(oldMatchingChild, false);
-                    setAt(newMatchingChild, true);
-                    return requestedIndex;
-                }
-                else {
-                    const closestFitIndex = getClosestFit(requestedIndex);
-                    setCurrentIndex(closestFitIndex);
-                    if (closestFitIndex != null) {
-                        newMatchingChild = children.getAt(closestFitIndex);
-                        console.assert(newMatchingChild != null, "Internal logic???");
-                        if (oldMatchingChild)
-                            setAt(oldMatchingChild, false);
-                        setAt(newMatchingChild, true);
-                        return closestFitIndex;
-                    }
-                    else {
-                        if (oldMatchingChild)
-                            setAt(oldMatchingChild, false);
-                        return null;
-                    }
-                }
-            }
-        }, []);
-        // Run once, on mount
-        _(() => {
-            onIndexChange?.(initialIndex ?? null, undefined);
-        }, []);
-        return { changeIndex, reevaluateClosestFit, getCurrentIndex };
-    }
-
-    function immediate(f) { f(); }
-    function useChildrenHaveFocus(args) {
-        const { childrenHaveFocusParameters: { onCompositeFocusChange } } = args;
-        const [getAnyFocused, setAnyFocused] = usePassiveState(onCompositeFocusChange, returnFalse, immediate);
-        const [_getFocusCount, setFocusCount] = usePassiveState(useStableCallback((anyFocused, anyPreviouslyFocused) => {
-            console.assert(anyFocused >= 0 && anyFocused <= 1);
-            setAnyFocused(!!(anyFocused && !anyPreviouslyFocused));
-        }));
-        return {
-            childrenHaveFocusReturn: { getAnyFocused, },
-            childrenHaveFocusChildContext: useStableObject({ childrenHaveFocusChildParameters: useStableObject({ setFocusCount }) }),
-        };
-    }
-    function useChildrenHaveFocusChild({ childrenHaveFocusChildContext: { childrenHaveFocusChildParameters: { setFocusCount } } }) {
-        return {
-            hasCurrentFocusParameters: {
-                onCurrentFocusedInnerChanged: useStableCallback((focused, prev) => {
-                    if (focused) {
-                        setFocusCount(p => (p ?? 0) + 1);
-                    }
-                    else if (!focused && prev) {
-                        setFocusCount(p => (p ?? 0) - 1);
-                    }
-                }),
-            },
-            /*refElementParameters: {
-                onElementChange: useCallback((e: E | null, _prev: E | null | undefined) => {
-                    if (e) {
-                        allElements.add(e);
-                        return () => {
-                            allElements.delete(e);
-                        }
-                    }
-                }, [])
-            }*/
-        };
-    }
-
-    function useMergedChildren({ children: lhs }, { children: rhs }) {
-        if (lhs == null && rhs == null) {
-            return undefined;
-        }
-        else if (lhs == null) {
-            return rhs;
-        }
-        else if (rhs == null) {
-            return lhs;
-        }
-        else {
-            return h$1(p$1, {}, lhs, rhs);
-        }
-    }
-
-    function r(e){var t,f,n="";if("string"==typeof e||"number"==typeof e)n+=e;else if("object"==typeof e)if(Array.isArray(e))for(t=0;t<e.length;t++)e[t]&&(f=r(e[t]))&&(n&&(n+=" "),n+=f);else for(t in e)e[t]&&(n&&(n+=" "),n+=t);return n}function clsx(){for(var e,t,f=0,n="";f<arguments.length;)(e=arguments[f++])&&(t=r(e))&&(n&&(n+=" "),n+=t);return n}
-
-    /**
-     * Given two sets of props, merges their `class` and `className` properties.
-     * Duplicate classes are removed (order doesn't matter anyway).
-     *
-     * @param lhs Classes of the first component
-     * @param rhs Classes of the second component
-     * @returns A string representing all combined classes from both arguments.
-     */
-    function useMergedClasses({ class: lhsClass, className: lhsClassName }, { class: rhsClass, className: rhsClassName }) {
-        // Note: For the sake of forward compatibility, this function is labelled as
-        // a hook, but as it uses no other hooks it technically isn't one.
-        if (lhsClass || rhsClass || lhsClassName || rhsClassName) {
-            const lhsClasses = clsx(lhsClass, lhsClassName).split(" ");
-            const rhsClasses = clsx(rhsClass, rhsClassName).split(" ");
-            const allClasses = new Set([...Array.from(lhsClasses), ...Array.from(rhsClasses)]);
-            return Array.from(allClasses).join(" ");
-        }
-        else {
-            return undefined;
-        }
-    }
-
-    function processRef(instance, ref) {
-        if (typeof ref === "function") {
-            ref(instance);
-        }
-        else if (ref != null) {
-            ref.current = instance;
-        }
-        else {
-            /* eslint-disable no-debugger */
-            debugger;
-            console.assert(false, "Unknown ref type found that was neither a RefCallback nor a RefObject");
-        }
-    }
-    /**
-     * Combines two refs into one. This allows a component to both use its own ref *and* forward a ref that was given to it.
-     * @param lhs
-     * @param rhs
-     * @returns
-     */
-    function useMergedRefs({ ref: rhs }, { ref: lhs }) {
-        const combined = q$1((current) => {
-            processRef(current, lhs);
-            processRef(current, rhs);
-        }, [lhs, rhs]);
-        if (lhs == null && rhs == null) {
-            return undefined;
-        }
-        else if (lhs == null) {
-            return rhs;
-        }
-        else if (rhs == null) {
-            return lhs;
-        }
-        else {
-            return combined;
-        }
-    }
-
-    function styleStringToObject(style) {
-        // TODO: This sucks D:
-        return Object.fromEntries(style.split(";").map(statement => statement.split(":")));
-    }
-    /**
-     * Merges two style objects, returning the result.
-     *
-     * @param style The user-given style prop for this component
-     * @param obj The CSS properties you want added to the user-given style
-     * @returns A CSS object containing the properties of both objects.
-     */
-    function useMergedStyles(lhs, rhs) {
-        // Easy case, when there are no styles to merge return nothing.
-        if (!lhs?.style && !rhs?.style)
-            return undefined;
-        if (typeof lhs != typeof rhs) {
-            // Easy cases, when one is null and the other isn't.
-            if (lhs?.style && !rhs?.style)
-                return lhs.style;
-            if (!lhs?.style && rhs?.style)
-                return rhs.style;
-            // They're both non-null but different types.
-            // Convert the string type to an object bag type and run it again.
-            if (lhs?.style && rhs?.style) {
-                // (useMergedStyles isn't a true hook -- this isn't a violation)
-                if (typeof lhs?.style == "string")
-                    return useMergedStyles({ style: styleStringToObject(lhs?.style) }, rhs);
-                if (typeof rhs?.style == "string")
-                    return useMergedStyles(lhs, { style: styleStringToObject(rhs?.style) });
-            }
-            // Logic???
-            return undefined;
-        }
-        // They're both strings, just concatenate them.
-        if (typeof lhs?.style == "string") {
-            return `${lhs.style};${rhs?.style ?? ""}`;
-        }
-        // They're both objects, just merge them.
-        return {
-            ...(lhs?.style ?? {}),
-            ...(rhs?.style ?? {})
-        };
-    }
-
-    let log = console.warn;
-    /**
-     * Given two sets of props, merges them and returns the result.
-     *
-     * The hook is aware of and can intelligently merge `className`, `class`, `style`, `ref`, and all event handlers.
-     * @param lhs2
-     * @param rhs2
-     * @returns
-     */
-    function useMergedProps(...allProps) {
-        useEnsureStability("useMergedProps", allProps.length);
-        let ret = {};
-        for (let nextProps of allProps) {
-            ret = useMergedProps2(ret, nextProps);
-        }
-        return ret;
-    }
-    function useMergedProps2(lhsAll, rhsAll) {
-        // First, separate the props we were given into two groups:
-        // lhsAll and rhsAll contain all the props we were given, and
-        // lhsMisc and rhsMisc contain all props *except* for the easy ones
-        // like className and style that we already know how to merge.
-        const { children: _lhsChildren, class: _lhsClass, className: _lhsClassName, style: _lhsStyle, ref: _lhsRef, ...lhsMisc } = lhsAll;
-        const { children: _rhsChildren, class: _rhsClass, className: _rhsClassName, style: _rhsStyle, ref: _rhsRef, ...rhsMisc } = rhsAll;
-        const ret = {
-            ...lhsMisc,
-            ref: useMergedRefs(lhsAll, rhsAll),
-            style: useMergedStyles(lhsAll, rhsAll),
-            className: useMergedClasses(lhsAll, rhsAll),
-            children: useMergedChildren(lhsAll, rhsAll),
-        };
-        if (ret.ref === undefined)
-            delete ret.ref;
-        if (ret.style === undefined)
-            delete ret.style;
-        if (ret.className === undefined)
-            delete ret.className;
-        if (ret.children === undefined)
-            delete ret.children;
-        // Now, do *everything* else
-        // Merge every remaining existing entry in lhs with what we've already put in ret.
-        //const lhsEntries = Object.entries(lhs) as [keyof T, T[keyof T]][];
-        const rhsEntries = Object.entries(rhsMisc);
-        for (const [rhsKeyU, rhsValue] of rhsEntries) {
-            const rhsKey = rhsKeyU;
-            const lhsValue = lhsMisc[rhsKey];
-            if (typeof lhsValue === "function" || typeof rhsValue === "function") {
-                // They're both functions that can be merged (or one's a function and the other's null).
-                // Not an *easy* case, but a well-defined one.
-                const merged = mergeFunctions(lhsValue, rhsValue);
-                ret[rhsKey] = merged;
-            }
-            else {
-                // Uh...we're here because one of them's null, right?
-                if (lhsValue == null && rhsValue == null) {
-                    if (rhsValue === null && lhsValue === undefined)
-                        ret[rhsKey] = rhsValue;
-                    else
-                        ret[rhsKey] = lhsValue;
-                }
-                if (lhsValue == null)
-                    ret[rhsKey] = rhsValue;
-                else if (rhsValue == null)
-                    ret[rhsKey] = lhsValue;
-                else if (rhsValue == lhsValue) ;
-                else {
-                    // Ugh.
-                    // No good strategies here, just log it if requested
-                    log?.(`The prop "${rhsKey}" cannot simultaneously be the values ${lhsValue} and ${rhsValue}. One must be chosen outside of useMergedProps.`);
-                    ret[rhsKey] = rhsValue;
-                }
-            }
-        }
-        return ret;
-    }
-    function mergeFunctions(lhs, rhs) {
-        if (!lhs)
-            return rhs;
-        if (!rhs)
-            return lhs;
-        return (...args) => {
-            const lv = lhs(...args);
-            const rv = rhs(...args);
-            if (lv instanceof Promise || rv instanceof Promise)
-                return Promise.all([lv, rv]);
-        };
-    }
-    /*
-    function test<P extends h.JSX.HTMLAttributes<HTMLInputElement>>(props: P) {
-
-        const id0: GenericGet<{}, "id", string> = "";
-        const id3: GenericGet<{ id: undefined }, "id", string> = undefined;
-        const id4: GenericGet<{ id: undefined }, "id", string> = undefined;
-        const id5: GenericGet<{ id: undefined }, "id", string> = undefined;
-        const id6: GenericGet<{ id: undefined }, "id", string> = undefined;
-        //const id2: ZipSingle<string | undefined, string | undefined> = undefined;
-        const id1: ZipObject<{ id: undefined }, { id: string }> = { id: undefined };
-
-        type M1 = GenericGet<P, "style", string>;
-        type M2 = GenericGet<{}, "style", string>;
-        const m1: M1 = "";
-        const m2: M1 = undefined;
-        /// @ts-expect-error    Because number isn't assignable to string
-        const m3: M1 = 0;
-
-        const m4: M2 = "";
-        const m5: M2 = undefined;
-        /// @ts-expect-error    Because number isn't assignable to string
-        const m6: M2 = 0;
-
-        const p1: MergedProps<HTMLInputElement, {}, { id: string }> = useMergedProps<HTMLInputElement>()({}, { id: "string" });
-        const p2: MergedProps<HTMLInputElement, { id: undefined }, { id: string }> = useMergedProps<HTMLInputElement>()({ id: undefined }, { id: "string" });
-        const p3: MergedProps<HTMLInputElement, { id: undefined }, { id: undefined }> = useMergedProps<HTMLInputElement>()({ id: undefined }, { id: undefined });
-        const p4: MergedProps<HTMLInputElement, {}, {}> = useMergedProps<HTMLInputElement>()({}, {});
-        const p5 = useMergedProps<HTMLInputElement>()(props, {});
-        const p6 = useMergedProps<HTMLInputElement>()(props, { id: undefined });
-        const p7 = useMergedProps<HTMLInputElement>()(props, { id: "string" });
-
-
-        p1.id?.concat("");
-        p2.id?.concat("");
-        /// @ts-expect-error    id can't be anything but undefined
-        p3.id?.concat("");
-        /// @ts-expect-error    id can't be anything but undefined
-        p4.id?.concat("");
-
-
-        p5.id?.concat("");
-        p6.id?.concat("");
-        p7.id?.concat("");
-
-        /// @ts-expect-error    id must contain undefined
-        p5.id.concat("");
-        /// @ts-expect-error    id must contain undefined
-        p6.id.concat("");
-        /// @ts-expect-error    id must contain undefined
-        p7.id.concat("");
-
-
-        if (p5.allowFullScreen === undefined) {}
-        else if (p5.allowFullScreen === false) {}
-        else if (p5.allowFullScreen === true) {}
-        else {
-            acceptsNever(p5.allowFullScreen);
-        }
-
-
-        if (p6.allowFullScreen === undefined) {}
-        else if (p6.allowFullScreen === false) {}
-        else if (p6.allowFullScreen === true) {}
-        else {
-            acceptsNever(p6.allowFullScreen);
-        }
-
-
-        if (p7.allowFullScreen === undefined) {}
-        else if (p7.allowFullScreen === false) {}
-        else if (p7.allowFullScreen === true) {}
-        else {
-            acceptsNever(p7.allowFullScreen);
-        }
-
-
-        // Make sure it works recursively
-        const r1a = useMergedProps<HTMLInputElement>()({}, p1);
-        const r1b = useMergedProps<HTMLInputElement>()(props, p1);
-        const r2a = useMergedProps<HTMLInputElement>()({}, p2);
-        const r2b = useMergedProps<HTMLInputElement>()(props, p2);
-        const r3a = useMergedProps<HTMLInputElement>()({}, p3);
-        const r3b = useMergedProps<HTMLInputElement>()(props, p3);
-        const r4a = useMergedProps<HTMLInputElement>()({}, p4);
-        const r4b = useMergedProps<HTMLInputElement>()(props, p4);
-        const r5a = useMergedProps<HTMLInputElement>()({}, p5);
-        const r5b = useMergedProps<HTMLInputElement>()(props, p5);
-        const r6a = useMergedProps<HTMLInputElement>()({}, p6);
-        const r6b = useMergedProps<HTMLInputElement>()(props, p6);
-        const r7a = useMergedProps<HTMLInputElement>()({}, p7);
-        const r7b = useMergedProps<HTMLInputElement>()(props, p7);
-
-
-        r1a.id?.concat("");
-        r1b.id?.concat("");
-        r2a.id?.concat("");
-        r2b.id?.concat("");
-        // @ts-expect-error    id can't be anything but undefined
-        r3a.id?.concat("");
-        r3b.id?.concat("");
-        /// @ts-expect-error    id can't be anything but undefined
-        r4a.id?.concat("");
-        r4b.id?.concat("");
-
-
-        r5a.id?.concat("");
-        r5b.id?.concat("");
-        r6a.id?.concat("");
-        r6b.id?.concat("");
-        r7a.id?.concat("");
-        r7b.id?.concat("");
-
-        /// @ts-expect-error    id must contain undefined
-        r5a.id.concat("");
-        /// @ts-expect-error    id must contain undefined
-        r5b.id.concat("");
-        /// @ts-expect-error    id must contain undefined
-        r6a.id.concat("");
-        /// @ts-expect-error    id must contain undefined
-        r6b.id.concat("");
-        /// @ts-expect-error    id must contain undefined
-        r7a.id.concat("");
-        /// @ts-expect-error    id must contain undefined
-        r7b.id.concat("");
-
-
-        if (r5a.allowFullScreen === undefined) {}
-        else if (r5a.allowFullScreen === false) {}
-        else if (r5a.allowFullScreen === true) {}
-        else {
-            acceptsNever(r5a.allowFullScreen);
-        }
-
-
-        if (r5b.allowFullScreen === undefined) {}
-        else if (r5b.allowFullScreen === false) {}
-        else if (r5b.allowFullScreen === true) {}
-        else {
-            acceptsNever(r5b.allowFullScreen);
-        }
-
-
-        if (r6a.allowFullScreen === undefined) {}
-        else if (r6a.allowFullScreen === false) {}
-        else if (r6a.allowFullScreen === true) {}
-        else {
-            acceptsNever(r6a.allowFullScreen);
-        }
-
-
-        if (r6b.allowFullScreen === undefined) {}
-        else if (r6b.allowFullScreen === false) {}
-        else if (r6b.allowFullScreen === true) {}
-        else {
-            acceptsNever(r6b.allowFullScreen);
-        }
-
-
-        if (r7a.allowFullScreen === undefined) {}
-        else if (r7a.allowFullScreen === false) {}
-        else if (r7a.allowFullScreen === true) {}
-        else {
-            acceptsNever(r7a.allowFullScreen);
-        }
-
-
-        if (r7b.allowFullScreen === undefined) {}
-        else if (r7b.allowFullScreen === false) {}
-        else if (r7b.allowFullScreen === true) {}
-        else {
-            acceptsNever(r7b.allowFullScreen);
-        }
-
-    }
-    function acceptsNever(n: never) {}
-    */
-
-    /**
-     * Allows attaching an event handler to any *non-Preact* element, and removing it when the component using the hook unmounts. The callback does not need to be stable across renders.
-     *
-     * Due to typing limitations, this function must be called like this:
-     *
-     * `useEventHandler(element, "input")<InputEvent>(e => {})`
-     *
-     * The type argument is optional, but narrows down the type from "a union of all events" to whatever you specify, and errors if it doesn't exist.
-     *
-     * There is a separate version that attaches event handlers to a set of props.
-     * It takes different event string types (onEvent vs onevent).
-     *
-     * @param target A *non-Preact* node to attach the event to.
-     * @returns
-     * *
-     */
-    function useGlobalHandler(target, type, handler, options) {
-        // Note to self: The typing doesn't improve even if this is split up into a sub-function.
-        // No matter what, it seems impossible to get the handler's event object typed perfectly.
-        // It seems like it's guaranteed to always be a union of all available tupes.
-        // Again, no matter what combination of sub- or sub-sub-functions used.
-        let stableHandler = useStableCallback(handler ?? (() => { }));
-        if (handler == null)
-            stableHandler = null;
-        s(() => {
-            if (stableHandler) {
-                target.addEventListener(type, stableHandler, options);
-                return () => target.removeEventListener(type, stableHandler, options);
-            }
-        }, [target, type, stableHandler]);
-    }
-
-    /*
-    export function useRefElementProps<E extends Element>(r: UseRefElementReturnType<E>, ...otherProps: h.JSX.HTMLAttributes<E>[]): h.JSX.HTMLAttributes<E>[] {
-        return [r.refElementReturn.propsStable, ...otherProps];
-    }*/
-    /**
-     * Allows accessing the element a ref references as soon as it does so.
-     * *This hook itself returns a hook*--useRefElementProps modifies the props that you were going to pass to an HTMLElement,
-     * adding a RefCallback and merging it with any existing ref that existed on the props.
-     *
-     * Don't forget to provide the Element as the type argument!
-     *
-     * @returns The element, and the sub-hook that makes it retrievable.
-     */
-    function useRefElement(args) {
-        const { refElementParameters: { onElementChange, onMount, onUnmount } } = args;
-        useEnsureStability("useRefElement", onElementChange, onMount, onUnmount);
-        // Called (indirectly) by the ref that the element receives.
-        const handler = q$1((e, prevValue) => {
-            const cleanup = onElementChange?.(e, prevValue);
-            if (prevValue)
-                onUnmount?.(prevValue);
-            if (e)
-                onMount?.(e);
-            return cleanup;
-        }, []);
-        // Let us store the actual (reference to) the element we capture
-        const [getElement, setElement] = usePassiveState(handler, returnNull, runImmediately);
-        const propsStable = A({ ref: setElement });
-        // Return both the element and the hook that modifies 
-        // the props and allows us to actually find the element
-        return {
-            refElementReturn: {
-                getElement,
-                propsStable: propsStable.current
-            }
-        };
-    }
-    function runImmediately(f) {
-        f();
-    }
-
-    const MagicWindowKey = ("__preact-prop-helpers-escape-key-dismiss__");
-    function getElementDepth(element) {
-        let depth = 0;
-        let parent = element.parentElement;
-        while (parent) {
-            depth += 1;
-            parent = parent.parentElement;
-        }
-        return depth;
-    }
-    /**
-     * Adds event handlers for a modal-like soft-dismiss interaction.
-     *
-     * That is, any clicks or taps outside of the given component,
-     * or any time the Escape key is pressed within the component,
-     * (with various browser oddities regarding clicks on blank or inert areas handled)
-     * the component will request to close itself.
-     *
-     * Of course, if you don't do anything in the `onClose` function,
-     * it won't be a soft dismiss anymore.
-     *
-     * Handles events for pressing the `Escape` key to close the any currently open dialogs, tooltips, menus, popups, etc.
-     *
-     * One press of the `Escape` key is guaranteed to only call `onClose` for *only one* component, and it is called on the component deepest in the DOM tree, differentiated by passing context information between parent and child.
-     *
-     * @param param0
-     * @returns
-     */
-    function useEscapeDismiss({ escapeDismissParameters: { onClose, open, getWindow: unstableGetWindow, parentDepth, ...void1 }, refElementPopupReturn: { getElement, ...void2 } }) {
-        const stableOnClose = useStableCallback(onClose);
-        const getWindow = useStableCallback(unstableGetWindow);
-        const getDepth = useStableGetter(parentDepth + 1);
-        // When this component opens, add an event listener that finds the deepest open soft dismiss element to actually dismiss.
-        // Only opened components will add event handlers, and will remove them once closed.
-        // The reason this is so complicated is because:
-        // 1. We must only close one soft dismiss component at a time.  If there's a tooltip in a popup, the tooltip must be dismissed.
-        // 2. `keydown` events don't just work on arbitrary elements, for our purposes they must be from the `window`. So we can't rely on normal capturing or bubbling behavior on the element itself.
-        // 3. Event handlers added to the `window` via `addEventHandler` are called in the order of registration, which is completely at odds with #1.
-        //
-        // So all soft dismiss components listen for a keydown of Escape, 
-        // then the first one to do so will wait for a microtask, 
-        // then find the deepest element in the document tree to dismiss of all of those components currently open.
-        s(() => {
-            const window = getWindow();
-            window[MagicWindowKey] ??= { microtaskQueued: false, elementQueue: new Map() };
-            const info = window[MagicWindowKey];
-            if (open) {
-                console.log(`Adding handler for depth=${getDepth()}`);
-                window.addEventListener("keydown", handler, { capture: true });
-                return () => {
-                    console.log(`Removing handler for depth=${getDepth()}`);
-                    const element = getElement();
-                    if (element && info.elementQueue)
-                        info.elementQueue.delete(element);
-                    window.removeEventListener("keydown", handler, { capture: true });
-                };
-            }
-            function handler(e) {
-                if (e.key == "Escape") {
-                    console.log(`Escape key for depth=${getDepth()}`);
-                    // We don't know which of the currently active soft dismisses will actually do something,
-                    // but ONE of them definitely will,
-                    // so we stop propagation to child nodes, but not to everyone on the window (stopImmediatePropagation).
-                    e.preventDefault();
-                    e.stopPropagation();
-                    // This is what at least one of the elements will call
-                    const onClose2 = () => { stableOnClose("escape"); };
-                    const element = getElement();
-                    if (element) {
-                        const treeDepth = getElementDepth(element);
-                        const depth = getDepth();
-                        info.elementQueue.set(element, { depth, onClose: onClose2, treeDepth });
-                    }
-                    if (!info.microtaskQueued) {
-                        info.microtaskQueued = true;
-                        setTimeout(() => {
-                            const { elementQueue } = info;
-                            info.microtaskQueued = false;
-                            info.elementQueue = new Map();
-                            let deepestDepth = -Infinity;
-                            let deepestTreeDepth = -Infinity;
-                            let deepestOnClose = null;
-                            for (const [element, { depth, onClose, treeDepth }] of elementQueue) {
-                                let tieBroken = false;
-                                if (depth == deepestDepth) {
-                                    if (treeDepth > deepestTreeDepth) {
-                                        tieBroken = true;
-                                    }
-                                }
-                                if (depth > deepestDepth || (depth == deepestDepth && tieBroken)) {
-                                    deepestDepth = depth;
-                                    deepestTreeDepth = treeDepth;
-                                    deepestOnClose = onClose;
-                                }
-                            }
-                            deepestOnClose?.();
-                        }, 0);
-                    }
-                }
-            }
-        }, [open]);
-    }
-    /**
-     * Handles events for dismiss events for things like popup menus or transient dialogs -- things where moving focus to a new area of the page means this component should close itself.
-     *
-     * @param param0
-     * @returns
-     */
-    function useLostFocusDismiss({ refElementPopupReturn: { getElement: getPopupElement, ...void3 }, refElementSourceReturn, lostFocusDismiss: { open, onClose }, ...void1 }) {
-        const { getElement: getSourceElement, ...void2 } = (refElementSourceReturn ?? {});
-        const stableOnClose = useStableCallback(onClose);
-        const getOpen = useStableGetter(open);
-        const onLastActiveElementChange = q$1((newElement, _prevElement) => {
-            const open = getOpen();
-            const sourceElement = getSourceElement?.();
-            const popupElement = getPopupElement();
-            if (!(sourceElement?.contains(newElement) || popupElement?.contains(newElement))) {
-                if (open)
-                    stableOnClose();
-            }
-        }, [getSourceElement]);
-        return { activeElementParameters: { onLastActiveElementChange } };
-    }
-    /**
-     * Handles events for a backdrop on a modal dialog -- the kind where the user expects the modal to close when they click/tap outside of it.
-     *
-     * @param param0
-     */
-    function useBackdropDismiss({ backdropDismissParameters: { open, onClose: onCloseUnstable, ...void1 }, refElementPopupReturn: { getElement, ...void3 }, ...void2 }) {
-        const getOpen = useStableGetter(open);
-        const onClose = useStableCallback(onCloseUnstable);
-        const onBackdropClick = q$1(function onBackdropClick(e) {
-            if (!getOpen())
-                return;
-            // Basically, "was this event fired on an element not contained by the modal?"
-            // There are multiple ways browser react to "interacting with nothing", and this takes care of everything.
-            let element = getElement();
-            let foundInsideClick = false;
-            if (e.target && element && element.contains(e.target)) {
-                foundInsideClick = true;
-            }
-            if (!foundInsideClick) {
-                onClose();
-            }
-        }, []);
-        useGlobalHandler(window, "mousedown", open ? onBackdropClick : null, { capture: true });
-        useGlobalHandler(window, "touchstart", open ? onBackdropClick : null, { capture: true });
-    }
-    /**
-     * Combines all the methods of dismissing a modal-ish or popup-ish component into one combined hook.
-     *
-     * This is similar to the "complete" series of list/grid navigation, in that it's the "outermost" hook of its type.
-     */
-    function useDismiss({ dismissParameters: { open: globalOpen, onClose: globalOnClose, closeOnBackdrop, closeOnEscape, closeOnLostFocus }, escapeDismissParameters: { getWindow, parentDepth } }) {
-        const { refElementReturn: refElementSourceReturn } = useRefElement({ refElementParameters: {} });
-        const { refElementReturn: refElementPopupReturn } = useRefElement({ refElementParameters: {} });
-        const onCloseBackdrop = q$1(() => { return globalOnClose?.("backdrop"); }, [globalOnClose]);
-        const onCloseEscape = q$1(() => { return globalOnClose?.("escape"); }, [globalOnClose]);
-        const onCloseFocus = q$1(() => { return globalOnClose?.("lost-focus"); }, [globalOnClose]);
-        useBackdropDismiss({ backdropDismissParameters: { onClose: onCloseBackdrop, open: (closeOnBackdrop && globalOpen) }, refElementPopupReturn });
-        useEscapeDismiss({ escapeDismissParameters: { getWindow, onClose: onCloseEscape, open: (closeOnEscape && globalOpen), parentDepth }, refElementPopupReturn });
-        const { activeElementParameters } = useLostFocusDismiss({ lostFocusDismiss: { onClose: onCloseFocus, open: (closeOnLostFocus && globalOpen) }, refElementPopupReturn, refElementSourceReturn });
-        const getDocument = q$1(() => {
-            return getWindow().document;
-        }, [getWindow]);
-        useActiveElement({ activeElementParameters: { ...activeElementParameters, getWindow, getDocument } });
-        return {
-            refElementSourceReturn,
-            refElementPopupReturn
-        };
-    }
-
-    function getDocument$1(element) { return (element?.ownerDocument ?? document ?? window.document ?? globalThis.document); }
-
-    function useDraggable({ effectAllowed, data, dragImage, dragImageXOffset, dragImageYOffset }) {
-        const [dragging, setDragging, getDragging] = useState(false);
-        const [lastDropEffect, setLastDropEffect, getLastDropEffect] = useState(null);
-        const onDragStart = (e) => {
-            //e.preventDefault();
-            setDragging(true);
-            if (e.dataTransfer) {
-                e.dataTransfer.effectAllowed = (effectAllowed ?? "all");
-                if (dragImage)
-                    e.dataTransfer.setDragImage(dragImage, dragImageXOffset ?? 0, dragImageYOffset ?? 0);
-                const entries = Object.entries(data);
-                for (const [mimeType, data] of entries) {
-                    e.dataTransfer.setData(mimeType, data);
-                }
-            }
-        };
-        const onDragEnd = (e) => {
-            e.preventDefault();
-            setDragging(false);
-            if (e.dataTransfer) {
-                if (e.dataTransfer.dropEffect != "none") {
-                    setLastDropEffect(e.dataTransfer.dropEffect);
-                }
-                else {
-                    setLastDropEffect(null);
-                }
-            }
-        };
-        // Return both the element and the hook that modifies 
-        // the props and allows us to actually find the element
-        const ret = {
-            propsUnstable: {
-                draggable: true,
-                onDragStart,
-                onDragEnd
-            },
-            dragging,
-            getDragging,
-            lastDropEffect,
-            getLastDropEffect
-        };
-        return ret;
-    }
-
-    class DroppableFileError extends Error {
-        fileName;
-        errorType;
-        constructor(fileName, base) {
-            super(base?.message ?? "An unspecified error occurred reading the file.");
-            this.fileName = fileName;
-            this.errorType = base?.name;
-        }
-    }
-    function useDroppable({ effect }) {
-        const [filesForConsideration, setFilesForConsideration] = useState(null);
-        const [stringsForConsideration, setStringsForConsideration] = useState(null);
-        const [droppedFiles, setDroppedFiles] = useState(null);
-        const [droppedStrings, setDroppedStrings] = useState(null);
-        const [dropError, setDropError] = useState(undefined);
-        // All the promises generated from the drop events.
-        // Used to process multiple drop events in succession
-        const dropPromisesRef = A([]);
-        const [currentPromiseIndex, setCurrentPromiseIndex, getCurrentPromiseIndex] = useState(-1);
-        const [promiseCount, setPromiseCount, getPromiseCount] = useState(0);
-        // Any time we add a new promise, if there's no current promise running, we need to start one.
-        // If there is one, then we don't need to do anything, since it runs the same check.
-        s(() => {
-            const currentPromiseIndex = getCurrentPromiseIndex();
-            const promiseCount = getPromiseCount();
-            if (promiseCount > 0) {
-                if ((currentPromiseIndex + 1) < promiseCount) {
-                    setCurrentPromiseIndex(i => ++i);
-                }
-            }
-        }, [promiseCount]);
-        // Anytime our current promise changes,
-        // wait for it to finish, then set our state to its result.
-        // Finally, check to see if there are anymore promises.
-        // If there are, then increase currentPromiseCount,
-        // which will trigger this again.
-        //
-        // This shouldn't happen *often*, but maybe in the case of
-        // individually dropping a bunch of large files or something.
-        s(() => {
-            if (currentPromiseIndex >= 0) {
-                const currentPromise = dropPromisesRef.current[currentPromiseIndex];
-                currentPromise.then((info) => {
-                    if (info !== null) {
-                        const { files, strings } = info;
-                        setDroppedFiles(files);
-                        setDroppedStrings(strings);
-                    }
-                    // Now that we're done, are there more promises in the queue?
-                    const currentPromiseIndex = getCurrentPromiseIndex();
-                    const promiseCount = getPromiseCount();
-                    if ((currentPromiseIndex + 1) < promiseCount) {
-                        // Since this promise has started, more have been added.
-                        // Run this effect again.
-                        setCurrentPromiseIndex(i => ++i);
-                    }
-                });
-            }
-        }, [currentPromiseIndex]);
-        // Handle collecting the current file metadata or MIME types.
-        const onDragEnter = useStableCallback((e) => {
-            e.preventDefault();
-            if (e.dataTransfer) {
-                // Is there a default? I can't find one anywhere.
-                e.dataTransfer.dropEffect = (effect ?? "move");
-                const newMimeTypes = new Set();
-                const newFiles = new Array();
-                for (const item of e.dataTransfer?.items ?? []) {
-                    const { kind, type } = item;
-                    if (kind === "string") {
-                        newMimeTypes.add(type);
-                    }
-                    else if (kind === "file") {
-                        newFiles.push({ type: item.type });
-                    }
-                }
-                setFilesForConsideration(newFiles);
-                setStringsForConsideration(newMimeTypes);
-            }
-        });
-        // Handle resetting the current file metadata or MIME types
-        const onDragLeave = useStableCallback((e) => {
-            e.preventDefault();
-            setFilesForConsideration(null);
-            setStringsForConsideration(null);
-        });
-        // Boilerplate, I guess
-        const onDragOver = useStableCallback((e) => {
-            e.preventDefault();
-        });
-        // Handle getting the drop data asynchronously
-        const onDrop = useStableCallback((e) => {
-            e.preventDefault();
-            setFilesForConsideration(null);
-            setStringsForConsideration(null);
-            const allPromises = new Array();
-            const dropData = {};
-            const dropFile = [];
-            for (const item of e.dataTransfer?.items ?? []) {
-                const { kind, type } = item;
-                if (kind === "string") {
-                    allPromises.push((new Promise((resolve, _reject) => item.getAsString(resolve))).then(str => dropData[type] = str));
-                }
-                else if (kind === "file") {
-                    const file = item.getAsFile();
-                    if (file) {
-                        allPromises.push(new Promise((resolve, reject) => {
-                            const reader = new FileReader();
-                            reader.onload = (_) => {
-                                resolve();
-                                const data = reader.result;
-                                dropFile.push({ data, name: file.name, type: file.type, size: data.byteLength, lastModified: file.lastModified });
-                            };
-                            reader.onerror = (_) => { reject(new DroppableFileError(file.name, reader.error)); };
-                            reader.onabort = (_) => { reject(new DroppableFileError(file.name, reader.error)); };
-                            reader.readAsArrayBuffer(file);
-                        }));
-                        dropFile.push();
-                    }
-                }
-            }
-            dropPromisesRef.current.push(Promise.all(allPromises).then(() => {
-                setPromiseCount(i => ++i);
-                setDropError(null);
-                return {
-                    strings: dropData,
-                    files: dropFile
-                };
-            }).catch(ex => {
-                /* eslint-disable no-debugger */
-                debugger;
-                setPromiseCount(i => ++i);
-                setDropError(ex);
-                return null;
-            }));
-        });
-        const propsStable = A({ onDragEnter, onDragLeave, onDragOver, onDrop });
-        return {
-            propsStable: propsStable.current,
-            filesForConsideration,
-            stringsForConsideration,
-            droppedFiles,
-            droppedStrings,
-            dropError
-        };
-    }
-
-    function useElementSize({ elementSizeParameters: { getObserveBox, onSizeChange }, refElementParameters: { onElementChange, onMount, onUnmount } }) {
-        useEnsureStability("useElementSize", getObserveBox, onSizeChange, onElementChange, onMount, onUnmount);
-        const [getSize, setSize] = usePassiveState(onSizeChange, returnNull);
-        const currentObserveBox = A(undefined);
-        const needANewObserver = q$1((element, observeBox) => {
-            if (element) {
-                const document = getDocument$1(element);
-                const window = document.defaultView;
-                const handleUpdate = () => {
-                    if (element.isConnected) {
-                        const { clientWidth, scrollWidth, offsetWidth, clientHeight, scrollHeight, offsetHeight, clientLeft, scrollLeft, offsetLeft, clientTop, scrollTop, offsetTop } = element;
-                        setSize({ clientWidth, scrollWidth, offsetWidth, clientHeight, scrollHeight, offsetHeight, clientLeft, scrollLeft, offsetLeft, clientTop, scrollTop, offsetTop });
-                    }
-                };
-                if (window && ("ResizeObserver" in window)) {
-                    const observer = new ResizeObserver((_entries) => { handleUpdate(); });
-                    observer.observe(element, { box: observeBox });
-                    return () => observer.disconnect();
-                }
-                else {
-                    document.addEventListener("resize", handleUpdate, { passive: true });
-                    return () => document.removeEventListener("resize", handleUpdate);
-                }
-            }
-        }, []);
-        const { refElementReturn } = useRefElement({
-            refElementParameters: {
-                onElementChange: q$1((e, p) => { needANewObserver(e, getObserveBox?.()); onElementChange?.(e, p); }, []),
-                onMount,
-                onUnmount
-            }
-        });
-        const { getElement } = refElementReturn;
-        s(() => {
-            if (getObserveBox) {
-                if (currentObserveBox.current !== getObserveBox())
-                    needANewObserver(getElement(), getObserveBox());
-            }
-        });
-        return {
-            elementSizeReturn: { getSize },
-            refElementReturn
-        };
     }
 
     var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
@@ -3589,6 +1446,144 @@ var bundle = (function (exports) {
             new BlockingElementsImpl();
     })();
 
+    function r(e){var t,f,n="";if("string"==typeof e||"number"==typeof e)n+=e;else if("object"==typeof e)if(Array.isArray(e))for(t=0;t<e.length;t++)e[t]&&(f=r(e[t]))&&(n&&(n+=" "),n+=f);else for(t in e)e[t]&&(n&&(n+=" "),n+=t);return n}function clsx(){for(var e,t,f=0,n="";f<arguments.length;)(e=arguments[f++])&&(t=r(e))&&(n&&(n+=" "),n+=t);return n}
+
+    function getDocument$1(element) { return (element?.ownerDocument ?? document ?? window.document ?? globalThis.document); }
+
+    const Table = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-";
+    function base64(value) {
+        return Table[value];
+    }
+    function random6Bits() {
+        return Math.floor(Math.random() * 0b1000000);
+    }
+    function random64Bits() {
+        return [random6Bits(), random6Bits(), random6Bits(), random6Bits(), random6Bits(), random6Bits(), random6Bits(), random6Bits(), random6Bits(), random6Bits(), random6Bits()];
+    }
+    /**
+     * Returns a randomly-generated ID with an optional prefix.
+     * Note that if the prefix is *explicitly* set to "", then
+     * IDs that are not valid under HTML4 may be generated. Oh no.
+     *
+     *
+     * (This is here, in this particular file, to avoid circular dependencies
+     * without also making a utilities file.
+     * Once we can remove this hook, we can put this function back with useRandomId)
+     */
+    function generateRandomId(prefix) {
+        return `${prefix ?? "id-"}${random64Bits().map(n => base64(n)).join("")}`;
+    }
+    const previousInputs = new Map();
+    const toRun = new Map();
+    // TODO: Whether this goes in options.diffed or options._commit
+    // is a post-suspense question.
+    // Right now, using options._commit has the problem of running
+    // *after* refs are applied, but we need to come before even that
+    // so `ref={someStableFunction}` works.
+    // 
+    // Also it's private.
+    //
+    // ...
+    // Well, useEvent or whatever is finally, finally 4 years later finally here
+    // which is cool and means we won't need this at all soon.
+    // So for now we'll stick with diff to prevent any weirdness with
+    // commit being private and all.
+    const commitName = "diffed";
+    const originalCommit = l$1[commitName];
+    const newCommit = (...args) => {
+        for (const [id, effectInfo] of toRun) {
+            const oldInputs = previousInputs.get(id);
+            if (argsChanged(oldInputs, effectInfo.inputs)) {
+                effectInfo.cleanup?.();
+                effectInfo.cleanup = effectInfo.effect();
+                previousInputs.set(id, effectInfo.inputs);
+            }
+        }
+        toRun.clear();
+        originalCommit?.(...args);
+    };
+    l$1[commitName] = newCommit;
+    /**
+     * Semi-private function to allow stable callbacks even within `useLayoutEffect` and ref assignment.
+     *
+     * Every render, we send the arguments to be evaluated after diffing has completed,
+     * which happens before.
+     *
+     * @param effect
+     * @param inputs
+     */
+    function useBeforeLayoutEffect(effect, inputs) {
+        /*(() => {
+            const cleanup = useRef<void | (() => void) | null>(null);
+            const prevArgsRef = useRef<Inputs>(null!);
+            if (argsChanged(inputs, prevArgsRef.current)) {
+                prevArgsRef.current = inputs!;
+                if (cleanup.current)
+                    cleanup.current();
+                cleanup.current = effect();
+            }
+        })();*/
+        const [id] = y(() => generateRandomId());
+        toRun.set(id, { effect, inputs, cleanup: null });
+        s(() => {
+            return () => {
+                toRun.delete(id);
+                previousInputs.delete(id);
+            };
+        }, [id]);
+    }
+    function argsChanged(oldArgs, newArgs) {
+        return !!(!oldArgs ||
+            oldArgs.length !== newArgs?.length ||
+            newArgs?.some((arg, index) => arg !== oldArgs[index]));
+    }
+
+    const Unset = Symbol("unset");
+    /**
+     * Given an input value, returns a constant getter function that can be used
+     * inside of `useEffect` and friends without including it in the dependency array.
+     *
+     * This uses `options.diffed` in order to run before everything, even
+     * ref assignment. This means this getter is safe to use anywhere ***except the render phase***.
+     *
+     * @param value
+     * @returns
+     */
+    function useStableGetter(value) {
+        const ref = A(Unset);
+        useBeforeLayoutEffect(() => { ref.current = value; }, [value]);
+        return q$1(() => {
+            if (ref.current === Unset) {
+                throw new Error('Value retrieved from useStableGetter() cannot be called during render.');
+            }
+            return ref.current;
+        }, []);
+    }
+    /**
+     * Like `useStableGetter`, but ***requires*** that everything in the object is also stable,
+     * and in turn returns an object that itself is stable.
+     * @param t
+     * @returns
+     */
+    function useStableObject(t) {
+        const e = Object.entries(t);
+        useEnsureStability("useStableObject", e.length, ...e.map(([_k, v]) => v));
+        return A(t).current;
+    }
+
+    function useStableCallback(fn, noDeps) {
+        if (noDeps == null) {
+            const currentCallbackGetter = useStableGetter(fn);
+            return q$1((...args) => {
+                return currentCallbackGetter()(...args);
+            }, []);
+        }
+        else {
+            console.assert(noDeps.length === 0);
+            return q$1(fn, []);
+        }
+    }
+
     function blockingElements() { return getDocument$1().$blockingElements; }
     /**
      * Allows an element to trap focus by applying the "inert" attribute to all sibling, aunt, and uncle nodes.
@@ -3625,6 +1620,47 @@ var bundle = (function (exports) {
     }
     function getTopElement() {
         return blockingElements().top;
+    }
+
+    /*
+    export function useRefElementProps<E extends Element>(r: UseRefElementReturnType<E>, ...otherProps: h.JSX.HTMLAttributes<E>[]): h.JSX.HTMLAttributes<E>[] {
+        return [r.refElementReturn.propsStable, ...otherProps];
+    }*/
+    /**
+     * Allows accessing the element a ref references as soon as it does so.
+     * *This hook itself returns a hook*--useRefElementProps modifies the props that you were going to pass to an HTMLElement,
+     * adding a RefCallback and merging it with any existing ref that existed on the props.
+     *
+     * Don't forget to provide the Element as the type argument!
+     *
+     * @returns The element, and the sub-hook that makes it retrievable.
+     */
+    function useRefElement(args) {
+        const { refElementParameters: { onElementChange, onMount, onUnmount } } = args;
+        useEnsureStability("useRefElement", onElementChange, onMount, onUnmount);
+        // Called (indirectly) by the ref that the element receives.
+        const handler = q$1((e, prevValue) => {
+            const cleanup = onElementChange?.(e, prevValue);
+            if (prevValue)
+                onUnmount?.(prevValue);
+            if (e)
+                onMount?.(e);
+            return cleanup;
+        }, []);
+        // Let us store the actual (reference to) the element we capture
+        const [getElement, setElement] = usePassiveState(handler, returnNull, runImmediately);
+        const propsStable = A({ ref: setElement });
+        // Return both the element and the hook that modifies 
+        // the props and allows us to actually find the element
+        return {
+            refElementReturn: {
+                getElement,
+                propsStable: propsStable.current
+            }
+        };
+    }
+    function runImmediately(f) {
+        f();
     }
 
     const elementsToRestoreFocusTo = new Map();
@@ -3704,14 +1740,291 @@ var bundle = (function (exports) {
     }
 
     /**
-     * Returns a function that will, when called, force the component
-     * that uses this hook to re-render itself.
+     * Allows a parent component to access information about certain
+     * child components once they have rendered.
      *
-     * It's a bit smelly, so best to use sparingly.
+     * This hook is designed to be lightweight, in that the parent keeps no state
+     * and runs no effects.  Each child *does* run an effect, but with no state
+     * changes unless you explicitly request them.
+     *
+     *
      */
-    function useForceUpdate() {
-        const [, set] = y(0);
-        return A(() => set(i => ++i)).current;
+    function useManagedChildren(parentParameters) {
+        const { managedChildrenParameters: { onAfterChildLayoutEffect, onChildrenMountChange }, ...rest } = parentParameters;
+        useEnsureStability("useManagedChildren", onAfterChildLayoutEffect, onChildrenMountChange);
+        const getHighestIndex = q$1(() => {
+            return managedChildrenArray.current.highestIndex;
+        }, []);
+        // All the information we have about our children is stored in this **stable** array.
+        // Any mutations to this array **DO NOT** trigger any sort of a re-render.
+        const managedChildrenArray = A({ arr: [], rec: {}, highestIndex: 0, lowestIndex: 0 });
+        // For indirect access to each child
+        // Compare getManagedChildInfo
+        // TODO: The primary use for this is flaggable closest fits
+        // which needs to search all children for that closest fit.
+        // It would be nice if there was something better for that.
+        const forEachChild = q$1((f) => {
+            for (const child of managedChildrenArray.current.arr) {
+                if (child)
+                    f(child);
+            }
+            for (const field in managedChildrenArray.current.rec) {
+                const child = managedChildrenArray.current.rec[field];
+                if (child)
+                    f(child);
+            }
+        }, []);
+        // Retrieves the information associated with the child with the given index.
+        // `undefined` if not child there, or it's unmounted.
+        const getManagedChildInfo = q$1((index) => {
+            if (typeof index == "number")
+                return managedChildrenArray.current.arr[index];
+            else
+                return managedChildrenArray.current.rec[index];
+        }, []);
+        // tl;dr this is a way to have run useLayoutEffect once after all N children
+        // have mounted and run *their* useLayoutEffect, but also *without* re-rendering
+        // ourselves because of having a `childCount` state or anything similar.
+        //
+        // When the child count ref updates, we want the parent to also run an effect
+        // to maybe do something with all these children that just mounted.
+        // The easiest way would be useEffect(..., [childCount]) but
+        // that would require us having a childCount state, then calling
+        // setChildCount and re-rendering every time children mount
+        // (only one re-render at a time unless children are staggered, but still)
+        // 
+        // As an alternate solution, any time a child uses ULE on mount, it queues a microtask
+        // to emulate running ULE on the parent. Only the first child will actually queue
+        // the microtask (by checking hasRemoteULE first) so that the "effect" only
+        // runs once. When it's done, hasRemoteULE is reset so it can run again if
+        // more children mount/unmount.
+        const hasRemoteULEChildMounted = A(null);
+        const remoteULEChildChangedCausers = A(new Set());
+        const remoteULEChildChanged = q$1((index) => {
+            if (remoteULEChildChangedCausers.current.size == 0) {
+                debounceRendering(() => {
+                    onAfterChildLayoutEffect?.(remoteULEChildChangedCausers.current);
+                    remoteULEChildChangedCausers.current.clear();
+                });
+            }
+            remoteULEChildChangedCausers.current.add(index);
+            return () => { };
+        }, [ /* Must remain stable */]);
+        const remoteULEChildMounted = q$1((index, mounted) => {
+            if (!hasRemoteULEChildMounted.current) {
+                hasRemoteULEChildMounted.current = {
+                    mounts: new Set(),
+                    unmounts: new Set(),
+                };
+                debounceRendering(() => {
+                    onChildrenMountChange?.(hasRemoteULEChildMounted.current.mounts, hasRemoteULEChildMounted.current.unmounts);
+                    hasRemoteULEChildMounted.current = null;
+                });
+            }
+            if (mounted) {
+                managedChildrenArray.current.highestIndex = Math.max(managedChildrenArray.current.highestIndex, index);
+            }
+            else {
+                if (typeof index == "number") {
+                    delete managedChildrenArray.current.arr[index];
+                    let shave = 0;
+                    while (shave <= managedChildrenArray.current.arr.length && managedChildrenArray.current.arr[managedChildrenArray.current.arr.length - 1 - shave] === undefined) {
+                        ++shave;
+                    }
+                    managedChildrenArray.current.arr.splice(managedChildrenArray.current.arr.length - shave, shave);
+                }
+                else
+                    delete managedChildrenArray.current.rec[index];
+            }
+            hasRemoteULEChildMounted.current[mounted ? "mounts" : "unmounts"].add(index);
+        }, [ /* Must remain stable */]);
+        const managedChildren = useStableObject({
+            ...{ _: managedChildrenArray.current },
+            forEach: forEachChild,
+            getAt: getManagedChildInfo,
+            getHighestIndex: getHighestIndex,
+            arraySlice: q$1(() => {
+                return managedChildrenArray.current.arr.slice();
+            }, [])
+        });
+        return {
+            managedChildContext: useStableObject({
+                managedChildParameters: useStableObject({
+                    managedChildrenArray: managedChildrenArray.current,
+                    remoteULEChildMounted,
+                    remoteULEChildChanged
+                })
+            }),
+            managedChildrenReturn: { getChildren: q$1(() => managedChildren, []) }
+        };
+    }
+    function useManagedChild(info) {
+        const { managedChildParameters: { index }, managedChildContext: { managedChildParameters: { managedChildrenArray, remoteULEChildMounted, remoteULEChildChanged } } } = info;
+        // Any time our child props change, make that information available
+        // the parent if they need it.
+        // The parent can listen for all updates and only act on the ones it cares about,
+        // and multiple children updating in the same tick will all be sent at once.
+        _(() => {
+            // Insert this information in-place
+            if (typeof index == "number") {
+                managedChildrenArray.arr[index] = { ...info.managedChildParameters };
+            }
+            else {
+                managedChildrenArray.rec[index] = { ...info.managedChildParameters };
+            }
+            return remoteULEChildChanged(index);
+        }, [...Object.entries(info).flat(9)]); // 9 is infinity, right? Sure. Unrelated: TODO.
+        // When we mount, notify the parent via queueMicrotask
+        // (every child does this, so everything's coordinated to only queue a single microtask per tick)
+        // Do the same on unmount.
+        // Note: It's important that this comes AFTER remoteULEChildChanged
+        // so that remoteULEChildMounted has access to all the info on mount.
+        _(() => {
+            remoteULEChildMounted?.(index, true);
+            return () => remoteULEChildMounted?.(index, false);
+        }, [index]);
+    }
+    /**
+     * An extension to useManagedChildren that handles the following common case:
+     * 1. You have a bunch of children
+     * 2. At any given time, only 1 of them is "selected", "activated", "focusable", whatever (or 0 of them, that's cool too, just 0 or 1 though).
+     * 3. The parent has control over who is "selected" via a numerical index.
+     *
+     * This hook allows for much easier control over selection management.
+     *
+     * Note that because you may want to use multiple flags with the same children, this hook *does not* use `useManagedChildren`!
+     * You need to pass it the existing children, and you must pass your invocation of `useManagedChildren` the returned `onChildrenMountChange` handler!
+     *
+     * Also because of that, the types of this function are rather odd.  It's better to start off using a hook that already uses a flag, such as `useRovingTabIndex`, as an example.
+     *
+     *
+     * @param param0
+     * @returns
+     */
+    function useChildrenFlag({ getChildren, initialIndex, closestFit, onIndexChange, getAt, setAt, isValid, }) {
+        useEnsureStability("useChildrenFlag", onIndexChange, getAt, setAt, isValid);
+        const [getCurrentIndex, setCurrentIndex] = usePassiveState(onIndexChange, q$1(() => (initialIndex ?? (null)), []));
+        const [getRequestedIndex, setRequestedIndex] = usePassiveState(null, q$1(() => (initialIndex ?? (null)), []));
+        //    const getFitNullToZero = useStableGetter(fitNullToZero);
+        // Shared between onChildrenMountChange and changeIndex, not public (but could be I guess)
+        const getClosestFit = q$1((requestedIndex) => {
+            const children = getChildren();
+            let closestDistance = Infinity;
+            let closestIndex = null;
+            children.forEach(child => {
+                if (isValid(child)) {
+                    const newDistance = Math.abs(child.index - requestedIndex);
+                    if (newDistance < closestDistance || (newDistance == closestDistance && child.index < requestedIndex)) {
+                        closestDistance = newDistance;
+                        closestIndex = child.index;
+                    }
+                }
+            });
+            return closestIndex;
+        }, [ /* Must remain stable! */]);
+        // Any time a child mounts/unmounts, we need to double-check to see if that affects 
+        // the "currently selected" (or whatever) index.  The two cases we're looking for:
+        // 1. The currently selected child unmounted
+        // 2. A child mounted, and it mounts with the index we're looking for
+        const reevaluateClosestFit = useStableCallback(() => {
+            const children = getChildren();
+            const requestedIndex = getRequestedIndex();
+            const currentIndex = getCurrentIndex();
+            const currentChild = currentIndex == null ? null : children.getAt(currentIndex);
+            if (requestedIndex != null && closestFit && (requestedIndex != currentIndex || currentChild == null || !isValid(currentChild))) {
+                if (currentChild)
+                    setAt(currentChild, false);
+                const closestFitIndex = getClosestFit(requestedIndex);
+                setCurrentIndex(closestFitIndex);
+                if (closestFitIndex != null) {
+                    const closestFitChild = children.getAt(closestFitIndex);
+                    console.assert(closestFitChild != null, "Internal logic???");
+                    setAt(closestFitChild, true);
+                }
+            }
+        });
+        const changeIndex = q$1((arg) => {
+            const children = getChildren();
+            const requestedIndex = arg instanceof Function ? arg(getRequestedIndex()) : arg;
+            //if (requestedIndex == null && getFitNullToZero())
+            //    requestedIndex = 0;
+            setRequestedIndex(requestedIndex);
+            const currentIndex = getCurrentIndex();
+            if (currentIndex == requestedIndex)
+                return requestedIndex;
+            let newMatchingChild = (requestedIndex == null ? null : children.getAt(requestedIndex));
+            const oldMatchingChild = (currentIndex == null ? null : children.getAt(currentIndex));
+            if (requestedIndex == null) {
+                // Easy case
+                setCurrentIndex(null);
+                if (oldMatchingChild)
+                    setAt(oldMatchingChild, false);
+                return null;
+            }
+            else {
+                if (newMatchingChild && isValid(newMatchingChild)) {
+                    setCurrentIndex(requestedIndex);
+                    if (oldMatchingChild)
+                        setAt(oldMatchingChild, false);
+                    setAt(newMatchingChild, true);
+                    return requestedIndex;
+                }
+                else {
+                    const closestFitIndex = getClosestFit(requestedIndex);
+                    setCurrentIndex(closestFitIndex);
+                    if (closestFitIndex != null) {
+                        newMatchingChild = children.getAt(closestFitIndex);
+                        console.assert(newMatchingChild != null, "Internal logic???");
+                        if (oldMatchingChild)
+                            setAt(oldMatchingChild, false);
+                        setAt(newMatchingChild, true);
+                        return closestFitIndex;
+                    }
+                    else {
+                        if (oldMatchingChild)
+                            setAt(oldMatchingChild, false);
+                        return null;
+                    }
+                }
+            }
+        }, []);
+        // Run once, on mount
+        _(() => {
+            onIndexChange?.(initialIndex ?? null, undefined);
+        }, []);
+        return { changeIndex, reevaluateClosestFit, getCurrentIndex };
+    }
+
+    /**
+     * Slightly enhanced version of `useState` that includes a getter that remains constant
+     * (i.e. you can use it in `useEffect` and friends without it being a dependency).
+     *
+     * @param initialState
+     * @returns
+     */
+    function useState(initialState) {
+        // We keep both, but overrride the `setState` functionality
+        const [state, setStateP] = y(initialState);
+        const ref = A(state);
+        // Hijack the normal setter function 
+        // to also set our ref to the new value
+        const setState = q$1(value => {
+            if (typeof value === "function") {
+                const callback = value;
+                setStateP(prevValue => {
+                    const nextValue = callback(prevValue);
+                    ref.current = nextValue;
+                    return nextValue;
+                });
+            }
+            else {
+                ref.current = value;
+                setStateP(value);
+            }
+        }, []);
+        const getState = () => { return ref.current; };
+        console.assert(ref.current === state || (typeof state === "number" && isNaN(state)));
+        return [state, setState, getState];
     }
 
     function useTimeout({ timeout, callback, triggerIndex }) {
@@ -4391,6 +2704,400 @@ var bundle = (function (exports) {
     }
 
     /**
+     * Returns a function that will, when called, force the component
+     * that uses this hook to re-render itself.
+     *
+     * It's a bit smelly, so best to use sparingly.
+     */
+    function useForceUpdate() {
+        const [, set] = y(0);
+        return A(() => set(i => ++i)).current;
+    }
+
+    function useMergedChildren({ children: lhs }, { children: rhs }) {
+        if (lhs == null && rhs == null) {
+            return undefined;
+        }
+        else if (lhs == null) {
+            return rhs;
+        }
+        else if (rhs == null) {
+            return lhs;
+        }
+        else {
+            return h$1(p$1, {}, lhs, rhs);
+        }
+    }
+
+    /**
+     * Given two sets of props, merges their `class` and `className` properties.
+     * Duplicate classes are removed (order doesn't matter anyway).
+     *
+     * @param lhs Classes of the first component
+     * @param rhs Classes of the second component
+     * @returns A string representing all combined classes from both arguments.
+     */
+    function useMergedClasses({ class: lhsClass, className: lhsClassName }, { class: rhsClass, className: rhsClassName }) {
+        // Note: For the sake of forward compatibility, this function is labelled as
+        // a hook, but as it uses no other hooks it technically isn't one.
+        if (lhsClass || rhsClass || lhsClassName || rhsClassName) {
+            const lhsClasses = clsx(lhsClass, lhsClassName).split(" ");
+            const rhsClasses = clsx(rhsClass, rhsClassName).split(" ");
+            const allClasses = new Set([...Array.from(lhsClasses), ...Array.from(rhsClasses)]);
+            return Array.from(allClasses).join(" ");
+        }
+        else {
+            return undefined;
+        }
+    }
+
+    function processRef(instance, ref) {
+        if (typeof ref === "function") {
+            ref(instance);
+        }
+        else if (ref != null) {
+            ref.current = instance;
+        }
+        else {
+            /* eslint-disable no-debugger */
+            debugger;
+            console.assert(false, "Unknown ref type found that was neither a RefCallback nor a RefObject");
+        }
+    }
+    /**
+     * Combines two refs into one. This allows a component to both use its own ref *and* forward a ref that was given to it.
+     * @param lhs
+     * @param rhs
+     * @returns
+     */
+    function useMergedRefs({ ref: rhs }, { ref: lhs }) {
+        const combined = q$1((current) => {
+            processRef(current, lhs);
+            processRef(current, rhs);
+        }, [lhs, rhs]);
+        if (lhs == null && rhs == null) {
+            return undefined;
+        }
+        else if (lhs == null) {
+            return rhs;
+        }
+        else if (rhs == null) {
+            return lhs;
+        }
+        else {
+            return combined;
+        }
+    }
+
+    function styleStringToObject(style) {
+        // TODO: This sucks D:
+        return Object.fromEntries(style.split(";").map(statement => statement.split(":")));
+    }
+    /**
+     * Merges two style objects, returning the result.
+     *
+     * @param style The user-given style prop for this component
+     * @param obj The CSS properties you want added to the user-given style
+     * @returns A CSS object containing the properties of both objects.
+     */
+    function useMergedStyles(lhs, rhs) {
+        // Easy case, when there are no styles to merge return nothing.
+        if (!lhs?.style && !rhs?.style)
+            return undefined;
+        if (typeof lhs != typeof rhs) {
+            // Easy cases, when one is null and the other isn't.
+            if (lhs?.style && !rhs?.style)
+                return lhs.style;
+            if (!lhs?.style && rhs?.style)
+                return rhs.style;
+            // They're both non-null but different types.
+            // Convert the string type to an object bag type and run it again.
+            if (lhs?.style && rhs?.style) {
+                // (useMergedStyles isn't a true hook -- this isn't a violation)
+                if (typeof lhs?.style == "string")
+                    return useMergedStyles({ style: styleStringToObject(lhs?.style) }, rhs);
+                if (typeof rhs?.style == "string")
+                    return useMergedStyles(lhs, { style: styleStringToObject(rhs?.style) });
+            }
+            // Logic???
+            return undefined;
+        }
+        // They're both strings, just concatenate them.
+        if (typeof lhs?.style == "string") {
+            return `${lhs.style};${rhs?.style ?? ""}`;
+        }
+        // They're both objects, just merge them.
+        return {
+            ...(lhs?.style ?? {}),
+            ...(rhs?.style ?? {})
+        };
+    }
+
+    let log = console.warn;
+    /**
+     * Given two sets of props, merges them and returns the result.
+     *
+     * The hook is aware of and can intelligently merge `className`, `class`, `style`, `ref`, and all event handlers.
+     * @param lhs2
+     * @param rhs2
+     * @returns
+     */
+    function useMergedProps(...allProps) {
+        useEnsureStability("useMergedProps", allProps.length);
+        let ret = {};
+        for (let nextProps of allProps) {
+            ret = useMergedProps2(ret, nextProps);
+        }
+        return ret;
+    }
+    function useMergedProps2(lhsAll, rhsAll) {
+        // First, separate the props we were given into two groups:
+        // lhsAll and rhsAll contain all the props we were given, and
+        // lhsMisc and rhsMisc contain all props *except* for the easy ones
+        // like className and style that we already know how to merge.
+        const { children: _lhsChildren, class: _lhsClass, className: _lhsClassName, style: _lhsStyle, ref: _lhsRef, ...lhsMisc } = lhsAll;
+        const { children: _rhsChildren, class: _rhsClass, className: _rhsClassName, style: _rhsStyle, ref: _rhsRef, ...rhsMisc } = rhsAll;
+        const ret = {
+            ...lhsMisc,
+            ref: useMergedRefs(lhsAll, rhsAll),
+            style: useMergedStyles(lhsAll, rhsAll),
+            className: useMergedClasses(lhsAll, rhsAll),
+            children: useMergedChildren(lhsAll, rhsAll),
+        };
+        if (ret.ref === undefined)
+            delete ret.ref;
+        if (ret.style === undefined)
+            delete ret.style;
+        if (ret.className === undefined)
+            delete ret.className;
+        if (ret.children === undefined)
+            delete ret.children;
+        // Now, do *everything* else
+        // Merge every remaining existing entry in lhs with what we've already put in ret.
+        //const lhsEntries = Object.entries(lhs) as [keyof T, T[keyof T]][];
+        const rhsEntries = Object.entries(rhsMisc);
+        for (const [rhsKeyU, rhsValue] of rhsEntries) {
+            const rhsKey = rhsKeyU;
+            const lhsValue = lhsMisc[rhsKey];
+            if (typeof lhsValue === "function" || typeof rhsValue === "function") {
+                // They're both functions that can be merged (or one's a function and the other's null).
+                // Not an *easy* case, but a well-defined one.
+                const merged = mergeFunctions(lhsValue, rhsValue);
+                ret[rhsKey] = merged;
+            }
+            else {
+                // Uh...we're here because one of them's null, right?
+                if (lhsValue == null && rhsValue == null) {
+                    if (rhsValue === null && lhsValue === undefined)
+                        ret[rhsKey] = rhsValue;
+                    else
+                        ret[rhsKey] = lhsValue;
+                }
+                if (lhsValue == null)
+                    ret[rhsKey] = rhsValue;
+                else if (rhsValue == null)
+                    ret[rhsKey] = lhsValue;
+                else if (rhsValue == lhsValue) ;
+                else {
+                    // Ugh.
+                    // No good strategies here, just log it if requested
+                    log?.(`The prop "${rhsKey}" cannot simultaneously be the values ${lhsValue} and ${rhsValue}. One must be chosen outside of useMergedProps.`);
+                    ret[rhsKey] = rhsValue;
+                }
+            }
+        }
+        return ret;
+    }
+    function mergeFunctions(lhs, rhs) {
+        if (!lhs)
+            return rhs;
+        if (!rhs)
+            return lhs;
+        return (...args) => {
+            const lv = lhs(...args);
+            const rv = rhs(...args);
+            if (lv instanceof Promise || rv instanceof Promise)
+                return Promise.all([lv, rv]);
+        };
+    }
+    /*
+    function test<P extends h.JSX.HTMLAttributes<HTMLInputElement>>(props: P) {
+
+        const id0: GenericGet<{}, "id", string> = "";
+        const id3: GenericGet<{ id: undefined }, "id", string> = undefined;
+        const id4: GenericGet<{ id: undefined }, "id", string> = undefined;
+        const id5: GenericGet<{ id: undefined }, "id", string> = undefined;
+        const id6: GenericGet<{ id: undefined }, "id", string> = undefined;
+        //const id2: ZipSingle<string | undefined, string | undefined> = undefined;
+        const id1: ZipObject<{ id: undefined }, { id: string }> = { id: undefined };
+
+        type M1 = GenericGet<P, "style", string>;
+        type M2 = GenericGet<{}, "style", string>;
+        const m1: M1 = "";
+        const m2: M1 = undefined;
+        /// @ts-expect-error    Because number isn't assignable to string
+        const m3: M1 = 0;
+
+        const m4: M2 = "";
+        const m5: M2 = undefined;
+        /// @ts-expect-error    Because number isn't assignable to string
+        const m6: M2 = 0;
+
+        const p1: MergedProps<HTMLInputElement, {}, { id: string }> = useMergedProps<HTMLInputElement>()({}, { id: "string" });
+        const p2: MergedProps<HTMLInputElement, { id: undefined }, { id: string }> = useMergedProps<HTMLInputElement>()({ id: undefined }, { id: "string" });
+        const p3: MergedProps<HTMLInputElement, { id: undefined }, { id: undefined }> = useMergedProps<HTMLInputElement>()({ id: undefined }, { id: undefined });
+        const p4: MergedProps<HTMLInputElement, {}, {}> = useMergedProps<HTMLInputElement>()({}, {});
+        const p5 = useMergedProps<HTMLInputElement>()(props, {});
+        const p6 = useMergedProps<HTMLInputElement>()(props, { id: undefined });
+        const p7 = useMergedProps<HTMLInputElement>()(props, { id: "string" });
+
+
+        p1.id?.concat("");
+        p2.id?.concat("");
+        /// @ts-expect-error    id can't be anything but undefined
+        p3.id?.concat("");
+        /// @ts-expect-error    id can't be anything but undefined
+        p4.id?.concat("");
+
+
+        p5.id?.concat("");
+        p6.id?.concat("");
+        p7.id?.concat("");
+
+        /// @ts-expect-error    id must contain undefined
+        p5.id.concat("");
+        /// @ts-expect-error    id must contain undefined
+        p6.id.concat("");
+        /// @ts-expect-error    id must contain undefined
+        p7.id.concat("");
+
+
+        if (p5.allowFullScreen === undefined) {}
+        else if (p5.allowFullScreen === false) {}
+        else if (p5.allowFullScreen === true) {}
+        else {
+            acceptsNever(p5.allowFullScreen);
+        }
+
+
+        if (p6.allowFullScreen === undefined) {}
+        else if (p6.allowFullScreen === false) {}
+        else if (p6.allowFullScreen === true) {}
+        else {
+            acceptsNever(p6.allowFullScreen);
+        }
+
+
+        if (p7.allowFullScreen === undefined) {}
+        else if (p7.allowFullScreen === false) {}
+        else if (p7.allowFullScreen === true) {}
+        else {
+            acceptsNever(p7.allowFullScreen);
+        }
+
+
+        // Make sure it works recursively
+        const r1a = useMergedProps<HTMLInputElement>()({}, p1);
+        const r1b = useMergedProps<HTMLInputElement>()(props, p1);
+        const r2a = useMergedProps<HTMLInputElement>()({}, p2);
+        const r2b = useMergedProps<HTMLInputElement>()(props, p2);
+        const r3a = useMergedProps<HTMLInputElement>()({}, p3);
+        const r3b = useMergedProps<HTMLInputElement>()(props, p3);
+        const r4a = useMergedProps<HTMLInputElement>()({}, p4);
+        const r4b = useMergedProps<HTMLInputElement>()(props, p4);
+        const r5a = useMergedProps<HTMLInputElement>()({}, p5);
+        const r5b = useMergedProps<HTMLInputElement>()(props, p5);
+        const r6a = useMergedProps<HTMLInputElement>()({}, p6);
+        const r6b = useMergedProps<HTMLInputElement>()(props, p6);
+        const r7a = useMergedProps<HTMLInputElement>()({}, p7);
+        const r7b = useMergedProps<HTMLInputElement>()(props, p7);
+
+
+        r1a.id?.concat("");
+        r1b.id?.concat("");
+        r2a.id?.concat("");
+        r2b.id?.concat("");
+        // @ts-expect-error    id can't be anything but undefined
+        r3a.id?.concat("");
+        r3b.id?.concat("");
+        /// @ts-expect-error    id can't be anything but undefined
+        r4a.id?.concat("");
+        r4b.id?.concat("");
+
+
+        r5a.id?.concat("");
+        r5b.id?.concat("");
+        r6a.id?.concat("");
+        r6b.id?.concat("");
+        r7a.id?.concat("");
+        r7b.id?.concat("");
+
+        /// @ts-expect-error    id must contain undefined
+        r5a.id.concat("");
+        /// @ts-expect-error    id must contain undefined
+        r5b.id.concat("");
+        /// @ts-expect-error    id must contain undefined
+        r6a.id.concat("");
+        /// @ts-expect-error    id must contain undefined
+        r6b.id.concat("");
+        /// @ts-expect-error    id must contain undefined
+        r7a.id.concat("");
+        /// @ts-expect-error    id must contain undefined
+        r7b.id.concat("");
+
+
+        if (r5a.allowFullScreen === undefined) {}
+        else if (r5a.allowFullScreen === false) {}
+        else if (r5a.allowFullScreen === true) {}
+        else {
+            acceptsNever(r5a.allowFullScreen);
+        }
+
+
+        if (r5b.allowFullScreen === undefined) {}
+        else if (r5b.allowFullScreen === false) {}
+        else if (r5b.allowFullScreen === true) {}
+        else {
+            acceptsNever(r5b.allowFullScreen);
+        }
+
+
+        if (r6a.allowFullScreen === undefined) {}
+        else if (r6a.allowFullScreen === false) {}
+        else if (r6a.allowFullScreen === true) {}
+        else {
+            acceptsNever(r6a.allowFullScreen);
+        }
+
+
+        if (r6b.allowFullScreen === undefined) {}
+        else if (r6b.allowFullScreen === false) {}
+        else if (r6b.allowFullScreen === true) {}
+        else {
+            acceptsNever(r6b.allowFullScreen);
+        }
+
+
+        if (r7a.allowFullScreen === undefined) {}
+        else if (r7a.allowFullScreen === false) {}
+        else if (r7a.allowFullScreen === true) {}
+        else {
+            acceptsNever(r7a.allowFullScreen);
+        }
+
+
+        if (r7b.allowFullScreen === undefined) {}
+        else if (r7b.allowFullScreen === false) {}
+        else if (r7b.allowFullScreen === true) {}
+        else {
+            acceptsNever(r7b.allowFullScreen);
+        }
+
+    }
+    function acceptsNever(n: never) {}
+    */
+
+    /**
      * Copies the values of `source` to `array`.
      *
      * @private
@@ -4515,6 +3222,133 @@ var bundle = (function (exports) {
         result[index] = iteratee(index);
       }
       return result;
+    }
+
+    /** Detect free variable `global` from Node.js. */
+    var freeGlobal = typeof global == 'object' && global && global.Object === Object && global;
+
+    /** Detect free variable `self`. */
+    var freeSelf = typeof self == 'object' && self && self.Object === Object && self;
+
+    /** Used as a reference to the global object. */
+    var root = freeGlobal || freeSelf || Function('return this')();
+
+    /** Built-in value references. */
+    var Symbol$1 = root.Symbol;
+
+    /** Used for built-in method references. */
+    var objectProto$5 = Object.prototype;
+
+    /** Used to check objects for own properties. */
+    var hasOwnProperty$3 = objectProto$5.hasOwnProperty;
+
+    /**
+     * Used to resolve the
+     * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
+     * of values.
+     */
+    var nativeObjectToString$1 = objectProto$5.toString;
+
+    /** Built-in value references. */
+    var symToStringTag$1 = Symbol$1 ? Symbol$1.toStringTag : undefined;
+
+    /**
+     * A specialized version of `baseGetTag` which ignores `Symbol.toStringTag` values.
+     *
+     * @private
+     * @param {*} value The value to query.
+     * @returns {string} Returns the raw `toStringTag`.
+     */
+    function getRawTag(value) {
+      var isOwn = hasOwnProperty$3.call(value, symToStringTag$1),
+          tag = value[symToStringTag$1];
+
+      try {
+        value[symToStringTag$1] = undefined;
+        var unmasked = true;
+      } catch (e) {}
+
+      var result = nativeObjectToString$1.call(value);
+      if (unmasked) {
+        if (isOwn) {
+          value[symToStringTag$1] = tag;
+        } else {
+          delete value[symToStringTag$1];
+        }
+      }
+      return result;
+    }
+
+    /** Used for built-in method references. */
+    var objectProto$4 = Object.prototype;
+
+    /**
+     * Used to resolve the
+     * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
+     * of values.
+     */
+    var nativeObjectToString = objectProto$4.toString;
+
+    /**
+     * Converts `value` to a string using `Object.prototype.toString`.
+     *
+     * @private
+     * @param {*} value The value to convert.
+     * @returns {string} Returns the converted string.
+     */
+    function objectToString(value) {
+      return nativeObjectToString.call(value);
+    }
+
+    /** `Object#toString` result references. */
+    var nullTag = '[object Null]',
+        undefinedTag = '[object Undefined]';
+
+    /** Built-in value references. */
+    var symToStringTag = Symbol$1 ? Symbol$1.toStringTag : undefined;
+
+    /**
+     * The base implementation of `getTag` without fallbacks for buggy environments.
+     *
+     * @private
+     * @param {*} value The value to query.
+     * @returns {string} Returns the `toStringTag`.
+     */
+    function baseGetTag(value) {
+      if (value == null) {
+        return value === undefined ? undefinedTag : nullTag;
+      }
+      return (symToStringTag && symToStringTag in Object(value))
+        ? getRawTag(value)
+        : objectToString(value);
+    }
+
+    /**
+     * Checks if `value` is object-like. A value is object-like if it's not `null`
+     * and has a `typeof` result of "object".
+     *
+     * @static
+     * @memberOf _
+     * @since 4.0.0
+     * @category Lang
+     * @param {*} value The value to check.
+     * @returns {boolean} Returns `true` if `value` is object-like, else `false`.
+     * @example
+     *
+     * _.isObjectLike({});
+     * // => true
+     *
+     * _.isObjectLike([1, 2, 3]);
+     * // => true
+     *
+     * _.isObjectLike(_.noop);
+     * // => false
+     *
+     * _.isObjectLike(null);
+     * // => false
+     */
+    function isObjectLike(value) {
+      return value != null && typeof value == 'object';
     }
 
     /** `Object#toString` result references. */
@@ -4915,6 +3749,36 @@ var bundle = (function (exports) {
       return result;
     }
 
+    /**
+     * Checks if `value` is the
+     * [language type](http://www.ecma-international.org/ecma-262/7.0/#sec-ecmascript-language-types)
+     * of `Object`. (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
+     *
+     * @static
+     * @memberOf _
+     * @since 0.1.0
+     * @category Lang
+     * @param {*} value The value to check.
+     * @returns {boolean} Returns `true` if `value` is an object, else `false`.
+     * @example
+     *
+     * _.isObject({});
+     * // => true
+     *
+     * _.isObject([1, 2, 3]);
+     * // => true
+     *
+     * _.isObject(_.noop);
+     * // => true
+     *
+     * _.isObject(null);
+     * // => false
+     */
+    function isObject(value) {
+      var type = typeof value;
+      return value != null && (type == 'object' || type == 'function');
+    }
+
     /** `Object#toString` result references. */
     var asyncTag = '[object AsyncFunction]',
         funcTag = '[object Function]',
@@ -5280,6 +4144,326 @@ var bundle = (function (exports) {
         return useGridNavigationCell(p);
     }
 
+    function useListNavigationSingleSelection({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, managedChildrenReturn, ..._void3 }) {
+        const lnr = useListNavigation({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, managedChildrenReturn });
+        const { rovingTabIndexReturn } = lnr;
+        const ssr = useSingleSelection({ rovingTabIndexReturn, managedChildrenReturn, singleSelectionParameters });
+        return {
+            ...ssr,
+            ...lnr,
+        };
+    }
+    function useListNavigationSingleSelectionChild({ managedChildParameters: { hidden, index, disabled, ..._void5 }, singleSelectionChildParameters, singleSelectionContext, typeaheadNavigationChildParameters, rovingTabIndexChildContext, typeaheadNavigationChildContext, ..._void1 }) {
+        const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ..._void3 }, ...sscr } = useSingleSelectionChild({
+            managedChildParameters: { index, disabled },
+            singleSelectionChildParameters,
+            singleSelectionContext
+        });
+        const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ..._void6 }, ...lncr } = useListNavigationChild({
+            managedChildParameters: { hidden, index },
+            typeaheadNavigationChildParameters,
+            rovingTabIndexChildContext,
+            typeaheadNavigationChildContext
+        });
+        const onCurrentFocusedInnerChanged = useStableCallback((focused, previouslyFocused) => {
+            ocfic1?.(focused, previouslyFocused);
+            ocfic2?.(focused, previouslyFocused);
+        });
+        return {
+            hasCurrentFocusParameters: { onCurrentFocusedInnerChanged },
+            ...sscr,
+            ...lncr
+        };
+    }
+
+    function useListNavigationSingleSelectionSortable({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, managedChildrenReturn, rearrangeableChildrenParameters, sortableChildrenParameters, ..._void3 }) {
+        const scr = useSortableChildren({ rearrangeableChildrenParameters, sortableChildrenParameters });
+        const { linearNavigationParameters: { navigateAbsolute, navigateRelative, ...void1 } } = scr;
+        const lnssr = useListNavigationSingleSelection({ linearNavigationParameters: { ...linearNavigationParameters, navigateRelative, navigateAbsolute }, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, managedChildrenReturn });
+        return { ...lnssr, ...scr };
+    }
+    function useListNavigationSingleSelectionSortableChild({ managedChildParameters: { hidden, index, disabled, ..._void5 }, singleSelectionChildParameters, singleSelectionContext, typeaheadNavigationChildParameters, rovingTabIndexChildContext, typeaheadNavigationChildContext, ..._void1 }) {
+        const lnsscr = useListNavigationSingleSelectionChild({
+            managedChildParameters: { index, hidden, disabled },
+            singleSelectionChildParameters,
+            singleSelectionContext,
+            typeaheadNavigationChildParameters,
+            rovingTabIndexChildContext,
+            typeaheadNavigationChildContext
+        });
+        return { ...lnsscr };
+    }
+
+    /**
+     * Allows attaching an event handler to any *non-Preact* element, and removing it when the component using the hook unmounts. The callback does not need to be stable across renders.
+     *
+     * Due to typing limitations, this function must be called like this:
+     *
+     * `useEventHandler(element, "input")<InputEvent>(e => {})`
+     *
+     * The type argument is optional, but narrows down the type from "a union of all events" to whatever you specify, and errors if it doesn't exist.
+     *
+     * There is a separate version that attaches event handlers to a set of props.
+     * It takes different event string types (onEvent vs onevent).
+     *
+     * @param target A *non-Preact* node to attach the event to.
+     * @returns
+     * *
+     */
+    function useGlobalHandler(target, type, handler, options) {
+        // Note to self: The typing doesn't improve even if this is split up into a sub-function.
+        // No matter what, it seems impossible to get the handler's event object typed perfectly.
+        // It seems like it's guaranteed to always be a union of all available tupes.
+        // Again, no matter what combination of sub- or sub-sub-functions used.
+        let stableHandler = useStableCallback(handler ?? (() => { }));
+        if (handler == null)
+            stableHandler = null;
+        s(() => {
+            if (stableHandler) {
+                target.addEventListener(type, stableHandler, options);
+                return () => target.removeEventListener(type, stableHandler, options);
+            }
+        }, [target, type, stableHandler]);
+    }
+
+    const MagicWindowKey = ("__preact-prop-helpers-escape-key-dismiss__");
+    function getElementDepth(element) {
+        let depth = 0;
+        let parent = element.parentElement;
+        while (parent) {
+            depth += 1;
+            parent = parent.parentElement;
+        }
+        return depth;
+    }
+    /**
+     * Adds event handlers for a modal-like soft-dismiss interaction.
+     *
+     * That is, any clicks or taps outside of the given component,
+     * or any time the Escape key is pressed within the component,
+     * (with various browser oddities regarding clicks on blank or inert areas handled)
+     * the component will request to close itself.
+     *
+     * Of course, if you don't do anything in the `onClose` function,
+     * it won't be a soft dismiss anymore.
+     *
+     * Handles events for pressing the `Escape` key to close the any currently open dialogs, tooltips, menus, popups, etc.
+     *
+     * One press of the `Escape` key is guaranteed to only call `onClose` for *only one* component, and it is called on the component deepest in the DOM tree, differentiated by passing context information between parent and child.
+     *
+     * @param param0
+     * @returns
+     */
+    function useEscapeDismiss({ escapeDismissParameters: { onClose, open, getWindow: unstableGetWindow, parentDepth, ...void1 }, refElementPopupReturn: { getElement, ...void2 } }) {
+        const stableOnClose = useStableCallback(onClose);
+        const getWindow = useStableCallback(unstableGetWindow);
+        const getDepth = useStableGetter(parentDepth + 1);
+        // When this component opens, add an event listener that finds the deepest open soft dismiss element to actually dismiss.
+        // Only opened components will add event handlers, and will remove them once closed.
+        // The reason this is so complicated is because:
+        // 1. We must only close one soft dismiss component at a time.  If there's a tooltip in a popup, the tooltip must be dismissed.
+        // 2. `keydown` events don't just work on arbitrary elements, for our purposes they must be from the `window`. So we can't rely on normal capturing or bubbling behavior on the element itself.
+        // 3. Event handlers added to the `window` via `addEventHandler` are called in the order of registration, which is completely at odds with #1.
+        //
+        // So all soft dismiss components listen for a keydown of Escape, 
+        // then the first one to do so will wait for a microtask, 
+        // then find the deepest element in the document tree to dismiss of all of those components currently open.
+        s(() => {
+            const window = getWindow();
+            window[MagicWindowKey] ??= { microtaskQueued: false, elementQueue: new Map() };
+            const info = window[MagicWindowKey];
+            if (open) {
+                console.log(`Adding handler for depth=${getDepth()}`);
+                window.addEventListener("keydown", handler, { capture: true });
+                return () => {
+                    console.log(`Removing handler for depth=${getDepth()}`);
+                    const element = getElement();
+                    if (element && info.elementQueue)
+                        info.elementQueue.delete(element);
+                    window.removeEventListener("keydown", handler, { capture: true });
+                };
+            }
+            function handler(e) {
+                if (e.key == "Escape") {
+                    console.log(`Escape key for depth=${getDepth()}`);
+                    // We don't know which of the currently active soft dismisses will actually do something,
+                    // but ONE of them definitely will,
+                    // so we stop propagation to child nodes, but not to everyone on the window (stopImmediatePropagation).
+                    e.preventDefault();
+                    e.stopPropagation();
+                    // This is what at least one of the elements will call
+                    const onClose2 = () => { stableOnClose("escape"); };
+                    const element = getElement();
+                    if (element) {
+                        const treeDepth = getElementDepth(element);
+                        const depth = getDepth();
+                        info.elementQueue.set(element, { depth, onClose: onClose2, treeDepth });
+                    }
+                    if (!info.microtaskQueued) {
+                        info.microtaskQueued = true;
+                        setTimeout(() => {
+                            const { elementQueue } = info;
+                            info.microtaskQueued = false;
+                            info.elementQueue = new Map();
+                            let deepestDepth = -Infinity;
+                            let deepestTreeDepth = -Infinity;
+                            let deepestOnClose = null;
+                            for (const [element, { depth, onClose, treeDepth }] of elementQueue) {
+                                let tieBroken = false;
+                                if (depth == deepestDepth) {
+                                    if (treeDepth > deepestTreeDepth) {
+                                        tieBroken = true;
+                                    }
+                                }
+                                if (depth > deepestDepth || (depth == deepestDepth && tieBroken)) {
+                                    deepestDepth = depth;
+                                    deepestTreeDepth = treeDepth;
+                                    deepestOnClose = onClose;
+                                }
+                            }
+                            deepestOnClose?.();
+                        }, 0);
+                    }
+                }
+            }
+        }, [open]);
+    }
+    /**
+     * Handles events for dismiss events for things like popup menus or transient dialogs -- things where moving focus to a new area of the page means this component should close itself.
+     *
+     * @param param0
+     * @returns
+     */
+    function useLostFocusDismiss({ refElementPopupReturn: { getElement: getPopupElement, ...void3 }, refElementSourceReturn, lostFocusDismiss: { open, onClose }, ...void1 }) {
+        const { getElement: getSourceElement, ...void2 } = (refElementSourceReturn ?? {});
+        const stableOnClose = useStableCallback(onClose);
+        const getOpen = useStableGetter(open);
+        const onLastActiveElementChange = q$1((newElement, _prevElement) => {
+            const open = getOpen();
+            const sourceElement = getSourceElement?.();
+            const popupElement = getPopupElement();
+            if (!(sourceElement?.contains(newElement) || popupElement?.contains(newElement))) {
+                if (open)
+                    stableOnClose();
+            }
+        }, [getSourceElement]);
+        return { activeElementParameters: { onLastActiveElementChange } };
+    }
+    /**
+     * Handles events for a backdrop on a modal dialog -- the kind where the user expects the modal to close when they click/tap outside of it.
+     *
+     * @param param0
+     */
+    function useBackdropDismiss({ backdropDismissParameters: { open, onClose: onCloseUnstable, ...void1 }, refElementPopupReturn: { getElement, ...void3 }, ...void2 }) {
+        const getOpen = useStableGetter(open);
+        const onClose = useStableCallback(onCloseUnstable);
+        const onBackdropClick = q$1(function onBackdropClick(e) {
+            if (!getOpen())
+                return;
+            // Basically, "was this event fired on an element not contained by the modal?"
+            // There are multiple ways browser react to "interacting with nothing", and this takes care of everything.
+            let element = getElement();
+            let foundInsideClick = false;
+            if (e.target && element && element.contains(e.target)) {
+                foundInsideClick = true;
+            }
+            if (!foundInsideClick) {
+                onClose();
+            }
+        }, []);
+        useGlobalHandler(window, "mousedown", open ? onBackdropClick : null, { capture: true });
+        useGlobalHandler(window, "touchstart", open ? onBackdropClick : null, { capture: true });
+    }
+    /**
+     * Combines all the methods of dismissing a modal-ish or popup-ish component into one combined hook.
+     *
+     * This is similar to the "complete" series of list/grid navigation, in that it's the "outermost" hook of its type.
+     */
+    function useDismiss({ dismissParameters: { open: globalOpen, onClose: globalOnClose, closeOnBackdrop, closeOnEscape, closeOnLostFocus }, escapeDismissParameters: { getWindow, parentDepth } }) {
+        const { refElementReturn: refElementSourceReturn } = useRefElement({ refElementParameters: {} });
+        const { refElementReturn: refElementPopupReturn } = useRefElement({ refElementParameters: {} });
+        const onCloseBackdrop = q$1(() => { return globalOnClose?.("backdrop"); }, [globalOnClose]);
+        const onCloseEscape = q$1(() => { return globalOnClose?.("escape"); }, [globalOnClose]);
+        const onCloseFocus = q$1(() => { return globalOnClose?.("lost-focus"); }, [globalOnClose]);
+        useBackdropDismiss({ backdropDismissParameters: { onClose: onCloseBackdrop, open: (closeOnBackdrop && globalOpen) }, refElementPopupReturn });
+        useEscapeDismiss({ escapeDismissParameters: { getWindow, onClose: onCloseEscape, open: (closeOnEscape && globalOpen), parentDepth }, refElementPopupReturn });
+        const { activeElementParameters } = useLostFocusDismiss({ lostFocusDismiss: { onClose: onCloseFocus, open: (closeOnLostFocus && globalOpen) }, refElementPopupReturn, refElementSourceReturn });
+        const getDocument = q$1(() => {
+            return getWindow().document;
+        }, [getWindow]);
+        useActiveElement({ activeElementParameters: { ...activeElementParameters, getWindow, getDocument } });
+        return {
+            refElementSourceReturn,
+            refElementPopupReturn
+        };
+    }
+
+    function immediate(f) { f(); }
+    function useChildrenHaveFocus(args) {
+        const { childrenHaveFocusParameters: { onCompositeFocusChange } } = args;
+        const [getAnyFocused, setAnyFocused] = usePassiveState(onCompositeFocusChange, returnFalse, immediate);
+        const [_getFocusCount, setFocusCount] = usePassiveState(useStableCallback((anyFocused, anyPreviouslyFocused) => {
+            console.assert(anyFocused >= 0 && anyFocused <= 1);
+            setAnyFocused(!!(anyFocused && !anyPreviouslyFocused));
+        }));
+        return {
+            childrenHaveFocusReturn: { getAnyFocused, },
+            childrenHaveFocusChildContext: useStableObject({ childrenHaveFocusChildParameters: useStableObject({ setFocusCount }) }),
+        };
+    }
+    function useChildrenHaveFocusChild({ childrenHaveFocusChildContext: { childrenHaveFocusChildParameters: { setFocusCount } } }) {
+        return {
+            hasCurrentFocusParameters: {
+                onCurrentFocusedInnerChanged: useStableCallback((focused, prev) => {
+                    if (focused) {
+                        setFocusCount(p => (p ?? 0) + 1);
+                    }
+                    else if (!focused && prev) {
+                        setFocusCount(p => (p ?? 0) - 1);
+                    }
+                }),
+            },
+            /*refElementParameters: {
+                onElementChange: useCallback((e: E | null, _prev: E | null | undefined) => {
+                    if (e) {
+                        allElements.add(e);
+                        return () => {
+                            allElements.delete(e);
+                        }
+                    }
+                }, [])
+            }*/
+        };
+    }
+
+    function useHasCurrentFocus(args) {
+        const { hasCurrentFocusParameters: { onCurrentFocusedChanged: onFocusedChanged, onCurrentFocusedInnerChanged: onFocusedInnerChanged }, refElementReturn: { getElement } } = args;
+        useEnsureStability("useHasCurrentFocus", onFocusedChanged, onFocusedInnerChanged, getElement);
+        const [getFocused, setFocused] = usePassiveState(onFocusedChanged, returnFalse);
+        const [getFocusedInner, setFocusedInner] = usePassiveState(onFocusedInnerChanged, returnFalse);
+        const onFocusIn = q$1((e) => {
+            setFocusedInner(true);
+            setFocused(e.target == getElement());
+        }, []);
+        const onFocusOut = q$1((e) => {
+            if (e.target == getElement()) {
+                setFocusedInner(false);
+                setFocused(false);
+            }
+        }, []);
+        const propsStable = A({
+            onfocusin: onFocusIn,
+            onfocusout: onFocusOut
+        });
+        return {
+            hasCurrentFocusReturn: {
+                propsStable: propsStable.current,
+                getCurrentFocused: getFocused,
+                getCurrentFocusedInner: getFocusedInner,
+            }
+        };
+    }
+
     /**
      * Adds the necessary event handlers to create a "press"-like event for
      * any element, whether it's a native <BUTTON> or regular <DIV>.
@@ -5507,39 +4691,10 @@ var bundle = (function (exports) {
         return false;
     }
 
-    function useHasCurrentFocus(args) {
-        const { hasCurrentFocusParameters: { onCurrentFocusedChanged: onFocusedChanged, onCurrentFocusedInnerChanged: onFocusedInnerChanged }, refElementReturn: { getElement } } = args;
-        useEnsureStability("useHasCurrentFocus", onFocusedChanged, onFocusedInnerChanged, getElement);
-        const [getFocused, setFocused] = usePassiveState(onFocusedChanged, returnFalse);
-        const [getFocusedInner, setFocusedInner] = usePassiveState(onFocusedInnerChanged, returnFalse);
-        const onFocusIn = q$1((e) => {
-            setFocusedInner(true);
-            setFocused(e.target == getElement());
-        }, []);
-        const onFocusOut = q$1((e) => {
-            if (e.target == getElement()) {
-                setFocusedInner(false);
-                setFocused(false);
-            }
-        }, []);
-        const propsStable = A({
-            onfocusin: onFocusIn,
-            onfocusout: onFocusOut
-        });
-        return {
-            hasCurrentFocusReturn: {
-                propsStable: propsStable.current,
-                getCurrentFocused: getFocused,
-                getCurrentFocusedInner: getFocusedInner,
-            }
-        };
-    }
-
-    function useCompleteGridNavigation({ completeGridNavigationParameters: { onTabbableColumnChange }, gridNavigationParameters, linearNavigationParameters, rearrangeableChildrenParameters: { getIndex, ...rearrangeableChildrenParameters }, rovingTabIndexParameters, singleSelectionParameters, sortableChildrenParameters, typeaheadNavigationParameters }) {
+    function useCompleteGridNavigation({ gridNavigationParameters, linearNavigationParameters, rearrangeableChildrenParameters: { getIndex, ...rearrangeableChildrenParameters }, rovingTabIndexParameters, singleSelectionParameters, sortableChildrenParameters, typeaheadNavigationParameters }) {
         const getChildren = q$1(() => managedChildrenReturn.getChildren(), []);
         const getHighestChildIndex = q$1(() => getChildren().getHighestIndex(), []);
         const getValid = useStableCallback((index) => { return !(getChildren().getAt(index)?.hidden); });
-        usePassiveState(onTabbableColumnChange, returnZero);
         const { childrenHaveFocusParameters, managedChildrenParameters, rovingTabIndexChildContext, singleSelectionContext, typeaheadNavigationChildContext, gridNavigationRowContext, ...gridNavigationSingleSelectionSortableReturn } = useGridNavigationSingleSelectionSortable({
             gridNavigationParameters,
             linearNavigationParameters: { getHighestIndex: getHighestChildIndex, ...linearNavigationParameters },
@@ -5550,7 +4705,7 @@ var bundle = (function (exports) {
             sortableChildrenParameters,
             typeaheadNavigationParameters
         });
-        const { linearNavigationReturn, typeaheadNavigationReturn, rovingTabIndexReturn } = gridNavigationSingleSelectionSortableReturn;
+        const { linearNavigationReturn, typeaheadNavigationReturn } = gridNavigationSingleSelectionSortableReturn;
         const { childrenHaveFocusChildContext, childrenHaveFocusReturn } = useChildrenHaveFocus({ childrenHaveFocusParameters });
         const { managedChildContext, managedChildrenReturn } = useManagedChildren({ managedChildrenParameters });
         const props = useMergedProps(linearNavigationReturn.propsStable, typeaheadNavigationReturn.propsStable);
@@ -5591,7 +4746,7 @@ var bundle = (function (exports) {
                 typeaheadNavigationChildParameters
             }
         });
-        const { asParentRowReturn: { managedChildrenParameters, rovingTabIndexChildContext: c1, typeaheadNavigationChildContext: c3, ...gridNavigationSingleSelectionSortableReturn }, asChildRowReturn: { pressParameters: { onPressSync } } } = r;
+        const { asParentRowReturn: { managedChildrenParameters }, asChildRowReturn: { pressParameters: { onPressSync } } } = r;
         const { asChildRowReturn, asParentRowReturn } = r;
         const { managedChildContext: mcc2, managedChildrenReturn } = useManagedChildren({ managedChildrenParameters });
         const { refElementReturn } = useRefElement({ refElementParameters: {} });
@@ -5686,108 +4841,6 @@ var bundle = (function (exports) {
             hasCurrentFocusReturn,
             rovingTabIndexChildReturn
         };
-    }
-
-    function useHasLastFocus(args) {
-        const { refElementReturn: { getElement }, activeElementParameters: { onActiveElementChange, onLastActiveElementChange, ...activeElementParameters }, hasLastFocusParameters: { onLastFocusedChanged, onLastFocusedInnerChanged, ..._void } } = args;
-        useEnsureStability("useHasFocus", onLastFocusedChanged, onLastFocusedInnerChanged);
-        const [getLastFocused, setLastFocused] = usePassiveState(onLastFocusedChanged, returnFalse);
-        const [getLastFocusedInner, setLastFocusedInner] = usePassiveState(onLastFocusedInnerChanged, returnFalse);
-        const { activeElementReturn } = useActiveElement({
-            activeElementParameters: {
-                onLastActiveElementChange: q$1((lastActiveElement, prevLastActiveElement) => {
-                    const selfElement = getElement();
-                    const focused = (selfElement != null && (selfElement == lastActiveElement));
-                    const focusedInner = (!!selfElement?.contains(lastActiveElement));
-                    setLastFocused(focused);
-                    setLastFocusedInner(focusedInner);
-                    onLastActiveElementChange?.(lastActiveElement, prevLastActiveElement);
-                }, []),
-                ...activeElementParameters
-            },
-        });
-        return {
-            activeElementReturn,
-            hasLastFocusReturn: {
-                getLastFocused,
-                getLastFocusedInner,
-            }
-        };
-    }
-
-    function useInterval({ interval, callback }) {
-        // Get a wrapper around the given callback that's stable
-        const stableCallback = useStableCallback(callback);
-        const getInterval = useStableGetter(interval);
-        s(() => {
-            const interval = getInterval();
-            let lastDelayUsed = interval;
-            if (interval == null)
-                return;
-            // Get a wrapper around the wrapper around the callback
-            // that clears and resets the interval if it changes.
-            const adjustableCallback = () => {
-                stableCallback();
-                const currentInterval = getInterval();
-                if (currentInterval != lastDelayUsed) {
-                    clearInterval(handle);
-                    if (currentInterval != null)
-                        handle = setInterval(adjustableCallback, lastDelayUsed = currentInterval);
-                }
-            };
-            let handle = setInterval(adjustableCallback, interval);
-            return () => clearInterval(handle);
-        }, []);
-    }
-
-    function useListNavigationSingleSelection({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, managedChildrenReturn, ..._void3 }) {
-        const lnr = useListNavigation({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, managedChildrenReturn });
-        const { rovingTabIndexReturn } = lnr;
-        const ssr = useSingleSelection({ rovingTabIndexReturn, managedChildrenReturn, singleSelectionParameters });
-        return {
-            ...ssr,
-            ...lnr,
-        };
-    }
-    function useListNavigationSingleSelectionChild({ managedChildParameters: { hidden, index, disabled, ..._void5 }, singleSelectionChildParameters, singleSelectionContext, typeaheadNavigationChildParameters, rovingTabIndexChildContext, typeaheadNavigationChildContext, ..._void1 }) {
-        const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ..._void3 }, ...sscr } = useSingleSelectionChild({
-            managedChildParameters: { index, disabled },
-            singleSelectionChildParameters,
-            singleSelectionContext
-        });
-        const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ..._void6 }, ...lncr } = useListNavigationChild({
-            managedChildParameters: { hidden, index },
-            typeaheadNavigationChildParameters,
-            rovingTabIndexChildContext,
-            typeaheadNavigationChildContext
-        });
-        const onCurrentFocusedInnerChanged = useStableCallback((focused, previouslyFocused) => {
-            ocfic1?.(focused, previouslyFocused);
-            ocfic2?.(focused, previouslyFocused);
-        });
-        return {
-            hasCurrentFocusParameters: { onCurrentFocusedInnerChanged },
-            ...sscr,
-            ...lncr
-        };
-    }
-
-    function useListNavigationSingleSelectionSortable({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, managedChildrenReturn, rearrangeableChildrenParameters, sortableChildrenParameters, ..._void3 }) {
-        const scr = useSortableChildren({ rearrangeableChildrenParameters, sortableChildrenParameters });
-        const { linearNavigationParameters: { navigateAbsolute, navigateRelative, ...void1 } } = scr;
-        const lnssr = useListNavigationSingleSelection({ linearNavigationParameters: { ...linearNavigationParameters, navigateRelative, navigateAbsolute }, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, managedChildrenReturn });
-        return { ...lnssr, ...scr };
-    }
-    function useListNavigationSingleSelectionSortableChild({ managedChildParameters: { hidden, index, disabled, ..._void5 }, singleSelectionChildParameters, singleSelectionContext, typeaheadNavigationChildParameters, rovingTabIndexChildContext, typeaheadNavigationChildContext, ..._void1 }) {
-        const lnsscr = useListNavigationSingleSelectionChild({
-            managedChildParameters: { index, hidden, disabled },
-            singleSelectionChildParameters,
-            singleSelectionContext,
-            typeaheadNavigationChildParameters,
-            rovingTabIndexChildContext,
-            typeaheadNavigationChildContext
-        });
-        return { ...lnsscr };
     }
 
     /**
@@ -5891,7 +4944,7 @@ var bundle = (function (exports) {
      *
      * Another in the "complete" series, alongside list/grid navigation and dismissal itself.
      *
-     * Use for dialogs, menus, etc.
+     * Use for dialogs, menus, etc.  Anything that can be dismissed and might trap focus, basically.
      *
      * @param param0
      * @returns
@@ -5917,6 +4970,950 @@ var bundle = (function (exports) {
             refElementSourceReturn,
             focusTrapReturn,
         };
+    }
+
+    /**
+     * Gets the timestamp of the number of milliseconds that have elapsed since
+     * the Unix epoch (1 January 1970 00:00:00 UTC).
+     *
+     * @static
+     * @memberOf _
+     * @since 2.4.0
+     * @category Date
+     * @returns {number} Returns the timestamp.
+     * @example
+     *
+     * _.defer(function(stamp) {
+     *   console.log(_.now() - stamp);
+     * }, _.now());
+     * // => Logs the number of milliseconds it took for the deferred invocation.
+     */
+    var now = function() {
+      return root.Date.now();
+    };
+
+    /** Used to match a single whitespace character. */
+    var reWhitespace = /\s/;
+
+    /**
+     * Used by `_.trim` and `_.trimEnd` to get the index of the last non-whitespace
+     * character of `string`.
+     *
+     * @private
+     * @param {string} string The string to inspect.
+     * @returns {number} Returns the index of the last non-whitespace character.
+     */
+    function trimmedEndIndex(string) {
+      var index = string.length;
+
+      while (index-- && reWhitespace.test(string.charAt(index))) {}
+      return index;
+    }
+
+    /** Used to match leading whitespace. */
+    var reTrimStart = /^\s+/;
+
+    /**
+     * The base implementation of `_.trim`.
+     *
+     * @private
+     * @param {string} string The string to trim.
+     * @returns {string} Returns the trimmed string.
+     */
+    function baseTrim(string) {
+      return string
+        ? string.slice(0, trimmedEndIndex(string) + 1).replace(reTrimStart, '')
+        : string;
+    }
+
+    /** `Object#toString` result references. */
+    var symbolTag = '[object Symbol]';
+
+    /**
+     * Checks if `value` is classified as a `Symbol` primitive or object.
+     *
+     * @static
+     * @memberOf _
+     * @since 4.0.0
+     * @category Lang
+     * @param {*} value The value to check.
+     * @returns {boolean} Returns `true` if `value` is a symbol, else `false`.
+     * @example
+     *
+     * _.isSymbol(Symbol.iterator);
+     * // => true
+     *
+     * _.isSymbol('abc');
+     * // => false
+     */
+    function isSymbol(value) {
+      return typeof value == 'symbol' ||
+        (isObjectLike(value) && baseGetTag(value) == symbolTag);
+    }
+
+    /** Used as references for various `Number` constants. */
+    var NAN = 0 / 0;
+
+    /** Used to detect bad signed hexadecimal string values. */
+    var reIsBadHex = /^[-+]0x[0-9a-f]+$/i;
+
+    /** Used to detect binary string values. */
+    var reIsBinary = /^0b[01]+$/i;
+
+    /** Used to detect octal string values. */
+    var reIsOctal = /^0o[0-7]+$/i;
+
+    /** Built-in method references without a dependency on `root`. */
+    var freeParseInt = parseInt;
+
+    /**
+     * Converts `value` to a number.
+     *
+     * @static
+     * @memberOf _
+     * @since 4.0.0
+     * @category Lang
+     * @param {*} value The value to process.
+     * @returns {number} Returns the number.
+     * @example
+     *
+     * _.toNumber(3.2);
+     * // => 3.2
+     *
+     * _.toNumber(Number.MIN_VALUE);
+     * // => 5e-324
+     *
+     * _.toNumber(Infinity);
+     * // => Infinity
+     *
+     * _.toNumber('3.2');
+     * // => 3.2
+     */
+    function toNumber(value) {
+      if (typeof value == 'number') {
+        return value;
+      }
+      if (isSymbol(value)) {
+        return NAN;
+      }
+      if (isObject(value)) {
+        var other = typeof value.valueOf == 'function' ? value.valueOf() : value;
+        value = isObject(other) ? (other + '') : other;
+      }
+      if (typeof value != 'string') {
+        return value === 0 ? value : +value;
+      }
+      value = baseTrim(value);
+      var isBinary = reIsBinary.test(value);
+      return (isBinary || reIsOctal.test(value))
+        ? freeParseInt(value.slice(2), isBinary ? 2 : 8)
+        : (reIsBadHex.test(value) ? NAN : +value);
+    }
+
+    /** Error message constants. */
+    var FUNC_ERROR_TEXT$1 = 'Expected a function';
+
+    /* Built-in method references for those with the same name as other `lodash` methods. */
+    var nativeMax = Math.max,
+        nativeMin = Math.min;
+
+    /**
+     * Creates a debounced function that delays invoking `func` until after `wait`
+     * milliseconds have elapsed since the last time the debounced function was
+     * invoked. The debounced function comes with a `cancel` method to cancel
+     * delayed `func` invocations and a `flush` method to immediately invoke them.
+     * Provide `options` to indicate whether `func` should be invoked on the
+     * leading and/or trailing edge of the `wait` timeout. The `func` is invoked
+     * with the last arguments provided to the debounced function. Subsequent
+     * calls to the debounced function return the result of the last `func`
+     * invocation.
+     *
+     * **Note:** If `leading` and `trailing` options are `true`, `func` is
+     * invoked on the trailing edge of the timeout only if the debounced function
+     * is invoked more than once during the `wait` timeout.
+     *
+     * If `wait` is `0` and `leading` is `false`, `func` invocation is deferred
+     * until to the next tick, similar to `setTimeout` with a timeout of `0`.
+     *
+     * See [David Corbacho's article](https://css-tricks.com/debouncing-throttling-explained-examples/)
+     * for details over the differences between `_.debounce` and `_.throttle`.
+     *
+     * @static
+     * @memberOf _
+     * @since 0.1.0
+     * @category Function
+     * @param {Function} func The function to debounce.
+     * @param {number} [wait=0] The number of milliseconds to delay.
+     * @param {Object} [options={}] The options object.
+     * @param {boolean} [options.leading=false]
+     *  Specify invoking on the leading edge of the timeout.
+     * @param {number} [options.maxWait]
+     *  The maximum time `func` is allowed to be delayed before it's invoked.
+     * @param {boolean} [options.trailing=true]
+     *  Specify invoking on the trailing edge of the timeout.
+     * @returns {Function} Returns the new debounced function.
+     * @example
+     *
+     * // Avoid costly calculations while the window size is in flux.
+     * jQuery(window).on('resize', _.debounce(calculateLayout, 150));
+     *
+     * // Invoke `sendMail` when clicked, debouncing subsequent calls.
+     * jQuery(element).on('click', _.debounce(sendMail, 300, {
+     *   'leading': true,
+     *   'trailing': false
+     * }));
+     *
+     * // Ensure `batchLog` is invoked once after 1 second of debounced calls.
+     * var debounced = _.debounce(batchLog, 250, { 'maxWait': 1000 });
+     * var source = new EventSource('/stream');
+     * jQuery(source).on('message', debounced);
+     *
+     * // Cancel the trailing debounced invocation.
+     * jQuery(window).on('popstate', debounced.cancel);
+     */
+    function debounce(func, wait, options) {
+      var lastArgs,
+          lastThis,
+          maxWait,
+          result,
+          timerId,
+          lastCallTime,
+          lastInvokeTime = 0,
+          leading = false,
+          maxing = false,
+          trailing = true;
+
+      if (typeof func != 'function') {
+        throw new TypeError(FUNC_ERROR_TEXT$1);
+      }
+      wait = toNumber(wait) || 0;
+      if (isObject(options)) {
+        leading = !!options.leading;
+        maxing = 'maxWait' in options;
+        maxWait = maxing ? nativeMax(toNumber(options.maxWait) || 0, wait) : maxWait;
+        trailing = 'trailing' in options ? !!options.trailing : trailing;
+      }
+
+      function invokeFunc(time) {
+        var args = lastArgs,
+            thisArg = lastThis;
+
+        lastArgs = lastThis = undefined;
+        lastInvokeTime = time;
+        result = func.apply(thisArg, args);
+        return result;
+      }
+
+      function leadingEdge(time) {
+        // Reset any `maxWait` timer.
+        lastInvokeTime = time;
+        // Start the timer for the trailing edge.
+        timerId = setTimeout(timerExpired, wait);
+        // Invoke the leading edge.
+        return leading ? invokeFunc(time) : result;
+      }
+
+      function remainingWait(time) {
+        var timeSinceLastCall = time - lastCallTime,
+            timeSinceLastInvoke = time - lastInvokeTime,
+            timeWaiting = wait - timeSinceLastCall;
+
+        return maxing
+          ? nativeMin(timeWaiting, maxWait - timeSinceLastInvoke)
+          : timeWaiting;
+      }
+
+      function shouldInvoke(time) {
+        var timeSinceLastCall = time - lastCallTime,
+            timeSinceLastInvoke = time - lastInvokeTime;
+
+        // Either this is the first call, activity has stopped and we're at the
+        // trailing edge, the system time has gone backwards and we're treating
+        // it as the trailing edge, or we've hit the `maxWait` limit.
+        return (lastCallTime === undefined || (timeSinceLastCall >= wait) ||
+          (timeSinceLastCall < 0) || (maxing && timeSinceLastInvoke >= maxWait));
+      }
+
+      function timerExpired() {
+        var time = now();
+        if (shouldInvoke(time)) {
+          return trailingEdge(time);
+        }
+        // Restart the timer.
+        timerId = setTimeout(timerExpired, remainingWait(time));
+      }
+
+      function trailingEdge(time) {
+        timerId = undefined;
+
+        // Only invoke if we have `lastArgs` which means `func` has been
+        // debounced at least once.
+        if (trailing && lastArgs) {
+          return invokeFunc(time);
+        }
+        lastArgs = lastThis = undefined;
+        return result;
+      }
+
+      function cancel() {
+        if (timerId !== undefined) {
+          clearTimeout(timerId);
+        }
+        lastInvokeTime = 0;
+        lastArgs = lastCallTime = lastThis = timerId = undefined;
+      }
+
+      function flush() {
+        return timerId === undefined ? result : trailingEdge(now());
+      }
+
+      function debounced() {
+        var time = now(),
+            isInvoking = shouldInvoke(time);
+
+        lastArgs = arguments;
+        lastThis = this;
+        lastCallTime = time;
+
+        if (isInvoking) {
+          if (timerId === undefined) {
+            return leadingEdge(lastCallTime);
+          }
+          if (maxing) {
+            // Handle invocations in a tight loop.
+            clearTimeout(timerId);
+            timerId = setTimeout(timerExpired, wait);
+            return invokeFunc(lastCallTime);
+          }
+        }
+        if (timerId === undefined) {
+          timerId = setTimeout(timerExpired, wait);
+        }
+        return result;
+      }
+      debounced.cancel = cancel;
+      debounced.flush = flush;
+      return debounced;
+    }
+
+    /** Error message constants. */
+    var FUNC_ERROR_TEXT = 'Expected a function';
+
+    /**
+     * Creates a throttled function that only invokes `func` at most once per
+     * every `wait` milliseconds. The throttled function comes with a `cancel`
+     * method to cancel delayed `func` invocations and a `flush` method to
+     * immediately invoke them. Provide `options` to indicate whether `func`
+     * should be invoked on the leading and/or trailing edge of the `wait`
+     * timeout. The `func` is invoked with the last arguments provided to the
+     * throttled function. Subsequent calls to the throttled function return the
+     * result of the last `func` invocation.
+     *
+     * **Note:** If `leading` and `trailing` options are `true`, `func` is
+     * invoked on the trailing edge of the timeout only if the throttled function
+     * is invoked more than once during the `wait` timeout.
+     *
+     * If `wait` is `0` and `leading` is `false`, `func` invocation is deferred
+     * until to the next tick, similar to `setTimeout` with a timeout of `0`.
+     *
+     * See [David Corbacho's article](https://css-tricks.com/debouncing-throttling-explained-examples/)
+     * for details over the differences between `_.throttle` and `_.debounce`.
+     *
+     * @static
+     * @memberOf _
+     * @since 0.1.0
+     * @category Function
+     * @param {Function} func The function to throttle.
+     * @param {number} [wait=0] The number of milliseconds to throttle invocations to.
+     * @param {Object} [options={}] The options object.
+     * @param {boolean} [options.leading=true]
+     *  Specify invoking on the leading edge of the timeout.
+     * @param {boolean} [options.trailing=true]
+     *  Specify invoking on the trailing edge of the timeout.
+     * @returns {Function} Returns the new throttled function.
+     * @example
+     *
+     * // Avoid excessively updating the position while scrolling.
+     * jQuery(window).on('scroll', _.throttle(updatePosition, 100));
+     *
+     * // Invoke `renewToken` when the click event is fired, but not more than once every 5 minutes.
+     * var throttled = _.throttle(renewToken, 300000, { 'trailing': false });
+     * jQuery(element).on('click', throttled);
+     *
+     * // Cancel the trailing throttled invocation.
+     * jQuery(window).on('popstate', throttled.cancel);
+     */
+    function throttle(func, wait, options) {
+      var leading = true,
+          trailing = true;
+
+      if (typeof func != 'function') {
+        throw new TypeError(FUNC_ERROR_TEXT);
+      }
+      if (isObject(options)) {
+        leading = 'leading' in options ? !!options.leading : leading;
+        trailing = 'trailing' in options ? !!options.trailing : trailing;
+      }
+      return debounce(func, wait, {
+        'leading': leading,
+        'maxWait': wait,
+        'trailing': trailing
+      });
+    }
+
+    function identity(...t) { return t; }
+    function useThrottled(callback, wait, options) {
+        const throttled = T$1(() => {
+            return callback ? throttle(callback, wait, options) : null;
+        }, [callback, wait, options?.leading, options?.trailing]);
+        s(() => {
+            return () => throttled?.cancel();
+        }, [throttled]);
+        return throttled;
+    }
+    function useDebounced(callback, wait, options) {
+        const debounced = T$1(() => {
+            return callback ? debounce(callback, wait, options) : null;
+        }, [callback, wait, options?.leading, options?.maxWait, options?.trailing]);
+        s(() => {
+            return () => debounced?.cancel();
+        }, [debounced]);
+        return debounced;
+    }
+    /**
+     * Given an async function, returns a function that's suitable for non-async APIs,
+     * along with other information about the current run's status.
+     *
+     * See also `useAsyncHandler` for a version that's specialized for DOM event handlers.
+     *
+     * When called multiple times in quick succession, (i.e. before the handler has finished),
+     * this works like Lodash's `throttle` function with the `wait` option always
+     * set to however long the handler takes to complete. A second call to the sync function will be
+     * throttled until the first call has finished. The return value of the function is the result
+     * of the previous invocation, or `undefined` on the first call.
+     *
+     * The handler is only ever delayed if one is currently running, so, e.g. for iOS touch events the
+     * first call happens in the same event handler (which means things like calls to `element.focus()`
+     * will work as intended, since that fails when the event is "split up")
+     *
+     * Finally, because the sync handler may be invoked on a delay, any property references on the arguments
+     * provided might be stale by the time it's actually invoked (e.g. accessing `event.currentTarget.checked`
+     * is not stable across time because it's a "live" value -- you almost always want the value that it
+     * had at the original time the handler was called). The `capture` option allows you to save that kind of
+     * dynamic data at the time it runs; the `AP` and `SP` type parameters likewise control
+     * the parameters the async handler and sync handler expect respectively.
+     *
+     */
+    function useAsync(asyncHandler, options) {
+        /* eslint-disable prefer-const */
+        let { throttle, debounce, capture } = (options ?? {});
+        capture ??= identity;
+        // We keep, like, a lot of render-state, but it only ever triggers a re-render
+        // when we start/stop an async action.
+        // Keep track of this for the caller's sake -- we don't really care.
+        const [currentType, setCurrentType] = useState(null);
+        const [runCount, setRunCount] = useState(0);
+        const [settleCount, setSettleCount] = useState(0);
+        const [resolveCount, setResolveCount] = useState(0);
+        const [rejectCount, setRejectCount] = useState(0);
+        // Things related to current execution
+        // Because we can both return and throw undefined, 
+        // we need separate state to track their existance too.
+        const [pending, setPending, getPending] = useState(false);
+        const [result, setResult, getResult] = useState(undefined);
+        const [error, setError, _getError] = useState(undefined);
+        const [hasError, setHasError, _getHasError] = useState(false);
+        const [hasResult, setHasResult, _getHasResult] = useState(false);
+        // We implement our own throttling behavior in regards to waiting until the async handler finishes.
+        // These two passive state variables keep track of that, automatically queueing/dequeuing the next handler.
+        const [getQueued, setQueued] = usePassiveState(null, returnNull);
+        // The actual sync handler.
+        // Capture/transform the given parameters if applicable,
+        // then run further logic that's debounced/throttled
+        const captureArgsAndExecuteDebouncedHandler = useStableCallback(function onNewExecuteRequest(...newArgs2) {
+            // Capture the arguments we were given.
+            // We might use them immediately, or we might store them to `queued`,
+            // but in either case we do need the captured value.
+            const captured = capture(...newArgs2);
+            // This is all logic that deals with the captured value instead of the raw arguments.
+            // It's called in two separate circumstances,
+            // and has the debounce/throttle logic already applied
+            return executeHandlerWithDebounce(getPending(), ...captured);
+        });
+        // This is the logic that runs when the handler is *just* about to start.
+        // This function itself is further transformed to be throttled/debounced if requested,
+        // so this might not be called immediately after 
+        const executeHandlerWithoutDebounce = useStableCallback(function onNewExecuteRequest2(enqueue, ...newArgs) {
+            const onThen = (value) => { setResult(value); setHasResult(true); setHasError(false); setResolveCount(r => ++r); };
+            const onCatch = (ex) => { setError(ex); setHasError(true); setHasResult(false); setRejectCount(r => ++r); };
+            const onFinally = () => {
+                const queued = getQueued();
+                setSettleCount(s => ++s);
+                if (queued) {
+                    setQueued(null);
+                    executeHandlerWithDebounce(false, ...queued);
+                }
+                else {
+                    setPending(false);
+                }
+            };
+            if (!enqueue) {
+                // Nothing is pending at the moment, so we can run our function immediately.
+                setRunCount(r => ++r);
+                setPending(true);
+                const result = asyncHandler?.(...newArgs);
+                const isPromise = (result != null && typeof result == "object" && "then" in result);
+                if (result == null || !isPromise) {
+                    // It's synchronous and returned successfully.
+                    // Bail out early.
+                    onThen(result);
+                    onFinally();
+                    setCurrentType("sync");
+                }
+                else {
+                    result.then(onThen).catch(onCatch).finally(onFinally);
+                    setCurrentType("async");
+                }
+            }
+            else {
+                // When we're still running a previous handler,
+                // just set ourselves as the next one to run and quit early.
+                // Nothing more to do.
+                setQueued(newArgs);
+            }
+            return getResult();
+        });
+        const executeHandlerWithT = useThrottled(!throttle ? null : executeHandlerWithoutDebounce, throttle ?? 0);
+        const executeHandlerWithD = useDebounced(!debounce ? null : (executeHandlerWithT ?? executeHandlerWithoutDebounce), debounce ?? 0);
+        const executeHandlerWithDebounce = (executeHandlerWithD ?? executeHandlerWithT ?? executeHandlerWithoutDebounce);
+        const flushDebouncedPromise = useStableCallback(() => {
+            if (executeHandlerWithDebounce && "flush" in executeHandlerWithDebounce)
+                executeHandlerWithDebounce.flush();
+        });
+        return {
+            syncHandler: captureArgsAndExecuteDebouncedHandler,
+            currentType,
+            pending,
+            result,
+            error,
+            hasError,
+            hasResult,
+            resolveCount,
+            rejectCount,
+            settleCount,
+            callCount: runCount,
+            flushDebouncedPromise
+        };
+    }
+
+    /**
+     * Given an asyncronous event handler, returns a syncronous one that works on the DOM,
+     * along with some other information related to the current state.
+     * Does not modify any props.
+     *
+     * Note that because the handler you provide may be called with a delay, and
+     * because the value of, e.g., an `<input>` element will likely be stale by the
+     * time the delay is over, a `capture` function is necessary in order to
+     * capture the relevant information from the DOM. Any other simple event data,
+     * like `mouseX` or `shiftKey` can stay on the event itself and don't
+     * need to be captured &ndash; it's never stale.
+     *
+     * ```tsx
+     * const asyncOnInput = async (value: number, e: Event) => {
+     *     [...] // Ex. send to a server and setState when done
+     * };
+     * const {
+     *     // A sync version of asyncOnInput
+     *     syncHandler,
+     *     // True while the handler is running
+     *     pending,
+     *     // The error thrown, if any
+     *     error,
+     *     // Show this value while the operation's pending
+     *     currentCapture,
+     *     // And others, see `UseAsyncHandlerReturnType`
+     *     ...rest
+     * } = useAsyncHandler<HTMLInputElement>()(asyncOnInput, {
+     *     // Pass in the capture function that saves event data
+     *     // from being stale.
+     *     capture: e => {
+     *         // `capture` can have side-effects because
+     *         // it's called exactly once per invocation
+     *         e.preventDefault();
+     *
+     *         // Save this value so that it's never stale
+     *         return e.currentTarget.valueAsNumber;
+     *     }
+     * });
+     *
+     * const onInput = pending? null : syncHandler;
+     * ```
+     *
+     * The handler is automatically throttled to only run one at a time.
+     * If the handler is called, and then before it finishes, is called again,
+     * it will be put on hold until the current one finishes, at which point
+     * the second one will run.  If the handler is called a third time before
+     * the first has finished, it will *replace* the second, so only the most
+     * recently called iteration of the handler will run.
+     *
+     *
+     * You may optionally *also* specify debounce and throttle parameters that wait until the
+     * syncronous handler has not been called for the specified number of
+     * milliseconds, at which point we *actually* run the asyncronous handler
+     * according to the logic in the previous paragraph. This is in
+     * *addition* to throttling the handler, and does not replace that behavior.
+     *
+     * @see useAsync A more general version of this hook that can work with any type of handler, not just DOM event handlers.
+     */
+    function useAsyncHandler({ asyncHandler, capture: originalCapture, ...restAsyncOptions }) {
+        // We need to differentiate between "nothing captured yet" and "`undefined` was captured"
+        const [currentCapture, setCurrentCapture, getCurrentCapture] = useState(undefined);
+        const [hasCapture, setHasCapture] = useState(false);
+        // Wrap around the normal `useAsync` `capture` function to also
+        // keep track of the last value the user actually input.
+        // 
+        // Without this there's no way to re-render the control with
+        // it being both controlled and also having the "correct" value,
+        // and at any rate also protects against sudden exceptions reverting
+        // your change out from under you.
+        const capture = useStableCallback((e) => {
+            const captured = originalCapture(e);
+            setCurrentCapture(captured);
+            setHasCapture(true);
+            return [captured, e];
+        });
+        return {
+            getCurrentCapture,
+            currentCapture,
+            hasCapture,
+            ...useAsync(asyncHandler, { capture, ...restAsyncOptions })
+        };
+    }
+
+    function useDraggable({ effectAllowed, data, dragImage, dragImageXOffset, dragImageYOffset }) {
+        const [dragging, setDragging, getDragging] = useState(false);
+        const [lastDropEffect, setLastDropEffect, getLastDropEffect] = useState(null);
+        const onDragStart = (e) => {
+            //e.preventDefault();
+            setDragging(true);
+            if (e.dataTransfer) {
+                e.dataTransfer.effectAllowed = (effectAllowed ?? "all");
+                if (dragImage)
+                    e.dataTransfer.setDragImage(dragImage, dragImageXOffset ?? 0, dragImageYOffset ?? 0);
+                const entries = Object.entries(data);
+                for (const [mimeType, data] of entries) {
+                    e.dataTransfer.setData(mimeType, data);
+                }
+            }
+        };
+        const onDragEnd = (e) => {
+            e.preventDefault();
+            setDragging(false);
+            if (e.dataTransfer) {
+                if (e.dataTransfer.dropEffect != "none") {
+                    setLastDropEffect(e.dataTransfer.dropEffect);
+                }
+                else {
+                    setLastDropEffect(null);
+                }
+            }
+        };
+        // Return both the element and the hook that modifies 
+        // the props and allows us to actually find the element
+        const ret = {
+            propsUnstable: {
+                draggable: true,
+                onDragStart,
+                onDragEnd
+            },
+            dragging,
+            getDragging,
+            lastDropEffect,
+            getLastDropEffect
+        };
+        return ret;
+    }
+
+    class DroppableFileError extends Error {
+        fileName;
+        errorType;
+        constructor(fileName, base) {
+            super(base?.message ?? "An unspecified error occurred reading the file.");
+            this.fileName = fileName;
+            this.errorType = base?.name;
+        }
+    }
+    function useDroppable({ effect }) {
+        const [filesForConsideration, setFilesForConsideration] = useState(null);
+        const [stringsForConsideration, setStringsForConsideration] = useState(null);
+        const [droppedFiles, setDroppedFiles] = useState(null);
+        const [droppedStrings, setDroppedStrings] = useState(null);
+        const [dropError, setDropError] = useState(undefined);
+        // All the promises generated from the drop events.
+        // Used to process multiple drop events in succession
+        const dropPromisesRef = A([]);
+        const [currentPromiseIndex, setCurrentPromiseIndex, getCurrentPromiseIndex] = useState(-1);
+        const [promiseCount, setPromiseCount, getPromiseCount] = useState(0);
+        // Any time we add a new promise, if there's no current promise running, we need to start one.
+        // If there is one, then we don't need to do anything, since it runs the same check.
+        s(() => {
+            const currentPromiseIndex = getCurrentPromiseIndex();
+            const promiseCount = getPromiseCount();
+            if (promiseCount > 0) {
+                if ((currentPromiseIndex + 1) < promiseCount) {
+                    setCurrentPromiseIndex(i => ++i);
+                }
+            }
+        }, [promiseCount]);
+        // Anytime our current promise changes,
+        // wait for it to finish, then set our state to its result.
+        // Finally, check to see if there are anymore promises.
+        // If there are, then increase currentPromiseCount,
+        // which will trigger this again.
+        //
+        // This shouldn't happen *often*, but maybe in the case of
+        // individually dropping a bunch of large files or something.
+        s(() => {
+            if (currentPromiseIndex >= 0) {
+                const currentPromise = dropPromisesRef.current[currentPromiseIndex];
+                currentPromise.then((info) => {
+                    if (info !== null) {
+                        const { files, strings } = info;
+                        setDroppedFiles(files);
+                        setDroppedStrings(strings);
+                    }
+                    // Now that we're done, are there more promises in the queue?
+                    const currentPromiseIndex = getCurrentPromiseIndex();
+                    const promiseCount = getPromiseCount();
+                    if ((currentPromiseIndex + 1) < promiseCount) {
+                        // Since this promise has started, more have been added.
+                        // Run this effect again.
+                        setCurrentPromiseIndex(i => ++i);
+                    }
+                });
+            }
+        }, [currentPromiseIndex]);
+        // Handle collecting the current file metadata or MIME types.
+        const onDragEnter = useStableCallback((e) => {
+            e.preventDefault();
+            if (e.dataTransfer) {
+                // Is there a default? I can't find one anywhere.
+                e.dataTransfer.dropEffect = (effect ?? "move");
+                const newMimeTypes = new Set();
+                const newFiles = new Array();
+                for (const item of e.dataTransfer?.items ?? []) {
+                    const { kind, type } = item;
+                    if (kind === "string") {
+                        newMimeTypes.add(type);
+                    }
+                    else if (kind === "file") {
+                        newFiles.push({ type: item.type });
+                    }
+                }
+                setFilesForConsideration(newFiles);
+                setStringsForConsideration(newMimeTypes);
+            }
+        });
+        // Handle resetting the current file metadata or MIME types
+        const onDragLeave = useStableCallback((e) => {
+            e.preventDefault();
+            setFilesForConsideration(null);
+            setStringsForConsideration(null);
+        });
+        // Boilerplate, I guess
+        const onDragOver = useStableCallback((e) => {
+            e.preventDefault();
+        });
+        // Handle getting the drop data asynchronously
+        const onDrop = useStableCallback((e) => {
+            e.preventDefault();
+            setFilesForConsideration(null);
+            setStringsForConsideration(null);
+            const allPromises = new Array();
+            const dropData = {};
+            const dropFile = [];
+            for (const item of e.dataTransfer?.items ?? []) {
+                const { kind, type } = item;
+                if (kind === "string") {
+                    allPromises.push((new Promise((resolve, _reject) => item.getAsString(resolve))).then(str => dropData[type] = str));
+                }
+                else if (kind === "file") {
+                    const file = item.getAsFile();
+                    if (file) {
+                        allPromises.push(new Promise((resolve, reject) => {
+                            const reader = new FileReader();
+                            reader.onload = (_) => {
+                                resolve();
+                                const data = reader.result;
+                                dropFile.push({ data, name: file.name, type: file.type, size: data.byteLength, lastModified: file.lastModified });
+                            };
+                            reader.onerror = (_) => { reject(new DroppableFileError(file.name, reader.error)); };
+                            reader.onabort = (_) => { reject(new DroppableFileError(file.name, reader.error)); };
+                            reader.readAsArrayBuffer(file);
+                        }));
+                        dropFile.push();
+                    }
+                }
+            }
+            dropPromisesRef.current.push(Promise.all(allPromises).then(() => {
+                setPromiseCount(i => ++i);
+                setDropError(null);
+                return {
+                    strings: dropData,
+                    files: dropFile
+                };
+            }).catch(ex => {
+                /* eslint-disable no-debugger */
+                debugger;
+                setPromiseCount(i => ++i);
+                setDropError(ex);
+                return null;
+            }));
+        });
+        const propsStable = A({ onDragEnter, onDragLeave, onDragOver, onDrop });
+        return {
+            propsStable: propsStable.current,
+            filesForConsideration,
+            stringsForConsideration,
+            droppedFiles,
+            droppedStrings,
+            dropError
+        };
+    }
+
+    function useElementSize({ elementSizeParameters: { getObserveBox, onSizeChange }, refElementParameters: { onElementChange, onMount, onUnmount } }) {
+        useEnsureStability("useElementSize", getObserveBox, onSizeChange, onElementChange, onMount, onUnmount);
+        const [getSize, setSize] = usePassiveState(onSizeChange, returnNull);
+        const currentObserveBox = A(undefined);
+        const needANewObserver = q$1((element, observeBox) => {
+            if (element) {
+                const document = getDocument$1(element);
+                const window = document.defaultView;
+                const handleUpdate = () => {
+                    if (element.isConnected) {
+                        const { clientWidth, scrollWidth, offsetWidth, clientHeight, scrollHeight, offsetHeight, clientLeft, scrollLeft, offsetLeft, clientTop, scrollTop, offsetTop } = element;
+                        setSize({ clientWidth, scrollWidth, offsetWidth, clientHeight, scrollHeight, offsetHeight, clientLeft, scrollLeft, offsetLeft, clientTop, scrollTop, offsetTop });
+                    }
+                };
+                if (window && ("ResizeObserver" in window)) {
+                    const observer = new ResizeObserver((_entries) => { handleUpdate(); });
+                    observer.observe(element, { box: observeBox });
+                    return () => observer.disconnect();
+                }
+                else {
+                    document.addEventListener("resize", handleUpdate, { passive: true });
+                    return () => document.removeEventListener("resize", handleUpdate);
+                }
+            }
+        }, []);
+        const { refElementReturn } = useRefElement({
+            refElementParameters: {
+                onElementChange: q$1((e, p) => { needANewObserver(e, getObserveBox?.()); onElementChange?.(e, p); }, []),
+                onMount,
+                onUnmount
+            }
+        });
+        const { getElement } = refElementReturn;
+        s(() => {
+            if (getObserveBox) {
+                if (currentObserveBox.current !== getObserveBox())
+                    needANewObserver(getElement(), getObserveBox());
+            }
+        });
+        return {
+            elementSizeReturn: { getSize },
+            refElementReturn
+        };
+    }
+
+    function useHasLastFocus(args) {
+        const { refElementReturn: { getElement }, activeElementParameters: { onLastActiveElementChange, ...activeElementParameters }, hasLastFocusParameters: { onLastFocusedChanged, onLastFocusedInnerChanged, ..._void } } = args;
+        useEnsureStability("useHasFocus", onLastFocusedChanged, onLastFocusedInnerChanged);
+        const [getLastFocused, setLastFocused] = usePassiveState(onLastFocusedChanged, returnFalse);
+        const [getLastFocusedInner, setLastFocusedInner] = usePassiveState(onLastFocusedInnerChanged, returnFalse);
+        const { activeElementReturn } = useActiveElement({
+            activeElementParameters: {
+                onLastActiveElementChange: q$1((lastActiveElement, prevLastActiveElement) => {
+                    const selfElement = getElement();
+                    const focused = (selfElement != null && (selfElement == lastActiveElement));
+                    const focusedInner = (!!selfElement?.contains(lastActiveElement));
+                    setLastFocused(focused);
+                    setLastFocusedInner(focusedInner);
+                    onLastActiveElementChange?.(lastActiveElement, prevLastActiveElement);
+                }, []),
+                ...activeElementParameters
+            },
+        });
+        return {
+            activeElementReturn,
+            hasLastFocusReturn: {
+                getLastFocused,
+                getLastFocusedInner,
+            }
+        };
+    }
+
+    const SharedAnimationFrameContext = B$2(null);
+    /**
+     * The (optionally non-stable) `callback` you provide will start running every frame after the component mounts.
+     *
+     * Passing `null` is fine and simply stops the effect until you restart it by providing a non-null callback.
+     *
+     * **This hook does not return anything at all, including no prop-modifying hooks**
+     */
+    function useAnimationFrame({ callback }) {
+        // Get a wrapper around the given callback that's stable
+        const stableCallback = useStableCallback(callback ?? noop);
+        const hasCallback = (callback != null);
+        const sharedAnimationFrameContext = x(SharedAnimationFrameContext);
+        s(() => {
+            if (sharedAnimationFrameContext) {
+                if (hasCallback) {
+                    sharedAnimationFrameContext.addCallback(stableCallback);
+                }
+                else {
+                    sharedAnimationFrameContext.removeCallback(stableCallback);
+                }
+            }
+            else {
+                if (hasCallback) {
+                    // Get a wrapper around the wrapper around the callback
+                    // that also calls `requestAnimationFrame` again.
+                    const rafCallback = (ms) => {
+                        handle = requestAnimationFrame(rafCallback);
+                        stableCallback(ms);
+                    };
+                    let handle = requestAnimationFrame(rafCallback);
+                    return () => cancelAnimationFrame(handle);
+                }
+            }
+        }, [sharedAnimationFrameContext, hasCallback]);
+    }
+    function noop() { }
+
+    function useInterval({ interval, callback }) {
+        // Get a wrapper around the given callback that's stable
+        const stableCallback = useStableCallback(callback);
+        const getInterval = useStableGetter(interval);
+        s(() => {
+            const interval = getInterval();
+            let lastDelayUsed = interval;
+            if (interval == null)
+                return;
+            // Get a wrapper around the wrapper around the callback
+            // that clears and resets the interval if it changes.
+            const adjustableCallback = () => {
+                stableCallback();
+                const currentInterval = getInterval();
+                if (currentInterval != lastDelayUsed) {
+                    clearInterval(handle);
+                    if (currentInterval != null)
+                        handle = setInterval(adjustableCallback, lastDelayUsed = currentInterval);
+                }
+            };
+            let handle = setInterval(adjustableCallback, interval);
+            return () => clearInterval(handle);
+        }, []);
     }
 
     const DemoUseInterval = () => {
@@ -6779,10 +6776,9 @@ var bundle = (function (exports) {
             typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000 },
             rearrangeableChildrenParameters: {
                 getIndex: q$1((a) => a.props.index, []),
-            },
-            completeGridNavigationParameters: { onTabbableColumnChange: null }
+            }
         });
-        const { context, props, linearNavigationReturn, rearrangeableChildrenReturn, rovingTabIndexReturn, sortableChildrenReturn, typeaheadNavigationReturn, managedChildrenReturn, childrenHaveFocusReturn, singleSelectionReturn } = ret;
+        const { context, props, rearrangeableChildrenReturn, managedChildrenReturn, } = ret;
         const { useRearrangeableProps } = rearrangeableChildrenReturn;
         const { getChildren: getChildren2 } = managedChildrenReturn;
         /*const {
@@ -6841,6 +6837,8 @@ var bundle = (function (exports) {
                                     })())
                                 }) }) })] })] }));
     });
+    //type GridRowContext<ParentElement extends Element, RowElement extends Element> = CompleteGridNavigationContext<ParentElement, RowElement>;
+    //type GridCellContext<RowElement extends Element, CellElement extends Element> = CompleteGridNavigationRowContext<RowElement, CellElement>;
     const GridRowContext = B$2(null);
     const GridCellContext = B$2(null);
     const DemoUseGridRow = w((({ index }) => {
@@ -6849,116 +6847,7 @@ var bundle = (function (exports) {
         //const getHighestIndex = useCallback(() => getChildren().getHighestIndex(), []);
         //const getChildren = useCallback(() => { return getChildren2() }, []);
         const hidden = (index === 3);
-        /*
-            const {
-                gridNavigationRowParameters,
-                rovingTabIndexChildParameters,
-                typeaheadNavigationChildParameters,
-                managedChildrenReturn: mcr
-            } = useContext(GridRowContext);
-        
-            const navigateAbsolute = useCallback((n: number) => { return n; }, [])
-            const navigateRelative = useCallback((n: number, o: number) => { return n + o; }, [])
-        
-            //const useGridRow = useContext(GridRowContext);
-            const { refElementReturn } = useRefElement<HTMLTableRowElement>({ refElementParameters: {} });
-            const { getElement, propsStable: p5 } = refElementReturn;
-            const { propsStable: p4 } = refElementReturn;
-            const setTabbableIndex2 = useStableCallback((a: Parameters<StateUpdater<number | null>>[0], b: boolean) => { setTabbableIndex(a, b) });
-            const gridNavRet: UseGridNavigationRowReturnType<HTMLTableRowElement, HTMLTableCellElement> = useGridNavigationRow<HTMLTableRowElement, HTMLTableCellElement, GridChildRowInfo<HTMLTableRowElement>, GridChildCellInfo<HTMLTableCellElement>>({
-                asChildRowOfTable: {
-                    gridNavigationRowParameters,
-                    managedChildParameters: { hidden, index },
-                    managedChildrenReturn: { getChildren },
-                    rovingTabIndexChildParameters,
-                    rovingTabIndexReturn: { setTabbableIndex: setTabbableIndex2 },
-                    typeaheadNavigationChildParameters: { text: "", ...typeaheadNavigationChildParameters }
-                },
-                asParentRowOfCells: {
-                    linearNavigationParameters: { disableArrowKeys: false, disableHomeEndKeys: false, getHighestIndex, navigateAbsolute, navigateRelative },
-                    managedChildrenReturn: { getChildren },
-                    rovingTabIndexParameters: { initiallyTabbedIndex: 0, onTabbableIndexChange: setTabbableColumn },
-                    typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000 }
-                }
-            });
-        
-            const {
-                asChildRowOfTable: {
-                    hasCurrentFocusParameters: { onCurrentFocusedInnerChanged },
-                    managedChildParameters: { focusSelf: focusSelfAsChildRow, setTabbableColumnIndex, ...void6 },
-                    rovingTabIndexChildReturn: { getTabbable, propsUnstable, setTabbable, tabbable, ...void7 },
-                    ...void5
-                },
-                asParentRowOfCells: {
-                    gridNavigationCellParameters,
-                    linearNavigationReturn: { propsStable: p3, ...void2 },
-                    managedChildrenParameters: { onChildrenMountChange, ...void1 },
-                    rovingTabIndexChildParameters: rticp1,
-                    rovingTabIndexReturn,
-                    typeaheadNavigationChildParameters: rncp1,
-                    typeaheadNavigationReturn,
-                    ...void4
-                },
-                ...void10
-            } = gridNavRet;
-        
-            const { getTabbableIndex, setTabbableIndex, ...void3 } = rovingTabIndexReturn;
-        
-        
-            const {
-                hasCurrentFocusReturn,
-                ...void8
-            } = useHasCurrentFocus<HTMLTableRowElement>({
-                refElementReturn,
-                hasCurrentFocusParameters: {
-                    onCurrentFocusedChanged: null,
-                    onCurrentFocusedInnerChanged
-                }
-            });
-        
-            useManagedChild({
-                managedChildParameters: {
-                    focusSelf: focusSelfAsChildRow,
-                    getElement,
-                    getTabbable,
-                    hidden,
-                    index,
-                    setTabbable,
-                    tabbable,
-                    setTabbableColumnIndex
-                },
-                managedChildrenReturn: mcr
-            })
-        
-            const {
-                managedChildrenReturn,
-                ...void9
-            } = useManagedChildren<GridChildCellInfo<HTMLTableCellElement>>({
-                managedChildrenParameters: {
-                    onAfterChildLayoutEffect: null,
-                    onChildrenMountChange: onChildrenMountChange
-                }
-            });
-        
-            assertEmptyObject(void1);
-            assertEmptyObject(void2);
-            assertEmptyObject(void3);
-            assertEmptyObject(void4);
-            assertEmptyObject(void5);
-            assertEmptyObject(void6);
-            assertEmptyObject(void7);
-            assertEmptyObject(void8);
-            assertEmptyObject(void9);
-            assertEmptyObject(void10);
-        
-            //const { propsStable: p1 } = linearNavigationReturn;
-            const { propsStable: p2 } = typeaheadNavigationReturn;
-            const { propsStable: p1 } = hasCurrentFocusReturn;
-        
-            const { getChildren: getChildren2 } = managedChildrenReturn;
-        
-            const props = useMergedProps(p1, p2, p3, p4, p5);*/
-        const { childrenHaveFocusChildContext, managedChildContext, rovingTabIndexChildContext, singleSelectionContext, typeaheadNavigationChildContext, gridNavigationRowContext, } = x(GridRowContext);
+        const { managedChildContext, rovingTabIndexChildContext, singleSelectionContext, typeaheadNavigationChildContext, gridNavigationRowContext, } = x(GridRowContext);
         const ret = useCompleteGridNavigationRow({
             asChildRowParameters: {
                 completeGridNavigationRowParameters: {},
@@ -6988,53 +6877,8 @@ var bundle = (function (exports) {
         if (row >= 6 && row % 2 == 0 && index > 1)
             return null;
         let hiddenText = (row === 3) ? " (row hidden)" : "";
-        /*const {
-            rovingTabIndexChildParameters,
-            typeaheadNavigationChildParameters,
-            gridNavigationCellParameters,
-            rovingTabIndexReturn,
-            managedChildrenReturn,
-            ...void5
-        } = useContext(GridCellContext);
-        const { refElementReturn } = useRefElement<HTMLTableCellElement>({ refElementParameters: {} });
-        const { propsStable: p1, getElement } = refElementReturn;
-
-        const {
-            hasCurrentFocusParameters: { onCurrentFocusedInnerChanged, ...void1 },
-            rovingTabIndexChildReturn: { getTabbable, propsUnstable: p2, setTabbable, tabbable, ...void2 },
-            ...void3
-        } = useGridNavigationCell<HTMLTableCellElement>({
-            gridNavigationCellParameters: { ...gridNavigationCellParameters, colSpan: 1 },
-            managedChildParameters: { hidden: false, index },
-            rovingTabIndexChildParameters,
-            rovingTabIndexReturn,
-            typeaheadNavigationChildParameters: {
-                text: "",
-                ...typeaheadNavigationChildParameters
-            }
-        })
-
-        assertEmptyObject(void1);
-        assertEmptyObject(void2);
-        assertEmptyObject(void3);
-        assertEmptyObject(void5);
-        const focusSelf = useCallback((e: HTMLTableCellElement) => { e.focus(); }, [])
-
-        const {
-            hasCurrentFocusReturn: { propsStable: p3 }
-        } = useHasCurrentFocus<HTMLTableCellElement>({
-            refElementReturn,
-            hasCurrentFocusParameters: { onCurrentFocusedChanged: null, onCurrentFocusedInnerChanged }
-        });
-
-        useManagedChild<GridChildCellInfo<HTMLTableCellElement>>({
-            managedChildParameters: { index, focusSelf, getElement, getTabbable, hidden: false, setTabbable, tabbable },
-            managedChildrenReturn
-        });
-
-        const props = useMergedProps(p1, p2, p3);*/
         const { completeGridNavigationContext, managedChildContext, rovingTabIndexChildContext, typeaheadNavigationChildContext, gridNavigationCellContext } = x(GridCellContext);
-        const { props, refElementReturn, rovingTabIndexChildReturn: { tabbable }, } = useCompleteGridNavigationCell({
+        const { props, rovingTabIndexChildReturn: { tabbable }, } = useCompleteGridNavigationCell({
             gridNavigationCellParameters: { colSpan: 1 },
             managedChildParameters: { hidden: false, index },
             completeGridNavigationContext,
@@ -7065,7 +6909,7 @@ var bundle = (function (exports) {
         }
     });
     const Component = () => {
-        return o$1("div", { class: "flex", style: { flexWrap: "wrap" }, children: [o$1(DemoUseModal, {}), o$1("hr", {}), o$1(DemoFocus, {}), o$1("hr", {}), o$1(DemoUseGrid, {}), o$1("hr", {}), o$1(DemoUseTimeout, {}), o$1("hr", {}), o$1(DemoUseInterval, {}), o$1("hr", {}), o$1(DemoUseRovingTabIndex, {}), o$1("hr", {}), o$1(DemoUseFocusTrap, {}), o$1("hr", {}), o$1(DemoUseAsyncHandler1, {}), o$1("hr", {}), o$1(DemoUseAsyncHandler2, {}), o$1("hr", {}), o$1(DemoUseDroppable, {}), o$1("hr", {}), o$1(DemoUseDraggable, {}), o$1("hr", {}), o$1(DemoUseElementSizeAnimation, {}), o$1("hr", {}), o$1("input", {})] });
+        return o$1("div", { class: "flex", style: { flexWrap: "wrap" }, children: [o$1("div", { style: "display:grid;grid-template-columns:1fr 1fr", children: [o$1(DemoUseModal, {}), o$1(DemoUseModal, {})] }), o$1("hr", {}), o$1(DemoFocus, {}), o$1("hr", {}), o$1(DemoUseGrid, {}), o$1("hr", {}), o$1(DemoUseTimeout, {}), o$1("hr", {}), o$1(DemoUseInterval, {}), o$1("hr", {}), o$1(DemoUseRovingTabIndex, {}), o$1("hr", {}), o$1(DemoUseFocusTrap, {}), o$1("hr", {}), o$1(DemoUseAsyncHandler1, {}), o$1("hr", {}), o$1(DemoUseAsyncHandler2, {}), o$1("hr", {}), o$1(DemoUseDroppable, {}), o$1("hr", {}), o$1(DemoUseDraggable, {}), o$1("hr", {}), o$1(DemoUseElementSizeAnimation, {}), o$1("hr", {}), o$1("input", {})] });
     };
     requestAnimationFrame(() => {
         P(o$1(Component, {}), document.getElementById("root"));

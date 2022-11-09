@@ -37,6 +37,9 @@ export interface UseGridNavigationRowParameters<RowElement extends Element, Cell
     asChildRowParameters: UseListNavigationChildParameters<RowElement> & {
         managedChildrenReturn: Pick<UseManagedChildrenReturnType<CM>["managedChildrenReturn"], "getChildren">;
         gridNavigationRowContext: {
+            _r?: RowElement;
+            _c?: CellElement;
+         
             gridNavigationRowParameters: {
                 setTabbableRow: (updater: Parameters<StateUpdater<number | null>>[0], fromUserInteraction: boolean) => void;
                 getCurrentTabbableColumn: () => (number | null);
@@ -72,6 +75,7 @@ export interface UseGridNavigationCellParameters<CellElement extends Element> ex
         colSpan: number;
     }
     gridNavigationCellContext: {
+        _c?: CellElement;
         gridNavigationCellParameters: {
             getRowIndex: () => number;
             setTabbableRow: (u: Parameters<StateUpdater<number | null>>[0], fromUserInteraction: boolean) => void;

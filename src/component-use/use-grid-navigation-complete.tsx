@@ -1,7 +1,6 @@
 import { UseGridNavigationRowReturnType } from "../component-detail/use-grid-navigation-partial";
 import { UseGridNavigationSingleSelectionRowReturnType } from "../component-detail/use-grid-navigation-single-selection";
 import { GridSingleSelectSortableChildCellInfo, GridSingleSelectSortableChildRowInfo, useGridNavigationSingleSelectionSortable, useGridNavigationSingleSelectionSortableCell, UseGridNavigationSingleSelectionSortableCellParameters, UseGridNavigationSingleSelectionSortableParameters, UseGridNavigationSingleSelectionSortableReturnType, useGridNavigationSingleSelectionSortableRow, UseGridNavigationSingleSelectionSortableRowParameters } from "../component-detail/use-grid-navigation-single-selection-sortable";
-//import { UseSingleSelectionChildParameters, UseSingleSelectionChildReturnTypeInfo, UseSingleSelectionParameters, UseSingleSelectionReturnTypeInfo } from "./use-single-selection";
 import { h } from "preact";
 import { useCallback } from "preact/hooks";
 import { ManagedChildren, useManagedChild, UseManagedChildParameters, useManagedChildren, UseManagedChildrenReturnType } from "../preact-extensions/use-child-manager";
@@ -126,21 +125,14 @@ export function useCompleteGridNavigation<ParentOrRowElement extends Element, Ro
 
 export function useCompleteGridNavigationRow<RowElement extends Element, CellElement extends Element, RM extends GridSingleSelectSortableChildRowInfo<RowElement> = GridSingleSelectSortableChildRowInfo<RowElement>, CM extends GridSingleSelectSortableChildCellInfo<CellElement> = GridSingleSelectSortableChildCellInfo<CellElement>>({
     asChildRowParameters: {
-        gridNavigationRowContext,
         managedChildParameters,
-        rovingTabIndexChildContext,
-        singleSelectionContext,
-        singleSelectionChildParameters,
-        typeaheadNavigationChildContext,
-        typeaheadNavigationChildParameters,
         managedChildContext: mcc1,
-        completeGridNavigationRowParameters
+        completeGridNavigationRowParameters,
+        ...asChildRowParameters
     },
     asParentRowParameters: {
         linearNavigationParameters,
-        rovingTabIndexParameters,
-        typeaheadNavigationParameters,
-
+        ...asParentRowParameters
     }
 }: UseCompleteGridNavigationRowParameters<RowElement, CellElement, RM, CM>) {
 
@@ -149,37 +141,21 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
 
     const r: UseGridNavigationSingleSelectionRowReturnType<RowElement, CellElement> = useGridNavigationSingleSelectionSortableRow<RowElement, CellElement, RM, CM>({
         asParentRowParameters: {
+            ...asParentRowParameters,
             linearNavigationParameters: { getHighestIndex: getHighestChildIndex, ...linearNavigationParameters },
             managedChildrenReturn: { getChildren },
-            rovingTabIndexParameters,
-            typeaheadNavigationParameters
         },
         asChildRowParameters: {
-            gridNavigationRowContext,
+            ...asChildRowParameters,
             managedChildParameters,
             managedChildrenReturn: { getChildren },
-            rovingTabIndexChildContext,
-            singleSelectionContext,
-            singleSelectionChildParameters,
-            typeaheadNavigationChildContext,
-            typeaheadNavigationChildParameters
         }
     });
-
-    const {
-        asParentRowReturn: {
-            managedChildrenParameters
-        },
-        asChildRowReturn: {
-            pressParameters: {
-                onPressSync
-            }
-        }
-    } = r;
+    
     const { asChildRowReturn, asParentRowReturn } = r;
 
 
-    const { managedChildContext: mcc2, managedChildrenReturn } = useManagedChildren<CM>({ managedChildrenParameters });
+    const { managedChildContext: mcc2, managedChildrenReturn } = useManagedChildren<CM>({ managedChildrenParameters: r.asParentRowReturn.managedChildrenParameters });
     const { refElementReturn } = useRefElement<RowElement>({ refElementParameters: {} })
     const { getElement } = refElementReturn;
 
@@ -210,20 +186,10 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
     );
     const context = useStableObject<CompleteGridNavigationRowContext<RowElement, CellElement, CM>>({
         managedChildContext: mcc2,
-        rovingTabIndexChildContext,
-        typeaheadNavigationChildContext,
-        completeGridNavigationContext: useStableObject({ onPressSync: onPressSync as any }),
-        gridNavigationCellContext: r.asParentRowReturn.gridNavigationCellContext,/* useStableObject({
-            gridNavigationCellParameters: useStableObject({
-
-                getRowIndex: getIndex,
-                getCurrentTabbableColumn: gridNavigationRowContext.gridNavigationRowParameters.getCurrentTabbableColumn,
-                setCurrentTabbableColumn: gridNavigationRowContext.gridNavigationRowParameters.setCurrentTabbableColumn,
-                setTabbableCell: asParentRowReturn.rovingTabIndexReturn.setTabbableIndex,
-                setTabbableRow: gridNavigationRowContext.gridNavigationRowParameters.setTabbableRow
-                // setTabbableRow: gridNavigationRowContext.gridNavigationRowParameters.setTabbableRow
-            })
-        })*/
+        rovingTabIndexChildContext: r.asParentRowReturn.rovingTabIndexChildContext,
+        typeaheadNavigationChildContext: r.asParentRowReturn.typeaheadNavigationChildContext,
+        completeGridNavigationContext: useStableObject({ onPressSync: r.asChildRowReturn.pressParameters.onPressSync as any }),
+        gridNavigationCellContext: r.asParentRowReturn.gridNavigationCellContext,
     });
     return {
         context,

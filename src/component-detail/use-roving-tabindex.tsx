@@ -99,6 +99,7 @@ export interface UseRovingTabIndexChildParameters<TabbableChildElement extends E
 }
 
 export interface RovingTabIndexChildContext<TabbableChildElement extends Element> {
+    _e?: TabbableChildElement;
 
     setTabbableIndex: UseRovingTabIndexReturnType<TabbableChildElement>["rovingTabIndexReturn"]["setTabbableIndex"];
 

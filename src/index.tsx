@@ -14,7 +14,8 @@ export { CompleteGridNavigationContext, CompleteGridNavigationRowContext, useCom
 export { CompleteListNavigationContext, useCompleteListNavigation, useCompleteListNavigationChild, UseCompleteListNavigationChildParameters, UseCompleteListNavigationChildReturnType, UseCompleteListNavigationParameters, UseCompleteListNavigationReturnType } from "./component-use/use-list-navigation-complete";
 export { useModal, UseModalParameters } from "./component-use/use-modal";
 export { setPressVibrate, usePress, UsePressParameters, UsePressReturnType } from "./component-use/use-press";
-export { generateRandomId, useRandomId, UseRandomIdParameters, UseRandomIdParametersOmits, UseRandomIdReferencerElement, UseRandomIdReferencerElementParameters, UseRandomIdReferencerElementParametersOmits, UseRandomIdReferencerElementReturn, UseRandomIdReturnTypeInfo, UseRandomIdReturnTypeWithHooks, UseRandomIdSourceElement, UseRandomIdSourceElementReturn } from "./component-use/use-random-id";
+export { generateRandomId, useRandomId, UseRandomIdParameters, UseRandomIdReturnType } from "./component-use/use-random-id";
+export { UseRandomDualIdsReturnType, useRandomDualIds } from "./component-use/use-random-dual-ids";
 export { AsyncHandler, useAsyncHandler, UseAsyncHandlerParameters, UseAsyncHandlerReturnType } from "./dom-helpers/use-async-handler";
 export { getDocument, useDocumentClass } from "./dom-helpers/use-document-class";
 export { useDraggable, UseDraggableParameters, UseDraggableReturnType } from "./dom-helpers/use-draggable";

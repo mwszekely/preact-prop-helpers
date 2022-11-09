@@ -42,7 +42,9 @@ const _dummy: any = null;
 
 
 
-export interface UseListNavigationChildInfo<TabbableChildElement extends Element> extends UseRovingTabIndexChildInfo<TabbableChildElement> { }
+export interface UseListNavigationChildInfo<TabbableChildElement extends Element> extends UseRovingTabIndexChildInfo<TabbableChildElement> {
+    _e?: TabbableChildElement;
+}
 
 /**
  * @param fromUserInteraction Whether the user interacted with this child as a means of navigating to it.  In that was the case, the child is also focused. Otherwise, focus moves as the browser determines.
@@ -112,7 +114,7 @@ export function useListNavigationChild<ChildElement extends Element>({
 
     assertEmptyObject(_void2);
     assertEmptyObject(_void5);
-    
+
     return {
         ...rticr
     }
