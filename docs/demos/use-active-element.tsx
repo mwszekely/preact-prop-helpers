@@ -1,5 +1,5 @@
 import { useCallback, useState } from "preact/hooks";
-import { useActiveElement } from "../../use-active-element";
+import { useActiveElement } from "../../observers/use-active-element";
 
 export function UseActiveElementDemo() {
     

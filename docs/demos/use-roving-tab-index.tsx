@@ -2,7 +2,7 @@ import { createContext, VNode } from "preact";
 import { memo, useCallback, useContext } from "preact/compat";
 import { GetIndex, GetValid, UseListNavigationSingleSelectionChildInfo, useMergedProps, useStableCallback } from "../../index";
 
-import { useState } from "../../use-state";
+import { useState } from "../../preact-extensions/use-state";
 
 import { CompleteListNavigationContext, useCompleteListNavigation, useCompleteListNavigationChild, UseCompleteListNavigationReturnType } from "../../use-list-navigation-single-selection-sortable-complete";
 
