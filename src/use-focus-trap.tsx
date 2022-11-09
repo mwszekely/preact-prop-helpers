@@ -9,6 +9,9 @@ import { useStableCallback } from "./use-stable-callback";
 
 export interface UseFocusTrapParameters<SourceElement extends Element, PopupElement extends Element> extends UseRefElementParameters<PopupElement>, UseActiveElementParameters {
     focusTrapParameters: {
+        /**
+         * Whether or not the focus trap is currently active (or, when used as part of a larger component, whether it is activatable)
+         */
         trapActive: boolean;
 
 

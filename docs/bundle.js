@@ -1990,6 +1990,178 @@ var bundle = (function (exports) {
         f();
     }
 
+    const MagicWindowKey = ("__preact-prop-helpers-escape-key-dismiss__");
+    function getElementDepth(element) {
+        let depth = 0;
+        let parent = element.parentElement;
+        while (parent) {
+            depth += 1;
+            parent = parent.parentElement;
+        }
+        return depth;
+    }
+    /**
+     * Adds event handlers for a modal-like soft-dismiss interaction.
+     *
+     * That is, any clicks or taps outside of the given component,
+     * or any time the Escape key is pressed within the component,
+     * (with various browser oddities regarding clicks on blank or inert areas handled)
+     * the component will request to close itself.
+     *
+     * Of course, if you don't do anything in the `onClose` function,
+     * it won't be a soft dismiss anymore.
+     *
+     * Handles events for pressing the `Escape` key to close the any currently open dialogs, tooltips, menus, popups, etc.
+     *
+     * One press of the `Escape` key is guaranteed to only call `onClose` for *only one* component, and it is called on the component deepest in the DOM tree, differentiated by passing context information between parent and child.
+     *
+     * @param param0
+     * @returns
+     */
+    function useEscapeDismiss({ escapeDismissParameters: { onClose, open, getWindow: unstableGetWindow, parentDepth, ...void1 }, refElementPopupReturn: { getElement, ...void2 } }) {
+        const stableOnClose = useStableCallback(onClose);
+        const getWindow = useStableCallback(unstableGetWindow);
+        const getDepth = useStableGetter(parentDepth + 1);
+        // When this component opens, add an event listener that finds the deepest open soft dismiss element to actually dismiss.
+        // Only opened components will add event handlers, and will remove them once closed.
+        // The reason this is so complicated is because:
+        // 1. We must only close one soft dismiss component at a time.  If there's a tooltip in a popup, the tooltip must be dismissed.
+        // 2. `keydown` events don't just work on arbitrary elements, for our purposes they must be from the `window`. So we can't rely on normal capturing or bubbling behavior on the element itself.
+        // 3. Event handlers added to the `window` via `addEventHandler` are called in the order of registration, which is completely at odds with #1.
+        //
+        // So all soft dismiss components listen for a keydown of Escape, 
+        // then the first one to do so will wait for a microtask, 
+        // then find the deepest element in the document tree to dismiss of all of those components currently open.
+        s(() => {
+            const window = getWindow();
+            window[MagicWindowKey] ??= { microtaskQueued: false, elementQueue: new Map() };
+            const info = window[MagicWindowKey];
+            if (open) {
+                console.log(`Adding handler for depth=${getDepth()}`);
+                window.addEventListener("keydown", handler, { capture: true });
+                return () => {
+                    console.log(`Removing handler for depth=${getDepth()}`);
+                    const element = getElement();
+                    if (element && info.elementQueue)
+                        info.elementQueue.delete(element);
+                    window.removeEventListener("keydown", handler, { capture: true });
+                };
+            }
+            function handler(e) {
+                if (e.key == "Escape") {
+                    console.log(`Escape key for depth=${getDepth()}`);
+                    // We don't know which of the currently active soft dismisses will actually do something,
+                    // but ONE of them definitely will,
+                    // so we stop propagation to child nodes, but not to everyone on the window (stopImmediatePropagation).
+                    e.preventDefault();
+                    e.stopPropagation();
+                    // This is what at least one of the elements will call
+                    const onClose2 = () => { stableOnClose("escape"); };
+                    const element = getElement();
+                    if (element) {
+                        const treeDepth = getElementDepth(element);
+                        const depth = getDepth();
+                        info.elementQueue.set(element, { depth, onClose: onClose2, treeDepth });
+                    }
+                    if (!info.microtaskQueued) {
+                        info.microtaskQueued = true;
+                        setTimeout(() => {
+                            const { elementQueue } = info;
+                            info.microtaskQueued = false;
+                            info.elementQueue = new Map();
+                            let deepestDepth = -Infinity;
+                            let deepestTreeDepth = -Infinity;
+                            let deepestOnClose = null;
+                            for (const [element, { depth, onClose, treeDepth }] of elementQueue) {
+                                let tieBroken = false;
+                                if (depth == deepestDepth) {
+                                    if (treeDepth > deepestTreeDepth) {
+                                        tieBroken = true;
+                                    }
+                                }
+                                if (depth > deepestDepth || (depth == deepestDepth && tieBroken)) {
+                                    deepestDepth = depth;
+                                    deepestTreeDepth = treeDepth;
+                                    deepestOnClose = onClose;
+                                }
+                            }
+                            deepestOnClose?.();
+                        }, 0);
+                    }
+                }
+            }
+        }, [open]);
+    }
+    /**
+     * Handles events for dismiss events for things like popup menus or transient dialogs -- things where moving focus to a new area of the page means this component should close itself.
+     *
+     * @param param0
+     * @returns
+     */
+    function useLostFocusDismiss({ refElementPopupReturn: { getElement: getPopupElement, ...void3 }, refElementSourceReturn, lostFocusDismiss: { open, onClose }, ...void1 }) {
+        const { getElement: getSourceElement, ...void2 } = (refElementSourceReturn ?? {});
+        const stableOnClose = useStableCallback(onClose);
+        const getOpen = useStableGetter(open);
+        const onLastActiveElementChange = q$1((newElement, _prevElement) => {
+            const open = getOpen();
+            const sourceElement = getSourceElement?.();
+            const popupElement = getPopupElement();
+            if (!(sourceElement?.contains(newElement) || popupElement?.contains(newElement))) {
+                if (open)
+                    stableOnClose();
+            }
+        }, [getSourceElement]);
+        return { activeElementParameters: { onLastActiveElementChange } };
+    }
+    /**
+     * Handles events for a backdrop on a modal dialog -- the kind where the user expects the modal to close when they click/tap outside of it.
+     *
+     * @param param0
+     */
+    function useBackdropDismiss({ backdropDismissParameters: { open, onClose: onCloseUnstable, ...void1 }, refElementPopupReturn: { getElement, ...void3 }, ...void2 }) {
+        const getOpen = useStableGetter(open);
+        const onClose = useStableCallback(onCloseUnstable);
+        const onBackdropClick = q$1(function onBackdropClick(e) {
+            if (!getOpen())
+                return;
+            // Basically, "was this event fired on an element not contained by the modal?"
+            // There are multiple ways browser react to "interacting with nothing", and this takes care of everything.
+            let element = getElement();
+            let foundInsideClick = false;
+            if (e.target && element && element.contains(e.target)) {
+                foundInsideClick = true;
+            }
+            if (!foundInsideClick) {
+                onClose();
+            }
+        }, []);
+        useGlobalHandler(window, "mousedown", open ? onBackdropClick : null, { capture: true });
+        useGlobalHandler(window, "touchstart", open ? onBackdropClick : null, { capture: true });
+    }
+    /**
+     * Combines all the methods of dismissing a modal-ish or popup-ish component into one combined hook.
+     *
+     * This is similar to the "complete" series of list/grid navigation, in that it's the "outermost" hook of its type.
+     */
+    function useDismiss({ dismissParameters: { open: globalOpen, onClose: globalOnClose, closeOnBackdrop, closeOnEscape, closeOnLostFocus }, escapeDismissParameters: { getWindow, parentDepth } }) {
+        const { refElementReturn: refElementSourceReturn } = useRefElement({ refElementParameters: {} });
+        const { refElementReturn: refElementPopupReturn } = useRefElement({ refElementParameters: {} });
+        const onCloseBackdrop = q$1(() => { return globalOnClose?.("backdrop"); }, [globalOnClose]);
+        const onCloseEscape = q$1(() => { return globalOnClose?.("escape"); }, [globalOnClose]);
+        const onCloseFocus = q$1(() => { return globalOnClose?.("lost-focus"); }, [globalOnClose]);
+        useBackdropDismiss({ backdropDismissParameters: { onClose: onCloseBackdrop, open: (closeOnBackdrop && globalOpen) }, refElementPopupReturn });
+        useEscapeDismiss({ escapeDismissParameters: { getWindow, onClose: onCloseEscape, open: (closeOnEscape && globalOpen), parentDepth }, refElementPopupReturn });
+        const { activeElementParameters } = useLostFocusDismiss({ lostFocusDismiss: { onClose: onCloseFocus, open: (closeOnLostFocus && globalOpen) }, refElementPopupReturn, refElementSourceReturn });
+        const getDocument = q$1(() => {
+            return getWindow().document;
+        }, [getWindow]);
+        useActiveElement({ activeElementParameters: { ...activeElementParameters, getWindow, getDocument } });
+        return {
+            refElementSourceReturn,
+            refElementPopupReturn
+        };
+    }
+
     function getDocument$1(element) { return (element?.ownerDocument ?? document ?? window.document ?? globalThis.document); }
 
     function useDraggable({ effectAllowed, data, dragImage, dragImageXOffset, dragImageYOffset }) {
@@ -5714,12 +5886,77 @@ var bundle = (function (exports) {
         };
     }
 
+    /**
+     * Combines dismissal hooks and focus trap hooks into one.
+     *
+     * Another in the "complete" series, alongside list/grid navigation and dismissal itself.
+     *
+     * Use for dialogs, menus, etc.
+     *
+     * @param param0
+     * @returns
+     */
+    function useModal({ dismissParameters, escapeDismissParameters, focusTrapParameters: { trapActive, ...focusTrapParameters } }) {
+        const { open } = dismissParameters;
+        const { getWindow } = escapeDismissParameters;
+        const getDocument = q$1(() => { return getWindow().document; }, [getWindow]);
+        const { refElementPopupReturn, refElementSourceReturn } = useDismiss({ dismissParameters, escapeDismissParameters });
+        const { focusTrapReturn, refElementReturn } = useFocusTrap({
+            activeElementParameters: { getDocument },
+            focusTrapParameters: { trapActive: open && trapActive, ...focusTrapParameters },
+            refElementParameters: {}
+        });
+        const { propsStable: pp1 } = refElementPopupReturn;
+        const { propsStable: ps2 } = refElementSourceReturn;
+        const { propsUnstable: pp3 } = focusTrapReturn;
+        const { propsStable: pp4 } = refElementReturn;
+        return {
+            propsPopup: useMergedProps(pp1, pp3, pp4),
+            propsSource: ps2,
+            refElementPopupReturn,
+            refElementSourceReturn,
+            focusTrapReturn,
+        };
+    }
+
     const DemoUseInterval = () => {
         const [interval, setInterval] = y(1000);
         const [fireCount, setFireCount] = y(0);
         useInterval({ interval, callback: () => setFireCount(i => ++i) });
         return (o$1("div", { class: "demo", children: [o$1("label", { children: ["Interval duration: ", o$1("input", { type: "number", value: interval, onInput: e => setInterval(e.currentTarget.valueAsNumber) })] }), o$1("div", { children: ["The callback has been called ", fireCount, " time", fireCount === 1 ? "" : "s", "."] })] }));
     };
+
+    function getWindow() { return globalThis.window; }
+    function DemoUseModal(props) {
+        const parentDepth = (props.parentDepth ?? 0);
+        const depth = parentDepth + 1;
+        const buttonRef = A(null);
+        const [closeOnBackdrop, setCloseOnBackdrop] = y(true);
+        const [closeOnEscape, setCloseOnEscape] = y(true);
+        const [closeOnLostFocus, setCloseOnLostFocus] = y(true);
+        const [focusTrapActive, setFocusTrapActive] = y(true);
+        const [hasChild, setHasChild] = y(false);
+        const [closeReason, setCloseReason] = y(null);
+        const [open, setOpen] = y(false);
+        const focusSelf = () => buttonRef.current?.focus();
+        const focusOpener = (e) => e?.focus();
+        const { propsPopup, propsSource } = useModal({
+            focusTrapParameters: {
+                trapActive: focusTrapActive,
+                focusOpener,
+                focusSelf
+            },
+            dismissParameters: {
+                closeOnBackdrop,
+                closeOnEscape,
+                closeOnLostFocus,
+                onClose: q$1((reason) => { setCloseReason(reason); setOpen(false); }, []),
+                open
+            },
+            escapeDismissParameters: { getWindow, parentDepth }
+        });
+        return (o$1("div", { style: { border: `${depth}px solid black` }, children: [o$1("div", { children: "useModal demo:" }), o$1("div", { style: "display: flex; flex-direction: column", children: [o$1("label", { children: [o$1("input", { type: "checkbox", disabled: true, checked: true }), " Close by setting open to false"] }), o$1("label", { children: [o$1("input", { type: "checkbox", checked: closeOnBackdrop, onInput: e => setCloseOnBackdrop(e.currentTarget.checked) }), " Close on backdrop click"] }), o$1("label", { children: [o$1("input", { type: "checkbox", checked: closeOnEscape, onInput: e => setCloseOnEscape(e.currentTarget.checked) }), " Close on Escape key press"] }), o$1("label", { children: [o$1("input", { type: "checkbox", checked: closeOnLostFocus, onInput: e => setCloseOnLostFocus(e.currentTarget.checked) }), " Close on focus lost"] }), o$1("label", { children: [o$1("input", { type: "checkbox", checked: focusTrapActive, onInput: e => setFocusTrapActive(e.currentTarget.checked) }), " Trap focus"] }), o$1("br", {})] }), o$1("div", { children: ["Last reason for closing: ", closeReason ?? "(hasn't been closed yet)"] }), o$1("button", { ...propsSource, onClick: () => setOpen(true), children: "Open Modal" }), o$1("div", { ...propsPopup, style: `border: ${depth}px dotted red; background: #ccc`, children: o$1("div", { style: { display: open ? "flex" : "none", flexDirection: "column" }, children: [o$1("div", { children: ["Modal element at depth ", depth, " with ", hasChild ? "a" : "no", " child"] }), o$1("label", { children: [o$1("input", { type: "checkbox", checked: hasChild, onInput: e => setHasChild(e.currentTarget.checked), ref: buttonRef }), " Add a child modal"] }), hasChild && o$1(DemoUseModal, { parentDepth: depth }), o$1("button", { ...propsSource, onClick: () => setOpen(false), children: "Close modal programmatically" })] }) })] }));
+    }
 
     const RandomWords$1 = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
     /*
@@ -6828,7 +7065,7 @@ var bundle = (function (exports) {
         }
     });
     const Component = () => {
-        return o$1("div", { class: "flex", style: { flexWrap: "wrap" }, children: [o$1(DemoFocus, {}), o$1("hr", {}), o$1(DemoUseGrid, {}), o$1("hr", {}), o$1(DemoUseTimeout, {}), o$1("hr", {}), o$1(DemoUseInterval, {}), o$1("hr", {}), o$1(DemoUseRovingTabIndex, {}), o$1("hr", {}), o$1(DemoUseFocusTrap, {}), o$1("hr", {}), o$1(DemoUseAsyncHandler1, {}), o$1("hr", {}), o$1(DemoUseAsyncHandler2, {}), o$1("hr", {}), o$1(DemoUseDroppable, {}), o$1("hr", {}), o$1(DemoUseDraggable, {}), o$1("hr", {}), o$1(DemoUseElementSizeAnimation, {}), o$1("hr", {}), o$1("input", {})] });
+        return o$1("div", { class: "flex", style: { flexWrap: "wrap" }, children: [o$1(DemoUseModal, {}), o$1("hr", {}), o$1(DemoFocus, {}), o$1("hr", {}), o$1(DemoUseGrid, {}), o$1("hr", {}), o$1(DemoUseTimeout, {}), o$1("hr", {}), o$1(DemoUseInterval, {}), o$1("hr", {}), o$1(DemoUseRovingTabIndex, {}), o$1("hr", {}), o$1(DemoUseFocusTrap, {}), o$1("hr", {}), o$1(DemoUseAsyncHandler1, {}), o$1("hr", {}), o$1(DemoUseAsyncHandler2, {}), o$1("hr", {}), o$1(DemoUseDroppable, {}), o$1("hr", {}), o$1(DemoUseDraggable, {}), o$1("hr", {}), o$1(DemoUseElementSizeAnimation, {}), o$1("hr", {}), o$1("input", {})] });
     };
     requestAnimationFrame(() => {
         P(o$1(Component, {}), document.getElementById("root"));

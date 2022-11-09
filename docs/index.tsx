@@ -6,6 +6,7 @@ import { ElementSize } from "../use-element-size";
 //import { useGridNavigation, UseGridNavigationCell, UseGridNavigationRow } from "../use-grid-navigation";
 import { CompleteGridNavigationContext, CompleteGridNavigationRowContext, useCompleteGridNavigation, useCompleteGridNavigationCell, useCompleteGridNavigationRow } from "../use-grid-navigation-single-selection-sortable-complete";
 import { DemoUseInterval } from "./demos/use-interval";
+import { DemoUseModal } from "./demos/use-modal";
 import { DemoUseRovingTabIndex } from "./demos/use-roving-tab-index";
 import { DemoUseTimeout } from "./demos/use-timeout";
 const RandomWords = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
@@ -84,8 +85,8 @@ const DemoUseFocusTrap = memo(({ depth }: { depth?: number }) => {
             trapActive: active,
             focusOpener: focusSelf,
             focusSelf: focusSelf,
-        }, 
-        activeElementParameters: { getDocument }, 
+        },
+        activeElementParameters: { getDocument },
         refElementParameters: { onElementChange: undefined }
     });
     //const { useRovingTabIndexChild, useRovingTabIndexProps } = useRovingTabIndex<HTMLUListElement, RovingTabIndexChildInfo>({ tabbableIndex, focusOnChange: false });
@@ -944,6 +945,8 @@ const DemoUseGridCell = (({ index, row, rowIsTabbable }: { index: number, row: n
 
 const Component = () => {
     return <div class="flex" style={{ flexWrap: "wrap" }}>
+        <DemoUseModal />
+        <hr />
         <DemoFocus />
         <hr />
         <DemoUseGrid />
