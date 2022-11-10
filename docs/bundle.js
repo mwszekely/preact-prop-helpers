@@ -4884,10 +4884,11 @@ var bundle = (function (exports) {
             childrenHaveFocusReturn
         };
     }
-    function useCompleteListNavigationChild({ managedChildParameters: { disabled, hidden, index }, completeListNavigationChildParameters, singleSelectionChildParameters, typeaheadNavigationChildParameters, rovingTabIndexChildContext, singleSelectionContext, typeaheadNavigationChildContext, managedChildContext, childrenHaveFocusChildContext, pressParameters: { exclude, focusSelf, onPseudoActiveStart, onPseudoActiveStop } }) {
+    function useCompleteListNavigationChild({ managedChildParameters: { disabled, hidden, index }, completeListNavigationChildParameters, singleSelectionChildParameters, typeaheadNavigationChildParameters, rovingTabIndexChildContext, singleSelectionContext, typeaheadNavigationChildContext, managedChildContext, childrenHaveFocusChildContext, pressParameters: { onPressSync: ops1, ...pressParameters } }) {
         const { refElementReturn } = useRefElement({ refElementParameters: {} });
         const { getElement } = refElementReturn;
-        const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1 }, managedChildParameters: { getSelected, selected, setSelected }, pressParameters, rovingTabIndexChildReturn, singleSelectionChildReturn } = useListNavigationSingleSelectionSortableChild({
+        const { focusSelf } = pressParameters;
+        const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1 }, managedChildParameters: { getSelected, selected, setSelected }, pressParameters: { onPressSync: ops2, ...p1 }, rovingTabIndexChildReturn, singleSelectionChildReturn } = useListNavigationSingleSelectionSortableChild({
             managedChildParameters: { disabled, hidden, index },
             rovingTabIndexChildContext,
             singleSelectionContext,
@@ -4898,11 +4899,12 @@ var bundle = (function (exports) {
         const { getTabbable, setTabbable, tabbable } = rovingTabIndexChildReturn;
         const { pressReturn } = usePress({
             pressParameters: {
+                ...p1,
                 ...pressParameters,
-                exclude,
-                focusSelf,
-                onPseudoActiveStart,
-                onPseudoActiveStop
+                onPressSync: (e) => {
+                    ops2?.(e);
+                    ops1?.(e);
+                }
             }, refElementReturn
         });
         const mcp1 = {

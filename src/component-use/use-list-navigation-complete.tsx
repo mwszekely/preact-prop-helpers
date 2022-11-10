@@ -70,13 +70,13 @@ export function useCompleteListNavigation<ParentElement extends Element, ChildEl
     const { childrenHaveFocusChildContext, childrenHaveFocusReturn } = useChildrenHaveFocus({ childrenHaveFocusParameters });
     const { managedChildContext, managedChildrenReturn } = useManagedChildren<M>({ managedChildrenParameters });
     const props = useMergedProps(linearNavigationReturn.propsStable, typeaheadNavigationReturn.propsStable);
-    const context = useStableObject<CompleteListNavigationContext<ParentElement, ChildElement, M>>({ 
-        singleSelectionContext, 
-        managedChildContext, 
-        rovingTabIndexChildContext, 
-        typeaheadNavigationChildContext, 
+    const context = useStableObject<CompleteListNavigationContext<ParentElement, ChildElement, M>>({
+        singleSelectionContext,
+        managedChildContext,
+        rovingTabIndexChildContext,
+        typeaheadNavigationChildContext,
         childrenHaveFocusChildContext
-     });
+    });
 
     return {
         context,
@@ -90,7 +90,7 @@ export function useCompleteListNavigation<ParentElement extends Element, ChildEl
 
 export interface UseCompleteListNavigationChildParameters<ChildElement extends Element, M extends UseListNavigationSingleSelectionChildInfo<ChildElement>> extends Pick<UseListNavigationSingleSelectionSortableChildParameters<ChildElement>, "typeaheadNavigationChildContext" | "singleSelectionContext" | "rovingTabIndexChildContext" | "managedChildParameters" | "singleSelectionChildParameters" | "typeaheadNavigationChildParameters"> {
     managedChildContext: UseManagedChildParameters<M>["managedChildContext"];
-    pressParameters: Omit<UsePressParameters<ChildElement, never>["pressParameters"], "onPressSync">;
+    pressParameters: UsePressParameters<ChildElement, never>["pressParameters"];
     childrenHaveFocusChildContext: UseChildrenHaveFocusChildParameters["childrenHaveFocusChildContext"];
     completeListNavigationChildParameters: Omit<M, keyof UseListNavigationSingleSelectionChildInfo<ChildElement>>;
 }
@@ -112,15 +112,16 @@ export function useCompleteListNavigationChild<ChildElement extends Element, M e
     typeaheadNavigationChildContext,
     managedChildContext,
     childrenHaveFocusChildContext,
-    pressParameters: { exclude, focusSelf, onPseudoActiveStart, onPseudoActiveStop }
+    pressParameters: { onPressSync: ops1, ...pressParameters }
 }: UseCompleteListNavigationChildParameters<ChildElement, M>): UseCompleteListNavigationChildReturnType<ChildElement> {
 
     const { refElementReturn } = useRefElement<ChildElement>({ refElementParameters: {} });
     const { getElement } = refElementReturn;
+    const { focusSelf } = pressParameters;
     const {
         hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1 },
         managedChildParameters: { getSelected, selected, setSelected },
-        pressParameters,
+        pressParameters: { onPressSync: ops2, ...p1 },
         rovingTabIndexChildReturn,
         singleSelectionChildReturn
     } = useListNavigationSingleSelectionSortableChild<ChildElement>({
@@ -135,15 +136,16 @@ export function useCompleteListNavigationChild<ChildElement extends Element, M e
 
     const { pressReturn } = usePress<ChildElement>({
         pressParameters: {
+            ...p1,
             ...pressParameters,
-            exclude,
-            focusSelf,
-            onPseudoActiveStart,
-            onPseudoActiveStop
+            onPressSync: (e) => {
+                ops2?.(e);
+                ops1?.(e);
+            }
         }, refElementReturn
     });
 
-    const mcp1:  UseListNavigationSingleSelectionChildInfo<ChildElement> = {
+    const mcp1: UseListNavigationSingleSelectionChildInfo<ChildElement> = {
         disabled,
         focusSelf,
         getElement,
