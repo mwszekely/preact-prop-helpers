@@ -75,7 +75,7 @@ options[commitName] = newCommit as never
  * @param effect 
  * @param inputs 
  */
-export function useBeforeLayoutEffect(effect: EffectCallback, inputs?: Inputs) {
+export function useBeforeLayoutEffect(effect: EffectCallback | null, inputs?: Inputs) {
 
     /*(() => {
         const cleanup = useRef<void | (() => void) | null>(null);
@@ -89,7 +89,10 @@ export function useBeforeLayoutEffect(effect: EffectCallback, inputs?: Inputs) {
     })();*/
 
     const [id] = useState(() => generateRandomId());
-    toRun.set(id, { effect, inputs, cleanup: null });
+    if (effect)
+        toRun.set(id, { effect, inputs, cleanup: null });
+    else
+        toRun.delete(id);
 
     useEffect(() => {
         return () => {

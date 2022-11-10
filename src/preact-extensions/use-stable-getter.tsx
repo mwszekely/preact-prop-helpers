@@ -4,9 +4,6 @@ import { useBeforeLayoutEffect } from "./use-before-layout-effect";
 
 const Unset = Symbol("unset");
 
-const _STABLE = Symbol("STABLE");
-export type Stable<T> = T;// & { [_STABLE]: true };
-
 
 /**
  * Given an input value, returns a constant getter function that can be used 
@@ -18,15 +15,17 @@ export type Stable<T> = T;// & { [_STABLE]: true };
  * @param value 
  * @returns 
  */
-export function useStableGetter<T>(value: T): Stable<() => T> {
+export function useStableGetter<T>(value: T) {
+
     const ref = useRef<T>(Unset as unknown as T);
-    useBeforeLayoutEffect(() => { ref.current = value; }, [value]);
+    useBeforeLayoutEffect((() => { ref.current = value; }), [value]);
+
     return useCallback(() => {
         if (ref.current as unknown === Unset) {
             throw new Error('Value retrieved from useStableGetter() cannot be called during render.')
         }
         return ref.current;
-    }, []) as Stable<() => T>
+    }, []);
 }
 
 
@@ -36,9 +35,9 @@ export function useStableGetter<T>(value: T): Stable<() => T> {
  * @param t 
  * @returns 
  */
- export function useStableObject<T extends {}>(t: T): Stable<T> {
+export function useStableObject<T extends {}>(t: T): T {
     const e = Object.entries(t);
     useEnsureStability("useStableObject", e.length, ...e.map(([_k, v]) => v));
-    return useRef(t).current as Stable<T>;
+    return useRef(t).current;
 }
 

@@ -1,7 +1,7 @@
 import { StateUpdater, useCallback, useLayoutEffect, useRef } from "preact/hooks";
 import { debounceRendering, OnPassiveStateChange, useEnsureStability, usePassiveState } from "./use-passive-state";
 import { useStableCallback } from "./use-stable-callback";
-import { Stable, useStableObject } from "./use-stable-getter";
+import { useStableObject } from "./use-stable-getter";
 
 /**
  * Reminder of order of execution:
@@ -107,13 +107,13 @@ export interface UseManagedChildrenReturnType<M extends ManagedChildInfo<any>> {
 
     };
 
-    managedChildContext: Stable<{
+    managedChildContext: {
         managedChildParameters: {
             managedChildrenArray: Foo<M>;
             remoteULEChildMounted: (index: M["index"], mounted: boolean) => void;
             remoteULEChildChanged: (index: M["index"]) => (() => void);
         }
-    }>;
+    };
 }
 
 export type UseManagedChildReturnType = void;

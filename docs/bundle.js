@@ -1524,7 +1524,10 @@ var bundle = (function (exports) {
             }
         })();*/
         const [id] = y(() => generateRandomId());
-        toRun.set(id, { effect, inputs, cleanup: null });
+        if (effect)
+            toRun.set(id, { effect, inputs, cleanup: null });
+        else
+            toRun.delete(id);
         s(() => {
             return () => {
                 toRun.delete(id);
@@ -1551,7 +1554,7 @@ var bundle = (function (exports) {
      */
     function useStableGetter(value) {
         const ref = A(Unset);
-        useBeforeLayoutEffect(() => { ref.current = value; }, [value]);
+        useBeforeLayoutEffect((() => { ref.current = value; }), [value]);
         return q$1(() => {
             if (ref.current === Unset) {
                 throw new Error('Value retrieved from useStableGetter() cannot be called during render.');
@@ -1571,16 +1574,32 @@ var bundle = (function (exports) {
         return A(t).current;
     }
 
+    /**
+     * We keep track of which callbacks are stable with a WeakMap instead of, say, a symbol because
+     * `useCallback` will return a function that's stable across *all* renders, meaning
+     * we can't use our funny "`if` only works here because it doesn't break the rules of hooks" trick then.
+     */
+    const map = new WeakMap();
+    function isStableGetter(obj) {
+        return (map.get(obj) ?? false);
+    }
+    function setIsStableGetter(obj) {
+        map.set(obj, true);
+        return obj;
+    }
     function useStableCallback(fn, noDeps) {
+        useEnsureStability("useStableCallback", noDeps == null, noDeps?.length, isStableGetter(fn));
+        if (isStableGetter(fn))
+            return fn;
         if (noDeps == null) {
             const currentCallbackGetter = useStableGetter(fn);
-            return q$1((...args) => {
+            return setIsStableGetter(q$1(((...args) => {
                 return currentCallbackGetter()(...args);
-            }, []);
+            }), []));
         }
         else {
             console.assert(noDeps.length === 0);
-            return q$1(fn, []);
+            return setIsStableGetter(q$1(fn, []));
         }
     }
 
@@ -4725,30 +4744,23 @@ var bundle = (function (exports) {
             childrenHaveFocusReturn
         };
     }
-    function useCompleteGridNavigationRow({ asChildRowParameters: { gridNavigationRowContext, managedChildParameters, rovingTabIndexChildContext, singleSelectionContext, singleSelectionChildParameters, typeaheadNavigationChildContext, typeaheadNavigationChildParameters, managedChildContext: mcc1, completeGridNavigationRowParameters }, asParentRowParameters: { linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, } }) {
+    function useCompleteGridNavigationRow({ asChildRowParameters: { managedChildParameters, managedChildContext: mcc1, completeGridNavigationRowParameters, ...asChildRowParameters }, asParentRowParameters: { linearNavigationParameters, ...asParentRowParameters } }) {
         const getChildren = q$1(() => managedChildrenReturn.getChildren(), []);
         const getHighestChildIndex = q$1(() => getChildren().getHighestIndex(), []);
         const r = useGridNavigationSingleSelectionSortableRow({
             asParentRowParameters: {
+                ...asParentRowParameters,
                 linearNavigationParameters: { getHighestIndex: getHighestChildIndex, ...linearNavigationParameters },
                 managedChildrenReturn: { getChildren },
-                rovingTabIndexParameters,
-                typeaheadNavigationParameters
             },
             asChildRowParameters: {
-                gridNavigationRowContext,
+                ...asChildRowParameters,
                 managedChildParameters,
                 managedChildrenReturn: { getChildren },
-                rovingTabIndexChildContext,
-                singleSelectionContext,
-                singleSelectionChildParameters,
-                typeaheadNavigationChildContext,
-                typeaheadNavigationChildParameters
             }
         });
-        const { asParentRowReturn: { managedChildrenParameters }, asChildRowReturn: { pressParameters: { onPressSync } } } = r;
         const { asChildRowReturn, asParentRowReturn } = r;
-        const { managedChildContext: mcc2, managedChildrenReturn } = useManagedChildren({ managedChildrenParameters });
+        const { managedChildContext: mcc2, managedChildrenReturn } = useManagedChildren({ managedChildrenParameters: r.asParentRowReturn.managedChildrenParameters });
         const { refElementReturn } = useRefElement({ refElementParameters: {} });
         const { getElement } = refElementReturn;
         const baseInfo = {
@@ -4772,20 +4784,10 @@ var bundle = (function (exports) {
         r.asChildRowReturn.singleSelectionChildReturn.propsUnstable, r.asParentRowReturn.linearNavigationReturn.propsStable, r.asParentRowReturn.typeaheadNavigationReturn.propsStable);
         const context = useStableObject({
             managedChildContext: mcc2,
-            rovingTabIndexChildContext,
-            typeaheadNavigationChildContext,
-            completeGridNavigationContext: useStableObject({ onPressSync: onPressSync }),
-            gridNavigationCellContext: r.asParentRowReturn.gridNavigationCellContext, /* useStableObject({
-                gridNavigationCellParameters: useStableObject({
-
-                    getRowIndex: getIndex,
-                    getCurrentTabbableColumn: gridNavigationRowContext.gridNavigationRowParameters.getCurrentTabbableColumn,
-                    setCurrentTabbableColumn: gridNavigationRowContext.gridNavigationRowParameters.setCurrentTabbableColumn,
-                    setTabbableCell: asParentRowReturn.rovingTabIndexReturn.setTabbableIndex,
-                    setTabbableRow: gridNavigationRowContext.gridNavigationRowParameters.setTabbableRow
-                    // setTabbableRow: gridNavigationRowContext.gridNavigationRowParameters.setTabbableRow
-                })
-            })*/
+            rovingTabIndexChildContext: r.asParentRowReturn.rovingTabIndexChildContext,
+            typeaheadNavigationChildContext: r.asParentRowReturn.typeaheadNavigationChildContext,
+            completeGridNavigationContext: useStableObject({ onPressSync: r.asChildRowReturn.pressParameters.onPressSync }),
+            gridNavigationCellContext: r.asParentRowReturn.gridNavigationCellContext,
         });
         return {
             context,
