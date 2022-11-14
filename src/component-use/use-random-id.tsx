@@ -42,7 +42,7 @@ export interface UseRandomIdParameters {
         prefix: string;
     
         /** This is the prop on the **OTHER** element that will use our ID.  E.G. The `input` calls `useRandomId` and passes `for` as `referencerProp`. */
-        referencerProp: keyof h.JSX.HTMLAttributes<any>;
+        referencerProp: keyof h.JSX.HTMLAttributes<any> | null;
     }
 }
 
