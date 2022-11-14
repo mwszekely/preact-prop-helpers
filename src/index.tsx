@@ -15,7 +15,7 @@ export { CompleteListNavigationContext, useCompleteListNavigation, useCompleteLi
 export { useModal, UseModalParameters } from "./component-use/use-modal";
 export { setPressVibrate, usePress, UsePressParameters, UsePressReturnType } from "./component-use/use-press";
 export { generateRandomId, useRandomId, UseRandomIdParameters, UseRandomIdReturnType } from "./component-use/use-random-id";
-export { UseRandomDualIdsReturnType, useRandomDualIds } from "./component-use/use-random-dual-ids";
+export { UseRandomDualIdsReturnType, useRandomDualIds, UseRandomDualIdsParameters } from "./component-use/use-random-dual-ids";
 export { AsyncHandler, useAsyncHandler, UseAsyncHandlerParameters, UseAsyncHandlerReturnType } from "./dom-helpers/use-async-handler";
 export { getDocument, useDocumentClass } from "./dom-helpers/use-document-class";
 export { useDraggable, UseDraggableParameters, UseDraggableReturnType } from "./dom-helpers/use-draggable";

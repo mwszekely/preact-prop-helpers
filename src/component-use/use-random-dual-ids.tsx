@@ -3,7 +3,7 @@ import { h } from "preact";
 import { useRandomId, UseRandomIdParameters, UseRandomIdReturnType } from "./use-random-id";
 
 
-interface UseRandomDualIdsParameters {
+export interface UseRandomDualIdsParameters {
     randomIdInputParameters: UseRandomIdParameters["randomIdParameters"];
     randomIdLabelParameters: UseRandomIdParameters["randomIdParameters"];
 }
