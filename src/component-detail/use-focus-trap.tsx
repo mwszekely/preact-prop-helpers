@@ -7,7 +7,7 @@ import { getDocument } from "../dom-helpers/use-document-class";
 import { useRefElement, UseRefElementParameters, UseRefElementReturnType } from "../dom-helpers/use-ref-element";
 import { useStableCallback } from "../preact-extensions/use-stable-callback";
 
-export interface UseFocusTrapParameters<SourceElement extends Element, PopupElement extends Element> extends UseRefElementParameters<PopupElement>, UseActiveElementParameters {
+export interface UseFocusTrapParameters<SourceElement extends Element | null, PopupElement extends Element> extends UseRefElementParameters<PopupElement>, UseActiveElementParameters {
     focusTrapParameters: {
         /**
          * Whether or not the focus trap is currently active (or, when used as part of a larger component, whether it is activatable)
@@ -49,7 +49,7 @@ export interface UseFocusTrapReturnType<E extends Element> extends UseRefElement
 
 const elementsToRestoreFocusTo = new Map<Element | null, (Node & HTMLOrSVGElement)>();
 
-export function useFocusTrap<SourceElement extends Element, PopupElement extends Element>({
+export function useFocusTrap<SourceElement extends Element | null, PopupElement extends Element>({
     focusTrapParameters: { trapActive, focusSelf: focusSelfUnstable, focusOpener: focusOpenerUnstable },
     activeElementParameters,
     refElementParameters: { onElementChange, ...refElementParameters }

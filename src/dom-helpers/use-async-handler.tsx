@@ -2,9 +2,9 @@ import { useAsync, UseAsyncParameters, UseAsyncReturnType } from "../preact-exte
 import { useStableCallback } from "../preact-extensions/use-stable-callback";
 import { useState } from "../preact-extensions/use-state";
 
-export type AsyncHandler<EventType extends Event, CaptureType> = ((c: CaptureType, e: EventType) => (Promise<void> | void));
+export type AsyncHandler<EventType, CaptureType> = ((c: CaptureType, e: EventType) => (Promise<void> | void));
 
-export interface UseAsyncHandlerParameters<EventType extends Event, CaptureType> extends Omit<UseAsyncParameters<[CaptureType, EventType], [EventType]>, "capture"> {
+export interface UseAsyncHandlerParameters<EventType, CaptureType> extends Omit<UseAsyncParameters<[CaptureType, EventType], [EventType]>, "capture"> {
     /**
      * What transient information is captured by this event 
      * and presented as the first argument of the event handler?
@@ -19,7 +19,7 @@ export interface UseAsyncHandlerParameters<EventType extends Event, CaptureType>
     asyncHandler: AsyncHandler<EventType, CaptureType> | null;
 }
 
-export interface UseAsyncHandlerReturnType<EventType extends Event, CaptureType> extends UseAsyncReturnType<[EventType], void> {
+export interface UseAsyncHandlerReturnType<EventType, CaptureType> extends UseAsyncReturnType<[EventType], void> {
 
     /**
      * The most recently captured value. In other words, represents what
@@ -111,7 +111,7 @@ export interface UseAsyncHandlerReturnType<EventType extends Event, CaptureType>
  * 
  * @see useAsync A more general version of this hook that can work with any type of handler, not just DOM event handlers.
  */
-export function useAsyncHandler<EventType extends Event, CaptureType>({ asyncHandler, capture: originalCapture, ...restAsyncOptions }: UseAsyncHandlerParameters<EventType, CaptureType>): UseAsyncHandlerReturnType<EventType, CaptureType> {
+export function useAsyncHandler<EventType, CaptureType>({ asyncHandler, capture: originalCapture, ...restAsyncOptions }: UseAsyncHandlerParameters<EventType, CaptureType>): UseAsyncHandlerReturnType<EventType, CaptureType> {
     
     // We need to differentiate between "nothing captured yet" and "`undefined` was captured"
     const [currentCapture, setCurrentCapture, getCurrentCapture] = useState<CaptureType | undefined>(undefined);
@@ -138,10 +138,3 @@ export function useAsyncHandler<EventType extends Event, CaptureType>({ asyncHan
         ...useAsync(asyncHandler, { capture, ...restAsyncOptions })
     };
 }
-
-
-
-
-
-
-

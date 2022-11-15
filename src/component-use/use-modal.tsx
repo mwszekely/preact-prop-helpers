@@ -9,11 +9,11 @@ export interface UseModalParameters<Listeners extends DismissListenerTypes> exte
     focusTrapParameters: UseFocusTrapParameters<any, any>["focusTrapParameters"];
 }
 
-export interface UseModalReturnType<SourceElement extends Element, PopupElement extends Element> {
+export interface UseModalReturnType<SourceElement extends Element | null, PopupElement extends Element> {
     propsPopup: h.JSX.HTMLAttributes<PopupElement>;
-    propsSource: h.JSX.HTMLAttributes<SourceElement>;
+    propsSource: h.JSX.HTMLAttributes<NonNullable<SourceElement>>;
     refElementPopupReturn: UseRefElementReturnType<PopupElement>["refElementReturn"];
-    refElementSourceReturn: UseRefElementReturnType<SourceElement>["refElementReturn"];
+    refElementSourceReturn: UseRefElementReturnType<NonNullable<SourceElement>>["refElementReturn"];
     focusTrapReturn: UseFocusTrapReturnType<PopupElement>["focusTrapReturn"];
 }
 
@@ -27,7 +27,7 @@ export interface UseModalReturnType<SourceElement extends Element, PopupElement 
  * @param param0 
  * @returns 
  */
-export function useModal<Listeners extends DismissListenerTypes, SourceElement extends Element, PopupElement extends Element>({
+export function useModal<Listeners extends DismissListenerTypes, SourceElement extends Element | null, PopupElement extends Element>({
     dismissParameters,
     escapeDismissParameters,
     focusTrapParameters: { trapActive, ...focusTrapParameters }

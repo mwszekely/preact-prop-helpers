@@ -12,7 +12,7 @@ export { Compare, GetHighestChildIndex, GetIndex, GetValid, tryNavigateToIndex, 
 export { DismissListenerTypes, useBackdropDismiss, UseBackdropDismissParameters, useDismiss, UseDismissParameters, useEscapeDismiss, UseEscapeDismissParameters, useLostFocusDismiss, UseLostFocusDismissParameters, UseLostFocusDismissReturnType } from "./component-use/use-dismiss";
 export { CompleteGridNavigationContext, CompleteGridNavigationRowContext, useCompleteGridNavigation, useCompleteGridNavigationCell, UseCompleteGridNavigationCellParameters, UseCompleteGridNavigationParameters, UseCompleteGridNavigationReturnType, useCompleteGridNavigationRow, UseCompleteGridNavigationRowParameters } from "./component-use/use-grid-navigation-complete";
 export { CompleteListNavigationContext, useCompleteListNavigation, useCompleteListNavigationChild, UseCompleteListNavigationChildParameters, UseCompleteListNavigationChildReturnType, UseCompleteListNavigationParameters, UseCompleteListNavigationReturnType } from "./component-use/use-list-navigation-complete";
-export { useModal, UseModalParameters } from "./component-use/use-modal";
+export { useModal, UseModalParameters, UseModalReturnType } from "./component-use/use-modal";
 export { setPressVibrate, usePress, UsePressParameters, UsePressReturnType } from "./component-use/use-press";
 export { generateRandomId, useRandomId, UseRandomIdParameters, UseRandomIdReturnType } from "./component-use/use-random-id";
 export { UseRandomDualIdsReturnType, useRandomDualIds, UseRandomDualIdsParameters } from "./component-use/use-random-dual-ids";

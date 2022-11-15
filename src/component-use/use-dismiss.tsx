@@ -183,13 +183,13 @@ export function useEscapeDismiss<PopupElement extends Element>({ escapeDismissPa
     }, [open]);
 }
 
-export interface UseLostFocusDismissParameters<SourceElement extends Element, PopupElement extends Element> {
+export interface UseLostFocusDismissParameters<SourceElement extends Element | null, PopupElement extends Element> {
     lostFocusDismiss: { open: boolean, onClose(): void; };
-    refElementSourceReturn: null | Pick<UseRefElementReturnType<SourceElement>["refElementReturn"], "getElement">;
+    refElementSourceReturn: null | Pick<UseRefElementReturnType<NonNullable<SourceElement>>["refElementReturn"], "getElement">;
     refElementPopupReturn: Pick<UseRefElementReturnType<PopupElement>["refElementReturn"], "getElement">;
 }
 
-export interface UseLostFocusDismissReturnType<_SourceElement extends Element, _PopupElement extends Element> {
+export interface UseLostFocusDismissReturnType<_SourceElement extends Element | null, _PopupElement extends Element> {
     activeElementParameters: Pick<UseActiveElementParameters["activeElementParameters"], "onLastActiveElementChange">
 }
 
@@ -199,7 +199,7 @@ export interface UseLostFocusDismissReturnType<_SourceElement extends Element, _
  * @param param0 
  * @returns 
  */
-export function useLostFocusDismiss<SourceElement extends Element, PopupElement extends Element>({ refElementPopupReturn: { getElement: getPopupElement, ...void3 }, refElementSourceReturn, lostFocusDismiss: { open, onClose }, ...void1 }: UseLostFocusDismissParameters<SourceElement, PopupElement>): UseLostFocusDismissReturnType<SourceElement, PopupElement> {
+export function useLostFocusDismiss<SourceElement extends Element | null, PopupElement extends Element>({ refElementPopupReturn: { getElement: getPopupElement, ...void3 }, refElementSourceReturn, lostFocusDismiss: { open, onClose }, ...void1 }: UseLostFocusDismissParameters<SourceElement, PopupElement>): UseLostFocusDismissReturnType<SourceElement, PopupElement> {
 
     const { getElement: getSourceElement, ...void2 } = (refElementSourceReturn ?? {});
 
@@ -312,7 +312,7 @@ export interface UseDismissParameters<Listeners extends DismissListenerTypes> {
     escapeDismissParameters: Pick<UseEscapeDismissParameters<any>["escapeDismissParameters"], "getWindow" | "parentDepth">;
 }
 
-export interface UseDismissReturnType<SourceElement extends Element, PopupElement extends Element> {
+export interface UseDismissReturnType<SourceElement extends Element | null, PopupElement extends Element> {
     /**
      * If this dismissable component has a specific element that caused it to appear (a button, for example),
      * provide it with these props.
@@ -320,7 +320,7 @@ export interface UseDismissReturnType<SourceElement extends Element, PopupElemen
      * * REQUIRED for things like menus that pop up from a button and for whom losing focus counts as requesting closure. 
      * * OPTIONAL for things like dialogs that can appear out of nowhere and for whom losing focus is actively impossible (due to focus traps).
      */
-    refElementSourceReturn: UseRefElementReturnType<SourceElement>["refElementReturn"];
+    refElementSourceReturn: UseRefElementReturnType<NonNullable<SourceElement>>["refElementReturn"];
 
     /**
      * This one's always required though
@@ -334,9 +334,9 @@ export interface UseDismissReturnType<SourceElement extends Element, PopupElemen
  * 
  * This is similar to the "complete" series of list/grid navigation, in that it's the "outermost" hook of its type.
  */
-export function useDismiss<Listeners extends DismissListenerTypes, SourceElement extends Element, PopupElement extends Element>({ dismissParameters: { open: globalOpen, onClose: globalOnClose, closeOnBackdrop, closeOnEscape, closeOnLostFocus }, escapeDismissParameters: { getWindow, parentDepth } }: UseDismissParameters<Listeners>): UseDismissReturnType<SourceElement, PopupElement> {
+export function useDismiss<Listeners extends DismissListenerTypes, SourceElement extends Element | null, PopupElement extends Element>({ dismissParameters: { open: globalOpen, onClose: globalOnClose, closeOnBackdrop, closeOnEscape, closeOnLostFocus }, escapeDismissParameters: { getWindow, parentDepth } }: UseDismissParameters<Listeners>): UseDismissReturnType<SourceElement, PopupElement> {
 
-    const { refElementReturn: refElementSourceReturn } = useRefElement<SourceElement>({ refElementParameters: {} });
+    const { refElementReturn: refElementSourceReturn } = useRefElement<NonNullable<SourceElement>>({ refElementParameters: {} });
     const { refElementReturn: refElementPopupReturn } = useRefElement<PopupElement>({ refElementParameters: {} });
 
     const onCloseBackdrop = useCallback(() => { return globalOnClose?.("backdrop" as Listeners); }, [globalOnClose]);
