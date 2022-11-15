@@ -6311,7 +6311,7 @@ var bundle = (function (exports) {
             childrenHaveFocusChildContext,
             managedChildContext,
             managedChildParameters: { disabled, hidden, index },
-            pressParameters: { exclude: {}, focusSelf, onPseudoActiveStart: null, onPseudoActiveStop: null },
+            pressParameters: { onPressSync: null, exclude: {}, focusSelf, onPseudoActiveStart: null, onPseudoActiveStop: null },
             rovingTabIndexChildContext,
             singleSelectionContext: singleSelectionContext,
             singleSelectionChildParameters: { ariaPropName: "aria-selected", selectionMode },

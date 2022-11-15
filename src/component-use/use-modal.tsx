@@ -1,10 +1,20 @@
 import { useCallback } from "preact/hooks";
 import { DismissListenerTypes, useDismiss, UseDismissParameters } from "./use-dismiss";
-import { useFocusTrap, UseFocusTrapParameters } from "../component-detail/use-focus-trap";
+import { useFocusTrap, UseFocusTrapParameters, UseFocusTrapReturnType } from "../component-detail/use-focus-trap";
 import { useMergedProps } from "../dom-helpers/use-merged-props";
+import { h } from "preact";
+import { UseRefElementReturnType } from "../dom-helpers/use-ref-element";
 
 export interface UseModalParameters<Listeners extends DismissListenerTypes> extends UseDismissParameters<Listeners> {
     focusTrapParameters: UseFocusTrapParameters<any, any>["focusTrapParameters"];
+}
+
+export interface UseModalReturnType<SourceElement extends Element, PopupElement extends Element> {
+    propsPopup: h.JSX.HTMLAttributes<PopupElement>;
+    propsSource: h.JSX.HTMLAttributes<SourceElement>;
+    refElementPopupReturn: UseRefElementReturnType<PopupElement>["refElementReturn"];
+    refElementSourceReturn: UseRefElementReturnType<SourceElement>["refElementReturn"];
+    focusTrapReturn: UseFocusTrapReturnType<PopupElement>["focusTrapReturn"];
 }
 
 /**
@@ -21,7 +31,7 @@ export function useModal<Listeners extends DismissListenerTypes, SourceElement e
     dismissParameters,
     escapeDismissParameters,
     focusTrapParameters: { trapActive, ...focusTrapParameters }
-}: UseModalParameters<Listeners>) {
+}: UseModalParameters<Listeners>): UseModalReturnType<SourceElement, PopupElement> {
     const { open } = dismissParameters;
     const { getWindow } = escapeDismissParameters;
     const getDocument = useCallback(() => { return getWindow().document; }, [getWindow]);
