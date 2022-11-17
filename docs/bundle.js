@@ -1866,19 +1866,21 @@ var bundle = (function (exports) {
                 return managedChildrenArray.current.arr.slice();
             }, [])
         });
+        const getChildren = q$1(() => managedChildren, []);
         return {
             managedChildContext: useStableObject({
                 managedChildParameters: useStableObject({
                     managedChildrenArray: managedChildrenArray.current,
                     remoteULEChildMounted,
-                    remoteULEChildChanged
+                    remoteULEChildChanged,
+                    getChildren
                 })
             }),
-            managedChildrenReturn: { getChildren: q$1(() => managedChildren, []) }
+            managedChildrenReturn: { getChildren }
         };
     }
     function useManagedChild(info) {
-        const { managedChildParameters: { index }, managedChildContext: { managedChildParameters: { managedChildrenArray, remoteULEChildMounted, remoteULEChildChanged } } } = info;
+        const { managedChildParameters: { index }, managedChildContext: { managedChildParameters: { getChildren, managedChildrenArray, remoteULEChildMounted, remoteULEChildChanged } } } = info;
         // Any time our child props change, make that information available
         // the parent if they need it.
         // The parent can listen for all updates and only act on the ones it cares about,
@@ -1902,6 +1904,9 @@ var bundle = (function (exports) {
             remoteULEChildMounted?.(index, true);
             return () => remoteULEChildMounted?.(index, false);
         }, [index]);
+        return {
+            managedChildReturn: { getChildren }
+        };
     }
     /**
      * An extension to useManagedChildren that handles the following common case:
@@ -4771,7 +4776,7 @@ var bundle = (function (exports) {
             ...managedChildParameters,
             ...r.asChildRowReturn.managedChildParameters,
         };
-        useManagedChild({
+        const { managedChildReturn } = useManagedChild({
             managedChildContext: mcc1,
             managedChildParameters: {
                 ...baseInfo,
@@ -4793,7 +4798,8 @@ var bundle = (function (exports) {
             context,
             props,
             asParentRowReturn,
-            asChildRowReturn
+            asChildRowReturn,
+            managedChildReturn
             //managedChildrenReturn,
             //...gridNavigationSingleSelectionSortableReturn
         };
@@ -4828,7 +4834,7 @@ var bundle = (function (exports) {
             setTabbable: rovingTabIndexChildReturn.setTabbable,
             tabbable: rovingTabIndexChildReturn.tabbable
         };
-        useManagedChild({
+        const { managedChildReturn } = useManagedChild({
             managedChildContext,
             managedChildParameters: {
                 ...baseInfo,
@@ -4841,7 +4847,8 @@ var bundle = (function (exports) {
             pressReturn,
             refElementReturn,
             hasCurrentFocusReturn,
-            rovingTabIndexChildReturn
+            rovingTabIndexChildReturn,
+            managedChildReturn
         };
     }
 
@@ -4920,7 +4927,7 @@ var bundle = (function (exports) {
             setTabbable,
             tabbable
         };
-        useManagedChild({
+        const { managedChildReturn } = useManagedChild({
             managedChildContext,
             managedChildParameters: {
                 ...mcp1,
@@ -4939,7 +4946,8 @@ var bundle = (function (exports) {
             pressReturn,
             rovingTabIndexChildReturn,
             singleSelectionChildReturn,
-            hasCurrentFocusReturn
+            hasCurrentFocusReturn,
+            managedChildReturn
         };
     }
 
@@ -4968,7 +4976,8 @@ var bundle = (function (exports) {
         const { propsUnstable: pp3 } = focusTrapReturn;
         const { propsStable: pp4 } = refElementReturn;
         return {
-            propsPopup: useMergedProps(pp1, pp3, pp4),
+            propsPopup: pp1,
+            propsFocusContainer: useMergedProps(pp3, pp4),
             propsSource: ps2,
             refElementPopupReturn,
             refElementSourceReturn,
@@ -5941,7 +5950,7 @@ var bundle = (function (exports) {
         const [open, setOpen] = y(false);
         const focusSelf = () => buttonRef.current?.focus();
         const focusOpener = (e) => e?.focus();
-        const { propsPopup, propsSource } = useModal({
+        const { propsPopup, propsSource, propsFocusContainer } = useModal({
             focusTrapParameters: {
                 trapActive: focusTrapActive,
                 focusOpener,
@@ -5956,7 +5965,7 @@ var bundle = (function (exports) {
             },
             escapeDismissParameters: { getWindow, parentDepth }
         });
-        return (o$1("div", { style: { border: `${depth}px solid black` }, children: [o$1("div", { children: "useModal demo:" }), o$1("div", { style: "display: flex; flex-direction: column", children: [o$1("label", { children: [o$1("input", { type: "checkbox", disabled: true, checked: true }), " Close by setting open to false"] }), o$1("label", { children: [o$1("input", { type: "checkbox", checked: closeOnBackdrop, onInput: e => setCloseOnBackdrop(e.currentTarget.checked) }), " Close on backdrop click"] }), o$1("label", { children: [o$1("input", { type: "checkbox", checked: closeOnEscape, onInput: e => setCloseOnEscape(e.currentTarget.checked) }), " Close on Escape key press"] }), o$1("label", { children: [o$1("input", { type: "checkbox", checked: closeOnLostFocus, onInput: e => setCloseOnLostFocus(e.currentTarget.checked) }), " Close on focus lost"] }), o$1("label", { children: [o$1("input", { type: "checkbox", checked: focusTrapActive, onInput: e => setFocusTrapActive(e.currentTarget.checked) }), " Trap focus"] }), o$1("br", {})] }), o$1("div", { children: ["Last reason for closing: ", closeReason ?? "(hasn't been closed yet)"] }), o$1("button", { ...propsSource, onClick: () => setOpen(true), children: "Open Modal" }), o$1("div", { ...propsPopup, style: `border: ${depth}px dotted red; background: #ccc`, children: o$1("div", { style: { display: open ? "flex" : "none", flexDirection: "column" }, children: [o$1("div", { children: ["Modal element at depth ", depth, " with ", hasChild ? "a" : "no", " child"] }), o$1("label", { children: [o$1("input", { type: "checkbox", checked: hasChild, onInput: e => setHasChild(e.currentTarget.checked), ref: buttonRef }), " Add a child modal"] }), hasChild && o$1(DemoUseModal, { parentDepth: depth }), o$1("button", { ...propsSource, onClick: () => setOpen(false), children: "Close modal programmatically" })] }) })] }));
+        return (o$1("div", { style: { border: `${depth}px solid black` }, children: [o$1("div", { children: "useModal demo:" }), o$1("div", { style: "display: flex; flex-direction: column", children: [o$1("label", { children: [o$1("input", { type: "checkbox", disabled: true, checked: true }), " Close by setting open to false"] }), o$1("label", { children: [o$1("input", { type: "checkbox", checked: closeOnBackdrop, onInput: e => setCloseOnBackdrop(e.currentTarget.checked) }), " Close on backdrop click"] }), o$1("label", { children: [o$1("input", { type: "checkbox", checked: closeOnEscape, onInput: e => setCloseOnEscape(e.currentTarget.checked) }), " Close on Escape key press"] }), o$1("label", { children: [o$1("input", { type: "checkbox", checked: closeOnLostFocus, onInput: e => setCloseOnLostFocus(e.currentTarget.checked) }), " Close on focus lost"] }), o$1("label", { children: [o$1("input", { type: "checkbox", checked: focusTrapActive, onInput: e => setFocusTrapActive(e.currentTarget.checked) }), " Trap focus"] }), o$1("br", {})] }), o$1("div", { children: ["Last reason for closing: ", closeReason ?? "(hasn't been closed yet)"] }), o$1("button", { ...propsSource, onClick: () => setOpen(true), children: "Open Modal" }), o$1("div", { ...useMergedProps(propsFocusContainer, propsPopup), style: `border: ${depth}px dotted red; background: #ccc`, children: o$1("div", { style: { display: open ? "flex" : "none", flexDirection: "column" }, children: [o$1("div", { children: ["Modal element at depth ", depth, " with ", hasChild ? "a" : "no", " child"] }), o$1("label", { children: [o$1("input", { type: "checkbox", checked: hasChild, onInput: e => setHasChild(e.currentTarget.checked), ref: buttonRef }), " Add a child modal"] }), hasChild && o$1(DemoUseModal, { parentDepth: depth }), o$1("button", { ...propsSource, onClick: () => setOpen(false), children: "Close modal programmatically" })] }) })] }));
     }
 
     const RandomWords$1 = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");

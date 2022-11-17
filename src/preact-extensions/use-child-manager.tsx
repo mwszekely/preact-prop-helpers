@@ -109,6 +109,7 @@ export interface UseManagedChildrenReturnType<M extends ManagedChildInfo<any>> {
 
     managedChildContext: {
         managedChildParameters: {
+            getChildren(): ManagedChildren<M>;
             managedChildrenArray: Foo<M>;
             remoteULEChildMounted: (index: M["index"], mounted: boolean) => void;
             remoteULEChildChanged: (index: M["index"]) => (() => void);
@@ -116,9 +117,13 @@ export interface UseManagedChildrenReturnType<M extends ManagedChildInfo<any>> {
     };
 }
 
-export type UseManagedChildReturnType = void;
+export interface UseManagedChildReturnType<M extends ManagedChildInfo<any>> {
+    managedChildReturn: {
+        getChildren(): ManagedChildren<M>;
+    }
+};
 
-export type UseManagedChild<M extends ManagedChildInfo<any>> = (a: UseManagedChildParameters<M>) => UseManagedChildReturnType;
+export type UseManagedChild<M extends ManagedChildInfo<any>> = (a: UseManagedChildParameters<M>) => UseManagedChildReturnType<M>;
 
 
 
@@ -275,25 +280,28 @@ export function useManagedChildren<M extends ManagedChildInfo<string | number>>(
         }, [])
     });
 
+    const getChildren = useCallback(() => managedChildren, []);
+
     return {
         managedChildContext: useStableObject({
             managedChildParameters: useStableObject({
                 managedChildrenArray: managedChildrenArray.current,
                 remoteULEChildMounted,
-                remoteULEChildChanged
+                remoteULEChildChanged,
+                getChildren
             })
         }),
-        managedChildrenReturn: { getChildren: useCallback(() => managedChildren, []) }
+        managedChildrenReturn: { getChildren }
     }
 }
 
 
 
 
-export function useManagedChild<M extends ManagedChildInfo<number | string>>(info: UseManagedChildParameters<M>): UseManagedChildReturnType {
+export function useManagedChild<M extends ManagedChildInfo<number | string>>(info: UseManagedChildParameters<M>): UseManagedChildReturnType<M> {
     type IndexType = M["index"];
 
-    const { managedChildParameters: { index }, managedChildContext: { managedChildParameters: { managedChildrenArray, remoteULEChildMounted, remoteULEChildChanged } } } = info;
+    const { managedChildParameters: { index }, managedChildContext: { managedChildParameters: { getChildren, managedChildrenArray, remoteULEChildMounted, remoteULEChildChanged } } } = info;
     // Any time our child props change, make that information available
     // the parent if they need it.
     // The parent can listen for all updates and only act on the ones it cares about,
@@ -318,6 +326,10 @@ export function useManagedChild<M extends ManagedChildInfo<number | string>>(inf
         remoteULEChildMounted?.(index as IndexType, true);
         return () => remoteULEChildMounted?.(index as IndexType, false);
     }, [index]);
+
+    return {
+        managedChildReturn: { getChildren }
+    }
 }
 
 

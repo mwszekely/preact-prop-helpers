@@ -1,6 +1,6 @@
 
 import { useCallback, useRef, useState } from "preact/hooks";
-import { DismissListenerTypes, useModal } from "../..";
+import { DismissListenerTypes, useMergedProps, useModal } from "../..";
 
 function getWindow(): Window { return globalThis.window; }
 
@@ -26,8 +26,9 @@ export function DemoUseModal(props: { parentDepth?: number }) {
 
     const {
         propsPopup,
-        propsSource
-    } = useModal<"lost-focus" | "backdrop" | "escape", HTMLButtonElement, HTMLDivElement>({
+        propsSource,
+        propsFocusContainer
+    } = useModal<"lost-focus" | "backdrop" | "escape", HTMLDivElement, HTMLButtonElement, HTMLDivElement>({
         focusTrapParameters: {
             trapActive: focusTrapActive,
             focusOpener,
@@ -55,9 +56,9 @@ export function DemoUseModal(props: { parentDepth?: number }) {
             </div>
             <div>Last reason for closing: {closeReason ?? "(hasn't been closed yet)"}</div>
             <button {...propsSource} onClick={() => setOpen(true)}>Open Modal</button>
-            <div {...propsPopup} style={`border: ${depth}px dotted red; background: #ccc`}>
+            <div {...useMergedProps(propsFocusContainer, propsPopup)} style={`border: ${depth}px dotted red; background: #ccc`}>
                 <div style={{ display: open ? "flex" : "none", flexDirection: "column" }}>
-                    <div>Modal element at depth {depth} with {hasChild? "a" : "no"} child</div>
+                    <div>Modal element at depth {depth} with {hasChild ? "a" : "no"} child</div>
                     <label><input type="checkbox" checked={hasChild} onInput={e => setHasChild(e.currentTarget.checked)} ref={buttonRef} /> Add a child modal</label>
                     {hasChild && <DemoUseModal parentDepth={depth} />}
                     <button {...propsSource} onClick={() => setOpen(false)}>Close modal programmatically</button>

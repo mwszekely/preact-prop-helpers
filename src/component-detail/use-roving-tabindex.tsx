@@ -1,6 +1,6 @@
 import { h } from "preact";
 import { StateUpdater, useCallback, useEffect } from "preact/hooks";
-import { assertEmptyObject, ManagedChildInfo, useChildrenFlag, UseManagedChildParameters, UseManagedChildrenParameters, UseManagedChildrenReturnType } from "../preact-extensions/use-child-manager";
+import { assertEmptyObject, ManagedChildInfo, useChildrenFlag, UseManagedChildParameters, UseManagedChildrenParameters, UseManagedChildrenReturnType, UseManagedChildReturnType } from "../preact-extensions/use-child-manager";
 import { UseHasCurrentFocusParameters } from "../observers/use-has-current-focus";
 import { OnPassiveStateChange } from "../preact-extensions/use-passive-state";
 import { useStableCallback } from "../preact-extensions/use-stable-callback";

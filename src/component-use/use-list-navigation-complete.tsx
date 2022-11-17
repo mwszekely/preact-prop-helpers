@@ -8,7 +8,7 @@ import { usePress, UsePressParameters, UsePressReturnType } from "./use-press";
 import { useRefElement } from "../dom-helpers/use-ref-element";
 import { useStableCallback } from "../preact-extensions/use-stable-callback";
 import { useStableObject } from "../preact-extensions/use-stable-getter";
-import { useManagedChild, UseManagedChildParameters, useManagedChildren, UseManagedChildrenReturnType } from "../preact-extensions/use-child-manager";
+import { useManagedChild, UseManagedChildParameters, useManagedChildren, UseManagedChildrenReturnType, UseManagedChildReturnType } from "../preact-extensions/use-child-manager";
 import { UseListNavigationSingleSelectionChildInfo } from "../component-detail/use-list-navigation-single-selection";
 
 
@@ -95,10 +95,11 @@ export interface UseCompleteListNavigationChildParameters<ChildElement extends E
     completeListNavigationChildParameters: Omit<M, keyof UseListNavigationSingleSelectionChildInfo<ChildElement>>;
 }
 
-export interface UseCompleteListNavigationChildReturnType<ChildElement extends Element>
+export interface UseCompleteListNavigationChildReturnType<ChildElement extends Element, M extends UseListNavigationSingleSelectionChildInfo<ChildElement>>
     extends Pick<UseListNavigationSingleSelectionSortableChildReturnType<ChildElement>, "singleSelectionChildReturn" | "rovingTabIndexChildReturn"> {
     pressReturn: UsePressReturnType<ChildElement>["pressReturn"];
     hasCurrentFocusReturn: UseHasCurrentFocusReturnType<ChildElement>["hasCurrentFocusReturn"];
+    managedChildReturn: UseManagedChildReturnType<M>["managedChildReturn"];
     props: h.JSX.HTMLAttributes<ChildElement>;
 }
 
@@ -113,7 +114,7 @@ export function useCompleteListNavigationChild<ChildElement extends Element, M e
     managedChildContext,
     childrenHaveFocusChildContext,
     pressParameters: { onPressSync: ops1, ...pressParameters }
-}: UseCompleteListNavigationChildParameters<ChildElement, M>): UseCompleteListNavigationChildReturnType<ChildElement> {
+}: UseCompleteListNavigationChildParameters<ChildElement, M>): UseCompleteListNavigationChildReturnType<ChildElement, M> {
 
     const { refElementReturn } = useRefElement<ChildElement>({ refElementParameters: {} });
     const { getElement } = refElementReturn;
@@ -159,7 +160,7 @@ export function useCompleteListNavigationChild<ChildElement extends Element, M e
         tabbable
     }
 
-    useManagedChild<M>({
+    const { managedChildReturn } = useManagedChild<M>({
         managedChildContext,
         managedChildParameters: {
             ...mcp1,
@@ -188,7 +189,8 @@ export function useCompleteListNavigationChild<ChildElement extends Element, M e
         pressReturn,
         rovingTabIndexChildReturn,
         singleSelectionChildReturn,
-        hasCurrentFocusReturn
+        hasCurrentFocusReturn,
+        managedChildReturn
     }
 
 }
