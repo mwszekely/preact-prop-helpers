@@ -4844,10 +4844,10 @@ var bundle = (function (exports) {
         const props = useMergedProps(refElementReturn.propsStable, pressReturn.propsStable, rovingTabIndexChildReturn.propsUnstable, hasCurrentFocusReturn.propsStable);
         return {
             props,
+            rovingTabIndexChildReturn,
             pressReturn,
             refElementReturn,
             hasCurrentFocusReturn,
-            rovingTabIndexChildReturn,
             managedChildReturn
         };
     }
