@@ -8,9 +8,9 @@ export { generateRandomId };
 
 
 
-export interface UseRandomIdReturnType<S extends Element> {
+export interface UseRandomIdReturnType<S extends Element, T extends Element> {
     propsSource: h.JSX.HTMLAttributes<S>;
-    propsReferencer: h.JSX.HTMLAttributes<any>;
+    propsReferencer: h.JSX.HTMLAttributes<T>;
 
     /**
      * **STABLE**
@@ -46,7 +46,7 @@ export interface UseRandomIdParameters {
     }
 }
 
-export function useRandomId<S extends Element>({ randomIdParameters: { prefix, referencerProp } }: UseRandomIdParameters): UseRandomIdReturnType<S> {
+export function useRandomId<S extends Element, T extends Element>({ randomIdParameters: { prefix, referencerProp } }: UseRandomIdParameters): UseRandomIdReturnType<S, T> {
     const id = (prefix + useId());
     useEnsureStability("useRandomId", prefix, id);
 

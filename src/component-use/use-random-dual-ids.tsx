@@ -11,8 +11,8 @@ export interface UseRandomDualIdsParameters {
 export interface UseRandomDualIdsReturnType<InputElement extends Element, LabelElement extends Element> {
     propsInput: h.JSX.HTMLAttributes<InputElement>;
     propsLabel: h.JSX.HTMLAttributes<LabelElement>;
-    randomIdInputReturn: UseRandomIdReturnType<InputElement>["randomIdReturn"];
-    randomIdLabelReturn: UseRandomIdReturnType<LabelElement>["randomIdReturn"];
+    randomIdInputReturn: UseRandomIdReturnType<InputElement, LabelElement>["randomIdReturn"];
+    randomIdLabelReturn: UseRandomIdReturnType<LabelElement, InputElement>["randomIdReturn"];
 }
 
 /**
@@ -23,8 +23,8 @@ export function useRandomDualIds<InputElement extends Element, LabelElement exte
     randomIdLabelParameters,
 }: UseRandomDualIdsParameters): UseRandomDualIdsReturnType<InputElement, LabelElement> {
 
-    const { randomIdReturn: randomIdInputReturn, propsReferencer: propsInputAsReferencer, propsSource: propsInputAsSource } = useRandomId<InputElement>({ randomIdParameters: randomIdInputParameters });
-    const { randomIdReturn: randomIdLabelReturn, propsReferencer: propsLabelAsReferencer, propsSource: propsLabelAsSource } = useRandomId<LabelElement>({ randomIdParameters: randomIdLabelParameters });
+    const { randomIdReturn: randomIdInputReturn, propsReferencer: propsLabelAsReferencer, propsSource: propsInputAsSource } = useRandomId<InputElement, LabelElement>({ randomIdParameters: randomIdInputParameters });
+    const { randomIdReturn: randomIdLabelReturn, propsReferencer: propsInputAsReferencer, propsSource: propsLabelAsSource } = useRandomId<LabelElement, InputElement>({ randomIdParameters: randomIdLabelParameters });
 
     return {
         propsLabel: useMergedProps<LabelElement>(propsLabelAsReferencer, propsLabelAsSource),
