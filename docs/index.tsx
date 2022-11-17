@@ -1,7 +1,7 @@
 import { createContext, h, render, VNode } from "preact";
 import { memo } from "preact/compat";
 import { useCallback, useContext, useRef } from "preact/hooks";
-import { GetIndex, GridSingleSelectSortableChildCellInfo, GridSingleSelectSortableChildRowInfo, useAnimationFrame, useAsyncHandler, useDraggable, useDroppable, useElementSize, useFocusTrap, useHasCurrentFocus, useHasLastFocus, useMergedProps, useRefElement, useStableCallback, useState } from "..";
+import { GetIndex, GetValid, GridSingleSelectSortableChildCellInfo, GridSingleSelectSortableChildRowInfo, useAnimationFrame, useAsyncHandler, UseCompleteGridNavigationReturnType, useDraggable, useDroppable, useElementSize, useFocusTrap, useHasCurrentFocus, useHasLastFocus, UseListNavigationSingleSelectionChildInfo, useMergedProps, useRefElement, useSortableChildren, useStableCallback, useState } from "..";
 import { ElementSize } from "../dom-helpers/use-element-size";
 //import { useGridNavigation, UseGridNavigationCell, UseGridNavigationRow } from "../use-grid-navigation";
 import { CompleteGridNavigationContext, CompleteGridNavigationRowContext, useCompleteGridNavigation, useCompleteGridNavigationCell, useCompleteGridNavigationRow } from "..";
@@ -567,26 +567,39 @@ export const DemoUseGrid = memo(() => {
     //const getHighestIndex = useCallback(() => getChildren().getHighestIndex(), []);
     const getChildren = useCallback<typeof getChildren2>(() => { return getChildren2() }, []);
 
-    const ret = useCompleteGridNavigation<HTMLTableSectionElement, HTMLTableRowElement, GridSingleSelectSortableChildRowInfo<HTMLTableRowElement>>({
+
+
+    const getHighestChildIndex = useStableCallback(() => ghci());
+    const getValid = useStableCallback<GetValid>((i) => gv(i));
+
+    const {
+        linearNavigationParameters: { navigateAbsolute, navigateRelative },
+        rearrangeableChildrenReturn: { useRearrangeableProps, shuffle },
+        sortableChildrenReturn
+    } = useSortableChildren<HTMLTableSectionElement, GridSingleSelectSortableChildRowInfo<HTMLTableRowElement>>({
+        rearrangeableChildrenParameters: {
+            getHighestChildIndex,
+            getValid,
+            getIndex: useCallback<GetIndex<{ index: number }>>((a: VNode<{ index: number }>) => a.props.index, [])
+        },
+        sortableChildrenParameters: { compare: useCallback((rhs, lhs) => { return lhs.index - rhs.index }, []) },
+    })
+
+    const ret: UseCompleteGridNavigationReturnType<HTMLTableSectionElement, HTMLTableRowElement, GridSingleSelectSortableChildRowInfo<HTMLTableRowElement>> = useCompleteGridNavigation<HTMLTableSectionElement, HTMLTableRowElement, GridSingleSelectSortableChildRowInfo<HTMLTableRowElement>>({
         singleSelectionParameters: { initiallySelectedIndex: selectedRow, onSelectedIndexChange: setSelectedRow },
         gridNavigationParameters: { onTabbableColumnChange: setTabbableColumn },
-        linearNavigationParameters: { disableArrowKeys: false, disableHomeEndKeys: false },
-        sortableChildrenParameters: { compare: useCallback((rhs, lhs) => { return lhs.index - rhs.index }, []) },
+        linearNavigationParameters: { disableArrowKeys: false, disableHomeEndKeys: false, navigateAbsolute, navigateRelative },
         //managedChildrenReturn: { getChildren },
         rovingTabIndexParameters: { initiallyTabbedIndex: null, onTabbableIndexChange: setTabbableRow },
         typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000 },
-        rearrangeableChildrenParameters: {
-            getIndex: useCallback<GetIndex<{ index: number }>>((a: VNode<{ index: number }>) => a.props.index, []),
-        }
     });
 
     const {
         context,
         props,
-        rearrangeableChildrenReturn,
         managedChildrenReturn,
+        rearrangeableChildrenParameters: { getHighestChildIndex: ghci, getValid: gv }
     } = ret;
-    const { useRearrangeableProps } = rearrangeableChildrenReturn;
     const { getChildren: getChildren2 } = managedChildrenReturn;
 
 

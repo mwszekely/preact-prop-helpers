@@ -2726,6 +2726,10 @@ var bundle = (function (exports) {
             asParentRowReturn: { ...gnr_prr },
         };
     }
+    // EZ
+    function useGridNavigationSingleSelectionCell(p) {
+        return useGridNavigationCell(p);
+    }
 
     /**
      * Returns a function that will, when called, force the component
@@ -4152,22 +4156,6 @@ var bundle = (function (exports) {
         }
     }
 
-    function useGridNavigationSingleSelectionSortable({ rearrangeableChildrenParameters, sortableChildrenParameters, linearNavigationParameters, ...gridNavigationSingleSelectionParameters }) {
-        const { linearNavigationParameters: { navigateAbsolute, navigateRelative }, ...scr } = useSortableChildren({ rearrangeableChildrenParameters, sortableChildrenParameters });
-        const gnr = useGridNavigationSingleSelection({
-            linearNavigationParameters: { navigateAbsolute, navigateRelative, ...linearNavigationParameters },
-            ...gridNavigationSingleSelectionParameters
-        });
-        return { ...gnr, ...scr, };
-    }
-    function useGridNavigationSingleSelectionSortableRow(p) {
-        return useGridNavigationSingleSelectionRow(p);
-    }
-    // EZ
-    function useGridNavigationSingleSelectionSortableCell(p) {
-        return useGridNavigationCell(p);
-    }
-
     function useListNavigationSingleSelection({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, managedChildrenReturn, ..._void3 }) {
         const lnr = useListNavigation({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, managedChildrenReturn });
         const { rovingTabIndexReturn } = lnr;
@@ -4198,24 +4186,6 @@ var bundle = (function (exports) {
             ...sscr,
             ...lncr
         };
-    }
-
-    function useListNavigationSingleSelectionSortable({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, managedChildrenReturn, rearrangeableChildrenParameters, sortableChildrenParameters, ..._void3 }) {
-        const scr = useSortableChildren({ rearrangeableChildrenParameters, sortableChildrenParameters });
-        const { linearNavigationParameters: { navigateAbsolute, navigateRelative, ...void1 } } = scr;
-        const lnssr = useListNavigationSingleSelection({ linearNavigationParameters: { ...linearNavigationParameters, navigateRelative, navigateAbsolute }, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, managedChildrenReturn });
-        return { ...lnssr, ...scr };
-    }
-    function useListNavigationSingleSelectionSortableChild({ managedChildParameters: { hidden, index, disabled, ..._void5 }, singleSelectionChildParameters, singleSelectionContext, typeaheadNavigationChildParameters, rovingTabIndexChildContext, typeaheadNavigationChildContext, ..._void1 }) {
-        const lnsscr = useListNavigationSingleSelectionChild({
-            managedChildParameters: { index, hidden, disabled },
-            singleSelectionChildParameters,
-            singleSelectionContext,
-            typeaheadNavigationChildParameters,
-            rovingTabIndexChildContext,
-            typeaheadNavigationChildContext
-        });
-        return { ...lnsscr };
     }
 
     /**
@@ -4715,21 +4685,19 @@ var bundle = (function (exports) {
         return false;
     }
 
-    function useCompleteGridNavigation({ gridNavigationParameters, linearNavigationParameters, rearrangeableChildrenParameters: { getIndex, ...rearrangeableChildrenParameters }, rovingTabIndexParameters, singleSelectionParameters, sortableChildrenParameters, typeaheadNavigationParameters }) {
+    function useCompleteGridNavigation({ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, typeaheadNavigationParameters }) {
         const getChildren = q$1(() => managedChildrenReturn.getChildren(), []);
         const getHighestChildIndex = q$1(() => getChildren().getHighestIndex(), []);
         const getValid = useStableCallback((index) => { return !(getChildren().getAt(index)?.hidden); });
-        const { childrenHaveFocusParameters, managedChildrenParameters, rovingTabIndexChildContext, singleSelectionContext, typeaheadNavigationChildContext, gridNavigationRowContext, ...gridNavigationSingleSelectionSortableReturn } = useGridNavigationSingleSelectionSortable({
+        const { childrenHaveFocusParameters, managedChildrenParameters, rovingTabIndexChildContext, singleSelectionContext, typeaheadNavigationChildContext, gridNavigationRowContext, ...gridNavigationSingleSelectionReturn } = useGridNavigationSingleSelection({
             gridNavigationParameters,
             linearNavigationParameters: { getHighestIndex: getHighestChildIndex, ...linearNavigationParameters },
             managedChildrenReturn: { getChildren },
-            rearrangeableChildrenParameters: { getHighestChildIndex: getHighestChildIndex, getValid, getIndex, ...rearrangeableChildrenParameters },
             rovingTabIndexParameters,
             singleSelectionParameters,
-            sortableChildrenParameters,
             typeaheadNavigationParameters
         });
-        const { linearNavigationReturn, typeaheadNavigationReturn } = gridNavigationSingleSelectionSortableReturn;
+        const { linearNavigationReturn, typeaheadNavigationReturn } = gridNavigationSingleSelectionReturn;
         const { childrenHaveFocusChildContext, childrenHaveFocusReturn } = useChildrenHaveFocus({ childrenHaveFocusParameters });
         const { managedChildContext, managedChildrenReturn } = useManagedChildren({ managedChildrenParameters });
         const props = useMergedProps(linearNavigationReturn.propsStable, typeaheadNavigationReturn.propsStable);
@@ -4745,14 +4713,15 @@ var bundle = (function (exports) {
             context,
             props,
             managedChildrenReturn,
-            ...gridNavigationSingleSelectionSortableReturn,
-            childrenHaveFocusReturn
+            ...gridNavigationSingleSelectionReturn,
+            childrenHaveFocusReturn,
+            rearrangeableChildrenParameters: { getHighestChildIndex: getHighestChildIndex, getValid },
         };
     }
     function useCompleteGridNavigationRow({ asChildRowParameters: { managedChildParameters, managedChildContext: mcc1, completeGridNavigationRowParameters, ...asChildRowParameters }, asParentRowParameters: { linearNavigationParameters, ...asParentRowParameters } }) {
         const getChildren = q$1(() => managedChildrenReturn.getChildren(), []);
         const getHighestChildIndex = q$1(() => getChildren().getHighestIndex(), []);
-        const r = useGridNavigationSingleSelectionSortableRow({
+        const r = useGridNavigationSingleSelectionRow({
             asParentRowParameters: {
                 ...asParentRowParameters,
                 linearNavigationParameters: { getHighestIndex: getHighestChildIndex, ...linearNavigationParameters },
@@ -4801,11 +4770,11 @@ var bundle = (function (exports) {
             asChildRowReturn,
             managedChildReturn
             //managedChildrenReturn,
-            //...gridNavigationSingleSelectionSortableReturn
+            //...gridNavigationSingleSelectionReturn
         };
     }
     function useCompleteGridNavigationCell({ gridNavigationCellContext, gridNavigationCellParameters, managedChildParameters, rovingTabIndexChildContext, typeaheadNavigationChildContext, typeaheadNavigationChildParameters, completeGridNavigationContext, managedChildContext, completeGridNavigationCellParameters, pressParameters: { onPressSync, ...pressParameters }, }) {
-        const { hasCurrentFocusParameters, rovingTabIndexChildReturn } = useGridNavigationSingleSelectionSortableCell({
+        const { hasCurrentFocusParameters, rovingTabIndexChildReturn } = useGridNavigationSingleSelectionCell({
             gridNavigationCellContext,
             gridNavigationCellParameters,
             managedChildParameters,
@@ -4862,7 +4831,7 @@ var bundle = (function (exports) {
      *
      * @returns
      */
-    function useCompleteListNavigation({ rearrangeableChildrenParameters, linearNavigationParameters, ...completeListNavigationParameters }) {
+    function useCompleteListNavigation({ linearNavigationParameters, ...completeListNavigationParameters }) {
         //type M = UseListNavigationSingleSelectionChildInfo<ChildElement>;
         const getChildren = q$1(() => managedChildrenReturn.getChildren(), []);
         const getHighestChildIndex = q$1(() => getChildren().getHighestIndex(), []);
@@ -4870,17 +4839,12 @@ var bundle = (function (exports) {
             const child = getChildren().getAt(i);
             return !(child?.disabled || child?.hidden);
         }, []);
-        const { childrenHaveFocusParameters, managedChildrenParameters, rovingTabIndexChildContext, typeaheadNavigationChildContext, singleSelectionContext, ...listNavigationSingleSelectionSortableReturn } = useListNavigationSingleSelectionSortable({
+        const { childrenHaveFocusParameters, managedChildrenParameters, rovingTabIndexChildContext, typeaheadNavigationChildContext, singleSelectionContext, linearNavigationReturn, rovingTabIndexReturn, singleSelectionReturn, typeaheadNavigationReturn } = useListNavigationSingleSelection({
             managedChildrenReturn: { getChildren },
-            rearrangeableChildrenParameters: {
-                ...rearrangeableChildrenParameters,
-                getValid,
-                getHighestChildIndex
-            },
             linearNavigationParameters: { getHighestIndex: getHighestChildIndex, ...linearNavigationParameters },
             ...completeListNavigationParameters,
         });
-        const { linearNavigationReturn, typeaheadNavigationReturn } = listNavigationSingleSelectionSortableReturn;
+        //const { linearNavigationReturn, typeaheadNavigationReturn } = listNavigationSingleSelectionSortableReturn;
         const { childrenHaveFocusChildContext, childrenHaveFocusReturn } = useChildrenHaveFocus({ childrenHaveFocusParameters });
         const { managedChildContext, managedChildrenReturn } = useManagedChildren({ managedChildrenParameters });
         const props = useMergedProps(linearNavigationReturn.propsStable, typeaheadNavigationReturn.propsStable);
@@ -4895,7 +4859,11 @@ var bundle = (function (exports) {
             context,
             props,
             managedChildrenReturn,
-            ...listNavigationSingleSelectionSortableReturn,
+            rearrangeableChildrenParameters: { getHighestChildIndex, getValid },
+            linearNavigationReturn,
+            rovingTabIndexReturn,
+            singleSelectionReturn,
+            typeaheadNavigationReturn,
             childrenHaveFocusReturn
         };
     }
@@ -4903,7 +4871,7 @@ var bundle = (function (exports) {
         const { refElementReturn } = useRefElement({ refElementParameters: {} });
         const { getElement } = refElementReturn;
         const { focusSelf } = pressParameters;
-        const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1 }, managedChildParameters: { getSelected, selected, setSelected }, pressParameters: { onPressSync: ops2, ...p1 }, rovingTabIndexChildReturn, singleSelectionChildReturn } = useListNavigationSingleSelectionSortableChild({
+        const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1 }, managedChildParameters: { getSelected, selected, setSelected }, pressParameters: { onPressSync: ops2, ...p1 }, rovingTabIndexChildReturn, singleSelectionChildReturn } = useListNavigationSingleSelectionChild({
             managedChildParameters: { disabled, hidden, index },
             rovingTabIndexChildContext,
             singleSelectionContext,
@@ -6191,17 +6159,25 @@ var bundle = (function (exports) {
         const [count, setCount] = useState(10);
         const [selectedIndex, setLocalSelectedIndex] = useState(0);
         const [tabbableIndex, setLocalTabbableIndex] = useState(0);
-        const r = useCompleteListNavigation({
-            linearNavigationParameters: { disableArrowKeys: false, disableHomeEndKeys: false, navigationDirection: "vertical" },
+        const getHighestChildIndex = useStableCallback(() => ghci());
+        const getValid = useStableCallback((i) => gv(i));
+        const { linearNavigationParameters: { navigateAbsolute, navigateRelative }, rearrangeableChildrenReturn: { useRearrangeableProps: useSortableProps, shuffle }, sortableChildrenReturn } = useSortableChildren({
             rearrangeableChildrenParameters: {
+                getHighestChildIndex,
+                getValid,
                 getIndex: q$1((a) => a.props.index, [])
             },
+            sortableChildrenParameters: { compare: q$1((rhs, lhs) => { return lhs.index - rhs.index; }, []) },
+        });
+        const r = useCompleteListNavigation({
             rovingTabIndexParameters: { initiallyTabbedIndex: tabbableIndex, onTabbableIndexChange: setLocalTabbableIndex },
             singleSelectionParameters: { initiallySelectedIndex: selectedIndex, onSelectedIndexChange: setLocalSelectedIndex },
-            sortableChildrenParameters: { compare: q$1((rhs, lhs) => { return lhs.index - rhs.index; }, []) },
-            typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000 }
+            typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000 },
+            linearNavigationParameters: { disableArrowKeys: false, disableHomeEndKeys: false, navigationDirection: "vertical", navigateAbsolute, navigateRelative },
         });
-        const { props, context, rovingTabIndexReturn: { setTabbableIndex }, singleSelectionReturn: { setSelectedIndex }, managedChildrenReturn: { getChildren }, typeaheadNavigationReturn: { currentTypeahead }, rearrangeableChildrenReturn: { useRearrangeableProps: useSortableProps, shuffle } } = r;
+        const { props, context, rovingTabIndexReturn: { setTabbableIndex }, singleSelectionReturn: { setSelectedIndex }, managedChildrenReturn: { getChildren }, typeaheadNavigationReturn: { currentTypeahead }, rearrangeableChildrenParameters: { getHighestChildIndex: ghci, getValid: gv },
+        //        rearrangeableChildrenReturn: { useRearrangeableProps: useSortableProps, shuffle }
+         } = r;
         const children = getChildren();
         /*const ret: UseSortableSingleSelectDemoReturn<HTMLUListElement, HTMLLIElement> = useSortableSingleSelectDemo<HTMLUListElement, HTMLLIElement>({
             rearrangeableChildrenParameters: {
@@ -6786,20 +6762,25 @@ var bundle = (function (exports) {
         const [tabbableRow, setTabbableRow] = useState(null);
         //const getHighestIndex = useCallback(() => getChildren().getHighestIndex(), []);
         q$1(() => { return getChildren2(); }, []);
+        const getHighestChildIndex = useStableCallback(() => ghci());
+        const getValid = useStableCallback((i) => gv(i));
+        const { linearNavigationParameters: { navigateAbsolute, navigateRelative }, rearrangeableChildrenReturn: { useRearrangeableProps, shuffle }, sortableChildrenReturn } = useSortableChildren({
+            rearrangeableChildrenParameters: {
+                getHighestChildIndex,
+                getValid,
+                getIndex: q$1((a) => a.props.index, [])
+            },
+            sortableChildrenParameters: { compare: q$1((rhs, lhs) => { return lhs.index - rhs.index; }, []) },
+        });
         const ret = useCompleteGridNavigation({
             singleSelectionParameters: { initiallySelectedIndex: selectedRow, onSelectedIndexChange: setSelectedRow },
             gridNavigationParameters: { onTabbableColumnChange: setTabbableColumn },
-            linearNavigationParameters: { disableArrowKeys: false, disableHomeEndKeys: false },
-            sortableChildrenParameters: { compare: q$1((rhs, lhs) => { return lhs.index - rhs.index; }, []) },
+            linearNavigationParameters: { disableArrowKeys: false, disableHomeEndKeys: false, navigateAbsolute, navigateRelative },
             //managedChildrenReturn: { getChildren },
             rovingTabIndexParameters: { initiallyTabbedIndex: null, onTabbableIndexChange: setTabbableRow },
             typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000 },
-            rearrangeableChildrenParameters: {
-                getIndex: q$1((a) => a.props.index, []),
-            }
         });
-        const { context, props, rearrangeableChildrenReturn, managedChildrenReturn, } = ret;
-        const { useRearrangeableProps } = rearrangeableChildrenReturn;
+        const { context, props, managedChildrenReturn, rearrangeableChildrenParameters: { getHighestChildIndex: ghci, getValid: gv } } = ret;
         const { getChildren: getChildren2 } = managedChildrenReturn;
         /*const {
             linearNavigationParameters,
