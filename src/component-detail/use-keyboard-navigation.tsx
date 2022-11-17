@@ -28,10 +28,15 @@ export interface UseLinearNavigationReturnTypeInfo<ParentOrChildElement extends 
 export interface UseLinearNavigationReturnTypeWithHooks<ParentOrChildElement extends Element> extends UseLinearNavigationReturnTypeInfo<ParentOrChildElement> {
 }
 
+/** Default implementation with no sorting */
+export function navigateRelative(original: number, offset: number): number | null { return original + offset; }
+
+/** Default implementation with no sorting */
+export function navigateAbsolute(index: number): number | null { return index; }
 
 /** Arguments passed to the parent `useLinearNavigation` */
 export interface UseLinearNavigationParameters {
-    
+
     rovingTabIndexReturn: Pick<UseRovingTabIndexReturnType<any>["rovingTabIndexReturn"], "getTabbableIndex" | "setTabbableIndex">
     linearNavigationParameters: {
         navigateRelative(original: number, offset: number): number | null;
