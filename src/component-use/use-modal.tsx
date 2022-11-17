@@ -8,11 +8,11 @@ export interface UseModalParameters<Listeners extends DismissListenerTypes> exte
     focusTrapParameters: UseFocusTrapParameters<any, any>["focusTrapParameters"];
 }
 
-export interface UseModalReturnType<FocusContainerElement extends Element, SourceElement extends Element | null, PopupElement extends Element> extends UseDismissReturnType<SourceElement, PopupElement> {
-    propsFocusContainer: h.JSX.HTMLAttributes<FocusContainerElement>;
+export interface UseModalReturnType<FocusContainerElement extends Element | null, SourceElement extends Element | null, PopupElement extends Element> extends UseDismissReturnType<SourceElement, PopupElement> {
+    propsFocusContainer: h.JSX.HTMLAttributes<NonNullable<FocusContainerElement>>;
     propsPopup: h.JSX.HTMLAttributes<PopupElement>;
     propsSource: h.JSX.HTMLAttributes<NonNullable<SourceElement>>;
-    focusTrapReturn: Omit<UseFocusTrapReturnType<FocusContainerElement>["focusTrapReturn"], "propsUnstable">;
+    focusTrapReturn: Omit<UseFocusTrapReturnType<NonNullable<FocusContainerElement>>["focusTrapReturn"], "propsUnstable">;
 }
 
 /**
@@ -25,7 +25,7 @@ export interface UseModalReturnType<FocusContainerElement extends Element, Sourc
  * @param param0 
  * @returns 
  */
-export function useModal<Listeners extends DismissListenerTypes, FocusContainerElement extends Element, SourceElement extends Element | null, PopupElement extends Element>({
+export function useModal<Listeners extends DismissListenerTypes, FocusContainerElement extends Element | null, SourceElement extends Element | null, PopupElement extends Element>({
     dismissParameters,
     escapeDismissParameters,
     focusTrapParameters: { trapActive, ...focusTrapParameters }
@@ -34,7 +34,7 @@ export function useModal<Listeners extends DismissListenerTypes, FocusContainerE
     const { getWindow } = escapeDismissParameters;
     const getDocument = useCallback(() => { return getWindow().document; }, [getWindow]);
     const { refElementPopupReturn, refElementSourceReturn } = useDismiss<Listeners, SourceElement, PopupElement>({ dismissParameters, escapeDismissParameters });
-    const { focusTrapReturn, refElementReturn } = useFocusTrap<SourceElement, FocusContainerElement>({
+    const { focusTrapReturn, refElementReturn } = useFocusTrap<SourceElement, NonNullable<FocusContainerElement>>({
         activeElementParameters: { getDocument },
         focusTrapParameters: { trapActive: open && trapActive, ...focusTrapParameters },
         refElementParameters: {}
