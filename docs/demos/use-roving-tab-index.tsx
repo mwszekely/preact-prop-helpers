@@ -233,8 +233,7 @@ export const DemoUseRovingTabIndex = memo(() => {
     const r: UseCompleteListNavigationReturnType<HTMLUListElement, HTMLLIElement, M> = useCompleteListNavigation<HTMLUListElement, HTMLLIElement, UseListNavigationSingleSelectionChildInfo<HTMLLIElement>>({
         linearNavigationParameters: { disableArrowKeys: false, disableHomeEndKeys: false, navigationDirection: "vertical" },
         rearrangeableChildrenParameters: {
-            getIndex: useCallback<GetIndex<{ index: number }>>((a: VNode<{ index: number }>) => a.props.index, []),
-            getValid: useStableCallback<GetValid>((index) => { return !(getChildren().getAt(index)?.hidden) })
+            getIndex: useCallback<GetIndex<{ index: number }>>((a: VNode<{ index: number }>) => a.props.index, [])
         },
         rovingTabIndexParameters: { initiallyTabbedIndex: tabbableIndex, onTabbableIndexChange: setLocalTabbableIndex },
         singleSelectionParameters: { initiallySelectedIndex: selectedIndex, onSelectedIndexChange: setLocalSelectedIndex },

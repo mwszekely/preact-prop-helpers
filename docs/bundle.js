@@ -4866,9 +4866,17 @@ var bundle = (function (exports) {
         //type M = UseListNavigationSingleSelectionChildInfo<ChildElement>;
         const getChildren = q$1(() => managedChildrenReturn.getChildren(), []);
         const getHighestChildIndex = q$1(() => getChildren().getHighestIndex(), []);
+        const getValid = q$1((i) => {
+            const child = getChildren().getAt(i);
+            return !(child?.disabled || child?.hidden);
+        }, []);
         const { childrenHaveFocusParameters, managedChildrenParameters, rovingTabIndexChildContext, typeaheadNavigationChildContext, singleSelectionContext, ...listNavigationSingleSelectionSortableReturn } = useListNavigationSingleSelectionSortable({
             managedChildrenReturn: { getChildren },
-            rearrangeableChildrenParameters: { ...rearrangeableChildrenParameters, getHighestChildIndex },
+            rearrangeableChildrenParameters: {
+                ...rearrangeableChildrenParameters,
+                getValid,
+                getHighestChildIndex
+            },
             linearNavigationParameters: { getHighestIndex: getHighestChildIndex, ...linearNavigationParameters },
             ...completeListNavigationParameters,
         });
@@ -6186,8 +6194,7 @@ var bundle = (function (exports) {
         const r = useCompleteListNavigation({
             linearNavigationParameters: { disableArrowKeys: false, disableHomeEndKeys: false, navigationDirection: "vertical" },
             rearrangeableChildrenParameters: {
-                getIndex: q$1((a) => a.props.index, []),
-                getValid: useStableCallback((index) => { return !(getChildren().getAt(index)?.hidden); })
+                getIndex: q$1((a) => a.props.index, [])
             },
             rovingTabIndexParameters: { initiallyTabbedIndex: tabbableIndex, onTabbableIndexChange: setLocalTabbableIndex },
             singleSelectionParameters: { initiallySelectedIndex: selectedIndex, onSelectedIndexChange: setLocalSelectedIndex },
