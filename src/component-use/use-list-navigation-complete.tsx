@@ -1,17 +1,16 @@
 import { h } from "preact";
 import { useCallback } from "preact/hooks";
+import { useListNavigationSingleSelection, useListNavigationSingleSelectionChild } from "../component-detail/use-list-navigation-single-selection";
+import { UseListNavigationSingleSelectionSortableChildInfo, UseListNavigationSingleSelectionSortableChildParameters, UseListNavigationSingleSelectionSortableChildReturnType, UseListNavigationSingleSelectionSortableParameters, UseListNavigationSingleSelectionSortableReturnType } from "../component-detail/use-list-navigation-single-selection-sortable";
+import { useSortableChildren } from "../component-detail/use-sortable-children";
+import { useMergedProps } from "../dom-helpers/use-merged-props";
+import { useRefElement } from "../dom-helpers/use-ref-element";
 import { useChildrenHaveFocus, useChildrenHaveFocusChild, UseChildrenHaveFocusChildParameters, UseChildrenHaveFocusReturnTypeInfo } from "../observers/use-children-have-focus";
 import { useHasCurrentFocus, UseHasCurrentFocusReturnType } from "../observers/use-has-current-focus";
-import { useListNavigationSingleSelection, useListNavigationSingleSelectionChild } from "../component-detail/use-list-navigation-single-selection";
-import { useMergedProps } from "../dom-helpers/use-merged-props";
-import { usePress, UsePressParameters, UsePressReturnType } from "./use-press";
-import { useRefElement } from "../dom-helpers/use-ref-element";
+import { ManagedChildren, useManagedChild, useManagedChildren, UseManagedChildrenContext, UseManagedChildrenReturnType, UseManagedChildReturnType } from "../preact-extensions/use-child-manager";
 import { useStableCallback } from "../preact-extensions/use-stable-callback";
 import { useStableObject } from "../preact-extensions/use-stable-getter";
-import { ManagedChildren, useManagedChild, UseManagedChildParameters, useManagedChildren, UseManagedChildrenContext, UseManagedChildrenReturnType, UseManagedChildReturnType } from "../preact-extensions/use-child-manager";
-import { UseSingleSelectionChildParameters, UseSingleSelectionParameters } from "../component-detail/use-single-selection";
-import { UseRearrangeableChildrenParameters, useSortableChildren } from "../component-detail/use-sortable-children";
-import { UseListNavigationSingleSelectionSortableChildInfo, UseListNavigationSingleSelectionSortableChildParameters, UseListNavigationSingleSelectionSortableChildReturnType, UseListNavigationSingleSelectionSortableParameters, UseListNavigationSingleSelectionSortableReturnType } from "../component-detail/use-list-navigation-single-selection-sortable";
+import { usePress, UsePressParameters, UsePressReturnType } from "./use-press";
 
 
 export interface UseCompleteListNavigationParameters<ParentElement extends Element, ChildElement extends Element, M extends UseListNavigationSingleSelectionSortableChildInfo<ChildElement>> extends Pick<UseListNavigationSingleSelectionSortableParameters<ParentElement, ChildElement, M>, "rovingTabIndexParameters" | "singleSelectionParameters"> {
@@ -66,7 +65,7 @@ export function useCompleteListNavigation<ParentElement extends Element, ChildEl
     }, []);
 
     const { rearrangeableChildrenReturn, sortableChildrenReturn } = useSortableChildren<ParentElement, M>({
-        rearrangeableChildrenParameters: { ...rearrangeableChildrenParameters, getHighestChildIndex, getValid },
+        rearrangeableChildrenParameters,
         sortableChildrenParameters
     });
     const { indexDemangler, indexMangler } = rearrangeableChildrenReturn;

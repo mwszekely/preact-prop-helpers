@@ -1,18 +1,16 @@
-import { UseGridNavigationRowReturnType } from "../component-detail/use-grid-navigation-partial";
-import { UseGridNavigationSingleSelectionRowReturnType } from "../component-detail/use-grid-navigation-single-selection";
-import { GridSingleSelectChildCellInfo, GridSingleSelectChildRowInfo, useGridNavigationSingleSelection, useGridNavigationSingleSelectionCell, UseGridNavigationSingleSelectionCellParameters, UseGridNavigationSingleSelectionCellReturnType, UseGridNavigationSingleSelectionParameters, UseGridNavigationSingleSelectionReturnType, useGridNavigationSingleSelectionRow, UseGridNavigationSingleSelectionRowParameters } from "../component-detail/use-grid-navigation-single-selection";
 import { h } from "preact";
 import { useCallback } from "preact/hooks";
-import { ManagedChildren, useManagedChild, UseManagedChildParameters, useManagedChildren, UseManagedChildrenContext, UseManagedChildrenReturnType, UseManagedChildReturnType } from "../preact-extensions/use-child-manager";
-import { useChildrenHaveFocus, useChildrenHaveFocusChild, UseChildrenHaveFocusReturnTypeInfo } from "../observers/use-children-have-focus";
-import { useHasCurrentFocus, UseHasCurrentFocusReturnType } from "../observers/use-has-current-focus";
+import { UseGridNavigationRowReturnType } from "../component-detail/use-grid-navigation-partial";
+import { GridSingleSelectChildCellInfo, GridSingleSelectChildRowInfo, useGridNavigationSingleSelectionCell, UseGridNavigationSingleSelectionCellParameters, UseGridNavigationSingleSelectionParameters, UseGridNavigationSingleSelectionReturnType, useGridNavigationSingleSelectionRow, UseGridNavigationSingleSelectionRowReturnType } from "../component-detail/use-grid-navigation-single-selection";
+import { useGridNavigationSingleSelectionSortable, UseGridNavigationSingleSelectionSortableCellReturnType, UseGridNavigationSingleSelectionSortableParameters, UseGridNavigationSingleSelectionSortableReturnType, UseGridNavigationSingleSelectionSortableRowParameters, UseGridNavigationSingleSelectionSortableRowReturnType } from "../component-detail/use-grid-navigation-single-selection-sortable";
 import { useMergedProps } from "../dom-helpers/use-merged-props";
 import { useRefElement, UseRefElementReturnType } from "../dom-helpers/use-ref-element";
-import { GetValid, UseRearrangeableChildrenParameters } from "../component-detail/use-sortable-children";
+import { useChildrenHaveFocus, useChildrenHaveFocusChild, UseChildrenHaveFocusReturnTypeInfo } from "../observers/use-children-have-focus";
+import { useHasCurrentFocus, UseHasCurrentFocusReturnType } from "../observers/use-has-current-focus";
+import { ManagedChildren, useManagedChild, useManagedChildren, UseManagedChildrenContext, UseManagedChildrenReturnType, UseManagedChildReturnType } from "../preact-extensions/use-child-manager";
 import { useStableCallback } from "../preact-extensions/use-stable-callback";
 import { useStableObject } from "../preact-extensions/use-stable-getter";
 import { usePress, UsePressParameters, UsePressReturnType } from "./use-press";
-import { useGridNavigationSingleSelectionSortable, UseGridNavigationSingleSelectionSortableCellReturnType, UseGridNavigationSingleSelectionSortableParameters, UseGridNavigationSingleSelectionSortableReturnType, UseGridNavigationSingleSelectionSortableRowParameters, UseGridNavigationSingleSelectionSortableRowReturnType } from "../component-detail/use-grid-navigation-single-selection-sortable";
 
 
 export interface UseCompleteGridNavigationParameters<_ParentOrRowElement extends Element, RowElement extends Element, M extends GridSingleSelectChildRowInfo<RowElement>> extends
@@ -51,10 +49,10 @@ export interface CompleteGridNavigationContext<ParentElement extends Element, Ch
 
 export interface CompleteGridNavigationRowContext<ParentElement extends Element, ChildElement extends Element, M extends GridSingleSelectChildCellInfo<ChildElement> = GridSingleSelectChildCellInfo<ChildElement>> extends UseManagedChildrenContext<M>,
     Pick<UseGridNavigationRowReturnType<ParentElement, ChildElement>["asParentRowReturn"], "rovingTabIndexChildContext" | "typeaheadNavigationChildContext" | "gridNavigationCellContext"> {
-        completeGridNavigationContext: {
-            onPressSync: UsePressParameters<ChildElement, never>["pressParameters"]["onPressSync"]
-        }
-    };
+    completeGridNavigationContext: {
+        onPressSync: UsePressParameters<ChildElement, never>["pressParameters"]["onPressSync"]
+    }
+}
 
 
 export interface UseCompleteGridNavigationReturnType<ParentElement extends Element, ChildElement extends Element, M extends GridSingleSelectChildRowInfo<ChildElement>>
@@ -97,7 +95,7 @@ export function useCompleteGridNavigation<ParentOrRowElement extends Element, Ro
     const getChildren: () => ManagedChildren<M> = useCallback<() => ManagedChildren<M>>(() => managedChildrenReturn.getChildren(), []);
     const getHighestChildIndex: (() => number) = useCallback<() => number>(() => getChildren().getHighestIndex(), []);
 
-    const getValid = useStableCallback<GetValid>((index): boolean => { return !(getChildren().getAt(index)?.hidden) });
+    //const getValid = useStableCallback<GetValid>((index): boolean => { return !(getChildren().getAt(index)?.hidden) });
 
     const {
         childrenHaveFocusParameters,
@@ -114,7 +112,7 @@ export function useCompleteGridNavigation<ParentOrRowElement extends Element, Ro
         rovingTabIndexParameters,
         singleSelectionParameters,
         typeaheadNavigationParameters,
-        rearrangeableChildrenParameters: { ...rearrangeableChildrenParameters, getHighestChildIndex, getValid },
+        rearrangeableChildrenParameters,
         sortableChildrenParameters
     });
 

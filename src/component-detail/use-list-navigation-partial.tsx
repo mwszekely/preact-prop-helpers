@@ -36,6 +36,9 @@ import { useRovingTabIndex, useRovingTabIndexChild, UseRovingTabIndexChildInfo, 
  * (Note to self: At some point, this file will probably be normalized
  * by somebody and 着 will turn back into 着.)
  * 
+ * Unrelated, but hey, this is fun: try highlighting the space between the two characters in VS Code,
+ * or just typing a character in between them. What's up with this?
+ * 着 着
  */
 const _dummy: any = null;
 

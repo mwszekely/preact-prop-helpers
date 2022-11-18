@@ -2098,7 +2098,7 @@ var bundle = (function (exports) {
         const { getTabbableIndex, setTabbableIndex } = rovingTabIndexReturn;
         const navigateAbsolute = q$1((i, fromUserInteraction) => {
             const target = indexDemangler(i);
-            const { status, value } = tryNavigateToIndex({ isValid, highestChildIndex: getHighestIndex(), indexDemangler, indexMangler, searchDirection: -1, target });
+            const { value } = tryNavigateToIndex({ isValid, highestChildIndex: getHighestIndex(), indexDemangler, indexMangler, searchDirection: -1, target });
             setTabbableIndex(value, fromUserInteraction);
         }, []);
         const navigateToFirst = useStableCallback((fromUserInteraction) => { navigateAbsolute(0, fromUserInteraction); });
@@ -2111,6 +2111,7 @@ var bundle = (function (exports) {
                     if (mode == "single")
                         navigateToFirst(fromUserInteraction);
                     else {
+                        /* eslint-disable no-constant-condition */
                         // Uncomment to allow page up/down to wrap after hitting the top/bottom once.
                         // It works fine, the problem isn't that -- the problem is it just feels wrong. 
                         // Page Up/Down don't feel like they should wrap, even if normally requested. 
@@ -2128,6 +2129,7 @@ var bundle = (function (exports) {
                         navigateToLast(fromUserInteraction);
                     }
                     else {
+                        /* eslint-disable no-constant-condition */
                         // See above. It works fine but just feels wrong to wrap on Page Up/Down.
                         navigateToFirst(fromUserInteraction);
                     }
@@ -4073,7 +4075,7 @@ var bundle = (function (exports) {
      * Because keys are given special treatment and a child has no way of modifying its own key
      * there's no other time or place this can happen other than exactly within the parent component's render function.
      */
-    function useRearrangeableChildren({ rearrangeableChildrenParameters: { getIndex, getValid, getHighestChildIndex } }) {
+    function useRearrangeableChildren({ rearrangeableChildrenParameters: { getIndex } }) {
         // These are used to keep track of a mapping between unsorted index <---> sorted index.
         // These are needed for navigation with the arrow keys.
         const mangleMap = A(new Map());
@@ -4085,35 +4087,6 @@ var bundle = (function (exports) {
             const shuffledRows = shuffle(managedRows.arraySlice());
             return rearrange(shuffledRows);
         }, [ /* Must remain stable */]);
-        /*const navigateAbsolute = useCallback((i: number | null) => {
-            if (i != null) {
-                const { value: nextIndex, status } = tryNavigateToIndex({
-                    highestChildIndex: getHighestChildIndex(),
-                    isValid: getValid,
-                    target: i,
-                    searchDirection: 1,
-                    indexMangler: indexMangler,
-                    indexDemangler: indexDemangler
-                });
-                console.assert(status == "normal");
-                return (i == null ? null : nextIndex);
-            }
-            else {
-                return null;
-            }
-        }, []);
-        const navigateRelative = useCallback((original: number, offset: number) => {
-            const { value, status } = tryNavigateToIndex({
-                target: indexDemangler(indexMangler(original) + offset),
-                highestChildIndex: getHighestChildIndex(),
-                isValid: getValid,
-                searchDirection: (Math.sign(offset) || 1) as 1 | -1,
-                indexMangler: indexMangler,
-                indexDemangler: indexDemangler
-            });
-
-            return value;
-        }, []);*/
         // The sort function needs to be able to update whoever has all the sortable children.
         // Because that might not be the consumer of *this* hook directly (e.g. a table uses
         // this hook, but it's tbody that actually needs updating), we need to remotely
@@ -4121,6 +4094,8 @@ var bundle = (function (exports) {
         //const [getForceUpdate, setForceUpdate] = usePassiveState<null | (() => void)>(null, returnNull);
         const [getForceUpdate, setForceUpdate] = usePassiveState(null, returnNull);
         const rearrange = q$1((sortedRows) => {
+            mangleMap.current.clear();
+            demangleMap.current.clear();
             // Update our sorted <--> unsorted indices map 
             // and rerender the whole table, basically
             for (let indexAsSorted = 0; indexAsSorted < sortedRows.length; ++indexAsSorted) {
@@ -4191,6 +4166,47 @@ var bundle = (function (exports) {
             rearrangeableChildrenReturn
         };
     }
+    /*export interface UseGroupedSortableChildrenParameters<M extends GroupedSortedChildInfo> {
+        managedChildrenReturn: UseManagedChildrenReturnType<M>["managedChildrenReturn"]
+    }
+
+    export interface UseGroupedSortableChildren {
+        linearNavigationParameters: Pick<UseLinearNavigationParameters["linearNavigationParameters"], "indexDemangler" | "indexMangler">
+    }*/
+    /**
+     * It's common enough to have, e.g., a list with multiple sortable groups, a table where the body is sorted independently of the head, etc...
+     *
+     * A sortable group assumes that the parent (which also calls this hook) handles list navigation (or similar),
+     * and that each group element (which can also be the list parent, if there are NO groups) handles sorting (or similar).
+     */
+    /*export function useGroupedSortableChildren<M extends GroupedSortedChildInfo>({ managedChildrenReturn: { getChildren } }: UseGroupedSortableChildrenParameters<M>): UseGroupedSortableChildren {
+        const allIndexManglers = useRef<Map<number, (i: number) => number>>(new Map());
+        const allIndexDemanglers = useRef<Map<number, (i: number) => number>>(new Map());
+        const indexMangler = useCallback((i: number): number => {
+            const child = getChildren().getAt(i);
+            if (child) {
+                let indexManglerForThisLocation = allIndexManglers.current.get(child.locationIndex);
+                return (indexManglerForThisLocation ?? identity)(i);
+            }
+            return identity(i);
+        }, []);
+        const indexDemangler = useCallback((i: number): number => {
+            const child = getChildren().getAt(i);
+            if (child) {
+                let indexDemanglerForThisLocation = allIndexDemanglers.current.get(child.locationIndex);
+                return (indexDemanglerForThisLocation ?? identity)(i);
+            }
+            return identity(i);
+        }, []);
+
+
+        return {
+            linearNavigationParameters: {
+                indexMangler,
+                indexDemangler
+            }
+        }
+    }*/
     function defaultCompare(lhs, rhs) {
         return compare1(lhs, rhs);
         function compare3(lhs, rhs) {
@@ -4773,7 +4789,7 @@ var bundle = (function (exports) {
     function useCompleteGridNavigation({ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, typeaheadNavigationParameters, sortableChildrenParameters, rearrangeableChildrenParameters }) {
         const getChildren = q$1(() => managedChildrenReturn.getChildren(), []);
         const getHighestChildIndex = q$1(() => getChildren().getHighestIndex(), []);
-        const getValid = useStableCallback((index) => { return !(getChildren().getAt(index)?.hidden); });
+        //const getValid = useStableCallback<GetValid>((index): boolean => { return !(getChildren().getAt(index)?.hidden) });
         const { childrenHaveFocusParameters, managedChildrenParameters, rovingTabIndexChildContext, singleSelectionContext, typeaheadNavigationChildContext, gridNavigationRowContext, ...gridNavigationSingleSelectionReturn } = useGridNavigationSingleSelectionSortable({
             gridNavigationParameters,
             linearNavigationParameters: { getHighestIndex: getHighestChildIndex, ...linearNavigationParameters },
@@ -4781,7 +4797,7 @@ var bundle = (function (exports) {
             rovingTabIndexParameters,
             singleSelectionParameters,
             typeaheadNavigationParameters,
-            rearrangeableChildrenParameters: { ...rearrangeableChildrenParameters, getHighestChildIndex, getValid },
+            rearrangeableChildrenParameters,
             sortableChildrenParameters
         });
         const { linearNavigationReturn, typeaheadNavigationReturn } = gridNavigationSingleSelectionReturn;
@@ -4943,7 +4959,7 @@ var bundle = (function (exports) {
             return !child.hidden;
         }, []);
         const { rearrangeableChildrenReturn, sortableChildrenReturn } = useSortableChildren({
-            rearrangeableChildrenParameters: { ...rearrangeableChildrenParameters, getHighestChildIndex, getValid },
+            rearrangeableChildrenParameters,
             sortableChildrenParameters
         });
         const { indexDemangler, indexMangler } = rearrangeableChildrenReturn;

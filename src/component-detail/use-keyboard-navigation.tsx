@@ -64,14 +64,26 @@ export interface UseLinearNavigationParameters {
         pageNavigationSize: number;
 
         /**
-         * What happens when `up` is pressed on the first child?
+         * What happens when `up` is pressed on the first valid child?
          */
         navigatePastStart: "wrap" | (() => void);
+        /**
+         * What happens when `down` is pressed on the last valid child?
+         */
         navigatePastEnd: "wrap" | (() => void);
+
+        /**
+         * Turn a sorted `index` into its original, unsorted `index`. Use `identity` if you don't care.
+         * 
+         * This is what allows our linear keyboard navigation to still work if the children are re-ordered
+         * (i.e. how when reverse-sorted, pressing `down` moves from item #9 to item #8).
+         */
         indexMangler: (n: number) => number;
+        /**
+         * Turn an unsorted `index` into its visual display `index`. Use `identity` if you don't care.
+         */
         indexDemangler: (n: number) => number;
-        //navigateRelative(original: number, offset: number): LinearNavigationResult;
-        //navigateAbsolute(index: number | null): LinearNavigationResult;
+
         getHighestIndex(): number;  // [0, n], not [0, n)
 
         /**
@@ -119,7 +131,7 @@ export function useLinearNavigation<ParentOrChildElement extends Element>({
 
     const navigateAbsolute = useCallback((i: number, fromUserInteraction: boolean) => {
         const target = indexDemangler(i);
-        const { status, value } = tryNavigateToIndex({ isValid, highestChildIndex: getHighestIndex(), indexDemangler, indexMangler, searchDirection: -1, target });
+        const { value } = tryNavigateToIndex({ isValid, highestChildIndex: getHighestIndex(), indexDemangler, indexMangler, searchDirection: -1, target });
         setTabbableIndex(value, fromUserInteraction);
     }, []);
     const navigateToFirst = useStableCallback((fromUserInteraction: boolean) => { navigateAbsolute(0, fromUserInteraction); });
@@ -133,6 +145,7 @@ export function useLinearNavigation<ParentOrChildElement extends Element>({
                     navigateToFirst(fromUserInteraction);
                 else {
 
+                    /* eslint-disable no-constant-condition */
                     // Uncomment to allow page up/down to wrap after hitting the top/bottom once.
                     // It works fine, the problem isn't that -- the problem is it just feels wrong. 
                     // Page Up/Down don't feel like they should wrap, even if normally requested. 
@@ -153,6 +166,7 @@ export function useLinearNavigation<ParentOrChildElement extends Element>({
                     navigateToLast(fromUserInteraction);
                 }
                 else {
+                    /* eslint-disable no-constant-condition */
                     // See above. It works fine but just feels wrong to wrap on Page Up/Down.
                     if (false && value == getTabbableIndex())
                         navigateToLast(fromUserInteraction);
@@ -319,7 +333,7 @@ export function tryNavigateToIndex({ isValid, highestChildIndex: upper, searchDi
         return target > upper ? { value: indexDemangler(upper), status: "past-end" } : { value: target, status: "normal" };
     }
     else {
-        return { value: lower, status: "normal" };;
+        return { value: lower, status: "normal" };
     }
 }
 
