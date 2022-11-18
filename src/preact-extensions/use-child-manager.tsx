@@ -27,7 +27,14 @@ import { useStableObject } from "./use-stable-getter";
 const _comments = void (0);
 
 export interface UseManagedChildrenContext<M extends ManagedChildInfo<any>> {
-    managedChildrenReturn: UseManagedChildrenReturnType<M>["managedChildrenReturn"]
+    //managedChildrenReturn: UseManagedChildrenReturnType<M>["managedChildrenReturn"]
+
+    managedChildParameters: {
+        getChildren(): ManagedChildren<M>;
+        managedChildrenArray: InternalChildInfo<M>;
+        remoteULEChildMounted: (index: M["index"], mounted: boolean) => void;
+        remoteULEChildChanged: (index: M["index"]) => (() => void);
+    }
 }
 
 
@@ -85,7 +92,7 @@ export interface UseManagedChildrenParameters<M extends ManagedChildInfo<any>> {
 // SubbestInfo refers to the actual parameters the user passes in that could be totally unrelated. 
 export interface UseManagedChildParameters<M extends ManagedChildInfo<any>> {
     managedChildParameters: M;
-    managedChildContext: UseManagedChildrenReturnType<M>["managedChildContext"];
+    managedChildContext: UseManagedChildrenContext<M>;
 }
 
 
@@ -107,14 +114,7 @@ export interface UseManagedChildrenReturnType<M extends ManagedChildInfo<any>> {
 
     };
 
-    managedChildContext: {
-        managedChildParameters: {
-            getChildren(): ManagedChildren<M>;
-            managedChildrenArray: InternalChildInfo<M>;
-            remoteULEChildMounted: (index: M["index"], mounted: boolean) => void;
-            remoteULEChildChanged: (index: M["index"]) => (() => void);
-        }
-    };
+    managedChildContext: UseManagedChildrenContext<M>;
 }
 
 export interface UseManagedChildReturnType<M extends ManagedChildInfo<any>> {
