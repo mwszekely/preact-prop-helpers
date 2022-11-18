@@ -106,7 +106,6 @@ export function useCompleteListNavigation<ParentElement extends Element, ChildEl
         managedChildrenReturn,
         rearrangeableChildrenReturn,
         sortableChildrenReturn,
-        //rearrangeableChildrenParameters: { getHighestChildIndex, getValid },
         linearNavigationReturn,
         rovingTabIndexReturn,
         singleSelectionReturn,
@@ -116,11 +115,9 @@ export function useCompleteListNavigation<ParentElement extends Element, ChildEl
 }
 
 export interface UseCompleteListNavigationChildParameters<ChildElement extends Element, M extends UseListNavigationSingleSelectionSortableChildInfo<ChildElement>> extends Pick<UseListNavigationSingleSelectionSortableChildParameters<ChildElement>, "managedChildParameters" | "typeaheadNavigationChildParameters"> {
-    //managedChildContext: UseManagedChildParameters<M>["managedChildContext"];
     context: CompleteListNavigationContext<any, ChildElement, M>;
-    pressParameters: UsePressParameters<ChildElement, never>["pressParameters"];
+    pressParameters: UsePressParameters<ChildElement>["pressParameters"];
     singleSelectionChildParameters: UseListNavigationSingleSelectionSortableChildParameters<ChildElement>["singleSelectionChildParameters"];
-    //childrenHaveFocusChildContext: UseChildrenHaveFocusChildParameters["childrenHaveFocusChildContext"];
     completeListNavigationChildParameters: Omit<M, keyof UseListNavigationSingleSelectionSortableChildInfo<ChildElement>>;
 }
 

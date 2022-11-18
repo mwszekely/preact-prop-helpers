@@ -32,7 +32,7 @@ export interface UseCompleteGridNavigationRowParameters<RowElement extends Eleme
 
 export interface UseCompleteGridNavigationCellParameters<CellElement extends Element, M extends GridSingleSelectChildCellInfo<CellElement>> extends
     Omit<UseGridNavigationSingleSelectionCellParameters<CellElement>, "typeaheadNavigationChildContext" | "rovingTabIndexChildContext" | "gridNavigationCellContext"> {
-    pressParameters: UsePressParameters<CellElement, never>["pressParameters"];
+    pressParameters: UsePressParameters<CellElement>["pressParameters"];
     //managedChildContext: UseManagedChildParameters<M>["managedChildContext"];
     completeGridNavigationCellParameters: Omit<M, keyof GridSingleSelectChildCellInfo<CellElement>>;
     context: CompleteGridNavigationRowContext<any, CellElement, M>;
@@ -50,7 +50,7 @@ export interface CompleteGridNavigationContext<ParentElement extends Element, Ch
 export interface CompleteGridNavigationRowContext<ParentElement extends Element, ChildElement extends Element, M extends GridSingleSelectChildCellInfo<ChildElement> = GridSingleSelectChildCellInfo<ChildElement>> extends UseManagedChildrenContext<M>,
     Pick<UseGridNavigationRowReturnType<ParentElement, ChildElement>["asParentRowReturn"], "rovingTabIndexChildContext" | "typeaheadNavigationChildContext" | "gridNavigationCellContext"> {
     completeGridNavigationContext: {
-        onPressSync: UsePressParameters<ChildElement, never>["pressParameters"]["onPressSync"]
+        onPressSync: UsePressParameters<ChildElement>["pressParameters"]["onPressSync"]
     }
 }
 

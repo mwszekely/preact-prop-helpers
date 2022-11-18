@@ -4579,9 +4579,9 @@ var bundle = (function (exports) {
      * @param exclude Whether the polyfill shouldn't apply (can specify for specific interactions)
      */
     function usePress(args) {
-        const { refElementReturn: { getElement }, pressParameters: { exclude, focusSelf, onPressSync, onPseudoActiveStart, onPseudoActiveStop } } = args;
-        const stableOnPseudoActiveStart = useStableCallback(onPseudoActiveStart ?? (() => { }));
-        const stableOnPseudoActiveStop = useStableCallback(onPseudoActiveStop ?? (() => { }));
+        const { refElementReturn: { getElement }, pressParameters: { exclude, focusSelf, onPressSync } } = args;
+        //const stableOnPseudoActiveStart = useStableCallback(onPseudoActiveStart ?? (() => { }));
+        //const stableOnPseudoActiveStop = useStableCallback(onPseudoActiveStop ?? (() => { }));
         // A button can be activated in multiple ways, so on the off chance
         // that multiple are triggered at once, we only *actually* register
         // a press once all of our "on" signals have turned back to "off".
@@ -4603,13 +4603,7 @@ var bundle = (function (exports) {
         // no longer active.
         const [textSelectedDuringActivationStartTime, setTextSelectedDuringActivationStartTime] = useState(null);
         const pseudoActive = (activeDuringRender && (textSelectedDuringActivationStartTime == null));
-        s(() => { if (pseudoActive) {
-            stableOnPseudoActiveStart();
-        }
-        else {
-            stableOnPseudoActiveStop();
-        } return () => { if (pseudoActive)
-            stableOnPseudoActiveStop(); }; }, [pseudoActive]);
+        //useEffect(() => { if (pseudoActive) { stableOnPseudoActiveStart(); } else { stableOnPseudoActiveStop(); } return () => { if (pseudoActive) stableOnPseudoActiveStop(); } }, [pseudoActive])
         useGlobalHandler(document, "selectionchange", _ => {
             setTextSelectedDuringActivationStartTime(prev => nodeSelectedTextLength(getElement()) == 0 ? null : prev != null ? prev : new Date());
         });
@@ -4747,6 +4741,7 @@ var bundle = (function (exports) {
         });
         return {
             pressReturn: {
+                pseudoActive: (pseudoActive || false),
                 propsStable: propsStable2.current,
                 /*propsUnstable: {
                     style: (textSelectedDuringActivationStartTime != null) ? { cursor: "text" } : undefined,
@@ -4986,7 +4981,6 @@ var bundle = (function (exports) {
             managedChildrenReturn,
             rearrangeableChildrenReturn,
             sortableChildrenReturn,
-            //rearrangeableChildrenParameters: { getHighestChildIndex, getValid },
             linearNavigationReturn,
             rovingTabIndexReturn,
             singleSelectionReturn,
@@ -6347,7 +6341,7 @@ var bundle = (function (exports) {
         //const { getElement, propsStable: p3 } = refElementReturn;
         const { props, rovingTabIndexChildReturn: { tabbable, propsUnstable: p2 }, singleSelectionChildReturn: { selected } } = useCompleteListNavigationChild({
             managedChildParameters: { hidden, disabled, index },
-            pressParameters: { onPressSync: null, exclude: {}, focusSelf, onPseudoActiveStart: null, onPseudoActiveStop: null },
+            pressParameters: { onPressSync: null, exclude: {}, focusSelf },
             singleSelectionChildParameters: { ariaPropName: "aria-selected", selectionMode },
             typeaheadNavigationChildParameters: { text },
             completeListNavigationChildParameters: {},
@@ -6927,7 +6921,7 @@ var bundle = (function (exports) {
             context,
             typeaheadNavigationChildParameters: { text: "", },
             completeGridNavigationCellParameters: {},
-            pressParameters: { exclude: index <= 1, focusSelf: useStableCallback(e => e.focus()), onPressSync: null, onPseudoActiveStart: null, onPseudoActiveStop: null }
+            pressParameters: { exclude: index <= 1, focusSelf: useStableCallback(e => e.focus()), onPressSync: null }
         });
         const t = (tabbable ? "(Tabbable)" : "(Not tabbable)");
         if (index === 0)

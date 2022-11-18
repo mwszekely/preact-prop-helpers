@@ -750,7 +750,7 @@ const DemoUseGridCell = (({ index, row, rowIsTabbable }: { index: number, row: n
         context,
         typeaheadNavigationChildParameters: { text: "", },
         completeGridNavigationCellParameters: {},
-        pressParameters: { exclude: index <= 1, focusSelf: useStableCallback(e => e.focus()), onPressSync: null, onPseudoActiveStart: null, onPseudoActiveStop: null }
+        pressParameters: { exclude: index <= 1, focusSelf: useStableCallback(e => e.focus()), onPressSync: null }
     });
 
 

@@ -69,7 +69,7 @@ export interface UseSingleSelectionChildReturnTypeInfo<E extends Element> extend
     }
     //refElementParameters: Required<Pick<UseRefElementParameters<E>["refElementParameters"], "onElementChange">>;
     managedChildParameters: Pick<UseManagedChildParameters<SelectableChildInfo<E>>["managedChildParameters"], "selected" | "setSelected" | "getSelected">;
-    pressParameters: Pick<UsePressParameters<E, never>["pressParameters"], "onPressSync">;
+    pressParameters: Pick<UsePressParameters<E>["pressParameters"], "onPressSync">;
 }
 
 export interface UseSingleSelectionChildReturnTypeWithHooks<E extends Element> extends UseSingleSelectionChildReturnTypeInfo<E> {

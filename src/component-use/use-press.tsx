@@ -10,36 +10,39 @@ export function usePressProps<E extends Element>(r: UsePressReturnType<E>, ...ot
     return [r.pressReturn.propsStable, ...otherProps];
 }*/
 
-interface PP<E extends Node> {
-    /**
-     * What should happen when this widget has been "pressed".
-     * 
-     * This must be a sync event handler; async handlers must be taken care of externally.
-     */
-    onPressSync: ((e: h.JSX.TargetedEvent<E>) => void) | null | undefined;
-
-    /**
-     * Whether certain methods of pressing this component should be deactivated.
-     * 
-     * For example, during typeahead, the space key shouldn't count as a press, it should just count for the search.
-     * 
-     * If true, then all presses are disabled.  If false/undefined/null, no presses are disabled.
-     */
-    exclude: undefined | boolean | { click?: "exclude" | undefined, space?: "exclude" | undefined, enter?: "exclude" | undefined };
-    focusSelf(element: E): void;
-    onPseudoActiveStart: null | undefined | (() => void);
-    onPseudoActiveStop: null | undefined | (() => void);
-}
-
-export type UsePressParametersOmits = keyof PP<any>;
-
-export interface UsePressParameters<E extends Node, PPOmits extends UsePressParametersOmits> {
+export interface UsePressParameters<E extends Node> {
     refElementReturn: Required<Pick<UseRefElementReturnType<E>["refElementReturn"], "getElement">>;
-    pressParameters: Omit<PP<E>, PPOmits>;
+    pressParameters: {
+        /**
+         * What should happen when this widget has been "pressed".
+         * 
+         * This must be a sync event handler; async handlers must be taken care of externally.
+         * 
+         * Setting to `null` or `undefined` effectively disables the press event handler.
+         */
+        onPressSync: ((e: h.JSX.TargetedEvent<E>) => void) | null | undefined;
+
+        /**
+         * Whether certain methods of pressing this component should be deactivated.
+         * 
+         * For example, during typeahead, the space key shouldn't count as a press, it should just count for the search.
+         * 
+         * If true, then all presses are disabled.  If false/undefined/null, no presses are disabled.
+         */
+        exclude: undefined | boolean | { click?: "exclude" | undefined, space?: "exclude" | undefined, enter?: "exclude" | undefined };
+        focusSelf(element: E): void;
+        //onPseudoActiveStart: null | undefined | (() => void);
+        //onPseudoActiveStop: null | undefined | (() => void);
+    }
 }
 
 export interface UsePressReturnType<E extends Element> {
     pressReturn: {
+        /** 
+         * Sort of like when the CSS `:active` pseudo-element would apply,
+         * but specifically for presses only. Useful for styling mostly.
+         */
+        pseudoActive: boolean;
         propsStable: h.JSX.HTMLAttributes<E>;
     }
 }
@@ -63,14 +66,14 @@ export interface UsePressReturnType<E extends Element> {
  * @param onClickSync 
  * @param exclude Whether the polyfill shouldn't apply (can specify for specific interactions)
  */
-export function usePress<E extends Element>(args: UsePressParameters<E, never>): UsePressReturnType<E> {
+export function usePress<E extends Element>(args: UsePressParameters<E>): UsePressReturnType<E> {
     const {
         refElementReturn: { getElement },
-        pressParameters: { exclude, focusSelf, onPressSync, onPseudoActiveStart, onPseudoActiveStop }
+        pressParameters: { exclude, focusSelf, onPressSync }
     } = args;
 
-    const stableOnPseudoActiveStart = useStableCallback(onPseudoActiveStart ?? (() => { }));
-    const stableOnPseudoActiveStop = useStableCallback(onPseudoActiveStop ?? (() => { }));
+    //const stableOnPseudoActiveStart = useStableCallback(onPseudoActiveStart ?? (() => { }));
+    //const stableOnPseudoActiveStop = useStableCallback(onPseudoActiveStop ?? (() => { }));
 
     // A button can be activated in multiple ways, so on the off chance
     // that multiple are triggered at once, we only *actually* register
@@ -95,7 +98,7 @@ export function usePress<E extends Element>(args: UsePressParameters<E, never>):
     // no longer active.
     const [textSelectedDuringActivationStartTime, setTextSelectedDuringActivationStartTime] = useState<Date | null>(null);
     const pseudoActive = (activeDuringRender && (textSelectedDuringActivationStartTime == null));
-    useEffect(() => { if (pseudoActive) { stableOnPseudoActiveStart(); } else { stableOnPseudoActiveStop(); } return () => { if (pseudoActive) stableOnPseudoActiveStop(); } }, [pseudoActive])
+    //useEffect(() => { if (pseudoActive) { stableOnPseudoActiveStart(); } else { stableOnPseudoActiveStop(); } return () => { if (pseudoActive) stableOnPseudoActiveStop(); } }, [pseudoActive])
 
     useGlobalHandler(document, "selectionchange", _ => {
         setTextSelectedDuringActivationStartTime(prev => nodeSelectedTextLength(getElement()) == 0 ? null : prev != null ? prev : new Date());
@@ -260,6 +263,7 @@ export function usePress<E extends Element>(args: UsePressParameters<E, never>):
 
     return {
         pressReturn: {
+            pseudoActive: (pseudoActive || false),
             propsStable: propsStable2.current,
             /*propsUnstable: {
                 style: (textSelectedDuringActivationStartTime != null) ? { cursor: "text" } : undefined,
