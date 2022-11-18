@@ -343,7 +343,7 @@ const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
         disabled = hidden = true;
     }
     const [randomWord] = useState(() => RandomWords[index/*Math.floor(Math.random() * (RandomWords.length - 1))*/]);
-    const { managedChildContext, rovingTabIndexChildContext, childrenHaveFocusChildContext, typeaheadNavigationChildContext, singleSelectionContext } = useContext(ListNavigationSingleSelectionChildContext) as CompleteListNavigationContext<HTMLOListElement, HTMLLIElement, UseListNavigationSingleSelectionChildInfo<HTMLLIElement>>;
+    const context = useContext(ListNavigationSingleSelectionChildContext) as CompleteListNavigationContext<HTMLOListElement, HTMLLIElement, UseListNavigationSingleSelectionChildInfo<HTMLLIElement>>;
     const text = `${randomWord} This is item #${index}${hidden ? " (hidden)" : ""}${disabled ? " (disabled)" : ""}`;
     const focusSelf = useCallback((e: HTMLElement) => { e.focus() }, []);
     // const { refElementReturn } = useRefElement<HTMLLIElement>({ refElementParameters: { onElementChange: undefined } });
@@ -354,16 +354,12 @@ const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
         rovingTabIndexChildReturn: { tabbable, propsUnstable: p2 },
         singleSelectionChildReturn: { selected }
     } = useCompleteListNavigationChild<HTMLLIElement, UseListNavigationSingleSelectionChildInfo<HTMLLIElement>>({
-        childrenHaveFocusChildContext,
-        managedChildContext,
         managedChildParameters: { hidden, disabled, index },
         pressParameters: { onPressSync: null, exclude: {}, focusSelf, onPseudoActiveStart: null, onPseudoActiveStop: null },
-        rovingTabIndexChildContext,
-        singleSelectionContext: singleSelectionContext,
         singleSelectionChildParameters: { ariaPropName: "aria-selected", selectionMode },
-        typeaheadNavigationChildContext,
         typeaheadNavigationChildParameters: { text },
-        completeListNavigationChildParameters: {}
+        completeListNavigationChildParameters: {},
+        context
     });
 
     /*

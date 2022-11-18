@@ -694,21 +694,11 @@ const DemoUseGridRow = memo((({ index }: { index: number }) => {
 
 //    const getValid = useStableCallback<GetValid>((i) => !!(ret.managedChildReturn.getChildren().getAt(i)?.hidden));
 
-    const {
-        managedChildContext,
-        rovingTabIndexChildContext,
-        singleSelectionContext,
-        typeaheadNavigationChildContext,
-        gridNavigationRowContext,
-    } = useContext(GridRowContext) as CompleteGridNavigationContext<HTMLTableSectionElement, HTMLTableRowElement>;
+    const contextFromParent = useContext(GridRowContext) as CompleteGridNavigationContext<HTMLTableSectionElement, HTMLTableRowElement>;
     const ret: UseCompleteGridNavigationRowReturnType<HTMLTableRowElement, HTMLTableCellElement, GridSingleSelectChildRowInfo<HTMLTableRowElement>, GridSingleSelectChildCellInfo<HTMLTableCellElement>> = useCompleteGridNavigationRow<HTMLTableRowElement, HTMLTableCellElement>({
         asChildRowParameters: {
             completeGridNavigationRowParameters: {},
-            gridNavigationRowContext,
-            managedChildContext,
-            rovingTabIndexChildContext,
-            singleSelectionContext,
-            typeaheadNavigationChildContext,
+            context: contextFromParent,
             managedChildParameters: { hidden, index, disabled },
             singleSelectionChildParameters: { ariaPropName: "aria-checked", selectionMode: "focus" },
             typeaheadNavigationChildParameters: { text: "" }
@@ -722,13 +712,13 @@ const DemoUseGridRow = memo((({ index }: { index: number }) => {
 
     const {
         asChildRowReturn: { rovingTabIndexChildReturn: { tabbable } },
-        context,
+        context: contextToChild,
         props
     } = ret;
 
     return (
         <tr {...props}>
-            <GridCellContext.Provider value={context}>
+            <GridCellContext.Provider value={contextToChild}>
                 {Array.from((function* () {
                     for (let i = 0; i < 3; ++i) {
                         yield <DemoUseGridCell index={i} key={i} row={index} rowIsTabbable={tabbable} />
@@ -747,13 +737,7 @@ const DemoUseGridCell = (({ index, row, rowIsTabbable }: { index: number, row: n
     let hiddenText = (row === 3) ? " (row hidden)" : ""
 
 
-    const {
-        completeGridNavigationContext,
-        managedChildContext,
-        rovingTabIndexChildContext,
-        typeaheadNavigationChildContext,
-        gridNavigationCellContext
-    } = useContext(GridCellContext) as CompleteGridNavigationRowContext<HTMLTableRowElement, HTMLTableCellElement>;
+    const context = useContext(GridCellContext) as CompleteGridNavigationRowContext<HTMLTableRowElement, HTMLTableCellElement>;
 
 
     const {
@@ -763,13 +747,9 @@ const DemoUseGridCell = (({ index, row, rowIsTabbable }: { index: number, row: n
     } = useCompleteGridNavigationCell<HTMLTableCellElement>({
         gridNavigationCellParameters: { colSpan: 1 },
         managedChildParameters: { hidden: false, index },
-        completeGridNavigationContext,
-        gridNavigationCellContext,
-        rovingTabIndexChildContext,
-        typeaheadNavigationChildContext,
+        context,
         typeaheadNavigationChildParameters: { text: "", },
         completeGridNavigationCellParameters: {},
-        managedChildContext,
         pressParameters: { exclude: index <= 1, focusSelf: useStableCallback(e => e.focus()), onPressSync: null, onPseudoActiveStart: null, onPseudoActiveStop: null }
     });
 
