@@ -30,7 +30,7 @@ export interface SelectableChildInfo<E extends Element> extends UseRovingTabInde
     /**
      * This is similar to `hidden` for `useRovingTabIndex`, but for selection.
      * 
-     * Disables selecting this child. Being `hidden` implies being `disabled`, but usually if it's `display: none` or whatever it already isn't receiving press events anyway. Still good to keep them aligned though.
+     * Disables selecting this child. Being `hidden` implies being `disabled`, but you can of course have something that's disabled (unselectable) but not hidden (untabbable).
      */
     disabled: boolean;
 }

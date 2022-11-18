@@ -11,9 +11,9 @@ import { UseListNavigationSingleSelectionChildParameters } from "./use-list-navi
  */
 const _dummy = 0;
 
-export interface UseListNavigationSingleSelectionSortableChildInfo<TabbableChildElement extends Element> extends UseListNavigationSingleSelectionChildInfo<TabbableChildElement> { }
+export interface UseListNavigationSingleSelectionSortableChildInfo<TabbableChildElement extends Element> extends UseListNavigationSingleSelectionChildInfo<TabbableChildElement> {}
 export interface UseListNavigationSingleSelectionSortableParameters<_ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationSingleSelectionChildInfo<ChildElement>> extends Omit<UseListNavigationSingleSelectionParameters<ChildElement, M>, "linearNavigationParameters">, UseSortableChildrenParameters<M> {
-    linearNavigationParameters: Omit<UseListNavigationSingleSelectionParameters<ChildElement, M>["linearNavigationParameters"], "navigateAbsolute" | "navigateRelative">
+    linearNavigationParameters: Omit<UseListNavigationSingleSelectionParameters<ChildElement, M>["linearNavigationParameters"], "indexDemangler" | "indexMangler">
 }
 export interface UseListNavigationSingleSelectionSortableReturnType<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationSingleSelectionSortableChildInfo<ChildElement>> extends UseListNavigationSingleSelectionReturnType<ParentOrChildElement, ChildElement>, Omit<UseSortableChildrenReturnType<ParentOrChildElement, M>, "linearNavigationParameters"> { }
 export interface UseListNavigationSingleSelectionSortableChildParameters<ChildElement extends Element> extends UseListNavigationSingleSelectionChildParameters<ChildElement> { }
@@ -30,9 +30,8 @@ export function useListNavigationSingleSelectionSortable<ParentOrChildElement ex
     ..._void3
 }: UseListNavigationSingleSelectionSortableParameters<ParentOrChildElement, ChildElement, M>): UseListNavigationSingleSelectionSortableReturnType<ParentOrChildElement, ChildElement, M> {
     const scr = useSortableChildren<ParentOrChildElement, M>({ rearrangeableChildrenParameters, sortableChildrenParameters });
-    const { linearNavigationParameters: { navigateAbsolute, navigateRelative, ...void1 } } = scr;
-    const lnssr = useListNavigationSingleSelection<ParentOrChildElement, ChildElement, M>({ linearNavigationParameters: { ...linearNavigationParameters, navigateRelative, navigateAbsolute }, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, managedChildrenReturn });
-    assertEmptyObject(void1);
+    const { rearrangeableChildrenReturn: { indexDemangler, indexMangler } } = scr;
+    const lnssr = useListNavigationSingleSelection<ParentOrChildElement, ChildElement, M>({ linearNavigationParameters: { ...linearNavigationParameters, indexDemangler, indexMangler }, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, managedChildrenReturn });
     assertEmptyObject(_void3);
 
     return { ...lnssr, ...scr }
@@ -50,7 +49,7 @@ export function useListNavigationSingleSelectionSortableChild<ChildElement exten
 }: UseListNavigationSingleSelectionSortableChildParameters<ChildElement>): UseListNavigationSingleSelectionSortableChildReturnType<ChildElement> {
 
     const lnsscr = useListNavigationSingleSelectionChild<ChildElement>({
-        managedChildParameters: { index, hidden, disabled },
+        managedChildParameters: { index, disabled, hidden },
         singleSelectionChildParameters,
         singleSelectionContext,
         typeaheadNavigationChildParameters,

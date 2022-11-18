@@ -51,7 +51,7 @@ export interface UseSortableChildrenParameters<M extends ManagedChildInfo<number
 
 
 export interface UseRearrangeableChildrenReturnType<ParentElement extends Element, M extends ManagedChildInfo<number>> {
-    linearNavigationParameters: Pick<UseLinearNavigationParameters["linearNavigationParameters"], "navigateRelative" | "navigateAbsolute">;
+    //linearNavigationParameters: Pick<UseLinearNavigationParameters["linearNavigationParameters"], "navigateRelative" | "navigateAbsolute">;
 
     rearrangeableChildrenReturn: {
         /**
@@ -142,9 +142,9 @@ export function useRearrangeableChildren<ParentElement extends Element, M extend
         return rearrange(shuffledRows);
     }, [/* Must remain stable */]);
 
-    const navigateAbsolute = useCallback((i: number | null) => {
+    /*const navigateAbsolute = useCallback((i: number | null) => {
         if (i != null) {
-            const nextIndex = tryNavigateToIndex({
+            const { value: nextIndex, status } = tryNavigateToIndex({
                 highestChildIndex: getHighestChildIndex(),
                 isValid: getValid,
                 target: i,
@@ -152,6 +152,7 @@ export function useRearrangeableChildren<ParentElement extends Element, M extend
                 indexMangler: indexMangler,
                 indexDemangler: indexDemangler
             });
+            console.assert(status == "normal");
             return (i == null ? null : nextIndex);
         }
         else {
@@ -159,7 +160,7 @@ export function useRearrangeableChildren<ParentElement extends Element, M extend
         }
     }, []);
     const navigateRelative = useCallback((original: number, offset: number) => {
-        return tryNavigateToIndex({
+        const { value, status } = tryNavigateToIndex({
             target: indexDemangler(indexMangler(original) + offset),
             highestChildIndex: getHighestChildIndex(),
             isValid: getValid,
@@ -167,7 +168,9 @@ export function useRearrangeableChildren<ParentElement extends Element, M extend
             indexMangler: indexMangler,
             indexDemangler: indexDemangler
         });
-    }, []);
+
+        return value;
+    }, []);*/
 
     // The sort function needs to be able to update whoever has all the sortable children.
     // Because that might not be the consumer of *this* hook directly (e.g. a table uses
@@ -210,7 +213,7 @@ export function useRearrangeableChildren<ParentElement extends Element, M extend
     }, []);
 
     return {
-        linearNavigationParameters: { navigateAbsolute, navigateRelative },
+        //linearNavigationParameters: { navigateAbsolute, navigateRelative },
         rearrangeableChildrenReturn: { indexMangler, indexDemangler, mangleMap, demangleMap, rearrange, shuffle, useRearrangeableProps, }
     };
 }
@@ -244,7 +247,7 @@ export function useSortableChildren<ParentElement extends Element, M extends Man
 
     const compare = (userCompare ?? defaultCompare);
 
-    const { linearNavigationParameters, rearrangeableChildrenReturn } = useRearrangeableChildren<ParentElement, M>({ rearrangeableChildrenParameters });
+    const { rearrangeableChildrenReturn } = useRearrangeableChildren<ParentElement, M>({ rearrangeableChildrenParameters });
     const { rearrange } = rearrangeableChildrenReturn;
     // The actual sort function.
     const sort = useCallback((managedRows: ManagedChildren<M>, direction: "ascending" | "descending"): Promise<void> | void => {
@@ -265,7 +268,6 @@ export function useSortableChildren<ParentElement extends Element, M extends Man
     }, [ /* Must remain stable */]);
 
     return {
-        linearNavigationParameters,
         sortableChildrenReturn: { sort },
         rearrangeableChildrenReturn
     };
@@ -319,39 +321,6 @@ function defaultCompare(lhs: string | number | boolean | Date | null | undefined
 }
 
 
-
-export interface TryNavigateToIndexParameters {
-    //children: ManagedChildren<number, unknown, K>;
-    highestChildIndex: number; // [0, n], not [0, n)
-    isValid(index: number): boolean;
-
-    //default: number;
-    target: number;
-    searchDirection: 1 | -1;
-    indexMangler: (n: number) => number;
-    indexDemangler: (n: number) => number;
-}
-
-export function tryNavigateToIndex({ isValid, highestChildIndex: upper, searchDirection, indexDemangler, indexMangler, target }: TryNavigateToIndexParameters) {
-    //const upper = children.getHighestIndex();
-    const lower = 0;
-
-    if (searchDirection === -1) {
-        while (target >= lower && !isValid(target))
-            target = indexDemangler(indexMangler(target) - 1);
-
-        return target < lower ? indexDemangler(lower) : target;
-    }
-    else if (searchDirection === 1) {
-        while (target <= upper && !isValid(target))
-            target = indexDemangler(indexMangler(target) + 1);
-
-        return target > upper ? indexDemangler(upper) : target;
-    }
-    else {
-        return lower;
-    }
-}
 
 
 

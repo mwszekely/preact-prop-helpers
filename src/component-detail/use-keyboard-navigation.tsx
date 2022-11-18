@@ -1,5 +1,5 @@
 import { h } from "preact";
-import { useEffect, useLayoutEffect, useRef } from "preact/hooks";
+import { useCallback, useEffect, useLayoutEffect, useRef } from "preact/hooks";
 import { assertEmptyObject, UseManagedChildParameters } from "../preact-extensions/use-child-manager";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "./use-roving-tabindex";
 import { useStableCallback } from "../preact-extensions/use-stable-callback";
@@ -19,6 +19,12 @@ export function useTypeaheadNavigationProps<E extends Element>(r: UseTypeaheadNa
     typeaheadNavigationChildParameters: UseTypeaheadNavigationReturnTypeInfo<ChildElement>["typeaheadNavigationChildParameters"];
 }*/
 
+export interface LinearNavigationResult {
+    value: number | null;
+    status: "normal" | "past-start" | "past-end"
+}
+
+
 export interface UseLinearNavigationReturnTypeInfo<ParentOrChildElement extends Element> {
     linearNavigationReturn: {
         propsStable: h.JSX.HTMLAttributes<ParentOrChildElement>;
@@ -29,18 +35,43 @@ export interface UseLinearNavigationReturnTypeWithHooks<ParentOrChildElement ext
 }
 
 /** Default implementation with no sorting */
-export function navigateRelative(original: number, offset: number): number | null { return original + offset; }
+//export function navigateRelative(original: number, offset: number): number | null { return original + offset; }
 
 /** Default implementation with no sorting */
-export function navigateAbsolute(index: number): number | null { return index; }
+//export function navigateAbsolute(index: number): number | null { return index; }
 
 /** Arguments passed to the parent `useLinearNavigation` */
 export interface UseLinearNavigationParameters {
 
     rovingTabIndexReturn: Pick<UseRovingTabIndexReturnType<any>["rovingTabIndexReturn"], "getTabbableIndex" | "setTabbableIndex">
     linearNavigationParameters: {
-        navigateRelative(original: number, offset: number): number | null;
-        navigateAbsolute(index: number | null): number | null;
+
+        /**
+         * Must return true if the given child can be navigated to.
+         * 
+         * Generally corresponds to a `hidden` or `disabled` prop.
+         * @param i 
+         */
+        isValid(i: number): boolean;
+
+        /**
+         * Controls how many elements are skipped over when page up/down are pressed.
+         * 
+         * * When 0: Page Up/Down are disabled
+         * * When >= 1: Page Up/Down moves that number of elements up or down
+         * * When 0 < x < 1, Page Up/Down moves by that percentage of all elements, or of 100 elements, whichever is higher. In other words, 0.1 jumps by 10 elements when there are fewer then 100 elements, and 20 elements when there are 200 elements.
+         */
+        pageNavigationSize: number;
+
+        /**
+         * What happens when `up` is pressed on the first child?
+         */
+        navigatePastStart: "wrap" | (() => void);
+        navigatePastEnd: "wrap" | (() => void);
+        indexMangler: (n: number) => number;
+        indexDemangler: (n: number) => number;
+        //navigateRelative(original: number, offset: number): LinearNavigationResult;
+        //navigateAbsolute(index: number | null): LinearNavigationResult;
         getHighestIndex(): number;  // [0, n], not [0, n)
 
         /**
@@ -83,16 +114,73 @@ export function useLinearNavigation<ParentOrChildElement extends Element>({
     rovingTabIndexReturn,
     linearNavigationParameters
 }: UseLinearNavigationParameters): UseLinearNavigationReturnTypeWithHooks<ParentOrChildElement> {
-    const { getHighestIndex, navigateAbsolute, navigateRelative } = linearNavigationParameters;
+    const { getHighestIndex, indexDemangler, indexMangler, isValid, navigatePastEnd, navigatePastStart } = linearNavigationParameters;
     const { getTabbableIndex, setTabbableIndex } = rovingTabIndexReturn;
 
-    const navigateToFirst = useStableCallback((fromUserInteraction: boolean) => { setTabbableIndex(navigateAbsolute(0), fromUserInteraction); });
-    const navigateToLast = useStableCallback((fromUserInteraction: boolean) => { setTabbableIndex(navigateAbsolute(getHighestIndex()), fromUserInteraction); });
-    const navigateToNext = useStableCallback((fromUserInteraction: boolean) => setTabbableIndex(navigateRelative((getTabbableIndex() ?? 0), +1), fromUserInteraction));
-    const navigateToPrev = useStableCallback((fromUserInteraction: boolean) => setTabbableIndex(navigateRelative((getTabbableIndex() ?? 0), -1), fromUserInteraction));
+    const navigateAbsolute = useCallback((i: number, fromUserInteraction: boolean) => {
+        const target = indexDemangler(i);
+        const { status, value } = tryNavigateToIndex({ isValid, highestChildIndex: getHighestIndex(), indexDemangler, indexMangler, searchDirection: -1, target });
+        setTabbableIndex(value, fromUserInteraction);
+    }, []);
+    const navigateToFirst = useStableCallback((fromUserInteraction: boolean) => { navigateAbsolute(0, fromUserInteraction); });
+    const navigateToLast = useStableCallback((fromUserInteraction: boolean) => { navigateAbsolute(getHighestIndex(), fromUserInteraction); });
+    const navigateRelative2 = useStableCallback((offset: number, fromUserInteraction: boolean, mode: "page" | "single") => {
+        const original = (getTabbableIndex() ?? 0);
+        const { status, value } = tryNavigateToIndex({ isValid, highestChildIndex: getHighestIndex(), indexDemangler, indexMangler, searchDirection: (Math.sign(offset) || 1) as 1 | -1, target: indexDemangler(indexMangler(original) + offset) });
+        if (status == "past-end") {
+            if (navigatePastEnd == "wrap") {
+                if (mode == "single")
+                    navigateToFirst(fromUserInteraction);
+                else {
+
+                    // Uncomment to allow page up/down to wrap after hitting the top/bottom once.
+                    // It works fine, the problem isn't that -- the problem is it just feels wrong. 
+                    // Page Up/Down don't feel like they should wrap, even if normally requested. 
+                    // That's the arrow keys' domain.
+                    if (false && (value == getTabbableIndex()))
+                        navigateToFirst(fromUserInteraction);
+                    else
+                        navigateToLast(fromUserInteraction);
+                }
+            }
+            else {
+                navigatePastEnd();
+            }
+        }
+        else if (status == "past-start") {
+            if (navigatePastStart == "wrap") {
+                if (mode == "single") {
+                    navigateToLast(fromUserInteraction);
+                }
+                else {
+                    // See above. It works fine but just feels wrong to wrap on Page Up/Down.
+                    if (false && value == getTabbableIndex())
+                        navigateToLast(fromUserInteraction);
+                    else
+                        navigateToFirst(fromUserInteraction);
+                }
+            }
+            else {
+                navigatePastStart();
+            }
+        }
+        else {
+            setTabbableIndex(value, fromUserInteraction);
+
+        }
+    })
+    const navigateToNext = useStableCallback((fromUserInteraction: boolean) => {
+        navigateRelative2(1, fromUserInteraction, "single");
+        // setTabbableIndex(navigateRelative((getTabbableIndex() ?? 0), +1), fromUserInteraction)
+    });
+    const navigateToPrev = useStableCallback((fromUserInteraction: boolean) => {
+        navigateRelative2(-1, fromUserInteraction, "single");
+        // setTabbableIndex(navigateRelative((getTabbableIndex() ?? 0), +1), fromUserInteraction)
+    });
     const getDisableArrowKeys = useStableGetter(linearNavigationParameters.disableArrowKeys);
     const getDisableHomeEndKeys = useStableGetter(linearNavigationParameters.disableHomeEndKeys);
     const getNavigationDirection = useStableGetter(linearNavigationParameters.navigationDirection);
+    const getPageNavigationSize = useStableGetter(linearNavigationParameters.pageNavigationSize);
 
 
     const stableProps = useRef<h.JSX.HTMLAttributes<ParentOrChildElement>>({
@@ -105,9 +193,15 @@ export function useLinearNavigation<ParentOrChildElement extends Element>({
             const navigationDirection = getNavigationDirection();
             const disableArrowKeys = getDisableArrowKeys();
             const disableHomeEndKeys = getDisableHomeEndKeys();
+            const pageNavigationSize = getPageNavigationSize();
 
             const allowsVerticalNavigation = (navigationDirection == "vertical" || navigationDirection == "either");
             const allowsHorizontalNavigation = (navigationDirection == "horizontal" || navigationDirection == "either");
+
+            let truePageNavigationSize = pageNavigationSize;
+            if (truePageNavigationSize < 1) {
+                truePageNavigationSize = Math.round(pageNavigationSize * Math.max(100, getHighestIndex() + 1));
+            }
 
             switch (e.key) {
                 case "ArrowUp": {
@@ -146,8 +240,22 @@ export function useLinearNavigation<ParentOrChildElement extends Element>({
                         e.preventDefault();
                         e.stopPropagation();
                     }
-                    e.preventDefault();
-                    e.stopPropagation();
+                    break;
+                }
+                case "PageUp": {
+                    if (truePageNavigationSize > 0) {
+                        navigateRelative2(-truePageNavigationSize, true, "page");
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                    break;
+                }
+                case "PageDown": {
+                    if (truePageNavigationSize > 0) {
+                        navigateRelative2(truePageNavigationSize, true, "page");
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
                     break;
                 }
                 case "Home":
@@ -180,6 +288,43 @@ export function useLinearNavigation<ParentOrChildElement extends Element>({
 }
 
 
+
+export interface TryNavigateToIndexParameters {
+    //children: ManagedChildren<number, unknown, K>;
+    highestChildIndex: number; // [0, n], not [0, n)
+    isValid(index: number): boolean;
+
+    //default: number;
+    target: number;
+    searchDirection: 1 | -1;
+    indexMangler: (n: number) => number;
+    indexDemangler: (n: number) => number;
+
+}
+
+export function tryNavigateToIndex({ isValid, highestChildIndex: upper, searchDirection, indexDemangler, indexMangler, target }: TryNavigateToIndexParameters): LinearNavigationResult {
+    //const upper = children.getHighestIndex();
+    const lower = 0;
+
+    if (searchDirection === -1) {
+        while (target >= lower && !isValid(target))
+            target = indexDemangler(indexMangler(target) - 1);
+
+        return target < lower ? { value: indexDemangler(lower), status: "past-start" } : { value: target, status: "normal" };
+    }
+    else if (searchDirection === 1) {
+        while (target <= upper && !isValid(target))
+            target = indexDemangler(indexMangler(target) + 1);
+
+        return target > upper ? { value: indexDemangler(upper), status: "past-end" } : { value: target, status: "normal" };
+    }
+    else {
+        return { value: lower, status: "normal" };;
+    }
+}
+
+
+
 export interface UseTypeaheadNavigationReturnTypeInfo<ParentOrChildElement extends Element> {
     typeaheadNavigationReturn: {
         currentTypeahead: string | null;
@@ -197,6 +342,17 @@ export interface UseTypeaheadNavigationReturnTypeWithHooks<ParentOrChildElement 
 
 export interface UseTypeaheadNavigationParameters<TabbableChildElement extends Element> {
     typeaheadNavigationParameters: {
+
+
+        /**
+         * Must return true if the given child can be navigated to.
+         * 
+         * Generally corresponds to a `hidden` or `disabled` prop.
+         * @param i 
+         */
+        isValid(i: number): boolean;
+
+
         /**
          * A collator to use when comparing. If not provided, simply uses `localeCompare` after transforming each to lowercase, which will, at best, work okay in English.
          */
@@ -222,6 +378,8 @@ export interface UseTypeaheadNavigationChildParameters<ChildElement extends Elem
          * It should be the same text content as whatever's displayed, ideally.
          */
         text: string | null;
+
+        //hidden: boolean;
     }
 
     typeaheadNavigationChildContext: {
@@ -245,7 +403,7 @@ export type UseTypeaheadNavigationChild<ChildElement extends Element> = (args: U
  * @see useListNavigation, which packages everything up together.
  */
 export function useTypeaheadNavigation<ParentOrChildElement extends Element, ChildElement extends Element>({
-    typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead, ..._void3 },
+    typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead, isValid, ..._void3 },
     rovingTabIndexReturn: { getTabbableIndex: getIndex, setTabbableIndex: setIndex, ..._void1 },
     ..._void2
 }: UseTypeaheadNavigationParameters<ChildElement>): UseTypeaheadNavigationReturnTypeWithHooks<ParentOrChildElement> {
@@ -260,7 +418,7 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
     // And, for the user's sake, let them know when their typeahead can't match anything anymore
     const [currentTypeahead, setCurrentTypeahead, getCurrentTypeahead] = useState<string | null>(null);
     useTimeout({ timeout: typeaheadTimeout ?? 1000, callback: () => { setCurrentTypeahead(null); setInvalidTypeahead(null); }, triggerIndex: currentTypeahead });
-    const sortedTypeaheadInfo = useRef<{ text: string, unsortedIndex: number }[]>([]);
+    const sortedTypeaheadInfo = useRef<TypeaheadInfo[]>([]);
     const [invalidTypeahead, setInvalidTypeahead] = useState<boolean | null>(false);
 
     // Handle typeahead for input method editors as well
@@ -425,6 +583,9 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
                 let lowestSortedIndexNext = sortedTypeaheadIndex;
 
                 const updateBestFit = (u: number) => {
+                    if (!isValid(u))
+                        return;
+
                     if (lowestUnsortedIndexAll == null || u < lowestUnsortedIndexAll) {
                         lowestUnsortedIndexAll = u;
                         lowestSortedIndexAll = i;

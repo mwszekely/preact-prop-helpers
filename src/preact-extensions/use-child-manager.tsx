@@ -110,7 +110,7 @@ export interface UseManagedChildrenReturnType<M extends ManagedChildInfo<any>> {
     managedChildContext: {
         managedChildParameters: {
             getChildren(): ManagedChildren<M>;
-            managedChildrenArray: Foo<M>;
+            managedChildrenArray: InternalChildInfo<M>;
             remoteULEChildMounted: (index: M["index"], mounted: boolean) => void;
             remoteULEChildChanged: (index: M["index"]) => (() => void);
         }
@@ -145,7 +145,7 @@ export interface ManagedChildren<M extends ManagedChildInfo<any>> {
     arraySlice: () => M[];
 }
 
-interface Foo<M extends ManagedChildInfo<string | number>> {
+interface InternalChildInfo<M extends ManagedChildInfo<string | number>> {
     arr: Array<M>;
     rec: Partial<Record<M["index"], M>>;
     highestIndex: number;
@@ -177,7 +177,7 @@ export function useManagedChildren<M extends ManagedChildInfo<string | number>>(
 
     // All the information we have about our children is stored in this **stable** array.
     // Any mutations to this array **DO NOT** trigger any sort of a re-render.
-    const managedChildrenArray = useRef<Foo<M>>({ arr: [], rec: {}, highestIndex: 0, lowestIndex: 0 });
+    const managedChildrenArray = useRef<InternalChildInfo<M>>({ arr: [], rec: {}, highestIndex: 0, lowestIndex: 0 });
 
     // For indirect access to each child
     // Compare getManagedChildInfo
@@ -251,7 +251,8 @@ export function useManagedChildren<M extends ManagedChildInfo<string | number>>(
         }
 
         if (mounted) {
-            managedChildrenArray.current.highestIndex = Math.max(managedChildrenArray.current.highestIndex, index as number);
+            if (typeof index == "number")
+                managedChildrenArray.current.highestIndex = Math.max(managedChildrenArray.current.highestIndex, index);
         }
         else {
             if (typeof index == "number") {
@@ -264,6 +265,9 @@ export function useManagedChildren<M extends ManagedChildInfo<string | number>>(
             }
             else
                 delete managedChildrenArray.current.rec[index as IndexType];
+
+            if (typeof index == "number")
+                managedChildrenArray.current.highestIndex = managedChildrenArray.current.arr.length - 1;
         }
 
         hasRemoteULEChildMounted.current[mounted ? "mounts" : "unmounts"].add(index);

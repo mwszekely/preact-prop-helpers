@@ -47,7 +47,7 @@ export interface UseListNavigationSingleSelectionChildParameters<ChildElement ex
 export interface UseListNavigationSingleSelectionChildReturnType<ChildElement extends Element> extends UseListNavigationChildReturnType<ChildElement>, UseSingleSelectionChildReturnTypeInfo<ChildElement> { }
 
 export function useListNavigationSingleSelectionChild<ChildElement extends Element>({
-    managedChildParameters: { hidden, index, disabled, ..._void5 },
+    managedChildParameters: { hidden, disabled, index, ..._void5 },
     singleSelectionChildParameters,
     singleSelectionContext,
     typeaheadNavigationChildParameters,

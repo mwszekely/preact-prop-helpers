@@ -12,21 +12,23 @@ import { GetValid, UseRearrangeableChildrenParameters } from "../component-detai
 import { useStableCallback } from "../preact-extensions/use-stable-callback";
 import { useStableObject } from "../preact-extensions/use-stable-getter";
 import { usePress, UsePressParameters, UsePressReturnType } from "./use-press";
+import { useGridNavigationSingleSelectionSortable, UseGridNavigationSingleSelectionSortableCellReturnType, UseGridNavigationSingleSelectionSortableParameters, UseGridNavigationSingleSelectionSortableReturnType, UseGridNavigationSingleSelectionSortableRowParameters, UseGridNavigationSingleSelectionSortableRowReturnType } from "../component-detail/use-grid-navigation-single-selection-sortable";
 
 
 export interface UseCompleteGridNavigationParameters<_ParentOrRowElement extends Element, RowElement extends Element, M extends GridSingleSelectChildRowInfo<RowElement>> extends
-    Omit<UseGridNavigationSingleSelectionParameters<RowElement, M>, "managedChildrenReturn" | "linearNavigationParameters" | "rearrangeableChildrenParameters"> {
-    linearNavigationParameters: Omit<UseGridNavigationSingleSelectionParameters<RowElement, M>["linearNavigationParameters"], "getHighestIndex">;
+    Omit<UseGridNavigationSingleSelectionSortableParameters<RowElement, M>, "managedChildrenReturn" | "linearNavigationParameters" | "rearrangeableChildrenParameters"> {
+    linearNavigationParameters: Omit<UseGridNavigationSingleSelectionParameters<RowElement, M>["linearNavigationParameters"], "getHighestIndex" | "indexMangler" | "indexDemangler">;
+    rearrangeableChildrenParameters: Omit<UseGridNavigationSingleSelectionSortableParameters<RowElement, M>["rearrangeableChildrenParameters"], "getHighestChildIndex" | "getValid">
 }
 
 export interface UseCompleteGridNavigationRowParameters<RowElement extends Element, CellElement extends Element, RM extends GridSingleSelectChildRowInfo<RowElement>, CM extends GridSingleSelectChildCellInfo<CellElement>> {
-    asChildRowParameters: Omit<UseGridNavigationSingleSelectionRowParameters<RowElement, CellElement, RM, CM>["asChildRowParameters"], "managedChildrenReturn"> & {
+    asChildRowParameters: Omit<UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM>["asChildRowParameters"], "managedChildrenReturn"> & {
         managedChildContext: UseManagedChildParameters<RM>["managedChildContext"];
         //managedChildReturn: UseManagedChildReturnType<RM>["managedChildReturn"];
         completeGridNavigationRowParameters: Omit<RM, keyof GridSingleSelectChildRowInfo<CellElement>>;
     };
-    asParentRowParameters: Omit<UseGridNavigationSingleSelectionRowParameters<RowElement, CellElement, RM, CM>["asParentRowParameters"], "managedChildrenReturn" | "linearNavigationParameters"> & {
-        linearNavigationParameters: Omit<UseGridNavigationSingleSelectionRowParameters<RowElement, CellElement, RM, CM>["asParentRowParameters"]["linearNavigationParameters"], "getHighestIndex">
+    asParentRowParameters: Omit<UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM>["asParentRowParameters"], "managedChildrenReturn" | "linearNavigationParameters"> & {
+        linearNavigationParameters: Omit<UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM>["asParentRowParameters"]["linearNavigationParameters"], "getHighestIndex" | "pageNavigationSize">
     };
 }
 
@@ -56,25 +58,25 @@ export type CompleteGridNavigationRowContext<ParentElement extends Element, Chil
 
 
 export interface UseCompleteGridNavigationReturnType<ParentElement extends Element, ChildElement extends Element, M extends GridSingleSelectChildRowInfo<ChildElement>>
-    extends Omit<UseGridNavigationSingleSelectionReturnType<ParentElement, ChildElement>, "typeaheadNavigationChildContext" | "singleSelectionContext" | "rovingTabIndexChildContext" | "gridNavigationRowContext" | "childrenHaveFocusParameters" | "managedChildrenParameters"> {
+    extends Omit<UseGridNavigationSingleSelectionSortableReturnType<ParentElement, ChildElement, M>, "typeaheadNavigationChildContext" | "singleSelectionContext" | "rovingTabIndexChildContext" | "gridNavigationRowContext" | "childrenHaveFocusParameters" | "managedChildrenParameters"> {
     props: h.JSX.HTMLAttributes<ParentElement>;
     context: CompleteGridNavigationContext<ParentElement, ChildElement, M>;
 
     managedChildrenReturn: UseManagedChildrenReturnType<M>["managedChildrenReturn"];
     childrenHaveFocusReturn: UseChildrenHaveFocusReturnTypeInfo["childrenHaveFocusReturn"];
-    rearrangeableChildrenParameters: Pick<UseRearrangeableChildrenParameters["rearrangeableChildrenParameters"], "getHighestChildIndex" | "getValid">;
+    //rearrangeableChildrenParameters: Pick<UseRearrangeableChildrenParameters["rearrangeableChildrenParameters"], "getHighestChildIndex" | "getValid">;
 }
 
 export interface UseCompleteGridNavigationRowReturnType<RowElement extends Element, CellElement extends Element, RM extends GridSingleSelectChildRowInfo<RowElement>, CM extends GridSingleSelectChildCellInfo<CellElement>> {
     context: CompleteGridNavigationRowContext<RowElement, CellElement, CM>;
     props: h.JSX.HTMLAttributes<RowElement>;
-    asParentRowReturn: UseGridNavigationSingleSelectionRowReturnType<RowElement, CellElement>["asParentRowReturn"];
-    asChildRowReturn: UseGridNavigationSingleSelectionRowReturnType<RowElement, CellElement>["asChildRowReturn"];
+    asParentRowReturn: UseGridNavigationSingleSelectionSortableRowReturnType<RowElement, CellElement>["asParentRowReturn"];
+    asChildRowReturn: UseGridNavigationSingleSelectionSortableRowReturnType<RowElement, CellElement>["asChildRowReturn"];
     managedChildReturn: UseManagedChildReturnType<RM>["managedChildReturn"];
 }
 
 export interface UseCompleteGridNavigationCellReturnType<CellElement extends Element, CM extends GridSingleSelectChildCellInfo<CellElement>> extends
-    Omit<UseGridNavigationSingleSelectionCellReturnType<CellElement>, "hasCurrentFocusParameters">,
+    Omit<UseGridNavigationSingleSelectionSortableCellReturnType<CellElement>, "hasCurrentFocusParameters">,
     UsePressReturnType<CellElement>, UseRefElementReturnType<CellElement>, UseHasCurrentFocusReturnType<CellElement>, UseManagedChildReturnType<CM> {
     props: h.JSX.HTMLAttributes<CellElement>;
 
@@ -86,7 +88,9 @@ export function useCompleteGridNavigation<ParentOrRowElement extends Element, Ro
     linearNavigationParameters,
     rovingTabIndexParameters,
     singleSelectionParameters,
-    typeaheadNavigationParameters
+    typeaheadNavigationParameters,
+    sortableChildrenParameters,
+    rearrangeableChildrenParameters
 }: UseCompleteGridNavigationParameters<ParentOrRowElement, RowElement, M>): UseCompleteGridNavigationReturnType<ParentOrRowElement, RowElement, M> {
 
     const getChildren: () => ManagedChildren<M> = useCallback<() => ManagedChildren<M>>(() => managedChildrenReturn.getChildren(), []);
@@ -102,13 +106,15 @@ export function useCompleteGridNavigation<ParentOrRowElement extends Element, Ro
         typeaheadNavigationChildContext,
         gridNavigationRowContext,
         ...gridNavigationSingleSelectionReturn
-    } = useGridNavigationSingleSelection<ParentOrRowElement, RowElement, M>({
+    } = useGridNavigationSingleSelectionSortable<ParentOrRowElement, RowElement, M>({
         gridNavigationParameters,
         linearNavigationParameters: { getHighestIndex: getHighestChildIndex, ...linearNavigationParameters },
         managedChildrenReturn: { getChildren },
         rovingTabIndexParameters,
         singleSelectionParameters,
-        typeaheadNavigationParameters
+        typeaheadNavigationParameters,
+        rearrangeableChildrenParameters: { ...rearrangeableChildrenParameters, getHighestChildIndex, getValid },
+        sortableChildrenParameters
     });
 
     const { linearNavigationReturn, typeaheadNavigationReturn } = gridNavigationSingleSelectionReturn;
@@ -132,7 +138,7 @@ export function useCompleteGridNavigation<ParentOrRowElement extends Element, Ro
         managedChildrenReturn,
         ...gridNavigationSingleSelectionReturn,
         childrenHaveFocusReturn,
-        rearrangeableChildrenParameters: { getHighestChildIndex: getHighestChildIndex, getValid },
+        //rearrangeableChildrenParameters: { getHighestChildIndex: getHighestChildIndex, getValid },
     }
 
 }
@@ -156,7 +162,7 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
     const r: UseGridNavigationSingleSelectionRowReturnType<RowElement, CellElement> = useGridNavigationSingleSelectionRow<RowElement, CellElement, RM, CM>({
         asParentRowParameters: {
             ...asParentRowParameters,
-            linearNavigationParameters: { getHighestIndex: getHighestChildIndex, ...linearNavigationParameters },
+            linearNavigationParameters: { getHighestIndex: getHighestChildIndex, pageNavigationSize: 0, ...linearNavigationParameters },
             managedChildrenReturn: { getChildren },
         },
         asChildRowParameters: {
