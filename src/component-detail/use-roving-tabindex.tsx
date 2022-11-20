@@ -71,7 +71,6 @@ export interface UseRovingTabIndexReturnType<TabbableChildElement extends Elemen
      *  
      */
     rovingTabIndexReturn: {
-        //propsUnstable: h.JSX.HTMLAttributes<ChildElement>;
         /** **STABLE** */
         setTabbableIndex: (updater: Parameters<StateUpdater<number | null>>[0], fromUserInteraction: boolean) => void;
         /** **STABLE** */
@@ -93,8 +92,6 @@ export interface UseRovingTabIndexChildParameters<TabbableChildElement extends E
     /**
      * The information provided by the parent hook
      */
-    //rovingTabIndexReturn: Pick<UseRovingTabIndexReturnType<TabbableChildElement>["rovingTabIndexReturn"], "setTabbableIndex">;
-
     rovingTabIndexChildContext: RovingTabIndexChildContext<TabbableChildElement>;
 }
 

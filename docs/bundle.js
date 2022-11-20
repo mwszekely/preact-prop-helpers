@@ -6340,7 +6340,7 @@ var bundle = (function (exports) {
         // const { refElementReturn } = useRefElement<HTMLLIElement>({ refElementParameters: { onElementChange: undefined } });
         //const { getElement, propsStable: p3 } = refElementReturn;
         const { props, rovingTabIndexChildReturn: { tabbable, propsUnstable: p2 }, singleSelectionChildReturn: { selected } } = useCompleteListNavigationChild({
-            managedChildParameters: { hidden, disabled, index },
+            managedChildParameters: { hidden, disabled, index, },
             pressParameters: { onPressSync: null, exclude: {}, focusSelf },
             singleSelectionChildParameters: { ariaPropName: "aria-selected", selectionMode },
             typeaheadNavigationChildParameters: { text },

@@ -114,11 +114,13 @@ export function useCompleteListNavigation<ParentElement extends Element, ChildEl
     }
 }
 
-export interface UseCompleteListNavigationChildParameters<ChildElement extends Element, M extends UseListNavigationSingleSelectionSortableChildInfo<ChildElement>> extends Pick<UseListNavigationSingleSelectionSortableChildParameters<ChildElement>, "managedChildParameters" | "typeaheadNavigationChildParameters"> {
+export interface UseCompleteListNavigationChildParameters<ChildElement extends Element, M extends UseListNavigationSingleSelectionSortableChildInfo<ChildElement>> {
     context: CompleteListNavigationContext<any, ChildElement, M>;
     pressParameters: UsePressParameters<ChildElement>["pressParameters"];
     singleSelectionChildParameters: UseListNavigationSingleSelectionSortableChildParameters<ChildElement>["singleSelectionChildParameters"];
     completeListNavigationChildParameters: Omit<M, keyof UseListNavigationSingleSelectionSortableChildInfo<ChildElement>>;
+    typeaheadNavigationChildParameters: UseListNavigationSingleSelectionSortableChildParameters<ChildElement>["typeaheadNavigationChildParameters"];
+    managedChildParameters: Omit<M, "getElement" | "getSelected" | "setSelected" | "getTabbable" | "setTabbable" | "tabbable" | "selected" | "focusSelf">;
 }
 
 export interface UseCompleteListNavigationChildReturnType<ChildElement extends Element, M extends UseListNavigationSingleSelectionSortableChildInfo<ChildElement>>

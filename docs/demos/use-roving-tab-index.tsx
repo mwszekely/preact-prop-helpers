@@ -354,7 +354,7 @@ const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
         rovingTabIndexChildReturn: { tabbable, propsUnstable: p2 },
         singleSelectionChildReturn: { selected }
     } = useCompleteListNavigationChild<HTMLLIElement, UseListNavigationSingleSelectionChildInfo<HTMLLIElement>>({
-        managedChildParameters: { hidden, disabled, index },
+        managedChildParameters: { hidden, disabled, index,  },
         pressParameters: { onPressSync: null, exclude: {}, focusSelf },
         singleSelectionChildParameters: { ariaPropName: "aria-selected", selectionMode },
         typeaheadNavigationChildParameters: { text },
