@@ -55,7 +55,7 @@ export interface UseGridNavigationRowParameters<RowElement extends Element, Cell
 
 export interface UseGridNavigationRowReturnType<RowElement extends Element, CellElement extends Element> {
     asChildRowReturn: UseListNavigationChildReturnType<RowElement> & {
-        managedChildParameters: Pick<UseManagedChildParameters<GridChildRowInfo<RowElement>>["managedChildParameters"], "focusSelf" | "setTabbableColumnIndex">;
+        managedChildParameters: Pick<UseManagedChildParameters<GridChildRowInfo<RowElement>, never>["managedChildParameters"], "focusSelf" | "setTabbableColumnIndex">;
     };
     asParentRowReturn: Omit<UseListNavigationReturnType<RowElement, CellElement>, "rovingTabIndexReturn"> & {
         rovingTabIndexReturn: Omit<UseListNavigationReturnType<RowElement, CellElement>["rovingTabIndexReturn"], "focusSelf">;

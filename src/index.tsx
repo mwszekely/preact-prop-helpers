@@ -38,7 +38,7 @@ export { useMediaQuery } from "./observers/use-media-query";
 export { useMutationObserver, UseMutationObserverParameters } from "./observers/use-mutation-observer";
 export { useAsync, UseAsyncParameters, UseAsyncReturnType, useDebounced, useThrottled } from "./preact-extensions/use-async";
 export { useAsyncEffect } from "./preact-extensions/use-async-effect";
-export { assertEmptyObject, ChildFlagOperations, ManagedChildInfo, ManagedChildren, OnAfterChildLayoutEffect, OnChildrenMountChange, useChildrenFlag, UseChildrenFlagParameters, UseChildrenFlagReturnType, useManagedChild, UseManagedChild, UseManagedChildParameters, useManagedChildren, UseManagedChildrenContext, UseManagedChildrenParameters, UseManagedChildrenReturnType, UseManagedChildReturnType } from "./preact-extensions/use-child-manager";
+export { assertEmptyObject, ChildFlagOperations, ManagedChildInfo, ManagedChildren, OnAfterChildLayoutEffect, OnChildrenMountChange, useChildrenFlag, UseChildrenFlagParameters, UseChildrenFlagReturnType, useManagedChild, UseManagedChildParameters, useManagedChildren, UseManagedChildrenContext, UseManagedChildrenParameters, UseManagedChildrenReturnType, UseManagedChildReturnType } from "./preact-extensions/use-child-manager";
 export { useEffectDebug } from "./preact-extensions/use-effect-debug";
 export { useForceUpdate } from "./preact-extensions/use-force-update";
 export { useLayoutEffectDebug } from "./preact-extensions/use-layout-effect-debug";

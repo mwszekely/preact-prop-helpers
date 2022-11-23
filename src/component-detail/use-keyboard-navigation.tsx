@@ -384,7 +384,7 @@ export interface UseTypeaheadNavigationParameters<TabbableChildElement extends E
 
 
 export interface UseTypeaheadNavigationChildParameters<ChildElement extends Element> {
-    managedChildParameters: Pick<UseManagedChildParameters<UseRovingTabIndexChildInfo<ChildElement>>["managedChildParameters"], "index">;
+    managedChildParameters: Pick<UseManagedChildParameters<UseRovingTabIndexChildInfo<ChildElement>, never>["managedChildParameters"], "index">;
 
     typeaheadNavigationChildParameters: {
         /**

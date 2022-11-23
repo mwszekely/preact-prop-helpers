@@ -87,7 +87,7 @@ export interface UseRovingTabIndexChildParameters<TabbableChildElement extends E
     /** 
      * The information specific to RTI for this child that you provide
      */
-    managedChildParameters: Pick<UseManagedChildParameters<UseRovingTabIndexChildInfo<TabbableChildElement>>["managedChildParameters"], "hidden" | "index">;
+    managedChildParameters: Pick<UseManagedChildParameters<UseRovingTabIndexChildInfo<TabbableChildElement>, never>["managedChildParameters"], "hidden" | "index">;
 
     /**
      * The information provided by the parent hook

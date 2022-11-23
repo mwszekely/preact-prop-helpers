@@ -48,7 +48,7 @@ export interface UseSingleSelectionParameters<ChildElement extends Element> {
 }
 
 export interface UseSingleSelectionChildParameters<E extends Element> {
-    managedChildParameters: Pick<UseManagedChildParameters<SelectableChildInfo<E>>["managedChildParameters"], "index" | "disabled">;
+    managedChildParameters: Pick<UseManagedChildParameters<SelectableChildInfo<E>, never>["managedChildParameters"], "index" | "disabled">;
     singleSelectionContext: UseSingleSelectionReturnType["singleSelectionContext"];
     singleSelectionChildParameters: {
         selectionMode: "focus" | "activation" | "disabled";
@@ -68,7 +68,7 @@ export interface UseSingleSelectionChildReturnTypeInfo<E extends Element> extend
         propsUnstable: h.JSX.HTMLAttributes<E>;
     }
     //refElementParameters: Required<Pick<UseRefElementParameters<E>["refElementParameters"], "onElementChange">>;
-    managedChildParameters: Pick<UseManagedChildParameters<SelectableChildInfo<E>>["managedChildParameters"], "selected" | "setSelected" | "getSelected">;
+    managedChildParameters: Pick<UseManagedChildParameters<SelectableChildInfo<E>, never>["managedChildParameters"], "selected" | "setSelected" | "getSelected">;
     pressParameters: Pick<UsePressParameters<E>["pressParameters"], "onPressSync">;
 }
 
