@@ -573,7 +573,7 @@ export const DemoUseGrid = memo(() => {
     const getValid = useStableCallback<GetValid>((i) => {
         const child = getChildren().getAt(i);
         return !(child?.hidden || child?.disabled);
-    } );
+    });
 
 
     const ret: UseCompleteGridNavigationReturnType<HTMLTableSectionElement, HTMLTableRowElement, GridSingleSelectSortableChildRowInfo<HTMLTableRowElement>> = useCompleteGridNavigation<HTMLTableSectionElement, HTMLTableRowElement, GridSingleSelectSortableChildRowInfo<HTMLTableRowElement>>({
@@ -581,7 +581,7 @@ export const DemoUseGrid = memo(() => {
         gridNavigationParameters: { onTabbableColumnChange: setTabbableColumn },
         linearNavigationParameters: { disableArrowKeys: false, disableHomeEndKeys: false, navigatePastEnd: "wrap", navigatePastStart: "wrap", isValid: getValid, pageNavigationSize: 0.1 },
         //managedChildrenReturn: { getChildren },
-        rovingTabIndexParameters: { initiallyTabbedIndex: null, onTabbableIndexChange: setTabbableRow },
+        rovingTabIndexParameters: { initiallyTabbedIndex: null, onTabbableIndexChange: setTabbableRow, untabbable: false },
         typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000, isValid: getValid },
         rearrangeableChildrenParameters: {
             getIndex: useCallback<GetIndex<{ index: number }>>((a: VNode<{ index: number }>) => a.props.index, [])
@@ -692,7 +692,7 @@ const DemoUseGridRow = memo((({ index }: { index: number }) => {
     const disabled = hidden;
 
 
-//    const getValid = useStableCallback<GetValid>((i) => !!(ret.managedChildReturn.getChildren().getAt(i)?.hidden));
+    //    const getValid = useStableCallback<GetValid>((i) => !!(ret.managedChildReturn.getChildren().getAt(i)?.hidden));
 
     const contextFromParent = useContext(GridRowContext) as CompleteGridNavigationContext<HTMLTableSectionElement, HTMLTableRowElement>;
     const ret: UseCompleteGridNavigationRowReturnType<HTMLTableRowElement, HTMLTableCellElement, GridSingleSelectChildRowInfo<HTMLTableRowElement>, GridSingleSelectChildCellInfo<HTMLTableCellElement>> = useCompleteGridNavigationRow<HTMLTableRowElement, HTMLTableCellElement>({
@@ -705,7 +705,7 @@ const DemoUseGridRow = memo((({ index }: { index: number }) => {
         },
         asParentRowParameters: {
             linearNavigationParameters: { disableArrowKeys: false, disableHomeEndKeys: false, indexDemangler: identity, indexMangler: identity, isValid: returnTrue, navigatePastEnd: "wrap", navigatePastStart: "wrap" },
-            rovingTabIndexParameters: { initiallyTabbedIndex: 0, onTabbableIndexChange: setTabbableColumn },
+            rovingTabIndexParameters: { initiallyTabbedIndex: 0, onTabbableIndexChange: setTabbableColumn, untabbable: false },
             typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000, isValid: returnTrue }
         }
     });

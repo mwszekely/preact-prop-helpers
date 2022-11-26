@@ -2528,7 +2528,7 @@ var bundle = (function (exports) {
      * And just as well! Children should be allowed at the root,
      * regardless of if it's the whole app or just a given component.
      */
-    function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovingTabIndexParameters: { initiallyTabbedIndex, onTabbableIndexChange }, ..._void1 }) {
+    function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovingTabIndexParameters: { untabbable, initiallyTabbedIndex, onTabbableIndexChange }, ..._void1 }) {
         //initiallyTabbedIndex ??= 0;
         // Keep track of three things related to the currently tabbable element's index:
         // What it is, and whether, when we render this component and it's changed, to also focus the element that was made tabbable.
@@ -2555,6 +2555,18 @@ var bundle = (function (exports) {
                 return nextIndex;
             });
         }, []);
+        const lastNonNullIndex = A(initiallyTabbedIndex);
+        s(() => {
+            const t = getTabbableIndex();
+            if (t != null)
+                lastNonNullIndex.current = t;
+        });
+        s(() => {
+            if (untabbable)
+                setTabbableIndex2(null);
+            else
+                setTabbableIndex2(lastNonNullIndex.current);
+        }, [untabbable]);
         // Boilerplate related to notifying individual children when they become tabbable/untabbable
         const getTabbableAt = q$1((m) => { return m.getTabbable(); }, []);
         const setTabbableAt = q$1((m, t) => { m.setTabbable(t); }, []);
@@ -6226,7 +6238,7 @@ var bundle = (function (exports) {
          * complete hooks need a parent naviateRelative/Absolute that handles all child sections
          */
         const r = useCompleteListNavigation({
-            rovingTabIndexParameters: { initiallyTabbedIndex: tabbableIndex, onTabbableIndexChange: setLocalTabbableIndex },
+            rovingTabIndexParameters: { initiallyTabbedIndex: tabbableIndex, onTabbableIndexChange: setLocalTabbableIndex, untabbable: false },
             singleSelectionParameters: { initiallySelectedIndex: selectedIndex, onSelectedIndexChange: setLocalSelectedIndex },
             typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000 },
             linearNavigationParameters: { disableArrowKeys: false, disableHomeEndKeys: false, navigationDirection: "vertical", navigatePastEnd: "wrap", navigatePastStart: "wrap", pageNavigationSize: 0.1 },
@@ -6729,7 +6741,7 @@ var bundle = (function (exports) {
             gridNavigationParameters: { onTabbableColumnChange: setTabbableColumn },
             linearNavigationParameters: { disableArrowKeys: false, disableHomeEndKeys: false, navigatePastEnd: "wrap", navigatePastStart: "wrap", isValid: getValid, pageNavigationSize: 0.1 },
             //managedChildrenReturn: { getChildren },
-            rovingTabIndexParameters: { initiallyTabbedIndex: null, onTabbableIndexChange: setTabbableRow },
+            rovingTabIndexParameters: { initiallyTabbedIndex: null, onTabbableIndexChange: setTabbableRow, untabbable: false },
             typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000, isValid: getValid },
             rearrangeableChildrenParameters: {
                 getIndex: q$1((a) => a.props.index, [])
@@ -6820,7 +6832,7 @@ var bundle = (function (exports) {
             },
             asParentRowParameters: {
                 linearNavigationParameters: { disableArrowKeys: false, disableHomeEndKeys: false, indexDemangler: identity, indexMangler: identity, isValid: returnTrue, navigatePastEnd: "wrap", navigatePastStart: "wrap" },
-                rovingTabIndexParameters: { initiallyTabbedIndex: 0, onTabbableIndexChange: setTabbableColumn },
+                rovingTabIndexParameters: { initiallyTabbedIndex: 0, onTabbableIndexChange: setTabbableColumn, untabbable: false },
                 typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000, isValid: returnTrue }
             }
         });

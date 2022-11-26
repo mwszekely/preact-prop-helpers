@@ -256,7 +256,7 @@ export const DemoUseRovingTabIndex = memo(() => {
 
 
     const r: UseCompleteListNavigationReturnType<HTMLOListElement, HTMLLIElement, M> = useCompleteListNavigation<HTMLOListElement, HTMLLIElement, UseListNavigationSingleSelectionChildInfo<HTMLLIElement>>({
-        rovingTabIndexParameters: { initiallyTabbedIndex: tabbableIndex, onTabbableIndexChange: setLocalTabbableIndex },
+        rovingTabIndexParameters: { initiallyTabbedIndex: tabbableIndex, onTabbableIndexChange: setLocalTabbableIndex, untabbable: false },
         singleSelectionParameters: { initiallySelectedIndex: selectedIndex, onSelectedIndexChange: setLocalSelectedIndex },
         typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000 },
         linearNavigationParameters: { disableArrowKeys: false, disableHomeEndKeys: false, navigationDirection: "vertical", navigatePastEnd: "wrap", navigatePastStart: "wrap", pageNavigationSize: 0.1 },

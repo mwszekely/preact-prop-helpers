@@ -1,5 +1,5 @@
 import { h } from "preact";
-import { StateUpdater, useCallback, useEffect } from "preact/hooks";
+import { StateUpdater, useCallback, useEffect, useRef } from "preact/hooks";
 import { assertEmptyObject, ManagedChildInfo, useChildrenFlag, UseManagedChildParameters, UseManagedChildrenParameters, UseManagedChildrenReturnType, UseManagedChildReturnType } from "../preact-extensions/use-child-manager";
 import { UseHasCurrentFocusParameters } from "../observers/use-has-current-focus";
 import { OnPassiveStateChange } from "../preact-extensions/use-passive-state";
@@ -44,6 +44,11 @@ export interface UseRovingTabIndexParameters<TabbableChildElement extends Elemen
     /** The only parameters RTI needs directly is the initial index to be tabbable */
     rovingTabIndexParameters: {
         initiallyTabbedIndex: number | null;
+
+        /**
+         * When true, this is the same as calling `setTabbableIndex(null)`.
+         */
+        untabbable: boolean;
 
         /** 
          * If you would like to have an event run whenever a new index becomes tabbable
@@ -174,7 +179,7 @@ export interface UseRovingTabIndexChildReturnType<ChildElement extends Element> 
  */
 export function useRovingTabIndex<ChildElement extends Element, M extends UseRovingTabIndexChildInfo<ChildElement>>({
     managedChildrenReturn: { getChildren },
-    rovingTabIndexParameters: { initiallyTabbedIndex, onTabbableIndexChange },
+    rovingTabIndexParameters: { untabbable, initiallyTabbedIndex, onTabbableIndexChange },
     ..._void1
 }: UseRovingTabIndexParameters<ChildElement, M>): UseRovingTabIndexReturnType<ChildElement> {
     assertEmptyObject(_void1);
@@ -211,6 +216,20 @@ export function useRovingTabIndex<ChildElement extends Element, M extends UseRov
             return nextIndex;
         })
     }, []);
+
+    const lastNonNullIndex = useRef<number | null>(initiallyTabbedIndex);
+
+    useEffect(() => {
+        const t =  getTabbableIndex();
+        if (t != null)
+        lastNonNullIndex.current = t;
+    });
+    useEffect(() => {
+        if (untabbable)
+            setTabbableIndex2(null);
+        else
+            setTabbableIndex2(lastNonNullIndex.current);
+    }, [untabbable])
 
     // Boilerplate related to notifying individual children when they become tabbable/untabbable
     const getTabbableAt = useCallback((m: UseRovingTabIndexChildInfo<ChildElement>) => { return m.getTabbable() }, []);
