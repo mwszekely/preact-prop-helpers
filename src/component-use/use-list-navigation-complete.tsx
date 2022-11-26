@@ -114,11 +114,11 @@ export function useCompleteListNavigation<ParentElement extends Element, ChildEl
     }
 }
 
-export interface UseCompleteListNavigationChildParameters<ChildElement extends Element, M extends UseListNavigationSingleSelectionSortableChildInfo<ChildElement>> {
+export interface UseCompleteListNavigationChildParameters<ChildElement extends Element, M extends UseListNavigationSingleSelectionSortableChildInfo<ChildElement>, ExtraOmits extends Exclude<keyof M, keyof UseListNavigationSingleSelectionSortableChildInfo<ChildElement>>> {
     context: CompleteListNavigationContext<any, ChildElement, M>;
     pressParameters: UsePressParameters<ChildElement>["pressParameters"];
     singleSelectionChildParameters: UseListNavigationSingleSelectionSortableChildParameters<ChildElement>["singleSelectionChildParameters"];
-    completeListNavigationChildParameters: Omit<M, keyof UseListNavigationSingleSelectionSortableChildInfo<ChildElement>>;
+    completeListNavigationChildParameters: Omit<M, keyof UseListNavigationSingleSelectionSortableChildInfo<ChildElement> | ExtraOmits>;
     typeaheadNavigationChildParameters: UseListNavigationSingleSelectionSortableChildParameters<ChildElement>["typeaheadNavigationChildParameters"];
     managedChildParameters: Omit<M, "getElement" | "getSelected" | "setSelected" | "getTabbable" | "setTabbable" | "tabbable" | "selected" | "focusSelf">;
 }
@@ -131,7 +131,7 @@ export interface UseCompleteListNavigationChildReturnType<ChildElement extends E
     props: h.JSX.HTMLAttributes<ChildElement>;
 }
 
-export function useCompleteListNavigationChild<ChildElement extends Element, M extends UseListNavigationSingleSelectionSortableChildInfo<ChildElement>>({
+export function useCompleteListNavigationChild<ChildElement extends Element, M extends UseListNavigationSingleSelectionSortableChildInfo<ChildElement>, ExtraOmits extends Exclude<keyof M, keyof UseListNavigationSingleSelectionSortableChildInfo<ChildElement>>>({
     managedChildParameters: { hidden, disabled, index },
     completeListNavigationChildParameters,
     singleSelectionChildParameters,
@@ -139,7 +139,7 @@ export function useCompleteListNavigationChild<ChildElement extends Element, M e
     context: { childrenHaveFocusChildContext, managedChildContext, rovingTabIndexChildContext, singleSelectionContext, typeaheadNavigationChildContext },
     pressParameters: { onPressSync: ops1, ...pressParameters },
     ..._void
-}: UseCompleteListNavigationChildParameters<ChildElement, M>): UseCompleteListNavigationChildReturnType<ChildElement, M> {
+}: UseCompleteListNavigationChildParameters<ChildElement, M, ExtraOmits>): UseCompleteListNavigationChildReturnType<ChildElement, M> {
 
     if (hidden)
         disabled = true;

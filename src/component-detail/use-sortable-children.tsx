@@ -1,16 +1,16 @@
-import * as _ from "lodash";
+import lodashShuffle from "lodash-es/shuffle";
 import { h, VNode } from "preact";
 import { MutableRef, useCallback, useLayoutEffect, useRef } from "preact/hooks";
+import { useMergedProps } from "../dom-helpers/use-merged-props";
 import { ManagedChildInfo, ManagedChildren } from "../preact-extensions/use-child-manager";
 import { useForceUpdate } from "../preact-extensions/use-force-update";
-import { useMergedProps } from "../dom-helpers/use-merged-props";
 import { returnNull, usePassiveState } from "../preact-extensions/use-passive-state";
-import lodashShuffle from "lodash-es/shuffle";
+import { useStableGetter } from "../preact-extensions/use-stable-getter";
 
 export type GetIndex<P> = (row: VNode<P>) => (number | null | undefined);
 export type GetValid = (index: number) => boolean;
 export type GetHighestChildIndex = () => number;
-export type Compare<V> = (lhs: V, rhs: V) => number;
+export type Compare<M extends ManagedChildInfo<number>> = (lhs: M, rhs: M) => number;
 
 /**
  * All of these functions **MUST** be stable across renders.
@@ -25,7 +25,7 @@ export interface UseRearrangeableChildrenParameters {
         /**
          * This must return the index of this child relative to all its sortable siblings.
          * 
-         * In general, this corresponds to the `index` prop.
+         * In general, this corresponds to the `index` prop, so something like `vnode => vnode.props.index` is what you're usually looking for.
          */
         getIndex: GetIndex<any>;
 
@@ -48,11 +48,14 @@ export interface UseRearrangeableChildrenParameters {
 export interface UseSortableChildrenParameters<M extends ManagedChildInfo<number>> extends UseRearrangeableChildrenParameters {
     sortableChildrenParameters: {
         /**
-         * Controls how values compare against each other.
+         * Controls how values compare against each other when `sort` is called.
+         * 
+         * If null, then sorting is disabled (manual rearrangement is still fine, but calling `sort()` will do nothing).
+         * 
          * @param lhs 
          * @param rhs 
          */
-        compare: Compare<M>;
+        compare: null | Compare<M>;
     }
 }
 
@@ -227,14 +230,15 @@ export function useSortableChildren<ParentElement extends Element, M extends Man
     sortableChildrenParameters: { compare: userCompare }
 }: UseSortableChildrenParameters<M>): UseSortableChildrenReturnType<ParentElement, M> {
 
-    const compare = (userCompare ?? defaultCompare);
+    const getCompare = useStableGetter(userCompare);
 
     const { rearrangeableChildrenReturn } = useRearrangeableChildren<ParentElement, M>({ rearrangeableChildrenParameters });
     const { rearrange } = rearrangeableChildrenReturn;
     // The actual sort function.
     const sort = useCallback((managedRows: ManagedChildren<M>, direction: "ascending" | "descending"): Promise<void> | void => {
+        const compare = getCompare();
 
-        const sortedRows = managedRows.arraySlice().sort((lhsRow, rhsRow) => {
+        const sortedRows = compare? managedRows.arraySlice().sort((lhsRow, rhsRow) => {
 
             const lhsValue = lhsRow;
             const rhsValue = rhsRow;
@@ -243,7 +247,7 @@ export function useSortableChildren<ParentElement extends Element, M extends Man
                 return -result;
             return result;
 
-        });
+        }) : managedRows.arraySlice();
 
         return rearrange(sortedRows);
 

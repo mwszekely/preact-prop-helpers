@@ -2824,400 +2824,6 @@ var bundle = (function (exports) {
     }
 
     /**
-     * Returns a function that will, when called, force the component
-     * that uses this hook to re-render itself.
-     *
-     * It's a bit smelly, so best to use sparingly.
-     */
-    function useForceUpdate() {
-        const [, set] = y(0);
-        return A(() => set(i => ++i)).current;
-    }
-
-    function useMergedChildren({ children: lhs }, { children: rhs }) {
-        if (lhs == null && rhs == null) {
-            return undefined;
-        }
-        else if (lhs == null) {
-            return rhs;
-        }
-        else if (rhs == null) {
-            return lhs;
-        }
-        else {
-            return h$1(p$1, {}, lhs, rhs);
-        }
-    }
-
-    /**
-     * Given two sets of props, merges their `class` and `className` properties.
-     * Duplicate classes are removed (order doesn't matter anyway).
-     *
-     * @param lhs Classes of the first component
-     * @param rhs Classes of the second component
-     * @returns A string representing all combined classes from both arguments.
-     */
-    function useMergedClasses({ class: lhsClass, className: lhsClassName }, { class: rhsClass, className: rhsClassName }) {
-        // Note: For the sake of forward compatibility, this function is labelled as
-        // a hook, but as it uses no other hooks it technically isn't one.
-        if (lhsClass || rhsClass || lhsClassName || rhsClassName) {
-            const lhsClasses = clsx(lhsClass, lhsClassName).split(" ");
-            const rhsClasses = clsx(rhsClass, rhsClassName).split(" ");
-            const allClasses = new Set([...Array.from(lhsClasses), ...Array.from(rhsClasses)]);
-            return Array.from(allClasses).join(" ");
-        }
-        else {
-            return undefined;
-        }
-    }
-
-    function processRef(instance, ref) {
-        if (typeof ref === "function") {
-            ref(instance);
-        }
-        else if (ref != null) {
-            ref.current = instance;
-        }
-        else {
-            /* eslint-disable no-debugger */
-            debugger;
-            console.assert(false, "Unknown ref type found that was neither a RefCallback nor a RefObject");
-        }
-    }
-    /**
-     * Combines two refs into one. This allows a component to both use its own ref *and* forward a ref that was given to it.
-     * @param lhs
-     * @param rhs
-     * @returns
-     */
-    function useMergedRefs({ ref: rhs }, { ref: lhs }) {
-        const combined = q$1((current) => {
-            processRef(current, lhs);
-            processRef(current, rhs);
-        }, [lhs, rhs]);
-        if (lhs == null && rhs == null) {
-            return undefined;
-        }
-        else if (lhs == null) {
-            return rhs;
-        }
-        else if (rhs == null) {
-            return lhs;
-        }
-        else {
-            return combined;
-        }
-    }
-
-    function styleStringToObject(style) {
-        // TODO: This sucks D:
-        return Object.fromEntries(style.split(";").map(statement => statement.split(":")));
-    }
-    /**
-     * Merges two style objects, returning the result.
-     *
-     * @param style The user-given style prop for this component
-     * @param obj The CSS properties you want added to the user-given style
-     * @returns A CSS object containing the properties of both objects.
-     */
-    function useMergedStyles(lhs, rhs) {
-        // Easy case, when there are no styles to merge return nothing.
-        if (!lhs?.style && !rhs?.style)
-            return undefined;
-        if (typeof lhs != typeof rhs) {
-            // Easy cases, when one is null and the other isn't.
-            if (lhs?.style && !rhs?.style)
-                return lhs.style;
-            if (!lhs?.style && rhs?.style)
-                return rhs.style;
-            // They're both non-null but different types.
-            // Convert the string type to an object bag type and run it again.
-            if (lhs?.style && rhs?.style) {
-                // (useMergedStyles isn't a true hook -- this isn't a violation)
-                if (typeof lhs?.style == "string")
-                    return useMergedStyles({ style: styleStringToObject(lhs?.style) }, rhs);
-                if (typeof rhs?.style == "string")
-                    return useMergedStyles(lhs, { style: styleStringToObject(rhs?.style) });
-            }
-            // Logic???
-            return undefined;
-        }
-        // They're both strings, just concatenate them.
-        if (typeof lhs?.style == "string") {
-            return `${lhs.style};${rhs?.style ?? ""}`;
-        }
-        // They're both objects, just merge them.
-        return {
-            ...(lhs?.style ?? {}),
-            ...(rhs?.style ?? {})
-        };
-    }
-
-    let log = console.warn;
-    /**
-     * Given two sets of props, merges them and returns the result.
-     *
-     * The hook is aware of and can intelligently merge `className`, `class`, `style`, `ref`, and all event handlers.
-     * @param lhs2
-     * @param rhs2
-     * @returns
-     */
-    function useMergedProps(...allProps) {
-        useEnsureStability("useMergedProps", allProps.length);
-        let ret = {};
-        for (let nextProps of allProps) {
-            ret = useMergedProps2(ret, nextProps);
-        }
-        return ret;
-    }
-    function useMergedProps2(lhsAll, rhsAll) {
-        // First, separate the props we were given into two groups:
-        // lhsAll and rhsAll contain all the props we were given, and
-        // lhsMisc and rhsMisc contain all props *except* for the easy ones
-        // like className and style that we already know how to merge.
-        const { children: _lhsChildren, class: _lhsClass, className: _lhsClassName, style: _lhsStyle, ref: _lhsRef, ...lhsMisc } = lhsAll;
-        const { children: _rhsChildren, class: _rhsClass, className: _rhsClassName, style: _rhsStyle, ref: _rhsRef, ...rhsMisc } = rhsAll;
-        const ret = {
-            ...lhsMisc,
-            ref: useMergedRefs(lhsAll, rhsAll),
-            style: useMergedStyles(lhsAll, rhsAll),
-            className: useMergedClasses(lhsAll, rhsAll),
-            children: useMergedChildren(lhsAll, rhsAll),
-        };
-        if (ret.ref === undefined)
-            delete ret.ref;
-        if (ret.style === undefined)
-            delete ret.style;
-        if (ret.className === undefined)
-            delete ret.className;
-        if (ret.children === undefined)
-            delete ret.children;
-        // Now, do *everything* else
-        // Merge every remaining existing entry in lhs with what we've already put in ret.
-        //const lhsEntries = Object.entries(lhs) as [keyof T, T[keyof T]][];
-        const rhsEntries = Object.entries(rhsMisc);
-        for (const [rhsKeyU, rhsValue] of rhsEntries) {
-            const rhsKey = rhsKeyU;
-            const lhsValue = lhsMisc[rhsKey];
-            if (typeof lhsValue === "function" || typeof rhsValue === "function") {
-                // They're both functions that can be merged (or one's a function and the other's null).
-                // Not an *easy* case, but a well-defined one.
-                const merged = mergeFunctions(lhsValue, rhsValue);
-                ret[rhsKey] = merged;
-            }
-            else {
-                // Uh...we're here because one of them's null, right?
-                if (lhsValue == null && rhsValue == null) {
-                    if (rhsValue === null && lhsValue === undefined)
-                        ret[rhsKey] = rhsValue;
-                    else
-                        ret[rhsKey] = lhsValue;
-                }
-                if (lhsValue == null)
-                    ret[rhsKey] = rhsValue;
-                else if (rhsValue == null)
-                    ret[rhsKey] = lhsValue;
-                else if (rhsValue == lhsValue) ;
-                else {
-                    // Ugh.
-                    // No good strategies here, just log it if requested
-                    log?.(`The prop "${rhsKey}" cannot simultaneously be the values ${lhsValue} and ${rhsValue}. One must be chosen outside of useMergedProps.`);
-                    ret[rhsKey] = rhsValue;
-                }
-            }
-        }
-        return ret;
-    }
-    function mergeFunctions(lhs, rhs) {
-        if (!lhs)
-            return rhs;
-        if (!rhs)
-            return lhs;
-        return (...args) => {
-            const lv = lhs(...args);
-            const rv = rhs(...args);
-            if (lv instanceof Promise || rv instanceof Promise)
-                return Promise.all([lv, rv]);
-        };
-    }
-    /*
-    function test<P extends h.JSX.HTMLAttributes<HTMLInputElement>>(props: P) {
-
-        const id0: GenericGet<{}, "id", string> = "";
-        const id3: GenericGet<{ id: undefined }, "id", string> = undefined;
-        const id4: GenericGet<{ id: undefined }, "id", string> = undefined;
-        const id5: GenericGet<{ id: undefined }, "id", string> = undefined;
-        const id6: GenericGet<{ id: undefined }, "id", string> = undefined;
-        //const id2: ZipSingle<string | undefined, string | undefined> = undefined;
-        const id1: ZipObject<{ id: undefined }, { id: string }> = { id: undefined };
-
-        type M1 = GenericGet<P, "style", string>;
-        type M2 = GenericGet<{}, "style", string>;
-        const m1: M1 = "";
-        const m2: M1 = undefined;
-        /// @ts-expect-error    Because number isn't assignable to string
-        const m3: M1 = 0;
-
-        const m4: M2 = "";
-        const m5: M2 = undefined;
-        /// @ts-expect-error    Because number isn't assignable to string
-        const m6: M2 = 0;
-
-        const p1: MergedProps<HTMLInputElement, {}, { id: string }> = useMergedProps<HTMLInputElement>()({}, { id: "string" });
-        const p2: MergedProps<HTMLInputElement, { id: undefined }, { id: string }> = useMergedProps<HTMLInputElement>()({ id: undefined }, { id: "string" });
-        const p3: MergedProps<HTMLInputElement, { id: undefined }, { id: undefined }> = useMergedProps<HTMLInputElement>()({ id: undefined }, { id: undefined });
-        const p4: MergedProps<HTMLInputElement, {}, {}> = useMergedProps<HTMLInputElement>()({}, {});
-        const p5 = useMergedProps<HTMLInputElement>()(props, {});
-        const p6 = useMergedProps<HTMLInputElement>()(props, { id: undefined });
-        const p7 = useMergedProps<HTMLInputElement>()(props, { id: "string" });
-
-
-        p1.id?.concat("");
-        p2.id?.concat("");
-        /// @ts-expect-error    id can't be anything but undefined
-        p3.id?.concat("");
-        /// @ts-expect-error    id can't be anything but undefined
-        p4.id?.concat("");
-
-
-        p5.id?.concat("");
-        p6.id?.concat("");
-        p7.id?.concat("");
-
-        /// @ts-expect-error    id must contain undefined
-        p5.id.concat("");
-        /// @ts-expect-error    id must contain undefined
-        p6.id.concat("");
-        /// @ts-expect-error    id must contain undefined
-        p7.id.concat("");
-
-
-        if (p5.allowFullScreen === undefined) {}
-        else if (p5.allowFullScreen === false) {}
-        else if (p5.allowFullScreen === true) {}
-        else {
-            acceptsNever(p5.allowFullScreen);
-        }
-
-
-        if (p6.allowFullScreen === undefined) {}
-        else if (p6.allowFullScreen === false) {}
-        else if (p6.allowFullScreen === true) {}
-        else {
-            acceptsNever(p6.allowFullScreen);
-        }
-
-
-        if (p7.allowFullScreen === undefined) {}
-        else if (p7.allowFullScreen === false) {}
-        else if (p7.allowFullScreen === true) {}
-        else {
-            acceptsNever(p7.allowFullScreen);
-        }
-
-
-        // Make sure it works recursively
-        const r1a = useMergedProps<HTMLInputElement>()({}, p1);
-        const r1b = useMergedProps<HTMLInputElement>()(props, p1);
-        const r2a = useMergedProps<HTMLInputElement>()({}, p2);
-        const r2b = useMergedProps<HTMLInputElement>()(props, p2);
-        const r3a = useMergedProps<HTMLInputElement>()({}, p3);
-        const r3b = useMergedProps<HTMLInputElement>()(props, p3);
-        const r4a = useMergedProps<HTMLInputElement>()({}, p4);
-        const r4b = useMergedProps<HTMLInputElement>()(props, p4);
-        const r5a = useMergedProps<HTMLInputElement>()({}, p5);
-        const r5b = useMergedProps<HTMLInputElement>()(props, p5);
-        const r6a = useMergedProps<HTMLInputElement>()({}, p6);
-        const r6b = useMergedProps<HTMLInputElement>()(props, p6);
-        const r7a = useMergedProps<HTMLInputElement>()({}, p7);
-        const r7b = useMergedProps<HTMLInputElement>()(props, p7);
-
-
-        r1a.id?.concat("");
-        r1b.id?.concat("");
-        r2a.id?.concat("");
-        r2b.id?.concat("");
-        // @ts-expect-error    id can't be anything but undefined
-        r3a.id?.concat("");
-        r3b.id?.concat("");
-        /// @ts-expect-error    id can't be anything but undefined
-        r4a.id?.concat("");
-        r4b.id?.concat("");
-
-
-        r5a.id?.concat("");
-        r5b.id?.concat("");
-        r6a.id?.concat("");
-        r6b.id?.concat("");
-        r7a.id?.concat("");
-        r7b.id?.concat("");
-
-        /// @ts-expect-error    id must contain undefined
-        r5a.id.concat("");
-        /// @ts-expect-error    id must contain undefined
-        r5b.id.concat("");
-        /// @ts-expect-error    id must contain undefined
-        r6a.id.concat("");
-        /// @ts-expect-error    id must contain undefined
-        r6b.id.concat("");
-        /// @ts-expect-error    id must contain undefined
-        r7a.id.concat("");
-        /// @ts-expect-error    id must contain undefined
-        r7b.id.concat("");
-
-
-        if (r5a.allowFullScreen === undefined) {}
-        else if (r5a.allowFullScreen === false) {}
-        else if (r5a.allowFullScreen === true) {}
-        else {
-            acceptsNever(r5a.allowFullScreen);
-        }
-
-
-        if (r5b.allowFullScreen === undefined) {}
-        else if (r5b.allowFullScreen === false) {}
-        else if (r5b.allowFullScreen === true) {}
-        else {
-            acceptsNever(r5b.allowFullScreen);
-        }
-
-
-        if (r6a.allowFullScreen === undefined) {}
-        else if (r6a.allowFullScreen === false) {}
-        else if (r6a.allowFullScreen === true) {}
-        else {
-            acceptsNever(r6a.allowFullScreen);
-        }
-
-
-        if (r6b.allowFullScreen === undefined) {}
-        else if (r6b.allowFullScreen === false) {}
-        else if (r6b.allowFullScreen === true) {}
-        else {
-            acceptsNever(r6b.allowFullScreen);
-        }
-
-
-        if (r7a.allowFullScreen === undefined) {}
-        else if (r7a.allowFullScreen === false) {}
-        else if (r7a.allowFullScreen === true) {}
-        else {
-            acceptsNever(r7a.allowFullScreen);
-        }
-
-
-        if (r7b.allowFullScreen === undefined) {}
-        else if (r7b.allowFullScreen === false) {}
-        else if (r7b.allowFullScreen === true) {}
-        else {
-            acceptsNever(r7b.allowFullScreen);
-        }
-
-    }
-    function acceptsNever(n: never) {}
-    */
-
-    /**
      * Copies the values of `source` to `array`.
      *
      * @private
@@ -4054,6 +3660,400 @@ var bundle = (function (exports) {
       return func(collection);
     }
 
+    function useMergedChildren({ children: lhs }, { children: rhs }) {
+        if (lhs == null && rhs == null) {
+            return undefined;
+        }
+        else if (lhs == null) {
+            return rhs;
+        }
+        else if (rhs == null) {
+            return lhs;
+        }
+        else {
+            return h$1(p$1, {}, lhs, rhs);
+        }
+    }
+
+    /**
+     * Given two sets of props, merges their `class` and `className` properties.
+     * Duplicate classes are removed (order doesn't matter anyway).
+     *
+     * @param lhs Classes of the first component
+     * @param rhs Classes of the second component
+     * @returns A string representing all combined classes from both arguments.
+     */
+    function useMergedClasses({ class: lhsClass, className: lhsClassName }, { class: rhsClass, className: rhsClassName }) {
+        // Note: For the sake of forward compatibility, this function is labelled as
+        // a hook, but as it uses no other hooks it technically isn't one.
+        if (lhsClass || rhsClass || lhsClassName || rhsClassName) {
+            const lhsClasses = clsx(lhsClass, lhsClassName).split(" ");
+            const rhsClasses = clsx(rhsClass, rhsClassName).split(" ");
+            const allClasses = new Set([...Array.from(lhsClasses), ...Array.from(rhsClasses)]);
+            return Array.from(allClasses).join(" ");
+        }
+        else {
+            return undefined;
+        }
+    }
+
+    function processRef(instance, ref) {
+        if (typeof ref === "function") {
+            ref(instance);
+        }
+        else if (ref != null) {
+            ref.current = instance;
+        }
+        else {
+            /* eslint-disable no-debugger */
+            debugger;
+            console.assert(false, "Unknown ref type found that was neither a RefCallback nor a RefObject");
+        }
+    }
+    /**
+     * Combines two refs into one. This allows a component to both use its own ref *and* forward a ref that was given to it.
+     * @param lhs
+     * @param rhs
+     * @returns
+     */
+    function useMergedRefs({ ref: rhs }, { ref: lhs }) {
+        const combined = q$1((current) => {
+            processRef(current, lhs);
+            processRef(current, rhs);
+        }, [lhs, rhs]);
+        if (lhs == null && rhs == null) {
+            return undefined;
+        }
+        else if (lhs == null) {
+            return rhs;
+        }
+        else if (rhs == null) {
+            return lhs;
+        }
+        else {
+            return combined;
+        }
+    }
+
+    function styleStringToObject(style) {
+        // TODO: This sucks D:
+        return Object.fromEntries(style.split(";").map(statement => statement.split(":")));
+    }
+    /**
+     * Merges two style objects, returning the result.
+     *
+     * @param style The user-given style prop for this component
+     * @param obj The CSS properties you want added to the user-given style
+     * @returns A CSS object containing the properties of both objects.
+     */
+    function useMergedStyles(lhs, rhs) {
+        // Easy case, when there are no styles to merge return nothing.
+        if (!lhs?.style && !rhs?.style)
+            return undefined;
+        if (typeof lhs != typeof rhs) {
+            // Easy cases, when one is null and the other isn't.
+            if (lhs?.style && !rhs?.style)
+                return lhs.style;
+            if (!lhs?.style && rhs?.style)
+                return rhs.style;
+            // They're both non-null but different types.
+            // Convert the string type to an object bag type and run it again.
+            if (lhs?.style && rhs?.style) {
+                // (useMergedStyles isn't a true hook -- this isn't a violation)
+                if (typeof lhs?.style == "string")
+                    return useMergedStyles({ style: styleStringToObject(lhs?.style) }, rhs);
+                if (typeof rhs?.style == "string")
+                    return useMergedStyles(lhs, { style: styleStringToObject(rhs?.style) });
+            }
+            // Logic???
+            return undefined;
+        }
+        // They're both strings, just concatenate them.
+        if (typeof lhs?.style == "string") {
+            return `${lhs.style};${rhs?.style ?? ""}`;
+        }
+        // They're both objects, just merge them.
+        return {
+            ...(lhs?.style ?? {}),
+            ...(rhs?.style ?? {})
+        };
+    }
+
+    let log = console.warn;
+    /**
+     * Given two sets of props, merges them and returns the result.
+     *
+     * The hook is aware of and can intelligently merge `className`, `class`, `style`, `ref`, and all event handlers.
+     * @param lhs2
+     * @param rhs2
+     * @returns
+     */
+    function useMergedProps(...allProps) {
+        useEnsureStability("useMergedProps", allProps.length);
+        let ret = {};
+        for (let nextProps of allProps) {
+            ret = useMergedProps2(ret, nextProps);
+        }
+        return ret;
+    }
+    function useMergedProps2(lhsAll, rhsAll) {
+        // First, separate the props we were given into two groups:
+        // lhsAll and rhsAll contain all the props we were given, and
+        // lhsMisc and rhsMisc contain all props *except* for the easy ones
+        // like className and style that we already know how to merge.
+        const { children: _lhsChildren, class: _lhsClass, className: _lhsClassName, style: _lhsStyle, ref: _lhsRef, ...lhsMisc } = lhsAll;
+        const { children: _rhsChildren, class: _rhsClass, className: _rhsClassName, style: _rhsStyle, ref: _rhsRef, ...rhsMisc } = rhsAll;
+        const ret = {
+            ...lhsMisc,
+            ref: useMergedRefs(lhsAll, rhsAll),
+            style: useMergedStyles(lhsAll, rhsAll),
+            className: useMergedClasses(lhsAll, rhsAll),
+            children: useMergedChildren(lhsAll, rhsAll),
+        };
+        if (ret.ref === undefined)
+            delete ret.ref;
+        if (ret.style === undefined)
+            delete ret.style;
+        if (ret.className === undefined)
+            delete ret.className;
+        if (ret.children === undefined)
+            delete ret.children;
+        // Now, do *everything* else
+        // Merge every remaining existing entry in lhs with what we've already put in ret.
+        //const lhsEntries = Object.entries(lhs) as [keyof T, T[keyof T]][];
+        const rhsEntries = Object.entries(rhsMisc);
+        for (const [rhsKeyU, rhsValue] of rhsEntries) {
+            const rhsKey = rhsKeyU;
+            const lhsValue = lhsMisc[rhsKey];
+            if (typeof lhsValue === "function" || typeof rhsValue === "function") {
+                // They're both functions that can be merged (or one's a function and the other's null).
+                // Not an *easy* case, but a well-defined one.
+                const merged = mergeFunctions(lhsValue, rhsValue);
+                ret[rhsKey] = merged;
+            }
+            else {
+                // Uh...we're here because one of them's null, right?
+                if (lhsValue == null && rhsValue == null) {
+                    if (rhsValue === null && lhsValue === undefined)
+                        ret[rhsKey] = rhsValue;
+                    else
+                        ret[rhsKey] = lhsValue;
+                }
+                if (lhsValue == null)
+                    ret[rhsKey] = rhsValue;
+                else if (rhsValue == null)
+                    ret[rhsKey] = lhsValue;
+                else if (rhsValue == lhsValue) ;
+                else {
+                    // Ugh.
+                    // No good strategies here, just log it if requested
+                    log?.(`The prop "${rhsKey}" cannot simultaneously be the values ${lhsValue} and ${rhsValue}. One must be chosen outside of useMergedProps.`);
+                    ret[rhsKey] = rhsValue;
+                }
+            }
+        }
+        return ret;
+    }
+    function mergeFunctions(lhs, rhs) {
+        if (!lhs)
+            return rhs;
+        if (!rhs)
+            return lhs;
+        return (...args) => {
+            const lv = lhs(...args);
+            const rv = rhs(...args);
+            if (lv instanceof Promise || rv instanceof Promise)
+                return Promise.all([lv, rv]);
+        };
+    }
+    /*
+    function test<P extends h.JSX.HTMLAttributes<HTMLInputElement>>(props: P) {
+
+        const id0: GenericGet<{}, "id", string> = "";
+        const id3: GenericGet<{ id: undefined }, "id", string> = undefined;
+        const id4: GenericGet<{ id: undefined }, "id", string> = undefined;
+        const id5: GenericGet<{ id: undefined }, "id", string> = undefined;
+        const id6: GenericGet<{ id: undefined }, "id", string> = undefined;
+        //const id2: ZipSingle<string | undefined, string | undefined> = undefined;
+        const id1: ZipObject<{ id: undefined }, { id: string }> = { id: undefined };
+
+        type M1 = GenericGet<P, "style", string>;
+        type M2 = GenericGet<{}, "style", string>;
+        const m1: M1 = "";
+        const m2: M1 = undefined;
+        /// @ts-expect-error    Because number isn't assignable to string
+        const m3: M1 = 0;
+
+        const m4: M2 = "";
+        const m5: M2 = undefined;
+        /// @ts-expect-error    Because number isn't assignable to string
+        const m6: M2 = 0;
+
+        const p1: MergedProps<HTMLInputElement, {}, { id: string }> = useMergedProps<HTMLInputElement>()({}, { id: "string" });
+        const p2: MergedProps<HTMLInputElement, { id: undefined }, { id: string }> = useMergedProps<HTMLInputElement>()({ id: undefined }, { id: "string" });
+        const p3: MergedProps<HTMLInputElement, { id: undefined }, { id: undefined }> = useMergedProps<HTMLInputElement>()({ id: undefined }, { id: undefined });
+        const p4: MergedProps<HTMLInputElement, {}, {}> = useMergedProps<HTMLInputElement>()({}, {});
+        const p5 = useMergedProps<HTMLInputElement>()(props, {});
+        const p6 = useMergedProps<HTMLInputElement>()(props, { id: undefined });
+        const p7 = useMergedProps<HTMLInputElement>()(props, { id: "string" });
+
+
+        p1.id?.concat("");
+        p2.id?.concat("");
+        /// @ts-expect-error    id can't be anything but undefined
+        p3.id?.concat("");
+        /// @ts-expect-error    id can't be anything but undefined
+        p4.id?.concat("");
+
+
+        p5.id?.concat("");
+        p6.id?.concat("");
+        p7.id?.concat("");
+
+        /// @ts-expect-error    id must contain undefined
+        p5.id.concat("");
+        /// @ts-expect-error    id must contain undefined
+        p6.id.concat("");
+        /// @ts-expect-error    id must contain undefined
+        p7.id.concat("");
+
+
+        if (p5.allowFullScreen === undefined) {}
+        else if (p5.allowFullScreen === false) {}
+        else if (p5.allowFullScreen === true) {}
+        else {
+            acceptsNever(p5.allowFullScreen);
+        }
+
+
+        if (p6.allowFullScreen === undefined) {}
+        else if (p6.allowFullScreen === false) {}
+        else if (p6.allowFullScreen === true) {}
+        else {
+            acceptsNever(p6.allowFullScreen);
+        }
+
+
+        if (p7.allowFullScreen === undefined) {}
+        else if (p7.allowFullScreen === false) {}
+        else if (p7.allowFullScreen === true) {}
+        else {
+            acceptsNever(p7.allowFullScreen);
+        }
+
+
+        // Make sure it works recursively
+        const r1a = useMergedProps<HTMLInputElement>()({}, p1);
+        const r1b = useMergedProps<HTMLInputElement>()(props, p1);
+        const r2a = useMergedProps<HTMLInputElement>()({}, p2);
+        const r2b = useMergedProps<HTMLInputElement>()(props, p2);
+        const r3a = useMergedProps<HTMLInputElement>()({}, p3);
+        const r3b = useMergedProps<HTMLInputElement>()(props, p3);
+        const r4a = useMergedProps<HTMLInputElement>()({}, p4);
+        const r4b = useMergedProps<HTMLInputElement>()(props, p4);
+        const r5a = useMergedProps<HTMLInputElement>()({}, p5);
+        const r5b = useMergedProps<HTMLInputElement>()(props, p5);
+        const r6a = useMergedProps<HTMLInputElement>()({}, p6);
+        const r6b = useMergedProps<HTMLInputElement>()(props, p6);
+        const r7a = useMergedProps<HTMLInputElement>()({}, p7);
+        const r7b = useMergedProps<HTMLInputElement>()(props, p7);
+
+
+        r1a.id?.concat("");
+        r1b.id?.concat("");
+        r2a.id?.concat("");
+        r2b.id?.concat("");
+        // @ts-expect-error    id can't be anything but undefined
+        r3a.id?.concat("");
+        r3b.id?.concat("");
+        /// @ts-expect-error    id can't be anything but undefined
+        r4a.id?.concat("");
+        r4b.id?.concat("");
+
+
+        r5a.id?.concat("");
+        r5b.id?.concat("");
+        r6a.id?.concat("");
+        r6b.id?.concat("");
+        r7a.id?.concat("");
+        r7b.id?.concat("");
+
+        /// @ts-expect-error    id must contain undefined
+        r5a.id.concat("");
+        /// @ts-expect-error    id must contain undefined
+        r5b.id.concat("");
+        /// @ts-expect-error    id must contain undefined
+        r6a.id.concat("");
+        /// @ts-expect-error    id must contain undefined
+        r6b.id.concat("");
+        /// @ts-expect-error    id must contain undefined
+        r7a.id.concat("");
+        /// @ts-expect-error    id must contain undefined
+        r7b.id.concat("");
+
+
+        if (r5a.allowFullScreen === undefined) {}
+        else if (r5a.allowFullScreen === false) {}
+        else if (r5a.allowFullScreen === true) {}
+        else {
+            acceptsNever(r5a.allowFullScreen);
+        }
+
+
+        if (r5b.allowFullScreen === undefined) {}
+        else if (r5b.allowFullScreen === false) {}
+        else if (r5b.allowFullScreen === true) {}
+        else {
+            acceptsNever(r5b.allowFullScreen);
+        }
+
+
+        if (r6a.allowFullScreen === undefined) {}
+        else if (r6a.allowFullScreen === false) {}
+        else if (r6a.allowFullScreen === true) {}
+        else {
+            acceptsNever(r6a.allowFullScreen);
+        }
+
+
+        if (r6b.allowFullScreen === undefined) {}
+        else if (r6b.allowFullScreen === false) {}
+        else if (r6b.allowFullScreen === true) {}
+        else {
+            acceptsNever(r6b.allowFullScreen);
+        }
+
+
+        if (r7a.allowFullScreen === undefined) {}
+        else if (r7a.allowFullScreen === false) {}
+        else if (r7a.allowFullScreen === true) {}
+        else {
+            acceptsNever(r7a.allowFullScreen);
+        }
+
+
+        if (r7b.allowFullScreen === undefined) {}
+        else if (r7b.allowFullScreen === false) {}
+        else if (r7b.allowFullScreen === true) {}
+        else {
+            acceptsNever(r7b.allowFullScreen);
+        }
+
+    }
+    function acceptsNever(n: never) {}
+    */
+
+    /**
+     * Returns a function that will, when called, force the component
+     * that uses this hook to re-render itself.
+     *
+     * It's a bit smelly, so best to use sparingly.
+     */
+    function useForceUpdate() {
+        const [, set] = y(0);
+        return A(() => set(i => ++i)).current;
+    }
+
     /**
      * Hook that allows for the **direct descendant** children of this component to be re-ordered and sorted.
      *
@@ -4146,105 +4146,26 @@ var bundle = (function (exports) {
      * there's no other time or place this can happen other than exactly within the parent component's render function.
      */
     function useSortableChildren({ rearrangeableChildrenParameters, sortableChildrenParameters: { compare: userCompare } }) {
-        const compare = (userCompare ?? defaultCompare);
+        const getCompare = useStableGetter(userCompare);
         const { rearrangeableChildrenReturn } = useRearrangeableChildren({ rearrangeableChildrenParameters });
         const { rearrange } = rearrangeableChildrenReturn;
         // The actual sort function.
         const sort = q$1((managedRows, direction) => {
-            const sortedRows = managedRows.arraySlice().sort((lhsRow, rhsRow) => {
+            const compare = getCompare();
+            const sortedRows = compare ? managedRows.arraySlice().sort((lhsRow, rhsRow) => {
                 const lhsValue = lhsRow;
                 const rhsValue = rhsRow;
                 const result = compare(lhsValue, rhsValue);
                 if (direction[0] == "d")
                     return -result;
                 return result;
-            });
+            }) : managedRows.arraySlice();
             return rearrange(sortedRows);
         }, [ /* Must remain stable */]);
         return {
             sortableChildrenReturn: { sort },
             rearrangeableChildrenReturn
         };
-    }
-    /*export interface UseGroupedSortableChildrenParameters<M extends GroupedSortedChildInfo> {
-        managedChildrenReturn: UseManagedChildrenReturnType<M>["managedChildrenReturn"]
-    }
-
-    export interface UseGroupedSortableChildren {
-        linearNavigationParameters: Pick<UseLinearNavigationParameters["linearNavigationParameters"], "indexDemangler" | "indexMangler">
-    }*/
-    /**
-     * It's common enough to have, e.g., a list with multiple sortable groups, a table where the body is sorted independently of the head, etc...
-     *
-     * A sortable group assumes that the parent (which also calls this hook) handles list navigation (or similar),
-     * and that each group element (which can also be the list parent, if there are NO groups) handles sorting (or similar).
-     */
-    /*export function useGroupedSortableChildren<M extends GroupedSortedChildInfo>({ managedChildrenReturn: { getChildren } }: UseGroupedSortableChildrenParameters<M>): UseGroupedSortableChildren {
-        const allIndexManglers = useRef<Map<number, (i: number) => number>>(new Map());
-        const allIndexDemanglers = useRef<Map<number, (i: number) => number>>(new Map());
-        const indexMangler = useCallback((i: number): number => {
-            const child = getChildren().getAt(i);
-            if (child) {
-                let indexManglerForThisLocation = allIndexManglers.current.get(child.locationIndex);
-                return (indexManglerForThisLocation ?? identity)(i);
-            }
-            return identity(i);
-        }, []);
-        const indexDemangler = useCallback((i: number): number => {
-            const child = getChildren().getAt(i);
-            if (child) {
-                let indexDemanglerForThisLocation = allIndexDemanglers.current.get(child.locationIndex);
-                return (indexDemanglerForThisLocation ?? identity)(i);
-            }
-            return identity(i);
-        }, []);
-
-
-        return {
-            linearNavigationParameters: {
-                indexMangler,
-                indexDemangler
-            }
-        }
-    }*/
-    function defaultCompare(lhs, rhs) {
-        return compare1(lhs, rhs);
-        function compare3(lhs, rhs) {
-            // Coerce strings to numbers if they seem to stay the same when serialized
-            if (`${+lhs}` === lhs)
-                lhs = +lhs;
-            if (`${+rhs}` === rhs)
-                rhs = +rhs;
-            // At this point, if either argument is a string, turn the other one into one too
-            if (typeof lhs === "string")
-                rhs = `${rhs}`;
-            if (typeof rhs === "string")
-                lhs = `${lhs}`;
-            console.assert(typeof lhs === typeof rhs);
-            if (typeof lhs === "string")
-                return lhs.localeCompare(rhs);
-            if (typeof lhs === "number")
-                return +lhs - +rhs;
-            return 0;
-        }
-        function compare2(lhs, rhs) {
-            if (typeof lhs === "boolean" || lhs instanceof Date)
-                lhs = +lhs;
-            if (typeof rhs === "boolean" || rhs instanceof Date)
-                rhs = +rhs;
-            return compare3(lhs, rhs);
-        }
-        function compare1(lhs, rhs) {
-            if (lhs == null && rhs == null) {
-                // They're both null
-                return 0;
-            }
-            else if (lhs == null || rhs == null) {
-                // One of the two is null -- easy case
-                return lhs != null ? 1 : -1;
-            }
-            return compare2(lhs, rhs);
-        }
     }
 
     function useGridNavigationSingleSelectionSortable({ rearrangeableChildrenParameters, sortableChildrenParameters, linearNavigationParameters, ...gridNavigationSingleSelectionParameters }) {
