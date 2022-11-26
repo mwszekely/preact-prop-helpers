@@ -581,7 +581,7 @@ export const DemoUseGrid = memo(() => {
         gridNavigationParameters: { onTabbableColumnChange: setTabbableColumn },
         linearNavigationParameters: { disableArrowKeys: false, disableHomeEndKeys: false, navigatePastEnd: "wrap", navigatePastStart: "wrap", pageNavigationSize: 0.1 },
         //managedChildrenReturn: { getChildren },
-        rovingTabIndexParameters: { initiallyTabbedIndex: null, onTabbableIndexChange: setTabbableRow, untabbable: false },
+        rovingTabIndexParameters: { onTabbableIndexChange: setTabbableRow, untabbable: false },
         typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000 },
         rearrangeableChildrenParameters: {
             getIndex: useCallback<GetIndex<{ index: number }>>((a: VNode<{ index: number }>) => a.props.index, [])

@@ -4775,7 +4775,7 @@ var bundle = (function (exports) {
             gridNavigationParameters,
             linearNavigationParameters: { getHighestIndex: getHighestChildIndex, isValid, ...linearNavigationParameters },
             managedChildrenReturn: { getChildren },
-            rovingTabIndexParameters,
+            rovingTabIndexParameters: { initiallyTabbedIndex: singleSelectionParameters.initiallySelectedIndex, ...rovingTabIndexParameters },
             singleSelectionParameters,
             typeaheadNavigationParameters: { isValid, ...typeaheadNavigationParameters },
             rearrangeableChildrenParameters,
