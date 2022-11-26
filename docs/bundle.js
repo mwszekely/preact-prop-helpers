@@ -4876,8 +4876,9 @@ var bundle = (function (exports) {
      *
      * @returns
      */
-    function useCompleteListNavigation({ linearNavigationParameters, rearrangeableChildrenParameters, sortableChildrenParameters, typeaheadNavigationParameters, ...completeListNavigationParameters }) {
+    function useCompleteListNavigation({ linearNavigationParameters, rearrangeableChildrenParameters, sortableChildrenParameters, typeaheadNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, ...completeListNavigationParameters }) {
         //type M = UseListNavigationSingleSelectionChildInfo<ChildElement>;
+        const { initiallySelectedIndex } = singleSelectionParameters;
         const getChildren = q$1(() => managedChildrenReturn.getChildren(), []);
         const getHighestChildIndex = q$1(() => getChildren().getHighestIndex(), []);
         const getValid = q$1((i) => {
@@ -4895,6 +4896,8 @@ var bundle = (function (exports) {
             managedChildrenReturn: { getChildren },
             linearNavigationParameters: { getHighestIndex: getHighestChildIndex, isValid: getValid, indexDemangler, indexMangler, ...linearNavigationParameters },
             typeaheadNavigationParameters: { isValid: getValid, ...typeaheadNavigationParameters },
+            rovingTabIndexParameters: { initiallyTabbedIndex: initiallySelectedIndex, ...rovingTabIndexParameters },
+            singleSelectionParameters,
             ...completeListNavigationParameters,
         });
         //const { linearNavigationReturn, typeaheadNavigationReturn } = listNavigationSingleSelectionSortableReturn;
@@ -6238,7 +6241,7 @@ var bundle = (function (exports) {
          * complete hooks need a parent naviateRelative/Absolute that handles all child sections
          */
         const r = useCompleteListNavigation({
-            rovingTabIndexParameters: { initiallyTabbedIndex: tabbableIndex, onTabbableIndexChange: setLocalTabbableIndex, untabbable: false },
+            rovingTabIndexParameters: { onTabbableIndexChange: setLocalTabbableIndex, untabbable: false },
             singleSelectionParameters: { initiallySelectedIndex: selectedIndex, onSelectedIndexChange: setLocalSelectedIndex },
             typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000 },
             linearNavigationParameters: { disableArrowKeys: false, disableHomeEndKeys: false, navigationDirection: "vertical", navigatePastEnd: "wrap", navigatePastStart: "wrap", pageNavigationSize: 0.1 },
