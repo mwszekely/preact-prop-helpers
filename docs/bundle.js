@@ -4158,7 +4158,7 @@ var bundle = (function (exports) {
      * there's no other time or place this can happen other than exactly within the parent component's render function.
      */
     function useSortableChildren({ rearrangeableChildrenParameters, sortableChildrenParameters: { compare: userCompare } }) {
-        const getCompare = useStableGetter(userCompare);
+        const getCompare = useStableGetter(userCompare ?? defaultCompare);
         const { rearrangeableChildrenReturn } = useRearrangeableChildren({ rearrangeableChildrenParameters });
         const { rearrange } = rearrangeableChildrenReturn;
         // The actual sort function.
@@ -4178,6 +4178,59 @@ var bundle = (function (exports) {
             sortableChildrenReturn: { sort },
             rearrangeableChildrenReturn
         };
+    }
+    /*export interface UseGroupedSortableChildrenParameters<M extends GroupedSortedChildInfo> {
+        managedChildrenReturn: UseManagedChildrenReturnType<M>["managedChildrenReturn"]
+    }
+
+    export interface UseGroupedSortableChildren {
+        linearNavigationParameters: Pick<UseLinearNavigationParameters["linearNavigationParameters"], "indexDemangler" | "indexMangler">
+    }*/
+    /**
+     * It's common enough to have, e.g., a list with multiple sortable groups, a table where the body is sorted independently of the head, etc...
+     *
+     * A sortable group assumes that the parent (which also calls this hook) handles list navigation (or similar),
+     * and that each group element (which can also be the list parent, if there are NO groups) handles sorting (or similar).
+     */
+    /*export function useGroupedSortableChildren<M extends GroupedSortedChildInfo>({ managedChildrenReturn: { getChildren } }: UseGroupedSortableChildrenParameters<M>): UseGroupedSortableChildren {
+        const allIndexManglers = useRef<Map<number, (i: number) => number>>(new Map());
+        const allIndexDemanglers = useRef<Map<number, (i: number) => number>>(new Map());
+        const indexMangler = useCallback((i: number): number => {
+            const child = getChildren().getAt(i);
+            if (child) {
+                let indexManglerForThisLocation = allIndexManglers.current.get(child.locationIndex);
+                return (indexManglerForThisLocation ?? identity)(i);
+            }
+            return identity(i);
+        }, []);
+        const indexDemangler = useCallback((i: number): number => {
+            const child = getChildren().getAt(i);
+            if (child) {
+                let indexDemanglerForThisLocation = allIndexDemanglers.current.get(child.locationIndex);
+                return (indexDemanglerForThisLocation ?? identity)(i);
+            }
+            return identity(i);
+        }, []);
+
+
+        return {
+            linearNavigationParameters: {
+                indexMangler,
+                indexDemangler
+            }
+        }
+    }*/
+    function defaultCompare(lhs, rhs) {
+        return compare1(lhs?.getSortValue(), rhs?.getSortValue());
+        function compare1(lhs, rhs) {
+            if (lhs == null || rhs == null) {
+                if (lhs == null)
+                    return -1;
+                if (rhs == null)
+                    return 1;
+            }
+            return lhs - rhs;
+        }
     }
 
     function useGridNavigationSingleSelectionSortable({ rearrangeableChildrenParameters, sortableChildrenParameters, linearNavigationParameters, ...gridNavigationSingleSelectionParameters }) {
@@ -4717,14 +4770,14 @@ var bundle = (function (exports) {
     function useCompleteGridNavigation({ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, typeaheadNavigationParameters, sortableChildrenParameters, rearrangeableChildrenParameters }) {
         const getChildren = q$1(() => managedChildrenReturn.getChildren(), []);
         const getHighestChildIndex = q$1(() => getChildren().getHighestIndex(), []);
-        //const getValid = useStableCallback<GetValid>((index): boolean => { return !(getChildren().getAt(index)?.hidden) });
+        const isValid = useStableCallback((index) => { return !(getChildren().getAt(index)?.hidden); });
         const { childrenHaveFocusParameters, managedChildrenParameters, rovingTabIndexChildContext, singleSelectionContext, typeaheadNavigationChildContext, gridNavigationRowContext, ...gridNavigationSingleSelectionReturn } = useGridNavigationSingleSelectionSortable({
             gridNavigationParameters,
-            linearNavigationParameters: { getHighestIndex: getHighestChildIndex, ...linearNavigationParameters },
+            linearNavigationParameters: { getHighestIndex: getHighestChildIndex, isValid, ...linearNavigationParameters },
             managedChildrenReturn: { getChildren },
             rovingTabIndexParameters,
             singleSelectionParameters,
-            typeaheadNavigationParameters,
+            typeaheadNavigationParameters: { isValid, ...typeaheadNavigationParameters },
             rearrangeableChildrenParameters,
             sortableChildrenParameters
         });
@@ -6735,19 +6788,19 @@ var bundle = (function (exports) {
         const [selectedRow, setSelectedRow, getSelectedRow] = useState(null);
         const [tabbableRow, setTabbableRow] = useState(null);
         //const getHighestIndex = useCallback(() => getChildren().getHighestIndex(), []);
-        const getChildren = q$1(() => { return getChildren2(); }, []);
+        //const getChildren = useCallback<typeof getChildren2>(() => { return getChildren2() }, []);
         //const getHighestChildIndex = useStableCallback(() => ghci());
-        const getValid = useStableCallback((i) => {
+        /*const getValid = useStableCallback<GetValid>((i) => {
             const child = getChildren().getAt(i);
             return !(child?.hidden || child?.disabled);
-        });
+        });*/
         const ret = useCompleteGridNavigation({
             singleSelectionParameters: { initiallySelectedIndex: selectedRow, onSelectedIndexChange: setSelectedRow },
             gridNavigationParameters: { onTabbableColumnChange: setTabbableColumn },
-            linearNavigationParameters: { disableArrowKeys: false, disableHomeEndKeys: false, navigatePastEnd: "wrap", navigatePastStart: "wrap", isValid: getValid, pageNavigationSize: 0.1 },
+            linearNavigationParameters: { disableArrowKeys: false, disableHomeEndKeys: false, navigatePastEnd: "wrap", navigatePastStart: "wrap", pageNavigationSize: 0.1 },
             //managedChildrenReturn: { getChildren },
             rovingTabIndexParameters: { initiallyTabbedIndex: null, onTabbableIndexChange: setTabbableRow, untabbable: false },
-            typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000, isValid: getValid },
+            typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000 },
             rearrangeableChildrenParameters: {
                 getIndex: q$1((a) => a.props.index, [])
             },
@@ -6756,7 +6809,6 @@ var bundle = (function (exports) {
         const { context, props, managedChildrenReturn, 
         //rearrangeableChildrenParameters: { getHighestChildIndex: ghci, getValid: gv },
         rearrangeableChildrenReturn: { useRearrangeableProps } } = ret;
-        const { getChildren: getChildren2 } = managedChildrenReturn;
         /*const {
             linearNavigationParameters,
             rearrangeableChildrenReturn,

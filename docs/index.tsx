@@ -565,24 +565,24 @@ export const DemoUseGrid = memo(() => {
     const [selectedRow, setSelectedRow, getSelectedRow] = useState<number | null>(null);
     const [tabbableRow, setTabbableRow] = useState<number | null>(null);
     //const getHighestIndex = useCallback(() => getChildren().getHighestIndex(), []);
-    const getChildren = useCallback<typeof getChildren2>(() => { return getChildren2() }, []);
+    //const getChildren = useCallback<typeof getChildren2>(() => { return getChildren2() }, []);
 
 
 
     //const getHighestChildIndex = useStableCallback(() => ghci());
-    const getValid = useStableCallback<GetValid>((i) => {
+    /*const getValid = useStableCallback<GetValid>((i) => {
         const child = getChildren().getAt(i);
         return !(child?.hidden || child?.disabled);
-    });
+    });*/
 
 
     const ret: UseCompleteGridNavigationReturnType<HTMLTableSectionElement, HTMLTableRowElement, GridSingleSelectSortableChildRowInfo<HTMLTableRowElement>> = useCompleteGridNavigation<HTMLTableSectionElement, HTMLTableRowElement, GridSingleSelectSortableChildRowInfo<HTMLTableRowElement>>({
         singleSelectionParameters: { initiallySelectedIndex: selectedRow, onSelectedIndexChange: setSelectedRow },
         gridNavigationParameters: { onTabbableColumnChange: setTabbableColumn },
-        linearNavigationParameters: { disableArrowKeys: false, disableHomeEndKeys: false, navigatePastEnd: "wrap", navigatePastStart: "wrap", isValid: getValid, pageNavigationSize: 0.1 },
+        linearNavigationParameters: { disableArrowKeys: false, disableHomeEndKeys: false, navigatePastEnd: "wrap", navigatePastStart: "wrap", pageNavigationSize: 0.1 },
         //managedChildrenReturn: { getChildren },
         rovingTabIndexParameters: { initiallyTabbedIndex: null, onTabbableIndexChange: setTabbableRow, untabbable: false },
-        typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000, isValid: getValid },
+        typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000 },
         rearrangeableChildrenParameters: {
             getIndex: useCallback<GetIndex<{ index: number }>>((a: VNode<{ index: number }>) => a.props.index, [])
         },
