@@ -163,7 +163,12 @@ export function useSingleSelectionChild<ChildElement extends Element>(args: UseS
 
     return {
         managedChildParameters: { selected, setSelected, getSelected, },
-        singleSelectionChildReturn: { selected, setSelected: useCallback(() => { setSelectedIndex(getIndex()) }, []), getSelected, propsUnstable: { [ariaPropName as keyof h.JSX.HTMLAttributes<any>]: (selected ?? false).toString() } },
+        singleSelectionChildReturn: { 
+            selected, 
+            setSelected: useCallback(() => { setSelectedIndex(getIndex()) }, []), 
+            getSelected, 
+            propsUnstable: ariaPropName == null? {} : { [ariaPropName as keyof h.JSX.HTMLAttributes<any>]: (selected ?? false).toString() } 
+        },
         pressParameters: { onPressSync },
         hasCurrentFocusParameters: { onCurrentFocusedInnerChanged }
     }

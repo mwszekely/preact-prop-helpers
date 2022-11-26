@@ -144,6 +144,7 @@ var bundle = (function (exports) {
     function returnTrue() { return true; }
     function returnFalse() { return false; }
     function returnNull() { return null; }
+    function identity$1(t) { return t; } // Kind of an extra, but it's useful in other places anyway
 
     /*
     const activeElementUpdaters = new Map<Window | null | undefined, Set<undefined | ((e: Node | null) => void)>>();
@@ -2796,7 +2797,12 @@ var bundle = (function (exports) {
         }));
         return {
             managedChildParameters: { selected, setSelected, getSelected, },
-            singleSelectionChildReturn: { selected, setSelected: q$1(() => { setSelectedIndex(getIndex()); }, []), getSelected, propsUnstable: { [ariaPropName]: (selected ?? false).toString() } },
+            singleSelectionChildReturn: {
+                selected,
+                setSelected: q$1(() => { setSelectedIndex(getIndex()); }, []),
+                getSelected,
+                propsUnstable: ariaPropName == null ? {} : { [ariaPropName]: (selected ?? false).toString() }
+            },
             pressParameters: { onPressSync },
             hasCurrentFocusParameters: { onCurrentFocusedInnerChanged }
         };
@@ -4805,12 +4811,18 @@ var bundle = (function (exports) {
     function useCompleteGridNavigationRow({ asChildRowParameters: { managedChildParameters, context: { childrenHaveFocusChildContext, gridNavigationRowContext, managedChildContext: mcc1, rovingTabIndexChildContext, singleSelectionContext, typeaheadNavigationChildContext }, completeGridNavigationRowParameters, singleSelectionChildParameters, typeaheadNavigationChildParameters, ...asChildRowParameters }, asParentRowParameters: { linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, ...asParentRowParameters } }) {
         const getChildren = q$1(() => managedChildrenReturn.getChildren(), []);
         const getHighestChildIndex = q$1(() => getChildren().getHighestIndex(), []);
+        const isValid = q$1((i) => {
+            const child = getChildren().getAt(i);
+            if (!child)
+                return false;
+            return !child.hidden;
+        }, []);
         const r = useGridNavigationSingleSelectionRow({
             asParentRowParameters: {
                 ...asParentRowParameters,
-                rovingTabIndexParameters,
-                typeaheadNavigationParameters,
-                linearNavigationParameters: { getHighestIndex: getHighestChildIndex, pageNavigationSize: 0, ...linearNavigationParameters },
+                rovingTabIndexParameters: { initiallyTabbedIndex: 0, ...rovingTabIndexParameters },
+                typeaheadNavigationParameters: { isValid, ...typeaheadNavigationParameters },
+                linearNavigationParameters: { isValid, getHighestIndex: getHighestChildIndex, pageNavigationSize: 0, indexDemangler: identity$1, indexMangler: identity$1, ...linearNavigationParameters },
                 managedChildrenReturn: { getChildren },
             },
             asChildRowParameters: {
@@ -5463,7 +5475,7 @@ var bundle = (function (exports) {
       });
     }
 
-    function identity$1(...t) { return t; }
+    function identity(...t) { return t; }
     function useThrottled(callback, wait, options) {
         const throttled = T$1(() => {
             return callback ? throttle(callback, wait, options) : null;
@@ -5509,7 +5521,7 @@ var bundle = (function (exports) {
     function useAsync(asyncHandler, options) {
         /* eslint-disable prefer-const */
         let { throttle, debounce, capture } = (options ?? {});
-        capture ??= identity$1;
+        capture ??= identity;
         // We keep, like, a lot of render-state, but it only ever triggers a re-render
         // when we start/stop an async action.
         // Keep track of this for the caller's sake -- we don't really care.
@@ -6865,7 +6877,6 @@ var bundle = (function (exports) {
                                     })())
                                 }) }) })] })] }));
     });
-    function identity(t) { return t; }
     //type GridRowContext<ParentElement extends Element, RowElement extends Element> = CompleteGridNavigationContext<ParentElement, RowElement>;
     //type GridCellContext<RowElement extends Element, CellElement extends Element> = CompleteGridNavigationRowContext<RowElement, CellElement>;
     const GridRowContext = B$2(null);
@@ -6888,9 +6899,9 @@ var bundle = (function (exports) {
                 typeaheadNavigationChildParameters: { text: "" }
             },
             asParentRowParameters: {
-                linearNavigationParameters: { disableArrowKeys: false, disableHomeEndKeys: false, indexDemangler: identity, indexMangler: identity, isValid: returnTrue, navigatePastEnd: "wrap", navigatePastStart: "wrap" },
-                rovingTabIndexParameters: { initiallyTabbedIndex: 0, onTabbableIndexChange: setTabbableColumn, untabbable: false },
-                typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000, isValid: returnTrue }
+                linearNavigationParameters: { disableArrowKeys: false, disableHomeEndKeys: false, navigatePastEnd: "wrap", navigatePastStart: "wrap" },
+                rovingTabIndexParameters: { onTabbableIndexChange: setTabbableColumn, untabbable: false },
+                typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000 }
             }
         });
         const { asChildRowReturn: { rovingTabIndexChildReturn: { tabbable } }, context: contextToChild, props } = ret;

@@ -704,9 +704,9 @@ const DemoUseGridRow = memo((({ index }: { index: number }) => {
             typeaheadNavigationChildParameters: { text: "" }
         },
         asParentRowParameters: {
-            linearNavigationParameters: { disableArrowKeys: false, disableHomeEndKeys: false, indexDemangler: identity, indexMangler: identity, isValid: returnTrue, navigatePastEnd: "wrap", navigatePastStart: "wrap" },
-            rovingTabIndexParameters: { initiallyTabbedIndex: 0, onTabbableIndexChange: setTabbableColumn, untabbable: false },
-            typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000, isValid: returnTrue }
+            linearNavigationParameters: { disableArrowKeys: false, disableHomeEndKeys: false, navigatePastEnd: "wrap", navigatePastStart: "wrap" },
+            rovingTabIndexParameters: { onTabbableIndexChange: setTabbableColumn, untabbable: false },
+            typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000 }
         }
     });
 
