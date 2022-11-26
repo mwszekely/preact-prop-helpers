@@ -4924,7 +4924,7 @@ var bundle = (function (exports) {
             childrenHaveFocusReturn
         };
     }
-    function useCompleteListNavigationChild({ managedChildParameters: { hidden, disabled, index }, completeListNavigationChildParameters, singleSelectionChildParameters, typeaheadNavigationChildParameters, context: { childrenHaveFocusChildContext, managedChildContext, rovingTabIndexChildContext, singleSelectionContext, typeaheadNavigationChildContext }, pressParameters: { onPressSync: ops1, ...pressParameters }, ..._void }) {
+    function useCompleteListNavigationChild({ managedChildParameters: { hidden, disabled, index, getSortValue }, completeListNavigationChildParameters, singleSelectionChildParameters, typeaheadNavigationChildParameters, context: { childrenHaveFocusChildContext, managedChildContext, rovingTabIndexChildContext, singleSelectionContext, typeaheadNavigationChildContext }, pressParameters: { onPressSync: ops1, ...pressParameters }, ..._void }) {
         if (hidden)
             disabled = true;
         const { refElementReturn } = useRefElement({ refElementParameters: {} });
@@ -4960,7 +4960,8 @@ var bundle = (function (exports) {
             selected,
             setSelected,
             setTabbable,
-            tabbable
+            tabbable,
+            getSortValue
         };
         const { managedChildReturn } = useManagedChild({
             context: { managedChildContext },
@@ -6275,8 +6276,9 @@ var bundle = (function (exports) {
         const focusSelf = q$1((e) => { e.focus(); }, []);
         // const { refElementReturn } = useRefElement<HTMLLIElement>({ refElementParameters: { onElementChange: undefined } });
         //const { getElement, propsStable: p3 } = refElementReturn;
+        const getSortValue = useStableCallback(() => index);
         const { props, rovingTabIndexChildReturn: { tabbable, propsUnstable: p2 }, singleSelectionChildReturn: { selected } } = useCompleteListNavigationChild({
-            managedChildParameters: { hidden, disabled, index, },
+            managedChildParameters: { hidden, disabled, index, getSortValue },
             pressParameters: { onPressSync: null, exclude: {}, focusSelf },
             singleSelectionChildParameters: { ariaPropName: "aria-selected", selectionMode },
             typeaheadNavigationChildParameters: { text },

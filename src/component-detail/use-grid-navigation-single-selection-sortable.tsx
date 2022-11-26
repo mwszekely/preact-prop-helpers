@@ -2,7 +2,7 @@ import { useCallback } from "preact/hooks";
 import { useGridNavigationCell, UseGridNavigationCellParameters, UseGridNavigationCellReturnType } from "./use-grid-navigation-partial";
 import { GridSingleSelectChildCellInfo, GridSingleSelectChildRowInfo, useGridNavigationSingleSelection, UseGridNavigationSingleSelectionParameters, UseGridNavigationSingleSelectionReturnType, useGridNavigationSingleSelectionRow, UseGridNavigationSingleSelectionRowParameters, UseGridNavigationSingleSelectionRowReturnType } from "./use-grid-navigation-single-selection";
 //import { UseSingleSelectionChildParameters, UseSingleSelectionChildReturnTypeInfo, UseSingleSelectionParameters, UseSingleSelectionReturnTypeInfo } from "./use-single-selection";
-import { useSortableChildren, UseSortableChildrenParameters, UseSortableChildrenReturnType } from "./use-sortable-children";
+import { UseSortableChildInfo, useSortableChildren, UseSortableChildrenParameters, UseSortableChildrenReturnType } from "./use-sortable-children";
 
 /**
  * Like list navigation single selection sortable etc. etc. etc.
@@ -11,7 +11,7 @@ import { useSortableChildren, UseSortableChildrenParameters, UseSortableChildren
  */
 const _dummy = 0;
 
-export interface GridSingleSelectSortableChildRowInfo<RowElement extends Element> extends GridSingleSelectChildRowInfo<RowElement> { }
+export interface GridSingleSelectSortableChildRowInfo<RowElement extends Element> extends GridSingleSelectChildRowInfo<RowElement>, UseSortableChildInfo { }
 export interface GridSingleSelectSortableChildCellInfo<CellElement extends Element> extends GridSingleSelectChildCellInfo<CellElement> { }
 
 export interface UseGridNavigationSingleSelectionSortableParameters<RowElement extends Element, M extends GridSingleSelectChildRowInfo<RowElement>> extends Omit<UseGridNavigationSingleSelectionParameters<RowElement, M>, "linearNavigationParameters">, UseSortableChildrenParameters<M> {

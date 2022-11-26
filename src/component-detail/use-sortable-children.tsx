@@ -50,7 +50,7 @@ export interface UseSortableChildrenParameters<M extends ManagedChildInfo<number
         /**
          * Controls how values compare against each other when `sort` is called.
          * 
-         * If null, then sorting is disabled (manual rearrangement is still fine, but calling `sort()` will do nothing).
+         * If null, a default sort is used that assumes `getSortValue` returns a value that works well with the `-` operator (so, like, a number, string, `Date`, `null`, etc.)
          * 
          * @param lhs 
          * @param rhs 
@@ -112,6 +112,10 @@ export interface UseSortableChildrenReturnType<ParentElement extends Element, M 
     }
 }
 
+export interface UseSortableChildInfo extends ManagedChildInfo<number> {
+    getSortValue(): unknown;
+}
+
 
 /**
  * Hook that allows for the **direct descendant** children of this component to be re-ordered and sorted.
@@ -134,7 +138,7 @@ export interface UseSortableChildrenReturnType<ParentElement extends Element, M 
  * Because keys are given special treatment and a child has no way of modifying its own key
  * there's no other time or place this can happen other than exactly within the parent component's render function.
  */
-export function useRearrangeableChildren<ParentElement extends Element, M extends ManagedChildInfo<number>>({
+export function useRearrangeableChildren<ParentElement extends Element, M extends UseSortableChildInfo>({
     rearrangeableChildrenParameters: { getIndex }
 }: UseRearrangeableChildrenParameters): UseRearrangeableChildrenReturnType<ParentElement, M> {
 
@@ -225,12 +229,12 @@ export function useRearrangeableChildren<ParentElement extends Element, M extend
  * Because keys are given special treatment and a child has no way of modifying its own key
  * there's no other time or place this can happen other than exactly within the parent component's render function.
  */
-export function useSortableChildren<ParentElement extends Element, M extends ManagedChildInfo<number>>({
+export function useSortableChildren<ParentElement extends Element, M extends UseSortableChildInfo>({
     rearrangeableChildrenParameters,
     sortableChildrenParameters: { compare: userCompare }
 }: UseSortableChildrenParameters<M>): UseSortableChildrenReturnType<ParentElement, M> {
 
-    const getCompare = useStableGetter(userCompare);
+    const getCompare = useStableGetter<Compare<M>>(userCompare ?? defaultCompare);
 
     const { rearrangeableChildrenReturn } = useRearrangeableChildren<ParentElement, M>({ rearrangeableChildrenParameters });
     const { rearrange } = rearrangeableChildrenReturn;
@@ -238,7 +242,7 @@ export function useSortableChildren<ParentElement extends Element, M extends Man
     const sort = useCallback((managedRows: ManagedChildren<M>, direction: "ascending" | "descending"): Promise<void> | void => {
         const compare = getCompare();
 
-        const sortedRows = compare? managedRows.arraySlice().sort((lhsRow, rhsRow) => {
+        const sortedRows = compare ? managedRows.arraySlice().sort((lhsRow, rhsRow) => {
 
             const lhsValue = lhsRow;
             const rhsValue = rhsRow;
@@ -302,48 +306,17 @@ export interface UseGroupedSortableChildren {
     }
 }*/
 
-function defaultCompare(lhs: string | number | boolean | Date | null | undefined, rhs: string | number | boolean | Date | null | undefined) {
-    return compare1(lhs, rhs);
+export function defaultCompare(lhs: UseSortableChildInfo | undefined, rhs: UseSortableChildInfo | undefined) {
+    return compare1(lhs?.getSortValue(), rhs?.getSortValue());
 
-    function compare3(lhs: string | number, rhs: string | number) {
-
-        // Coerce strings to numbers if they seem to stay the same when serialized
-        if (`${+lhs}` === lhs)
-            lhs = +lhs;
-        if (`${+rhs}` === rhs)
-            rhs = +rhs;
-
-        // At this point, if either argument is a string, turn the other one into one too
-        if (typeof lhs === "string")
-            rhs = `${rhs}`;
-        if (typeof rhs === "string")
-            lhs = `${lhs}`;
-
-        console.assert(typeof lhs === typeof rhs);
-
-        if (typeof lhs === "string")
-            return lhs.localeCompare(rhs as string);
-        if (typeof lhs === "number")
-            return +lhs - +rhs;
-
-        return 0;
-    }
-    function compare2(lhs: string | number | boolean | Date, rhs: string | number | boolean | Date) {
-        if (typeof lhs === "boolean" || lhs instanceof Date)
-            lhs = +lhs;
-        if (typeof rhs === "boolean" || rhs instanceof Date)
-            rhs = +rhs;
-        return compare3(lhs, rhs);
-    }
-    function compare1(lhs: string | number | boolean | Date | null | undefined, rhs: string | number | boolean | Date | null | undefined) {
-        if (lhs == null && rhs == null) {
-            // They're both null
-            return 0;
+    function compare1(lhs: unknown | undefined, rhs: unknown | undefined) {
+        if (lhs == null || rhs == null) {
+            if (lhs == null)
+                return -1;
+            if (rhs == null)
+                return 1;
         }
-        else if (lhs == null || rhs == null) {
-            // One of the two is null -- easy case
-            return lhs != null ? 1 : -1
-        }
-        return compare2(lhs, rhs);
+
+        return (lhs as any) - (rhs as any);
     }
 }

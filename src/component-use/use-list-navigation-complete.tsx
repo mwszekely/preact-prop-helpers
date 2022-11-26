@@ -138,7 +138,7 @@ export interface UseCompleteListNavigationChildReturnType<ChildElement extends E
 }
 
 export function useCompleteListNavigationChild<ChildElement extends Element, M extends UseListNavigationSingleSelectionSortableChildInfo<ChildElement>, ExtraOmits extends Exclude<keyof M, keyof UseListNavigationSingleSelectionSortableChildInfo<ChildElement>>>({
-    managedChildParameters: { hidden, disabled, index },
+    managedChildParameters: { hidden, disabled, index, getSortValue },
     completeListNavigationChildParameters,
     singleSelectionChildParameters,
     typeaheadNavigationChildParameters,
@@ -191,7 +191,8 @@ export function useCompleteListNavigationChild<ChildElement extends Element, M e
         selected,
         setSelected,
         setTabbable,
-        tabbable
+        tabbable,
+        getSortValue
     }
 
     const { managedChildReturn } = useManagedChild<M>({

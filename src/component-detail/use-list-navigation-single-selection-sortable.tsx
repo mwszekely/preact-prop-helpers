@@ -1,5 +1,5 @@
 import { useListNavigationSingleSelection, useListNavigationSingleSelectionChild, UseListNavigationSingleSelectionChildInfo, UseListNavigationSingleSelectionChildReturnType, UseListNavigationSingleSelectionParameters, UseListNavigationSingleSelectionReturnType } from "./use-list-navigation-single-selection";
-import { useSortableChildren, UseSortableChildrenParameters, UseSortableChildrenReturnType } from "./use-sortable-children";
+import { UseSortableChildInfo, useSortableChildren, UseSortableChildrenParameters, UseSortableChildrenReturnType } from "./use-sortable-children";
 import { assertEmptyObject } from "../preact-extensions/use-child-manager";
 import { UseListNavigationSingleSelectionChildParameters } from "./use-list-navigation-single-selection";
 
@@ -11,7 +11,7 @@ import { UseListNavigationSingleSelectionChildParameters } from "./use-list-navi
  */
 const _dummy = 0;
 
-export interface UseListNavigationSingleSelectionSortableChildInfo<TabbableChildElement extends Element> extends UseListNavigationSingleSelectionChildInfo<TabbableChildElement> {}
+export interface UseListNavigationSingleSelectionSortableChildInfo<TabbableChildElement extends Element> extends UseListNavigationSingleSelectionChildInfo<TabbableChildElement>, UseSortableChildInfo {}
 export interface UseListNavigationSingleSelectionSortableParameters<_ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationSingleSelectionChildInfo<ChildElement>> extends Omit<UseListNavigationSingleSelectionParameters<ChildElement, M>, "linearNavigationParameters">, UseSortableChildrenParameters<M> {
     linearNavigationParameters: Omit<UseListNavigationSingleSelectionParameters<ChildElement, M>["linearNavigationParameters"], "indexDemangler" | "indexMangler">
 }

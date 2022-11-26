@@ -1,6 +1,6 @@
 import { createContext, VNode } from "preact";
 import { memo, useCallback, useContext } from "preact/compat";
-import { GetIndex, GetValid, UseListNavigationSingleSelectionChildInfo, useMergedProps, useSortableChildren, useStableCallback } from "../../index";
+import { GetIndex, GetValid, UseListNavigationSingleSelectionChildInfo, UseListNavigationSingleSelectionSortableChildInfo, useMergedProps, useSortableChildren, useStableCallback } from "../../index";
 
 import { useState } from "../../preact-extensions/use-state";
 
@@ -220,9 +220,9 @@ function useSortableSingleSelectChildDemo<ListItemElement extends Element>({
 
 }*/
 
-const ListNavigationSingleSelectionChildContext = createContext<CompleteListNavigationContext<HTMLOListElement, HTMLLIElement, UseListNavigationSingleSelectionChildInfo<HTMLLIElement>>>(null!)
+const ListNavigationSingleSelectionChildContext = createContext<CompleteListNavigationContext<HTMLOListElement, HTMLLIElement, UseListNavigationSingleSelectionSortableChildInfo<HTMLLIElement>>>(null!)
 export const DemoUseRovingTabIndex = memo(() => {
-    type M = UseListNavigationSingleSelectionChildInfo<HTMLLIElement>;
+    type M = UseListNavigationSingleSelectionSortableChildInfo<HTMLLIElement>;
 
     const [selectionMode, setSelectionMode] = useState("activation" as "focus" | "activation");
     const [count, setCount] = useState(10);
@@ -255,7 +255,7 @@ export const DemoUseRovingTabIndex = memo(() => {
      */
 
 
-    const r: UseCompleteListNavigationReturnType<HTMLOListElement, HTMLLIElement, M> = useCompleteListNavigation<HTMLOListElement, HTMLLIElement, UseListNavigationSingleSelectionChildInfo<HTMLLIElement>>({
+    const r: UseCompleteListNavigationReturnType<HTMLOListElement, HTMLLIElement, M> = useCompleteListNavigation<HTMLOListElement, HTMLLIElement, UseListNavigationSingleSelectionSortableChildInfo<HTMLLIElement>>({
         rovingTabIndexParameters: { onTabbableIndexChange: setLocalTabbableIndex, untabbable: false },
         singleSelectionParameters: { initiallySelectedIndex: selectedIndex, onSelectedIndexChange: setLocalSelectedIndex },
         typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000 },
@@ -343,18 +343,20 @@ const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
         disabled = hidden = true;
     }
     const [randomWord] = useState(() => RandomWords[index/*Math.floor(Math.random() * (RandomWords.length - 1))*/]);
-    const context = useContext(ListNavigationSingleSelectionChildContext) as CompleteListNavigationContext<HTMLOListElement, HTMLLIElement, UseListNavigationSingleSelectionChildInfo<HTMLLIElement>>;
+    const context = useContext(ListNavigationSingleSelectionChildContext) as CompleteListNavigationContext<HTMLOListElement, HTMLLIElement, UseListNavigationSingleSelectionSortableChildInfo<HTMLLIElement>>;
     const text = `${randomWord} This is item #${index}${hidden ? " (hidden)" : ""}${disabled ? " (disabled)" : ""}`;
     const focusSelf = useCallback((e: HTMLElement) => { e.focus() }, []);
     // const { refElementReturn } = useRefElement<HTMLLIElement>({ refElementParameters: { onElementChange: undefined } });
     //const { getElement, propsStable: p3 } = refElementReturn;
 
+    const getSortValue = useStableCallback(() => index);
+
     const {
         props,
         rovingTabIndexChildReturn: { tabbable, propsUnstable: p2 },
         singleSelectionChildReturn: { selected }
-    } = useCompleteListNavigationChild<HTMLLIElement, UseListNavigationSingleSelectionChildInfo<HTMLLIElement>, never>({
-        managedChildParameters: { hidden, disabled, index,  },
+    } = useCompleteListNavigationChild<HTMLLIElement, UseListNavigationSingleSelectionSortableChildInfo<HTMLLIElement>, never>({
+        managedChildParameters: { hidden, disabled, index, getSortValue },
         pressParameters: { onPressSync: null, exclude: {}, focusSelf },
         singleSelectionChildParameters: { ariaPropName: "aria-selected", selectionMode },
         typeaheadNavigationChildParameters: { text },
