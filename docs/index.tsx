@@ -694,8 +694,8 @@ const DemoUseGridRow = memo((({ index }: { index: number }) => {
 
     //    const getValid = useStableCallback<GetValid>((i) => !!(ret.managedChildReturn.getChildren().getAt(i)?.hidden));
 
-    const contextFromParent = useContext(GridRowContext) as CompleteGridNavigationContext<HTMLTableSectionElement, HTMLTableRowElement>;
-    const ret: UseCompleteGridNavigationRowReturnType<HTMLTableRowElement, HTMLTableCellElement, GridSingleSelectChildRowInfo<HTMLTableRowElement>, GridSingleSelectChildCellInfo<HTMLTableCellElement>> = useCompleteGridNavigationRow<HTMLTableRowElement, HTMLTableCellElement>({
+    const contextFromParent = useContext(GridRowContext) as CompleteGridNavigationContext<HTMLTableSectionElement, HTMLTableRowElement, GridSingleSelectSortableChildRowInfo<HTMLTableRowElement>>;
+    const ret: UseCompleteGridNavigationRowReturnType<HTMLTableRowElement, HTMLTableCellElement, GridSingleSelectSortableChildRowInfo<HTMLTableRowElement>, GridSingleSelectSortableChildCellInfo<HTMLTableCellElement>> = useCompleteGridNavigationRow<HTMLTableRowElement, HTMLTableCellElement, GridSingleSelectSortableChildRowInfo<HTMLTableRowElement>, GridSingleSelectSortableChildCellInfo<HTMLTableCellElement>>({
         asChildRowParameters: {
             completeGridNavigationRowParameters: {},
             context: contextFromParent,

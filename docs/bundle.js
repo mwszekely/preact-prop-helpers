@@ -6799,7 +6799,7 @@ var bundle = (function (exports) {
             gridNavigationParameters: { onTabbableColumnChange: setTabbableColumn },
             linearNavigationParameters: { disableArrowKeys: false, disableHomeEndKeys: false, navigatePastEnd: "wrap", navigatePastStart: "wrap", pageNavigationSize: 0.1 },
             //managedChildrenReturn: { getChildren },
-            rovingTabIndexParameters: { initiallyTabbedIndex: null, onTabbableIndexChange: setTabbableRow, untabbable: false },
+            rovingTabIndexParameters: { onTabbableIndexChange: setTabbableRow, untabbable: false },
             typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000 },
             rearrangeableChildrenParameters: {
                 getIndex: q$1((a) => a.props.index, [])
