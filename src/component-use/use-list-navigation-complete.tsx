@@ -120,7 +120,7 @@ export function useCompleteListNavigation<ParentElement extends Element, ChildEl
     }
 }
 
-export interface UseCompleteListNavigationChildParameters<ChildElement extends Element, M extends UseListNavigationSingleSelectionSortableChildInfo<ChildElement>, ExtraOmits extends Exclude<keyof M, keyof UseListNavigationSingleSelectionSortableChildInfo<ChildElement>>> {
+export interface UseCompleteListNavigationChildParameters<ChildElement extends Element, M extends UseListNavigationSingleSelectionSortableChildInfo<ChildElement>, ExtraOmits extends keyof M> {
     context: CompleteListNavigationContext<any, ChildElement, M>;
     pressParameters: UsePressParameters<ChildElement>["pressParameters"];
     singleSelectionChildParameters: UseListNavigationSingleSelectionSortableChildParameters<ChildElement>["singleSelectionChildParameters"];
