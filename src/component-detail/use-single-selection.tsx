@@ -42,7 +42,12 @@ export interface UseSingleSelectionParameters<ChildElement extends Element> {
     rovingTabIndexReturn: Pick<UseRovingTabIndexReturnType<ChildElement>["rovingTabIndexReturn"], "setTabbableIndex">
     singleSelectionParameters: {
         initiallySelectedIndex: number | null;
-        onSelectedIndexChange: OnPassiveStateChange<number | null>;
+        /**
+         * In general, this should only be `null` when single selection is entirely disabled.
+         * 
+         * In either case, **MUST** be stable!!
+         */
+        onSelectedIndexChange: null | OnPassiveStateChange<number | null>;
 
     }
 }
