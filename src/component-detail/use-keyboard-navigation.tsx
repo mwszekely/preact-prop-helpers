@@ -7,7 +7,7 @@ import { useStableGetter, useStableObject } from "../preact-extensions/use-stabl
 import { useState } from "../preact-extensions/use-state";
 import { useTimeout } from "../timing/use-timeout";
 import { UseRefElementReturnType } from "../dom-helpers/use-ref-element";
-import { useTextContent } from "../dom-helpers/use-text-content";
+import { useTextContent, UseTextContentParameters } from "../dom-helpers/use-text-content";
 import { OnPassiveStateChange } from "../preact-extensions/use-passive-state";
 
 /*
@@ -389,6 +389,8 @@ export interface UseTypeaheadNavigationParameters<TabbableChildElement extends E
 export interface UseTypeaheadNavigationChildParameters<ChildElement extends Element> {
     managedChildParameters: Pick<UseRovingTabIndexChildParameters<ChildElement>["managedChildParameters"], "index">;
 
+    textContentParameters: Pick<UseTextContentParameters<ChildElement>["textContentParameters"], "getText">;
+
     //typeaheadNavigationChildParameters: {
 
     //getText(element: Element | null): string;
@@ -651,6 +653,7 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
 
 export function useTypeaheadNavigationChild<ChildElement extends Element>({
     managedChildParameters: { index, ...void1 },
+    textContentParameters: { getText, ...void5 },
     typeaheadNavigationChildContext: { typeaheadNavigationChildParameters: { sortedTypeaheadInfo, insertingComparator, ...void2 } },
     refElementReturn: { getElement, ...void3 },
     //typeaheadNavigationChildParameters: { ...void5 },
@@ -661,11 +664,12 @@ export function useTypeaheadNavigationChild<ChildElement extends Element>({
     assertEmptyObject(void2);
     assertEmptyObject(void3);
     assertEmptyObject(void4);
-    //assertEmptyObject(void5);
+    assertEmptyObject(void5);
 
     const { } = useTextContent({
         refElementReturn: { getElement },
         textContentParameters: {
+            getText,
             onTextContentChange: useCallback<OnPassiveStateChange<string | null>>((text: string | null) => {
                 if (text) {
                     // Find where to insert this item.

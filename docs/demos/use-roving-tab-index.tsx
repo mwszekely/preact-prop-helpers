@@ -364,7 +364,8 @@ const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
         pressParameters: { onPressSync: null, exclude: {}, focusSelf },
         singleSelectionChildParameters: { ariaPropName: "aria-selected", selectionMode, disabled },
         completeListNavigationChildParameters: { foo: "bar" },
-        context
+        context,
+        textContentParameters: { getText: useCallback((e) => { return e?.textContent ?? "" }, []) }
     });
 
     const text = `${randomWord} This is item #${index}${hidden ? " (hidden)" : ""}${disabled ? " (disabled)" : ""}${selected ? " (selected)" : " (not selected)"} (${tabbable ? "Tabbable" : "Not tabbable"})`;

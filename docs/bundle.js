@@ -2305,12 +2305,12 @@ var bundle = (function (exports) {
       return { getElapsedTime, getRemainingTime };
   }
 
-  function useTextContent({ refElementReturn: { getElement }, textContentParameters: { onTextContentChange } }) {
+  function useTextContent({ refElementReturn: { getElement }, textContentParameters: { getText, onTextContentChange } }) {
       const [getTextContent, setTextContent] = usePassiveState(onTextContentChange, returnNull);
       s(() => {
           const element = getElement();
           if (element) {
-              const textContent = element.textContent;
+              const textContent = getText(element);
               if (textContent) {
                   setTextContent(textContent);
               }
@@ -2678,13 +2678,13 @@ var bundle = (function (exports) {
           }
       };
   }
-  function useTypeaheadNavigationChild({ managedChildParameters: { index, ...void1 }, typeaheadNavigationChildContext: { typeaheadNavigationChildParameters: { sortedTypeaheadInfo, insertingComparator, ...void2 } }, refElementReturn: { getElement, ...void3 }, 
+  function useTypeaheadNavigationChild({ managedChildParameters: { index, ...void1 }, textContentParameters: { getText, ...void5 }, typeaheadNavigationChildContext: { typeaheadNavigationChildParameters: { sortedTypeaheadInfo, insertingComparator, ...void2 } }, refElementReturn: { getElement, ...void3 }, 
   //typeaheadNavigationChildParameters: { ...void5 },
   ...void4 }) {
-      //assertEmptyObject(void5);
       useTextContent({
           refElementReturn: { getElement },
           textContentParameters: {
+              getText,
               onTextContentChange: q$1((text) => {
                   if (text) {
                       // Find where to insert this item.
@@ -2884,9 +2884,9 @@ var bundle = (function (exports) {
   }
   function useListNavigationChild({ rovingTabIndexChildParameters, rovingTabIndexChildContext, typeaheadNavigationChildContext, 
   //typeaheadNavigationChildParameters,
-  managedChildParameters, refElementReturn, ..._void2 }) {
+  managedChildParameters, refElementReturn, textContentParameters, ..._void2 }) {
       const rticr = useRovingTabIndexChild({ rovingTabIndexChildContext, rovingTabIndexChildParameters, managedChildParameters });
-      useTypeaheadNavigationChild({ refElementReturn, typeaheadNavigationChildContext, managedChildParameters });
+      useTypeaheadNavigationChild({ refElementReturn, typeaheadNavigationChildContext, managedChildParameters, textContentParameters });
       //    assertEmptyObject(_void5);
       return {
           ...rticr
@@ -2966,13 +2966,14 @@ var bundle = (function (exports) {
   //    managedChildParameters: { hidden, index, ...void3 },
   rovingTabIndexChildContext, typeaheadNavigationChildContext, 
   //typeaheadNavigationChildParameters,
-  rovingTabIndexChildParameters, managedChildParameters, refElementReturn, gridNavigationCellParameters: { colSpan }, gridNavigationCellContext: { gridNavigationCellParameters: { getRowIndex, setTabbableRow, getCurrentTabbableColumn: _getCurrentColumn, setCurrentTabbableColumn, setTabbableCell } }, ..._void1 }) {
+  rovingTabIndexChildParameters, managedChildParameters, refElementReturn, textContentParameters, gridNavigationCellParameters: { colSpan }, gridNavigationCellContext: { gridNavigationCellParameters: { getRowIndex, setTabbableRow, getCurrentTabbableColumn: _getCurrentColumn, setCurrentTabbableColumn, setTabbableCell } }, ..._void1 }) {
       const { index } = managedChildParameters;
       const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1 }, rovingTabIndexChildReturn, ...void2 } = useListNavigationChild({
           rovingTabIndexChildParameters,
           managedChildParameters,
           rovingTabIndexChildContext,
           typeaheadNavigationChildContext,
+          textContentParameters,
           //typeaheadNavigationChildParameters,
           refElementReturn
       });
@@ -4524,7 +4525,7 @@ var bundle = (function (exports) {
           ...lnr,
       };
   }
-  function useListNavigationSingleSelectionChild({ managedChildParameters: { index, ..._void5 }, rovingTabIndexChildParameters: { hidden, ...void7 }, singleSelectionChildParameters, singleSelectionContext, rovingTabIndexChildContext, typeaheadNavigationChildContext, refElementReturn, ..._void1 }) {
+  function useListNavigationSingleSelectionChild({ managedChildParameters: { index, ..._void5 }, rovingTabIndexChildParameters: { hidden, ...void7 }, singleSelectionChildParameters, singleSelectionContext, rovingTabIndexChildContext, typeaheadNavigationChildContext, refElementReturn, textContentParameters, ..._void1 }) {
       const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ..._void3 }, ...sscr } = useSingleSelectionChild({
           managedChildParameters: { index },
           singleSelectionChildParameters,
@@ -4535,7 +4536,8 @@ var bundle = (function (exports) {
           rovingTabIndexChildParameters: { hidden },
           rovingTabIndexChildContext,
           typeaheadNavigationChildContext,
-          refElementReturn
+          refElementReturn,
+          textContentParameters
       });
       const onCurrentFocusedInnerChanged = useStableCallback((focused, previouslyFocused) => {
           ocfic1?.(focused, previouslyFocused);
@@ -5150,7 +5152,7 @@ var bundle = (function (exports) {
           //...gridNavigationSingleSelectionReturn
       };
   }
-  function useCompleteGridNavigationCell({ gridNavigationCellParameters, managedChildParameters, context: { completeGridNavigationContext, gridNavigationCellContext, managedChildContext, rovingTabIndexChildContext, typeaheadNavigationChildContext }, rovingTabIndexChildParameters, 
+  function useCompleteGridNavigationCell({ gridNavigationCellParameters, managedChildParameters, context: { completeGridNavigationContext, gridNavigationCellContext, managedChildContext, rovingTabIndexChildContext, typeaheadNavigationChildContext }, rovingTabIndexChildParameters, textContentParameters, 
   //managedChildContext,
   completeGridNavigationCellParameters, pressParameters: { onPressSync, ...pressParameters }, }) {
       const { index } = managedChildParameters;
@@ -5162,7 +5164,8 @@ var bundle = (function (exports) {
           rovingTabIndexChildContext,
           typeaheadNavigationChildContext,
           rovingTabIndexChildParameters,
-          refElementReturn
+          refElementReturn,
+          textContentParameters
       });
       const { hasCurrentFocusReturn } = useHasCurrentFocus({ hasCurrentFocusParameters: { onCurrentFocusedChanged: null, ...hasCurrentFocusParameters }, refElementReturn });
       const { pressReturn } = usePress({
@@ -5262,7 +5265,7 @@ var bundle = (function (exports) {
   }
   function useCompleteListNavigationChild({ 
   //managedChildParameters: { hidden, disabled, index, getSortValue },
-  completeListNavigationChildParameters, singleSelectionChildParameters, rovingTabIndexChildParameters, managedChildParameters, context: { childrenHaveFocusChildContext, managedChildContext, rovingTabIndexChildContext, singleSelectionContext, typeaheadNavigationChildContext }, pressParameters: { onPressSync: ops1, ...pressParameters }, sortableChildParameters: { getSortValue }, ..._void }) {
+  completeListNavigationChildParameters, singleSelectionChildParameters, rovingTabIndexChildParameters, managedChildParameters, textContentParameters, context: { childrenHaveFocusChildContext, managedChildContext, rovingTabIndexChildContext, singleSelectionContext, typeaheadNavigationChildContext }, pressParameters: { onPressSync: ops1, ...pressParameters }, sortableChildParameters: { getSortValue }, ..._void }) {
       const { hidden } = rovingTabIndexChildParameters;
       const { index } = managedChildParameters;
       let { disabled } = singleSelectionChildParameters;
@@ -5278,7 +5281,8 @@ var bundle = (function (exports) {
           rovingTabIndexChildContext,
           singleSelectionContext,
           typeaheadNavigationChildContext,
-          refElementReturn
+          refElementReturn,
+          textContentParameters
       });
       const { getTabbable, setTabbable, tabbable } = rovingTabIndexChildReturn;
       const { pressReturn } = usePress({
@@ -6618,7 +6622,8 @@ var bundle = (function (exports) {
           pressParameters: { onPressSync: null, exclude: {}, focusSelf },
           singleSelectionChildParameters: { ariaPropName: "aria-selected", selectionMode, disabled },
           completeListNavigationChildParameters: { foo: "bar" },
-          context
+          context,
+          textContentParameters: { getText: q$1((e) => { return e?.textContent ?? ""; }, []) }
       });
       const text = `${randomWord} This is item #${index}${hidden ? " (hidden)" : ""}${disabled ? " (disabled)" : ""}${selected ? " (selected)" : " (not selected)"} (${tabbable ? "Tabbable" : "Not tabbable"})`;
       /*
@@ -7167,6 +7172,7 @@ var bundle = (function (exports) {
               rovingTabIndexChildParameters: { hidden },
               managedChildParameters: { index },
               singleSelectionChildParameters: { disabled, ariaPropName: "aria-checked", selectionMode: "focus" },
+              textContentParameters: { getText: q$1((e) => { return e?.textContent ?? ""; }, []) }
           },
           asParentRowParameters: {
               linearNavigationParameters: { disableArrowKeys: false, disableHomeEndKeys: false, navigatePastEnd: "wrap", navigatePastStart: "wrap" },
@@ -7192,6 +7198,7 @@ var bundle = (function (exports) {
           rovingTabIndexChildParameters: { hidden: false },
           context,
           completeGridNavigationCellParameters: { bar: "baz" },
+          textContentParameters: { getText: q$1((e) => { return e?.textContent ?? ""; }, []) },
           pressParameters: { exclude: index <= 1, focusSelf: useStableCallback(e => e.focus()), onPressSync: null }
       });
       const t = (tabbable ? "(Tabbable)" : "(Not tabbable)");

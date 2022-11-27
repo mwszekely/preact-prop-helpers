@@ -124,6 +124,7 @@ export interface UseCompleteListNavigationChildParameters<ChildElement extends E
     context: CompleteListNavigationContext<any, ChildElement, M>;
     pressParameters: UsePressParameters<ChildElement>["pressParameters"];
     singleSelectionChildParameters: UseListNavigationSingleSelectionSortableChildParameters<ChildElement>["singleSelectionChildParameters"];
+    textContentParameters: UseListNavigationSingleSelectionSortableChildParameters<ChildElement>["textContentParameters"];
     completeListNavigationChildParameters: Omit<M, keyof UseListNavigationSingleSelectionSortableChildInfo<ChildElement> | ExtraOmits>;
     rovingTabIndexChildParameters: UseListNavigationSingleSelectionSortableChildParameters<ChildElement>["rovingTabIndexChildParameters"];
     managedChildParameters: UseListNavigationSingleSelectionSortableChildParameters<ChildElement>["managedChildParameters"];
@@ -146,6 +147,7 @@ export function useCompleteListNavigationChild<ChildElement extends Element, M e
     singleSelectionChildParameters,
     rovingTabIndexChildParameters,
     managedChildParameters,
+    textContentParameters,
     context: { childrenHaveFocusChildContext, managedChildContext, rovingTabIndexChildContext, singleSelectionContext, typeaheadNavigationChildContext },
     pressParameters: { onPressSync: ops1, ...pressParameters },
     sortableChildParameters: { getSortValue },
@@ -173,7 +175,8 @@ export function useCompleteListNavigationChild<ChildElement extends Element, M e
         rovingTabIndexChildContext,
         singleSelectionContext,
         typeaheadNavigationChildContext,
-        refElementReturn
+        refElementReturn,
+        textContentParameters
     });
     const { getTabbable, setTabbable, tabbable } = rovingTabIndexChildReturn;
 

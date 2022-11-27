@@ -704,6 +704,7 @@ const DemoUseGridRow = memo((({ index }: { index: number }) => {
             rovingTabIndexChildParameters: { hidden },
             managedChildParameters: { index },
             singleSelectionChildParameters: { disabled, ariaPropName: "aria-checked", selectionMode: "focus" },
+            textContentParameters: { getText: useCallback((e) => { return e?.textContent ?? "" }, []) }
         },
         asParentRowParameters: {
             linearNavigationParameters: { disableArrowKeys: false, disableHomeEndKeys: false, navigatePastEnd: "wrap", navigatePastStart: "wrap" },
@@ -752,6 +753,7 @@ const DemoUseGridCell = (({ index, row, rowIsTabbable }: { index: number, row: n
         rovingTabIndexChildParameters: { hidden: false },
         context,
         completeGridNavigationCellParameters: { bar: "baz" },
+        textContentParameters: { getText: useCallback((e) => { return e?.textContent ?? "" }, []) },
         pressParameters: { exclude: index <= 1, focusSelf: useStableCallback(e => e.focus()), onPressSync: null }
     });
 

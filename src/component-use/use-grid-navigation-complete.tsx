@@ -263,6 +263,7 @@ export function useCompleteGridNavigationCell<CellElement extends Element, M ext
     managedChildParameters,
     context: { completeGridNavigationContext, gridNavigationCellContext, managedChildContext, rovingTabIndexChildContext, typeaheadNavigationChildContext },
     rovingTabIndexChildParameters,
+    textContentParameters,
     //managedChildContext,
     completeGridNavigationCellParameters,
     pressParameters: { onPressSync, ...pressParameters },
@@ -282,7 +283,8 @@ export function useCompleteGridNavigationCell<CellElement extends Element, M ext
         rovingTabIndexChildContext,
         typeaheadNavigationChildContext,
         rovingTabIndexChildParameters,
-        refElementReturn
+        refElementReturn,
+        textContentParameters
     });
 
     const { hasCurrentFocusReturn } = useHasCurrentFocus<CellElement>({ hasCurrentFocusParameters: { onCurrentFocusedChanged: null, ...hasCurrentFocusParameters }, refElementReturn });

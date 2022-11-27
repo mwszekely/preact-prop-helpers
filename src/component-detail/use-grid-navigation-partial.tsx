@@ -202,6 +202,7 @@ export function useGridNavigationCell<CellElement extends Element>({
     rovingTabIndexChildParameters,
     managedChildParameters,
     refElementReturn,
+    textContentParameters,
     gridNavigationCellParameters: {
         colSpan
     },
@@ -226,6 +227,7 @@ export function useGridNavigationCell<CellElement extends Element>({
         managedChildParameters,
         rovingTabIndexChildContext,
         typeaheadNavigationChildContext,
+        textContentParameters,
         //typeaheadNavigationChildParameters,
         refElementReturn
     });

@@ -54,6 +54,7 @@ export function useListNavigationSingleSelectionChild<ChildElement extends Eleme
     rovingTabIndexChildContext,
     typeaheadNavigationChildContext,
     refElementReturn,
+    textContentParameters,
     ..._void1
 }: UseListNavigationSingleSelectionChildParameters<ChildElement>): UseListNavigationSingleSelectionChildReturnType<ChildElement> {
 
@@ -74,7 +75,8 @@ export function useListNavigationSingleSelectionChild<ChildElement extends Eleme
         rovingTabIndexChildParameters: { hidden },
         rovingTabIndexChildContext,
         typeaheadNavigationChildContext,
-        refElementReturn
+        refElementReturn,
+        textContentParameters
     });
 
     assertEmptyObject(_void1);

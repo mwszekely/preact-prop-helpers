@@ -111,11 +111,12 @@ export function useListNavigationChild<ChildElement extends Element>({
     //typeaheadNavigationChildParameters,
     managedChildParameters,
     refElementReturn,
+    textContentParameters,
     ..._void2
 }: UseListNavigationChildParameters<ChildElement>): UseListNavigationChildReturnType<ChildElement> {
 
     const rticr = useRovingTabIndexChild<ChildElement>({ rovingTabIndexChildContext, rovingTabIndexChildParameters, managedChildParameters });
-    const _void: void = useTypeaheadNavigationChild<ChildElement>({ refElementReturn, typeaheadNavigationChildContext, managedChildParameters });
+    const _void: void = useTypeaheadNavigationChild<ChildElement>({ refElementReturn, typeaheadNavigationChildContext, managedChildParameters, textContentParameters });
 
     assertEmptyObject(_void2);
 //    assertEmptyObject(_void5);
