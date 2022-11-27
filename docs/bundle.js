@@ -2305,6 +2305,20 @@ var bundle = (function (exports) {
       return { getElapsedTime, getRemainingTime };
   }
 
+  function useTextContent({ refElementReturn: { getElement }, textContentParameters: { onTextContentChange } }) {
+      const [getTextContent, setTextContent] = usePassiveState(onTextContentChange, returnNull);
+      s(() => {
+          const element = getElement();
+          if (element) {
+              const textContent = element.textContent;
+              if (textContent) {
+                  setTextContent(textContent);
+              }
+          }
+      });
+      return { textContentReturn: { getTextContent } };
+  }
+
   /** Arguments passed to the child 'useLinearNavigationChild` */
   //export interface UseLinearNavigationChildInfo { }
   /**
@@ -2664,31 +2678,39 @@ var bundle = (function (exports) {
           }
       };
   }
-  function useTypeaheadNavigationChild({ managedChildParameters: { index, ...void1 }, typeaheadNavigationChildContext: { typeaheadNavigationChildParameters: { sortedTypeaheadInfo, insertingComparator, ...void2 } }, typeaheadNavigationChildParameters: { text, ...void3 }, ...void4 }) {
-      s(() => {
-          if (text) {
-              // Find where to insert this item.
-              // Because all index values should be unique, the returned sortedIndex
-              // should always refer to a new location (i.e. be negative)                
-              const sortedIndex = binarySearch(sortedTypeaheadInfo, text, insertingComparator);
-              console.assert(sortedIndex < 0 || insertingComparator(sortedTypeaheadInfo[sortedIndex].text, { unsortedIndex: index, text }) == 0);
-              if (sortedIndex < 0) {
-                  sortedTypeaheadInfo.splice(-sortedIndex - 1, 0, { text, unsortedIndex: index });
-              }
-              else {
-                  sortedTypeaheadInfo.splice(sortedIndex, 0, { text, unsortedIndex: index });
-              }
-              return () => {
-                  // When unmounting, find where we were and remove ourselves.
-                  // Again, we should always find ourselves because there should be no duplicate values if each index is unique.
-                  const sortedIndex = binarySearch(sortedTypeaheadInfo, text, insertingComparator);
-                  console.assert(sortedIndex < 0 || insertingComparator(sortedTypeaheadInfo[sortedIndex].text, { unsortedIndex: index, text }) == 0);
-                  if (sortedIndex >= 0) {
-                      sortedTypeaheadInfo.splice(sortedIndex, 1);
+  function useTypeaheadNavigationChild({ managedChildParameters: { index, ...void1 }, typeaheadNavigationChildContext: { typeaheadNavigationChildParameters: { sortedTypeaheadInfo, insertingComparator, ...void2 } }, refElementReturn: { getElement, ...void3 }, 
+  //typeaheadNavigationChildParameters: { ...void5 },
+  ...void4 }) {
+      //assertEmptyObject(void5);
+      useTextContent({
+          refElementReturn: { getElement },
+          textContentParameters: {
+              onTextContentChange: q$1((text) => {
+                  if (text) {
+                      // Find where to insert this item.
+                      // Because all index values should be unique, the returned sortedIndex
+                      // should always refer to a new location (i.e. be negative)                
+                      const sortedIndex = binarySearch(sortedTypeaheadInfo, text, insertingComparator);
+                      console.assert(sortedIndex < 0 || insertingComparator(sortedTypeaheadInfo[sortedIndex].text, { unsortedIndex: index, text }) == 0);
+                      if (sortedIndex < 0) {
+                          sortedTypeaheadInfo.splice(-sortedIndex - 1, 0, { text, unsortedIndex: index });
+                      }
+                      else {
+                          sortedTypeaheadInfo.splice(sortedIndex, 0, { text, unsortedIndex: index });
+                      }
+                      return () => {
+                          // When unmounting, find where we were and remove ourselves.
+                          // Again, we should always find ourselves because there should be no duplicate values if each index is unique.
+                          const sortedIndex = binarySearch(sortedTypeaheadInfo, text, insertingComparator);
+                          console.assert(sortedIndex < 0 || insertingComparator(sortedTypeaheadInfo[sortedIndex].text, { unsortedIndex: index, text }) == 0);
+                          if (sortedIndex >= 0) {
+                              sortedTypeaheadInfo.splice(sortedIndex, 1);
+                          }
+                      };
                   }
-              };
+              }, [])
           }
-      }, [text]);
+      });
   }
   /**
    * Your usual binary search implementation.
@@ -2860,9 +2882,11 @@ var bundle = (function (exports) {
           ...rtir
       };
   }
-  function useListNavigationChild({ rovingTabIndexChildParameters, rovingTabIndexChildContext, typeaheadNavigationChildContext, typeaheadNavigationChildParameters, managedChildParameters, ..._void2 }) {
+  function useListNavigationChild({ rovingTabIndexChildParameters, rovingTabIndexChildContext, typeaheadNavigationChildContext, 
+  //typeaheadNavigationChildParameters,
+  managedChildParameters, refElementReturn, ..._void2 }) {
       const rticr = useRovingTabIndexChild({ rovingTabIndexChildContext, rovingTabIndexChildParameters, managedChildParameters });
-      useTypeaheadNavigationChild({ typeaheadNavigationChildParameters, typeaheadNavigationChildContext, managedChildParameters });
+      useTypeaheadNavigationChild({ refElementReturn, typeaheadNavigationChildContext, managedChildParameters });
       //    assertEmptyObject(_void5);
       return {
           ...rticr
@@ -2940,14 +2964,17 @@ var bundle = (function (exports) {
   }
   function useGridNavigationCell({ 
   //    managedChildParameters: { hidden, index, ...void3 },
-  rovingTabIndexChildContext, typeaheadNavigationChildContext, typeaheadNavigationChildParameters, rovingTabIndexChildParameters, managedChildParameters, gridNavigationCellParameters: { colSpan }, gridNavigationCellContext: { gridNavigationCellParameters: { getRowIndex, setTabbableRow, getCurrentTabbableColumn: _getCurrentColumn, setCurrentTabbableColumn, setTabbableCell } }, ..._void1 }) {
+  rovingTabIndexChildContext, typeaheadNavigationChildContext, 
+  //typeaheadNavigationChildParameters,
+  rovingTabIndexChildParameters, managedChildParameters, refElementReturn, gridNavigationCellParameters: { colSpan }, gridNavigationCellContext: { gridNavigationCellParameters: { getRowIndex, setTabbableRow, getCurrentTabbableColumn: _getCurrentColumn, setCurrentTabbableColumn, setTabbableCell } }, ..._void1 }) {
       const { index } = managedChildParameters;
       const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1 }, rovingTabIndexChildReturn, ...void2 } = useListNavigationChild({
           rovingTabIndexChildParameters,
           managedChildParameters,
           rovingTabIndexChildContext,
           typeaheadNavigationChildContext,
-          typeaheadNavigationChildParameters
+          //typeaheadNavigationChildParameters,
+          refElementReturn
       });
       //    assertEmptyObject(void3);
       return {
@@ -2977,7 +3004,7 @@ var bundle = (function (exports) {
           if (m.hidden) {
               console.assert(false);
           }
-          m.setSelected(t);
+          m.setLocalSelected(t);
       }, []);
       const isSelectedValid = q$1((m) => { return !m.hidden; }, []);
       const { changeIndex: setSelectedIndex, getCurrentIndex: getSelectedIndex } = useChildrenFlag({
@@ -3008,28 +3035,28 @@ var bundle = (function (exports) {
       };
   }
   function useSingleSelectionChild(args) {
-      const { singleSelectionContext: { getSelectedIndex, setSelectedIndex }, singleSelectionChildParameters: { ariaPropName, selectionMode, disabled }, managedChildParameters: { index } } = args;
-      useEnsureStability("useSingleSelectionChild", getSelectedIndex, setSelectedIndex);
+      const { singleSelectionContext: { getSelectedIndex, setSelectedIndex: parentSetSelectedIndex }, singleSelectionChildParameters: { ariaPropName, selectionMode, disabled }, managedChildParameters: { index } } = args;
+      useEnsureStability("useSingleSelectionChild", getSelectedIndex, parentSetSelectedIndex);
       const getDisabled = useStableGetter(disabled);
       const [selected, setSelected, getSelected] = useState(getSelectedIndex() == index);
       const getIndex = useStableGetter(index);
       const onCurrentFocusedInnerChanged = useStableCallback((focused, _prev) => {
           if (selectionMode == 'focus' && focused) {
-              setSelectedIndex(getIndex());
+              parentSetSelectedIndex(getIndex());
           }
       });
       const onPressSync = useStableCallback((() => {
           if (!disabled)
-              setSelectedIndex(getIndex());
+              parentSetSelectedIndex(getIndex());
       }));
       return {
           //managedChildParameters: { selected, setSelected, getSelected, },
+          managedChildParameters: { setLocalSelected: setSelected },
           singleSelectionChildReturn: {
               selected,
-              setSelected: q$1((selected) => {
+              setThisOneSelected: q$1(() => {
                   console.assert(!getDisabled());
-                  if (selected)
-                      setSelectedIndex(getIndex());
+                  parentSetSelectedIndex(getIndex());
               }, []),
               getSelected,
               propsUnstable: ariaPropName == null ? {} : { [ariaPropName]: (selected ?? false).toString() }
@@ -3059,11 +3086,11 @@ var bundle = (function (exports) {
       };
   }
   function useGridNavigationSingleSelectionRow({ asChildRowParameters, asParentRowParameters, ..._void1 }) {
-      const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ..._void3 }, pressParameters, singleSelectionChildReturn } = useSingleSelectionChild(asChildRowParameters);
+      const { managedChildParameters, hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ..._void3 }, pressParameters, singleSelectionChildReturn } = useSingleSelectionChild(asChildRowParameters);
       const { asChildRowReturn: { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ..._void2 }, gridNavigationRowParameters, rovingTabIndexChildReturn }, asParentRowReturn } = useGridNavigationRow({ asChildRowParameters, asParentRowParameters });
       const onCurrentFocusedInnerChanged = useStableCallback((focused, prevFocused) => { ocfic1?.(focused, prevFocused); ocfic2?.(focused, prevFocused); });
       return {
-          asChildRowReturn: { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged }, gridNavigationRowParameters, pressParameters, rovingTabIndexChildReturn, singleSelectionChildReturn },
+          asChildRowReturn: { managedChildParameters, hasCurrentFocusParameters: { onCurrentFocusedInnerChanged }, gridNavigationRowParameters, pressParameters, rovingTabIndexChildReturn, singleSelectionChildReturn },
           asParentRowReturn
       };
   }
@@ -3909,7 +3936,7 @@ var bundle = (function (exports) {
     return func(collection);
   }
 
-  function useMergedChildren({ children: lhs }, { children: rhs }) {
+  function useMergedChildren(lhs, rhs) {
       if (lhs == null && rhs == null) {
           return undefined;
       }
@@ -3932,7 +3959,7 @@ var bundle = (function (exports) {
    * @param rhs Classes of the second component
    * @returns A string representing all combined classes from both arguments.
    */
-  function useMergedClasses({ class: lhsClass, className: lhsClassName }, { class: rhsClass, className: rhsClassName }) {
+  function useMergedClasses(lhsClass, lhsClassName, rhsClass, rhsClassName) {
       // Note: For the sake of forward compatibility, this function is labelled as
       // a hook, but as it uses no other hooks it technically isn't one.
       if (lhsClass || rhsClass || lhsClassName || rhsClassName) {
@@ -3965,7 +3992,7 @@ var bundle = (function (exports) {
    * @param rhs
    * @returns
    */
-  function useMergedRefs({ ref: rhs }, { ref: lhs }) {
+  function useMergedRefs(rhs, lhs) {
       const combined = q$1((current) => {
           processRef(current, lhs);
           processRef(current, rhs);
@@ -3997,34 +4024,34 @@ var bundle = (function (exports) {
    */
   function useMergedStyles(lhs, rhs) {
       // Easy case, when there are no styles to merge return nothing.
-      if (!lhs?.style && !rhs?.style)
+      if (!lhs && !rhs)
           return undefined;
       if (typeof lhs != typeof rhs) {
           // Easy cases, when one is null and the other isn't.
-          if (lhs?.style && !rhs?.style)
-              return lhs.style;
-          if (!lhs?.style && rhs?.style)
-              return rhs.style;
+          if (lhs && !rhs)
+              return lhs;
+          if (!lhs && rhs)
+              return rhs;
           // They're both non-null but different types.
           // Convert the string type to an object bag type and run it again.
-          if (lhs?.style && rhs?.style) {
+          if (lhs && rhs) {
               // (useMergedStyles isn't a true hook -- this isn't a violation)
-              if (typeof lhs?.style == "string")
-                  return useMergedStyles({ style: styleStringToObject(lhs?.style) }, rhs);
-              if (typeof rhs?.style == "string")
-                  return useMergedStyles(lhs, { style: styleStringToObject(rhs?.style) });
+              if (typeof lhs == "string")
+                  return useMergedStyles(styleStringToObject(lhs), rhs);
+              if (typeof rhs == "string")
+                  return useMergedStyles(lhs, styleStringToObject(rhs));
           }
           // Logic???
           return undefined;
       }
       // They're both strings, just concatenate them.
-      if (typeof lhs?.style == "string") {
-          return `${lhs.style};${rhs?.style ?? ""}`;
+      if (typeof lhs == "string") {
+          return `${lhs};${rhs ?? ""}`;
       }
       // They're both objects, just merge them.
       return {
-          ...(lhs?.style ?? {}),
-          ...(rhs?.style ?? {})
+          ...(lhs ?? {}),
+          ...(rhs ?? {})
       };
   }
 
@@ -4045,19 +4072,47 @@ var bundle = (function (exports) {
       }
       return ret;
   }
+  const knowns = new Set(["children", "ref", "className", "class", "style"]);
+  function mergeUnknown(key, lhsValue, rhsValue) {
+      if (typeof lhsValue === "function" || typeof rhsValue === "function") {
+          // They're both functions that can be merged (or one's a function and the other's null).
+          // Not an *easy* case, but a well-defined one.
+          const merged = mergeFunctions(lhsValue, rhsValue);
+          return merged;
+      }
+      else {
+          // Uh...we're here because one of them's null, right?
+          if (lhsValue == null && rhsValue == null) {
+              if (rhsValue === null && lhsValue === undefined)
+                  return rhsValue;
+              else
+                  return lhsValue;
+          }
+          if (lhsValue == null)
+              return rhsValue;
+          else if (rhsValue == null)
+              return lhsValue;
+          else if (rhsValue == lhsValue) ;
+          else {
+              // Ugh.
+              // No good strategies here, just log it if requested
+              log?.(`The prop "${key}" cannot simultaneously be the values ${lhsValue} and ${rhsValue}. One must be chosen outside of useMergedProps.`);
+              return rhsValue;
+          }
+      }
+  }
+  /**
+   * Helper function.
+   *
+   * This is one of the most commonly called functions in this and consumer libraries,
+   * so it trades a bit of readability for speed (i.e. we don't decompose objects and just do regular property access, iterate with `for...in`, instead of `Object.entries`, etc.)
+   */
   function useMergedProps2(lhsAll, rhsAll) {
-      // First, separate the props we were given into two groups:
-      // lhsAll and rhsAll contain all the props we were given, and
-      // lhsMisc and rhsMisc contain all props *except* for the easy ones
-      // like className and style that we already know how to merge.
-      const { children: _lhsChildren, class: _lhsClass, className: _lhsClassName, style: _lhsStyle, ref: _lhsRef, ...lhsMisc } = lhsAll;
-      const { children: _rhsChildren, class: _rhsClass, className: _rhsClassName, style: _rhsStyle, ref: _rhsRef, ...rhsMisc } = rhsAll;
       const ret = {
-          ...lhsMisc,
-          ref: useMergedRefs(lhsAll, rhsAll),
-          style: useMergedStyles(lhsAll, rhsAll),
-          className: useMergedClasses(lhsAll, rhsAll),
-          children: useMergedChildren(lhsAll, rhsAll),
+          ref: useMergedRefs(lhsAll.ref, rhsAll.ref),
+          style: useMergedStyles(lhsAll.style, rhsAll.style),
+          className: useMergedClasses(lhsAll["class"], lhsAll.className, rhsAll["class"], rhsAll.className),
+          children: useMergedChildren(lhsAll.children, rhsAll.children),
       };
       if (ret.ref === undefined)
           delete ret.ref;
@@ -4065,41 +4120,21 @@ var bundle = (function (exports) {
           delete ret.style;
       if (ret.className === undefined)
           delete ret.className;
+      if (ret["class"] === undefined)
+          delete ret["class"];
       if (ret.children === undefined)
           delete ret.children;
-      // Now, do *everything* else
-      // Merge every remaining existing entry in lhs with what we've already put in ret.
-      //const lhsEntries = Object.entries(lhs) as [keyof T, T[keyof T]][];
-      const rhsEntries = Object.entries(rhsMisc);
-      for (const [rhsKeyU, rhsValue] of rhsEntries) {
+      for (const lhsKeyU in lhsAll) {
+          const lhsKey = lhsKeyU;
+          if (knowns.has(lhsKey))
+              continue;
+          ret[lhsKey] = lhsAll[lhsKey];
+      }
+      for (const rhsKeyU in rhsAll) {
           const rhsKey = rhsKeyU;
-          const lhsValue = lhsMisc[rhsKey];
-          if (typeof lhsValue === "function" || typeof rhsValue === "function") {
-              // They're both functions that can be merged (or one's a function and the other's null).
-              // Not an *easy* case, but a well-defined one.
-              const merged = mergeFunctions(lhsValue, rhsValue);
-              ret[rhsKey] = merged;
-          }
-          else {
-              // Uh...we're here because one of them's null, right?
-              if (lhsValue == null && rhsValue == null) {
-                  if (rhsValue === null && lhsValue === undefined)
-                      ret[rhsKey] = rhsValue;
-                  else
-                      ret[rhsKey] = lhsValue;
-              }
-              if (lhsValue == null)
-                  ret[rhsKey] = rhsValue;
-              else if (rhsValue == null)
-                  ret[rhsKey] = lhsValue;
-              else if (rhsValue == lhsValue) ;
-              else {
-                  // Ugh.
-                  // No good strategies here, just log it if requested
-                  log?.(`The prop "${rhsKey}" cannot simultaneously be the values ${lhsValue} and ${rhsValue}. One must be chosen outside of useMergedProps.`);
-                  ret[rhsKey] = rhsValue;
-              }
-          }
+          if (knowns.has(rhsKey))
+              continue;
+          ret[rhsKey] = mergeUnknown(rhsKey, ret[rhsKey], rhsAll[rhsKey]);
       }
       return ret;
   }
@@ -4489,7 +4524,7 @@ var bundle = (function (exports) {
           ...lnr,
       };
   }
-  function useListNavigationSingleSelectionChild({ managedChildParameters: { index, ..._void5 }, rovingTabIndexChildParameters: { hidden, ...void7 }, singleSelectionChildParameters, singleSelectionContext, typeaheadNavigationChildParameters, rovingTabIndexChildContext, typeaheadNavigationChildContext, ..._void1 }) {
+  function useListNavigationSingleSelectionChild({ managedChildParameters: { index, ..._void5 }, rovingTabIndexChildParameters: { hidden, ...void7 }, singleSelectionChildParameters, singleSelectionContext, rovingTabIndexChildContext, typeaheadNavigationChildContext, refElementReturn, ..._void1 }) {
       const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ..._void3 }, ...sscr } = useSingleSelectionChild({
           managedChildParameters: { index },
           singleSelectionChildParameters,
@@ -4498,9 +4533,9 @@ var bundle = (function (exports) {
       const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ..._void6 }, ...lncr } = useListNavigationChild({
           managedChildParameters: { index },
           rovingTabIndexChildParameters: { hidden },
-          typeaheadNavigationChildParameters,
           rovingTabIndexChildContext,
-          typeaheadNavigationChildContext
+          typeaheadNavigationChildContext,
+          refElementReturn
       });
       const onCurrentFocusedInnerChanged = useStableCallback((focused, previouslyFocused) => {
           ocfic1?.(focused, previouslyFocused);
@@ -5040,7 +5075,7 @@ var bundle = (function (exports) {
           //rearrangeableChildrenParameters: { getHighestChildIndex: getHighestChildIndex, getValid },
       };
   }
-  function useCompleteGridNavigationRow({ asChildRowParameters: { managedChildParameters, context: { childrenHaveFocusChildContext, gridNavigationRowContext, managedChildContext: mcc1, rovingTabIndexChildContext, singleSelectionContext, typeaheadNavigationChildContext }, completeGridNavigationRowParameters, singleSelectionChildParameters, typeaheadNavigationChildParameters, rovingTabIndexChildParameters, ...asChildRowParameters }, asParentRowParameters: { linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, ...asParentRowParameters } }) {
+  function useCompleteGridNavigationRow({ asChildRowParameters: { managedChildParameters, context: { childrenHaveFocusChildContext, gridNavigationRowContext, managedChildContext: mcc1, rovingTabIndexChildContext, singleSelectionContext, typeaheadNavigationChildContext }, completeGridNavigationRowParameters, singleSelectionChildParameters, rovingTabIndexChildParameters, ...asChildRowParameters }, asParentRowParameters: { linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, ...asParentRowParameters } }) {
       const { index } = managedChildParameters;
       const getChildren = q$1(() => managedChildrenReturn.getChildren(), []);
       const getHighestChildIndex = q$1(() => getChildren().getHighestIndex(), []);
@@ -5050,6 +5085,7 @@ var bundle = (function (exports) {
               return false;
           return !child.hidden;
       }, []);
+      const { refElementReturn } = useRefElement({ refElementParameters: {} });
       const r = useGridNavigationSingleSelectionRow({
           asParentRowParameters: {
               ...asParentRowParameters,
@@ -5060,20 +5096,19 @@ var bundle = (function (exports) {
           },
           asChildRowParameters: {
               ...asChildRowParameters,
+              refElementReturn,
               rovingTabIndexChildParameters,
               gridNavigationRowContext,
               rovingTabIndexChildContext,
               singleSelectionContext,
               typeaheadNavigationChildContext,
               singleSelectionChildParameters,
-              typeaheadNavigationChildParameters,
               managedChildParameters,
               managedChildrenReturn: { getChildren },
           }
       });
       const { asChildRowReturn, asParentRowReturn } = r;
       const { context: { managedChildContext }, managedChildrenReturn } = useManagedChildren({ managedChildrenParameters: r.asParentRowReturn.managedChildrenParameters });
-      const { refElementReturn } = useRefElement({ refElementParameters: {} });
       const { getElement } = refElementReturn;
       const baseInfo = {
           getElement,
@@ -5085,7 +5120,7 @@ var bundle = (function (exports) {
           selected: r.asChildRowReturn.singleSelectionChildReturn.selected,
           focusSelf: r.asChildRowReturn.gridNavigationRowParameters.focusSelf,
           getSelected: r.asChildRowReturn.singleSelectionChildReturn.getSelected,
-          setSelected: r.asChildRowReturn.singleSelectionChildReturn.setSelected,
+          setLocalSelected: r.asChildRowReturn.managedChildParameters.setLocalSelected,
           disabled: singleSelectionChildParameters.disabled,
           setTabbableColumnIndex: r.asChildRowReturn.gridNavigationRowParameters.setTabbableColumnIndex
       };
@@ -5115,20 +5150,20 @@ var bundle = (function (exports) {
           //...gridNavigationSingleSelectionReturn
       };
   }
-  function useCompleteGridNavigationCell({ gridNavigationCellParameters, managedChildParameters, typeaheadNavigationChildParameters, context: { completeGridNavigationContext, gridNavigationCellContext, managedChildContext, rovingTabIndexChildContext, typeaheadNavigationChildContext }, rovingTabIndexChildParameters, 
+  function useCompleteGridNavigationCell({ gridNavigationCellParameters, managedChildParameters, context: { completeGridNavigationContext, gridNavigationCellContext, managedChildContext, rovingTabIndexChildContext, typeaheadNavigationChildContext }, rovingTabIndexChildParameters, 
   //managedChildContext,
   completeGridNavigationCellParameters, pressParameters: { onPressSync, ...pressParameters }, }) {
       const { index } = managedChildParameters;
+      const { refElementReturn } = useRefElement({ refElementParameters: {} });
       const { hasCurrentFocusParameters, rovingTabIndexChildReturn } = useGridNavigationSingleSelectionCell({
           gridNavigationCellContext,
           gridNavigationCellParameters,
           managedChildParameters,
           rovingTabIndexChildContext,
           typeaheadNavigationChildContext,
-          typeaheadNavigationChildParameters,
-          rovingTabIndexChildParameters
+          rovingTabIndexChildParameters,
+          refElementReturn
       });
-      const { refElementReturn } = useRefElement({ refElementParameters: {} });
       const { hasCurrentFocusReturn } = useHasCurrentFocus({ hasCurrentFocusParameters: { onCurrentFocusedChanged: null, ...hasCurrentFocusParameters }, refElementReturn });
       const { pressReturn } = usePress({
           pressParameters: {
@@ -5227,7 +5262,7 @@ var bundle = (function (exports) {
   }
   function useCompleteListNavigationChild({ 
   //managedChildParameters: { hidden, disabled, index, getSortValue },
-  completeListNavigationChildParameters, singleSelectionChildParameters, typeaheadNavigationChildParameters, rovingTabIndexChildParameters, managedChildParameters, context: { childrenHaveFocusChildContext, managedChildContext, rovingTabIndexChildContext, singleSelectionContext, typeaheadNavigationChildContext }, pressParameters: { onPressSync: ops1, ...pressParameters }, sortableChildParameters: { getSortValue }, ..._void }) {
+  completeListNavigationChildParameters, singleSelectionChildParameters, rovingTabIndexChildParameters, managedChildParameters, context: { childrenHaveFocusChildContext, managedChildContext, rovingTabIndexChildContext, singleSelectionContext, typeaheadNavigationChildContext }, pressParameters: { onPressSync: ops1, ...pressParameters }, sortableChildParameters: { getSortValue }, ..._void }) {
       const { hidden } = rovingTabIndexChildParameters;
       const { index } = managedChildParameters;
       let { disabled } = singleSelectionChildParameters;
@@ -5236,14 +5271,14 @@ var bundle = (function (exports) {
       const { refElementReturn } = useRefElement({ refElementParameters: {} });
       const { getElement } = refElementReturn;
       const { focusSelf } = pressParameters;
-      const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1 }, pressParameters: { onPressSync: ops2, ...p1 }, rovingTabIndexChildReturn, singleSelectionChildReturn } = useListNavigationSingleSelectionChild({
+      const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1 }, pressParameters: { onPressSync: ops2, ...p1 }, rovingTabIndexChildReturn, singleSelectionChildReturn, managedChildParameters: { setLocalSelected } } = useListNavigationSingleSelectionChild({
           managedChildParameters: { index },
           rovingTabIndexChildParameters: { hidden },
           singleSelectionChildParameters: { ...singleSelectionChildParameters },
           rovingTabIndexChildContext,
           singleSelectionContext,
           typeaheadNavigationChildContext,
-          typeaheadNavigationChildParameters
+          refElementReturn
       });
       const { getTabbable, setTabbable, tabbable } = rovingTabIndexChildReturn;
       const { pressReturn } = usePress({
@@ -5256,7 +5291,7 @@ var bundle = (function (exports) {
               })
           }, refElementReturn
       });
-      const { getSelected, selected, setSelected } = singleSelectionChildReturn;
+      const { getSelected, selected, setThisOneSelected } = singleSelectionChildReturn;
       const mcp1 = {
           disabled,
           focusSelf,
@@ -5266,7 +5301,7 @@ var bundle = (function (exports) {
           hidden,
           index,
           selected,
-          setSelected,
+          setLocalSelected,
           setTabbable,
           tabbable,
           getSortValue
@@ -6572,7 +6607,6 @@ var bundle = (function (exports) {
       }
       const [randomWord] = useState(() => RandomWords$1[index /*Math.floor(Math.random() * (RandomWords.length - 1))*/]);
       const context = x(ListNavigationSingleSelectionChildContext);
-      const text = `${randomWord} This is item #${index}${hidden ? " (hidden)" : ""}${disabled ? " (disabled)" : ""}`;
       const focusSelf = q$1((e) => { e.focus(); }, []);
       // const { refElementReturn } = useRefElement<HTMLLIElement>({ refElementParameters: { onElementChange: undefined } });
       //const { getElement, propsStable: p3 } = refElementReturn;
@@ -6583,10 +6617,10 @@ var bundle = (function (exports) {
           sortableChildParameters: { getSortValue },
           pressParameters: { onPressSync: null, exclude: {}, focusSelf },
           singleSelectionChildParameters: { ariaPropName: "aria-selected", selectionMode, disabled },
-          typeaheadNavigationChildParameters: { text },
           completeListNavigationChildParameters: { foo: "bar" },
           context
       });
+      const text = `${randomWord} This is item #${index}${hidden ? " (hidden)" : ""}${disabled ? " (disabled)" : ""}${selected ? " (selected)" : " (not selected)"} (${tabbable ? "Tabbable" : "Not tabbable"})`;
       /*
           const {
               hasCurrentFocusParameters: { onCurrentFocusedInnerChanged, ...void5 },
@@ -6634,7 +6668,7 @@ var bundle = (function (exports) {
           });
       
           const props = useMergedProps<HTMLLIElement>(p2, p3, p4, p5, p6);*/
-      return (o$1("li", { ...props, children: [text, " (", tabbable ? "Tabbable" : "Not tabbable", ", ", selected ? "Selected" : "Not selected", ")", o$1("input", { ...useMergedProps(p2, { type: "number" }), style: { width: "5ch" } })] }));
+      return (o$1("li", { ...props, children: [text, o$1("input", { ...useMergedProps(p2, { type: "number" }), style: { width: "5ch" } })] }));
   }));
 
   const DemoUseTimeout = () => {
@@ -7133,7 +7167,6 @@ var bundle = (function (exports) {
               rovingTabIndexChildParameters: { hidden },
               managedChildParameters: { index },
               singleSelectionChildParameters: { disabled, ariaPropName: "aria-checked", selectionMode: "focus" },
-              typeaheadNavigationChildParameters: { text: "" }
           },
           asParentRowParameters: {
               linearNavigationParameters: { disableArrowKeys: false, disableHomeEndKeys: false, navigatePastEnd: "wrap", navigatePastStart: "wrap" },
@@ -7158,7 +7191,6 @@ var bundle = (function (exports) {
           managedChildParameters: { index },
           rovingTabIndexChildParameters: { hidden: false },
           context,
-          typeaheadNavigationChildParameters: { text: "", },
           completeGridNavigationCellParameters: { bar: "baz" },
           pressParameters: { exclude: index <= 1, focusSelf: useStableCallback(e => e.focus()), onPressSync: null }
       });

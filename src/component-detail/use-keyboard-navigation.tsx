@@ -6,6 +6,9 @@ import { useStableCallback } from "../preact-extensions/use-stable-callback";
 import { useStableGetter, useStableObject } from "../preact-extensions/use-stable-getter";
 import { useState } from "../preact-extensions/use-state";
 import { useTimeout } from "../timing/use-timeout";
+import { UseRefElementReturnType } from "../dom-helpers/use-ref-element";
+import { useTextContent } from "../dom-helpers/use-text-content";
+import { OnPassiveStateChange } from "../preact-extensions/use-passive-state";
 
 /*
 export function useLinearNavigationProps<E extends Element>(r: UseLinearNavigationReturnTypeInfo<E>, ...otherProps: h.JSX.HTMLAttributes<E>[]): h.JSX.HTMLAttributes<E>[] {
@@ -386,26 +389,25 @@ export interface UseTypeaheadNavigationParameters<TabbableChildElement extends E
 export interface UseTypeaheadNavigationChildParameters<ChildElement extends Element> {
     managedChildParameters: Pick<UseRovingTabIndexChildParameters<ChildElement>["managedChildParameters"], "index">;
 
-    typeaheadNavigationChildParameters: {
-        /**
-         * If provided, allows this component to be navigated to by typing this string. 
-         * It should be the same text content as whatever's displayed, ideally.
-         */
-        text: string | null;
+    //typeaheadNavigationChildParameters: {
 
-        //hidden: boolean;
-    }
+    //getText(element: Element | null): string;
+
+    //hidden: boolean;
+    //}
+
+    refElementReturn: Pick<UseRefElementReturnType<ChildElement>["refElementReturn"], "getElement">;
 
     typeaheadNavigationChildContext: {
 
         typeaheadNavigationChildParameters: {
             sortedTypeaheadInfo: Array<TypeaheadInfo>;
-            insertingComparator: (lhs: string, rhs: TypeaheadInfo) => number;
+            insertingComparator: (lhs: string | null, rhs: TypeaheadInfo) => number;
         }
     }
 }
 
-interface TypeaheadInfo { text: string; unsortedIndex: number; }
+interface TypeaheadInfo { text: string | null; unsortedIndex: number; }
 
 /** Type of the child's sub-hook */
 export type UseTypeaheadNavigationChild<ChildElement extends Element> = (args: UseTypeaheadNavigationChildParameters<ChildElement>) => void;
@@ -467,7 +469,7 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
         return compare;
     });
 
-    const insertingComparator = useStableCallback((lhs: string, rhs: TypeaheadInfo) => {
+    const insertingComparator = useStableCallback((lhs: string | null, rhs: TypeaheadInfo) => {
 
         if (typeof lhs === "string" && typeof rhs.text === "string") {
             return comparatorShared(lhs, rhs.text);
@@ -650,7 +652,8 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
 export function useTypeaheadNavigationChild<ChildElement extends Element>({
     managedChildParameters: { index, ...void1 },
     typeaheadNavigationChildContext: { typeaheadNavigationChildParameters: { sortedTypeaheadInfo, insertingComparator, ...void2 } },
-    typeaheadNavigationChildParameters: { text, ...void3 },
+    refElementReturn: { getElement, ...void3 },
+    //typeaheadNavigationChildParameters: { ...void5 },
     ...void4
 }: UseTypeaheadNavigationChildParameters<ChildElement>): ReturnType<UseTypeaheadNavigationChild<ChildElement>> {
 
@@ -658,34 +661,41 @@ export function useTypeaheadNavigationChild<ChildElement extends Element>({
     assertEmptyObject(void2);
     assertEmptyObject(void3);
     assertEmptyObject(void4);
+    //assertEmptyObject(void5);
 
-    useEffect(() => {
-        if (text) {
+    const { } = useTextContent({
+        refElementReturn: { getElement },
+        textContentParameters: {
+            onTextContentChange: useCallback<OnPassiveStateChange<string | null>>((text: string | null) => {
+                if (text) {
+                    // Find where to insert this item.
+                    // Because all index values should be unique, the returned sortedIndex
+                    // should always refer to a new location (i.e. be negative)                
+                    const sortedIndex = binarySearch(sortedTypeaheadInfo, text, insertingComparator);
+                    console.assert(sortedIndex < 0 || insertingComparator(sortedTypeaheadInfo[sortedIndex].text, { unsortedIndex: index, text }) == 0);
+                    if (sortedIndex < 0) {
+                        sortedTypeaheadInfo.splice(-sortedIndex - 1, 0, { text, unsortedIndex: index });
+                    }
+                    else {
+                        sortedTypeaheadInfo.splice(sortedIndex, 0, { text, unsortedIndex: index });
+                    }
 
-            // Find where to insert this item.
-            // Because all index values should be unique, the returned sortedIndex
-            // should always refer to a new location (i.e. be negative)                
-            const sortedIndex = binarySearch(sortedTypeaheadInfo, text, insertingComparator);
-            console.assert(sortedIndex < 0 || insertingComparator(sortedTypeaheadInfo[sortedIndex].text, { unsortedIndex: index, text }) == 0);
-            if (sortedIndex < 0) {
-                sortedTypeaheadInfo.splice(-sortedIndex - 1, 0, { text, unsortedIndex: index });
-            }
-            else {
-                sortedTypeaheadInfo.splice(sortedIndex, 0, { text, unsortedIndex: index });
-            }
+                    return () => {
+                        // When unmounting, find where we were and remove ourselves.
+                        // Again, we should always find ourselves because there should be no duplicate values if each index is unique.
+                        const sortedIndex = binarySearch(sortedTypeaheadInfo, text, insertingComparator);
+                        console.assert(sortedIndex < 0 || insertingComparator(sortedTypeaheadInfo[sortedIndex].text, { unsortedIndex: index, text }) == 0);
 
-            return () => {
-                // When unmounting, find where we were and remove ourselves.
-                // Again, we should always find ourselves because there should be no duplicate values if each index is unique.
-                const sortedIndex = binarySearch(sortedTypeaheadInfo, text, insertingComparator);
-                console.assert(sortedIndex < 0 || insertingComparator(sortedTypeaheadInfo[sortedIndex].text, { unsortedIndex: index, text }) == 0);
-
-                if (sortedIndex >= 0) {
-                    sortedTypeaheadInfo.splice(sortedIndex, 1);
+                        if (sortedIndex >= 0) {
+                            sortedTypeaheadInfo.splice(sortedIndex, 1);
+                        }
+                    }
                 }
-            }
+
+            }, [])
         }
-    }, [text]);
+    })
+
 }
 
 /**

@@ -24,7 +24,7 @@ export interface UseCompleteGridNavigationParameters<_ParentOrRowElement extends
 }
 
 export interface UseCompleteGridNavigationRowParameters<RowElement extends Element, CellElement extends Element, RM extends GridSingleSelectSortableChildRowInfo<RowElement>, CM extends GridSingleSelectChildCellInfo<CellElement>> {
-    asChildRowParameters: Omit<UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM>["asChildRowParameters"], "managedChildrenReturn" | "singleSelectionContext" | "gridNavigationRowContext" | "rovingTabIndexChildContext" | "typeaheadNavigationChildContext"> & {
+    asChildRowParameters: Omit<UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM>["asChildRowParameters"], "managedChildrenReturn" | "singleSelectionContext" | "gridNavigationRowContext" | "rovingTabIndexChildContext" | "typeaheadNavigationChildContext" | "refElementReturn"> & {
         context: CompleteGridNavigationContext<any, RowElement, RM>; //UseManagedChildParameters<RM>["context"];
         //managedChildReturn: UseManagedChildReturnType<RM>["managedChildReturn"];
         completeGridNavigationRowParameters: Omit<RM, keyof GridSingleSelectSortableChildRowInfo<CellElement>>;
@@ -38,7 +38,7 @@ export interface UseCompleteGridNavigationRowParameters<RowElement extends Eleme
 }
 
 export interface UseCompleteGridNavigationCellParameters<CellElement extends Element, M extends GridSingleSelectChildCellInfo<CellElement>> extends
-    Omit<UseGridNavigationSingleSelectionCellParameters<CellElement>, "typeaheadNavigationChildContext" | "rovingTabIndexChildContext" | "gridNavigationCellContext"> {
+    Omit<UseGridNavigationSingleSelectionCellParameters<CellElement>, "typeaheadNavigationChildContext" | "rovingTabIndexChildContext" | "gridNavigationCellContext" | "refElementReturn"> {
     pressParameters: UsePressParameters<CellElement>["pressParameters"];
     //managedChildContext: UseManagedChildParameters<M>["managedChildContext"];
     completeGridNavigationCellParameters: Omit<M, keyof GridSingleSelectChildCellInfo<CellElement>>;
@@ -155,7 +155,6 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
         context: { childrenHaveFocusChildContext, gridNavigationRowContext, managedChildContext: mcc1, rovingTabIndexChildContext, singleSelectionContext, typeaheadNavigationChildContext },
         completeGridNavigationRowParameters,
         singleSelectionChildParameters,
-        typeaheadNavigationChildParameters,
         rovingTabIndexChildParameters,
         ...asChildRowParameters
     },
@@ -178,6 +177,8 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
         return !child.hidden;
     }, []);
 
+    const { refElementReturn } = useRefElement<RowElement>({ refElementParameters: {} });
+
     const r: UseGridNavigationSingleSelectionRowReturnType<RowElement, CellElement> = useGridNavigationSingleSelectionRow<RowElement, CellElement, RM, CM>({
         asParentRowParameters: {
             ...asParentRowParameters,
@@ -188,13 +189,13 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
         },
         asChildRowParameters: {
             ...asChildRowParameters,
+            refElementReturn,
             rovingTabIndexChildParameters,
             gridNavigationRowContext,
             rovingTabIndexChildContext,
             singleSelectionContext,
             typeaheadNavigationChildContext,
             singleSelectionChildParameters,
-            typeaheadNavigationChildParameters,
             managedChildParameters,
             managedChildrenReturn: { getChildren },
         }
@@ -204,7 +205,6 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
 
 
     const { context: { managedChildContext }, managedChildrenReturn } = useManagedChildren<CM>({ managedChildrenParameters: r.asParentRowReturn.managedChildrenParameters });
-    const { refElementReturn } = useRefElement<RowElement>({ refElementParameters: {} })
     const { getElement } = refElementReturn;
 
     const baseInfo: GridSingleSelectChildRowInfo<RowElement> = {
@@ -217,7 +217,7 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
         selected: r.asChildRowReturn.singleSelectionChildReturn.selected,
         focusSelf: r.asChildRowReturn.gridNavigationRowParameters.focusSelf,
         getSelected: r.asChildRowReturn.singleSelectionChildReturn.getSelected,
-        setSelected: r.asChildRowReturn.singleSelectionChildReturn.setSelected,
+        setLocalSelected: r.asChildRowReturn.managedChildParameters.setLocalSelected,
         disabled: singleSelectionChildParameters.disabled,
         setTabbableColumnIndex: r.asChildRowReturn.gridNavigationRowParameters.setTabbableColumnIndex
     }
@@ -261,15 +261,16 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
 export function useCompleteGridNavigationCell<CellElement extends Element, M extends GridSingleSelectChildCellInfo<CellElement>>({
     gridNavigationCellParameters,
     managedChildParameters,
-    typeaheadNavigationChildParameters,
     context: { completeGridNavigationContext, gridNavigationCellContext, managedChildContext, rovingTabIndexChildContext, typeaheadNavigationChildContext },
     rovingTabIndexChildParameters,
     //managedChildContext,
     completeGridNavigationCellParameters,
     pressParameters: { onPressSync, ...pressParameters },
 }: UseCompleteGridNavigationCellParameters<CellElement, M>): UseCompleteGridNavigationCellReturnType<CellElement, M> {
-    
+
     const { index } = managedChildParameters;
+
+    const { refElementReturn } = useRefElement<CellElement>({ refElementParameters: {} });
 
     const {
         hasCurrentFocusParameters,
@@ -280,11 +281,10 @@ export function useCompleteGridNavigationCell<CellElement extends Element, M ext
         managedChildParameters,
         rovingTabIndexChildContext,
         typeaheadNavigationChildContext,
-        typeaheadNavigationChildParameters,
-        rovingTabIndexChildParameters
+        rovingTabIndexChildParameters,
+        refElementReturn
     });
 
-    const { refElementReturn } = useRefElement<CellElement>({ refElementParameters: {} });
     const { hasCurrentFocusReturn } = useHasCurrentFocus<CellElement>({ hasCurrentFocusParameters: { onCurrentFocusedChanged: null, ...hasCurrentFocusParameters }, refElementReturn });
 
 

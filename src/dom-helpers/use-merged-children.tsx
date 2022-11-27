@@ -1,6 +1,6 @@
 import { createElement, Fragment, h } from "preact";
 
-export function useMergedChildren({ children: lhs }: Pick<h.JSX.HTMLAttributes<EventTarget>, "children">, { children: rhs}: Pick<h.JSX.HTMLAttributes<EventTarget>, "children">): h.JSX.HTMLAttributes<EventTarget>["children"] {
+export function useMergedChildren(lhs: h.JSX.HTMLAttributes<EventTarget>["children"], rhs: h.JSX.HTMLAttributes<EventTarget>["children"]): h.JSX.HTMLAttributes<EventTarget>["children"] {
     if (lhs == null && rhs == null) {
         return undefined;
     }

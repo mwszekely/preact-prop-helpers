@@ -43,9 +43,9 @@ export function useListNavigationSingleSelectionSortableChild<ChildElement exten
     rovingTabIndexChildParameters,
     singleSelectionChildParameters,
     singleSelectionContext,
-    typeaheadNavigationChildParameters,
     rovingTabIndexChildContext,
     typeaheadNavigationChildContext,
+    refElementReturn,
     ..._void1
 }: UseListNavigationSingleSelectionSortableChildParameters<ChildElement>): UseListNavigationSingleSelectionSortableChildReturnType<ChildElement> {
 
@@ -54,9 +54,9 @@ export function useListNavigationSingleSelectionSortableChild<ChildElement exten
         rovingTabIndexChildParameters,
         singleSelectionChildParameters,
         singleSelectionContext,
-        typeaheadNavigationChildParameters,
         rovingTabIndexChildContext,
-        typeaheadNavigationChildContext
+        typeaheadNavigationChildContext,
+        refElementReturn
     })
 
     assertEmptyObject(_void1);

@@ -42,68 +42,77 @@ export function useMergedProps<E extends EventTarget>(...allProps: h.JSX.HTMLAtt
     return ret;
 }
 
-function useMergedProps2<E extends EventTarget>(lhsAll: h.JSX.HTMLAttributes<E>, rhsAll: h.JSX.HTMLAttributes<E>): h.JSX.HTMLAttributes<E> {
-    // First, separate the props we were given into two groups:
-    // lhsAll and rhsAll contain all the props we were given, and
-    // lhsMisc and rhsMisc contain all props *except* for the easy ones
-    // like className and style that we already know how to merge.
-    const { children: _lhsChildren, class: _lhsClass, className: _lhsClassName, style: _lhsStyle, ref: _lhsRef, ...lhsMisc } = lhsAll;
-    const { children: _rhsChildren, class: _rhsClass, className: _rhsClassName, style: _rhsStyle, ref: _rhsRef, ...rhsMisc } = rhsAll;
+const knowns = new Set<string>(["children", "ref", "className", "class", "style"])
 
+function mergeUnknown(key: string, lhsValue: unknown, rhsValue: unknown) {
+
+    if (typeof lhsValue === "function" || typeof rhsValue === "function") {
+
+        // They're both functions that can be merged (or one's a function and the other's null).
+        // Not an *easy* case, but a well-defined one.
+        const merged = mergeFunctions(lhsValue as never, rhsValue as never);
+        return merged as never;
+    }
+    else {
+        // Uh...we're here because one of them's null, right?
+        if (lhsValue == null && rhsValue == null) {
+            if (rhsValue === null && lhsValue === undefined)
+                return rhsValue as never;
+            else
+                return lhsValue as never;
+        }
+        if (lhsValue == null)
+            return rhsValue as never;
+        else if (rhsValue == null)
+            return lhsValue as never;
+        else if ((rhsValue as any) == lhsValue) {
+            // I mean, they're the same value at least
+            // so we don't need to do anything.
+            // Not really ideal though.
+        }
+        else {
+            // Ugh.
+            // No good strategies here, just log it if requested
+            log?.(`The prop "${key}" cannot simultaneously be the values ${lhsValue} and ${rhsValue}. One must be chosen outside of useMergedProps.`);
+            return rhsValue as never
+        }
+    }
+}
+
+/**
+ * Helper function.
+ * 
+ * This is one of the most commonly called functions in this and consumer libraries,
+ * so it trades a bit of readability for speed (i.e. we don't decompose objects and just do regular property access, iterate with `for...in`, instead of `Object.entries`, etc.)
+ */
+function useMergedProps2<E extends EventTarget>(lhsAll: h.JSX.HTMLAttributes<E>, rhsAll: h.JSX.HTMLAttributes<E>): h.JSX.HTMLAttributes<E> {
+
+    
     const ret: h.JSX.HTMLAttributes<E> = {
-        ...lhsMisc,
-        ref: useMergedRefs<E>(lhsAll, rhsAll),
-        style: useMergedStyles(lhsAll, rhsAll),
-        className: useMergedClasses(lhsAll, rhsAll),
-        children: useMergedChildren(lhsAll, rhsAll),
+        ref: useMergedRefs<E>(lhsAll.ref, rhsAll.ref),
+        style: useMergedStyles(lhsAll.style, rhsAll.style),
+        className: useMergedClasses(lhsAll["class"], lhsAll.className, rhsAll["class"], rhsAll.className),
+        children: useMergedChildren(lhsAll.children, rhsAll.children),
     } as any;
 
     if (ret.ref === undefined) delete ret.ref;
     if (ret.style === undefined) delete ret.style;
     if (ret.className === undefined) delete ret.className;
+    if (ret["class"] === undefined) delete ret["class"];
     if (ret.children === undefined) delete ret.children;
 
-    // Now, do *everything* else
-    // Merge every remaining existing entry in lhs with what we've already put in ret.
-    //const lhsEntries = Object.entries(lhs) as [keyof T, T[keyof T]][];
-    const rhsEntries = Object.entries(rhsMisc);
+    for (const lhsKeyU in lhsAll) {
+        const lhsKey = lhsKeyU as keyof typeof lhsAll;
+        if (knowns.has(lhsKey))
+            continue;
+        ret[lhsKey] = lhsAll[lhsKey];
+    }
 
-    for (const [rhsKeyU, rhsValue] of rhsEntries) {
-        const rhsKey = rhsKeyU as keyof h.JSX.HTMLAttributes<E>;
-
-        const lhsValue = lhsMisc[rhsKey as keyof typeof lhsMisc];
-
-        if (typeof lhsValue === "function" || typeof rhsValue === "function") {
-
-            // They're both functions that can be merged (or one's a function and the other's null).
-            // Not an *easy* case, but a well-defined one.
-            const merged = mergeFunctions(lhsValue as never, rhsValue as never);
-            ret[rhsKey as keyof h.JSX.HTMLAttributes<E>] = merged as never;
-        }
-        else {
-            // Uh...we're here because one of them's null, right?
-            if (lhsValue == null && rhsValue == null) {
-                if (rhsValue === null && lhsValue === undefined)
-                    ret[rhsKey] = rhsValue as never;
-                else
-                    ret[rhsKey] = lhsValue as never;
-            }
-            if (lhsValue == null)
-                ret[rhsKey] = rhsValue as never;
-            else if (rhsValue == null)
-                ret[rhsKey] = lhsValue as never;
-            else if ((rhsValue as any) == lhsValue) {
-                // I mean, they're the same value at least
-                // so we don't need to do anything.
-                // Not really ideal though.
-            }
-            else {
-                // Ugh.
-                // No good strategies here, just log it if requested
-                log?.(`The prop "${rhsKey}" cannot simultaneously be the values ${lhsValue} and ${rhsValue}. One must be chosen outside of useMergedProps.`);
-                ret[rhsKey] = rhsValue as never
-            }
-        }
+    for (const rhsKeyU in rhsAll) {
+        const rhsKey = rhsKeyU as keyof typeof rhsAll;
+        if (knowns.has(rhsKey))
+            continue;
+        ret[rhsKey] = mergeUnknown(rhsKey, ret[rhsKey], rhsAll[rhsKey]);
     }
 
     return ret;

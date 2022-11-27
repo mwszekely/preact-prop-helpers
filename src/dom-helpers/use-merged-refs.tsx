@@ -23,7 +23,7 @@ function processRef<T>(instance: T | null, ref: Ref<T> | null | undefined) {
  * @param rhs 
  * @returns 
  */
-export function useMergedRefs<E extends EventTarget>({ ref: rhs }: h.JSX.HTMLAttributes<E>, { ref: lhs }: h.JSX.HTMLAttributes<E>) {
+export function useMergedRefs<E extends EventTarget>(rhs: h.JSX.HTMLAttributes<E>["ref"], lhs: h.JSX.HTMLAttributes<E>["ref"]) {
     const combined: RefCallback<E> = useCallback((current: E | null) => {
         processRef(current, lhs);
         processRef(current, rhs);

@@ -125,7 +125,6 @@ export interface UseCompleteListNavigationChildParameters<ChildElement extends E
     pressParameters: UsePressParameters<ChildElement>["pressParameters"];
     singleSelectionChildParameters: UseListNavigationSingleSelectionSortableChildParameters<ChildElement>["singleSelectionChildParameters"];
     completeListNavigationChildParameters: Omit<M, keyof UseListNavigationSingleSelectionSortableChildInfo<ChildElement> | ExtraOmits>;
-    typeaheadNavigationChildParameters: UseListNavigationSingleSelectionSortableChildParameters<ChildElement>["typeaheadNavigationChildParameters"];
     rovingTabIndexChildParameters: UseListNavigationSingleSelectionSortableChildParameters<ChildElement>["rovingTabIndexChildParameters"];
     managedChildParameters: UseListNavigationSingleSelectionSortableChildParameters<ChildElement>["managedChildParameters"];
     sortableChildParameters: Pick<UseSortableChildInfo, "getSortValue">;
@@ -145,7 +144,6 @@ export function useCompleteListNavigationChild<ChildElement extends Element, M e
     //managedChildParameters: { hidden, disabled, index, getSortValue },
     completeListNavigationChildParameters,
     singleSelectionChildParameters,
-    typeaheadNavigationChildParameters,
     rovingTabIndexChildParameters,
     managedChildParameters,
     context: { childrenHaveFocusChildContext, managedChildContext, rovingTabIndexChildContext, singleSelectionContext, typeaheadNavigationChildContext },
@@ -166,7 +164,8 @@ export function useCompleteListNavigationChild<ChildElement extends Element, M e
         hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1 },
         pressParameters: { onPressSync: ops2, ...p1 },
         rovingTabIndexChildReturn,
-        singleSelectionChildReturn
+        singleSelectionChildReturn,
+        managedChildParameters: { setLocalSelected }
     } = useListNavigationSingleSelectionChild<ChildElement>({
         managedChildParameters: { index },
         rovingTabIndexChildParameters: { hidden },
@@ -174,7 +173,7 @@ export function useCompleteListNavigationChild<ChildElement extends Element, M e
         rovingTabIndexChildContext,
         singleSelectionContext,
         typeaheadNavigationChildContext,
-        typeaheadNavigationChildParameters
+        refElementReturn
     });
     const { getTabbable, setTabbable, tabbable } = rovingTabIndexChildReturn;
 
@@ -189,7 +188,7 @@ export function useCompleteListNavigationChild<ChildElement extends Element, M e
         }, refElementReturn
     });
 
-    const { getSelected, selected, setSelected } = singleSelectionChildReturn;
+    const { getSelected, selected, setThisOneSelected } = singleSelectionChildReturn;
 
     const mcp1: UseListNavigationSingleSelectionSortableChildInfo<ChildElement> = {
         disabled,
@@ -200,7 +199,7 @@ export function useCompleteListNavigationChild<ChildElement extends Element, M e
         hidden,
         index,
         selected,
-        setSelected,
+        setLocalSelected,
         setTabbable,
         tabbable,
         getSortValue

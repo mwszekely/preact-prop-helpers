@@ -347,7 +347,6 @@ const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
     }
     const [randomWord] = useState(() => RandomWords[index/*Math.floor(Math.random() * (RandomWords.length - 1))*/]);
     const context = useContext(ListNavigationSingleSelectionChildContext) as CompleteListNavigationContext<HTMLOListElement, HTMLLIElement, CustomInfoType>;
-    const text = `${randomWord} This is item #${index}${hidden ? " (hidden)" : ""}${disabled ? " (disabled)" : ""}`;
     const focusSelf = useCallback((e: HTMLElement) => { e.focus() }, []);
     // const { refElementReturn } = useRefElement<HTMLLIElement>({ refElementParameters: { onElementChange: undefined } });
     //const { getElement, propsStable: p3 } = refElementReturn;
@@ -364,10 +363,11 @@ const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
         sortableChildParameters: { getSortValue },
         pressParameters: { onPressSync: null, exclude: {}, focusSelf },
         singleSelectionChildParameters: { ariaPropName: "aria-selected", selectionMode, disabled },
-        typeaheadNavigationChildParameters: { text },
         completeListNavigationChildParameters: { foo: "bar" },
         context
     });
+
+    const text = `${randomWord} This is item #${index}${hidden ? " (hidden)" : ""}${disabled ? " (disabled)" : ""}${selected ? " (selected)" : " (not selected)"} (${tabbable ? "Tabbable" : "Not tabbable"})`;
 
     /*
         const {
@@ -418,6 +418,6 @@ const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
         const props = useMergedProps<HTMLLIElement>(p2, p3, p4, p5, p6);*/
 
     return (
-        <li {...props}>{text} ({tabbable ? "Tabbable" : "Not tabbable"}, {selected ? "Selected" : "Not selected"})<input {...useMergedProps(p2, { type: "number" }) as any} style={{ width: "5ch" }} /></li>
+        <li {...props}>{text}<input {...useMergedProps(p2, { type: "number" }) as any} style={{ width: "5ch" }} /></li>
     )
 }));

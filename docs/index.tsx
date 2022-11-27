@@ -704,7 +704,6 @@ const DemoUseGridRow = memo((({ index }: { index: number }) => {
             rovingTabIndexChildParameters: { hidden },
             managedChildParameters: { index },
             singleSelectionChildParameters: { disabled, ariaPropName: "aria-checked", selectionMode: "focus" },
-            typeaheadNavigationChildParameters: { text: "" }
         },
         asParentRowParameters: {
             linearNavigationParameters: { disableArrowKeys: false, disableHomeEndKeys: false, navigatePastEnd: "wrap", navigatePastStart: "wrap" },
@@ -752,7 +751,6 @@ const DemoUseGridCell = (({ index, row, rowIsTabbable }: { index: number, row: n
         managedChildParameters: { index },
         rovingTabIndexChildParameters: { hidden: false },
         context,
-        typeaheadNavigationChildParameters: { text: "", },
         completeGridNavigationCellParameters: { bar: "baz" },
         pressParameters: { exclude: index <= 1, focusSelf: useStableCallback(e => e.focus()), onPressSync: null }
     });

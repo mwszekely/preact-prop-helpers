@@ -198,9 +198,10 @@ export function useGridNavigationCell<CellElement extends Element>({
 //    managedChildParameters: { hidden, index, ...void3 },
     rovingTabIndexChildContext,
     typeaheadNavigationChildContext,
-    typeaheadNavigationChildParameters,
+    //typeaheadNavigationChildParameters,
     rovingTabIndexChildParameters,
     managedChildParameters,
+    refElementReturn,
     gridNavigationCellParameters: {
         colSpan
     },
@@ -225,7 +226,8 @@ export function useGridNavigationCell<CellElement extends Element>({
         managedChildParameters,
         rovingTabIndexChildContext,
         typeaheadNavigationChildContext,
-        typeaheadNavigationChildParameters
+        //typeaheadNavigationChildParameters,
+        refElementReturn
     });
 
     assertEmptyObject(_void1);
