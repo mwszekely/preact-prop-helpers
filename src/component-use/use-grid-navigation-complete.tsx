@@ -1,3 +1,4 @@
+import { UseSortableChildInfo } from "component-detail/use-sortable-children";
 import { h } from "preact";
 import { useCallback } from "preact/hooks";
 import { UseGridNavigationRowReturnType } from "../component-detail/use-grid-navigation-partial";
@@ -27,6 +28,7 @@ export interface UseCompleteGridNavigationRowParameters<RowElement extends Eleme
         context: CompleteGridNavigationContext<any, RowElement, RM>; //UseManagedChildParameters<RM>["context"];
         //managedChildReturn: UseManagedChildReturnType<RM>["managedChildReturn"];
         completeGridNavigationRowParameters: Omit<RM, keyof GridSingleSelectSortableChildRowInfo<CellElement>>;
+        sortableChildParameters: Pick<UseSortableChildInfo, "getSortValue">;
     };
     asParentRowParameters: Omit<UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM>["asParentRowParameters"], "rovingTabIndexParameters" | "managedChildrenReturn" | "linearNavigationParameters" | "typeaheadNavigationParameters"> & {
         linearNavigationParameters: Omit<UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM>["asParentRowParameters"]["linearNavigationParameters"], "getHighestIndex" | "pageNavigationSize" | "isValid" | "indexMangler" | "indexDemangler">;
@@ -52,7 +54,7 @@ export interface CompleteGridNavigationContext<ParentElement extends Element, Ch
 }
 
 
-export interface CompleteGridNavigationRowContext<ParentElement extends Element, ChildElement extends Element, M extends GridSingleSelectChildCellInfo<ChildElement> = GridSingleSelectChildCellInfo<ChildElement>> extends UseManagedChildrenContext<M>,
+export interface CompleteGridNavigationRowContext<ParentElement extends Element, ChildElement extends Element, M extends GridSingleSelectChildCellInfo<ChildElement>> extends UseManagedChildrenContext<M>,
     Pick<UseGridNavigationRowReturnType<ParentElement, ChildElement>["asParentRowReturn"], "rovingTabIndexChildContext" | "typeaheadNavigationChildContext" | "gridNavigationCellContext"> {
     completeGridNavigationContext: {
         onPressSync: UsePressParameters<ChildElement>["pressParameters"]["onPressSync"]
@@ -87,7 +89,7 @@ export interface UseCompleteGridNavigationCellReturnType<CellElement extends Ele
 }
 
 
-export function useCompleteGridNavigation<ParentOrRowElement extends Element, RowElement extends Element, M extends GridSingleSelectSortableChildRowInfo<RowElement> = GridSingleSelectSortableChildRowInfo<RowElement>>({
+export function useCompleteGridNavigation<ParentOrRowElement extends Element, RowElement extends Element, M extends GridSingleSelectSortableChildRowInfo<RowElement>>({
     gridNavigationParameters,
     linearNavigationParameters,
     rovingTabIndexParameters,
@@ -154,6 +156,7 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
         completeGridNavigationRowParameters,
         singleSelectionChildParameters,
         typeaheadNavigationChildParameters,
+        rovingTabIndexChildParameters,
         ...asChildRowParameters
     },
     asParentRowParameters: {
@@ -163,6 +166,8 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
         ...asParentRowParameters
     }
 }: UseCompleteGridNavigationRowParameters<RowElement, CellElement, RM, CM>): UseCompleteGridNavigationRowReturnType<RowElement, CellElement, RM, CM> {
+
+    const { index } = managedChildParameters;
 
     const getChildren = useCallback(() => managedChildrenReturn.getChildren(), []);
     const getHighestChildIndex: (() => number) = useCallback<() => number>(() => getChildren().getHighestIndex(), []);
@@ -183,6 +188,7 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
         },
         asChildRowParameters: {
             ...asChildRowParameters,
+            rovingTabIndexChildParameters,
             gridNavigationRowContext,
             rovingTabIndexChildContext,
             singleSelectionContext,
@@ -206,17 +212,17 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
         setTabbable: r.asChildRowReturn.rovingTabIndexChildReturn.setTabbable,
         getTabbable: r.asChildRowReturn.rovingTabIndexChildReturn.getTabbable,
         tabbable: r.asChildRowReturn.rovingTabIndexChildReturn.tabbable,
-        ...managedChildParameters,
-        ...r.asChildRowReturn.managedChildParameters,
+        index: managedChildParameters.index,
+        hidden: rovingTabIndexChildParameters.hidden,
+        selected: r.asChildRowReturn.singleSelectionChildReturn.selected,
+        focusSelf: r.asChildRowReturn.gridNavigationRowParameters.focusSelf,
+        getSelected: r.asChildRowReturn.singleSelectionChildReturn.getSelected,
+        setSelected: r.asChildRowReturn.singleSelectionChildReturn.setSelected,
+        disabled: singleSelectionChildParameters.disabled,
+        setTabbableColumnIndex: r.asChildRowReturn.gridNavigationRowParameters.setTabbableColumnIndex
     }
 
-    const { managedChildReturn } = useManagedChild<RM>({
-        context: { managedChildContext: mcc1 },
-        managedChildParameters: {
-            ...baseInfo,
-            ...completeGridNavigationRowParameters
-        } as RM
-    })
+    const { managedChildReturn } = useManagedChild<RM>({ context: { managedChildContext: mcc1 }, managedChildParameters: { index } }, { ...baseInfo, ...completeGridNavigationRowParameters } as RM)
 
 
     const context = useStableObject<CompleteGridNavigationRowContext<RowElement, CellElement, CM>>({
@@ -252,15 +258,19 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
     }
 }
 
-export function useCompleteGridNavigationCell<CellElement extends Element, M extends GridSingleSelectChildCellInfo<CellElement> = GridSingleSelectChildCellInfo<CellElement>>({
+export function useCompleteGridNavigationCell<CellElement extends Element, M extends GridSingleSelectChildCellInfo<CellElement>>({
     gridNavigationCellParameters,
     managedChildParameters,
     typeaheadNavigationChildParameters,
     context: { completeGridNavigationContext, gridNavigationCellContext, managedChildContext, rovingTabIndexChildContext, typeaheadNavigationChildContext },
+    rovingTabIndexChildParameters,
     //managedChildContext,
     completeGridNavigationCellParameters,
     pressParameters: { onPressSync, ...pressParameters },
 }: UseCompleteGridNavigationCellParameters<CellElement, M>): UseCompleteGridNavigationCellReturnType<CellElement, M> {
+    
+    const { index } = managedChildParameters;
+
     const {
         hasCurrentFocusParameters,
         rovingTabIndexChildReturn
@@ -270,7 +280,8 @@ export function useCompleteGridNavigationCell<CellElement extends Element, M ext
         managedChildParameters,
         rovingTabIndexChildContext,
         typeaheadNavigationChildContext,
-        typeaheadNavigationChildParameters
+        typeaheadNavigationChildParameters,
+        rovingTabIndexChildParameters
     });
 
     const { refElementReturn } = useRefElement<CellElement>({ refElementParameters: {} });
@@ -294,7 +305,7 @@ export function useCompleteGridNavigationCell<CellElement extends Element, M ext
     const baseInfo: GridSingleSelectChildCellInfo<CellElement> = {
         focusSelf: pressParameters.focusSelf,
         getElement: refElementReturn.getElement,
-        hidden: managedChildParameters.hidden,
+        hidden: rovingTabIndexChildParameters.hidden,
         index: managedChildParameters.index,
         getTabbable: rovingTabIndexChildReturn.getTabbable,
         setTabbable: rovingTabIndexChildReturn.setTabbable,
@@ -303,11 +314,12 @@ export function useCompleteGridNavigationCell<CellElement extends Element, M ext
 
     const { managedChildReturn } = useManagedChild<M>({
         context: { managedChildContext },
-        managedChildParameters: {
+        managedChildParameters: { index }
+    },
+        {
             ...baseInfo,
             ...completeGridNavigationCellParameters
-        } as M
-    })
+        } as M)
 
     const props = useMergedProps(
         refElementReturn.propsStable,

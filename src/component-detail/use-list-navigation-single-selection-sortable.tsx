@@ -39,7 +39,8 @@ export function useListNavigationSingleSelectionSortable<ParentOrChildElement ex
 
 
 export function useListNavigationSingleSelectionSortableChild<ChildElement extends Element>({
-    managedChildParameters: { hidden, index, disabled, ..._void5 },
+    managedChildParameters: { index, ..._void5 },
+    rovingTabIndexChildParameters,
     singleSelectionChildParameters,
     singleSelectionContext,
     typeaheadNavigationChildParameters,
@@ -49,7 +50,8 @@ export function useListNavigationSingleSelectionSortableChild<ChildElement exten
 }: UseListNavigationSingleSelectionSortableChildParameters<ChildElement>): UseListNavigationSingleSelectionSortableChildReturnType<ChildElement> {
 
     const lnsscr = useListNavigationSingleSelectionChild<ChildElement>({
-        managedChildParameters: { index, disabled, hidden },
+        managedChildParameters: { index },
+        rovingTabIndexChildParameters,
         singleSelectionChildParameters,
         singleSelectionContext,
         typeaheadNavigationChildParameters,

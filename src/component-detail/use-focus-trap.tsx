@@ -1,5 +1,5 @@
 import { h } from "preact";
-import { useCallback, useLayoutEffect } from "preact/hooks";
+import { useCallback, useEffect, useLayoutEffect, useRef } from "preact/hooks";
 import { isFocusable } from "tabbable";
 import { useActiveElement, UseActiveElementParameters, UseActiveElementReturnType } from "../observers/use-active-element";
 import { getTopElement, useBlockingElement } from "../dom-helpers/use-blocking-element";
@@ -7,7 +7,7 @@ import { getDocument } from "../dom-helpers/use-document-class";
 import { useRefElement, UseRefElementParameters, UseRefElementReturnType } from "../dom-helpers/use-ref-element";
 import { useStableCallback } from "../preact-extensions/use-stable-callback";
 
-export interface UseFocusTrapParameters<SourceElement extends Element | null, PopupElement extends Element> extends UseRefElementParameters<PopupElement>, UseActiveElementParameters {
+export interface UseFocusTrapParameters<SourceElement extends Element | null, PopupElement extends Element> extends UseRefElementParameters<PopupElement> {
     focusTrapParameters: {
         /**
          * Whether or not the focus trap is currently active (or, when used as part of a larger component, whether it is activatable)
@@ -30,7 +30,7 @@ export interface UseFocusTrapParameters<SourceElement extends Element | null, Po
          * then as a very last resort, use `findFirstFocusable`, and then if nothing's found focus the body.  
          * Just please, please make sure that whatever that first focusable is **isn't** a destructive action, at the very least. 
          */
-        focusSelf(e: PopupElement): void;
+        focusPopup(e: PopupElement, findFirstFocusable: () => HTMLOrSVGElement | null): void;
 
         /**
          * When the focus trap has deactivated, focus must be sent back to the element that opened it.
@@ -43,15 +43,14 @@ export interface UseFocusTrapParameters<SourceElement extends Element | null, Po
     }
 }
 
-export interface UseFocusTrapReturnType<E extends Element> extends UseRefElementReturnType<E>, UseActiveElementReturnType {
+export interface UseFocusTrapReturnType<E extends Element> extends UseRefElementReturnType<E> {
     focusTrapReturn: { propsUnstable: h.JSX.HTMLAttributes<E> }
 }
 
-const elementsToRestoreFocusTo = new Map<Element | null, (Node & HTMLOrSVGElement)>();
+//const elementsToRestoreFocusTo = new Map<Element | null, (Node & HTMLOrSVGElement)>();
 
 export function useFocusTrap<SourceElement extends Element | null, PopupElement extends Element>({
-    focusTrapParameters: { trapActive, focusSelf: focusSelfUnstable, focusOpener: focusOpenerUnstable },
-    activeElementParameters,
+    focusTrapParameters: { trapActive, focusPopup: focusSelfUnstable, focusOpener: focusOpenerUnstable },
     refElementParameters: { onElementChange, ...refElementParameters }
 }: UseFocusTrapParameters<SourceElement, PopupElement>): UseFocusTrapReturnType<PopupElement> {
 
@@ -60,85 +59,39 @@ export function useFocusTrap<SourceElement extends Element | null, PopupElement 
     const focusSelf = useStableCallback(focusSelfUnstable);
     const focusOpener = useStableCallback(focusOpenerUnstable);
 
-    const handleActiveChange = useCallback((trapActive: boolean, element: E | null) => {
-        if (trapActive && element) {
-
-            let rafHandle = requestAnimationFrame(() => {
-                // TODO: This extra queueMicrotask is needed for
-                // ...reasons?
-                queueMicrotask(() => {
-                    focusSelf(element);
-                    //findFirstFocusable(element)?.focus();
-                    rafHandle = 0;
-                })
-            })
-
-            return () => {
-                if (rafHandle)
-                    cancelAnimationFrame(rafHandle);
-            };
+    useEffect(() => {
+        if (trapActive) {
+            debugger;
+            const top = getTop();
+            const lastFocusedInThisComponent = getLastActiveWhenOpen();
+            // TODO: Is it better to focus the same element that was focused the last time this focus trap was opened?
+            // I don't know. 
+            /// @ts-expect-error
+            if (false && lastFocusedInThisComponent && lastFocusedInThisComponent.isConnected) {
+                focusSelf(lastFocusedInThisComponent as any as PopupElement, () => lastFocusedInThisComponent);
+            }
+            else {
+                console.assert(!!top);
+                if (top)
+                    focusSelf(top as any as PopupElement, () => findFirstFocusable(top));
+            }
         }
-        else if (element) {
-
-            // Restore the focus to the element
-            // that has returned to the top of the stack
-            let rafHandle = requestAnimationFrame(() => {
-                queueMicrotask(() => {
-                    let elementToFocus = elementsToRestoreFocusTo.get(getTopElement());
-                    rafHandle = 0;
-                    focusOpener((elementToFocus ?? null) as SourceElement | null);
-                });
-            });
-
-            return () => {
-                if (rafHandle)
-                    cancelAnimationFrame(rafHandle);
-            };
+        else {
+            const lastActive = getLastActiveWhenClosed();
+            if (lastActive)
+                focusOpener(lastActive as any as SourceElement);
         }
-    }, []);
+    }, [trapActive])
 
     const { refElementReturn } = useRefElement<E>({
-        refElementParameters: {
-            onElementChange: useStableCallback((element: E | null, p: E | null | undefined) => {
-                handleActiveChange(trapActive, element);
-                onElementChange?.(element, p);
-            }),
-            ...refElementParameters
-        }
+        refElementParameters: { onElementChange, ...refElementParameters }
     })
-    const { activeElementReturn } = useActiveElement({ activeElementParameters });
     const { getElement } = refElementReturn;
-    const { getLastActiveElement } = activeElementReturn;
 
-
-    // When the trap becomes active, before we let the blockingElements hook run,
-    // keep track of whatever's currently focused and save it.
-    useLayoutEffect(() => {
-        const element = getElement();
-        if (trapActive && element) {
-            const document = getDocument(element);
-
-            // Save the currently focused element
-            // to whatever's currently at the top of the stack
-            elementsToRestoreFocusTo.set(getTopElement(), (getLastActiveElement() as (Element & HTMLOrSVGElement)) ?? document.body);
-        }
-    }, [trapActive]);
-
-    useBlockingElement(trapActive, getElement);
-
-    /**
-     * Any time we activate or deactivate the trap,
-     * change focus to something else (something in
-     * the trap if it's active, or whatever we've
-     * tracked in elementsToRestoreFocusTo if not)
-     */
-    useLayoutEffect(() => {
-        handleActiveChange(trapActive, getElement());
-    }, [trapActive]);
+    const { getTop, getLastActiveWhenClosed, getLastActiveWhenOpen } = useBlockingElement(trapActive, getElement);
 
 
     return {
-        activeElementReturn,
         refElementReturn,
         focusTrapReturn: { propsUnstable: { "aria-modal": trapActive ? "true" : undefined } as h.JSX.HTMLAttributes<E> }
     };

@@ -66,7 +66,7 @@ export interface UseListNavigationParameters<ChildElement extends Element, M ext
 }
 
 export interface UseListNavigationChildParameters<ChildElement extends Element> extends UseRovingTabIndexChildParameters<ChildElement>, UseTypeaheadNavigationChildParameters<ChildElement> {
-    managedChildParameters: UseRovingTabIndexChildParameters<ChildElement>["managedChildParameters"] & UseTypeaheadNavigationChildParameters<ChildElement>["managedChildParameters"];
+    //managedChildParameters: UseRovingTabIndexChildParameters<ChildElement>["managedChildParameters"] & UseTypeaheadNavigationChildParameters<ChildElement>["managedChildParameters"];
 }
 
 
@@ -105,18 +105,19 @@ export function useListNavigation<ParentOrChildElement extends Element, ChildEle
 }
 
 export function useListNavigationChild<ChildElement extends Element>({
-    managedChildParameters: { hidden, index, ..._void5 },
+    rovingTabIndexChildParameters,
     rovingTabIndexChildContext,
     typeaheadNavigationChildContext,
     typeaheadNavigationChildParameters,
+    managedChildParameters,
     ..._void2
 }: UseListNavigationChildParameters<ChildElement>): UseListNavigationChildReturnType<ChildElement> {
 
-    const rticr = useRovingTabIndexChild<ChildElement>({ rovingTabIndexChildContext, managedChildParameters: { hidden, index } });
-    const _void: void = useTypeaheadNavigationChild<ChildElement>({ managedChildParameters: { index }, typeaheadNavigationChildParameters, typeaheadNavigationChildContext });
+    const rticr = useRovingTabIndexChild<ChildElement>({ rovingTabIndexChildContext, rovingTabIndexChildParameters, managedChildParameters });
+    const _void: void = useTypeaheadNavigationChild<ChildElement>({ typeaheadNavigationChildParameters, typeaheadNavigationChildContext, managedChildParameters });
 
     assertEmptyObject(_void2);
-    assertEmptyObject(_void5);
+//    assertEmptyObject(_void5);
 
     return {
         ...rticr

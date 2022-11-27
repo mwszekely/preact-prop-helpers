@@ -91,7 +91,9 @@ export interface UseManagedChildrenParameters<M extends ManagedChildInfo<any>> {
 // MCSubInfo contains the entirety of the saved data for this child.  All of it. Even types the user will never be able to pass in because they're internally derived.
 // SubbestInfo refers to the actual parameters the user passes in that could be totally unrelated. 
 export interface UseManagedChildParameters<M extends ManagedChildInfo<any>, Omits extends keyof M> {
-    managedChildParameters: Omit<M, Omits>;
+    // This is the only property shared among all managed children.
+    // Technically this is redundant with the second argument, which is...eh. But the types are clear.
+    managedChildParameters: Pick<M, "index">;
     context: UseManagedChildrenContext<M>;
 }
 
@@ -302,10 +304,11 @@ export function useManagedChildren<M extends ManagedChildInfo<string | number>>(
 
 
 
-export function useManagedChild<M extends ManagedChildInfo<number | string>>(info: UseManagedChildParameters<M, never>): UseManagedChildReturnType<M> {
+export function useManagedChild<M extends ManagedChildInfo<number | string>>(info: UseManagedChildParameters<M, never>, managedChildParameters: M): UseManagedChildReturnType<M> {
     type IndexType = M["index"];
 
-    const { managedChildParameters: { index }, context: { managedChildContext: { getChildren, managedChildrenArray, remoteULEChildMounted, remoteULEChildChanged } } } = info;
+    const { context: { managedChildContext: { getChildren, managedChildrenArray, remoteULEChildMounted, remoteULEChildChanged } } } = info;
+    const index = managedChildParameters.index;
     // Any time our child props change, make that information available
     // the parent if they need it.
     // The parent can listen for all updates and only act on the ones it cares about,
@@ -313,10 +316,10 @@ export function useManagedChild<M extends ManagedChildInfo<number | string>>(inf
     useLayoutEffect(() => {
         // Insert this information in-place
         if (typeof index == "number") {
-            managedChildrenArray.arr[index as number] = { ...info.managedChildParameters };
+            managedChildrenArray.arr[index as number] = { ...managedChildParameters };
         }
         else {
-            managedChildrenArray.rec[index as IndexType] = { ...info.managedChildParameters };
+            managedChildrenArray.rec[index as IndexType] = { ...managedChildParameters };
         }
         return remoteULEChildChanged(index as IndexType);
     }, [...Object.entries(info).flat(9)]);  // 9 is infinity, right? Sure. Unrelated: TODO.

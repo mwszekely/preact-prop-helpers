@@ -1,7 +1,7 @@
 import { h } from "preact";
 import { useCallback, useEffect, useLayoutEffect, useRef } from "preact/hooks";
 import { assertEmptyObject, UseManagedChildParameters } from "../preact-extensions/use-child-manager";
-import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "./use-roving-tabindex";
+import { UseRovingTabIndexChildInfo, UseRovingTabIndexChildParameters, UseRovingTabIndexReturnType } from "./use-roving-tabindex";
 import { useStableCallback } from "../preact-extensions/use-stable-callback";
 import { useStableGetter, useStableObject } from "../preact-extensions/use-stable-getter";
 import { useState } from "../preact-extensions/use-state";
@@ -384,7 +384,7 @@ export interface UseTypeaheadNavigationParameters<TabbableChildElement extends E
 
 
 export interface UseTypeaheadNavigationChildParameters<ChildElement extends Element> {
-    managedChildParameters: Pick<UseManagedChildParameters<UseRovingTabIndexChildInfo<ChildElement>, never>["managedChildParameters"], "index">;
+    managedChildParameters: Pick<UseRovingTabIndexChildParameters<ChildElement>["managedChildParameters"], "index">;
 
     typeaheadNavigationChildParameters: {
         /**

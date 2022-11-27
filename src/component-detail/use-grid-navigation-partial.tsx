@@ -55,7 +55,7 @@ export interface UseGridNavigationRowParameters<RowElement extends Element, Cell
 
 export interface UseGridNavigationRowReturnType<RowElement extends Element, CellElement extends Element> {
     asChildRowReturn: UseListNavigationChildReturnType<RowElement> & {
-        managedChildParameters: Pick<UseManagedChildParameters<GridChildRowInfo<RowElement>, never>["managedChildParameters"], "focusSelf" | "setTabbableColumnIndex">;
+        gridNavigationRowParameters: Pick<GridChildRowInfo<RowElement>, "focusSelf" | "setTabbableColumnIndex">;
     };
     asParentRowReturn: Omit<UseListNavigationReturnType<RowElement, CellElement>, "rovingTabIndexReturn"> & {
         rovingTabIndexReturn: Omit<UseListNavigationReturnType<RowElement, CellElement>["rovingTabIndexReturn"], "focusSelf">;
@@ -187,7 +187,7 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
     })
 
     return {
-        asChildRowReturn: { managedChildParameters: { focusSelf, setTabbableColumnIndex: setTabbableIndex }, ...lncr, },
+        asChildRowReturn: { gridNavigationRowParameters: { focusSelf, setTabbableColumnIndex: setTabbableIndex }, ...lncr, },
         asParentRowReturn: { gridNavigationCellContext, ...lnr }
     }
 
@@ -195,10 +195,12 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
 
 
 export function useGridNavigationCell<CellElement extends Element>({
-    managedChildParameters: { hidden, index, ...void3 },
+//    managedChildParameters: { hidden, index, ...void3 },
     rovingTabIndexChildContext,
     typeaheadNavigationChildContext,
     typeaheadNavigationChildParameters,
+    rovingTabIndexChildParameters,
+    managedChildParameters,
     gridNavigationCellParameters: {
         colSpan
     },
@@ -213,12 +215,14 @@ export function useGridNavigationCell<CellElement extends Element>({
     },
     ..._void1
 }: UseGridNavigationCellParameters<CellElement>): UseGridNavigationCellReturnType<CellElement> {
+    const { index } = managedChildParameters;
     const {
         hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1 },
         rovingTabIndexChildReturn,
         ...void2
     } = useListNavigationChild<CellElement>({
-        managedChildParameters: { hidden, index },
+        rovingTabIndexChildParameters,
+        managedChildParameters,
         rovingTabIndexChildContext,
         typeaheadNavigationChildContext,
         typeaheadNavigationChildParameters
@@ -226,7 +230,7 @@ export function useGridNavigationCell<CellElement extends Element>({
 
     assertEmptyObject(_void1);
     assertEmptyObject(void2);
-    assertEmptyObject(void3);
+//    assertEmptyObject(void3);
 
     return {
         hasCurrentFocusParameters: {

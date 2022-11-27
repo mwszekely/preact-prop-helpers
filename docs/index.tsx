@@ -1,7 +1,7 @@
 import { createContext, h, render, VNode } from "preact";
 import { memo } from "preact/compat";
 import { useCallback, useContext, useRef } from "preact/hooks";
-import { GetIndex, GetValid, GridSingleSelectChildCellInfo, GridSingleSelectChildRowInfo, GridSingleSelectSortableChildCellInfo, GridSingleSelectSortableChildRowInfo, returnTrue, useAnimationFrame, useAsyncHandler, UseCompleteGridNavigationReturnType, UseCompleteGridNavigationRowReturnType, useDraggable, useDroppable, useElementSize, useFocusTrap, useHasCurrentFocus, useHasLastFocus, UseListNavigationSingleSelectionChildInfo, useMergedProps, useRefElement, useSortableChildren, useStableCallback, useState } from "..";
+import { GetIndex, GetValid, GridSingleSelectChildCellInfo, GridSingleSelectChildRowInfo, GridSingleSelectSortableChildCellInfo, GridSingleSelectSortableChildRowInfo, returnNull, returnTrue, useAnimationFrame, useAsyncHandler, UseCompleteGridNavigationReturnType, UseCompleteGridNavigationRowReturnType, useDraggable, useDroppable, useElementSize, useFocusTrap, useHasCurrentFocus, useHasLastFocus, UseListNavigationSingleSelectionChildInfo, useMergedProps, useRefElement, useSortableChildren, useStableCallback, useState } from "..";
 import { ElementSize } from "../dom-helpers/use-element-size";
 //import { useGridNavigation, UseGridNavigationCell, UseGridNavigationRow } from "../use-grid-navigation";
 import { CompleteGridNavigationContext, CompleteGridNavigationRowContext, useCompleteGridNavigation, useCompleteGridNavigationCell, useCompleteGridNavigationRow } from "..";
@@ -78,15 +78,13 @@ const DemoUseFocusTrap = memo(({ depth }: { depth?: number }) => {
 
     const [active, setActive] = useState(false);
 
-    const focusSelf = useCallback((e: any) => e.focus(), []);
 
-    const { activeElementReturn: _activeElementReturn, focusTrapReturn: { propsUnstable }, refElementReturn: { propsStable } } = useFocusTrap<HTMLDivElement, HTMLDivElement>({
+    const { focusTrapReturn: { propsUnstable }, refElementReturn: { propsStable } } = useFocusTrap<HTMLDivElement, HTMLDivElement>({
         focusTrapParameters: {
             trapActive: active,
-            focusOpener: focusSelf,
-            focusSelf: focusSelf,
+            focusOpener: e => e?.focus(),
+            focusPopup: (e, f) => f()?.focus(),
         },
-        activeElementParameters: { getDocument },
         refElementParameters: { onElementChange: undefined }
     });
     //const { useRovingTabIndexChild, useRovingTabIndexProps } = useRovingTabIndex<HTMLUListElement, RovingTabIndexChildInfo>({ tabbableIndex, focusOnChange: false });
@@ -576,7 +574,7 @@ export const DemoUseGrid = memo(() => {
     });*/
 
 
-    const ret: UseCompleteGridNavigationReturnType<HTMLTableSectionElement, HTMLTableRowElement, GridSingleSelectSortableChildRowInfo<HTMLTableRowElement>> = useCompleteGridNavigation<HTMLTableSectionElement, HTMLTableRowElement, GridSingleSelectSortableChildRowInfo<HTMLTableRowElement>>({
+    const ret: UseCompleteGridNavigationReturnType<HTMLTableSectionElement, HTMLTableRowElement, CustomGridInfo> = useCompleteGridNavigation<HTMLTableSectionElement, HTMLTableRowElement, CustomGridInfo>({
         singleSelectionParameters: { initiallySelectedIndex: selectedRow, onSelectedIndexChange: setSelectedRow },
         gridNavigationParameters: { onTabbableColumnChange: setTabbableColumn },
         linearNavigationParameters: { disableArrowKeys: false, disableHomeEndKeys: false, navigatePastEnd: "wrap", navigatePastStart: "wrap", pageNavigationSize: 0.1 },
@@ -675,11 +673,14 @@ export const DemoUseGrid = memo(() => {
     );
 });
 
+interface CustomGridInfo extends GridSingleSelectSortableChildRowInfo<HTMLTableRowElement> { foo: "bar" }
+interface CustomGridRowInfo extends GridSingleSelectSortableChildCellInfo<HTMLTableCellElement> { bar: "baz" }
+
 function identity<T>(t: T) { return t; }
 //type GridRowContext<ParentElement extends Element, RowElement extends Element> = CompleteGridNavigationContext<ParentElement, RowElement>;
 //type GridCellContext<RowElement extends Element, CellElement extends Element> = CompleteGridNavigationRowContext<RowElement, CellElement>;
-const GridRowContext = createContext<CompleteGridNavigationContext<HTMLTableSectionElement, HTMLTableRowElement, GridSingleSelectSortableChildRowInfo<HTMLTableRowElement>>>(null!);
-const GridCellContext = createContext<CompleteGridNavigationRowContext<HTMLTableRowElement, HTMLTableCellElement, GridSingleSelectSortableChildCellInfo<HTMLTableCellElement>>>(null!);
+const GridRowContext = createContext<CompleteGridNavigationContext<HTMLTableSectionElement, HTMLTableRowElement, CustomGridInfo>>(null!);
+const GridCellContext = createContext<CompleteGridNavigationRowContext<HTMLTableRowElement, HTMLTableCellElement,  CustomGridRowInfo>>(null!);
 
 const _Prefix = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const DemoUseGridRow = memo((({ index }: { index: number }) => {
@@ -694,13 +695,15 @@ const DemoUseGridRow = memo((({ index }: { index: number }) => {
 
     //    const getValid = useStableCallback<GetValid>((i) => !!(ret.managedChildReturn.getChildren().getAt(i)?.hidden));
 
-    const contextFromParent = useContext(GridRowContext) as CompleteGridNavigationContext<HTMLTableSectionElement, HTMLTableRowElement, GridSingleSelectSortableChildRowInfo<HTMLTableRowElement>>;
-    const ret: UseCompleteGridNavigationRowReturnType<HTMLTableRowElement, HTMLTableCellElement, GridSingleSelectSortableChildRowInfo<HTMLTableRowElement>, GridSingleSelectSortableChildCellInfo<HTMLTableCellElement>> = useCompleteGridNavigationRow<HTMLTableRowElement, HTMLTableCellElement, GridSingleSelectSortableChildRowInfo<HTMLTableRowElement>, GridSingleSelectSortableChildCellInfo<HTMLTableCellElement>>({
+    const contextFromParent = useContext(GridRowContext) as CompleteGridNavigationContext<HTMLTableSectionElement, HTMLTableRowElement, CustomGridInfo>;
+    const ret: UseCompleteGridNavigationRowReturnType<HTMLTableRowElement, HTMLTableCellElement, CustomGridInfo, CustomGridRowInfo> = useCompleteGridNavigationRow<HTMLTableRowElement, HTMLTableCellElement, CustomGridInfo, CustomGridRowInfo>({
         asChildRowParameters: {
-            completeGridNavigationRowParameters: {},
+            completeGridNavigationRowParameters: { foo: "bar" },
+            sortableChildParameters: { getSortValue: returnNull },
             context: contextFromParent,
-            managedChildParameters: { hidden, index, disabled },
-            singleSelectionChildParameters: { ariaPropName: "aria-checked", selectionMode: "focus" },
+            rovingTabIndexChildParameters: { hidden },
+            managedChildParameters: { index },
+            singleSelectionChildParameters: { disabled, ariaPropName: "aria-checked", selectionMode: "focus" },
             typeaheadNavigationChildParameters: { text: "" }
         },
         asParentRowParameters: {
@@ -737,19 +740,20 @@ const DemoUseGridCell = (({ index, row, rowIsTabbable }: { index: number, row: n
     let hiddenText = (row === 3) ? " (row hidden)" : ""
 
 
-    const context = useContext(GridCellContext) as CompleteGridNavigationRowContext<HTMLTableRowElement, HTMLTableCellElement>;
+    const context = useContext(GridCellContext) as CompleteGridNavigationRowContext<HTMLTableRowElement, HTMLTableCellElement, CustomGridRowInfo>;
 
 
     const {
         props,
         rovingTabIndexChildReturn: { tabbable },
 
-    } = useCompleteGridNavigationCell<HTMLTableCellElement>({
+    } = useCompleteGridNavigationCell<HTMLTableCellElement, CustomGridRowInfo>({
         gridNavigationCellParameters: { colSpan: 1 },
-        managedChildParameters: { hidden: false, index },
+        managedChildParameters: { index },
+        rovingTabIndexChildParameters: { hidden: false },
         context,
         typeaheadNavigationChildParameters: { text: "", },
-        completeGridNavigationCellParameters: {},
+        completeGridNavigationCellParameters: { bar: "baz" },
         pressParameters: { exclude: index <= 1, focusSelf: useStableCallback(e => e.focus()), onPressSync: null }
     });
 

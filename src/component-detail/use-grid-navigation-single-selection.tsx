@@ -84,8 +84,8 @@ export function useGridNavigationSingleSelectionRow<RowElement extends Element, 
     asParentRowParameters,
     ..._void1
 }: UseGridNavigationSingleSelectionRowParameters<RowElement, CellElement, RM, CM>): UseGridNavigationSingleSelectionRowReturnType<RowElement, CellElement> {
-    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ..._void3 }, managedChildParameters: mcp3, ...sscr } = useSingleSelectionChild<RowElement>(asChildRowParameters);
-    const { asChildRowReturn: { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ..._void2 }, managedChildParameters: mcp2, ...gnr_crr }, asParentRowReturn: { ...gnr_prr } } = useGridNavigationRow<RowElement, CellElement, RM, CM>({ asChildRowParameters, asParentRowParameters });
+    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ..._void3 }, pressParameters, singleSelectionChildReturn } = useSingleSelectionChild<RowElement>(asChildRowParameters);
+    const { asChildRowReturn: { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ..._void2 }, gridNavigationRowParameters, rovingTabIndexChildReturn }, asParentRowReturn } = useGridNavigationRow<RowElement, CellElement, RM, CM>({ asChildRowParameters, asParentRowParameters });
     const onCurrentFocusedInnerChanged = useStableCallback<NonNullable<typeof ocfic2>>((focused, prevFocused) => { ocfic1?.(focused, prevFocused); ocfic2?.(focused, prevFocused); })
 
     assertEmptyObject(_void1);
@@ -93,8 +93,8 @@ export function useGridNavigationSingleSelectionRow<RowElement extends Element, 
     assertEmptyObject(_void3);
 
     return {
-        asChildRowReturn: { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged }, managedChildParameters: { ...mcp2, ...mcp3 }, ...gnr_crr, ...sscr },
-        asParentRowReturn: { ...gnr_prr },
+        asChildRowReturn: { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged }, gridNavigationRowParameters, pressParameters, rovingTabIndexChildReturn, singleSelectionChildReturn },
+        asParentRowReturn
     }
 
 }

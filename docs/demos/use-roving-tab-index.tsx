@@ -220,9 +220,8 @@ function useSortableSingleSelectChildDemo<ListItemElement extends Element>({
 
 }*/
 
-const ListNavigationSingleSelectionChildContext = createContext<CompleteListNavigationContext<HTMLOListElement, HTMLLIElement, UseListNavigationSingleSelectionSortableChildInfo<HTMLLIElement>>>(null!)
+const ListNavigationSingleSelectionChildContext = createContext<CompleteListNavigationContext<HTMLOListElement, HTMLLIElement, CustomInfoType>>(null!)
 export const DemoUseRovingTabIndex = memo(() => {
-    type M = UseListNavigationSingleSelectionSortableChildInfo<HTMLLIElement>;
 
     const [selectionMode, setSelectionMode] = useState("activation" as "focus" | "activation");
     const [count, setCount] = useState(10);
@@ -255,7 +254,7 @@ export const DemoUseRovingTabIndex = memo(() => {
      */
 
 
-    const r: UseCompleteListNavigationReturnType<HTMLOListElement, HTMLLIElement, M> = useCompleteListNavigation<HTMLOListElement, HTMLLIElement, UseListNavigationSingleSelectionSortableChildInfo<HTMLLIElement>>({
+    const r: UseCompleteListNavigationReturnType<HTMLOListElement, HTMLLIElement, CustomInfoType> = useCompleteListNavigation<HTMLOListElement, HTMLLIElement, CustomInfoType>({
         rovingTabIndexParameters: { onTabbableIndexChange: setLocalTabbableIndex, untabbable: false },
         singleSelectionParameters: { initiallySelectedIndex: selectedIndex, onSelectedIndexChange: setLocalSelectedIndex },
         typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000 },
@@ -333,6 +332,10 @@ export const DemoUseRovingTabIndex = memo(() => {
     );
 })
 
+interface CustomInfoType extends UseListNavigationSingleSelectionSortableChildInfo<HTMLLIElement> {
+    foo: "bar";
+}
+
 const SelectionModeContext = createContext("focus" as "focus" | "activation");
 const _Prefix = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
@@ -343,7 +346,7 @@ const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
         disabled = hidden = true;
     }
     const [randomWord] = useState(() => RandomWords[index/*Math.floor(Math.random() * (RandomWords.length - 1))*/]);
-    const context = useContext(ListNavigationSingleSelectionChildContext) as CompleteListNavigationContext<HTMLOListElement, HTMLLIElement, UseListNavigationSingleSelectionSortableChildInfo<HTMLLIElement>>;
+    const context = useContext(ListNavigationSingleSelectionChildContext) as CompleteListNavigationContext<HTMLOListElement, HTMLLIElement, CustomInfoType>;
     const text = `${randomWord} This is item #${index}${hidden ? " (hidden)" : ""}${disabled ? " (disabled)" : ""}`;
     const focusSelf = useCallback((e: HTMLElement) => { e.focus() }, []);
     // const { refElementReturn } = useRefElement<HTMLLIElement>({ refElementParameters: { onElementChange: undefined } });
@@ -355,12 +358,14 @@ const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
         props,
         rovingTabIndexChildReturn: { tabbable, propsUnstable: p2 },
         singleSelectionChildReturn: { selected }
-    } = useCompleteListNavigationChild<HTMLLIElement, UseListNavigationSingleSelectionSortableChildInfo<HTMLLIElement>, never>({
-        managedChildParameters: { hidden, disabled, index, getSortValue },
+    } = useCompleteListNavigationChild<HTMLLIElement, CustomInfoType, never>({
+        managedChildParameters: { index },
+        rovingTabIndexChildParameters: { hidden },
+        sortableChildParameters: { getSortValue },
         pressParameters: { onPressSync: null, exclude: {}, focusSelf },
-        singleSelectionChildParameters: { ariaPropName: "aria-selected", selectionMode },
+        singleSelectionChildParameters: { ariaPropName: "aria-selected", selectionMode, disabled },
         typeaheadNavigationChildParameters: { text },
-        completeListNavigationChildParameters: {},
+        completeListNavigationChildParameters: { foo: "bar" },
         context
     });
 

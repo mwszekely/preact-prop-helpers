@@ -21,8 +21,7 @@ export function DemoUseModal(props: { parentDepth?: number }) {
 
     const [open, setOpen] = useState(false);
 
-    const focusSelf = () => buttonRef.current?.focus();
-    const focusOpener = (e: any) => e?.focus();
+    const focusOpener = (e: any) =>buttonRef.current?.focus();
 
     const {
         propsPopup,
@@ -32,7 +31,7 @@ export function DemoUseModal(props: { parentDepth?: number }) {
         focusTrapParameters: {
             trapActive: focusTrapActive,
             focusOpener,
-            focusSelf
+            focusPopup: (e, f) => f()
         },
         dismissParameters: {
             closeOnBackdrop,

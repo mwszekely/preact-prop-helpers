@@ -47,7 +47,8 @@ export interface UseListNavigationSingleSelectionChildParameters<ChildElement ex
 export interface UseListNavigationSingleSelectionChildReturnType<ChildElement extends Element> extends UseListNavigationChildReturnType<ChildElement>, UseSingleSelectionChildReturnTypeInfo<ChildElement> { }
 
 export function useListNavigationSingleSelectionChild<ChildElement extends Element>({
-    managedChildParameters: { hidden, disabled, index, ..._void5 },
+    managedChildParameters: { index, ..._void5 },
+    rovingTabIndexChildParameters: { hidden, ...void7 },
     singleSelectionChildParameters,
     singleSelectionContext,
     typeaheadNavigationChildParameters,
@@ -60,7 +61,7 @@ export function useListNavigationSingleSelectionChild<ChildElement extends Eleme
         hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ..._void3 },
         ...sscr
     } = useSingleSelectionChild<ChildElement>({
-        managedChildParameters: { index, disabled },
+        managedChildParameters: { index },
         singleSelectionChildParameters,
         singleSelectionContext
     });
@@ -69,7 +70,8 @@ export function useListNavigationSingleSelectionChild<ChildElement extends Eleme
         hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ..._void6 },
         ...lncr
     } = useListNavigationChild<ChildElement>({
-        managedChildParameters: { hidden, index },
+        managedChildParameters: { index },
+        rovingTabIndexChildParameters: { hidden },
         typeaheadNavigationChildParameters,
         rovingTabIndexChildContext,
         typeaheadNavigationChildContext
@@ -79,6 +81,7 @@ export function useListNavigationSingleSelectionChild<ChildElement extends Eleme
     assertEmptyObject(_void3);
     assertEmptyObject(_void5);
     assertEmptyObject(_void6);
+    assertEmptyObject(void7);
 
     const onCurrentFocusedInnerChanged = useStableCallback<NonNullable<typeof ocfic1>>((focused, previouslyFocused) => {
         ocfic1?.(focused, previouslyFocused);

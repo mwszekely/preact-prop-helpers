@@ -30,7 +30,7 @@ export interface SelectableChildInfo<E extends Element> extends UseRovingTabInde
     /**
      * This is similar to `hidden` for `useRovingTabIndex`, but for selection.
      * 
-     * Disables selecting this child. Being `hidden` implies being `disabled`, but you can of course have something that's disabled (unselectable) but not hidden (untabbable).
+     * Disables selecting this child. Being `hidden` must imply being `disabled`, but you can of course have something that's disabled (unselectable) but not hidden (untabbable).
      */
     disabled: boolean;
 }
@@ -48,12 +48,13 @@ export interface UseSingleSelectionParameters<ChildElement extends Element> {
 }
 
 export interface UseSingleSelectionChildParameters<E extends Element> {
-    managedChildParameters: Pick<UseManagedChildParameters<SelectableChildInfo<E>, never>["managedChildParameters"], "index" | "disabled">;
+    //managedChildParameters: Pick<UseManagedChildParameters<SelectableChildInfo<E>, never>["managedChildParameters"], "index" | "disabled">;
     singleSelectionContext: UseSingleSelectionReturnType["singleSelectionContext"];
     singleSelectionChildParameters: {
         selectionMode: "focus" | "activation" | "disabled";
         ariaPropName: `aria-${"pressed" | "selected" | "checked"}` | null;
-    }
+    } & Pick<SelectableChildInfo<E>, "disabled">;
+    managedChildParameters: Pick<SelectableChildInfo<E>, "index">;
 }
 
 export interface UseSingleSelectionChildReturnTypeInfo<E extends Element> extends UseChildrenHaveFocusChildReturnType<E> {
@@ -64,11 +65,11 @@ export interface UseSingleSelectionChildReturnTypeInfo<E extends Element> extend
         getSelected(): boolean;
         // Used to programmatically set this as the selected element;
         // it requests the parent to actually change the numeric index to this one's.
-        setSelected: () => void;
+        setSelected: (selected: boolean) => void;
         propsUnstable: h.JSX.HTMLAttributes<E>;
     }
     //refElementParameters: Required<Pick<UseRefElementParameters<E>["refElementParameters"], "onElementChange">>;
-    managedChildParameters: Pick<UseManagedChildParameters<SelectableChildInfo<E>, never>["managedChildParameters"], "selected" | "setSelected" | "getSelected">;
+    //managedChildParameters: Pick<UseManagedChildParameters<SelectableChildInfo<E>, never>["managedChildParameters"], "selected" | "setSelected" | "getSelected">;
     pressParameters: Pick<UsePressParameters<E>["pressParameters"], "onPressSync">;
 }
 
@@ -141,10 +142,14 @@ export function useSingleSelection<ChildElement extends Element>({
 
 export function useSingleSelectionChild<ChildElement extends Element>(args: UseSingleSelectionChildParameters<ChildElement>): UseSingleSelectionChildReturnTypeWithHooks<ChildElement> {
     const {
-        managedChildParameters: { index, disabled },
+
         singleSelectionContext: { getSelectedIndex, setSelectedIndex },
-        singleSelectionChildParameters: { ariaPropName, selectionMode },
+        singleSelectionChildParameters: { ariaPropName, selectionMode, disabled },
+        managedChildParameters: { index }
     } = args;
+
+    useEnsureStability("useSingleSelectionChild", getSelectedIndex, setSelectedIndex);
+    const getDisabled = useStableGetter(disabled);
 
     const [selected, setSelected, getSelected] = useState(getSelectedIndex() == index);
 
@@ -162,12 +167,16 @@ export function useSingleSelectionChild<ChildElement extends Element>(args: UseS
     }));
 
     return {
-        managedChildParameters: { selected, setSelected, getSelected, },
-        singleSelectionChildReturn: { 
-            selected, 
-            setSelected: useCallback(() => { setSelectedIndex(getIndex()) }, []), 
-            getSelected, 
-            propsUnstable: ariaPropName == null? {} : { [ariaPropName as keyof h.JSX.HTMLAttributes<any>]: (selected ?? false).toString() } 
+        //managedChildParameters: { selected, setSelected, getSelected, },
+        singleSelectionChildReturn: {
+            selected,
+            setSelected: useCallback((selected: boolean) => {
+                console.assert(!getDisabled());
+                if (selected)
+                    setSelectedIndex(getIndex());
+            }, []),
+            getSelected,
+            propsUnstable: ariaPropName == null ? {} : { [ariaPropName as keyof h.JSX.HTMLAttributes<any>]: (selected ?? false).toString() }
         },
         pressParameters: { onPressSync },
         hasCurrentFocusParameters: { onCurrentFocusedInnerChanged }

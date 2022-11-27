@@ -89,10 +89,12 @@ export interface UseRovingTabIndexReturnType<TabbableChildElement extends Elemen
 
 
 export interface UseRovingTabIndexChildParameters<TabbableChildElement extends Element> {
+    managedChildParameters: Pick<UseRovingTabIndexChildInfo<TabbableChildElement>, "index">;
+
     /** 
      * The information specific to RTI for this child that you provide
      */
-    managedChildParameters: Pick<UseManagedChildParameters<UseRovingTabIndexChildInfo<TabbableChildElement>, never>["managedChildParameters"], "hidden" | "index">;
+    rovingTabIndexChildParameters: Pick<UseRovingTabIndexChildInfo<TabbableChildElement>, "hidden">;
 
     /**
      * The information provided by the parent hook
@@ -271,10 +273,11 @@ export function useRovingTabIndex<ChildElement extends Element, M extends UseRov
 
 
 export function useRovingTabIndexChild<ChildElement extends Element>({
+    managedChildParameters: { index, ..._void2 },
     rovingTabIndexChildContext: { reevaluateClosestFit, setTabbableIndex },
-    managedChildParameters,
+    rovingTabIndexChildParameters,
 }: UseRovingTabIndexChildParameters<ChildElement>): UseRovingTabIndexChildReturnType<ChildElement> {
-    const { hidden, index, ..._void1 } = managedChildParameters;
+    const { hidden, ..._void1 } = rovingTabIndexChildParameters;
     const [tabbable, setTabbable, getTabbable] = useState(false);
 
     useEffect(() => {
@@ -282,6 +285,7 @@ export function useRovingTabIndexChild<ChildElement extends Element>({
     }, [!!hidden]);
 
     assertEmptyObject(_void1);
+    assertEmptyObject(_void2);
 
     return {
         hasCurrentFocusParameters: {

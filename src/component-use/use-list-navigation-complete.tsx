@@ -2,7 +2,7 @@ import { h } from "preact";
 import { useCallback } from "preact/hooks";
 import { useListNavigationSingleSelection, useListNavigationSingleSelectionChild } from "../component-detail/use-list-navigation-single-selection";
 import { UseListNavigationSingleSelectionSortableChildInfo, UseListNavigationSingleSelectionSortableChildParameters, UseListNavigationSingleSelectionSortableChildReturnType, UseListNavigationSingleSelectionSortableParameters, UseListNavigationSingleSelectionSortableReturnType } from "../component-detail/use-list-navigation-single-selection-sortable";
-import { useSortableChildren } from "../component-detail/use-sortable-children";
+import { UseSortableChildInfo, useSortableChildren } from "../component-detail/use-sortable-children";
 import { useMergedProps } from "../dom-helpers/use-merged-props";
 import { useRefElement } from "../dom-helpers/use-ref-element";
 import { useChildrenHaveFocus, useChildrenHaveFocusChild, UseChildrenHaveFocusChildParameters, UseChildrenHaveFocusReturnTypeInfo } from "../observers/use-children-have-focus";
@@ -35,7 +35,7 @@ export interface UseCompleteListNavigationReturnType<ParentElement extends Eleme
 export interface CompleteListNavigationContext<ParentElement extends Element, ChildElement extends Element, M extends UseListNavigationSingleSelectionSortableChildInfo<ChildElement>> extends UseManagedChildrenContext<M>,
     Pick<UseChildrenHaveFocusReturnTypeInfo, "childrenHaveFocusChildContext">,
     Pick<UseListNavigationSingleSelectionSortableReturnType<ParentElement, ChildElement, M>, "singleSelectionContext" | "rovingTabIndexChildContext" | "typeaheadNavigationChildContext"> {
-        childrenHaveFocusChildContext: UseChildrenHaveFocusChildParameters["childrenHaveFocusChildContext"];
+    childrenHaveFocusChildContext: UseChildrenHaveFocusChildParameters["childrenHaveFocusChildContext"];
 }
 
 /**
@@ -126,7 +126,11 @@ export interface UseCompleteListNavigationChildParameters<ChildElement extends E
     singleSelectionChildParameters: UseListNavigationSingleSelectionSortableChildParameters<ChildElement>["singleSelectionChildParameters"];
     completeListNavigationChildParameters: Omit<M, keyof UseListNavigationSingleSelectionSortableChildInfo<ChildElement> | ExtraOmits>;
     typeaheadNavigationChildParameters: UseListNavigationSingleSelectionSortableChildParameters<ChildElement>["typeaheadNavigationChildParameters"];
-    managedChildParameters: Omit<M, "getElement" | "getSelected" | "setSelected" | "getTabbable" | "setTabbable" | "tabbable" | "selected" | "focusSelf">;
+    rovingTabIndexChildParameters: UseListNavigationSingleSelectionSortableChildParameters<ChildElement>["rovingTabIndexChildParameters"];
+    managedChildParameters: UseListNavigationSingleSelectionSortableChildParameters<ChildElement>["managedChildParameters"];
+    sortableChildParameters: Pick<UseSortableChildInfo, "getSortValue">;
+    //singleSelectionChildParameters: Pick<UseListNavigationSingleSelectionSortableChildParameters<ChildElement>["singleSelectionChildParameters"], "disabled">;
+    //managedChildParameters: Omit<UseListNavigationSingleSelectionSortableChildInfo<ChildElement>, "getElement" | "getSelected" | "setSelected" | "getTabbable" | "setTabbable" | "tabbable" | "selected" | "focusSelf">;
 }
 
 export interface UseCompleteListNavigationChildReturnType<ChildElement extends Element, M extends UseListNavigationSingleSelectionSortableChildInfo<ChildElement>>
@@ -138,15 +142,20 @@ export interface UseCompleteListNavigationChildReturnType<ChildElement extends E
 }
 
 export function useCompleteListNavigationChild<ChildElement extends Element, M extends UseListNavigationSingleSelectionSortableChildInfo<ChildElement>, ExtraOmits extends Exclude<keyof M, keyof UseListNavigationSingleSelectionSortableChildInfo<ChildElement>>>({
-    managedChildParameters: { hidden, disabled, index, getSortValue },
+    //managedChildParameters: { hidden, disabled, index, getSortValue },
     completeListNavigationChildParameters,
     singleSelectionChildParameters,
     typeaheadNavigationChildParameters,
+    rovingTabIndexChildParameters,
+    managedChildParameters,
     context: { childrenHaveFocusChildContext, managedChildContext, rovingTabIndexChildContext, singleSelectionContext, typeaheadNavigationChildContext },
     pressParameters: { onPressSync: ops1, ...pressParameters },
+    sortableChildParameters: { getSortValue },
     ..._void
 }: UseCompleteListNavigationChildParameters<ChildElement, M, ExtraOmits>): UseCompleteListNavigationChildReturnType<ChildElement, M> {
-
+    const { hidden } = rovingTabIndexChildParameters;
+    const { index } = managedChildParameters;
+    let { disabled } = singleSelectionChildParameters;
     if (hidden)
         disabled = true;
 
@@ -155,12 +164,12 @@ export function useCompleteListNavigationChild<ChildElement extends Element, M e
     const { focusSelf } = pressParameters;
     const {
         hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1 },
-        managedChildParameters: { getSelected, selected, setSelected },
         pressParameters: { onPressSync: ops2, ...p1 },
         rovingTabIndexChildReturn,
         singleSelectionChildReturn
     } = useListNavigationSingleSelectionChild<ChildElement>({
-        managedChildParameters: { disabled, hidden, index },
+        managedChildParameters: { index },
+        rovingTabIndexChildParameters: { hidden },
         singleSelectionChildParameters: { ...singleSelectionChildParameters },
         rovingTabIndexChildContext,
         singleSelectionContext,
@@ -173,12 +182,14 @@ export function useCompleteListNavigationChild<ChildElement extends Element, M e
         pressParameters: {
             ...p1,
             ...pressParameters,
-            onPressSync: (e) => {
+            onPressSync: disabled ? null : ((e) => {
                 ops2?.(e);
                 ops1?.(e);
-            }
+            })
         }, refElementReturn
     });
+
+    const { getSelected, selected, setSelected } = singleSelectionChildReturn;
 
     const mcp1: UseListNavigationSingleSelectionSortableChildInfo<ChildElement> = {
         disabled,
@@ -195,13 +206,7 @@ export function useCompleteListNavigationChild<ChildElement extends Element, M e
         getSortValue
     }
 
-    const { managedChildReturn } = useManagedChild<M>({
-        context: { managedChildContext },
-        managedChildParameters: {
-            ...mcp1,
-            ...completeListNavigationChildParameters
-        } as M
-    })
+    const { managedChildReturn } = useManagedChild<M>({ context: { managedChildContext }, managedChildParameters: { index } }, { ...mcp1, ...completeListNavigationChildParameters } as M);
 
     const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2 } } = useChildrenHaveFocusChild({ childrenHaveFocusChildContext });
     const onCurrentFocusedInnerChanged = useStableCallback<NonNullable<typeof ocfic1>>((focused, prev) => {
