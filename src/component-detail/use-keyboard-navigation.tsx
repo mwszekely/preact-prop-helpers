@@ -1,14 +1,13 @@
 import { h } from "preact";
-import { useCallback, useEffect, useLayoutEffect, useRef } from "preact/hooks";
-import { assertEmptyObject, UseManagedChildParameters } from "../preact-extensions/use-child-manager";
-import { UseRovingTabIndexChildInfo, UseRovingTabIndexChildParameters, UseRovingTabIndexReturnType } from "./use-roving-tabindex";
+import { useCallback, useLayoutEffect, useRef } from "preact/hooks";
+import { UseRefElementReturnType } from "../dom-helpers/use-ref-element";
+import { useTextContent, UseTextContentParameters } from "../dom-helpers/use-text-content";
+import { assertEmptyObject } from "../preact-extensions/use-child-manager";
+import { OnPassiveStateChange, usePassiveState } from "../preact-extensions/use-passive-state";
 import { useStableCallback } from "../preact-extensions/use-stable-callback";
 import { useStableGetter, useStableObject } from "../preact-extensions/use-stable-getter";
 import { useState } from "../preact-extensions/use-state";
-import { useTimeout } from "../timing/use-timeout";
-import { UseRefElementReturnType } from "../dom-helpers/use-ref-element";
-import { useTextContent, UseTextContentParameters } from "../dom-helpers/use-text-content";
-import { OnPassiveStateChange } from "../preact-extensions/use-passive-state";
+import { UseRovingTabIndexChildParameters, UseRovingTabIndexReturnType } from "./use-roving-tabindex";
 
 /*
 export function useLinearNavigationProps<E extends Element>(r: UseLinearNavigationReturnTypeInfo<E>, ...otherProps: h.JSX.HTMLAttributes<E>[]): h.JSX.HTMLAttributes<E>[] {
@@ -44,9 +43,9 @@ export interface UseLinearNavigationReturnTypeWithHooks<ParentOrChildElement ext
 //export function navigateAbsolute(index: number): number | null { return index; }
 
 /** Arguments passed to the parent `useLinearNavigation` */
-export interface UseLinearNavigationParameters {
+export interface UseLinearNavigationParameters<ParentOrChildElement extends Element, ChildElement extends Element> {
 
-    rovingTabIndexReturn: Pick<UseRovingTabIndexReturnType<any>["rovingTabIndexReturn"], "getTabbableIndex" | "setTabbableIndex">
+    rovingTabIndexReturn: Pick<UseRovingTabIndexReturnType<ChildElement>["rovingTabIndexReturn"], "getTabbableIndex" | "setTabbableIndex">
     linearNavigationParameters: {
 
         /**
@@ -125,27 +124,27 @@ export interface UseLinearNavigationParameters {
  * 
  * @see useListNavigation, which packages everything up together.
  */
-export function useLinearNavigation<ParentOrChildElement extends Element>({
+export function useLinearNavigation<ParentOrChildElement extends Element, ChildElement extends Element>({
     rovingTabIndexReturn,
     linearNavigationParameters
-}: UseLinearNavigationParameters): UseLinearNavigationReturnTypeWithHooks<ParentOrChildElement> {
+}: UseLinearNavigationParameters<ParentOrChildElement, ChildElement>): UseLinearNavigationReturnTypeWithHooks<ParentOrChildElement> {
     const { getHighestIndex, indexDemangler, indexMangler, isValid, navigatePastEnd, navigatePastStart } = linearNavigationParameters;
     const { getTabbableIndex, setTabbableIndex } = rovingTabIndexReturn;
 
-    const navigateAbsolute = useCallback((i: number, fromUserInteraction: boolean) => {
+    const navigateAbsolute = useCallback((i: number, e: h.JSX.TargetedKeyboardEvent<ChildElement>, fromUserInteraction: boolean) => {
         const target = indexDemangler(i);
         const { value } = tryNavigateToIndex({ isValid, highestChildIndex: getHighestIndex(), indexDemangler, indexMangler, searchDirection: -1, target });
-        setTabbableIndex(value, fromUserInteraction);
+        setTabbableIndex(value, e, fromUserInteraction);
     }, []);
-    const navigateToFirst = useStableCallback((fromUserInteraction: boolean) => { navigateAbsolute(0, fromUserInteraction); });
-    const navigateToLast = useStableCallback((fromUserInteraction: boolean) => { navigateAbsolute(getHighestIndex(), fromUserInteraction); });
-    const navigateRelative2 = useStableCallback((offset: number, fromUserInteraction: boolean, mode: "page" | "single") => {
+    const navigateToFirst = useStableCallback((e: h.JSX.TargetedKeyboardEvent<ChildElement>, fromUserInteraction: boolean) => { navigateAbsolute(0, e, fromUserInteraction); });
+    const navigateToLast = useStableCallback((e: h.JSX.TargetedKeyboardEvent<ChildElement>, fromUserInteraction: boolean) => { navigateAbsolute(getHighestIndex(), e, fromUserInteraction); });
+    const navigateRelative2 = useStableCallback((e: h.JSX.TargetedKeyboardEvent<ChildElement>, offset: number, fromUserInteraction: boolean, mode: "page" | "single") => {
         const original = (getTabbableIndex() ?? 0);
         const { status, value } = tryNavigateToIndex({ isValid, highestChildIndex: getHighestIndex(), indexDemangler, indexMangler, searchDirection: (Math.sign(offset) || 1) as 1 | -1, target: indexDemangler(indexMangler(original) + offset) });
         if (status == "past-end") {
             if (navigatePastEnd == "wrap") {
                 if (mode == "single")
-                    navigateToFirst(fromUserInteraction);
+                    navigateToFirst(e, fromUserInteraction);
                 else {
 
                     /* eslint-disable no-constant-condition */
@@ -154,9 +153,9 @@ export function useLinearNavigation<ParentOrChildElement extends Element>({
                     // Page Up/Down don't feel like they should wrap, even if normally requested. 
                     // That's the arrow keys' domain.
                     if (false && (value == getTabbableIndex()))
-                        navigateToFirst(fromUserInteraction);
+                        navigateToFirst(e, fromUserInteraction);
                     else
-                        navigateToLast(fromUserInteraction);
+                        navigateToLast(e, fromUserInteraction);
                 }
             }
             else {
@@ -166,15 +165,15 @@ export function useLinearNavigation<ParentOrChildElement extends Element>({
         else if (status == "past-start") {
             if (navigatePastStart == "wrap") {
                 if (mode == "single") {
-                    navigateToLast(fromUserInteraction);
+                    navigateToLast(e, fromUserInteraction);
                 }
                 else {
                     /* eslint-disable no-constant-condition */
                     // See above. It works fine but just feels wrong to wrap on Page Up/Down.
                     if (false && value == getTabbableIndex())
-                        navigateToLast(fromUserInteraction);
+                        navigateToLast(e, fromUserInteraction);
                     else
-                        navigateToFirst(fromUserInteraction);
+                        navigateToFirst(e, fromUserInteraction);
                 }
             }
             else {
@@ -182,16 +181,16 @@ export function useLinearNavigation<ParentOrChildElement extends Element>({
             }
         }
         else {
-            setTabbableIndex(value, fromUserInteraction);
+            setTabbableIndex(value, e, fromUserInteraction);
 
         }
     })
-    const navigateToNext = useStableCallback((fromUserInteraction: boolean) => {
-        navigateRelative2(1, fromUserInteraction, "single");
+    const navigateToNext = useStableCallback((e: h.JSX.TargetedKeyboardEvent<ChildElement>, fromUserInteraction: boolean) => {
+        navigateRelative2(e, 1, fromUserInteraction, "single");
         // setTabbableIndex(navigateRelative((getTabbableIndex() ?? 0), +1), fromUserInteraction)
     });
-    const navigateToPrev = useStableCallback((fromUserInteraction: boolean) => {
-        navigateRelative2(-1, fromUserInteraction, "single");
+    const navigateToPrev = useStableCallback((e: h.JSX.TargetedKeyboardEvent<ChildElement>, fromUserInteraction: boolean) => {
+        navigateRelative2(e, -1, fromUserInteraction, "single");
         // setTabbableIndex(navigateRelative((getTabbableIndex() ?? 0), +1), fromUserInteraction)
     });
     const getDisableArrowKeys = useStableGetter(linearNavigationParameters.disableArrowKeys);
@@ -201,7 +200,7 @@ export function useLinearNavigation<ParentOrChildElement extends Element>({
 
 
     const stableProps = useRef<h.JSX.HTMLAttributes<ParentOrChildElement>>({
-        onKeyDown: (e: KeyboardEvent) => {
+        onKeyDown: (e: h.JSX.TargetedKeyboardEvent<ParentOrChildElement>) => {
             // Not handled by typeahead (i.e. assume this is a keyboard shortcut)
             if (e.ctrlKey || e.metaKey)
                 return;
@@ -225,7 +224,7 @@ export function useLinearNavigation<ParentOrChildElement extends Element>({
                     //const propName = (info?.blockOrientation === "vertical" ? "blockDirection" : "inlineDirection");
                     const directionAllowed = (!disableArrowKeys && allowsVerticalNavigation);
                     if (directionAllowed) {
-                        navigateToPrev(true);
+                        navigateToPrev(e, true);
                         e.preventDefault();
                         e.stopPropagation();
                     }
@@ -234,7 +233,7 @@ export function useLinearNavigation<ParentOrChildElement extends Element>({
                 case "ArrowDown": {
                     const directionAllowed = (!disableArrowKeys && allowsVerticalNavigation);
                     if (directionAllowed) {
-                        navigateToNext(true);
+                        navigateToNext(e, true);
                         e.preventDefault();
                         e.stopPropagation();
                     }
@@ -244,7 +243,7 @@ export function useLinearNavigation<ParentOrChildElement extends Element>({
                 case "ArrowLeft": {
                     const directionAllowed = (!disableArrowKeys && allowsHorizontalNavigation);
                     if (directionAllowed) {
-                        navigateToPrev(true);
+                        navigateToPrev(e, true);
                         e.preventDefault();
                         e.stopPropagation();
                     }
@@ -253,7 +252,7 @@ export function useLinearNavigation<ParentOrChildElement extends Element>({
                 case "ArrowRight": {
                     const directionAllowed = (!disableArrowKeys && allowsHorizontalNavigation);
                     if (directionAllowed) {
-                        navigateToNext(true);
+                        navigateToNext(e, true);
                         e.preventDefault();
                         e.stopPropagation();
                     }
@@ -261,7 +260,7 @@ export function useLinearNavigation<ParentOrChildElement extends Element>({
                 }
                 case "PageUp": {
                     if (truePageNavigationSize > 0) {
-                        navigateRelative2(-truePageNavigationSize, true, "page");
+                        navigateRelative2(e, -truePageNavigationSize, true, "page");
                         e.preventDefault();
                         e.stopPropagation();
                     }
@@ -269,7 +268,7 @@ export function useLinearNavigation<ParentOrChildElement extends Element>({
                 }
                 case "PageDown": {
                     if (truePageNavigationSize > 0) {
-                        navigateRelative2(truePageNavigationSize, true, "page");
+                        navigateRelative2(e, truePageNavigationSize, true, "page");
                         e.preventDefault();
                         e.stopPropagation();
                     }
@@ -277,7 +276,7 @@ export function useLinearNavigation<ParentOrChildElement extends Element>({
                 }
                 case "Home":
                     if (!disableHomeEndKeys) {
-                        navigateToFirst(true);
+                        navigateToFirst(e, true);
                         e.preventDefault();
                         e.stopPropagation();
                     }
@@ -285,7 +284,7 @@ export function useLinearNavigation<ParentOrChildElement extends Element>({
 
                 case "End":
                     if (!disableHomeEndKeys) {
-                        navigateToLast(true);
+                        navigateToLast(e, true);
                         e.preventDefault();
                         e.stopPropagation();
                     }
@@ -342,9 +341,9 @@ export function tryNavigateToIndex({ isValid, highestChildIndex: upper, searchDi
 
 
 
-export interface UseTypeaheadNavigationReturnTypeInfo<ParentOrChildElement extends Element> {
+export interface UseTypeaheadNavigationReturnType<ParentOrChildElement extends Element> {
     typeaheadNavigationReturn: {
-        currentTypeahead: string | null;
+        getCurrentTypeahead(): string | null;
         invalidTypeahead: boolean | null;
         propsStable: h.JSX.HTMLAttributes<ParentOrChildElement>;
     }
@@ -353,9 +352,6 @@ export interface UseTypeaheadNavigationReturnTypeInfo<ParentOrChildElement exten
 
 
 
-export interface UseTypeaheadNavigationReturnTypeWithHooks<ParentOrChildElement extends Element> extends UseTypeaheadNavigationReturnTypeInfo<ParentOrChildElement> {
-
-}
 
 export interface UseTypeaheadNavigationParameters<TabbableChildElement extends Element> {
     typeaheadNavigationParameters: {
@@ -409,10 +405,14 @@ export interface UseTypeaheadNavigationChildParameters<ChildElement extends Elem
     }
 }
 
+export interface UseTypeaheadNavigationChildReturnType {
+    textContentReturn: { getTextContent(): string | null }
+}
+
 interface TypeaheadInfo { text: string | null; unsortedIndex: number; }
 
 /** Type of the child's sub-hook */
-export type UseTypeaheadNavigationChild<ChildElement extends Element> = (args: UseTypeaheadNavigationChildParameters<ChildElement>) => void;
+export type UseTypeaheadNavigationChild<ChildElement extends Element> = (args: UseTypeaheadNavigationChildParameters<ChildElement>) => UseTypeaheadNavigationChildReturnType;
 
 
 /**
@@ -424,7 +424,7 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
     typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead, isValid, ..._void3 },
     rovingTabIndexReturn: { getTabbableIndex: getIndex, setTabbableIndex: setIndex, ..._void1 },
     ..._void2
-}: UseTypeaheadNavigationParameters<ChildElement>): UseTypeaheadNavigationReturnTypeWithHooks<ParentOrChildElement> {
+}: UseTypeaheadNavigationParameters<ChildElement>): UseTypeaheadNavigationReturnType<ParentOrChildElement> {
 
     assertEmptyObject(_void1);
     assertEmptyObject(_void2);
@@ -434,8 +434,12 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
     // and also clear it every 1000 ms since the last time it changed.
     // Next, keep a mapping of typeahead values to indices for faster searching.
     // And, for the user's sake, let them know when their typeahead can't match anything anymore
-    const [currentTypeahead, setCurrentTypeahead, getCurrentTypeahead] = useState<string | null>(null);
-    useTimeout({ timeout: typeaheadTimeout ?? 1000, callback: () => { setCurrentTypeahead(null); setInvalidTypeahead(null); }, triggerIndex: currentTypeahead });
+    const [getCurrentTypeahead, setCurrentTypeahead] = usePassiveState<string | null, h.JSX.TargetedEvent<ChildElement, Event>>(useStableCallback((currentTypeahead, prev, reason) => {
+        const handle = setTimeout(() => { setCurrentTypeahead(null, undefined!); setInvalidTypeahead(null); }, typeaheadTimeout ?? 1000);
+        updateBasedOnTypeaheadChange(currentTypeahead, reason);
+        return () => clearTimeout(handle);
+    }));
+    //useTimeout({ timeout: typeaheadTimeout ?? 1000, callback: () => { setCurrentTypeahead(null); setInvalidTypeahead(null); }, triggerIndex: currentTypeahead });
     const sortedTypeaheadInfo = useRef<TypeaheadInfo[]>([]);
     const [invalidTypeahead, setInvalidTypeahead] = useState<boolean | null>(false);
 
@@ -450,7 +454,7 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
     const [nextTypeaheadChar, setNextTypeaheadChar] = useState<string | null>(null);
     useLayoutEffect(() => {
         if (nextTypeaheadChar !== null) {
-            setCurrentTypeahead(typeahead => ((typeahead ?? "") + nextTypeaheadChar));
+            setCurrentTypeahead(typeahead => ((typeahead ?? "") + nextTypeaheadChar), undefined!);
             setNextTypeaheadChar(null);
         }
     }, [nextTypeaheadChar]);
@@ -495,7 +499,7 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
 
 
     const propsStable = useRef<h.JSX.HTMLAttributes<ParentOrChildElement>>({
-        onKeyDown: useStableCallback((e: KeyboardEvent) => {
+        onKeyDown: useStableCallback((e: h.JSX.TargetedKeyboardEvent<ParentOrChildElement>) => {
             if (isDisabled())
                 return;
 
@@ -509,7 +513,7 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
 
             if (!imeActive && e.key === "Backspace") {
                 // Remove the last character in a way that doesn't split UTF-16 surrogates.
-                setCurrentTypeahead(t => t === null ? null : [...t].reverse().slice(1).reverse().join(""));
+                setCurrentTypeahead(t => t == null ? null : [...t].reverse().slice(1).reverse().join(""), e as h.JSX.TargetedKeyboardEvent<any>);
                 e.preventDefault();
                 e.stopPropagation();
                 return;
@@ -550,7 +554,32 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
     });
 
     // Handle changes in typeahead that cause changes to the tabbable index
-    useEffect(() => {
+    /* useEffect(() => {
+         
+     }, [currentTypeahead]);*/
+
+
+    return {
+        typeaheadNavigationChildContext: useStableObject({
+            typeaheadNavigationChildParameters: useStableObject({
+                insertingComparator,
+                sortedTypeaheadInfo: sortedTypeaheadInfo.current
+            }),
+
+        }),
+        typeaheadNavigationReturn: {
+            getCurrentTypeahead,
+            invalidTypeahead,
+            propsStable: propsStable.current
+        }
+    }
+
+
+
+
+
+
+    function updateBasedOnTypeaheadChange(currentTypeahead: string | null, reason: h.JSX.TargetedEvent<ChildElement, Event>) {
         if (currentTypeahead && sortedTypeaheadInfo.current.length) {
 
 
@@ -570,20 +599,20 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
                   But roughly isn't good enough if there are multiple matches.
                   To convert our sorted index to the unsorted index we need, we have to find the first
                   element that matches us *and* (if any such exist) is *after* our current selection.
-
+    
                   In other words, the only way typeahead moves backwards relative to our current
                   position is if the only other option is behind us.
-
+    
                   It's not specified in WAI-ARIA what to do in that case.  I suppose wrap back to the start?
                   Though there's also a case for just going upwards to the nearest to prevent jumpiness.
                   But if you're already doing typeahead on an unsorted list, like, jumpiness can't be avoided.
                   I dunno. Going back to the start is the simplist though.
-
+    
                   Basically what this does: Starting from where we found ourselves after our binary search,
                   scan backwards and forwards through all adjacent entries that also compare equally so that
                   we can find the one whose `unsortedIndex` is the lowest amongst all other equal strings
                   (and also the lowest `unsortedIndex` yadda yadda except that it comes after us).
-
+    
                   TODO: The binary search starts this off with a solid O(log n), but one-character 
                   searches are, thanks to pigeonhole principal, eventually guaranteed to become 
                   O(n*log n). This is annoying but probably not easily solvable? There could be an 
@@ -627,29 +656,14 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
                 }
 
                 if (lowestUnsortedIndexNext !== null)
-                    setIndex(sortedTypeaheadInfo.current[lowestSortedIndexNext].unsortedIndex, true);
+                    setIndex(sortedTypeaheadInfo.current[lowestSortedIndexNext].unsortedIndex, reason, true);
                 else if (lowestUnsortedIndexAll !== null)
-                    setIndex(sortedTypeaheadInfo.current[lowestSortedIndexAll].unsortedIndex, true);
+                    setIndex(sortedTypeaheadInfo.current[lowestSortedIndexAll].unsortedIndex,reason, true);
             }
-        }
-    }, [currentTypeahead]);
-
-
-    return {
-        typeaheadNavigationChildContext: useStableObject({
-            typeaheadNavigationChildParameters: useStableObject({
-                insertingComparator,
-                sortedTypeaheadInfo: sortedTypeaheadInfo.current
-            }),
-
-        }),
-        typeaheadNavigationReturn: {
-            currentTypeahead,
-            invalidTypeahead,
-            propsStable: propsStable.current
         }
     }
 }
+
 
 export function useTypeaheadNavigationChild<ChildElement extends Element>({
     managedChildParameters: { index, ...void1 },
@@ -666,11 +680,11 @@ export function useTypeaheadNavigationChild<ChildElement extends Element>({
     assertEmptyObject(void4);
     assertEmptyObject(void5);
 
-    const { } = useTextContent({
+    const { textContentReturn } = useTextContent({
         refElementReturn: { getElement },
         textContentParameters: {
             getText,
-            onTextContentChange: useCallback<OnPassiveStateChange<string | null>>((text: string | null) => {
+            onTextContentChange: useCallback<OnPassiveStateChange<string | null, never>>((text: string | null) => {
                 if (text) {
                     // Find where to insert this item.
                     // Because all index values should be unique, the returned sortedIndex
@@ -699,6 +713,8 @@ export function useTypeaheadNavigationChild<ChildElement extends Element>({
             }, [])
         }
     })
+
+    return { textContentReturn }
 
 }
 

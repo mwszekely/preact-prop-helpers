@@ -1,5 +1,5 @@
-import { StateUpdater, useCallback, useLayoutEffect, useRef } from "preact/hooks";
-import { debounceRendering, OnPassiveStateChange, useEnsureStability, usePassiveState } from "./use-passive-state";
+import { useCallback, useLayoutEffect, useRef } from "preact/hooks";
+import { debounceRendering, OnPassiveStateChange, PassiveStateUpdater, useEnsureStability, usePassiveState } from "./use-passive-state";
 import { useStableCallback } from "./use-stable-callback";
 import { useStableObject } from "./use-stable-getter";
 
@@ -90,7 +90,7 @@ export interface UseManagedChildrenParameters<M extends ManagedChildInfo<any>> {
 
 // MCSubInfo contains the entirety of the saved data for this child.  All of it. Even types the user will never be able to pass in because they're internally derived.
 // SubbestInfo refers to the actual parameters the user passes in that could be totally unrelated. 
-export interface UseManagedChildParameters<M extends ManagedChildInfo<any>, Omits extends keyof M> {
+export interface UseManagedChildParameters<M extends ManagedChildInfo<any>> {
     // This is the only property shared among all managed children.
     // Technically this is redundant with the second argument, which is...eh. But the types are clear.
     managedChildParameters: Pick<M, "index">;
@@ -123,7 +123,7 @@ export interface UseManagedChildReturnType<M extends ManagedChildInfo<any>> {
     managedChildReturn: {
         getChildren(): ManagedChildren<M>;
     }
-};
+}
 
 //export type UseManagedChild<M extends ManagedChildInfo<any>> = (a: UseManagedChildParameters<M>) => UseManagedChildReturnType<M>;
 
@@ -304,7 +304,7 @@ export function useManagedChildren<M extends ManagedChildInfo<string | number>>(
 
 
 
-export function useManagedChild<M extends ManagedChildInfo<number | string>>(info: UseManagedChildParameters<M, never>, managedChildParameters: M): UseManagedChildReturnType<M> {
+export function useManagedChild<M extends ManagedChildInfo<number | string>>(info: UseManagedChildParameters<M>, managedChildParameters: M): UseManagedChildReturnType<M> {
     type IndexType = M["index"];
 
     const { context: { managedChildContext: { getChildren, managedChildrenArray, remoteULEChildMounted, remoteULEChildChanged } } } = info;
@@ -340,7 +340,7 @@ export function useManagedChild<M extends ManagedChildInfo<number | string>>(inf
 }
 
 
-export interface UseChildrenFlagParameters<M extends ManagedChildInfo<any>> {
+export interface UseChildrenFlagParameters<M extends ManagedChildInfo<any>, R> {
 
     /**
      * Which child is considered active on mount.
@@ -369,7 +369,7 @@ export interface UseChildrenFlagParameters<M extends ManagedChildInfo<any>> {
      * Notably, the value can be different than what was called with changeIndex()
      * if the requested index didn't exist or was hidden.
      */
-    onIndexChange: null | OnPassiveStateChange<number | null>;
+    onIndexChange: null | OnPassiveStateChange<number | null, R>;
 
     setAt(index: M, value: boolean): void;
     getAt(index: M): boolean;
@@ -398,9 +398,9 @@ export interface ChildFlagOperations {
 
 
 
-export interface UseChildrenFlagReturnType {
+export interface UseChildrenFlagReturnType<R> {
     /** **STABLE** */
-    changeIndex: (arg: Parameters<StateUpdater<number | null>>[0]) => number | null;
+    changeIndex: PassiveStateUpdater<number | null, R>; //(arg: Parameters<StateUpdater<number | null>>[0]) => number | null;
     /** 
      * **STABLE**
      * 
@@ -428,12 +428,12 @@ export interface UseChildrenFlagReturnType {
  * @param param0 
  * @returns 
  */
-export function useChildrenFlag<M extends ManagedChildInfo<number>>({ getChildren, initialIndex, closestFit, onIndexChange, getAt, setAt, isValid, }: UseChildrenFlagParameters<M>): UseChildrenFlagReturnType {
+export function useChildrenFlag<M extends ManagedChildInfo<number>, R>({ getChildren, initialIndex, closestFit, onIndexChange, getAt, setAt, isValid, }: UseChildrenFlagParameters<M, R>): UseChildrenFlagReturnType<R> {
     useEnsureStability("useChildrenFlag", onIndexChange, getAt, setAt, isValid);
 
-    const [getCurrentIndex, setCurrentIndex] = usePassiveState<null | number>(onIndexChange, useCallback(() => (initialIndex ?? (null)), []));
+    const [getCurrentIndex, setCurrentIndex] = usePassiveState<null | number, R>(onIndexChange, useCallback(() => (initialIndex ?? (null)), []));
 
-    const [getRequestedIndex, setRequestedIndex] = usePassiveState<null | number>(null, useCallback(() => (initialIndex ?? (null)), []));
+    const [getRequestedIndex, setRequestedIndex] = usePassiveState<null | number, R>(null, useCallback(() => (initialIndex ?? (null)), []));
 
     //    const getFitNullToZero = useStableGetter(fitNullToZero);
 
@@ -470,7 +470,7 @@ export function useChildrenFlag<M extends ManagedChildInfo<number>>({ getChildre
                 setAt(currentChild, false);
 
             const closestFitIndex = getClosestFit(requestedIndex);
-            setCurrentIndex(closestFitIndex);
+            setCurrentIndex(closestFitIndex, undefined!);
             if (closestFitIndex != null) {
                 const closestFitChild = children.getAt(closestFitIndex)!;
                 console.assert(closestFitChild != null, "Internal logic???");
@@ -483,13 +483,13 @@ export function useChildrenFlag<M extends ManagedChildInfo<number>>({ getChildre
 
 
 
-    const changeIndex = useCallback((arg: Parameters<StateUpdater<number | null>>[0]) => {
+    const changeIndex = useCallback<PassiveStateUpdater<number | null, R>>((arg: Parameters<PassiveStateUpdater<number | null, R>>[0], reason: Parameters<PassiveStateUpdater<number | null, R>>[1]) => {
         const children = getChildren();
-        const requestedIndex = arg instanceof Function ? arg(getRequestedIndex()) : arg;
+        const requestedIndex = (arg instanceof Function ? arg(getRequestedIndex()) : arg) as M["index"];
         //if (requestedIndex == null && getFitNullToZero())
         //    requestedIndex = 0;
 
-        setRequestedIndex(requestedIndex);
+        setRequestedIndex(requestedIndex, reason as R);
         const currentIndex = getCurrentIndex();
         if (currentIndex == requestedIndex)
             return requestedIndex;
@@ -498,14 +498,14 @@ export function useChildrenFlag<M extends ManagedChildInfo<number>>({ getChildre
         const oldMatchingChild = (currentIndex == null ? null : children.getAt(currentIndex));
         if (requestedIndex == null) {
             // Easy case
-            setCurrentIndex(null);
+            setCurrentIndex(null, reason as R);
             if (oldMatchingChild)
                 setAt(oldMatchingChild, false);
             return null;
         }
         else {
             if (newMatchingChild && isValid(newMatchingChild)) {
-                setCurrentIndex(requestedIndex);
+                setCurrentIndex(requestedIndex, reason as R);
                 if (oldMatchingChild)
                     setAt(oldMatchingChild, false);
                 setAt(newMatchingChild, true);
@@ -513,7 +513,7 @@ export function useChildrenFlag<M extends ManagedChildInfo<number>>({ getChildre
             }
             else {
                 const closestFitIndex = getClosestFit(requestedIndex);
-                setCurrentIndex(closestFitIndex);
+                setCurrentIndex(closestFitIndex, reason as R);
                 if (closestFitIndex != null) {
                     newMatchingChild = children.getAt(closestFitIndex)!;
                     console.assert(newMatchingChild != null, "Internal logic???");
@@ -533,7 +533,7 @@ export function useChildrenFlag<M extends ManagedChildInfo<number>>({ getChildre
 
     // Run once, on mount
     useLayoutEffect(() => {
-        onIndexChange?.(initialIndex ?? null, undefined);
+        onIndexChange?.(initialIndex ?? null, undefined, undefined!);
     }, [])
 
     return { changeIndex, reevaluateClosestFit, getCurrentIndex };

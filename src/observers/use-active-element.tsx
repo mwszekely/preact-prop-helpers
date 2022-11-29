@@ -42,7 +42,7 @@ const _dummy = 0;
 
 interface Foo<T> {
     lastSent: T | undefined;
-    send: (e: T) => void;
+    send: (e: T, r: FocusEvent) => void;
 }
 /*
 const activeElementUpdaters = new Map<Window | null | undefined, Set<undefined | ((e: Node | null) => void)>>();
@@ -59,7 +59,7 @@ const windowsFocusedUpdaters = new Map<Window | null | undefined, boolean>();
 // The focusin and focusout events often fire syncronously in the middle of running code.
 // E.G. calling element.focus() can cause a focusin event handler to immediately interrupt that code.
 // For the purpose of improving stability, we debounce all focus events to the next microtask.
-function forEachUpdater<T>(window: Window | null | undefined, map: Map<Window | null | undefined, Set<Foo<T>>>, value: T) {
+function forEachUpdater<T>(window: Window | null | undefined, map: Map<Window | null | undefined, Set<Foo<T>>>, value: T, reason: any) {
     const updaters = map.get(window);
     if (updaters) {
         //if (!microtasks.has(updatersKey)) {
@@ -72,7 +72,7 @@ function forEachUpdater<T>(window: Window | null | undefined, map: Map<Window | 
             for (const updater of updaters) {
                 const { lastSent, send } = updater;
                 if (value !== lastSent) {
-                    send(value);
+                    send(value, reason);
                     updater.lastSent = value;
                 }
 
@@ -89,7 +89,7 @@ function focusout(e: FocusEvent) {
     const window = (e.target as Element).ownerDocument.defaultView;
 
     if (e.relatedTarget == null) {
-        forEachUpdater(window, activeElementUpdaters, null);
+        forEachUpdater(window, activeElementUpdaters, null, e);
     }
     else {
         // Just wait for the focusin event.
@@ -100,20 +100,20 @@ function focusout(e: FocusEvent) {
 function focusin(e: FocusEvent) {
     const window = (e.target as Element).ownerDocument.defaultView;
     const currentlyFocusedElement = e.target as (Element & HTMLOrSVGElement);
-    forEachUpdater(window, activeElementUpdaters, currentlyFocusedElement);
-    forEachUpdater(window, lastActiveElementUpdaters, currentlyFocusedElement);
+    forEachUpdater(window, activeElementUpdaters, currentlyFocusedElement, e);
+    forEachUpdater(window, lastActiveElementUpdaters, currentlyFocusedElement, e);
 }
 
 function windowFocus(e: FocusEvent) {
     const window = (e.target instanceof Window ? e.target : e.currentTarget instanceof Window ? e.currentTarget : (e.target as Element).ownerDocument.defaultView);
     windowsFocusedUpdaters.set(window, true);
-    forEachUpdater(window, windowFocusedUpdaters, true);
+    forEachUpdater(window, windowFocusedUpdaters, true, e);
 }
 
 function windowBlur(e: FocusEvent) {
     const window = (e.target instanceof Window ? e.target : e.currentTarget instanceof Window ? e.currentTarget : (e.target as Element).ownerDocument.defaultView);
     windowsFocusedUpdaters.set(window, false);
-    forEachUpdater(window, windowFocusedUpdaters, false);
+    forEachUpdater(window, windowFocusedUpdaters, false, e);
 }
 
 export interface UseActiveElementParameters {
@@ -122,18 +122,18 @@ export interface UseActiveElementParameters {
         /**
          * Called any time the active element changes. Must be stable.
          */
-        onActiveElementChange?: OnPassiveStateChange<Element | null>;
+        onActiveElementChange?: OnPassiveStateChange<Element | null, FocusEvent>;
 
         /**
          * Called any time the active element changes and is not null. 
          * Must be stable.
          */
-        onLastActiveElementChange?: OnPassiveStateChange<Element>;
+        onLastActiveElementChange?: OnPassiveStateChange<Element, FocusEvent>;
 
         /**
          * Called any time the window gains/loses focus. Must be stable.
          */
-        onWindowFocusedChange?: OnPassiveStateChange<boolean>;
+        onWindowFocusedChange?: OnPassiveStateChange<boolean, FocusEvent>;
 
         /**
          * This must be a function that returns the document associated with whatever elements we're listening to.
@@ -233,9 +233,9 @@ export function useActiveElement({ activeElementParameters: { onActiveElementCha
         }
     }, [])
 
-    const [getActiveElement, setActiveElement] = usePassiveState<Element | null>(onActiveElementChange, returnNull);
-    const [getLastActiveElement, setLastActiveElement] = usePassiveState<Element>(onLastActiveElementChange, returnNull as () => never);
-    const [getWindowFocused, setWindowFocused] = usePassiveState<boolean>(onWindowFocusedChange, returnTrue);
+    const [getActiveElement, setActiveElement] = usePassiveState<Element | null, FocusEvent>(onActiveElementChange, returnNull);
+    const [getLastActiveElement, setLastActiveElement] = usePassiveState<Element, FocusEvent>(onLastActiveElementChange, returnNull as () => never);
+    const [getWindowFocused, setWindowFocused] = usePassiveState<boolean, FocusEvent>(onWindowFocusedChange, returnTrue);
 
     return { activeElementReturn: { getActiveElement, getLastActiveElement, getWindowFocused } };
 }

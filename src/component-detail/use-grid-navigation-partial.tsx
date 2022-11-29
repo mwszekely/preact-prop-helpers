@@ -1,9 +1,10 @@
-import { StateUpdater } from "preact/hooks";
-import { assertEmptyObject, UseManagedChildParameters, UseManagedChildrenReturnType } from "../preact-extensions/use-child-manager";
-import { PassiveStateUpdater, usePassiveState } from "../preact-extensions/use-passive-state";
+import { h } from "preact";
+import { assertEmptyObject, UseManagedChildrenReturnType } from "../preact-extensions/use-child-manager";
+import { OnPassiveStateChange, PassiveStateUpdater, usePassiveState } from "../preact-extensions/use-passive-state";
 import { useStableCallback } from "../preact-extensions/use-stable-callback";
 import { useStableObject } from "../preact-extensions/use-stable-getter";
 import { useListNavigation, useListNavigationChild, UseListNavigationChildInfo, UseListNavigationChildParameters, UseListNavigationChildReturnType, UseListNavigationParameters, UseListNavigationReturnType } from "./use-list-navigation-partial";
+import { SetTabbableIndex } from "./use-roving-tabindex";
 
 /*
 export function useGridNavigationProps<ParentOrRowElement extends Element, RowElement extends Element>(r: UseGridNavigationReturnType<ParentOrRowElement, RowElement>, ...otherProps: h.JSX.HTMLAttributes<ParentOrRowElement>[]) {
@@ -17,23 +18,23 @@ export function useGridNavigationCellProps<CellElement extends Element>(r: UseGr
 }*/
 
 
-export interface GridChildRowInfo<RowElement extends Element> extends UseListNavigationChildInfo<RowElement> { setTabbableColumnIndex: (u: Parameters<StateUpdater<number | null>>[0], fromUserInteraction: boolean) => void; }
+export interface GridChildRowInfo<RowElement extends Element, CellElement extends Element> extends UseListNavigationChildInfo<RowElement> { setTabbableColumnIndex: SetTabbableIndex<CellElement> }
 export interface GridChildCellInfo<CellElement extends Element> extends UseListNavigationChildInfo<CellElement> {
 }
 
-export interface UseGridNavigationParameters<RowElement extends Element, M extends GridChildRowInfo<RowElement>> extends Omit<UseListNavigationParameters<RowElement, M>, "linearNavigationParameters"> {
+export interface UseGridNavigationParameters<RowElement extends Element, CellElement extends Element, M extends GridChildRowInfo<RowElement, CellElement>> extends Omit<UseListNavigationParameters<RowElement, M>, "linearNavigationParameters"> {
     gridNavigationParameters: {
-        onTabbableColumnChange: PassiveStateUpdater<number | null>;
+        onTabbableColumnChange: OnPassiveStateChange<number | null, h.JSX.TargetedFocusEvent<any>>;
     };
     linearNavigationParameters: Omit<UseListNavigationParameters<RowElement, M>["linearNavigationParameters"], "navigationDirection">
 }
-export interface UseGridNavigationReturnType<ParentOrRowElement extends Element, RowElement extends Element> extends UseListNavigationReturnType<ParentOrRowElement, RowElement> {
-    gridNavigationRowContext: UseGridNavigationRowParameters<RowElement, any, any, any>["asChildRowParameters"]["gridNavigationRowContext"]
+export interface UseGridNavigationReturnType<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element,  RM extends GridChildRowInfo<RowElement, CellElement>, CM extends GridChildCellInfo<CellElement>> extends UseListNavigationReturnType<ParentOrRowElement, RowElement> {
+    gridNavigationRowContext: UseGridNavigationRowParameters<RowElement, CellElement, RM, CM>["asChildRowParameters"]["gridNavigationRowContext"]
 }
 
 
 
-export interface UseGridNavigationRowParameters<RowElement extends Element, CellElement extends Element, _RM extends GridChildRowInfo<RowElement>, CM extends GridChildCellInfo<CellElement>> {
+export interface UseGridNavigationRowParameters<RowElement extends Element, CellElement extends Element, _RM extends GridChildRowInfo<RowElement, CellElement>, CM extends GridChildCellInfo<CellElement>> {
     asChildRowParameters: UseListNavigationChildParameters<RowElement> & {
         managedChildrenReturn: Pick<UseManagedChildrenReturnType<CM>["managedChildrenReturn"], "getChildren">;
         gridNavigationRowContext: {
@@ -41,9 +42,9 @@ export interface UseGridNavigationRowParameters<RowElement extends Element, Cell
             _c?: CellElement;
          
             gridNavigationRowParameters: {
-                setTabbableRow: (updater: Parameters<StateUpdater<number | null>>[0], fromUserInteraction: boolean) => void;
+                setTabbableRow: SetTabbableIndex<RowElement>; // (updater: Parameters<StateUpdater<number | null>>[0], fromUserInteraction: boolean) => void;
                 getCurrentTabbableColumn: () => (number | null);
-                setCurrentTabbableColumn: PassiveStateUpdater<number | null>;
+                setCurrentTabbableColumn: PassiveStateUpdater<number | null, h.JSX.TargetedFocusEvent<CellElement>>;
             }
         }
     };
@@ -55,11 +56,11 @@ export interface UseGridNavigationRowParameters<RowElement extends Element, Cell
 
 export interface UseGridNavigationRowReturnType<RowElement extends Element, CellElement extends Element> {
     asChildRowReturn: UseListNavigationChildReturnType<RowElement> & {
-        gridNavigationRowParameters: Pick<GridChildRowInfo<RowElement>, "focusSelf" | "setTabbableColumnIndex">;
+        gridNavigationRowParameters: Pick<GridChildRowInfo<RowElement, CellElement>, "focusSelf" | "setTabbableColumnIndex">;
     };
     asParentRowReturn: Omit<UseListNavigationReturnType<RowElement, CellElement>, "rovingTabIndexReturn"> & {
         rovingTabIndexReturn: Omit<UseListNavigationReturnType<RowElement, CellElement>["rovingTabIndexReturn"], "focusSelf">;
-        gridNavigationCellContext: UseGridNavigationCellParameters<CellElement>["gridNavigationCellContext"];
+        gridNavigationCellContext: UseGridNavigationCellParameters<RowElement, CellElement>["gridNavigationCellContext"];
     };
 }
 
@@ -70,7 +71,7 @@ export interface UseGridNavigationRowReturnType<RowElement extends Element, Cell
 
 
 
-export interface UseGridNavigationCellParameters<CellElement extends Element> extends UseListNavigationChildParameters<CellElement> {
+export interface UseGridNavigationCellParameters<RowElement extends Element, CellElement extends Element> extends UseListNavigationChildParameters<CellElement> {
     gridNavigationCellParameters: {
         colSpan: number;
     }
@@ -78,35 +79,35 @@ export interface UseGridNavigationCellParameters<CellElement extends Element> ex
         _c?: CellElement;
         gridNavigationCellParameters: {
             getRowIndex: () => number;
-            setTabbableRow: (u: Parameters<StateUpdater<number | null>>[0], fromUserInteraction: boolean) => void;
+            setTabbableRow:  SetTabbableIndex<RowElement>; //(u: Parameters<StateUpdater<number | null>>[0], fromUserInteraction: boolean) => void;
             getCurrentTabbableColumn: () => (number | null);
-            setCurrentTabbableColumn: PassiveStateUpdater<number | null>;
-            setTabbableCell: (updater: Parameters<StateUpdater<number | null>>[0], fromUserInteraction: boolean) => void;
+            setCurrentTabbableColumn: PassiveStateUpdater<number | null, h.JSX.TargetedFocusEvent<CellElement>>;
+            setTabbableCell: SetTabbableIndex<CellElement>; //(updater: Parameters<StateUpdater<number | null>>[0], fromUserInteraction: boolean) => void;
         }
     }
 }
 export interface UseGridNavigationCellReturnType<CellElement extends Element> extends UseListNavigationChildReturnType<CellElement> { }
 
-export function useGridNavigation<ParentOrRowElement extends Element, RowElement extends Element, M extends GridChildRowInfo<RowElement>>({
+export function useGridNavigation<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, RM extends GridChildRowInfo<RowElement, CellElement>, CM extends GridChildCellInfo<CellElement>>({
     gridNavigationParameters: { onTabbableColumnChange, ...void3 },
     linearNavigationParameters,
     rovingTabIndexParameters: { onTabbableIndexChange, ...rovingTabIndexParameters },
     managedChildrenReturn,
     typeaheadNavigationParameters,
     ..._void2
-}: UseGridNavigationParameters<RowElement, M>): UseGridNavigationReturnType<ParentOrRowElement, RowElement> {
+}: UseGridNavigationParameters<RowElement, CellElement, RM>): UseGridNavigationReturnType<ParentOrRowElement, RowElement, CellElement, RM, CM> {
     const { getChildren } = managedChildrenReturn;
     const { initiallyTabbedIndex } = rovingTabIndexParameters
 
-    const [getCurrentTabbableColumn, setCurrentTabbableColumn] = usePassiveState<number | null>(onTabbableColumnChange, useStableCallback(() => { return (initiallyTabbedIndex ?? 0) }));
+    const [getCurrentTabbableColumn, setCurrentTabbableColumn] = usePassiveState<number | null, h.JSX.TargetedFocusEvent<CellElement>>(onTabbableColumnChange, useStableCallback(() => { return (initiallyTabbedIndex ?? 0) }));
 
-    const onTabbableIndexChangeOverride = useStableCallback((i: number | null, p: number | null | undefined) => {
+    const onTabbableIndexChangeOverride = useStableCallback((i: number | null, p: number | null | undefined, reason: h.JSX.TargetedEvent<RowElement, Event>) => {
         const children = getChildren();
-        onTabbableIndexChange?.(i, p);
+        onTabbableIndexChange?.(i, p, reason);
         if (p != null)
-            children.getAt(p)?.setTabbableColumnIndex(null, false);
+            children.getAt(p)?.setTabbableColumnIndex(null, reason as unknown as h.JSX.TargetedFocusEvent<CellElement>, false);
         if (i != null)
-            children.getAt(i)?.setTabbableColumnIndex(getCurrentTabbableColumn(), false);
+            children.getAt(i)?.setTabbableColumnIndex(getCurrentTabbableColumn(), reason as unknown as h.JSX.TargetedFocusEvent<CellElement>, false);
 
     })
 
@@ -118,7 +119,7 @@ export function useGridNavigation<ParentOrRowElement extends Element, RowElement
         rovingTabIndexChildContext,
         typeaheadNavigationChildContext,
         ...void1
-    } = useListNavigation<ParentOrRowElement, RowElement, M>({
+    } = useListNavigation<ParentOrRowElement, RowElement, RM>({
         linearNavigationParameters: { navigationDirection: "vertical", ...linearNavigationParameters },
         rovingTabIndexParameters: { onTabbableIndexChange: onTabbableIndexChangeOverride, ...rovingTabIndexParameters },
         managedChildrenReturn,
@@ -146,7 +147,7 @@ export function useGridNavigation<ParentOrRowElement extends Element, RowElement
     }
 }
 
-export function useGridNavigationRow<RowElement extends Element, CellElement extends Element, RM extends GridChildRowInfo<RowElement>, CM extends GridChildCellInfo<CellElement>>({
+export function useGridNavigationRow<RowElement extends Element, CellElement extends Element, RM extends GridChildRowInfo<RowElement, CellElement>, CM extends GridChildCellInfo<CellElement>>({
     asChildRowParameters: { gridNavigationRowContext: { gridNavigationRowParameters: { setTabbableRow, getCurrentTabbableColumn, setCurrentTabbableColumn } }, ...asChildRowOfTable },
     asParentRowParameters: { linearNavigationParameters, ...asParentRowOfCellsP },
     ..._void1
@@ -175,20 +176,30 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
 
     assertEmptyObject(_void1);
 
-    const { rovingTabIndexReturn: { setTabbableIndex } } = lnr;
-    const gridNavigationCellContext = useStableObject({
-        gridNavigationCellParameters: useStableObject({
-            setTabbableRow,
-            getRowIndex: getIndex,
-            getCurrentTabbableColumn,
-            setCurrentTabbableColumn,
-            setTabbableCell: setTabbableIndex
-        })
-    })
+    const { rovingTabIndexReturn: { setTabbableIndex },rovingTabIndexReturn, linearNavigationReturn, managedChildrenParameters, rovingTabIndexChildContext, typeaheadNavigationChildContext, typeaheadNavigationReturn } = lnr;
+
 
     return {
         asChildRowReturn: { gridNavigationRowParameters: { focusSelf, setTabbableColumnIndex: setTabbableIndex }, ...lncr, },
-        asParentRowReturn: { gridNavigationCellContext, ...lnr }
+        asParentRowReturn: {
+            ...lnr ,
+            gridNavigationCellContext:useStableObject ({
+                gridNavigationCellParameters: useStableObject({
+                    setTabbableRow,
+                    getRowIndex: getIndex,
+                    getCurrentTabbableColumn,
+                    setCurrentTabbableColumn,
+                    setTabbableCell: setTabbableIndex
+                })
+            }),
+            linearNavigationReturn,
+            managedChildrenParameters,
+            rovingTabIndexChildContext,
+            rovingTabIndexReturn,
+            typeaheadNavigationChildContext,
+            typeaheadNavigationReturn,
+
+        }
     }
 
 }
@@ -216,11 +227,12 @@ export function useGridNavigationCell<CellElement extends Element>({
         }
     },
     ..._void1
-}: UseGridNavigationCellParameters<CellElement>): UseGridNavigationCellReturnType<CellElement> {
+}: UseGridNavigationCellParameters<any, CellElement>): UseGridNavigationCellReturnType<CellElement> {
     const { index } = managedChildParameters;
     const {
         hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1 },
         rovingTabIndexChildReturn,
+        textContentReturn,
         ...void2
     } = useListNavigationChild<CellElement>({
         rovingTabIndexChildParameters,
@@ -237,22 +249,23 @@ export function useGridNavigationCell<CellElement extends Element>({
 //    assertEmptyObject(void3);
 
     return {
+        rovingTabIndexChildReturn,
+        textContentReturn,
         hasCurrentFocusParameters: {
-            onCurrentFocusedInnerChanged: useStableCallback((focused: boolean, prev: boolean | undefined) => {
-                ocfic1?.(focused, prev);
+            onCurrentFocusedInnerChanged: useStableCallback((focused, prev, e) => {
+                ocfic1?.(focused, prev, e);
 
                 if (focused) {
-                    setTabbableRow(getRowIndex(), false);
-                    setCurrentTabbableColumn(index);
-                    setTabbableCell(prev => {
+                    setTabbableRow(getRowIndex(), e, false);
+                    setCurrentTabbableColumn(index, e);
+                    setTabbableCell((prev) => {
                         if (prev != null && (prev < index || prev > index + colSpan)) {
                             return prev;
                         }
                         return index;
-                    }, false);
+                    }, e, false);
                 }
             })
         },
-        rovingTabIndexChildReturn
     }
 }

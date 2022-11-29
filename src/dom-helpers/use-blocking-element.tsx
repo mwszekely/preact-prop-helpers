@@ -35,9 +35,9 @@ export function useBlockingElement<E extends Element>(enabled: boolean, getTarge
         }
     })
 
-    const [getTop, setTop] = usePassiveState<HTMLElement | null>(null, returnNull);
-    const [getLastActiveWhenClosed, setLastActiveWhenClosed] = usePassiveState<HTMLElement | null>(null, returnNull);
-    const [getLastActiveWhenOpen, setLastActiveWhenOpen] = usePassiveState<HTMLElement | null>(null, returnNull);
+    const [getTop, setTop] = usePassiveState<HTMLElement | null, never>(null, returnNull);
+    const [getLastActiveWhenClosed, setLastActiveWhenClosed] = usePassiveState<HTMLElement | null, never>(null, returnNull);
+    const [getLastActiveWhenOpen, setLastActiveWhenOpen] = usePassiveState<HTMLElement | null, never>(null, returnNull);
 
     /**
      * Push/pop the element from the blockingElements stack.

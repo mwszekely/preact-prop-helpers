@@ -1,7 +1,7 @@
 import { h } from "preact";
 import { useCallback, useEffect, useRef } from "preact/hooks";
-import { getDocument } from "./use-document-class";
 import { OnPassiveStateChange, returnNull, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state";
+import { getDocument } from "./use-document-class";
 import { useRefElement, UseRefElementParameters, UseRefElementReturnType } from "./use-ref-element";
 
 export interface UseElementSizeParameters<T extends Element> extends UseRefElementParameters<T> {
@@ -12,7 +12,7 @@ export interface UseElementSizeParameters<T extends Element> extends UseRefEleme
      * values you use if you'd like.
      * @param sizeInfo 
      */
-        onSizeChange(sizeInfo: ElementSize): void;
+        onSizeChange(sizeInfo: ElementSize, prevSize: ElementSize | undefined, entries: ResizeObserverEntry[] | h.JSX.TargetedEvent<T>): void;
 
         /**
          * Passed as an argument to the created ResizeObserver.
@@ -49,7 +49,7 @@ export function useElementSize<E extends Element>({ elementSizeParameters: { get
 
     useEnsureStability("useElementSize", getObserveBox, onSizeChange, onElementChange, onMount, onUnmount);
 
-    const [getSize, setSize] = usePassiveState<ElementSize | null>(onSizeChange as OnPassiveStateChange<ElementSize | null>, returnNull);
+    const [getSize, setSize] = usePassiveState<ElementSize | null, UIEvent | ResizeObserverEntry[]>(onSizeChange as OnPassiveStateChange<ElementSize | null, UIEvent | ResizeObserverEntry[]>, returnNull);
 
     const currentObserveBox = useRef<ResizeObserverBoxOptions | undefined>(undefined);
 
@@ -58,16 +58,16 @@ export function useElementSize<E extends Element>({ elementSizeParameters: { get
             const document = getDocument(element);
             const window = document.defaultView;
 
-            const handleUpdate = () => {
+            const handleUpdate = (entries: ResizeObserverEntry[] | UIEvent) => {
                 if (element.isConnected) {
                     const { clientWidth, scrollWidth, offsetWidth, clientHeight, scrollHeight, offsetHeight, clientLeft, scrollLeft, offsetLeft, clientTop, scrollTop, offsetTop } = (element as Element & Partial<HTMLElement>);
-                    setSize({ clientWidth, scrollWidth, offsetWidth, clientHeight, scrollHeight, offsetHeight, clientLeft, scrollLeft, offsetLeft, clientTop, scrollTop, offsetTop });
+                    setSize({ clientWidth, scrollWidth, offsetWidth, clientHeight, scrollHeight, offsetHeight, clientLeft, scrollLeft, offsetLeft, clientTop, scrollTop, offsetTop }, entries);
                 }
             }
 
 
             if (window && ("ResizeObserver" in window)) {
-                const observer = new ResizeObserver((_entries) => { handleUpdate(); });
+                const observer = new ResizeObserver((entries) => { handleUpdate(entries); });
 
                 observer.observe(element, { box: observeBox });
 

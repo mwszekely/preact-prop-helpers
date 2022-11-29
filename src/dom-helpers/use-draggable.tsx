@@ -1,6 +1,4 @@
 import { h } from "preact";
-import { useCallback, useRef } from "preact/hooks";
-import { useMergedProps } from "./use-merged-props";
 import { useState } from "../preact-extensions/use-state";
 
 /*

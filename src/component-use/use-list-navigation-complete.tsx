@@ -5,7 +5,7 @@ import { UseListNavigationSingleSelectionSortableChildInfo, UseListNavigationSin
 import { UseSortableChildInfo, useSortableChildren } from "../component-detail/use-sortable-children";
 import { useMergedProps } from "../dom-helpers/use-merged-props";
 import { useRefElement } from "../dom-helpers/use-ref-element";
-import { useChildrenHaveFocus, useChildrenHaveFocusChild, UseChildrenHaveFocusChildParameters, UseChildrenHaveFocusReturnTypeInfo } from "../observers/use-children-have-focus";
+import { useChildrenHaveFocus, useChildrenHaveFocusChild, UseChildrenHaveFocusChildParameters, UseChildrenHaveFocusReturnType } from "../observers/use-children-have-focus";
 import { useHasCurrentFocus, UseHasCurrentFocusReturnType } from "../observers/use-has-current-focus";
 import { ManagedChildren, useManagedChild, useManagedChildren, UseManagedChildrenContext, UseManagedChildrenReturnType, UseManagedChildReturnType } from "../preact-extensions/use-child-manager";
 import { useStableCallback } from "../preact-extensions/use-stable-callback";
@@ -27,15 +27,15 @@ export interface UseCompleteListNavigationReturnType<ParentElement extends Eleme
     context: CompleteListNavigationContext<ParentElement, ChildElement, M>;
 
     managedChildrenReturn: UseManagedChildrenReturnType<M>["managedChildrenReturn"];
-    childrenHaveFocusReturn: UseChildrenHaveFocusReturnTypeInfo["childrenHaveFocusReturn"];
+    childrenHaveFocusReturn: UseChildrenHaveFocusReturnType<ChildElement>["childrenHaveFocusReturn"];
     //rearrangeableChildrenParameters: Pick<UseRearrangeableChildrenParameters["rearrangeableChildrenParameters"], "getHighestChildIndex" | "getValid">;
 }
 
 
 export interface CompleteListNavigationContext<ParentElement extends Element, ChildElement extends Element, M extends UseListNavigationSingleSelectionSortableChildInfo<ChildElement>> extends UseManagedChildrenContext<M>,
-    Pick<UseChildrenHaveFocusReturnTypeInfo, "childrenHaveFocusChildContext">,
+    Pick<UseChildrenHaveFocusReturnType<ChildElement>, "childrenHaveFocusChildContext">,
     Pick<UseListNavigationSingleSelectionSortableReturnType<ParentElement, ChildElement, M>, "singleSelectionContext" | "rovingTabIndexChildContext" | "typeaheadNavigationChildContext"> {
-    childrenHaveFocusChildContext: UseChildrenHaveFocusChildParameters["childrenHaveFocusChildContext"];
+    childrenHaveFocusChildContext: UseChildrenHaveFocusChildParameters<ChildElement>["childrenHaveFocusChildContext"];
 }
 
 /**
@@ -96,7 +96,7 @@ export function useCompleteListNavigation<ParentElement extends Element, ChildEl
 
     const { childrenHaveFocusChildContext, childrenHaveFocusReturn } = useChildrenHaveFocus({ childrenHaveFocusParameters });
     const { context: { managedChildContext }, managedChildrenReturn } = useManagedChildren<M>({ managedChildrenParameters });
-    const props = useMergedProps(linearNavigationReturn.propsStable, typeaheadNavigationReturn.propsStable);
+    const props = useMergedProps<ParentElement>(linearNavigationReturn.propsStable, typeaheadNavigationReturn.propsStable);
     const context = useStableObject<CompleteListNavigationContext<ParentElement, ChildElement, M>>({
         singleSelectionContext,
         managedChildContext,
@@ -191,7 +191,7 @@ export function useCompleteListNavigationChild<ChildElement extends Element, M e
         }, refElementReturn
     });
 
-    const { getSelected, selected, setThisOneSelected } = singleSelectionChildReturn;
+    const { getSelected, selected } = singleSelectionChildReturn;
 
     const mcp1: UseListNavigationSingleSelectionSortableChildInfo<ChildElement> = {
         disabled,
@@ -211,9 +211,9 @@ export function useCompleteListNavigationChild<ChildElement extends Element, M e
     const { managedChildReturn } = useManagedChild<M>({ context: { managedChildContext }, managedChildParameters: { index } }, { ...mcp1, ...completeListNavigationChildParameters } as M);
 
     const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2 } } = useChildrenHaveFocusChild({ childrenHaveFocusChildContext });
-    const onCurrentFocusedInnerChanged = useStableCallback<NonNullable<typeof ocfic1>>((focused, prev) => {
-        ocfic1?.(focused, prev);
-        ocfic2?.(focused, prev);
+    const onCurrentFocusedInnerChanged = useStableCallback<NonNullable<typeof ocfic1>>((focused, prev, e) => {
+        ocfic1?.(focused, prev, e);
+        ocfic2?.(focused, prev, e);
     })
     const { hasCurrentFocusReturn } = useHasCurrentFocus<ChildElement>({ hasCurrentFocusParameters: { onCurrentFocusedInnerChanged, onCurrentFocusedChanged: null }, refElementReturn });
 

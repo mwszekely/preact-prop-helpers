@@ -163,7 +163,7 @@ export function useRearrangeableChildren<ParentElement extends Element, M extend
     // this hook, but it's tbody that actually needs updating), we need to remotely
     // get and set a forceUpdate function.
     //const [getForceUpdate, setForceUpdate] = usePassiveState<null | (() => void)>(null, returnNull);
-    const [getForceUpdate, setForceUpdate] = usePassiveState<null | (() => void)>(null, returnNull);
+    const [getForceUpdate, setForceUpdate] = usePassiveState<null | (() => void), never>(null, returnNull);
 
     const rearrange = useCallback((sortedRows: M[]) => {
 

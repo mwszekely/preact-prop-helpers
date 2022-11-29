@@ -11,9 +11,9 @@ export type Stable<T> = T;// & { [_STABLE]: true };
  * `useCallback` will return a function that's stable across *all* renders, meaning
  * we can't use our funny "`if` only works here because it doesn't break the rules of hooks" trick then.
  */
-const map = new WeakMap<(..._args: any[]) => any, boolean>();
+const map = new WeakMap<Function, boolean>();
 
-export function isStableGetter<T extends (..._args: any[]) => any>(obj: T): obj is Stable<T> {
+export function isStableGetter<T extends Function>(obj: T): obj is Stable<T> {
     return (map.get(obj) ?? false);
 }
 function setIsStableGetter<T extends (..._args: any[]) => any>(obj: T): Stable<T> {
@@ -32,23 +32,24 @@ function setIsStableGetter<T extends (..._args: any[]) => any>(obj: T): Stable<T
  * empty dependency array, but with the associated stable typing. In this case, you ***must*** ensure that it
  * truly has no dependencies/only stable dependencies!!
  */
-export function useStableCallback<T extends (..._args: any[]) => any>(fn: T, noDeps: []): Stable<T>;
-export function useStableCallback<T extends (..._args: any[]) => any>(fn: T): Stable<T>;
-export function useStableCallback<T extends (..._args: any[]) => any>(fn: T, noDeps?: []): Stable<T> {
-    useEnsureStability("useStableCallback", noDeps == null, noDeps?.length, isStableGetter(fn));
+//export function useStableCallback<T extends (..._args: any[]) => any>(fn: T, noDeps: []): Stable<T>;
+//export function useStableCallback<T extends (..._args: any[]) => any>(fn: T): Stable<T>;
+export function useStableCallback<T extends Function | null | undefined>(fn: NonNullable<T>, noDeps?: [] | null | undefined): Stable<NonNullable<T>> {
+    type U = (NonNullable<T> & ((...args: any) => any));
+    useEnsureStability("useStableCallback", noDeps == null, noDeps?.length, isStableGetter<U>(fn as U));
     if (isStableGetter(fn))
         return fn;
 
     if (noDeps == null) {
-        const currentCallbackGetter = useStableGetter<T>(fn);
-
-        return setIsStableGetter(useCallbackNative<T>(((...args: Parameters<T>): ReturnType<T> => {
+        const currentCallbackGetter = useStableGetter<U>(fn);
+        return setIsStableGetter(useCallbackNative<U>(((...args) => {
             return currentCallbackGetter()(...args);
-        }) as T, []));
+        }) as U, []));
 
     }
     else {
         console.assert(noDeps.length === 0);
-        return setIsStableGetter(useCallbackNative(fn, []));
+        return setIsStableGetter(useCallbackNative<U>(fn, []));
     }
 }
+

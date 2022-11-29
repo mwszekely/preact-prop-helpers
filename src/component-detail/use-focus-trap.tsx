@@ -1,9 +1,7 @@
 import { h } from "preact";
-import { useCallback, useEffect, useLayoutEffect, useRef } from "preact/hooks";
+import { useEffect } from "preact/hooks";
 import { isFocusable } from "tabbable";
-import { useActiveElement, UseActiveElementParameters, UseActiveElementReturnType } from "../observers/use-active-element";
-import { getTopElement, useBlockingElement } from "../dom-helpers/use-blocking-element";
-import { getDocument } from "../dom-helpers/use-document-class";
+import { useBlockingElement } from "../dom-helpers/use-blocking-element";
 import { useRefElement, UseRefElementParameters, UseRefElementReturnType } from "../dom-helpers/use-ref-element";
 import { useStableCallback } from "../preact-extensions/use-stable-callback";
 
@@ -61,13 +59,10 @@ export function useFocusTrap<SourceElement extends Element | null, PopupElement 
 
     useEffect(() => {
         if (trapActive) {
-            debugger;
             const top = getTop();
             const lastFocusedInThisComponent = getLastActiveWhenOpen();
-            // TODO: Is it better to focus the same element that was focused the last time this focus trap was opened?
-            // I don't know. 
-            /// @ts-expect-error
-            if (false && lastFocusedInThisComponent && lastFocusedInThisComponent.isConnected) {
+            
+            if (false && lastFocusedInThisComponent && lastFocusedInThisComponent?.isConnected) {
                 focusSelf(lastFocusedInThisComponent as any as PopupElement, () => lastFocusedInThisComponent);
             }
             else {

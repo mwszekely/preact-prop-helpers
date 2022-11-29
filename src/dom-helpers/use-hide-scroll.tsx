@@ -9,8 +9,8 @@ import { usePassiveState } from "../preact-extensions/use-passive-state";
  * @param hideScroll 
  */
  export function useHideScroll(hideScroll: boolean) {
-    const [getScrollbarWidth, setScrollbarWidth] = usePassiveState<number | null>(null);
-    const [getScrollbarHeight, setScrollbarHeight] = usePassiveState<number | null>(null);
+    const [getScrollbarWidth, setScrollbarWidth] = usePassiveState<number | null, never>(null);
+    const [getScrollbarHeight, setScrollbarHeight] = usePassiveState<number | null, never>(null);
 
     useEffect(() => {
         if (hideScroll) {

@@ -1,5 +1,5 @@
 import { useCallback } from "preact/hooks";
-import { DismissListenerTypes, useDismiss, UseDismissParameters, UseDismissReturnType } from "./use-dismiss";
+import { DismissListenerTypes, useDismiss, UseDismissParameters, UseDismissReturnType } from "../component-detail/use-dismiss";
 import { useFocusTrap, UseFocusTrapParameters, UseFocusTrapReturnType } from "../component-detail/use-focus-trap";
 import { useMergedProps } from "../dom-helpers/use-merged-props";
 import { h } from "preact";

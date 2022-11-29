@@ -253,7 +253,7 @@ export function useAsync<AP extends unknown[], R, SP extends unknown[] = AP>(asy
 
     // We implement our own throttling behavior in regards to waiting until the async handler finishes.
     // These two passive state variables keep track of that, automatically queueing/dequeuing the next handler.
-    const [getQueued, setQueued] = usePassiveState<AP | null>(null, returnNull);
+    const [getQueued, setQueued] = usePassiveState<AP | null, never>(null, returnNull);
 
 
     // The actual sync handler.

@@ -3,14 +3,14 @@ import { h } from "preact";
 import { useCallback, useRef } from "preact/hooks";
 //import { UseManagedChildParameters, useManagedChildren, UseManagedChildrenParameters, UseManagedChildrenReturnTypeInfo } from "./use-child-manager";
 import { UseRefElementReturnType } from "../dom-helpers/use-ref-element";
-import { returnFalse, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state";
+import { OnPassiveStateChange, returnFalse, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state";
 
 /*
 export function useHasCurrentFocusProps<E extends Element>(r: UseHasCurrentFocusReturnType<E>, ...otherProps: h.JSX.HTMLAttributes<E>[]) {
     return useMergedProps<E>(r.hasCurrentFocusReturn.propsStable, ...otherProps);
 }*/
 
-export interface UseHasCurrentFocusParameters<T extends Node> {
+export interface UseHasCurrentFocusParameters<T extends Node, R extends h.JSX.TargetedFocusEvent<T>> {
     refElementReturn: Required<Pick<UseRefElementReturnType<T>["refElementReturn"], "getElement">>;
 
     hasCurrentFocusParameters: {
@@ -20,14 +20,14 @@ export interface UseHasCurrentFocusParameters<T extends Node> {
          * 
          * `prevFocused` is generally the opposite of `focused`, but on mount it's `undefined` while `focused` is probably false (both falsy)
          */
-        onCurrentFocusedChanged: null | ((focused: boolean, prevFocused: boolean | undefined) => void);
+        onCurrentFocusedChanged: null | OnPassiveStateChange<boolean, R>; //((focused: boolean, prevFocused: boolean | undefined) => void);
 
         /**
          * Like `onFocusedChanged`, but also *additionally* if any child elements are focused.
          * 
          * @see this.onFocusedChanged
          */
-        onCurrentFocusedInnerChanged: null | ((focused: boolean, prevFocused: boolean | undefined) => void);
+        onCurrentFocusedInnerChanged: null | OnPassiveStateChange<boolean, R>; //((focused: boolean, prevFocused: boolean | undefined) => void);
     }
 }
 
@@ -46,7 +46,7 @@ export interface UseHasCurrentFocusReturnType<E extends Node> {
     }
 }
 
-export function useHasCurrentFocus<T extends Node>(args: UseHasCurrentFocusParameters<T>): UseHasCurrentFocusReturnType<T> {
+export function useHasCurrentFocus<T extends Node, R extends h.JSX.TargetedFocusEvent<T>>(args: UseHasCurrentFocusParameters<T, R>): UseHasCurrentFocusReturnType<T> {
     const {
         hasCurrentFocusParameters: { onCurrentFocusedChanged: onFocusedChanged, onCurrentFocusedInnerChanged: onFocusedInnerChanged },
         refElementReturn: { getElement }
@@ -55,18 +55,18 @@ export function useHasCurrentFocus<T extends Node>(args: UseHasCurrentFocusParam
 
     useEnsureStability("useHasCurrentFocus", onFocusedChanged, onFocusedInnerChanged, getElement);
 
-    const [getFocused, setFocused] = usePassiveState<boolean>(onFocusedChanged, returnFalse);
-    const [getFocusedInner, setFocusedInner] = usePassiveState<boolean>(onFocusedInnerChanged, returnFalse);
+    const [getFocused, setFocused] = usePassiveState<boolean,  R>(onFocusedChanged, returnFalse);
+    const [getFocusedInner, setFocusedInner] = usePassiveState<boolean,  R>(onFocusedInnerChanged, returnFalse);
 
-    const onFocusIn = useCallback((e: h.JSX.TargetedFocusEvent<T>) => {
-        setFocusedInner(true);
-        setFocused(e.target == getElement())
+    const onFocusIn = useCallback<h.JSX.EventHandler<h.JSX.TargetedFocusEvent<T>>>((e) => {
+        setFocusedInner(true, e as R);
+        setFocused(e.target == getElement(), e as R)
     }, []);
 
-    const onFocusOut = useCallback((e: h.JSX.TargetedFocusEvent<T>) => {
+    const onFocusOut = useCallback<h.JSX.EventHandler<h.JSX.TargetedFocusEvent<T>>>((e) => {
         if (e.target == getElement()) {
-            setFocusedInner(false);
-            setFocused(false);
+            setFocusedInner(false, e as R);
+            setFocused(false, e as R);
         }
     }, []);
 

@@ -1,6 +1,6 @@
 import { h } from "preact";
 import { useCallback, useRef } from "preact/hooks";
-import { OnPassiveStateChange, returnNull, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state";
+import { OnPassiveStateChange, returnNull, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state";
 
 export interface UseRefElementReturnType<T extends EventTarget> {
     refElementReturn: {
@@ -12,7 +12,7 @@ export interface UseRefElementReturnType<T extends EventTarget> {
 
 export interface UseRefElementParameters<T> {
     refElementParameters: {
-        onElementChange?: OnPassiveStateChange<T | null>;
+        onElementChange?: OnPassiveStateChange<T | null, never>;
         onMount?: (element: T) => void;
         onUnmount?: (element: T) => void;
     }
@@ -38,7 +38,7 @@ export function useRefElement<T extends EventTarget>(args: UseRefElementParamete
     useEnsureStability("useRefElement", onElementChange, onMount, onUnmount);
 
     // Called (indirectly) by the ref that the element receives.
-    const handler = useCallback<OnPassiveStateChange<T | null>>((e, prevValue) => {
+    const handler = useCallback<OnPassiveStateChange<T | null, never>>((e, prevValue) => {
         const cleanup = onElementChange?.(e, prevValue);
         if (prevValue)
             onUnmount?.(prevValue!);
@@ -50,7 +50,7 @@ export function useRefElement<T extends EventTarget>(args: UseRefElementParamete
     }, []);
 
     // Let us store the actual (reference to) the element we capture
-    const [getElement, setElement] = usePassiveState<T | null>(handler, returnNull, runImmediately);
+    const [getElement, setElement] = usePassiveState<T | null, never>(handler, returnNull, runImmediately);
     const propsStable = useRef<h.JSX.HTMLAttributes<T>>({ ref: setElement });
 
     // Return both the element and the hook that modifies 
@@ -63,6 +63,3 @@ export function useRefElement<T extends EventTarget>(args: UseRefElementParamete
     }
 }
 
-function runImmediately(f: () => void) {
-    f();
-}

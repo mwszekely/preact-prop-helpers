@@ -18,7 +18,7 @@ export interface UseListNavigationSingleSelectionParameters<ChildElement extends
     managedChildrenReturn: UseListNavigationParameters<ChildElement, M>["managedChildrenReturn"] & UseSingleSelectionParameters<ChildElement>["managedChildrenReturn"];
 }
 
-export interface UseListNavigationSingleSelectionReturnType<ParentOrChildElement extends Element, ChildElement extends Element> extends UseListNavigationReturnType<ParentOrChildElement, ChildElement>, UseSingleSelectionReturnType { }
+export interface UseListNavigationSingleSelectionReturnType<ParentOrChildElement extends Element, ChildElement extends Element> extends UseListNavigationReturnType<ParentOrChildElement, ChildElement>, UseSingleSelectionReturnType<ChildElement> { }
 
 export function useListNavigationSingleSelection<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationSingleSelectionChildInfo<ChildElement>>({
     linearNavigationParameters,
@@ -85,13 +85,13 @@ export function useListNavigationSingleSelectionChild<ChildElement extends Eleme
     assertEmptyObject(_void6);
     assertEmptyObject(void7);
 
-    const onCurrentFocusedInnerChanged = useStableCallback<NonNullable<typeof ocfic1>>((focused, previouslyFocused) => {
-        ocfic1?.(focused, previouslyFocused);
-        ocfic2?.(focused, previouslyFocused);
-    });
-
     return {
-        hasCurrentFocusParameters: { onCurrentFocusedInnerChanged },
+        hasCurrentFocusParameters: {
+            onCurrentFocusedInnerChanged: useStableCallback((focused, previouslyFocused, e) => {
+                ocfic1?.(focused, previouslyFocused, e);
+                ocfic2?.(focused, previouslyFocused, e);
+            })
+        },
         ...sscr,
         ...lncr
     }

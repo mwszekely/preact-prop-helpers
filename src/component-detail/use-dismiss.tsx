@@ -210,7 +210,7 @@ export function useLostFocusDismiss<SourceElement extends Element | null, PopupE
 
     const stableOnClose = useStableCallback(onClose);
     const getOpen = useStableGetter(open);
-    const onLastActiveElementChange = useCallback<OnPassiveStateChange<Element | null>>((newElement, _prevElement) => {
+    const onLastActiveElementChange = useCallback<OnPassiveStateChange<Element | null, h.JSX.TargetedFocusEvent<any>>>((newElement, _prevElement, _e) => {
         const open = getOpen();
         const sourceElement = getSourceElement?.();
         const popupElement = getPopupElement();

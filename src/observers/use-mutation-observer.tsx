@@ -34,7 +34,7 @@ export function useMutationObserver<E extends Element>(options: UseMutationObser
     const stableOnCharacterData = useStableCallback(onCharacterData ?? (() => { }));
     const stableOnAttributes = useStableCallback(onAttributes ?? (() => { }));
 
-    const [_getMo, setMo] = usePassiveState<MutationObserver | null>(useStableCallback(observer => {
+    const [_getMo, setMo] = usePassiveState<MutationObserver | null, never>(useStableCallback(observer => {
         const element = getElement();
         if (element && observer && (!!attributeKey || !!characterData || !!childList)) {
             observer.observe(element, {

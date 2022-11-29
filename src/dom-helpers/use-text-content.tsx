@@ -9,12 +9,12 @@ export interface UseTextContentParameters<E extends Element> {
          * Return the text content of this component. By default, `e => e.textContent` is probably what you want.
          */
         getText(e: E | null): string | null;
-        onTextContentChange: OnPassiveStateChange<string | null>;
+        onTextContentChange: OnPassiveStateChange<string | null, never>;
     }
 }
 
 export function useTextContent<E extends Element>({ refElementReturn: { getElement }, textContentParameters: { getText, onTextContentChange } }: UseTextContentParameters<E>) {
-    const [getTextContent, setTextContent] = usePassiveState<string | null>(onTextContentChange, returnNull);
+    const [getTextContent, setTextContent] = usePassiveState<string | null, never>(onTextContentChange, returnNull);
     useEffect(() => {
         const element = getElement();
         if (element) {

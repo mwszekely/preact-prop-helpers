@@ -3,7 +3,7 @@ import { h } from "preact";
 import { useCallback } from "preact/hooks";
 import { UsePressParameters } from "../component-use/use-press";
 import { UseChildrenHaveFocusChildReturnType, UseChildrenHaveFocusParameters } from "../observers/use-children-have-focus";
-import { useChildrenFlag, UseManagedChildParameters, UseManagedChildrenReturnType } from "../preact-extensions/use-child-manager";
+import { useChildrenFlag, UseManagedChildrenReturnType } from "../preact-extensions/use-child-manager";
 import { OnPassiveStateChange, PassiveStateUpdater, useEnsureStability } from "../preact-extensions/use-passive-state";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "./use-roving-tabindex";
 //import { usePress, UsePressReturnType } from "./use-press";
@@ -37,24 +37,28 @@ export interface SelectableChildInfo<E extends Element> extends UseRovingTabInde
 
 
 
-export interface UseSingleSelectionParameters<ChildElement extends Element> {
+export interface UseSingleSelectionParameters<ChildElement extends Element, R extends h.JSX.TargetedFocusEvent<ChildElement>> {
     managedChildrenReturn: Pick<UseManagedChildrenReturnType<SelectableChildInfo<ChildElement>>["managedChildrenReturn"], "getChildren">;
-    rovingTabIndexReturn: Pick<UseRovingTabIndexReturnType<ChildElement>["rovingTabIndexReturn"], "setTabbableIndex">
+    rovingTabIndexReturn: Pick<UseRovingTabIndexReturnType<ChildElement, R>["rovingTabIndexReturn"], "setTabbableIndex">
     singleSelectionParameters: {
+        /**
+         * This is imperative, as opposed to declarative, 
+         * to save on re-rendering the parent whenever the selected index changes.
+         */
         initiallySelectedIndex: number | null;
         /**
          * In general, this should only be `null` when single selection is entirely disabled.
          * 
          * In either case, **MUST** be stable!!
          */
-        onSelectedIndexChange: null | OnPassiveStateChange<number | null>;
+        onSelectedIndexChange: null | OnPassiveStateChange<number | null, R>;
 
     }
 }
 
-export interface UseSingleSelectionChildParameters<E extends Element> {
+export interface UseSingleSelectionChildParameters<E extends Element, R extends h.JSX.TargetedFocusEvent<E>> {
     //managedChildParameters: Pick<UseManagedChildParameters<SelectableChildInfo<E>, never>["managedChildParameters"], "index" | "disabled">;
-    singleSelectionContext: UseSingleSelectionReturnType["singleSelectionContext"];
+    singleSelectionContext: UseSingleSelectionReturnType<E, R>["singleSelectionContext"];
     singleSelectionChildParameters: {
         selectionMode: "focus" | "activation" | "disabled";
         ariaPropName: `aria-${"pressed" | "selected" | "checked"}` | null;
@@ -62,7 +66,7 @@ export interface UseSingleSelectionChildParameters<E extends Element> {
     managedChildParameters: Pick<SelectableChildInfo<E>, "index">;
 }
 
-export interface UseSingleSelectionChildReturnTypeInfo<E extends Element> extends UseChildrenHaveFocusChildReturnType<E> {
+export interface UseSingleSelectionChildReturnType<E extends Element, R extends h.JSX.TargetedFocusEvent<E>> extends UseChildrenHaveFocusChildReturnType<E, R> {
     singleSelectionChildReturn: {
         // These two are already available as managedChild info,
         // but we're keeping them because RTI does the same thing, and it's convenient.
@@ -70,7 +74,7 @@ export interface UseSingleSelectionChildReturnTypeInfo<E extends Element> extend
         getSelected(): boolean;
         // Used to programmatically set this as the selected element;
         // it requests the parent to actually change the numeric index to this one's.
-        setThisOneSelected: () => void;
+        setThisOneSelected: (event: h.JSX.TargetedEvent<E, Event>) => void;
         propsUnstable: h.JSX.HTMLAttributes<E>;
     }
     //refElementParameters: Required<Pick<UseRefElementParameters<E>["refElementParameters"], "onElementChange">>;
@@ -79,27 +83,26 @@ export interface UseSingleSelectionChildReturnTypeInfo<E extends Element> extend
     pressParameters: Pick<UsePressParameters<E>["pressParameters"], "onPressSync">;
 }
 
-export interface UseSingleSelectionChildReturnTypeWithHooks<E extends Element> extends UseSingleSelectionChildReturnTypeInfo<E> {
-}
+//export interface UseSingleSelectionChildReturnTypeWithHooks<E extends Element> extends UseSingleSelectionChildReturnTypeInfo<E> {}
 
-export interface UseSingleSelectionReturnType {
+export interface UseSingleSelectionReturnType<ChildElement extends Element, R  extends h.JSX.TargetedFocusEvent<ChildElement>> {
     singleSelectionReturn: {
-        setSelectedIndex: PassiveStateUpdater<number | null>;
+        setSelectedIndex: PassiveStateUpdater<number | null, R>;
         getSelectedIndex(): number | null;
     }
-    singleSelectionContext: { setSelectedIndex: PassiveStateUpdater<number | null>; getSelectedIndex(): number | null; }
-    childrenHaveFocusParameters: Pick<UseChildrenHaveFocusParameters["childrenHaveFocusParameters"], "onCompositeFocusChange">
+    singleSelectionContext: { setSelectedIndex: PassiveStateUpdater<number | null, R>; getSelectedIndex(): number | null; }
+    childrenHaveFocusParameters: Pick<UseChildrenHaveFocusParameters<ChildElement, R>["childrenHaveFocusParameters"], "onCompositeFocusChange">
 }
 
 
 
-export type UseSingleSelectionChild<E extends Element> = (a: UseSingleSelectionChildParameters<E>) => UseSingleSelectionChildReturnTypeWithHooks<E>;
+//export type UseSingleSelectionChild<E extends Element> = (a: UseSingleSelectionChildParameters<E>) => UseSingleSelectionChildReturnTypeWithHooks<E>;
 
-export function useSingleSelection<ChildElement extends Element>({
+export function useSingleSelection<ChildElement extends Element, R extends h.JSX.TargetedFocusEvent<ChildElement>>({
     managedChildrenReturn: { getChildren },
     rovingTabIndexReturn: { setTabbableIndex },
     singleSelectionParameters: { onSelectedIndexChange, initiallySelectedIndex }
-}: UseSingleSelectionParameters<ChildElement>): UseSingleSelectionReturnType {
+}: UseSingleSelectionParameters<ChildElement, R>): UseSingleSelectionReturnType<ChildElement, R> {
 
     useEnsureStability("useSingleSelection", onSelectedIndexChange);
 
@@ -117,7 +120,7 @@ export function useSingleSelection<ChildElement extends Element>({
     const {
         changeIndex: setSelectedIndex,
         getCurrentIndex: getSelectedIndex
-    } = useChildrenFlag<SelectableChildInfo<ChildElement>>({
+    } = useChildrenFlag<SelectableChildInfo<ChildElement>, R>({
         getChildren,
         onIndexChange: onSelectedIndexChange,
         initialIndex: initiallySelectedIndex,
@@ -134,11 +137,11 @@ export function useSingleSelection<ChildElement extends Element>({
         singleSelectionReturn,
         singleSelectionContext: singleSelectionReturn,
         childrenHaveFocusParameters: {
-            onCompositeFocusChange: useStableCallback((anyFocused: boolean) => {
+            onCompositeFocusChange: useStableCallback((anyFocused, prev, reason) => {
                 if (!anyFocused) {
                     const selectedIndex = getSelectedIndex();
                     if (selectedIndex != null)
-                        setTabbableIndex(selectedIndex, false);
+                        setTabbableIndex(selectedIndex, reason, false);
                 }
             })
         }
@@ -146,7 +149,7 @@ export function useSingleSelection<ChildElement extends Element>({
 }
 
 
-export function useSingleSelectionChild<ChildElement extends Element>(args: UseSingleSelectionChildParameters<ChildElement>): UseSingleSelectionChildReturnTypeWithHooks<ChildElement> {
+export function useSingleSelectionChild<ChildElement extends Element, R  extends h.JSX.TargetedFocusEvent<ChildElement>>(args: UseSingleSelectionChildParameters<ChildElement, R>): UseSingleSelectionChildReturnType<ChildElement, R> {
     const {
 
         singleSelectionContext: { getSelectedIndex, setSelectedIndex: parentSetSelectedIndex },
@@ -161,15 +164,15 @@ export function useSingleSelectionChild<ChildElement extends Element>(args: UseS
 
     const getIndex = useStableGetter(index);
 
-    const onCurrentFocusedInnerChanged = useStableCallback((focused: boolean, _prev: boolean | undefined) => {
+    const onCurrentFocusedInnerChanged = useStableCallback<OnPassiveStateChange<boolean, R>>((focused, _prev, e) => {
         if (selectionMode == 'focus' && focused) {
-            parentSetSelectedIndex(getIndex());
+            parentSetSelectedIndex(getIndex(), e);
         }
     });
 
-    const onPressSync = useStableCallback((() => {
+    const onPressSync = useStableCallback(((e: h.JSX.TargetedEvent<ChildElement>) => {
         if (!disabled)
-        parentSetSelectedIndex(getIndex());
+            parentSetSelectedIndex(getIndex(), e as  R);
     }));
 
     return {
@@ -177,9 +180,9 @@ export function useSingleSelectionChild<ChildElement extends Element>(args: UseS
         managedChildParameters: { setLocalSelected: setSelected },
         singleSelectionChildReturn: {
             selected,
-            setThisOneSelected: useCallback(() => {
+            setThisOneSelected: useCallback((event) => {
                 console.assert(!getDisabled());
-                parentSetSelectedIndex(getIndex());
+                parentSetSelectedIndex(getIndex(), event as R);
             }, []),
             getSelected,
             propsUnstable: ariaPropName == null ? {} : { [ariaPropName as keyof h.JSX.HTMLAttributes<any>]: (selected ?? false).toString() }

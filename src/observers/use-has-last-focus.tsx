@@ -42,18 +42,18 @@ export function useHasLastFocus<T extends Node>(args: UseHasLastFocusParameters<
 
     useEnsureStability("useHasFocus", onLastFocusedChanged, onLastFocusedInnerChanged);
     
-    const [getLastFocused, setLastFocused] = usePassiveState<boolean>(onLastFocusedChanged, returnFalse);
-    const [getLastFocusedInner, setLastFocusedInner] = usePassiveState<boolean>(onLastFocusedInnerChanged, returnFalse);
+    const [getLastFocused, setLastFocused] = usePassiveState<boolean, UIEvent>(onLastFocusedChanged, returnFalse);
+    const [getLastFocusedInner, setLastFocusedInner] = usePassiveState<boolean, UIEvent>(onLastFocusedInnerChanged, returnFalse);
 
     const { activeElementReturn } = useActiveElement({
         activeElementParameters: {
-            onLastActiveElementChange: useCallback<NonNullable<typeof onLastActiveElementChange>>((lastActiveElement, prevLastActiveElement) => {
+            onLastActiveElementChange: useCallback<NonNullable<typeof onLastActiveElementChange>>((lastActiveElement, prevLastActiveElement, e) => {
                 const selfElement = getElement();
                 const focused = (selfElement != null && (selfElement == lastActiveElement as Node | null));
                 const focusedInner = (!!selfElement?.contains(lastActiveElement as Node | null));
-                setLastFocused(focused);
-                setLastFocusedInner(focusedInner);
-                onLastActiveElementChange?.(lastActiveElement, prevLastActiveElement);
+                setLastFocused(focused, e);
+                setLastFocusedInner(focusedInner, e);
+                onLastActiveElementChange?.(lastActiveElement, prevLastActiveElement, e);
             }, []),
             ...activeElementParameters
         },

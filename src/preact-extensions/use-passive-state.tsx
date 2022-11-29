@@ -2,9 +2,9 @@ import { useCallback, useLayoutEffect, useRef } from "preact/hooks";
 import { options } from "preact"
 
 /** Takes a new value or a function that updates a value, unlike `OnPassiveStateChange` which reacts to those updates */
-export type PassiveStateUpdater<S> = ((value: S | ((prevState: S | undefined) => S)) => void);
+export type PassiveStateUpdater<S, R> = ((value: S | ((prevState: S | undefined) => S), reason?: R) => void);//[R] extends [never]? ((value: S | ((prevState: S | undefined) => S), reason?: R) => void) : ((value: S | ((prevState: S | undefined) => S), reason: R) => void);
 /** Responds to a change in a value, unlike `PassiveStateUpdater` which causes the updates */
-export type OnPassiveStateChange<S> = ((value: S, prevValue: S | undefined) => (void | (() => void)));
+export type OnPassiveStateChange<S, R> = ((value: S, prevValue: S | undefined, reason?: R) => (void | (() => void)));//[R] extends [never]? ((value: S, prevValue: S | undefined, reason?: R) => (void | (() => void))) : ((value: S, prevValue: S | undefined, reason: R) => (void | (() => void)));
 
 
 
@@ -16,22 +16,25 @@ export type OnPassiveStateChange<S> = ((value: S, prevValue: S | undefined) => (
  * Eventually, when useEvent lands, we hopefully won't need this.
  */
 export function useEnsureStability<T extends any[]>(parentHookName: string, ...values: T) {
-    useHelper(values.length, 0);
+    const helperToEnsureStability = useRef<Array<T>>([]);
+    const shownError = useRef<Array<boolean>>([]);
+    useHelper(values.length as any, 0);
     values.forEach(useHelper);
     return;
 
 
-    function useHelper<U>(value: U, index: number) {
+    function useHelper<U extends T>(value: U, index: number) {
 
         // Make sure that the provided functions are perfectly stable across renders
-        const helperToEnsureStability = useRef(value);
-        const shownError = useRef(false);
-        if (helperToEnsureStability.current != value) {
-            if (!shownError.current) {
+        if (helperToEnsureStability.current[index] === undefined)
+            helperToEnsureStability.current[index] = value;
+
+        if (helperToEnsureStability.current[index] != value) {
+            if (!shownError.current[index]) {
                 /* eslint-disable no-debugger */
                 debugger;
                 console.error(`The hook ${parentHookName} requires some or all of its arguments remain stable across each render; please check the ${index}-indexed argument.`);
-                shownError.current = true;
+                shownError.current[index] = true;
             }
         }
     }
@@ -60,9 +63,10 @@ export function debounceRendering(f: () => void) {
  * @param customDebounceRendering By default, changes to passive state are delayed by one tick so that we only check for changes in a similar way to Preact. You can override this to, for example, always run immediately instead.
  * @returns 
  */
-export function usePassiveState<T>(onChange: undefined | null | OnPassiveStateChange<T>, getInitialValue?: () => T, customDebounceRendering?: typeof debounceRendering): readonly [getStateStable: () => T, setStateStable: PassiveStateUpdater<T>] {
+export function usePassiveState<T, R>(onChange: undefined | null | OnPassiveStateChange<T, R>, getInitialValue?: () => T, customDebounceRendering?: typeof debounceRendering): readonly [getStateStable: () => T, setStateStable: PassiveStateUpdater<T, R>] {
 
     const valueRef = useRef<T | typeof Unset>(Unset);
+    const reasonRef = useRef<R | typeof Unset>(Unset);
     const warningRef = useRef(false);
     const dependencyToCompareAgainst = useRef<T | (typeof Unset)>(Unset);
     const cleanupCallbackRef = useRef<undefined | (() => void)>(undefined);
@@ -86,7 +90,7 @@ export function usePassiveState<T>(onChange: undefined | null | OnPassiveStateCh
             try {
                 const initialValue = getInitialValue();
                 valueRef.current = initialValue;
-                cleanupCallbackRef.current = (onChange?.(initialValue, undefined) ?? undefined);
+                cleanupCallbackRef.current = (onChange?.(initialValue, undefined, undefined!) ?? undefined);
             }
             catch (ex) {
                 // Exceptions are intentional to allow bailout (without exposing the Unset symbol)
@@ -117,7 +121,7 @@ export function usePassiveState<T>(onChange: undefined | null | OnPassiveStateCh
     }, []);
 
     // The actual code the user calls to (possibly) run a new effect.
-    const setValue = useCallback<PassiveStateUpdater<T>>((arg) => {
+    const setValue = useCallback<PassiveStateUpdater<T, R>>((arg: Parameters<PassiveStateUpdater<T, R>>[0], reason: Parameters<PassiveStateUpdater<T, R>>[1]) => {
 
         // Regardless of anything else, figure out what our next value is about to be.
         const nextValue = (arg instanceof Function ? arg(valueRef.current === Unset ? undefined : valueRef.current) : arg);
@@ -133,9 +137,11 @@ export function usePassiveState<T>(onChange: undefined | null | OnPassiveStateCh
 
             // It's important to update this here (as well as below) in case customDebounceRendering invokes this immediately
             valueRef.current = nextValue;
+            reasonRef.current = reason as R;
 
             // Schedule the actual check and invocation of onChange later to let effects settle
             (customDebounceRendering ?? debounceRendering)(() => {
+                const nextReason = reasonRef.current! as R;
                 const nextDep = valueRef.current! as T;
                 const prevDep = dependencyToCompareAgainst.current;
                 if (dependencyToCompareAgainst.current != valueRef.current) {
@@ -144,7 +150,7 @@ export function usePassiveState<T>(onChange: undefined | null | OnPassiveStateCh
                     try {
                         // Call any registered cleanup function
                         onShouldCleanUp();
-                        cleanupCallbackRef.current = (onChange?.(nextDep, prevDep === Unset ? undefined : prevDep) ?? undefined);
+                        cleanupCallbackRef.current = (onChange?.(nextDep, prevDep === Unset ? undefined : prevDep, nextReason) ?? undefined);
                         valueRef.current = nextDep;
                     }
                     finally {
@@ -178,3 +184,8 @@ export function returnNull() { return null; }
 export function returnUndefined() { return undefined; }
 export function returnZero() { return 0; }
 export function identity<T>(t: T) { return t; } // Kind of an extra, but it's useful in other places anyway
+
+/** 
+ * An alternative to use for `customDebounceRendering` that causes `usePassiveState` to run changes without waiting a tick.
+ */
+export function runImmediately(f: () => void) { f(); }
