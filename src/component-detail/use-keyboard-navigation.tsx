@@ -43,7 +43,7 @@ export interface UseLinearNavigationReturnTypeWithHooks<ParentOrChildElement ext
 //export function navigateAbsolute(index: number): number | null { return index; }
 
 /** Arguments passed to the parent `useLinearNavigation` */
-export interface UseLinearNavigationParameters<ParentOrChildElement extends Element, ChildElement extends Element> {
+export interface UseLinearNavigationParameters<_ParentOrChildElement extends Element, ChildElement extends Element> {
 
     rovingTabIndexReturn: Pick<UseRovingTabIndexReturnType<ChildElement>["rovingTabIndexReturn"], "getTabbableIndex" | "setTabbableIndex">
     linearNavigationParameters: {
@@ -128,7 +128,7 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
     rovingTabIndexReturn,
     linearNavigationParameters
 }: UseLinearNavigationParameters<ParentOrChildElement, ChildElement>): UseLinearNavigationReturnTypeWithHooks<ParentOrChildElement> {
-    type R = h.JSX.TargetedEvent<ParentOrChildElement>;
+    type R = Event;//h.JSX.TargetedEvent<ParentOrChildElement>;
     const { getHighestIndex, indexDemangler, indexMangler, isValid, navigatePastEnd, navigatePastStart } = linearNavigationParameters;
     const { getTabbableIndex, setTabbableIndex } = rovingTabIndexReturn;
 
@@ -435,7 +435,7 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
     // and also clear it every 1000 ms since the last time it changed.
     // Next, keep a mapping of typeahead values to indices for faster searching.
     // And, for the user's sake, let them know when their typeahead can't match anything anymore
-    const [getCurrentTypeahead, setCurrentTypeahead] = usePassiveState<string | null, h.JSX.TargetedEvent<ChildElement, Event>>(useStableCallback((currentTypeahead, prev, reason) => {
+    const [getCurrentTypeahead, setCurrentTypeahead] = usePassiveState<string | null, Event>(useStableCallback((currentTypeahead, prev, reason) => {
         const handle = setTimeout(() => { setCurrentTypeahead(null, undefined!); setInvalidTypeahead(null); }, typeaheadTimeout ?? 1000);
         updateBasedOnTypeaheadChange(currentTypeahead, reason!);
         return () => clearTimeout(handle);
@@ -580,7 +580,7 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
 
 
 
-    function updateBasedOnTypeaheadChange(currentTypeahead: string | null, reason: h.JSX.TargetedEvent<ChildElement, Event>) {
+    function updateBasedOnTypeaheadChange(currentTypeahead: string | null, reason: Event) {
         if (currentTypeahead && sortedTypeaheadInfo.current.length) {
 
 

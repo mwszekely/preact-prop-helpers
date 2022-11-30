@@ -271,7 +271,7 @@ export const DemoUseRovingTabIndex = memo(() => {
         rovingTabIndexReturn: { setTabbableIndex },
         singleSelectionReturn: { setSelectedIndex },
         managedChildrenReturn: { getChildren },
-        typeaheadNavigationReturn: { getCurrentTypeahead, invalidTypeahead },
+        typeaheadNavigationReturn: { invalidTypeahead },
         rearrangeableChildrenReturn: { useRearrangeableProps: useSortableProps, shuffle }
         //        rearrangeableChildrenReturn: { useRearrangeableProps: useSortableProps, shuffle }
     } = r;

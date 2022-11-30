@@ -5349,8 +5349,8 @@ var bundle = (function (exports) {
    */
   function useModal({ dismissParameters, escapeDismissParameters, focusTrapParameters: { trapActive, ...focusTrapParameters } }) {
       const { open } = dismissParameters;
-      const { getWindow } = escapeDismissParameters;
-      q$1(() => { return getWindow().document; }, [getWindow]);
+      //const { getWindow } = escapeDismissParameters;
+      //const getDocument = useCallback(() => { return getWindow().document; }, [getWindow]);
       const { refElementPopupReturn, refElementSourceReturn } = useDismiss({ dismissParameters, escapeDismissParameters });
       const { focusTrapReturn, refElementReturn } = useFocusTrap({
           focusTrapParameters: { trapActive: open && trapActive, ...focusTrapParameters },
@@ -6630,7 +6630,7 @@ var bundle = (function (exports) {
           },
           sortableChildrenParameters: { compare: q$1((rhs, lhs) => { return lhs.index - rhs.index; }, []) },
       });
-      const { props, context, rovingTabIndexReturn: { setTabbableIndex }, singleSelectionReturn: { setSelectedIndex }, managedChildrenReturn: { getChildren }, typeaheadNavigationReturn: { getCurrentTypeahead, invalidTypeahead }, rearrangeableChildrenReturn: { useRearrangeableProps: useSortableProps, shuffle }
+      const { props, context, rovingTabIndexReturn: { setTabbableIndex }, singleSelectionReturn: { setSelectedIndex }, managedChildrenReturn: { getChildren }, typeaheadNavigationReturn: { invalidTypeahead }, rearrangeableChildrenReturn: { useRearrangeableProps: useSortableProps, shuffle }
       //        rearrangeableChildrenReturn: { useRearrangeableProps: useSortableProps, shuffle }
        } = r;
       const children = getChildren();

@@ -64,7 +64,7 @@ export interface UseRovingTabIndexParameters<TabbableChildElement extends Elemen
          * 
          * **MUST** be stable!
          */
-        onTabbableIndexChange: null | OnPassiveStateChange<number | null, h.JSX.TargetedEvent<TabbableChildElement>>;
+        onTabbableIndexChange: null | OnPassiveStateChange<number | null, Event>;
     };
 }
 
@@ -92,7 +92,7 @@ export interface UseRovingTabIndexReturnType<TabbableChildElement extends Elemen
     }
 }
 
-export type SetTabbableIndex = <ChildElement2 extends Element>(updater: Parameters<PassiveStateUpdater<number | null, h.JSX.TargetedEvent<ChildElement2>>>[0], reason: h.JSX.TargetedEvent<ChildElement2> | undefined, fromUserInteraction: boolean) => void;
+export type SetTabbableIndex = (updater: Parameters<PassiveStateUpdater<number | null, Event>>[0], reason: Event | undefined, fromUserInteraction: boolean) => void;
 
 //export interface UseRovingTabIndexReturnTypeWithHooks<TabbableChildElement extends Element> extends UseRovingTabIndexReturnTypeInfo<TabbableChildElement> { }
 
@@ -209,7 +209,7 @@ export function useRovingTabIndex<ChildElement extends Element, M extends UseRov
 
         // Notify the relevant children that they should become tabbable/untabbable,
         // but also handle focus management when we changed due to user interaction
-        return setTabbableIndex2(f, reason as h.JSX.TargetedEvent<any>);
+        return setTabbableIndex2(f, reason);
 
 
 
@@ -254,7 +254,7 @@ export function useRovingTabIndex<ChildElement extends Element, M extends UseRov
     const getTabbableAt = useCallback((m: UseRovingTabIndexChildInfo<ChildElement>) => { return m.getTabbable() }, []);
     const setTabbableAt = useCallback((m: UseRovingTabIndexChildInfo<ChildElement>, t: boolean) => { m.setTabbable(t); }, []);
     const isTabbableValid = useCallback((m: UseRovingTabIndexChildInfo<ChildElement>) => { return !m.hidden }, []);
-    const { changeIndex: setTabbableIndex2, getCurrentIndex: getTabbableIndex, reevaluateClosestFit } = useChildrenFlag<UseRovingTabIndexChildInfo<ChildElement>, h.JSX.TargetedEvent<ChildElement>>({
+    const { changeIndex: setTabbableIndex2, getCurrentIndex: getTabbableIndex, reevaluateClosestFit } = useChildrenFlag<UseRovingTabIndexChildInfo<ChildElement>, Event>({
         initialIndex: initiallyTabbedIndex,
         onIndexChange: onTabbableIndexChange,
         getChildren,
