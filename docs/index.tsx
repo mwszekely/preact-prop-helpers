@@ -1,7 +1,7 @@
 import { createContext, h, render, VNode } from "preact";
 import { memo } from "preact/compat";
 import { useCallback, useContext, useRef } from "preact/hooks";
-import { GetIndex, GetValid, GridSingleSelectChildCellInfo, GridSingleSelectChildRowInfo, GridSingleSelectSortableChildCellInfo, GridSingleSelectSortableChildRowInfo, returnNull, returnTrue, useAnimationFrame, useAsyncHandler, UseCompleteGridNavigationReturnType, UseCompleteGridNavigationRowReturnType, useDraggable, useDroppable, useElementSize, useFocusTrap, useHasCurrentFocus, useHasLastFocus, UseListNavigationSingleSelectionChildInfo, useMergedProps, useRefElement, useSortableChildren, useStableCallback, useState } from "..";
+import { GetIndex, GridSingleSelectSortableChildCellInfo, GridSingleSelectSortableChildRowInfo, returnNull, useAnimationFrame, useAsyncHandler, UseCompleteGridNavigationReturnType, UseCompleteGridNavigationRowReturnType, useDraggable, useDroppable, useElementSize, useFocusTrap, useHasCurrentFocus, useHasLastFocus, useMergedProps, useRefElement, useStableCallback, useState } from "..";
 import { ElementSize } from "../dom-helpers/use-element-size";
 //import { useGridNavigation, UseGridNavigationCell, UseGridNavigationRow } from "../use-grid-navigation";
 import { CompleteGridNavigationContext, CompleteGridNavigationRowContext, useCompleteGridNavigation, useCompleteGridNavigationCell, useCompleteGridNavigationRow } from "..";
@@ -50,6 +50,7 @@ const DemoUseDraggable = () => {
 }
 
 const DemoUseElementSizeAnimation = () => {
+    return <div />;
     const [height, setHeight] = useState(0);
     const [angle, setAngle] = useState(0);
     useAnimationFrame({
@@ -61,14 +62,16 @@ const DemoUseElementSizeAnimation = () => {
 
     const [elementSize, setElementSize] = useState<ElementSize | null>(null);
 
-    const { elementSizeReturn: { getSize }, refElementReturn: { propsStable } } = useElementSize<HTMLDivElement>({
+    const { refElementReturn: { propsStable } } = useElementSize<HTMLDivElement>({
         elementSizeParameters: { onSizeChange: setElementSize, getObserveBox: null },
         refElementParameters: { onElementChange: undefined }
     });
 
     return (
-        <div {...useMergedProps(propsStable, { ref: undefined, className: "demo", style: { height: `${(height * 100) + 100}px` } })}>
-            <pre>{JSON.stringify(elementSize, null, 2)}</pre>
+        <div style="height: 300px; width: 300px; contain: strict;">
+            <div {...useMergedProps(propsStable, { ref: undefined, className: "demo", style: { height: `${(height * 100) + 100}px` } })}>
+                <pre>{JSON.stringify(elementSize, null, 2)}</pre>
+            </div>
         </div>
     );
 }
@@ -559,8 +562,8 @@ export const DemoUseGrid = memo(() => {
     //const [, setLastFocusedInner, _getLastFocusedInner] = useState(false);
     //const { props } = useHasFocus<HTMLTableSectionElement>({ onLastFocusedInnerChanged: setLastFocusedInner, getDocument });
 
-    const [tabbableColumn, setTabbableColumn, getTabbableColumn] = useState<number | null>(null);
-    const [selectedRow, setSelectedRow, getSelectedRow] = useState<number | null>(null);
+    const [tabbableColumn, setTabbableColumn, _getTabbableColumn] = useState<number | null>(null);
+    const [selectedRow, setSelectedRow, _getSelectedRow] = useState<number | null>(null);
     const [tabbableRow, setTabbableRow] = useState<number | null>(null);
     //const getHighestIndex = useCallback(() => getChildren().getHighestIndex(), []);
     //const getChildren = useCallback<typeof getChildren2>(() => { return getChildren2() }, []);
@@ -575,7 +578,7 @@ export const DemoUseGrid = memo(() => {
 
 
     const ret: UseCompleteGridNavigationReturnType<HTMLTableSectionElement, HTMLTableRowElement, HTMLTableCellElement, CustomGridInfo, CustomGridRowInfo> = useCompleteGridNavigation<HTMLTableSectionElement, HTMLTableRowElement, HTMLTableCellElement, CustomGridInfo, CustomGridRowInfo>({
-        singleSelectionParameters: { initiallySelectedIndex: selectedRow, onSelectedIndexChange: setSelectedRow },
+        singleSelectionParameters: { initiallySelectedIndex: selectedRow, setSelectedIndex: setSelectedRow },
         gridNavigationParameters: { onTabbableColumnChange: setTabbableColumn },
         linearNavigationParameters: { disableArrowKeys: false, disableHomeEndKeys: false, navigatePastEnd: "wrap", navigatePastStart: "wrap", pageNavigationSize: 0.1 },
         //managedChildrenReturn: { getChildren },
@@ -590,11 +593,10 @@ export const DemoUseGrid = memo(() => {
     const {
         context,
         props,
-        managedChildrenReturn,
         //rearrangeableChildrenParameters: { getHighestChildIndex: ghci, getValid: gv },
         rearrangeableChildrenReturn: { useRearrangeableProps }
     } = ret;
-    const { getChildren: getChildren2 } = managedChildrenReturn;
+    //const { getChildren: getChildren2 } = managedChildrenReturn;
 
 
     /*const {
@@ -676,17 +678,16 @@ export const DemoUseGrid = memo(() => {
 interface CustomGridInfo extends GridSingleSelectSortableChildRowInfo<HTMLTableRowElement, HTMLTableCellElement> { foo: "bar" }
 interface CustomGridRowInfo extends GridSingleSelectSortableChildCellInfo<HTMLTableCellElement> { bar: "baz" }
 
-function identity<T>(t: T) { return t; }
 //type GridRowContext<ParentElement extends Element, RowElement extends Element> = CompleteGridNavigationContext<ParentElement, RowElement>;
 //type GridCellContext<RowElement extends Element, CellElement extends Element> = CompleteGridNavigationRowContext<RowElement, CellElement>;
 const GridRowContext = createContext<CompleteGridNavigationContext<HTMLTableSectionElement, HTMLTableRowElement, HTMLTableCellElement, CustomGridInfo, CustomGridRowInfo>>(null!);
-const GridCellContext = createContext<CompleteGridNavigationRowContext<HTMLTableRowElement, HTMLTableCellElement,  CustomGridRowInfo>>(null!);
+const GridCellContext = createContext<CompleteGridNavigationRowContext<HTMLTableRowElement, HTMLTableCellElement, CustomGridRowInfo>>(null!);
 
 const _Prefix = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const DemoUseGridRow = memo((({ index }: { index: number }) => {
     const [_randomWord] = useState(() => RandomWords[index/*Math.floor(Math.random() * (RandomWords.length - 1))*/]);
 
-    const [tabbableColumn, setTabbableColumn, getTabbableColumn] = useState<number | null>(null);
+    const [_tabbableColumn, setTabbableColumn, _getTabbableColumn] = useState<number | null>(null);
     //const getHighestIndex = useCallback(() => getChildren().getHighestIndex(), []);
     //const getChildren = useCallback(() => { return getChildren2() }, []);
     const hidden = (index === 3);

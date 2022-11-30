@@ -18,12 +18,13 @@ export type OnPassiveStateChange<S, R> = ((value: S, prevValue: S | undefined, r
 export function useEnsureStability<T extends any[]>(parentHookName: string, ...values: T) {
     const helperToEnsureStability = useRef<Array<T>>([]);
     const shownError = useRef<Array<boolean>>([]);
-    useHelper(values.length as any, 0);
+    useHelper(values.length as any, -1);
     values.forEach(useHelper);
     return;
 
 
-    function useHelper<U extends T>(value: U, index: number) {
+    function useHelper<U extends T>(value: U, i: number) {
+        const index = i + 1;
 
         // Make sure that the provided functions are perfectly stable across renders
         if (helperToEnsureStability.current[index] === undefined)
@@ -33,7 +34,7 @@ export function useEnsureStability<T extends any[]>(parentHookName: string, ...v
             if (!shownError.current[index]) {
                 /* eslint-disable no-debugger */
                 debugger;
-                console.error(`The hook ${parentHookName} requires some or all of its arguments remain stable across each render; please check the ${index}-indexed argument.`);
+                console.error(`The hook ${parentHookName} requires some or all of its arguments remain stable across each render; please check the ${i}-indexed argument (${i >= 0? JSON.stringify(values[i]) : "the number of supposedly stable elements"}).`);
                 shownError.current[index] = true;
             }
         }

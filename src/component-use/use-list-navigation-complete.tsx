@@ -236,3 +236,10 @@ export function useCompleteListNavigationChild<ChildElement extends Element, M e
     }
 
 }
+
+/*
+function foo<ParentElement extends Element, ChildElement extends Element, M extends UseListNavigationSingleSelectionSortableChildInfo<ChildElement>>(p: UseCompleteListNavigationParameters<ParentElement, ChildElement, M>) {
+    const { singleSelectionReturn } = useCompleteListNavigation<ParentElement, ChildElement, M>(p);
+    const selectedIndex = 0;
+    useSingleSelectionDeclarative({ singleSelectionReturn, singleSelectionDeclarativeParameters: { selectedIndex } })
+}*/

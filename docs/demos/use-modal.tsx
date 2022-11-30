@@ -21,7 +21,7 @@ export function DemoUseModal(props: { parentDepth?: number }) {
 
     const [open, setOpen] = useState(false);
 
-    const focusOpener = (e: any) =>buttonRef.current?.focus();
+    const focusOpener = () =>buttonRef.current?.focus();
 
     const {
         propsPopup,
