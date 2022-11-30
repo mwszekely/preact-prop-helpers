@@ -12,8 +12,8 @@ import { UseListNavigationSingleSelectionChildParameters } from "./use-list-navi
 const _dummy = 0;
 
 export interface UseListNavigationSingleSelectionSortableChildInfo<TabbableChildElement extends Element> extends UseListNavigationSingleSelectionChildInfo<TabbableChildElement>, UseSortableChildInfo {}
-export interface UseListNavigationSingleSelectionSortableParameters<_ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationSingleSelectionChildInfo<ChildElement>> extends Omit<UseListNavigationSingleSelectionParameters<ChildElement, M>, "linearNavigationParameters">, UseSortableChildrenParameters<M> {
-    linearNavigationParameters: Omit<UseListNavigationSingleSelectionParameters<ChildElement, M>["linearNavigationParameters"], "indexDemangler" | "indexMangler">
+export interface UseListNavigationSingleSelectionSortableParameters<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationSingleSelectionChildInfo<ChildElement>> extends Omit<UseListNavigationSingleSelectionParameters<ParentOrChildElement, ChildElement, M>, "linearNavigationParameters">, UseSortableChildrenParameters<M> {
+    linearNavigationParameters: Omit<UseListNavigationSingleSelectionParameters<ParentOrChildElement, ChildElement, M>["linearNavigationParameters"], "indexDemangler" | "indexMangler">
 }
 export interface UseListNavigationSingleSelectionSortableReturnType<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationSingleSelectionSortableChildInfo<ChildElement>> extends UseListNavigationSingleSelectionReturnType<ParentOrChildElement, ChildElement>, Omit<UseSortableChildrenReturnType<ParentOrChildElement, M>, "linearNavigationParameters"> { }
 export interface UseListNavigationSingleSelectionSortableChildParameters<ChildElement extends Element> extends UseListNavigationSingleSelectionChildParameters<ChildElement> { }

@@ -1,6 +1,6 @@
 import { createContext, VNode } from "preact";
 import { memo, useCallback, useContext } from "preact/compat";
-import { GetIndex, GetValid, UseListNavigationSingleSelectionChildInfo, UseListNavigationSingleSelectionSortableChildInfo, useMergedProps, useSortableChildren, useStableCallback } from "../../index";
+import { GetIndex, UseListNavigationSingleSelectionSortableChildInfo, useMergedProps, useStableCallback } from "../../index";
 
 import { useState } from "../../preact-extensions/use-state";
 
@@ -271,7 +271,7 @@ export const DemoUseRovingTabIndex = memo(() => {
         rovingTabIndexReturn: { setTabbableIndex },
         singleSelectionReturn: { setSelectedIndex },
         managedChildrenReturn: { getChildren },
-        typeaheadNavigationReturn: { currentTypeahead },
+        typeaheadNavigationReturn: { getCurrentTypeahead, invalidTypeahead },
         rearrangeableChildrenReturn: { useRearrangeableProps: useSortableProps, shuffle }
         //        rearrangeableChildrenReturn: { useRearrangeableProps: useSortableProps, shuffle }
     } = r;
@@ -315,7 +315,7 @@ export const DemoUseRovingTabIndex = memo(() => {
             </p>
             <label># of items<input type="number" value={count} min={0} onInput={e => { e.preventDefault(); setCount(e.currentTarget.valueAsNumber) }} /></label>
             <button onClick={() => shuffle(children)}>Shuffle</button>
-            <label>Tabbable index: <input type="number" value={tabbableIndex ?? undefined} onInput={e => { e.preventDefault(); setTabbableIndex(e.currentTarget.valueAsNumber, false); }} /></label>
+            <label>Tabbable index: <input type="number" value={tabbableIndex ?? undefined} onInput={e => { e.preventDefault(); setTabbableIndex(e.currentTarget.valueAsNumber, e, false); }} /></label>
             <label>Selected index: <input type="number" value={selectedIndex ?? undefined} onInput={e => { e.preventDefault(); setSelectedIndex(e.currentTarget.valueAsNumber); }} /></label>
             <label>Selection mode:
                 <label><input name="rti-demo-selection-mode" type="radio" checked={selectionMode == 'focus'} onInput={e => { e.preventDefault(); setSelectionMode("focus"); }} /> On focus</label>
@@ -327,7 +327,7 @@ export const DemoUseRovingTabIndex = memo(() => {
                     <ol {...(useSortableProps(useMergedProps(props, { children: jsxChildren })))} />
                 </ListNavigationSingleSelectionChildContext.Provider>
             </SelectionModeContext.Provider>
-            {currentTypeahead && <div>Typeahead: {currentTypeahead}</div>}
+            {<div>{invalidTypeahead && "Invalid typeahead (no matches for the current string)"}</div>}
         </div>
     );
 })

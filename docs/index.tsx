@@ -574,7 +574,7 @@ export const DemoUseGrid = memo(() => {
     });*/
 
 
-    const ret: UseCompleteGridNavigationReturnType<HTMLTableSectionElement, HTMLTableRowElement, CustomGridInfo> = useCompleteGridNavigation<HTMLTableSectionElement, HTMLTableRowElement, CustomGridInfo>({
+    const ret: UseCompleteGridNavigationReturnType<HTMLTableSectionElement, HTMLTableRowElement, HTMLTableCellElement, CustomGridInfo, CustomGridRowInfo> = useCompleteGridNavigation<HTMLTableSectionElement, HTMLTableRowElement, HTMLTableCellElement, CustomGridInfo, CustomGridRowInfo>({
         singleSelectionParameters: { initiallySelectedIndex: selectedRow, onSelectedIndexChange: setSelectedRow },
         gridNavigationParameters: { onTabbableColumnChange: setTabbableColumn },
         linearNavigationParameters: { disableArrowKeys: false, disableHomeEndKeys: false, navigatePastEnd: "wrap", navigatePastStart: "wrap", pageNavigationSize: 0.1 },
@@ -673,13 +673,13 @@ export const DemoUseGrid = memo(() => {
     );
 });
 
-interface CustomGridInfo extends GridSingleSelectSortableChildRowInfo<HTMLTableRowElement> { foo: "bar" }
+interface CustomGridInfo extends GridSingleSelectSortableChildRowInfo<HTMLTableRowElement, HTMLTableCellElement> { foo: "bar" }
 interface CustomGridRowInfo extends GridSingleSelectSortableChildCellInfo<HTMLTableCellElement> { bar: "baz" }
 
 function identity<T>(t: T) { return t; }
 //type GridRowContext<ParentElement extends Element, RowElement extends Element> = CompleteGridNavigationContext<ParentElement, RowElement>;
 //type GridCellContext<RowElement extends Element, CellElement extends Element> = CompleteGridNavigationRowContext<RowElement, CellElement>;
-const GridRowContext = createContext<CompleteGridNavigationContext<HTMLTableSectionElement, HTMLTableRowElement, CustomGridInfo>>(null!);
+const GridRowContext = createContext<CompleteGridNavigationContext<HTMLTableSectionElement, HTMLTableRowElement, HTMLTableCellElement, CustomGridInfo, CustomGridRowInfo>>(null!);
 const GridCellContext = createContext<CompleteGridNavigationRowContext<HTMLTableRowElement, HTMLTableCellElement,  CustomGridRowInfo>>(null!);
 
 const _Prefix = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -695,7 +695,7 @@ const DemoUseGridRow = memo((({ index }: { index: number }) => {
 
     //    const getValid = useStableCallback<GetValid>((i) => !!(ret.managedChildReturn.getChildren().getAt(i)?.hidden));
 
-    const contextFromParent = useContext(GridRowContext) as CompleteGridNavigationContext<HTMLTableSectionElement, HTMLTableRowElement, CustomGridInfo>;
+    const contextFromParent = useContext(GridRowContext) as CompleteGridNavigationContext<HTMLTableSectionElement, HTMLTableRowElement, HTMLTableCellElement, CustomGridInfo, CustomGridRowInfo>;
     const ret: UseCompleteGridNavigationRowReturnType<HTMLTableRowElement, HTMLTableCellElement, CustomGridInfo, CustomGridRowInfo> = useCompleteGridNavigationRow<HTMLTableRowElement, HTMLTableCellElement, CustomGridInfo, CustomGridRowInfo>({
         asChildRowParameters: {
             completeGridNavigationRowParameters: { foo: "bar" },

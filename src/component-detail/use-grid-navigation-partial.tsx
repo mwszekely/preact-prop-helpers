@@ -18,15 +18,15 @@ export function useGridNavigationCellProps<CellElement extends Element>(r: UseGr
 }*/
 
 
-export interface GridChildRowInfo<RowElement extends Element, CellElement extends Element> extends UseListNavigationChildInfo<RowElement> { setTabbableColumnIndex: SetTabbableIndex<CellElement> }
+export interface GridChildRowInfo<RowElement extends Element, CellElement extends Element> extends UseListNavigationChildInfo<RowElement> { setTabbableColumnIndex: SetTabbableIndex }
 export interface GridChildCellInfo<CellElement extends Element> extends UseListNavigationChildInfo<CellElement> {
 }
 
-export interface UseGridNavigationParameters<RowElement extends Element, CellElement extends Element, M extends GridChildRowInfo<RowElement, CellElement>> extends Omit<UseListNavigationParameters<RowElement, M>, "linearNavigationParameters"> {
+export interface UseGridNavigationParameters<ParentOrChildElement extends Element, RowElement extends Element, CellElement extends Element, M extends GridChildRowInfo<RowElement, CellElement>> extends Omit<UseListNavigationParameters<ParentOrChildElement, RowElement, M>, "linearNavigationParameters"> {
     gridNavigationParameters: {
-        onTabbableColumnChange: OnPassiveStateChange<number | null, h.JSX.TargetedFocusEvent<any>>;
+        onTabbableColumnChange: OnPassiveStateChange<number | null, h.JSX.TargetedEvent<any>>;
     };
-    linearNavigationParameters: Omit<UseListNavigationParameters<RowElement, M>["linearNavigationParameters"], "navigationDirection">
+    linearNavigationParameters: Omit<UseListNavigationParameters<ParentOrChildElement, RowElement, M>["linearNavigationParameters"], "navigationDirection">
 }
 export interface UseGridNavigationReturnType<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element,  RM extends GridChildRowInfo<RowElement, CellElement>, CM extends GridChildCellInfo<CellElement>> extends UseListNavigationReturnType<ParentOrRowElement, RowElement> {
     gridNavigationRowContext: UseGridNavigationRowParameters<RowElement, CellElement, RM, CM>["asChildRowParameters"]["gridNavigationRowContext"]
@@ -42,14 +42,14 @@ export interface UseGridNavigationRowParameters<RowElement extends Element, Cell
             _c?: CellElement;
          
             gridNavigationRowParameters: {
-                setTabbableRow: SetTabbableIndex<RowElement>; // (updater: Parameters<StateUpdater<number | null>>[0], fromUserInteraction: boolean) => void;
+                setTabbableRow: SetTabbableIndex; // (updater: Parameters<StateUpdater<number | null>>[0], fromUserInteraction: boolean) => void;
                 getCurrentTabbableColumn: () => (number | null);
-                setCurrentTabbableColumn: PassiveStateUpdater<number | null, h.JSX.TargetedFocusEvent<CellElement>>;
+                setCurrentTabbableColumn: PassiveStateUpdater<number | null, h.JSX.TargetedEvent<CellElement>>;
             }
         }
     };
-    asParentRowParameters: Omit<UseListNavigationParameters<CellElement, CM>, "linearNavigationParameters"> & {
-        linearNavigationParameters: Omit<UseListNavigationParameters<CellElement, CM>["linearNavigationParameters"], "navigationDirection">
+    asParentRowParameters: Omit<UseListNavigationParameters<RowElement, CellElement, CM>, "linearNavigationParameters"> & {
+        linearNavigationParameters: Omit<UseListNavigationParameters<RowElement, CellElement, CM>["linearNavigationParameters"], "navigationDirection">
     }
 
 }
@@ -79,10 +79,10 @@ export interface UseGridNavigationCellParameters<RowElement extends Element, Cel
         _c?: CellElement;
         gridNavigationCellParameters: {
             getRowIndex: () => number;
-            setTabbableRow:  SetTabbableIndex<RowElement>; //(u: Parameters<StateUpdater<number | null>>[0], fromUserInteraction: boolean) => void;
+            setTabbableRow:  SetTabbableIndex; //(u: Parameters<StateUpdater<number | null>>[0], fromUserInteraction: boolean) => void;
             getCurrentTabbableColumn: () => (number | null);
-            setCurrentTabbableColumn: PassiveStateUpdater<number | null, h.JSX.TargetedFocusEvent<CellElement>>;
-            setTabbableCell: SetTabbableIndex<CellElement>; //(updater: Parameters<StateUpdater<number | null>>[0], fromUserInteraction: boolean) => void;
+            setCurrentTabbableColumn: PassiveStateUpdater<number | null, h.JSX.TargetedEvent<CellElement>>;
+            setTabbableCell: SetTabbableIndex; //(updater: Parameters<StateUpdater<number | null>>[0], fromUserInteraction: boolean) => void;
         }
     }
 }
@@ -95,19 +95,19 @@ export function useGridNavigation<ParentOrRowElement extends Element, RowElement
     managedChildrenReturn,
     typeaheadNavigationParameters,
     ..._void2
-}: UseGridNavigationParameters<RowElement, CellElement, RM>): UseGridNavigationReturnType<ParentOrRowElement, RowElement, CellElement, RM, CM> {
+}: UseGridNavigationParameters<ParentOrRowElement, RowElement, CellElement, RM>): UseGridNavigationReturnType<ParentOrRowElement, RowElement, CellElement, RM, CM> {
     const { getChildren } = managedChildrenReturn;
     const { initiallyTabbedIndex } = rovingTabIndexParameters
 
-    const [getCurrentTabbableColumn, setCurrentTabbableColumn] = usePassiveState<number | null, h.JSX.TargetedFocusEvent<CellElement>>(onTabbableColumnChange, useStableCallback(() => { return (initiallyTabbedIndex ?? 0) }));
+    const [getCurrentTabbableColumn, setCurrentTabbableColumn] = usePassiveState<number | null, h.JSX.TargetedEvent<CellElement>>(onTabbableColumnChange, useStableCallback(() => { return (initiallyTabbedIndex ?? 0) }));
 
-    const onTabbableIndexChangeOverride = useStableCallback((i: number | null, p: number | null | undefined, reason: h.JSX.TargetedEvent<RowElement, Event>) => {
+    const onTabbableIndexChangeOverride = useStableCallback((i: number | null, p: number | null | undefined, reason: h.JSX.TargetedEvent<RowElement, Event> | undefined) => {
         const children = getChildren();
         onTabbableIndexChange?.(i, p, reason);
         if (p != null)
-            children.getAt(p)?.setTabbableColumnIndex(null, reason as unknown as h.JSX.TargetedFocusEvent<CellElement>, false);
+            children.getAt(p)?.setTabbableColumnIndex(null, reason as unknown as h.JSX.TargetedEvent<CellElement>, false);
         if (i != null)
-            children.getAt(i)?.setTabbableColumnIndex(getCurrentTabbableColumn(), reason as unknown as h.JSX.TargetedFocusEvent<CellElement>, false);
+            children.getAt(i)?.setTabbableColumnIndex(getCurrentTabbableColumn(), reason as unknown as h.JSX.TargetedEvent<CellElement>, false);
 
     })
 

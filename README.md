@@ -14,16 +14,14 @@ return <div {...useElementSizeProps(props)}>I'm {offsetHeight} pixels tall!</div
 
 This library follows a few conventions:
 * Re-render as few times as possible.  E.G. `useElementSize` doesn't return the size of the element by re-rendering, but you can *choose* to re-render like in the example above. Composite hooks with lots of children (e.g. `useRovingTabIndex`) similarly try to keep re-renders on the parent to a minimum.
-    * Re-rendering is only necessary if you need the result, well, while rendering.  If you just need the result in an event handler, then re-rendering to show nothing new is a huge waste!
-* Be composable; parameters and return types are all typed *very* specifically into single objects (like `return { useRefElementReturn: { getElement } }`) to make swizzling all these different parameters back and forth as foolproof as possible.
-    * See below for specific naming conventions
+    * In the case of `useElementSize`, re-rendering is only necessary if you need the result, well, while rendering.  If you just need the result in an event handler, then re-rendering to show nothing new can be a huge waste, especially for common hooks like `useRefElement`.
 * As much as possible, no specific DOM restrictions are imposed and, for hooks with children, those children can be anywhere descendent in the tree (except for `useSortableChildren`). Nesting hooks, even of the same type, is also fine.
 * Organizationally, some hooks exist primarily to be used as a part of a larger hook.  Hooks within the `component-use` folder are generally "ready-to-use" and don't require much passing of parameters back and forth, but are not fully extensible.  Hooks within `component-detail` are the lower-level building blocks that make up those "ready-to-use" complete hooks, but they're much more time-consuming to use.
     * You can also just copy and paste one of the complete hooks somewhere else and use it as a new building block...
 * Break work up into sub-hooks that can be called in remote locations. E.G. `useRovingTabIndex` returns information that you can toss into a `Context` so that each child can call `useRovingTabIndexChild` with that information, and this can happen pretty much anywhere decendent in the DOM that you'd like.
 * Children provide their data to the parent, never the other way around. E.G. `useListNavigation` can filter children, but it doesn't take an array of which children to filter out; each child reports its own status as filtered/unfiltered, and the parent responds to that.
     * This means that the child data is *always* the single source of truth, and maps nicely to how components are built and diffed.
-* **Naming conventions:**
+* Be composable; parameters and return types are all typed *very* specifically into single objects (like `return { useRefElementReturn: { getElement } }`) to make swizzling all these different parameters back and forth as foolproof as possible:
     * Hooks return information in the form of an object with properties named `${hookName}Return`. This is to disambiguate which return values are a result of which hook, especially when one hook itself uses multiple hooks, e.g. list navigation will return `{ rovingTabIndexReturn: { ... }, linearNavigationReturn: { ... } }`.
     * Hooks take parameters in the form of `${hookName}Parameters: { some: "properties" }` for themselves, or `${hookName}Return` when it requires information from another hook (many, many hooks rely on the return of `useRefElement`, for example). In most cases, you can simply pass the entire `${hookName}Return` directly from one hook to another.
     * Some returns/parameters are `${hookName}Context`, which must be placed within a `Context` object, then retrieved with `useContext` and passed to the child hook that needs it.
@@ -31,7 +29,7 @@ This library follows a few conventions:
     * Complex, composite hooks (like `useCompleteListNavigation`) will collect all the sub-hooks' props together and bundle them up into a single object called `props` in the root of the returned object (the original props will all still be available in their own objects as `propsUnstable` or whatever; the combined `props` object at the root is for convenience.).
     * Complex, composite hooks (like `useCompleteListNavigation`) will simiarly collect all the sub-hooks' `Context`s together and bundle them up into a single object called `context` in the root of the returned object.
 
-The name (Preact Prop Hooks) comes from the fact that most of these hooks require modifying the props that were going to be passed to an element in order to function (generally just the `ref` on those props, but still).  It's since grown in scope to include a bunch of general helper hooks as well (like `useAsync`), but `useMergedProps` truly was the core at one point.
+The name (Preact Prop Helpers) comes from the fact that most of these hooks require modifying the props that were going to be passed to an element in order to function (generally just the `ref` on those props, but still).  It's since grown in scope to include a bunch of general helper hooks as well (like `useAsync`), but `useMergedProps` truly was the core at one point.
 
 ## Summary of available hooks
 
@@ -42,7 +40,7 @@ The name (Preact Prop Hooks) comes from the fact that most of these hooks requir
 <table>
     <thead><tr><th>Hook</th><th>Description</tthd><th>Used by</th></tr></thead>
     <tbody>
-    <tr><th colspan="3">"No Assembly Required" hooks for your complex components</th></tr>
+    <tr><th colspan="3">"Minimal Assembly Required" hooks for your complex components</th></tr>
     <tr><td>useCompleteListNavigation</td><td>Navigate through multiple children as **one** component with the arrow keys or a typeahead search. Optionally, one child at a time can be marked as "selected". Optionally, all children can be sorted or arbitrarily reordered.</td><td></td></tr>
     <tr><td>useCompleteGridNavigation</td><td>useCompleteListNavigation in two dimensions. Sorting and selection apply to the rows only. This is not limited to tables and can be used for complex lists as well.</td><td></td></tr>
     <tr><td>useModal</td><td>Create an element that (optionally) traps focus and (optionally) can only be closed in response to certain events, such as the Escape key or clicking on a backdrop.</td><td></td></tr>
@@ -92,39 +90,9 @@ The name (Preact Prop Hooks) comes from the fact that most of these hooks requir
     </tbody>
 </table>
 
-|Hook|Description|
-|------|------|
-|`useMergedProps` (& `useMergedClasses`, `useMergedRefs`, `useMergedStyles`, `useMergedChildren`)	|Allows a component to use props from two (or more) separate unrelated sources.|
-|`useChildManager` (& `useChildFlag`)				|Allows for child → parent communication, and more efficient parent → child communication (e.g. telling a single child to change itself instead of rerendering all children).|
-|`useListNavigation` (& `useRovingTabIndex`, `useLinearNavigation`, `useTypeaheadNavigation`)	|Implements keyboard navigation for a list-based component (arrow keys, home keys, typeahead, etc.). Also supports re-ordering &amp; filtering children.|
-|`useGridNavigation`								|Complement to `useListNavigation` that is 2-dimensional. Also supports re-ordering &amp; filtering. |
-|`useAsyncHandler` (& `useAsync`)					|Creates a synchronous event handler from an asynchronous one, and provides the component with the information it needs to display the current async state effectively. `useAsync` is a version that operates on any async function, instead of just event handlers.|
-|`useRefElement`									|Allows a component to use the `Element` that it actually renders.|
-|`usePassiveState`                                  |Offshoot of `useState` that, instead of re-rendering, runs a `useEffect`-esque effect & cleanup function when the state changes.|
-|`useElementSize`									|Allows a component to measure the size of the element it renders|
-|`useLogicalDirection`								|Lets a component measure its own "text flow" direction (is the inline direction ltr or rtl? is the block direction vertical or horizontal? etc.), and convert between physical and logical dimensions (e.g. knowing that "inline-start" is equivalent to "left" in this writing mode).|
-|`useHasCurrentFocus`                               |Allows a component to detect if it or its children currently have focus (i.e. have received `focusIn` but not `focusOut`)|
-|`useHasLastFocus` (& `useActiveElement`)			|Allows a component to detect if it is still the *most recently* focused element, ignoring, for example, clicking on the body or non-focusable text.|
-|`useFocusTrap` (& `useBlockingElement`)			|Allows a component to make itself modal so that no interactions outside of it are considered, primarily for dialogs and such, restoring focus when done.|
-|`useDraggable` & `useDroppable`					|Allows a component to quickly implement the Drag & drop API, returning information about the current operation.|
-|`useDocumentClass`                                 |Allows you to add a class to, e.g., the root `<html>` element, and then remove it on unmount automatically.|
-|`useGlobalEventHandler`							|Ensures an event handler is attached to `window`, `document`, etc. as long as the component is mounted.|
-|`useLocalEventHandler`								|Alternate way of attaching/detaching an event handler to the component, primarily for 3rd party APIs.|
-|`useRandomId`										|Allows a component to use a randomly-generated ID. Also lets another component reference whatever ID was used, e.g. in a `for` or `aria-labelledby` prop.|
-|`useSortableChildren`                              |A component using this hook can re-order its immediate children arbitrarily in response to something.|
-|`usePress`                                         |Lets you use a more comprehensive event than `onClick` that works around common edge cases like double-clicking text selection.|
-|`useChildrenHaveFocus`|                            |Allows a component to determine if focus is contained within any of its child elements without using a parent element (i.e. if any of the given elements have focus)|
-|`useTimeout`, `useInterval`, `useAnimationFrame`	|Runs the specified function (which doesn't need to be stable) with the given delay/interval/on every frame. In particular `useTimeout` is very effective as "`useEffect` but on a delay".|
-|`useStableCallback`								|`useCallback`, but doesn't require dependencies and is always stable. __Cannot be used during render__, only during event handlers, `useLayoutEffect`, etc.|
-|`useStableGetter`									|Allows you to use some variable within `useEffect` or `useCallback` without including it in a dependency array. __Cannot be used during render__, only during event handlers, `useLayoutEffect`, etc.|
-|`useState`											|Identical to the built-in, but returns a third value, `getState`, that is stable everywhere, and __can be used during render__. In general, this is the *only* getter that can be used there.|
-|`usePersistentState`								|Identical to `useState`, but persists across browsing sessions, separate tabs, etc.|
-|`useEffect`, `useLayoutEffect`						|Identical to the built-ins, but provides previous dependency values as well as a list of what exactly changed (mainly useful for debugging). In most cases, the built-ins are just fine.|
-|`useForceUpdate`|Returns a function that forces the component that uses it to re-render itself when called (any children just follow normal diffing rules past that point). The returned function is completely stable.|
-|`useMutationObserver`								|`MutationObserver`, but In a Hook™!|
-|`useMediaQuery`									|Measures if a given media query matches the device or not.|
 
 # General Purpose Prop Hooks
+(TODO: reorder these under their proper headings)
 
 These hooks can all be used to modify the props that were going to be passed to an element to "enhance" them with special behavior.  `useElementSize`, for example, "enhances" an element with the ability to report its size during render by using its `ref` in a `ResizeObserver`.  `useDraggable` "enhances" an element with the ability to be dragged and report its dragging state during render, etc.
 

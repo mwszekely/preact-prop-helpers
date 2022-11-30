@@ -15,12 +15,12 @@ import { useStableObject } from "../preact-extensions/use-stable-getter";
 import { usePress, UsePressParameters, UsePressReturnType } from "./use-press";
 
 
-export interface UseCompleteGridNavigationParameters<_ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, M extends GridSingleSelectSortableChildRowInfo<RowElement, CellElement>> extends
-    Omit<UseGridNavigationSingleSelectionSortableParameters<RowElement, CellElement, M>, "managedChildrenReturn" | "linearNavigationParameters" | "typeaheadNavigationParameters" | "rearrangeableChildrenParameters" | "rovingTabIndexParameters"> {
-    linearNavigationParameters: Omit<UseGridNavigationSingleSelectionParameters<RowElement, CellElement, M>["linearNavigationParameters"], "getHighestIndex" | "indexMangler" | "indexDemangler" | "isValid">;
-    typeaheadNavigationParameters: Omit<UseGridNavigationSingleSelectionParameters<RowElement, CellElement, M>["typeaheadNavigationParameters"], "getHighestIndex" | "indexMangler" | "indexDemangler" | "isValid">;
-    rearrangeableChildrenParameters: Omit<UseGridNavigationSingleSelectionSortableParameters<RowElement, CellElement, M>["rearrangeableChildrenParameters"], "getHighestChildIndex" | "isValid">;
-    rovingTabIndexParameters: Omit<UseGridNavigationSingleSelectionSortableParameters<RowElement, CellElement, M>["rovingTabIndexParameters"], "initiallyTabbedIndex">;
+export interface UseCompleteGridNavigationParameters<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, M extends GridSingleSelectSortableChildRowInfo<RowElement, CellElement>> extends
+    Omit<UseGridNavigationSingleSelectionSortableParameters<ParentOrRowElement, RowElement, CellElement, M>, "managedChildrenReturn" | "linearNavigationParameters" | "typeaheadNavigationParameters" | "rearrangeableChildrenParameters" | "rovingTabIndexParameters"> {
+    linearNavigationParameters: Omit<UseGridNavigationSingleSelectionParameters<ParentOrRowElement, RowElement, CellElement, M>["linearNavigationParameters"], "getHighestIndex" | "indexMangler" | "indexDemangler" | "isValid">;
+    typeaheadNavigationParameters: Omit<UseGridNavigationSingleSelectionParameters<ParentOrRowElement, RowElement, CellElement, M>["typeaheadNavigationParameters"], "getHighestIndex" | "indexMangler" | "indexDemangler" | "isValid">;
+    rearrangeableChildrenParameters: Omit<UseGridNavigationSingleSelectionSortableParameters<ParentOrRowElement, RowElement, CellElement, M>["rearrangeableChildrenParameters"], "getHighestChildIndex" | "isValid">;
+    rovingTabIndexParameters: Omit<UseGridNavigationSingleSelectionSortableParameters<ParentOrRowElement, RowElement, CellElement, M>["rovingTabIndexParameters"], "initiallyTabbedIndex">;
 }
 
 export interface UseCompleteGridNavigationRowParameters<RowElement extends Element, CellElement extends Element, RM extends GridSingleSelectSortableChildRowInfo<RowElement, CellElement>, CM extends GridSingleSelectChildCellInfo<CellElement>> {
@@ -275,7 +275,8 @@ export function useCompleteGridNavigationCell<CellElement extends Element, M ext
 
     const {
         hasCurrentFocusParameters,
-        rovingTabIndexChildReturn
+        rovingTabIndexChildReturn,
+        textContentReturn
     } = useGridNavigationSingleSelectionCell<CellElement>({
         gridNavigationCellContext,
         gridNavigationCellParameters,
@@ -336,6 +337,7 @@ export function useCompleteGridNavigationCell<CellElement extends Element, M ext
         pressReturn,
         refElementReturn,
         hasCurrentFocusReturn,
-        managedChildReturn
+        managedChildReturn,
+        textContentReturn
     }
 }

@@ -1,7 +1,8 @@
 import { assertEmptyObject } from "../preact-extensions/use-child-manager";
 import { useListNavigation, useListNavigationChild, UseListNavigationChildInfo, UseListNavigationChildParameters, UseListNavigationChildReturnType, UseListNavigationParameters, UseListNavigationReturnType } from "./use-list-navigation-partial";
-import { SelectableChildInfo, useSingleSelection, useSingleSelectionChild, UseSingleSelectionChildParameters, UseSingleSelectionChildReturnTypeInfo, UseSingleSelectionParameters, UseSingleSelectionReturnType } from "./use-single-selection";
+import { SelectableChildInfo, useSingleSelection, useSingleSelectionChild, UseSingleSelectionChildParameters, UseSingleSelectionChildReturnType, UseSingleSelectionParameters, UseSingleSelectionReturnType } from "./use-single-selection";
 import { useStableCallback } from "../preact-extensions/use-stable-callback";
+import { h } from "preact";
 
 /**
  * We're just gluing together the list navigation and single selection hooks,
@@ -12,10 +13,10 @@ const _dummy = 0;
 export interface UseListNavigationSingleSelectionChildInfo<TabbableChildElement extends Element> extends UseListNavigationChildInfo<TabbableChildElement>, SelectableChildInfo<TabbableChildElement> { }
 
 
-export interface UseListNavigationSingleSelectionParameters<ChildElement extends Element, M extends UseListNavigationSingleSelectionChildInfo<ChildElement>> extends
-    UseListNavigationParameters<ChildElement, M>,
+export interface UseListNavigationSingleSelectionParameters<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationSingleSelectionChildInfo<ChildElement>> extends
+    UseListNavigationParameters<ParentOrChildElement, ChildElement, M>,
     Omit<UseSingleSelectionParameters<ChildElement>, "rovingTabIndexReturn"> {
-    managedChildrenReturn: UseListNavigationParameters<ChildElement, M>["managedChildrenReturn"] & UseSingleSelectionParameters<ChildElement>["managedChildrenReturn"];
+    managedChildrenReturn: UseListNavigationParameters<ParentOrChildElement, ChildElement, M>["managedChildrenReturn"] & UseSingleSelectionParameters<ChildElement>["managedChildrenReturn"];
 }
 
 export interface UseListNavigationSingleSelectionReturnType<ParentOrChildElement extends Element, ChildElement extends Element> extends UseListNavigationReturnType<ParentOrChildElement, ChildElement>, UseSingleSelectionReturnType<ChildElement> { }
@@ -27,7 +28,7 @@ export function useListNavigationSingleSelection<ParentOrChildElement extends El
     singleSelectionParameters,
     managedChildrenReturn,
     ..._void3
-}: UseListNavigationSingleSelectionParameters<ChildElement, M>): UseListNavigationSingleSelectionReturnType<ParentOrChildElement, ChildElement> {
+}: UseListNavigationSingleSelectionParameters<ParentOrChildElement, ChildElement, M>): UseListNavigationSingleSelectionReturnType<ParentOrChildElement, ChildElement> {
     const lnr = useListNavigation<ParentOrChildElement, ChildElement, M>({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, managedChildrenReturn });
     const { rovingTabIndexReturn } = lnr;
     const ssr = useSingleSelection<ChildElement>({ rovingTabIndexReturn, managedChildrenReturn, singleSelectionParameters });
@@ -44,7 +45,7 @@ export interface UseListNavigationSingleSelectionChildParameters<ChildElement ex
     managedChildParameters: UseListNavigationChildParameters<ChildElement>["managedChildParameters"] & UseSingleSelectionChildParameters<ChildElement>["managedChildParameters"];
 }
 
-export interface UseListNavigationSingleSelectionChildReturnType<ChildElement extends Element> extends UseListNavigationChildReturnType<ChildElement>, UseSingleSelectionChildReturnTypeInfo<ChildElement> { }
+export interface UseListNavigationSingleSelectionChildReturnType<ChildElement extends Element> extends UseListNavigationChildReturnType<ChildElement>, UseSingleSelectionChildReturnType<ChildElement> { }
 
 export function useListNavigationSingleSelectionChild<ChildElement extends Element>({
     managedChildParameters: { index, ..._void5 },

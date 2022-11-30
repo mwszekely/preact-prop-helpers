@@ -1,5 +1,5 @@
 import { GridChildCellInfo as gcci, GridChildRowInfo as gcri, useGridNavigation, useGridNavigationCell, UseGridNavigationCellParameters, UseGridNavigationCellReturnType, UseGridNavigationParameters, UseGridNavigationReturnType, useGridNavigationRow, UseGridNavigationRowParameters, UseGridNavigationRowReturnType } from "./use-grid-navigation-partial";
-import { SelectableChildInfo, useSingleSelection, useSingleSelectionChild, UseSingleSelectionChildParameters, UseSingleSelectionChildReturnTypeInfo, UseSingleSelectionParameters, UseSingleSelectionReturnType } from "./use-single-selection";
+import { SelectableChildInfo, useSingleSelection, useSingleSelectionChild, UseSingleSelectionChildParameters, UseSingleSelectionChildReturnType, UseSingleSelectionParameters, UseSingleSelectionReturnType } from "./use-single-selection";
 import { assertEmptyObject } from "../preact-extensions/use-child-manager";
 import { useStableCallback } from "../preact-extensions/use-stable-callback";
 
@@ -16,8 +16,8 @@ export interface GridSingleSelectChildRowInfo<RowElement extends Element, CellEl
 export interface GridSingleSelectChildCellInfo<CellElement extends Element> extends gcci<CellElement> {
 }
 
-export interface UseGridNavigationSingleSelectionParameters<RowElement extends Element, CellElement extends Element, M extends GridSingleSelectChildRowInfo<RowElement, CellElement>> extends UseGridNavigationParameters<RowElement, CellElement, M>, Omit<UseSingleSelectionParameters<RowElement>, "rovingTabIndexReturn"> {
-    managedChildrenReturn: UseGridNavigationParameters<RowElement, CellElement, M>["managedChildrenReturn"] & UseSingleSelectionParameters<RowElement>["managedChildrenReturn"];
+export interface UseGridNavigationSingleSelectionParameters<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, M extends GridSingleSelectChildRowInfo<RowElement, CellElement>> extends UseGridNavigationParameters<ParentOrRowElement, RowElement, CellElement, M>, Omit<UseSingleSelectionParameters<RowElement>, "rovingTabIndexReturn"> {
+    managedChildrenReturn: UseGridNavigationParameters<ParentOrRowElement, RowElement, CellElement, M>["managedChildrenReturn"] & UseSingleSelectionParameters<RowElement>["managedChildrenReturn"];
 }
 export interface UseGridNavigationSingleSelectionReturnType<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, RM extends GridSingleSelectChildRowInfo<RowElement, CellElement>, CM extends GridSingleSelectChildCellInfo<CellElement>> extends UseGridNavigationReturnType<ParentOrRowElement, RowElement, CellElement, RM, CM>, UseSingleSelectionReturnType<RowElement> {
     // gridNavigationRowContext: UseGridNavigationRowParameters<RowElement, any, any, any>["asChildRowParameters"]["gridNavigationRowContext"]
@@ -32,7 +32,7 @@ export interface UseGridNavigationSingleSelectionRowParameters<RowElement extend
 }
 
 export interface UseGridNavigationSingleSelectionRowReturnType<RowElement extends Element, CellElement extends Element> {
-    asChildRowReturn: UseGridNavigationRowReturnType<RowElement, CellElement>["asChildRowReturn"] & UseSingleSelectionChildReturnTypeInfo<RowElement>;
+    asChildRowReturn: UseGridNavigationRowReturnType<RowElement, CellElement>["asChildRowReturn"] & UseSingleSelectionChildReturnType<RowElement>;
     asParentRowReturn: UseGridNavigationRowReturnType<RowElement, CellElement>["asParentRowReturn"]
 }
 
@@ -54,7 +54,7 @@ export function useGridNavigationSingleSelection<ParentOrRowElement extends Elem
     typeaheadNavigationParameters,
     singleSelectionParameters,
     ..._void2
-}: UseGridNavigationSingleSelectionParameters<RowElement, CellElement, RM>): UseGridNavigationSingleSelectionReturnType<ParentOrRowElement, RowElement, CellElement, RM, CM> {
+}: UseGridNavigationSingleSelectionParameters<ParentOrRowElement, RowElement, CellElement, RM>): UseGridNavigationSingleSelectionReturnType<ParentOrRowElement, RowElement, CellElement, RM, CM> {
     const gnr = useGridNavigation<ParentOrRowElement, RowElement, CellElement, RM, CM>({
         gridNavigationParameters,
         linearNavigationParameters,

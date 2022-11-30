@@ -6,28 +6,28 @@ import { useStableCallback } from "../preact-extensions/use-stable-callback";
 import { h } from "preact";
 
 
-export interface UseChildrenHaveFocusParameters<T extends Element, R extends h.JSX.TargetedFocusEvent<T>> {
+export interface UseChildrenHaveFocusParameters<T extends Element> {
     childrenHaveFocusParameters: {
         /** */
-        onCompositeFocusChange: null | OnPassiveStateChange<boolean, R>;
+        onCompositeFocusChange: null | OnPassiveStateChange<boolean, h.JSX.TargetedEvent<T>>;
     }
 }
 
-export interface UseChildrenHaveFocusChildReturnType<E extends Element, R extends h.JSX.TargetedFocusEvent<E>> {
-    hasCurrentFocusParameters: Required<Pick<UseHasCurrentFocusParameters<E, R>["hasCurrentFocusParameters"], "onCurrentFocusedInnerChanged">>;
+export interface UseChildrenHaveFocusChildReturnType<E extends Element> {
+    hasCurrentFocusParameters: Required<Pick<UseHasCurrentFocusParameters<E>["hasCurrentFocusParameters"], "onCurrentFocusedInnerChanged">>;
     //refElementParameters: Required<Pick<UseRefElementParameters<E>["refElementParameters"], "onElementChange">>;
 }
 
-export interface UseChildrenHaveFocusReturnType<T extends Element, R extends h.JSX.TargetedFocusEvent<T>> {
+export interface UseChildrenHaveFocusReturnType<T extends Element> {
     childrenHaveFocusReturn: { getAnyFocused(): boolean; }
-    childrenHaveFocusChildContext: UseChildrenHaveFocusChildParameters<T, R>["childrenHaveFocusChildContext"];
+    childrenHaveFocusChildContext: UseChildrenHaveFocusChildParameters<T>["childrenHaveFocusChildContext"];
 }
 
-export interface UseChildrenHaveFocusChildParameters<T extends Element, R extends h.JSX.TargetedFocusEvent<T>> {
+export interface UseChildrenHaveFocusChildParameters<T extends Element> {
     childrenHaveFocusChildContext: {
         childrenHaveFocusChildParameters: {
             /** **STABLE** */
-            setFocusCount: PassiveStateUpdater<number, R>;
+            setFocusCount: PassiveStateUpdater<number, h.JSX.TargetedEvent<T>>;
 
             /** **STABLE** */
             //allElements: Set<Node>
@@ -45,7 +45,8 @@ export interface UseChildrenHaveFocusChildParameters<T extends Element, R extend
  * 
  * I.E. you can use this without needing a parent `<div>` to listen for a `focusout` event.
  */
-export function useChildrenHaveFocus<ChildElement extends Element, R extends h.JSX.TargetedFocusEvent<ChildElement>>(args: UseChildrenHaveFocusParameters<ChildElement, R>): UseChildrenHaveFocusReturnType<ChildElement, R> {
+export function useChildrenHaveFocus<ChildElement extends Element>(args: UseChildrenHaveFocusParameters<ChildElement>): UseChildrenHaveFocusReturnType<ChildElement> {
+    type R = h.JSX.TargetedEvent<ChildElement>;
     const { childrenHaveFocusParameters: { onCompositeFocusChange } } = args;
 
     const [getAnyFocused, setAnyFocused] = usePassiveState<boolean, R>(onCompositeFocusChange, returnFalse, runImmediately);
@@ -60,7 +61,7 @@ export function useChildrenHaveFocus<ChildElement extends Element, R extends h.J
     }
 }
 
-export function useChildrenHaveFocusChild<E extends Element, R extends h.JSX.TargetedFocusEvent<E>>({ childrenHaveFocusChildContext: { childrenHaveFocusChildParameters: { setFocusCount } } }: UseChildrenHaveFocusChildParameters<E, R>): UseChildrenHaveFocusChildReturnType<E, R> {
+export function useChildrenHaveFocusChild<E extends Element>({ childrenHaveFocusChildContext: { childrenHaveFocusChildParameters: { setFocusCount } } }: UseChildrenHaveFocusChildParameters<E>): UseChildrenHaveFocusChildReturnType<E> {
     return {
         hasCurrentFocusParameters: {
             onCurrentFocusedInnerChanged: useStableCallback((focused, prev, e) => {

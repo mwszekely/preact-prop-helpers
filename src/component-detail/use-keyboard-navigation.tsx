@@ -128,17 +128,18 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
     rovingTabIndexReturn,
     linearNavigationParameters
 }: UseLinearNavigationParameters<ParentOrChildElement, ChildElement>): UseLinearNavigationReturnTypeWithHooks<ParentOrChildElement> {
+    type R = h.JSX.TargetedEvent<ParentOrChildElement>;
     const { getHighestIndex, indexDemangler, indexMangler, isValid, navigatePastEnd, navigatePastStart } = linearNavigationParameters;
     const { getTabbableIndex, setTabbableIndex } = rovingTabIndexReturn;
 
-    const navigateAbsolute = useCallback((i: number, e: h.JSX.TargetedKeyboardEvent<ChildElement>, fromUserInteraction: boolean) => {
+    const navigateAbsolute = useCallback((i: number, e: R, fromUserInteraction: boolean) => {
         const target = indexDemangler(i);
         const { value } = tryNavigateToIndex({ isValid, highestChildIndex: getHighestIndex(), indexDemangler, indexMangler, searchDirection: -1, target });
         setTabbableIndex(value, e, fromUserInteraction);
     }, []);
-    const navigateToFirst = useStableCallback((e: h.JSX.TargetedKeyboardEvent<ChildElement>, fromUserInteraction: boolean) => { navigateAbsolute(0, e, fromUserInteraction); });
-    const navigateToLast = useStableCallback((e: h.JSX.TargetedKeyboardEvent<ChildElement>, fromUserInteraction: boolean) => { navigateAbsolute(getHighestIndex(), e, fromUserInteraction); });
-    const navigateRelative2 = useStableCallback((e: h.JSX.TargetedKeyboardEvent<ChildElement>, offset: number, fromUserInteraction: boolean, mode: "page" | "single") => {
+    const navigateToFirst = useStableCallback((e: R, fromUserInteraction: boolean) => { navigateAbsolute(0, e, fromUserInteraction); });
+    const navigateToLast = useStableCallback((e: R, fromUserInteraction: boolean) => { navigateAbsolute(getHighestIndex(), e, fromUserInteraction); });
+    const navigateRelative2 = useStableCallback((e: R, offset: number, fromUserInteraction: boolean, mode: "page" | "single") => {
         const original = (getTabbableIndex() ?? 0);
         const { status, value } = tryNavigateToIndex({ isValid, highestChildIndex: getHighestIndex(), indexDemangler, indexMangler, searchDirection: (Math.sign(offset) || 1) as 1 | -1, target: indexDemangler(indexMangler(original) + offset) });
         if (status == "past-end") {
@@ -185,11 +186,11 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
 
         }
     })
-    const navigateToNext = useStableCallback((e: h.JSX.TargetedKeyboardEvent<ChildElement>, fromUserInteraction: boolean) => {
+    const navigateToNext = useStableCallback((e: R, fromUserInteraction: boolean) => {
         navigateRelative2(e, 1, fromUserInteraction, "single");
         // setTabbableIndex(navigateRelative((getTabbableIndex() ?? 0), +1), fromUserInteraction)
     });
-    const navigateToPrev = useStableCallback((e: h.JSX.TargetedKeyboardEvent<ChildElement>, fromUserInteraction: boolean) => {
+    const navigateToPrev = useStableCallback((e: R, fromUserInteraction: boolean) => {
         navigateRelative2(e, -1, fromUserInteraction, "single");
         // setTabbableIndex(navigateRelative((getTabbableIndex() ?? 0), +1), fromUserInteraction)
     });
@@ -436,7 +437,7 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
     // And, for the user's sake, let them know when their typeahead can't match anything anymore
     const [getCurrentTypeahead, setCurrentTypeahead] = usePassiveState<string | null, h.JSX.TargetedEvent<ChildElement, Event>>(useStableCallback((currentTypeahead, prev, reason) => {
         const handle = setTimeout(() => { setCurrentTypeahead(null, undefined!); setInvalidTypeahead(null); }, typeaheadTimeout ?? 1000);
-        updateBasedOnTypeaheadChange(currentTypeahead, reason);
+        updateBasedOnTypeaheadChange(currentTypeahead, reason!);
         return () => clearTimeout(handle);
     }));
     //useTimeout({ timeout: typeaheadTimeout ?? 1000, callback: () => { setCurrentTypeahead(null); setInvalidTypeahead(null); }, triggerIndex: currentTypeahead });

@@ -10,7 +10,7 @@ export function useHasCurrentFocusProps<E extends Element>(r: UseHasCurrentFocus
     return useMergedProps<E>(r.hasCurrentFocusReturn.propsStable, ...otherProps);
 }*/
 
-export interface UseHasCurrentFocusParameters<T extends Node, R extends h.JSX.TargetedFocusEvent<T>> {
+export interface UseHasCurrentFocusParameters<T extends Node> {
     refElementReturn: Required<Pick<UseRefElementReturnType<T>["refElementReturn"], "getElement">>;
 
     hasCurrentFocusParameters: {
@@ -20,14 +20,14 @@ export interface UseHasCurrentFocusParameters<T extends Node, R extends h.JSX.Ta
          * 
          * `prevFocused` is generally the opposite of `focused`, but on mount it's `undefined` while `focused` is probably false (both falsy)
          */
-        onCurrentFocusedChanged: null | OnPassiveStateChange<boolean, R>; //((focused: boolean, prevFocused: boolean | undefined) => void);
+        onCurrentFocusedChanged: null | OnPassiveStateChange<boolean, h.JSX.TargetedEvent<T>>; //((focused: boolean, prevFocused: boolean | undefined) => void);
 
         /**
          * Like `onFocusedChanged`, but also *additionally* if any child elements are focused.
          * 
          * @see this.onFocusedChanged
          */
-        onCurrentFocusedInnerChanged: null | OnPassiveStateChange<boolean, R>; //((focused: boolean, prevFocused: boolean | undefined) => void);
+        onCurrentFocusedInnerChanged: null | OnPassiveStateChange<boolean, h.JSX.TargetedEvent<T>>; //((focused: boolean, prevFocused: boolean | undefined) => void);
     }
 }
 
@@ -46,7 +46,8 @@ export interface UseHasCurrentFocusReturnType<E extends Node> {
     }
 }
 
-export function useHasCurrentFocus<T extends Node, R extends h.JSX.TargetedFocusEvent<T>>(args: UseHasCurrentFocusParameters<T, R>): UseHasCurrentFocusReturnType<T> {
+export function useHasCurrentFocus<T extends Node>(args: UseHasCurrentFocusParameters<T>): UseHasCurrentFocusReturnType<T> {
+    type R = h.JSX.TargetedFocusEvent<T>;
     const {
         hasCurrentFocusParameters: { onCurrentFocusedChanged: onFocusedChanged, onCurrentFocusedInnerChanged: onFocusedInnerChanged },
         refElementReturn: { getElement }
