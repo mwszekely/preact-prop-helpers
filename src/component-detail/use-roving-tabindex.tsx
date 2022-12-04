@@ -52,8 +52,9 @@ export interface UseRovingTabIndexParameters<TabbableChildElement extends Elemen
         initiallyTabbedIndex: number | null;
 
         /**
-         * When true, this is the same as calling `setTabbableIndex(null)`,
-         * but this doesn't actually change what the tabbable index currently is.
+         * When true, none of the children will be tabbable, as if the entire component is hidden.
+         * 
+         * This does not actually change the currently tabbable index; if this is set to `false`, the last tabbable child is remembered.
          */
         untabbable: boolean;
 
@@ -148,7 +149,7 @@ export interface UseRovingTabIndexChildReturnType<ChildElement extends Element> 
          * 
          * Internal use only, pass to `useManagedChild`
          */
-         setTabbable: StateUpdater<boolean>;
+        setTabbable: StateUpdater<boolean>;
 
         /** 
          * *Unstable*
@@ -201,25 +202,26 @@ export function useRovingTabIndex<ChildElement extends Element, M extends UseRov
 
     //initiallyTabbedIndex ??= 0;
 
-    // Keep track of three things related to the currently tabbable element's index:
-    // What it is, and whether, when we render this component and it's changed, to also focus the element that was made tabbable.
-    //const [getTabbableIndex, setTabbableIndex2] = usePassiveState<number | null>(onTabbableIndexChange, useCallback(() => { return initiallyTabbedIndex }, []));
-    const setTabbableIndex = useCallback<SetTabbableIndex>((updater, reason, fromUserInteraction) => {
+    // Override the actual setter to include some extra logic related to avoiding hidden children, 
+    // what to do when we're untabbable, what to do when we're tabbable but given `null`, etc.
+    const setTabbableIndex = useStableCallback<SetTabbableIndex>((updater, reason, fromUserInteraction) => {
         const children = getChildren();
 
         // Notify the relevant children that they should become tabbable/untabbable,
         // but also handle focus management when we changed due to user interaction
-        return setTabbableIndex2(f, reason);
-
+        return setTabbableIndex3(f, reason);
 
 
         function f(prevIndex: number | null | undefined): number | null {
             let nextIndex = ((typeof updater === "function") ? updater(prevIndex ?? null) : updater) as M["index"];
 
+            if (untabbable)
+                return null;
+
             if (prevIndex != nextIndex) {
                 const nextChild = nextIndex == null ? null : children.getAt(nextIndex);
                 if (nextChild?.hidden) {
-                    return prevIndex ?? null;
+                    return prevIndex ?? (untabbable ? null : 0);
                 }
 
                 if (nextChild != null && fromUserInteraction) {
@@ -232,29 +234,31 @@ export function useRovingTabIndex<ChildElement extends Element, M extends UseRov
 
             }
 
-            return nextIndex;
+            return nextIndex ?? (untabbable ? null : 0);
         }
     }, []);
 
     const lastNonNullIndex = useRef<number | null>(initiallyTabbedIndex);
 
     useEffect(() => {
-        const t =  getTabbableIndex();
+        const t = getTabbableIndex();
         if (t != null)
-        lastNonNullIndex.current = t;
+            lastNonNullIndex.current = t;
     });
+
+    // Any time we switch to being untabbable, set the current tabbable index accordingly.
     useEffect(() => {
         if (untabbable)
-            setTabbableIndex2(null, undefined!);
+            setTabbableIndex3(null, undefined!);
         else
-            setTabbableIndex2(lastNonNullIndex.current, undefined!);
-    }, [untabbable])
+            setTabbableIndex3(lastNonNullIndex.current, undefined!);
+    }, [untabbable]);
 
     // Boilerplate related to notifying individual children when they become tabbable/untabbable
     const getTabbableAt = useCallback((m: UseRovingTabIndexChildInfo<ChildElement>) => { return m.getTabbable() }, []);
     const setTabbableAt = useCallback((m: UseRovingTabIndexChildInfo<ChildElement>, t: boolean) => { m.setTabbable(t); }, []);
     const isTabbableValid = useCallback((m: UseRovingTabIndexChildInfo<ChildElement>) => { return !m.hidden }, []);
-    const { changeIndex: setTabbableIndex2, getCurrentIndex: getTabbableIndex, reevaluateClosestFit } = useChildrenFlag<UseRovingTabIndexChildInfo<ChildElement>, Event>({
+    const { changeIndex: setTabbableIndex3, getCurrentIndex: getTabbableIndex, reevaluateClosestFit } = useChildrenFlag<UseRovingTabIndexChildInfo<ChildElement>, Event>({
         initialIndex: initiallyTabbedIndex,
         onIndexChange: onTabbableIndexChange,
         getChildren,
