@@ -259,7 +259,7 @@ export function useRovingTabIndex<ChildElement extends Element, M extends UseRov
     const setTabbableAt = useCallback((m: UseRovingTabIndexChildInfo<ChildElement>, t: boolean) => { m.setTabbable(t); }, []);
     const isTabbableValid = useCallback((m: UseRovingTabIndexChildInfo<ChildElement>) => { return !m.hidden }, []);
     const { changeIndex: setTabbableIndex3, getCurrentIndex: getTabbableIndex, reevaluateClosestFit } = useChildrenFlag<UseRovingTabIndexChildInfo<ChildElement>, Event>({
-        initialIndex: initiallyTabbedIndex,
+        initialIndex: initiallyTabbedIndex ?? (untabbable? null : 0),
         onIndexChange: onTabbableIndexChange,
         getChildren,
         closestFit: true,
