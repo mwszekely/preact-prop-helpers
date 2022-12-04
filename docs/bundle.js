@@ -606,8 +606,8 @@ var bundle = (function (exports) {
      */
     function useChildrenFlag({ getChildren, initialIndex, closestFit, onIndexChange, getAt, setAt, isValid, }) {
         useEnsureStability("useChildrenFlag", onIndexChange, getAt, setAt, isValid);
-        const [getCurrentIndex, setCurrentIndex] = usePassiveState(onIndexChange, T$1(() => (initialIndex ?? (null)), []));
-        const [getRequestedIndex, setRequestedIndex] = usePassiveState(null, T$1(() => (initialIndex ?? (null)), []));
+        const [getCurrentIndex, setCurrentIndex] = usePassiveState(onIndexChange);
+        const [getRequestedIndex, setRequestedIndex] = usePassiveState(null);
         //    const getFitNullToZero = useStableGetter(fitNullToZero);
         // Shared between onChildrenMountChange and changeIndex, not public (but could be I guess)
         const getClosestFit = T$1((requestedIndex) => {
@@ -693,7 +693,8 @@ var bundle = (function (exports) {
         }, []);
         // Run once, on mount
         s(() => {
-            onIndexChange?.(initialIndex ?? null, undefined, undefined);
+            changeIndex(initialIndex ?? null, undefined);
+            //onIndexChange?.(initialIndex ?? null, undefined, undefined!);
         }, []);
         return { changeIndex, reevaluateClosestFit, getCurrentIndex };
     }
@@ -3359,20 +3360,21 @@ var bundle = (function (exports) {
      */
     function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovingTabIndexParameters: { untabbable, initiallyTabbedIndex, onTabbableIndexChange }, ..._void1 }) {
         //initiallyTabbedIndex ??= 0;
-        // Keep track of three things related to the currently tabbable element's index:
-        // What it is, and whether, when we render this component and it's changed, to also focus the element that was made tabbable.
-        //const [getTabbableIndex, setTabbableIndex2] = usePassiveState<number | null>(onTabbableIndexChange, useCallback(() => { return initiallyTabbedIndex }, []));
-        const setTabbableIndex = T$1((updater, reason, fromUserInteraction) => {
+        // Override the actual setter to include some extra logic related to avoiding hidden children, 
+        // what to do when we're untabbable, what to do when we're tabbable but given `null`, etc.
+        const setTabbableIndex = useStableCallback((updater, reason, fromUserInteraction) => {
             const children = getChildren();
             // Notify the relevant children that they should become tabbable/untabbable,
             // but also handle focus management when we changed due to user interaction
-            return setTabbableIndex2(f, reason);
+            return setTabbableIndex3(f, reason);
             function f(prevIndex) {
                 let nextIndex = ((typeof updater === "function") ? updater(prevIndex ?? null) : updater);
+                if (untabbable)
+                    return null;
                 if (prevIndex != nextIndex) {
                     const nextChild = nextIndex == null ? null : children.getAt(nextIndex);
                     if (nextChild?.hidden) {
-                        return prevIndex ?? null;
+                        return prevIndex ?? (untabbable ? null : 0);
                     }
                     if (nextChild != null && fromUserInteraction) {
                         const element = nextChild.getElement();
@@ -3382,7 +3384,7 @@ var bundle = (function (exports) {
                         }
                     }
                 }
-                return nextIndex;
+                return nextIndex ?? (untabbable ? null : 0);
             }
         }, []);
         const lastNonNullIndex = _(initiallyTabbedIndex);
@@ -3391,18 +3393,19 @@ var bundle = (function (exports) {
             if (t != null)
                 lastNonNullIndex.current = t;
         });
+        // Any time we switch to being untabbable, set the current tabbable index accordingly.
         h(() => {
             if (untabbable)
-                setTabbableIndex2(null, undefined);
+                setTabbableIndex3(null, undefined);
             else
-                setTabbableIndex2(lastNonNullIndex.current, undefined);
+                setTabbableIndex3(lastNonNullIndex.current, undefined);
         }, [untabbable]);
         // Boilerplate related to notifying individual children when they become tabbable/untabbable
         const getTabbableAt = T$1((m) => { return m.getTabbable(); }, []);
         const setTabbableAt = T$1((m, t) => { m.setTabbable(t); }, []);
         const isTabbableValid = T$1((m) => { return !m.hidden; }, []);
-        const { changeIndex: setTabbableIndex2, getCurrentIndex: getTabbableIndex, reevaluateClosestFit } = useChildrenFlag({
-            initialIndex: initiallyTabbedIndex,
+        const { changeIndex: setTabbableIndex3, getCurrentIndex: getTabbableIndex, reevaluateClosestFit } = useChildrenFlag({
+            initialIndex: initiallyTabbedIndex ?? (untabbable ? null : 0),
             onIndexChange: onTabbableIndexChange,
             getChildren,
             closestFit: true,

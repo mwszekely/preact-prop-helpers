@@ -431,9 +431,10 @@ export interface UseChildrenFlagReturnType<R> {
 export function useChildrenFlag<M extends ManagedChildInfo<number>, R>({ getChildren, initialIndex, closestFit, onIndexChange, getAt, setAt, isValid, }: UseChildrenFlagParameters<M, R>): UseChildrenFlagReturnType<R> {
     useEnsureStability("useChildrenFlag", onIndexChange, getAt, setAt, isValid);
 
-    const [getCurrentIndex, setCurrentIndex] = usePassiveState<null | number, R>(onIndexChange, useCallback(() => (initialIndex ?? (null)), []));
+    // TODO (maybe?): Even if there is an initial index, it's not set until mount. Is that fine?
+    const [getCurrentIndex, setCurrentIndex] = usePassiveState<null | number, R>(onIndexChange);
 
-    const [getRequestedIndex, setRequestedIndex] = usePassiveState<null | number, R>(null, useCallback(() => (initialIndex ?? (null)), []));
+    const [getRequestedIndex, setRequestedIndex] = usePassiveState<null | number, R>(null);
 
     //    const getFitNullToZero = useStableGetter(fitNullToZero);
 
@@ -533,7 +534,7 @@ export function useChildrenFlag<M extends ManagedChildInfo<number>, R>({ getChil
 
     // Run once, on mount
     useLayoutEffect(() => {
-        onIndexChange?.(initialIndex ?? null, undefined, undefined!);
+        changeIndex(initialIndex ?? null, undefined);
     }, [])
 
     return { changeIndex, reevaluateClosestFit, getCurrentIndex };
