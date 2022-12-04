@@ -1,6 +1,6 @@
 
 import { useCallback, useRef, useState } from "preact/hooks";
-import { DismissListenerTypes, useMergedProps, useModal } from "../..";
+import { DismissListenerTypes, useMergedProps, useModal, useStableCallback } from "../..";
 
 function getWindow(): Window { return globalThis.window; }
 
@@ -31,7 +31,7 @@ export function DemoUseModal(props: { parentDepth?: number }) {
         focusTrapParameters: {
             trapActive: focusTrapActive,
             focusOpener,
-            focusPopup: (e, f) => f()
+            focusPopup: useStableCallback((e, f) => f()?.focus())
         },
         dismissParameters: {
             closeOnBackdrop,

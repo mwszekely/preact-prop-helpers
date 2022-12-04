@@ -1,7 +1,7 @@
 import { createContext, h, render, VNode } from "preact";
 import { memo } from "preact/compat";
 import { useCallback, useContext, useRef } from "preact/hooks";
-import { GetIndex, GridSingleSelectSortableChildCellInfo, GridSingleSelectSortableChildRowInfo, returnNull, useAnimationFrame, useAsyncHandler, UseCompleteGridNavigationReturnType, UseCompleteGridNavigationRowReturnType, useDraggable, useDroppable, useElementSize, useFocusTrap, useHasCurrentFocus, useHasLastFocus, useMergedProps, useRefElement, useStableCallback, useState } from "..";
+import { GetIndex, GridSingleSelectSortableChildCellInfo, GridSingleSelectSortableChildRowInfo, returnNull, useAnimationFrame, useAsyncHandler, UseCompleteGridNavigationReturnType, UseCompleteGridNavigationRowReturnType, useDraggable, useDroppable, useElementSize, useFocusTrap, useHasCurrentFocus, useHasLastFocus, useMergedProps, useRandomDualIds, useRefElement, useStableCallback, useState } from "..";
 import { ElementSize } from "../dom-helpers/use-element-size";
 //import { useGridNavigation, UseGridNavigationCell, UseGridNavigationRow } from "../use-grid-navigation";
 import { CompleteGridNavigationContext, CompleteGridNavigationRowContext, useCompleteGridNavigation, useCompleteGridNavigationCell, useCompleteGridNavigationRow } from "..";
@@ -781,12 +781,24 @@ const DemoUseGridCell = (({ index, row, rowIsTabbable }: { index: number, row: n
     }
 });
 
+function DemoLabel() {
+    const { propsInput, propsLabel } = useRandomDualIds<HTMLInputElement, HTMLLabelElement>({ randomIdInputParameters: { prefix: "input-", otherReferencerProp: "for" }, randomIdLabelParameters: { prefix: "label-", otherReferencerProp: "aria-labelledby" as never } })
+    return (
+        <div className="demo">
+            <input {...propsInput} />
+            <label {...propsLabel}>Label</label>
+        </div>
+    )
+}
+
 const Component = () => {
     return <div class="flex" style={{ flexWrap: "wrap" }}>
         <div style="display:grid;grid-template-columns:1fr 1fr">
             <DemoUseModal />
             <DemoUseModal />
         </div>
+        <hr />
+        <DemoLabel />
         <hr />
         <DemoFocus />
         <hr />

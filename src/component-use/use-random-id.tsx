@@ -42,17 +42,17 @@ export interface UseRandomIdParameters {
         prefix: string;
     
         /** This is the prop on the **OTHER** element that will use our ID.  E.G. The `input` calls `useRandomId` and passes `for` as `referencerProp`. */
-        referencerProp: keyof h.JSX.HTMLAttributes<any> | null;
+        otherReferencerProp: keyof h.JSX.HTMLAttributes<any> | null;
     }
 }
 
-export function useRandomId<S extends Element, T extends Element>({ randomIdParameters: { prefix, referencerProp } }: UseRandomIdParameters): UseRandomIdReturnType<S, T> {
+export function useRandomId<S extends Element, T extends Element>({ randomIdParameters: { prefix, otherReferencerProp } }: UseRandomIdParameters): UseRandomIdReturnType<S, T> {
     const id = (prefix + useId());
     useEnsureStability("useRandomId", prefix, id);
 
-    const referencerElementProps = useRef<h.JSX.HTMLAttributes<any>>(referencerProp == null ? {} : { [referencerProp]: id });
+    const referencerElementProps = useRef<h.JSX.HTMLAttributes<any>>(otherReferencerProp == null ? {} : { [otherReferencerProp]: id });
     const sourceElementProps = useRef<h.JSX.HTMLAttributes<S>>({ id });
-    useEnsureStability("useRandomIdReferencerElement", referencerProp);
+    useEnsureStability("useRandomIdReferencerElement", otherReferencerProp);
     
 
     return {
