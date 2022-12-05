@@ -24,7 +24,7 @@ export interface GridChildCellInfo<CellElement extends Element> extends UseListN
 
 export interface UseGridNavigationParameters<ParentOrChildElement extends Element, RowElement extends Element, CellElement extends Element, M extends GridChildRowInfo<RowElement, CellElement>> extends Omit<UseListNavigationParameters<ParentOrChildElement, RowElement, M>, "linearNavigationParameters"> {
     gridNavigationParameters: {
-        onTabbableColumnChange: OnPassiveStateChange<number | null, Event>;
+        onTabbableColumnChange: OnPassiveStateChange<number | null, Event> | null;
     };
     linearNavigationParameters: Omit<UseListNavigationParameters<ParentOrChildElement, RowElement, M>["linearNavigationParameters"], "navigationDirection">
 }

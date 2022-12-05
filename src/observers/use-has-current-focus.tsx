@@ -1,6 +1,6 @@
 
 import { h } from "preact";
-import { useCallback, useRef } from "preact/hooks";
+import { useCallback, useEffect, useRef } from "preact/hooks";
 //import { UseManagedChildParameters, useManagedChildren, UseManagedChildrenParameters, UseManagedChildrenReturnTypeInfo } from "./use-child-manager";
 import { UseRefElementReturnType } from "../dom-helpers/use-ref-element";
 import { OnPassiveStateChange, returnFalse, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state";
@@ -74,7 +74,14 @@ export function useHasCurrentFocus<T extends Node>(args: UseHasCurrentFocusParam
     const propsStable = useRef<h.JSX.HTMLAttributes<T>>({
         onfocusin: onFocusIn,
         onfocusout: onFocusOut
-    })
+    });
+
+    useEffect(() => {
+        return () => {
+            setFocused(false);
+            setFocusedInner(false);
+        }
+    }, []);
 
     return {
         hasCurrentFocusReturn: {

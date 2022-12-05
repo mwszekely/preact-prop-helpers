@@ -606,6 +606,7 @@ var bundle = (function (exports) {
      */
     function useChildrenFlag({ getChildren, initialIndex, closestFit, onIndexChange, getAt, setAt, isValid, }) {
         useEnsureStability("useChildrenFlag", onIndexChange, getAt, setAt, isValid);
+        // TODO (maybe?): Even if there is an initial index, it's not set until mount. Is that fine?
         const [getCurrentIndex, setCurrentIndex] = usePassiveState(onIndexChange);
         const [getRequestedIndex, setRequestedIndex] = usePassiveState(null);
         //    const getFitNullToZero = useStableGetter(fitNullToZero);
@@ -694,7 +695,6 @@ var bundle = (function (exports) {
         // Run once, on mount
         s(() => {
             changeIndex(initialIndex ?? null, undefined);
-            //onIndexChange?.(initialIndex ?? null, undefined, undefined!);
         }, []);
         return { changeIndex, reevaluateClosestFit, getCurrentIndex };
     }
@@ -2813,14 +2813,15 @@ var bundle = (function (exports) {
     }
 
     //const elementsToRestoreFocusTo = new Map<Element | null, (Node & HTMLOrSVGElement)>();
-    function useFocusTrap({ focusTrapParameters: { trapActive, focusPopup: focusSelfUnstable, focusOpener: focusOpenerUnstable }, refElementParameters: { onElementChange, ...refElementParameters } }) {
+    function useFocusTrap({ focusTrapParameters: { onlyMoveFocus, trapActive, focusPopup: focusSelfUnstable, focusOpener: focusOpenerUnstable }, refElementParameters: { onElementChange, ...refElementParameters } }) {
         const focusSelf = useStableCallback(focusSelfUnstable);
         const focusOpener = useStableCallback(focusOpenerUnstable);
         h(() => {
             if (trapActive) {
-                const top = getTop();
+                let top = getTop();
                 getLastActiveWhenOpen();
                 {
+                    top ??= refElementReturn.getElement();
                     console.assert(!!top);
                     if (top)
                         focusSelf(top, () => findFirstFocusable(top));
@@ -2836,7 +2837,7 @@ var bundle = (function (exports) {
             refElementParameters: { onElementChange, ...refElementParameters }
         });
         const { getElement } = refElementReturn;
-        const { getTop, getLastActiveWhenClosed, getLastActiveWhenOpen } = useBlockingElement(trapActive, getElement);
+        const { getTop, getLastActiveWhenClosed, getLastActiveWhenOpen } = useBlockingElement(trapActive && !onlyMoveFocus, getElement);
         return {
             refElementReturn,
             focusTrapReturn: { propsUnstable: { "aria-modal": trapActive ? "true" : undefined } }
@@ -2848,6 +2849,8 @@ var bundle = (function (exports) {
      * @returns
      */
     function findFirstFocusable(element) {
+        console.assert(!!element);
+        element ??= document.body;
         const treeWalker = document.createTreeWalker(element, NodeFilter.SHOW_ELEMENT, { acceptNode: (node) => (node instanceof Element && isFocusable(node) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP) });
         const firstFocusable = treeWalker.firstChild();
         return firstFocusable;
@@ -4825,6 +4828,12 @@ var bundle = (function (exports) {
             onfocusin: onFocusIn,
             onfocusout: onFocusOut
         });
+        h(() => {
+            return () => {
+                setFocused(false);
+                setFocusedInner(false);
+            };
+        }, []);
         return {
             hasCurrentFocusReturn: {
                 propsStable: propsStable.current,
@@ -6477,6 +6486,7 @@ var bundle = (function (exports) {
         const { focusTrapReturn: { propsUnstable }, refElementReturn: { propsStable } } = useFocusTrap({
             focusTrapParameters: {
                 trapActive: active,
+                onlyMoveFocus: false,
                 focusOpener: e => e?.focus(),
                 focusPopup: (e, f) => f()?.focus(),
             },

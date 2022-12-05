@@ -85,6 +85,7 @@ const DemoUseFocusTrap = memo(({ depth }: { depth?: number }) => {
     const { focusTrapReturn: { propsUnstable }, refElementReturn: { propsStable } } = useFocusTrap<HTMLDivElement, HTMLDivElement>({
         focusTrapParameters: {
             trapActive: active,
+            onlyMoveFocus: false,
             focusOpener: e => e?.focus(),
             focusPopup: (e, f) => f()?.focus(),
         },
