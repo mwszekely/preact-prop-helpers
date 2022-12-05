@@ -12,6 +12,11 @@ export interface UseFocusTrapParameters<SourceElement extends Element | null, Po
          */
         trapActive: boolean;
 
+        /**
+         * If true, focus is not trapped but only moved to the new element. 
+         */
+        onlyMoveFocus: boolean;
+
 
         /**
          * When a modal popup opens, focus must be sent to the first element that makes sense.
@@ -48,7 +53,7 @@ export interface UseFocusTrapReturnType<E extends Element> extends UseRefElement
 //const elementsToRestoreFocusTo = new Map<Element | null, (Node & HTMLOrSVGElement)>();
 
 export function useFocusTrap<SourceElement extends Element | null, PopupElement extends Element>({
-    focusTrapParameters: { trapActive, focusPopup: focusSelfUnstable, focusOpener: focusOpenerUnstable },
+    focusTrapParameters: { onlyMoveFocus, trapActive, focusPopup: focusSelfUnstable, focusOpener: focusOpenerUnstable },
     refElementParameters: { onElementChange, ...refElementParameters }
 }: UseFocusTrapParameters<SourceElement, PopupElement>): UseFocusTrapReturnType<PopupElement> {
 
@@ -83,7 +88,7 @@ export function useFocusTrap<SourceElement extends Element | null, PopupElement 
     })
     const { getElement } = refElementReturn;
 
-    const { getTop, getLastActiveWhenClosed, getLastActiveWhenOpen } = useBlockingElement(trapActive, getElement);
+    const { getTop, getLastActiveWhenClosed, getLastActiveWhenOpen } = useBlockingElement(trapActive && !onlyMoveFocus, getElement);
 
 
     return {
