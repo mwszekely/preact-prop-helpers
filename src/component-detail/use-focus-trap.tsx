@@ -64,16 +64,17 @@ export function useFocusTrap<SourceElement extends Element | null, PopupElement 
 
     useEffect(() => {
         if (trapActive) {
-            const top = getTop();
+            let top = getTop();
             const lastFocusedInThisComponent = getLastActiveWhenOpen();
             
             if (false && lastFocusedInThisComponent && lastFocusedInThisComponent?.isConnected) {
                 focusSelf(lastFocusedInThisComponent as any as PopupElement, () => lastFocusedInThisComponent);
             }
             else {
+                top ??= refElementReturn.getElement() as unknown as HTMLElement;
                 console.assert(!!top);
                 if (top)
-                    focusSelf(top as any as PopupElement, () => findFirstFocusable(top));
+                    focusSelf(top as any as PopupElement, () => findFirstFocusable(top!));
             }
         }
         else {
@@ -103,6 +104,8 @@ export function useFocusTrap<SourceElement extends Element | null, PopupElement 
  * @returns 
  */
 export function findFirstFocusable(element: Node) {
+    console.assert(!!element);
+    element ??= document.body;
     const treeWalker = document.createTreeWalker(element, NodeFilter.SHOW_ELEMENT, { acceptNode: (node) => (node instanceof Element && isFocusable(node) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP) })
     const firstFocusable = treeWalker.firstChild() as (Element & HTMLOrSVGElement) | null;
     return firstFocusable;
