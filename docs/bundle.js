@@ -3522,7 +3522,7 @@ var bundle = (function (exports) {
             })
         };
     }
-    function useGridNavigationRow({ rowAsChildOfGridParameters: { gridNavigationRowContext: { gridNavigationRowParameters: { setTabbableRow, getCurrentTabbableColumn, setCurrentTabbableColumn } }, ...asChildRowOfTable }, rowAsParentOfCellsParameters: { linearNavigationParameters, ...asParentRowOfCellsP }, ..._void1 }) {
+    function useGridNavigationRow({ rowAsChildOfGridParameters: { gridNavigationRowContext: { gridNavigationRowParameters: { setTabbableRow, getCurrentTabbableColumn, setCurrentTabbableColumn } }, ...asChildRowOfTable }, rowAsParentOfCellsParameters: { linearNavigationParameters, rovingTabIndexParameters: { untabbable, ...rovingTabIndexParameters }, ...asParentRowOfCellsP }, ..._void1 }) {
         const { managedChildrenReturn: { getChildren } } = asChildRowOfTable;
         const getIndex = useStableCallback(() => { return asChildRowOfTable.managedChildParameters.index; });
         const focusSelf = useStableCallback((e) => {
@@ -3541,7 +3541,7 @@ var bundle = (function (exports) {
             }
         }, []);
         const lncr = useListNavigationChild(asChildRowOfTable);
-        const lnr = useListNavigation({ ...asParentRowOfCellsP, linearNavigationParameters: { navigationDirection: "horizontal", ...linearNavigationParameters } });
+        const lnr = useListNavigation({ ...asParentRowOfCellsP, rovingTabIndexParameters: { untabbable: untabbable || !lncr.rovingTabIndexChildReturn.tabbable, ...rovingTabIndexParameters }, linearNavigationParameters: { navigationDirection: "horizontal", ...linearNavigationParameters } });
         const { rovingTabIndexReturn: { setTabbableIndex }, rovingTabIndexReturn, linearNavigationReturn, managedChildrenParameters, rovingTabIndexChildContext, typeaheadNavigationChildContext, typeaheadNavigationReturn } = lnr;
         return {
             rowAsChildOfGridReturn: { gridNavigationRowParameters: { focusSelf, setTabbableColumnIndex: setTabbableIndex }, ...lncr, },

@@ -149,7 +149,7 @@ export function useGridNavigation<ParentOrRowElement extends Element, RowElement
 
 export function useGridNavigationRow<RowElement extends Element, CellElement extends Element, RM extends GridChildRowInfo<RowElement, CellElement>, CM extends GridChildCellInfo<CellElement>>({
     rowAsChildOfGridParameters: { gridNavigationRowContext: { gridNavigationRowParameters: { setTabbableRow, getCurrentTabbableColumn, setCurrentTabbableColumn } }, ...asChildRowOfTable },
-    rowAsParentOfCellsParameters: { linearNavigationParameters, ...asParentRowOfCellsP },
+    rowAsParentOfCellsParameters: { linearNavigationParameters, rovingTabIndexParameters: { untabbable, ...rovingTabIndexParameters }, ...asParentRowOfCellsP },
     ..._void1
 }: UseGridNavigationRowParameters<RowElement, CellElement, RM, CM>): UseGridNavigationRowReturnType<RowElement, CellElement> {
     const { managedChildrenReturn: { getChildren } } = asChildRowOfTable;
@@ -171,7 +171,7 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
     }, []);
 
     const lncr = useListNavigationChild<RowElement>(asChildRowOfTable);
-    const lnr = useListNavigation<RowElement, CellElement, CM>({ ...asParentRowOfCellsP, linearNavigationParameters: { navigationDirection: "horizontal", ...linearNavigationParameters } });
+    const lnr = useListNavigation<RowElement, CellElement, CM>({ ...asParentRowOfCellsP, rovingTabIndexParameters: { untabbable: untabbable || !lncr.rovingTabIndexChildReturn.tabbable, ...rovingTabIndexParameters }, linearNavigationParameters: { navigationDirection: "horizontal", ...linearNavigationParameters } });
 
 
     assertEmptyObject(_void1);
