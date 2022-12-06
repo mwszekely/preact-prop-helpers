@@ -5181,7 +5181,9 @@ var bundle = (function (exports) {
     }
     function useCompleteGridNavigationCell({ gridNavigationCellParameters, managedChildParameters, context: { completeGridNavigationContext, gridNavigationCellContext, managedChildContext, rovingTabIndexChildContext, typeaheadNavigationChildContext }, rovingTabIndexChildParameters, textContentParameters, 
     //managedChildContext,
-    completeGridNavigationCellParameters, sortableChildParameters: { getSortValue }, pressParameters: { onPressSync, ...pressParameters }, }) {
+    completeGridNavigationCellParameters, 
+    //sortableChildParameters: { getSortValue },
+    pressParameters: { onPressSync, ...pressParameters }, }) {
         const { index } = managedChildParameters;
         const { refElementReturn } = useRefElement({ refElementParameters: {} });
         const { hasCurrentFocusParameters, rovingTabIndexChildReturn, textContentReturn } = useGridNavigationSingleSelectionCell({
@@ -5213,7 +5215,7 @@ var bundle = (function (exports) {
             getTabbable: rovingTabIndexChildReturn.getTabbable,
             setTabbable: rovingTabIndexChildReturn.setTabbable,
             tabbable: rovingTabIndexChildReturn.tabbable,
-            getSortValue
+            //getSortValue
         };
         const { managedChildReturn } = useManagedChild({
             context: { managedChildContext },

@@ -1,4 +1,4 @@
-import { UseSortableChildInfo } from "component-detail/use-sortable-children";
+import { UseSortableChildInfo } from "../component-detail/use-sortable-children";
 import { h } from "preact";
 import { useCallback } from "preact/hooks";
 import { UseGridNavigationRowReturnType } from "../component-detail/use-grid-navigation-partial";
@@ -44,7 +44,7 @@ export interface UseCompleteGridNavigationRowParameters<RowElement extends Eleme
 export interface UseCompleteGridNavigationCellParameters<CellElement extends Element, M extends GridSingleSelectSortableChildCellInfo<CellElement>> extends
     Omit<UseGridNavigationSingleSelectionCellParameters<any, CellElement>, "typeaheadNavigationChildContext" | "rovingTabIndexChildContext" | "gridNavigationCellContext" | "refElementReturn"> {
     pressParameters: UsePressParameters<CellElement>["pressParameters"];
-    sortableChildParameters: { getSortValue: UseSortableChildInfo["getSortValue"] };
+    //sortableChildParameters: { getSortValue: UseSortableChildInfo["getSortValue"] };
     //managedChildContext: UseManagedChildParameters<M>["managedChildContext"];
     completeGridNavigationCellParameters: Omit<M, keyof GridSingleSelectSortableChildCellInfo<CellElement>>;
     context: CompleteGridNavigationRowContext<any, CellElement, M>;
@@ -277,7 +277,7 @@ export function useCompleteGridNavigationCell<CellElement extends Element, M ext
     textContentParameters,
     //managedChildContext,
     completeGridNavigationCellParameters,
-    sortableChildParameters: { getSortValue },
+    //sortableChildParameters: { getSortValue },
     pressParameters: { onPressSync, ...pressParameters },
 }: UseCompleteGridNavigationCellParameters<CellElement, M>): UseCompleteGridNavigationCellReturnType<CellElement, M> {
 
@@ -325,7 +325,7 @@ export function useCompleteGridNavigationCell<CellElement extends Element, M ext
         getTabbable: rovingTabIndexChildReturn.getTabbable,
         setTabbable: rovingTabIndexChildReturn.setTabbable,
         tabbable: rovingTabIndexChildReturn.tabbable,
-        getSortValue
+        //getSortValue
     }
 
     const { managedChildReturn } = useManagedChild<M>({
