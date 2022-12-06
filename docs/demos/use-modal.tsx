@@ -30,6 +30,7 @@ export function DemoUseModal(props: { parentDepth?: number }) {
     } = useModal<"lost-focus" | "backdrop" | "escape", HTMLDivElement, HTMLButtonElement, HTMLDivElement>({
         focusTrapParameters: {
             trapActive: focusTrapActive,
+            onlyMoveFocus: false,
             focusOpener,
             focusPopup: useStableCallback((e, f) => f()?.focus())
         },

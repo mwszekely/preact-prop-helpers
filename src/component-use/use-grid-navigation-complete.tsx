@@ -34,7 +34,7 @@ export interface UseCompleteGridNavigationRowParameters<RowElement extends Eleme
         completeGridNavigationRowParameters: Omit<RM, keyof GridSingleSelectSortableChildRowInfo<RowElement, CellElement>>;
         sortableChildParameters: Pick<UseSortableChildInfo, "getSortValue">;
     };
-    rowAsParentOfCellsParameters: Omit<UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM>["rowAsParentOfCellsParameters"], "rovingTabIndexParameters" | "linearNavigationParameters" | "typeaheadNavigationParameters"> & {
+    rowAsParentOfCellsParameters: Omit<UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM>["rowAsParentOfCellsParameters"], "managedChildrenReturn" | "rovingTabIndexParameters" | "linearNavigationParameters" | "typeaheadNavigationParameters"> & {
         linearNavigationParameters: Omit<UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM>["rowAsParentOfCellsParameters"]["linearNavigationParameters"], "getHighestIndex" | "pageNavigationSize" | "isValid" | "indexMangler" | "indexDemangler">;
         typeaheadNavigationParameters: Omit<UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM>["rowAsParentOfCellsParameters"]["typeaheadNavigationParameters"], "isValid">;
         rovingTabIndexParameters: Omit<UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM>["rowAsParentOfCellsParameters"]["rovingTabIndexParameters"], "initiallyTabbedIndex">;

@@ -100,7 +100,7 @@ export interface UseRearrangeableChildrenReturnType<ParentElement extends Elemen
          * Call this on your props (that contain the children to sort!!) to allow them to be sortable.
          * 
          */
-        useRearrangeableProps: (props: h.JSX.HTMLAttributes<ParentElement>) => h.JSX.HTMLAttributes<ParentElement>;
+        useRearrangedChildren: (props: h.JSX.HTMLAttributes<ParentElement>) => h.JSX.HTMLAttributes<ParentElement>;
     }
 }
 
@@ -183,7 +183,7 @@ export function useRearrangeableChildren<ParentElement extends Element, M extend
         getForceUpdate()?.();
     }, []);
 
-    const useRearrangeableProps = useCallback(({ children, ...props }: h.JSX.HTMLAttributes<ParentElement>) => {
+    const useRearrangedChildren = useCallback(({ children, ...props }: h.JSX.HTMLAttributes<ParentElement>) => {
         console.assert(Array.isArray(children));
 
         const forceUpdate = useForceUpdate();
@@ -203,7 +203,7 @@ export function useRearrangeableChildren<ParentElement extends Element, M extend
 
     return {
         //linearNavigationParameters: { navigateAbsolute, navigateRelative },
-        rearrangeableChildrenReturn: { indexMangler, indexDemangler, mangleMap, demangleMap, rearrange, shuffle, useRearrangeableProps, }
+        rearrangeableChildrenReturn: { indexMangler, indexDemangler, mangleMap, demangleMap, rearrange, shuffle, useRearrangedChildren, }
     };
 }
 

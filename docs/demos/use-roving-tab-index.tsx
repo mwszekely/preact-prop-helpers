@@ -44,8 +44,8 @@ export const DemoUseRovingTabIndex = memo(() => {
         singleSelectionReturn: { setSelectedIndex },
         managedChildrenReturn: { getChildren },
         typeaheadNavigationReturn: { invalidTypeahead },
-        rearrangeableChildrenReturn: { useRearrangeableProps: useSortableProps, shuffle }
-        //        rearrangeableChildrenReturn: { useRearrangeableProps: useSortableProps, shuffle }
+        rearrangeableChildrenReturn: { useRearrangedChildren: useSortableProps, shuffle }
+        //        rearrangeableChildrenReturn: { useRearrangedChildren: useSortableProps, shuffle }
     } = r;
     //useSingleSelectionDeclarative({ singleSelectionReturn: {  setSelectedIndex }, singleSelectionDeclarativeParameters: { selectedIndex } });
     const children = getChildren();

@@ -595,7 +595,7 @@ export const DemoUseGrid = memo(() => {
         context,
         props,
         //rearrangeableChildrenParameters: { getHighestChildIndex: ghci, getValid: gv },
-        rearrangeableChildrenReturn: { useRearrangeableProps }
+        rearrangeableChildrenReturn: { useRearrangedChildren }
     } = ret;
     //const { getChildren: getChildren2 } = managedChildrenReturn;
 
@@ -662,7 +662,7 @@ export const DemoUseGrid = memo(() => {
                     </tr>
                 </thead>
                 <GridRowContext.Provider value={context}>
-                    <tbody {...useRearrangeableProps({
+                    <tbody {...useRearrangedChildren({
                         ...props,
                         children: Array.from((function* () {
                             for (let i = 0; i < 10; ++i) {

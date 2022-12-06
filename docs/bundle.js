@@ -4614,7 +4614,7 @@ var bundle = (function (exports) {
             }
             getForceUpdate()?.();
         }, []);
-        const useRearrangeableProps = T$1(({ children, ...props }) => {
+        const useRearrangedChildren = T$1(({ children, ...props }) => {
             console.assert(Array.isArray(children));
             const forceUpdate = useForceUpdate();
             s(() => { setForceUpdate(_prev => forceUpdate); }, [forceUpdate]);
@@ -4630,7 +4630,7 @@ var bundle = (function (exports) {
         }, []);
         return {
             //linearNavigationParameters: { navigateAbsolute, navigateRelative },
-            rearrangeableChildrenReturn: { indexMangler, indexDemangler, mangleMap, demangleMap, rearrange, shuffle: shuffle$1, useRearrangeableProps, }
+            rearrangeableChildrenReturn: { indexMangler, indexDemangler, mangleMap, demangleMap, rearrange, shuffle: shuffle$1, useRearrangedChildren, }
         };
     }
     /**
@@ -6346,6 +6346,7 @@ var bundle = (function (exports) {
         const { propsPopup, propsSource, propsFocusContainer } = useModal({
             focusTrapParameters: {
                 trapActive: focusTrapActive,
+                onlyMoveFocus: false,
                 focusOpener,
                 focusPopup: useStableCallback((e, f) => f()?.focus())
             },
@@ -6380,8 +6381,8 @@ var bundle = (function (exports) {
             },
             sortableChildrenParameters: { compare: T$1((rhs, lhs) => { return lhs.index - rhs.index; }, []) },
         });
-        const { props, context, rovingTabIndexReturn: { setTabbableIndex }, singleSelectionReturn: { setSelectedIndex }, managedChildrenReturn: { getChildren }, typeaheadNavigationReturn: { invalidTypeahead }, rearrangeableChildrenReturn: { useRearrangeableProps: useSortableProps, shuffle }
-        //        rearrangeableChildrenReturn: { useRearrangeableProps: useSortableProps, shuffle }
+        const { props, context, rovingTabIndexReturn: { setTabbableIndex }, singleSelectionReturn: { setSelectedIndex }, managedChildrenReturn: { getChildren }, typeaheadNavigationReturn: { invalidTypeahead }, rearrangeableChildrenReturn: { useRearrangedChildren: useSortableProps, shuffle }
+        //        rearrangeableChildrenReturn: { useRearrangedChildren: useSortableProps, shuffle }
          } = r;
         //useSingleSelectionDeclarative({ singleSelectionReturn: {  setSelectedIndex }, singleSelectionDeclarativeParameters: { selectedIndex } });
         const children = getChildren();
@@ -6874,7 +6875,7 @@ var bundle = (function (exports) {
         });
         const { context, props, 
         //rearrangeableChildrenParameters: { getHighestChildIndex: ghci, getValid: gv },
-        rearrangeableChildrenReturn: { useRearrangeableProps } } = ret;
+        rearrangeableChildrenReturn: { useRearrangedChildren } } = ret;
         //const { getChildren: getChildren2 } = managedChildrenReturn;
         /*const {
             linearNavigationParameters,
@@ -6923,7 +6924,7 @@ var bundle = (function (exports) {
         const { propsStable: p2 } = typeaheadNavigationReturn;
 
         const { getChildren: getChildren2 } = managedChildrenReturn;*/
-        return (o$1("div", { class: "demo", children: [o$1("div", { children: ["Current row: ", tabbableRow] }), o$1("div", { children: ["Current column: ", tabbableColumn] }), o$1("table", { ...{ border: "2" }, style: { whiteSpace: "nowrap" }, children: [o$1("thead", { children: o$1("tr", { children: [o$1("th", { children: "Row is tabbable?" }), o$1("th", { children: "Column 1" }), o$1("th", { children: "Column 2" })] }) }), o$1(GridRowContext.Provider, { value: context, children: o$1("tbody", { ...useRearrangeableProps({
+        return (o$1("div", { class: "demo", children: [o$1("div", { children: ["Current row: ", tabbableRow] }), o$1("div", { children: ["Current column: ", tabbableColumn] }), o$1("table", { ...{ border: "2" }, style: { whiteSpace: "nowrap" }, children: [o$1("thead", { children: o$1("tr", { children: [o$1("th", { children: "Row is tabbable?" }), o$1("th", { children: "Column 1" }), o$1("th", { children: "Column 2" })] }) }), o$1(GridRowContext.Provider, { value: context, children: o$1("tbody", { ...useRearrangedChildren({
                                     ...props,
                                     children: Array.from((function* () {
                                         for (let i = 0; i < 10; ++i) {
