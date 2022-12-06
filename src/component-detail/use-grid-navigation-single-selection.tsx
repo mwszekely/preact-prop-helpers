@@ -32,7 +32,7 @@ export interface UseGridNavigationSingleSelectionRowParameters<RowElement extend
 }
 
 export interface UseGridNavigationSingleSelectionRowReturnType<RowElement extends Element, CellElement extends Element> {
-    rowAsChildOfGridReturn: UseGridNavigationRowReturnType<RowElement, CellElement>["rowAsChildOfGridReturn"] & UseSingleSelectionChildReturnType<RowElement>;
+    rowAsChildOfGridReturn: UseGridNavigationRowReturnType<RowElement, CellElement>["rowAsChildOfGridReturn"] & Omit<UseSingleSelectionChildReturnType<RowElement>, "pressParameters">;
     rowAsParentOfCellsReturn: UseGridNavigationRowReturnType<RowElement, CellElement>["rowAsParentOfCellsReturn"]
 }
 
@@ -98,8 +98,7 @@ export function useGridNavigationSingleSelectionRow<RowElement extends Element, 
             textContentReturn,
             managedChildParameters, 
             hasCurrentFocusParameters: { onCurrentFocusedInnerChanged }, 
-            gridNavigationRowParameters, 
-            pressParameters, 
+            gridNavigationRowParameters,
             rovingTabIndexChildReturn, 
             singleSelectionChildReturn
          },

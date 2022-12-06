@@ -1332,7 +1332,7 @@ var bundle = (function (exports) {
     }
 
     /*!
-    * tabbable 6.0.1
+    * tabbable 6.0.0
     * @license MIT, https://github.com/focus-trap/tabbable/blob/master/LICENSE
     */
     var candidateSelectors = ['input', 'select', 'textarea', 'a[href]', 'button', '[tabindex]:not(slot)', 'audio[controls]', 'video[controls]', '[contenteditable]:not([contenteditable="false"])', 'details>summary:first-of-type', 'details'];
@@ -1343,12 +1343,15 @@ var bundle = (function (exports) {
     } : function (element) {
       return element.ownerDocument;
     };
+
     var isInput = function isInput(node) {
       return node.tagName === 'INPUT';
     };
+
     var isHiddenInput = function isHiddenInput(node) {
       return isInput(node) && node.type === 'hidden';
     };
+
     var isDetailsWithSummary = function isDetailsWithSummary(node) {
       var r = node.tagName === 'DETAILS' && Array.prototype.slice.apply(node.children).some(function (child) {
         return child.tagName === 'SUMMARY';
@@ -1356,9 +1359,10 @@ var bundle = (function (exports) {
       return r;
     };
 
-    // determines if a node is ultimately attached to the window's document
+
     var isNodeAttached = function isNodeAttached(node) {
       var _nodeRootHost;
+
       // The root node is the shadow root if the node is in a shadow DOM; some document otherwise
       //  (but NOT _the_ document; see second 'If' comment below for more).
       // If rootNode is shadow root, it'll have a host, which is the element to which the shadow
@@ -1380,25 +1384,32 @@ var bundle = (function (exports) {
       //  node is actually detached.
       var nodeRootHost = getRootNode(node).host;
       var attached = !!((_nodeRootHost = nodeRootHost) !== null && _nodeRootHost !== void 0 && _nodeRootHost.ownerDocument.contains(nodeRootHost) || node.ownerDocument.contains(node));
+
       while (!attached && nodeRootHost) {
         var _nodeRootHost2;
+
         // since it's not attached and we have a root host, the node MUST be in a nested shadow DOM,
         //  which means we need to get the host's host and check if that parent host is contained
         //  in (i.e. attached to) the document
         nodeRootHost = getRootNode(nodeRootHost).host;
         attached = !!((_nodeRootHost2 = nodeRootHost) !== null && _nodeRootHost2 !== void 0 && _nodeRootHost2.ownerDocument.contains(nodeRootHost));
       }
+
       return attached;
     };
+
     var isZeroArea = function isZeroArea(node) {
       var _node$getBoundingClie = node.getBoundingClientRect(),
-        width = _node$getBoundingClie.width,
-        height = _node$getBoundingClie.height;
+          width = _node$getBoundingClie.width,
+          height = _node$getBoundingClie.height;
+
       return width === 0 && height === 0;
     };
+
     var isHidden = function isHidden(node, _ref) {
       var displayCheck = _ref.displayCheck,
-        getShadowRoot = _ref.getShadowRoot;
+          getShadowRoot = _ref.getShadowRoot;
+
       // NOTE: visibility will be `undefined` if node is detached from the document
       //  (see notes about this further down), which means we will consider it visible
       //  (this is legacy behavior from a very long way back)
@@ -1407,19 +1418,24 @@ var bundle = (function (exports) {
       if (getComputedStyle(node).visibility === 'hidden') {
         return true;
       }
+
       var isDirectSummary = matches.call(node, 'details>summary:first-of-type');
       var nodeUnderDetails = isDirectSummary ? node.parentElement : node;
+
       if (matches.call(nodeUnderDetails, 'details:not([open]) *')) {
         return true;
       }
+
       if (!displayCheck || displayCheck === 'full' || displayCheck === 'legacy-full') {
         if (typeof getShadowRoot === 'function') {
           // figure out if we should consider the node to be in an undisclosed shadow and use the
           //  'non-zero-area' fallback
           var originalNode = node;
+
           while (node) {
             var parentElement = node.parentElement;
             var rootNode = getRootNode(node);
+
             if (parentElement && !parentElement.shadowRoot && getShadowRoot(parentElement) === true // check if there's an undisclosed shadow
             ) {
               // node has an undisclosed shadow which means we can only treat it as a black box, so we
@@ -1436,17 +1452,17 @@ var bundle = (function (exports) {
               node = parentElement;
             }
           }
+
           node = originalNode;
-        }
-        // else, `getShadowRoot` might be true, but all that does is enable shadow DOM support
+        } // else, `getShadowRoot` might be true, but all that does is enable shadow DOM support
         //  (i.e. it does not also presume that all nodes might have undisclosed shadows); or
         //  it might be a falsy value, which means shadow DOM support is disabled
-
         // Since we didn't find it sitting in an undisclosed shadow (or shadows are disabled)
         //  now we can just test to see if it would normally be visible or not, provided it's
         //  attached to the main document.
         // NOTE: We must consider case where node is inside a shadow DOM and given directly to
         //  `isTabbable()` or `isFocusable()` -- regardless of `getShadowRoot` option setting.
+
 
         if (isNodeAttached(node)) {
           // this works wherever the node is: if there's at least one client rect, it's
@@ -1454,9 +1470,7 @@ var bundle = (function (exports) {
           //  node itself is hidden in place of its contents; and there's no need to search
           //  up the hierarchy either
           return !node.getClientRects().length;
-        }
-
-        // Else, the node isn't attached to the document, which means the `getClientRects()`
+        } // Else, the node isn't attached to the document, which means the `getClientRects()`
         //  API will __always__ return zero rects (this can happen, for example, if React
         //  is used to render nodes onto a detached tree, as confirmed in this thread:
         //  https://github.com/facebook/react/issues/9117#issuecomment-284228870)
@@ -1472,10 +1486,12 @@ var bundle = (function (exports) {
         //
         // v6.0.0: As of this major release, the default 'full' option __no longer treats detached
         //  nodes as visible with the 'none' fallback.__
+
+
         if (displayCheck !== 'legacy-full') {
           return true; // hidden
-        }
-        // else, fallback to 'none' mode and consider the node visible
+        } // else, fallback to 'none' mode and consider the node visible
+
       } else if (displayCheck === 'non-zero-area') {
         // NOTE: Even though this tests that the node's client rect is non-zero to determine
         //  whether it's displayed, and that a detached node will __always__ have a zero-area
@@ -1483,60 +1499,68 @@ var bundle = (function (exports) {
         //  this mode, we do want to consider nodes that have a zero area to be hidden at all
         //  times, and that includes attached or not.
         return isZeroArea(node);
-      }
-
-      // visible, as far as we can tell, or per current `displayCheck=none` mode, we assume
+      } // visible, as far as we can tell, or per current `displayCheck=none` mode, we assume
       //  it's visible
-      return false;
-    };
 
-    // form fields (nested) inside a disabled fieldset are not focusable/tabbable
+
+      return false;
+    }; // form fields (nested) inside a disabled fieldset are not focusable/tabbable
     //  unless they are in the _first_ <legend> element of the top-most disabled
     //  fieldset
+
+
     var isDisabledFromFieldset = function isDisabledFromFieldset(node) {
       if (/^(INPUT|BUTTON|SELECT|TEXTAREA)$/.test(node.tagName)) {
-        var parentNode = node.parentElement;
-        // check if `node` is contained in a disabled <fieldset>
+        var parentNode = node.parentElement; // check if `node` is contained in a disabled <fieldset>
+
         while (parentNode) {
           if (parentNode.tagName === 'FIELDSET' && parentNode.disabled) {
             // look for the first <legend> among the children of the disabled <fieldset>
             for (var i = 0; i < parentNode.children.length; i++) {
-              var child = parentNode.children.item(i);
-              // when the first <legend> (in document order) is found
+              var child = parentNode.children.item(i); // when the first <legend> (in document order) is found
+
               if (child.tagName === 'LEGEND') {
                 // if its parent <fieldset> is not nested in another disabled <fieldset>,
                 // return whether `node` is a descendant of its first <legend>
                 return matches.call(parentNode, 'fieldset[disabled] *') ? true : !child.contains(node);
               }
-            }
-            // the disabled <fieldset> containing `node` has no <legend>
+            } // the disabled <fieldset> containing `node` has no <legend>
+
+
             return true;
           }
+
           parentNode = parentNode.parentElement;
         }
-      }
-
-      // else, node's tabbable/focusable state should not be affected by a fieldset's
+      } // else, node's tabbable/focusable state should not be affected by a fieldset's
       //  enabled/disabled state
+
+
       return false;
     };
+
     var isNodeMatchingSelectorFocusable = function isNodeMatchingSelectorFocusable(options, node) {
-      if (node.disabled || isHiddenInput(node) || isHidden(node, options) ||
-      // For a details element with a summary, the summary element gets the focus
+      if (node.disabled || isHiddenInput(node) || isHidden(node, options) || // For a details element with a summary, the summary element gets the focus
       isDetailsWithSummary(node) || isDisabledFromFieldset(node)) {
         return false;
       }
+
       return true;
     };
+
     var focusableCandidateSelector = /* #__PURE__ */candidateSelectors.concat('iframe').join(',');
+
     var isFocusable = function isFocusable(node, options) {
       options = options || {};
+
       if (!node) {
         throw new Error('No node provided');
       }
+
       if (matches.call(node, focusableCandidateSelector) === false) {
         return false;
       }
+
       return isNodeMatchingSelectorFocusable(options, node);
     };
 
@@ -3691,7 +3715,6 @@ var bundle = (function (exports) {
                 managedChildParameters,
                 hasCurrentFocusParameters: { onCurrentFocusedInnerChanged },
                 gridNavigationRowParameters,
-                pressParameters,
                 rovingTabIndexChildReturn,
                 singleSelectionChildReturn
             },
@@ -4726,6 +4749,41 @@ var bundle = (function (exports) {
         return { ...gnr, ...scr, };
     }
 
+    function useListNavigationSingleSelection({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, managedChildrenReturn, ..._void3 }) {
+        const lnr = useListNavigation({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, managedChildrenReturn });
+        const { rovingTabIndexReturn } = lnr;
+        const ssr = useSingleSelection({ rovingTabIndexReturn, managedChildrenReturn, singleSelectionParameters });
+        return {
+            ...ssr,
+            ...lnr,
+        };
+    }
+    function useListNavigationSingleSelectionChild({ managedChildParameters: { index, ..._void5 }, rovingTabIndexChildParameters: { hidden, ...void7 }, singleSelectionChildParameters, singleSelectionContext, rovingTabIndexChildContext, typeaheadNavigationChildContext, refElementReturn, textContentParameters, ..._void1 }) {
+        const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ..._void3 }, ...sscr } = useSingleSelectionChild({
+            managedChildParameters: { index },
+            singleSelectionChildParameters,
+            singleSelectionContext
+        });
+        const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ..._void6 }, ...lncr } = useListNavigationChild({
+            managedChildParameters: { index },
+            rovingTabIndexChildParameters: { hidden },
+            rovingTabIndexChildContext,
+            typeaheadNavigationChildContext,
+            refElementReturn,
+            textContentParameters
+        });
+        return {
+            hasCurrentFocusParameters: {
+                onCurrentFocusedInnerChanged: useStableCallback((focused, previouslyFocused, e) => {
+                    ocfic1?.(focused, previouslyFocused, e);
+                    ocfic2?.(focused, previouslyFocused, e);
+                })
+            },
+            ...sscr,
+            ...lncr
+        };
+    }
+
     /**
      * Allows a composite component (such as a radio group or listbox) to listen
      * for an "overall focusin/out" event; this hook lets you know when focus has
@@ -4798,6 +4856,183 @@ var bundle = (function (exports) {
                 getCurrentFocused: getFocused,
                 getCurrentFocusedInner: getFocusedInner,
             }
+        };
+    }
+
+    function useCompleteGridNavigation({ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, typeaheadNavigationParameters, sortableChildrenParameters, rearrangeableChildrenParameters }) {
+        const getChildren = T$1(() => managedChildrenReturn.getChildren(), []);
+        const getHighestChildIndex = T$1(() => getChildren().getHighestIndex(), []);
+        const isValid = useStableCallback((index) => { return !(getChildren().getAt(index)?.hidden); });
+        const { childrenHaveFocusParameters, managedChildrenParameters, rovingTabIndexChildContext, singleSelectionContext, typeaheadNavigationChildContext, gridNavigationRowContext, ...gridNavigationSingleSelectionReturn } = useGridNavigationSingleSelectionSortable({
+            gridNavigationParameters,
+            linearNavigationParameters: { getHighestIndex: getHighestChildIndex, isValid, ...linearNavigationParameters },
+            managedChildrenReturn: { getChildren },
+            rovingTabIndexParameters: { initiallyTabbedIndex: singleSelectionParameters.initiallySelectedIndex, ...rovingTabIndexParameters },
+            singleSelectionParameters,
+            typeaheadNavigationParameters: { isValid, ...typeaheadNavigationParameters },
+            rearrangeableChildrenParameters,
+            sortableChildrenParameters
+        });
+        const { linearNavigationReturn, typeaheadNavigationReturn } = gridNavigationSingleSelectionReturn;
+        const { childrenHaveFocusChildContext, childrenHaveFocusReturn } = useChildrenHaveFocus({ childrenHaveFocusParameters });
+        const { context: { managedChildContext }, managedChildrenReturn } = useManagedChildren({ managedChildrenParameters });
+        const props = useMergedProps(linearNavigationReturn.propsStable, typeaheadNavigationReturn.propsStable);
+        const context = useStableObject({
+            singleSelectionContext,
+            managedChildContext,
+            rovingTabIndexChildContext,
+            typeaheadNavigationChildContext,
+            childrenHaveFocusChildContext,
+            gridNavigationRowContext,
+        });
+        return {
+            context,
+            props,
+            managedChildrenReturn,
+            ...gridNavigationSingleSelectionReturn,
+            childrenHaveFocusReturn,
+            //rearrangeableChildrenParameters: { getHighestChildIndex: getHighestChildIndex, getValid },
+        };
+    }
+    function useCompleteGridNavigationRow({ rowAsChildOfGridParameters: { managedChildParameters, context: { childrenHaveFocusChildContext, gridNavigationRowContext, managedChildContext: mcc1, rovingTabIndexChildContext, singleSelectionContext, typeaheadNavigationChildContext }, completeGridNavigationRowParameters, singleSelectionChildParameters, rovingTabIndexChildParameters, ...rowAsChildOfGridParameters }, rowAsParentOfCellsParameters: { linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, ...rowAsParentOfCellsParameters } }) {
+        const { index } = managedChildParameters;
+        const getChildren = T$1(() => managedChildrenReturn.getChildren(), []);
+        const getHighestChildIndex = T$1(() => getChildren().getHighestIndex(), []);
+        const isValid = T$1((i) => {
+            const child = getChildren().getAt(i);
+            if (!child)
+                return false;
+            return !child.hidden;
+        }, []);
+        const { refElementReturn } = useRefElement({ refElementParameters: {} });
+        const r = useGridNavigationSingleSelectionRow({
+            rowAsParentOfCellsParameters: {
+                ...rowAsParentOfCellsParameters,
+                rovingTabIndexParameters: { initiallyTabbedIndex: 0, ...rovingTabIndexParameters },
+                typeaheadNavigationParameters: { isValid, ...typeaheadNavigationParameters },
+                linearNavigationParameters: { isValid, getHighestIndex: getHighestChildIndex, pageNavigationSize: 0, indexDemangler: identity$1, indexMangler: identity$1, ...linearNavigationParameters },
+                managedChildrenReturn: { getChildren },
+            },
+            rowAsChildOfGridParameters: {
+                ...rowAsChildOfGridParameters,
+                refElementReturn,
+                rovingTabIndexChildParameters,
+                gridNavigationRowContext,
+                rovingTabIndexChildContext,
+                singleSelectionContext,
+                typeaheadNavigationChildContext,
+                singleSelectionChildParameters,
+                managedChildParameters,
+                managedChildrenReturn: { getChildren },
+            }
+        });
+        const { rowAsChildOfGridReturn, rowAsParentOfCellsReturn } = r;
+        const { context: { managedChildContext }, managedChildrenReturn } = useManagedChildren({ managedChildrenParameters: r.rowAsParentOfCellsReturn.managedChildrenParameters });
+        const { getElement } = refElementReturn;
+        const baseInfo = {
+            getElement,
+            setTabbable: r.rowAsChildOfGridReturn.rovingTabIndexChildReturn.setTabbable,
+            getTabbable: r.rowAsChildOfGridReturn.rovingTabIndexChildReturn.getTabbable,
+            tabbable: r.rowAsChildOfGridReturn.rovingTabIndexChildReturn.tabbable,
+            index: managedChildParameters.index,
+            hidden: rovingTabIndexChildParameters.hidden,
+            selected: r.rowAsChildOfGridReturn.singleSelectionChildReturn.selected,
+            focusSelf: r.rowAsChildOfGridReturn.gridNavigationRowParameters.focusSelf,
+            getSelected: r.rowAsChildOfGridReturn.singleSelectionChildReturn.getSelected,
+            setLocalSelected: r.rowAsChildOfGridReturn.managedChildParameters.setLocalSelected,
+            disabled: singleSelectionChildParameters.disabled,
+            setTabbableColumnIndex: r.rowAsChildOfGridReturn.gridNavigationRowParameters.setTabbableColumnIndex,
+            getSortValue: rowAsChildOfGridParameters.sortableChildParameters.getSortValue
+        };
+        const { managedChildReturn } = useManagedChild({ context: { managedChildContext: mcc1 }, managedChildParameters: { index } }, { ...baseInfo, ...completeGridNavigationRowParameters });
+        const context = useStableObject({
+            managedChildContext,
+            rovingTabIndexChildContext: r.rowAsParentOfCellsReturn.rovingTabIndexChildContext,
+            typeaheadNavigationChildContext: r.rowAsParentOfCellsReturn.typeaheadNavigationChildContext,
+            completeGridNavigationContext: useStableObject({}),
+            gridNavigationCellContext: r.rowAsParentOfCellsReturn.gridNavigationCellContext,
+        });
+        const { hasCurrentFocusParameters } = useChildrenHaveFocusChild({ childrenHaveFocusChildContext });
+        //const { refElementReturn } = useRefElement<RowElement>({ refElementParameters: {} })
+        const { hasCurrentFocusReturn } = useHasCurrentFocus({ refElementReturn, hasCurrentFocusParameters: { ...hasCurrentFocusParameters, onCurrentFocusedChanged: null } });
+        const props = useMergedProps(refElementReturn.propsStable, 
+        // TODO: Rows don't use tabIndex, but just excluding props here is...weird.
+        //r.rowAsChildOfGridReturn.rovingTabIndexChildReturn.propsUnstable,
+        r.rowAsChildOfGridReturn.singleSelectionChildReturn.propsUnstable, r.rowAsParentOfCellsReturn.linearNavigationReturn.propsStable, r.rowAsParentOfCellsReturn.typeaheadNavigationReturn.propsStable, hasCurrentFocusReturn.propsStable);
+        return {
+            context,
+            props,
+            rowAsParentOfCellsReturn: {
+                ...rowAsParentOfCellsReturn,
+                managedChildrenReturn
+            },
+            rowAsChildOfGridReturn: {
+                ...rowAsChildOfGridReturn,
+                managedChildReturn
+            },
+            hasCurrentFocusReturn
+            //managedChildrenReturn,
+            //...gridNavigationSingleSelectionReturn
+        };
+    }
+    function useCompleteGridNavigationCell({ gridNavigationCellParameters, managedChildParameters, context: { completeGridNavigationContext, gridNavigationCellContext, managedChildContext, rovingTabIndexChildContext, typeaheadNavigationChildContext }, rovingTabIndexChildParameters, textContentParameters, 
+    //managedChildContext,
+    completeGridNavigationCellParameters: { focusSelf, ...completeGridNavigationCellParameters },
+    //sortableChildParameters: { getSortValue },
+    //    pressParameters: { onPressSync, ...pressParameters },
+     }) {
+        const { index } = managedChildParameters;
+        const { refElementReturn } = useRefElement({ refElementParameters: {} });
+        const { hasCurrentFocusParameters, rovingTabIndexChildReturn, textContentReturn } = useGridNavigationSingleSelectionCell({
+            gridNavigationCellContext,
+            gridNavigationCellParameters,
+            managedChildParameters,
+            rovingTabIndexChildContext,
+            typeaheadNavigationChildContext,
+            rovingTabIndexChildParameters,
+            refElementReturn,
+            textContentParameters
+        });
+        const { hasCurrentFocusReturn } = useHasCurrentFocus({ hasCurrentFocusParameters: { onCurrentFocusedChanged: null, ...hasCurrentFocusParameters }, refElementReturn });
+        /* const { pressReturn } = usePress<CellElement>({
+             pressParameters: {
+                 onPressSync: useStableCallback<NonNullable<typeof onPressSync>>(e => {
+                     onPressSync?.(e);
+                     completeGridNavigationContext.onPressSync?.(e);
+                 }),
+                 focusSelf: null,
+                 ...pressParameters
+             },
+             refElementReturn
+         });*/
+        const baseInfo = {
+            focusSelf,
+            getElement: refElementReturn.getElement,
+            hidden: rovingTabIndexChildParameters.hidden,
+            index: managedChildParameters.index,
+            getTabbable: rovingTabIndexChildReturn.getTabbable,
+            setTabbable: rovingTabIndexChildReturn.setTabbable,
+            tabbable: rovingTabIndexChildReturn.tabbable,
+            //getSortValue
+        };
+        const { managedChildReturn } = useManagedChild({
+            context: { managedChildContext },
+            managedChildParameters: { index }
+        }, {
+            ...baseInfo,
+            ...completeGridNavigationCellParameters
+        });
+        const props = useMergedProps(refElementReturn.propsStable, 
+        //pressReturn.propsStable,
+        rovingTabIndexChildReturn.propsUnstable, hasCurrentFocusReturn.propsStable);
+        return {
+            props,
+            refElementReturn,
+            rovingTabIndexChildReturn,
+            //pressReturn,
+            hasCurrentFocusReturn,
+            managedChildReturn,
+            textContentReturn
         };
     }
 
@@ -5023,21 +5258,41 @@ var bundle = (function (exports) {
         return false;
     }
 
-    function useCompleteGridNavigation({ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, typeaheadNavigationParameters, sortableChildrenParameters, rearrangeableChildrenParameters }) {
+    /**
+     * All the list-related hooks combined into one giant hook that encapsulates everything.
+     *
+     * Unlike most others, this hook assume's it's the final one--the "outermost" hook in the component--so it uses `useManagedChildren` and wraps everything up nicely,
+     * combining event handlers that are used in multiple sub-hooks, collecting all the necessary context-related data, and merging all known DOM props together.
+     *
+     *
+     *
+     * @returns
+     */
+    function useCompleteListNavigation({ linearNavigationParameters, rearrangeableChildrenParameters, sortableChildrenParameters, typeaheadNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, ...completeListNavigationParameters }) {
+        //type M = UseListNavigationSingleSelectionChildInfo<ChildElement>;
+        const { initiallySelectedIndex } = singleSelectionParameters;
         const getChildren = T$1(() => managedChildrenReturn.getChildren(), []);
         const getHighestChildIndex = T$1(() => getChildren().getHighestIndex(), []);
-        const isValid = useStableCallback((index) => { return !(getChildren().getAt(index)?.hidden); });
-        const { childrenHaveFocusParameters, managedChildrenParameters, rovingTabIndexChildContext, singleSelectionContext, typeaheadNavigationChildContext, gridNavigationRowContext, ...gridNavigationSingleSelectionReturn } = useGridNavigationSingleSelectionSortable({
-            gridNavigationParameters,
-            linearNavigationParameters: { getHighestIndex: getHighestChildIndex, isValid, ...linearNavigationParameters },
-            managedChildrenReturn: { getChildren },
-            rovingTabIndexParameters: { initiallyTabbedIndex: singleSelectionParameters.initiallySelectedIndex, ...rovingTabIndexParameters },
-            singleSelectionParameters,
-            typeaheadNavigationParameters: { isValid, ...typeaheadNavigationParameters },
+        const getValid = T$1((i) => {
+            const child = getChildren().getAt(i);
+            if (!child)
+                return false;
+            return !child.hidden;
+        }, []);
+        const { rearrangeableChildrenReturn, sortableChildrenReturn } = useSortableChildren({
             rearrangeableChildrenParameters,
             sortableChildrenParameters
         });
-        const { linearNavigationReturn, typeaheadNavigationReturn } = gridNavigationSingleSelectionReturn;
+        const { indexDemangler, indexMangler } = rearrangeableChildrenReturn;
+        const { childrenHaveFocusParameters, managedChildrenParameters, rovingTabIndexChildContext, typeaheadNavigationChildContext, singleSelectionContext, linearNavigationReturn, rovingTabIndexReturn, singleSelectionReturn, typeaheadNavigationReturn } = useListNavigationSingleSelection({
+            managedChildrenReturn: { getChildren },
+            linearNavigationParameters: { getHighestIndex: getHighestChildIndex, isValid: getValid, indexDemangler, indexMangler, ...linearNavigationParameters },
+            typeaheadNavigationParameters: { isValid: getValid, ...typeaheadNavigationParameters },
+            rovingTabIndexParameters: { initiallyTabbedIndex: initiallySelectedIndex, ...rovingTabIndexParameters },
+            singleSelectionParameters,
+            ...completeListNavigationParameters,
+        });
+        //const { linearNavigationReturn, typeaheadNavigationReturn } = listNavigationSingleSelectionSortableReturn;
         const { childrenHaveFocusChildContext, childrenHaveFocusReturn } = useChildrenHaveFocus({ childrenHaveFocusParameters });
         const { context: { managedChildContext }, managedChildrenReturn } = useManagedChildren({ managedChildrenParameters });
         const props = useMergedProps(linearNavigationReturn.propsStable, typeaheadNavigationReturn.propsStable);
@@ -5046,155 +5301,91 @@ var bundle = (function (exports) {
             managedChildContext,
             rovingTabIndexChildContext,
             typeaheadNavigationChildContext,
-            childrenHaveFocusChildContext,
-            gridNavigationRowContext,
+            childrenHaveFocusChildContext
         });
         return {
             context,
             props,
             managedChildrenReturn,
-            ...gridNavigationSingleSelectionReturn,
-            childrenHaveFocusReturn,
-            //rearrangeableChildrenParameters: { getHighestChildIndex: getHighestChildIndex, getValid },
+            rearrangeableChildrenReturn,
+            sortableChildrenReturn,
+            linearNavigationReturn,
+            rovingTabIndexReturn,
+            singleSelectionReturn,
+            typeaheadNavigationReturn,
+            childrenHaveFocusReturn
         };
     }
-    function useCompleteGridNavigationRow({ rowAsChildOfGridParameters: { managedChildParameters, context: { childrenHaveFocusChildContext, gridNavigationRowContext, managedChildContext: mcc1, rovingTabIndexChildContext, singleSelectionContext, typeaheadNavigationChildContext }, completeGridNavigationRowParameters, singleSelectionChildParameters, rovingTabIndexChildParameters, ...rowAsChildOfGridParameters }, rowAsParentOfCellsParameters: { linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, ...rowAsParentOfCellsParameters } }) {
+    function useCompleteListNavigationChild({ 
+    //managedChildParameters: { hidden, disabled, index, getSortValue },
+    completeListNavigationChildParameters, singleSelectionChildParameters, rovingTabIndexChildParameters, managedChildParameters, textContentParameters, context: { childrenHaveFocusChildContext, managedChildContext, rovingTabIndexChildContext, singleSelectionContext, typeaheadNavigationChildContext }, pressParameters: { onPressSync: ops1, ...pressParameters }, sortableChildParameters: { getSortValue }, ..._void }) {
+        const { hidden } = rovingTabIndexChildParameters;
         const { index } = managedChildParameters;
-        const getChildren = T$1(() => managedChildrenReturn.getChildren(), []);
-        const getHighestChildIndex = T$1(() => getChildren().getHighestIndex(), []);
-        const isValid = T$1((i) => {
-            const child = getChildren().getAt(i);
-            if (!child)
-                return false;
-            return !child.hidden;
-        }, []);
+        let { disabled } = singleSelectionChildParameters;
+        if (hidden)
+            disabled = true;
         const { refElementReturn } = useRefElement({ refElementParameters: {} });
-        const r = useGridNavigationSingleSelectionRow({
-            rowAsParentOfCellsParameters: {
-                ...rowAsParentOfCellsParameters,
-                rovingTabIndexParameters: { initiallyTabbedIndex: 0, ...rovingTabIndexParameters },
-                typeaheadNavigationParameters: { isValid, ...typeaheadNavigationParameters },
-                linearNavigationParameters: { isValid, getHighestIndex: getHighestChildIndex, pageNavigationSize: 0, indexDemangler: identity$1, indexMangler: identity$1, ...linearNavigationParameters },
-                managedChildrenReturn: { getChildren },
-            },
-            rowAsChildOfGridParameters: {
-                ...rowAsChildOfGridParameters,
-                refElementReturn,
-                rovingTabIndexChildParameters,
-                gridNavigationRowContext,
-                rovingTabIndexChildContext,
-                singleSelectionContext,
-                typeaheadNavigationChildContext,
-                singleSelectionChildParameters,
-                managedChildParameters,
-                managedChildrenReturn: { getChildren },
-            }
-        });
-        const { rowAsChildOfGridReturn, rowAsParentOfCellsReturn } = r;
-        const { context: { managedChildContext }, managedChildrenReturn } = useManagedChildren({ managedChildrenParameters: r.rowAsParentOfCellsReturn.managedChildrenParameters });
         const { getElement } = refElementReturn;
-        const baseInfo = {
-            getElement,
-            setTabbable: r.rowAsChildOfGridReturn.rovingTabIndexChildReturn.setTabbable,
-            getTabbable: r.rowAsChildOfGridReturn.rovingTabIndexChildReturn.getTabbable,
-            tabbable: r.rowAsChildOfGridReturn.rovingTabIndexChildReturn.tabbable,
-            index: managedChildParameters.index,
-            hidden: rovingTabIndexChildParameters.hidden,
-            selected: r.rowAsChildOfGridReturn.singleSelectionChildReturn.selected,
-            focusSelf: r.rowAsChildOfGridReturn.gridNavigationRowParameters.focusSelf,
-            getSelected: r.rowAsChildOfGridReturn.singleSelectionChildReturn.getSelected,
-            setLocalSelected: r.rowAsChildOfGridReturn.managedChildParameters.setLocalSelected,
-            disabled: singleSelectionChildParameters.disabled,
-            setTabbableColumnIndex: r.rowAsChildOfGridReturn.gridNavigationRowParameters.setTabbableColumnIndex,
-            getSortValue: rowAsChildOfGridParameters.sortableChildParameters.getSortValue
-        };
-        const { managedChildReturn } = useManagedChild({ context: { managedChildContext: mcc1 }, managedChildParameters: { index } }, { ...baseInfo, ...completeGridNavigationRowParameters });
-        const context = useStableObject({
-            managedChildContext,
-            rovingTabIndexChildContext: r.rowAsParentOfCellsReturn.rovingTabIndexChildContext,
-            typeaheadNavigationChildContext: r.rowAsParentOfCellsReturn.typeaheadNavigationChildContext,
-            completeGridNavigationContext: useStableObject({ onPressSync: r.rowAsChildOfGridReturn.pressParameters.onPressSync }),
-            gridNavigationCellContext: r.rowAsParentOfCellsReturn.gridNavigationCellContext,
-        });
-        const { hasCurrentFocusParameters } = useChildrenHaveFocusChild({ childrenHaveFocusChildContext });
-        //const { refElementReturn } = useRefElement<RowElement>({ refElementParameters: {} })
-        const { hasCurrentFocusReturn } = useHasCurrentFocus({ refElementReturn, hasCurrentFocusParameters: { ...hasCurrentFocusParameters, onCurrentFocusedChanged: null } });
-        const props = useMergedProps(refElementReturn.propsStable, 
-        // TODO: Rows don't use tabIndex, but just excluding props here is...weird.
-        //r.rowAsChildOfGridReturn.rovingTabIndexChildReturn.propsUnstable,
-        r.rowAsChildOfGridReturn.singleSelectionChildReturn.propsUnstable, r.rowAsParentOfCellsReturn.linearNavigationReturn.propsStable, r.rowAsParentOfCellsReturn.typeaheadNavigationReturn.propsStable, hasCurrentFocusReturn.propsStable);
-        return {
-            context,
-            props,
-            rowAsParentOfCellsReturn: {
-                ...rowAsParentOfCellsReturn,
-                managedChildrenReturn
-            },
-            rowAsChildOfGridReturn: {
-                ...rowAsChildOfGridReturn,
-                managedChildReturn
-            },
-            hasCurrentFocusReturn
-            //managedChildrenReturn,
-            //...gridNavigationSingleSelectionReturn
-        };
-    }
-    function useCompleteGridNavigationCell({ gridNavigationCellParameters, managedChildParameters, context: { completeGridNavigationContext, gridNavigationCellContext, managedChildContext, rovingTabIndexChildContext, typeaheadNavigationChildContext }, rovingTabIndexChildParameters, textContentParameters, 
-    //managedChildContext,
-    completeGridNavigationCellParameters, 
-    //sortableChildParameters: { getSortValue },
-    pressParameters: { onPressSync, ...pressParameters }, }) {
-        const { index } = managedChildParameters;
-        const { refElementReturn } = useRefElement({ refElementParameters: {} });
-        const { hasCurrentFocusParameters, rovingTabIndexChildReturn, textContentReturn } = useGridNavigationSingleSelectionCell({
-            gridNavigationCellContext,
-            gridNavigationCellParameters,
-            managedChildParameters,
+        const { focusSelf } = pressParameters;
+        const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1 }, pressParameters: { onPressSync: ops2, ...p1 }, rovingTabIndexChildReturn, singleSelectionChildReturn, managedChildParameters: { setLocalSelected } } = useListNavigationSingleSelectionChild({
+            managedChildParameters: { index },
+            rovingTabIndexChildParameters: { hidden },
+            singleSelectionChildParameters: { ...singleSelectionChildParameters },
             rovingTabIndexChildContext,
+            singleSelectionContext,
             typeaheadNavigationChildContext,
-            rovingTabIndexChildParameters,
             refElementReturn,
             textContentParameters
         });
-        const { hasCurrentFocusReturn } = useHasCurrentFocus({ hasCurrentFocusParameters: { onCurrentFocusedChanged: null, ...hasCurrentFocusParameters }, refElementReturn });
+        const { getTabbable, setTabbable, tabbable } = rovingTabIndexChildReturn;
         const { pressReturn } = usePress({
             pressParameters: {
-                onPressSync: useStableCallback(e => {
-                    onPressSync?.(e);
-                    completeGridNavigationContext.onPressSync?.(e);
-                }),
-                ...pressParameters
-            },
-            refElementReturn
+                ...p1,
+                ...pressParameters,
+                onPressSync: disabled ? null : ((e) => {
+                    ops2?.(e);
+                    ops1?.(e);
+                })
+            }, refElementReturn
         });
-        const baseInfo = {
-            focusSelf: pressParameters.focusSelf,
-            getElement: refElementReturn.getElement,
-            hidden: rovingTabIndexChildParameters.hidden,
-            index: managedChildParameters.index,
-            getTabbable: rovingTabIndexChildReturn.getTabbable,
-            setTabbable: rovingTabIndexChildReturn.setTabbable,
-            tabbable: rovingTabIndexChildReturn.tabbable,
-            //getSortValue
+        const { getSelected, selected } = singleSelectionChildReturn;
+        const mcp1 = {
+            disabled,
+            focusSelf,
+            getElement,
+            getSelected,
+            getTabbable,
+            hidden,
+            index,
+            selected,
+            setLocalSelected,
+            setTabbable,
+            tabbable,
+            getSortValue
         };
-        const { managedChildReturn } = useManagedChild({
-            context: { managedChildContext },
-            managedChildParameters: { index }
-        }, {
-            ...baseInfo,
-            ...completeGridNavigationCellParameters
+        const { managedChildReturn } = useManagedChild({ context: { managedChildContext }, managedChildParameters: { index } }, { ...mcp1, ...completeListNavigationChildParameters });
+        const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2 } } = useChildrenHaveFocusChild({ childrenHaveFocusChildContext });
+        const onCurrentFocusedInnerChanged = useStableCallback((focused, prev, e) => {
+            ocfic1?.(focused, prev, e);
+            ocfic2?.(focused, prev, e);
         });
-        const props = useMergedProps(refElementReturn.propsStable, pressReturn.propsStable, rovingTabIndexChildReturn.propsUnstable, hasCurrentFocusReturn.propsStable);
+        const { hasCurrentFocusReturn } = useHasCurrentFocus({ hasCurrentFocusParameters: { onCurrentFocusedInnerChanged, onCurrentFocusedChanged: null }, refElementReturn });
+        const props = useMergedProps(refElementReturn.propsStable, pressReturn.propsStable, hasCurrentFocusReturn.propsStable, rovingTabIndexChildReturn.propsUnstable, singleSelectionChildReturn.propsUnstable);
         return {
             props,
-            rovingTabIndexChildReturn,
             pressReturn,
-            refElementReturn,
+            rovingTabIndexChildReturn,
+            singleSelectionChildReturn,
             hasCurrentFocusReturn,
-            managedChildReturn,
-            textContentReturn
+            managedChildReturn
         };
     }
+    /*
+    function foo<ParentElement extends Element, ChildElement extends Element, M extends UseListNavigationSingleSelectionSortableChildInfo<ChildElement>>(p: UseCompleteListNavigationParameters<ParentElement, ChildElement, M>) {
+        const { singleSelectionReturn } = useCompleteListNavigation<ParentElement, ChildElement, M>(p);
+        const selectedIndex = 0;
+        useSingleSelectionDeclarative({ singleSelectionReturn, singleSelectionDeclarativeParameters: { selectedIndex } })
+    }*/
 
     /**
      * Combines dismissal hooks and focus trap hooks into one.
@@ -5876,6 +6067,197 @@ var bundle = (function (exports) {
         };
     }
 
+    function useDraggable({ effectAllowed, data, dragImage, dragImageXOffset, dragImageYOffset }) {
+        const [dragging, setDragging, getDragging] = useState(false);
+        const [lastDropEffect, setLastDropEffect, getLastDropEffect] = useState(null);
+        const onDragStart = (e) => {
+            //e.preventDefault();
+            setDragging(true);
+            if (e.dataTransfer) {
+                e.dataTransfer.effectAllowed = (effectAllowed ?? "all");
+                if (dragImage)
+                    e.dataTransfer.setDragImage(dragImage, dragImageXOffset ?? 0, dragImageYOffset ?? 0);
+                const entries = Object.entries(data);
+                for (const [mimeType, data] of entries) {
+                    e.dataTransfer.setData(mimeType, data);
+                }
+            }
+        };
+        const onDragEnd = (e) => {
+            e.preventDefault();
+            setDragging(false);
+            if (e.dataTransfer) {
+                if (e.dataTransfer.dropEffect != "none") {
+                    setLastDropEffect(e.dataTransfer.dropEffect);
+                }
+                else {
+                    setLastDropEffect(null);
+                }
+            }
+        };
+        // Return both the element and the hook that modifies 
+        // the props and allows us to actually find the element
+        const ret = {
+            propsUnstable: {
+                draggable: true,
+                onDragStart,
+                onDragEnd
+            },
+            dragging,
+            getDragging,
+            lastDropEffect,
+            getLastDropEffect
+        };
+        return ret;
+    }
+
+    class DroppableFileError extends Error {
+        fileName;
+        errorType;
+        constructor(fileName, base) {
+            super(base?.message ?? "An unspecified error occurred reading the file.");
+            this.fileName = fileName;
+            this.errorType = base?.name;
+        }
+    }
+    function useDroppable({ effect }) {
+        const [filesForConsideration, setFilesForConsideration] = useState(null);
+        const [stringsForConsideration, setStringsForConsideration] = useState(null);
+        const [droppedFiles, setDroppedFiles] = useState(null);
+        const [droppedStrings, setDroppedStrings] = useState(null);
+        const [dropError, setDropError] = useState(undefined);
+        // All the promises generated from the drop events.
+        // Used to process multiple drop events in succession
+        const dropPromisesRef = _([]);
+        const [currentPromiseIndex, setCurrentPromiseIndex, getCurrentPromiseIndex] = useState(-1);
+        const [promiseCount, setPromiseCount, getPromiseCount] = useState(0);
+        // Any time we add a new promise, if there's no current promise running, we need to start one.
+        // If there is one, then we don't need to do anything, since it runs the same check.
+        h(() => {
+            const currentPromiseIndex = getCurrentPromiseIndex();
+            const promiseCount = getPromiseCount();
+            if (promiseCount > 0) {
+                if ((currentPromiseIndex + 1) < promiseCount) {
+                    setCurrentPromiseIndex(i => ++i);
+                }
+            }
+        }, [promiseCount]);
+        // Anytime our current promise changes,
+        // wait for it to finish, then set our state to its result.
+        // Finally, check to see if there are anymore promises.
+        // If there are, then increase currentPromiseCount,
+        // which will trigger this again.
+        //
+        // This shouldn't happen *often*, but maybe in the case of
+        // individually dropping a bunch of large files or something.
+        h(() => {
+            if (currentPromiseIndex >= 0) {
+                const currentPromise = dropPromisesRef.current[currentPromiseIndex];
+                currentPromise.then((info) => {
+                    if (info !== null) {
+                        const { files, strings } = info;
+                        setDroppedFiles(files);
+                        setDroppedStrings(strings);
+                    }
+                    // Now that we're done, are there more promises in the queue?
+                    const currentPromiseIndex = getCurrentPromiseIndex();
+                    const promiseCount = getPromiseCount();
+                    if ((currentPromiseIndex + 1) < promiseCount) {
+                        // Since this promise has started, more have been added.
+                        // Run this effect again.
+                        setCurrentPromiseIndex(i => ++i);
+                    }
+                });
+            }
+        }, [currentPromiseIndex]);
+        // Handle collecting the current file metadata or MIME types.
+        const onDragEnter = useStableCallback((e) => {
+            e.preventDefault();
+            if (e.dataTransfer) {
+                // Is there a default? I can't find one anywhere.
+                e.dataTransfer.dropEffect = (effect ?? "move");
+                const newMimeTypes = new Set();
+                const newFiles = new Array();
+                for (const item of e.dataTransfer?.items ?? []) {
+                    const { kind, type } = item;
+                    if (kind === "string") {
+                        newMimeTypes.add(type);
+                    }
+                    else if (kind === "file") {
+                        newFiles.push({ type: item.type });
+                    }
+                }
+                setFilesForConsideration(newFiles);
+                setStringsForConsideration(newMimeTypes);
+            }
+        });
+        // Handle resetting the current file metadata or MIME types
+        const onDragLeave = useStableCallback((e) => {
+            e.preventDefault();
+            setFilesForConsideration(null);
+            setStringsForConsideration(null);
+        });
+        // Boilerplate, I guess
+        const onDragOver = useStableCallback((e) => {
+            e.preventDefault();
+        });
+        // Handle getting the drop data asynchronously
+        const onDrop = useStableCallback((e) => {
+            e.preventDefault();
+            setFilesForConsideration(null);
+            setStringsForConsideration(null);
+            const allPromises = new Array();
+            const dropData = {};
+            const dropFile = [];
+            for (const item of e.dataTransfer?.items ?? []) {
+                const { kind, type } = item;
+                if (kind === "string") {
+                    allPromises.push((new Promise((resolve, _reject) => item.getAsString(resolve))).then(str => dropData[type] = str));
+                }
+                else if (kind === "file") {
+                    const file = item.getAsFile();
+                    if (file) {
+                        allPromises.push(new Promise((resolve, reject) => {
+                            const reader = new FileReader();
+                            reader.onload = (_) => {
+                                resolve();
+                                const data = reader.result;
+                                dropFile.push({ data, name: file.name, type: file.type, size: data.byteLength, lastModified: file.lastModified });
+                            };
+                            reader.onerror = (_) => { reject(new DroppableFileError(file.name, reader.error)); };
+                            reader.onabort = (_) => { reject(new DroppableFileError(file.name, reader.error)); };
+                            reader.readAsArrayBuffer(file);
+                        }));
+                        dropFile.push();
+                    }
+                }
+            }
+            dropPromisesRef.current.push(Promise.all(allPromises).then(() => {
+                setPromiseCount(i => ++i);
+                setDropError(null);
+                return {
+                    strings: dropData,
+                    files: dropFile
+                };
+            }).catch(ex => {
+                /* eslint-disable no-debugger */
+                debugger;
+                setPromiseCount(i => ++i);
+                setDropError(ex);
+                return null;
+            }));
+        });
+        const propsStable = _({ onDragEnter, onDragLeave, onDragOver, onDrop });
+        return {
+            propsStable: propsStable.current,
+            filesForConsideration,
+            stringsForConsideration,
+            droppedFiles,
+            droppedStrings,
+            dropError
+        };
+    }
+
     function useHasLastFocus(args) {
         const { refElementReturn: { getElement }, activeElementParameters: { onLastActiveElementChange, ...activeElementParameters }, hasLastFocusParameters: { onLastFocusedChanged, onLastFocusedInnerChanged, ..._void } } = args;
         useEnsureStability("useHasFocus", onLastFocusedChanged, onLastFocusedInnerChanged);
@@ -5936,6 +6318,44 @@ var bundle = (function (exports) {
         }, []);
     }
 
+    function useTimeout({ timeout, callback, triggerIndex }) {
+        const stableCallback = useStableCallback(() => { startTimeRef.current = null; callback(); });
+        const getTimeout = useStableGetter(timeout);
+        // Set any time we start timeout.
+        // Unset any time the timeout completes
+        const startTimeRef = _(null);
+        const timeoutIsNull = (timeout == null);
+        // Any time the triggerIndex changes (including on mount)
+        // restart the timeout.  The timeout does NOT reset
+        // when the duration or callback changes, only triggerIndex.
+        h(() => {
+            if (!timeoutIsNull) {
+                const timeout = getTimeout();
+                console.assert(timeoutIsNull == (timeout == null));
+                if (timeout != null) {
+                    startTimeRef.current = +(new Date());
+                    const handle = setTimeout(stableCallback, timeout);
+                    return () => clearTimeout(handle);
+                }
+            }
+        }, [triggerIndex, timeoutIsNull]);
+        const getElapsedTime = T$1(() => {
+            return (+(new Date())) - (+(startTimeRef.current ?? new Date()));
+        }, []);
+        const getRemainingTime = T$1(() => {
+            const timeout = getTimeout();
+            return timeout == null ? null : Math.max(0, timeout - getElapsedTime());
+        }, []);
+        return { getElapsedTime, getRemainingTime };
+    }
+
+    const DemoUseInterval = () => {
+        const [interval, setInterval] = p(1000);
+        const [fireCount, setFireCount] = p(0);
+        useInterval({ interval, callback: () => setFireCount(i => ++i) });
+        return (o$1("div", { class: "demo", children: [o$1("h2", { children: "useInterval" }), o$1("p", { children: ["Run code every ", o$1("code", { children: "n" }), " milliseconds after the component mounts"] }), o$1("label", { children: ["Interval duration: ", o$1("input", { type: "number", value: interval, onInput: e => setInterval(e.currentTarget.valueAsNumber) })] }), o$1("div", { children: ["The callback has been called ", fireCount, " time", fireCount === 1 ? "" : "s", "."] })] }));
+    };
+
     function getWindow() { return globalThis.window; }
     function DemoUseModal(props) {
         const parentDepth = (props.parentDepth ?? 0);
@@ -5968,7 +6388,130 @@ var bundle = (function (exports) {
         return (o$1("div", { style: { border: `${depth}px solid black` }, children: [o$1("div", { children: "useModal demo:" }), o$1("div", { style: "display: flex; flex-direction: column", children: [o$1("label", { children: [o$1("input", { type: "checkbox", disabled: true, checked: true }), " Close by setting open to false"] }), o$1("label", { children: [o$1("input", { type: "checkbox", checked: closeOnBackdrop, onInput: e => setCloseOnBackdrop(e.currentTarget.checked) }), " Close on backdrop click"] }), o$1("label", { children: [o$1("input", { type: "checkbox", checked: closeOnEscape, onInput: e => setCloseOnEscape(e.currentTarget.checked) }), " Close on Escape key press"] }), o$1("label", { children: [o$1("input", { type: "checkbox", checked: closeOnLostFocus, onInput: e => setCloseOnLostFocus(e.currentTarget.checked) }), " Close on focus lost"] }), o$1("label", { children: [o$1("input", { type: "checkbox", checked: focusTrapActive, onInput: e => setFocusTrapActive(e.currentTarget.checked) }), " Trap focus"] }), o$1("br", {})] }), o$1("div", { children: ["Last reason for closing: ", closeReason ?? "(hasn't been closed yet)"] }), o$1("button", { ...propsSource, onClick: () => setOpen(true), children: "Open Modal" }), o$1("div", { ...useMergedProps(propsFocusContainer, propsPopup), style: `border: ${depth}px dotted red; background: #ccc`, children: o$1("div", { style: { display: open ? "flex" : "none", flexDirection: "column" }, children: [o$1("div", { children: ["Modal element at depth ", depth, " with ", hasChild ? "a" : "no", " child"] }), o$1("label", { children: [o$1("input", { type: "checkbox", checked: hasChild, onInput: e => setHasChild(e.currentTarget.checked), ref: buttonRef }), " Add a child modal"] }), hasChild && o$1(DemoUseModal, { parentDepth: depth }), o$1("button", { ...propsSource, onClick: () => setOpen(false), children: "Close modal programmatically" })] }) })] }));
     }
 
+    const RandomWords$1 = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
+    const ListNavigationSingleSelectionChildContext = B$2(null);
+    const DemoUseRovingTabIndex = R(() => {
+        const [selectionMode, setSelectionMode] = useState("activation");
+        const [count, setCount] = useState(10);
+        const [min, setMin] = useState(0);
+        // const [selectedIndex, _setLocalSelectedIndex] = useState<number | null>(0);
+        // const [tabbableIndex, _setLocalTabbableIndex] = useState<number | null>(0);
+        const r = useCompleteListNavigation({
+            rovingTabIndexParameters: { onTabbableIndexChange: null, untabbable: false },
+            singleSelectionParameters: { initiallySelectedIndex: 0, setSelectedIndex: useStableCallback(newIndex => { /*setLocalSelectedIndex(newIndex);*/ setSelectedIndex(newIndex); }) },
+            typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000 },
+            linearNavigationParameters: { disableArrowKeys: false, disableHomeEndKeys: false, navigationDirection: "vertical", navigatePastEnd: "wrap", navigatePastStart: "wrap", pageNavigationSize: 0.1 },
+            rearrangeableChildrenParameters: {
+                getIndex: T$1((a) => a.props.index, []),
+            },
+            sortableChildrenParameters: { compare: T$1((rhs, lhs) => { return lhs.index - rhs.index; }, []) },
+        });
+        const { props, context, rovingTabIndexReturn: { setTabbableIndex }, singleSelectionReturn: { setSelectedIndex }, managedChildrenReturn: { getChildren }, typeaheadNavigationReturn: { invalidTypeahead }, rearrangeableChildrenReturn: { useRearrangedChildren, shuffle }
+        //        rearrangeableChildrenReturn: { useRearrangedChildren: useSortableProps, shuffle }
+         } = r;
+        //useSingleSelectionDeclarative({ singleSelectionReturn: {  setSelectedIndex }, singleSelectionDeclarativeParameters: { selectedIndex } });
+        const children = getChildren();
+        const jsxChildren = Array.from((function* () {
+            for (let i = min; i < (count); ++i) {
+                yield o$1(DemoUseRovingTabIndexChild, { index: i }, i);
+            }
+        })());
+        return (o$1("div", { className: "demo", children: [o$1("h2", { children: "Keyboard & List Navigation" }), o$1("h3", { children: o$1("code", { children: "useCompleteListNavigation" }) }), o$1("p", { children: "This hook accomplishes a few things:" }), o$1("ul", { children: [o$1("li", { children: ["Turns a group of widgets into one singular composite widget with only ", o$1("strong", { children: "a single tab stop" }), " shared between them (a \"roving\" tab stop, because it wanders back and forth)."] }), o$1("li", { children: ["Navigation within this composite widget is done via:", o$1("ul", { children: [o$1("li", { children: "Arrow keys (up/down or left/right depending in the orientation you specify)" }), o$1("li", { children: "Page Up/Down to jump by a larger amount (either a fixed number or some percentage of the total number of items, as you specify)" }), o$1("li", { children: "Home/End to jump to the first or last item" })] })] }), o$1("li", { children: "Items can be marked as \"hidden\", in which case they are skipped over when navigating, no matter the method. E.G. if Home is pressed but the first item is hidden, the second item is focused instead." }), o$1("li", { children: "Items can be marked as \"disabled\" to prevent selection (with or without also marking them as \"hidden\", though \"hidden\" implies \"disabled\")." }), o$1("li", { children: "Children can be reordered arbitrarily, including sorting, shuffling, etc. while ensuring coherent navigation regardless." }), o$1("li", { children: ["The parent's selected index is ", o$1("strong", { children: "uncontrolled" }), " and so it does not re-render itself when the selected index changes (you can easily make it controlled, of course, at the cost of 1 additional render. See ", o$1("code", { children: "useSingleSelectionDeclarative" }), " for a shortcut to do exactly that)"] }), o$1("li", { children: "Changing which child is focused or selected only re-renders a maximum of 2 children each time." }), o$1("li", { children: ["Lists can be nested, and there is no strict requirement on DOM structure (except for sorting/rearranging children, if you use that).", o$1("ul", { children: o$1("li", { children: ["If you don't need sorting/rearranging this DOM requirement is ", o$1("strong", { children: "optional" }), "; rearranging requires all children be in one contiguous array of VNodes so that their ", o$1("code", { children: "key" }), " props can be manipulated."] }) })] })] }), o$1("p", { children: "The biggest restriction of this method is that every child needs a 0-based numeric index." }), o$1("label", { children: ["# of items", o$1("input", { type: "number", value: count, min: 0, onInput: e => { e.preventDefault(); setCount(e.currentTarget.valueAsNumber); } })] }), o$1("button", { onClick: () => shuffle(children), children: "Shuffle" }), o$1("label", { children: ["Imperatively set the tabbable index to: ", o$1("input", { type: "number", onInput: e => { e.preventDefault(); setTabbableIndex(e.currentTarget.valueAsNumber, e, false); } })] }), o$1("label", { children: ["Imperatively set the selected index to: ", o$1("input", { type: "number", onInput: e => { e.preventDefault(); setSelectedIndex(e.currentTarget.valueAsNumber); } })] }), o$1("label", { children: ["Skip rendering the first N children: ", o$1("input", { type: "number", min: 0, onInput: e => { e.preventDefault(); setMin(e.currentTarget.valueAsNumber); } })] }), o$1("label", { children: ["Selection mode:", o$1("label", { children: [o$1("input", { name: "rti-demo-selection-mode", type: "radio", checked: selectionMode == 'focus', onInput: e => { e.preventDefault(); setSelectionMode("focus"); } }), " On focus"] }), o$1("label", { children: [o$1("input", { name: "rti-demo-selection-mode", type: "radio", checked: selectionMode == 'activation', onInput: e => { e.preventDefault(); setSelectionMode("activation"); } }), " On activation (click, tap, Enter, Space, etc.)"] })] }), o$1(SelectionModeContext.Provider, { value: selectionMode, children: o$1(ListNavigationSingleSelectionChildContext.Provider, { value: context, children: o$1("ol", { ...props, children: useRearrangedChildren(jsxChildren) }) }) }), o$1("div", { children: invalidTypeahead && "Invalid typeahead (no matches for the current string)" })] }));
+    });
+    const SelectionModeContext = B$2("focus");
+    const DemoUseRovingTabIndexChild = R((({ index }) => {
+        const selectionMode = q(SelectionModeContext);
+        let disabled = (index == 6);
+        let hidden = (index == 7);
+        if (index == 8) {
+            disabled = hidden = true;
+        }
+        const [randomWord] = useState(() => RandomWords$1[index /*Math.floor(Math.random() * (RandomWords.length - 1))*/]);
+        const context = q(ListNavigationSingleSelectionChildContext);
+        const focusSelf = T$1((e) => { e.focus(); }, []);
+        // const { refElementReturn } = useRefElement<HTMLLIElement>({ refElementParameters: { onElementChange: undefined } });
+        //const { getElement, propsStable: p3 } = refElementReturn;
+        const getSortValue = useStableCallback(() => index);
+        const { props, rovingTabIndexChildReturn: { tabbable, propsUnstable: p2 }, singleSelectionChildReturn: { selected } } = useCompleteListNavigationChild({
+            managedChildParameters: { index },
+            rovingTabIndexChildParameters: { hidden },
+            sortableChildParameters: { getSortValue },
+            pressParameters: { onPressSync: null, exclude: {}, focusSelf },
+            singleSelectionChildParameters: { ariaPropName: "aria-selected", selectionMode, disabled },
+            completeListNavigationChildParameters: { foo: "bar" },
+            context,
+            textContentParameters: { getText: T$1((e) => { return e?.textContent ?? ""; }, []) }
+        });
+        const text = `${randomWord} This is item #${index}${hidden ? " (hidden)" : ""}${disabled ? " (disabled)" : ""}${selected ? " (selected)" : " (not selected)"} (${tabbable ? "Tabbable" : "Not tabbable"})`;
+        /*
+            const {
+                hasCurrentFocusParameters: { onCurrentFocusedInnerChanged, ...void5 },
+                managedChildParameters: { getSelected, selected, setSelected, ...void4 },
+                pressParameters: { onPressSync, ...void3 },
+                rovingTabIndexChildReturn: { setTabbable, getTabbable, propsUnstable: p2, tabbable, ...void2 },
+                singleSelectionChildReturn: { propsUnstable: p4, ...void1 },
+                ...void6
+            } = useListNavigationSingleSelectionChild<HTMLLIElement>({
+                managedChildParameters: { hidden, index, disabled },
+                rovingTabIndexChildParameters: rovingTabIndexChildParameters,
+                rovingTabIndexReturn,
+                singleSelectionChildParameters: { ariaPropName: "aria-selected", selectionMode },
+                singleSelectionReturn,
+                typeaheadNavigationChildParameters: { text, ...typeaheadNavigationChildParameters }
+            });
+        
+            const {
+                pressReturn: { propsStable: p5 }
+            } = usePress<HTMLLIElement>({
+                pressParameters: { exclude: {}, focusSelf, onPressSync, onPseudoActiveStart: null, onPseudoActiveStop: null },
+                refElementReturn
+            })
+        
+            useManagedChild<UseListNavigationSingleSelectionChildInfo<HTMLLIElement>>({
+                managedChildParameters: { index, focusSelf, getElement, getSelected, getTabbable, hidden, selected, setSelected, setTabbable, tabbable, disabled },
+                managedChildrenReturn
+            });
+        
+            assertEmptyObject(void1);
+            assertEmptyObject(void2);
+            assertEmptyObject(void3);
+            assertEmptyObject(void4);
+            assertEmptyObject(void5);
+            assertEmptyObject(void6);
+        
+            const {
+                hasCurrentFocusReturn: { propsStable: p6 }
+            } = useHasCurrentFocus({
+                refElementReturn,
+                hasCurrentFocusParameters: {
+                    onCurrentFocusedChanged: null,
+                    onCurrentFocusedInnerChanged
+                }
+            });
+        
+            const props = useMergedProps<HTMLLIElement>(p2, p3, p4, p5, p6);*/
+        return (o$1("li", { ...props, children: [text, o$1("input", { ...useMergedProps(p2, { type: "number" }), style: { width: "5ch" } })] }));
+    }));
+
+    const DemoUseTimeout = () => {
+        const [timeout, setTimeout] = p(1000);
+        const [triggerIndex, setTriggerIndex] = p("");
+        const [fireCount, setFireCount] = p(0);
+        useTimeout({ timeout, triggerIndex, callback: () => setFireCount(i => ++i) });
+        return (o$1("div", { class: "demo", children: [o$1("h2", { children: "useTimeout" }), o$1("p", { children: [o$1("code", { children: "useEffect" }), " but on a timer"] }), o$1("label", { children: ["Timeout duration: ", o$1("input", { type: "number", value: timeout, onInput: e => setTimeout(e.currentTarget.valueAsNumber) })] }), o$1("label", { children: ["Refresh key: ", o$1("input", { type: "text", value: triggerIndex, onInput: e => setTriggerIndex(e.currentTarget.value) })] }), o$1("div", { children: ["The callback has been called ", fireCount, " time", fireCount === 1 ? "" : "s", "."] })] }));
+    };
+
     const RandomWords = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
+    const DemoUseDroppable = () => {
+        const { droppedFiles, droppedStrings, filesForConsideration, stringsForConsideration, propsStable: props, dropError } = useDroppable({ effect: "copy" });
+        useMergedProps({}, { ref: _(null) });
+        const p = useMergedProps(props, { className: "demo droppable" });
+        return (o$1("div", { ...p, children: [droppedStrings != null && o$1("div", { children: ["Data dropped: ", o$1("ul", { children: Object.entries(droppedStrings).map(([type, value]) => o$1("li", { children: [type, ": ", value] })) })] }), droppedFiles != null && o$1("div", { children: ["Files dropped: ", o$1("table", { children: [o$1("thead", { children: o$1("tr", { children: [o$1("th", { children: "Name" }), o$1("th", { children: "Size" }), o$1("th", { children: "Type" }), o$1("th", { children: "Last modified" })] }) }), o$1("tbody", { children: droppedFiles.map(f => o$1("tr", { children: [o$1("td", { children: f.name }), f.data.byteLength, o$1("td", { children: f.type }), o$1("td", { children: new Date(f.lastModified ?? 0) })] })) })] })] }), o$1("hr", {}), stringsForConsideration != null && o$1("div", { children: ["Data being considered: ", o$1("ul", { children: Array.from(stringsForConsideration).map(type => o$1("li", { children: type })) })] }), filesForConsideration != null && o$1("div", { children: ["Files being considered: ", o$1("ul", { children: filesForConsideration.map(f => o$1("li", { children: JSON.stringify(f) })) })] }), o$1("hr", {}), dropError && o$1("div", { children: dropError instanceof Error ? dropError.message : JSON.stringify(dropError) })] }));
+    };
+    const DemoUseDraggable = () => {
+        const { propsUnstable: props } = useDraggable({ data: { "text/plain": "This is custom draggable content of type text/plain." } });
+        return (o$1("div", { ...useMergedProps(props, { className: "demo" }), children: "Draggable content" }));
+    };
     const ChildrenHaveFocusContext = B$2(null);
     const DemoUseChildrenHaveFocus = () => {
         const [maxChildCount, setMaxChildCount] = useState(10);
@@ -5999,7 +6542,10 @@ var bundle = (function (exports) {
         const { hasCurrentFocusReturn } = useHasCurrentFocus({ hasCurrentFocusParameters: { onCurrentFocusedChanged: null, onCurrentFocusedInnerChanged }, refElementReturn });
         return (o$1("div", { tabIndex: 0, ...useMergedProps(refElementReturn.propsStable, hasCurrentFocusReturn.propsStable), children: ["Focusable child #", index, o$1("input", {}), o$1("input", {})] }));
     };
-    R(({ depth }) => {
+    const DemoUseElementSizeAnimation = () => {
+        return o$1("div", {});
+    };
+    const DemoUseFocusTrap = R(({ depth }) => {
         const [active, setActive] = useState(false);
         const { focusTrapReturn: { propsUnstable }, refElementReturn: { propsStable } } = useFocusTrap({
             focusTrapParameters: {
@@ -6019,7 +6565,7 @@ var bundle = (function (exports) {
     const DemoUseFocusTrapChild = R(({ setActive, active }) => {
         return (o$1(p$1, { children: [o$1("button", { children: "Button 1" }), o$1("button", { children: "Button 2" }), o$1("button", { children: "Button 3" }), o$1("label", { children: ["Active: ", o$1("input", { type: "checkbox", checked: active, onInput: e => { e.preventDefault(); setActive(e.currentTarget.checked); } })] })] }));
     });
-    R(() => {
+    const DemoUseAsyncHandler1 = R(() => {
         const [timeout, setTimeout] = useState(1000);
         const [debounce, setDebounce] = useState(0);
         const [shouldThrow, setShouldThrow, getShouldThrow] = useState(false);
@@ -6029,7 +6575,7 @@ var bundle = (function (exports) {
         const onClick = pending ? undefined : syncHandler;
         return (o$1("div", { className: "demo", children: [o$1("button", { disabled: pending && disableConsecutive, onClick: onClick, children: "Click me!" }), o$1("label", { children: ["Sleep for: ", o$1("input", { type: "number", value: timeout, onInput: e => setTimeout(e.currentTarget.valueAsNumber) })] }), o$1("label", { children: ["Throw an error ", o$1("input", { type: "checkbox", checked: shouldThrow, onInput: e => setShouldThrow(e.currentTarget.checked) })] }), o$1("label", { children: ["Disabled while pending ", o$1("input", { type: "checkbox", checked: disableConsecutive, onInput: e => setDisableConsecutive(e.currentTarget.checked) })] }), o$1("label", { children: ["Debounce: ", o$1("input", { type: "number", value: debounce, onInput: e => setDebounce(e.currentTarget.valueAsNumber) })] }), o$1("table", { children: [o$1("thead", { children: o$1("tr", { children: [o$1("th", { children: "Field" }), o$1("th", { children: "Value" })] }) }), o$1("tbody", { children: [o$1("tr", { children: [o$1("td", { children: "callCount" }), o$1("td", { children: callCount })] }), o$1("tr", { children: [o$1("td", { children: "settleCount" }), o$1("td", { children: settleCount })] }), o$1("tr", { children: [o$1("td", { children: "resolveCount" }), o$1("td", { children: resolveCount })] }), o$1("tr", { children: [o$1("td", { children: "rejectCount" }), o$1("td", { children: rejectCount })] }), o$1("tr", { children: [o$1("td", { children: "hasError" }), o$1("td", { children: hasError.toString() })] }), o$1("tr", { children: [o$1("td", { children: "hasCapture" }), o$1("td", { children: hasCapture.toString() })] })] })] })] }));
     });
-    R(() => {
+    const DemoUseAsyncHandler2 = R(() => {
         const [timeout, setTimeout] = useState(1000);
         const [debounce, setDebounce] = useState(0);
         const [shouldThrow, setShouldThrow, getShouldThrow] = useState(false);
@@ -6176,9 +6722,9 @@ var bundle = (function (exports) {
             managedChildParameters: { index },
             rovingTabIndexChildParameters: { hidden: false },
             context,
-            completeGridNavigationCellParameters: { bar: "baz" },
+            completeGridNavigationCellParameters: { bar: "baz", focusSelf: useStableCallback((e) => e.focus()) },
             textContentParameters: { getText: T$1((e) => { return e?.textContent ?? ""; }, []) },
-            pressParameters: { exclude: index <= 1, focusSelf: useStableCallback(e => e.focus()), onPressSync: null }
+            //pressParameters: { exclude: index <= 1, focusSelf: useStableCallback(e => e.focus()), onPressSync: null }
         });
         const t = (tabbable ? "(Tabbable)" : "(Not tabbable)");
         if (index === 0)
@@ -6203,13 +6749,15 @@ var bundle = (function (exports) {
         return (o$1("div", { className: "demo", children: [o$1("input", { ...propsInput }), o$1("label", { ...propsLabel, children: "Label" })] }));
     }
     const Component = () => {
-        return o$1("div", { class: "flex", style: { flexWrap: "wrap" }, children: [o$1("input", {}), o$1("div", { style: "display:grid;grid-template-columns:1fr 1fr", children: [o$1(DemoUseModal, {}), o$1(DemoUseModal, {})] }), o$1("hr", {}), o$1(DemoLabel, {}), o$1("hr", {}), o$1(DemoFocus, {}), o$1("hr", {}), o$1(DemoUseChildrenHaveFocus, {}), o$1("hr", {}), o$1(DemoUseGrid, {}), o$1("input", {})] });
+        return o$1("div", { class: "flex", style: { flexWrap: "wrap" }, children: [o$1("input", {}), o$1("div", { style: "display:grid;grid-template-columns:1fr 1fr", children: [o$1(DemoUseModal, {}), o$1(DemoUseModal, {})] }), o$1("hr", {}), o$1(DemoLabel, {}), o$1("hr", {}), o$1(DemoFocus, {}), o$1("hr", {}), o$1(DemoUseChildrenHaveFocus, {}), o$1("hr", {}), o$1(DemoUseGrid, {}), o$1("hr", {}), o$1(DemoUseTimeout, {}), o$1("hr", {}), o$1(DemoUseInterval, {}), o$1("hr", {}), o$1(DemoUseRovingTabIndex, {}), o$1("hr", {}), o$1(DemoUseFocusTrap, {}), o$1("hr", {}), o$1(DemoUseAsyncHandler1, {}), o$1("hr", {}), o$1(DemoUseAsyncHandler2, {}), o$1("hr", {}), o$1(DemoUseDroppable, {}), o$1("hr", {}), o$1(DemoUseDraggable, {}), o$1("hr", {}), o$1(DemoUseElementSizeAnimation, {}), o$1("hr", {}), o$1("input", {})] });
     };
     requestAnimationFrame(() => {
         P(o$1(Component, {}), document.getElementById("root"));
     });
 
     exports.DemoUseGrid = DemoUseGrid;
+
+    Object.defineProperty(exports, '__esModule', { value: true });
 
     return exports;
 

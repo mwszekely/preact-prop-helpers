@@ -509,9 +509,9 @@ const DemoUseGridCell = (({ index, row, rowIsTabbable }: { index: number, row: n
         managedChildParameters: { index },
         rovingTabIndexChildParameters: { hidden: false },
         context,
-        completeGridNavigationCellParameters: { bar: "baz" },
+        completeGridNavigationCellParameters: { bar: "baz", focusSelf: useStableCallback((e: HTMLElement) => e.focus()) },
         textContentParameters: { getText: useCallback((e: Element | null) => { return e?.textContent ?? "" }, []) },
-        pressParameters: { exclude: index <= 1, focusSelf: useStableCallback(e => e.focus()), onPressSync: null }
+        //pressParameters: { exclude: index <= 1, focusSelf: useStableCallback(e => e.focus()), onPressSync: null }
     });
 
 
@@ -562,7 +562,7 @@ const Component = () => {
         <DemoUseChildrenHaveFocus />
         <hr />
         <DemoUseGrid />
-        {/*<hr />
+        <hr />
         <DemoUseTimeout />
         <hr />
         <DemoUseInterval />
@@ -582,7 +582,7 @@ const Component = () => {
         <DemoUseDraggable />
         <hr />
         <DemoUseElementSizeAnimation />
-        <hr />*/}
+        <hr />
         <input />
     </div>
 }

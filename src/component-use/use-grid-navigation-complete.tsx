@@ -12,7 +12,7 @@ import { ManagedChildren, useManagedChild, useManagedChildren, UseManagedChildre
 import { identity } from "../preact-extensions/use-passive-state";
 import { useStableCallback } from "../preact-extensions/use-stable-callback";
 import { useStableObject } from "../preact-extensions/use-stable-getter";
-import { usePress, UsePressParameters, UsePressReturnType } from "./use-press";
+
 
 /*export interface UseCompleteGridNavigationChildInfo<RowElement extends Element, CellElement extends Element> extends GridSingleSelectSortableChildRowInfo<RowElement, CellElement> {
     
@@ -43,10 +43,10 @@ export interface UseCompleteGridNavigationRowParameters<RowElement extends Eleme
 
 export interface UseCompleteGridNavigationCellParameters<CellElement extends Element, M extends GridSingleSelectSortableChildCellInfo<CellElement>> extends
     Omit<UseGridNavigationSingleSelectionCellParameters<any, CellElement>, "typeaheadNavigationChildContext" | "rovingTabIndexChildContext" | "gridNavigationCellContext" | "refElementReturn"> {
-    pressParameters: UsePressParameters<CellElement>["pressParameters"];
+    //pressParameters: UsePressParameters<CellElement>["pressParameters"];
     //sortableChildParameters: { getSortValue: UseSortableChildInfo["getSortValue"] };
     //managedChildContext: UseManagedChildParameters<M>["managedChildContext"];
-    completeGridNavigationCellParameters: Omit<M, keyof GridSingleSelectSortableChildCellInfo<CellElement>>;
+    completeGridNavigationCellParameters: Pick<M, "focusSelf"> & Omit<M, keyof GridSingleSelectSortableChildCellInfo<CellElement>>;
     context: CompleteGridNavigationRowContext<any, CellElement, M>;
     //managedChildReturn: UseManagedChildReturnType<M>["managedChildReturn"];
 }
@@ -62,7 +62,8 @@ export interface CompleteGridNavigationContext<ParentOrRowElement extends Elemen
 export interface CompleteGridNavigationRowContext<ParentElement extends Element, ChildElement extends Element, M extends GridSingleSelectSortableChildCellInfo<ChildElement>> extends UseManagedChildrenContext<M>,
     Pick<UseGridNavigationRowReturnType<ParentElement, ChildElement>["rowAsParentOfCellsReturn"], "rovingTabIndexChildContext" | "typeaheadNavigationChildContext" | "gridNavigationCellContext"> {
     completeGridNavigationContext: {
-        onPressSync: UsePressParameters<ChildElement>["pressParameters"]["onPressSync"]
+        //onClick: () => void;
+        // onPressSync: UsePressParameters<ChildElement>["pressParameters"]["onPressSync"]
     }
 }
 
@@ -91,7 +92,9 @@ export interface UseCompleteGridNavigationRowReturnType<RowElement extends Eleme
 
 export interface UseCompleteGridNavigationCellReturnType<CellElement extends Element, CM extends GridSingleSelectSortableChildCellInfo<CellElement>> extends
     Omit<UseGridNavigationSingleSelectionSortableCellReturnType<CellElement>, "hasCurrentFocusParameters">,
-    UsePressReturnType<CellElement>, UseRefElementReturnType<CellElement>, UseHasCurrentFocusReturnType<CellElement>, UseManagedChildReturnType<CM> {
+    //UsePressReturnType<CellElement>, 
+    UseRefElementReturnType<CellElement>, UseHasCurrentFocusReturnType<CellElement>, UseManagedChildReturnType<CM> 
+    {
     props: h.JSX.HTMLAttributes<CellElement>;
 
 }
@@ -238,7 +241,7 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
         managedChildContext,
         rovingTabIndexChildContext: r.rowAsParentOfCellsReturn.rovingTabIndexChildContext,
         typeaheadNavigationChildContext: r.rowAsParentOfCellsReturn.typeaheadNavigationChildContext,
-        completeGridNavigationContext: useStableObject({ onPressSync: r.rowAsChildOfGridReturn.pressParameters.onPressSync as any }),
+        completeGridNavigationContext: useStableObject({  }),
         gridNavigationCellContext: r.rowAsParentOfCellsReturn.gridNavigationCellContext,
     });
     const { hasCurrentFocusParameters } = useChildrenHaveFocusChild({ childrenHaveFocusChildContext });
@@ -279,9 +282,9 @@ export function useCompleteGridNavigationCell<CellElement extends Element, M ext
     rovingTabIndexChildParameters,
     textContentParameters,
     //managedChildContext,
-    completeGridNavigationCellParameters,
+    completeGridNavigationCellParameters: { focusSelf, ...completeGridNavigationCellParameters },
     //sortableChildParameters: { getSortValue },
-    pressParameters: { onPressSync, ...pressParameters },
+//    pressParameters: { onPressSync, ...pressParameters },
 }: UseCompleteGridNavigationCellParameters<CellElement, M>): UseCompleteGridNavigationCellReturnType<CellElement, M> {
 
     const { index } = managedChildParameters;
@@ -307,21 +310,22 @@ export function useCompleteGridNavigationCell<CellElement extends Element, M ext
 
 
 
-    const { pressReturn } = usePress<CellElement>({
+   /* const { pressReturn } = usePress<CellElement>({
         pressParameters: {
             onPressSync: useStableCallback<NonNullable<typeof onPressSync>>(e => {
                 onPressSync?.(e);
                 completeGridNavigationContext.onPressSync?.(e);
             }),
+            focusSelf: null,
             ...pressParameters
         },
         refElementReturn
-    });
+    });*/
 
 
 
     const baseInfo: GridSingleSelectSortableChildCellInfo<CellElement> = {
-        focusSelf: pressParameters.focusSelf,
+        focusSelf,
         getElement: refElementReturn.getElement,
         hidden: rovingTabIndexChildParameters.hidden,
         index: managedChildParameters.index,
@@ -342,16 +346,16 @@ export function useCompleteGridNavigationCell<CellElement extends Element, M ext
 
     const props = useMergedProps(
         refElementReturn.propsStable,
-        pressReturn.propsStable,
+        //pressReturn.propsStable,
         rovingTabIndexChildReturn.propsUnstable,
         hasCurrentFocusReturn.propsStable
     );
 
     return {
         props,
-        rovingTabIndexChildReturn,
-        pressReturn,
         refElementReturn,
+        rovingTabIndexChildReturn,
+        //pressReturn,
         hasCurrentFocusReturn,
         managedChildReturn,
         textContentReturn
