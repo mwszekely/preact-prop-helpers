@@ -173,9 +173,6 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
 
     const lncr = useListNavigationChild<RowElement>(asChildRowOfTable);
     const untabbable = !lncr.rovingTabIndexChildReturn.tabbable;
-    //if (untabbable && asChildRowOfTable.managedChildParameters.index == 1)
-    //    debugger;
-    console.log(`Row #${asChildRowOfTable.managedChildParameters.index}${untabbable? " is untabbable" : ""}`)
     const lnr = useListNavigation<RowElement, CellElement, CM>({ ...asParentRowOfCellsP, rovingTabIndexParameters: { untabbable, ...rovingTabIndexParameters }, linearNavigationParameters: { navigationDirection: "horizontal", ...linearNavigationParameters } });
 
 

@@ -1209,10 +1209,8 @@ var bundle = (function (exports) {
             window[MagicWindowKey] ??= { microtaskQueued: false, elementQueue: new Map() };
             const info = window[MagicWindowKey];
             if (open) {
-                console.log(`Adding handler for depth=${getDepth()}`);
                 window.addEventListener("keydown", handler, { capture: true });
                 return () => {
-                    console.log(`Removing handler for depth=${getDepth()}`);
                     const element = getElement();
                     if (element && info.elementQueue)
                         info.elementQueue.delete(element);
@@ -1221,7 +1219,6 @@ var bundle = (function (exports) {
             }
             function handler(e) {
                 if (e.key == "Escape") {
-                    console.log(`Escape key for depth=${getDepth()}`);
                     // We don't know which of the currently active soft dismisses will actually do something,
                     // but ONE of them definitely will,
                     // so we stop propagation to child nodes, but not to everyone on the window (stopImmediatePropagation).
@@ -3532,9 +3529,6 @@ var bundle = (function (exports) {
         }, []);
         const lncr = useListNavigationChild(asChildRowOfTable);
         const untabbable = !lncr.rovingTabIndexChildReturn.tabbable;
-        //if (untabbable && asChildRowOfTable.managedChildParameters.index == 1)
-        //    debugger;
-        console.log(`Row #${asChildRowOfTable.managedChildParameters.index}${untabbable ? " is untabbable" : ""}`);
         const lnr = useListNavigation({ ...asParentRowOfCellsP, rovingTabIndexParameters: { untabbable, ...rovingTabIndexParameters }, linearNavigationParameters: { navigationDirection: "horizontal", ...linearNavigationParameters } });
         const { rovingTabIndexReturn: { setTabbableIndex }, rovingTabIndexReturn, linearNavigationReturn, managedChildrenParameters, rovingTabIndexChildContext, typeaheadNavigationChildContext, typeaheadNavigationReturn } = lnr;
         return {
@@ -4743,7 +4737,6 @@ var bundle = (function (exports) {
         const { childrenHaveFocusParameters: { onCompositeFocusChange } } = args;
         const [getAnyFocused, setAnyFocused] = usePassiveState(onCompositeFocusChange, returnFalse, runImmediately);
         const [_getFocusCount, setFocusCount] = usePassiveState(useStableCallback((anyFocused, anyPreviouslyFocused, e) => {
-            console.log("Focus count: " + anyFocused);
             console.assert(anyFocused >= 0 && anyFocused <= 1);
             setAnyFocused(!!(anyFocused && !anyPreviouslyFocused), e);
         }));

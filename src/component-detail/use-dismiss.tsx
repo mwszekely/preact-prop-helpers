@@ -110,11 +110,9 @@ export function useEscapeDismiss<PopupElement extends Element>({ escapeDismissPa
         const info = window[MagicWindowKey] as WindowEscapeKeyInfo;
 
         if (open) {
-            console.log(`Adding handler for depth=${getDepth()}`);
             window.addEventListener("keydown", handler, { capture: true });
 
             return () => {
-                console.log(`Removing handler for depth=${getDepth()}`);
                 const element = getElement();
                 if (element && info.elementQueue)
                     info.elementQueue.delete(element);
@@ -127,7 +125,6 @@ export function useEscapeDismiss<PopupElement extends Element>({ escapeDismissPa
 
         function handler(e: KeyboardEvent) {
             if (e.key == "Escape") {
-                console.log(`Escape key for depth=${getDepth()}`);
 
                 // We don't know which of the currently active soft dismisses will actually do something,
                 // but ONE of them definitely will,
