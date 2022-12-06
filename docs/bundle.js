@@ -1332,7 +1332,7 @@ var bundle = (function (exports) {
     }
 
     /*!
-    * tabbable 6.0.0
+    * tabbable 6.0.1
     * @license MIT, https://github.com/focus-trap/tabbable/blob/master/LICENSE
     */
     var candidateSelectors = ['input', 'select', 'textarea', 'a[href]', 'button', '[tabindex]:not(slot)', 'audio[controls]', 'video[controls]', '[contenteditable]:not([contenteditable="false"])', 'details>summary:first-of-type', 'details'];
@@ -1343,15 +1343,12 @@ var bundle = (function (exports) {
     } : function (element) {
       return element.ownerDocument;
     };
-
     var isInput = function isInput(node) {
       return node.tagName === 'INPUT';
     };
-
     var isHiddenInput = function isHiddenInput(node) {
       return isInput(node) && node.type === 'hidden';
     };
-
     var isDetailsWithSummary = function isDetailsWithSummary(node) {
       var r = node.tagName === 'DETAILS' && Array.prototype.slice.apply(node.children).some(function (child) {
         return child.tagName === 'SUMMARY';
@@ -1359,10 +1356,9 @@ var bundle = (function (exports) {
       return r;
     };
 
-
+    // determines if a node is ultimately attached to the window's document
     var isNodeAttached = function isNodeAttached(node) {
       var _nodeRootHost;
-
       // The root node is the shadow root if the node is in a shadow DOM; some document otherwise
       //  (but NOT _the_ document; see second 'If' comment below for more).
       // If rootNode is shadow root, it'll have a host, which is the element to which the shadow
@@ -1384,32 +1380,25 @@ var bundle = (function (exports) {
       //  node is actually detached.
       var nodeRootHost = getRootNode(node).host;
       var attached = !!((_nodeRootHost = nodeRootHost) !== null && _nodeRootHost !== void 0 && _nodeRootHost.ownerDocument.contains(nodeRootHost) || node.ownerDocument.contains(node));
-
       while (!attached && nodeRootHost) {
         var _nodeRootHost2;
-
         // since it's not attached and we have a root host, the node MUST be in a nested shadow DOM,
         //  which means we need to get the host's host and check if that parent host is contained
         //  in (i.e. attached to) the document
         nodeRootHost = getRootNode(nodeRootHost).host;
         attached = !!((_nodeRootHost2 = nodeRootHost) !== null && _nodeRootHost2 !== void 0 && _nodeRootHost2.ownerDocument.contains(nodeRootHost));
       }
-
       return attached;
     };
-
     var isZeroArea = function isZeroArea(node) {
       var _node$getBoundingClie = node.getBoundingClientRect(),
-          width = _node$getBoundingClie.width,
-          height = _node$getBoundingClie.height;
-
+        width = _node$getBoundingClie.width,
+        height = _node$getBoundingClie.height;
       return width === 0 && height === 0;
     };
-
     var isHidden = function isHidden(node, _ref) {
       var displayCheck = _ref.displayCheck,
-          getShadowRoot = _ref.getShadowRoot;
-
+        getShadowRoot = _ref.getShadowRoot;
       // NOTE: visibility will be `undefined` if node is detached from the document
       //  (see notes about this further down), which means we will consider it visible
       //  (this is legacy behavior from a very long way back)
@@ -1418,24 +1407,19 @@ var bundle = (function (exports) {
       if (getComputedStyle(node).visibility === 'hidden') {
         return true;
       }
-
       var isDirectSummary = matches.call(node, 'details>summary:first-of-type');
       var nodeUnderDetails = isDirectSummary ? node.parentElement : node;
-
       if (matches.call(nodeUnderDetails, 'details:not([open]) *')) {
         return true;
       }
-
       if (!displayCheck || displayCheck === 'full' || displayCheck === 'legacy-full') {
         if (typeof getShadowRoot === 'function') {
           // figure out if we should consider the node to be in an undisclosed shadow and use the
           //  'non-zero-area' fallback
           var originalNode = node;
-
           while (node) {
             var parentElement = node.parentElement;
             var rootNode = getRootNode(node);
-
             if (parentElement && !parentElement.shadowRoot && getShadowRoot(parentElement) === true // check if there's an undisclosed shadow
             ) {
               // node has an undisclosed shadow which means we can only treat it as a black box, so we
@@ -1452,17 +1436,17 @@ var bundle = (function (exports) {
               node = parentElement;
             }
           }
-
           node = originalNode;
-        } // else, `getShadowRoot` might be true, but all that does is enable shadow DOM support
+        }
+        // else, `getShadowRoot` might be true, but all that does is enable shadow DOM support
         //  (i.e. it does not also presume that all nodes might have undisclosed shadows); or
         //  it might be a falsy value, which means shadow DOM support is disabled
+
         // Since we didn't find it sitting in an undisclosed shadow (or shadows are disabled)
         //  now we can just test to see if it would normally be visible or not, provided it's
         //  attached to the main document.
         // NOTE: We must consider case where node is inside a shadow DOM and given directly to
         //  `isTabbable()` or `isFocusable()` -- regardless of `getShadowRoot` option setting.
-
 
         if (isNodeAttached(node)) {
           // this works wherever the node is: if there's at least one client rect, it's
@@ -1470,7 +1454,9 @@ var bundle = (function (exports) {
           //  node itself is hidden in place of its contents; and there's no need to search
           //  up the hierarchy either
           return !node.getClientRects().length;
-        } // Else, the node isn't attached to the document, which means the `getClientRects()`
+        }
+
+        // Else, the node isn't attached to the document, which means the `getClientRects()`
         //  API will __always__ return zero rects (this can happen, for example, if React
         //  is used to render nodes onto a detached tree, as confirmed in this thread:
         //  https://github.com/facebook/react/issues/9117#issuecomment-284228870)
@@ -1486,12 +1472,10 @@ var bundle = (function (exports) {
         //
         // v6.0.0: As of this major release, the default 'full' option __no longer treats detached
         //  nodes as visible with the 'none' fallback.__
-
-
         if (displayCheck !== 'legacy-full') {
           return true; // hidden
-        } // else, fallback to 'none' mode and consider the node visible
-
+        }
+        // else, fallback to 'none' mode and consider the node visible
       } else if (displayCheck === 'non-zero-area') {
         // NOTE: Even though this tests that the node's client rect is non-zero to determine
         //  whether it's displayed, and that a detached node will __always__ have a zero-area
@@ -1499,68 +1483,60 @@ var bundle = (function (exports) {
         //  this mode, we do want to consider nodes that have a zero area to be hidden at all
         //  times, and that includes attached or not.
         return isZeroArea(node);
-      } // visible, as far as we can tell, or per current `displayCheck=none` mode, we assume
+      }
+
+      // visible, as far as we can tell, or per current `displayCheck=none` mode, we assume
       //  it's visible
-
-
       return false;
-    }; // form fields (nested) inside a disabled fieldset are not focusable/tabbable
+    };
+
+    // form fields (nested) inside a disabled fieldset are not focusable/tabbable
     //  unless they are in the _first_ <legend> element of the top-most disabled
     //  fieldset
-
-
     var isDisabledFromFieldset = function isDisabledFromFieldset(node) {
       if (/^(INPUT|BUTTON|SELECT|TEXTAREA)$/.test(node.tagName)) {
-        var parentNode = node.parentElement; // check if `node` is contained in a disabled <fieldset>
-
+        var parentNode = node.parentElement;
+        // check if `node` is contained in a disabled <fieldset>
         while (parentNode) {
           if (parentNode.tagName === 'FIELDSET' && parentNode.disabled) {
             // look for the first <legend> among the children of the disabled <fieldset>
             for (var i = 0; i < parentNode.children.length; i++) {
-              var child = parentNode.children.item(i); // when the first <legend> (in document order) is found
-
+              var child = parentNode.children.item(i);
+              // when the first <legend> (in document order) is found
               if (child.tagName === 'LEGEND') {
                 // if its parent <fieldset> is not nested in another disabled <fieldset>,
                 // return whether `node` is a descendant of its first <legend>
                 return matches.call(parentNode, 'fieldset[disabled] *') ? true : !child.contains(node);
               }
-            } // the disabled <fieldset> containing `node` has no <legend>
-
-
+            }
+            // the disabled <fieldset> containing `node` has no <legend>
             return true;
           }
-
           parentNode = parentNode.parentElement;
         }
-      } // else, node's tabbable/focusable state should not be affected by a fieldset's
+      }
+
+      // else, node's tabbable/focusable state should not be affected by a fieldset's
       //  enabled/disabled state
-
-
       return false;
     };
-
     var isNodeMatchingSelectorFocusable = function isNodeMatchingSelectorFocusable(options, node) {
-      if (node.disabled || isHiddenInput(node) || isHidden(node, options) || // For a details element with a summary, the summary element gets the focus
+      if (node.disabled || isHiddenInput(node) || isHidden(node, options) ||
+      // For a details element with a summary, the summary element gets the focus
       isDetailsWithSummary(node) || isDisabledFromFieldset(node)) {
         return false;
       }
-
       return true;
     };
-
     var focusableCandidateSelector = /* #__PURE__ */candidateSelectors.concat('iframe').join(',');
-
     var isFocusable = function isFocusable(node, options) {
       options = options || {};
-
       if (!node) {
         throw new Error('No node provided');
       }
-
       if (matches.call(node, focusableCandidateSelector) === false) {
         return false;
       }
-
       return isNodeMatchingSelectorFocusable(options, node);
     };
 
@@ -6756,8 +6732,6 @@ var bundle = (function (exports) {
     });
 
     exports.DemoUseGrid = DemoUseGrid;
-
-    Object.defineProperty(exports, '__esModule', { value: true });
 
     return exports;
 
