@@ -3544,8 +3544,8 @@ var bundle = (function (exports) {
         const lnr = useListNavigation({ ...asParentRowOfCellsP, linearNavigationParameters: { navigationDirection: "horizontal", ...linearNavigationParameters } });
         const { rovingTabIndexReturn: { setTabbableIndex }, rovingTabIndexReturn, linearNavigationReturn, managedChildrenParameters, rovingTabIndexChildContext, typeaheadNavigationChildContext, typeaheadNavigationReturn } = lnr;
         return {
-            asChildRowReturn: { gridNavigationRowParameters: { focusSelf, setTabbableColumnIndex: setTabbableIndex }, ...lncr, },
-            asParentRowReturn: {
+            rowAsChildOfGrid: { gridNavigationRowParameters: { focusSelf, setTabbableColumnIndex: setTabbableIndex }, ...lncr, },
+            rowAsParentOfCells: {
                 ...lnr,
                 gridNavigationCellContext: useStableObject({
                     gridNavigationCellParameters: useStableObject({
@@ -3695,10 +3695,10 @@ var bundle = (function (exports) {
     }
     function useGridNavigationSingleSelectionRow({ asChildRowParameters, asParentRowParameters, ..._void1 }) {
         const { managedChildParameters, hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ..._void3 }, pressParameters, singleSelectionChildReturn } = useSingleSelectionChild(asChildRowParameters);
-        const { asChildRowReturn: { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ..._void2 }, gridNavigationRowParameters, rovingTabIndexChildReturn, textContentReturn, ...void4 }, asParentRowReturn } = useGridNavigationRow({ asChildRowParameters, asParentRowParameters });
+        const { rowAsChildOfGrid: { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ..._void2 }, gridNavigationRowParameters, rovingTabIndexChildReturn, textContentReturn, ...void4 }, rowAsParentOfCells } = useGridNavigationRow({ asChildRowParameters, asParentRowParameters });
         const onCurrentFocusedInnerChanged = useStableCallback((focused, prevFocused, e) => { ocfic1?.(focused, prevFocused, e); ocfic2?.(focused, prevFocused, e); });
         return {
-            asChildRowReturn: {
+            rowAsChildOfGrid: {
                 textContentReturn,
                 managedChildParameters,
                 hasCurrentFocusParameters: { onCurrentFocusedInnerChanged },
@@ -3707,7 +3707,7 @@ var bundle = (function (exports) {
                 rovingTabIndexChildReturn,
                 singleSelectionChildReturn
             },
-            asParentRowReturn
+            rowAsParentOfCells
         };
     }
     // EZ
@@ -5132,48 +5132,50 @@ var bundle = (function (exports) {
                 managedChildrenReturn: { getChildren },
             }
         });
-        const { asChildRowReturn, asParentRowReturn } = r;
-        const { context: { managedChildContext }, managedChildrenReturn } = useManagedChildren({ managedChildrenParameters: r.asParentRowReturn.managedChildrenParameters });
+        const { rowAsChildOfGrid, rowAsParentOfCells } = r;
+        const { context: { managedChildContext }, managedChildrenReturn } = useManagedChildren({ managedChildrenParameters: r.rowAsParentOfCells.managedChildrenParameters });
         const { getElement } = refElementReturn;
         const baseInfo = {
             getElement,
-            setTabbable: r.asChildRowReturn.rovingTabIndexChildReturn.setTabbable,
-            getTabbable: r.asChildRowReturn.rovingTabIndexChildReturn.getTabbable,
-            tabbable: r.asChildRowReturn.rovingTabIndexChildReturn.tabbable,
+            setTabbable: r.rowAsChildOfGrid.rovingTabIndexChildReturn.setTabbable,
+            getTabbable: r.rowAsChildOfGrid.rovingTabIndexChildReturn.getTabbable,
+            tabbable: r.rowAsChildOfGrid.rovingTabIndexChildReturn.tabbable,
             index: managedChildParameters.index,
             hidden: rovingTabIndexChildParameters.hidden,
-            selected: r.asChildRowReturn.singleSelectionChildReturn.selected,
-            focusSelf: r.asChildRowReturn.gridNavigationRowParameters.focusSelf,
-            getSelected: r.asChildRowReturn.singleSelectionChildReturn.getSelected,
-            setLocalSelected: r.asChildRowReturn.managedChildParameters.setLocalSelected,
+            selected: r.rowAsChildOfGrid.singleSelectionChildReturn.selected,
+            focusSelf: r.rowAsChildOfGrid.gridNavigationRowParameters.focusSelf,
+            getSelected: r.rowAsChildOfGrid.singleSelectionChildReturn.getSelected,
+            setLocalSelected: r.rowAsChildOfGrid.managedChildParameters.setLocalSelected,
             disabled: singleSelectionChildParameters.disabled,
-            setTabbableColumnIndex: r.asChildRowReturn.gridNavigationRowParameters.setTabbableColumnIndex,
+            setTabbableColumnIndex: r.rowAsChildOfGrid.gridNavigationRowParameters.setTabbableColumnIndex,
             getSortValue: asChildRowParameters.sortableChildParameters.getSortValue
         };
         const { managedChildReturn } = useManagedChild({ context: { managedChildContext: mcc1 }, managedChildParameters: { index } }, { ...baseInfo, ...completeGridNavigationRowParameters });
         const context = useStableObject({
             managedChildContext,
-            rovingTabIndexChildContext: r.asParentRowReturn.rovingTabIndexChildContext,
-            typeaheadNavigationChildContext: r.asParentRowReturn.typeaheadNavigationChildContext,
-            completeGridNavigationContext: useStableObject({ onPressSync: r.asChildRowReturn.pressParameters.onPressSync }),
-            gridNavigationCellContext: r.asParentRowReturn.gridNavigationCellContext,
+            rovingTabIndexChildContext: r.rowAsParentOfCells.rovingTabIndexChildContext,
+            typeaheadNavigationChildContext: r.rowAsParentOfCells.typeaheadNavigationChildContext,
+            completeGridNavigationContext: useStableObject({ onPressSync: r.rowAsChildOfGrid.pressParameters.onPressSync }),
+            gridNavigationCellContext: r.rowAsParentOfCells.gridNavigationCellContext,
         });
         const { hasCurrentFocusParameters } = useChildrenHaveFocusChild({ childrenHaveFocusChildContext });
         //const { refElementReturn } = useRefElement<RowElement>({ refElementParameters: {} })
         const { hasCurrentFocusReturn } = useHasCurrentFocus({ refElementReturn, hasCurrentFocusParameters: { ...hasCurrentFocusParameters, onCurrentFocusedChanged: null } });
         const props = useMergedProps(refElementReturn.propsStable, 
         // TODO: Rows don't use tabIndex, but just excluding props here is...weird.
-        //r.asChildRowReturn.rovingTabIndexChildReturn.propsUnstable,
-        r.asChildRowReturn.singleSelectionChildReturn.propsUnstable, r.asParentRowReturn.linearNavigationReturn.propsStable, r.asParentRowReturn.typeaheadNavigationReturn.propsStable, hasCurrentFocusReturn.propsStable);
+        //r.rowAsChildOfGrid.rovingTabIndexChildReturn.propsUnstable,
+        r.rowAsChildOfGrid.singleSelectionChildReturn.propsUnstable, r.rowAsParentOfCells.linearNavigationReturn.propsStable, r.rowAsParentOfCells.typeaheadNavigationReturn.propsStable, hasCurrentFocusReturn.propsStable);
         return {
             context,
             props,
-            asParentRowReturn,
-            asChildRowReturn: {
-                ...asChildRowReturn,
+            rowAsParentOfCells: {
+                ...rowAsParentOfCells,
                 managedChildrenReturn
             },
-            managedChildReturn,
+            rowAsChildOfGrid: {
+                ...rowAsChildOfGrid,
+                managedChildReturn
+            },
             hasCurrentFocusReturn
             //managedChildrenReturn,
             //...gridNavigationSingleSelectionReturn
@@ -6959,7 +6961,7 @@ var bundle = (function (exports) {
                 typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000 }
             }
         });
-        const { asChildRowReturn: { rovingTabIndexChildReturn: { tabbable } }, context: contextToChild, props } = ret;
+        const { rowAsChildOfGrid: { rovingTabIndexChildReturn: { tabbable } }, context: contextToChild, props } = ret;
         return (o$1("tr", { ...props, children: o$1(GridCellContext.Provider, { value: contextToChild, children: Array.from((function* () {
                     for (let i = 0; i < 3; ++i) {
                         yield o$1(DemoUseGridCell, { index: i, row: index, rowIsTabbable: tabbable }, i);

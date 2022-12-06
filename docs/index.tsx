@@ -716,7 +716,7 @@ const DemoUseGridRow = memo((({ index }: { index: number }) => {
     });
 
     const {
-        asChildRowReturn: { rovingTabIndexChildReturn: { tabbable } },
+        rowAsChildOfGrid: { rovingTabIndexChildReturn: { tabbable } },
         context: contextToChild,
         props
     } = ret;
