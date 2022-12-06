@@ -3522,7 +3522,7 @@ var bundle = (function (exports) {
             })
         };
     }
-    function useGridNavigationRow({ asChildRowParameters: { gridNavigationRowContext: { gridNavigationRowParameters: { setTabbableRow, getCurrentTabbableColumn, setCurrentTabbableColumn } }, ...asChildRowOfTable }, asParentRowParameters: { linearNavigationParameters, ...asParentRowOfCellsP }, ..._void1 }) {
+    function useGridNavigationRow({ rowAsChildOfGridParameters: { gridNavigationRowContext: { gridNavigationRowParameters: { setTabbableRow, getCurrentTabbableColumn, setCurrentTabbableColumn } }, ...asChildRowOfTable }, rowAsParentOfCellsParameters: { linearNavigationParameters, ...asParentRowOfCellsP }, ..._void1 }) {
         const { managedChildrenReturn: { getChildren } } = asChildRowOfTable;
         const getIndex = useStableCallback(() => { return asChildRowOfTable.managedChildParameters.index; });
         const focusSelf = useStableCallback((e) => {
@@ -3544,8 +3544,8 @@ var bundle = (function (exports) {
         const lnr = useListNavigation({ ...asParentRowOfCellsP, linearNavigationParameters: { navigationDirection: "horizontal", ...linearNavigationParameters } });
         const { rovingTabIndexReturn: { setTabbableIndex }, rovingTabIndexReturn, linearNavigationReturn, managedChildrenParameters, rovingTabIndexChildContext, typeaheadNavigationChildContext, typeaheadNavigationReturn } = lnr;
         return {
-            rowAsChildOfGrid: { gridNavigationRowParameters: { focusSelf, setTabbableColumnIndex: setTabbableIndex }, ...lncr, },
-            rowAsParentOfCells: {
+            rowAsChildOfGridReturn: { gridNavigationRowParameters: { focusSelf, setTabbableColumnIndex: setTabbableIndex }, ...lncr, },
+            rowAsParentOfCellsReturn: {
                 ...lnr,
                 gridNavigationCellContext: useStableObject({
                     gridNavigationCellParameters: useStableObject({
@@ -3693,12 +3693,12 @@ var bundle = (function (exports) {
             ...ssr,
         };
     }
-    function useGridNavigationSingleSelectionRow({ asChildRowParameters, asParentRowParameters, ..._void1 }) {
-        const { managedChildParameters, hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ..._void3 }, pressParameters, singleSelectionChildReturn } = useSingleSelectionChild(asChildRowParameters);
-        const { rowAsChildOfGrid: { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ..._void2 }, gridNavigationRowParameters, rovingTabIndexChildReturn, textContentReturn, ...void4 }, rowAsParentOfCells } = useGridNavigationRow({ asChildRowParameters, asParentRowParameters });
+    function useGridNavigationSingleSelectionRow({ rowAsChildOfGridParameters, rowAsParentOfCellsParameters, ..._void1 }) {
+        const { managedChildParameters, hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ..._void3 }, pressParameters, singleSelectionChildReturn } = useSingleSelectionChild(rowAsChildOfGridParameters);
+        const { rowAsChildOfGridReturn: { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ..._void2 }, gridNavigationRowParameters, rovingTabIndexChildReturn, textContentReturn, ...void4 }, rowAsParentOfCellsReturn } = useGridNavigationRow({ rowAsChildOfGridParameters, rowAsParentOfCellsParameters });
         const onCurrentFocusedInnerChanged = useStableCallback((focused, prevFocused, e) => { ocfic1?.(focused, prevFocused, e); ocfic2?.(focused, prevFocused, e); });
         return {
-            rowAsChildOfGrid: {
+            rowAsChildOfGridReturn: {
                 textContentReturn,
                 managedChildParameters,
                 hasCurrentFocusParameters: { onCurrentFocusedInnerChanged },
@@ -3707,7 +3707,7 @@ var bundle = (function (exports) {
                 rovingTabIndexChildReturn,
                 singleSelectionChildReturn
             },
-            rowAsParentOfCells
+            rowAsParentOfCellsReturn
         };
     }
     // EZ
@@ -5100,7 +5100,7 @@ var bundle = (function (exports) {
             //rearrangeableChildrenParameters: { getHighestChildIndex: getHighestChildIndex, getValid },
         };
     }
-    function useCompleteGridNavigationRow({ asChildRowParameters: { managedChildParameters, context: { childrenHaveFocusChildContext, gridNavigationRowContext, managedChildContext: mcc1, rovingTabIndexChildContext, singleSelectionContext, typeaheadNavigationChildContext }, completeGridNavigationRowParameters, singleSelectionChildParameters, rovingTabIndexChildParameters, ...asChildRowParameters }, asParentRowParameters: { linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, ...asParentRowParameters } }) {
+    function useCompleteGridNavigationRow({ rowAsChildOfGridParameters: { managedChildParameters, context: { childrenHaveFocusChildContext, gridNavigationRowContext, managedChildContext: mcc1, rovingTabIndexChildContext, singleSelectionContext, typeaheadNavigationChildContext }, completeGridNavigationRowParameters, singleSelectionChildParameters, rovingTabIndexChildParameters, ...rowAsChildOfGridParameters }, rowAsParentOfCellsParameters: { linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, ...rowAsParentOfCellsParameters } }) {
         const { index } = managedChildParameters;
         const getChildren = T$1(() => managedChildrenReturn.getChildren(), []);
         const getHighestChildIndex = T$1(() => getChildren().getHighestIndex(), []);
@@ -5112,15 +5112,15 @@ var bundle = (function (exports) {
         }, []);
         const { refElementReturn } = useRefElement({ refElementParameters: {} });
         const r = useGridNavigationSingleSelectionRow({
-            asParentRowParameters: {
-                ...asParentRowParameters,
+            rowAsParentOfCellsParameters: {
+                ...rowAsParentOfCellsParameters,
                 rovingTabIndexParameters: { initiallyTabbedIndex: 0, ...rovingTabIndexParameters },
                 typeaheadNavigationParameters: { isValid, ...typeaheadNavigationParameters },
                 linearNavigationParameters: { isValid, getHighestIndex: getHighestChildIndex, pageNavigationSize: 0, indexDemangler: identity$1, indexMangler: identity$1, ...linearNavigationParameters },
                 managedChildrenReturn: { getChildren },
             },
-            asChildRowParameters: {
-                ...asChildRowParameters,
+            rowAsChildOfGridParameters: {
+                ...rowAsChildOfGridParameters,
                 refElementReturn,
                 rovingTabIndexChildParameters,
                 gridNavigationRowContext,
@@ -5132,48 +5132,48 @@ var bundle = (function (exports) {
                 managedChildrenReturn: { getChildren },
             }
         });
-        const { rowAsChildOfGrid, rowAsParentOfCells } = r;
-        const { context: { managedChildContext }, managedChildrenReturn } = useManagedChildren({ managedChildrenParameters: r.rowAsParentOfCells.managedChildrenParameters });
+        const { rowAsChildOfGridReturn, rowAsParentOfCellsReturn } = r;
+        const { context: { managedChildContext }, managedChildrenReturn } = useManagedChildren({ managedChildrenParameters: r.rowAsParentOfCellsReturn.managedChildrenParameters });
         const { getElement } = refElementReturn;
         const baseInfo = {
             getElement,
-            setTabbable: r.rowAsChildOfGrid.rovingTabIndexChildReturn.setTabbable,
-            getTabbable: r.rowAsChildOfGrid.rovingTabIndexChildReturn.getTabbable,
-            tabbable: r.rowAsChildOfGrid.rovingTabIndexChildReturn.tabbable,
+            setTabbable: r.rowAsChildOfGridReturn.rovingTabIndexChildReturn.setTabbable,
+            getTabbable: r.rowAsChildOfGridReturn.rovingTabIndexChildReturn.getTabbable,
+            tabbable: r.rowAsChildOfGridReturn.rovingTabIndexChildReturn.tabbable,
             index: managedChildParameters.index,
             hidden: rovingTabIndexChildParameters.hidden,
-            selected: r.rowAsChildOfGrid.singleSelectionChildReturn.selected,
-            focusSelf: r.rowAsChildOfGrid.gridNavigationRowParameters.focusSelf,
-            getSelected: r.rowAsChildOfGrid.singleSelectionChildReturn.getSelected,
-            setLocalSelected: r.rowAsChildOfGrid.managedChildParameters.setLocalSelected,
+            selected: r.rowAsChildOfGridReturn.singleSelectionChildReturn.selected,
+            focusSelf: r.rowAsChildOfGridReturn.gridNavigationRowParameters.focusSelf,
+            getSelected: r.rowAsChildOfGridReturn.singleSelectionChildReturn.getSelected,
+            setLocalSelected: r.rowAsChildOfGridReturn.managedChildParameters.setLocalSelected,
             disabled: singleSelectionChildParameters.disabled,
-            setTabbableColumnIndex: r.rowAsChildOfGrid.gridNavigationRowParameters.setTabbableColumnIndex,
-            getSortValue: asChildRowParameters.sortableChildParameters.getSortValue
+            setTabbableColumnIndex: r.rowAsChildOfGridReturn.gridNavigationRowParameters.setTabbableColumnIndex,
+            getSortValue: rowAsChildOfGridParameters.sortableChildParameters.getSortValue
         };
         const { managedChildReturn } = useManagedChild({ context: { managedChildContext: mcc1 }, managedChildParameters: { index } }, { ...baseInfo, ...completeGridNavigationRowParameters });
         const context = useStableObject({
             managedChildContext,
-            rovingTabIndexChildContext: r.rowAsParentOfCells.rovingTabIndexChildContext,
-            typeaheadNavigationChildContext: r.rowAsParentOfCells.typeaheadNavigationChildContext,
-            completeGridNavigationContext: useStableObject({ onPressSync: r.rowAsChildOfGrid.pressParameters.onPressSync }),
-            gridNavigationCellContext: r.rowAsParentOfCells.gridNavigationCellContext,
+            rovingTabIndexChildContext: r.rowAsParentOfCellsReturn.rovingTabIndexChildContext,
+            typeaheadNavigationChildContext: r.rowAsParentOfCellsReturn.typeaheadNavigationChildContext,
+            completeGridNavigationContext: useStableObject({ onPressSync: r.rowAsChildOfGridReturn.pressParameters.onPressSync }),
+            gridNavigationCellContext: r.rowAsParentOfCellsReturn.gridNavigationCellContext,
         });
         const { hasCurrentFocusParameters } = useChildrenHaveFocusChild({ childrenHaveFocusChildContext });
         //const { refElementReturn } = useRefElement<RowElement>({ refElementParameters: {} })
         const { hasCurrentFocusReturn } = useHasCurrentFocus({ refElementReturn, hasCurrentFocusParameters: { ...hasCurrentFocusParameters, onCurrentFocusedChanged: null } });
         const props = useMergedProps(refElementReturn.propsStable, 
         // TODO: Rows don't use tabIndex, but just excluding props here is...weird.
-        //r.rowAsChildOfGrid.rovingTabIndexChildReturn.propsUnstable,
-        r.rowAsChildOfGrid.singleSelectionChildReturn.propsUnstable, r.rowAsParentOfCells.linearNavigationReturn.propsStable, r.rowAsParentOfCells.typeaheadNavigationReturn.propsStable, hasCurrentFocusReturn.propsStable);
+        //r.rowAsChildOfGridReturn.rovingTabIndexChildReturn.propsUnstable,
+        r.rowAsChildOfGridReturn.singleSelectionChildReturn.propsUnstable, r.rowAsParentOfCellsReturn.linearNavigationReturn.propsStable, r.rowAsParentOfCellsReturn.typeaheadNavigationReturn.propsStable, hasCurrentFocusReturn.propsStable);
         return {
             context,
             props,
-            rowAsParentOfCells: {
-                ...rowAsParentOfCells,
+            rowAsParentOfCellsReturn: {
+                ...rowAsParentOfCellsReturn,
                 managedChildrenReturn
             },
-            rowAsChildOfGrid: {
-                ...rowAsChildOfGrid,
+            rowAsChildOfGridReturn: {
+                ...rowAsChildOfGridReturn,
                 managedChildReturn
             },
             hasCurrentFocusReturn
@@ -6946,7 +6946,7 @@ var bundle = (function (exports) {
         //    const getValid = useStableCallback<GetValid>((i) => !!(ret.managedChildReturn.getChildren().getAt(i)?.hidden));
         const contextFromParent = q(GridRowContext);
         const ret = useCompleteGridNavigationRow({
-            asChildRowParameters: {
+            rowAsChildOfGridParameters: {
                 completeGridNavigationRowParameters: { foo: "bar" },
                 sortableChildParameters: { getSortValue: returnNull },
                 context: contextFromParent,
@@ -6955,13 +6955,13 @@ var bundle = (function (exports) {
                 singleSelectionChildParameters: { disabled, ariaPropName: "aria-checked", selectionMode: "focus" },
                 textContentParameters: { getText: T$1((e) => { return e?.textContent ?? ""; }, []) }
             },
-            asParentRowParameters: {
+            rowAsParentOfCellsParameters: {
                 linearNavigationParameters: { disableArrowKeys: false, disableHomeEndKeys: false, navigatePastEnd: "wrap", navigatePastStart: "wrap" },
                 rovingTabIndexParameters: { onTabbableIndexChange: setTabbableColumn, untabbable: false },
                 typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000 }
             }
         });
-        const { rowAsChildOfGrid: { rovingTabIndexChildReturn: { tabbable } }, context: contextToChild, props } = ret;
+        const { rowAsChildOfGridReturn: { rovingTabIndexChildReturn: { tabbable } }, context: contextToChild, props } = ret;
         return (o$1("tr", { ...props, children: o$1(GridCellContext.Provider, { value: contextToChild, children: Array.from((function* () {
                     for (let i = 0; i < 3; ++i) {
                         yield o$1(DemoUseGridCell, { index: i, row: index, rowIsTabbable: tabbable }, i);

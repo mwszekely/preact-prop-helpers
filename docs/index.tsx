@@ -699,7 +699,7 @@ const DemoUseGridRow = memo((({ index }: { index: number }) => {
 
     const contextFromParent = useContext(GridRowContext) as CompleteGridNavigationContext<HTMLTableSectionElement, HTMLTableRowElement, HTMLTableCellElement, CustomGridInfo, CustomGridRowInfo>;
     const ret: UseCompleteGridNavigationRowReturnType<HTMLTableRowElement, HTMLTableCellElement, CustomGridInfo, CustomGridRowInfo> = useCompleteGridNavigationRow<HTMLTableRowElement, HTMLTableCellElement, CustomGridInfo, CustomGridRowInfo>({
-        asChildRowParameters: {
+        rowAsChildOfGridParameters: {
             completeGridNavigationRowParameters: { foo: "bar" },
             sortableChildParameters: { getSortValue: returnNull },
             context: contextFromParent,
@@ -708,7 +708,7 @@ const DemoUseGridRow = memo((({ index }: { index: number }) => {
             singleSelectionChildParameters: { disabled, ariaPropName: "aria-checked", selectionMode: "focus" },
             textContentParameters: { getText: useCallback((e) => { return e?.textContent ?? "" }, []) }
         },
-        asParentRowParameters: {
+        rowAsParentOfCellsParameters: {
             linearNavigationParameters: { disableArrowKeys: false, disableHomeEndKeys: false, navigatePastEnd: "wrap", navigatePastStart: "wrap" },
             rovingTabIndexParameters: { onTabbableIndexChange: setTabbableColumn, untabbable: false },
             typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000 }
@@ -716,7 +716,7 @@ const DemoUseGridRow = memo((({ index }: { index: number }) => {
     });
 
     const {
-        rowAsChildOfGrid: { rovingTabIndexChildReturn: { tabbable } },
+        rowAsChildOfGridReturn: { rovingTabIndexChildReturn: { tabbable } },
         context: contextToChild,
         props
     } = ret;

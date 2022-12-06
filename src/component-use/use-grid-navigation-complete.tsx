@@ -28,16 +28,16 @@ export interface UseCompleteGridNavigationParameters<ParentOrRowElement extends 
 }
 
 export interface UseCompleteGridNavigationRowParameters<RowElement extends Element, CellElement extends Element, RM extends GridSingleSelectSortableChildRowInfo<RowElement, CellElement>, CM extends GridSingleSelectSortableChildCellInfo<CellElement>> {
-    asChildRowParameters: Omit<UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM>["asChildRowParameters"], "managedChildrenReturn" | "singleSelectionContext" | "gridNavigationRowContext" | "rovingTabIndexChildContext" | "typeaheadNavigationChildContext" | "refElementReturn"> & {
+    rowAsChildOfGridParameters: Omit<UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM>["rowAsChildOfGridParameters"], "managedChildrenReturn" | "singleSelectionContext" | "gridNavigationRowContext" | "rovingTabIndexChildContext" | "typeaheadNavigationChildContext" | "refElementReturn"> & {
         context: CompleteGridNavigationContext<any, RowElement, CellElement, RM, CM>; //UseManagedChildParameters<RM>["context"];
         //managedChildReturn: UseManagedChildReturnType<RM>["managedChildReturn"];
         completeGridNavigationRowParameters: Omit<RM, keyof GridSingleSelectSortableChildRowInfo<RowElement, CellElement>>;
         sortableChildParameters: Pick<UseSortableChildInfo, "getSortValue">;
     };
-    asParentRowParameters: Omit<UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM>["asParentRowParameters"], "rovingTabIndexParameters" | "linearNavigationParameters" | "typeaheadNavigationParameters"> & {
-        linearNavigationParameters: Omit<UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM>["asParentRowParameters"]["linearNavigationParameters"], "getHighestIndex" | "pageNavigationSize" | "isValid" | "indexMangler" | "indexDemangler">;
-        typeaheadNavigationParameters: Omit<UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM>["asParentRowParameters"]["typeaheadNavigationParameters"], "isValid">;
-        rovingTabIndexParameters: Omit<UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM>["asParentRowParameters"]["rovingTabIndexParameters"], "initiallyTabbedIndex">;
+    rowAsParentOfCellsParameters: Omit<UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM>["rowAsParentOfCellsParameters"], "rovingTabIndexParameters" | "linearNavigationParameters" | "typeaheadNavigationParameters"> & {
+        linearNavigationParameters: Omit<UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM>["rowAsParentOfCellsParameters"]["linearNavigationParameters"], "getHighestIndex" | "pageNavigationSize" | "isValid" | "indexMangler" | "indexDemangler">;
+        typeaheadNavigationParameters: Omit<UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM>["rowAsParentOfCellsParameters"]["typeaheadNavigationParameters"], "isValid">;
+        rovingTabIndexParameters: Omit<UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM>["rowAsParentOfCellsParameters"]["rovingTabIndexParameters"], "initiallyTabbedIndex">;
     };
 }
 
@@ -60,7 +60,7 @@ export interface CompleteGridNavigationContext<ParentOrRowElement extends Elemen
 
 
 export interface CompleteGridNavigationRowContext<ParentElement extends Element, ChildElement extends Element, M extends GridSingleSelectSortableChildCellInfo<ChildElement>> extends UseManagedChildrenContext<M>,
-    Pick<UseGridNavigationRowReturnType<ParentElement, ChildElement>["rowAsParentOfCells"], "rovingTabIndexChildContext" | "typeaheadNavigationChildContext" | "gridNavigationCellContext"> {
+    Pick<UseGridNavigationRowReturnType<ParentElement, ChildElement>["rowAsParentOfCellsReturn"], "rovingTabIndexChildContext" | "typeaheadNavigationChildContext" | "gridNavigationCellContext"> {
     completeGridNavigationContext: {
         onPressSync: UsePressParameters<ChildElement>["pressParameters"]["onPressSync"]
     }
@@ -80,10 +80,10 @@ export interface UseCompleteGridNavigationReturnType<ParentOrRowElement extends 
 export interface UseCompleteGridNavigationRowReturnType<RowElement extends Element, CellElement extends Element, RM extends GridSingleSelectSortableChildRowInfo<RowElement, CellElement>, CM extends GridSingleSelectSortableChildCellInfo<CellElement>> {
     context: CompleteGridNavigationRowContext<RowElement, CellElement, CM>;
     props: h.JSX.HTMLAttributes<RowElement>;
-    rowAsParentOfCells: UseGridNavigationSingleSelectionSortableRowReturnType<RowElement, CellElement>["rowAsParentOfCells"] & {
+    rowAsParentOfCellsReturn: UseGridNavigationSingleSelectionSortableRowReturnType<RowElement, CellElement>["rowAsParentOfCellsReturn"] & {
         managedChildrenReturn: UseManagedChildrenReturnType<CM>["managedChildrenReturn"];
     };
-    rowAsChildOfGrid: UseGridNavigationSingleSelectionSortableRowReturnType<RowElement, CellElement>["rowAsChildOfGrid"] & {
+    rowAsChildOfGridReturn: UseGridNavigationSingleSelectionSortableRowReturnType<RowElement, CellElement>["rowAsChildOfGridReturn"] & {
         managedChildReturn: UseManagedChildReturnType<RM>["managedChildReturn"];
     };
     hasCurrentFocusReturn: UseHasCurrentFocusReturnType<RowElement>["hasCurrentFocusReturn"];
@@ -158,19 +158,19 @@ export function useCompleteGridNavigation<ParentOrRowElement extends Element, Ro
 }
 
 export function useCompleteGridNavigationRow<RowElement extends Element, CellElement extends Element, RM extends GridSingleSelectSortableChildRowInfo<RowElement, CellElement>, CM extends GridSingleSelectSortableChildCellInfo<CellElement>>({
-    asChildRowParameters: {
+    rowAsChildOfGridParameters: {
         managedChildParameters,
         context: { childrenHaveFocusChildContext, gridNavigationRowContext, managedChildContext: mcc1, rovingTabIndexChildContext, singleSelectionContext, typeaheadNavigationChildContext },
         completeGridNavigationRowParameters,
         singleSelectionChildParameters,
         rovingTabIndexChildParameters,
-        ...asChildRowParameters
+        ...rowAsChildOfGridParameters
     },
-    asParentRowParameters: {
+    rowAsParentOfCellsParameters: {
         linearNavigationParameters,
         rovingTabIndexParameters,
         typeaheadNavigationParameters,
-        ...asParentRowParameters
+        ...rowAsParentOfCellsParameters
     }
 }: UseCompleteGridNavigationRowParameters<RowElement, CellElement, RM, CM>): UseCompleteGridNavigationRowReturnType<RowElement, CellElement, RM, CM> {
 
@@ -188,15 +188,15 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
     const { refElementReturn } = useRefElement<RowElement>({ refElementParameters: {} });
 
     const r: UseGridNavigationSingleSelectionRowReturnType<RowElement, CellElement> = useGridNavigationSingleSelectionRow<RowElement, CellElement, RM, CM>({
-        asParentRowParameters: {
-            ...asParentRowParameters,
+        rowAsParentOfCellsParameters: {
+            ...rowAsParentOfCellsParameters,
             rovingTabIndexParameters: { initiallyTabbedIndex: 0, ...rovingTabIndexParameters },
             typeaheadNavigationParameters: { isValid, ...typeaheadNavigationParameters },
             linearNavigationParameters: { isValid, getHighestIndex: getHighestChildIndex, pageNavigationSize: 0, indexDemangler: identity, indexMangler: identity, ...linearNavigationParameters },
             managedChildrenReturn: { getChildren },
         },
-        asChildRowParameters: {
-            ...asChildRowParameters,
+        rowAsChildOfGridParameters: {
+            ...rowAsChildOfGridParameters,
             refElementReturn,
             rovingTabIndexChildParameters,
             gridNavigationRowContext,
@@ -209,26 +209,26 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
         }
     });
 
-    const { rowAsChildOfGrid, rowAsParentOfCells } = r;
+    const { rowAsChildOfGridReturn, rowAsParentOfCellsReturn } = r;
 
 
-    const { context: { managedChildContext }, managedChildrenReturn } = useManagedChildren<CM>({ managedChildrenParameters: r.rowAsParentOfCells.managedChildrenParameters });
+    const { context: { managedChildContext }, managedChildrenReturn } = useManagedChildren<CM>({ managedChildrenParameters: r.rowAsParentOfCellsReturn.managedChildrenParameters });
     const { getElement } = refElementReturn;
 
     const baseInfo: GridSingleSelectSortableChildRowInfo<RowElement, CellElement> = {
         getElement,
-        setTabbable: r.rowAsChildOfGrid.rovingTabIndexChildReturn.setTabbable,
-        getTabbable: r.rowAsChildOfGrid.rovingTabIndexChildReturn.getTabbable,
-        tabbable: r.rowAsChildOfGrid.rovingTabIndexChildReturn.tabbable,
+        setTabbable: r.rowAsChildOfGridReturn.rovingTabIndexChildReturn.setTabbable,
+        getTabbable: r.rowAsChildOfGridReturn.rovingTabIndexChildReturn.getTabbable,
+        tabbable: r.rowAsChildOfGridReturn.rovingTabIndexChildReturn.tabbable,
         index: managedChildParameters.index,
         hidden: rovingTabIndexChildParameters.hidden,
-        selected: r.rowAsChildOfGrid.singleSelectionChildReturn.selected,
-        focusSelf: r.rowAsChildOfGrid.gridNavigationRowParameters.focusSelf,
-        getSelected: r.rowAsChildOfGrid.singleSelectionChildReturn.getSelected,
-        setLocalSelected: r.rowAsChildOfGrid.managedChildParameters.setLocalSelected,
+        selected: r.rowAsChildOfGridReturn.singleSelectionChildReturn.selected,
+        focusSelf: r.rowAsChildOfGridReturn.gridNavigationRowParameters.focusSelf,
+        getSelected: r.rowAsChildOfGridReturn.singleSelectionChildReturn.getSelected,
+        setLocalSelected: r.rowAsChildOfGridReturn.managedChildParameters.setLocalSelected,
         disabled: singleSelectionChildParameters.disabled,
-        setTabbableColumnIndex: r.rowAsChildOfGrid.gridNavigationRowParameters.setTabbableColumnIndex,
-        getSortValue: asChildRowParameters.sortableChildParameters.getSortValue
+        setTabbableColumnIndex: r.rowAsChildOfGridReturn.gridNavigationRowParameters.setTabbableColumnIndex,
+        getSortValue: rowAsChildOfGridParameters.sortableChildParameters.getSortValue
     }
 
     const { managedChildReturn } = useManagedChild<RM>({ context: { managedChildContext: mcc1 }, managedChildParameters: { index } }, { ...baseInfo, ...completeGridNavigationRowParameters } as RM)
@@ -236,10 +236,10 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
 
     const context = useStableObject<CompleteGridNavigationRowContext<RowElement, CellElement, CM>>({
         managedChildContext,
-        rovingTabIndexChildContext: r.rowAsParentOfCells.rovingTabIndexChildContext,
-        typeaheadNavigationChildContext: r.rowAsParentOfCells.typeaheadNavigationChildContext,
-        completeGridNavigationContext: useStableObject({ onPressSync: r.rowAsChildOfGrid.pressParameters.onPressSync as any }),
-        gridNavigationCellContext: r.rowAsParentOfCells.gridNavigationCellContext,
+        rovingTabIndexChildContext: r.rowAsParentOfCellsReturn.rovingTabIndexChildContext,
+        typeaheadNavigationChildContext: r.rowAsParentOfCellsReturn.typeaheadNavigationChildContext,
+        completeGridNavigationContext: useStableObject({ onPressSync: r.rowAsChildOfGridReturn.pressParameters.onPressSync as any }),
+        gridNavigationCellContext: r.rowAsParentOfCellsReturn.gridNavigationCellContext,
     });
     const { hasCurrentFocusParameters } = useChildrenHaveFocusChild({ childrenHaveFocusChildContext });
     //const { refElementReturn } = useRefElement<RowElement>({ refElementParameters: {} })
@@ -247,22 +247,22 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
     const props = useMergedProps(
         refElementReturn.propsStable,
         // TODO: Rows don't use tabIndex, but just excluding props here is...weird.
-        //r.rowAsChildOfGrid.rovingTabIndexChildReturn.propsUnstable,
-        r.rowAsChildOfGrid.singleSelectionChildReturn.propsUnstable,
-        r.rowAsParentOfCells.linearNavigationReturn.propsStable,
-        r.rowAsParentOfCells.typeaheadNavigationReturn.propsStable,
+        //r.rowAsChildOfGridReturn.rovingTabIndexChildReturn.propsUnstable,
+        r.rowAsChildOfGridReturn.singleSelectionChildReturn.propsUnstable,
+        r.rowAsParentOfCellsReturn.linearNavigationReturn.propsStable,
+        r.rowAsParentOfCellsReturn.typeaheadNavigationReturn.propsStable,
         hasCurrentFocusReturn.propsStable
     );
     
     return {
         context,
         props,
-        rowAsParentOfCells: {
-            ...rowAsParentOfCells,
+        rowAsParentOfCellsReturn: {
+            ...rowAsParentOfCellsReturn,
             managedChildrenReturn
         },
-        rowAsChildOfGrid: {
-            ...rowAsChildOfGrid,
+        rowAsChildOfGridReturn: {
+            ...rowAsChildOfGridReturn,
             managedChildReturn
         },
         hasCurrentFocusReturn

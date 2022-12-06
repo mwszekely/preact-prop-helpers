@@ -29,13 +29,13 @@ export interface UseGridNavigationParameters<ParentOrChildElement extends Elemen
     linearNavigationParameters: Omit<UseListNavigationParameters<ParentOrChildElement, RowElement, M>["linearNavigationParameters"], "navigationDirection">
 }
 export interface UseGridNavigationReturnType<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element,  RM extends GridChildRowInfo<RowElement, CellElement>, CM extends GridChildCellInfo<CellElement>> extends UseListNavigationReturnType<ParentOrRowElement, RowElement> {
-    gridNavigationRowContext: UseGridNavigationRowParameters<RowElement, CellElement, RM, CM>["asChildRowParameters"]["gridNavigationRowContext"]
+    gridNavigationRowContext: UseGridNavigationRowParameters<RowElement, CellElement, RM, CM>["rowAsChildOfGridParameters"]["gridNavigationRowContext"]
 }
 
 
 
 export interface UseGridNavigationRowParameters<RowElement extends Element, CellElement extends Element, _RM extends GridChildRowInfo<RowElement, CellElement>, CM extends GridChildCellInfo<CellElement>> {
-    asChildRowParameters: UseListNavigationChildParameters<RowElement> & {
+    rowAsChildOfGridParameters: UseListNavigationChildParameters<RowElement> & {
         managedChildrenReturn: Pick<UseManagedChildrenReturnType<CM>["managedChildrenReturn"], "getChildren">;
         gridNavigationRowContext: {
             _r?: RowElement;
@@ -48,17 +48,17 @@ export interface UseGridNavigationRowParameters<RowElement extends Element, Cell
             }
         }
     };
-    asParentRowParameters: Omit<UseListNavigationParameters<RowElement, CellElement, CM>, "linearNavigationParameters"> & {
+    rowAsParentOfCellsParameters: Omit<UseListNavigationParameters<RowElement, CellElement, CM>, "linearNavigationParameters"> & {
         linearNavigationParameters: Omit<UseListNavigationParameters<RowElement, CellElement, CM>["linearNavigationParameters"], "navigationDirection">
     }
 
 }
 
 export interface UseGridNavigationRowReturnType<RowElement extends Element, CellElement extends Element> {
-    rowAsChildOfGrid: UseListNavigationChildReturnType<RowElement> & {
+    rowAsChildOfGridReturn: UseListNavigationChildReturnType<RowElement> & {
         gridNavigationRowParameters: Pick<GridChildRowInfo<RowElement, CellElement>, "focusSelf" | "setTabbableColumnIndex">;
     };
-    rowAsParentOfCells: Omit<UseListNavigationReturnType<RowElement, CellElement>, "rovingTabIndexReturn"> & {
+    rowAsParentOfCellsReturn: Omit<UseListNavigationReturnType<RowElement, CellElement>, "rovingTabIndexReturn"> & {
         rovingTabIndexReturn: Omit<UseListNavigationReturnType<RowElement, CellElement>["rovingTabIndexReturn"], "focusSelf">;
         gridNavigationCellContext: UseGridNavigationCellParameters<RowElement, CellElement>["gridNavigationCellContext"];
     };
@@ -148,8 +148,8 @@ export function useGridNavigation<ParentOrRowElement extends Element, RowElement
 }
 
 export function useGridNavigationRow<RowElement extends Element, CellElement extends Element, RM extends GridChildRowInfo<RowElement, CellElement>, CM extends GridChildCellInfo<CellElement>>({
-    asChildRowParameters: { gridNavigationRowContext: { gridNavigationRowParameters: { setTabbableRow, getCurrentTabbableColumn, setCurrentTabbableColumn } }, ...asChildRowOfTable },
-    asParentRowParameters: { linearNavigationParameters, ...asParentRowOfCellsP },
+    rowAsChildOfGridParameters: { gridNavigationRowContext: { gridNavigationRowParameters: { setTabbableRow, getCurrentTabbableColumn, setCurrentTabbableColumn } }, ...asChildRowOfTable },
+    rowAsParentOfCellsParameters: { linearNavigationParameters, ...asParentRowOfCellsP },
     ..._void1
 }: UseGridNavigationRowParameters<RowElement, CellElement, RM, CM>): UseGridNavigationRowReturnType<RowElement, CellElement> {
     const { managedChildrenReturn: { getChildren } } = asChildRowOfTable;
@@ -180,8 +180,8 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
 
 
     return {
-        rowAsChildOfGrid: { gridNavigationRowParameters: { focusSelf, setTabbableColumnIndex: setTabbableIndex }, ...lncr, },
-        rowAsParentOfCells: {
+        rowAsChildOfGridReturn: { gridNavigationRowParameters: { focusSelf, setTabbableColumnIndex: setTabbableIndex }, ...lncr, },
+        rowAsParentOfCellsReturn: {
             ...lnr ,
             gridNavigationCellContext:useStableObject ({
                 gridNavigationCellParameters: useStableObject({

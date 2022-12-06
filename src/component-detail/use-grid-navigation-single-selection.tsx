@@ -20,20 +20,20 @@ export interface UseGridNavigationSingleSelectionParameters<ParentOrRowElement e
     managedChildrenReturn: UseGridNavigationParameters<ParentOrRowElement, RowElement, CellElement, M>["managedChildrenReturn"] & UseSingleSelectionParameters<RowElement>["managedChildrenReturn"];
 }
 export interface UseGridNavigationSingleSelectionReturnType<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, RM extends GridSingleSelectChildRowInfo<RowElement, CellElement>, CM extends GridSingleSelectChildCellInfo<CellElement>> extends UseGridNavigationReturnType<ParentOrRowElement, RowElement, CellElement, RM, CM>, UseSingleSelectionReturnType<RowElement> {
-    // gridNavigationRowContext: UseGridNavigationRowParameters<RowElement, any, any, any>["asChildRowParameters"]["gridNavigationRowContext"]
+    // gridNavigationRowContext: UseGridNavigationRowParameters<RowElement, any, any, any>["rowAsChildOfGridParameters"]["gridNavigationRowContext"]
 }
 
 
 
 export interface UseGridNavigationSingleSelectionRowParameters<RowElement extends Element, CellElement extends Element, _RM extends GridSingleSelectChildRowInfo<RowElement, CellElement>, CM extends GridSingleSelectChildCellInfo<CellElement>> {
-    asChildRowParameters: UseGridNavigationRowParameters<RowElement, CellElement, _RM, CM>["asChildRowParameters"] & UseSingleSelectionChildParameters<RowElement>;
-    asParentRowParameters: UseGridNavigationRowParameters<RowElement, CellElement, _RM, CM>["asParentRowParameters"];
+    rowAsChildOfGridParameters: UseGridNavigationRowParameters<RowElement, CellElement, _RM, CM>["rowAsChildOfGridParameters"] & UseSingleSelectionChildParameters<RowElement>;
+    rowAsParentOfCellsParameters: UseGridNavigationRowParameters<RowElement, CellElement, _RM, CM>["rowAsParentOfCellsParameters"];
 
 }
 
 export interface UseGridNavigationSingleSelectionRowReturnType<RowElement extends Element, CellElement extends Element> {
-    rowAsChildOfGrid: UseGridNavigationRowReturnType<RowElement, CellElement>["rowAsChildOfGrid"] & UseSingleSelectionChildReturnType<RowElement>;
-    rowAsParentOfCells: UseGridNavigationRowReturnType<RowElement, CellElement>["rowAsParentOfCells"]
+    rowAsChildOfGridReturn: UseGridNavigationRowReturnType<RowElement, CellElement>["rowAsChildOfGridReturn"] & UseSingleSelectionChildReturnType<RowElement>;
+    rowAsParentOfCellsReturn: UseGridNavigationRowReturnType<RowElement, CellElement>["rowAsParentOfCellsReturn"]
 }
 
 
@@ -80,12 +80,12 @@ export function useGridNavigationSingleSelection<ParentOrRowElement extends Elem
 }
 
 export function useGridNavigationSingleSelectionRow<RowElement extends Element, CellElement extends Element, RM extends GridSingleSelectChildRowInfo<RowElement, CellElement>, CM extends GridSingleSelectChildCellInfo<CellElement>>({
-    asChildRowParameters,
-    asParentRowParameters,
+    rowAsChildOfGridParameters,
+    rowAsParentOfCellsParameters,
     ..._void1
 }: UseGridNavigationSingleSelectionRowParameters<RowElement, CellElement, RM, CM>): UseGridNavigationSingleSelectionRowReturnType<RowElement, CellElement> {
-    const { managedChildParameters, hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ..._void3 }, pressParameters, singleSelectionChildReturn } = useSingleSelectionChild<RowElement>(asChildRowParameters);
-    const { rowAsChildOfGrid: { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ..._void2 }, gridNavigationRowParameters, rovingTabIndexChildReturn, textContentReturn, ...void4 }, rowAsParentOfCells } = useGridNavigationRow<RowElement, CellElement, RM, CM>({ asChildRowParameters, asParentRowParameters });
+    const { managedChildParameters, hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ..._void3 }, pressParameters, singleSelectionChildReturn } = useSingleSelectionChild<RowElement>(rowAsChildOfGridParameters);
+    const { rowAsChildOfGridReturn: { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ..._void2 }, gridNavigationRowParameters, rovingTabIndexChildReturn, textContentReturn, ...void4 }, rowAsParentOfCellsReturn } = useGridNavigationRow<RowElement, CellElement, RM, CM>({ rowAsChildOfGridParameters, rowAsParentOfCellsParameters });
     const onCurrentFocusedInnerChanged = useStableCallback<NonNullable<typeof ocfic2>>((focused, prevFocused, e) => { ocfic1?.(focused, prevFocused, e); ocfic2?.(focused, prevFocused, e); })
 
     assertEmptyObject(_void1);
@@ -94,7 +94,7 @@ export function useGridNavigationSingleSelectionRow<RowElement extends Element, 
     assertEmptyObject(void4);
 
     return {
-        rowAsChildOfGrid: { 
+        rowAsChildOfGridReturn: { 
             textContentReturn,
             managedChildParameters, 
             hasCurrentFocusParameters: { onCurrentFocusedInnerChanged }, 
@@ -103,7 +103,7 @@ export function useGridNavigationSingleSelectionRow<RowElement extends Element, 
             rovingTabIndexChildReturn, 
             singleSelectionChildReturn
          },
-        rowAsParentOfCells
+        rowAsParentOfCellsReturn
     }
 
 }
