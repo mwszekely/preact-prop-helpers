@@ -659,6 +659,7 @@ export const DemoUseGrid = memo(() => {
                         <th>Row is tabbable?</th>
                         <th>Column 1</th>
                         <th>Column 2</th>
+                        <th>Column 3</th>
                     </tr>
                 </thead>
                 <GridRowContext.Provider value={context}>
@@ -708,7 +709,7 @@ const DemoUseGridRow = memo((({ index }: { index: number }) => {
         },
         rowAsParentOfCellsParameters: {
             linearNavigationParameters: { disableArrowKeys: false, disableHomeEndKeys: false, navigatePastEnd: "wrap", navigatePastStart: "wrap" },
-            rovingTabIndexParameters: { onTabbableIndexChange: setTabbableColumn, untabbable: false },
+            rovingTabIndexParameters: { onTabbableIndexChange: setTabbableColumn },
             typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000 }
         }
     });
@@ -720,8 +721,9 @@ const DemoUseGridRow = memo((({ index }: { index: number }) => {
     } = ret;
 
     return (
-        <tr {...props}>
+        <tr {...props} data-tabbable={ret.rowAsChildOfGridReturn.rovingTabIndexChildReturn.tabbable}>
             <GridCellContext.Provider value={contextToChild}>
+                <td>{_tabbableColumn}, {tabbable.toString()}</td>
                 {Array.from((function* () {
                     for (let i = 0; i < 3; ++i) {
                         yield <DemoUseGridCell index={i} key={i} row={index} rowIsTabbable={tabbable} />

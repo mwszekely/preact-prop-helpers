@@ -48,7 +48,8 @@ export interface UseGridNavigationRowParameters<RowElement extends Element, Cell
             }
         }
     };
-    rowAsParentOfCellsParameters: Omit<UseListNavigationParameters<RowElement, CellElement, CM>, "linearNavigationParameters"> & {
+    rowAsParentOfCellsParameters: Omit<UseListNavigationParameters<RowElement, CellElement, CM>, "linearNavigationParameters" | "rovingTabIndexParameters"> & {
+        rovingTabIndexParameters: Omit<UseListNavigationParameters<RowElement, CellElement, CM>["rovingTabIndexParameters"], "untabbable">
         linearNavigationParameters: Omit<UseListNavigationParameters<RowElement, CellElement, CM>["linearNavigationParameters"], "navigationDirection">
     }
 
@@ -101,13 +102,13 @@ export function useGridNavigation<ParentOrRowElement extends Element, RowElement
 
     const [getCurrentTabbableColumn, setCurrentTabbableColumn] = usePassiveState<number | null, Event>(onTabbableColumnChange, useStableCallback(() => { return (initiallyTabbedIndex ?? 0) }));
 
-    const onTabbableIndexChangeOverride = useStableCallback((i: number | null, p: number | null | undefined, reason: Event | undefined) => {
+    const onTabbableIndexChangeOverride = useStableCallback((nextRow: number | null, previousRow: number | null | undefined, reason: Event | undefined) => {
         const children = getChildren();
-        onTabbableIndexChange?.(i, p, reason);
-        if (p != null)
-            children.getAt(p)?.setTabbableColumnIndex(null, reason, false);
-        if (i != null)
-            children.getAt(i)?.setTabbableColumnIndex(getCurrentTabbableColumn(), reason, false);
+        onTabbableIndexChange?.(nextRow, previousRow, reason);
+        if (previousRow != null)
+            children.getAt(previousRow)?.setTabbableColumnIndex(null, reason, false);
+        if (nextRow != null)
+            children.getAt(nextRow)?.setTabbableColumnIndex(getCurrentTabbableColumn(), reason, false);
 
     })
 
@@ -149,7 +150,7 @@ export function useGridNavigation<ParentOrRowElement extends Element, RowElement
 
 export function useGridNavigationRow<RowElement extends Element, CellElement extends Element, RM extends GridChildRowInfo<RowElement, CellElement>, CM extends GridChildCellInfo<CellElement>>({
     rowAsChildOfGridParameters: { gridNavigationRowContext: { gridNavigationRowParameters: { setTabbableRow, getCurrentTabbableColumn, setCurrentTabbableColumn } }, ...asChildRowOfTable },
-    rowAsParentOfCellsParameters: { linearNavigationParameters, rovingTabIndexParameters: { untabbable, ...rovingTabIndexParameters }, ...asParentRowOfCellsP },
+    rowAsParentOfCellsParameters: { linearNavigationParameters, rovingTabIndexParameters: { ...rovingTabIndexParameters }, ...asParentRowOfCellsP },
     ..._void1
 }: UseGridNavigationRowParameters<RowElement, CellElement, RM, CM>): UseGridNavigationRowReturnType<RowElement, CellElement> {
     const { managedChildrenReturn: { getChildren } } = asChildRowOfTable;
@@ -171,7 +172,7 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
     }, []);
 
     const lncr = useListNavigationChild<RowElement>(asChildRowOfTable);
-    const lnr = useListNavigation<RowElement, CellElement, CM>({ ...asParentRowOfCellsP, rovingTabIndexParameters: { untabbable: untabbable || !lncr.rovingTabIndexChildReturn.tabbable, ...rovingTabIndexParameters }, linearNavigationParameters: { navigationDirection: "horizontal", ...linearNavigationParameters } });
+    const lnr = useListNavigation<RowElement, CellElement, CM>({ ...asParentRowOfCellsP, rovingTabIndexParameters: { untabbable: !lncr.rovingTabIndexChildReturn.tabbable, ...rovingTabIndexParameters }, linearNavigationParameters: { navigationDirection: "horizontal", ...linearNavigationParameters } });
 
 
     assertEmptyObject(_void1);

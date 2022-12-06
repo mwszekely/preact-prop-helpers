@@ -3492,13 +3492,13 @@ var bundle = (function (exports) {
         const { getChildren } = managedChildrenReturn;
         const { initiallyTabbedIndex } = rovingTabIndexParameters;
         const [getCurrentTabbableColumn, setCurrentTabbableColumn] = usePassiveState(onTabbableColumnChange, useStableCallback(() => { return (initiallyTabbedIndex ?? 0); }));
-        const onTabbableIndexChangeOverride = useStableCallback((i, p, reason) => {
+        const onTabbableIndexChangeOverride = useStableCallback((nextRow, previousRow, reason) => {
             const children = getChildren();
-            onTabbableIndexChange?.(i, p, reason);
-            if (p != null)
-                children.getAt(p)?.setTabbableColumnIndex(null, reason, false);
-            if (i != null)
-                children.getAt(i)?.setTabbableColumnIndex(getCurrentTabbableColumn(), reason, false);
+            onTabbableIndexChange?.(nextRow, previousRow, reason);
+            if (previousRow != null)
+                children.getAt(previousRow)?.setTabbableColumnIndex(null, reason, false);
+            if (nextRow != null)
+                children.getAt(nextRow)?.setTabbableColumnIndex(getCurrentTabbableColumn(), reason, false);
         });
         const { linearNavigationReturn, rovingTabIndexReturn, typeaheadNavigationReturn, managedChildrenParameters, rovingTabIndexChildContext, typeaheadNavigationChildContext, ...void1 } = useListNavigation({
             linearNavigationParameters: { navigationDirection: "vertical", ...linearNavigationParameters },
@@ -3522,7 +3522,7 @@ var bundle = (function (exports) {
             })
         };
     }
-    function useGridNavigationRow({ rowAsChildOfGridParameters: { gridNavigationRowContext: { gridNavigationRowParameters: { setTabbableRow, getCurrentTabbableColumn, setCurrentTabbableColumn } }, ...asChildRowOfTable }, rowAsParentOfCellsParameters: { linearNavigationParameters, rovingTabIndexParameters: { untabbable, ...rovingTabIndexParameters }, ...asParentRowOfCellsP }, ..._void1 }) {
+    function useGridNavigationRow({ rowAsChildOfGridParameters: { gridNavigationRowContext: { gridNavigationRowParameters: { setTabbableRow, getCurrentTabbableColumn, setCurrentTabbableColumn } }, ...asChildRowOfTable }, rowAsParentOfCellsParameters: { linearNavigationParameters, rovingTabIndexParameters: { ...rovingTabIndexParameters }, ...asParentRowOfCellsP }, ..._void1 }) {
         const { managedChildrenReturn: { getChildren } } = asChildRowOfTable;
         const getIndex = useStableCallback(() => { return asChildRowOfTable.managedChildParameters.index; });
         const focusSelf = useStableCallback((e) => {
@@ -3541,7 +3541,7 @@ var bundle = (function (exports) {
             }
         }, []);
         const lncr = useListNavigationChild(asChildRowOfTable);
-        const lnr = useListNavigation({ ...asParentRowOfCellsP, rovingTabIndexParameters: { untabbable: untabbable || !lncr.rovingTabIndexChildReturn.tabbable, ...rovingTabIndexParameters }, linearNavigationParameters: { navigationDirection: "horizontal", ...linearNavigationParameters } });
+        const lnr = useListNavigation({ ...asParentRowOfCellsP, rovingTabIndexParameters: { untabbable: !lncr.rovingTabIndexChildReturn.tabbable, ...rovingTabIndexParameters }, linearNavigationParameters: { navigationDirection: "horizontal", ...linearNavigationParameters } });
         const { rovingTabIndexReturn: { setTabbableIndex }, rovingTabIndexReturn, linearNavigationReturn, managedChildrenParameters, rovingTabIndexChildContext, typeaheadNavigationChildContext, typeaheadNavigationReturn } = lnr;
         return {
             rowAsChildOfGridReturn: { gridNavigationRowParameters: { focusSelf, setTabbableColumnIndex: setTabbableIndex }, ...lncr, },
@@ -6922,7 +6922,7 @@ var bundle = (function (exports) {
         const { propsStable: p2 } = typeaheadNavigationReturn;
 
         const { getChildren: getChildren2 } = managedChildrenReturn;*/
-        return (o$1("div", { class: "demo", children: [o$1("div", { children: ["Current row: ", tabbableRow] }), o$1("div", { children: ["Current column: ", tabbableColumn] }), o$1("table", { ...{ border: "2" }, style: { whiteSpace: "nowrap" }, children: [o$1("thead", { children: o$1("tr", { children: [o$1("th", { children: "Row is tabbable?" }), o$1("th", { children: "Column 1" }), o$1("th", { children: "Column 2" })] }) }), o$1(GridRowContext.Provider, { value: context, children: o$1("tbody", { ...props, children: ret.rearrangeableChildrenReturn.useRearrangedChildren(Array.from((function* () {
+        return (o$1("div", { class: "demo", children: [o$1("div", { children: ["Current row: ", tabbableRow] }), o$1("div", { children: ["Current column: ", tabbableColumn] }), o$1("table", { ...{ border: "2" }, style: { whiteSpace: "nowrap" }, children: [o$1("thead", { children: o$1("tr", { children: [o$1("th", { children: "Row is tabbable?" }), o$1("th", { children: "Column 1" }), o$1("th", { children: "Column 2" }), o$1("th", { children: "Column 3" })] }) }), o$1(GridRowContext.Provider, { value: context, children: o$1("tbody", { ...props, children: ret.rearrangeableChildrenReturn.useRearrangedChildren(Array.from((function* () {
                                     for (let i = 0; i < 10; ++i) {
                                         yield o$1(DemoUseGridRow, { index: i }, i);
                                     }
@@ -6953,16 +6953,16 @@ var bundle = (function (exports) {
             },
             rowAsParentOfCellsParameters: {
                 linearNavigationParameters: { disableArrowKeys: false, disableHomeEndKeys: false, navigatePastEnd: "wrap", navigatePastStart: "wrap" },
-                rovingTabIndexParameters: { onTabbableIndexChange: setTabbableColumn, untabbable: false },
+                rovingTabIndexParameters: { onTabbableIndexChange: setTabbableColumn },
                 typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000 }
             }
         });
         const { rowAsChildOfGridReturn: { rovingTabIndexChildReturn: { tabbable } }, context: contextToChild, props } = ret;
-        return (o$1("tr", { ...props, children: o$1(GridCellContext.Provider, { value: contextToChild, children: Array.from((function* () {
-                    for (let i = 0; i < 3; ++i) {
-                        yield o$1(DemoUseGridCell, { index: i, row: index, rowIsTabbable: tabbable }, i);
-                    }
-                })()) }) }));
+        return (o$1("tr", { ...props, "data-tabbable": ret.rowAsChildOfGridReturn.rovingTabIndexChildReturn.tabbable, children: o$1(GridCellContext.Provider, { value: contextToChild, children: [o$1("td", { children: [_tabbableColumn, ", ", tabbable.toString()] }), Array.from((function* () {
+                        for (let i = 0; i < 3; ++i) {
+                            yield o$1(DemoUseGridCell, { index: i, row: index, rowIsTabbable: tabbable }, i);
+                        }
+                    })())] }) }));
     }));
     const DemoUseGridCell = (({ index, row, rowIsTabbable }) => {
         if (row >= 6 && row % 2 == 0 && index > 1)
