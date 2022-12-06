@@ -44,7 +44,7 @@ export const DemoUseRovingTabIndex = memo(() => {
         singleSelectionReturn: { setSelectedIndex },
         managedChildrenReturn: { getChildren },
         typeaheadNavigationReturn: { invalidTypeahead },
-        rearrangeableChildrenReturn: { useRearrangedChildren: useSortableProps, shuffle }
+        rearrangeableChildrenReturn: { useRearrangedChildren, shuffle }
         //        rearrangeableChildrenReturn: { useRearrangedChildren: useSortableProps, shuffle }
     } = r;
     //useSingleSelectionDeclarative({ singleSelectionReturn: {  setSelectedIndex }, singleSelectionDeclarativeParameters: { selectedIndex } });
@@ -94,7 +94,7 @@ export const DemoUseRovingTabIndex = memo(() => {
 
             <SelectionModeContext.Provider value={selectionMode}>
                 <ListNavigationSingleSelectionChildContext.Provider value={context}>
-                    <ol {...(useSortableProps(useMergedProps(props, { children: jsxChildren })))} />
+                    <ol {...props}>{useRearrangedChildren(jsxChildren)}</ol>
                 </ListNavigationSingleSelectionChildContext.Provider>
             </SelectionModeContext.Provider>
             {<div>{invalidTypeahead && "Invalid typeahead (no matches for the current string)"}</div>}

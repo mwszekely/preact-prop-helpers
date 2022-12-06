@@ -662,14 +662,12 @@ export const DemoUseGrid = memo(() => {
                     </tr>
                 </thead>
                 <GridRowContext.Provider value={context}>
-                    <tbody {...useRearrangedChildren({
-                        ...props,
-                        children: Array.from((function* () {
-                            for (let i = 0; i < 10; ++i) {
-                                yield <DemoUseGridRow index={i} key={i} />
-                            }
-                        })())
-                    })} />
+                    <tbody {...props}>{ret.rearrangeableChildrenReturn.useRearrangedChildren(Array.from((function* () {
+                        for (let i = 0; i < 10; ++i) {
+                            yield <DemoUseGridRow index={i} key={i} />
+                        }
+                    })())
+                    )}</tbody>
                 </GridRowContext.Provider>
             </table>
         </div>

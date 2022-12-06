@@ -100,7 +100,7 @@ export interface UseRearrangeableChildrenReturnType<ParentElement extends Elemen
          * Call this on your props (that contain the children to sort!!) to allow them to be sortable.
          * 
          */
-        useRearrangedChildren: (props: h.JSX.HTMLAttributes<ParentElement>) => h.JSX.HTMLAttributes<ParentElement>;
+        useRearrangedChildren: (children: VNode[]) => VNode[];
     }
 }
 
@@ -183,22 +183,19 @@ export function useRearrangeableChildren<ParentElement extends Element, M extend
         getForceUpdate()?.();
     }, []);
 
-    const useRearrangedChildren = useCallback(({ children, ...props }: h.JSX.HTMLAttributes<ParentElement>) => {
+    const useRearrangedChildren = useCallback((children: VNode[]) => {
         console.assert(Array.isArray(children));
 
         const forceUpdate = useForceUpdate();
         useLayoutEffect(() => { setForceUpdate(_prev => forceUpdate); }, [forceUpdate])
 
-        return (useMergedProps<ParentElement>({
-            children:
-                (children as VNode<any>[])
-                    .slice()
-                    .map(child => ({ child, mangledIndex: indexMangler(getIndex(child)!), demangledIndex: getIndex(child) }))
-                    .sort((lhs, rhs) => { return lhs.mangledIndex - rhs.mangledIndex })
-                    .map(({ child, mangledIndex, demangledIndex }) => {
-                        return h(child.type as any, { ...child.props, key: demangledIndex, "data-mangled-index": mangledIndex, "data-unmangled-index": demangledIndex });
-                    })
-        }, props));
+        return (children as VNode<any>[])
+            .slice()
+            .map(child => ({ child, mangledIndex: indexMangler(getIndex(child)!), demangledIndex: getIndex(child) }))
+            .sort((lhs, rhs) => { return lhs.mangledIndex - rhs.mangledIndex })
+            .map(({ child, mangledIndex, demangledIndex }) => {
+                return h(child.type as any, { ...child.props, key: demangledIndex, "data-mangled-index": mangledIndex, "data-unmangled-index": demangledIndex });
+            });
     }, []);
 
     return {
