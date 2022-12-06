@@ -1,10 +1,10 @@
 import { h } from "preact";
-import { StateUpdater, useCallback, useEffect, useRef } from "preact/hooks";
-import { assertEmptyObject, ManagedChildInfo, useChildrenFlag, UseManagedChildrenParameters, UseManagedChildrenReturnType } from "../preact-extensions/use-child-manager";
+import { StateUpdater, useCallback, useEffect } from "preact/hooks";
 import { UseHasCurrentFocusParameters } from "../observers/use-has-current-focus";
-import { OnPassiveStateChange, PassiveStateUpdater } from "../preact-extensions/use-passive-state";
+import { assertEmptyObject, ManagedChildInfo, useChildrenFlag, UseManagedChildrenParameters, UseManagedChildrenReturnType } from "../preact-extensions/use-child-manager";
+import { OnPassiveStateChange, PassiveStateUpdater, usePassiveState } from "../preact-extensions/use-passive-state";
 import { useStableCallback } from "../preact-extensions/use-stable-callback";
-import { useStableObject } from "../preact-extensions/use-stable-getter";
+import { useStableGetter, useStableObject } from "../preact-extensions/use-stable-getter";
 import { useState } from "../preact-extensions/use-state";
 
 
@@ -115,7 +115,9 @@ export interface UseRovingTabIndexChildParameters<TabbableChildElement extends E
 export interface RovingTabIndexChildContext<TabbableChildElement extends Element> {
     _e?: TabbableChildElement;
 
-    setTabbableIndex: SetTabbableIndex; //UseRovingTabIndexReturnType<TabbableChildElement>["rovingTabIndexReturn"]["setTabbableIndex"];
+    setTabbableIndex: SetTabbableIndex;
+
+    getInitiallyTabbedIndex(): number | null;
 
     /**
      * (This is technically the same as what's passed to onChildrenMountChange,
@@ -200,6 +202,8 @@ export function useRovingTabIndex<ChildElement extends Element, M extends UseRov
 }: UseRovingTabIndexParameters<ChildElement, M>): UseRovingTabIndexReturnType<ChildElement> {
     assertEmptyObject(_void1);
 
+    const getUntabbable = useStableGetter(untabbable);
+
     //initiallyTabbedIndex ??= 0;
 
     // Override the actual setter to include some extra logic related to avoiding hidden children, 
@@ -214,6 +218,10 @@ export function useRovingTabIndex<ChildElement extends Element, M extends UseRov
 
         function f(prevIndex: number | null | undefined): number | null {
             let nextIndex = ((typeof updater === "function") ? updater(prevIndex ?? null) : updater) as M["index"];
+            const untabbable = getUntabbable();
+
+            if (nextIndex != null)
+                setLastNonNullIndex(nextIndex);
 
             if (untabbable)
                 return null;
@@ -231,27 +239,35 @@ export function useRovingTabIndex<ChildElement extends Element, M extends UseRov
                             nextChild.focusSelf(element);
                     }
                 }
-
             }
+
+            if (nextIndex != null)
+                setLastNonNullIndex(nextIndex);
 
             return nextIndex ?? (untabbable ? null : 0);
         }
     }, []);
 
-    const lastNonNullIndex = useRef<number | null>(initiallyTabbedIndex);
+    // When we switch from tabbable to non/tabbable, we really want to remember the last tabbable child.
+    // So every time we change the index for any reason, record that change as a back up here that can be restored.
+    const [getLastNonNullIndex, setLastNonNullIndex] = usePassiveState<number, Event>(null, useCallback(() => (initiallyTabbedIndex ?? 0), []));
 
-    useEffect(() => {
+    /*useEffect(() => {
         const t = getTabbableIndex();
-        if (t != null)
+        if (!untabbable && t != null) {
+            if (t == 0)
+                debugger;
             lastNonNullIndex.current = t;
-    });
+        }
+    });*/
 
     // Any time we switch to being untabbable, set the current tabbable index accordingly.
     useEffect(() => {
         if (untabbable)
             setTabbableIndex3(null, undefined!);
-        else
-            setTabbableIndex3(lastNonNullIndex.current, undefined!);
+        else {
+            setTabbableIndex3(getLastNonNullIndex(), undefined!);
+        }
     }, [untabbable]);
 
     // Boilerplate related to notifying individual children when they become tabbable/untabbable
@@ -259,8 +275,13 @@ export function useRovingTabIndex<ChildElement extends Element, M extends UseRov
     const setTabbableAt = useCallback((m: UseRovingTabIndexChildInfo<ChildElement>, t: boolean) => { m.setTabbable(t); }, []);
     const isTabbableValid = useCallback((m: UseRovingTabIndexChildInfo<ChildElement>) => { return !m.hidden }, []);
     const { changeIndex: setTabbableIndex3, getCurrentIndex: getTabbableIndex, reevaluateClosestFit } = useChildrenFlag<UseRovingTabIndexChildInfo<ChildElement>, Event>({
-        initialIndex: initiallyTabbedIndex ?? (untabbable? null : 0),
-        onIndexChange: onTabbableIndexChange,
+        initialIndex: initiallyTabbedIndex ?? (untabbable ? null : 0),
+        onIndexChange: onTabbableIndexChange, /*useStableCallback<OnPassiveStateChange<number | null, Event>>((newIndex, prevIndex, reason) => {
+            if (newIndex != null)
+                setLastNonNullIndex(newIndex);
+            if (!untabbable || untabbable && newIndex != null)
+                onTabbableIndexChange?.(newIndex, prevIndex, reason);
+        })*/
         getChildren,
         closestFit: true,
         getAt: getTabbableAt,
@@ -281,6 +302,7 @@ export function useRovingTabIndex<ChildElement extends Element, M extends UseRov
 
     const rovingTabIndexChildContext = useStableObject({
         setTabbableIndex,
+        getInitiallyTabbedIndex: useCallback(() => { return initiallyTabbedIndex ?? (untabbable ? null : 0) }, []),
         reevaluateClosestFit
     });
 
@@ -294,11 +316,11 @@ export function useRovingTabIndex<ChildElement extends Element, M extends UseRov
 
 export function useRovingTabIndexChild<ChildElement extends Element>({
     managedChildParameters: { index, ..._void2 },
-    rovingTabIndexChildContext: { reevaluateClosestFit, setTabbableIndex },
+    rovingTabIndexChildContext: { reevaluateClosestFit, setTabbableIndex, getInitiallyTabbedIndex },
     rovingTabIndexChildParameters,
 }: UseRovingTabIndexChildParameters<ChildElement>): UseRovingTabIndexChildReturnType<ChildElement> {
     const { hidden, ..._void1 } = rovingTabIndexChildParameters;
-    const [tabbable, setTabbable, getTabbable] = useState(false);
+    const [tabbable, setTabbable, getTabbable] = useState(getInitiallyTabbedIndex() === index);
 
     useEffect(() => {
         reevaluateClosestFit();

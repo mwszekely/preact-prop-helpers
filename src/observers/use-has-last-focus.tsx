@@ -1,5 +1,5 @@
 
-import { useCallback } from "preact/hooks";
+import { useCallback, useEffect } from "preact/hooks";
 //import { UseManagedChildParameters, useManagedChildren, UseManagedChildrenParameters, UseManagedChildrenReturnTypeInfo } from "./use-child-manager";
 import { UseRefElementReturnType } from "../dom-helpers/use-ref-element";
 import { returnFalse, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state";
@@ -58,6 +58,13 @@ export function useHasLastFocus<T extends Node>(args: UseHasLastFocusParameters<
             ...activeElementParameters
         },
     });
+
+    useEffect(() => {
+        return () => {
+            setLastFocused(false);
+            setLastFocusedInner(false);
+        }
+    }, []);
 
     return {
         activeElementReturn,

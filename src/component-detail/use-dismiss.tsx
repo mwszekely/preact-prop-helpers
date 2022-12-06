@@ -1,10 +1,10 @@
 import { h } from "preact";
 import { useCallback, useEffect } from "preact/hooks";
+import { useGlobalHandler } from "../dom-helpers/use-event-handler";
+import { useRefElement, UseRefElementReturnType } from "../dom-helpers/use-ref-element";
 import { useActiveElement, UseActiveElementParameters } from "../observers/use-active-element";
 import { assertEmptyObject } from "../preact-extensions/use-child-manager";
-import { useGlobalHandler } from "../dom-helpers/use-event-handler";
 import { OnPassiveStateChange } from "../preact-extensions/use-passive-state";
-import { useRefElement, UseRefElementReturnType } from "../dom-helpers/use-ref-element";
 import { useStableCallback } from "../preact-extensions/use-stable-callback";
 import { useStableGetter } from "../preact-extensions/use-stable-getter";
 

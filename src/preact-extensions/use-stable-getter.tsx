@@ -1,6 +1,6 @@
 import { useCallback, useRef } from "preact/hooks";
-import { useEnsureStability } from "./use-passive-state";
 import { useBeforeLayoutEffect } from "./use-before-layout-effect";
+import { useEnsureStability } from "./use-passive-state";
 
 const Unset = Symbol("unset");
 

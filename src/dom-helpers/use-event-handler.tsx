@@ -1,7 +1,7 @@
 import { h, PreactDOMAttributes } from "preact";
 import { useCallback, useEffect } from "preact/hooks";
-import { useMergedProps } from "./use-merged-props";
 import { useStableCallback } from "../preact-extensions/use-stable-callback";
+import { useMergedProps } from "./use-merged-props";
 
 /**
  * This is used to select *just* the typed addEventListener 

@@ -1,7 +1,7 @@
 import { h } from "preact";
 import { useEffect, useRef } from "preact/hooks";
-import { UseRefElementReturnType } from "../dom-helpers/use-ref-element";
 import { useGlobalHandler } from "../dom-helpers/use-event-handler";
+import { UseRefElementReturnType } from "../dom-helpers/use-ref-element";
 import { useForceUpdate } from "../preact-extensions/use-force-update";
 import { useStableCallback } from "../preact-extensions/use-stable-callback";
 import { useState } from "../preact-extensions/use-state";

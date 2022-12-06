@@ -22,8 +22,6 @@ export const DemoUseRovingTabIndex = memo(() => {
     // const [selectedIndex, _setLocalSelectedIndex] = useState<number | null>(0);
     // const [tabbableIndex, _setLocalTabbableIndex] = useState<number | null>(0);
 
-    console.log(`rovingTabIndex parent render`)
-
 
     const r: UseCompleteListNavigationReturnType<HTMLOListElement, HTMLLIElement, CustomInfoType> = useCompleteListNavigation<HTMLOListElement, HTMLLIElement, CustomInfoType>({
         rovingTabIndexParameters: { onTabbableIndexChange: null, untabbable: false },
@@ -33,7 +31,7 @@ export const DemoUseRovingTabIndex = memo(() => {
         rearrangeableChildrenParameters: {
             getIndex: useCallback<GetIndex<{ index: number }>>((a: VNode<{ index: number }>) => a.props.index, []),
         },
-        sortableChildrenParameters: { compare: useCallback((rhs, lhs) => { return lhs.index - rhs.index }, []) },
+        sortableChildrenParameters: { compare: useCallback((rhs: CustomInfoType, lhs: CustomInfoType) => { return lhs.index - rhs.index }, []) },
     });
 
 
@@ -76,8 +74,8 @@ export const DemoUseRovingTabIndex = memo(() => {
                 <li>Children can be reordered arbitrarily, including sorting, shuffling, etc. while ensuring coherent navigation regardless.</li>
                 <li>The parent's selected index is <strong>uncontrolled</strong> and so it does not re-render itself when the selected index changes (you can easily make it controlled, of course, at the cost of 1 additional render. See <code>useSingleSelectionDeclarative</code> for a shortcut to do exactly that)</li>
                 <li>Changing which child is focused or selected only re-renders a maximum of 2 children each time.</li>
-                <li>Lists can be nested, and there is no strict requirement on DOM structure*
-                    <ul><li>*Using re-arrangeable children does impose some restrictions and so is <strong>optional</strong>; it requires all those children be in one contiguous array of VNodes so that their <code>key</code> props can be manipulated.</li></ul>
+                <li>Lists can be nested, and there is no strict requirement on DOM structure (except for sorting/rearranging children, if you use that).
+                    <ul><li>If you don't need sorting/rearranging this DOM requirement is <strong>optional</strong>; rearranging requires all children be in one contiguous array of VNodes so that their <code>key</code> props can be manipulated.</li></ul>
                 </li>
             </ul>
             <p>The biggest restriction of this method is that every child needs a 0-based numeric index.</p>
@@ -138,7 +136,7 @@ const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
         textContentParameters: { getText: useCallback((e) => { return e?.textContent ?? "" }, []) }
     });
 
-    console.log(`rovingTabIndex child #${index} render (${selected.toString()})`)
+    //console.log(`rovingTabIndex child #${index} render (${selected.toString()})`)
     const text = `${randomWord} This is item #${index}${hidden ? " (hidden)" : ""}${disabled ? " (disabled)" : ""}${selected ? " (selected)" : " (not selected)"} (${tabbable ? "Tabbable" : "Not tabbable"})`;
 
     /*

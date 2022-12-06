@@ -1,5 +1,5 @@
-import { useMergedProps } from "../dom-helpers/use-merged-props";
 import { h } from "preact";
+import { useMergedProps } from "../dom-helpers/use-merged-props";
 import { useRandomId, UseRandomIdParameters, UseRandomIdReturnType } from "./use-random-id";
 
 

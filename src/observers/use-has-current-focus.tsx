@@ -56,18 +56,27 @@ export function useHasCurrentFocus<T extends Node>(args: UseHasCurrentFocusParam
 
     useEnsureStability("useHasCurrentFocus", onFocusedChanged, onFocusedInnerChanged, getElement);
 
-    const [getFocused, setFocused] = usePassiveState<boolean,  R>(onFocusedChanged, returnFalse);
-    const [getFocusedInner, setFocusedInner] = usePassiveState<boolean,  R>(onFocusedInnerChanged, returnFalse);
+    const [getFocused, setFocused] = usePassiveState<boolean, R>(onFocusedChanged, returnFalse);
+    const [getFocusedInner, setFocusedInner] = usePassiveState<boolean, R>(onFocusedInnerChanged, returnFalse);
 
     const onFocusIn = useCallback<h.JSX.EventHandler<h.JSX.TargetedFocusEvent<T>>>((e) => {
+
         setFocusedInner(true, e as R);
         setFocused(e.target == getElement(), e as R)
     }, []);
 
     const onFocusOut = useCallback<h.JSX.EventHandler<h.JSX.TargetedFocusEvent<T>>>((e) => {
-        if (e.target == getElement()) {
-            setFocusedInner(false, e as R);
-            setFocused(false, e as R);
+        // Even if we're focusOut-ing to another inner element,
+        // that'll be caught during onFocusIn,
+        // so just set everything to false and let that revert things back to true if necessary.
+        setFocusedInner(false, e as R);
+        setFocused(false, e as R);
+    }, []);
+
+    useEffect(() => {
+        return () => {
+            setFocused(false);
+            setFocusedInner(false);
         }
     }, []);
 

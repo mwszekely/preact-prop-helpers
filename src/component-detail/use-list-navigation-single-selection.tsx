@@ -1,8 +1,7 @@
 import { assertEmptyObject } from "../preact-extensions/use-child-manager";
+import { useStableCallback } from "../preact-extensions/use-stable-callback";
 import { useListNavigation, useListNavigationChild, UseListNavigationChildInfo, UseListNavigationChildParameters, UseListNavigationChildReturnType, UseListNavigationParameters, UseListNavigationReturnType } from "./use-list-navigation-partial";
 import { SelectableChildInfo, useSingleSelection, useSingleSelectionChild, UseSingleSelectionChildParameters, UseSingleSelectionChildReturnType, UseSingleSelectionParameters, UseSingleSelectionReturnType } from "./use-single-selection";
-import { useStableCallback } from "../preact-extensions/use-stable-callback";
-import { h } from "preact";
 
 /**
  * We're just gluing together the list navigation and single selection hooks,

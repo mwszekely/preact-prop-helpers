@@ -1,11 +1,11 @@
-import "wicg-inert";
 import "blocking-elements";
 import { DocumentWithBlockingElements } from "blocking-elements";
 import { useLayoutEffect } from "preact/hooks";
-import { getDocument } from "./use-document-class";
-import { useStableCallback } from "../preact-extensions/use-stable-callback";
-import { returnNull, usePassiveState } from "../preact-extensions/use-passive-state";
+import "wicg-inert";
 import { useActiveElement } from "../observers/use-active-element";
+import { returnNull, usePassiveState } from "../preact-extensions/use-passive-state";
+import { useStableCallback } from "../preact-extensions/use-stable-callback";
+import { getDocument } from "./use-document-class";
 
 function blockingElements() { return (getDocument() as DocumentWithBlockingElements).$blockingElements }
 /**

@@ -1,7 +1,7 @@
+import { h } from "preact";
 import { DismissListenerTypes, useDismiss, UseDismissParameters, UseDismissReturnType } from "../component-detail/use-dismiss";
 import { useFocusTrap, UseFocusTrapParameters, UseFocusTrapReturnType } from "../component-detail/use-focus-trap";
 import { useMergedProps } from "../dom-helpers/use-merged-props";
-import { h } from "preact";
 
 export interface UseModalParameters<Listeners extends DismissListenerTypes> extends UseDismissParameters<Listeners> {
     focusTrapParameters: UseFocusTrapParameters<any, any>["focusTrapParameters"];

@@ -1,9 +1,9 @@
 
-import { useStableObject } from "../preact-extensions/use-stable-getter";
-import { UseHasCurrentFocusParameters } from "./use-has-current-focus";
+import { h } from "preact";
 import { OnPassiveStateChange, PassiveStateUpdater, returnFalse, runImmediately, usePassiveState } from "../preact-extensions/use-passive-state";
 import { useStableCallback } from "../preact-extensions/use-stable-callback";
-import { h } from "preact";
+import { useStableObject } from "../preact-extensions/use-stable-getter";
+import { UseHasCurrentFocusParameters } from "./use-has-current-focus";
 
 
 export interface UseChildrenHaveFocusParameters<T extends Element> {
@@ -51,6 +51,7 @@ export function useChildrenHaveFocus<ChildElement extends Element>(args: UseChil
 
     const [getAnyFocused, setAnyFocused] = usePassiveState<boolean, R>(onCompositeFocusChange, returnFalse, runImmediately);
     const [_getFocusCount, setFocusCount] = usePassiveState<number, R>(useStableCallback<OnPassiveStateChange<number, R>>((anyFocused, anyPreviouslyFocused, e) => {
+        console.log("Focus count: " + anyFocused);
         console.assert(anyFocused >= 0 && anyFocused <= 1);
         setAnyFocused(!!(anyFocused && !anyPreviouslyFocused), e);
     }));

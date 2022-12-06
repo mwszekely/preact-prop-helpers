@@ -1,7 +1,6 @@
 import lodashShuffle from "lodash-es/shuffle";
 import { h, VNode } from "preact";
 import { MutableRef, useCallback, useLayoutEffect, useRef } from "preact/hooks";
-import { useMergedProps } from "../dom-helpers/use-merged-props";
 import { ManagedChildInfo, ManagedChildren } from "../preact-extensions/use-child-manager";
 import { useForceUpdate } from "../preact-extensions/use-force-update";
 import { returnNull, usePassiveState } from "../preact-extensions/use-passive-state";
@@ -60,7 +59,7 @@ export interface UseSortableChildrenParameters<M extends ManagedChildInfo<number
 }
 
 
-export interface UseRearrangeableChildrenReturnType<ParentElement extends Element, M extends ManagedChildInfo<number>> {
+export interface UseRearrangeableChildrenReturnType<M extends ManagedChildInfo<number>> {
     //linearNavigationParameters: Pick<UseLinearNavigationParameters["linearNavigationParameters"], "navigateRelative" | "navigateAbsolute">;
 
     rearrangeableChildrenReturn: {
@@ -105,7 +104,7 @@ export interface UseRearrangeableChildrenReturnType<ParentElement extends Elemen
 }
 
 
-export interface UseSortableChildrenReturnType<ParentElement extends Element, M extends ManagedChildInfo<number>> extends UseRearrangeableChildrenReturnType<ParentElement, M> {
+export interface UseSortableChildrenReturnType<M extends ManagedChildInfo<number>> extends UseRearrangeableChildrenReturnType<M> {
     sortableChildrenReturn: {
         /** **STABLE** */
         sort: (managedRows: ManagedChildren<M>, direction: "ascending" | "descending") => Promise<void> | void;
@@ -138,9 +137,9 @@ export interface UseSortableChildInfo extends ManagedChildInfo<number> {
  * Because keys are given special treatment and a child has no way of modifying its own key
  * there's no other time or place this can happen other than exactly within the parent component's render function.
  */
-export function useRearrangeableChildren<ParentElement extends Element, M extends UseSortableChildInfo>({
+export function useRearrangeableChildren<M extends UseSortableChildInfo>({
     rearrangeableChildrenParameters: { getIndex }
-}: UseRearrangeableChildrenParameters): UseRearrangeableChildrenReturnType<ParentElement, M> {
+}: UseRearrangeableChildrenParameters): UseRearrangeableChildrenReturnType<M> {
 
     // These are used to keep track of a mapping between unsorted index <---> sorted index.
     // These are needed for navigation with the arrow keys.
@@ -226,14 +225,14 @@ export function useRearrangeableChildren<ParentElement extends Element, M extend
  * Because keys are given special treatment and a child has no way of modifying its own key
  * there's no other time or place this can happen other than exactly within the parent component's render function.
  */
-export function useSortableChildren<ParentElement extends Element, M extends UseSortableChildInfo>({
+export function useSortableChildren<M extends UseSortableChildInfo>({
     rearrangeableChildrenParameters,
     sortableChildrenParameters: { compare: userCompare }
-}: UseSortableChildrenParameters<M>): UseSortableChildrenReturnType<ParentElement, M> {
+}: UseSortableChildrenParameters<M>): UseSortableChildrenReturnType<M> {
 
     const getCompare = useStableGetter<Compare<M>>(userCompare ?? defaultCompare);
 
-    const { rearrangeableChildrenReturn } = useRearrangeableChildren<ParentElement, M>({ rearrangeableChildrenParameters });
+    const { rearrangeableChildrenReturn } = useRearrangeableChildren<M>({ rearrangeableChildrenParameters });
     const { rearrange } = rearrangeableChildrenReturn;
     // The actual sort function.
     const sort = useCallback((managedRows: ManagedChildren<M>, direction: "ascending" | "descending"): Promise<void> | void => {

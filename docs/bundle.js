@@ -5,7 +5,7 @@ var bundle = (function (exports) {
 
     var _$1=0;function o$1(o,e,n,t,f){var l,s,u={};for(s in e)"ref"==s?l=e[s]:u[s]=e[s];var a={type:o,props:u,key:n,ref:l,__k:null,__:null,__b:0,__e:null,__d:void 0,__c:null,__h:null,constructor:void 0,__v:--_$1,__source:f,__self:t};if("function"==typeof o&&(l=o.defaultProps))for(s in l)void 0===u[s]&&(u[s]=l[s]);return l$1.vnode&&l$1.vnode(a),a}
 
-    var t,r$1,u,i,o=0,f=[],c=[],e=l$1.__b,a=l$1.__r,v=l$1.diffed,l=l$1.__c,m=l$1.unmount;function d(t,u){l$1.__h&&l$1.__h(r$1,t,o||u),o=0;var i=r$1.__H||(r$1.__H={__:[],__h:[]});return t>=i.__.length&&i.__.push({__V:c}),i.__[t]}function p(n){return o=1,y(B$1,n)}function y(n,u,i){var o=d(t++,2);if(o.t=n,!o.__c&&(o.__=[i?i(u):B$1(void 0,u),function(n){var t=o.__N?o.__N[0]:o.__[0],r=o.t(t,n);t!==r&&(o.__N=[r,o.__[1]],o.__c.setState({}));}],o.__c=r$1,!r$1.u)){r$1.u=!0;var f=r$1.shouldComponentUpdate;r$1.shouldComponentUpdate=function(n,t,r){if(!o.__c.__H)return !0;var u=o.__c.__H.__.filter(function(n){return n.__c});if(u.every(function(n){return !n.__N}))return !f||f.call(this,n,t,r);var i=!1;return u.forEach(function(n){if(n.__N){var t=n.__[0];n.__=n.__N,n.__N=void 0,t!==n.__[0]&&(i=!0);}}),!(!i&&o.__c.props===n)&&(!f||f.call(this,n,t,r))};}return o.__N||o.__}function h(u,i){var o=d(t++,3);!l$1.__s&&z$1(o.__H,i)&&(o.__=u,o.i=i,r$1.__H.__h.push(o));}function s(u,i){var o=d(t++,4);!l$1.__s&&z$1(o.__H,i)&&(o.__=u,o.i=i,r$1.__h.push(o));}function _(n){return o=5,F$1(function(){return {current:n}},[])}function F$1(n,r){var u=d(t++,7);return z$1(u.__H,r)?(u.__V=n(),u.i=r,u.__h=n,u.__V):u.__}function T$1(n,t){return o=8,F$1(function(){return n},t)}function q(n){var u=r$1.context[n.__c],i=d(t++,9);return i.c=n,u?(null==i.__&&(i.__=!0,u.sub(r$1)),u.props.value):n.__}function V$1(){var n=d(t++,11);if(!n.__){for(var u=r$1.__v;null!==u&&!u.__m&&null!==u.__;)u=u.__;var i=u.__m||(u.__m=[0,0]);n.__="P"+i[0]+"-"+i[1]++;}return n.__}function b(){for(var t;t=f.shift();)if(t.__P&&t.__H)try{t.__H.__h.forEach(k),t.__H.__h.forEach(w$1),t.__H.__h=[];}catch(r){t.__H.__h=[],l$1.__e(r,t.__v);}}l$1.__b=function(n){r$1=null,e&&e(n);},l$1.__r=function(n){a&&a(n),t=0;var i=(r$1=n.__c).__H;i&&(u===r$1?(i.__h=[],r$1.__h=[],i.__.forEach(function(n){n.__N&&(n.__=n.__N),n.__V=c,n.__N=n.i=void 0;})):(i.__h.forEach(k),i.__h.forEach(w$1),i.__h=[])),u=r$1;},l$1.diffed=function(t){v&&v(t);var o=t.__c;o&&o.__H&&(o.__H.__h.length&&(1!==f.push(o)&&i===l$1.requestAnimationFrame||((i=l$1.requestAnimationFrame)||j)(b)),o.__H.__.forEach(function(n){n.i&&(n.__H=n.i),n.__V!==c&&(n.__=n.__V),n.i=void 0,n.__V=c;})),u=r$1=null;},l$1.__c=function(t,r){r.some(function(t){try{t.__h.forEach(k),t.__h=t.__h.filter(function(n){return !n.__||w$1(n)});}catch(u){r.some(function(n){n.__h&&(n.__h=[]);}),r=[],l$1.__e(u,t.__v);}}),l&&l(t,r);},l$1.unmount=function(t){m&&m(t);var r,u=t.__c;u&&u.__H&&(u.__H.__.forEach(function(n){try{k(n);}catch(n){r=n;}}),u.__H=void 0,r&&l$1.__e(r,u.__v));};var g$1="function"==typeof requestAnimationFrame;function j(n){var t,r=function(){clearTimeout(u),g$1&&cancelAnimationFrame(t),setTimeout(n);},u=setTimeout(r,100);g$1&&(t=requestAnimationFrame(r));}function k(n){var t=r$1,u=n.__c;"function"==typeof u&&(n.__c=void 0,u()),r$1=t;}function w$1(n){var t=r$1;n.__c=n.__(),r$1=t;}function z$1(n,t){return !n||n.length!==t.length||t.some(function(t,r){return t!==n[r]})}function B$1(n,t){return "function"==typeof t?t(n):t}
+    var t,r$1,u,i,o=0,f=[],c=[],e=l$1.__b,a=l$1.__r,v=l$1.diffed,l=l$1.__c,m=l$1.unmount;function d(t,u){l$1.__h&&l$1.__h(r$1,t,o||u),o=0;var i=r$1.__H||(r$1.__H={__:[],__h:[]});return t>=i.__.length&&i.__.push({__V:c}),i.__[t]}function p(n){return o=1,y(B$1,n)}function y(n,u,i){var o=d(t++,2);if(o.t=n,!o.__c&&(o.__=[i?i(u):B$1(void 0,u),function(n){var t=o.__N?o.__N[0]:o.__[0],r=o.t(t,n);t!==r&&(o.__N=[r,o.__[1]],o.__c.setState({}));}],o.__c=r$1,!r$1.u)){r$1.u=!0;var f=r$1.shouldComponentUpdate;r$1.shouldComponentUpdate=function(n,t,r){if(!o.__c.__H)return !0;var u=o.__c.__H.__.filter(function(n){return n.__c});if(u.every(function(n){return !n.__N}))return !f||f.call(this,n,t,r);var i=!1;return u.forEach(function(n){if(n.__N){var t=n.__[0];n.__=n.__N,n.__N=void 0,t!==n.__[0]&&(i=!0);}}),!(!i&&o.__c.props===n)&&(!f||f.call(this,n,t,r))};}return o.__N||o.__}function h(u,i){var o=d(t++,3);!l$1.__s&&z$1(o.__H,i)&&(o.__=u,o.i=i,r$1.__H.__h.push(o));}function s(u,i){var o=d(t++,4);!l$1.__s&&z$1(o.__H,i)&&(o.__=u,o.i=i,r$1.__h.push(o));}function _(n){return o=5,F$1(function(){return {current:n}},[])}function F$1(n,r){var u=d(t++,7);return z$1(u.__H,r)?(u.__V=n(),u.i=r,u.__h=n,u.__V):u.__}function T$1(n,t){return o=8,F$1(function(){return n},t)}function q(n){var u=r$1.context[n.__c],i=d(t++,9);return i.c=n,u?(null==i.__&&(i.__=!0,u.sub(r$1)),u.props.value):n.__}function b(){for(var t;t=f.shift();)if(t.__P&&t.__H)try{t.__H.__h.forEach(k),t.__H.__h.forEach(w$1),t.__H.__h=[];}catch(r){t.__H.__h=[],l$1.__e(r,t.__v);}}l$1.__b=function(n){r$1=null,e&&e(n);},l$1.__r=function(n){a&&a(n),t=0;var i=(r$1=n.__c).__H;i&&(u===r$1?(i.__h=[],r$1.__h=[],i.__.forEach(function(n){n.__N&&(n.__=n.__N),n.__V=c,n.__N=n.i=void 0;})):(i.__h.forEach(k),i.__h.forEach(w$1),i.__h=[])),u=r$1;},l$1.diffed=function(t){v&&v(t);var o=t.__c;o&&o.__H&&(o.__H.__h.length&&(1!==f.push(o)&&i===l$1.requestAnimationFrame||((i=l$1.requestAnimationFrame)||j)(b)),o.__H.__.forEach(function(n){n.i&&(n.__H=n.i),n.__V!==c&&(n.__=n.__V),n.i=void 0,n.__V=c;})),u=r$1=null;},l$1.__c=function(t,r){r.some(function(t){try{t.__h.forEach(k),t.__h=t.__h.filter(function(n){return !n.__||w$1(n)});}catch(u){r.some(function(n){n.__h&&(n.__h=[]);}),r=[],l$1.__e(u,t.__v);}}),l&&l(t,r);},l$1.unmount=function(t){m&&m(t);var r,u=t.__c;u&&u.__H&&(u.__H.__.forEach(function(n){try{k(n);}catch(n){r=n;}}),u.__H=void 0,r&&l$1.__e(r,u.__v));};var g$1="function"==typeof requestAnimationFrame;function j(n){var t,r=function(){clearTimeout(u),g$1&&cancelAnimationFrame(t),setTimeout(n);},u=setTimeout(r,100);g$1&&(t=requestAnimationFrame(r));}function k(n){var t=r$1,u=n.__c;"function"==typeof u&&(n.__c=void 0,u()),r$1=t;}function w$1(n){var t=r$1;n.__c=n.__(),r$1=t;}function z$1(n,t){return !n||n.length!==t.length||t.some(function(t,r){return t!==n[r]})}function B$1(n,t){return "function"==typeof t?t(n):t}
 
     function g(n,t){for(var e in t)n[e]=t[e];return n}function C(n,t){for(var e in n)if("__source"!==e&&!(e in t))return !0;for(var r in t)if("__source"!==r&&n[r]!==t[r])return !0;return !1}function w(n){this.props=n;}function R(n,e){function r(n){var t=this.props.ref,r=t==n.ref;return !r&&t&&(t.call?t(null):t.current=null),e?!e(this.props,n)||!r:C(this.props,n)}function u(e){return this.shouldComponentUpdate=r,h$1(n,e)}return u.displayName="Memo("+(n.displayName||n.name)+")",u.prototype.isReactComponent=!0,u.__f=!0,u}(w.prototype=new d$1).isPureReactComponent=!0,w.prototype.shouldComponentUpdate=function(n,t){return C(this.props,n)||C(this.state,t)};var x=l$1.__b;l$1.__b=function(n){n.type&&n.type.__f&&n.ref&&(n.props.ref=n.ref,n.ref=null),x&&x(n);};var T=l$1.__e;l$1.__e=function(n,t,e,r){if(n.then)for(var u,o=t;o=o.__;)if((u=o.__c)&&u.__c)return null==t.__e&&(t.__e=e.__e,t.__k=e.__k),u.__c(n,t);T(n,t,e,r);};var I=l$1.unmount;function L(n,t,e){return n&&(n.__c&&n.__c.__H&&(n.__c.__H.__.forEach(function(n){"function"==typeof n.__c&&n.__c();}),n.__c.__H=null),null!=(n=g({},n)).__c&&(n.__c.__P===e&&(n.__c.__P=t),n.__c=null),n.__k=n.__k&&n.__k.map(function(n){return L(n,t,e)})),n}function U(n,t,e){return n&&(n.__v=null,n.__k=n.__k&&n.__k.map(function(n){return U(n,t,e)}),n.__c&&n.__c.__P===t&&(n.__e&&e.insertBefore(n.__e,n.__d),n.__c.__e=!0,n.__c.__P=e)),n}function D(){this.__u=0,this.t=null,this.__b=null;}function F(n){var t=n.__.__c;return t&&t.__a&&t.__a(n)}function V(){this.u=null,this.o=null;}l$1.unmount=function(n){var t=n.__c;t&&t.__R&&t.__R(),t&&!0===n.__h&&(n.type=null),I&&I(n);},(D.prototype=new d$1).__c=function(n,t){var e=t.__c,r=this;null==r.t&&(r.t=[]),r.t.push(e);var u=F(r.__v),o=!1,i=function(){o||(o=!0,e.__R=null,u?u(l):l());};e.__R=i;var l=function(){if(!--r.__u){if(r.state.__a){var n=r.state.__a;r.__v.__k[0]=U(n,n.__c.__P,n.__c.__O);}var t;for(r.setState({__a:r.__b=null});t=r.t.pop();)t.forceUpdate();}},c=!0===t.__h;r.__u++||c||r.setState({__a:r.__b=r.__v.__k[0]}),n.then(i,i);},D.prototype.componentWillUnmount=function(){this.t=[];},D.prototype.render=function(n,e){if(this.__b){if(this.__v.__k){var r=document.createElement("div"),o=this.__v.__k[0].__c;this.__v.__k[0]=L(this.__b,r,o.__O=o.__P);}this.__b=null;}var i=e.__a&&h$1(p$1,null,n.fallback);return i&&(i.__h=null),[h$1(p$1,null,e.__a?null:n.children),i]};var W=function(n,t,e){if(++e[1]===e[0]&&n.o.delete(t),n.props.revealOrder&&("t"!==n.props.revealOrder[0]||!n.o.size))for(e=n.u;e;){for(;e.length>3;)e.pop()();if(e[1]<e[0])break;n.u=e=e[2];}};(V.prototype=new d$1).__a=function(n){var t=this,e=F(t.__v),r=t.o.get(n);return r[0]++,function(u){var o=function(){t.props.revealOrder?(r.push(u),W(t,n,r)):u();};e?e(o):o();}},V.prototype.render=function(n){this.u=null,this.o=new Map;var t=x$1(n.children);n.revealOrder&&"b"===n.revealOrder[0]&&t.reverse();for(var e=t.length;e--;)this.o.set(t[e],this.u=[1,0,this.u]);return n.children},V.prototype.componentDidUpdate=V.prototype.componentDidMount=function(){var n=this;this.o.forEach(function(t,e){W(n,e,t);});};var z="undefined"!=typeof Symbol&&Symbol.for&&Symbol.for("react.element")||60103,B=/^(?:accent|alignment|arabic|baseline|cap|clip(?!PathU)|color|dominant|fill|flood|font|glyph(?!R)|horiz|image|letter|lighting|marker(?!H|W|U)|overline|paint|pointer|shape|stop|strikethrough|stroke|text(?!L)|transform|underline|unicode|units|v|vector|vert|word|writing|x(?!C))[A-Z]/,H="undefined"!=typeof document,Z=function(n){return ("undefined"!=typeof Symbol&&"symbol"==typeof Symbol()?/fil|che|rad/i:/fil|che|ra/i).test(n)};d$1.prototype.isReactComponent={},["componentWillMount","componentWillReceiveProps","componentWillUpdate"].forEach(function(t){Object.defineProperty(d$1.prototype,t,{configurable:!0,get:function(){return this["UNSAFE_"+t]},set:function(n){Object.defineProperty(this,t,{configurable:!0,writable:!0,value:n});}});});var G=l$1.event;function J(){}function K(){return this.cancelBubble}function Q(){return this.defaultPrevented}l$1.event=function(n){return G&&(n=G(n)),n.persist=J,n.isPropagationStopped=K,n.isDefaultPrevented=Q,n.nativeEvent=n};var nn={configurable:!0,get:function(){return this.class}},tn=l$1.vnode;l$1.vnode=function(n){var t=n.type,e=n.props,u=e;if("string"==typeof t){var o=-1===t.indexOf("-");for(var i in u={},e){var l=e[i];H&&"children"===i&&"noscript"===t||"value"===i&&"defaultValue"in e&&null==l||("defaultValue"===i&&"value"in e&&null==e.value?i="value":"download"===i&&!0===l?l="":/ondoubleclick/i.test(i)?i="ondblclick":/^onchange(textarea|input)/i.test(i+t)&&!Z(e.type)?i="oninput":/^onfocus$/i.test(i)?i="onfocusin":/^onblur$/i.test(i)?i="onfocusout":/^on(Ani|Tra|Tou|BeforeInp|Compo)/.test(i)?i=i.toLowerCase():o&&B.test(i)?i=i.replace(/[A-Z0-9]/g,"-$&").toLowerCase():null===l&&(l=void 0),/^oninput$/i.test(i)&&(i=i.toLowerCase(),u[i]&&(i="oninputCapture")),u[i]=l);}"select"==t&&u.multiple&&Array.isArray(u.value)&&(u.value=x$1(e.children).forEach(function(n){n.props.selected=-1!=u.value.indexOf(n.props.value);})),"select"==t&&null!=u.defaultValue&&(u.value=x$1(e.children).forEach(function(n){n.props.selected=u.multiple?-1!=u.defaultValue.indexOf(n.props.value):u.defaultValue==n.props.value;})),n.props=u,e.class!=e.className&&(nn.enumerable="className"in e,null!=e.className&&(u.class=e.className),Object.defineProperty(u,"className",nn));}n.$$typeof=z,tn&&tn(n);};var en=l$1.__r;l$1.__r=function(n){en&&en(n),n.__c;};
 
@@ -155,118 +155,6 @@ var bundle = (function (exports) {
      * An alternative to use for `customDebounceRendering` that causes `usePassiveState` to run changes without waiting a tick.
      */
     function runImmediately(f) { f(); }
-
-    /*
-    const activeElementUpdaters = new Map<Window | null | undefined, Set<undefined | ((e: Node | null) => void)>>();
-    const lastActiveElementUpdaters = new Map<Window | null | undefined, Set<undefined | ((e: Node) => void)>>();
-    const windowFocusedUpdaters = new Map<Window | null | undefined, Set<undefined | ((focused: boolean) => void)>>();
-    const windowsFocusedUpdaters = new Map<Window | null | undefined, boolean>();*/
-    const activeElementUpdaters = new Map();
-    const lastActiveElementUpdaters = new Map();
-    const windowFocusedUpdaters = new Map();
-    const windowsFocusedUpdaters = new Map();
-    //const microtasks = new Map<Set<any>, any>();
-    // The focusin and focusout events often fire syncronously in the middle of running code.
-    // E.G. calling element.focus() can cause a focusin event handler to immediately interrupt that code.
-    // For the purpose of improving stability, we debounce all focus events to the next microtask.
-    function forEachUpdater(window, map, value, reason) {
-        const updaters = map.get(window);
-        if (updaters) {
-            //if (!microtasks.has(updatersKey)) {
-            //debounceRendering(() => {
-            //const updatersKey = map.get(window)!;
-            //const value = microtasks.get(updatersKey);
-            //microtasks.delete(updatersKey);
-            if (updaters) {
-                for (const updater of updaters) {
-                    const { lastSent, send } = updater;
-                    if (value !== lastSent) {
-                        send(value, reason);
-                        updater.lastSent = value;
-                    }
-                }
-            }
-            //});
-            //}
-            //microtasks.set(updatersKey, value);
-        }
-    }
-    function focusout(e) {
-        const window = e.target.ownerDocument.defaultView;
-        if (e.relatedTarget == null) {
-            forEachUpdater(window, activeElementUpdaters, null, e);
-        }
-    }
-    function focusin(e) {
-        const window = e.target.ownerDocument.defaultView;
-        const currentlyFocusedElement = e.target;
-        forEachUpdater(window, activeElementUpdaters, currentlyFocusedElement, e);
-        forEachUpdater(window, lastActiveElementUpdaters, currentlyFocusedElement, e);
-    }
-    function windowFocus(e) {
-        const window = (e.target instanceof Window ? e.target : e.currentTarget instanceof Window ? e.currentTarget : e.target.ownerDocument.defaultView);
-        windowsFocusedUpdaters.set(window, true);
-        forEachUpdater(window, windowFocusedUpdaters, true, e);
-    }
-    function windowBlur(e) {
-        const window = (e.target instanceof Window ? e.target : e.currentTarget instanceof Window ? e.currentTarget : e.target.ownerDocument.defaultView);
-        windowsFocusedUpdaters.set(window, false);
-        forEachUpdater(window, windowFocusedUpdaters, false, e);
-    }
-    /**
-     * Allows you to inspect which element in the `document` currently has focus, which was most recently focused if none are currently, and whether or not the window has focus by returning the following functions:
-     * * `getActiveElement()`
-     * * `getLastActiveElement()`
-     * * `getWindowFocused()`
-     *
-     * (The document's body receiving focus, like it does when you click on an empty area, is counted as no element having focus for all intents and purposes)
-     *
-     * This is a passive hook, so by default it returns getter functions that report this information but the component will not re-render by default when the active element changes.
-     *
-     * If you need the component to re-render when the active element changes, use the `on*Change` arguments to set some state on your end.
-     */
-    function useActiveElement({ activeElementParameters: { onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument, getWindow } }) {
-        useEnsureStability("useActiveElement", onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument, getWindow);
-        h(() => {
-            const document = getDocument();
-            const window = (getWindow?.(document) ?? document?.defaultView);
-            if ((activeElementUpdaters.get(window)?.size ?? 0) === 0) {
-                document?.addEventListener("focusin", focusin, { passive: true });
-                document?.addEventListener("focusout", focusout, { passive: true });
-                window?.addEventListener("focus", windowFocus, { passive: true });
-                window?.addEventListener("blur", windowBlur, { passive: true });
-            }
-            // Add them even if they're undefined to more easily
-            // manage the ">0 means don't add handlers" logic.
-            const localActiveElementUpdaters = activeElementUpdaters.get(window) ?? new Set();
-            const localLastActiveElementUpdaters = lastActiveElementUpdaters.get(window) ?? new Set();
-            const localWindowFocusedUpdaters = windowFocusedUpdaters.get(window) ?? new Set();
-            const laeu = { send: setActiveElement, lastSent: undefined };
-            const llaeu = { send: setLastActiveElement, lastSent: undefined };
-            const lwfu = { send: setWindowFocused, lastSent: undefined };
-            localActiveElementUpdaters.add(laeu);
-            localLastActiveElementUpdaters.add(llaeu);
-            localWindowFocusedUpdaters.add(lwfu);
-            activeElementUpdaters.set(window, localActiveElementUpdaters);
-            lastActiveElementUpdaters.set(window, localLastActiveElementUpdaters);
-            windowFocusedUpdaters.set(window, localWindowFocusedUpdaters);
-            return () => {
-                activeElementUpdaters.get(window).delete(laeu);
-                lastActiveElementUpdaters.get(window).delete(laeu);
-                windowFocusedUpdaters.get(window).delete(lwfu);
-                if (activeElementUpdaters.size === 0) {
-                    document?.removeEventListener("focusin", focusin);
-                    document?.removeEventListener("focusout", focusout);
-                    window?.removeEventListener("focus", windowFocus);
-                    window?.removeEventListener("blur", windowBlur);
-                }
-            };
-        }, []);
-        const [getActiveElement, setActiveElement] = usePassiveState(onActiveElementChange, returnNull);
-        const [getLastActiveElement, setLastActiveElement] = usePassiveState(onLastActiveElementChange, returnNull);
-        const [getWindowFocused, setWindowFocused] = usePassiveState(onWindowFocusedChange, returnTrue);
-        return { activeElementReturn: { getActiveElement, getLastActiveElement, getWindowFocused } };
-    }
 
     const Table = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-";
     function base64(value) {
@@ -431,272 +319,6 @@ var bundle = (function (exports) {
             console.assert(noDeps.length === 0);
             return setIsStableGetter(T$1(fn, []));
         }
-    }
-
-    /**
-     * Allows a parent component to access information about certain
-     * child components once they have rendered.
-     *
-     * This hook is designed to be lightweight, in that the parent keeps no state
-     * and runs no effects.  Each child *does* run an effect, but with no state
-     * changes unless you explicitly request them.
-     *
-     *
-     */
-    function useManagedChildren(parentParameters) {
-        const { managedChildrenParameters: { onAfterChildLayoutEffect, onChildrenMountChange }, ...rest } = parentParameters;
-        useEnsureStability("useManagedChildren", onAfterChildLayoutEffect, onChildrenMountChange);
-        const getHighestIndex = T$1(() => {
-            return managedChildrenArray.current.highestIndex;
-        }, []);
-        // All the information we have about our children is stored in this **stable** array.
-        // Any mutations to this array **DO NOT** trigger any sort of a re-render.
-        const managedChildrenArray = _({ arr: [], rec: {}, highestIndex: 0, lowestIndex: 0 });
-        // For indirect access to each child
-        // Compare getManagedChildInfo
-        // TODO: The primary use for this is flaggable closest fits
-        // which needs to search all children for that closest fit.
-        // It would be nice if there was something better for that.
-        const forEachChild = T$1((f) => {
-            for (const child of managedChildrenArray.current.arr) {
-                if (child)
-                    f(child);
-            }
-            for (const field in managedChildrenArray.current.rec) {
-                const child = managedChildrenArray.current.rec[field];
-                if (child)
-                    f(child);
-            }
-        }, []);
-        // Retrieves the information associated with the child with the given index.
-        // `undefined` if not child there, or it's unmounted.
-        const getManagedChildInfo = T$1((index) => {
-            if (typeof index == "number")
-                return managedChildrenArray.current.arr[index];
-            else
-                return managedChildrenArray.current.rec[index];
-        }, []);
-        // tl;dr this is a way to have run useLayoutEffect once after all N children
-        // have mounted and run *their* useLayoutEffect, but also *without* re-rendering
-        // ourselves because of having a `childCount` state or anything similar.
-        //
-        // When the child count ref updates, we want the parent to also run an effect
-        // to maybe do something with all these children that just mounted.
-        // The easiest way would be useEffect(..., [childCount]) but
-        // that would require us having a childCount state, then calling
-        // setChildCount and re-rendering every time children mount
-        // (only one re-render at a time unless children are staggered, but still)
-        // 
-        // As an alternate solution, any time a child uses ULE on mount, it queues a microtask
-        // to emulate running ULE on the parent. Only the first child will actually queue
-        // the microtask (by checking hasRemoteULE first) so that the "effect" only
-        // runs once. When it's done, hasRemoteULE is reset so it can run again if
-        // more children mount/unmount.
-        const hasRemoteULEChildMounted = _(null);
-        const remoteULEChildChangedCausers = _(new Set());
-        const remoteULEChildChanged = T$1((index) => {
-            if (remoteULEChildChangedCausers.current.size == 0) {
-                debounceRendering(() => {
-                    onAfterChildLayoutEffect?.(remoteULEChildChangedCausers.current);
-                    remoteULEChildChangedCausers.current.clear();
-                });
-            }
-            remoteULEChildChangedCausers.current.add(index);
-            return () => { };
-        }, [ /* Must remain stable */]);
-        const remoteULEChildMounted = T$1((index, mounted) => {
-            if (!hasRemoteULEChildMounted.current) {
-                hasRemoteULEChildMounted.current = {
-                    mounts: new Set(),
-                    unmounts: new Set(),
-                };
-                debounceRendering(() => {
-                    onChildrenMountChange?.(hasRemoteULEChildMounted.current.mounts, hasRemoteULEChildMounted.current.unmounts);
-                    hasRemoteULEChildMounted.current = null;
-                });
-            }
-            if (mounted) {
-                if (typeof index == "number")
-                    managedChildrenArray.current.highestIndex = Math.max(managedChildrenArray.current.highestIndex, index);
-            }
-            else {
-                if (typeof index == "number") {
-                    delete managedChildrenArray.current.arr[index];
-                    let shave = 0;
-                    while (shave <= managedChildrenArray.current.arr.length && managedChildrenArray.current.arr[managedChildrenArray.current.arr.length - 1 - shave] === undefined) {
-                        ++shave;
-                    }
-                    managedChildrenArray.current.arr.splice(managedChildrenArray.current.arr.length - shave, shave);
-                }
-                else
-                    delete managedChildrenArray.current.rec[index];
-                if (typeof index == "number")
-                    managedChildrenArray.current.highestIndex = managedChildrenArray.current.arr.length - 1;
-            }
-            hasRemoteULEChildMounted.current[mounted ? "mounts" : "unmounts"].add(index);
-        }, [ /* Must remain stable */]);
-        const managedChildren = useStableObject({
-            ...{ _: managedChildrenArray.current },
-            forEach: forEachChild,
-            getAt: getManagedChildInfo,
-            getHighestIndex: getHighestIndex,
-            arraySlice: T$1(() => {
-                return managedChildrenArray.current.arr.slice();
-            }, [])
-        });
-        const getChildren = T$1(() => managedChildren, []);
-        return {
-            context: useStableObject({
-                managedChildContext: useStableObject({
-                    managedChildrenArray: managedChildrenArray.current,
-                    remoteULEChildMounted,
-                    remoteULEChildChanged,
-                    getChildren
-                })
-            }),
-            managedChildrenReturn: { getChildren }
-        };
-    }
-    function useManagedChild(info, managedChildParameters) {
-        const { context: { managedChildContext: { getChildren, managedChildrenArray, remoteULEChildMounted, remoteULEChildChanged } } } = info;
-        const index = managedChildParameters.index;
-        // Any time our child props change, make that information available
-        // the parent if they need it.
-        // The parent can listen for all updates and only act on the ones it cares about,
-        // and multiple children updating in the same tick will all be sent at once.
-        s(() => {
-            // Insert this information in-place
-            if (typeof index == "number") {
-                managedChildrenArray.arr[index] = { ...managedChildParameters };
-            }
-            else {
-                managedChildrenArray.rec[index] = { ...managedChildParameters };
-            }
-            return remoteULEChildChanged(index);
-        }, [...Object.entries(info).flat(9)]); // 9 is infinity, right? Sure. Unrelated: TODO.
-        // When we mount, notify the parent via queueMicrotask
-        // (every child does this, so everything's coordinated to only queue a single microtask per tick)
-        // Do the same on unmount.
-        // Note: It's important that this comes AFTER remoteULEChildChanged
-        // so that remoteULEChildMounted has access to all the info on mount.
-        s(() => {
-            remoteULEChildMounted?.(index, true);
-            return () => remoteULEChildMounted?.(index, false);
-        }, [index]);
-        return {
-            managedChildReturn: { getChildren }
-        };
-    }
-    /**
-     * An extension to useManagedChildren that handles the following common case:
-     * 1. You have a bunch of children
-     * 2. At any given time, only 1 of them is "selected", "activated", "focusable", whatever (or 0 of them, that's cool too, just 0 or 1 though).
-     * 3. The parent has control over who is "selected" via a numerical index.
-     *
-     * This hook allows for much easier control over selection management.
-     *
-     * Note that because you may want to use multiple flags with the same children, this hook *does not* use `useManagedChildren`!
-     * You need to pass it the existing children, and you must pass your invocation of `useManagedChildren` the returned `onChildrenMountChange` handler!
-     *
-     * Also because of that, the types of this function are rather odd.  It's better to start off using a hook that already uses a flag, such as `useRovingTabIndex`, as an example.
-     *
-     *
-     * @param param0
-     * @returns
-     */
-    function useChildrenFlag({ getChildren, initialIndex, closestFit, onIndexChange, getAt, setAt, isValid, }) {
-        useEnsureStability("useChildrenFlag", onIndexChange, getAt, setAt, isValid);
-        // TODO (maybe?): Even if there is an initial index, it's not set until mount. Is that fine?
-        const [getCurrentIndex, setCurrentIndex] = usePassiveState(onIndexChange);
-        const [getRequestedIndex, setRequestedIndex] = usePassiveState(null);
-        //    const getFitNullToZero = useStableGetter(fitNullToZero);
-        // Shared between onChildrenMountChange and changeIndex, not public (but could be I guess)
-        const getClosestFit = T$1((requestedIndex) => {
-            const children = getChildren();
-            let closestDistance = Infinity;
-            let closestIndex = null;
-            children.forEach(child => {
-                if (isValid(child)) {
-                    const newDistance = Math.abs(child.index - requestedIndex);
-                    if (newDistance < closestDistance || (newDistance == closestDistance && child.index < requestedIndex)) {
-                        closestDistance = newDistance;
-                        closestIndex = child.index;
-                    }
-                }
-            });
-            return closestIndex;
-        }, [ /* Must remain stable! */]);
-        // Any time a child mounts/unmounts, we need to double-check to see if that affects 
-        // the "currently selected" (or whatever) index.  The two cases we're looking for:
-        // 1. The currently selected child unmounted
-        // 2. A child mounted, and it mounts with the index we're looking for
-        const reevaluateClosestFit = useStableCallback(() => {
-            const children = getChildren();
-            const requestedIndex = getRequestedIndex();
-            const currentIndex = getCurrentIndex();
-            const currentChild = currentIndex == null ? null : children.getAt(currentIndex);
-            if (requestedIndex != null && closestFit && (requestedIndex != currentIndex || currentChild == null || !isValid(currentChild))) {
-                if (currentChild)
-                    setAt(currentChild, false);
-                const closestFitIndex = getClosestFit(requestedIndex);
-                setCurrentIndex(closestFitIndex, undefined);
-                if (closestFitIndex != null) {
-                    const closestFitChild = children.getAt(closestFitIndex);
-                    console.assert(closestFitChild != null, "Internal logic???");
-                    setAt(closestFitChild, true);
-                }
-            }
-        });
-        const changeIndex = T$1((arg, reason) => {
-            const children = getChildren();
-            const requestedIndex = (arg instanceof Function ? arg(getRequestedIndex()) : arg);
-            //if (requestedIndex == null && getFitNullToZero())
-            //    requestedIndex = 0;
-            setRequestedIndex(requestedIndex, reason);
-            const currentIndex = getCurrentIndex();
-            if (currentIndex == requestedIndex)
-                return requestedIndex;
-            let newMatchingChild = (requestedIndex == null ? null : children.getAt(requestedIndex));
-            const oldMatchingChild = (currentIndex == null ? null : children.getAt(currentIndex));
-            if (requestedIndex == null) {
-                // Easy case
-                setCurrentIndex(null, reason);
-                if (oldMatchingChild)
-                    setAt(oldMatchingChild, false);
-                return null;
-            }
-            else {
-                if (newMatchingChild && isValid(newMatchingChild)) {
-                    setCurrentIndex(requestedIndex, reason);
-                    if (oldMatchingChild)
-                        setAt(oldMatchingChild, false);
-                    setAt(newMatchingChild, true);
-                    return requestedIndex;
-                }
-                else {
-                    const closestFitIndex = getClosestFit(requestedIndex);
-                    setCurrentIndex(closestFitIndex, reason);
-                    if (closestFitIndex != null) {
-                        newMatchingChild = children.getAt(closestFitIndex);
-                        console.assert(newMatchingChild != null, "Internal logic???");
-                        if (oldMatchingChild)
-                            setAt(oldMatchingChild, false);
-                        setAt(newMatchingChild, true);
-                        return closestFitIndex;
-                    }
-                    else {
-                        if (oldMatchingChild)
-                            setAt(oldMatchingChild, false);
-                        return null;
-                    }
-                }
-            }
-        }, []);
-        // Run once, on mount
-        s(() => {
-            changeIndex(initialIndex ?? null, undefined);
-        }, []);
-        return { changeIndex, reevaluateClosestFit, getCurrentIndex };
     }
 
     function useMergedChildren(lhs, rhs) {
@@ -1162,180 +784,386 @@ var bundle = (function (exports) {
         };
     }
 
-    const MagicWindowKey = ("__preact-prop-helpers-escape-key-dismiss__");
-    function getElementDepth(element) {
-        let depth = 0;
-        let parent = element.parentElement;
-        while (parent) {
-            depth += 1;
-            parent = parent.parentElement;
-        }
-        return depth;
-    }
-    /**
-     * Adds event handlers for a modal-like soft-dismiss interaction.
-     *
-     * That is, any clicks or taps outside of the given component,
-     * or any time the Escape key is pressed within the component,
-     * (with various browser oddities regarding clicks on blank or inert areas handled)
-     * the component will request to close itself.
-     *
-     * Of course, if you don't do anything in the `onClose` function,
-     * it won't be a soft dismiss anymore.
-     *
-     * Handles events for pressing the `Escape` key to close the any currently open dialogs, tooltips, menus, popups, etc.
-     *
-     * One press of the `Escape` key is guaranteed to only call `onClose` for *only one* component, and it is called on the component deepest in the DOM tree, differentiated by passing context information between parent and child.
-     *
-     * @param param0
-     * @returns
-     */
-    function useEscapeDismiss({ escapeDismissParameters: { onClose, open, getWindow: unstableGetWindow, parentDepth, ...void1 }, refElementPopupReturn: { getElement, ...void2 } }) {
-        const stableOnClose = useStableCallback(onClose);
-        const getWindow = useStableCallback(unstableGetWindow);
-        const getDepth = useStableGetter(parentDepth + 1);
-        // When this component opens, add an event listener that finds the deepest open soft dismiss element to actually dismiss.
-        // Only opened components will add event handlers, and will remove them once closed.
-        // The reason this is so complicated is because:
-        // 1. We must only close one soft dismiss component at a time.  If there's a tooltip in a popup, the tooltip must be dismissed.
-        // 2. `keydown` events don't just work on arbitrary elements, for our purposes they must be from the `window`. So we can't rely on normal capturing or bubbling behavior on the element itself.
-        // 3. Event handlers added to the `window` via `addEventHandler` are called in the order of registration, which is completely at odds with #1.
-        //
-        // So all soft dismiss components listen for a keydown of Escape, 
-        // then the first one to do so will wait for a microtask, 
-        // then find the deepest element in the document tree to dismiss of all of those components currently open.
-        h(() => {
-            const window = getWindow();
-            window[MagicWindowKey] ??= { microtaskQueued: false, elementQueue: new Map() };
-            const info = window[MagicWindowKey];
-            if (open) {
-                console.log(`Adding handler for depth=${getDepth()}`);
-                window.addEventListener("keydown", handler, { capture: true });
-                return () => {
-                    console.log(`Removing handler for depth=${getDepth()}`);
-                    const element = getElement();
-                    if (element && info.elementQueue)
-                        info.elementQueue.delete(element);
-                    window.removeEventListener("keydown", handler, { capture: true });
-                };
-            }
-            function handler(e) {
-                if (e.key == "Escape") {
-                    console.log(`Escape key for depth=${getDepth()}`);
-                    // We don't know which of the currently active soft dismisses will actually do something,
-                    // but ONE of them definitely will,
-                    // so we stop propagation to child nodes, but not to everyone on the window (stopImmediatePropagation).
-                    e.preventDefault();
-                    e.stopPropagation();
-                    // This is what at least one of the elements will call
-                    const onClose2 = () => { stableOnClose("escape"); };
-                    const element = getElement();
-                    if (element) {
-                        const treeDepth = getElementDepth(element);
-                        const depth = getDepth();
-                        info.elementQueue.set(element, { depth, onClose: onClose2, treeDepth });
-                    }
-                    if (!info.microtaskQueued) {
-                        info.microtaskQueued = true;
-                        setTimeout(() => {
-                            const { elementQueue } = info;
-                            info.microtaskQueued = false;
-                            info.elementQueue = new Map();
-                            let deepestDepth = -Infinity;
-                            let deepestTreeDepth = -Infinity;
-                            let deepestOnClose = null;
-                            for (const [element, { depth, onClose, treeDepth }] of elementQueue) {
-                                let tieBroken = false;
-                                if (depth == deepestDepth) {
-                                    if (treeDepth > deepestTreeDepth) {
-                                        tieBroken = true;
-                                    }
-                                }
-                                if (depth > deepestDepth || (depth == deepestDepth && tieBroken)) {
-                                    deepestDepth = depth;
-                                    deepestTreeDepth = treeDepth;
-                                    deepestOnClose = onClose;
-                                }
-                            }
-                            deepestOnClose?.();
-                        }, 0);
+    /*
+    const activeElementUpdaters = new Map<Window | null | undefined, Set<undefined | ((e: Node | null) => void)>>();
+    const lastActiveElementUpdaters = new Map<Window | null | undefined, Set<undefined | ((e: Node) => void)>>();
+    const windowFocusedUpdaters = new Map<Window | null | undefined, Set<undefined | ((focused: boolean) => void)>>();
+    const windowsFocusedUpdaters = new Map<Window | null | undefined, boolean>();*/
+    const activeElementUpdaters = new Map();
+    const lastActiveElementUpdaters = new Map();
+    const windowFocusedUpdaters = new Map();
+    const windowsFocusedUpdaters = new Map();
+    //const microtasks = new Map<Set<any>, any>();
+    // The focusin and focusout events often fire syncronously in the middle of running code.
+    // E.G. calling element.focus() can cause a focusin event handler to immediately interrupt that code.
+    // For the purpose of improving stability, we debounce all focus events to the next microtask.
+    function forEachUpdater(window, map, value, reason) {
+        const updaters = map.get(window);
+        if (updaters) {
+            //if (!microtasks.has(updatersKey)) {
+            //debounceRendering(() => {
+            //const updatersKey = map.get(window)!;
+            //const value = microtasks.get(updatersKey);
+            //microtasks.delete(updatersKey);
+            if (updaters) {
+                for (const updater of updaters) {
+                    const { lastSent, send } = updater;
+                    if (value !== lastSent) {
+                        send(value, reason);
+                        updater.lastSent = value;
                     }
                 }
             }
-        }, [open]);
+            //});
+            //}
+            //microtasks.set(updatersKey, value);
+        }
+    }
+    function focusout(e) {
+        const window = e.target.ownerDocument.defaultView;
+        if (e.relatedTarget == null) {
+            forEachUpdater(window, activeElementUpdaters, null, e);
+        }
+    }
+    function focusin(e) {
+        const window = e.target.ownerDocument.defaultView;
+        const currentlyFocusedElement = e.target;
+        forEachUpdater(window, activeElementUpdaters, currentlyFocusedElement, e);
+        forEachUpdater(window, lastActiveElementUpdaters, currentlyFocusedElement, e);
+    }
+    function windowFocus(e) {
+        const window = (e.target instanceof Window ? e.target : e.currentTarget instanceof Window ? e.currentTarget : e.target.ownerDocument.defaultView);
+        windowsFocusedUpdaters.set(window, true);
+        forEachUpdater(window, windowFocusedUpdaters, true, e);
+    }
+    function windowBlur(e) {
+        const window = (e.target instanceof Window ? e.target : e.currentTarget instanceof Window ? e.currentTarget : e.target.ownerDocument.defaultView);
+        windowsFocusedUpdaters.set(window, false);
+        forEachUpdater(window, windowFocusedUpdaters, false, e);
     }
     /**
-     * Handles events for dismiss events for things like popup menus or transient dialogs -- things where moving focus to a new area of the page means this component should close itself.
+     * Allows you to inspect which element in the `document` currently has focus, which was most recently focused if none are currently, and whether or not the window has focus by returning the following functions:
+     * * `getActiveElement()`
+     * * `getLastActiveElement()`
+     * * `getWindowFocused()`
+     *
+     * (The document's body receiving focus, like it does when you click on an empty area, is counted as no element having focus for all intents and purposes)
+     *
+     * This is a passive hook, so by default it returns getter functions that report this information but the component will not re-render by default when the active element changes.
+     *
+     * If you need the component to re-render when the active element changes, use the `on*Change` arguments to set some state on your end.
+     */
+    function useActiveElement({ activeElementParameters: { onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument, getWindow } }) {
+        useEnsureStability("useActiveElement", onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument, getWindow);
+        h(() => {
+            const document = getDocument();
+            const window = (getWindow?.(document) ?? document?.defaultView);
+            if ((activeElementUpdaters.get(window)?.size ?? 0) === 0) {
+                document?.addEventListener("focusin", focusin, { passive: true });
+                document?.addEventListener("focusout", focusout, { passive: true });
+                window?.addEventListener("focus", windowFocus, { passive: true });
+                window?.addEventListener("blur", windowBlur, { passive: true });
+            }
+            // Add them even if they're undefined to more easily
+            // manage the ">0 means don't add handlers" logic.
+            const localActiveElementUpdaters = activeElementUpdaters.get(window) ?? new Set();
+            const localLastActiveElementUpdaters = lastActiveElementUpdaters.get(window) ?? new Set();
+            const localWindowFocusedUpdaters = windowFocusedUpdaters.get(window) ?? new Set();
+            const laeu = { send: setActiveElement, lastSent: undefined };
+            const llaeu = { send: setLastActiveElement, lastSent: undefined };
+            const lwfu = { send: setWindowFocused, lastSent: undefined };
+            localActiveElementUpdaters.add(laeu);
+            localLastActiveElementUpdaters.add(llaeu);
+            localWindowFocusedUpdaters.add(lwfu);
+            activeElementUpdaters.set(window, localActiveElementUpdaters);
+            lastActiveElementUpdaters.set(window, localLastActiveElementUpdaters);
+            windowFocusedUpdaters.set(window, localWindowFocusedUpdaters);
+            return () => {
+                activeElementUpdaters.get(window).delete(laeu);
+                lastActiveElementUpdaters.get(window).delete(laeu);
+                windowFocusedUpdaters.get(window).delete(lwfu);
+                if (activeElementUpdaters.size === 0) {
+                    document?.removeEventListener("focusin", focusin);
+                    document?.removeEventListener("focusout", focusout);
+                    window?.removeEventListener("focus", windowFocus);
+                    window?.removeEventListener("blur", windowBlur);
+                }
+            };
+        }, []);
+        const [getActiveElement, setActiveElement] = usePassiveState(onActiveElementChange, returnNull);
+        const [getLastActiveElement, setLastActiveElement] = usePassiveState(onLastActiveElementChange, returnNull);
+        const [getWindowFocused, setWindowFocused] = usePassiveState(onWindowFocusedChange, returnTrue);
+        return { activeElementReturn: { getActiveElement, getLastActiveElement, getWindowFocused } };
+    }
+
+    /**
+     * Allows a parent component to access information about certain
+     * child components once they have rendered.
+     *
+     * This hook is designed to be lightweight, in that the parent keeps no state
+     * and runs no effects.  Each child *does* run an effect, but with no state
+     * changes unless you explicitly request them.
+     *
+     *
+     */
+    function useManagedChildren(parentParameters) {
+        const { managedChildrenParameters: { onAfterChildLayoutEffect, onChildrenMountChange }, ...rest } = parentParameters;
+        useEnsureStability("useManagedChildren", onAfterChildLayoutEffect, onChildrenMountChange);
+        const getHighestIndex = T$1(() => {
+            return managedChildrenArray.current.highestIndex;
+        }, []);
+        // All the information we have about our children is stored in this **stable** array.
+        // Any mutations to this array **DO NOT** trigger any sort of a re-render.
+        const managedChildrenArray = _({ arr: [], rec: {}, highestIndex: 0, lowestIndex: 0 });
+        // For indirect access to each child
+        // Compare getManagedChildInfo
+        // TODO: The primary use for this is flaggable closest fits
+        // which needs to search all children for that closest fit.
+        // It would be nice if there was something better for that.
+        const forEachChild = T$1((f) => {
+            for (const child of managedChildrenArray.current.arr) {
+                if (child)
+                    f(child);
+            }
+            for (const field in managedChildrenArray.current.rec) {
+                const child = managedChildrenArray.current.rec[field];
+                if (child)
+                    f(child);
+            }
+        }, []);
+        // Retrieves the information associated with the child with the given index.
+        // `undefined` if not child there, or it's unmounted.
+        const getManagedChildInfo = T$1((index) => {
+            if (typeof index == "number")
+                return managedChildrenArray.current.arr[index];
+            else
+                return managedChildrenArray.current.rec[index];
+        }, []);
+        // tl;dr this is a way to have run useLayoutEffect once after all N children
+        // have mounted and run *their* useLayoutEffect, but also *without* re-rendering
+        // ourselves because of having a `childCount` state or anything similar.
+        //
+        // When the child count ref updates, we want the parent to also run an effect
+        // to maybe do something with all these children that just mounted.
+        // The easiest way would be useEffect(..., [childCount]) but
+        // that would require us having a childCount state, then calling
+        // setChildCount and re-rendering every time children mount
+        // (only one re-render at a time unless children are staggered, but still)
+        // 
+        // As an alternate solution, any time a child uses ULE on mount, it queues a microtask
+        // to emulate running ULE on the parent. Only the first child will actually queue
+        // the microtask (by checking hasRemoteULE first) so that the "effect" only
+        // runs once. When it's done, hasRemoteULE is reset so it can run again if
+        // more children mount/unmount.
+        const hasRemoteULEChildMounted = _(null);
+        const remoteULEChildChangedCausers = _(new Set());
+        const remoteULEChildChanged = T$1((index) => {
+            if (remoteULEChildChangedCausers.current.size == 0) {
+                debounceRendering(() => {
+                    onAfterChildLayoutEffect?.(remoteULEChildChangedCausers.current);
+                    remoteULEChildChangedCausers.current.clear();
+                });
+            }
+            remoteULEChildChangedCausers.current.add(index);
+            return () => { };
+        }, [ /* Must remain stable */]);
+        const remoteULEChildMounted = T$1((index, mounted) => {
+            if (!hasRemoteULEChildMounted.current) {
+                hasRemoteULEChildMounted.current = {
+                    mounts: new Set(),
+                    unmounts: new Set(),
+                };
+                debounceRendering(() => {
+                    onChildrenMountChange?.(hasRemoteULEChildMounted.current.mounts, hasRemoteULEChildMounted.current.unmounts);
+                    hasRemoteULEChildMounted.current = null;
+                });
+            }
+            if (mounted) {
+                if (typeof index == "number")
+                    managedChildrenArray.current.highestIndex = Math.max(managedChildrenArray.current.highestIndex, index);
+            }
+            else {
+                if (typeof index == "number") {
+                    delete managedChildrenArray.current.arr[index];
+                    let shave = 0;
+                    while (shave <= managedChildrenArray.current.arr.length && managedChildrenArray.current.arr[managedChildrenArray.current.arr.length - 1 - shave] === undefined) {
+                        ++shave;
+                    }
+                    managedChildrenArray.current.arr.splice(managedChildrenArray.current.arr.length - shave, shave);
+                }
+                else
+                    delete managedChildrenArray.current.rec[index];
+                if (typeof index == "number")
+                    managedChildrenArray.current.highestIndex = managedChildrenArray.current.arr.length - 1;
+            }
+            hasRemoteULEChildMounted.current[mounted ? "mounts" : "unmounts"].add(index);
+        }, [ /* Must remain stable */]);
+        const managedChildren = useStableObject({
+            ...{ _: managedChildrenArray.current },
+            forEach: forEachChild,
+            getAt: getManagedChildInfo,
+            getHighestIndex: getHighestIndex,
+            arraySlice: T$1(() => {
+                return managedChildrenArray.current.arr.slice();
+            }, [])
+        });
+        const getChildren = T$1(() => managedChildren, []);
+        return {
+            context: useStableObject({
+                managedChildContext: useStableObject({
+                    managedChildrenArray: managedChildrenArray.current,
+                    remoteULEChildMounted,
+                    remoteULEChildChanged,
+                    getChildren
+                })
+            }),
+            managedChildrenReturn: { getChildren }
+        };
+    }
+    function useManagedChild(info, managedChildParameters) {
+        const { context: { managedChildContext: { getChildren, managedChildrenArray, remoteULEChildMounted, remoteULEChildChanged } } } = info;
+        const index = managedChildParameters.index;
+        // Any time our child props change, make that information available
+        // the parent if they need it.
+        // The parent can listen for all updates and only act on the ones it cares about,
+        // and multiple children updating in the same tick will all be sent at once.
+        s(() => {
+            // Insert this information in-place
+            if (typeof index == "number") {
+                managedChildrenArray.arr[index] = { ...managedChildParameters };
+            }
+            else {
+                managedChildrenArray.rec[index] = { ...managedChildParameters };
+            }
+            return remoteULEChildChanged(index);
+        }, [...Object.entries(info).flat(9)]); // 9 is infinity, right? Sure. Unrelated: TODO.
+        // When we mount, notify the parent via queueMicrotask
+        // (every child does this, so everything's coordinated to only queue a single microtask per tick)
+        // Do the same on unmount.
+        // Note: It's important that this comes AFTER remoteULEChildChanged
+        // so that remoteULEChildMounted has access to all the info on mount.
+        s(() => {
+            remoteULEChildMounted?.(index, true);
+            return () => remoteULEChildMounted?.(index, false);
+        }, [index]);
+        return {
+            managedChildReturn: { getChildren }
+        };
+    }
+    /**
+     * An extension to useManagedChildren that handles the following common case:
+     * 1. You have a bunch of children
+     * 2. At any given time, only 1 of them is "selected", "activated", "focusable", whatever (or 0 of them, that's cool too, just 0 or 1 though).
+     * 3. The parent has control over who is "selected" via a numerical index.
+     *
+     * This hook allows for much easier control over selection management.
+     *
+     * Note that because you may want to use multiple flags with the same children, this hook *does not* use `useManagedChildren`!
+     * You need to pass it the existing children, and you must pass your invocation of `useManagedChildren` the returned `onChildrenMountChange` handler!
+     *
+     * Also because of that, the types of this function are rather odd.  It's better to start off using a hook that already uses a flag, such as `useRovingTabIndex`, as an example.
+     *
      *
      * @param param0
      * @returns
      */
-    function useLostFocusDismiss({ refElementPopupReturn: { getElement: getPopupElement, ...void3 }, refElementSourceReturn, lostFocusDismiss: { open, onClose }, ...void1 }) {
-        const { getElement: getSourceElement, ...void2 } = (refElementSourceReturn ?? {});
-        const stableOnClose = useStableCallback(onClose);
-        const getOpen = useStableGetter(open);
-        const onLastActiveElementChange = T$1((newElement, _prevElement, _e) => {
-            const open = getOpen();
-            const sourceElement = getSourceElement?.();
-            const popupElement = getPopupElement();
-            if (!(sourceElement?.contains(newElement) || popupElement?.contains(newElement))) {
-                if (open)
-                    stableOnClose();
+    function useChildrenFlag({ getChildren, initialIndex, closestFit, onIndexChange, getAt, setAt, isValid, }) {
+        useEnsureStability("useChildrenFlag", onIndexChange, getAt, setAt, isValid);
+        // TODO (maybe?): Even if there is an initial index, it's not set until mount. Is that fine?
+        const [getCurrentIndex, setCurrentIndex] = usePassiveState(onIndexChange);
+        const [getRequestedIndex, setRequestedIndex] = usePassiveState(null);
+        //    const getFitNullToZero = useStableGetter(fitNullToZero);
+        // Shared between onChildrenMountChange and changeIndex, not public (but could be I guess)
+        const getClosestFit = T$1((requestedIndex) => {
+            const children = getChildren();
+            let closestDistance = Infinity;
+            let closestIndex = null;
+            children.forEach(child => {
+                if (isValid(child)) {
+                    const newDistance = Math.abs(child.index - requestedIndex);
+                    if (newDistance < closestDistance || (newDistance == closestDistance && child.index < requestedIndex)) {
+                        closestDistance = newDistance;
+                        closestIndex = child.index;
+                    }
+                }
+            });
+            return closestIndex;
+        }, [ /* Must remain stable! */]);
+        // Any time a child mounts/unmounts, we need to double-check to see if that affects 
+        // the "currently selected" (or whatever) index.  The two cases we're looking for:
+        // 1. The currently selected child unmounted
+        // 2. A child mounted, and it mounts with the index we're looking for
+        const reevaluateClosestFit = useStableCallback(() => {
+            const children = getChildren();
+            const requestedIndex = getRequestedIndex();
+            const currentIndex = getCurrentIndex();
+            const currentChild = currentIndex == null ? null : children.getAt(currentIndex);
+            if (requestedIndex != null && closestFit && (requestedIndex != currentIndex || currentChild == null || !isValid(currentChild))) {
+                if (currentChild)
+                    setAt(currentChild, false);
+                const closestFitIndex = getClosestFit(requestedIndex);
+                setCurrentIndex(closestFitIndex, undefined);
+                if (closestFitIndex != null) {
+                    const closestFitChild = children.getAt(closestFitIndex);
+                    console.assert(closestFitChild != null, "Internal logic???");
+                    setAt(closestFitChild, true);
+                }
             }
-        }, [getSourceElement]);
-        return { activeElementParameters: { onLastActiveElementChange } };
-    }
-    /**
-     * Handles events for a backdrop on a modal dialog -- the kind where the user expects the modal to close when they click/tap outside of it.
-     *
-     * @param param0
-     */
-    function useBackdropDismiss({ backdropDismissParameters: { open, onClose: onCloseUnstable, ...void1 }, refElementPopupReturn: { getElement, ...void3 }, ...void2 }) {
-        const getOpen = useStableGetter(open);
-        const onClose = useStableCallback(onCloseUnstable);
-        const onBackdropClick = T$1(function onBackdropClick(e) {
-            if (!getOpen())
-                return;
-            // Basically, "was this event fired on an element not contained by the modal?"
-            // There are multiple ways browser react to "interacting with nothing", and this takes care of everything.
-            let element = getElement();
-            let foundInsideClick = false;
-            if (e.target && element && element.contains(e.target)) {
-                foundInsideClick = true;
+        });
+        const changeIndex = T$1((arg, reason) => {
+            const children = getChildren();
+            const requestedIndex = (arg instanceof Function ? arg(getRequestedIndex()) : arg);
+            //if (requestedIndex == null && getFitNullToZero())
+            //    requestedIndex = 0;
+            setRequestedIndex(requestedIndex, reason);
+            const currentIndex = getCurrentIndex();
+            if (currentIndex == requestedIndex)
+                return requestedIndex;
+            let newMatchingChild = (requestedIndex == null ? null : children.getAt(requestedIndex));
+            const oldMatchingChild = (currentIndex == null ? null : children.getAt(currentIndex));
+            if (requestedIndex == null) {
+                // Easy case
+                setCurrentIndex(null, reason);
+                if (oldMatchingChild)
+                    setAt(oldMatchingChild, false);
+                return null;
             }
-            if (!foundInsideClick) {
-                onClose();
+            else {
+                if (newMatchingChild && isValid(newMatchingChild)) {
+                    setCurrentIndex(requestedIndex, reason);
+                    if (oldMatchingChild)
+                        setAt(oldMatchingChild, false);
+                    setAt(newMatchingChild, true);
+                    return requestedIndex;
+                }
+                else {
+                    const closestFitIndex = getClosestFit(requestedIndex);
+                    setCurrentIndex(closestFitIndex, reason);
+                    if (closestFitIndex != null) {
+                        newMatchingChild = children.getAt(closestFitIndex);
+                        console.assert(newMatchingChild != null, "Internal logic???");
+                        if (oldMatchingChild)
+                            setAt(oldMatchingChild, false);
+                        setAt(newMatchingChild, true);
+                        return closestFitIndex;
+                    }
+                    else {
+                        if (oldMatchingChild)
+                            setAt(oldMatchingChild, false);
+                        return null;
+                    }
+                }
             }
         }, []);
-        useGlobalHandler(window, "mousedown", open ? onBackdropClick : null, { capture: true });
-        useGlobalHandler(window, "touchstart", open ? onBackdropClick : null, { capture: true });
-    }
-    /**
-     * Combines all the methods of dismissing a modal-ish or popup-ish component into one combined hook.
-     *
-     * This is similar to the "complete" series of list/grid navigation, in that it's the "outermost" hook of its type.
-     */
-    function useDismiss({ dismissParameters: { open: globalOpen, onClose: globalOnClose, closeOnBackdrop, closeOnEscape, closeOnLostFocus }, escapeDismissParameters: { getWindow, parentDepth } }) {
-        const { refElementReturn: refElementSourceReturn } = useRefElement({ refElementParameters: {} });
-        const { refElementReturn: refElementPopupReturn } = useRefElement({ refElementParameters: {} });
-        const onCloseBackdrop = T$1(() => { return globalOnClose?.("backdrop"); }, [globalOnClose]);
-        const onCloseEscape = T$1(() => { return globalOnClose?.("escape"); }, [globalOnClose]);
-        const onCloseFocus = T$1(() => { return globalOnClose?.("lost-focus"); }, [globalOnClose]);
-        useBackdropDismiss({ backdropDismissParameters: { onClose: onCloseBackdrop, open: (closeOnBackdrop && globalOpen) }, refElementPopupReturn });
-        useEscapeDismiss({ escapeDismissParameters: { getWindow, onClose: onCloseEscape, open: (closeOnEscape && globalOpen), parentDepth }, refElementPopupReturn });
-        const { activeElementParameters } = useLostFocusDismiss({ lostFocusDismiss: { onClose: onCloseFocus, open: (closeOnLostFocus && globalOpen) }, refElementPopupReturn, refElementSourceReturn });
-        const getDocument = T$1(() => {
-            return getWindow().document;
-        }, [getWindow]);
-        useActiveElement({ activeElementParameters: { ...activeElementParameters, getWindow, getDocument } });
-        return {
-            refElementSourceReturn,
-            refElementPopupReturn
-        };
+        // Run once, on mount
+        s(() => {
+            changeIndex(initialIndex ?? null, undefined);
+        }, []);
+        return { changeIndex, reevaluateClosestFit, getCurrentIndex };
     }
 
     /*!
-    * tabbable 6.0.0
+    * tabbable 6.0.1
     * @license MIT, https://github.com/focus-trap/tabbable/blob/master/LICENSE
     */
     var candidateSelectors = ['input', 'select', 'textarea', 'a[href]', 'button', '[tabindex]:not(slot)', 'audio[controls]', 'video[controls]', '[contenteditable]:not([contenteditable="false"])', 'details>summary:first-of-type', 'details'];
@@ -1346,15 +1174,12 @@ var bundle = (function (exports) {
     } : function (element) {
       return element.ownerDocument;
     };
-
     var isInput = function isInput(node) {
       return node.tagName === 'INPUT';
     };
-
     var isHiddenInput = function isHiddenInput(node) {
       return isInput(node) && node.type === 'hidden';
     };
-
     var isDetailsWithSummary = function isDetailsWithSummary(node) {
       var r = node.tagName === 'DETAILS' && Array.prototype.slice.apply(node.children).some(function (child) {
         return child.tagName === 'SUMMARY';
@@ -1362,10 +1187,9 @@ var bundle = (function (exports) {
       return r;
     };
 
-
+    // determines if a node is ultimately attached to the window's document
     var isNodeAttached = function isNodeAttached(node) {
       var _nodeRootHost;
-
       // The root node is the shadow root if the node is in a shadow DOM; some document otherwise
       //  (but NOT _the_ document; see second 'If' comment below for more).
       // If rootNode is shadow root, it'll have a host, which is the element to which the shadow
@@ -1387,32 +1211,25 @@ var bundle = (function (exports) {
       //  node is actually detached.
       var nodeRootHost = getRootNode(node).host;
       var attached = !!((_nodeRootHost = nodeRootHost) !== null && _nodeRootHost !== void 0 && _nodeRootHost.ownerDocument.contains(nodeRootHost) || node.ownerDocument.contains(node));
-
       while (!attached && nodeRootHost) {
         var _nodeRootHost2;
-
         // since it's not attached and we have a root host, the node MUST be in a nested shadow DOM,
         //  which means we need to get the host's host and check if that parent host is contained
         //  in (i.e. attached to) the document
         nodeRootHost = getRootNode(nodeRootHost).host;
         attached = !!((_nodeRootHost2 = nodeRootHost) !== null && _nodeRootHost2 !== void 0 && _nodeRootHost2.ownerDocument.contains(nodeRootHost));
       }
-
       return attached;
     };
-
     var isZeroArea = function isZeroArea(node) {
       var _node$getBoundingClie = node.getBoundingClientRect(),
-          width = _node$getBoundingClie.width,
-          height = _node$getBoundingClie.height;
-
+        width = _node$getBoundingClie.width,
+        height = _node$getBoundingClie.height;
       return width === 0 && height === 0;
     };
-
     var isHidden = function isHidden(node, _ref) {
       var displayCheck = _ref.displayCheck,
-          getShadowRoot = _ref.getShadowRoot;
-
+        getShadowRoot = _ref.getShadowRoot;
       // NOTE: visibility will be `undefined` if node is detached from the document
       //  (see notes about this further down), which means we will consider it visible
       //  (this is legacy behavior from a very long way back)
@@ -1421,24 +1238,19 @@ var bundle = (function (exports) {
       if (getComputedStyle(node).visibility === 'hidden') {
         return true;
       }
-
       var isDirectSummary = matches.call(node, 'details>summary:first-of-type');
       var nodeUnderDetails = isDirectSummary ? node.parentElement : node;
-
       if (matches.call(nodeUnderDetails, 'details:not([open]) *')) {
         return true;
       }
-
       if (!displayCheck || displayCheck === 'full' || displayCheck === 'legacy-full') {
         if (typeof getShadowRoot === 'function') {
           // figure out if we should consider the node to be in an undisclosed shadow and use the
           //  'non-zero-area' fallback
           var originalNode = node;
-
           while (node) {
             var parentElement = node.parentElement;
             var rootNode = getRootNode(node);
-
             if (parentElement && !parentElement.shadowRoot && getShadowRoot(parentElement) === true // check if there's an undisclosed shadow
             ) {
               // node has an undisclosed shadow which means we can only treat it as a black box, so we
@@ -1455,17 +1267,17 @@ var bundle = (function (exports) {
               node = parentElement;
             }
           }
-
           node = originalNode;
-        } // else, `getShadowRoot` might be true, but all that does is enable shadow DOM support
+        }
+        // else, `getShadowRoot` might be true, but all that does is enable shadow DOM support
         //  (i.e. it does not also presume that all nodes might have undisclosed shadows); or
         //  it might be a falsy value, which means shadow DOM support is disabled
+
         // Since we didn't find it sitting in an undisclosed shadow (or shadows are disabled)
         //  now we can just test to see if it would normally be visible or not, provided it's
         //  attached to the main document.
         // NOTE: We must consider case where node is inside a shadow DOM and given directly to
         //  `isTabbable()` or `isFocusable()` -- regardless of `getShadowRoot` option setting.
-
 
         if (isNodeAttached(node)) {
           // this works wherever the node is: if there's at least one client rect, it's
@@ -1473,7 +1285,9 @@ var bundle = (function (exports) {
           //  node itself is hidden in place of its contents; and there's no need to search
           //  up the hierarchy either
           return !node.getClientRects().length;
-        } // Else, the node isn't attached to the document, which means the `getClientRects()`
+        }
+
+        // Else, the node isn't attached to the document, which means the `getClientRects()`
         //  API will __always__ return zero rects (this can happen, for example, if React
         //  is used to render nodes onto a detached tree, as confirmed in this thread:
         //  https://github.com/facebook/react/issues/9117#issuecomment-284228870)
@@ -1489,12 +1303,10 @@ var bundle = (function (exports) {
         //
         // v6.0.0: As of this major release, the default 'full' option __no longer treats detached
         //  nodes as visible with the 'none' fallback.__
-
-
         if (displayCheck !== 'legacy-full') {
           return true; // hidden
-        } // else, fallback to 'none' mode and consider the node visible
-
+        }
+        // else, fallback to 'none' mode and consider the node visible
       } else if (displayCheck === 'non-zero-area') {
         // NOTE: Even though this tests that the node's client rect is non-zero to determine
         //  whether it's displayed, and that a detached node will __always__ have a zero-area
@@ -1502,70 +1314,409 @@ var bundle = (function (exports) {
         //  this mode, we do want to consider nodes that have a zero area to be hidden at all
         //  times, and that includes attached or not.
         return isZeroArea(node);
-      } // visible, as far as we can tell, or per current `displayCheck=none` mode, we assume
+      }
+
+      // visible, as far as we can tell, or per current `displayCheck=none` mode, we assume
       //  it's visible
-
-
       return false;
-    }; // form fields (nested) inside a disabled fieldset are not focusable/tabbable
+    };
+
+    // form fields (nested) inside a disabled fieldset are not focusable/tabbable
     //  unless they are in the _first_ <legend> element of the top-most disabled
     //  fieldset
-
-
     var isDisabledFromFieldset = function isDisabledFromFieldset(node) {
       if (/^(INPUT|BUTTON|SELECT|TEXTAREA)$/.test(node.tagName)) {
-        var parentNode = node.parentElement; // check if `node` is contained in a disabled <fieldset>
-
+        var parentNode = node.parentElement;
+        // check if `node` is contained in a disabled <fieldset>
         while (parentNode) {
           if (parentNode.tagName === 'FIELDSET' && parentNode.disabled) {
             // look for the first <legend> among the children of the disabled <fieldset>
             for (var i = 0; i < parentNode.children.length; i++) {
-              var child = parentNode.children.item(i); // when the first <legend> (in document order) is found
-
+              var child = parentNode.children.item(i);
+              // when the first <legend> (in document order) is found
               if (child.tagName === 'LEGEND') {
                 // if its parent <fieldset> is not nested in another disabled <fieldset>,
                 // return whether `node` is a descendant of its first <legend>
                 return matches.call(parentNode, 'fieldset[disabled] *') ? true : !child.contains(node);
               }
-            } // the disabled <fieldset> containing `node` has no <legend>
-
-
+            }
+            // the disabled <fieldset> containing `node` has no <legend>
             return true;
           }
-
           parentNode = parentNode.parentElement;
         }
-      } // else, node's tabbable/focusable state should not be affected by a fieldset's
+      }
+
+      // else, node's tabbable/focusable state should not be affected by a fieldset's
       //  enabled/disabled state
-
-
       return false;
     };
-
     var isNodeMatchingSelectorFocusable = function isNodeMatchingSelectorFocusable(options, node) {
-      if (node.disabled || isHiddenInput(node) || isHidden(node, options) || // For a details element with a summary, the summary element gets the focus
+      if (node.disabled || isHiddenInput(node) || isHidden(node, options) ||
+      // For a details element with a summary, the summary element gets the focus
       isDetailsWithSummary(node) || isDisabledFromFieldset(node)) {
         return false;
       }
-
       return true;
     };
-
     var focusableCandidateSelector = /* #__PURE__ */candidateSelectors.concat('iframe').join(',');
-
     var isFocusable = function isFocusable(node, options) {
       options = options || {};
-
       if (!node) {
         throw new Error('No node provided');
       }
-
       if (matches.call(node, focusableCandidateSelector) === false) {
         return false;
       }
-
       return isNodeMatchingSelectorFocusable(options, node);
     };
+
+    /**
+     * @license
+     * Copyright 2016 Google Inc. All rights reserved.
+     *
+     * Licensed under the Apache License, Version 2.0 (the "License");
+     * you may not use this file except in compliance with the License.
+     * You may obtain a copy of the License at
+     *
+     *     http://www.apache.org/licenses/LICENSE-2.0
+     *
+     * Unless required by applicable law or agreed to in writing, software
+     * distributed under the License is distributed on an "AS IS" BASIS,
+     * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     * See the License for the specific language governing permissions and
+     * limitations under the License.
+     */
+    (() => {
+        var _a, _b, _c;
+        /* Symbols for private properties */
+        const _blockingElements = Symbol();
+        const _alreadyInertElements = Symbol();
+        const _topElParents = Symbol();
+        const _siblingsToRestore = Symbol();
+        const _parentMO = Symbol();
+        /* Symbols for private static methods */
+        const _topChanged = Symbol();
+        const _swapInertedSibling = Symbol();
+        const _inertSiblings = Symbol();
+        const _restoreInertedSiblings = Symbol();
+        const _getParents = Symbol();
+        const _getDistributedChildren = Symbol();
+        const _isInertable = Symbol();
+        const _handleMutations = Symbol();
+        class BlockingElementsImpl {
+            constructor() {
+                /**
+                 * The blocking elements.
+                 */
+                this[_a] = [];
+                /**
+                 * Used to keep track of the parents of the top element, from the element
+                 * itself up to body. When top changes, the old top might have been removed
+                 * from the document, so we need to memoize the inerted parents' siblings
+                 * in order to restore their inerteness when top changes.
+                 */
+                this[_b] = [];
+                /**
+                 * Elements that are already inert before the first blocking element is
+                 * pushed.
+                 */
+                this[_c] = new Set();
+            }
+            destructor() {
+                // Restore original inertness.
+                this[_restoreInertedSiblings](this[_topElParents]);
+                // Note we don't want to make these properties nullable on the class,
+                // since then we'd need non-null casts in many places. Calling a method on
+                // a BlockingElements instance after calling destructor will result in an
+                // exception.
+                const nullable = this;
+                nullable[_blockingElements] = null;
+                nullable[_topElParents] = null;
+                nullable[_alreadyInertElements] = null;
+            }
+            get top() {
+                const elems = this[_blockingElements];
+                return elems[elems.length - 1] || null;
+            }
+            push(element) {
+                if (!element || element === this.top) {
+                    return;
+                }
+                // Remove it from the stack, we'll bring it to the top.
+                this.remove(element);
+                this[_topChanged](element);
+                this[_blockingElements].push(element);
+            }
+            remove(element) {
+                const i = this[_blockingElements].indexOf(element);
+                if (i === -1) {
+                    return false;
+                }
+                this[_blockingElements].splice(i, 1);
+                // Top changed only if the removed element was the top element.
+                if (i === this[_blockingElements].length) {
+                    this[_topChanged](this.top);
+                }
+                return true;
+            }
+            pop() {
+                const top = this.top;
+                top && this.remove(top);
+                return top;
+            }
+            has(element) {
+                return this[_blockingElements].indexOf(element) !== -1;
+            }
+            /**
+             * Sets `inert` to all document elements except the new top element, its
+             * parents, and its distributed content.
+             */
+            [(_a = _blockingElements, _b = _topElParents, _c = _alreadyInertElements, _topChanged)](newTop) {
+                const toKeepInert = this[_alreadyInertElements];
+                const oldParents = this[_topElParents];
+                // No new top, reset old top if any.
+                if (!newTop) {
+                    this[_restoreInertedSiblings](oldParents);
+                    toKeepInert.clear();
+                    this[_topElParents] = [];
+                    return;
+                }
+                const newParents = this[_getParents](newTop);
+                // New top is not contained in the main document!
+                if (newParents[newParents.length - 1].parentNode !== document.body) {
+                    throw Error('Non-connected element cannot be a blocking element');
+                }
+                // Cast here because we know we'll call _inertSiblings on newParents
+                // below.
+                this[_topElParents] = newParents;
+                const toSkip = this[_getDistributedChildren](newTop);
+                // No previous top element.
+                if (!oldParents.length) {
+                    this[_inertSiblings](newParents, toSkip, toKeepInert);
+                    return;
+                }
+                let i = oldParents.length - 1;
+                let j = newParents.length - 1;
+                // Find common parent. Index 0 is the element itself (so stop before it).
+                while (i > 0 && j > 0 && oldParents[i] === newParents[j]) {
+                    i--;
+                    j--;
+                }
+                // If up the parents tree there are 2 elements that are siblings, swap
+                // the inerted sibling.
+                if (oldParents[i] !== newParents[j]) {
+                    this[_swapInertedSibling](oldParents[i], newParents[j]);
+                }
+                // Restore old parents siblings inertness.
+                i > 0 && this[_restoreInertedSiblings](oldParents.slice(0, i));
+                // Make new parents siblings inert.
+                j > 0 && this[_inertSiblings](newParents.slice(0, j), toSkip, null);
+            }
+            /**
+             * Swaps inertness between two sibling elements.
+             * Sets the property `inert` over the attribute since the inert spec
+             * doesn't specify if it should be reflected.
+             * https://html.spec.whatwg.org/multipage/interaction.html#inert
+             */
+            [_swapInertedSibling](oldInert, newInert) {
+                const siblingsToRestore = oldInert[_siblingsToRestore];
+                // oldInert is not contained in siblings to restore, so we have to check
+                // if it's inertable and if already inert.
+                if (this[_isInertable](oldInert) && !oldInert.inert) {
+                    oldInert.inert = true;
+                    siblingsToRestore.add(oldInert);
+                }
+                // If newInert was already between the siblings to restore, it means it is
+                // inertable and must be restored.
+                if (siblingsToRestore.has(newInert)) {
+                    newInert.inert = false;
+                    siblingsToRestore.delete(newInert);
+                }
+                newInert[_parentMO] = oldInert[_parentMO];
+                newInert[_siblingsToRestore] = siblingsToRestore;
+                oldInert[_parentMO] = undefined;
+                oldInert[_siblingsToRestore] = undefined;
+            }
+            /**
+             * Restores original inertness to the siblings of the elements.
+             * Sets the property `inert` over the attribute since the inert spec
+             * doesn't specify if it should be reflected.
+             * https://html.spec.whatwg.org/multipage/interaction.html#inert
+             */
+            [_restoreInertedSiblings](elements) {
+                for (const element of elements) {
+                    const mo = element[_parentMO];
+                    mo.disconnect();
+                    element[_parentMO] = undefined;
+                    const siblings = element[_siblingsToRestore];
+                    for (const sibling of siblings) {
+                        sibling.inert = false;
+                    }
+                    element[_siblingsToRestore] = undefined;
+                }
+            }
+            /**
+             * Inerts the siblings of the elements except the elements to skip. Stores
+             * the inerted siblings into the element's symbol `_siblingsToRestore`.
+             * Pass `toKeepInert` to collect the already inert elements.
+             * Sets the property `inert` over the attribute since the inert spec
+             * doesn't specify if it should be reflected.
+             * https://html.spec.whatwg.org/multipage/interaction.html#inert
+             */
+            [_inertSiblings](elements, toSkip, toKeepInert) {
+                for (const element of elements) {
+                    // Assume element is not a Document, so it must have a parentNode.
+                    const parent = element.parentNode;
+                    const children = parent.children;
+                    const inertedSiblings = new Set();
+                    for (let j = 0; j < children.length; j++) {
+                        const sibling = children[j];
+                        // Skip the input element, if not inertable or to be skipped.
+                        if (sibling === element || !this[_isInertable](sibling) ||
+                            (toSkip && toSkip.has(sibling))) {
+                            continue;
+                        }
+                        // Should be collected since already inerted.
+                        if (toKeepInert && sibling.inert) {
+                            toKeepInert.add(sibling);
+                        }
+                        else {
+                            sibling.inert = true;
+                            inertedSiblings.add(sibling);
+                        }
+                    }
+                    // Store the siblings that were inerted.
+                    element[_siblingsToRestore] = inertedSiblings;
+                    // Observe only immediate children mutations on the parent.
+                    const mo = new MutationObserver(this[_handleMutations].bind(this));
+                    element[_parentMO] = mo;
+                    let parentToObserve = parent;
+                    // If we're using the ShadyDOM polyfill, then our parent could be a
+                    // shady root, which is an object that acts like a ShadowRoot, but isn't
+                    // actually a node in the real DOM. Observe the real DOM parent instead.
+                    const maybeShadyRoot = parentToObserve;
+                    if (maybeShadyRoot.__shady && maybeShadyRoot.host) {
+                        parentToObserve = maybeShadyRoot.host;
+                    }
+                    mo.observe(parentToObserve, {
+                        childList: true,
+                    });
+                }
+            }
+            /**
+             * Handles newly added/removed nodes by toggling their inertness.
+             * It also checks if the current top Blocking Element has been removed,
+             * notifying and removing it.
+             */
+            [_handleMutations](mutations) {
+                const parents = this[_topElParents];
+                const toKeepInert = this[_alreadyInertElements];
+                for (const mutation of mutations) {
+                    // If the target is a shadowRoot, get its host as we skip shadowRoots when
+                    // computing _topElParents.
+                    const target = mutation.target.host || mutation.target;
+                    const idx = target === document.body ?
+                        parents.length :
+                        parents.indexOf(target);
+                    const inertedChild = parents[idx - 1];
+                    const inertedSiblings = inertedChild[_siblingsToRestore];
+                    // To restore.
+                    for (let i = 0; i < mutation.removedNodes.length; i++) {
+                        const sibling = mutation.removedNodes[i];
+                        if (sibling === inertedChild) {
+                            console.info('Detected removal of the top Blocking Element.');
+                            this.pop();
+                            return;
+                        }
+                        if (inertedSiblings.has(sibling)) {
+                            sibling.inert = false;
+                            inertedSiblings.delete(sibling);
+                        }
+                    }
+                    // To inert.
+                    for (let i = 0; i < mutation.addedNodes.length; i++) {
+                        const sibling = mutation.addedNodes[i];
+                        if (!this[_isInertable](sibling)) {
+                            continue;
+                        }
+                        if (toKeepInert && sibling.inert) {
+                            toKeepInert.add(sibling);
+                        }
+                        else {
+                            sibling.inert = true;
+                            inertedSiblings.add(sibling);
+                        }
+                    }
+                }
+            }
+            /**
+             * Returns if the element is inertable.
+             */
+            [_isInertable](element) {
+                return false === /^(style|template|script)$/.test(element.localName);
+            }
+            /**
+             * Returns the list of newParents of an element, starting from element
+             * (included) up to `document.body` (excluded).
+             */
+            [_getParents](element) {
+                const parents = [];
+                let current = element;
+                // Stop to body.
+                while (current && current !== document.body) {
+                    // Skip shadow roots.
+                    if (current.nodeType === Node.ELEMENT_NODE) {
+                        parents.push(current);
+                    }
+                    // ShadowDom v1
+                    if (current.assignedSlot) {
+                        // Collect slots from deepest slot to top.
+                        while (current = current.assignedSlot) {
+                            parents.push(current);
+                        }
+                        // Continue the search on the top slot.
+                        current = parents.pop();
+                        continue;
+                    }
+                    current = current.parentNode ||
+                        current.host;
+                }
+                return parents;
+            }
+            /**
+             * Returns the distributed children of the element's shadow root.
+             * Returns null if the element doesn't have a shadow root.
+             */
+            [_getDistributedChildren](element) {
+                const shadowRoot = element.shadowRoot;
+                if (!shadowRoot) {
+                    return null;
+                }
+                const result = new Set();
+                let i;
+                let j;
+                let nodes;
+                const slots = shadowRoot.querySelectorAll('slot');
+                if (slots.length && slots[0].assignedNodes) {
+                    for (i = 0; i < slots.length; i++) {
+                        nodes = slots[i].assignedNodes({
+                            flatten: true,
+                        });
+                        for (j = 0; j < nodes.length; j++) {
+                            if (nodes[j].nodeType === Node.ELEMENT_NODE) {
+                                result.add(nodes[j]);
+                            }
+                        }
+                    }
+                    // No need to search for <content>.
+                }
+                return result;
+            }
+        }
+        document.$blockingElements =
+            new BlockingElementsImpl();
+    })();
 
     var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
@@ -2409,353 +2560,6 @@ var bundle = (function (exports) {
     	})));
     } ());
 
-    /**
-     * @license
-     * Copyright 2016 Google Inc. All rights reserved.
-     *
-     * Licensed under the Apache License, Version 2.0 (the "License");
-     * you may not use this file except in compliance with the License.
-     * You may obtain a copy of the License at
-     *
-     *     http://www.apache.org/licenses/LICENSE-2.0
-     *
-     * Unless required by applicable law or agreed to in writing, software
-     * distributed under the License is distributed on an "AS IS" BASIS,
-     * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-     * See the License for the specific language governing permissions and
-     * limitations under the License.
-     */
-    (() => {
-        var _a, _b, _c;
-        /* Symbols for private properties */
-        const _blockingElements = Symbol();
-        const _alreadyInertElements = Symbol();
-        const _topElParents = Symbol();
-        const _siblingsToRestore = Symbol();
-        const _parentMO = Symbol();
-        /* Symbols for private static methods */
-        const _topChanged = Symbol();
-        const _swapInertedSibling = Symbol();
-        const _inertSiblings = Symbol();
-        const _restoreInertedSiblings = Symbol();
-        const _getParents = Symbol();
-        const _getDistributedChildren = Symbol();
-        const _isInertable = Symbol();
-        const _handleMutations = Symbol();
-        class BlockingElementsImpl {
-            constructor() {
-                /**
-                 * The blocking elements.
-                 */
-                this[_a] = [];
-                /**
-                 * Used to keep track of the parents of the top element, from the element
-                 * itself up to body. When top changes, the old top might have been removed
-                 * from the document, so we need to memoize the inerted parents' siblings
-                 * in order to restore their inerteness when top changes.
-                 */
-                this[_b] = [];
-                /**
-                 * Elements that are already inert before the first blocking element is
-                 * pushed.
-                 */
-                this[_c] = new Set();
-            }
-            destructor() {
-                // Restore original inertness.
-                this[_restoreInertedSiblings](this[_topElParents]);
-                // Note we don't want to make these properties nullable on the class,
-                // since then we'd need non-null casts in many places. Calling a method on
-                // a BlockingElements instance after calling destructor will result in an
-                // exception.
-                const nullable = this;
-                nullable[_blockingElements] = null;
-                nullable[_topElParents] = null;
-                nullable[_alreadyInertElements] = null;
-            }
-            get top() {
-                const elems = this[_blockingElements];
-                return elems[elems.length - 1] || null;
-            }
-            push(element) {
-                if (!element || element === this.top) {
-                    return;
-                }
-                // Remove it from the stack, we'll bring it to the top.
-                this.remove(element);
-                this[_topChanged](element);
-                this[_blockingElements].push(element);
-            }
-            remove(element) {
-                const i = this[_blockingElements].indexOf(element);
-                if (i === -1) {
-                    return false;
-                }
-                this[_blockingElements].splice(i, 1);
-                // Top changed only if the removed element was the top element.
-                if (i === this[_blockingElements].length) {
-                    this[_topChanged](this.top);
-                }
-                return true;
-            }
-            pop() {
-                const top = this.top;
-                top && this.remove(top);
-                return top;
-            }
-            has(element) {
-                return this[_blockingElements].indexOf(element) !== -1;
-            }
-            /**
-             * Sets `inert` to all document elements except the new top element, its
-             * parents, and its distributed content.
-             */
-            [(_a = _blockingElements, _b = _topElParents, _c = _alreadyInertElements, _topChanged)](newTop) {
-                const toKeepInert = this[_alreadyInertElements];
-                const oldParents = this[_topElParents];
-                // No new top, reset old top if any.
-                if (!newTop) {
-                    this[_restoreInertedSiblings](oldParents);
-                    toKeepInert.clear();
-                    this[_topElParents] = [];
-                    return;
-                }
-                const newParents = this[_getParents](newTop);
-                // New top is not contained in the main document!
-                if (newParents[newParents.length - 1].parentNode !== document.body) {
-                    throw Error('Non-connected element cannot be a blocking element');
-                }
-                // Cast here because we know we'll call _inertSiblings on newParents
-                // below.
-                this[_topElParents] = newParents;
-                const toSkip = this[_getDistributedChildren](newTop);
-                // No previous top element.
-                if (!oldParents.length) {
-                    this[_inertSiblings](newParents, toSkip, toKeepInert);
-                    return;
-                }
-                let i = oldParents.length - 1;
-                let j = newParents.length - 1;
-                // Find common parent. Index 0 is the element itself (so stop before it).
-                while (i > 0 && j > 0 && oldParents[i] === newParents[j]) {
-                    i--;
-                    j--;
-                }
-                // If up the parents tree there are 2 elements that are siblings, swap
-                // the inerted sibling.
-                if (oldParents[i] !== newParents[j]) {
-                    this[_swapInertedSibling](oldParents[i], newParents[j]);
-                }
-                // Restore old parents siblings inertness.
-                i > 0 && this[_restoreInertedSiblings](oldParents.slice(0, i));
-                // Make new parents siblings inert.
-                j > 0 && this[_inertSiblings](newParents.slice(0, j), toSkip, null);
-            }
-            /**
-             * Swaps inertness between two sibling elements.
-             * Sets the property `inert` over the attribute since the inert spec
-             * doesn't specify if it should be reflected.
-             * https://html.spec.whatwg.org/multipage/interaction.html#inert
-             */
-            [_swapInertedSibling](oldInert, newInert) {
-                const siblingsToRestore = oldInert[_siblingsToRestore];
-                // oldInert is not contained in siblings to restore, so we have to check
-                // if it's inertable and if already inert.
-                if (this[_isInertable](oldInert) && !oldInert.inert) {
-                    oldInert.inert = true;
-                    siblingsToRestore.add(oldInert);
-                }
-                // If newInert was already between the siblings to restore, it means it is
-                // inertable and must be restored.
-                if (siblingsToRestore.has(newInert)) {
-                    newInert.inert = false;
-                    siblingsToRestore.delete(newInert);
-                }
-                newInert[_parentMO] = oldInert[_parentMO];
-                newInert[_siblingsToRestore] = siblingsToRestore;
-                oldInert[_parentMO] = undefined;
-                oldInert[_siblingsToRestore] = undefined;
-            }
-            /**
-             * Restores original inertness to the siblings of the elements.
-             * Sets the property `inert` over the attribute since the inert spec
-             * doesn't specify if it should be reflected.
-             * https://html.spec.whatwg.org/multipage/interaction.html#inert
-             */
-            [_restoreInertedSiblings](elements) {
-                for (const element of elements) {
-                    const mo = element[_parentMO];
-                    mo.disconnect();
-                    element[_parentMO] = undefined;
-                    const siblings = element[_siblingsToRestore];
-                    for (const sibling of siblings) {
-                        sibling.inert = false;
-                    }
-                    element[_siblingsToRestore] = undefined;
-                }
-            }
-            /**
-             * Inerts the siblings of the elements except the elements to skip. Stores
-             * the inerted siblings into the element's symbol `_siblingsToRestore`.
-             * Pass `toKeepInert` to collect the already inert elements.
-             * Sets the property `inert` over the attribute since the inert spec
-             * doesn't specify if it should be reflected.
-             * https://html.spec.whatwg.org/multipage/interaction.html#inert
-             */
-            [_inertSiblings](elements, toSkip, toKeepInert) {
-                for (const element of elements) {
-                    // Assume element is not a Document, so it must have a parentNode.
-                    const parent = element.parentNode;
-                    const children = parent.children;
-                    const inertedSiblings = new Set();
-                    for (let j = 0; j < children.length; j++) {
-                        const sibling = children[j];
-                        // Skip the input element, if not inertable or to be skipped.
-                        if (sibling === element || !this[_isInertable](sibling) ||
-                            (toSkip && toSkip.has(sibling))) {
-                            continue;
-                        }
-                        // Should be collected since already inerted.
-                        if (toKeepInert && sibling.inert) {
-                            toKeepInert.add(sibling);
-                        }
-                        else {
-                            sibling.inert = true;
-                            inertedSiblings.add(sibling);
-                        }
-                    }
-                    // Store the siblings that were inerted.
-                    element[_siblingsToRestore] = inertedSiblings;
-                    // Observe only immediate children mutations on the parent.
-                    const mo = new MutationObserver(this[_handleMutations].bind(this));
-                    element[_parentMO] = mo;
-                    let parentToObserve = parent;
-                    // If we're using the ShadyDOM polyfill, then our parent could be a
-                    // shady root, which is an object that acts like a ShadowRoot, but isn't
-                    // actually a node in the real DOM. Observe the real DOM parent instead.
-                    const maybeShadyRoot = parentToObserve;
-                    if (maybeShadyRoot.__shady && maybeShadyRoot.host) {
-                        parentToObserve = maybeShadyRoot.host;
-                    }
-                    mo.observe(parentToObserve, {
-                        childList: true,
-                    });
-                }
-            }
-            /**
-             * Handles newly added/removed nodes by toggling their inertness.
-             * It also checks if the current top Blocking Element has been removed,
-             * notifying and removing it.
-             */
-            [_handleMutations](mutations) {
-                const parents = this[_topElParents];
-                const toKeepInert = this[_alreadyInertElements];
-                for (const mutation of mutations) {
-                    // If the target is a shadowRoot, get its host as we skip shadowRoots when
-                    // computing _topElParents.
-                    const target = mutation.target.host || mutation.target;
-                    const idx = target === document.body ?
-                        parents.length :
-                        parents.indexOf(target);
-                    const inertedChild = parents[idx - 1];
-                    const inertedSiblings = inertedChild[_siblingsToRestore];
-                    // To restore.
-                    for (let i = 0; i < mutation.removedNodes.length; i++) {
-                        const sibling = mutation.removedNodes[i];
-                        if (sibling === inertedChild) {
-                            console.info('Detected removal of the top Blocking Element.');
-                            this.pop();
-                            return;
-                        }
-                        if (inertedSiblings.has(sibling)) {
-                            sibling.inert = false;
-                            inertedSiblings.delete(sibling);
-                        }
-                    }
-                    // To inert.
-                    for (let i = 0; i < mutation.addedNodes.length; i++) {
-                        const sibling = mutation.addedNodes[i];
-                        if (!this[_isInertable](sibling)) {
-                            continue;
-                        }
-                        if (toKeepInert && sibling.inert) {
-                            toKeepInert.add(sibling);
-                        }
-                        else {
-                            sibling.inert = true;
-                            inertedSiblings.add(sibling);
-                        }
-                    }
-                }
-            }
-            /**
-             * Returns if the element is inertable.
-             */
-            [_isInertable](element) {
-                return false === /^(style|template|script)$/.test(element.localName);
-            }
-            /**
-             * Returns the list of newParents of an element, starting from element
-             * (included) up to `document.body` (excluded).
-             */
-            [_getParents](element) {
-                const parents = [];
-                let current = element;
-                // Stop to body.
-                while (current && current !== document.body) {
-                    // Skip shadow roots.
-                    if (current.nodeType === Node.ELEMENT_NODE) {
-                        parents.push(current);
-                    }
-                    // ShadowDom v1
-                    if (current.assignedSlot) {
-                        // Collect slots from deepest slot to top.
-                        while (current = current.assignedSlot) {
-                            parents.push(current);
-                        }
-                        // Continue the search on the top slot.
-                        current = parents.pop();
-                        continue;
-                    }
-                    current = current.parentNode ||
-                        current.host;
-                }
-                return parents;
-            }
-            /**
-             * Returns the distributed children of the element's shadow root.
-             * Returns null if the element doesn't have a shadow root.
-             */
-            [_getDistributedChildren](element) {
-                const shadowRoot = element.shadowRoot;
-                if (!shadowRoot) {
-                    return null;
-                }
-                const result = new Set();
-                let i;
-                let j;
-                let nodes;
-                const slots = shadowRoot.querySelectorAll('slot');
-                if (slots.length && slots[0].assignedNodes) {
-                    for (i = 0; i < slots.length; i++) {
-                        nodes = slots[i].assignedNodes({
-                            flatten: true,
-                        });
-                        for (j = 0; j < nodes.length; j++) {
-                            if (nodes[j].nodeType === Node.ELEMENT_NODE) {
-                                result.add(nodes[j]);
-                            }
-                        }
-                    }
-                    // No need to search for <content>.
-                }
-                return result;
-            }
-        }
-        document.$blockingElements =
-            new BlockingElementsImpl();
-    })();
-
     function getDocument$1(element) { return (element?.ownerDocument ?? document ?? window.document ?? globalThis.document); }
 
     function blockingElements() { return getDocument$1().$blockingElements; }
@@ -3362,6 +3166,7 @@ var bundle = (function (exports) {
      * regardless of if it's the whole app or just a given component.
      */
     function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovingTabIndexParameters: { untabbable, initiallyTabbedIndex, onTabbableIndexChange }, ..._void1 }) {
+        const getUntabbable = useStableGetter(untabbable);
         //initiallyTabbedIndex ??= 0;
         // Override the actual setter to include some extra logic related to avoiding hidden children, 
         // what to do when we're untabbable, what to do when we're tabbable but given `null`, etc.
@@ -3372,6 +3177,9 @@ var bundle = (function (exports) {
             return setTabbableIndex3(f, reason);
             function f(prevIndex) {
                 let nextIndex = ((typeof updater === "function") ? updater(prevIndex ?? null) : updater);
+                const untabbable = getUntabbable();
+                if (nextIndex != null)
+                    setLastNonNullIndex(nextIndex);
                 if (untabbable)
                     return null;
                 if (prevIndex != nextIndex) {
@@ -3387,21 +3195,29 @@ var bundle = (function (exports) {
                         }
                     }
                 }
+                if (nextIndex != null)
+                    setLastNonNullIndex(nextIndex);
                 return nextIndex ?? (untabbable ? null : 0);
             }
         }, []);
-        const lastNonNullIndex = _(initiallyTabbedIndex);
-        h(() => {
+        // When we switch from tabbable to non/tabbable, we really want to remember the last tabbable child.
+        // So every time we change the index for any reason, record that change as a back up here that can be restored.
+        const [getLastNonNullIndex, setLastNonNullIndex] = usePassiveState(null, T$1(() => (initiallyTabbedIndex ?? 0), []));
+        /*useEffect(() => {
             const t = getTabbableIndex();
-            if (t != null)
+            if (!untabbable && t != null) {
+                if (t == 0)
+                    debugger;
                 lastNonNullIndex.current = t;
-        });
+            }
+        });*/
         // Any time we switch to being untabbable, set the current tabbable index accordingly.
         h(() => {
             if (untabbable)
                 setTabbableIndex3(null, undefined);
-            else
-                setTabbableIndex3(lastNonNullIndex.current, undefined);
+            else {
+                setTabbableIndex3(getLastNonNullIndex(), undefined);
+            }
         }, [untabbable]);
         // Boilerplate related to notifying individual children when they become tabbable/untabbable
         const getTabbableAt = T$1((m) => { return m.getTabbable(); }, []);
@@ -3428,6 +3244,7 @@ var bundle = (function (exports) {
         }, []);
         const rovingTabIndexChildContext = useStableObject({
             setTabbableIndex,
+            getInitiallyTabbedIndex: T$1(() => { return initiallyTabbedIndex ?? (untabbable ? null : 0); }, []),
             reevaluateClosestFit
         });
         return {
@@ -3436,9 +3253,9 @@ var bundle = (function (exports) {
             rovingTabIndexChildContext
         };
     }
-    function useRovingTabIndexChild({ managedChildParameters: { index, ..._void2 }, rovingTabIndexChildContext: { reevaluateClosestFit, setTabbableIndex }, rovingTabIndexChildParameters, }) {
+    function useRovingTabIndexChild({ managedChildParameters: { index, ..._void2 }, rovingTabIndexChildContext: { reevaluateClosestFit, setTabbableIndex, getInitiallyTabbedIndex }, rovingTabIndexChildParameters, }) {
         const { hidden, ..._void1 } = rovingTabIndexChildParameters;
-        const [tabbable, setTabbable, getTabbable] = useState(false);
+        const [tabbable, setTabbable, getTabbable] = useState(getInitiallyTabbedIndex() === index);
         h(() => {
             reevaluateClosestFit();
         }, [!!hidden]);
@@ -3495,10 +3312,11 @@ var bundle = (function (exports) {
         const onTabbableIndexChangeOverride = useStableCallback((nextRow, previousRow, reason) => {
             const children = getChildren();
             onTabbableIndexChange?.(nextRow, previousRow, reason);
+            const nextColumn = getCurrentTabbableColumn();
             if (previousRow != null)
-                children.getAt(previousRow)?.setTabbableColumnIndex(null, reason, false);
+                children.getAt(previousRow)?.setTabbableColumnIndex(nextColumn, reason, false);
             if (nextRow != null)
-                children.getAt(nextRow)?.setTabbableColumnIndex(getCurrentTabbableColumn(), reason, false);
+                children.getAt(nextRow)?.setTabbableColumnIndex(nextColumn, reason, false);
         });
         const { linearNavigationReturn, rovingTabIndexReturn, typeaheadNavigationReturn, managedChildrenParameters, rovingTabIndexChildContext, typeaheadNavigationChildContext, ...void1 } = useListNavigation({
             linearNavigationParameters: { navigationDirection: "vertical", ...linearNavigationParameters },
@@ -3541,7 +3359,11 @@ var bundle = (function (exports) {
             }
         }, []);
         const lncr = useListNavigationChild(asChildRowOfTable);
-        const lnr = useListNavigation({ ...asParentRowOfCellsP, rovingTabIndexParameters: { untabbable: !lncr.rovingTabIndexChildReturn.tabbable, ...rovingTabIndexParameters }, linearNavigationParameters: { navigationDirection: "horizontal", ...linearNavigationParameters } });
+        const untabbable = !lncr.rovingTabIndexChildReturn.tabbable;
+        //if (untabbable && asChildRowOfTable.managedChildParameters.index == 1)
+        //    debugger;
+        console.log(`Row #${asChildRowOfTable.managedChildParameters.index}${untabbable ? " is untabbable" : ""}`);
+        const lnr = useListNavigation({ ...asParentRowOfCellsP, rovingTabIndexParameters: { untabbable, ...rovingTabIndexParameters }, linearNavigationParameters: { navigationDirection: "horizontal", ...linearNavigationParameters } });
         const { rovingTabIndexReturn: { setTabbableIndex }, rovingTabIndexReturn, linearNavigationReturn, managedChildrenParameters, rovingTabIndexChildContext, typeaheadNavigationChildContext, typeaheadNavigationReturn } = lnr;
         return {
             rowAsChildOfGridReturn: { gridNavigationRowParameters: { focusSelf, setTabbableColumnIndex: setTabbableIndex }, ...lncr, },
@@ -4738,41 +4560,6 @@ var bundle = (function (exports) {
         return { ...gnr, ...scr, };
     }
 
-    function useListNavigationSingleSelection({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, managedChildrenReturn, ..._void3 }) {
-        const lnr = useListNavigation({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, managedChildrenReturn });
-        const { rovingTabIndexReturn } = lnr;
-        const ssr = useSingleSelection({ rovingTabIndexReturn, managedChildrenReturn, singleSelectionParameters });
-        return {
-            ...ssr,
-            ...lnr,
-        };
-    }
-    function useListNavigationSingleSelectionChild({ managedChildParameters: { index, ..._void5 }, rovingTabIndexChildParameters: { hidden, ...void7 }, singleSelectionChildParameters, singleSelectionContext, rovingTabIndexChildContext, typeaheadNavigationChildContext, refElementReturn, textContentParameters, ..._void1 }) {
-        const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ..._void3 }, ...sscr } = useSingleSelectionChild({
-            managedChildParameters: { index },
-            singleSelectionChildParameters,
-            singleSelectionContext
-        });
-        const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ..._void6 }, ...lncr } = useListNavigationChild({
-            managedChildParameters: { index },
-            rovingTabIndexChildParameters: { hidden },
-            rovingTabIndexChildContext,
-            typeaheadNavigationChildContext,
-            refElementReturn,
-            textContentParameters
-        });
-        return {
-            hasCurrentFocusParameters: {
-                onCurrentFocusedInnerChanged: useStableCallback((focused, previouslyFocused, e) => {
-                    ocfic1?.(focused, previouslyFocused, e);
-                    ocfic2?.(focused, previouslyFocused, e);
-                })
-            },
-            ...sscr,
-            ...lncr
-        };
-    }
-
     /**
      * Allows a composite component (such as a radio group or listbox) to listen
      * for an "overall focusin/out" event; this hook lets you know when focus has
@@ -4784,6 +4571,7 @@ var bundle = (function (exports) {
         const { childrenHaveFocusParameters: { onCompositeFocusChange } } = args;
         const [getAnyFocused, setAnyFocused] = usePassiveState(onCompositeFocusChange, returnFalse, runImmediately);
         const [_getFocusCount, setFocusCount] = usePassiveState(useStableCallback((anyFocused, anyPreviouslyFocused, e) => {
+            console.log("Focus count: " + anyFocused);
             console.assert(anyFocused >= 0 && anyFocused <= 1);
             setAnyFocused(!!(anyFocused && !anyPreviouslyFocused), e);
         }));
@@ -4817,10 +4605,17 @@ var bundle = (function (exports) {
             setFocused(e.target == getElement(), e);
         }, []);
         const onFocusOut = T$1((e) => {
-            if (e.target == getElement()) {
-                setFocusedInner(false, e);
-                setFocused(false, e);
-            }
+            // Even if we're focusOut-ing to another inner element,
+            // that'll be caught during onFocusIn,
+            // so just set everything to false and let that revert things back to true if necessary.
+            setFocusedInner(false, e);
+            setFocused(false, e);
+        }, []);
+        h(() => {
+            return () => {
+                setFocused(false);
+                setFocusedInner(false);
+            };
         }, []);
         const propsStable = _({
             onfocusin: onFocusIn,
@@ -5233,197 +5028,6 @@ var bundle = (function (exports) {
             hasCurrentFocusReturn,
             managedChildReturn,
             textContentReturn
-        };
-    }
-
-    /**
-     * All the list-related hooks combined into one giant hook that encapsulates everything.
-     *
-     * Unlike most others, this hook assume's it's the final one--the "outermost" hook in the component--so it uses `useManagedChildren` and wraps everything up nicely,
-     * combining event handlers that are used in multiple sub-hooks, collecting all the necessary context-related data, and merging all known DOM props together.
-     *
-     *
-     *
-     * @returns
-     */
-    function useCompleteListNavigation({ linearNavigationParameters, rearrangeableChildrenParameters, sortableChildrenParameters, typeaheadNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, ...completeListNavigationParameters }) {
-        //type M = UseListNavigationSingleSelectionChildInfo<ChildElement>;
-        const { initiallySelectedIndex } = singleSelectionParameters;
-        const getChildren = T$1(() => managedChildrenReturn.getChildren(), []);
-        const getHighestChildIndex = T$1(() => getChildren().getHighestIndex(), []);
-        const getValid = T$1((i) => {
-            const child = getChildren().getAt(i);
-            if (!child)
-                return false;
-            return !child.hidden;
-        }, []);
-        const { rearrangeableChildrenReturn, sortableChildrenReturn } = useSortableChildren({
-            rearrangeableChildrenParameters,
-            sortableChildrenParameters
-        });
-        const { indexDemangler, indexMangler } = rearrangeableChildrenReturn;
-        const { childrenHaveFocusParameters, managedChildrenParameters, rovingTabIndexChildContext, typeaheadNavigationChildContext, singleSelectionContext, linearNavigationReturn, rovingTabIndexReturn, singleSelectionReturn, typeaheadNavigationReturn } = useListNavigationSingleSelection({
-            managedChildrenReturn: { getChildren },
-            linearNavigationParameters: { getHighestIndex: getHighestChildIndex, isValid: getValid, indexDemangler, indexMangler, ...linearNavigationParameters },
-            typeaheadNavigationParameters: { isValid: getValid, ...typeaheadNavigationParameters },
-            rovingTabIndexParameters: { initiallyTabbedIndex: initiallySelectedIndex, ...rovingTabIndexParameters },
-            singleSelectionParameters,
-            ...completeListNavigationParameters,
-        });
-        //const { linearNavigationReturn, typeaheadNavigationReturn } = listNavigationSingleSelectionSortableReturn;
-        const { childrenHaveFocusChildContext, childrenHaveFocusReturn } = useChildrenHaveFocus({ childrenHaveFocusParameters });
-        const { context: { managedChildContext }, managedChildrenReturn } = useManagedChildren({ managedChildrenParameters });
-        const props = useMergedProps(linearNavigationReturn.propsStable, typeaheadNavigationReturn.propsStable);
-        const context = useStableObject({
-            singleSelectionContext,
-            managedChildContext,
-            rovingTabIndexChildContext,
-            typeaheadNavigationChildContext,
-            childrenHaveFocusChildContext
-        });
-        return {
-            context,
-            props,
-            managedChildrenReturn,
-            rearrangeableChildrenReturn,
-            sortableChildrenReturn,
-            linearNavigationReturn,
-            rovingTabIndexReturn,
-            singleSelectionReturn,
-            typeaheadNavigationReturn,
-            childrenHaveFocusReturn
-        };
-    }
-    function useCompleteListNavigationChild({ 
-    //managedChildParameters: { hidden, disabled, index, getSortValue },
-    completeListNavigationChildParameters, singleSelectionChildParameters, rovingTabIndexChildParameters, managedChildParameters, textContentParameters, context: { childrenHaveFocusChildContext, managedChildContext, rovingTabIndexChildContext, singleSelectionContext, typeaheadNavigationChildContext }, pressParameters: { onPressSync: ops1, ...pressParameters }, sortableChildParameters: { getSortValue }, ..._void }) {
-        const { hidden } = rovingTabIndexChildParameters;
-        const { index } = managedChildParameters;
-        let { disabled } = singleSelectionChildParameters;
-        if (hidden)
-            disabled = true;
-        const { refElementReturn } = useRefElement({ refElementParameters: {} });
-        const { getElement } = refElementReturn;
-        const { focusSelf } = pressParameters;
-        const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1 }, pressParameters: { onPressSync: ops2, ...p1 }, rovingTabIndexChildReturn, singleSelectionChildReturn, managedChildParameters: { setLocalSelected } } = useListNavigationSingleSelectionChild({
-            managedChildParameters: { index },
-            rovingTabIndexChildParameters: { hidden },
-            singleSelectionChildParameters: { ...singleSelectionChildParameters },
-            rovingTabIndexChildContext,
-            singleSelectionContext,
-            typeaheadNavigationChildContext,
-            refElementReturn,
-            textContentParameters
-        });
-        const { getTabbable, setTabbable, tabbable } = rovingTabIndexChildReturn;
-        const { pressReturn } = usePress({
-            pressParameters: {
-                ...p1,
-                ...pressParameters,
-                onPressSync: disabled ? null : ((e) => {
-                    ops2?.(e);
-                    ops1?.(e);
-                })
-            }, refElementReturn
-        });
-        const { getSelected, selected } = singleSelectionChildReturn;
-        const mcp1 = {
-            disabled,
-            focusSelf,
-            getElement,
-            getSelected,
-            getTabbable,
-            hidden,
-            index,
-            selected,
-            setLocalSelected,
-            setTabbable,
-            tabbable,
-            getSortValue
-        };
-        const { managedChildReturn } = useManagedChild({ context: { managedChildContext }, managedChildParameters: { index } }, { ...mcp1, ...completeListNavigationChildParameters });
-        const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2 } } = useChildrenHaveFocusChild({ childrenHaveFocusChildContext });
-        const onCurrentFocusedInnerChanged = useStableCallback((focused, prev, e) => {
-            ocfic1?.(focused, prev, e);
-            ocfic2?.(focused, prev, e);
-        });
-        const { hasCurrentFocusReturn } = useHasCurrentFocus({ hasCurrentFocusParameters: { onCurrentFocusedInnerChanged, onCurrentFocusedChanged: null }, refElementReturn });
-        const props = useMergedProps(refElementReturn.propsStable, pressReturn.propsStable, hasCurrentFocusReturn.propsStable, rovingTabIndexChildReturn.propsUnstable, singleSelectionChildReturn.propsUnstable);
-        return {
-            props,
-            pressReturn,
-            rovingTabIndexChildReturn,
-            singleSelectionChildReturn,
-            hasCurrentFocusReturn,
-            managedChildReturn
-        };
-    }
-    /*
-    function foo<ParentElement extends Element, ChildElement extends Element, M extends UseListNavigationSingleSelectionSortableChildInfo<ChildElement>>(p: UseCompleteListNavigationParameters<ParentElement, ChildElement, M>) {
-        const { singleSelectionReturn } = useCompleteListNavigation<ParentElement, ChildElement, M>(p);
-        const selectedIndex = 0;
-        useSingleSelectionDeclarative({ singleSelectionReturn, singleSelectionDeclarativeParameters: { selectedIndex } })
-    }*/
-
-    /**
-     * Combines dismissal hooks and focus trap hooks into one.
-     *
-     * Another in the "complete" series, alongside list/grid navigation and dismissal itself.
-     *
-     * Use for dialogs, menus, etc.  Anything that can be dismissed and might trap focus, basically.
-     *
-     * @param param0
-     * @returns
-     */
-    function useModal({ dismissParameters, escapeDismissParameters, focusTrapParameters: { trapActive, ...focusTrapParameters } }) {
-        const { open } = dismissParameters;
-        //const { getWindow } = escapeDismissParameters;
-        //const getDocument = useCallback(() => { return getWindow().document; }, [getWindow]);
-        const { refElementPopupReturn, refElementSourceReturn } = useDismiss({ dismissParameters, escapeDismissParameters });
-        const { focusTrapReturn, refElementReturn } = useFocusTrap({
-            focusTrapParameters: { trapActive: open && trapActive, ...focusTrapParameters },
-            refElementParameters: {}
-        });
-        const { propsStable: pp1 } = refElementPopupReturn;
-        const { propsStable: ps2 } = refElementSourceReturn;
-        const { propsUnstable: pp3 } = focusTrapReturn;
-        const { propsStable: pp4 } = refElementReturn;
-        return {
-            propsPopup: pp1,
-            propsFocusContainer: useMergedProps(pp3, pp4),
-            propsSource: ps2,
-            refElementPopupReturn,
-            refElementSourceReturn,
-            focusTrapReturn,
-        };
-    }
-
-    function useRandomId({ randomIdParameters: { prefix, otherReferencerProp } }) {
-        const id = (prefix + V$1());
-        useEnsureStability("useRandomId", prefix, id);
-        const referencerElementProps = _(otherReferencerProp == null ? {} : { [otherReferencerProp]: id });
-        const sourceElementProps = _({ id });
-        useEnsureStability("useRandomIdReferencerElement", otherReferencerProp);
-        return {
-            propsReferencer: referencerElementProps.current,
-            propsSource: sourceElementProps.current,
-            randomIdReturn: {
-                id: id
-            }
-        };
-    }
-
-    /**
-     * While `useRandomId` allows the referencer to use the source's ID, sometimes you also want the reverse too (e.g. I `aria-label` you, you `aria-controls` me. That sort of thing).
-     */
-    function useRandomDualIds({ randomIdInputParameters, randomIdLabelParameters, }) {
-        const { randomIdReturn: randomIdInputReturn, propsReferencer: propsLabelAsReferencer, propsSource: propsInputAsSource } = useRandomId({ randomIdParameters: randomIdInputParameters });
-        const { randomIdReturn: randomIdLabelReturn, propsReferencer: propsInputAsReferencer, propsSource: propsLabelAsSource } = useRandomId({ randomIdParameters: randomIdLabelParameters });
-        return {
-            propsLabel: useMergedProps(propsLabelAsReferencer, propsLabelAsSource),
-            propsInput: useMergedProps(propsInputAsReferencer, propsInputAsSource),
-            randomIdInputReturn,
-            randomIdLabelReturn
         };
     }
 
@@ -6045,197 +5649,6 @@ var bundle = (function (exports) {
         };
     }
 
-    function useDraggable({ effectAllowed, data, dragImage, dragImageXOffset, dragImageYOffset }) {
-        const [dragging, setDragging, getDragging] = useState(false);
-        const [lastDropEffect, setLastDropEffect, getLastDropEffect] = useState(null);
-        const onDragStart = (e) => {
-            //e.preventDefault();
-            setDragging(true);
-            if (e.dataTransfer) {
-                e.dataTransfer.effectAllowed = (effectAllowed ?? "all");
-                if (dragImage)
-                    e.dataTransfer.setDragImage(dragImage, dragImageXOffset ?? 0, dragImageYOffset ?? 0);
-                const entries = Object.entries(data);
-                for (const [mimeType, data] of entries) {
-                    e.dataTransfer.setData(mimeType, data);
-                }
-            }
-        };
-        const onDragEnd = (e) => {
-            e.preventDefault();
-            setDragging(false);
-            if (e.dataTransfer) {
-                if (e.dataTransfer.dropEffect != "none") {
-                    setLastDropEffect(e.dataTransfer.dropEffect);
-                }
-                else {
-                    setLastDropEffect(null);
-                }
-            }
-        };
-        // Return both the element and the hook that modifies 
-        // the props and allows us to actually find the element
-        const ret = {
-            propsUnstable: {
-                draggable: true,
-                onDragStart,
-                onDragEnd
-            },
-            dragging,
-            getDragging,
-            lastDropEffect,
-            getLastDropEffect
-        };
-        return ret;
-    }
-
-    class DroppableFileError extends Error {
-        fileName;
-        errorType;
-        constructor(fileName, base) {
-            super(base?.message ?? "An unspecified error occurred reading the file.");
-            this.fileName = fileName;
-            this.errorType = base?.name;
-        }
-    }
-    function useDroppable({ effect }) {
-        const [filesForConsideration, setFilesForConsideration] = useState(null);
-        const [stringsForConsideration, setStringsForConsideration] = useState(null);
-        const [droppedFiles, setDroppedFiles] = useState(null);
-        const [droppedStrings, setDroppedStrings] = useState(null);
-        const [dropError, setDropError] = useState(undefined);
-        // All the promises generated from the drop events.
-        // Used to process multiple drop events in succession
-        const dropPromisesRef = _([]);
-        const [currentPromiseIndex, setCurrentPromiseIndex, getCurrentPromiseIndex] = useState(-1);
-        const [promiseCount, setPromiseCount, getPromiseCount] = useState(0);
-        // Any time we add a new promise, if there's no current promise running, we need to start one.
-        // If there is one, then we don't need to do anything, since it runs the same check.
-        h(() => {
-            const currentPromiseIndex = getCurrentPromiseIndex();
-            const promiseCount = getPromiseCount();
-            if (promiseCount > 0) {
-                if ((currentPromiseIndex + 1) < promiseCount) {
-                    setCurrentPromiseIndex(i => ++i);
-                }
-            }
-        }, [promiseCount]);
-        // Anytime our current promise changes,
-        // wait for it to finish, then set our state to its result.
-        // Finally, check to see if there are anymore promises.
-        // If there are, then increase currentPromiseCount,
-        // which will trigger this again.
-        //
-        // This shouldn't happen *often*, but maybe in the case of
-        // individually dropping a bunch of large files or something.
-        h(() => {
-            if (currentPromiseIndex >= 0) {
-                const currentPromise = dropPromisesRef.current[currentPromiseIndex];
-                currentPromise.then((info) => {
-                    if (info !== null) {
-                        const { files, strings } = info;
-                        setDroppedFiles(files);
-                        setDroppedStrings(strings);
-                    }
-                    // Now that we're done, are there more promises in the queue?
-                    const currentPromiseIndex = getCurrentPromiseIndex();
-                    const promiseCount = getPromiseCount();
-                    if ((currentPromiseIndex + 1) < promiseCount) {
-                        // Since this promise has started, more have been added.
-                        // Run this effect again.
-                        setCurrentPromiseIndex(i => ++i);
-                    }
-                });
-            }
-        }, [currentPromiseIndex]);
-        // Handle collecting the current file metadata or MIME types.
-        const onDragEnter = useStableCallback((e) => {
-            e.preventDefault();
-            if (e.dataTransfer) {
-                // Is there a default? I can't find one anywhere.
-                e.dataTransfer.dropEffect = (effect ?? "move");
-                const newMimeTypes = new Set();
-                const newFiles = new Array();
-                for (const item of e.dataTransfer?.items ?? []) {
-                    const { kind, type } = item;
-                    if (kind === "string") {
-                        newMimeTypes.add(type);
-                    }
-                    else if (kind === "file") {
-                        newFiles.push({ type: item.type });
-                    }
-                }
-                setFilesForConsideration(newFiles);
-                setStringsForConsideration(newMimeTypes);
-            }
-        });
-        // Handle resetting the current file metadata or MIME types
-        const onDragLeave = useStableCallback((e) => {
-            e.preventDefault();
-            setFilesForConsideration(null);
-            setStringsForConsideration(null);
-        });
-        // Boilerplate, I guess
-        const onDragOver = useStableCallback((e) => {
-            e.preventDefault();
-        });
-        // Handle getting the drop data asynchronously
-        const onDrop = useStableCallback((e) => {
-            e.preventDefault();
-            setFilesForConsideration(null);
-            setStringsForConsideration(null);
-            const allPromises = new Array();
-            const dropData = {};
-            const dropFile = [];
-            for (const item of e.dataTransfer?.items ?? []) {
-                const { kind, type } = item;
-                if (kind === "string") {
-                    allPromises.push((new Promise((resolve, _reject) => item.getAsString(resolve))).then(str => dropData[type] = str));
-                }
-                else if (kind === "file") {
-                    const file = item.getAsFile();
-                    if (file) {
-                        allPromises.push(new Promise((resolve, reject) => {
-                            const reader = new FileReader();
-                            reader.onload = (_) => {
-                                resolve();
-                                const data = reader.result;
-                                dropFile.push({ data, name: file.name, type: file.type, size: data.byteLength, lastModified: file.lastModified });
-                            };
-                            reader.onerror = (_) => { reject(new DroppableFileError(file.name, reader.error)); };
-                            reader.onabort = (_) => { reject(new DroppableFileError(file.name, reader.error)); };
-                            reader.readAsArrayBuffer(file);
-                        }));
-                        dropFile.push();
-                    }
-                }
-            }
-            dropPromisesRef.current.push(Promise.all(allPromises).then(() => {
-                setPromiseCount(i => ++i);
-                setDropError(null);
-                return {
-                    strings: dropData,
-                    files: dropFile
-                };
-            }).catch(ex => {
-                /* eslint-disable no-debugger */
-                debugger;
-                setPromiseCount(i => ++i);
-                setDropError(ex);
-                return null;
-            }));
-        });
-        const propsStable = _({ onDragEnter, onDragLeave, onDragOver, onDrop });
-        return {
-            propsStable: propsStable.current,
-            filesForConsideration,
-            stringsForConsideration,
-            droppedFiles,
-            droppedStrings,
-            dropError
-        };
-    }
-
     function useHasLastFocus(args) {
         const { refElementReturn: { getElement }, activeElementParameters: { onLastActiveElementChange, ...activeElementParameters }, hasLastFocusParameters: { onLastFocusedChanged, onLastFocusedInnerChanged, ..._void } } = args;
         useEnsureStability("useHasFocus", onLastFocusedChanged, onLastFocusedInnerChanged);
@@ -6254,6 +5667,12 @@ var bundle = (function (exports) {
                 ...activeElementParameters
             },
         });
+        h(() => {
+            return () => {
+                setLastFocused(false);
+                setLastFocusedInner(false);
+            };
+        }, []);
         return {
             activeElementReturn,
             hasLastFocusReturn: {
@@ -6265,231 +5684,9 @@ var bundle = (function (exports) {
 
     B$2(null);
 
-    function useInterval({ interval, callback }) {
-        // Get a wrapper around the given callback that's stable
-        const stableCallback = useStableCallback(callback);
-        const getInterval = useStableGetter(interval);
-        h(() => {
-            const interval = getInterval();
-            let lastDelayUsed = interval;
-            if (interval == null)
-                return;
-            // Get a wrapper around the wrapper around the callback
-            // that clears and resets the interval if it changes.
-            const adjustableCallback = () => {
-                stableCallback();
-                const currentInterval = getInterval();
-                if (currentInterval != lastDelayUsed) {
-                    clearInterval(handle);
-                    if (currentInterval != null)
-                        handle = setInterval(adjustableCallback, lastDelayUsed = currentInterval);
-                }
-            };
-            let handle = setInterval(adjustableCallback, interval);
-            return () => clearInterval(handle);
-        }, []);
-    }
-
-    function useTimeout({ timeout, callback, triggerIndex }) {
-        const stableCallback = useStableCallback(() => { startTimeRef.current = null; callback(); });
-        const getTimeout = useStableGetter(timeout);
-        // Set any time we start timeout.
-        // Unset any time the timeout completes
-        const startTimeRef = _(null);
-        const timeoutIsNull = (timeout == null);
-        // Any time the triggerIndex changes (including on mount)
-        // restart the timeout.  The timeout does NOT reset
-        // when the duration or callback changes, only triggerIndex.
-        h(() => {
-            if (!timeoutIsNull) {
-                const timeout = getTimeout();
-                console.assert(timeoutIsNull == (timeout == null));
-                if (timeout != null) {
-                    startTimeRef.current = +(new Date());
-                    const handle = setTimeout(stableCallback, timeout);
-                    return () => clearTimeout(handle);
-                }
-            }
-        }, [triggerIndex, timeoutIsNull]);
-        const getElapsedTime = T$1(() => {
-            return (+(new Date())) - (+(startTimeRef.current ?? new Date()));
-        }, []);
-        const getRemainingTime = T$1(() => {
-            const timeout = getTimeout();
-            return timeout == null ? null : Math.max(0, timeout - getElapsedTime());
-        }, []);
-        return { getElapsedTime, getRemainingTime };
-    }
-
-    const DemoUseInterval = () => {
-        const [interval, setInterval] = p(1000);
-        const [fireCount, setFireCount] = p(0);
-        useInterval({ interval, callback: () => setFireCount(i => ++i) });
-        return (o$1("div", { class: "demo", children: [o$1("label", { children: ["Interval duration: ", o$1("input", { type: "number", value: interval, onInput: e => setInterval(e.currentTarget.valueAsNumber) })] }), o$1("div", { children: ["The callback has been called ", fireCount, " time", fireCount === 1 ? "" : "s", "."] })] }));
-    };
-
-    function getWindow() { return globalThis.window; }
-    function DemoUseModal(props) {
-        const parentDepth = (props.parentDepth ?? 0);
-        const depth = parentDepth + 1;
-        const buttonRef = _(null);
-        const [closeOnBackdrop, setCloseOnBackdrop] = p(true);
-        const [closeOnEscape, setCloseOnEscape] = p(true);
-        const [closeOnLostFocus, setCloseOnLostFocus] = p(true);
-        const [focusTrapActive, setFocusTrapActive] = p(true);
-        const [hasChild, setHasChild] = p(false);
-        const [closeReason, setCloseReason] = p(null);
-        const [open, setOpen] = p(false);
-        const focusOpener = () => buttonRef.current?.focus();
-        const { propsPopup, propsSource, propsFocusContainer } = useModal({
-            focusTrapParameters: {
-                trapActive: focusTrapActive,
-                onlyMoveFocus: false,
-                focusOpener,
-                focusPopup: useStableCallback((e, f) => f()?.focus())
-            },
-            dismissParameters: {
-                closeOnBackdrop,
-                closeOnEscape,
-                closeOnLostFocus,
-                onClose: T$1((reason) => { setCloseReason(reason); setOpen(false); }, []),
-                open
-            },
-            escapeDismissParameters: { getWindow, parentDepth }
-        });
-        return (o$1("div", { style: { border: `${depth}px solid black` }, children: [o$1("div", { children: "useModal demo:" }), o$1("div", { style: "display: flex; flex-direction: column", children: [o$1("label", { children: [o$1("input", { type: "checkbox", disabled: true, checked: true }), " Close by setting open to false"] }), o$1("label", { children: [o$1("input", { type: "checkbox", checked: closeOnBackdrop, onInput: e => setCloseOnBackdrop(e.currentTarget.checked) }), " Close on backdrop click"] }), o$1("label", { children: [o$1("input", { type: "checkbox", checked: closeOnEscape, onInput: e => setCloseOnEscape(e.currentTarget.checked) }), " Close on Escape key press"] }), o$1("label", { children: [o$1("input", { type: "checkbox", checked: closeOnLostFocus, onInput: e => setCloseOnLostFocus(e.currentTarget.checked) }), " Close on focus lost"] }), o$1("label", { children: [o$1("input", { type: "checkbox", checked: focusTrapActive, onInput: e => setFocusTrapActive(e.currentTarget.checked) }), " Trap focus"] }), o$1("br", {})] }), o$1("div", { children: ["Last reason for closing: ", closeReason ?? "(hasn't been closed yet)"] }), o$1("button", { ...propsSource, onClick: () => setOpen(true), children: "Open Modal" }), o$1("div", { ...useMergedProps(propsFocusContainer, propsPopup), style: `border: ${depth}px dotted red; background: #ccc`, children: o$1("div", { style: { display: open ? "flex" : "none", flexDirection: "column" }, children: [o$1("div", { children: ["Modal element at depth ", depth, " with ", hasChild ? "a" : "no", " child"] }), o$1("label", { children: [o$1("input", { type: "checkbox", checked: hasChild, onInput: e => setHasChild(e.currentTarget.checked), ref: buttonRef }), " Add a child modal"] }), hasChild && o$1(DemoUseModal, { parentDepth: depth }), o$1("button", { ...propsSource, onClick: () => setOpen(false), children: "Close modal programmatically" })] }) })] }));
-    }
-
-    const RandomWords$1 = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
-    const ListNavigationSingleSelectionChildContext = B$2(null);
-    const DemoUseRovingTabIndex = R(() => {
-        const [selectionMode, setSelectionMode] = useState("activation");
-        const [count, setCount] = useState(10);
-        const [min, setMin] = useState(0);
-        // const [selectedIndex, _setLocalSelectedIndex] = useState<number | null>(0);
-        // const [tabbableIndex, _setLocalTabbableIndex] = useState<number | null>(0);
-        console.log(`rovingTabIndex parent render`);
-        const r = useCompleteListNavigation({
-            rovingTabIndexParameters: { onTabbableIndexChange: null, untabbable: false },
-            singleSelectionParameters: { initiallySelectedIndex: 0, setSelectedIndex: useStableCallback(newIndex => { /*setLocalSelectedIndex(newIndex);*/ setSelectedIndex(newIndex); }) },
-            typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000 },
-            linearNavigationParameters: { disableArrowKeys: false, disableHomeEndKeys: false, navigationDirection: "vertical", navigatePastEnd: "wrap", navigatePastStart: "wrap", pageNavigationSize: 0.1 },
-            rearrangeableChildrenParameters: {
-                getIndex: T$1((a) => a.props.index, []),
-            },
-            sortableChildrenParameters: { compare: T$1((rhs, lhs) => { return lhs.index - rhs.index; }, []) },
-        });
-        const { props, context, rovingTabIndexReturn: { setTabbableIndex }, singleSelectionReturn: { setSelectedIndex }, managedChildrenReturn: { getChildren }, typeaheadNavigationReturn: { invalidTypeahead }, rearrangeableChildrenReturn: { useRearrangedChildren, shuffle }
-        //        rearrangeableChildrenReturn: { useRearrangedChildren: useSortableProps, shuffle }
-         } = r;
-        //useSingleSelectionDeclarative({ singleSelectionReturn: {  setSelectedIndex }, singleSelectionDeclarativeParameters: { selectedIndex } });
-        const children = getChildren();
-        const jsxChildren = Array.from((function* () {
-            for (let i = min; i < (count); ++i) {
-                yield o$1(DemoUseRovingTabIndexChild, { index: i }, i);
-            }
-        })());
-        return (o$1("div", { className: "demo", children: [o$1("h2", { children: "Keyboard & List Navigation" }), o$1("h3", { children: o$1("code", { children: "useCompleteListNavigation" }) }), o$1("p", { children: "This hook accomplishes a few things:" }), o$1("ul", { children: [o$1("li", { children: ["Turns a group of widgets into one singular composite widget with only ", o$1("strong", { children: "a single tab stop" }), " shared between them (a \"roving\" tab stop, because it wanders back and forth)."] }), o$1("li", { children: ["Navigation within this composite widget is done via:", o$1("ul", { children: [o$1("li", { children: "Arrow keys (up/down or left/right depending in the orientation you specify)" }), o$1("li", { children: "Page Up/Down to jump by a larger amount (either a fixed number or some percentage of the total number of items, as you specify)" }), o$1("li", { children: "Home/End to jump to the first or last item" })] })] }), o$1("li", { children: "Items can be marked as \"hidden\", in which case they are skipped over when navigating, no matter the method. E.G. if Home is pressed but the first item is hidden, the second item is focused instead." }), o$1("li", { children: "Items can be marked as \"disabled\" to prevent selection (with or without also marking them as \"hidden\", though \"hidden\" implies \"disabled\")." }), o$1("li", { children: "Children can be reordered arbitrarily, including sorting, shuffling, etc. while ensuring coherent navigation regardless." }), o$1("li", { children: ["The parent's selected index is ", o$1("strong", { children: "uncontrolled" }), " and so it does not re-render itself when the selected index changes (you can easily make it controlled, of course, at the cost of 1 additional render. See ", o$1("code", { children: "useSingleSelectionDeclarative" }), " for a shortcut to do exactly that)"] }), o$1("li", { children: "Changing which child is focused or selected only re-renders a maximum of 2 children each time." }), o$1("li", { children: ["Lists can be nested, and there is no strict requirement on DOM structure*", o$1("ul", { children: o$1("li", { children: ["*Using re-arrangeable children does impose some restrictions and so is ", o$1("strong", { children: "optional" }), "; it requires all those children be in one contiguous array of VNodes so that their ", o$1("code", { children: "key" }), " props can be manipulated."] }) })] })] }), o$1("p", { children: "The biggest restriction of this method is that every child needs a 0-based numeric index." }), o$1("label", { children: ["# of items", o$1("input", { type: "number", value: count, min: 0, onInput: e => { e.preventDefault(); setCount(e.currentTarget.valueAsNumber); } })] }), o$1("button", { onClick: () => shuffle(children), children: "Shuffle" }), o$1("label", { children: ["Imperatively set the tabbable index to: ", o$1("input", { type: "number", onInput: e => { e.preventDefault(); setTabbableIndex(e.currentTarget.valueAsNumber, e, false); } })] }), o$1("label", { children: ["Imperatively set the selected index to: ", o$1("input", { type: "number", onInput: e => { e.preventDefault(); setSelectedIndex(e.currentTarget.valueAsNumber); } })] }), o$1("label", { children: ["Skip rendering the first N children: ", o$1("input", { type: "number", min: 0, onInput: e => { e.preventDefault(); setMin(e.currentTarget.valueAsNumber); } })] }), o$1("label", { children: ["Selection mode:", o$1("label", { children: [o$1("input", { name: "rti-demo-selection-mode", type: "radio", checked: selectionMode == 'focus', onInput: e => { e.preventDefault(); setSelectionMode("focus"); } }), " On focus"] }), o$1("label", { children: [o$1("input", { name: "rti-demo-selection-mode", type: "radio", checked: selectionMode == 'activation', onInput: e => { e.preventDefault(); setSelectionMode("activation"); } }), " On activation (click, tap, Enter, Space, etc.)"] })] }), o$1(SelectionModeContext.Provider, { value: selectionMode, children: o$1(ListNavigationSingleSelectionChildContext.Provider, { value: context, children: o$1("ol", { ...props, children: useRearrangedChildren(jsxChildren) }) }) }), o$1("div", { children: invalidTypeahead && "Invalid typeahead (no matches for the current string)" })] }));
-    });
-    const SelectionModeContext = B$2("focus");
-    const DemoUseRovingTabIndexChild = R((({ index }) => {
-        const selectionMode = q(SelectionModeContext);
-        let disabled = (index == 6);
-        let hidden = (index == 7);
-        if (index == 8) {
-            disabled = hidden = true;
-        }
-        const [randomWord] = useState(() => RandomWords$1[index /*Math.floor(Math.random() * (RandomWords.length - 1))*/]);
-        const context = q(ListNavigationSingleSelectionChildContext);
-        const focusSelf = T$1((e) => { e.focus(); }, []);
-        // const { refElementReturn } = useRefElement<HTMLLIElement>({ refElementParameters: { onElementChange: undefined } });
-        //const { getElement, propsStable: p3 } = refElementReturn;
-        const getSortValue = useStableCallback(() => index);
-        const { props, rovingTabIndexChildReturn: { tabbable, propsUnstable: p2 }, singleSelectionChildReturn: { selected } } = useCompleteListNavigationChild({
-            managedChildParameters: { index },
-            rovingTabIndexChildParameters: { hidden },
-            sortableChildParameters: { getSortValue },
-            pressParameters: { onPressSync: null, exclude: {}, focusSelf },
-            singleSelectionChildParameters: { ariaPropName: "aria-selected", selectionMode, disabled },
-            completeListNavigationChildParameters: { foo: "bar" },
-            context,
-            textContentParameters: { getText: T$1((e) => { return e?.textContent ?? ""; }, []) }
-        });
-        console.log(`rovingTabIndex child #${index} render (${selected.toString()})`);
-        const text = `${randomWord} This is item #${index}${hidden ? " (hidden)" : ""}${disabled ? " (disabled)" : ""}${selected ? " (selected)" : " (not selected)"} (${tabbable ? "Tabbable" : "Not tabbable"})`;
-        /*
-            const {
-                hasCurrentFocusParameters: { onCurrentFocusedInnerChanged, ...void5 },
-                managedChildParameters: { getSelected, selected, setSelected, ...void4 },
-                pressParameters: { onPressSync, ...void3 },
-                rovingTabIndexChildReturn: { setTabbable, getTabbable, propsUnstable: p2, tabbable, ...void2 },
-                singleSelectionChildReturn: { propsUnstable: p4, ...void1 },
-                ...void6
-            } = useListNavigationSingleSelectionChild<HTMLLIElement>({
-                managedChildParameters: { hidden, index, disabled },
-                rovingTabIndexChildParameters: rovingTabIndexChildParameters,
-                rovingTabIndexReturn,
-                singleSelectionChildParameters: { ariaPropName: "aria-selected", selectionMode },
-                singleSelectionReturn,
-                typeaheadNavigationChildParameters: { text, ...typeaheadNavigationChildParameters }
-            });
-        
-            const {
-                pressReturn: { propsStable: p5 }
-            } = usePress<HTMLLIElement>({
-                pressParameters: { exclude: {}, focusSelf, onPressSync, onPseudoActiveStart: null, onPseudoActiveStop: null },
-                refElementReturn
-            })
-        
-            useManagedChild<UseListNavigationSingleSelectionChildInfo<HTMLLIElement>>({
-                managedChildParameters: { index, focusSelf, getElement, getSelected, getTabbable, hidden, selected, setSelected, setTabbable, tabbable, disabled },
-                managedChildrenReturn
-            });
-        
-            assertEmptyObject(void1);
-            assertEmptyObject(void2);
-            assertEmptyObject(void3);
-            assertEmptyObject(void4);
-            assertEmptyObject(void5);
-            assertEmptyObject(void6);
-        
-            const {
-                hasCurrentFocusReturn: { propsStable: p6 }
-            } = useHasCurrentFocus({
-                refElementReturn,
-                hasCurrentFocusParameters: {
-                    onCurrentFocusedChanged: null,
-                    onCurrentFocusedInnerChanged
-                }
-            });
-        
-            const props = useMergedProps<HTMLLIElement>(p2, p3, p4, p5, p6);*/
-        return (o$1("li", { ...props, children: [text, o$1("input", { ...useMergedProps(p2, { type: "number" }), style: { width: "5ch" } })] }));
-    }));
-
-    const DemoUseTimeout = () => {
-        const [timeout, setTimeout] = p(1000);
-        const [triggerIndex, setTriggerIndex] = p("");
-        const [fireCount, setFireCount] = p(0);
-        useTimeout({ timeout, triggerIndex, callback: () => setFireCount(i => ++i) });
-        return (o$1("div", { class: "demo", children: [o$1("label", { children: ["Timeout duration: ", o$1("input", { type: "number", value: timeout, onInput: e => setTimeout(e.currentTarget.valueAsNumber) })] }), o$1("label", { children: ["Refresh key: ", o$1("input", { type: "text", value: triggerIndex, onInput: e => setTriggerIndex(e.currentTarget.value) })] }), o$1("div", { children: ["The callback has been called ", fireCount, " time", fireCount === 1 ? "" : "s", "."] })] }));
-    };
-
     const RandomWords = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
-    const DemoUseDroppable = () => {
-        const { droppedFiles, droppedStrings, filesForConsideration, stringsForConsideration, propsStable: props, dropError } = useDroppable({ effect: "copy" });
-        useMergedProps({}, { ref: _(null) });
-        const p = useMergedProps(props, { className: "demo droppable" });
-        return (o$1("div", { ...p, children: [droppedStrings != null && o$1("div", { children: ["Data dropped: ", o$1("ul", { children: Object.entries(droppedStrings).map(([type, value]) => o$1("li", { children: [type, ": ", value] })) })] }), droppedFiles != null && o$1("div", { children: ["Files dropped: ", o$1("table", { children: [o$1("thead", { children: o$1("tr", { children: [o$1("th", { children: "Name" }), o$1("th", { children: "Size" }), o$1("th", { children: "Type" }), o$1("th", { children: "Last modified" })] }) }), o$1("tbody", { children: droppedFiles.map(f => o$1("tr", { children: [o$1("td", { children: f.name }), f.data.byteLength, o$1("td", { children: f.type }), o$1("td", { children: new Date(f.lastModified ?? 0) })] })) })] })] }), o$1("hr", {}), stringsForConsideration != null && o$1("div", { children: ["Data being considered: ", o$1("ul", { children: Array.from(stringsForConsideration).map(type => o$1("li", { children: type })) })] }), filesForConsideration != null && o$1("div", { children: ["Files being considered: ", o$1("ul", { children: filesForConsideration.map(f => o$1("li", { children: JSON.stringify(f) })) })] }), o$1("hr", {}), dropError && o$1("div", { children: dropError instanceof Error ? dropError.message : JSON.stringify(dropError) })] }));
-    };
-    const DemoUseDraggable = () => {
-        const { propsUnstable: props } = useDraggable({ data: { "text/plain": "This is custom draggable content of type text/plain." } });
-        return (o$1("div", { ...useMergedProps(props, { className: "demo" }), children: "Draggable content" }));
-    };
-    const DemoUseElementSizeAnimation = () => {
-        return o$1("div", {});
-    };
-    const DemoUseFocusTrap = R(({ depth }) => {
+    B$2(null);
+    R(({ depth }) => {
         const [active, setActive] = useState(false);
         const { focusTrapReturn: { propsUnstable }, refElementReturn: { propsStable } } = useFocusTrap({
             focusTrapParameters: {
@@ -6509,7 +5706,7 @@ var bundle = (function (exports) {
     const DemoUseFocusTrapChild = R(({ setActive, active }) => {
         return (o$1(p$1, { children: [o$1("button", { children: "Button 1" }), o$1("button", { children: "Button 2" }), o$1("button", { children: "Button 3" }), o$1("label", { children: ["Active: ", o$1("input", { type: "checkbox", checked: active, onInput: e => { e.preventDefault(); setActive(e.currentTarget.checked); } })] })] }));
     });
-    const DemoUseAsyncHandler1 = R(() => {
+    R(() => {
         const [timeout, setTimeout] = useState(1000);
         const [debounce, setDebounce] = useState(0);
         const [shouldThrow, setShouldThrow, getShouldThrow] = useState(false);
@@ -6519,7 +5716,7 @@ var bundle = (function (exports) {
         const onClick = pending ? undefined : syncHandler;
         return (o$1("div", { className: "demo", children: [o$1("button", { disabled: pending && disableConsecutive, onClick: onClick, children: "Click me!" }), o$1("label", { children: ["Sleep for: ", o$1("input", { type: "number", value: timeout, onInput: e => setTimeout(e.currentTarget.valueAsNumber) })] }), o$1("label", { children: ["Throw an error ", o$1("input", { type: "checkbox", checked: shouldThrow, onInput: e => setShouldThrow(e.currentTarget.checked) })] }), o$1("label", { children: ["Disabled while pending ", o$1("input", { type: "checkbox", checked: disableConsecutive, onInput: e => setDisableConsecutive(e.currentTarget.checked) })] }), o$1("label", { children: ["Debounce: ", o$1("input", { type: "number", value: debounce, onInput: e => setDebounce(e.currentTarget.valueAsNumber) })] }), o$1("table", { children: [o$1("thead", { children: o$1("tr", { children: [o$1("th", { children: "Field" }), o$1("th", { children: "Value" })] }) }), o$1("tbody", { children: [o$1("tr", { children: [o$1("td", { children: "callCount" }), o$1("td", { children: callCount })] }), o$1("tr", { children: [o$1("td", { children: "settleCount" }), o$1("td", { children: settleCount })] }), o$1("tr", { children: [o$1("td", { children: "resolveCount" }), o$1("td", { children: resolveCount })] }), o$1("tr", { children: [o$1("td", { children: "rejectCount" }), o$1("td", { children: rejectCount })] }), o$1("tr", { children: [o$1("td", { children: "hasError" }), o$1("td", { children: hasError.toString() })] }), o$1("tr", { children: [o$1("td", { children: "hasCapture" }), o$1("td", { children: hasCapture.toString() })] })] })] })] }));
     });
-    const DemoUseAsyncHandler2 = R(() => {
+    R(() => {
         const [timeout, setTimeout] = useState(1000);
         const [debounce, setDebounce] = useState(0);
         const [shouldThrow, setShouldThrow, getShouldThrow] = useState(false);
@@ -6540,7 +5737,9 @@ var bundle = (function (exports) {
     function getDocument() {
         return window.document;
     }
-    const DemoFocus = R(() => {
+    R(() => {
+        const [focusCount, setFocusCount] = useState(0);
+        const [innerFocusCount, setInnerFocusCount] = useState(0);
         const [lastActiveElement, setLastActiveElement] = useState(null);
         const [activeElement, setActiveElement] = useState(null);
         const [windowFocused, setWindowFocused] = useState(false);
@@ -6553,8 +5752,16 @@ var bundle = (function (exports) {
         const { hasCurrentFocusReturn: { propsStable: p1 } } = useHasCurrentFocus({
             refElementReturn,
             hasCurrentFocusParameters: {
-                onCurrentFocusedChanged: setFocused,
-                onCurrentFocusedInnerChanged: setFocusedInner,
+                onCurrentFocusedChanged: useStableCallback((focused) => {
+                    setFocused(focused);
+                    if (focused)
+                        setFocusCount(c => ++c);
+                }),
+                onCurrentFocusedInnerChanged: useStableCallback((focused) => {
+                    setFocusedInner(focused);
+                    if (focused)
+                        setInnerFocusCount(c => ++c);
+                }),
             }
         });
         useHasLastFocus({
@@ -6570,279 +5777,8 @@ var bundle = (function (exports) {
                 onLastFocusedInnerChanged: setLastFocusedInner,
             }
         });
-        return (o$1("div", { class: "demo", children: [o$1("h2", { children: "useHasFocus" }), o$1("div", { ...(useMergedProps(p2, p1, { style: { border: "1px solid black" }, tabIndex: 0 })), children: ["Outer ", o$1("div", { tabIndex: 0, style: { border: "1px solid black" }, children: "Inner element" })] }), o$1("div", { children: o$1("ul", { children: [o$1("li", { children: ["Strictly focused: ", focused.toString(), ", ", lastFocused.toString()] }), o$1("li", { children: ["Inner focused: ", focusedInner.toString(), ", ", lastFocusedInner.toString()] }), o$1("li", { children: ["Window focused: ", windowFocused.toString()] }), o$1("li", { children: ["activeElement: ", activeElement?.textContent] }), o$1("li", { children: ["lastActiveElement: ", lastActiveElement?.textContent] })] }) })] }));
+        return (o$1("div", { class: "demo", children: [o$1("h2", { children: "useHasFocus" }), o$1("p", { children: "Tracks focus related to the component:" }), o$1("ul", { children: [o$1("li", { children: "Is this element (or, optionally, any element within it) focused?" }), o$1("li", { children: ["Regardless of if focus was lost because the ", o$1("code", { children: "body" }), " was clicked, was this element (or, optionally, any element within it), the last to be actually focused?"] }), o$1("li", { children: "Does the window have focus?" })] }), o$1("div", { ...(useMergedProps(p2, p1, { style: { border: "1px solid black" }, tabIndex: 0 })), children: [o$1("span", { children: "Outer element" }), o$1("input", {}), o$1("input", {}), o$1("div", { tabIndex: 0, style: { border: "1px solid black" }, children: [o$1("span", { children: "Inner element" }), o$1("input", {}), o$1("input", {})] })] }), o$1("div", { children: o$1("ul", { children: [o$1("li", { children: ["Focus count: ", focusCount] }), o$1("li", { children: ["Inner focus count: ", innerFocusCount] }), o$1("li", { children: ["Strictly focused: ", focused.toString(), ", ", lastFocused.toString(), " (focused, lastFocused)"] }), o$1("li", { children: ["Inner focused: ", focusedInner.toString(), ", ", lastFocusedInner.toString(), " (focusedInner, lastFocusedInner)"] }), o$1("li", { children: ["Window focused: ", windowFocused.toString()] }), o$1("li", { children: ["activeElement: ", activeElement?.textContent] }), o$1("li", { children: ["lastActiveElement: ", lastActiveElement?.textContent] })] }) })] }));
     });
-    /*
-    interface GridDemoParameters<GridParentElement extends Element, GridRowElement extends Element, GridCellElement extends Element> {
-        rearrangeableChildrenParameters: Omit<UseSortableChildrenParameters<GridChildRowInfo<GridRowElement>>["rearrangeableChildrenParameters"], "getHighestChildIndex">;
-        sortableChildrenParameters: UseSortableChildrenParameters<GridChildRowInfo<GridRowElement>>["sortableChildrenParameters"];
-        gridNavigationParameters: UseGridNavigationParameters<GridRowElement, GridChildRowInfo<GridRowElement>>["gridNavigationParameters"];
-        rovingTabIndexParameters: UseGridNavigationParameters<GridRowElement, GridChildRowInfo<GridRowElement>>["rovingTabIndexParameters"];
-        typeaheadNavigationParameters: UseGridNavigationParameters<GridRowElement, GridChildRowInfo<GridRowElement>>["typeaheadNavigationParameters"];
-        linearNavigationParameters: Omit<UseGridNavigationParameters<GridRowElement, GridChildRowInfo<GridRowElement>>["linearNavigationParameters"], "getHighestIndex" | "navigateAbsolute" | "navigateRelative">;
-    }
-    interface GridDemoRowParameters<GridRowElement extends Element, GridCellElement extends Element> {
-        asChildRowOfTable: {
-            gridNavigationRowParameters: UseGridNavigationRowParameters<GridRowElement, GridCellElement, GridChildRowInfo<GridRowElement>, GridChildCellInfo<GridCellElement>>["asChildRowOfTable"]["gridNavigationRowParameters"];
-            managedChildParameters: UseGridNavigationRowParameters<GridRowElement, GridCellElement, GridChildRowInfo<GridRowElement>, GridChildCellInfo<GridCellElement>>["asChildRowOfTable"]["managedChildParameters"];
-            managedChildrenReturn: UseManagedChildrenReturnTypeInfo<GridChildRowInfo<GridRowElement>>["managedChildrenReturn"];
-            rovingTabIndexChildParameters: UseGridNavigationRowParameters<GridRowElement, GridCellElement, GridChildRowInfo<GridRowElement>, GridChildCellInfo<GridCellElement>>["asChildRowOfTable"]["rovingTabIndexChildParameters"];
-            typeaheadNavigationChildParameters: UseGridNavigationRowParameters<GridRowElement, GridCellElement, GridChildRowInfo<GridRowElement>, GridChildCellInfo<GridCellElement>>["asChildRowOfTable"]["typeaheadNavigationChildParameters"];
-        };
-        asParentRowOfCells: {
-            linearNavigationParameters: Omit<UseGridNavigationRowParameters<GridRowElement, GridCellElement, GridChildRowInfo<GridRowElement>, GridChildCellInfo<GridCellElement>>["asParentRowOfCells"]["linearNavigationParameters"], "getHighestIndex" | "navigateAbsolute" | "navigateRelative">;
-            typeaheadNavigationParameters: UseGridNavigationRowParameters<GridRowElement, GridCellElement, GridChildRowInfo<GridRowElement>, GridChildCellInfo<GridCellElement>>["asParentRowOfCells"]["typeaheadNavigationParameters"];
-            rovingTabIndexParameters: UseGridNavigationRowParameters<GridRowElement, GridCellElement, GridChildRowInfo<GridRowElement>, GridChildCellInfo<GridCellElement>>["asParentRowOfCells"]["rovingTabIndexParameters"];
-        }
-    }
-    interface GridDemoCellParameters<GridCellElement extends Element> extends UseGridNavigationCellParameters<GridCellElement> {
-        managedChildrenReturn: UseManagedChildrenReturnTypeInfo<GridChildCellInfo<GridCellElement>>["managedChildrenReturn"];
-        managedChildParameters: Pick<UseManagedChildParameters<GridChildCellInfo<GridCellElement>>["managedChildParameters"], "index" | "hidden">;
-    }
-
-    interface GridDemoReturn<GridParentElement extends Element, GridRowElement extends Element, GridCellElement extends Element> extends
-        Omit<UseSortableChildrenReturnTypeWithHooks<GridParentElement, GridChildRowInfo<GridRowElement>>, "linearNavigationParameters">,
-        Omit<UseGridNavigationReturnType<GridParentElement, GridRowElement>, "gridNavigationRowParameters" | "managedChildrenParameters"> {
-        props: h.JSX.HTMLAttributes<GridParentElement>;
-        context: UseGridNavigationContext<GridParentElement, GridRowElement> & UseManagedChildrenContext<GridChildRowInfo<GridRowElement>>;
-        managedChildrenReturn: UseManagedChildrenReturnTypeInfo<GridChildRowInfo<GridRowElement>>["managedChildrenReturn"];
-    }
-    interface GridDemoRowReturn<GridRowElement extends Element, GridCellElement extends Element> {
-        context: UseGridNavigationRowContext<GridRowElement, GridCellElement> & UseManagedChildrenContext<GridChildCellInfo<GridCellElement>>;
-        props: h.JSX.HTMLAttributes<GridRowElement>;
-
-        asChildRowOfTable: {
-            rovingTabIndexChildReturn: UseGridNavigationRowReturnType<GridRowElement, GridCellElement>["asChildRowOfTable"]["rovingTabIndexChildReturn"];
-            managedChildrenReturn: UseManagedChildrenReturnTypeInfo<GridChildRowInfo<GridRowElement>>["managedChildrenReturn"];
-        };
-        asParentRowOfCells: {
-            gridNavigationCellParameters: UseGridNavigationRowReturnType<GridRowElement, GridCellElement>["asParentRowOfCells"]["gridNavigationCellParameters"];
-            linearNavigationReturn: UseGridNavigationRowReturnType<GridRowElement, GridCellElement>["asParentRowOfCells"]["linearNavigationReturn"];
-            rovingTabIndexChildParameters: UseGridNavigationRowReturnType<GridRowElement, GridCellElement>["asParentRowOfCells"]["rovingTabIndexChildParameters"];
-            rovingTabIndexReturn: UseGridNavigationRowReturnType<GridRowElement, GridCellElement>["asParentRowOfCells"]["rovingTabIndexReturn"];
-            typeaheadNavigationChildParameters: UseGridNavigationRowReturnType<GridRowElement, GridCellElement>["asParentRowOfCells"]["typeaheadNavigationChildParameters"];
-            typeaheadNavigationReturn: UseGridNavigationRowReturnType<GridRowElement, GridCellElement>["asParentRowOfCells"]["typeaheadNavigationReturn"];
-        }
-    }
-    interface GridDemoCellReturn<GridCellElement extends Element> {
-        props: h.JSX.HTMLAttributes<GridCellElement>;
-        rovingTabIndexChildReturn: UseGridNavigationCellReturnType<GridCellElement>["rovingTabIndexChildReturn"];
-        //managedChildrenReturn: UseManagedChildrenReturnTypeInfo<GridChildRowInfo<GridCellElement>>["managedChildrenReturn"];
-    }
-
-    function useGridDemo<GridParentElement extends Element, GridRowElement extends Element, GridCellElement extends Element>({
-        rearrangeableChildrenParameters,
-        sortableChildrenParameters,
-        gridNavigationParameters,
-        linearNavigationParameters: { disableArrowKeys, disableHomeEndKeys },
-        rovingTabIndexParameters,
-        typeaheadNavigationParameters
-    }: GridDemoParameters<GridParentElement, GridRowElement, GridCellElement>): GridDemoReturn<GridParentElement, GridRowElement, GridCellElement> {
-
-        const getHighestIndex = useCallback(() => getChildren().getHighestIndex(), []);
-        const getChildren = useCallback<typeof getChildren2>(() => { return getChildren2() }, []);
-
-        const { linearNavigationParameters: { navigateAbsolute, navigateRelative }, ...sortableChildrenReturn } = useSortableChildren<GridParentElement, GridChildRowInfo<GridRowElement>>({
-            rearrangeableChildrenParameters: {
-                getHighestChildIndex: getHighestIndex,
-                ...rearrangeableChildrenParameters
-            },
-            sortableChildrenParameters
-        });
-
-        const {
-            gridNavigationRowParameters,
-            linearNavigationReturn,
-            managedChildrenParameters,
-            rovingTabIndexChildParameters,
-            rovingTabIndexReturn,
-            typeaheadNavigationChildParameters,
-            typeaheadNavigationReturn,
-            ...void1
-        } = useGridNavigation<GridParentElement, GridRowElement, GridChildRowInfo<GridRowElement>>({
-            gridNavigationParameters,
-            linearNavigationParameters: { getHighestIndex, navigateAbsolute, navigateRelative, disableArrowKeys, disableHomeEndKeys },
-            managedChildrenReturn: { getChildren },
-            rovingTabIndexParameters,
-            typeaheadNavigationParameters
-        });
-
-        const {
-            managedChildrenReturn
-        } = useManagedChildren<GridChildRowInfo<GridRowElement>>({
-            managedChildrenParameters: {
-                onAfterChildLayoutEffect: null,
-                onChildrenMountChange: null
-            }
-        });
-
-        const { propsStable: p1 } = linearNavigationReturn;
-        const { propsStable: p2 } = typeaheadNavigationReturn;
-
-        const { getChildren: getChildren2 } = managedChildrenReturn;
-
-        const props = useMergedProps(p1, p2);
-        const context = useStableObject({ gridNavigationRowParameters, rovingTabIndexChildParameters, typeaheadNavigationChildParameters, managedChildrenReturn });
-
-        return {
-            context,
-            props,
-            ...sortableChildrenReturn,
-            linearNavigationReturn,
-            rovingTabIndexReturn,
-            typeaheadNavigationChildParameters,
-            typeaheadNavigationReturn,
-            rovingTabIndexChildParameters,
-            managedChildrenReturn
-        }
-
-    }
-
-    function useGridRowDemo<GridRowElement extends Element, GridCellElement extends Element>({
-        asChildRowOfTable: asChildRowOfTableP,
-        asParentRowOfCells: asParentRowOfCellsP
-    }: GridDemoRowParameters<GridRowElement, GridCellElement>): GridDemoRowReturn<GridRowElement, GridCellElement> {
-        const getHighestIndex = useCallback(() => getChildren().getHighestIndex(), []);
-        const getChildren = useCallback(() => { return getChildren2() }, []);
-
-
-        const navigateAbsolute = useCallback((n: number) => { return n; }, [])
-        const navigateRelative = useCallback((n: number, o: number) => { return n + o; }, [])
-
-        const { refElementReturn } = useRefElement<GridRowElement>({ refElementParameters: {} });
-        const { getElement, propsStable: p5 } = refElementReturn;
-        const { propsStable: p4 } = refElementReturn;
-        const setTabbableIndex2 = useStableCallback((a: Parameters<StateUpdater<number | null>>[0], b: boolean) => { setTabbableIndex(a, b) });
-        const gridNavRet: UseGridNavigationRowReturnType<GridRowElement, GridCellElement> = useGridNavigationRow<GridRowElement, GridCellElement, GridChildRowInfo<GridRowElement>, GridChildCellInfo<GridCellElement>>({
-            asChildRowOfTable: {
-                ...asChildRowOfTableP,
-                managedChildrenReturn: { getChildren },
-                rovingTabIndexReturn: { setTabbableIndex: setTabbableIndex2 },
-            },
-            asParentRowOfCells: {
-                linearNavigationParameters: { ...asParentRowOfCellsP.linearNavigationParameters, getHighestIndex, navigateAbsolute, navigateRelative },
-                managedChildrenReturn: { getChildren },
-                rovingTabIndexParameters: asParentRowOfCellsP.rovingTabIndexParameters,
-                typeaheadNavigationParameters: asParentRowOfCellsP.typeaheadNavigationParameters,
-            }
-        });
-
-        const { asChildRowOfTable: asChildRowOfTableR, asParentRowOfCells: asParentRowOfCellsR, ...void10 } = gridNavRet;
-        const { propsStable: p3, ...void2 } = asParentRowOfCellsR.linearNavigationReturn;
-        const { getTabbableIndex, setTabbableIndex, ...void3 } = asParentRowOfCellsR.rovingTabIndexReturn;
-        const { getTabbable, propsUnstable, setTabbable, tabbable, ...void7 } = asChildRowOfTableR.rovingTabIndexChildReturn;
-
-        const { hasCurrentFocusReturn, ...void8 } = useHasCurrentFocus<GridRowElement>({ refElementReturn, hasCurrentFocusParameters: { onCurrentFocusedChanged: null, ...asChildRowOfTableR.hasCurrentFocusParameters } });
-
-        const { managedChildParameters: { hidden, index } } = asChildRowOfTableP;
-
-        useManagedChild<GridChildRowInfo<GridRowElement>>({
-            managedChildParameters: { getElement, getTabbable, hidden, index, setTabbable, tabbable, ...asChildRowOfTableR.managedChildParameters },
-            managedChildrenReturn: asChildRowOfTableP.managedChildrenReturn
-        })
-
-        const {
-            managedChildrenReturn: mcr2,
-            ...void9
-        } = useManagedChildren<GridChildCellInfo<GridCellElement>>({
-            managedChildrenParameters: {
-                onAfterChildLayoutEffect: null,
-                ...asParentRowOfCellsR.managedChildrenParameters
-            }
-        });
-
-
-        assertEmptyObject(void2);
-        assertEmptyObject(void3);
-        assertEmptyObject(void7);
-        assertEmptyObject(void8);
-        assertEmptyObject(void9);
-        assertEmptyObject(void10);
-
-        const { propsStable: p2 } = asParentRowOfCellsR.typeaheadNavigationReturn;
-        const { propsStable: p1 } = hasCurrentFocusReturn;
-
-        const { getChildren: getChildren2 } = mcr2;
-
-        const props = useMergedProps(p1, p2, p3, p4, p5);
-        const context = useStableObject<GridCellContext<GridRowElement, GridCellElement>>({
-            rovingTabIndexChildParameters: asParentRowOfCellsR.rovingTabIndexChildParameters,
-            typeaheadNavigationChildParameters: asParentRowOfCellsR.typeaheadNavigationChildParameters,
-            gridNavigationCellParameters: asParentRowOfCellsR.gridNavigationCellParameters,
-            rovingTabIndexReturn: asParentRowOfCellsR.rovingTabIndexReturn,
-            managedChildrenReturn: mcr2
-        });
-
-
-        return {
-            asChildRowOfTable: {
-                managedChildrenReturn: asChildRowOfTableP.managedChildrenReturn,
-                ...asChildRowOfTableR,
-            },
-            asParentRowOfCells: asParentRowOfCellsR,
-            context,
-            props,
-
-        }
-
-    }
-
-    function useGridCellDemo<CellElement extends Element>({
-        gridNavigationCellParameters,
-        managedChildrenReturn,
-        rovingTabIndexChildParameters,
-        rovingTabIndexReturn,
-        typeaheadNavigationChildParameters,
-        managedChildParameters: { index, hidden },
-        ...void4
-    }: GridDemoCellParameters<CellElement>): GridDemoCellReturn<CellElement> {
-
-
-        const { refElementReturn } = useRefElement<CellElement>({ refElementParameters: {} });
-        const { propsStable: p1, getElement } = refElementReturn;
-
-        const {
-            hasCurrentFocusParameters,
-            rovingTabIndexChildReturn,
-            ...void3
-        } = useGridNavigationCell<CellElement>({
-            gridNavigationCellParameters: { ...gridNavigationCellParameters, colSpan: 1 },
-            managedChildParameters: { hidden, index },
-            rovingTabIndexChildParameters,
-            rovingTabIndexReturn,
-            typeaheadNavigationChildParameters
-        });
-
-
-        const { onCurrentFocusedInnerChanged, ...void1 } = hasCurrentFocusParameters;
-        const { getTabbable, propsUnstable: p2, setTabbable, tabbable, ...void2 } = rovingTabIndexChildReturn;
-
-        assertEmptyObject(void1);
-        assertEmptyObject(void2);
-        assertEmptyObject(void3);
-        assertEmptyObject(void4);
-        const focusSelf = useCallback((e: CellElement) => { (e as Element as HTMLElement).focus(); }, [])
-
-        const {
-            hasCurrentFocusReturn: { propsStable: p3 }
-        } = useHasCurrentFocus<CellElement>({
-            refElementReturn,
-            hasCurrentFocusParameters: { onCurrentFocusedChanged: null, onCurrentFocusedInnerChanged }
-        });
-
-        useManagedChild<GridChildCellInfo<CellElement>>({
-            managedChildParameters: { index, focusSelf, getElement, getTabbable, hidden: false, setTabbable, tabbable },
-            managedChildrenReturn
-        });
-
-        const props = useMergedProps<CellElement>(p1, p2, p3);
-
-        return {
-            props,
-            rovingTabIndexChildReturn
-        }
-    }
-    */
     //const GridRowContext = createContext<UseGridNavigationRow<HTMLTableRowElement, HTMLTableCellElement, {}, {}, string, string>>(null!);
     //const GridCellContext = createContext<UseGridNavigationCell<HTMLTableCellElement, {}, string>>(null!);
     const DemoUseGrid = R(() => {
@@ -6875,55 +5811,8 @@ var bundle = (function (exports) {
         //rearrangeableChildrenParameters: { getHighestChildIndex: ghci, getValid: gv },
         rearrangeableChildrenReturn: { useRearrangedChildren } } = ret;
         //const { getChildren: getChildren2 } = managedChildrenReturn;
-        /*const {
-            linearNavigationParameters,
-            rearrangeableChildrenReturn,
-            sortableChildrenReturn,
-            useSortableProps,
-            ...void8
-        } = useSortableChildren<HTMLUListElement, GridChildRowInfo<HTMLTableCellElement>>({
-            rearrangeableChildrenParameters: {
-                getHighestChildIndex: getHighestIndex,
-                getIndex: useCallback<GetIndex<{ index: number }>>((a: VNode<{ index: number }>) => a.props.index, []),
-                getValid: useStableCallback<GetValid>((index) => { return !(getChildren().getAt(index)?.hidden) })
-            },
-            sortableChildrenParameters: { compare: useCallback((rhs, lhs) => { return lhs.index - rhs.index }, []) }
-        });
-
-        const { sort } = sortableChildrenReturn;
-
-        const {
-            gridNavigationRowParameters,
-            linearNavigationReturn,
-            managedChildrenParameters,
-            rovingTabIndexChildParameters,
-            rovingTabIndexReturn,
-            typeaheadNavigationChildParameters,
-            typeaheadNavigationReturn,
-            ...void1
-        } = useGridNavigation<HTMLTableSectionElement, HTMLTableRowElement, GridChildRowInfo<HTMLTableRowElement>>({
-            gridNavigationParameters: { onTabbableColumnChange: setTabbableColumn },
-            linearNavigationParameters: { disableArrowKeys: false, disableHomeEndKeys: false, getHighestIndex, ...linearNavigationParameters },
-            managedChildrenReturn: { getChildren },
-            rovingTabIndexParameters: { initiallyTabbedIndex: null, onTabbableIndexChange: null },
-            typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000 }
-        });
-
-        const {
-            managedChildrenReturn
-        } = useManagedChildren<GridChildRowInfo<HTMLTableRowElement>>({
-            managedChildrenParameters: {
-                onAfterChildLayoutEffect: null,
-                onChildrenMountChange: null
-            }
-        });
-
-        const { propsStable: p1 } = linearNavigationReturn;
-        const { propsStable: p2 } = typeaheadNavigationReturn;
-
-        const { getChildren: getChildren2 } = managedChildrenReturn;*/
-        return (o$1("div", { class: "demo", children: [o$1("div", { children: ["Current row: ", tabbableRow] }), o$1("div", { children: ["Current column: ", tabbableColumn] }), o$1("table", { ...{ border: "2" }, style: { whiteSpace: "nowrap" }, children: [o$1("thead", { children: o$1("tr", { children: [o$1("th", { children: "Row is tabbable?" }), o$1("th", { children: "Column 1" }), o$1("th", { children: "Column 2" }), o$1("th", { children: "Column 3" })] }) }), o$1(GridRowContext.Provider, { value: context, children: o$1("tbody", { ...props, children: ret.rearrangeableChildrenReturn.useRearrangedChildren(Array.from((function* () {
-                                    for (let i = 0; i < 10; ++i) {
+        return (o$1("div", { class: "demo", children: [o$1("h2", { children: "useGridNavigationComplete" }), o$1("p", { children: ["Like ", o$1("code", { children: "useCompleteListNavigation" }), " but for 2D navigation. Cells can span multiple columns. Rows can be filtered, sorted, and arbitrarily re-arranged."] }), o$1("div", { children: ["Current row: ", tabbableRow] }), o$1("div", { children: ["Current column: ", tabbableColumn] }), o$1("table", { ...{ border: "2" }, style: { whiteSpace: "nowrap" }, children: [o$1("thead", { children: o$1("tr", { children: [o$1("th", { children: "Row is tabbable?" }), o$1("th", { children: "Column 1" }), o$1("th", { children: "Column 2" }), o$1("th", { children: "Column 3" })] }) }), o$1(GridRowContext.Provider, { value: context, children: o$1("tbody", { ...props, children: useRearrangedChildren(Array.from((function* () {
+                                    for (let i = 0; i < 2; ++i) {
                                         yield o$1(DemoUseGridRow, { index: i }, i);
                                     }
                                 })())) }) })] })] }));
@@ -6953,7 +5842,7 @@ var bundle = (function (exports) {
             },
             rowAsParentOfCellsParameters: {
                 linearNavigationParameters: { disableArrowKeys: false, disableHomeEndKeys: false, navigatePastEnd: "wrap", navigatePastStart: "wrap" },
-                rovingTabIndexParameters: { onTabbableIndexChange: setTabbableColumn },
+                rovingTabIndexParameters: { onTabbableIndexChange: useStableCallback((i) => { setTabbableColumn(i); }) },
                 typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000 }
             }
         });
@@ -6996,20 +5885,14 @@ var bundle = (function (exports) {
             }
         }
     });
-    function DemoLabel() {
-        const { propsInput, propsLabel } = useRandomDualIds({ randomIdInputParameters: { prefix: "input-", otherReferencerProp: "for" }, randomIdLabelParameters: { prefix: "label-", otherReferencerProp: "aria-labelledby" } });
-        return (o$1("div", { className: "demo", children: [o$1("input", { ...propsInput }), o$1("label", { ...propsLabel, children: "Label" })] }));
-    }
     const Component = () => {
-        return o$1("div", { class: "flex", style: { flexWrap: "wrap" }, children: [o$1("div", { style: "display:grid;grid-template-columns:1fr 1fr", children: [o$1(DemoUseModal, {}), o$1(DemoUseModal, {})] }), o$1("hr", {}), o$1(DemoLabel, {}), o$1("hr", {}), o$1(DemoFocus, {}), o$1("hr", {}), o$1(DemoUseGrid, {}), o$1("hr", {}), o$1(DemoUseTimeout, {}), o$1("hr", {}), o$1(DemoUseInterval, {}), o$1("hr", {}), o$1(DemoUseRovingTabIndex, {}), o$1("hr", {}), o$1(DemoUseFocusTrap, {}), o$1("hr", {}), o$1(DemoUseAsyncHandler1, {}), o$1("hr", {}), o$1(DemoUseAsyncHandler2, {}), o$1("hr", {}), o$1(DemoUseDroppable, {}), o$1("hr", {}), o$1(DemoUseDraggable, {}), o$1("hr", {}), o$1(DemoUseElementSizeAnimation, {}), o$1("hr", {}), o$1("input", {})] });
+        return o$1("div", { class: "flex", style: { flexWrap: "wrap" }, children: [o$1("input", {}), o$1(DemoUseGrid, {}), o$1("input", {})] });
     };
     requestAnimationFrame(() => {
         P(o$1(Component, {}), document.getElementById("root"));
     });
 
     exports.DemoUseGrid = DemoUseGrid;
-
-    Object.defineProperty(exports, '__esModule', { value: true });
 
     return exports;
 

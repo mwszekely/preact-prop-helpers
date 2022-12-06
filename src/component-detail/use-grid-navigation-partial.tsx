@@ -1,4 +1,3 @@
-import { h } from "preact";
 import { assertEmptyObject, UseManagedChildrenReturnType } from "../preact-extensions/use-child-manager";
 import { OnPassiveStateChange, PassiveStateUpdater, usePassiveState } from "../preact-extensions/use-passive-state";
 import { useStableCallback } from "../preact-extensions/use-stable-callback";
@@ -105,10 +104,11 @@ export function useGridNavigation<ParentOrRowElement extends Element, RowElement
     const onTabbableIndexChangeOverride = useStableCallback((nextRow: number | null, previousRow: number | null | undefined, reason: Event | undefined) => {
         const children = getChildren();
         onTabbableIndexChange?.(nextRow, previousRow, reason);
+        const nextColumn = getCurrentTabbableColumn();
         if (previousRow != null)
-            children.getAt(previousRow)?.setTabbableColumnIndex(null, reason, false);
+            children.getAt(previousRow)?.setTabbableColumnIndex(nextColumn, reason, false);
         if (nextRow != null)
-            children.getAt(nextRow)?.setTabbableColumnIndex(getCurrentTabbableColumn(), reason, false);
+            children.getAt(nextRow)?.setTabbableColumnIndex(nextColumn, reason, false);
 
     })
 
@@ -172,7 +172,11 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
     }, []);
 
     const lncr = useListNavigationChild<RowElement>(asChildRowOfTable);
-    const lnr = useListNavigation<RowElement, CellElement, CM>({ ...asParentRowOfCellsP, rovingTabIndexParameters: { untabbable: !lncr.rovingTabIndexChildReturn.tabbable, ...rovingTabIndexParameters }, linearNavigationParameters: { navigationDirection: "horizontal", ...linearNavigationParameters } });
+    const untabbable = !lncr.rovingTabIndexChildReturn.tabbable;
+    //if (untabbable && asChildRowOfTable.managedChildParameters.index == 1)
+    //    debugger;
+    console.log(`Row #${asChildRowOfTable.managedChildParameters.index}${untabbable? " is untabbable" : ""}`)
+    const lnr = useListNavigation<RowElement, CellElement, CM>({ ...asParentRowOfCellsP, rovingTabIndexParameters: { untabbable, ...rovingTabIndexParameters }, linearNavigationParameters: { navigationDirection: "horizontal", ...linearNavigationParameters } });
 
 
     assertEmptyObject(_void1);
@@ -184,7 +188,7 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
         rowAsChildOfGridReturn: { gridNavigationRowParameters: { focusSelf, setTabbableColumnIndex: setTabbableIndex }, ...lncr, },
         rowAsParentOfCellsReturn: {
             ...lnr ,
-            gridNavigationCellContext:useStableObject ({
+            gridNavigationCellContext: useStableObject ({
                 gridNavigationCellParameters: useStableObject({
                     setTabbableRow,
                     getRowIndex: getIndex,

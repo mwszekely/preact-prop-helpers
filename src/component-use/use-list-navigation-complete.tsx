@@ -67,7 +67,7 @@ export function useCompleteListNavigation<ParentElement extends Element, ChildEl
         return !child.hidden;
     }, []);
 
-    const { rearrangeableChildrenReturn, sortableChildrenReturn } = useSortableChildren<ParentElement, M>({
+    const { rearrangeableChildrenReturn, sortableChildrenReturn } = useSortableChildren<M>({
         rearrangeableChildrenParameters,
         sortableChildrenParameters
     });

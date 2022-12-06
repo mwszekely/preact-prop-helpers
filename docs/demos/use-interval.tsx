@@ -12,6 +12,8 @@ export const DemoUseInterval = () => {
 
     return (
         <div class="demo">
+            <h2>useInterval</h2>
+            <p>Run code every <code>n</code> milliseconds after the component mounts</p>
             <label>Interval duration: <input type="number" value={interval} onInput={e => setInterval(e.currentTarget.valueAsNumber)} /></label>
             <div>The callback has been called {fireCount} time{fireCount === 1 ? "" : "s"}.</div>
         </div>

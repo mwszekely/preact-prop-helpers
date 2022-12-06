@@ -1,6 +1,6 @@
 import { useCallback, useEffect } from "preact/hooks";
-import { returnNull, usePassiveState } from "../preact-extensions/use-passive-state";
 import { useRefElement, UseRefElementParameters } from "../dom-helpers/use-ref-element";
+import { returnNull, usePassiveState } from "../preact-extensions/use-passive-state";
 import { useStableCallback } from "../preact-extensions/use-stable-callback";
 
 export interface UseMutationObserverParameters<E extends Element> extends UseRefElementParameters<E> {
