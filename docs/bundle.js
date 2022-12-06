@@ -5147,7 +5147,8 @@ var bundle = (function (exports) {
             getSelected: r.asChildRowReturn.singleSelectionChildReturn.getSelected,
             setLocalSelected: r.asChildRowReturn.managedChildParameters.setLocalSelected,
             disabled: singleSelectionChildParameters.disabled,
-            setTabbableColumnIndex: r.asChildRowReturn.gridNavigationRowParameters.setTabbableColumnIndex
+            setTabbableColumnIndex: r.asChildRowReturn.gridNavigationRowParameters.setTabbableColumnIndex,
+            getSortValue: asChildRowParameters.sortableChildParameters.getSortValue
         };
         const { managedChildReturn } = useManagedChild({ context: { managedChildContext: mcc1 }, managedChildParameters: { index } }, { ...baseInfo, ...completeGridNavigationRowParameters });
         const context = useStableObject({
@@ -5168,7 +5169,10 @@ var bundle = (function (exports) {
             context,
             props,
             asParentRowReturn,
-            asChildRowReturn,
+            asChildRowReturn: {
+                ...asChildRowReturn,
+                managedChildrenReturn
+            },
             managedChildReturn,
             hasCurrentFocusReturn
             //managedChildrenReturn,

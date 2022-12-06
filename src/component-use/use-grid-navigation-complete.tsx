@@ -80,7 +80,9 @@ export interface UseCompleteGridNavigationRowReturnType<RowElement extends Eleme
     context: CompleteGridNavigationRowContext<RowElement, CellElement, CM>;
     props: h.JSX.HTMLAttributes<RowElement>;
     asParentRowReturn: UseGridNavigationSingleSelectionSortableRowReturnType<RowElement, CellElement>["asParentRowReturn"];
-    asChildRowReturn: UseGridNavigationSingleSelectionSortableRowReturnType<RowElement, CellElement>["asChildRowReturn"];
+    asChildRowReturn: UseGridNavigationSingleSelectionSortableRowReturnType<RowElement, CellElement>["asChildRowReturn"] & {
+        managedChildrenReturn: UseManagedChildrenReturnType<CM>["managedChildrenReturn"];
+    };
     managedChildReturn: UseManagedChildReturnType<RM>["managedChildReturn"];
     hasCurrentFocusReturn: UseHasCurrentFocusReturnType<RowElement>["hasCurrentFocusReturn"];
 }
@@ -211,7 +213,7 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
     const { context: { managedChildContext }, managedChildrenReturn } = useManagedChildren<CM>({ managedChildrenParameters: r.asParentRowReturn.managedChildrenParameters });
     const { getElement } = refElementReturn;
 
-    const baseInfo: GridSingleSelectChildRowInfo<RowElement, CellElement> = {
+    const baseInfo: GridSingleSelectSortableChildRowInfo<RowElement, CellElement> = {
         getElement,
         setTabbable: r.asChildRowReturn.rovingTabIndexChildReturn.setTabbable,
         getTabbable: r.asChildRowReturn.rovingTabIndexChildReturn.getTabbable,
@@ -223,7 +225,8 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
         getSelected: r.asChildRowReturn.singleSelectionChildReturn.getSelected,
         setLocalSelected: r.asChildRowReturn.managedChildParameters.setLocalSelected,
         disabled: singleSelectionChildParameters.disabled,
-        setTabbableColumnIndex: r.asChildRowReturn.gridNavigationRowParameters.setTabbableColumnIndex
+        setTabbableColumnIndex: r.asChildRowReturn.gridNavigationRowParameters.setTabbableColumnIndex,
+        getSortValue: asChildRowParameters.sortableChildParameters.getSortValue
     }
 
     const { managedChildReturn } = useManagedChild<RM>({ context: { managedChildContext: mcc1 }, managedChildParameters: { index } }, { ...baseInfo, ...completeGridNavigationRowParameters } as RM)
@@ -252,7 +255,10 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
         context,
         props,
         asParentRowReturn,
-        asChildRowReturn,
+        asChildRowReturn: {
+            ...asChildRowReturn,
+            managedChildrenReturn
+        },
 
         managedChildReturn,
         hasCurrentFocusReturn
