@@ -400,7 +400,7 @@ export const DemoUseGrid = memo(() => {
     //const { getChildren: getChildren2 } = managedChildrenReturn;
 
 
-    
+
     return (
         <div class="demo">
             <h2>useGridNavigationComplete</h2>
@@ -419,10 +419,10 @@ export const DemoUseGrid = memo(() => {
                 </thead>
                 <GridRowContext.Provider value={context}>
                     <tbody {...props}>{useRearrangedChildren(Array.from((function* () {
-                            for (let i = 0; i < 2; ++i) {
-                                yield <DemoUseGridRow index={i} key={i} />
-                            }
-                        })())
+                        for (let i = 0; i < 10; ++i) {
+                            yield <DemoUseGridRow index={i} key={i} />
+                        }
+                    })())
                     )}</tbody>
                 </GridRowContext.Provider>
             </table>
@@ -460,7 +460,7 @@ const DemoUseGridRow = memo((({ index }: { index: number }) => {
             rovingTabIndexChildParameters: { hidden },
             managedChildParameters: { index },
             singleSelectionChildParameters: { disabled, ariaPropName: "aria-checked", selectionMode: "focus" },
-            textContentParameters: { getText: useCallback((e) => { return e?.textContent ?? "" }, []) }
+            textContentParameters: { getText: useCallback((e: Element | null) => { return e?.textContent ?? "" }, []) }
         },
         rowAsParentOfCellsParameters: {
             linearNavigationParameters: { disableArrowKeys: false, disableHomeEndKeys: false, navigatePastEnd: "wrap", navigatePastStart: "wrap" },
@@ -510,7 +510,7 @@ const DemoUseGridCell = (({ index, row, rowIsTabbable }: { index: number, row: n
         rovingTabIndexChildParameters: { hidden: false },
         context,
         completeGridNavigationCellParameters: { bar: "baz" },
-        textContentParameters: { getText: useCallback((e) => { return e?.textContent ?? "" }, []) },
+        textContentParameters: { getText: useCallback((e: Element | null) => { return e?.textContent ?? "" }, []) },
         pressParameters: { exclude: index <= 1, focusSelf: useStableCallback(e => e.focus()), onPressSync: null }
     });
 
@@ -549,8 +549,8 @@ function DemoLabel() {
 
 const Component = () => {
     return <div class="flex" style={{ flexWrap: "wrap" }}>
-    <input />
-        {/*<div style="display:grid;grid-template-columns:1fr 1fr">
+        <input />
+        <div style="display:grid;grid-template-columns:1fr 1fr">
             <DemoUseModal />
             <DemoUseModal />
         </div>
@@ -560,7 +560,7 @@ const Component = () => {
         <DemoFocus />
         <hr />
         <DemoUseChildrenHaveFocus />
-<hr />*/}
+        <hr />
         <DemoUseGrid />
         {/*<hr />
         <DemoUseTimeout />
@@ -583,7 +583,7 @@ const Component = () => {
         <hr />
         <DemoUseElementSizeAnimation />
         <hr />*/}
-<input />
+        <input />
     </div>
 }
 

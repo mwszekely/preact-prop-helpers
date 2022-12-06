@@ -5,7 +5,7 @@ var bundle = (function (exports) {
 
     var _$1=0;function o$1(o,e,n,t,f){var l,s,u={};for(s in e)"ref"==s?l=e[s]:u[s]=e[s];var a={type:o,props:u,key:n,ref:l,__k:null,__:null,__b:0,__e:null,__d:void 0,__c:null,__h:null,constructor:void 0,__v:--_$1,__source:f,__self:t};if("function"==typeof o&&(l=o.defaultProps))for(s in l)void 0===u[s]&&(u[s]=l[s]);return l$1.vnode&&l$1.vnode(a),a}
 
-    var t,r$1,u,i,o=0,f=[],c=[],e=l$1.__b,a=l$1.__r,v=l$1.diffed,l=l$1.__c,m=l$1.unmount;function d(t,u){l$1.__h&&l$1.__h(r$1,t,o||u),o=0;var i=r$1.__H||(r$1.__H={__:[],__h:[]});return t>=i.__.length&&i.__.push({__V:c}),i.__[t]}function p(n){return o=1,y(B$1,n)}function y(n,u,i){var o=d(t++,2);if(o.t=n,!o.__c&&(o.__=[i?i(u):B$1(void 0,u),function(n){var t=o.__N?o.__N[0]:o.__[0],r=o.t(t,n);t!==r&&(o.__N=[r,o.__[1]],o.__c.setState({}));}],o.__c=r$1,!r$1.u)){r$1.u=!0;var f=r$1.shouldComponentUpdate;r$1.shouldComponentUpdate=function(n,t,r){if(!o.__c.__H)return !0;var u=o.__c.__H.__.filter(function(n){return n.__c});if(u.every(function(n){return !n.__N}))return !f||f.call(this,n,t,r);var i=!1;return u.forEach(function(n){if(n.__N){var t=n.__[0];n.__=n.__N,n.__N=void 0,t!==n.__[0]&&(i=!0);}}),!(!i&&o.__c.props===n)&&(!f||f.call(this,n,t,r))};}return o.__N||o.__}function h(u,i){var o=d(t++,3);!l$1.__s&&z$1(o.__H,i)&&(o.__=u,o.i=i,r$1.__H.__h.push(o));}function s(u,i){var o=d(t++,4);!l$1.__s&&z$1(o.__H,i)&&(o.__=u,o.i=i,r$1.__h.push(o));}function _(n){return o=5,F$1(function(){return {current:n}},[])}function F$1(n,r){var u=d(t++,7);return z$1(u.__H,r)?(u.__V=n(),u.i=r,u.__h=n,u.__V):u.__}function T$1(n,t){return o=8,F$1(function(){return n},t)}function q(n){var u=r$1.context[n.__c],i=d(t++,9);return i.c=n,u?(null==i.__&&(i.__=!0,u.sub(r$1)),u.props.value):n.__}function b(){for(var t;t=f.shift();)if(t.__P&&t.__H)try{t.__H.__h.forEach(k),t.__H.__h.forEach(w$1),t.__H.__h=[];}catch(r){t.__H.__h=[],l$1.__e(r,t.__v);}}l$1.__b=function(n){r$1=null,e&&e(n);},l$1.__r=function(n){a&&a(n),t=0;var i=(r$1=n.__c).__H;i&&(u===r$1?(i.__h=[],r$1.__h=[],i.__.forEach(function(n){n.__N&&(n.__=n.__N),n.__V=c,n.__N=n.i=void 0;})):(i.__h.forEach(k),i.__h.forEach(w$1),i.__h=[])),u=r$1;},l$1.diffed=function(t){v&&v(t);var o=t.__c;o&&o.__H&&(o.__H.__h.length&&(1!==f.push(o)&&i===l$1.requestAnimationFrame||((i=l$1.requestAnimationFrame)||j)(b)),o.__H.__.forEach(function(n){n.i&&(n.__H=n.i),n.__V!==c&&(n.__=n.__V),n.i=void 0,n.__V=c;})),u=r$1=null;},l$1.__c=function(t,r){r.some(function(t){try{t.__h.forEach(k),t.__h=t.__h.filter(function(n){return !n.__||w$1(n)});}catch(u){r.some(function(n){n.__h&&(n.__h=[]);}),r=[],l$1.__e(u,t.__v);}}),l&&l(t,r);},l$1.unmount=function(t){m&&m(t);var r,u=t.__c;u&&u.__H&&(u.__H.__.forEach(function(n){try{k(n);}catch(n){r=n;}}),u.__H=void 0,r&&l$1.__e(r,u.__v));};var g$1="function"==typeof requestAnimationFrame;function j(n){var t,r=function(){clearTimeout(u),g$1&&cancelAnimationFrame(t),setTimeout(n);},u=setTimeout(r,100);g$1&&(t=requestAnimationFrame(r));}function k(n){var t=r$1,u=n.__c;"function"==typeof u&&(n.__c=void 0,u()),r$1=t;}function w$1(n){var t=r$1;n.__c=n.__(),r$1=t;}function z$1(n,t){return !n||n.length!==t.length||t.some(function(t,r){return t!==n[r]})}function B$1(n,t){return "function"==typeof t?t(n):t}
+    var t,r$1,u,i,o=0,f=[],c=[],e=l$1.__b,a=l$1.__r,v=l$1.diffed,l=l$1.__c,m=l$1.unmount;function d(t,u){l$1.__h&&l$1.__h(r$1,t,o||u),o=0;var i=r$1.__H||(r$1.__H={__:[],__h:[]});return t>=i.__.length&&i.__.push({__V:c}),i.__[t]}function p(n){return o=1,y(B$1,n)}function y(n,u,i){var o=d(t++,2);if(o.t=n,!o.__c&&(o.__=[i?i(u):B$1(void 0,u),function(n){var t=o.__N?o.__N[0]:o.__[0],r=o.t(t,n);t!==r&&(o.__N=[r,o.__[1]],o.__c.setState({}));}],o.__c=r$1,!r$1.u)){r$1.u=!0;var f=r$1.shouldComponentUpdate;r$1.shouldComponentUpdate=function(n,t,r){if(!o.__c.__H)return !0;var u=o.__c.__H.__.filter(function(n){return n.__c});if(u.every(function(n){return !n.__N}))return !f||f.call(this,n,t,r);var i=!1;return u.forEach(function(n){if(n.__N){var t=n.__[0];n.__=n.__N,n.__N=void 0,t!==n.__[0]&&(i=!0);}}),!(!i&&o.__c.props===n)&&(!f||f.call(this,n,t,r))};}return o.__N||o.__}function h(u,i){var o=d(t++,3);!l$1.__s&&z$1(o.__H,i)&&(o.__=u,o.i=i,r$1.__H.__h.push(o));}function s(u,i){var o=d(t++,4);!l$1.__s&&z$1(o.__H,i)&&(o.__=u,o.i=i,r$1.__h.push(o));}function _(n){return o=5,F$1(function(){return {current:n}},[])}function F$1(n,r){var u=d(t++,7);return z$1(u.__H,r)?(u.__V=n(),u.i=r,u.__h=n,u.__V):u.__}function T$1(n,t){return o=8,F$1(function(){return n},t)}function q(n){var u=r$1.context[n.__c],i=d(t++,9);return i.c=n,u?(null==i.__&&(i.__=!0,u.sub(r$1)),u.props.value):n.__}function V$1(){var n=d(t++,11);if(!n.__){for(var u=r$1.__v;null!==u&&!u.__m&&null!==u.__;)u=u.__;var i=u.__m||(u.__m=[0,0]);n.__="P"+i[0]+"-"+i[1]++;}return n.__}function b(){for(var t;t=f.shift();)if(t.__P&&t.__H)try{t.__H.__h.forEach(k),t.__H.__h.forEach(w$1),t.__H.__h=[];}catch(r){t.__H.__h=[],l$1.__e(r,t.__v);}}l$1.__b=function(n){r$1=null,e&&e(n);},l$1.__r=function(n){a&&a(n),t=0;var i=(r$1=n.__c).__H;i&&(u===r$1?(i.__h=[],r$1.__h=[],i.__.forEach(function(n){n.__N&&(n.__=n.__N),n.__V=c,n.__N=n.i=void 0;})):(i.__h.forEach(k),i.__h.forEach(w$1),i.__h=[])),u=r$1;},l$1.diffed=function(t){v&&v(t);var o=t.__c;o&&o.__H&&(o.__H.__h.length&&(1!==f.push(o)&&i===l$1.requestAnimationFrame||((i=l$1.requestAnimationFrame)||j)(b)),o.__H.__.forEach(function(n){n.i&&(n.__H=n.i),n.__V!==c&&(n.__=n.__V),n.i=void 0,n.__V=c;})),u=r$1=null;},l$1.__c=function(t,r){r.some(function(t){try{t.__h.forEach(k),t.__h=t.__h.filter(function(n){return !n.__||w$1(n)});}catch(u){r.some(function(n){n.__h&&(n.__h=[]);}),r=[],l$1.__e(u,t.__v);}}),l&&l(t,r);},l$1.unmount=function(t){m&&m(t);var r,u=t.__c;u&&u.__H&&(u.__H.__.forEach(function(n){try{k(n);}catch(n){r=n;}}),u.__H=void 0,r&&l$1.__e(r,u.__v));};var g$1="function"==typeof requestAnimationFrame;function j(n){var t,r=function(){clearTimeout(u),g$1&&cancelAnimationFrame(t),setTimeout(n);},u=setTimeout(r,100);g$1&&(t=requestAnimationFrame(r));}function k(n){var t=r$1,u=n.__c;"function"==typeof u&&(n.__c=void 0,u()),r$1=t;}function w$1(n){var t=r$1;n.__c=n.__(),r$1=t;}function z$1(n,t){return !n||n.length!==t.length||t.some(function(t,r){return t!==n[r]})}function B$1(n,t){return "function"==typeof t?t(n):t}
 
     function g(n,t){for(var e in t)n[e]=t[e];return n}function C(n,t){for(var e in n)if("__source"!==e&&!(e in t))return !0;for(var r in t)if("__source"!==r&&n[r]!==t[r])return !0;return !1}function w(n){this.props=n;}function R(n,e){function r(n){var t=this.props.ref,r=t==n.ref;return !r&&t&&(t.call?t(null):t.current=null),e?!e(this.props,n)||!r:C(this.props,n)}function u(e){return this.shouldComponentUpdate=r,h$1(n,e)}return u.displayName="Memo("+(n.displayName||n.name)+")",u.prototype.isReactComponent=!0,u.__f=!0,u}(w.prototype=new d$1).isPureReactComponent=!0,w.prototype.shouldComponentUpdate=function(n,t){return C(this.props,n)||C(this.state,t)};var x=l$1.__b;l$1.__b=function(n){n.type&&n.type.__f&&n.ref&&(n.props.ref=n.ref,n.ref=null),x&&x(n);};var T=l$1.__e;l$1.__e=function(n,t,e,r){if(n.then)for(var u,o=t;o=o.__;)if((u=o.__c)&&u.__c)return null==t.__e&&(t.__e=e.__e,t.__k=e.__k),u.__c(n,t);T(n,t,e,r);};var I=l$1.unmount;function L(n,t,e){return n&&(n.__c&&n.__c.__H&&(n.__c.__H.__.forEach(function(n){"function"==typeof n.__c&&n.__c();}),n.__c.__H=null),null!=(n=g({},n)).__c&&(n.__c.__P===e&&(n.__c.__P=t),n.__c=null),n.__k=n.__k&&n.__k.map(function(n){return L(n,t,e)})),n}function U(n,t,e){return n&&(n.__v=null,n.__k=n.__k&&n.__k.map(function(n){return U(n,t,e)}),n.__c&&n.__c.__P===t&&(n.__e&&e.insertBefore(n.__e,n.__d),n.__c.__e=!0,n.__c.__P=e)),n}function D(){this.__u=0,this.t=null,this.__b=null;}function F(n){var t=n.__.__c;return t&&t.__a&&t.__a(n)}function V(){this.u=null,this.o=null;}l$1.unmount=function(n){var t=n.__c;t&&t.__R&&t.__R(),t&&!0===n.__h&&(n.type=null),I&&I(n);},(D.prototype=new d$1).__c=function(n,t){var e=t.__c,r=this;null==r.t&&(r.t=[]),r.t.push(e);var u=F(r.__v),o=!1,i=function(){o||(o=!0,e.__R=null,u?u(l):l());};e.__R=i;var l=function(){if(!--r.__u){if(r.state.__a){var n=r.state.__a;r.__v.__k[0]=U(n,n.__c.__P,n.__c.__O);}var t;for(r.setState({__a:r.__b=null});t=r.t.pop();)t.forceUpdate();}},c=!0===t.__h;r.__u++||c||r.setState({__a:r.__b=r.__v.__k[0]}),n.then(i,i);},D.prototype.componentWillUnmount=function(){this.t=[];},D.prototype.render=function(n,e){if(this.__b){if(this.__v.__k){var r=document.createElement("div"),o=this.__v.__k[0].__c;this.__v.__k[0]=L(this.__b,r,o.__O=o.__P);}this.__b=null;}var i=e.__a&&h$1(p$1,null,n.fallback);return i&&(i.__h=null),[h$1(p$1,null,e.__a?null:n.children),i]};var W=function(n,t,e){if(++e[1]===e[0]&&n.o.delete(t),n.props.revealOrder&&("t"!==n.props.revealOrder[0]||!n.o.size))for(e=n.u;e;){for(;e.length>3;)e.pop()();if(e[1]<e[0])break;n.u=e=e[2];}};(V.prototype=new d$1).__a=function(n){var t=this,e=F(t.__v),r=t.o.get(n);return r[0]++,function(u){var o=function(){t.props.revealOrder?(r.push(u),W(t,n,r)):u();};e?e(o):o();}},V.prototype.render=function(n){this.u=null,this.o=new Map;var t=x$1(n.children);n.revealOrder&&"b"===n.revealOrder[0]&&t.reverse();for(var e=t.length;e--;)this.o.set(t[e],this.u=[1,0,this.u]);return n.children},V.prototype.componentDidUpdate=V.prototype.componentDidMount=function(){var n=this;this.o.forEach(function(t,e){W(n,e,t);});};var z="undefined"!=typeof Symbol&&Symbol.for&&Symbol.for("react.element")||60103,B=/^(?:accent|alignment|arabic|baseline|cap|clip(?!PathU)|color|dominant|fill|flood|font|glyph(?!R)|horiz|image|letter|lighting|marker(?!H|W|U)|overline|paint|pointer|shape|stop|strikethrough|stroke|text(?!L)|transform|underline|unicode|units|v|vector|vert|word|writing|x(?!C))[A-Z]/,H="undefined"!=typeof document,Z=function(n){return ("undefined"!=typeof Symbol&&"symbol"==typeof Symbol()?/fil|che|rad/i:/fil|che|ra/i).test(n)};d$1.prototype.isReactComponent={},["componentWillMount","componentWillReceiveProps","componentWillUpdate"].forEach(function(t){Object.defineProperty(d$1.prototype,t,{configurable:!0,get:function(){return this["UNSAFE_"+t]},set:function(n){Object.defineProperty(this,t,{configurable:!0,writable:!0,value:n});}});});var G=l$1.event;function J(){}function K(){return this.cancelBubble}function Q(){return this.defaultPrevented}l$1.event=function(n){return G&&(n=G(n)),n.persist=J,n.isPropagationStopped=K,n.isDefaultPrevented=Q,n.nativeEvent=n};var nn={configurable:!0,get:function(){return this.class}},tn=l$1.vnode;l$1.vnode=function(n){var t=n.type,e=n.props,u=e;if("string"==typeof t){var o=-1===t.indexOf("-");for(var i in u={},e){var l=e[i];H&&"children"===i&&"noscript"===t||"value"===i&&"defaultValue"in e&&null==l||("defaultValue"===i&&"value"in e&&null==e.value?i="value":"download"===i&&!0===l?l="":/ondoubleclick/i.test(i)?i="ondblclick":/^onchange(textarea|input)/i.test(i+t)&&!Z(e.type)?i="oninput":/^onfocus$/i.test(i)?i="onfocusin":/^onblur$/i.test(i)?i="onfocusout":/^on(Ani|Tra|Tou|BeforeInp|Compo)/.test(i)?i=i.toLowerCase():o&&B.test(i)?i=i.replace(/[A-Z0-9]/g,"-$&").toLowerCase():null===l&&(l=void 0),/^oninput$/i.test(i)&&(i=i.toLowerCase(),u[i]&&(i="oninputCapture")),u[i]=l);}"select"==t&&u.multiple&&Array.isArray(u.value)&&(u.value=x$1(e.children).forEach(function(n){n.props.selected=-1!=u.value.indexOf(n.props.value);})),"select"==t&&null!=u.defaultValue&&(u.value=x$1(e.children).forEach(function(n){n.props.selected=u.multiple?-1!=u.defaultValue.indexOf(n.props.value):u.defaultValue==n.props.value;})),n.props=u,e.class!=e.className&&(nn.enumerable="className"in e,null!=e.className&&(u.class=e.className),Object.defineProperty(u,"className",nn));}n.$$typeof=z,tn&&tn(n);};var en=l$1.__r;l$1.__r=function(n){en&&en(n),n.__c;};
 
@@ -1160,6 +1160,178 @@ var bundle = (function (exports) {
             changeIndex(initialIndex ?? null, undefined);
         }, []);
         return { changeIndex, reevaluateClosestFit, getCurrentIndex };
+    }
+
+    const MagicWindowKey = ("__preact-prop-helpers-escape-key-dismiss__");
+    function getElementDepth(element) {
+        let depth = 0;
+        let parent = element.parentElement;
+        while (parent) {
+            depth += 1;
+            parent = parent.parentElement;
+        }
+        return depth;
+    }
+    /**
+     * Adds event handlers for a modal-like soft-dismiss interaction.
+     *
+     * That is, any clicks or taps outside of the given component,
+     * or any time the Escape key is pressed within the component,
+     * (with various browser oddities regarding clicks on blank or inert areas handled)
+     * the component will request to close itself.
+     *
+     * Of course, if you don't do anything in the `onClose` function,
+     * it won't be a soft dismiss anymore.
+     *
+     * Handles events for pressing the `Escape` key to close the any currently open dialogs, tooltips, menus, popups, etc.
+     *
+     * One press of the `Escape` key is guaranteed to only call `onClose` for *only one* component, and it is called on the component deepest in the DOM tree, differentiated by passing context information between parent and child.
+     *
+     * @param param0
+     * @returns
+     */
+    function useEscapeDismiss({ escapeDismissParameters: { onClose, open, getWindow: unstableGetWindow, parentDepth, ...void1 }, refElementPopupReturn: { getElement, ...void2 } }) {
+        const stableOnClose = useStableCallback(onClose);
+        const getWindow = useStableCallback(unstableGetWindow);
+        const getDepth = useStableGetter(parentDepth + 1);
+        // When this component opens, add an event listener that finds the deepest open soft dismiss element to actually dismiss.
+        // Only opened components will add event handlers, and will remove them once closed.
+        // The reason this is so complicated is because:
+        // 1. We must only close one soft dismiss component at a time.  If there's a tooltip in a popup, the tooltip must be dismissed.
+        // 2. `keydown` events don't just work on arbitrary elements, for our purposes they must be from the `window`. So we can't rely on normal capturing or bubbling behavior on the element itself.
+        // 3. Event handlers added to the `window` via `addEventHandler` are called in the order of registration, which is completely at odds with #1.
+        //
+        // So all soft dismiss components listen for a keydown of Escape, 
+        // then the first one to do so will wait for a microtask, 
+        // then find the deepest element in the document tree to dismiss of all of those components currently open.
+        h(() => {
+            const window = getWindow();
+            window[MagicWindowKey] ??= { microtaskQueued: false, elementQueue: new Map() };
+            const info = window[MagicWindowKey];
+            if (open) {
+                console.log(`Adding handler for depth=${getDepth()}`);
+                window.addEventListener("keydown", handler, { capture: true });
+                return () => {
+                    console.log(`Removing handler for depth=${getDepth()}`);
+                    const element = getElement();
+                    if (element && info.elementQueue)
+                        info.elementQueue.delete(element);
+                    window.removeEventListener("keydown", handler, { capture: true });
+                };
+            }
+            function handler(e) {
+                if (e.key == "Escape") {
+                    console.log(`Escape key for depth=${getDepth()}`);
+                    // We don't know which of the currently active soft dismisses will actually do something,
+                    // but ONE of them definitely will,
+                    // so we stop propagation to child nodes, but not to everyone on the window (stopImmediatePropagation).
+                    e.preventDefault();
+                    e.stopPropagation();
+                    // This is what at least one of the elements will call
+                    const onClose2 = () => { stableOnClose("escape"); };
+                    const element = getElement();
+                    if (element) {
+                        const treeDepth = getElementDepth(element);
+                        const depth = getDepth();
+                        info.elementQueue.set(element, { depth, onClose: onClose2, treeDepth });
+                    }
+                    if (!info.microtaskQueued) {
+                        info.microtaskQueued = true;
+                        setTimeout(() => {
+                            const { elementQueue } = info;
+                            info.microtaskQueued = false;
+                            info.elementQueue = new Map();
+                            let deepestDepth = -Infinity;
+                            let deepestTreeDepth = -Infinity;
+                            let deepestOnClose = null;
+                            for (const [element, { depth, onClose, treeDepth }] of elementQueue) {
+                                let tieBroken = false;
+                                if (depth == deepestDepth) {
+                                    if (treeDepth > deepestTreeDepth) {
+                                        tieBroken = true;
+                                    }
+                                }
+                                if (depth > deepestDepth || (depth == deepestDepth && tieBroken)) {
+                                    deepestDepth = depth;
+                                    deepestTreeDepth = treeDepth;
+                                    deepestOnClose = onClose;
+                                }
+                            }
+                            deepestOnClose?.();
+                        }, 0);
+                    }
+                }
+            }
+        }, [open]);
+    }
+    /**
+     * Handles events for dismiss events for things like popup menus or transient dialogs -- things where moving focus to a new area of the page means this component should close itself.
+     *
+     * @param param0
+     * @returns
+     */
+    function useLostFocusDismiss({ refElementPopupReturn: { getElement: getPopupElement, ...void3 }, refElementSourceReturn, lostFocusDismiss: { open, onClose }, ...void1 }) {
+        const { getElement: getSourceElement, ...void2 } = (refElementSourceReturn ?? {});
+        const stableOnClose = useStableCallback(onClose);
+        const getOpen = useStableGetter(open);
+        const onLastActiveElementChange = T$1((newElement, _prevElement, _e) => {
+            const open = getOpen();
+            const sourceElement = getSourceElement?.();
+            const popupElement = getPopupElement();
+            if (!(sourceElement?.contains(newElement) || popupElement?.contains(newElement))) {
+                if (open)
+                    stableOnClose();
+            }
+        }, [getSourceElement]);
+        return { activeElementParameters: { onLastActiveElementChange } };
+    }
+    /**
+     * Handles events for a backdrop on a modal dialog -- the kind where the user expects the modal to close when they click/tap outside of it.
+     *
+     * @param param0
+     */
+    function useBackdropDismiss({ backdropDismissParameters: { open, onClose: onCloseUnstable, ...void1 }, refElementPopupReturn: { getElement, ...void3 }, ...void2 }) {
+        const getOpen = useStableGetter(open);
+        const onClose = useStableCallback(onCloseUnstable);
+        const onBackdropClick = T$1(function onBackdropClick(e) {
+            if (!getOpen())
+                return;
+            // Basically, "was this event fired on an element not contained by the modal?"
+            // There are multiple ways browser react to "interacting with nothing", and this takes care of everything.
+            let element = getElement();
+            let foundInsideClick = false;
+            if (e.target && element && element.contains(e.target)) {
+                foundInsideClick = true;
+            }
+            if (!foundInsideClick) {
+                onClose();
+            }
+        }, []);
+        useGlobalHandler(window, "mousedown", open ? onBackdropClick : null, { capture: true });
+        useGlobalHandler(window, "touchstart", open ? onBackdropClick : null, { capture: true });
+    }
+    /**
+     * Combines all the methods of dismissing a modal-ish or popup-ish component into one combined hook.
+     *
+     * This is similar to the "complete" series of list/grid navigation, in that it's the "outermost" hook of its type.
+     */
+    function useDismiss({ dismissParameters: { open: globalOpen, onClose: globalOnClose, closeOnBackdrop, closeOnEscape, closeOnLostFocus }, escapeDismissParameters: { getWindow, parentDepth } }) {
+        const { refElementReturn: refElementSourceReturn } = useRefElement({ refElementParameters: {} });
+        const { refElementReturn: refElementPopupReturn } = useRefElement({ refElementParameters: {} });
+        const onCloseBackdrop = T$1(() => { return globalOnClose?.("backdrop"); }, [globalOnClose]);
+        const onCloseEscape = T$1(() => { return globalOnClose?.("escape"); }, [globalOnClose]);
+        const onCloseFocus = T$1(() => { return globalOnClose?.("lost-focus"); }, [globalOnClose]);
+        useBackdropDismiss({ backdropDismissParameters: { onClose: onCloseBackdrop, open: (closeOnBackdrop && globalOpen) }, refElementPopupReturn });
+        useEscapeDismiss({ escapeDismissParameters: { getWindow, onClose: onCloseEscape, open: (closeOnEscape && globalOpen), parentDepth }, refElementPopupReturn });
+        const { activeElementParameters } = useLostFocusDismiss({ lostFocusDismiss: { onClose: onCloseFocus, open: (closeOnLostFocus && globalOpen) }, refElementPopupReturn, refElementSourceReturn });
+        const getDocument = T$1(() => {
+            return getWindow().document;
+        }, [getWindow]);
+        useActiveElement({ activeElementParameters: { ...activeElementParameters, getWindow, getDocument } });
+        return {
+            refElementSourceReturn,
+            refElementPopupReturn
+        };
     }
 
     /*!
@@ -5032,6 +5204,68 @@ var bundle = (function (exports) {
     }
 
     /**
+     * Combines dismissal hooks and focus trap hooks into one.
+     *
+     * Another in the "complete" series, alongside list/grid navigation and dismissal itself.
+     *
+     * Use for dialogs, menus, etc.  Anything that can be dismissed and might trap focus, basically.
+     *
+     * @param param0
+     * @returns
+     */
+    function useModal({ dismissParameters, escapeDismissParameters, focusTrapParameters: { trapActive, ...focusTrapParameters } }) {
+        const { open } = dismissParameters;
+        //const { getWindow } = escapeDismissParameters;
+        //const getDocument = useCallback(() => { return getWindow().document; }, [getWindow]);
+        const { refElementPopupReturn, refElementSourceReturn } = useDismiss({ dismissParameters, escapeDismissParameters });
+        const { focusTrapReturn, refElementReturn } = useFocusTrap({
+            focusTrapParameters: { trapActive: open && trapActive, ...focusTrapParameters },
+            refElementParameters: {}
+        });
+        const { propsStable: pp1 } = refElementPopupReturn;
+        const { propsStable: ps2 } = refElementSourceReturn;
+        const { propsUnstable: pp3 } = focusTrapReturn;
+        const { propsStable: pp4 } = refElementReturn;
+        return {
+            propsPopup: pp1,
+            propsFocusContainer: useMergedProps(pp3, pp4),
+            propsSource: ps2,
+            refElementPopupReturn,
+            refElementSourceReturn,
+            focusTrapReturn,
+        };
+    }
+
+    function useRandomId({ randomIdParameters: { prefix, otherReferencerProp } }) {
+        const id = (prefix + V$1());
+        useEnsureStability("useRandomId", prefix, id);
+        const referencerElementProps = _(otherReferencerProp == null ? {} : { [otherReferencerProp]: id });
+        const sourceElementProps = _({ id });
+        useEnsureStability("useRandomIdReferencerElement", otherReferencerProp);
+        return {
+            propsReferencer: referencerElementProps.current,
+            propsSource: sourceElementProps.current,
+            randomIdReturn: {
+                id: id
+            }
+        };
+    }
+
+    /**
+     * While `useRandomId` allows the referencer to use the source's ID, sometimes you also want the reverse too (e.g. I `aria-label` you, you `aria-controls` me. That sort of thing).
+     */
+    function useRandomDualIds({ randomIdInputParameters, randomIdLabelParameters, }) {
+        const { randomIdReturn: randomIdInputReturn, propsReferencer: propsLabelAsReferencer, propsSource: propsInputAsSource } = useRandomId({ randomIdParameters: randomIdInputParameters });
+        const { randomIdReturn: randomIdLabelReturn, propsReferencer: propsInputAsReferencer, propsSource: propsLabelAsSource } = useRandomId({ randomIdParameters: randomIdLabelParameters });
+        return {
+            propsLabel: useMergedProps(propsLabelAsReferencer, propsLabelAsSource),
+            propsInput: useMergedProps(propsInputAsReferencer, propsInputAsSource),
+            randomIdInputReturn,
+            randomIdLabelReturn
+        };
+    }
+
+    /**
      * Gets the timestamp of the number of milliseconds that have elapsed since
      * the Unix epoch (1 January 1970 00:00:00 UTC).
      *
@@ -5684,8 +5918,94 @@ var bundle = (function (exports) {
 
     B$2(null);
 
+    function useInterval({ interval, callback }) {
+        // Get a wrapper around the given callback that's stable
+        const stableCallback = useStableCallback(callback);
+        const getInterval = useStableGetter(interval);
+        h(() => {
+            const interval = getInterval();
+            let lastDelayUsed = interval;
+            if (interval == null)
+                return;
+            // Get a wrapper around the wrapper around the callback
+            // that clears and resets the interval if it changes.
+            const adjustableCallback = () => {
+                stableCallback();
+                const currentInterval = getInterval();
+                if (currentInterval != lastDelayUsed) {
+                    clearInterval(handle);
+                    if (currentInterval != null)
+                        handle = setInterval(adjustableCallback, lastDelayUsed = currentInterval);
+                }
+            };
+            let handle = setInterval(adjustableCallback, interval);
+            return () => clearInterval(handle);
+        }, []);
+    }
+
+    function getWindow() { return globalThis.window; }
+    function DemoUseModal(props) {
+        const parentDepth = (props.parentDepth ?? 0);
+        const depth = parentDepth + 1;
+        const buttonRef = _(null);
+        const [closeOnBackdrop, setCloseOnBackdrop] = p(true);
+        const [closeOnEscape, setCloseOnEscape] = p(true);
+        const [closeOnLostFocus, setCloseOnLostFocus] = p(true);
+        const [focusTrapActive, setFocusTrapActive] = p(true);
+        const [hasChild, setHasChild] = p(false);
+        const [closeReason, setCloseReason] = p(null);
+        const [open, setOpen] = p(false);
+        const focusOpener = () => buttonRef.current?.focus();
+        const { propsPopup, propsSource, propsFocusContainer } = useModal({
+            focusTrapParameters: {
+                trapActive: focusTrapActive,
+                onlyMoveFocus: false,
+                focusOpener,
+                focusPopup: useStableCallback((e, f) => f()?.focus())
+            },
+            dismissParameters: {
+                closeOnBackdrop,
+                closeOnEscape,
+                closeOnLostFocus,
+                onClose: T$1((reason) => { setCloseReason(reason); setOpen(false); }, []),
+                open
+            },
+            escapeDismissParameters: { getWindow, parentDepth }
+        });
+        return (o$1("div", { style: { border: `${depth}px solid black` }, children: [o$1("div", { children: "useModal demo:" }), o$1("div", { style: "display: flex; flex-direction: column", children: [o$1("label", { children: [o$1("input", { type: "checkbox", disabled: true, checked: true }), " Close by setting open to false"] }), o$1("label", { children: [o$1("input", { type: "checkbox", checked: closeOnBackdrop, onInput: e => setCloseOnBackdrop(e.currentTarget.checked) }), " Close on backdrop click"] }), o$1("label", { children: [o$1("input", { type: "checkbox", checked: closeOnEscape, onInput: e => setCloseOnEscape(e.currentTarget.checked) }), " Close on Escape key press"] }), o$1("label", { children: [o$1("input", { type: "checkbox", checked: closeOnLostFocus, onInput: e => setCloseOnLostFocus(e.currentTarget.checked) }), " Close on focus lost"] }), o$1("label", { children: [o$1("input", { type: "checkbox", checked: focusTrapActive, onInput: e => setFocusTrapActive(e.currentTarget.checked) }), " Trap focus"] }), o$1("br", {})] }), o$1("div", { children: ["Last reason for closing: ", closeReason ?? "(hasn't been closed yet)"] }), o$1("button", { ...propsSource, onClick: () => setOpen(true), children: "Open Modal" }), o$1("div", { ...useMergedProps(propsFocusContainer, propsPopup), style: `border: ${depth}px dotted red; background: #ccc`, children: o$1("div", { style: { display: open ? "flex" : "none", flexDirection: "column" }, children: [o$1("div", { children: ["Modal element at depth ", depth, " with ", hasChild ? "a" : "no", " child"] }), o$1("label", { children: [o$1("input", { type: "checkbox", checked: hasChild, onInput: e => setHasChild(e.currentTarget.checked), ref: buttonRef }), " Add a child modal"] }), hasChild && o$1(DemoUseModal, { parentDepth: depth }), o$1("button", { ...propsSource, onClick: () => setOpen(false), children: "Close modal programmatically" })] }) })] }));
+    }
+
     const RandomWords = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
-    B$2(null);
+    const ChildrenHaveFocusContext = B$2(null);
+    const DemoUseChildrenHaveFocus = () => {
+        const [maxChildCount, setMaxChildCount] = useState(10);
+        const [minChildCount, setMinChildCount] = useState(5);
+        const [currentChildCount, setCurrentChildCount] = useState(minChildCount);
+        useInterval({
+            callback: () => {
+                if (currentChildCount == minChildCount)
+                    setCurrentChildCount(maxChildCount);
+                else
+                    setCurrentChildCount(currentChildCount - 1);
+                //let newChildCount = Math.round(Math.random() * (maxChildCount - minChildCount)) + minChildCount
+                //setCurrentChildCount(newChildCount);
+            },
+            interval: 1000
+        });
+        const [anyFocused, setAnyFocused] = useState(false);
+        const { childrenHaveFocusChildContext } = useChildrenHaveFocus({ childrenHaveFocusParameters: { onCompositeFocusChange: setAnyFocused } });
+        return (o$1("div", { ...useMergedProps({}, { className: "demo" }), children: [o$1("h2", { children: "useChildrenHaveFocus" }), o$1("p", { children: ["If you want to see if any of your children have focus, the easiest way is to just attach a ", o$1("code", { children: "focusIn" }), " handler to the parent DOM node. But what if you don't have just one single parent DOM node? This hook lets you coordinate all the children to give you that information as if you were able to take that easy parent node route."] }), o$1("div", { children: o$1("label", { children: [o$1("input", { type: "number", min: 0, value: minChildCount, onInput: e => { e.preventDefault(); setMinChildCount(e.currentTarget.valueAsNumber); } }), " Min # of children"] }) }), o$1("div", { children: o$1("label", { children: [o$1("input", { type: "number", min: minChildCount, value: maxChildCount, onInput: e => { e.preventDefault(); setMaxChildCount(e.currentTarget.valueAsNumber); } }), " Max # of children"] }) }), o$1("div", { children: ["Current # of children: ", currentChildCount] }), o$1(ChildrenHaveFocusContext.Provider, { value: childrenHaveFocusChildContext, children: [o$1("div", { children: ["Any children focused: ", anyFocused.toString()] }), o$1("div", { children: Array.from((function* () {
+                                for (let i = 0; i < currentChildCount; ++i) {
+                                    yield o$1(DemoUseChildrenHaveFocusChild, { index: i }, i);
+                                }
+                            })()) })] })] }));
+    };
+    const DemoUseChildrenHaveFocusChild = ({ index }) => {
+        const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged } } = useChildrenHaveFocusChild({ childrenHaveFocusChildContext: q(ChildrenHaveFocusContext) });
+        const { refElementReturn } = useRefElement({ refElementParameters: {} });
+        const { hasCurrentFocusReturn } = useHasCurrentFocus({ hasCurrentFocusParameters: { onCurrentFocusedChanged: null, onCurrentFocusedInnerChanged }, refElementReturn });
+        return (o$1("div", { tabIndex: 0, ...useMergedProps(refElementReturn.propsStable, hasCurrentFocusReturn.propsStable), children: ["Focusable child #", index, o$1("input", {}), o$1("input", {})] }));
+    };
     R(({ depth }) => {
         const [active, setActive] = useState(false);
         const { focusTrapReturn: { propsUnstable }, refElementReturn: { propsStable } } = useFocusTrap({
@@ -5737,7 +6057,7 @@ var bundle = (function (exports) {
     function getDocument() {
         return window.document;
     }
-    R(() => {
+    const DemoFocus = R(() => {
         const [focusCount, setFocusCount] = useState(0);
         const [innerFocusCount, setInnerFocusCount] = useState(0);
         const [lastActiveElement, setLastActiveElement] = useState(null);
@@ -5812,7 +6132,7 @@ var bundle = (function (exports) {
         rearrangeableChildrenReturn: { useRearrangedChildren } } = ret;
         //const { getChildren: getChildren2 } = managedChildrenReturn;
         return (o$1("div", { class: "demo", children: [o$1("h2", { children: "useGridNavigationComplete" }), o$1("p", { children: ["Like ", o$1("code", { children: "useCompleteListNavigation" }), " but for 2D navigation. Cells can span multiple columns. Rows can be filtered, sorted, and arbitrarily re-arranged."] }), o$1("div", { children: ["Current row: ", tabbableRow] }), o$1("div", { children: ["Current column: ", tabbableColumn] }), o$1("table", { ...{ border: "2" }, style: { whiteSpace: "nowrap" }, children: [o$1("thead", { children: o$1("tr", { children: [o$1("th", { children: "Row is tabbable?" }), o$1("th", { children: "Column 1" }), o$1("th", { children: "Column 2" }), o$1("th", { children: "Column 3" })] }) }), o$1(GridRowContext.Provider, { value: context, children: o$1("tbody", { ...props, children: useRearrangedChildren(Array.from((function* () {
-                                    for (let i = 0; i < 2; ++i) {
+                                    for (let i = 0; i < 10; ++i) {
                                         yield o$1(DemoUseGridRow, { index: i }, i);
                                     }
                                 })())) }) })] })] }));
@@ -5885,8 +6205,12 @@ var bundle = (function (exports) {
             }
         }
     });
+    function DemoLabel() {
+        const { propsInput, propsLabel } = useRandomDualIds({ randomIdInputParameters: { prefix: "input-", otherReferencerProp: "for" }, randomIdLabelParameters: { prefix: "label-", otherReferencerProp: "aria-labelledby" } });
+        return (o$1("div", { className: "demo", children: [o$1("input", { ...propsInput }), o$1("label", { ...propsLabel, children: "Label" })] }));
+    }
     const Component = () => {
-        return o$1("div", { class: "flex", style: { flexWrap: "wrap" }, children: [o$1("input", {}), o$1(DemoUseGrid, {}), o$1("input", {})] });
+        return o$1("div", { class: "flex", style: { flexWrap: "wrap" }, children: [o$1("input", {}), o$1("div", { style: "display:grid;grid-template-columns:1fr 1fr", children: [o$1(DemoUseModal, {}), o$1(DemoUseModal, {})] }), o$1("hr", {}), o$1(DemoLabel, {}), o$1("hr", {}), o$1(DemoFocus, {}), o$1("hr", {}), o$1(DemoUseChildrenHaveFocus, {}), o$1("hr", {}), o$1(DemoUseGrid, {}), o$1("input", {})] });
     };
     requestAnimationFrame(() => {
         P(o$1(Component, {}), document.getElementById("root"));
