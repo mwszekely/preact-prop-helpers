@@ -67,12 +67,16 @@ export interface UseLinearNavigationParameters<_ParentOrChildElement extends Ele
 
         /**
          * What happens when `up` is pressed on the first valid child?
+         * 
+         * * "wrap": The focus is sent down to the last child
+         * * "passthrough": Nothing happens, **and the event is allowed to propagate**.
+         * * A function: 
          */
-        navigatePastStart: "wrap" | (() => void);
+        navigatePastStart: "passthrough" | "wrap" | (() => void);
         /**
          * What happens when `down` is pressed on the last valid child?
          */
-        navigatePastEnd: "wrap" | (() => void);
+        navigatePastEnd: "passthrough" | "wrap" | (() => void);
 
         /**
          * Turn a sorted `index` into its original, unsorted `index`. Use `identity` if you don't care.
@@ -139,7 +143,7 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
     }, []);
     const navigateToFirst = useStableCallback((e: R, fromUserInteraction: boolean) => { navigateAbsolute(0, e, fromUserInteraction); });
     const navigateToLast = useStableCallback((e: R, fromUserInteraction: boolean) => { navigateAbsolute(getHighestIndex(), e, fromUserInteraction); });
-    const navigateRelative2 = useStableCallback((e: R, offset: number, fromUserInteraction: boolean, mode: "page" | "single") => {
+    const navigateRelative2 = useStableCallback((e: R, offset: number, fromUserInteraction: boolean, mode: "page" | "single"): "passthrough" | "stop" => {
         const original = (getTabbableIndex() ?? 0);
         const { status, value } = tryNavigateToIndex({ isValid, highestChildIndex: getHighestIndex(), indexDemangler, indexMangler, searchDirection: (Math.sign(offset) || 1) as 1 | -1, target: indexDemangler(indexMangler(original) + offset) });
         if (status == "past-end") {
@@ -158,9 +162,14 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
                     else
                         navigateToLast(e, fromUserInteraction);
                 }
+                return "stop";
+            }
+            else if (navigatePastEnd == "passthrough") {
+                return "passthrough";
             }
             else {
                 navigatePastEnd();
+                return "stop";
             }
         }
         else if (status == "past-start") {
@@ -176,22 +185,27 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
                     else
                         navigateToFirst(e, fromUserInteraction);
                 }
+                return "stop";
+            }
+            else if (navigatePastStart == "passthrough") {
+                return "passthrough";
             }
             else {
                 navigatePastStart();
+                return "stop";
             }
         }
         else {
             setTabbableIndex(value, e, fromUserInteraction);
-
+            return "stop";
         }
     })
     const navigateToNext = useStableCallback((e: R, fromUserInteraction: boolean) => {
-        navigateRelative2(e, 1, fromUserInteraction, "single");
+        return navigateRelative2(e, 1, fromUserInteraction, "single");
         // setTabbableIndex(navigateRelative((getTabbableIndex() ?? 0), +1), fromUserInteraction)
     });
     const navigateToPrev = useStableCallback((e: R, fromUserInteraction: boolean) => {
-        navigateRelative2(e, -1, fromUserInteraction, "single");
+        return navigateRelative2(e, -1, fromUserInteraction, "single");
         // setTabbableIndex(navigateRelative((getTabbableIndex() ?? 0), +1), fromUserInteraction)
     });
     const getDisableArrowKeys = useStableGetter(linearNavigationParameters.disableArrowKeys);
@@ -225,18 +239,22 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
                     //const propName = (info?.blockOrientation === "vertical" ? "blockDirection" : "inlineDirection");
                     const directionAllowed = (!disableArrowKeys && allowsVerticalNavigation);
                     if (directionAllowed) {
-                        navigateToPrev(e, true);
-                        e.preventDefault();
-                        e.stopPropagation();
+                        const result = navigateToPrev(e, true);
+                        if (result != "passthrough") {
+                            e.preventDefault();
+                            e.stopPropagation();
+                        }
                     }
                     break;
                 }
                 case "ArrowDown": {
                     const directionAllowed = (!disableArrowKeys && allowsVerticalNavigation);
                     if (directionAllowed) {
-                        navigateToNext(e, true);
-                        e.preventDefault();
-                        e.stopPropagation();
+                        const result = navigateToNext(e, true);
+                        if (result != "passthrough") {
+                            e.preventDefault();
+                            e.stopPropagation();
+                        }
                     }
                     break;
                 }
@@ -244,18 +262,22 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
                 case "ArrowLeft": {
                     const directionAllowed = (!disableArrowKeys && allowsHorizontalNavigation);
                     if (directionAllowed) {
-                        navigateToPrev(e, true);
-                        e.preventDefault();
-                        e.stopPropagation();
+                        const result = navigateToPrev(e, true);
+                        if (result != "passthrough") {
+                            e.preventDefault();
+                            e.stopPropagation();
+                        }
                     }
                     break;
                 }
                 case "ArrowRight": {
                     const directionAllowed = (!disableArrowKeys && allowsHorizontalNavigation);
                     if (directionAllowed) {
-                        navigateToNext(e, true);
-                        e.preventDefault();
-                        e.stopPropagation();
+                        const result = navigateToNext(e, true);
+                        if (result != "passthrough") {
+                            e.preventDefault();
+                            e.stopPropagation();
+                        }
                     }
                     break;
                 }
@@ -659,7 +681,7 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
                 if (lowestUnsortedIndexNext !== null)
                     setIndex(sortedTypeaheadInfo.current[lowestSortedIndexNext].unsortedIndex, reason, true);
                 else if (lowestUnsortedIndexAll !== null)
-                    setIndex(sortedTypeaheadInfo.current[lowestSortedIndexAll].unsortedIndex,reason, true);
+                    setIndex(sortedTypeaheadInfo.current[lowestSortedIndexAll].unsortedIndex, reason, true);
             }
         }
     }

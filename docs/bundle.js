@@ -2908,9 +2908,14 @@ var bundle = (function (exports) {
                         // That's the arrow keys' domain.
                         navigateToLast(e, fromUserInteraction);
                     }
+                    return "stop";
+                }
+                else if (navigatePastEnd == "passthrough") {
+                    return "passthrough";
                 }
                 else {
                     navigatePastEnd();
+                    return "stop";
                 }
             }
             else if (status == "past-start") {
@@ -2923,21 +2928,27 @@ var bundle = (function (exports) {
                         // See above. It works fine but just feels wrong to wrap on Page Up/Down.
                         navigateToFirst(e, fromUserInteraction);
                     }
+                    return "stop";
+                }
+                else if (navigatePastStart == "passthrough") {
+                    return "passthrough";
                 }
                 else {
                     navigatePastStart();
+                    return "stop";
                 }
             }
             else {
                 setTabbableIndex(value, e, fromUserInteraction);
+                return "stop";
             }
         });
         const navigateToNext = useStableCallback((e, fromUserInteraction) => {
-            navigateRelative2(e, 1, fromUserInteraction, "single");
+            return navigateRelative2(e, 1, fromUserInteraction, "single");
             // setTabbableIndex(navigateRelative((getTabbableIndex() ?? 0), +1), fromUserInteraction)
         });
         const navigateToPrev = useStableCallback((e, fromUserInteraction) => {
-            navigateRelative2(e, -1, fromUserInteraction, "single");
+            return navigateRelative2(e, -1, fromUserInteraction, "single");
             // setTabbableIndex(navigateRelative((getTabbableIndex() ?? 0), +1), fromUserInteraction)
         });
         const getDisableArrowKeys = useStableGetter(linearNavigationParameters.disableArrowKeys);
@@ -2965,36 +2976,44 @@ var bundle = (function (exports) {
                         //const propName = (info?.blockOrientation === "vertical" ? "blockDirection" : "inlineDirection");
                         const directionAllowed = (!disableArrowKeys && allowsVerticalNavigation);
                         if (directionAllowed) {
-                            navigateToPrev(e, true);
-                            e.preventDefault();
-                            e.stopPropagation();
+                            const result = navigateToPrev(e, true);
+                            if (result != "passthrough") {
+                                e.preventDefault();
+                                e.stopPropagation();
+                            }
                         }
                         break;
                     }
                     case "ArrowDown": {
                         const directionAllowed = (!disableArrowKeys && allowsVerticalNavigation);
                         if (directionAllowed) {
-                            navigateToNext(e, true);
-                            e.preventDefault();
-                            e.stopPropagation();
+                            const result = navigateToNext(e, true);
+                            if (result != "passthrough") {
+                                e.preventDefault();
+                                e.stopPropagation();
+                            }
                         }
                         break;
                     }
                     case "ArrowLeft": {
                         const directionAllowed = (!disableArrowKeys && allowsHorizontalNavigation);
                         if (directionAllowed) {
-                            navigateToPrev(e, true);
-                            e.preventDefault();
-                            e.stopPropagation();
+                            const result = navigateToPrev(e, true);
+                            if (result != "passthrough") {
+                                e.preventDefault();
+                                e.stopPropagation();
+                            }
                         }
                         break;
                     }
                     case "ArrowRight": {
                         const directionAllowed = (!disableArrowKeys && allowsHorizontalNavigation);
                         if (directionAllowed) {
-                            navigateToNext(e, true);
-                            e.preventDefault();
-                            e.stopPropagation();
+                            const result = navigateToNext(e, true);
+                            if (result != "passthrough") {
+                                e.preventDefault();
+                                e.stopPropagation();
+                            }
                         }
                         break;
                     }
