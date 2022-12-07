@@ -187,6 +187,8 @@ export function useSingleSelectionChild<ChildElement extends Element>(args: UseS
     });
 
     const onPressSync = useStableCallback(((e: Event) => {
+        if (selectionMode == "disabled")
+            return;
         if (!disabled)
             setSelectedIndexExternal?.(index, e as R);
     }));
@@ -201,7 +203,7 @@ export function useSingleSelectionChild<ChildElement extends Element>(args: UseS
                 setSelectedIndexExternal?.(index, event as R);
             }),
             getSelected,
-            propsUnstable: ariaPropName == null ? {} : { [ariaPropName as keyof h.JSX.HTMLAttributes<any>]: (selected ?? false).toString() }
+            propsUnstable: ariaPropName == null || selectionMode == "disabled" ? {} : { [ariaPropName as keyof h.JSX.HTMLAttributes<any>]: (selected ?? false).toString() }
         },
         pressParameters: { onPressSync },
         hasCurrentFocusParameters: { onCurrentFocusedInnerChanged }
