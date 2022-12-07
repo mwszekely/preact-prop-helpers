@@ -1,6 +1,6 @@
 import { h } from "preact";
 import { useEffect } from "preact/hooks";
-import { isFocusable } from "tabbable";
+import { isFocusable, isTabbable } from "tabbable";
 import { useBlockingElement } from "../dom-helpers/use-blocking-element";
 import { useRefElement, UseRefElementParameters, UseRefElementReturnType } from "../dom-helpers/use-ref-element";
 import { useStableCallback } from "../preact-extensions/use-stable-callback";
@@ -66,7 +66,7 @@ export function useFocusTrap<SourceElement extends Element | null, PopupElement 
         if (trapActive) {
             let top = getTop();
             const lastFocusedInThisComponent = getLastActiveWhenOpen();
-            
+
             if (false && lastFocusedInThisComponent && lastFocusedInThisComponent?.isConnected) {
                 focusSelf(lastFocusedInThisComponent as any as PopupElement, () => lastFocusedInThisComponent);
             }
@@ -103,11 +103,26 @@ export function useFocusTrap<SourceElement extends Element | null, PopupElement 
  * @param element 
  * @returns 
  */
-export function findFirstFocusable(element: Node) {
-    console.assert(!!element);
-    element ??= document.body;
-    const treeWalker = document.createTreeWalker(element, NodeFilter.SHOW_ELEMENT, { acceptNode: (node) => (node instanceof Element && isFocusable(node) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP) })
-    const firstFocusable = treeWalker.firstChild() as (Element & HTMLOrSVGElement) | null;
-    return firstFocusable;
+export function findFirstFocusable<T extends Node>(element: T): T | null {
+    return findFirstCondition<T>(element, node => node instanceof Element && isFocusable(node));
 }
 
+/**
+ * Returns the first tabbable element contained within the given node, or null if none are found.
+ * @param element 
+ * @returns 
+ */
+export function findFirstTabbable<T extends Node>(element: T): T | null {
+    return findFirstCondition<T>(element, node => node instanceof Element && isTabbable(node));
+}
+
+function findFirstCondition<T extends Node>(element: T, filter: (node: Node) => boolean): T | null {
+    if (element && filter(element))
+        return element;
+
+    console.assert(!!element);
+    element ??= document.body as Node as T;
+    const treeWalker = document.createTreeWalker(element, NodeFilter.SHOW_ELEMENT, { acceptNode: (node) => (filter(node) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP) })
+    const firstFocusable = treeWalker.firstChild() as T | null;
+    return firstFocusable;
+}

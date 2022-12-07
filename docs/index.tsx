@@ -464,7 +464,7 @@ const DemoUseGridRow = memo((({ index }: { index: number }) => {
         },
         rowAsParentOfCellsParameters: {
             linearNavigationParameters: { disableArrowKeys: false, disableHomeEndKeys: false, navigatePastEnd: "wrap", navigatePastStart: "wrap" },
-            rovingTabIndexParameters: { onTabbableIndexChange: useStableCallback((i) => { setTabbableColumn(i) }) },
+            rovingTabIndexParameters: { onTabbableIndexChange: useStableCallback((i: number | null) => { setTabbableColumn(i) }) },
             typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000 }
         }
     });
