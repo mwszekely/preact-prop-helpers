@@ -10,7 +10,7 @@ import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "./use-r
 import { useStableCallback } from "../preact-extensions/use-stable-callback";
 import { useStableGetter, useStableObject } from "../preact-extensions/use-stable-getter";
 import { useState } from "../preact-extensions/use-state";
-import { noop } from "lodash-es";
+import noop from "lodash-es/noop";
 
 /*
 export function useSingleSelectionChildProps<E extends Element>(r: UseSingleSelectionChildReturnTypeInfo<E>, ...otherProps: h.JSX.HTMLAttributes<E>[]): h.JSX.HTMLAttributes<E>[] {

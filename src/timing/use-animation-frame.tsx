@@ -1,6 +1,7 @@
 import { ComponentChildren, createContext } from "preact";
 import { useCallback, useContext, useEffect, useRef } from "preact/hooks";
 import { useStableCallback } from "../preact-extensions/use-stable-callback";
+import noop from "lodash-es/noop";
 
 type RafCallbackType = (msSinceLast: number, tag?: any) => void;
 
@@ -90,5 +91,3 @@ export function useAnimationFrame({ callback }: UseAnimationFrameParameters): vo
         }
     }, [sharedAnimationFrameContext, hasCallback])
 }
-
-function noop() { }
