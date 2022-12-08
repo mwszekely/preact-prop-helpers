@@ -1,6 +1,6 @@
 import { createContext, VNode } from "preact";
 import { memo, useCallback, useContext } from "preact/compat";
-import { GetIndex, UseListNavigationSingleSelectionSortableChildInfo, useMergedProps, useStableCallback } from "../../index";
+import { GetIndex, UseListNavigationSingleSelectionSortableChildInfo, useMergedProps, useSingleSelectionDeclarative, useStableCallback } from "../../index";
 
 import { useState } from "../../preact-extensions/use-state";
 
@@ -25,7 +25,7 @@ export const DemoUseRovingTabIndex = memo(() => {
 
     const r: UseCompleteListNavigationReturnType<HTMLOListElement, HTMLLIElement, CustomInfoType> = useCompleteListNavigation<HTMLOListElement, HTMLLIElement, CustomInfoType>({
         rovingTabIndexParameters: { onTabbableIndexChange: null, untabbable: false },
-        singleSelectionParameters: { initiallySelectedIndex: 0, setSelectedIndex: useStableCallback(newIndex => { /*setLocalSelectedIndex(newIndex);*/ setSelectedIndex(newIndex); }) },
+        singleSelectionParameters: { initiallySelectedIndex: 0, onSelectedIndexChange: useStableCallback(newIndex => { /*setLocalSelectedIndex(newIndex);*/ changeSelectedIndex(newIndex); }) },
         typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000 },
         linearNavigationParameters: { disableArrowKeys: false, disableHomeEndKeys: false, navigationDirection: "vertical", navigatePastEnd: "wrap", navigatePastStart: "wrap", pageNavigationSize: 0.1 },
         rearrangeableChildrenParameters: {
@@ -39,13 +39,13 @@ export const DemoUseRovingTabIndex = memo(() => {
         props,
         context,
         rovingTabIndexReturn: { setTabbableIndex },
-        singleSelectionReturn: { setSelectedIndex },
+        singleSelectionReturn: { changeSelectedIndex },
         managedChildrenReturn: { getChildren },
         typeaheadNavigationReturn: { invalidTypeahead },
         rearrangeableChildrenReturn: { useRearrangedChildren, shuffle }
         //        rearrangeableChildrenReturn: { useRearrangedChildren: useSortableProps, shuffle }
     } = r;
-    //useSingleSelectionDeclarative({ singleSelectionReturn: {  setSelectedIndex }, singleSelectionDeclarativeParameters: { selectedIndex } });
+    //useSingleSelectionDeclarative({ singleSelectionReturn: {  changeSelectedIndex }, singleSelectionDeclarativeParameters: { selectedIndex } });
     const children = getChildren();
 
 
@@ -83,7 +83,7 @@ export const DemoUseRovingTabIndex = memo(() => {
             <label># of items<input type="number" value={count} min={0} onInput={e => { e.preventDefault(); setCount(e.currentTarget.valueAsNumber) }} /></label>
             <button onClick={() => shuffle(children)}>Shuffle</button>
             <label>Imperatively set the tabbable index to: <input type="number" onInput={e => { e.preventDefault(); setTabbableIndex(e.currentTarget.valueAsNumber, e, false); }} /></label>
-            <label>Imperatively set the selected index to: <input type="number" onInput={e => { e.preventDefault(); setSelectedIndex(e.currentTarget.valueAsNumber); }} /></label>
+            <label>Imperatively set the selected index to: <input type="number" onInput={e => { e.preventDefault(); changeSelectedIndex(e.currentTarget.valueAsNumber); }} /></label>
             <label>Skip rendering the first N children: <input type="number" min={0} onInput={e => { e.preventDefault(); setMin(e.currentTarget.valueAsNumber); }} /></label>
             <label>Selection mode:
                 <label><input name="rti-demo-selection-mode" type="radio" checked={selectionMode == 'focus'} onInput={e => { e.preventDefault(); setSelectionMode("focus"); }} /> On focus</label>

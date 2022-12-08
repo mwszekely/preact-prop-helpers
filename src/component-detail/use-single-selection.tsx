@@ -10,6 +10,7 @@ import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "./use-r
 import { useStableCallback } from "../preact-extensions/use-stable-callback";
 import { useStableGetter, useStableObject } from "../preact-extensions/use-stable-getter";
 import { useState } from "../preact-extensions/use-state";
+import { noop } from "lodash-es";
 
 /*
 export function useSingleSelectionChildProps<E extends Element>(r: UseSingleSelectionChildReturnTypeInfo<E>, ...otherProps: h.JSX.HTMLAttributes<E>[]): h.JSX.HTMLAttributes<E>[] {
@@ -46,19 +47,19 @@ export interface UseSingleSelectionParameters<ChildElement extends Element> {
          * to save on re-rendering the parent whenever the selected index changes.
          */
         initiallySelectedIndex: number | null;
-        //selectedIndex: number | null | undefined;
+        
         /**
          * Called when a child is selected (via a press or other method).
          * 
-         * `singleSelectionReturn` returns a function with the same name that can be plugged in here
-         * to make this component imperative, or you can use `useEffect` to set some state
-         * on your end that does something else.
+         * If this component is declaratively controlled (with e.g. `useSingleSelectionDeclarative`),
+         * then you should use this to `setState` somewhere that'll change your `selectedIndex`.
+         * 
+         * If this component is imperatively controlled, then you should hook this up to the
+         * returned `changeSelectedIndex` function to have the desired change occur.
          * 
          * In general, this should only be `null` when single selection is entirely disabled.
-         * 
-         * In any case, **MUST** be stable!!
          */
-        setSelectedIndex: null | PassiveStateUpdater<number | null, Event>;
+        onSelectedIndexChange: null | ((index: number | null, reason: Event | undefined) => void);
 
     }
 }
@@ -102,10 +103,13 @@ export interface UseSingleSelectionReturnType<ChildElement extends Element> {
          * 
          * If you are creating a declarative component, this is what you call in `useEffect` when your `selectedIndex` changes.
          */
-        setSelectedIndex: PassiveStateUpdater<number | null, Event>;
+        changeSelectedIndex: PassiveStateUpdater<number | null, Event>;
         getSelectedIndex(): number | null;
     }
-    singleSelectionContext: { setSelectedIndex: PassiveStateUpdater<number | null, Event> | null; getSelectedIndex(): number | null; }
+    singleSelectionContext: { 
+        onSelectedIndexChange: UseSingleSelectionParameters<ChildElement>["singleSelectionParameters"]["onSelectedIndexChange"] //PassiveStateUpdater<number | null, Event> | null; 
+        getSelectedIndex(): number | null;
+     }
     childrenHaveFocusParameters: Pick<UseChildrenHaveFocusParameters<ChildElement>["childrenHaveFocusParameters"], "onCompositeFocusChange">
 }
 
@@ -116,10 +120,11 @@ export interface UseSingleSelectionReturnType<ChildElement extends Element> {
 export function useSingleSelection<ChildElement extends Element>({
     managedChildrenReturn: { getChildren },
     rovingTabIndexReturn: { setTabbableIndex },
-    singleSelectionParameters: { setSelectedIndex: setSelectedIndexExternal, initiallySelectedIndex }
+    singleSelectionParameters: { onSelectedIndexChange: onSelectedIndexChange_U, initiallySelectedIndex }
 }: UseSingleSelectionParameters<ChildElement>): UseSingleSelectionReturnType<ChildElement> {
     type R = Event;//h.JSX.TargetedEvent<ChildElement>;
-    useEnsureStability("useSingleSelection", setSelectedIndexExternal);
+    const onSelectedIndexChange = useStableCallback(onSelectedIndexChange_U ?? noop);
+    //useEnsureStability("useSingleSelection", onSelectedIndexChange);
 
     const getSelectedAt = useCallback((m: SelectableChildInfo<ChildElement>) => { return m.getSelected(); }, []);
     const setSelectedAt = useCallback((m: SelectableChildInfo<ChildElement>, t: boolean) => {
@@ -131,7 +136,7 @@ export function useSingleSelection<ChildElement extends Element>({
     const isSelectedValid = useCallback((m: SelectableChildInfo<ChildElement>) => { return !m.hidden; }, []);
 
     const {
-        changeIndex: setSelectedIndexInternal,
+        changeIndex: changeSelectedIndex,
         getCurrentIndex: getSelectedIndex
     } = useChildrenFlag<SelectableChildInfo<ChildElement>, R>({
         getChildren,
@@ -145,11 +150,11 @@ export function useSingleSelection<ChildElement extends Element>({
     return {
         singleSelectionReturn: useStableObject({
             getSelectedIndex,
-            setSelectedIndex: setSelectedIndexInternal
+            changeSelectedIndex
         }),
         singleSelectionContext: useStableObject({
             getSelectedIndex,
-            setSelectedIndex: setSelectedIndexExternal
+            onSelectedIndexChange: onSelectedIndexChange
         }),
         childrenHaveFocusParameters: {
             onCompositeFocusChange: useStableCallback((anyFocused, prev, reason) => {
@@ -168,12 +173,12 @@ export function useSingleSelectionChild<ChildElement extends Element>(args: UseS
     type R = Event;//h.JSX.TargetedEvent<ChildElement>;
     const {
 
-        singleSelectionContext: { getSelectedIndex, setSelectedIndex: setSelectedIndexExternal },
+        singleSelectionContext: { getSelectedIndex, onSelectedIndexChange },
         singleSelectionChildParameters: { ariaPropName, selectionMode, disabled },
         managedChildParameters: { index }
     } = args;
 
-    useEnsureStability("useSingleSelectionChild", getSelectedIndex, setSelectedIndexExternal);
+    useEnsureStability("useSingleSelectionChild", getSelectedIndex, onSelectedIndexChange);
     const getDisabled = useStableGetter(disabled);
 
     const [selected, setSelected, getSelected] = useState(getSelectedIndex() == index);
@@ -182,7 +187,7 @@ export function useSingleSelectionChild<ChildElement extends Element>(args: UseS
 
     const onCurrentFocusedInnerChanged = useStableCallback<OnPassiveStateChange<boolean, R>>((focused, _prev, e) => {
         if (selectionMode == 'focus' && focused) {
-            setSelectedIndexExternal?.(index, e);
+            onSelectedIndexChange?.(index, e);
         }
     });
 
@@ -190,7 +195,7 @@ export function useSingleSelectionChild<ChildElement extends Element>(args: UseS
         if (selectionMode == "disabled")
             return;
         if (!disabled)
-            setSelectedIndexExternal?.(index, e as R);
+        onSelectedIndexChange?.(index, e as R);
     }));
 
     return {
@@ -200,7 +205,7 @@ export function useSingleSelectionChild<ChildElement extends Element>(args: UseS
             selected,
             setThisOneSelected: useStableCallback((event) => {
                 console.assert(!getDisabled());
-                setSelectedIndexExternal?.(index, event as R);
+                onSelectedIndexChange?.(index, event as R);
             }),
             getSelected,
             propsUnstable: ariaPropName == null || selectionMode == "disabled" ? {} : { [ariaPropName as keyof h.JSX.HTMLAttributes<any>]: (selected ?? false).toString() }
@@ -214,7 +219,7 @@ export function useSingleSelectionChild<ChildElement extends Element>(args: UseS
 
 export interface UseSingleSelectionDeclarativeParameters {
     singleSelectionDeclarativeParameters: { selectedIndex: number | null }
-    singleSelectionReturn: Pick<UseSingleSelectionReturnType<any>["singleSelectionReturn"], "setSelectedIndex">;
+    singleSelectionReturn: Pick<UseSingleSelectionReturnType<any>["singleSelectionReturn"], "changeSelectedIndex">;
 }
 
 export type MakeSingleSelectionDeclarativeParameters<P> = Omit<P, "singleSelectionParameters"> & UseSingleSelectionDeclarativeParameters;
@@ -223,9 +228,9 @@ export type MakeSingleSelectionDeclarativeReturnType<R> = Omit<R, "singleSelecti
 /**
  * Let's face it, declarative is nicer to use than imperative, so this is a shortcut.
  */
-export function useSingleSelectionDeclarative({ singleSelectionReturn: { setSelectedIndex: setSelectedIndexInternal }, singleSelectionDeclarativeParameters: { selectedIndex } }: UseSingleSelectionDeclarativeParameters) {
+export function useSingleSelectionDeclarative({ singleSelectionReturn: { changeSelectedIndex }, singleSelectionDeclarativeParameters: { selectedIndex } }: UseSingleSelectionDeclarativeParameters) {
     useEffect(() => {
-        setSelectedIndexInternal(selectedIndex);
+        changeSelectedIndex(selectedIndex);
     }, [selectedIndex]);
 }
 
