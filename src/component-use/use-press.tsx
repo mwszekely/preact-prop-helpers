@@ -1,10 +1,12 @@
 import { h } from "preact";
-import { useEffect, useRef } from "preact/hooks";
+import { returnFalse, returnNull, usePassiveState } from "../preact-extensions/use-passive-state";
+import { useCallback, useEffect, useRef } from "preact/hooks";
 import { useGlobalHandler } from "../dom-helpers/use-event-handler";
 import { UseRefElementReturnType } from "../dom-helpers/use-ref-element";
 import { useForceUpdate } from "../preact-extensions/use-force-update";
 import { useStableCallback } from "../preact-extensions/use-stable-callback";
 import { useState } from "../preact-extensions/use-state";
+import { useTimeout } from "../timing/use-timeout";
 /*
 export function usePressProps<E extends Element>(r: UsePressReturnType<E>, ...otherProps: h.JSX.HTMLAttributes<E>[]): h.JSX.HTMLAttributes<E>[] {
     return [r.pressReturn.propsStable, ...otherProps];
@@ -31,6 +33,9 @@ export interface UsePressParameters<E extends Node> {
          */
         exclude: undefined | boolean | { click?: "exclude" | undefined, space?: "exclude" | undefined, enter?: "exclude" | undefined };
         focusSelf(element: E): void;
+        allowRepeatPresses?: boolean;
+        longPressThreshold?: number | null;
+
         //onPseudoActiveStart: null | undefined | (() => void);
         //onPseudoActiveStop: null | undefined | (() => void);
     }
@@ -43,25 +48,33 @@ export interface UsePressReturnType<E extends Element> {
          * but specifically for presses only. Useful for styling mostly.
          */
         pseudoActive: boolean;
+        hovering: boolean;
+        /**
+         * Similar to pseudoActive, but for if the button as been pressed down for a determined length of time.
+         */
+        longPress: boolean | null;
         propsStable: h.JSX.HTMLAttributes<E>;
     }
 }
 
+function supportsPointerEvents() {
+    return ("onpointerup" in window);
+}
+
 /**
  * Adds the necessary event handlers to create a "press"-like event for
- * any element, whether it's a native <BUTTON> or regular <DIV>.
+ * any element, whether it's a native &lt;BUTTON> or regular &lt;DIV>.
  * 
  * Notably, the following cases are covered:
  * * The target element is properly focused, even on iOS Safari (*especially* on iOS Safari)
- * * Double-clicks won't select text. 
- * * Conversely, manually selecting text won't invoke a press.
- * * Keyboard events &mdash; `enter` immediately invokes the handler, while `space` invokes it on keyup.
+ * * Double-clicks won't select text, it just presses the button twice.
+ * * Text selection that happens to end/start with this element won't invoke a press.
+ * * The `enter` key immediately invokes a press (by default just once until pressed again), while the `space` key invokes it when released, if focus hasn't moved away from the button.
  * * Haptic feedback (on, like, the one browser combination that supports it &mdash; this can be disabled app-wide with `setButtonVibrate`)
  * 
- * In addition, when the CSS `:active` pseudo-class would apply to a normal button
- * (i.e. when holding the spacebar or during mousedown), `{ "data-pseudo-active": "true" }`
- * is added to the props.  You can either let it pass through and style it through new CSS,
- * or inspect the returned props for it and add e.g. an `.active` class for existing CSS
+ * In addition, returns a "more accurate" CSS `active` and `hover`; more accurate
+ * in that `hover` won't mess up mobile devices that see `hover` and mess up your click events,
+ * and in that `active` accurately displays when a press would occur or not.
  * 
  * @param onClickSync 
  * @param exclude Whether the polyfill shouldn't apply (can specify for specific interactions)
@@ -69,74 +82,153 @@ export interface UsePressReturnType<E extends Element> {
 export function usePress<E extends Element>(args: UsePressParameters<E>): UsePressReturnType<E> {
     const {
         refElementReturn: { getElement },
-        pressParameters: { exclude, focusSelf, onPressSync }
+        pressParameters: { exclude, focusSelf, onPressSync, allowRepeatPresses, longPressThreshold }
     } = args;
 
-    //const stableOnPseudoActiveStart = useStableCallback(onPseudoActiveStart ?? (() => { }));
-    //const stableOnPseudoActiveStop = useStableCallback(onPseudoActiveStop ?? (() => { }));
+    /**
+     * Explanations:
+     * 
+     * It would be nice to just use pointer events for everything,
+     * but 2019 iOS devices can't run those, amazingly enough, and
+     * that's still pretty recent. So we need to have backup touch
+     * events.
+     * 
+     * Why not just use click? Because at the very, very least,
+     * we also need to be able to handle space and enter key presses,
+     * and that needs to work regardless of if it's a <button> or not.
+     * 
+     * Also, we do still use click, because programmatic clicks can come
+     * from anything from ATs to automation scripts, and we don't want
+     * to break those. But since we are listening for pointer/touch events,
+     * and we can't prevent the subsequent click event from happening,
+     * and we **don't want to duplicate press events**, we need to
+     * ignore click events that happen in the same tick as a handled press event.
+     * 
+     * When we do a pointermove/touchmove, we check to see if we're still hovering over the element
+     * for more accurate "active"/hover detection.
+     * 
+     * "But you have a pointerleave event, why check for hovering during pointermove?"
+     * 
+     * Because for some reason, pointerleave (etc.) aren't fired until *after* pointerup, no matter what.
+     * 
+     */
 
-    // A button can be activated in multiple ways, so on the off chance
-    // that multiple are triggered at once, we only *actually* register
-    // a press once all of our "on" signals have turned back to "off".
-    // We approximate this by just incrementing when active, and
-    // decrementing when deactivated.
-    //
-    // As an emergency failsafe, when the element loses focus,
-    // this is reset back to 0.
-    const [activeDuringRender, setActive, getActive] = useState(0);
-    const forceUpdate = useForceUpdate();
-
-    //const { getElement } = refElementReturn;
-
-    // If we the current text selection changes to include this element
-    // DURING e.g. a mousedown, then we don't want the mouseup to "count", as it were,
-    // because its only purpose was selecting text, not clicking buttons.
-    //
-    // To catch this, any time the text selection includes us while in the middle
-    // of a click, this flag is set, which cancels the activation of a press.
-    // The flag is reset any time the selection is empty or the button is
-    // no longer active.
-    const [textSelectedDuringActivationStartTime, setTextSelectedDuringActivationStartTime] = useState<Date | null>(null);
-    const pseudoActive = (activeDuringRender && (textSelectedDuringActivationStartTime == null));
-    //useEffect(() => { if (pseudoActive) { stableOnPseudoActiveStart(); } else { stableOnPseudoActiveStop(); } return () => { if (pseudoActive) stableOnPseudoActiveStop(); } }, [pseudoActive])
-
-    useGlobalHandler(document, "selectionchange", _ => {
-        setTextSelectedDuringActivationStartTime(prev => nodeSelectedTextLength(getElement()) == 0 ? null : prev != null ? prev : new Date());
-    });
-
-    useEffect(() => {
-        if (activeDuringRender == 0)
-            setTextSelectedDuringActivationStartTime(null);
-
-    }, [activeDuringRender == 0]);
-
-    const onActiveStart = useStableCallback<NonNullable<typeof onPressSync>>((_) => {
-        setActive(a => ++a);
-    });
-
-    const onActiveStop = useStableCallback<NonNullable<typeof onPressSync>>((e) => {
-        setActive(a => Math.max(0, --a));
-
-        const currentTime = new Date();
-        const timeDifference = (textSelectedDuringActivationStartTime == null ? null : +currentTime - +textSelectedDuringActivationStartTime);
-        const charactersSelected = nodeSelectedTextLength(getElement())
-
-        // If we're selecting text (heuristically determined by selecting for longer than 1/4 a second, or more than 2 characters)
-        // then this isn't a press event.
-        // TODO: This should measure glyphs instead of characters.
-        if (charactersSelected > 1 || ((timeDifference ?? 0) > 250 && charactersSelected >= 1)) {
-            e.preventDefault();
-            return;
+    // All our checking for pointerdown and up doesn't mean anything if it's
+    // a programmatic onClick event, which could come from any non-user source.
+    // We want to handle those just like GUI clicks, but we don't want to double-up on press events.
+    // So if we handle a press from pointerup, we ignore any subsequent click events, at least for a tick.
+    const [getJustHandled, setJustHandled] = usePassiveState<boolean, h.JSX.TargetedEvent<E>>(useStableCallback((justHandled, _p, reason) => {
+        if (justHandled) {
+            const h = setTimeout(() => {
+                setJustHandled(false, reason);
+            }, 1);
+            return clearTimeout(h);
         }
+    }), returnFalse);
 
-        let active = getActive();   // We query if we're active *after* calling setState because we count a press iff we're now at 0.
-        if (active <= 0) {
+    const [longPress, setLongPress] = useState(null as boolean | null);
+    const [waitingForSpaceUp, setWaitingForSpaceUp, getWaitingForSpaceUp] = useState(false);
+    const [pointerDownStartedHere, setPointerDownStartedHere, getPointerDownStartedHere] = useState(false);
+    const [hovering, setHovering, getHovering] = useState(false);
+    const onTouchStart = useCallback((e: h.JSX.TargetedTouchEvent<E>) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setPointerDownStartedHere(true);
+        setHovering(true);
+        setLongPress(false);
+
+        const element = getElement();
+        if (element)
+            focusSelf(element);
+    }, []);
+    const onTouchMove = useCallback((e: h.JSX.TargetedTouchEvent<E>) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const element = getElement();
+        const touch = e.touches[0];
+        // Be as generous as possible with touch events by checking all four corners of the radius too
+        const offsets = [
+            [0, 0] as const,
+            [-touch.radiusX, -touch.radiusY] as const,
+            [+touch.radiusX, -touch.radiusY] as const,
+            [-touch.radiusX, +touch.radiusY] as const,
+            [+touch.radiusX, +touch.radiusY] as const
+        ] as const;
+        let hoveringAtAnyPoint = false;
+        for (const [x, y] of offsets) {
+            const elementAtTouch = document.elementFromPoint((touch?.clientX ?? 0) + x, (touch?.clientY ?? 0) + y);
+            hoveringAtAnyPoint ||= (element?.contains(elementAtTouch) ?? false)
+        }
+        setHovering(hoveringAtAnyPoint);
+    }, []);
+    const onTouchEnd = useCallback((e: h.JSX.TargetedTouchEvent<E>) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const hovering = getHovering();
+        const pointerDownStartedHere = getPointerDownStartedHere();
+
+        setJustHandled(true);
+        if (pointerDownStartedHere && hovering) {
             handlePress(e);
-            forceUpdate();  // TODO: Remove when issue resolved https://github.com/preactjs/preact/issues/3731
         }
-    });
+        setWaitingForSpaceUp(false);
+        setHovering(false);
+        setPointerDownStartedHere(false);
+    }, []);
+
+    const onPointerDown = useCallback((e: h.JSX.TargetedPointerEvent<E>) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setPointerDownStartedHere(true);
+        setHovering(true);
+        setLongPress(false);
+
+        const element = getElement();
+        if (element)
+            focusSelf(element);
+    }, []);
+    const onPointerMove = useCallback((e: h.JSX.TargetedPointerEvent<E>) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const element = getElement();
+        const elementAtPointer = document.elementFromPoint(e.clientX, e.clientY);
+        setHovering(element == elementAtPointer || element?.contains(elementAtPointer) || false);
+    }, [])
+    const onPointerUp = useCallback((e: h.JSX.TargetedPointerEvent<E>) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const hovering = getHovering();
+        const pointerDownStartedHere = getPointerDownStartedHere();
+
+        setJustHandled(true);
+        if (pointerDownStartedHere && hovering) {
+            handlePress(e);
+        }
+        setWaitingForSpaceUp(false);
+        setHovering(false);
+        setPointerDownStartedHere(false);
+
+    }, []);
+    const onPointerLeave = useCallback((e: h.JSX.TargetedPointerEvent<E>) => {
+        e.preventDefault();
+        setHovering(false);
+    }, []);
+
+    useTimeout({
+        callback: () => {
+            setLongPress(pointerDownStartedHere && hovering);
+        },
+        timeout: longPressThreshold ?? null,
+        triggerIndex: (pointerDownStartedHere && hovering)
+    })
+
 
     const handlePress = useStableCallback<NonNullable<typeof onPressSync>>((e) => {
+        setWaitingForSpaceUp(false);
+        setHovering(false);
+        setPointerDownStartedHere(false);
+        setLongPress(null);
+
         if (onPressSync) {
 
             // Note: The element is focused here because of iOS Safari.
@@ -156,9 +248,8 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
             // For iOS Safari.
             //
             const element = getElement();
-            if (element && "focus" in (element as EventTarget as HTMLElement))
+            if (element)
                 focusSelf(element as EventTarget as E);
-            //(element as EventTarget as HTMLElement | null)?.focus();
 
             // Whatever the browser was going to do with this event,
             // forget it. We're turning it into a "press" event.
@@ -184,91 +275,91 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
         }
     });
 
-    const onMouseDown = useStableCallback((e: h.JSX.TargetedMouseEvent<E>) => {
-        if (onPressSync && !excludes("click", exclude)) {
-            // Stop double clicks from selecting text in an component that's *supposed* to be acting like a button,
-            // but also don't prevent the user from selecting that text manually if they really want to
-            // (which user-select: none would do, but cancelling a double click on mouseDown doesn't)
-            if (e.detail > 1) {
-                e.preventDefault();
-            }
-
-
-            if (e.button === 0) {
-                onActiveStart(e);
-            }
-        }
-    })
-    const onMouseUp = useStableCallback((e: h.JSX.TargetedMouseEvent<E>) => {
-        if (onPressSync && !excludes("click", exclude)) {
-            if (e.button === 0 && getActive() > 0) {
-                onActiveStop(e);
-            }
-        }
-    });
-
-
-    const onMouseLeave = useStableCallback(() => {
-        if (onPressSync && !excludes("click", exclude)) {
-            setActive(0);
-        }
-    });
 
     const onKeyDown = useStableCallback((e: h.JSX.TargetedKeyboardEvent<E>) => {
         if (onPressSync) {
             if (e.key == " " && !excludes("space", exclude)) {
                 // We don't actually activate it on a space keydown
                 // but we do preventDefault to stop the page from scrolling.
-                onActiveStart(e);
+                setWaitingForSpaceUp(true);
+                //onActiveStart(e);
                 e.preventDefault();
             }
 
-            if (e.key == "Enter" && !excludes("enter", exclude)) {
-                e.preventDefault();
-                onActiveStart(e);
-                onActiveStop(e);
+            if (e.key == "Enter" && !excludes("enter", exclude) && (!e.repeat || (allowRepeatPresses ?? false))) {
+
+                handlePress(e);
             }
         }
     })
 
     const onKeyUp = useStableCallback((e: h.JSX.TargetedKeyboardEvent<E>) => {
-        if (onPressSync && e.key == " " && !excludes("space", exclude))
-            onActiveStop(e);
+        const waitingForSpaceUp = getWaitingForSpaceUp();
+        if (waitingForSpaceUp && e.key == " " && !excludes("space", exclude))
+            handlePress(e);
     })
 
     const onClick = useStableCallback((e: h.JSX.TargetedMouseEvent<E>) => {
+        const element = getElement();
         if (onPressSync) {
             e.preventDefault();
+
+            //const element = getElement();
+            //if (element)
+            //    focusSelf(element);
+
             if (e.detail > 1) {
                 e.stopImmediatePropagation();
                 e.stopPropagation();
             }
+            else {
+                // Listen for "programmatic" click events.  That would be
+                // events that don't immediately follow a bunch of pointer and mouse events
+                // and also was fired **specifically** on this element.
+                // (That second check is to avoid bubbled clicks being caught as programmatic presses on parent components)
+                if (getJustHandled() == false && e.target == element) {
+                    // Intentional, for now. Programmatic clicks shouldn't happen in most cases.
+                    // TODO: Remove this when I'm confident stray clicks won't be handled.
+                    console.log(false);
+                    debugger;
+
+                    handlePress(e);
+                }
+            }
         }
     });
 
+
     const onFocusOut = useStableCallback((_e: h.JSX.TargetedFocusEvent<E>) => {
-        setActive(0);
+        setWaitingForSpaceUp(false);
     })
 
 
+    const p = supportsPointerEvents();
     const propsStable2 = useRef<h.JSX.HTMLAttributes<E>>({
         onKeyDown,
         onKeyUp,
-        onMouseDown,
-        onMouseUp,
-        onMouseLeave,
-        onClick,
-        onfocusout: onFocusOut
+
+        onTouchStart: !p ? onTouchStart : undefined,
+        onTouchCancel: !p ? onTouchEnd : undefined,
+        onTouchMove: !p ? onTouchMove : undefined,
+        onTouchEnd: !p ? onTouchEnd : undefined,
+
+        onPointerDown: p ? onPointerDown : undefined,
+        onPointerCancel: p ? onPointerDown : undefined,
+        onPointerMove: p ? onPointerMove : undefined,
+        onPointerUp: p ? onPointerUp : undefined,
+        onPointerLeave: p ? onPointerLeave : undefined,
+        onfocusout: onFocusOut,
+        onClick
     });
 
     return {
         pressReturn: {
-            pseudoActive: (pseudoActive || false),
+            pseudoActive: ((pointerDownStartedHere && hovering) || waitingForSpaceUp || false),
+            hovering,
+            longPress,
             propsStable: propsStable2.current,
-            /*propsUnstable: {
-                style: (textSelectedDuringActivationStartTime != null) ? { cursor: "text" } : undefined,
-                ...{ "data-pseudo-active": pseudoActive ? "true" : undefined } as {}
-            },*/
         }
     };
 }

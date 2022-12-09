@@ -1,7 +1,7 @@
 import { createContext, h, render, VNode } from "preact";
 import { memo } from "preact/compat";
 import { useCallback, useContext, useRef } from "preact/hooks";
-import { GetIndex, GridSingleSelectSortableChildCellInfo, GridSingleSelectSortableChildRowInfo, returnNull, useAnimationFrame, useAsyncHandler, useChildrenHaveFocus, useChildrenHaveFocusChild, UseChildrenHaveFocusChildParameters, UseCompleteGridNavigationReturnType, UseCompleteGridNavigationRowReturnType, useDraggable, useDroppable, useElementSize, useFocusTrap, useHasCurrentFocus, useHasLastFocus, useInterval, useMergedProps, useRandomDualIds, useRefElement, useStableCallback, useState } from "..";
+import { GetIndex, GridSingleSelectSortableChildCellInfo, GridSingleSelectSortableChildRowInfo, returnNull, useAnimationFrame, useAsyncHandler, useChildrenHaveFocus, useChildrenHaveFocusChild, UseChildrenHaveFocusChildParameters, UseCompleteGridNavigationReturnType, UseCompleteGridNavigationRowReturnType, useDraggable, useDroppable, useElementSize, useFocusTrap, useHasCurrentFocus, useHasLastFocus, useInterval, useMergedProps, usePress, useRandomDualIds, useRefElement, useStableCallback, useState } from "..";
 import { ElementSize } from "../dom-helpers/use-element-size";
 //import { useGridNavigation, UseGridNavigationCell, UseGridNavigationRow } from "../use-grid-navigation";
 import { CompleteGridNavigationContext, CompleteGridNavigationRowContext, useCompleteGridNavigation, useCompleteGridNavigationCell, useCompleteGridNavigationRow } from "..";
@@ -547,8 +547,33 @@ function DemoLabel() {
     )
 }
 
+function DemoPress({ remaining }: { remaining: number }) {
+
+    const [count, setCount] = useState(0);
+    const { refElementReturn, refElementReturn: { propsStable: p1 } } = useRefElement<HTMLDivElement>({ refElementParameters: {} })
+    const { pressReturn: { propsStable: p2, pseudoActive, hovering, longPress } } = usePress<HTMLDivElement>({
+        pressParameters: { exclude: undefined, focusSelf: e => { e.focus() }, longPressThreshold: 1000, onPressSync: () => { setCount(c => ++c) } },
+        refElementReturn
+    })
+    return (
+        <div className="demo">
+            <div>Press count: {count}</div>
+            <div>Active: {pseudoActive.toString()}</div>
+            <div>Hovering: {hovering.toString()}</div>
+            <div>Long press: {(longPress ?? "null").toString()}</div>
+            <div style={{ border: "1px solid black", touchAction: "none" }} tabIndex={0} {...useMergedProps(p1, p2)}>
+                <div>Pressable</div>
+                <div>
+                    {remaining > 0 && <DemoPress remaining={remaining - 1} />}
+                </div>
+            </div>
+        </div>
+    )
+}
+
 const Component = () => {
     return <div class="flex" style={{ flexWrap: "wrap" }}>
+        <DemoPress remaining={2} />
         <input />
         <div style="display:grid;grid-template-columns:1fr 1fr">
             <DemoUseModal />
@@ -556,6 +581,7 @@ const Component = () => {
         </div>
         <hr />
         <DemoLabel />
+        <hr />
         <hr />
         <DemoFocus />
         <hr />
