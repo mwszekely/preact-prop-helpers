@@ -158,8 +158,13 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
     const focusSelf = useStableCallback((e: RowElement) => {
         let index = (getCurrentTabbableColumn() ?? 0);
         let child = getChildren().getAt(index);
-        while ((!child) && index > 0) {
+        let highestIndex = getChildren().getHighestIndex();
+        while ((!child || child.hidden) && index > 0) {
             --index;
+            child = getChildren().getAt(index);
+        }
+        while ((!child || child.hidden) && index <= highestIndex) {
+            ++index;
             child = getChildren().getAt(index);
         }
         if (child) {

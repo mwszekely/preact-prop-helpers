@@ -4565,8 +4565,13 @@ var bundle = function (exports) {
       var _getCurrentTabbableCo;
       let index = (_getCurrentTabbableCo = getCurrentTabbableColumn()) !== null && _getCurrentTabbableCo !== void 0 ? _getCurrentTabbableCo : 0;
       let child = getChildren().getAt(index);
-      while (!child && index > 0) {
+      let highestIndex = getChildren().getHighestIndex();
+      while ((!child || child.hidden) && index > 0) {
         --index;
+        child = getChildren().getAt(index);
+      }
+      while ((!child || child.hidden) && index <= highestIndex) {
+        ++index;
         child = getChildren().getAt(index);
       }
       if (child) {
