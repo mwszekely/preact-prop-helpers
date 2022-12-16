@@ -271,7 +271,7 @@ export function useAsync<AP extends unknown[], R, SP extends unknown[] = AP>(asy
     let { throttle, debounce, capture: captureUnstable } = (options ?? {});
     const captureStable = useStableCallback(captureUnstable ?? identity);
     const asyncHandlerStable = useStableCallback<(...args: AP) => R | Promise<R>>(asyncHandler2 ?? (identity as any));
-    const { flush, syncOutput } = useMemo(() => {
+    const { flush, syncOutput, cancel } = useMemo(() => {
         return asyncToSync<AP, SP, R>({
             asyncInput: asyncHandlerStable,
             capture: captureStable,
@@ -289,7 +289,11 @@ export function useAsync<AP extends unknown[], R, SP extends unknown[] = AP>(asy
             throttle: options?.throttle,
             wait: options?.debounce
         })
-    }, [throttle, debounce])
+    }, [throttle, debounce]);
+
+    useEffect(() => {
+        return () => cancel();
+    }, [cancel])
 
     // We keep, like, a lot of render-state, but it only ever triggers a re-render
     // when we start/stop an async action.
@@ -346,9 +350,10 @@ interface AsyncToSyncParameters<AsyncArgs extends any[], SyncArgs extends any[],
     setHasResult(hasResult: boolean | null): void;
 }
 
-interface AsyncToSyncReturn<SyncArgs extends any[], Return> {
+interface AsyncToSyncReturn<SyncArgs extends any[], _Return> {
     syncOutput: (...args: SyncArgs) => void;
     flush(): void;
+    cancel(): void;
 }
 
 function isPromise<T>(p: T | Promise<T>): p is Promise<T> {
@@ -368,8 +373,6 @@ function asyncToSync<AsyncArgs extends any[], SyncArgs extends any[], Return>({ 
     let asyncDebouncing = false;
     let currentCapture: AsyncArgs | typeof Unset = Unset;
 
-    console.log("Creating a new async-to-sync function");
-
     const onAsyncFinished = () => {
 
         // 8. This is run at the end of every invocation of the async handler,
@@ -378,12 +381,10 @@ function asyncToSync<AsyncArgs extends any[], SyncArgs extends any[], Return>({ 
         setPending(pending = false);
 
         if (!asyncDebouncing) {
-            console.log("onAsyncFinished: !asyncDebouncing");
             // 9a. After completing the async handler, we found that it wasn't called again since the last time.
             // This means we can just end. We're done. Mission accomplished.
         }
         else {
-            console.log("onAsyncFinished: asyncDebouncing");
             // 9a. Another request to run the async handler came in while we were running this one.
             // Instead of stopping, we're just going to immediately run again using the arguments that were given to us most recently.
             // We also clear that flag, because we're handling it now. It'll be set again if the handler is called again while *this* one is running
@@ -397,7 +398,6 @@ function asyncToSync<AsyncArgs extends any[], SyncArgs extends any[], Return>({ 
     }
 
     const sync = (...args: AsyncArgs) => {
-        console.log("sync: ", ...args);
         // 5. We're finally running the async version of the function, so notify the caller that the return value is pending.
         // And because the fact that we're here means the debounce/throttle period is over, we can clear that flag too.
         setPending(pending = true);
@@ -448,13 +448,11 @@ function asyncToSync<AsyncArgs extends any[], SyncArgs extends any[], Return>({ 
     const syncDebounced = LodashDebounce(() => {
         setSyncDebouncing(syncDebouncing = false);
         if (!pending) {
-            console.log("syncDebounced !pending");
             // 3a. If this is the first invocation, or if we're not still waiting for a previous invocation to finish its async call,
             // then we can just go ahead and run the debounced version of our function.
             console.assert(currentCapture != Unset);
             sync(...(currentCapture as AsyncArgs));
         } else {
-            console.log("syncDebounced pending");
             // 3b. If we were called while still waiting for the (or a) previous invocation to finish,
             // then we'll need to delay this one. When that previous invocation finishes, it'll check
             // to see if it needs to run again, and it will use these new captured arguments from step 2.
@@ -465,7 +463,6 @@ function asyncToSync<AsyncArgs extends any[], SyncArgs extends any[], Return>({ 
 
     return {
         syncOutput: (...args: SyncArgs) => {
-            console.log("syncOutput");
             // 1. We call the sync version of our async function.
             // 2. We capture the arguments into a form that won't become stale if/when the function is called with a (possibly seconds-long) delay.
             currentCapture = capture(...args);
@@ -474,6 +471,9 @@ function asyncToSync<AsyncArgs extends any[], SyncArgs extends any[], Return>({ 
         },
         flush: () => {
             syncDebounced.flush();
+        },
+        cancel: () => {
+            syncDebounced.cancel();
         }
     };
 }

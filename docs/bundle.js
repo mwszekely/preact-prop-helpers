@@ -7568,7 +7568,8 @@ var bundle = function (exports) {
     const asyncHandlerStable = useStableCallback(asyncHandler2 !== null && asyncHandler2 !== void 0 ? asyncHandler2 : identity);
     const {
       flush,
-      syncOutput
+      syncOutput,
+      cancel
     } = F$1(() => {
       return asyncToSync({
         asyncInput: asyncHandlerStable,
@@ -7588,6 +7589,9 @@ var bundle = function (exports) {
         wait: options === null || options === void 0 ? void 0 : options.debounce
       });
     }, [throttle, debounce]);
+    h(() => {
+      return () => cancel();
+    }, [cancel]);
     // We keep, like, a lot of render-state, but it only ever triggers a re-render
     // when we start/stop an async action.
     // Keep track of this for the caller's sake -- we don't really care.
@@ -7644,18 +7648,12 @@ var bundle = function (exports) {
     let syncDebouncing = false;
     let asyncDebouncing = false;
     let currentCapture = Unset;
-    console.log("Creating a new async-to-sync function");
     const onAsyncFinished = () => {
       // 8. This is run at the end of every invocation of the async handler,
       // whether it completed or not.
       incrementFinallyCount();
       setPending(pending = false);
-      if (!asyncDebouncing) {
-        console.log("onAsyncFinished: !asyncDebouncing");
-        // 9a. After completing the async handler, we found that it wasn't called again since the last time.
-        // This means we can just end. We're done. Mission accomplished.
-      } else {
-        console.log("onAsyncFinished: asyncDebouncing");
+      if (!asyncDebouncing) ;else {
         // 9a. Another request to run the async handler came in while we were running this one.
         // Instead of stopping, we're just going to immediately run again using the arguments that were given to us most recently.
         // We also clear that flag, because we're handling it now. It'll be set again if the handler is called again while *this* one is running
@@ -7668,10 +7666,6 @@ var bundle = function (exports) {
       }
     };
     const sync = function () {
-      for (var _len5 = arguments.length, args = new Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
-        args[_key5] = arguments[_key5];
-      }
-      console.log("sync: ", ...args);
       // 5. We're finally running the async version of the function, so notify the caller that the return value is pending.
       // And because the fact that we're here means the debounce/throttle period is over, we can clear that flag too.
       setPending(pending = true);
@@ -7685,7 +7679,7 @@ var bundle = function (exports) {
         // Because it may be sync, or it may throw before returning, we must still wrap it in a try/catch...
         // Also important is that we preserve the async-ness (or lack thereof) on the original input function.
         incrementCallCount();
-        promiseOrReturn = asyncInput(...args);
+        promiseOrReturn = asyncInput(...arguments);
         setHasError(false);
       } catch (ex) {
         hadSyncError = true;
@@ -7723,13 +7717,11 @@ var bundle = function (exports) {
     const syncDebounced = debounce(() => {
       setSyncDebouncing(syncDebouncing = false);
       if (!pending) {
-        console.log("syncDebounced !pending");
         // 3a. If this is the first invocation, or if we're not still waiting for a previous invocation to finish its async call,
         // then we can just go ahead and run the debounced version of our function.
         console.assert(currentCapture != Unset);
         sync(...currentCapture);
       } else {
-        console.log("syncDebounced pending");
         // 3b. If we were called while still waiting for the (or a) previous invocation to finish,
         // then we'll need to delay this one. When that previous invocation finishes, it'll check
         // to see if it needs to run again, and it will use these new captured arguments from step 2.
@@ -7742,7 +7734,6 @@ var bundle = function (exports) {
     });
     return {
       syncOutput: function () {
-        console.log("syncOutput");
         // 1. We call the sync version of our async function.
         // 2. We capture the arguments into a form that won't become stale if/when the function is called with a (possibly seconds-long) delay.
         currentCapture = capture(...arguments);
@@ -7751,6 +7742,9 @@ var bundle = function (exports) {
       },
       flush: () => {
         syncDebounced.flush();
+      },
+      cancel: () => {
+        syncDebounced.cancel();
       }
     };
   }
