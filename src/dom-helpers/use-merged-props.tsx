@@ -69,6 +69,7 @@ function mergeUnknown(key: string, lhsValue: unknown, rhsValue: unknown) {
             // I mean, they're the same value at least
             // so we don't need to do anything.
             // Not really ideal though.
+            return rhsValue as never;
         }
         else {
             // Ugh.

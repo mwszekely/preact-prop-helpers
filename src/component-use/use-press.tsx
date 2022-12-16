@@ -313,18 +313,16 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
                 e.stopPropagation();
             }
             else {
-                // Listen for "programmatic" click events.  That would be
-                // events that don't immediately follow a bunch of pointer and mouse events
-                // and also was fired **specifically** on this element.
-                // (That second check is to avoid bubbled clicks being caught as programmatic presses on parent components)
+                // Listen for "programmatic" click events.
                 if (
-                    // Ignore click events that were just handled with pointerup
+                    // Ignore the click events that were *just* handled with pointerup
                     getJustHandled() == false &&
-                    // Ignore click events that were't fired SPECIFICALLY on this element
+                    // Ignore stray click events that were't fired SPECIFICALLY on this element
                     e.target == element &&
-                    // Ignore click events that were fired on a checked radio
+                    // Ignore click events that were fired on a radio that just became checked
                     // (Whenever the `checked` property is changed, all browsers fire a `click` event, no matter the reason for the change,
-                    // but since *we* were the reason for the change, this will always be a duplicate event related to whatever we just did.)
+                    // but since everything's declarative and *we* were the reason for the change, 
+                    // this will always be a duplicate event related to whatever we just did.)
                     element?.tagName == 'input' && (element as Element as HTMLInputElement).type == 'radio' && (element as Element as HTMLInputElement).checked
                 ) {
                     // Intentional, for now. Programmatic clicks shouldn't happen in most cases.

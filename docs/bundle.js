@@ -1151,7 +1151,12 @@ var bundle = function (exports) {
       if (lhsValue == null && rhsValue == null) {
         if (rhsValue === null && lhsValue === undefined) return rhsValue;else return lhsValue;
       }
-      if (lhsValue == null) return rhsValue;else if (rhsValue == null) return lhsValue;else if (rhsValue == lhsValue) ;else {
+      if (lhsValue == null) return rhsValue;else if (rhsValue == null) return lhsValue;else if (rhsValue == lhsValue) {
+        // I mean, they're the same value at least
+        // so we don't need to do anything.
+        // Not really ideal though.
+        return rhsValue;
+      } else {
         // Ugh.
         // No good strategies here, just log it if requested
         log === null || log === void 0 ? void 0 : log("The prop \"".concat(key, "\" cannot simultaneously be the values ").concat(lhsValue, " and ").concat(rhsValue, ". One must be chosen outside of useMergedProps."));
@@ -1200,64 +1205,64 @@ var bundle = function (exports) {
   }
   /*
   function test<P extends h.JSX.HTMLAttributes<HTMLInputElement>>(props: P) {
-       const id0: GenericGet<{}, "id", string> = "";
+        const id0: GenericGet<{}, "id", string> = "";
       const id3: GenericGet<{ id: undefined }, "id", string> = undefined;
       const id4: GenericGet<{ id: undefined }, "id", string> = undefined;
       const id5: GenericGet<{ id: undefined }, "id", string> = undefined;
       const id6: GenericGet<{ id: undefined }, "id", string> = undefined;
       //const id2: ZipSingle<string | undefined, string | undefined> = undefined;
       const id1: ZipObject<{ id: undefined }, { id: string }> = { id: undefined };
-       type M1 = GenericGet<P, "style", string>;
+        type M1 = GenericGet<P, "style", string>;
       type M2 = GenericGet<{}, "style", string>;
       const m1: M1 = "";
       const m2: M1 = undefined;
       /// @ts-expect-error    Because number isn't assignable to string
       const m3: M1 = 0;
-       const m4: M2 = "";
+        const m4: M2 = "";
       const m5: M2 = undefined;
       /// @ts-expect-error    Because number isn't assignable to string
       const m6: M2 = 0;
-       const p1: MergedProps<HTMLInputElement, {}, { id: string }> = useMergedProps<HTMLInputElement>()({}, { id: "string" });
+        const p1: MergedProps<HTMLInputElement, {}, { id: string }> = useMergedProps<HTMLInputElement>()({}, { id: "string" });
       const p2: MergedProps<HTMLInputElement, { id: undefined }, { id: string }> = useMergedProps<HTMLInputElement>()({ id: undefined }, { id: "string" });
       const p3: MergedProps<HTMLInputElement, { id: undefined }, { id: undefined }> = useMergedProps<HTMLInputElement>()({ id: undefined }, { id: undefined });
       const p4: MergedProps<HTMLInputElement, {}, {}> = useMergedProps<HTMLInputElement>()({}, {});
       const p5 = useMergedProps<HTMLInputElement>()(props, {});
       const p6 = useMergedProps<HTMLInputElement>()(props, { id: undefined });
       const p7 = useMergedProps<HTMLInputElement>()(props, { id: "string" });
-        p1.id?.concat("");
+          p1.id?.concat("");
       p2.id?.concat("");
       /// @ts-expect-error    id can't be anything but undefined
       p3.id?.concat("");
       /// @ts-expect-error    id can't be anything but undefined
       p4.id?.concat("");
-        p5.id?.concat("");
+          p5.id?.concat("");
       p6.id?.concat("");
       p7.id?.concat("");
-       /// @ts-expect-error    id must contain undefined
+        /// @ts-expect-error    id must contain undefined
       p5.id.concat("");
       /// @ts-expect-error    id must contain undefined
       p6.id.concat("");
       /// @ts-expect-error    id must contain undefined
       p7.id.concat("");
-        if (p5.allowFullScreen === undefined) {}
+          if (p5.allowFullScreen === undefined) {}
       else if (p5.allowFullScreen === false) {}
       else if (p5.allowFullScreen === true) {}
       else {
           acceptsNever(p5.allowFullScreen);
       }
-        if (p6.allowFullScreen === undefined) {}
+          if (p6.allowFullScreen === undefined) {}
       else if (p6.allowFullScreen === false) {}
       else if (p6.allowFullScreen === true) {}
       else {
           acceptsNever(p6.allowFullScreen);
       }
-        if (p7.allowFullScreen === undefined) {}
+          if (p7.allowFullScreen === undefined) {}
       else if (p7.allowFullScreen === false) {}
       else if (p7.allowFullScreen === true) {}
       else {
           acceptsNever(p7.allowFullScreen);
       }
-        // Make sure it works recursively
+          // Make sure it works recursively
       const r1a = useMergedProps<HTMLInputElement>()({}, p1);
       const r1b = useMergedProps<HTMLInputElement>()(props, p1);
       const r2a = useMergedProps<HTMLInputElement>()({}, p2);
@@ -1272,7 +1277,7 @@ var bundle = function (exports) {
       const r6b = useMergedProps<HTMLInputElement>()(props, p6);
       const r7a = useMergedProps<HTMLInputElement>()({}, p7);
       const r7b = useMergedProps<HTMLInputElement>()(props, p7);
-        r1a.id?.concat("");
+          r1a.id?.concat("");
       r1b.id?.concat("");
       r2a.id?.concat("");
       r2b.id?.concat("");
@@ -1282,13 +1287,13 @@ var bundle = function (exports) {
       /// @ts-expect-error    id can't be anything but undefined
       r4a.id?.concat("");
       r4b.id?.concat("");
-        r5a.id?.concat("");
+          r5a.id?.concat("");
       r5b.id?.concat("");
       r6a.id?.concat("");
       r6b.id?.concat("");
       r7a.id?.concat("");
       r7b.id?.concat("");
-       /// @ts-expect-error    id must contain undefined
+        /// @ts-expect-error    id must contain undefined
       r5a.id.concat("");
       /// @ts-expect-error    id must contain undefined
       r5b.id.concat("");
@@ -1300,43 +1305,43 @@ var bundle = function (exports) {
       r7a.id.concat("");
       /// @ts-expect-error    id must contain undefined
       r7b.id.concat("");
-        if (r5a.allowFullScreen === undefined) {}
+          if (r5a.allowFullScreen === undefined) {}
       else if (r5a.allowFullScreen === false) {}
       else if (r5a.allowFullScreen === true) {}
       else {
           acceptsNever(r5a.allowFullScreen);
       }
-        if (r5b.allowFullScreen === undefined) {}
+          if (r5b.allowFullScreen === undefined) {}
       else if (r5b.allowFullScreen === false) {}
       else if (r5b.allowFullScreen === true) {}
       else {
           acceptsNever(r5b.allowFullScreen);
       }
-        if (r6a.allowFullScreen === undefined) {}
+          if (r6a.allowFullScreen === undefined) {}
       else if (r6a.allowFullScreen === false) {}
       else if (r6a.allowFullScreen === true) {}
       else {
           acceptsNever(r6a.allowFullScreen);
       }
-        if (r6b.allowFullScreen === undefined) {}
+          if (r6b.allowFullScreen === undefined) {}
       else if (r6b.allowFullScreen === false) {}
       else if (r6b.allowFullScreen === true) {}
       else {
           acceptsNever(r6b.allowFullScreen);
       }
-        if (r7a.allowFullScreen === undefined) {}
+          if (r7a.allowFullScreen === undefined) {}
       else if (r7a.allowFullScreen === false) {}
       else if (r7a.allowFullScreen === true) {}
       else {
           acceptsNever(r7a.allowFullScreen);
       }
-        if (r7b.allowFullScreen === undefined) {}
+          if (r7b.allowFullScreen === undefined) {}
       else if (r7b.allowFullScreen === false) {}
       else if (r7b.allowFullScreen === true) {}
       else {
           acceptsNever(r7b.allowFullScreen);
       }
-   }
+    }
   function acceptsNever(n: never) {}
   */
 
@@ -2144,7 +2149,7 @@ var bundle = function (exports) {
   }
 
   /*!
-  * tabbable 5.3.3
+  * tabbable 6.0.1
   * @license MIT, https://github.com/focus-trap/tabbable/blob/master/LICENSE
   */
   var candidateSelectors = ['input', 'select', 'textarea', 'a[href]', 'button', '[tabindex]:not(slot)', 'audio[controls]', 'video[controls]', '[contenteditable]:not([contenteditable="false"])', 'details>summary:first-of-type', 'details'];
@@ -2167,6 +2172,41 @@ var bundle = function (exports) {
     });
     return r;
   };
+
+  // determines if a node is ultimately attached to the window's document
+  var isNodeAttached = function isNodeAttached(node) {
+    var _nodeRootHost;
+    // The root node is the shadow root if the node is in a shadow DOM; some document otherwise
+    //  (but NOT _the_ document; see second 'If' comment below for more).
+    // If rootNode is shadow root, it'll have a host, which is the element to which the shadow
+    //  is attached, and the one we need to check if it's in the document or not (because the
+    //  shadow, and all nodes it contains, is never considered in the document since shadows
+    //  behave like self-contained DOMs; but if the shadow's HOST, which is part of the document,
+    //  is hidden, or is not in the document itself but is detached, it will affect the shadow's
+    //  visibility, including all the nodes it contains). The host could be any normal node,
+    //  or a custom element (i.e. web component). Either way, that's the one that is considered
+    //  part of the document, not the shadow root, nor any of its children (i.e. the node being
+    //  tested).
+    // To further complicate things, we have to look all the way up until we find a shadow HOST
+    //  that is attached (or find none) because the node might be in nested shadows...
+    // If rootNode is not a shadow root, it won't have a host, and so rootNode should be the
+    //  document (per the docs) and while it's a Document-type object, that document does not
+    //  appear to be the same as the node's `ownerDocument` for some reason, so it's safer
+    //  to ignore the rootNode at this point, and use `node.ownerDocument`. Otherwise,
+    //  using `rootNode.contains(node)` will _always_ be true we'll get false-positives when
+    //  node is actually detached.
+    var nodeRootHost = getRootNode(node).host;
+    var attached = !!((_nodeRootHost = nodeRootHost) !== null && _nodeRootHost !== void 0 && _nodeRootHost.ownerDocument.contains(nodeRootHost) || node.ownerDocument.contains(node));
+    while (!attached && nodeRootHost) {
+      var _nodeRootHost2;
+      // since it's not attached and we have a root host, the node MUST be in a nested shadow DOM,
+      //  which means we need to get the host's host and check if that parent host is contained
+      //  in (i.e. attached to) the document
+      nodeRootHost = getRootNode(nodeRootHost).host;
+      attached = !!((_nodeRootHost2 = nodeRootHost) !== null && _nodeRootHost2 !== void 0 && _nodeRootHost2.ownerDocument.contains(nodeRootHost));
+    }
+    return attached;
+  };
   var isZeroArea = function isZeroArea(node) {
     var _node$getBoundingClie = node.getBoundingClientRect(),
       width = _node$getBoundingClie.width,
@@ -2176,7 +2216,6 @@ var bundle = function (exports) {
   var isHidden = function isHidden(node, _ref) {
     var displayCheck = _ref.displayCheck,
       getShadowRoot = _ref.getShadowRoot;
-
     // NOTE: visibility will be `undefined` if node is detached from the document
     //  (see notes about this further down), which means we will consider it visible
     //  (this is legacy behavior from a very long way back)
@@ -2189,27 +2228,8 @@ var bundle = function (exports) {
     var nodeUnderDetails = isDirectSummary ? node.parentElement : node;
     if (matches.call(nodeUnderDetails, 'details:not([open]) *')) {
       return true;
-    } // The root node is the shadow root if the node is in a shadow DOM; some document otherwise
-    //  (but NOT _the_ document; see second 'If' comment below for more).
-    // If rootNode is shadow root, it'll have a host, which is the element to which the shadow
-    //  is attached, and the one we need to check if it's in the document or not (because the
-    //  shadow, and all nodes it contains, is never considered in the document since shadows
-    //  behave like self-contained DOMs; but if the shadow's HOST, which is part of the document,
-    //  is hidden, or is not in the document itself but is detached, it will affect the shadow's
-    //  visibility, including all the nodes it contains). The host could be any normal node,
-    //  or a custom element (i.e. web component). Either way, that's the one that is considered
-    //  part of the document, not the shadow root, nor any of its children (i.e. the node being
-    //  tested).
-    // If rootNode is not a shadow root, it won't have a host, and so rootNode should be the
-    //  document (per the docs) and while it's a Document-type object, that document does not
-    //  appear to be the same as the node's `ownerDocument` for some reason, so it's safer
-    //  to ignore the rootNode at this point, and use `node.ownerDocument`. Otherwise,
-    //  using `rootNode.contains(node)` will _always_ be true we'll get false-positives when
-    //  node is actually detached.
-
-    var nodeRootHost = getRootNode(node).host;
-    var nodeIsAttached = (nodeRootHost === null || nodeRootHost === void 0 ? void 0 : nodeRootHost.ownerDocument.contains(nodeRootHost)) || node.ownerDocument.contains(node);
-    if (!displayCheck || displayCheck === 'full') {
+    }
+    if (!displayCheck || displayCheck === 'full' || displayCheck === 'legacy-full') {
       if (typeof getShadowRoot === 'function') {
         // figure out if we should consider the node to be in an undisclosed shadow and use the
         //  'non-zero-area' fallback
@@ -2234,22 +2254,26 @@ var bundle = function (exports) {
           }
         }
         node = originalNode;
-      } // else, `getShadowRoot` might be true, but all that does is enable shadow DOM support
+      }
+      // else, `getShadowRoot` might be true, but all that does is enable shadow DOM support
       //  (i.e. it does not also presume that all nodes might have undisclosed shadows); or
       //  it might be a falsy value, which means shadow DOM support is disabled
+
       // Since we didn't find it sitting in an undisclosed shadow (or shadows are disabled)
       //  now we can just test to see if it would normally be visible or not, provided it's
       //  attached to the main document.
       // NOTE: We must consider case where node is inside a shadow DOM and given directly to
       //  `isTabbable()` or `isFocusable()` -- regardless of `getShadowRoot` option setting.
 
-      if (nodeIsAttached) {
+      if (isNodeAttached(node)) {
         // this works wherever the node is: if there's at least one client rect, it's
         //  somehow displayed; it also covers the CSS 'display: contents' case where the
         //  node itself is hidden in place of its contents; and there's no need to search
         //  up the hierarchy either
         return !node.getClientRects().length;
-      } // Else, the node isn't attached to the document, which means the `getClientRects()`
+      }
+
+      // Else, the node isn't attached to the document, which means the `getClientRects()`
       //  API will __always__ return zero rects (this can happen, for example, if React
       //  is used to render nodes onto a detached tree, as confirmed in this thread:
       //  https://github.com/facebook/react/issues/9117#issuecomment-284228870)
@@ -2262,6 +2286,13 @@ var bundle = function (exports) {
       //  APIs on nodes in detached containers has actually implicitly used tabbable in what
       //  was later (as of v5.2.0 on Apr 9, 2021) called `displayCheck="none"` mode -- essentially
       //  considering __everything__ to be visible because of the innability to determine styles.
+      //
+      // v6.0.0: As of this major release, the default 'full' option __no longer treats detached
+      //  nodes as visible with the 'none' fallback.__
+      if (displayCheck !== 'legacy-full') {
+        return true; // hidden
+      }
+      // else, fallback to 'none' mode and consider the node visible
     } else if (displayCheck === 'non-zero-area') {
       // NOTE: Even though this tests that the node's client rect is non-zero to determine
       //  whether it's displayed, and that a detached node will __always__ have a zero-area
@@ -2269,37 +2300,41 @@ var bundle = function (exports) {
       //  this mode, we do want to consider nodes that have a zero area to be hidden at all
       //  times, and that includes attached or not.
       return isZeroArea(node);
-    } // visible, as far as we can tell, or per current `displayCheck` mode
+    }
 
+    // visible, as far as we can tell, or per current `displayCheck=none` mode, we assume
+    //  it's visible
     return false;
-  }; // form fields (nested) inside a disabled fieldset are not focusable/tabbable
+  };
+
+  // form fields (nested) inside a disabled fieldset are not focusable/tabbable
   //  unless they are in the _first_ <legend> element of the top-most disabled
   //  fieldset
-
   var isDisabledFromFieldset = function isDisabledFromFieldset(node) {
     if (/^(INPUT|BUTTON|SELECT|TEXTAREA)$/.test(node.tagName)) {
-      var parentNode = node.parentElement; // check if `node` is contained in a disabled <fieldset>
-
+      var parentNode = node.parentElement;
+      // check if `node` is contained in a disabled <fieldset>
       while (parentNode) {
         if (parentNode.tagName === 'FIELDSET' && parentNode.disabled) {
           // look for the first <legend> among the children of the disabled <fieldset>
           for (var i = 0; i < parentNode.children.length; i++) {
-            var child = parentNode.children.item(i); // when the first <legend> (in document order) is found
-
+            var child = parentNode.children.item(i);
+            // when the first <legend> (in document order) is found
             if (child.tagName === 'LEGEND') {
               // if its parent <fieldset> is not nested in another disabled <fieldset>,
               // return whether `node` is a descendant of its first <legend>
               return matches.call(parentNode, 'fieldset[disabled] *') ? true : !child.contains(node);
             }
-          } // the disabled <fieldset> containing `node` has no <legend>
-
+          }
+          // the disabled <fieldset> containing `node` has no <legend>
           return true;
         }
         parentNode = parentNode.parentElement;
       }
-    } // else, node's tabbable/focusable state should not be affected by a fieldset's
-    //  enabled/disabled state
+    }
 
+    // else, node's tabbable/focusable state should not be affected by a fieldset's
+    //  enabled/disabled state
     return false;
   };
   var isNodeMatchingSelectorFocusable = function isNodeMatchingSelectorFocusable(options, node) {
@@ -4071,17 +4106,17 @@ var bundle = function (exports) {
             But roughly isn't good enough if there are multiple matches.
             To convert our sorted index to the unsorted index we need, we have to find the first
             element that matches us *and* (if any such exist) is *after* our current selection.
-                     In other words, the only way typeahead moves backwards relative to our current
+                      In other words, the only way typeahead moves backwards relative to our current
             position is if the only other option is behind us.
-                     It's not specified in WAI-ARIA what to do in that case.  I suppose wrap back to the start?
+                      It's not specified in WAI-ARIA what to do in that case.  I suppose wrap back to the start?
             Though there's also a case for just going upwards to the nearest to prevent jumpiness.
             But if you're already doing typeahead on an unsorted list, like, jumpiness can't be avoided.
             I dunno. Going back to the start is the simplist though.
-                     Basically what this does: Starting from where we found ourselves after our binary search,
+                      Basically what this does: Starting from where we found ourselves after our binary search,
             scan backwards and forwards through all adjacent entries that also compare equally so that
             we can find the one whose `unsortedIndex` is the lowest amongst all other equal strings
             (and also the lowest `unsortedIndex` yadda yadda except that it comes after us).
-                     TODO: The binary search starts this off with a solid O(log n), but one-character
+                      TODO: The binary search starts this off with a solid O(log n), but one-character
             searches are, thanks to pigeonhole principal, eventually guaranteed to become
             O(n*log n). This is annoying but probably not easily solvable? There could be an
             exception for one-character strings, but that's just kicking the can down
@@ -5888,7 +5923,7 @@ var bundle = function (exports) {
   /*export interface UseGroupedSortableChildrenParameters<M extends GroupedSortedChildInfo> {
       managedChildrenReturn: UseManagedChildrenReturnType<M>["managedChildrenReturn"]
   }
-   export interface UseGroupedSortableChildren {
+    export interface UseGroupedSortableChildren {
       linearNavigationParameters: Pick<UseLinearNavigationParameters["linearNavigationParameters"], "indexDemangler" | "indexMangler">
   }*/
   /**
@@ -5916,7 +5951,7 @@ var bundle = function (exports) {
           }
           return identity(i);
       }, []);
-        return {
+          return {
           linearNavigationParameters: {
               indexMangler,
               indexDemangler
@@ -6765,18 +6800,16 @@ var bundle = function (exports) {
           e.stopImmediatePropagation();
           e.stopPropagation();
         } else {
-          // Listen for "programmatic" click events.  That would be
-          // events that don't immediately follow a bunch of pointer and mouse events
-          // and also was fired **specifically** on this element.
-          // (That second check is to avoid bubbled clicks being caught as programmatic presses on parent components)
+          // Listen for "programmatic" click events.
           if (
-          // Ignore click events that were just handled with pointerup
+          // Ignore the click events that were *just* handled with pointerup
           getJustHandled() == false &&
-          // Ignore click events that were't fired SPECIFICALLY on this element
+          // Ignore stray click events that were't fired SPECIFICALLY on this element
           e.target == element &&
-          // Ignore click events that were fired on a checked radio
+          // Ignore click events that were fired on a radio that just became checked
           // (Whenever the `checked` property is changed, all browsers fire a `click` event, no matter the reason for the change,
-          // but since *we* were the reason for the change, this will always be a duplicate event related to whatever we just did.)
+          // but since everything's declarative and *we* were the reason for the change, 
+          // this will always be a duplicate event related to whatever we just did.)
           (element === null || element === void 0 ? void 0 : element.tagName) == 'input' && element.type == 'radio' && element.checked) {
             // Intentional, for now. Programmatic clicks shouldn't happen in most cases.
             // TODO: Remove this when I'm confident stray clicks won't be handled.
@@ -9636,10 +9669,10 @@ var bundle = function (exports) {
       const onClickThrottled = useThrottled(onClick, 1000);
       const onClickDebounced = useDebounced(onClick, 1000);
       const onClickBoth = useDebounced(onClickThrottled, 1000);
-       return (
+        return (
           <div className="demo">
               <div>Press count: {count}</div>
-               <div><button onClick={() => {debugger; onClick();}}>Normal</button></div>
+                <div><button onClick={() => {debugger; onClick();}}>Normal</button></div>
               <div><button onClick={() => {debugger; onClickThrottled();}}>Throttled</button></div>
               <div><button onClick={() => {debugger; onClickDebounced();}}>Debounced</button></div>
               <div><button onClick={() => {debugger; onClickBoth();}}>Combined</button></div>
