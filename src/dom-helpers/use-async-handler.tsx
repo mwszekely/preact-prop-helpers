@@ -19,7 +19,7 @@ export interface UseAsyncHandlerParameters<EventType, CaptureType> extends Omit<
     asyncHandler: AsyncHandler<EventType, CaptureType> | null;
 }
 
-export interface UseAsyncHandlerReturnType<EventType, CaptureType> extends UseAsyncReturnType<[EventType], void> {
+export interface UseAsyncHandlerReturnType<EventType, CaptureType> extends Omit<UseAsyncReturnType<[CaptureType, EventType], [EventType], void>, "getCurrentCapture" | "currentCapture"> {
 
     /**
      * The most recently captured value. In other words, represents what
@@ -130,6 +130,7 @@ export function useAsyncHandler<EventType, CaptureType>({ asyncHandler, capture:
         setHasCapture(true);
         return [captured, e];
     });
+
 
     return {
         getCurrentCapture,

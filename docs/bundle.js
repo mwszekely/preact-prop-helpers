@@ -734,10 +734,10 @@ var bundle = function (exports) {
    * @returns
    */
   function usePassiveState(onChange, getInitialValue, customDebounceRendering) {
-    const valueRef = _(Unset$1);
-    const reasonRef = _(Unset$1);
+    const valueRef = _(Unset$2);
+    const reasonRef = _(Unset$2);
     const warningRef = _(false);
-    const dependencyToCompareAgainst = _(Unset$1);
+    const dependencyToCompareAgainst = _(Unset$2);
     const cleanupCallbackRef = _(undefined);
     // Make sure that the provided functions are perfectly stable across renders
     useEnsureStability("usePassiveState", onChange, getInitialValue, customDebounceRendering);
@@ -751,7 +751,7 @@ var bundle = function (exports) {
     // This is the shared code for that, used on mount and whenever
     // getValue is called.
     const tryEnsureValue = T$1(() => {
-      if (valueRef.current === Unset$1 && getInitialValue != undefined) {
+      if (valueRef.current === Unset$2 && getInitialValue != undefined) {
         try {
           var _onChange;
           const initialValue = getInitialValue();
@@ -767,8 +767,8 @@ var bundle = function (exports) {
       // The first time we call getValue, if we haven't been given a value yet,
       // (and we were given an initial value to use)
       // return the initial value instead of nothing.
-      if (valueRef.current === Unset$1) tryEnsureValue();
-      return valueRef.current === Unset$1 ? undefined : valueRef.current;
+      if (valueRef.current === Unset$2) tryEnsureValue();
+      return valueRef.current === Unset$2 ? undefined : valueRef.current;
     }, []);
     s(() => {
       // Make sure we've run our effect at least once on mount.
@@ -778,8 +778,8 @@ var bundle = function (exports) {
     // The actual code the user calls to (possibly) run a new effect.
     const setValue = T$1((arg, reason) => {
       // Regardless of anything else, figure out what our next value is about to be.
-      const nextValue = arg instanceof Function ? arg(valueRef.current === Unset$1 ? undefined : valueRef.current) : arg;
-      if (dependencyToCompareAgainst.current === Unset$1 && nextValue !== valueRef.current) {
+      const nextValue = arg instanceof Function ? arg(valueRef.current === Unset$2 ? undefined : valueRef.current) : arg;
+      if (dependencyToCompareAgainst.current === Unset$2 && nextValue !== valueRef.current) {
         // This is the first request to change this value.
         // Evaluate the request immediately, then queue up the onChange function
         // Save our current value so that we can compare against it later
@@ -799,7 +799,7 @@ var bundle = function (exports) {
               var _onChange2;
               // Call any registered cleanup function
               onShouldCleanUp();
-              cleanupCallbackRef.current = (_onChange2 = onChange === null || onChange === void 0 ? void 0 : onChange(nextDep, prevDep === Unset$1 ? undefined : prevDep, nextReason)) !== null && _onChange2 !== void 0 ? _onChange2 : undefined;
+              cleanupCallbackRef.current = (_onChange2 = onChange === null || onChange === void 0 ? void 0 : onChange(nextDep, prevDep === Unset$2 ? undefined : prevDep, nextReason)) !== null && _onChange2 !== void 0 ? _onChange2 : undefined;
               valueRef.current = nextDep;
             } finally {
               // Allow the user to normally call getValue again
@@ -807,7 +807,7 @@ var bundle = function (exports) {
             }
           }
           // We've finished with everything, so mark us as being on a clean slate again.
-          dependencyToCompareAgainst.current = Unset$1;
+          dependencyToCompareAgainst.current = Unset$2;
         });
       }
       // Update the value immediately.
@@ -816,7 +816,7 @@ var bundle = function (exports) {
     }, []);
     return [getValue, setValue];
   }
-  const Unset$1 = Symbol();
+  const Unset$2 = Symbol();
   // Easy constants for getInitialValue
   function returnTrue() {
     return true;
@@ -929,7 +929,7 @@ var bundle = function (exports) {
   function argsChanged(oldArgs, newArgs) {
     return !!(!oldArgs || oldArgs.length !== (newArgs === null || newArgs === void 0 ? void 0 : newArgs.length) || newArgs !== null && newArgs !== void 0 && newArgs.some((arg, index) => arg !== oldArgs[index]));
   }
-  const Unset = Symbol("unset");
+  const Unset$1 = Symbol("unset");
   /**
    * Given an input value, returns a constant getter function that can be used
    * inside of `useEffect` and friends without including it in the dependency array.
@@ -941,12 +941,12 @@ var bundle = function (exports) {
    * @returns
    */
   function useStableGetter(value) {
-    const ref = _(Unset);
+    const ref = _(Unset$1);
     useBeforeLayoutEffect(() => {
       ref.current = value;
     }, [value]);
     return T$1(() => {
-      if (ref.current === Unset) {
+      if (ref.current === Unset$1) {
         throw new Error('Value retrieved from useStableGetter() cannot be called during render.');
       }
       return ref.current;
@@ -6764,7 +6764,15 @@ var bundle = function (exports) {
           // events that don't immediately follow a bunch of pointer and mouse events
           // and also was fired **specifically** on this element.
           // (That second check is to avoid bubbled clicks being caught as programmatic presses on parent components)
-          if (getJustHandled() == false && e.target == element) {
+          if (
+          // Ignore click events that were just handled with pointerup
+          getJustHandled() == false &&
+          // Ignore click events that were't fired SPECIFICALLY on this element
+          e.target == element &&
+          // Ignore click events that were fired on a checked radio
+          // (Whenever the `checked` property is changed, all browsers fire a `click` event, no matter the reason for the change,
+          // but since *we* were the reason for the change, this will always be a duplicate event related to whatever we just did.)
+          (element === null || element === void 0 ? void 0 : element.tagName) == 'input' && element.type == 'radio' && element.checked) {
             // Intentional, for now. Programmatic clicks shouldn't happen in most cases.
             // TODO: Remove this when I'm confident stray clicks won't be handled.
             console.log(false);
@@ -7329,7 +7337,7 @@ var bundle = function (exports) {
   }
 
   /** Error message constants. */
-  var FUNC_ERROR_TEXT$1 = 'Expected a function';
+  var FUNC_ERROR_TEXT = 'Expected a function';
 
   /* Built-in method references for those with the same name as other `lodash` methods. */
   var nativeMax = Math.max,
@@ -7401,7 +7409,7 @@ var bundle = function (exports) {
       maxing = false,
       trailing = true;
     if (typeof func != 'function') {
-      throw new TypeError(FUNC_ERROR_TEXT$1);
+      throw new TypeError(FUNC_ERROR_TEXT);
     }
     wait = toNumber(wait) || 0;
     if (isObject(options)) {
@@ -7496,93 +7504,11 @@ var bundle = function (exports) {
     debounced.flush = flush;
     return debounced;
   }
-
-  /** Error message constants. */
-  var FUNC_ERROR_TEXT = 'Expected a function';
-
-  /**
-   * Creates a throttled function that only invokes `func` at most once per
-   * every `wait` milliseconds. The throttled function comes with a `cancel`
-   * method to cancel delayed `func` invocations and a `flush` method to
-   * immediately invoke them. Provide `options` to indicate whether `func`
-   * should be invoked on the leading and/or trailing edge of the `wait`
-   * timeout. The `func` is invoked with the last arguments provided to the
-   * throttled function. Subsequent calls to the throttled function return the
-   * result of the last `func` invocation.
-   *
-   * **Note:** If `leading` and `trailing` options are `true`, `func` is
-   * invoked on the trailing edge of the timeout only if the throttled function
-   * is invoked more than once during the `wait` timeout.
-   *
-   * If `wait` is `0` and `leading` is `false`, `func` invocation is deferred
-   * until to the next tick, similar to `setTimeout` with a timeout of `0`.
-   *
-   * See [David Corbacho's article](https://css-tricks.com/debouncing-throttling-explained-examples/)
-   * for details over the differences between `_.throttle` and `_.debounce`.
-   *
-   * @static
-   * @memberOf _
-   * @since 0.1.0
-   * @category Function
-   * @param {Function} func The function to throttle.
-   * @param {number} [wait=0] The number of milliseconds to throttle invocations to.
-   * @param {Object} [options={}] The options object.
-   * @param {boolean} [options.leading=true]
-   *  Specify invoking on the leading edge of the timeout.
-   * @param {boolean} [options.trailing=true]
-   *  Specify invoking on the trailing edge of the timeout.
-   * @returns {Function} Returns the new throttled function.
-   * @example
-   *
-   * // Avoid excessively updating the position while scrolling.
-   * jQuery(window).on('scroll', _.throttle(updatePosition, 100));
-   *
-   * // Invoke `renewToken` when the click event is fired, but not more than once every 5 minutes.
-   * var throttled = _.throttle(renewToken, 300000, { 'trailing': false });
-   * jQuery(element).on('click', throttled);
-   *
-   * // Cancel the trailing throttled invocation.
-   * jQuery(window).on('popstate', throttled.cancel);
-   */
-  function throttle(func, wait, options) {
-    var leading = true,
-      trailing = true;
-    if (typeof func != 'function') {
-      throw new TypeError(FUNC_ERROR_TEXT);
-    }
-    if (isObject(options)) {
-      leading = 'leading' in options ? !!options.leading : leading;
-      trailing = 'trailing' in options ? !!options.trailing : trailing;
-    }
-    return debounce(func, wait, {
-      'leading': leading,
-      'maxWait': wait,
-      'trailing': trailing
-    });
-  }
   function identity() {
     for (var _len4 = arguments.length, t = new Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
       t[_key4] = arguments[_key4];
     }
     return t;
-  }
-  function useThrottled(callback, wait, options) {
-    const throttled = F$1(() => {
-      return callback ? throttle(callback, wait, options) : null;
-    }, [callback, wait, options === null || options === void 0 ? void 0 : options.leading, options === null || options === void 0 ? void 0 : options.trailing]);
-    h(() => {
-      return () => throttled === null || throttled === void 0 ? void 0 : throttled.cancel();
-    }, [throttled]);
-    return throttled;
-  }
-  function useDebounced(callback, wait, options) {
-    const debounced = F$1(() => {
-      return callback ? debounce(callback, wait, options) : null;
-    }, [callback, wait, options === null || options === void 0 ? void 0 : options.leading, options === null || options === void 0 ? void 0 : options.maxWait, options === null || options === void 0 ? void 0 : options.trailing]);
-    h(() => {
-      return () => debounced === null || debounced === void 0 ? void 0 : debounced.cancel();
-    }, [debounced]);
-    return debounced;
   }
   /**
    * Given an async function, returns a function that's suitable for non-async APIs,
@@ -7608,23 +7534,7 @@ var bundle = function (exports) {
    * the parameters the async handler and sync handler expect respectively.
    *
    */
-  function useAsync(asyncHandler, options) {
-    var _capture, _ref43;
-    /* eslint-disable prefer-const */
-    let {
-      throttle,
-      debounce,
-      capture
-    } = options !== null && options !== void 0 ? options : {};
-    (_capture = capture) !== null && _capture !== void 0 ? _capture : capture = identity;
-    // We keep, like, a lot of render-state, but it only ever triggers a re-render
-    // when we start/stop an async action.
-    // Keep track of this for the caller's sake -- we don't really care.
-    const [currentType, setCurrentType] = useState(null);
-    const [runCount, setRunCount] = useState(0);
-    const [settleCount, setSettleCount] = useState(0);
-    const [resolveCount, setResolveCount] = useState(0);
-    const [rejectCount, setRejectCount] = useState(0);
+  function useAsync(asyncHandler2, options) {
     // Things related to current execution
     // Because we can both return and throw undefined, 
     // we need separate state to track their existance too.
@@ -7633,94 +7543,215 @@ var bundle = function (exports) {
     const [error, setError, _getError] = useState(undefined);
     const [hasError, setHasError, _getHasError] = useState(false);
     const [hasResult, setHasResult, _getHasResult] = useState(false);
-    // We implement our own throttling behavior in regards to waiting until the async handler finishes.
-    // These two passive state variables keep track of that, automatically queueing/dequeuing the next handler.
-    const [getQueued, setQueued] = usePassiveState(null, returnNull);
-    // The actual sync handler.
-    // Capture/transform the given parameters if applicable,
-    // then run further logic that's debounced/throttled
-    const captureArgsAndExecuteDebouncedHandler = useStableCallback(function onNewExecuteRequest() {
-      // Capture the arguments we were given.
-      // We might use them immediately, or we might store them to `queued`,
-      // but in either case we do need the captured value.
-      const captured = capture(...arguments);
-      // This is all logic that deals with the captured value instead of the raw arguments.
-      // It's called in two separate circumstances,
-      // and has the debounce/throttle logic already applied
-      return executeHandlerWithDebounce(getPending(), ...captured);
-    });
-    // This is the logic that runs when the handler is *just* about to start.
-    // This function itself is further transformed to be throttled/debounced if requested,
-    // so this might not be called immediately after 
-    const executeHandlerWithoutDebounce = useStableCallback(function onNewExecuteRequest2(enqueue) {
-      const onThen = value => {
-        setResult(value);
-        setHasResult(true);
-        setHasError(false);
-        setResolveCount(r => ++r);
-      };
-      const onCatch = ex => {
-        setError(ex);
-        setHasError(true);
-        setHasResult(false);
-        setRejectCount(r => ++r);
-      };
-      const onFinally = () => {
-        const queued = getQueued();
-        setSettleCount(s => ++s);
-        if (queued) {
-          setQueued(null);
-          executeHandlerWithDebounce(false, ...queued);
-        } else {
-          setPending(false);
-        }
-      };
-      for (var _len5 = arguments.length, newArgs = new Array(_len5 > 1 ? _len5 - 1 : 0), _key5 = 1; _key5 < _len5; _key5++) {
-        newArgs[_key5 - 1] = arguments[_key5];
-      }
-      if (!enqueue) {
-        // Nothing is pending at the moment, so we can run our function immediately.
-        setRunCount(r => ++r);
-        setPending(true);
-        const result = asyncHandler === null || asyncHandler === void 0 ? void 0 : asyncHandler(...newArgs);
-        const isPromise = result != null && typeof result == "object" && "then" in result;
-        if (result == null || !isPromise) {
-          // It's synchronous and returned successfully.
-          // Bail out early.
-          onThen(result);
-          onFinally();
-          setCurrentType("sync");
-        } else {
-          result.then(onThen).catch(onCatch).finally(onFinally);
-          setCurrentType("async");
-        }
-      } else {
-        // When we're still running a previous handler,
-        // just set ourselves as the next one to run and quit early.
-        // Nothing more to do.
-        setQueued(newArgs);
-      }
-      return getResult();
-    });
-    const executeHandlerWithT = useThrottled(!throttle ? null : executeHandlerWithoutDebounce, throttle !== null && throttle !== void 0 ? throttle : 0);
-    const executeHandlerWithD = useDebounced(!debounce ? null : executeHandlerWithT !== null && executeHandlerWithT !== void 0 ? executeHandlerWithT : executeHandlerWithoutDebounce, debounce !== null && debounce !== void 0 ? debounce : 0);
-    const executeHandlerWithDebounce = (_ref43 = executeHandlerWithD !== null && executeHandlerWithD !== void 0 ? executeHandlerWithD : executeHandlerWithT) !== null && _ref43 !== void 0 ? _ref43 : executeHandlerWithoutDebounce;
-    const flushDebouncedPromise = useStableCallback(() => {
-      if (executeHandlerWithDebounce && "flush" in executeHandlerWithDebounce) executeHandlerWithDebounce.flush();
-    });
+    const [asyncDebouncing, setAsyncDebouncing] = useState(false);
+    const [syncDebouncing, setSyncDebouncing] = useState(false);
+    //const [currentCapture, setCurrentCapture] = useState<AP | undefined>(undefined);
+    const incrementCallCount = T$1(() => {
+      setRunCount(c => c + 1);
+    }, []);
+    const incrementResolveCount = T$1(() => {
+      setResolveCount(c => c + 1);
+    }, []);
+    const incrementRejectCount = T$1(() => {
+      setRejectCount(c => c + 1);
+    }, []);
+    const incrementFinallyCount = T$1(() => {
+      setSettleCount(c => c + 1);
+    }, []);
+    /* eslint-disable prefer-const */
+    let {
+      throttle,
+      debounce,
+      capture: captureUnstable
+    } = options !== null && options !== void 0 ? options : {};
+    const captureStable = useStableCallback(captureUnstable !== null && captureUnstable !== void 0 ? captureUnstable : identity);
+    const asyncHandlerStable = useStableCallback(asyncHandler2 !== null && asyncHandler2 !== void 0 ? asyncHandler2 : identity);
+    const {
+      flush,
+      syncOutput
+    } = F$1(() => {
+      return asyncToSync({
+        asyncInput: asyncHandlerStable,
+        capture: captureStable,
+        setAsyncDebouncing,
+        setError,
+        setPending,
+        setReturn: setResult,
+        setSyncDebouncing,
+        setHasError,
+        setHasResult,
+        incrementCallCount,
+        incrementFinallyCount,
+        incrementRejectCount,
+        incrementResolveCount,
+        throttle: options === null || options === void 0 ? void 0 : options.throttle,
+        wait: options === null || options === void 0 ? void 0 : options.debounce
+      });
+    }, [throttle, debounce]);
+    // We keep, like, a lot of render-state, but it only ever triggers a re-render
+    // when we start/stop an async action.
+    // Keep track of this for the caller's sake -- we don't really care.
+    /*const [currentType, setCurrentType] = useState<null | "sync" | "async">(null);*/
+    const [runCount, setRunCount] = useState(0);
+    const [settleCount, setSettleCount] = useState(0);
+    const [resolveCount, setResolveCount] = useState(0);
+    const [rejectCount, setRejectCount] = useState(0);
     return {
-      syncHandler: captureArgsAndExecuteDebouncedHandler,
-      currentType,
+      syncHandler: syncOutput,
+      //currentType,
       pending,
       result,
       error,
-      hasError,
-      hasResult,
+      hasError: hasError || false,
+      hasResult: hasResult || false,
       resolveCount,
       rejectCount,
       settleCount,
+      debouncingAsync: asyncDebouncing,
+      debouncingSync: syncDebouncing,
       callCount: runCount,
-      flushDebouncedPromise
+      flushDebouncedPromise: flush
+    };
+  }
+  function isPromise(p) {
+    return p instanceof Promise;
+  }
+  const Unset = Symbol("Unset");
+  /**
+   * lodash-ish function that's like debounce + (throttle w/ async handling) combined.
+   *
+   * Requires a lot of callbacks to meaningfully turn a red function into a blue one, but you *can* do it!
+   */
+  function asyncToSync(_ref43) {
+    let {
+      asyncInput,
+      incrementCallCount,
+      incrementFinallyCount,
+      incrementRejectCount,
+      incrementResolveCount,
+      setHasError,
+      setHasResult,
+      setError,
+      setReturn,
+      capture,
+      setAsyncDebouncing,
+      setSyncDebouncing,
+      setPending,
+      throttle,
+      wait
+    } = _ref43;
+    let pending = false;
+    let syncDebouncing = false;
+    let asyncDebouncing = false;
+    let currentCapture = Unset;
+    console.log("Creating a new async-to-sync function");
+    const onAsyncFinished = () => {
+      // 8. This is run at the end of every invocation of the async handler,
+      // whether it completed or not.
+      incrementFinallyCount();
+      setPending(pending = false);
+      if (!asyncDebouncing) {
+        console.log("onAsyncFinished: !asyncDebouncing");
+        // 9a. After completing the async handler, we found that it wasn't called again since the last time.
+        // This means we can just end. We're done. Mission accomplished.
+      } else {
+        console.log("onAsyncFinished: asyncDebouncing");
+        // 9a. Another request to run the async handler came in while we were running this one.
+        // Instead of stopping, we're just going to immediately run again using the arguments that were given to us most recently.
+        // We also clear that flag, because we're handling it now. It'll be set again if the handler is called again while *this* one is running
+        setAsyncDebouncing(asyncDebouncing = false);
+        console.assert(currentCapture !== Unset);
+        if (currentCapture != Unset) {
+          setSyncDebouncing(syncDebouncing = true);
+          syncDebounced();
+        }
+      }
+    };
+    const sync = function () {
+      for (var _len5 = arguments.length, args = new Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
+        args[_key5] = arguments[_key5];
+      }
+      console.log("sync: ", ...args);
+      // 5. We're finally running the async version of the function, so notify the caller that the return value is pending.
+      // And because the fact that we're here means the debounce/throttle period is over, we can clear that flag too.
+      setPending(pending = true);
+      console.assert(syncDebouncing == false);
+      setHasError(null);
+      setHasResult(null);
+      let promiseOrReturn;
+      let hadSyncError = false;
+      try {
+        // 6. Run the function we were given.
+        // Because it may be sync, or it may throw before returning, we must still wrap it in a try/catch...
+        // Also important is that we preserve the async-ness (or lack thereof) on the original input function.
+        incrementCallCount();
+        promiseOrReturn = asyncInput(...args);
+        setHasError(false);
+      } catch (ex) {
+        hadSyncError = true;
+        setError(ex);
+      }
+      // 7. Either end immediately, or schedule to end when completed.
+      if (isPromise(promiseOrReturn)) {
+        promiseOrReturn.then(r => {
+          incrementResolveCount();
+          setHasResult(true);
+          setReturn(r);
+          return r;
+        }).catch(e => {
+          incrementRejectCount();
+          setHasError(true);
+          setError(e);
+          return e;
+        }).finally(onAsyncFinished);
+      } else {
+        if (!hadSyncError) {
+          incrementResolveCount();
+          setHasResult(true);
+          setHasError(false);
+        } else {
+          incrementRejectCount();
+          setHasResult(false);
+          setHasError(true);
+        }
+        setReturn(promiseOrReturn);
+        setPending(pending = false);
+        onAsyncFinished();
+      }
+    };
+    // 4. Instead of calling the sync version of our function directly, we allow it to be throttled/debounced.
+    const syncDebounced = debounce(() => {
+      setSyncDebouncing(syncDebouncing = false);
+      if (!pending) {
+        console.log("syncDebounced !pending");
+        // 3a. If this is the first invocation, or if we're not still waiting for a previous invocation to finish its async call,
+        // then we can just go ahead and run the debounced version of our function.
+        console.assert(currentCapture != Unset);
+        sync(...currentCapture);
+      } else {
+        console.log("syncDebounced pending");
+        // 3b. If we were called while still waiting for the (or a) previous invocation to finish,
+        // then we'll need to delay this one. When that previous invocation finishes, it'll check
+        // to see if it needs to run again, and it will use these new captured arguments from step 2.
+        setAsyncDebouncing(asyncDebouncing = true);
+      }
+    }, wait, {
+      leading: true,
+      trailing: true,
+      maxWait: throttle
+    });
+    return {
+      syncOutput: function () {
+        console.log("syncOutput");
+        // 1. We call the sync version of our async function.
+        // 2. We capture the arguments into a form that won't become stale if/when the function is called with a (possibly seconds-long) delay.
+        currentCapture = capture(...arguments);
+        setSyncDebouncing(syncDebouncing = true);
+        syncDebounced();
+      },
+      flush: () => {
+        syncDebounced.flush();
+      }
     };
   }
 
@@ -8990,6 +9021,7 @@ var bundle = function (exports) {
   const DemoUseAsyncHandler2 = R(() => {
     const [timeout, setTimeout] = useState(1000);
     const [debounce, setDebounce] = useState(0);
+    const [throttle, setThrottle] = useState(0);
     const [shouldThrow, setShouldThrow, getShouldThrow] = useState(false);
     const [disableConsecutive, setDisableConsecutive] = useState(false);
     const [text, setText] = useState("");
@@ -9010,15 +9042,19 @@ var bundle = function (exports) {
       pending,
       hasError,
       rejectCount,
-      resolveCount
+      resolveCount,
+      debouncingAsync,
+      debouncingSync
     } = useAsyncHandler({
       asyncHandler: onInputAsync,
       capture: e => {
         e.preventDefault();
         return e.currentTarget.value;
       },
-      debounce: debounce == 0 ? undefined : debounce
+      debounce: debounce == 0 ? undefined : debounce,
+      throttle: throttle == 0 ? undefined : throttle
     });
+    let anyWaiting = pending || debouncingAsync || debouncingSync;
     return o$1("div", {
       className: "demo",
       children: [o$1("label", {
@@ -9028,7 +9064,7 @@ var bundle = function (exports) {
           onInput: syncHandler
         })]
       }), o$1("hr", {}), o$1("label", {
-        children: ["Sleep for: ", o$1("input", {
+        children: ["# of milliseconds the async handler takes to run: ", o$1("input", {
           type: "number",
           value: timeout,
           onInput: e => setTimeout(e.currentTarget.valueAsNumber)
@@ -9051,6 +9087,12 @@ var bundle = function (exports) {
           value: debounce,
           onInput: e => setDebounce(e.currentTarget.valueAsNumber)
         })]
+      }), o$1("label", {
+        children: ["Throttle: ", o$1("input", {
+          type: "number",
+          value: throttle,
+          onInput: e => setThrottle(e.currentTarget.valueAsNumber)
+        })]
       }), o$1("table", {
         children: [o$1("thead", {
           children: o$1("tr", {
@@ -9062,6 +9104,30 @@ var bundle = function (exports) {
           })
         }), o$1("tbody", {
           children: [o$1("tr", {
+            children: [o$1("td", {
+              children: "showSpinner"
+            }), o$1("td", {
+              children: "".concat(anyWaiting)
+            })]
+          }), o$1("tr", {
+            children: [o$1("td", {
+              children: "pending"
+            }), o$1("td", {
+              children: "".concat(pending)
+            })]
+          }), o$1("tr", {
+            children: [o$1("td", {
+              children: "debouncingSync"
+            }), o$1("td", {
+              children: "".concat(debouncingSync)
+            })]
+          }), o$1("tr", {
+            children: [o$1("td", {
+              children: "debouncingAsync"
+            }), o$1("td", {
+              children: "".concat(debouncingAsync)
+            })]
+          }), o$1("tr", {
             children: [o$1("td", {
               children: "callCount"
             }), o$1("td", {
@@ -9561,6 +9627,25 @@ var bundle = function (exports) {
       })]
     });
   }
+  /*
+  function DemoThrottleDebounce() {
+      const [count, setCount] = useState(0);
+      const onClick = useCallback(() => {
+          debugger;
+          setCount(i => i + 1);
+      }, []);
+      const onClickThrottled = useThrottled(onClick, 1000);
+      const onClickDebounced = useDebounced(onClick, 1000);
+      const onClickBoth = useDebounced(onClickThrottled, 1000);
+       return (
+          <div className="demo">
+              <div>Press count: {count}</div>
+               <div><button onClick={() => {debugger; onClick();}}>Normal</button></div>
+              <div><button onClick={() => {debugger; onClickThrottled();}}>Throttled</button></div>
+              <div><button onClick={() => {debugger; onClickDebounced();}}>Debounced</button></div>
+              <div><button onClick={() => {debugger; onClickBoth();}}>Combined</button></div>
+          </div>)
+  }*/
   const Component = () => {
     return o$1("div", {
       class: "flex",
@@ -9572,7 +9657,7 @@ var bundle = function (exports) {
       }), o$1("input", {}), o$1("div", {
         style: "display:grid;grid-template-columns:1fr 1fr",
         children: [o$1(DemoUseModal, {}), o$1(DemoUseModal, {})]
-      }), o$1("hr", {}), o$1(DemoLabel, {}), o$1("hr", {}), o$1("hr", {}), o$1(DemoFocus, {}), o$1("hr", {}), o$1(DemoUseChildrenHaveFocus, {}), o$1("hr", {}), o$1(DemoUseGrid, {}), o$1("hr", {}), o$1(DemoUseTimeout, {}), o$1("hr", {}), o$1(DemoUseInterval, {}), o$1("hr", {}), o$1(DemoUseRovingTabIndex, {}), o$1("hr", {}), o$1(DemoUseFocusTrap, {}), o$1("hr", {}), o$1(DemoUseAsyncHandler1, {}), o$1("hr", {}), o$1(DemoUseAsyncHandler2, {}), o$1("hr", {}), o$1(DemoUseDroppable, {}), o$1("hr", {}), o$1(DemoUseDraggable, {}), o$1("hr", {}), o$1(DemoUseElementSizeAnimation, {}), o$1("hr", {}), o$1("input", {})]
+      }), o$1("hr", {}), o$1(DemoLabel, {}), o$1("hr", {}), o$1(DemoFocus, {}), o$1("hr", {}), o$1(DemoUseChildrenHaveFocus, {}), o$1("hr", {}), o$1(DemoUseGrid, {}), o$1("hr", {}), o$1(DemoUseTimeout, {}), o$1("hr", {}), o$1(DemoUseInterval, {}), o$1("hr", {}), o$1(DemoUseRovingTabIndex, {}), o$1("hr", {}), o$1(DemoUseFocusTrap, {}), o$1("hr", {}), o$1(DemoUseAsyncHandler1, {}), o$1("hr", {}), o$1(DemoUseAsyncHandler2, {}), o$1("hr", {}), o$1(DemoUseDroppable, {}), o$1("hr", {}), o$1(DemoUseDraggable, {}), o$1("hr", {}), o$1(DemoUseElementSizeAnimation, {}), o$1("hr", {}), o$1("input", {})]
     });
   };
   requestAnimationFrame(() => {

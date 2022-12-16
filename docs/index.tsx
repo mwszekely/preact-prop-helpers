@@ -225,6 +225,7 @@ const DemoUseAsyncHandler2 = memo(() => {
 
     const [timeout, setTimeout] = useState(1000);
     const [debounce, setDebounce] = useState(0);
+    const [throttle, setThrottle] = useState(0);
     const [shouldThrow, setShouldThrow, getShouldThrow] = useState(false);
     const [disableConsecutive, setDisableConsecutive] = useState(false);
 
@@ -249,18 +250,28 @@ const DemoUseAsyncHandler2 = memo(() => {
         pending,
         hasError,
         rejectCount,
-        resolveCount
-    } = useAsyncHandler<h.JSX.TargetedEvent<HTMLInputElement>, string>({ asyncHandler: onInputAsync, capture: (e: h.JSX.TargetedEvent<HTMLInputElement>) => { e.preventDefault(); return e.currentTarget.value }, debounce: debounce == 0 ? undefined : debounce });
+        resolveCount,
+        debouncingAsync,
+        debouncingSync
+    } = useAsyncHandler<h.JSX.TargetedEvent<HTMLInputElement>, string>({ 
+        asyncHandler: onInputAsync, 
+        capture: (e: h.JSX.TargetedEvent<HTMLInputElement>) => { e.preventDefault(); return e.currentTarget.value }, 
+        debounce: debounce == 0 ? undefined : debounce,
+        throttle: throttle == 0 ? undefined : throttle
+    });
+
+    let anyWaiting = (pending || debouncingAsync || debouncingSync);
 
 
     return (
         <div className="demo">
             <label>Demo text: <input value={hasCapture ? currentCapture : text} disabled={pending && disableConsecutive} onInput={syncHandler} /></label>
             <hr />
-            <label>Sleep for: <input type="number" value={timeout} onInput={e => setTimeout(e.currentTarget.valueAsNumber)} /></label>
+            <label># of milliseconds the async handler takes to run: <input type="number" value={timeout} onInput={e => setTimeout(e.currentTarget.valueAsNumber)} /></label>
             <label>Throw an error <input type="checkbox" checked={shouldThrow} onInput={e => setShouldThrow(e.currentTarget.checked)} /></label>
             <label>Disabled while pending <input type="checkbox" checked={disableConsecutive} onInput={e => setDisableConsecutive(e.currentTarget.checked)} /></label>
             <label>Debounce: <input type="number" value={debounce} onInput={e => setDebounce(e.currentTarget.valueAsNumber)} /></label>
+            <label>Throttle: <input type="number" value={throttle} onInput={e => setThrottle(e.currentTarget.valueAsNumber)} /></label>
             <table>
                 <thead>
                     <tr>
@@ -269,6 +280,10 @@ const DemoUseAsyncHandler2 = memo(() => {
                     </tr>
                 </thead>
                 <tbody>
+                    <tr><td>showSpinner</td><td>{`${anyWaiting}`}</td></tr>
+                    <tr><td>pending</td><td>{`${pending}`}</td></tr>
+                    <tr><td>debouncingSync</td><td>{`${debouncingSync}`}</td></tr>
+                    <tr><td>debouncingAsync</td><td>{`${debouncingAsync}`}</td></tr>
                     <tr><td>callCount</td><td>{callCount}</td></tr>
                     <tr><td>settleCount</td><td>{settleCount}</td></tr>
                     <tr><td>resolveCount</td><td>{resolveCount}</td></tr>
@@ -570,6 +585,27 @@ function DemoPress({ remaining }: { remaining: number }) {
         </div>
     )
 }
+/*
+function DemoThrottleDebounce() {
+    const [count, setCount] = useState(0);
+    const onClick = useCallback(() => {
+        debugger;
+        setCount(i => i + 1);
+    }, []);
+    const onClickThrottled = useThrottled(onClick, 1000);
+    const onClickDebounced = useDebounced(onClick, 1000);
+    const onClickBoth = useDebounced(onClickThrottled, 1000);
+
+    return (
+        <div className="demo">
+            <div>Press count: {count}</div>
+
+            <div><button onClick={() => {debugger; onClick();}}>Normal</button></div>
+            <div><button onClick={() => {debugger; onClickThrottled();}}>Throttled</button></div>
+            <div><button onClick={() => {debugger; onClickDebounced();}}>Debounced</button></div>
+            <div><button onClick={() => {debugger; onClickBoth();}}>Combined</button></div>
+        </div>)
+}*/
 
 const Component = () => {
     return <div class="flex" style={{ flexWrap: "wrap" }}>
@@ -581,7 +617,6 @@ const Component = () => {
         </div>
         <hr />
         <DemoLabel />
-        <hr />
         <hr />
         <DemoFocus />
         <hr />

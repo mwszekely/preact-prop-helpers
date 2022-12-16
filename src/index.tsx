@@ -36,7 +36,7 @@ export { useHasLastFocus, UseHasLastFocusParameters, UseHasLastFocusReturnType }
 export { LogicalDirectionInfo, LogicalElementSize, LogicalOrientation, PhysicalDirection, PhysicalOrientation, PhysicalSize, useLogicalDirection, UseLogicalDirectionParameters, UseLogicalDirectionReturnType } from "./observers/use-logical-direction";
 export { useMediaQuery } from "./observers/use-media-query";
 export { useMutationObserver, UseMutationObserverParameters } from "./observers/use-mutation-observer";
-export { useAsync, UseAsyncParameters, UseAsyncReturnType, useDebounced, useThrottled } from "./preact-extensions/use-async";
+export { useAsync, UseAsyncParameters, UseAsyncReturnType } from "./preact-extensions/use-async";
 export { useAsyncEffect } from "./preact-extensions/use-async-effect";
 export { assertEmptyObject, ChildFlagOperations, ManagedChildInfo, ManagedChildren, OnAfterChildLayoutEffect, OnChildrenMountChange, useChildrenFlag, UseChildrenFlagParameters, UseChildrenFlagReturnType, useManagedChild, UseManagedChildParameters, useManagedChildren, UseManagedChildrenContext, UseManagedChildrenParameters, UseManagedChildrenReturnType, UseManagedChildReturnType } from "./preact-extensions/use-child-manager";
 export { useEffectDebug } from "./preact-extensions/use-effect-debug";
