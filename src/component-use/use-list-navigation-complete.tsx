@@ -166,7 +166,7 @@ export function useCompleteListNavigationChild<ChildElement extends Element, M e
         pressParameters: { onPressSync: ops2, ...p1 },
         rovingTabIndexChildReturn,
         singleSelectionChildReturn,
-        managedChildParameters: { setLocalDirection }
+        managedChildParameters: { setLocalSelected }
     } = useListNavigationSingleSelectionChild<ChildElement>({
         managedChildParameters: { index },
         rovingTabIndexChildParameters: { hidden },
@@ -201,7 +201,7 @@ export function useCompleteListNavigationChild<ChildElement extends Element, M e
         hidden,
         index,
         selected,
-        setLocalDirection,
+        setLocalSelected,
         setTabbable,
         tabbable,
         getSortValue

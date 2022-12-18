@@ -34,7 +34,7 @@ export interface SelectableChildInfo<E extends Element> extends UseRovingTabInde
      * @param selected This is the selected child (out of all of them)
      * @param distance How far to the `selectedIndex` this child is
      */
-    setLocalDirection(direction: number | null): void;
+    setLocalSelected(selected: boolean, direction: number | null): void;
 
     /**
      * This is similar to `hidden` for `useRovingTabIndex`, but for selection.
@@ -109,7 +109,7 @@ export interface UseSingleSelectionChildReturnType<E extends Element> extends Us
         propsUnstable: h.JSX.HTMLAttributes<E>;
     }
     //refElementParameters: Required<Pick<UseRefElementParameters<E>["refElementParameters"], "onElementChange">>;
-    managedChildParameters: Pick<SelectableChildInfo<E>, "setLocalDirection">;
+    managedChildParameters: Pick<SelectableChildInfo<E>, "setLocalSelected">;
     //managedChildParameters: Pick<UseManagedChildParameters<SelectableChildInfo<E>, never>["managedChildParameters"], "selected" | "setSelected" | "getSelected">;
     pressParameters: Pick<UsePressParameters<E>["pressParameters"], "onPressSync">;
 }
@@ -161,7 +161,7 @@ export function useSingleSelection<ChildElement extends Element>({
         if (t)
             console.assert(newSelectedIndex === m.index);
 
-        m.setLocalDirection(direction);
+        m.setLocalSelected(t, direction);
     }, []);
     const isSelectedValid = useCallback((m: SelectableChildInfo<ChildElement>) => { return !m.hidden; }, []);
 
@@ -233,8 +233,10 @@ export function useSingleSelectionChild<ChildElement extends Element>(args: UseS
 
     return {
         //managedChildParameters: { selected, setSelected, getSelected, },
-        managedChildParameters: { setLocalDirection: useStableCallback((direction) => {
-            if (direction == null) {
+        managedChildParameters: { setLocalSelected: useStableCallback((selected, direction) => {
+            setSelected(selected);
+            setDirection(direction);
+            /*if (direction == null) {
                 setSelected(false);
                 setDirection(null);
             }
@@ -244,7 +246,7 @@ export function useSingleSelectionChild<ChildElement extends Element>(args: UseS
             else {
                 setSelected(false);
                 setDirection(direction);
-            }
+            }*/
         }) },
         singleSelectionChildReturn: {
             selected: (direction === 0),

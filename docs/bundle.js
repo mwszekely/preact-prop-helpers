@@ -1802,11 +1802,11 @@ var bundle = function (exports) {
       if (requestedIndex != null && closestFit && (requestedIndex != currentIndex || currentChild == null || !isValid(currentChild))) {
         const closestFitIndex = getClosestFit(requestedIndex);
         setCurrentIndex(closestFitIndex, undefined);
-        if (currentChild) setAt(currentChild, false, closestFitIndex);
+        if (currentChild) setAt(currentChild, false, closestFitIndex, currentIndex);
         if (closestFitIndex != null) {
           const closestFitChild = children.getAt(closestFitIndex);
           console.assert(closestFitChild != null, "Internal logic???");
-          setAt(closestFitChild, true, closestFitIndex);
+          setAt(closestFitChild, true, closestFitIndex, currentIndex);
         }
       }
     });
@@ -1823,13 +1823,13 @@ var bundle = function (exports) {
       if (requestedIndex == null) {
         // Easy case
         setCurrentIndex(null, reason);
-        if (oldMatchingChild) setAt(oldMatchingChild, false, requestedIndex);
+        if (oldMatchingChild) setAt(oldMatchingChild, false, requestedIndex, currentIndex);
         return null;
       } else {
         if (newMatchingChild && isValid(newMatchingChild)) {
           setCurrentIndex(requestedIndex, reason);
-          if (oldMatchingChild) setAt(oldMatchingChild, false, requestedIndex);
-          setAt(newMatchingChild, true, requestedIndex);
+          if (oldMatchingChild) setAt(oldMatchingChild, false, requestedIndex, currentIndex);
+          setAt(newMatchingChild, true, requestedIndex, currentIndex);
           return requestedIndex;
         } else {
           const closestFitIndex = getClosestFit(requestedIndex);
@@ -1837,11 +1837,11 @@ var bundle = function (exports) {
           if (closestFitIndex != null) {
             newMatchingChild = children.getAt(closestFitIndex);
             console.assert(newMatchingChild != null, "Internal logic???");
-            if (oldMatchingChild) setAt(oldMatchingChild, false, closestFitIndex);
-            setAt(newMatchingChild, true, closestFitIndex);
+            if (oldMatchingChild) setAt(oldMatchingChild, false, closestFitIndex, currentIndex);
+            setAt(newMatchingChild, true, closestFitIndex, currentIndex);
             return closestFitIndex;
           } else {
-            if (oldMatchingChild) setAt(oldMatchingChild, false, closestFitIndex);
+            if (oldMatchingChild) setAt(oldMatchingChild, false, closestFitIndex, currentIndex);
             return null;
           }
         }
@@ -4740,14 +4740,15 @@ var bundle = function (exports) {
     const getSelectedAt = T$1(m => {
       return m.getSelected();
     }, []);
-    const setSelectedAt = T$1((m, t, newSelectedIndex) => {
+    const setSelectedAt = T$1((m, t, newSelectedIndex, prevSelectedIndex) => {
       if (m.hidden) {
         console.assert(false);
       }
-      const direction = newSelectedIndex == null ? null : m.index - newSelectedIndex;
+      const directionComparison = newSelectedIndex == m.index ? prevSelectedIndex : newSelectedIndex;
+      const direction = directionComparison == null ? null : m.index - directionComparison;
       if (newSelectedIndex == null) console.assert(t == false);
-      if (t) console.assert(newSelectedIndex === 0);
-      m.setLocalDirection(direction);
+      if (t) console.assert(newSelectedIndex === m.index);
+      m.setLocalSelected(t, direction);
     }, []);
     const isSelectedValid = T$1(m => {
       return !m.hidden;
@@ -4817,18 +4818,23 @@ var bundle = function (exports) {
     return {
       //managedChildParameters: { selected, setSelected, getSelected, },
       managedChildParameters: {
-        setLocalDirection: useStableCallback(direction => {
-          if (direction == null) {
-            setSelected(false);
-            setDirection(null);
-          } else if (direction == 0) {
-            setSelected(true);
-          } else {
-            setSelected(false);
-            setDirection(direction);
+        setLocalSelected: useStableCallback((selected, direction) => {
+          setSelected(selected);
+          setDirection(direction);
+          /*if (direction == null) {
+              setSelected(false);
+              setDirection(null);
           }
+          else if (direction == 0) {
+              setSelected(true);
+          }
+          else {
+              setSelected(false);
+              setDirection(direction);
+          }*/
         })
       },
+
       singleSelectionChildReturn: {
         selected: direction === 0,
         setThisOneSelected: useStableCallback(event => {
@@ -6361,7 +6367,7 @@ var bundle = function (exports) {
       selected: r.rowAsChildOfGridReturn.singleSelectionChildReturn.selected,
       focusSelf: r.rowAsChildOfGridReturn.gridNavigationRowParameters.focusSelf,
       getSelected: r.rowAsChildOfGridReturn.singleSelectionChildReturn.getSelected,
-      setLocalDirection: r.rowAsChildOfGridReturn.managedChildParameters.setLocalDirection,
+      setLocalSelected: r.rowAsChildOfGridReturn.managedChildParameters.setLocalSelected,
       disabled: singleSelectionChildParameters.disabled,
       setTabbableColumnIndex: r.rowAsChildOfGridReturn.gridNavigationRowParameters.setTabbableColumnIndex,
       getSortValue: rowAsChildOfGridParameters.sortableChildParameters.getSortValue
@@ -7011,7 +7017,7 @@ var bundle = function (exports) {
       rovingTabIndexChildReturn,
       singleSelectionChildReturn,
       managedChildParameters: {
-        setLocalDirection
+        setLocalSelected
       }
     } = useListNavigationSingleSelectionChild({
       managedChildParameters: {
@@ -7060,7 +7066,7 @@ var bundle = function (exports) {
       hidden,
       index,
       selected,
-      setLocalDirection,
+      setLocalSelected,
       setTabbable,
       tabbable,
       getSortValue
