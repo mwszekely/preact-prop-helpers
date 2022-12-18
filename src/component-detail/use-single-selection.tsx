@@ -34,7 +34,7 @@ export interface SelectableChildInfo<E extends Element> extends UseRovingTabInde
      * @param selected This is the selected child (out of all of them)
      * @param distance How far to the `selectedIndex` this child is
      */
-    setLocalSelected(selected: boolean, distance: number): void;
+    setLocalDirection(direction: number | null): void;
 
     /**
      * This is similar to `hidden` for `useRovingTabIndex`, but for selection.
@@ -89,19 +89,26 @@ export interface UseSingleSelectionChildReturnType<E extends Element> extends Us
         // but we're keeping them because RTI does the same thing, and it's convenient.
         selected: boolean,
         getSelected(): boolean;
+
+        /**
+         * Any time `selected` changes, this represents the direction (and magnitude) of the change.
+         * It is *not* kept up to date outside of that scenario -- this is meant for determining the direction of a change only.
+         */
+        selectedOffset: number | null;
+        getSelectedOffset: () => (number | null);
         /**
          * Returns the distance from this child to the selected child.
          * 
          * **Stable**, and can be called during render.
          */
-        getDistance(): number;
+        //getDistance(): number;
         // Used to programmatically set this as the selected element;
         // it requests the parent to actually change the numeric index to this one's.
         setThisOneSelected: (event: Event) => void;
         propsUnstable: h.JSX.HTMLAttributes<E>;
     }
     //refElementParameters: Required<Pick<UseRefElementParameters<E>["refElementParameters"], "onElementChange">>;
-    managedChildParameters: Pick<SelectableChildInfo<E>, "setLocalSelected">;
+    managedChildParameters: Pick<SelectableChildInfo<E>, "setLocalDirection">;
     //managedChildParameters: Pick<UseManagedChildParameters<SelectableChildInfo<E>, never>["managedChildParameters"], "selected" | "setSelected" | "getSelected">;
     pressParameters: Pick<UsePressParameters<E>["pressParameters"], "onPressSync">;
 }
@@ -146,7 +153,13 @@ export function useSingleSelection<ChildElement extends Element>({
         if (m.hidden) {
             console.assert(false);
         }
-        m.setLocalSelected(t, newSelectedIndex == null ? 0 : (newSelectedIndex - m.index));
+        const direction = (newSelectedIndex == null ? null : (m.index - newSelectedIndex));
+        if (newSelectedIndex == null)
+            console.assert(t == false);
+        if (t)
+            console.assert(newSelectedIndex === 0);
+
+        m.setLocalDirection(direction);
     }, []);
     const isSelectedValid = useCallback((m: SelectableChildInfo<ChildElement>) => { return !m.hidden; }, []);
 
@@ -193,11 +206,12 @@ export function useSingleSelectionChild<ChildElement extends Element>(args: UseS
         managedChildParameters: { index }
     } = args;
 
-    let lastRecordedDistance = useRef(0);
+    //let lastRecordedDistance = useRef(0);
     useEnsureStability("useSingleSelectionChild", getSelectedIndex, onSelectedIndexChange);
     const getDisabled = useStableGetter(disabled);
 
-    const [selected, setSelected, getSelected] = useState(getSelectedIndex() == index);
+    const [direction, setDirection, getDirection] = useState(getSelectedIndex() == null? null : (getSelectedIndex()! - index));
+    //const [selected, setSelected, getSelected] = useState(getSelectedIndex() == index);
 
     // const getIndex = useStableGetter(index);
 
@@ -216,16 +230,18 @@ export function useSingleSelectionChild<ChildElement extends Element>(args: UseS
 
     return {
         //managedChildParameters: { selected, setSelected, getSelected, },
-        managedChildParameters: { setLocalSelected: useStableCallback((selected, distance) => { lastRecordedDistance.current = distance; setSelected(selected); }) },
+        managedChildParameters: { setLocalDirection: setDirection },
         singleSelectionChildReturn: {
-            selected,
+            selected: (direction === 0),
             setThisOneSelected: useStableCallback((event) => {
                 console.assert(!getDisabled());
                 onSelectedIndexChange?.(index, event as R);
             }),
-            getSelected,
-            getDistance: useCallback(() => { return lastRecordedDistance.current; }, []),
-            propsUnstable: ariaPropName == null || selectionMode == "disabled" ? {} : { [ariaPropName as keyof h.JSX.HTMLAttributes<any>]: (selected ?? false).toString() }
+            getSelectedOffset: getDirection,
+            selectedOffset: direction,
+            getSelected: useCallback(() => { return getDirection() == 0; }, []),
+            //getDistance: useCallback(() => { return lastRecordedDistance.current; }, []),
+            propsUnstable: ariaPropName == null || selectionMode == "disabled" ? {} : { [ariaPropName as keyof h.JSX.HTMLAttributes<any>]: ((direction === 0) ?? false).toString() }
         },
         pressParameters: { onPressSync },
         hasCurrentFocusParameters: { onCurrentFocusedInnerChanged }

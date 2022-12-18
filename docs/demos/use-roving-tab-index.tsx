@@ -124,7 +124,7 @@ const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
     const {
         props,
         rovingTabIndexChildReturn: { tabbable, propsUnstable: p2 },
-        singleSelectionChildReturn: { selected }
+        singleSelectionChildReturn: { selected, selectedOffset }
     } = useCompleteListNavigationChild<HTMLLIElement, CustomInfoType, never>({
         managedChildParameters: { index },
         rovingTabIndexChildParameters: { hidden },
@@ -136,7 +136,7 @@ const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
         textContentParameters: { getText: useCallback((e) => { return e?.textContent ?? "" }, []) }
     });
 
-    const text = `${randomWord} This is item #${index}${hidden ? " (hidden)" : ""}${disabled ? " (disabled)" : ""}${selected ? " (selected)" : " (not selected)"} (${tabbable ? "Tabbable" : "Not tabbable"})`;
+    const text = `${randomWord} This is item #${index} (offset: ${selectedOffset}) ${hidden ? " (hidden)" : ""}${disabled ? " (disabled)" : ""}${selected ? " (selected)" : " (not selected)"} (${tabbable ? "Tabbable" : "Not tabbable"})`;
 
     /*
         const {

@@ -4743,7 +4743,10 @@ var bundle = function (exports) {
       if (m.hidden) {
         console.assert(false);
       }
-      m.setLocalSelected(t, newSelectedIndex == null ? 0 : newSelectedIndex - m.index);
+      const direction = newSelectedIndex == null ? null : m.index - newSelectedIndex;
+      if (newSelectedIndex == null) console.assert(t == false);
+      if (t) console.assert(newSelectedIndex === 0);
+      m.setLocalDirection(direction);
     }, []);
     const isSelectedValid = T$1(m => {
       return !m.hidden;
@@ -4780,6 +4783,7 @@ var bundle = function (exports) {
     };
   }
   function useSingleSelectionChild(args) {
+    var _ref25;
     const {
       singleSelectionContext: {
         getSelectedIndex,
@@ -4794,10 +4798,11 @@ var bundle = function (exports) {
         index
       }
     } = args;
-    let lastRecordedDistance = _(0);
+    //let lastRecordedDistance = useRef(0);
     useEnsureStability("useSingleSelectionChild", getSelectedIndex, onSelectedIndexChange);
     const getDisabled = useStableGetter(disabled);
-    const [selected, setSelected, getSelected] = useState(getSelectedIndex() == index);
+    const [direction, setDirection, getDirection] = useState(getSelectedIndex() == null ? null : getSelectedIndex() - index);
+    //const [selected, setSelected, getSelected] = useState(getSelectedIndex() == index);
     // const getIndex = useStableGetter(index);
     const onCurrentFocusedInnerChanged = useStableCallback((focused, _prev, e) => {
       if (selectionMode == 'focus' && focused) {
@@ -4811,23 +4816,22 @@ var bundle = function (exports) {
     return {
       //managedChildParameters: { selected, setSelected, getSelected, },
       managedChildParameters: {
-        setLocalSelected: useStableCallback((selected, distance) => {
-          lastRecordedDistance.current = distance;
-          setSelected(selected);
-        })
+        setLocalDirection: setDirection
       },
       singleSelectionChildReturn: {
-        selected,
+        selected: direction === 0,
         setThisOneSelected: useStableCallback(event => {
           console.assert(!getDisabled());
           onSelectedIndexChange === null || onSelectedIndexChange === void 0 ? void 0 : onSelectedIndexChange(index, event);
         }),
-        getSelected,
-        getDistance: T$1(() => {
-          return lastRecordedDistance.current;
+        getSelectedOffset: getDirection,
+        selectedOffset: direction,
+        getSelected: T$1(() => {
+          return getDirection() == 0;
         }, []),
+        //getDistance: useCallback(() => { return lastRecordedDistance.current; }, []),
         propsUnstable: ariaPropName == null || selectionMode == "disabled" ? {} : {
-          [ariaPropName]: (selected !== null && selected !== void 0 ? selected : false).toString()
+          [ariaPropName]: ((_ref25 = direction === 0) !== null && _ref25 !== void 0 ? _ref25 : false).toString()
         }
       },
       pressParameters: {
@@ -4838,7 +4842,7 @@ var bundle = function (exports) {
       }
     };
   }
-  function useGridNavigationSingleSelection(_ref25) {
+  function useGridNavigationSingleSelection(_ref26) {
     let {
       gridNavigationParameters,
       linearNavigationParameters,
@@ -4847,7 +4851,7 @@ var bundle = function (exports) {
       typeaheadNavigationParameters,
       singleSelectionParameters,
       ..._void2
-    } = _ref25;
+    } = _ref26;
     const gnr = useGridNavigation({
       gridNavigationParameters,
       linearNavigationParameters,
@@ -4868,12 +4872,12 @@ var bundle = function (exports) {
       ...ssr
     };
   }
-  function useGridNavigationSingleSelectionRow(_ref26) {
+  function useGridNavigationSingleSelectionRow(_ref27) {
     let {
       rowAsChildOfGridParameters,
       rowAsParentOfCellsParameters,
       ..._void1
-    } = _ref26;
+    } = _ref27;
     const {
       managedChildParameters,
       hasCurrentFocusParameters: {
@@ -5760,12 +5764,12 @@ var bundle = function (exports) {
    * Because keys are given special treatment and a child has no way of modifying its own key
    * there's no other time or place this can happen other than exactly within the parent component's render function.
    */
-  function useRearrangeableChildren(_ref27) {
+  function useRearrangeableChildren(_ref28) {
     let {
       rearrangeableChildrenParameters: {
         getIndex
       }
-    } = _ref27;
+    } = _ref28;
     // These are used to keep track of a mapping between unsorted index <---> sorted index.
     // These are needed for navigation with the arrow keys.
     const mangleMap = _(new Map());
@@ -5814,12 +5818,12 @@ var bundle = function (exports) {
         demangledIndex: getIndex(child)
       })).sort((lhs, rhs) => {
         return lhs.mangledIndex - rhs.mangledIndex;
-      }).map(_ref28 => {
+      }).map(_ref29 => {
         let {
           child,
           mangledIndex,
           demangledIndex
-        } = _ref28;
+        } = _ref29;
         return h$1(child.type, {
           ...child.props,
           key: demangledIndex,
@@ -5862,13 +5866,13 @@ var bundle = function (exports) {
    * Because keys are given special treatment and a child has no way of modifying its own key
    * there's no other time or place this can happen other than exactly within the parent component's render function.
    */
-  function useSortableChildren(_ref29) {
+  function useSortableChildren(_ref30) {
     let {
       rearrangeableChildrenParameters,
       sortableChildrenParameters: {
         compare: userCompare
       }
-    } = _ref29;
+    } = _ref30;
     const getCompare = useStableGetter(userCompare !== null && userCompare !== void 0 ? userCompare : defaultCompare);
     const {
       rearrangeableChildrenReturn
@@ -5945,13 +5949,13 @@ var bundle = function (exports) {
       return lhs - rhs;
     }
   }
-  function useGridNavigationSingleSelectionSortable(_ref30) {
+  function useGridNavigationSingleSelectionSortable(_ref31) {
     let {
       rearrangeableChildrenParameters,
       sortableChildrenParameters,
       linearNavigationParameters,
       ...gridNavigationSingleSelectionParameters
-    } = _ref30;
+    } = _ref31;
     const {
       ...scr
     } = useSortableChildren({
@@ -5977,7 +5981,7 @@ var bundle = function (exports) {
       ...scr
     };
   }
-  function useListNavigationSingleSelection(_ref31) {
+  function useListNavigationSingleSelection(_ref32) {
     let {
       linearNavigationParameters,
       rovingTabIndexParameters,
@@ -5985,7 +5989,7 @@ var bundle = function (exports) {
       singleSelectionParameters,
       managedChildrenReturn,
       ..._void3
-    } = _ref31;
+    } = _ref32;
     const lnr = useListNavigation({
       linearNavigationParameters,
       rovingTabIndexParameters,
@@ -6005,7 +6009,7 @@ var bundle = function (exports) {
       ...lnr
     };
   }
-  function useListNavigationSingleSelectionChild(_ref32) {
+  function useListNavigationSingleSelectionChild(_ref33) {
     let {
       managedChildParameters: {
         index,
@@ -6022,7 +6026,7 @@ var bundle = function (exports) {
       refElementReturn,
       textContentParameters,
       ..._void1
-    } = _ref32;
+    } = _ref33;
     const {
       hasCurrentFocusParameters: {
         onCurrentFocusedInnerChanged: ocfic2,
@@ -6095,14 +6099,14 @@ var bundle = function (exports) {
       })
     };
   }
-  function useChildrenHaveFocusChild(_ref33) {
+  function useChildrenHaveFocusChild(_ref34) {
     let {
       childrenHaveFocusChildContext: {
         childrenHaveFocusChildParameters: {
           setFocusCount
         }
       }
-    } = _ref33;
+    } = _ref34;
     return {
       hasCurrentFocusParameters: {
         onCurrentFocusedInnerChanged: useStableCallback((focused, prev, e) => {
@@ -6163,7 +6167,7 @@ var bundle = function (exports) {
       }
     };
   }
-  function useCompleteGridNavigation(_ref34) {
+  function useCompleteGridNavigation(_ref35) {
     let {
       gridNavigationParameters,
       linearNavigationParameters,
@@ -6172,7 +6176,7 @@ var bundle = function (exports) {
       typeaheadNavigationParameters,
       sortableChildrenParameters,
       rearrangeableChildrenParameters
-    } = _ref34;
+    } = _ref35;
     const getChildren = T$1(() => managedChildrenReturn.getChildren(), []);
     const getHighestChildIndex = T$1(() => getChildren().getHighestIndex(), []);
     const isValid = useStableCallback(index => {
@@ -6246,7 +6250,7 @@ var bundle = function (exports) {
     };
   }
 
-  function useCompleteGridNavigationRow(_ref35) {
+  function useCompleteGridNavigationRow(_ref36) {
     let {
       rowAsChildOfGridParameters: {
         managedChildParameters,
@@ -6269,7 +6273,7 @@ var bundle = function (exports) {
         typeaheadNavigationParameters,
         ...rowAsParentOfCellsParameters
       }
-    } = _ref35;
+    } = _ref36;
     const {
       index
     } = managedChildParameters;
@@ -6348,7 +6352,7 @@ var bundle = function (exports) {
       selected: r.rowAsChildOfGridReturn.singleSelectionChildReturn.selected,
       focusSelf: r.rowAsChildOfGridReturn.gridNavigationRowParameters.focusSelf,
       getSelected: r.rowAsChildOfGridReturn.singleSelectionChildReturn.getSelected,
-      setLocalSelected: r.rowAsChildOfGridReturn.managedChildParameters.setLocalSelected,
+      setLocalDirection: r.rowAsChildOfGridReturn.managedChildParameters.setLocalDirection,
       disabled: singleSelectionChildParameters.disabled,
       setTabbableColumnIndex: r.rowAsChildOfGridReturn.gridNavigationRowParameters.setTabbableColumnIndex,
       getSortValue: rowAsChildOfGridParameters.sortableChildParameters.getSortValue
@@ -6409,7 +6413,7 @@ var bundle = function (exports) {
     };
   }
 
-  function useCompleteGridNavigationCell(_ref36) {
+  function useCompleteGridNavigationCell(_ref37) {
     let {
       gridNavigationCellParameters,
       managedChildParameters,
@@ -6429,7 +6433,7 @@ var bundle = function (exports) {
       }
       //sortableChildParameters: { getSortValue },
       //    pressParameters: { onPressSync, ...pressParameters },
-    } = _ref36;
+    } = _ref37;
     const {
       index
     } = managedChildParameters;
@@ -6509,12 +6513,12 @@ var bundle = function (exports) {
       textContentReturn
     };
   }
-  function useTimeout(_ref37) {
+  function useTimeout(_ref38) {
     let {
       timeout,
       callback,
       triggerIndex
-    } = _ref37;
+    } = _ref38;
     const stableCallback = useStableCallback(() => {
       startTimeRef.current = null;
       callback();
@@ -6842,7 +6846,7 @@ var bundle = function (exports) {
    *
    * @returns
    */
-  function useCompleteListNavigation(_ref38) {
+  function useCompleteListNavigation(_ref39) {
     let {
       linearNavigationParameters,
       rearrangeableChildrenParameters,
@@ -6851,7 +6855,7 @@ var bundle = function (exports) {
       rovingTabIndexParameters,
       singleSelectionParameters,
       ...completeListNavigationParameters
-    } = _ref38;
+    } = _ref39;
     //type M = UseListNavigationSingleSelectionChildInfo<ChildElement>;
     const {
       initiallySelectedIndex
@@ -6942,7 +6946,7 @@ var bundle = function (exports) {
       childrenHaveFocusReturn
     };
   }
-  function useCompleteListNavigationChild(_ref39) {
+  function useCompleteListNavigationChild(_ref40) {
     let {
       //managedChildParameters: { hidden, disabled, index, getSortValue },
       completeListNavigationChildParameters,
@@ -6965,7 +6969,7 @@ var bundle = function (exports) {
         getSortValue
       },
       ..._void
-    } = _ref39;
+    } = _ref40;
     const {
       hidden
     } = rovingTabIndexChildParameters;
@@ -6998,7 +7002,7 @@ var bundle = function (exports) {
       rovingTabIndexChildReturn,
       singleSelectionChildReturn,
       managedChildParameters: {
-        setLocalSelected
+        setLocalDirection
       }
     } = useListNavigationSingleSelectionChild({
       managedChildParameters: {
@@ -7047,7 +7051,7 @@ var bundle = function (exports) {
       hidden,
       index,
       selected,
-      setLocalSelected,
+      setLocalDirection,
       setTabbable,
       tabbable,
       getSortValue
@@ -7112,7 +7116,7 @@ var bundle = function (exports) {
    * @param param0
    * @returns
    */
-  function useModal(_ref40) {
+  function useModal(_ref41) {
     let {
       dismissParameters,
       escapeDismissParameters,
@@ -7120,7 +7124,7 @@ var bundle = function (exports) {
         trapActive,
         ...focusTrapParameters
       }
-    } = _ref40;
+    } = _ref41;
     const {
       open
     } = dismissParameters;
@@ -7164,13 +7168,13 @@ var bundle = function (exports) {
       focusTrapReturn
     };
   }
-  function useRandomId(_ref41) {
+  function useRandomId(_ref42) {
     let {
       randomIdParameters: {
         prefix,
         otherReferencerProp
       }
-    } = _ref41;
+    } = _ref42;
     const id = prefix + V$1();
     useEnsureStability("useRandomId", prefix, id);
     const referencerElementProps = _(otherReferencerProp == null ? {} : {
@@ -7192,11 +7196,11 @@ var bundle = function (exports) {
   /**
    * While `useRandomId` allows the referencer to use the source's ID, sometimes you also want the reverse too (e.g. I `aria-label` you, you `aria-controls` me. That sort of thing).
    */
-  function useRandomDualIds(_ref42) {
+  function useRandomDualIds(_ref43) {
     let {
       randomIdInputParameters,
       randomIdLabelParameters
-    } = _ref42;
+    } = _ref43;
     const {
       randomIdReturn: randomIdInputReturn,
       propsReferencer: propsLabelAsReferencer,
@@ -7641,7 +7645,7 @@ var bundle = function (exports) {
    *
    * Requires a lot of callbacks to meaningfully turn a red function into a blue one, but you *can* do it!
    */
-  function asyncToSync(_ref43) {
+  function asyncToSync(_ref44) {
     let {
       asyncInput,
       incrementCallCount,
@@ -7658,7 +7662,7 @@ var bundle = function (exports) {
       setPending,
       throttle,
       wait
-    } = _ref43;
+    } = _ref44;
     let pending = false;
     let syncDebouncing = false;
     let asyncDebouncing = false;
@@ -7823,12 +7827,12 @@ var bundle = function (exports) {
    *
    * @see useAsync A more general version of this hook that can work with any type of handler, not just DOM event handlers.
    */
-  function useAsyncHandler(_ref44) {
+  function useAsyncHandler(_ref45) {
     let {
       asyncHandler,
       capture: originalCapture,
       ...restAsyncOptions
-    } = _ref44;
+    } = _ref45;
     // We need to differentiate between "nothing captured yet" and "`undefined` was captured"
     const [currentCapture, setCurrentCapture, getCurrentCapture] = useState(undefined);
     const [hasCapture, setHasCapture] = useState(false);
@@ -7855,14 +7859,14 @@ var bundle = function (exports) {
       })
     };
   }
-  function useDraggable(_ref45) {
+  function useDraggable(_ref46) {
     let {
       effectAllowed,
       data,
       dragImage,
       dragImageXOffset,
       dragImageYOffset
-    } = _ref45;
+    } = _ref46;
     const [dragging, setDragging, getDragging] = useState(false);
     const [lastDropEffect, setLastDropEffect, getLastDropEffect] = useState(null);
     const onDragStart = e => {
@@ -7913,10 +7917,10 @@ var bundle = function (exports) {
       this.errorType = base === null || base === void 0 ? void 0 : base.name;
     }
   }
-  function useDroppable(_ref46) {
+  function useDroppable(_ref47) {
     let {
       effect
-    } = _ref46;
+    } = _ref47;
     const [filesForConsideration, setFilesForConsideration] = useState(null);
     const [stringsForConsideration, setStringsForConsideration] = useState(null);
     const [droppedFiles, setDroppedFiles] = useState(null);
@@ -8127,11 +8131,11 @@ var bundle = function (exports) {
     };
   }
   B$2(null);
-  function useInterval(_ref47) {
+  function useInterval(_ref48) {
     let {
       interval,
       callback
-    } = _ref47;
+    } = _ref48;
     // Get a wrapper around the given callback that's stable
     const stableCallback = useStableCallback(callback);
     const getInterval = useStableGetter(interval);
@@ -8498,10 +8502,10 @@ var bundle = function (exports) {
     });
   });
   const SelectionModeContext = B$2("focus");
-  const DemoUseRovingTabIndexChild = R(_ref48 => {
+  const DemoUseRovingTabIndexChild = R(_ref49 => {
     let {
       index
-    } = _ref48;
+    } = _ref49;
     const selectionMode = q(SelectionModeContext);
     let disabled = index == 6;
     let hidden = index == 7;
@@ -8523,7 +8527,8 @@ var bundle = function (exports) {
         propsUnstable: p2
       },
       singleSelectionChildReturn: {
-        selected
+        selected,
+        selectedOffset
       }
     } = useCompleteListNavigationChild({
       managedChildParameters: {
@@ -8556,7 +8561,7 @@ var bundle = function (exports) {
         }, [])
       }
     });
-    const text = "".concat(randomWord, " This is item #").concat(index).concat(hidden ? " (hidden)" : "").concat(disabled ? " (disabled)" : "").concat(selected ? " (selected)" : " (not selected)", " (").concat(tabbable ? "Tabbable" : "Not tabbable", ")");
+    const text = "".concat(randomWord, " This is item #").concat(index, " (offset: ").concat(selectedOffset, ") ").concat(hidden ? " (hidden)" : "").concat(disabled ? " (disabled)" : "").concat(selected ? " (selected)" : " (not selected)", " (").concat(tabbable ? "Tabbable" : "Not tabbable", ")");
     /*
         const {
             hasCurrentFocusParameters: { onCurrentFocusedInnerChanged, ...void5 },
@@ -8672,8 +8677,8 @@ var bundle = function (exports) {
       ...p,
       children: [droppedStrings != null && o$1("div", {
         children: ["Data dropped: ", o$1("ul", {
-          children: Object.entries(droppedStrings).map(_ref49 => {
-            let [type, value] = _ref49;
+          children: Object.entries(droppedStrings).map(_ref50 => {
+            let [type, value] = _ref50;
             return o$1("li", {
               children: [type, ": ", value]
             });
@@ -8814,10 +8819,10 @@ var bundle = function (exports) {
       })]
     });
   };
-  const DemoUseChildrenHaveFocusChild = _ref50 => {
+  const DemoUseChildrenHaveFocusChild = _ref51 => {
     let {
       index
-    } = _ref50;
+    } = _ref51;
     const {
       hasCurrentFocusParameters: {
         onCurrentFocusedInnerChanged
@@ -8848,10 +8853,10 @@ var bundle = function (exports) {
   const DemoUseElementSizeAnimation = () => {
     return o$1("div", {});
   };
-  const DemoUseFocusTrap = R(_ref51 => {
+  const DemoUseFocusTrap = R(_ref52 => {
     let {
       depth
-    } = _ref51;
+    } = _ref52;
     const [active, setActive] = useState(false);
     const {
       focusTrapReturn: {
@@ -8901,11 +8906,11 @@ var bundle = function (exports) {
       })]
     });
   });
-  const DemoUseFocusTrapChild = R(_ref52 => {
+  const DemoUseFocusTrapChild = R(_ref53 => {
     let {
       setActive,
       active
-    } = _ref52;
+    } = _ref53;
     return o$1(p$1, {
       children: [o$1("button", {
         children: "Button 1"
@@ -9401,10 +9406,10 @@ var bundle = function (exports) {
   //type GridCellContext<RowElement extends Element, CellElement extends Element> = CompleteGridNavigationRowContext<RowElement, CellElement>;
   const GridRowContext = B$2(null);
   const GridCellContext = B$2(null);
-  const DemoUseGridRow = R(_ref53 => {
+  const DemoUseGridRow = R(_ref54 => {
     let {
       index
-    } = _ref53;
+    } = _ref54;
     useState(() => RandomWords[index /*Math.floor(Math.random() * (RandomWords.length - 1))*/]);
     const [_tabbableColumn, setTabbableColumn, _getTabbableColumn] = useState(null);
     //const getHighestIndex = useCallback(() => getChildren().getHighestIndex(), []);
@@ -9487,12 +9492,12 @@ var bundle = function (exports) {
       })
     });
   });
-  const DemoUseGridCell = _ref54 => {
+  const DemoUseGridCell = _ref55 => {
     let {
       index,
       row,
       rowIsTabbable
-    } = _ref54;
+    } = _ref55;
     if (row >= 6 && row % 2 == 0 && index > 1) return null;
     let hiddenText = row === 3 ? " (row hidden)" : "";
     const context = q(GridCellContext);
@@ -9576,10 +9581,10 @@ var bundle = function (exports) {
       })]
     });
   }
-  function DemoPress(_ref55) {
+  function DemoPress(_ref56) {
     let {
       remaining
-    } = _ref55;
+    } = _ref56;
     const [count, setCount] = useState(0);
     const {
       refElementReturn,

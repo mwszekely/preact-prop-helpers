@@ -228,7 +228,7 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
         selected: r.rowAsChildOfGridReturn.singleSelectionChildReturn.selected,
         focusSelf: r.rowAsChildOfGridReturn.gridNavigationRowParameters.focusSelf,
         getSelected: r.rowAsChildOfGridReturn.singleSelectionChildReturn.getSelected,
-        setLocalSelected: r.rowAsChildOfGridReturn.managedChildParameters.setLocalSelected,
+        setLocalDirection: r.rowAsChildOfGridReturn.managedChildParameters.setLocalDirection,
         disabled: singleSelectionChildParameters.disabled,
         setTabbableColumnIndex: r.rowAsChildOfGridReturn.gridNavigationRowParameters.setTabbableColumnIndex,
         getSortValue: rowAsChildOfGridParameters.sortableChildParameters.getSortValue
