@@ -1,6 +1,6 @@
 
 import { h } from "preact";
-import { useCallback, useEffect } from "preact/hooks";
+import { useCallback, useEffect, useRef } from "preact/hooks";
 import { UsePressParameters } from "../component-use/use-press";
 import { UseChildrenHaveFocusChildReturnType, UseChildrenHaveFocusParameters } from "../observers/use-children-have-focus";
 import { useChildrenFlag, UseManagedChildrenReturnType } from "../preact-extensions/use-child-manager";
@@ -55,7 +55,7 @@ export interface UseSingleSelectionParameters<ChildElement extends Element> {
          * to save on re-rendering the parent whenever the selected index changes.
          */
         initiallySelectedIndex: number | null;
-        
+
         /**
          * Called when a child is selected (via a press or other method).
          * 
@@ -76,7 +76,7 @@ export interface UseSingleSelectionChildParameters<E extends Element> {
     //managedChildParameters: Pick<UseManagedChildParameters<SelectableChildInfo<E>, never>["managedChildParameters"], "index" | "disabled">;
     singleSelectionContext: UseSingleSelectionReturnType<E>["singleSelectionContext"];
     singleSelectionChildParameters: {
-        onDistanceChange: null | ((distance: number) => void);
+        //onDistanceChange: null | ((distance: number) => void);
         selectionMode: "focus" | "activation" | "disabled";
         ariaPropName: `aria-${"pressed" | "selected" | "checked"}` | null;
     } & Pick<SelectableChildInfo<E>, "disabled">;
@@ -89,6 +89,12 @@ export interface UseSingleSelectionChildReturnType<E extends Element> extends Us
         // but we're keeping them because RTI does the same thing, and it's convenient.
         selected: boolean,
         getSelected(): boolean;
+        /**
+         * Returns the distance from this child to the selected child.
+         * 
+         * **Stable**, and can be called during render.
+         */
+        getDistance(): number;
         // Used to programmatically set this as the selected element;
         // it requests the parent to actually change the numeric index to this one's.
         setThisOneSelected: (event: Event) => void;
@@ -115,10 +121,10 @@ export interface UseSingleSelectionReturnType<ChildElement extends Element> {
         changeSelectedIndex: PassiveStateUpdater<number | null, Event>;
         getSelectedIndex(): number | null;
     }
-    singleSelectionContext: { 
+    singleSelectionContext: {
         onSelectedIndexChange: UseSingleSelectionParameters<ChildElement>["singleSelectionParameters"]["onSelectedIndexChange"] //PassiveStateUpdater<number | null, Event> | null; 
         getSelectedIndex(): number | null;
-     }
+    }
     childrenHaveFocusParameters: Pick<UseChildrenHaveFocusParameters<ChildElement>["childrenHaveFocusParameters"], "onCompositeFocusChange">
 }
 
@@ -140,7 +146,7 @@ export function useSingleSelection<ChildElement extends Element>({
         if (m.hidden) {
             console.assert(false);
         }
-        m.setLocalSelected(t, newSelectedIndex == null? 0 : (newSelectedIndex - m.index));
+        m.setLocalSelected(t, newSelectedIndex == null ? 0 : (newSelectedIndex - m.index));
     }, []);
     const isSelectedValid = useCallback((m: SelectableChildInfo<ChildElement>) => { return !m.hidden; }, []);
 
@@ -183,16 +189,17 @@ export function useSingleSelectionChild<ChildElement extends Element>(args: UseS
     const {
 
         singleSelectionContext: { getSelectedIndex, onSelectedIndexChange },
-        singleSelectionChildParameters: { ariaPropName, selectionMode, disabled, onDistanceChange },
+        singleSelectionChildParameters: { ariaPropName, selectionMode, disabled },
         managedChildParameters: { index }
     } = args;
 
+    let lastRecordedDistance = useRef(0);
     useEnsureStability("useSingleSelectionChild", getSelectedIndex, onSelectedIndexChange);
     const getDisabled = useStableGetter(disabled);
 
     const [selected, setSelected, getSelected] = useState(getSelectedIndex() == index);
 
-   // const getIndex = useStableGetter(index);
+    // const getIndex = useStableGetter(index);
 
     const onCurrentFocusedInnerChanged = useStableCallback<OnPassiveStateChange<boolean, R>>((focused, _prev, e) => {
         if (selectionMode == 'focus' && focused) {
@@ -204,12 +211,12 @@ export function useSingleSelectionChild<ChildElement extends Element>(args: UseS
         if (selectionMode == "disabled")
             return;
         if (!disabled)
-        onSelectedIndexChange?.(index, e as R);
+            onSelectedIndexChange?.(index, e as R);
     }));
 
     return {
         //managedChildParameters: { selected, setSelected, getSelected, },
-        managedChildParameters: { setLocalSelected: useStableCallback((selected, distance) => { setSelected(selected); onDistanceChange?.(distance); }) },
+        managedChildParameters: { setLocalSelected: useStableCallback((selected, distance) => { lastRecordedDistance.current = distance; setSelected(selected); }) },
         singleSelectionChildReturn: {
             selected,
             setThisOneSelected: useStableCallback((event) => {
@@ -217,6 +224,7 @@ export function useSingleSelectionChild<ChildElement extends Element>(args: UseS
                 onSelectedIndexChange?.(index, event as R);
             }),
             getSelected,
+            getDistance: useCallback(() => { return lastRecordedDistance.current; }, []),
             propsUnstable: ariaPropName == null || selectionMode == "disabled" ? {} : { [ariaPropName as keyof h.JSX.HTMLAttributes<any>]: (selected ?? false).toString() }
         },
         pressParameters: { onPressSync },
