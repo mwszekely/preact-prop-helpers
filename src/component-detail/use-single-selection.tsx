@@ -94,6 +94,8 @@ export interface UseSingleSelectionChildReturnType<E extends Element> extends Us
          * Any time `selected` changes to or from being visible, this will represent the direction and magnitude of the change.
          * 
          * It will never be zero; when `selected` is `true`, then this will be the most recently-used offset.
+         * 
+         * This useful for things like animations or transitions.
          */
         selectedOffset: number | null;
         getSelectedOffset: () => (number | null);
@@ -212,7 +214,7 @@ export function useSingleSelectionChild<ChildElement extends Element>(args: UseS
     useEnsureStability("useSingleSelectionChild", getSelectedIndex, onSelectedIndexChange);
     const getDisabled = useStableGetter(disabled);
 
-    const [selected, setSelected, getSelected] = useState(getSelectedIndex() == index);
+    const [localSelected, setLocalSelected, getLocalSelected] = useState(getSelectedIndex() == index);
     const [direction, setDirection, getDirection] = useState(getSelectedIndex() == null? null : (getSelectedIndex()! - index));
     //const [selected, setSelected, getSelected] = useState(getSelectedIndex() == index);
 
@@ -234,7 +236,7 @@ export function useSingleSelectionChild<ChildElement extends Element>(args: UseS
     return {
         //managedChildParameters: { selected, setSelected, getSelected, },
         managedChildParameters: { setLocalSelected: useStableCallback((selected, direction) => {
-            setSelected(selected);
+            setLocalSelected(selected);
             setDirection(direction);
             /*if (direction == null) {
                 setSelected(false);
@@ -249,16 +251,16 @@ export function useSingleSelectionChild<ChildElement extends Element>(args: UseS
             }*/
         }) },
         singleSelectionChildReturn: {
-            selected: (direction === 0),
+            selected: localSelected,
             setThisOneSelected: useStableCallback((event) => {
                 console.assert(!getDisabled());
                 onSelectedIndexChange?.(index, event as R);
             }),
             getSelectedOffset: getDirection,
             selectedOffset: direction,
-            getSelected,
+            getSelected: getLocalSelected,
             //getDistance: useCallback(() => { return lastRecordedDistance.current; }, []),
-            propsUnstable: ariaPropName == null || selectionMode == "disabled" ? {} : { [ariaPropName as keyof h.JSX.HTMLAttributes<any>]: (selected ?? false).toString() }
+            propsUnstable: ariaPropName == null || selectionMode == "disabled" ? {} : { [ariaPropName as keyof h.JSX.HTMLAttributes<any>]: (localSelected ?? false).toString() }
         },
         pressParameters: { onPressSync },
         hasCurrentFocusParameters: { onCurrentFocusedInnerChanged }
