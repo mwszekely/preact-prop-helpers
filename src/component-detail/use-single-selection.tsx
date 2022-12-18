@@ -26,7 +26,15 @@ export interface UseSingleSelectionContext {
 export interface SelectableChildInfo<E extends Element> extends UseRovingTabIndexChildInfo<E> {
     selected: boolean;
     getSelected(): boolean;
-    setLocalSelected(selected: boolean): void;
+    /**
+     * The parent calls this to change the child's local state.
+     * 
+     * When the `selectedIndex` changes, the relevant children's `setLocalSelected` are called (max of 2).
+     * 
+     * @param selected This is the selected child (out of all of them)
+     * @param distance How far to the `selectedIndex` this child is
+     */
+    setLocalSelected(selected: boolean, distance: number): void;
 
     /**
      * This is similar to `hidden` for `useRovingTabIndex`, but for selection.
@@ -68,6 +76,7 @@ export interface UseSingleSelectionChildParameters<E extends Element> {
     //managedChildParameters: Pick<UseManagedChildParameters<SelectableChildInfo<E>, never>["managedChildParameters"], "index" | "disabled">;
     singleSelectionContext: UseSingleSelectionReturnType<E>["singleSelectionContext"];
     singleSelectionChildParameters: {
+        onDistanceChange: null | ((distance: number) => void);
         selectionMode: "focus" | "activation" | "disabled";
         ariaPropName: `aria-${"pressed" | "selected" | "checked"}` | null;
     } & Pick<SelectableChildInfo<E>, "disabled">;
@@ -127,11 +136,11 @@ export function useSingleSelection<ChildElement extends Element>({
     //useEnsureStability("useSingleSelection", onSelectedIndexChange);
 
     const getSelectedAt = useCallback((m: SelectableChildInfo<ChildElement>) => { return m.getSelected(); }, []);
-    const setSelectedAt = useCallback((m: SelectableChildInfo<ChildElement>, t: boolean) => {
+    const setSelectedAt = useCallback((m: SelectableChildInfo<ChildElement>, t: boolean, newSelectedIndex: number | null) => {
         if (m.hidden) {
             console.assert(false);
         }
-        m.setLocalSelected(t);
+        m.setLocalSelected(t, newSelectedIndex == null? 0 : (newSelectedIndex - m.index));
     }, []);
     const isSelectedValid = useCallback((m: SelectableChildInfo<ChildElement>) => { return !m.hidden; }, []);
 
@@ -174,7 +183,7 @@ export function useSingleSelectionChild<ChildElement extends Element>(args: UseS
     const {
 
         singleSelectionContext: { getSelectedIndex, onSelectedIndexChange },
-        singleSelectionChildParameters: { ariaPropName, selectionMode, disabled },
+        singleSelectionChildParameters: { ariaPropName, selectionMode, disabled, onDistanceChange },
         managedChildParameters: { index }
     } = args;
 
@@ -200,7 +209,7 @@ export function useSingleSelectionChild<ChildElement extends Element>(args: UseS
 
     return {
         //managedChildParameters: { selected, setSelected, getSelected, },
-        managedChildParameters: { setLocalSelected: setSelected },
+        managedChildParameters: { setLocalSelected: useStableCallback((selected, distance) => { setSelected(selected); onDistanceChange?.(distance); }) },
         singleSelectionChildReturn: {
             selected,
             setThisOneSelected: useStableCallback((event) => {

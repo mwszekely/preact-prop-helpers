@@ -371,7 +371,7 @@ export interface UseChildrenFlagParameters<M extends ManagedChildInfo<any>, R> {
      */
     onIndexChange: null | OnPassiveStateChange<number | null, R>;
 
-    setAt(index: M, value: boolean): void;
+    setAt(index: M, value: boolean, newSelectedIndex: number | null): void;
     getAt(index: M): boolean;
     isValid(index: M): boolean;
 }
@@ -467,15 +467,15 @@ export function useChildrenFlag<M extends ManagedChildInfo<number>, R>({ getChil
         const currentChild = currentIndex == null ? null : children.getAt(currentIndex);
 
         if (requestedIndex != null && closestFit && (requestedIndex != currentIndex || currentChild == null || !isValid(currentChild))) {
-            if (currentChild)
-                setAt(currentChild, false);
 
             const closestFitIndex = getClosestFit(requestedIndex);
             setCurrentIndex(closestFitIndex, undefined!);
+            if (currentChild)
+                setAt(currentChild, false, closestFitIndex);
             if (closestFitIndex != null) {
                 const closestFitChild = children.getAt(closestFitIndex)!;
                 console.assert(closestFitChild != null, "Internal logic???");
-                setAt(closestFitChild, true);
+                setAt(closestFitChild, true, closestFitIndex);
             }
 
         }
@@ -501,15 +501,15 @@ export function useChildrenFlag<M extends ManagedChildInfo<number>, R>({ getChil
             // Easy case
             setCurrentIndex(null, reason as R);
             if (oldMatchingChild)
-                setAt(oldMatchingChild, false);
+                setAt(oldMatchingChild, false, requestedIndex);
             return null;
         }
         else {
             if (newMatchingChild && isValid(newMatchingChild)) {
                 setCurrentIndex(requestedIndex, reason as R);
                 if (oldMatchingChild)
-                    setAt(oldMatchingChild, false);
-                setAt(newMatchingChild, true);
+                    setAt(oldMatchingChild, false, requestedIndex);
+                setAt(newMatchingChild, true, requestedIndex);
                 return requestedIndex;
             }
             else {
@@ -519,13 +519,13 @@ export function useChildrenFlag<M extends ManagedChildInfo<number>, R>({ getChil
                     newMatchingChild = children.getAt(closestFitIndex)!;
                     console.assert(newMatchingChild != null, "Internal logic???");
                     if (oldMatchingChild)
-                        setAt(oldMatchingChild, false);
-                    setAt(newMatchingChild, true);
+                        setAt(oldMatchingChild, false, closestFitIndex);
+                    setAt(newMatchingChild, true, closestFitIndex);
                     return closestFitIndex;
                 }
                 else {
                     if (oldMatchingChild)
-                        setAt(oldMatchingChild, false);
+                        setAt(oldMatchingChild, false, closestFitIndex);
                     return null;
                 }
             }
