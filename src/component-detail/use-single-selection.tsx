@@ -159,7 +159,7 @@ export function useSingleSelection<ChildElement extends Element>({
         if (newSelectedIndex == null)
             console.assert(t == false);
         if (t)
-            console.assert(newSelectedIndex === 0);
+            console.assert(newSelectedIndex === m.index);
 
         m.setLocalDirection(direction);
     }, []);
