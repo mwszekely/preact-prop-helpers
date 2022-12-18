@@ -154,7 +154,7 @@ export function useSingleSelection<ChildElement extends Element>({
         if (m.hidden) {
             console.assert(false);
         }
-        const directionComparison = (newSelectedIndex || prevSelectedIndex);
+        const directionComparison = (newSelectedIndex == m.index? prevSelectedIndex : newSelectedIndex);
         const direction = (directionComparison == null ? null : (m.index - directionComparison));
         if (newSelectedIndex == null)
             console.assert(t == false);
