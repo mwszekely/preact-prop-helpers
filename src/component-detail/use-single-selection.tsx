@@ -150,11 +150,12 @@ export function useSingleSelection<ChildElement extends Element>({
     //useEnsureStability("useSingleSelection", onSelectedIndexChange);
 
     const getSelectedAt = useCallback((m: SelectableChildInfo<ChildElement>) => { return m.getSelected(); }, []);
-    const setSelectedAt = useCallback((m: SelectableChildInfo<ChildElement>, t: boolean, newSelectedIndex: number | null) => {
+    const setSelectedAt = useCallback((m: SelectableChildInfo<ChildElement>, t: boolean, newSelectedIndex: number | null, prevSelectedIndex: number | null) => {
         if (m.hidden) {
             console.assert(false);
         }
-        const direction = (newSelectedIndex == null ? null : (m.index - newSelectedIndex));
+        const directionComparison = (newSelectedIndex || prevSelectedIndex);
+        const direction = (directionComparison == null ? null : (m.index - directionComparison));
         if (newSelectedIndex == null)
             console.assert(t == false);
         if (t)
