@@ -1,4 +1,4 @@
-import { assertEmptyObject, UseManagedChildrenReturnType } from "../preact-extensions/use-child-manager";
+import { assertEmptyObject, UseManagedChildrenReturnType } from "../preact-extensions/use-managed-children";
 import { OnPassiveStateChange, PassiveStateUpdater, usePassiveState } from "../preact-extensions/use-passive-state";
 import { useStableCallback } from "../preact-extensions/use-stable-callback";
 import { useStableObject } from "../preact-extensions/use-stable-getter";

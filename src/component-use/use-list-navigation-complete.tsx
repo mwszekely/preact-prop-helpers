@@ -7,7 +7,7 @@ import { useMergedProps } from "../dom-helpers/use-merged-props";
 import { useRefElement } from "../dom-helpers/use-ref-element";
 import { useChildrenHaveFocus, useChildrenHaveFocusChild, UseChildrenHaveFocusChildParameters, UseChildrenHaveFocusReturnType } from "../observers/use-children-have-focus";
 import { useHasCurrentFocus, UseHasCurrentFocusReturnType } from "../observers/use-has-current-focus";
-import { ManagedChildren, useManagedChild, useManagedChildren, UseManagedChildrenContext, UseManagedChildrenReturnType, UseManagedChildReturnType } from "../preact-extensions/use-child-manager";
+import { ManagedChildren, useManagedChild, useManagedChildren, UseManagedChildrenContext, UseManagedChildrenReturnType, UseManagedChildReturnType } from "../preact-extensions/use-managed-children";
 import { useStableCallback } from "../preact-extensions/use-stable-callback";
 import { useStableObject } from "../preact-extensions/use-stable-getter";
 import { usePress, UsePressParameters, UsePressReturnType } from "./use-press";

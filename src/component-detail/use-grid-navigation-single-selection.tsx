@@ -1,4 +1,4 @@
-import { assertEmptyObject } from "../preact-extensions/use-child-manager";
+import { assertEmptyObject } from "../preact-extensions/use-managed-children";
 import { useStableCallback } from "../preact-extensions/use-stable-callback";
 import { GridChildCellInfo as gcci, GridChildRowInfo as gcri, useGridNavigation, useGridNavigationCell, UseGridNavigationCellParameters, UseGridNavigationCellReturnType, UseGridNavigationParameters, UseGridNavigationReturnType, useGridNavigationRow, UseGridNavigationRowParameters, UseGridNavigationRowReturnType } from "./use-grid-navigation-partial";
 import { SelectableChildInfo, useSingleSelection, useSingleSelectionChild, UseSingleSelectionChildParameters, UseSingleSelectionChildReturnType, UseSingleSelectionParameters, UseSingleSelectionReturnType } from "./use-single-selection";

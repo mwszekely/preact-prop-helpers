@@ -1,4 +1,4 @@
-import { assertEmptyObject } from "../preact-extensions/use-child-manager";
+import { assertEmptyObject } from "../preact-extensions/use-managed-children";
 import { useStableCallback } from "../preact-extensions/use-stable-callback";
 import { useListNavigation, useListNavigationChild, UseListNavigationChildInfo, UseListNavigationChildParameters, UseListNavigationChildReturnType, UseListNavigationParameters, UseListNavigationReturnType } from "./use-list-navigation-partial";
 import { SelectableChildInfo, useSingleSelection, useSingleSelectionChild, UseSingleSelectionChildParameters, UseSingleSelectionChildReturnType, UseSingleSelectionParameters, UseSingleSelectionReturnType } from "./use-single-selection";

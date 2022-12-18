@@ -3,7 +3,7 @@ import { h } from "preact";
 import { useCallback, useEffect, useRef } from "preact/hooks";
 import { UsePressParameters } from "../component-use/use-press";
 import { UseChildrenHaveFocusChildReturnType, UseChildrenHaveFocusParameters } from "../observers/use-children-have-focus";
-import { useChildrenFlag, UseManagedChildrenReturnType } from "../preact-extensions/use-child-manager";
+import { useChildrenFlag, UseManagedChildrenReturnType } from "../preact-extensions/use-managed-children";
 import { OnPassiveStateChange, PassiveStateUpdater, useEnsureStability } from "../preact-extensions/use-passive-state";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "./use-roving-tabindex";
 //import { usePress, UsePressReturnType } from "./use-press";
@@ -91,8 +91,9 @@ export interface UseSingleSelectionChildReturnType<E extends Element> extends Us
         getSelected(): boolean;
 
         /**
-         * Any time `selected` changes, this represents the direction (and magnitude) of the change.
-         * It is *not* kept up to date outside of that scenario -- this is meant for determining the direction of a change only.
+         * Any time `selected` changes to or from being visible, this will represent the direction and magnitude of the change.
+         * 
+         * It will never be zero; when `selected` is `true`, then this will be the most recently-used offset.
          */
         selectedOffset: number | null;
         getSelectedOffset: () => (number | null);
@@ -210,6 +211,7 @@ export function useSingleSelectionChild<ChildElement extends Element>(args: UseS
     useEnsureStability("useSingleSelectionChild", getSelectedIndex, onSelectedIndexChange);
     const getDisabled = useStableGetter(disabled);
 
+    const [selected, setSelected, getSelected] = useState(getSelectedIndex() == index);
     const [direction, setDirection, getDirection] = useState(getSelectedIndex() == null? null : (getSelectedIndex()! - index));
     //const [selected, setSelected, getSelected] = useState(getSelectedIndex() == index);
 
@@ -230,7 +232,19 @@ export function useSingleSelectionChild<ChildElement extends Element>(args: UseS
 
     return {
         //managedChildParameters: { selected, setSelected, getSelected, },
-        managedChildParameters: { setLocalDirection: setDirection },
+        managedChildParameters: { setLocalDirection: useStableCallback((direction) => {
+            if (direction == null) {
+                setSelected(false);
+                setDirection(null);
+            }
+            else if (direction == 0) {
+                setSelected(true);
+            }
+            else {
+                setSelected(false);
+                setDirection(direction);
+            }
+        }) },
         singleSelectionChildReturn: {
             selected: (direction === 0),
             setThisOneSelected: useStableCallback((event) => {
@@ -239,9 +253,9 @@ export function useSingleSelectionChild<ChildElement extends Element>(args: UseS
             }),
             getSelectedOffset: getDirection,
             selectedOffset: direction,
-            getSelected: useCallback(() => { return getDirection() == 0; }, []),
+            getSelected,
             //getDistance: useCallback(() => { return lastRecordedDistance.current; }, []),
-            propsUnstable: ariaPropName == null || selectionMode == "disabled" ? {} : { [ariaPropName as keyof h.JSX.HTMLAttributes<any>]: ((direction === 0) ?? false).toString() }
+            propsUnstable: ariaPropName == null || selectionMode == "disabled" ? {} : { [ariaPropName as keyof h.JSX.HTMLAttributes<any>]: (selected ?? false).toString() }
         },
         pressParameters: { onPressSync },
         hasCurrentFocusParameters: { onCurrentFocusedInnerChanged }
