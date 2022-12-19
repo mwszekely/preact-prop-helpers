@@ -71,12 +71,14 @@ export function usePersistentState<Key extends keyof PersistentStates>(key: Key,
 
             if (newValue != null)
                 setLocalCopy(fromString(newValue));
+            else
+                setLocalCopy(initialValue);
         }
     });
 
     const setValueWrapper = useCallback<typeof setLocalCopy>((valueOrSetter) => {
 
-        const value: unknown = typeof valueOrSetter === "function" ? (valueOrSetter as Function)(getLocalCopy()) : valueOrSetter;
+        const value: PersistentStates[Key] = typeof valueOrSetter === "function" ? (valueOrSetter as Function)(getLocalCopy()) : valueOrSetter;
 
         // Make sure this update is available immediately before the next render
         setLocalCopy(valueOrSetter);
@@ -84,8 +86,8 @@ export function usePersistentState<Key extends keyof PersistentStates>(key: Key,
         // Actually save the value to local storage.
         storeToLocalStorage(key, value as PersistentStates[Key], toString);
 
-        if (value instanceof Date) {
-            console.assert(fromString != JSON.parse);
+        if (typeof value == "object" && (value as object) instanceof Date) {
+            console.assert(fromString != JSON.parse, "Dates (and other non-JSON types) must be given custom fromString and toString functions.");
         }
     }, [key, toString]);
 
