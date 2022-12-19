@@ -22,7 +22,7 @@ export interface PersistentStates { }
 export function getFromLocalStorage<Key extends (keyof PersistentStates) & string>(key: Key, converter: ((input: string) => PersistentStates[Key]) = JSON.parse): PersistentStates[Key] | undefined {
     try {
         const item = localStorage.getItem(key);
-        if (!item)
+        if (item == null)
             return undefined;
         return converter(item);
     }
