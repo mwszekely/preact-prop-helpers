@@ -1,6 +1,6 @@
 import { h } from "preact";
 import { useCallback, useEffect, useRef } from "preact/hooks";
-import { OnPassiveStateChange, returnNull, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state";
+import { OnPassiveStateChange, returnNull, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state";
 import { getDocument } from "./use-document-class";
 import { useRefElement, UseRefElementParameters, UseRefElementReturnType } from "./use-ref-element";
 
@@ -49,7 +49,7 @@ export function useElementSize<E extends Element>({ elementSizeParameters: { get
 
     useEnsureStability("useElementSize", getObserveBox, onSizeChange, onElementChange, onMount, onUnmount);
 
-    const [getSize, setSize] = usePassiveState<ElementSize | null, UIEvent | ResizeObserverEntry[]>(onSizeChange as OnPassiveStateChange<ElementSize | null, UIEvent | ResizeObserverEntry[]>, returnNull);
+    const [getSize, setSize] = usePassiveState<ElementSize | null, UIEvent | ResizeObserverEntry[]>(onSizeChange as OnPassiveStateChange<ElementSize | null, UIEvent | ResizeObserverEntry[]>, returnNull, runImmediately);
 
     const currentObserveBox = useRef<ResizeObserverBoxOptions | undefined>(undefined);
 

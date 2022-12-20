@@ -2,7 +2,7 @@
 import { useCallback, useEffect } from "preact/hooks";
 //import { UseManagedChildParameters, useManagedChildren, UseManagedChildrenParameters, UseManagedChildrenReturnTypeInfo } from "./use-child-manager";
 import { UseRefElementReturnType } from "../dom-helpers/use-ref-element";
-import { returnFalse, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state";
+import { returnFalse, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state";
 import { useActiveElement, UseActiveElementParameters, UseActiveElementReturnType } from "./use-active-element";
 
 export interface UseHasLastFocusParameters<T extends Node> extends UseActiveElementParameters {
@@ -42,8 +42,8 @@ export function useHasLastFocus<T extends Node>(args: UseHasLastFocusParameters<
 
     useEnsureStability("useHasFocus", onLastFocusedChanged, onLastFocusedInnerChanged);
     
-    const [getLastFocused, setLastFocused] = usePassiveState<boolean, UIEvent>(onLastFocusedChanged, returnFalse);
-    const [getLastFocusedInner, setLastFocusedInner] = usePassiveState<boolean, UIEvent>(onLastFocusedInnerChanged, returnFalse);
+    const [getLastFocused, setLastFocused] = usePassiveState<boolean, UIEvent>(onLastFocusedChanged, returnFalse, runImmediately);
+    const [getLastFocusedInner, setLastFocusedInner] = usePassiveState<boolean, UIEvent>(onLastFocusedInnerChanged, returnFalse, runImmediately);
 
     const { activeElementReturn } = useActiveElement({
         activeElementParameters: {

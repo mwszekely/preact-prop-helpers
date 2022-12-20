@@ -1,6 +1,6 @@
 import { useCallback, useEffect } from "preact/hooks";
 import { useRefElement, UseRefElementParameters } from "../dom-helpers/use-ref-element";
-import { returnNull, usePassiveState } from "../preact-extensions/use-passive-state";
+import { returnNull, runImmediately, usePassiveState } from "../preact-extensions/use-passive-state";
 import { useStableCallback } from "../preact-extensions/use-stable-callback";
 
 export interface UseMutationObserverParameters<E extends Element> extends UseRefElementParameters<E> {
@@ -49,7 +49,7 @@ export function useMutationObserver<E extends Element>(options: UseMutationObser
 
             return () => observer.disconnect();
         }
-    }), returnNull)
+    }), returnNull, runImmediately)
 
     const onNeedMutationObserverReset = useCallback((element: E | null) => {
         if (element) {

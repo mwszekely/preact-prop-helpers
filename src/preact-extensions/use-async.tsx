@@ -1,9 +1,6 @@
 
-import LodashDebounce, { type DebouncedFunc, type DebounceSettings } from "lodash-es/debounce";
-import noop from "lodash-es/noop";
-import LodashThrottle, { type ThrottleSettings } from "lodash-es/throttle";
+import LodashDebounce from "lodash-es/debounce";
 import { useCallback, useEffect, useMemo } from "preact/hooks";
-import { returnNull, usePassiveState } from "./use-passive-state";
 import { useStableCallback } from "./use-stable-callback";
 import { useState } from "./use-state";
 

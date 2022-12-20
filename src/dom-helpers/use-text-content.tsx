@@ -1,5 +1,5 @@
 import { useEffect } from "preact/hooks";
-import { OnPassiveStateChange, returnNull, usePassiveState } from "../preact-extensions/use-passive-state";
+import { OnPassiveStateChange, returnNull, runImmediately, usePassiveState } from "../preact-extensions/use-passive-state";
 import { UseRefElementReturnType } from "./use-ref-element";
 
 export interface UseTextContentParameters<E extends Element> {
@@ -14,7 +14,7 @@ export interface UseTextContentParameters<E extends Element> {
 }
 
 export function useTextContent<E extends Element>({ refElementReturn: { getElement }, textContentParameters: { getText, onTextContentChange } }: UseTextContentParameters<E>) {
-    const [getTextContent, setTextContent] = usePassiveState<string | null, never>(onTextContentChange, returnNull);
+    const [getTextContent, setTextContent] = usePassiveState<string | null, never>(onTextContentChange, returnNull, runImmediately);
     useEffect(() => {
         const element = getElement();
         if (element) {

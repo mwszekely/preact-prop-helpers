@@ -3,7 +3,7 @@ import { h } from "preact";
 import { useCallback, useEffect, useRef } from "preact/hooks";
 //import { UseManagedChildParameters, useManagedChildren, UseManagedChildrenParameters, UseManagedChildrenReturnTypeInfo } from "./use-child-manager";
 import { UseRefElementReturnType } from "../dom-helpers/use-ref-element";
-import { OnPassiveStateChange, returnFalse, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state";
+import { OnPassiveStateChange, returnFalse, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state";
 
 /*
 export function useHasCurrentFocusProps<E extends Element>(r: UseHasCurrentFocusReturnType<E>, ...otherProps: h.JSX.HTMLAttributes<E>[]) {
@@ -56,8 +56,8 @@ export function useHasCurrentFocus<T extends Node>(args: UseHasCurrentFocusParam
 
     useEnsureStability("useHasCurrentFocus", onFocusedChanged, onFocusedInnerChanged, getElement);
 
-    const [getFocused, setFocused] = usePassiveState<boolean, R>(onFocusedChanged, returnFalse);
-    const [getFocusedInner, setFocusedInner] = usePassiveState<boolean, R>(onFocusedInnerChanged, returnFalse);
+    const [getFocused, setFocused] = usePassiveState<boolean, R>(onFocusedChanged, returnFalse, runImmediately);
+    const [getFocusedInner, setFocusedInner] = usePassiveState<boolean, R>(onFocusedInnerChanged, returnFalse, runImmediately);
 
     const onFocusIn = useCallback<h.JSX.EventHandler<h.JSX.TargetedFocusEvent<T>>>((e) => {
 

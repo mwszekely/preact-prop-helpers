@@ -4094,7 +4094,7 @@ var bundle = function (exports) {
         onTextContentChange
       }
     } = _ref16;
-    const [getTextContent, setTextContent] = usePassiveState(onTextContentChange, returnNull);
+    const [getTextContent, setTextContent] = usePassiveState(onTextContentChange, returnNull, runImmediately);
     h(() => {
       const element = getElement();
       if (element) {
@@ -6145,8 +6145,8 @@ var bundle = function (exports) {
       }
     } = args;
     useEnsureStability("useHasCurrentFocus", onFocusedChanged, onFocusedInnerChanged, getElement);
-    const [getFocused, setFocused] = usePassiveState(onFocusedChanged, returnFalse);
-    const [getFocusedInner, setFocusedInner] = usePassiveState(onFocusedInnerChanged, returnFalse);
+    const [getFocused, setFocused] = usePassiveState(onFocusedChanged, returnFalse, runImmediately);
+    const [getFocusedInner, setFocusedInner] = usePassiveState(onFocusedInnerChanged, returnFalse, runImmediately);
     const onFocusIn = T$1(e => {
       setFocusedInner(true, e);
       setFocused(e.target == getElement(), e);
@@ -6714,7 +6714,6 @@ var bundle = function (exports) {
     const onPointerUp = T$1(e => {
       const hovering = getHovering();
       const pointerDownStartedHere = getPointerDownStartedHere();
-      console.log("onPointerUp: " + hovering.toString());
       setJustHandled(true);
       if (pointerDownStartedHere && hovering) {
         handlePress(e);
@@ -6729,8 +6728,6 @@ var bundle = function (exports) {
       setHovering(true);
     }, []);
     const onPointerLeave = T$1(e => {
-      console.log("onPointerLeave");
-      //e.preventDefault();
       setHovering(false);
       setLongPress(false);
     }, []);
@@ -6830,7 +6827,7 @@ var bundle = function (exports) {
           (element === null || element === void 0 ? void 0 : element.tagName) == 'input' && element.type == 'radio' && element.checked) {
             // Intentional, for now. Programmatic clicks shouldn't happen in most cases.
             // TODO: Remove this when I'm confident stray clicks won't be handled.
-            console.log(false);
+            console.assert(false);
             debugger;
             handlePress(e);
           }
@@ -8135,8 +8132,8 @@ var bundle = function (exports) {
       }
     } = args;
     useEnsureStability("useHasFocus", onLastFocusedChanged, onLastFocusedInnerChanged);
-    const [getLastFocused, setLastFocused] = usePassiveState(onLastFocusedChanged, returnFalse);
-    const [getLastFocusedInner, setLastFocusedInner] = usePassiveState(onLastFocusedInnerChanged, returnFalse);
+    const [getLastFocused, setLastFocused] = usePassiveState(onLastFocusedChanged, returnFalse, runImmediately);
+    const [getLastFocusedInner, setLastFocusedInner] = usePassiveState(onLastFocusedInnerChanged, returnFalse, runImmediately);
     const {
       activeElementReturn
     } = useActiveElement({
