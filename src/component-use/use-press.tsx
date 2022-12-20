@@ -1,9 +1,7 @@
 import { h } from "preact";
-import { returnFalse, returnNull, usePassiveState } from "../preact-extensions/use-passive-state";
-import { useCallback, useEffect, useRef } from "preact/hooks";
-import { useGlobalHandler } from "../dom-helpers/use-event-handler";
+import { useCallback, useRef } from "preact/hooks";
 import { UseRefElementReturnType } from "../dom-helpers/use-ref-element";
-import { useForceUpdate } from "../preact-extensions/use-force-update";
+import { returnFalse, usePassiveState } from "../preact-extensions/use-passive-state";
 import { useStableCallback } from "../preact-extensions/use-stable-callback";
 import { useState } from "../preact-extensions/use-state";
 import { useTimeout } from "../timing/use-timeout";
@@ -48,7 +46,7 @@ export interface UsePressReturnType<E extends Element> {
          * but specifically for presses only. Useful for styling mostly.
          */
         pseudoActive: boolean;
-        hovering: boolean;
+        //hovering: boolean;
         /**
          * Similar to pseudoActive, but for if the button as been pressed down for a determined length of time.
          */
@@ -84,6 +82,8 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
         refElementReturn: { getElement },
         pressParameters: { exclude, focusSelf, onPressSync, allowRepeatPresses, longPressThreshold }
     } = args;
+
+    const hasPressEvent = (onPressSync != null);
 
     /**
      * Explanations:
@@ -177,32 +177,47 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
     }, []);
 
     const onPointerDown = useCallback((e: h.JSX.TargetedPointerEvent<E>) => {
-        e.preventDefault();
-        e.stopPropagation();
-        setPointerDownStartedHere(true);
-        setHovering(true);
-        setLongPress(false);
+        if ((e.buttons & 1)) {
+            e.preventDefault();
+            e.stopPropagation();
+            setPointerDownStartedHere(true);
+            setHovering(true);
+            setLongPress(false);
 
-        const element = getElement();
-        if (element)
-            focusSelf(element);
+            const element = getElement();
+            if (element)
+                focusSelf(element);
+        }
     }, []);
-    const onPointerMove = useCallback((e: h.JSX.TargetedPointerEvent<E>) => {
-        e.preventDefault();
-        e.stopPropagation();
-        const element = getElement();
-        const elementAtPointer = document.elementFromPoint(e.clientX, e.clientY);
-        setHovering(element == elementAtPointer || element?.contains(elementAtPointer) || false);
-    }, [])
+    const onPointerMove = useStableCallback((e: h.JSX.TargetedPointerEvent<E>) => {
+        let listeningForPress = getPointerDownStartedHere();
+        // If we're hovering over this element and not holding down the mouse button (or whatever other primary button)
+        // then we're definitely not in a press anymore (if we could we'd just wait for onPointerUp, but it could happen outside this element)
+        if (!(e.buttons & 1))
+            setPointerDownStartedHere(listeningForPress = false);
+
+
+        if (listeningForPress) {
+            //e.preventDefault();
+            //e.stopPropagation();
+            const element = getElement();
+            // Note: elementFromPoint starts reasonably expensive on a decent computer when on the order of 500 or so elements,
+            // so we only test for hovering while actively attempting to detect a press
+            const elementAtPointer = document.elementFromPoint(e.clientX, e.clientY);
+            setHovering(element == elementAtPointer || element?.contains(elementAtPointer) || false);
+        }
+
+    })
     const onPointerUp = useCallback((e: h.JSX.TargetedPointerEvent<E>) => {
-        e.preventDefault();
-        e.stopPropagation();
         const hovering = getHovering();
         const pointerDownStartedHere = getPointerDownStartedHere();
+        console.log("onPointerUp: " + hovering.toString());
 
         setJustHandled(true);
         if (pointerDownStartedHere && hovering) {
             handlePress(e);
+            e.preventDefault();
+            e.stopPropagation();
         }
         setWaitingForSpaceUp(false);
         setHovering(false);
@@ -210,8 +225,10 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
 
     }, []);
     const onPointerLeave = useCallback((e: h.JSX.TargetedPointerEvent<E>) => {
-        e.preventDefault();
+        console.log("onPointerLeave");
+        //e.preventDefault();
         setHovering(false);
+        setLongPress(false);
     }, []);
 
     useTimeout({
@@ -347,16 +364,15 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
         onKeyDown,
         onKeyUp,
 
-        onTouchStart: !p ? onTouchStart : undefined,
-        onTouchCancel: !p ? onTouchEnd : undefined,
-        onTouchMove: !p ? onTouchMove : undefined,
-        onTouchEnd: !p ? onTouchEnd : undefined,
-
-        onPointerDown: p ? onPointerDown : undefined,
-        onPointerCancel: p ? onPointerDown : undefined,
-        onPointerMove: p ? onPointerMove : undefined,
-        onPointerUp: p ? onPointerUp : undefined,
-        onPointerLeave: p ? onPointerLeave : undefined,
+        onTouchStart: !hasPressEvent? undefined : (!p ? onTouchStart : undefined),
+        onTouchCancel: !hasPressEvent? undefined : (!p ? onTouchEnd : undefined),
+        onTouchMove: !hasPressEvent? undefined : (!p ? onTouchMove : undefined),
+        onTouchEnd: !hasPressEvent? undefined : (!p ? onTouchEnd : undefined),
+        onPointerDown: !hasPressEvent? undefined : (p ? onPointerDown : undefined),
+        onPointerCancel: !hasPressEvent? undefined : (p ? onPointerDown : undefined),
+        onPointerMove: !hasPressEvent? undefined : (p ? onPointerMove : undefined),
+        onPointerUp: !hasPressEvent? undefined : (p ? onPointerUp : undefined),
+        onPointerLeave: !hasPressEvent? undefined : (p ? onPointerLeave : undefined),
         onfocusout: onFocusOut,
         onClick
     });
@@ -364,7 +380,7 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
     return {
         pressReturn: {
             pseudoActive: ((pointerDownStartedHere && hovering) || waitingForSpaceUp || false),
-            hovering,
+            //hovering,
             longPress,
             propsStable: propsStable2.current,
         }

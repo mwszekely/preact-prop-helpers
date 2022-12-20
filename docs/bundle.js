@@ -6604,6 +6604,7 @@ var bundle = function (exports) {
         longPressThreshold
       }
     } = args;
+    const hasPressEvent = onPressSync != null;
     /**
      * Explanations:
      *
@@ -6685,37 +6686,50 @@ var bundle = function (exports) {
       setPointerDownStartedHere(false);
     }, []);
     const onPointerDown = T$1(e => {
-      e.preventDefault();
-      e.stopPropagation();
-      setPointerDownStartedHere(true);
-      setHovering(true);
-      setLongPress(false);
-      const element = getElement();
-      if (element) focusSelf(element);
+      if (e.buttons & 1) {
+        e.preventDefault();
+        e.stopPropagation();
+        setPointerDownStartedHere(true);
+        setHovering(true);
+        setLongPress(false);
+        const element = getElement();
+        if (element) focusSelf(element);
+      }
     }, []);
-    const onPointerMove = T$1(e => {
-      e.preventDefault();
-      e.stopPropagation();
-      const element = getElement();
-      const elementAtPointer = document.elementFromPoint(e.clientX, e.clientY);
-      setHovering(element == elementAtPointer || (element === null || element === void 0 ? void 0 : element.contains(elementAtPointer)) || false);
-    }, []);
+    const onPointerMove = useStableCallback(e => {
+      let listeningForPress = getPointerDownStartedHere();
+      // If we're hovering over this element and not holding down the mouse button (or whatever other primary button)
+      // then we're definitely not in a press anymore (if we could we'd just wait for onPointerUp, but it could happen outside this element)
+      if (!(e.buttons & 1)) setPointerDownStartedHere(listeningForPress = false);
+      if (listeningForPress) {
+        //e.preventDefault();
+        //e.stopPropagation();
+        const element = getElement();
+        // Note: elementFromPoint starts reasonably expensive on a decent computer when on the order of 500 or so elements,
+        // so we only test for hovering while actively attempting to detect a press
+        const elementAtPointer = document.elementFromPoint(e.clientX, e.clientY);
+        setHovering(element == elementAtPointer || (element === null || element === void 0 ? void 0 : element.contains(elementAtPointer)) || false);
+      }
+    });
     const onPointerUp = T$1(e => {
-      e.preventDefault();
-      e.stopPropagation();
       const hovering = getHovering();
       const pointerDownStartedHere = getPointerDownStartedHere();
+      console.log("onPointerUp: " + hovering.toString());
       setJustHandled(true);
       if (pointerDownStartedHere && hovering) {
         handlePress(e);
+        e.preventDefault();
+        e.stopPropagation();
       }
       setWaitingForSpaceUp(false);
       setHovering(false);
       setPointerDownStartedHere(false);
     }, []);
     const onPointerLeave = T$1(e => {
-      e.preventDefault();
+      console.log("onPointerLeave");
+      //e.preventDefault();
       setHovering(false);
+      setLongPress(false);
     }, []);
     useTimeout({
       callback: () => {
@@ -6823,22 +6837,22 @@ var bundle = function (exports) {
     const propsStable2 = _({
       onKeyDown,
       onKeyUp,
-      onTouchStart: !p ? onTouchStart : undefined,
-      onTouchCancel: !p ? onTouchEnd : undefined,
-      onTouchMove: !p ? onTouchMove : undefined,
-      onTouchEnd: !p ? onTouchEnd : undefined,
-      onPointerDown: p ? onPointerDown : undefined,
-      onPointerCancel: p ? onPointerDown : undefined,
-      onPointerMove: p ? onPointerMove : undefined,
-      onPointerUp: p ? onPointerUp : undefined,
-      onPointerLeave: p ? onPointerLeave : undefined,
+      onTouchStart: !hasPressEvent ? undefined : !p ? onTouchStart : undefined,
+      onTouchCancel: !hasPressEvent ? undefined : !p ? onTouchEnd : undefined,
+      onTouchMove: !hasPressEvent ? undefined : !p ? onTouchMove : undefined,
+      onTouchEnd: !hasPressEvent ? undefined : !p ? onTouchEnd : undefined,
+      onPointerDown: !hasPressEvent ? undefined : p ? onPointerDown : undefined,
+      onPointerCancel: !hasPressEvent ? undefined : p ? onPointerDown : undefined,
+      onPointerMove: !hasPressEvent ? undefined : p ? onPointerMove : undefined,
+      onPointerUp: !hasPressEvent ? undefined : p ? onPointerUp : undefined,
+      onPointerLeave: !hasPressEvent ? undefined : p ? onPointerLeave : undefined,
       onfocusout: onFocusOut,
       onClick
     });
     return {
       pressReturn: {
         pseudoActive: pointerDownStartedHere && hovering || waitingForSpaceUp || false,
-        hovering,
+        //hovering,
         longPress,
         propsStable: propsStable2.current
       }
@@ -9613,7 +9627,6 @@ var bundle = function (exports) {
       pressReturn: {
         propsStable: p2,
         pseudoActive,
-        hovering,
         longPress
       }
     } = usePress({
@@ -9636,8 +9649,6 @@ var bundle = function (exports) {
       }), o$1("div", {
         children: ["Active: ", pseudoActive.toString()]
       }), o$1("div", {
-        children: ["Hovering: ", hovering.toString()]
-      }), o$1("div", {
         children: ["Long press: ", (longPress !== null && longPress !== void 0 ? longPress : "null").toString()]
       }), o$1("div", {
         style: {
@@ -9647,7 +9658,7 @@ var bundle = function (exports) {
         tabIndex: 0,
         ...useMergedProps(p1, p2),
         children: [o$1("div", {
-          children: "Pressable"
+          children: "This DIV's parent is pressable. Click here to press, cancel by leaving or hovering over a pressable child."
         }), o$1("div", {
           children: remaining > 0 && o$1(DemoPress, {
             remaining: remaining - 1
