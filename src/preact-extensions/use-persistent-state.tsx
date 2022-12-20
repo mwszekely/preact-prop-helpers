@@ -1,6 +1,7 @@
-import { useCallback, useLayoutEffect } from "preact/hooks";
+import { useLayoutEffect } from "preact/hooks";
 import { useGlobalHandler } from "../dom-helpers/use-event-handler";
 import { useStableCallback } from "./use-stable-callback";
+import { useStableGetter } from "./use-stable-getter";
 import { useState } from "./use-state";
 
 /* eslint-disable @typescript-eslint/no-empty-interface */
@@ -64,12 +65,12 @@ export function storeToLocalStorage<Key extends (keyof PersistentStates) & strin
  */
 export function usePersistentState<Key extends keyof PersistentStates>(key: Key, initialValue: PersistentStates[Key], fromString: ((value: string) => PersistentStates[Key]) = JSON.parse, toString: ((value: PersistentStates[Key]) => string) = JSON.stringify) {
     const [localCopy, setLocalCopy, getLocalCopy] = useState<PersistentStates[Key]>(() => (getFromLocalStorage(key, fromString) ?? initialValue));
+    const getInitialValue = useStableGetter(initialValue);
 
     // Ensure that if our key changes, we also update `localCopy` to match.
     useLayoutEffect(() => {
         const newCopy = getFromLocalStorage(key, fromString);
-        if (newCopy != null)
-            setLocalCopy(newCopy);
+        setLocalCopy(newCopy ?? getInitialValue());
     }, [key])
 
     // Listen for changes to this storage in other browser tabs
