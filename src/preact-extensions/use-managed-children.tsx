@@ -75,6 +75,8 @@ interface MCP<T extends number | string> {
      * 
      * Only one will run per tick, just like layoutEffect, but it isn't
      * *guaranteed* to have actually been a change.
+     * 
+     * TODO: This ended up not being needed by anything. Is it necessary? Does it cost anything?
      */
     onAfterChildLayoutEffect?: null | undefined | OnAfterChildLayoutEffect<T>;
 
@@ -228,10 +230,12 @@ export function useManagedChildren<M extends ManagedChildInfo<string | number>>(
     const remoteULEChildChanged = useCallback((index: IndexType) => {
 
         if (remoteULEChildChangedCausers.current.size == 0) {
-            debounceRendering(() => {
-                onAfterChildLayoutEffect?.(remoteULEChildChangedCausers.current);
-                remoteULEChildChangedCausers.current.clear();
-            });
+            if (!!onAfterChildLayoutEffect) {
+                debounceRendering(() => {
+                    onAfterChildLayoutEffect?.(remoteULEChildChangedCausers.current);
+                    remoteULEChildChangedCausers.current.clear();
+                });
+            }
         }
 
         remoteULEChildChangedCausers.current.add(index);
@@ -246,10 +250,12 @@ export function useManagedChildren<M extends ManagedChildInfo<string | number>>(
                 mounts: new Set(),
                 unmounts: new Set(),
             };
-            debounceRendering(() => {
-                onChildrenMountChange?.(hasRemoteULEChildMounted.current!.mounts, hasRemoteULEChildMounted.current!.unmounts)
-                hasRemoteULEChildMounted.current = null;
-            });
+            if (onChildrenMountChange) {
+                debounceRendering(() => {
+                    onChildrenMountChange?.(hasRemoteULEChildMounted.current!.mounts, hasRemoteULEChildMounted.current!.unmounts)
+                    hasRemoteULEChildMounted.current = null;
+                });
+            }
         }
 
         if (mounted) {
