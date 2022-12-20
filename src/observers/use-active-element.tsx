@@ -1,6 +1,6 @@
 
 import { StateUpdater, useEffect } from "preact/hooks";
-import { OnPassiveStateChange, returnNull, returnTrue, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state";
+import { OnPassiveStateChange, returnNull, returnTrue, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state";
 
 
 /**
@@ -233,9 +233,9 @@ export function useActiveElement({ activeElementParameters: { onActiveElementCha
         }
     }, [])
 
-    const [getActiveElement, setActiveElement] = usePassiveState<Element | null, FocusEvent>(onActiveElementChange, returnNull);
-    const [getLastActiveElement, setLastActiveElement] = usePassiveState<Element, FocusEvent>(onLastActiveElementChange, returnNull as () => never);
-    const [getWindowFocused, setWindowFocused] = usePassiveState<boolean, FocusEvent>(onWindowFocusedChange, returnTrue);
+    const [getActiveElement, setActiveElement] = usePassiveState<Element | null, FocusEvent>(onActiveElementChange, returnNull, runImmediately);
+    const [getLastActiveElement, setLastActiveElement] = usePassiveState<Element, FocusEvent>(onLastActiveElementChange, returnNull as () => never, runImmediately);
+    const [getWindowFocused, setWindowFocused] = usePassiveState<boolean, FocusEvent>(onWindowFocusedChange, returnTrue, runImmediately);
 
     return { activeElementReturn: { getActiveElement, getLastActiveElement, getWindowFocused } };
 }

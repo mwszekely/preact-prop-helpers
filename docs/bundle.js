@@ -1557,9 +1557,9 @@ var bundle = function (exports) {
         }
       };
     }, []);
-    const [getActiveElement, setActiveElement] = usePassiveState(onActiveElementChange, returnNull);
-    const [getLastActiveElement, setLastActiveElement] = usePassiveState(onLastActiveElementChange, returnNull);
-    const [getWindowFocused, setWindowFocused] = usePassiveState(onWindowFocusedChange, returnTrue);
+    const [getActiveElement, setActiveElement] = usePassiveState(onActiveElementChange, returnNull, runImmediately);
+    const [getLastActiveElement, setLastActiveElement] = usePassiveState(onLastActiveElementChange, returnNull, runImmediately);
+    const [getWindowFocused, setWindowFocused] = usePassiveState(onWindowFocusedChange, returnTrue, runImmediately);
     return {
       activeElementReturn: {
         getActiveElement,
@@ -1638,10 +1638,12 @@ var bundle = function (exports) {
     const remoteULEChildChangedCausers = _(new Set());
     const remoteULEChildChanged = T$1(index => {
       if (remoteULEChildChangedCausers.current.size == 0) {
-        debounceRendering(() => {
-          onAfterChildLayoutEffect === null || onAfterChildLayoutEffect === void 0 ? void 0 : onAfterChildLayoutEffect(remoteULEChildChangedCausers.current);
-          remoteULEChildChangedCausers.current.clear();
-        });
+        if (!!onAfterChildLayoutEffect) {
+          debounceRendering(() => {
+            onAfterChildLayoutEffect === null || onAfterChildLayoutEffect === void 0 ? void 0 : onAfterChildLayoutEffect(remoteULEChildChangedCausers.current);
+            remoteULEChildChangedCausers.current.clear();
+          });
+        }
       }
       remoteULEChildChangedCausers.current.add(index);
       return () => {};
@@ -1652,10 +1654,12 @@ var bundle = function (exports) {
           mounts: new Set(),
           unmounts: new Set()
         };
-        debounceRendering(() => {
-          onChildrenMountChange === null || onChildrenMountChange === void 0 ? void 0 : onChildrenMountChange(hasRemoteULEChildMounted.current.mounts, hasRemoteULEChildMounted.current.unmounts);
-          hasRemoteULEChildMounted.current = null;
-        });
+        if (onChildrenMountChange) {
+          debounceRendering(() => {
+            onChildrenMountChange === null || onChildrenMountChange === void 0 ? void 0 : onChildrenMountChange(hasRemoteULEChildMounted.current.mounts, hasRemoteULEChildMounted.current.unmounts);
+            hasRemoteULEChildMounted.current = null;
+          });
+        }
       }
       if (mounted) {
         if (typeof index == "number") managedChildrenArray.current.highestIndex = Math.max(managedChildrenArray.current.highestIndex, index);
