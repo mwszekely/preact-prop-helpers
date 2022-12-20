@@ -236,6 +236,10 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
 
     useTimeout({
         callback: () => {
+            const element = getElement();
+            if (element && pointerDownStartedHere && hovering) {
+                focusSelf(element);
+            }
             setLongPress(pointerDownStartedHere && hovering);
         },
         timeout: longPressThreshold ?? null,
@@ -363,30 +367,29 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
 
 
     const p = supportsPointerEvents();
-    const propsStable2 = useRef<h.JSX.HTMLAttributes<E>>({
-        onKeyDown,
-        onKeyUp,
-
-        onTouchStart: !hasPressEvent? undefined : (!p ? onTouchStart : undefined),
-        onTouchCancel: !hasPressEvent? undefined : (!p ? onTouchEnd : undefined),
-        onTouchMove: !hasPressEvent? undefined : (!p ? onTouchMove : undefined),
-        onTouchEnd: !hasPressEvent? undefined : (!p ? onTouchEnd : undefined),
-        onPointerDown: !hasPressEvent? undefined : (p ? onPointerDown : undefined),
-        onPointerCancel: !hasPressEvent? undefined : (p ? onPointerDown : undefined),
-        onPointerMove: !pointerDownStartedHere || !hasPressEvent? undefined : (p ? onPointerMove : undefined),
-        onPointerUp: !hasPressEvent? undefined : (p ? onPointerUp : undefined),
-        onPointerEnter: !hasPressEvent? undefined : (p ? onPointerEnter : undefined),
-        onPointerLeave: !hasPressEvent? undefined : (p ? onPointerLeave : undefined),
-        onfocusout: onFocusOut,
-        onClick
-    });
 
     return {
         pressReturn: {
             pseudoActive: ((pointerDownStartedHere && hovering) || waitingForSpaceUp || false),
             //hovering,
             longPress,
-            propsUnstable: propsStable2.current,
+            propsUnstable: {
+                onKeyDown,
+                onKeyUp,
+        
+                onTouchStart: !hasPressEvent ? undefined : (!p ? onTouchStart : undefined),
+                onTouchCancel: !hasPressEvent ? undefined : (!p ? onTouchEnd : undefined),
+                onTouchMove: !hasPressEvent ? undefined : (!p ? onTouchMove : undefined),
+                onTouchEnd: !hasPressEvent ? undefined : (!p ? onTouchEnd : undefined),
+                onPointerDown: !hasPressEvent ? undefined : (p ? onPointerDown : undefined),
+                onPointerCancel: !hasPressEvent ? undefined : (p ? onPointerDown : undefined),
+                onPointerMove: !pointerDownStartedHere || !hasPressEvent ? undefined : (p ? onPointerMove : undefined),
+                onPointerUp: !hasPressEvent ? undefined : (p ? onPointerUp : undefined),
+                onPointerEnter: !hasPressEvent ? undefined : (p ? onPointerEnter : undefined),
+                onPointerLeave: !hasPressEvent ? undefined : (p ? onPointerLeave : undefined),
+                onfocusout: onFocusOut,
+                onClick
+            },
         }
     };
 }
