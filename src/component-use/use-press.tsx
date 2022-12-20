@@ -211,7 +211,6 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
     const onPointerUp = useCallback((e: h.JSX.TargetedPointerEvent<E>) => {
         const hovering = getHovering();
         const pointerDownStartedHere = getPointerDownStartedHere();
-        console.log("onPointerUp: " + hovering.toString());
 
         setJustHandled(true);
         if (pointerDownStartedHere && hovering) {
@@ -228,8 +227,6 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
         setHovering(true);
     }, [])
     const onPointerLeave = useCallback((e: h.JSX.TargetedPointerEvent<E>) => {
-        console.log("onPointerLeave");
-        //e.preventDefault();
         setHovering(false);
         setLongPress(false);
     }, []);
@@ -351,7 +348,7 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
                 ) {
                     // Intentional, for now. Programmatic clicks shouldn't happen in most cases.
                     // TODO: Remove this when I'm confident stray clicks won't be handled.
-                    console.log(false);
+                    console.assert(false);
                     debugger;
 
                     handlePress(e);
