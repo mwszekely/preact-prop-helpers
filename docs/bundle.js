@@ -4139,14 +4139,14 @@ var bundle = function (exports) {
     const [getCurrentTypeahead, setCurrentTypeahead] = usePassiveState(useStableCallback((currentTypeahead, prev, reason) => {
       const handle = setTimeout(() => {
         setCurrentTypeahead(null, undefined);
-        setInvalidTypeahead(null);
+        setTypeaheadStatus("none");
       }, typeaheadTimeout !== null && typeaheadTimeout !== void 0 ? typeaheadTimeout : 1000);
       updateBasedOnTypeaheadChange(currentTypeahead, reason);
       return () => clearTimeout(handle);
     }));
     //useTimeout({ timeout: typeaheadTimeout ?? 1000, callback: () => { setCurrentTypeahead(null); setInvalidTypeahead(null); }, triggerIndex: currentTypeahead });
     const sortedTypeaheadInfo = _([]);
-    const [invalidTypeahead, setInvalidTypeahead] = useState(false);
+    const [typeaheadStatus, setTypeaheadStatus] = useState("none");
     // Handle typeahead for input method editors as well
     // Essentially, when active, ignore further keys 
     // because we're waiting for a CompositionEnd event
@@ -4238,7 +4238,7 @@ var bundle = function (exports) {
       }),
       typeaheadNavigationReturn: {
         getCurrentTypeahead,
-        invalidTypeahead,
+        typeaheadStatus,
         propsStable: propsStable.current
       }
     };
@@ -4248,9 +4248,9 @@ var bundle = function (exports) {
         if (sortedTypeaheadIndex < 0) {
           // The user has typed an entry that doesn't exist in the list
           // (or more specifically "for which there is no entry that starts with that input")
-          setInvalidTypeahead(true);
+          setTypeaheadStatus("invalid");
         } else {
-          setInvalidTypeahead(false);
+          setTypeaheadStatus("valid");
           /*
             We know roughly where, in the sorted array of strings, our next typeahead location is.
             But roughly isn't good enough if there are multiple matches.
@@ -8394,7 +8394,7 @@ var bundle = function (exports) {
         getChildren
       },
       typeaheadNavigationReturn: {
-        invalidTypeahead
+        typeaheadStatus
       },
       rearrangeableChildrenReturn: {
         useRearrangedChildren,
@@ -8533,7 +8533,7 @@ var bundle = function (exports) {
           })
         })
       }), o$1("div", {
-        children: invalidTypeahead && "Invalid typeahead (no matches for the current string)"
+        children: ["Typeahead status: ", typeaheadStatus]
       })]
     });
   });

@@ -41,7 +41,7 @@ export const DemoUseRovingTabIndex = memo(() => {
         rovingTabIndexReturn: { setTabbableIndex },
         singleSelectionReturn: { changeSelectedIndex },
         managedChildrenReturn: { getChildren },
-        typeaheadNavigationReturn: { invalidTypeahead },
+        typeaheadNavigationReturn: { typeaheadStatus },
         rearrangeableChildrenReturn: { useRearrangedChildren, shuffle }
         //        rearrangeableChildrenReturn: { useRearrangedChildren: useSortableProps, shuffle }
     } = r;
@@ -95,7 +95,7 @@ export const DemoUseRovingTabIndex = memo(() => {
                     <ol {...props}>{useRearrangedChildren(jsxChildren)}</ol>
                 </ListNavigationSingleSelectionChildContext.Provider>
             </SelectionModeContext.Provider>
-            {<div>{invalidTypeahead && "Invalid typeahead (no matches for the current string)"}</div>}
+            {<div>Typeahead status: {typeaheadStatus}</div>}
         </div>
     );
 })

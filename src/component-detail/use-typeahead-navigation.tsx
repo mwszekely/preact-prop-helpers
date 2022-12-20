@@ -14,7 +14,8 @@ import { UseRovingTabIndexChildParameters, UseRovingTabIndexReturnType } from ".
 export interface UseTypeaheadNavigationReturnType<ParentOrChildElement extends Element> {
     typeaheadNavigationReturn: {
         getCurrentTypeahead(): string | null;
-        invalidTypeahead: boolean | null;
+        typeaheadStatus: "invalid" | "valid" | "none";
+        //invalidTypeahead: boolean | null;
         propsStable: h.JSX.HTMLAttributes<ParentOrChildElement>;
     }
     typeaheadNavigationChildContext: UseTypeaheadNavigationChildParameters<ParentOrChildElement>["typeaheadNavigationChildContext"];
@@ -105,13 +106,13 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
     // Next, keep a mapping of typeahead values to indices for faster searching.
     // And, for the user's sake, let them know when their typeahead can't match anything anymore
     const [getCurrentTypeahead, setCurrentTypeahead] = usePassiveState<string | null, Event>(useStableCallback((currentTypeahead, prev, reason) => {
-        const handle = setTimeout(() => { setCurrentTypeahead(null, undefined!); setInvalidTypeahead(null); }, typeaheadTimeout ?? 1000);
+        const handle = setTimeout(() => { setCurrentTypeahead(null, undefined!); setTypeaheadStatus("none"); }, typeaheadTimeout ?? 1000);
         updateBasedOnTypeaheadChange(currentTypeahead, reason!);
         return () => clearTimeout(handle);
     }));
     //useTimeout({ timeout: typeaheadTimeout ?? 1000, callback: () => { setCurrentTypeahead(null); setInvalidTypeahead(null); }, triggerIndex: currentTypeahead });
     const sortedTypeaheadInfo = useRef<TypeaheadInfo[]>([]);
-    const [invalidTypeahead, setInvalidTypeahead] = useState<boolean | null>(false);
+    const [typeaheadStatus, setTypeaheadStatus] = useState<`${"in" | ""}valid` | "none">("none");
 
     // Handle typeahead for input method editors as well
     // Essentially, when active, ignore further keys 
@@ -239,7 +240,7 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
         }),
         typeaheadNavigationReturn: {
             getCurrentTypeahead,
-            invalidTypeahead,
+            typeaheadStatus,
             propsStable: propsStable.current
         }
     }
@@ -259,10 +260,10 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
             if (sortedTypeaheadIndex < 0) {
                 // The user has typed an entry that doesn't exist in the list
                 // (or more specifically "for which there is no entry that starts with that input")
-                setInvalidTypeahead(true);
+                setTypeaheadStatus("invalid");
             }
             else {
-                setInvalidTypeahead(false);
+                setTypeaheadStatus("valid");
 
                 /*
                   We know roughly where, in the sorted array of strings, our next typeahead location is.
