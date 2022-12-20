@@ -566,7 +566,7 @@ function DemoPress({ remaining }: { remaining: number }) {
 
     const [count, setCount] = useState(0);
     const { refElementReturn, refElementReturn: { propsStable: p1 } } = useRefElement<HTMLDivElement>({ refElementParameters: {} })
-    const { pressReturn: { propsStable: p2, pseudoActive, longPress } } = usePress<HTMLDivElement>({
+    const { pressReturn: { propsUnstable: p2, pseudoActive, longPress } } = usePress<HTMLDivElement>({
         pressParameters: { exclude: undefined, focusSelf: e => { e.focus() }, longPressThreshold: 1000, onPressSync: () => { setCount(c => ++c) } },
         refElementReturn
     })

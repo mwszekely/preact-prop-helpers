@@ -51,7 +51,7 @@ export interface UsePressReturnType<E extends Element> {
          * Similar to pseudoActive, but for if the button as been pressed down for a determined length of time.
          */
         longPress: boolean | null;
-        propsStable: h.JSX.HTMLAttributes<E>;
+        propsUnstable: h.JSX.HTMLAttributes<E>;
     }
 }
 
@@ -224,6 +224,9 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
         setPointerDownStartedHere(false);
 
     }, []);
+    const onPointerEnter = useCallback((e: h.JSX.TargetedPointerEvent<E>) => {
+        setHovering(true);
+    }, [])
     const onPointerLeave = useCallback((e: h.JSX.TargetedPointerEvent<E>) => {
         console.log("onPointerLeave");
         //e.preventDefault();
@@ -370,8 +373,9 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
         onTouchEnd: !hasPressEvent? undefined : (!p ? onTouchEnd : undefined),
         onPointerDown: !hasPressEvent? undefined : (p ? onPointerDown : undefined),
         onPointerCancel: !hasPressEvent? undefined : (p ? onPointerDown : undefined),
-        onPointerMove: !hasPressEvent? undefined : (p ? onPointerMove : undefined),
+        onPointerMove: !pointerDownStartedHere || !hasPressEvent? undefined : (p ? onPointerMove : undefined),
         onPointerUp: !hasPressEvent? undefined : (p ? onPointerUp : undefined),
+        onPointerEnter: !hasPressEvent? undefined : (p ? onPointerEnter : undefined),
         onPointerLeave: !hasPressEvent? undefined : (p ? onPointerLeave : undefined),
         onfocusout: onFocusOut,
         onClick
@@ -382,7 +386,7 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
             pseudoActive: ((pointerDownStartedHere && hovering) || waitingForSpaceUp || false),
             //hovering,
             longPress,
-            propsStable: propsStable2.current,
+            propsUnstable: propsStable2.current,
         }
     };
 }

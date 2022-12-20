@@ -6725,6 +6725,9 @@ var bundle = function (exports) {
       setHovering(false);
       setPointerDownStartedHere(false);
     }, []);
+    const onPointerEnter = T$1(e => {
+      setHovering(true);
+    }, []);
     const onPointerLeave = T$1(e => {
       console.log("onPointerLeave");
       //e.preventDefault();
@@ -6843,8 +6846,9 @@ var bundle = function (exports) {
       onTouchEnd: !hasPressEvent ? undefined : !p ? onTouchEnd : undefined,
       onPointerDown: !hasPressEvent ? undefined : p ? onPointerDown : undefined,
       onPointerCancel: !hasPressEvent ? undefined : p ? onPointerDown : undefined,
-      onPointerMove: !hasPressEvent ? undefined : p ? onPointerMove : undefined,
+      onPointerMove: !pointerDownStartedHere || !hasPressEvent ? undefined : p ? onPointerMove : undefined,
       onPointerUp: !hasPressEvent ? undefined : p ? onPointerUp : undefined,
+      onPointerEnter: !hasPressEvent ? undefined : p ? onPointerEnter : undefined,
       onPointerLeave: !hasPressEvent ? undefined : p ? onPointerLeave : undefined,
       onfocusout: onFocusOut,
       onClick
@@ -6854,7 +6858,7 @@ var bundle = function (exports) {
         pseudoActive: pointerDownStartedHere && hovering || waitingForSpaceUp || false,
         //hovering,
         longPress,
-        propsStable: propsStable2.current
+        propsUnstable: propsStable2.current
       }
     };
   }
@@ -7118,7 +7122,7 @@ var bundle = function (exports) {
       },
       refElementReturn
     });
-    const props = useMergedProps(refElementReturn.propsStable, pressReturn.propsStable, hasCurrentFocusReturn.propsStable, rovingTabIndexChildReturn.propsUnstable, singleSelectionChildReturn.propsUnstable);
+    const props = useMergedProps(refElementReturn.propsStable, pressReturn.propsUnstable, hasCurrentFocusReturn.propsStable, rovingTabIndexChildReturn.propsUnstable, singleSelectionChildReturn.propsUnstable);
     return {
       props,
       pressReturn,
@@ -9625,7 +9629,7 @@ var bundle = function (exports) {
     });
     const {
       pressReturn: {
-        propsStable: p2,
+        propsUnstable: p2,
         pseudoActive,
         longPress
       }

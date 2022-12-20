@@ -219,7 +219,7 @@ export function useCompleteListNavigationChild<ChildElement extends Element, M e
 
     const props = useMergedProps<ChildElement>(
         refElementReturn.propsStable,
-        pressReturn.propsStable,
+        pressReturn.propsUnstable,
         hasCurrentFocusReturn.propsStable,
         rovingTabIndexChildReturn.propsUnstable,
         singleSelectionChildReturn.propsUnstable
