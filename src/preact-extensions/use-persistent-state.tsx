@@ -1,5 +1,6 @@
-import { useCallback } from "preact/hooks";
+import { useCallback, useLayoutEffect } from "preact/hooks";
 import { useGlobalHandler } from "../dom-helpers/use-event-handler";
+import { useStableCallback } from "./use-stable-callback";
 import { useState } from "./use-state";
 
 /* eslint-disable @typescript-eslint/no-empty-interface */
@@ -62,7 +63,14 @@ export function storeToLocalStorage<Key extends (keyof PersistentStates) & strin
  * @returns 
  */
 export function usePersistentState<Key extends keyof PersistentStates>(key: Key, initialValue: PersistentStates[Key], fromString: ((value: string) => PersistentStates[Key]) = JSON.parse, toString: ((value: PersistentStates[Key]) => string) = JSON.stringify) {
-    const [localCopy, setLocalCopy, getLocalCopy] = useState(getFromLocalStorage(key, fromString) ?? initialValue);
+    const [localCopy, setLocalCopy, getLocalCopy] = useState<PersistentStates[Key]>(() => (getFromLocalStorage(key, fromString) ?? initialValue));
+
+    // Ensure that if our key changes, we also update `localCopy` to match.
+    useLayoutEffect(() => {
+        const newCopy = getFromLocalStorage(key, fromString);
+        if (newCopy != null)
+            setLocalCopy(newCopy);
+    }, [key])
 
     // Listen for changes to this storage in other browser tabs
     useGlobalHandler(window, "storage", (e: StorageEvent) => {
@@ -76,7 +84,7 @@ export function usePersistentState<Key extends keyof PersistentStates>(key: Key,
         }
     });
 
-    const setValueWrapper = useCallback<typeof setLocalCopy>((valueOrSetter) => {
+    const setValueWrapper = useStableCallback<typeof setLocalCopy>((valueOrSetter) => {
 
         const value: PersistentStates[Key] = typeof valueOrSetter === "function" ? (valueOrSetter as Function)(getLocalCopy()) : valueOrSetter;
 
@@ -89,12 +97,12 @@ export function usePersistentState<Key extends keyof PersistentStates>(key: Key,
         if (typeof value == "object" && (value as object) instanceof Date) {
             console.assert(fromString != JSON.parse, "Dates (and other non-JSON types) must be given custom fromString and toString functions.");
         }
-    }, [key, toString]);
+    });
 
-    const getValue = useCallback(() => {
+    const getValue = useStableCallback(() => {
         const trueValue = getFromLocalStorage(key, fromString);
         return trueValue ?? localCopy;
-    }, [key, fromString]);
+    });
 
     return [localCopy, setValueWrapper, getValue] as const;
 

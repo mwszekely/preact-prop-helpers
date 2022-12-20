@@ -4802,7 +4802,7 @@ var bundle = function (exports) {
     //let lastRecordedDistance = useRef(0);
     useEnsureStability("useSingleSelectionChild", getSelectedIndex, onSelectedIndexChange);
     const getDisabled = useStableGetter(disabled);
-    const [selected, setSelected, getSelected] = useState(getSelectedIndex() == index);
+    const [localSelected, setLocalSelected, getLocalSelected] = useState(getSelectedIndex() == index);
     const [direction, setDirection, getDirection] = useState(getSelectedIndex() == null ? null : getSelectedIndex() - index);
     //const [selected, setSelected, getSelected] = useState(getSelectedIndex() == index);
     // const getIndex = useStableGetter(index);
@@ -4819,7 +4819,7 @@ var bundle = function (exports) {
       //managedChildParameters: { selected, setSelected, getSelected, },
       managedChildParameters: {
         setLocalSelected: useStableCallback((selected, direction) => {
-          setSelected(selected);
+          setLocalSelected(selected);
           setDirection(direction);
           /*if (direction == null) {
               setSelected(false);
@@ -4836,17 +4836,17 @@ var bundle = function (exports) {
       },
 
       singleSelectionChildReturn: {
-        selected: direction === 0,
+        selected: localSelected,
         setThisOneSelected: useStableCallback(event => {
           console.assert(!getDisabled());
           onSelectedIndexChange === null || onSelectedIndexChange === void 0 ? void 0 : onSelectedIndexChange(index, event);
         }),
         getSelectedOffset: getDirection,
         selectedOffset: direction,
-        getSelected,
+        getSelected: getLocalSelected,
         //getDistance: useCallback(() => { return lastRecordedDistance.current; }, []),
         propsUnstable: ariaPropName == null || selectionMode == "disabled" ? {} : {
-          [ariaPropName]: (selected !== null && selected !== void 0 ? selected : false).toString()
+          [ariaPropName]: (localSelected !== null && localSelected !== void 0 ? localSelected : false).toString()
         }
       },
       pressParameters: {
