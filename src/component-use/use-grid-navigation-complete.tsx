@@ -79,6 +79,9 @@ export interface UseCompleteGridNavigationReturnType<ParentOrRowElement extends 
 
     managedChildrenReturn: UseManagedChildrenReturnType<RM>["managedChildrenReturn"];
     childrenHaveFocusReturn: UseChildrenHaveFocusReturnType<RowElement>["childrenHaveFocusReturn"];
+    /*completeGridNavigationReturn: {
+        toJson(): object;
+    }*/
     //rearrangeableChildrenParameters: Pick<UseRearrangeableChildrenParameters["rearrangeableChildrenParameters"], "getHighestChildIndex" | "getValid">;
 }
 
@@ -163,6 +166,7 @@ export function useCompleteGridNavigation<ParentOrRowElement extends Element, Ro
         paginatedChild: useStableObject({ getDefaultPaginationVisible })
     });
 
+    const { toJsonArray } = rearrangeableChildrenReturn
 
     return {
         context,
@@ -173,6 +177,13 @@ export function useCompleteGridNavigation<ParentOrRowElement extends Element, Ro
         ...gridNavigationSingleSelectionReturn,
         childrenHaveFocusReturn,
         paginatedChildrenReturn,
+        /*completeGridNavigationReturn: {
+            toJson: useCallback(() => {
+                return toJsonArray(getChildren(), info => {
+                    return info.
+                })
+            }, [])
+        }*/
         //rearrangeableChildrenParameters: { getHighestChildIndex: getHighestChildIndex, getValid },
     }
 

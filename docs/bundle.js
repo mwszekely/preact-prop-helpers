@@ -5862,6 +5862,11 @@ var bundle = function (exports) {
         });
       });
     }, []);
+    const toJsonArray = T$1((managedRows, transform) => {
+      return managedRows.arraySlice().map(child => {
+        if (transform) return transform(child);else return child.getSortValue();
+      });
+    }, []);
     return {
       //linearNavigationParameters: { navigateAbsolute, navigateRelative },
       rearrangeableChildrenReturn: {
@@ -5871,7 +5876,8 @@ var bundle = function (exports) {
         demangleMap,
         rearrange,
         shuffle: shuffle$1,
-        useRearrangedChildren
+        useRearrangedChildren,
+        toJsonArray
       }
     };
   }
@@ -6403,6 +6409,13 @@ var bundle = function (exports) {
       ...gridNavigationSingleSelectionReturn,
       childrenHaveFocusReturn,
       paginatedChildrenReturn
+      /*completeGridNavigationReturn: {
+          toJson: useCallback(() => {
+              return toJsonArray(getChildren(), info => {
+                  return info.
+              })
+          }, [])
+      }*/
       //rearrangeableChildrenParameters: { getHighestChildIndex: getHighestChildIndex, getValid },
     };
   }

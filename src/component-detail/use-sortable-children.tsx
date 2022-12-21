@@ -102,7 +102,10 @@ export interface UseRearrangeableChildrenReturnType<M extends ManagedChildInfo<n
          * Call this on your props (that contain the children to sort!!) to allow them to be sortable.
          * 
          */
-        useRearrangedChildren: (children: VNode[]) => VNode[];
+        useRearrangedChildren: (children: VNode[]) => VNode[]; 
+        
+            toJsonArray(managedRows: ManagedChildren<M>, transform?: (info: M) => object): object;
+        
     }
 }
 
@@ -201,9 +204,27 @@ export function useRearrangeableChildren<M extends UseSortableChildInfo>({
             });
     }, []);
 
+    const toJsonArray = useCallback((managedRows: ManagedChildren<M>, transform?: (info: M) => object) => {
+        return managedRows.arraySlice().map(child => {
+            if (transform)
+                return (transform(child));
+            else
+                return child.getSortValue();
+        })
+    }, []);
+
     return {
         //linearNavigationParameters: { navigateAbsolute, navigateRelative },
-        rearrangeableChildrenReturn: { indexMangler, indexDemangler, mangleMap, demangleMap, rearrange, shuffle, useRearrangedChildren, }
+        rearrangeableChildrenReturn: { 
+            indexMangler, 
+            indexDemangler, 
+            mangleMap, 
+            demangleMap, 
+            rearrange, 
+            shuffle, 
+            useRearrangedChildren,
+            toJsonArray
+         }
     };
 }
 
