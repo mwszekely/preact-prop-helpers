@@ -6481,6 +6481,9 @@ var bundle = function (exports) {
     } = useRefElement({
       refElementParameters: {}
     });
+    if (isPaginated) {
+      rovingTabIndexChildParameters.hidden || (rovingTabIndexChildParameters.hidden = !paginatedVisible);
+    }
     const r = useGridNavigationSingleSelectionRow({
       rowAsParentOfCellsParameters: {
         ...rowAsParentOfCellsParameters,
@@ -6540,7 +6543,7 @@ var bundle = function (exports) {
       getTabbable: r.rowAsChildOfGridReturn.rovingTabIndexChildReturn.getTabbable,
       tabbable: r.rowAsChildOfGridReturn.rovingTabIndexChildReturn.tabbable,
       index: managedChildParameters.index,
-      hidden: !paginatedVisible && rovingTabIndexChildParameters.hidden,
+      hidden: rovingTabIndexChildParameters.hidden,
       selected: r.rowAsChildOfGridReturn.singleSelectionChildReturn.selected,
       focusSelf: r.rowAsChildOfGridReturn.gridNavigationRowParameters.focusSelf,
       getSelected: r.rowAsChildOfGridReturn.singleSelectionChildReturn.getSelected,

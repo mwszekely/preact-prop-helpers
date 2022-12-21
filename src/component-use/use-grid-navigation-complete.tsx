@@ -227,7 +227,7 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
     const { refElementReturn } = useRefElement<RowElement>({ refElementParameters: {} });
 
     if (isPaginated) {
-        rovingTabIndexChildParameters.hidden ||= paginatedVisible;
+        rovingTabIndexChildParameters.hidden ||= !paginatedVisible;
     }
 
     const r: UseGridNavigationSingleSelectionRowReturnType<RowElement, CellElement> = useGridNavigationSingleSelectionRow<RowElement, CellElement, RM, CM>({
