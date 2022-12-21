@@ -4795,6 +4795,7 @@ var bundle = function (exports) {
     };
   }
   function useSingleSelectionChild(args) {
+    var _ariaPropName$split;
     const {
       singleSelectionContext: {
         getSelectedIndex,
@@ -4825,6 +4826,7 @@ var bundle = function (exports) {
       if (selectionMode == "disabled") return;
       if (!disabled) onSelectedIndexChange === null || onSelectedIndexChange === void 0 ? void 0 : onSelectedIndexChange(index, e);
     });
+    const propParts = (_ariaPropName$split = ariaPropName === null || ariaPropName === void 0 ? void 0 : ariaPropName.split("-")) !== null && _ariaPropName$split !== void 0 ? _ariaPropName$split : [];
     return {
       //managedChildParameters: { selected, setSelected, getSelected, },
       managedChildParameters: {
@@ -4856,7 +4858,7 @@ var bundle = function (exports) {
         getSelected: getLocalSelected,
         //getDistance: useCallback(() => { return lastRecordedDistance.current; }, []),
         propsUnstable: ariaPropName == null || selectionMode == "disabled" ? {} : {
-          [ariaPropName]: (localSelected !== null && localSelected !== void 0 ? localSelected : false).toString()
+          ["".concat(propParts[0], "-").concat(propParts[1])]: localSelected ? propParts[1] == "current" ? "".concat(propParts[2]) : "true" : "false"
         }
       },
       pressParameters: {

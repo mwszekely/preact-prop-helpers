@@ -78,7 +78,12 @@ export interface UseSingleSelectionChildParameters<E extends Element> {
     singleSelectionChildParameters: {
         //onDistanceChange: null | ((distance: number) => void);
         selectionMode: "focus" | "activation" | "disabled";
-        ariaPropName: `aria-${"pressed" | "selected" | "checked"}` | null;
+        /**
+         * What property will be used to mark this item as selected.
+         * 
+         * **IMPORTANT**: The `aria-current` options should be used with caution as they are semantically very different from the usual selection cases.
+         */
+        ariaPropName: `aria-${"pressed" | "selected" | "checked" | `current-${"page" | "step" | "date" | "time" | "location" | "true"}`}` | null;
     } & Pick<SelectableChildInfo<E>, "disabled">;
     managedChildParameters: Pick<SelectableChildInfo<E>, "index">;
 }
@@ -233,6 +238,9 @@ export function useSingleSelectionChild<ChildElement extends Element>(args: UseS
             onSelectedIndexChange?.(index, e as R);
     }));
 
+    const propParts = ariaPropName?.split("-") ?? [];
+
+
     return {
         //managedChildParameters: { selected, setSelected, getSelected, },
         managedChildParameters: { setLocalSelected: useStableCallback((selected, direction) => {
@@ -260,7 +268,9 @@ export function useSingleSelectionChild<ChildElement extends Element>(args: UseS
             selectedOffset: direction,
             getSelected: getLocalSelected,
             //getDistance: useCallback(() => { return lastRecordedDistance.current; }, []),
-            propsUnstable: ariaPropName == null || selectionMode == "disabled" ? {} : { [ariaPropName as keyof h.JSX.HTMLAttributes<any>]: (localSelected ?? false).toString() }
+            propsUnstable: ariaPropName == null || selectionMode == "disabled" ? {} : { 
+                [`${propParts[0]}-${propParts[1]}`]: (localSelected? (propParts[1] == "current"? `${propParts[2]}` : `true`) : "false") 
+            }
         },
         pressParameters: { onPressSync },
         hasCurrentFocusParameters: { onCurrentFocusedInnerChanged }
