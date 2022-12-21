@@ -1,5 +1,5 @@
 import { useCallback, useLayoutEffect, useRef } from "preact/hooks";
-import { debounceRendering, OnPassiveStateChange, PassiveStateUpdater, useEnsureStability, usePassiveState } from "./use-passive-state";
+import { debounceRendering, OnPassiveStateChange, PassiveStateUpdater, returnZero, runImmediately, useEnsureStability, usePassiveState } from "./use-passive-state";
 import { useStableCallback } from "./use-stable-callback";
 import { useStableObject } from "./use-stable-getter";
 
@@ -84,6 +84,8 @@ interface MCP<T extends number | string> {
      * Same as the above, but only for mount/unmount (or when a child changes its index)
      */
     onChildrenMountChange?: null | undefined | OnChildrenMountChange<T>;
+
+    onChildCountChange?: null | undefined | ((count: number) => void);
 }
 
 export interface UseManagedChildrenParameters<M extends ManagedChildInfo<any>> {
@@ -170,10 +172,12 @@ export function useManagedChildren<M extends ManagedChildInfo<string | number>>(
     type IndexType = M["index"];
     type Info = M;
 
-    const { managedChildrenParameters: { onAfterChildLayoutEffect, onChildrenMountChange }, ...rest } = parentParameters;
+    const { managedChildrenParameters: { onAfterChildLayoutEffect, onChildrenMountChange, onChildCountChange }, ...rest } = parentParameters;
     assertEmptyObject(rest);
 
-    useEnsureStability("useManagedChildren", onAfterChildLayoutEffect, onChildrenMountChange);
+    useEnsureStability("useManagedChildren", onAfterChildLayoutEffect, onChildrenMountChange, onChildCountChange);
+
+    const [getMountCount, setMountCount] = usePassiveState(onChildCountChange, returnZero, runImmediately);
 
     const getHighestIndex = useCallback((): number => {
         return managedChildrenArray.current.highestIndex;
@@ -250,9 +254,10 @@ export function useManagedChildren<M extends ManagedChildInfo<string | number>>(
                 mounts: new Set(),
                 unmounts: new Set(),
             };
-            if (onChildrenMountChange) {
+            if (onChildCountChange || onChildrenMountChange) {
                 debounceRendering(() => {
-                    onChildrenMountChange?.(hasRemoteULEChildMounted.current!.mounts, hasRemoteULEChildMounted.current!.unmounts)
+                    onChildrenMountChange?.(hasRemoteULEChildMounted.current!.mounts, hasRemoteULEChildMounted.current!.unmounts);
+                    onChildCountChange?.(getChildren().getHighestIndex() + 1);
                     hasRemoteULEChildMounted.current = null;
                 });
             }

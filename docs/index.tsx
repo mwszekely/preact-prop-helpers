@@ -303,7 +303,7 @@ function getDocument() {
 }
 
 const DemoFocus = memo(() => {
-    const [focusCount, setFocusCount] = useState(0);
+    const [focusCount, setFocusCount] = useState<number>(0);
     const [innerFocusCount, setInnerFocusCount] = useState(0);
     const [lastActiveElement, setLastActiveElement] = useState<(Element) | null>(null);
     const [activeElement, setActiveElement] = useState<(Element) | null>(null);
@@ -319,15 +319,15 @@ const DemoFocus = memo(() => {
     } = useHasCurrentFocus<HTMLDivElement>({
         refElementReturn,
         hasCurrentFocusParameters: {
-            onCurrentFocusedChanged: useStableCallback((focused) => {
+            onCurrentFocusedChanged: useStableCallback((focused: boolean) => {
                 setFocused(focused);
                 if (focused)
-                    setFocusCount(c => ++c);
+                    setFocusCount((c: number) => ++c);
             }),
-            onCurrentFocusedInnerChanged: useStableCallback((focused) => {
+            onCurrentFocusedInnerChanged: useStableCallback((focused: boolean) => {
                 setFocusedInner(focused);
                 if (focused)
-                    setInnerFocusCount(c => ++c);
+                    setInnerFocusCount((c: number) => ++c);
             }),
         }
     });
@@ -566,10 +566,10 @@ function DemoLabel() {
 
 function DemoPress({ remaining }: { remaining: number }) {
 
-    const [count, setCount] = useState(0);
+    const [count, setCount] = useState<number>(0);
     const { refElementReturn, refElementReturn: { propsStable: p1 } } = useRefElement<HTMLDivElement>({ refElementParameters: {} })
     const { pressReturn: { propsUnstable: p2, pseudoActive, longPress } } = usePress<HTMLDivElement>({
-        pressParameters: { exclude: undefined, focusSelf: e => { e.focus() }, longPressThreshold: 1000, onPressSync: () => { setCount(c => ++c) } },
+        pressParameters: { exclude: undefined, focusSelf: e => { e.focus() }, longPressThreshold: 1000, onPressSync: () => { setCount((c: number) => ++c) } },
         refElementReturn
     })
     return (
@@ -609,7 +609,6 @@ function DemoThrottleDebounce() {
 }*/
 
 const Component = () => {
-    return     <DemoUseRovingTabIndex />
     return <div class="flex" style={{ flexWrap: "wrap" }}>
         <DemoPress remaining={2} />
         <input />

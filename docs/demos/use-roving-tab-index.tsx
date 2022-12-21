@@ -19,8 +19,8 @@ export const DemoUseRovingTabIndex = memo(() => {
 
     const [selectionMode, setSelectionMode] = useState("activation" as "focus" | "activation");
     const [count, setCount] = useState(10);
-    const [min, setMin] = useState(0);
-    const [max, setMax] = useState(count);
+    const [min, setMin] = useState<number>(null!);
+    const [max, setMax] = useState<number>(null!);
     // const [selectedIndex, _setLocalSelectedIndex] = useState<number | null>(0);
     // const [tabbableIndex, _setLocalTabbableIndex] = useState<number | null>(0);
 
