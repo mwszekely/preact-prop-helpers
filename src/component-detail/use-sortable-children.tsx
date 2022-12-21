@@ -28,6 +28,9 @@ export interface UseRearrangeableChildrenParameters {
          */
         getIndex: GetIndex<any>;
 
+
+        onRearranged: null | (() => void);
+
         /** 
          * Using rearrangeable children means we need to be able to override arrow key navigation,
          * which also means that, somewhere down the road, we need to know which children are arrow-key-able,
@@ -138,7 +141,7 @@ export interface UseSortableChildInfo extends ManagedChildInfo<number> {
  * there's no other time or place this can happen other than exactly within the parent component's render function.
  */
 export function useRearrangeableChildren<M extends UseSortableChildInfo>({
-    rearrangeableChildrenParameters: { getIndex }
+    rearrangeableChildrenParameters: { getIndex, onRearranged }
 }: UseRearrangeableChildrenParameters): UseRearrangeableChildrenReturnType<M> {
 
     // These are used to keep track of a mapping between unsorted index <---> sorted index.
@@ -147,6 +150,7 @@ export function useRearrangeableChildren<M extends UseSortableChildInfo>({
     const demangleMap = useRef(new Map<number, number>());
     const indexMangler = useCallback((n: number) => (mangleMap.current.get(n) ?? n), []);
     const indexDemangler = useCallback((n: number) => (demangleMap.current.get(n) ?? n), []);
+    const onRearrangedGetter = useStableGetter(onRearranged);
     //const { setTabbableIndex } = rovingTabIndexReturn;
 
 
@@ -178,7 +182,7 @@ export function useRearrangeableChildren<M extends UseSortableChildInfo>({
             demangleMap.current.set(indexAsSorted, indexAsUnsorted);
         }
 
-
+        onRearrangedGetter()?.();
         getForceUpdate()?.();
     }, []);
 

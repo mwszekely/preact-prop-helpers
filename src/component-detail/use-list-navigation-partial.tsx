@@ -1,5 +1,5 @@
 import { assertEmptyObject } from "../preact-extensions/use-managed-children";
-import { useLinearNavigation, UseLinearNavigationParameters, UseLinearNavigationReturnTypeInfo } from "./use-linear-navigation";
+import { useLinearNavigation, UseLinearNavigationParameters, UseLinearNavigationReturnType } from "./use-linear-navigation";
 import { useRovingTabIndex, useRovingTabIndexChild, UseRovingTabIndexChildInfo, UseRovingTabIndexChildParameters, UseRovingTabIndexChildReturnType, UseRovingTabIndexParameters, UseRovingTabIndexReturnType } from "./use-roving-tabindex";
 import { useTypeaheadNavigation, useTypeaheadNavigationChild, UseTypeaheadNavigationChildParameters, UseTypeaheadNavigationChildReturnType, UseTypeaheadNavigationParameters, UseTypeaheadNavigationReturnType } from "./use-typeahead-navigation";
 
@@ -71,7 +71,7 @@ export interface UseListNavigationChildParameters<ChildElement extends Element> 
 }
 
 
-export interface UseListNavigationReturnType<ParentOrChildElement extends Element, ChildElement extends Element> extends UseRovingTabIndexReturnType<ChildElement>, UseLinearNavigationReturnTypeInfo<ParentOrChildElement>, UseTypeaheadNavigationReturnType<ParentOrChildElement> { }
+export interface UseListNavigationReturnType<ParentOrChildElement extends Element, ChildElement extends Element> extends UseRovingTabIndexReturnType<ChildElement>, UseLinearNavigationReturnType<ParentOrChildElement>, UseTypeaheadNavigationReturnType<ParentOrChildElement> { }
 export interface UseListNavigationChildReturnType<ChildElement extends Element> extends UseRovingTabIndexChildReturnType<ChildElement>, UseTypeaheadNavigationChildReturnType { }
 export type UseListNavigationChild<ChildElement extends Element> = (a: UseListNavigationChildParameters<ChildElement>) => UseListNavigationChildReturnType<ChildElement>;
 

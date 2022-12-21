@@ -9,6 +9,7 @@ import { DemoUseInterval } from "./demos/use-interval";
 import { DemoUseModal } from "./demos/use-modal";
 import { DemoUseRovingTabIndex } from "./demos/use-roving-tab-index";
 import { DemoUseTimeout } from "./demos/use-timeout";
+import { UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationRowInfo } from "../component-use/use-grid-navigation-complete";
 const RandomWords = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
 
 
@@ -404,6 +405,7 @@ export const DemoUseGrid = memo(() => {
             getIndex: useCallback<GetIndex<{ index: number }>>((a: VNode<{ index: number }>) => a.props.index, [])
         },
         sortableChildrenParameters: { compare: useCallback((rhs: CustomGridInfo, lhs: CustomGridInfo) => { return lhs.index - rhs.index }, []) },
+        paginatedChildrenParameters: { paginationMin: null, paginationMax: null }
     });
 
     const {
@@ -445,8 +447,8 @@ export const DemoUseGrid = memo(() => {
     );
 });
 
-interface CustomGridInfo extends GridSingleSelectSortableChildRowInfo<HTMLTableRowElement, HTMLTableCellElement> { foo: "bar" }
-interface CustomGridRowInfo extends GridSingleSelectSortableChildCellInfo<HTMLTableCellElement> { bar: "baz" }
+interface CustomGridInfo extends UseCompleteGridNavigationRowInfo<HTMLTableRowElement, HTMLTableCellElement> { foo: "bar" }
+interface CustomGridRowInfo extends UseCompleteGridNavigationCellInfo<HTMLTableCellElement> { bar: "baz" }
 
 //type GridRowContext<ParentElement extends Element, RowElement extends Element> = CompleteGridNavigationContext<ParentElement, RowElement>;
 //type GridCellContext<RowElement extends Element, CellElement extends Element> = CompleteGridNavigationRowContext<RowElement, CellElement>;
@@ -607,6 +609,7 @@ function DemoThrottleDebounce() {
 }*/
 
 const Component = () => {
+    return     <DemoUseRovingTabIndex />
     return <div class="flex" style={{ flexWrap: "wrap" }}>
         <DemoPress remaining={2} />
         <input />

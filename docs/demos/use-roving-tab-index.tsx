@@ -5,6 +5,7 @@ import { GetIndex, UseListNavigationSingleSelectionSortableChildInfo, useMergedP
 import { useState } from "../../preact-extensions/use-state";
 
 import { CompleteListNavigationContext, useCompleteListNavigation, useCompleteListNavigationChild, UseCompleteListNavigationReturnType } from "../..";
+import { UseCompleteListNavigationChildInfo } from "../../component-use/use-list-navigation-complete";
 
 const RandomWords = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
 
@@ -18,7 +19,8 @@ export const DemoUseRovingTabIndex = memo(() => {
 
     const [selectionMode, setSelectionMode] = useState("activation" as "focus" | "activation");
     const [count, setCount] = useState(10);
-    const [min, setMin] = useState(0)
+    const [min, setMin] = useState(0);
+    const [max, setMax] = useState(count);
     // const [selectedIndex, _setLocalSelectedIndex] = useState<number | null>(0);
     // const [tabbableIndex, _setLocalTabbableIndex] = useState<number | null>(0);
 
@@ -31,6 +33,7 @@ export const DemoUseRovingTabIndex = memo(() => {
         rearrangeableChildrenParameters: {
             getIndex: useCallback<GetIndex<{ index: number }>>((a: VNode<{ index: number }>) => a.props.index, []),
         },
+        paginatedChildrenParameters: { paginationMin: min, paginationMax: max },
         sortableChildrenParameters: { compare: useCallback((rhs: CustomInfoType, lhs: CustomInfoType) => { return lhs.index - rhs.index }, []) },
     });
 
@@ -50,7 +53,7 @@ export const DemoUseRovingTabIndex = memo(() => {
 
 
     const jsxChildren = Array.from((function* () {
-        for (let i = min; i < (count); ++i) {
+        for (let i = 0; i < (count); ++i) {
             yield <DemoUseRovingTabIndexChild index={i} key={i} />
         }
     })());
@@ -84,7 +87,8 @@ export const DemoUseRovingTabIndex = memo(() => {
             <button onClick={() => shuffle(children)}>Shuffle</button>
             <label>Imperatively set the tabbable index to: <input type="number" onInput={e => { e.preventDefault(); setTabbableIndex(e.currentTarget.valueAsNumber, e, false); }} /></label>
             <label>Imperatively set the selected index to: <input type="number" onInput={e => { e.preventDefault(); changeSelectedIndex(e.currentTarget.valueAsNumber); }} /></label>
-            <label>Skip rendering the first N children: <input type="number" min={0} onInput={e => { e.preventDefault(); setMin(e.currentTarget.valueAsNumber); }} /></label>
+            <label>Pagination window starts at: <input type="number" value={min} min={0} max={max} onInput={e => { e.preventDefault(); setMin(e.currentTarget.valueAsNumber); }} /></label>
+            <label>Pagination window ends at: <input type="number" value={max} min={min} max={count} onInput={e => { e.preventDefault(); setMax(e.currentTarget.valueAsNumber); }} /></label>
             <label>Selection mode:
                 <label><input name="rti-demo-selection-mode" type="radio" checked={selectionMode == 'focus'} onInput={e => { e.preventDefault(); setSelectionMode("focus"); }} /> On focus</label>
                 <label><input name="rti-demo-selection-mode" type="radio" checked={selectionMode == 'activation'} onInput={e => { e.preventDefault(); setSelectionMode("activation"); }} /> On activation (click, tap, Enter, Space, etc.)</label>
@@ -100,7 +104,7 @@ export const DemoUseRovingTabIndex = memo(() => {
     );
 })
 
-interface CustomInfoType extends UseListNavigationSingleSelectionSortableChildInfo<HTMLLIElement> {
+interface CustomInfoType extends UseCompleteListNavigationChildInfo<HTMLLIElement> {
     foo: "bar";
 }
 
@@ -124,7 +128,8 @@ const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
     const {
         props,
         rovingTabIndexChildReturn: { tabbable, propsUnstable: p2 },
-        singleSelectionChildReturn: { selected, selectedOffset }
+        singleSelectionChildReturn: { selected, selectedOffset },
+        paginatedChildReturn: { paginatedVisible }
     } = useCompleteListNavigationChild<HTMLLIElement, CustomInfoType, never>({
         managedChildParameters: { index },
         rovingTabIndexChildParameters: { hidden },
@@ -187,6 +192,6 @@ const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
         const props = useMergedProps<HTMLLIElement>(p2, p3, p4, p5, p6);*/
 
     return (
-        <li {...props}>{text}<input {...useMergedProps(p2, { type: "number" }) as any} style={{ width: "5ch" }} /></li>
+        <li {...props} style={paginatedVisible? {} : { opacity: 0.25 }}>{text}<input {...useMergedProps(p2, { type: "number" }) as any} style={{ width: "5ch" }} /></li>
     )
 }));

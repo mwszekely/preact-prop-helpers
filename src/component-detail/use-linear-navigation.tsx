@@ -27,13 +27,10 @@ export interface LinearNavigationResult {
 }
 
 
-export interface UseLinearNavigationReturnTypeInfo<ParentOrChildElement extends Element> {
+export interface UseLinearNavigationReturnType<ParentOrChildElement extends Element> {
     linearNavigationReturn: {
         propsStable: h.JSX.HTMLAttributes<ParentOrChildElement>;
     }
-}
-
-export interface UseLinearNavigationReturnTypeWithHooks<ParentOrChildElement extends Element> extends UseLinearNavigationReturnTypeInfo<ParentOrChildElement> {
 }
 
 /** Default implementation with no sorting */
@@ -131,7 +128,7 @@ export interface UseLinearNavigationParameters<_ParentOrChildElement extends Ele
 export function useLinearNavigation<ParentOrChildElement extends Element, ChildElement extends Element>({
     rovingTabIndexReturn,
     linearNavigationParameters
-}: UseLinearNavigationParameters<ParentOrChildElement, ChildElement>): UseLinearNavigationReturnTypeWithHooks<ParentOrChildElement> {
+}: UseLinearNavigationParameters<ParentOrChildElement, ChildElement>): UseLinearNavigationReturnType<ParentOrChildElement> {
     type R = Event;//h.JSX.TargetedEvent<ParentOrChildElement>;
     const { getHighestIndex, indexDemangler, indexMangler, isValid, navigatePastEnd, navigatePastStart } = linearNavigationParameters;
     const { getTabbableIndex, setTabbableIndex } = rovingTabIndexReturn;
