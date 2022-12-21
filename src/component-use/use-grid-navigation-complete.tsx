@@ -226,6 +226,10 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
 
     const { refElementReturn } = useRefElement<RowElement>({ refElementParameters: {} });
 
+    if (isPaginated) {
+        rovingTabIndexChildParameters.hidden ||= paginatedVisible;
+    }
+
     const r: UseGridNavigationSingleSelectionRowReturnType<RowElement, CellElement> = useGridNavigationSingleSelectionRow<RowElement, CellElement, RM, CM>({
         rowAsParentOfCellsParameters: {
             ...rowAsParentOfCellsParameters,
@@ -260,7 +264,7 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
         getTabbable: r.rowAsChildOfGridReturn.rovingTabIndexChildReturn.getTabbable,
         tabbable: r.rowAsChildOfGridReturn.rovingTabIndexChildReturn.tabbable,
         index: managedChildParameters.index,
-        hidden: !paginatedVisible && rovingTabIndexChildParameters.hidden,
+        hidden: rovingTabIndexChildParameters.hidden,
         selected: r.rowAsChildOfGridReturn.singleSelectionChildReturn.selected,
         focusSelf: r.rowAsChildOfGridReturn.gridNavigationRowParameters.focusSelf,
         getSelected: r.rowAsChildOfGridReturn.singleSelectionChildReturn.getSelected,
