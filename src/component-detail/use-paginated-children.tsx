@@ -22,11 +22,27 @@ export interface UsePaginatedChildContext {
     paginatedChild: { getDefaultPaginationVisible(i: number): boolean; }
 }
 
+export interface UsePaginatedChildrenReturn {
+    managedChildrenParameters: {
+        onChildCountChange: (count: number) => void;
+    };
+    paginatedChildrenReturn: {
+        refreshPagination: () => void;
+        /**
+         * **IMPORTANT**: This is only tracked when pagination is enabled.
+         * 
+         * If pagination is not enabled, this is either `null` or some undefined previous number.
+         */
+        childCount: number | null;
+    };
+}
+
 export function usePaginatedChildren<E extends Element, M extends UsePaginatedChildrenInfo<E>>({
     managedChildrenReturn,
     linearNavigationParameters: { indexDemangler, indexMangler },
     paginatedChildrenParameters: { paginationMax, paginationMin } }: UsePaginatedChildrenParameters<E, M>) {
 
+    const [childCount, setChildCount] = useState(null as number | null);
     const parentIsPaginated = (paginationMin != null || paginationMax != null);
 
     const lastPagination = useRef({ paginationMax: null as null | number, paginationMin: null as null | number });
@@ -50,6 +66,7 @@ export function usePaginatedChildren<E extends Element, M extends UsePaginatedCh
         managedChildrenParameters: {
             onChildCountChange: useStableCallback((count: number) => {
                 if (paginationMax != null || paginationMin != null) {
+                    setChildCount(count);
                     const min = (paginationMin ?? 0);
                     const max = (paginationMax ?? count);
                     for (let i = min; i < max; ++i) {
@@ -57,9 +74,13 @@ export function usePaginatedChildren<E extends Element, M extends UsePaginatedCh
                         managedChildrenReturn.getChildren().getAt(i)?.setChildCountIfPaginated(count);
                     }
                 }
+                else {
+                    // TODO: Make this debug only.
+                    setChildCount(null);
+                }
             }),
         },
-        paginatedChildrenReturn: { refreshPagination }
+        paginatedChildrenReturn: { refreshPagination, childCount }
     }
 }
 

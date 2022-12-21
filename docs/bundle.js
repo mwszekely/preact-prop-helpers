@@ -6109,6 +6109,7 @@ var bundle = function (exports) {
         paginationMin
       }
     } = _ref33;
+    const [childCount, setChildCount] = p(null);
     const parentIsPaginated = paginationMin != null || paginationMax != null;
     const lastPagination = _({
       paginationMax: null,
@@ -6133,6 +6134,7 @@ var bundle = function (exports) {
       managedChildrenParameters: {
         onChildCountChange: useStableCallback(count => {
           if (paginationMax != null || paginationMin != null) {
+            setChildCount(count);
             const min = paginationMin !== null && paginationMin !== void 0 ? paginationMin : 0;
             const max = paginationMax !== null && paginationMax !== void 0 ? paginationMax : count;
             for (let i = min; i < max; ++i) {
@@ -6140,11 +6142,15 @@ var bundle = function (exports) {
               (_managedChildrenRetur4 = managedChildrenReturn.getChildren().getAt(i)) === null || _managedChildrenRetur4 === void 0 ? void 0 : _managedChildrenRetur4.setParentIsPaginated(parentIsPaginated);
               (_managedChildrenRetur5 = managedChildrenReturn.getChildren().getAt(i)) === null || _managedChildrenRetur5 === void 0 ? void 0 : _managedChildrenRetur5.setChildCountIfPaginated(count);
             }
+          } else {
+            // TODO: Make this debug only.
+            setChildCount(null);
           }
         })
       },
       paginatedChildrenReturn: {
-        refreshPagination
+        refreshPagination,
+        childCount
       }
     };
   }
