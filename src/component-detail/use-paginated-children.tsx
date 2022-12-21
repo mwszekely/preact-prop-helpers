@@ -1,4 +1,4 @@
-import { UseManagedChildrenReturnType } from "../preact-extensions/use-managed-children";
+import { UseManagedChildParameters, UseManagedChildrenReturnType } from "../preact-extensions/use-managed-children";
 import { useStableCallback } from "../preact-extensions/use-stable-callback";
 import { useLayoutEffect, useRef, useState } from "preact/hooks";
 import { UseLinearNavigationParameters, UseLinearNavigationReturnType } from "./use-linear-navigation";
@@ -90,7 +90,17 @@ export interface UsePaginatedChildParameters extends UsePaginatedChildContext {
     managedChildParameters: { index: number; }
 }
 
-export function usePaginatedChild<ChildElement extends Element>({ managedChildParameters: { index }, paginatedChild: { getDefaultPaginationVisible } }: UsePaginatedChildParameters) {
+export interface UsePaginatedChildReturn<ChildElement extends Element> {
+    props: h.JSX.HTMLAttributes<ChildElement>;
+    paginatedChildReturn: {
+        paginatedVisible: boolean;
+        isPaginated: boolean;
+    };
+    managedChildParameters: Pick<UsePaginatedChildrenInfo<ChildElement>, "setPaginationVisible" | "setChildCountIfPaginated" | "setParentIsPaginated">
+}
+
+
+export function usePaginatedChild<ChildElement extends Element>({ managedChildParameters: { index }, paginatedChild: { getDefaultPaginationVisible } }: UsePaginatedChildParameters): UsePaginatedChildReturn<ChildElement> {
     const [parentIsPaginated, setParentIsPaginated] = useState(false);
     const [childCountIfPaginated, setChildCountIfPaginated] = useState(null as number | null);
     const [paginatedVisible, setPaginatedVisible] = useState(false);
@@ -99,7 +109,7 @@ export function usePaginatedChild<ChildElement extends Element>({ managedChildPa
 
         setPaginatedVisible(getDefaultPaginationVisible(index));
     }, [index])
-
+    
     return {
         props: !parentIsPaginated ? {} : (({ "aria-setsize": childCountIfPaginated ?? undefined, "aria-posinset": (index + 1) } as h.JSX.HTMLAttributes<ChildElement>)),
         paginatedChildReturn: { paginatedVisible, isPaginated: parentIsPaginated },

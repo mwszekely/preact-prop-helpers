@@ -3,7 +3,7 @@ import { useCallback, useLayoutEffect } from "preact/hooks";
 import { UseGridNavigationRowReturnType } from "../component-detail/use-grid-navigation-partial";
 import { useGridNavigationSingleSelectionCell, UseGridNavigationSingleSelectionCellParameters, UseGridNavigationSingleSelectionParameters, UseGridNavigationSingleSelectionReturnType, useGridNavigationSingleSelectionRow, UseGridNavigationSingleSelectionRowReturnType } from "../component-detail/use-grid-navigation-single-selection";
 import { GridSingleSelectSortableChildCellInfo, GridSingleSelectSortableChildRowInfo, useGridNavigationSingleSelectionSortable, UseGridNavigationSingleSelectionSortableCellReturnType, UseGridNavigationSingleSelectionSortableParameters, UseGridNavigationSingleSelectionSortableReturnType, UseGridNavigationSingleSelectionSortableRowParameters, UseGridNavigationSingleSelectionSortableRowReturnType } from "../component-detail/use-grid-navigation-single-selection-sortable";
-import { usePaginatedChild, UsePaginatedChildContext, usePaginatedChildren, UsePaginatedChildrenInfo, UsePaginatedChildrenParameters, UsePaginatedChildrenReturnType } from "../component-detail/use-paginated-children";
+import { usePaginatedChild, UsePaginatedChildContext, usePaginatedChildren, UsePaginatedChildrenInfo, UsePaginatedChildrenParameters, UsePaginatedChildrenReturnType, UsePaginatedChildReturn } from "../component-detail/use-paginated-children";
 import { UseSortableChildInfo } from "../component-detail/use-sortable-children";
 import { useMergedProps } from "../dom-helpers/use-merged-props";
 import { useRefElement, UseRefElementReturnType } from "../dom-helpers/use-ref-element";
@@ -90,7 +90,7 @@ export interface UseCompleteGridNavigationRowReturnType<RowElement extends Eleme
     };
     rowAsChildOfGridReturn: UseGridNavigationSingleSelectionSortableRowReturnType<RowElement, CellElement>["rowAsChildOfGridReturn"] & {
         managedChildReturn: UseManagedChildReturnType<RM>["managedChildReturn"];
-        paginatedChildReturn: { paginatedVisible: boolean; };
+        paginatedChildReturn: UsePaginatedChildReturn<RowElement>["paginatedChildReturn"];
     };
     hasCurrentFocusReturn: UseHasCurrentFocusReturnType<RowElement>["hasCurrentFocusReturn"];
 }
@@ -194,10 +194,14 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
         ...rowAsParentOfCellsParameters
     }
 }: UseCompleteGridNavigationRowParameters<RowElement, CellElement, RM, CM>): UseCompleteGridNavigationRowReturnType<RowElement, CellElement, RM, CM> {
-    
+
     const { index } = managedChildParameters;
-    const { managedChildParameters: { setChildCountIfPaginated, setPaginationVisible, setParentIsPaginated }, paginatedChildReturn: { paginatedVisible }, props: paginationProps } = usePaginatedChild<RowElement>({ managedChildParameters: { index } , paginatedChild: { getDefaultPaginationVisible } })
-    
+    const {
+        managedChildParameters: { setChildCountIfPaginated, setPaginationVisible, setParentIsPaginated },
+        paginatedChildReturn: { paginatedVisible, isPaginated },
+        props: paginationProps
+    } = usePaginatedChild<RowElement>({ managedChildParameters: { index }, paginatedChild: { getDefaultPaginationVisible } })
+
 
 
     const getChildren = useCallback(() => managedChildrenReturn.getChildren(), []);
@@ -293,7 +297,7 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
         rowAsChildOfGridReturn: {
             ...rowAsChildOfGridReturn,
             managedChildReturn,
-            paginatedChildReturn: { paginatedVisible }
+            paginatedChildReturn: { isPaginated, paginatedVisible }
         },
         hasCurrentFocusReturn
 

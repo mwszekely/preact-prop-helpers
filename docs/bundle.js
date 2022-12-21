@@ -6175,7 +6175,8 @@ var bundle = function (exports) {
         "aria-posinset": index + 1
       },
       paginatedChildReturn: {
-        paginatedVisible
+        paginatedVisible,
+        isPaginated: parentIsPaginated
       },
       managedChildParameters: {
         setPaginationVisible: setPaginatedVisible,
@@ -6441,7 +6442,8 @@ var bundle = function (exports) {
         setParentIsPaginated
       },
       paginatedChildReturn: {
-        paginatedVisible
+        paginatedVisible,
+        isPaginated
       },
       props: paginationProps
     } = usePaginatedChild({
@@ -6588,6 +6590,7 @@ var bundle = function (exports) {
         ...rowAsChildOfGridReturn,
         managedChildReturn,
         paginatedChildReturn: {
+          isPaginated,
           paginatedVisible
         }
       },
