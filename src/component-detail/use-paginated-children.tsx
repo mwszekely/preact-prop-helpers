@@ -102,7 +102,7 @@ export function usePaginatedChild<ChildElement extends Element>({ managedChildPa
 
     return {
         props: !parentIsPaginated ? {} : (({ "aria-setsize": childCountIfPaginated ?? undefined, "aria-posinset": (index + 1) } as h.JSX.HTMLAttributes<ChildElement>)),
-        paginatedChildReturn: { paginatedVisible },
+        paginatedChildReturn: { paginatedVisible, isPaginated: parentIsPaginated },
         managedChildParameters: {
             setPaginationVisible: setPaginatedVisible,
             setChildCountIfPaginated,
