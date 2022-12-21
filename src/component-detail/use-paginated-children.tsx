@@ -22,7 +22,7 @@ export interface UsePaginatedChildContext {
     paginatedChild: { getDefaultPaginationVisible(i: number): boolean; }
 }
 
-export interface UsePaginatedChildrenReturn {
+export interface UsePaginatedChildrenReturnType {
     managedChildrenParameters: {
         onChildCountChange: (count: number) => void;
     };

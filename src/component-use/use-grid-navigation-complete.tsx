@@ -1,9 +1,9 @@
-import { usePaginatedChild, UsePaginatedChildContext, UsePaginatedChildParameters, usePaginatedChildren, UsePaginatedChildrenInfo, UsePaginatedChildrenParameters } from "../component-detail/use-paginated-children";
 import { h } from "preact";
-import { useCallback, useLayoutEffect, useState } from "preact/hooks";
+import { useCallback, useLayoutEffect } from "preact/hooks";
 import { UseGridNavigationRowReturnType } from "../component-detail/use-grid-navigation-partial";
 import { useGridNavigationSingleSelectionCell, UseGridNavigationSingleSelectionCellParameters, UseGridNavigationSingleSelectionParameters, UseGridNavigationSingleSelectionReturnType, useGridNavigationSingleSelectionRow, UseGridNavigationSingleSelectionRowReturnType } from "../component-detail/use-grid-navigation-single-selection";
 import { GridSingleSelectSortableChildCellInfo, GridSingleSelectSortableChildRowInfo, useGridNavigationSingleSelectionSortable, UseGridNavigationSingleSelectionSortableCellReturnType, UseGridNavigationSingleSelectionSortableParameters, UseGridNavigationSingleSelectionSortableReturnType, UseGridNavigationSingleSelectionSortableRowParameters, UseGridNavigationSingleSelectionSortableRowReturnType } from "../component-detail/use-grid-navigation-single-selection-sortable";
+import { usePaginatedChild, UsePaginatedChildContext, usePaginatedChildren, UsePaginatedChildrenInfo, UsePaginatedChildrenParameters, UsePaginatedChildrenReturnType } from "../component-detail/use-paginated-children";
 import { UseSortableChildInfo } from "../component-detail/use-sortable-children";
 import { useMergedProps } from "../dom-helpers/use-merged-props";
 import { useRefElement, UseRefElementReturnType } from "../dom-helpers/use-ref-element";
@@ -73,7 +73,7 @@ export interface CompleteGridNavigationRowContext<ParentElement extends Element,
 
 
 export interface UseCompleteGridNavigationReturnType<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement, CellElement>, CM extends UseCompleteGridNavigationCellInfo<CellElement>>
-    extends Omit<UseGridNavigationSingleSelectionSortableReturnType<ParentOrRowElement, RowElement, CellElement, RM, CM>, "typeaheadNavigationChildContext" | "singleSelectionContext" | "rovingTabIndexChildContext" | "gridNavigationRowContext" | "childrenHaveFocusParameters" | "managedChildrenParameters"> {
+    extends Pick<UsePaginatedChildrenReturnType, "paginatedChildrenReturn">, Omit<UseGridNavigationSingleSelectionSortableReturnType<ParentOrRowElement, RowElement, CellElement, RM, CM>, "typeaheadNavigationChildContext" | "singleSelectionContext" | "rovingTabIndexChildContext" | "gridNavigationRowContext" | "childrenHaveFocusParameters" | "managedChildrenParameters"> {
     props: h.JSX.HTMLAttributes<ParentOrRowElement>;
     context: CompleteGridNavigationContext<ParentOrRowElement, RowElement, CellElement, RM, CM>;
 
@@ -148,7 +148,7 @@ export function useCompleteGridNavigation<ParentOrRowElement extends Element, Ro
 
     const { childrenHaveFocusChildContext, childrenHaveFocusReturn } = useChildrenHaveFocus<RowElement>({ childrenHaveFocusParameters });
     const { context: { managedChildContext }, managedChildrenReturn } = useManagedChildren<RM>({ managedChildrenParameters: { onChildCountChange: useStableCallback(c => onChildCountChange(c)), ...managedChildrenParameters } });
-    const { paginatedChildrenReturn: { refreshPagination }, managedChildrenParameters: { onChildCountChange } } = usePaginatedChildren<RowElement, RM>({ managedChildrenReturn, paginatedChildrenParameters, linearNavigationParameters: { indexDemangler, indexMangler } });
+    const { paginatedChildrenReturn, paginatedChildrenReturn: { refreshPagination }, managedChildrenParameters: { onChildCountChange } } = usePaginatedChildren<RowElement, RM>({ managedChildrenReturn, paginatedChildrenParameters, linearNavigationParameters: { indexDemangler, indexMangler } });
     const props = useMergedProps(linearNavigationReturn.propsStable, typeaheadNavigationReturn.propsStable);
     const getDefaultPaginationVisible = useStableCallback((i: number) => {
         return (i >= (paginatedChildrenParameters.paginationMin ?? -Infinity)) && (i < (paginatedChildrenParameters.paginationMax ?? Infinity));
@@ -172,6 +172,7 @@ export function useCompleteGridNavigation<ParentOrRowElement extends Element, Ro
         rearrangeableChildrenReturn,
         ...gridNavigationSingleSelectionReturn,
         childrenHaveFocusReturn,
+        paginatedChildrenReturn,
         //rearrangeableChildrenParameters: { getHighestChildIndex: getHighestChildIndex, getValid },
     }
 

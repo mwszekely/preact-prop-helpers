@@ -6361,6 +6361,7 @@ var bundle = function (exports) {
       }
     });
     const {
+      paginatedChildrenReturn,
       paginatedChildrenReturn: {
         refreshPagination
       },
@@ -6397,7 +6398,8 @@ var bundle = function (exports) {
       managedChildrenReturn,
       rearrangeableChildrenReturn,
       ...gridNavigationSingleSelectionReturn,
-      childrenHaveFocusReturn
+      childrenHaveFocusReturn,
+      paginatedChildrenReturn
       //rearrangeableChildrenParameters: { getHighestChildIndex: getHighestChildIndex, getValid },
     };
   }
@@ -7138,6 +7140,7 @@ var bundle = function (exports) {
       }
     });
     const {
+      paginatedChildrenReturn,
       paginatedChildrenReturn: {
         refreshPagination
       },
@@ -7176,6 +7179,7 @@ var bundle = function (exports) {
         indexMangler,
         ...rearrangeableChildrenReturn
       },
+      paginatedChildrenReturn,
       sortableChildrenReturn,
       linearNavigationReturn,
       rovingTabIndexReturn,

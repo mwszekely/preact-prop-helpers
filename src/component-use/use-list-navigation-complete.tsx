@@ -1,4 +1,4 @@
-import { usePaginatedChild, UsePaginatedChildContext, usePaginatedChildren, UsePaginatedChildrenInfo, UsePaginatedChildrenParameters } from "../component-detail/use-paginated-children";
+import { usePaginatedChild, UsePaginatedChildContext, usePaginatedChildren, UsePaginatedChildrenInfo, UsePaginatedChildrenParameters, UsePaginatedChildrenReturnType } from "../component-detail/use-paginated-children";
 import { h } from "preact";
 import { useCallback, useLayoutEffect, useRef, useState } from "preact/hooks";
 import { useListNavigationSingleSelection, useListNavigationSingleSelectionChild } from "../component-detail/use-list-navigation-single-selection";
@@ -27,7 +27,7 @@ export interface UseCompleteListNavigationParameters<ParentElement extends Eleme
 }
 
 export interface UseCompleteListNavigationReturnType<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>>
-    extends Pick<UseListNavigationSingleSelectionSortableReturnType<ParentElement, ChildElement, M>, "rovingTabIndexReturn" | "singleSelectionReturn" | "linearNavigationReturn" | "typeaheadNavigationReturn" | "rearrangeableChildrenReturn" | "sortableChildrenReturn"> {
+    extends Pick<UsePaginatedChildrenReturnType, "paginatedChildrenReturn">, Pick<UseListNavigationSingleSelectionSortableReturnType<ParentElement, ChildElement, M>, "rovingTabIndexReturn" | "singleSelectionReturn" | "linearNavigationReturn" | "typeaheadNavigationReturn" | "rearrangeableChildrenReturn" | "sortableChildrenReturn"> {
     props: h.JSX.HTMLAttributes<ParentElement>;
     context: CompleteListNavigationContext<ParentElement, ChildElement, M>;
 
@@ -111,7 +111,7 @@ export function useCompleteListNavigation<ParentElement extends Element, ChildEl
             ...managedChildrenParameters
         }
     });
-    const { paginatedChildrenReturn: { refreshPagination }, managedChildrenParameters: { onChildCountChange } } = usePaginatedChildren<ChildElement, M>({ managedChildrenReturn, paginatedChildrenParameters, linearNavigationParameters: { indexDemangler, indexMangler } });
+    const { paginatedChildrenReturn, paginatedChildrenReturn: { refreshPagination }, managedChildrenParameters: { onChildCountChange } } = usePaginatedChildren<ChildElement, M>({ managedChildrenReturn, paginatedChildrenParameters, linearNavigationParameters: { indexDemangler, indexMangler } });
     const props = useMergedProps<ParentElement>(linearNavigationReturn.propsStable, typeaheadNavigationReturn.propsStable);
     const getDefaultPaginationVisible = useStableCallback((i: number) => {
         return (i >= (paginatedChildrenParameters.paginationMin ?? -Infinity)) && (i < (paginatedChildrenParameters.paginationMax ?? Infinity));
@@ -137,6 +137,7 @@ export function useCompleteListNavigation<ParentElement extends Element, ChildEl
             indexMangler,
             ...rearrangeableChildrenReturn
         },
+        paginatedChildrenReturn,
         sortableChildrenReturn,
         linearNavigationReturn,
         rovingTabIndexReturn,
