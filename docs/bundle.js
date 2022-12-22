@@ -5774,7 +5774,9 @@ var bundle = function (exports) {
   }
   function useStaggeredChildren(_ref29) {
     let {
-      managedChildrenReturn,
+      managedChildrenReturn: {
+        getChildren
+      },
       staggeredChildrenParameters: {
         staggered
       }
@@ -5784,7 +5786,7 @@ var bundle = function (exports) {
     // To guard against that, we also wait for 50ms, and if it hasn't loaded by then, we just continue as if it did.
     const [currentlyStaggering, setCurrentlyStaggering] = p(staggered);
     const timeoutHandle = _(-1);
-    const resetEmergencyTimeout = useStableCallback(() => {
+    const resetEmergencyTimeout = T$1(() => {
       if (timeoutHandle.current != -1) clearTimeout(timeoutHandle.current);
       timeoutHandle.current = setTimeout(() => {
         // We've gone this long without hearing the next child mount itself...
@@ -5795,17 +5797,17 @@ var bundle = function (exports) {
           return Math.min((_getTargetStaggerInde = getTargetStaggerIndex()) !== null && _getTargetStaggerInde !== void 0 ? _getTargetStaggerInde : 0, (c !== null && c !== void 0 ? c : 0) + 1);
         });
       }, 50);
-    });
+    }, [/* Must be empty */]);
     // The target index is the index that we're "animating" to.
     // Each child simply sets this to the highest value ever seen.
     // TODO: When unmounting children, we should reset this, but that requires us to track total # of children
-    const [getTargetStaggerIndex, setTargetStaggerIndex] = usePassiveState(useStableCallback((newIndex, prevIndex) => {
+    const [getTargetStaggerIndex, setTargetStaggerIndex] = usePassiveState(T$1((newIndex, prevIndex) => {
       // Any time our target changes,
       // ensure our timeout is running, and start a new one if not
       // For any newly mounted children, make sure they're aware of if they should consider themselves staggered or not
       for (let i = prevIndex !== null && prevIndex !== void 0 ? prevIndex : 0; i < (newIndex !== null && newIndex !== void 0 ? newIndex : 0); ++i) {
-        var _managedChildrenRetur;
-        (_managedChildrenRetur = managedChildrenReturn.getChildren().getAt(i)) === null || _managedChildrenRetur === void 0 ? void 0 : _managedChildrenRetur.setParentIsStaggered(parentIsStaggered);
+        var _getChildren$getAt;
+        (_getChildren$getAt = getChildren().getAt(i)) === null || _getChildren$getAt === void 0 ? void 0 : _getChildren$getAt.setParentIsStaggered(parentIsStaggered);
       }
       if (timeoutHandle.current == -1) {
         resetEmergencyTimeout();
@@ -5813,9 +5815,9 @@ var bundle = function (exports) {
         // So ask a child to mount and then wait for that child to mount.
         setDisplayedStaggerIndex(c => Math.min(newIndex !== null && newIndex !== void 0 ? newIndex : 0, (c !== null && c !== void 0 ? c : 0) + 1));
       }
-    }), returnNull);
+    }, [/* Must be empty */]), returnNull);
     //const [getTimeoutHandle, setTimeoutHandle] = usePassiveState<number | null, Event>(null, returnNull);
-    const [getDisplayedStaggerIndex, setDisplayedStaggerIndex] = usePassiveState(useStableCallback((newIndex, prevIndex) => {
+    const [getDisplayedStaggerIndex, setDisplayedStaggerIndex] = usePassiveState(T$1((newIndex, prevIndex) => {
       var _getTargetStaggerInde2;
       if (newIndex == null) {
         return;
@@ -5828,8 +5830,8 @@ var bundle = function (exports) {
       // Either way, tell the next child to show itself.
       // Also make sure that anyone we skipped somehow show themselves as well.
       for (let i = prevIndex !== null && prevIndex !== void 0 ? prevIndex : 0; i < newIndex; ++i) {
-        var _managedChildrenRetur2;
-        (_managedChildrenRetur2 = managedChildrenReturn.getChildren().getAt(i)) === null || _managedChildrenRetur2 === void 0 ? void 0 : _managedChildrenRetur2.setStaggeredVisible(true);
+        var _getChildren$getAt2;
+        (_getChildren$getAt2 = getChildren().getAt(i)) === null || _getChildren$getAt2 === void 0 ? void 0 : _getChildren$getAt2.setStaggeredVisible(true);
       }
       // Set a new emergency timeout
       resetEmergencyTimeout();
@@ -5837,16 +5839,16 @@ var bundle = function (exports) {
           const handle = setTimeout(() => { setDisplayedStaggerIndex(c => (c ?? 0) + 1); }, staggerDelay ?? 50);
           return clearTimeout(handle);
       }*/
-    }), returnNull);
+    }, [/* Must be empty */]), returnNull);
     const parentIsStaggered = staggered != null;
-    const childCallsThisToTellTheParentToMountTheNextOne = useStableCallback(index => {
+    const childCallsThisToTellTheParentToMountTheNextOne = T$1(index => {
       setDisplayedStaggerIndex(s => {
         var _getTargetStaggerInde3;
         return Math.min((_getTargetStaggerInde3 = getTargetStaggerIndex()) !== null && _getTargetStaggerInde3 !== void 0 ? _getTargetStaggerInde3 : 0, 1 + Math.max(s !== null && s !== void 0 ? s : 0, index + 1));
       });
-    });
+    }, []);
     s(() => {
-      managedChildrenReturn.getChildren().forEach(child => child.setParentIsStaggered(parentIsStaggered));
+      getChildren().forEach(child => child.setParentIsStaggered(parentIsStaggered));
       //if (parentIsStaggered)
       //    childCallsThisToTellTheParentToMountTheNextOne(-1);
     }, [parentIsStaggered]);
@@ -5918,7 +5920,9 @@ var bundle = function (exports) {
   }
   function usePaginatedChildren(_ref31) {
     let {
-      managedChildrenReturn,
+      managedChildrenReturn: {
+        getChildren
+      },
       linearNavigationParameters: {
         indexDemangler,
         indexMangler
@@ -5934,16 +5938,16 @@ var bundle = function (exports) {
       paginationMax: null,
       paginationMin: null
     });
-    const refreshPagination = useStableCallback(() => {
-      const childMax = managedChildrenReturn.getChildren().getHighestIndex() + 1;
+    const refreshPagination = T$1(() => {
+      const childMax = getChildren().getHighestIndex() + 1;
       for (let i = 0; i <= childMax; ++i) {
-        var _managedChildrenRetur3, _managedChildrenRetur4, _managedChildrenRetur5;
+        var _getChildren$getAt3, _getChildren$getAt4, _getChildren$getAt5;
         const visible = i >= (paginationMin !== null && paginationMin !== void 0 ? paginationMin : -Infinity) && i < (paginationMax !== null && paginationMax !== void 0 ? paginationMax : Infinity);
-        (_managedChildrenRetur3 = managedChildrenReturn.getChildren().getAt(indexDemangler(i))) === null || _managedChildrenRetur3 === void 0 ? void 0 : _managedChildrenRetur3.setParentIsPaginated(parentIsPaginated);
-        (_managedChildrenRetur4 = managedChildrenReturn.getChildren().getAt(indexDemangler(i))) === null || _managedChildrenRetur4 === void 0 ? void 0 : _managedChildrenRetur4.setPaginationVisible(visible);
-        (_managedChildrenRetur5 = managedChildrenReturn.getChildren().getAt(indexDemangler(i))) === null || _managedChildrenRetur5 === void 0 ? void 0 : _managedChildrenRetur5.setChildCountIfPaginated(managedChildrenReturn.getChildren().getHighestIndex() + 1);
+        (_getChildren$getAt3 = getChildren().getAt(indexDemangler(i))) === null || _getChildren$getAt3 === void 0 ? void 0 : _getChildren$getAt3.setParentIsPaginated(parentIsPaginated);
+        (_getChildren$getAt4 = getChildren().getAt(indexDemangler(i))) === null || _getChildren$getAt4 === void 0 ? void 0 : _getChildren$getAt4.setPaginationVisible(visible);
+        (_getChildren$getAt5 = getChildren().getAt(indexDemangler(i))) === null || _getChildren$getAt5 === void 0 ? void 0 : _getChildren$getAt5.setChildCountIfPaginated(getChildren().getHighestIndex() + 1);
       }
-    });
+    }, [/* Must be empty */]);
     s(() => {
       refreshPagination();
       lastPagination.current.paginationMax = paginationMax;
@@ -5964,9 +5968,9 @@ var bundle = function (exports) {
             const min = paginationMin !== null && paginationMin !== void 0 ? paginationMin : 0;
             const max = paginationMax !== null && paginationMax !== void 0 ? paginationMax : count;
             for (let i = min; i < max; ++i) {
-              var _managedChildrenRetur6, _managedChildrenRetur7;
-              (_managedChildrenRetur6 = managedChildrenReturn.getChildren().getAt(i)) === null || _managedChildrenRetur6 === void 0 ? void 0 : _managedChildrenRetur6.setParentIsPaginated(parentIsPaginated);
-              (_managedChildrenRetur7 = managedChildrenReturn.getChildren().getAt(i)) === null || _managedChildrenRetur7 === void 0 ? void 0 : _managedChildrenRetur7.setChildCountIfPaginated(count);
+              var _getChildren$getAt6, _getChildren$getAt7;
+              (_getChildren$getAt6 = getChildren().getAt(i)) === null || _getChildren$getAt6 === void 0 ? void 0 : _getChildren$getAt6.setParentIsPaginated(parentIsPaginated);
+              (_getChildren$getAt7 = getChildren().getAt(i)) === null || _getChildren$getAt7 === void 0 ? void 0 : _getChildren$getAt7.setChildCountIfPaginated(count);
             }
           } else {
             // TODO: Make this debug only.
@@ -6123,8 +6127,8 @@ var bundle = function (exports) {
     const getChildren = T$1(() => managedChildrenReturn.getChildren(), []);
     const getHighestChildIndex = T$1(() => getChildren().getHighestIndex(), []);
     const isValid = useStableCallback(index => {
-      var _getChildren$getAt;
-      return !((_getChildren$getAt = getChildren().getAt(index)) !== null && _getChildren$getAt !== void 0 && _getChildren$getAt.hidden);
+      var _getChildren$getAt8;
+      return !((_getChildren$getAt8 = getChildren().getAt(index)) !== null && _getChildren$getAt8 !== void 0 && _getChildren$getAt8.hidden);
     });
     const {
       childrenHaveFocusParameters,

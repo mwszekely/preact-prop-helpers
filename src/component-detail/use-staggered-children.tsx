@@ -3,7 +3,6 @@ import { returnNull, returnZero, usePassiveState } from "../preact-extensions/us
 import { useStableGetter, useStableObject } from "../preact-extensions/use-stable-getter";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "preact/hooks";
 import { UseManagedChildrenReturnType } from "../preact-extensions/use-managed-children";
-import { useStableCallback } from "../preact-extensions/use-stable-callback";
 import { UseLinearNavigationParameters } from "./use-linear-navigation";
 import { UseRovingTabIndexChildInfo } from "./use-roving-tabindex";
 
@@ -39,10 +38,9 @@ export interface UseStaggeredChildrenReturnType {
 }
 
 export function useStaggeredChildren<E extends Element, M extends UseStaggeredChildrenInfo<E>>({
-    managedChildrenReturn,
+    managedChildrenReturn: { getChildren },
     staggeredChildrenParameters: { staggered }
 }: UseStaggeredChildrenParameters<E, M>): UseStaggeredChildrenReturnType {
-
 
     // By default, when a child mounts, we tell the next child to mount and simply repeat.
     // If a child is missing, however, it will break that chain.
@@ -51,7 +49,7 @@ export function useStaggeredChildren<E extends Element, M extends UseStaggeredCh
     const [currentlyStaggering, setCurrentlyStaggering] = useState(staggered);
 
     const timeoutHandle = useRef(-1);
-    const resetEmergencyTimeout = useStableCallback(() => {
+    const resetEmergencyTimeout = useCallback(() => {
         if (timeoutHandle.current != -1)
             clearTimeout(timeoutHandle.current);
 
@@ -61,19 +59,19 @@ export function useStaggeredChildren<E extends Element, M extends UseStaggeredCh
             timeoutHandle.current = -1;
             setDisplayedStaggerIndex(c => Math.min(getTargetStaggerIndex() ?? 0, (c ?? 0) + 1));
         }, 50)
-    })
+    }, [/* Must be empty */])
 
     // The target index is the index that we're "animating" to.
     // Each child simply sets this to the highest value ever seen.
     // TODO: When unmounting children, we should reset this, but that requires us to track total # of children
-    const [getTargetStaggerIndex, setTargetStaggerIndex] = usePassiveState<number | null, never>(useStableCallback((newIndex: number | null, prevIndex: number | null | undefined) => {
+    const [getTargetStaggerIndex, setTargetStaggerIndex] = usePassiveState<number | null, never>(useCallback((newIndex: number | null, prevIndex: number | null | undefined) => {
         // Any time our target changes,
         // ensure our timeout is running, and start a new one if not
 
 
         // For any newly mounted children, make sure they're aware of if they should consider themselves staggered or not
         for (let i = (prevIndex ?? 0); i < (newIndex ?? 0); ++i) {
-            managedChildrenReturn.getChildren().getAt(i)?.setParentIsStaggered(parentIsStaggered);
+            getChildren().getAt(i)?.setParentIsStaggered(parentIsStaggered);
         }
 
         if (timeoutHandle.current == -1) {
@@ -83,11 +81,11 @@ export function useStaggeredChildren<E extends Element, M extends UseStaggeredCh
             // So ask a child to mount and then wait for that child to mount.
             setDisplayedStaggerIndex(c => Math.min(newIndex ?? 0, (c ?? 0) + 1));
         }
-    }), returnNull);
+    }, [/* Must be empty */]), returnNull);
 
     //const [getTimeoutHandle, setTimeoutHandle] = usePassiveState<number | null, Event>(null, returnNull);
 
-    const [getDisplayedStaggerIndex, setDisplayedStaggerIndex] = usePassiveState<number | null, never>(useStableCallback((newIndex: number | null, prevIndex: number | null | undefined) => {
+    const [getDisplayedStaggerIndex, setDisplayedStaggerIndex] = usePassiveState<number | null, never>(useCallback((newIndex: number | null, prevIndex: number | null | undefined) => {
         if (newIndex == null) {
             return;
         }
@@ -102,7 +100,7 @@ export function useStaggeredChildren<E extends Element, M extends UseStaggeredCh
         // Also make sure that anyone we skipped somehow show themselves as well.
 
         for (let i = (prevIndex ?? 0); i < newIndex; ++i) {
-            managedChildrenReturn.getChildren().getAt(i)?.setStaggeredVisible(true);
+            getChildren().getAt(i)?.setStaggeredVisible(true);
         }
 
         // Set a new emergency timeout
@@ -113,16 +111,16 @@ export function useStaggeredChildren<E extends Element, M extends UseStaggeredCh
             return clearTimeout(handle);
         }*/
 
-    }), returnNull)
+    }, [/* Must be empty */]), returnNull)
 
     const parentIsStaggered = (staggered != null);
 
-    const childCallsThisToTellTheParentToMountTheNextOne = useStableCallback((index: number) => {
+    const childCallsThisToTellTheParentToMountTheNextOne = useCallback((index: number) => {
         setDisplayedStaggerIndex(s => Math.min((getTargetStaggerIndex() ?? 0), 1 + (Math.max(s ?? 0, index + 1))));
-    });
+    }, []);
 
     useLayoutEffect(() => {
-        managedChildrenReturn.getChildren().forEach(child => child.setParentIsStaggered(parentIsStaggered));
+        getChildren().forEach(child => child.setParentIsStaggered(parentIsStaggered));
         //if (parentIsStaggered)
         //    childCallsThisToTellTheParentToMountTheNextOne(-1);
 
@@ -143,7 +141,7 @@ export function useStaggeredChildren<E extends Element, M extends UseStaggeredCh
                 // It's more important that these can be called during render.
                 getDefaultIsStaggered: useCallback(() => {
                     return parentIsStaggered;
-                },[]),
+                }, []),
                 getDefaultStaggeredVisible: useCallback((i) => {
                     if (parentIsStaggered) {
                         const staggerIndex = getDisplayedStaggerIndex();
@@ -154,7 +152,7 @@ export function useStaggeredChildren<E extends Element, M extends UseStaggeredCh
                     else {
                         return true;
                     }
-                },[])
+                }, [])
             })
         }),
     }
