@@ -1,6 +1,6 @@
 import { h } from "preact";
 import { useStableObject } from "../preact-extensions/use-stable-getter";
-import { useLayoutEffect, useRef, useState } from "preact/hooks";
+import { useCallback, useLayoutEffect, useRef, useState } from "preact/hooks";
 import { UseManagedChildrenReturnType } from "../preact-extensions/use-managed-children";
 import { useStableCallback } from "../preact-extensions/use-stable-callback";
 import { UseLinearNavigationParameters } from "./use-linear-navigation";
@@ -66,7 +66,7 @@ export function usePaginatedChildren<E extends Element, M extends UsePaginatedCh
     return {
         context: useStableObject({
             paginatedChildContext: useStableObject({
-                getDefaultPaginationVisible: useStableCallback((i) => { return parentIsPaginated? (i >= (paginationMin ?? -Infinity) && i < (paginationMax ?? Infinity)) : true; })
+                getDefaultPaginationVisible: useCallback((i) => { return parentIsPaginated ? (i >= (paginationMin ?? -Infinity) && i < (paginationMax ?? Infinity)) : true; }, [])
             })
         }),
         managedChildrenParameters: {
@@ -112,8 +112,6 @@ export function usePaginatedChild<ChildElement extends Element>({ managedChildPa
     const [childCountIfPaginated, setChildCountIfPaginated] = useState(null as number | null);
     const [paginatedVisible, setPaginatedVisible] = useState(getDefaultPaginationVisible(index));
 
-//    useLayoutEffect(() => { setPaginationVisible(getDefaultPaginationVisible(index)); }, [index])
-    
     return {
         props: !parentIsPaginated ? {} : (({ "aria-setsize": childCountIfPaginated ?? undefined, "aria-posinset": (index + 1) } as h.JSX.HTMLAttributes<ChildElement>)),
         paginatedChildReturn: { paginatedVisible, isPaginated: parentIsPaginated },

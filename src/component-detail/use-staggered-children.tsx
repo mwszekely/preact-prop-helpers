@@ -138,10 +138,13 @@ export function useStaggeredChildren<E extends Element, M extends UseStaggeredCh
             staggeredChildContext: useStableObject({
                 childCallsThisToTellTheParentToMountTheNextOne,
                 childCallsThisToTellTheParentTheHighestIndex,
-                getDefaultIsStaggered: useStableCallback(() => {
+                // These are used durong setState, so just once during mount.
+                // It's okay that the dependencies aren't included.
+                // It's more important that these can be called during render.
+                getDefaultIsStaggered: useCallback(() => {
                     return parentIsStaggered;
-                }),
-                getDefaultStaggeredVisible: useStableCallback((i) => {
+                },[]),
+                getDefaultStaggeredVisible: useCallback((i) => {
                     if (parentIsStaggered) {
                         const staggerIndex = getDisplayedStaggerIndex();
                         if (staggerIndex == null)
@@ -151,7 +154,7 @@ export function useStaggeredChildren<E extends Element, M extends UseStaggeredCh
                     else {
                         return true;
                     }
-                })
+                },[])
             })
         }),
     }

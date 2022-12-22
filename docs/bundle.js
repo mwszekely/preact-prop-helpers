@@ -5861,10 +5861,13 @@ var bundle = function (exports) {
         staggeredChildContext: useStableObject({
           childCallsThisToTellTheParentToMountTheNextOne,
           childCallsThisToTellTheParentTheHighestIndex,
-          getDefaultIsStaggered: useStableCallback(() => {
+          // These are used durong setState, so just once during mount.
+          // It's okay that the dependencies aren't included.
+          // It's more important that these can be called during render.
+          getDefaultIsStaggered: T$1(() => {
             return parentIsStaggered;
-          }),
-          getDefaultStaggeredVisible: useStableCallback(i => {
+          }, []),
+          getDefaultStaggeredVisible: T$1(i => {
             if (parentIsStaggered) {
               const staggerIndex = getDisplayedStaggerIndex();
               if (staggerIndex == null) return false;
@@ -5872,7 +5875,7 @@ var bundle = function (exports) {
             } else {
               return true;
             }
-          })
+          }, [])
         })
       })
     };
@@ -5949,9 +5952,9 @@ var bundle = function (exports) {
     return {
       context: useStableObject({
         paginatedChildContext: useStableObject({
-          getDefaultPaginationVisible: useStableCallback(i => {
+          getDefaultPaginationVisible: T$1(i => {
             return parentIsPaginated ? i >= (paginationMin !== null && paginationMin !== void 0 ? paginationMin : -Infinity) && i < (paginationMax !== null && paginationMax !== void 0 ? paginationMax : Infinity) : true;
-          })
+          }, [])
         })
       }),
       managedChildrenParameters: {
@@ -5991,7 +5994,6 @@ var bundle = function (exports) {
     const [parentIsPaginated, setParentIsPaginated] = p(false);
     const [childCountIfPaginated, setChildCountIfPaginated] = p(null);
     const [paginatedVisible, setPaginatedVisible] = p(getDefaultPaginationVisible(index));
-    //    useLayoutEffect(() => { setPaginationVisible(getDefaultPaginationVisible(index)); }, [index])
     return {
       props: !parentIsPaginated ? {} : {
         "aria-setsize": childCountIfPaginated !== null && childCountIfPaginated !== void 0 ? childCountIfPaginated : undefined,
