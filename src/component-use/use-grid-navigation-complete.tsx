@@ -147,7 +147,7 @@ export function useCompleteGridNavigation<ParentOrRowElement extends Element, Ro
         singleSelectionParameters,
         typeaheadNavigationParameters: { isValid, ...typeaheadNavigationParameters },
         rearrangeableChildrenParameters: {
-            onRearranged: () => { refreshPagination(); },
+            onRearranged: useStableCallback(() => { refreshPagination(paginatedChildrenParameters.paginationMin, paginatedChildrenParameters.paginationMax); }),
             ...rearrangeableChildrenParameters
         },
         sortableChildrenParameters

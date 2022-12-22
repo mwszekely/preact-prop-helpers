@@ -5938,7 +5938,7 @@ var bundle = function (exports) {
       paginationMax: null,
       paginationMin: null
     });
-    const refreshPagination = T$1(() => {
+    const refreshPagination = T$1((paginationMin, paginationMax) => {
       const childMax = getChildren().getHighestIndex() + 1;
       for (let i = 0; i <= childMax; ++i) {
         var _getChildren$getAt3, _getChildren$getAt4, _getChildren$getAt5;
@@ -5949,13 +5949,14 @@ var bundle = function (exports) {
       }
     }, [/* Must be empty */]);
     s(() => {
-      refreshPagination();
+      refreshPagination(paginationMin, paginationMax);
       lastPagination.current.paginationMax = paginationMax;
       lastPagination.current.paginationMin = paginationMin;
     }, [paginationMax, paginationMin]);
     return {
       context: useStableObject({
         paginatedChildContext: useStableObject({
+          // This is only used during setState on mount, so this is fine.
           getDefaultPaginationVisible: T$1(i => {
             return parentIsPaginated ? i >= (paginationMin !== null && paginationMin !== void 0 ? paginationMin : -Infinity) && i < (paginationMax !== null && paginationMax !== void 0 ? paginationMax : Infinity) : true;
           }, [])
@@ -6159,9 +6160,9 @@ var bundle = function (exports) {
         ...typeaheadNavigationParameters
       },
       rearrangeableChildrenParameters: {
-        onRearranged: () => {
-          refreshPagination();
-        },
+        onRearranged: useStableCallback(() => {
+          refreshPagination(paginatedChildrenParameters.paginationMin, paginatedChildrenParameters.paginationMax);
+        }),
         ...rearrangeableChildrenParameters
       },
       sortableChildrenParameters
@@ -6953,9 +6954,9 @@ var bundle = function (exports) {
       sortableChildrenReturn
     } = useSortableChildren({
       rearrangeableChildrenParameters: {
-        onRearranged: () => {
-          refreshPagination();
-        },
+        onRearranged: useStableCallback(() => {
+          refreshPagination(paginatedChildrenParameters.paginationMin, paginatedChildrenParameters.paginationMax);
+        }),
         ...rearrangeableChildrenParameters
       },
       sortableChildrenParameters

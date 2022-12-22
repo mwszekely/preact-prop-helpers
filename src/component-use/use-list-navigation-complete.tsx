@@ -79,7 +79,7 @@ export function useCompleteListNavigation<ParentElement extends Element, ChildEl
 
     const { rearrangeableChildrenReturn: { indexDemangler, indexMangler, ...rearrangeableChildrenReturn }, sortableChildrenReturn } = useSortableChildren<M>({
         rearrangeableChildrenParameters: {
-            onRearranged: () => { refreshPagination() },
+            onRearranged: useStableCallback(() => { refreshPagination(paginatedChildrenParameters.paginationMin, paginatedChildrenParameters.paginationMax) }),
             ...rearrangeableChildrenParameters
         },
         sortableChildrenParameters

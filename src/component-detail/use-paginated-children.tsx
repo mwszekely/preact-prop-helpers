@@ -27,7 +27,7 @@ export interface UsePaginatedChildrenReturnType {
         onChildCountChange: (count: number) => void;
     };
     paginatedChildrenReturn: {
-        refreshPagination: () => void;
+        refreshPagination: (min: number | null, max: number | null) => void;
         /**
          * **IMPORTANT**: This is only tracked when pagination is enabled.
          * 
@@ -47,7 +47,7 @@ export function usePaginatedChildren<E extends Element, M extends UsePaginatedCh
     const parentIsPaginated = (paginationMin != null || paginationMax != null);
 
     const lastPagination = useRef({ paginationMax: null as null | number, paginationMin: null as null | number });
-    const refreshPagination = useCallback(() => {
+    const refreshPagination = useCallback((paginationMin: number | null, paginationMax: number | null) => {
         const childMax = (getChildren().getHighestIndex() + 1);
         for (let i = 0; i <= childMax; ++i) {
             const visible = (i >= (paginationMin ?? -Infinity) && i < (paginationMax ?? Infinity));
@@ -58,7 +58,7 @@ export function usePaginatedChildren<E extends Element, M extends UsePaginatedCh
 
     }, [/* Must be empty */])
     useLayoutEffect(() => {
-        refreshPagination();
+        refreshPagination(paginationMin, paginationMax);
         lastPagination.current.paginationMax = paginationMax;
         lastPagination.current.paginationMin = paginationMin;
     }, [paginationMax, paginationMin]);
@@ -66,6 +66,7 @@ export function usePaginatedChildren<E extends Element, M extends UsePaginatedCh
     return {
         context: useStableObject({
             paginatedChildContext: useStableObject({
+                // This is only used during setState on mount, so this is fine.
                 getDefaultPaginationVisible: useCallback((i) => { return parentIsPaginated ? (i >= (paginationMin ?? -Infinity) && i < (paginationMax ?? Infinity)) : true; }, [])
             })
         }),
