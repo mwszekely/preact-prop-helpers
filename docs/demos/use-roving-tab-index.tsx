@@ -21,6 +21,7 @@ export const DemoUseRovingTabIndex = memo(() => {
     const [count, setCount] = useState(10);
     const [min, setMin] = useState<number>(null!);
     const [max, setMax] = useState<number>(null!);
+    const [staggered, setStaggered] = useState<boolean>(true);
     // const [selectedIndex, _setLocalSelectedIndex] = useState<number | null>(0);
     // const [tabbableIndex, _setLocalTabbableIndex] = useState<number | null>(0);
 
@@ -35,6 +36,7 @@ export const DemoUseRovingTabIndex = memo(() => {
         },
         paginatedChildrenParameters: { paginationMin: min, paginationMax: max },
         sortableChildrenParameters: { compare: useCallback((rhs: CustomInfoType, lhs: CustomInfoType) => { return lhs.index - rhs.index }, []) },
+        staggeredChildrenParameters: { staggered }
     });
 
 
@@ -89,6 +91,7 @@ export const DemoUseRovingTabIndex = memo(() => {
             <label>Imperatively set the selected index to: <input type="number" onInput={e => { e.preventDefault(); changeSelectedIndex(e.currentTarget.valueAsNumber); }} /></label>
             <label>Pagination window starts at: <input type="number" value={min} min={0} max={max} onInput={e => { e.preventDefault(); setMin(e.currentTarget.valueAsNumber); }} /></label>
             <label>Pagination window ends at: <input type="number" value={max} min={min} max={count} onInput={e => { e.preventDefault(); setMax(e.currentTarget.valueAsNumber); }} /></label>
+            <label>Stagger delay: <input type="checkbox" checked={staggered} onInput={e => { e.preventDefault(); setStaggered(e.currentTarget.checked); }} /></label>
             <label>Selection mode:
                 <label><input name="rti-demo-selection-mode" type="radio" checked={selectionMode == 'focus'} onInput={e => { e.preventDefault(); setSelectionMode("focus"); }} /> On focus</label>
                 <label><input name="rti-demo-selection-mode" type="radio" checked={selectionMode == 'activation'} onInput={e => { e.preventDefault(); setSelectionMode("activation"); }} /> On activation (click, tap, Enter, Space, etc.)</label>
@@ -129,7 +132,9 @@ const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
         props,
         rovingTabIndexChildReturn: { tabbable, propsUnstable: p2 },
         singleSelectionChildReturn: { selected, selectedOffset },
-        paginatedChildReturn: { paginatedVisible }
+        paginatedChildReturn: { isPaginated, paginatedVisible },
+        staggeredChildReturn: { isStaggered, staggeredVisible }
+        
     } = useCompleteListNavigationChild<HTMLLIElement, CustomInfoType, never>({
         managedChildParameters: { index },
         rovingTabIndexChildParameters: { hidden },
@@ -192,6 +197,6 @@ const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
         const props = useMergedProps<HTMLLIElement>(p2, p3, p4, p5, p6);*/
 
     return (
-        <li {...props} style={paginatedVisible? {} : { opacity: 0.25 }}>{text}<input {...useMergedProps(p2, { type: "number" }) as any} style={{ width: "5ch" }} /></li>
+        <li {...props} style={{ opacity: isPaginated? paginatedVisible? 1 : 0.25 : 1, transform: `translateX(${staggeredVisible? isStaggered? "50%" : "0%" : "0%"})` }}>{text}<input {...useMergedProps(p2, { type: "number" }) as any} style={{ width: "5ch" }} /></li>
     )
 }));

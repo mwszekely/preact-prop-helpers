@@ -405,7 +405,8 @@ export const DemoUseGrid = memo(() => {
             getIndex: useCallback<GetIndex<{ index: number }>>((a: VNode<{ index: number }>) => a.props.index, [])
         },
         sortableChildrenParameters: { compare: useCallback((rhs: CustomGridInfo, lhs: CustomGridInfo) => { return lhs.index - rhs.index }, []) },
-        paginatedChildrenParameters: { paginationMin: null, paginationMax: null }
+        paginatedChildrenParameters: { paginationMin: null, paginationMax: null },
+        staggeredChildrenParameters: { staggered: true }
     });
 
     const {
@@ -609,6 +610,8 @@ function DemoThrottleDebounce() {
 }*/
 
 const Component = () => {
+        return <DemoUseRovingTabIndex />;
+
     return <div class="flex" style={{ flexWrap: "wrap" }}>
         <DemoPress remaining={2} />
         <input />

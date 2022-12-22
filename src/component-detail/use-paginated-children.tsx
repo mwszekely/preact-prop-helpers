@@ -1,10 +1,10 @@
-import { UseManagedChildParameters, UseManagedChildrenReturnType } from "../preact-extensions/use-managed-children";
-import { useStableCallback } from "../preact-extensions/use-stable-callback";
-import { useLayoutEffect, useRef, useState } from "preact/hooks";
-import { UseLinearNavigationParameters, UseLinearNavigationReturnType } from "./use-linear-navigation";
-import { UseRovingTabIndexChildInfo } from "./use-roving-tabindex";
-import { UseCompleteListNavigationChildInfo } from "component-use/use-list-navigation-complete";
 import { h } from "preact";
+import { useStableObject } from "../preact-extensions/use-stable-getter";
+import { useLayoutEffect, useRef, useState } from "preact/hooks";
+import { UseManagedChildrenReturnType } from "../preact-extensions/use-managed-children";
+import { useStableCallback } from "../preact-extensions/use-stable-callback";
+import { UseLinearNavigationParameters } from "./use-linear-navigation";
+import { UseRovingTabIndexChildInfo } from "./use-roving-tabindex";
 
 export interface UsePaginatedChildrenInfo<E extends Element> extends UseRovingTabIndexChildInfo<E> {
     setParentIsPaginated(parentIsPaginated: boolean): void;
@@ -19,7 +19,7 @@ export interface UsePaginatedChildrenParameters<E extends Element, M extends Use
 }
 
 export interface UsePaginatedChildContext {
-    paginatedChild: { getDefaultPaginationVisible(i: number): boolean; }
+    paginatedChildContext: { getDefaultPaginationVisible(i: number): boolean; }
 }
 
 export interface UsePaginatedChildrenReturnType {
@@ -35,12 +35,13 @@ export interface UsePaginatedChildrenReturnType {
          */
         childCount: number | null;
     };
+    context: UsePaginatedChildContext;
 }
 
 export function usePaginatedChildren<E extends Element, M extends UsePaginatedChildrenInfo<E>>({
     managedChildrenReturn,
     linearNavigationParameters: { indexDemangler, indexMangler },
-    paginatedChildrenParameters: { paginationMax, paginationMin } }: UsePaginatedChildrenParameters<E, M>) {
+    paginatedChildrenParameters: { paginationMax, paginationMin } }: UsePaginatedChildrenParameters<E, M>): UsePaginatedChildrenReturnType {
 
     const [childCount, setChildCount] = useState(null as number | null);
     const parentIsPaginated = (paginationMin != null || paginationMax != null);
@@ -63,6 +64,11 @@ export function usePaginatedChildren<E extends Element, M extends UsePaginatedCh
     }, [paginationMax, paginationMin]);
 
     return {
+        context: useStableObject({
+            paginatedChildContext: useStableObject({
+                getDefaultPaginationVisible: useStableCallback((i) => { return parentIsPaginated? (i >= (paginationMin ?? -Infinity) && i < (paginationMax ?? Infinity)) : true; })
+            })
+        }),
         managedChildrenParameters: {
             onChildCountChange: useStableCallback((count: number) => {
                 if (paginationMax != null || paginationMin != null) {
@@ -86,8 +92,9 @@ export function usePaginatedChildren<E extends Element, M extends UsePaginatedCh
 
 
 
-export interface UsePaginatedChildParameters extends UsePaginatedChildContext {
+export interface UsePaginatedChildParameters {
     managedChildParameters: { index: number; }
+    context: UsePaginatedChildContext;
 }
 
 export interface UsePaginatedChildReturn<ChildElement extends Element> {
@@ -100,15 +107,15 @@ export interface UsePaginatedChildReturn<ChildElement extends Element> {
 }
 
 
-export function usePaginatedChild<ChildElement extends Element>({ managedChildParameters: { index }, paginatedChild: { getDefaultPaginationVisible } }: UsePaginatedChildParameters): UsePaginatedChildReturn<ChildElement> {
+export function usePaginatedChild<ChildElement extends Element>({ managedChildParameters: { index }, context: { paginatedChildContext: { getDefaultPaginationVisible } } }: UsePaginatedChildParameters): UsePaginatedChildReturn<ChildElement> {
     const [parentIsPaginated, setParentIsPaginated] = useState(false);
     const [childCountIfPaginated, setChildCountIfPaginated] = useState(null as number | null);
     const [paginatedVisible, setPaginatedVisible] = useState(false);
 
     useLayoutEffect(() => {
-
         setPaginatedVisible(getDefaultPaginationVisible(index));
     }, [index])
+//    useLayoutEffect(() => { setPaginationVisible(getDefaultPaginationVisible(index)); }, [index])
     
     return {
         props: !parentIsPaginated ? {} : (({ "aria-setsize": childCountIfPaginated ?? undefined, "aria-posinset": (index + 1) } as h.JSX.HTMLAttributes<ChildElement>)),
