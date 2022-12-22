@@ -183,6 +183,7 @@ export function useCompleteListNavigationChild<ChildElement extends Element, M e
     sortableChildParameters: { getSortValue },
     ..._void
 }: UseCompleteListNavigationChildParameters<ChildElement, M, ExtraOmits>): UseCompleteListNavigationChildReturnType<ChildElement, M> {
+    console.log(`CHILD_${managedChildParameters.index}_${+new Date()}`)
     const { index } = managedChildParameters;
     const { managedChildParameters: { setChildCountIfPaginated, setPaginationVisible, setParentIsPaginated }, paginatedChildReturn, paginatedChildReturn: { paginatedVisible, isPaginated }, props: paginationProps } = usePaginatedChild<ChildElement>({ managedChildParameters: { index } , context: { paginatedChildContext } })
     const { managedChildParameters: { setParentIsStaggered, setStaggeredVisible }, props: staggeredProps, staggeredChildReturn, staggeredChildReturn: { isStaggered, staggeredVisible } } = useStaggeredChild<ChildElement>({ managedChildParameters, context: { staggeredChildContext } });

@@ -5789,7 +5789,6 @@ var bundle = function (exports) {
       timeoutHandle.current = setTimeout(() => {
         // We've gone this long without hearing the next child mount itself...
         // We need to continue.
-        console.log("Emergency timeout fired, target index is ".concat(getTargetStaggerIndex()));
         timeoutHandle.current = -1;
         setDisplayedStaggerIndex(c => {
           var _getTargetStaggerInde;
@@ -5801,17 +5800,14 @@ var bundle = function (exports) {
     // Each child simply sets this to the highest value ever seen.
     // TODO: When unmounting children, we should reset this, but that requires us to track total # of children
     const [getTargetStaggerIndex, setTargetStaggerIndex] = usePassiveState(useStableCallback((newIndex, prevIndex) => {
-      console.log("Change target from ".concat(prevIndex !== null && prevIndex !== void 0 ? prevIndex : "null", " to ").concat(newIndex !== null && newIndex !== void 0 ? newIndex : null));
       // Any time our target changes,
       // ensure our timeout is running, and start a new one if not
       // For any newly mounted children, make sure they're aware of if they should consider themselves staggered or not
       for (let i = prevIndex !== null && prevIndex !== void 0 ? prevIndex : 0; i < (newIndex !== null && newIndex !== void 0 ? newIndex : 0); ++i) {
         var _managedChildrenRetur;
-        console.log("Child #".concat(i, " is visible now"));
         (_managedChildrenRetur = managedChildrenReturn.getChildren().getAt(i)) === null || _managedChildrenRetur === void 0 ? void 0 : _managedChildrenRetur.setParentIsStaggered(parentIsStaggered);
       }
       if (timeoutHandle.current == -1) {
-        console.log("TC: Running immediate mount logic, displayed index is ".concat(getDisplayedStaggerIndex()));
         resetEmergencyTimeout();
         // If there's no timeout running, then that also means we're not waiting for a child to mount.
         // So ask a child to mount and then wait for that child to mount.
@@ -5821,7 +5817,6 @@ var bundle = function (exports) {
     //const [getTimeoutHandle, setTimeoutHandle] = usePassiveState<number | null, Event>(null, returnNull);
     const [getDisplayedStaggerIndex, setDisplayedStaggerIndex] = usePassiveState(useStableCallback((newIndex, prevIndex) => {
       var _getTargetStaggerInde2;
-      console.log("Change displayed from ".concat(prevIndex !== null && prevIndex !== void 0 ? prevIndex : "null", " to ").concat(newIndex !== null && newIndex !== void 0 ? newIndex : null));
       if (newIndex == null) {
         return;
       }
@@ -5834,7 +5829,6 @@ var bundle = function (exports) {
       // Also make sure that anyone we skipped somehow show themselves as well.
       for (let i = prevIndex !== null && prevIndex !== void 0 ? prevIndex : 0; i < newIndex; ++i) {
         var _managedChildrenRetur2;
-        console.log("Child #".concat(i, " is visible now"));
         (_managedChildrenRetur2 = managedChildrenReturn.getChildren().getAt(i)) === null || _managedChildrenRetur2 === void 0 ? void 0 : _managedChildrenRetur2.setStaggeredVisible(true);
       }
       // Set a new emergency timeout
@@ -5846,7 +5840,6 @@ var bundle = function (exports) {
     }), returnNull);
     const parentIsStaggered = staggered != null;
     const childCallsThisToTellTheParentToMountTheNextOne = useStableCallback(index => {
-      console.log("MountNext: by ".concat(index));
       setDisplayedStaggerIndex(s => {
         var _getTargetStaggerInde3;
         return Math.min((_getTargetStaggerInde3 = getTargetStaggerIndex()) !== null && _getTargetStaggerInde3 !== void 0 ? _getTargetStaggerInde3 : 0, 1 + Math.max(s !== null && s !== void 0 ? s : 0, index + 1));
@@ -5858,7 +5851,6 @@ var bundle = function (exports) {
       //    childCallsThisToTellTheParentToMountTheNextOne(-1);
     }, [parentIsStaggered]);
     const childCallsThisToTellTheParentTheHighestIndex = T$1(mountedIndex => {
-      console.log("HighestIndex: ".concat(mountedIndex));
       setTargetStaggerIndex(i => Math.max(i !== null && i !== void 0 ? i : 0, 1 + mountedIndex));
     }, []);
     return {
@@ -5899,14 +5891,10 @@ var bundle = function (exports) {
         }
       }
     } = _ref30;
-    const [parentIsStaggered, setParentIsStaggered] = p(false);
-    const [staggeredVisible, setStaggeredVisible] = p(false);
-    console.log("Render staggered child #".concat(index, " with ").concat(parentIsStaggered.toString(), " and ").concat(staggeredVisible.toString()));
+    const [parentIsStaggered, setParentIsStaggered] = p(getDefaultIsStaggered(index));
+    const [staggeredVisible, setStaggeredVisible] = p(getDefaultStaggeredVisible(index));
     s(() => {
       childCallsThisToTellTheParentTheHighestIndex(index);
-      console.log("Child #".concat(index, " has mounted and visibility is ").concat(getDefaultStaggeredVisible(index).toString()));
-      setStaggeredVisible(getDefaultStaggeredVisible(index));
-      setParentIsStaggered(getDefaultIsStaggered(index));
     }, [index]);
     h(() => {
       if (parentIsStaggered && staggeredVisible) childCallsThisToTellTheParentToMountTheNextOne(index);
@@ -6002,10 +5990,7 @@ var bundle = function (exports) {
     } = _ref32;
     const [parentIsPaginated, setParentIsPaginated] = p(false);
     const [childCountIfPaginated, setChildCountIfPaginated] = p(null);
-    const [paginatedVisible, setPaginatedVisible] = p(false);
-    s(() => {
-      setPaginatedVisible(getDefaultPaginationVisible(index));
-    }, [index]);
+    const [paginatedVisible, setPaginatedVisible] = p(getDefaultPaginationVisible(index));
     //    useLayoutEffect(() => { setPaginationVisible(getDefaultPaginationVisible(index)); }, [index])
     return {
       props: !parentIsPaginated ? {} : {
@@ -7105,6 +7090,7 @@ var bundle = function (exports) {
       },
       ..._void
     } = _ref39;
+    console.log("CHILD_".concat(managedChildParameters.index, "_").concat(+new Date()));
     const {
       index
     } = managedChildParameters;

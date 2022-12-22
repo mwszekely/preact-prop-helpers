@@ -110,11 +110,8 @@ export interface UsePaginatedChildReturn<ChildElement extends Element> {
 export function usePaginatedChild<ChildElement extends Element>({ managedChildParameters: { index }, context: { paginatedChildContext: { getDefaultPaginationVisible } } }: UsePaginatedChildParameters): UsePaginatedChildReturn<ChildElement> {
     const [parentIsPaginated, setParentIsPaginated] = useState(false);
     const [childCountIfPaginated, setChildCountIfPaginated] = useState(null as number | null);
-    const [paginatedVisible, setPaginatedVisible] = useState(false);
+    const [paginatedVisible, setPaginatedVisible] = useState(getDefaultPaginationVisible(index));
 
-    useLayoutEffect(() => {
-        setPaginatedVisible(getDefaultPaginationVisible(index));
-    }, [index])
 //    useLayoutEffect(() => { setPaginationVisible(getDefaultPaginationVisible(index)); }, [index])
     
     return {

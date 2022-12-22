@@ -58,7 +58,6 @@ export function useStaggeredChildren<E extends Element, M extends UseStaggeredCh
         timeoutHandle.current = setTimeout(() => {
             // We've gone this long without hearing the next child mount itself...
             // We need to continue.
-            console.log(`Emergency timeout fired, target index is ${getTargetStaggerIndex()}`);
             timeoutHandle.current = -1;
             setDisplayedStaggerIndex(c => Math.min(getTargetStaggerIndex() ?? 0, (c ?? 0) + 1));
         }, 50)
@@ -68,19 +67,16 @@ export function useStaggeredChildren<E extends Element, M extends UseStaggeredCh
     // Each child simply sets this to the highest value ever seen.
     // TODO: When unmounting children, we should reset this, but that requires us to track total # of children
     const [getTargetStaggerIndex, setTargetStaggerIndex] = usePassiveState<number | null, never>(useStableCallback((newIndex: number | null, prevIndex: number | null | undefined) => {
-        console.log(`Change target from ${prevIndex ?? "null"} to ${newIndex ?? null}`)
         // Any time our target changes,
         // ensure our timeout is running, and start a new one if not
 
 
         // For any newly mounted children, make sure they're aware of if they should consider themselves staggered or not
         for (let i = (prevIndex ?? 0); i < (newIndex ?? 0); ++i) {
-            console.log(`Child #${i} is visible now`)
             managedChildrenReturn.getChildren().getAt(i)?.setParentIsStaggered(parentIsStaggered);
         }
 
         if (timeoutHandle.current == -1) {
-            console.log(`TC: Running immediate mount logic, displayed index is ${getDisplayedStaggerIndex()}`)
             resetEmergencyTimeout();
 
             // If there's no timeout running, then that also means we're not waiting for a child to mount.
@@ -92,7 +88,6 @@ export function useStaggeredChildren<E extends Element, M extends UseStaggeredCh
     //const [getTimeoutHandle, setTimeoutHandle] = usePassiveState<number | null, Event>(null, returnNull);
 
     const [getDisplayedStaggerIndex, setDisplayedStaggerIndex] = usePassiveState<number | null, never>(useStableCallback((newIndex: number | null, prevIndex: number | null | undefined) => {
-        console.log(`Change displayed from ${prevIndex ?? "null"} to ${newIndex ?? null}`);
         if (newIndex == null) {
             return;
         }
@@ -107,7 +102,6 @@ export function useStaggeredChildren<E extends Element, M extends UseStaggeredCh
         // Also make sure that anyone we skipped somehow show themselves as well.
 
         for (let i = (prevIndex ?? 0); i < newIndex; ++i) {
-            console.log(`Child #${i} is visible now`)
             managedChildrenReturn.getChildren().getAt(i)?.setStaggeredVisible(true);
         }
 
@@ -124,7 +118,6 @@ export function useStaggeredChildren<E extends Element, M extends UseStaggeredCh
     const parentIsStaggered = (staggered != null);
 
     const childCallsThisToTellTheParentToMountTheNextOne = useStableCallback((index: number) => {
-        console.log(`MountNext: by ${index}`);
         setDisplayedStaggerIndex(s => Math.min((getTargetStaggerIndex() ?? 0), 1 + (Math.max(s ?? 0, index + 1))));
     });
 
@@ -136,7 +129,6 @@ export function useStaggeredChildren<E extends Element, M extends UseStaggeredCh
     }, [parentIsStaggered]);
 
     const childCallsThisToTellTheParentTheHighestIndex = useCallback((mountedIndex: number) => {
-        console.log(`HighestIndex: ${mountedIndex}`);
         setTargetStaggerIndex(i => Math.max((i ?? 0), 1 + mountedIndex))
     }, []);
 
@@ -183,16 +175,11 @@ export interface UseStaggeredChildReturn<ChildElement extends Element> {
 
 
 export function useStaggeredChild<ChildElement extends Element>({ managedChildParameters: { index }, context: { staggeredChildContext: { childCallsThisToTellTheParentTheHighestIndex, getDefaultIsStaggered, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne } } }: UseStaggeredChildParameters): UseStaggeredChildReturn<ChildElement> {
-    const [parentIsStaggered, setParentIsStaggered] = useState(false);
-    const [staggeredVisible, setStaggeredVisible] = useState(false);
-
-    console.log(`Render staggered child #${index} with ${parentIsStaggered.toString()} and ${staggeredVisible.toString()}`)
+    const [parentIsStaggered, setParentIsStaggered] = useState(getDefaultIsStaggered(index));
+    const [staggeredVisible, setStaggeredVisible] = useState(getDefaultStaggeredVisible(index));
 
     useLayoutEffect(() => {
         childCallsThisToTellTheParentTheHighestIndex(index);
-        console.log(`Child #${index} has mounted and visibility is ${getDefaultStaggeredVisible(index).toString()}`)
-        setStaggeredVisible(getDefaultStaggeredVisible(index));
-        setParentIsStaggered(getDefaultIsStaggered(index));
     }, [index]);
 
     useEffect(() => {
