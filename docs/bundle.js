@@ -7096,7 +7096,6 @@ var bundle = function (exports) {
       },
       ..._void
     } = _ref39;
-    console.log("CHILD_".concat(managedChildParameters.index, "_").concat(+new Date()));
     const {
       index
     } = managedChildParameters;
