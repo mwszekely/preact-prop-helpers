@@ -34,18 +34,21 @@ export interface UseStaggeredChildrenReturnType {
     /*managedChildrenParameters: {
         onChildCountChange: (count: number) => void;
     };*/
+    staggeredChildrenReturn: { stillStaggering: boolean }
     context: UseStaggeredChildContext;
 }
 
 export function useStaggeredChildren<E extends Element, M extends UseStaggeredChildrenInfo<E>>({
     managedChildrenReturn,
     staggeredChildrenParameters: { staggered }
- }: UseStaggeredChildrenParameters<E, M>): UseStaggeredChildrenReturnType {
+}: UseStaggeredChildrenParameters<E, M>): UseStaggeredChildrenReturnType {
 
 
     // By default, when a child mounts, we tell the next child to mount and simply repeat.
     // If a child is missing, however, it will break that chain.
     // To guard against that, we also wait for 50ms, and if it hasn't loaded by then, we just continue as if it did.
+
+    const [currentlyStaggering, setCurrentlyStaggering] = useState(staggered);
 
     const timeoutHandle = useRef(-1);
     const resetEmergencyTimeout = useStableCallback(() => {
@@ -90,8 +93,11 @@ export function useStaggeredChildren<E extends Element, M extends UseStaggeredCh
 
     const [getDisplayedStaggerIndex, setDisplayedStaggerIndex] = usePassiveState<number | null, never>(useStableCallback((newIndex: number | null, prevIndex: number | null | undefined) => {
         console.log(`Change displayed from ${prevIndex ?? "null"} to ${newIndex ?? null}`);
-        if (newIndex == null)
+        if (newIndex == null) {
             return;
+        }
+
+        setCurrentlyStaggering(newIndex >= (getTargetStaggerIndex() ?? 0));
 
         // It's time to show the next child,
         // either because the current one finished mounting,
@@ -135,6 +141,7 @@ export function useStaggeredChildren<E extends Element, M extends UseStaggeredCh
     }, []);
 
     return {
+        staggeredChildrenReturn: { stillStaggering: currentlyStaggering },
         context: useStableObject({
             staggeredChildContext: useStableObject({
                 childCallsThisToTellTheParentToMountTheNextOne,

@@ -5782,6 +5782,7 @@ var bundle = function (exports) {
     // By default, when a child mounts, we tell the next child to mount and simply repeat.
     // If a child is missing, however, it will break that chain.
     // To guard against that, we also wait for 50ms, and if it hasn't loaded by then, we just continue as if it did.
+    const [currentlyStaggering, setCurrentlyStaggering] = p(staggered);
     const timeoutHandle = _(-1);
     const resetEmergencyTimeout = useStableCallback(() => {
       if (timeoutHandle.current != -1) clearTimeout(timeoutHandle.current);
@@ -5819,8 +5820,12 @@ var bundle = function (exports) {
     }), returnNull);
     //const [getTimeoutHandle, setTimeoutHandle] = usePassiveState<number | null, Event>(null, returnNull);
     const [getDisplayedStaggerIndex, setDisplayedStaggerIndex] = usePassiveState(useStableCallback((newIndex, prevIndex) => {
+      var _getTargetStaggerInde2;
       console.log("Change displayed from ".concat(prevIndex !== null && prevIndex !== void 0 ? prevIndex : "null", " to ").concat(newIndex !== null && newIndex !== void 0 ? newIndex : null));
-      if (newIndex == null) return;
+      if (newIndex == null) {
+        return;
+      }
+      setCurrentlyStaggering(newIndex >= ((_getTargetStaggerInde2 = getTargetStaggerIndex()) !== null && _getTargetStaggerInde2 !== void 0 ? _getTargetStaggerInde2 : 0));
       // It's time to show the next child,
       // either because the current one finished mounting,
       // or because our emergency backup timeout fired.
@@ -5843,8 +5848,8 @@ var bundle = function (exports) {
     const childCallsThisToTellTheParentToMountTheNextOne = useStableCallback(index => {
       console.log("MountNext: by ".concat(index));
       setDisplayedStaggerIndex(s => {
-        var _getTargetStaggerInde2;
-        return Math.min((_getTargetStaggerInde2 = getTargetStaggerIndex()) !== null && _getTargetStaggerInde2 !== void 0 ? _getTargetStaggerInde2 : 0, 1 + Math.max(s !== null && s !== void 0 ? s : 0, index + 1));
+        var _getTargetStaggerInde3;
+        return Math.min((_getTargetStaggerInde3 = getTargetStaggerIndex()) !== null && _getTargetStaggerInde3 !== void 0 ? _getTargetStaggerInde3 : 0, 1 + Math.max(s !== null && s !== void 0 ? s : 0, index + 1));
       });
     });
     s(() => {
@@ -5857,6 +5862,9 @@ var bundle = function (exports) {
       setTargetStaggerIndex(i => Math.max(i !== null && i !== void 0 ? i : 0, 1 + mountedIndex));
     }, []);
     return {
+      staggeredChildrenReturn: {
+        stillStaggering: currentlyStaggering
+      },
       context: useStableObject({
         staggeredChildContext: useStableObject({
           childCallsThisToTellTheParentToMountTheNextOne,
@@ -6214,7 +6222,8 @@ var bundle = function (exports) {
     const {
       context: {
         staggeredChildContext
-      }
+      },
+      staggeredChildrenReturn
     } = useStaggeredChildren({
       managedChildrenReturn,
       staggeredChildrenParameters
@@ -6238,6 +6247,7 @@ var bundle = function (exports) {
       props,
       managedChildrenReturn,
       rearrangeableChildrenReturn,
+      staggeredChildrenReturn,
       ...gridNavigationSingleSelectionReturn,
       childrenHaveFocusReturn,
       paginatedChildrenReturn
@@ -7034,7 +7044,8 @@ var bundle = function (exports) {
     const {
       context: {
         staggeredChildContext
-      }
+      },
+      staggeredChildrenReturn
     } = useStaggeredChildren({
       managedChildrenReturn,
       staggeredChildrenParameters
@@ -7058,6 +7069,7 @@ var bundle = function (exports) {
         indexMangler,
         ...rearrangeableChildrenReturn
       },
+      staggeredChildrenReturn,
       paginatedChildrenReturn,
       sortableChildrenReturn,
       linearNavigationReturn,

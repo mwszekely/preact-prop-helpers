@@ -38,11 +38,10 @@ The name (Preact Prop Helpers) comes from the fact that most of these hooks requ
 **`useEvent` when it finally lands is going to make some of these, like `useStableCallback` and _especially_ `useBeforeLayoutEffect` obsolete, or at least make the problems they solve obsolete.**
 
 <table>
-    <thead><tr><th>Hook</th><th>Description</tthd><th>Used by</th></tr></thead>
+    <thead><tr><th>Hook</th><th>Description</tthd><th>Uses/Used by</th></tr></thead>
     <tbody>
     <tr><th colspan="3">"Minimal Assembly Required" hooks for your complex components</th></tr>
-    <tr><td>useCompleteListNavigation</td><td>Navigate through multiple children as **one** component with the arrow keys or a typeahead search. Optionally, one child at a time can be marked as "selected". Optionally, all children can be sorted or arbitrarily reordered.</td><td></td></tr>
-    <tr><td>useCompleteGridNavigation</td><td>useCompleteListNavigation in two dimensions. Sorting and selection apply to the rows only. This is not limited to tables and can be used for complex lists as well.</td><td></td></tr>
+    <tr><td>useCompleteListNavigation/useCompleteGridNavigation</td><td colspan="2">Navigate through multiple children as <strong>one</strong> component with the keyboard (arrow keys, etc.). A combination of the following hooks (all can be disabled): <ul><li>useRovingTabIndex (only one child among all can be tabbed to)</li><li>useLinearNavigation (navigate among children with the arrow keys, page up/down, home/end)</li><li>useTypeaheadNavigation (type to select the child with that name)</li><li>useSortableChildren (sort or arbitrarily rearrange a component's children)</li><li>usePaginatedChildren (Hide/show children except those in a narrow window)</li><li>useStaggeredChildren (Delay mounting a child's children until the one above it has finished)</li></ul></td></tr>
     <tr><td>useModal</td><td>Create an element that (optionally) traps focus and (optionally) can only be closed in response to certain events, such as the Escape key or clicking on a backdrop.</td><td></td></tr>
     <tr><td>usePress</td><td>A higher-level event than onClick for things like buttons that need standardized "press me" interactions.</td><td></td></tr>
     <tr><td>useRandomId/useRandomDualIds</td><td>Give a DOM element a randomly generated ID, and make sure that the other DOM element that references that ID does so properly.</td><td></td></tr>
