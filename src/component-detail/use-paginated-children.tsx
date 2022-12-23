@@ -1,10 +1,11 @@
 import { h } from "preact";
 import { useStableObject } from "../preact-extensions/use-stable-getter";
-import { useCallback, useLayoutEffect, useRef, useState } from "preact/hooks";
+import { useCallback, useLayoutEffect, useRef } from "preact/hooks";
 import { UseManagedChildrenReturnType } from "../preact-extensions/use-managed-children";
 import { UseLinearNavigationParameters } from "./use-linear-navigation";
 import { UseRovingTabIndexChildInfo } from "./use-roving-tabindex";
 import { useStableCallback } from "../preact-extensions/use-stable-callback";
+import { useState } from "../preact-extensions/use-state";
 
 export interface UsePaginatedChildrenInfo<E extends Element> extends UseRovingTabIndexChildInfo<E> {
     setParentIsPaginated(parentIsPaginated: boolean): void;
