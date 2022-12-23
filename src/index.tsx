@@ -48,6 +48,7 @@ export { getFromLocalStorage, PersistentStates, storeToLocalStorage, usePersiste
 export { useStableCallback } from "./preact-extensions/use-stable-callback";
 export { useStableGetter, useStableObject } from "./preact-extensions/use-stable-getter";
 export { useState } from "./preact-extensions/use-state";
+export { useWhatCausedRender } from "./preact-extensions/use-what-caused-render";
 export { ProvideBatchedAnimationFrames, useAnimationFrame, UseAnimationFrameParameters } from "./timing/use-animation-frame";
 export { useInterval, UseIntervalParameters } from "./timing/use-interval";
 export { useTimeout, UseTimeoutParameters } from "./timing/use-timeout";

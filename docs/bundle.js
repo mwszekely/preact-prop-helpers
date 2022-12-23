@@ -7962,6 +7962,57 @@ var bundle = function (exports) {
       }
     };
   }
+  console.log(describeDifferences("", 5, 5));
+  console.log(describeDifferences("", 5, 6));
+  console.log(describeDifferences("", null, undefined));
+  console.log(describeDifferences("", {}, {}));
+  console.log(describeDifferences("", {
+    a: 5
+  }, {
+    a: 5
+  }));
+  console.log(describeDifferences("", {
+    a: 5
+  }, {
+    a: 6
+  }));
+  console.log(describeDifferences("", {
+    a: 5
+  }, {
+    b: 5
+  }));
+  console.log(describeDifferences("", {
+    a: {
+      b: 5
+    }
+  }, {
+    a: {
+      b: 6
+    }
+  }));
+  function describeDifferences(path, lhs, rhs) {
+    if (typeof lhs != typeof rhs) {
+      return [{
+        path,
+        oldValue: lhs,
+        newValue: rhs
+      }];
+    }
+    if (typeof lhs == "number" || typeof lhs == "string" || typeof rhs == "boolean" || lhs == null || rhs == null) {
+      if (lhs != rhs) return [{
+        path,
+        oldValue: lhs,
+        newValue: rhs
+      }];
+    }
+    const allKeys = new Set([...Object.keys(lhs !== null && lhs !== void 0 ? lhs : {}), ...Object.keys(rhs !== null && rhs !== void 0 ? rhs : {})]);
+    return Array.from(allKeys).map(key => describeDifferences(path + "." + key, lhs[key], rhs[key])).flat();
+    /*for (const key of allKeys) {
+        current = describeDifferences(path + ".key", current, lhs[key], rhs[key]);
+    }
+     return current;*/
+  }
+
   B$2(null);
   const RandomWords$1 = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
   const ListNavigationSingleSelectionChildContext = B$2(null);
