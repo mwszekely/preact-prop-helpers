@@ -114,7 +114,7 @@ export function useStaggeredChildren<E extends Element, M extends UseStaggeredCh
 
     }, [/* Must be empty */]), returnNull)
 
-    const parentIsStaggered = (staggered != null);
+    const parentIsStaggered = (!!staggered);
 
     const childCallsThisToTellTheParentToMountTheNextOne = useCallback((index: number) => {
         setDisplayedStaggerIndex(s => Math.min((getTargetStaggerIndex() ?? 0), 1 + (Math.max(s ?? 0, index + 1))));

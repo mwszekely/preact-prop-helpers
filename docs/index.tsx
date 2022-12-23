@@ -405,8 +405,8 @@ export const DemoUseGrid = memo(() => {
             getIndex: useCallback<GetIndex<{ index: number }>>((a: VNode<{ index: number }>) => a.props.index, [])
         },
         sortableChildrenParameters: { compare: useCallback((rhs: CustomGridInfo, lhs: CustomGridInfo) => { return lhs.index - rhs.index }, []) },
-        paginatedChildrenParameters: { paginationMin: null, paginationMax: null },
-        staggeredChildrenParameters: { staggered: true }
+        paginatedChildrenParameters: { paginationMin: 1, paginationMax: 2 },
+        staggeredChildrenParameters: { staggered: false }
     });
 
     const {

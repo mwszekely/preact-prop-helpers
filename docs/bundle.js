@@ -5784,7 +5784,7 @@ var bundle = function (exports) {
     // By default, when a child mounts, we tell the next child to mount and simply repeat.
     // If a child is missing, however, it will break that chain.
     // To guard against that, we also wait for 50ms, and if it hasn't loaded by then, we just continue as if it did.
-    const [currentlyStaggering, setCurrentlyStaggering] = p(staggered);
+    const [currentlyStaggering, setCurrentlyStaggering] = useState(staggered);
     const timeoutHandle = _(-1);
     const resetEmergencyTimeout = T$1(() => {
       if (timeoutHandle.current != -1) clearTimeout(timeoutHandle.current);
@@ -5840,7 +5840,7 @@ var bundle = function (exports) {
           return clearTimeout(handle);
       }*/
     }, [/* Must be empty */]), returnNull);
-    const parentIsStaggered = staggered != null;
+    const parentIsStaggered = !!staggered;
     const childCallsThisToTellTheParentToMountTheNextOne = T$1(index => {
       setDisplayedStaggerIndex(s => {
         var _getTargetStaggerInde3;
@@ -5896,8 +5896,8 @@ var bundle = function (exports) {
         }
       }
     } = _ref30;
-    const [parentIsStaggered, setParentIsStaggered] = p(getDefaultIsStaggered(index));
-    const [staggeredVisible, setStaggeredVisible] = p(getDefaultStaggeredVisible(index));
+    const [parentIsStaggered, setParentIsStaggered] = useState(getDefaultIsStaggered(index));
+    const [staggeredVisible, setStaggeredVisible] = useState(getDefaultStaggeredVisible(index));
     s(() => {
       childCallsThisToTellTheParentTheHighestIndex(index);
     }, [index]);
@@ -5932,7 +5932,7 @@ var bundle = function (exports) {
         paginationMin
       }
     } = _ref31;
-    const [childCount, setChildCount] = p(null);
+    const [childCount, setChildCount] = useState(null);
     const parentIsPaginated = paginationMin != null || paginationMax != null;
     const lastPagination = _({
       paginationMax: null,
@@ -5996,9 +5996,9 @@ var bundle = function (exports) {
         }
       }
     } = _ref32;
-    const [parentIsPaginated, setParentIsPaginated] = p(false);
-    const [childCountIfPaginated, setChildCountIfPaginated] = p(null);
-    const [paginatedVisible, setPaginatedVisible] = p(getDefaultPaginationVisible(index));
+    const [parentIsPaginated, setParentIsPaginated] = useState(false);
+    const [childCountIfPaginated, setChildCountIfPaginated] = useState(null);
+    const [paginatedVisible, setPaginatedVisible] = useState(getDefaultPaginationVisible(index));
     return {
       props: !parentIsPaginated ? {} : {
         "aria-setsize": childCountIfPaginated !== null && childCountIfPaginated !== void 0 ? childCountIfPaginated : undefined,
@@ -7968,8 +7968,8 @@ var bundle = function (exports) {
   const DemoUseRovingTabIndex = R(() => {
     const [selectionMode, setSelectionMode] = useState("activation");
     const [count, setCount] = useState(10);
-    const [min, setMin] = useState(null);
-    const [max, setMax] = useState(null);
+    const [min, setMin] = useState(1);
+    const [max, setMax] = useState(2);
     const [staggered, setStaggered] = useState(true);
     // const [selectedIndex, _setLocalSelectedIndex] = useState<number | null>(0);
     // const [tabbableIndex, _setLocalTabbableIndex] = useState<number | null>(0);
@@ -8818,11 +8818,11 @@ var bundle = function (exports) {
         }, [])
       },
       paginatedChildrenParameters: {
-        paginationMin: null,
-        paginationMax: null
+        paginationMin: 1,
+        paginationMax: 2
       },
       staggeredChildrenParameters: {
-        staggered: true
+        staggered: false
       }
     });
     const {
