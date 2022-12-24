@@ -219,16 +219,17 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
     const { index } = managedChildParameters;
     const {
         managedChildParameters: { setChildCountIfPaginated, setPaginationVisible, setParentIsPaginated },
-        paginatedChildReturn: { paginatedVisible, isPaginated },
+        paginatedChildReturn: { paginatedVisible, isPaginated, hideBecausePaginated },
         props: paginationProps
     } = usePaginatedChild<RowElement>({ managedChildParameters: { index }, context: { paginatedChildContext } });
 
     const {
         managedChildParameters: { setParentIsStaggered, setStaggeredVisible },
-        staggeredChildReturn: { staggeredVisible, isStaggered },
+        staggeredChildReturn: { staggeredVisible, isStaggered, hideBecauseStaggered },
         props: staggeredProps
-    } = useStaggeredChild({ managedChildParameters: { index }, context: { staggeredChildContext } })
+    } = useStaggeredChild<RowElement>({ managedChildParameters: { index }, context: { staggeredChildContext } })
 
+    rovingTabIndexChildParameters.hidden ||= (hideBecausePaginated || hideBecauseStaggered);
 
 
     const getChildren = useCallback(() => managedChildrenReturn.getChildren(), []);
@@ -241,11 +242,6 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
     }, []);
 
     const { refElementReturn } = useRefElement<RowElement>({ refElementParameters: {} });
-
-    if (isPaginated)
-        rovingTabIndexChildParameters.hidden ||= !paginatedVisible;
-    if (isStaggered)
-        rovingTabIndexChildParameters.hidden ||= !staggeredVisible;
 
 
     const r: UseGridNavigationSingleSelectionRowReturnType<RowElement, CellElement> = useGridNavigationSingleSelectionRow<RowElement, CellElement, RM, CM>({
@@ -318,7 +314,8 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
         r.rowAsParentOfCellsReturn.linearNavigationReturn.propsStable,
         r.rowAsParentOfCellsReturn.typeaheadNavigationReturn.propsStable,
         hasCurrentFocusReturn.propsStable,
-        paginationProps
+        paginationProps,
+        staggeredProps
     );
 
     return {
@@ -331,8 +328,8 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
         rowAsChildOfGridReturn: {
             ...rowAsChildOfGridReturn,
             managedChildReturn,
-            staggeredChildReturn: { isStaggered, staggeredVisible },
-            paginatedChildReturn: { isPaginated, paginatedVisible }
+            staggeredChildReturn: { isStaggered, staggeredVisible, hideBecauseStaggered },
+            paginatedChildReturn: { isPaginated, paginatedVisible, hideBecausePaginated }
         },
         hasCurrentFocusReturn
 

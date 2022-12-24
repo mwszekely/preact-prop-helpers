@@ -1,5 +1,5 @@
 import { h } from "preact";
-import { returnNull, returnZero, usePassiveState } from "../preact-extensions/use-passive-state";
+import { returnNull, returnZero, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state";
 import { useStableGetter, useStableObject } from "../preact-extensions/use-stable-getter";
 import { useCallback, useEffect, useLayoutEffect, useRef } from "preact/hooks";
 import { UseManagedChildrenReturnType } from "../preact-extensions/use-managed-children";
@@ -38,6 +38,14 @@ export interface UseStaggeredChildrenReturnType {
     context: UseStaggeredChildContext;
 }
 
+/**
+ * Allows children to each wait until the previous has finished rendering before itself rendering.
+ * 
+ * E.G. Child #3 waits until #2 renders. #2 waits until #1 renders, etc.
+ * 
+ * Note that the child itself will still render, but you can delay rendering *its* children, or
+ * delay other complicated or heavy logic, until the child is no longer staggered.
+ */
 export function useStaggeredChildren<E extends Element, M extends UseStaggeredChildrenInfo<E>>({
     managedChildrenReturn: { getChildren },
     staggeredChildrenParameters: { staggered }
@@ -137,9 +145,11 @@ export function useStaggeredChildren<E extends Element, M extends UseStaggeredCh
             staggeredChildContext: useStableObject({
                 childCallsThisToTellTheParentToMountTheNextOne,
                 childCallsThisToTellTheParentTheHighestIndex,
-                // These are used durong setState, so just once during mount.
+                // These are used during setState, so just once during mount.
                 // It's okay that the dependencies aren't included.
                 // It's more important that these can be called during render.
+                //
+                // (If we switch, this is caught during useLayoutEffect anyway)
                 getDefaultIsStaggered: useCallback(() => {
                     return parentIsStaggered;
                 }, []),
@@ -169,8 +179,15 @@ export interface UseStaggeredChildParameters {
 export interface UseStaggeredChildReturn<ChildElement extends Element> {
     props: h.JSX.HTMLAttributes<ChildElement>;
     staggeredChildReturn: {
-        staggeredVisible: boolean;
+        /** Whether the parent has indicated that all of its children, including this one, are staggered. */
         isStaggered: boolean;
+        staggeredVisible: boolean;
+        /** 
+         * If this is true, you should delay showing *your* children or running other heavy logic until this becomes false.
+         * 
+         * Can be as simple as `<div>{hideBecauseStaggered? null : children}</div>`
+         *  */
+        hideBecauseStaggered: boolean;
     };
     managedChildParameters: Pick<UseStaggeredChildrenInfo<ChildElement>, "setParentIsStaggered" | "setStaggeredVisible">
 }
@@ -191,7 +208,7 @@ export function useStaggeredChild<ChildElement extends Element>({ managedChildPa
 
     return {
         props: !parentIsStaggered ? {} : { "aria-busy": (!staggeredVisible).toString() } as {},
-        staggeredChildReturn: { staggeredVisible, isStaggered: parentIsStaggered },
+        staggeredChildReturn: { staggeredVisible, isStaggered: parentIsStaggered, hideBecauseStaggered: parentIsStaggered? !staggeredVisible : false },
         managedChildParameters: {
             setStaggeredVisible: setStaggeredVisible,
             setParentIsStaggered,

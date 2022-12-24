@@ -10,22 +10,13 @@ export function useWhatCausedRender(allPropsAndState: any) {
     });
 }
 
-console.log(describeDifferences("", 5, 5))
-console.log(describeDifferences("", 5, 6))
-console.log(describeDifferences("", null, undefined))
-console.log(describeDifferences("", {}, {}))
-console.log(describeDifferences("", { a: 5 }, { a: 5 }))
-console.log(describeDifferences("", { a: 5 }, { a: 6 }))
-console.log(describeDifferences("", { a: 5 }, { b: 5 }))
-console.log(describeDifferences("", { a: { b: 5 } }, { a: { b: 6 } }))
-
-interface Foo {
+interface DifferenceInfo {
     path: string;
     oldValue: unknown;
     newValue: unknown;
 }
 
-function describeDifferences(path: string, lhs: any, rhs: any): Foo[] {
+function describeDifferences(path: string, lhs: any, rhs: any): DifferenceInfo[] {
     if (typeof lhs != typeof rhs) {
         return [{ path, oldValue: lhs, newValue: rhs }];
     }
@@ -35,10 +26,5 @@ function describeDifferences(path: string, lhs: any, rhs: any): Foo[] {
     }
 
     const allKeys = new Set([...Object.keys(lhs ?? {}), ...Object.keys(rhs ?? {})]);
-    return Array.from(allKeys).map(key => describeDifferences(path + "." + key, lhs[key], rhs[key])).flat()
-    /*for (const key of allKeys) {
-        current = describeDifferences(path + ".key", current, lhs[key], rhs[key]);
-    }
-
-    return current;*/
+    return Array.from(allKeys).map(key => describeDifferences(path + "." + key, lhs[key], rhs[key])).flat();
 }

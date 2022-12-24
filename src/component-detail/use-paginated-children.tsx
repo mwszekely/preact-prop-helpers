@@ -68,6 +68,7 @@ export function usePaginatedChildren<E extends Element, M extends UsePaginatedCh
         context: useStableObject({
             paginatedChildContext: useStableObject({
                 // This is only used during setState on mount, so this is fine.
+                // (If we change from paginated to not paginated, this is caught during useLayoutEffect)
                 getDefaultPaginationVisible: useCallback((i) => { return parentIsPaginated ? (i >= (paginationMin ?? -Infinity) && i < (paginationMax ?? Infinity)) : true; }, [])
             })
         }),
@@ -104,6 +105,7 @@ export interface UsePaginatedChildReturn<ChildElement extends Element> {
     paginatedChildReturn: {
         paginatedVisible: boolean;
         isPaginated: boolean;
+        hideBecausePaginated: boolean;
     };
     managedChildParameters: Pick<UsePaginatedChildrenInfo<ChildElement>, "setPaginationVisible" | "setChildCountIfPaginated" | "setParentIsPaginated">
 }
@@ -116,7 +118,7 @@ export function usePaginatedChild<ChildElement extends Element>({ managedChildPa
 
     return {
         props: !parentIsPaginated ? {} : (({ "aria-setsize": childCountIfPaginated ?? undefined, "aria-posinset": (index + 1) } as h.JSX.HTMLAttributes<ChildElement>)),
-        paginatedChildReturn: { paginatedVisible, isPaginated: parentIsPaginated },
+        paginatedChildReturn: { paginatedVisible, isPaginated: parentIsPaginated, hideBecausePaginated: parentIsPaginated? !paginatedVisible : false },
         managedChildParameters: {
             setPaginationVisible: setPaginatedVisible,
             setChildCountIfPaginated,

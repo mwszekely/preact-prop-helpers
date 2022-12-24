@@ -184,13 +184,11 @@ export function useCompleteListNavigationChild<ChildElement extends Element, M e
     ..._void
 }: UseCompleteListNavigationChildParameters<ChildElement, M, ExtraOmits>): UseCompleteListNavigationChildReturnType<ChildElement, M> {
     const { index } = managedChildParameters;
-    const { managedChildParameters: { setChildCountIfPaginated, setPaginationVisible, setParentIsPaginated }, paginatedChildReturn, paginatedChildReturn: { paginatedVisible, isPaginated }, props: paginationProps } = usePaginatedChild<ChildElement>({ managedChildParameters: { index } , context: { paginatedChildContext } })
-    const { managedChildParameters: { setParentIsStaggered, setStaggeredVisible }, props: staggeredProps, staggeredChildReturn, staggeredChildReturn: { isStaggered, staggeredVisible } } = useStaggeredChild<ChildElement>({ managedChildParameters, context: { staggeredChildContext } });
+    const { managedChildParameters: { setChildCountIfPaginated, setPaginationVisible, setParentIsPaginated }, paginatedChildReturn, paginatedChildReturn: { hideBecausePaginated }, props: paginationProps } = usePaginatedChild<ChildElement>({ managedChildParameters: { index } , context: { paginatedChildContext } })
+    const { managedChildParameters: { setParentIsStaggered, setStaggeredVisible }, staggeredChildReturn, staggeredChildReturn: { hideBecauseStaggered }, props: staggeredProps } = useStaggeredChild<ChildElement>({ managedChildParameters, context: { staggeredChildContext } });
     let { hidden } = rovingTabIndexChildParameters;
-    if (isPaginated)
-        hidden ||= !paginatedVisible;
-    if (isStaggered)
-        hidden ||= !staggeredVisible;
+
+    rovingTabIndexChildParameters.hidden ||= (hideBecausePaginated || hideBecauseStaggered);
 
     let { disabled } = singleSelectionChildParameters;
     if (hidden)
