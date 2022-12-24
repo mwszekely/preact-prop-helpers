@@ -3768,16 +3768,19 @@ var bundle = function (exports) {
       },
       textContentParameters: {
         getText,
-        onTextContentChange
+        onTextContentChange,
+        hidden
       }
     } = _ref12;
     const [getTextContent, setTextContent] = usePassiveState(onTextContentChange, returnNull, runImmediately);
     h(() => {
-      const element = getElement();
-      if (element) {
-        const textContent = getText(element);
-        if (textContent) {
-          setTextContent(textContent);
+      if (!hidden) {
+        const element = getElement();
+        if (element) {
+          const textContent = getText(element);
+          if (textContent) {
+            setTextContent(textContent);
+          }
         }
       }
     });
@@ -3990,6 +3993,7 @@ var bundle = function (exports) {
       },
       textContentParameters: {
         getText,
+        hidden,
         ...void5
       },
       typeaheadNavigationChildContext: {
@@ -4014,6 +4018,7 @@ var bundle = function (exports) {
       },
       textContentParameters: {
         getText,
+        hidden,
         onTextContentChange: T$1(text => {
           if (text) {
             // Find where to insert this item.
@@ -5772,6 +5777,15 @@ var bundle = function (exports) {
       ...lncr
     };
   }
+
+  /**
+   * Allows children to each wait until the previous has finished rendering before itself rendering.
+   *
+   * E.G. Child #3 waits until #2 renders. #2 waits until #1 renders, etc.
+   *
+   * Note that the child itself will still render, but you can delay rendering *its* children, or
+   * delay other complicated or heavy logic, until the child is no longer staggered.
+   */
   function useStaggeredChildren(_ref29) {
     let {
       managedChildrenReturn: {
@@ -5863,9 +5877,11 @@ var bundle = function (exports) {
         staggeredChildContext: useStableObject({
           childCallsThisToTellTheParentToMountTheNextOne,
           childCallsThisToTellTheParentTheHighestIndex,
-          // These are used durong setState, so just once during mount.
+          // These are used during setState, so just once during mount.
           // It's okay that the dependencies aren't included.
           // It's more important that these can be called during render.
+          //
+          // (If we switch, this is caught during useLayoutEffect anyway)
           getDefaultIsStaggered: T$1(() => {
             return parentIsStaggered;
           }, []),
@@ -5910,7 +5926,8 @@ var bundle = function (exports) {
       },
       staggeredChildReturn: {
         staggeredVisible,
-        isStaggered: parentIsStaggered
+        isStaggered: parentIsStaggered,
+        hideBecauseStaggered: parentIsStaggered ? !staggeredVisible : false
       },
       managedChildParameters: {
         setStaggeredVisible: setStaggeredVisible,
@@ -5957,6 +5974,7 @@ var bundle = function (exports) {
       context: useStableObject({
         paginatedChildContext: useStableObject({
           // This is only used during setState on mount, so this is fine.
+          // (If we change from paginated to not paginated, this is caught during useLayoutEffect)
           getDefaultPaginationVisible: T$1(i => {
             return parentIsPaginated ? i >= (paginationMin !== null && paginationMin !== void 0 ? paginationMin : -Infinity) && i < (paginationMax !== null && paginationMax !== void 0 ? paginationMax : Infinity) : true;
           }, [])
@@ -6006,7 +6024,8 @@ var bundle = function (exports) {
       },
       paginatedChildReturn: {
         paginatedVisible,
-        isPaginated: parentIsPaginated
+        isPaginated: parentIsPaginated,
+        hideBecausePaginated: parentIsPaginated ? !paginatedVisible : false
       },
       managedChildParameters: {
         setPaginationVisible: setPaginatedVisible,
@@ -6271,6 +6290,10 @@ var bundle = function (exports) {
         completeGridNavigationRowParameters,
         singleSelectionChildParameters,
         rovingTabIndexChildParameters,
+        rovingTabIndexChildParameters: {
+          hidden
+        },
+        textContentParameters,
         ...rowAsChildOfGridParameters
       },
       rowAsParentOfCellsParameters: {
@@ -6291,7 +6314,8 @@ var bundle = function (exports) {
       },
       paginatedChildReturn: {
         paginatedVisible,
-        isPaginated
+        isPaginated,
+        hideBecausePaginated
       },
       props: paginationProps
     } = usePaginatedChild({
@@ -6309,7 +6333,8 @@ var bundle = function (exports) {
       },
       staggeredChildReturn: {
         staggeredVisible,
-        isStaggered
+        isStaggered,
+        hideBecauseStaggered
       },
       props: staggeredProps
     } = useStaggeredChild({
@@ -6320,6 +6345,8 @@ var bundle = function (exports) {
         staggeredChildContext
       }
     });
+    rovingTabIndexChildParameters.hidden || (rovingTabIndexChildParameters.hidden = hideBecausePaginated || hideBecauseStaggered);
+    singleSelectionChildParameters.disabled || (singleSelectionChildParameters.disabled = rovingTabIndexChildParameters.hidden);
     const getChildren = T$1(() => managedChildrenReturn.getChildren(), []);
     const getHighestChildIndex = T$1(() => getChildren().getHighestIndex(), []);
     const isValid = T$1(i => {
@@ -6332,8 +6359,6 @@ var bundle = function (exports) {
     } = useRefElement({
       refElementParameters: {}
     });
-    if (isPaginated) rovingTabIndexChildParameters.hidden || (rovingTabIndexChildParameters.hidden = !paginatedVisible);
-    if (isStaggered) rovingTabIndexChildParameters.hidden || (rovingTabIndexChildParameters.hidden = !staggeredVisible);
     const r = useGridNavigationSingleSelectionRow({
       rowAsParentOfCellsParameters: {
         ...rowAsParentOfCellsParameters,
@@ -6367,6 +6392,10 @@ var bundle = function (exports) {
         typeaheadNavigationChildContext,
         singleSelectionChildParameters,
         managedChildParameters,
+        textContentParameters: {
+          hidden,
+          ...textContentParameters
+        },
         managedChildrenReturn: {
           getChildren
         }
@@ -6445,7 +6474,7 @@ var bundle = function (exports) {
     const props = useMergedProps(refElementReturn.propsStable,
     // TODO: Rows don't use tabIndex, but just excluding props here is...weird.
     //r.rowAsChildOfGridReturn.rovingTabIndexChildReturn.propsUnstable,
-    r.rowAsChildOfGridReturn.singleSelectionChildReturn.propsUnstable, r.rowAsParentOfCellsReturn.linearNavigationReturn.propsStable, r.rowAsParentOfCellsReturn.typeaheadNavigationReturn.propsStable, hasCurrentFocusReturn.propsStable, paginationProps);
+    r.rowAsChildOfGridReturn.singleSelectionChildReturn.propsUnstable, r.rowAsParentOfCellsReturn.linearNavigationReturn.propsStable, r.rowAsParentOfCellsReturn.typeaheadNavigationReturn.propsStable, hasCurrentFocusReturn.propsStable, paginationProps, staggeredProps);
     return {
       context,
       props,
@@ -6458,11 +6487,13 @@ var bundle = function (exports) {
         managedChildReturn,
         staggeredChildReturn: {
           isStaggered,
-          staggeredVisible
+          staggeredVisible,
+          hideBecauseStaggered
         },
         paginatedChildReturn: {
           isPaginated,
-          paginatedVisible
+          paginatedVisible,
+          hideBecausePaginated
         }
       },
       hasCurrentFocusReturn
@@ -6481,6 +6512,9 @@ var bundle = function (exports) {
         managedChildContext,
         rovingTabIndexChildContext,
         typeaheadNavigationChildContext
+      },
+      rovingTabIndexChildParameters: {
+        hidden
       },
       rovingTabIndexChildParameters,
       textContentParameters,
@@ -6512,7 +6546,10 @@ var bundle = function (exports) {
       typeaheadNavigationChildContext,
       rovingTabIndexChildParameters,
       refElementReturn,
-      textContentParameters
+      textContentParameters: {
+        hidden,
+        ...textContentParameters
+      }
     });
     const {
       hasCurrentFocusReturn
@@ -7108,8 +7145,7 @@ var bundle = function (exports) {
       },
       paginatedChildReturn,
       paginatedChildReturn: {
-        paginatedVisible,
-        isPaginated
+        hideBecausePaginated
       },
       props: paginationProps
     } = usePaginatedChild({
@@ -7125,12 +7161,11 @@ var bundle = function (exports) {
         setParentIsStaggered,
         setStaggeredVisible
       },
-      props: staggeredProps,
       staggeredChildReturn,
       staggeredChildReturn: {
-        isStaggered,
-        staggeredVisible
-      }
+        hideBecauseStaggered
+      },
+      props: staggeredProps
     } = useStaggeredChild({
       managedChildParameters,
       context: {
@@ -7140,8 +7175,7 @@ var bundle = function (exports) {
     let {
       hidden
     } = rovingTabIndexChildParameters;
-    if (isPaginated) hidden || (hidden = !paginatedVisible);
-    if (isStaggered) hidden || (hidden = !staggeredVisible);
+    rovingTabIndexChildParameters.hidden || (rovingTabIndexChildParameters.hidden = hideBecausePaginated || hideBecauseStaggered);
     let {
       disabled
     } = singleSelectionChildParameters;
@@ -7184,7 +7218,10 @@ var bundle = function (exports) {
       singleSelectionContext,
       typeaheadNavigationChildContext,
       refElementReturn,
-      textContentParameters
+      textContentParameters: {
+        hidden,
+        ...textContentParameters
+      }
     });
     const {
       getTabbable,
@@ -7962,57 +7999,6 @@ var bundle = function (exports) {
       }
     };
   }
-  console.log(describeDifferences("", 5, 5));
-  console.log(describeDifferences("", 5, 6));
-  console.log(describeDifferences("", null, undefined));
-  console.log(describeDifferences("", {}, {}));
-  console.log(describeDifferences("", {
-    a: 5
-  }, {
-    a: 5
-  }));
-  console.log(describeDifferences("", {
-    a: 5
-  }, {
-    a: 6
-  }));
-  console.log(describeDifferences("", {
-    a: 5
-  }, {
-    b: 5
-  }));
-  console.log(describeDifferences("", {
-    a: {
-      b: 5
-    }
-  }, {
-    a: {
-      b: 6
-    }
-  }));
-  function describeDifferences(path, lhs, rhs) {
-    if (typeof lhs != typeof rhs) {
-      return [{
-        path,
-        oldValue: lhs,
-        newValue: rhs
-      }];
-    }
-    if (typeof lhs == "number" || typeof lhs == "string" || typeof rhs == "boolean" || lhs == null || rhs == null) {
-      if (lhs != rhs) return [{
-        path,
-        oldValue: lhs,
-        newValue: rhs
-      }];
-    }
-    const allKeys = new Set([...Object.keys(lhs !== null && lhs !== void 0 ? lhs : {}), ...Object.keys(rhs !== null && rhs !== void 0 ? rhs : {})]);
-    return Array.from(allKeys).map(key => describeDifferences(path + "." + key, lhs[key], rhs[key])).flat();
-    /*for (const key of allKeys) {
-        current = describeDifferences(path + ".key", current, lhs[key], rhs[key]);
-    }
-     return current;*/
-  }
-
   B$2(null);
   const RandomWords$1 = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
   const ListNavigationSingleSelectionChildContext = B$2(null);

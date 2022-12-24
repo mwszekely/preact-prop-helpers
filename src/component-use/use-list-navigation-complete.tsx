@@ -152,7 +152,7 @@ export interface UseCompleteListNavigationChildParameters<ChildElement extends E
     context: CompleteListNavigationContext<any, ChildElement, M>;
     pressParameters: UsePressParameters<ChildElement>["pressParameters"];
     singleSelectionChildParameters: UseListNavigationSingleSelectionSortableChildParameters<ChildElement>["singleSelectionChildParameters"];
-    textContentParameters: UseListNavigationSingleSelectionSortableChildParameters<ChildElement>["textContentParameters"];
+    textContentParameters: Omit<UseListNavigationSingleSelectionSortableChildParameters<ChildElement>["textContentParameters"], "hidden">;
     completeListNavigationChildParameters: Omit<M, keyof UseCompleteListNavigationChildInfo<ChildElement> | ExtraOmits>;
     rovingTabIndexChildParameters: UseListNavigationSingleSelectionSortableChildParameters<ChildElement>["rovingTabIndexChildParameters"];
     managedChildParameters: UseListNavigationSingleSelectionSortableChildParameters<ChildElement>["managedChildParameters"];
@@ -211,7 +211,7 @@ export function useCompleteListNavigationChild<ChildElement extends Element, M e
         singleSelectionContext,
         typeaheadNavigationChildContext,
         refElementReturn,
-        textContentParameters
+        textContentParameters: { hidden, ...textContentParameters }
     });
     const { getTabbable, setTabbable, tabbable } = rovingTabIndexChildReturn;
 
