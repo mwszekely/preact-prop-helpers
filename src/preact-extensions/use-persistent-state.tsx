@@ -21,24 +21,27 @@ import { useState } from "./use-state";
  */
 export interface PersistentStates { }
 
-export function getFromLocalStorage<Key extends (keyof PersistentStates) & string>(key: Key, converter: ((input: string) => PersistentStates[Key]) = JSON.parse): PersistentStates[Key] | undefined {
+export function getFromLocalStorage<Key extends (keyof PersistentStates) & string>(key: Key, converter: ((input: string) => PersistentStates[Key]) = JSON.parse): PersistentStates[Key] | null {
     try {
         const item = localStorage.getItem(key);
         if (item == null)
-            return undefined;
+            return null;
         return converter(item);
     }
     catch (e) {
         /* eslint-disable no-debugger */
         debugger;
-        return undefined;
+        return null;
     }
 }
 
 
 export function storeToLocalStorage<Key extends (keyof PersistentStates) & string>(key: Key, value: PersistentStates[Key], converter: ((input: PersistentStates[Key]) => string) = JSON.stringify): void {
     try {
-        localStorage.setItem(key, converter(value));
+        if (value == null)
+            localStorage.removeItem(key);
+        else
+            localStorage.setItem(key, converter(value));
     }
     catch (e) {
         /* eslint-disable no-debugger */
@@ -63,14 +66,14 @@ export function storeToLocalStorage<Key extends (keyof PersistentStates) & strin
  * @param toString 
  * @returns 
  */
-export function usePersistentState<Key extends keyof PersistentStates>(key: Key, initialValue: PersistentStates[Key], fromString: ((value: string) => PersistentStates[Key]) = JSON.parse, toString: ((value: PersistentStates[Key]) => string) = JSON.stringify): [PersistentStates[Key], StateUpdater<PersistentStates[Key]>, () => PersistentStates[Key]] {
-    const [localCopy, setLocalCopy, getLocalCopy] = useState<PersistentStates[Key]>(() => (getFromLocalStorage(key, fromString) ?? initialValue));
+export function usePersistentState<Key extends keyof PersistentStates, T = PersistentStates[Key]>(key: Key | null, initialValue: T, fromString: ((value: string) => T) = JSON.parse, toString: ((value: T) => string) = JSON.stringify): [T, StateUpdater<T>, () => T] {
+    const [localCopy, setLocalCopy, getLocalCopy] = useState<T>(() => ((key ? (getFromLocalStorage(key, fromString as any)) : null) ?? initialValue));
     const getInitialValue = useStableGetter(initialValue);
 
     // Ensure that if our key changes, we also update `localCopy` to match.
     useLayoutEffect(() => {
         if (key) {
-            const newCopy = getFromLocalStorage(key, fromString);
+            const newCopy = getFromLocalStorage(key, fromString as any);
             setLocalCopy(newCopy ?? getInitialValue());
         }
     }, [key])
@@ -105,7 +108,7 @@ export function usePersistentState<Key extends keyof PersistentStates>(key: Key,
     });
 
     const getValue = useStableCallback(() => {
-        const trueValue = !key? undefined : getFromLocalStorage(key, fromString);
+        const trueValue = !key ? undefined : getFromLocalStorage(key, fromString as any);
         return trueValue ?? localCopy;
     });
 
