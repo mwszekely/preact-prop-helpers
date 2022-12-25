@@ -1,12 +1,21 @@
 import { useEffect, useRef } from "preact/hooks";
 
-export function useWhatCausedRender(who: string, allPropsAndState: any) {
-    const prev = useRef<any>(undefined!);
+export function useWhatCausedRender(who: string, { props, state }: { props: any, state: any }) {
+    const prevProps = useRef<any>(undefined!);
+    const prevState = useRef<any>(undefined!);
     useEffect(() => {
-        const differences = describeDifferences(who, allPropsAndState, prev.current, new Set());
-        if (differences.length)
-            console.log(differences);
-        prev.current = allPropsAndState
+        if (prevProps.current != undefined) {
+            const propDifferences = describeDifferences(1, who + ".props", props, prevProps.current, 0);
+            if (propDifferences.length)
+                console.log(propDifferences);
+        }
+        if (prevState.current != undefined) {
+            const stateDifferences = describeDifferences(10, who + ".state", state, prevState.current, 0);
+            if (stateDifferences.length)
+                console.log(stateDifferences);
+        }
+        prevProps.current = props;
+        prevState.current = state;
     });
 }
 
@@ -16,11 +25,11 @@ interface DifferenceInfo {
     newValue: unknown;
 }
 
-function describeDifferences(path: string, lhs: any, rhs: any, seen: Set<any>): DifferenceInfo[] {
-    if (seen.has(lhs) && seen.has(rhs))
+function describeDifferences(maxDepth: number, path: string, lhs: any, rhs: any, depth: number): DifferenceInfo[] {
+    if (depth > maxDepth)
         return [];
-    seen.add(lhs);
-    seen.add(rhs);
+    if (lhs === rhs)
+        return [];
 
     if (typeof lhs != typeof rhs) {
         return [{ path, oldValue: lhs, newValue: rhs }];
@@ -32,6 +41,12 @@ function describeDifferences(path: string, lhs: any, rhs: any, seen: Set<any>): 
             return [];
     }
 
+    // If we're at our max depth, just count this different in and of itself as a difference -- don't recurse down to find why.
+    if (lhs != rhs && depth == maxDepth) {
+        return [{ path, oldValue: lhs, newValue: rhs }];
+    }
+
+    // We don't check for equality -- we just recurse down the property chain.
     const allKeys = new Set([...Object.keys(lhs ?? {}), ...Object.keys(rhs ?? {})]);
-    return Array.from(allKeys).map(key => describeDifferences(path + "." + key, lhs[key], rhs[key], seen)).flat();
+    return Array.from(allKeys).map(key => describeDifferences(maxDepth, path + "." + key, lhs[key], rhs[key], depth + 1)).flat();
 }
