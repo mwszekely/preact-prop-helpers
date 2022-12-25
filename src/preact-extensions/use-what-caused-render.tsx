@@ -1,9 +1,9 @@
 import { useEffect, useRef } from "preact/hooks";
 
-export function useWhatCausedRender(allPropsAndState: any) {
+export function useWhatCausedRender(who: string, allPropsAndState: any) {
     const prev = useRef<any>(undefined!);
     useEffect(() => {
-        const differences = describeDifferences("", allPropsAndState, prev.current);
+        const differences = describeDifferences(who, allPropsAndState, prev.current);
         if (differences.length)
             console.log(differences);
         prev.current = allPropsAndState
