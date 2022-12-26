@@ -8015,10 +8015,10 @@ var bundle = function (exports) {
   const ListNavigationSingleSelectionChildContext = B$2(null);
   const DemoUseRovingTabIndex = R(() => {
     const [selectionMode, setSelectionMode] = useState("activation");
-    const [count, setCount] = useState(10);
+    const [count, setCount] = useState(1000);
     const [min, setMin] = useState(1);
     const [max, setMax] = useState(2);
-    const [staggered, setStaggered] = useState(true);
+    const [staggered, setStaggered] = useState(false);
     // const [selectedIndex, _setLocalSelectedIndex] = useState<number | null>(0);
     // const [tabbableIndex, _setLocalTabbableIndex] = useState<number | null>(0);
     const r = useCompleteListNavigation({
