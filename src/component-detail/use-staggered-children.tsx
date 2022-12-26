@@ -26,7 +26,7 @@ export interface UseStaggeredChildContext {
         childCallsThisToTellTheParentToMountTheNextOne(index: number): void;
         childCallsThisToTellTheParentTheHighestIndex(index: number): void;
         getDefaultStaggeredVisible(i: number): boolean;
-        getDefaultIsStaggered(i: number): boolean;
+        getDefaultIsStaggered(): boolean;
     }
 }
 
@@ -194,7 +194,7 @@ export interface UseStaggeredChildReturn<ChildElement extends Element> {
 
 
 export function useStaggeredChild<ChildElement extends Element>({ managedChildParameters: { index }, context: { staggeredChildContext: { childCallsThisToTellTheParentTheHighestIndex, getDefaultIsStaggered, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne } } }: UseStaggeredChildParameters): UseStaggeredChildReturn<ChildElement> {
-    const [parentIsStaggered, setParentIsStaggered] = useState(getDefaultIsStaggered(index));
+    const [parentIsStaggered, setParentIsStaggered] = useState(getDefaultIsStaggered());
     const [staggeredVisible, setStaggeredVisible] = useState(getDefaultStaggeredVisible(index));
 
     useLayoutEffect(() => {

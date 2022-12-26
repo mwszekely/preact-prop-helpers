@@ -5912,7 +5912,7 @@ var bundle = function (exports) {
         }
       }
     } = _ref30;
-    const [parentIsStaggered, setParentIsStaggered] = useState(getDefaultIsStaggered(index));
+    const [parentIsStaggered, setParentIsStaggered] = useState(getDefaultIsStaggered());
     const [staggeredVisible, setStaggeredVisible] = useState(getDefaultStaggeredVisible(index));
     s(() => {
       childCallsThisToTellTheParentTheHighestIndex(index);
@@ -5962,7 +5962,7 @@ var bundle = function (exports) {
         const visible = i >= (paginationMin !== null && paginationMin !== void 0 ? paginationMin : -Infinity) && i < (paginationMax !== null && paginationMax !== void 0 ? paginationMax : Infinity);
         (_getChildren$getAt3 = getChildren().getAt(indexDemangler(i))) === null || _getChildren$getAt3 === void 0 ? void 0 : _getChildren$getAt3.setParentIsPaginated(parentIsPaginated);
         (_getChildren$getAt4 = getChildren().getAt(indexDemangler(i))) === null || _getChildren$getAt4 === void 0 ? void 0 : _getChildren$getAt4.setPaginationVisible(visible);
-        (_getChildren$getAt5 = getChildren().getAt(indexDemangler(i))) === null || _getChildren$getAt5 === void 0 ? void 0 : _getChildren$getAt5.setChildCountIfPaginated(getChildren().getHighestIndex() + 1);
+        if (visible) (_getChildren$getAt5 = getChildren().getAt(indexDemangler(i))) === null || _getChildren$getAt5 === void 0 ? void 0 : _getChildren$getAt5.setChildCountIfPaginated(getChildren().getHighestIndex() + 1);
       }
     }, [/* Must be empty */]);
     s(() => {
@@ -5973,6 +5973,16 @@ var bundle = function (exports) {
     return {
       context: useStableObject({
         paginatedChildContext: useStableObject({
+          // These are used during setState, so just once during mount.
+          // It's okay that the dependencies aren't included.
+          // It's more important that these can be called during render.
+          //
+          // (If we switch, this is caught during useLayoutEffect anyway,
+          // which does incur a performance penalty, but only if we switch,
+          // at least, instead of every time)
+          getDefaultIsPaginated: T$1(() => {
+            return parentIsPaginated;
+          }, []),
           // This is only used during setState on mount, so this is fine.
           // (If we change from paginated to not paginated, this is caught during useLayoutEffect)
           getDefaultPaginationVisible: T$1(i => {
@@ -6010,11 +6020,12 @@ var bundle = function (exports) {
       },
       context: {
         paginatedChildContext: {
-          getDefaultPaginationVisible
+          getDefaultPaginationVisible,
+          getDefaultIsPaginated
         }
       }
     } = _ref32;
-    const [parentIsPaginated, setParentIsPaginated] = useState(false);
+    const [parentIsPaginated, setParentIsPaginated] = useState(getDefaultIsPaginated());
     const [childCountIfPaginated, setChildCountIfPaginated] = useState(null);
     const [paginatedVisible, setPaginatedVisible] = useState(getDefaultPaginationVisible(index));
     return {

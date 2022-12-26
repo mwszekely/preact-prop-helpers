@@ -32,18 +32,18 @@ function describeDifferences(maxDepth: number, path: string, lhs: any, rhs: any,
         return [];
 
     if (typeof lhs != typeof rhs) {
-        return [{ path, oldValue: lhs, newValue: rhs }];
+        return [{ path, newValue: lhs, oldValue: rhs }];
     }
     if (typeof lhs == "number" || typeof lhs == "string" || typeof rhs == "boolean" || lhs == null || rhs == null) {
         if (lhs != rhs)
-            return [{ path, oldValue: lhs, newValue: rhs }];
+            return [{ path, newValue: lhs, oldValue: rhs }];
         else
             return [];
     }
 
     // If we're at our max depth, just count this different in and of itself as a difference -- don't recurse down to find why.
     if (lhs != rhs && depth == maxDepth) {
-        return [{ path, oldValue: lhs, newValue: rhs }];
+        return [{ path, newValue: lhs, oldValue: rhs }];
     }
 
     // We don't check for equality -- we just recurse down the property chain.

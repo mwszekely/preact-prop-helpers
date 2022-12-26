@@ -20,7 +20,10 @@ export interface UsePaginatedChildrenParameters<E extends Element, M extends Use
 }
 
 export interface UsePaginatedChildContext {
-    paginatedChildContext: { getDefaultPaginationVisible(i: number): boolean; }
+    paginatedChildContext: {
+        getDefaultIsPaginated(): boolean;
+        getDefaultPaginationVisible(i: number): boolean;
+    }
 }
 
 export interface UsePaginatedChildrenReturnType {
@@ -52,9 +55,10 @@ export function usePaginatedChildren<E extends Element, M extends UsePaginatedCh
         const childMax = (getChildren().getHighestIndex() + 1);
         for (let i = 0; i <= childMax; ++i) {
             const visible = (i >= (paginationMin ?? -Infinity) && i < (paginationMax ?? Infinity));
-           getChildren().getAt(indexDemangler(i))?.setParentIsPaginated(parentIsPaginated);
-           getChildren().getAt(indexDemangler(i))?.setPaginationVisible(visible);
-           getChildren().getAt(indexDemangler(i))?.setChildCountIfPaginated(getChildren().getHighestIndex() + 1);
+            getChildren().getAt(indexDemangler(i))?.setParentIsPaginated(parentIsPaginated);
+            getChildren().getAt(indexDemangler(i))?.setPaginationVisible(visible);
+            if (visible)
+                getChildren().getAt(indexDemangler(i))?.setChildCountIfPaginated(getChildren().getHighestIndex() + 1);
         }
 
     }, [/* Must be empty */])
@@ -67,6 +71,16 @@ export function usePaginatedChildren<E extends Element, M extends UsePaginatedCh
     return {
         context: useStableObject({
             paginatedChildContext: useStableObject({
+                // These are used during setState, so just once during mount.
+                // It's okay that the dependencies aren't included.
+                // It's more important that these can be called during render.
+                //
+                // (If we switch, this is caught during useLayoutEffect anyway,
+                // which does incur a performance penalty, but only if we switch,
+                // at least, instead of every time)
+                getDefaultIsPaginated: useCallback(() => {
+                    return parentIsPaginated;
+                }, []),
                 // This is only used during setState on mount, so this is fine.
                 // (If we change from paginated to not paginated, this is caught during useLayoutEffect)
                 getDefaultPaginationVisible: useCallback((i) => { return parentIsPaginated ? (i >= (paginationMin ?? -Infinity) && i < (paginationMax ?? Infinity)) : true; }, [])
@@ -111,14 +125,14 @@ export interface UsePaginatedChildReturn<ChildElement extends Element> {
 }
 
 
-export function usePaginatedChild<ChildElement extends Element>({ managedChildParameters: { index }, context: { paginatedChildContext: { getDefaultPaginationVisible } } }: UsePaginatedChildParameters): UsePaginatedChildReturn<ChildElement> {
-    const [parentIsPaginated, setParentIsPaginated] = useState(false);
+export function usePaginatedChild<ChildElement extends Element>({ managedChildParameters: { index }, context: { paginatedChildContext: { getDefaultPaginationVisible, getDefaultIsPaginated } } }: UsePaginatedChildParameters): UsePaginatedChildReturn<ChildElement> {
+    const [parentIsPaginated, setParentIsPaginated] = useState(getDefaultIsPaginated());
     const [childCountIfPaginated, setChildCountIfPaginated] = useState(null as number | null);
     const [paginatedVisible, setPaginatedVisible] = useState(getDefaultPaginationVisible(index));
 
     return {
         props: !parentIsPaginated ? {} : (({ "aria-setsize": childCountIfPaginated ?? undefined, "aria-posinset": (index + 1) } as h.JSX.HTMLAttributes<ChildElement>)),
-        paginatedChildReturn: { paginatedVisible, isPaginated: parentIsPaginated, hideBecausePaginated: parentIsPaginated? !paginatedVisible : false },
+        paginatedChildReturn: { paginatedVisible, isPaginated: parentIsPaginated, hideBecausePaginated: parentIsPaginated ? !paginatedVisible : false },
         managedChildParameters: {
             setPaginationVisible: setPaginatedVisible,
             setChildCountIfPaginated,
