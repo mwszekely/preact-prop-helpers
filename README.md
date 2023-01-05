@@ -9,17 +9,27 @@ const { offsetHeight, ...otherSizes } = (size ?? {});
 
 // Do something fun with offsetHeight here
 
-return <div {...useElementSizeProps(props)} />
+return <div {...useElementSizeProps(props)}>I'm {offsetHeight} pixels tall!</div>
 ```
-Note that many of these props return an object containing both the hook's "result", if any, but also another "sub-hook" (e.g. `useElementSizeProps`) that needs to be used to modify the props you were going to pass to the `Element`. If you don't use a sub-hook returned by some of these hooks, chances are __nothing will happen, as if you never used the hook at all.__
 
-There are a few reasons:
+This library follows a few conventions:
+* Re-render as few times as possible.  E.G. `useElementSize` doesn't return the size of the element by re-rendering, but you can *choose* to re-render like in the example above. Composite hooks with lots of children (e.g. `useRovingTabIndex`) similarly don't re-render the parent, but provide the means to allow *you* to.
+    * In the case of `useElementSize`, re-rendering is only necessary if you need the result, well, while rendering.  If you just need the result in an event handler, then re-rendering to show nothing new can be a huge waste, especially for common hooks like `useRefElement`.
+* As much as possible, no specific DOM restrictions are imposed and, for hooks with children, those children can be anywhere descendent in the tree (except for `useSortableChildren`). Nesting hooks, even of the same type, is also fine.
+* Organizationally, some hooks exist primarily to be used as a part of a larger hook.  Hooks within the `component-use` folder are generally "ready-to-use" and don't require much passing of parameters back and forth, but are not fully extensible.  Hooks within `component-detail` are the lower-level building blocks that make up those "ready-to-use" complete hooks, but they're much more time-consuming to use.
+    * You can also just copy and paste one of the complete hooks somewhere else and use it as a new building block...
+* Break work up into sub-hooks that can be called in remote locations. E.G. `useRovingTabIndex` returns information that you can toss into a `Context` so that each child can call `useRovingTabIndexChild` with that information, and this can happen pretty much anywhere decendent in the DOM that you'd like.
+* Children provide their data to the parent, never the other way around. E.G. `useListNavigation` can filter children, but it doesn't take an array of which children to filter out; each child reports its own status as filtered/unfiltered, and the parent responds to that.
+    * This means that the child data is *always* the single source of truth, and maps nicely to how components are built and diffed.
+* Be composable; parameters and return types are all typed *very* specifically into single objects (like `return { useRefElementReturn: { getElement } }`) to make swizzling all these different parameters back and forth as foolproof as possible:
+    * Hooks return information in the form of an object with properties named `${hookName}Return`. This is to disambiguate which return values are a result of which hook, especially when one hook itself uses multiple hooks, e.g. list navigation will return `{ rovingTabIndexReturn: { ... }, linearNavigationReturn: { ... } }`.
+    * Hooks take parameters in the form of `${hookName}Parameters: { some: "properties" }` for themselves, or `${hookName}Return` when it requires information from another hook (many, many hooks rely on the return of `useRefElement`, for example). In most cases, you can simply pass the entire `${hookName}Return` directly from one hook to another.
+    * Some returns/parameters are `${hookName}Context`, which must be placed within a `Context` object, then retrieved with `useContext` and passed to the child hook that needs it.
+    * Most hooks return props that must be spread to some DOM element somewhere in order to work. When an individual hook is returning those props, they will in that hook's `${hookName}Return` bag and be named `propsStable` or `propsUnstable`; "stable" refers to both the object itself and the values within it and follows the same rules as stable functions for things like `useEffect`.
+    * Complex, composite hooks (like `useCompleteListNavigation`) will collect all the sub-hooks' props together and bundle them up into a single object called `props` in the root of the returned object (the original props will all still be available in their own objects as `propsUnstable` or whatever; the combined `props` object at the root is for convenience.).
+    * Complex, composite hooks (like `useCompleteListNavigation`) will simiarly collect all the sub-hooks' `Context`s together and bundle them up into a single object called `context` in the root of the returned object.
 
-1. Keeping hook arguments and component props separate.  Any arguments you pass to the initial hook don't get mixed in with the props, making discovery easier, type-checking less complex, and in general just avoiding ambiguities with what any given prop will affect.
-
-2. Allowing for deeper hook composition &ndash; it's not just prop-modifying hooks that can be returned.  See, for example, `useListNavigation`, which returns both a prop-modifying hook, but also a hook that's intented to be called once per child.
-
-3. Type-checking.  Avoiding JSX errors with refs and event handlers in all scenarios relating to keeping the correct `Element` type around is extremely error-prone with enough edge cases to make a circle. By having an outer function that *just* looks for an `Element` type, 95% of all obscure "ref isn't compatible with ref" errors can be prevented.
+The name (Preact Prop Helpers) comes from the fact that most of these hooks require modifying the props that were going to be passed to an element in order to function (generally just the `ref` on those props, but still).  It's since grown in scope to include a bunch of general helper hooks as well (like `useAsync`), but `useMergedProps` truly was the core at one point.
 
 ## Summary of available hooks
 
@@ -27,36 +37,61 @@ There are a few reasons:
 
 **`useEvent` when it finally lands is going to make some of these, like `useStableCallback` and _especially_ `useBeforeLayoutEffect` obsolete, or at least make the problems they solve obsolete.**
 
-|Hook|Description|
-|------|------|
-|`useMergedProps` (& `useMergedClasses`, `useMergedRefs`, `useMergedStyles`, `useMergedChildren`)	|Allows a component to use props from two (or more) separate unrelated sources.|
-|`useChildManager` (& `useChildFlag`)				|Allows for child → parent communication, and more efficient parent → child communication (e.g. telling a single child to change itself instead of rerendering all children).|
-|`useListNavigation` (& `useRovingTabIndex`, `useLinearNavigation`, `useTypeaheadNavigation`)	|Allows a component with children (like a select menu or radio group) to be treated as *one element to be tabbed into/out of*, with arrow keys and typeahead handling the navigation *within* the component.|
-|`useGridNavigation`								|Complement to `useListNavigation` that is 2-dimensional and supports sorting &amp; filtering. |
-|`useAsyncHandler` (& `useAsync`)					|Creates a synchronous event handler from an asynchronous one, and provides the component with the information it needs to display the current async state effectively. `useAsync` is a version that operates on any async function, instead of just event handlers.|
-|`useRefElement`									|Allows a component to use the `Element` that it actually renders.|
-|`useElementSize`									|Allows a component to use its size as part of the rendering process.|
-|`useLogicalDirection`								|Lets a component measure its own "text flow" direction (is the inline direction ltr or rtl? is the block direction vertical or horizontal? etc.), and convert between physical and logical dimensions (e.g. knowing that "inline-start" is equivalent to "left" in this writing mode).|
-|`useHasFocus` (& `useActiveElement`)				|Allows a component to detect if it or its children have focus, and if nothing's focused, additionally detect if it is still the *most recently* focused element.|
-|`useFocusTrap` (& `useBlockingElement`)			|Allows a component to make itself modal so that no interactions outside of it are considered, primarily for dialogs and such, restoring focus when done.|
-|`useDraggable` & `useDroppable`					|Allows a component to quickly implement the Drag & drop API, returning information about the current operation.|
-|`useDocumentClass`                                 |Allows you to add a class to, e.g., the root `<html>` element, and then remove it on unmount automatically.|
-|`useGlobalEventHandler`							|Ensures an event handler is attached to `window`, `document`, etc. as long as the component is mounted.|
-|`useLocalEventHandler`								|Alternate way of attaching/detaching an event handler to the component, primarily for 3rd party APIs.|
-|`useRandomId`										|Allows a component to use a randomly-generated ID. Also lets another component reference whatever ID was used, e.g. in a `for` or `aria-labelledby` prop.|
-|`useSortableChildren`|                             |A component using this hook can re-order its immediate children arbitrarily in response to something.|
-|`useTimeout`, `useInterval`, `useAnimationFrame`	|Runs the specified function (which doesn't need to be stable) with the given delay/interval/on every frame. In particular `useTimeout` is very effective as "`useEffect` but on a delay".|
-|`useStableCallback`								|`useCallback`, but doesn't require dependencies and is always stable. __Cannot be used during render__, only during event handlers, `useLayoutEffect`, etc.|
-|`useStableGetter`									|Allows you to use some variable within `useEffect` or `useCallback` without including it in a dependency array. __Cannot be used during render__, only during event handlers, `useLayoutEffect`, etc.|
-|`useState`											|Identical to the built-in, but returns a third value, `getState`, that is stable everywhere, and __can be used during render__. In general, this is the *only* getter that can be used there.|
-|`usePersistentState`								|Identical to `useState`, but persists across browsing sessions, separate tabs, etc.|
-|`usePassiveState`                                  |Offshoot of `useState` that, instead of re-rendering, runs a `useEffect`-esque effect & cleanup function when the state changes.|
-|`useEffect`, `useLayoutEffect`						|Identical to the built-ins, but provides previous dependency values as well as a list of what exactly changed (mainly useful for debugging). In most cases, the built-ins are just fine.|
-|`useForceUpdate`|Returns a function that forces the component that uses it to re-render itself when called (any children just follow normal diffing rules past that point). The returned function is completely stable.|
-|`useMutationObserver`								|`MutationObserver`, but In a Hook™!|
-|`useMediaQuery`									|Measures if a given media query matches the device or not.|
+<table>
+    <thead><tr><th>Hook</th><th>Description</tthd><th>Uses/Used by</th></tr></thead>
+    <tbody>
+    <tr><th colspan="3">"Minimal Assembly Required" hooks for your complex components</th></tr>
+    <tr><td>useCompleteListNavigation/useCompleteGridNavigation</td><td colspan="2">Navigate through multiple children as <strong>one</strong> component with the keyboard (arrow keys, etc.). A combination of the following hooks (all can be disabled): <ul><li>useRovingTabIndex (only one child among all can be tabbed to)</li><li>useLinearNavigation (navigate among children with the arrow keys, page up/down, home/end)</li><li>useTypeaheadNavigation (type to select the child with that name)</li><li>useSortableChildren (sort or arbitrarily rearrange a component's children)</li><li>usePaginatedChildren (Hide/show children except those in a narrow window)</li><li>useStaggeredChildren (Delay mounting a child's children until the one above it has finished)</li></ul></td></tr>
+    <tr><td>useModal</td><td>Create an element that (optionally) traps focus and (optionally) can only be closed in response to certain events, such as the Escape key or clicking on a backdrop.</td><td></td></tr>
+    <tr><td>usePress</td><td>A higher-level event than onClick for things like buttons that need standardized "press me" interactions.</td><td></td></tr>
+    <tr><td>useRandomId/useRandomDualIds</td><td>Give a DOM element a randomly generated ID, and make sure that the other DOM element that references that ID does so properly.</td><td></td></tr>
+    <tr><th colspan="3">"Some Assembly Required"; these are the building blocks of the above hooks</th></tr>
+    <tr><td>useDismiss</td><td>Listen for user gestures that signal the component using this hook should hide itself, including Escape key presses and clicking away</td><td>useModal</td></tr>
+    <tr><td>useRovingTabIndex</td><td>For composite components where only one child should be focusable/tabbable at any given point.</td><td>useCompleteListNavigation, useCompleteGridNavigation</td></tr>
+    <tr><td>useFocusTrap</td><td>Forces all user interaction to be within one specific DOM node, and restores focus to whatever was focused beforehand when done.</td><td>useModal</td></tr>
+    <tr><td>useListNavigation(Partial/SingleSelection/SingleSelectionSortable)</td><td>Fully-extensible (and <strong>extremely</strong> verbose) alternative to useCompleteListNavigation</td><td>useCompleteListNavigation</td></tr>
+    <tr><td>useGridNavigation(Partial/SingleSelection/SingleSelectionSortable)</td><td>Fully-extensible (and <strong>extremely</strong> verbose) alternative to useCompleteGridNavigation</td><td>useCompleteGridNavigation</td></tr>
+    <tr><td>useLinearNavigation</td><td>For when the user can navigate throuch children using the arrow keys/Page Up &amp; Down/Home &amp; End. Can react to the kinds of arbitrary reordering that useSortableChildren returns. </td><td>useCompleteListNavigation, useCompleteGridNavigation</td></tr>
+    <tr><td>useTypeaheadNavigation</td><td>For when the user can navigate through children by typing the text the child displays.</td><td>useCompleteListNavigation, useCompleteGridNavigation</td></tr>
+    <tr><td>useSortableChildren</td><td>Allows the children of this component to be re-ordered while preserving keys and providing the information that other hooks need to react to this out-of-order information. </td><td>useCompleteListNavigation, useCompleteGridNavigation</td></tr>
+    <tr><td>useSingleSelection</td><td>Anywhere a single child can be selected (lists, tabs, etc.), you can use this. The parent will be given a numeric index (or null) that corresponds to the child that's selected, and it will handle re-rendering the (maximum two) children that need this new information.</td><td>useCompleteListNavigation, useCompleteGridNavigation</td></tr>
+    <tr><th colspan="3">DOM-related hooks</th></tr>
+    <tr><td>useAsyncHandler</td><td>Turn an async function into a normal, sync DOM event handler, plus some extra information like status and run count that you can display to the user.</td><td></td></tr>
+    <tr><td>useBlockingElement</td><td>Forces interaction to be contained within one specific DOM node.</td><td>useFocusTrap</td></tr>
+    <tr><td>useDocumentClass</td><td>Add/remove CSS classes from document-global nodes, like window, document, or body.</td><td></td></tr>
+    <tr><td>useGlobalHandler</td><td>Add/remove event handlers from document-global nodes, like window, document, or body</td><td>useDismiss, usePress, usePersistentState</td></tr>
+    <tr><td>useDraggable &amp; useDroppable</td><td>Add simple drag&amp;drop handlers to your elements.</td></tr>
+    <tr><td>useElementSize</td><td>Query and react to changes in the size of the rendered component</td></tr>
+    <tr><td>useHideScroll</td><td>Hide the body's visible scrollbar and lock the body at the current position with no shifting of layout or viewport</td></tr>
+    <tr><td>useMergedProps(/Styles/Refs/Classes/Children)</td><td>Combined two props-objects from two separate sources into one props-object. Refs, styles, CSS classes, and event handlers are all handled properly. Other properties will optionally warn if conflicts are found.</td><td>Too many to list</td></tr>
+    <tr><td>useRefElement</td><td>Query and react to the DOM element that's rendered by this component.</td><td>Too many to list</td></tr>
+    <tr><td>useTextContent</td><td>Query and react to the text content of the DOM element that's rendered by this component.</td><td>useTypeaheadNavigation</td></tr>
+    <tr><th colspan="3">Hooks that monitor and react to things</th></tr>
+    <tr><td>useActiveElement</td><td>Allows you to track document.activeElement as it moves across the entire page</td><td>useHasLastFocus, useBlockingElement</td></tr>
+    <tr><td>useHasCurrentFocus</td><td>Track if this component is the element that's currently focused (if the body or other interactive element is clicked, then this component would no longer be considred "currently" focused and null would be returned)</td><td>useChildrenHaveFocus, useCompleteListNavigation, useCompleteGridNavigation</td></tr>
+    <tr><td>useHasLastFocus</td><td>Track if this component is the element that was most recently given focus (if the body or other interactive element is clicked, then this component would still be considered as the "last" focused element until a new one is focused)</td></tr>
+    <tr><td>useMediaQuery</td><td>Query and react to anything that can be measured in a CSS Media Query</td></tr>
+    <tr><td>useMutationObserver</td><td>Query and react to anything that can be measured in a <a href="https://developer.mozilla.org/en-US/docs/Web/API/MutationRecord">Mutation Observer</a> (nodes added/removed, text changed, etc)</td></tr>
+    <tr><th colspan="3">Hooks that expand on build-in Preact functionality</th></tr>
+    <tr><td>useAsync</td><td>Turn an async function into a sync one for use with APIs that only handle sync functions, along with additional metainfo about the current state that you can react to.</td><td>useAsyncEffect, useAsyncHandler</td></tr>
+    <tr><td>useAsyncEffect</td><td>Like useEffect, but if the previous async effect is still running, this one is delayed until that one finishes (and all the other useAsync rules).</td></tr>
+    <tr><td>useManagedChildren</td><td>Allows a parent component to react to changes in what its children are doing, when they've mounted/unmounted, etc. Also allows more fine communication between parents and children, or children and other children.</td><td>Too many to list</td></tr>
+    <tr><td>useChildrenFlag</td><td>When you need to have exactly <strong>one or zero</strong> children as "the selected child" or "the focusable child" or "the currently-processing child" or whatever, this hook helps set that up so that at maximum a change in the selected(/whatever) index only results in two children re-rendering themselves.</td><td>useRovingTabIndex, useSingleSelection</td></tr>
+    <tr><td>useForceUpdate</td><td>Returns a stable function that forces <strong>just this</strong> component to re-render itself (children onwards use the normal rendering rules)</td><td>useSortableChildren, usePress</td></tr>
+    <tr><td>usePassiveState</td><td>For when you need to run useState, and even need to run useEffect on changes to your state, but that state might not even be used during rendering and so you don't necessarily want to re-render when that state changes. Like useEffect, you can specify a function that runs when the value changes and returns a cleanup function that is run beforehand the next time.</td><td>Too many to list</td></tr>
+    <tr><td>usePersistentState</td><td>State that is saved to localStorage</td></tr>
+    <tr><td>useStableCallback &amp; useStableGetter</td><td>Allows a function (or any arbitrary value) to be used in any callback/effect without specifiying them as dependencies. The returned functions are perfectly stable, but cannot be called during render, as their values are indeterminate until the commit phase.</td><td>Too many to list</td></tr>
+    <tr><td>useState</td><td>Exactly like the native useState, but with a third element in the returned tuple corresponding to the missing getState function. This function is perfectly stable and can even be called during render (well, you shouldn't call setState and getState both during render, but I argue calling setState during render is a bigger smell).</td><td>Too many to list</td></tr>
+    <tr><th colspan="3">Hooks based around timing</th></tr>
+    <tr><td>useTimeout</td><td>Run some code after after waiting the specified amount of time from the component first rendering, or from any time the component renders if you want. This can be used like useEffect but with a delay very easily.</td><td>useTypeaheadNavigation</td></tr>
+    <tr><td>useInterval</td><td>Like useTimeout, but with a repeating interval instead.</td><td></td></tr>
+    <tr><td>useAnimationFrame</td><td>Run some code on every frame this component is mounted</td><td></td></tr>
+    </tbody>
+</table>
+
 
 # General Purpose Prop Hooks
+(TODO: reorder these under their proper headings)
 
 These hooks can all be used to modify the props that were going to be passed to an element to "enhance" them with special behavior.  `useElementSize`, for example, "enhances" an element with the ability to report its size during render by using its `ref` in a `ResizeObserver`.  `useDraggable` "enhances" an element with the ability to be dragged and report its dragging state during render, etc.
 
@@ -128,10 +163,10 @@ You can either store the element via `setState` and re-render to do something in
 
 ## `useDraggable`, `useDroppable`
 ```tsx
-export function useDraggable<E extends HTMLElement>(args: UseDraggableParameters): UseDraggableReturnType<E>;
+export function useDraggable<E extends Element>(args: UseDraggableParameters): UseDraggableReturnType<E>;
 function useDraggableProps<P extends UseDraggablePropsParameters<E>>(props: P): MergedProps<..., P>;
 
-export function useDroppable<E extends HTMLElement>(args: UseDroppableParameters): UseDroppableReturnType<E>;
+export function useDroppable<E extends Element>(args: UseDroppableParameters): UseDroppableReturnType<E>;
 function useDroppableProps<P extends UseDroppablePropsParameters<E>>(props: P): MergedProps<..., P>;
 ```
 `useDraggable` lets an element provide data that can be dropped somewhere else.  Returns both whether the element is currently being dragged, and the `dropEffect` of whatever it was dropped onto when that happens.  If, for example, the `dropEffect` changes to "move", it means the component should `useEffect` and delete itself however appropriate.
@@ -176,7 +211,7 @@ Works similarly to `useListNavigation`, but for 2-dimensional grid layouts.  `us
 ## `useElementSize`
 
 ```tsx
-export function useElementSize<E extends HTMLElement>({ observeBox, setSize }: UseElementSizeParameters): UseElementSizeReturnType<E>;
+export function useElementSize<E extends Element>({ observeBox, setSize }: UseElementSizeParameters): UseElementSizeReturnType<E>;
 function useElementSizeProps<P extends UseElementSizePropsParameters<T>>(props: P): MergedProps<..., P>;
 ```
 
@@ -206,7 +241,7 @@ Note that this structure can be converted from physical dimensions to logical di
 ## `useRandomId`
 
 ```tsx
-export function useElementSize<E extends HTMLElement>({ observeBox }?: UseElementSizeParameters): UseElementSizeReturnType<E>;
+export function useElementSize<E extends Element>({ observeBox }?: UseElementSizeParameters): UseElementSizeReturnType<E>;
 function useElementSizeProps<P extends UseElementSizePropsParameters<T>>(props: P): MergedProps<..., P>;
 ```
 
@@ -228,9 +263,11 @@ Note that while `useChildManager` is generally a great choice for manipulating d
 
 Allows an element to become modal, stopping any attempt to interact with anything not contained by the element.  Internally utilizes the `inert` attribute, for which a polyfill is provided.  Multiple focus traps can be active at once, managed with a stack based off the `blockingElements` proposal implemented as `useBlockingElement`.
 
-## `useHasFocus`
+## `useHasCurrentFocus`, `useHasLastFocus`
 
-Allows you to inspect if the given element is focused.  Also tracks focus across the page and lets you determine if an inner element instead has focus (uses `contains`, so both may be true at once).
+Allows you to inspect if the given element is focused.  "Current focus" refers to just attaching `focusIn` and `focusOut` events and literally looking at where the user's focus has moved within the element. "Last focus" refers to whatever was most recently focused, disregarding times where the element loses focus but a new element hasn't been given focus yet (e.g. when clicking on the body, "current focus" is lost, but "last focus" remains until a new non-body element is focused).
+
+In either case, you can differentiate between whether or not just the element itself is focused, or the element and/or any element inside of it is focused.
 
 ## `useLogicalDirection`
 
@@ -336,9 +373,11 @@ Very similar to `useStableGetter`; returns a callback that is stable between ren
 
 Like a mashup of `useEffect` and `useState`, `usePassiveEffect` lets you use state that won't (necessarily) cause a re-render when you update the state, but updating the state will cause a specified cleanup function to run.
 
-`usePassiveState` accepts a `useEffect`-esque callback that will run any time the state value changes.  If you hook that up to a normal `setState` call from a normal `useState` hook, it'll act just like regular state again.
+`usePassiveState` accepts a `useEffect`-esque callback that will run any time the state value changes.  If you hook that up to a normal `setState` call from a normal `useState` hook, it'll act just like regular state again.  `usePassiveState` also, like `useEffect`, waits a tick and only runs the handler if there has actually been a change after all the dust settles. 
 
 Effectively, `usePassiveState` lets you choose whether you'd like the state to be "active" (and re-render the component each time it changes), or "passive" (and just make the state available to anyone who asks during an event handler or whatever). 
+
+**NOTE**: Just like the real `useState`, calling `setState` multiple times is debounced until the next tick, and only the latest invocation is considered.
 
 ## `useState`
 

@@ -1,0 +1,15 @@
+{
+    //"comments": false,
+    "presets": [
+        [
+        "@babel/preset-env",
+        {
+                "targets": {
+                    "browsers": "iOS 12"
+                }
+            }
+        ]
+        //,"minify"
+    ],
+    "plugins": ["@babel/plugin-proposal-nullish-coalescing-operator"]
+}
