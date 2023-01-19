@@ -52,5 +52,5 @@ export { useWhatCausedRender } from "./preact-extensions/use-what-caused-render"
 export { ProvideBatchedAnimationFrames, useAnimationFrame, UseAnimationFrameParameters } from "./timing/use-animation-frame";
 export { useInterval, UseIntervalParameters } from "./timing/use-interval";
 export { useTimeout, UseTimeoutParameters } from "./timing/use-timeout";
-export { usePortalChildren } from "./dom-helpers/use-portal-children"
+export { usePortalChildren, PushChild, RemoveChild, UpdateChild, UsePortalChildrenParameters, UsePortalChildrenReturnType } from "./dom-helpers/use-portal-children"
 

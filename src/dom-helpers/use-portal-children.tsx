@@ -6,7 +6,7 @@ import { useState } from "../preact-extensions/use-state";
 import { useStableCallback } from "../preact-extensions/use-stable-callback";
 import { generateRandomId } from "../preact-extensions/use-before-layout-effect";
 
-interface UsePortalChildrenParameters {
+export interface UsePortalChildrenParameters {
     target: string | Element | null;
 }
 
