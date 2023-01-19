@@ -1,7 +1,7 @@
 import { createContext, h, render, VNode } from "preact";
 import { memo } from "preact/compat";
 import { useCallback, useContext, useRef } from "preact/hooks";
-import { GetIndex, GridSingleSelectSortableChildCellInfo, GridSingleSelectSortableChildRowInfo, returnNull, useAnimationFrame, useAsyncHandler, useChildrenHaveFocus, useChildrenHaveFocusChild, UseChildrenHaveFocusChildParameters, UseCompleteGridNavigationReturnType, UseCompleteGridNavigationRowReturnType, useDraggable, useDroppable, useElementSize, useFocusTrap, useHasCurrentFocus, useHasLastFocus, useInterval, useMergedProps, usePress, useRandomDualIds, useRefElement, useStableCallback, useState } from "..";
+import { GetIndex, GridSingleSelectSortableChildCellInfo, GridSingleSelectSortableChildRowInfo, returnNull, useAnimationFrame, useAsyncHandler, useChildrenHaveFocus, useChildrenHaveFocusChild, UseChildrenHaveFocusChildParameters, UseCompleteGridNavigationReturnType, UseCompleteGridNavigationRowReturnType, useDraggable, useDroppable, useElementSize, useFocusTrap, useHasCurrentFocus, useHasLastFocus, useInterval, useMergedProps, usePortalChildren, usePress, useRandomDualIds, useRefElement, useStableCallback, useState } from "..";
 import { ElementSize } from "../dom-helpers/use-element-size";
 //import { useGridNavigation, UseGridNavigationCell, UseGridNavigationRow } from "../use-grid-navigation";
 import { CompleteGridNavigationContext, CompleteGridNavigationRowContext, useCompleteGridNavigation, useCompleteGridNavigationCell, useCompleteGridNavigationRow } from "..";
@@ -254,9 +254,9 @@ const DemoUseAsyncHandler2 = memo(() => {
         resolveCount,
         debouncingAsync,
         debouncingSync
-    } = useAsyncHandler<h.JSX.TargetedEvent<HTMLInputElement>, string>({ 
-        asyncHandler: onInputAsync, 
-        capture: (e: h.JSX.TargetedEvent<HTMLInputElement>) => { e.preventDefault(); return e.currentTarget.value }, 
+    } = useAsyncHandler<h.JSX.TargetedEvent<HTMLInputElement>, string>({
+        asyncHandler: onInputAsync,
+        capture: (e: h.JSX.TargetedEvent<HTMLInputElement>) => { e.preventDefault(); return e.currentTarget.value },
         debounce: debounce == 0 ? undefined : debounce,
         throttle: throttle == 0 ? undefined : throttle
     });
@@ -559,6 +559,7 @@ function DemoLabel() {
     const { propsInput, propsLabel } = useRandomDualIds<HTMLInputElement, HTMLLabelElement>({ randomIdInputParameters: { prefix: "input-", otherReferencerProp: "for" }, randomIdLabelParameters: { prefix: "label-", otherReferencerProp: "aria-labelledby" as never } })
     return (
         <div className="demo">
+            <h2>Labels</h2>
             <input {...propsInput} />
             <label {...propsLabel}>Label</label>
         </div>
@@ -575,6 +576,7 @@ function DemoPress({ remaining }: { remaining: number }) {
     })
     return (
         <div className="demo">
+            <h2>Press</h2>
             <div>Press count: {count}</div>
             <div>Active: {pseudoActive.toString()}</div>
             <div>Long press: {(longPress ?? "null").toString()}</div>
@@ -584,6 +586,24 @@ function DemoPress({ remaining }: { remaining: number }) {
                     {remaining > 0 && <DemoPress remaining={remaining - 1} />}
                 </div>
             </div>
+        </div>
+    )
+}
+
+function DemoPortalChildrenChild() {
+    console.log("Render portal child");
+    return <p>Portal child</p>
+}
+
+function DemoPortalChildren() {
+    const [element, setElement] = useState<HTMLDivElement | null>(null);
+    const { children, pushChild, removeChild, updateChild } = usePortalChildren({ target: element });
+    return (
+        <div className="demo">
+            <h2>Portal children</h2>
+            <button onClick={() => pushChild(<DemoPortalChildrenChild />)}>Push child</button>
+            {children}
+            <div id="demo-portal-target" ref={setElement} />
         </div>
     )
 }
@@ -610,7 +630,6 @@ function DemoThrottleDebounce() {
 }*/
 
 const Component = () => {
-        return <DemoUseRovingTabIndex />;
 
     return <div class="flex" style={{ flexWrap: "wrap" }}>
         <DemoPress remaining={2} />
@@ -621,6 +640,8 @@ const Component = () => {
         </div>
         <hr />
         <DemoLabel />
+        <hr />
+        <DemoPortalChildren />
         <hr />
         <DemoFocus />
         <hr />
