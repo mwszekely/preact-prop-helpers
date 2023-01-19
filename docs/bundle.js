@@ -8771,80 +8771,6 @@ var bundle = function (exports) {
       dropError
     };
   }
-  function useHasLastFocus(args) {
-    const {
-      refElementReturn: {
-        getElement
-      },
-      activeElementParameters: {
-        onLastActiveElementChange,
-        ...activeElementParameters
-      },
-      hasLastFocusParameters: {
-        onLastFocusedChanged,
-        onLastFocusedInnerChanged,
-        ..._void
-      }
-    } = args;
-    useEnsureStability("useHasFocus", onLastFocusedChanged, onLastFocusedInnerChanged);
-    const [getLastFocused, setLastFocused] = usePassiveState(onLastFocusedChanged, returnFalse, runImmediately);
-    const [getLastFocusedInner, setLastFocusedInner] = usePassiveState(onLastFocusedInnerChanged, returnFalse, runImmediately);
-    const {
-      activeElementReturn
-    } = useActiveElement({
-      activeElementParameters: {
-        onLastActiveElementChange: T$1((lastActiveElement, prevLastActiveElement, e) => {
-          const selfElement = getElement();
-          const focused = selfElement != null && selfElement == lastActiveElement;
-          const focusedInner = !!(selfElement !== null && selfElement !== void 0 && selfElement.contains(lastActiveElement));
-          setLastFocused(focused, e);
-          setLastFocusedInner(focusedInner, e);
-          onLastActiveElementChange === null || onLastActiveElementChange === void 0 ? void 0 : onLastActiveElementChange(lastActiveElement, prevLastActiveElement, e);
-        }, []),
-        ...activeElementParameters
-      }
-    });
-    h(() => {
-      return () => {
-        setLastFocused(false);
-        setLastFocusedInner(false);
-      };
-    }, []);
-    return {
-      activeElementReturn,
-      hasLastFocusReturn: {
-        getLastFocused,
-        getLastFocusedInner
-      }
-    };
-  }
-  B$2(null);
-  function useInterval(_ref53) {
-    let {
-      interval,
-      callback
-    } = _ref53;
-    // Get a wrapper around the given callback that's stable
-    const stableCallback = useStableCallback(callback);
-    const getInterval = useStableGetter(interval);
-    h(() => {
-      const interval = getInterval();
-      let lastDelayUsed = interval;
-      if (interval == null) return;
-      // Get a wrapper around the wrapper around the callback
-      // that clears and resets the interval if it changes.
-      const adjustableCallback = () => {
-        stableCallback();
-        const currentInterval = getInterval();
-        if (currentInterval != lastDelayUsed) {
-          clearInterval(handle);
-          if (currentInterval != null) handle = setInterval(adjustableCallback, lastDelayUsed = currentInterval);
-        }
-      };
-      let handle = setInterval(adjustableCallback, interval);
-      return () => clearInterval(handle);
-    }, []);
-  }
 
   /**
    * Very basic hook for a root-level component to use to allow any children within the whole app to push children to a portal somewhere.
@@ -8856,10 +8782,10 @@ var bundle = function (exports) {
    * @param param0
    * @returns
    */
-  function usePortalChildren(_ref54) {
+  function usePortalChildren(_ref53) {
     let {
       target
-    } = _ref54;
+    } = _ref53;
     const [pushChild, setPushChild] = useState(null);
     const [updateChild, setUpdateChild] = useState(null);
     const [removeChild, setRemoveChild] = useState(null);
@@ -8892,12 +8818,12 @@ var bundle = function (exports) {
   /**
    * Implementation
    */
-  function PortalChildren(_ref55) {
+  function PortalChildren(_ref54) {
     let {
       setPushChild,
       setUpdateChild,
       setRemoveChild
-    } = _ref55;
+    } = _ref54;
     const [children, setChildren, getChildren] = useState([]);
     const pushChild = T$1(child => {
       const randomKey = generateRandomId();
@@ -8949,6 +8875,80 @@ var bundle = function (exports) {
     return o$1(p$1, {
       children: children
     });
+  }
+  function useHasLastFocus(args) {
+    const {
+      refElementReturn: {
+        getElement
+      },
+      activeElementParameters: {
+        onLastActiveElementChange,
+        ...activeElementParameters
+      },
+      hasLastFocusParameters: {
+        onLastFocusedChanged,
+        onLastFocusedInnerChanged,
+        ..._void
+      }
+    } = args;
+    useEnsureStability("useHasFocus", onLastFocusedChanged, onLastFocusedInnerChanged);
+    const [getLastFocused, setLastFocused] = usePassiveState(onLastFocusedChanged, returnFalse, runImmediately);
+    const [getLastFocusedInner, setLastFocusedInner] = usePassiveState(onLastFocusedInnerChanged, returnFalse, runImmediately);
+    const {
+      activeElementReturn
+    } = useActiveElement({
+      activeElementParameters: {
+        onLastActiveElementChange: T$1((lastActiveElement, prevLastActiveElement, e) => {
+          const selfElement = getElement();
+          const focused = selfElement != null && selfElement == lastActiveElement;
+          const focusedInner = !!(selfElement !== null && selfElement !== void 0 && selfElement.contains(lastActiveElement));
+          setLastFocused(focused, e);
+          setLastFocusedInner(focusedInner, e);
+          onLastActiveElementChange === null || onLastActiveElementChange === void 0 ? void 0 : onLastActiveElementChange(lastActiveElement, prevLastActiveElement, e);
+        }, []),
+        ...activeElementParameters
+      }
+    });
+    h(() => {
+      return () => {
+        setLastFocused(false);
+        setLastFocusedInner(false);
+      };
+    }, []);
+    return {
+      activeElementReturn,
+      hasLastFocusReturn: {
+        getLastFocused,
+        getLastFocusedInner
+      }
+    };
+  }
+  B$2(null);
+  function useInterval(_ref55) {
+    let {
+      interval,
+      callback
+    } = _ref55;
+    // Get a wrapper around the given callback that's stable
+    const stableCallback = useStableCallback(callback);
+    const getInterval = useStableGetter(interval);
+    h(() => {
+      const interval = getInterval();
+      let lastDelayUsed = interval;
+      if (interval == null) return;
+      // Get a wrapper around the wrapper around the callback
+      // that clears and resets the interval if it changes.
+      const adjustableCallback = () => {
+        stableCallback();
+        const currentInterval = getInterval();
+        if (currentInterval != lastDelayUsed) {
+          clearInterval(handle);
+          if (currentInterval != null) handle = setInterval(adjustableCallback, lastDelayUsed = currentInterval);
+        }
+      };
+      let handle = setInterval(adjustableCallback, interval);
+      return () => clearInterval(handle);
+    }, []);
   }
   const DemoUseInterval = () => {
     const [interval, setInterval] = useState(1000);

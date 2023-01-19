@@ -13,9 +13,9 @@ export interface UsePortalChildrenParameters {
 export interface UsePortalChildrenReturnType {
     children: VNode;
     portalElement: Element | null;
-    pushChild: PushChild;
-    updateChild: UpdateChild;
-    removeChild: RemoveChild;
+    pushChild: PushPortalChild;
+    updateChild: UpdatePortalChild;
+    removeChild: RemovePortalChild;
 }
 
 /**
@@ -30,9 +30,9 @@ export interface UsePortalChildrenReturnType {
  */
 export function usePortalChildren({ target }: UsePortalChildrenParameters) {
 
-    const [pushChild, setPushChild] = useState<PushChild | null>(null);
-    const [updateChild, setUpdateChild] = useState<UpdateChild | null>(null);
-    const [removeChild, setRemoveChild] = useState<RemoveChild | null>(null);
+    const [pushChild, setPushChild] = useState<PushPortalChild | null>(null);
+    const [updateChild, setUpdateChild] = useState<UpdatePortalChild | null>(null);
+    const [removeChild, setRemoveChild] = useState<RemovePortalChild | null>(null);
 
     const pushChildStable = useStableCallback<NonNullable<typeof pushChild>>((child) => {
         return pushChild?.(child) ?? -1;
@@ -60,24 +60,24 @@ export function usePortalChildren({ target }: UsePortalChildrenParameters) {
 
 
 export type StateUpdater<S> = (value: ((prevState: S) => S)) => void;
-export type PushChild = (child: h.JSX.Element) => number;
-export type UpdateChild = (index: number, child: h.JSX.Element) => void;
-export type RemoveChild = (index: number) => void;
+export type PushPortalChild = (child: h.JSX.Element) => number;
+export type UpdatePortalChild = (index: number, child: h.JSX.Element) => void;
+export type RemovePortalChild = (index: number) => void;
 
 
 /**
  * Implementation
  */
-function PortalChildren({ setPushChild, setUpdateChild, setRemoveChild }: { setPushChild: StateUpdater<PushChild | null>, setUpdateChild: StateUpdater<UpdateChild | null>, setRemoveChild: StateUpdater<RemoveChild | null> }) {
+function PortalChildren({ setPushChild, setUpdateChild, setRemoveChild }: { setPushChild: StateUpdater<PushPortalChild | null>, setUpdateChild: StateUpdater<UpdatePortalChild | null>, setRemoveChild: StateUpdater<RemovePortalChild | null> }) {
     const [children, setChildren, getChildren] = useState<h.JSX.Element[]>([]);
-    const pushChild: PushChild | null = useCallback((child: h.JSX.Element) => {
+    const pushChild: PushPortalChild | null = useCallback((child: h.JSX.Element) => {
         const randomKey = generateRandomId();
         let index = getChildren().length;
         setChildren(prev => ([...prev, cloneElement(child, { key: randomKey, index })]));
         return index;
     }, []);
 
-    const updateChild: UpdateChild | null = useCallback((index: number, child: h.JSX.Element) => {
+    const updateChild: UpdatePortalChild | null = useCallback((index: number, child: h.JSX.Element) => {
         const key = getChildren()[index]?.key;
         console.assert(key);
         if (key) {
@@ -90,7 +90,7 @@ function PortalChildren({ setPushChild, setUpdateChild, setRemoveChild }: { setP
         }
     }, []);
 
-    const removeChild: RemoveChild | null = useCallback((index: number) => {
+    const removeChild: RemovePortalChild | null = useCallback((index: number) => {
         const key = getChildren()[index]?.key;
         console.assert(key);
         if (key) {

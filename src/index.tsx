@@ -29,6 +29,7 @@ export { useMergedClasses } from "./dom-helpers/use-merged-classes";
 export { enableLoggingPropConflicts, useMergedProps } from "./dom-helpers/use-merged-props";
 export { useMergedRefs } from "./dom-helpers/use-merged-refs";
 export { useMergedStyles } from "./dom-helpers/use-merged-styles";
+export { PushPortalChild, RemovePortalChild, UpdatePortalChild, usePortalChildren, UsePortalChildrenParameters, UsePortalChildrenReturnType } from "./dom-helpers/use-portal-children";
 export { useRefElement, UseRefElementParameters, UseRefElementReturnType } from "./dom-helpers/use-ref-element";
 export { useActiveElement, UseActiveElementParameters, UseActiveElementReturnType } from "./observers/use-active-element";
 export { useChildrenHaveFocus, useChildrenHaveFocusChild, UseChildrenHaveFocusChildParameters, UseChildrenHaveFocusChildReturnType, UseChildrenHaveFocusParameters, UseChildrenHaveFocusReturnType } from "./observers/use-children-have-focus";
@@ -52,5 +53,4 @@ export { useWhatCausedRender } from "./preact-extensions/use-what-caused-render"
 export { ProvideBatchedAnimationFrames, useAnimationFrame, UseAnimationFrameParameters } from "./timing/use-animation-frame";
 export { useInterval, UseIntervalParameters } from "./timing/use-interval";
 export { useTimeout, UseTimeoutParameters } from "./timing/use-timeout";
-export { usePortalChildren, PushChild, RemoveChild, UpdateChild, UsePortalChildrenParameters, UsePortalChildrenReturnType } from "./dom-helpers/use-portal-children"
 
