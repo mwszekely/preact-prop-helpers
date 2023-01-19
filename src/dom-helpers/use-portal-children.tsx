@@ -12,6 +12,7 @@ interface UsePortalChildrenParameters {
 
 export interface UsePortalChildrenReturnType {
     children: VNode;
+    portalElement: Element | null;
     pushChild: PushChild;
     updateChild: UpdateChild;
     removeChild: RemoveChild;
@@ -52,7 +53,8 @@ export function usePortalChildren({ target }: UsePortalChildrenParameters) {
         children: children,
         pushChild: pushChildStable,
         updateChild: updateChildStable,
-        removeChild: removeChildStable
+        removeChild: removeChildStable,
+        portalElement: element
     }
 }
 

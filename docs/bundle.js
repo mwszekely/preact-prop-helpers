@@ -8885,7 +8885,8 @@ var bundle = function (exports) {
       children: children,
       pushChild: pushChildStable,
       updateChild: updateChildStable,
-      removeChild: removeChildStable
+      removeChild: removeChildStable,
+      portalElement: element
     };
   }
   /**
