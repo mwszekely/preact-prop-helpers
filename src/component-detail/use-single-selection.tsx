@@ -1,6 +1,6 @@
 
 import { h } from "preact";
-import { useCallback, useEffect, useRef } from "preact/hooks";
+import { useCallback, useEffect } from "preact/hooks";
 import { UsePressParameters } from "../component-use/use-press";
 import { UseChildrenHaveFocusChildReturnType, UseChildrenHaveFocusParameters } from "../observers/use-children-have-focus";
 import { useChildrenFlag, UseManagedChildrenReturnType } from "../preact-extensions/use-managed-children";
@@ -117,7 +117,6 @@ export interface UseSingleSelectionChildReturnType<E extends Element> extends Us
     }
     //refElementParameters: Required<Pick<UseRefElementParameters<E>["refElementParameters"], "onElementChange">>;
     managedChildParameters: Pick<SelectableChildInfo<E>, "setLocalSelected">;
-    //managedChildParameters: Pick<UseManagedChildParameters<SelectableChildInfo<E>, never>["managedChildParameters"], "selected" | "setSelected" | "getSelected">;
     pressParameters: Pick<UsePressParameters<E>["pressParameters"], "onPressSync">;
 }
 
@@ -246,17 +245,6 @@ export function useSingleSelectionChild<ChildElement extends Element>(args: UseS
         managedChildParameters: { setLocalSelected: useStableCallback((selected, direction) => {
             setLocalSelected(selected);
             setDirection(direction);
-            /*if (direction == null) {
-                setSelected(false);
-                setDirection(null);
-            }
-            else if (direction == 0) {
-                setSelected(true);
-            }
-            else {
-                setSelected(false);
-                setDirection(direction);
-            }*/
         }) },
         singleSelectionChildReturn: {
             selected: localSelected,

@@ -1,13 +1,8 @@
 import { h } from "preact";
-import { useCallback, useLayoutEffect, useRef } from "preact/hooks";
-import { UseRefElementReturnType } from "../dom-helpers/use-ref-element";
-import { useTextContent, UseTextContentParameters } from "../dom-helpers/use-text-content";
-import { assertEmptyObject } from "../preact-extensions/use-managed-children";
-import { OnPassiveStateChange, usePassiveState } from "../preact-extensions/use-passive-state";
+import { useCallback, useRef } from "preact/hooks";
 import { useStableCallback } from "../preact-extensions/use-stable-callback";
-import { useStableGetter, useStableObject } from "../preact-extensions/use-stable-getter";
-import { useState } from "../preact-extensions/use-state";
-import { UseRovingTabIndexChildParameters, UseRovingTabIndexReturnType } from "./use-roving-tabindex";
+import { useStableGetter } from "../preact-extensions/use-stable-getter";
+import { UseRovingTabIndexReturnType } from "./use-roving-tabindex";
 
 /*
 export function useLinearNavigationProps<E extends Element>(r: UseLinearNavigationReturnTypeInfo<E>, ...otherProps: h.JSX.HTMLAttributes<E>[]): h.JSX.HTMLAttributes<E>[] {
