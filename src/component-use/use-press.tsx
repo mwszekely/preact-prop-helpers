@@ -1,5 +1,5 @@
 import { h } from "preact";
-import { useCallback, useRef } from "preact/hooks";
+import { useCallback } from "preact/hooks";
 import { UseRefElementReturnType } from "../dom-helpers/use-ref-element";
 import { returnFalse, usePassiveState } from "../preact-extensions/use-passive-state";
 import { useStableCallback } from "../preact-extensions/use-stable-callback";
@@ -223,10 +223,10 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
         setPointerDownStartedHere(false);
 
     }, []);
-    const onPointerEnter = useCallback((e: h.JSX.TargetedPointerEvent<E>) => {
+    const onPointerEnter = useCallback((_e: h.JSX.TargetedPointerEvent<E>) => {
         setHovering(true);
     }, [])
-    const onPointerLeave = useCallback((e: h.JSX.TargetedPointerEvent<E>) => {
+    const onPointerLeave = useCallback((_e: h.JSX.TargetedPointerEvent<E>) => {
         setHovering(false);
         setLongPress(false);
     }, []);

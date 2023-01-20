@@ -1,11 +1,10 @@
 import { h } from "preact";
-import { returnNull, returnZero, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state";
-import { useStableGetter, useStableObject } from "../preact-extensions/use-stable-getter";
 import { useCallback, useEffect, useLayoutEffect, useRef } from "preact/hooks";
 import { UseManagedChildrenReturnType } from "../preact-extensions/use-managed-children";
-import { UseLinearNavigationParameters } from "./use-linear-navigation";
-import { UseRovingTabIndexChildInfo } from "./use-roving-tabindex";
+import { returnNull, usePassiveState } from "../preact-extensions/use-passive-state";
+import { useStableObject } from "../preact-extensions/use-stable-getter";
 import { useState } from "../preact-extensions/use-state";
+import { UseRovingTabIndexChildInfo } from "./use-roving-tabindex";
 
 export interface UseStaggeredChildrenInfo<E extends Element> extends UseRovingTabIndexChildInfo<E> {
     setParentIsStaggered(parentIsStaggered: boolean): void;

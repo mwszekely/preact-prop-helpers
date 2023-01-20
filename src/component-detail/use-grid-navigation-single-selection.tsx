@@ -84,7 +84,7 @@ export function useGridNavigationSingleSelectionRow<RowElement extends Element, 
     rowAsParentOfCellsParameters,
     ..._void1
 }: UseGridNavigationSingleSelectionRowParameters<RowElement, CellElement, RM, CM>): UseGridNavigationSingleSelectionRowReturnType<RowElement, CellElement> {
-    const { managedChildParameters, hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ..._void3 }, pressParameters, singleSelectionChildReturn } = useSingleSelectionChild<RowElement>(rowAsChildOfGridParameters);
+    const { managedChildParameters, hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ..._void3 }, singleSelectionChildReturn } = useSingleSelectionChild<RowElement>(rowAsChildOfGridParameters);
     const { rowAsChildOfGridReturn: { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ..._void2 }, gridNavigationRowParameters, rovingTabIndexChildReturn, textContentReturn, ...void4 }, rowAsParentOfCellsReturn } = useGridNavigationRow<RowElement, CellElement, RM, CM>({ rowAsChildOfGridParameters, rowAsParentOfCellsParameters });
     const onCurrentFocusedInnerChanged = useStableCallback<NonNullable<typeof ocfic2>>((focused, prevFocused, e) => { ocfic1?.(focused, prevFocused, e); ocfic2?.(focused, prevFocused, e); })
 

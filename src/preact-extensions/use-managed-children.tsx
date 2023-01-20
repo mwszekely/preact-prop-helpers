@@ -1,5 +1,5 @@
 import { useCallback, useLayoutEffect, useRef } from "preact/hooks";
-import { debounceRendering, OnPassiveStateChange, PassiveStateUpdater, returnZero, runImmediately, useEnsureStability, usePassiveState } from "./use-passive-state";
+import { debounceRendering, OnPassiveStateChange, PassiveStateUpdater, useEnsureStability, usePassiveState } from "./use-passive-state";
 import { useStableCallback } from "./use-stable-callback";
 import { useStableObject } from "./use-stable-getter";
 
@@ -177,7 +177,7 @@ export function useManagedChildren<M extends ManagedChildInfo<string | number>>(
 
     useEnsureStability("useManagedChildren", onAfterChildLayoutEffect, onChildrenMountChange, onChildCountChange);
 
-    const [getMountCount, setMountCount] = usePassiveState(onChildCountChange, returnZero, runImmediately);
+    //const [getMountCount, setMountCount] = usePassiveState(onChildCountChange, returnZero, runImmediately);
 
     const getHighestIndex = useCallback((): number => {
         return managedChildrenArray.current.highestIndex;
@@ -234,7 +234,7 @@ export function useManagedChildren<M extends ManagedChildInfo<string | number>>(
     const remoteULEChildChanged = useCallback((index: IndexType) => {
 
         if (remoteULEChildChangedCausers.current.size == 0) {
-            if (!!onAfterChildLayoutEffect) {
+            if (onAfterChildLayoutEffect != null) {
                 debounceRendering(() => {
                     onAfterChildLayoutEffect?.(remoteULEChildChangedCausers.current);
                     remoteULEChildChangedCausers.current.clear();

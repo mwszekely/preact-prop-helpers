@@ -1,8 +1,8 @@
 import lodashShuffle from "lodash-es/shuffle";
 import { h, VNode } from "preact";
 import { MutableRef, useCallback, useLayoutEffect, useRef } from "preact/hooks";
-import { ManagedChildInfo, ManagedChildren } from "../preact-extensions/use-managed-children";
 import { useForceUpdate } from "../preact-extensions/use-force-update";
+import { ManagedChildInfo, ManagedChildren } from "../preact-extensions/use-managed-children";
 import { returnNull, usePassiveState } from "../preact-extensions/use-passive-state";
 import { useStableGetter } from "../preact-extensions/use-stable-getter";
 

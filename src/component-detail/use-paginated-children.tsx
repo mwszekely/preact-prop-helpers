@@ -1,11 +1,11 @@
 import { h } from "preact";
-import { useStableObject } from "../preact-extensions/use-stable-getter";
 import { useCallback, useLayoutEffect, useRef } from "preact/hooks";
 import { UseManagedChildrenReturnType } from "../preact-extensions/use-managed-children";
+import { useStableCallback } from "../preact-extensions/use-stable-callback";
+import { useStableObject } from "../preact-extensions/use-stable-getter";
+import { useState } from "../preact-extensions/use-state";
 import { UseLinearNavigationParameters } from "./use-linear-navigation";
 import { UseRovingTabIndexChildInfo } from "./use-roving-tabindex";
-import { useStableCallback } from "../preact-extensions/use-stable-callback";
-import { useState } from "../preact-extensions/use-state";
 
 export interface UsePaginatedChildrenInfo<E extends Element> extends UseRovingTabIndexChildInfo<E> {
     setParentIsPaginated(parentIsPaginated: boolean): void;
@@ -15,7 +15,7 @@ export interface UsePaginatedChildrenInfo<E extends Element> extends UseRovingTa
 
 export interface UsePaginatedChildrenParameters<E extends Element, M extends UsePaginatedChildrenInfo<E>> {
     managedChildrenReturn: UseManagedChildrenReturnType<M>["managedChildrenReturn"];
-    linearNavigationParameters: Pick<UseLinearNavigationParameters<any, E>["linearNavigationParameters"], "indexDemangler" | "indexMangler">;
+    linearNavigationParameters: Pick<UseLinearNavigationParameters<any, E>["linearNavigationParameters"], "indexDemangler">;
     paginatedChildrenParameters: { paginationMin: number | null; paginationMax: number | null; }
 }
 
@@ -44,7 +44,7 @@ export interface UsePaginatedChildrenReturnType {
 
 export function usePaginatedChildren<E extends Element, M extends UsePaginatedChildrenInfo<E>>({
     managedChildrenReturn: { getChildren },
-    linearNavigationParameters: { indexDemangler, indexMangler },
+    linearNavigationParameters: { indexDemangler },
     paginatedChildrenParameters: { paginationMax, paginationMin } }: UsePaginatedChildrenParameters<E, M>): UsePaginatedChildrenReturnType {
 
     const [childCount, setChildCount] = useState(null as number | null);

@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo } from "preact/hooks";
 import { useStableCallback } from "./use-stable-callback";
 import { useState } from "./use-state";
 
-type Func = (...args: any) => Promise<unknown> | unknown;
+//type Func = (...args: any) => Promise<unknown> | unknown;
 
 export interface UseAsyncParameters<AP extends unknown[], SP extends unknown[] = AP> {
     /**
@@ -47,7 +47,7 @@ export interface UseAsyncParameters<AP extends unknown[], SP extends unknown[] =
     capture?: CaptureFunctionType<AP, SP>;
 }
 
-export interface UseAsyncReturnType<AP extends unknown[], SP extends unknown[], R> {
+export interface UseAsyncReturnType<SP extends unknown[], R> {
 
     /**
      * When the async handler is currently executing, this is true.
@@ -245,14 +245,14 @@ type CaptureFunctionType<AP extends unknown[], SP extends unknown[] = AP> = (...
  * the parameters the async handler and sync handler expect respectively.
  * 
  */
-export function useAsync<AP extends unknown[], R, SP extends unknown[] = AP>(asyncHandler2: AsyncFunctionType<AP, R> | null, options?: UseAsyncParameters<AP, SP>): UseAsyncReturnType<AP, SP, R> {
+export function useAsync<AP extends unknown[], R, SP extends unknown[] = AP>(asyncHandler2: AsyncFunctionType<AP, R> | null, options?: UseAsyncParameters<AP, SP>): UseAsyncReturnType<SP, R> {
 
 
     // Things related to current execution
     // Because we can both return and throw undefined, 
     // we need separate state to track their existance too.
-    const [pending, setPending, getPending] = useState(false);
-    const [result, setResult, getResult] = useState<R>(undefined!);
+    const [pending, setPending, _getPending] = useState(false);
+    const [result, setResult, _getResult] = useState<R>(undefined!);
     const [error, setError, _getError] = useState<unknown>(undefined!);
     const [hasError, setHasError, _getHasError] = useState<boolean | null>(false);
     const [hasResult, setHasResult, _getHasResult] = useState<boolean | null>(false);

@@ -19,7 +19,7 @@ export interface UseAsyncHandlerParameters<EventType, CaptureType> extends Omit<
     asyncHandler: AsyncHandler<EventType, CaptureType> | null;
 }
 
-export interface UseAsyncHandlerReturnType<EventType, CaptureType> extends Omit<UseAsyncReturnType<[CaptureType, EventType], [EventType], void>, "getCurrentCapture" | "currentCapture"> {
+export interface UseAsyncHandlerReturnType<EventType, CaptureType> extends Omit<UseAsyncReturnType<[EventType], void>, "getCurrentCapture" | "currentCapture"> {
 
     /**
      * The most recently captured value. In other words, represents what

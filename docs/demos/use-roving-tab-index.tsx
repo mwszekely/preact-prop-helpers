@@ -1,6 +1,6 @@
 import { createContext, VNode } from "preact";
 import { memo, useCallback, useContext } from "preact/compat";
-import { GetIndex, UseListNavigationSingleSelectionSortableChildInfo, useMergedProps, useSingleSelectionDeclarative, useStableCallback } from "../../index";
+import { GetIndex, useMergedProps, usePress, useStableCallback } from "../../index";
 
 import { useState } from "../../preact-extensions/use-state";
 
@@ -138,18 +138,24 @@ const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
         rovingTabIndexChildReturn: { tabbable, propsUnstable: p2 },
         singleSelectionChildReturn: { selected, selectedOffset },
         paginatedChildReturn: { hideBecausePaginated },
-        staggeredChildReturn: { hideBecauseStaggered }
-
+        staggeredChildReturn: { hideBecauseStaggered },
+        refElementReturn
     } = useCompleteListNavigationChild<HTMLLIElement, CustomInfoType, never>({
         managedChildParameters: { index },
         rovingTabIndexChildParameters: { hidden },
         sortableChildParameters: { getSortValue },
-        pressParameters: { onPressSync: null, exclude: {}, focusSelf },
         singleSelectionChildParameters: { ariaPropName: "aria-selected", selectionMode, disabled },
-        completeListNavigationChildParameters: { foo: "bar" },
+        completeListNavigationChildParameters: { focusSelf, foo: "bar" },
         context,
         textContentParameters: { getText: useCallback((e) => { return e?.textContent ?? "" }, []) }
     });
+
+    const { pressReturn } = usePress<HTMLLIElement>({
+        refElementReturn,
+        pressParameters: { onPressSync: null, exclude: {}, focusSelf }
+    });
+
+    const props2 = useMergedProps(props, pressReturn.propsUnstable);
 
     const text = `${randomWord} This is item #${index} (offset: ${selectedOffset}) ${hidden ? " (hidden)" : ""}${disabled ? " (disabled)" : ""}${selected ? " (selected)" : " (not selected)"} (${tabbable ? "Tabbable" : "Not tabbable"})`;
 
@@ -202,6 +208,6 @@ const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
         const props = useMergedProps<HTMLLIElement>(p2, p3, p4, p5, p6);*/
 
     return (
-        <li {...props} style={{ opacity: hideBecausePaginated ? 0.25 : 1, transform: `translateX(${hideBecauseStaggered ? "50%" : "0%"})` }}>{text}<input {...useMergedProps(p2, { type: "number" }) as any} style={{ width: "5ch" }} /></li>
+        <li {...props2} style={{ opacity: hideBecausePaginated ? 0.25 : 1, transform: `translateX(${hideBecauseStaggered ? "50%" : "0%"})` }}>{text}<input {...useMergedProps(p2, { type: "number" }) as any} style={{ width: "5ch" }} /></li>
     )
 }));

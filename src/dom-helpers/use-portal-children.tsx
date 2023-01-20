@@ -1,10 +1,10 @@
 
-import { createPortal } from "preact/compat"
-import { useCallback, useLayoutEffect, useMemo } from "preact/hooks"
-import { cloneElement, ComponentChildren, h, VNode } from "preact"
-import { useState } from "../preact-extensions/use-state";
-import { useStableCallback } from "../preact-extensions/use-stable-callback";
+import { cloneElement, h, VNode } from "preact";
+import { createPortal } from "preact/compat";
+import { useCallback, useLayoutEffect, useMemo } from "preact/hooks";
 import { generateRandomId } from "../preact-extensions/use-before-layout-effect";
+import { useStableCallback } from "../preact-extensions/use-stable-callback";
+import { useState } from "../preact-extensions/use-state";
 
 export interface UsePortalChildrenParameters {
     target: string | Element | null;

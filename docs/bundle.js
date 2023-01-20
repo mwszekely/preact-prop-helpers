@@ -869,9 +869,6 @@ var bundle = function (exports) {
   function returnNull() {
     return null;
   }
-  function returnZero() {
-    return 0;
-  }
   function identity$1(t) {
     return t;
   } // Kind of an extra, but it's useful in other places anyway
@@ -1250,64 +1247,64 @@ var bundle = function (exports) {
   }
   /*
   function test<P extends h.JSX.HTMLAttributes<HTMLInputElement>>(props: P) {
-       const id0: GenericGet<{}, "id", string> = "";
+        const id0: GenericGet<{}, "id", string> = "";
       const id3: GenericGet<{ id: undefined }, "id", string> = undefined;
       const id4: GenericGet<{ id: undefined }, "id", string> = undefined;
       const id5: GenericGet<{ id: undefined }, "id", string> = undefined;
       const id6: GenericGet<{ id: undefined }, "id", string> = undefined;
       //const id2: ZipSingle<string | undefined, string | undefined> = undefined;
       const id1: ZipObject<{ id: undefined }, { id: string }> = { id: undefined };
-       type M1 = GenericGet<P, "style", string>;
+        type M1 = GenericGet<P, "style", string>;
       type M2 = GenericGet<{}, "style", string>;
       const m1: M1 = "";
       const m2: M1 = undefined;
       /// @ts-expect-error    Because number isn't assignable to string
       const m3: M1 = 0;
-       const m4: M2 = "";
+        const m4: M2 = "";
       const m5: M2 = undefined;
       /// @ts-expect-error    Because number isn't assignable to string
       const m6: M2 = 0;
-       const p1: MergedProps<HTMLInputElement, {}, { id: string }> = useMergedProps<HTMLInputElement>()({}, { id: "string" });
+        const p1: MergedProps<HTMLInputElement, {}, { id: string }> = useMergedProps<HTMLInputElement>()({}, { id: "string" });
       const p2: MergedProps<HTMLInputElement, { id: undefined }, { id: string }> = useMergedProps<HTMLInputElement>()({ id: undefined }, { id: "string" });
       const p3: MergedProps<HTMLInputElement, { id: undefined }, { id: undefined }> = useMergedProps<HTMLInputElement>()({ id: undefined }, { id: undefined });
       const p4: MergedProps<HTMLInputElement, {}, {}> = useMergedProps<HTMLInputElement>()({}, {});
       const p5 = useMergedProps<HTMLInputElement>()(props, {});
       const p6 = useMergedProps<HTMLInputElement>()(props, { id: undefined });
       const p7 = useMergedProps<HTMLInputElement>()(props, { id: "string" });
-        p1.id?.concat("");
+          p1.id?.concat("");
       p2.id?.concat("");
       /// @ts-expect-error    id can't be anything but undefined
       p3.id?.concat("");
       /// @ts-expect-error    id can't be anything but undefined
       p4.id?.concat("");
-        p5.id?.concat("");
+          p5.id?.concat("");
       p6.id?.concat("");
       p7.id?.concat("");
-       /// @ts-expect-error    id must contain undefined
+        /// @ts-expect-error    id must contain undefined
       p5.id.concat("");
       /// @ts-expect-error    id must contain undefined
       p6.id.concat("");
       /// @ts-expect-error    id must contain undefined
       p7.id.concat("");
-        if (p5.allowFullScreen === undefined) {}
+          if (p5.allowFullScreen === undefined) {}
       else if (p5.allowFullScreen === false) {}
       else if (p5.allowFullScreen === true) {}
       else {
           acceptsNever(p5.allowFullScreen);
       }
-        if (p6.allowFullScreen === undefined) {}
+          if (p6.allowFullScreen === undefined) {}
       else if (p6.allowFullScreen === false) {}
       else if (p6.allowFullScreen === true) {}
       else {
           acceptsNever(p6.allowFullScreen);
       }
-        if (p7.allowFullScreen === undefined) {}
+          if (p7.allowFullScreen === undefined) {}
       else if (p7.allowFullScreen === false) {}
       else if (p7.allowFullScreen === true) {}
       else {
           acceptsNever(p7.allowFullScreen);
       }
-        // Make sure it works recursively
+          // Make sure it works recursively
       const r1a = useMergedProps<HTMLInputElement>()({}, p1);
       const r1b = useMergedProps<HTMLInputElement>()(props, p1);
       const r2a = useMergedProps<HTMLInputElement>()({}, p2);
@@ -1322,7 +1319,7 @@ var bundle = function (exports) {
       const r6b = useMergedProps<HTMLInputElement>()(props, p6);
       const r7a = useMergedProps<HTMLInputElement>()({}, p7);
       const r7b = useMergedProps<HTMLInputElement>()(props, p7);
-        r1a.id?.concat("");
+          r1a.id?.concat("");
       r1b.id?.concat("");
       r2a.id?.concat("");
       r2b.id?.concat("");
@@ -1332,13 +1329,13 @@ var bundle = function (exports) {
       /// @ts-expect-error    id can't be anything but undefined
       r4a.id?.concat("");
       r4b.id?.concat("");
-        r5a.id?.concat("");
+          r5a.id?.concat("");
       r5b.id?.concat("");
       r6a.id?.concat("");
       r6b.id?.concat("");
       r7a.id?.concat("");
       r7b.id?.concat("");
-       /// @ts-expect-error    id must contain undefined
+        /// @ts-expect-error    id must contain undefined
       r5a.id.concat("");
       /// @ts-expect-error    id must contain undefined
       r5b.id.concat("");
@@ -1350,43 +1347,43 @@ var bundle = function (exports) {
       r7a.id.concat("");
       /// @ts-expect-error    id must contain undefined
       r7b.id.concat("");
-        if (r5a.allowFullScreen === undefined) {}
+          if (r5a.allowFullScreen === undefined) {}
       else if (r5a.allowFullScreen === false) {}
       else if (r5a.allowFullScreen === true) {}
       else {
           acceptsNever(r5a.allowFullScreen);
       }
-        if (r5b.allowFullScreen === undefined) {}
+          if (r5b.allowFullScreen === undefined) {}
       else if (r5b.allowFullScreen === false) {}
       else if (r5b.allowFullScreen === true) {}
       else {
           acceptsNever(r5b.allowFullScreen);
       }
-        if (r6a.allowFullScreen === undefined) {}
+          if (r6a.allowFullScreen === undefined) {}
       else if (r6a.allowFullScreen === false) {}
       else if (r6a.allowFullScreen === true) {}
       else {
           acceptsNever(r6a.allowFullScreen);
       }
-        if (r6b.allowFullScreen === undefined) {}
+          if (r6b.allowFullScreen === undefined) {}
       else if (r6b.allowFullScreen === false) {}
       else if (r6b.allowFullScreen === true) {}
       else {
           acceptsNever(r6b.allowFullScreen);
       }
-        if (r7a.allowFullScreen === undefined) {}
+          if (r7a.allowFullScreen === undefined) {}
       else if (r7a.allowFullScreen === false) {}
       else if (r7a.allowFullScreen === true) {}
       else {
           acceptsNever(r7a.allowFullScreen);
       }
-        if (r7b.allowFullScreen === undefined) {}
+          if (r7b.allowFullScreen === undefined) {}
       else if (r7b.allowFullScreen === false) {}
       else if (r7b.allowFullScreen === true) {}
       else {
           acceptsNever(r7b.allowFullScreen);
       }
-   }
+    }
   function acceptsNever(n: never) {}
   */
 
@@ -1634,7 +1631,7 @@ var bundle = function (exports) {
       ...rest
     } = parentParameters;
     useEnsureStability("useManagedChildren", onAfterChildLayoutEffect, onChildrenMountChange, onChildCountChange);
-    usePassiveState(onChildCountChange, returnZero, runImmediately);
+    //const [getMountCount, setMountCount] = usePassiveState(onChildCountChange, returnZero, runImmediately);
     const getHighestIndex = T$1(() => {
       return managedChildrenArray.current.highestIndex;
     }, []);
@@ -1685,7 +1682,7 @@ var bundle = function (exports) {
     const remoteULEChildChangedCausers = _(new Set());
     const remoteULEChildChanged = T$1(index => {
       if (remoteULEChildChangedCausers.current.size == 0) {
-        if (!!onAfterChildLayoutEffect) {
+        if (onAfterChildLayoutEffect != null) {
           debounceRendering(() => {
             onAfterChildLayoutEffect === null || onAfterChildLayoutEffect === void 0 ? void 0 : onAfterChildLayoutEffect(remoteULEChildChangedCausers.current);
             remoteULEChildChangedCausers.current.clear();
@@ -2749,818 +2746,811 @@ var bundle = function (exports) {
     }
     document.$blockingElements = new BlockingElementsImpl();
   })();
-  var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
-  (function (module, exports) {
-    (function (global, factory) {
-      factory();
-    })(commonjsGlobal, function () {
-      var _createClass = function () {
-        function defineProperties(target, props) {
-          for (var i = 0; i < props.length; i++) {
-            var descriptor = props[i];
-            descriptor.enumerable = descriptor.enumerable || false;
-            descriptor.configurable = true;
-            if ("value" in descriptor) descriptor.writable = true;
-            Object.defineProperty(target, descriptor.key, descriptor);
+  var _createClass = function () {
+    function defineProperties(target, props) {
+      for (var i = 0; i < props.length; i++) {
+        var descriptor = props[i];
+        descriptor.enumerable = descriptor.enumerable || false;
+        descriptor.configurable = true;
+        if ("value" in descriptor) descriptor.writable = true;
+        Object.defineProperty(target, descriptor.key, descriptor);
+      }
+    }
+    return function (Constructor, protoProps, staticProps) {
+      if (protoProps) defineProperties(Constructor.prototype, protoProps);
+      if (staticProps) defineProperties(Constructor, staticProps);
+      return Constructor;
+    };
+  }();
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  /**
+   * This work is licensed under the W3C Software and Document License
+   * (http://www.w3.org/Consortium/Legal/2015/copyright-software-and-document).
+   */
+
+  (function () {
+    // Return early if we're not running inside of the browser.
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    // Convenience function for converting NodeLists.
+    /** @type {typeof Array.prototype.slice} */
+    var slice = Array.prototype.slice;
+
+    /**
+     * IE has a non-standard name for "matches".
+     * @type {typeof Element.prototype.matches}
+     */
+    var matches = Element.prototype.matches || Element.prototype.msMatchesSelector;
+
+    /** @type {string} */
+    var _focusableElementsString = ['a[href]', 'area[href]', 'input:not([disabled])', 'select:not([disabled])', 'textarea:not([disabled])', 'button:not([disabled])', 'details', 'summary', 'iframe', 'object', 'embed', '[contenteditable]'].join(',');
+
+    /**
+     * `InertRoot` manages a single inert subtree, i.e. a DOM subtree whose root element has an `inert`
+     * attribute.
+     *
+     * Its main functions are:
+     *
+     * - to create and maintain a set of managed `InertNode`s, including when mutations occur in the
+     *   subtree. The `makeSubtreeUnfocusable()` method handles collecting `InertNode`s via registering
+     *   each focusable node in the subtree with the singleton `InertManager` which manages all known
+     *   focusable nodes within inert subtrees. `InertManager` ensures that a single `InertNode`
+     *   instance exists for each focusable node which has at least one inert root as an ancestor.
+     *
+     * - to notify all managed `InertNode`s when this subtree stops being inert (i.e. when the `inert`
+     *   attribute is removed from the root node). This is handled in the destructor, which calls the
+     *   `deregister` method on `InertManager` for each managed inert node.
+     */
+
+    var InertRoot = function () {
+      /**
+       * @param {!HTMLElement} rootElement The HTMLElement at the root of the inert subtree.
+       * @param {!InertManager} inertManager The global singleton InertManager object.
+       */
+      function InertRoot(rootElement, inertManager) {
+        _classCallCheck(this, InertRoot);
+
+        /** @type {!InertManager} */
+        this._inertManager = inertManager;
+
+        /** @type {!HTMLElement} */
+        this._rootElement = rootElement;
+
+        /**
+         * @type {!Set<!InertNode>}
+         * All managed focusable nodes in this InertRoot's subtree.
+         */
+        this._managedNodes = new Set();
+
+        // Make the subtree hidden from assistive technology
+        if (this._rootElement.hasAttribute('aria-hidden')) {
+          /** @type {?string} */
+          this._savedAriaHidden = this._rootElement.getAttribute('aria-hidden');
+        } else {
+          this._savedAriaHidden = null;
+        }
+        this._rootElement.setAttribute('aria-hidden', 'true');
+
+        // Make all focusable elements in the subtree unfocusable and add them to _managedNodes
+        this._makeSubtreeUnfocusable(this._rootElement);
+
+        // Watch for:
+        // - any additions in the subtree: make them unfocusable too
+        // - any removals from the subtree: remove them from this inert root's managed nodes
+        // - attribute changes: if `tabindex` is added, or removed from an intrinsically focusable
+        //   element, make that node a managed node.
+        this._observer = new MutationObserver(this._onMutation.bind(this));
+        this._observer.observe(this._rootElement, {
+          attributes: true,
+          childList: true,
+          subtree: true
+        });
+      }
+
+      /**
+       * Call this whenever this object is about to become obsolete.  This unwinds all of the state
+       * stored in this object and updates the state of all of the managed nodes.
+       */
+
+      _createClass(InertRoot, [{
+        key: 'destructor',
+        value: function destructor() {
+          this._observer.disconnect();
+          if (this._rootElement) {
+            if (this._savedAriaHidden !== null) {
+              this._rootElement.setAttribute('aria-hidden', this._savedAriaHidden);
+            } else {
+              this._rootElement.removeAttribute('aria-hidden');
+            }
+          }
+          this._managedNodes.forEach(function (inertNode) {
+            this._unmanageNode(inertNode.node);
+          }, this);
+
+          // Note we cast the nulls to the ANY type here because:
+          // 1) We want the class properties to be declared as non-null, or else we
+          //    need even more casts throughout this code. All bets are off if an
+          //    instance has been destroyed and a method is called.
+          // 2) We don't want to cast "this", because we want type-aware optimizations
+          //    to know which properties we're setting.
+          this._observer = /** @type {?} */null;
+          this._rootElement = /** @type {?} */null;
+          this._managedNodes = /** @type {?} */null;
+          this._inertManager = /** @type {?} */null;
+        }
+
+        /**
+         * @return {!Set<!InertNode>} A copy of this InertRoot's managed nodes set.
+         */
+      }, {
+        key: '_makeSubtreeUnfocusable',
+        /**
+         * @param {!Node} startNode
+         */
+        value: function _makeSubtreeUnfocusable(startNode) {
+          var _this2 = this;
+          composedTreeWalk(startNode, function (node) {
+            return _this2._visitNode(node);
+          });
+          var activeElement = document.activeElement;
+          if (!document.body.contains(startNode)) {
+            // startNode may be in shadow DOM, so find its nearest shadowRoot to get the activeElement.
+            var node = startNode;
+            /** @type {!ShadowRoot|undefined} */
+            var root = undefined;
+            while (node) {
+              if (node.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
+                root = /** @type {!ShadowRoot} */node;
+                break;
+              }
+              node = node.parentNode;
+            }
+            if (root) {
+              activeElement = root.activeElement;
+            }
+          }
+          if (startNode.contains(activeElement)) {
+            activeElement.blur();
+            // In IE11, if an element is already focused, and then set to tabindex=-1
+            // calling blur() will not actually move the focus.
+            // To work around this we call focus() on the body instead.
+            if (activeElement === document.activeElement) {
+              document.body.focus();
+            }
           }
         }
-        return function (Constructor, protoProps, staticProps) {
-          if (protoProps) defineProperties(Constructor.prototype, protoProps);
-          if (staticProps) defineProperties(Constructor, staticProps);
-          return Constructor;
-        };
-      }();
-      function _classCallCheck(instance, Constructor) {
-        if (!(instance instanceof Constructor)) {
-          throw new TypeError("Cannot call a class as a function");
+
+        /**
+         * @param {!Node} node
+         */
+      }, {
+        key: '_visitNode',
+        value: function _visitNode(node) {
+          if (node.nodeType !== Node.ELEMENT_NODE) {
+            return;
+          }
+          var element = /** @type {!HTMLElement} */node;
+
+          // If a descendant inert root becomes un-inert, its descendants will still be inert because of
+          // this inert root, so all of its managed nodes need to be adopted by this InertRoot.
+          if (element !== this._rootElement && element.hasAttribute('inert')) {
+            this._adoptInertRoot(element);
+          }
+          if (matches.call(element, _focusableElementsString) || element.hasAttribute('tabindex')) {
+            this._manageNode(element);
+          }
+        }
+
+        /**
+         * Register the given node with this InertRoot and with InertManager.
+         * @param {!Node} node
+         */
+      }, {
+        key: '_manageNode',
+        value: function _manageNode(node) {
+          var inertNode = this._inertManager.register(node, this);
+          this._managedNodes.add(inertNode);
+        }
+
+        /**
+         * Unregister the given node with this InertRoot and with InertManager.
+         * @param {!Node} node
+         */
+      }, {
+        key: '_unmanageNode',
+        value: function _unmanageNode(node) {
+          var inertNode = this._inertManager.deregister(node, this);
+          if (inertNode) {
+            this._managedNodes['delete'](inertNode);
+          }
+        }
+
+        /**
+         * Unregister the entire subtree starting at `startNode`.
+         * @param {!Node} startNode
+         */
+      }, {
+        key: '_unmanageSubtree',
+        value: function _unmanageSubtree(startNode) {
+          var _this3 = this;
+          composedTreeWalk(startNode, function (node) {
+            return _this3._unmanageNode(node);
+          });
+        }
+
+        /**
+         * If a descendant node is found with an `inert` attribute, adopt its managed nodes.
+         * @param {!HTMLElement} node
+         */
+      }, {
+        key: '_adoptInertRoot',
+        value: function _adoptInertRoot(node) {
+          var inertSubroot = this._inertManager.getInertRoot(node);
+
+          // During initialisation this inert root may not have been registered yet,
+          // so register it now if need be.
+          if (!inertSubroot) {
+            this._inertManager.setInert(node, true);
+            inertSubroot = this._inertManager.getInertRoot(node);
+          }
+          inertSubroot.managedNodes.forEach(function (savedInertNode) {
+            this._manageNode(savedInertNode.node);
+          }, this);
+        }
+
+        /**
+         * Callback used when mutation observer detects subtree additions, removals, or attribute changes.
+         * @param {!Array<!MutationRecord>} records
+         * @param {!MutationObserver} self
+         */
+      }, {
+        key: '_onMutation',
+        value: function _onMutation(records, self) {
+          records.forEach(function (record) {
+            var target = /** @type {!HTMLElement} */record.target;
+            if (record.type === 'childList') {
+              // Manage added nodes
+              slice.call(record.addedNodes).forEach(function (node) {
+                this._makeSubtreeUnfocusable(node);
+              }, this);
+
+              // Un-manage removed nodes
+              slice.call(record.removedNodes).forEach(function (node) {
+                this._unmanageSubtree(node);
+              }, this);
+            } else if (record.type === 'attributes') {
+              if (record.attributeName === 'tabindex') {
+                // Re-initialise inert node if tabindex changes
+                this._manageNode(target);
+              } else if (target !== this._rootElement && record.attributeName === 'inert' && target.hasAttribute('inert')) {
+                // If a new inert root is added, adopt its managed nodes and make sure it knows about the
+                // already managed nodes from this inert subroot.
+                this._adoptInertRoot(target);
+                var inertSubroot = this._inertManager.getInertRoot(target);
+                this._managedNodes.forEach(function (managedNode) {
+                  if (target.contains(managedNode.node)) {
+                    inertSubroot._manageNode(managedNode.node);
+                  }
+                });
+              }
+            }
+          }, this);
+        }
+      }, {
+        key: 'managedNodes',
+        get: function get() {
+          return new Set(this._managedNodes);
+        }
+
+        /** @return {boolean} */
+      }, {
+        key: 'hasSavedAriaHidden',
+        get: function get() {
+          return this._savedAriaHidden !== null;
+        }
+
+        /** @param {?string} ariaHidden */
+      }, {
+        key: 'savedAriaHidden',
+        set: function set(ariaHidden) {
+          this._savedAriaHidden = ariaHidden;
+        }
+
+        /** @return {?string} */,
+
+        get: function get() {
+          return this._savedAriaHidden;
+        }
+      }]);
+      return InertRoot;
+    }();
+
+    /**
+     * `InertNode` initialises and manages a single inert node.
+     * A node is inert if it is a descendant of one or more inert root elements.
+     *
+     * On construction, `InertNode` saves the existing `tabindex` value for the node, if any, and
+     * either removes the `tabindex` attribute or sets it to `-1`, depending on whether the element
+     * is intrinsically focusable or not.
+     *
+     * `InertNode` maintains a set of `InertRoot`s which are descendants of this `InertNode`. When an
+     * `InertRoot` is destroyed, and calls `InertManager.deregister()`, the `InertManager` notifies the
+     * `InertNode` via `removeInertRoot()`, which in turn destroys the `InertNode` if no `InertRoot`s
+     * remain in the set. On destruction, `InertNode` reinstates the stored `tabindex` if one exists,
+     * or removes the `tabindex` attribute if the element is intrinsically focusable.
+     */
+
+    var InertNode = function () {
+      /**
+       * @param {!Node} node A focusable element to be made inert.
+       * @param {!InertRoot} inertRoot The inert root element associated with this inert node.
+       */
+      function InertNode(node, inertRoot) {
+        _classCallCheck(this, InertNode);
+
+        /** @type {!Node} */
+        this._node = node;
+
+        /** @type {boolean} */
+        this._overrodeFocusMethod = false;
+
+        /**
+         * @type {!Set<!InertRoot>} The set of descendant inert roots.
+         *    If and only if this set becomes empty, this node is no longer inert.
+         */
+        this._inertRoots = new Set([inertRoot]);
+
+        /** @type {?number} */
+        this._savedTabIndex = null;
+
+        /** @type {boolean} */
+        this._destroyed = false;
+
+        // Save any prior tabindex info and make this node untabbable
+        this.ensureUntabbable();
+      }
+
+      /**
+       * Call this whenever this object is about to become obsolete.
+       * This makes the managed node focusable again and deletes all of the previously stored state.
+       */
+
+      _createClass(InertNode, [{
+        key: 'destructor',
+        value: function destructor() {
+          this._throwIfDestroyed();
+          if (this._node && this._node.nodeType === Node.ELEMENT_NODE) {
+            var element = /** @type {!HTMLElement} */this._node;
+            if (this._savedTabIndex !== null) {
+              element.setAttribute('tabindex', this._savedTabIndex);
+            } else {
+              element.removeAttribute('tabindex');
+            }
+
+            // Use `delete` to restore native focus method.
+            if (this._overrodeFocusMethod) {
+              delete element.focus;
+            }
+          }
+
+          // See note in InertRoot.destructor for why we cast these nulls to ANY.
+          this._node = /** @type {?} */null;
+          this._inertRoots = /** @type {?} */null;
+          this._destroyed = true;
+        }
+
+        /**
+         * @type {boolean} Whether this object is obsolete because the managed node is no longer inert.
+         * If the object has been destroyed, any attempt to access it will cause an exception.
+         */
+      }, {
+        key: '_throwIfDestroyed',
+        /**
+         * Throw if user tries to access destroyed InertNode.
+         */
+        value: function _throwIfDestroyed() {
+          if (this.destroyed) {
+            throw new Error('Trying to access destroyed InertNode');
+          }
+        }
+
+        /** @return {boolean} */
+      }, {
+        key: 'ensureUntabbable',
+        /** Save the existing tabindex value and make the node untabbable and unfocusable */
+        value: function ensureUntabbable() {
+          if (this.node.nodeType !== Node.ELEMENT_NODE) {
+            return;
+          }
+          var element = /** @type {!HTMLElement} */this.node;
+          if (matches.call(element, _focusableElementsString)) {
+            if ( /** @type {!HTMLElement} */element.tabIndex === -1 && this.hasSavedTabIndex) {
+              return;
+            }
+            if (element.hasAttribute('tabindex')) {
+              this._savedTabIndex = /** @type {!HTMLElement} */element.tabIndex;
+            }
+            element.setAttribute('tabindex', '-1');
+            if (element.nodeType === Node.ELEMENT_NODE) {
+              element.focus = function () {};
+              this._overrodeFocusMethod = true;
+            }
+          } else if (element.hasAttribute('tabindex')) {
+            this._savedTabIndex = /** @type {!HTMLElement} */element.tabIndex;
+            element.removeAttribute('tabindex');
+          }
+        }
+
+        /**
+         * Add another inert root to this inert node's set of managing inert roots.
+         * @param {!InertRoot} inertRoot
+         */
+      }, {
+        key: 'addInertRoot',
+        value: function addInertRoot(inertRoot) {
+          this._throwIfDestroyed();
+          this._inertRoots.add(inertRoot);
+        }
+
+        /**
+         * Remove the given inert root from this inert node's set of managing inert roots.
+         * If the set of managing inert roots becomes empty, this node is no longer inert,
+         * so the object should be destroyed.
+         * @param {!InertRoot} inertRoot
+         */
+      }, {
+        key: 'removeInertRoot',
+        value: function removeInertRoot(inertRoot) {
+          this._throwIfDestroyed();
+          this._inertRoots['delete'](inertRoot);
+          if (this._inertRoots.size === 0) {
+            this.destructor();
+          }
+        }
+      }, {
+        key: 'destroyed',
+        get: function get() {
+          return (/** @type {!InertNode} */this._destroyed
+          );
+        }
+      }, {
+        key: 'hasSavedTabIndex',
+        get: function get() {
+          return this._savedTabIndex !== null;
+        }
+
+        /** @return {!Node} */
+      }, {
+        key: 'node',
+        get: function get() {
+          this._throwIfDestroyed();
+          return this._node;
+        }
+
+        /** @param {?number} tabIndex */
+      }, {
+        key: 'savedTabIndex',
+        set: function set(tabIndex) {
+          this._throwIfDestroyed();
+          this._savedTabIndex = tabIndex;
+        }
+
+        /** @return {?number} */,
+
+        get: function get() {
+          this._throwIfDestroyed();
+          return this._savedTabIndex;
+        }
+      }]);
+      return InertNode;
+    }();
+
+    /**
+     * InertManager is a per-document singleton object which manages all inert roots and nodes.
+     *
+     * When an element becomes an inert root by having an `inert` attribute set and/or its `inert`
+     * property set to `true`, the `setInert` method creates an `InertRoot` object for the element.
+     * The `InertRoot` in turn registers itself as managing all of the element's focusable descendant
+     * nodes via the `register()` method. The `InertManager` ensures that a single `InertNode` instance
+     * is created for each such node, via the `_managedNodes` map.
+     */
+
+    var InertManager = function () {
+      /**
+       * @param {!Document} document
+       */
+      function InertManager(document) {
+        _classCallCheck(this, InertManager);
+        if (!document) {
+          throw new Error('Missing required argument; InertManager needs to wrap a document.');
+        }
+
+        /** @type {!Document} */
+        this._document = document;
+
+        /**
+         * All managed nodes known to this InertManager. In a map to allow looking up by Node.
+         * @type {!Map<!Node, !InertNode>}
+         */
+        this._managedNodes = new Map();
+
+        /**
+         * All inert roots known to this InertManager. In a map to allow looking up by Node.
+         * @type {!Map<!Node, !InertRoot>}
+         */
+        this._inertRoots = new Map();
+
+        /**
+         * Observer for mutations on `document.body`.
+         * @type {!MutationObserver}
+         */
+        this._observer = new MutationObserver(this._watchForInert.bind(this));
+
+        // Add inert style.
+        addInertStyle(document.head || document.body || document.documentElement);
+
+        // Wait for document to be loaded.
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', this._onDocumentLoaded.bind(this));
+        } else {
+          this._onDocumentLoaded();
         }
       }
 
       /**
-       * This work is licensed under the W3C Software and Document License
-       * (http://www.w3.org/Consortium/Legal/2015/copyright-software-and-document).
+       * Set whether the given element should be an inert root or not.
+       * @param {!HTMLElement} root
+       * @param {boolean} inert
        */
 
-      (function () {
-        // Return early if we're not running inside of the browser.
-        if (typeof window === 'undefined') {
+      _createClass(InertManager, [{
+        key: 'setInert',
+        value: function setInert(root, inert) {
+          if (inert) {
+            if (this._inertRoots.has(root)) {
+              // element is already inert
+              return;
+            }
+            var inertRoot = new InertRoot(root, this);
+            root.setAttribute('inert', '');
+            this._inertRoots.set(root, inertRoot);
+            // If not contained in the document, it must be in a shadowRoot.
+            // Ensure inert styles are added there.
+            if (!this._document.body.contains(root)) {
+              var parent = root.parentNode;
+              while (parent) {
+                if (parent.nodeType === 11) {
+                  addInertStyle(parent);
+                }
+                parent = parent.parentNode;
+              }
+            }
+          } else {
+            if (!this._inertRoots.has(root)) {
+              // element is already non-inert
+              return;
+            }
+            var _inertRoot = this._inertRoots.get(root);
+            _inertRoot.destructor();
+            this._inertRoots['delete'](root);
+            root.removeAttribute('inert');
+          }
+        }
+
+        /**
+         * Get the InertRoot object corresponding to the given inert root element, if any.
+         * @param {!Node} element
+         * @return {!InertRoot|undefined}
+         */
+      }, {
+        key: 'getInertRoot',
+        value: function getInertRoot(element) {
+          return this._inertRoots.get(element);
+        }
+
+        /**
+         * Register the given InertRoot as managing the given node.
+         * In the case where the node has a previously existing inert root, this inert root will
+         * be added to its set of inert roots.
+         * @param {!Node} node
+         * @param {!InertRoot} inertRoot
+         * @return {!InertNode} inertNode
+         */
+      }, {
+        key: 'register',
+        value: function register(node, inertRoot) {
+          var inertNode = this._managedNodes.get(node);
+          if (inertNode !== undefined) {
+            // node was already in an inert subtree
+            inertNode.addInertRoot(inertRoot);
+          } else {
+            inertNode = new InertNode(node, inertRoot);
+          }
+          this._managedNodes.set(node, inertNode);
+          return inertNode;
+        }
+
+        /**
+         * De-register the given InertRoot as managing the given inert node.
+         * Removes the inert root from the InertNode's set of managing inert roots, and remove the inert
+         * node from the InertManager's set of managed nodes if it is destroyed.
+         * If the node is not currently managed, this is essentially a no-op.
+         * @param {!Node} node
+         * @param {!InertRoot} inertRoot
+         * @return {?InertNode} The potentially destroyed InertNode associated with this node, if any.
+         */
+      }, {
+        key: 'deregister',
+        value: function deregister(node, inertRoot) {
+          var inertNode = this._managedNodes.get(node);
+          if (!inertNode) {
+            return null;
+          }
+          inertNode.removeInertRoot(inertRoot);
+          if (inertNode.destroyed) {
+            this._managedNodes['delete'](node);
+          }
+          return inertNode;
+        }
+
+        /**
+         * Callback used when document has finished loading.
+         */
+      }, {
+        key: '_onDocumentLoaded',
+        value: function _onDocumentLoaded() {
+          // Find all inert roots in document and make them actually inert.
+          var inertElements = slice.call(this._document.querySelectorAll('[inert]'));
+          inertElements.forEach(function (inertElement) {
+            this.setInert(inertElement, true);
+          }, this);
+
+          // Comment this out to use programmatic API only.
+          this._observer.observe(this._document.body || this._document.documentElement, {
+            attributes: true,
+            subtree: true,
+            childList: true
+          });
+        }
+
+        /**
+         * Callback used when mutation observer detects attribute changes.
+         * @param {!Array<!MutationRecord>} records
+         * @param {!MutationObserver} self
+         */
+      }, {
+        key: '_watchForInert',
+        value: function _watchForInert(records, self) {
+          var _this = this;
+          records.forEach(function (record) {
+            switch (record.type) {
+              case 'childList':
+                slice.call(record.addedNodes).forEach(function (node) {
+                  if (node.nodeType !== Node.ELEMENT_NODE) {
+                    return;
+                  }
+                  var inertElements = slice.call(node.querySelectorAll('[inert]'));
+                  if (matches.call(node, '[inert]')) {
+                    inertElements.unshift(node);
+                  }
+                  inertElements.forEach(function (inertElement) {
+                    this.setInert(inertElement, true);
+                  }, _this);
+                }, _this);
+                break;
+              case 'attributes':
+                if (record.attributeName !== 'inert') {
+                  return;
+                }
+                var target = /** @type {!HTMLElement} */record.target;
+                var inert = target.hasAttribute('inert');
+                _this.setInert(target, inert);
+                break;
+            }
+          }, this);
+        }
+      }]);
+      return InertManager;
+    }();
+
+    /**
+     * Recursively walk the composed tree from |node|.
+     * @param {!Node} node
+     * @param {(function (!HTMLElement))=} callback Callback to be called for each element traversed,
+     *     before descending into child nodes.
+     * @param {?ShadowRoot=} shadowRootAncestor The nearest ShadowRoot ancestor, if any.
+     */
+
+    function composedTreeWalk(node, callback, shadowRootAncestor) {
+      if (node.nodeType == Node.ELEMENT_NODE) {
+        var element = /** @type {!HTMLElement} */node;
+        if (callback) {
+          callback(element);
+        }
+
+        // Descend into node:
+        // If it has a ShadowRoot, ignore all child elements - these will be picked
+        // up by the <content> or <shadow> elements. Descend straight into the
+        // ShadowRoot.
+        var shadowRoot = /** @type {!HTMLElement} */element.shadowRoot;
+        if (shadowRoot) {
+          composedTreeWalk(shadowRoot, callback);
           return;
         }
 
-        // Convenience function for converting NodeLists.
-        /** @type {typeof Array.prototype.slice} */
-        var slice = Array.prototype.slice;
-
-        /**
-         * IE has a non-standard name for "matches".
-         * @type {typeof Element.prototype.matches}
-         */
-        var matches = Element.prototype.matches || Element.prototype.msMatchesSelector;
-
-        /** @type {string} */
-        var _focusableElementsString = ['a[href]', 'area[href]', 'input:not([disabled])', 'select:not([disabled])', 'textarea:not([disabled])', 'button:not([disabled])', 'details', 'summary', 'iframe', 'object', 'embed', '[contenteditable]'].join(',');
-
-        /**
-         * `InertRoot` manages a single inert subtree, i.e. a DOM subtree whose root element has an `inert`
-         * attribute.
-         *
-         * Its main functions are:
-         *
-         * - to create and maintain a set of managed `InertNode`s, including when mutations occur in the
-         *   subtree. The `makeSubtreeUnfocusable()` method handles collecting `InertNode`s via registering
-         *   each focusable node in the subtree with the singleton `InertManager` which manages all known
-         *   focusable nodes within inert subtrees. `InertManager` ensures that a single `InertNode`
-         *   instance exists for each focusable node which has at least one inert root as an ancestor.
-         *
-         * - to notify all managed `InertNode`s when this subtree stops being inert (i.e. when the `inert`
-         *   attribute is removed from the root node). This is handled in the destructor, which calls the
-         *   `deregister` method on `InertManager` for each managed inert node.
-         */
-
-        var InertRoot = function () {
-          /**
-           * @param {!HTMLElement} rootElement The HTMLElement at the root of the inert subtree.
-           * @param {!InertManager} inertManager The global singleton InertManager object.
-           */
-          function InertRoot(rootElement, inertManager) {
-            _classCallCheck(this, InertRoot);
-
-            /** @type {!InertManager} */
-            this._inertManager = inertManager;
-
-            /** @type {!HTMLElement} */
-            this._rootElement = rootElement;
-
-            /**
-             * @type {!Set<!InertNode>}
-             * All managed focusable nodes in this InertRoot's subtree.
-             */
-            this._managedNodes = new Set();
-
-            // Make the subtree hidden from assistive technology
-            if (this._rootElement.hasAttribute('aria-hidden')) {
-              /** @type {?string} */
-              this._savedAriaHidden = this._rootElement.getAttribute('aria-hidden');
-            } else {
-              this._savedAriaHidden = null;
-            }
-            this._rootElement.setAttribute('aria-hidden', 'true');
-
-            // Make all focusable elements in the subtree unfocusable and add them to _managedNodes
-            this._makeSubtreeUnfocusable(this._rootElement);
-
-            // Watch for:
-            // - any additions in the subtree: make them unfocusable too
-            // - any removals from the subtree: remove them from this inert root's managed nodes
-            // - attribute changes: if `tabindex` is added, or removed from an intrinsically focusable
-            //   element, make that node a managed node.
-            this._observer = new MutationObserver(this._onMutation.bind(this));
-            this._observer.observe(this._rootElement, {
-              attributes: true,
-              childList: true,
-              subtree: true
-            });
+        // If it is a <content> element, descend into distributed elements - these
+        // are elements from outside the shadow root which are rendered inside the
+        // shadow DOM.
+        if (element.localName == 'content') {
+          var content = /** @type {!HTMLContentElement} */element;
+          // Verifies if ShadowDom v0 is supported.
+          var distributedNodes = content.getDistributedNodes ? content.getDistributedNodes() : [];
+          for (var i = 0; i < distributedNodes.length; i++) {
+            composedTreeWalk(distributedNodes[i], callback);
           }
-
-          /**
-           * Call this whenever this object is about to become obsolete.  This unwinds all of the state
-           * stored in this object and updates the state of all of the managed nodes.
-           */
-
-          _createClass(InertRoot, [{
-            key: 'destructor',
-            value: function destructor() {
-              this._observer.disconnect();
-              if (this._rootElement) {
-                if (this._savedAriaHidden !== null) {
-                  this._rootElement.setAttribute('aria-hidden', this._savedAriaHidden);
-                } else {
-                  this._rootElement.removeAttribute('aria-hidden');
-                }
-              }
-              this._managedNodes.forEach(function (inertNode) {
-                this._unmanageNode(inertNode.node);
-              }, this);
-
-              // Note we cast the nulls to the ANY type here because:
-              // 1) We want the class properties to be declared as non-null, or else we
-              //    need even more casts throughout this code. All bets are off if an
-              //    instance has been destroyed and a method is called.
-              // 2) We don't want to cast "this", because we want type-aware optimizations
-              //    to know which properties we're setting.
-              this._observer = /** @type {?} */null;
-              this._rootElement = /** @type {?} */null;
-              this._managedNodes = /** @type {?} */null;
-              this._inertManager = /** @type {?} */null;
-            }
-
-            /**
-             * @return {!Set<!InertNode>} A copy of this InertRoot's managed nodes set.
-             */
-          }, {
-            key: '_makeSubtreeUnfocusable',
-            /**
-             * @param {!Node} startNode
-             */
-            value: function _makeSubtreeUnfocusable(startNode) {
-              var _this2 = this;
-              composedTreeWalk(startNode, function (node) {
-                return _this2._visitNode(node);
-              });
-              var activeElement = document.activeElement;
-              if (!document.body.contains(startNode)) {
-                // startNode may be in shadow DOM, so find its nearest shadowRoot to get the activeElement.
-                var node = startNode;
-                /** @type {!ShadowRoot|undefined} */
-                var root = undefined;
-                while (node) {
-                  if (node.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
-                    root = /** @type {!ShadowRoot} */node;
-                    break;
-                  }
-                  node = node.parentNode;
-                }
-                if (root) {
-                  activeElement = root.activeElement;
-                }
-              }
-              if (startNode.contains(activeElement)) {
-                activeElement.blur();
-                // In IE11, if an element is already focused, and then set to tabindex=-1
-                // calling blur() will not actually move the focus.
-                // To work around this we call focus() on the body instead.
-                if (activeElement === document.activeElement) {
-                  document.body.focus();
-                }
-              }
-            }
-
-            /**
-             * @param {!Node} node
-             */
-          }, {
-            key: '_visitNode',
-            value: function _visitNode(node) {
-              if (node.nodeType !== Node.ELEMENT_NODE) {
-                return;
-              }
-              var element = /** @type {!HTMLElement} */node;
-
-              // If a descendant inert root becomes un-inert, its descendants will still be inert because of
-              // this inert root, so all of its managed nodes need to be adopted by this InertRoot.
-              if (element !== this._rootElement && element.hasAttribute('inert')) {
-                this._adoptInertRoot(element);
-              }
-              if (matches.call(element, _focusableElementsString) || element.hasAttribute('tabindex')) {
-                this._manageNode(element);
-              }
-            }
-
-            /**
-             * Register the given node with this InertRoot and with InertManager.
-             * @param {!Node} node
-             */
-          }, {
-            key: '_manageNode',
-            value: function _manageNode(node) {
-              var inertNode = this._inertManager.register(node, this);
-              this._managedNodes.add(inertNode);
-            }
-
-            /**
-             * Unregister the given node with this InertRoot and with InertManager.
-             * @param {!Node} node
-             */
-          }, {
-            key: '_unmanageNode',
-            value: function _unmanageNode(node) {
-              var inertNode = this._inertManager.deregister(node, this);
-              if (inertNode) {
-                this._managedNodes['delete'](inertNode);
-              }
-            }
-
-            /**
-             * Unregister the entire subtree starting at `startNode`.
-             * @param {!Node} startNode
-             */
-          }, {
-            key: '_unmanageSubtree',
-            value: function _unmanageSubtree(startNode) {
-              var _this3 = this;
-              composedTreeWalk(startNode, function (node) {
-                return _this3._unmanageNode(node);
-              });
-            }
-
-            /**
-             * If a descendant node is found with an `inert` attribute, adopt its managed nodes.
-             * @param {!HTMLElement} node
-             */
-          }, {
-            key: '_adoptInertRoot',
-            value: function _adoptInertRoot(node) {
-              var inertSubroot = this._inertManager.getInertRoot(node);
-
-              // During initialisation this inert root may not have been registered yet,
-              // so register it now if need be.
-              if (!inertSubroot) {
-                this._inertManager.setInert(node, true);
-                inertSubroot = this._inertManager.getInertRoot(node);
-              }
-              inertSubroot.managedNodes.forEach(function (savedInertNode) {
-                this._manageNode(savedInertNode.node);
-              }, this);
-            }
-
-            /**
-             * Callback used when mutation observer detects subtree additions, removals, or attribute changes.
-             * @param {!Array<!MutationRecord>} records
-             * @param {!MutationObserver} self
-             */
-          }, {
-            key: '_onMutation',
-            value: function _onMutation(records, self) {
-              records.forEach(function (record) {
-                var target = /** @type {!HTMLElement} */record.target;
-                if (record.type === 'childList') {
-                  // Manage added nodes
-                  slice.call(record.addedNodes).forEach(function (node) {
-                    this._makeSubtreeUnfocusable(node);
-                  }, this);
-
-                  // Un-manage removed nodes
-                  slice.call(record.removedNodes).forEach(function (node) {
-                    this._unmanageSubtree(node);
-                  }, this);
-                } else if (record.type === 'attributes') {
-                  if (record.attributeName === 'tabindex') {
-                    // Re-initialise inert node if tabindex changes
-                    this._manageNode(target);
-                  } else if (target !== this._rootElement && record.attributeName === 'inert' && target.hasAttribute('inert')) {
-                    // If a new inert root is added, adopt its managed nodes and make sure it knows about the
-                    // already managed nodes from this inert subroot.
-                    this._adoptInertRoot(target);
-                    var inertSubroot = this._inertManager.getInertRoot(target);
-                    this._managedNodes.forEach(function (managedNode) {
-                      if (target.contains(managedNode.node)) {
-                        inertSubroot._manageNode(managedNode.node);
-                      }
-                    });
-                  }
-                }
-              }, this);
-            }
-          }, {
-            key: 'managedNodes',
-            get: function get() {
-              return new Set(this._managedNodes);
-            }
-
-            /** @return {boolean} */
-          }, {
-            key: 'hasSavedAriaHidden',
-            get: function get() {
-              return this._savedAriaHidden !== null;
-            }
-
-            /** @param {?string} ariaHidden */
-          }, {
-            key: 'savedAriaHidden',
-            set: function set(ariaHidden) {
-              this._savedAriaHidden = ariaHidden;
-            }
-
-            /** @return {?string} */,
-
-            get: function get() {
-              return this._savedAriaHidden;
-            }
-          }]);
-          return InertRoot;
-        }();
-
-        /**
-         * `InertNode` initialises and manages a single inert node.
-         * A node is inert if it is a descendant of one or more inert root elements.
-         *
-         * On construction, `InertNode` saves the existing `tabindex` value for the node, if any, and
-         * either removes the `tabindex` attribute or sets it to `-1`, depending on whether the element
-         * is intrinsically focusable or not.
-         *
-         * `InertNode` maintains a set of `InertRoot`s which are descendants of this `InertNode`. When an
-         * `InertRoot` is destroyed, and calls `InertManager.deregister()`, the `InertManager` notifies the
-         * `InertNode` via `removeInertRoot()`, which in turn destroys the `InertNode` if no `InertRoot`s
-         * remain in the set. On destruction, `InertNode` reinstates the stored `tabindex` if one exists,
-         * or removes the `tabindex` attribute if the element is intrinsically focusable.
-         */
-
-        var InertNode = function () {
-          /**
-           * @param {!Node} node A focusable element to be made inert.
-           * @param {!InertRoot} inertRoot The inert root element associated with this inert node.
-           */
-          function InertNode(node, inertRoot) {
-            _classCallCheck(this, InertNode);
-
-            /** @type {!Node} */
-            this._node = node;
-
-            /** @type {boolean} */
-            this._overrodeFocusMethod = false;
-
-            /**
-             * @type {!Set<!InertRoot>} The set of descendant inert roots.
-             *    If and only if this set becomes empty, this node is no longer inert.
-             */
-            this._inertRoots = new Set([inertRoot]);
-
-            /** @type {?number} */
-            this._savedTabIndex = null;
-
-            /** @type {boolean} */
-            this._destroyed = false;
-
-            // Save any prior tabindex info and make this node untabbable
-            this.ensureUntabbable();
-          }
-
-          /**
-           * Call this whenever this object is about to become obsolete.
-           * This makes the managed node focusable again and deletes all of the previously stored state.
-           */
-
-          _createClass(InertNode, [{
-            key: 'destructor',
-            value: function destructor() {
-              this._throwIfDestroyed();
-              if (this._node && this._node.nodeType === Node.ELEMENT_NODE) {
-                var element = /** @type {!HTMLElement} */this._node;
-                if (this._savedTabIndex !== null) {
-                  element.setAttribute('tabindex', this._savedTabIndex);
-                } else {
-                  element.removeAttribute('tabindex');
-                }
-
-                // Use `delete` to restore native focus method.
-                if (this._overrodeFocusMethod) {
-                  delete element.focus;
-                }
-              }
-
-              // See note in InertRoot.destructor for why we cast these nulls to ANY.
-              this._node = /** @type {?} */null;
-              this._inertRoots = /** @type {?} */null;
-              this._destroyed = true;
-            }
-
-            /**
-             * @type {boolean} Whether this object is obsolete because the managed node is no longer inert.
-             * If the object has been destroyed, any attempt to access it will cause an exception.
-             */
-          }, {
-            key: '_throwIfDestroyed',
-            /**
-             * Throw if user tries to access destroyed InertNode.
-             */
-            value: function _throwIfDestroyed() {
-              if (this.destroyed) {
-                throw new Error('Trying to access destroyed InertNode');
-              }
-            }
-
-            /** @return {boolean} */
-          }, {
-            key: 'ensureUntabbable',
-            /** Save the existing tabindex value and make the node untabbable and unfocusable */
-            value: function ensureUntabbable() {
-              if (this.node.nodeType !== Node.ELEMENT_NODE) {
-                return;
-              }
-              var element = /** @type {!HTMLElement} */this.node;
-              if (matches.call(element, _focusableElementsString)) {
-                if ( /** @type {!HTMLElement} */element.tabIndex === -1 && this.hasSavedTabIndex) {
-                  return;
-                }
-                if (element.hasAttribute('tabindex')) {
-                  this._savedTabIndex = /** @type {!HTMLElement} */element.tabIndex;
-                }
-                element.setAttribute('tabindex', '-1');
-                if (element.nodeType === Node.ELEMENT_NODE) {
-                  element.focus = function () {};
-                  this._overrodeFocusMethod = true;
-                }
-              } else if (element.hasAttribute('tabindex')) {
-                this._savedTabIndex = /** @type {!HTMLElement} */element.tabIndex;
-                element.removeAttribute('tabindex');
-              }
-            }
-
-            /**
-             * Add another inert root to this inert node's set of managing inert roots.
-             * @param {!InertRoot} inertRoot
-             */
-          }, {
-            key: 'addInertRoot',
-            value: function addInertRoot(inertRoot) {
-              this._throwIfDestroyed();
-              this._inertRoots.add(inertRoot);
-            }
-
-            /**
-             * Remove the given inert root from this inert node's set of managing inert roots.
-             * If the set of managing inert roots becomes empty, this node is no longer inert,
-             * so the object should be destroyed.
-             * @param {!InertRoot} inertRoot
-             */
-          }, {
-            key: 'removeInertRoot',
-            value: function removeInertRoot(inertRoot) {
-              this._throwIfDestroyed();
-              this._inertRoots['delete'](inertRoot);
-              if (this._inertRoots.size === 0) {
-                this.destructor();
-              }
-            }
-          }, {
-            key: 'destroyed',
-            get: function get() {
-              return (/** @type {!InertNode} */this._destroyed
-              );
-            }
-          }, {
-            key: 'hasSavedTabIndex',
-            get: function get() {
-              return this._savedTabIndex !== null;
-            }
-
-            /** @return {!Node} */
-          }, {
-            key: 'node',
-            get: function get() {
-              this._throwIfDestroyed();
-              return this._node;
-            }
-
-            /** @param {?number} tabIndex */
-          }, {
-            key: 'savedTabIndex',
-            set: function set(tabIndex) {
-              this._throwIfDestroyed();
-              this._savedTabIndex = tabIndex;
-            }
-
-            /** @return {?number} */,
-
-            get: function get() {
-              this._throwIfDestroyed();
-              return this._savedTabIndex;
-            }
-          }]);
-          return InertNode;
-        }();
-
-        /**
-         * InertManager is a per-document singleton object which manages all inert roots and nodes.
-         *
-         * When an element becomes an inert root by having an `inert` attribute set and/or its `inert`
-         * property set to `true`, the `setInert` method creates an `InertRoot` object for the element.
-         * The `InertRoot` in turn registers itself as managing all of the element's focusable descendant
-         * nodes via the `register()` method. The `InertManager` ensures that a single `InertNode` instance
-         * is created for each such node, via the `_managedNodes` map.
-         */
-
-        var InertManager = function () {
-          /**
-           * @param {!Document} document
-           */
-          function InertManager(document) {
-            _classCallCheck(this, InertManager);
-            if (!document) {
-              throw new Error('Missing required argument; InertManager needs to wrap a document.');
-            }
-
-            /** @type {!Document} */
-            this._document = document;
-
-            /**
-             * All managed nodes known to this InertManager. In a map to allow looking up by Node.
-             * @type {!Map<!Node, !InertNode>}
-             */
-            this._managedNodes = new Map();
-
-            /**
-             * All inert roots known to this InertManager. In a map to allow looking up by Node.
-             * @type {!Map<!Node, !InertRoot>}
-             */
-            this._inertRoots = new Map();
-
-            /**
-             * Observer for mutations on `document.body`.
-             * @type {!MutationObserver}
-             */
-            this._observer = new MutationObserver(this._watchForInert.bind(this));
-
-            // Add inert style.
-            addInertStyle(document.head || document.body || document.documentElement);
-
-            // Wait for document to be loaded.
-            if (document.readyState === 'loading') {
-              document.addEventListener('DOMContentLoaded', this._onDocumentLoaded.bind(this));
-            } else {
-              this._onDocumentLoaded();
-            }
-          }
-
-          /**
-           * Set whether the given element should be an inert root or not.
-           * @param {!HTMLElement} root
-           * @param {boolean} inert
-           */
-
-          _createClass(InertManager, [{
-            key: 'setInert',
-            value: function setInert(root, inert) {
-              if (inert) {
-                if (this._inertRoots.has(root)) {
-                  // element is already inert
-                  return;
-                }
-                var inertRoot = new InertRoot(root, this);
-                root.setAttribute('inert', '');
-                this._inertRoots.set(root, inertRoot);
-                // If not contained in the document, it must be in a shadowRoot.
-                // Ensure inert styles are added there.
-                if (!this._document.body.contains(root)) {
-                  var parent = root.parentNode;
-                  while (parent) {
-                    if (parent.nodeType === 11) {
-                      addInertStyle(parent);
-                    }
-                    parent = parent.parentNode;
-                  }
-                }
-              } else {
-                if (!this._inertRoots.has(root)) {
-                  // element is already non-inert
-                  return;
-                }
-                var _inertRoot = this._inertRoots.get(root);
-                _inertRoot.destructor();
-                this._inertRoots['delete'](root);
-                root.removeAttribute('inert');
-              }
-            }
-
-            /**
-             * Get the InertRoot object corresponding to the given inert root element, if any.
-             * @param {!Node} element
-             * @return {!InertRoot|undefined}
-             */
-          }, {
-            key: 'getInertRoot',
-            value: function getInertRoot(element) {
-              return this._inertRoots.get(element);
-            }
-
-            /**
-             * Register the given InertRoot as managing the given node.
-             * In the case where the node has a previously existing inert root, this inert root will
-             * be added to its set of inert roots.
-             * @param {!Node} node
-             * @param {!InertRoot} inertRoot
-             * @return {!InertNode} inertNode
-             */
-          }, {
-            key: 'register',
-            value: function register(node, inertRoot) {
-              var inertNode = this._managedNodes.get(node);
-              if (inertNode !== undefined) {
-                // node was already in an inert subtree
-                inertNode.addInertRoot(inertRoot);
-              } else {
-                inertNode = new InertNode(node, inertRoot);
-              }
-              this._managedNodes.set(node, inertNode);
-              return inertNode;
-            }
-
-            /**
-             * De-register the given InertRoot as managing the given inert node.
-             * Removes the inert root from the InertNode's set of managing inert roots, and remove the inert
-             * node from the InertManager's set of managed nodes if it is destroyed.
-             * If the node is not currently managed, this is essentially a no-op.
-             * @param {!Node} node
-             * @param {!InertRoot} inertRoot
-             * @return {?InertNode} The potentially destroyed InertNode associated with this node, if any.
-             */
-          }, {
-            key: 'deregister',
-            value: function deregister(node, inertRoot) {
-              var inertNode = this._managedNodes.get(node);
-              if (!inertNode) {
-                return null;
-              }
-              inertNode.removeInertRoot(inertRoot);
-              if (inertNode.destroyed) {
-                this._managedNodes['delete'](node);
-              }
-              return inertNode;
-            }
-
-            /**
-             * Callback used when document has finished loading.
-             */
-          }, {
-            key: '_onDocumentLoaded',
-            value: function _onDocumentLoaded() {
-              // Find all inert roots in document and make them actually inert.
-              var inertElements = slice.call(this._document.querySelectorAll('[inert]'));
-              inertElements.forEach(function (inertElement) {
-                this.setInert(inertElement, true);
-              }, this);
-
-              // Comment this out to use programmatic API only.
-              this._observer.observe(this._document.body || this._document.documentElement, {
-                attributes: true,
-                subtree: true,
-                childList: true
-              });
-            }
-
-            /**
-             * Callback used when mutation observer detects attribute changes.
-             * @param {!Array<!MutationRecord>} records
-             * @param {!MutationObserver} self
-             */
-          }, {
-            key: '_watchForInert',
-            value: function _watchForInert(records, self) {
-              var _this = this;
-              records.forEach(function (record) {
-                switch (record.type) {
-                  case 'childList':
-                    slice.call(record.addedNodes).forEach(function (node) {
-                      if (node.nodeType !== Node.ELEMENT_NODE) {
-                        return;
-                      }
-                      var inertElements = slice.call(node.querySelectorAll('[inert]'));
-                      if (matches.call(node, '[inert]')) {
-                        inertElements.unshift(node);
-                      }
-                      inertElements.forEach(function (inertElement) {
-                        this.setInert(inertElement, true);
-                      }, _this);
-                    }, _this);
-                    break;
-                  case 'attributes':
-                    if (record.attributeName !== 'inert') {
-                      return;
-                    }
-                    var target = /** @type {!HTMLElement} */record.target;
-                    var inert = target.hasAttribute('inert');
-                    _this.setInert(target, inert);
-                    break;
-                }
-              }, this);
-            }
-          }]);
-          return InertManager;
-        }();
-
-        /**
-         * Recursively walk the composed tree from |node|.
-         * @param {!Node} node
-         * @param {(function (!HTMLElement))=} callback Callback to be called for each element traversed,
-         *     before descending into child nodes.
-         * @param {?ShadowRoot=} shadowRootAncestor The nearest ShadowRoot ancestor, if any.
-         */
-
-        function composedTreeWalk(node, callback, shadowRootAncestor) {
-          if (node.nodeType == Node.ELEMENT_NODE) {
-            var element = /** @type {!HTMLElement} */node;
-            if (callback) {
-              callback(element);
-            }
-
-            // Descend into node:
-            // If it has a ShadowRoot, ignore all child elements - these will be picked
-            // up by the <content> or <shadow> elements. Descend straight into the
-            // ShadowRoot.
-            var shadowRoot = /** @type {!HTMLElement} */element.shadowRoot;
-            if (shadowRoot) {
-              composedTreeWalk(shadowRoot, callback);
-              return;
-            }
-
-            // If it is a <content> element, descend into distributed elements - these
-            // are elements from outside the shadow root which are rendered inside the
-            // shadow DOM.
-            if (element.localName == 'content') {
-              var content = /** @type {!HTMLContentElement} */element;
-              // Verifies if ShadowDom v0 is supported.
-              var distributedNodes = content.getDistributedNodes ? content.getDistributedNodes() : [];
-              for (var i = 0; i < distributedNodes.length; i++) {
-                composedTreeWalk(distributedNodes[i], callback);
-              }
-              return;
-            }
-
-            // If it is a <slot> element, descend into assigned nodes - these
-            // are elements from outside the shadow root which are rendered inside the
-            // shadow DOM.
-            if (element.localName == 'slot') {
-              var slot = /** @type {!HTMLSlotElement} */element;
-              // Verify if ShadowDom v1 is supported.
-              var _distributedNodes = slot.assignedNodes ? slot.assignedNodes({
-                flatten: true
-              }) : [];
-              for (var _i = 0; _i < _distributedNodes.length; _i++) {
-                composedTreeWalk(_distributedNodes[_i], callback);
-              }
-              return;
-            }
-          }
-
-          // If it is neither the parent of a ShadowRoot, a <content> element, a <slot>
-          // element, nor a <shadow> element recurse normally.
-          var child = node.firstChild;
-          while (child != null) {
-            composedTreeWalk(child, callback);
-            child = child.nextSibling;
-          }
+          return;
         }
 
-        /**
-         * Adds a style element to the node containing the inert specific styles
-         * @param {!Node} node
-         */
-        function addInertStyle(node) {
-          if (node.querySelector('style#inert-style, link#inert-style')) {
-            return;
+        // If it is a <slot> element, descend into assigned nodes - these
+        // are elements from outside the shadow root which are rendered inside the
+        // shadow DOM.
+        if (element.localName == 'slot') {
+          var slot = /** @type {!HTMLSlotElement} */element;
+          // Verify if ShadowDom v1 is supported.
+          var _distributedNodes = slot.assignedNodes ? slot.assignedNodes({
+            flatten: true
+          }) : [];
+          for (var _i = 0; _i < _distributedNodes.length; _i++) {
+            composedTreeWalk(_distributedNodes[_i], callback);
           }
-          var style = document.createElement('style');
-          style.setAttribute('id', 'inert-style');
-          style.textContent = '\n' + '[inert] {\n' + '  pointer-events: none;\n' + '  cursor: default;\n' + '}\n' + '\n' + '[inert], [inert] * {\n' + '  -webkit-user-select: none;\n' + '  -moz-user-select: none;\n' + '  -ms-user-select: none;\n' + '  user-select: none;\n' + '}\n';
-          node.appendChild(style);
+          return;
         }
-        if (!HTMLElement.prototype.hasOwnProperty('inert')) {
-          /** @type {!InertManager} */
-          var inertManager = new InertManager(document);
-          Object.defineProperty(HTMLElement.prototype, 'inert', {
-            enumerable: true,
-            /** @this {!HTMLElement} */
-            get: function get() {
-              return this.hasAttribute('inert');
-            },
-            /** @this {!HTMLElement} */
-            set: function set(inert) {
-              inertManager.setInert(this, inert);
-            }
-          });
+      }
+
+      // If it is neither the parent of a ShadowRoot, a <content> element, a <slot>
+      // element, nor a <shadow> element recurse normally.
+      var child = node.firstChild;
+      while (child != null) {
+        composedTreeWalk(child, callback);
+        child = child.nextSibling;
+      }
+    }
+
+    /**
+     * Adds a style element to the node containing the inert specific styles
+     * @param {!Node} node
+     */
+    function addInertStyle(node) {
+      if (node.querySelector('style#inert-style, link#inert-style')) {
+        return;
+      }
+      var style = document.createElement('style');
+      style.setAttribute('id', 'inert-style');
+      style.textContent = '\n' + '[inert] {\n' + '  pointer-events: none;\n' + '  cursor: default;\n' + '}\n' + '\n' + '[inert], [inert] * {\n' + '  -webkit-user-select: none;\n' + '  -moz-user-select: none;\n' + '  -ms-user-select: none;\n' + '  user-select: none;\n' + '}\n';
+      node.appendChild(style);
+    }
+    if (!HTMLElement.prototype.hasOwnProperty('inert')) {
+      /** @type {!InertManager} */
+      var inertManager = new InertManager(document);
+      Object.defineProperty(HTMLElement.prototype, 'inert', {
+        enumerable: true,
+        /** @this {!HTMLElement} */
+        get: function get() {
+          return this.hasAttribute('inert');
+        },
+        /** @this {!HTMLElement} */
+        set: function set(inert) {
+          inertManager.setInert(this, inert);
         }
-      })();
-    });
+      });
+    }
   })();
   function getDocument$1(element) {
     var _ref9, _ref10, _element$ownerDocumen;
@@ -4404,17 +4394,17 @@ var bundle = function (exports) {
             But roughly isn't good enough if there are multiple matches.
             To convert our sorted index to the unsorted index we need, we have to find the first
             element that matches us *and* (if any such exist) is *after* our current selection.
-                     In other words, the only way typeahead moves backwards relative to our current
+                      In other words, the only way typeahead moves backwards relative to our current
             position is if the only other option is behind us.
-                     It's not specified in WAI-ARIA what to do in that case.  I suppose wrap back to the start?
+                      It's not specified in WAI-ARIA what to do in that case.  I suppose wrap back to the start?
             Though there's also a case for just going upwards to the nearest to prevent jumpiness.
             But if you're already doing typeahead on an unsorted list, like, jumpiness can't be avoided.
             I dunno. Going back to the start is the simplist though.
-                     Basically what this does: Starting from where we found ourselves after our binary search,
+                      Basically what this does: Starting from where we found ourselves after our binary search,
             scan backwards and forwards through all adjacent entries that also compare equally so that
             we can find the one whose `unsortedIndex` is the lowest amongst all other equal strings
             (and also the lowest `unsortedIndex` yadda yadda except that it comes after us).
-                     TODO: The binary search starts this off with a solid O(log n), but one-character
+                      TODO: The binary search starts this off with a solid O(log n), but one-character
             searches are, thanks to pigeonhole principal, eventually guaranteed to become
             O(n*log n). This is annoying but probably not easily solvable? There could be an
             exception for one-character strings, but that's just kicking the can down
@@ -5051,7 +5041,6 @@ var bundle = function (exports) {
         onCurrentFocusedInnerChanged: ocfic2,
         ..._void3
       },
-      pressParameters,
       singleSelectionChildReturn
     } = useSingleSelectionChild(rowAsChildOfGridParameters);
     const {
@@ -5217,15 +5206,18 @@ var bundle = function (exports) {
 
   /** Detect free variable `global` from Node.js. */
   var freeGlobal = typeof global == 'object' && global && global.Object === Object && global;
+  var freeGlobal$1 = freeGlobal;
 
   /** Detect free variable `self`. */
   var freeSelf = typeof self == 'object' && self && self.Object === Object && self;
 
   /** Used as a reference to the global object. */
-  var root = freeGlobal || freeSelf || Function('return this')();
+  var root = freeGlobal$1 || freeSelf || Function('return this')();
+  var root$1 = root;
 
   /** Built-in value references. */
-  var Symbol$1 = root.Symbol;
+  var Symbol$1 = root$1.Symbol;
+  var Symbol$2 = Symbol$1;
 
   /** Used for built-in method references. */
   var objectProto$5 = Object.prototype;
@@ -5241,7 +5233,7 @@ var bundle = function (exports) {
   var nativeObjectToString$1 = objectProto$5.toString;
 
   /** Built-in value references. */
-  var symToStringTag$1 = Symbol$1 ? Symbol$1.toStringTag : undefined;
+  var symToStringTag$1 = Symbol$2 ? Symbol$2.toStringTag : undefined;
 
   /**
    * A specialized version of `baseGetTag` which ignores `Symbol.toStringTag` values.
@@ -5294,7 +5286,7 @@ var bundle = function (exports) {
     undefinedTag = '[object Undefined]';
 
   /** Built-in value references. */
-  var symToStringTag = Symbol$1 ? Symbol$1.toStringTag : undefined;
+  var symToStringTag = Symbol$2 ? Symbol$2.toStringTag : undefined;
 
   /**
    * The base implementation of `getTag` without fallbacks for buggy environments.
@@ -5384,6 +5376,7 @@ var bundle = function (exports) {
   }()) ? baseIsArguments : function (value) {
     return isObjectLike(value) && hasOwnProperty$2.call(value, 'callee') && !propertyIsEnumerable.call(value, 'callee');
   };
+  var isArguments$1 = isArguments;
 
   /**
    * Checks if `value` is classified as an `Array` object.
@@ -5409,6 +5402,7 @@ var bundle = function (exports) {
    * // => false
    */
   var isArray = Array.isArray;
+  var isArray$1 = isArray;
 
   /**
    * This method returns `false`.
@@ -5437,7 +5431,7 @@ var bundle = function (exports) {
   var moduleExports$1 = freeModule$1 && freeModule$1.exports === freeExports$1;
 
   /** Built-in value references. */
-  var Buffer = moduleExports$1 ? root.Buffer : undefined;
+  var Buffer = moduleExports$1 ? root$1.Buffer : undefined;
 
   /* Built-in method references for those with the same name as other `lodash` methods. */
   var nativeIsBuffer = Buffer ? Buffer.isBuffer : undefined;
@@ -5460,6 +5454,7 @@ var bundle = function (exports) {
    * // => false
    */
   var isBuffer = nativeIsBuffer || stubFalse;
+  var isBuffer$1 = isBuffer;
 
   /** Used as references for various `Number` constants. */
   var MAX_SAFE_INTEGER$1 = 9007199254740991;
@@ -5579,7 +5574,7 @@ var bundle = function (exports) {
   var moduleExports = freeModule && freeModule.exports === freeExports;
 
   /** Detect free variable `process` from Node.js. */
-  var freeProcess = moduleExports && freeGlobal.process;
+  var freeProcess = moduleExports && freeGlobal$1.process;
 
   /** Used to access faster Node.js helpers. */
   var nodeUtil = function () {
@@ -5594,9 +5589,10 @@ var bundle = function (exports) {
       return freeProcess && freeProcess.binding && freeProcess.binding('util');
     } catch (e) {}
   }();
+  var nodeUtil$1 = nodeUtil;
 
   /* Node.js helper references. */
-  var nodeIsTypedArray = nodeUtil && nodeUtil.isTypedArray;
+  var nodeIsTypedArray = nodeUtil$1 && nodeUtil$1.isTypedArray;
 
   /**
    * Checks if `value` is classified as a typed array.
@@ -5616,6 +5612,7 @@ var bundle = function (exports) {
    * // => false
    */
   var isTypedArray = nodeIsTypedArray ? baseUnary(nodeIsTypedArray) : baseIsTypedArray;
+  var isTypedArray$1 = isTypedArray;
 
   /** Used for built-in method references. */
   var objectProto$2 = Object.prototype;
@@ -5632,10 +5629,10 @@ var bundle = function (exports) {
    * @returns {Array} Returns the array of property names.
    */
   function arrayLikeKeys(value, inherited) {
-    var isArr = isArray(value),
-      isArg = !isArr && isArguments(value),
-      isBuff = !isArr && !isArg && isBuffer(value),
-      isType = !isArr && !isArg && !isBuff && isTypedArray(value),
+    var isArr = isArray$1(value),
+      isArg = !isArr && isArguments$1(value),
+      isBuff = !isArr && !isArg && isBuffer$1(value),
+      isType = !isArr && !isArg && !isBuff && isTypedArray$1(value),
       skipIndexes = isArr || isArg || isBuff || isType,
       result = skipIndexes ? baseTimes(value.length, String) : [],
       length = result.length;
@@ -5687,6 +5684,7 @@ var bundle = function (exports) {
 
   /* Built-in method references for those with the same name as other `lodash` methods. */
   var nativeKeys = overArg(Object.keys, Object);
+  var nativeKeys$1 = nativeKeys;
 
   /** Used for built-in method references. */
   var objectProto = Object.prototype;
@@ -5703,7 +5701,7 @@ var bundle = function (exports) {
    */
   function baseKeys(object) {
     if (!isPrototype(object)) {
-      return nativeKeys(object);
+      return nativeKeys$1(object);
     }
     var result = [];
     for (var key in Object(object)) {
@@ -5895,7 +5893,7 @@ var bundle = function (exports) {
    * // => [4, 1, 3, 2]
    */
   function shuffle(collection) {
-    var func = isArray(collection) ? arrayShuffle : baseShuffle;
+    var func = isArray$1(collection) ? arrayShuffle : baseShuffle;
     return func(collection);
   }
 
@@ -6080,7 +6078,7 @@ var bundle = function (exports) {
   /*export interface UseGroupedSortableChildrenParameters<M extends GroupedSortedChildInfo> {
       managedChildrenReturn: UseManagedChildrenReturnType<M>["managedChildrenReturn"]
   }
-   export interface UseGroupedSortableChildren {
+    export interface UseGroupedSortableChildren {
       linearNavigationParameters: Pick<UseLinearNavigationParameters["linearNavigationParameters"], "indexDemangler" | "indexMangler">
   }*/
   /**
@@ -6108,7 +6106,7 @@ var bundle = function (exports) {
           }
           return identity(i);
       }, []);
-        return {
+          return {
           linearNavigationParameters: {
               indexMangler,
               indexDemangler
@@ -6245,6 +6243,111 @@ var bundle = function (exports) {
       ...lncr
     };
   }
+  function usePaginatedChildren(_ref35) {
+    let {
+      managedChildrenReturn: {
+        getChildren
+      },
+      linearNavigationParameters: {
+        indexDemangler
+      },
+      paginatedChildrenParameters: {
+        paginationMax,
+        paginationMin
+      }
+    } = _ref35;
+    const [childCount, setChildCount] = useState(null);
+    const parentIsPaginated = paginationMin != null || paginationMax != null;
+    const lastPagination = _({
+      paginationMax: null,
+      paginationMin: null
+    });
+    const refreshPagination = T$1((paginationMin, paginationMax) => {
+      const childMax = getChildren().getHighestIndex() + 1;
+      for (let i = 0; i <= childMax; ++i) {
+        var _getChildren$getAt, _getChildren$getAt2, _getChildren$getAt3;
+        const visible = i >= (paginationMin !== null && paginationMin !== void 0 ? paginationMin : -Infinity) && i < (paginationMax !== null && paginationMax !== void 0 ? paginationMax : Infinity);
+        (_getChildren$getAt = getChildren().getAt(indexDemangler(i))) === null || _getChildren$getAt === void 0 ? void 0 : _getChildren$getAt.setParentIsPaginated(parentIsPaginated);
+        (_getChildren$getAt2 = getChildren().getAt(indexDemangler(i))) === null || _getChildren$getAt2 === void 0 ? void 0 : _getChildren$getAt2.setPaginationVisible(visible);
+        if (visible) (_getChildren$getAt3 = getChildren().getAt(indexDemangler(i))) === null || _getChildren$getAt3 === void 0 ? void 0 : _getChildren$getAt3.setChildCountIfPaginated(getChildren().getHighestIndex() + 1);
+      }
+    }, [/* Must be empty */]);
+    s(() => {
+      refreshPagination(paginationMin, paginationMax);
+      lastPagination.current.paginationMax = paginationMax;
+      lastPagination.current.paginationMin = paginationMin;
+    }, [paginationMax, paginationMin]);
+    // TODO: Modification during render
+    const p = _(parentIsPaginated);
+    p.current = parentIsPaginated;
+    return {
+      context: useStableObject({
+        paginatedChildContext: useStableObject({
+          getDefaultIsPaginated: T$1(() => {
+            return p.current;
+          }, []),
+          // This is only used during setState on mount, so this is fine.
+          // (If we change from paginated to not paginated, this is caught during useLayoutEffect)
+          getDefaultPaginationVisible: T$1(i => {
+            return parentIsPaginated ? i >= (paginationMin !== null && paginationMin !== void 0 ? paginationMin : -Infinity) && i < (paginationMax !== null && paginationMax !== void 0 ? paginationMax : Infinity) : true;
+          }, [])
+        })
+      }),
+      managedChildrenParameters: {
+        onChildCountChange: useStableCallback(count => {
+          if (paginationMax != null || paginationMin != null) {
+            setChildCount(count);
+            const min = paginationMin !== null && paginationMin !== void 0 ? paginationMin : 0;
+            const max = paginationMax !== null && paginationMax !== void 0 ? paginationMax : count;
+            for (let i = min; i < max; ++i) {
+              var _getChildren$getAt4, _getChildren$getAt5;
+              (_getChildren$getAt4 = getChildren().getAt(i)) === null || _getChildren$getAt4 === void 0 ? void 0 : _getChildren$getAt4.setParentIsPaginated(parentIsPaginated);
+              (_getChildren$getAt5 = getChildren().getAt(i)) === null || _getChildren$getAt5 === void 0 ? void 0 : _getChildren$getAt5.setChildCountIfPaginated(count);
+            }
+          } else {
+            // TODO: Make this debug only.
+            setChildCount(null);
+          }
+        })
+      },
+      paginatedChildrenReturn: {
+        refreshPagination,
+        childCount
+      }
+    };
+  }
+  function usePaginatedChild(_ref36) {
+    let {
+      managedChildParameters: {
+        index
+      },
+      context: {
+        paginatedChildContext: {
+          getDefaultPaginationVisible,
+          getDefaultIsPaginated
+        }
+      }
+    } = _ref36;
+    const [parentIsPaginated, setParentIsPaginated] = useState(getDefaultIsPaginated());
+    const [childCountIfPaginated, setChildCountIfPaginated] = useState(null);
+    const [paginatedVisible, setPaginatedVisible] = useState(getDefaultPaginationVisible(index));
+    return {
+      props: !parentIsPaginated ? {} : {
+        "aria-setsize": childCountIfPaginated !== null && childCountIfPaginated !== void 0 ? childCountIfPaginated : undefined,
+        "aria-posinset": index + 1
+      },
+      paginatedChildReturn: {
+        paginatedVisible,
+        isPaginated: parentIsPaginated,
+        hideBecausePaginated: parentIsPaginated ? !paginatedVisible : false
+      },
+      managedChildParameters: {
+        setPaginationVisible: setPaginatedVisible,
+        setChildCountIfPaginated,
+        setParentIsPaginated
+      }
+    };
+  }
 
   /**
    * Allows children to each wait until the previous has finished rendering before itself rendering.
@@ -6254,7 +6357,7 @@ var bundle = function (exports) {
    * Note that the child itself will still render, but you can delay rendering *its* children, or
    * delay other complicated or heavy logic, until the child is no longer staggered.
    */
-  function useStaggeredChildren(_ref35) {
+  function useStaggeredChildren(_ref37) {
     let {
       managedChildrenReturn: {
         getChildren
@@ -6262,7 +6365,7 @@ var bundle = function (exports) {
       staggeredChildrenParameters: {
         staggered
       }
-    } = _ref35;
+    } = _ref37;
     // By default, when a child mounts, we tell the next child to mount and simply repeat.
     // If a child is missing, however, it will break that chain.
     // To guard against that, we also wait for 50ms, and if it hasn't loaded by then, we just continue as if it did.
@@ -6288,8 +6391,8 @@ var bundle = function (exports) {
       // ensure our timeout is running, and start a new one if not
       // For any newly mounted children, make sure they're aware of if they should consider themselves staggered or not
       for (let i = prevIndex !== null && prevIndex !== void 0 ? prevIndex : 0; i < (newIndex !== null && newIndex !== void 0 ? newIndex : 0); ++i) {
-        var _getChildren$getAt;
-        (_getChildren$getAt = getChildren().getAt(i)) === null || _getChildren$getAt === void 0 ? void 0 : _getChildren$getAt.setParentIsStaggered(parentIsStaggered);
+        var _getChildren$getAt6;
+        (_getChildren$getAt6 = getChildren().getAt(i)) === null || _getChildren$getAt6 === void 0 ? void 0 : _getChildren$getAt6.setParentIsStaggered(parentIsStaggered);
       }
       if (timeoutHandle.current == -1) {
         resetEmergencyTimeout();
@@ -6312,8 +6415,8 @@ var bundle = function (exports) {
       // Either way, tell the next child to show itself.
       // Also make sure that anyone we skipped somehow show themselves as well.
       for (let i = prevIndex !== null && prevIndex !== void 0 ? prevIndex : 0; i < newIndex; ++i) {
-        var _getChildren$getAt2;
-        (_getChildren$getAt2 = getChildren().getAt(i)) === null || _getChildren$getAt2 === void 0 ? void 0 : _getChildren$getAt2.setStaggeredVisible(true);
+        var _getChildren$getAt7;
+        (_getChildren$getAt7 = getChildren().getAt(i)) === null || _getChildren$getAt7 === void 0 ? void 0 : _getChildren$getAt7.setStaggeredVisible(true);
       }
       // Set a new emergency timeout
       resetEmergencyTimeout();
@@ -6369,7 +6472,7 @@ var bundle = function (exports) {
       })
     };
   }
-  function useStaggeredChild(_ref36) {
+  function useStaggeredChild(_ref38) {
     let {
       managedChildParameters: {
         index
@@ -6382,7 +6485,7 @@ var bundle = function (exports) {
           childCallsThisToTellTheParentToMountTheNextOne
         }
       }
-    } = _ref36;
+    } = _ref38;
     const [parentIsStaggered, setParentIsStaggered] = useState(getDefaultIsStaggered());
     const [staggeredVisible, setStaggeredVisible] = useState(getDefaultStaggeredVisible(index));
     s(() => {
@@ -6403,112 +6506,6 @@ var bundle = function (exports) {
       managedChildParameters: {
         setStaggeredVisible: setStaggeredVisible,
         setParentIsStaggered
-      }
-    };
-  }
-  function usePaginatedChildren(_ref37) {
-    let {
-      managedChildrenReturn: {
-        getChildren
-      },
-      linearNavigationParameters: {
-        indexDemangler,
-        indexMangler
-      },
-      paginatedChildrenParameters: {
-        paginationMax,
-        paginationMin
-      }
-    } = _ref37;
-    const [childCount, setChildCount] = useState(null);
-    const parentIsPaginated = paginationMin != null || paginationMax != null;
-    const lastPagination = _({
-      paginationMax: null,
-      paginationMin: null
-    });
-    const refreshPagination = T$1((paginationMin, paginationMax) => {
-      const childMax = getChildren().getHighestIndex() + 1;
-      for (let i = 0; i <= childMax; ++i) {
-        var _getChildren$getAt3, _getChildren$getAt4, _getChildren$getAt5;
-        const visible = i >= (paginationMin !== null && paginationMin !== void 0 ? paginationMin : -Infinity) && i < (paginationMax !== null && paginationMax !== void 0 ? paginationMax : Infinity);
-        (_getChildren$getAt3 = getChildren().getAt(indexDemangler(i))) === null || _getChildren$getAt3 === void 0 ? void 0 : _getChildren$getAt3.setParentIsPaginated(parentIsPaginated);
-        (_getChildren$getAt4 = getChildren().getAt(indexDemangler(i))) === null || _getChildren$getAt4 === void 0 ? void 0 : _getChildren$getAt4.setPaginationVisible(visible);
-        if (visible) (_getChildren$getAt5 = getChildren().getAt(indexDemangler(i))) === null || _getChildren$getAt5 === void 0 ? void 0 : _getChildren$getAt5.setChildCountIfPaginated(getChildren().getHighestIndex() + 1);
-      }
-    }, [/* Must be empty */]);
-    s(() => {
-      refreshPagination(paginationMin, paginationMax);
-      lastPagination.current.paginationMax = paginationMax;
-      lastPagination.current.paginationMin = paginationMin;
-    }, [paginationMax, paginationMin]);
-    // TODO: Modification during render
-    const p = _(parentIsPaginated);
-    p.current = parentIsPaginated;
-    return {
-      context: useStableObject({
-        paginatedChildContext: useStableObject({
-          getDefaultIsPaginated: T$1(() => {
-            return p.current;
-          }, []),
-          // This is only used during setState on mount, so this is fine.
-          // (If we change from paginated to not paginated, this is caught during useLayoutEffect)
-          getDefaultPaginationVisible: T$1(i => {
-            return parentIsPaginated ? i >= (paginationMin !== null && paginationMin !== void 0 ? paginationMin : -Infinity) && i < (paginationMax !== null && paginationMax !== void 0 ? paginationMax : Infinity) : true;
-          }, [])
-        })
-      }),
-      managedChildrenParameters: {
-        onChildCountChange: useStableCallback(count => {
-          if (paginationMax != null || paginationMin != null) {
-            setChildCount(count);
-            const min = paginationMin !== null && paginationMin !== void 0 ? paginationMin : 0;
-            const max = paginationMax !== null && paginationMax !== void 0 ? paginationMax : count;
-            for (let i = min; i < max; ++i) {
-              var _getChildren$getAt6, _getChildren$getAt7;
-              (_getChildren$getAt6 = getChildren().getAt(i)) === null || _getChildren$getAt6 === void 0 ? void 0 : _getChildren$getAt6.setParentIsPaginated(parentIsPaginated);
-              (_getChildren$getAt7 = getChildren().getAt(i)) === null || _getChildren$getAt7 === void 0 ? void 0 : _getChildren$getAt7.setChildCountIfPaginated(count);
-            }
-          } else {
-            // TODO: Make this debug only.
-            setChildCount(null);
-          }
-        })
-      },
-      paginatedChildrenReturn: {
-        refreshPagination,
-        childCount
-      }
-    };
-  }
-  function usePaginatedChild(_ref38) {
-    let {
-      managedChildParameters: {
-        index
-      },
-      context: {
-        paginatedChildContext: {
-          getDefaultPaginationVisible,
-          getDefaultIsPaginated
-        }
-      }
-    } = _ref38;
-    const [parentIsPaginated, setParentIsPaginated] = useState(getDefaultIsPaginated());
-    const [childCountIfPaginated, setChildCountIfPaginated] = useState(null);
-    const [paginatedVisible, setPaginatedVisible] = useState(getDefaultPaginationVisible(index));
-    return {
-      props: !parentIsPaginated ? {} : {
-        "aria-setsize": childCountIfPaginated !== null && childCountIfPaginated !== void 0 ? childCountIfPaginated : undefined,
-        "aria-posinset": index + 1
-      },
-      paginatedChildReturn: {
-        paginatedVisible,
-        isPaginated: parentIsPaginated,
-        hideBecausePaginated: parentIsPaginated ? !paginatedVisible : false
-      },
-      managedChildParameters: {
-        setPaginationVisible: setPaginatedVisible,
-        setChildCountIfPaginated,
-        setParentIsPaginated
       }
     };
   }
@@ -6669,8 +6666,7 @@ var bundle = function (exports) {
       typeaheadNavigationReturn
     } = gridNavigationSingleSelectionReturn;
     const {
-      indexDemangler,
-      indexMangler
+      indexDemangler
     } = rearrangeableChildrenReturn;
     const {
       childrenHaveFocusChildContext,
@@ -6704,8 +6700,7 @@ var bundle = function (exports) {
       managedChildrenReturn,
       paginatedChildrenParameters,
       linearNavigationParameters: {
-        indexDemangler,
-        indexMangler
+        indexDemangler
       }
     });
     const {
@@ -6931,7 +6926,7 @@ var bundle = function (exports) {
       managedChildContext,
       rovingTabIndexChildContext: r.rowAsParentOfCellsReturn.rovingTabIndexChildContext,
       typeaheadNavigationChildContext: r.rowAsParentOfCellsReturn.typeaheadNavigationChildContext,
-      completeGridNavigationContext: useStableObject({}),
+      // completeGridNavigationContext: useStableObject({}),
       gridNavigationCellContext: r.rowAsParentOfCellsReturn.gridNavigationCellContext
     });
     const {
@@ -6985,7 +6980,6 @@ var bundle = function (exports) {
       gridNavigationCellParameters,
       managedChildParameters,
       context: {
-        completeGridNavigationContext,
         gridNavigationCellContext,
         managedChildContext,
         rovingTabIndexChildContext,
@@ -7086,12 +7080,433 @@ var bundle = function (exports) {
       textContentReturn
     };
   }
-  function useTimeout(_ref43) {
+
+  /**
+   * All the list-related hooks combined into one giant hook that encapsulates everything.
+   *
+   * Unlike most others, this hook assume's it's the final one--the "outermost" hook in the component--so it uses `useManagedChildren` and wraps everything up nicely,
+   * combining event handlers that are used in multiple sub-hooks, collecting all the necessary context-related data, and merging all known DOM props together.
+   *
+   *
+   *
+   * @returns
+   */
+  function useCompleteListNavigation(_ref43) {
+    let {
+      linearNavigationParameters,
+      rearrangeableChildrenParameters,
+      sortableChildrenParameters,
+      typeaheadNavigationParameters,
+      rovingTabIndexParameters,
+      singleSelectionParameters,
+      paginatedChildrenParameters,
+      staggeredChildrenParameters,
+      ...completeListNavigationParameters
+    } = _ref43;
+    //type M = UseListNavigationSingleSelectionChildInfo<ChildElement>;
+    const {
+      initiallySelectedIndex
+    } = singleSelectionParameters;
+    const getChildren = T$1(() => managedChildrenReturn.getChildren(), []);
+    const getHighestChildIndex = T$1(() => getChildren().getHighestIndex(), []);
+    const getValid = T$1(i => {
+      const child = getChildren().getAt(i);
+      if (!child) return false;
+      return !child.hidden;
+    }, []);
+    const {
+      rearrangeableChildrenReturn: {
+        indexDemangler,
+        indexMangler,
+        ...rearrangeableChildrenReturn
+      },
+      sortableChildrenReturn
+    } = useSortableChildren({
+      rearrangeableChildrenParameters: {
+        onRearranged: useStableCallback(() => {
+          refreshPagination(paginatedChildrenParameters.paginationMin, paginatedChildrenParameters.paginationMax);
+        }),
+        ...rearrangeableChildrenParameters
+      },
+      sortableChildrenParameters
+    });
+    const {
+      childrenHaveFocusParameters,
+      managedChildrenParameters,
+      rovingTabIndexChildContext,
+      typeaheadNavigationChildContext,
+      singleSelectionContext,
+      linearNavigationReturn,
+      rovingTabIndexReturn,
+      singleSelectionReturn,
+      typeaheadNavigationReturn
+    } = useListNavigationSingleSelection({
+      managedChildrenReturn: {
+        getChildren
+      },
+      linearNavigationParameters: {
+        getHighestIndex: getHighestChildIndex,
+        isValid: getValid,
+        indexDemangler,
+        indexMangler,
+        ...linearNavigationParameters
+      },
+      typeaheadNavigationParameters: {
+        isValid: getValid,
+        ...typeaheadNavigationParameters
+      },
+      rovingTabIndexParameters: {
+        initiallyTabbedIndex: initiallySelectedIndex,
+        ...rovingTabIndexParameters
+      },
+      singleSelectionParameters,
+      ...completeListNavigationParameters
+    });
+    //const { linearNavigationReturn, typeaheadNavigationReturn } = listNavigationSingleSelectionSortableReturn;
+    //const [childCount, setChildCount] = useState(0);
+    const {
+      childrenHaveFocusChildContext,
+      childrenHaveFocusReturn
+    } = useChildrenHaveFocus({
+      childrenHaveFocusParameters
+    });
+    const {
+      context: {
+        managedChildContext
+      },
+      managedChildrenReturn
+    } = useManagedChildren({
+      managedChildrenParameters: {
+        onChildCountChange: useStableCallback(c => {
+          onChildCountChange(c);
+        }),
+        ...managedChildrenParameters
+      }
+    });
+    const {
+      paginatedChildrenReturn,
+      paginatedChildrenReturn: {
+        refreshPagination
+      },
+      managedChildrenParameters: {
+        onChildCountChange
+      },
+      context: {
+        paginatedChildContext
+      }
+    } = usePaginatedChildren({
+      managedChildrenReturn,
+      paginatedChildrenParameters,
+      linearNavigationParameters: {
+        indexDemangler
+      }
+    });
+    const {
+      context: {
+        staggeredChildContext
+      },
+      staggeredChildrenReturn
+    } = useStaggeredChildren({
+      managedChildrenReturn,
+      staggeredChildrenParameters
+    });
+    const props = useMergedProps(linearNavigationReturn.propsStable, typeaheadNavigationReturn.propsStable);
+    const context = useStableObject({
+      singleSelectionContext,
+      managedChildContext,
+      rovingTabIndexChildContext,
+      typeaheadNavigationChildContext,
+      childrenHaveFocusChildContext,
+      paginatedChildContext,
+      staggeredChildContext
+    });
+    return {
+      context,
+      props,
+      managedChildrenReturn,
+      rearrangeableChildrenReturn: {
+        indexDemangler,
+        indexMangler,
+        ...rearrangeableChildrenReturn
+      },
+      staggeredChildrenReturn,
+      paginatedChildrenReturn,
+      sortableChildrenReturn,
+      linearNavigationReturn,
+      rovingTabIndexReturn,
+      singleSelectionReturn,
+      typeaheadNavigationReturn,
+      childrenHaveFocusReturn
+    };
+  }
+  function useCompleteListNavigationChild(_ref44) {
+    let {
+      //managedChildParameters: { hidden, disabled, index, getSortValue },
+      completeListNavigationChildParameters: {
+        focusSelf,
+        ...completeListNavigationChildParameters
+      },
+      singleSelectionChildParameters,
+      rovingTabIndexChildParameters: {
+        hidden
+      },
+      managedChildParameters,
+      textContentParameters,
+      context: {
+        childrenHaveFocusChildContext,
+        managedChildContext,
+        rovingTabIndexChildContext,
+        singleSelectionContext,
+        typeaheadNavigationChildContext,
+        paginatedChildContext,
+        staggeredChildContext
+      },
+      //pressParameters: { onPressSync: ops1, ...pressParameters },
+      sortableChildParameters: {
+        getSortValue
+      },
+      ..._void
+    } = _ref44;
+    const {
+      index
+    } = managedChildParameters;
+    const {
+      managedChildParameters: {
+        setChildCountIfPaginated,
+        setPaginationVisible,
+        setParentIsPaginated
+      },
+      paginatedChildReturn,
+      paginatedChildReturn: {
+        hideBecausePaginated
+      },
+      props: paginationProps
+    } = usePaginatedChild({
+      managedChildParameters: {
+        index
+      },
+      context: {
+        paginatedChildContext
+      }
+    });
+    const {
+      managedChildParameters: {
+        setParentIsStaggered,
+        setStaggeredVisible
+      },
+      staggeredChildReturn,
+      staggeredChildReturn: {
+        hideBecauseStaggered
+      },
+      props: staggeredProps
+    } = useStaggeredChild({
+      managedChildParameters,
+      context: {
+        staggeredChildContext
+      }
+    });
+    //let { hidden } = rovingTabIndexChildParameters;
+    hidden || (hidden = hideBecausePaginated || hideBecauseStaggered);
+    let {
+      disabled
+    } = singleSelectionChildParameters;
+    if (hidden) disabled = true;
+    const {
+      refElementReturn
+    } = useRefElement({
+      refElementParameters: {}
+    });
+    const {
+      getElement
+    } = refElementReturn;
+    const {
+      hasCurrentFocusParameters: {
+        onCurrentFocusedInnerChanged: ocfic1
+      },
+      pressParameters,
+      rovingTabIndexChildReturn,
+      singleSelectionChildReturn,
+      managedChildParameters: {
+        setLocalSelected
+      }
+    } = useListNavigationSingleSelectionChild({
+      managedChildParameters: {
+        index
+      },
+      rovingTabIndexChildParameters: {
+        hidden
+      },
+      singleSelectionChildParameters: {
+        ...singleSelectionChildParameters
+      },
+      rovingTabIndexChildContext,
+      singleSelectionContext,
+      typeaheadNavigationChildContext,
+      refElementReturn,
+      textContentParameters: {
+        hidden,
+        ...textContentParameters
+      }
+    });
+    const {
+      getTabbable,
+      setTabbable,
+      tabbable
+    } = rovingTabIndexChildReturn;
+    /* const { pressReturn } = usePress<ChildElement>({
+         pressParameters: {
+             ...p1,
+             ...pressParameters,
+             onPressSync: disabled ? null : ((e) => {
+                 ops2?.(e);
+                 ops1?.(e);
+             })
+         }, refElementReturn
+     });*/
+    const {
+      getSelected,
+      selected
+    } = singleSelectionChildReturn;
+    const mcp1 = {
+      disabled,
+      focusSelf,
+      getElement,
+      getSelected,
+      getTabbable,
+      hidden,
+      index,
+      selected,
+      setLocalSelected,
+      setTabbable,
+      tabbable,
+      getSortValue,
+      setChildCountIfPaginated,
+      setPaginationVisible,
+      setParentIsPaginated,
+      setParentIsStaggered,
+      setStaggeredVisible
+    };
+    const {
+      managedChildReturn
+    } = useManagedChild({
+      context: {
+        managedChildContext
+      },
+      managedChildParameters: {
+        index
+      }
+    }, {
+      ...mcp1,
+      ...completeListNavigationChildParameters
+    });
+    const {
+      hasCurrentFocusParameters: {
+        onCurrentFocusedInnerChanged: ocfic2
+      }
+    } = useChildrenHaveFocusChild({
+      childrenHaveFocusChildContext
+    });
+    const onCurrentFocusedInnerChanged = useStableCallback((focused, prev, e) => {
+      ocfic1 === null || ocfic1 === void 0 ? void 0 : ocfic1(focused, prev, e);
+      ocfic2 === null || ocfic2 === void 0 ? void 0 : ocfic2(focused, prev, e);
+    });
+    const {
+      hasCurrentFocusReturn
+    } = useHasCurrentFocus({
+      hasCurrentFocusParameters: {
+        onCurrentFocusedInnerChanged,
+        onCurrentFocusedChanged: null
+      },
+      refElementReturn
+    });
+    const props = useMergedProps(refElementReturn.propsStable, hasCurrentFocusReturn.propsStable, rovingTabIndexChildReturn.propsUnstable, singleSelectionChildReturn.propsUnstable, paginationProps, staggeredProps);
+    return {
+      props,
+      pressParameters,
+      refElementReturn,
+      rovingTabIndexChildReturn,
+      singleSelectionChildReturn,
+      hasCurrentFocusReturn,
+      managedChildReturn,
+      paginatedChildReturn,
+      staggeredChildReturn
+    };
+  }
+  /*
+  function foo<ParentElement extends Element, ChildElement extends Element, M extends UseListNavigationSingleSelectionSortableChildInfo<ChildElement>>(p: UseCompleteListNavigationParameters<ParentElement, ChildElement, M>) {
+      const { singleSelectionReturn } = useCompleteListNavigation<ParentElement, ChildElement, M>(p);
+      const selectedIndex = 0;
+      useSingleSelectionDeclarative({ singleSelectionReturn, singleSelectionDeclarativeParameters: { selectedIndex } })
+  }*/
+
+  /**
+   * Combines dismissal hooks and focus trap hooks into one.
+   *
+   * Another in the "complete" series, alongside list/grid navigation and dismissal itself.
+   *
+   * Use for dialogs, menus, etc.  Anything that can be dismissed and might trap focus, basically.
+   *
+   * @param param0
+   * @returns
+   */
+  function useModal(_ref45) {
+    let {
+      dismissParameters,
+      escapeDismissParameters,
+      focusTrapParameters: {
+        trapActive,
+        ...focusTrapParameters
+      }
+    } = _ref45;
+    const {
+      open
+    } = dismissParameters;
+    //const { getWindow } = escapeDismissParameters;
+    //const getDocument = useCallback(() => { return getWindow().document; }, [getWindow]);
+    const {
+      refElementPopupReturn,
+      refElementSourceReturn
+    } = useDismiss({
+      dismissParameters,
+      escapeDismissParameters
+    });
+    const {
+      focusTrapReturn,
+      refElementReturn
+    } = useFocusTrap({
+      focusTrapParameters: {
+        trapActive: open && trapActive,
+        ...focusTrapParameters
+      },
+      refElementParameters: {}
+    });
+    const {
+      propsStable: pp1
+    } = refElementPopupReturn;
+    const {
+      propsStable: ps2
+    } = refElementSourceReturn;
+    const {
+      propsUnstable: pp3
+    } = focusTrapReturn;
+    const {
+      propsStable: pp4
+    } = refElementReturn;
+    return {
+      propsPopup: pp1,
+      propsFocusContainer: useMergedProps(pp3, pp4),
+      propsSource: ps2,
+      refElementPopupReturn,
+      refElementSourceReturn,
+      focusTrapReturn
+    };
+  }
+  function useTimeout(_ref46) {
     let {
       timeout,
       callback,
       triggerIndex
-    } = _ref43;
+    } = _ref46;
     const stableCallback = useStableCallback(() => {
       startTimeRef.current = null;
       callback();
@@ -7282,10 +7697,10 @@ var bundle = function (exports) {
       setHovering(false);
       setPointerDownStartedHere(false);
     }, []);
-    const onPointerEnter = T$1(e => {
+    const onPointerEnter = T$1(_e => {
       setHovering(true);
     }, []);
-    const onPointerLeave = T$1(e => {
+    const onPointerLeave = T$1(_e => {
       setHovering(false);
       setLongPress(false);
     }, []);
@@ -7426,436 +7841,6 @@ var bundle = function (exports) {
     if (exclude === true || exclude !== null && exclude !== void 0 && exclude[target]) return true;
     return false;
   }
-
-  /**
-   * All the list-related hooks combined into one giant hook that encapsulates everything.
-   *
-   * Unlike most others, this hook assume's it's the final one--the "outermost" hook in the component--so it uses `useManagedChildren` and wraps everything up nicely,
-   * combining event handlers that are used in multiple sub-hooks, collecting all the necessary context-related data, and merging all known DOM props together.
-   *
-   *
-   *
-   * @returns
-   */
-  function useCompleteListNavigation(_ref44) {
-    let {
-      linearNavigationParameters,
-      rearrangeableChildrenParameters,
-      sortableChildrenParameters,
-      typeaheadNavigationParameters,
-      rovingTabIndexParameters,
-      singleSelectionParameters,
-      paginatedChildrenParameters,
-      staggeredChildrenParameters,
-      ...completeListNavigationParameters
-    } = _ref44;
-    //type M = UseListNavigationSingleSelectionChildInfo<ChildElement>;
-    const {
-      initiallySelectedIndex
-    } = singleSelectionParameters;
-    const getChildren = T$1(() => managedChildrenReturn.getChildren(), []);
-    const getHighestChildIndex = T$1(() => getChildren().getHighestIndex(), []);
-    const getValid = T$1(i => {
-      const child = getChildren().getAt(i);
-      if (!child) return false;
-      return !child.hidden;
-    }, []);
-    const {
-      rearrangeableChildrenReturn: {
-        indexDemangler,
-        indexMangler,
-        ...rearrangeableChildrenReturn
-      },
-      sortableChildrenReturn
-    } = useSortableChildren({
-      rearrangeableChildrenParameters: {
-        onRearranged: useStableCallback(() => {
-          refreshPagination(paginatedChildrenParameters.paginationMin, paginatedChildrenParameters.paginationMax);
-        }),
-        ...rearrangeableChildrenParameters
-      },
-      sortableChildrenParameters
-    });
-    const {
-      childrenHaveFocusParameters,
-      managedChildrenParameters,
-      rovingTabIndexChildContext,
-      typeaheadNavigationChildContext,
-      singleSelectionContext,
-      linearNavigationReturn,
-      rovingTabIndexReturn,
-      singleSelectionReturn,
-      typeaheadNavigationReturn
-    } = useListNavigationSingleSelection({
-      managedChildrenReturn: {
-        getChildren
-      },
-      linearNavigationParameters: {
-        getHighestIndex: getHighestChildIndex,
-        isValid: getValid,
-        indexDemangler,
-        indexMangler,
-        ...linearNavigationParameters
-      },
-      typeaheadNavigationParameters: {
-        isValid: getValid,
-        ...typeaheadNavigationParameters
-      },
-      rovingTabIndexParameters: {
-        initiallyTabbedIndex: initiallySelectedIndex,
-        ...rovingTabIndexParameters
-      },
-      singleSelectionParameters,
-      ...completeListNavigationParameters
-    });
-    //const { linearNavigationReturn, typeaheadNavigationReturn } = listNavigationSingleSelectionSortableReturn;
-    //const [childCount, setChildCount] = useState(0);
-    const {
-      childrenHaveFocusChildContext,
-      childrenHaveFocusReturn
-    } = useChildrenHaveFocus({
-      childrenHaveFocusParameters
-    });
-    const {
-      context: {
-        managedChildContext
-      },
-      managedChildrenReturn
-    } = useManagedChildren({
-      managedChildrenParameters: {
-        onChildCountChange: useStableCallback(c => {
-          onChildCountChange(c);
-        }),
-        ...managedChildrenParameters
-      }
-    });
-    const {
-      paginatedChildrenReturn,
-      paginatedChildrenReturn: {
-        refreshPagination
-      },
-      managedChildrenParameters: {
-        onChildCountChange
-      },
-      context: {
-        paginatedChildContext
-      }
-    } = usePaginatedChildren({
-      managedChildrenReturn,
-      paginatedChildrenParameters,
-      linearNavigationParameters: {
-        indexDemangler,
-        indexMangler
-      }
-    });
-    const {
-      context: {
-        staggeredChildContext
-      },
-      staggeredChildrenReturn
-    } = useStaggeredChildren({
-      managedChildrenReturn,
-      staggeredChildrenParameters
-    });
-    const props = useMergedProps(linearNavigationReturn.propsStable, typeaheadNavigationReturn.propsStable);
-    const context = useStableObject({
-      singleSelectionContext,
-      managedChildContext,
-      rovingTabIndexChildContext,
-      typeaheadNavigationChildContext,
-      childrenHaveFocusChildContext,
-      paginatedChildContext,
-      staggeredChildContext
-    });
-    return {
-      context,
-      props,
-      managedChildrenReturn,
-      rearrangeableChildrenReturn: {
-        indexDemangler,
-        indexMangler,
-        ...rearrangeableChildrenReturn
-      },
-      staggeredChildrenReturn,
-      paginatedChildrenReturn,
-      sortableChildrenReturn,
-      linearNavigationReturn,
-      rovingTabIndexReturn,
-      singleSelectionReturn,
-      typeaheadNavigationReturn,
-      childrenHaveFocusReturn
-    };
-  }
-  function useCompleteListNavigationChild(_ref45) {
-    let {
-      //managedChildParameters: { hidden, disabled, index, getSortValue },
-      completeListNavigationChildParameters,
-      singleSelectionChildParameters,
-      rovingTabIndexChildParameters: {
-        hidden
-      },
-      managedChildParameters,
-      textContentParameters,
-      context: {
-        childrenHaveFocusChildContext,
-        managedChildContext,
-        rovingTabIndexChildContext,
-        singleSelectionContext,
-        typeaheadNavigationChildContext,
-        paginatedChildContext,
-        staggeredChildContext
-      },
-      pressParameters: {
-        onPressSync: ops1,
-        ...pressParameters
-      },
-      sortableChildParameters: {
-        getSortValue
-      },
-      ..._void
-    } = _ref45;
-    const {
-      index
-    } = managedChildParameters;
-    const {
-      managedChildParameters: {
-        setChildCountIfPaginated,
-        setPaginationVisible,
-        setParentIsPaginated
-      },
-      paginatedChildReturn,
-      paginatedChildReturn: {
-        hideBecausePaginated
-      },
-      props: paginationProps
-    } = usePaginatedChild({
-      managedChildParameters: {
-        index
-      },
-      context: {
-        paginatedChildContext
-      }
-    });
-    const {
-      managedChildParameters: {
-        setParentIsStaggered,
-        setStaggeredVisible
-      },
-      staggeredChildReturn,
-      staggeredChildReturn: {
-        hideBecauseStaggered
-      },
-      props: staggeredProps
-    } = useStaggeredChild({
-      managedChildParameters,
-      context: {
-        staggeredChildContext
-      }
-    });
-    //let { hidden } = rovingTabIndexChildParameters;
-    hidden || (hidden = hideBecausePaginated || hideBecauseStaggered);
-    let {
-      disabled
-    } = singleSelectionChildParameters;
-    if (hidden) disabled = true;
-    const {
-      refElementReturn
-    } = useRefElement({
-      refElementParameters: {}
-    });
-    const {
-      getElement
-    } = refElementReturn;
-    const {
-      focusSelf
-    } = pressParameters;
-    const {
-      hasCurrentFocusParameters: {
-        onCurrentFocusedInnerChanged: ocfic1
-      },
-      pressParameters: {
-        onPressSync: ops2,
-        ...p1
-      },
-      rovingTabIndexChildReturn,
-      singleSelectionChildReturn,
-      managedChildParameters: {
-        setLocalSelected
-      }
-    } = useListNavigationSingleSelectionChild({
-      managedChildParameters: {
-        index
-      },
-      rovingTabIndexChildParameters: {
-        hidden
-      },
-      singleSelectionChildParameters: {
-        ...singleSelectionChildParameters
-      },
-      rovingTabIndexChildContext,
-      singleSelectionContext,
-      typeaheadNavigationChildContext,
-      refElementReturn,
-      textContentParameters: {
-        hidden,
-        ...textContentParameters
-      }
-    });
-    const {
-      getTabbable,
-      setTabbable,
-      tabbable
-    } = rovingTabIndexChildReturn;
-    const {
-      pressReturn
-    } = usePress({
-      pressParameters: {
-        ...p1,
-        ...pressParameters,
-        onPressSync: disabled ? null : e => {
-          ops2 === null || ops2 === void 0 ? void 0 : ops2(e);
-          ops1 === null || ops1 === void 0 ? void 0 : ops1(e);
-        }
-      },
-      refElementReturn
-    });
-    const {
-      getSelected,
-      selected
-    } = singleSelectionChildReturn;
-    const mcp1 = {
-      disabled,
-      focusSelf,
-      getElement,
-      getSelected,
-      getTabbable,
-      hidden,
-      index,
-      selected,
-      setLocalSelected,
-      setTabbable,
-      tabbable,
-      getSortValue,
-      setChildCountIfPaginated,
-      setPaginationVisible,
-      setParentIsPaginated,
-      setParentIsStaggered,
-      setStaggeredVisible
-    };
-    const {
-      managedChildReturn
-    } = useManagedChild({
-      context: {
-        managedChildContext
-      },
-      managedChildParameters: {
-        index
-      }
-    }, {
-      ...mcp1,
-      ...completeListNavigationChildParameters
-    });
-    const {
-      hasCurrentFocusParameters: {
-        onCurrentFocusedInnerChanged: ocfic2
-      }
-    } = useChildrenHaveFocusChild({
-      childrenHaveFocusChildContext
-    });
-    const onCurrentFocusedInnerChanged = useStableCallback((focused, prev, e) => {
-      ocfic1 === null || ocfic1 === void 0 ? void 0 : ocfic1(focused, prev, e);
-      ocfic2 === null || ocfic2 === void 0 ? void 0 : ocfic2(focused, prev, e);
-    });
-    const {
-      hasCurrentFocusReturn
-    } = useHasCurrentFocus({
-      hasCurrentFocusParameters: {
-        onCurrentFocusedInnerChanged,
-        onCurrentFocusedChanged: null
-      },
-      refElementReturn
-    });
-    const props = useMergedProps(refElementReturn.propsStable, pressReturn.propsUnstable, hasCurrentFocusReturn.propsStable, rovingTabIndexChildReturn.propsUnstable, singleSelectionChildReturn.propsUnstable, paginationProps, staggeredProps);
-    return {
-      props,
-      pressReturn,
-      rovingTabIndexChildReturn,
-      singleSelectionChildReturn,
-      hasCurrentFocusReturn,
-      managedChildReturn,
-      paginatedChildReturn,
-      staggeredChildReturn
-    };
-  }
-  /*
-  function foo<ParentElement extends Element, ChildElement extends Element, M extends UseListNavigationSingleSelectionSortableChildInfo<ChildElement>>(p: UseCompleteListNavigationParameters<ParentElement, ChildElement, M>) {
-      const { singleSelectionReturn } = useCompleteListNavigation<ParentElement, ChildElement, M>(p);
-      const selectedIndex = 0;
-      useSingleSelectionDeclarative({ singleSelectionReturn, singleSelectionDeclarativeParameters: { selectedIndex } })
-  }*/
-
-  /**
-   * Combines dismissal hooks and focus trap hooks into one.
-   *
-   * Another in the "complete" series, alongside list/grid navigation and dismissal itself.
-   *
-   * Use for dialogs, menus, etc.  Anything that can be dismissed and might trap focus, basically.
-   *
-   * @param param0
-   * @returns
-   */
-  function useModal(_ref46) {
-    let {
-      dismissParameters,
-      escapeDismissParameters,
-      focusTrapParameters: {
-        trapActive,
-        ...focusTrapParameters
-      }
-    } = _ref46;
-    const {
-      open
-    } = dismissParameters;
-    //const { getWindow } = escapeDismissParameters;
-    //const getDocument = useCallback(() => { return getWindow().document; }, [getWindow]);
-    const {
-      refElementPopupReturn,
-      refElementSourceReturn
-    } = useDismiss({
-      dismissParameters,
-      escapeDismissParameters
-    });
-    const {
-      focusTrapReturn,
-      refElementReturn
-    } = useFocusTrap({
-      focusTrapParameters: {
-        trapActive: open && trapActive,
-        ...focusTrapParameters
-      },
-      refElementParameters: {}
-    });
-    const {
-      propsStable: pp1
-    } = refElementPopupReturn;
-    const {
-      propsStable: ps2
-    } = refElementSourceReturn;
-    const {
-      propsUnstable: pp3
-    } = focusTrapReturn;
-    const {
-      propsStable: pp4
-    } = refElementReturn;
-    return {
-      propsPopup: pp1,
-      propsFocusContainer: useMergedProps(pp3, pp4),
-      propsSource: ps2,
-      refElementPopupReturn,
-      refElementSourceReturn,
-      focusTrapReturn
-    };
-  }
   function useRandomId(_ref47) {
     let {
       randomIdParameters: {
@@ -7928,8 +7913,9 @@ var bundle = function (exports) {
    * // => Logs the number of milliseconds it took for the deferred invocation.
    */
   var now = function () {
-    return root.Date.now();
+    return root$1.Date.now();
   };
+  var now$1 = now;
 
   /** Used to match a single whitespace character. */
   var reWhitespace = /\s/;
@@ -8157,7 +8143,7 @@ var bundle = function (exports) {
       return lastCallTime === undefined || timeSinceLastCall >= wait || timeSinceLastCall < 0 || maxing && timeSinceLastInvoke >= maxWait;
     }
     function timerExpired() {
-      var time = now();
+      var time = now$1();
       if (shouldInvoke(time)) {
         return trailingEdge(time);
       }
@@ -8183,10 +8169,10 @@ var bundle = function (exports) {
       lastArgs = lastCallTime = lastThis = timerId = undefined;
     }
     function flush() {
-      return timerId === undefined ? result : trailingEdge(now());
+      return timerId === undefined ? result : trailingEdge(now$1());
     }
     function debounced() {
-      var time = now(),
+      var time = now$1(),
         isInvoking = shouldInvoke(time);
       lastArgs = arguments;
       lastThis = this;
@@ -8245,8 +8231,8 @@ var bundle = function (exports) {
     // Things related to current execution
     // Because we can both return and throw undefined, 
     // we need separate state to track their existance too.
-    const [pending, setPending, getPending] = useState(false);
-    const [result, setResult, getResult] = useState(undefined);
+    const [pending, setPending, _getPending] = useState(false);
+    const [result, setResult, _getResult] = useState(undefined);
     const [error, setError, _getError] = useState(undefined);
     const [hasError, setHasError, _getHasError] = useState(false);
     const [hasResult, setHasResult, _getHasResult] = useState(false);
@@ -9361,7 +9347,8 @@ var bundle = function (exports) {
       },
       staggeredChildReturn: {
         hideBecauseStaggered
-      }
+      },
+      refElementReturn
     } = useCompleteListNavigationChild({
       managedChildParameters: {
         index
@@ -9372,17 +9359,13 @@ var bundle = function (exports) {
       sortableChildParameters: {
         getSortValue
       },
-      pressParameters: {
-        onPressSync: null,
-        exclude: {},
-        focusSelf
-      },
       singleSelectionChildParameters: {
         ariaPropName: "aria-selected",
         selectionMode,
         disabled
       },
       completeListNavigationChildParameters: {
+        focusSelf,
         foo: "bar"
       },
       context,
@@ -9393,6 +9376,17 @@ var bundle = function (exports) {
         }, [])
       }
     });
+    const {
+      pressReturn
+    } = usePress({
+      refElementReturn,
+      pressParameters: {
+        onPressSync: null,
+        exclude: {},
+        focusSelf
+      }
+    });
+    const props2 = useMergedProps(props, pressReturn.propsUnstable);
     const text = "".concat(randomWord, " This is item #").concat(index, " (offset: ").concat(selectedOffset, ") ").concat(hidden ? " (hidden)" : "").concat(disabled ? " (disabled)" : "").concat(selected ? " (selected)" : " (not selected)", " (").concat(tabbable ? "Tabbable" : "Not tabbable", ")");
     /*
         const {
@@ -9442,7 +9436,7 @@ var bundle = function (exports) {
     
         const props = useMergedProps<HTMLLIElement>(p2, p3, p4, p5, p6);*/
     return o$1("li", {
-      ...props,
+      ...props2,
       style: {
         opacity: hideBecausePaginated ? 0.25 : 1,
         transform: "translateX(".concat(hideBecauseStaggered ? "50%" : "0%", ")")
@@ -10524,10 +10518,10 @@ var bundle = function (exports) {
       const onClickThrottled = useThrottled(onClick, 1000);
       const onClickDebounced = useDebounced(onClick, 1000);
       const onClickBoth = useDebounced(onClickThrottled, 1000);
-       return (
+        return (
           <div className="demo">
               <div>Press count: {count}</div>
-               <div><button onClick={() => {debugger; onClick();}}>Normal</button></div>
+                <div><button onClick={() => {debugger; onClick();}}>Normal</button></div>
               <div><button onClick={() => {debugger; onClickThrottled();}}>Throttled</button></div>
               <div><button onClick={() => {debugger; onClickDebounced();}}>Debounced</button></div>
               <div><button onClick={() => {debugger; onClickBoth();}}>Combined</button></div>
