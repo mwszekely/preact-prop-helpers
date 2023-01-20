@@ -117,13 +117,13 @@ export function useListNavigationChild<ChildElement extends Element>({
 }: UseListNavigationChildParameters<ChildElement>): UseListNavigationChildReturnType<ChildElement> {
 
     const rticr = useRovingTabIndexChild<ChildElement>({ rovingTabIndexChildContext, rovingTabIndexChildParameters, managedChildParameters });
-    const { textContentReturn } = useTypeaheadNavigationChild<ChildElement>({ refElementReturn, typeaheadNavigationChildContext, managedChildParameters, textContentParameters });
+    const tncr = useTypeaheadNavigationChild<ChildElement>({ refElementReturn, typeaheadNavigationChildContext, managedChildParameters, textContentParameters });
 
     assertEmptyObject(_void2);
 //    assertEmptyObject(_void5);
 
     return {
-        textContentReturn,
+        ...tncr,
         ...rticr
     }
 }

@@ -362,7 +362,8 @@ export function useCompleteGridNavigationCell<CellElement extends Element, M ext
     const {
         hasCurrentFocusParameters,
         rovingTabIndexChildReturn,
-        textContentReturn
+        textContentReturn,
+        pressParameters
     } = useGridNavigationSingleSelectionCell<CellElement>({
         gridNavigationCellContext,
         gridNavigationCellParameters,
@@ -423,6 +424,7 @@ export function useCompleteGridNavigationCell<CellElement extends Element, M ext
         props,
         refElementReturn,
         rovingTabIndexChildReturn,
+        pressParameters,
         //pressReturn,
         hasCurrentFocusReturn,
         managedChildReturn,

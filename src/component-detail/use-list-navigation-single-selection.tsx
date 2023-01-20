@@ -44,7 +44,9 @@ export interface UseListNavigationSingleSelectionChildParameters<ChildElement ex
     managedChildParameters: UseListNavigationChildParameters<ChildElement>["managedChildParameters"] & UseSingleSelectionChildParameters<ChildElement>["managedChildParameters"];
 }
 
-export interface UseListNavigationSingleSelectionChildReturnType<ChildElement extends Element> extends UseListNavigationChildReturnType<ChildElement>, UseSingleSelectionChildReturnType<ChildElement> { }
+export interface UseListNavigationSingleSelectionChildReturnType<ChildElement extends Element> extends UseListNavigationChildReturnType<ChildElement>, UseSingleSelectionChildReturnType<ChildElement> {
+    pressParameters: UseListNavigationChildReturnType<ChildElement>["pressParameters"] & UseSingleSelectionChildReturnType<ChildElement>["pressParameters"];
+}
 
 export function useListNavigationSingleSelectionChild<ChildElement extends Element>({
     managedChildParameters: { index, ..._void5 },
@@ -60,6 +62,7 @@ export function useListNavigationSingleSelectionChild<ChildElement extends Eleme
 
     const {
         hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ..._void3 },
+        pressParameters: { onPressSync },
         ...sscr
     } = useSingleSelectionChild<ChildElement>({
         managedChildParameters: { index },
@@ -69,6 +72,7 @@ export function useListNavigationSingleSelectionChild<ChildElement extends Eleme
 
     const {
         hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ..._void6 },
+        pressParameters: { excludeSpace },
         ...lncr
     } = useListNavigationChild<ChildElement>({
         managedChildParameters: { index },
@@ -92,6 +96,7 @@ export function useListNavigationSingleSelectionChild<ChildElement extends Eleme
                 ocfic2?.(focused, previouslyFocused, e);
             })
         },
+        pressParameters: { onPressSync, excludeSpace },
         ...sscr,
         ...lncr
     }

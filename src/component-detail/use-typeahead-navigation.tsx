@@ -1,3 +1,4 @@
+import { UsePressParameters } from "component-use/use-press";
 import { h } from "preact";
 import { useCallback, useLayoutEffect, useRef } from "preact/hooks";
 import { UseRefElementReturnType } from "../dom-helpers/use-ref-element";
@@ -70,6 +71,7 @@ export interface UseTypeaheadNavigationChildParameters<ChildElement extends Elem
     typeaheadNavigationChildContext: {
 
         typeaheadNavigationChildParameters: {
+            excludeSpace: () => boolean;
             sortedTypeaheadInfo: Array<TypeaheadInfo>;
             insertingComparator: (lhs: string | null, rhs: TypeaheadInfo) => number;
         }
@@ -77,6 +79,8 @@ export interface UseTypeaheadNavigationChildParameters<ChildElement extends Elem
 }
 
 export interface UseTypeaheadNavigationChildReturnType {
+    pressParameters: Pick<UsePressParameters<any>["pressParameters"], "excludeSpace">;
+
     textContentReturn: { getTextContent(): string | null }
 }
 
@@ -229,12 +233,14 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
          
      }, [currentTypeahead]);*/
 
+    const excludeSpace = useStableCallback(() => { return typeaheadStatus != "none" });
 
     return {
         typeaheadNavigationChildContext: useStableObject({
             typeaheadNavigationChildParameters: useStableObject({
                 insertingComparator,
-                sortedTypeaheadInfo: sortedTypeaheadInfo.current
+                sortedTypeaheadInfo: sortedTypeaheadInfo.current,
+                excludeSpace
             }),
 
         }),
@@ -339,7 +345,7 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
 export function useTypeaheadNavigationChild<ChildElement extends Element>({
     managedChildParameters: { index, ...void1 },
     textContentParameters: { getText, hidden, ...void5 },
-    typeaheadNavigationChildContext: { typeaheadNavigationChildParameters: { sortedTypeaheadInfo, insertingComparator, ...void2 } },
+    typeaheadNavigationChildContext: { typeaheadNavigationChildParameters: { sortedTypeaheadInfo, insertingComparator, excludeSpace, ...void2 } },
     refElementReturn: { getElement, ...void3 },
     //typeaheadNavigationChildParameters: { ...void5 },
     ...void4
@@ -386,7 +392,7 @@ export function useTypeaheadNavigationChild<ChildElement extends Element>({
         }
     })
 
-    return { textContentReturn }
+    return { textContentReturn, pressParameters: { excludeSpace } }
 
 }
 

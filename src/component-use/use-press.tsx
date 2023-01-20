@@ -22,6 +22,13 @@ export interface UsePressParameters<E extends Node> {
          */
         onPressSync: ((e: h.JSX.TargetedEvent<E>) => void) | null | undefined;
 
+        /** Pass a function that returns `true` to prevent the spacebar from contributing to press events */
+        excludeSpace?(): boolean;
+        /** Pass a function that returns `true` to prevent the enter key from contributing to press events */
+        excludeEnter?(): boolean;
+        /** Pass a function that returns `true` to prevent the pointer (mouse, touch, etc.) from contributing to press events */
+        excludePointer?(): boolean;
+
         /**
          * Whether certain methods of pressing this component should be deactivated.
          * 
@@ -29,9 +36,25 @@ export interface UsePressParameters<E extends Node> {
          * 
          * If true, then all presses are disabled.  If false/undefined/null, no presses are disabled.
          */
-        exclude: undefined | boolean | { click?: "exclude" | undefined, space?: "exclude" | undefined, enter?: "exclude" | undefined };
+
+        //exclude: undefined | boolean | { click?: "exclude" | undefined, space?: "exclude" | undefined, enter?: "exclude" | undefined };
+        /**
+         * Ensures that when a button is pressed it properly receives focus (even on iOS Safari).
+         * 
+         * Generally, this should just be `e => e.focus()`
+         * @param element 
+         */
         focusSelf(element: E): void;
+
+        /**
+         * If `true`, holding down the `Enter` key will repeatedly fire press events as each sequential repeated keyboard event happens.
+         */
         allowRepeatPresses?: boolean;
+
+        /**
+         * After this number of milliseconds have passed pressing down but not up, the returned `longPress` value will be set to `true`
+         * and the user's actions will not fire an actual press event.
+         */
         longPressThreshold?: number | null;
 
         //onPseudoActiveStart: null | undefined | (() => void);
@@ -61,7 +84,9 @@ function supportsPointerEvents() {
 
 /**
  * Adds the necessary event handlers to create a "press"-like event for
- * any element, whether it's a native &lt;BUTTON> or regular &lt;DIV>.
+ * any element, whether it's a native &lt;button> or regular &lt;div>,
+ * and allows for a "long press" that can be used to, 
+ * e.g., show a tooltip *instead* of activating a press.
  * 
  * Notably, the following cases are covered:
  * * The target element is properly focused, even on iOS Safari (*especially* on iOS Safari)
@@ -80,8 +105,12 @@ function supportsPointerEvents() {
 export function usePress<E extends Element>(args: UsePressParameters<E>): UsePressReturnType<E> {
     const {
         refElementReturn: { getElement },
-        pressParameters: { exclude, focusSelf, onPressSync, allowRepeatPresses, longPressThreshold }
+        pressParameters: { focusSelf, onPressSync, allowRepeatPresses, longPressThreshold, excludeEnter: ee, excludePointer: ep, excludeSpace: es }
     } = args;
+
+    const excludeEnter = useStableCallback(ee ?? returnFalse);
+    const excludeSpace = useStableCallback(es ?? returnFalse);
+    const excludePointer = useStableCallback(ep ?? returnFalse);
 
     const hasPressEvent = (onPressSync != null);
 
@@ -177,16 +206,18 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
     }, []);
 
     const onPointerDown = useCallback((e: h.JSX.TargetedPointerEvent<E>) => {
-        if ((e.buttons & 1)) {
-            e.preventDefault();
-            e.stopPropagation();
-            setPointerDownStartedHere(true);
-            setHovering(true);
-            setLongPress(false);
+        if (!excludePointer()) {
+            if ((e.buttons & 1)) {
+                e.preventDefault();
+                e.stopPropagation();
+                setPointerDownStartedHere(true);
+                setHovering(true);
+                setLongPress(false);
 
-            const element = getElement();
-            if (element)
-                focusSelf(element);
+                const element = getElement();
+                if (element)
+                    focusSelf(element);
+            }
         }
     }, []);
     const onPointerMove = useStableCallback((e: h.JSX.TargetedPointerEvent<E>) => {
@@ -212,15 +243,18 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
         const hovering = getHovering();
         const pointerDownStartedHere = getPointerDownStartedHere();
 
-        setJustHandled(true);
-        if (pointerDownStartedHere && hovering) {
-            handlePress(e);
-            e.preventDefault();
-            e.stopPropagation();
+        if (!excludePointer()) {
+            setJustHandled(true);
+            if (pointerDownStartedHere && hovering) {
+                handlePress(e);
+                e.preventDefault();
+                e.stopPropagation();
+            }
         }
         setWaitingForSpaceUp(false);
         setHovering(false);
         setPointerDownStartedHere(false);
+        setLongPress(false);
 
     }, []);
     const onPointerEnter = useCallback((_e: h.JSX.TargetedPointerEvent<E>) => {
@@ -234,13 +268,21 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
     useTimeout({
         callback: () => {
             const element = getElement();
+            setLongPress(pointerDownStartedHere && hovering);
             if (element && pointerDownStartedHere && hovering) {
                 focusSelf(element);
+
+
+                if (longPressThreshold) {
+                    setWaitingForSpaceUp(false);
+                    setHovering(false);
+                    setPointerDownStartedHere(false);
+                }
             }
-            setLongPress(pointerDownStartedHere && hovering);
+
         },
         timeout: longPressThreshold ?? null,
-        triggerIndex: (pointerDownStartedHere && hovering)
+        triggerIndex: longPress? true : (pointerDownStartedHere && hovering)
     })
 
 
@@ -299,7 +341,7 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
 
     const onKeyDown = useStableCallback((e: h.JSX.TargetedKeyboardEvent<E>) => {
         if (onPressSync) {
-            if (e.key == " " && !excludes("space", exclude)) {
+            if (e.key == " " && !excludeSpace()) {
                 // We don't actually activate it on a space keydown
                 // but we do preventDefault to stop the page from scrolling.
                 setWaitingForSpaceUp(true);
@@ -307,7 +349,7 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
                 e.preventDefault();
             }
 
-            if (e.key == "Enter" && !excludes("enter", exclude) && (!e.repeat || (allowRepeatPresses ?? false))) {
+            if (e.key == "Enter" && !excludeEnter() && (!e.repeat || (allowRepeatPresses ?? false))) {
 
                 handlePress(e);
             }
@@ -316,7 +358,7 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
 
     const onKeyUp = useStableCallback((e: h.JSX.TargetedKeyboardEvent<E>) => {
         const waitingForSpaceUp = getWaitingForSpaceUp();
-        if (waitingForSpaceUp && e.key == " " && !excludes("space", exclude))
+        if (waitingForSpaceUp && e.key == " " && !excludeSpace())
             handlePress(e);
     })
 
@@ -373,7 +415,7 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
             propsUnstable: {
                 onKeyDown,
                 onKeyUp,
-        
+
                 onTouchStart: !hasPressEvent ? undefined : (!p ? onTouchStart : undefined),
                 onTouchCancel: !hasPressEvent ? undefined : (!p ? onTouchEnd : undefined),
                 onTouchMove: !hasPressEvent ? undefined : (!p ? onTouchMove : undefined),

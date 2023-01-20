@@ -240,6 +240,7 @@ export function useGridNavigationCell<CellElement extends Element>({
         hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1 },
         rovingTabIndexChildReturn,
         textContentReturn,
+        pressParameters,
         ...void2
     } = useListNavigationChild<CellElement>({
         rovingTabIndexChildParameters,
@@ -258,6 +259,7 @@ export function useGridNavigationCell<CellElement extends Element>({
     return {
         rovingTabIndexChildReturn,
         textContentReturn,
+        pressParameters,
         hasCurrentFocusParameters: {
             onCurrentFocusedInnerChanged: useStableCallback((focused, prev, e) => {
                 ocfic1?.(focused, prev, e);
