@@ -1,3 +1,4 @@
+import { UseTypeaheadNavigationChildParameters } from "component-detail/use-typeahead-navigation";
 import { h } from "preact";
 import { useCallback } from "preact/hooks";
 import { UseGridNavigationRowReturnType } from "../component-detail/use-grid-navigation-partial";
@@ -60,7 +61,11 @@ export interface UseCompleteGridNavigationCellParameters<CellElement extends Ele
 }
 
 
-export interface CompleteGridNavigationContext<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement, CellElement>, CM extends UseCompleteGridNavigationCellInfo<CellElement>> extends UseManagedChildrenContext<RM>, UsePaginatedChildContext, UseStaggeredChildContext,
+export interface CompleteGridNavigationContext<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement, CellElement>, CM extends UseCompleteGridNavigationCellInfo<CellElement>> extends
+    UseManagedChildrenContext<RM>,
+    UsePaginatedChildContext,
+    UseStaggeredChildContext,
+    Pick<UseTypeaheadNavigationChildParameters<RowElement>, "typeaheadNavigationChildContext">,
     Pick<UseChildrenHaveFocusReturnType<RowElement>, "childrenHaveFocusChildContext">,
     Pick<UseGridNavigationSingleSelectionReturnType<ParentOrRowElement, RowElement, CellElement, RM, CM>, "singleSelectionContext" | "rovingTabIndexChildContext" | "typeaheadNavigationChildContext" | "gridNavigationRowContext"> {
 
@@ -70,8 +75,8 @@ export interface CompleteGridNavigationContext<ParentOrRowElement extends Elemen
 export interface CompleteGridNavigationRowContext<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteGridNavigationCellInfo<ChildElement>> extends UseManagedChildrenContext<M>,
     Pick<UseGridNavigationRowReturnType<ParentElement, ChildElement>["rowAsParentOfCellsReturn"], "rovingTabIndexChildContext" | "typeaheadNavigationChildContext" | "gridNavigationCellContext"> {
     //completeGridNavigationContext: {
-        //onClick: () => void;
-        // onPressSync: UsePressParameters<ChildElement>["pressParameters"]["onPressSync"]
+    //onClick: () => void;
+    // onPressSync: UsePressParameters<ChildElement>["pressParameters"]["onPressSync"]
     //}
 }
 
@@ -304,7 +309,7 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
         managedChildContext,
         rovingTabIndexChildContext: r.rowAsParentOfCellsReturn.rovingTabIndexChildContext,
         typeaheadNavigationChildContext: r.rowAsParentOfCellsReturn.typeaheadNavigationChildContext,
-       // completeGridNavigationContext: useStableObject({}),
+        // completeGridNavigationContext: useStableObject({}),
         gridNavigationCellContext: r.rowAsParentOfCellsReturn.gridNavigationCellContext,
     });
     const { hasCurrentFocusParameters } = useChildrenHaveFocusChild({ childrenHaveFocusChildContext });
