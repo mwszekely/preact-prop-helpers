@@ -19,7 +19,16 @@ export interface UseTypeaheadNavigationReturnType<ParentOrChildElement extends E
         //invalidTypeahead: boolean | null;
         propsStable: h.JSX.HTMLAttributes<ParentOrChildElement>;
     }
-    typeaheadNavigationChildContext: UseTypeaheadNavigationChildParameters<ParentOrChildElement>["typeaheadNavigationChildContext"];
+    typeaheadNavigationChildContext: UseTypeaheadNavigationContext;
+}
+
+export interface UseTypeaheadNavigationContext {
+
+    typeaheadNavigationChildParameters: {
+        excludeSpace: () => boolean;
+        sortedTypeaheadInfo: Array<TypeaheadInfo>;
+        insertingComparator: (lhs: string | null, rhs: TypeaheadInfo) => number;
+    }
 }
 
 
@@ -68,14 +77,7 @@ export interface UseTypeaheadNavigationChildParameters<ChildElement extends Elem
 
     refElementReturn: Pick<UseRefElementReturnType<ChildElement>["refElementReturn"], "getElement">;
 
-    typeaheadNavigationChildContext: {
-
-        typeaheadNavigationChildParameters: {
-            excludeSpace: () => boolean;
-            sortedTypeaheadInfo: Array<TypeaheadInfo>;
-            insertingComparator: (lhs: string | null, rhs: TypeaheadInfo) => number;
-        }
-    }
+    typeaheadNavigationChildContext: UseTypeaheadNavigationContext
 }
 
 export interface UseTypeaheadNavigationChildReturnType {
