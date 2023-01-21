@@ -2,7 +2,7 @@ import { UsePressParameters } from "component-use/use-press";
 import { h } from "preact";
 import { useCallback, useLayoutEffect, useRef } from "preact/hooks";
 import { UseRefElementReturnType } from "../dom-helpers/use-ref-element";
-import { useTextContent, UseTextContentParameters } from "../dom-helpers/use-text-content";
+import { useTextContent, UseTextContentParameters, UseTextContentReturnType } from "../dom-helpers/use-text-content";
 import { assertEmptyObject } from "../preact-extensions/use-managed-children";
 import { OnPassiveStateChange, usePassiveState } from "../preact-extensions/use-passive-state";
 import { useStableCallback } from "../preact-extensions/use-stable-callback";
@@ -80,16 +80,11 @@ export interface UseTypeaheadNavigationChildParameters<ChildElement extends Elem
     typeaheadNavigationChildContext: UseTypeaheadNavigationContext
 }
 
-export interface UseTypeaheadNavigationChildReturnType {
+export interface UseTypeaheadNavigationChildReturnType extends UseTextContentReturnType {
     pressParameters: Pick<UsePressParameters<any>["pressParameters"], "excludeSpace">;
-
-    textContentReturn: { getTextContent(): string | null }
 }
 
 interface TypeaheadInfo { text: string | null; unsortedIndex: number; }
-
-/** Type of the child's sub-hook */
-export type UseTypeaheadNavigationChild<ChildElement extends Element> = (args: UseTypeaheadNavigationChildParameters<ChildElement>) => UseTypeaheadNavigationChildReturnType;
 
 
 /**
@@ -351,7 +346,7 @@ export function useTypeaheadNavigationChild<ChildElement extends Element>({
     refElementReturn: { getElement, ...void3 },
     //typeaheadNavigationChildParameters: { ...void5 },
     ...void4
-}: UseTypeaheadNavigationChildParameters<ChildElement>): ReturnType<UseTypeaheadNavigationChild<ChildElement>> {
+}: UseTypeaheadNavigationChildParameters<ChildElement>): UseTypeaheadNavigationChildReturnType {
 
     assertEmptyObject(void1);
     assertEmptyObject(void2);
@@ -394,7 +389,10 @@ export function useTypeaheadNavigationChild<ChildElement extends Element>({
         }
     })
 
-    return { textContentReturn, pressParameters: { excludeSpace } }
+    return {
+        textContentReturn,
+        pressParameters: { excludeSpace }
+    };
 
 }
 

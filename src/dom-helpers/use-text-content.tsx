@@ -15,7 +15,11 @@ export interface UseTextContentParameters<E extends Element> {
     }
 }
 
-export function useTextContent<E extends Element>({ refElementReturn: { getElement }, textContentParameters: { getText, onTextContentChange, hidden } }: UseTextContentParameters<E>) {
+export interface UseTextContentReturnType {
+    textContentReturn: { getTextContent: () => string | null; } 
+}
+
+export function useTextContent<E extends Element>({ refElementReturn: { getElement }, textContentParameters: { getText, onTextContentChange, hidden } }: UseTextContentParameters<E>): UseTextContentReturnType {
     const [getTextContent, setTextContent] = usePassiveState<string | null, never>(onTextContentChange, returnNull, runImmediately);
     useEffect(() => {
         if (!hidden) {
