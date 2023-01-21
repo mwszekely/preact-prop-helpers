@@ -35,7 +35,7 @@ export interface UseCompleteGridNavigationParameters<ParentOrRowElement extends 
 }
 
 export interface UseCompleteGridNavigationRowParameters<RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement, CellElement>, CM extends UseCompleteGridNavigationCellInfo<CellElement>> {
-    rowAsChildOfGridParameters: Omit<UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM>["rowAsChildOfGridParameters"], "textContentParameters" | "managedChildrenReturn" | "singleSelectionContext" | "gridNavigationRowContext" | "rovingTabIndexChildContext" | "typeaheadNavigationChildContext" | "refElementReturn"> & {
+    rowAsChildOfGridParameters: Omit<UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM>["rowAsChildOfGridParameters"], "typeaheadNavigationChildContext" | "textContentParameters" | "managedChildrenReturn" | "singleSelectionContext" | "gridNavigationRowContext" | "rovingTabIndexChildContext" | "typeaheadNavigationChildContext" | "refElementReturn"> & {
         context: CompleteGridNavigationContext<any, RowElement, CellElement, RM, CM>; //UseManagedChildParameters<RM>["context"];
         //managedChildReturn: UseManagedChildReturnType<RM>["managedChildReturn"];
         completeGridNavigationRowParameters: Omit<RM, keyof UseCompleteGridNavigationRowInfo<RowElement, CellElement>>;
@@ -73,7 +73,7 @@ export interface CompleteGridNavigationContext<ParentOrRowElement extends Elemen
 
 
 export interface CompleteGridNavigationRowContext<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteGridNavigationCellInfo<ChildElement>> extends UseManagedChildrenContext<M>,
-    Pick<UseGridNavigationRowReturnType<ParentElement, ChildElement>["rowAsParentOfCellsReturn"], "rovingTabIndexChildContext" | "typeaheadNavigationChildContext" | "gridNavigationCellContext"> {
+    Pick<UseGridNavigationRowReturnType<ParentElement, ChildElement>["rowAsParentOfCellsReturn"], "typeaheadNavigationChildContext" | "rovingTabIndexChildContext" | "gridNavigationCellContext"> {
     //completeGridNavigationContext: {
     //onClick: () => void;
     // onPressSync: UsePressParameters<ChildElement>["pressParameters"]["onPressSync"]
