@@ -7,6 +7,7 @@
   "main": "index.js",
   "module": "index.js",
   "types": "index.d.ts",
+  "packageManager": "pnpm@7.26.2",
   "scripts": {
     "build": "npx npm-run-all --npm-path npm -pc clean build:*",
     "watch": "npx npm-run-all --npm-path npm -pc clean watch:*",
@@ -23,16 +24,10 @@
     "preact": "^10.11.1"
   },
   "devDependencies": {
-    "@types/jest": "^29.2.5",
-    "@types/jsdom": "^20.0.1",
     "@types/lodash-es": "^4.17.6",
     "@typescript-eslint/eslint-plugin": "^5.48.0",
     "@typescript-eslint/parser": "^5.48.0",
-    "enzyme": "^3.11.0",
-    "enzyme-adapter-preact-pure": "^4.0.1",
     "eslint": "^8.31.0",
-    "jest": "^29.3.1",
-    "jsdom": "^20.0.3",
     "npm-run-all": "^4.1.5",
     "typescript": "^4.9.4"
   },
