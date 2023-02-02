@@ -21,9 +21,9 @@ import { useState } from "./use-state";
  */
 export interface PersistentStates { }
 
-export function getFromLocalStorage<Key extends (keyof PersistentStates) & string>(key: Key, converter: ((input: string) => PersistentStates[Key]) = JSON.parse): PersistentStates[Key] | null {
+export function getFromLocalStorage<Key extends (keyof PersistentStates) & string>(key: Key, converter: ((input: string) => PersistentStates[Key]) = JSON.parse, storage: Storage = localStorage): PersistentStates[Key] | null {
     try {
-        const item = localStorage.getItem(key);
+        const item = storage.getItem(key);
         if (item == null)
             return null;
         return converter(item);
@@ -35,13 +35,12 @@ export function getFromLocalStorage<Key extends (keyof PersistentStates) & strin
     }
 }
 
-
-export function storeToLocalStorage<Key extends (keyof PersistentStates) & string>(key: Key, value: PersistentStates[Key], converter: ((input: PersistentStates[Key]) => string) = JSON.stringify): void {
+export function storeToLocalStorage<Key extends (keyof PersistentStates) & string>(key: Key, value: PersistentStates[Key], converter: ((input: PersistentStates[Key]) => string) = JSON.stringify, storage: Storage = localStorage): void {
     try {
         if (value == null)
-            localStorage.removeItem(key);
+            storage.removeItem(key);
         else
-            localStorage.setItem(key, converter(value));
+            storage.setItem(key, converter(value));
     }
     catch (e) {
         /* eslint-disable no-debugger */
@@ -66,21 +65,22 @@ export function storeToLocalStorage<Key extends (keyof PersistentStates) & strin
  * @param toString 
  * @returns 
  */
-export function usePersistentState<Key extends keyof PersistentStates, T = PersistentStates[Key]>(key: Key | null, initialValue: T, fromString: ((value: string) => T) = JSON.parse, toString: ((value: T) => string) = JSON.stringify): [T, StateUpdater<T>, () => T] {
-    const [localCopy, setLocalCopy, getLocalCopy] = useState<T>(() => ((key ? (getFromLocalStorage(key, fromString as any)) : null) ?? initialValue));
+export function usePersistentState<Key extends keyof PersistentStates, T = PersistentStates[Key]>(key: Key | null, initialValue: T, fromString: ((value: string) => T) = JSON.parse, toString: ((value: T) => string) = JSON.stringify, storage: Storage = localStorage): [T, StateUpdater<T>, () => T] {
+    const [localCopy, setLocalCopy, getLocalCopy] = useState<T>(() => ((key ? (getFromLocalStorage(key, fromString as any, storage)) : null) ?? initialValue));
     const getInitialValue = useStableGetter(initialValue);
 
     // Ensure that if our key changes, we also update `localCopy` to match.
     useLayoutEffect(() => {
         if (key) {
-            const newCopy = getFromLocalStorage(key, fromString as any);
+            const newCopy = getFromLocalStorage(key, fromString as any, storage);
             setLocalCopy(newCopy ?? getInitialValue());
         }
-    }, [key])
+    }, [key, storage])
 
     // Listen for changes to this storage in other browser tabs
-    useGlobalHandler(window, "storage", (e: StorageEvent) => {
-        if (key && e.key === key) {
+    useGlobalHandler(window, "storage", useStableCallback((e: StorageEvent) => {
+
+        if (key && e.key === key && e.storageArea == storage) {
             const newValue = e.newValue;
 
             if (newValue != null)
@@ -88,7 +88,7 @@ export function usePersistentState<Key extends keyof PersistentStates, T = Persi
             else
                 setLocalCopy(initialValue);
         }
-    });
+    }));
 
     const setValueWrapper = useStableCallback<typeof setLocalCopy>((valueOrSetter) => {
 
@@ -99,7 +99,7 @@ export function usePersistentState<Key extends keyof PersistentStates, T = Persi
 
         // Actually save the value to local storage.
         if (key) {
-            storeToLocalStorage(key, value as PersistentStates[Key], toString);
+            storeToLocalStorage(key, value as PersistentStates[Key], toString, storage);
 
             if (typeof value == "object" && (value as object) instanceof Date) {
                 console.assert(fromString != JSON.parse, "Dates (and other non-JSON types) must be given custom fromString and toString functions.");
@@ -108,7 +108,7 @@ export function usePersistentState<Key extends keyof PersistentStates, T = Persi
     });
 
     const getValue = useStableCallback(() => {
-        const trueValue = !key ? undefined : getFromLocalStorage(key, fromString as any);
+        const trueValue = !key ? undefined : getFromLocalStorage(key, fromString as any, storage);
         return trueValue ?? localCopy;
     });
 
