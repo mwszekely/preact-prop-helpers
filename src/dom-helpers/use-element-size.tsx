@@ -45,7 +45,9 @@ export interface UseElementSizeReturnType<E extends Element> extends Omit<UseRef
 }
 
 
-export function useElementSize<E extends Element>({ elementSizeParameters: { getObserveBox, onSizeChange }, refElementParameters: { onElementChange, onMount, onUnmount } }: UseElementSizeParameters<E>): UseElementSizeReturnType<E> {
+export function useElementSize<E extends Element>({ elementSizeParameters: { getObserveBox, onSizeChange }, refElementParameters }: UseElementSizeParameters<E>): UseElementSizeReturnType<E> {
+
+    const { onElementChange, onMount, onUnmount } = (refElementParameters || {})
 
     useEnsureStability("useElementSize", getObserveBox, onSizeChange, onElementChange, onMount, onUnmount);
 

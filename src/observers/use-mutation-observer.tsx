@@ -15,12 +15,13 @@ export interface UseMutationObserverParameters<E extends Element> extends UseRef
     }
 }
 
-export function useMutationObserver<E extends Element>(options: UseMutationObserverParameters<E>) {
+export function useMutationObserver<E extends Element>({
+    refElementParameters,
+    mutationObserverParameters: { attributeFilter, subtree, onChildList, characterDataOldValue, onCharacterData, onAttributes, attributeOldValue }
+}: UseMutationObserverParameters<E>) {
     /* eslint-disable prefer-const */
-    let {
-        refElementParameters: { onElementChange, ...refElementParameters },
-        mutationObserverParameters: { attributeFilter, subtree, onChildList, characterDataOldValue, onCharacterData, onAttributes, attributeOldValue }
-    } = options;
+    const { onElementChange, ...rest } = (refElementParameters || {})
+
 
     if (typeof attributeFilter === "string")
         attributeFilter = [attributeFilter];
@@ -82,7 +83,7 @@ export function useMutationObserver<E extends Element>(options: UseMutationObser
     const { refElementReturn } = useRefElement<E>({
         refElementParameters: {
             onElementChange: useStableCallback((e: E | null, p: E | null | undefined) => { onElementChange?.(e, p); onNeedMutationObserverReset(e); }),
-            ...refElementParameters
+            ...rest
         }
     });
     const { getElement } = refElementReturn;

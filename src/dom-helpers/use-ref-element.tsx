@@ -11,7 +11,14 @@ export interface UseRefElementReturnType<T extends EventTarget> {
 }
 
 export interface UseRefElementParameters<T> {
-    refElementParameters: {
+    /**
+     * For the sake of convenience,
+     * this one is optional, since using this hook is so common,
+     * but using its parameter options is so uncommon, and it's
+     * absense isn't usually because it was forgotten, it's because
+     * it doesn't matter.
+     */
+    refElementParameters?: {
         onElementChange?: OnPassiveStateChange<T | null, never>;
         onMount?: (element: T) => void;
         onUnmount?: (element: T) => void;
@@ -34,7 +41,7 @@ export function useRefElementProps<E extends Element>(r: UseRefElementReturnType
  * @returns The element, and the sub-hook that makes it retrievable.
  */
 export function useRefElement<T extends EventTarget>(args: UseRefElementParameters<T>): UseRefElementReturnType<T> {
-    const { refElementParameters: { onElementChange, onMount, onUnmount } } = args;
+    const { onElementChange, onMount, onUnmount } = (args.refElementParameters || {});
     useEnsureStability("useRefElement", onElementChange, onMount, onUnmount);
 
     // Called (indirectly) by the ref that the element receives.

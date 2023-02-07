@@ -1,4 +1,5 @@
 import { UseTypeaheadNavigationChildParameters } from "component-detail/use-typeahead-navigation";
+import identity from "lodash-es/identity";
 import { h } from "preact";
 import { useCallback } from "preact/hooks";
 import { UseGridNavigationRowReturnType } from "../component-detail/use-grid-navigation-partial";
@@ -12,7 +13,6 @@ import { useRefElement, UseRefElementReturnType } from "../dom-helpers/use-ref-e
 import { useChildrenHaveFocus, useChildrenHaveFocusChild, UseChildrenHaveFocusReturnType } from "../observers/use-children-have-focus";
 import { useHasCurrentFocus, UseHasCurrentFocusReturnType } from "../observers/use-has-current-focus";
 import { ManagedChildren, useManagedChild, useManagedChildren, UseManagedChildrenContext, UseManagedChildrenReturnType, UseManagedChildReturnType } from "../preact-extensions/use-managed-children";
-import { identity } from "../preact-extensions/use-passive-state";
 import { useStableCallback } from "../preact-extensions/use-stable-callback";
 import { useStableObject } from "../preact-extensions/use-stable-getter";
 

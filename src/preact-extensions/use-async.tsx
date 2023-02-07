@@ -272,17 +272,17 @@ export function useAsync<AP extends unknown[], R, SP extends unknown[] = AP>(asy
         return asyncToSync<AP, SP, R>({
             asyncInput: asyncHandlerStable,
             capture: captureStable,
-            setAsyncDebouncing,
-            setError,
-            setPending,
-            setReturn: setResult,
-            setSyncDebouncing,
-            setHasError,
-            setHasResult,
-            incrementCallCount,
-            incrementFinallyCount,
-            incrementRejectCount,
-            incrementResolveCount,
+            onAsyncDebounce: setAsyncDebouncing,
+            onError: setError,
+            onPending: setPending,
+            onReturnValue: setResult,
+            onSyncDebounce: setSyncDebouncing,
+            onHasError: setHasError,
+            onHasResult: setHasResult,
+            onInvoke: incrementCallCount,
+            onFinally: incrementFinallyCount,
+            onReject: incrementRejectCount,
+            onResolve: incrementResolveCount,
             throttle: options?.throttle,
             wait: options?.debounce
         })
@@ -302,7 +302,7 @@ export function useAsync<AP extends unknown[], R, SP extends unknown[] = AP>(asy
     const [resolveCount, setResolveCount] = useState(0);
     const [rejectCount, setRejectCount] = useState(0);
 
-    
+
     return {
         syncHandler: syncOutput,
         //currentType,
@@ -330,24 +330,132 @@ export function useAsync<AP extends unknown[], R, SP extends unknown[] = AP>(asy
 
 
 interface AsyncToSyncParameters<AsyncArgs extends any[], SyncArgs extends any[], Return> {
+
+    /**
+     * The function to create a sync version of
+     */
     asyncInput: (...args: AsyncArgs) => (Return | Promise<Return>);
-    setPending(pending: boolean): void;
-    setSyncDebouncing(debouncing: boolean): void;
-    setAsyncDebouncing(debouncing: boolean): void;
-    setReturn(ret: Return): void;
-    setError(ex: unknown): void;
-    incrementCallCount(): void;
-    incrementResolveCount(): void;
-    incrementRejectCount(): void;
-    incrementFinallyCount(): void;
+
+    /**
+     * When the function starts running, this is set to true.
+     * When it stops running, this is set to false.
+     * 
+     * This is the same for sync and async functions. When
+     * a sync function is used, onPending will be called twice on the same frame.
+     */
+    onPending(pending: boolean): void;
+
+    /**
+     * When the *sync handler is invoked* (even if the async handler doesn't run yet), this is set to `true`.
+     * 
+     * When the debounce period, as specified by either `wait` or `throttle`, as ended, this is set to `false.
+     * 
+     * This is the same even when not using `wait` or `throttle`. In this case, `onSyncDebounce` will be called twice on the same frame.
+     * @param debouncing 
+     */
+    onSyncDebounce(debouncing: boolean): void;
+    /**
+     * When the async handler is about to start running (after debouncing and throttling have finished), 
+     * but must wait for another in-process handler to finish, this is set to `true`.
+     * 
+     * When the handler finishes (regardless of if it was sync or async), this is set to `false`.
+     * 
+     * @param debouncing 
+     */
+    onAsyncDebounce(debouncing: boolean): void;
+    /**
+     * When the handler returns, its return value will be passed to this function (after awaiting it if necessary).
+     * 
+     * Even if the handler does not return anything, this will still be called (with `undefined`)
+     * 
+     * This value is not reset at any time! See `setHasReturn` to determine if there is a value at any given time.
+     * @param ret 
+     */
+    onReturnValue(ret: Return): void;
+
+    /**
+     * When the handler `throw`s, the value thrown will be passed to this function.
+     * 
+     * This value is not reset at any time! See `setHasError` to determine if there is a value at any given time.
+     * 
+     * @param ex 
+     */
+    onError(ex: unknown): void;
+
+    /**
+     * When the handler is about to be called (after all methods of debouncing and throttling and such)
+     * this is always called once.
+     */
+    onInvoke(): void;
+    /**
+     * When the handler returns successfully, this will be called once.
+     */
+    onResolve(): void;
+    /**
+     * When the handler rejects, for any reason, this will be called once.
+     */
+    onReject(): void;
+    /**
+     * When the handler resolves, for any reason, this will be called once.
+     */
+    onFinally(): void;
+
+    //onResolve2(type: "resolve", value: Return): void;
+    //onResolve2(type: "reject", value: Error): void;
+
+    /**
+     * It's frequently necessary (especially with DOM events) to save
+     * values so that they don't become stale.  For example, referencing
+     * `event.currentTarget.value` is a *live* value, so your handler
+     * could be called with, seemingly, different arguments than were initially passed.
+     * 
+     * To prevent this "stale argument" problem, you can capture the useful parts
+     * of whatever the async function's arguments are into an object that's not live.
+     * 
+     * `capture` will be called with the arguments your sync handler takes, 
+     * and should return the arguments your async handler takes as an array.
+     * 
+     * For example, `e => [e, e.currentTarget.value]`
+     */
     capture: CaptureFunctionType<AsyncArgs, SyncArgs>;
+
+    /**
+     * Identical to Lodash's `throttle` function, applying *before* waiting for any prior async handlers to finish.
+     */
     throttle: number | undefined;
+
+    /**
+     * Identical to Lodash's `debounce` function, applying *before* waiting for any prior async handlers to finish.
+     */
     wait: number | undefined;
-    setHasError(hasError: boolean | null): void;
-    setHasResult(hasResult: boolean | null): void;
+
+    /**
+     * When the handler is about to run, this is set to `null`.
+     * 
+     * If the handler throws, then this will be set to `true`. If it resolves, this will be set to `false`.
+     * 
+     * This is the same for sync and async functions; 
+     * sync functions will result in this function being called twice in one frame.
+     */
+    onHasError(hasError: boolean | null): void;
+
+    /**
+     * When the handler is about to run, this is set to `null`.
+     * 
+     * If the handler resolves successfully, then this will be set to `true`. If it throws, this will be set to `false`.
+     * 
+     * This is the same for sync and async functions; 
+     * sync functions will result in this function being called twice in one frame.
+     */
+    onHasResult(hasResult: boolean | null): void;
 }
 
-interface AsyncToSyncReturn<SyncArgs extends any[], _Return> {
+interface AsyncToSyncReturn<SyncArgs extends any[]> {
+    /**
+     * The sync version of the handler you specified.
+     * 
+     * It doesn't return a value (because it can't in case the handler was async).
+     */
     syncOutput: (...args: SyncArgs) => void;
     flush(): void;
     cancel(): void;
@@ -363,32 +471,37 @@ const Unset = Symbol("Unset");
  * lodash-ish function that's like debounce + (throttle w/ async handling) combined.
  * 
  * Requires a lot of callbacks to meaningfully turn a red function into a blue one, but you *can* do it!
+ * Note that part of this is emulating the fact that the sync handler cannot have a return value,
+ * so you'll need to use `setResolve` and the other related functions to do that in whatever way works for your specific scenario.
+ * 
+ * The comments are numbered in approximate execution order for your reading pleasure (1 is near the bottom).
  */
-function asyncToSync<AsyncArgs extends any[], SyncArgs extends any[], Return>({ asyncInput, incrementCallCount, incrementFinallyCount, incrementRejectCount, incrementResolveCount, setHasError, setHasResult, setError, setReturn, capture, setAsyncDebouncing, setSyncDebouncing, setPending, throttle, wait }: AsyncToSyncParameters<AsyncArgs, SyncArgs, Return>): AsyncToSyncReturn<SyncArgs, Return> {
+function asyncToSync<AsyncArgs extends any[], SyncArgs extends any[], Return>({ asyncInput, onInvoke, onFinally: onFinallyAny, onReject, onResolve, onHasError, onHasResult, onError, onReturnValue, capture, onAsyncDebounce, onSyncDebounce, onPending, throttle, wait }: AsyncToSyncParameters<AsyncArgs, SyncArgs, Return>): AsyncToSyncReturn<SyncArgs> {
     let pending = false;
     let syncDebouncing = false;
     let asyncDebouncing = false;
     let currentCapture: AsyncArgs | typeof Unset = Unset;
 
-    const onAsyncFinished = () => {
+    const onFinally = () => {
 
         // 8. This is run at the end of every invocation of the async handler,
-        // whether it completed or not.
-        incrementFinallyCount();
-        setPending(pending = false);
+        // whether it completed or not, and whether it was async or not.
+        onFinallyAny();
+        onPending(pending = false);
 
+        onAsyncDebounce(asyncDebouncing = false);
         if (!asyncDebouncing) {
             // 9a. After completing the async handler, we found that it wasn't called again since the last time.
             // This means we can just end. We're done. Mission accomplished.
         }
         else {
-            // 9a. Another request to run the async handler came in while we were running this one.
+            // 9b. Another request to run the async handler came in while we were running this one.
             // Instead of stopping, we're just going to immediately run again using the arguments that were given to us most recently.
             // We also clear that flag, because we're handling it now. It'll be set again if the handler is called again while *this* one is running
-            setAsyncDebouncing(asyncDebouncing = false);
+            //onAsyncDebounce(asyncDebouncing = false);
             console.assert(currentCapture !== Unset);
             if (currentCapture != Unset) {
-                setSyncDebouncing(syncDebouncing = true);
+                onSyncDebounce(syncDebouncing = true);
                 syncDebounced();
             }
         }
@@ -397,10 +510,10 @@ function asyncToSync<AsyncArgs extends any[], SyncArgs extends any[], Return>({ 
     const sync = (...args: AsyncArgs) => {
         // 5. We're finally running the async version of the function, so notify the caller that the return value is pending.
         // And because the fact that we're here means the debounce/throttle period is over, we can clear that flag too.
-        setPending(pending = true);
+        onPending(pending = true);
         console.assert(syncDebouncing == false);
-        setHasError(null);
-        setHasResult(null);
+        onHasError(null);
+        onHasResult(null);
         let promiseOrReturn: Promise<Return> | Return | undefined;
 
         let hadSyncError = false;
@@ -408,52 +521,52 @@ function asyncToSync<AsyncArgs extends any[], SyncArgs extends any[], Return>({ 
             // 6. Run the function we were given.
             // Because it may be sync, or it may throw before returning, we must still wrap it in a try/catch...
             // Also important is that we preserve the async-ness (or lack thereof) on the original input function.
-            incrementCallCount();
+            onInvoke();
             promiseOrReturn = asyncInput(...args);
-            setHasError(false);
+            onHasError(false);
         }
         catch (ex) {
             hadSyncError = true;
-            setError(ex);
+            onError(ex);
         }
 
         // 7. Either end immediately, or schedule to end when completed.
         if (isPromise(promiseOrReturn)) {
             promiseOrReturn
-                .then(r => { incrementResolveCount(); setHasResult(true); setReturn(r); return r; })
-                .catch(e => { incrementRejectCount(); setHasError(true); setError(e); return e; })
-                .finally(onAsyncFinished);
+                .then(r => { onResolve(); onHasResult(true); onReturnValue(r); return r; })
+                .catch(e => { onReject(); onHasError(true); onError(e); return e; })
+                .finally(onFinally);
         }
         else {
             if (!hadSyncError) {
-                incrementResolveCount();
-                setHasResult(true);
-                setHasError(false);
+                onResolve();
+                onHasResult(true);
+                onHasError(false);
             }
             else {
-                incrementRejectCount();
-                setHasResult(false);
-                setHasError(true);
+                onReject();
+                onHasResult(false);
+                onHasError(true);
             }
-            setReturn(promiseOrReturn as Return);
-            setPending(pending = false);
-            onAsyncFinished();
+            onReturnValue(promiseOrReturn as Return);
+            onPending(pending = false);
+            onFinally();
         }
     }
 
-    // 4. Instead of calling the sync version of our function directly, we allow it to be throttled/debounced.
     const syncDebounced = LodashDebounce(() => {
-        setSyncDebouncing(syncDebouncing = false);
+        // 3. Instead of calling the sync version of our function directly, we allow it to be throttled/debounced.
+        onSyncDebounce(syncDebouncing = false);
         if (!pending) {
-            // 3a. If this is the first invocation, or if we're not still waiting for a previous invocation to finish its async call,
+            // 4a. If this is the first invocation, or if we're not still waiting for a previous invocation to finish its async call,
             // then we can just go ahead and run the debounced version of our function.
             console.assert(currentCapture != Unset);
             sync(...(currentCapture as AsyncArgs));
         } else {
-            // 3b. If we were called while still waiting for the (or a) previous invocation to finish,
+            // 4b. If we were called while still waiting for the (or a) previous invocation to finish,
             // then we'll need to delay this one. When that previous invocation finishes, it'll check
             // to see if it needs to run again, and it will use these new captured arguments from step 2.
-            setAsyncDebouncing(asyncDebouncing = true);
+            onAsyncDebounce(asyncDebouncing = true);
         }
 
     }, wait, { leading: true, trailing: true, maxWait: throttle });
@@ -461,9 +574,9 @@ function asyncToSync<AsyncArgs extends any[], SyncArgs extends any[], Return>({ 
     return {
         syncOutput: (...args: SyncArgs) => {
             // 1. We call the sync version of our async function.
-            // 2. We capture the arguments into a form that won't become stale if/when the function is called with a (possibly seconds-long) delay.
+            // 2. We capture the arguments into a form that won't become stale if/when the function is called with a (possibly seconds-long) delay (e.g. event.currentTarget.value on an <input> element).
             currentCapture = capture(...args);
-            setSyncDebouncing(syncDebouncing = true);
+            onSyncDebounce(syncDebouncing = true);
             syncDebounced();
         },
         flush: () => {
@@ -476,3 +589,22 @@ function asyncToSync<AsyncArgs extends any[], SyncArgs extends any[], Return>({ 
 }
 
 
+const { syncOutput } = asyncToSync<[async: "async"], [sync: "sync"], number>({
+    asyncInput: async (async) => { return 0 },
+    capture: (sync) => ["async"],
+    onInvoke: () => { },
+    onFinally: () => { },
+    onReject: () => { },
+    onResolve: () => { },
+    onAsyncDebounce: () => { },
+    onError: () => { },
+    onHasError: () => { },
+    onHasResult: () => { },
+    onPending: () => { },
+    onReturnValue: () => { },
+    onSyncDebounce: () => { },
+    throttle: 0,
+    wait: 0
+})
+
+const value = syncOutput("sync")

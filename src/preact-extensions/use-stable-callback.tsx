@@ -32,8 +32,6 @@ function setIsStableGetter<T extends (..._args: any[]) => any>(obj: T): Stable<T
  * empty dependency array, but with the associated stable typing. In this case, you ***must*** ensure that it
  * truly has no dependencies/only stable dependencies!!
  */
-//export function useStableCallback<T extends (..._args: any[]) => any>(fn: T, noDeps: []): Stable<T>;
-//export function useStableCallback<T extends (..._args: any[]) => any>(fn: T): Stable<T>;
 export function useStableCallback<T extends Function | null | undefined>(fn: NonNullable<T>, noDeps?: [] | null | undefined): Stable<NonNullable<T>> {
     type U = (NonNullable<T> & ((...args: any) => any));
     useEnsureStability("useStableCallback", noDeps == null, noDeps?.length, isStableGetter<U>(fn as U));

@@ -1271,9 +1271,6 @@ var bundle = function (exports) {
   function returnNull() {
     return null;
   }
-  function identity$1(t) {
-    return t;
-  } // Kind of an extra, but it's useful in other places anyway
   /**
    * An alternative to use for `customDebounceRendering` that causes `usePassiveState` to run changes without waiting a tick.
    */
@@ -1435,8 +1432,6 @@ var bundle = function (exports) {
    * empty dependency array, but with the associated stable typing. In this case, you ***must*** ensure that it
    * truly has no dependencies/only stable dependencies!!
    */
-  //export function useStableCallback<T extends (..._args: any[]) => any>(fn: T, noDeps: []): Stable<T>;
-  //export function useStableCallback<T extends (..._args: any[]) => any>(fn: T): Stable<T>;
   function useStableCallback(fn, noDeps) {
     useEnsureStability("useStableCallback", noDeps == null, noDeps === null || noDeps === void 0 ? void 0 : noDeps.length, isStableGetter(fn));
     if (isStableGetter(fn)) return fn;
@@ -1835,12 +1830,10 @@ var bundle = function (exports) {
    */
   function useRefElement(args) {
     const {
-      refElementParameters: {
-        onElementChange,
-        onMount,
-        onUnmount
-      }
-    } = args;
+      onElementChange,
+      onMount,
+      onUnmount
+    } = args.refElementParameters || {};
     useEnsureStability("useRefElement", onElementChange, onMount, onUnmount);
     // Called (indirectly) by the ref that the element receives.
     const handler = T$1((e, prevValue) => {
@@ -4033,11 +4026,12 @@ var bundle = function (exports) {
         focusPopup: focusSelfUnstable,
         focusOpener: focusOpenerUnstable
       },
-      refElementParameters: {
-        onElementChange,
-        ...refElementParameters
-      }
+      refElementParameters
     } = _ref11;
+    const {
+      onElementChange,
+      ...rest
+    } = refElementParameters || {};
     const focusSelf = useStableCallback(focusSelfUnstable);
     const focusOpener = useStableCallback(focusOpenerUnstable);
     h(() => {
@@ -4060,7 +4054,7 @@ var bundle = function (exports) {
     } = useRefElement({
       refElementParameters: {
         onElementChange,
-        ...refElementParameters
+        ...rest
       }
     });
     const {
@@ -6663,6 +6657,26 @@ var bundle = function (exports) {
       ...lncr
     };
   }
+
+  /**
+   * This method returns the first argument it receives.
+   *
+   * @static
+   * @since 0.1.0
+   * @memberOf _
+   * @category Util
+   * @param {*} value Any value.
+   * @returns {*} Returns `value`.
+   * @example
+   *
+   * var object = { 'a': 1 };
+   *
+   * console.log(_.identity(object) === object);
+   * // => true
+   */
+  function identity$1(value) {
+    return value;
+  }
   function usePaginatedChildren(_ref35) {
     let {
       managedChildrenReturn: {
@@ -8700,17 +8714,17 @@ var bundle = function (exports) {
       return asyncToSync({
         asyncInput: asyncHandlerStable,
         capture: captureStable,
-        setAsyncDebouncing,
-        setError,
-        setPending,
-        setReturn: setResult,
-        setSyncDebouncing,
-        setHasError,
-        setHasResult,
-        incrementCallCount,
-        incrementFinallyCount,
-        incrementRejectCount,
-        incrementResolveCount,
+        onAsyncDebounce: setAsyncDebouncing,
+        onError: setError,
+        onPending: setPending,
+        onReturnValue: setResult,
+        onSyncDebounce: setSyncDebouncing,
+        onHasError: setHasError,
+        onHasResult: setHasResult,
+        onInvoke: incrementCallCount,
+        onFinally: incrementFinallyCount,
+        onReject: incrementRejectCount,
+        onResolve: incrementResolveCount,
         throttle: options === null || options === void 0 ? void 0 : options.throttle,
         wait: options === null || options === void 0 ? void 0 : options.debounce
       });
@@ -8751,22 +8765,26 @@ var bundle = function (exports) {
    * lodash-ish function that's like debounce + (throttle w/ async handling) combined.
    *
    * Requires a lot of callbacks to meaningfully turn a red function into a blue one, but you *can* do it!
+   * Note that part of this is emulating the fact that the sync handler cannot have a return value,
+   * so you'll need to use `setResolve` and the other related functions to do that in whatever way works for your specific scenario.
+   *
+   * The comments are numbered in approximate execution order for your reading pleasure (1 is near the bottom).
    */
   function asyncToSync(_ref49) {
     let {
       asyncInput,
-      incrementCallCount,
-      incrementFinallyCount,
-      incrementRejectCount,
-      incrementResolveCount,
-      setHasError,
-      setHasResult,
-      setError,
-      setReturn,
+      onInvoke,
+      onFinally: onFinallyAny,
+      onReject,
+      onResolve,
+      onHasError,
+      onHasResult,
+      onError,
+      onReturnValue,
       capture,
-      setAsyncDebouncing,
-      setSyncDebouncing,
-      setPending,
+      onAsyncDebounce,
+      onSyncDebounce,
+      onPending,
       throttle,
       wait
     } = _ref49;
@@ -8774,19 +8792,20 @@ var bundle = function (exports) {
     let syncDebouncing = false;
     let asyncDebouncing = false;
     let currentCapture = Unset;
-    const onAsyncFinished = () => {
+    const onFinally = () => {
       // 8. This is run at the end of every invocation of the async handler,
-      // whether it completed or not.
-      incrementFinallyCount();
-      setPending(pending = false);
+      // whether it completed or not, and whether it was async or not.
+      onFinallyAny();
+      onPending(pending = false);
+      onAsyncDebounce(asyncDebouncing = false);
       if (!asyncDebouncing) ;else {
-        // 9a. Another request to run the async handler came in while we were running this one.
+        // 9b. Another request to run the async handler came in while we were running this one.
         // Instead of stopping, we're just going to immediately run again using the arguments that were given to us most recently.
         // We also clear that flag, because we're handling it now. It'll be set again if the handler is called again while *this* one is running
-        setAsyncDebouncing(asyncDebouncing = false);
+        //onAsyncDebounce(asyncDebouncing = false);
         console.assert(currentCapture !== Unset);
         if (currentCapture != Unset) {
-          setSyncDebouncing(syncDebouncing = true);
+          onSyncDebounce(syncDebouncing = true);
           syncDebounced();
         }
       }
@@ -8794,64 +8813,64 @@ var bundle = function (exports) {
     const sync = function () {
       // 5. We're finally running the async version of the function, so notify the caller that the return value is pending.
       // And because the fact that we're here means the debounce/throttle period is over, we can clear that flag too.
-      setPending(pending = true);
+      onPending(pending = true);
       console.assert(syncDebouncing == false);
-      setHasError(null);
-      setHasResult(null);
+      onHasError(null);
+      onHasResult(null);
       let promiseOrReturn;
       let hadSyncError = false;
       try {
         // 6. Run the function we were given.
         // Because it may be sync, or it may throw before returning, we must still wrap it in a try/catch...
         // Also important is that we preserve the async-ness (or lack thereof) on the original input function.
-        incrementCallCount();
+        onInvoke();
         promiseOrReturn = asyncInput(...arguments);
-        setHasError(false);
+        onHasError(false);
       } catch (ex) {
         hadSyncError = true;
-        setError(ex);
+        onError(ex);
       }
       // 7. Either end immediately, or schedule to end when completed.
       if (isPromise(promiseOrReturn)) {
         promiseOrReturn.then(r => {
-          incrementResolveCount();
-          setHasResult(true);
-          setReturn(r);
+          onResolve();
+          onHasResult(true);
+          onReturnValue(r);
           return r;
         }).catch(e => {
-          incrementRejectCount();
-          setHasError(true);
-          setError(e);
+          onReject();
+          onHasError(true);
+          onError(e);
           return e;
-        }).finally(onAsyncFinished);
+        }).finally(onFinally);
       } else {
         if (!hadSyncError) {
-          incrementResolveCount();
-          setHasResult(true);
-          setHasError(false);
+          onResolve();
+          onHasResult(true);
+          onHasError(false);
         } else {
-          incrementRejectCount();
-          setHasResult(false);
-          setHasError(true);
+          onReject();
+          onHasResult(false);
+          onHasError(true);
         }
-        setReturn(promiseOrReturn);
-        setPending(pending = false);
-        onAsyncFinished();
+        onReturnValue(promiseOrReturn);
+        onPending(pending = false);
+        onFinally();
       }
     };
-    // 4. Instead of calling the sync version of our function directly, we allow it to be throttled/debounced.
     const syncDebounced = debounce(() => {
-      setSyncDebouncing(syncDebouncing = false);
+      // 3. Instead of calling the sync version of our function directly, we allow it to be throttled/debounced.
+      onSyncDebounce(syncDebouncing = false);
       if (!pending) {
-        // 3a. If this is the first invocation, or if we're not still waiting for a previous invocation to finish its async call,
+        // 4a. If this is the first invocation, or if we're not still waiting for a previous invocation to finish its async call,
         // then we can just go ahead and run the debounced version of our function.
         console.assert(currentCapture != Unset);
         sync(...currentCapture);
       } else {
-        // 3b. If we were called while still waiting for the (or a) previous invocation to finish,
+        // 4b. If we were called while still waiting for the (or a) previous invocation to finish,
         // then we'll need to delay this one. When that previous invocation finishes, it'll check
         // to see if it needs to run again, and it will use these new captured arguments from step 2.
-        setAsyncDebouncing(asyncDebouncing = true);
+        onAsyncDebounce(asyncDebouncing = true);
       }
     }, wait, {
       leading: true,
@@ -8861,9 +8880,9 @@ var bundle = function (exports) {
     return {
       syncOutput: function () {
         // 1. We call the sync version of our async function.
-        // 2. We capture the arguments into a form that won't become stale if/when the function is called with a (possibly seconds-long) delay.
+        // 2. We capture the arguments into a form that won't become stale if/when the function is called with a (possibly seconds-long) delay (e.g. event.currentTarget.value on an <input> element).
         currentCapture = capture(...arguments);
-        setSyncDebouncing(syncDebouncing = true);
+        onSyncDebounce(syncDebouncing = true);
         syncDebounced();
       },
       flush: () => {
@@ -8874,6 +8893,28 @@ var bundle = function (exports) {
       }
     };
   }
+  const {
+    syncOutput
+  } = asyncToSync({
+    asyncInput: async async => {
+      return 0;
+    },
+    capture: sync => ["async"],
+    onInvoke: () => {},
+    onFinally: () => {},
+    onReject: () => {},
+    onResolve: () => {},
+    onAsyncDebounce: () => {},
+    onError: () => {},
+    onHasError: () => {},
+    onHasResult: () => {},
+    onPending: () => {},
+    onReturnValue: () => {},
+    onSyncDebounce: () => {},
+    throttle: 0,
+    wait: 0
+  });
+  syncOutput("sync");
 
   /**
    * Given an asyncronous event handler, returns a syncronous one that works on the DOM,

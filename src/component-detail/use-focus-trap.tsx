@@ -54,8 +54,10 @@ export interface UseFocusTrapReturnType<E extends Element> extends UseRefElement
 
 export function useFocusTrap<SourceElement extends Element | null, PopupElement extends Element>({
     focusTrapParameters: { onlyMoveFocus, trapActive, focusPopup: focusSelfUnstable, focusOpener: focusOpenerUnstable },
-    refElementParameters: { onElementChange, ...refElementParameters }
+    refElementParameters
 }: UseFocusTrapParameters<SourceElement, PopupElement>): UseFocusTrapReturnType<PopupElement> {
+
+    const { onElementChange, ...rest } = (refElementParameters || {});
 
     type E = PopupElement;
 
@@ -85,7 +87,7 @@ export function useFocusTrap<SourceElement extends Element | null, PopupElement 
     }, [trapActive])
 
     const { refElementReturn } = useRefElement<E>({
-        refElementParameters: { onElementChange, ...refElementParameters }
+        refElementParameters: { onElementChange, ...rest }
     })
     const { getElement } = refElementReturn;
 

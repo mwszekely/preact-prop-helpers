@@ -184,7 +184,6 @@ export function returnFalse() { return false; }
 export function returnNull() { return null; }
 export function returnUndefined() { return undefined; }
 export function returnZero() { return 0; }
-export function identity<T>(t: T) { return t; } // Kind of an extra, but it's useful in other places anyway
 
 /** 
  * An alternative to use for `customDebounceRendering` that causes `usePassiveState` to run changes without waiting a tick.
