@@ -6653,10 +6653,12 @@ var bundle = function (exports) {
     } = _ref40;
     const getChildren = T$1(() => managedChildrenReturn.getChildren(), []);
     const getHighestChildIndex = T$1(() => getChildren().getHighestIndex(), []);
-    const isValid = useStableCallback(index => {
-      var _getChildren$getAt8;
-      return !((_getChildren$getAt8 = getChildren().getAt(index)) !== null && _getChildren$getAt8 !== void 0 && _getChildren$getAt8.hidden);
-    });
+    const isValid = T$1(i => {
+      const child = getChildren().getAt(i);
+      if (child == null) return false;
+      if (child.hidden) return false;
+      return true;
+    }, []);
     const {
       childrenHaveFocusParameters,
       managedChildrenParameters,
@@ -6767,17 +6769,8 @@ var bundle = function (exports) {
       ...gridNavigationSingleSelectionReturn,
       childrenHaveFocusReturn,
       paginatedChildrenReturn
-      /*completeGridNavigationReturn: {
-          toJson: useCallback(() => {
-              return toJsonArray(getChildren(), info => {
-                  return info.
-              })
-          }, [])
-      }*/
-      //rearrangeableChildrenParameters: { getHighestChildIndex: getHighestChildIndex, getValid },
     };
   }
-
   function useCompleteGridNavigationRow(_ref41) {
     let {
       rowAsChildOfGridParameters: {
@@ -7144,10 +7137,11 @@ var bundle = function (exports) {
     } = singleSelectionParameters;
     const getChildren = T$1(() => managedChildrenReturn.getChildren(), []);
     const getHighestChildIndex = T$1(() => getChildren().getHighestIndex(), []);
-    const getValid = T$1(i => {
+    const isValid = T$1(i => {
       const child = getChildren().getAt(i);
       if (!child) return false;
-      return !child.hidden;
+      if (child.hidden) return false;
+      return true;
     }, []);
     const {
       rearrangeableChildrenReturn: {
@@ -7181,13 +7175,13 @@ var bundle = function (exports) {
       },
       linearNavigationParameters: {
         getHighestIndex: getHighestChildIndex,
-        isValid: getValid,
+        isValid,
         indexDemangler,
         indexMangler,
         ...linearNavigationParameters
       },
       typeaheadNavigationParameters: {
-        isValid: getValid,
+        isValid,
         ...typeaheadNavigationParameters
       },
       rovingTabIndexParameters: {
@@ -10204,19 +10198,9 @@ var bundle = function (exports) {
   //const GridRowContext = createContext<UseGridNavigationRow<HTMLTableRowElement, HTMLTableCellElement, {}, {}, string, string>>(null!);
   //const GridCellContext = createContext<UseGridNavigationCell<HTMLTableCellElement, {}, string>>(null!);
   const DemoUseGrid = R(() => {
-    //return <div />;
-    //const [, setLastFocusedInner, _getLastFocusedInner] = useState(false);
-    //const { props } = useHasFocus<HTMLTableSectionElement>({ onLastFocusedInnerChanged: setLastFocusedInner, getDocument });
     const [tabbableColumn, setTabbableColumn, _getTabbableColumn] = useState(null);
     const [selectedRow, setSelectedRow, _getSelectedRow] = useState(null);
     const [tabbableRow, setTabbableRow] = useState(null);
-    //const getHighestIndex = useCallback(() => getChildren().getHighestIndex(), []);
-    //const getChildren = useCallback<typeof getChildren2>(() => { return getChildren2() }, []);
-    //const getHighestChildIndex = useStableCallback(() => ghci());
-    /*const getValid = useStableCallback<GetValid>((i) => {
-        const child = getChildren().getAt(i);
-        return !(child?.hidden || child?.disabled);
-    });*/
     const ret = useCompleteGridNavigation({
       singleSelectionParameters: {
         initiallySelectedIndex: selectedRow,
@@ -10261,12 +10245,10 @@ var bundle = function (exports) {
     const {
       context,
       props,
-      //rearrangeableChildrenParameters: { getHighestChildIndex: ghci, getValid: gv },
       rearrangeableChildrenReturn: {
         useRearrangedChildren
       }
     } = ret;
-    //const { getChildren: getChildren2 } = managedChildrenReturn;
     return o$1("div", {
       class: "demo",
       children: [o$1("h2", {
@@ -10328,7 +10310,6 @@ var bundle = function (exports) {
     //const getChildren = useCallback(() => { return getChildren2() }, []);
     const hidden = index === 3;
     const disabled = hidden;
-    //    const getValid = useStableCallback<GetValid>((i) => !!(ret.managedChildReturn.getChildren().getAt(i)?.hidden));
     const contextFromParent = q(GridRowContext);
     const ret = useCompleteGridNavigationRow({
       rowAsChildOfGridParameters: {

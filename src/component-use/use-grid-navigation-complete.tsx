@@ -132,7 +132,15 @@ export function useCompleteGridNavigation<ParentOrRowElement extends Element, Ro
     const getChildren: () => ManagedChildren<RM> = useCallback<() => ManagedChildren<RM>>(() => managedChildrenReturn.getChildren(), []);
     const getHighestChildIndex: (() => number) = useCallback<() => number>(() => getChildren().getHighestIndex(), []);
 
-    const isValid = useStableCallback((index: number): boolean => { return !(getChildren().getAt(index)?.hidden) });
+    
+    const isValid = useCallback((i: number) => {
+        const child = getChildren().getAt(i);
+        if (child == null)
+            return false;
+        if (child.hidden)
+            return false;
+        return true;
+    }, []);
 
     const {
         childrenHaveFocusParameters,
