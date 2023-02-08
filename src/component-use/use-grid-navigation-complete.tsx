@@ -91,10 +91,6 @@ export interface UseCompleteGridNavigationReturnType<ParentOrRowElement extends 
 
     managedChildrenReturn: UseManagedChildrenReturnType<RM>["managedChildrenReturn"];
     childrenHaveFocusReturn: UseChildrenHaveFocusReturnType<RowElement>["childrenHaveFocusReturn"];
-    /*completeGridNavigationReturn: {
-        toJson(): object;
-    }*/
-    //rearrangeableChildrenParameters: Pick<UseRearrangeableChildrenParameters["rearrangeableChildrenParameters"], "getHighestChildIndex" | "getValid">;
 }
 
 export interface UseCompleteGridNavigationRowReturnType<RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement, CellElement>, CM extends UseCompleteGridNavigationCellInfo<CellElement>> {
@@ -193,14 +189,6 @@ export function useCompleteGridNavigation<ParentOrRowElement extends Element, Ro
         ...gridNavigationSingleSelectionReturn,
         childrenHaveFocusReturn,
         paginatedChildrenReturn,
-        /*completeGridNavigationReturn: {
-            toJson: useCallback(() => {
-                return toJsonArray(getChildren(), info => {
-                    return info.
-                })
-            }, [])
-        }*/
-        //rearrangeableChildrenParameters: { getHighestChildIndex: getHighestChildIndex, getValid },
     }
 
 }
@@ -244,9 +232,11 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
     const getHighestChildIndex: (() => number) = useCallback<() => number>(() => getChildren().getHighestIndex(), []);
     const isValid = useCallback((i: number) => {
         const child = getChildren().getAt(i);
-        if (!child)
+        if (child == null)
             return false;
-        return !child.hidden;
+        if (child.hidden)
+            return false;
+        return true;
     }, []);
 
     const { refElementReturn } = useRefElement<RowElement>({ refElementParameters: {} });

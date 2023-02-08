@@ -6856,8 +6856,9 @@ var bundle = function (exports) {
     const getHighestChildIndex = T$1(() => getChildren().getHighestIndex(), []);
     const isValid = T$1(i => {
       const child = getChildren().getAt(i);
-      if (!child) return false;
-      return !child.hidden;
+      if (child == null) return false;
+      if (child.hidden) return false;
+      return true;
     }, []);
     const {
       refElementReturn

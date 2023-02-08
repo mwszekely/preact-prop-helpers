@@ -14,6 +14,8 @@ import { ManagedChildren, useManagedChild, useManagedChildren, UseManagedChildre
 import { useStableCallback } from "../preact-extensions/use-stable-callback";
 import { useStableObject } from "../preact-extensions/use-stable-getter";
 
+type OmitStrong<T, K extends keyof T> = Omit<T, K>;
+
 export interface UseCompleteListNavigationChildInfo<ChildElement extends Element> extends UseListNavigationSingleSelectionSortableChildInfo<ChildElement>, UsePaginatedChildrenInfo<ChildElement>, UseStaggeredChildrenInfo<ChildElement> {
 
 }
@@ -21,23 +23,22 @@ export interface UseCompleteListNavigationChildInfo<ChildElement extends Element
 export interface UseCompleteListNavigationParameters<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends Pick<UseListNavigationSingleSelectionSortableParameters<ParentElement, ChildElement, M>, "singleSelectionParameters"> {
     linearNavigationParameters: Omit<UseListNavigationSingleSelectionSortableParameters<ParentElement, ChildElement, M>["linearNavigationParameters"], "getHighestIndex" | "indexDemangler" | "indexMangler" | "isValid">;
     typeaheadNavigationParameters: Omit<UseListNavigationSingleSelectionSortableParameters<ParentElement, ChildElement, M>["typeaheadNavigationParameters"], "isValid">;
-    rearrangeableChildrenParameters: Omit<UseListNavigationSingleSelectionSortableParameters<ParentElement, ChildElement, M>["rearrangeableChildrenParameters"], "getHighestChildIndex" | "getValid" | "onRearranged">;
+    rearrangeableChildrenParameters: OmitStrong<UseListNavigationSingleSelectionSortableParameters<ParentElement, ChildElement, M>["rearrangeableChildrenParameters"], "onRearranged">;
     sortableChildrenParameters: UseListNavigationSingleSelectionSortableParameters<ParentElement, ChildElement, M>["sortableChildrenParameters"];
     rovingTabIndexParameters: Omit<UseListNavigationSingleSelectionSortableParameters<ParentElement, ChildElement, M>["rovingTabIndexParameters"], "initiallyTabbedIndex">;
     paginatedChildrenParameters: Pick<UsePaginatedChildrenParameters<ChildElement, M>, "paginatedChildrenParameters">["paginatedChildrenParameters"];
     staggeredChildrenParameters: Pick<UseStaggeredChildrenParameters<ChildElement, M>, "staggeredChildrenParameters">["staggeredChildrenParameters"];
 }
 
-export interface UseCompleteListNavigationReturnType<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends 
-    Pick<UsePaginatedChildrenReturnType, "paginatedChildrenReturn">, 
-    Pick<UseStaggeredChildrenReturnType, "staggeredChildrenReturn">, 
+export interface UseCompleteListNavigationReturnType<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends
+    Pick<UsePaginatedChildrenReturnType, "paginatedChildrenReturn">,
+    Pick<UseStaggeredChildrenReturnType, "staggeredChildrenReturn">,
     Pick<UseListNavigationSingleSelectionSortableReturnType<ParentElement, ChildElement, M>, "rovingTabIndexReturn" | "singleSelectionReturn" | "linearNavigationReturn" | "typeaheadNavigationReturn" | "rearrangeableChildrenReturn" | "sortableChildrenReturn"> {
     props: h.JSX.HTMLAttributes<ParentElement>;
     context: CompleteListNavigationContext<ParentElement, ChildElement, M>;
 
     managedChildrenReturn: UseManagedChildrenReturnType<M>["managedChildrenReturn"];
     childrenHaveFocusReturn: UseChildrenHaveFocusReturnType<ChildElement>["childrenHaveFocusReturn"];
-    //rearrangeableChildrenParameters: Pick<UseRearrangeableChildrenParameters["rearrangeableChildrenParameters"], "getHighestChildIndex" | "getValid">;
 }
 
 
@@ -76,11 +77,13 @@ export function useCompleteListNavigation<ParentElement extends Element, ChildEl
     const { initiallySelectedIndex } = singleSelectionParameters;
     const getChildren: () => ManagedChildren<M> = useCallback(() => managedChildrenReturn.getChildren(), []);
     const getHighestChildIndex: (() => number) = useCallback<() => number>(() => getChildren().getHighestIndex(), []);
-    const getValid = useCallback((i: number) => {
+    const isValid = useCallback((i: number) => {
         const child = getChildren().getAt(i);
         if (!child)
             return false;
-        return !child.hidden;
+        if (child.hidden)
+            return false;
+        return true;
     }, []);
 
     const { rearrangeableChildrenReturn: { indexDemangler, indexMangler, ...rearrangeableChildrenReturn }, sortableChildrenReturn } = useSortableChildren<M>({
@@ -102,8 +105,8 @@ export function useCompleteListNavigation<ParentElement extends Element, ChildEl
         typeaheadNavigationReturn
     } = useListNavigationSingleSelection<ParentElement, ChildElement, M>({
         managedChildrenReturn: { getChildren },
-        linearNavigationParameters: { getHighestIndex: getHighestChildIndex, isValid: getValid, indexDemangler, indexMangler, ...linearNavigationParameters },
-        typeaheadNavigationParameters: { isValid: getValid, ...typeaheadNavigationParameters },
+        linearNavigationParameters: { getHighestIndex: getHighestChildIndex, isValid, indexDemangler, indexMangler, ...linearNavigationParameters },
+        typeaheadNavigationParameters: { isValid, ...typeaheadNavigationParameters },
         rovingTabIndexParameters: { initiallyTabbedIndex: initiallySelectedIndex, ...rovingTabIndexParameters },
         singleSelectionParameters,
         ...completeListNavigationParameters,

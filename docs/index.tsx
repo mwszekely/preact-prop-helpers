@@ -2,14 +2,14 @@ import { createContext, h, render, VNode } from "preact";
 import { memo } from "preact/compat";
 import { useCallback, useContext, useRef } from "preact/hooks";
 import { GetIndex, GridSingleSelectSortableChildCellInfo, GridSingleSelectSortableChildRowInfo, returnNull, useAnimationFrame, useAsyncHandler, useChildrenHaveFocus, useChildrenHaveFocusChild, UseChildrenHaveFocusChildParameters, UseCompleteGridNavigationReturnType, UseCompleteGridNavigationRowReturnType, useDraggable, useDroppable, useElementSize, useFocusTrap, useHasCurrentFocus, useHasLastFocus, useInterval, useMergedProps, usePortalChildren, usePress, useRandomDualIds, useRefElement, useStableCallback, useState } from "..";
-import { ElementSize } from "../dom-helpers/use-element-size";
+import { ElementSize } from "../";
 //import { useGridNavigation, UseGridNavigationCell, UseGridNavigationRow } from "../use-grid-navigation";
 import { CompleteGridNavigationContext, CompleteGridNavigationRowContext, useCompleteGridNavigation, useCompleteGridNavigationCell, useCompleteGridNavigationRow } from "..";
 import { DemoUseInterval } from "./demos/use-interval";
 import { DemoUseModal } from "./demos/use-modal";
 import { DemoUseRovingTabIndex } from "./demos/use-roving-tab-index";
 import { DemoUseTimeout } from "./demos/use-timeout";
-import { UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationRowInfo } from "../component-use/use-grid-navigation-complete";
+import { UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationRowInfo } from "../";
 const RandomWords = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
 
 
@@ -374,25 +374,10 @@ const DemoFocus = memo(() => {
 //const GridRowContext = createContext<UseGridNavigationRow<HTMLTableRowElement, HTMLTableCellElement, {}, {}, string, string>>(null!);
 //const GridCellContext = createContext<UseGridNavigationCell<HTMLTableCellElement, {}, string>>(null!);
 export const DemoUseGrid = memo(() => {
-    //return <div />;
-
-    //const [, setLastFocusedInner, _getLastFocusedInner] = useState(false);
-    //const { props } = useHasFocus<HTMLTableSectionElement>({ onLastFocusedInnerChanged: setLastFocusedInner, getDocument });
 
     const [tabbableColumn, setTabbableColumn, _getTabbableColumn] = useState<number | null>(null);
     const [selectedRow, setSelectedRow, _getSelectedRow] = useState<number | null>(null);
     const [tabbableRow, setTabbableRow] = useState<number | null>(null);
-    //const getHighestIndex = useCallback(() => getChildren().getHighestIndex(), []);
-    //const getChildren = useCallback<typeof getChildren2>(() => { return getChildren2() }, []);
-
-
-
-    //const getHighestChildIndex = useStableCallback(() => ghci());
-    /*const getValid = useStableCallback<GetValid>((i) => {
-        const child = getChildren().getAt(i);
-        return !(child?.hidden || child?.disabled);
-    });*/
-
 
     const ret: UseCompleteGridNavigationReturnType<HTMLTableSectionElement, HTMLTableRowElement, HTMLTableCellElement, CustomGridInfo, CustomGridRowInfo> = useCompleteGridNavigation<HTMLTableSectionElement, HTMLTableRowElement, HTMLTableCellElement, CustomGridInfo, CustomGridRowInfo>({
         singleSelectionParameters: { initiallySelectedIndex: selectedRow, onSelectedIndexChange: setSelectedRow },
@@ -412,10 +397,8 @@ export const DemoUseGrid = memo(() => {
     const {
         context,
         props,
-        //rearrangeableChildrenParameters: { getHighestChildIndex: ghci, getValid: gv },
         rearrangeableChildrenReturn: { useRearrangedChildren }
     } = ret;
-    //const { getChildren: getChildren2 } = managedChildrenReturn;
 
 
 
@@ -467,7 +450,6 @@ const DemoUseGridRow = memo((({ index }: { index: number }) => {
     const disabled = hidden;
 
 
-    //    const getValid = useStableCallback<GetValid>((i) => !!(ret.managedChildReturn.getChildren().getAt(i)?.hidden));
 
     const contextFromParent = useContext(GridRowContext) as CompleteGridNavigationContext<HTMLTableSectionElement, HTMLTableRowElement, HTMLTableCellElement, CustomGridInfo, CustomGridRowInfo>;
     const ret: UseCompleteGridNavigationRowReturnType<HTMLTableRowElement, HTMLTableCellElement, CustomGridInfo, CustomGridRowInfo> = useCompleteGridNavigationRow<HTMLTableRowElement, HTMLTableCellElement, CustomGridInfo, CustomGridRowInfo>({
