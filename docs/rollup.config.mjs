@@ -18,7 +18,7 @@ export default {
     plugins: [
         typescript({ sourceMap: true }), 
         commonjs({ sourceMap: true, extensions }), 
-        resolve({ extensions }), 
+        resolve({ extensions, dedupe: ['preact', "preact/compat", "preact/hooks"] }),   // TODO: Why, exactly, is this needed? It doesn't not make sense, but specifically. Why.
         getBabelOutputPlugin({
             configFile: path.resolve(".babelrc"),
             sourceMaps: true,

@@ -19,15 +19,15 @@ export const DemoUseRovingTabIndex = memo(() => {
 
     const [selectionMode, setSelectionMode] = useState("activation" as "focus" | "activation");
     const [count, setCount] = useState(10);
-    let [min, setMin] = useState<number>(1);
-    let [max, setMax] = useState<number>(2);
-    const [staggered, setStaggered] = useState<boolean>(true);
+    let [min, setMin] = useState<number | null>(null);
+    let [max, setMax] = useState<number | null>(null);
+    const [staggered, setStaggered] = useState<boolean>(false);
     // const [selectedIndex, _setLocalSelectedIndex] = useState<number | null>(0);
     // const [tabbableIndex, _setLocalTabbableIndex] = useState<number | null>(0);
 
-    if (!isFinite(min))
+    if (!isFinite(min ?? NaN))
         min = null!;
-    if (!isFinite(max))
+    if (!isFinite(max ?? NaN))
         max = null!;
 
 
@@ -94,8 +94,8 @@ export const DemoUseRovingTabIndex = memo(() => {
             <button onClick={() => shuffle(children)}>Shuffle</button>
             <label>Imperatively set the tabbable index to: <input type="number" onInput={e => { e.preventDefault(); setTabbableIndex(e.currentTarget.valueAsNumber, e, false); }} /></label>
             <label>Imperatively set the selected index to: <input type="number" onInput={e => { e.preventDefault(); changeSelectedIndex(e.currentTarget.valueAsNumber); }} /></label>
-            <label>Pagination window starts at: <input type="number" value={min} min={0} max={max} onInput={e => { e.preventDefault(); setMin(e.currentTarget.valueAsNumber); }} /></label>
-            <label>Pagination window ends at: <input type="number" value={max} min={min} max={count} onInput={e => { e.preventDefault(); setMax(e.currentTarget.valueAsNumber); }} /></label>
+            <label>Pagination window starts at: <input type="number" value={min ?? undefined} min={0} max={max ?? undefined} onInput={e => { e.preventDefault(); setMin(e.currentTarget.valueAsNumber); }} /></label>
+            <label>Pagination window ends at: <input type="number" value={max ?? undefined} min={min ?? undefined} max={count} onInput={e => { e.preventDefault(); setMax(e.currentTarget.valueAsNumber); }} /></label>
             <label>Stagger delay: <input type="checkbox" checked={staggered} onInput={e => { e.preventDefault(); setStaggered(e.currentTarget.checked); }} /></label>
             <label>Selection mode:
                 <label><input name="rti-demo-selection-mode" type="radio" checked={selectionMode == 'focus'} onInput={e => { e.preventDefault(); setSelectionMode("focus"); }} /> On focus</label>
@@ -119,6 +119,9 @@ interface CustomInfoType extends UseCompleteListNavigationChildInfo<HTMLLIElemen
 const SelectionModeContext = createContext("focus" as "focus" | "activation");
 const _Prefix = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
+    if (index == 4)
+        return null;
+
     const selectionMode = useContext(SelectionModeContext);
     let disabled = (index == 6);
     let hidden = (index == 7);

@@ -5,7 +5,7 @@
     "main": "index.tsx",
     "packageManager": "pnpm@7.26.2",
     "scripts": {
-        "watch": "rollup --config rollup.config.mjs --watch",
+        "watch": "rollup --config rollup.config.mjs --watch --no-watch.clearScreen",
         "build": "rollup --config rollup.config.mjs",
         "test": "echo \"Error: no test specified\" && exit 1",
         "install": "npm run build"
