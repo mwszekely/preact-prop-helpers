@@ -1,6 +1,3 @@
-function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return typeof key === "symbol" ? key : String(key); }
-function _toPrimitive(input, hint) { if (typeof input !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (typeof res !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
 var bundle = function (exports) {
   'use strict';
 
@@ -77,7 +74,7 @@ var bundle = function (exports) {
       return n.__v.__b - l.__v.__b;
     }), t$1 = [], n.some(function (n) {
       var l, u, i, t, o, r;
-      n.__d && (o = (t = (l = n).__v).__e, (r = l.__P) && (u = [], (i = s$1({}, t)).__v = t.__v + 1, j$2(r, t, i, l.__n, void 0 !== r.ownerSVGElement, null != t.__h ? [o] : null, u, null == o ? _$2(t) : o, t.__h), z$2(u, t), t.__e != o && k$1(t)));
+      n.__d && (o = (t = (l = n).__v).__e, (r = l.__P) && (u = [], (i = s$1({}, t)).__v = t.__v + 1, j$1(r, t, i, l.__n, void 0 !== r.ownerSVGElement, null != t.__h ? [o] : null, u, null == o ? _$2(t) : o, t.__h), z$2(u, t), t.__e != o && k$1(t)));
     });
   }
   function w$2(n, l, u, i, t, o, r, c, s, a) {
@@ -100,7 +97,7 @@ var bundle = function (exports) {
         }
         d = null;
       }
-      j$2(n, k, d = d || f$1, t, o, r, c, s, a), b = k.__e, (y = k.ref) && d.ref != y && (w || (w = []), d.ref && w.push(d.ref, null, k), w.push(y, k.__c || b, k)), null != b ? (null == g && (g = b), "function" == typeof k.type && k.__k === d.__k ? k.__d = s = m$1(k, s, n) : s = A(n, k, d, x, b, s), "function" == typeof u.type && (u.__d = s)) : s && d.__e == s && s.parentNode != n && (s = _$2(d));
+      j$1(n, k, d = d || f$1, t, o, r, c, s, a), b = k.__e, (y = k.ref) && d.ref != y && (w || (w = []), d.ref && w.push(d.ref, null, k), w.push(y, k.__c || b, k)), null != b ? (null == g && (g = b), "function" == typeof k.type && k.__k === d.__k ? k.__d = s = m$1(k, s, n) : s = A(n, k, d, x, b, s), "function" == typeof u.type && (u.__d = s)) : s && d.__e == s && s.parentNode != n && (s = _$2(d));
     }
     for (u.__e = g, h = C; h--;) null != x[h] && N(x[h], x[h]);
     if (w) for (h = 0; h < w.length; h++) M(w[h], w[++h], w[++h]);
@@ -127,15 +124,15 @@ var bundle = function (exports) {
     for (o in u) "children" === o || "key" === o || o in l || H$1(n, o, null, u[o], i);
     for (o in l) t && "function" != typeof l[o] || "children" === o || "key" === o || "value" === o || "checked" === o || u[o] === l[o] || H$1(n, o, l[o], u[o], i);
   }
-  function $$1(n, l, u) {
+  function $(n, l, u) {
     "-" === l[0] ? n.setProperty(l, u) : n[l] = null == u ? "" : "number" != typeof u || c$1.test(l) ? u : u + "px";
   }
   function H$1(n, l, u, i, t) {
     var o;
     n: if ("style" === l) {
       if ("string" == typeof u) n.style.cssText = u;else {
-        if ("string" == typeof i && (n.style.cssText = i = ""), i) for (l in i) u && l in u || $$1(n.style, l, "");
-        if (u) for (l in u) i && u[l] === i[l] || $$1(n.style, l, u[l]);
+        if ("string" == typeof i && (n.style.cssText = i = ""), i) for (l in i) u && l in u || $(n.style, l, "");
+        if (u) for (l in u) i && u[l] === i[l] || $(n.style, l, u[l]);
       }
     } else if ("o" === l[0] && "n" === l[1]) o = l !== (l = l.replace(/Capture$/, "")), l = l.toLowerCase() in n ? l.toLowerCase().slice(2) : l.slice(2), n.l || (n.l = {}), n.l[l + o] = u, u ? i || n.addEventListener(l, o ? T$2 : I$1, o) : n.removeEventListener(l, o ? T$2 : I$1, o);else if ("dangerouslySetInnerHTML" !== l) {
       if (t) l = l.replace(/xlink(H|:h)/, "h").replace(/sName$/, "s");else if ("href" !== l && "list" !== l && "form" !== l && "tabIndex" !== l && "download" !== l && l in n) try {
@@ -151,7 +148,7 @@ var bundle = function (exports) {
   function T$2(n) {
     this.l[n.type + !0](l$1.event ? l$1.event(n) : n);
   }
-  function j$2(n, u, i, t, o, r, f, e, c) {
+  function j$1(n, u, i, t, o, r, f, e, c) {
     var a,
       h,
       v,
@@ -257,17 +254,9 @@ var bundle = function (exports) {
   function O(n, l, u) {
     return this.constructor(n, u);
   }
-  function P$1(u, i, t) {
+  function P(u, i, t) {
     var o, r, e;
-    l$1.__ && l$1.__(u, i), r = (o = "function" == typeof t) ? null : t && t.__k || i.__k, e = [], j$2(i, u = (!o && t || i).__k = h$1(p$1, null, [u]), r || f$1, f$1, void 0 !== i.ownerSVGElement, !o && t ? [t] : r ? null : i.firstChild ? n.call(i.childNodes) : null, e, !o && t ? t : r ? r.__e : i.firstChild, o), z$2(e, u);
-  }
-  function q$1(l, u, i) {
-    var t,
-      o,
-      r,
-      f = s$1({}, l.props);
-    for (r in u) "key" == r ? t = u[r] : "ref" == r ? o = u[r] : f[r] = u[r];
-    return arguments.length > 2 && (f.children = arguments.length > 3 ? n.call(arguments, 2) : i), v$1(l.type, f, t || l.key, o || l.ref, null);
+    l$1.__ && l$1.__(u, i), r = (o = "function" == typeof t) ? null : t && t.__k || i.__k, e = [], j$1(i, u = (!o && t || i).__k = h$1(p$1, null, [u]), r || f$1, f$1, void 0 !== i.ownerSVGElement, !o && t ? [t] : r ? null : i.firstChild ? n.call(i.childNodes) : null, e, !o && t ? t : r ? r.__e : i.firstChild, o), z$2(e, u);
   }
   function B$2(n, l) {
     var u = {
@@ -416,15 +405,6 @@ var bundle = function (exports) {
       i = d(t++, 9);
     return i.c = n, u ? (null == i.__ && (i.__ = !0, u.sub(r$1)), u.props.value) : n.__;
   }
-  function V$1() {
-    var n = d(t++, 11);
-    if (!n.__) {
-      for (var u = r$1.__v; null !== u && !u.__m && null !== u.__;) u = u.__;
-      var i = u.__m || (u.__m = [0, 0]);
-      n.__ = "P" + i[0] + "-" + i[1]++;
-    }
-    return n.__;
-  }
   function b() {
     for (var t; t = f.shift();) if (t.__P && t.__H) try {
       t.__H.__h.forEach(k), t.__H.__h.forEach(w$1), t.__H.__h = [];
@@ -443,7 +423,7 @@ var bundle = function (exports) {
   }, l$1.diffed = function (t) {
     v && v(t);
     var o = t.__c;
-    o && o.__H && (o.__H.__h.length && (1 !== f.push(o) && i === l$1.requestAnimationFrame || ((i = l$1.requestAnimationFrame) || j$1)(b)), o.__H.__.forEach(function (n) {
+    o && o.__H && (o.__H.__h.length && (1 !== f.push(o) && i === l$1.requestAnimationFrame || ((i = l$1.requestAnimationFrame) || j)(b)), o.__H.__.forEach(function (n) {
       n.i && (n.__H = n.i), n.__V !== c && (n.__ = n.__V), n.i = void 0, n.__V = c;
     })), u = r$1 = null;
   }, l$1.__c = function (t, r) {
@@ -471,7 +451,7 @@ var bundle = function (exports) {
     }), u.__H = void 0, r && l$1.__e(r, u.__v));
   };
   var g$1 = "function" == typeof requestAnimationFrame;
-  function j$1(n) {
+  function j(n) {
     var t,
       r = function () {
         clearTimeout(u), g$1 && cancelAnimationFrame(t), setTimeout(n);
@@ -604,40 +584,6 @@ var bundle = function (exports) {
       n.u = e = e[2];
     }
   };
-  function P(n) {
-    return this.getChildContext = function () {
-      return n.context;
-    }, n.children;
-  }
-  function $(n) {
-    var e = this,
-      r = n.i;
-    e.componentWillUnmount = function () {
-      P$1(null, e.l), e.l = null, e.i = null;
-    }, e.i && e.i !== r && e.componentWillUnmount(), n.__v ? (e.l || (e.i = r, e.l = {
-      nodeType: 1,
-      parentNode: r,
-      childNodes: [],
-      appendChild: function (n) {
-        this.childNodes.push(n), e.i.appendChild(n);
-      },
-      insertBefore: function (n, t) {
-        this.childNodes.push(n), e.i.appendChild(n);
-      },
-      removeChild: function (n) {
-        this.childNodes.splice(this.childNodes.indexOf(n) >>> 1, 1), e.i.removeChild(n);
-      }
-    }), P$1(h$1(P, {
-      context: e.context
-    }, n.__v), e.l)) : e.l && e.componentWillUnmount();
-  }
-  function j(n, e) {
-    var r = h$1($, {
-      __v: n,
-      i: e
-    });
-    return r.containerInfo = e, r;
-  }
   (V.prototype = new d$1()).__a = function (n) {
     var t = this,
       e = F(t.__v),
@@ -1398,11 +1344,64 @@ var bundle = function (exports) {
    * @returns
    * *
    */
-  function useGlobalHandler(target, type, handler, options) {
-    // Note to self: The typing doesn't improve even if this is split up into a sub-function.
-    // No matter what, it seems impossible to get the handler's event object typed perfectly.
-    // It seems like it's guaranteed to always be a union of all available tupes.
-    // Again, no matter what combination of sub- or sub-sub-functions used.
+  function useGlobalHandler(target, type, handler, options, mode) {
+    mode || (mode = "grouped");
+    useEnsureStability("useGlobalHandler", mode);
+    if (mode === "grouped") {
+      // Note to self: The typing doesn't improve even if this is split up into a sub-function.
+      // No matter what, it seems impossible to get the handler's event object typed perfectly.
+      // It seems like it's guaranteed to always be a union of all available tupes.
+      // Again, no matter what combination of sub- or sub-sub-functions used.
+      useGlobalHandlerGrouped(target, type, handler, options);
+    } else {
+      useGlobalHandlerSingle(target, type, handler, options);
+    }
+  }
+  let mapThing = new Map();
+  function doMapThing(op, target, type, handler, options) {
+    if (handler) {
+      const optionsKey = JSON.stringify(options);
+      const byType = mapThing.get(target) || new Map();
+      const byOptions = byType.get(type) || new Map();
+      const info = byOptions.get(optionsKey) || {
+        listener: null,
+        listeners: new Set()
+      };
+      op(info, handler);
+      byOptions.set(optionsKey, info);
+      byType.set(type, byOptions);
+      mapThing.set(target, byType);
+    }
+  }
+  function addToMapThing(target, type, handler, options) {
+    doMapThing((info, h) => {
+      info.listeners.add(h);
+      if (info.listener == null) target.addEventListener(type, info.listener = e => info.listeners.forEach(fn => fn(e)), options);
+    }, target, type, handler, options);
+  }
+  function removeFromMapThing(target, type, handler, options) {
+    doMapThing((info, h) => {
+      info.listeners.delete(h);
+      if (info.listener == null) target.removeEventListener(type, info.listener = e => info.listeners.forEach(fn => fn(e)), options);
+    }, target, type, handler, options);
+  }
+  /**
+   * This is way faster for large numbers of event handlers.
+   *
+   * For example, if every button listens for a global click, or something,
+   * it would be nice if it was efficient at least.
+   */
+  function useGlobalHandlerGrouped(target, type, handler, options) {
+    let stableHandler = useStableCallback(handler !== null && handler !== void 0 ? handler : () => {});
+    if (handler == null) stableHandler = null;
+    h(() => {
+      if (stableHandler) {
+        addToMapThing(target, type, stableHandler, options);
+        return () => removeFromMapThing(target, type, stableHandler, options);
+      }
+    }, [target, type, stableHandler]);
+  }
+  function useGlobalHandlerSingle(target, type, handler, options) {
     let stableHandler = useStableCallback(handler !== null && handler !== void 0 ? handler : () => {});
     if (handler == null) stableHandler = null;
     h(() => {
@@ -1897,296 +1896,6 @@ var bundle = function (exports) {
       changeIndex,
       reevaluateClosestFit,
       getCurrentIndex
-    };
-  }
-  const MagicWindowKey = "__preact-prop-helpers-escape-key-dismiss__";
-  function getElementDepth(element) {
-    let depth = 0;
-    let parent = element.parentElement;
-    while (parent) {
-      depth += 1;
-      parent = parent.parentElement;
-    }
-    return depth;
-  }
-  /**
-   * Adds event handlers for a modal-like soft-dismiss interaction.
-   *
-   * That is, any clicks or taps outside of the given component,
-   * or any time the Escape key is pressed within the component,
-   * (with various browser oddities regarding clicks on blank or inert areas handled)
-   * the component will request to close itself.
-   *
-   * Of course, if you don't do anything in the `onClose` function,
-   * it won't be a soft dismiss anymore.
-   *
-   * Handles events for pressing the `Escape` key to close the any currently open dialogs, tooltips, menus, popups, etc.
-   *
-   * One press of the `Escape` key is guaranteed to only call `onClose` for *only one* component, and it is called on the component deepest in the DOM tree, differentiated by passing context information between parent and child.
-   *
-   * @param param0
-   * @returns
-   */
-  function useEscapeDismiss(_ref5) {
-    let {
-      escapeDismissParameters: {
-        onClose,
-        open,
-        getWindow: unstableGetWindow,
-        parentDepth,
-        ...void1
-      },
-      refElementPopupReturn: {
-        getElement,
-        ...void2
-      }
-    } = _ref5;
-    const stableOnClose = useStableCallback(onClose);
-    const getWindow = useStableCallback(unstableGetWindow);
-    const getDepth = useStableGetter(parentDepth + 1);
-    // When this component opens, add an event listener that finds the deepest open soft dismiss element to actually dismiss.
-    // Only opened components will add event handlers, and will remove them once closed.
-    // The reason this is so complicated is because:
-    // 1. We must only close one soft dismiss component at a time.  If there's a tooltip in a popup, the tooltip must be dismissed.
-    // 2. `keydown` events don't just work on arbitrary elements, for our purposes they must be from the `window`. So we can't rely on normal capturing or bubbling behavior on the element itself.
-    // 3. Event handlers added to the `window` via `addEventHandler` are called in the order of registration, which is completely at odds with #1.
-    //
-    // So all soft dismiss components listen for a keydown of Escape, 
-    // then the first one to do so will wait for a microtask, 
-    // then find the deepest element in the document tree to dismiss of all of those components currently open.
-    h(() => {
-      var _window$MagicWindowKe;
-      const window = getWindow();
-      (_window$MagicWindowKe = window[MagicWindowKey]) !== null && _window$MagicWindowKe !== void 0 ? _window$MagicWindowKe : window[MagicWindowKey] = {
-        microtaskQueued: false,
-        elementQueue: new Map()
-      };
-      const info = window[MagicWindowKey];
-      if (open) {
-        window.addEventListener("keydown", handler, {
-          capture: true
-        });
-        return () => {
-          const element = getElement();
-          if (element && info.elementQueue) info.elementQueue.delete(element);
-          window.removeEventListener("keydown", handler, {
-            capture: true
-          });
-        };
-      }
-      function handler(e) {
-        if (e.key == "Escape") {
-          // We don't know which of the currently active soft dismisses will actually do something,
-          // but ONE of them definitely will,
-          // so we stop propagation to child nodes, but not to everyone on the window (stopImmediatePropagation).
-          e.preventDefault();
-          e.stopPropagation();
-          // This is what at least one of the elements will call
-          const onClose2 = () => {
-            stableOnClose("escape");
-          };
-          const element = getElement();
-          if (element) {
-            const treeDepth = getElementDepth(element);
-            const depth = getDepth();
-            info.elementQueue.set(element, {
-              depth,
-              onClose: onClose2,
-              treeDepth
-            });
-          }
-          if (!info.microtaskQueued) {
-            info.microtaskQueued = true;
-            setTimeout(() => {
-              var _deepestOnClose;
-              const {
-                elementQueue
-              } = info;
-              info.microtaskQueued = false;
-              info.elementQueue = new Map();
-              let deepestDepth = -Infinity;
-              let deepestTreeDepth = -Infinity;
-              let deepestOnClose = null;
-              for (const [element, {
-                depth,
-                onClose,
-                treeDepth
-              }] of elementQueue) {
-                let tieBroken = false;
-                if (depth == deepestDepth) {
-                  if (treeDepth > deepestTreeDepth) {
-                    tieBroken = true;
-                  }
-                }
-                if (depth > deepestDepth || depth == deepestDepth && tieBroken) {
-                  deepestDepth = depth;
-                  deepestTreeDepth = treeDepth;
-                  deepestOnClose = onClose;
-                }
-              }
-              (_deepestOnClose = deepestOnClose) === null || _deepestOnClose === void 0 ? void 0 : _deepestOnClose();
-            }, 0);
-          }
-        }
-      }
-    }, [open]);
-  }
-  /**
-   * Handles events for dismiss events for things like popup menus or transient dialogs -- things where moving focus to a new area of the page means this component should close itself.
-   *
-   * @param param0
-   * @returns
-   */
-  function useLostFocusDismiss(_ref6) {
-    let {
-      refElementPopupReturn: {
-        getElement: getPopupElement,
-        ...void3
-      },
-      refElementSourceReturn,
-      lostFocusDismiss: {
-        open,
-        onClose
-      },
-      ...void1
-    } = _ref6;
-    const {
-      getElement: getSourceElement,
-      ...void2
-    } = refElementSourceReturn !== null && refElementSourceReturn !== void 0 ? refElementSourceReturn : {};
-    const stableOnClose = useStableCallback(onClose);
-    const getOpen = useStableGetter(open);
-    const onLastActiveElementChange = T$1((newElement, _prevElement, _e) => {
-      const open = getOpen();
-      const sourceElement = getSourceElement === null || getSourceElement === void 0 ? void 0 : getSourceElement();
-      const popupElement = getPopupElement();
-      if (!(sourceElement !== null && sourceElement !== void 0 && sourceElement.contains(newElement) || popupElement !== null && popupElement !== void 0 && popupElement.contains(newElement))) {
-        if (open) stableOnClose();
-      }
-    }, [getSourceElement]);
-    return {
-      activeElementParameters: {
-        onLastActiveElementChange
-      }
-    };
-  }
-  /**
-   * Handles events for a backdrop on a modal dialog -- the kind where the user expects the modal to close when they click/tap outside of it.
-   *
-   * @param param0
-   */
-  function useBackdropDismiss(_ref7) {
-    let {
-      backdropDismissParameters: {
-        open,
-        onClose: onCloseUnstable,
-        ...void1
-      },
-      refElementPopupReturn: {
-        getElement,
-        ...void3
-      },
-      ...void2
-    } = _ref7;
-    const getOpen = useStableGetter(open);
-    const onClose = useStableCallback(onCloseUnstable);
-    const onBackdropClick = T$1(function onBackdropClick(e) {
-      if (!getOpen()) return;
-      // Basically, "was this event fired on an element not contained by the modal?"
-      // There are multiple ways browser react to "interacting with nothing", and this takes care of everything.
-      let element = getElement();
-      let foundInsideClick = false;
-      if (e.target && element && element.contains(e.target)) {
-        foundInsideClick = true;
-      }
-      if (!foundInsideClick) {
-        onClose();
-      }
-    }, []);
-    useGlobalHandler(window, "mousedown", open ? onBackdropClick : null, {
-      capture: true
-    });
-    useGlobalHandler(window, "touchstart", open ? onBackdropClick : null, {
-      capture: true
-    });
-  }
-  /**
-   * Combines all the methods of dismissing a modal-ish or popup-ish component into one combined hook.
-   *
-   * This is similar to the "complete" series of list/grid navigation, in that it's the "outermost" hook of its type.
-   */
-  function useDismiss(_ref8) {
-    let {
-      dismissParameters: {
-        open: globalOpen,
-        onClose: globalOnClose,
-        closeOnBackdrop,
-        closeOnEscape,
-        closeOnLostFocus
-      },
-      escapeDismissParameters: {
-        getWindow,
-        parentDepth
-      }
-    } = _ref8;
-    const {
-      refElementReturn: refElementSourceReturn
-    } = useRefElement({
-      refElementParameters: {}
-    });
-    const {
-      refElementReturn: refElementPopupReturn
-    } = useRefElement({
-      refElementParameters: {}
-    });
-    const onCloseBackdrop = T$1(() => {
-      return globalOnClose === null || globalOnClose === void 0 ? void 0 : globalOnClose("backdrop");
-    }, [globalOnClose]);
-    const onCloseEscape = T$1(() => {
-      return globalOnClose === null || globalOnClose === void 0 ? void 0 : globalOnClose("escape");
-    }, [globalOnClose]);
-    const onCloseFocus = T$1(() => {
-      return globalOnClose === null || globalOnClose === void 0 ? void 0 : globalOnClose("lost-focus");
-    }, [globalOnClose]);
-    useBackdropDismiss({
-      backdropDismissParameters: {
-        onClose: onCloseBackdrop,
-        open: closeOnBackdrop && globalOpen
-      },
-      refElementPopupReturn
-    });
-    useEscapeDismiss({
-      escapeDismissParameters: {
-        getWindow,
-        onClose: onCloseEscape,
-        open: closeOnEscape && globalOpen,
-        parentDepth
-      },
-      refElementPopupReturn
-    });
-    const {
-      activeElementParameters
-    } = useLostFocusDismiss({
-      lostFocusDismiss: {
-        onClose: onCloseFocus,
-        open: closeOnLostFocus && globalOpen
-      },
-      refElementPopupReturn,
-      refElementSourceReturn
-    });
-    const getDocument = T$1(() => {
-      return getWindow().document;
-    }, [getWindow]);
-    useActiveElement({
-      activeElementParameters: {
-        ...activeElementParameters,
-        getWindow,
-        getDocument
-      }
-    });
-    return {
-      refElementSourceReturn,
-      refElementPopupReturn
     };
   }
 
@@ -3553,8 +3262,8 @@ var bundle = function (exports) {
     });
   })();
   function getDocument$1(element) {
-    var _ref9, _ref10, _element$ownerDocumen;
-    return (_ref9 = (_ref10 = (_element$ownerDocumen = element === null || element === void 0 ? void 0 : element.ownerDocument) !== null && _element$ownerDocumen !== void 0 ? _element$ownerDocumen : document) !== null && _ref10 !== void 0 ? _ref10 : window.document) !== null && _ref9 !== void 0 ? _ref9 : globalThis.document;
+    var _ref5, _ref6, _element$ownerDocumen;
+    return (_ref5 = (_ref6 = (_element$ownerDocumen = element === null || element === void 0 ? void 0 : element.ownerDocument) !== null && _element$ownerDocumen !== void 0 ? _element$ownerDocumen : document) !== null && _ref6 !== void 0 ? _ref6 : window.document) !== null && _ref5 !== void 0 ? _ref5 : globalThis.document;
   }
   function blockingElements() {
     return getDocument$1().$blockingElements;
@@ -3616,7 +3325,7 @@ var bundle = function (exports) {
   }
 
   //const elementsToRestoreFocusTo = new Map<Element | null, (Node & HTMLOrSVGElement)>();
-  function useFocusTrap(_ref11) {
+  function useFocusTrap(_ref7) {
     let {
       focusTrapParameters: {
         onlyMoveFocus,
@@ -3625,7 +3334,7 @@ var bundle = function (exports) {
         focusOpener: focusOpenerUnstable
       },
       refElementParameters
-    } = _ref11;
+    } = _ref7;
     const {
       onElementChange,
       ...rest
@@ -3700,11 +3409,11 @@ var bundle = function (exports) {
    *
    * @see useListNavigation, which packages everything up together.
    */
-  function useLinearNavigation(_ref12) {
+  function useLinearNavigation(_ref8) {
     let {
       rovingTabIndexReturn,
       linearNavigationParameters
-    } = _ref12;
+    } = _ref8;
     const {
       getHighestIndex,
       indexDemangler,
@@ -3909,7 +3618,7 @@ var bundle = function (exports) {
       }
     };
   }
-  function tryNavigateToIndex(_ref13) {
+  function tryNavigateToIndex(_ref9) {
     let {
       isValid,
       highestChildIndex,
@@ -3917,7 +3626,7 @@ var bundle = function (exports) {
       indexDemangler,
       indexMangler,
       target
-    } = _ref13;
+    } = _ref9;
     if (searchDirection === -1) {
       var _bestUpResult;
       let bestUpResult = undefined;
@@ -3960,13 +3669,13 @@ var bundle = function (exports) {
       };
     }
   }
-  function tryNavigateUp(_ref14) {
+  function tryNavigateUp(_ref10) {
     let {
       isValid,
       indexDemangler,
       indexMangler,
       target
-    } = _ref14;
+    } = _ref10;
     const lower = 0;
     while (target >= lower && !isValid(target)) target = indexDemangler(indexMangler(target) - 1);
     if (!isValid(target)) {
@@ -3984,14 +3693,14 @@ var bundle = function (exports) {
       };
     }
   }
-  function tryNavigateDown(_ref15) {
+  function tryNavigateDown(_ref11) {
     let {
       isValid,
       indexDemangler,
       indexMangler,
       target,
       highestChildIndex: upper
-    } = _ref15;
+    } = _ref11;
     while (target <= upper && !isValid(target)) target = indexDemangler(indexMangler(target) + 1);
     if (!isValid(target)) {
       return undefined;
@@ -4071,7 +3780,7 @@ var bundle = function (exports) {
    * And just as well! Children should be allowed at the root,
    * regardless of if it's the whole app or just a given component.
    */
-  function useRovingTabIndex(_ref16) {
+  function useRovingTabIndex(_ref12) {
     let {
       managedChildrenReturn: {
         getChildren
@@ -4082,7 +3791,7 @@ var bundle = function (exports) {
         onTabbableIndexChange
       },
       ..._void1
-    } = _ref16;
+    } = _ref12;
     const getUntabbable = useStableGetter(untabbable);
     //initiallyTabbedIndex ??= 0;
     // Override the actual setter to include some extra logic related to avoiding hidden children, 
@@ -4181,7 +3890,7 @@ var bundle = function (exports) {
       rovingTabIndexChildContext
     };
   }
-  function useRovingTabIndexChild(_ref17) {
+  function useRovingTabIndexChild(_ref13) {
     let {
       managedChildParameters: {
         index,
@@ -4193,7 +3902,7 @@ var bundle = function (exports) {
         getInitiallyTabbedIndex
       },
       rovingTabIndexChildParameters
-    } = _ref17;
+    } = _ref13;
     const {
       hidden,
       ..._void1
@@ -4220,7 +3929,7 @@ var bundle = function (exports) {
       }
     };
   }
-  function useTextContent(_ref18) {
+  function useTextContent(_ref14) {
     let {
       refElementReturn: {
         getElement
@@ -4230,7 +3939,7 @@ var bundle = function (exports) {
         onTextContentChange,
         hidden
       }
-    } = _ref18;
+    } = _ref14;
     const [getTextContent, setTextContent] = usePassiveState(onTextContentChange, returnNull, runImmediately);
     h(() => {
       if (!hidden) {
@@ -4255,7 +3964,7 @@ var bundle = function (exports) {
    *
    * @see useListNavigation, which packages everything up together.
    */
-  function useTypeaheadNavigation(_ref19) {
+  function useTypeaheadNavigation(_ref15) {
     let {
       typeaheadNavigationParameters: {
         collator,
@@ -4270,7 +3979,7 @@ var bundle = function (exports) {
         ..._void1
       },
       ..._void2
-    } = _ref19;
+    } = _ref15;
     // For typeahead, keep track of what our current "search" string is (if we have one)
     // and also clear it every 1000 ms since the last time it changed.
     // Next, keep a mapping of typeahead values to indices for faster searching.
@@ -4448,7 +4157,7 @@ var bundle = function (exports) {
       }
     }
   }
-  function useTypeaheadNavigationChild(_ref20) {
+  function useTypeaheadNavigationChild(_ref16) {
     let {
       managedChildParameters: {
         index,
@@ -4473,7 +4182,7 @@ var bundle = function (exports) {
       },
       //typeaheadNavigationChildParameters: { ...void5 },
       ...void4
-    } = _ref20;
+    } = _ref16;
     const {
       textContentReturn
     } = useTextContent({
@@ -4560,14 +4269,14 @@ var bundle = function (exports) {
    * In the document order, there will be only one "focused" or "tabbable" element, making it act more like one complete unit in comparison to everything around it.
    * Navigating forwards/backwards can be done with the arrow keys, Home/End keys, or any text for typeahead to focus the next item that matches.
    */
-  function useListNavigation(_ref21) {
+  function useListNavigation(_ref17) {
     let {
       linearNavigationParameters,
       typeaheadNavigationParameters,
       rovingTabIndexParameters,
       managedChildrenReturn,
       ..._void1
-    } = _ref21;
+    } = _ref17;
     const rtir = useRovingTabIndex({
       managedChildrenReturn,
       rovingTabIndexParameters
@@ -4589,7 +4298,7 @@ var bundle = function (exports) {
       ...rtir
     };
   }
-  function useListNavigationChild(_ref22) {
+  function useListNavigationChild(_ref18) {
     let {
       rovingTabIndexChildParameters,
       rovingTabIndexChildContext,
@@ -4599,7 +4308,7 @@ var bundle = function (exports) {
       refElementReturn,
       textContentParameters,
       ..._void2
-    } = _ref22;
+    } = _ref18;
     const rticr = useRovingTabIndexChild({
       rovingTabIndexChildContext,
       rovingTabIndexChildParameters,
@@ -4617,7 +4326,7 @@ var bundle = function (exports) {
       ...rticr
     };
   }
-  function useGridNavigation(_ref23) {
+  function useGridNavigation(_ref19) {
     let {
       gridNavigationParameters: {
         onTabbableColumnChange,
@@ -4631,7 +4340,7 @@ var bundle = function (exports) {
       managedChildrenReturn,
       typeaheadNavigationParameters,
       ..._void2
-    } = _ref23;
+    } = _ref19;
     const {
       getChildren
     } = managedChildrenReturn;
@@ -4685,7 +4394,7 @@ var bundle = function (exports) {
       })
     };
   }
-  function useGridNavigationRow(_ref24) {
+  function useGridNavigationRow(_ref20) {
     let {
       rowAsChildOfGridParameters: {
         gridNavigationRowContext: {
@@ -4705,7 +4414,7 @@ var bundle = function (exports) {
         ...asParentRowOfCellsP
       },
       ..._void1
-    } = _ref24;
+    } = _ref20;
     const {
       managedChildrenReturn: {
         getChildren
@@ -4787,7 +4496,7 @@ var bundle = function (exports) {
       }
     };
   }
-  function useGridNavigationCell(_ref25) {
+  function useGridNavigationCell(_ref21) {
     let {
       //    managedChildParameters: { hidden, index, ...void3 },
       rovingTabIndexChildContext,
@@ -4810,7 +4519,7 @@ var bundle = function (exports) {
         }
       },
       ..._void1
-    } = _ref25;
+    } = _ref21;
     const {
       index
     } = managedChildParameters;
@@ -4871,7 +4580,7 @@ var bundle = function (exports) {
   }
 
   //export type UseSingleSelectionChild<E extends Element> = (a: UseSingleSelectionChildParameters<E>) => UseSingleSelectionChildReturnTypeWithHooks<E>;
-  function useSingleSelection(_ref26) {
+  function useSingleSelection(_ref22) {
     let {
       managedChildrenReturn: {
         getChildren
@@ -4883,7 +4592,7 @@ var bundle = function (exports) {
         onSelectedIndexChange: onSelectedIndexChange_U,
         initiallySelectedIndex
       }
-    } = _ref26;
+    } = _ref22;
     const onSelectedIndexChange = useStableCallback(onSelectedIndexChange_U !== null && onSelectedIndexChange_U !== void 0 ? onSelectedIndexChange_U : noop);
     //useEnsureStability("useSingleSelection", onSelectedIndexChange);
     const getSelectedAt = T$1(m => {
@@ -5008,7 +4717,7 @@ var bundle = function (exports) {
       }
     };
   }
-  function useGridNavigationSingleSelection(_ref27) {
+  function useGridNavigationSingleSelection(_ref23) {
     let {
       gridNavigationParameters,
       linearNavigationParameters,
@@ -5017,7 +4726,7 @@ var bundle = function (exports) {
       typeaheadNavigationParameters,
       singleSelectionParameters,
       ..._void2
-    } = _ref27;
+    } = _ref23;
     const gnr = useGridNavigation({
       gridNavigationParameters,
       linearNavigationParameters,
@@ -5038,12 +4747,12 @@ var bundle = function (exports) {
       ...ssr
     };
   }
-  function useGridNavigationSingleSelectionRow(_ref28) {
+  function useGridNavigationSingleSelectionRow(_ref24) {
     let {
       rowAsChildOfGridParameters,
       rowAsParentOfCellsParameters,
       ..._void1
-    } = _ref28;
+    } = _ref24;
     const {
       managedChildParameters,
       hasCurrentFocusParameters: {
@@ -5931,13 +5640,13 @@ var bundle = function (exports) {
    * Because keys are given special treatment and a child has no way of modifying its own key
    * there's no other time or place this can happen other than exactly within the parent component's render function.
    */
-  function useRearrangeableChildren(_ref29) {
+  function useRearrangeableChildren(_ref25) {
     let {
       rearrangeableChildrenParameters: {
         getIndex,
         onRearranged
       }
-    } = _ref29;
+    } = _ref25;
     // These are used to keep track of a mapping between unsorted index <---> sorted index.
     // These are needed for navigation with the arrow keys.
     const mangleMap = _(new Map());
@@ -5988,12 +5697,12 @@ var bundle = function (exports) {
         demangledIndex: getIndex(child)
       })).sort((lhs, rhs) => {
         return lhs.mangledIndex - rhs.mangledIndex;
-      }).map(_ref30 => {
+      }).map(_ref26 => {
         let {
           child,
           mangledIndex,
           demangledIndex
-        } = _ref30;
+        } = _ref26;
         return h$1(child.type, {
           ...child.props,
           key: demangledIndex,
@@ -6042,13 +5751,13 @@ var bundle = function (exports) {
    * Because keys are given special treatment and a child has no way of modifying its own key
    * there's no other time or place this can happen other than exactly within the parent component's render function.
    */
-  function useSortableChildren(_ref31) {
+  function useSortableChildren(_ref27) {
     let {
       rearrangeableChildrenParameters,
       sortableChildrenParameters: {
         compare: userCompare
       }
-    } = _ref31;
+    } = _ref27;
     const getCompare = useStableGetter(userCompare !== null && userCompare !== void 0 ? userCompare : defaultCompare);
     const {
       rearrangeableChildrenReturn
@@ -6125,13 +5834,13 @@ var bundle = function (exports) {
       return lhs - rhs;
     }
   }
-  function useGridNavigationSingleSelectionSortable(_ref32) {
+  function useGridNavigationSingleSelectionSortable(_ref28) {
     let {
       rearrangeableChildrenParameters,
       sortableChildrenParameters,
       linearNavigationParameters,
       ...gridNavigationSingleSelectionParameters
-    } = _ref32;
+    } = _ref28;
     const {
       ...scr
     } = useSortableChildren({
@@ -6157,7 +5866,7 @@ var bundle = function (exports) {
       ...scr
     };
   }
-  function useListNavigationSingleSelection(_ref33) {
+  function useListNavigationSingleSelection(_ref29) {
     let {
       linearNavigationParameters,
       rovingTabIndexParameters,
@@ -6165,7 +5874,7 @@ var bundle = function (exports) {
       singleSelectionParameters,
       managedChildrenReturn,
       ..._void3
-    } = _ref33;
+    } = _ref29;
     const lnr = useListNavigation({
       linearNavigationParameters,
       rovingTabIndexParameters,
@@ -6185,7 +5894,7 @@ var bundle = function (exports) {
       ...lnr
     };
   }
-  function useListNavigationSingleSelectionChild(_ref34) {
+  function useListNavigationSingleSelectionChild(_ref30) {
     let {
       managedChildParameters: {
         index,
@@ -6202,7 +5911,7 @@ var bundle = function (exports) {
       refElementReturn,
       textContentParameters,
       ..._void1
-    } = _ref34;
+    } = _ref30;
     const {
       hasCurrentFocusParameters: {
         onCurrentFocusedInnerChanged: ocfic2,
@@ -6275,7 +5984,7 @@ var bundle = function (exports) {
   function identity$1(value) {
     return value;
   }
-  function usePaginatedChildren(_ref35) {
+  function usePaginatedChildren(_ref31) {
     let {
       managedChildrenReturn: {
         getChildren
@@ -6287,7 +5996,7 @@ var bundle = function (exports) {
         paginationMax,
         paginationMin
       }
-    } = _ref35;
+    } = _ref31;
     const [childCount, setChildCount] = useState(null);
     const parentIsPaginated = paginationMin != null || paginationMax != null;
     const lastPagination = _({
@@ -6348,7 +6057,7 @@ var bundle = function (exports) {
       }
     };
   }
-  function usePaginatedChild(_ref36) {
+  function usePaginatedChild(_ref32) {
     let {
       managedChildParameters: {
         index
@@ -6359,7 +6068,7 @@ var bundle = function (exports) {
           getDefaultIsPaginated
         }
       }
-    } = _ref36;
+    } = _ref32;
     const [parentIsPaginated, setParentIsPaginated] = useState(getDefaultIsPaginated());
     const [childCountIfPaginated, setChildCountIfPaginated] = useState(null);
     const [paginatedVisible, setPaginatedVisible] = useState(getDefaultPaginationVisible(index));
@@ -6389,7 +6098,7 @@ var bundle = function (exports) {
    * Note that the child itself will still render, but you can delay rendering *its* children, or
    * delay other complicated or heavy logic, until the child is no longer staggered.
    */
-  function useStaggeredChildren(_ref37) {
+  function useStaggeredChildren(_ref33) {
     let {
       managedChildrenReturn: {
         getChildren
@@ -6397,7 +6106,7 @@ var bundle = function (exports) {
       staggeredChildrenParameters: {
         staggered
       }
-    } = _ref37;
+    } = _ref33;
     // By default, when a child mounts, we tell the next child to mount and simply repeat.
     // If a child is missing, however, it will break that chain.
     // To guard against that, we also wait for 50ms, and if it hasn't loaded by then, we just continue as if it did.
@@ -6504,7 +6213,7 @@ var bundle = function (exports) {
       })
     };
   }
-  function useStaggeredChild(_ref38) {
+  function useStaggeredChild(_ref34) {
     let {
       managedChildParameters: {
         index
@@ -6517,7 +6226,7 @@ var bundle = function (exports) {
           childCallsThisToTellTheParentToMountTheNextOne
         }
       }
-    } = _ref38;
+    } = _ref34;
     const [parentIsStaggered, setParentIsStaggered] = useState(getDefaultIsStaggered());
     const [staggeredVisible, setStaggeredVisible] = useState(getDefaultStaggeredVisible(index));
     s(() => {
@@ -6571,14 +6280,14 @@ var bundle = function (exports) {
       })
     };
   }
-  function useChildrenHaveFocusChild(_ref39) {
+  function useChildrenHaveFocusChild(_ref35) {
     let {
       childrenHaveFocusChildContext: {
         childrenHaveFocusChildParameters: {
           setFocusCount
         }
       }
-    } = _ref39;
+    } = _ref35;
     return {
       hasCurrentFocusParameters: {
         onCurrentFocusedInnerChanged: useStableCallback((focused, prev, e) => {
@@ -6639,7 +6348,7 @@ var bundle = function (exports) {
       }
     };
   }
-  function useCompleteGridNavigation(_ref40) {
+  function useCompleteGridNavigation(_ref36) {
     let {
       gridNavigationParameters,
       linearNavigationParameters,
@@ -6650,7 +6359,7 @@ var bundle = function (exports) {
       rearrangeableChildrenParameters,
       paginatedChildrenParameters,
       staggeredChildrenParameters
-    } = _ref40;
+    } = _ref36;
     const getChildren = T$1(() => managedChildrenReturn.getChildren(), []);
     const getHighestChildIndex = T$1(() => getChildren().getHighestIndex(), []);
     const isValid = T$1(i => {
@@ -6771,7 +6480,7 @@ var bundle = function (exports) {
       paginatedChildrenReturn
     };
   }
-  function useCompleteGridNavigationRow(_ref41) {
+  function useCompleteGridNavigationRow(_ref37) {
     let {
       rowAsChildOfGridParameters: {
         managedChildParameters,
@@ -6800,7 +6509,7 @@ var bundle = function (exports) {
         typeaheadNavigationParameters,
         ...rowAsParentOfCellsParameters
       }
-    } = _ref41;
+    } = _ref37;
     const {
       index
     } = managedChildParameters;
@@ -7001,7 +6710,7 @@ var bundle = function (exports) {
     };
   }
 
-  function useCompleteGridNavigationCell(_ref42) {
+  function useCompleteGridNavigationCell(_ref38) {
     let {
       gridNavigationCellParameters,
       managedChildParameters,
@@ -7023,7 +6732,7 @@ var bundle = function (exports) {
       }
       //sortableChildParameters: { getSortValue },
       //    pressParameters: { onPressSync, ...pressParameters },
-    } = _ref42;
+    } = _ref38;
     const {
       index
     } = managedChildParameters;
@@ -7119,7 +6828,7 @@ var bundle = function (exports) {
    *
    * @returns
    */
-  function useCompleteListNavigation(_ref43) {
+  function useCompleteListNavigation(_ref39) {
     let {
       linearNavigationParameters,
       rearrangeableChildrenParameters,
@@ -7130,7 +6839,7 @@ var bundle = function (exports) {
       paginatedChildrenParameters,
       staggeredChildrenParameters,
       ...completeListNavigationParameters
-    } = _ref43;
+    } = _ref39;
     //type M = UseListNavigationSingleSelectionChildInfo<ChildElement>;
     const {
       initiallySelectedIndex
@@ -7268,7 +6977,7 @@ var bundle = function (exports) {
       childrenHaveFocusReturn
     };
   }
-  function useCompleteListNavigationChild(_ref44) {
+  function useCompleteListNavigationChild(_ref40) {
     let {
       //managedChildParameters: { hidden, disabled, index, getSortValue },
       completeListNavigationChildParameters: {
@@ -7295,7 +7004,7 @@ var bundle = function (exports) {
         getSortValue
       },
       ..._void
-    } = _ref44;
+    } = _ref40;
     const {
       index
     } = managedChildParameters;
@@ -7468,74 +7177,12 @@ var bundle = function (exports) {
       useSingleSelectionDeclarative({ singleSelectionReturn, singleSelectionDeclarativeParameters: { selectedIndex } })
   }*/
 
-  /**
-   * Combines dismissal hooks and focus trap hooks into one.
-   *
-   * Another in the "complete" series, alongside list/grid navigation and dismissal itself.
-   *
-   * Use for dialogs, menus, etc.  Anything that can be dismissed and might trap focus, basically.
-   *
-   * @param param0
-   * @returns
-   */
-  function useModal(_ref45) {
-    let {
-      dismissParameters,
-      escapeDismissParameters,
-      focusTrapParameters: {
-        trapActive,
-        ...focusTrapParameters
-      }
-    } = _ref45;
-    const {
-      open
-    } = dismissParameters;
-    //const { getWindow } = escapeDismissParameters;
-    //const getDocument = useCallback(() => { return getWindow().document; }, [getWindow]);
-    const {
-      refElementPopupReturn,
-      refElementSourceReturn
-    } = useDismiss({
-      dismissParameters,
-      escapeDismissParameters
-    });
-    const {
-      focusTrapReturn,
-      refElementReturn
-    } = useFocusTrap({
-      focusTrapParameters: {
-        trapActive: open && trapActive,
-        ...focusTrapParameters
-      },
-      refElementParameters: {}
-    });
-    const {
-      propsStable: pp1
-    } = refElementPopupReturn;
-    const {
-      propsStable: ps2
-    } = refElementSourceReturn;
-    const {
-      propsUnstable: pp3
-    } = focusTrapReturn;
-    const {
-      propsStable: pp4
-    } = refElementReturn;
-    return {
-      propsPopup: pp1,
-      propsFocusContainer: useMergedProps(pp3, pp4),
-      propsSource: ps2,
-      refElementPopupReturn,
-      refElementSourceReturn,
-      focusTrapReturn
-    };
-  }
-  function useTimeout(_ref46) {
+  function useTimeout(_ref41) {
     let {
       timeout,
       callback,
       triggerIndex
-    } = _ref46;
+    } = _ref41;
     const stableCallback = useStableCallback(() => {
       startTimeRef.current = null;
       callback();
@@ -7882,60 +7529,6 @@ var bundle = function (exports) {
     };
   }
   let pulse = "vibrate" in navigator && navigator.vibrate instanceof Function ? () => navigator.vibrate(10) : () => {};
-  function useRandomId(_ref47) {
-    let {
-      randomIdParameters: {
-        prefix,
-        otherReferencerProp
-      }
-    } = _ref47;
-    const id = prefix + V$1();
-    useEnsureStability("useRandomId", prefix, id);
-    const referencerElementProps = _(otherReferencerProp == null ? {} : {
-      [otherReferencerProp]: id
-    });
-    const sourceElementProps = _({
-      id
-    });
-    useEnsureStability("useRandomIdReferencerElement", otherReferencerProp);
-    return {
-      propsReferencer: referencerElementProps.current,
-      propsSource: sourceElementProps.current,
-      randomIdReturn: {
-        id: id
-      }
-    };
-  }
-
-  /**
-   * While `useRandomId` allows the referencer to use the source's ID, sometimes you also want the reverse too (e.g. I `aria-label` you, you `aria-controls` me. That sort of thing).
-   */
-  function useRandomDualIds(_ref48) {
-    let {
-      randomIdInputParameters,
-      randomIdLabelParameters
-    } = _ref48;
-    const {
-      randomIdReturn: randomIdInputReturn,
-      propsReferencer: propsLabelAsReferencer,
-      propsSource: propsInputAsSource
-    } = useRandomId({
-      randomIdParameters: randomIdInputParameters
-    });
-    const {
-      randomIdReturn: randomIdLabelReturn,
-      propsReferencer: propsInputAsReferencer,
-      propsSource: propsLabelAsSource
-    } = useRandomId({
-      randomIdParameters: randomIdLabelParameters
-    });
-    return {
-      propsLabel: useMergedProps(propsLabelAsReferencer, propsLabelAsSource),
-      propsInput: useMergedProps(propsInputAsReferencer, propsInputAsSource),
-      randomIdInputReturn,
-      randomIdLabelReturn
-    };
-  }
 
   /**
    * Gets the timestamp of the number of milliseconds that have elapsed since
@@ -8363,7 +7956,7 @@ var bundle = function (exports) {
    *
    * The comments are numbered in approximate execution order for your reading pleasure (1 is near the bottom).
    */
-  function asyncToSync(_ref49) {
+  function asyncToSync(_ref42) {
     let {
       asyncInput,
       onInvoke,
@@ -8380,7 +7973,7 @@ var bundle = function (exports) {
       onPending,
       throttle,
       wait
-    } = _ref49;
+    } = _ref42;
     let pending = false;
     let syncDebouncing = false;
     let asyncDebouncing = false;
@@ -8568,12 +8161,12 @@ var bundle = function (exports) {
    *
    * @see useAsync A more general version of this hook that can work with any type of handler, not just DOM event handlers.
    */
-  function useAsyncHandler(_ref50) {
+  function useAsyncHandler(_ref43) {
     let {
       asyncHandler,
       capture: originalCapture,
       ...restAsyncOptions
-    } = _ref50;
+    } = _ref43;
     // We need to differentiate between "nothing captured yet" and "`undefined` was captured"
     const [currentCapture, setCurrentCapture, getCurrentCapture] = useState(undefined);
     const [hasCapture, setHasCapture] = useState(false);
@@ -8599,335 +8192,6 @@ var bundle = function (exports) {
         ...restAsyncOptions
       })
     };
-  }
-  function useDraggable(_ref51) {
-    let {
-      effectAllowed,
-      data,
-      dragImage,
-      dragImageXOffset,
-      dragImageYOffset
-    } = _ref51;
-    const [dragging, setDragging, getDragging] = useState(false);
-    const [lastDropEffect, setLastDropEffect, getLastDropEffect] = useState(null);
-    const onDragStart = e => {
-      //e.preventDefault();
-      setDragging(true);
-      if (e.dataTransfer) {
-        e.dataTransfer.effectAllowed = effectAllowed !== null && effectAllowed !== void 0 ? effectAllowed : "all";
-        if (dragImage) e.dataTransfer.setDragImage(dragImage, dragImageXOffset !== null && dragImageXOffset !== void 0 ? dragImageXOffset : 0, dragImageYOffset !== null && dragImageYOffset !== void 0 ? dragImageYOffset : 0);
-        const entries = Object.entries(data);
-        for (const [mimeType, data] of entries) {
-          e.dataTransfer.setData(mimeType, data);
-        }
-      }
-    };
-    const onDragEnd = e => {
-      e.preventDefault();
-      setDragging(false);
-      if (e.dataTransfer) {
-        if (e.dataTransfer.dropEffect != "none") {
-          setLastDropEffect(e.dataTransfer.dropEffect);
-        } else {
-          setLastDropEffect(null);
-        }
-      }
-    };
-    // Return both the element and the hook that modifies 
-    // the props and allows us to actually find the element
-    const ret = {
-      propsUnstable: {
-        draggable: true,
-        onDragStart,
-        onDragEnd
-      },
-      dragging,
-      getDragging,
-      lastDropEffect,
-      getLastDropEffect
-    };
-    return ret;
-  }
-  class DroppableFileError extends Error {
-    constructor(fileName, base) {
-      var _base$message;
-      super((_base$message = base === null || base === void 0 ? void 0 : base.message) !== null && _base$message !== void 0 ? _base$message : "An unspecified error occurred reading the file.");
-      _defineProperty(this, "fileName", void 0);
-      _defineProperty(this, "errorType", void 0);
-      this.fileName = fileName;
-      this.errorType = base === null || base === void 0 ? void 0 : base.name;
-    }
-  }
-  function useDroppable(_ref52) {
-    let {
-      effect
-    } = _ref52;
-    const [filesForConsideration, setFilesForConsideration] = useState(null);
-    const [stringsForConsideration, setStringsForConsideration] = useState(null);
-    const [droppedFiles, setDroppedFiles] = useState(null);
-    const [droppedStrings, setDroppedStrings] = useState(null);
-    const [dropError, setDropError] = useState(undefined);
-    // All the promises generated from the drop events.
-    // Used to process multiple drop events in succession
-    const dropPromisesRef = _([]);
-    const [currentPromiseIndex, setCurrentPromiseIndex, getCurrentPromiseIndex] = useState(-1);
-    const [promiseCount, setPromiseCount, getPromiseCount] = useState(0);
-    // Any time we add a new promise, if there's no current promise running, we need to start one.
-    // If there is one, then we don't need to do anything, since it runs the same check.
-    h(() => {
-      const currentPromiseIndex = getCurrentPromiseIndex();
-      const promiseCount = getPromiseCount();
-      if (promiseCount > 0) {
-        if (currentPromiseIndex + 1 < promiseCount) {
-          setCurrentPromiseIndex(i => ++i);
-        }
-      }
-    }, [promiseCount]);
-    // Anytime our current promise changes,
-    // wait for it to finish, then set our state to its result.
-    // Finally, check to see if there are anymore promises.
-    // If there are, then increase currentPromiseCount,
-    // which will trigger this again.
-    //
-    // This shouldn't happen *often*, but maybe in the case of
-    // individually dropping a bunch of large files or something.
-    h(() => {
-      if (currentPromiseIndex >= 0) {
-        const currentPromise = dropPromisesRef.current[currentPromiseIndex];
-        currentPromise.then(info => {
-          if (info !== null) {
-            const {
-              files,
-              strings
-            } = info;
-            setDroppedFiles(files);
-            setDroppedStrings(strings);
-          }
-          // Now that we're done, are there more promises in the queue?
-          const currentPromiseIndex = getCurrentPromiseIndex();
-          const promiseCount = getPromiseCount();
-          if (currentPromiseIndex + 1 < promiseCount) {
-            // Since this promise has started, more have been added.
-            // Run this effect again.
-            setCurrentPromiseIndex(i => ++i);
-          }
-        });
-      }
-    }, [currentPromiseIndex]);
-    // Handle collecting the current file metadata or MIME types.
-    const onDragEnter = useStableCallback(e => {
-      e.preventDefault();
-      if (e.dataTransfer) {
-        // Is there a default? I can't find one anywhere.
-        e.dataTransfer.dropEffect = effect !== null && effect !== void 0 ? effect : "move";
-        const newMimeTypes = new Set();
-        const newFiles = new Array();
-        for (const item of (_e$dataTransfer$items = (_e$dataTransfer = e.dataTransfer) === null || _e$dataTransfer === void 0 ? void 0 : _e$dataTransfer.items) !== null && _e$dataTransfer$items !== void 0 ? _e$dataTransfer$items : []) {
-          var _e$dataTransfer$items, _e$dataTransfer;
-          const {
-            kind,
-            type
-          } = item;
-          if (kind === "string") {
-            newMimeTypes.add(type);
-          } else if (kind === "file") {
-            newFiles.push({
-              type: item.type
-            });
-          }
-        }
-        setFilesForConsideration(newFiles);
-        setStringsForConsideration(newMimeTypes);
-      }
-    });
-    // Handle resetting the current file metadata or MIME types
-    const onDragLeave = useStableCallback(e => {
-      e.preventDefault();
-      setFilesForConsideration(null);
-      setStringsForConsideration(null);
-    });
-    // Boilerplate, I guess
-    const onDragOver = useStableCallback(e => {
-      e.preventDefault();
-    });
-    // Handle getting the drop data asynchronously
-    const onDrop = useStableCallback(e => {
-      e.preventDefault();
-      setFilesForConsideration(null);
-      setStringsForConsideration(null);
-      const allPromises = new Array();
-      const dropData = {};
-      const dropFile = [];
-      for (const item of (_e$dataTransfer$items2 = (_e$dataTransfer2 = e.dataTransfer) === null || _e$dataTransfer2 === void 0 ? void 0 : _e$dataTransfer2.items) !== null && _e$dataTransfer$items2 !== void 0 ? _e$dataTransfer$items2 : []) {
-        var _e$dataTransfer$items2, _e$dataTransfer2;
-        const {
-          kind,
-          type
-        } = item;
-        if (kind === "string") {
-          allPromises.push(new Promise((resolve, _reject) => item.getAsString(resolve)).then(str => dropData[type] = str));
-        } else if (kind === "file") {
-          const file = item.getAsFile();
-          if (file) {
-            allPromises.push(new Promise((resolve, reject) => {
-              const reader = new FileReader();
-              reader.onload = _ => {
-                resolve();
-                const data = reader.result;
-                dropFile.push({
-                  data,
-                  name: file.name,
-                  type: file.type,
-                  size: data.byteLength,
-                  lastModified: file.lastModified
-                });
-              };
-              reader.onerror = _ => {
-                reject(new DroppableFileError(file.name, reader.error));
-              };
-              reader.onabort = _ => {
-                reject(new DroppableFileError(file.name, reader.error));
-              };
-              reader.readAsArrayBuffer(file);
-            }));
-            dropFile.push();
-          }
-        }
-      }
-      dropPromisesRef.current.push(Promise.all(allPromises).then(() => {
-        setPromiseCount(i => ++i);
-        setDropError(null);
-        return {
-          strings: dropData,
-          files: dropFile
-        };
-      }).catch(ex => {
-        /* eslint-disable no-debugger */
-        debugger;
-        setPromiseCount(i => ++i);
-        setDropError(ex);
-        return null;
-      }));
-    });
-    const propsStable = _({
-      onDragEnter,
-      onDragLeave,
-      onDragOver,
-      onDrop
-    });
-    return {
-      propsStable: propsStable.current,
-      filesForConsideration,
-      stringsForConsideration,
-      droppedFiles,
-      droppedStrings,
-      dropError
-    };
-  }
-
-  /**
-   * Very basic hook for a root-level component to use to allow any children within the whole app to push children to a portal somewhere.
-   *
-   * Returns the portal (as `children`, and functions to add, remove, or update a child to the portaled area)
-   *
-   * TODO: Can't push a child until after the very first `useLayoutEffect`
-   *
-   * @param param0
-   * @returns
-   */
-  function usePortalChildren(_ref53) {
-    let {
-      target
-    } = _ref53;
-    const [pushChild, setPushChild] = useState(null);
-    const [updateChild, setUpdateChild] = useState(null);
-    const [removeChild, setRemoveChild] = useState(null);
-    const pushChildStable = useStableCallback(child => {
-      var _pushChild;
-      return (_pushChild = pushChild === null || pushChild === void 0 ? void 0 : pushChild(child)) !== null && _pushChild !== void 0 ? _pushChild : -1;
-    });
-    const updateChildStable = useStableCallback((index, child) => {
-      return updateChild === null || updateChild === void 0 ? void 0 : updateChild(index, child);
-    });
-    const removeChildStable = useStableCallback(index => {
-      return removeChild === null || removeChild === void 0 ? void 0 : removeChild(index);
-    });
-    const element = F$1(() => {
-      return target == null ? null : typeof target == "string" ? document.getElementById(target) : target;
-    }, [target]);
-    const children = !element ? null : j(o$1(PortalChildren, {
-      setPushChild: setPushChild,
-      setUpdateChild: setUpdateChild,
-      setRemoveChild: setRemoveChild
-    }), element);
-    return {
-      children: children,
-      pushChild: pushChildStable,
-      updateChild: updateChildStable,
-      removeChild: removeChildStable,
-      portalElement: element
-    };
-  }
-  /**
-   * Implementation
-   */
-  function PortalChildren(_ref54) {
-    let {
-      setPushChild,
-      setUpdateChild,
-      setRemoveChild
-    } = _ref54;
-    const [children, setChildren, getChildren] = useState([]);
-    const pushChild = T$1(child => {
-      const randomKey = generateRandomId();
-      let index = getChildren().length;
-      setChildren(prev => [...prev, q$1(child, {
-        key: randomKey,
-        index
-      })]);
-      return index;
-    }, []);
-    const updateChild = T$1((index, child) => {
-      var _getChildren$index;
-      const key = (_getChildren$index = getChildren()[index]) === null || _getChildren$index === void 0 ? void 0 : _getChildren$index.key;
-      console.assert(key);
-      if (key) {
-        setChildren(prev => {
-          let newChildren = prev.slice();
-          newChildren.splice(index, 1, q$1(child, {
-            key: key,
-            index
-          }));
-          return newChildren;
-        });
-        return index;
-      }
-    }, []);
-    const removeChild = T$1(index => {
-      var _getChildren$index2;
-      const key = (_getChildren$index2 = getChildren()[index]) === null || _getChildren$index2 === void 0 ? void 0 : _getChildren$index2.key;
-      console.assert(key);
-      if (key) {
-        setChildren(prev => {
-          let newChildren = prev.slice();
-          newChildren.splice(index, 1);
-          return newChildren;
-        });
-        return index;
-      }
-    }, []);
-    s(() => {
-      setPushChild(_ => pushChild);
-    }, [pushChild]);
-    s(() => {
-      setUpdateChild(_ => updateChild);
-    }, [updateChild]);
-    s(() => {
-      setRemoveChild(_ => removeChild);
-    }, [removeChild]);
-    return o$1(p$1, {
-      children: children
-    });
   }
   function useHasLastFocus(args) {
     const {
@@ -8977,182 +8241,9 @@ var bundle = function (exports) {
     };
   }
   B$2(null);
-  function useInterval(_ref55) {
-    let {
-      interval,
-      callback
-    } = _ref55;
-    // Get a wrapper around the given callback that's stable
-    const stableCallback = useStableCallback(callback);
-    const getInterval = useStableGetter(interval);
-    h(() => {
-      const interval = getInterval();
-      let lastDelayUsed = interval;
-      if (interval == null) return;
-      // Get a wrapper around the wrapper around the callback
-      // that clears and resets the interval if it changes.
-      const adjustableCallback = () => {
-        stableCallback();
-        const currentInterval = getInterval();
-        if (currentInterval != lastDelayUsed) {
-          clearInterval(handle);
-          if (currentInterval != null) handle = setInterval(adjustableCallback, lastDelayUsed = currentInterval);
-        }
-      };
-      let handle = setInterval(adjustableCallback, interval);
-      return () => clearInterval(handle);
-    }, []);
-  }
-  const DemoUseInterval = () => {
-    const [interval, setInterval] = useState(1000);
-    const [fireCount, setFireCount] = useState(0);
-    useInterval({
-      interval,
-      callback: () => setFireCount(i => ++i)
-    });
-    return o$1("div", {
-      class: "demo",
-      children: [o$1("h2", {
-        children: "useInterval"
-      }), o$1("p", {
-        children: ["Run code every ", o$1("code", {
-          children: "n"
-        }), " milliseconds after the component mounts"]
-      }), o$1("label", {
-        children: ["Interval duration: ", o$1("input", {
-          type: "number",
-          value: interval,
-          onInput: e => setInterval(e.currentTarget.valueAsNumber)
-        })]
-      }), o$1("div", {
-        children: ["The callback has been called ", fireCount, " time", fireCount === 1 ? "" : "s", "."]
-      })]
-    });
-  };
-  function getWindow() {
-    return globalThis.window;
-  }
-  function DemoUseModal(props) {
-    var _props$parentDepth;
-    const parentDepth = (_props$parentDepth = props.parentDepth) !== null && _props$parentDepth !== void 0 ? _props$parentDepth : 0;
-    const depth = parentDepth + 1;
-    const buttonRef = _(null);
-    const [closeOnBackdrop, setCloseOnBackdrop] = p(true);
-    const [closeOnEscape, setCloseOnEscape] = p(true);
-    const [closeOnLostFocus, setCloseOnLostFocus] = p(true);
-    const [focusTrapActive, setFocusTrapActive] = p(true);
-    const [hasChild, setHasChild] = p(false);
-    const [closeReason, setCloseReason] = p(null);
-    const [open, setOpen] = p(false);
-    const focusOpener = () => {
-      var _buttonRef$current;
-      return (_buttonRef$current = buttonRef.current) === null || _buttonRef$current === void 0 ? void 0 : _buttonRef$current.focus();
-    };
-    const {
-      propsPopup,
-      propsSource,
-      propsFocusContainer
-    } = useModal({
-      focusTrapParameters: {
-        trapActive: focusTrapActive,
-        onlyMoveFocus: false,
-        focusOpener,
-        focusPopup: useStableCallback((e, f) => {
-          var _f;
-          return (_f = f()) === null || _f === void 0 ? void 0 : _f.focus();
-        })
-      },
-      dismissParameters: {
-        closeOnBackdrop,
-        closeOnEscape,
-        closeOnLostFocus,
-        onClose: T$1(reason => {
-          setCloseReason(reason);
-          setOpen(false);
-        }, []),
-        open
-      },
-      escapeDismissParameters: {
-        getWindow,
-        parentDepth
-      }
-    });
-    return o$1("div", {
-      style: {
-        border: "".concat(depth, "px solid black")
-      },
-      children: [o$1("div", {
-        children: "useModal demo:"
-      }), o$1("div", {
-        style: "display: flex; flex-direction: column",
-        children: [o$1("label", {
-          children: [o$1("input", {
-            type: "checkbox",
-            disabled: true,
-            checked: true
-          }), " Close by setting open to false"]
-        }), o$1("label", {
-          children: [o$1("input", {
-            type: "checkbox",
-            checked: closeOnBackdrop,
-            onInput: e => setCloseOnBackdrop(e.currentTarget.checked)
-          }), " Close on backdrop click"]
-        }), o$1("label", {
-          children: [o$1("input", {
-            type: "checkbox",
-            checked: closeOnEscape,
-            onInput: e => setCloseOnEscape(e.currentTarget.checked)
-          }), " Close on Escape key press"]
-        }), o$1("label", {
-          children: [o$1("input", {
-            type: "checkbox",
-            checked: closeOnLostFocus,
-            onInput: e => setCloseOnLostFocus(e.currentTarget.checked)
-          }), " Close on focus lost"]
-        }), o$1("label", {
-          children: [o$1("input", {
-            type: "checkbox",
-            checked: focusTrapActive,
-            onInput: e => setFocusTrapActive(e.currentTarget.checked)
-          }), " Trap focus"]
-        }), o$1("br", {})]
-      }), o$1("div", {
-        children: ["Last reason for closing: ", closeReason !== null && closeReason !== void 0 ? closeReason : "(hasn't been closed yet)"]
-      }), o$1("button", {
-        ...propsSource,
-        onClick: () => setOpen(true),
-        children: "Open Modal"
-      }), o$1("div", {
-        ...useMergedProps(propsFocusContainer, propsPopup),
-        style: "border: ".concat(depth, "px dotted red; background: #ccc"),
-        children: o$1("div", {
-          style: {
-            display: open ? "flex" : "none",
-            flexDirection: "column"
-          },
-          children: [o$1("div", {
-            children: ["Modal element at depth ", depth, " with ", hasChild ? "a" : "no", " child"]
-          }), o$1("label", {
-            children: [o$1("input", {
-              type: "checkbox",
-              checked: hasChild,
-              onInput: e => setHasChild(e.currentTarget.checked),
-              ref: buttonRef
-            }), " Add a child modal"]
-          }), hasChild && o$1(DemoUseModal, {
-            parentDepth: depth
-          }), o$1("button", {
-            ...propsSource,
-            onClick: () => setOpen(false),
-            children: "Close modal programmatically"
-          })]
-        })
-      })]
-    });
-  }
   const RandomWords$1 = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
   const ListNavigationSingleSelectionChildContext = B$2(null);
-  const DemoUseRovingTabIndex = R(() => {
+  R(() => {
     var _min, _max, _min2, _max2, _max3, _min3;
     const [selectionMode, setSelectionMode] = useState("activation");
     const [count, setCount] = useState(10);
@@ -9382,10 +8473,10 @@ var bundle = function (exports) {
     });
   });
   const SelectionModeContext = B$2("focus");
-  const DemoUseRovingTabIndexChild = R(_ref56 => {
+  const DemoUseRovingTabIndexChild = R(_ref44 => {
     let {
       index
-    } = _ref56;
+    } = _ref44;
     if (index == 4) return null;
     const selectionMode = q(SelectionModeContext);
     let disabled = index == 6;
@@ -9520,242 +8611,12 @@ var bundle = function (exports) {
       })]
     });
   });
-  const DemoUseTimeout = () => {
-    const [timeout, setTimeout] = p(1000);
-    const [triggerIndex, setTriggerIndex] = p("");
-    const [fireCount, setFireCount] = p(0);
-    useTimeout({
-      timeout,
-      triggerIndex,
-      callback: () => setFireCount(i => ++i)
-    });
-    return o$1("div", {
-      class: "demo",
-      children: [o$1("h2", {
-        children: "useTimeout"
-      }), o$1("p", {
-        children: [o$1("code", {
-          children: "useEffect"
-        }), " but on a timer"]
-      }), o$1("label", {
-        children: ["Timeout duration: ", o$1("input", {
-          type: "number",
-          value: timeout,
-          onInput: e => setTimeout(e.currentTarget.valueAsNumber)
-        })]
-      }), o$1("label", {
-        children: ["Refresh key: ", o$1("input", {
-          type: "text",
-          value: triggerIndex,
-          onInput: e => setTriggerIndex(e.currentTarget.value)
-        })]
-      }), o$1("div", {
-        children: ["The callback has been called ", fireCount, " time", fireCount === 1 ? "" : "s", "."]
-      })]
-    });
-  };
   const RandomWords = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
-  const DemoUseDroppable = () => {
-    const {
-      droppedFiles,
-      droppedStrings,
-      filesForConsideration,
-      stringsForConsideration,
-      propsStable: props,
-      dropError
-    } = useDroppable({
-      effect: "copy"
-    });
-    useMergedProps({}, {
-      ref: _(null)
-    });
-    const p = useMergedProps(props, {
-      className: "demo droppable"
-    });
-    return o$1("div", {
-      ...p,
-      children: [droppedStrings != null && o$1("div", {
-        children: ["Data dropped: ", o$1("ul", {
-          children: Object.entries(droppedStrings).map(_ref57 => {
-            let [type, value] = _ref57;
-            return o$1("li", {
-              children: [type, ": ", value]
-            });
-          })
-        })]
-      }), droppedFiles != null && o$1("div", {
-        children: ["Files dropped: ", o$1("table", {
-          children: [o$1("thead", {
-            children: o$1("tr", {
-              children: [o$1("th", {
-                children: "Name"
-              }), o$1("th", {
-                children: "Size"
-              }), o$1("th", {
-                children: "Type"
-              }), o$1("th", {
-                children: "Last modified"
-              })]
-            })
-          }), o$1("tbody", {
-            children: droppedFiles.map(f => {
-              var _f$lastModified;
-              return o$1("tr", {
-                children: [o$1("td", {
-                  children: f.name
-                }), f.data.byteLength, o$1("td", {
-                  children: f.type
-                }), o$1("td", {
-                  children: new Date((_f$lastModified = f.lastModified) !== null && _f$lastModified !== void 0 ? _f$lastModified : 0)
-                })]
-              });
-            })
-          })]
-        })]
-      }), o$1("hr", {}), stringsForConsideration != null && o$1("div", {
-        children: ["Data being considered: ", o$1("ul", {
-          children: Array.from(stringsForConsideration).map(type => o$1("li", {
-            children: type
-          }))
-        })]
-      }), filesForConsideration != null && o$1("div", {
-        children: ["Files being considered: ", o$1("ul", {
-          children: filesForConsideration.map(f => o$1("li", {
-            children: JSON.stringify(f)
-          }))
-        })]
-      }), o$1("hr", {}), dropError && o$1("div", {
-        children: dropError instanceof Error ? dropError.message : JSON.stringify(dropError)
-      })]
-    });
-  };
-  const DemoUseDraggable = () => {
-    const {
-      propsUnstable: props
-    } = useDraggable({
-      data: {
-        "text/plain": "This is custom draggable content of type text/plain."
-      }
-    });
-    return o$1("div", {
-      ...useMergedProps(props, {
-        className: "demo"
-      }),
-      children: "Draggable content"
-    });
-  };
-  const ChildrenHaveFocusContext = B$2(null);
-  const DemoUseChildrenHaveFocus = () => {
-    const [maxChildCount, setMaxChildCount] = useState(10);
-    const [minChildCount, setMinChildCount] = useState(5);
-    const [currentChildCount, setCurrentChildCount] = useState(minChildCount);
-    useInterval({
-      callback: () => {
-        if (currentChildCount == minChildCount) setCurrentChildCount(maxChildCount);else setCurrentChildCount(currentChildCount - 1);
-        //let newChildCount = Math.round(Math.random() * (maxChildCount - minChildCount)) + minChildCount
-        //setCurrentChildCount(newChildCount);
-      },
-
-      interval: 1000
-    });
-    const [anyFocused, setAnyFocused] = useState(false);
-    const {
-      childrenHaveFocusChildContext
-    } = useChildrenHaveFocus({
-      childrenHaveFocusParameters: {
-        onCompositeFocusChange: setAnyFocused
-      }
-    });
-    return o$1("div", {
-      ...useMergedProps({}, {
-        className: "demo"
-      }),
-      children: [o$1("h2", {
-        children: "useChildrenHaveFocus"
-      }), o$1("p", {
-        children: ["If you want to see if any of your children have focus, the easiest way is to just attach a ", o$1("code", {
-          children: "focusIn"
-        }), " handler to the parent DOM node. But what if you don't have just one single parent DOM node? This hook lets you coordinate all the children to give you that information as if you were able to take that easy parent node route."]
-      }), o$1("div", {
-        children: o$1("label", {
-          children: [o$1("input", {
-            type: "number",
-            min: 0,
-            value: minChildCount,
-            onInput: e => {
-              e.preventDefault();
-              setMinChildCount(e.currentTarget.valueAsNumber);
-            }
-          }), " Min # of children"]
-        })
-      }), o$1("div", {
-        children: o$1("label", {
-          children: [o$1("input", {
-            type: "number",
-            min: minChildCount,
-            value: maxChildCount,
-            onInput: e => {
-              e.preventDefault();
-              setMaxChildCount(e.currentTarget.valueAsNumber);
-            }
-          }), " Max # of children"]
-        })
-      }), o$1("div", {
-        children: ["Current # of children: ", currentChildCount]
-      }), o$1(ChildrenHaveFocusContext.Provider, {
-        value: childrenHaveFocusChildContext,
-        children: [o$1("div", {
-          children: ["Any children focused: ", anyFocused.toString()]
-        }), o$1("div", {
-          children: Array.from(function* () {
-            for (let i = 0; i < currentChildCount; ++i) {
-              yield o$1(DemoUseChildrenHaveFocusChild, {
-                index: i
-              }, i);
-            }
-          }())
-        })]
-      })]
-    });
-  };
-  const DemoUseChildrenHaveFocusChild = _ref58 => {
-    let {
-      index
-    } = _ref58;
-    const {
-      hasCurrentFocusParameters: {
-        onCurrentFocusedInnerChanged
-      }
-    } = useChildrenHaveFocusChild({
-      childrenHaveFocusChildContext: q(ChildrenHaveFocusContext)
-    });
-    const {
-      refElementReturn
-    } = useRefElement({
-      refElementParameters: {}
-    });
-    const {
-      hasCurrentFocusReturn
-    } = useHasCurrentFocus({
-      hasCurrentFocusParameters: {
-        onCurrentFocusedChanged: null,
-        onCurrentFocusedInnerChanged
-      },
-      refElementReturn
-    });
-    return o$1("div", {
-      tabIndex: 0,
-      ...useMergedProps(refElementReturn.propsStable, hasCurrentFocusReturn.propsStable),
-      children: ["Focusable child #", index, o$1("input", {}), o$1("input", {})]
-    });
-  };
-  const DemoUseElementSizeAnimation = () => {
-    return o$1("div", {});
-  };
-  const DemoUseFocusTrap = R(_ref59 => {
+  B$2(null);
+  R(_ref45 => {
     let {
       depth
-    } = _ref59;
+    } = _ref45;
     const [active, setActive] = useState(false);
     const {
       focusTrapReturn: {
@@ -9770,8 +8631,8 @@ var bundle = function (exports) {
         onlyMoveFocus: false,
         focusOpener: e => e === null || e === void 0 ? void 0 : e.focus(),
         focusPopup: (e, f) => {
-          var _f2;
-          return (_f2 = f()) === null || _f2 === void 0 ? void 0 : _f2.focus();
+          var _f;
+          return (_f = f()) === null || _f === void 0 ? void 0 : _f.focus();
         }
       },
       refElementParameters: {
@@ -9805,11 +8666,11 @@ var bundle = function (exports) {
       })]
     });
   });
-  const DemoUseFocusTrapChild = R(_ref60 => {
+  const DemoUseFocusTrapChild = R(_ref46 => {
     let {
       setActive,
       active
-    } = _ref60;
+    } = _ref46;
     return o$1(p$1, {
       children: [o$1("button", {
         children: "Button 1"
@@ -9829,7 +8690,7 @@ var bundle = function (exports) {
       })]
     });
   });
-  const DemoUseAsyncHandler1 = R(() => {
+  R(() => {
     const [timeout, setTimeout] = useState(1000);
     const [debounce, setDebounce] = useState(0);
     const [shouldThrow, setShouldThrow, getShouldThrow] = useState(false);
@@ -9931,7 +8792,7 @@ var bundle = function (exports) {
       })]
     });
   });
-  const DemoUseAsyncHandler2 = R(() => {
+  R(() => {
     const [timeout, setTimeout] = useState(1000);
     const [debounce, setDebounce] = useState(0);
     const [throttle, setThrottle] = useState(0);
@@ -10090,7 +8951,7 @@ var bundle = function (exports) {
   function getDocument() {
     return window.document;
   }
-  const DemoFocus = R(() => {
+  R(() => {
     const [focusCount, setFocusCount] = useState(0);
     const [innerFocusCount, setInnerFocusCount] = useState(0);
     const [lastActiveElement, setLastActiveElement] = useState(null);
@@ -10300,10 +9161,10 @@ var bundle = function (exports) {
   //type GridCellContext<RowElement extends Element, CellElement extends Element> = CompleteGridNavigationRowContext<RowElement, CellElement>;
   const GridRowContext = B$2(null);
   const GridCellContext = B$2(null);
-  const DemoUseGridRow = R(_ref61 => {
+  const DemoUseGridRow = R(_ref47 => {
     let {
       index
-    } = _ref61;
+    } = _ref47;
     useState(() => RandomWords[index /*Math.floor(Math.random() * (RandomWords.length - 1))*/]);
     const [_tabbableColumn, setTabbableColumn, _getTabbableColumn] = useState(null);
     //const getHighestIndex = useCallback(() => getChildren().getHighestIndex(), []);
@@ -10385,12 +9246,12 @@ var bundle = function (exports) {
       })
     });
   });
-  const DemoUseGridCell = _ref62 => {
+  const DemoUseGridCell = _ref48 => {
     let {
       index,
       row,
       rowIsTabbable
-    } = _ref62;
+    } = _ref48;
     if (row >= 6 && row % 2 == 0 && index > 1) return null;
     let hiddenText = row === 3 ? " (row hidden)" : "";
     const context = q(GridCellContext);
@@ -10450,154 +9311,109 @@ var bundle = function (exports) {
       }
     }
   };
-  function DemoLabel() {
-    const {
-      propsInput,
-      propsLabel
-    } = useRandomDualIds({
-      randomIdInputParameters: {
-        prefix: "input-",
-        otherReferencerProp: "for"
-      },
-      randomIdLabelParameters: {
-        prefix: "label-",
-        otherReferencerProp: "aria-labelledby"
-      }
-    });
+  function DemoGlobalHandler() {
+    const [count, setCount] = useState(10);
+    const [mode, setMode] = useState("single");
+    const [testTime, setTestTime] = useState("");
     return o$1("div", {
       className: "demo",
-      children: [o$1("h2", {
-        children: "Labels"
-      }), o$1("input", {
-        ...propsInput
+      children: [o$1("div", {
+        children: "Global event handlers:"
       }), o$1("label", {
-        ...propsLabel,
-        children: "Label"
-      })]
-    });
-  }
-  function DemoPress(_ref63) {
-    let {
-      remaining
-    } = _ref63;
-    const [count, setCount] = useState(0);
-    const {
-      refElementReturn,
-      refElementReturn: {
-        propsStable: p1
-      }
-    } = useRefElement({
-      refElementParameters: {}
-    });
-    const {
-      pressReturn: {
-        propsUnstable: p2,
-        pseudoActive,
-        longPress
-      }
-    } = usePress({
-      pressParameters: {
-        focusSelf: e => {
-          e.focus();
-        },
-        longPressThreshold: 1000,
-        onPressSync: () => {
-          setCount(c => ++c);
-        }
-      },
-      refElementReturn
-    });
-    return o$1("div", {
-      className: "demo",
-      children: [o$1("h2", {
-        children: "Press"
-      }), o$1("div", {
-        children: ["Press count: ", count]
-      }), o$1("div", {
-        children: ["Active: ", pseudoActive.toString()]
-      }), o$1("div", {
-        children: ["Long press: ", (longPress !== null && longPress !== void 0 ? longPress : "null").toString()]
-      }), o$1("div", {
-        style: {
-          border: "1px solid black",
-          touchAction: "none"
-        },
-        tabIndex: 0,
-        ...useMergedProps(p1, p2),
-        children: [o$1("div", {
-          children: "This DIV's parent is pressable. Click here to press, cancel by leaving or hovering over a pressable child."
-        }), o$1("div", {
-          children: remaining > 0 && o$1(DemoPress, {
-            remaining: remaining - 1
-          })
+        children: ["# of event handlers", o$1("input", {
+          type: "number",
+          value: count,
+          min: 0,
+          onInput: e => {
+            e.preventDefault();
+            setCount(e.currentTarget.valueAsNumber);
+          }
         })]
-      })]
-    });
-  }
-  function DemoPortalChildrenChild() {
-    console.log("Render portal child");
-    return o$1("p", {
-      children: "Portal child"
-    });
-  }
-  function DemoPortalChildren() {
-    const [element, setElement] = useState(null);
-    const {
-      children,
-      pushChild,
-      removeChild,
-      updateChild
-    } = usePortalChildren({
-      target: element
-    });
-    return o$1("div", {
-      className: "demo",
-      children: [o$1("h2", {
-        children: "Portal children"
+      }), o$1("div", {
+        children: [o$1("label", {
+          children: [o$1("input", {
+            onInput: e => {
+              e.preventDefault();
+              if (e.currentTarget.checked) setMode("grouped");
+            },
+            type: "radio",
+            name: "global-handler-mode"
+          }), " Grouped"]
+        }), o$1("label", {
+          children: [o$1("input", {
+            onInput: e => {
+              e.preventDefault();
+              if (e.currentTarget.checked) setMode("single");
+            },
+            type: "radio",
+            name: "global-handler-mode"
+          }), " Single"]
+        }), o$1("label", {
+          children: [o$1("input", {
+            onInput: e => {
+              e.preventDefault();
+              if (e.currentTarget.checked) setMode(null);
+            },
+            type: "radio",
+            name: "global-handler-mode"
+          }), " Off"]
+        })]
       }), o$1("button", {
-        onClick: () => pushChild(o$1(DemoPortalChildrenChild, {})),
-        children: "Push child"
-      }), children, o$1("div", {
-        id: "demo-portal-target",
-        ref: setElement
-      })]
+        id: "global-handler-test",
+        onClick: () => {
+          var _document$getElementB;
+          const now = new Date();
+          (_document$getElementB = document.getElementById("global-handler-test2")) === null || _document$getElementB === void 0 ? void 0 : _document$getElementB.click();
+          const then = new Date();
+          setTestTime((+then - +now) / 1000 + "s passed");
+        },
+        children: "Run test"
+      }), o$1("button", {
+        id: "global-handler-test2",
+        children: "Run test 2"
+      }), o$1("div", {
+        children: testTime
+      }), o$1(DemoGlobalHandlerChildren, {
+        count: count,
+        mode: mode
+      }, mode)]
     });
   }
-  /*
-  function DemoThrottleDebounce() {
-      const [count, setCount] = useState(0);
-      const onClick = useCallback(() => {
-          debugger;
-          setCount(i => i + 1);
-      }, []);
-      const onClickThrottled = useThrottled(onClick, 1000);
-      const onClickDebounced = useDebounced(onClick, 1000);
-      const onClickBoth = useDebounced(onClickThrottled, 1000);
-       return (
-          <div className="demo">
-              <div>Press count: {count}</div>
-               <div><button onClick={() => {debugger; onClick();}}>Normal</button></div>
-              <div><button onClick={() => {debugger; onClickThrottled();}}>Throttled</button></div>
-              <div><button onClick={() => {debugger; onClickDebounced();}}>Debounced</button></div>
-              <div><button onClick={() => {debugger; onClickBoth();}}>Combined</button></div>
-          </div>)
-  }*/
-  const Component = () => {
-    return o$1("div", {
-      class: "flex",
-      style: {
-        flexWrap: "wrap"
-      },
-      children: [o$1(DemoPress, {
-        remaining: 2
-      }), o$1("input", {}), o$1("div", {
-        style: "display:grid;grid-template-columns:1fr 1fr",
-        children: [o$1(DemoUseModal, {}), o$1(DemoUseModal, {})]
-      }), o$1("hr", {}), o$1(DemoLabel, {}), o$1("hr", {}), o$1(DemoPortalChildren, {}), o$1("hr", {}), o$1(DemoFocus, {}), o$1("hr", {}), o$1(DemoUseChildrenHaveFocus, {}), o$1("hr", {}), o$1(DemoUseGrid, {}), o$1("hr", {}), o$1(DemoUseTimeout, {}), o$1("hr", {}), o$1(DemoUseInterval, {}), o$1("hr", {}), o$1(DemoUseRovingTabIndex, {}), o$1("hr", {}), o$1(DemoUseFocusTrap, {}), o$1("hr", {}), o$1(DemoUseAsyncHandler1, {}), o$1("hr", {}), o$1(DemoUseAsyncHandler2, {}), o$1("hr", {}), o$1(DemoUseDroppable, {}), o$1("hr", {}), o$1(DemoUseDraggable, {}), o$1("hr", {}), o$1(DemoUseElementSizeAnimation, {}), o$1("hr", {}), o$1("input", {})]
+  const DemoGlobalHandlerChildren = R(function DemoGlobalHandlerChildren(_ref49) {
+    let {
+      count,
+      mode
+    } = _ref49;
+    return o$1(p$1, {
+      children: [...function* () {
+        for (let i = 0; i < count; ++i) {
+          yield o$1(DemoGlobalHandlerChild, {
+            mode: mode,
+            target: window
+          }, i);
+        }
+      }()]
     });
+  });
+  const DemoGlobalHandlerChild = R(function DemoGlobalHandlerChild(_ref50) {
+    let {
+      mode,
+      target
+    } = _ref50;
+    useGlobalHandler(target, "click", mode == null ? null : e => {
+      var _e$target;
+      if (((_e$target = e.target) === null || _e$target === void 0 ? void 0 : _e$target.id) != "global-handler-test2") return;
+      window._demo_event = (window._demo_event || 0) + 1;
+    }, {}, mode || "grouped");
+    return o$1("div", {
+      hidden: true
+    });
+  });
+  const Component = () => {
+    return o$1(DemoGlobalHandler, {});
   };
   requestAnimationFrame(() => {
-    P$1(o$1(Component, {}), document.getElementById("root"));
+    P(o$1(Component, {}), document.getElementById("root"));
   });
   exports.DemoUseGrid = DemoUseGrid;
   return exports;

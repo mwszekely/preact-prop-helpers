@@ -1,7 +1,7 @@
 import { createContext, h, render, VNode } from "preact";
 import { memo } from "preact/compat";
 import { useCallback, useContext, useRef } from "preact/hooks";
-import { GetIndex, GridSingleSelectSortableChildCellInfo, GridSingleSelectSortableChildRowInfo, returnNull, useAnimationFrame, useAsyncHandler, useChildrenHaveFocus, useChildrenHaveFocusChild, UseChildrenHaveFocusChildParameters, UseCompleteGridNavigationReturnType, UseCompleteGridNavigationRowReturnType, useDraggable, useDroppable, useElementSize, useFocusTrap, useHasCurrentFocus, useHasLastFocus, useInterval, useMergedProps, usePortalChildren, usePress, useRandomDualIds, useRefElement, useStableCallback, useState } from "..";
+import { GetIndex, GridSingleSelectSortableChildCellInfo, GridSingleSelectSortableChildRowInfo, returnNull, useAnimationFrame, useAsyncHandler, useChildrenHaveFocus, useChildrenHaveFocusChild, UseChildrenHaveFocusChildParameters, UseCompleteGridNavigationReturnType, UseCompleteGridNavigationRowReturnType, useDraggable, useDroppable, useElementSize, useFocusTrap, useGlobalHandler, useHasCurrentFocus, useHasLastFocus, useInterval, useMergedProps, usePortalChildren, usePress, useRandomDualIds, useRefElement, useStableCallback, useState } from "..";
 import { ElementSize } from "../";
 //import { useGridNavigation, UseGridNavigationCell, UseGridNavigationRow } from "../use-grid-navigation";
 import { CompleteGridNavigationContext, CompleteGridNavigationRowContext, useCompleteGridNavigation, useCompleteGridNavigationCell, useCompleteGridNavigationRow } from "..";
@@ -589,29 +589,61 @@ function DemoPortalChildren() {
         </div>
     )
 }
-/*
-function DemoThrottleDebounce() {
-    const [count, setCount] = useState(0);
-    const onClick = useCallback(() => {
-        debugger;
-        setCount(i => i + 1);
-    }, []);
-    const onClickThrottled = useThrottled(onClick, 1000);
-    const onClickDebounced = useDebounced(onClick, 1000);
-    const onClickBoth = useDebounced(onClickThrottled, 1000);
 
+function DemoGlobalHandler() {
+    const [count, setCount] = useState(10);
+    const [mode, setMode] = useState<"grouped" | "single" | null>("single");
+    const [testTime, setTestTime] = useState("")
     return (
         <div className="demo">
-            <div>Press count: {count}</div>
+            <div>Global event handlers:</div>
+            <label># of event handlers<input type="number" value={count} min={0} onInput={e => { e.preventDefault(); setCount(e.currentTarget.valueAsNumber) }} /></label>
+            <div>
+                <label><input onInput={e => { e.preventDefault(); if (e.currentTarget.checked) setMode("grouped"); }} type="radio" name="global-handler-mode" /> Grouped</label>
+                <label><input onInput={e => { e.preventDefault(); if (e.currentTarget.checked) setMode("single"); }} type="radio" name="global-handler-mode" /> Single</label>
+                <label><input onInput={e => { e.preventDefault(); if (e.currentTarget.checked) setMode(null); }} type="radio" name="global-handler-mode" /> Off</label>
+            </div>
 
-            <div><button onClick={() => {debugger; onClick();}}>Normal</button></div>
-            <div><button onClick={() => {debugger; onClickThrottled();}}>Throttled</button></div>
-            <div><button onClick={() => {debugger; onClickDebounced();}}>Debounced</button></div>
-            <div><button onClick={() => {debugger; onClickBoth();}}>Combined</button></div>
-        </div>)
-}*/
+            <button id="global-handler-test" onClick={() => {
+                const now = new Date();
+                document.getElementById("global-handler-test2")?.click();
+                const then = new Date();
+                setTestTime(((+then - +now) / 1000) + "s passed")
+            }}>Run test</button>
+            <button id="global-handler-test2">Run test 2</button>
+            <div>{testTime}</div>
+
+            <DemoGlobalHandlerChildren count={count} mode={mode} key={mode} />
+        </div>
+    )
+}
+
+const DemoGlobalHandlerChildren = memo(function DemoGlobalHandlerChildren({ count, mode }: { count: number, mode: "grouped" | "single" | null }) {
+    return (
+        <>
+
+            {[...(function* () {
+                for (let i = 0; i < count; ++i) {
+                    yield <DemoGlobalHandlerChild key={i} mode={mode} target={window} />
+                }
+            })()]}
+        </>
+    )
+})
+
+const DemoGlobalHandlerChild = memo(function DemoGlobalHandlerChild({ mode, target }: { target: Window | Document, mode: "grouped" | "single" | null }) {
+
+    useGlobalHandler(target, "click", mode == null ? null : (e: h.JSX.TargetedMouseEvent<HTMLButtonElement>) => {
+        if ((e.target as Element | null)?.id != "global-handler-test2")
+            return;
+        (window as any)._demo_event = ((window as any)._demo_event || 0) + 1
+    }, {}, mode || "grouped");
+
+    return <div hidden />;
+})
 
 const Component = () => {
+    return <DemoGlobalHandler />;
 
     return <div class="flex" style={{ flexWrap: "wrap" }}>
         <DemoPress remaining={2} />
@@ -622,6 +654,8 @@ const Component = () => {
         </div>
         <hr />
         <DemoLabel />
+        <hr />
+        <DemoGlobalHandler />
         <hr />
         <DemoPortalChildren />
         <hr />
