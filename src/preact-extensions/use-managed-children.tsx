@@ -410,8 +410,16 @@ export interface ChildFlagOperations {
 
 
 export interface UseChildrenFlagReturnType<R> {
-    /** **STABLE** */
-    changeIndex: PassiveStateUpdater<number | null, R>; //(arg: Parameters<StateUpdater<number | null>>[0]) => number | null;
+    /** 
+     * **STABLE**
+     * 
+     * Manually changes the current index that is (focused/selected/tabbable/whatever).
+     * 
+     * The parent can use this to notify each relevant child of what it must do in order to make this change happen.
+     * 
+     * The returned value will be the new index that will be used. If `closestFit` is false, it will always be the same as what you passed in.
+     */
+    changeIndex: PassiveStateUpdater<number | null, R>;
     /** 
      * **STABLE**
      * 
@@ -447,16 +455,15 @@ export function useChildrenFlag<M extends ManagedChildInfo<number>, R>({ getChil
 
     const [getRequestedIndex, setRequestedIndex] = usePassiveState<null | number, R>(null);
 
-    //    const getFitNullToZero = useStableGetter(fitNullToZero);
-
-    // Shared between onChildrenMountChange and changeIndex, not public (but could be I guess)
+    // Shared between onChildrenMountChange and changeIndex, not public
+    // Only called when `closestFit` is false, naturally.
     const getClosestFit = useCallback((requestedIndex: number) => {
         const children = getChildren();
         let closestDistance = Infinity;
         let closestIndex: number | null = null;
         children.forEach(child => {
 
-            if (isValid(child)) {
+            if (child != null && isValid(child)) {
                 const newDistance = Math.abs(child.index - requestedIndex);
                 if (newDistance < closestDistance || (newDistance == closestDistance && child.index < requestedIndex)) {
                     closestDistance = newDistance;
@@ -516,11 +523,14 @@ export function useChildrenFlag<M extends ManagedChildInfo<number>, R>({ getChil
             return null;
         }
         else {
-            if (newMatchingChild && isValid(newMatchingChild)) {
+            const childIsValid = (newMatchingChild && isValid(newMatchingChild));
+            if (childIsValid || !closestFit) {
                 setCurrentIndex(requestedIndex, reason as R);
                 if (oldMatchingChild)
                     setAt(oldMatchingChild, false, requestedIndex, currentIndex);
-                setAt(newMatchingChild, true, requestedIndex, currentIndex);
+                if (newMatchingChild)
+                    setAt(newMatchingChild, true, requestedIndex, currentIndex);
+
                 return requestedIndex;
             }
             else {

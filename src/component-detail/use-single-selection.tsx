@@ -34,7 +34,7 @@ export interface SelectableChildInfo<E extends Element> extends UseRovingTabInde
      * When the `selectedIndex` changes, the relevant children's `setLocalSelected` are called (max of 2).
      * 
      * @param selected This is the selected child (out of all of them)
-     * @param distance How far to the `selectedIndex` this child is
+     * @param direction How far to the `selectedIndex` this child is
      */
     setLocalSelected(selected: boolean, direction: number | null): void;
 
@@ -156,7 +156,6 @@ export function useSingleSelection<ChildElement extends Element>({
 }: UseSingleSelectionParameters<ChildElement>): UseSingleSelectionReturnType<ChildElement> {
     type R = Event;//h.JSX.TargetedEvent<ChildElement>;
     const onSelectedIndexChange = useStableCallback(onSelectedIndexChange_U ?? noop);
-    //useEnsureStability("useSingleSelection", onSelectedIndexChange);
 
     const getSelectedAt = useCallback((m: SelectableChildInfo<ChildElement>) => { return m.getSelected(); }, []);
     const setSelectedAt = useCallback((m: SelectableChildInfo<ChildElement>, t: boolean, newSelectedIndex: number | null, prevSelectedIndex: number | null) => {
@@ -223,10 +222,7 @@ export function useSingleSelectionChild<ChildElement extends Element>(args: UseS
 
     const [localSelected, setLocalSelected, getLocalSelected] = useState(getSelectedIndex() == index);
     const [direction, setDirection, getDirection] = useState(getSelectedIndex() == null? null : (getSelectedIndex()! - index));
-    //const [selected, setSelected, getSelected] = useState(getSelectedIndex() == index);
-
-    // const getIndex = useStableGetter(index);
-
+    
     const onCurrentFocusedInnerChanged = useStableCallback<OnPassiveStateChange<boolean, R>>((focused, _prev, e) => {
         if (selectionMode == 'focus' && focused) {
             onSelectedIndexChange?.(index, e);
@@ -248,17 +244,6 @@ export function useSingleSelectionChild<ChildElement extends Element>(args: UseS
         managedChildParameters: { setLocalSelected: useStableCallback((selected, direction) => {
             setLocalSelected(selected);
             setDirection(direction);
-            /*if (direction == null) {
-                setSelected(false);
-                setDirection(null);
-            }
-            else if (direction == 0) {
-                setSelected(true);
-            }
-            else {
-                setSelected(false);
-                setDirection(direction);
-            }*/
         }) },
         singleSelectionChildReturn: {
             selected: localSelected,

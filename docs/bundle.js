@@ -1868,14 +1868,14 @@ var bundle = function (exports) {
     // TODO (maybe?): Even if there is an initial index, it's not set until mount. Is that fine?
     const [getCurrentIndex, setCurrentIndex] = usePassiveState(onIndexChange);
     const [getRequestedIndex, setRequestedIndex] = usePassiveState(null);
-    //    const getFitNullToZero = useStableGetter(fitNullToZero);
-    // Shared between onChildrenMountChange and changeIndex, not public (but could be I guess)
+    // Shared between onChildrenMountChange and changeIndex, not public
+    // Only called when `closestFit` is false, naturally.
     const getClosestFit = T$1(requestedIndex => {
       const children = getChildren();
       let closestDistance = Infinity;
       let closestIndex = null;
       children.forEach(child => {
-        if (isValid(child)) {
+        if (child != null && isValid(child)) {
           const newDistance = Math.abs(child.index - requestedIndex);
           if (newDistance < closestDistance || newDistance == closestDistance && child.index < requestedIndex) {
             closestDistance = newDistance;
@@ -1921,10 +1921,11 @@ var bundle = function (exports) {
         if (oldMatchingChild) setAt(oldMatchingChild, false, requestedIndex, currentIndex);
         return null;
       } else {
-        if (newMatchingChild && isValid(newMatchingChild)) {
+        const childIsValid = newMatchingChild && isValid(newMatchingChild);
+        if (childIsValid || !closestFit) {
           setCurrentIndex(requestedIndex, reason);
           if (oldMatchingChild) setAt(oldMatchingChild, false, requestedIndex, currentIndex);
-          setAt(newMatchingChild, true, requestedIndex, currentIndex);
+          if (newMatchingChild) setAt(newMatchingChild, true, requestedIndex, currentIndex);
           return requestedIndex;
         } else {
           const closestFitIndex = getClosestFit(requestedIndex);
@@ -4144,8 +4145,7 @@ var bundle = function (exports) {
       const children = getChildren();
       // Notify the relevant children that they should become tabbable/untabbable,
       // but also handle focus management when we changed due to user interaction
-      return setTabbableIndex3(f, reason);
-      function f(prevIndex) {
+      return changeTabbableIndex(function returnModifiedTabbableIndex(prevIndex) {
         let nextIndex = typeof updater === "function" ? updater(prevIndex !== null && prevIndex !== void 0 ? prevIndex : null) : updater;
         const untabbable = getUntabbable();
         if (nextIndex != null) setLastNonNullIndex(nextIndex);
@@ -4162,25 +4162,18 @@ var bundle = function (exports) {
             }
           }
         }
+        // TODO: Redundant?
         if (nextIndex != null) setLastNonNullIndex(nextIndex);
         return nextIndex !== null && nextIndex !== void 0 ? nextIndex : untabbable ? null : 0;
-      }
+      }, reason);
     }, []);
     // When we switch from tabbable to non/tabbable, we really want to remember the last tabbable child.
     // So every time we change the index for any reason, record that change as a back up here that can be restored.
     const [getLastNonNullIndex, setLastNonNullIndex] = usePassiveState(null, T$1(() => initiallyTabbedIndex !== null && initiallyTabbedIndex !== void 0 ? initiallyTabbedIndex : 0, []));
-    /*useEffect(() => {
-        const t = getTabbableIndex();
-        if (!untabbable && t != null) {
-            if (t == 0)
-                debugger;
-            lastNonNullIndex.current = t;
-        }
-    });*/
     // Any time we switch to being untabbable, set the current tabbable index accordingly.
     h(() => {
-      if (untabbable) setTabbableIndex3(null, undefined);else {
-        setTabbableIndex3(getLastNonNullIndex(), undefined);
+      if (untabbable) changeTabbableIndex(null, undefined);else {
+        changeTabbableIndex(getLastNonNullIndex(), undefined);
       }
     }, [untabbable]);
     // Boilerplate related to notifying individual children when they become tabbable/untabbable
@@ -4194,7 +4187,7 @@ var bundle = function (exports) {
       return !m.hidden;
     }, []);
     const {
-      changeIndex: setTabbableIndex3,
+      changeIndex: changeTabbableIndex,
       getCurrentIndex: getTabbableIndex,
       reevaluateClosestFit
     } = useChildrenFlag({
@@ -4938,7 +4931,6 @@ var bundle = function (exports) {
       }
     } = _ref26;
     const onSelectedIndexChange = useStableCallback(onSelectedIndexChange_U !== null && onSelectedIndexChange_U !== void 0 ? onSelectedIndexChange_U : noop);
-    //useEnsureStability("useSingleSelection", onSelectedIndexChange);
     const getSelectedAt = T$1(m => {
       return m.getSelected();
     }, []);
@@ -5007,8 +4999,6 @@ var bundle = function (exports) {
     const getDisabled = useStableGetter(disabled);
     const [localSelected, setLocalSelected, getLocalSelected] = useState(getSelectedIndex() == index);
     const [direction, setDirection, getDirection] = useState(getSelectedIndex() == null ? null : getSelectedIndex() - index);
-    //const [selected, setSelected, getSelected] = useState(getSelectedIndex() == index);
-    // const getIndex = useStableGetter(index);
     const onCurrentFocusedInnerChanged = useStableCallback((focused, _prev, e) => {
       if (selectionMode == 'focus' && focused) {
         onSelectedIndexChange === null || onSelectedIndexChange === void 0 ? void 0 : onSelectedIndexChange(index, e);
@@ -5025,20 +5015,8 @@ var bundle = function (exports) {
         setLocalSelected: useStableCallback((selected, direction) => {
           setLocalSelected(selected);
           setDirection(direction);
-          /*if (direction == null) {
-              setSelected(false);
-              setDirection(null);
-          }
-          else if (direction == 0) {
-              setSelected(true);
-          }
-          else {
-              setSelected(false);
-              setDirection(direction);
-          }*/
         })
       },
-
       singleSelectionChildReturn: {
         selected: localSelected,
         setThisOneSelected: useStableCallback(event => {
