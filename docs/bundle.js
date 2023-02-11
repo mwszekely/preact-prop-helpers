@@ -8421,12 +8421,12 @@ var bundle = function (exports) {
       // whether it completed or not, and whether it was async or not.
       onFinallyAny();
       onPending(pending = false);
+      let nothingElseToDo = !asyncDebouncing;
       onAsyncDebounce(asyncDebouncing = false);
-      if (!asyncDebouncing) ;else {
+      if (nothingElseToDo) ;else {
         // 9b. Another request to run the async handler came in while we were running this one.
         // Instead of stopping, we're just going to immediately run again using the arguments that were given to us most recently.
         // We also clear that flag, because we're handling it now. It'll be set again if the handler is called again while *this* one is running
-        //onAsyncDebounce(asyncDebouncing = false);
         console.assert(currentCapture !== Unset);
         if (currentCapture != Unset) {
           onSyncDebounce(syncDebouncing = true);
@@ -10698,7 +10698,7 @@ var bundle = function (exports) {
     });
   });
   const Component = () => {
-    //return <DemoUseAsyncHandler2 />;
+    // return <DemoUseAsyncHandler2 />;
     return o$1("div", {
       class: "flex",
       style: {

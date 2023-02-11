@@ -643,7 +643,7 @@ const DemoGlobalHandlerChild = memo(function DemoGlobalHandlerChild({ mode, targ
 })
 
 const Component = () => {
-    //return <DemoUseAsyncHandler2 />;
+    // return <DemoUseAsyncHandler2 />;
 
     return <div class="flex" style={{ flexWrap: "wrap" }}>
         <DemoPress remaining={2} />

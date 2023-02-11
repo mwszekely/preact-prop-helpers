@@ -489,8 +489,10 @@ function asyncToSync<AsyncArgs extends any[], SyncArgs extends any[], Return>({ 
         onFinallyAny();
         onPending(pending = false);
 
+        let nothingElseToDo = (!asyncDebouncing);
+
         onAsyncDebounce(asyncDebouncing = false);
-        if (!asyncDebouncing) {
+        if (nothingElseToDo) {
             // 9a. After completing the async handler, we found that it wasn't called again since the last time.
             // This means we can just end. We're done. Mission accomplished.
         }
@@ -498,7 +500,6 @@ function asyncToSync<AsyncArgs extends any[], SyncArgs extends any[], Return>({ 
             // 9b. Another request to run the async handler came in while we were running this one.
             // Instead of stopping, we're just going to immediately run again using the arguments that were given to us most recently.
             // We also clear that flag, because we're handling it now. It'll be set again if the handler is called again while *this* one is running
-            //onAsyncDebounce(asyncDebouncing = false);
             console.assert(currentCapture !== Unset);
             if (currentCapture != Unset) {
                 onSyncDebounce(syncDebouncing = true);
