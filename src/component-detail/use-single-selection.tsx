@@ -12,6 +12,8 @@ import { useStableCallback } from "../preact-extensions/use-stable-callback";
 import { useStableGetter, useStableObject } from "../preact-extensions/use-stable-getter";
 import { useState } from "../preact-extensions/use-state";
 
+type OmitStrong<T, K extends keyof T> = Omit<T, K>
+
 /*
 export function useSingleSelectionChildProps<E extends Element>(r: UseSingleSelectionChildReturnTypeInfo<E>, ...otherProps: h.JSX.HTMLAttributes<E>[]): h.JSX.HTMLAttributes<E>[] {
     return [r.singleSelectionChildReturn.propsUnstable, ...otherProps];

@@ -3,6 +3,8 @@ import { DismissListenerTypes, useDismiss, UseDismissParameters, UseDismissRetur
 import { useFocusTrap, UseFocusTrapParameters, UseFocusTrapReturnType } from "../component-detail/use-focus-trap";
 import { useMergedProps } from "../dom-helpers/use-merged-props";
 
+type OmitStrong<T, K extends keyof T> = Omit<T, K>
+
 export interface UseModalParameters<Listeners extends DismissListenerTypes> extends UseDismissParameters<Listeners> {
     focusTrapParameters: UseFocusTrapParameters<any, any>["focusTrapParameters"];
 }
@@ -11,7 +13,7 @@ export interface UseModalReturnType<FocusContainerElement extends Element | null
     propsFocusContainer: h.JSX.HTMLAttributes<NonNullable<FocusContainerElement>>;
     propsPopup: h.JSX.HTMLAttributes<PopupElement>;
     propsSource: h.JSX.HTMLAttributes<NonNullable<SourceElement>>;
-    focusTrapReturn: Omit<UseFocusTrapReturnType<NonNullable<FocusContainerElement>>["focusTrapReturn"], "propsUnstable">;
+    focusTrapReturn: OmitStrong<UseFocusTrapReturnType<NonNullable<FocusContainerElement>>["focusTrapReturn"], "propsUnstable">;
 }
 
 /**

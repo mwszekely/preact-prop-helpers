@@ -5,6 +5,8 @@ import { useStableObject } from "../preact-extensions/use-stable-getter";
 import { useListNavigation, useListNavigationChild, UseListNavigationChildInfo, UseListNavigationChildParameters, UseListNavigationChildReturnType, UseListNavigationParameters, UseListNavigationReturnType } from "./use-list-navigation-partial";
 import { SetTabbableIndex } from "./use-roving-tabindex";
 
+type OmitStrong<T, K extends keyof T> = Omit<T, K>
+
 /*
 export function useGridNavigationProps<ParentOrRowElement extends Element, RowElement extends Element>(r: UseGridNavigationReturnType<ParentOrRowElement, RowElement>, ...otherProps: h.JSX.HTMLAttributes<ParentOrRowElement>[]) {
     return useListNavigationProps<ParentOrRowElement, RowElement>(r, ...otherProps)
@@ -21,11 +23,11 @@ export interface GridChildRowInfo<RowElement extends Element, _CellElement exten
 export interface GridChildCellInfo<CellElement extends Element> extends UseListNavigationChildInfo<CellElement> {
 }
 
-export interface UseGridNavigationParameters<ParentOrChildElement extends Element, RowElement extends Element, CellElement extends Element, M extends GridChildRowInfo<RowElement, CellElement>> extends Omit<UseListNavigationParameters<ParentOrChildElement, RowElement, M>, "linearNavigationParameters"> {
+export interface UseGridNavigationParameters<ParentOrChildElement extends Element, RowElement extends Element, CellElement extends Element, M extends GridChildRowInfo<RowElement, CellElement>> extends OmitStrong<UseListNavigationParameters<ParentOrChildElement, RowElement, M>, "linearNavigationParameters"> {
     gridNavigationParameters: {
         onTabbableColumnChange: OnPassiveStateChange<number | null, Event> | null;
     };
-    linearNavigationParameters: Omit<UseListNavigationParameters<ParentOrChildElement, RowElement, M>["linearNavigationParameters"], "navigationDirection">
+    linearNavigationParameters: OmitStrong<UseListNavigationParameters<ParentOrChildElement, RowElement, M>["linearNavigationParameters"], "navigationDirection">
 }
 export interface UseGridNavigationReturnType<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element,  RM extends GridChildRowInfo<RowElement, CellElement>, CM extends GridChildCellInfo<CellElement>> extends UseListNavigationReturnType<ParentOrRowElement, RowElement> {
     gridNavigationRowContext: UseGridNavigationRowParameters<RowElement, CellElement, RM, CM>["rowAsChildOfGridParameters"]["gridNavigationRowContext"]
@@ -47,9 +49,9 @@ export interface UseGridNavigationRowParameters<RowElement extends Element, Cell
             }
         }
     };
-    rowAsParentOfCellsParameters: Omit<UseListNavigationParameters<RowElement, CellElement, CM>, "linearNavigationParameters" | "rovingTabIndexParameters"> & {
-        rovingTabIndexParameters: Omit<UseListNavigationParameters<RowElement, CellElement, CM>["rovingTabIndexParameters"], "untabbable">
-        linearNavigationParameters: Omit<UseListNavigationParameters<RowElement, CellElement, CM>["linearNavigationParameters"], "navigationDirection">
+    rowAsParentOfCellsParameters: OmitStrong<UseListNavigationParameters<RowElement, CellElement, CM>, "linearNavigationParameters" | "rovingTabIndexParameters"> & {
+        rovingTabIndexParameters: OmitStrong<UseListNavigationParameters<RowElement, CellElement, CM>["rovingTabIndexParameters"], "untabbable">
+        linearNavigationParameters: OmitStrong<UseListNavigationParameters<RowElement, CellElement, CM>["linearNavigationParameters"], "navigationDirection">
     }
 
 }
@@ -58,8 +60,8 @@ export interface UseGridNavigationRowReturnType<RowElement extends Element, Cell
     rowAsChildOfGridReturn: UseListNavigationChildReturnType<RowElement> & {
         gridNavigationRowParameters: Pick<GridChildRowInfo<RowElement, CellElement>, "focusSelf" | "setTabbableColumnIndex">;
     };
-    rowAsParentOfCellsReturn: Omit<UseListNavigationReturnType<RowElement, CellElement>, "rovingTabIndexReturn"> & {
-        rovingTabIndexReturn: Omit<UseListNavigationReturnType<RowElement, CellElement>["rovingTabIndexReturn"], "focusSelf">;
+    rowAsParentOfCellsReturn: OmitStrong<UseListNavigationReturnType<RowElement, CellElement>, "rovingTabIndexReturn"> & {
+        rovingTabIndexReturn: OmitStrong<UseListNavigationReturnType<RowElement, CellElement>["rovingTabIndexReturn"], "focusSelf">;
         gridNavigationCellContext: UseGridNavigationCellParameters<RowElement, CellElement>["gridNavigationCellContext"];
     };
 }

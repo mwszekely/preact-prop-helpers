@@ -3,6 +3,8 @@ import { useStableCallback } from "../preact-extensions/use-stable-callback";
 import { useListNavigation, useListNavigationChild, UseListNavigationChildInfo, UseListNavigationChildParameters, UseListNavigationChildReturnType, UseListNavigationParameters, UseListNavigationReturnType } from "./use-list-navigation-partial";
 import { SelectableChildInfo, useSingleSelection, useSingleSelectionChild, UseSingleSelectionChildParameters, UseSingleSelectionChildReturnType, UseSingleSelectionParameters, UseSingleSelectionReturnType } from "./use-single-selection";
 
+type OmitStrong<T, K extends keyof T> = Omit<T, K>
+
 /**
  * We're just gluing together the list navigation and single selection hooks,
  * since they're so commonly paired together. Also see the one that includes sorting.
@@ -14,7 +16,7 @@ export interface UseListNavigationSingleSelectionChildInfo<TabbableChildElement 
 
 export interface UseListNavigationSingleSelectionParameters<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationSingleSelectionChildInfo<ChildElement>> extends
     UseListNavigationParameters<ParentOrChildElement, ChildElement, M>,
-    Omit<UseSingleSelectionParameters<ChildElement>, "rovingTabIndexReturn"> {
+    OmitStrong<UseSingleSelectionParameters<ChildElement>, "rovingTabIndexReturn"> {
     managedChildrenReturn: UseListNavigationParameters<ParentOrChildElement, ChildElement, M>["managedChildrenReturn"] & UseSingleSelectionParameters<ChildElement>["managedChildrenReturn"];
 }
 

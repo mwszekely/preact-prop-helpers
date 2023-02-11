@@ -4,6 +4,8 @@ import { OnPassiveStateChange, returnNull, runImmediately, useEnsureStability, u
 import { getDocument } from "./use-document-class";
 import { useRefElement, UseRefElementParameters, UseRefElementReturnType } from "./use-ref-element";
 
+type OmitStrong<T, K extends keyof T> = Omit<T, K>
+
 export interface UseElementSizeParameters<T extends Element> extends UseRefElementParameters<T> {
     elementSizeParameters: {/**
      * Called any time the browser detects a size change
@@ -38,7 +40,7 @@ export interface ElementSize {
     offsetTop: number | undefined;
 }
 
-export interface UseElementSizeReturnType<E extends Element> extends Omit<UseRefElementReturnType<E>, "props" | "useProps"> {
+export interface UseElementSizeReturnType<E extends Element> extends UseRefElementReturnType<E> {
     elementSizeReturn: {/** **STABLE** */
         getSize(): ElementSize | null;
     }

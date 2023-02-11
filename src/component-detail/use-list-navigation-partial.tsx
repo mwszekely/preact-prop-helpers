@@ -3,6 +3,7 @@ import { useLinearNavigation, UseLinearNavigationParameters, UseLinearNavigation
 import { useRovingTabIndex, useRovingTabIndexChild, UseRovingTabIndexChildInfo, UseRovingTabIndexChildParameters, UseRovingTabIndexChildReturnType, UseRovingTabIndexParameters, UseRovingTabIndexReturnType } from "./use-roving-tabindex";
 import { useTypeaheadNavigation, useTypeaheadNavigationChild, UseTypeaheadNavigationChildParameters, UseTypeaheadNavigationChildReturnType, UseTypeaheadNavigationParameters, UseTypeaheadNavigationReturnType } from "./use-typeahead-navigation";
 
+type OmitStrong<T, K extends keyof T> = Omit<T, K>
 
 /**
  * 
@@ -62,8 +63,8 @@ export type NavigateToIndex = (i: number | null, fromUserInteraction: boolean) =
 // *** Parameters (list, list-single, list-child, list-single-child)
 export interface UseListNavigationParameters<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationChildInfo<ChildElement>> extends
     UseRovingTabIndexParameters<ChildElement, M>,
-    Omit<UseTypeaheadNavigationParameters<ChildElement>, "rovingTabIndexReturn">,
-    Omit<UseLinearNavigationParameters<ParentOrChildElement, ChildElement>, "rovingTabIndexReturn"> {
+    OmitStrong<UseTypeaheadNavigationParameters<ChildElement>, "rovingTabIndexReturn">,
+    OmitStrong<UseLinearNavigationParameters<ParentOrChildElement, ChildElement>, "rovingTabIndexReturn"> {
 }
 
 export interface UseListNavigationChildParameters<ChildElement extends Element> extends UseRovingTabIndexChildParameters<ChildElement>, UseTypeaheadNavigationChildParameters<ChildElement> {

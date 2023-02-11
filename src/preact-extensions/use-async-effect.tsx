@@ -1,6 +1,8 @@
 import { Inputs, useEffect } from "preact/hooks";
 import { useAsync, UseAsyncParameters } from "./use-async";
 
+type OmitStrong<T, K extends keyof T> = Omit<T, K>
+
 /**
  * Combines the semantics of `useAsync` and `useEffect`. 
  * 
@@ -11,7 +13,7 @@ import { useAsync, UseAsyncParameters } from "./use-async";
  * 
  * @returns All values from `useAsync`, except for `syncHandler`.
  */
-export function useAsyncEffect<I extends Inputs>(effect: () => Promise<(void | (() => void))>, inputs?: I, options?: Omit<UseAsyncParameters<[void], [void]>, "capture">) {
+export function useAsyncEffect<I extends Inputs>(effect: () => Promise<(void | (() => void))>, inputs?: I, options?: OmitStrong<UseAsyncParameters<[void], [void]>, "capture">) {
     const { syncHandler, ...rest } = useAsync(effect, options);
     useEffect(syncHandler, inputs);
     return rest;

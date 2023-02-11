@@ -2,9 +2,11 @@ import { useAsync, UseAsyncParameters, UseAsyncReturnType } from "../preact-exte
 import { useStableCallback } from "../preact-extensions/use-stable-callback";
 import { useState } from "../preact-extensions/use-state";
 
+type OmitStrong<T, K extends keyof T> = Omit<T, K>
+
 export type AsyncHandler<EventType, CaptureType> = ((c: CaptureType, e: EventType) => (Promise<void> | void));
 
-export interface UseAsyncHandlerParameters<EventType, CaptureType> extends Omit<UseAsyncParameters<[CaptureType, EventType], [EventType]>, "capture"> {
+export interface UseAsyncHandlerParameters<EventType, CaptureType> extends OmitStrong<UseAsyncParameters<[CaptureType, EventType], [EventType]>, "capture"> {
     /**
      * What transient information is captured by this event 
      * and presented as the first argument of the event handler?
@@ -19,7 +21,7 @@ export interface UseAsyncHandlerParameters<EventType, CaptureType> extends Omit<
     asyncHandler: AsyncHandler<EventType, CaptureType> | null;
 }
 
-export interface UseAsyncHandlerReturnType<EventType, CaptureType> extends Omit<UseAsyncReturnType<[EventType], void>, "getCurrentCapture" | "currentCapture"> {
+export interface UseAsyncHandlerReturnType<EventType, CaptureType> extends UseAsyncReturnType<[EventType], void> {
 
     /**
      * The most recently captured value. In other words, represents what

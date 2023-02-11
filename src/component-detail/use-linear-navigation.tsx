@@ -4,6 +4,8 @@ import { useStableCallback } from "../preact-extensions/use-stable-callback";
 import { useStableGetter } from "../preact-extensions/use-stable-getter";
 import { UseRovingTabIndexReturnType } from "./use-roving-tabindex";
 
+type OmitStrong<T, K extends keyof T> = Omit<T, K>
+
 /*
 export function useLinearNavigationProps<E extends Element>(r: UseLinearNavigationReturnTypeInfo<E>, ...otherProps: h.JSX.HTMLAttributes<E>[]): h.JSX.HTMLAttributes<E>[] {
     return [r.linearNavigationReturn.propsStable, ...otherProps];
@@ -349,7 +351,7 @@ export function tryNavigateToIndex({ isValid, highestChildIndex, searchDirection
     }
 }
 
-function tryNavigateUp({ isValid, indexDemangler, indexMangler, target }: Omit<TryNavigateToIndexParameters, "highestChildIndex" | "searchDirection">): LinearNavigationResult | undefined {
+function tryNavigateUp({ isValid, indexDemangler, indexMangler, target }: OmitStrong<TryNavigateToIndexParameters, "highestChildIndex" | "searchDirection">): LinearNavigationResult | undefined {
     const lower = 0;
     while (target >= lower && !isValid(target))
         target = indexDemangler(indexMangler(target) - 1);
@@ -365,7 +367,7 @@ function tryNavigateUp({ isValid, indexDemangler, indexMangler, target }: Omit<T
     }
 }
 
-function tryNavigateDown({ isValid, indexDemangler, indexMangler, target, highestChildIndex: upper }: Omit<TryNavigateToIndexParameters, "searchDirection">): LinearNavigationResult | undefined {
+function tryNavigateDown({ isValid, indexDemangler, indexMangler, target, highestChildIndex: upper }: OmitStrong<TryNavigateToIndexParameters, "searchDirection">): LinearNavigationResult | undefined {
 
     while (target <= upper && !isValid(target))
         target = indexDemangler(indexMangler(target) + 1);
