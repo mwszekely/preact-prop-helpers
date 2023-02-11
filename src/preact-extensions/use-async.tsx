@@ -1,5 +1,5 @@
 
-import LodashDebounce from "lodash-es/debounce";
+import LodashDebounce, { DebounceSettings } from "lodash-es/debounce";
 import { useCallback, useEffect, useMemo } from "preact/hooks";
 import { useStableCallback } from "./use-stable-callback";
 import { useState } from "./use-state";
@@ -554,6 +554,17 @@ function asyncToSync<AsyncArgs extends any[], SyncArgs extends any[], Return>({ 
         }
     }
 
+    // lodash uses "in" instead of checking for `undefined`...
+    const lodashOptions: DebounceSettings = {
+        leading: !wait,
+        trailing: true
+    }
+    if (throttle) {
+        if (wait == null || (wait < throttle))
+            wait = throttle;
+        lodashOptions.maxWait = throttle;
+    }
+
     const syncDebounced = LodashDebounce(() => {
         // 3. Instead of calling the sync version of our function directly, we allow it to be throttled/debounced.
         onSyncDebounce(syncDebouncing = false);
@@ -568,8 +579,7 @@ function asyncToSync<AsyncArgs extends any[], SyncArgs extends any[], Return>({ 
             // to see if it needs to run again, and it will use these new captured arguments from step 2.
             onAsyncDebounce(asyncDebouncing = true);
         }
-
-    }, wait, { leading: true, trailing: true, maxWait: throttle });
+    }, wait || undefined, lodashOptions);
 
     return {
         syncOutput: (...args: SyncArgs) => {
