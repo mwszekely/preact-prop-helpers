@@ -498,7 +498,7 @@ const Unset = Symbol("Unset");
  * 
  * The comments are numbered in approximate execution order for your reading pleasure (1 is near the bottom).
  */
-function asyncToSync<AsyncArgs extends any[], SyncArgs extends any[], Return>({ asyncInput, onInvoke, onFinally: onFinallyAny, onReject, onResolve, onHasError, onHasResult, onError, onReturnValue, capture, onAsyncDebounce, onSyncDebounce, onPending, throttle, wait }: AsyncToSyncParameters<AsyncArgs, SyncArgs, Return>): AsyncToSyncReturn<SyncArgs> {
+function asyncToSync<AsyncArgs extends any[], SyncArgs extends any[], Return>({ asyncInput, onInvoke, onInvoked, onFinally: onFinallyAny, onReject, onResolve, onHasError, onHasResult, onError, onReturnValue, capture, onAsyncDebounce, onSyncDebounce, onPending, throttle, wait }: AsyncToSyncParameters<AsyncArgs, SyncArgs, Return>): AsyncToSyncReturn<SyncArgs> {
     let pending = false;
     let syncDebouncing = false;
     let asyncDebouncing = false;
@@ -551,16 +551,19 @@ function asyncToSync<AsyncArgs extends any[], SyncArgs extends any[], Return>({ 
         catch (ex) {
             hadSyncError = true;
             onError(ex);
+            onInvoked("throw");
         }
 
         // 7. Either end immediately, or schedule to end when completed.
         if (isPromise(promiseOrReturn)) {
+            onInvoked("async");
             promiseOrReturn
                 .then(r => { onResolve(); onHasResult(true); onReturnValue(r); return r; })
                 .catch(e => { onReject(); onHasError(true); onError(e); return e; })
                 .finally(onFinally);
         }
         else {
+            onInvoked("sync");
             if (!hadSyncError) {
                 onResolve();
                 onHasResult(true);

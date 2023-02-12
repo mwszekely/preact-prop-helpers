@@ -8401,6 +8401,7 @@ var bundle = function (exports) {
     let {
       asyncInput,
       onInvoke,
+      onInvoked,
       onFinally: onFinallyAny,
       onReject,
       onResolve,
@@ -8456,9 +8457,11 @@ var bundle = function (exports) {
       } catch (ex) {
         hadSyncError = true;
         onError(ex);
+        onInvoked("throw");
       }
       // 7. Either end immediately, or schedule to end when completed.
       if (isPromise(promiseOrReturn)) {
+        onInvoked("async");
         promiseOrReturn.then(r => {
           onResolve();
           onHasResult(true);
@@ -8471,6 +8474,7 @@ var bundle = function (exports) {
           return e;
         }).finally(onFinally);
       } else {
+        onInvoked("sync");
         if (!hadSyncError) {
           onResolve();
           onHasResult(true);
