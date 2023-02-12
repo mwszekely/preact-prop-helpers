@@ -8309,6 +8309,7 @@ var bundle = function (exports) {
     const [hasResult, setHasResult, _getHasResult] = useState(false);
     const [asyncDebouncing, setAsyncDebouncing] = useState(false);
     const [syncDebouncing, setSyncDebouncing] = useState(false);
+    const [invocationResult, setInvocationResult] = useState(null);
     //const [currentCapture, setCurrentCapture] = useState<AP | undefined>(undefined);
     const incrementCallCount = T$1(() => {
       setRunCount(c => c + 1);
@@ -8345,6 +8346,7 @@ var bundle = function (exports) {
         onSyncDebounce: setSyncDebouncing,
         onHasError: setHasError,
         onHasResult: setHasResult,
+        onInvoked: setInvocationResult,
         onInvoke: incrementCallCount,
         onFinally: incrementFinallyCount,
         onReject: incrementRejectCount,
@@ -8377,6 +8379,7 @@ var bundle = function (exports) {
       settleCount,
       debouncingAsync: asyncDebouncing,
       debouncingSync: syncDebouncing,
+      invocationResult,
       callCount: runCount,
       flushDebouncedPromise: flush
     };
@@ -8522,28 +8525,6 @@ var bundle = function (exports) {
       }
     };
   }
-  const {
-    syncOutput
-  } = asyncToSync({
-    asyncInput: async async => {
-      return 0;
-    },
-    capture: sync => ["async"],
-    onInvoke: () => {},
-    onFinally: () => {},
-    onReject: () => {},
-    onResolve: () => {},
-    onAsyncDebounce: () => {},
-    onError: () => {},
-    onHasError: () => {},
-    onHasResult: () => {},
-    onPending: () => {},
-    onReturnValue: () => {},
-    onSyncDebounce: () => {},
-    throttle: 0,
-    wait: 0
-  });
-  syncOutput("sync");
 
   /**
    * Given an asyncronous event handler, returns a syncronous one that works on the DOM,

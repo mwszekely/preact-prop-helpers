@@ -133,6 +133,15 @@ export interface UseAsyncReturnType<SP extends unknown[], R> {
     hasError: boolean;
 
     /**
+     * What happened the last time the handler was called?
+     * * `"async"`: A `Promise` was returned, and we're about to `await` it.
+     * * `"sync"`: `undefined` was returned, so it finished immediately.
+     * * `"throw"`: An error was thrown, so it could have been either (more likely `"sync"`, though).
+     * * `null`: Nothing's happened yet.
+     */
+    invocationResult: "async" | "sync" | "throw" | null;
+
+    /**
      * If you would like any currently debounced-but-eventually-pending promises to immediately be considered by cancelling their debounce timeout,
      * you can call this function.  Normal procedure applies as if the debounced ended normally -- if there's no promise waiting in the queue,
      * the debounced promise runs normally, otherwise, it waits its turn until the current one ends, potentially being overwritten later on
@@ -258,6 +267,7 @@ export function useAsync<AP extends unknown[], R, SP extends unknown[] = AP>(asy
     const [hasResult, setHasResult, _getHasResult] = useState<boolean | null>(false);
     const [asyncDebouncing, setAsyncDebouncing] = useState(false);
     const [syncDebouncing, setSyncDebouncing] = useState(false);
+    const [invocationResult, setInvocationResult] = useState<"async" | "sync" | "throw" | null>(null);
     //const [currentCapture, setCurrentCapture] = useState<AP | undefined>(undefined);
     const incrementCallCount = useCallback(() => { setRunCount(c => c + 1) }, []);
     const incrementResolveCount = useCallback(() => { setResolveCount(c => c + 1) }, []);
@@ -279,6 +289,7 @@ export function useAsync<AP extends unknown[], R, SP extends unknown[] = AP>(asy
             onSyncDebounce: setSyncDebouncing,
             onHasError: setHasError,
             onHasResult: setHasResult,
+            onInvoked: setInvocationResult,
             onInvoke: incrementCallCount,
             onFinally: incrementFinallyCount,
             onReject: incrementRejectCount,
@@ -316,6 +327,7 @@ export function useAsync<AP extends unknown[], R, SP extends unknown[] = AP>(asy
         settleCount,
         debouncingAsync: asyncDebouncing,
         debouncingSync: syncDebouncing,
+        invocationResult,
         callCount: runCount,
         flushDebouncedPromise: flush
     }
@@ -330,6 +342,8 @@ export function useAsync<AP extends unknown[], R, SP extends unknown[] = AP>(asy
 
 
 interface AsyncToSyncParameters<AsyncArgs extends any[], SyncArgs extends any[], Return> {
+
+
 
     /**
      * The function to create a sync version of
@@ -387,6 +401,14 @@ interface AsyncToSyncParameters<AsyncArgs extends any[], SyncArgs extends any[],
      * this is always called once.
      */
     onInvoke(): void;
+
+    /**
+     * Immediately after the handler has been called, this is called once with the result of the call.
+     * 
+     * This can be used to estimate if a given handler was sync or async, though if it throws you might not know.
+     */
+    onInvoked(result: "async" | "throw" | "sync"): void;
+
     /**
      * When the handler returns successfully, this will be called once.
      */
@@ -598,24 +620,3 @@ function asyncToSync<AsyncArgs extends any[], SyncArgs extends any[], Return>({ 
         }
     };
 }
-
-
-const { syncOutput } = asyncToSync<[async: "async"], [sync: "sync"], number>({
-    asyncInput: async (async) => { return 0 },
-    capture: (sync) => ["async"],
-    onInvoke: () => { },
-    onFinally: () => { },
-    onReject: () => { },
-    onResolve: () => { },
-    onAsyncDebounce: () => { },
-    onError: () => { },
-    onHasError: () => { },
-    onHasResult: () => { },
-    onPending: () => { },
-    onReturnValue: () => { },
-    onSyncDebounce: () => { },
-    throttle: 0,
-    wait: 0
-})
-
-const value = syncOutput("sync")
