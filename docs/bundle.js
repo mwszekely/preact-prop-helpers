@@ -8274,6 +8274,8 @@ var bundle = function (exports) {
     }
     return t;
   }
+  // why???
+  const AsyncFunction = async function () {}.constructor;
   /**
    * Given an async function, returns a function that's suitable for non-async APIs,
    * along with other information about the current run's status.
@@ -8309,7 +8311,7 @@ var bundle = function (exports) {
     const [hasResult, setHasResult, _getHasResult] = useState(false);
     const [asyncDebouncing, setAsyncDebouncing] = useState(false);
     const [syncDebouncing, setSyncDebouncing] = useState(false);
-    const [invocationResult, setInvocationResult] = useState(null);
+    const [invocationResult, setInvocationResult] = useState(asyncHandler2 instanceof AsyncFunction ? "async" : null);
     //const [currentCapture, setCurrentCapture] = useState<AP | undefined>(undefined);
     const incrementCallCount = T$1(() => {
       setRunCount(c => c + 1);

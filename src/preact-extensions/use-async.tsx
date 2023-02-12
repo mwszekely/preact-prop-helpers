@@ -230,6 +230,9 @@ type AsyncFunctionType<AP extends unknown[], R> = ((...args: AP) => (R | Promise
 //type GlueFunctionType<AP extends unknown[], R> = (enqueue: boolean, ...args: AP) => R | undefined;
 type CaptureFunctionType<AP extends unknown[], SP extends unknown[] = AP> = (...args: SP) => AP;
 
+// why???
+const AsyncFunction = (async function () {}.constructor)
+
 /**
  * Given an async function, returns a function that's suitable for non-async APIs, 
  * along with other information about the current run's status.
@@ -267,7 +270,7 @@ export function useAsync<AP extends unknown[], R, SP extends unknown[] = AP>(asy
     const [hasResult, setHasResult, _getHasResult] = useState<boolean | null>(false);
     const [asyncDebouncing, setAsyncDebouncing] = useState(false);
     const [syncDebouncing, setSyncDebouncing] = useState(false);
-    const [invocationResult, setInvocationResult] = useState<"async" | "sync" | "throw" | null>(null);
+    const [invocationResult, setInvocationResult] = useState<"async" | "sync" | "throw" | null>(asyncHandler2 instanceof AsyncFunction? "async" : null);
     //const [currentCapture, setCurrentCapture] = useState<AP | undefined>(undefined);
     const incrementCallCount = useCallback(() => { setRunCount(c => c + 1) }, []);
     const incrementResolveCount = useCallback(() => { setResolveCount(c => c + 1) }, []);
