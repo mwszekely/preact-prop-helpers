@@ -1,7 +1,8 @@
-import { useEffect } from "preact/hooks";
+import { useEffect, useRef } from "preact/hooks";
 import { useState } from "../preact-extensions/use-state";
 
 export function useMediaQuery(query: string | null | undefined) {
+    const mediaList = useRef<MediaQueryList | null>(null);
     const [matches, setMatches, getMatches] = useState(false);
 
     console.assert(!query || query.startsWith("("));
@@ -10,19 +11,20 @@ export function useMediaQuery(query: string | null | undefined) {
         if (!query)
             return;
 
-        const q = matchMedia(query);
+        mediaList.current = matchMedia(query);
 
         const handler = (e: MediaQueryListEvent) => {
             setMatches(e.matches);
         }
-        q.addEventListener("change", handler, { passive: true });
-        return () => q.removeEventListener("change", handler);
+
+        mediaList.current.addEventListener("change", handler);
+        return () => mediaList.current?.removeEventListener("change", handler);
 
     }, [query]);
 
-    return { 
-        matches, 
-        getMatches 
+    return {
+        matches,
+        getMatches
     };
 }
 
