@@ -37,7 +37,7 @@ export { useChildrenHaveFocus, useChildrenHaveFocusChild, UseChildrenHaveFocusCh
 export { useHasCurrentFocus, UseHasCurrentFocusParameters, UseHasCurrentFocusReturnType } from "./observers/use-has-current-focus";
 export { useHasLastFocus, UseHasLastFocusParameters, UseHasLastFocusReturnType } from "./observers/use-has-last-focus";
 export { LogicalDirectionInfo, LogicalElementSize, LogicalOrientation, PhysicalDirection, PhysicalOrientation, PhysicalSize, useLogicalDirection, UseLogicalDirectionParameters, UseLogicalDirectionReturnType } from "./observers/use-logical-direction";
-export { useMediaQuery } from "./observers/use-media-query";
+export { useMediaQuery, UseMediaQueryReturnType } from "./observers/use-media-query";
 export { useMutationObserver, UseMutationObserverParameters } from "./observers/use-mutation-observer";
 export { useAsync, UseAsyncParameters, UseAsyncReturnType } from "./preact-extensions/use-async";
 export { useAsyncEffect } from "./preact-extensions/use-async-effect";
