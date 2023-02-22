@@ -358,7 +358,7 @@ export interface UseChildrenFlagParameters<M extends ManagedChildInfo<any>, R> {
      * 
      * After mount, change the current active child with `changeIndex`.
      */
-    initialIndex: number | null | undefined;
+    initialIndex: M["index"] | null | undefined;
 
     /**
      * When provided, if the given activatedIndex doesn't map onto any
@@ -380,9 +380,9 @@ export interface UseChildrenFlagParameters<M extends ManagedChildInfo<any>, R> {
      * Notably, the value can be different than what was called with changeIndex()
      * if the requested index didn't exist or was hidden.
      */
-    onIndexChange: null | OnPassiveStateChange<number | null, R>;
+    onIndexChange: null | OnPassiveStateChange<M["index"] | null, R>;
 
-    setAt(index: M, value: boolean, newSelectedIndex: number | null, prevSelectedIndex: number | null): void;
+    setAt(index: M, value: boolean, newSelectedIndex: M["index"] | null, prevSelectedIndex: M["index"] | null): void;
     getAt(index: M): boolean;
     isValid(index: M): boolean;
 }
@@ -409,7 +409,7 @@ export interface ChildFlagOperations {
 
 
 
-export interface UseChildrenFlagReturnType<R> {
+export interface UseChildrenFlagReturnType<M extends ManagedChildInfo<any>, R> {
     /** 
      * **STABLE**
      * 
@@ -419,7 +419,7 @@ export interface UseChildrenFlagReturnType<R> {
      * 
      * The returned value will be the new index that will be used. If `closestFit` is false, it will always be the same as what you passed in.
      */
-    changeIndex: PassiveStateUpdater<number | null, R>;
+    changeIndex: PassiveStateUpdater<M["index"] | null, R>;
     /** 
      * **STABLE**
      * 
@@ -427,7 +427,7 @@ export interface UseChildrenFlagReturnType<R> {
      *  */
     reevaluateClosestFit: () => void;
     /** **STABLE** */
-    getCurrentIndex: () => number | null;
+    getCurrentIndex: () => M["index"] | null;
 }
 
 /**
@@ -447,13 +447,13 @@ export interface UseChildrenFlagReturnType<R> {
  * @param param0 
  * @returns 
  */
-export function useChildrenFlag<M extends ManagedChildInfo<number>, R>({ getChildren, initialIndex, closestFit, onIndexChange, getAt, setAt, isValid, }: UseChildrenFlagParameters<M, R>): UseChildrenFlagReturnType<R> {
+export function useChildrenFlag<M extends ManagedChildInfo<number | string>, R>({ getChildren, initialIndex, closestFit, onIndexChange, getAt, setAt, isValid, }: UseChildrenFlagParameters<M, R>): UseChildrenFlagReturnType<M, R> {
     useEnsureStability("useChildrenFlag", onIndexChange, getAt, setAt, isValid);
 
     // TODO (maybe?): Even if there is an initial index, it's not set until mount. Is that fine?
-    const [getCurrentIndex, setCurrentIndex] = usePassiveState<null | number, R>(onIndexChange);
+    const [getCurrentIndex, setCurrentIndex] = usePassiveState<null | M["index"], R>(onIndexChange);
 
-    const [getRequestedIndex, setRequestedIndex] = usePassiveState<null | number, R>(null);
+    const [getRequestedIndex, setRequestedIndex] = usePassiveState<null | M["index"], R>(null);
 
     // Shared between onChildrenMountChange and changeIndex, not public
     // Only called when `closestFit` is false, naturally.
@@ -464,10 +464,11 @@ export function useChildrenFlag<M extends ManagedChildInfo<number>, R>({ getChil
         children.forEach(child => {
 
             if (child != null && isValid(child)) {
-                const newDistance = Math.abs(child.index - requestedIndex);
+                console.assert(typeof child.index == "number", "closestFit can only be used when each child has a numeric index, and cannot be used when children use string indices instead.");
+                const newDistance = Math.abs((child.index as number) - requestedIndex);
                 if (newDistance < closestDistance || (newDistance == closestDistance && child.index < requestedIndex)) {
                     closestDistance = newDistance;
-                    closestIndex = child.index;
+                    closestIndex = (child.index as number);
                 }
             }
         });
@@ -485,8 +486,9 @@ export function useChildrenFlag<M extends ManagedChildInfo<number>, R>({ getChil
         const currentChild = currentIndex == null ? null : children.getAt(currentIndex);
 
         if (requestedIndex != null && closestFit && (requestedIndex != currentIndex || currentChild == null || !isValid(currentChild))) {
+            console.assert(typeof requestedIndex == "number", "closestFit can only be used when each child has a numeric index, and cannot be used when children use string indices instead.");
 
-            const closestFitIndex = getClosestFit(requestedIndex);
+            const closestFitIndex = getClosestFit(requestedIndex as number);
             setCurrentIndex(closestFitIndex, undefined!);
             if (currentChild)
                 setAt(currentChild, false, closestFitIndex, currentIndex);
@@ -502,11 +504,9 @@ export function useChildrenFlag<M extends ManagedChildInfo<number>, R>({ getChil
 
 
 
-    const changeIndex = useCallback<PassiveStateUpdater<number | null, R>>((arg: Parameters<PassiveStateUpdater<number | null, R>>[0], reason: Parameters<PassiveStateUpdater<number | null, R>>[1]) => {
+    const changeIndex = useCallback<PassiveStateUpdater<M["index"] | null, R>>((arg: Parameters<PassiveStateUpdater<M["index"] | null, R>>[0], reason: Parameters<PassiveStateUpdater<M["index"] | null, R>>[1]) => {
         const children = getChildren();
         const requestedIndex = (arg instanceof Function ? arg(getRequestedIndex()) : arg) as M["index"];
-        //if (requestedIndex == null && getFitNullToZero())
-        //    requestedIndex = 0;
 
         setRequestedIndex(requestedIndex, reason as R);
         const currentIndex = getCurrentIndex();
@@ -534,7 +534,9 @@ export function useChildrenFlag<M extends ManagedChildInfo<number>, R>({ getChil
                 return requestedIndex;
             }
             else {
-                const closestFitIndex = getClosestFit(requestedIndex);
+                console.assert(typeof requestedIndex == "number", "closestFit can only be used when each child has a numeric index, and cannot be used when children use string indices instead.");
+
+                const closestFitIndex = getClosestFit(requestedIndex as number);
                 setCurrentIndex(closestFitIndex, reason as R);
                 if (closestFitIndex != null) {
                     newMatchingChild = children.getAt(closestFitIndex)!;

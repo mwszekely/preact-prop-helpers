@@ -1876,6 +1876,7 @@ var bundle = function (exports) {
       let closestIndex = null;
       children.forEach(child => {
         if (child != null && isValid(child)) {
+          console.assert(typeof child.index == "number", "closestFit can only be used when each child has a numeric index, and cannot be used when children use string indices instead.");
           const newDistance = Math.abs(child.index - requestedIndex);
           if (newDistance < closestDistance || newDistance == closestDistance && child.index < requestedIndex) {
             closestDistance = newDistance;
@@ -1895,6 +1896,7 @@ var bundle = function (exports) {
       const currentIndex = getCurrentIndex();
       const currentChild = currentIndex == null ? null : children.getAt(currentIndex);
       if (requestedIndex != null && closestFit && (requestedIndex != currentIndex || currentChild == null || !isValid(currentChild))) {
+        console.assert(typeof requestedIndex == "number", "closestFit can only be used when each child has a numeric index, and cannot be used when children use string indices instead.");
         const closestFitIndex = getClosestFit(requestedIndex);
         setCurrentIndex(closestFitIndex, undefined);
         if (currentChild) setAt(currentChild, false, closestFitIndex, currentIndex);
@@ -1908,8 +1910,6 @@ var bundle = function (exports) {
     const changeIndex = T$1((arg, reason) => {
       const children = getChildren();
       const requestedIndex = arg instanceof Function ? arg(getRequestedIndex()) : arg;
-      //if (requestedIndex == null && getFitNullToZero())
-      //    requestedIndex = 0;
       setRequestedIndex(requestedIndex, reason);
       const currentIndex = getCurrentIndex();
       if (currentIndex == requestedIndex) return requestedIndex;
@@ -1928,6 +1928,7 @@ var bundle = function (exports) {
           if (newMatchingChild) setAt(newMatchingChild, true, requestedIndex, currentIndex);
           return requestedIndex;
         } else {
+          console.assert(typeof requestedIndex == "number", "closestFit can only be used when each child has a numeric index, and cannot be used when children use string indices instead.");
           const closestFitIndex = getClosestFit(requestedIndex);
           setCurrentIndex(closestFitIndex, reason);
           if (closestFitIndex != null) {
