@@ -7,18 +7,6 @@ import { SetTabbableIndex } from "./use-roving-tabindex";
 
 type OmitStrong<T, K extends keyof T> = Omit<T, K>
 
-/*
-export function useGridNavigationProps<ParentOrRowElement extends Element, RowElement extends Element>(r: UseGridNavigationReturnType<ParentOrRowElement, RowElement>, ...otherProps: h.JSX.HTMLAttributes<ParentOrRowElement>[]) {
-    return useListNavigationProps<ParentOrRowElement, RowElement>(r, ...otherProps)
-}
-export function useGridNavigationRowProps<RowElement extends Element, CellElement extends Element>(r: UseGridNavigationRowReturnType<RowElement, CellElement>, ...otherProps: h.JSX.HTMLAttributes<RowElement>[]) {
-    return useListNavigationProps<RowElement, CellElement>(r.asParentRowOfCells, ...useListNavigationChildProps<RowElement>(r.asChildRowOfTable, ...otherProps));
-}
-export function useGridNavigationCellProps<CellElement extends Element>(r: UseGridNavigationCellReturnType<CellElement>, ...otherProps: h.JSX.HTMLAttributes<CellElement>[]) {
-    return useListNavigationChildProps<CellElement>(r, ...otherProps);
-}*/
-
-
 export interface GridChildRowInfo<RowElement extends Element, _CellElement extends Element> extends UseListNavigationChildInfo<RowElement> { setTabbableColumnIndex: SetTabbableIndex }
 export interface GridChildCellInfo<CellElement extends Element> extends UseListNavigationChildInfo<CellElement> {
 }
