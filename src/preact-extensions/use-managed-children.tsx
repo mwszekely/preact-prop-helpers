@@ -1,3 +1,4 @@
+import { noop } from "lodash-es";
 import { useCallback, useLayoutEffect, useRef } from "preact/hooks";
 import { debounceRendering, OnPassiveStateChange, PassiveStateUpdater, useEnsureStability, usePassiveState } from "./use-passive-state";
 import { useStableCallback } from "./use-stable-callback";
@@ -98,7 +99,11 @@ export interface UseManagedChildParameters<M extends ManagedChildInfo<any>> {
     // This is the only property shared among all managed children.
     // Technically this is redundant with the second argument, which is...eh. But the types are clear.
     managedChildParameters: Pick<M, "index">;
-    context: UseManagedChildrenContext<M>;
+
+    /**
+     * In general, this shouldn't be null, but for convenience's sake you are allowed to, which disables all behavior, and also means `getChildren` will be `undefined`!
+     */
+    context: UseManagedChildrenContext<M> | null;
 }
 
 
@@ -318,13 +323,15 @@ export function useManagedChildren<M extends ManagedChildInfo<string | number>>(
 export function useManagedChild<M extends ManagedChildInfo<number | string>>(info: UseManagedChildParameters<M>, managedChildParameters: M): UseManagedChildReturnType<M> {
     type IndexType = M["index"];
 
-    const { context: { managedChildContext: { getChildren, managedChildrenArray, remoteULEChildMounted, remoteULEChildChanged } } } = info;
+    const { managedChildContext: { getChildren, managedChildrenArray, remoteULEChildMounted, remoteULEChildChanged } } = (info.context ?? { managedChildContext: {} });
     const index = managedChildParameters.index;
     // Any time our child props change, make that information available
     // the parent if they need it.
     // The parent can listen for all updates and only act on the ones it cares about,
     // and multiple children updating in the same tick will all be sent at once.
     useLayoutEffect(() => {
+        if (managedChildrenArray == null || remoteULEChildChanged == null) return;
+
         // Insert this information in-place
         if (typeof index == "number") {
             managedChildrenArray.arr[index as number] = { ...managedChildParameters };
@@ -346,7 +353,7 @@ export function useManagedChild<M extends ManagedChildInfo<number | string>>(inf
     }, [index]);
 
     return {
-        managedChildReturn: { getChildren }
+        managedChildReturn: { getChildren: getChildren! }
     }
 }
 

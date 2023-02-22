@@ -1794,22 +1794,24 @@ var bundle = function (exports) {
     };
   }
   function useManagedChild(info, managedChildParameters) {
+    var _info$context;
     const {
-      context: {
-        managedChildContext: {
-          getChildren,
-          managedChildrenArray,
-          remoteULEChildMounted,
-          remoteULEChildChanged
-        }
+      managedChildContext: {
+        getChildren,
+        managedChildrenArray,
+        remoteULEChildMounted,
+        remoteULEChildChanged
       }
-    } = info;
+    } = (_info$context = info.context) !== null && _info$context !== void 0 ? _info$context : {
+      managedChildContext: {}
+    };
     const index = managedChildParameters.index;
     // Any time our child props change, make that information available
     // the parent if they need it.
     // The parent can listen for all updates and only act on the ones it cares about,
     // and multiple children updating in the same tick will all be sent at once.
     s(() => {
+      if (managedChildrenArray == null || remoteULEChildChanged == null) return;
       // Insert this information in-place
       if (typeof index == "number") {
         managedChildrenArray.arr[index] = {
@@ -1833,7 +1835,7 @@ var bundle = function (exports) {
     }, [index]);
     return {
       managedChildReturn: {
-        getChildren
+        getChildren: getChildren
       }
     };
   }
