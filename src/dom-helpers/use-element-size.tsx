@@ -1,10 +1,8 @@
 import { h } from "preact";
 import { useCallback, useEffect, useRef } from "preact/hooks";
-import { OnPassiveStateChange, returnNull, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state";
-import { getDocument } from "./use-document-class";
-import { useRefElement, UseRefElementParameters, UseRefElementReturnType } from "./use-ref-element";
-
-type OmitStrong<T, K extends keyof T> = Omit<T, K>
+import { OnPassiveStateChange, returnNull, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
+import { getDocument } from "./use-document-class.js";
+import { useRefElement, UseRefElementParameters, UseRefElementReturnType } from "./use-ref-element.js";
 
 export interface UseElementSizeParameters<T extends Element> extends UseRefElementParameters<T> {
     elementSizeParameters: {/**

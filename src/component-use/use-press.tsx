@@ -1,10 +1,10 @@
 import { h } from "preact";
 import { useCallback } from "preact/hooks";
-import { UseRefElementReturnType } from "../dom-helpers/use-ref-element";
-import { returnFalse, usePassiveState } from "../preact-extensions/use-passive-state";
-import { useStableCallback } from "../preact-extensions/use-stable-callback";
-import { useState } from "../preact-extensions/use-state";
-import { useTimeout } from "../timing/use-timeout";
+import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
+import { returnFalse, usePassiveState } from "../preact-extensions/use-passive-state.js";
+import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
+import { useState } from "../preact-extensions/use-state.js";
+import { useTimeout } from "../timing/use-timeout.js";
 /*
 export function usePressProps<E extends Element>(r: UsePressReturnType<E>, ...otherProps: h.JSX.HTMLAttributes<E>[]): h.JSX.HTMLAttributes<E>[] {
     return [r.pressReturn.propsStable, ...otherProps];

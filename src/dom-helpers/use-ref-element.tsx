@@ -1,6 +1,6 @@
 import { h } from "preact";
 import { useCallback, useRef } from "preact/hooks";
-import { OnPassiveStateChange, returnNull, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state";
+import { OnPassiveStateChange, returnNull, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
 
 export interface UseRefElementReturnType<T extends EventTarget> {
     refElementReturn: {

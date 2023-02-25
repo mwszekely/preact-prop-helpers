@@ -1,7 +1,7 @@
 import { h } from "preact";
 import { useId, useRef } from "preact/hooks";
-import { generateRandomId } from "../preact-extensions/use-before-layout-effect";
-import { useEnsureStability } from "../preact-extensions/use-passive-state";
+import { generateRandomId } from "../preact-extensions/use-before-layout-effect.js";
+import { useEnsureStability } from "../preact-extensions/use-passive-state.js";
 export { generateRandomId };
 
 

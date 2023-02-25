@@ -1,9 +1,9 @@
 
 import { useCallback, useEffect } from "preact/hooks";
 //import { UseManagedChildParameters, useManagedChildren, UseManagedChildrenParameters, UseManagedChildrenReturnTypeInfo } from "./use-child-manager";
-import { UseRefElementReturnType } from "../dom-helpers/use-ref-element";
-import { returnFalse, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state";
-import { useActiveElement, UseActiveElementParameters, UseActiveElementReturnType } from "./use-active-element";
+import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
+import { returnFalse, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
+import { useActiveElement, UseActiveElementParameters, UseActiveElementReturnType } from "./use-active-element.js";
 
 export interface UseHasLastFocusParameters<T extends Node> extends UseActiveElementParameters {
     refElementReturn: Pick<UseRefElementReturnType<T>["refElementReturn"], "getElement">;

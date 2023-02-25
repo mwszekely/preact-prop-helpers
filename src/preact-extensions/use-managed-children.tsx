@@ -1,8 +1,8 @@
 import { noop } from "lodash-es";
 import { useCallback, useLayoutEffect, useRef } from "preact/hooks";
-import { debounceRendering, OnPassiveStateChange, PassiveStateUpdater, useEnsureStability, usePassiveState } from "./use-passive-state";
-import { useStableCallback } from "./use-stable-callback";
-import { useStableObject } from "./use-stable-getter";
+import { debounceRendering, OnPassiveStateChange, PassiveStateUpdater, useEnsureStability, usePassiveState } from "./use-passive-state.js";
+import { useStableCallback } from "./use-stable-callback.js";
+import { useStableObject } from "./use-stable-getter.js";
 
 /**
  * Reminder of order of execution:
@@ -473,7 +473,7 @@ export function useChildrenFlag<M extends ManagedChildInfo<number | string>, R>(
             if (child != null && isValid(child)) {
                 console.assert(typeof child.index == "number", "closestFit can only be used when each child has a numeric index, and cannot be used when children use string indices instead.");
                 const newDistance = Math.abs((child.index as number) - requestedIndex);
-                if (newDistance < closestDistance || (newDistance == closestDistance && child.index < requestedIndex)) {
+                if (newDistance < closestDistance || (newDistance == closestDistance && (child.index as number) < requestedIndex)) {
                     closestDistance = newDistance;
                     closestIndex = (child.index as number);
                 }

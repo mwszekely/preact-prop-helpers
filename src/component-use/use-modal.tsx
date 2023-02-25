@@ -1,7 +1,7 @@
 import { h } from "preact";
-import { DismissListenerTypes, useDismiss, UseDismissParameters, UseDismissReturnType } from "../component-detail/use-dismiss";
-import { useFocusTrap, UseFocusTrapParameters, UseFocusTrapReturnType } from "../component-detail/use-focus-trap";
-import { useMergedProps } from "../dom-helpers/use-merged-props";
+import { DismissListenerTypes, useDismiss, UseDismissParameters, UseDismissReturnType } from "../component-detail/use-dismiss.js";
+import { useFocusTrap, UseFocusTrapParameters, UseFocusTrapReturnType } from "../component-detail/use-focus-trap.js";
+import { useMergedProps } from "../dom-helpers/use-merged-props.js";
 
 type OmitStrong<T, K extends keyof T> = Omit<T, K>
 

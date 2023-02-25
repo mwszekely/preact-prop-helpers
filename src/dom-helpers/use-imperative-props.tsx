@@ -1,7 +1,7 @@
 import { h } from "preact";
 import { useCallback, useRef } from "preact/hooks";
-import { useMergedProps } from "./use-merged-props";
-import { useRefElement } from "./use-ref-element";
+import { useMergedProps } from "./use-merged-props.js";
+import { useRefElement } from "./use-ref-element.js";
 
 export function useImperativeProps<T extends Element>() {
     const currentImperativeProps = useRef<{ className: DOMTokenList, style: h.JSX.CSSProperties, others: h.JSX.HTMLAttributes<T> }>({ className: new DOMTokenList(), style: {}, others: {} });

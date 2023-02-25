@@ -1,10 +1,10 @@
-import lodashShuffle from "lodash-es/shuffle";
+import { shuffle as lodashShuffle } from "lodash-es";
 import { h, VNode } from "preact";
 import { MutableRef, useCallback, useLayoutEffect, useRef } from "preact/hooks";
-import { useForceUpdate } from "../preact-extensions/use-force-update";
-import { ManagedChildInfo, ManagedChildren } from "../preact-extensions/use-managed-children";
-import { returnNull, usePassiveState } from "../preact-extensions/use-passive-state";
-import { useStableGetter } from "../preact-extensions/use-stable-getter";
+import { useForceUpdate } from "../preact-extensions/use-force-update.js";
+import { ManagedChildInfo, ManagedChildren } from "../preact-extensions/use-managed-children.js";
+import { returnNull, usePassiveState } from "../preact-extensions/use-passive-state.js";
+import { useStableGetter } from "../preact-extensions/use-stable-getter.js";
 
 export type GetIndex<P> = (row: VNode<P>) => (number | null | undefined);
 export type GetValid = (index: number) => boolean;
@@ -102,10 +102,10 @@ export interface UseRearrangeableChildrenReturnType<M extends ManagedChildInfo<n
          * Call this on your props (that contain the children to sort!!) to allow them to be sortable.
          * 
          */
-        useRearrangedChildren: (children: VNode[]) => VNode[]; 
-        
-            toJsonArray(managedRows: ManagedChildren<M>, transform?: (info: M) => object): object;
-        
+        useRearrangedChildren: (children: VNode[]) => VNode[];
+
+        toJsonArray(managedRows: ManagedChildren<M>, transform?: (info: M) => object): object;
+
     }
 }
 
@@ -215,16 +215,16 @@ export function useRearrangeableChildren<M extends UseSortableChildInfo>({
 
     return {
         //linearNavigationParameters: { navigateAbsolute, navigateRelative },
-        rearrangeableChildrenReturn: { 
-            indexMangler, 
-            indexDemangler, 
-            mangleMap, 
-            demangleMap, 
-            rearrange, 
-            shuffle, 
+        rearrangeableChildrenReturn: {
+            indexMangler,
+            indexDemangler,
+            mangleMap,
+            demangleMap,
+            rearrange,
+            shuffle,
             useRearrangedChildren,
             toJsonArray
-         }
+        }
     };
 }
 

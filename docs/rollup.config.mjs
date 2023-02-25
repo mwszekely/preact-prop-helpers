@@ -13,10 +13,12 @@ export default {
         file: "bundle.js",
         format: "iife",
         name: "bundle",
-        sourcemap: true
+        sourcemap: true,
+        
     },
+    treeshake: "recommended",
     plugins: [
-        typescript({ sourceMap: true }), 
+        typescript({ sourceMap: true, moduleResolution: "nodenext" }), 
         commonjs({ sourceMap: true, extensions }), 
         resolve({ extensions, dedupe: ['preact', "preact/compat", "preact/hooks"] }),   // TODO: Why, exactly, is this needed? It doesn't not make sense, but specifically. Why.
         getBabelOutputPlugin({

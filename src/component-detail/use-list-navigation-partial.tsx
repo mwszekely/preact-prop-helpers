@@ -1,7 +1,7 @@
-import { assertEmptyObject } from "../preact-extensions/use-managed-children";
-import { useLinearNavigation, UseLinearNavigationParameters, UseLinearNavigationReturnType } from "./use-linear-navigation";
-import { useRovingTabIndex, useRovingTabIndexChild, UseRovingTabIndexChildInfo, UseRovingTabIndexChildParameters, UseRovingTabIndexChildReturnType, UseRovingTabIndexParameters, UseRovingTabIndexReturnType } from "./use-roving-tabindex";
-import { useTypeaheadNavigation, useTypeaheadNavigationChild, UseTypeaheadNavigationChildParameters, UseTypeaheadNavigationChildReturnType, UseTypeaheadNavigationParameters, UseTypeaheadNavigationReturnType } from "./use-typeahead-navigation";
+import { assertEmptyObject } from "../preact-extensions/use-managed-children.js";
+import { useLinearNavigation, UseLinearNavigationParameters, UseLinearNavigationReturnType } from "./use-linear-navigation.js";
+import { useRovingTabIndex, useRovingTabIndexChild, UseRovingTabIndexChildInfo, UseRovingTabIndexChildParameters, UseRovingTabIndexChildReturnType, UseRovingTabIndexParameters, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
+import { useTypeaheadNavigation, useTypeaheadNavigationChild, UseTypeaheadNavigationChildParameters, UseTypeaheadNavigationChildReturnType, UseTypeaheadNavigationParameters, UseTypeaheadNavigationReturnType } from "./use-typeahead-navigation.js";
 
 type OmitStrong<T, K extends keyof T> = Omit<T, K>
 

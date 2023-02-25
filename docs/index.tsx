@@ -1,15 +1,14 @@
 import { createContext, h, render, VNode } from "preact";
 import { memo } from "preact/compat";
 import { useCallback, useContext, useRef } from "preact/hooks";
-import { GetIndex, GridSingleSelectSortableChildCellInfo, GridSingleSelectSortableChildRowInfo, returnNull, useAnimationFrame, useAsyncHandler, useChildrenHaveFocus, useChildrenHaveFocusChild, UseChildrenHaveFocusChildParameters, UseCompleteGridNavigationReturnType, UseCompleteGridNavigationRowReturnType, useDraggable, useDroppable, useElementSize, useFocusTrap, useGlobalHandler, useHasCurrentFocus, useHasLastFocus, useInterval, useMergedProps, usePortalChildren, usePress, useRandomDualIds, useRefElement, useStableCallback, useState } from "..";
-import { ElementSize } from "../";
-//import { useGridNavigation, UseGridNavigationCell, UseGridNavigationRow } from "../use-grid-navigation";
-import { CompleteGridNavigationContext, CompleteGridNavigationRowContext, useCompleteGridNavigation, useCompleteGridNavigationCell, useCompleteGridNavigationRow } from "..";
-import { DemoUseInterval } from "./demos/use-interval";
-import { DemoUseModal } from "./demos/use-modal";
-import { DemoUseRovingTabIndex } from "./demos/use-roving-tab-index";
-import { DemoUseTimeout } from "./demos/use-timeout";
-import { UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationRowInfo } from "../";
+import { GetIndex, GridSingleSelectSortableChildCellInfo, GridSingleSelectSortableChildRowInfo, returnNull, useAnimationFrame, useAsyncHandler, useChildrenHaveFocus, useChildrenHaveFocusChild, UseChildrenHaveFocusChildParameters, UseCompleteGridNavigationReturnType, UseCompleteGridNavigationRowReturnType, useDraggable, useDroppable, useElementSize, useFocusTrap, useGlobalHandler, useHasCurrentFocus, useHasLastFocus, useInterval, useMergedProps, usePortalChildren, usePress, useRandomDualIds, useRefElement, useStableCallback, useState } from "../dist/index.js";
+import { ElementSize } from "../dist/index.js";
+import { CompleteGridNavigationContext, CompleteGridNavigationRowContext, useCompleteGridNavigation, useCompleteGridNavigationCell, useCompleteGridNavigationRow } from "../dist/index.js";
+import { DemoUseInterval } from "./demos/use-interval.js";
+import { DemoUseModal } from "./demos/use-modal.js";
+import { DemoUseRovingTabIndex } from "./demos/use-roving-tab-index.js";
+import { DemoUseTimeout } from "./demos/use-timeout.js";
+import { UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationRowInfo } from "../dist/index.js";
 const RandomWords = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
 
 

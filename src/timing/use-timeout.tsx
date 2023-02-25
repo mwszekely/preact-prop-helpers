@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from "preact/hooks";
-import { useStableCallback } from "../preact-extensions/use-stable-callback";
-import { useStableGetter } from "../preact-extensions/use-stable-getter";
+import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
+import { useStableGetter } from "../preact-extensions/use-stable-getter.js";
 
 export interface UseTimeoutParameters {
     /**

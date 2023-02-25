@@ -1,5 +1,5 @@
 import { useLayoutEffect, useRef } from "preact/hooks";
-import { useState } from "../preact-extensions/use-state";
+import { useState } from "../preact-extensions/use-state.js";
 
 /**
  * 

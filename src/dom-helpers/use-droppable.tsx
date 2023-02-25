@@ -1,7 +1,7 @@
 import { h } from "preact";
 import { useEffect, useRef } from "preact/hooks";
-import { useStableCallback } from "../preact-extensions/use-stable-callback";
-import { useState } from "../preact-extensions/use-state";
+import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
+import { useState } from "../preact-extensions/use-state.js";
 
 /*
 export function useDroppableProps<E extends Element>(r: UseDroppableReturnType<E>, ...otherProps: h.JSX.HTMLAttributes<E>[]): h.JSX.HTMLAttributes<E>[] {

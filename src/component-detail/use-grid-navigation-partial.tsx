@@ -1,9 +1,9 @@
-import { assertEmptyObject, UseManagedChildrenReturnType } from "../preact-extensions/use-managed-children";
-import { OnPassiveStateChange, PassiveStateUpdater, usePassiveState } from "../preact-extensions/use-passive-state";
-import { useStableCallback } from "../preact-extensions/use-stable-callback";
-import { useStableObject } from "../preact-extensions/use-stable-getter";
-import { useListNavigation, useListNavigationChild, UseListNavigationChildInfo, UseListNavigationChildParameters, UseListNavigationChildReturnType, UseListNavigationParameters, UseListNavigationReturnType } from "./use-list-navigation-partial";
-import { SetTabbableIndex } from "./use-roving-tabindex";
+import { assertEmptyObject, UseManagedChildrenReturnType } from "../preact-extensions/use-managed-children.js";
+import { OnPassiveStateChange, PassiveStateUpdater, usePassiveState } from "../preact-extensions/use-passive-state.js";
+import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
+import { useStableObject } from "../preact-extensions/use-stable-getter.js";
+import { useListNavigation, useListNavigationChild, UseListNavigationChildInfo, UseListNavigationChildParameters, UseListNavigationChildReturnType, UseListNavigationParameters, UseListNavigationReturnType } from "./use-list-navigation-partial.js";
+import { SetTabbableIndex } from "./use-roving-tabindex.js";
 
 type OmitStrong<T, K extends keyof T> = Omit<T, K>
 

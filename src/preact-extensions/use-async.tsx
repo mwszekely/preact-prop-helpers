@@ -1,8 +1,8 @@
 
-import LodashDebounce, { DebounceSettings } from "lodash-es/debounce";
+import { debounce as LodashDebounce, DebounceSettings } from "lodash-es";
 import { useCallback, useEffect, useMemo } from "preact/hooks";
-import { useStableCallback } from "./use-stable-callback";
-import { useState } from "./use-state";
+import { useStableCallback } from "./use-stable-callback.js";
+import { useState } from "./use-state.js";
 
 //type Func = (...args: any) => Promise<unknown> | unknown;
 

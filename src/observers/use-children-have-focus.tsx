@@ -1,9 +1,9 @@
 
 import { h } from "preact";
-import { OnPassiveStateChange, PassiveStateUpdater, returnFalse, runImmediately, usePassiveState } from "../preact-extensions/use-passive-state";
-import { useStableCallback } from "../preact-extensions/use-stable-callback";
-import { useStableObject } from "../preact-extensions/use-stable-getter";
-import { UseHasCurrentFocusParameters } from "./use-has-current-focus";
+import { OnPassiveStateChange, PassiveStateUpdater, returnFalse, runImmediately, usePassiveState } from "../preact-extensions/use-passive-state.js";
+import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
+import { useStableObject } from "../preact-extensions/use-stable-getter.js";
+import { UseHasCurrentFocusParameters } from "./use-has-current-focus.js";
 
 
 export interface UseChildrenHaveFocusParameters<T extends Element> {

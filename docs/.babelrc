@@ -1,5 +1,5 @@
 {
-    //"comments": false,
+    "comments": true,
     "presets": [
         [
         "@babel/preset-env",
@@ -9,7 +9,6 @@
                 }
             }
         ]
-        //,"minify"
     ],
     "plugins": ["@babel/plugin-proposal-nullish-coalescing-operator"]
 }

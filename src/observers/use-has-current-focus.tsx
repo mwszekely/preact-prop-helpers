@@ -2,8 +2,8 @@
 import { h } from "preact";
 import { useCallback, useEffect, useRef } from "preact/hooks";
 //import { UseManagedChildParameters, useManagedChildren, UseManagedChildrenParameters, UseManagedChildrenReturnTypeInfo } from "./use-child-manager";
-import { UseRefElementReturnType } from "../dom-helpers/use-ref-element";
-import { OnPassiveStateChange, returnFalse, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state";
+import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
+import { OnPassiveStateChange, returnFalse, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
 
 /*
 export function useHasCurrentFocusProps<E extends Element>(r: UseHasCurrentFocusReturnType<E>, ...otherProps: h.JSX.HTMLAttributes<E>[]) {
