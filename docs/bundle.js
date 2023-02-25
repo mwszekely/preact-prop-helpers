@@ -2108,16 +2108,51 @@ var bundle = function (exports) {
   }
 
   /*!
-  * tabbable 6.0.1
+  * tabbable 6.1.1
   * @license MIT, https://github.com/focus-trap/tabbable/blob/master/LICENSE
   */
-  var candidateSelectors = ['input', 'select', 'textarea', 'a[href]', 'button', '[tabindex]:not(slot)', 'audio[controls]', 'video[controls]', '[contenteditable]:not([contenteditable="false"])', 'details>summary:first-of-type', 'details'];
+  // NOTE: separate `:not()` selectors has broader browser support than the newer
+  //  `:not([inert], [inert] *)` (Feb 2023)
+  // CAREFUL: JSDom does not support `:not([inert] *)` as a selector; using it causes
+  //  the entire query to fail, resulting in no nodes found, which will break a lot
+  //  of things... so we have to rely on JS to identify nodes inside an inert container
+  var candidateSelectors = ['input:not([inert])', 'select:not([inert])', 'textarea:not([inert])', 'a[href]:not([inert])', 'button:not([inert])', '[tabindex]:not(slot):not([inert])', 'audio[controls]:not([inert])', 'video[controls]:not([inert])', '[contenteditable]:not([contenteditable="false"]):not([inert])', 'details>summary:first-of-type:not([inert])', 'details:not([inert])'];
   var NoElement = typeof Element === 'undefined';
   var matches = NoElement ? function () {} : Element.prototype.matches || Element.prototype.msMatchesSelector || Element.prototype.webkitMatchesSelector;
   var getRootNode = !NoElement && Element.prototype.getRootNode ? function (element) {
-    return element.getRootNode();
+    var _element$getRootNode;
+    return element === null || element === void 0 ? void 0 : (_element$getRootNode = element.getRootNode) === null || _element$getRootNode === void 0 ? void 0 : _element$getRootNode.call(element);
   } : function (element) {
-    return element.ownerDocument;
+    return element === null || element === void 0 ? void 0 : element.ownerDocument;
+  };
+
+  /**
+   * Determines if a node is inert or in an inert ancestor.
+   * @param {Element} [node]
+   * @param {boolean} [lookUp] If true and `node` is not inert, looks up at ancestors to
+   *  see if any of them are inert. If false, only `node` itself is considered.
+   * @returns {boolean} True if inert itself or by way of being in an inert ancestor.
+   *  False if `node` is falsy.
+   */
+  var isInert = function isInert(node, lookUp) {
+    var _node$getAttribute;
+    if (lookUp === void 0) {
+      lookUp = true;
+    }
+    // CAREFUL: JSDom does not support inert at all, so we can't use the `HTMLElement.inert`
+    //  JS API property; we have to check the attribute, which can either be empty or 'true';
+    //  if it's `null` (not specified) or 'false', it's an active element
+    var inertAtt = node === null || node === void 0 ? void 0 : (_node$getAttribute = node.getAttribute) === null || _node$getAttribute === void 0 ? void 0 : _node$getAttribute.call(node, 'inert');
+    var inert = inertAtt === '' || inertAtt === 'true';
+
+    // NOTE: this could also be handled with `node.matches('[inert], :is([inert] *)')`
+    //  if it weren't for `matches()` not being a function on shadow roots; the following
+    //  code works for any kind of node
+    // CAREFUL: JSDom does not appear to support certain selectors like `:not([inert] *)`
+    //  so it likely would not support `:is([inert] *)` either...
+    var result = inert || lookUp && node && isInert(node.parentNode); // recursive
+
+    return result;
   };
   var isInput = function isInput(node) {
     return node.tagName === 'INPUT';
@@ -2134,7 +2169,7 @@ var bundle = function (exports) {
 
   // determines if a node is ultimately attached to the window's document
   var isNodeAttached = function isNodeAttached(node) {
-    var _nodeRootHost;
+    var _nodeRoot;
     // The root node is the shadow root if the node is in a shadow DOM; some document otherwise
     //  (but NOT _the_ document; see second 'If' comment below for more).
     // If rootNode is shadow root, it'll have a host, which is the element to which the shadow
@@ -2154,15 +2189,28 @@ var bundle = function (exports) {
     //  to ignore the rootNode at this point, and use `node.ownerDocument`. Otherwise,
     //  using `rootNode.contains(node)` will _always_ be true we'll get false-positives when
     //  node is actually detached.
-    var nodeRootHost = getRootNode(node).host;
-    var attached = !!((_nodeRootHost = nodeRootHost) !== null && _nodeRootHost !== void 0 && _nodeRootHost.ownerDocument.contains(nodeRootHost) || node.ownerDocument.contains(node));
-    while (!attached && nodeRootHost) {
-      var _nodeRootHost2;
-      // since it's not attached and we have a root host, the node MUST be in a nested shadow DOM,
-      //  which means we need to get the host's host and check if that parent host is contained
-      //  in (i.e. attached to) the document
-      nodeRootHost = getRootNode(nodeRootHost).host;
-      attached = !!((_nodeRootHost2 = nodeRootHost) !== null && _nodeRootHost2 !== void 0 && _nodeRootHost2.ownerDocument.contains(nodeRootHost));
+    // NOTE: If `nodeRootHost` or `node` happens to be the `document` itself (which is possible
+    //  if a tabbable/focusable node was quickly added to the DOM, focused, and then removed
+    //  from the DOM as in https://github.com/focus-trap/focus-trap-react/issues/905), then
+    //  `ownerDocument` will be `null`, hence the optional chaining on it.
+    var nodeRoot = node && getRootNode(node);
+    var nodeRootHost = (_nodeRoot = nodeRoot) === null || _nodeRoot === void 0 ? void 0 : _nodeRoot.host;
+
+    // in some cases, a detached node will return itself as the root instead of a document or
+    //  shadow root object, in which case, we shouldn't try to look further up the host chain
+    var attached = false;
+    if (nodeRoot && nodeRoot !== node) {
+      var _nodeRootHost, _nodeRootHost$ownerDo, _node$ownerDocument;
+      attached = !!((_nodeRootHost = nodeRootHost) !== null && _nodeRootHost !== void 0 && (_nodeRootHost$ownerDo = _nodeRootHost.ownerDocument) !== null && _nodeRootHost$ownerDo !== void 0 && _nodeRootHost$ownerDo.contains(nodeRootHost) || node !== null && node !== void 0 && (_node$ownerDocument = node.ownerDocument) !== null && _node$ownerDocument !== void 0 && _node$ownerDocument.contains(node));
+      while (!attached && nodeRootHost) {
+        var _nodeRoot2, _nodeRootHost2, _nodeRootHost2$ownerD;
+        // since it's not attached and we have a root host, the node MUST be in a nested shadow DOM,
+        //  which means we need to get the host's host and check if that parent host is contained
+        //  in (i.e. attached to) the document
+        nodeRoot = getRootNode(nodeRootHost);
+        nodeRootHost = (_nodeRoot2 = nodeRoot) === null || _nodeRoot2 === void 0 ? void 0 : _nodeRoot2.host;
+        attached = !!((_nodeRootHost2 = nodeRootHost) !== null && _nodeRootHost2 !== void 0 && (_nodeRootHost2$ownerD = _nodeRootHost2.ownerDocument) !== null && _nodeRootHost2$ownerD !== void 0 && _nodeRootHost2$ownerD.contains(nodeRootHost));
+      }
     }
     return attached;
   };
@@ -2297,7 +2345,11 @@ var bundle = function (exports) {
     return false;
   };
   var isNodeMatchingSelectorFocusable = function isNodeMatchingSelectorFocusable(options, node) {
-    if (node.disabled || isHiddenInput(node) || isHidden(node, options) ||
+    if (node.disabled ||
+    // we must do an inert look up to filter out any elements inside an inert ancestor
+    //  because we're limited in the type of selectors we can use in JSDom (see related
+    //  note related to `candidateSelectors`)
+    isInert(node) || isHiddenInput(node) || isHidden(node, options) ||
     // For a details element with a summary, the summary element gets the focus
     isDetailsWithSummary(node) || isDisabledFromFieldset(node)) {
       return false;

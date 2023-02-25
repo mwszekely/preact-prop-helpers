@@ -45,7 +45,7 @@ export { useEffectDebug } from "./preact-extensions/use-effect-debug.js";
 export { useForceUpdate } from "./preact-extensions/use-force-update.js";
 export { useLayoutEffectDebug } from "./preact-extensions/use-layout-effect-debug.js";
 export { assertEmptyObject, useChildrenFlag, useManagedChild, useManagedChildren } from "./preact-extensions/use-managed-children.js";
-export { debounceRendering, returnFalse, returnNull, returnTrue, returnUndefined, returnZero, useEnsureStability, usePassiveState } from "./preact-extensions/use-passive-state.js";
+export { debounceRendering, returnFalse, returnNull, returnTrue, returnUndefined, returnZero, runImmediately, useEnsureStability, usePassiveState } from "./preact-extensions/use-passive-state.js";
 export { getFromLocalStorage, storeToLocalStorage, usePersistentState } from "./preact-extensions/use-persistent-state.js";
 export { useStableCallback } from "./preact-extensions/use-stable-callback.js";
 export { useStableGetter, useStableObject } from "./preact-extensions/use-stable-getter.js";
