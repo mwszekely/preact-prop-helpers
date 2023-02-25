@@ -1,3 +1,4 @@
+import { reverse } from "lodash-es";
 import lodashShuffle from "lodash-es/shuffle";
 import { h, VNode } from "preact";
 import { MutableRef, useCallback, useLayoutEffect, useRef } from "preact/hooks";
@@ -63,7 +64,6 @@ export interface UseSortableChildrenParameters<M extends ManagedChildInfo<number
 
 
 export interface UseRearrangeableChildrenReturnType<M extends ManagedChildInfo<number>> {
-    //linearNavigationParameters: Pick<UseLinearNavigationParameters["linearNavigationParameters"], "navigateRelative" | "navigateAbsolute">;
 
     rearrangeableChildrenReturn: {
 
@@ -79,6 +79,9 @@ export interface UseRearrangeableChildrenReturnType<M extends ManagedChildInfo<n
 
         /** **STABLE** */
         shuffle: (managedRows: ManagedChildren<M>) => Promise<void> | void;
+
+        /** **STABLE** */
+        reverse: (managedRows: ManagedChildren<M>) => Promise<void> | void;
 
         /** 
          * **STABLE**
@@ -102,10 +105,10 @@ export interface UseRearrangeableChildrenReturnType<M extends ManagedChildInfo<n
          * Call this on your props (that contain the children to sort!!) to allow them to be sortable.
          * 
          */
-        useRearrangedChildren: (children: VNode[]) => VNode[]; 
-        
-            toJsonArray(managedRows: ManagedChildren<M>, transform?: (info: M) => object): object;
-        
+        useRearrangedChildren: (children: VNode[]) => VNode[];
+
+        toJsonArray(managedRows: ManagedChildren<M>, transform?: (info: M) => object): object;
+
     }
 }
 
@@ -163,6 +166,11 @@ export function useRearrangeableChildren<M extends UseSortableChildInfo>({
         return rearrange(shuffledRows);
     }, [/* Must remain stable */]);
 
+    const reverse = useCallback((managedRows: ManagedChildren<M>): Promise<void> | void => {
+        const reversedRows = managedRows.arraySlice().reverse()
+        return rearrange(reversedRows);
+    }, [/* Must remain stable */]);
+
 
     // The sort function needs to be able to update whoever has all the sortable children.
     // Because that might not be the consumer of *this* hook directly (e.g. a table uses
@@ -179,10 +187,12 @@ export function useRearrangeableChildren<M extends UseSortableChildInfo>({
         // Update our sorted <--> unsorted indices map 
         // and rerender the whole table, basically
         for (let indexAsSorted = 0; indexAsSorted < sortedRows.length; ++indexAsSorted) {
-            const indexAsUnsorted = sortedRows[indexAsSorted].index;
+            if (sortedRows[indexAsSorted]) {
+                const indexAsUnsorted = sortedRows[indexAsSorted].index;
 
-            mangleMap.current.set(indexAsUnsorted, indexAsSorted);
-            demangleMap.current.set(indexAsSorted, indexAsUnsorted);
+                mangleMap.current.set(indexAsUnsorted, indexAsSorted);
+                demangleMap.current.set(indexAsSorted, indexAsUnsorted);
+            }
         }
 
         onRearrangedGetter()?.();
@@ -214,17 +224,17 @@ export function useRearrangeableChildren<M extends UseSortableChildInfo>({
     }, []);
 
     return {
-        //linearNavigationParameters: { navigateAbsolute, navigateRelative },
-        rearrangeableChildrenReturn: { 
-            indexMangler, 
-            indexDemangler, 
-            mangleMap, 
-            demangleMap, 
-            rearrange, 
-            shuffle, 
+        rearrangeableChildrenReturn: {
+            indexMangler,
+            indexDemangler,
+            mangleMap,
+            demangleMap,
+            rearrange,
+            shuffle,
+            reverse,
             useRearrangedChildren,
             toJsonArray
-         }
+        }
     };
 }
 

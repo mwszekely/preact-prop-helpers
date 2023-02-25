@@ -52,7 +52,7 @@ export const DemoUseRovingTabIndex = memo(() => {
         singleSelectionReturn: { changeSelectedIndex },
         managedChildrenReturn: { getChildren },
         typeaheadNavigationReturn: { typeaheadStatus },
-        rearrangeableChildrenReturn: { useRearrangedChildren, shuffle }
+        rearrangeableChildrenReturn: { useRearrangedChildren, shuffle, reverse }
         //        rearrangeableChildrenReturn: { useRearrangedChildren: useSortableProps, shuffle }
     } = r;
     //useSingleSelectionDeclarative({ singleSelectionReturn: {  changeSelectedIndex }, singleSelectionDeclarativeParameters: { selectedIndex } });
@@ -92,6 +92,7 @@ export const DemoUseRovingTabIndex = memo(() => {
 
             <label># of items<input type="number" value={count} min={0} onInput={e => { e.preventDefault(); setCount(e.currentTarget.valueAsNumber) }} /></label>
             <button onClick={() => shuffle(children)}>Shuffle</button>
+            <button onClick={() => reverse(children)}>Reverse</button>
             <label>Imperatively set the tabbable index to: <input type="number" onInput={e => { e.preventDefault(); setTabbableIndex(e.currentTarget.valueAsNumber, e, false); }} /></label>
             <label>Imperatively set the selected index to: <input type="number" onInput={e => { e.preventDefault(); changeSelectedIndex(e.currentTarget.valueAsNumber); }} /></label>
             <label>Pagination window starts at: <input type="number" value={min ?? undefined} min={0} max={max ?? undefined} onInput={e => { e.preventDefault(); setMin(e.currentTarget.valueAsNumber); }} /></label>
@@ -104,7 +105,7 @@ export const DemoUseRovingTabIndex = memo(() => {
 
             <SelectionModeContext.Provider value={selectionMode}>
                 <ListNavigationSingleSelectionChildContext.Provider value={context}>
-                    <ol {...props}>{useRearrangedChildren(jsxChildren)}</ol>
+                    <ol start={0} {...props}>{useRearrangedChildren(jsxChildren)}</ol>
                 </ListNavigationSingleSelectionChildContext.Provider>
             </SelectionModeContext.Provider>
             {<div>Typeahead status: {typeaheadStatus}</div>}
@@ -119,8 +120,9 @@ interface CustomInfoType extends UseCompleteListNavigationChildInfo<HTMLLIElemen
 const SelectionModeContext = createContext("focus" as "focus" | "activation");
 const _Prefix = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
-    if (index == 4)
-        return null;
+    // FIXME: A hole in the array works for nagivation but not for sorting.
+    //if (index == 1)
+    //    return <li>(Item #${index} isn't rendered; it's a hole in the array)</li>;
 
     const selectionMode = useContext(SelectionModeContext);
     let disabled = (index == 6);
@@ -128,11 +130,9 @@ const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
     if (index == 8) {
         disabled = hidden = true;
     }
-    const [randomWord] = useState(() => RandomWords[index/*Math.floor(Math.random() * (RandomWords.length - 1))*/]);
+    const [randomWord] = useState(() => RandomWords[index]);
     const context = useContext(ListNavigationSingleSelectionChildContext) as CompleteListNavigationContext<HTMLOListElement, HTMLLIElement, CustomInfoType>;
     const focusSelf = useCallback((e: HTMLElement) => { e.focus() }, []);
-    // const { refElementReturn } = useRefElement<HTMLLIElement>({ refElementParameters: { onElementChange: undefined } });
-    //const { getElement, propsStable: p3 } = refElementReturn;
 
     const getSortValue = useStableCallback(() => index);
 
@@ -162,54 +162,6 @@ const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
     const props2 = useMergedProps(props, pressReturn.propsUnstable);
 
     const text = `${randomWord} This is item #${index} (offset: ${selectedOffset}) ${hidden ? " (hidden)" : ""}${disabled ? " (disabled)" : ""}${selected ? " (selected)" : " (not selected)"} (${tabbable ? "Tabbable" : "Not tabbable"})`;
-
-    /*
-        const {
-            hasCurrentFocusParameters: { onCurrentFocusedInnerChanged, ...void5 },
-            managedChildParameters: { getSelected, selected, setSelected, ...void4 },
-            pressParameters: { onPressSync, ...void3 },
-            rovingTabIndexChildReturn: { setTabbable, getTabbable, propsUnstable: p2, tabbable, ...void2 },
-            singleSelectionChildReturn: { propsUnstable: p4, ...void1 },
-            ...void6
-        } = useListNavigationSingleSelectionChild<HTMLLIElement>({
-            managedChildParameters: { hidden, index, disabled },
-            rovingTabIndexChildParameters: rovingTabIndexChildParameters,
-            rovingTabIndexReturn,
-            singleSelectionChildParameters: { ariaPropName: "aria-selected", selectionMode },
-            singleSelectionReturn,
-            typeaheadNavigationChildParameters: { text, ...typeaheadNavigationChildParameters }
-        });
-    
-        const {
-            pressReturn: { propsStable: p5 }
-        } = usePress<HTMLLIElement>({
-            pressParameters: { exclude: {}, focusSelf, onPressSync, onPseudoActiveStart: null, onPseudoActiveStop: null },
-            refElementReturn
-        })
-    
-        useManagedChild<UseListNavigationSingleSelectionChildInfo<HTMLLIElement>>({
-            managedChildParameters: { index, focusSelf, getElement, getSelected, getTabbable, hidden, selected, setSelected, setTabbable, tabbable, disabled },
-            managedChildrenReturn
-        });
-    
-        assertEmptyObject(void1);
-        assertEmptyObject(void2);
-        assertEmptyObject(void3);
-        assertEmptyObject(void4);
-        assertEmptyObject(void5);
-        assertEmptyObject(void6);
-    
-        const {
-            hasCurrentFocusReturn: { propsStable: p6 }
-        } = useHasCurrentFocus({
-            refElementReturn,
-            hasCurrentFocusParameters: {
-                onCurrentFocusedChanged: null,
-                onCurrentFocusedInnerChanged
-            }
-        });
-    
-        const props = useMergedProps<HTMLLIElement>(p2, p3, p4, p5, p6);*/
 
     return (
         <li {...props2} style={{ opacity: hideBecausePaginated ? 0.25 : 1, transform: `translateX(${hideBecauseStaggered ? "50%" : "0%"})` }}>{text}<input {...useMergedProps(p2, { type: "number" }) as any} style={{ width: "5ch" }} /></li>
