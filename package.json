@@ -11,9 +11,7 @@
     ".": {
       "types": "./dist/index.d.ts",
       "browser": "./dist/index.js",
-      "umd": "./dist/index.js",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
+      "import": "./dist/index.js"
     },
     "./package.json": "./package.json"
   },
