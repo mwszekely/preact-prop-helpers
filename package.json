@@ -15,6 +15,7 @@
     },
     "./package.json": "./package.json"
   },
+  "typings": "./dist/index.d.ts",
   "scripts": {
     "build": "npx npm-run-all --npm-path npm -pc clean build:*",
     "watch": "npx npm-run-all --npm-path npm -pc clean watch:*",
