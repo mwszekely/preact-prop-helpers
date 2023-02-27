@@ -44,7 +44,7 @@ export { useAsync, UseAsyncParameters, UseAsyncReturnType } from "./preact-exten
 export { useEffectDebug } from "./preact-extensions/use-effect-debug.js";
 export { useForceUpdate } from "./preact-extensions/use-force-update.js";
 export { useLayoutEffectDebug } from "./preact-extensions/use-layout-effect-debug.js";
-export { assertEmptyObject, ChildFlagOperations, ManagedChildInfo, ManagedChildren, OnAfterChildLayoutEffect, OnChildrenMountChange, useChildrenFlag, UseChildrenFlagParameters, UseChildrenFlagReturnType, useManagedChild, UseManagedChildParameters, useManagedChildren, UseManagedChildrenContext, UseManagedChildrenParameters, UseManagedChildrenReturnType, UseManagedChildReturnType } from "./preact-extensions/use-managed-children.js";
+export { ChildFlagOperations, ManagedChildInfo, ManagedChildren, OnAfterChildLayoutEffect, OnChildrenMountChange, useChildrenFlag, UseChildrenFlagParameters, UseChildrenFlagReturnType, useManagedChild, UseManagedChildParameters, useManagedChildren, UseManagedChildrenContext, UseManagedChildrenParameters, UseManagedChildrenReturnType, UseManagedChildReturnType } from "./preact-extensions/use-managed-children.js";
 export { debounceRendering, OnPassiveStateChange, PassiveStateUpdater, returnFalse, returnNull, returnTrue, returnUndefined, returnZero, runImmediately, useEnsureStability, usePassiveState } from "./preact-extensions/use-passive-state.js";
 export { getFromLocalStorage, PersistentStates, storeToLocalStorage, usePersistentState } from "./preact-extensions/use-persistent-state.js";
 export { useStableCallback } from "./preact-extensions/use-stable-callback.js";
@@ -54,4 +54,6 @@ export { useWhatCausedRender } from "./preact-extensions/use-what-caused-render.
 export { ProvideBatchedAnimationFrames, useAnimationFrame, UseAnimationFrameParameters } from "./timing/use-animation-frame.js";
 export { useInterval, UseIntervalParameters } from "./timing/use-interval.js";
 export { useTimeout, UseTimeoutParameters } from "./timing/use-timeout.js";
+export { assertEmptyObject } from "./util/assert.js";
+export { getBuildMode } from "./util/mode.js";
 

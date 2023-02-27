@@ -8,16 +8,6 @@ export interface UseManagedChildrenContext<M extends ManagedChildInfo<any>> {
     };
 }
 /**
- * Does nothing at runtime -- type checking only.
- *
- * Throws a (Typescript compiler) error if the passed object is anything but the empty object {}.
- *
- * Use this to ensure that your spread operators work correctly and cover all cases.
- *
- * @param _a The remaining spread parameters of a given object that you expect to be empty (because you properly accounted for all the properties that exist in it, and want to ensure it stays that way)
- */
-export declare function assertEmptyObject<T extends {}>(_a: [keyof T] extends [never] ? T : `Unhandled keys in this rest spread object!`): void;
-/**
  * Information that children and parents use to communicate with each other.
  *
  * * `index` refers to which child this is.
@@ -29,24 +19,23 @@ export interface ManagedChildInfo<T extends string | number> {
 }
 export type OnChildrenMountChange<T extends string | number> = ((mounted: Set<T>, unmounted: Set<T>) => void);
 export type OnAfterChildLayoutEffect<T extends string | number> = ((causers: Iterable<T>) => void);
-interface MCP<T extends number | string> {
-    /**
-     * Runs after one or more children have updated their information (index, etc.).
-     *
-     * Only one will run per tick, just like layoutEffect, but it isn't
-     * *guaranteed* to have actually been a change.
-     *
-     * TODO: This ended up not being needed by anything. Is it necessary? Does it cost anything?
-     */
-    onAfterChildLayoutEffect?: null | undefined | OnAfterChildLayoutEffect<T>;
-    /**
-     * Same as the above, but only for mount/unmount (or when a child changes its index)
-     */
-    onChildrenMountChange?: null | undefined | OnChildrenMountChange<T>;
-    onChildCountChange?: null | undefined | ((count: number) => void);
-}
 export interface UseManagedChildrenParameters<M extends ManagedChildInfo<any>> {
-    managedChildrenParameters: MCP<M["index"]>;
+    managedChildrenParameters: {
+        /**
+         * Runs after one or more children have updated their information (index, etc.).
+         *
+         * Only one will run per tick, just like layoutEffect, but it isn't
+         * *guaranteed* to have actually been a change.
+         *
+         * TODO: This ended up not being needed by anything. Is it necessary? Does it cost anything?
+         */
+        onAfterChildLayoutEffect?: null | undefined | OnAfterChildLayoutEffect<M["index"]>;
+        /**
+         * Same as the above, but only for mount/unmount (or when a child changes its index)
+         */
+        onChildrenMountChange?: null | undefined | OnChildrenMountChange<M["index"]>;
+        onChildCountChange?: null | undefined | ((count: number) => void);
+    };
 }
 export interface UseManagedChildParameters<M extends ManagedChildInfo<any>> {
     managedChildParameters: Pick<M, "index">;

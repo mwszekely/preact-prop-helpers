@@ -1,8 +1,7 @@
-import { assertEmptyObject } from "../preact-extensions/use-managed-children.js";
+import { assertEmptyObject } from "../util/assert.js";
+import { OmitStrong } from "../util/types.js";
 import { useListNavigationSingleSelection, useListNavigationSingleSelectionChild, UseListNavigationSingleSelectionChildInfo, UseListNavigationSingleSelectionChildParameters, UseListNavigationSingleSelectionChildReturnType, UseListNavigationSingleSelectionParameters, UseListNavigationSingleSelectionReturnType } from "./use-list-navigation-single-selection.js";
 import { UseSortableChildInfo, useSortableChildren, UseSortableChildrenParameters, UseSortableChildrenReturnType } from "./use-sortable-children.js";
-
-type OmitStrong<T, K extends keyof T> = Omit<T, K>
 
 /**
  * We're just gluing together the single selection list navigation and sortable children hooks,

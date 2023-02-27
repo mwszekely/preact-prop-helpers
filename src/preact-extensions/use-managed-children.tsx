@@ -1,5 +1,5 @@
-import { noop } from "lodash-es";
 import { useCallback, useLayoutEffect, useRef } from "preact/hooks";
+import { assertEmptyObject } from "../util/assert.js";
 import { debounceRendering, OnPassiveStateChange, PassiveStateUpdater, useEnsureStability, usePassiveState } from "./use-passive-state.js";
 import { useStableCallback } from "./use-stable-callback.js";
 import { useStableObject } from "./use-stable-getter.js";
@@ -39,18 +39,6 @@ export interface UseManagedChildrenContext<M extends ManagedChildInfo<any>> {
 }
 
 
-/**
- * Does nothing at runtime -- type checking only.
- * 
- * Throws a (Typescript compiler) error if the passed object is anything but the empty object {}.
- * 
- * Use this to ensure that your spread operators work correctly and cover all cases.
- * 
- * @param _a The remaining spread parameters of a given object that you expect to be empty (because you properly accounted for all the properties that exist in it, and want to ensure it stays that way)
- */
-export function assertEmptyObject<T extends {}>(_a: [keyof T] extends [never] ? T : `Unhandled keys in this rest spread object!`): void { }
-
-
 
 /**
  * Information that children and parents use to communicate with each other.
@@ -61,8 +49,6 @@ export function assertEmptyObject<T extends {}>(_a: [keyof T] extends [never] ? 
  */
 export interface ManagedChildInfo<T extends string | number> {
     index: T;
-    //flags: Partial<Record<K, ChildFlagOperations>>;
-    //subInfo: MCSubInfo;
 }
 
 
@@ -70,27 +56,26 @@ export interface ManagedChildInfo<T extends string | number> {
 export type OnChildrenMountChange<T extends string | number> = ((mounted: Set<T>, unmounted: Set<T>) => void);
 export type OnAfterChildLayoutEffect<T extends string | number> = ((causers: Iterable<T>) => void);
 
-interface MCP<T extends number | string> {
-    /**
-     * Runs after one or more children have updated their information (index, etc.).
-     * 
-     * Only one will run per tick, just like layoutEffect, but it isn't
-     * *guaranteed* to have actually been a change.
-     * 
-     * TODO: This ended up not being needed by anything. Is it necessary? Does it cost anything?
-     */
-    onAfterChildLayoutEffect?: null | undefined | OnAfterChildLayoutEffect<T>;
-
-    /**
-     * Same as the above, but only for mount/unmount (or when a child changes its index)
-     */
-    onChildrenMountChange?: null | undefined | OnChildrenMountChange<T>;
-
-    onChildCountChange?: null | undefined | ((count: number) => void);
-}
 
 export interface UseManagedChildrenParameters<M extends ManagedChildInfo<any>> {
-    managedChildrenParameters: MCP<M["index"]>;
+    managedChildrenParameters: {
+        /**
+         * Runs after one or more children have updated their information (index, etc.).
+         * 
+         * Only one will run per tick, just like layoutEffect, but it isn't
+         * *guaranteed* to have actually been a change.
+         * 
+         * TODO: This ended up not being needed by anything. Is it necessary? Does it cost anything?
+         */
+        onAfterChildLayoutEffect?: null | undefined | OnAfterChildLayoutEffect<M["index"]>;
+    
+        /**
+         * Same as the above, but only for mount/unmount (or when a child changes its index)
+         */
+        onChildrenMountChange?: null | undefined | OnChildrenMountChange<M["index"]>;
+    
+        onChildCountChange?: null | undefined | ((count: number) => void);
+    }
 }
 
 // MCSubInfo contains the entirety of the saved data for this child.  All of it. Even types the user will never be able to pass in because they're internally derived.
@@ -133,12 +118,6 @@ export interface UseManagedChildReturnType<M extends ManagedChildInfo<any>> {
         getChildren(): ManagedChildren<M>;
     }
 }
-
-//export type UseManagedChild<M extends ManagedChildInfo<any>> = (a: UseManagedChildParameters<M>) => UseManagedChildReturnType<M>;
-
-
-
-
 
 
 /**

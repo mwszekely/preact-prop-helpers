@@ -1,9 +1,10 @@
 import { useCallback, useEffect } from "preact/hooks";
-import { assertEmptyObject, useChildrenFlag } from "../preact-extensions/use-managed-children.js";
+import { useChildrenFlag } from "../preact-extensions/use-managed-children.js";
 import { usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useStableGetter, useStableObject } from "../preact-extensions/use-stable-getter.js";
 import { useState } from "../preact-extensions/use-state.js";
+import { assertEmptyObject } from "../util/assert.js";
 /**
  * Implements a roving tabindex system where only one "focusable"
  * component in a set is able to receive a tab focus. *Which*
@@ -36,7 +37,6 @@ import { useState } from "../preact-extensions/use-state.js";
 export function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovingTabIndexParameters: { untabbable, initiallyTabbedIndex, onTabbableIndexChange }, ..._void1 }) {
     assertEmptyObject(_void1);
     const getUntabbable = useStableGetter(untabbable);
-    //initiallyTabbedIndex ??= 0;
     // Override the actual setter to include some extra logic related to avoiding hidden children, 
     // what to do when we're untabbable, what to do when we're tabbable but given `null`, etc.
     const setTabbableIndex = useStableCallback((updater, reason, fromUserInteraction) => {

@@ -62,8 +62,6 @@ export interface UseRovingTabIndexReturnType<TabbableChildElement extends Elemen
     rovingTabIndexChildContext: UseRovingTabIndexChildParameters<TabbableChildElement>["rovingTabIndexChildContext"];
     /**
      * Return information that lets the user update/query/focus the currently tabbable child
-     *
-     *
      */
     rovingTabIndexReturn: {
         /** **STABLE** */

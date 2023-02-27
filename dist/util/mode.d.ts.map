@@ -1,0 +1,1 @@
+{"version":3,"file":"mode.d.ts","sourceRoot":"","sources":["../../src/util/mode.tsx"],"names":[],"mappings":"AAEA,OAAO,CAAC,MAAM,CAAC;IACX,MAAM,OAAO,EAAE;QAAE,GAAG,EAAE;YAAE,QAAQ,CAAC,EAAE,MAAM,GAAG,SAAS,CAAA;SAAE,GAAG,SAAS,CAAA;KAAE,GAAG,SAAS,CAAC;CACrF;AAED,iBAAS,sBAAsB,iCAS9B;AAED,eAAO,MAAM,YAAY,+BAAmE,CAAC"}

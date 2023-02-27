@@ -1,6 +1,6 @@
+import { OmitStrong } from "../util/types.js";
 import { UseListNavigationChildInfo, UseListNavigationChildParameters, UseListNavigationChildReturnType, UseListNavigationParameters, UseListNavigationReturnType } from "./use-list-navigation-partial.js";
 import { SelectableChildInfo, UseSingleSelectionChildParameters, UseSingleSelectionChildReturnType, UseSingleSelectionParameters, UseSingleSelectionReturnType } from "./use-single-selection.js";
-type OmitStrong<T, K extends keyof T> = Omit<T, K>;
 export interface UseListNavigationSingleSelectionChildInfo<TabbableChildElement extends Element> extends UseListNavigationChildInfo<TabbableChildElement>, SelectableChildInfo<TabbableChildElement> {
 }
 export interface UseListNavigationSingleSelectionParameters<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationSingleSelectionChildInfo<ChildElement>> extends UseListNavigationParameters<ParentOrChildElement, ChildElement, M>, OmitStrong<UseSingleSelectionParameters<ChildElement>, "rovingTabIndexReturn"> {
@@ -16,5 +16,4 @@ export interface UseListNavigationSingleSelectionChildReturnType<ChildElement ex
     pressParameters: UseListNavigationChildReturnType<ChildElement>["pressParameters"] & UseSingleSelectionChildReturnType<ChildElement>["pressParameters"];
 }
 export declare function useListNavigationSingleSelectionChild<ChildElement extends Element>({ managedChildParameters: { index, ..._void5 }, rovingTabIndexChildParameters: { hidden, ...void7 }, singleSelectionChildParameters, singleSelectionContext, rovingTabIndexChildContext, typeaheadNavigationChildContext, refElementReturn, textContentParameters, ..._void1 }: UseListNavigationSingleSelectionChildParameters<ChildElement>): UseListNavigationSingleSelectionChildReturnType<ChildElement>;
-export {};
 //# sourceMappingURL=use-list-navigation-single-selection.d.ts.map

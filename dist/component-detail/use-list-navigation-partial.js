@@ -1,4 +1,4 @@
-import { assertEmptyObject } from "../preact-extensions/use-managed-children.js";
+import { assertEmptyObject } from "../util/assert.js";
 import { useLinearNavigation } from "./use-linear-navigation.js";
 import { useRovingTabIndex, useRovingTabIndexChild } from "./use-roving-tabindex.js";
 import { useTypeaheadNavigation, useTypeaheadNavigationChild } from "./use-typeahead-navigation.js";
@@ -58,13 +58,10 @@ export function useListNavigation({ linearNavigationParameters, typeaheadNavigat
         ...rtir
     };
 }
-export function useListNavigationChild({ rovingTabIndexChildParameters, rovingTabIndexChildContext, typeaheadNavigationChildContext, 
-//typeaheadNavigationChildParameters,
-managedChildParameters, refElementReturn, textContentParameters, ..._void2 }) {
+export function useListNavigationChild({ rovingTabIndexChildParameters, rovingTabIndexChildContext, typeaheadNavigationChildContext, managedChildParameters, refElementReturn, textContentParameters, ..._void2 }) {
     const rticr = useRovingTabIndexChild({ rovingTabIndexChildContext, rovingTabIndexChildParameters, managedChildParameters });
     const tncr = useTypeaheadNavigationChild({ refElementReturn, typeaheadNavigationChildContext, managedChildParameters, textContentParameters });
     assertEmptyObject(_void2);
-    //    assertEmptyObject(_void5);
     return {
         ...tncr,
         ...rticr

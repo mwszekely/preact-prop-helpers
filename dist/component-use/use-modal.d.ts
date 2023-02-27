@@ -1,7 +1,7 @@
 import { h } from "preact";
 import { DismissListenerTypes, UseDismissParameters, UseDismissReturnType } from "../component-detail/use-dismiss.js";
 import { UseFocusTrapParameters, UseFocusTrapReturnType } from "../component-detail/use-focus-trap.js";
-type OmitStrong<T, K extends keyof T> = Omit<T, K>;
+import { OmitStrong } from "../util/types.js";
 export interface UseModalParameters<Listeners extends DismissListenerTypes> extends UseDismissParameters<Listeners> {
     focusTrapParameters: UseFocusTrapParameters<any, any>["focusTrapParameters"];
 }
@@ -22,5 +22,4 @@ export interface UseModalReturnType<FocusContainerElement extends Element | null
  * @returns
  */
 export declare function useModal<Listeners extends DismissListenerTypes, FocusContainerElement extends Element | null, SourceElement extends Element | null, PopupElement extends Element>({ dismissParameters, escapeDismissParameters, focusTrapParameters: { trapActive, ...focusTrapParameters } }: UseModalParameters<Listeners>): UseModalReturnType<FocusContainerElement, SourceElement, PopupElement>;
-export {};
 //# sourceMappingURL=use-modal.d.ts.map

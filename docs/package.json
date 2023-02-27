@@ -4,12 +4,11 @@
     "type": "module",
     "description": "Demo page for preact-prop-helpers",
     "main": "index.tsx",
-    "packageManager": "pnpm@7.26.2",
+    "packageManager": "pnpm@7.28.0",
     "scripts": {
         "watch": "rollup --config rollup.config.mjs --watch --no-watch.clearScreen",
         "build": "rollup --config rollup.config.mjs",
-        "test": "echo \"Error: no test specified\" && exit 1",
-        "install": "npm run build"
+        "test": "echo \"Error: no test specified\" && exit 1"
     },
     "author": "",
     "license": "ISC",
@@ -30,6 +29,6 @@
         "clsx": "^1.2.1",
         "lodash-es": "^4.17.21",
         "preact": "^10.13.0",
-        "tslib": "^2.4.1"
+        "tslib": "^2.5.0"
     }
 }

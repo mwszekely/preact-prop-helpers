@@ -1,4 +1,4 @@
-import { assertEmptyObject } from "../preact-extensions/use-managed-children.js";
+import { assertEmptyObject } from "../util/assert.js";
 import { useListNavigationSingleSelection, useListNavigationSingleSelectionChild } from "./use-list-navigation-single-selection.js";
 import { useSortableChildren } from "./use-sortable-children.js";
 /**

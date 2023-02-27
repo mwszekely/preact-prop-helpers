@@ -1,8 +1,7 @@
 import { useAsync, UseAsyncParameters, UseAsyncReturnType } from "../preact-extensions/use-async.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useState } from "../preact-extensions/use-state.js";
-
-type OmitStrong<T, K extends keyof T> = Omit<T, K>
+import { OmitStrong } from "../util/types.js";
 
 export type AsyncHandler<EventType, CaptureType> = ((c: CaptureType, e: EventType) => (Promise<void> | void));
 

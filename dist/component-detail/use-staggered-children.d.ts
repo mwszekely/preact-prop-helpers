@@ -50,7 +50,7 @@ export interface UseStaggeredChildReturn<ChildElement extends Element> {
          * If this is true, you should delay showing *your* children or running other heavy logic until this becomes false.
          *
          * Can be as simple as `<div>{hideBecauseStaggered? null : children}</div>`
-         *  */
+         */
         hideBecauseStaggered: boolean;
     };
     managedChildParameters: Pick<UseStaggeredChildrenInfo<ChildElement>, "setParentIsStaggered" | "setStaggeredVisible">;

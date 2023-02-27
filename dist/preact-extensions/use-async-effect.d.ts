@@ -1,6 +1,6 @@
 import { Inputs } from "preact/hooks";
+import { OmitStrong } from "../util/types.js";
 import { UseAsyncParameters } from "./use-async.js";
-type OmitStrong<T, K extends keyof T> = Omit<T, K>;
 /**
  * Combines the semantics of `useAsync` and `useEffect`.
  *
@@ -26,5 +26,4 @@ export declare function useAsyncEffect<I extends Inputs>(effect: () => Promise<(
     invocationResult: "sync" | "async" | "throw" | null;
     flushDebouncedPromise: () => void;
 };
-export {};
 //# sourceMappingURL=use-async-effect.d.ts.map

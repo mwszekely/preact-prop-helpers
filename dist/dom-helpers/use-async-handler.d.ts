@@ -1,5 +1,5 @@
 import { UseAsyncParameters, UseAsyncReturnType } from "../preact-extensions/use-async.js";
-type OmitStrong<T, K extends keyof T> = Omit<T, K>;
+import { OmitStrong } from "../util/types.js";
 export type AsyncHandler<EventType, CaptureType> = ((c: CaptureType, e: EventType) => (Promise<void> | void));
 export interface UseAsyncHandlerParameters<EventType, CaptureType> extends OmitStrong<UseAsyncParameters<[CaptureType, EventType], [EventType]>, "capture"> {
     /**
@@ -99,5 +99,4 @@ export interface UseAsyncHandlerReturnType<EventType, CaptureType> extends UseAs
  * @see useAsync A more general version of this hook that can work with any type of handler, not just DOM event handlers.
  */
 export declare function useAsyncHandler<EventType, CaptureType>({ asyncHandler, capture: originalCapture, ...restAsyncOptions }: UseAsyncHandlerParameters<EventType, CaptureType>): UseAsyncHandlerReturnType<EventType, CaptureType>;
-export {};
 //# sourceMappingURL=use-async-handler.d.ts.map

@@ -43,7 +43,6 @@ export function useStaggeredChildren({ managedChildrenReturn: { getChildren }, s
             setDisplayedStaggerIndex(c => Math.min(newIndex ?? 0, (c ?? 0) + 1));
         }
     }, [ /* Must be empty */]), returnNull);
-    //const [getTimeoutHandle, setTimeoutHandle] = usePassiveState<number | null, Event>(null, returnNull);
     const [getDisplayedStaggerIndex, setDisplayedStaggerIndex] = usePassiveState(useCallback((newIndex, prevIndex) => {
         if (newIndex == null) {
             return;
@@ -60,10 +59,6 @@ export function useStaggeredChildren({ managedChildrenReturn: { getChildren }, s
         }
         // Set a new emergency timeout
         resetEmergencyTimeout();
-        /*if (newIndex < targetIndex) {
-            const handle = setTimeout(() => { setDisplayedStaggerIndex(c => (c ?? 0) + 1); }, staggerDelay ?? 50);
-            return clearTimeout(handle);
-        }*/
     }, [ /* Must be empty */]), returnNull);
     const parentIsStaggered = (!!staggered);
     const childCallsThisToTellTheParentToMountTheNextOne = useCallback((index) => {
@@ -71,8 +66,6 @@ export function useStaggeredChildren({ managedChildrenReturn: { getChildren }, s
     }, []);
     useLayoutEffect(() => {
         getChildren().forEach(child => child.setParentIsStaggered(parentIsStaggered));
-        //if (parentIsStaggered)
-        //    childCallsThisToTellTheParentToMountTheNextOne(-1);
     }, [parentIsStaggered]);
     const childCallsThisToTellTheParentTheHighestIndex = useCallback((mountedIndex) => {
         setTargetStaggerIndex(i => Math.max((i ?? 0), 1 + mountedIndex));

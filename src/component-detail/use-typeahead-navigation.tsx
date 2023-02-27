@@ -3,20 +3,17 @@ import { h } from "preact";
 import { useCallback, useLayoutEffect, useRef } from "preact/hooks";
 import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
 import { UseTextContentParameters, UseTextContentReturnType, useTextContent } from "../dom-helpers/use-text-content.js";
-import { assertEmptyObject } from "../preact-extensions/use-managed-children.js";
 import { OnPassiveStateChange, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useStableGetter, useStableObject } from "../preact-extensions/use-stable-getter.js";
 import { useState } from "../preact-extensions/use-state.js";
 import { UseRovingTabIndexChildParameters, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
-
-
+import { assertEmptyObject } from "../util/assert.js";
 
 export interface UseTypeaheadNavigationReturnType<ParentOrChildElement extends Element> {
     typeaheadNavigationReturn: {
         getCurrentTypeahead(): string | null;
         typeaheadStatus: "invalid" | "valid" | "none";
-        //invalidTypeahead: boolean | null;
         propsStable: h.JSX.HTMLAttributes<ParentOrChildElement>;
     }
     typeaheadNavigationChildContext: UseTypeaheadNavigationContext;
@@ -30,9 +27,6 @@ export interface UseTypeaheadNavigationContext {
         insertingComparator: (lhs: string | null, rhs: TypeaheadInfo) => number;
     }
 }
-
-
-
 
 export interface UseTypeaheadNavigationParameters<TabbableChildElement extends Element> {
     typeaheadNavigationParameters: {
@@ -60,23 +54,11 @@ export interface UseTypeaheadNavigationParameters<TabbableChildElement extends E
     rovingTabIndexReturn: Pick<UseRovingTabIndexReturnType<TabbableChildElement>["rovingTabIndexReturn"], "getTabbableIndex" | "setTabbableIndex">
 }
 
-/** Arguments passed to the child 'useTypeaheadNavigationChild` */
-
-
+/** Arguments passed to the child `useTypeaheadNavigationChild` */
 export interface UseTypeaheadNavigationChildParameters<ChildElement extends Element> {
     managedChildParameters: Pick<UseRovingTabIndexChildParameters<ChildElement>["managedChildParameters"], "index">;
-
     textContentParameters: Pick<UseTextContentParameters<ChildElement>["textContentParameters"], "getText" | "hidden">;
-
-    //typeaheadNavigationChildParameters: {
-
-    //getText(element: Element | null): string;
-
-    //hidden: boolean;
-    //}
-
     refElementReturn: Pick<UseRefElementReturnType<ChildElement>["refElementReturn"], "getElement">;
-
     typeaheadNavigationChildContext: UseTypeaheadNavigationContext
 }
 
@@ -225,11 +207,6 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
         onCompositionEnd: useStableCallback((_e: CompositionEvent) => { setImeActive(true) }),
     });
 
-    // Handle changes in typeahead that cause changes to the tabbable index
-    /* useEffect(() => {
-         
-     }, [currentTypeahead]);*/
-
     const excludeSpace = useStableCallback(() => { return typeaheadStatus != "none" });
 
     return {
@@ -344,7 +321,6 @@ export function useTypeaheadNavigationChild<ChildElement extends Element>({
     textContentParameters: { getText, hidden, ...void5 },
     typeaheadNavigationChildContext: { typeaheadNavigationChildParameters: { sortedTypeaheadInfo, insertingComparator, excludeSpace, ...void2 } },
     refElementReturn: { getElement, ...void3 },
-    //typeaheadNavigationChildParameters: { ...void5 },
     ...void4
 }: UseTypeaheadNavigationChildParameters<ChildElement>): UseTypeaheadNavigationChildReturnType {
 

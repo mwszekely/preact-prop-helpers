@@ -2,9 +2,8 @@ import { h } from "preact";
 import { useCallback, useRef } from "preact/hooks";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useStableGetter } from "../preact-extensions/use-stable-getter.js";
+import { OmitStrong } from "../util/types.js";
 import { UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
-
-type OmitStrong<T, K extends keyof T> = Omit<T, K>
 
 /*
 export function useLinearNavigationProps<E extends Element>(r: UseLinearNavigationReturnTypeInfo<E>, ...otherProps: h.JSX.HTMLAttributes<E>[]): h.JSX.HTMLAttributes<E>[] {

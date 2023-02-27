@@ -1,12 +1,7 @@
-import { assertEmptyObject } from "../preact-extensions/use-managed-children.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
+import { assertEmptyObject } from "../util/assert.js";
 import { useListNavigation, useListNavigationChild } from "./use-list-navigation-partial.js";
 import { useSingleSelection, useSingleSelectionChild } from "./use-single-selection.js";
-/**
- * We're just gluing together the list navigation and single selection hooks,
- * since they're so commonly paired together. Also see the one that includes sorting.
- */
-const _dummy = 0;
 export function useListNavigationSingleSelection({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, managedChildrenReturn, ..._void3 }) {
     const lnr = useListNavigation({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, managedChildrenReturn });
     const { rovingTabIndexReturn } = lnr;

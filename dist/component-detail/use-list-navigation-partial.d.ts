@@ -1,7 +1,7 @@
+import { OmitStrong } from "../util/types.js";
 import { UseLinearNavigationParameters, UseLinearNavigationReturnType } from "./use-linear-navigation.js";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexChildParameters, UseRovingTabIndexChildReturnType, UseRovingTabIndexParameters, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
 import { UseTypeaheadNavigationChildParameters, UseTypeaheadNavigationChildReturnType, UseTypeaheadNavigationParameters, UseTypeaheadNavigationReturnType } from "./use-typeahead-navigation.js";
-type OmitStrong<T, K extends keyof T> = Omit<T, K>;
 export interface UseListNavigationChildInfo<TabbableChildElement extends Element> extends UseRovingTabIndexChildInfo<TabbableChildElement> {
     _e?: TabbableChildElement;
 }
@@ -26,5 +26,4 @@ export type UseListNavigationChild<ChildElement extends Element> = (a: UseListNa
  */
 export declare function useListNavigation<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationChildInfo<ChildElement>>({ linearNavigationParameters, typeaheadNavigationParameters, rovingTabIndexParameters, managedChildrenReturn, ..._void1 }: UseListNavigationParameters<ParentOrChildElement, ChildElement, M>): UseListNavigationReturnType<ParentOrChildElement, ChildElement>;
 export declare function useListNavigationChild<ChildElement extends Element>({ rovingTabIndexChildParameters, rovingTabIndexChildContext, typeaheadNavigationChildContext, managedChildParameters, refElementReturn, textContentParameters, ..._void2 }: UseListNavigationChildParameters<ChildElement>): UseListNavigationChildReturnType<ChildElement>;
-export {};
 //# sourceMappingURL=use-list-navigation-partial.d.ts.map

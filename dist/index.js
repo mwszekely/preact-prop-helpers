@@ -44,7 +44,7 @@ export { useAsync } from "./preact-extensions/use-async.js";
 export { useEffectDebug } from "./preact-extensions/use-effect-debug.js";
 export { useForceUpdate } from "./preact-extensions/use-force-update.js";
 export { useLayoutEffectDebug } from "./preact-extensions/use-layout-effect-debug.js";
-export { assertEmptyObject, useChildrenFlag, useManagedChild, useManagedChildren } from "./preact-extensions/use-managed-children.js";
+export { useChildrenFlag, useManagedChild, useManagedChildren } from "./preact-extensions/use-managed-children.js";
 export { debounceRendering, returnFalse, returnNull, returnTrue, returnUndefined, returnZero, runImmediately, useEnsureStability, usePassiveState } from "./preact-extensions/use-passive-state.js";
 export { getFromLocalStorage, storeToLocalStorage, usePersistentState } from "./preact-extensions/use-persistent-state.js";
 export { useStableCallback } from "./preact-extensions/use-stable-callback.js";
@@ -54,4 +54,6 @@ export { useWhatCausedRender } from "./preact-extensions/use-what-caused-render.
 export { ProvideBatchedAnimationFrames, useAnimationFrame } from "./timing/use-animation-frame.js";
 export { useInterval } from "./timing/use-interval.js";
 export { useTimeout } from "./timing/use-timeout.js";
+export { assertEmptyObject } from "./util/assert.js";
+export { getBuildMode } from "./util/mode.js";
 //# sourceMappingURL=index.js.map

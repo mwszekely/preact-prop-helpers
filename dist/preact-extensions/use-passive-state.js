@@ -1,5 +1,6 @@
 import { options } from "preact";
 import { useCallback, useLayoutEffect, useRef } from "preact/hooks";
+import { getBuildMode } from "../util/mode.js";
 /**
  * Debug hook.
  *
@@ -8,6 +9,8 @@ import { useCallback, useLayoutEffect, useRef } from "preact/hooks";
  * Eventually, when useEvent lands, we hopefully won't need this.
  */
 export function useEnsureStability(parentHookName, ...values) {
+    if (getBuildMode() == 'production')
+        return;
     const helperToEnsureStability = useRef([]);
     const shownError = useRef([]);
     useHelper(values.length, -1);

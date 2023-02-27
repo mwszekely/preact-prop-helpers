@@ -1,15 +1,8 @@
-import { assertEmptyObject } from "../preact-extensions/use-managed-children.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
+import { assertEmptyObject } from "../util/assert.js";
+import { OmitStrong } from "../util/types.js";
 import { useListNavigation, useListNavigationChild, UseListNavigationChildInfo, UseListNavigationChildParameters, UseListNavigationChildReturnType, UseListNavigationParameters, UseListNavigationReturnType } from "./use-list-navigation-partial.js";
 import { SelectableChildInfo, useSingleSelection, useSingleSelectionChild, UseSingleSelectionChildParameters, UseSingleSelectionChildReturnType, UseSingleSelectionParameters, UseSingleSelectionReturnType } from "./use-single-selection.js";
-
-type OmitStrong<T, K extends keyof T> = Omit<T, K>
-
-/**
- * We're just gluing together the list navigation and single selection hooks,
- * since they're so commonly paired together. Also see the one that includes sorting.
- */
-const _dummy = 0;
 
 export interface UseListNavigationSingleSelectionChildInfo<TabbableChildElement extends Element> extends UseListNavigationChildInfo<TabbableChildElement>, SelectableChildInfo<TabbableChildElement> { }
 

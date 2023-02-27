@@ -1,10 +1,10 @@
 import { useCallback, useLayoutEffect, useRef } from "preact/hooks";
 import { useTextContent } from "../dom-helpers/use-text-content.js";
-import { assertEmptyObject } from "../preact-extensions/use-managed-children.js";
 import { usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useStableGetter, useStableObject } from "../preact-extensions/use-stable-getter.js";
 import { useState } from "../preact-extensions/use-state.js";
+import { assertEmptyObject } from "../util/assert.js";
 /**
  * Allows for the selection of a managed child by typing the given text associated with it.
  *
@@ -111,10 +111,6 @@ export function useTypeaheadNavigation({ typeaheadNavigationParameters: { collat
         }),
         onCompositionEnd: useStableCallback((_e) => { setImeActive(true); }),
     });
-    // Handle changes in typeahead that cause changes to the tabbable index
-    /* useEffect(() => {
-         
-     }, [currentTypeahead]);*/
     const excludeSpace = useStableCallback(() => { return typeaheadStatus != "none"; });
     return {
         typeaheadNavigationChildContext: useStableObject({
@@ -201,9 +197,7 @@ export function useTypeaheadNavigation({ typeaheadNavigationParameters: { collat
         }
     }
 }
-export function useTypeaheadNavigationChild({ managedChildParameters: { index, ...void1 }, textContentParameters: { getText, hidden, ...void5 }, typeaheadNavigationChildContext: { typeaheadNavigationChildParameters: { sortedTypeaheadInfo, insertingComparator, excludeSpace, ...void2 } }, refElementReturn: { getElement, ...void3 }, 
-//typeaheadNavigationChildParameters: { ...void5 },
-...void4 }) {
+export function useTypeaheadNavigationChild({ managedChildParameters: { index, ...void1 }, textContentParameters: { getText, hidden, ...void5 }, typeaheadNavigationChildContext: { typeaheadNavigationChildParameters: { sortedTypeaheadInfo, insertingComparator, excludeSpace, ...void2 } }, refElementReturn: { getElement, ...void3 }, ...void4 }) {
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     assertEmptyObject(void3);

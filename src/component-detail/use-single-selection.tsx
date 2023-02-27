@@ -4,7 +4,7 @@ import { h } from "preact";
 import { useCallback, useEffect } from "preact/hooks";
 import { UsePressParameters } from "../component-use/use-press.js";
 import { UseChildrenHaveFocusChildReturnType, UseChildrenHaveFocusParameters } from "../observers/use-children-have-focus.js";
-import { UseManagedChildrenReturnType, useChildrenFlag } from "../preact-extensions/use-managed-children.js";
+import { useChildrenFlag, UseManagedChildrenReturnType } from "../preact-extensions/use-managed-children.js";
 import { OnPassiveStateChange, PassiveStateUpdater, useEnsureStability } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useStableGetter, useStableObject } from "../preact-extensions/use-stable-getter.js";
@@ -63,7 +63,6 @@ export interface UseSingleSelectionParameters<ChildElement extends Element> {
 }
 
 export interface UseSingleSelectionChildParameters<E extends Element> {
-    //managedChildParameters: Pick<UseManagedChildParameters<SelectableChildInfo<E>, never>["managedChildParameters"], "index" | "disabled">;
     singleSelectionContext: UseSingleSelectionReturnType<E>["singleSelectionContext"];
     singleSelectionChildParameters: {
         //onDistanceChange: null | ((distance: number) => void);
@@ -94,12 +93,7 @@ export interface UseSingleSelectionChildReturnType<E extends Element> extends Us
          */
         selectedOffset: number | null;
         getSelectedOffset: () => (number | null);
-        /**
-         * Returns the distance from this child to the selected child.
-         * 
-         * **Stable**, and can be called during render.
-         */
-        //getDistance(): number;
+        
         // Used to programmatically set this as the selected element;
         // it requests the parent to actually change the numeric index to this one's.
         setThisOneSelected: (event: Event) => void;
@@ -108,8 +102,6 @@ export interface UseSingleSelectionChildReturnType<E extends Element> extends Us
     managedChildParameters: Pick<SelectableChildInfo<E>, "setLocalSelected">;
     pressParameters: Pick<UsePressParameters<E>["pressParameters"], "onPressSync">;
 }
-
-//export interface UseSingleSelectionChildReturnTypeWithHooks<E extends Element> extends UseSingleSelectionChildReturnTypeInfo<E> {}
 
 export interface UseSingleSelectionReturnType<ChildElement extends Element> {
     singleSelectionReturn: {

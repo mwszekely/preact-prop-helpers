@@ -1,9 +1,8 @@
-import { assertEmptyObject } from "../preact-extensions/use-managed-children.js";
+import { assertEmptyObject } from "../util/assert.js";
+import { OmitStrong } from "../util/types.js";
 import { useLinearNavigation, UseLinearNavigationParameters, UseLinearNavigationReturnType } from "./use-linear-navigation.js";
 import { useRovingTabIndex, useRovingTabIndexChild, UseRovingTabIndexChildInfo, UseRovingTabIndexChildParameters, UseRovingTabIndexChildReturnType, UseRovingTabIndexParameters, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
 import { useTypeaheadNavigation, useTypeaheadNavigationChild, UseTypeaheadNavigationChildParameters, UseTypeaheadNavigationChildReturnType, UseTypeaheadNavigationParameters, UseTypeaheadNavigationReturnType } from "./use-typeahead-navigation.js";
-
-type OmitStrong<T, K extends keyof T> = Omit<T, K>
 
 /**
  * 
@@ -67,9 +66,7 @@ export interface UseListNavigationParameters<ParentOrChildElement extends Elemen
     OmitStrong<UseLinearNavigationParameters<ParentOrChildElement, ChildElement>, "rovingTabIndexReturn"> {
 }
 
-export interface UseListNavigationChildParameters<ChildElement extends Element> extends UseRovingTabIndexChildParameters<ChildElement>, UseTypeaheadNavigationChildParameters<ChildElement> {
-    //managedChildParameters: UseRovingTabIndexChildParameters<ChildElement>["managedChildParameters"] & UseTypeaheadNavigationChildParameters<ChildElement>["managedChildParameters"];
-}
+export interface UseListNavigationChildParameters<ChildElement extends Element> extends UseRovingTabIndexChildParameters<ChildElement>, UseTypeaheadNavigationChildParameters<ChildElement> {}
 
 
 export interface UseListNavigationReturnType<ParentOrChildElement extends Element, ChildElement extends Element> extends UseRovingTabIndexReturnType<ChildElement>, UseLinearNavigationReturnType<ParentOrChildElement>, UseTypeaheadNavigationReturnType<ParentOrChildElement> { }
@@ -110,7 +107,6 @@ export function useListNavigationChild<ChildElement extends Element>({
     rovingTabIndexChildParameters,
     rovingTabIndexChildContext,
     typeaheadNavigationChildContext,
-    //typeaheadNavigationChildParameters,
     managedChildParameters,
     refElementReturn,
     textContentParameters,
@@ -121,7 +117,6 @@ export function useListNavigationChild<ChildElement extends Element>({
     const tncr = useTypeaheadNavigationChild<ChildElement>({ refElementReturn, typeaheadNavigationChildContext, managedChildParameters, textContentParameters });
 
     assertEmptyObject(_void2);
-//    assertEmptyObject(_void5);
 
     return {
         ...tncr,

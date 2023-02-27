@@ -130,11 +130,5 @@ export declare function useRearrangeableChildren<M extends UseSortableChildInfo>
  * there's no other time or place this can happen other than exactly within the parent component's render function.
  */
 export declare function useSortableChildren<M extends UseSortableChildInfo>({ rearrangeableChildrenParameters, sortableChildrenParameters: { compare: userCompare } }: UseSortableChildrenParameters<M>): UseSortableChildrenReturnType<M>;
-/**
- * It's common enough to have, e.g., a list with multiple sortable groups, a table where the body is sorted independently of the head, etc...
- *
- * A sortable group assumes that the parent (which also calls this hook) handles list navigation (or similar),
- * and that each group element (which can also be the list parent, if there are NO groups) handles sorting (or similar).
- */
 export declare function defaultCompare(lhs: UseSortableChildInfo | undefined, rhs: UseSortableChildInfo | undefined): number;
 //# sourceMappingURL=use-sortable-children.d.ts.map

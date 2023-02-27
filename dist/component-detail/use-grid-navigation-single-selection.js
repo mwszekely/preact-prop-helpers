@@ -1,5 +1,5 @@
-import { assertEmptyObject } from "../preact-extensions/use-managed-children.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
+import { assertEmptyObject } from "../util/assert.js";
 import { useGridNavigation, useGridNavigationCell, useGridNavigationRow } from "./use-grid-navigation-partial.js";
 import { useSingleSelection, useSingleSelectionChild } from "./use-single-selection.js";
 /**

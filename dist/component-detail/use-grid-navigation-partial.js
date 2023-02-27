@@ -1,7 +1,7 @@
-import { assertEmptyObject } from "../preact-extensions/use-managed-children.js";
 import { usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useStableObject } from "../preact-extensions/use-stable-getter.js";
+import { assertEmptyObject } from "../util/assert.js";
 import { useListNavigation, useListNavigationChild } from "./use-list-navigation-partial.js";
 export function useGridNavigation({ gridNavigationParameters: { onTabbableColumnChange, ...void3 }, linearNavigationParameters, rovingTabIndexParameters: { onTabbableIndexChange, ...rovingTabIndexParameters }, managedChildrenReturn, typeaheadNavigationParameters, ..._void2 }) {
     const { getChildren } = managedChildrenReturn;

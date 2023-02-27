@@ -1,11 +1,12 @@
 import { h } from "preact";
 import { StateUpdater, useCallback, useEffect } from "preact/hooks";
 import { UseHasCurrentFocusParameters } from "../observers/use-has-current-focus.js";
-import { ManagedChildInfo, UseManagedChildrenParameters, UseManagedChildrenReturnType, assertEmptyObject, useChildrenFlag } from "../preact-extensions/use-managed-children.js";
+import { ManagedChildInfo, useChildrenFlag, UseManagedChildrenParameters, UseManagedChildrenReturnType } from "../preact-extensions/use-managed-children.js";
 import { OnPassiveStateChange, PassiveStateUpdater, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useStableGetter, useStableObject } from "../preact-extensions/use-stable-getter.js";
 import { useState } from "../preact-extensions/use-state.js";
+import { assertEmptyObject } from "../util/assert.js";
 
 
 
@@ -80,8 +81,6 @@ export interface UseRovingTabIndexReturnType<TabbableChildElement extends Elemen
 
     /** 
      * Return information that lets the user update/query/focus the currently tabbable child
-     *
-     *  
      */
     rovingTabIndexReturn: {
         /** **STABLE** */
@@ -94,9 +93,6 @@ export interface UseRovingTabIndexReturnType<TabbableChildElement extends Elemen
 }
 
 export type SetTabbableIndex = (updater: Parameters<PassiveStateUpdater<number | null, Event>>[0], reason: Event | undefined, fromUserInteraction: boolean) => void;
-
-//export interface UseRovingTabIndexReturnTypeWithHooks<TabbableChildElement extends Element> extends UseRovingTabIndexReturnTypeInfo<TabbableChildElement> { }
-
 
 export interface UseRovingTabIndexChildParameters<TabbableChildElement extends Element> {
     managedChildParameters: Pick<UseRovingTabIndexChildInfo<TabbableChildElement>, "index">;
@@ -203,8 +199,6 @@ export function useRovingTabIndex<ChildElement extends Element, M extends UseRov
     assertEmptyObject(_void1);
 
     const getUntabbable = useStableGetter(untabbable);
-
-    //initiallyTabbedIndex ??= 0;
 
     // Override the actual setter to include some extra logic related to avoiding hidden children, 
     // what to do when we're untabbable, what to do when we're tabbable but given `null`, etc.

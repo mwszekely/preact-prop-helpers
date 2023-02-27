@@ -214,7 +214,6 @@ export function useRearrangeableChildren<M extends UseSortableChildInfo>({
     }, []);
 
     return {
-        //linearNavigationParameters: { navigateAbsolute, navigateRelative },
         rearrangeableChildrenReturn: {
             indexMangler,
             indexDemangler,
@@ -283,49 +282,6 @@ export function useSortableChildren<M extends UseSortableChildInfo>({
         rearrangeableChildrenReturn
     };
 }
-
-/*export interface UseGroupedSortableChildrenParameters<M extends GroupedSortedChildInfo> {
-    managedChildrenReturn: UseManagedChildrenReturnType<M>["managedChildrenReturn"]
-}
-
-export interface UseGroupedSortableChildren {
-    linearNavigationParameters: Pick<UseLinearNavigationParameters["linearNavigationParameters"], "indexDemangler" | "indexMangler">
-}*/
-
-/**
- * It's common enough to have, e.g., a list with multiple sortable groups, a table where the body is sorted independently of the head, etc...
- * 
- * A sortable group assumes that the parent (which also calls this hook) handles list navigation (or similar),
- * and that each group element (which can also be the list parent, if there are NO groups) handles sorting (or similar).
- */
-/*export function useGroupedSortableChildren<M extends GroupedSortedChildInfo>({ managedChildrenReturn: { getChildren } }: UseGroupedSortableChildrenParameters<M>): UseGroupedSortableChildren {
-    const allIndexManglers = useRef<Map<number, (i: number) => number>>(new Map());
-    const allIndexDemanglers = useRef<Map<number, (i: number) => number>>(new Map());
-    const indexMangler = useCallback((i: number): number => {
-        const child = getChildren().getAt(i);
-        if (child) {
-            let indexManglerForThisLocation = allIndexManglers.current.get(child.locationIndex);
-            return (indexManglerForThisLocation ?? identity)(i);
-        }
-        return identity(i);
-    }, []);
-    const indexDemangler = useCallback((i: number): number => {
-        const child = getChildren().getAt(i);
-        if (child) {
-            let indexDemanglerForThisLocation = allIndexDemanglers.current.get(child.locationIndex);
-            return (indexDemanglerForThisLocation ?? identity)(i);
-        }
-        return identity(i);
-    }, []);
-
-
-    return {
-        linearNavigationParameters: {
-            indexMangler,
-            indexDemangler
-        }
-    }
-}*/
 
 export function defaultCompare(lhs: UseSortableChildInfo | undefined, rhs: UseSortableChildInfo | undefined) {
     return compare1(lhs?.getSortValue(), rhs?.getSortValue());

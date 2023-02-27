@@ -21,7 +21,6 @@ import { useStableObject } from "../preact-extensions/use-stable-getter.js";
  * @returns
  */
 export function useCompleteListNavigation({ linearNavigationParameters, rearrangeableChildrenParameters, sortableChildrenParameters, typeaheadNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, paginatedChildrenParameters, staggeredChildrenParameters, ...completeListNavigationParameters }) {
-    //type M = UseListNavigationSingleSelectionChildInfo<ChildElement>;
     const { initiallySelectedIndex } = singleSelectionParameters;
     const getChildren = useCallback(() => managedChildrenReturn.getChildren(), []);
     const getHighestChildIndex = useCallback(() => getChildren().getHighestIndex(), []);

@@ -9,12 +9,10 @@ import { UseRovingTabIndexChildInfo } from "./use-roving-tabindex.js";
 export interface UseStaggeredChildrenInfo<E extends Element> extends UseRovingTabIndexChildInfo<E> {
     setParentIsStaggered(parentIsStaggered: boolean): void;
     setStaggeredVisible(visible: boolean): void;
-    //setChildCountIfStaggered(count: number): void;
 }
 
 export interface UseStaggeredChildrenParameters<E extends Element, M extends UseStaggeredChildrenInfo<E>> {
     managedChildrenReturn: UseManagedChildrenReturnType<M>["managedChildrenReturn"];
-    //linearNavigationParameters: Pick<UseLinearNavigationParameters<any, E>["linearNavigationParameters"], "indexDemangler" | "indexMangler">;
     staggeredChildrenParameters: {
         staggered: boolean;
     }
@@ -30,9 +28,6 @@ export interface UseStaggeredChildContext {
 }
 
 export interface UseStaggeredChildrenReturnType {
-    /*managedChildrenParameters: {
-        onChildCountChange: (count: number) => void;
-    };*/
     staggeredChildrenReturn: { stillStaggering: boolean }
     context: UseStaggeredChildContext;
 }
@@ -91,8 +86,6 @@ export function useStaggeredChildren<E extends Element, M extends UseStaggeredCh
         }
     }, [/* Must be empty */]), returnNull);
 
-    //const [getTimeoutHandle, setTimeoutHandle] = usePassiveState<number | null, Event>(null, returnNull);
-
     const [getDisplayedStaggerIndex, setDisplayedStaggerIndex] = usePassiveState<number | null, never>(useCallback((newIndex: number | null, prevIndex: number | null | undefined) => {
         if (newIndex == null) {
             return;
@@ -114,11 +107,6 @@ export function useStaggeredChildren<E extends Element, M extends UseStaggeredCh
         // Set a new emergency timeout
         resetEmergencyTimeout();
 
-        /*if (newIndex < targetIndex) {
-            const handle = setTimeout(() => { setDisplayedStaggerIndex(c => (c ?? 0) + 1); }, staggerDelay ?? 50);
-            return clearTimeout(handle);
-        }*/
-
     }, [/* Must be empty */]), returnNull)
 
     const parentIsStaggered = (!!staggered);
@@ -129,8 +117,6 @@ export function useStaggeredChildren<E extends Element, M extends UseStaggeredCh
 
     useLayoutEffect(() => {
         getChildren().forEach(child => child.setParentIsStaggered(parentIsStaggered));
-        //if (parentIsStaggered)
-        //    childCallsThisToTellTheParentToMountTheNextOne(-1);
 
     }, [parentIsStaggered]);
 
@@ -189,7 +175,7 @@ export interface UseStaggeredChildReturn<ChildElement extends Element> {
          * If this is true, you should delay showing *your* children or running other heavy logic until this becomes false.
          * 
          * Can be as simple as `<div>{hideBecauseStaggered? null : children}</div>`
-         *  */
+         */
         hideBecauseStaggered: boolean;
     };
     managedChildParameters: Pick<UseStaggeredChildrenInfo<ChildElement>, "setParentIsStaggered" | "setStaggeredVisible">

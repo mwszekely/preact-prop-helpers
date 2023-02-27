@@ -73,11 +73,6 @@ export interface UseSingleSelectionChildReturnType<E extends Element> extends Us
          */
         selectedOffset: number | null;
         getSelectedOffset: () => (number | null);
-        /**
-         * Returns the distance from this child to the selected child.
-         *
-         * **Stable**, and can be called during render.
-         */
         setThisOneSelected: (event: Event) => void;
         propsUnstable: h.JSX.HTMLAttributes<E>;
     };

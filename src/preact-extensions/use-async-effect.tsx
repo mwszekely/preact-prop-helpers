@@ -1,7 +1,6 @@
 import { Inputs, useEffect } from "preact/hooks";
+import { OmitStrong } from "../util/types.js";
 import { useAsync, UseAsyncParameters } from "./use-async.js";
-
-type OmitStrong<T, K extends keyof T> = Omit<T, K>
 
 /**
  * Combines the semantics of `useAsync` and `useEffect`. 
