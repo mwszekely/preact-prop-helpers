@@ -1,5 +1,5 @@
 
-import { debounce as LodashDebounce, DebounceSettings } from "lodash-es";
+import { debounce as LodashDebounce, DebounceSettings, identity } from "lodash-es";
 import { useCallback, useEffect, useMemo } from "preact/hooks";
 import { useStableCallback } from "./use-stable-callback.js";
 import { useState } from "./use-state.js";
@@ -172,7 +172,7 @@ export interface UseAsyncReturnType<SP extends unknown[], R> {
     syncHandler: SyncFunctionType<SP, void>;
 }
 
-function identity<AP extends unknown[], SP extends unknown[]>(...t: SP) { return t as unknown[] as AP; }
+function identityCapture<AP extends unknown[], SP extends unknown[]>(...t: SP) { return t as unknown[] as AP; }
 
 /**
  * Returns a throttled version of the given (stable) callback using Lodash's `throttle` function.
@@ -271,7 +271,6 @@ export function useAsync<AP extends unknown[], R, SP extends unknown[] = AP>(asy
     const [asyncDebouncing, setAsyncDebouncing] = useState(false);
     const [syncDebouncing, setSyncDebouncing] = useState(false);
     const [invocationResult, setInvocationResult] = useState<"async" | "sync" | "throw" | null>(asyncHandler2 instanceof AsyncFunction? "async" : null);
-    //const [currentCapture, setCurrentCapture] = useState<AP | undefined>(undefined);
     const incrementCallCount = useCallback(() => { setRunCount(c => c + 1) }, []);
     const incrementResolveCount = useCallback(() => { setResolveCount(c => c + 1) }, []);
     const incrementRejectCount = useCallback(() => { setRejectCount(c => c + 1) }, []);
@@ -279,7 +278,7 @@ export function useAsync<AP extends unknown[], R, SP extends unknown[] = AP>(asy
 
     /* eslint-disable prefer-const */
     let { throttle, debounce, capture: captureUnstable } = (options ?? {});
-    const captureStable = useStableCallback(captureUnstable ?? identity);
+    const captureStable = useStableCallback(captureUnstable ?? identityCapture);
     const asyncHandlerStable = useStableCallback<(...args: AP) => R | Promise<R>>(asyncHandler2 ?? (identity as any));
     const { flush, syncOutput, cancel } = useMemo(() => {
         return asyncToSync<AP, SP, R>({
@@ -319,7 +318,6 @@ export function useAsync<AP extends unknown[], R, SP extends unknown[] = AP>(asy
 
     return {
         syncHandler: syncOutput,
-        //currentType,
         pending,
         result,
         error,

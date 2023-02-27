@@ -1,8 +1,8 @@
-import { debounce as LodashDebounce } from "lodash-es";
+import { debounce as LodashDebounce, identity } from "lodash-es";
 import { useCallback, useEffect, useMemo } from "preact/hooks";
 import { useStableCallback } from "./use-stable-callback.js";
 import { useState } from "./use-state.js";
-function identity(...t) { return t; }
+function identityCapture(...t) { return t; }
 // why???
 const AsyncFunction = (async function () { }.constructor);
 /**
@@ -41,14 +41,13 @@ export function useAsync(asyncHandler2, options) {
     const [asyncDebouncing, setAsyncDebouncing] = useState(false);
     const [syncDebouncing, setSyncDebouncing] = useState(false);
     const [invocationResult, setInvocationResult] = useState(asyncHandler2 instanceof AsyncFunction ? "async" : null);
-    //const [currentCapture, setCurrentCapture] = useState<AP | undefined>(undefined);
     const incrementCallCount = useCallback(() => { setRunCount(c => c + 1); }, []);
     const incrementResolveCount = useCallback(() => { setResolveCount(c => c + 1); }, []);
     const incrementRejectCount = useCallback(() => { setRejectCount(c => c + 1); }, []);
     const incrementFinallyCount = useCallback(() => { setSettleCount(c => c + 1); }, []);
     /* eslint-disable prefer-const */
     let { throttle, debounce, capture: captureUnstable } = (options ?? {});
-    const captureStable = useStableCallback(captureUnstable ?? identity);
+    const captureStable = useStableCallback(captureUnstable ?? identityCapture);
     const asyncHandlerStable = useStableCallback(asyncHandler2 ?? identity);
     const { flush, syncOutput, cancel } = useMemo(() => {
         return asyncToSync({
@@ -83,7 +82,6 @@ export function useAsync(asyncHandler2, options) {
     const [rejectCount, setRejectCount] = useState(0);
     return {
         syncHandler: syncOutput,
-        //currentType,
         pending,
         result,
         error,
