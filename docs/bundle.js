@@ -3280,306 +3280,6 @@ var bundle = function (exports) {
       }
     };
   }
-
-  /**
-   * Allows a parent component to access information about certain
-   * child components once they have rendered.
-   *
-   * This hook is designed to be lightweight, in that the parent keeps no state
-   * and runs no effects.  Each child *does* run an effect, but with no state
-   * changes unless you explicitly request them.
-   *
-   *
-   */
-  function useManagedChildren(parentParameters) {
-    const {
-      managedChildrenParameters: {
-        onAfterChildLayoutEffect,
-        onChildrenMountChange,
-        onChildCountChange
-      },
-      ...rest
-    } = parentParameters;
-    useEnsureStability("useManagedChildren", onAfterChildLayoutEffect, onChildrenMountChange, onChildCountChange);
-    //const [getMountCount, setMountCount] = usePassiveState(onChildCountChange, returnZero, runImmediately);
-    const getHighestIndex = T$1(() => {
-      return managedChildrenArray.current.highestIndex;
-    }, []);
-    // All the information we have about our children is stored in this **stable** array.
-    // Any mutations to this array **DO NOT** trigger any sort of a re-render.
-    const managedChildrenArray = _({
-      arr: [],
-      rec: {},
-      highestIndex: 0,
-      lowestIndex: 0
-    });
-    // For indirect access to each child
-    // Compare getManagedChildInfo
-    // TODO: The primary use for this is flaggable closest fits
-    // which needs to search all children for that closest fit.
-    // It would be nice if there was something better for that.
-    const forEachChild = T$1(f => {
-      for (const child of managedChildrenArray.current.arr) {
-        if (child) f(child);
-      }
-      for (const field in managedChildrenArray.current.rec) {
-        const child = managedChildrenArray.current.rec[field];
-        if (child) f(child);
-      }
-    }, []);
-    // Retrieves the information associated with the child with the given index.
-    // `undefined` if not child there, or it's unmounted.
-    const getManagedChildInfo = T$1(index => {
-      if (typeof index == "number") return managedChildrenArray.current.arr[index];else return managedChildrenArray.current.rec[index];
-    }, []);
-    // tl;dr this is a way to have run useLayoutEffect once after all N children
-    // have mounted and run *their* useLayoutEffect, but also *without* re-rendering
-    // ourselves because of having a `childCount` state or anything similar.
-    //
-    // When the child count ref updates, we want the parent to also run an effect
-    // to maybe do something with all these children that just mounted.
-    // The easiest way would be useEffect(..., [childCount]) but
-    // that would require us having a childCount state, then calling
-    // setChildCount and re-rendering every time children mount
-    // (only one re-render at a time unless children are staggered, but still)
-    // 
-    // As an alternate solution, any time a child uses ULE on mount, it queues a microtask
-    // to emulate running ULE on the parent. Only the first child will actually queue
-    // the microtask (by checking hasRemoteULE first) so that the "effect" only
-    // runs once. When it's done, hasRemoteULE is reset so it can run again if
-    // more children mount/unmount.
-    const hasRemoteULEChildMounted = _(null);
-    const remoteULEChildChangedCausers = _(new Set());
-    const remoteULEChildChanged = T$1(index => {
-      if (remoteULEChildChangedCausers.current.size == 0) {
-        if (onAfterChildLayoutEffect != null) {
-          debounceRendering(() => {
-            onAfterChildLayoutEffect === null || onAfterChildLayoutEffect === void 0 ? void 0 : onAfterChildLayoutEffect(remoteULEChildChangedCausers.current);
-            remoteULEChildChangedCausers.current.clear();
-          });
-        }
-      }
-      remoteULEChildChangedCausers.current.add(index);
-      return () => {};
-    }, [/* Must remain stable */]);
-    const remoteULEChildMounted = T$1((index, mounted) => {
-      if (!hasRemoteULEChildMounted.current) {
-        hasRemoteULEChildMounted.current = {
-          mounts: new Set(),
-          unmounts: new Set()
-        };
-        if (onChildCountChange || onChildrenMountChange) {
-          debounceRendering(() => {
-            onChildrenMountChange === null || onChildrenMountChange === void 0 ? void 0 : onChildrenMountChange(hasRemoteULEChildMounted.current.mounts, hasRemoteULEChildMounted.current.unmounts);
-            onChildCountChange === null || onChildCountChange === void 0 ? void 0 : onChildCountChange(getChildren().getHighestIndex() + 1);
-            hasRemoteULEChildMounted.current = null;
-          });
-        }
-      }
-      if (mounted) {
-        if (typeof index == "number") managedChildrenArray.current.highestIndex = Math.max(managedChildrenArray.current.highestIndex, index);
-      } else {
-        if (typeof index == "number") {
-          delete managedChildrenArray.current.arr[index];
-          let shave = 0;
-          while (shave <= managedChildrenArray.current.arr.length && managedChildrenArray.current.arr[managedChildrenArray.current.arr.length - 1 - shave] === undefined) {
-            ++shave;
-          }
-          managedChildrenArray.current.arr.splice(managedChildrenArray.current.arr.length - shave, shave);
-        } else delete managedChildrenArray.current.rec[index];
-        if (typeof index == "number") managedChildrenArray.current.highestIndex = managedChildrenArray.current.arr.length - 1;
-      }
-      hasRemoteULEChildMounted.current[mounted ? "mounts" : "unmounts"].add(index);
-    }, [/* Must remain stable */]);
-    const managedChildren = useStableObject({
-      ...{
-        _: managedChildrenArray.current
-      },
-      forEach: forEachChild,
-      getAt: getManagedChildInfo,
-      getHighestIndex: getHighestIndex,
-      arraySlice: T$1(() => {
-        return managedChildrenArray.current.arr.slice();
-      }, [])
-    });
-    const getChildren = T$1(() => managedChildren, []);
-    return {
-      context: useStableObject({
-        managedChildContext: useStableObject({
-          managedChildrenArray: managedChildrenArray.current,
-          remoteULEChildMounted,
-          remoteULEChildChanged,
-          getChildren
-        })
-      }),
-      managedChildrenReturn: {
-        getChildren
-      }
-    };
-  }
-  function useManagedChild(info, managedChildParameters) {
-    var _info$context;
-    const {
-      managedChildContext: {
-        getChildren,
-        managedChildrenArray,
-        remoteULEChildMounted,
-        remoteULEChildChanged
-      }
-    } = (_info$context = info.context) !== null && _info$context !== void 0 ? _info$context : {
-      managedChildContext: {}
-    };
-    const index = managedChildParameters.index;
-    // Any time our child props change, make that information available
-    // the parent if they need it.
-    // The parent can listen for all updates and only act on the ones it cares about,
-    // and multiple children updating in the same tick will all be sent at once.
-    s(() => {
-      if (managedChildrenArray == null || remoteULEChildChanged == null) return;
-      // Insert this information in-place
-      if (typeof index == "number") {
-        managedChildrenArray.arr[index] = {
-          ...managedChildParameters
-        };
-      } else {
-        managedChildrenArray.rec[index] = {
-          ...managedChildParameters
-        };
-      }
-      return remoteULEChildChanged(index);
-    }, [...Object.entries(info).flat(9)]); // 9 is infinity, right? Sure. Unrelated: TODO.
-    // When we mount, notify the parent via queueMicrotask
-    // (every child does this, so everything's coordinated to only queue a single microtask per tick)
-    // Do the same on unmount.
-    // Note: It's important that this comes AFTER remoteULEChildChanged
-    // so that remoteULEChildMounted has access to all the info on mount.
-    s(() => {
-      remoteULEChildMounted === null || remoteULEChildMounted === void 0 ? void 0 : remoteULEChildMounted(index, true);
-      return () => remoteULEChildMounted === null || remoteULEChildMounted === void 0 ? void 0 : remoteULEChildMounted(index, false);
-    }, [index]);
-    return {
-      managedChildReturn: {
-        getChildren: getChildren
-      }
-    };
-  }
-  /**
-   * An extension to useManagedChildren that handles the following common case:
-   * 1. You have a bunch of children
-   * 2. At any given time, only 1 of them is "selected", "activated", "focusable", whatever (or 0 of them, that's cool too, just 0 or 1 though).
-   * 3. The parent has control over who is "selected" via a numerical index.
-   *
-   * This hook allows for much easier control over selection management.
-   *
-   * Note that because you may want to use multiple flags with the same children, this hook *does not* use `useManagedChildren`!
-   * You need to pass it the existing children, and you must pass your invocation of `useManagedChildren` the returned `onChildrenMountChange` handler!
-   *
-   * Also because of that, the types of this function are rather odd.  It's better to start off using a hook that already uses a flag, such as `useRovingTabIndex`, as an example.
-   *
-   *
-   * @param param0
-   * @returns
-   */
-  function useChildrenFlag(_ref4) {
-    let {
-      getChildren,
-      initialIndex,
-      closestFit,
-      onIndexChange,
-      getAt,
-      setAt,
-      isValid
-    } = _ref4;
-    useEnsureStability("useChildrenFlag", onIndexChange, getAt, setAt, isValid);
-    // TODO (maybe?): Even if there is an initial index, it's not set until mount. Is that fine?
-    const [getCurrentIndex, setCurrentIndex] = usePassiveState(onIndexChange);
-    const [getRequestedIndex, setRequestedIndex] = usePassiveState(null);
-    // Shared between onChildrenMountChange and changeIndex, not public
-    // Only called when `closestFit` is false, naturally.
-    const getClosestFit = T$1(requestedIndex => {
-      const children = getChildren();
-      let closestDistance = Infinity;
-      let closestIndex = null;
-      children.forEach(child => {
-        if (child != null && isValid(child)) {
-          console.assert(typeof child.index == "number", "closestFit can only be used when each child has a numeric index, and cannot be used when children use string indices instead.");
-          const newDistance = Math.abs(child.index - requestedIndex);
-          if (newDistance < closestDistance || newDistance == closestDistance && child.index < requestedIndex) {
-            closestDistance = newDistance;
-            closestIndex = child.index;
-          }
-        }
-      });
-      return closestIndex;
-    }, [/* Must remain stable! */]);
-    // Any time a child mounts/unmounts, we need to double-check to see if that affects 
-    // the "currently selected" (or whatever) index.  The two cases we're looking for:
-    // 1. The currently selected child unmounted
-    // 2. A child mounted, and it mounts with the index we're looking for
-    const reevaluateClosestFit = useStableCallback(() => {
-      const children = getChildren();
-      const requestedIndex = getRequestedIndex();
-      const currentIndex = getCurrentIndex();
-      const currentChild = currentIndex == null ? null : children.getAt(currentIndex);
-      if (requestedIndex != null && closestFit && (requestedIndex != currentIndex || currentChild == null || !isValid(currentChild))) {
-        console.assert(typeof requestedIndex == "number", "closestFit can only be used when each child has a numeric index, and cannot be used when children use string indices instead.");
-        const closestFitIndex = getClosestFit(requestedIndex);
-        setCurrentIndex(closestFitIndex, undefined);
-        if (currentChild) setAt(currentChild, false, closestFitIndex, currentIndex);
-        if (closestFitIndex != null) {
-          const closestFitChild = children.getAt(closestFitIndex);
-          console.assert(closestFitChild != null, "Internal logic???");
-          setAt(closestFitChild, true, closestFitIndex, currentIndex);
-        }
-      }
-    });
-    const changeIndex = T$1((arg, reason) => {
-      const children = getChildren();
-      const requestedIndex = arg instanceof Function ? arg(getRequestedIndex()) : arg;
-      setRequestedIndex(requestedIndex, reason);
-      const currentIndex = getCurrentIndex();
-      if (currentIndex == requestedIndex) return requestedIndex;
-      let newMatchingChild = requestedIndex == null ? null : children.getAt(requestedIndex);
-      const oldMatchingChild = currentIndex == null ? null : children.getAt(currentIndex);
-      if (requestedIndex == null) {
-        // Easy case
-        setCurrentIndex(null, reason);
-        if (oldMatchingChild) setAt(oldMatchingChild, false, requestedIndex, currentIndex);
-        return null;
-      } else {
-        const childIsValid = newMatchingChild && isValid(newMatchingChild);
-        if (childIsValid || !closestFit) {
-          setCurrentIndex(requestedIndex, reason);
-          if (oldMatchingChild) setAt(oldMatchingChild, false, requestedIndex, currentIndex);
-          if (newMatchingChild) setAt(newMatchingChild, true, requestedIndex, currentIndex);
-          return requestedIndex;
-        } else {
-          console.assert(typeof requestedIndex == "number", "closestFit can only be used when each child has a numeric index, and cannot be used when children use string indices instead.");
-          const closestFitIndex = getClosestFit(requestedIndex);
-          setCurrentIndex(closestFitIndex, reason);
-          if (closestFitIndex != null) {
-            newMatchingChild = children.getAt(closestFitIndex);
-            console.assert(newMatchingChild != null, "Internal logic???");
-            if (oldMatchingChild) setAt(oldMatchingChild, false, closestFitIndex, currentIndex);
-            setAt(newMatchingChild, true, closestFitIndex, currentIndex);
-            return closestFitIndex;
-          } else {
-            if (oldMatchingChild) setAt(oldMatchingChild, false, closestFitIndex, currentIndex);
-            return null;
-          }
-        }
-      }
-    }, []);
-    // Run once, on mount
-    s(() => {
-      changeIndex(initialIndex !== null && initialIndex !== void 0 ? initialIndex : null, undefined);
-    }, []);
-    return {
-      changeIndex,
-      reevaluateClosestFit,
-      getCurrentIndex
-    };
-  }
   const MagicWindowKey = "__preact-prop-helpers-escape-key-dismiss__";
   function getElementDepth(element) {
     let depth = 0;
@@ -3608,7 +3308,7 @@ var bundle = function (exports) {
    * @param param0
    * @returns
    */
-  function useEscapeDismiss(_ref5) {
+  function useEscapeDismiss(_ref4) {
     let {
       escapeDismissParameters: {
         onClose,
@@ -3621,7 +3321,7 @@ var bundle = function (exports) {
         getElement,
         ...void2
       }
-    } = _ref5;
+    } = _ref4;
     const stableOnClose = useStableCallback(onClose);
     const getWindow = useStableCallback(unstableGetWindow);
     const getDepth = useStableGetter(parentDepth + 1);
@@ -3718,7 +3418,7 @@ var bundle = function (exports) {
    * @param param0
    * @returns
    */
-  function useLostFocusDismiss(_ref6) {
+  function useLostFocusDismiss(_ref5) {
     let {
       refElementPopupReturn: {
         getElement: getPopupElement,
@@ -3730,7 +3430,7 @@ var bundle = function (exports) {
         onClose
       },
       ...void1
-    } = _ref6;
+    } = _ref5;
     const {
       getElement: getSourceElement,
       ...void2
@@ -3756,7 +3456,7 @@ var bundle = function (exports) {
    *
    * @param param0
    */
-  function useBackdropDismiss(_ref7) {
+  function useBackdropDismiss(_ref6) {
     let {
       backdropDismissParameters: {
         open,
@@ -3768,7 +3468,7 @@ var bundle = function (exports) {
         ...void3
       },
       ...void2
-    } = _ref7;
+    } = _ref6;
     const getOpen = useStableGetter(open);
     const onClose = useStableCallback(onCloseUnstable);
     const onBackdropClick = T$1(function onBackdropClick(e) {
@@ -3796,7 +3496,7 @@ var bundle = function (exports) {
    *
    * This is similar to the "complete" series of list/grid navigation, in that it's the "outermost" hook of its type.
    */
-  function useDismiss(_ref8) {
+  function useDismiss(_ref7) {
     let {
       dismissParameters: {
         open: globalOpen,
@@ -3809,7 +3509,7 @@ var bundle = function (exports) {
         getWindow,
         parentDepth
       }
-    } = _ref8;
+    } = _ref7;
     const {
       refElementReturn: refElementSourceReturn
     } = useRefElement({
@@ -5279,8 +4979,8 @@ var bundle = function (exports) {
     }
   })();
   function getDocument$1(element) {
-    var _ref9, _ref10, _element$ownerDocumen;
-    return (_ref9 = (_ref10 = (_element$ownerDocumen = element === null || element === void 0 ? void 0 : element.ownerDocument) !== null && _element$ownerDocumen !== void 0 ? _element$ownerDocumen : document) !== null && _ref10 !== void 0 ? _ref10 : window.document) !== null && _ref9 !== void 0 ? _ref9 : globalThis.document;
+    var _ref8, _ref9, _element$ownerDocumen;
+    return (_ref8 = (_ref9 = (_element$ownerDocumen = element === null || element === void 0 ? void 0 : element.ownerDocument) !== null && _element$ownerDocumen !== void 0 ? _element$ownerDocumen : document) !== null && _ref9 !== void 0 ? _ref9 : window.document) !== null && _ref8 !== void 0 ? _ref8 : globalThis.document;
   }
   function blockingElements() {
     return getDocument$1().$blockingElements;
@@ -5342,7 +5042,7 @@ var bundle = function (exports) {
   }
 
   //const elementsToRestoreFocusTo = new Map<Element | null, (Node & HTMLOrSVGElement)>();
-  function useFocusTrap(_ref11) {
+  function useFocusTrap(_ref10) {
     let {
       focusTrapParameters: {
         onlyMoveFocus,
@@ -5351,7 +5051,7 @@ var bundle = function (exports) {
         focusOpener: focusOpenerUnstable
       },
       refElementParameters
-    } = _ref11;
+    } = _ref10;
     const {
       onElementChange,
       ...rest
@@ -5426,11 +5126,11 @@ var bundle = function (exports) {
    *
    * @see useListNavigation, which packages everything up together.
    */
-  function useLinearNavigation(_ref12) {
+  function useLinearNavigation(_ref11) {
     let {
       rovingTabIndexReturn,
       linearNavigationParameters
-    } = _ref12;
+    } = _ref11;
     const {
       getHighestIndex,
       indexDemangler,
@@ -5635,7 +5335,7 @@ var bundle = function (exports) {
       }
     };
   }
-  function tryNavigateToIndex(_ref13) {
+  function tryNavigateToIndex(_ref12) {
     let {
       isValid,
       highestChildIndex,
@@ -5643,7 +5343,7 @@ var bundle = function (exports) {
       indexDemangler,
       indexMangler,
       target
-    } = _ref13;
+    } = _ref12;
     if (searchDirection === -1) {
       var _bestUpResult;
       let bestUpResult = undefined;
@@ -5686,13 +5386,13 @@ var bundle = function (exports) {
       };
     }
   }
-  function tryNavigateUp(_ref14) {
+  function tryNavigateUp(_ref13) {
     let {
       isValid,
       indexDemangler,
       indexMangler,
       target
-    } = _ref14;
+    } = _ref13;
     const lower = 0;
     while (target >= lower && !isValid(target)) target = indexDemangler(indexMangler(target) - 1);
     if (!isValid(target)) {
@@ -5710,14 +5410,14 @@ var bundle = function (exports) {
       };
     }
   }
-  function tryNavigateDown(_ref15) {
+  function tryNavigateDown(_ref14) {
     let {
       isValid,
       indexDemangler,
       indexMangler,
       target,
       highestChildIndex: upper
-    } = _ref15;
+    } = _ref14;
     while (target <= upper && !isValid(target)) target = indexDemangler(indexMangler(target) + 1);
     if (!isValid(target)) {
       return undefined;
@@ -5733,6 +5433,306 @@ var bundle = function (exports) {
         status: "normal"
       };
     }
+  }
+
+  /**
+   * Allows a parent component to access information about certain
+   * child components once they have rendered.
+   *
+   * This hook is designed to be lightweight, in that the parent keeps no state
+   * and runs no effects.  Each child *does* run an effect, but with no state
+   * changes unless you explicitly request them.
+   *
+   *
+   */
+  function useManagedChildren(parentParameters) {
+    const {
+      managedChildrenParameters: {
+        onAfterChildLayoutEffect,
+        onChildrenMountChange,
+        onChildCountChange
+      },
+      ...rest
+    } = parentParameters;
+    useEnsureStability("useManagedChildren", onAfterChildLayoutEffect, onChildrenMountChange, onChildCountChange);
+    //const [getMountCount, setMountCount] = usePassiveState(onChildCountChange, returnZero, runImmediately);
+    const getHighestIndex = T$1(() => {
+      return managedChildrenArray.current.highestIndex;
+    }, []);
+    // All the information we have about our children is stored in this **stable** array.
+    // Any mutations to this array **DO NOT** trigger any sort of a re-render.
+    const managedChildrenArray = _({
+      arr: [],
+      rec: {},
+      highestIndex: 0,
+      lowestIndex: 0
+    });
+    // For indirect access to each child
+    // Compare getManagedChildInfo
+    // TODO: The primary use for this is flaggable closest fits
+    // which needs to search all children for that closest fit.
+    // It would be nice if there was something better for that.
+    const forEachChild = T$1(f => {
+      for (const child of managedChildrenArray.current.arr) {
+        if (child) f(child);
+      }
+      for (const field in managedChildrenArray.current.rec) {
+        const child = managedChildrenArray.current.rec[field];
+        if (child) f(child);
+      }
+    }, []);
+    // Retrieves the information associated with the child with the given index.
+    // `undefined` if not child there, or it's unmounted.
+    const getManagedChildInfo = T$1(index => {
+      if (typeof index == "number") return managedChildrenArray.current.arr[index];else return managedChildrenArray.current.rec[index];
+    }, []);
+    // tl;dr this is a way to have run useLayoutEffect once after all N children
+    // have mounted and run *their* useLayoutEffect, but also *without* re-rendering
+    // ourselves because of having a `childCount` state or anything similar.
+    //
+    // When the child count ref updates, we want the parent to also run an effect
+    // to maybe do something with all these children that just mounted.
+    // The easiest way would be useEffect(..., [childCount]) but
+    // that would require us having a childCount state, then calling
+    // setChildCount and re-rendering every time children mount
+    // (only one re-render at a time unless children are staggered, but still)
+    // 
+    // As an alternate solution, any time a child uses ULE on mount, it queues a microtask
+    // to emulate running ULE on the parent. Only the first child will actually queue
+    // the microtask (by checking hasRemoteULE first) so that the "effect" only
+    // runs once. When it's done, hasRemoteULE is reset so it can run again if
+    // more children mount/unmount.
+    const hasRemoteULEChildMounted = _(null);
+    const remoteULEChildChangedCausers = _(new Set());
+    const remoteULEChildChanged = T$1(index => {
+      if (remoteULEChildChangedCausers.current.size == 0) {
+        if (onAfterChildLayoutEffect != null) {
+          debounceRendering(() => {
+            onAfterChildLayoutEffect === null || onAfterChildLayoutEffect === void 0 ? void 0 : onAfterChildLayoutEffect(remoteULEChildChangedCausers.current);
+            remoteULEChildChangedCausers.current.clear();
+          });
+        }
+      }
+      remoteULEChildChangedCausers.current.add(index);
+      return () => {};
+    }, [/* Must remain stable */]);
+    const remoteULEChildMounted = T$1((index, mounted) => {
+      if (!hasRemoteULEChildMounted.current) {
+        hasRemoteULEChildMounted.current = {
+          mounts: new Set(),
+          unmounts: new Set()
+        };
+        if (onChildCountChange || onChildrenMountChange) {
+          debounceRendering(() => {
+            onChildrenMountChange === null || onChildrenMountChange === void 0 ? void 0 : onChildrenMountChange(hasRemoteULEChildMounted.current.mounts, hasRemoteULEChildMounted.current.unmounts);
+            onChildCountChange === null || onChildCountChange === void 0 ? void 0 : onChildCountChange(getChildren().getHighestIndex() + 1);
+            hasRemoteULEChildMounted.current = null;
+          });
+        }
+      }
+      if (mounted) {
+        if (typeof index == "number") managedChildrenArray.current.highestIndex = Math.max(managedChildrenArray.current.highestIndex, index);
+      } else {
+        if (typeof index == "number") {
+          delete managedChildrenArray.current.arr[index];
+          let shave = 0;
+          while (shave <= managedChildrenArray.current.arr.length && managedChildrenArray.current.arr[managedChildrenArray.current.arr.length - 1 - shave] === undefined) {
+            ++shave;
+          }
+          managedChildrenArray.current.arr.splice(managedChildrenArray.current.arr.length - shave, shave);
+        } else delete managedChildrenArray.current.rec[index];
+        if (typeof index == "number") managedChildrenArray.current.highestIndex = managedChildrenArray.current.arr.length - 1;
+      }
+      hasRemoteULEChildMounted.current[mounted ? "mounts" : "unmounts"].add(index);
+    }, [/* Must remain stable */]);
+    const managedChildren = useStableObject({
+      ...{
+        _: managedChildrenArray.current
+      },
+      forEach: forEachChild,
+      getAt: getManagedChildInfo,
+      getHighestIndex: getHighestIndex,
+      arraySlice: T$1(() => {
+        return managedChildrenArray.current.arr.slice();
+      }, [])
+    });
+    const getChildren = T$1(() => managedChildren, []);
+    return {
+      context: useStableObject({
+        managedChildContext: useStableObject({
+          managedChildrenArray: managedChildrenArray.current,
+          remoteULEChildMounted,
+          remoteULEChildChanged,
+          getChildren
+        })
+      }),
+      managedChildrenReturn: {
+        getChildren
+      }
+    };
+  }
+  function useManagedChild(info, managedChildParameters) {
+    var _info$context;
+    const {
+      managedChildContext: {
+        getChildren,
+        managedChildrenArray,
+        remoteULEChildMounted,
+        remoteULEChildChanged
+      }
+    } = (_info$context = info.context) !== null && _info$context !== void 0 ? _info$context : {
+      managedChildContext: {}
+    };
+    const index = managedChildParameters.index;
+    // Any time our child props change, make that information available
+    // the parent if they need it.
+    // The parent can listen for all updates and only act on the ones it cares about,
+    // and multiple children updating in the same tick will all be sent at once.
+    s(() => {
+      if (managedChildrenArray == null || remoteULEChildChanged == null) return;
+      // Insert this information in-place
+      if (typeof index == "number") {
+        managedChildrenArray.arr[index] = {
+          ...managedChildParameters
+        };
+      } else {
+        managedChildrenArray.rec[index] = {
+          ...managedChildParameters
+        };
+      }
+      return remoteULEChildChanged(index);
+    }, [...Object.entries(info).flat(9)]); // 9 is infinity, right? Sure. Unrelated: TODO.
+    // When we mount, notify the parent via queueMicrotask
+    // (every child does this, so everything's coordinated to only queue a single microtask per tick)
+    // Do the same on unmount.
+    // Note: It's important that this comes AFTER remoteULEChildChanged
+    // so that remoteULEChildMounted has access to all the info on mount.
+    s(() => {
+      remoteULEChildMounted === null || remoteULEChildMounted === void 0 ? void 0 : remoteULEChildMounted(index, true);
+      return () => remoteULEChildMounted === null || remoteULEChildMounted === void 0 ? void 0 : remoteULEChildMounted(index, false);
+    }, [index]);
+    return {
+      managedChildReturn: {
+        getChildren: getChildren
+      }
+    };
+  }
+  /**
+   * An extension to useManagedChildren that handles the following common case:
+   * 1. You have a bunch of children
+   * 2. At any given time, only 1 of them is "selected", "activated", "focusable", whatever (or 0 of them, that's cool too, just 0 or 1 though).
+   * 3. The parent has control over who is "selected" via a numerical index.
+   *
+   * This hook allows for much easier control over selection management.
+   *
+   * Note that because you may want to use multiple flags with the same children, this hook *does not* use `useManagedChildren`!
+   * You need to pass it the existing children, and you must pass your invocation of `useManagedChildren` the returned `onChildrenMountChange` handler!
+   *
+   * Also because of that, the types of this function are rather odd.  It's better to start off using a hook that already uses a flag, such as `useRovingTabIndex`, as an example.
+   *
+   *
+   * @param param0
+   * @returns
+   */
+  function useChildrenFlag(_ref15) {
+    let {
+      getChildren,
+      initialIndex,
+      closestFit,
+      onIndexChange,
+      getAt,
+      setAt,
+      isValid
+    } = _ref15;
+    useEnsureStability("useChildrenFlag", onIndexChange, getAt, setAt, isValid);
+    // TODO (maybe?): Even if there is an initial index, it's not set until mount. Is that fine?
+    const [getCurrentIndex, setCurrentIndex] = usePassiveState(onIndexChange);
+    const [getRequestedIndex, setRequestedIndex] = usePassiveState(null);
+    // Shared between onChildrenMountChange and changeIndex, not public
+    // Only called when `closestFit` is false, naturally.
+    const getClosestFit = T$1(requestedIndex => {
+      const children = getChildren();
+      let closestDistance = Infinity;
+      let closestIndex = null;
+      children.forEach(child => {
+        if (child != null && isValid(child)) {
+          console.assert(typeof child.index == "number", "closestFit can only be used when each child has a numeric index, and cannot be used when children use string indices instead.");
+          const newDistance = Math.abs(child.index - requestedIndex);
+          if (newDistance < closestDistance || newDistance == closestDistance && child.index < requestedIndex) {
+            closestDistance = newDistance;
+            closestIndex = child.index;
+          }
+        }
+      });
+      return closestIndex;
+    }, [/* Must remain stable! */]);
+    // Any time a child mounts/unmounts, we need to double-check to see if that affects 
+    // the "currently selected" (or whatever) index.  The two cases we're looking for:
+    // 1. The currently selected child unmounted
+    // 2. A child mounted, and it mounts with the index we're looking for
+    const reevaluateClosestFit = useStableCallback(() => {
+      const children = getChildren();
+      const requestedIndex = getRequestedIndex();
+      const currentIndex = getCurrentIndex();
+      const currentChild = currentIndex == null ? null : children.getAt(currentIndex);
+      if (requestedIndex != null && closestFit && (requestedIndex != currentIndex || currentChild == null || !isValid(currentChild))) {
+        console.assert(typeof requestedIndex == "number", "closestFit can only be used when each child has a numeric index, and cannot be used when children use string indices instead.");
+        const closestFitIndex = getClosestFit(requestedIndex);
+        setCurrentIndex(closestFitIndex, undefined);
+        if (currentChild) setAt(currentChild, false, closestFitIndex, currentIndex);
+        if (closestFitIndex != null) {
+          const closestFitChild = children.getAt(closestFitIndex);
+          console.assert(closestFitChild != null, "Internal logic???");
+          setAt(closestFitChild, true, closestFitIndex, currentIndex);
+        }
+      }
+    });
+    const changeIndex = T$1((arg, reason) => {
+      const children = getChildren();
+      const requestedIndex = arg instanceof Function ? arg(getRequestedIndex()) : arg;
+      setRequestedIndex(requestedIndex, reason);
+      const currentIndex = getCurrentIndex();
+      if (currentIndex == requestedIndex) return requestedIndex;
+      let newMatchingChild = requestedIndex == null ? null : children.getAt(requestedIndex);
+      const oldMatchingChild = currentIndex == null ? null : children.getAt(currentIndex);
+      if (requestedIndex == null) {
+        // Easy case
+        setCurrentIndex(null, reason);
+        if (oldMatchingChild) setAt(oldMatchingChild, false, requestedIndex, currentIndex);
+        return null;
+      } else {
+        const childIsValid = newMatchingChild && isValid(newMatchingChild);
+        if (childIsValid || !closestFit) {
+          setCurrentIndex(requestedIndex, reason);
+          if (oldMatchingChild) setAt(oldMatchingChild, false, requestedIndex, currentIndex);
+          if (newMatchingChild) setAt(newMatchingChild, true, requestedIndex, currentIndex);
+          return requestedIndex;
+        } else {
+          console.assert(typeof requestedIndex == "number", "closestFit can only be used when each child has a numeric index, and cannot be used when children use string indices instead.");
+          const closestFitIndex = getClosestFit(requestedIndex);
+          setCurrentIndex(closestFitIndex, reason);
+          if (closestFitIndex != null) {
+            newMatchingChild = children.getAt(closestFitIndex);
+            console.assert(newMatchingChild != null, "Internal logic???");
+            if (oldMatchingChild) setAt(oldMatchingChild, false, closestFitIndex, currentIndex);
+            setAt(newMatchingChild, true, closestFitIndex, currentIndex);
+            return closestFitIndex;
+          } else {
+            if (oldMatchingChild) setAt(oldMatchingChild, false, closestFitIndex, currentIndex);
+            return null;
+          }
+        }
+      }
+    }, []);
+    // Run once, on mount
+    s(() => {
+      changeIndex(initialIndex !== null && initialIndex !== void 0 ? initialIndex : null, undefined);
+    }, []);
+    return {
+      changeIndex,
+      reevaluateClosestFit,
+      getCurrentIndex
+    };
   }
 
   /**
