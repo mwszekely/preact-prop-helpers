@@ -1,9 +1,7 @@
 import { useCallback, useRef } from "preact/hooks";
 import { useMergedProps } from "./use-merged-props.js";
-import { useRefElement } from "./use-ref-element.js";
-export function useImperativeProps() {
+export function useImperativeProps({ refElementReturn: { getElement } }) {
     const currentImperativeProps = useRef({ className: new DOMTokenList(), style: {}, children: null, others: {} });
-    const { refElementReturn, refElementReturn: { getElement, propsStable } } = useRefElement({ refElementParameters: { onElementChange: undefined, onMount: undefined, onUnmount: undefined } });
     const setClass = useCallback((cls, enabled) => {
         if (currentImperativeProps.current.className.contains(cls) == !enabled) {
             getElement()?.classList[enabled ? "add" : "remove"](cls);
@@ -43,8 +41,7 @@ export function useImperativeProps() {
             setAttribute,
             setChildren
         }).current,
-        refElementReturn,
-        propsUnstable: useMergedProps(propsStable, { className: currentImperativeProps.current.className.toString(), style: currentImperativeProps.current.style }, currentImperativeProps.current.others)
+        propsUnstable: useMergedProps({ className: currentImperativeProps.current.className.toString(), style: currentImperativeProps.current.style }, currentImperativeProps.current.others)
     };
 }
 //# sourceMappingURL=use-imperative-props.js.map

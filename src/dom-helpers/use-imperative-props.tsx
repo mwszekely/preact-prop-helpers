@@ -1,7 +1,7 @@
-import { ComponentChildren, h } from "preact";
+import { h } from "preact";
 import { useCallback, useRef } from "preact/hooks";
 import { useMergedProps } from "./use-merged-props.js";
-import { useRefElement } from "./use-ref-element.js";
+import { useRefElement, UseRefElementParameters, UseRefElementReturnType } from "./use-ref-element.js";
 
 export type SetChildren = ((children: string | null) => void);
 export type SetClass = (cls: string, enabled: boolean) => void;
@@ -15,14 +15,14 @@ export interface ImperativeHandle<T extends Element> {
     setChildren: SetChildren;
 }
 
-export function useImperativeProps<E extends Element>() {
+export interface UseImperativePropsParameters<E extends Element> {
+    refElementReturn: Pick<UseRefElementReturnType<E>["refElementReturn"], "getElement">;
+}
+
+export function useImperativeProps<E extends Element>({ refElementReturn: { getElement } }: UseImperativePropsParameters<E>) {
     const currentImperativeProps = useRef<{ className: DOMTokenList, style: h.JSX.CSSProperties, children: string | null, others: h.JSX.HTMLAttributes<E> }>({ className: new DOMTokenList(), style: {}, children: null, others: {} });
 
 
-    const {
-        refElementReturn,
-        refElementReturn: { getElement, propsStable }
-    } = useRefElement<E>({ refElementParameters: { onElementChange: undefined, onMount: undefined, onUnmount: undefined } });
 
     const setClass = useCallback<SetClass>((cls, enabled) => {
         if (currentImperativeProps.current.className.contains(cls) == !enabled) {
@@ -67,9 +67,7 @@ export function useImperativeProps<E extends Element>() {
             setAttribute,
             setChildren
         }).current,
-        refElementReturn,
         propsUnstable: useMergedProps<E>(
-            propsStable,
             { className: currentImperativeProps.current.className.toString(), style: currentImperativeProps.current.style },
             currentImperativeProps.current.others
         )

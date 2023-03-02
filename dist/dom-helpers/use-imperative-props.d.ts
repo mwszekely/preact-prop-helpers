@@ -1,4 +1,5 @@
 import { h } from "preact";
+import { UseRefElementReturnType } from "./use-ref-element.js";
 export type SetChildren = ((children: string | null) => void);
 export type SetClass = (cls: string, enabled: boolean) => void;
 export type SetStyle = <T extends keyof CSSStyleDeclaration>(prop: T, value: h.JSX.CSSProperties[T] | null) => void;
@@ -9,12 +10,11 @@ export interface ImperativeHandle<T extends Element> {
     setAttribute: SetAttribute<T>;
     setChildren: SetChildren;
 }
-export declare function useImperativeProps<E extends Element>(): {
+export interface UseImperativePropsParameters<E extends Element> {
+    refElementReturn: Pick<UseRefElementReturnType<E>["refElementReturn"], "getElement">;
+}
+export declare function useImperativeProps<E extends Element>({ refElementReturn: { getElement } }: UseImperativePropsParameters<E>): {
     imperativeHandle: ImperativeHandle<E>;
-    refElementReturn: {
-        getElement(): E | null;
-        propsStable: h.JSX.HTMLAttributes<E>;
-    };
     propsUnstable: h.JSX.HTMLAttributes<E>;
 };
 //# sourceMappingURL=use-imperative-props.d.ts.map

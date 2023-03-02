@@ -1806,7 +1806,7 @@ var bundle = (function (exports) {
   }
   function debounceRendering(f) {
     var _options$debounceRend;
-    ((_options$debounceRend = l$1.debounceRendering) !== null && _options$debounceRend !== void 0 ? _options$debounceRend : setTimeout)(f);
+    ((_options$debounceRend = l$1.debounceRendering) !== null && _options$debounceRend !== void 0 ? _options$debounceRend : queueMicrotask)(f);
   }
   /**
    * Similar to `useState`, but for values that aren't "render-important" &ndash; updates don't cause a re-render and so the value shouldn't be used during render (though it certainly can, at least by re-rendering again).
@@ -1995,16 +1995,6 @@ var bundle = (function (exports) {
    * @param inputs
    */
   function useBeforeLayoutEffect(effect, inputs) {
-    /*(() => {
-        const cleanup = useRef<void | (() => void) | null>(null);
-        const prevArgsRef = useRef<Inputs>(null!);
-        if (argsChanged(inputs, prevArgsRef.current)) {
-            prevArgsRef.current = inputs!;
-            if (cleanup.current)
-                cleanup.current();
-            cleanup.current = effect();
-        }
-    })();*/
     const [id] = p(() => generateRandomId());
     if (effect) toRun.set(id, {
       effect,
@@ -4402,8 +4392,6 @@ var bundle = (function (exports) {
     return firstFocusable;
   }
 
-  /** Arguments passed to the child 'useLinearNavigationChild` */
-  //export interface UseLinearNavigationChildInfo { }
   /**
    * When used in tandem with `useRovingTabIndex`, allows control of
    * the tabbable index with the arrow keys.
@@ -4501,14 +4489,10 @@ var bundle = (function (exports) {
     });
     const navigateToNext = useStableCallback((e, fromUserInteraction) => {
       return navigateRelative2(e, 1, fromUserInteraction, "single");
-      // setTabbableIndex(navigateRelative((getTabbableIndex() ?? 0), +1), fromUserInteraction)
     });
-
     const navigateToPrev = useStableCallback((e, fromUserInteraction) => {
       return navigateRelative2(e, -1, fromUserInteraction, "single");
-      // setTabbableIndex(navigateRelative((getTabbableIndex() ?? 0), +1), fromUserInteraction)
     });
-
     const getDisableArrowKeys = useStableGetter(linearNavigationParameters.disableArrowKeys);
     const getDisableHomeEndKeys = useStableGetter(linearNavigationParameters.disableHomeEndKeys);
     const getNavigationDirection = useStableGetter(linearNavigationParameters.navigationDirection);
@@ -4528,91 +4512,129 @@ var bundle = (function (exports) {
         if (truePageNavigationSize < 1) {
           truePageNavigationSize = Math.round(pageNavigationSize * Math.max(100, getHighestIndex() + 1));
         }
+        let result = null;
+        // Arrow keys only take effect for components oriented in that direction,
+        // so we want to make sure we only listen for left/right or up/down when appropriate.
+        let keyPressIsValidForOrientation = true;
         switch (e.key) {
           case "ArrowUp":
-            {
-              //const propName = (info?.blockOrientation === "vertical" ? "blockDirection" : "inlineDirection");
-              const directionAllowed = !disableArrowKeys && allowsVerticalNavigation;
-              if (directionAllowed) {
-                const result = navigateToPrev(e, true);
-                if (result != "passthrough") {
-                  e.preventDefault();
-                  e.stopPropagation();
-                }
-              }
-              break;
-            }
           case "ArrowDown":
-            {
-              const directionAllowed = !disableArrowKeys && allowsVerticalNavigation;
-              if (directionAllowed) {
-                const result = navigateToNext(e, true);
-                if (result != "passthrough") {
-                  e.preventDefault();
-                  e.stopPropagation();
-                }
-              }
-              break;
-            }
-          case "ArrowLeft":
-            {
-              const directionAllowed = !disableArrowKeys && allowsHorizontalNavigation;
-              if (directionAllowed) {
-                const result = navigateToPrev(e, true);
-                if (result != "passthrough") {
-                  e.preventDefault();
-                  e.stopPropagation();
-                }
-              }
-              break;
-            }
-          case "ArrowRight":
-            {
-              const directionAllowed = !disableArrowKeys && allowsHorizontalNavigation;
-              if (directionAllowed) {
-                const result = navigateToNext(e, true);
-                if (result != "passthrough") {
-                  e.preventDefault();
-                  e.stopPropagation();
-                }
-              }
-              break;
-            }
-          case "PageUp":
-            {
-              if (truePageNavigationSize > 0) {
-                navigateRelative2(e, -truePageNavigationSize, true, "page");
-                e.preventDefault();
-                e.stopPropagation();
-              }
-              break;
-            }
-          case "PageDown":
-            {
-              if (truePageNavigationSize > 0) {
-                navigateRelative2(e, truePageNavigationSize, true, "page");
-                e.preventDefault();
-                e.stopPropagation();
-              }
-              break;
-            }
-          case "Home":
-            if (!disableHomeEndKeys) {
-              navigateToFirst(e, true);
-              e.preventDefault();
-              e.stopPropagation();
-            }
+            keyPressIsValidForOrientation = !disableArrowKeys && allowsVerticalNavigation;
             break;
-          case "End":
-            if (!disableHomeEndKeys) {
-              navigateToLast(e, true);
-              e.preventDefault();
-              e.stopPropagation();
-            }
+          case "ArrowLeft":
+          case "ArrowRight":
+            keyPressIsValidForOrientation = !disableArrowKeys && allowsHorizontalNavigation;
             break;
         }
+        if (keyPressIsValidForOrientation) {
+          switch (e.key) {
+            case "ArrowUp":
+            case "ArrowLeft":
+              result = navigateToPrev(e, true);
+              break;
+            case "ArrowDown":
+            case "ArrowRight":
+              result = navigateToNext(e, true);
+              break;
+            case "PageUp":
+            case "PageDown":
+              if (truePageNavigationSize > 0) {
+                navigateRelative2(e, truePageNavigationSize * (e.key.endsWith('n') ? -1 : 1), true, "page");
+                result = 'passthrough';
+              }
+              break;
+            case "Home":
+            case "End":
+              if (!disableHomeEndKeys) {
+                if (e.key.endsWith('e')) navigateToFirst(e, true);else navigateToLast(e, true);
+                result = 'passthrough';
+              }
+              break;
+          }
+        }
+        if (result && result == 'passthrough') {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        /*switch (e.key) {
+            case "ArrowUp": {
+                const directionAllowed = (!disableArrowKeys && allowsVerticalNavigation);
+                if (directionAllowed) {
+                    const result = navigateToPrev(e, true);
+                    if (result != "passthrough") {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                }
+                break;
+            }
+            case "ArrowDown": {
+                const directionAllowed = (!disableArrowKeys && allowsVerticalNavigation);
+                if (directionAllowed) {
+                    const result = navigateToNext(e, true);
+                    if (result != "passthrough") {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                }
+                break;
+            }
+             case "ArrowLeft": {
+                const directionAllowed = (!disableArrowKeys && allowsHorizontalNavigation);
+                if (directionAllowed) {
+                    const result = navigateToPrev(e, true);
+                    if (result != "passthrough") {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                }
+                break;
+            }
+            case "ArrowRight": {
+                const directionAllowed = (!disableArrowKeys && allowsHorizontalNavigation);
+                if (directionAllowed) {
+                    const result = navigateToNext(e, true);
+                    if (result != "passthrough") {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                }
+                break;
+            }
+            case "PageUp": {
+                if (truePageNavigationSize > 0) {
+                    navigateRelative2(e, -truePageNavigationSize, true, "page");
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+                break;
+            }
+            case "PageDown": {
+                if (truePageNavigationSize > 0) {
+                    navigateRelative2(e, truePageNavigationSize, true, "page");
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+                break;
+            }
+            case "Home":
+                if (!disableHomeEndKeys) {
+                    navigateToFirst(e, true);
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+                break;
+             case "End":
+                if (!disableHomeEndKeys) {
+                    navigateToLast(e, true);
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+                break;
+        }*/
       }
     });
+
     return {
       linearNavigationReturn: {
         propsStable: stableProps.current
@@ -4837,7 +4859,14 @@ var bundle = (function (exports) {
       getAt: getManagedChildInfo,
       getHighestIndex: getHighestIndex,
       arraySlice: T$1(() => {
-        return managedChildrenArray.current.arr.slice();
+        let ret = managedChildrenArray.current.arr.slice();
+        const max = getHighestIndex();
+        for (let i = 0; i <= max; ++i) {
+          if (ret[i] == null) ret[i] = {
+            index: i
+          };
+        }
+        return ret;
       }, [])
     });
     const getChildren = T$1(() => managedChildren, []);
@@ -5045,10 +5074,9 @@ var bundle = (function (exports) {
         setStateP(value);
       }
     }, []);
-    const getState = () => {
+    const getState = T$1(() => {
       return ref.current;
-    };
-    console.assert(ref.current === state || typeof state === "number" && isNaN(state));
+    }, []);
     return [state, setState, getState];
   }
 
@@ -5103,13 +5131,18 @@ var bundle = (function (exports) {
       return changeTabbableIndex(function returnModifiedTabbableIndex(prevIndex) {
         let nextIndex = typeof updater === "function" ? updater(prevIndex !== null && prevIndex !== void 0 ? prevIndex : null) : updater;
         const untabbable = getUntabbable();
+        // Whether or not we're currently tabbable, make sure that when we switch from untabbable to tabbable,
+        // that we know which index to switch back to.
         if (nextIndex != null) setLastNonNullIndex(nextIndex);
+        // If we're untabbable, then any attempt to set a new index simply fails and sets it to `null`.
         if (untabbable) return null;
+        // If the requested index is hidden, then there's no need to focus any elements or run any extra logic.
+        if (nextIndex == null) return null;
+        // If we've made a change, and it was because the user clicked on it or something,
+        // then focus that element too
         if (prevIndex != nextIndex) {
-          const nextChild = nextIndex == null ? null : children.getAt(nextIndex);
-          if (nextChild !== null && nextChild !== void 0 && nextChild.hidden) {
-            return prevIndex !== null && prevIndex !== void 0 ? prevIndex : untabbable ? null : 0;
-          }
+          const nextChild = children.getAt(nextIndex);
+          console.assert(!(nextChild !== null && nextChild !== void 0 && nextChild.hidden));
           if (nextChild != null && fromUserInteraction) {
             const element = nextChild.getElement();
             if (element) {
@@ -5119,7 +5152,8 @@ var bundle = (function (exports) {
         }
         // TODO: Redundant?
         if (nextIndex != null) setLastNonNullIndex(nextIndex);
-        return nextIndex !== null && nextIndex !== void 0 ? nextIndex : untabbable ? null : 0;
+        // Finally, return the value the user requested the index be set to.
+        return nextIndex !== null && nextIndex !== void 0 ? nextIndex : 0;
       }, reason);
     }, []);
     // When we switch from tabbable to non/tabbable, we really want to remember the last tabbable child.
@@ -5193,7 +5227,8 @@ var bundle = (function (exports) {
         setTabbableIndex,
         getInitiallyTabbedIndex
       },
-      rovingTabIndexChildParameters
+      rovingTabIndexChildParameters,
+      ..._void3
     } = _ref2;
     const {
       hidden,
@@ -6109,8 +6144,9 @@ var bundle = (function (exports) {
     const onRearrangedGetter = useStableGetter(onRearranged);
     //const { setTabbableIndex } = rovingTabIndexReturn;
     const shuffle$1 = T$1(managedRows => {
-      const shuffledRows = shuffle(managedRows.arraySlice());
-      return rearrange(shuffledRows);
+      const originalRows = managedRows.arraySlice();
+      const shuffledRows = shuffle(originalRows);
+      return rearrange(originalRows, shuffledRows);
     }, [/* Must remain stable */]);
     // The sort function needs to be able to update whoever has all the sortable children.
     // Because that might not be the consumer of *this* hook directly (e.g. a table uses
@@ -6118,7 +6154,7 @@ var bundle = (function (exports) {
     // get and set a forceUpdate function.
     //const [getForceUpdate, setForceUpdate] = usePassiveState<null | (() => void)>(null, returnNull);
     const [getForceUpdate, setForceUpdate] = usePassiveState(null, returnNull);
-    const rearrange = T$1(sortedRows => {
+    const rearrange = T$1((originalRows, sortedRows) => {
       var _onRearrangedGetter, _getForceUpdate;
       mangleMap.current.clear();
       demangleMap.current.clear();
@@ -6216,14 +6252,15 @@ var bundle = (function (exports) {
     // The actual sort function.
     const sort = T$1((managedRows, direction) => {
       const compare = getCompare();
-      const sortedRows = compare ? managedRows.arraySlice().sort((lhsRow, rhsRow) => {
+      const originalRows = managedRows.arraySlice();
+      const sortedRows = compare ? originalRows.sort((lhsRow, rhsRow) => {
         const lhsValue = lhsRow;
         const rhsValue = rhsRow;
         const result = compare(lhsValue, rhsValue);
         if (direction[0] == "d") return -result;
         return result;
       }) : managedRows.arraySlice();
-      return rearrange(sortedRows);
+      return rearrange(originalRows, sortedRows);
     }, [/* Must remain stable */]);
     return {
       sortableChildrenReturn: {
@@ -6372,6 +6409,44 @@ var bundle = (function (exports) {
       },
       ...sscr,
       ...lncr
+    };
+  }
+
+  function useListNavigationSingleSelectionSortable(_ref) {
+    let {
+      linearNavigationParameters,
+      rovingTabIndexParameters,
+      typeaheadNavigationParameters,
+      singleSelectionParameters,
+      managedChildrenReturn,
+      rearrangeableChildrenParameters,
+      sortableChildrenParameters,
+      ..._void3
+    } = _ref;
+    const scr = useSortableChildren({
+      rearrangeableChildrenParameters,
+      sortableChildrenParameters
+    });
+    const {
+      rearrangeableChildrenReturn: {
+        indexDemangler,
+        indexMangler
+      }
+    } = scr;
+    const lnssr = useListNavigationSingleSelection({
+      linearNavigationParameters: {
+        ...linearNavigationParameters,
+        indexDemangler,
+        indexMangler
+      },
+      rovingTabIndexParameters,
+      typeaheadNavigationParameters,
+      singleSelectionParameters,
+      managedChildrenReturn
+    });
+    return {
+      ...lnssr,
+      ...scr
     };
   }
 
@@ -7089,11 +7164,8 @@ var bundle = (function (exports) {
         }
       },
       hasCurrentFocusReturn
-      //managedChildrenReturn,
-      //...gridNavigationSingleSelectionReturn
     };
   }
-
   function useCompleteGridNavigationCell(_ref3) {
     let {
       gridNavigationCellParameters,
@@ -7109,13 +7181,10 @@ var bundle = (function (exports) {
       },
       rovingTabIndexChildParameters,
       textContentParameters,
-      //managedChildContext,
       completeGridNavigationCellParameters: {
         focusSelf,
         ...completeGridNavigationCellParameters
       }
-      //sortableChildParameters: { getSortValue },
-      //    pressParameters: { onPressSync, ...pressParameters },
     } = _ref3;
     const {
       index
@@ -7152,17 +7221,6 @@ var bundle = (function (exports) {
       },
       refElementReturn
     });
-    /* const { pressReturn } = usePress<CellElement>({
-         pressParameters: {
-             onPressSync: useStableCallback<NonNullable<typeof onPressSync>>(e => {
-                 onPressSync?.(e);
-                 completeGridNavigationContext.onPressSync?.(e);
-             }),
-             focusSelf: null,
-             ...pressParameters
-         },
-         refElementReturn
-     });*/
     const baseInfo = {
       focusSelf,
       getElement: refElementReturn.getElement,
@@ -7171,9 +7229,7 @@ var bundle = (function (exports) {
       getTabbable: rovingTabIndexChildReturn.getTabbable,
       setTabbable: rovingTabIndexChildReturn.setTabbable,
       tabbable: rovingTabIndexChildReturn.tabbable
-      //getSortValue
     };
-
     const {
       managedChildReturn
     } = useManagedChild({
@@ -7187,15 +7243,12 @@ var bundle = (function (exports) {
       ...baseInfo,
       ...completeGridNavigationCellParameters
     });
-    const props = useMergedProps(refElementReturn.propsStable,
-    //pressReturn.propsStable,
-    rovingTabIndexChildReturn.propsUnstable, hasCurrentFocusReturn.propsStable);
+    const props = useMergedProps(refElementReturn.propsStable, rovingTabIndexChildReturn.propsUnstable, hasCurrentFocusReturn.propsStable);
     return {
       props,
       refElementReturn,
       rovingTabIndexChildReturn,
       pressParameters,
-      //pressReturn,
       hasCurrentFocusReturn,
       managedChildReturn,
       textContentReturn
@@ -7236,22 +7289,6 @@ var bundle = (function (exports) {
       return true;
     }, []);
     const {
-      rearrangeableChildrenReturn: {
-        indexDemangler,
-        indexMangler,
-        ...rearrangeableChildrenReturn
-      },
-      sortableChildrenReturn
-    } = useSortableChildren({
-      rearrangeableChildrenParameters: {
-        onRearranged: useStableCallback(() => {
-          refreshPagination(paginatedChildrenParameters.paginationMin, paginatedChildrenParameters.paginationMax);
-        }),
-        ...rearrangeableChildrenParameters
-      },
-      sortableChildrenParameters
-    });
-    const {
       childrenHaveFocusParameters,
       managedChildrenParameters,
       rovingTabIndexChildContext,
@@ -7260,16 +7297,16 @@ var bundle = (function (exports) {
       linearNavigationReturn,
       rovingTabIndexReturn,
       singleSelectionReturn,
-      typeaheadNavigationReturn
-    } = useListNavigationSingleSelection({
+      typeaheadNavigationReturn,
+      rearrangeableChildrenReturn,
+      sortableChildrenReturn
+    } = useListNavigationSingleSelectionSortable({
       managedChildrenReturn: {
         getChildren
       },
       linearNavigationParameters: {
         getHighestIndex: getHighestChildIndex,
         isValid,
-        indexDemangler,
-        indexMangler,
         ...linearNavigationParameters
       },
       typeaheadNavigationParameters: {
@@ -7281,10 +7318,15 @@ var bundle = (function (exports) {
         ...rovingTabIndexParameters
       },
       singleSelectionParameters,
+      rearrangeableChildrenParameters: {
+        onRearranged: useStableCallback(() => {
+          refreshPagination(paginatedChildrenParameters.paginationMin, paginatedChildrenParameters.paginationMax);
+        }),
+        ...rearrangeableChildrenParameters
+      },
+      sortableChildrenParameters,
       ...completeListNavigationParameters
     });
-    //const { linearNavigationReturn, typeaheadNavigationReturn } = listNavigationSingleSelectionSortableReturn;
-    //const [childCount, setChildCount] = useState(0);
     const {
       childrenHaveFocusChildContext,
       childrenHaveFocusReturn
@@ -7319,7 +7361,7 @@ var bundle = (function (exports) {
       managedChildrenReturn,
       paginatedChildrenParameters,
       linearNavigationParameters: {
-        indexDemangler
+        indexDemangler: rearrangeableChildrenReturn.indexDemangler
       }
     });
     const {
@@ -7345,11 +7387,7 @@ var bundle = (function (exports) {
       context,
       props,
       managedChildrenReturn,
-      rearrangeableChildrenReturn: {
-        indexDemangler,
-        indexMangler,
-        ...rearrangeableChildrenReturn
-      },
+      rearrangeableChildrenReturn,
       staggeredChildrenReturn,
       paginatedChildrenReturn,
       sortableChildrenReturn,
@@ -7382,7 +7420,6 @@ var bundle = (function (exports) {
         paginatedChildContext,
         staggeredChildContext
       },
-      //pressParameters: { onPressSync: ops1, ...pressParameters },
       sortableChildParameters: {
         getSortValue
       },
@@ -7426,7 +7463,6 @@ var bundle = (function (exports) {
         staggeredChildContext
       }
     });
-    //let { hidden } = rovingTabIndexChildParameters;
     hidden || (hidden = hideBecausePaginated || hideBecauseStaggered);
     let {
       disabled
@@ -7474,16 +7510,6 @@ var bundle = (function (exports) {
       setTabbable,
       tabbable
     } = rovingTabIndexChildReturn;
-    /* const { pressReturn } = usePress<ChildElement>({
-         pressParameters: {
-             ...p1,
-             ...pressParameters,
-             onPressSync: disabled ? null : ((e) => {
-                 ops2?.(e);
-                 ops1?.(e);
-             })
-         }, refElementReturn
-     });*/
     const {
       getSelected,
       selected
@@ -7553,12 +7579,6 @@ var bundle = (function (exports) {
       staggeredChildReturn
     };
   }
-  /*
-  function foo<ParentElement extends Element, ChildElement extends Element, M extends UseListNavigationSingleSelectionSortableChildInfo<ChildElement>>(p: UseCompleteListNavigationParameters<ParentElement, ChildElement, M>) {
-      const { singleSelectionReturn } = useCompleteListNavigation<ParentElement, ChildElement, M>(p);
-      const selectedIndex = 0;
-      useSingleSelectionDeclarative({ singleSelectionReturn, singleSelectionDeclarativeParameters: { selectedIndex } })
-  }*/
 
   /**
    * Combines dismissal hooks and focus trap hooks into one.
@@ -7582,8 +7602,6 @@ var bundle = (function (exports) {
     const {
       open
     } = dismissParameters;
-    //const { getWindow } = escapeDismissParameters;
-    //const getDocument = useCallback(() => { return getWindow().document; }, [getWindow]);
     const {
       refElementPopupReturn,
       refElementSourceReturn
@@ -7807,8 +7825,6 @@ var bundle = (function (exports) {
       // then we're definitely not in a press anymore (if we could we'd just wait for onPointerUp, but it could happen outside this element)
       if (!(e.buttons & 1)) setPointerDownStartedHere(listeningForPress = false);
       if (listeningForPress) {
-        //e.preventDefault();
-        //e.stopPropagation();
         const element = getElement();
         // Note: elementFromPoint starts reasonably expensive on a decent computer when on the order of 500 or so elements,
         // so we only test for hovering while actively attempting to detect a press
@@ -7904,7 +7920,6 @@ var bundle = (function (exports) {
           // We don't actually activate it on a space keydown
           // but we do preventDefault to stop the page from scrolling.
           setWaitingForSpaceUp(true);
-          //onActiveStart(e);
           e.preventDefault();
         }
         if (e.key == "Enter" && !excludeEnter() && (!e.repeat || (allowRepeatPresses !== null && allowRepeatPresses !== void 0 ? allowRepeatPresses : false))) {
@@ -7920,9 +7935,6 @@ var bundle = (function (exports) {
       const element = getElement();
       if (onPressSync) {
         e.preventDefault();
-        //const element = getElement();
-        //if (element)
-        //    focusSelf(element);
         if (e.detail > 1) {
           e.stopImmediatePropagation();
           e.stopPropagation();
@@ -7940,8 +7952,8 @@ var bundle = (function (exports) {
           (element === null || element === void 0 ? void 0 : element.tagName) == 'input' && element.type == 'radio' && element.checked) {
             // Intentional, for now. Programmatic clicks shouldn't happen in most cases.
             // TODO: Remove this when I'm confident stray clicks won't be handled.
-            console.assert(false);
             debugger;
+            console.log("onclick was fired and will be handled as it doesn't look like it came from a pointer event", e);
             handlePress(e);
           }
         }
@@ -8038,7 +8050,6 @@ var bundle = (function (exports) {
     }
     return t;
   }
-  // why???
   const AsyncFunction = async function () {}.constructor;
   /**
    * Given an async function, returns a function that's suitable for non-async APIs,
