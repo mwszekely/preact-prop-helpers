@@ -3,22 +3,34 @@ import { useCallback, useRef } from "preact/hooks";
 import { useMergedProps } from "./use-merged-props.js";
 import { useRefElement } from "./use-ref-element.js";
 
-export function useImperativeProps<T extends Element>() {
-    const currentImperativeProps = useRef<{ className: DOMTokenList, style: h.JSX.CSSProperties, children: string | null, others: h.JSX.HTMLAttributes<T> }>({ className: new DOMTokenList(), style: {}, children: null, others: {} });
+export type SetChildren = ((children: string | null) => void);
+export type SetClass = (cls: string, enabled: boolean) => void;
+export type SetStyle = <T extends keyof CSSStyleDeclaration>(prop: T, value: h.JSX.CSSProperties[T] | null) => void;
+export type SetAttribute<T extends Element> = <K extends keyof h.JSX.HTMLAttributes<T>>(prop: K, value: h.JSX.HTMLAttributes<T>[K] | null) => void;
+
+export interface ImperativeHandle<T extends Element> {
+    setClass: SetClass;
+    setStyle: SetStyle;
+    setAttribute: SetAttribute<T>;
+    setChildren: SetChildren;
+}
+
+export function useImperativeProps<E extends Element>() {
+    const currentImperativeProps = useRef<{ className: DOMTokenList, style: h.JSX.CSSProperties, children: string | null, others: h.JSX.HTMLAttributes<E> }>({ className: new DOMTokenList(), style: {}, children: null, others: {} });
 
 
     const {
         refElementReturn: { getElement, propsStable }
-    } = useRefElement<T>({ refElementParameters: { onElementChange: undefined, onMount: undefined, onUnmount: undefined } });
+    } = useRefElement<E>({ refElementParameters: { onElementChange: undefined, onMount: undefined, onUnmount: undefined } });
 
-    const setClass = useCallback((cls: string, enabled: boolean) => {
+    const setClass = useCallback<SetClass>((cls, enabled) => {
         if (currentImperativeProps.current.className.contains(cls) == !enabled) {
             getElement()?.classList[enabled ? "add" : "remove"](cls);
             currentImperativeProps.current.className[enabled ? "add" : "remove"](cls);
         }
     }, []);
 
-    const setStyle = useCallback(<T extends keyof CSSStyleDeclaration>(prop: T, value: h.JSX.CSSProperties[T] | null) => {
+    const setStyle = useCallback<SetStyle>((prop, value) => {
         const element = (getElement() as Element as HTMLElement | undefined);
         if (element) {
             if (currentImperativeProps.current.style[prop] != value) {
@@ -28,7 +40,7 @@ export function useImperativeProps<T extends Element>() {
         }
     }, []);
 
-    const setChildren = useCallback((children: string | null) => {
+    const setChildren = useCallback<SetChildren>((children: string | null) => {
         let e = getElement();
         if (e && currentImperativeProps.current.children != children) {
             currentImperativeProps.current.children = children;
@@ -36,7 +48,7 @@ export function useImperativeProps<T extends Element>() {
         }
     }, []);
 
-    const setAttribute = useCallback(<K extends keyof h.JSX.HTMLAttributes<T>>(prop: K, value: h.JSX.HTMLAttributes<T>[K] | null) => {
+    const setAttribute = useCallback<SetAttribute<E>>((prop, value) => {
         if (value != null) {
             currentImperativeProps.current.others[prop] = value;
             getElement()?.setAttribute(prop, value);
@@ -48,14 +60,14 @@ export function useImperativeProps<T extends Element>() {
     }, []);
 
     return {
-        imperativeProps: useRef({
+        imperativeHandle: useRef<ImperativeHandle<E>>({
             setClass,
             setStyle,
             setAttribute,
             setChildren
         }).current,
 
-        propsUnstable: useMergedProps<T>(
+        propsUnstable: useMergedProps<E>(
             propsStable,
             { className: currentImperativeProps.current.className.toString(), style: currentImperativeProps.current.style },
             currentImperativeProps.current.others

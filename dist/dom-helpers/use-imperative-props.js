@@ -37,7 +37,7 @@ export function useImperativeProps() {
         }
     }, []);
     return {
-        imperativeProps: useRef({
+        imperativeHandle: useRef({
             setClass,
             setStyle,
             setAttribute,
