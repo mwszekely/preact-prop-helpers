@@ -30,17 +30,6 @@ export interface UseRearrangeableChildrenParameters {
 
 
         onRearranged: null | (() => void);
-
-        /** 
-         * Using rearrangeable children means we need to be able to override arrow key navigation,
-         * which also means that, somewhere down the road, we need to know which children are arrow-key-able,
-         * just like in normal linear navigation.
-         * 
-         * 
-         * PSYCHE!! LinearNavigation should be the one to deal with index manglers and demanglers, and now it does.
-         */
-        //getValid: GetValid;
-        // getHighestChildIndex: GetHighestChildIndex;
     }
 }
 
@@ -75,7 +64,7 @@ export interface UseRearrangeableChildrenReturnType<M extends ManagedChildInfo<n
          *  
          * 
          */
-        rearrange: (rowsInOrder: M[]) => void;
+        rearrange: (originalRows: M[], rowsInOrder: M[]) => void;
 
         /** **STABLE** */
         shuffle: (managedRows: ManagedChildren<M>) => Promise<void> | void;
@@ -159,8 +148,9 @@ export function useRearrangeableChildren<M extends UseSortableChildInfo>({
 
 
     const shuffle = useCallback((managedRows: ManagedChildren<M>): Promise<void> | void => {
-        const shuffledRows = lodashShuffle(managedRows.arraySlice())
-        return rearrange(shuffledRows);
+        const originalRows = managedRows.arraySlice();
+        const shuffledRows = lodashShuffle(originalRows)
+        return rearrange(originalRows, shuffledRows);
     }, [/* Must remain stable */]);
 
 
@@ -171,7 +161,7 @@ export function useRearrangeableChildren<M extends UseSortableChildInfo>({
     //const [getForceUpdate, setForceUpdate] = usePassiveState<null | (() => void)>(null, returnNull);
     const [getForceUpdate, setForceUpdate] = usePassiveState<null | (() => void), never>(null, returnNull);
 
-    const rearrange = useCallback((sortedRows: M[]) => {
+    const rearrange = useCallback((originalRows: M[], sortedRows: M[]) => {
 
         mangleMap.current.clear();
         demangleMap.current.clear();
@@ -261,8 +251,9 @@ export function useSortableChildren<M extends UseSortableChildInfo>({
     // The actual sort function.
     const sort = useCallback((managedRows: ManagedChildren<M>, direction: "ascending" | "descending"): Promise<void> | void => {
         const compare = getCompare();
+        const originalRows = managedRows.arraySlice();
 
-        const sortedRows = compare ? managedRows.arraySlice().sort((lhsRow, rhsRow) => {
+        const sortedRows = compare ? originalRows.sort((lhsRow, rhsRow) => {
 
             const lhsValue = lhsRow;
             const rhsValue = rhsRow;
@@ -273,7 +264,7 @@ export function useSortableChildren<M extends UseSortableChildInfo>({
 
         }) : managedRows.arraySlice();
 
-        return rearrange(sortedRows);
+        return rearrange(originalRows, sortedRows);
 
     }, [ /* Must remain stable */]);
 

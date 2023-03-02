@@ -35,8 +35,9 @@ export function useRearrangeableChildren({ rearrangeableChildrenParameters: { ge
     const onRearrangedGetter = useStableGetter(onRearranged);
     //const { setTabbableIndex } = rovingTabIndexReturn;
     const shuffle = useCallback((managedRows) => {
-        const shuffledRows = lodashShuffle(managedRows.arraySlice());
-        return rearrange(shuffledRows);
+        const originalRows = managedRows.arraySlice();
+        const shuffledRows = lodashShuffle(originalRows);
+        return rearrange(originalRows, shuffledRows);
     }, [ /* Must remain stable */]);
     // The sort function needs to be able to update whoever has all the sortable children.
     // Because that might not be the consumer of *this* hook directly (e.g. a table uses
@@ -44,7 +45,7 @@ export function useRearrangeableChildren({ rearrangeableChildrenParameters: { ge
     // get and set a forceUpdate function.
     //const [getForceUpdate, setForceUpdate] = usePassiveState<null | (() => void)>(null, returnNull);
     const [getForceUpdate, setForceUpdate] = usePassiveState(null, returnNull);
-    const rearrange = useCallback((sortedRows) => {
+    const rearrange = useCallback((originalRows, sortedRows) => {
         mangleMap.current.clear();
         demangleMap.current.clear();
         // Update our sorted <--> unsorted indices map 
@@ -118,7 +119,8 @@ export function useSortableChildren({ rearrangeableChildrenParameters, sortableC
     // The actual sort function.
     const sort = useCallback((managedRows, direction) => {
         const compare = getCompare();
-        const sortedRows = compare ? managedRows.arraySlice().sort((lhsRow, rhsRow) => {
+        const originalRows = managedRows.arraySlice();
+        const sortedRows = compare ? originalRows.sort((lhsRow, rhsRow) => {
             const lhsValue = lhsRow;
             const rhsValue = rhsRow;
             const result = compare(lhsValue, rhsValue);
@@ -126,7 +128,7 @@ export function useSortableChildren({ rearrangeableChildrenParameters, sortableC
                 return -result;
             return result;
         }) : managedRows.arraySlice();
-        return rearrange(sortedRows);
+        return rearrange(originalRows, sortedRows);
     }, [ /* Must remain stable */]);
     return {
         sortableChildrenReturn: { sort },

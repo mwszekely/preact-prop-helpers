@@ -32,8 +32,7 @@ export interface UseCompleteGridNavigationParameters<ParentOrRowElement extends 
 
 export interface UseCompleteGridNavigationRowParameters<RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement, CellElement>, CM extends UseCompleteGridNavigationCellInfo<CellElement>> {
     rowAsChildOfGridParameters: OmitStrong<UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM>["rowAsChildOfGridParameters"], "typeaheadNavigationChildContext" | "textContentParameters" | "managedChildrenReturn" | "singleSelectionContext" | "gridNavigationRowContext" | "rovingTabIndexChildContext" | "typeaheadNavigationChildContext" | "refElementReturn"> & {
-        context: CompleteGridNavigationContext<any, RowElement, CellElement, RM, CM>; //UseManagedChildParameters<RM>["context"];
-        //managedChildReturn: UseManagedChildReturnType<RM>["managedChildReturn"];
+        context: CompleteGridNavigationContext<any, RowElement, CellElement, RM, CM>;
         completeGridNavigationRowParameters: OmitStrong<RM, keyof UseCompleteGridNavigationRowInfo<RowElement, CellElement>>;
         sortableChildParameters: Pick<UseSortableChildInfo, "getSortValue">;
         textContentParameters: OmitStrong<UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM>["rowAsChildOfGridParameters"]["textContentParameters"], "hidden">;
@@ -47,13 +46,9 @@ export interface UseCompleteGridNavigationRowParameters<RowElement extends Eleme
 
 export interface UseCompleteGridNavigationCellParameters<CellElement extends Element, M extends UseCompleteGridNavigationCellInfo<CellElement>> extends
     OmitStrong<UseGridNavigationSingleSelectionCellParameters<any, CellElement>, "textContentParameters" | "typeaheadNavigationChildContext" | "rovingTabIndexChildContext" | "gridNavigationCellContext" | "refElementReturn"> {
-    //pressParameters: UsePressParameters<CellElement>["pressParameters"];
-    //sortableChildParameters: { getSortValue: UseSortableChildInfo["getSortValue"] };
-    //managedChildContext: UseManagedChildParameters<M>["managedChildContext"];
     textContentParameters: OmitStrong<UseGridNavigationSingleSelectionCellParameters<any, CellElement>["textContentParameters"], "hidden">;
     completeGridNavigationCellParameters: Pick<M, "focusSelf"> & OmitStrong<M, keyof UseCompleteGridNavigationCellInfo<CellElement>>;
     context: CompleteGridNavigationRowContext<any, CellElement, M>;
-    //managedChildReturn: UseManagedChildReturnType<M>["managedChildReturn"];
 }
 
 
@@ -70,10 +65,6 @@ export interface CompleteGridNavigationContext<ParentOrRowElement extends Elemen
 
 export interface CompleteGridNavigationRowContext<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteGridNavigationCellInfo<ChildElement>> extends UseManagedChildrenContext<M>,
     Pick<UseGridNavigationRowReturnType<ParentElement, ChildElement>["rowAsParentOfCellsReturn"], "typeaheadNavigationChildContext" | "rovingTabIndexChildContext" | "gridNavigationCellContext"> {
-    //completeGridNavigationContext: {
-    //onClick: () => void;
-    // onPressSync: UsePressParameters<ChildElement>["pressParameters"]["onPressSync"]
-    //}
 }
 
 
@@ -106,7 +97,6 @@ export interface UseCompleteGridNavigationRowReturnType<RowElement extends Eleme
 
 export interface UseCompleteGridNavigationCellReturnType<CellElement extends Element, CM extends UseCompleteGridNavigationCellInfo<CellElement>> extends
     OmitStrong<UseGridNavigationSingleSelectionSortableCellReturnType<CellElement>, "hasCurrentFocusParameters">,
-    //UsePressReturnType<CellElement>, 
     UseRefElementReturnType<CellElement>, UseHasCurrentFocusReturnType<CellElement>, UseManagedChildReturnType<CM> {
     props: h.JSX.HTMLAttributes<CellElement>;
 
@@ -335,9 +325,6 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
             paginatedChildReturn: { isPaginated, paginatedVisible, hideBecausePaginated }
         },
         hasCurrentFocusReturn
-
-        //managedChildrenReturn,
-        //...gridNavigationSingleSelectionReturn
     }
 }
 
@@ -348,10 +335,7 @@ export function useCompleteGridNavigationCell<CellElement extends Element, M ext
     rovingTabIndexChildParameters: { hidden },
     rovingTabIndexChildParameters,
     textContentParameters,
-    //managedChildContext,
     completeGridNavigationCellParameters: { focusSelf, ...completeGridNavigationCellParameters },
-    //sortableChildParameters: { getSortValue },
-    //    pressParameters: { onPressSync, ...pressParameters },
 }: UseCompleteGridNavigationCellParameters<CellElement, M>): UseCompleteGridNavigationCellReturnType<CellElement, M> {
 
     const { index } = managedChildParameters;
@@ -376,22 +360,6 @@ export function useCompleteGridNavigationCell<CellElement extends Element, M ext
 
     const { hasCurrentFocusReturn } = useHasCurrentFocus<CellElement>({ hasCurrentFocusParameters: { onCurrentFocusedChanged: null, ...hasCurrentFocusParameters }, refElementReturn });
 
-
-
-    /* const { pressReturn } = usePress<CellElement>({
-         pressParameters: {
-             onPressSync: useStableCallback<NonNullable<typeof onPressSync>>(e => {
-                 onPressSync?.(e);
-                 completeGridNavigationContext.onPressSync?.(e);
-             }),
-             focusSelf: null,
-             ...pressParameters
-         },
-         refElementReturn
-     });*/
-
-
-
     const baseInfo: UseCompleteGridNavigationCellInfo<CellElement> = {
         focusSelf,
         getElement: refElementReturn.getElement,
@@ -400,7 +368,6 @@ export function useCompleteGridNavigationCell<CellElement extends Element, M ext
         getTabbable: rovingTabIndexChildReturn.getTabbable,
         setTabbable: rovingTabIndexChildReturn.setTabbable,
         tabbable: rovingTabIndexChildReturn.tabbable,
-        //getSortValue
     }
 
     const { managedChildReturn } = useManagedChild<M>({
@@ -414,7 +381,6 @@ export function useCompleteGridNavigationCell<CellElement extends Element, M ext
 
     const props = useMergedProps(
         refElementReturn.propsStable,
-        //pressReturn.propsStable,
         rovingTabIndexChildReturn.propsUnstable,
         hasCurrentFocusReturn.propsStable
     );
@@ -424,7 +390,6 @@ export function useCompleteGridNavigationCell<CellElement extends Element, M ext
         refElementReturn,
         rovingTabIndexChildReturn,
         pressParameters,
-        //pressReturn,
         hasCurrentFocusReturn,
         managedChildReturn,
         textContentReturn

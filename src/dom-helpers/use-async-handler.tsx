@@ -48,9 +48,6 @@ export interface UseAsyncHandlerReturnType<EventType, CaptureType> extends UseAs
      */
     hasCapture: boolean;
 
-    // Same as in useAsync, but with a different type
-    //promise: Promise<void> | null;
-
 }
 
 /**

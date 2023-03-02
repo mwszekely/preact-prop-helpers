@@ -11,22 +11,7 @@ export { generateRandomId };
 export interface UseRandomIdReturnType<S extends Element, T extends Element> {
     propsSource: h.JSX.HTMLAttributes<S>;
     propsReferencer: h.JSX.HTMLAttributes<T>;
-
-    /**
-     * **STABLE**
-     * 
-     * The element that needs a custom `id` prop must use this hook.
-     */
-    //useRandomIdSourceElement: UseRandomIdSourceElement<S>;
-
-    /**
-     * **STABLE**
-     * 
-     * Any element that references the id via `for` or `aria-labelledby`, etc. must use this hook.
-     * 
-     * This hook can be used multiple times on different components.
-     */
-    //useRandomIdReferencerElement: UseRandomIdReferencerElement;
+    
     randomIdReturn: { id: string; };
 }
 

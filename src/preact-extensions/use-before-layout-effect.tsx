@@ -77,17 +77,6 @@ options[commitName] = newCommit as never
  */
 export function useBeforeLayoutEffect(effect: EffectCallback | null, inputs?: Inputs) {
 
-    /*(() => {
-        const cleanup = useRef<void | (() => void) | null>(null);
-        const prevArgsRef = useRef<Inputs>(null!);
-        if (argsChanged(inputs, prevArgsRef.current)) {
-            prevArgsRef.current = inputs!;
-            if (cleanup.current)
-                cleanup.current();
-            cleanup.current = effect();
-        }
-    })();*/
-
     const [id] = useState(() => generateRandomId());
     if (effect)
         toRun.set(id, { effect, inputs, cleanup: null });

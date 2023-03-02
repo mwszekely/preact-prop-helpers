@@ -46,15 +46,21 @@ export function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovi
         return changeTabbableIndex(function returnModifiedTabbableIndex(prevIndex) {
             let nextIndex = ((typeof updater === "function") ? updater(prevIndex ?? null) : updater);
             const untabbable = getUntabbable();
+            // Whether or not we're currently tabbable, make sure that when we switch from untabbable to tabbable,
+            // that we know which index to switch back to.
             if (nextIndex != null)
                 setLastNonNullIndex(nextIndex);
+            // If we're untabbable, then any attempt to set a new index simply fails and sets it to `null`.
             if (untabbable)
                 return null;
+            // If the requested index is hidden, then there's no need to focus any elements or run any extra logic.
+            if (nextIndex == null)
+                return null;
+            // If we've made a change, and it was because the user clicked on it or something,
+            // then focus that element too
             if (prevIndex != nextIndex) {
-                const nextChild = nextIndex == null ? null : children.getAt(nextIndex);
-                if (nextChild?.hidden) {
-                    return prevIndex ?? (untabbable ? null : 0);
-                }
+                const nextChild = children.getAt(nextIndex);
+                console.assert(!nextChild?.hidden);
                 if (nextChild != null && fromUserInteraction) {
                     const element = nextChild.getElement();
                     if (element) {
@@ -66,7 +72,8 @@ export function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovi
             // TODO: Redundant?
             if (nextIndex != null)
                 setLastNonNullIndex(nextIndex);
-            return nextIndex ?? (untabbable ? null : 0);
+            // Finally, return the value the user requested the index be set to.
+            return nextIndex ?? 0;
         }, reason);
     }, []);
     // When we switch from tabbable to non/tabbable, we really want to remember the last tabbable child.
@@ -114,7 +121,7 @@ export function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovi
         rovingTabIndexChildContext
     };
 }
-export function useRovingTabIndexChild({ managedChildParameters: { index, ..._void2 }, rovingTabIndexChildContext: { reevaluateClosestFit, setTabbableIndex, getInitiallyTabbedIndex }, rovingTabIndexChildParameters, }) {
+export function useRovingTabIndexChild({ managedChildParameters: { index, ..._void2 }, rovingTabIndexChildContext: { reevaluateClosestFit, setTabbableIndex, getInitiallyTabbedIndex }, rovingTabIndexChildParameters, ..._void3 }) {
     const { hidden, ..._void1 } = rovingTabIndexChildParameters;
     const [tabbable, setTabbable, getTabbable] = useState(getInitiallyTabbedIndex() === index);
     useEffect(() => {
@@ -122,6 +129,7 @@ export function useRovingTabIndexChild({ managedChildParameters: { index, ..._vo
     }, [!!hidden]);
     assertEmptyObject(_void1);
     assertEmptyObject(_void2);
+    assertEmptyObject(_void3);
     return {
         hasCurrentFocusParameters: {
             onCurrentFocusedInnerChanged: useStableCallback((focused, _prevFocused, e) => {

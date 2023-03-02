@@ -12,6 +12,13 @@ interface ContextType {
 
 const SharedAnimationFrameContext = createContext<null | ContextType>(null);
 
+/**
+ * When a bunch of unrelated components all use `requestAnimationFrame`,
+ * yes, this actually is faster. I wish it wasn't. It's lame.
+ * 
+ * @param param0 
+ * @returns 
+ */
 export function ProvideBatchedAnimationFrames({ children }: { children: ComponentChildren }) {
 
     const addCallback = useCallback<ContextType["addCallback"]>((callbackToBeBatched, tag) => { allCallbacks.current.set(callbackToBeBatched, tag); }, []);

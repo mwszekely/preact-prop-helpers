@@ -220,14 +220,6 @@ export function useLostFocusDismiss<SourceElement extends Element | null, PopupE
     return { activeElementParameters: { onLastActiveElementChange } }
 }
 
-/*
-export interface UseSoftDismissParameters<SourceElement extends Element, PopupElement extends Element> extends UseLostFocusDismissParameters<SourceElement, PopupElement>, UseEscapeDismissParameters<SourceElement> { }
-
-export function useSoftDismiss<SourceElement extends Element, PopupElement extends Element>({ escapeDismissParameters, lostFocusDismiss, refElementPopupReturn, refElementReturn, refElementSourceReturn, ..._void3 }: UseSoftDismissParameters<SourceElement, PopupElement>) {
-    const { activeElementParameters, ...void2 } = useLostFocusDismiss({ lostFocusDismiss, refElementPopupReturn, refElementSourceReturn });
-    const _void1: void = useEscapeDismiss({ escapeDismissParameters, refElementReturn });
-}*/
-
 export interface UseBackdropDismissParameters<PopupElement extends Element> {
     backdropDismissParameters: { open: boolean, onClose(): void; };
     refElementPopupReturn: Pick<UseRefElementReturnType<PopupElement>["refElementReturn"], "getElement">;

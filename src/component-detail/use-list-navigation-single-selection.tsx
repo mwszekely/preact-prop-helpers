@@ -6,10 +6,7 @@ import { SelectableChildInfo, useSingleSelection, useSingleSelectionChild, UseSi
 
 export interface UseListNavigationSingleSelectionChildInfo<TabbableChildElement extends Element> extends UseListNavigationChildInfo<TabbableChildElement>, SelectableChildInfo<TabbableChildElement> { }
 
-
-export interface UseListNavigationSingleSelectionParameters<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationSingleSelectionChildInfo<ChildElement>> extends
-    UseListNavigationParameters<ParentOrChildElement, ChildElement, M>,
-    OmitStrong<UseSingleSelectionParameters<ChildElement>, "rovingTabIndexReturn"> {
+export interface UseListNavigationSingleSelectionParameters<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationSingleSelectionChildInfo<ChildElement>> extends UseListNavigationParameters<ParentOrChildElement, ChildElement, M>, OmitStrong<UseSingleSelectionParameters<ChildElement>, "rovingTabIndexReturn"> {
     managedChildrenReturn: UseListNavigationParameters<ParentOrChildElement, ChildElement, M>["managedChildrenReturn"] & UseSingleSelectionParameters<ChildElement>["managedChildrenReturn"];
 }
 

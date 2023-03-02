@@ -8,16 +8,14 @@ export interface UseListNavigationChildInfo<TabbableChildElement extends Element
 /**
  * @param fromUserInteraction Whether the user interacted with this child as a means of navigating to it.  In that was the case, the child is also focused. Otherwise, focus moves as the browser determines.
  */
-export type NavigateToIndex = (i: number | null, fromUserInteraction: boolean) => void;
 export interface UseListNavigationParameters<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationChildInfo<ChildElement>> extends UseRovingTabIndexParameters<ChildElement, M>, OmitStrong<UseTypeaheadNavigationParameters<ChildElement>, "rovingTabIndexReturn">, OmitStrong<UseLinearNavigationParameters<ParentOrChildElement, ChildElement>, "rovingTabIndexReturn"> {
-}
-export interface UseListNavigationChildParameters<ChildElement extends Element> extends UseRovingTabIndexChildParameters<ChildElement>, UseTypeaheadNavigationChildParameters<ChildElement> {
 }
 export interface UseListNavigationReturnType<ParentOrChildElement extends Element, ChildElement extends Element> extends UseRovingTabIndexReturnType<ChildElement>, UseLinearNavigationReturnType<ParentOrChildElement>, UseTypeaheadNavigationReturnType<ParentOrChildElement> {
 }
+export interface UseListNavigationChildParameters<ChildElement extends Element> extends UseRovingTabIndexChildParameters<ChildElement>, UseTypeaheadNavigationChildParameters<ChildElement> {
+}
 export interface UseListNavigationChildReturnType<ChildElement extends Element> extends UseRovingTabIndexChildReturnType<ChildElement>, UseTypeaheadNavigationChildReturnType {
 }
-export type UseListNavigationChild<ChildElement extends Element> = (a: UseListNavigationChildParameters<ChildElement>) => UseListNavigationChildReturnType<ChildElement>;
 /**
  * Implements proper keyboard navigation for components like listboxes, button groups, menus, etc.
  *

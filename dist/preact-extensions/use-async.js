@@ -3,8 +3,7 @@ import { useCallback, useEffect, useMemo } from "preact/hooks";
 import { useStableCallback } from "./use-stable-callback.js";
 import { useState } from "./use-state.js";
 function identityCapture(...t) { return t; }
-// why???
-const AsyncFunction = (async function () { }.constructor);
+const AsyncFunction = ((async function () { }).constructor);
 /**
  * Given an async function, returns a function that's suitable for non-async APIs,
  * along with other information about the current run's status.

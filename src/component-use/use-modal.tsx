@@ -31,8 +31,6 @@ export function useModal<Listeners extends DismissListenerTypes, FocusContainerE
     focusTrapParameters: { trapActive, ...focusTrapParameters }
 }: UseModalParameters<Listeners>): UseModalReturnType<FocusContainerElement, SourceElement, PopupElement> {
     const { open } = dismissParameters;
-    //const { getWindow } = escapeDismissParameters;
-    //const getDocument = useCallback(() => { return getWindow().document; }, [getWindow]);
     const { refElementPopupReturn, refElementSourceReturn } = useDismiss<Listeners, SourceElement, PopupElement>({ dismissParameters, escapeDismissParameters });
     const { focusTrapReturn, refElementReturn } = useFocusTrap<SourceElement, NonNullable<FocusContainerElement>>({
         focusTrapParameters: { trapActive: open && trapActive, ...focusTrapParameters },

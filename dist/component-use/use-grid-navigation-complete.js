@@ -155,16 +155,9 @@ export function useCompleteGridNavigationRow({ rowAsChildOfGridParameters: { man
             paginatedChildReturn: { isPaginated, paginatedVisible, hideBecausePaginated }
         },
         hasCurrentFocusReturn
-        //managedChildrenReturn,
-        //...gridNavigationSingleSelectionReturn
     };
 }
-export function useCompleteGridNavigationCell({ gridNavigationCellParameters, managedChildParameters, context: { gridNavigationCellContext, managedChildContext, rovingTabIndexChildContext, typeaheadNavigationChildContext }, rovingTabIndexChildParameters: { hidden }, rovingTabIndexChildParameters, textContentParameters, 
-//managedChildContext,
-completeGridNavigationCellParameters: { focusSelf, ...completeGridNavigationCellParameters },
-//sortableChildParameters: { getSortValue },
-//    pressParameters: { onPressSync, ...pressParameters },
- }) {
+export function useCompleteGridNavigationCell({ gridNavigationCellParameters, managedChildParameters, context: { gridNavigationCellContext, managedChildContext, rovingTabIndexChildContext, typeaheadNavigationChildContext }, rovingTabIndexChildParameters: { hidden }, rovingTabIndexChildParameters, textContentParameters, completeGridNavigationCellParameters: { focusSelf, ...completeGridNavigationCellParameters }, }) {
     const { index } = managedChildParameters;
     const { refElementReturn } = useRefElement({ refElementParameters: {} });
     const { hasCurrentFocusParameters, rovingTabIndexChildReturn, textContentReturn, pressParameters } = useGridNavigationSingleSelectionCell({
@@ -178,17 +171,6 @@ completeGridNavigationCellParameters: { focusSelf, ...completeGridNavigationCell
         textContentParameters: { hidden, ...textContentParameters }
     });
     const { hasCurrentFocusReturn } = useHasCurrentFocus({ hasCurrentFocusParameters: { onCurrentFocusedChanged: null, ...hasCurrentFocusParameters }, refElementReturn });
-    /* const { pressReturn } = usePress<CellElement>({
-         pressParameters: {
-             onPressSync: useStableCallback<NonNullable<typeof onPressSync>>(e => {
-                 onPressSync?.(e);
-                 completeGridNavigationContext.onPressSync?.(e);
-             }),
-             focusSelf: null,
-             ...pressParameters
-         },
-         refElementReturn
-     });*/
     const baseInfo = {
         focusSelf,
         getElement: refElementReturn.getElement,
@@ -197,7 +179,6 @@ completeGridNavigationCellParameters: { focusSelf, ...completeGridNavigationCell
         getTabbable: rovingTabIndexChildReturn.getTabbable,
         setTabbable: rovingTabIndexChildReturn.setTabbable,
         tabbable: rovingTabIndexChildReturn.tabbable,
-        //getSortValue
     };
     const { managedChildReturn } = useManagedChild({
         context: { managedChildContext },
@@ -206,15 +187,12 @@ completeGridNavigationCellParameters: { focusSelf, ...completeGridNavigationCell
         ...baseInfo,
         ...completeGridNavigationCellParameters
     });
-    const props = useMergedProps(refElementReturn.propsStable, 
-    //pressReturn.propsStable,
-    rovingTabIndexChildReturn.propsUnstable, hasCurrentFocusReturn.propsStable);
+    const props = useMergedProps(refElementReturn.propsStable, rovingTabIndexChildReturn.propsUnstable, hasCurrentFocusReturn.propsStable);
     return {
         props,
         refElementReturn,
         rovingTabIndexChildReturn,
         pressParameters,
-        //pressReturn,
         hasCurrentFocusReturn,
         managedChildReturn,
         textContentReturn

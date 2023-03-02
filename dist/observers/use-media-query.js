@@ -16,7 +16,7 @@ import { useState } from "../preact-extensions/use-state.js";
 export function useMediaQuery(query, defaultGuess) {
     const queryList = useRef();
     // queryList.current ??= (query == null ? null : matchMedia(query))
-    // This ^^^ is not done because, it seems to cause reflows at inopportune moments.
+    // This ^^^ is not done because it seems to cause reflows at inopportune moments.
     // Specifically on iOS Safari (tested on 12).
     // It's always iOS Safari.
     // At any rate it botches transitions that happen on a just-mounted component, somehow.

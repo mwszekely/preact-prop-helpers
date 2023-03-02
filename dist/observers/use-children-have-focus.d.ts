@@ -3,7 +3,9 @@ import { OnPassiveStateChange, PassiveStateUpdater } from "../preact-extensions/
 import { UseHasCurrentFocusParameters } from "./use-has-current-focus.js";
 export interface UseChildrenHaveFocusParameters<T extends Element> {
     childrenHaveFocusParameters: {
-        /** */
+        /**
+         * Fires `true` once any of the children have become focused, and `false` once all of the children have become unfocused.
+         */
         onCompositeFocusChange: null | OnPassiveStateChange<boolean, h.JSX.TargetedEvent<T>>;
     };
 }

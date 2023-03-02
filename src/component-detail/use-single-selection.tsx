@@ -65,7 +65,6 @@ export interface UseSingleSelectionParameters<ChildElement extends Element> {
 export interface UseSingleSelectionChildParameters<E extends Element> {
     singleSelectionContext: UseSingleSelectionReturnType<E>["singleSelectionContext"];
     singleSelectionChildParameters: {
-        //onDistanceChange: null | ((distance: number) => void);
         selectionMode: "focus" | "activation" | "disabled";
         /**
          * What property will be used to mark this item as selected.

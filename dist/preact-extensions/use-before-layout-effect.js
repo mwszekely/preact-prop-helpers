@@ -63,16 +63,6 @@ options[commitName] = newCommit;
  * @param inputs
  */
 export function useBeforeLayoutEffect(effect, inputs) {
-    /*(() => {
-        const cleanup = useRef<void | (() => void) | null>(null);
-        const prevArgsRef = useRef<Inputs>(null!);
-        if (argsChanged(inputs, prevArgsRef.current)) {
-            prevArgsRef.current = inputs!;
-            if (cleanup.current)
-                cleanup.current();
-            cleanup.current = effect();
-        }
-    })();*/
     const [id] = useState(() => generateRandomId());
     if (effect)
         toRun.set(id, { effect, inputs, cleanup: null });

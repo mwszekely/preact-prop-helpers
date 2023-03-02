@@ -49,7 +49,7 @@ export interface UseRearrangeableChildrenReturnType<M extends ManagedChildInfo<n
          *
          *
          */
-        rearrange: (rowsInOrder: M[]) => void;
+        rearrange: (originalRows: M[], rowsInOrder: M[]) => void;
         /** **STABLE** */
         shuffle: (managedRows: ManagedChildren<M>) => Promise<void> | void;
         /**

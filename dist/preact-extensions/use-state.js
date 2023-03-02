@@ -26,8 +26,7 @@ export function useState(initialState) {
             setStateP(value);
         }
     }, []);
-    const getState = () => { return ref.current; };
-    console.assert(ref.current === state || (typeof state === "number" && isNaN(state)));
+    const getState = useCallback(() => { return ref.current; }, []);
     return [state, setState, getState];
 }
 //# sourceMappingURL=use-state.js.map

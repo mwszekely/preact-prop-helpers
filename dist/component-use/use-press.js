@@ -139,8 +139,6 @@ export function usePress(args) {
         if (!(e.buttons & 1))
             setPointerDownStartedHere(listeningForPress = false);
         if (listeningForPress) {
-            //e.preventDefault();
-            //e.stopPropagation();
             const element = getElement();
             // Note: elementFromPoint starts reasonably expensive on a decent computer when on the order of 500 or so elements,
             // so we only test for hovering while actively attempting to detect a press
@@ -238,7 +236,6 @@ export function usePress(args) {
                 // We don't actually activate it on a space keydown
                 // but we do preventDefault to stop the page from scrolling.
                 setWaitingForSpaceUp(true);
-                //onActiveStart(e);
                 e.preventDefault();
             }
             if (e.key == "Enter" && !excludeEnter() && (!e.repeat || (allowRepeatPresses ?? false))) {
@@ -255,9 +252,6 @@ export function usePress(args) {
         const element = getElement();
         if (onPressSync) {
             e.preventDefault();
-            //const element = getElement();
-            //if (element)
-            //    focusSelf(element);
             if (e.detail > 1) {
                 e.stopImmediatePropagation();
                 e.stopPropagation();
@@ -276,8 +270,8 @@ export function usePress(args) {
                     element?.tagName == 'input' && element.type == 'radio' && element.checked) {
                     // Intentional, for now. Programmatic clicks shouldn't happen in most cases.
                     // TODO: Remove this when I'm confident stray clicks won't be handled.
-                    console.assert(false);
                     debugger;
+                    console.log("onclick was fired and will be handled as it doesn't look like it came from a pointer event", e);
                     handlePress(e);
                 }
             }
@@ -321,7 +315,7 @@ export function usePress(args) {
  * @param element
  * @returns
  */
-function nodeSelectedTextLength(element) {
+function _nodeSelectedTextLength(element) {
     if (element && element instanceof Node) {
         const selection = window.getSelection();
         for (let i = 0; i < (selection?.rangeCount ?? 0); ++i) {
@@ -343,12 +337,5 @@ let pulse = (("vibrate" in navigator) && (navigator.vibrate instanceof Function)
  */
 export function setPressVibrate(func) {
     pulse = func;
-}
-function excludes(target, exclude) {
-    if (exclude === false)
-        return false;
-    if (exclude === true || exclude?.[target])
-        return true;
-    return false;
 }
 //# sourceMappingURL=use-press.js.map

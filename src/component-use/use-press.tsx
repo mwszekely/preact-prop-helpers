@@ -229,8 +229,6 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
 
 
         if (listeningForPress) {
-            //e.preventDefault();
-            //e.stopPropagation();
             const element = getElement();
             // Note: elementFromPoint starts reasonably expensive on a decent computer when on the order of 500 or so elements,
             // so we only test for hovering while actively attempting to detect a press
@@ -345,7 +343,6 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
                 // We don't actually activate it on a space keydown
                 // but we do preventDefault to stop the page from scrolling.
                 setWaitingForSpaceUp(true);
-                //onActiveStart(e);
                 e.preventDefault();
             }
 
@@ -367,10 +364,6 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
         if (onPressSync) {
             e.preventDefault();
 
-            //const element = getElement();
-            //if (element)
-            //    focusSelf(element);
-
             if (e.detail > 1) {
                 e.stopImmediatePropagation();
                 e.stopPropagation();
@@ -390,9 +383,8 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
                 ) {
                     // Intentional, for now. Programmatic clicks shouldn't happen in most cases.
                     // TODO: Remove this when I'm confident stray clicks won't be handled.
-                    console.assert(false);
                     debugger;
-
+                    console.log("onclick was fired and will be handled as it doesn't look like it came from a pointer event", e);
                     handlePress(e);
                 }
             }
@@ -446,7 +438,7 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
  * @param element 
  * @returns 
  */
-function nodeSelectedTextLength(element: EventTarget | null | undefined) {
+function _nodeSelectedTextLength(element: EventTarget | null | undefined) {
     if (element && element instanceof Node) {
         const selection = window.getSelection();
 
@@ -473,16 +465,4 @@ let pulse = (("vibrate" in navigator) && (navigator.vibrate instanceof Function)
  */
 export function setPressVibrate(func: () => void) {
     pulse = func;
-}
-
-
-
-function excludes(target: "click" | "space" | "enter", exclude: undefined | boolean | { click?: "exclude" | undefined, space?: "exclude" | undefined, enter?: "exclude" | undefined }) {
-    if (exclude === false)
-        return false;
-
-    if (exclude === true || exclude?.[target])
-        return true;
-
-    return false;
 }

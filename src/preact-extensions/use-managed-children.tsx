@@ -68,12 +68,12 @@ export interface UseManagedChildrenParameters<M extends ManagedChildInfo<any>> {
          * TODO: This ended up not being needed by anything. Is it necessary? Does it cost anything?
          */
         onAfterChildLayoutEffect?: null | undefined | OnAfterChildLayoutEffect<M["index"]>;
-    
+
         /**
          * Same as the above, but only for mount/unmount (or when a child changes its index)
          */
         onChildrenMountChange?: null | undefined | OnChildrenMountChange<M["index"]>;
-    
+
         onChildCountChange?: null | undefined | ((count: number) => void);
     }
 }
@@ -131,7 +131,21 @@ export interface ManagedChildren<M extends ManagedChildInfo<any>> {
     /** STABLE */
     forEach: (f: (child: M) => void) => void;
 
-    /** **UNSTABLE**, also internal-use only, also TODO need a workaround for this for sortable children */
+    /**
+     * **UNSTABLE**, 
+     * also internal-use only, 
+     * also TODO need a workaround for this for sortable children,
+     * or at least properly name it.
+     * 
+     * WHAT THIS DOES:
+     * 
+     * This function takes the children, slices the array containing them, 
+     * and, *crutially*, fills in any holes in the array with a pseudo-child that just contains an index.
+     * 
+     * This behavior, to be clear, is only necessary for sorting and rearranging because
+     * sorting and rearranging require knowing perfectly which index maps to which.
+     * We don't need any other missing information in the array besides the missing index.
+     * */
     arraySlice: () => M[];
 }
 
@@ -277,7 +291,13 @@ export function useManagedChildren<M extends ManagedChildInfo<string | number>>(
         getAt: getManagedChildInfo,
         getHighestIndex: getHighestIndex,
         arraySlice: useCallback(() => {
-            return managedChildrenArray.current.arr.slice();
+            let ret = managedChildrenArray.current.arr.slice();
+            const max = getHighestIndex();
+            for (let i = 0; i <= max; ++i) {
+                if (ret[i] == null)
+                    ret[i] = { index: i } as M;
+            }
+            return ret;
         }, [])
     });
 

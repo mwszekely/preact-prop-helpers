@@ -9,8 +9,6 @@ export interface UseLinearNavigationReturnType<ParentOrChildElement extends Elem
         propsStable: h.JSX.HTMLAttributes<ParentOrChildElement>;
     };
 }
-/** Default implementation with no sorting */
-/** Default implementation with no sorting */
 /** Arguments passed to the parent `useLinearNavigation` */
 export interface UseLinearNavigationParameters<_ParentOrChildElement extends Element, ChildElement extends Element> {
     rovingTabIndexReturn: Pick<UseRovingTabIndexReturnType<ChildElement>["rovingTabIndexReturn"], "getTabbableIndex" | "setTabbableIndex">;
@@ -77,7 +75,6 @@ export interface UseLinearNavigationParameters<_ParentOrChildElement extends Ele
         disableHomeEndKeys: boolean;
     };
 }
-/** Arguments passed to the child 'useLinearNavigationChild` */
 /**
  * When used in tandem with `useRovingTabIndex`, allows control of
  * the tabbable index with the arrow keys.

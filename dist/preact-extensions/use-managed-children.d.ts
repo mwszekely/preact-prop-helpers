@@ -77,7 +77,21 @@ export interface ManagedChildren<M extends ManagedChildInfo<any>> {
     getHighestIndex(): number;
     /** STABLE */
     forEach: (f: (child: M) => void) => void;
-    /** **UNSTABLE**, also internal-use only, also TODO need a workaround for this for sortable children */
+    /**
+     * **UNSTABLE**,
+     * also internal-use only,
+     * also TODO need a workaround for this for sortable children,
+     * or at least properly name it.
+     *
+     * WHAT THIS DOES:
+     *
+     * This function takes the children, slices the array containing them,
+     * and, *crutially*, fills in any holes in the array with a pseudo-child that just contains an index.
+     *
+     * This behavior, to be clear, is only necessary for sorting and rearranging because
+     * sorting and rearranging require knowing perfectly which index maps to which.
+     * We don't need any other missing information in the array besides the missing index.
+     * */
     arraySlice: () => M[];
 }
 interface InternalChildInfo<M extends ManagedChildInfo<string | number>> {

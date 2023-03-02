@@ -8,14 +8,15 @@ import { UseHasCurrentFocusParameters } from "./use-has-current-focus.js";
 
 export interface UseChildrenHaveFocusParameters<T extends Element> {
     childrenHaveFocusParameters: {
-        /** */
+        /**
+         * Fires `true` once any of the children have become focused, and `false` once all of the children have become unfocused.
+         */
         onCompositeFocusChange: null | OnPassiveStateChange<boolean, h.JSX.TargetedEvent<T>>;
     }
 }
 
 export interface UseChildrenHaveFocusChildReturnType<E extends Element> {
     hasCurrentFocusParameters: Required<Pick<UseHasCurrentFocusParameters<E>["hasCurrentFocusParameters"], "onCurrentFocusedInnerChanged">>;
-    //refElementParameters: Required<Pick<UseRefElementParameters<E>["refElementParameters"], "onElementChange">>;
 }
 
 export interface UseChildrenHaveFocusReturnType<T extends Element> {
@@ -28,9 +29,6 @@ export interface UseChildrenHaveFocusChildParameters<T extends Element> {
         childrenHaveFocusChildParameters: {
             /** **STABLE** */
             setFocusCount: PassiveStateUpdater<number, h.JSX.TargetedEvent<T>>;
-
-            /** **STABLE** */
-            //allElements: Set<Node>
         }
     }
 }

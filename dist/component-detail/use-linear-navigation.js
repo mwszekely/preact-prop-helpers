@@ -1,8 +1,6 @@
 import { useCallback, useRef } from "preact/hooks";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useStableGetter } from "../preact-extensions/use-stable-getter.js";
-/** Arguments passed to the child 'useLinearNavigationChild` */
-//export interface UseLinearNavigationChildInfo { }
 /**
  * When used in tandem with `useRovingTabIndex`, allows control of
  * the tabbable index with the arrow keys.
@@ -77,11 +75,9 @@ export function useLinearNavigation({ rovingTabIndexReturn, linearNavigationPara
     });
     const navigateToNext = useStableCallback((e, fromUserInteraction) => {
         return navigateRelative2(e, 1, fromUserInteraction, "single");
-        // setTabbableIndex(navigateRelative((getTabbableIndex() ?? 0), +1), fromUserInteraction)
     });
     const navigateToPrev = useStableCallback((e, fromUserInteraction) => {
         return navigateRelative2(e, -1, fromUserInteraction, "single");
-        // setTabbableIndex(navigateRelative((getTabbableIndex() ?? 0), +1), fromUserInteraction)
     });
     const getDisableArrowKeys = useStableGetter(linearNavigationParameters.disableArrowKeys);
     const getDisableHomeEndKeys = useStableGetter(linearNavigationParameters.disableHomeEndKeys);
@@ -103,9 +99,55 @@ export function useLinearNavigation({ rovingTabIndexReturn, linearNavigationPara
             if (truePageNavigationSize < 1) {
                 truePageNavigationSize = Math.round(pageNavigationSize * Math.max(100, getHighestIndex() + 1));
             }
+            let result = null;
+            // Arrow keys only take effect for components oriented in that direction,
+            // so we want to make sure we only listen for left/right or up/down when appropriate.
+            let keyPressIsValidForOrientation = true;
             switch (e.key) {
+                case "ArrowUp":
+                case "ArrowDown":
+                    keyPressIsValidForOrientation = (!disableArrowKeys && allowsVerticalNavigation);
+                    break;
+                case "ArrowLeft":
+                case "ArrowRight":
+                    keyPressIsValidForOrientation = (!disableArrowKeys && allowsHorizontalNavigation);
+                    break;
+            }
+            if (keyPressIsValidForOrientation) {
+                switch (e.key) {
+                    case "ArrowUp":
+                    case "ArrowLeft":
+                        result = navigateToPrev(e, true);
+                        break;
+                    case "ArrowDown":
+                    case "ArrowRight":
+                        result = navigateToNext(e, true);
+                        break;
+                    case "PageUp":
+                    case "PageDown":
+                        if (truePageNavigationSize > 0) {
+                            navigateRelative2(e, truePageNavigationSize * (e.key.endsWith('n') ? -1 : 1), true, "page");
+                            result = 'passthrough';
+                        }
+                        break;
+                    case "Home":
+                    case "End":
+                        if (!disableHomeEndKeys) {
+                            if (e.key.endsWith('e'))
+                                navigateToFirst(e, true);
+                            else
+                                navigateToLast(e, true);
+                            result = 'passthrough';
+                        }
+                        break;
+                }
+            }
+            if (result != 'passthrough') {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            /*switch (e.key) {
                 case "ArrowUp": {
-                    //const propName = (info?.blockOrientation === "vertical" ? "blockDirection" : "inlineDirection");
                     const directionAllowed = (!disableArrowKeys && allowsVerticalNavigation);
                     if (directionAllowed) {
                         const result = navigateToPrev(e, true);
@@ -127,6 +169,7 @@ export function useLinearNavigation({ rovingTabIndexReturn, linearNavigationPara
                     }
                     break;
                 }
+
                 case "ArrowLeft": {
                     const directionAllowed = (!disableArrowKeys && allowsHorizontalNavigation);
                     if (directionAllowed) {
@@ -172,6 +215,7 @@ export function useLinearNavigation({ rovingTabIndexReturn, linearNavigationPara
                         e.stopPropagation();
                     }
                     break;
+
                 case "End":
                     if (!disableHomeEndKeys) {
                         navigateToLast(e, true);
@@ -179,7 +223,7 @@ export function useLinearNavigation({ rovingTabIndexReturn, linearNavigationPara
                         e.stopPropagation();
                     }
                     break;
-            }
+            }*/
         }
     });
     return {

@@ -13,8 +13,6 @@ import { useMergedProps } from "../dom-helpers/use-merged-props.js";
  */
 export function useModal({ dismissParameters, escapeDismissParameters, focusTrapParameters: { trapActive, ...focusTrapParameters } }) {
     const { open } = dismissParameters;
-    //const { getWindow } = escapeDismissParameters;
-    //const getDocument = useCallback(() => { return getWindow().document; }, [getWindow]);
     const { refElementPopupReturn, refElementSourceReturn } = useDismiss({ dismissParameters, escapeDismissParameters });
     const { focusTrapReturn, refElementReturn } = useFocusTrap({
         focusTrapParameters: { trapActive: open && trapActive, ...focusTrapParameters },

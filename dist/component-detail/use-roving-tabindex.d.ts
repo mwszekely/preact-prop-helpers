@@ -3,6 +3,7 @@ import { StateUpdater } from "preact/hooks";
 import { UseHasCurrentFocusParameters } from "../observers/use-has-current-focus.js";
 import { ManagedChildInfo, UseManagedChildrenParameters, UseManagedChildrenReturnType } from "../preact-extensions/use-managed-children.js";
 import { OnPassiveStateChange, PassiveStateUpdater } from "../preact-extensions/use-passive-state.js";
+export type SetTabbableIndex = (updater: Parameters<PassiveStateUpdater<number | null, Event>>[0], reason: Event | undefined, fromUserInteraction: boolean) => void;
 export type OnTabbableIndexChange = (tabbableIndex: number | null) => void;
 export interface UseRovingTabIndexChildInfo<TabbableChildElement extends Element> extends ManagedChildInfo<number> {
     /**
@@ -64,15 +65,26 @@ export interface UseRovingTabIndexReturnType<TabbableChildElement extends Elemen
      * Return information that lets the user update/query/focus the currently tabbable child
      */
     rovingTabIndexReturn: {
-        /** **STABLE** */
+        /**
+         * **STABLE**
+         *
+         * Can be used to programmatically change which child is the currently tabbable one.
+         *
+         * `fromUserInteraction` determines if this was a user-generated event that should focus the newly tabbable child,
+         * or a programmatic event that should leave the user's focus where the user currently is, because they didn't do that.
+         *
+         */
         setTabbableIndex: SetTabbableIndex;
         /** **STABLE** */
         getTabbableIndex: () => number | null;
-        /** **STABLE** */
+        /**
+         * **STABLE**
+         *
+         * Call to focus the currently tabbable child.
+         */
         focusSelf: (reason?: any) => void;
     };
 }
-export type SetTabbableIndex = (updater: Parameters<PassiveStateUpdater<number | null, Event>>[0], reason: Event | undefined, fromUserInteraction: boolean) => void;
 export interface UseRovingTabIndexChildParameters<TabbableChildElement extends Element> {
     managedChildParameters: Pick<UseRovingTabIndexChildInfo<TabbableChildElement>, "index">;
     /**
@@ -156,5 +168,5 @@ export interface UseRovingTabIndexChildReturnType<ChildElement extends Element> 
  * regardless of if it's the whole app or just a given component.
  */
 export declare function useRovingTabIndex<ChildElement extends Element, M extends UseRovingTabIndexChildInfo<ChildElement>>({ managedChildrenReturn: { getChildren }, rovingTabIndexParameters: { untabbable, initiallyTabbedIndex, onTabbableIndexChange }, ..._void1 }: UseRovingTabIndexParameters<ChildElement, M>): UseRovingTabIndexReturnType<ChildElement>;
-export declare function useRovingTabIndexChild<ChildElement extends Element>({ managedChildParameters: { index, ..._void2 }, rovingTabIndexChildContext: { reevaluateClosestFit, setTabbableIndex, getInitiallyTabbedIndex }, rovingTabIndexChildParameters, }: UseRovingTabIndexChildParameters<ChildElement>): UseRovingTabIndexChildReturnType<ChildElement>;
+export declare function useRovingTabIndexChild<ChildElement extends Element>({ managedChildParameters: { index, ..._void2 }, rovingTabIndexChildContext: { reevaluateClosestFit, setTabbableIndex, getInitiallyTabbedIndex }, rovingTabIndexChildParameters, ..._void3 }: UseRovingTabIndexChildParameters<ChildElement>): UseRovingTabIndexChildReturnType<ChildElement>;
 //# sourceMappingURL=use-roving-tabindex.d.ts.map

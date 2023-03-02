@@ -32,7 +32,7 @@ export function useEnsureStability(parentHookName, ...values) {
     }
 }
 export function debounceRendering(f) {
-    (options.debounceRendering ?? setTimeout)(f);
+    (options.debounceRendering ?? queueMicrotask)(f);
 }
 /**
  * Similar to `useState`, but for values that aren't "render-important" &ndash; updates don't cause a re-render and so the value shouldn't be used during render (though it certainly can, at least by re-rendering again).

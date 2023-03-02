@@ -1,6 +1,6 @@
 import { UseManagedChildrenReturnType } from "../preact-extensions/use-managed-children.js";
 import { OnPassiveStateChange, PassiveStateUpdater } from "../preact-extensions/use-passive-state.js";
-import { OmitStrong } from "../util/types.js";
+import { OmitStrong, OmitTargeted } from "../util/types.js";
 import { UseListNavigationChildInfo, UseListNavigationChildParameters, UseListNavigationChildReturnType, UseListNavigationParameters, UseListNavigationReturnType } from "./use-list-navigation-partial.js";
 import { SetTabbableIndex } from "./use-roving-tabindex.js";
 export interface GridChildRowInfo<RowElement extends Element, _CellElement extends Element> extends UseListNavigationChildInfo<RowElement> {
@@ -8,11 +8,10 @@ export interface GridChildRowInfo<RowElement extends Element, _CellElement exten
 }
 export interface GridChildCellInfo<CellElement extends Element> extends UseListNavigationChildInfo<CellElement> {
 }
-export interface UseGridNavigationParameters<ParentOrChildElement extends Element, RowElement extends Element, CellElement extends Element, M extends GridChildRowInfo<RowElement, CellElement>> extends OmitStrong<UseListNavigationParameters<ParentOrChildElement, RowElement, M>, "linearNavigationParameters"> {
+export interface UseGridNavigationParameters<ParentOrChildElement extends Element, RowElement extends Element, CellElement extends Element, M extends GridChildRowInfo<RowElement, CellElement>> extends OmitTargeted<UseListNavigationParameters<ParentOrChildElement, RowElement, M>, "linearNavigationParameters", "navigationDirection"> {
     gridNavigationParameters: {
         onTabbableColumnChange: OnPassiveStateChange<number | null, Event> | null;
     };
-    linearNavigationParameters: OmitStrong<UseListNavigationParameters<ParentOrChildElement, RowElement, M>["linearNavigationParameters"], "navigationDirection">;
 }
 export interface UseGridNavigationReturnType<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, RM extends GridChildRowInfo<RowElement, CellElement>, CM extends GridChildCellInfo<CellElement>> extends UseListNavigationReturnType<ParentOrRowElement, RowElement> {
     gridNavigationRowContext: UseGridNavigationRowParameters<RowElement, CellElement, RM, CM>["rowAsChildOfGridParameters"]["gridNavigationRowContext"];

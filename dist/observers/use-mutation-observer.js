@@ -3,7 +3,6 @@ import { useRefElement } from "../dom-helpers/use-ref-element.js";
 import { returnNull, runImmediately, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 export function useMutationObserver({ refElementParameters, mutationObserverParameters: { attributeFilter, subtree, onChildList, characterDataOldValue, onCharacterData, onAttributes, attributeOldValue } }) {
-    /* eslint-disable prefer-const */
     const { onElementChange, ...rest } = (refElementParameters || {});
     if (typeof attributeFilter === "string")
         attributeFilter = [attributeFilter];

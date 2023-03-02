@@ -143,16 +143,6 @@ export interface UseAsyncReturnType<SP extends unknown[], R> {
      */
     syncHandler: SyncFunctionType<SP, void>;
 }
-/**
- * Returns a throttled version of the given (stable) callback using Lodash's `throttle` function.
- *
- * If the callback is `null`, then `null` will be returned, otherwise `callback` must be stable for this to work as intented.
- */
-/**
- * Returns a debounced version of the given (stable) callback using Lodash's `debounced` function.
- *
- * If the callback is `null`, then `null` will be returned, otherwise `callback` must be stable for this to work as intented.
- */
 type SyncFunctionType<SP extends unknown[], R> = (...args: SP) => (R | undefined);
 type AsyncFunctionType<AP extends unknown[], R> = ((...args: AP) => (R | Promise<R>));
 type CaptureFunctionType<AP extends unknown[], SP extends unknown[] = AP> = (...args: SP) => AP;

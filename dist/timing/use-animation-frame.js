@@ -4,6 +4,13 @@ import { createContext } from "preact";
 import { useCallback, useContext, useEffect, useRef } from "preact/hooks";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 const SharedAnimationFrameContext = createContext(null);
+/**
+ * When a bunch of unrelated components all use `requestAnimationFrame`,
+ * yes, this actually is faster. I wish it wasn't. It's lame.
+ *
+ * @param param0
+ * @returns
+ */
 export function ProvideBatchedAnimationFrames({ children }) {
     const addCallback = useCallback((callbackToBeBatched, tag) => { allCallbacks.current.set(callbackToBeBatched, tag); }, []);
     const removeCallback = useCallback((callback) => { allCallbacks.current.delete(callback); }, []);

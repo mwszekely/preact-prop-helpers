@@ -140,7 +140,13 @@ export function useManagedChildren(parentParameters) {
         getAt: getManagedChildInfo,
         getHighestIndex: getHighestIndex,
         arraySlice: useCallback(() => {
-            return managedChildrenArray.current.arr.slice();
+            let ret = managedChildrenArray.current.arr.slice();
+            const max = getHighestIndex();
+            for (let i = 0; i <= max; ++i) {
+                if (ret[i] == null)
+                    ret[i] = { index: i };
+            }
+            return ret;
         }, [])
     });
     const getChildren = useCallback(() => managedChildren, []);

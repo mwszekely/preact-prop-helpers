@@ -46,7 +46,7 @@ export function useEnsureStability<T extends any[]>(parentHookName: string, ...v
 }
 
 export function debounceRendering(f: () => void) {
-    (options.debounceRendering ?? setTimeout)(f);
+    (options.debounceRendering ?? queueMicrotask)(f);
 }
 
 /**
@@ -121,8 +121,6 @@ export function usePassiveState<T, R>(onChange: undefined | null | OnPassiveStat
         // Make sure we've run our effect at least once on mount.
         // (If we have an initial value, of course)
         tryEnsureValue();
-
-
     }, []);
 
     // The actual code the user calls to (possibly) run a new effect.
