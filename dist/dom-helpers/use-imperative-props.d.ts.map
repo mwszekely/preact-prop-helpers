@@ -1,1 +1,1 @@
-{"version":3,"file":"use-imperative-props.d.ts","sourceRoot":"","sources":["../../src/dom-helpers/use-imperative-props.tsx"],"names":[],"mappings":"AAAA,OAAO,EAAE,CAAC,EAAE,MAAM,QAAQ,CAAC;AAK3B,wBAAgB,kBAAkB,CAAC,CAAC,SAAS,OAAO;;wBAQb,MAAM;2BAKH,MAAM;;;;;;;EA0C/C"}
+{"version":3,"file":"use-imperative-props.d.ts","sourceRoot":"","sources":["../../src/dom-helpers/use-imperative-props.tsx"],"names":[],"mappings":"AAAA,OAAO,EAAqB,CAAC,EAAE,MAAM,QAAQ,CAAC;AAK9C,wBAAgB,kBAAkB,CAAC,CAAC,SAAS,OAAO;;wBAQb,MAAM,WAAW,OAAO;;;gCAiBhB,MAAM,GAAG,IAAI;;;EAkC3D"}

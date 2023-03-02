@@ -1,54 +1,58 @@
-import { h } from "preact";
+import { ComponentChildren, h } from "preact";
 import { useCallback, useRef } from "preact/hooks";
 import { useMergedProps } from "./use-merged-props.js";
 import { useRefElement } from "./use-ref-element.js";
 
 export function useImperativeProps<T extends Element>() {
-    const currentImperativeProps = useRef<{ className: DOMTokenList, style: h.JSX.CSSProperties, others: h.JSX.HTMLAttributes<T> }>({ className: new DOMTokenList(), style: {}, others: {} });
+    const currentImperativeProps = useRef<{ className: DOMTokenList, style: h.JSX.CSSProperties, children: string | null, others: h.JSX.HTMLAttributes<T> }>({ className: new DOMTokenList(), style: {}, children: null, others: {} });
 
 
     const {
         refElementReturn: { getElement, propsStable }
     } = useRefElement<T>({ refElementParameters: { onElementChange: undefined, onMount: undefined, onUnmount: undefined } });
 
-    const addClass = useCallback((cls: string) => {
-        getElement()?.classList.add(cls);
-        currentImperativeProps.current.className.add(cls);
+    const setClass = useCallback((cls: string, enabled: boolean) => {
+        if (currentImperativeProps.current.className.contains(cls) == !enabled) {
+            getElement()?.classList[enabled ? "add" : "remove"](cls);
+            currentImperativeProps.current.className[enabled ? "add" : "remove"](cls);
+        }
     }, []);
 
-    const removeClass = useCallback((cls: string) => {
-        getElement()?.classList.remove(cls);
-        currentImperativeProps.current.className.remove(cls);
+    const setStyle = useCallback(<T extends keyof CSSStyleDeclaration>(prop: T, value: h.JSX.CSSProperties[T] | null) => {
+        const element = (getElement() as Element as HTMLElement | undefined);
+        if (element) {
+            if (currentImperativeProps.current.style[prop] != value) {
+                currentImperativeProps.current.style[prop] = value;
+                element.style[prop] = value ?? ("" as any);
+            }
+        }
     }, []);
 
-    const setStyle = useCallback(<T extends keyof h.JSX.CSSProperties>(prop: T, value: h.JSX.CSSProperties[T]) => {
-        currentImperativeProps.current.style[prop] = value;
-        (getElement() as Element as HTMLElement | undefined)?.style.setProperty(prop as string, value as string ?? null);
+    const setChildren = useCallback((children: string | null) => {
+        let e = getElement();
+        if (e && currentImperativeProps.current.children != children) {
+            currentImperativeProps.current.children = children;
+            e.textContent = children;
+        }
     }, []);
 
-    const removeStyle = useCallback(<T extends keyof h.JSX.CSSProperties>(prop: T) => {
-        delete currentImperativeProps.current.style[prop];
-        (getElement() as Element as HTMLElement | undefined)?.style.removeProperty(prop as string);
+    const setAttribute = useCallback(<K extends keyof h.JSX.HTMLAttributes<T>>(prop: K, value: h.JSX.HTMLAttributes<T>[K] | null) => {
+        if (value != null) {
+            currentImperativeProps.current.others[prop] = value;
+            getElement()?.setAttribute(prop, value);
+        }
+        else {
+            delete currentImperativeProps.current.others[prop];
+            getElement()?.removeAttribute(prop);
+        }
     }, []);
-
-    const setAttribute = useCallback(<K extends keyof h.JSX.HTMLAttributes<T>>(prop: K, value: h.JSX.HTMLAttributes<T>[K]) => {
-        currentImperativeProps.current.others[prop] = value;
-        getElement()?.setAttribute(prop, value);
-    }, [])
-
-    const removeAttribute = useCallback(<K extends keyof h.JSX.HTMLAttributes<T>>(prop: K) => {
-        delete currentImperativeProps.current.others[prop];
-        getElement()?.removeAttribute(prop);
-    }, [])
 
     return {
         imperativeProps: useRef({
-            addClass,
-            removeClass,
+            setClass,
             setStyle,
-            removeStyle,
             setAttribute,
-            removeAttribute,
+            setChildren
         }).current,
 
         propsUnstable: useMergedProps<T>(

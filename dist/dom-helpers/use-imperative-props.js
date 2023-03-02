@@ -2,40 +2,46 @@ import { useCallback, useRef } from "preact/hooks";
 import { useMergedProps } from "./use-merged-props.js";
 import { useRefElement } from "./use-ref-element.js";
 export function useImperativeProps() {
-    const currentImperativeProps = useRef({ className: new DOMTokenList(), style: {}, others: {} });
+    const currentImperativeProps = useRef({ className: new DOMTokenList(), style: {}, children: null, others: {} });
     const { refElementReturn: { getElement, propsStable } } = useRefElement({ refElementParameters: { onElementChange: undefined, onMount: undefined, onUnmount: undefined } });
-    const addClass = useCallback((cls) => {
-        getElement()?.classList.add(cls);
-        currentImperativeProps.current.className.add(cls);
-    }, []);
-    const removeClass = useCallback((cls) => {
-        getElement()?.classList.remove(cls);
-        currentImperativeProps.current.className.remove(cls);
+    const setClass = useCallback((cls, enabled) => {
+        if (currentImperativeProps.current.className.contains(cls) == !enabled) {
+            getElement()?.classList[enabled ? "add" : "remove"](cls);
+            currentImperativeProps.current.className[enabled ? "add" : "remove"](cls);
+        }
     }, []);
     const setStyle = useCallback((prop, value) => {
-        currentImperativeProps.current.style[prop] = value;
-        getElement()?.style.setProperty(prop, value ?? null);
+        const element = getElement();
+        if (element) {
+            if (currentImperativeProps.current.style[prop] != value) {
+                currentImperativeProps.current.style[prop] = value;
+                element.style[prop] = value ?? "";
+            }
+        }
     }, []);
-    const removeStyle = useCallback((prop) => {
-        delete currentImperativeProps.current.style[prop];
-        getElement()?.style.removeProperty(prop);
+    const setChildren = useCallback((children) => {
+        let e = getElement();
+        if (e && currentImperativeProps.current.children != children) {
+            currentImperativeProps.current.children = children;
+            e.textContent = children;
+        }
     }, []);
     const setAttribute = useCallback((prop, value) => {
-        currentImperativeProps.current.others[prop] = value;
-        getElement()?.setAttribute(prop, value);
-    }, []);
-    const removeAttribute = useCallback((prop) => {
-        delete currentImperativeProps.current.others[prop];
-        getElement()?.removeAttribute(prop);
+        if (value != null) {
+            currentImperativeProps.current.others[prop] = value;
+            getElement()?.setAttribute(prop, value);
+        }
+        else {
+            delete currentImperativeProps.current.others[prop];
+            getElement()?.removeAttribute(prop);
+        }
     }, []);
     return {
         imperativeProps: useRef({
-            addClass,
-            removeClass,
+            setClass,
             setStyle,
-            removeStyle,
             setAttribute,
-            removeAttribute,
+            setChildren
         }).current,
         propsUnstable: useMergedProps(propsStable, { className: currentImperativeProps.current.className.toString(), style: currentImperativeProps.current.style }, currentImperativeProps.current.others)
     };
