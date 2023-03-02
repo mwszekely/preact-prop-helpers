@@ -24,7 +24,7 @@ export { DropFile, DropFileMetadata, DroppableFileError, useDroppable, UseDroppa
 export { ElementSize, useElementSize, UseElementSizeParameters, UseElementSizeReturnType } from "./dom-helpers/use-element-size.js";
 export { useGlobalHandler, useLocalHandler } from "./dom-helpers/use-event-handler.js";
 export { useHideScroll } from "./dom-helpers/use-hide-scroll.js";
-export { useImperativeProps } from "./dom-helpers/use-imperative-props.js";
+export { ImperativeHandle, useImperativeProps } from "./dom-helpers/use-imperative-props.js";
 export { useMergedClasses } from "./dom-helpers/use-merged-classes.js";
 export { enableLoggingPropConflicts, mergeFunctions, useMergedProps } from "./dom-helpers/use-merged-props.js";
 export { useMergedRefs } from "./dom-helpers/use-merged-refs.js";
