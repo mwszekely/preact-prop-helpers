@@ -11,6 +11,10 @@ export interface ImperativeHandle<T extends Element> {
 }
 export declare function useImperativeProps<E extends Element>(): {
     imperativeHandle: ImperativeHandle<E>;
+    refElementReturn: {
+        getElement(): E | null;
+        propsStable: h.JSX.HTMLAttributes<E>;
+    };
     propsUnstable: h.JSX.HTMLAttributes<E>;
 };
 //# sourceMappingURL=use-imperative-props.d.ts.map

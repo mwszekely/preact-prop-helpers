@@ -20,6 +20,7 @@ export function useImperativeProps<E extends Element>() {
 
 
     const {
+        refElementReturn,
         refElementReturn: { getElement, propsStable }
     } = useRefElement<E>({ refElementParameters: { onElementChange: undefined, onMount: undefined, onUnmount: undefined } });
 
@@ -66,7 +67,7 @@ export function useImperativeProps<E extends Element>() {
             setAttribute,
             setChildren
         }).current,
-
+        refElementReturn,
         propsUnstable: useMergedProps<E>(
             propsStable,
             { className: currentImperativeProps.current.className.toString(), style: currentImperativeProps.current.style },

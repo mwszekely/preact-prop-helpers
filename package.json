@@ -23,7 +23,8 @@
     "build:ts": "tsc",
     "test": "jest",
     "lint": "npx eslint ./src",
-    "clean": "tsc --build --clean"
+    "clean": "tsc --build --clean",
+    "rebuild": "rm \"./pnpm-lock.yaml\" && rm -R \"./node_modules\" && pnpm install && pnpm run build"
   },
   "author": "",
   "license": "ISC",
