@@ -84,7 +84,7 @@ export function useImperativeProps<E extends Element>({ refElementReturn: { getE
             setChildren
         }).current,
         propsUnstable: useMergedProps<E>(
-            { className: currentImperativeProps.current.className.toString(), style: currentImperativeProps.current.style },
+            { className: [...currentImperativeProps.current.className].join(" "), style: currentImperativeProps.current.style },
             currentImperativeProps.current.others
         )
 

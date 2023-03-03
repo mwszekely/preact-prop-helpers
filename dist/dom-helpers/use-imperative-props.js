@@ -54,7 +54,7 @@ export function useImperativeProps({ refElementReturn: { getElement } }) {
             setEventHandler,
             setChildren
         }).current,
-        propsUnstable: useMergedProps({ className: currentImperativeProps.current.className.toString(), style: currentImperativeProps.current.style }, currentImperativeProps.current.others)
+        propsUnstable: useMergedProps({ className: [...currentImperativeProps.current.className].join(" "), style: currentImperativeProps.current.style }, currentImperativeProps.current.others)
     };
 }
 const EventMapping = {
