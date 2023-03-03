@@ -7,12 +7,14 @@ export type SetChildren = ((children: string | null) => void);
 export type SetClass = (cls: string, enabled: boolean) => void;
 export type SetStyle = <T extends keyof CSSStyleDeclaration>(prop: T, value: h.JSX.CSSProperties[T] | null) => void;
 export type SetAttribute<T extends Element> = <K extends keyof h.JSX.HTMLAttributes<T>>(prop: K, value: h.JSX.HTMLAttributes<T>[K] | null) => void;
+export type SetEventHandler = <K extends keyof HTMLElementEventMap>(type: K, listener: null | ((this: HTMLElement, ev: HTMLElementEventMap[K]) => void), options: AddEventListenerOptions) => void;
 
 export interface ImperativeHandle<T extends Element> {
     setClass: SetClass;
     setStyle: SetStyle;
     setAttribute: SetAttribute<T>;
     setChildren: SetChildren;
+    setEventHandler: SetEventHandler;
 }
 
 export interface UseImperativePropsParameters<E extends Element> {
@@ -60,11 +62,25 @@ export function useImperativeProps<E extends Element>({ refElementReturn: { getE
         }
     }, []);
 
+    const setEventHandler = useCallback<SetEventHandler>((type, handler, options) => {
+        const element = (getElement() as Element as HTMLElement | undefined);
+        const mappedKey = EventMapping[type] as keyof h.JSX.HTMLAttributes<E>;
+        if (element) {
+            if (handler) {
+                element.addEventListener(type, handler, options);
+            }
+            else if (currentImperativeProps.current.others[mappedKey]) {
+                element.removeEventListener(type, currentImperativeProps.current.others[mappedKey], options);
+            }
+        }
+    }, [])
+
     return {
         imperativeHandle: useRef<ImperativeHandle<E>>({
             setClass,
             setStyle,
             setAttribute,
+            setEventHandler,
             setChildren
         }).current,
         propsUnstable: useMergedProps<E>(
@@ -73,4 +89,89 @@ export function useImperativeProps<E extends Element>({ refElementReturn: { getE
         )
 
     }
+}
+
+
+
+const EventMapping: Partial<{ [K in keyof HTMLElementEventMap]: (keyof h.JSX.HTMLAttributes<any> & `on${string}`) }> = {
+    abort: "onAbort",
+    animationend: "onAnimationEnd",
+    animationstart: "onAnimationStart",
+    animationiteration: "onAnimationIteration",
+    beforeinput: "onBeforeInput",
+    blur: "onBlur",
+    canplay: "onCanPlay",
+    canplaythrough: "onCanPlayThrough",
+    change: "onChange",
+    click: "onClick",
+    compositionend: "onCompositionEnd",
+    compositionstart: "onCompositionStart",
+    compositionupdate: "onCompositionUpdate",
+    contextmenu: "onContextMenu",
+    cut: "onCut",
+    dblclick: "onDblClick",
+    drag: "onDrag",
+    dragend: "onDragEnd",
+    dragenter: "onDragEnter",
+    dragleave: "onDragLeave",
+    dragover: "onDragOver",
+    dragstart: "onDragStart",
+    drop: "onDrop",
+    durationchange: "onDurationChange",
+    emptied: "onEmptied",
+    ended: "onEnded",
+    error: "onError",
+    focus: "onFocus",
+    focusin: "onfocusin",
+    focusout: "onfocusout",
+    formdata: "onFormData",
+    gotpointercapture: "onGotPointerCapture",
+    input: "onInput",
+    invalid: "onInvalid",
+    keydown: "onKeyDown",
+    keypress: "onKeyPress",
+    keyup: "onKeyUp",
+    load: "onLoad",
+    loadeddata: "onLoadedData",
+    loadedmetadata: "onLoadedMetadata",
+    loadstart: "onLoadStart",
+    lostpointercapture: "onLostPointerCapture",
+    mousedown: "onMouseDown",
+    mouseenter: "onMouseEnter",
+    mouseleave: "onMouseLeave",
+    mousemove: "onMouseMove",
+    mouseout: "onMouseOut",
+    mouseover: "onMouseOver",
+    mouseup: "onMouseUp",
+    paste: "onPaste",
+    pause: "onPause",
+    play: "onPlay",
+    playing: "onPlaying",
+    pointercancel: "onPointerCancel",
+    pointerdown: "onPointerDown",
+    pointerenter: "onPointerEnter",
+    pointerleave: "onPointerLeave",
+    pointermove: "onPointerMove",
+    pointerout: "onPointerOut",
+    pointerover: "onPointerOver",
+    pointerup: "onPointerUp",
+    progress: "onProgress",
+    reset: "onReset",
+    scroll: "onScroll",
+    seeked: "onSeeked",
+    seeking: "onSeeking",
+    select: "onSelect",
+    stalled: "onStalled",
+    submit: "onSubmit",
+    suspend: "onSuspend",
+    timeupdate: "onTimeUpdate",
+    toggle: "onToggle",
+    touchcancel: "onTouchCancel",
+    touchend: "onTouchEnd",
+    touchmove: "onTouchMove",
+    touchstart: "onTouchStart",
+    transitionend: "onTransitionEnd",
+    volumechange: "onVolumeChange",
+    waiting: "onWaiting",
+    wheel: "onWheel"
 }
