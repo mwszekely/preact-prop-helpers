@@ -547,7 +547,7 @@ function DemoPress({ remaining }: { remaining: number }) {
 
     const [count, setCount] = useState<number>(0);
     const { refElementReturn, refElementReturn: { propsStable: p1 } } = useRefElement<HTMLDivElement>({ refElementParameters: {} })
-    const { pressReturn: { propsUnstable: p2, pseudoActive, longPress } } = usePress<HTMLDivElement>({
+    const { pressReturn: { propsUnstable: p2, pressing, longPress } } = usePress<HTMLDivElement>({
         pressParameters: { focusSelf: e => { e.focus() }, longPressThreshold: 1000, onPressSync: () => { setCount((c: number) => ++c) } },
         refElementReturn
     })
@@ -555,7 +555,7 @@ function DemoPress({ remaining }: { remaining: number }) {
         <div className="demo">
             <h2>Press</h2>
             <div>Press count: {count}</div>
-            <div>Active: {pseudoActive.toString()}</div>
+            <div>Active: {pressing.toString()}</div>
             <div>Long press: {(longPress ?? "null").toString()}</div>
             <div style={{ border: "1px solid black", touchAction: "none" }} tabIndex={0} {...useMergedProps(p1, p2)}>
                 <div>This DIV's parent is pressable. Click here to press, cancel by leaving or hovering over a pressable child.</div>

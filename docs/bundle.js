@@ -10350,7 +10350,7 @@ var bundle = (function (exports) {
     const {
       pressReturn: {
         propsUnstable: p2,
-        pseudoActive,
+        pressing,
         longPress
       }
     } = usePress({
@@ -10372,7 +10372,7 @@ var bundle = (function (exports) {
       }), o$1("div", {
         children: ["Press count: ", count]
       }), o$1("div", {
-        children: ["Active: ", pseudoActive.toString()]
+        children: ["Active: ", pressing.toString()]
       }), o$1("div", {
         children: ["Long press: ", (longPress !== null && longPress !== void 0 ? longPress : "null").toString()]
       }), o$1("div", {

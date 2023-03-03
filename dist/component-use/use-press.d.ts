@@ -48,7 +48,8 @@ export interface UsePressReturnType<E extends Element> {
     pressReturn: {
         /**
          * Sort of like when the CSS `:active` pseudo-element would apply,
-         * but specifically for presses only. Useful for styling mostly.
+         * but specifically for presses only, so it's a more accurate reflection
+         * of what will happen for the user. Useful for styling mostly.
          */
         pressing: boolean;
         getIsPressing(): boolean;

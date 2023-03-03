@@ -4,14 +4,18 @@ import { useMergedProps } from "./use-merged-props.js";
 import { useRefElement, UseRefElementParameters, UseRefElementReturnType } from "./use-ref-element.js";
 
 export type SetChildren = ((children: string | null) => void);
+export type GetClass = (cls: string) => boolean;
 export type SetClass = (cls: string, enabled: boolean) => void;
 export type SetStyle = <T extends (keyof CSSStyleDeclaration) & string>(prop: T, value: h.JSX.CSSProperties[T] | null) => void;
+export type GetAttribute<T extends Element> = <K extends keyof h.JSX.HTMLAttributes<T>>(prop: K) => h.JSX.HTMLAttributes<T>[K];
 export type SetAttribute<T extends Element> = <K extends keyof h.JSX.HTMLAttributes<T>>(prop: K, value: h.JSX.HTMLAttributes<T>[K] | null) => void;
 export type SetEventHandler = <K extends keyof HTMLElementEventMap>(type: K, listener: null | ((this: HTMLElement, ev: HTMLElementEventMap[K]) => void), options: AddEventListenerOptions) => void;
 
 export interface ImperativeHandle<T extends Element> {
+    hasClass: GetClass;
     setClass: SetClass;
     setStyle: SetStyle;
+    getAttribute: GetAttribute<T>;
     setAttribute: SetAttribute<T>;
     setChildren: SetChildren;
     setEventHandler: SetEventHandler;
@@ -25,9 +29,9 @@ export function useImperativeProps<E extends Element>({ refElementReturn: { getE
     const currentImperativeProps = useRef<{ className: Set<string>, style: h.JSX.CSSProperties, children: string | null, others: h.JSX.HTMLAttributes<E> }>({ className: new Set(), style: {}, children: null, others: {} });
 
 
-
+    const hasClass = useCallback<GetClass>((cls: string) => { return currentImperativeProps.current.className.has(cls); }, [])
     const setClass = useCallback<SetClass>((cls, enabled) => {
-        if (currentImperativeProps.current.className.has(cls) == !enabled) {
+        if (hasClass(cls) == !enabled) {
             getElement()?.classList[enabled ? "add" : "remove"](cls);
             currentImperativeProps.current.className[enabled ? "add" : "delete"](cls);
         }
@@ -59,6 +63,10 @@ export function useImperativeProps<E extends Element>({ refElementReturn: { getE
         }
     }, []);
 
+    const getAttribute = useCallback<GetAttribute<E>>((prop) => {
+        return currentImperativeProps.current.others[prop];
+    }, []);
+
     const setAttribute = useCallback<SetAttribute<E>>((prop, value) => {
         if (value != null) {
             currentImperativeProps.current.others[prop] = value;
@@ -87,8 +95,10 @@ export function useImperativeProps<E extends Element>({ refElementReturn: { getE
 
     return {
         imperativeHandle: useRef<ImperativeHandle<E>>({
+            hasClass,
             setClass,
             setStyle,
+            getAttribute,
             setAttribute,
             setEventHandler,
             setChildren

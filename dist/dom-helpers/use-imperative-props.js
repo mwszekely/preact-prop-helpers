@@ -2,8 +2,9 @@ import { useCallback, useRef } from "preact/hooks";
 import { useMergedProps } from "./use-merged-props.js";
 export function useImperativeProps({ refElementReturn: { getElement } }) {
     const currentImperativeProps = useRef({ className: new Set(), style: {}, children: null, others: {} });
+    const hasClass = useCallback((cls) => { return currentImperativeProps.current.className.has(cls); }, []);
     const setClass = useCallback((cls, enabled) => {
-        if (currentImperativeProps.current.className.has(cls) == !enabled) {
+        if (hasClass(cls) == !enabled) {
             getElement()?.classList[enabled ? "add" : "remove"](cls);
             currentImperativeProps.current.className[enabled ? "add" : "delete"](cls);
         }
@@ -32,6 +33,9 @@ export function useImperativeProps({ refElementReturn: { getElement } }) {
             e.textContent = children;
         }
     }, []);
+    const getAttribute = useCallback((prop) => {
+        return currentImperativeProps.current.others[prop];
+    }, []);
     const setAttribute = useCallback((prop, value) => {
         if (value != null) {
             currentImperativeProps.current.others[prop] = value;
@@ -58,8 +62,10 @@ export function useImperativeProps({ refElementReturn: { getElement } }) {
     }, []);
     return {
         imperativeHandle: useRef({
+            hasClass,
             setClass,
             setStyle,
+            getAttribute,
             setAttribute,
             setEventHandler,
             setChildren
