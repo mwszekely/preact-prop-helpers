@@ -13,7 +13,15 @@ export function useImperativeProps({ refElementReturn: { getElement } }) {
         if (element) {
             if (currentImperativeProps.current.style[prop] != value) {
                 currentImperativeProps.current.style[prop] = value;
-                element.style[prop] = value ?? "";
+                if (prop.startsWith("--")) {
+                    if (value != null)
+                        element.style.setProperty(prop, `${value}`);
+                    else
+                        element.style.removeProperty(prop);
+                }
+                else {
+                    element.style[prop] = value ?? "";
+                }
             }
         }
     }, []);
