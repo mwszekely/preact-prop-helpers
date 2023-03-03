@@ -7719,12 +7719,15 @@ var bundle = (function (exports) {
         longPressThreshold,
         excludeEnter: ee,
         excludePointer: ep,
-        excludeSpace: es
+        excludeSpace: es,
+        onPressingChange: opc
       }
     } = args;
     const excludeEnter = useStableCallback(ee !== null && ee !== void 0 ? ee : returnFalse);
     const excludeSpace = useStableCallback(es !== null && es !== void 0 ? es : returnFalse);
     const excludePointer = useStableCallback(ep !== null && ep !== void 0 ? ep : returnFalse);
+    const onPressingChange = useStableCallback(opc !== null && opc !== void 0 ? opc : noop);
+    const [getIsPressing, setIsPressing] = usePassiveState(onPressingChange, returnFalse);
     const hasPressEvent = onPressSync != null;
     /**
      * Explanations:
@@ -7772,6 +7775,7 @@ var bundle = (function (exports) {
     const onTouchStart = T$1(e => {
       e.preventDefault();
       e.stopPropagation();
+      setIsPressing(true, e);
       setPointerDownStartedHere(true);
       setHovering(true);
       setLongPress(false);
@@ -7791,6 +7795,7 @@ var bundle = (function (exports) {
         const elementAtTouch = document.elementFromPoint(((_touch$clientX = touch === null || touch === void 0 ? void 0 : touch.clientX) !== null && _touch$clientX !== void 0 ? _touch$clientX : 0) + x, ((_touch$clientY = touch === null || touch === void 0 ? void 0 : touch.clientY) !== null && _touch$clientY !== void 0 ? _touch$clientY : 0) + y);
         hoveringAtAnyPoint || (hoveringAtAnyPoint = (_element$contains = element === null || element === void 0 ? void 0 : element.contains(elementAtTouch)) !== null && _element$contains !== void 0 ? _element$contains : false);
       }
+      setIsPressing(hoveringAtAnyPoint && getPointerDownStartedHere(), e);
       setHovering(hoveringAtAnyPoint);
     }, []);
     const onTouchEnd = T$1(e => {
@@ -7805,12 +7810,14 @@ var bundle = (function (exports) {
       setWaitingForSpaceUp(false);
       setHovering(false);
       setPointerDownStartedHere(false);
+      setIsPressing(false, e);
     }, []);
     const onPointerDown = T$1(e => {
       if (!excludePointer()) {
         if (e.buttons & 1) {
           e.preventDefault();
           e.stopPropagation();
+          setIsPressing(true, e);
           setPointerDownStartedHere(true);
           setHovering(true);
           setLongPress(false);
@@ -7829,7 +7836,9 @@ var bundle = (function (exports) {
         // Note: elementFromPoint starts reasonably expensive on a decent computer when on the order of 500 or so elements,
         // so we only test for hovering while actively attempting to detect a press
         const elementAtPointer = document.elementFromPoint(e.clientX, e.clientY);
-        setHovering(element == elementAtPointer || (element === null || element === void 0 ? void 0 : element.contains(elementAtPointer)) || false);
+        const hovering = element == elementAtPointer || (element === null || element === void 0 ? void 0 : element.contains(elementAtPointer)) || false;
+        setHovering(hovering);
+        setIsPressing(hovering && getPointerDownStartedHere(), e);
       }
     });
     const onPointerUp = T$1(e => {
@@ -7847,6 +7856,7 @@ var bundle = (function (exports) {
       setHovering(false);
       setPointerDownStartedHere(false);
       setLongPress(false);
+      setIsPressing(false, e);
     }, []);
     const onPointerEnter = T$1(_e => {
       setHovering(true);
@@ -7920,16 +7930,24 @@ var bundle = (function (exports) {
           // We don't actually activate it on a space keydown
           // but we do preventDefault to stop the page from scrolling.
           setWaitingForSpaceUp(true);
+          setIsPressing(true, e);
           e.preventDefault();
         }
         if (e.key == "Enter" && !excludeEnter() && (!e.repeat || (allowRepeatPresses !== null && allowRepeatPresses !== void 0 ? allowRepeatPresses : false))) {
-          handlePress(e);
+          setIsPressing(true, e);
+          requestAnimationFrame(() => {
+            setIsPressing(false, e);
+            handlePress(e);
+          });
         }
       }
     });
     const onKeyUp = useStableCallback(e => {
       const waitingForSpaceUp = getWaitingForSpaceUp();
-      if (waitingForSpaceUp && e.key == " " && !excludeSpace()) handlePress(e);
+      if (waitingForSpaceUp && e.key == " " && !excludeSpace()) {
+        handlePress(e);
+        setIsPressing(false, e);
+      }
     });
     const onClick = useStableCallback(e => {
       const element = getElement();
@@ -7954,19 +7972,25 @@ var bundle = (function (exports) {
             // TODO: Remove this when I'm confident stray clicks won't be handled.
             debugger;
             console.log("onclick was fired and will be handled as it doesn't look like it came from a pointer event", e);
+            setIsPressing(true, e);
+            requestAnimationFrame(() => {
+              setIsPressing(false, e);
+              handlePress(e);
+            });
             handlePress(e);
           }
         }
       }
     });
-    const onFocusOut = useStableCallback(_e => {
+    const onFocusOut = useStableCallback(e => {
       setWaitingForSpaceUp(false);
+      setIsPressing(false, e);
     });
     const p = supportsPointerEvents();
     return {
       pressReturn: {
-        pseudoActive: pointerDownStartedHere && hovering || waitingForSpaceUp || false,
-        //hovering,
+        pressing: pointerDownStartedHere && hovering || waitingForSpaceUp || false,
+        getIsPressing,
         longPress,
         propsUnstable: {
           onKeyDown,

@@ -1,8 +1,10 @@
 import { h } from "preact";
 import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
+import { OnPassiveStateChange } from "../preact-extensions/use-passive-state.js";
 export interface UsePressParameters<E extends Node> {
     refElementReturn: Required<Pick<UseRefElementReturnType<E>["refElementReturn"], "getElement">>;
     pressParameters: {
+        onPressingChange?: OnPassiveStateChange<boolean, h.JSX.TargetedEvent<E>>;
         /**
          * What should happen when this widget has been "pressed".
          *
@@ -48,7 +50,8 @@ export interface UsePressReturnType<E extends Element> {
          * Sort of like when the CSS `:active` pseudo-element would apply,
          * but specifically for presses only. Useful for styling mostly.
          */
-        pseudoActive: boolean;
+        pressing: boolean;
+        getIsPressing(): boolean;
         /**
          * Similar to pseudoActive, but for if the button as been pressed down for a determined length of time.
          */

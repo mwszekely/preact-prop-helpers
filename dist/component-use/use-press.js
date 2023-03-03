@@ -1,3 +1,4 @@
+import { noop } from "lodash-es";
 import { useCallback } from "preact/hooks";
 import { returnFalse, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
@@ -27,10 +28,12 @@ function supportsPointerEvents() {
  * @param exclude Whether the polyfill shouldn't apply (can specify for specific interactions)
  */
 export function usePress(args) {
-    const { refElementReturn: { getElement }, pressParameters: { focusSelf, onPressSync, allowRepeatPresses, longPressThreshold, excludeEnter: ee, excludePointer: ep, excludeSpace: es } } = args;
+    const { refElementReturn: { getElement }, pressParameters: { focusSelf, onPressSync, allowRepeatPresses, longPressThreshold, excludeEnter: ee, excludePointer: ep, excludeSpace: es, onPressingChange: opc } } = args;
     const excludeEnter = useStableCallback(ee ?? returnFalse);
     const excludeSpace = useStableCallback(es ?? returnFalse);
     const excludePointer = useStableCallback(ep ?? returnFalse);
+    const onPressingChange = useStableCallback(opc ?? noop);
+    const [getIsPressing, setIsPressing] = usePassiveState(onPressingChange, returnFalse);
     const hasPressEvent = (onPressSync != null);
     /**
      * Explanations:
@@ -78,6 +81,7 @@ export function usePress(args) {
     const onTouchStart = useCallback((e) => {
         e.preventDefault();
         e.stopPropagation();
+        setIsPressing(true, e);
         setPointerDownStartedHere(true);
         setHovering(true);
         setLongPress(false);
@@ -103,6 +107,7 @@ export function usePress(args) {
             const elementAtTouch = document.elementFromPoint((touch?.clientX ?? 0) + x, (touch?.clientY ?? 0) + y);
             hoveringAtAnyPoint ||= (element?.contains(elementAtTouch) ?? false);
         }
+        setIsPressing(hoveringAtAnyPoint && getPointerDownStartedHere(), e);
         setHovering(hoveringAtAnyPoint);
     }, []);
     const onTouchEnd = useCallback((e) => {
@@ -117,12 +122,14 @@ export function usePress(args) {
         setWaitingForSpaceUp(false);
         setHovering(false);
         setPointerDownStartedHere(false);
+        setIsPressing(false, e);
     }, []);
     const onPointerDown = useCallback((e) => {
         if (!excludePointer()) {
             if ((e.buttons & 1)) {
                 e.preventDefault();
                 e.stopPropagation();
+                setIsPressing(true, e);
                 setPointerDownStartedHere(true);
                 setHovering(true);
                 setLongPress(false);
@@ -143,7 +150,9 @@ export function usePress(args) {
             // Note: elementFromPoint starts reasonably expensive on a decent computer when on the order of 500 or so elements,
             // so we only test for hovering while actively attempting to detect a press
             const elementAtPointer = document.elementFromPoint(e.clientX, e.clientY);
-            setHovering(element == elementAtPointer || element?.contains(elementAtPointer) || false);
+            const hovering = element == elementAtPointer || element?.contains(elementAtPointer) || false;
+            setHovering(hovering);
+            setIsPressing(hovering && getPointerDownStartedHere(), e);
         }
     });
     const onPointerUp = useCallback((e) => {
@@ -161,6 +170,7 @@ export function usePress(args) {
         setHovering(false);
         setPointerDownStartedHere(false);
         setLongPress(false);
+        setIsPressing(false, e);
     }, []);
     const onPointerEnter = useCallback((_e) => {
         setHovering(true);
@@ -236,17 +246,24 @@ export function usePress(args) {
                 // We don't actually activate it on a space keydown
                 // but we do preventDefault to stop the page from scrolling.
                 setWaitingForSpaceUp(true);
+                setIsPressing(true, e);
                 e.preventDefault();
             }
             if (e.key == "Enter" && !excludeEnter() && (!e.repeat || (allowRepeatPresses ?? false))) {
-                handlePress(e);
+                setIsPressing(true, e);
+                requestAnimationFrame(() => {
+                    setIsPressing(false, e);
+                    handlePress(e);
+                });
             }
         }
     });
     const onKeyUp = useStableCallback((e) => {
         const waitingForSpaceUp = getWaitingForSpaceUp();
-        if (waitingForSpaceUp && e.key == " " && !excludeSpace())
+        if (waitingForSpaceUp && e.key == " " && !excludeSpace()) {
             handlePress(e);
+            setIsPressing(false, e);
+        }
     });
     const onClick = useStableCallback((e) => {
         const element = getElement();
@@ -272,19 +289,25 @@ export function usePress(args) {
                     // TODO: Remove this when I'm confident stray clicks won't be handled.
                     debugger;
                     console.log("onclick was fired and will be handled as it doesn't look like it came from a pointer event", e);
+                    setIsPressing(true, e);
+                    requestAnimationFrame(() => {
+                        setIsPressing(false, e);
+                        handlePress(e);
+                    });
                     handlePress(e);
                 }
             }
         }
     });
-    const onFocusOut = useStableCallback((_e) => {
+    const onFocusOut = useStableCallback((e) => {
         setWaitingForSpaceUp(false);
+        setIsPressing(false, e);
     });
     const p = supportsPointerEvents();
     return {
         pressReturn: {
-            pseudoActive: ((pointerDownStartedHere && hovering) || waitingForSpaceUp || false),
-            //hovering,
+            pressing: ((pointerDownStartedHere && hovering) || waitingForSpaceUp || false),
+            getIsPressing,
             longPress,
             propsUnstable: {
                 onKeyDown,
