@@ -76,9 +76,11 @@ export function useImperativeProps<E extends Element>({ refElementReturn: { getE
         if (element) {
             if (handler) {
                 element.addEventListener(type, handler, options);
+                currentImperativeProps.current.others[mappedKey] = handler;
             }
             else if (currentImperativeProps.current.others[mappedKey]) {
                 element.removeEventListener(type, currentImperativeProps.current.others[mappedKey], options);
+                currentImperativeProps.current.others[mappedKey] = undefined;
             }
         }
     }, [])
