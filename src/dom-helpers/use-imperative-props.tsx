@@ -22,14 +22,14 @@ export interface UseImperativePropsParameters<E extends Element> {
 }
 
 export function useImperativeProps<E extends Element>({ refElementReturn: { getElement } }: UseImperativePropsParameters<E>) {
-    const currentImperativeProps = useRef<{ className: DOMTokenList, style: h.JSX.CSSProperties, children: string | null, others: h.JSX.HTMLAttributes<E> }>({ className: new DOMTokenList(), style: {}, children: null, others: {} });
+    const currentImperativeProps = useRef<{ className: Set<string>, style: h.JSX.CSSProperties, children: string | null, others: h.JSX.HTMLAttributes<E> }>({ className: new Set(), style: {}, children: null, others: {} });
 
 
 
     const setClass = useCallback<SetClass>((cls, enabled) => {
-        if (currentImperativeProps.current.className.contains(cls) == !enabled) {
+        if (currentImperativeProps.current.className.has(cls) == !enabled) {
             getElement()?.classList[enabled ? "add" : "remove"](cls);
-            currentImperativeProps.current.className[enabled ? "add" : "remove"](cls);
+            currentImperativeProps.current.className[enabled ? "add" : "delete"](cls);
         }
     }, []);
 

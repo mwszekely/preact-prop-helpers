@@ -1,11 +1,11 @@
 import { useCallback, useRef } from "preact/hooks";
 import { useMergedProps } from "./use-merged-props.js";
 export function useImperativeProps({ refElementReturn: { getElement } }) {
-    const currentImperativeProps = useRef({ className: new DOMTokenList(), style: {}, children: null, others: {} });
+    const currentImperativeProps = useRef({ className: new Set(), style: {}, children: null, others: {} });
     const setClass = useCallback((cls, enabled) => {
-        if (currentImperativeProps.current.className.contains(cls) == !enabled) {
+        if (currentImperativeProps.current.className.has(cls) == !enabled) {
             getElement()?.classList[enabled ? "add" : "remove"](cls);
-            currentImperativeProps.current.className[enabled ? "add" : "remove"](cls);
+            currentImperativeProps.current.className[enabled ? "add" : "delete"](cls);
         }
     }, []);
     const setStyle = useCallback((prop, value) => {
