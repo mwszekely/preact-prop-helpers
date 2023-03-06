@@ -1,7 +1,7 @@
 import { createContext, h, render, VNode } from "preact";
 import { memo } from "preact/compat";
 import { useCallback, useContext, useRef } from "preact/hooks";
-import { CompleteGridNavigationContext, CompleteGridNavigationRowContext, ElementSize, GetIndex, returnNull, useAnimationFrame, useAsyncHandler, useChildrenHaveFocus, useChildrenHaveFocusChild, UseChildrenHaveFocusChildParameters, useCompleteGridNavigation, useCompleteGridNavigationCell, UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationReturnType, useCompleteGridNavigationRow, UseCompleteGridNavigationRowInfo, UseCompleteGridNavigationRowReturnType, useDraggable, useDroppable, useElementSize, useFocusTrap, useGlobalHandler, useHasCurrentFocus, useHasLastFocus, useInterval, useMergedProps, usePortalChildren, usePress, useRandomDualIds, useRefElement, useStableCallback, useState } from "../dist/index.js";
+import { CompleteGridNavigationContext, CompleteGridNavigationRowContext, UseStaggeredChildContext, ElementSize, GetIndex, returnNull, useAnimationFrame, useAsyncHandler, useChildrenHaveFocus, useChildrenHaveFocusChild, UseChildrenHaveFocusChildParameters, useCompleteGridNavigation, useCompleteGridNavigationCell, UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationReturnType, useCompleteGridNavigationRow, UseCompleteGridNavigationRowInfo, UseCompleteGridNavigationRowReturnType, useDraggable, useDroppable, useElementSize, useFocusTrap, useGlobalHandler, useHasCurrentFocus, useHasLastFocus, useInterval, useManagedChildren, UseManagedChildrenContext, useMergedProps, usePortalChildren, usePress, useRandomDualIds, useRefElement, useStableCallback, UseStaggeredChildrenInfo, useState, useStaggeredChildren, useManagedChild, useStaggeredChild } from "../dist/index.js";
 import { DemoUseInterval } from "./demos/use-interval.js";
 import { DemoUseModal } from "./demos/use-modal.js";
 import { DemoUseRovingTabIndex } from "./demos/use-roving-tab-index.js";
@@ -15,7 +15,7 @@ const DemoUseDroppable = () => {
     const { ref: _ref } = useMergedProps<HTMLInputElement>({}, { ref: useRef<HTMLInputElement>(null!) })
 
     const p = useMergedProps(props, { className: "demo droppable" });
-    
+
     return (
         <div {...p}>
 
@@ -30,7 +30,7 @@ const DemoUseDroppable = () => {
             {filesForConsideration != null && <div>Files being considered: <ul>{filesForConsideration.map(f => <li>{JSON.stringify(f)}</li>)}</ul></div>}
 
             <hr />
-            {dropError? <div>{dropError instanceof Error ? dropError.message : JSON.stringify(dropError)}</div> : null}
+            {dropError ? <div>{dropError instanceof Error ? dropError.message : JSON.stringify(dropError)}</div> : null}
         </div>
     )
 }
@@ -637,6 +637,51 @@ const DemoGlobalHandlerChild = memo(function DemoGlobalHandlerChild({ mode, targ
     return <div hidden />;
 })
 
+const StaggeredContext = createContext<UseManagedChildrenContext<UseStaggeredChildrenInfo<HTMLDivElement>> & UseStaggeredChildContext>(null!);
+
+const DemoStaggered = memo(() => {
+    const [staggered, setStaggered] = useState(false);
+    const [checked, setChecked] = useState(false);
+    const [childCount, setChildCount] = useState(100);
+    const { context: mcc, managedChildrenReturn } = useManagedChildren<UseStaggeredChildrenInfo<HTMLDivElement>>({ managedChildrenParameters: {} })
+    const { context: scc, staggeredChildrenReturn } = useStaggeredChildren({ managedChildrenReturn, staggeredChildrenParameters: { staggered } })
+    return (
+        <StaggeredContext.Provider value={{ ...mcc, ...scc }}>
+            <div class="demo">
+                <label><input type="checkbox" checked={checked} onInput={e => { e.preventDefault(); setChecked(e.currentTarget.checked) }} /> Children mounted</label>
+                <label><input type="checkbox" checked={staggered} onInput={e => { e.preventDefault(); setStaggered(e.currentTarget.checked) }} /> Children Staggered</label>
+                <label><input type="number" value={childCount} onInput={e => { e.preventDefault(); setChildCount(e.currentTarget.valueAsNumber) }} /> # of children</label>
+                <div>
+                    <div>Status: {staggered ? staggeredChildrenReturn.stillStaggering ? "staggering" : "done staggering" : "(not staggering)"}</div>
+                    <div style="display:flex;flex-wrap: wrap;">{checked && <DemoStaggeredChildren childCount={childCount} />}</div>
+                </div>
+            </div>
+        </StaggeredContext.Provider>
+    )
+})
+
+const DemoStaggeredChildren = memo(({ childCount }: { childCount: number }) => {
+    return (
+        <>
+            {Array.from(function* () {
+                for (let i = 0; i < childCount; ++i) {
+                    yield <DemoStaggeredChild index={i} key={i} />
+                }
+            }())}
+        </>
+    )
+})
+
+const DemoStaggeredChild = memo(({ index }: { index: number }) => {
+    const context = useContext(StaggeredContext);
+    const { managedChildParameters: { setParentIsStaggered, setStaggeredVisible }, props, staggeredChildReturn: { hideBecauseStaggered, isStaggered } } = useStaggeredChild<HTMLDivElement>({ context: context, managedChildParameters: { index } });
+    const { managedChildReturn } = useManagedChild<UseStaggeredChildrenInfo<HTMLDivElement>>({ context, managedChildParameters: { index } }, { hidden: false, index, setParentIsStaggered, setStaggeredVisible });
+
+    return (
+        <div {...useMergedProps(props, { style: hideBecauseStaggered ? { opacity: 0.25 } : {} })}>Child #{index}{isStaggered ? hideBecauseStaggered ? "(pending)" : "" : "(not staggered)"}</div>
+    )
+})
+
 const Component = () => {
     // return <DemoUseAsyncHandler2 />;
 
@@ -663,6 +708,8 @@ const Component = () => {
         <DemoUseTimeout />
         <hr />
         <DemoUseInterval />
+        <hr />
+        <DemoStaggered />
         <hr />
         <DemoUseRovingTabIndex />
         <hr />

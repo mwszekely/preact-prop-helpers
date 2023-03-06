@@ -7,9 +7,11 @@ export { tryNavigateToIndex, useLinearNavigation } from "./component-detail/use-
 export { useListNavigation, useListNavigationChild } from "./component-detail/use-list-navigation-partial.js";
 export { useListNavigationSingleSelectionSortable, useListNavigationSingleSelectionSortableChild } from "./component-detail/use-list-navigation-single-selection-sortable.js";
 export { useListNavigationSingleSelection, useListNavigationSingleSelectionChild } from "./component-detail/use-list-navigation-single-selection.js";
+export { usePaginatedChild, usePaginatedChildren } from "./component-detail/use-paginated-children.js";
 export { useRovingTabIndex, useRovingTabIndexChild } from "./component-detail/use-roving-tabindex.js";
 export { useSingleSelection, useSingleSelectionChild, useSingleSelectionDeclarative } from "./component-detail/use-single-selection.js";
 export { useRearrangeableChildren, useSortableChildren } from "./component-detail/use-sortable-children.js";
+export { useStaggeredChild, useStaggeredChildren } from "./component-detail/use-staggered-children.js";
 export { binarySearch, useTypeaheadNavigation, useTypeaheadNavigationChild } from "./component-detail/use-typeahead-navigation.js";
 export { useCompleteGridNavigation, useCompleteGridNavigationCell, useCompleteGridNavigationRow } from "./component-use/use-grid-navigation-complete.js";
 export { useCompleteListNavigation, useCompleteListNavigationChild } from "./component-use/use-list-navigation-complete.js";

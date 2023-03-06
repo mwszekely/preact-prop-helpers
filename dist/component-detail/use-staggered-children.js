@@ -23,19 +23,21 @@ export function useStaggeredChildren({ managedChildrenReturn: { getChildren }, s
             // We've gone this long without hearing the next child mount itself...
             // We need to continue.
             timeoutHandle.current = -1;
-            setDisplayedStaggerIndex(c => Math.min(getTargetStaggerIndex() ?? 0, (c ?? 0) + 1));
+            let target = getTargetStaggerIndex();
+            if (target != null)
+                setDisplayedStaggerIndex(c => Math.min(target, (c ?? 0) + 1));
         }, 50);
     }, [ /* Must be empty */]);
     // The target index is the index that we're "animating" to.
     // Each child simply sets this to the highest value ever seen.
     // TODO: When unmounting children, we should reset this, but that requires us to track total # of children
-    const [getTargetStaggerIndex, setTargetStaggerIndex] = usePassiveState(useCallback((newIndex, prevIndex) => {
+    const [getTargetStaggerIndex, setTargetStaggerIndex] = usePassiveState(useCallback((newIndex, _prevIndex) => {
         // Any time our target changes,
         // ensure our timeout is running, and start a new one if not
         // For any newly mounted children, make sure they're aware of if they should consider themselves staggered or not
-        for (let i = (prevIndex ?? 0); i < (newIndex ?? 0); ++i) {
-            getChildren().getAt(i)?.setParentIsStaggered(parentIsStaggered);
-        }
+        //for (let i = (prevIndex ?? 0); i < (newIndex ?? 0); ++i) {
+        //    getChildren().getAt(i)?.setParentIsStaggered(s.current);
+        //}
         if (timeoutHandle.current == -1) {
             resetEmergencyTimeout();
             // If there's no timeout running, then that also means we're not waiting for a child to mount.
@@ -47,7 +49,7 @@ export function useStaggeredChildren({ managedChildrenReturn: { getChildren }, s
         if (newIndex == null) {
             return;
         }
-        setCurrentlyStaggering(newIndex >= (getTargetStaggerIndex() ?? 0));
+        setCurrentlyStaggering(newIndex < (getTargetStaggerIndex() ?? 0));
         // It's time to show the next child,
         // either because the current one finished mounting,
         // or because our emergency backup timeout fired.
@@ -70,7 +72,8 @@ export function useStaggeredChildren({ managedChildrenReturn: { getChildren }, s
     const childCallsThisToTellTheParentTheHighestIndex = useCallback((mountedIndex) => {
         setTargetStaggerIndex(i => Math.max((i ?? 0), 1 + mountedIndex));
     }, []);
-    // TODO: Modification during render
+    // TODO: Modification during render (but it's really, really hard to avoid here,
+    // but also probably fine because parents render before children? Does that include suspense?)
     const s = useRef(parentIsStaggered);
     s.current = parentIsStaggered;
     return {
@@ -83,12 +86,14 @@ export function useStaggeredChildren({ managedChildrenReturn: { getChildren }, s
                 // It's okay that the dependencies aren't included.
                 // It's more important that these can be called during render.
                 //
-                // (If we switch, this is caught during useLayoutEffect anyway)
+                // (If we switch, this is caught during useLayoutEffect anyway,
+                // but only if we switch *after* the children mount! The ref
+                // is to take care of the case where we switch *before* they mount)
                 getDefaultIsStaggered: useCallback(() => {
-                    return parentIsStaggered;
+                    return s.current;
                 }, []),
                 getDefaultStaggeredVisible: useCallback((i) => {
-                    if (parentIsStaggered) {
+                    if (s.current) {
                         const staggerIndex = getDisplayedStaggerIndex();
                         if (staggerIndex == null)
                             return false;
@@ -103,7 +108,7 @@ export function useStaggeredChildren({ managedChildrenReturn: { getChildren }, s
     };
 }
 export function useStaggeredChild({ managedChildParameters: { index }, context: { staggeredChildContext: { childCallsThisToTellTheParentTheHighestIndex, getDefaultIsStaggered, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne } } }) {
-    const [parentIsStaggered, setParentIsStaggered] = useState(getDefaultIsStaggered());
+    const [parentIsStaggered, setParentIsStaggered] = useState(getDefaultIsStaggered);
     const [staggeredVisible, setStaggeredVisible] = useState(getDefaultStaggeredVisible(index));
     useLayoutEffect(() => {
         childCallsThisToTellTheParentTheHighestIndex(index);
@@ -114,7 +119,7 @@ export function useStaggeredChild({ managedChildParameters: { index }, context: 
     }, [index, (parentIsStaggered && staggeredVisible)]);
     return {
         props: !parentIsStaggered ? {} : { "aria-busy": (!staggeredVisible).toString() },
-        staggeredChildReturn: { staggeredVisible, isStaggered: parentIsStaggered, hideBecauseStaggered: parentIsStaggered ? !staggeredVisible : false },
+        staggeredChildReturn: { isStaggered: parentIsStaggered, hideBecauseStaggered: parentIsStaggered ? !staggeredVisible : false },
         managedChildParameters: {
             setStaggeredVisible: setStaggeredVisible,
             setParentIsStaggered,

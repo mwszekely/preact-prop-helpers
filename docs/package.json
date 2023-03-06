@@ -4,7 +4,7 @@
     "type": "module",
     "description": "Demo page for preact-prop-helpers",
     "main": "index.tsx",
-    "packageManager": "pnpm@7.28.0",
+    "packageManager": "pnpm@7.29.0",
     "browserslist": "defaults, iOS >= 12",
     "scripts": {
         "watch": "rollup --config rollup.config.mjs --watch --no-watch.clearScreen",
@@ -21,7 +21,7 @@
         "@rollup/plugin-commonjs": "^24.0.1",
         "@rollup/plugin-node-resolve": "^15.0.1",
         "@rollup/plugin-typescript": "^11.0.0",
-        "rollup": "^3.17.2",
+        "rollup": "^3.18.0",
         "rollup-plugin-sourcemaps": "^0.6.3",
         "serve": "^14.2.0",
         "typescript": "^4.9.5"

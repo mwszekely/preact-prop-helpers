@@ -215,7 +215,7 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
 
     const {
         managedChildParameters: { setParentIsStaggered, setStaggeredVisible },
-        staggeredChildReturn: { staggeredVisible, isStaggered, hideBecauseStaggered },
+        staggeredChildReturn: { isStaggered, hideBecauseStaggered },
         props: staggeredProps
     } = useStaggeredChild<RowElement>({ managedChildParameters: { index }, context: { staggeredChildContext } })
 
@@ -321,7 +321,7 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
         rowAsChildOfGridReturn: {
             ...rowAsChildOfGridReturn,
             managedChildReturn,
-            staggeredChildReturn: { isStaggered, staggeredVisible, hideBecauseStaggered },
+            staggeredChildReturn: { isStaggered, hideBecauseStaggered },
             paginatedChildReturn: { isPaginated, paginatedVisible, hideBecausePaginated }
         },
         hasCurrentFocusReturn

@@ -1,7 +1,7 @@
 import { h } from "preact";
 import { UseManagedChildrenReturnType } from "../preact-extensions/use-managed-children.js";
 import { UseRovingTabIndexChildInfo } from "./use-roving-tabindex.js";
-export interface UseStaggeredChildrenInfo<E extends Element> extends UseRovingTabIndexChildInfo<E> {
+export interface UseStaggeredChildrenInfo<E extends Element> extends Pick<UseRovingTabIndexChildInfo<E>, "hidden" | "index"> {
     setParentIsStaggered(parentIsStaggered: boolean): void;
     setStaggeredVisible(visible: boolean): void;
 }
@@ -45,7 +45,6 @@ export interface UseStaggeredChildReturn<ChildElement extends Element> {
     staggeredChildReturn: {
         /** Whether the parent has indicated that all of its children, including this one, are staggered. */
         isStaggered: boolean;
-        staggeredVisible: boolean;
         /**
          * If this is true, you should delay showing *your* children or running other heavy logic until this becomes false.
          *

@@ -78,7 +78,7 @@ export function usePaginatedChildren<E extends Element, M extends UsePaginatedCh
                 getDefaultIsPaginated: useCallback(() => { return p.current; }, []),
                 // This is only used during setState on mount, so this is fine.
                 // (If we change from paginated to not paginated, this is caught during useLayoutEffect)
-                getDefaultPaginationVisible: useCallback((i) => { return parentIsPaginated ? (i >= (paginationMin ?? -Infinity) && i < (paginationMax ?? Infinity)) : true; }, [])
+                getDefaultPaginationVisible: useCallback((i) => { return p.current ? (i >= (paginationMin ?? -Infinity) && i < (paginationMax ?? Infinity)) : true; }, [])
             })
         }),
         managedChildrenParameters: {

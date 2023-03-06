@@ -4579,7 +4579,7 @@ var bundle = (function (exports) {
                 }
                 break;
             }
-             case "ArrowLeft": {
+              case "ArrowLeft": {
                 const directionAllowed = (!disableArrowKeys && allowsHorizontalNavigation);
                 if (directionAllowed) {
                     const result = navigateToPrev(e, true);
@@ -4624,7 +4624,7 @@ var bundle = (function (exports) {
                     e.stopPropagation();
                 }
                 break;
-             case "End":
+              case "End":
                 if (!disableHomeEndKeys) {
                     navigateToLast(e, true);
                     e.preventDefault();
@@ -5432,17 +5432,17 @@ var bundle = (function (exports) {
             But roughly isn't good enough if there are multiple matches.
             To convert our sorted index to the unsorted index we need, we have to find the first
             element that matches us *and* (if any such exist) is *after* our current selection.
-                 In other words, the only way typeahead moves backwards relative to our current
+                  In other words, the only way typeahead moves backwards relative to our current
             position is if the only other option is behind us.
-                 It's not specified in WAI-ARIA what to do in that case.  I suppose wrap back to the start?
+                  It's not specified in WAI-ARIA what to do in that case.  I suppose wrap back to the start?
             Though there's also a case for just going upwards to the nearest to prevent jumpiness.
             But if you're already doing typeahead on an unsorted list, like, jumpiness can't be avoided.
             I dunno. Going back to the start is the simplist though.
-                 Basically what this does: Starting from where we found ourselves after our binary search,
+                  Basically what this does: Starting from where we found ourselves after our binary search,
             scan backwards and forwards through all adjacent entries that also compare equally so that
             we can find the one whose `unsortedIndex` is the lowest amongst all other equal strings
             (and also the lowest `unsortedIndex` yadda yadda except that it comes after us).
-                 TODO: The binary search starts this off with a solid O(log n), but one-character
+                  TODO: The binary search starts this off with a solid O(log n), but one-character
             searches are, thanks to pigeonhole principal, eventually guaranteed to become
             O(n*log n). This is annoying but probably not easily solvable? There could be an
             exception for one-character strings, but that's just kicking the can down
@@ -6496,7 +6496,7 @@ var bundle = (function (exports) {
           // This is only used during setState on mount, so this is fine.
           // (If we change from paginated to not paginated, this is caught during useLayoutEffect)
           getDefaultPaginationVisible: T$1(i => {
-            return parentIsPaginated ? i >= (paginationMin !== null && paginationMin !== void 0 ? paginationMin : -Infinity) && i < (paginationMax !== null && paginationMax !== void 0 ? paginationMax : Infinity) : true;
+            return p.current ? i >= (paginationMin !== null && paginationMin !== void 0 ? paginationMin : -Infinity) && i < (paginationMax !== null && paginationMax !== void 0 ? paginationMax : Infinity) : true;
           }, [])
         })
       }),
@@ -6584,23 +6584,20 @@ var bundle = (function (exports) {
         // We've gone this long without hearing the next child mount itself...
         // We need to continue.
         timeoutHandle.current = -1;
-        setDisplayedStaggerIndex(c => {
-          var _getTargetStaggerInde;
-          return Math.min((_getTargetStaggerInde = getTargetStaggerIndex()) !== null && _getTargetStaggerInde !== void 0 ? _getTargetStaggerInde : 0, (c !== null && c !== void 0 ? c : 0) + 1);
-        });
+        let target = getTargetStaggerIndex();
+        if (target != null) setDisplayedStaggerIndex(c => Math.min(target, (c !== null && c !== void 0 ? c : 0) + 1));
       }, 50);
     }, [/* Must be empty */]);
     // The target index is the index that we're "animating" to.
     // Each child simply sets this to the highest value ever seen.
     // TODO: When unmounting children, we should reset this, but that requires us to track total # of children
-    const [getTargetStaggerIndex, setTargetStaggerIndex] = usePassiveState(T$1((newIndex, prevIndex) => {
+    const [getTargetStaggerIndex, setTargetStaggerIndex] = usePassiveState(T$1((newIndex, _prevIndex) => {
       // Any time our target changes,
       // ensure our timeout is running, and start a new one if not
       // For any newly mounted children, make sure they're aware of if they should consider themselves staggered or not
-      for (let i = prevIndex !== null && prevIndex !== void 0 ? prevIndex : 0; i < (newIndex !== null && newIndex !== void 0 ? newIndex : 0); ++i) {
-        var _getChildren$getAt;
-        (_getChildren$getAt = getChildren().getAt(i)) === null || _getChildren$getAt === void 0 ? void 0 : _getChildren$getAt.setParentIsStaggered(parentIsStaggered);
-      }
+      //for (let i = (prevIndex ?? 0); i < (newIndex ?? 0); ++i) {
+      //    getChildren().getAt(i)?.setParentIsStaggered(s.current);
+      //}
       if (timeoutHandle.current == -1) {
         resetEmergencyTimeout();
         // If there's no timeout running, then that also means we're not waiting for a child to mount.
@@ -6609,11 +6606,11 @@ var bundle = (function (exports) {
       }
     }, [/* Must be empty */]), returnNull);
     const [getDisplayedStaggerIndex, setDisplayedStaggerIndex] = usePassiveState(T$1((newIndex, prevIndex) => {
-      var _getTargetStaggerInde2;
+      var _getTargetStaggerInde;
       if (newIndex == null) {
         return;
       }
-      setCurrentlyStaggering(newIndex >= ((_getTargetStaggerInde2 = getTargetStaggerIndex()) !== null && _getTargetStaggerInde2 !== void 0 ? _getTargetStaggerInde2 : 0));
+      setCurrentlyStaggering(newIndex < ((_getTargetStaggerInde = getTargetStaggerIndex()) !== null && _getTargetStaggerInde !== void 0 ? _getTargetStaggerInde : 0));
       // It's time to show the next child,
       // either because the current one finished mounting,
       // or because our emergency backup timeout fired.
@@ -6621,8 +6618,8 @@ var bundle = (function (exports) {
       // Either way, tell the next child to show itself.
       // Also make sure that anyone we skipped somehow show themselves as well.
       for (let i = prevIndex !== null && prevIndex !== void 0 ? prevIndex : 0; i < newIndex; ++i) {
-        var _getChildren$getAt2;
-        (_getChildren$getAt2 = getChildren().getAt(i)) === null || _getChildren$getAt2 === void 0 ? void 0 : _getChildren$getAt2.setStaggeredVisible(true);
+        var _getChildren$getAt;
+        (_getChildren$getAt = getChildren().getAt(i)) === null || _getChildren$getAt === void 0 ? void 0 : _getChildren$getAt.setStaggeredVisible(true);
       }
       // Set a new emergency timeout
       resetEmergencyTimeout();
@@ -6630,8 +6627,8 @@ var bundle = (function (exports) {
     const parentIsStaggered = !!staggered;
     const childCallsThisToTellTheParentToMountTheNextOne = T$1(index => {
       setDisplayedStaggerIndex(s => {
-        var _getTargetStaggerInde3;
-        return Math.min((_getTargetStaggerInde3 = getTargetStaggerIndex()) !== null && _getTargetStaggerInde3 !== void 0 ? _getTargetStaggerInde3 : 0, 1 + Math.max(s !== null && s !== void 0 ? s : 0, index + 1));
+        var _getTargetStaggerInde2;
+        return Math.min((_getTargetStaggerInde2 = getTargetStaggerIndex()) !== null && _getTargetStaggerInde2 !== void 0 ? _getTargetStaggerInde2 : 0, 1 + Math.max(s !== null && s !== void 0 ? s : 0, index + 1));
       });
     }, []);
     s(() => {
@@ -6640,7 +6637,8 @@ var bundle = (function (exports) {
     const childCallsThisToTellTheParentTheHighestIndex = T$1(mountedIndex => {
       setTargetStaggerIndex(i => Math.max(i !== null && i !== void 0 ? i : 0, 1 + mountedIndex));
     }, []);
-    // TODO: Modification during render
+    // TODO: Modification during render (but it's really, really hard to avoid here,
+    // but also probably fine because parents render before children? Does that include suspense?)
     const s$1 = _(parentIsStaggered);
     s$1.current = parentIsStaggered;
     return {
@@ -6655,12 +6653,14 @@ var bundle = (function (exports) {
           // It's okay that the dependencies aren't included.
           // It's more important that these can be called during render.
           //
-          // (If we switch, this is caught during useLayoutEffect anyway)
+          // (If we switch, this is caught during useLayoutEffect anyway,
+          // but only if we switch *after* the children mount! The ref
+          // is to take care of the case where we switch *before* they mount)
           getDefaultIsStaggered: T$1(() => {
-            return parentIsStaggered;
+            return s$1.current;
           }, []),
           getDefaultStaggeredVisible: T$1(i => {
-            if (parentIsStaggered) {
+            if (s$1.current) {
               const staggerIndex = getDisplayedStaggerIndex();
               if (staggerIndex == null) return false;
               return i < staggerIndex;
@@ -6686,7 +6686,7 @@ var bundle = (function (exports) {
         }
       }
     } = _ref2;
-    const [parentIsStaggered, setParentIsStaggered] = useState(getDefaultIsStaggered());
+    const [parentIsStaggered, setParentIsStaggered] = useState(getDefaultIsStaggered);
     const [staggeredVisible, setStaggeredVisible] = useState(getDefaultStaggeredVisible(index));
     s(() => {
       childCallsThisToTellTheParentTheHighestIndex(index);
@@ -6699,7 +6699,6 @@ var bundle = (function (exports) {
         "aria-busy": (!staggeredVisible).toString()
       },
       staggeredChildReturn: {
-        staggeredVisible,
         isStaggered: parentIsStaggered,
         hideBecauseStaggered: parentIsStaggered ? !staggeredVisible : false
       },
@@ -6998,7 +6997,6 @@ var bundle = (function (exports) {
         setStaggeredVisible
       },
       staggeredChildReturn: {
-        staggeredVisible,
         isStaggered,
         hideBecauseStaggered
       },
@@ -7154,7 +7152,6 @@ var bundle = (function (exports) {
         managedChildReturn,
         staggeredChildReturn: {
           isStaggered,
-          staggeredVisible,
           hideBecauseStaggered
         },
         paginatedChildReturn: {
@@ -10519,6 +10516,128 @@ var bundle = (function (exports) {
       hidden: true
     });
   });
+  const StaggeredContext = E(null);
+  const DemoStaggered = x(() => {
+    const [staggered, setStaggered] = useState(false);
+    const [checked, setChecked] = useState(false);
+    const [childCount, setChildCount] = useState(100);
+    const {
+      context: mcc,
+      managedChildrenReturn
+    } = useManagedChildren({
+      managedChildrenParameters: {}
+    });
+    const {
+      context: scc,
+      staggeredChildrenReturn
+    } = useStaggeredChildren({
+      managedChildrenReturn,
+      staggeredChildrenParameters: {
+        staggered
+      }
+    });
+    return o$1(StaggeredContext.Provider, {
+      value: {
+        ...mcc,
+        ...scc
+      },
+      children: o$1("div", {
+        class: "demo",
+        children: [o$1("label", {
+          children: [o$1("input", {
+            type: "checkbox",
+            checked: checked,
+            onInput: e => {
+              e.preventDefault();
+              setChecked(e.currentTarget.checked);
+            }
+          }), " Children mounted"]
+        }), o$1("label", {
+          children: [o$1("input", {
+            type: "checkbox",
+            checked: staggered,
+            onInput: e => {
+              e.preventDefault();
+              setStaggered(e.currentTarget.checked);
+            }
+          }), " Children Staggered"]
+        }), o$1("label", {
+          children: [o$1("input", {
+            type: "number",
+            value: childCount,
+            onInput: e => {
+              e.preventDefault();
+              setChildCount(e.currentTarget.valueAsNumber);
+            }
+          }), " # of children"]
+        }), o$1("div", {
+          children: [o$1("div", {
+            children: ["Status: ", staggered ? staggeredChildrenReturn.stillStaggering ? "staggering" : "done staggering" : "(not staggering)"]
+          }), o$1("div", {
+            style: "display:flex;flex-wrap: wrap;",
+            children: checked && o$1(DemoStaggeredChildren, {
+              childCount: childCount
+            })
+          })]
+        })]
+      })
+    });
+  });
+  const DemoStaggeredChildren = x(_ref11 => {
+    let {
+      childCount
+    } = _ref11;
+    return o$1(d$1, {
+      children: Array.from(function* () {
+        for (let i = 0; i < childCount; ++i) {
+          yield o$1(DemoStaggeredChild, {
+            index: i
+          }, i);
+        }
+      }())
+    });
+  });
+  const DemoStaggeredChild = x(_ref12 => {
+    let {
+      index
+    } = _ref12;
+    const context = q(StaggeredContext);
+    const {
+      managedChildParameters: {
+        setParentIsStaggered,
+        setStaggeredVisible
+      },
+      props,
+      staggeredChildReturn: {
+        hideBecauseStaggered,
+        isStaggered
+      }
+    } = useStaggeredChild({
+      context: context,
+      managedChildParameters: {
+        index
+      }
+    });
+    useManagedChild({
+      context,
+      managedChildParameters: {
+        index
+      }
+    }, {
+      hidden: false,
+      index,
+      setParentIsStaggered,
+      setStaggeredVisible
+    });
+    return o$1("div", {
+      ...useMergedProps(props, {
+        style: hideBecauseStaggered ? {
+          opacity: 0.25
+        } : {}
+      }),
+      children: ["Child #", index, isStaggered ? hideBecauseStaggered ? "(pending)" : "" : "(not staggered)"]
+    });
+  });
   const Component = () => {
     // return <DemoUseAsyncHandler2 />;
     return o$1("div", {
@@ -10531,7 +10650,7 @@ var bundle = (function (exports) {
       }), o$1("input", {}), o$1("div", {
         style: "display:grid;grid-template-columns:1fr 1fr",
         children: [o$1(DemoUseModal, {}), o$1(DemoUseModal, {})]
-      }), o$1("hr", {}), o$1(DemoLabel, {}), o$1("hr", {}), o$1(DemoGlobalHandler, {}), o$1("hr", {}), o$1(DemoPortalChildren, {}), o$1("hr", {}), o$1(DemoFocus, {}), o$1("hr", {}), o$1(DemoUseChildrenHaveFocus, {}), o$1("hr", {}), o$1(DemoUseGrid, {}), o$1("hr", {}), o$1(DemoUseTimeout, {}), o$1("hr", {}), o$1(DemoUseInterval, {}), o$1("hr", {}), o$1(DemoUseRovingTabIndex, {}), o$1("hr", {}), o$1(DemoUseFocusTrap, {}), o$1("hr", {}), o$1(DemoUseAsyncHandler1, {}), o$1("hr", {}), o$1(DemoUseAsyncHandler2, {}), o$1("hr", {}), o$1(DemoUseDroppable, {}), o$1("hr", {}), o$1(DemoUseDraggable, {}), o$1("hr", {}), o$1(DemoUseElementSizeAnimation, {}), o$1("hr", {}), o$1("input", {})]
+      }), o$1("hr", {}), o$1(DemoLabel, {}), o$1("hr", {}), o$1(DemoGlobalHandler, {}), o$1("hr", {}), o$1(DemoPortalChildren, {}), o$1("hr", {}), o$1(DemoFocus, {}), o$1("hr", {}), o$1(DemoUseChildrenHaveFocus, {}), o$1("hr", {}), o$1(DemoUseGrid, {}), o$1("hr", {}), o$1(DemoUseTimeout, {}), o$1("hr", {}), o$1(DemoUseInterval, {}), o$1("hr", {}), o$1(DemoStaggered, {}), o$1("hr", {}), o$1(DemoUseRovingTabIndex, {}), o$1("hr", {}), o$1(DemoUseFocusTrap, {}), o$1("hr", {}), o$1(DemoUseAsyncHandler1, {}), o$1("hr", {}), o$1(DemoUseAsyncHandler2, {}), o$1("hr", {}), o$1(DemoUseDroppable, {}), o$1("hr", {}), o$1(DemoUseDraggable, {}), o$1("hr", {}), o$1(DemoUseElementSizeAnimation, {}), o$1("hr", {}), o$1("input", {})]
     });
   };
   requestAnimationFrame(() => {

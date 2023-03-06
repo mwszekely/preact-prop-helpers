@@ -6,7 +6,7 @@ import { useStableObject } from "../preact-extensions/use-stable-getter.js";
 import { useState } from "../preact-extensions/use-state.js";
 import { UseRovingTabIndexChildInfo } from "./use-roving-tabindex.js";
 
-export interface UseStaggeredChildrenInfo<E extends Element> extends UseRovingTabIndexChildInfo<E> {
+export interface UseStaggeredChildrenInfo<E extends Element> extends Pick<UseRovingTabIndexChildInfo<E>, "hidden" | "index"> {
     setParentIsStaggered(parentIsStaggered: boolean): void;
     setStaggeredVisible(visible: boolean): void;
 }
@@ -60,22 +60,23 @@ export function useStaggeredChildren<E extends Element, M extends UseStaggeredCh
             // We've gone this long without hearing the next child mount itself...
             // We need to continue.
             timeoutHandle.current = -1;
-            setDisplayedStaggerIndex(c => Math.min(getTargetStaggerIndex() ?? 0, (c ?? 0) + 1));
+            let target = getTargetStaggerIndex();
+            if (target != null)
+                setDisplayedStaggerIndex(c => Math.min(target!, (c ?? 0) + 1));
         }, 50)
     }, [/* Must be empty */])
 
     // The target index is the index that we're "animating" to.
     // Each child simply sets this to the highest value ever seen.
     // TODO: When unmounting children, we should reset this, but that requires us to track total # of children
-    const [getTargetStaggerIndex, setTargetStaggerIndex] = usePassiveState<number | null, never>(useCallback((newIndex: number | null, prevIndex: number | null | undefined) => {
+    const [getTargetStaggerIndex, setTargetStaggerIndex] = usePassiveState<number | null, never>(useCallback((newIndex: number | null, _prevIndex: number | null | undefined) => {
         // Any time our target changes,
         // ensure our timeout is running, and start a new one if not
 
-
         // For any newly mounted children, make sure they're aware of if they should consider themselves staggered or not
-        for (let i = (prevIndex ?? 0); i < (newIndex ?? 0); ++i) {
-            getChildren().getAt(i)?.setParentIsStaggered(parentIsStaggered);
-        }
+        //for (let i = (prevIndex ?? 0); i < (newIndex ?? 0); ++i) {
+        //    getChildren().getAt(i)?.setParentIsStaggered(s.current);
+        //}
 
         if (timeoutHandle.current == -1) {
             resetEmergencyTimeout();
@@ -91,7 +92,7 @@ export function useStaggeredChildren<E extends Element, M extends UseStaggeredCh
             return;
         }
 
-        setCurrentlyStaggering(newIndex >= (getTargetStaggerIndex() ?? 0));
+        setCurrentlyStaggering(newIndex < (getTargetStaggerIndex() ?? 0));
 
         // It's time to show the next child,
         // either because the current one finished mounting,
@@ -124,7 +125,8 @@ export function useStaggeredChildren<E extends Element, M extends UseStaggeredCh
         setTargetStaggerIndex(i => Math.max((i ?? 0), 1 + mountedIndex))
     }, []);
 
-    // TODO: Modification during render
+    // TODO: Modification during render (but it's really, really hard to avoid here,
+    // but also probably fine because parents render before children? Does that include suspense?)
     const s = useRef(parentIsStaggered);
     s.current = parentIsStaggered;
 
@@ -138,12 +140,14 @@ export function useStaggeredChildren<E extends Element, M extends UseStaggeredCh
                 // It's okay that the dependencies aren't included.
                 // It's more important that these can be called during render.
                 //
-                // (If we switch, this is caught during useLayoutEffect anyway)
+                // (If we switch, this is caught during useLayoutEffect anyway,
+                // but only if we switch *after* the children mount! The ref
+                // is to take care of the case where we switch *before* they mount)
                 getDefaultIsStaggered: useCallback(() => {
-                    return parentIsStaggered;
+                    return s.current;
                 }, []),
                 getDefaultStaggeredVisible: useCallback((i) => {
-                    if (parentIsStaggered) {
+                    if (s.current) {
                         const staggerIndex = getDisplayedStaggerIndex();
                         if (staggerIndex == null)
                             return false;
@@ -170,7 +174,7 @@ export interface UseStaggeredChildReturn<ChildElement extends Element> {
     staggeredChildReturn: {
         /** Whether the parent has indicated that all of its children, including this one, are staggered. */
         isStaggered: boolean;
-        staggeredVisible: boolean;
+        //staggeredVisible: boolean;
         /** 
          * If this is true, you should delay showing *your* children or running other heavy logic until this becomes false.
          * 
@@ -183,7 +187,7 @@ export interface UseStaggeredChildReturn<ChildElement extends Element> {
 
 
 export function useStaggeredChild<ChildElement extends Element>({ managedChildParameters: { index }, context: { staggeredChildContext: { childCallsThisToTellTheParentTheHighestIndex, getDefaultIsStaggered, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne } } }: UseStaggeredChildParameters): UseStaggeredChildReturn<ChildElement> {
-    const [parentIsStaggered, setParentIsStaggered] = useState(getDefaultIsStaggered());
+    const [parentIsStaggered, setParentIsStaggered] = useState(getDefaultIsStaggered);
     const [staggeredVisible, setStaggeredVisible] = useState(getDefaultStaggeredVisible(index));
 
     useLayoutEffect(() => {
@@ -197,7 +201,7 @@ export function useStaggeredChild<ChildElement extends Element>({ managedChildPa
 
     return {
         props: !parentIsStaggered ? {} : { "aria-busy": (!staggeredVisible).toString() } as {},
-        staggeredChildReturn: { staggeredVisible, isStaggered: parentIsStaggered, hideBecauseStaggered: parentIsStaggered? !staggeredVisible : false },
+        staggeredChildReturn: { isStaggered: parentIsStaggered, hideBecauseStaggered: parentIsStaggered? !staggeredVisible : false },
         managedChildParameters: {
             setStaggeredVisible: setStaggeredVisible,
             setParentIsStaggered,

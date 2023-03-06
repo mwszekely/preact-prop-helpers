@@ -67,7 +67,7 @@ export function useCompleteGridNavigation({ gridNavigationParameters, linearNavi
 export function useCompleteGridNavigationRow({ rowAsChildOfGridParameters: { managedChildParameters, context: { childrenHaveFocusChildContext, gridNavigationRowContext, managedChildContext: mcc1, rovingTabIndexChildContext, singleSelectionContext, typeaheadNavigationChildContext, staggeredChildContext, paginatedChildContext }, completeGridNavigationRowParameters, singleSelectionChildParameters, rovingTabIndexChildParameters, rovingTabIndexChildParameters: { hidden }, textContentParameters, ...rowAsChildOfGridParameters }, rowAsParentOfCellsParameters: { linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, ...rowAsParentOfCellsParameters } }) {
     const { index } = managedChildParameters;
     const { managedChildParameters: { setChildCountIfPaginated, setPaginationVisible, setParentIsPaginated }, paginatedChildReturn: { paginatedVisible, isPaginated, hideBecausePaginated }, props: paginationProps } = usePaginatedChild({ managedChildParameters: { index }, context: { paginatedChildContext } });
-    const { managedChildParameters: { setParentIsStaggered, setStaggeredVisible }, staggeredChildReturn: { staggeredVisible, isStaggered, hideBecauseStaggered }, props: staggeredProps } = useStaggeredChild({ managedChildParameters: { index }, context: { staggeredChildContext } });
+    const { managedChildParameters: { setParentIsStaggered, setStaggeredVisible }, staggeredChildReturn: { isStaggered, hideBecauseStaggered }, props: staggeredProps } = useStaggeredChild({ managedChildParameters: { index }, context: { staggeredChildContext } });
     rovingTabIndexChildParameters.hidden ||= (hideBecausePaginated || hideBecauseStaggered);
     singleSelectionChildParameters.disabled ||= rovingTabIndexChildParameters.hidden;
     const getChildren = useCallback(() => managedChildrenReturn.getChildren(), []);
@@ -151,7 +151,7 @@ export function useCompleteGridNavigationRow({ rowAsChildOfGridParameters: { man
         rowAsChildOfGridReturn: {
             ...rowAsChildOfGridReturn,
             managedChildReturn,
-            staggeredChildReturn: { isStaggered, staggeredVisible, hideBecauseStaggered },
+            staggeredChildReturn: { isStaggered, hideBecauseStaggered },
             paginatedChildReturn: { isPaginated, paginatedVisible, hideBecausePaginated }
         },
         hasCurrentFocusReturn
