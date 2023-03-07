@@ -25,7 +25,7 @@ export function useMergedRefs(rhs, lhs) {
     const combined = useStableCallback(function combined(current) {
         processRef(current, lhs);
         processRef(current, rhs);
-    }, []);
+    });
     if (lhs == null && rhs == null) {
         return undefined;
     }

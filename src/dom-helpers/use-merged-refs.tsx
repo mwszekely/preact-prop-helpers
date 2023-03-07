@@ -32,7 +32,7 @@ export function useMergedRefs<E extends EventTarget>(rhs: h.JSX.HTMLAttributes<E
     const combined = useStableCallback(function combined(current: E | null) {
         processRef(current, lhs);
         processRef(current, rhs);
-    }, []);
+    });
 
     if (lhs == null && rhs == null) {
         return undefined!;
