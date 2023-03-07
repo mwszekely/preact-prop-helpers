@@ -2152,7 +2152,8 @@ var bundle = (function (exports) {
    */
   function useMergedRefs(rhs, lhs) {
     useEnsureStability("useMergedRefs", lhs, rhs);
-    const combined = T$1(function combined(current) {
+    // This *must* be stable in order to prevent repeated reset `null` calls after every render.
+    const combined = useStableCallback(function combined(current) {
       processRef(current, lhs);
       processRef(current, rhs);
     }, []);
@@ -4553,7 +4554,7 @@ var bundle = (function (exports) {
               break;
           }
         }
-        if (result && result == 'passthrough') {
+        if (result && result != 'passthrough') {
           e.preventDefault();
           e.stopPropagation();
         }

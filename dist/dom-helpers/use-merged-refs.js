@@ -1,5 +1,5 @@
-import { useCallback } from "preact/hooks";
 import { useEnsureStability } from "../preact-extensions/use-passive-state.js";
+import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 function processRef(instance, ref) {
     if (typeof ref === "function") {
         ref(instance);
@@ -21,7 +21,8 @@ function processRef(instance, ref) {
  */
 export function useMergedRefs(rhs, lhs) {
     useEnsureStability("useMergedRefs", lhs, rhs);
-    const combined = useCallback(function combined(current) {
+    // This *must* be stable in order to prevent repeated reset `null` calls after every render.
+    const combined = useStableCallback(function combined(current) {
         processRef(current, lhs);
         processRef(current, rhs);
     }, []);
