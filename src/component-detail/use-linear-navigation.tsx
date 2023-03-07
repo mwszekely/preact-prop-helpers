@@ -254,7 +254,7 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
                 }
             }
 
-            if (result && result == 'passthrough') {
+            if (result && result != 'passthrough') {
                 e.preventDefault();
                 e.stopPropagation();
             }

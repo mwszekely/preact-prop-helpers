@@ -142,7 +142,7 @@ export function useLinearNavigation({ rovingTabIndexReturn, linearNavigationPara
                         break;
                 }
             }
-            if (result && result == 'passthrough') {
+            if (result && result != 'passthrough') {
                 e.preventDefault();
                 e.stopPropagation();
             }
