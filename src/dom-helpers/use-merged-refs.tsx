@@ -26,7 +26,6 @@ function processRef<T>(instance: T | null, ref: Ref<T> | null | undefined) {
  * @returns 
  */
 export function useMergedRefs<E extends EventTarget>(rhs: h.JSX.HTMLAttributes<E>["ref"], lhs: h.JSX.HTMLAttributes<E>["ref"]) {
-    useEnsureStability("useMergedRefs", lhs, rhs);
     
     // This *must* be stable in order to prevent repeated reset `null` calls after every render.
     const combined = useStableCallback(function combined(current: E | null) {

@@ -2151,7 +2151,6 @@ var bundle = (function (exports) {
    * @returns
    */
   function useMergedRefs(rhs, lhs) {
-    useEnsureStability("useMergedRefs", lhs, rhs);
     // This *must* be stable in order to prevent repeated reset `null` calls after every render.
     const combined = useStableCallback(function combined(current) {
       processRef(current, lhs);
