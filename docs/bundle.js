@@ -2151,6 +2151,11 @@ var bundle = (function (exports) {
    * @returns
    */
   function useMergedRefs(rhs, lhs) {
+    useEnsureStability("useMergedRefs", lhs, rhs);
+    const combined = T$1(function combined(current) {
+      processRef(current, lhs);
+      processRef(current, rhs);
+    }, []);
     if (lhs == null && rhs == null) {
       return undefined;
     } else if (lhs == null) {
@@ -2159,10 +2164,6 @@ var bundle = (function (exports) {
       return lhs;
     } else {
       return combined;
-    }
-    function combined(current) {
-      processRef(current, lhs);
-      processRef(current, rhs);
     }
   }
 
@@ -4579,7 +4580,7 @@ var bundle = (function (exports) {
                 }
                 break;
             }
-              case "ArrowLeft": {
+             case "ArrowLeft": {
                 const directionAllowed = (!disableArrowKeys && allowsHorizontalNavigation);
                 if (directionAllowed) {
                     const result = navigateToPrev(e, true);
@@ -4624,7 +4625,7 @@ var bundle = (function (exports) {
                     e.stopPropagation();
                 }
                 break;
-              case "End":
+             case "End":
                 if (!disableHomeEndKeys) {
                     navigateToLast(e, true);
                     e.preventDefault();
@@ -5432,17 +5433,17 @@ var bundle = (function (exports) {
             But roughly isn't good enough if there are multiple matches.
             To convert our sorted index to the unsorted index we need, we have to find the first
             element that matches us *and* (if any such exist) is *after* our current selection.
-                  In other words, the only way typeahead moves backwards relative to our current
+                 In other words, the only way typeahead moves backwards relative to our current
             position is if the only other option is behind us.
-                  It's not specified in WAI-ARIA what to do in that case.  I suppose wrap back to the start?
+                 It's not specified in WAI-ARIA what to do in that case.  I suppose wrap back to the start?
             Though there's also a case for just going upwards to the nearest to prevent jumpiness.
             But if you're already doing typeahead on an unsorted list, like, jumpiness can't be avoided.
             I dunno. Going back to the start is the simplist though.
-                  Basically what this does: Starting from where we found ourselves after our binary search,
+                 Basically what this does: Starting from where we found ourselves after our binary search,
             scan backwards and forwards through all adjacent entries that also compare equally so that
             we can find the one whose `unsortedIndex` is the lowest amongst all other equal strings
             (and also the lowest `unsortedIndex` yadda yadda except that it comes after us).
-                  TODO: The binary search starts this off with a solid O(log n), but one-character
+                 TODO: The binary search starts this off with a solid O(log n), but one-character
             searches are, thanks to pigeonhole principal, eventually guaranteed to become
             O(n*log n). This is annoying but probably not easily solvable? There could be an
             exception for one-character strings, but that's just kicking the can down

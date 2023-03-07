@@ -1,3 +1,5 @@
+import { useCallback } from "preact/hooks";
+import { useEnsureStability } from "../preact-extensions/use-passive-state.js";
 function processRef(instance, ref) {
     if (typeof ref === "function") {
         ref(instance);
@@ -18,6 +20,11 @@ function processRef(instance, ref) {
  * @returns
  */
 export function useMergedRefs(rhs, lhs) {
+    useEnsureStability("useMergedRefs", lhs, rhs);
+    const combined = useCallback(function combined(current) {
+        processRef(current, lhs);
+        processRef(current, rhs);
+    }, []);
     if (lhs == null && rhs == null) {
         return undefined;
     }
@@ -30,10 +37,5 @@ export function useMergedRefs(rhs, lhs) {
     else {
         return combined;
     }
-    function combined(current) {
-        processRef(current, lhs);
-        processRef(current, rhs);
-    }
-    ;
 }
 //# sourceMappingURL=use-merged-refs.js.map
