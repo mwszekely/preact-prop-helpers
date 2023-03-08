@@ -1,36 +1,7 @@
 
 import { Component, options, VNode } from "preact";
 import { EffectCallback, Inputs, useEffect, useState } from "preact/hooks";
-
-
-
-const Table = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-";
-
-function base64(value: number) {
-    return Table[value];
-}
-
-function random6Bits() {
-    return Math.floor(Math.random() * 0b1000000);
-}
-
-function random64Bits() {
-    return [random6Bits(), random6Bits(), random6Bits(), random6Bits(), random6Bits(), random6Bits(), random6Bits(), random6Bits(), random6Bits(), random6Bits(), random6Bits()] as const;
-}
-
-/**
- * Returns a randomly-generated ID with an optional prefix.
- * Note that if the prefix is *explicitly* set to "", then
- * IDs that are not valid under HTML4 may be generated. Oh no.
- * 
- * 
- * (This is here, in this particular file, to avoid circular dependencies
- * without also making a utilities file.
- * Once we can remove this hook, we can put this function back with useRandomId)
- */
-export function generateRandomId(prefix?: string) {
-    return `${prefix ?? "id-"}${random64Bits().map(n => base64(n)).join("")}`;
-}
+import { generateRandomId } from "../util/random-id.js";
 
 const previousInputs = new Map<string, Inputs | undefined>();
 const toRun = new Map<string, { effect: EffectCallback, inputs?: Inputs, cleanup: null | undefined | void | (() => void) }>();

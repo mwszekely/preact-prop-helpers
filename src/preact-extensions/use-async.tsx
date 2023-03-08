@@ -4,8 +4,6 @@ import { useCallback, useEffect, useMemo } from "preact/hooks";
 import { useStableCallback } from "./use-stable-callback.js";
 import { useState } from "./use-state.js";
 
-//type Func = (...args: any) => Promise<unknown> | unknown;
-
 export interface UseAsyncParameters<AP extends unknown[], SP extends unknown[] = AP> {
     /**
      * If provided, adds a debounce behavior *in addition* to
@@ -14,7 +12,7 @@ export interface UseAsyncParameters<AP extends unknown[], SP extends unknown[] =
     debounce?: number;
 
     /**
-     * By default, `useAsync` with auto-throttle based on how long it takes
+     * By default, `useAsync` will auto-throttle based on how long it takes
      * for the operation to complete.  If you would like there to be a
      * minimum amount of time to wait before allowing a second operation,
      * the `throttle` parameter can be used in addition to that behavior.
@@ -211,6 +209,9 @@ export function useAsync<AP extends unknown[], R, SP extends unknown[] = AP>(asy
     // Things related to current execution
     // Because we can both return and throw undefined, 
     // we need separate state to track their existance too.
+    //
+    // We keep, like, a *lot* of render-state, but it only ever triggers a re-render
+    // when we start/stop an async action.
     const [pending, setPending, _getPending] = useState(false);
     const [result, setResult, _getResult] = useState<R>(undefined!);
     const [error, setError, _getError] = useState<unknown>(undefined!);
@@ -219,6 +220,12 @@ export function useAsync<AP extends unknown[], R, SP extends unknown[] = AP>(asy
     const [asyncDebouncing, setAsyncDebouncing] = useState(false);
     const [syncDebouncing, setSyncDebouncing] = useState(false);
     const [invocationResult, setInvocationResult] = useState<"async" | "sync" | "throw" | null>(asyncHandler2 instanceof AsyncFunction? "async" : null);
+    
+    // Keep track of this for the caller's sake -- we don't really care.
+    const [runCount, setRunCount] = useState(0);
+    const [settleCount, setSettleCount] = useState(0);
+    const [resolveCount, setResolveCount] = useState(0);
+    const [rejectCount, setRejectCount] = useState(0);
     const incrementCallCount = useCallback(() => { setRunCount(c => c + 1) }, []);
     const incrementResolveCount = useCallback(() => { setResolveCount(c => c + 1) }, []);
     const incrementRejectCount = useCallback(() => { setRejectCount(c => c + 1) }, []);
@@ -228,7 +235,7 @@ export function useAsync<AP extends unknown[], R, SP extends unknown[] = AP>(asy
     let { throttle, debounce, capture: captureUnstable } = (options ?? {});
     const captureStable = useStableCallback(captureUnstable ?? identityCapture);
     const asyncHandlerStable = useStableCallback<(...args: AP) => R | Promise<R>>(asyncHandler2 ?? (identity as any));
-    const { flush, syncOutput, cancel } = useMemo(() => {
+    const { flushSyncDebounce, syncOutput, cancelSyncDebounce } = useMemo(() => {
         return asyncToSync<AP, SP, R>({
             asyncInput: asyncHandlerStable,
             capture: captureStable,
@@ -250,18 +257,9 @@ export function useAsync<AP extends unknown[], R, SP extends unknown[] = AP>(asy
     }, [throttle, debounce]);
 
     useEffect(() => {
-        return () => cancel();
-    }, [cancel])
+        return () => cancelSyncDebounce();
+    }, [cancelSyncDebounce])
 
-    // We keep, like, a lot of render-state, but it only ever triggers a re-render
-    // when we start/stop an async action.
-
-    // Keep track of this for the caller's sake -- we don't really care.
-    /*const [currentType, setCurrentType] = useState<null | "sync" | "async">(null);*/
-    const [runCount, setRunCount] = useState(0);
-    const [settleCount, setSettleCount] = useState(0);
-    const [resolveCount, setResolveCount] = useState(0);
-    const [rejectCount, setRejectCount] = useState(0);
 
 
     return {
@@ -278,7 +276,7 @@ export function useAsync<AP extends unknown[], R, SP extends unknown[] = AP>(asy
         debouncingSync: syncDebouncing,
         invocationResult,
         callCount: runCount,
-        flushDebouncedPromise: flush
+        flushDebouncedPromise: flushSyncDebounce
     }
 
 
@@ -291,9 +289,6 @@ export function useAsync<AP extends unknown[], R, SP extends unknown[] = AP>(asy
 
 
 interface AsyncToSyncParameters<AsyncArgs extends any[], SyncArgs extends any[], Return> {
-
-
-
     /**
      * The function to create a sync version of
      */
@@ -346,8 +341,10 @@ interface AsyncToSyncParameters<AsyncArgs extends any[], SyncArgs extends any[],
     onError(ex: unknown): void;
 
     /**
-     * When the handler is about to be called (after all methods of debouncing and throttling and such)
+     * Immediately before the handler will be called (after all methods of debouncing and throttling and such)
      * this is always called once.
+     * 
+     * @see onInvoked (called immediately after instead)
      */
     onInvoke(): void;
 
@@ -355,24 +352,33 @@ interface AsyncToSyncParameters<AsyncArgs extends any[], SyncArgs extends any[],
      * Immediately after the handler has been called, this is called once with the result of the call.
      * 
      * This can be used to estimate if a given handler was sync or async, though if it throws you might not know.
+     * 
+     * @see onInvoke (called immediately before instead)
      */
     onInvoked(result: "async" | "throw" | "sync"): void;
 
     /**
      * When the handler returns successfully, this will be called once.
+     * 
+     * @see onFinally
+     * @see onReject
      */
     onResolve(): void;
+
     /**
      * When the handler rejects, for any reason, this will be called once.
+     * 
+     * @see onResolve
+     * @see onFinally
      */
     onReject(): void;
+
     /**
      * When the handler resolves, for any reason, this will be called once.
+     * @see onResolve
+     * @see onReject
      */
     onFinally(): void;
-
-    //onResolve2(type: "resolve", value: Return): void;
-    //onResolve2(type: "reject", value: Error): void;
 
     /**
      * It's frequently necessary (especially with DOM events) to save
@@ -428,8 +434,20 @@ interface AsyncToSyncReturn<SyncArgs extends any[]> {
      * It doesn't return a value (because it can't in case the handler was async).
      */
     syncOutput: (...args: SyncArgs) => void;
-    flush(): void;
-    cancel(): void;
+    /**
+     * If there are currently any handlers in wait because they are throttled or debounced
+     * (not from being async, but from the `throttle` or `debounce` settings),
+     * this will force its immediate invocation (as soon as the given async handler has
+     * finished, if any
+     */
+    flushSyncDebounce(): void;
+
+    /**
+     * If there are currently any handlers in wait because they are throttled or debounced
+     * (not from being async, but from the `throttle` or `debounce` settings),
+     * this will cancel its future invocation, causing it to no longer run.
+     */
+    cancelSyncDebounce(): void;
 }
 
 function isPromise<T>(p: T | Promise<T>): p is Promise<T> {
@@ -541,7 +559,8 @@ function asyncToSync<AsyncArgs extends any[], SyncArgs extends any[], Return>({ 
     }
 
     const syncDebounced = LodashDebounce(() => {
-        // 3. Instead of calling the sync version of our function directly, we allow it to be throttled/debounced.
+        // 3. Instead of calling the sync version of our function directly, we allow it to be throttled/debounced (above)
+        // and now that we're done throttling/debouncing, notify anyone who cares of this fact (below).
         onSyncDebounce(syncDebouncing = false);
         if (!pending) {
             // 4a. If this is the first invocation, or if we're not still waiting for a previous invocation to finish its async call,
@@ -558,16 +577,16 @@ function asyncToSync<AsyncArgs extends any[], SyncArgs extends any[], Return>({ 
 
     return {
         syncOutput: (...args: SyncArgs) => {
-            // 1. We call the sync version of our async function.
-            // 2. We capture the arguments into a form that won't become stale if/when the function is called with a (possibly seconds-long) delay (e.g. event.currentTarget.value on an <input> element).
+            // 1. Someone just called the sync version of our async function.
+            // 2. We capture the arguments in a way that won't become stale if/when the function is called with a (possibly seconds-long) delay (e.g. event.currentTarget.value on an <input> element).
             currentCapture = capture(...args);
             onSyncDebounce(syncDebouncing = true);
             syncDebounced();
         },
-        flush: () => {
+        flushSyncDebounce: () => {
             syncDebounced.flush();
         },
-        cancel: () => {
+        cancelSyncDebounce: () => {
             syncDebounced.cancel();
         }
     };

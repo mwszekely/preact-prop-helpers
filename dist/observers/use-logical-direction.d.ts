@@ -1,4 +1,4 @@
-import { ElementSize } from "../dom-helpers/use-element-size.js";
+import { ElementSize } from "./use-element-size.js";
 export type PhysicalDirection = "ltr" | "rtl" | "ttb" | "btt";
 export type PhysicalOrientation = "horizontal" | "vertical";
 export type PhysicalSize = "width" | "height";

@@ -1,17 +1,18 @@
 import { h } from "preact";
 import { useCallback, useEffect, useRef } from "preact/hooks";
+import { getDocument } from "../dom-helpers/use-document-class.js";
+import { useRefElement, UseRefElementParameters, UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
 import { OnPassiveStateChange, returnNull, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
-import { getDocument } from "./use-document-class.js";
-import { useRefElement, UseRefElementParameters, UseRefElementReturnType } from "./use-ref-element.js";
 
 export interface UseElementSizeParameters<T extends Element> extends UseRefElementParameters<T> {
-    elementSizeParameters: {/**
-     * Called any time the browser detects a size change
-     * on the element. Does not need to be stable, so you
-     * can pass an anonymous function that only sets the
-     * values you use if you'd like.
-     * @param sizeInfo 
-     */
+    elementSizeParameters: {
+        /**
+         * Called any time the browser detects a size change
+         * on the element. Does not need to be stable, so you
+         * can pass an anonymous function that only sets the
+         * values you use if you'd like.
+         * @param sizeInfo 
+         */
         onSizeChange(sizeInfo: ElementSize, prevSize: ElementSize | undefined, entries: ResizeObserverEntry[] | h.JSX.TargetedEvent<T>): void;
 
         /**

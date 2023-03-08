@@ -1,5 +1,5 @@
 import { h } from "preact";
-import { UseRefElementParameters, UseRefElementReturnType } from "./use-ref-element.js";
+import { UseRefElementParameters, UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
 export interface UseElementSizeParameters<T extends Element> extends UseRefElementParameters<T> {
     elementSizeParameters: {
         onSizeChange(sizeInfo: ElementSize, prevSize: ElementSize | undefined, entries: ResizeObserverEntry[] | h.JSX.TargetedEvent<T>): void;

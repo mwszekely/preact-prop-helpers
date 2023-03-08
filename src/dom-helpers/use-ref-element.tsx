@@ -3,10 +3,11 @@ import { useCallback, useRef } from "preact/hooks";
 import { OnPassiveStateChange, returnNull, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
 
 export interface UseRefElementReturnType<T extends EventTarget> {
+    propsStable: h.JSX.HTMLAttributes<T>;
+
     refElementReturn: {
         /** **STABLE** */
         getElement(): T | null;
-        propsStable: h.JSX.HTMLAttributes<T>;
     }
 }
 
@@ -63,9 +64,10 @@ export function useRefElement<T extends EventTarget>(args: UseRefElementParamete
     // Return both the element and the hook that modifies 
     // the props and allows us to actually find the element
     return {
+        propsStable: propsStable.current,
+        
         refElementReturn: {
             getElement,
-            propsStable: propsStable.current
         }
     }
 }

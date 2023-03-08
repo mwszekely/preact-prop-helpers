@@ -23,7 +23,7 @@ export { AsyncHandler, useAsyncHandler, UseAsyncHandlerParameters, UseAsyncHandl
 export { getDocument, useDocumentClass } from "./dom-helpers/use-document-class.js";
 export { useDraggable, UseDraggableParameters, UseDraggableReturnType } from "./dom-helpers/use-draggable.js";
 export { DropFile, DropFileMetadata, DroppableFileError, useDroppable, UseDroppableParameters, UseDroppableReturnType } from "./dom-helpers/use-droppable.js";
-export { ElementSize, useElementSize, UseElementSizeParameters, UseElementSizeReturnType } from "./dom-helpers/use-element-size.js";
+export { ElementSize, useElementSize, UseElementSizeParameters, UseElementSizeReturnType } from "./observers/use-element-size.js";
 export { useGlobalHandler, useLocalHandler } from "./dom-helpers/use-event-handler.js";
 export { useHideScroll } from "./dom-helpers/use-hide-scroll.js";
 export { ImperativeHandle, SetAttribute, SetChildren, SetClass, SetStyle, useImperativeProps, UseImperativePropsParameters } from "./dom-helpers/use-imperative-props.js";

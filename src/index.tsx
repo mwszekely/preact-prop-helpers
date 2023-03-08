@@ -18,12 +18,11 @@ export { CompleteListNavigationContext, useCompleteListNavigation, useCompleteLi
 export { useModal, UseModalParameters, UseModalReturnType } from "./component-use/use-modal.js";
 export { setPressVibrate, usePress, UsePressParameters, UsePressReturnType } from "./component-use/use-press.js";
 export { useRandomDualIds, UseRandomDualIdsParameters, UseRandomDualIdsReturnType } from "./component-use/use-random-dual-ids.js";
-export { generateRandomId, useRandomId, UseRandomIdParameters, UseRandomIdReturnType } from "./component-use/use-random-id.js";
+export { useRandomId, UseRandomIdParameters, UseRandomIdReturnType } from "./component-use/use-random-id.js";
 export { AsyncHandler, useAsyncHandler, UseAsyncHandlerParameters, UseAsyncHandlerReturnType } from "./dom-helpers/use-async-handler.js";
 export { getDocument, useDocumentClass } from "./dom-helpers/use-document-class.js";
 export { useDraggable, UseDraggableParameters, UseDraggableReturnType } from "./dom-helpers/use-draggable.js";
 export { DropFile, DropFileMetadata, DroppableFileError, useDroppable, UseDroppableParameters, UseDroppableReturnType } from "./dom-helpers/use-droppable.js";
-export { ElementSize, useElementSize, UseElementSizeParameters, UseElementSizeReturnType } from "./dom-helpers/use-element-size.js";
 export { useGlobalHandler, useLocalHandler } from "./dom-helpers/use-event-handler.js";
 export { useHideScroll } from "./dom-helpers/use-hide-scroll.js";
 export { ImperativeHandle, SetAttribute, SetChildren, SetClass, SetStyle, useImperativeProps, UseImperativePropsParameters } from "./dom-helpers/use-imperative-props.js";
@@ -36,6 +35,7 @@ export { useRefElement, UseRefElementParameters, UseRefElementReturnType } from 
 export { useTextContent, UseTextContentParameters, UseTextContentReturnType } from "./dom-helpers/use-text-content.js";
 export { useActiveElement, UseActiveElementParameters, UseActiveElementReturnType } from "./observers/use-active-element.js";
 export { useChildrenHaveFocus, useChildrenHaveFocusChild, UseChildrenHaveFocusChildParameters, UseChildrenHaveFocusChildReturnType, UseChildrenHaveFocusParameters, UseChildrenHaveFocusReturnType } from "./observers/use-children-have-focus.js";
+export { ElementSize, useElementSize, UseElementSizeParameters, UseElementSizeReturnType } from "./observers/use-element-size.js";
 export { useHasCurrentFocus, UseHasCurrentFocusParameters, UseHasCurrentFocusReturnType } from "./observers/use-has-current-focus.js";
 export { useHasLastFocus, UseHasLastFocusParameters, UseHasLastFocusReturnType } from "./observers/use-has-last-focus.js";
 export { LogicalDirectionInfo, LogicalElementSize, LogicalOrientation, PhysicalDirection, PhysicalOrientation, PhysicalSize, useLogicalDirection, UseLogicalDirectionParameters, UseLogicalDirectionReturnType } from "./observers/use-logical-direction.js";
@@ -58,4 +58,5 @@ export { useInterval, UseIntervalParameters } from "./timing/use-interval.js";
 export { useTimeout, UseTimeoutParameters } from "./timing/use-timeout.js";
 export { assertEmptyObject } from "./util/assert.js";
 export { getBuildMode } from "./util/mode.js";
+export { generateRandomId } from "./util/random-id.js";
 
