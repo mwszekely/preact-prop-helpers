@@ -1,7 +1,7 @@
 import { h } from "preact";
 import { useId, useRef } from "preact/hooks";
-import { generateRandomId } from "../preact-extensions/use-before-layout-effect";
-import { useEnsureStability } from "../preact-extensions/use-passive-state";
+import { generateRandomId } from "../preact-extensions/use-before-layout-effect.js";
+import { useEnsureStability } from "../preact-extensions/use-passive-state.js";
 export { generateRandomId };
 
 
@@ -11,22 +11,7 @@ export { generateRandomId };
 export interface UseRandomIdReturnType<S extends Element, T extends Element> {
     propsSource: h.JSX.HTMLAttributes<S>;
     propsReferencer: h.JSX.HTMLAttributes<T>;
-
-    /**
-     * **STABLE**
-     * 
-     * The element that needs a custom `id` prop must use this hook.
-     */
-    //useRandomIdSourceElement: UseRandomIdSourceElement<S>;
-
-    /**
-     * **STABLE**
-     * 
-     * Any element that references the id via `for` or `aria-labelledby`, etc. must use this hook.
-     * 
-     * This hook can be used multiple times on different components.
-     */
-    //useRandomIdReferencerElement: UseRandomIdReferencerElement;
+    
     randomIdReturn: { id: string; };
 }
 

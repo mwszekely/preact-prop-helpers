@@ -1,4 +1,4 @@
-import { default as clsx } from "clsx";
+import { clsx } from "clsx";
 import { h } from "preact";
 type C = h.JSX.HTMLAttributes<EventTarget>["className"];
 /**

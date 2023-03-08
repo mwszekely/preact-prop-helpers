@@ -1,10 +1,8 @@
-import { assertEmptyObject } from "../preact-extensions/use-managed-children";
-import { useStableCallback } from "../preact-extensions/use-stable-callback";
-import { GridChildCellInfo as gcci, GridChildRowInfo as gcri, useGridNavigation, useGridNavigationCell, UseGridNavigationCellParameters, UseGridNavigationCellReturnType, UseGridNavigationParameters, UseGridNavigationReturnType, useGridNavigationRow, UseGridNavigationRowParameters, UseGridNavigationRowReturnType } from "./use-grid-navigation-partial";
-import { SelectableChildInfo, useSingleSelection, useSingleSelectionChild, UseSingleSelectionChildParameters, UseSingleSelectionChildReturnType, UseSingleSelectionParameters, UseSingleSelectionReturnType } from "./use-single-selection";
-
-type OmitStrong<T, K extends keyof T> = Omit<T, K>;
-
+import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
+import { assertEmptyObject } from "../util/assert.js";
+import { OmitStrong } from "../util/types.js";
+import { GridChildCellInfo as gcci, GridChildRowInfo as gcri, useGridNavigation, useGridNavigationCell, UseGridNavigationCellParameters, UseGridNavigationCellReturnType, UseGridNavigationParameters, UseGridNavigationReturnType, useGridNavigationRow, UseGridNavigationRowParameters, UseGridNavigationRowReturnType } from "./use-grid-navigation-partial.js";
+import { SelectableChildInfo, useSingleSelection, useSingleSelectionChild, UseSingleSelectionChildParameters, UseSingleSelectionChildReturnType, UseSingleSelectionParameters, UseSingleSelectionReturnType } from "./use-single-selection.js";
 
 /**
  * List navigation gets single selection, so grid navigation does too.
@@ -16,15 +14,14 @@ type OmitStrong<T, K extends keyof T> = Omit<T, K>;
 const _dummy = 0;
 
 export interface GridSingleSelectChildRowInfo<RowElement extends Element, CellElement extends Element> extends gcri<RowElement, CellElement>, SelectableChildInfo<RowElement> { }
-export interface GridSingleSelectChildCellInfo<CellElement extends Element> extends gcci<CellElement> {
-}
+export interface GridSingleSelectChildCellInfo<CellElement extends Element> extends gcci<CellElement> {}
 
+//                                                                                                                                                                                                                                                                                                             vvvvvvvvvv `useGridNavigation` provides us with this, so we don't need it.
 export interface UseGridNavigationSingleSelectionParameters<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, M extends GridSingleSelectChildRowInfo<RowElement, CellElement>> extends UseGridNavigationParameters<ParentOrRowElement, RowElement, CellElement, M>, OmitStrong<UseSingleSelectionParameters<RowElement>, "rovingTabIndexReturn"> {
+   // Defined explicitly as the intersection of the two types it extends
     managedChildrenReturn: UseGridNavigationParameters<ParentOrRowElement, RowElement, CellElement, M>["managedChildrenReturn"] & UseSingleSelectionParameters<RowElement>["managedChildrenReturn"];
 }
-export interface UseGridNavigationSingleSelectionReturnType<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, RM extends GridSingleSelectChildRowInfo<RowElement, CellElement>, CM extends GridSingleSelectChildCellInfo<CellElement>> extends UseGridNavigationReturnType<ParentOrRowElement, RowElement, CellElement, RM, CM>, UseSingleSelectionReturnType<RowElement> {
-    // gridNavigationRowContext: UseGridNavigationRowParameters<RowElement, any, any, any>["rowAsChildOfGridParameters"]["gridNavigationRowContext"]
-}
+export interface UseGridNavigationSingleSelectionReturnType<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, RM extends GridSingleSelectChildRowInfo<RowElement, CellElement>, CM extends GridSingleSelectChildCellInfo<CellElement>> extends UseGridNavigationReturnType<ParentOrRowElement, RowElement, CellElement, RM, CM>, UseSingleSelectionReturnType<RowElement> {}
 
 
 

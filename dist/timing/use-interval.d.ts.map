@@ -1,0 +1,1 @@
+{"version":3,"file":"use-interval.d.ts","sourceRoot":"","sources":["../../src/timing/use-interval.tsx"],"names":[],"mappings":"AAMA,MAAM,WAAW,qBAAqB;IAClC;;OAEG;IACH,QAAQ,EAAE,MAAM,GAAG,IAAI,CAAC;IAExB;;OAEG;IACH,QAAQ,EAAE,MAAM,IAAI,CAAC;CACxB;AAED,wBAAgB,WAAW,CAAC,EAAE,QAAQ,EAAE,QAAQ,EAAE,EAAE,qBAAqB,QA2BxE"}

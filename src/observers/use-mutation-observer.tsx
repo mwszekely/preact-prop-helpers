@@ -1,7 +1,7 @@
 import { useCallback, useEffect } from "preact/hooks";
-import { useRefElement, UseRefElementParameters } from "../dom-helpers/use-ref-element";
-import { returnNull, runImmediately, usePassiveState } from "../preact-extensions/use-passive-state";
-import { useStableCallback } from "../preact-extensions/use-stable-callback";
+import { useRefElement, UseRefElementParameters } from "../dom-helpers/use-ref-element.js";
+import { returnNull, runImmediately, usePassiveState } from "../preact-extensions/use-passive-state.js";
+import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 
 export interface UseMutationObserverParameters<E extends Element> extends UseRefElementParameters<E> {
     mutationObserverParameters: {
@@ -19,7 +19,7 @@ export function useMutationObserver<E extends Element>({
     refElementParameters,
     mutationObserverParameters: { attributeFilter, subtree, onChildList, characterDataOldValue, onCharacterData, onAttributes, attributeOldValue }
 }: UseMutationObserverParameters<E>) {
-    /* eslint-disable prefer-const */
+    
     const { onElementChange, ...rest } = (refElementParameters || {})
 
 

@@ -1,14 +1,14 @@
 import { h } from "preact";
 import { StateUpdater, useCallback, useEffect } from "preact/hooks";
-import { UseHasCurrentFocusParameters } from "../observers/use-has-current-focus";
-import { assertEmptyObject, ManagedChildInfo, useChildrenFlag, UseManagedChildrenParameters, UseManagedChildrenReturnType } from "../preact-extensions/use-managed-children";
-import { OnPassiveStateChange, PassiveStateUpdater, usePassiveState } from "../preact-extensions/use-passive-state";
-import { useStableCallback } from "../preact-extensions/use-stable-callback";
-import { useStableGetter, useStableObject } from "../preact-extensions/use-stable-getter";
-import { useState } from "../preact-extensions/use-state";
+import { UseHasCurrentFocusParameters } from "../observers/use-has-current-focus.js";
+import { ManagedChildInfo, useChildrenFlag, UseManagedChildrenParameters, UseManagedChildrenReturnType } from "../preact-extensions/use-managed-children.js";
+import { OnPassiveStateChange, PassiveStateUpdater, usePassiveState } from "../preact-extensions/use-passive-state.js";
+import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
+import { useStableGetter, useStableObject } from "../preact-extensions/use-stable-getter.js";
+import { useState } from "../preact-extensions/use-state.js";
+import { assertEmptyObject } from "../util/assert.js";
 
-
-
+export type SetTabbableIndex = (updater: Parameters<PassiveStateUpdater<number | null, Event>>[0], reason: Event | undefined, fromUserInteraction: boolean) => void;
 export type OnTabbableIndexChange = (tabbableIndex: number | null) => void;
 
 export interface UseRovingTabIndexChildInfo<TabbableChildElement extends Element> extends ManagedChildInfo<number> {
@@ -80,22 +80,28 @@ export interface UseRovingTabIndexReturnType<TabbableChildElement extends Elemen
 
     /** 
      * Return information that lets the user update/query/focus the currently tabbable child
-     *
-     *  
      */
     rovingTabIndexReturn: {
-        /** **STABLE** */
+        /** 
+         * **STABLE**
+         * 
+         * Can be used to programmatically change which child is the currently tabbable one.
+         * 
+         * `fromUserInteraction` determines if this was a user-generated event that should focus the newly tabbable child,
+         * or a programmatic event that should leave the user's focus where the user currently is, because they didn't do that.
+         * 
+         */
         setTabbableIndex: SetTabbableIndex;
         /** **STABLE** */
         getTabbableIndex: () => number | null;
-        /** **STABLE** */
+        /** 
+         * **STABLE**
+         * 
+         * Call to focus the currently tabbable child.
+         */
         focusSelf: (reason?: any) => void;
     }
 }
-
-export type SetTabbableIndex = (updater: Parameters<PassiveStateUpdater<number | null, Event>>[0], reason: Event | undefined, fromUserInteraction: boolean) => void;
-
-//export interface UseRovingTabIndexReturnTypeWithHooks<TabbableChildElement extends Element> extends UseRovingTabIndexReturnTypeInfo<TabbableChildElement> { }
 
 
 export interface UseRovingTabIndexChildParameters<TabbableChildElement extends Element> {
@@ -204,8 +210,6 @@ export function useRovingTabIndex<ChildElement extends Element, M extends UseRov
 
     const getUntabbable = useStableGetter(untabbable);
 
-    //initiallyTabbedIndex ??= 0;
-
     // Override the actual setter to include some extra logic related to avoiding hidden children, 
     // what to do when we're untabbable, what to do when we're tabbable but given `null`, etc.
     const setTabbableIndex = useStableCallback<SetTabbableIndex>((updater, reason, fromUserInteraction) => {
@@ -217,17 +221,24 @@ export function useRovingTabIndex<ChildElement extends Element, M extends UseRov
             let nextIndex = ((typeof updater === "function") ? updater(prevIndex ?? null) : updater) as M["index"];
             const untabbable = getUntabbable();
 
+            // Whether or not we're currently tabbable, make sure that when we switch from untabbable to tabbable,
+            // that we know which index to switch back to.
             if (nextIndex != null)
                 setLastNonNullIndex(nextIndex);
 
+            // If we're untabbable, then any attempt to set a new index simply fails and sets it to `null`.
             if (untabbable)
                 return null;
 
+            // If the requested index is hidden, then there's no need to focus any elements or run any extra logic.
+            if (nextIndex == null)
+                return null;
+
+            // If we've made a change, and it was because the user clicked on it or something,
+            // then focus that element too
             if (prevIndex != nextIndex) {
-                const nextChild = nextIndex == null ? null : children.getAt(nextIndex);
-                if (nextChild?.hidden) {
-                    return prevIndex ?? (untabbable ? null : 0);
-                }
+                const nextChild = children.getAt(nextIndex);
+                console.assert(!nextChild?.hidden);
 
                 if (nextChild != null && fromUserInteraction) {
                     const element = nextChild.getElement();
@@ -242,7 +253,8 @@ export function useRovingTabIndex<ChildElement extends Element, M extends UseRov
             if (nextIndex != null)
                 setLastNonNullIndex(nextIndex);
 
-            return nextIndex ?? (untabbable ? null : 0);
+            // Finally, return the value the user requested the index be set to.
+            return nextIndex ?? 0;
         }, reason);
     }, []);
 
@@ -302,6 +314,7 @@ export function useRovingTabIndexChild<ChildElement extends Element>({
     managedChildParameters: { index, ..._void2 },
     rovingTabIndexChildContext: { reevaluateClosestFit, setTabbableIndex, getInitiallyTabbedIndex },
     rovingTabIndexChildParameters,
+    ..._void3
 }: UseRovingTabIndexChildParameters<ChildElement>): UseRovingTabIndexChildReturnType<ChildElement> {
     const { hidden, ..._void1 } = rovingTabIndexChildParameters;
     const [tabbable, setTabbable, getTabbable] = useState(getInitiallyTabbedIndex() === index);
@@ -312,6 +325,7 @@ export function useRovingTabIndexChild<ChildElement extends Element>({
 
     assertEmptyObject(_void1);
     assertEmptyObject(_void2);
+    assertEmptyObject(_void3);
 
     return {
         hasCurrentFocusParameters: {

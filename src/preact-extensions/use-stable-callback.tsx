@@ -1,6 +1,6 @@
 import { useCallback as useCallbackNative } from "preact/hooks";
-import { useEnsureStability } from "./use-passive-state";
-import { useStableGetter } from "./use-stable-getter";
+import { useEnsureStability } from "./use-passive-state.js";
+import { useStableGetter } from "./use-stable-getter.js";
 
 
 //const _IS_STABLE_GETTER = Symbol("STABLE");

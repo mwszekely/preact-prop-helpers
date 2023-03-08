@@ -1,5 +1,6 @@
 import { options } from "preact";
 import { useCallback, useLayoutEffect, useRef } from "preact/hooks";
+import { getBuildMode } from "../util/mode.js";
 
 /** Takes a new value or a function that updates a value, unlike `OnPassiveStateChange` which reacts to those updates */
 export type PassiveStateUpdater<S, R> = ((value: S | ((prevState: S | undefined) => S), reason?: R) => void);//[R] extends [never]? ((value: S | ((prevState: S | undefined) => S), reason?: R) => void) : ((value: S | ((prevState: S | undefined) => S), reason: R) => void);
@@ -16,6 +17,9 @@ export type OnPassiveStateChange<S, R> = ((value: S, prevValue: S | undefined, r
  * Eventually, when useEvent lands, we hopefully won't need this.
  */
 export function useEnsureStability<T extends any[]>(parentHookName: string, ...values: T) {
+    if (getBuildMode() == 'production')
+        return;
+    
     const helperToEnsureStability = useRef<Array<T>>([]);
     const shownError = useRef<Array<boolean>>([]);
     useHelper(values.length as any, -1);
@@ -42,7 +46,7 @@ export function useEnsureStability<T extends any[]>(parentHookName: string, ...v
 }
 
 export function debounceRendering(f: () => void) {
-    (options.debounceRendering ?? setTimeout)(f);
+    (options.debounceRendering ?? queueMicrotask)(f);
 }
 
 /**
@@ -117,8 +121,6 @@ export function usePassiveState<T, R>(onChange: undefined | null | OnPassiveStat
         // Make sure we've run our effect at least once on mount.
         // (If we have an initial value, of course)
         tryEnsureValue();
-
-
     }, []);
 
     // The actual code the user calls to (possibly) run a new effect.

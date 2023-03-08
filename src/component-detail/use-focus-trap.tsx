@@ -1,9 +1,9 @@
 import { h } from "preact";
 import { useEffect } from "preact/hooks";
 import { isFocusable, isTabbable } from "tabbable";
-import { useBlockingElement } from "../dom-helpers/use-blocking-element";
-import { useRefElement, UseRefElementParameters, UseRefElementReturnType } from "../dom-helpers/use-ref-element";
-import { useStableCallback } from "../preact-extensions/use-stable-callback";
+import { useBlockingElement } from "../dom-helpers/use-blocking-element.js";
+import { useRefElement, UseRefElementParameters, UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
+import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 
 export interface UseFocusTrapParameters<SourceElement extends Element | null, PopupElement extends Element> extends UseRefElementParameters<PopupElement> {
     focusTrapParameters: {

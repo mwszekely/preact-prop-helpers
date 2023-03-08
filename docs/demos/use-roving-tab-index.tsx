@@ -1,11 +1,9 @@
 import { createContext, VNode } from "preact";
 import { memo, useCallback, useContext } from "preact/compat";
-import { GetIndex, useMergedProps, usePress, useStableCallback } from "../../index";
-
-import { useState } from "../../preact-extensions/use-state";
-
-import { CompleteListNavigationContext, useCompleteListNavigation, useCompleteListNavigationChild, UseCompleteListNavigationReturnType } from "../..";
-import { UseCompleteListNavigationChildInfo } from "../../component-use/use-list-navigation-complete";
+import { GetIndex, useMergedProps, usePress, useStableCallback } from "../../dist/index.js";
+import { useState } from "../../dist/index.js";
+import { CompleteListNavigationContext, useCompleteListNavigation, useCompleteListNavigationChild, UseCompleteListNavigationReturnType } from "../../dist/index.js";
+import { UseCompleteListNavigationChildInfo } from "../../dist/index.js";
 
 const RandomWords = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
 
@@ -22,8 +20,6 @@ export const DemoUseRovingTabIndex = memo(() => {
     let [min, setMin] = useState<number | null>(null);
     let [max, setMax] = useState<number | null>(null);
     const [staggered, setStaggered] = useState<boolean>(false);
-    // const [selectedIndex, _setLocalSelectedIndex] = useState<number | null>(0);
-    // const [tabbableIndex, _setLocalTabbableIndex] = useState<number | null>(0);
 
     if (!isFinite(min ?? NaN))
         min = null!;

@@ -1,8 +1,8 @@
 import { StateUpdater, useLayoutEffect } from "preact/hooks";
-import { useGlobalHandler } from "../dom-helpers/use-event-handler";
-import { useStableCallback } from "./use-stable-callback";
-import { useStableGetter } from "./use-stable-getter";
-import { useState } from "./use-state";
+import { useGlobalHandler } from "../dom-helpers/use-event-handler.js";
+import { useStableCallback } from "./use-stable-callback.js";
+import { useStableGetter } from "./use-stable-getter.js";
+import { useState } from "./use-state.js";
 
 /* eslint-disable @typescript-eslint/no-empty-interface */
 /**

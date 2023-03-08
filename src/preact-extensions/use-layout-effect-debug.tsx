@@ -1,5 +1,5 @@
 import { Inputs, useLayoutEffect as useLayoutEffectNative } from "preact/hooks";
-import { EffectChange, useEffectDebug } from "./use-effect-debug";
+import { EffectChange, useEffectDebug } from "./use-effect-debug.js";
 
 /**
  * Wrap the native `useLayoutEffect` to add arguments 

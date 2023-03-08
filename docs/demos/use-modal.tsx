@@ -1,6 +1,6 @@
 
 import { useCallback, useRef, useState } from "preact/hooks";
-import { DismissListenerTypes, useMergedProps, useModal, useStableCallback } from "../..";
+import { DismissListenerTypes, useMergedProps, useModal, useStableCallback } from "../../dist/index.js";
 
 function getWindow(): Window { return globalThis.window; }
 
@@ -43,6 +43,7 @@ export function DemoUseModal(props: { parentDepth?: number }) {
         },
         escapeDismissParameters: { getWindow, parentDepth }
     })
+    let a = propsSource.role;
     return (
         <div style={{ border: `${depth}px solid black` }}>
             <div>useModal demo:</div>

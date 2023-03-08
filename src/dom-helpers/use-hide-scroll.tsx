@@ -1,5 +1,5 @@
 import { useEffect } from "preact/hooks";
-import { usePassiveState } from "../preact-extensions/use-passive-state";
+import { usePassiveState } from "../preact-extensions/use-passive-state.js";
 
 
 /**

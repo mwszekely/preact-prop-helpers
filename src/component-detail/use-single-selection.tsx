@@ -1,28 +1,16 @@
 
+import { noop } from "lodash-es";
 import { h } from "preact";
 import { useCallback, useEffect } from "preact/hooks";
-import { UsePressParameters } from "../component-use/use-press";
-import { UseChildrenHaveFocusChildReturnType, UseChildrenHaveFocusParameters } from "../observers/use-children-have-focus";
-import { useChildrenFlag, UseManagedChildrenReturnType } from "../preact-extensions/use-managed-children";
-import { OnPassiveStateChange, PassiveStateUpdater, useEnsureStability } from "../preact-extensions/use-passive-state";
-import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "./use-roving-tabindex";
-//import { usePress, UsePressReturnType } from "./use-press";
-import noop from "lodash-es/noop";
-import { useStableCallback } from "../preact-extensions/use-stable-callback";
-import { useStableGetter, useStableObject } from "../preact-extensions/use-stable-getter";
-import { useState } from "../preact-extensions/use-state";
+import { UsePressParameters } from "../component-use/use-press.js";
+import { UseChildrenHaveFocusChildReturnType, UseChildrenHaveFocusParameters } from "../observers/use-children-have-focus.js";
+import { useChildrenFlag, UseManagedChildrenReturnType } from "../preact-extensions/use-managed-children.js";
+import { OnPassiveStateChange, PassiveStateUpdater, useEnsureStability } from "../preact-extensions/use-passive-state.js";
+import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
+import { useStableGetter, useStableObject } from "../preact-extensions/use-stable-getter.js";
+import { useState } from "../preact-extensions/use-state.js";
+import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
 
-type OmitStrong<T, K extends keyof T> = Omit<T, K>
-
-/*
-export function useSingleSelectionChildProps<E extends Element>(r: UseSingleSelectionChildReturnTypeInfo<E>, ...otherProps: h.JSX.HTMLAttributes<E>[]): h.JSX.HTMLAttributes<E>[] {
-    return [r.singleSelectionChildReturn.propsUnstable, ...otherProps];
-}*/
-
-/*
-export interface UseSingleSelectionContext {
-    singleSelectionReturn: UseSingleSelectionReturnTypeInfo["singleSelectionReturn"];
-}*/
 
 /** Anything that's selectable must be tabbable, so we DO use rovingtabindex instead of just managedchildren */
 export interface SelectableChildInfo<E extends Element> extends UseRovingTabIndexChildInfo<E> {
@@ -75,10 +63,8 @@ export interface UseSingleSelectionParameters<ChildElement extends Element> {
 }
 
 export interface UseSingleSelectionChildParameters<E extends Element> {
-    //managedChildParameters: Pick<UseManagedChildParameters<SelectableChildInfo<E>, never>["managedChildParameters"], "index" | "disabled">;
     singleSelectionContext: UseSingleSelectionReturnType<E>["singleSelectionContext"];
     singleSelectionChildParameters: {
-        //onDistanceChange: null | ((distance: number) => void);
         selectionMode: "focus" | "activation" | "disabled";
         /**
          * What property will be used to mark this item as selected.
@@ -106,24 +92,15 @@ export interface UseSingleSelectionChildReturnType<E extends Element> extends Us
          */
         selectedOffset: number | null;
         getSelectedOffset: () => (number | null);
-        /**
-         * Returns the distance from this child to the selected child.
-         * 
-         * **Stable**, and can be called during render.
-         */
-        //getDistance(): number;
+        
         // Used to programmatically set this as the selected element;
         // it requests the parent to actually change the numeric index to this one's.
         setThisOneSelected: (event: Event) => void;
         propsUnstable: h.JSX.HTMLAttributes<E>;
     }
-    //refElementParameters: Required<Pick<UseRefElementParameters<E>["refElementParameters"], "onElementChange">>;
     managedChildParameters: Pick<SelectableChildInfo<E>, "setLocalSelected">;
-    //managedChildParameters: Pick<UseManagedChildParameters<SelectableChildInfo<E>, never>["managedChildParameters"], "selected" | "setSelected" | "getSelected">;
     pressParameters: Pick<UsePressParameters<E>["pressParameters"], "onPressSync">;
 }
-
-//export interface UseSingleSelectionChildReturnTypeWithHooks<E extends Element> extends UseSingleSelectionChildReturnTypeInfo<E> {}
 
 export interface UseSingleSelectionReturnType<ChildElement extends Element> {
     singleSelectionReturn: {
@@ -146,15 +123,12 @@ export interface UseSingleSelectionReturnType<ChildElement extends Element> {
 }
 
 
-
-//export type UseSingleSelectionChild<E extends Element> = (a: UseSingleSelectionChildParameters<E>) => UseSingleSelectionChildReturnTypeWithHooks<E>;
-
 export function useSingleSelection<ChildElement extends Element>({
     managedChildrenReturn: { getChildren },
     rovingTabIndexReturn: { setTabbableIndex },
     singleSelectionParameters: { onSelectedIndexChange: onSelectedIndexChange_U, initiallySelectedIndex }
 }: UseSingleSelectionParameters<ChildElement>): UseSingleSelectionReturnType<ChildElement> {
-    type R = Event;//h.JSX.TargetedEvent<ChildElement>;
+    type R = Event;
     const onSelectedIndexChange = useStableCallback(onSelectedIndexChange_U ?? noop);
 
     const getSelectedAt = useCallback((m: SelectableChildInfo<ChildElement>) => { return m.getSelected(); }, []);
@@ -208,7 +182,7 @@ export function useSingleSelection<ChildElement extends Element>({
 
 
 export function useSingleSelectionChild<ChildElement extends Element>(args: UseSingleSelectionChildParameters<ChildElement>): UseSingleSelectionChildReturnType<ChildElement> {
-    type R = Event;//h.JSX.TargetedEvent<ChildElement>;
+    type R = Event;
     const {
 
         singleSelectionContext: { getSelectedIndex, onSelectedIndexChange },
@@ -216,7 +190,6 @@ export function useSingleSelectionChild<ChildElement extends Element>(args: UseS
         managedChildParameters: { index }
     } = args;
 
-    //let lastRecordedDistance = useRef(0);
     useEnsureStability("useSingleSelectionChild", getSelectedIndex, onSelectedIndexChange);
     const getDisabled = useStableGetter(disabled);
 
@@ -240,7 +213,6 @@ export function useSingleSelectionChild<ChildElement extends Element>(args: UseS
 
 
     return {
-        //managedChildParameters: { selected, setSelected, getSelected, },
         managedChildParameters: { setLocalSelected: useStableCallback((selected, direction) => {
             setLocalSelected(selected);
             setDirection(direction);
@@ -254,7 +226,6 @@ export function useSingleSelectionChild<ChildElement extends Element>(args: UseS
             getSelectedOffset: getDirection,
             selectedOffset: direction,
             getSelected: getLocalSelected,
-            //getDistance: useCallback(() => { return lastRecordedDistance.current; }, []),
             propsUnstable: ariaPropName == null || selectionMode == "disabled" ? {} : { 
                 [`${propParts[0]}-${propParts[1]}`]: (localSelected? (propParts[1] == "current"? `${propParts[2]}` : `true`) : "false") 
             }

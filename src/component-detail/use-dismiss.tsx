@@ -1,12 +1,12 @@
 import { h } from "preact";
 import { useCallback, useEffect } from "preact/hooks";
-import { useGlobalHandler } from "../dom-helpers/use-event-handler";
-import { useRefElement, UseRefElementReturnType } from "../dom-helpers/use-ref-element";
-import { useActiveElement, UseActiveElementParameters } from "../observers/use-active-element";
-import { assertEmptyObject } from "../preact-extensions/use-managed-children";
-import { OnPassiveStateChange } from "../preact-extensions/use-passive-state";
-import { useStableCallback } from "../preact-extensions/use-stable-callback";
-import { useStableGetter } from "../preact-extensions/use-stable-getter";
+import { useGlobalHandler } from "../dom-helpers/use-event-handler.js";
+import { useRefElement, UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
+import { useActiveElement, UseActiveElementParameters } from "../observers/use-active-element.js";
+import { OnPassiveStateChange } from "../preact-extensions/use-passive-state.js";
+import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
+import { useStableGetter } from "../preact-extensions/use-stable-getter.js";
+import { assertEmptyObject } from "../util/assert.js";
 
 /**
  * In general, each soft dismiss hook takes an `open` and an `onClose` prop.
@@ -219,14 +219,6 @@ export function useLostFocusDismiss<SourceElement extends Element | null, PopupE
 
     return { activeElementParameters: { onLastActiveElementChange } }
 }
-
-/*
-export interface UseSoftDismissParameters<SourceElement extends Element, PopupElement extends Element> extends UseLostFocusDismissParameters<SourceElement, PopupElement>, UseEscapeDismissParameters<SourceElement> { }
-
-export function useSoftDismiss<SourceElement extends Element, PopupElement extends Element>({ escapeDismissParameters, lostFocusDismiss, refElementPopupReturn, refElementReturn, refElementSourceReturn, ..._void3 }: UseSoftDismissParameters<SourceElement, PopupElement>) {
-    const { activeElementParameters, ...void2 } = useLostFocusDismiss({ lostFocusDismiss, refElementPopupReturn, refElementSourceReturn });
-    const _void1: void = useEscapeDismiss({ escapeDismissParameters, refElementReturn });
-}*/
 
 export interface UseBackdropDismissParameters<PopupElement extends Element> {
     backdropDismissParameters: { open: boolean, onClose(): void; };

@@ -1,6 +1,6 @@
 
 import { StateUpdater, useEffect } from "preact/hooks";
-import { OnPassiveStateChange, returnNull, returnTrue, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state";
+import { OnPassiveStateChange, returnNull, returnTrue, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
 
 
 /**
@@ -44,17 +44,12 @@ interface Foo<T> {
     lastSent: T | undefined;
     send: (e: T, r: FocusEvent) => void;
 }
-/*
-const activeElementUpdaters = new Map<Window | null | undefined, Set<undefined | ((e: Node | null) => void)>>();
-const lastActiveElementUpdaters = new Map<Window | null | undefined, Set<undefined | ((e: Node) => void)>>();
-const windowFocusedUpdaters = new Map<Window | null | undefined, Set<undefined | ((focused: boolean) => void)>>();
-const windowsFocusedUpdaters = new Map<Window | null | undefined, boolean>();*/
+
 const activeElementUpdaters = new Map<Window | null | undefined, Set<Foo<Node | null>>>();
 const lastActiveElementUpdaters = new Map<Window | null | undefined, Set<Foo<Node>>>();
 const windowFocusedUpdaters = new Map<Window | null | undefined, Set<Foo<boolean>>>();
 const windowsFocusedUpdaters = new Map<Window | null | undefined, boolean>();
 
-//const microtasks = new Map<Set<any>, any>();
 
 // The focusin and focusout events often fire syncronously in the middle of running code.
 // E.G. calling element.focus() can cause a focusin event handler to immediately interrupt that code.
@@ -62,12 +57,6 @@ const windowsFocusedUpdaters = new Map<Window | null | undefined, boolean>();
 function forEachUpdater<T>(window: Window | null | undefined, map: Map<Window | null | undefined, Set<Foo<T>>>, value: T, reason: any) {
     const updaters = map.get(window);
     if (updaters) {
-        //if (!microtasks.has(updatersKey)) {
-        //debounceRendering(() => {
-        //const updatersKey = map.get(window)!;
-        //const value = microtasks.get(updatersKey);
-        //microtasks.delete(updatersKey);
-
         if (updaters) {
             for (const updater of updaters) {
                 const { lastSent, send } = updater;
@@ -78,10 +67,6 @@ function forEachUpdater<T>(window: Window | null | undefined, map: Map<Window | 
 
             }
         }
-        //});
-        //}
-
-        //microtasks.set(updatersKey, value);
     }
 }
 

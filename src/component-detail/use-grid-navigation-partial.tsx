@@ -1,21 +1,21 @@
-import { assertEmptyObject, UseManagedChildrenReturnType } from "../preact-extensions/use-managed-children";
-import { OnPassiveStateChange, PassiveStateUpdater, usePassiveState } from "../preact-extensions/use-passive-state";
-import { useStableCallback } from "../preact-extensions/use-stable-callback";
-import { useStableObject } from "../preact-extensions/use-stable-getter";
-import { useListNavigation, useListNavigationChild, UseListNavigationChildInfo, UseListNavigationChildParameters, UseListNavigationChildReturnType, UseListNavigationParameters, UseListNavigationReturnType } from "./use-list-navigation-partial";
-import { SetTabbableIndex } from "./use-roving-tabindex";
-
-type OmitStrong<T, K extends keyof T> = Omit<T, K>
+import { UseManagedChildrenReturnType } from "../preact-extensions/use-managed-children.js";
+import { OnPassiveStateChange, PassiveStateUpdater, usePassiveState } from "../preact-extensions/use-passive-state.js";
+import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
+import { useStableObject } from "../preact-extensions/use-stable-getter.js";
+import { assertEmptyObject } from "../util/assert.js";
+import { OmitStrong, OmitTargeted } from "../util/types.js";
+import { useListNavigation, useListNavigationChild, UseListNavigationChildInfo, UseListNavigationChildParameters, UseListNavigationChildReturnType, UseListNavigationParameters, UseListNavigationReturnType } from "./use-list-navigation-partial.js";
+import { SetTabbableIndex } from "./use-roving-tabindex.js";
 
 export interface GridChildRowInfo<RowElement extends Element, _CellElement extends Element> extends UseListNavigationChildInfo<RowElement> { setTabbableColumnIndex: SetTabbableIndex }
 export interface GridChildCellInfo<CellElement extends Element> extends UseListNavigationChildInfo<CellElement> {
 }
 
-export interface UseGridNavigationParameters<ParentOrChildElement extends Element, RowElement extends Element, CellElement extends Element, M extends GridChildRowInfo<RowElement, CellElement>> extends OmitStrong<UseListNavigationParameters<ParentOrChildElement, RowElement, M>, "linearNavigationParameters"> {
+export interface UseGridNavigationParameters<ParentOrChildElement extends Element, RowElement extends Element, CellElement extends Element, M extends GridChildRowInfo<RowElement, CellElement>> extends OmitTargeted<UseListNavigationParameters<ParentOrChildElement, RowElement, M>, "linearNavigationParameters", "navigationDirection"> {
     gridNavigationParameters: {
         onTabbableColumnChange: OnPassiveStateChange<number | null, Event> | null;
     };
-    linearNavigationParameters: OmitStrong<UseListNavigationParameters<ParentOrChildElement, RowElement, M>["linearNavigationParameters"], "navigationDirection">
+    //linearNavigationParameters: OmitStrong<UseListNavigationParameters<ParentOrChildElement, RowElement, M>["linearNavigationParameters"], "navigationDirection">
 }
 export interface UseGridNavigationReturnType<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element,  RM extends GridChildRowInfo<RowElement, CellElement>, CM extends GridChildCellInfo<CellElement>> extends UseListNavigationReturnType<ParentOrRowElement, RowElement> {
     gridNavigationRowContext: UseGridNavigationRowParameters<RowElement, CellElement, RM, CM>["rowAsChildOfGridParameters"]["gridNavigationRowContext"]

@@ -1,61 +1,197 @@
 import { h } from "preact";
 import { useCallback, useRef } from "preact/hooks";
-import { useMergedProps } from "./use-merged-props";
-import { useRefElement } from "./use-ref-element";
+import { useMergedProps } from "./use-merged-props.js";
+import { useRefElement, UseRefElementParameters, UseRefElementReturnType } from "./use-ref-element.js";
 
-export function useImperativeProps<T extends Element>() {
-    const currentImperativeProps = useRef<{ className: DOMTokenList, style: h.JSX.CSSProperties, others: h.JSX.HTMLAttributes<T> }>({ className: new DOMTokenList(), style: {}, others: {} });
+export type SetChildren = ((children: string | null) => void);
+export type GetClass = (cls: string) => boolean;
+export type SetClass = (cls: string, enabled: boolean) => void;
+export type SetStyle = <T extends (keyof CSSStyleDeclaration) & string>(prop: T, value: h.JSX.CSSProperties[T] | null) => void;
+export type GetAttribute<T extends Element> = <K extends keyof h.JSX.HTMLAttributes<T>>(prop: K) => h.JSX.HTMLAttributes<T>[K];
+export type SetAttribute<T extends Element> = <K extends keyof h.JSX.HTMLAttributes<T>>(prop: K, value: h.JSX.HTMLAttributes<T>[K] | null) => void;
+export type SetEventHandler = <K extends keyof HTMLElementEventMap>(type: K, listener: null | ((this: HTMLElement, ev: HTMLElementEventMap[K]) => void), options: AddEventListenerOptions) => void;
+
+export interface ImperativeHandle<T extends Element> {
+    hasClass: GetClass;
+    setClass: SetClass;
+    setStyle: SetStyle;
+    getAttribute: GetAttribute<T>;
+    setAttribute: SetAttribute<T>;
+    setChildren: SetChildren;
+    setEventHandler: SetEventHandler;
+}
+
+export interface UseImperativePropsParameters<E extends Element> {
+    refElementReturn: Pick<UseRefElementReturnType<E>["refElementReturn"], "getElement">;
+}
+
+export function useImperativeProps<E extends Element>({ refElementReturn: { getElement } }: UseImperativePropsParameters<E>) {
+    const currentImperativeProps = useRef<{ className: Set<string>, style: h.JSX.CSSProperties, children: string | null, others: h.JSX.HTMLAttributes<E> }>({ className: new Set(), style: {}, children: null, others: {} });
 
 
-    const {
-        refElementReturn: { getElement, propsStable }
-    } = useRefElement<T>({ refElementParameters: { onElementChange: undefined, onMount: undefined, onUnmount: undefined } });
-
-    const addClass = useCallback((cls: string) => {
-        getElement()?.classList.add(cls);
-        currentImperativeProps.current.className.add(cls);
+    const hasClass = useCallback<GetClass>((cls: string) => { return currentImperativeProps.current.className.has(cls); }, [])
+    const setClass = useCallback<SetClass>((cls, enabled) => {
+        if (hasClass(cls) == !enabled) {
+            getElement()?.classList[enabled ? "add" : "remove"](cls);
+            currentImperativeProps.current.className[enabled ? "add" : "delete"](cls);
+        }
     }, []);
 
-    const removeClass = useCallback((cls: string) => {
-        getElement()?.classList.remove(cls);
-        currentImperativeProps.current.className.remove(cls);
+    const setStyle = useCallback<SetStyle>((prop, value) => {
+        const element = (getElement() as Element as HTMLElement | undefined);
+        if (element) {
+            if (currentImperativeProps.current.style[prop] != value) {
+                currentImperativeProps.current.style[prop] = value;
+                if ((prop as string).startsWith("--")) {
+                    if (value != null)
+                        element.style.setProperty(prop, `${value}`);
+                    else
+                        element.style.removeProperty(prop);
+                }
+                else {
+                    element.style[prop] = value ?? ("" as any);
+                }
+            }
+        }
     }, []);
 
-    const setStyle = useCallback(<T extends keyof h.JSX.CSSProperties>(prop: T, value: h.JSX.CSSProperties[T]) => {
-        currentImperativeProps.current.style[prop] = value;
-        (getElement() as Element as HTMLElement | undefined)?.style.setProperty(prop as string, value as string ?? null);
+    const setChildren = useCallback<SetChildren>((children: string | null) => {
+        let e = getElement();
+        if (e && currentImperativeProps.current.children != children) {
+            currentImperativeProps.current.children = children;
+            e.textContent = children;
+        }
     }, []);
 
-    const removeStyle = useCallback(<T extends keyof h.JSX.CSSProperties>(prop: T) => {
-        delete currentImperativeProps.current.style[prop];
-        (getElement() as Element as HTMLElement | undefined)?.style.removeProperty(prop as string);
+    const getAttribute = useCallback<GetAttribute<E>>((prop) => {
+        return currentImperativeProps.current.others[prop];
     }, []);
 
-    const setAttribute = useCallback(<K extends keyof h.JSX.HTMLAttributes<T>>(prop: K, value: h.JSX.HTMLAttributes<T>[K]) => {
-        currentImperativeProps.current.others[prop] = value;
-        getElement()?.setAttribute(prop, value);
-    }, [])
+    const setAttribute = useCallback<SetAttribute<E>>((prop, value) => {
+        if (value != null) {
+            currentImperativeProps.current.others[prop] = value;
+            getElement()?.setAttribute(prop, value);
+        }
+        else {
+            delete currentImperativeProps.current.others[prop];
+            getElement()?.removeAttribute(prop);
+        }
+    }, []);
 
-    const removeAttribute = useCallback(<K extends keyof h.JSX.HTMLAttributes<T>>(prop: K) => {
-        delete currentImperativeProps.current.others[prop];
-        getElement()?.removeAttribute(prop);
+    const setEventHandler = useCallback<SetEventHandler>((type, handler, options) => {
+        const element = (getElement() as Element as HTMLElement | undefined);
+        const mappedKey = EventMapping[type] as keyof h.JSX.HTMLAttributes<E>;
+        if (element) {
+            if (handler) {
+                element.addEventListener(type, handler, options);
+                currentImperativeProps.current.others[mappedKey] = handler;
+            }
+            else if (currentImperativeProps.current.others[mappedKey]) {
+                element.removeEventListener(type, currentImperativeProps.current.others[mappedKey], options);
+                currentImperativeProps.current.others[mappedKey] = undefined;
+            }
+        }
     }, [])
 
     return {
-        imperativeProps: useRef({
-            addClass,
-            removeClass,
+        imperativeHandle: useRef<ImperativeHandle<E>>({
+            hasClass,
+            setClass,
             setStyle,
-            removeStyle,
+            getAttribute,
             setAttribute,
-            removeAttribute,
+            setEventHandler,
+            setChildren
         }).current,
-
-        propsUnstable: useMergedProps<T>(
-            propsStable,
-            { className: currentImperativeProps.current.className.toString(), style: currentImperativeProps.current.style },
+        propsUnstable: useMergedProps<E>(
+            { className: [...currentImperativeProps.current.className].join(" "), style: currentImperativeProps.current.style },
             currentImperativeProps.current.others
         )
 
     }
+}
+
+
+
+const EventMapping: Partial<{ [K in keyof HTMLElementEventMap]: (keyof h.JSX.HTMLAttributes<any> & `on${string}`) }> = {
+    abort: "onAbort",
+    animationend: "onAnimationEnd",
+    animationstart: "onAnimationStart",
+    animationiteration: "onAnimationIteration",
+    beforeinput: "onBeforeInput",
+    blur: "onBlur",
+    canplay: "onCanPlay",
+    canplaythrough: "onCanPlayThrough",
+    change: "onChange",
+    click: "onClick",
+    compositionend: "onCompositionEnd",
+    compositionstart: "onCompositionStart",
+    compositionupdate: "onCompositionUpdate",
+    contextmenu: "onContextMenu",
+    cut: "onCut",
+    dblclick: "onDblClick",
+    drag: "onDrag",
+    dragend: "onDragEnd",
+    dragenter: "onDragEnter",
+    dragleave: "onDragLeave",
+    dragover: "onDragOver",
+    dragstart: "onDragStart",
+    drop: "onDrop",
+    durationchange: "onDurationChange",
+    emptied: "onEmptied",
+    ended: "onEnded",
+    error: "onError",
+    focus: "onFocus",
+    focusin: "onfocusin",
+    focusout: "onfocusout",
+    formdata: "onFormData",
+    gotpointercapture: "onGotPointerCapture",
+    input: "onInput",
+    invalid: "onInvalid",
+    keydown: "onKeyDown",
+    keypress: "onKeyPress",
+    keyup: "onKeyUp",
+    load: "onLoad",
+    loadeddata: "onLoadedData",
+    loadedmetadata: "onLoadedMetadata",
+    loadstart: "onLoadStart",
+    lostpointercapture: "onLostPointerCapture",
+    mousedown: "onMouseDown",
+    mouseenter: "onMouseEnter",
+    mouseleave: "onMouseLeave",
+    mousemove: "onMouseMove",
+    mouseout: "onMouseOut",
+    mouseover: "onMouseOver",
+    mouseup: "onMouseUp",
+    paste: "onPaste",
+    pause: "onPause",
+    play: "onPlay",
+    playing: "onPlaying",
+    pointercancel: "onPointerCancel",
+    pointerdown: "onPointerDown",
+    pointerenter: "onPointerEnter",
+    pointerleave: "onPointerLeave",
+    pointermove: "onPointerMove",
+    pointerout: "onPointerOut",
+    pointerover: "onPointerOver",
+    pointerup: "onPointerUp",
+    progress: "onProgress",
+    reset: "onReset",
+    scroll: "onScroll",
+    seeked: "onSeeked",
+    seeking: "onSeeking",
+    select: "onSelect",
+    stalled: "onStalled",
+    submit: "onSubmit",
+    suspend: "onSuspend",
+    timeupdate: "onTimeUpdate",
+    toggle: "onToggle",
+    touchcancel: "onTouchCancel",
+    touchend: "onTouchEnd",
+    touchmove: "onTouchMove",
+    touchstart: "onTouchStart",
+    transitionend: "onTransitionEnd",
+    volumechange: "onVolumeChange",
+    waiting: "onWaiting",
+    wheel: "onWheel"
 }

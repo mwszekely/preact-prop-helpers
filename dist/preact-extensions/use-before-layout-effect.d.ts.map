@@ -1,0 +1,1 @@
+{"version":3,"file":"use-before-layout-effect.d.ts","sourceRoot":"","sources":["../../src/preact-extensions/use-before-layout-effect.tsx"],"names":[],"mappings":"AAEA,OAAO,EAAE,cAAc,EAAE,MAAM,EAAuB,MAAM,cAAc,CAAC;AAkB3E;;;;;;;;;GASG;AACH,wBAAgB,gBAAgB,CAAC,MAAM,CAAC,EAAE,MAAM,UAE/C;AAoCD;;;;;;;;GAQG;AACH,wBAAgB,qBAAqB,CAAC,MAAM,EAAE,cAAc,GAAG,IAAI,EAAE,MAAM,CAAC,EAAE,MAAM,QAcnF"}

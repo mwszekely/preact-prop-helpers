@@ -1,8 +1,7 @@
-import { useAsync, UseAsyncParameters, UseAsyncReturnType } from "../preact-extensions/use-async";
-import { useStableCallback } from "../preact-extensions/use-stable-callback";
-import { useState } from "../preact-extensions/use-state";
-
-type OmitStrong<T, K extends keyof T> = Omit<T, K>
+import { useAsync, UseAsyncParameters, UseAsyncReturnType } from "../preact-extensions/use-async.js";
+import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
+import { useState } from "../preact-extensions/use-state.js";
+import { OmitStrong } from "../util/types.js";
 
 export type AsyncHandler<EventType, CaptureType> = ((c: CaptureType, e: EventType) => (Promise<void> | void));
 
@@ -48,9 +47,6 @@ export interface UseAsyncHandlerReturnType<EventType, CaptureType> extends UseAs
      * you might need this.
      */
     hasCapture: boolean;
-
-    // Same as in useAsync, but with a different type
-    //promise: Promise<void> | null;
 
 }
 

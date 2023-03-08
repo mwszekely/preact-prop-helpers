@@ -1,11 +1,10 @@
-import { reverse } from "lodash-es";
-import lodashShuffle from "lodash-es/shuffle";
+import { shuffle as lodashShuffle } from "lodash-es";
 import { h, VNode } from "preact";
 import { MutableRef, useCallback, useLayoutEffect, useRef } from "preact/hooks";
-import { useForceUpdate } from "../preact-extensions/use-force-update";
-import { ManagedChildInfo, ManagedChildren } from "../preact-extensions/use-managed-children";
-import { returnNull, usePassiveState } from "../preact-extensions/use-passive-state";
-import { useStableGetter } from "../preact-extensions/use-stable-getter";
+import { useForceUpdate } from "../preact-extensions/use-force-update.js";
+import { ManagedChildInfo, ManagedChildren } from "../preact-extensions/use-managed-children.js";
+import { returnNull, usePassiveState } from "../preact-extensions/use-passive-state.js";
+import { useStableGetter } from "../preact-extensions/use-stable-getter.js";
 
 export type GetIndex<P> = (row: VNode<P>) => (number | null | undefined);
 export type GetValid = (index: number) => boolean;
@@ -31,17 +30,6 @@ export interface UseRearrangeableChildrenParameters {
 
 
         onRearranged: null | (() => void);
-
-        /** 
-         * Using rearrangeable children means we need to be able to override arrow key navigation,
-         * which also means that, somewhere down the road, we need to know which children are arrow-key-able,
-         * just like in normal linear navigation.
-         * 
-         * 
-         * PSYCHE!! LinearNavigation should be the one to deal with index manglers and demanglers, and now it does.
-         */
-        //getValid: GetValid;
-        // getHighestChildIndex: GetHighestChildIndex;
     }
 }
 
@@ -75,7 +63,7 @@ export interface UseRearrangeableChildrenReturnType<M extends ManagedChildInfo<n
          *  
          * 
          */
-        rearrange: (rowsInOrder: M[]) => void;
+        rearrange: (originalRows: M[], rowsInOrder: M[]) => void;
 
         /** **STABLE** */
         shuffle: (managedRows: ManagedChildren<M>) => Promise<void> | void;
@@ -162,13 +150,15 @@ export function useRearrangeableChildren<M extends UseSortableChildInfo>({
 
 
     const shuffle = useCallback((managedRows: ManagedChildren<M>): Promise<void> | void => {
-        const shuffledRows = lodashShuffle(managedRows.arraySlice())
-        return rearrange(shuffledRows);
+        const originalRows = managedRows.arraySlice();
+        const shuffledRows = lodashShuffle(originalRows);
+        return rearrange(originalRows, shuffledRows);
     }, [/* Must remain stable */]);
 
     const reverse = useCallback((managedRows: ManagedChildren<M>): Promise<void> | void => {
-        const reversedRows = managedRows.arraySlice().reverse()
-        return rearrange(reversedRows);
+        const originalRows = managedRows.arraySlice();
+        const reversedRows = managedRows.arraySlice().reverse();
+        return rearrange(originalRows, reversedRows);
     }, [/* Must remain stable */]);
 
 
@@ -179,7 +169,7 @@ export function useRearrangeableChildren<M extends UseSortableChildInfo>({
     //const [getForceUpdate, setForceUpdate] = usePassiveState<null | (() => void)>(null, returnNull);
     const [getForceUpdate, setForceUpdate] = usePassiveState<null | (() => void), never>(null, returnNull);
 
-    const rearrange = useCallback((sortedRows: M[]) => {
+    const rearrange = useCallback((originalRows: M[], sortedRows: M[]) => {
 
         mangleMap.current.clear();
         demangleMap.current.clear();
@@ -272,8 +262,9 @@ export function useSortableChildren<M extends UseSortableChildInfo>({
     // The actual sort function.
     const sort = useCallback((managedRows: ManagedChildren<M>, direction: "ascending" | "descending"): Promise<void> | void => {
         const compare = getCompare();
+        const originalRows = managedRows.arraySlice();
 
-        const sortedRows = compare ? managedRows.arraySlice().sort((lhsRow, rhsRow) => {
+        const sortedRows = compare ? originalRows.sort((lhsRow, rhsRow) => {
 
             const lhsValue = lhsRow;
             const rhsValue = rhsRow;
@@ -284,7 +275,7 @@ export function useSortableChildren<M extends UseSortableChildInfo>({
 
         }) : managedRows.arraySlice();
 
-        return rearrange(sortedRows);
+        return rearrange(originalRows, sortedRows);
 
     }, [ /* Must remain stable */]);
 
@@ -293,49 +284,6 @@ export function useSortableChildren<M extends UseSortableChildInfo>({
         rearrangeableChildrenReturn
     };
 }
-
-/*export interface UseGroupedSortableChildrenParameters<M extends GroupedSortedChildInfo> {
-    managedChildrenReturn: UseManagedChildrenReturnType<M>["managedChildrenReturn"]
-}
-
-export interface UseGroupedSortableChildren {
-    linearNavigationParameters: Pick<UseLinearNavigationParameters["linearNavigationParameters"], "indexDemangler" | "indexMangler">
-}*/
-
-/**
- * It's common enough to have, e.g., a list with multiple sortable groups, a table where the body is sorted independently of the head, etc...
- * 
- * A sortable group assumes that the parent (which also calls this hook) handles list navigation (or similar),
- * and that each group element (which can also be the list parent, if there are NO groups) handles sorting (or similar).
- */
-/*export function useGroupedSortableChildren<M extends GroupedSortedChildInfo>({ managedChildrenReturn: { getChildren } }: UseGroupedSortableChildrenParameters<M>): UseGroupedSortableChildren {
-    const allIndexManglers = useRef<Map<number, (i: number) => number>>(new Map());
-    const allIndexDemanglers = useRef<Map<number, (i: number) => number>>(new Map());
-    const indexMangler = useCallback((i: number): number => {
-        const child = getChildren().getAt(i);
-        if (child) {
-            let indexManglerForThisLocation = allIndexManglers.current.get(child.locationIndex);
-            return (indexManglerForThisLocation ?? identity)(i);
-        }
-        return identity(i);
-    }, []);
-    const indexDemangler = useCallback((i: number): number => {
-        const child = getChildren().getAt(i);
-        if (child) {
-            let indexDemanglerForThisLocation = allIndexDemanglers.current.get(child.locationIndex);
-            return (indexDemanglerForThisLocation ?? identity)(i);
-        }
-        return identity(i);
-    }, []);
-
-
-    return {
-        linearNavigationParameters: {
-            indexMangler,
-            indexDemangler
-        }
-    }
-}*/
 
 export function defaultCompare(lhs: UseSortableChildInfo | undefined, rhs: UseSortableChildInfo | undefined) {
     return compare1(lhs?.getSortValue(), rhs?.getSortValue());

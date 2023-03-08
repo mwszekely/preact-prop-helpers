@@ -1,6 +1,6 @@
 import { useEffect } from "preact/hooks";
-import { OnPassiveStateChange, returnNull, runImmediately, usePassiveState } from "../preact-extensions/use-passive-state";
-import { UseRefElementReturnType } from "./use-ref-element";
+import { OnPassiveStateChange, returnNull, runImmediately, usePassiveState } from "../preact-extensions/use-passive-state.js";
+import { UseRefElementReturnType } from "./use-ref-element.js";
 
 export interface UseTextContentParameters<E extends Element> {
     refElementReturn: Pick<UseRefElementReturnType<E>["refElementReturn"], "getElement">;

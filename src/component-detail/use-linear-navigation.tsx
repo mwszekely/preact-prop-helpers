@@ -1,22 +1,9 @@
 import { h } from "preact";
 import { useCallback, useRef } from "preact/hooks";
-import { useStableCallback } from "../preact-extensions/use-stable-callback";
-import { useStableGetter } from "../preact-extensions/use-stable-getter";
-import { UseRovingTabIndexReturnType } from "./use-roving-tabindex";
-
-type OmitStrong<T, K extends keyof T> = Omit<T, K>
-
-/*
-export function useLinearNavigationProps<E extends Element>(r: UseLinearNavigationReturnTypeInfo<E>, ...otherProps: h.JSX.HTMLAttributes<E>[]): h.JSX.HTMLAttributes<E>[] {
-    return [r.linearNavigationReturn.propsStable, ...otherProps];
-}
-export function useTypeaheadNavigationProps<E extends Element>(r: UseTypeaheadNavigationReturnTypeInfo<E>, ...otherProps: h.JSX.HTMLAttributes<E>[]): h.JSX.HTMLAttributes<E>[] {
-    return [r.typeaheadNavigationReturn.propsStable, ...otherProps];
-}*/
-
-/*export interface UseTypeaheadNavigationContext<ChildElement extends Element> {
-    typeaheadNavigationChildParameters: UseTypeaheadNavigationReturnTypeInfo<ChildElement>["typeaheadNavigationChildParameters"];
-}*/
+import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
+import { useStableGetter } from "../preact-extensions/use-stable-getter.js";
+import { OmitStrong } from "../util/types.js";
+import { UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
 
 export interface LinearNavigationResult {
     valueUnmangled: number | null;
@@ -30,16 +17,11 @@ export interface UseLinearNavigationReturnType<ParentOrChildElement extends Elem
     }
 }
 
-/** Default implementation with no sorting */
-//export function navigateRelative(original: number, offset: number): number | null { return original + offset; }
-
-/** Default implementation with no sorting */
-//export function navigateAbsolute(index: number): number | null { return index; }
-
 /** Arguments passed to the parent `useLinearNavigation` */
 export interface UseLinearNavigationParameters<_ParentOrChildElement extends Element, ChildElement extends Element> {
 
-    rovingTabIndexReturn: Pick<UseRovingTabIndexReturnType<ChildElement>["rovingTabIndexReturn"], "getTabbableIndex" | "setTabbableIndex">
+    rovingTabIndexReturn: Pick<UseRovingTabIndexReturnType<ChildElement>["rovingTabIndexReturn"], "getTabbableIndex" | "setTabbableIndex">;
+
     linearNavigationParameters: {
 
         /**
@@ -113,9 +95,6 @@ export interface UseLinearNavigationParameters<_ParentOrChildElement extends Ele
 }
 
 
-/** Arguments passed to the child 'useLinearNavigationChild` */
-//export interface UseLinearNavigationChildInfo { }
-
 /**
  * When used in tandem with `useRovingTabIndex`, allows control of
  * the tabbable index with the arrow keys.
@@ -126,7 +105,7 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
     rovingTabIndexReturn,
     linearNavigationParameters
 }: UseLinearNavigationParameters<ParentOrChildElement, ChildElement>): UseLinearNavigationReturnType<ParentOrChildElement> {
-    type R = Event;//h.JSX.TargetedEvent<ParentOrChildElement>;
+    type R = Event;
     const { getHighestIndex, indexDemangler, indexMangler, isValid, navigatePastEnd, navigatePastStart } = linearNavigationParameters;
     const { getTabbableIndex, setTabbableIndex } = rovingTabIndexReturn;
 
@@ -236,9 +215,62 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
                 truePageNavigationSize = Math.round(pageNavigationSize * Math.max(100, getHighestIndex() + 1));
             }
 
+            let result: "passthrough" | "stop" | null = null;
+
+            // Arrow keys only take effect for components oriented in that direction,
+            // so we want to make sure we only listen for left/right or up/down when appropriate.
+            let keyPressIsValidForOrientation = true;
             switch (e.key) {
+                case "ArrowUp":
+                case "ArrowDown":
+                    keyPressIsValidForOrientation = (!disableArrowKeys && allowsVerticalNavigation);
+                    break;
+                case "ArrowLeft":
+                case "ArrowRight":
+                    keyPressIsValidForOrientation = (!disableArrowKeys && allowsHorizontalNavigation);
+                    break;
+            }
+
+            if (keyPressIsValidForOrientation) {
+                switch (e.key) {
+                    case "ArrowUp":
+                    case "ArrowLeft":
+                        result = navigateToPrev(e, true);
+                        break;
+                        
+                    case "ArrowDown":
+                    case "ArrowRight":
+                        result = navigateToNext(e, true);
+                        break;
+
+                    case "PageUp":
+                    case "PageDown":
+                        if (truePageNavigationSize > 0) {
+                            navigateRelative2(e, truePageNavigationSize * (e.key.endsWith('n') ? -1 : 1), true, "page");
+                            result = 'passthrough';
+                        }
+                        break;
+
+                    case "Home":
+                    case "End":
+                        if (!disableHomeEndKeys) {
+                            if (e.key.endsWith('e'))
+                                navigateToFirst(e, true);
+                            else
+                                navigateToLast(e, true);
+                            result = 'passthrough';
+                        }
+                        break;
+                }
+            }
+
+            if (result && result != 'passthrough') {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            /*switch (e.key) {
                 case "ArrowUp": {
-                    //const propName = (info?.blockOrientation === "vertical" ? "blockDirection" : "inlineDirection");
                     const directionAllowed = (!disableArrowKeys && allowsVerticalNavigation);
                     if (directionAllowed) {
                         const result = navigateToPrev(e, true);
@@ -314,7 +346,7 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
                         e.stopPropagation();
                     }
                     break;
-            }
+            }*/
         }
     })
 

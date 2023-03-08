@@ -31,9 +31,7 @@ export function useState<T>(initialState: T | (() => T)): readonly [value: T, se
         }
     }, []);
 
-    const getState = () => { return ref.current; };
+    const getState = useCallback(() => { return ref.current; }, []);
 
-
-    console.assert(ref.current === state || (typeof state === "number" && isNaN(state)));
     return [state, setState, getState] as const;
 }

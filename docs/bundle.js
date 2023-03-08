@@ -1,743 +1,1777 @@
-function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return typeof key === "symbol" ? key : String(key); }
-function _toPrimitive(input, hint) { if (typeof input !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (typeof res !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
-var bundle = function (exports) {
+var bundle = (function (exports) {
   'use strict';
 
-  var n,
-    l$1,
-    u$1,
-    t$1,
-    r$2,
-    o$2,
-    f$1,
-    e$1 = {},
-    c$1 = [],
-    s$1 = /acit|ex(?:s|g|n|p|$)|rph|grid|ows|mnc|ntw|ine[ch]|zoo|^ord|itera/i;
-  function a$1(n, l) {
-    for (var u in l) n[u] = l[u];
-    return n;
-  }
-  function h$1(n) {
-    var l = n.parentNode;
-    l && l.removeChild(n);
-  }
-  function v$1(l, u, i) {
-    var t,
-      r,
-      o,
-      f = {};
-    for (o in u) "key" == o ? t = u[o] : "ref" == o ? r = u[o] : f[o] = u[o];
-    if (arguments.length > 2 && (f.children = arguments.length > 3 ? n.call(arguments, 2) : i), "function" == typeof l && null != l.defaultProps) for (o in l.defaultProps) void 0 === f[o] && (f[o] = l.defaultProps[o]);
-    return y$1(l, f, t, r, null);
-  }
-  function y$1(n, i, t, r, o) {
-    var f = {
-      type: n,
-      props: i,
-      key: t,
-      ref: r,
-      __k: null,
-      __: null,
-      __b: 0,
-      __e: null,
-      __d: void 0,
-      __c: null,
-      __h: null,
-      constructor: void 0,
-      __v: null == o ? ++u$1 : o
-    };
-    return null == o && null != l$1.vnode && l$1.vnode(f), f;
-  }
-  function d$1(n) {
-    return n.children;
-  }
-  function _$2(n, l) {
-    this.props = n, this.context = l;
-  }
-  function k$1(n, l) {
-    if (null == l) return n.__ ? k$1(n.__, n.__.__k.indexOf(n) + 1) : null;
-    for (var u; l < n.__k.length; l++) if (null != (u = n.__k[l]) && null != u.__e) return u.__e;
-    return "function" == typeof n.type ? k$1(n) : null;
-  }
-  function b$1(n) {
-    var l, u;
-    if (null != (n = n.__) && null != n.__c) {
-      for (n.__e = n.__c.base = null, l = 0; l < n.__k.length; l++) if (null != (u = n.__k[l]) && null != u.__e) {
-        n.__e = n.__c.base = u.__e;
-        break;
-      }
-      return b$1(n);
-    }
-  }
-  function g$2(n) {
-    (!n.__d && (n.__d = !0) && t$1.push(n) && !m$1.__r++ || r$2 !== l$1.debounceRendering) && ((r$2 = l$1.debounceRendering) || o$2)(m$1);
-  }
-  function m$1() {
-    var n, l, u, i, r, o, f, e;
-    for (t$1.sort(function (n, l) {
-      return n.__v.__b - l.__v.__b;
-    }); n = t$1.shift();) n.__d && (l = t$1.length, i = void 0, r = void 0, f = (o = (u = n).__v).__e, (e = u.__P) && (i = [], (r = a$1({}, o)).__v = o.__v + 1, z$2(e, o, r, u.__n, void 0 !== e.ownerSVGElement, null != o.__h ? [f] : null, i, null == f ? k$1(o) : f, o.__h), L$1(i, o), o.__e != f && b$1(o)), t$1.length > l && t$1.sort(function (n, l) {
-      return n.__v.__b - l.__v.__b;
-    }));
-    m$1.__r = 0;
-  }
-  function w$2(n, l, u, i, t, r, o, f, s, a) {
-    var h,
-      v,
-      p,
-      _,
-      b,
-      g,
-      m,
-      w = i && i.__k || c$1,
-      A = w.length;
-    for (u.__k = [], h = 0; h < l.length; h++) if (null != (_ = u.__k[h] = null == (_ = l[h]) || "boolean" == typeof _ ? null : "string" == typeof _ || "number" == typeof _ || "bigint" == typeof _ ? y$1(null, _, null, null, _) : Array.isArray(_) ? y$1(d$1, {
-      children: _
-    }, null, null, null) : _.__b > 0 ? y$1(_.type, _.props, _.key, _.ref ? _.ref : null, _.__v) : _)) {
-      if (_.__ = u, _.__b = u.__b + 1, null === (p = w[h]) || p && _.key == p.key && _.type === p.type) w[h] = void 0;else for (v = 0; v < A; v++) {
-        if ((p = w[v]) && _.key == p.key && _.type === p.type) {
-          w[v] = void 0;
-          break;
-        }
-        p = null;
-      }
-      z$2(n, _, p = p || e$1, t, r, o, f, s, a), b = _.__e, (v = _.ref) && p.ref != v && (m || (m = []), p.ref && m.push(p.ref, null, _), m.push(v, _.__c || b, _)), null != b ? (null == g && (g = b), "function" == typeof _.type && _.__k === p.__k ? _.__d = s = x$1(_, s, n) : s = P$1(n, _, p, w, b, s), "function" == typeof u.type && (u.__d = s)) : s && p.__e == s && s.parentNode != n && (s = k$1(p));
-    }
-    for (u.__e = g, h = A; h--;) null != w[h] && ("function" == typeof u.type && null != w[h].__e && w[h].__e == u.__d && (u.__d = C$1(i).nextSibling), O(w[h], w[h]));
-    if (m) for (h = 0; h < m.length; h++) N(m[h], m[++h], m[++h]);
-  }
-  function x$1(n, l, u) {
-    for (var i, t = n.__k, r = 0; t && r < t.length; r++) (i = t[r]) && (i.__ = n, l = "function" == typeof i.type ? x$1(i, l, u) : P$1(u, i, i, t, i.__e, l));
-    return l;
-  }
-  function A(n, l) {
-    return l = l || [], null == n || "boolean" == typeof n || (Array.isArray(n) ? n.some(function (n) {
-      A(n, l);
-    }) : l.push(n)), l;
-  }
-  function P$1(n, l, u, i, t, r) {
-    var o, f, e;
-    if (void 0 !== l.__d) o = l.__d, l.__d = void 0;else if (null == u || t != r || null == t.parentNode) n: if (null == r || r.parentNode !== n) n.appendChild(t), o = null;else {
-      for (f = r, e = 0; (f = f.nextSibling) && e < i.length; e += 1) if (f == t) break n;
-      n.insertBefore(t, r), o = r;
-    }
-    return void 0 !== o ? o : t.nextSibling;
-  }
-  function C$1(n) {
-    var l, u, i;
-    if (null == n.type || "string" == typeof n.type) return n.__e;
-    if (n.__k) for (l = n.__k.length - 1; l >= 0; l--) if ((u = n.__k[l]) && (i = C$1(u))) return i;
-    return null;
-  }
-  function $$1(n, l, u, i, t) {
-    var r;
-    for (r in u) "children" === r || "key" === r || r in l || I$1(n, r, null, u[r], i);
-    for (r in l) t && "function" != typeof l[r] || "children" === r || "key" === r || "value" === r || "checked" === r || u[r] === l[r] || I$1(n, r, l[r], u[r], i);
-  }
-  function H$1(n, l, u) {
-    "-" === l[0] ? n.setProperty(l, null == u ? "" : u) : n[l] = null == u ? "" : "number" != typeof u || s$1.test(l) ? u : u + "px";
-  }
-  function I$1(n, l, u, i, t) {
-    var r;
-    n: if ("style" === l) {
-      if ("string" == typeof u) n.style.cssText = u;else {
-        if ("string" == typeof i && (n.style.cssText = i = ""), i) for (l in i) u && l in u || H$1(n.style, l, "");
-        if (u) for (l in u) i && u[l] === i[l] || H$1(n.style, l, u[l]);
-      }
-    } else if ("o" === l[0] && "n" === l[1]) r = l !== (l = l.replace(/Capture$/, "")), l = l.toLowerCase() in n ? l.toLowerCase().slice(2) : l.slice(2), n.l || (n.l = {}), n.l[l + r] = u, u ? i || n.addEventListener(l, r ? j$2 : T$2, r) : n.removeEventListener(l, r ? j$2 : T$2, r);else if ("dangerouslySetInnerHTML" !== l) {
-      if (t) l = l.replace(/xlink(H|:h)/, "h").replace(/sName$/, "s");else if ("width" !== l && "height" !== l && "href" !== l && "list" !== l && "form" !== l && "tabIndex" !== l && "download" !== l && l in n) try {
-        n[l] = null == u ? "" : u;
-        break n;
-      } catch (n) {}
-      "function" == typeof u || (null == u || !1 === u && -1 == l.indexOf("-") ? n.removeAttribute(l) : n.setAttribute(l, u));
-    }
-  }
-  function T$2(n) {
-    return this.l[n.type + !1](l$1.event ? l$1.event(n) : n);
-  }
-  function j$2(n) {
-    return this.l[n.type + !0](l$1.event ? l$1.event(n) : n);
-  }
-  function z$2(n, u, i, t, r, o, f, e, c) {
-    var s,
-      h,
-      v,
-      y,
-      p,
-      k,
-      b,
-      g,
-      m,
-      x,
-      A,
-      P,
-      C,
-      $,
-      H,
-      I = u.type;
-    if (void 0 !== u.constructor) return null;
-    null != i.__h && (c = i.__h, e = u.__e = i.__e, u.__h = null, o = [e]), (s = l$1.__b) && s(u);
+  var n,l$1,u$1,t$1,r$2,o$2,f$1,e$1={},c$1=[],s$1=/acit|ex(?:s|g|n|p|$)|rph|grid|ows|mnc|ntw|ine[ch]|zoo|^ord|itera/i;function a$1(n,l){for(var u in l)n[u]=l[u];return n}function h$1(n){var l=n.parentNode;l&&l.removeChild(n);}function v$1(l,u,i){var t,r,o,f={};for(o in u)"key"==o?t=u[o]:"ref"==o?r=u[o]:f[o]=u[o];if(arguments.length>2&&(f.children=arguments.length>3?n.call(arguments,2):i),"function"==typeof l&&null!=l.defaultProps)for(o in l.defaultProps)void 0===f[o]&&(f[o]=l.defaultProps[o]);return y$1(l,f,t,r,null)}function y$1(n,i,t,r,o){var f={type:n,props:i,key:t,ref:r,__k:null,__:null,__b:0,__e:null,__d:void 0,__c:null,__h:null,constructor:void 0,__v:null==o?++u$1:o};return null==o&&null!=l$1.vnode&&l$1.vnode(f),f}function d$1(n){return n.children}function _$2(n,l){this.props=n,this.context=l;}function k$1(n,l){if(null==l)return n.__?k$1(n.__,n.__.__k.indexOf(n)+1):null;for(var u;l<n.__k.length;l++)if(null!=(u=n.__k[l])&&null!=u.__e)return u.__e;return "function"==typeof n.type?k$1(n):null}function b$1(n){var l,u;if(null!=(n=n.__)&&null!=n.__c){for(n.__e=n.__c.base=null,l=0;l<n.__k.length;l++)if(null!=(u=n.__k[l])&&null!=u.__e){n.__e=n.__c.base=u.__e;break}return b$1(n)}}function g$2(n){(!n.__d&&(n.__d=!0)&&t$1.push(n)&&!m$1.__r++||r$2!==l$1.debounceRendering)&&((r$2=l$1.debounceRendering)||o$2)(m$1);}function m$1(){var n,l,u,i,r,o,f,e;for(t$1.sort(function(n,l){return n.__v.__b-l.__v.__b});n=t$1.shift();)n.__d&&(l=t$1.length,i=void 0,r=void 0,f=(o=(u=n).__v).__e,(e=u.__P)&&(i=[],(r=a$1({},o)).__v=o.__v+1,z$2(e,o,r,u.__n,void 0!==e.ownerSVGElement,null!=o.__h?[f]:null,i,null==f?k$1(o):f,o.__h),L$1(i,o),o.__e!=f&&b$1(o)),t$1.length>l&&t$1.sort(function(n,l){return n.__v.__b-l.__v.__b}));m$1.__r=0;}function w$2(n,l,u,i,t,r,o,f,s,a){var h,v,p,_,b,g,m,w=i&&i.__k||c$1,A=w.length;for(u.__k=[],h=0;h<l.length;h++)if(null!=(_=u.__k[h]=null==(_=l[h])||"boolean"==typeof _?null:"string"==typeof _||"number"==typeof _||"bigint"==typeof _?y$1(null,_,null,null,_):Array.isArray(_)?y$1(d$1,{children:_},null,null,null):_.__b>0?y$1(_.type,_.props,_.key,_.ref?_.ref:null,_.__v):_)){if(_.__=u,_.__b=u.__b+1,null===(p=w[h])||p&&_.key==p.key&&_.type===p.type)w[h]=void 0;else for(v=0;v<A;v++){if((p=w[v])&&_.key==p.key&&_.type===p.type){w[v]=void 0;break}p=null;}z$2(n,_,p=p||e$1,t,r,o,f,s,a),b=_.__e,(v=_.ref)&&p.ref!=v&&(m||(m=[]),p.ref&&m.push(p.ref,null,_),m.push(v,_.__c||b,_)),null!=b?(null==g&&(g=b),"function"==typeof _.type&&_.__k===p.__k?_.__d=s=x$1(_,s,n):s=P$1(n,_,p,w,b,s),"function"==typeof u.type&&(u.__d=s)):s&&p.__e==s&&s.parentNode!=n&&(s=k$1(p));}for(u.__e=g,h=A;h--;)null!=w[h]&&("function"==typeof u.type&&null!=w[h].__e&&w[h].__e==u.__d&&(u.__d=C$1(i).nextSibling),O(w[h],w[h]));if(m)for(h=0;h<m.length;h++)N(m[h],m[++h],m[++h]);}function x$1(n,l,u){for(var i,t=n.__k,r=0;t&&r<t.length;r++)(i=t[r])&&(i.__=n,l="function"==typeof i.type?x$1(i,l,u):P$1(u,i,i,t,i.__e,l));return l}function A(n,l){return l=l||[],null==n||"boolean"==typeof n||(Array.isArray(n)?n.some(function(n){A(n,l);}):l.push(n)),l}function P$1(n,l,u,i,t,r){var o,f,e;if(void 0!==l.__d)o=l.__d,l.__d=void 0;else if(null==u||t!=r||null==t.parentNode)n:if(null==r||r.parentNode!==n)n.appendChild(t),o=null;else {for(f=r,e=0;(f=f.nextSibling)&&e<i.length;e+=1)if(f==t)break n;n.insertBefore(t,r),o=r;}return void 0!==o?o:t.nextSibling}function C$1(n){var l,u,i;if(null==n.type||"string"==typeof n.type)return n.__e;if(n.__k)for(l=n.__k.length-1;l>=0;l--)if((u=n.__k[l])&&(i=C$1(u)))return i;return null}function $$1(n,l,u,i,t){var r;for(r in u)"children"===r||"key"===r||r in l||I$1(n,r,null,u[r],i);for(r in l)t&&"function"!=typeof l[r]||"children"===r||"key"===r||"value"===r||"checked"===r||u[r]===l[r]||I$1(n,r,l[r],u[r],i);}function H$1(n,l,u){"-"===l[0]?n.setProperty(l,null==u?"":u):n[l]=null==u?"":"number"!=typeof u||s$1.test(l)?u:u+"px";}function I$1(n,l,u,i,t){var r;n:if("style"===l)if("string"==typeof u)n.style.cssText=u;else {if("string"==typeof i&&(n.style.cssText=i=""),i)for(l in i)u&&l in u||H$1(n.style,l,"");if(u)for(l in u)i&&u[l]===i[l]||H$1(n.style,l,u[l]);}else if("o"===l[0]&&"n"===l[1])r=l!==(l=l.replace(/Capture$/,"")),l=l.toLowerCase()in n?l.toLowerCase().slice(2):l.slice(2),n.l||(n.l={}),n.l[l+r]=u,u?i||n.addEventListener(l,r?j$2:T$2,r):n.removeEventListener(l,r?j$2:T$2,r);else if("dangerouslySetInnerHTML"!==l){if(t)l=l.replace(/xlink(H|:h)/,"h").replace(/sName$/,"s");else if("width"!==l&&"height"!==l&&"href"!==l&&"list"!==l&&"form"!==l&&"tabIndex"!==l&&"download"!==l&&l in n)try{n[l]=null==u?"":u;break n}catch(n){}"function"==typeof u||(null==u||!1===u&&-1==l.indexOf("-")?n.removeAttribute(l):n.setAttribute(l,u));}}function T$2(n){return this.l[n.type+!1](l$1.event?l$1.event(n):n)}function j$2(n){return this.l[n.type+!0](l$1.event?l$1.event(n):n)}function z$2(n,u,i,t,r,o,f,e,c){var s,h,v,y,p,k,b,g,m,x,A,P,C,$,H,I=u.type;if(void 0!==u.constructor)return null;null!=i.__h&&(c=i.__h,e=u.__e=i.__e,u.__h=null,o=[e]),(s=l$1.__b)&&s(u);try{n:if("function"==typeof I){if(g=u.props,m=(s=I.contextType)&&t[s.__c],x=s?m?m.props.value:s.__:t,i.__c?b=(h=u.__c=i.__c).__=h.__E:("prototype"in I&&I.prototype.render?u.__c=h=new I(g,x):(u.__c=h=new _$2(g,x),h.constructor=I,h.render=S),m&&m.sub(h),h.props=g,h.state||(h.state={}),h.context=x,h.__n=t,v=h.__d=!0,h.__h=[],h._sb=[]),null==h.__s&&(h.__s=h.state),null!=I.getDerivedStateFromProps&&(h.__s==h.state&&(h.__s=a$1({},h.__s)),a$1(h.__s,I.getDerivedStateFromProps(g,h.__s))),y=h.props,p=h.state,h.__v=u,v)null==I.getDerivedStateFromProps&&null!=h.componentWillMount&&h.componentWillMount(),null!=h.componentDidMount&&h.__h.push(h.componentDidMount);else {if(null==I.getDerivedStateFromProps&&g!==y&&null!=h.componentWillReceiveProps&&h.componentWillReceiveProps(g,x),!h.__e&&null!=h.shouldComponentUpdate&&!1===h.shouldComponentUpdate(g,h.__s,x)||u.__v===i.__v){for(u.__v!==i.__v&&(h.props=g,h.state=h.__s,h.__d=!1),h.__e=!1,u.__e=i.__e,u.__k=i.__k,u.__k.forEach(function(n){n&&(n.__=u);}),A=0;A<h._sb.length;A++)h.__h.push(h._sb[A]);h._sb=[],h.__h.length&&f.push(h);break n}null!=h.componentWillUpdate&&h.componentWillUpdate(g,h.__s,x),null!=h.componentDidUpdate&&h.__h.push(function(){h.componentDidUpdate(y,p,k);});}if(h.context=x,h.props=g,h.__P=n,P=l$1.__r,C=0,"prototype"in I&&I.prototype.render){for(h.state=h.__s,h.__d=!1,P&&P(u),s=h.render(h.props,h.state,h.context),$=0;$<h._sb.length;$++)h.__h.push(h._sb[$]);h._sb=[];}else do{h.__d=!1,P&&P(u),s=h.render(h.props,h.state,h.context),h.state=h.__s;}while(h.__d&&++C<25);h.state=h.__s,null!=h.getChildContext&&(t=a$1(a$1({},t),h.getChildContext())),v||null==h.getSnapshotBeforeUpdate||(k=h.getSnapshotBeforeUpdate(y,p)),H=null!=s&&s.type===d$1&&null==s.key?s.props.children:s,w$2(n,Array.isArray(H)?H:[H],u,i,t,r,o,f,e,c),h.base=u.__e,u.__h=null,h.__h.length&&f.push(h),b&&(h.__E=h.__=null),h.__e=!1;}else null==o&&u.__v===i.__v?(u.__k=i.__k,u.__e=i.__e):u.__e=M(i.__e,u,i,t,r,o,f,c);(s=l$1.diffed)&&s(u);}catch(n){u.__v=null,(c||null!=o)&&(u.__e=e,u.__h=!!c,o[o.indexOf(e)]=null),l$1.__e(n,u,i);}}function L$1(n,u){l$1.__c&&l$1.__c(u,n),n.some(function(u){try{n=u.__h,u.__h=[],n.some(function(n){n.call(u);});}catch(n){l$1.__e(n,u.__v);}});}function M(l,u,i,t,r,o,f,c){var s,a,v,y=i.props,p=u.props,d=u.type,_=0;if("svg"===d&&(r=!0),null!=o)for(;_<o.length;_++)if((s=o[_])&&"setAttribute"in s==!!d&&(d?s.localName===d:3===s.nodeType)){l=s,o[_]=null;break}if(null==l){if(null===d)return document.createTextNode(p);l=r?document.createElementNS("http://www.w3.org/2000/svg",d):document.createElement(d,p.is&&p),o=null,c=!1;}if(null===d)y===p||c&&l.data===p||(l.data=p);else {if(o=o&&n.call(l.childNodes),a=(y=i.props||e$1).dangerouslySetInnerHTML,v=p.dangerouslySetInnerHTML,!c){if(null!=o)for(y={},_=0;_<l.attributes.length;_++)y[l.attributes[_].name]=l.attributes[_].value;(v||a)&&(v&&(a&&v.__html==a.__html||v.__html===l.innerHTML)||(l.innerHTML=v&&v.__html||""));}if($$1(l,p,y,r,c),v)u.__k=[];else if(_=u.props.children,w$2(l,Array.isArray(_)?_:[_],u,i,t,r&&"foreignObject"!==d,o,f,o?o[0]:i.__k&&k$1(i,0),c),null!=o)for(_=o.length;_--;)null!=o[_]&&h$1(o[_]);c||("value"in p&&void 0!==(_=p.value)&&(_!==l.value||"progress"===d&&!_||"option"===d&&_!==y.value)&&I$1(l,"value",_,y.value,!1),"checked"in p&&void 0!==(_=p.checked)&&_!==l.checked&&I$1(l,"checked",_,y.checked,!1));}return l}function N(n,u,i){try{"function"==typeof n?n(u):n.current=u;}catch(n){l$1.__e(n,i);}}function O(n,u,i){var t,r;if(l$1.unmount&&l$1.unmount(n),(t=n.ref)&&(t.current&&t.current!==n.__e||N(t,null,u)),null!=(t=n.__c)){if(t.componentWillUnmount)try{t.componentWillUnmount();}catch(n){l$1.__e(n,u);}t.base=t.__P=null,n.__c=void 0;}if(t=n.__k)for(r=0;r<t.length;r++)t[r]&&O(t[r],u,i||"function"!=typeof n.type);i||null==n.__e||h$1(n.__e),n.__=n.__e=n.__d=void 0;}function S(n,l,u){return this.constructor(n,u)}function q$1(u,i,t){var r,o,f;l$1.__&&l$1.__(u,i),o=(r="function"==typeof t)?null:t&&t.__k||i.__k,f=[],z$2(i,u=(!r&&t||i).__k=v$1(d$1,null,[u]),o||e$1,e$1,void 0!==i.ownerSVGElement,!r&&t?[t]:o?null:i.firstChild?n.call(i.childNodes):null,f,!r&&t?t:o?o.__e:i.firstChild,r),L$1(f,u);}function D$1(l,u,i){var t,r,o,f=a$1({},l.props);for(o in u)"key"==o?t=u[o]:"ref"==o?r=u[o]:f[o]=u[o];return arguments.length>2&&(f.children=arguments.length>3?n.call(arguments,2):i),y$1(l.type,f,t||l.key,r||l.ref,null)}function E(n,l){var u={__c:l="__cC"+f$1++,__:n,Consumer:function(n,l){return n.children(l)},Provider:function(n){var u,i;return this.getChildContext||(u=[],(i={})[l]=this,this.getChildContext=function(){return i},this.shouldComponentUpdate=function(n){this.props.value!==n.value&&u.some(function(n){n.__e=!0,g$2(n);});},this.sub=function(n){u.push(n);var l=n.componentWillUnmount;n.componentWillUnmount=function(){u.splice(u.indexOf(n),1),l&&l.call(n);};}),n.children}};return u.Provider.__=u.Consumer.contextType=u}n=c$1.slice,l$1={__e:function(n,l,u,i){for(var t,r,o;l=l.__;)if((t=l.__c)&&!t.__)try{if((r=t.constructor)&&null!=r.getDerivedStateFromError&&(t.setState(r.getDerivedStateFromError(n)),o=t.__d),null!=t.componentDidCatch&&(t.componentDidCatch(n,i||{}),o=t.__d),o)return t.__E=t}catch(l){n=l;}throw n}},u$1=0,_$2.prototype.setState=function(n,l){var u;u=null!=this.__s&&this.__s!==this.state?this.__s:this.__s=a$1({},this.state),"function"==typeof n&&(n=n(a$1({},u),this.props)),n&&a$1(u,n),null!=n&&this.__v&&(l&&this._sb.push(l),g$2(this));},_$2.prototype.forceUpdate=function(n){this.__v&&(this.__e=!0,n&&this.__h.push(n),g$2(this));},_$2.prototype.render=d$1,t$1=[],o$2="function"==typeof Promise?Promise.prototype.then.bind(Promise.resolve()):setTimeout,m$1.__r=0,f$1=0;
+
+  var _$1=0;function o$1(o,e,n,t,f,l){var s,u,a={};for(u in e)"ref"==u?s=e[u]:a[u]=e[u];var i={type:o,props:a,key:n,ref:s,__k:null,__:null,__b:0,__e:null,__d:void 0,__c:null,__h:null,constructor:void 0,__v:--_$1,__source:f,__self:l};if("function"==typeof o&&(s=o.defaultProps))for(u in s)void 0===a[u]&&(a[u]=s[u]);return l$1.vnode&&l$1.vnode(i),i}
+
+  var t,r$1,u,i,o=0,f=[],c=[],e=l$1.__b,a=l$1.__r,v=l$1.diffed,l=l$1.__c,m=l$1.unmount;function d(t,u){l$1.__h&&l$1.__h(r$1,t,o||u),o=0;var i=r$1.__H||(r$1.__H={__:[],__h:[]});return t>=i.__.length&&i.__.push({__V:c}),i.__[t]}function p(n){return o=1,y(B$1,n)}function y(n,u,i){var o=d(t++,2);if(o.t=n,!o.__c&&(o.__=[i?i(u):B$1(void 0,u),function(n){var t=o.__N?o.__N[0]:o.__[0],r=o.t(t,n);t!==r&&(o.__N=[r,o.__[1]],o.__c.setState({}));}],o.__c=r$1,!r$1.u)){r$1.u=!0;var f=r$1.shouldComponentUpdate;r$1.shouldComponentUpdate=function(n,t,r){if(!o.__c.__H)return !0;var u=o.__c.__H.__.filter(function(n){return n.__c});if(u.every(function(n){return !n.__N}))return !f||f.call(this,n,t,r);var i=!1;return u.forEach(function(n){if(n.__N){var t=n.__[0];n.__=n.__N,n.__N=void 0,t!==n.__[0]&&(i=!0);}}),!(!i&&o.__c.props===n)&&(!f||f.call(this,n,t,r))};}return o.__N||o.__}function h(u,i){var o=d(t++,3);!l$1.__s&&z$1(o.__H,i)&&(o.__=u,o.i=i,r$1.__H.__h.push(o));}function s(u,i){var o=d(t++,4);!l$1.__s&&z$1(o.__H,i)&&(o.__=u,o.i=i,r$1.__h.push(o));}function _(n){return o=5,F$1(function(){return {current:n}},[])}function F$1(n,r){var u=d(t++,7);return z$1(u.__H,r)?(u.__V=n(),u.i=r,u.__h=n,u.__V):u.__}function T$1(n,t){return o=8,F$1(function(){return n},t)}function q(n){var u=r$1.context[n.__c],i=d(t++,9);return i.c=n,u?(null==i.__&&(i.__=!0,u.sub(r$1)),u.props.value):n.__}function V$1(){var n=d(t++,11);if(!n.__){for(var u=r$1.__v;null!==u&&!u.__m&&null!==u.__;)u=u.__;var i=u.__m||(u.__m=[0,0]);n.__="P"+i[0]+"-"+i[1]++;}return n.__}function b(){for(var t;t=f.shift();)if(t.__P&&t.__H)try{t.__H.__h.forEach(k),t.__H.__h.forEach(w$1),t.__H.__h=[];}catch(r){t.__H.__h=[],l$1.__e(r,t.__v);}}l$1.__b=function(n){r$1=null,e&&e(n);},l$1.__r=function(n){a&&a(n),t=0;var i=(r$1=n.__c).__H;i&&(u===r$1?(i.__h=[],r$1.__h=[],i.__.forEach(function(n){n.__N&&(n.__=n.__N),n.__V=c,n.__N=n.i=void 0;})):(i.__h.forEach(k),i.__h.forEach(w$1),i.__h=[])),u=r$1;},l$1.diffed=function(t){v&&v(t);var o=t.__c;o&&o.__H&&(o.__H.__h.length&&(1!==f.push(o)&&i===l$1.requestAnimationFrame||((i=l$1.requestAnimationFrame)||j$1)(b)),o.__H.__.forEach(function(n){n.i&&(n.__H=n.i),n.__V!==c&&(n.__=n.__V),n.i=void 0,n.__V=c;})),u=r$1=null;},l$1.__c=function(t,r){r.some(function(t){try{t.__h.forEach(k),t.__h=t.__h.filter(function(n){return !n.__||w$1(n)});}catch(u){r.some(function(n){n.__h&&(n.__h=[]);}),r=[],l$1.__e(u,t.__v);}}),l&&l(t,r);},l$1.unmount=function(t){m&&m(t);var r,u=t.__c;u&&u.__H&&(u.__H.__.forEach(function(n){try{k(n);}catch(n){r=n;}}),u.__H=void 0,r&&l$1.__e(r,u.__v));};var g$1="function"==typeof requestAnimationFrame;function j$1(n){var t,r=function(){clearTimeout(u),g$1&&cancelAnimationFrame(t),setTimeout(n);},u=setTimeout(r,100);g$1&&(t=requestAnimationFrame(r));}function k(n){var t=r$1,u=n.__c;"function"==typeof u&&(n.__c=void 0,u()),r$1=t;}function w$1(n){var t=r$1;n.__c=n.__(),r$1=t;}function z$1(n,t){return !n||n.length!==t.length||t.some(function(t,r){return t!==n[r]})}function B$1(n,t){return "function"==typeof t?t(n):t}
+
+  function g(n,t){for(var e in t)n[e]=t[e];return n}function C(n,t){for(var e in n)if("__source"!==e&&!(e in t))return !0;for(var r in t)if("__source"!==r&&n[r]!==t[r])return !0;return !1}function w(n){this.props=n;}function x(n,e){function r(n){var t=this.props.ref,r=t==n.ref;return !r&&t&&(t.call?t(null):t.current=null),e?!e(this.props,n)||!r:C(this.props,n)}function u(e){return this.shouldComponentUpdate=r,v$1(n,e)}return u.displayName="Memo("+(n.displayName||n.name)+")",u.prototype.isReactComponent=!0,u.__f=!0,u}(w.prototype=new _$2).isPureReactComponent=!0,w.prototype.shouldComponentUpdate=function(n,t){return C(this.props,n)||C(this.state,t)};var R=l$1.__b;l$1.__b=function(n){n.type&&n.type.__f&&n.ref&&(n.props.ref=n.ref,n.ref=null),R&&R(n);};var T=l$1.__e;l$1.__e=function(n,t,e,r){if(n.then)for(var u,o=t;o=o.__;)if((u=o.__c)&&u.__c)return null==t.__e&&(t.__e=e.__e,t.__k=e.__k),u.__c(n,t);T(n,t,e,r);};var I=l$1.unmount;function L(n,t,e){return n&&(n.__c&&n.__c.__H&&(n.__c.__H.__.forEach(function(n){"function"==typeof n.__c&&n.__c();}),n.__c.__H=null),null!=(n=g({},n)).__c&&(n.__c.__P===e&&(n.__c.__P=t),n.__c=null),n.__k=n.__k&&n.__k.map(function(n){return L(n,t,e)})),n}function U(n,t,e){return n&&(n.__v=null,n.__k=n.__k&&n.__k.map(function(n){return U(n,t,e)}),n.__c&&n.__c.__P===t&&(n.__e&&e.insertBefore(n.__e,n.__d),n.__c.__e=!0,n.__c.__P=e)),n}function D(){this.__u=0,this.t=null,this.__b=null;}function F(n){var t=n.__.__c;return t&&t.__a&&t.__a(n)}function V(){this.u=null,this.o=null;}l$1.unmount=function(n){var t=n.__c;t&&t.__R&&t.__R(),t&&!0===n.__h&&(n.type=null),I&&I(n);},(D.prototype=new _$2).__c=function(n,t){var e=t.__c,r=this;null==r.t&&(r.t=[]),r.t.push(e);var u=F(r.__v),o=!1,i=function(){o||(o=!0,e.__R=null,u?u(l):l());};e.__R=i;var l=function(){if(!--r.__u){if(r.state.__a){var n=r.state.__a;r.__v.__k[0]=U(n,n.__c.__P,n.__c.__O);}var t;for(r.setState({__a:r.__b=null});t=r.t.pop();)t.forceUpdate();}},c=!0===t.__h;r.__u++||c||r.setState({__a:r.__b=r.__v.__k[0]}),n.then(i,i);},D.prototype.componentWillUnmount=function(){this.t=[];},D.prototype.render=function(n,e){if(this.__b){if(this.__v.__k){var r=document.createElement("div"),o=this.__v.__k[0].__c;this.__v.__k[0]=L(this.__b,r,o.__O=o.__P);}this.__b=null;}var i=e.__a&&v$1(d$1,null,n.fallback);return i&&(i.__h=null),[v$1(d$1,null,e.__a?null:n.children),i]};var W=function(n,t,e){if(++e[1]===e[0]&&n.o.delete(t),n.props.revealOrder&&("t"!==n.props.revealOrder[0]||!n.o.size))for(e=n.u;e;){for(;e.length>3;)e.pop()();if(e[1]<e[0])break;n.u=e=e[2];}};function P(n){return this.getChildContext=function(){return n.context},n.children}function $(n){var e=this,r=n.i;e.componentWillUnmount=function(){q$1(null,e.l),e.l=null,e.i=null;},e.i&&e.i!==r&&e.componentWillUnmount(),n.__v?(e.l||(e.i=r,e.l={nodeType:1,parentNode:r,childNodes:[],appendChild:function(n){this.childNodes.push(n),e.i.appendChild(n);},insertBefore:function(n,t){this.childNodes.push(n),e.i.appendChild(n);},removeChild:function(n){this.childNodes.splice(this.childNodes.indexOf(n)>>>1,1),e.i.removeChild(n);}}),q$1(v$1(P,{context:e.context},n.__v),e.l)):e.l&&e.componentWillUnmount();}function j(n,e){var r=v$1($,{__v:n,i:e});return r.containerInfo=e,r}(V.prototype=new _$2).__a=function(n){var t=this,e=F(t.__v),r=t.o.get(n);return r[0]++,function(u){var o=function(){t.props.revealOrder?(r.push(u),W(t,n,r)):u();};e?e(o):o();}},V.prototype.render=function(n){this.u=null,this.o=new Map;var t=A(n.children);n.revealOrder&&"b"===n.revealOrder[0]&&t.reverse();for(var e=t.length;e--;)this.o.set(t[e],this.u=[1,0,this.u]);return n.children},V.prototype.componentDidUpdate=V.prototype.componentDidMount=function(){var n=this;this.o.forEach(function(t,e){W(n,e,t);});};var z="undefined"!=typeof Symbol&&Symbol.for&&Symbol.for("react.element")||60103,B=/^(?:accent|alignment|arabic|baseline|cap|clip(?!PathU)|color|dominant|fill|flood|font|glyph(?!R)|horiz|image|letter|lighting|marker(?!H|W|U)|overline|paint|pointer|shape|stop|strikethrough|stroke|text(?!L)|transform|underline|unicode|units|v|vector|vert|word|writing|x(?!C))[A-Z]/,H="undefined"!=typeof document,Z=function(n){return ("undefined"!=typeof Symbol&&"symbol"==typeof Symbol()?/fil|che|rad/i:/fil|che|ra/i).test(n)};_$2.prototype.isReactComponent={},["componentWillMount","componentWillReceiveProps","componentWillUpdate"].forEach(function(t){Object.defineProperty(_$2.prototype,t,{configurable:!0,get:function(){return this["UNSAFE_"+t]},set:function(n){Object.defineProperty(this,t,{configurable:!0,writable:!0,value:n});}});});var G=l$1.event;function J(){}function K(){return this.cancelBubble}function Q(){return this.defaultPrevented}l$1.event=function(n){return G&&(n=G(n)),n.persist=J,n.isPropagationStopped=K,n.isDefaultPrevented=Q,n.nativeEvent=n};var nn={configurable:!0,get:function(){return this.class}},tn=l$1.vnode;l$1.vnode=function(n){var t=n.type,e=n.props,u=e;if("string"==typeof t){var o=-1===t.indexOf("-");for(var i in u={},e){var l=e[i];H&&"children"===i&&"noscript"===t||"value"===i&&"defaultValue"in e&&null==l||("defaultValue"===i&&"value"in e&&null==e.value?i="value":"download"===i&&!0===l?l="":/ondoubleclick/i.test(i)?i="ondblclick":/^onchange(textarea|input)/i.test(i+t)&&!Z(e.type)?i="oninput":/^onfocus$/i.test(i)?i="onfocusin":/^onblur$/i.test(i)?i="onfocusout":/^on(Ani|Tra|Tou|BeforeInp|Compo)/.test(i)?i=i.toLowerCase():o&&B.test(i)?i=i.replace(/[A-Z0-9]/g,"-$&").toLowerCase():null===l&&(l=void 0),/^oninput$/i.test(i)&&(i=i.toLowerCase(),u[i]&&(i="oninputCapture")),u[i]=l);}"select"==t&&u.multiple&&Array.isArray(u.value)&&(u.value=A(e.children).forEach(function(n){n.props.selected=-1!=u.value.indexOf(n.props.value);})),"select"==t&&null!=u.defaultValue&&(u.value=A(e.children).forEach(function(n){n.props.selected=u.multiple?-1!=u.defaultValue.indexOf(n.props.value):u.defaultValue==n.props.value;})),n.props=u,e.class!=e.className&&(nn.enumerable="className"in e,null!=e.className&&(u.class=e.className),Object.defineProperty(u,"className",nn));}n.$$typeof=z,tn&&tn(n);};var en=l$1.__r;l$1.__r=function(n){en&&en(n),n.__c;};var rn=l$1.diffed;l$1.diffed=function(n){rn&&rn(n);var t=n.props,e=n.__e;null!=e&&"textarea"===n.type&&"value"in t&&t.value!==e.value&&(e.value=null==t.value?"":t.value);};
+
+  /** Detect free variable `global` from Node.js. */
+  var freeGlobal = typeof global == 'object' && global && global.Object === Object && global;
+  var freeGlobal$1 = freeGlobal;
+
+  /** Detect free variable `self`. */
+  var freeSelf = typeof self == 'object' && self && self.Object === Object && self;
+
+  /** Used as a reference to the global object. */
+  var root = freeGlobal$1 || freeSelf || Function('return this')();
+  var root$1 = root;
+
+  /** Built-in value references. */
+  var Symbol$1 = root$1.Symbol;
+  var Symbol$2 = Symbol$1;
+
+  /** Used for built-in method references. */
+  var objectProto$8 = Object.prototype;
+
+  /** Used to check objects for own properties. */
+  var hasOwnProperty$6 = objectProto$8.hasOwnProperty;
+
+  /**
+   * Used to resolve the
+   * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
+   * of values.
+   */
+  var nativeObjectToString$1 = objectProto$8.toString;
+
+  /** Built-in value references. */
+  var symToStringTag$1 = Symbol$2 ? Symbol$2.toStringTag : undefined;
+
+  /**
+   * A specialized version of `baseGetTag` which ignores `Symbol.toStringTag` values.
+   *
+   * @private
+   * @param {*} value The value to query.
+   * @returns {string} Returns the raw `toStringTag`.
+   */
+  function getRawTag(value) {
+    var isOwn = hasOwnProperty$6.call(value, symToStringTag$1),
+      tag = value[symToStringTag$1];
     try {
-      n: if ("function" == typeof I) {
-        if (g = u.props, m = (s = I.contextType) && t[s.__c], x = s ? m ? m.props.value : s.__ : t, i.__c ? b = (h = u.__c = i.__c).__ = h.__E : ("prototype" in I && I.prototype.render ? u.__c = h = new I(g, x) : (u.__c = h = new _$2(g, x), h.constructor = I, h.render = S), m && m.sub(h), h.props = g, h.state || (h.state = {}), h.context = x, h.__n = t, v = h.__d = !0, h.__h = [], h._sb = []), null == h.__s && (h.__s = h.state), null != I.getDerivedStateFromProps && (h.__s == h.state && (h.__s = a$1({}, h.__s)), a$1(h.__s, I.getDerivedStateFromProps(g, h.__s))), y = h.props, p = h.state, h.__v = u, v) null == I.getDerivedStateFromProps && null != h.componentWillMount && h.componentWillMount(), null != h.componentDidMount && h.__h.push(h.componentDidMount);else {
-          if (null == I.getDerivedStateFromProps && g !== y && null != h.componentWillReceiveProps && h.componentWillReceiveProps(g, x), !h.__e && null != h.shouldComponentUpdate && !1 === h.shouldComponentUpdate(g, h.__s, x) || u.__v === i.__v) {
-            for (u.__v !== i.__v && (h.props = g, h.state = h.__s, h.__d = !1), h.__e = !1, u.__e = i.__e, u.__k = i.__k, u.__k.forEach(function (n) {
-              n && (n.__ = u);
-            }), A = 0; A < h._sb.length; A++) h.__h.push(h._sb[A]);
-            h._sb = [], h.__h.length && f.push(h);
-            break n;
-          }
-          null != h.componentWillUpdate && h.componentWillUpdate(g, h.__s, x), null != h.componentDidUpdate && h.__h.push(function () {
-            h.componentDidUpdate(y, p, k);
-          });
-        }
-        if (h.context = x, h.props = g, h.__P = n, P = l$1.__r, C = 0, "prototype" in I && I.prototype.render) {
-          for (h.state = h.__s, h.__d = !1, P && P(u), s = h.render(h.props, h.state, h.context), $ = 0; $ < h._sb.length; $++) h.__h.push(h._sb[$]);
-          h._sb = [];
-        } else do {
-          h.__d = !1, P && P(u), s = h.render(h.props, h.state, h.context), h.state = h.__s;
-        } while (h.__d && ++C < 25);
-        h.state = h.__s, null != h.getChildContext && (t = a$1(a$1({}, t), h.getChildContext())), v || null == h.getSnapshotBeforeUpdate || (k = h.getSnapshotBeforeUpdate(y, p)), H = null != s && s.type === d$1 && null == s.key ? s.props.children : s, w$2(n, Array.isArray(H) ? H : [H], u, i, t, r, o, f, e, c), h.base = u.__e, u.__h = null, h.__h.length && f.push(h), b && (h.__E = h.__ = null), h.__e = !1;
-      } else null == o && u.__v === i.__v ? (u.__k = i.__k, u.__e = i.__e) : u.__e = M(i.__e, u, i, t, r, o, f, c);
-      (s = l$1.diffed) && s(u);
-    } catch (n) {
-      u.__v = null, (c || null != o) && (u.__e = e, u.__h = !!c, o[o.indexOf(e)] = null), l$1.__e(n, u, i);
+      value[symToStringTag$1] = undefined;
+      var unmasked = true;
+    } catch (e) {}
+    var result = nativeObjectToString$1.call(value);
+    if (unmasked) {
+      if (isOwn) {
+        value[symToStringTag$1] = tag;
+      } else {
+        delete value[symToStringTag$1];
+      }
     }
+    return result;
   }
-  function L$1(n, u) {
-    l$1.__c && l$1.__c(u, n), n.some(function (u) {
+
+  /** Used for built-in method references. */
+  var objectProto$7 = Object.prototype;
+
+  /**
+   * Used to resolve the
+   * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
+   * of values.
+   */
+  var nativeObjectToString = objectProto$7.toString;
+
+  /**
+   * Converts `value` to a string using `Object.prototype.toString`.
+   *
+   * @private
+   * @param {*} value The value to convert.
+   * @returns {string} Returns the converted string.
+   */
+  function objectToString(value) {
+    return nativeObjectToString.call(value);
+  }
+
+  /** `Object#toString` result references. */
+  var nullTag = '[object Null]',
+    undefinedTag = '[object Undefined]';
+
+  /** Built-in value references. */
+  var symToStringTag = Symbol$2 ? Symbol$2.toStringTag : undefined;
+
+  /**
+   * The base implementation of `getTag` without fallbacks for buggy environments.
+   *
+   * @private
+   * @param {*} value The value to query.
+   * @returns {string} Returns the `toStringTag`.
+   */
+  function baseGetTag(value) {
+    if (value == null) {
+      return value === undefined ? undefinedTag : nullTag;
+    }
+    return symToStringTag && symToStringTag in Object(value) ? getRawTag(value) : objectToString(value);
+  }
+
+  /**
+   * Checks if `value` is object-like. A value is object-like if it's not `null`
+   * and has a `typeof` result of "object".
+   *
+   * @static
+   * @memberOf _
+   * @since 4.0.0
+   * @category Lang
+   * @param {*} value The value to check.
+   * @returns {boolean} Returns `true` if `value` is object-like, else `false`.
+   * @example
+   *
+   * _.isObjectLike({});
+   * // => true
+   *
+   * _.isObjectLike([1, 2, 3]);
+   * // => true
+   *
+   * _.isObjectLike(_.noop);
+   * // => false
+   *
+   * _.isObjectLike(null);
+   * // => false
+   */
+  function isObjectLike(value) {
+    return value != null && typeof value == 'object';
+  }
+
+  /** `Object#toString` result references. */
+  var symbolTag = '[object Symbol]';
+
+  /**
+   * Checks if `value` is classified as a `Symbol` primitive or object.
+   *
+   * @static
+   * @memberOf _
+   * @since 4.0.0
+   * @category Lang
+   * @param {*} value The value to check.
+   * @returns {boolean} Returns `true` if `value` is a symbol, else `false`.
+   * @example
+   *
+   * _.isSymbol(Symbol.iterator);
+   * // => true
+   *
+   * _.isSymbol('abc');
+   * // => false
+   */
+  function isSymbol(value) {
+    return typeof value == 'symbol' || isObjectLike(value) && baseGetTag(value) == symbolTag;
+  }
+
+  /**
+   * A specialized version of `_.map` for arrays without support for iteratee
+   * shorthands.
+   *
+   * @private
+   * @param {Array} [array] The array to iterate over.
+   * @param {Function} iteratee The function invoked per iteration.
+   * @returns {Array} Returns the new mapped array.
+   */
+  function arrayMap(array, iteratee) {
+    var index = -1,
+      length = array == null ? 0 : array.length,
+      result = Array(length);
+    while (++index < length) {
+      result[index] = iteratee(array[index], index, array);
+    }
+    return result;
+  }
+
+  /**
+   * Checks if `value` is classified as an `Array` object.
+   *
+   * @static
+   * @memberOf _
+   * @since 0.1.0
+   * @category Lang
+   * @param {*} value The value to check.
+   * @returns {boolean} Returns `true` if `value` is an array, else `false`.
+   * @example
+   *
+   * _.isArray([1, 2, 3]);
+   * // => true
+   *
+   * _.isArray(document.body.children);
+   * // => false
+   *
+   * _.isArray('abc');
+   * // => false
+   *
+   * _.isArray(_.noop);
+   * // => false
+   */
+  var isArray = Array.isArray;
+  var isArray$1 = isArray;
+
+  /** Used to match a single whitespace character. */
+  var reWhitespace = /\s/;
+
+  /**
+   * Used by `_.trim` and `_.trimEnd` to get the index of the last non-whitespace
+   * character of `string`.
+   *
+   * @private
+   * @param {string} string The string to inspect.
+   * @returns {number} Returns the index of the last non-whitespace character.
+   */
+  function trimmedEndIndex(string) {
+    var index = string.length;
+    while (index-- && reWhitespace.test(string.charAt(index))) {}
+    return index;
+  }
+
+  /** Used to match leading whitespace. */
+  var reTrimStart = /^\s+/;
+
+  /**
+   * The base implementation of `_.trim`.
+   *
+   * @private
+   * @param {string} string The string to trim.
+   * @returns {string} Returns the trimmed string.
+   */
+  function baseTrim(string) {
+    return string ? string.slice(0, trimmedEndIndex(string) + 1).replace(reTrimStart, '') : string;
+  }
+
+  /**
+   * Checks if `value` is the
+   * [language type](http://www.ecma-international.org/ecma-262/7.0/#sec-ecmascript-language-types)
+   * of `Object`. (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
+   *
+   * @static
+   * @memberOf _
+   * @since 0.1.0
+   * @category Lang
+   * @param {*} value The value to check.
+   * @returns {boolean} Returns `true` if `value` is an object, else `false`.
+   * @example
+   *
+   * _.isObject({});
+   * // => true
+   *
+   * _.isObject([1, 2, 3]);
+   * // => true
+   *
+   * _.isObject(_.noop);
+   * // => true
+   *
+   * _.isObject(null);
+   * // => false
+   */
+  function isObject(value) {
+    var type = typeof value;
+    return value != null && (type == 'object' || type == 'function');
+  }
+
+  /** Used as references for various `Number` constants. */
+  var NAN = 0 / 0;
+
+  /** Used to detect bad signed hexadecimal string values. */
+  var reIsBadHex = /^[-+]0x[0-9a-f]+$/i;
+
+  /** Used to detect binary string values. */
+  var reIsBinary = /^0b[01]+$/i;
+
+  /** Used to detect octal string values. */
+  var reIsOctal = /^0o[0-7]+$/i;
+
+  /** Built-in method references without a dependency on `root`. */
+  var freeParseInt = parseInt;
+
+  /**
+   * Converts `value` to a number.
+   *
+   * @static
+   * @memberOf _
+   * @since 4.0.0
+   * @category Lang
+   * @param {*} value The value to process.
+   * @returns {number} Returns the number.
+   * @example
+   *
+   * _.toNumber(3.2);
+   * // => 3.2
+   *
+   * _.toNumber(Number.MIN_VALUE);
+   * // => 5e-324
+   *
+   * _.toNumber(Infinity);
+   * // => Infinity
+   *
+   * _.toNumber('3.2');
+   * // => 3.2
+   */
+  function toNumber(value) {
+    if (typeof value == 'number') {
+      return value;
+    }
+    if (isSymbol(value)) {
+      return NAN;
+    }
+    if (isObject(value)) {
+      var other = typeof value.valueOf == 'function' ? value.valueOf() : value;
+      value = isObject(other) ? other + '' : other;
+    }
+    if (typeof value != 'string') {
+      return value === 0 ? value : +value;
+    }
+    value = baseTrim(value);
+    var isBinary = reIsBinary.test(value);
+    return isBinary || reIsOctal.test(value) ? freeParseInt(value.slice(2), isBinary ? 2 : 8) : reIsBadHex.test(value) ? NAN : +value;
+  }
+
+  /**
+   * This method returns the first argument it receives.
+   *
+   * @static
+   * @since 0.1.0
+   * @memberOf _
+   * @category Util
+   * @param {*} value Any value.
+   * @returns {*} Returns `value`.
+   * @example
+   *
+   * var object = { 'a': 1 };
+   *
+   * console.log(_.identity(object) === object);
+   * // => true
+   */
+  function identity(value) {
+    return value;
+  }
+
+  /** `Object#toString` result references. */
+  var asyncTag = '[object AsyncFunction]',
+    funcTag$1 = '[object Function]',
+    genTag = '[object GeneratorFunction]',
+    proxyTag = '[object Proxy]';
+
+  /**
+   * Checks if `value` is classified as a `Function` object.
+   *
+   * @static
+   * @memberOf _
+   * @since 0.1.0
+   * @category Lang
+   * @param {*} value The value to check.
+   * @returns {boolean} Returns `true` if `value` is a function, else `false`.
+   * @example
+   *
+   * _.isFunction(_);
+   * // => true
+   *
+   * _.isFunction(/abc/);
+   * // => false
+   */
+  function isFunction(value) {
+    if (!isObject(value)) {
+      return false;
+    }
+    // The use of `Object#toString` avoids issues with the `typeof` operator
+    // in Safari 9 which returns 'object' for typed arrays and other constructors.
+    var tag = baseGetTag(value);
+    return tag == funcTag$1 || tag == genTag || tag == asyncTag || tag == proxyTag;
+  }
+
+  /** Used to detect overreaching core-js shims. */
+  var coreJsData = root$1['__core-js_shared__'];
+  var coreJsData$1 = coreJsData;
+
+  /** Used to detect methods masquerading as native. */
+  var maskSrcKey = function () {
+    var uid = /[^.]+$/.exec(coreJsData$1 && coreJsData$1.keys && coreJsData$1.keys.IE_PROTO || '');
+    return uid ? 'Symbol(src)_1.' + uid : '';
+  }();
+
+  /**
+   * Checks if `func` has its source masked.
+   *
+   * @private
+   * @param {Function} func The function to check.
+   * @returns {boolean} Returns `true` if `func` is masked, else `false`.
+   */
+  function isMasked(func) {
+    return !!maskSrcKey && maskSrcKey in func;
+  }
+
+  /** Used for built-in method references. */
+  var funcProto$1 = Function.prototype;
+
+  /** Used to resolve the decompiled source of functions. */
+  var funcToString$1 = funcProto$1.toString;
+
+  /**
+   * Converts `func` to its source code.
+   *
+   * @private
+   * @param {Function} func The function to convert.
+   * @returns {string} Returns the source code.
+   */
+  function toSource(func) {
+    if (func != null) {
       try {
-        n = u.__h, u.__h = [], n.some(function (n) {
-          n.call(u);
-        });
-      } catch (n) {
-        l$1.__e(n, u.__v);
-      }
-    });
+        return funcToString$1.call(func);
+      } catch (e) {}
+      try {
+        return func + '';
+      } catch (e) {}
+    }
+    return '';
   }
-  function M(l, u, i, t, r, o, f, c) {
-    var s,
-      a,
-      v,
-      y = i.props,
-      p = u.props,
-      d = u.type,
-      _ = 0;
-    if ("svg" === d && (r = !0), null != o) for (; _ < o.length; _++) if ((s = o[_]) && "setAttribute" in s == !!d && (d ? s.localName === d : 3 === s.nodeType)) {
-      l = s, o[_] = null;
-      break;
+
+  /**
+   * Used to match `RegExp`
+   * [syntax characters](http://ecma-international.org/ecma-262/7.0/#sec-patterns).
+   */
+  var reRegExpChar = /[\\^$.*+?()[\]{}|]/g;
+
+  /** Used to detect host constructors (Safari). */
+  var reIsHostCtor = /^\[object .+?Constructor\]$/;
+
+  /** Used for built-in method references. */
+  var funcProto = Function.prototype,
+    objectProto$6 = Object.prototype;
+
+  /** Used to resolve the decompiled source of functions. */
+  var funcToString = funcProto.toString;
+
+  /** Used to check objects for own properties. */
+  var hasOwnProperty$5 = objectProto$6.hasOwnProperty;
+
+  /** Used to detect if a method is native. */
+  var reIsNative = RegExp('^' + funcToString.call(hasOwnProperty$5).replace(reRegExpChar, '\\$&').replace(/hasOwnProperty|(function).*?(?=\\\()| for .+?(?=\\\])/g, '$1.*?') + '$');
+
+  /**
+   * The base implementation of `_.isNative` without bad shim checks.
+   *
+   * @private
+   * @param {*} value The value to check.
+   * @returns {boolean} Returns `true` if `value` is a native function,
+   *  else `false`.
+   */
+  function baseIsNative(value) {
+    if (!isObject(value) || isMasked(value)) {
+      return false;
     }
-    if (null == l) {
-      if (null === d) return document.createTextNode(p);
-      l = r ? document.createElementNS("http://www.w3.org/2000/svg", d) : document.createElement(d, p.is && p), o = null, c = !1;
-    }
-    if (null === d) y === p || c && l.data === p || (l.data = p);else {
-      if (o = o && n.call(l.childNodes), a = (y = i.props || e$1).dangerouslySetInnerHTML, v = p.dangerouslySetInnerHTML, !c) {
-        if (null != o) for (y = {}, _ = 0; _ < l.attributes.length; _++) y[l.attributes[_].name] = l.attributes[_].value;
-        (v || a) && (v && (a && v.__html == a.__html || v.__html === l.innerHTML) || (l.innerHTML = v && v.__html || ""));
-      }
-      if ($$1(l, p, y, r, c), v) u.__k = [];else if (_ = u.props.children, w$2(l, Array.isArray(_) ? _ : [_], u, i, t, r && "foreignObject" !== d, o, f, o ? o[0] : i.__k && k$1(i, 0), c), null != o) for (_ = o.length; _--;) null != o[_] && h$1(o[_]);
-      c || ("value" in p && void 0 !== (_ = p.value) && (_ !== l.value || "progress" === d && !_ || "option" === d && _ !== y.value) && I$1(l, "value", _, y.value, !1), "checked" in p && void 0 !== (_ = p.checked) && _ !== l.checked && I$1(l, "checked", _, y.checked, !1));
-    }
-    return l;
+    var pattern = isFunction(value) ? reIsNative : reIsHostCtor;
+    return pattern.test(toSource(value));
   }
-  function N(n, u, i) {
+
+  /**
+   * Gets the value at `key` of `object`.
+   *
+   * @private
+   * @param {Object} [object] The object to query.
+   * @param {string} key The key of the property to get.
+   * @returns {*} Returns the property value.
+   */
+  function getValue(object, key) {
+    return object == null ? undefined : object[key];
+  }
+
+  /**
+   * Gets the native function at `key` of `object`.
+   *
+   * @private
+   * @param {Object} object The object to query.
+   * @param {string} key The key of the method to get.
+   * @returns {*} Returns the function if it's native, else `undefined`.
+   */
+  function getNative(object, key) {
+    var value = getValue(object, key);
+    return baseIsNative(value) ? value : undefined;
+  }
+
+  /**
+   * This method returns `undefined`.
+   *
+   * @static
+   * @memberOf _
+   * @since 2.3.0
+   * @category Util
+   * @example
+   *
+   * _.times(2, _.noop);
+   * // => [undefined, undefined]
+   */
+  function noop() {
+    // No operation performed.
+  }
+
+  /**
+   * Copies the values of `source` to `array`.
+   *
+   * @private
+   * @param {Array} source The array to copy values from.
+   * @param {Array} [array=[]] The array to copy values to.
+   * @returns {Array} Returns `array`.
+   */
+  function copyArray(source, array) {
+    var index = -1,
+      length = source.length;
+    array || (array = Array(length));
+    while (++index < length) {
+      array[index] = source[index];
+    }
+    return array;
+  }
+
+  /** Used as references for various `Number` constants. */
+  var MAX_SAFE_INTEGER$1 = 9007199254740991;
+
+  /** Used to detect unsigned integer values. */
+  var reIsUint = /^(?:0|[1-9]\d*)$/;
+
+  /**
+   * Checks if `value` is a valid array-like index.
+   *
+   * @private
+   * @param {*} value The value to check.
+   * @param {number} [length=MAX_SAFE_INTEGER] The upper bounds of a valid index.
+   * @returns {boolean} Returns `true` if `value` is a valid index, else `false`.
+   */
+  function isIndex(value, length) {
+    var type = typeof value;
+    length = length == null ? MAX_SAFE_INTEGER$1 : length;
+    return !!length && (type == 'number' || type != 'symbol' && reIsUint.test(value)) && value > -1 && value % 1 == 0 && value < length;
+  }
+
+  /**
+   * Performs a
+   * [`SameValueZero`](http://ecma-international.org/ecma-262/7.0/#sec-samevaluezero)
+   * comparison between two values to determine if they are equivalent.
+   *
+   * @static
+   * @memberOf _
+   * @since 4.0.0
+   * @category Lang
+   * @param {*} value The value to compare.
+   * @param {*} other The other value to compare.
+   * @returns {boolean} Returns `true` if the values are equivalent, else `false`.
+   * @example
+   *
+   * var object = { 'a': 1 };
+   * var other = { 'a': 1 };
+   *
+   * _.eq(object, object);
+   * // => true
+   *
+   * _.eq(object, other);
+   * // => false
+   *
+   * _.eq('a', 'a');
+   * // => true
+   *
+   * _.eq('a', Object('a'));
+   * // => false
+   *
+   * _.eq(NaN, NaN);
+   * // => true
+   */
+  function eq(value, other) {
+    return value === other || value !== value && other !== other;
+  }
+
+  /** Used as references for various `Number` constants. */
+  var MAX_SAFE_INTEGER = 9007199254740991;
+
+  /**
+   * Checks if `value` is a valid array-like length.
+   *
+   * **Note:** This method is loosely based on
+   * [`ToLength`](http://ecma-international.org/ecma-262/7.0/#sec-tolength).
+   *
+   * @static
+   * @memberOf _
+   * @since 4.0.0
+   * @category Lang
+   * @param {*} value The value to check.
+   * @returns {boolean} Returns `true` if `value` is a valid length, else `false`.
+   * @example
+   *
+   * _.isLength(3);
+   * // => true
+   *
+   * _.isLength(Number.MIN_VALUE);
+   * // => false
+   *
+   * _.isLength(Infinity);
+   * // => false
+   *
+   * _.isLength('3');
+   * // => false
+   */
+  function isLength(value) {
+    return typeof value == 'number' && value > -1 && value % 1 == 0 && value <= MAX_SAFE_INTEGER;
+  }
+
+  /**
+   * Checks if `value` is array-like. A value is considered array-like if it's
+   * not a function and has a `value.length` that's an integer greater than or
+   * equal to `0` and less than or equal to `Number.MAX_SAFE_INTEGER`.
+   *
+   * @static
+   * @memberOf _
+   * @since 4.0.0
+   * @category Lang
+   * @param {*} value The value to check.
+   * @returns {boolean} Returns `true` if `value` is array-like, else `false`.
+   * @example
+   *
+   * _.isArrayLike([1, 2, 3]);
+   * // => true
+   *
+   * _.isArrayLike(document.body.children);
+   * // => true
+   *
+   * _.isArrayLike('abc');
+   * // => true
+   *
+   * _.isArrayLike(_.noop);
+   * // => false
+   */
+  function isArrayLike(value) {
+    return value != null && isLength(value.length) && !isFunction(value);
+  }
+
+  /** Used for built-in method references. */
+  var objectProto$5 = Object.prototype;
+
+  /**
+   * Checks if `value` is likely a prototype object.
+   *
+   * @private
+   * @param {*} value The value to check.
+   * @returns {boolean} Returns `true` if `value` is a prototype, else `false`.
+   */
+  function isPrototype(value) {
+    var Ctor = value && value.constructor,
+      proto = typeof Ctor == 'function' && Ctor.prototype || objectProto$5;
+    return value === proto;
+  }
+
+  /**
+   * The base implementation of `_.times` without support for iteratee shorthands
+   * or max array length checks.
+   *
+   * @private
+   * @param {number} n The number of times to invoke `iteratee`.
+   * @param {Function} iteratee The function invoked per iteration.
+   * @returns {Array} Returns the array of results.
+   */
+  function baseTimes(n, iteratee) {
+    var index = -1,
+      result = Array(n);
+    while (++index < n) {
+      result[index] = iteratee(index);
+    }
+    return result;
+  }
+
+  /** `Object#toString` result references. */
+  var argsTag$1 = '[object Arguments]';
+
+  /**
+   * The base implementation of `_.isArguments`.
+   *
+   * @private
+   * @param {*} value The value to check.
+   * @returns {boolean} Returns `true` if `value` is an `arguments` object,
+   */
+  function baseIsArguments(value) {
+    return isObjectLike(value) && baseGetTag(value) == argsTag$1;
+  }
+
+  /** Used for built-in method references. */
+  var objectProto$4 = Object.prototype;
+
+  /** Used to check objects for own properties. */
+  var hasOwnProperty$4 = objectProto$4.hasOwnProperty;
+
+  /** Built-in value references. */
+  var propertyIsEnumerable = objectProto$4.propertyIsEnumerable;
+
+  /**
+   * Checks if `value` is likely an `arguments` object.
+   *
+   * @static
+   * @memberOf _
+   * @since 0.1.0
+   * @category Lang
+   * @param {*} value The value to check.
+   * @returns {boolean} Returns `true` if `value` is an `arguments` object,
+   *  else `false`.
+   * @example
+   *
+   * _.isArguments(function() { return arguments; }());
+   * // => true
+   *
+   * _.isArguments([1, 2, 3]);
+   * // => false
+   */
+  var isArguments = baseIsArguments(function () {
+    return arguments;
+  }()) ? baseIsArguments : function (value) {
+    return isObjectLike(value) && hasOwnProperty$4.call(value, 'callee') && !propertyIsEnumerable.call(value, 'callee');
+  };
+  var isArguments$1 = isArguments;
+
+  /**
+   * This method returns `false`.
+   *
+   * @static
+   * @memberOf _
+   * @since 4.13.0
+   * @category Util
+   * @returns {boolean} Returns `false`.
+   * @example
+   *
+   * _.times(2, _.stubFalse);
+   * // => [false, false]
+   */
+  function stubFalse() {
+    return false;
+  }
+
+  /** Detect free variable `exports`. */
+  var freeExports$1 = typeof exports == 'object' && exports && !exports.nodeType && exports;
+
+  /** Detect free variable `module`. */
+  var freeModule$1 = freeExports$1 && typeof module == 'object' && module && !module.nodeType && module;
+
+  /** Detect the popular CommonJS extension `module.exports`. */
+  var moduleExports$1 = freeModule$1 && freeModule$1.exports === freeExports$1;
+
+  /** Built-in value references. */
+  var Buffer = moduleExports$1 ? root$1.Buffer : undefined;
+
+  /* Built-in method references for those with the same name as other `lodash` methods. */
+  var nativeIsBuffer = Buffer ? Buffer.isBuffer : undefined;
+
+  /**
+   * Checks if `value` is a buffer.
+   *
+   * @static
+   * @memberOf _
+   * @since 4.3.0
+   * @category Lang
+   * @param {*} value The value to check.
+   * @returns {boolean} Returns `true` if `value` is a buffer, else `false`.
+   * @example
+   *
+   * _.isBuffer(new Buffer(2));
+   * // => true
+   *
+   * _.isBuffer(new Uint8Array(2));
+   * // => false
+   */
+  var isBuffer = nativeIsBuffer || stubFalse;
+  var isBuffer$1 = isBuffer;
+
+  /** `Object#toString` result references. */
+  var argsTag = '[object Arguments]',
+    arrayTag = '[object Array]',
+    boolTag = '[object Boolean]',
+    dateTag = '[object Date]',
+    errorTag = '[object Error]',
+    funcTag = '[object Function]',
+    mapTag = '[object Map]',
+    numberTag = '[object Number]',
+    objectTag = '[object Object]',
+    regexpTag = '[object RegExp]',
+    setTag = '[object Set]',
+    stringTag = '[object String]',
+    weakMapTag = '[object WeakMap]';
+  var arrayBufferTag = '[object ArrayBuffer]',
+    dataViewTag = '[object DataView]',
+    float32Tag = '[object Float32Array]',
+    float64Tag = '[object Float64Array]',
+    int8Tag = '[object Int8Array]',
+    int16Tag = '[object Int16Array]',
+    int32Tag = '[object Int32Array]',
+    uint8Tag = '[object Uint8Array]',
+    uint8ClampedTag = '[object Uint8ClampedArray]',
+    uint16Tag = '[object Uint16Array]',
+    uint32Tag = '[object Uint32Array]';
+
+  /** Used to identify `toStringTag` values of typed arrays. */
+  var typedArrayTags = {};
+  typedArrayTags[float32Tag] = typedArrayTags[float64Tag] = typedArrayTags[int8Tag] = typedArrayTags[int16Tag] = typedArrayTags[int32Tag] = typedArrayTags[uint8Tag] = typedArrayTags[uint8ClampedTag] = typedArrayTags[uint16Tag] = typedArrayTags[uint32Tag] = true;
+  typedArrayTags[argsTag] = typedArrayTags[arrayTag] = typedArrayTags[arrayBufferTag] = typedArrayTags[boolTag] = typedArrayTags[dataViewTag] = typedArrayTags[dateTag] = typedArrayTags[errorTag] = typedArrayTags[funcTag] = typedArrayTags[mapTag] = typedArrayTags[numberTag] = typedArrayTags[objectTag] = typedArrayTags[regexpTag] = typedArrayTags[setTag] = typedArrayTags[stringTag] = typedArrayTags[weakMapTag] = false;
+
+  /**
+   * The base implementation of `_.isTypedArray` without Node.js optimizations.
+   *
+   * @private
+   * @param {*} value The value to check.
+   * @returns {boolean} Returns `true` if `value` is a typed array, else `false`.
+   */
+  function baseIsTypedArray(value) {
+    return isObjectLike(value) && isLength(value.length) && !!typedArrayTags[baseGetTag(value)];
+  }
+
+  /**
+   * The base implementation of `_.unary` without support for storing metadata.
+   *
+   * @private
+   * @param {Function} func The function to cap arguments for.
+   * @returns {Function} Returns the new capped function.
+   */
+  function baseUnary(func) {
+    return function (value) {
+      return func(value);
+    };
+  }
+
+  /** Detect free variable `exports`. */
+  var freeExports = typeof exports == 'object' && exports && !exports.nodeType && exports;
+
+  /** Detect free variable `module`. */
+  var freeModule = freeExports && typeof module == 'object' && module && !module.nodeType && module;
+
+  /** Detect the popular CommonJS extension `module.exports`. */
+  var moduleExports = freeModule && freeModule.exports === freeExports;
+
+  /** Detect free variable `process` from Node.js. */
+  var freeProcess = moduleExports && freeGlobal$1.process;
+
+  /** Used to access faster Node.js helpers. */
+  var nodeUtil = function () {
     try {
-      "function" == typeof n ? n(u) : n.current = u;
-    } catch (n) {
-      l$1.__e(n, i);
-    }
-  }
-  function O(n, u, i) {
-    var t, r;
-    if (l$1.unmount && l$1.unmount(n), (t = n.ref) && (t.current && t.current !== n.__e || N(t, null, u)), null != (t = n.__c)) {
-      if (t.componentWillUnmount) try {
-        t.componentWillUnmount();
-      } catch (n) {
-        l$1.__e(n, u);
+      // Use `util.types` for Node.js 10+.
+      var types = freeModule && freeModule.require && freeModule.require('util').types;
+      if (types) {
+        return types;
       }
-      t.base = t.__P = null, n.__c = void 0;
-    }
-    if (t = n.__k) for (r = 0; r < t.length; r++) t[r] && O(t[r], u, i || "function" != typeof n.type);
-    i || null == n.__e || h$1(n.__e), n.__ = n.__e = n.__d = void 0;
-  }
-  function S(n, l, u) {
-    return this.constructor(n, u);
-  }
-  function q$1(u, i, t) {
-    var r, o, f;
-    l$1.__ && l$1.__(u, i), o = (r = "function" == typeof t) ? null : t && t.__k || i.__k, f = [], z$2(i, u = (!r && t || i).__k = v$1(d$1, null, [u]), o || e$1, e$1, void 0 !== i.ownerSVGElement, !r && t ? [t] : o ? null : i.firstChild ? n.call(i.childNodes) : null, f, !r && t ? t : o ? o.__e : i.firstChild, r), L$1(f, u);
-  }
-  function D$1(l, u, i) {
-    var t,
-      r,
-      o,
-      f = a$1({}, l.props);
-    for (o in u) "key" == o ? t = u[o] : "ref" == o ? r = u[o] : f[o] = u[o];
-    return arguments.length > 2 && (f.children = arguments.length > 3 ? n.call(arguments, 2) : i), y$1(l.type, f, t || l.key, r || l.ref, null);
-  }
-  function E(n, l) {
-    var u = {
-      __c: l = "__cC" + f$1++,
-      __: n,
-      Consumer: function (n, l) {
-        return n.children(l);
-      },
-      Provider: function (n) {
-        var u, i;
-        return this.getChildContext || (u = [], (i = {})[l] = this, this.getChildContext = function () {
-          return i;
-        }, this.shouldComponentUpdate = function (n) {
-          this.props.value !== n.value && u.some(function (n) {
-            n.__e = !0, g$2(n);
-          });
-        }, this.sub = function (n) {
-          u.push(n);
-          var l = n.componentWillUnmount;
-          n.componentWillUnmount = function () {
-            u.splice(u.indexOf(n), 1), l && l.call(n);
-          };
-        }), n.children;
+
+      // Legacy `process.binding('util')` for Node.js < 10.
+      return freeProcess && freeProcess.binding && freeProcess.binding('util');
+    } catch (e) {}
+  }();
+  var nodeUtil$1 = nodeUtil;
+
+  /* Node.js helper references. */
+  var nodeIsTypedArray = nodeUtil$1 && nodeUtil$1.isTypedArray;
+
+  /**
+   * Checks if `value` is classified as a typed array.
+   *
+   * @static
+   * @memberOf _
+   * @since 3.0.0
+   * @category Lang
+   * @param {*} value The value to check.
+   * @returns {boolean} Returns `true` if `value` is a typed array, else `false`.
+   * @example
+   *
+   * _.isTypedArray(new Uint8Array);
+   * // => true
+   *
+   * _.isTypedArray([]);
+   * // => false
+   */
+  var isTypedArray = nodeIsTypedArray ? baseUnary(nodeIsTypedArray) : baseIsTypedArray;
+  var isTypedArray$1 = isTypedArray;
+
+  /** Used for built-in method references. */
+  var objectProto$3 = Object.prototype;
+
+  /** Used to check objects for own properties. */
+  var hasOwnProperty$3 = objectProto$3.hasOwnProperty;
+
+  /**
+   * Creates an array of the enumerable property names of the array-like `value`.
+   *
+   * @private
+   * @param {*} value The value to query.
+   * @param {boolean} inherited Specify returning inherited property names.
+   * @returns {Array} Returns the array of property names.
+   */
+  function arrayLikeKeys(value, inherited) {
+    var isArr = isArray$1(value),
+      isArg = !isArr && isArguments$1(value),
+      isBuff = !isArr && !isArg && isBuffer$1(value),
+      isType = !isArr && !isArg && !isBuff && isTypedArray$1(value),
+      skipIndexes = isArr || isArg || isBuff || isType,
+      result = skipIndexes ? baseTimes(value.length, String) : [],
+      length = result.length;
+    for (var key in value) {
+      if ((inherited || hasOwnProperty$3.call(value, key)) && !(skipIndexes && (
+      // Safari 9 has enumerable `arguments.length` in strict mode.
+      key == 'length' ||
+      // Node.js 0.10 has enumerable non-index properties on buffers.
+      isBuff && (key == 'offset' || key == 'parent') ||
+      // PhantomJS 2 has enumerable non-index properties on typed arrays.
+      isType && (key == 'buffer' || key == 'byteLength' || key == 'byteOffset') ||
+      // Skip index properties.
+      isIndex(key, length)))) {
+        result.push(key);
       }
+    }
+    return result;
+  }
+
+  /**
+   * Creates a unary function that invokes `func` with its argument transformed.
+   *
+   * @private
+   * @param {Function} func The function to wrap.
+   * @param {Function} transform The argument transform.
+   * @returns {Function} Returns the new function.
+   */
+  function overArg(func, transform) {
+    return function (arg) {
+      return func(transform(arg));
     };
-    return u.Provider.__ = u.Consumer.contextType = u;
   }
-  n = c$1.slice, l$1 = {
-    __e: function (n, l, u, i) {
-      for (var t, r, o; l = l.__;) if ((t = l.__c) && !t.__) try {
-        if ((r = t.constructor) && null != r.getDerivedStateFromError && (t.setState(r.getDerivedStateFromError(n)), o = t.__d), null != t.componentDidCatch && (t.componentDidCatch(n, i || {}), o = t.__d), o) return t.__E = t;
-      } catch (l) {
-        n = l;
-      }
-      throw n;
+
+  /* Built-in method references for those with the same name as other `lodash` methods. */
+  var nativeKeys = overArg(Object.keys, Object);
+  var nativeKeys$1 = nativeKeys;
+
+  /** Used for built-in method references. */
+  var objectProto$2 = Object.prototype;
+
+  /** Used to check objects for own properties. */
+  var hasOwnProperty$2 = objectProto$2.hasOwnProperty;
+
+  /**
+   * The base implementation of `_.keys` which doesn't treat sparse arrays as dense.
+   *
+   * @private
+   * @param {Object} object The object to query.
+   * @returns {Array} Returns the array of property names.
+   */
+  function baseKeys(object) {
+    if (!isPrototype(object)) {
+      return nativeKeys$1(object);
     }
-  }, u$1 = 0, _$2.prototype.setState = function (n, l) {
-    var u;
-    u = null != this.__s && this.__s !== this.state ? this.__s : this.__s = a$1({}, this.state), "function" == typeof n && (n = n(a$1({}, u), this.props)), n && a$1(u, n), null != n && this.__v && (l && this._sb.push(l), g$2(this));
-  }, _$2.prototype.forceUpdate = function (n) {
-    this.__v && (this.__e = !0, n && this.__h.push(n), g$2(this));
-  }, _$2.prototype.render = d$1, t$1 = [], o$2 = "function" == typeof Promise ? Promise.prototype.then.bind(Promise.resolve()) : setTimeout, m$1.__r = 0, f$1 = 0;
-  var _$1 = 0;
-  function o$1(o, e, n, t, f, l) {
-    var s,
-      u,
-      a = {};
-    for (u in e) "ref" == u ? s = e[u] : a[u] = e[u];
-    var i = {
-      type: o,
-      props: a,
-      key: n,
-      ref: s,
-      __k: null,
-      __: null,
-      __b: 0,
-      __e: null,
-      __d: void 0,
-      __c: null,
-      __h: null,
-      constructor: void 0,
-      __v: --_$1,
-      __source: f,
-      __self: l
+    var result = [];
+    for (var key in Object(object)) {
+      if (hasOwnProperty$2.call(object, key) && key != 'constructor') {
+        result.push(key);
+      }
+    }
+    return result;
+  }
+
+  /**
+   * Creates an array of the own enumerable property names of `object`.
+   *
+   * **Note:** Non-object values are coerced to objects. See the
+   * [ES spec](http://ecma-international.org/ecma-262/7.0/#sec-object.keys)
+   * for more details.
+   *
+   * @static
+   * @since 0.1.0
+   * @memberOf _
+   * @category Object
+   * @param {Object} object The object to query.
+   * @returns {Array} Returns the array of property names.
+   * @example
+   *
+   * function Foo() {
+   *   this.a = 1;
+   *   this.b = 2;
+   * }
+   *
+   * Foo.prototype.c = 3;
+   *
+   * _.keys(new Foo);
+   * // => ['a', 'b'] (iteration order is not guaranteed)
+   *
+   * _.keys('hi');
+   * // => ['0', '1']
+   */
+  function keys(object) {
+    return isArrayLike(object) ? arrayLikeKeys(object) : baseKeys(object);
+  }
+
+  /* Built-in method references that are verified to be native. */
+  var nativeCreate = getNative(Object, 'create');
+  var nativeCreate$1 = nativeCreate;
+
+  /**
+   * Removes all key-value entries from the hash.
+   *
+   * @private
+   * @name clear
+   * @memberOf Hash
+   */
+  function hashClear() {
+    this.__data__ = nativeCreate$1 ? nativeCreate$1(null) : {};
+    this.size = 0;
+  }
+
+  /**
+   * Removes `key` and its value from the hash.
+   *
+   * @private
+   * @name delete
+   * @memberOf Hash
+   * @param {Object} hash The hash to modify.
+   * @param {string} key The key of the value to remove.
+   * @returns {boolean} Returns `true` if the entry was removed, else `false`.
+   */
+  function hashDelete(key) {
+    var result = this.has(key) && delete this.__data__[key];
+    this.size -= result ? 1 : 0;
+    return result;
+  }
+
+  /** Used to stand-in for `undefined` hash values. */
+  var HASH_UNDEFINED$1 = '__lodash_hash_undefined__';
+
+  /** Used for built-in method references. */
+  var objectProto$1 = Object.prototype;
+
+  /** Used to check objects for own properties. */
+  var hasOwnProperty$1 = objectProto$1.hasOwnProperty;
+
+  /**
+   * Gets the hash value for `key`.
+   *
+   * @private
+   * @name get
+   * @memberOf Hash
+   * @param {string} key The key of the value to get.
+   * @returns {*} Returns the entry value.
+   */
+  function hashGet(key) {
+    var data = this.__data__;
+    if (nativeCreate$1) {
+      var result = data[key];
+      return result === HASH_UNDEFINED$1 ? undefined : result;
+    }
+    return hasOwnProperty$1.call(data, key) ? data[key] : undefined;
+  }
+
+  /** Used for built-in method references. */
+  var objectProto = Object.prototype;
+
+  /** Used to check objects for own properties. */
+  var hasOwnProperty = objectProto.hasOwnProperty;
+
+  /**
+   * Checks if a hash value for `key` exists.
+   *
+   * @private
+   * @name has
+   * @memberOf Hash
+   * @param {string} key The key of the entry to check.
+   * @returns {boolean} Returns `true` if an entry for `key` exists, else `false`.
+   */
+  function hashHas(key) {
+    var data = this.__data__;
+    return nativeCreate$1 ? data[key] !== undefined : hasOwnProperty.call(data, key);
+  }
+
+  /** Used to stand-in for `undefined` hash values. */
+  var HASH_UNDEFINED = '__lodash_hash_undefined__';
+
+  /**
+   * Sets the hash `key` to `value`.
+   *
+   * @private
+   * @name set
+   * @memberOf Hash
+   * @param {string} key The key of the value to set.
+   * @param {*} value The value to set.
+   * @returns {Object} Returns the hash instance.
+   */
+  function hashSet(key, value) {
+    var data = this.__data__;
+    this.size += this.has(key) ? 0 : 1;
+    data[key] = nativeCreate$1 && value === undefined ? HASH_UNDEFINED : value;
+    return this;
+  }
+
+  /**
+   * Creates a hash object.
+   *
+   * @private
+   * @constructor
+   * @param {Array} [entries] The key-value pairs to cache.
+   */
+  function Hash(entries) {
+    var index = -1,
+      length = entries == null ? 0 : entries.length;
+    this.clear();
+    while (++index < length) {
+      var entry = entries[index];
+      this.set(entry[0], entry[1]);
+    }
+  }
+
+  // Add methods to `Hash`.
+  Hash.prototype.clear = hashClear;
+  Hash.prototype['delete'] = hashDelete;
+  Hash.prototype.get = hashGet;
+  Hash.prototype.has = hashHas;
+  Hash.prototype.set = hashSet;
+
+  /**
+   * Removes all key-value entries from the list cache.
+   *
+   * @private
+   * @name clear
+   * @memberOf ListCache
+   */
+  function listCacheClear() {
+    this.__data__ = [];
+    this.size = 0;
+  }
+
+  /**
+   * Gets the index at which the `key` is found in `array` of key-value pairs.
+   *
+   * @private
+   * @param {Array} array The array to inspect.
+   * @param {*} key The key to search for.
+   * @returns {number} Returns the index of the matched value, else `-1`.
+   */
+  function assocIndexOf(array, key) {
+    var length = array.length;
+    while (length--) {
+      if (eq(array[length][0], key)) {
+        return length;
+      }
+    }
+    return -1;
+  }
+
+  /** Used for built-in method references. */
+  var arrayProto = Array.prototype;
+
+  /** Built-in value references. */
+  var splice = arrayProto.splice;
+
+  /**
+   * Removes `key` and its value from the list cache.
+   *
+   * @private
+   * @name delete
+   * @memberOf ListCache
+   * @param {string} key The key of the value to remove.
+   * @returns {boolean} Returns `true` if the entry was removed, else `false`.
+   */
+  function listCacheDelete(key) {
+    var data = this.__data__,
+      index = assocIndexOf(data, key);
+    if (index < 0) {
+      return false;
+    }
+    var lastIndex = data.length - 1;
+    if (index == lastIndex) {
+      data.pop();
+    } else {
+      splice.call(data, index, 1);
+    }
+    --this.size;
+    return true;
+  }
+
+  /**
+   * Gets the list cache value for `key`.
+   *
+   * @private
+   * @name get
+   * @memberOf ListCache
+   * @param {string} key The key of the value to get.
+   * @returns {*} Returns the entry value.
+   */
+  function listCacheGet(key) {
+    var data = this.__data__,
+      index = assocIndexOf(data, key);
+    return index < 0 ? undefined : data[index][1];
+  }
+
+  /**
+   * Checks if a list cache value for `key` exists.
+   *
+   * @private
+   * @name has
+   * @memberOf ListCache
+   * @param {string} key The key of the entry to check.
+   * @returns {boolean} Returns `true` if an entry for `key` exists, else `false`.
+   */
+  function listCacheHas(key) {
+    return assocIndexOf(this.__data__, key) > -1;
+  }
+
+  /**
+   * Sets the list cache `key` to `value`.
+   *
+   * @private
+   * @name set
+   * @memberOf ListCache
+   * @param {string} key The key of the value to set.
+   * @param {*} value The value to set.
+   * @returns {Object} Returns the list cache instance.
+   */
+  function listCacheSet(key, value) {
+    var data = this.__data__,
+      index = assocIndexOf(data, key);
+    if (index < 0) {
+      ++this.size;
+      data.push([key, value]);
+    } else {
+      data[index][1] = value;
+    }
+    return this;
+  }
+
+  /**
+   * Creates an list cache object.
+   *
+   * @private
+   * @constructor
+   * @param {Array} [entries] The key-value pairs to cache.
+   */
+  function ListCache(entries) {
+    var index = -1,
+      length = entries == null ? 0 : entries.length;
+    this.clear();
+    while (++index < length) {
+      var entry = entries[index];
+      this.set(entry[0], entry[1]);
+    }
+  }
+
+  // Add methods to `ListCache`.
+  ListCache.prototype.clear = listCacheClear;
+  ListCache.prototype['delete'] = listCacheDelete;
+  ListCache.prototype.get = listCacheGet;
+  ListCache.prototype.has = listCacheHas;
+  ListCache.prototype.set = listCacheSet;
+
+  /* Built-in method references that are verified to be native. */
+  var Map$1 = getNative(root$1, 'Map');
+  var Map$2 = Map$1;
+
+  /**
+   * Removes all key-value entries from the map.
+   *
+   * @private
+   * @name clear
+   * @memberOf MapCache
+   */
+  function mapCacheClear() {
+    this.size = 0;
+    this.__data__ = {
+      'hash': new Hash(),
+      'map': new (Map$2 || ListCache)(),
+      'string': new Hash()
     };
-    if ("function" == typeof o && (s = o.defaultProps)) for (u in s) void 0 === a[u] && (a[u] = s[u]);
-    return l$1.vnode && l$1.vnode(i), i;
   }
-  var t,
-    r$1,
-    u,
-    i,
-    o = 0,
-    f = [],
-    c = [],
-    e = l$1.__b,
-    a = l$1.__r,
-    v = l$1.diffed,
-    l = l$1.__c,
-    m = l$1.unmount;
-  function d(t, u) {
-    l$1.__h && l$1.__h(r$1, t, o || u), o = 0;
-    var i = r$1.__H || (r$1.__H = {
-      __: [],
-      __h: []
-    });
-    return t >= i.__.length && i.__.push({
-      __V: c
-    }), i.__[t];
+
+  /**
+   * Checks if `value` is suitable for use as unique object key.
+   *
+   * @private
+   * @param {*} value The value to check.
+   * @returns {boolean} Returns `true` if `value` is suitable, else `false`.
+   */
+  function isKeyable(value) {
+    var type = typeof value;
+    return type == 'string' || type == 'number' || type == 'symbol' || type == 'boolean' ? value !== '__proto__' : value === null;
   }
-  function p(n) {
-    return o = 1, y(B$1, n);
+
+  /**
+   * Gets the data for `map`.
+   *
+   * @private
+   * @param {Object} map The map to query.
+   * @param {string} key The reference key.
+   * @returns {*} Returns the map data.
+   */
+  function getMapData(map, key) {
+    var data = map.__data__;
+    return isKeyable(key) ? data[typeof key == 'string' ? 'string' : 'hash'] : data.map;
   }
-  function y(n, u, i) {
-    var o = d(t++, 2);
-    if (o.t = n, !o.__c && (o.__ = [i ? i(u) : B$1(void 0, u), function (n) {
-      var t = o.__N ? o.__N[0] : o.__[0],
-        r = o.t(t, n);
-      t !== r && (o.__N = [r, o.__[1]], o.__c.setState({}));
-    }], o.__c = r$1, !r$1.u)) {
-      r$1.u = !0;
-      var f = r$1.shouldComponentUpdate;
-      r$1.shouldComponentUpdate = function (n, t, r) {
-        if (!o.__c.__H) return !0;
-        var u = o.__c.__H.__.filter(function (n) {
-          return n.__c;
-        });
-        if (u.every(function (n) {
-          return !n.__N;
-        })) return !f || f.call(this, n, t, r);
-        var i = !1;
-        return u.forEach(function (n) {
-          if (n.__N) {
-            var t = n.__[0];
-            n.__ = n.__N, n.__N = void 0, t !== n.__[0] && (i = !0);
-          }
-        }), !(!i && o.__c.props === n) && (!f || f.call(this, n, t, r));
-      };
+
+  /**
+   * Removes `key` and its value from the map.
+   *
+   * @private
+   * @name delete
+   * @memberOf MapCache
+   * @param {string} key The key of the value to remove.
+   * @returns {boolean} Returns `true` if the entry was removed, else `false`.
+   */
+  function mapCacheDelete(key) {
+    var result = getMapData(this, key)['delete'](key);
+    this.size -= result ? 1 : 0;
+    return result;
+  }
+
+  /**
+   * Gets the map value for `key`.
+   *
+   * @private
+   * @name get
+   * @memberOf MapCache
+   * @param {string} key The key of the value to get.
+   * @returns {*} Returns the entry value.
+   */
+  function mapCacheGet(key) {
+    return getMapData(this, key).get(key);
+  }
+
+  /**
+   * Checks if a map value for `key` exists.
+   *
+   * @private
+   * @name has
+   * @memberOf MapCache
+   * @param {string} key The key of the entry to check.
+   * @returns {boolean} Returns `true` if an entry for `key` exists, else `false`.
+   */
+  function mapCacheHas(key) {
+    return getMapData(this, key).has(key);
+  }
+
+  /**
+   * Sets the map `key` to `value`.
+   *
+   * @private
+   * @name set
+   * @memberOf MapCache
+   * @param {string} key The key of the value to set.
+   * @param {*} value The value to set.
+   * @returns {Object} Returns the map cache instance.
+   */
+  function mapCacheSet(key, value) {
+    var data = getMapData(this, key),
+      size = data.size;
+    data.set(key, value);
+    this.size += data.size == size ? 0 : 1;
+    return this;
+  }
+
+  /**
+   * Creates a map cache object to store key-value pairs.
+   *
+   * @private
+   * @constructor
+   * @param {Array} [entries] The key-value pairs to cache.
+   */
+  function MapCache(entries) {
+    var index = -1,
+      length = entries == null ? 0 : entries.length;
+    this.clear();
+    while (++index < length) {
+      var entry = entries[index];
+      this.set(entry[0], entry[1]);
     }
-    return o.__N || o.__;
   }
-  function h(u, i) {
-    var o = d(t++, 3);
-    !l$1.__s && z$1(o.__H, i) && (o.__ = u, o.i = i, r$1.__H.__h.push(o));
-  }
-  function s(u, i) {
-    var o = d(t++, 4);
-    !l$1.__s && z$1(o.__H, i) && (o.__ = u, o.i = i, r$1.__h.push(o));
-  }
-  function _(n) {
-    return o = 5, F$1(function () {
-      return {
-        current: n
-      };
-    }, []);
-  }
-  function F$1(n, r) {
-    var u = d(t++, 7);
-    return z$1(u.__H, r) ? (u.__V = n(), u.i = r, u.__h = n, u.__V) : u.__;
-  }
-  function T$1(n, t) {
-    return o = 8, F$1(function () {
-      return n;
-    }, t);
-  }
-  function q(n) {
-    var u = r$1.context[n.__c],
-      i = d(t++, 9);
-    return i.c = n, u ? (null == i.__ && (i.__ = !0, u.sub(r$1)), u.props.value) : n.__;
-  }
-  function V$1() {
-    var n = d(t++, 11);
-    if (!n.__) {
-      for (var u = r$1.__v; null !== u && !u.__m && null !== u.__;) u = u.__;
-      var i = u.__m || (u.__m = [0, 0]);
-      n.__ = "P" + i[0] + "-" + i[1]++;
+
+  // Add methods to `MapCache`.
+  MapCache.prototype.clear = mapCacheClear;
+  MapCache.prototype['delete'] = mapCacheDelete;
+  MapCache.prototype.get = mapCacheGet;
+  MapCache.prototype.has = mapCacheHas;
+  MapCache.prototype.set = mapCacheSet;
+
+  /** Error message constants. */
+  var FUNC_ERROR_TEXT$1 = 'Expected a function';
+
+  /**
+   * Creates a function that memoizes the result of `func`. If `resolver` is
+   * provided, it determines the cache key for storing the result based on the
+   * arguments provided to the memoized function. By default, the first argument
+   * provided to the memoized function is used as the map cache key. The `func`
+   * is invoked with the `this` binding of the memoized function.
+   *
+   * **Note:** The cache is exposed as the `cache` property on the memoized
+   * function. Its creation may be customized by replacing the `_.memoize.Cache`
+   * constructor with one whose instances implement the
+   * [`Map`](http://ecma-international.org/ecma-262/7.0/#sec-properties-of-the-map-prototype-object)
+   * method interface of `clear`, `delete`, `get`, `has`, and `set`.
+   *
+   * @static
+   * @memberOf _
+   * @since 0.1.0
+   * @category Function
+   * @param {Function} func The function to have its output memoized.
+   * @param {Function} [resolver] The function to resolve the cache key.
+   * @returns {Function} Returns the new memoized function.
+   * @example
+   *
+   * var object = { 'a': 1, 'b': 2 };
+   * var other = { 'c': 3, 'd': 4 };
+   *
+   * var values = _.memoize(_.values);
+   * values(object);
+   * // => [1, 2]
+   *
+   * values(other);
+   * // => [3, 4]
+   *
+   * object.a = 2;
+   * values(object);
+   * // => [1, 2]
+   *
+   * // Modify the result cache.
+   * values.cache.set(object, ['a', 'b']);
+   * values(object);
+   * // => ['a', 'b']
+   *
+   * // Replace `_.memoize.Cache`.
+   * _.memoize.Cache = WeakMap;
+   */
+  function memoize(func, resolver) {
+    if (typeof func != 'function' || resolver != null && typeof resolver != 'function') {
+      throw new TypeError(FUNC_ERROR_TEXT$1);
     }
-    return n.__;
-  }
-  function b() {
-    for (var t; t = f.shift();) if (t.__P && t.__H) try {
-      t.__H.__h.forEach(k), t.__H.__h.forEach(w$1), t.__H.__h = [];
-    } catch (r) {
-      t.__H.__h = [], l$1.__e(r, t.__v);
-    }
-  }
-  l$1.__b = function (n) {
-    r$1 = null, e && e(n);
-  }, l$1.__r = function (n) {
-    a && a(n), t = 0;
-    var i = (r$1 = n.__c).__H;
-    i && (u === r$1 ? (i.__h = [], r$1.__h = [], i.__.forEach(function (n) {
-      n.__N && (n.__ = n.__N), n.__V = c, n.__N = n.i = void 0;
-    })) : (i.__h.forEach(k), i.__h.forEach(w$1), i.__h = [])), u = r$1;
-  }, l$1.diffed = function (t) {
-    v && v(t);
-    var o = t.__c;
-    o && o.__H && (o.__H.__h.length && (1 !== f.push(o) && i === l$1.requestAnimationFrame || ((i = l$1.requestAnimationFrame) || j$1)(b)), o.__H.__.forEach(function (n) {
-      n.i && (n.__H = n.i), n.__V !== c && (n.__ = n.__V), n.i = void 0, n.__V = c;
-    })), u = r$1 = null;
-  }, l$1.__c = function (t, r) {
-    r.some(function (t) {
-      try {
-        t.__h.forEach(k), t.__h = t.__h.filter(function (n) {
-          return !n.__ || w$1(n);
-        });
-      } catch (u) {
-        r.some(function (n) {
-          n.__h && (n.__h = []);
-        }), r = [], l$1.__e(u, t.__v);
+    var memoized = function () {
+      var args = arguments,
+        key = resolver ? resolver.apply(this, args) : args[0],
+        cache = memoized.cache;
+      if (cache.has(key)) {
+        return cache.get(key);
       }
-    }), l && l(t, r);
-  }, l$1.unmount = function (t) {
-    m && m(t);
-    var r,
-      u = t.__c;
-    u && u.__H && (u.__H.__.forEach(function (n) {
-      try {
-        k(n);
-      } catch (n) {
-        r = n;
+      var result = func.apply(this, args);
+      memoized.cache = cache.set(key, result) || cache;
+      return result;
+    };
+    memoized.cache = new (memoize.Cache || MapCache)();
+    return memoized;
+  }
+
+  // Expose `MapCache`.
+  memoize.Cache = MapCache;
+
+  /**
+   * Gets the timestamp of the number of milliseconds that have elapsed since
+   * the Unix epoch (1 January 1970 00:00:00 UTC).
+   *
+   * @static
+   * @memberOf _
+   * @since 2.4.0
+   * @category Date
+   * @returns {number} Returns the timestamp.
+   * @example
+   *
+   * _.defer(function(stamp) {
+   *   console.log(_.now() - stamp);
+   * }, _.now());
+   * // => Logs the number of milliseconds it took for the deferred invocation.
+   */
+  var now = function () {
+    return root$1.Date.now();
+  };
+  var now$1 = now;
+
+  /** Error message constants. */
+  var FUNC_ERROR_TEXT = 'Expected a function';
+
+  /* Built-in method references for those with the same name as other `lodash` methods. */
+  var nativeMax = Math.max,
+    nativeMin = Math.min;
+
+  /**
+   * Creates a debounced function that delays invoking `func` until after `wait`
+   * milliseconds have elapsed since the last time the debounced function was
+   * invoked. The debounced function comes with a `cancel` method to cancel
+   * delayed `func` invocations and a `flush` method to immediately invoke them.
+   * Provide `options` to indicate whether `func` should be invoked on the
+   * leading and/or trailing edge of the `wait` timeout. The `func` is invoked
+   * with the last arguments provided to the debounced function. Subsequent
+   * calls to the debounced function return the result of the last `func`
+   * invocation.
+   *
+   * **Note:** If `leading` and `trailing` options are `true`, `func` is
+   * invoked on the trailing edge of the timeout only if the debounced function
+   * is invoked more than once during the `wait` timeout.
+   *
+   * If `wait` is `0` and `leading` is `false`, `func` invocation is deferred
+   * until to the next tick, similar to `setTimeout` with a timeout of `0`.
+   *
+   * See [David Corbacho's article](https://css-tricks.com/debouncing-throttling-explained-examples/)
+   * for details over the differences between `_.debounce` and `_.throttle`.
+   *
+   * @static
+   * @memberOf _
+   * @since 0.1.0
+   * @category Function
+   * @param {Function} func The function to debounce.
+   * @param {number} [wait=0] The number of milliseconds to delay.
+   * @param {Object} [options={}] The options object.
+   * @param {boolean} [options.leading=false]
+   *  Specify invoking on the leading edge of the timeout.
+   * @param {number} [options.maxWait]
+   *  The maximum time `func` is allowed to be delayed before it's invoked.
+   * @param {boolean} [options.trailing=true]
+   *  Specify invoking on the trailing edge of the timeout.
+   * @returns {Function} Returns the new debounced function.
+   * @example
+   *
+   * // Avoid costly calculations while the window size is in flux.
+   * jQuery(window).on('resize', _.debounce(calculateLayout, 150));
+   *
+   * // Invoke `sendMail` when clicked, debouncing subsequent calls.
+   * jQuery(element).on('click', _.debounce(sendMail, 300, {
+   *   'leading': true,
+   *   'trailing': false
+   * }));
+   *
+   * // Ensure `batchLog` is invoked once after 1 second of debounced calls.
+   * var debounced = _.debounce(batchLog, 250, { 'maxWait': 1000 });
+   * var source = new EventSource('/stream');
+   * jQuery(source).on('message', debounced);
+   *
+   * // Cancel the trailing debounced invocation.
+   * jQuery(window).on('popstate', debounced.cancel);
+   */
+  function debounce(func, wait, options) {
+    var lastArgs,
+      lastThis,
+      maxWait,
+      result,
+      timerId,
+      lastCallTime,
+      lastInvokeTime = 0,
+      leading = false,
+      maxing = false,
+      trailing = true;
+    if (typeof func != 'function') {
+      throw new TypeError(FUNC_ERROR_TEXT);
+    }
+    wait = toNumber(wait) || 0;
+    if (isObject(options)) {
+      leading = !!options.leading;
+      maxing = 'maxWait' in options;
+      maxWait = maxing ? nativeMax(toNumber(options.maxWait) || 0, wait) : maxWait;
+      trailing = 'trailing' in options ? !!options.trailing : trailing;
+    }
+    function invokeFunc(time) {
+      var args = lastArgs,
+        thisArg = lastThis;
+      lastArgs = lastThis = undefined;
+      lastInvokeTime = time;
+      result = func.apply(thisArg, args);
+      return result;
+    }
+    function leadingEdge(time) {
+      // Reset any `maxWait` timer.
+      lastInvokeTime = time;
+      // Start the timer for the trailing edge.
+      timerId = setTimeout(timerExpired, wait);
+      // Invoke the leading edge.
+      return leading ? invokeFunc(time) : result;
+    }
+    function remainingWait(time) {
+      var timeSinceLastCall = time - lastCallTime,
+        timeSinceLastInvoke = time - lastInvokeTime,
+        timeWaiting = wait - timeSinceLastCall;
+      return maxing ? nativeMin(timeWaiting, maxWait - timeSinceLastInvoke) : timeWaiting;
+    }
+    function shouldInvoke(time) {
+      var timeSinceLastCall = time - lastCallTime,
+        timeSinceLastInvoke = time - lastInvokeTime;
+
+      // Either this is the first call, activity has stopped and we're at the
+      // trailing edge, the system time has gone backwards and we're treating
+      // it as the trailing edge, or we've hit the `maxWait` limit.
+      return lastCallTime === undefined || timeSinceLastCall >= wait || timeSinceLastCall < 0 || maxing && timeSinceLastInvoke >= maxWait;
+    }
+    function timerExpired() {
+      var time = now$1();
+      if (shouldInvoke(time)) {
+        return trailingEdge(time);
       }
-    }), u.__H = void 0, r && l$1.__e(r, u.__v));
-  };
-  var g$1 = "function" == typeof requestAnimationFrame;
-  function j$1(n) {
-    var t,
-      r = function () {
-        clearTimeout(u), g$1 && cancelAnimationFrame(t), setTimeout(n);
-      },
-      u = setTimeout(r, 100);
-    g$1 && (t = requestAnimationFrame(r));
-  }
-  function k(n) {
-    var t = r$1,
-      u = n.__c;
-    "function" == typeof u && (n.__c = void 0, u()), r$1 = t;
-  }
-  function w$1(n) {
-    var t = r$1;
-    n.__c = n.__(), r$1 = t;
-  }
-  function z$1(n, t) {
-    return !n || n.length !== t.length || t.some(function (t, r) {
-      return t !== n[r];
-    });
-  }
-  function B$1(n, t) {
-    return "function" == typeof t ? t(n) : t;
-  }
-  function g(n, t) {
-    for (var e in t) n[e] = t[e];
-    return n;
-  }
-  function C(n, t) {
-    for (var e in n) if ("__source" !== e && !(e in t)) return !0;
-    for (var r in t) if ("__source" !== r && n[r] !== t[r]) return !0;
-    return !1;
-  }
-  function w(n) {
-    this.props = n;
-  }
-  function x(n, e) {
-    function r(n) {
-      var t = this.props.ref,
-        r = t == n.ref;
-      return !r && t && (t.call ? t(null) : t.current = null), e ? !e(this.props, n) || !r : C(this.props, n);
+      // Restart the timer.
+      timerId = setTimeout(timerExpired, remainingWait(time));
     }
-    function u(e) {
-      return this.shouldComponentUpdate = r, v$1(n, e);
+    function trailingEdge(time) {
+      timerId = undefined;
+
+      // Only invoke if we have `lastArgs` which means `func` has been
+      // debounced at least once.
+      if (trailing && lastArgs) {
+        return invokeFunc(time);
+      }
+      lastArgs = lastThis = undefined;
+      return result;
     }
-    return u.displayName = "Memo(" + (n.displayName || n.name) + ")", u.prototype.isReactComponent = !0, u.__f = !0, u;
-  }
-  (w.prototype = new _$2()).isPureReactComponent = !0, w.prototype.shouldComponentUpdate = function (n, t) {
-    return C(this.props, n) || C(this.state, t);
-  };
-  var R = l$1.__b;
-  l$1.__b = function (n) {
-    n.type && n.type.__f && n.ref && (n.props.ref = n.ref, n.ref = null), R && R(n);
-  };
-  var T = l$1.__e;
-  l$1.__e = function (n, t, e, r) {
-    if (n.then) for (var u, o = t; o = o.__;) if ((u = o.__c) && u.__c) return null == t.__e && (t.__e = e.__e, t.__k = e.__k), u.__c(n, t);
-    T(n, t, e, r);
-  };
-  var I = l$1.unmount;
-  function L(n, t, e) {
-    return n && (n.__c && n.__c.__H && (n.__c.__H.__.forEach(function (n) {
-      "function" == typeof n.__c && n.__c();
-    }), n.__c.__H = null), null != (n = g({}, n)).__c && (n.__c.__P === e && (n.__c.__P = t), n.__c = null), n.__k = n.__k && n.__k.map(function (n) {
-      return L(n, t, e);
-    })), n;
-  }
-  function U(n, t, e) {
-    return n && (n.__v = null, n.__k = n.__k && n.__k.map(function (n) {
-      return U(n, t, e);
-    }), n.__c && n.__c.__P === t && (n.__e && e.insertBefore(n.__e, n.__d), n.__c.__e = !0, n.__c.__P = e)), n;
-  }
-  function D() {
-    this.__u = 0, this.t = null, this.__b = null;
-  }
-  function F(n) {
-    var t = n.__.__c;
-    return t && t.__a && t.__a(n);
-  }
-  function V() {
-    this.u = null, this.o = null;
-  }
-  l$1.unmount = function (n) {
-    var t = n.__c;
-    t && t.__R && t.__R(), t && !0 === n.__h && (n.type = null), I && I(n);
-  }, (D.prototype = new _$2()).__c = function (n, t) {
-    var e = t.__c,
-      r = this;
-    null == r.t && (r.t = []), r.t.push(e);
-    var u = F(r.__v),
-      o = !1,
-      i = function () {
-        o || (o = !0, e.__R = null, u ? u(l) : l());
-      };
-    e.__R = i;
-    var l = function () {
-        if (! --r.__u) {
-          if (r.state.__a) {
-            var n = r.state.__a;
-            r.__v.__k[0] = U(n, n.__c.__P, n.__c.__O);
-          }
-          var t;
-          for (r.setState({
-            __a: r.__b = null
-          }); t = r.t.pop();) t.forceUpdate();
+    function cancel() {
+      if (timerId !== undefined) {
+        clearTimeout(timerId);
+      }
+      lastInvokeTime = 0;
+      lastArgs = lastCallTime = lastThis = timerId = undefined;
+    }
+    function flush() {
+      return timerId === undefined ? result : trailingEdge(now$1());
+    }
+    function debounced() {
+      var time = now$1(),
+        isInvoking = shouldInvoke(time);
+      lastArgs = arguments;
+      lastThis = this;
+      lastCallTime = time;
+      if (isInvoking) {
+        if (timerId === undefined) {
+          return leadingEdge(lastCallTime);
         }
-      },
-      c = !0 === t.__h;
-    r.__u++ || c || r.setState({
-      __a: r.__b = r.__v.__k[0]
-    }), n.then(i, i);
-  }, D.prototype.componentWillUnmount = function () {
-    this.t = [];
-  }, D.prototype.render = function (n, e) {
-    if (this.__b) {
-      if (this.__v.__k) {
-        var r = document.createElement("div"),
-          o = this.__v.__k[0].__c;
-        this.__v.__k[0] = L(this.__b, r, o.__O = o.__P);
+        if (maxing) {
+          // Handle invocations in a tight loop.
+          clearTimeout(timerId);
+          timerId = setTimeout(timerExpired, wait);
+          return invokeFunc(lastCallTime);
+        }
       }
-      this.__b = null;
+      if (timerId === undefined) {
+        timerId = setTimeout(timerExpired, wait);
+      }
+      return result;
     }
-    var i = e.__a && v$1(d$1, null, n.fallback);
-    return i && (i.__h = null), [v$1(d$1, null, e.__a ? null : n.children), i];
-  };
-  var W = function (n, t, e) {
-    if (++e[1] === e[0] && n.o.delete(t), n.props.revealOrder && ("t" !== n.props.revealOrder[0] || !n.o.size)) for (e = n.u; e;) {
-      for (; e.length > 3;) e.pop()();
-      if (e[1] < e[0]) break;
-      n.u = e = e[2];
+    debounced.cancel = cancel;
+    debounced.flush = flush;
+    return debounced;
+  }
+
+  /**
+   * The base implementation of `_.values` and `_.valuesIn` which creates an
+   * array of `object` property values corresponding to the property names
+   * of `props`.
+   *
+   * @private
+   * @param {Object} object The object to query.
+   * @param {Array} props The property names to get values for.
+   * @returns {Object} Returns the array of property values.
+   */
+  function baseValues(object, props) {
+    return arrayMap(props, function (key) {
+      return object[key];
+    });
+  }
+
+  /**
+   * Creates an array of the own enumerable string keyed property values of `object`.
+   *
+   * **Note:** Non-object values are coerced to objects.
+   *
+   * @static
+   * @since 0.1.0
+   * @memberOf _
+   * @category Object
+   * @param {Object} object The object to query.
+   * @returns {Array} Returns the array of property values.
+   * @example
+   *
+   * function Foo() {
+   *   this.a = 1;
+   *   this.b = 2;
+   * }
+   *
+   * Foo.prototype.c = 3;
+   *
+   * _.values(new Foo);
+   * // => [1, 2] (iteration order is not guaranteed)
+   *
+   * _.values('hi');
+   * // => ['h', 'i']
+   */
+  function values(object) {
+    return object == null ? [] : baseValues(object, keys(object));
+  }
+
+  /* Built-in method references for those with the same name as other `lodash` methods. */
+  var nativeFloor = Math.floor,
+    nativeRandom = Math.random;
+
+  /**
+   * The base implementation of `_.random` without support for returning
+   * floating-point numbers.
+   *
+   * @private
+   * @param {number} lower The lower bound.
+   * @param {number} upper The upper bound.
+   * @returns {number} Returns the random number.
+   */
+  function baseRandom(lower, upper) {
+    return lower + nativeFloor(nativeRandom() * (upper - lower + 1));
+  }
+
+  /**
+   * A specialized version of `_.shuffle` which mutates and sets the size of `array`.
+   *
+   * @private
+   * @param {Array} array The array to shuffle.
+   * @param {number} [size=array.length] The size of `array`.
+   * @returns {Array} Returns `array`.
+   */
+  function shuffleSelf(array, size) {
+    var index = -1,
+      length = array.length,
+      lastIndex = length - 1;
+    size = size === undefined ? length : size;
+    while (++index < size) {
+      var rand = baseRandom(index, lastIndex),
+        value = array[rand];
+      array[rand] = array[index];
+      array[index] = value;
     }
-  };
-  function P(n) {
-    return this.getChildContext = function () {
-      return n.context;
-    }, n.children;
+    array.length = size;
+    return array;
   }
-  function $(n) {
-    var e = this,
-      r = n.i;
-    e.componentWillUnmount = function () {
-      q$1(null, e.l), e.l = null, e.i = null;
-    }, e.i && e.i !== r && e.componentWillUnmount(), n.__v ? (e.l || (e.i = r, e.l = {
-      nodeType: 1,
-      parentNode: r,
-      childNodes: [],
-      appendChild: function (n) {
-        this.childNodes.push(n), e.i.appendChild(n);
-      },
-      insertBefore: function (n, t) {
-        this.childNodes.push(n), e.i.appendChild(n);
-      },
-      removeChild: function (n) {
-        this.childNodes.splice(this.childNodes.indexOf(n) >>> 1, 1), e.i.removeChild(n);
-      }
-    }), q$1(v$1(P, {
-      context: e.context
-    }, n.__v), e.l)) : e.l && e.componentWillUnmount();
+
+  /**
+   * A specialized version of `_.shuffle` for arrays.
+   *
+   * @private
+   * @param {Array} array The array to shuffle.
+   * @returns {Array} Returns the new shuffled array.
+   */
+  function arrayShuffle(array) {
+    return shuffleSelf(copyArray(array));
   }
-  function j(n, e) {
-    var r = v$1($, {
-      __v: n,
-      i: e
-    });
-    return r.containerInfo = e, r;
+
+  /**
+   * The base implementation of `_.shuffle`.
+   *
+   * @private
+   * @param {Array|Object} collection The collection to shuffle.
+   * @returns {Array} Returns the new shuffled array.
+   */
+  function baseShuffle(collection) {
+    return shuffleSelf(values(collection));
   }
-  (V.prototype = new _$2()).__a = function (n) {
-    var t = this,
-      e = F(t.__v),
-      r = t.o.get(n);
-    return r[0]++, function (u) {
-      var o = function () {
-        t.props.revealOrder ? (r.push(u), W(t, n, r)) : u();
-      };
-      e ? e(o) : o();
-    };
-  }, V.prototype.render = function (n) {
-    this.u = null, this.o = new Map();
-    var t = A(n.children);
-    n.revealOrder && "b" === n.revealOrder[0] && t.reverse();
-    for (var e = t.length; e--;) this.o.set(t[e], this.u = [1, 0, this.u]);
-    return n.children;
-  }, V.prototype.componentDidUpdate = V.prototype.componentDidMount = function () {
-    var n = this;
-    this.o.forEach(function (t, e) {
-      W(n, e, t);
-    });
-  };
-  var z = "undefined" != typeof Symbol && Symbol.for && Symbol.for("react.element") || 60103,
-    B = /^(?:accent|alignment|arabic|baseline|cap|clip(?!PathU)|color|dominant|fill|flood|font|glyph(?!R)|horiz|image|letter|lighting|marker(?!H|W|U)|overline|paint|pointer|shape|stop|strikethrough|stroke|text(?!L)|transform|underline|unicode|units|v|vector|vert|word|writing|x(?!C))[A-Z]/,
-    H = "undefined" != typeof document,
-    Z = function (n) {
-      return ("undefined" != typeof Symbol && "symbol" == typeof Symbol() ? /fil|che|rad/i : /fil|che|ra/i).test(n);
-    };
-  _$2.prototype.isReactComponent = {}, ["componentWillMount", "componentWillReceiveProps", "componentWillUpdate"].forEach(function (t) {
-    Object.defineProperty(_$2.prototype, t, {
-      configurable: !0,
-      get: function () {
-        return this["UNSAFE_" + t];
-      },
-      set: function (n) {
-        Object.defineProperty(this, t, {
-          configurable: !0,
-          writable: !0,
-          value: n
-        });
-      }
-    });
-  });
-  var G = l$1.event;
-  function J() {}
-  function K() {
-    return this.cancelBubble;
+
+  /**
+   * Creates an array of shuffled values, using a version of the
+   * [Fisher-Yates shuffle](https://en.wikipedia.org/wiki/Fisher-Yates_shuffle).
+   *
+   * @static
+   * @memberOf _
+   * @since 0.1.0
+   * @category Collection
+   * @param {Array|Object} collection The collection to shuffle.
+   * @returns {Array} Returns the new shuffled array.
+   * @example
+   *
+   * _.shuffle([1, 2, 3, 4]);
+   * // => [4, 1, 3, 2]
+   */
+  function shuffle(collection) {
+    var func = isArray$1(collection) ? arrayShuffle : baseShuffle;
+    return func(collection);
   }
-  function Q() {
-    return this.defaultPrevented;
-  }
-  l$1.event = function (n) {
-    return G && (n = G(n)), n.persist = J, n.isPropagationStopped = K, n.isDefaultPrevented = Q, n.nativeEvent = n;
-  };
-  var nn = {
-      configurable: !0,
-      get: function () {
-        return this.class;
-      }
-    },
-    tn = l$1.vnode;
-  l$1.vnode = function (n) {
-    var t = n.type,
-      e = n.props,
-      u = e;
-    if ("string" == typeof t) {
-      var o = -1 === t.indexOf("-");
-      for (var i in u = {}, e) {
-        var l = e[i];
-        H && "children" === i && "noscript" === t || "value" === i && "defaultValue" in e && null == l || ("defaultValue" === i && "value" in e && null == e.value ? i = "value" : "download" === i && !0 === l ? l = "" : /ondoubleclick/i.test(i) ? i = "ondblclick" : /^onchange(textarea|input)/i.test(i + t) && !Z(e.type) ? i = "oninput" : /^onfocus$/i.test(i) ? i = "onfocusin" : /^onblur$/i.test(i) ? i = "onfocusout" : /^on(Ani|Tra|Tou|BeforeInp|Compo)/.test(i) ? i = i.toLowerCase() : o && B.test(i) ? i = i.replace(/[A-Z0-9]/g, "-$&").toLowerCase() : null === l && (l = void 0), /^oninput$/i.test(i) && (i = i.toLowerCase(), u[i] && (i = "oninputCapture")), u[i] = l);
-      }
-      "select" == t && u.multiple && Array.isArray(u.value) && (u.value = A(e.children).forEach(function (n) {
-        n.props.selected = -1 != u.value.indexOf(n.props.value);
-      })), "select" == t && null != u.defaultValue && (u.value = A(e.children).forEach(function (n) {
-        n.props.selected = u.multiple ? -1 != u.defaultValue.indexOf(n.props.value) : u.defaultValue == n.props.value;
-      })), n.props = u, e.class != e.className && (nn.enumerable = "className" in e, null != e.className && (u.class = e.className), Object.defineProperty(u, "className", nn));
+
+  function getBuildModeUnmemoized() {
+    try {
+      var _process, _process$env;
+      if (((_process = process) === null || _process === void 0 ? void 0 : (_process$env = _process.env) === null || _process$env === void 0 ? void 0 : _process$env.NODE_ENV) === 'development') return 'development';
+      return 'production';
+    } catch (_e) {
+      return "production";
     }
-    n.$$typeof = z, tn && tn(n);
-  };
-  var en = l$1.__r;
-  l$1.__r = function (n) {
-    en && en(n), n.__c;
-  };
-  var rn = l$1.diffed;
-  l$1.diffed = function (n) {
-    rn && rn(n);
-    var t = n.props,
-      e = n.__e;
-    null != e && "textarea" === n.type && "value" in t && t.value !== e.value && (e.value = null == t.value ? "" : t.value);
-  };
+  }
+  const getBuildMode = memoize(getBuildModeUnmemoized);
 
   /**
    * Debug hook.
@@ -750,6 +1784,7 @@ var bundle = function (exports) {
     for (var _len = arguments.length, values = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
       values[_key - 1] = arguments[_key];
     }
+    if (getBuildMode() == 'production') return;
     const helperToEnsureStability = _([]);
     const shownError = _([]);
     useHelper(values.length, -1);
@@ -770,8 +1805,8 @@ var bundle = function (exports) {
     }
   }
   function debounceRendering(f) {
-    var _l$1$debounceRenderin;
-    ((_l$1$debounceRenderin = l$1.debounceRendering) !== null && _l$1$debounceRenderin !== void 0 ? _l$1$debounceRenderin : setTimeout)(f);
+    var _options$debounceRend;
+    ((_options$debounceRend = l$1.debounceRendering) !== null && _options$debounceRend !== void 0 ? _options$debounceRend : queueMicrotask)(f);
   }
   /**
    * Similar to `useState`, but for values that aren't "render-important" &ndash; updates don't cause a re-render and so the value shouldn't be used during render (though it certainly can, at least by re-rendering again).
@@ -892,6 +1927,7 @@ var bundle = function (exports) {
   function runImmediately(f) {
     f();
   }
+
   const Table = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-";
   function base64(value) {
     return Table[value];
@@ -943,8 +1979,8 @@ var bundle = function (exports) {
       }
     }
     toRun.clear();
-    for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-      args[_key2] = arguments[_key2];
+    for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
     }
     originalCommit === null || originalCommit === void 0 ? void 0 : originalCommit(...args);
   };
@@ -959,16 +1995,6 @@ var bundle = function (exports) {
    * @param inputs
    */
   function useBeforeLayoutEffect(effect, inputs) {
-    /*(() => {
-        const cleanup = useRef<void | (() => void) | null>(null);
-        const prevArgsRef = useRef<Inputs>(null!);
-        if (argsChanged(inputs, prevArgsRef.current)) {
-            prevArgsRef.current = inputs!;
-            if (cleanup.current)
-                cleanup.current();
-            cleanup.current = effect();
-        }
-    })();*/
     const [id] = p(() => generateRandomId());
     if (effect) toRun.set(id, {
       effect,
@@ -985,6 +2011,7 @@ var bundle = function (exports) {
   function argsChanged(oldArgs, newArgs) {
     return !!(!oldArgs || oldArgs.length !== (newArgs === null || newArgs === void 0 ? void 0 : newArgs.length) || newArgs !== null && newArgs !== void 0 && newArgs.some((arg, index) => arg !== oldArgs[index]));
   }
+
   const Unset$1 = Symbol("unset");
   /**
    * Given an input value, returns a constant getter function that can be used
@@ -1016,8 +2043,8 @@ var bundle = function (exports) {
    */
   function useStableObject(t) {
     const e = Object.entries(t);
-    useEnsureStability("useStableObject", e.length, ...e.map(_ref2 => {
-      let [_k, v] = _ref2;
+    useEnsureStability("useStableObject", e.length, ...e.map(_ref => {
+      let [_k, v] = _ref;
       return v;
     }));
     return _(t).current;
@@ -1060,6 +2087,7 @@ var bundle = function (exports) {
       return setIsStableGetter(T$1(fn, []));
     }
   }
+
   function useMergedChildren(lhs, rhs) {
     if (lhs == null && rhs == null) {
       return undefined;
@@ -1071,6 +2099,7 @@ var bundle = function (exports) {
       return v$1(d$1, {}, lhs, rhs);
     }
   }
+
   function r(e) {
     var t,
       f,
@@ -1103,6 +2132,7 @@ var bundle = function (exports) {
       return undefined;
     }
   }
+
   function processRef(instance, ref) {
     if (typeof ref === "function") {
       ref(instance);
@@ -1121,6 +2151,11 @@ var bundle = function (exports) {
    * @returns
    */
   function useMergedRefs(rhs, lhs) {
+    // This *must* be stable in order to prevent repeated reset `null` calls after every render.
+    const combined = useStableCallback(function combined(current) {
+      processRef(current, lhs);
+      processRef(current, rhs);
+    });
     if (lhs == null && rhs == null) {
       return undefined;
     } else if (lhs == null) {
@@ -1130,11 +2165,8 @@ var bundle = function (exports) {
     } else {
       return combined;
     }
-    function combined(current) {
-      processRef(current, lhs);
-      processRef(current, rhs);
-    }
   }
+
   function styleStringToObject(style) {
     // TODO: This sucks D:
     return Object.fromEntries(style.split(";").map(statement => statement.split(":")));
@@ -1173,6 +2205,7 @@ var bundle = function (exports) {
       ...(rhs !== null && rhs !== void 0 ? rhs : {})
     };
   }
+
   let log = console.warn;
   /**
    * Given two sets of props, merges them and returns the result.
@@ -1183,8 +2216,8 @@ var bundle = function (exports) {
    * @returns
    */
   function useMergedProps() {
-    for (var _len3 = arguments.length, allProps = new Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
-      allProps[_key3] = arguments[_key3];
+    for (var _len = arguments.length, allProps = new Array(_len), _key = 0; _key < _len; _key++) {
+      allProps[_key] = arguments[_key];
     }
     useEnsureStability("useMergedProps", allProps.length);
     let ret = {};
@@ -1211,9 +2244,10 @@ var bundle = function (exports) {
         // Not really ideal though.
         return rhsValue;
       } else {
+        var _log;
         // Ugh.
         // No good strategies here, just log it if requested
-        log === null || log === void 0 ? void 0 : log("The prop \"".concat(key, "\" cannot simultaneously be the values ").concat(lhsValue, " and ").concat(rhsValue, ". One must be chosen outside of useMergedProps."));
+        (_log = log) === null || _log === void 0 ? void 0 : _log("The prop \"".concat(key, "\" cannot simultaneously be the values ").concat(lhsValue, " and ").concat(rhsValue, ". One must be chosen outside of useMergedProps."));
         return rhsValue;
       }
     }
@@ -1257,147 +2291,6 @@ var bundle = function (exports) {
       if (lv instanceof Promise || rv instanceof Promise) return Promise.all([lv, rv]);
     };
   }
-  /*
-  function test<P extends h.JSX.HTMLAttributes<HTMLInputElement>>(props: P) {
-       const id0: GenericGet<{}, "id", string> = "";
-      const id3: GenericGet<{ id: undefined }, "id", string> = undefined;
-      const id4: GenericGet<{ id: undefined }, "id", string> = undefined;
-      const id5: GenericGet<{ id: undefined }, "id", string> = undefined;
-      const id6: GenericGet<{ id: undefined }, "id", string> = undefined;
-      //const id2: ZipSingle<string | undefined, string | undefined> = undefined;
-      const id1: ZipObject<{ id: undefined }, { id: string }> = { id: undefined };
-       type M1 = GenericGet<P, "style", string>;
-      type M2 = GenericGet<{}, "style", string>;
-      const m1: M1 = "";
-      const m2: M1 = undefined;
-      /// @ts-expect-error    Because number isn't assignable to string
-      const m3: M1 = 0;
-       const m4: M2 = "";
-      const m5: M2 = undefined;
-      /// @ts-expect-error    Because number isn't assignable to string
-      const m6: M2 = 0;
-       const p1: MergedProps<HTMLInputElement, {}, { id: string }> = useMergedProps<HTMLInputElement>()({}, { id: "string" });
-      const p2: MergedProps<HTMLInputElement, { id: undefined }, { id: string }> = useMergedProps<HTMLInputElement>()({ id: undefined }, { id: "string" });
-      const p3: MergedProps<HTMLInputElement, { id: undefined }, { id: undefined }> = useMergedProps<HTMLInputElement>()({ id: undefined }, { id: undefined });
-      const p4: MergedProps<HTMLInputElement, {}, {}> = useMergedProps<HTMLInputElement>()({}, {});
-      const p5 = useMergedProps<HTMLInputElement>()(props, {});
-      const p6 = useMergedProps<HTMLInputElement>()(props, { id: undefined });
-      const p7 = useMergedProps<HTMLInputElement>()(props, { id: "string" });
-        p1.id?.concat("");
-      p2.id?.concat("");
-      /// @ts-expect-error    id can't be anything but undefined
-      p3.id?.concat("");
-      /// @ts-expect-error    id can't be anything but undefined
-      p4.id?.concat("");
-        p5.id?.concat("");
-      p6.id?.concat("");
-      p7.id?.concat("");
-       /// @ts-expect-error    id must contain undefined
-      p5.id.concat("");
-      /// @ts-expect-error    id must contain undefined
-      p6.id.concat("");
-      /// @ts-expect-error    id must contain undefined
-      p7.id.concat("");
-        if (p5.allowFullScreen === undefined) {}
-      else if (p5.allowFullScreen === false) {}
-      else if (p5.allowFullScreen === true) {}
-      else {
-          acceptsNever(p5.allowFullScreen);
-      }
-        if (p6.allowFullScreen === undefined) {}
-      else if (p6.allowFullScreen === false) {}
-      else if (p6.allowFullScreen === true) {}
-      else {
-          acceptsNever(p6.allowFullScreen);
-      }
-        if (p7.allowFullScreen === undefined) {}
-      else if (p7.allowFullScreen === false) {}
-      else if (p7.allowFullScreen === true) {}
-      else {
-          acceptsNever(p7.allowFullScreen);
-      }
-        // Make sure it works recursively
-      const r1a = useMergedProps<HTMLInputElement>()({}, p1);
-      const r1b = useMergedProps<HTMLInputElement>()(props, p1);
-      const r2a = useMergedProps<HTMLInputElement>()({}, p2);
-      const r2b = useMergedProps<HTMLInputElement>()(props, p2);
-      const r3a = useMergedProps<HTMLInputElement>()({}, p3);
-      const r3b = useMergedProps<HTMLInputElement>()(props, p3);
-      const r4a = useMergedProps<HTMLInputElement>()({}, p4);
-      const r4b = useMergedProps<HTMLInputElement>()(props, p4);
-      const r5a = useMergedProps<HTMLInputElement>()({}, p5);
-      const r5b = useMergedProps<HTMLInputElement>()(props, p5);
-      const r6a = useMergedProps<HTMLInputElement>()({}, p6);
-      const r6b = useMergedProps<HTMLInputElement>()(props, p6);
-      const r7a = useMergedProps<HTMLInputElement>()({}, p7);
-      const r7b = useMergedProps<HTMLInputElement>()(props, p7);
-        r1a.id?.concat("");
-      r1b.id?.concat("");
-      r2a.id?.concat("");
-      r2b.id?.concat("");
-      // @ts-expect-error    id can't be anything but undefined
-      r3a.id?.concat("");
-      r3b.id?.concat("");
-      /// @ts-expect-error    id can't be anything but undefined
-      r4a.id?.concat("");
-      r4b.id?.concat("");
-        r5a.id?.concat("");
-      r5b.id?.concat("");
-      r6a.id?.concat("");
-      r6b.id?.concat("");
-      r7a.id?.concat("");
-      r7b.id?.concat("");
-       /// @ts-expect-error    id must contain undefined
-      r5a.id.concat("");
-      /// @ts-expect-error    id must contain undefined
-      r5b.id.concat("");
-      /// @ts-expect-error    id must contain undefined
-      r6a.id.concat("");
-      /// @ts-expect-error    id must contain undefined
-      r6b.id.concat("");
-      /// @ts-expect-error    id must contain undefined
-      r7a.id.concat("");
-      /// @ts-expect-error    id must contain undefined
-      r7b.id.concat("");
-        if (r5a.allowFullScreen === undefined) {}
-      else if (r5a.allowFullScreen === false) {}
-      else if (r5a.allowFullScreen === true) {}
-      else {
-          acceptsNever(r5a.allowFullScreen);
-      }
-        if (r5b.allowFullScreen === undefined) {}
-      else if (r5b.allowFullScreen === false) {}
-      else if (r5b.allowFullScreen === true) {}
-      else {
-          acceptsNever(r5b.allowFullScreen);
-      }
-        if (r6a.allowFullScreen === undefined) {}
-      else if (r6a.allowFullScreen === false) {}
-      else if (r6a.allowFullScreen === true) {}
-      else {
-          acceptsNever(r6a.allowFullScreen);
-      }
-        if (r6b.allowFullScreen === undefined) {}
-      else if (r6b.allowFullScreen === false) {}
-      else if (r6b.allowFullScreen === true) {}
-      else {
-          acceptsNever(r6b.allowFullScreen);
-      }
-        if (r7a.allowFullScreen === undefined) {}
-      else if (r7a.allowFullScreen === false) {}
-      else if (r7a.allowFullScreen === true) {}
-      else {
-          acceptsNever(r7a.allowFullScreen);
-      }
-        if (r7b.allowFullScreen === undefined) {}
-      else if (r7b.allowFullScreen === false) {}
-      else if (r7b.allowFullScreen === true) {}
-      else {
-          acceptsNever(r7b.allowFullScreen);
-      }
-   }
-  function acceptsNever(n: never) {}
-  */
 
   /**
    * Allows attaching an event handler to any *non-Preact* element, and removing it when the component using the hook unmounts. The callback does not need to be stable across renders.
@@ -1525,27 +2418,16 @@ var bundle = function (exports) {
     };
   }
 
-  /*
-  const activeElementUpdaters = new Map<Window | null | undefined, Set<undefined | ((e: Node | null) => void)>>();
-  const lastActiveElementUpdaters = new Map<Window | null | undefined, Set<undefined | ((e: Node) => void)>>();
-  const windowFocusedUpdaters = new Map<Window | null | undefined, Set<undefined | ((focused: boolean) => void)>>();
-  const windowsFocusedUpdaters = new Map<Window | null | undefined, boolean>();*/
   const activeElementUpdaters = new Map();
   const lastActiveElementUpdaters = new Map();
   const windowFocusedUpdaters = new Map();
   const windowsFocusedUpdaters = new Map();
-  //const microtasks = new Map<Set<any>, any>();
   // The focusin and focusout events often fire syncronously in the middle of running code.
   // E.G. calling element.focus() can cause a focusin event handler to immediately interrupt that code.
   // For the purpose of improving stability, we debounce all focus events to the next microtask.
   function forEachUpdater(window, map, value, reason) {
     const updaters = map.get(window);
     if (updaters) {
-      //if (!microtasks.has(updatersKey)) {
-      //debounceRendering(() => {
-      //const updatersKey = map.get(window)!;
-      //const value = microtasks.get(updatersKey);
-      //microtasks.delete(updatersKey);
       if (updaters) {
         for (const updater of updaters) {
           const {
@@ -1558,12 +2440,8 @@ var bundle = function (exports) {
           }
         }
       }
-      //});
-      //}
-      //microtasks.set(updatersKey, value);
     }
   }
-
   function focusout(e) {
     const window = e.target.ownerDocument.defaultView;
     if (e.relatedTarget == null) {
@@ -1598,7 +2476,7 @@ var bundle = function (exports) {
    *
    * If you need the component to re-render when the active element changes, use the `on*Change` arguments to set some state on your end.
    */
-  function useActiveElement(_ref3) {
+  function useActiveElement(_ref) {
     let {
       activeElementParameters: {
         onActiveElementChange,
@@ -1607,7 +2485,7 @@ var bundle = function (exports) {
         getDocument,
         getWindow
       }
-    } = _ref3;
+    } = _ref;
     useEnsureStability("useActiveElement", onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument, getWindow);
     h(() => {
       var _getWindow, _activeElementUpdater, _activeElementUpdater2, _activeElementUpdater3, _lastActiveElementUpd, _windowFocusedUpdater;
@@ -1674,305 +2552,6 @@ var bundle = function (exports) {
     };
   }
 
-  /**
-   * Allows a parent component to access information about certain
-   * child components once they have rendered.
-   *
-   * This hook is designed to be lightweight, in that the parent keeps no state
-   * and runs no effects.  Each child *does* run an effect, but with no state
-   * changes unless you explicitly request them.
-   *
-   *
-   */
-  function useManagedChildren(parentParameters) {
-    const {
-      managedChildrenParameters: {
-        onAfterChildLayoutEffect,
-        onChildrenMountChange,
-        onChildCountChange
-      },
-      ...rest
-    } = parentParameters;
-    useEnsureStability("useManagedChildren", onAfterChildLayoutEffect, onChildrenMountChange, onChildCountChange);
-    //const [getMountCount, setMountCount] = usePassiveState(onChildCountChange, returnZero, runImmediately);
-    const getHighestIndex = T$1(() => {
-      return managedChildrenArray.current.highestIndex;
-    }, []);
-    // All the information we have about our children is stored in this **stable** array.
-    // Any mutations to this array **DO NOT** trigger any sort of a re-render.
-    const managedChildrenArray = _({
-      arr: [],
-      rec: {},
-      highestIndex: 0,
-      lowestIndex: 0
-    });
-    // For indirect access to each child
-    // Compare getManagedChildInfo
-    // TODO: The primary use for this is flaggable closest fits
-    // which needs to search all children for that closest fit.
-    // It would be nice if there was something better for that.
-    const forEachChild = T$1(f => {
-      for (const child of managedChildrenArray.current.arr) {
-        if (child) f(child);
-      }
-      for (const field in managedChildrenArray.current.rec) {
-        const child = managedChildrenArray.current.rec[field];
-        if (child) f(child);
-      }
-    }, []);
-    // Retrieves the information associated with the child with the given index.
-    // `undefined` if not child there, or it's unmounted.
-    const getManagedChildInfo = T$1(index => {
-      if (typeof index == "number") return managedChildrenArray.current.arr[index];else return managedChildrenArray.current.rec[index];
-    }, []);
-    // tl;dr this is a way to have run useLayoutEffect once after all N children
-    // have mounted and run *their* useLayoutEffect, but also *without* re-rendering
-    // ourselves because of having a `childCount` state or anything similar.
-    //
-    // When the child count ref updates, we want the parent to also run an effect
-    // to maybe do something with all these children that just mounted.
-    // The easiest way would be useEffect(..., [childCount]) but
-    // that would require us having a childCount state, then calling
-    // setChildCount and re-rendering every time children mount
-    // (only one re-render at a time unless children are staggered, but still)
-    // 
-    // As an alternate solution, any time a child uses ULE on mount, it queues a microtask
-    // to emulate running ULE on the parent. Only the first child will actually queue
-    // the microtask (by checking hasRemoteULE first) so that the "effect" only
-    // runs once. When it's done, hasRemoteULE is reset so it can run again if
-    // more children mount/unmount.
-    const hasRemoteULEChildMounted = _(null);
-    const remoteULEChildChangedCausers = _(new Set());
-    const remoteULEChildChanged = T$1(index => {
-      if (remoteULEChildChangedCausers.current.size == 0) {
-        if (onAfterChildLayoutEffect != null) {
-          debounceRendering(() => {
-            onAfterChildLayoutEffect === null || onAfterChildLayoutEffect === void 0 ? void 0 : onAfterChildLayoutEffect(remoteULEChildChangedCausers.current);
-            remoteULEChildChangedCausers.current.clear();
-          });
-        }
-      }
-      remoteULEChildChangedCausers.current.add(index);
-      return () => {};
-    }, [/* Must remain stable */]);
-    const remoteULEChildMounted = T$1((index, mounted) => {
-      if (!hasRemoteULEChildMounted.current) {
-        hasRemoteULEChildMounted.current = {
-          mounts: new Set(),
-          unmounts: new Set()
-        };
-        if (onChildCountChange || onChildrenMountChange) {
-          debounceRendering(() => {
-            onChildrenMountChange === null || onChildrenMountChange === void 0 ? void 0 : onChildrenMountChange(hasRemoteULEChildMounted.current.mounts, hasRemoteULEChildMounted.current.unmounts);
-            onChildCountChange === null || onChildCountChange === void 0 ? void 0 : onChildCountChange(getChildren().getHighestIndex() + 1);
-            hasRemoteULEChildMounted.current = null;
-          });
-        }
-      }
-      if (mounted) {
-        if (typeof index == "number") managedChildrenArray.current.highestIndex = Math.max(managedChildrenArray.current.highestIndex, index);
-      } else {
-        if (typeof index == "number") {
-          delete managedChildrenArray.current.arr[index];
-          let shave = 0;
-          while (shave <= managedChildrenArray.current.arr.length && managedChildrenArray.current.arr[managedChildrenArray.current.arr.length - 1 - shave] === undefined) {
-            ++shave;
-          }
-          managedChildrenArray.current.arr.splice(managedChildrenArray.current.arr.length - shave, shave);
-        } else delete managedChildrenArray.current.rec[index];
-        if (typeof index == "number") managedChildrenArray.current.highestIndex = managedChildrenArray.current.arr.length - 1;
-      }
-      hasRemoteULEChildMounted.current[mounted ? "mounts" : "unmounts"].add(index);
-    }, [/* Must remain stable */]);
-    const managedChildren = useStableObject({
-      ...{
-        _: managedChildrenArray.current
-      },
-      forEach: forEachChild,
-      getAt: getManagedChildInfo,
-      getHighestIndex: getHighestIndex,
-      arraySlice: T$1(() => {
-        return managedChildrenArray.current.arr.slice();
-      }, [])
-    });
-    const getChildren = T$1(() => managedChildren, []);
-    return {
-      context: useStableObject({
-        managedChildContext: useStableObject({
-          managedChildrenArray: managedChildrenArray.current,
-          remoteULEChildMounted,
-          remoteULEChildChanged,
-          getChildren
-        })
-      }),
-      managedChildrenReturn: {
-        getChildren
-      }
-    };
-  }
-  function useManagedChild(info, managedChildParameters) {
-    var _info$context;
-    const {
-      managedChildContext: {
-        getChildren,
-        managedChildrenArray,
-        remoteULEChildMounted,
-        remoteULEChildChanged
-      }
-    } = (_info$context = info.context) !== null && _info$context !== void 0 ? _info$context : {
-      managedChildContext: {}
-    };
-    const index = managedChildParameters.index;
-    // Any time our child props change, make that information available
-    // the parent if they need it.
-    // The parent can listen for all updates and only act on the ones it cares about,
-    // and multiple children updating in the same tick will all be sent at once.
-    s(() => {
-      if (managedChildrenArray == null || remoteULEChildChanged == null) return;
-      // Insert this information in-place
-      if (typeof index == "number") {
-        managedChildrenArray.arr[index] = {
-          ...managedChildParameters
-        };
-      } else {
-        managedChildrenArray.rec[index] = {
-          ...managedChildParameters
-        };
-      }
-      return remoteULEChildChanged(index);
-    }, [...Object.entries(info).flat(9)]); // 9 is infinity, right? Sure. Unrelated: TODO.
-    // When we mount, notify the parent via queueMicrotask
-    // (every child does this, so everything's coordinated to only queue a single microtask per tick)
-    // Do the same on unmount.
-    // Note: It's important that this comes AFTER remoteULEChildChanged
-    // so that remoteULEChildMounted has access to all the info on mount.
-    s(() => {
-      remoteULEChildMounted === null || remoteULEChildMounted === void 0 ? void 0 : remoteULEChildMounted(index, true);
-      return () => remoteULEChildMounted === null || remoteULEChildMounted === void 0 ? void 0 : remoteULEChildMounted(index, false);
-    }, [index]);
-    return {
-      managedChildReturn: {
-        getChildren: getChildren
-      }
-    };
-  }
-  /**
-   * An extension to useManagedChildren that handles the following common case:
-   * 1. You have a bunch of children
-   * 2. At any given time, only 1 of them is "selected", "activated", "focusable", whatever (or 0 of them, that's cool too, just 0 or 1 though).
-   * 3. The parent has control over who is "selected" via a numerical index.
-   *
-   * This hook allows for much easier control over selection management.
-   *
-   * Note that because you may want to use multiple flags with the same children, this hook *does not* use `useManagedChildren`!
-   * You need to pass it the existing children, and you must pass your invocation of `useManagedChildren` the returned `onChildrenMountChange` handler!
-   *
-   * Also because of that, the types of this function are rather odd.  It's better to start off using a hook that already uses a flag, such as `useRovingTabIndex`, as an example.
-   *
-   *
-   * @param param0
-   * @returns
-   */
-  function useChildrenFlag(_ref4) {
-    let {
-      getChildren,
-      initialIndex,
-      closestFit,
-      onIndexChange,
-      getAt,
-      setAt,
-      isValid
-    } = _ref4;
-    useEnsureStability("useChildrenFlag", onIndexChange, getAt, setAt, isValid);
-    // TODO (maybe?): Even if there is an initial index, it's not set until mount. Is that fine?
-    const [getCurrentIndex, setCurrentIndex] = usePassiveState(onIndexChange);
-    const [getRequestedIndex, setRequestedIndex] = usePassiveState(null);
-    // Shared between onChildrenMountChange and changeIndex, not public
-    // Only called when `closestFit` is false, naturally.
-    const getClosestFit = T$1(requestedIndex => {
-      const children = getChildren();
-      let closestDistance = Infinity;
-      let closestIndex = null;
-      children.forEach(child => {
-        if (child != null && isValid(child)) {
-          console.assert(typeof child.index == "number", "closestFit can only be used when each child has a numeric index, and cannot be used when children use string indices instead.");
-          const newDistance = Math.abs(child.index - requestedIndex);
-          if (newDistance < closestDistance || newDistance == closestDistance && child.index < requestedIndex) {
-            closestDistance = newDistance;
-            closestIndex = child.index;
-          }
-        }
-      });
-      return closestIndex;
-    }, [/* Must remain stable! */]);
-    // Any time a child mounts/unmounts, we need to double-check to see if that affects 
-    // the "currently selected" (or whatever) index.  The two cases we're looking for:
-    // 1. The currently selected child unmounted
-    // 2. A child mounted, and it mounts with the index we're looking for
-    const reevaluateClosestFit = useStableCallback(() => {
-      const children = getChildren();
-      const requestedIndex = getRequestedIndex();
-      const currentIndex = getCurrentIndex();
-      const currentChild = currentIndex == null ? null : children.getAt(currentIndex);
-      if (requestedIndex != null && closestFit && (requestedIndex != currentIndex || currentChild == null || !isValid(currentChild))) {
-        console.assert(typeof requestedIndex == "number", "closestFit can only be used when each child has a numeric index, and cannot be used when children use string indices instead.");
-        const closestFitIndex = getClosestFit(requestedIndex);
-        setCurrentIndex(closestFitIndex, undefined);
-        if (currentChild) setAt(currentChild, false, closestFitIndex, currentIndex);
-        if (closestFitIndex != null) {
-          const closestFitChild = children.getAt(closestFitIndex);
-          console.assert(closestFitChild != null, "Internal logic???");
-          setAt(closestFitChild, true, closestFitIndex, currentIndex);
-        }
-      }
-    });
-    const changeIndex = T$1((arg, reason) => {
-      const children = getChildren();
-      const requestedIndex = arg instanceof Function ? arg(getRequestedIndex()) : arg;
-      setRequestedIndex(requestedIndex, reason);
-      const currentIndex = getCurrentIndex();
-      if (currentIndex == requestedIndex) return requestedIndex;
-      let newMatchingChild = requestedIndex == null ? null : children.getAt(requestedIndex);
-      const oldMatchingChild = currentIndex == null ? null : children.getAt(currentIndex);
-      if (requestedIndex == null) {
-        // Easy case
-        setCurrentIndex(null, reason);
-        if (oldMatchingChild) setAt(oldMatchingChild, false, requestedIndex, currentIndex);
-        return null;
-      } else {
-        const childIsValid = newMatchingChild && isValid(newMatchingChild);
-        if (childIsValid || !closestFit) {
-          setCurrentIndex(requestedIndex, reason);
-          if (oldMatchingChild) setAt(oldMatchingChild, false, requestedIndex, currentIndex);
-          if (newMatchingChild) setAt(newMatchingChild, true, requestedIndex, currentIndex);
-          return requestedIndex;
-        } else {
-          console.assert(typeof requestedIndex == "number", "closestFit can only be used when each child has a numeric index, and cannot be used when children use string indices instead.");
-          const closestFitIndex = getClosestFit(requestedIndex);
-          setCurrentIndex(closestFitIndex, reason);
-          if (closestFitIndex != null) {
-            newMatchingChild = children.getAt(closestFitIndex);
-            console.assert(newMatchingChild != null, "Internal logic???");
-            if (oldMatchingChild) setAt(oldMatchingChild, false, closestFitIndex, currentIndex);
-            setAt(newMatchingChild, true, closestFitIndex, currentIndex);
-            return closestFitIndex;
-          } else {
-            if (oldMatchingChild) setAt(oldMatchingChild, false, closestFitIndex, currentIndex);
-            return null;
-          }
-        }
-      }
-    }, []);
-    // Run once, on mount
-    s(() => {
-      changeIndex(initialIndex !== null && initialIndex !== void 0 ? initialIndex : null, undefined);
-    }, []);
-    return {
-      changeIndex,
-      reevaluateClosestFit,
-      getCurrentIndex
-    };
-  }
   const MagicWindowKey = "__preact-prop-helpers-escape-key-dismiss__";
   function getElementDepth(element) {
     let depth = 0;
@@ -2001,7 +2580,7 @@ var bundle = function (exports) {
    * @param param0
    * @returns
    */
-  function useEscapeDismiss(_ref5) {
+  function useEscapeDismiss(_ref) {
     let {
       escapeDismissParameters: {
         onClose,
@@ -2014,7 +2593,7 @@ var bundle = function (exports) {
         getElement,
         ...void2
       }
-    } = _ref5;
+    } = _ref;
     const stableOnClose = useStableCallback(onClose);
     const getWindow = useStableCallback(unstableGetWindow);
     const getDepth = useStableGetter(parentDepth + 1);
@@ -2111,7 +2690,7 @@ var bundle = function (exports) {
    * @param param0
    * @returns
    */
-  function useLostFocusDismiss(_ref6) {
+  function useLostFocusDismiss(_ref2) {
     let {
       refElementPopupReturn: {
         getElement: getPopupElement,
@@ -2123,7 +2702,7 @@ var bundle = function (exports) {
         onClose
       },
       ...void1
-    } = _ref6;
+    } = _ref2;
     const {
       getElement: getSourceElement,
       ...void2
@@ -2149,7 +2728,7 @@ var bundle = function (exports) {
    *
    * @param param0
    */
-  function useBackdropDismiss(_ref7) {
+  function useBackdropDismiss(_ref3) {
     let {
       backdropDismissParameters: {
         open,
@@ -2161,7 +2740,7 @@ var bundle = function (exports) {
         ...void3
       },
       ...void2
-    } = _ref7;
+    } = _ref3;
     const getOpen = useStableGetter(open);
     const onClose = useStableCallback(onCloseUnstable);
     const onBackdropClick = T$1(function onBackdropClick(e) {
@@ -2189,7 +2768,7 @@ var bundle = function (exports) {
    *
    * This is similar to the "complete" series of list/grid navigation, in that it's the "outermost" hook of its type.
    */
-  function useDismiss(_ref8) {
+  function useDismiss(_ref4) {
     let {
       dismissParameters: {
         open: globalOpen,
@@ -2202,7 +2781,7 @@ var bundle = function (exports) {
         getWindow,
         parentDepth
       }
-    } = _ref8;
+    } = _ref4;
     const {
       refElementReturn: refElementSourceReturn
     } = useRefElement({
@@ -2865,6 +3444,7 @@ var bundle = function (exports) {
     }
     document.$blockingElements = new BlockingElementsImpl();
   })();
+
   var _createClass = function () {
     function defineProperties(target, props) {
       for (var i = 0; i < props.length; i++) {
@@ -3671,10 +4251,12 @@ var bundle = function (exports) {
       });
     }
   })();
+
   function getDocument$1(element) {
-    var _ref9, _ref10, _element$ownerDocumen;
-    return (_ref9 = (_ref10 = (_element$ownerDocumen = element === null || element === void 0 ? void 0 : element.ownerDocument) !== null && _element$ownerDocumen !== void 0 ? _element$ownerDocumen : document) !== null && _ref10 !== void 0 ? _ref10 : window.document) !== null && _ref9 !== void 0 ? _ref9 : globalThis.document;
+    var _ref, _ref2, _element$ownerDocumen;
+    return (_ref = (_ref2 = (_element$ownerDocumen = element === null || element === void 0 ? void 0 : element.ownerDocument) !== null && _element$ownerDocumen !== void 0 ? _element$ownerDocumen : document) !== null && _ref2 !== void 0 ? _ref2 : window.document) !== null && _ref !== void 0 ? _ref : globalThis.document;
   }
+
   function blockingElements() {
     return getDocument$1().$blockingElements;
   }
@@ -3735,7 +4317,7 @@ var bundle = function (exports) {
   }
 
   //const elementsToRestoreFocusTo = new Map<Element | null, (Node & HTMLOrSVGElement)>();
-  function useFocusTrap(_ref11) {
+  function useFocusTrap(_ref) {
     let {
       focusTrapParameters: {
         onlyMoveFocus,
@@ -3744,7 +4326,7 @@ var bundle = function (exports) {
         focusOpener: focusOpenerUnstable
       },
       refElementParameters
-    } = _ref11;
+    } = _ref;
     const {
       onElementChange,
       ...rest
@@ -3811,19 +4393,17 @@ var bundle = function (exports) {
     return firstFocusable;
   }
 
-  /** Arguments passed to the child 'useLinearNavigationChild` */
-  //export interface UseLinearNavigationChildInfo { }
   /**
    * When used in tandem with `useRovingTabIndex`, allows control of
    * the tabbable index with the arrow keys.
    *
    * @see useListNavigation, which packages everything up together.
    */
-  function useLinearNavigation(_ref12) {
+  function useLinearNavigation(_ref) {
     let {
       rovingTabIndexReturn,
       linearNavigationParameters
-    } = _ref12;
+    } = _ref;
     const {
       getHighestIndex,
       indexDemangler,
@@ -3943,98 +4523,136 @@ var bundle = function (exports) {
         if (truePageNavigationSize < 1) {
           truePageNavigationSize = Math.round(pageNavigationSize * Math.max(100, getHighestIndex() + 1));
         }
+        let result = null;
+        // Arrow keys only take effect for components oriented in that direction,
+        // so we want to make sure we only listen for left/right or up/down when appropriate.
+        let keyPressIsValidForOrientation = true;
         switch (e.key) {
           case "ArrowUp":
-            {
-              //const propName = (info?.blockOrientation === "vertical" ? "blockDirection" : "inlineDirection");
-              const directionAllowed = !disableArrowKeys && allowsVerticalNavigation;
-              if (directionAllowed) {
-                const result = navigateToPrev(e, true);
-                if (result != "passthrough") {
-                  e.preventDefault();
-                  e.stopPropagation();
-                }
-              }
-              break;
-            }
           case "ArrowDown":
-            {
-              const directionAllowed = !disableArrowKeys && allowsVerticalNavigation;
-              if (directionAllowed) {
-                const result = navigateToNext(e, true);
-                if (result != "passthrough") {
-                  e.preventDefault();
-                  e.stopPropagation();
-                }
-              }
-              break;
-            }
-          case "ArrowLeft":
-            {
-              const directionAllowed = !disableArrowKeys && allowsHorizontalNavigation;
-              if (directionAllowed) {
-                const result = navigateToPrev(e, true);
-                if (result != "passthrough") {
-                  e.preventDefault();
-                  e.stopPropagation();
-                }
-              }
-              break;
-            }
-          case "ArrowRight":
-            {
-              const directionAllowed = !disableArrowKeys && allowsHorizontalNavigation;
-              if (directionAllowed) {
-                const result = navigateToNext(e, true);
-                if (result != "passthrough") {
-                  e.preventDefault();
-                  e.stopPropagation();
-                }
-              }
-              break;
-            }
-          case "PageUp":
-            {
-              if (truePageNavigationSize > 0) {
-                navigateRelative2(e, -truePageNavigationSize, true, "page");
-                e.preventDefault();
-                e.stopPropagation();
-              }
-              break;
-            }
-          case "PageDown":
-            {
-              if (truePageNavigationSize > 0) {
-                navigateRelative2(e, truePageNavigationSize, true, "page");
-                e.preventDefault();
-                e.stopPropagation();
-              }
-              break;
-            }
-          case "Home":
-            if (!disableHomeEndKeys) {
-              navigateToFirst(e, true);
-              e.preventDefault();
-              e.stopPropagation();
-            }
+            keyPressIsValidForOrientation = !disableArrowKeys && allowsVerticalNavigation;
             break;
-          case "End":
-            if (!disableHomeEndKeys) {
-              navigateToLast(e, true);
-              e.preventDefault();
-              e.stopPropagation();
-            }
+          case "ArrowLeft":
+          case "ArrowRight":
+            keyPressIsValidForOrientation = !disableArrowKeys && allowsHorizontalNavigation;
             break;
         }
+        if (keyPressIsValidForOrientation) {
+          switch (e.key) {
+            case "ArrowUp":
+            case "ArrowLeft":
+              result = navigateToPrev(e, true);
+              break;
+            case "ArrowDown":
+            case "ArrowRight":
+              result = navigateToNext(e, true);
+              break;
+            case "PageUp":
+            case "PageDown":
+              if (truePageNavigationSize > 0) {
+                navigateRelative2(e, truePageNavigationSize * (e.key.endsWith('n') ? -1 : 1), true, "page");
+                result = 'passthrough';
+              }
+              break;
+            case "Home":
+            case "End":
+              if (!disableHomeEndKeys) {
+                if (e.key.endsWith('e')) navigateToFirst(e, true);else navigateToLast(e, true);
+                result = 'passthrough';
+              }
+              break;
+          }
+        }
+        if (result && result != 'passthrough') {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        /*switch (e.key) {
+            case "ArrowUp": {
+                const directionAllowed = (!disableArrowKeys && allowsVerticalNavigation);
+                if (directionAllowed) {
+                    const result = navigateToPrev(e, true);
+                    if (result != "passthrough") {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                }
+                break;
+            }
+            case "ArrowDown": {
+                const directionAllowed = (!disableArrowKeys && allowsVerticalNavigation);
+                if (directionAllowed) {
+                    const result = navigateToNext(e, true);
+                    if (result != "passthrough") {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                }
+                break;
+            }
+             case "ArrowLeft": {
+                const directionAllowed = (!disableArrowKeys && allowsHorizontalNavigation);
+                if (directionAllowed) {
+                    const result = navigateToPrev(e, true);
+                    if (result != "passthrough") {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                }
+                break;
+            }
+            case "ArrowRight": {
+                const directionAllowed = (!disableArrowKeys && allowsHorizontalNavigation);
+                if (directionAllowed) {
+                    const result = navigateToNext(e, true);
+                    if (result != "passthrough") {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                }
+                break;
+            }
+            case "PageUp": {
+                if (truePageNavigationSize > 0) {
+                    navigateRelative2(e, -truePageNavigationSize, true, "page");
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+                break;
+            }
+            case "PageDown": {
+                if (truePageNavigationSize > 0) {
+                    navigateRelative2(e, truePageNavigationSize, true, "page");
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+                break;
+            }
+            case "Home":
+                if (!disableHomeEndKeys) {
+                    navigateToFirst(e, true);
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+                break;
+             case "End":
+                if (!disableHomeEndKeys) {
+                    navigateToLast(e, true);
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+                break;
+        }*/
       }
     });
+
     return {
       linearNavigationReturn: {
         propsStable: stableProps.current
       }
     };
   }
-  function tryNavigateToIndex(_ref13) {
+  function tryNavigateToIndex(_ref2) {
     let {
       isValid,
       highestChildIndex,
@@ -4042,7 +4660,7 @@ var bundle = function (exports) {
       indexDemangler,
       indexMangler,
       targetUnmangled
-    } = _ref13;
+    } = _ref2;
     if (searchDirection === -1) {
       var _bestUpResult;
       let bestUpResult = undefined;
@@ -4085,13 +4703,13 @@ var bundle = function (exports) {
       };
     }
   }
-  function tryNavigateUp(_ref14) {
+  function tryNavigateUp(_ref3) {
     let {
       isValid,
       indexDemangler,
       indexMangler,
       targetUnmangled
-    } = _ref14;
+    } = _ref3;
     const lower = 0;
     while (targetUnmangled >= lower && !isValid(targetUnmangled)) {
       targetUnmangled = indexDemangler(indexMangler(targetUnmangled) - 1);
@@ -4111,14 +4729,14 @@ var bundle = function (exports) {
       };
     }
   }
-  function tryNavigateDown(_ref15) {
+  function tryNavigateDown(_ref4) {
     let {
       isValid,
       indexDemangler,
       indexMangler,
       targetUnmangled,
       highestChildIndex: upper
-    } = _ref15;
+    } = _ref4;
     while (targetUnmangled <= upper && !isValid(targetUnmangled)) {
       targetUnmangled = indexDemangler(indexMangler(targetUnmangled) + 1);
     }
@@ -4136,6 +4754,313 @@ var bundle = function (exports) {
         status: "normal"
       };
     }
+  }
+
+  /**
+   * Allows a parent component to access information about certain
+   * child components once they have rendered.
+   *
+   * This hook is designed to be lightweight, in that the parent keeps no state
+   * and runs no effects.  Each child *does* run an effect, but with no state
+   * changes unless you explicitly request them.
+   *
+   *
+   */
+  function useManagedChildren(parentParameters) {
+    const {
+      managedChildrenParameters: {
+        onAfterChildLayoutEffect,
+        onChildrenMountChange,
+        onChildCountChange
+      },
+      ...rest
+    } = parentParameters;
+    useEnsureStability("useManagedChildren", onAfterChildLayoutEffect, onChildrenMountChange, onChildCountChange);
+    //const [getMountCount, setMountCount] = usePassiveState(onChildCountChange, returnZero, runImmediately);
+    const getHighestIndex = T$1(() => {
+      return managedChildrenArray.current.highestIndex;
+    }, []);
+    // All the information we have about our children is stored in this **stable** array.
+    // Any mutations to this array **DO NOT** trigger any sort of a re-render.
+    const managedChildrenArray = _({
+      arr: [],
+      rec: {},
+      highestIndex: 0,
+      lowestIndex: 0
+    });
+    // For indirect access to each child
+    // Compare getManagedChildInfo
+    // TODO: The primary use for this is flaggable closest fits
+    // which needs to search all children for that closest fit.
+    // It would be nice if there was something better for that.
+    const forEachChild = T$1(f => {
+      for (const child of managedChildrenArray.current.arr) {
+        if (child) f(child);
+      }
+      for (const field in managedChildrenArray.current.rec) {
+        const child = managedChildrenArray.current.rec[field];
+        if (child) f(child);
+      }
+    }, []);
+    // Retrieves the information associated with the child with the given index.
+    // `undefined` if not child there, or it's unmounted.
+    const getManagedChildInfo = T$1(index => {
+      if (typeof index == "number") return managedChildrenArray.current.arr[index];else return managedChildrenArray.current.rec[index];
+    }, []);
+    // tl;dr this is a way to have run useLayoutEffect once after all N children
+    // have mounted and run *their* useLayoutEffect, but also *without* re-rendering
+    // ourselves because of having a `childCount` state or anything similar.
+    //
+    // When the child count ref updates, we want the parent to also run an effect
+    // to maybe do something with all these children that just mounted.
+    // The easiest way would be useEffect(..., [childCount]) but
+    // that would require us having a childCount state, then calling
+    // setChildCount and re-rendering every time children mount
+    // (only one re-render at a time unless children are staggered, but still)
+    // 
+    // As an alternate solution, any time a child uses ULE on mount, it queues a microtask
+    // to emulate running ULE on the parent. Only the first child will actually queue
+    // the microtask (by checking hasRemoteULE first) so that the "effect" only
+    // runs once. When it's done, hasRemoteULE is reset so it can run again if
+    // more children mount/unmount.
+    const hasRemoteULEChildMounted = _(null);
+    const remoteULEChildChangedCausers = _(new Set());
+    const remoteULEChildChanged = T$1(index => {
+      if (remoteULEChildChangedCausers.current.size == 0) {
+        if (onAfterChildLayoutEffect != null) {
+          debounceRendering(() => {
+            onAfterChildLayoutEffect === null || onAfterChildLayoutEffect === void 0 ? void 0 : onAfterChildLayoutEffect(remoteULEChildChangedCausers.current);
+            remoteULEChildChangedCausers.current.clear();
+          });
+        }
+      }
+      remoteULEChildChangedCausers.current.add(index);
+      return () => {};
+    }, [/* Must remain stable */]);
+    const remoteULEChildMounted = T$1((index, mounted) => {
+      if (!hasRemoteULEChildMounted.current) {
+        hasRemoteULEChildMounted.current = {
+          mounts: new Set(),
+          unmounts: new Set()
+        };
+        if (onChildCountChange || onChildrenMountChange) {
+          debounceRendering(() => {
+            onChildrenMountChange === null || onChildrenMountChange === void 0 ? void 0 : onChildrenMountChange(hasRemoteULEChildMounted.current.mounts, hasRemoteULEChildMounted.current.unmounts);
+            onChildCountChange === null || onChildCountChange === void 0 ? void 0 : onChildCountChange(getChildren().getHighestIndex() + 1);
+            hasRemoteULEChildMounted.current = null;
+          });
+        }
+      }
+      if (mounted) {
+        if (typeof index == "number") managedChildrenArray.current.highestIndex = Math.max(managedChildrenArray.current.highestIndex, index);
+      } else {
+        if (typeof index == "number") {
+          delete managedChildrenArray.current.arr[index];
+          let shave = 0;
+          while (shave <= managedChildrenArray.current.arr.length && managedChildrenArray.current.arr[managedChildrenArray.current.arr.length - 1 - shave] === undefined) {
+            ++shave;
+          }
+          managedChildrenArray.current.arr.splice(managedChildrenArray.current.arr.length - shave, shave);
+        } else delete managedChildrenArray.current.rec[index];
+        if (typeof index == "number") managedChildrenArray.current.highestIndex = managedChildrenArray.current.arr.length - 1;
+      }
+      hasRemoteULEChildMounted.current[mounted ? "mounts" : "unmounts"].add(index);
+    }, [/* Must remain stable */]);
+    const managedChildren = useStableObject({
+      ...{
+        _: managedChildrenArray.current
+      },
+      forEach: forEachChild,
+      getAt: getManagedChildInfo,
+      getHighestIndex: getHighestIndex,
+      arraySlice: T$1(() => {
+        let ret = managedChildrenArray.current.arr.slice();
+        const max = getHighestIndex();
+        for (let i = 0; i <= max; ++i) {
+          if (ret[i] == null) ret[i] = {
+            index: i
+          };
+        }
+        return ret;
+      }, [])
+    });
+    const getChildren = T$1(() => managedChildren, []);
+    return {
+      context: useStableObject({
+        managedChildContext: useStableObject({
+          managedChildrenArray: managedChildrenArray.current,
+          remoteULEChildMounted,
+          remoteULEChildChanged,
+          getChildren
+        })
+      }),
+      managedChildrenReturn: {
+        getChildren
+      }
+    };
+  }
+  function useManagedChild(info, managedChildParameters) {
+    var _info$context;
+    const {
+      managedChildContext: {
+        getChildren,
+        managedChildrenArray,
+        remoteULEChildMounted,
+        remoteULEChildChanged
+      }
+    } = (_info$context = info.context) !== null && _info$context !== void 0 ? _info$context : {
+      managedChildContext: {}
+    };
+    const index = managedChildParameters.index;
+    // Any time our child props change, make that information available
+    // the parent if they need it.
+    // The parent can listen for all updates and only act on the ones it cares about,
+    // and multiple children updating in the same tick will all be sent at once.
+    s(() => {
+      if (managedChildrenArray == null || remoteULEChildChanged == null) return;
+      // Insert this information in-place
+      if (typeof index == "number") {
+        managedChildrenArray.arr[index] = {
+          ...managedChildParameters
+        };
+      } else {
+        managedChildrenArray.rec[index] = {
+          ...managedChildParameters
+        };
+      }
+      return remoteULEChildChanged(index);
+    }, [...Object.entries(info).flat(9)]); // 9 is infinity, right? Sure. Unrelated: TODO.
+    // When we mount, notify the parent via queueMicrotask
+    // (every child does this, so everything's coordinated to only queue a single microtask per tick)
+    // Do the same on unmount.
+    // Note: It's important that this comes AFTER remoteULEChildChanged
+    // so that remoteULEChildMounted has access to all the info on mount.
+    s(() => {
+      remoteULEChildMounted === null || remoteULEChildMounted === void 0 ? void 0 : remoteULEChildMounted(index, true);
+      return () => remoteULEChildMounted === null || remoteULEChildMounted === void 0 ? void 0 : remoteULEChildMounted(index, false);
+    }, [index]);
+    return {
+      managedChildReturn: {
+        getChildren: getChildren
+      }
+    };
+  }
+  /**
+   * An extension to useManagedChildren that handles the following common case:
+   * 1. You have a bunch of children
+   * 2. At any given time, only 1 of them is "selected", "activated", "focusable", whatever (or 0 of them, that's cool too, just 0 or 1 though).
+   * 3. The parent has control over who is "selected" via a numerical index.
+   *
+   * This hook allows for much easier control over selection management.
+   *
+   * Note that because you may want to use multiple flags with the same children, this hook *does not* use `useManagedChildren`!
+   * You need to pass it the existing children, and you must pass your invocation of `useManagedChildren` the returned `onChildrenMountChange` handler!
+   *
+   * Also because of that, the types of this function are rather odd.  It's better to start off using a hook that already uses a flag, such as `useRovingTabIndex`, as an example.
+   *
+   *
+   * @param param0
+   * @returns
+   */
+  function useChildrenFlag(_ref) {
+    let {
+      getChildren,
+      initialIndex,
+      closestFit,
+      onIndexChange,
+      getAt,
+      setAt,
+      isValid
+    } = _ref;
+    useEnsureStability("useChildrenFlag", onIndexChange, getAt, setAt, isValid);
+    // TODO (maybe?): Even if there is an initial index, it's not set until mount. Is that fine?
+    const [getCurrentIndex, setCurrentIndex] = usePassiveState(onIndexChange);
+    const [getRequestedIndex, setRequestedIndex] = usePassiveState(null);
+    // Shared between onChildrenMountChange and changeIndex, not public
+    // Only called when `closestFit` is false, naturally.
+    const getClosestFit = T$1(requestedIndex => {
+      const children = getChildren();
+      let closestDistance = Infinity;
+      let closestIndex = null;
+      children.forEach(child => {
+        if (child != null && isValid(child)) {
+          console.assert(typeof child.index == "number", "closestFit can only be used when each child has a numeric index, and cannot be used when children use string indices instead.");
+          const newDistance = Math.abs(child.index - requestedIndex);
+          if (newDistance < closestDistance || newDistance == closestDistance && child.index < requestedIndex) {
+            closestDistance = newDistance;
+            closestIndex = child.index;
+          }
+        }
+      });
+      return closestIndex;
+    }, [/* Must remain stable! */]);
+    // Any time a child mounts/unmounts, we need to double-check to see if that affects 
+    // the "currently selected" (or whatever) index.  The two cases we're looking for:
+    // 1. The currently selected child unmounted
+    // 2. A child mounted, and it mounts with the index we're looking for
+    const reevaluateClosestFit = useStableCallback(() => {
+      const children = getChildren();
+      const requestedIndex = getRequestedIndex();
+      const currentIndex = getCurrentIndex();
+      const currentChild = currentIndex == null ? null : children.getAt(currentIndex);
+      if (requestedIndex != null && closestFit && (requestedIndex != currentIndex || currentChild == null || !isValid(currentChild))) {
+        console.assert(typeof requestedIndex == "number", "closestFit can only be used when each child has a numeric index, and cannot be used when children use string indices instead.");
+        const closestFitIndex = getClosestFit(requestedIndex);
+        setCurrentIndex(closestFitIndex, undefined);
+        if (currentChild) setAt(currentChild, false, closestFitIndex, currentIndex);
+        if (closestFitIndex != null) {
+          const closestFitChild = children.getAt(closestFitIndex);
+          console.assert(closestFitChild != null, "Internal logic???");
+          setAt(closestFitChild, true, closestFitIndex, currentIndex);
+        }
+      }
+    });
+    const changeIndex = T$1((arg, reason) => {
+      const children = getChildren();
+      const requestedIndex = arg instanceof Function ? arg(getRequestedIndex()) : arg;
+      setRequestedIndex(requestedIndex, reason);
+      const currentIndex = getCurrentIndex();
+      if (currentIndex == requestedIndex) return requestedIndex;
+      let newMatchingChild = requestedIndex == null ? null : children.getAt(requestedIndex);
+      const oldMatchingChild = currentIndex == null ? null : children.getAt(currentIndex);
+      if (requestedIndex == null) {
+        // Easy case
+        setCurrentIndex(null, reason);
+        if (oldMatchingChild) setAt(oldMatchingChild, false, requestedIndex, currentIndex);
+        return null;
+      } else {
+        const childIsValid = newMatchingChild && isValid(newMatchingChild);
+        if (childIsValid || !closestFit) {
+          setCurrentIndex(requestedIndex, reason);
+          if (oldMatchingChild) setAt(oldMatchingChild, false, requestedIndex, currentIndex);
+          if (newMatchingChild) setAt(newMatchingChild, true, requestedIndex, currentIndex);
+          return requestedIndex;
+        } else {
+          console.assert(typeof requestedIndex == "number", "closestFit can only be used when each child has a numeric index, and cannot be used when children use string indices instead.");
+          const closestFitIndex = getClosestFit(requestedIndex);
+          setCurrentIndex(closestFitIndex, reason);
+          if (closestFitIndex != null) {
+            newMatchingChild = children.getAt(closestFitIndex);
+            console.assert(newMatchingChild != null, "Internal logic???");
+            if (oldMatchingChild) setAt(oldMatchingChild, false, closestFitIndex, currentIndex);
+            setAt(newMatchingChild, true, closestFitIndex, currentIndex);
+            return closestFitIndex;
+          } else {
+            if (oldMatchingChild) setAt(oldMatchingChild, false, closestFitIndex, currentIndex);
+            return null;
+          }
+        }
+      }
+    }, []);
+    // Run once, on mount
+    s(() => {
+      changeIndex(initialIndex !== null && initialIndex !== void 0 ? initialIndex : null, undefined);
+    }, []);
+    return {
+      changeIndex,
+      reevaluateClosestFit,
+      getCurrentIndex
+    };
   }
 
   /**
@@ -4164,10 +5089,9 @@ var bundle = function (exports) {
         setStateP(value);
       }
     }, []);
-    const getState = () => {
+    const getState = T$1(() => {
       return ref.current;
-    };
-    console.assert(ref.current === state || typeof state === "number" && isNaN(state));
+    }, []);
     return [state, setState, getState];
   }
 
@@ -4200,7 +5124,7 @@ var bundle = function (exports) {
    * And just as well! Children should be allowed at the root,
    * regardless of if it's the whole app or just a given component.
    */
-  function useRovingTabIndex(_ref16) {
+  function useRovingTabIndex(_ref) {
     let {
       managedChildrenReturn: {
         getChildren
@@ -4211,9 +5135,8 @@ var bundle = function (exports) {
         onTabbableIndexChange
       },
       ..._void1
-    } = _ref16;
+    } = _ref;
     const getUntabbable = useStableGetter(untabbable);
-    //initiallyTabbedIndex ??= 0;
     // Override the actual setter to include some extra logic related to avoiding hidden children, 
     // what to do when we're untabbable, what to do when we're tabbable but given `null`, etc.
     const setTabbableIndex = useStableCallback((updater, reason, fromUserInteraction) => {
@@ -4223,13 +5146,18 @@ var bundle = function (exports) {
       return changeTabbableIndex(function returnModifiedTabbableIndex(prevIndex) {
         let nextIndex = typeof updater === "function" ? updater(prevIndex !== null && prevIndex !== void 0 ? prevIndex : null) : updater;
         const untabbable = getUntabbable();
+        // Whether or not we're currently tabbable, make sure that when we switch from untabbable to tabbable,
+        // that we know which index to switch back to.
         if (nextIndex != null) setLastNonNullIndex(nextIndex);
+        // If we're untabbable, then any attempt to set a new index simply fails and sets it to `null`.
         if (untabbable) return null;
+        // If the requested index is hidden, then there's no need to focus any elements or run any extra logic.
+        if (nextIndex == null) return null;
+        // If we've made a change, and it was because the user clicked on it or something,
+        // then focus that element too
         if (prevIndex != nextIndex) {
-          const nextChild = nextIndex == null ? null : children.getAt(nextIndex);
-          if (nextChild !== null && nextChild !== void 0 && nextChild.hidden) {
-            return prevIndex !== null && prevIndex !== void 0 ? prevIndex : untabbable ? null : 0;
-          }
+          const nextChild = children.getAt(nextIndex);
+          console.assert(!(nextChild !== null && nextChild !== void 0 && nextChild.hidden));
           if (nextChild != null && fromUserInteraction) {
             const element = nextChild.getElement();
             if (element) {
@@ -4239,7 +5167,8 @@ var bundle = function (exports) {
         }
         // TODO: Redundant?
         if (nextIndex != null) setLastNonNullIndex(nextIndex);
-        return nextIndex !== null && nextIndex !== void 0 ? nextIndex : untabbable ? null : 0;
+        // Finally, return the value the user requested the index be set to.
+        return nextIndex !== null && nextIndex !== void 0 ? nextIndex : 0;
       }, reason);
     }, []);
     // When we switch from tabbable to non/tabbable, we really want to remember the last tabbable child.
@@ -4302,7 +5231,7 @@ var bundle = function (exports) {
       rovingTabIndexChildContext
     };
   }
-  function useRovingTabIndexChild(_ref17) {
+  function useRovingTabIndexChild(_ref2) {
     let {
       managedChildParameters: {
         index,
@@ -4313,8 +5242,9 @@ var bundle = function (exports) {
         setTabbableIndex,
         getInitiallyTabbedIndex
       },
-      rovingTabIndexChildParameters
-    } = _ref17;
+      rovingTabIndexChildParameters,
+      ..._void3
+    } = _ref2;
     const {
       hidden,
       ..._void1
@@ -4341,7 +5271,8 @@ var bundle = function (exports) {
       }
     };
   }
-  function useTextContent(_ref18) {
+
+  function useTextContent(_ref) {
     let {
       refElementReturn: {
         getElement
@@ -4351,7 +5282,7 @@ var bundle = function (exports) {
         onTextContentChange,
         hidden
       }
-    } = _ref18;
+    } = _ref;
     const [getTextContent, setTextContent] = usePassiveState(onTextContentChange, returnNull, runImmediately);
     h(() => {
       if (!hidden) {
@@ -4376,7 +5307,7 @@ var bundle = function (exports) {
    *
    * @see useListNavigation, which packages everything up together.
    */
-  function useTypeaheadNavigation(_ref19) {
+  function useTypeaheadNavigation(_ref) {
     let {
       typeaheadNavigationParameters: {
         collator,
@@ -4391,7 +5322,7 @@ var bundle = function (exports) {
         ..._void1
       },
       ..._void2
-    } = _ref19;
+    } = _ref;
     // For typeahead, keep track of what our current "search" string is (if we have one)
     // and also clear it every 1000 ms since the last time it changed.
     // Next, keep a mapping of typeahead values to indices for faster searching.
@@ -4467,7 +5398,7 @@ var bundle = function (exports) {
         const isCharacterKey = key.length === 1 || !/^[A-Za-z]/.test(key);
         if (isCharacterKey) {
           var _getCurrentTypeahead;
-          if (key == " " && ((_getCurrentTypeahead = getCurrentTypeahead()) !== null && _getCurrentTypeahead !== void 0 ? _getCurrentTypeahead : "").trim().length == 0) ;else {
+          if (key == " " && ((_getCurrentTypeahead = getCurrentTypeahead()) !== null && _getCurrentTypeahead !== void 0 ? _getCurrentTypeahead : "").trim().length == 0) ; else {
             e.preventDefault();
             e.stopPropagation();
             // Note: Won't be true for the first keydown
@@ -4485,10 +5416,6 @@ var bundle = function (exports) {
         setImeActive(true);
       })
     });
-    // Handle changes in typeahead that cause changes to the tabbable index
-    /* useEffect(() => {
-         
-     }, [currentTypeahead]);*/
     const excludeSpace = useStableCallback(() => {
       return typeaheadStatus != "none";
     });
@@ -4520,17 +5447,17 @@ var bundle = function (exports) {
             But roughly isn't good enough if there are multiple matches.
             To convert our sorted index to the unsorted index we need, we have to find the first
             element that matches us *and* (if any such exist) is *after* our current selection.
-                     In other words, the only way typeahead moves backwards relative to our current
+                 In other words, the only way typeahead moves backwards relative to our current
             position is if the only other option is behind us.
-                     It's not specified in WAI-ARIA what to do in that case.  I suppose wrap back to the start?
+                 It's not specified in WAI-ARIA what to do in that case.  I suppose wrap back to the start?
             Though there's also a case for just going upwards to the nearest to prevent jumpiness.
             But if you're already doing typeahead on an unsorted list, like, jumpiness can't be avoided.
             I dunno. Going back to the start is the simplist though.
-                     Basically what this does: Starting from where we found ourselves after our binary search,
+                 Basically what this does: Starting from where we found ourselves after our binary search,
             scan backwards and forwards through all adjacent entries that also compare equally so that
             we can find the one whose `unsortedIndex` is the lowest amongst all other equal strings
             (and also the lowest `unsortedIndex` yadda yadda except that it comes after us).
-                     TODO: The binary search starts this off with a solid O(log n), but one-character
+                 TODO: The binary search starts this off with a solid O(log n), but one-character
             searches are, thanks to pigeonhole principal, eventually guaranteed to become
             O(n*log n). This is annoying but probably not easily solvable? There could be an
             exception for one-character strings, but that's just kicking the can down
@@ -4569,7 +5496,7 @@ var bundle = function (exports) {
       }
     }
   }
-  function useTypeaheadNavigationChild(_ref20) {
+  function useTypeaheadNavigationChild(_ref2) {
     let {
       managedChildParameters: {
         index,
@@ -4592,9 +5519,8 @@ var bundle = function (exports) {
         getElement,
         ...void3
       },
-      //typeaheadNavigationChildParameters: { ...void5 },
       ...void4
-    } = _ref20;
+    } = _ref2;
     const {
       textContentReturn
     } = useTextContent({
@@ -4681,14 +5607,14 @@ var bundle = function (exports) {
    * In the document order, there will be only one "focused" or "tabbable" element, making it act more like one complete unit in comparison to everything around it.
    * Navigating forwards/backwards can be done with the arrow keys, Home/End keys, or any text for typeahead to focus the next item that matches.
    */
-  function useListNavigation(_ref21) {
+  function useListNavigation(_ref) {
     let {
       linearNavigationParameters,
       typeaheadNavigationParameters,
       rovingTabIndexParameters,
       managedChildrenReturn,
       ..._void1
-    } = _ref21;
+    } = _ref;
     const rtir = useRovingTabIndex({
       managedChildrenReturn,
       rovingTabIndexParameters
@@ -4710,17 +5636,16 @@ var bundle = function (exports) {
       ...rtir
     };
   }
-  function useListNavigationChild(_ref22) {
+  function useListNavigationChild(_ref2) {
     let {
       rovingTabIndexChildParameters,
       rovingTabIndexChildContext,
       typeaheadNavigationChildContext,
-      //typeaheadNavigationChildParameters,
       managedChildParameters,
       refElementReturn,
       textContentParameters,
       ..._void2
-    } = _ref22;
+    } = _ref2;
     const rticr = useRovingTabIndexChild({
       rovingTabIndexChildContext,
       rovingTabIndexChildParameters,
@@ -4732,13 +5657,13 @@ var bundle = function (exports) {
       managedChildParameters,
       textContentParameters
     });
-    //    assertEmptyObject(_void5);
     return {
       ...tncr,
       ...rticr
     };
   }
-  function useGridNavigation(_ref23) {
+
+  function useGridNavigation(_ref) {
     let {
       gridNavigationParameters: {
         onTabbableColumnChange,
@@ -4752,7 +5677,7 @@ var bundle = function (exports) {
       managedChildrenReturn,
       typeaheadNavigationParameters,
       ..._void2
-    } = _ref23;
+    } = _ref;
     const {
       getChildren
     } = managedChildrenReturn;
@@ -4763,12 +5688,12 @@ var bundle = function (exports) {
       return initiallyTabbedIndex !== null && initiallyTabbedIndex !== void 0 ? initiallyTabbedIndex : 0;
     }));
     const onTabbableIndexChangeOverride = useStableCallback((nextRow, previousRow, reason) => {
-      var _children$getAt3, _children$getAt4;
+      var _children$getAt, _children$getAt2;
       const children = getChildren();
       onTabbableIndexChange === null || onTabbableIndexChange === void 0 ? void 0 : onTabbableIndexChange(nextRow, previousRow, reason);
       const nextColumn = getCurrentTabbableColumn();
-      if (previousRow != null) (_children$getAt3 = children.getAt(previousRow)) === null || _children$getAt3 === void 0 ? void 0 : _children$getAt3.setTabbableColumnIndex(nextColumn, reason, false);
-      if (nextRow != null) (_children$getAt4 = children.getAt(nextRow)) === null || _children$getAt4 === void 0 ? void 0 : _children$getAt4.setTabbableColumnIndex(nextColumn, reason, false);
+      if (previousRow != null) (_children$getAt = children.getAt(previousRow)) === null || _children$getAt === void 0 ? void 0 : _children$getAt.setTabbableColumnIndex(nextColumn, reason, false);
+      if (nextRow != null) (_children$getAt2 = children.getAt(nextRow)) === null || _children$getAt2 === void 0 ? void 0 : _children$getAt2.setTabbableColumnIndex(nextColumn, reason, false);
     });
     const {
       linearNavigationReturn,
@@ -4806,7 +5731,7 @@ var bundle = function (exports) {
       })
     };
   }
-  function useGridNavigationRow(_ref24) {
+  function useGridNavigationRow(_ref2) {
     let {
       rowAsChildOfGridParameters: {
         gridNavigationRowContext: {
@@ -4826,7 +5751,7 @@ var bundle = function (exports) {
         ...asParentRowOfCellsP
       },
       ..._void1
-    } = _ref24;
+    } = _ref2;
     const {
       managedChildrenReturn: {
         getChildren
@@ -4908,7 +5833,7 @@ var bundle = function (exports) {
       }
     };
   }
-  function useGridNavigationCell(_ref25) {
+  function useGridNavigationCell(_ref3) {
     let {
       //    managedChildParameters: { hidden, index, ...void3 },
       rovingTabIndexChildContext,
@@ -4931,7 +5856,7 @@ var bundle = function (exports) {
         }
       },
       ..._void1
-    } = _ref25;
+    } = _ref3;
     const {
       index
     } = managedChildParameters;
@@ -4975,24 +5900,7 @@ var bundle = function (exports) {
     };
   }
 
-  /**
-   * This method returns `undefined`.
-   *
-   * @static
-   * @memberOf _
-   * @since 2.3.0
-   * @category Util
-   * @example
-   *
-   * _.times(2, _.noop);
-   * // => [undefined, undefined]
-   */
-  function noop() {
-    // No operation performed.
-  }
-
-  //export type UseSingleSelectionChild<E extends Element> = (a: UseSingleSelectionChildParameters<E>) => UseSingleSelectionChildReturnTypeWithHooks<E>;
-  function useSingleSelection(_ref26) {
+  function useSingleSelection(_ref) {
     let {
       managedChildrenReturn: {
         getChildren
@@ -5004,7 +5912,7 @@ var bundle = function (exports) {
         onSelectedIndexChange: onSelectedIndexChange_U,
         initiallySelectedIndex
       }
-    } = _ref26;
+    } = _ref;
     const onSelectedIndexChange = useStableCallback(onSelectedIndexChange_U !== null && onSelectedIndexChange_U !== void 0 ? onSelectedIndexChange_U : noop);
     const getSelectedAt = T$1(m => {
       return m.getSelected();
@@ -5069,7 +5977,6 @@ var bundle = function (exports) {
         index
       }
     } = args;
-    //let lastRecordedDistance = useRef(0);
     useEnsureStability("useSingleSelectionChild", getSelectedIndex, onSelectedIndexChange);
     const getDisabled = useStableGetter(disabled);
     const [localSelected, setLocalSelected, getLocalSelected] = useState(getSelectedIndex() == index);
@@ -5085,7 +5992,6 @@ var bundle = function (exports) {
     });
     const propParts = (_ariaPropName$split = ariaPropName === null || ariaPropName === void 0 ? void 0 : ariaPropName.split("-")) !== null && _ariaPropName$split !== void 0 ? _ariaPropName$split : [];
     return {
-      //managedChildParameters: { selected, setSelected, getSelected, },
       managedChildParameters: {
         setLocalSelected: useStableCallback((selected, direction) => {
           setLocalSelected(selected);
@@ -5101,7 +6007,6 @@ var bundle = function (exports) {
         getSelectedOffset: getDirection,
         selectedOffset: direction,
         getSelected: getLocalSelected,
-        //getDistance: useCallback(() => { return lastRecordedDistance.current; }, []),
         propsUnstable: ariaPropName == null || selectionMode == "disabled" ? {} : {
           ["".concat(propParts[0], "-").concat(propParts[1])]: localSelected ? propParts[1] == "current" ? "".concat(propParts[2]) : "true" : "false"
         }
@@ -5114,7 +6019,8 @@ var bundle = function (exports) {
       }
     };
   }
-  function useGridNavigationSingleSelection(_ref27) {
+
+  function useGridNavigationSingleSelection(_ref) {
     let {
       gridNavigationParameters,
       linearNavigationParameters,
@@ -5123,7 +6029,7 @@ var bundle = function (exports) {
       typeaheadNavigationParameters,
       singleSelectionParameters,
       ..._void2
-    } = _ref27;
+    } = _ref;
     const gnr = useGridNavigation({
       gridNavigationParameters,
       linearNavigationParameters,
@@ -5144,12 +6050,12 @@ var bundle = function (exports) {
       ...ssr
     };
   }
-  function useGridNavigationSingleSelectionRow(_ref28) {
+  function useGridNavigationSingleSelectionRow(_ref2) {
     let {
       rowAsChildOfGridParameters,
       rowAsParentOfCellsParameters,
       ..._void1
-    } = _ref28;
+    } = _ref2;
     const {
       managedChildParameters,
       hasCurrentFocusParameters: {
@@ -5200,821 +6106,6 @@ var bundle = function (exports) {
   }
 
   /**
-   * Copies the values of `source` to `array`.
-   *
-   * @private
-   * @param {Array} source The array to copy values from.
-   * @param {Array} [array=[]] The array to copy values to.
-   * @returns {Array} Returns `array`.
-   */
-  function copyArray(source, array) {
-    var index = -1,
-      length = source.length;
-    array || (array = Array(length));
-    while (++index < length) {
-      array[index] = source[index];
-    }
-    return array;
-  }
-
-  /* Built-in method references for those with the same name as other `lodash` methods. */
-  var nativeFloor = Math.floor,
-    nativeRandom = Math.random;
-
-  /**
-   * The base implementation of `_.random` without support for returning
-   * floating-point numbers.
-   *
-   * @private
-   * @param {number} lower The lower bound.
-   * @param {number} upper The upper bound.
-   * @returns {number} Returns the random number.
-   */
-  function baseRandom(lower, upper) {
-    return lower + nativeFloor(nativeRandom() * (upper - lower + 1));
-  }
-
-  /**
-   * A specialized version of `_.shuffle` which mutates and sets the size of `array`.
-   *
-   * @private
-   * @param {Array} array The array to shuffle.
-   * @param {number} [size=array.length] The size of `array`.
-   * @returns {Array} Returns `array`.
-   */
-  function shuffleSelf(array, size) {
-    var index = -1,
-      length = array.length,
-      lastIndex = length - 1;
-    size = size === undefined ? length : size;
-    while (++index < size) {
-      var rand = baseRandom(index, lastIndex),
-        value = array[rand];
-      array[rand] = array[index];
-      array[index] = value;
-    }
-    array.length = size;
-    return array;
-  }
-
-  /**
-   * A specialized version of `_.shuffle` for arrays.
-   *
-   * @private
-   * @param {Array} array The array to shuffle.
-   * @returns {Array} Returns the new shuffled array.
-   */
-  function arrayShuffle(array) {
-    return shuffleSelf(copyArray(array));
-  }
-
-  /**
-   * A specialized version of `_.map` for arrays without support for iteratee
-   * shorthands.
-   *
-   * @private
-   * @param {Array} [array] The array to iterate over.
-   * @param {Function} iteratee The function invoked per iteration.
-   * @returns {Array} Returns the new mapped array.
-   */
-  function arrayMap(array, iteratee) {
-    var index = -1,
-      length = array == null ? 0 : array.length,
-      result = Array(length);
-    while (++index < length) {
-      result[index] = iteratee(array[index], index, array);
-    }
-    return result;
-  }
-
-  /**
-   * The base implementation of `_.values` and `_.valuesIn` which creates an
-   * array of `object` property values corresponding to the property names
-   * of `props`.
-   *
-   * @private
-   * @param {Object} object The object to query.
-   * @param {Array} props The property names to get values for.
-   * @returns {Object} Returns the array of property values.
-   */
-  function baseValues(object, props) {
-    return arrayMap(props, function (key) {
-      return object[key];
-    });
-  }
-
-  /**
-   * The base implementation of `_.times` without support for iteratee shorthands
-   * or max array length checks.
-   *
-   * @private
-   * @param {number} n The number of times to invoke `iteratee`.
-   * @param {Function} iteratee The function invoked per iteration.
-   * @returns {Array} Returns the array of results.
-   */
-  function baseTimes(n, iteratee) {
-    var index = -1,
-      result = Array(n);
-    while (++index < n) {
-      result[index] = iteratee(index);
-    }
-    return result;
-  }
-
-  /** Detect free variable `global` from Node.js. */
-  var freeGlobal = typeof global == 'object' && global && global.Object === Object && global;
-  var freeGlobal$1 = freeGlobal;
-
-  /** Detect free variable `self`. */
-  var freeSelf = typeof self == 'object' && self && self.Object === Object && self;
-
-  /** Used as a reference to the global object. */
-  var root = freeGlobal$1 || freeSelf || Function('return this')();
-  var root$1 = root;
-
-  /** Built-in value references. */
-  var Symbol$1 = root$1.Symbol;
-  var Symbol$2 = Symbol$1;
-
-  /** Used for built-in method references. */
-  var objectProto$5 = Object.prototype;
-
-  /** Used to check objects for own properties. */
-  var hasOwnProperty$3 = objectProto$5.hasOwnProperty;
-
-  /**
-   * Used to resolve the
-   * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
-   * of values.
-   */
-  var nativeObjectToString$1 = objectProto$5.toString;
-
-  /** Built-in value references. */
-  var symToStringTag$1 = Symbol$2 ? Symbol$2.toStringTag : undefined;
-
-  /**
-   * A specialized version of `baseGetTag` which ignores `Symbol.toStringTag` values.
-   *
-   * @private
-   * @param {*} value The value to query.
-   * @returns {string} Returns the raw `toStringTag`.
-   */
-  function getRawTag(value) {
-    var isOwn = hasOwnProperty$3.call(value, symToStringTag$1),
-      tag = value[symToStringTag$1];
-    try {
-      value[symToStringTag$1] = undefined;
-      var unmasked = true;
-    } catch (e) {}
-    var result = nativeObjectToString$1.call(value);
-    if (unmasked) {
-      if (isOwn) {
-        value[symToStringTag$1] = tag;
-      } else {
-        delete value[symToStringTag$1];
-      }
-    }
-    return result;
-  }
-
-  /** Used for built-in method references. */
-  var objectProto$4 = Object.prototype;
-
-  /**
-   * Used to resolve the
-   * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
-   * of values.
-   */
-  var nativeObjectToString = objectProto$4.toString;
-
-  /**
-   * Converts `value` to a string using `Object.prototype.toString`.
-   *
-   * @private
-   * @param {*} value The value to convert.
-   * @returns {string} Returns the converted string.
-   */
-  function objectToString(value) {
-    return nativeObjectToString.call(value);
-  }
-
-  /** `Object#toString` result references. */
-  var nullTag = '[object Null]',
-    undefinedTag = '[object Undefined]';
-
-  /** Built-in value references. */
-  var symToStringTag = Symbol$2 ? Symbol$2.toStringTag : undefined;
-
-  /**
-   * The base implementation of `getTag` without fallbacks for buggy environments.
-   *
-   * @private
-   * @param {*} value The value to query.
-   * @returns {string} Returns the `toStringTag`.
-   */
-  function baseGetTag(value) {
-    if (value == null) {
-      return value === undefined ? undefinedTag : nullTag;
-    }
-    return symToStringTag && symToStringTag in Object(value) ? getRawTag(value) : objectToString(value);
-  }
-
-  /**
-   * Checks if `value` is object-like. A value is object-like if it's not `null`
-   * and has a `typeof` result of "object".
-   *
-   * @static
-   * @memberOf _
-   * @since 4.0.0
-   * @category Lang
-   * @param {*} value The value to check.
-   * @returns {boolean} Returns `true` if `value` is object-like, else `false`.
-   * @example
-   *
-   * _.isObjectLike({});
-   * // => true
-   *
-   * _.isObjectLike([1, 2, 3]);
-   * // => true
-   *
-   * _.isObjectLike(_.noop);
-   * // => false
-   *
-   * _.isObjectLike(null);
-   * // => false
-   */
-  function isObjectLike(value) {
-    return value != null && typeof value == 'object';
-  }
-
-  /** `Object#toString` result references. */
-  var argsTag$1 = '[object Arguments]';
-
-  /**
-   * The base implementation of `_.isArguments`.
-   *
-   * @private
-   * @param {*} value The value to check.
-   * @returns {boolean} Returns `true` if `value` is an `arguments` object,
-   */
-  function baseIsArguments(value) {
-    return isObjectLike(value) && baseGetTag(value) == argsTag$1;
-  }
-
-  /** Used for built-in method references. */
-  var objectProto$3 = Object.prototype;
-
-  /** Used to check objects for own properties. */
-  var hasOwnProperty$2 = objectProto$3.hasOwnProperty;
-
-  /** Built-in value references. */
-  var propertyIsEnumerable = objectProto$3.propertyIsEnumerable;
-
-  /**
-   * Checks if `value` is likely an `arguments` object.
-   *
-   * @static
-   * @memberOf _
-   * @since 0.1.0
-   * @category Lang
-   * @param {*} value The value to check.
-   * @returns {boolean} Returns `true` if `value` is an `arguments` object,
-   *  else `false`.
-   * @example
-   *
-   * _.isArguments(function() { return arguments; }());
-   * // => true
-   *
-   * _.isArguments([1, 2, 3]);
-   * // => false
-   */
-  var isArguments = baseIsArguments(function () {
-    return arguments;
-  }()) ? baseIsArguments : function (value) {
-    return isObjectLike(value) && hasOwnProperty$2.call(value, 'callee') && !propertyIsEnumerable.call(value, 'callee');
-  };
-  var isArguments$1 = isArguments;
-
-  /**
-   * Checks if `value` is classified as an `Array` object.
-   *
-   * @static
-   * @memberOf _
-   * @since 0.1.0
-   * @category Lang
-   * @param {*} value The value to check.
-   * @returns {boolean} Returns `true` if `value` is an array, else `false`.
-   * @example
-   *
-   * _.isArray([1, 2, 3]);
-   * // => true
-   *
-   * _.isArray(document.body.children);
-   * // => false
-   *
-   * _.isArray('abc');
-   * // => false
-   *
-   * _.isArray(_.noop);
-   * // => false
-   */
-  var isArray = Array.isArray;
-  var isArray$1 = isArray;
-
-  /**
-   * This method returns `false`.
-   *
-   * @static
-   * @memberOf _
-   * @since 4.13.0
-   * @category Util
-   * @returns {boolean} Returns `false`.
-   * @example
-   *
-   * _.times(2, _.stubFalse);
-   * // => [false, false]
-   */
-  function stubFalse() {
-    return false;
-  }
-
-  /** Detect free variable `exports`. */
-  var freeExports$1 = typeof exports == 'object' && exports && !exports.nodeType && exports;
-
-  /** Detect free variable `module`. */
-  var freeModule$1 = freeExports$1 && typeof module == 'object' && module && !module.nodeType && module;
-
-  /** Detect the popular CommonJS extension `module.exports`. */
-  var moduleExports$1 = freeModule$1 && freeModule$1.exports === freeExports$1;
-
-  /** Built-in value references. */
-  var Buffer = moduleExports$1 ? root$1.Buffer : undefined;
-
-  /* Built-in method references for those with the same name as other `lodash` methods. */
-  var nativeIsBuffer = Buffer ? Buffer.isBuffer : undefined;
-
-  /**
-   * Checks if `value` is a buffer.
-   *
-   * @static
-   * @memberOf _
-   * @since 4.3.0
-   * @category Lang
-   * @param {*} value The value to check.
-   * @returns {boolean} Returns `true` if `value` is a buffer, else `false`.
-   * @example
-   *
-   * _.isBuffer(new Buffer(2));
-   * // => true
-   *
-   * _.isBuffer(new Uint8Array(2));
-   * // => false
-   */
-  var isBuffer = nativeIsBuffer || stubFalse;
-  var isBuffer$1 = isBuffer;
-
-  /** Used as references for various `Number` constants. */
-  var MAX_SAFE_INTEGER$1 = 9007199254740991;
-
-  /** Used to detect unsigned integer values. */
-  var reIsUint = /^(?:0|[1-9]\d*)$/;
-
-  /**
-   * Checks if `value` is a valid array-like index.
-   *
-   * @private
-   * @param {*} value The value to check.
-   * @param {number} [length=MAX_SAFE_INTEGER] The upper bounds of a valid index.
-   * @returns {boolean} Returns `true` if `value` is a valid index, else `false`.
-   */
-  function isIndex(value, length) {
-    var type = typeof value;
-    length = length == null ? MAX_SAFE_INTEGER$1 : length;
-    return !!length && (type == 'number' || type != 'symbol' && reIsUint.test(value)) && value > -1 && value % 1 == 0 && value < length;
-  }
-
-  /** Used as references for various `Number` constants. */
-  var MAX_SAFE_INTEGER = 9007199254740991;
-
-  /**
-   * Checks if `value` is a valid array-like length.
-   *
-   * **Note:** This method is loosely based on
-   * [`ToLength`](http://ecma-international.org/ecma-262/7.0/#sec-tolength).
-   *
-   * @static
-   * @memberOf _
-   * @since 4.0.0
-   * @category Lang
-   * @param {*} value The value to check.
-   * @returns {boolean} Returns `true` if `value` is a valid length, else `false`.
-   * @example
-   *
-   * _.isLength(3);
-   * // => true
-   *
-   * _.isLength(Number.MIN_VALUE);
-   * // => false
-   *
-   * _.isLength(Infinity);
-   * // => false
-   *
-   * _.isLength('3');
-   * // => false
-   */
-  function isLength(value) {
-    return typeof value == 'number' && value > -1 && value % 1 == 0 && value <= MAX_SAFE_INTEGER;
-  }
-
-  /** `Object#toString` result references. */
-  var argsTag = '[object Arguments]',
-    arrayTag = '[object Array]',
-    boolTag = '[object Boolean]',
-    dateTag = '[object Date]',
-    errorTag = '[object Error]',
-    funcTag$1 = '[object Function]',
-    mapTag = '[object Map]',
-    numberTag = '[object Number]',
-    objectTag = '[object Object]',
-    regexpTag = '[object RegExp]',
-    setTag = '[object Set]',
-    stringTag = '[object String]',
-    weakMapTag = '[object WeakMap]';
-  var arrayBufferTag = '[object ArrayBuffer]',
-    dataViewTag = '[object DataView]',
-    float32Tag = '[object Float32Array]',
-    float64Tag = '[object Float64Array]',
-    int8Tag = '[object Int8Array]',
-    int16Tag = '[object Int16Array]',
-    int32Tag = '[object Int32Array]',
-    uint8Tag = '[object Uint8Array]',
-    uint8ClampedTag = '[object Uint8ClampedArray]',
-    uint16Tag = '[object Uint16Array]',
-    uint32Tag = '[object Uint32Array]';
-
-  /** Used to identify `toStringTag` values of typed arrays. */
-  var typedArrayTags = {};
-  typedArrayTags[float32Tag] = typedArrayTags[float64Tag] = typedArrayTags[int8Tag] = typedArrayTags[int16Tag] = typedArrayTags[int32Tag] = typedArrayTags[uint8Tag] = typedArrayTags[uint8ClampedTag] = typedArrayTags[uint16Tag] = typedArrayTags[uint32Tag] = true;
-  typedArrayTags[argsTag] = typedArrayTags[arrayTag] = typedArrayTags[arrayBufferTag] = typedArrayTags[boolTag] = typedArrayTags[dataViewTag] = typedArrayTags[dateTag] = typedArrayTags[errorTag] = typedArrayTags[funcTag$1] = typedArrayTags[mapTag] = typedArrayTags[numberTag] = typedArrayTags[objectTag] = typedArrayTags[regexpTag] = typedArrayTags[setTag] = typedArrayTags[stringTag] = typedArrayTags[weakMapTag] = false;
-
-  /**
-   * The base implementation of `_.isTypedArray` without Node.js optimizations.
-   *
-   * @private
-   * @param {*} value The value to check.
-   * @returns {boolean} Returns `true` if `value` is a typed array, else `false`.
-   */
-  function baseIsTypedArray(value) {
-    return isObjectLike(value) && isLength(value.length) && !!typedArrayTags[baseGetTag(value)];
-  }
-
-  /**
-   * The base implementation of `_.unary` without support for storing metadata.
-   *
-   * @private
-   * @param {Function} func The function to cap arguments for.
-   * @returns {Function} Returns the new capped function.
-   */
-  function baseUnary(func) {
-    return function (value) {
-      return func(value);
-    };
-  }
-
-  /** Detect free variable `exports`. */
-  var freeExports = typeof exports == 'object' && exports && !exports.nodeType && exports;
-
-  /** Detect free variable `module`. */
-  var freeModule = freeExports && typeof module == 'object' && module && !module.nodeType && module;
-
-  /** Detect the popular CommonJS extension `module.exports`. */
-  var moduleExports = freeModule && freeModule.exports === freeExports;
-
-  /** Detect free variable `process` from Node.js. */
-  var freeProcess = moduleExports && freeGlobal$1.process;
-
-  /** Used to access faster Node.js helpers. */
-  var nodeUtil = function () {
-    try {
-      // Use `util.types` for Node.js 10+.
-      var types = freeModule && freeModule.require && freeModule.require('util').types;
-      if (types) {
-        return types;
-      }
-
-      // Legacy `process.binding('util')` for Node.js < 10.
-      return freeProcess && freeProcess.binding && freeProcess.binding('util');
-    } catch (e) {}
-  }();
-  var nodeUtil$1 = nodeUtil;
-
-  /* Node.js helper references. */
-  var nodeIsTypedArray = nodeUtil$1 && nodeUtil$1.isTypedArray;
-
-  /**
-   * Checks if `value` is classified as a typed array.
-   *
-   * @static
-   * @memberOf _
-   * @since 3.0.0
-   * @category Lang
-   * @param {*} value The value to check.
-   * @returns {boolean} Returns `true` if `value` is a typed array, else `false`.
-   * @example
-   *
-   * _.isTypedArray(new Uint8Array);
-   * // => true
-   *
-   * _.isTypedArray([]);
-   * // => false
-   */
-  var isTypedArray = nodeIsTypedArray ? baseUnary(nodeIsTypedArray) : baseIsTypedArray;
-  var isTypedArray$1 = isTypedArray;
-
-  /** Used for built-in method references. */
-  var objectProto$2 = Object.prototype;
-
-  /** Used to check objects for own properties. */
-  var hasOwnProperty$1 = objectProto$2.hasOwnProperty;
-
-  /**
-   * Creates an array of the enumerable property names of the array-like `value`.
-   *
-   * @private
-   * @param {*} value The value to query.
-   * @param {boolean} inherited Specify returning inherited property names.
-   * @returns {Array} Returns the array of property names.
-   */
-  function arrayLikeKeys(value, inherited) {
-    var isArr = isArray$1(value),
-      isArg = !isArr && isArguments$1(value),
-      isBuff = !isArr && !isArg && isBuffer$1(value),
-      isType = !isArr && !isArg && !isBuff && isTypedArray$1(value),
-      skipIndexes = isArr || isArg || isBuff || isType,
-      result = skipIndexes ? baseTimes(value.length, String) : [],
-      length = result.length;
-    for (var key in value) {
-      if ((inherited || hasOwnProperty$1.call(value, key)) && !(skipIndexes && (
-      // Safari 9 has enumerable `arguments.length` in strict mode.
-      key == 'length' ||
-      // Node.js 0.10 has enumerable non-index properties on buffers.
-      isBuff && (key == 'offset' || key == 'parent') ||
-      // PhantomJS 2 has enumerable non-index properties on typed arrays.
-      isType && (key == 'buffer' || key == 'byteLength' || key == 'byteOffset') ||
-      // Skip index properties.
-      isIndex(key, length)))) {
-        result.push(key);
-      }
-    }
-    return result;
-  }
-
-  /** Used for built-in method references. */
-  var objectProto$1 = Object.prototype;
-
-  /**
-   * Checks if `value` is likely a prototype object.
-   *
-   * @private
-   * @param {*} value The value to check.
-   * @returns {boolean} Returns `true` if `value` is a prototype, else `false`.
-   */
-  function isPrototype(value) {
-    var Ctor = value && value.constructor,
-      proto = typeof Ctor == 'function' && Ctor.prototype || objectProto$1;
-    return value === proto;
-  }
-
-  /**
-   * Creates a unary function that invokes `func` with its argument transformed.
-   *
-   * @private
-   * @param {Function} func The function to wrap.
-   * @param {Function} transform The argument transform.
-   * @returns {Function} Returns the new function.
-   */
-  function overArg(func, transform) {
-    return function (arg) {
-      return func(transform(arg));
-    };
-  }
-
-  /* Built-in method references for those with the same name as other `lodash` methods. */
-  var nativeKeys = overArg(Object.keys, Object);
-  var nativeKeys$1 = nativeKeys;
-
-  /** Used for built-in method references. */
-  var objectProto = Object.prototype;
-
-  /** Used to check objects for own properties. */
-  var hasOwnProperty = objectProto.hasOwnProperty;
-
-  /**
-   * The base implementation of `_.keys` which doesn't treat sparse arrays as dense.
-   *
-   * @private
-   * @param {Object} object The object to query.
-   * @returns {Array} Returns the array of property names.
-   */
-  function baseKeys(object) {
-    if (!isPrototype(object)) {
-      return nativeKeys$1(object);
-    }
-    var result = [];
-    for (var key in Object(object)) {
-      if (hasOwnProperty.call(object, key) && key != 'constructor') {
-        result.push(key);
-      }
-    }
-    return result;
-  }
-
-  /**
-   * Checks if `value` is the
-   * [language type](http://www.ecma-international.org/ecma-262/7.0/#sec-ecmascript-language-types)
-   * of `Object`. (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
-   *
-   * @static
-   * @memberOf _
-   * @since 0.1.0
-   * @category Lang
-   * @param {*} value The value to check.
-   * @returns {boolean} Returns `true` if `value` is an object, else `false`.
-   * @example
-   *
-   * _.isObject({});
-   * // => true
-   *
-   * _.isObject([1, 2, 3]);
-   * // => true
-   *
-   * _.isObject(_.noop);
-   * // => true
-   *
-   * _.isObject(null);
-   * // => false
-   */
-  function isObject(value) {
-    var type = typeof value;
-    return value != null && (type == 'object' || type == 'function');
-  }
-
-  /** `Object#toString` result references. */
-  var asyncTag = '[object AsyncFunction]',
-    funcTag = '[object Function]',
-    genTag = '[object GeneratorFunction]',
-    proxyTag = '[object Proxy]';
-
-  /**
-   * Checks if `value` is classified as a `Function` object.
-   *
-   * @static
-   * @memberOf _
-   * @since 0.1.0
-   * @category Lang
-   * @param {*} value The value to check.
-   * @returns {boolean} Returns `true` if `value` is a function, else `false`.
-   * @example
-   *
-   * _.isFunction(_);
-   * // => true
-   *
-   * _.isFunction(/abc/);
-   * // => false
-   */
-  function isFunction(value) {
-    if (!isObject(value)) {
-      return false;
-    }
-    // The use of `Object#toString` avoids issues with the `typeof` operator
-    // in Safari 9 which returns 'object' for typed arrays and other constructors.
-    var tag = baseGetTag(value);
-    return tag == funcTag || tag == genTag || tag == asyncTag || tag == proxyTag;
-  }
-
-  /**
-   * Checks if `value` is array-like. A value is considered array-like if it's
-   * not a function and has a `value.length` that's an integer greater than or
-   * equal to `0` and less than or equal to `Number.MAX_SAFE_INTEGER`.
-   *
-   * @static
-   * @memberOf _
-   * @since 4.0.0
-   * @category Lang
-   * @param {*} value The value to check.
-   * @returns {boolean} Returns `true` if `value` is array-like, else `false`.
-   * @example
-   *
-   * _.isArrayLike([1, 2, 3]);
-   * // => true
-   *
-   * _.isArrayLike(document.body.children);
-   * // => true
-   *
-   * _.isArrayLike('abc');
-   * // => true
-   *
-   * _.isArrayLike(_.noop);
-   * // => false
-   */
-  function isArrayLike(value) {
-    return value != null && isLength(value.length) && !isFunction(value);
-  }
-
-  /**
-   * Creates an array of the own enumerable property names of `object`.
-   *
-   * **Note:** Non-object values are coerced to objects. See the
-   * [ES spec](http://ecma-international.org/ecma-262/7.0/#sec-object.keys)
-   * for more details.
-   *
-   * @static
-   * @since 0.1.0
-   * @memberOf _
-   * @category Object
-   * @param {Object} object The object to query.
-   * @returns {Array} Returns the array of property names.
-   * @example
-   *
-   * function Foo() {
-   *   this.a = 1;
-   *   this.b = 2;
-   * }
-   *
-   * Foo.prototype.c = 3;
-   *
-   * _.keys(new Foo);
-   * // => ['a', 'b'] (iteration order is not guaranteed)
-   *
-   * _.keys('hi');
-   * // => ['0', '1']
-   */
-  function keys(object) {
-    return isArrayLike(object) ? arrayLikeKeys(object) : baseKeys(object);
-  }
-
-  /**
-   * Creates an array of the own enumerable string keyed property values of `object`.
-   *
-   * **Note:** Non-object values are coerced to objects.
-   *
-   * @static
-   * @since 0.1.0
-   * @memberOf _
-   * @category Object
-   * @param {Object} object The object to query.
-   * @returns {Array} Returns the array of property values.
-   * @example
-   *
-   * function Foo() {
-   *   this.a = 1;
-   *   this.b = 2;
-   * }
-   *
-   * Foo.prototype.c = 3;
-   *
-   * _.values(new Foo);
-   * // => [1, 2] (iteration order is not guaranteed)
-   *
-   * _.values('hi');
-   * // => ['h', 'i']
-   */
-  function values(object) {
-    return object == null ? [] : baseValues(object, keys(object));
-  }
-
-  /**
-   * The base implementation of `_.shuffle`.
-   *
-   * @private
-   * @param {Array|Object} collection The collection to shuffle.
-   * @returns {Array} Returns the new shuffled array.
-   */
-  function baseShuffle(collection) {
-    return shuffleSelf(values(collection));
-  }
-
-  /**
-   * Creates an array of shuffled values, using a version of the
-   * [Fisher-Yates shuffle](https://en.wikipedia.org/wiki/Fisher-Yates_shuffle).
-   *
-   * @static
-   * @memberOf _
-   * @since 0.1.0
-   * @category Collection
-   * @param {Array|Object} collection The collection to shuffle.
-   * @returns {Array} Returns the new shuffled array.
-   * @example
-   *
-   * _.shuffle([1, 2, 3, 4]);
-   * // => [4, 1, 3, 2]
-   */
-  function shuffle(collection) {
-    var func = isArray$1(collection) ? arrayShuffle : baseShuffle;
-    return func(collection);
-  }
-
-  /**
    * Returns a function that will, when called, force the component
    * that uses this hook to re-render itself.
    *
@@ -6046,13 +6137,13 @@ var bundle = function (exports) {
    * Because keys are given special treatment and a child has no way of modifying its own key
    * there's no other time or place this can happen other than exactly within the parent component's render function.
    */
-  function useRearrangeableChildren(_ref29) {
+  function useRearrangeableChildren(_ref) {
     let {
       rearrangeableChildrenParameters: {
         getIndex,
         onRearranged
       }
-    } = _ref29;
+    } = _ref;
     // These are used to keep track of a mapping between unsorted index <---> sorted index.
     // These are needed for navigation with the arrow keys.
     const mangleMap = _(new Map());
@@ -6068,12 +6159,14 @@ var bundle = function (exports) {
     const onRearrangedGetter = useStableGetter(onRearranged);
     //const { setTabbableIndex } = rovingTabIndexReturn;
     const shuffle$1 = T$1(managedRows => {
-      const shuffledRows = shuffle(managedRows.arraySlice());
-      return rearrange(shuffledRows);
+      const originalRows = managedRows.arraySlice();
+      const shuffledRows = shuffle(originalRows);
+      return rearrange(originalRows, shuffledRows);
     }, [/* Must remain stable */]);
     const reverse = T$1(managedRows => {
+      const originalRows = managedRows.arraySlice();
       const reversedRows = managedRows.arraySlice().reverse();
-      return rearrange(reversedRows);
+      return rearrange(originalRows, reversedRows);
     }, [/* Must remain stable */]);
     // The sort function needs to be able to update whoever has all the sortable children.
     // Because that might not be the consumer of *this* hook directly (e.g. a table uses
@@ -6081,7 +6174,7 @@ var bundle = function (exports) {
     // get and set a forceUpdate function.
     //const [getForceUpdate, setForceUpdate] = usePassiveState<null | (() => void)>(null, returnNull);
     const [getForceUpdate, setForceUpdate] = usePassiveState(null, returnNull);
-    const rearrange = T$1(sortedRows => {
+    const rearrange = T$1((originalRows, sortedRows) => {
       var _onRearrangedGetter, _getForceUpdate;
       mangleMap.current.clear();
       demangleMap.current.clear();
@@ -6109,12 +6202,12 @@ var bundle = function (exports) {
         demangledIndex: getIndex(child)
       })).sort((lhs, rhs) => {
         return lhs.mangledIndex - rhs.mangledIndex;
-      }).map(_ref30 => {
+      }).map(_ref2 => {
         let {
           child,
           mangledIndex,
           demangledIndex
-        } = _ref30;
+        } = _ref2;
         return v$1(child.type, {
           ...child.props,
           key: demangledIndex,
@@ -6163,13 +6256,13 @@ var bundle = function (exports) {
    * Because keys are given special treatment and a child has no way of modifying its own key
    * there's no other time or place this can happen other than exactly within the parent component's render function.
    */
-  function useSortableChildren(_ref31) {
+  function useSortableChildren(_ref3) {
     let {
       rearrangeableChildrenParameters,
       sortableChildrenParameters: {
         compare: userCompare
       }
-    } = _ref31;
+    } = _ref3;
     const getCompare = useStableGetter(userCompare !== null && userCompare !== void 0 ? userCompare : defaultCompare);
     const {
       rearrangeableChildrenReturn
@@ -6182,14 +6275,15 @@ var bundle = function (exports) {
     // The actual sort function.
     const sort = T$1((managedRows, direction) => {
       const compare = getCompare();
-      const sortedRows = compare ? managedRows.arraySlice().sort((lhsRow, rhsRow) => {
+      const originalRows = managedRows.arraySlice();
+      const sortedRows = compare ? originalRows.sort((lhsRow, rhsRow) => {
         const lhsValue = lhsRow;
         const rhsValue = rhsRow;
         const result = compare(lhsValue, rhsValue);
         if (direction[0] == "d") return -result;
         return result;
       }) : managedRows.arraySlice();
-      return rearrange(sortedRows);
+      return rearrange(originalRows, sortedRows);
     }, [/* Must remain stable */]);
     return {
       sortableChildrenReturn: {
@@ -6198,44 +6292,6 @@ var bundle = function (exports) {
       rearrangeableChildrenReturn
     };
   }
-  /*export interface UseGroupedSortableChildrenParameters<M extends GroupedSortedChildInfo> {
-      managedChildrenReturn: UseManagedChildrenReturnType<M>["managedChildrenReturn"]
-  }
-   export interface UseGroupedSortableChildren {
-      linearNavigationParameters: Pick<UseLinearNavigationParameters["linearNavigationParameters"], "indexDemangler" | "indexMangler">
-  }*/
-  /**
-   * It's common enough to have, e.g., a list with multiple sortable groups, a table where the body is sorted independently of the head, etc...
-   *
-   * A sortable group assumes that the parent (which also calls this hook) handles list navigation (or similar),
-   * and that each group element (which can also be the list parent, if there are NO groups) handles sorting (or similar).
-   */
-  /*export function useGroupedSortableChildren<M extends GroupedSortedChildInfo>({ managedChildrenReturn: { getChildren } }: UseGroupedSortableChildrenParameters<M>): UseGroupedSortableChildren {
-      const allIndexManglers = useRef<Map<number, (i: number) => number>>(new Map());
-      const allIndexDemanglers = useRef<Map<number, (i: number) => number>>(new Map());
-      const indexMangler = useCallback((i: number): number => {
-          const child = getChildren().getAt(i);
-          if (child) {
-              let indexManglerForThisLocation = allIndexManglers.current.get(child.locationIndex);
-              return (indexManglerForThisLocation ?? identity)(i);
-          }
-          return identity(i);
-      }, []);
-      const indexDemangler = useCallback((i: number): number => {
-          const child = getChildren().getAt(i);
-          if (child) {
-              let indexDemanglerForThisLocation = allIndexDemanglers.current.get(child.locationIndex);
-              return (indexDemanglerForThisLocation ?? identity)(i);
-          }
-          return identity(i);
-      }, []);
-        return {
-          linearNavigationParameters: {
-              indexMangler,
-              indexDemangler
-          }
-      }
-  }*/
   function defaultCompare(lhs, rhs) {
     return compare1(lhs === null || lhs === void 0 ? void 0 : lhs.getSortValue(), rhs === null || rhs === void 0 ? void 0 : rhs.getSortValue());
     function compare1(lhs, rhs) {
@@ -6246,13 +6302,14 @@ var bundle = function (exports) {
       return lhs - rhs;
     }
   }
-  function useGridNavigationSingleSelectionSortable(_ref32) {
+
+  function useGridNavigationSingleSelectionSortable(_ref) {
     let {
       rearrangeableChildrenParameters,
       sortableChildrenParameters,
       linearNavigationParameters,
       ...gridNavigationSingleSelectionParameters
-    } = _ref32;
+    } = _ref;
     const {
       ...scr
     } = useSortableChildren({
@@ -6278,7 +6335,8 @@ var bundle = function (exports) {
       ...scr
     };
   }
-  function useListNavigationSingleSelection(_ref33) {
+
+  function useListNavigationSingleSelection(_ref) {
     let {
       linearNavigationParameters,
       rovingTabIndexParameters,
@@ -6286,7 +6344,7 @@ var bundle = function (exports) {
       singleSelectionParameters,
       managedChildrenReturn,
       ..._void3
-    } = _ref33;
+    } = _ref;
     const lnr = useListNavigation({
       linearNavigationParameters,
       rovingTabIndexParameters,
@@ -6306,7 +6364,7 @@ var bundle = function (exports) {
       ...lnr
     };
   }
-  function useListNavigationSingleSelectionChild(_ref34) {
+  function useListNavigationSingleSelectionChild(_ref2) {
     let {
       managedChildParameters: {
         index,
@@ -6323,7 +6381,7 @@ var bundle = function (exports) {
       refElementReturn,
       textContentParameters,
       ..._void1
-    } = _ref34;
+    } = _ref2;
     const {
       hasCurrentFocusParameters: {
         onCurrentFocusedInnerChanged: ocfic2,
@@ -6377,26 +6435,45 @@ var bundle = function (exports) {
     };
   }
 
-  /**
-   * This method returns the first argument it receives.
-   *
-   * @static
-   * @since 0.1.0
-   * @memberOf _
-   * @category Util
-   * @param {*} value Any value.
-   * @returns {*} Returns `value`.
-   * @example
-   *
-   * var object = { 'a': 1 };
-   *
-   * console.log(_.identity(object) === object);
-   * // => true
-   */
-  function identity$1(value) {
-    return value;
+  function useListNavigationSingleSelectionSortable(_ref) {
+    let {
+      linearNavigationParameters,
+      rovingTabIndexParameters,
+      typeaheadNavigationParameters,
+      singleSelectionParameters,
+      managedChildrenReturn,
+      rearrangeableChildrenParameters,
+      sortableChildrenParameters,
+      ..._void3
+    } = _ref;
+    const scr = useSortableChildren({
+      rearrangeableChildrenParameters,
+      sortableChildrenParameters
+    });
+    const {
+      rearrangeableChildrenReturn: {
+        indexDemangler,
+        indexMangler
+      }
+    } = scr;
+    const lnssr = useListNavigationSingleSelection({
+      linearNavigationParameters: {
+        ...linearNavigationParameters,
+        indexDemangler,
+        indexMangler
+      },
+      rovingTabIndexParameters,
+      typeaheadNavigationParameters,
+      singleSelectionParameters,
+      managedChildrenReturn
+    });
+    return {
+      ...lnssr,
+      ...scr
+    };
   }
-  function usePaginatedChildren(_ref35) {
+
+  function usePaginatedChildren(_ref) {
     let {
       managedChildrenReturn: {
         getChildren
@@ -6408,7 +6485,7 @@ var bundle = function (exports) {
         paginationMax,
         paginationMin
       }
-    } = _ref35;
+    } = _ref;
     const [childCount, setChildCount] = useState(null);
     const parentIsPaginated = paginationMin != null || paginationMax != null;
     const lastPagination = _({
@@ -6442,7 +6519,7 @@ var bundle = function (exports) {
           // This is only used during setState on mount, so this is fine.
           // (If we change from paginated to not paginated, this is caught during useLayoutEffect)
           getDefaultPaginationVisible: T$1(i => {
-            return parentIsPaginated ? i >= (paginationMin !== null && paginationMin !== void 0 ? paginationMin : -Infinity) && i < (paginationMax !== null && paginationMax !== void 0 ? paginationMax : Infinity) : true;
+            return p.current ? i >= (paginationMin !== null && paginationMin !== void 0 ? paginationMin : -Infinity) && i < (paginationMax !== null && paginationMax !== void 0 ? paginationMax : Infinity) : true;
           }, [])
         })
       }),
@@ -6469,7 +6546,7 @@ var bundle = function (exports) {
       }
     };
   }
-  function usePaginatedChild(_ref36) {
+  function usePaginatedChild(_ref2) {
     let {
       managedChildParameters: {
         index
@@ -6480,7 +6557,7 @@ var bundle = function (exports) {
           getDefaultIsPaginated
         }
       }
-    } = _ref36;
+    } = _ref2;
     const [parentIsPaginated, setParentIsPaginated] = useState(getDefaultIsPaginated());
     const [childCountIfPaginated, setChildCountIfPaginated] = useState(null);
     const [paginatedVisible, setPaginatedVisible] = useState(getDefaultPaginationVisible(index));
@@ -6510,7 +6587,7 @@ var bundle = function (exports) {
    * Note that the child itself will still render, but you can delay rendering *its* children, or
    * delay other complicated or heavy logic, until the child is no longer staggered.
    */
-  function useStaggeredChildren(_ref37) {
+  function useStaggeredChildren(_ref) {
     let {
       managedChildrenReturn: {
         getChildren
@@ -6518,7 +6595,7 @@ var bundle = function (exports) {
       staggeredChildrenParameters: {
         staggered
       }
-    } = _ref37;
+    } = _ref;
     // By default, when a child mounts, we tell the next child to mount and simply repeat.
     // If a child is missing, however, it will break that chain.
     // To guard against that, we also wait for 50ms, and if it hasn't loaded by then, we just continue as if it did.
@@ -6530,23 +6607,20 @@ var bundle = function (exports) {
         // We've gone this long without hearing the next child mount itself...
         // We need to continue.
         timeoutHandle.current = -1;
-        setDisplayedStaggerIndex(c => {
-          var _getTargetStaggerInde;
-          return Math.min((_getTargetStaggerInde = getTargetStaggerIndex()) !== null && _getTargetStaggerInde !== void 0 ? _getTargetStaggerInde : 0, (c !== null && c !== void 0 ? c : 0) + 1);
-        });
+        let target = getTargetStaggerIndex();
+        if (target != null) setDisplayedStaggerIndex(c => Math.min(target, (c !== null && c !== void 0 ? c : 0) + 1));
       }, 50);
     }, [/* Must be empty */]);
     // The target index is the index that we're "animating" to.
     // Each child simply sets this to the highest value ever seen.
     // TODO: When unmounting children, we should reset this, but that requires us to track total # of children
-    const [getTargetStaggerIndex, setTargetStaggerIndex] = usePassiveState(T$1((newIndex, prevIndex) => {
+    const [getTargetStaggerIndex, setTargetStaggerIndex] = usePassiveState(T$1((newIndex, _prevIndex) => {
       // Any time our target changes,
       // ensure our timeout is running, and start a new one if not
       // For any newly mounted children, make sure they're aware of if they should consider themselves staggered or not
-      for (let i = prevIndex !== null && prevIndex !== void 0 ? prevIndex : 0; i < (newIndex !== null && newIndex !== void 0 ? newIndex : 0); ++i) {
-        var _getChildren$getAt6;
-        (_getChildren$getAt6 = getChildren().getAt(i)) === null || _getChildren$getAt6 === void 0 ? void 0 : _getChildren$getAt6.setParentIsStaggered(parentIsStaggered);
-      }
+      //for (let i = (prevIndex ?? 0); i < (newIndex ?? 0); ++i) {
+      //    getChildren().getAt(i)?.setParentIsStaggered(s.current);
+      //}
       if (timeoutHandle.current == -1) {
         resetEmergencyTimeout();
         // If there's no timeout running, then that also means we're not waiting for a child to mount.
@@ -6554,13 +6628,12 @@ var bundle = function (exports) {
         setDisplayedStaggerIndex(c => Math.min(newIndex !== null && newIndex !== void 0 ? newIndex : 0, (c !== null && c !== void 0 ? c : 0) + 1));
       }
     }, [/* Must be empty */]), returnNull);
-    //const [getTimeoutHandle, setTimeoutHandle] = usePassiveState<number | null, Event>(null, returnNull);
     const [getDisplayedStaggerIndex, setDisplayedStaggerIndex] = usePassiveState(T$1((newIndex, prevIndex) => {
-      var _getTargetStaggerInde2;
+      var _getTargetStaggerInde;
       if (newIndex == null) {
         return;
       }
-      setCurrentlyStaggering(newIndex >= ((_getTargetStaggerInde2 = getTargetStaggerIndex()) !== null && _getTargetStaggerInde2 !== void 0 ? _getTargetStaggerInde2 : 0));
+      setCurrentlyStaggering(newIndex < ((_getTargetStaggerInde = getTargetStaggerIndex()) !== null && _getTargetStaggerInde !== void 0 ? _getTargetStaggerInde : 0));
       // It's time to show the next child,
       // either because the current one finished mounting,
       // or because our emergency backup timeout fired.
@@ -6568,32 +6641,27 @@ var bundle = function (exports) {
       // Either way, tell the next child to show itself.
       // Also make sure that anyone we skipped somehow show themselves as well.
       for (let i = prevIndex !== null && prevIndex !== void 0 ? prevIndex : 0; i < newIndex; ++i) {
-        var _getChildren$getAt7;
-        (_getChildren$getAt7 = getChildren().getAt(i)) === null || _getChildren$getAt7 === void 0 ? void 0 : _getChildren$getAt7.setStaggeredVisible(true);
+        var _getChildren$getAt;
+        (_getChildren$getAt = getChildren().getAt(i)) === null || _getChildren$getAt === void 0 ? void 0 : _getChildren$getAt.setStaggeredVisible(true);
       }
       // Set a new emergency timeout
       resetEmergencyTimeout();
-      /*if (newIndex < targetIndex) {
-          const handle = setTimeout(() => { setDisplayedStaggerIndex(c => (c ?? 0) + 1); }, staggerDelay ?? 50);
-          return clearTimeout(handle);
-      }*/
     }, [/* Must be empty */]), returnNull);
     const parentIsStaggered = !!staggered;
     const childCallsThisToTellTheParentToMountTheNextOne = T$1(index => {
       setDisplayedStaggerIndex(s => {
-        var _getTargetStaggerInde3;
-        return Math.min((_getTargetStaggerInde3 = getTargetStaggerIndex()) !== null && _getTargetStaggerInde3 !== void 0 ? _getTargetStaggerInde3 : 0, 1 + Math.max(s !== null && s !== void 0 ? s : 0, index + 1));
+        var _getTargetStaggerInde2;
+        return Math.min((_getTargetStaggerInde2 = getTargetStaggerIndex()) !== null && _getTargetStaggerInde2 !== void 0 ? _getTargetStaggerInde2 : 0, 1 + Math.max(s !== null && s !== void 0 ? s : 0, index + 1));
       });
     }, []);
     s(() => {
       getChildren().forEach(child => child.setParentIsStaggered(parentIsStaggered));
-      //if (parentIsStaggered)
-      //    childCallsThisToTellTheParentToMountTheNextOne(-1);
     }, [parentIsStaggered]);
     const childCallsThisToTellTheParentTheHighestIndex = T$1(mountedIndex => {
       setTargetStaggerIndex(i => Math.max(i !== null && i !== void 0 ? i : 0, 1 + mountedIndex));
     }, []);
-    // TODO: Modification during render
+    // TODO: Modification during render (but it's really, really hard to avoid here,
+    // but also probably fine because parents render before children? Does that include suspense?)
     const s$1 = _(parentIsStaggered);
     s$1.current = parentIsStaggered;
     return {
@@ -6608,12 +6676,14 @@ var bundle = function (exports) {
           // It's okay that the dependencies aren't included.
           // It's more important that these can be called during render.
           //
-          // (If we switch, this is caught during useLayoutEffect anyway)
+          // (If we switch, this is caught during useLayoutEffect anyway,
+          // but only if we switch *after* the children mount! The ref
+          // is to take care of the case where we switch *before* they mount)
           getDefaultIsStaggered: T$1(() => {
-            return parentIsStaggered;
+            return s$1.current;
           }, []),
           getDefaultStaggeredVisible: T$1(i => {
-            if (parentIsStaggered) {
+            if (s$1.current) {
               const staggerIndex = getDisplayedStaggerIndex();
               if (staggerIndex == null) return false;
               return i < staggerIndex;
@@ -6625,7 +6695,7 @@ var bundle = function (exports) {
       })
     };
   }
-  function useStaggeredChild(_ref38) {
+  function useStaggeredChild(_ref2) {
     let {
       managedChildParameters: {
         index
@@ -6638,8 +6708,8 @@ var bundle = function (exports) {
           childCallsThisToTellTheParentToMountTheNextOne
         }
       }
-    } = _ref38;
-    const [parentIsStaggered, setParentIsStaggered] = useState(getDefaultIsStaggered());
+    } = _ref2;
+    const [parentIsStaggered, setParentIsStaggered] = useState(getDefaultIsStaggered);
     const [staggeredVisible, setStaggeredVisible] = useState(getDefaultStaggeredVisible(index));
     s(() => {
       childCallsThisToTellTheParentTheHighestIndex(index);
@@ -6652,7 +6722,6 @@ var bundle = function (exports) {
         "aria-busy": (!staggeredVisible).toString()
       },
       staggeredChildReturn: {
-        staggeredVisible,
         isStaggered: parentIsStaggered,
         hideBecauseStaggered: parentIsStaggered ? !staggeredVisible : false
       },
@@ -6692,14 +6761,14 @@ var bundle = function (exports) {
       })
     };
   }
-  function useChildrenHaveFocusChild(_ref39) {
+  function useChildrenHaveFocusChild(_ref) {
     let {
       childrenHaveFocusChildContext: {
         childrenHaveFocusChildParameters: {
           setFocusCount
         }
       }
-    } = _ref39;
+    } = _ref;
     return {
       hasCurrentFocusParameters: {
         onCurrentFocusedInnerChanged: useStableCallback((focused, prev, e) => {
@@ -6712,6 +6781,7 @@ var bundle = function (exports) {
       }
     };
   }
+
   function useHasCurrentFocus(args) {
     const {
       hasCurrentFocusParameters: {
@@ -6760,7 +6830,8 @@ var bundle = function (exports) {
       }
     };
   }
-  function useCompleteGridNavigation(_ref40) {
+
+  function useCompleteGridNavigation(_ref) {
     let {
       gridNavigationParameters,
       linearNavigationParameters,
@@ -6771,7 +6842,7 @@ var bundle = function (exports) {
       rearrangeableChildrenParameters,
       paginatedChildrenParameters,
       staggeredChildrenParameters
-    } = _ref40;
+    } = _ref;
     const getChildren = T$1(() => managedChildrenReturn.getChildren(), []);
     const getHighestChildIndex = T$1(() => getChildren().getHighestIndex(), []);
     const isValid = T$1(i => {
@@ -6829,17 +6900,18 @@ var bundle = function (exports) {
     } = useChildrenHaveFocus({
       childrenHaveFocusParameters
     });
-    const {
-      context: {
-        managedChildContext
-      },
-      managedChildrenReturn
-    } = useManagedChildren({
+    const mcr = useManagedChildren({
       managedChildrenParameters: {
         onChildCountChange: useStableCallback(c => onChildCountChange(c)),
         ...managedChildrenParameters
       }
     });
+    const {
+      context: {
+        managedChildContext
+      },
+      managedChildrenReturn
+    } = mcr; // TODO: This is split into two lines for TypeScript reasons? Can this be fixed? E.G. like    vvvvvvvvvvvvvvvvvvvvvvvvvvvvvv  why doesn't that work?
     const {
       paginatedChildrenReturn,
       paginatedChildrenReturn: {
@@ -6868,9 +6940,6 @@ var bundle = function (exports) {
       staggeredChildrenParameters
     });
     const props = useMergedProps(linearNavigationReturn.propsStable, typeaheadNavigationReturn.propsStable);
-    /*const getDefaultPaginationVisible = useStableCallback((i: number) => {
-        return (i >= (paginatedChildrenParameters.paginationMin ?? -Infinity)) && (i < (paginatedChildrenParameters.paginationMax ?? Infinity));
-    });*/
     const context = useStableObject({
       singleSelectionContext,
       managedChildContext,
@@ -6892,7 +6961,7 @@ var bundle = function (exports) {
       paginatedChildrenReturn
     };
   }
-  function useCompleteGridNavigationRow(_ref41) {
+  function useCompleteGridNavigationRow(_ref2) {
     let {
       rowAsChildOfGridParameters: {
         managedChildParameters,
@@ -6921,7 +6990,7 @@ var bundle = function (exports) {
         typeaheadNavigationParameters,
         ...rowAsParentOfCellsParameters
       }
-    } = _ref41;
+    } = _ref2;
     const {
       index
     } = managedChildParameters;
@@ -6951,7 +7020,6 @@ var bundle = function (exports) {
         setStaggeredVisible
       },
       staggeredChildReturn: {
-        staggeredVisible,
         isStaggered,
         hideBecauseStaggered
       },
@@ -6994,8 +7062,8 @@ var bundle = function (exports) {
           isValid,
           getHighestIndex: getHighestChildIndex,
           pageNavigationSize: 0,
-          indexDemangler: identity$1,
-          indexMangler: identity$1,
+          indexDemangler: identity,
+          indexMangler: identity,
           ...linearNavigationParameters
         },
         managedChildrenReturn: {
@@ -7107,7 +7175,6 @@ var bundle = function (exports) {
         managedChildReturn,
         staggeredChildReturn: {
           isStaggered,
-          staggeredVisible,
           hideBecauseStaggered
         },
         paginatedChildReturn: {
@@ -7117,12 +7184,9 @@ var bundle = function (exports) {
         }
       },
       hasCurrentFocusReturn
-      //managedChildrenReturn,
-      //...gridNavigationSingleSelectionReturn
     };
   }
-
-  function useCompleteGridNavigationCell(_ref42) {
+  function useCompleteGridNavigationCell(_ref3) {
     let {
       gridNavigationCellParameters,
       managedChildParameters,
@@ -7137,14 +7201,11 @@ var bundle = function (exports) {
       },
       rovingTabIndexChildParameters,
       textContentParameters,
-      //managedChildContext,
       completeGridNavigationCellParameters: {
         focusSelf,
         ...completeGridNavigationCellParameters
       }
-      //sortableChildParameters: { getSortValue },
-      //    pressParameters: { onPressSync, ...pressParameters },
-    } = _ref42;
+    } = _ref3;
     const {
       index
     } = managedChildParameters;
@@ -7180,17 +7241,6 @@ var bundle = function (exports) {
       },
       refElementReturn
     });
-    /* const { pressReturn } = usePress<CellElement>({
-         pressParameters: {
-             onPressSync: useStableCallback<NonNullable<typeof onPressSync>>(e => {
-                 onPressSync?.(e);
-                 completeGridNavigationContext.onPressSync?.(e);
-             }),
-             focusSelf: null,
-             ...pressParameters
-         },
-         refElementReturn
-     });*/
     const baseInfo = {
       focusSelf,
       getElement: refElementReturn.getElement,
@@ -7199,9 +7249,7 @@ var bundle = function (exports) {
       getTabbable: rovingTabIndexChildReturn.getTabbable,
       setTabbable: rovingTabIndexChildReturn.setTabbable,
       tabbable: rovingTabIndexChildReturn.tabbable
-      //getSortValue
     };
-
     const {
       managedChildReturn
     } = useManagedChild({
@@ -7215,15 +7263,12 @@ var bundle = function (exports) {
       ...baseInfo,
       ...completeGridNavigationCellParameters
     });
-    const props = useMergedProps(refElementReturn.propsStable,
-    //pressReturn.propsStable,
-    rovingTabIndexChildReturn.propsUnstable, hasCurrentFocusReturn.propsStable);
+    const props = useMergedProps(refElementReturn.propsStable, rovingTabIndexChildReturn.propsUnstable, hasCurrentFocusReturn.propsStable);
     return {
       props,
       refElementReturn,
       rovingTabIndexChildReturn,
       pressParameters,
-      //pressReturn,
       hasCurrentFocusReturn,
       managedChildReturn,
       textContentReturn
@@ -7240,7 +7285,7 @@ var bundle = function (exports) {
    *
    * @returns
    */
-  function useCompleteListNavigation(_ref43) {
+  function useCompleteListNavigation(_ref) {
     let {
       linearNavigationParameters,
       rearrangeableChildrenParameters,
@@ -7251,8 +7296,7 @@ var bundle = function (exports) {
       paginatedChildrenParameters,
       staggeredChildrenParameters,
       ...completeListNavigationParameters
-    } = _ref43;
-    //type M = UseListNavigationSingleSelectionChildInfo<ChildElement>;
+    } = _ref;
     const {
       initiallySelectedIndex
     } = singleSelectionParameters;
@@ -7265,22 +7309,6 @@ var bundle = function (exports) {
       return true;
     }, []);
     const {
-      rearrangeableChildrenReturn: {
-        indexDemangler,
-        indexMangler,
-        ...rearrangeableChildrenReturn
-      },
-      sortableChildrenReturn
-    } = useSortableChildren({
-      rearrangeableChildrenParameters: {
-        onRearranged: useStableCallback(() => {
-          refreshPagination(paginatedChildrenParameters.paginationMin, paginatedChildrenParameters.paginationMax);
-        }),
-        ...rearrangeableChildrenParameters
-      },
-      sortableChildrenParameters
-    });
-    const {
       childrenHaveFocusParameters,
       managedChildrenParameters,
       rovingTabIndexChildContext,
@@ -7289,16 +7317,16 @@ var bundle = function (exports) {
       linearNavigationReturn,
       rovingTabIndexReturn,
       singleSelectionReturn,
-      typeaheadNavigationReturn
-    } = useListNavigationSingleSelection({
+      typeaheadNavigationReturn,
+      rearrangeableChildrenReturn,
+      sortableChildrenReturn
+    } = useListNavigationSingleSelectionSortable({
       managedChildrenReturn: {
         getChildren
       },
       linearNavigationParameters: {
         getHighestIndex: getHighestChildIndex,
         isValid,
-        indexDemangler,
-        indexMangler,
         ...linearNavigationParameters
       },
       typeaheadNavigationParameters: {
@@ -7310,10 +7338,15 @@ var bundle = function (exports) {
         ...rovingTabIndexParameters
       },
       singleSelectionParameters,
+      rearrangeableChildrenParameters: {
+        onRearranged: useStableCallback(() => {
+          refreshPagination(paginatedChildrenParameters.paginationMin, paginatedChildrenParameters.paginationMax);
+        }),
+        ...rearrangeableChildrenParameters
+      },
+      sortableChildrenParameters,
       ...completeListNavigationParameters
     });
-    //const { linearNavigationReturn, typeaheadNavigationReturn } = listNavigationSingleSelectionSortableReturn;
-    //const [childCount, setChildCount] = useState(0);
     const {
       childrenHaveFocusChildContext,
       childrenHaveFocusReturn
@@ -7348,7 +7381,7 @@ var bundle = function (exports) {
       managedChildrenReturn,
       paginatedChildrenParameters,
       linearNavigationParameters: {
-        indexDemangler
+        indexDemangler: rearrangeableChildrenReturn.indexDemangler
       }
     });
     const {
@@ -7374,11 +7407,7 @@ var bundle = function (exports) {
       context,
       props,
       managedChildrenReturn,
-      rearrangeableChildrenReturn: {
-        indexDemangler,
-        indexMangler,
-        ...rearrangeableChildrenReturn
-      },
+      rearrangeableChildrenReturn,
       staggeredChildrenReturn,
       paginatedChildrenReturn,
       sortableChildrenReturn,
@@ -7389,7 +7418,7 @@ var bundle = function (exports) {
       childrenHaveFocusReturn
     };
   }
-  function useCompleteListNavigationChild(_ref44) {
+  function useCompleteListNavigationChild(_ref2) {
     let {
       //managedChildParameters: { hidden, disabled, index, getSortValue },
       completeListNavigationChildParameters: {
@@ -7411,12 +7440,11 @@ var bundle = function (exports) {
         paginatedChildContext,
         staggeredChildContext
       },
-      //pressParameters: { onPressSync: ops1, ...pressParameters },
       sortableChildParameters: {
         getSortValue
       },
       ..._void
-    } = _ref44;
+    } = _ref2;
     const {
       index
     } = managedChildParameters;
@@ -7455,7 +7483,6 @@ var bundle = function (exports) {
         staggeredChildContext
       }
     });
-    //let { hidden } = rovingTabIndexChildParameters;
     hidden || (hidden = hideBecausePaginated || hideBecauseStaggered);
     let {
       disabled
@@ -7503,16 +7530,6 @@ var bundle = function (exports) {
       setTabbable,
       tabbable
     } = rovingTabIndexChildReturn;
-    /* const { pressReturn } = usePress<ChildElement>({
-         pressParameters: {
-             ...p1,
-             ...pressParameters,
-             onPressSync: disabled ? null : ((e) => {
-                 ops2?.(e);
-                 ops1?.(e);
-             })
-         }, refElementReturn
-     });*/
     const {
       getSelected,
       selected
@@ -7582,12 +7599,6 @@ var bundle = function (exports) {
       staggeredChildReturn
     };
   }
-  /*
-  function foo<ParentElement extends Element, ChildElement extends Element, M extends UseListNavigationSingleSelectionSortableChildInfo<ChildElement>>(p: UseCompleteListNavigationParameters<ParentElement, ChildElement, M>) {
-      const { singleSelectionReturn } = useCompleteListNavigation<ParentElement, ChildElement, M>(p);
-      const selectedIndex = 0;
-      useSingleSelectionDeclarative({ singleSelectionReturn, singleSelectionDeclarativeParameters: { selectedIndex } })
-  }*/
 
   /**
    * Combines dismissal hooks and focus trap hooks into one.
@@ -7599,7 +7610,7 @@ var bundle = function (exports) {
    * @param param0
    * @returns
    */
-  function useModal(_ref45) {
+  function useModal(_ref) {
     let {
       dismissParameters,
       escapeDismissParameters,
@@ -7607,12 +7618,10 @@ var bundle = function (exports) {
         trapActive,
         ...focusTrapParameters
       }
-    } = _ref45;
+    } = _ref;
     const {
       open
     } = dismissParameters;
-    //const { getWindow } = escapeDismissParameters;
-    //const getDocument = useCallback(() => { return getWindow().document; }, [getWindow]);
     const {
       refElementPopupReturn,
       refElementSourceReturn
@@ -7651,12 +7660,13 @@ var bundle = function (exports) {
       focusTrapReturn
     };
   }
-  function useTimeout(_ref46) {
+
+  function useTimeout(_ref) {
     let {
       timeout,
       callback,
       triggerIndex
-    } = _ref46;
+    } = _ref;
     const stableCallback = useStableCallback(() => {
       startTimeRef.current = null;
       callback();
@@ -7693,6 +7703,7 @@ var bundle = function (exports) {
       getRemainingTime
     };
   }
+
   function supportsPointerEvents() {
     return "onpointerup" in window;
   }
@@ -7728,12 +7739,15 @@ var bundle = function (exports) {
         longPressThreshold,
         excludeEnter: ee,
         excludePointer: ep,
-        excludeSpace: es
+        excludeSpace: es,
+        onPressingChange: opc
       }
     } = args;
     const excludeEnter = useStableCallback(ee !== null && ee !== void 0 ? ee : returnFalse);
     const excludeSpace = useStableCallback(es !== null && es !== void 0 ? es : returnFalse);
     const excludePointer = useStableCallback(ep !== null && ep !== void 0 ? ep : returnFalse);
+    const onPressingChange = useStableCallback(opc !== null && opc !== void 0 ? opc : noop);
+    const [getIsPressing, setIsPressing] = usePassiveState(onPressingChange, returnFalse);
     const hasPressEvent = onPressSync != null;
     /**
      * Explanations:
@@ -7781,6 +7795,7 @@ var bundle = function (exports) {
     const onTouchStart = T$1(e => {
       e.preventDefault();
       e.stopPropagation();
+      setIsPressing(true, e);
       setPointerDownStartedHere(true);
       setHovering(true);
       setLongPress(false);
@@ -7800,6 +7815,7 @@ var bundle = function (exports) {
         const elementAtTouch = document.elementFromPoint(((_touch$clientX = touch === null || touch === void 0 ? void 0 : touch.clientX) !== null && _touch$clientX !== void 0 ? _touch$clientX : 0) + x, ((_touch$clientY = touch === null || touch === void 0 ? void 0 : touch.clientY) !== null && _touch$clientY !== void 0 ? _touch$clientY : 0) + y);
         hoveringAtAnyPoint || (hoveringAtAnyPoint = (_element$contains = element === null || element === void 0 ? void 0 : element.contains(elementAtTouch)) !== null && _element$contains !== void 0 ? _element$contains : false);
       }
+      setIsPressing(hoveringAtAnyPoint && getPointerDownStartedHere(), e);
       setHovering(hoveringAtAnyPoint);
     }, []);
     const onTouchEnd = T$1(e => {
@@ -7814,12 +7830,14 @@ var bundle = function (exports) {
       setWaitingForSpaceUp(false);
       setHovering(false);
       setPointerDownStartedHere(false);
+      setIsPressing(false, e);
     }, []);
     const onPointerDown = T$1(e => {
       if (!excludePointer()) {
         if (e.buttons & 1) {
           e.preventDefault();
           e.stopPropagation();
+          setIsPressing(true, e);
           setPointerDownStartedHere(true);
           setHovering(true);
           setLongPress(false);
@@ -7834,13 +7852,13 @@ var bundle = function (exports) {
       // then we're definitely not in a press anymore (if we could we'd just wait for onPointerUp, but it could happen outside this element)
       if (!(e.buttons & 1)) setPointerDownStartedHere(listeningForPress = false);
       if (listeningForPress) {
-        //e.preventDefault();
-        //e.stopPropagation();
         const element = getElement();
         // Note: elementFromPoint starts reasonably expensive on a decent computer when on the order of 500 or so elements,
         // so we only test for hovering while actively attempting to detect a press
         const elementAtPointer = document.elementFromPoint(e.clientX, e.clientY);
-        setHovering(element == elementAtPointer || (element === null || element === void 0 ? void 0 : element.contains(elementAtPointer)) || false);
+        const hovering = element == elementAtPointer || (element === null || element === void 0 ? void 0 : element.contains(elementAtPointer)) || false;
+        setHovering(hovering);
+        setIsPressing(hovering && getPointerDownStartedHere(), e);
       }
     });
     const onPointerUp = T$1(e => {
@@ -7858,6 +7876,7 @@ var bundle = function (exports) {
       setHovering(false);
       setPointerDownStartedHere(false);
       setLongPress(false);
+      setIsPressing(false, e);
     }, []);
     const onPointerEnter = T$1(_e => {
       setHovering(true);
@@ -7931,25 +7950,29 @@ var bundle = function (exports) {
           // We don't actually activate it on a space keydown
           // but we do preventDefault to stop the page from scrolling.
           setWaitingForSpaceUp(true);
-          //onActiveStart(e);
+          setIsPressing(true, e);
           e.preventDefault();
         }
         if (e.key == "Enter" && !excludeEnter() && (!e.repeat || (allowRepeatPresses !== null && allowRepeatPresses !== void 0 ? allowRepeatPresses : false))) {
-          handlePress(e);
+          setIsPressing(true, e);
+          requestAnimationFrame(() => {
+            setIsPressing(false, e);
+            handlePress(e);
+          });
         }
       }
     });
     const onKeyUp = useStableCallback(e => {
       const waitingForSpaceUp = getWaitingForSpaceUp();
-      if (waitingForSpaceUp && e.key == " " && !excludeSpace()) handlePress(e);
+      if (waitingForSpaceUp && e.key == " " && !excludeSpace()) {
+        handlePress(e);
+        setIsPressing(false, e);
+      }
     });
     const onClick = useStableCallback(e => {
       const element = getElement();
       if (onPressSync) {
         e.preventDefault();
-        //const element = getElement();
-        //if (element)
-        //    focusSelf(element);
         if (e.detail > 1) {
           e.stopImmediatePropagation();
           e.stopPropagation();
@@ -7967,21 +7990,27 @@ var bundle = function (exports) {
           (element === null || element === void 0 ? void 0 : element.tagName) == 'input' && element.type == 'radio' && element.checked) {
             // Intentional, for now. Programmatic clicks shouldn't happen in most cases.
             // TODO: Remove this when I'm confident stray clicks won't be handled.
-            console.assert(false);
             debugger;
+            console.log("onclick was fired and will be handled as it doesn't look like it came from a pointer event", e);
+            setIsPressing(true, e);
+            requestAnimationFrame(() => {
+              setIsPressing(false, e);
+              handlePress(e);
+            });
             handlePress(e);
           }
         }
       }
     });
-    const onFocusOut = useStableCallback(_e => {
+    const onFocusOut = useStableCallback(e => {
       setWaitingForSpaceUp(false);
+      setIsPressing(false, e);
     });
     const p = supportsPointerEvents();
     return {
       pressReturn: {
-        pseudoActive: pointerDownStartedHere && hovering || waitingForSpaceUp || false,
-        //hovering,
+        pressing: pointerDownStartedHere && hovering || waitingForSpaceUp || false,
+        getIsPressing,
         longPress,
         propsUnstable: {
           onKeyDown,
@@ -8003,13 +8032,14 @@ var bundle = function (exports) {
     };
   }
   let pulse = "vibrate" in navigator && navigator.vibrate instanceof Function ? () => navigator.vibrate(10) : () => {};
-  function useRandomId(_ref47) {
+
+  function useRandomId(_ref) {
     let {
       randomIdParameters: {
         prefix,
         otherReferencerProp
       }
-    } = _ref47;
+    } = _ref;
     const id = prefix + V$1();
     useEnsureStability("useRandomId", prefix, id);
     const referencerElementProps = _(otherReferencerProp == null ? {} : {
@@ -8031,11 +8061,11 @@ var bundle = function (exports) {
   /**
    * While `useRandomId` allows the referencer to use the source's ID, sometimes you also want the reverse too (e.g. I `aria-label` you, you `aria-controls` me. That sort of thing).
    */
-  function useRandomDualIds(_ref48) {
+  function useRandomDualIds(_ref) {
     let {
       randomIdInputParameters,
       randomIdLabelParameters
-    } = _ref48;
+    } = _ref;
     const {
       randomIdReturn: randomIdInputReturn,
       propsReferencer: propsLabelAsReferencer,
@@ -8058,314 +8088,12 @@ var bundle = function (exports) {
     };
   }
 
-  /**
-   * Gets the timestamp of the number of milliseconds that have elapsed since
-   * the Unix epoch (1 January 1970 00:00:00 UTC).
-   *
-   * @static
-   * @memberOf _
-   * @since 2.4.0
-   * @category Date
-   * @returns {number} Returns the timestamp.
-   * @example
-   *
-   * _.defer(function(stamp) {
-   *   console.log(_.now() - stamp);
-   * }, _.now());
-   * // => Logs the number of milliseconds it took for the deferred invocation.
-   */
-  var now = function () {
-    return root$1.Date.now();
-  };
-  var now$1 = now;
-
-  /** Used to match a single whitespace character. */
-  var reWhitespace = /\s/;
-
-  /**
-   * Used by `_.trim` and `_.trimEnd` to get the index of the last non-whitespace
-   * character of `string`.
-   *
-   * @private
-   * @param {string} string The string to inspect.
-   * @returns {number} Returns the index of the last non-whitespace character.
-   */
-  function trimmedEndIndex(string) {
-    var index = string.length;
-    while (index-- && reWhitespace.test(string.charAt(index))) {}
-    return index;
-  }
-
-  /** Used to match leading whitespace. */
-  var reTrimStart = /^\s+/;
-
-  /**
-   * The base implementation of `_.trim`.
-   *
-   * @private
-   * @param {string} string The string to trim.
-   * @returns {string} Returns the trimmed string.
-   */
-  function baseTrim(string) {
-    return string ? string.slice(0, trimmedEndIndex(string) + 1).replace(reTrimStart, '') : string;
-  }
-
-  /** `Object#toString` result references. */
-  var symbolTag = '[object Symbol]';
-
-  /**
-   * Checks if `value` is classified as a `Symbol` primitive or object.
-   *
-   * @static
-   * @memberOf _
-   * @since 4.0.0
-   * @category Lang
-   * @param {*} value The value to check.
-   * @returns {boolean} Returns `true` if `value` is a symbol, else `false`.
-   * @example
-   *
-   * _.isSymbol(Symbol.iterator);
-   * // => true
-   *
-   * _.isSymbol('abc');
-   * // => false
-   */
-  function isSymbol(value) {
-    return typeof value == 'symbol' || isObjectLike(value) && baseGetTag(value) == symbolTag;
-  }
-
-  /** Used as references for various `Number` constants. */
-  var NAN = 0 / 0;
-
-  /** Used to detect bad signed hexadecimal string values. */
-  var reIsBadHex = /^[-+]0x[0-9a-f]+$/i;
-
-  /** Used to detect binary string values. */
-  var reIsBinary = /^0b[01]+$/i;
-
-  /** Used to detect octal string values. */
-  var reIsOctal = /^0o[0-7]+$/i;
-
-  /** Built-in method references without a dependency on `root`. */
-  var freeParseInt = parseInt;
-
-  /**
-   * Converts `value` to a number.
-   *
-   * @static
-   * @memberOf _
-   * @since 4.0.0
-   * @category Lang
-   * @param {*} value The value to process.
-   * @returns {number} Returns the number.
-   * @example
-   *
-   * _.toNumber(3.2);
-   * // => 3.2
-   *
-   * _.toNumber(Number.MIN_VALUE);
-   * // => 5e-324
-   *
-   * _.toNumber(Infinity);
-   * // => Infinity
-   *
-   * _.toNumber('3.2');
-   * // => 3.2
-   */
-  function toNumber(value) {
-    if (typeof value == 'number') {
-      return value;
-    }
-    if (isSymbol(value)) {
-      return NAN;
-    }
-    if (isObject(value)) {
-      var other = typeof value.valueOf == 'function' ? value.valueOf() : value;
-      value = isObject(other) ? other + '' : other;
-    }
-    if (typeof value != 'string') {
-      return value === 0 ? value : +value;
-    }
-    value = baseTrim(value);
-    var isBinary = reIsBinary.test(value);
-    return isBinary || reIsOctal.test(value) ? freeParseInt(value.slice(2), isBinary ? 2 : 8) : reIsBadHex.test(value) ? NAN : +value;
-  }
-
-  /** Error message constants. */
-  var FUNC_ERROR_TEXT = 'Expected a function';
-
-  /* Built-in method references for those with the same name as other `lodash` methods. */
-  var nativeMax = Math.max,
-    nativeMin = Math.min;
-
-  /**
-   * Creates a debounced function that delays invoking `func` until after `wait`
-   * milliseconds have elapsed since the last time the debounced function was
-   * invoked. The debounced function comes with a `cancel` method to cancel
-   * delayed `func` invocations and a `flush` method to immediately invoke them.
-   * Provide `options` to indicate whether `func` should be invoked on the
-   * leading and/or trailing edge of the `wait` timeout. The `func` is invoked
-   * with the last arguments provided to the debounced function. Subsequent
-   * calls to the debounced function return the result of the last `func`
-   * invocation.
-   *
-   * **Note:** If `leading` and `trailing` options are `true`, `func` is
-   * invoked on the trailing edge of the timeout only if the debounced function
-   * is invoked more than once during the `wait` timeout.
-   *
-   * If `wait` is `0` and `leading` is `false`, `func` invocation is deferred
-   * until to the next tick, similar to `setTimeout` with a timeout of `0`.
-   *
-   * See [David Corbacho's article](https://css-tricks.com/debouncing-throttling-explained-examples/)
-   * for details over the differences between `_.debounce` and `_.throttle`.
-   *
-   * @static
-   * @memberOf _
-   * @since 0.1.0
-   * @category Function
-   * @param {Function} func The function to debounce.
-   * @param {number} [wait=0] The number of milliseconds to delay.
-   * @param {Object} [options={}] The options object.
-   * @param {boolean} [options.leading=false]
-   *  Specify invoking on the leading edge of the timeout.
-   * @param {number} [options.maxWait]
-   *  The maximum time `func` is allowed to be delayed before it's invoked.
-   * @param {boolean} [options.trailing=true]
-   *  Specify invoking on the trailing edge of the timeout.
-   * @returns {Function} Returns the new debounced function.
-   * @example
-   *
-   * // Avoid costly calculations while the window size is in flux.
-   * jQuery(window).on('resize', _.debounce(calculateLayout, 150));
-   *
-   * // Invoke `sendMail` when clicked, debouncing subsequent calls.
-   * jQuery(element).on('click', _.debounce(sendMail, 300, {
-   *   'leading': true,
-   *   'trailing': false
-   * }));
-   *
-   * // Ensure `batchLog` is invoked once after 1 second of debounced calls.
-   * var debounced = _.debounce(batchLog, 250, { 'maxWait': 1000 });
-   * var source = new EventSource('/stream');
-   * jQuery(source).on('message', debounced);
-   *
-   * // Cancel the trailing debounced invocation.
-   * jQuery(window).on('popstate', debounced.cancel);
-   */
-  function debounce(func, wait, options) {
-    var lastArgs,
-      lastThis,
-      maxWait,
-      result,
-      timerId,
-      lastCallTime,
-      lastInvokeTime = 0,
-      leading = false,
-      maxing = false,
-      trailing = true;
-    if (typeof func != 'function') {
-      throw new TypeError(FUNC_ERROR_TEXT);
-    }
-    wait = toNumber(wait) || 0;
-    if (isObject(options)) {
-      leading = !!options.leading;
-      maxing = 'maxWait' in options;
-      maxWait = maxing ? nativeMax(toNumber(options.maxWait) || 0, wait) : maxWait;
-      trailing = 'trailing' in options ? !!options.trailing : trailing;
-    }
-    function invokeFunc(time) {
-      var args = lastArgs,
-        thisArg = lastThis;
-      lastArgs = lastThis = undefined;
-      lastInvokeTime = time;
-      result = func.apply(thisArg, args);
-      return result;
-    }
-    function leadingEdge(time) {
-      // Reset any `maxWait` timer.
-      lastInvokeTime = time;
-      // Start the timer for the trailing edge.
-      timerId = setTimeout(timerExpired, wait);
-      // Invoke the leading edge.
-      return leading ? invokeFunc(time) : result;
-    }
-    function remainingWait(time) {
-      var timeSinceLastCall = time - lastCallTime,
-        timeSinceLastInvoke = time - lastInvokeTime,
-        timeWaiting = wait - timeSinceLastCall;
-      return maxing ? nativeMin(timeWaiting, maxWait - timeSinceLastInvoke) : timeWaiting;
-    }
-    function shouldInvoke(time) {
-      var timeSinceLastCall = time - lastCallTime,
-        timeSinceLastInvoke = time - lastInvokeTime;
-
-      // Either this is the first call, activity has stopped and we're at the
-      // trailing edge, the system time has gone backwards and we're treating
-      // it as the trailing edge, or we've hit the `maxWait` limit.
-      return lastCallTime === undefined || timeSinceLastCall >= wait || timeSinceLastCall < 0 || maxing && timeSinceLastInvoke >= maxWait;
-    }
-    function timerExpired() {
-      var time = now$1();
-      if (shouldInvoke(time)) {
-        return trailingEdge(time);
-      }
-      // Restart the timer.
-      timerId = setTimeout(timerExpired, remainingWait(time));
-    }
-    function trailingEdge(time) {
-      timerId = undefined;
-
-      // Only invoke if we have `lastArgs` which means `func` has been
-      // debounced at least once.
-      if (trailing && lastArgs) {
-        return invokeFunc(time);
-      }
-      lastArgs = lastThis = undefined;
-      return result;
-    }
-    function cancel() {
-      if (timerId !== undefined) {
-        clearTimeout(timerId);
-      }
-      lastInvokeTime = 0;
-      lastArgs = lastCallTime = lastThis = timerId = undefined;
-    }
-    function flush() {
-      return timerId === undefined ? result : trailingEdge(now$1());
-    }
-    function debounced() {
-      var time = now$1(),
-        isInvoking = shouldInvoke(time);
-      lastArgs = arguments;
-      lastThis = this;
-      lastCallTime = time;
-      if (isInvoking) {
-        if (timerId === undefined) {
-          return leadingEdge(lastCallTime);
-        }
-        if (maxing) {
-          // Handle invocations in a tight loop.
-          clearTimeout(timerId);
-          timerId = setTimeout(timerExpired, wait);
-          return invokeFunc(lastCallTime);
-        }
-      }
-      if (timerId === undefined) {
-        timerId = setTimeout(timerExpired, wait);
-      }
-      return result;
-    }
-    debounced.cancel = cancel;
-    debounced.flush = flush;
-    return debounced;
-  }
-  function identity() {
-    for (var _len4 = arguments.length, t = new Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
-      t[_key4] = arguments[_key4];
+  function identityCapture() {
+    for (var _len = arguments.length, t = new Array(_len), _key = 0; _key < _len; _key++) {
+      t[_key] = arguments[_key];
     }
     return t;
   }
-  // why???
   const AsyncFunction = async function () {}.constructor;
   /**
    * Given an async function, returns a function that's suitable for non-async APIs,
@@ -8403,7 +8131,6 @@ var bundle = function (exports) {
     const [asyncDebouncing, setAsyncDebouncing] = useState(false);
     const [syncDebouncing, setSyncDebouncing] = useState(false);
     const [invocationResult, setInvocationResult] = useState(asyncHandler2 instanceof AsyncFunction ? "async" : null);
-    //const [currentCapture, setCurrentCapture] = useState<AP | undefined>(undefined);
     const incrementCallCount = T$1(() => {
       setRunCount(c => c + 1);
     }, []);
@@ -8422,7 +8149,7 @@ var bundle = function (exports) {
       debounce,
       capture: captureUnstable
     } = options !== null && options !== void 0 ? options : {};
-    const captureStable = useStableCallback(captureUnstable !== null && captureUnstable !== void 0 ? captureUnstable : identity);
+    const captureStable = useStableCallback(captureUnstable !== null && captureUnstable !== void 0 ? captureUnstable : identityCapture);
     const asyncHandlerStable = useStableCallback(asyncHandler2 !== null && asyncHandler2 !== void 0 ? asyncHandler2 : identity);
     const {
       flush,
@@ -8461,7 +8188,6 @@ var bundle = function (exports) {
     const [rejectCount, setRejectCount] = useState(0);
     return {
       syncHandler: syncOutput,
-      //currentType,
       pending,
       result,
       error,
@@ -8490,7 +8216,7 @@ var bundle = function (exports) {
    *
    * The comments are numbered in approximate execution order for your reading pleasure (1 is near the bottom).
    */
-  function asyncToSync(_ref49) {
+  function asyncToSync(_ref) {
     let {
       asyncInput,
       onInvoke,
@@ -8508,7 +8234,7 @@ var bundle = function (exports) {
       onPending,
       throttle,
       wait
-    } = _ref49;
+    } = _ref;
     let pending = false;
     let syncDebouncing = false;
     let asyncDebouncing = false;
@@ -8520,7 +8246,7 @@ var bundle = function (exports) {
       onPending(pending = false);
       let nothingElseToDo = !asyncDebouncing;
       onAsyncDebounce(asyncDebouncing = false);
-      if (nothingElseToDo) ;else {
+      if (nothingElseToDo) ; else {
         // 9b. Another request to run the async handler came in while we were running this one.
         // Instead of stopping, we're just going to immediately run again using the arguments that were given to us most recently.
         // We also clear that flag, because we're handling it now. It'll be set again if the handler is called again while *this* one is running
@@ -8682,12 +8408,12 @@ var bundle = function (exports) {
    *
    * @see useAsync A more general version of this hook that can work with any type of handler, not just DOM event handlers.
    */
-  function useAsyncHandler(_ref50) {
+  function useAsyncHandler(_ref) {
     let {
       asyncHandler,
       capture: originalCapture,
       ...restAsyncOptions
-    } = _ref50;
+    } = _ref;
     // We need to differentiate between "nothing captured yet" and "`undefined` was captured"
     const [currentCapture, setCurrentCapture, getCurrentCapture] = useState(undefined);
     const [hasCapture, setHasCapture] = useState(false);
@@ -8714,14 +8440,15 @@ var bundle = function (exports) {
       })
     };
   }
-  function useDraggable(_ref51) {
+
+  function useDraggable(_ref) {
     let {
       effectAllowed,
       data,
       dragImage,
       dragImageXOffset,
       dragImageYOffset
-    } = _ref51;
+    } = _ref;
     const [dragging, setDragging, getDragging] = useState(false);
     const [lastDropEffect, setLastDropEffect, getLastDropEffect] = useState(null);
     const onDragStart = e => {
@@ -8762,6 +8489,36 @@ var bundle = function (exports) {
     };
     return ret;
   }
+
+  function _defineProperty(obj, key, value) {
+    key = _toPropertyKey(key);
+    if (key in obj) {
+      Object.defineProperty(obj, key, {
+        value: value,
+        enumerable: true,
+        configurable: true,
+        writable: true
+      });
+    } else {
+      obj[key] = value;
+    }
+    return obj;
+  }
+  function _toPrimitive(input, hint) {
+    if (typeof input !== "object" || input === null) return input;
+    var prim = input[Symbol.toPrimitive];
+    if (prim !== undefined) {
+      var res = prim.call(input, hint || "default");
+      if (typeof res !== "object") return res;
+      throw new TypeError("@@toPrimitive must return a primitive value.");
+    }
+    return (hint === "string" ? String : Number)(input);
+  }
+  function _toPropertyKey(arg) {
+    var key = _toPrimitive(arg, "string");
+    return typeof key === "symbol" ? key : String(key);
+  }
+
   class DroppableFileError extends Error {
     constructor(fileName, base) {
       var _base$message;
@@ -8772,10 +8529,10 @@ var bundle = function (exports) {
       this.errorType = base === null || base === void 0 ? void 0 : base.name;
     }
   }
-  function useDroppable(_ref52) {
+  function useDroppable(_ref) {
     let {
       effect
-    } = _ref52;
+    } = _ref;
     const [filesForConsideration, setFilesForConsideration] = useState(null);
     const [stringsForConsideration, setStringsForConsideration] = useState(null);
     const [droppedFiles, setDroppedFiles] = useState(null);
@@ -8949,10 +8706,10 @@ var bundle = function (exports) {
    * @param param0
    * @returns
    */
-  function usePortalChildren(_ref53) {
+  function usePortalChildren(_ref) {
     let {
       target
-    } = _ref53;
+    } = _ref;
     const [pushChild, setPushChild] = useState(null);
     const [updateChild, setUpdateChild] = useState(null);
     const [removeChild, setRemoveChild] = useState(null);
@@ -8985,12 +8742,12 @@ var bundle = function (exports) {
   /**
    * Implementation
    */
-  function PortalChildren(_ref54) {
+  function PortalChildren(_ref2) {
     let {
       setPushChild,
       setUpdateChild,
       setRemoveChild
-    } = _ref54;
+    } = _ref2;
     const [children, setChildren, getChildren] = useState([]);
     const pushChild = T$1(child => {
       const randomKey = generateRandomId();
@@ -9043,6 +8800,7 @@ var bundle = function (exports) {
       children: children
     });
   }
+
   function useHasLastFocus(args) {
     const {
       refElementReturn: {
@@ -9090,12 +8848,14 @@ var bundle = function (exports) {
       }
     };
   }
+
   E(null);
-  function useInterval(_ref55) {
+
+  function useInterval(_ref) {
     let {
       interval,
       callback
-    } = _ref55;
+    } = _ref;
     // Get a wrapper around the given callback that's stable
     const stableCallback = useStableCallback(callback);
     const getInterval = useStableGetter(interval);
@@ -9117,6 +8877,7 @@ var bundle = function (exports) {
       return () => clearInterval(handle);
     }, []);
   }
+
   const DemoUseInterval = () => {
     const [interval, setInterval] = useState(1000);
     const [fireCount, setFireCount] = useState(0);
@@ -9143,6 +8904,7 @@ var bundle = function (exports) {
       })]
     });
   };
+
   function getWindow() {
     return globalThis.window;
   }
@@ -9191,6 +8953,7 @@ var bundle = function (exports) {
         parentDepth
       }
     });
+    propsSource.role;
     return o$1("div", {
       style: {
         border: "".concat(depth, "px solid black")
@@ -9264,6 +9027,7 @@ var bundle = function (exports) {
       })]
     });
   }
+
   const RandomWords$1 = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
   const ListNavigationSingleSelectionChildContext = E(null);
   const DemoUseRovingTabIndex = x(() => {
@@ -9273,8 +9037,6 @@ var bundle = function (exports) {
     let [min, setMin] = useState(null);
     let [max, setMax] = useState(null);
     const [staggered, setStaggered] = useState(false);
-    // const [selectedIndex, _setLocalSelectedIndex] = useState<number | null>(0);
-    // const [tabbableIndex, _setLocalTabbableIndex] = useState<number | null>(0);
     if (!isFinite((_min = min) !== null && _min !== void 0 ? _min : NaN)) min = null;
     if (!isFinite((_max = max) !== null && _max !== void 0 ? _max : NaN)) max = null;
     const r = useCompleteListNavigation({
@@ -9501,10 +9263,10 @@ var bundle = function (exports) {
     });
   });
   const SelectionModeContext = E("focus");
-  const DemoUseRovingTabIndexChild = x(_ref56 => {
+  const DemoUseRovingTabIndexChild = x(_ref => {
     let {
       index
-    } = _ref56;
+    } = _ref;
     // FIXME: A hole in the array works for nagivation but not for sorting.
     //if (index == 1)
     //    return <li>(Item #${index} isn't rendered; it's a hole in the array)</li>;
@@ -9592,6 +9354,7 @@ var bundle = function (exports) {
       })]
     });
   });
+
   const DemoUseTimeout = () => {
     const [timeout, setTimeout] = p(1000);
     const [triggerIndex, setTriggerIndex] = p("");
@@ -9626,6 +9389,7 @@ var bundle = function (exports) {
       })]
     });
   };
+
   const RandomWords = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
   const DemoUseDroppable = () => {
     const {
@@ -9648,8 +9412,8 @@ var bundle = function (exports) {
       ...p,
       children: [droppedStrings != null && o$1("div", {
         children: ["Data dropped: ", o$1("ul", {
-          children: Object.entries(droppedStrings).map(_ref57 => {
-            let [type, value] = _ref57;
+          children: Object.entries(droppedStrings).map(_ref2 => {
+            let [type, value] = _ref2;
             return o$1("li", {
               children: [type, ": ", value]
             });
@@ -9696,9 +9460,9 @@ var bundle = function (exports) {
             children: JSON.stringify(f)
           }))
         })]
-      }), o$1("hr", {}), dropError && o$1("div", {
+      }), o$1("hr", {}), dropError ? o$1("div", {
         children: dropError instanceof Error ? dropError.message : JSON.stringify(dropError)
-      })]
+      }) : null]
     });
   };
   const DemoUseDraggable = () => {
@@ -9790,10 +9554,10 @@ var bundle = function (exports) {
       })]
     });
   };
-  const DemoUseChildrenHaveFocusChild = _ref58 => {
+  const DemoUseChildrenHaveFocusChild = _ref3 => {
     let {
       index
-    } = _ref58;
+    } = _ref3;
     const {
       hasCurrentFocusParameters: {
         onCurrentFocusedInnerChanged
@@ -9824,10 +9588,10 @@ var bundle = function (exports) {
   const DemoUseElementSizeAnimation = () => {
     return o$1("div", {});
   };
-  const DemoUseFocusTrap = x(_ref59 => {
+  const DemoUseFocusTrap = x(_ref4 => {
     let {
       depth
-    } = _ref59;
+    } = _ref4;
     const [active, setActive] = useState(false);
     const {
       focusTrapReturn: {
@@ -9842,8 +9606,8 @@ var bundle = function (exports) {
         onlyMoveFocus: false,
         focusOpener: e => e === null || e === void 0 ? void 0 : e.focus(),
         focusPopup: (e, f) => {
-          var _f2;
-          return (_f2 = f()) === null || _f2 === void 0 ? void 0 : _f2.focus();
+          var _f;
+          return (_f = f()) === null || _f === void 0 ? void 0 : _f.focus();
         }
       },
       refElementParameters: {
@@ -9877,11 +9641,11 @@ var bundle = function (exports) {
       })]
     });
   });
-  const DemoUseFocusTrapChild = x(_ref60 => {
+  const DemoUseFocusTrapChild = x(_ref5 => {
     let {
       setActive,
       active
-    } = _ref60;
+    } = _ref5;
     return o$1(d$1, {
       children: [o$1("button", {
         children: "Button 1"
@@ -10372,10 +10136,10 @@ var bundle = function (exports) {
   //type GridCellContext<RowElement extends Element, CellElement extends Element> = CompleteGridNavigationRowContext<RowElement, CellElement>;
   const GridRowContext = E(null);
   const GridCellContext = E(null);
-  const DemoUseGridRow = x(_ref61 => {
+  const DemoUseGridRow = x(_ref6 => {
     let {
       index
-    } = _ref61;
+    } = _ref6;
     useState(() => RandomWords[index /*Math.floor(Math.random() * (RandomWords.length - 1))*/]);
     const [_tabbableColumn, setTabbableColumn, _getTabbableColumn] = useState(null);
     //const getHighestIndex = useCallback(() => getChildren().getHighestIndex(), []);
@@ -10405,8 +10169,8 @@ var bundle = function (exports) {
         },
         textContentParameters: {
           getText: T$1(e => {
-            var _e$textContent2;
-            return (_e$textContent2 = e === null || e === void 0 ? void 0 : e.textContent) !== null && _e$textContent2 !== void 0 ? _e$textContent2 : "";
+            var _e$textContent;
+            return (_e$textContent = e === null || e === void 0 ? void 0 : e.textContent) !== null && _e$textContent !== void 0 ? _e$textContent : "";
           }, [])
         }
       },
@@ -10457,12 +10221,12 @@ var bundle = function (exports) {
       })
     });
   });
-  const DemoUseGridCell = _ref62 => {
+  const DemoUseGridCell = _ref7 => {
     let {
       index,
       row,
       rowIsTabbable
-    } = _ref62;
+    } = _ref7;
     if (row >= 6 && row % 2 == 0 && index > 1) return null;
     let hiddenText = row === 3 ? " (row hidden)" : "";
     const context = q(GridCellContext);
@@ -10488,8 +10252,8 @@ var bundle = function (exports) {
       },
       textContentParameters: {
         getText: T$1(e => {
-          var _e$textContent3;
-          return (_e$textContent3 = e === null || e === void 0 ? void 0 : e.textContent) !== null && _e$textContent3 !== void 0 ? _e$textContent3 : "";
+          var _e$textContent2;
+          return (_e$textContent2 = e === null || e === void 0 ? void 0 : e.textContent) !== null && _e$textContent2 !== void 0 ? _e$textContent2 : "";
         }, [])
       }
       //pressParameters: { exclude: index <= 1, focusSelf: useStableCallback(e => e.focus()), onPressSync: null }
@@ -10548,10 +10312,10 @@ var bundle = function (exports) {
       })]
     });
   }
-  function DemoPress(_ref63) {
+  function DemoPress(_ref8) {
     let {
       remaining
-    } = _ref63;
+    } = _ref8;
     const [count, setCount] = useState(0);
     const {
       refElementReturn,
@@ -10564,7 +10328,7 @@ var bundle = function (exports) {
     const {
       pressReturn: {
         propsUnstable: p2,
-        pseudoActive,
+        pressing,
         longPress
       }
     } = usePress({
@@ -10586,7 +10350,7 @@ var bundle = function (exports) {
       }), o$1("div", {
         children: ["Press count: ", count]
       }), o$1("div", {
-        children: ["Active: ", pseudoActive.toString()]
+        children: ["Active: ", pressing.toString()]
       }), o$1("div", {
         children: ["Long press: ", (longPress !== null && longPress !== void 0 ? longPress : "null").toString()]
       }), o$1("div", {
@@ -10703,11 +10467,11 @@ var bundle = function (exports) {
       }, mode)]
     });
   }
-  const DemoGlobalHandlerChildren = x(function DemoGlobalHandlerChildren(_ref64) {
+  const DemoGlobalHandlerChildren = x(function DemoGlobalHandlerChildren(_ref9) {
     let {
       count,
       mode
-    } = _ref64;
+    } = _ref9;
     return o$1(d$1, {
       children: [...function* () {
         for (let i = 0; i < count; ++i) {
@@ -10719,11 +10483,11 @@ var bundle = function (exports) {
       }()]
     });
   });
-  const DemoGlobalHandlerChild = x(function DemoGlobalHandlerChild(_ref65) {
+  const DemoGlobalHandlerChild = x(function DemoGlobalHandlerChild(_ref10) {
     let {
       mode,
       target
-    } = _ref65;
+    } = _ref10;
     useGlobalHandler(target, "click", mode == null ? null : e => {
       var _e$target;
       if (((_e$target = e.target) === null || _e$target === void 0 ? void 0 : _e$target.id) != "global-handler-test2") return;
@@ -10731,6 +10495,128 @@ var bundle = function (exports) {
     }, {}, mode || "grouped");
     return o$1("div", {
       hidden: true
+    });
+  });
+  const StaggeredContext = E(null);
+  const DemoStaggered = x(() => {
+    const [staggered, setStaggered] = useState(false);
+    const [checked, setChecked] = useState(false);
+    const [childCount, setChildCount] = useState(100);
+    const {
+      context: mcc,
+      managedChildrenReturn
+    } = useManagedChildren({
+      managedChildrenParameters: {}
+    });
+    const {
+      context: scc,
+      staggeredChildrenReturn
+    } = useStaggeredChildren({
+      managedChildrenReturn,
+      staggeredChildrenParameters: {
+        staggered
+      }
+    });
+    return o$1(StaggeredContext.Provider, {
+      value: {
+        ...mcc,
+        ...scc
+      },
+      children: o$1("div", {
+        class: "demo",
+        children: [o$1("label", {
+          children: [o$1("input", {
+            type: "checkbox",
+            checked: checked,
+            onInput: e => {
+              e.preventDefault();
+              setChecked(e.currentTarget.checked);
+            }
+          }), " Children mounted"]
+        }), o$1("label", {
+          children: [o$1("input", {
+            type: "checkbox",
+            checked: staggered,
+            onInput: e => {
+              e.preventDefault();
+              setStaggered(e.currentTarget.checked);
+            }
+          }), " Children Staggered"]
+        }), o$1("label", {
+          children: [o$1("input", {
+            type: "number",
+            value: childCount,
+            onInput: e => {
+              e.preventDefault();
+              setChildCount(e.currentTarget.valueAsNumber);
+            }
+          }), " # of children"]
+        }), o$1("div", {
+          children: [o$1("div", {
+            children: ["Status: ", staggered ? staggeredChildrenReturn.stillStaggering ? "staggering" : "done staggering" : "(not staggering)"]
+          }), o$1("div", {
+            style: "display:flex;flex-wrap: wrap;",
+            children: checked && o$1(DemoStaggeredChildren, {
+              childCount: childCount
+            })
+          })]
+        })]
+      })
+    });
+  });
+  const DemoStaggeredChildren = x(_ref11 => {
+    let {
+      childCount
+    } = _ref11;
+    return o$1(d$1, {
+      children: Array.from(function* () {
+        for (let i = 0; i < childCount; ++i) {
+          yield o$1(DemoStaggeredChild, {
+            index: i
+          }, i);
+        }
+      }())
+    });
+  });
+  const DemoStaggeredChild = x(_ref12 => {
+    let {
+      index
+    } = _ref12;
+    const context = q(StaggeredContext);
+    const {
+      managedChildParameters: {
+        setParentIsStaggered,
+        setStaggeredVisible
+      },
+      props,
+      staggeredChildReturn: {
+        hideBecauseStaggered,
+        isStaggered
+      }
+    } = useStaggeredChild({
+      context: context,
+      managedChildParameters: {
+        index
+      }
+    });
+    useManagedChild({
+      context,
+      managedChildParameters: {
+        index
+      }
+    }, {
+      hidden: false,
+      index,
+      setParentIsStaggered,
+      setStaggeredVisible
+    });
+    return o$1("div", {
+      ...useMergedProps(props, {
+        style: hideBecauseStaggered ? {
+          opacity: 0.25
+        } : {}
+      }),
+      children: ["Child #", index, isStaggered ? hideBecauseStaggered ? "(pending)" : "" : "(not staggered)"]
     });
   });
   const Component = () => {
@@ -10745,13 +10631,16 @@ var bundle = function (exports) {
       }), o$1("input", {}), o$1("div", {
         style: "display:grid;grid-template-columns:1fr 1fr",
         children: [o$1(DemoUseModal, {}), o$1(DemoUseModal, {})]
-      }), o$1("hr", {}), o$1(DemoLabel, {}), o$1("hr", {}), o$1(DemoGlobalHandler, {}), o$1("hr", {}), o$1(DemoPortalChildren, {}), o$1("hr", {}), o$1(DemoFocus, {}), o$1("hr", {}), o$1(DemoUseChildrenHaveFocus, {}), o$1("hr", {}), o$1(DemoUseGrid, {}), o$1("hr", {}), o$1(DemoUseTimeout, {}), o$1("hr", {}), o$1(DemoUseInterval, {}), o$1("hr", {}), o$1(DemoUseRovingTabIndex, {}), o$1("hr", {}), o$1(DemoUseFocusTrap, {}), o$1("hr", {}), o$1(DemoUseAsyncHandler1, {}), o$1("hr", {}), o$1(DemoUseAsyncHandler2, {}), o$1("hr", {}), o$1(DemoUseDroppable, {}), o$1("hr", {}), o$1(DemoUseDraggable, {}), o$1("hr", {}), o$1(DemoUseElementSizeAnimation, {}), o$1("hr", {}), o$1("input", {})]
+      }), o$1("hr", {}), o$1(DemoLabel, {}), o$1("hr", {}), o$1(DemoGlobalHandler, {}), o$1("hr", {}), o$1(DemoPortalChildren, {}), o$1("hr", {}), o$1(DemoFocus, {}), o$1("hr", {}), o$1(DemoUseChildrenHaveFocus, {}), o$1("hr", {}), o$1(DemoUseGrid, {}), o$1("hr", {}), o$1(DemoUseTimeout, {}), o$1("hr", {}), o$1(DemoUseInterval, {}), o$1("hr", {}), o$1(DemoStaggered, {}), o$1("hr", {}), o$1(DemoUseRovingTabIndex, {}), o$1("hr", {}), o$1(DemoUseFocusTrap, {}), o$1("hr", {}), o$1(DemoUseAsyncHandler1, {}), o$1("hr", {}), o$1(DemoUseAsyncHandler2, {}), o$1("hr", {}), o$1(DemoUseDroppable, {}), o$1("hr", {}), o$1(DemoUseDraggable, {}), o$1("hr", {}), o$1(DemoUseElementSizeAnimation, {}), o$1("hr", {}), o$1("input", {})]
     });
   };
   requestAnimationFrame(() => {
     q$1(o$1(Component, {}), document.getElementById("root"));
   });
+
   exports.DemoUseGrid = DemoUseGrid;
+
   return exports;
-}({});
+
+})({});
 //# sourceMappingURL=bundle.js.map

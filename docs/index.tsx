@@ -1,18 +1,13 @@
 import { createContext, h, render, VNode } from "preact";
 import { memo } from "preact/compat";
 import { useCallback, useContext, useRef } from "preact/hooks";
-import { GetIndex, GridSingleSelectSortableChildCellInfo, GridSingleSelectSortableChildRowInfo, returnNull, useAnimationFrame, useAsyncHandler, useChildrenHaveFocus, useChildrenHaveFocusChild, UseChildrenHaveFocusChildParameters, UseCompleteGridNavigationReturnType, UseCompleteGridNavigationRowReturnType, useDraggable, useDroppable, useElementSize, useFocusTrap, useGlobalHandler, useHasCurrentFocus, useHasLastFocus, useInterval, useMergedProps, usePortalChildren, usePress, useRandomDualIds, useRefElement, useStableCallback, useState } from "..";
-import { ElementSize } from "../";
-//import { useGridNavigation, UseGridNavigationCell, UseGridNavigationRow } from "../use-grid-navigation";
-import { CompleteGridNavigationContext, CompleteGridNavigationRowContext, useCompleteGridNavigation, useCompleteGridNavigationCell, useCompleteGridNavigationRow } from "..";
-import { DemoUseInterval } from "./demos/use-interval";
-import { DemoUseModal } from "./demos/use-modal";
-import { DemoUseRovingTabIndex } from "./demos/use-roving-tab-index";
-import { DemoUseTimeout } from "./demos/use-timeout";
-import { UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationRowInfo } from "../";
+import { CompleteGridNavigationContext, CompleteGridNavigationRowContext, UseStaggeredChildContext, ElementSize, GetIndex, returnNull, useAnimationFrame, useAsyncHandler, useChildrenHaveFocus, useChildrenHaveFocusChild, UseChildrenHaveFocusChildParameters, useCompleteGridNavigation, useCompleteGridNavigationCell, UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationReturnType, useCompleteGridNavigationRow, UseCompleteGridNavigationRowInfo, UseCompleteGridNavigationRowReturnType, useDraggable, useDroppable, useElementSize, useFocusTrap, useGlobalHandler, useHasCurrentFocus, useHasLastFocus, useInterval, useManagedChildren, UseManagedChildrenContext, useMergedProps, usePortalChildren, usePress, useRandomDualIds, useRefElement, useStableCallback, UseStaggeredChildrenInfo, useState, useStaggeredChildren, useManagedChild, useStaggeredChild } from "../dist/index.js";
+import { DemoUseInterval } from "./demos/use-interval.js";
+import { DemoUseModal } from "./demos/use-modal.js";
+import { DemoUseRovingTabIndex } from "./demos/use-roving-tab-index.js";
+import { DemoUseTimeout } from "./demos/use-timeout.js";
+
 const RandomWords = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
-
-
 
 const DemoUseDroppable = () => {
     const { droppedFiles, droppedStrings, filesForConsideration, stringsForConsideration, propsStable: props, dropError } = useDroppable<HTMLDivElement>({ effect: "copy" });
@@ -35,7 +30,7 @@ const DemoUseDroppable = () => {
             {filesForConsideration != null && <div>Files being considered: <ul>{filesForConsideration.map(f => <li>{JSON.stringify(f)}</li>)}</ul></div>}
 
             <hr />
-            {dropError && <div>{dropError instanceof Error ? dropError.message : JSON.stringify(dropError)}</div>}
+            {dropError ? <div>{dropError instanceof Error ? dropError.message : JSON.stringify(dropError)}</div> : null}
         </div>
     )
 }
@@ -552,7 +547,7 @@ function DemoPress({ remaining }: { remaining: number }) {
 
     const [count, setCount] = useState<number>(0);
     const { refElementReturn, refElementReturn: { propsStable: p1 } } = useRefElement<HTMLDivElement>({ refElementParameters: {} })
-    const { pressReturn: { propsUnstable: p2, pseudoActive, longPress } } = usePress<HTMLDivElement>({
+    const { pressReturn: { propsUnstable: p2, pressing, longPress } } = usePress<HTMLDivElement>({
         pressParameters: { focusSelf: e => { e.focus() }, longPressThreshold: 1000, onPressSync: () => { setCount((c: number) => ++c) } },
         refElementReturn
     })
@@ -560,7 +555,7 @@ function DemoPress({ remaining }: { remaining: number }) {
         <div className="demo">
             <h2>Press</h2>
             <div>Press count: {count}</div>
-            <div>Active: {pseudoActive.toString()}</div>
+            <div>Active: {pressing.toString()}</div>
             <div>Long press: {(longPress ?? "null").toString()}</div>
             <div style={{ border: "1px solid black", touchAction: "none" }} tabIndex={0} {...useMergedProps(p1, p2)}>
                 <div>This DIV's parent is pressable. Click here to press, cancel by leaving or hovering over a pressable child.</div>
@@ -642,6 +637,51 @@ const DemoGlobalHandlerChild = memo(function DemoGlobalHandlerChild({ mode, targ
     return <div hidden />;
 })
 
+const StaggeredContext = createContext<UseManagedChildrenContext<UseStaggeredChildrenInfo<HTMLDivElement>> & UseStaggeredChildContext>(null!);
+
+const DemoStaggered = memo(() => {
+    const [staggered, setStaggered] = useState(false);
+    const [checked, setChecked] = useState(false);
+    const [childCount, setChildCount] = useState(100);
+    const { context: mcc, managedChildrenReturn } = useManagedChildren<UseStaggeredChildrenInfo<HTMLDivElement>>({ managedChildrenParameters: {} })
+    const { context: scc, staggeredChildrenReturn } = useStaggeredChildren({ managedChildrenReturn, staggeredChildrenParameters: { staggered } })
+    return (
+        <StaggeredContext.Provider value={{ ...mcc, ...scc }}>
+            <div class="demo">
+                <label><input type="checkbox" checked={checked} onInput={e => { e.preventDefault(); setChecked(e.currentTarget.checked) }} /> Children mounted</label>
+                <label><input type="checkbox" checked={staggered} onInput={e => { e.preventDefault(); setStaggered(e.currentTarget.checked) }} /> Children Staggered</label>
+                <label><input type="number" value={childCount} onInput={e => { e.preventDefault(); setChildCount(e.currentTarget.valueAsNumber) }} /> # of children</label>
+                <div>
+                    <div>Status: {staggered ? staggeredChildrenReturn.stillStaggering ? "staggering" : "done staggering" : "(not staggering)"}</div>
+                    <div style="display:flex;flex-wrap: wrap;">{checked && <DemoStaggeredChildren childCount={childCount} />}</div>
+                </div>
+            </div>
+        </StaggeredContext.Provider>
+    )
+})
+
+const DemoStaggeredChildren = memo(({ childCount }: { childCount: number }) => {
+    return (
+        <>
+            {Array.from(function* () {
+                for (let i = 0; i < childCount; ++i) {
+                    yield <DemoStaggeredChild index={i} key={i} />
+                }
+            }())}
+        </>
+    )
+})
+
+const DemoStaggeredChild = memo(({ index }: { index: number }) => {
+    const context = useContext(StaggeredContext);
+    const { managedChildParameters: { setParentIsStaggered, setStaggeredVisible }, props, staggeredChildReturn: { hideBecauseStaggered, isStaggered } } = useStaggeredChild<HTMLDivElement>({ context: context, managedChildParameters: { index } });
+    const { managedChildReturn } = useManagedChild<UseStaggeredChildrenInfo<HTMLDivElement>>({ context, managedChildParameters: { index } }, { hidden: false, index, setParentIsStaggered, setStaggeredVisible });
+
+    return (
+        <div {...useMergedProps(props, { style: hideBecauseStaggered ? { opacity: 0.25 } : {} })}>Child #{index}{isStaggered ? hideBecauseStaggered ? "(pending)" : "" : "(not staggered)"}</div>
+    )
+})
+
 const Component = () => {
     // return <DemoUseAsyncHandler2 />;
 
@@ -668,6 +708,8 @@ const Component = () => {
         <DemoUseTimeout />
         <hr />
         <DemoUseInterval />
+        <hr />
+        <DemoStaggered />
         <hr />
         <DemoUseRovingTabIndex />
         <hr />

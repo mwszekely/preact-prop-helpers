@@ -1,8 +1,8 @@
 
-import LodashDebounce, { DebounceSettings } from "lodash-es/debounce";
+import { debounce as LodashDebounce, DebounceSettings, identity } from "lodash-es";
 import { useCallback, useEffect, useMemo } from "preact/hooks";
-import { useStableCallback } from "./use-stable-callback";
-import { useState } from "./use-state";
+import { useStableCallback } from "./use-stable-callback.js";
+import { useState } from "./use-state.js";
 
 //type Func = (...args: any) => Promise<unknown> | unknown;
 
@@ -172,66 +172,14 @@ export interface UseAsyncReturnType<SP extends unknown[], R> {
     syncHandler: SyncFunctionType<SP, void>;
 }
 
-function identity<AP extends unknown[], SP extends unknown[]>(...t: SP) { return t as unknown[] as AP; }
+function identityCapture<AP extends unknown[], SP extends unknown[]>(...t: SP) { return t as unknown[] as AP; }
 
-/**
- * Returns a throttled version of the given (stable) callback using Lodash's `throttle` function.
- * 
- * If the callback is `null`, then `null` will be returned, otherwise `callback` must be stable for this to work as intented.
- */
-/*export function useThrottled<F extends Func>(callback: F | null, wait: number, options?: ThrottleSettings): DebouncedFunc<F>;
-export function useThrottled<F extends Func>(callback: F | null, wait: number, options?: ThrottleSettings): DebouncedFunc<F> | null;
-export function useThrottled<F extends Func>(callbackUnstable: F | null, wait: number, options?: ThrottleSettings): DebouncedFunc<F> | null {
-    let { leading, trailing } = (options || {});
-    // These are the lodash defaults, but lodash treats nonexistence and being undefined as separate things...
-    leading ??= true;
-    trailing ??= true;
-    const enabled = (callbackUnstable != null);
-    const callbackStable = useStableCallback(callbackUnstable ?? noop);
-    const throttled = useMemo(() => {
-        return enabled ? throttle(callbackStable, wait, { leading, trailing }) : null;
-    }, [enabled, wait, options?.leading, options?.trailing]);
-
-    useEffect(() => {
-        return () => { console.log("cancel throttle"); throttled?.cancel(); }
-    }, [throttled])
-
-    return throttled;
-}*/
-
-/**
- * Returns a debounced version of the given (stable) callback using Lodash's `debounced` function.
- * 
- * If the callback is `null`, then `null` will be returned, otherwise `callback` must be stable for this to work as intented.
- */
-/*export function useDebounced<F extends Func>(callback: F, wait: number, options?: DebounceSettings): DebouncedFunc<F>;
-export function useDebounced<F extends Func>(callback: F | null, wait: number, options?: DebounceSettings): DebouncedFunc<F> | null;
-export function useDebounced<F extends Func>(callbackUnstable: F | null, wait: number, options?: DebounceSettings): DebouncedFunc<F> | null {
-    let { leading, maxWait, trailing } = (options || {});
-    // These are the lodash defaults, but lodash treats nonexistence and being undefined as separate things...
-    leading ??= false;
-    trailing ??= true;
-    maxWait ??= 1e99;
-    const enabled = (callbackUnstable != null);
-    const callbackStable = useStableCallback(callbackUnstable ?? noop);
-    const debounced = useMemo(() => {
-        return enabled ? debounce(callbackStable, wait, { leading, trailing, maxWait }) : null;
-    }, [enabled, wait, leading, maxWait, trailing]);
-
-    useEffect(() => {
-        return () => { console.log("cancel debounce"); debounced?.cancel(); }
-    }, [debounced])
-
-    return debounced;
-}*/
 
 type SyncFunctionType<SP extends unknown[], R> = (...args: SP) => (R | undefined);
 type AsyncFunctionType<AP extends unknown[], R> = ((...args: AP) => (R | Promise<R>));
-//type GlueFunctionType<AP extends unknown[], R> = (enqueue: boolean, ...args: AP) => R | undefined;
 type CaptureFunctionType<AP extends unknown[], SP extends unknown[] = AP> = (...args: SP) => AP;
 
-// why???
-const AsyncFunction = (async function () {}.constructor)
+const AsyncFunction = ((async function () {}).constructor)
 
 /**
  * Given an async function, returns a function that's suitable for non-async APIs, 
@@ -271,7 +219,6 @@ export function useAsync<AP extends unknown[], R, SP extends unknown[] = AP>(asy
     const [asyncDebouncing, setAsyncDebouncing] = useState(false);
     const [syncDebouncing, setSyncDebouncing] = useState(false);
     const [invocationResult, setInvocationResult] = useState<"async" | "sync" | "throw" | null>(asyncHandler2 instanceof AsyncFunction? "async" : null);
-    //const [currentCapture, setCurrentCapture] = useState<AP | undefined>(undefined);
     const incrementCallCount = useCallback(() => { setRunCount(c => c + 1) }, []);
     const incrementResolveCount = useCallback(() => { setResolveCount(c => c + 1) }, []);
     const incrementRejectCount = useCallback(() => { setRejectCount(c => c + 1) }, []);
@@ -279,7 +226,7 @@ export function useAsync<AP extends unknown[], R, SP extends unknown[] = AP>(asy
 
     /* eslint-disable prefer-const */
     let { throttle, debounce, capture: captureUnstable } = (options ?? {});
-    const captureStable = useStableCallback(captureUnstable ?? identity);
+    const captureStable = useStableCallback(captureUnstable ?? identityCapture);
     const asyncHandlerStable = useStableCallback<(...args: AP) => R | Promise<R>>(asyncHandler2 ?? (identity as any));
     const { flush, syncOutput, cancel } = useMemo(() => {
         return asyncToSync<AP, SP, R>({
@@ -319,7 +266,6 @@ export function useAsync<AP extends unknown[], R, SP extends unknown[] = AP>(asy
 
     return {
         syncHandler: syncOutput,
-        //currentType,
         pending,
         result,
         error,

@@ -1,5 +1,5 @@
 import { h } from "preact";
-import { useState } from "../preact-extensions/use-state";
+import { useState } from "../preact-extensions/use-state.js";
 
 /*
 export function useDraggableProps<E extends EventTarget>(r: UseDraggableReturnType<E>, ...otherProps: h.JSX.HTMLAttributes<E>[]): h.JSX.HTMLAttributes<E>[] {

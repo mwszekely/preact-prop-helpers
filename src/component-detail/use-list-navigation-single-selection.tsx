@@ -1,22 +1,12 @@
-import { assertEmptyObject } from "../preact-extensions/use-managed-children";
-import { useStableCallback } from "../preact-extensions/use-stable-callback";
-import { useListNavigation, useListNavigationChild, UseListNavigationChildInfo, UseListNavigationChildParameters, UseListNavigationChildReturnType, UseListNavigationParameters, UseListNavigationReturnType } from "./use-list-navigation-partial";
-import { SelectableChildInfo, useSingleSelection, useSingleSelectionChild, UseSingleSelectionChildParameters, UseSingleSelectionChildReturnType, UseSingleSelectionParameters, UseSingleSelectionReturnType } from "./use-single-selection";
-
-type OmitStrong<T, K extends keyof T> = Omit<T, K>
-
-/**
- * We're just gluing together the list navigation and single selection hooks,
- * since they're so commonly paired together. Also see the one that includes sorting.
- */
-const _dummy = 0;
+import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
+import { assertEmptyObject } from "../util/assert.js";
+import { OmitStrong } from "../util/types.js";
+import { useListNavigation, useListNavigationChild, UseListNavigationChildInfo, UseListNavigationChildParameters, UseListNavigationChildReturnType, UseListNavigationParameters, UseListNavigationReturnType } from "./use-list-navigation-partial.js";
+import { SelectableChildInfo, useSingleSelection, useSingleSelectionChild, UseSingleSelectionChildParameters, UseSingleSelectionChildReturnType, UseSingleSelectionParameters, UseSingleSelectionReturnType } from "./use-single-selection.js";
 
 export interface UseListNavigationSingleSelectionChildInfo<TabbableChildElement extends Element> extends UseListNavigationChildInfo<TabbableChildElement>, SelectableChildInfo<TabbableChildElement> { }
 
-
-export interface UseListNavigationSingleSelectionParameters<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationSingleSelectionChildInfo<ChildElement>> extends
-    UseListNavigationParameters<ParentOrChildElement, ChildElement, M>,
-    OmitStrong<UseSingleSelectionParameters<ChildElement>, "rovingTabIndexReturn"> {
+export interface UseListNavigationSingleSelectionParameters<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationSingleSelectionChildInfo<ChildElement>> extends UseListNavigationParameters<ParentOrChildElement, ChildElement, M>, OmitStrong<UseSingleSelectionParameters<ChildElement>, "rovingTabIndexReturn"> {
     managedChildrenReturn: UseListNavigationParameters<ParentOrChildElement, ChildElement, M>["managedChildrenReturn"] & UseSingleSelectionParameters<ChildElement>["managedChildrenReturn"];
 }
 

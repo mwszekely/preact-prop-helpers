@@ -1,5 +1,5 @@
 import { h } from "preact";
-import { useInterval, useState } from "../..";
+import { useInterval, useState } from "../../dist/index.js";
 
 
 export const DemoUseInterval = () => {

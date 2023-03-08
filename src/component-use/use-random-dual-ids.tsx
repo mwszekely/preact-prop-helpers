@@ -1,6 +1,6 @@
 import { h } from "preact";
-import { useMergedProps } from "../dom-helpers/use-merged-props";
-import { useRandomId, UseRandomIdParameters, UseRandomIdReturnType } from "./use-random-id";
+import { useMergedProps } from "../dom-helpers/use-merged-props.js";
+import { useRandomId, UseRandomIdParameters, UseRandomIdReturnType } from "./use-random-id.js";
 
 
 export interface UseRandomDualIdsParameters {

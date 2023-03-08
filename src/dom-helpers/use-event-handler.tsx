@@ -1,8 +1,8 @@
 import { h, PreactDOMAttributes } from "preact";
-import { useEnsureStability } from "../preact-extensions/use-passive-state";
+import { useEnsureStability } from "../preact-extensions/use-passive-state.js";
 import { useCallback, useEffect } from "preact/hooks";
-import { useStableCallback } from "../preact-extensions/use-stable-callback";
-import { useMergedProps } from "./use-merged-props";
+import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
+import { useMergedProps } from "./use-merged-props.js";
 
 /**
  * This is used to select *just* the typed addEventListener 
