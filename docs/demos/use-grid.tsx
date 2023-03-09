@@ -87,26 +87,25 @@ const DemoUseGridRow = memo((({ index }: { index: number }) => {
 
     const contextFromParent = useContext(GridRowContext) as CompleteGridNavigationContext<HTMLTableSectionElement, HTMLTableRowElement, HTMLTableCellElement, CustomGridInfo, CustomGridRowInfo>;
     const ret: UseCompleteGridNavigationRowReturnType<HTMLTableRowElement, HTMLTableCellElement, CustomGridInfo, CustomGridRowInfo> = useCompleteGridNavigationRow<HTMLTableRowElement, HTMLTableCellElement, CustomGridInfo, CustomGridRowInfo>({
-        rowAsChildOfGridParameters: {
-            completeGridNavigationRowParameters: { foo: "bar" },
-            sortableChildParameters: { getSortValue: returnNull },
-            context: contextFromParent,
-            rovingTabIndexChildParameters: { hidden },
-            managedChildParameters: { index },
-            singleSelectionChildParameters: { disabled, ariaPropName: "aria-checked", selectionMode: "focus" },
-            textContentParameters: { getText: useCallback((e: Element | null) => { return e?.textContent ?? "" }, []) }
-        },
-        rowAsParentOfCellsParameters: {
-            linearNavigationParameters: { disableArrowKeys: false, disableHomeEndKeys: false, navigatePastEnd: "wrap", navigatePastStart: "wrap" },
-            rovingTabIndexParameters: { onTabbableIndexChange: useStableCallback((i: number | null) => { setTabbableColumn(i) }) },
-            typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000 }
-        }
+
+        completeGridNavigationRowParameters: { foo: "bar" },
+        sortableChildParameters: { getSortValue: returnNull },
+        context: contextFromParent,
+        rovingTabIndexChildParameters: { hidden },
+        managedChildParameters: { index },
+        singleSelectionChildParameters: { disabled, ariaPropName: "aria-checked", selectionMode: "focus" },
+        textContentParameters: { getText: useCallback((e: Element | null) => { return e?.textContent ?? "" }, []) },
+
+        linearNavigationParameters: { disableArrowKeys: false, disableHomeEndKeys: false, navigatePastEnd: "wrap", navigatePastStart: "wrap" },
+        rovingTabIndexParameters: { onTabbableIndexChange: useStableCallback((i: number | null) => { setTabbableColumn(i) }) },
+        typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000 }
+
     });
 
     const {
         rowAsParentOfCellsReturn: { propsStable, context: contextToChild },
         rowAsChildOfGridReturn: { rovingTabIndexChildReturn: { tabbable } },
-        
+
     } = ret;
 
     return (

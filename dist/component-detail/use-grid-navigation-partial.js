@@ -42,9 +42,9 @@ export function useGridNavigation({ gridNavigationParameters: { onTabbableColumn
         })
     };
 }
-export function useGridNavigationRow({ rowAsChildOfGridParameters: { gridNavigationRowContext: { gridNavigationRowParameters: { setTabbableRow, getCurrentTabbableColumn, setCurrentTabbableColumn } }, ...asChildRowOfTable }, rowAsParentOfCellsParameters: { linearNavigationParameters, rovingTabIndexParameters: { ...rovingTabIndexParameters }, ...asParentRowOfCellsP }, ..._void1 }) {
-    const { managedChildrenReturn: { getChildren } } = asChildRowOfTable;
-    const getIndex = useStableCallback(() => { return asChildRowOfTable.managedChildParameters.index; });
+export function useGridNavigationRow({ gridNavigationRowContext: { gridNavigationRowParameters: { setTabbableRow, getCurrentTabbableColumn, setCurrentTabbableColumn } }, linearNavigationParameters, rovingTabIndexParameters: { ...rovingTabIndexParameters }, managedChildParameters, managedChildrenReturn, refElementReturn, rovingTabIndexChildContext, rovingTabIndexChildParameters, textContentParameters, typeaheadNavigationChildContext, typeaheadNavigationParameters, ..._void1 }) {
+    const { getChildren } = managedChildrenReturn;
+    const getIndex = useStableCallback(() => { return managedChildParameters.index; });
     const focusSelf = useStableCallback((e) => {
         let index = (getCurrentTabbableColumn() ?? 0);
         let child = getChildren().getAt(index);
@@ -65,9 +65,9 @@ export function useGridNavigationRow({ rowAsChildOfGridParameters: { gridNavigat
             e?.focus?.();
         }
     }, []);
-    const lncr = useListNavigationChild(asChildRowOfTable);
+    const lncr = useListNavigationChild({ managedChildParameters, refElementReturn, rovingTabIndexChildContext, rovingTabIndexChildParameters, textContentParameters, typeaheadNavigationChildContext });
     const untabbable = !lncr.rovingTabIndexChildReturn.tabbable;
-    const lnr = useListNavigation({ ...asParentRowOfCellsP, rovingTabIndexParameters: { untabbable, ...rovingTabIndexParameters }, linearNavigationParameters: { navigationDirection: "horizontal", ...linearNavigationParameters } });
+    const lnr = useListNavigation({ managedChildrenReturn, typeaheadNavigationParameters, rovingTabIndexParameters: { untabbable, ...rovingTabIndexParameters }, linearNavigationParameters: { navigationDirection: "horizontal", ...linearNavigationParameters } });
     assertEmptyObject(_void1);
     const { rovingTabIndexReturn: { setTabbableIndex } } = lnr;
     return {

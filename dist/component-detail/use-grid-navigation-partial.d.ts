@@ -14,25 +14,21 @@ export interface UseGridNavigationParameters<ParentOrChildElement extends Elemen
     };
 }
 export interface UseGridNavigationReturnType<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, RM extends GridChildRowInfo<RowElement, CellElement>, CM extends GridChildCellInfo<CellElement>> extends UseListNavigationReturnType<ParentOrRowElement, RowElement> {
-    gridNavigationRowContext: UseGridNavigationRowParameters<RowElement, CellElement, RM, CM>["rowAsChildOfGridParameters"]["gridNavigationRowContext"];
+    gridNavigationRowContext: UseGridNavigationRowParameters<RowElement, CellElement, RM, CM>["gridNavigationRowContext"];
 }
-export interface UseGridNavigationRowParameters<RowElement extends Element, CellElement extends Element, _RM extends GridChildRowInfo<RowElement, CellElement>, CM extends GridChildCellInfo<CellElement>> {
-    rowAsChildOfGridParameters: UseListNavigationChildParameters<RowElement> & {
-        managedChildrenReturn: Pick<UseManagedChildrenReturnType<CM>["managedChildrenReturn"], "getChildren">;
-        gridNavigationRowContext: {
-            _r?: RowElement;
-            _c?: CellElement;
-            gridNavigationRowParameters: {
-                setTabbableRow: SetTabbableIndex;
-                getCurrentTabbableColumn: () => (number | null);
-                setCurrentTabbableColumn: PassiveStateUpdater<number | null, Event>;
-            };
+export interface UseGridNavigationRowParameters<RowElement extends Element, CellElement extends Element, _RM extends GridChildRowInfo<RowElement, CellElement>, CM extends GridChildCellInfo<CellElement>> extends UseListNavigationChildParameters<RowElement>, OmitStrong<UseListNavigationParameters<RowElement, CellElement, CM>, "linearNavigationParameters" | "rovingTabIndexParameters"> {
+    managedChildrenReturn: Pick<UseManagedChildrenReturnType<CM>["managedChildrenReturn"], "getChildren">;
+    gridNavigationRowContext: {
+        _r?: RowElement;
+        _c?: CellElement;
+        gridNavigationRowParameters: {
+            setTabbableRow: SetTabbableIndex;
+            getCurrentTabbableColumn: () => (number | null);
+            setCurrentTabbableColumn: PassiveStateUpdater<number | null, Event>;
         };
     };
-    rowAsParentOfCellsParameters: OmitStrong<UseListNavigationParameters<RowElement, CellElement, CM>, "linearNavigationParameters" | "rovingTabIndexParameters"> & {
-        rovingTabIndexParameters: OmitStrong<UseListNavigationParameters<RowElement, CellElement, CM>["rovingTabIndexParameters"], "untabbable">;
-        linearNavigationParameters: OmitStrong<UseListNavigationParameters<RowElement, CellElement, CM>["linearNavigationParameters"], "navigationDirection">;
-    };
+    rovingTabIndexParameters: OmitStrong<UseListNavigationParameters<RowElement, CellElement, CM>["rovingTabIndexParameters"], "untabbable">;
+    linearNavigationParameters: OmitStrong<UseListNavigationParameters<RowElement, CellElement, CM>["linearNavigationParameters"], "navigationDirection">;
 }
 export interface UseGridNavigationRowReturnType<RowElement extends Element, CellElement extends Element> {
     rowAsChildOfGridReturn: UseListNavigationChildReturnType<RowElement> & {
@@ -61,6 +57,6 @@ export interface UseGridNavigationCellParameters<_RowElement extends Element, Ce
 export interface UseGridNavigationCellReturnType<CellElement extends Element> extends UseListNavigationChildReturnType<CellElement> {
 }
 export declare function useGridNavigation<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, RM extends GridChildRowInfo<RowElement, CellElement>, CM extends GridChildCellInfo<CellElement>>({ gridNavigationParameters: { onTabbableColumnChange, ...void3 }, linearNavigationParameters, rovingTabIndexParameters: { onTabbableIndexChange, ...rovingTabIndexParameters }, managedChildrenReturn, typeaheadNavigationParameters, ..._void2 }: UseGridNavigationParameters<ParentOrRowElement, RowElement, CellElement, RM>): UseGridNavigationReturnType<ParentOrRowElement, RowElement, CellElement, RM, CM>;
-export declare function useGridNavigationRow<RowElement extends Element, CellElement extends Element, RM extends GridChildRowInfo<RowElement, CellElement>, CM extends GridChildCellInfo<CellElement>>({ rowAsChildOfGridParameters: { gridNavigationRowContext: { gridNavigationRowParameters: { setTabbableRow, getCurrentTabbableColumn, setCurrentTabbableColumn } }, ...asChildRowOfTable }, rowAsParentOfCellsParameters: { linearNavigationParameters, rovingTabIndexParameters: { ...rovingTabIndexParameters }, ...asParentRowOfCellsP }, ..._void1 }: UseGridNavigationRowParameters<RowElement, CellElement, RM, CM>): UseGridNavigationRowReturnType<RowElement, CellElement>;
+export declare function useGridNavigationRow<RowElement extends Element, CellElement extends Element, RM extends GridChildRowInfo<RowElement, CellElement>, CM extends GridChildCellInfo<CellElement>>({ gridNavigationRowContext: { gridNavigationRowParameters: { setTabbableRow, getCurrentTabbableColumn, setCurrentTabbableColumn } }, linearNavigationParameters, rovingTabIndexParameters: { ...rovingTabIndexParameters }, managedChildParameters, managedChildrenReturn, refElementReturn, rovingTabIndexChildContext, rovingTabIndexChildParameters, textContentParameters, typeaheadNavigationChildContext, typeaheadNavigationParameters, ..._void1 }: UseGridNavigationRowParameters<RowElement, CellElement, RM, CM>): UseGridNavigationRowReturnType<RowElement, CellElement>;
 export declare function useGridNavigationCell<CellElement extends Element>({ rovingTabIndexChildContext, typeaheadNavigationChildContext, rovingTabIndexChildParameters, managedChildParameters, refElementReturn, textContentParameters, gridNavigationCellParameters: { colSpan }, gridNavigationCellContext: { gridNavigationCellParameters: { getRowIndex, setTabbableRow, getCurrentTabbableColumn, setCurrentTabbableColumn, setTabbableCell } }, ..._void1 }: UseGridNavigationCellParameters<any, CellElement>): UseGridNavigationCellReturnType<CellElement>;
 //# sourceMappingURL=use-grid-navigation-partial.d.ts.map

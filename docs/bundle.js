@@ -5738,32 +5738,32 @@
   }
   function useGridNavigationRow(_ref2) {
     let {
-      rowAsChildOfGridParameters: {
-        gridNavigationRowContext: {
-          gridNavigationRowParameters: {
-            setTabbableRow,
-            getCurrentTabbableColumn,
-            setCurrentTabbableColumn
-          }
-        },
-        ...asChildRowOfTable
+      gridNavigationRowContext: {
+        gridNavigationRowParameters: {
+          setTabbableRow,
+          getCurrentTabbableColumn,
+          setCurrentTabbableColumn
+        }
       },
-      rowAsParentOfCellsParameters: {
-        linearNavigationParameters,
-        rovingTabIndexParameters: {
-          ...rovingTabIndexParameters
-        },
-        ...asParentRowOfCellsP
+      linearNavigationParameters,
+      rovingTabIndexParameters: {
+        ...rovingTabIndexParameters
       },
+      managedChildParameters,
+      managedChildrenReturn,
+      refElementReturn,
+      rovingTabIndexChildContext,
+      rovingTabIndexChildParameters,
+      textContentParameters,
+      typeaheadNavigationChildContext,
+      typeaheadNavigationParameters,
       ..._void1
     } = _ref2;
     const {
-      managedChildrenReturn: {
-        getChildren
-      }
-    } = asChildRowOfTable;
+      getChildren
+    } = managedChildrenReturn;
     const getIndex = useStableCallback(() => {
-      return asChildRowOfTable.managedChildParameters.index;
+      return managedChildParameters.index;
     });
     const focusSelf = useStableCallback(e => {
       var _getCurrentTabbableCo;
@@ -5786,10 +5786,18 @@
         e === null || e === void 0 ? void 0 : (_e$focus = e.focus) === null || _e$focus === void 0 ? void 0 : _e$focus.call(e);
       }
     }, []);
-    const lncr = useListNavigationChild(asChildRowOfTable);
+    const lncr = useListNavigationChild({
+      managedChildParameters,
+      refElementReturn,
+      rovingTabIndexChildContext,
+      rovingTabIndexChildParameters,
+      textContentParameters,
+      typeaheadNavigationChildContext
+    });
     const untabbable = !lncr.rovingTabIndexChildReturn.tabbable;
     const lnr = useListNavigation({
-      ...asParentRowOfCellsP,
+      managedChildrenReturn,
+      typeaheadNavigationParameters,
       rovingTabIndexParameters: {
         untabbable,
         ...rovingTabIndexParameters
@@ -6045,8 +6053,19 @@
   }
   function useGridNavigationSingleSelectionRow(_ref2) {
     let {
-      rowAsChildOfGridParameters,
-      rowAsParentOfCellsParameters,
+      managedChildParameters,
+      singleSelectionChildParameters,
+      singleSelectionContext,
+      gridNavigationRowContext,
+      linearNavigationParameters,
+      managedChildrenReturn,
+      refElementReturn,
+      rovingTabIndexChildContext,
+      rovingTabIndexChildParameters,
+      rovingTabIndexParameters,
+      textContentParameters,
+      typeaheadNavigationChildContext,
+      typeaheadNavigationParameters,
       ..._void1
     } = _ref2;
     const {
@@ -6055,7 +6074,11 @@
         ..._void3
       },
       ...ssr
-    } = useSingleSelectionChild(rowAsChildOfGridParameters);
+    } = useSingleSelectionChild({
+      managedChildParameters,
+      singleSelectionChildParameters,
+      singleSelectionContext
+    });
     const {
       rowAsChildOfGridReturn: {
         hasCurrentFocusParameters: {
@@ -6066,8 +6089,17 @@
       },
       rowAsParentOfCellsReturn
     } = useGridNavigationRow({
-      rowAsChildOfGridParameters,
-      rowAsParentOfCellsParameters
+      gridNavigationRowContext,
+      linearNavigationParameters,
+      managedChildParameters,
+      managedChildrenReturn,
+      refElementReturn,
+      rovingTabIndexChildContext,
+      rovingTabIndexChildParameters,
+      rovingTabIndexParameters,
+      textContentParameters,
+      typeaheadNavigationChildContext,
+      typeaheadNavigationParameters
     });
     const onCurrentFocusedInnerChanged = useStableCallback((focused, prevFocused, e) => {
       ocfic1 === null || ocfic1 === void 0 ? void 0 : ocfic1(focused, prevFocused, e);
@@ -6957,33 +6989,28 @@
   }
   function useCompleteGridNavigationRow(_ref2) {
     let {
-      rowAsChildOfGridParameters: {
-        managedChildParameters,
-        context: {
-          childrenHaveFocusChildContext,
-          gridNavigationRowContext,
-          managedChildContext: mcc1,
-          rovingTabIndexChildContext,
-          singleSelectionContext,
-          typeaheadNavigationChildContext,
-          staggeredChildContext,
-          paginatedChildContext
-        },
-        completeGridNavigationRowParameters,
-        singleSelectionChildParameters,
-        rovingTabIndexChildParameters,
-        rovingTabIndexChildParameters: {
-          hidden
-        },
-        textContentParameters,
-        ...rowAsChildOfGridParameters
+      managedChildParameters,
+      context: {
+        childrenHaveFocusChildContext,
+        gridNavigationRowContext,
+        managedChildContext: mcc1,
+        rovingTabIndexChildContext,
+        singleSelectionContext,
+        typeaheadNavigationChildContext,
+        staggeredChildContext,
+        paginatedChildContext
       },
-      rowAsParentOfCellsParameters: {
-        linearNavigationParameters,
-        rovingTabIndexParameters,
-        typeaheadNavigationParameters,
-        ...rowAsParentOfCellsParameters
-      }
+      completeGridNavigationRowParameters,
+      singleSelectionChildParameters,
+      rovingTabIndexChildParameters,
+      rovingTabIndexChildParameters: {
+        hidden
+      },
+      textContentParameters,
+      linearNavigationParameters,
+      rovingTabIndexParameters,
+      typeaheadNavigationParameters,
+      sortableChildParameters
     } = _ref2;
     const {
       index
@@ -7043,45 +7070,36 @@
       refElementParameters: {}
     });
     const r = useGridNavigationSingleSelectionRow({
-      rowAsParentOfCellsParameters: {
-        ...rowAsParentOfCellsParameters,
-        rovingTabIndexParameters: {
-          initiallyTabbedIndex: 0,
-          ...rovingTabIndexParameters
-        },
-        typeaheadNavigationParameters: {
-          isValid,
-          ...typeaheadNavigationParameters
-        },
-        linearNavigationParameters: {
-          isValid,
-          getHighestIndex: getHighestChildIndex,
-          pageNavigationSize: 0,
-          indexDemangler: identity,
-          indexMangler: identity,
-          ...linearNavigationParameters
-        },
-        managedChildrenReturn: {
-          getChildren
-        }
+      rovingTabIndexParameters: {
+        initiallyTabbedIndex: 0,
+        ...rovingTabIndexParameters
       },
-      rowAsChildOfGridParameters: {
-        ...rowAsChildOfGridParameters,
-        refElementReturn,
-        rovingTabIndexChildParameters,
-        gridNavigationRowContext,
-        rovingTabIndexChildContext,
-        singleSelectionContext,
-        typeaheadNavigationChildContext,
-        singleSelectionChildParameters,
-        managedChildParameters,
-        textContentParameters: {
-          hidden,
-          ...textContentParameters
-        },
-        managedChildrenReturn: {
-          getChildren
-        }
+      typeaheadNavigationParameters: {
+        isValid,
+        ...typeaheadNavigationParameters
+      },
+      linearNavigationParameters: {
+        isValid,
+        getHighestIndex: getHighestChildIndex,
+        pageNavigationSize: 0,
+        indexDemangler: identity,
+        indexMangler: identity,
+        ...linearNavigationParameters
+      },
+      managedChildrenReturn: {
+        getChildren
+      },
+      refElementReturn,
+      rovingTabIndexChildParameters,
+      gridNavigationRowContext,
+      rovingTabIndexChildContext,
+      singleSelectionContext,
+      typeaheadNavigationChildContext,
+      singleSelectionChildParameters,
+      managedChildParameters,
+      textContentParameters: {
+        hidden,
+        ...textContentParameters
       }
     });
     const {
@@ -7118,7 +7136,7 @@
       setLocalSelected: r.rowAsChildOfGridReturn.managedChildParameters.setLocalSelected,
       disabled: singleSelectionChildParameters.disabled,
       setTabbableColumnIndex: r.rowAsChildOfGridReturn.gridNavigationRowParameters.setTabbableColumnIndex,
-      getSortValue: rowAsChildOfGridParameters.sortableChildParameters.getSortValue,
+      getSortValue: sortableChildParameters.getSortValue,
       setPaginationVisible,
       setChildCountIfPaginated: setChildCountIfPaginated,
       setParentIsPaginated,
@@ -9711,49 +9729,45 @@
     const disabled = hidden;
     const contextFromParent = q(GridRowContext);
     const ret = useCompleteGridNavigationRow({
-      rowAsChildOfGridParameters: {
-        completeGridNavigationRowParameters: {
-          foo: "bar"
-        },
-        sortableChildParameters: {
-          getSortValue: returnNull
-        },
-        context: contextFromParent,
-        rovingTabIndexChildParameters: {
-          hidden
-        },
-        managedChildParameters: {
-          index
-        },
-        singleSelectionChildParameters: {
-          disabled,
-          ariaPropName: "aria-checked",
-          selectionMode: "focus"
-        },
-        textContentParameters: {
-          getText: T$1(e => {
-            var _e$textContent;
-            return (_e$textContent = e === null || e === void 0 ? void 0 : e.textContent) !== null && _e$textContent !== void 0 ? _e$textContent : "";
-          }, [])
-        }
+      completeGridNavigationRowParameters: {
+        foo: "bar"
       },
-      rowAsParentOfCellsParameters: {
-        linearNavigationParameters: {
-          disableArrowKeys: false,
-          disableHomeEndKeys: false,
-          navigatePastEnd: "wrap",
-          navigatePastStart: "wrap"
-        },
-        rovingTabIndexParameters: {
-          onTabbableIndexChange: useStableCallback(i => {
-            setTabbableColumn(i);
-          })
-        },
-        typeaheadNavigationParameters: {
-          collator: null,
-          noTypeahead: false,
-          typeaheadTimeout: 1000
-        }
+      sortableChildParameters: {
+        getSortValue: returnNull
+      },
+      context: contextFromParent,
+      rovingTabIndexChildParameters: {
+        hidden
+      },
+      managedChildParameters: {
+        index
+      },
+      singleSelectionChildParameters: {
+        disabled,
+        ariaPropName: "aria-checked",
+        selectionMode: "focus"
+      },
+      textContentParameters: {
+        getText: T$1(e => {
+          var _e$textContent;
+          return (_e$textContent = e === null || e === void 0 ? void 0 : e.textContent) !== null && _e$textContent !== void 0 ? _e$textContent : "";
+        }, [])
+      },
+      linearNavigationParameters: {
+        disableArrowKeys: false,
+        disableHomeEndKeys: false,
+        navigatePastEnd: "wrap",
+        navigatePastStart: "wrap"
+      },
+      rovingTabIndexParameters: {
+        onTabbableIndexChange: useStableCallback(i => {
+          setTabbableColumn(i);
+        })
+      },
+      typeaheadNavigationParameters: {
+        collator: null,
+        noTypeahead: false,
+        typeaheadTimeout: 1000
       }
     });
     const {

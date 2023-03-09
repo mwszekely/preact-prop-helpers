@@ -30,9 +30,9 @@ export function useGridNavigationSingleSelection({ gridNavigationParameters, lin
         ...ssr,
     };
 }
-export function useGridNavigationSingleSelectionRow({ rowAsChildOfGridParameters, rowAsParentOfCellsParameters, ..._void1 }) {
-    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ..._void3 }, ...ssr } = useSingleSelectionChild(rowAsChildOfGridParameters);
-    const { rowAsChildOfGridReturn: { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ..._void2 }, ...rowAsChildOfGridReturn }, rowAsParentOfCellsReturn } = useGridNavigationRow({ rowAsChildOfGridParameters, rowAsParentOfCellsParameters });
+export function useGridNavigationSingleSelectionRow({ managedChildParameters, singleSelectionChildParameters, singleSelectionContext, gridNavigationRowContext, linearNavigationParameters, managedChildrenReturn, refElementReturn, rovingTabIndexChildContext, rovingTabIndexChildParameters, rovingTabIndexParameters, textContentParameters, typeaheadNavigationChildContext, typeaheadNavigationParameters, ..._void1 }) {
+    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ..._void3 }, ...ssr } = useSingleSelectionChild({ managedChildParameters, singleSelectionChildParameters, singleSelectionContext });
+    const { rowAsChildOfGridReturn: { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ..._void2 }, ...rowAsChildOfGridReturn }, rowAsParentOfCellsReturn } = useGridNavigationRow({ gridNavigationRowContext, linearNavigationParameters, managedChildParameters, managedChildrenReturn, refElementReturn, rovingTabIndexChildContext, rovingTabIndexChildParameters, rovingTabIndexParameters, textContentParameters, typeaheadNavigationChildContext, typeaheadNavigationParameters });
     const onCurrentFocusedInnerChanged = useStableCallback((focused, prevFocused, e) => { ocfic1?.(focused, prevFocused, e); ocfic2?.(focused, prevFocused, e); });
     assertEmptyObject(_void1);
     assertEmptyObject(_void2);

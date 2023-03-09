@@ -64,7 +64,7 @@ export function useCompleteGridNavigation({ gridNavigationParameters, linearNavi
         paginatedChildrenReturn,
     };
 }
-export function useCompleteGridNavigationRow({ rowAsChildOfGridParameters: { managedChildParameters, context: { childrenHaveFocusChildContext, gridNavigationRowContext, managedChildContext: mcc1, rovingTabIndexChildContext, singleSelectionContext, typeaheadNavigationChildContext, staggeredChildContext, paginatedChildContext }, completeGridNavigationRowParameters, singleSelectionChildParameters, rovingTabIndexChildParameters, rovingTabIndexChildParameters: { hidden }, textContentParameters, ...rowAsChildOfGridParameters }, rowAsParentOfCellsParameters: { linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, ...rowAsParentOfCellsParameters } }) {
+export function useCompleteGridNavigationRow({ managedChildParameters, context: { childrenHaveFocusChildContext, gridNavigationRowContext, managedChildContext: mcc1, rovingTabIndexChildContext, singleSelectionContext, typeaheadNavigationChildContext, staggeredChildContext, paginatedChildContext }, completeGridNavigationRowParameters, singleSelectionChildParameters, rovingTabIndexChildParameters, rovingTabIndexChildParameters: { hidden }, textContentParameters, linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, sortableChildParameters }) {
     const { index } = managedChildParameters;
     const { managedChildParameters: { setChildCountIfPaginated, setPaginationVisible, setParentIsPaginated }, paginatedChildReturn: { paginatedVisible, isPaginated, hideBecausePaginated }, props: paginationProps } = usePaginatedChild({ managedChildParameters: { index }, context: { paginatedChildContext } });
     const { managedChildParameters: { setParentIsStaggered, setStaggeredVisible }, staggeredChildReturn: { isStaggered, hideBecauseStaggered }, props: staggeredProps } = useStaggeredChild({ managedChildParameters: { index }, context: { staggeredChildContext } });
@@ -82,26 +82,19 @@ export function useCompleteGridNavigationRow({ rowAsChildOfGridParameters: { man
     }, []);
     const { refElementReturn, propsStable } = useRefElement({ refElementParameters: {} });
     const r = useGridNavigationSingleSelectionRow({
-        rowAsParentOfCellsParameters: {
-            ...rowAsParentOfCellsParameters,
-            rovingTabIndexParameters: { initiallyTabbedIndex: 0, ...rovingTabIndexParameters },
-            typeaheadNavigationParameters: { isValid, ...typeaheadNavigationParameters },
-            linearNavigationParameters: { isValid, getHighestIndex: getHighestChildIndex, pageNavigationSize: 0, indexDemangler: identity, indexMangler: identity, ...linearNavigationParameters },
-            managedChildrenReturn: { getChildren },
-        },
-        rowAsChildOfGridParameters: {
-            ...rowAsChildOfGridParameters,
-            refElementReturn,
-            rovingTabIndexChildParameters,
-            gridNavigationRowContext,
-            rovingTabIndexChildContext,
-            singleSelectionContext,
-            typeaheadNavigationChildContext,
-            singleSelectionChildParameters,
-            managedChildParameters,
-            textContentParameters: { hidden, ...textContentParameters },
-            managedChildrenReturn: { getChildren },
-        }
+        rovingTabIndexParameters: { initiallyTabbedIndex: 0, ...rovingTabIndexParameters },
+        typeaheadNavigationParameters: { isValid, ...typeaheadNavigationParameters },
+        linearNavigationParameters: { isValid, getHighestIndex: getHighestChildIndex, pageNavigationSize: 0, indexDemangler: identity, indexMangler: identity, ...linearNavigationParameters },
+        managedChildrenReturn: { getChildren },
+        refElementReturn,
+        rovingTabIndexChildParameters,
+        gridNavigationRowContext,
+        rovingTabIndexChildContext,
+        singleSelectionContext,
+        typeaheadNavigationChildContext,
+        singleSelectionChildParameters,
+        managedChildParameters,
+        textContentParameters: { hidden, ...textContentParameters },
     });
     const { rowAsChildOfGridReturn: { props: propsRowAsChild, ...rowAsChildOfGridReturn }, rowAsParentOfCellsReturn: { propsStable: propsParentOfCells, ...rowAsParentOfCellsReturn } } = r;
     const { context: { managedChildContext }, managedChildrenReturn } = useManagedChildren({ managedChildrenParameters: r.rowAsParentOfCellsReturn.managedChildrenParameters });
@@ -119,7 +112,7 @@ export function useCompleteGridNavigationRow({ rowAsChildOfGridParameters: { man
         setLocalSelected: r.rowAsChildOfGridReturn.managedChildParameters.setLocalSelected,
         disabled: singleSelectionChildParameters.disabled,
         setTabbableColumnIndex: r.rowAsChildOfGridReturn.gridNavigationRowParameters.setTabbableColumnIndex,
-        getSortValue: rowAsChildOfGridParameters.sortableChildParameters.getSortValue,
+        getSortValue: sortableChildParameters.getSortValue,
         setPaginationVisible,
         setChildCountIfPaginated: setChildCountIfPaginated,
         setParentIsPaginated,
