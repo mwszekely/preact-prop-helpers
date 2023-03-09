@@ -1,3 +1,4 @@
+import { useMergedProps } from "../dom-helpers/use-merged-props.js";
 import { usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useStableObject } from "../preact-extensions/use-stable-getter.js";
@@ -16,7 +17,7 @@ export function useGridNavigation({ gridNavigationParameters: { onTabbableColumn
         if (nextRow != null)
             children.getAt(nextRow)?.setTabbableColumnIndex(nextColumn, reason, false);
     });
-    const { linearNavigationReturn, rovingTabIndexReturn, typeaheadNavigationReturn, managedChildrenParameters, rovingTabIndexChildContext, typeaheadNavigationChildContext, propsStable, ...void1 } = useListNavigation({
+    const { linearNavigationReturn, rovingTabIndexReturn, typeaheadNavigationReturn, managedChildrenParameters, context: { rovingTabIndexContext, typeaheadNavigationContext }, propsStable, ...void1 } = useListNavigation({
         linearNavigationParameters: { navigationDirection: "vertical", ...linearNavigationParameters },
         rovingTabIndexParameters: { onTabbableIndexChange: onTabbableIndexChangeOverride, ...rovingTabIndexParameters },
         managedChildrenReturn,
@@ -25,24 +26,25 @@ export function useGridNavigation({ gridNavigationParameters: { onTabbableColumn
     assertEmptyObject(void1);
     assertEmptyObject(_void2);
     assertEmptyObject(void3);
+    const gridNavigationRowContext = useStableObject({
+        setTabbableRow: rovingTabIndexReturn.setTabbableIndex,
+        getCurrentTabbableColumn,
+        setCurrentTabbableColumn
+    });
     return {
         propsStable,
         managedChildrenParameters,
-        rovingTabIndexChildContext,
-        typeaheadNavigationChildContext,
+        context: useStableObject({
+            gridNavigationRowContext,
+            rovingTabIndexContext,
+            typeaheadNavigationContext
+        }),
         linearNavigationReturn,
         rovingTabIndexReturn,
-        typeaheadNavigationReturn,
-        gridNavigationRowContext: useStableObject({
-            gridNavigationRowParameters: useStableObject({
-                setTabbableRow: rovingTabIndexReturn.setTabbableIndex,
-                getCurrentTabbableColumn,
-                setCurrentTabbableColumn
-            })
-        })
+        typeaheadNavigationReturn
     };
 }
-export function useGridNavigationRow({ gridNavigationRowContext: { gridNavigationRowParameters: { setTabbableRow, getCurrentTabbableColumn, setCurrentTabbableColumn } }, linearNavigationParameters, rovingTabIndexParameters: { ...rovingTabIndexParameters }, managedChildParameters, managedChildrenReturn, refElementReturn, rovingTabIndexChildContext, rovingTabIndexChildParameters, textContentParameters, typeaheadNavigationChildContext, typeaheadNavigationParameters, ..._void1 }) {
+export function useGridNavigationRow({ context: { rovingTabIndexContext: contextRTI, typeaheadNavigationContext: contextTN, gridNavigationRowContext: { setTabbableRow, getCurrentTabbableColumn, setCurrentTabbableColumn } }, linearNavigationParameters, rovingTabIndexParameters: { ...rovingTabIndexParameters }, managedChildParameters, managedChildrenReturn, refElementReturn, rovingTabIndexChildParameters, textContentParameters, typeaheadNavigationParameters, ..._void1 }) {
     const { getChildren } = managedChildrenReturn;
     const getIndex = useStableCallback(() => { return managedChildParameters.index; });
     const focusSelf = useStableCallback((e) => {
@@ -65,38 +67,42 @@ export function useGridNavigationRow({ gridNavigationRowContext: { gridNavigatio
             e?.focus?.();
         }
     }, []);
-    const lncr = useListNavigationChild({ managedChildParameters, refElementReturn, rovingTabIndexChildContext, rovingTabIndexChildParameters, textContentParameters, typeaheadNavigationChildContext });
-    const untabbable = !lncr.rovingTabIndexChildReturn.tabbable;
-    const lnr = useListNavigation({ managedChildrenReturn, typeaheadNavigationParameters, rovingTabIndexParameters: { untabbable, ...rovingTabIndexParameters }, linearNavigationParameters: { navigationDirection: "horizontal", ...linearNavigationParameters } });
+    const { hasCurrentFocusParameters, pressParameters, props: propsLNC, rovingTabIndexChildReturn, textContentReturn } = useListNavigationChild({ managedChildParameters, refElementReturn, rovingTabIndexChildParameters, textContentParameters, context: { rovingTabIndexContext: contextRTI, typeaheadNavigationContext: contextTN } });
+    const untabbable = !rovingTabIndexChildReturn.tabbable;
+    const { linearNavigationReturn, managedChildrenParameters, propsStable: propsLN, rovingTabIndexReturn, typeaheadNavigationReturn, context: { rovingTabIndexContext: rtiContext, typeaheadNavigationContext: tnContext } } = useListNavigation({ managedChildrenReturn, typeaheadNavigationParameters, rovingTabIndexParameters: { untabbable, ...rovingTabIndexParameters }, linearNavigationParameters: { navigationDirection: "horizontal", ...linearNavigationParameters } });
     assertEmptyObject(_void1);
-    const { rovingTabIndexReturn: { setTabbableIndex } } = lnr;
+    const { setTabbableIndex } = rovingTabIndexReturn;
+    const gridNavigationCellContext = useStableObject({
+        setTabbableRow,
+        getRowIndex: getIndex,
+        getCurrentTabbableColumn,
+        setCurrentTabbableColumn,
+        setTabbableCell: setTabbableIndex
+    });
     return {
-        rowAsChildOfGridReturn: { gridNavigationRowParameters: { focusSelf, setTabbableColumnIndex: setTabbableIndex }, ...lncr, },
-        rowAsParentOfCellsReturn: {
-            gridNavigationCellContext: useStableObject({
-                gridNavigationCellParameters: useStableObject({
-                    setTabbableRow,
-                    getRowIndex: getIndex,
-                    getCurrentTabbableColumn,
-                    setCurrentTabbableColumn,
-                    setTabbableCell: setTabbableIndex
-                })
-            }),
-            ...lnr,
-        }
+        context: useStableObject({
+            rovingTabIndexContext: rtiContext,
+            gridNavigationCellContext,
+            typeaheadNavigationContext: tnContext
+        }),
+        hasCurrentFocusParameters,
+        linearNavigationReturn,
+        managedChildrenParameters,
+        pressParameters,
+        props: useMergedProps(propsLN, propsLNC),
+        rovingTabIndexChildReturn,
+        rovingTabIndexReturn,
+        textContentReturn,
+        typeaheadNavigationReturn,
+        gridNavigationRowParameters: { focusSelf, setTabbableColumnIndex: setTabbableIndex },
     };
 }
-export function useGridNavigationCell({ 
-//    managedChildParameters: { hidden, index, ...void3 },
-rovingTabIndexChildContext, typeaheadNavigationChildContext, 
-//typeaheadNavigationChildParameters,
-rovingTabIndexChildParameters, managedChildParameters, refElementReturn, textContentParameters, gridNavigationCellParameters: { colSpan }, gridNavigationCellContext: { gridNavigationCellParameters: { getRowIndex, setTabbableRow, getCurrentTabbableColumn: _getCurrentColumn, setCurrentTabbableColumn, setTabbableCell } }, ..._void1 }) {
+export function useGridNavigationCell({ context: { gridNavigationCellContext: { getRowIndex, setTabbableRow, getCurrentTabbableColumn: _getCurrentColumn, setCurrentTabbableColumn, setTabbableCell }, rovingTabIndexContext, typeaheadNavigationContext }, rovingTabIndexChildParameters, managedChildParameters, refElementReturn, textContentParameters, gridNavigationCellParameters: { colSpan }, ..._void1 }) {
     const { index } = managedChildParameters;
     const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1 }, rovingTabIndexChildReturn, textContentReturn, pressParameters, props, ...void2 } = useListNavigationChild({
         rovingTabIndexChildParameters,
         managedChildParameters,
-        rovingTabIndexChildContext,
-        typeaheadNavigationChildContext,
+        context: { rovingTabIndexContext, typeaheadNavigationContext },
         textContentParameters,
         refElementReturn
     });

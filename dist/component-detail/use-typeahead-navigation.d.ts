@@ -9,10 +9,10 @@ export interface UseTypeaheadNavigationReturnType<ParentOrChildElement extends E
         typeaheadStatus: "invalid" | "valid" | "none";
     };
     propsStable: h.JSX.HTMLAttributes<ParentOrChildElement>;
-    typeaheadNavigationChildContext: UseTypeaheadNavigationContext;
+    context: UseTypeaheadNavigationContext;
 }
 export interface UseTypeaheadNavigationContext {
-    typeaheadNavigationChildParameters: {
+    typeaheadNavigationContext: {
         excludeSpace: () => boolean;
         sortedTypeaheadInfo: Array<TypeaheadInfo>;
         insertingComparator: (lhs: string | null, rhs: TypeaheadInfo) => number;
@@ -41,7 +41,7 @@ export interface UseTypeaheadNavigationChildParameters<ChildElement extends Elem
     managedChildParameters: Pick<UseRovingTabIndexChildParameters<ChildElement>["managedChildParameters"], "index">;
     textContentParameters: Pick<UseTextContentParameters<ChildElement>["textContentParameters"], "getText" | "hidden">;
     refElementReturn: Pick<UseRefElementReturnType<ChildElement>["refElementReturn"], "getElement">;
-    typeaheadNavigationChildContext: UseTypeaheadNavigationContext;
+    context: UseTypeaheadNavigationContext;
 }
 export interface UseTypeaheadNavigationChildReturnType extends UseTextContentReturnType {
     pressParameters: Pick<UsePressParameters<any>["pressParameters"], "excludeSpace">;
@@ -56,7 +56,7 @@ interface TypeaheadInfo {
  * @see useListNavigation, which packages everything up together.
  */
 export declare function useTypeaheadNavigation<ParentOrChildElement extends Element, ChildElement extends Element>({ typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead, isValid, ..._void3 }, rovingTabIndexReturn: { getTabbableIndex: getIndex, setTabbableIndex: setIndex, ..._void1 }, ..._void2 }: UseTypeaheadNavigationParameters<ChildElement>): UseTypeaheadNavigationReturnType<ParentOrChildElement>;
-export declare function useTypeaheadNavigationChild<ChildElement extends Element>({ managedChildParameters: { index, ...void1 }, textContentParameters: { getText, hidden, ...void5 }, typeaheadNavigationChildContext: { typeaheadNavigationChildParameters: { sortedTypeaheadInfo, insertingComparator, excludeSpace, ...void2 } }, refElementReturn: { getElement, ...void3 }, ...void4 }: UseTypeaheadNavigationChildParameters<ChildElement>): UseTypeaheadNavigationChildReturnType;
+export declare function useTypeaheadNavigationChild<ChildElement extends Element>({ managedChildParameters: { index, ...void1 }, textContentParameters: { getText, hidden, ...void5 }, context: { typeaheadNavigationContext: { sortedTypeaheadInfo, insertingComparator, excludeSpace, ...void2 } }, refElementReturn: { getElement, ...void3 }, ...void4 }: UseTypeaheadNavigationChildParameters<ChildElement>): UseTypeaheadNavigationChildReturnType;
 /**
  * Your usual binary search implementation.
  *

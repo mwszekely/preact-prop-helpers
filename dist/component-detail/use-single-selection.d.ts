@@ -1,5 +1,4 @@
 import { h } from "preact";
-import { UsePressParameters } from "../component-use/use-press.js";
 import { UseChildrenHaveFocusChildReturnType, UseChildrenHaveFocusParameters } from "../observers/use-children-have-focus.js";
 import { UseManagedChildrenReturnType } from "../preact-extensions/use-managed-children.js";
 import { PassiveStateUpdater } from "../preact-extensions/use-passive-state.js";
@@ -48,7 +47,7 @@ export interface UseSingleSelectionParameters<ChildElement extends Element> {
     };
 }
 export interface UseSingleSelectionChildParameters<E extends Element> {
-    singleSelectionContext: UseSingleSelectionReturnType<E>["singleSelectionContext"];
+    context: UseSingleSelectionReturnType<E>["context"];
     singleSelectionChildParameters: {
         selectionMode: "focus" | "activation" | "disabled";
         /**
@@ -77,7 +76,6 @@ export interface UseSingleSelectionChildReturnType<E extends Element> extends Us
         setThisOneSelected: (event: Event) => void;
     };
     managedChildParameters: Pick<SelectableChildInfo<E>, "setLocalSelected">;
-    pressParameters: Pick<UsePressParameters<E>["pressParameters"], "onPressSync">;
 }
 export interface UseSingleSelectionReturnType<ChildElement extends Element> {
     singleSelectionReturn: {
@@ -92,11 +90,15 @@ export interface UseSingleSelectionReturnType<ChildElement extends Element> {
         changeSelectedIndex: PassiveStateUpdater<number | null, Event>;
         getSelectedIndex(): number | null;
     };
+    context: UseSingleSelectionContext<ChildElement>;
+    childrenHaveFocusParameters: Pick<UseChildrenHaveFocusParameters<ChildElement>["childrenHaveFocusParameters"], "onCompositeFocusChange">;
+}
+export interface UseSingleSelectionContext<ChildElement extends Element> {
     singleSelectionContext: {
+        _c?: ChildElement;
         onSelectedIndexChange: UseSingleSelectionParameters<ChildElement>["singleSelectionParameters"]["onSelectedIndexChange"];
         getSelectedIndex(): number | null;
     };
-    childrenHaveFocusParameters: Pick<UseChildrenHaveFocusParameters<ChildElement>["childrenHaveFocusParameters"], "onCompositeFocusChange">;
 }
 export declare function useSingleSelection<ChildElement extends Element>({ managedChildrenReturn: { getChildren }, rovingTabIndexReturn: { setTabbableIndex }, singleSelectionParameters: { onSelectedIndexChange: onSelectedIndexChange_U, initiallySelectedIndex } }: UseSingleSelectionParameters<ChildElement>): UseSingleSelectionReturnType<ChildElement>;
 export declare function useSingleSelectionChild<ChildElement extends Element>(args: UseSingleSelectionChildParameters<ChildElement>): UseSingleSelectionChildReturnType<ChildElement>;

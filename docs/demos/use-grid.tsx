@@ -103,13 +103,14 @@ const DemoUseGridRow = memo((({ index }: { index: number }) => {
     });
 
     const {
-        rowAsParentOfCellsReturn: { propsStable, context: contextToChild },
-        rowAsChildOfGridReturn: { rovingTabIndexChildReturn: { tabbable } },
+        props,
+        context: contextToChild,
+        rovingTabIndexChildReturn: { tabbable }
 
     } = ret;
 
     return (
-        <tr {...propsStable} data-tabbable={ret.rowAsChildOfGridReturn.rovingTabIndexChildReturn.tabbable}>
+        <tr {...props} data-tabbable={ret.rovingTabIndexChildReturn.tabbable}>
             <GridCellContext.Provider value={contextToChild}>
                 <td>{_tabbableColumn}, {tabbable.toString()}</td>
                 {Array.from((function* () {

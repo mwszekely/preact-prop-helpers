@@ -63,7 +63,7 @@ export interface UseSingleSelectionParameters<ChildElement extends Element> {
 }
 
 export interface UseSingleSelectionChildParameters<E extends Element> {
-    singleSelectionContext: UseSingleSelectionReturnType<E>["singleSelectionContext"];
+    context: UseSingleSelectionReturnType<E>["context"];
     singleSelectionChildParameters: {
         selectionMode: "focus" | "activation" | "disabled";
         /**
@@ -94,13 +94,12 @@ export interface UseSingleSelectionChildReturnType<E extends Element> extends Us
          */
         selectedOffset: number | null;
         getSelectedOffset: () => (number | null);
-        
+
         // Used to programmatically set this as the selected element;
         // it requests the parent to actually change the numeric index to this one's.
         setThisOneSelected: (event: Event) => void;
     }
     managedChildParameters: Pick<SelectableChildInfo<E>, "setLocalSelected">;
-    pressParameters: Pick<UsePressParameters<E>["pressParameters"], "onPressSync">;
 }
 
 export interface UseSingleSelectionReturnType<ChildElement extends Element> {
@@ -116,11 +115,16 @@ export interface UseSingleSelectionReturnType<ChildElement extends Element> {
         changeSelectedIndex: PassiveStateUpdater<number | null, Event>;
         getSelectedIndex(): number | null;
     }
+    context: UseSingleSelectionContext<ChildElement>;
+    childrenHaveFocusParameters: Pick<UseChildrenHaveFocusParameters<ChildElement>["childrenHaveFocusParameters"], "onCompositeFocusChange">
+}
+
+export interface UseSingleSelectionContext<ChildElement extends Element> {
     singleSelectionContext: {
+        _c?: ChildElement;
         onSelectedIndexChange: UseSingleSelectionParameters<ChildElement>["singleSelectionParameters"]["onSelectedIndexChange"] //PassiveStateUpdater<number | null, Event> | null; 
         getSelectedIndex(): number | null;
     }
-    childrenHaveFocusParameters: Pick<UseChildrenHaveFocusParameters<ChildElement>["childrenHaveFocusParameters"], "onCompositeFocusChange">
 }
 
 
@@ -137,7 +141,7 @@ export function useSingleSelection<ChildElement extends Element>({
         if (m.hidden) {
             console.assert(false);
         }
-        const directionComparison = (newSelectedIndex == m.index? prevSelectedIndex : newSelectedIndex);
+        const directionComparison = (newSelectedIndex == m.index ? prevSelectedIndex : newSelectedIndex);
         const direction = (directionComparison == null ? null : (m.index - directionComparison));
         if (newSelectedIndex == null)
             console.assert(t == false);
@@ -165,9 +169,11 @@ export function useSingleSelection<ChildElement extends Element>({
             getSelectedIndex,
             changeSelectedIndex
         }),
-        singleSelectionContext: useStableObject({
-            getSelectedIndex,
-            onSelectedIndexChange: onSelectedIndexChange
+        context: useStableObject({
+            singleSelectionContext: useStableObject({
+                getSelectedIndex,
+                onSelectedIndexChange: onSelectedIndexChange
+            }),
         }),
         childrenHaveFocusParameters: {
             onCompositeFocusChange: useStableCallback((anyFocused, prev, reason) => {
@@ -185,8 +191,7 @@ export function useSingleSelection<ChildElement extends Element>({
 export function useSingleSelectionChild<ChildElement extends Element>(args: UseSingleSelectionChildParameters<ChildElement>): UseSingleSelectionChildReturnType<ChildElement> {
     type R = Event;
     const {
-
-        singleSelectionContext: { getSelectedIndex, onSelectedIndexChange },
+        context: { singleSelectionContext: { getSelectedIndex, onSelectedIndexChange } },
         singleSelectionChildParameters: { ariaPropName, selectionMode, disabled },
         managedChildParameters: { index }
     } = args;
@@ -195,43 +200,41 @@ export function useSingleSelectionChild<ChildElement extends Element>(args: UseS
     const getDisabled = useStableGetter(disabled);
 
     const [localSelected, setLocalSelected, getLocalSelected] = useState(getSelectedIndex() == index);
-    const [direction, setDirection, getDirection] = useState(getSelectedIndex() == null? null : (getSelectedIndex()! - index));
-    
+    const [direction, setDirection, getDirection] = useState(getSelectedIndex() == null ? null : (getSelectedIndex()! - index));
+
     const onCurrentFocusedInnerChanged = useStableCallback<OnPassiveStateChange<boolean, R>>((focused, _prev, e) => {
         if (selectionMode == 'focus' && focused) {
             onSelectedIndexChange?.(index, e);
         }
     });
 
-    const onPressSync = useStableCallback(((e: Event) => {
-        if (selectionMode == "disabled")
-            return;
-        if (!disabled)
-            onSelectedIndexChange?.(index, e as R);
-    }));
-
     const propParts = ariaPropName?.split("-") ?? [];
 
 
     return {
-        managedChildParameters: { setLocalSelected: useStableCallback((selected, direction) => {
-            setLocalSelected(selected);
-            setDirection(direction);
-        }) },
+        managedChildParameters: {
+            setLocalSelected: useStableCallback((selected, direction) => {
+                setLocalSelected(selected);
+                setDirection(direction);
+            })
+        },
         singleSelectionChildReturn: {
             selected: localSelected,
+            // This is the thing that's passed to onPress or onClick or whatever
             setThisOneSelected: useStableCallback((event) => {
                 console.assert(!getDisabled());
-                onSelectedIndexChange?.(index, event as R);
+                if (selectionMode == "disabled")
+                    return;
+                if (!disabled)
+                    onSelectedIndexChange?.(index, event as R);
             }),
             getSelectedOffset: getDirection,
             selectedOffset: direction,
             getSelected: getLocalSelected
         },
-        props: ariaPropName == null || selectionMode == "disabled" ? {} : { 
-            [`${propParts[0]}-${propParts[1]}`]: (localSelected? (propParts[1] == "current"? `${propParts[2]}` : `true`) : "false") 
+        props: ariaPropName == null || selectionMode == "disabled" ? {} : {
+            [`${propParts[0]}-${propParts[1]}`]: (localSelected ? (propParts[1] == "current" ? `${propParts[2]}` : `true`) : "false")
         },
-        pressParameters: { onPressSync },
         hasCurrentFocusParameters: { onCurrentFocusedInnerChanged }
     }
 }

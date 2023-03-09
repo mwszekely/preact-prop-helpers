@@ -1,7 +1,7 @@
 import { h } from "preact";
 import { StateUpdater, useCallback, useEffect } from "preact/hooks";
 import { UseHasCurrentFocusParameters } from "../observers/use-has-current-focus.js";
-import { ManagedChildInfo, useChildrenFlag, UseManagedChildrenParameters, UseManagedChildrenReturnType } from "../preact-extensions/use-managed-children.js";
+import { ManagedChildInfo, UseManagedChildrenParameters, UseManagedChildrenReturnType, useChildrenFlag } from "../preact-extensions/use-managed-children.js";
 import { OnPassiveStateChange, PassiveStateUpdater, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useStableGetter, useStableObject } from "../preact-extensions/use-stable-getter.js";
@@ -76,7 +76,7 @@ export interface UseRovingTabIndexReturnType<TabbableChildElement extends Elemen
     /**
      * STABLE
      */
-    rovingTabIndexChildContext: UseRovingTabIndexChildParameters<TabbableChildElement>["rovingTabIndexChildContext"];
+    context: RovingTabIndexChildContext<TabbableChildElement>;
 
     /** 
      * Return information that lets the user update/query/focus the currently tabbable child
@@ -115,21 +115,23 @@ export interface UseRovingTabIndexChildParameters<TabbableChildElement extends E
     /**
      * The information provided by the parent hook
      */
-    rovingTabIndexChildContext: RovingTabIndexChildContext<TabbableChildElement>;
+    context: RovingTabIndexChildContext<TabbableChildElement>;
 }
 
 export interface RovingTabIndexChildContext<TabbableChildElement extends Element> {
-    _e?: TabbableChildElement;
+    rovingTabIndexContext: {
+        _tce?: TabbableChildElement;
 
-    setTabbableIndex: SetTabbableIndex;
+        setTabbableIndex: SetTabbableIndex;
 
-    getInitiallyTabbedIndex(): number | null;
+        getInitiallyTabbedIndex(): number | null;
 
-    /**
-     * (This is technically the same as what's passed to onChildrenMountChange,
-     * but it serves a slightly different purpose and is separate for clarity)
-     */
-    reevaluateClosestFit: () => void;
+        /**
+         * (This is technically the same as what's passed to onChildrenMountChange,
+         * but it serves a slightly different purpose and is separate for clarity)
+         */
+        reevaluateClosestFit: () => void;
+    }
 }
 
 //export type UseRovingTabIndexChild<ChildElement extends Element> = (a: UseRovingTabIndexChildParameters<ChildElement, R>) => UseRovingTabIndexChildReturnType<ChildElement>;
@@ -296,7 +298,7 @@ export function useRovingTabIndex<ChildElement extends Element, M extends UseRov
             setTabbableIndex(null, reason as any, true);
     }, []);
 
-    const rovingTabIndexChildContext = useStableObject({
+    const rovingTabIndexContext = useStableObject({
         setTabbableIndex,
         getInitiallyTabbedIndex: useCallback(() => { return initiallyTabbedIndex ?? (untabbable ? null : 0) }, []),
         reevaluateClosestFit
@@ -305,14 +307,14 @@ export function useRovingTabIndex<ChildElement extends Element, M extends UseRov
     return {
         managedChildrenParameters: { onChildrenMountChange: reevaluateClosestFit, },
         rovingTabIndexReturn: { setTabbableIndex, getTabbableIndex, focusSelf },
-        rovingTabIndexChildContext
+        context: useStableObject({ rovingTabIndexContext })
     };
 }
 
 
 export function useRovingTabIndexChild<ChildElement extends Element>({
     managedChildParameters: { index, ..._void2 },
-    rovingTabIndexChildContext: { reevaluateClosestFit, setTabbableIndex, getInitiallyTabbedIndex },
+    context: { rovingTabIndexContext: { reevaluateClosestFit, setTabbableIndex, getInitiallyTabbedIndex } },
     rovingTabIndexChildParameters,
     ..._void3
 }: UseRovingTabIndexChildParameters<ChildElement>): UseRovingTabIndexChildReturnType<ChildElement> {

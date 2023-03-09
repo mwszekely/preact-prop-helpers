@@ -44,7 +44,7 @@ const DemoUseDraggable = () => {
         </div>)
 }
 
-const ChildrenHaveFocusContext = createContext<UseChildrenHaveFocusChildParameters<HTMLDivElement>["childrenHaveFocusChildContext"]>(null!);
+const ChildrenHaveFocusContext = createContext<UseChildrenHaveFocusChildParameters<HTMLDivElement>["context"]>(null!);
 const DemoUseChildrenHaveFocus = () => {
     const [maxChildCount, setMaxChildCount] = useState(10);
     const [minChildCount, setMinChildCount] = useState(5);
@@ -61,7 +61,7 @@ const DemoUseChildrenHaveFocus = () => {
         interval: 1000
     });
     const [anyFocused, setAnyFocused] = useState(false);
-    const { childrenHaveFocusChildContext } = useChildrenHaveFocus<HTMLDivElement>({ childrenHaveFocusParameters: { onCompositeFocusChange: setAnyFocused } });
+    const { context } = useChildrenHaveFocus<HTMLDivElement>({ childrenHaveFocusParameters: { onCompositeFocusChange: setAnyFocused } });
 
 
     return (
@@ -71,7 +71,7 @@ const DemoUseChildrenHaveFocus = () => {
             <div><label><input type="number" min={0} value={minChildCount} onInput={e => { e.preventDefault(); setMinChildCount(e.currentTarget.valueAsNumber) }} /> Min # of children</label></div>
             <div><label><input type="number" min={minChildCount} value={maxChildCount} onInput={e => { e.preventDefault(); setMaxChildCount(e.currentTarget.valueAsNumber) }} /> Max # of children</label></div>
             <div>Current # of children: {currentChildCount}</div>
-            <ChildrenHaveFocusContext.Provider value={childrenHaveFocusChildContext}>
+            <ChildrenHaveFocusContext.Provider value={context}>
                 <div>Any children focused: {anyFocused.toString()}</div>
                 <div>{Array.from((function* () {
                     for (let i = 0; i < currentChildCount; ++i) {
@@ -83,7 +83,7 @@ const DemoUseChildrenHaveFocus = () => {
 }
 
 const DemoUseChildrenHaveFocusChild = ({ index }: { index: number }) => {
-    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged } } = useChildrenHaveFocusChild<HTMLDivElement>({ childrenHaveFocusChildContext: useContext(ChildrenHaveFocusContext) });
+    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged } } = useChildrenHaveFocusChild<HTMLDivElement>({ context: useContext(ChildrenHaveFocusContext) });
     const { refElementReturn, propsStable } = useRefElement<HTMLDivElement>({ refElementParameters: {} })
     const { hasCurrentFocusReturn } = useHasCurrentFocus({ hasCurrentFocusParameters: { onCurrentFocusedChanged: null, onCurrentFocusedInnerChanged }, refElementReturn });
     return (

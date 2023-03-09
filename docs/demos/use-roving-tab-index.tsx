@@ -134,10 +134,10 @@ const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
     const {
         props,
         rovingTabIndexChildReturn: { tabbable },
-        singleSelectionChildReturn: { selected, selectedOffset },
+        singleSelectionChildReturn: { selected, selectedOffset, setThisOneSelected },
         paginatedChildReturn: { hideBecausePaginated },
         staggeredChildReturn: { hideBecauseStaggered },
-        pressParameters,
+        pressParameters: { excludeSpace },
         refElementReturn
     } = useCompleteListNavigationChild<HTMLLIElement, CustomInfoType, never>({
         managedChildParameters: { index },
@@ -151,7 +151,7 @@ const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
 
     const { pressReturn, props: propsPress } = usePress<HTMLLIElement>({
         refElementReturn,
-        pressParameters: { ...pressParameters, focusSelf },
+        pressParameters: { excludeSpace, onPressSync: setThisOneSelected, focusSelf },
     });
 
     const props2 = useMergedProps(props, propsPress);

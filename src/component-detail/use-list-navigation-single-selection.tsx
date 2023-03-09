@@ -1,9 +1,10 @@
 import { useMergedProps } from "../dom-helpers/use-merged-props.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
+import { useStableObject } from "../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../util/assert.js";
 import { OmitStrong } from "../util/types.js";
-import { useListNavigation, useListNavigationChild, UseListNavigationChildInfo, UseListNavigationChildParameters, UseListNavigationChildReturnType, UseListNavigationParameters, UseListNavigationReturnType } from "./use-list-navigation-partial.js";
-import { SelectableChildInfo, useSingleSelection, useSingleSelectionChild, UseSingleSelectionChildParameters, UseSingleSelectionChildReturnType, UseSingleSelectionParameters, UseSingleSelectionReturnType } from "./use-single-selection.js";
+import { useListNavigation, useListNavigationChild, UseListNavigationChildInfo, UseListNavigationChildParameters, UseListNavigationChildReturnType, UseListNavigationContext, UseListNavigationParameters, UseListNavigationReturnType } from "./use-list-navigation-partial.js";
+import { SelectableChildInfo, useSingleSelection, useSingleSelectionChild, UseSingleSelectionChildParameters, UseSingleSelectionChildReturnType, UseSingleSelectionContext, UseSingleSelectionParameters, UseSingleSelectionReturnType } from "./use-single-selection.js";
 
 export interface UseListNavigationSingleSelectionChildInfo<TabbableChildElement extends Element> extends UseListNavigationChildInfo<TabbableChildElement>, SelectableChildInfo<TabbableChildElement> { }
 
@@ -11,7 +12,15 @@ export interface UseListNavigationSingleSelectionParameters<ParentOrChildElement
     managedChildrenReturn: UseListNavigationParameters<ParentOrChildElement, ChildElement, M>["managedChildrenReturn"] & UseSingleSelectionParameters<ChildElement>["managedChildrenReturn"];
 }
 
-export interface UseListNavigationSingleSelectionReturnType<ParentOrChildElement extends Element, ChildElement extends Element> extends UseListNavigationReturnType<ParentOrChildElement, ChildElement>, UseSingleSelectionReturnType<ChildElement> { }
+export interface UseListNavigationSingleSelectionReturnType<ParentOrChildElement extends Element, ChildElement extends Element> extends
+    OmitStrong<UseListNavigationReturnType<ParentOrChildElement, ChildElement>, "context">,
+    OmitStrong<UseSingleSelectionReturnType<ChildElement>, "context"> {
+    context: UseListNavigationSingleSelectionChildContext<ParentOrChildElement, ChildElement>;
+}
+
+export interface UseListNavigationSingleSelectionChildContext<ParentOrChildElement extends Element, ChildElement extends Element> extends UseListNavigationContext<ParentOrChildElement, ChildElement>, UseSingleSelectionContext<ChildElement> {
+
+}
 
 export function useListNavigationSingleSelection<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationSingleSelectionChildInfo<ChildElement>>({
     linearNavigationParameters,
@@ -21,34 +30,44 @@ export function useListNavigationSingleSelection<ParentOrChildElement extends El
     managedChildrenReturn,
     ..._void3
 }: UseListNavigationSingleSelectionParameters<ParentOrChildElement, ChildElement, M>): UseListNavigationSingleSelectionReturnType<ParentOrChildElement, ChildElement> {
-    const { propsStable, ...lnr } = useListNavigation<ParentOrChildElement, ChildElement, M>({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, managedChildrenReturn });
-    const { rovingTabIndexReturn } = lnr;
-    const { ...ssr } = useSingleSelection<ChildElement>({ rovingTabIndexReturn, managedChildrenReturn, singleSelectionParameters });
+    const { context: { rovingTabIndexContext, typeaheadNavigationContext }, propsStable, rovingTabIndexReturn, typeaheadNavigationReturn, managedChildrenParameters, linearNavigationReturn, ...void1 } = useListNavigation<ParentOrChildElement, ChildElement, M>({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, managedChildrenReturn });
+    const { context: { singleSelectionContext }, childrenHaveFocusParameters, singleSelectionReturn, ...void2 } = useSingleSelection<ChildElement>({ rovingTabIndexReturn, managedChildrenReturn, singleSelectionParameters });
 
     assertEmptyObject(_void3);
+    assertEmptyObject(void1);
+    assertEmptyObject(void2);
 
     return {
-        ...ssr,
-        ...lnr,
+        childrenHaveFocusParameters,
+        rovingTabIndexReturn,
+        singleSelectionReturn,
+        typeaheadNavigationReturn,
+        linearNavigationReturn,
+        managedChildrenParameters,
+        context: useStableObject({
+            rovingTabIndexContext,
+            singleSelectionContext,
+            typeaheadNavigationContext
+        }),
         propsStable
     }
 }
 
-export interface UseListNavigationSingleSelectionChildParameters<ChildElement extends Element> extends UseListNavigationChildParameters<ChildElement>, UseSingleSelectionChildParameters<ChildElement> {
+export interface UseListNavigationSingleSelectionChildParameters<ChildElement extends Element> extends
+    OmitStrong<UseListNavigationChildParameters<ChildElement>, "context">,
+    OmitStrong<UseSingleSelectionChildParameters<ChildElement>, "context"> {
+    context: UseListNavigationSingleSelectionChildContext<Element, ChildElement>;
     managedChildParameters: UseListNavigationChildParameters<ChildElement>["managedChildParameters"] & UseSingleSelectionChildParameters<ChildElement>["managedChildParameters"];
 }
 
-export interface UseListNavigationSingleSelectionChildReturnType<ChildElement extends Element> extends UseListNavigationChildReturnType<ChildElement>, UseSingleSelectionChildReturnType<ChildElement> {
-    pressParameters: UseListNavigationChildReturnType<ChildElement>["pressParameters"] & UseSingleSelectionChildReturnType<ChildElement>["pressParameters"];
-}
+
+export interface UseListNavigationSingleSelectionChildReturnType<ChildElement extends Element> extends UseListNavigationChildReturnType<ChildElement>, UseSingleSelectionChildReturnType<ChildElement> {}
 
 export function useListNavigationSingleSelectionChild<ChildElement extends Element>({
     managedChildParameters: { index, ..._void5 },
     rovingTabIndexChildParameters: { hidden, ...void7 },
     singleSelectionChildParameters,
-    singleSelectionContext,
-    rovingTabIndexChildContext,
-    typeaheadNavigationChildContext,
+    context,
     refElementReturn,
     textContentParameters,
     ..._void1
@@ -56,25 +75,27 @@ export function useListNavigationSingleSelectionChild<ChildElement extends Eleme
 
     const {
         hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ..._void3 },
-        pressParameters: { onPressSync },
+        managedChildParameters,
+        singleSelectionChildReturn,
         props: propsSS,
-        ...sscr
+        ...void9
     } = useSingleSelectionChild<ChildElement>({
         managedChildParameters: { index },
         singleSelectionChildParameters,
-        singleSelectionContext
+        context
     });
 
     const {
         hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ..._void6 },
-        pressParameters: { excludeSpace },
+        pressParameters,
+        rovingTabIndexChildReturn,
+        textContentReturn,
         props: propsLN,
-        ...lncr
+        ...void8
     } = useListNavigationChild<ChildElement>({
         managedChildParameters: { index },
         rovingTabIndexChildParameters: { hidden },
-        rovingTabIndexChildContext,
-        typeaheadNavigationChildContext,
+        context,
         refElementReturn,
         textContentParameters
     });
@@ -84,6 +105,8 @@ export function useListNavigationSingleSelectionChild<ChildElement extends Eleme
     assertEmptyObject(_void5);
     assertEmptyObject(_void6);
     assertEmptyObject(void7);
+    assertEmptyObject(void8);
+    assertEmptyObject(void9);
 
     return {
         hasCurrentFocusParameters: {
@@ -92,9 +115,11 @@ export function useListNavigationSingleSelectionChild<ChildElement extends Eleme
                 ocfic2?.(focused, previouslyFocused, e);
             })
         },
-        pressParameters: { onPressSync, excludeSpace },
+        pressParameters,
+        managedChildParameters,
+        rovingTabIndexChildReturn,
+        singleSelectionChildReturn,
+        textContentReturn,
         props: useMergedProps(propsLN, propsSS),
-        ...sscr,
-        ...lncr
     }
 }

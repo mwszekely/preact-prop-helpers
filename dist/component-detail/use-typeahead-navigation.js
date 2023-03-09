@@ -113,8 +113,8 @@ export function useTypeaheadNavigation({ typeaheadNavigationParameters: { collat
     });
     const excludeSpace = useStableCallback(() => { return typeaheadStatus != "none"; });
     return {
-        typeaheadNavigationChildContext: useStableObject({
-            typeaheadNavigationChildParameters: useStableObject({
+        context: useStableObject({
+            typeaheadNavigationContext: useStableObject({
                 insertingComparator,
                 sortedTypeaheadInfo: sortedTypeaheadInfo.current,
                 excludeSpace
@@ -197,7 +197,7 @@ export function useTypeaheadNavigation({ typeaheadNavigationParameters: { collat
         }
     }
 }
-export function useTypeaheadNavigationChild({ managedChildParameters: { index, ...void1 }, textContentParameters: { getText, hidden, ...void5 }, typeaheadNavigationChildContext: { typeaheadNavigationChildParameters: { sortedTypeaheadInfo, insertingComparator, excludeSpace, ...void2 } }, refElementReturn: { getElement, ...void3 }, ...void4 }) {
+export function useTypeaheadNavigationChild({ managedChildParameters: { index, ...void1 }, textContentParameters: { getText, hidden, ...void5 }, context: { typeaheadNavigationContext: { sortedTypeaheadInfo, insertingComparator, excludeSpace, ...void2 } }, refElementReturn: { getElement, ...void3 }, ...void4 }) {
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     assertEmptyObject(void3);

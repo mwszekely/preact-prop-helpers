@@ -60,7 +60,7 @@ export interface UseRovingTabIndexReturnType<TabbableChildElement extends Elemen
     /**
      * STABLE
      */
-    rovingTabIndexChildContext: UseRovingTabIndexChildParameters<TabbableChildElement>["rovingTabIndexChildContext"];
+    context: RovingTabIndexChildContext<TabbableChildElement>;
     /**
      * Return information that lets the user update/query/focus the currently tabbable child
      */
@@ -94,17 +94,19 @@ export interface UseRovingTabIndexChildParameters<TabbableChildElement extends E
     /**
      * The information provided by the parent hook
      */
-    rovingTabIndexChildContext: RovingTabIndexChildContext<TabbableChildElement>;
+    context: RovingTabIndexChildContext<TabbableChildElement>;
 }
 export interface RovingTabIndexChildContext<TabbableChildElement extends Element> {
-    _e?: TabbableChildElement;
-    setTabbableIndex: SetTabbableIndex;
-    getInitiallyTabbedIndex(): number | null;
-    /**
-     * (This is technically the same as what's passed to onChildrenMountChange,
-     * but it serves a slightly different purpose and is separate for clarity)
-     */
-    reevaluateClosestFit: () => void;
+    rovingTabIndexContext: {
+        _tce?: TabbableChildElement;
+        setTabbableIndex: SetTabbableIndex;
+        getInitiallyTabbedIndex(): number | null;
+        /**
+         * (This is technically the same as what's passed to onChildrenMountChange,
+         * but it serves a slightly different purpose and is separate for clarity)
+         */
+        reevaluateClosestFit: () => void;
+    };
 }
 export interface UseRovingTabIndexChildReturnType<ChildElement extends Element> {
     /**
@@ -168,5 +170,5 @@ export interface UseRovingTabIndexChildReturnType<ChildElement extends Element> 
  * regardless of if it's the whole app or just a given component.
  */
 export declare function useRovingTabIndex<ChildElement extends Element, M extends UseRovingTabIndexChildInfo<ChildElement>>({ managedChildrenReturn: { getChildren }, rovingTabIndexParameters: { untabbable, initiallyTabbedIndex, onTabbableIndexChange }, ..._void1 }: UseRovingTabIndexParameters<ChildElement, M>): UseRovingTabIndexReturnType<ChildElement>;
-export declare function useRovingTabIndexChild<ChildElement extends Element>({ managedChildParameters: { index, ..._void2 }, rovingTabIndexChildContext: { reevaluateClosestFit, setTabbableIndex, getInitiallyTabbedIndex }, rovingTabIndexChildParameters, ..._void3 }: UseRovingTabIndexChildParameters<ChildElement>): UseRovingTabIndexChildReturnType<ChildElement>;
+export declare function useRovingTabIndexChild<ChildElement extends Element>({ managedChildParameters: { index, ..._void2 }, context: { rovingTabIndexContext: { reevaluateClosestFit, setTabbableIndex, getInitiallyTabbedIndex } }, rovingTabIndexChildParameters, ..._void3 }: UseRovingTabIndexChildParameters<ChildElement>): UseRovingTabIndexChildReturnType<ChildElement>;
 //# sourceMappingURL=use-roving-tabindex.d.ts.map

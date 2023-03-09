@@ -25,14 +25,28 @@ export function useListNavigationSingleSelectionSortable<ParentOrChildElement ex
     managedChildrenReturn,
     rearrangeableChildrenParameters,
     sortableChildrenParameters,
-    ..._void3
+    ...void3
 }: UseListNavigationSingleSelectionSortableParameters<ParentOrChildElement, ChildElement, M>): UseListNavigationSingleSelectionSortableReturnType<ParentOrChildElement, ChildElement, M> {
-    const scr = useSortableChildren<M>({ rearrangeableChildrenParameters, sortableChildrenParameters });
-    const { rearrangeableChildrenReturn: { indexDemangler, indexMangler } } = scr;
-    const { propsStable, ...lnssr } = useListNavigationSingleSelection<ParentOrChildElement, ChildElement, M>({ linearNavigationParameters: { ...linearNavigationParameters, indexDemangler, indexMangler }, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, managedChildrenReturn });
-    assertEmptyObject(_void3);
+    const { rearrangeableChildrenReturn, sortableChildrenReturn, ...void1 } = useSortableChildren<M>({ rearrangeableChildrenParameters, sortableChildrenParameters });
+    const { indexDemangler, indexMangler } = rearrangeableChildrenReturn;
+    const { propsStable, childrenHaveFocusParameters, context, linearNavigationReturn, managedChildrenParameters, rovingTabIndexReturn, singleSelectionReturn, typeaheadNavigationReturn, ...void2 } = useListNavigationSingleSelection<ParentOrChildElement, ChildElement, M>({ linearNavigationParameters: { ...linearNavigationParameters, indexDemangler, indexMangler }, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, managedChildrenReturn });
+    
+    assertEmptyObject(void1);
+    assertEmptyObject(void2);
+    assertEmptyObject(void3);
 
-    return { propsStable, ...lnssr, ...scr }
+    return {
+        context,
+        propsStable,
+        childrenHaveFocusParameters,
+        linearNavigationReturn,
+        managedChildrenParameters,
+        rearrangeableChildrenReturn,
+        rovingTabIndexReturn,
+        singleSelectionReturn,
+        sortableChildrenReturn,
+        typeaheadNavigationReturn
+    }
 }
 
 
@@ -40,9 +54,7 @@ export function useListNavigationSingleSelectionSortableChild<ChildElement exten
     managedChildParameters: { index, ..._void5 },
     rovingTabIndexChildParameters,
     singleSelectionChildParameters,
-    singleSelectionContext,
-    rovingTabIndexChildContext,
-    typeaheadNavigationChildContext,
+    context,
     refElementReturn,
     textContentParameters,
     ..._void1
@@ -52,9 +64,7 @@ export function useListNavigationSingleSelectionSortableChild<ChildElement exten
         managedChildParameters: { index },
         rovingTabIndexChildParameters,
         singleSelectionChildParameters,
-        singleSelectionContext,
-        rovingTabIndexChildContext,
-        typeaheadNavigationChildContext,
+        context,
         refElementReturn,
         textContentParameters
     })

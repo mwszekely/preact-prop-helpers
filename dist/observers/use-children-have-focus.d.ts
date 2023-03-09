@@ -16,15 +16,16 @@ export interface UseChildrenHaveFocusReturnType<T extends Element> {
     childrenHaveFocusReturn: {
         getAnyFocused(): boolean;
     };
-    childrenHaveFocusChildContext: UseChildrenHaveFocusChildParameters<T>["childrenHaveFocusChildContext"];
+    context: UseChildrenHaveFocusContext<T>;
+}
+export interface UseChildrenHaveFocusContext<T extends Element> {
+    childrenHaveFocusChildContext: {
+        /** **STABLE** */
+        setFocusCount: PassiveStateUpdater<number, h.JSX.TargetedEvent<T>>;
+    };
 }
 export interface UseChildrenHaveFocusChildParameters<T extends Element> {
-    childrenHaveFocusChildContext: {
-        childrenHaveFocusChildParameters: {
-            /** **STABLE** */
-            setFocusCount: PassiveStateUpdater<number, h.JSX.TargetedEvent<T>>;
-        };
-    };
+    context: UseChildrenHaveFocusContext<T>;
 }
 /**
  * Allows a composite component (such as a radio group or listbox) to listen
@@ -34,5 +35,5 @@ export interface UseChildrenHaveFocusChildParameters<T extends Element> {
  * I.E. you can use this without needing a parent `<div>` to listen for a `focusout` event.
  */
 export declare function useChildrenHaveFocus<ChildElement extends Element>(args: UseChildrenHaveFocusParameters<ChildElement>): UseChildrenHaveFocusReturnType<ChildElement>;
-export declare function useChildrenHaveFocusChild<E extends Element>({ childrenHaveFocusChildContext: { childrenHaveFocusChildParameters: { setFocusCount } } }: UseChildrenHaveFocusChildParameters<E>): UseChildrenHaveFocusChildReturnType<E>;
+export declare function useChildrenHaveFocusChild<E extends Element>({ context: { childrenHaveFocusChildContext: { setFocusCount } } }: UseChildrenHaveFocusChildParameters<E>): UseChildrenHaveFocusChildReturnType<E>;
 //# sourceMappingURL=use-children-have-focus.d.ts.map

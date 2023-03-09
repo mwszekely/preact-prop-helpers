@@ -110,7 +110,7 @@ export function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovi
         else
             setTabbableIndex(null, reason, true);
     }, []);
-    const rovingTabIndexChildContext = useStableObject({
+    const rovingTabIndexContext = useStableObject({
         setTabbableIndex,
         getInitiallyTabbedIndex: useCallback(() => { return initiallyTabbedIndex ?? (untabbable ? null : 0); }, []),
         reevaluateClosestFit
@@ -118,10 +118,10 @@ export function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovi
     return {
         managedChildrenParameters: { onChildrenMountChange: reevaluateClosestFit, },
         rovingTabIndexReturn: { setTabbableIndex, getTabbableIndex, focusSelf },
-        rovingTabIndexChildContext
+        context: useStableObject({ rovingTabIndexContext })
     };
 }
-export function useRovingTabIndexChild({ managedChildParameters: { index, ..._void2 }, rovingTabIndexChildContext: { reevaluateClosestFit, setTabbableIndex, getInitiallyTabbedIndex }, rovingTabIndexChildParameters, ..._void3 }) {
+export function useRovingTabIndexChild({ managedChildParameters: { index, ..._void2 }, context: { rovingTabIndexContext: { reevaluateClosestFit, setTabbableIndex, getInitiallyTabbedIndex } }, rovingTabIndexChildParameters, ..._void3 }) {
     const { hidden, ..._void1 } = rovingTabIndexChildParameters;
     const [tabbable, setTabbable, getTabbable] = useState(getInitiallyTabbedIndex() === index);
     useEffect(() => {

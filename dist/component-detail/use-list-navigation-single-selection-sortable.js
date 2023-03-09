@@ -8,21 +8,32 @@ import { useSortableChildren } from "./use-sortable-children.js";
  * There could also be one that's just list nav + sortable, but single selection can be disregarded by setting `selectedIndex` to `null` anyway.
  */
 const _dummy = 0;
-export function useListNavigationSingleSelectionSortable({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, managedChildrenReturn, rearrangeableChildrenParameters, sortableChildrenParameters, ..._void3 }) {
-    const scr = useSortableChildren({ rearrangeableChildrenParameters, sortableChildrenParameters });
-    const { rearrangeableChildrenReturn: { indexDemangler, indexMangler } } = scr;
-    const { propsStable, ...lnssr } = useListNavigationSingleSelection({ linearNavigationParameters: { ...linearNavigationParameters, indexDemangler, indexMangler }, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, managedChildrenReturn });
-    assertEmptyObject(_void3);
-    return { propsStable, ...lnssr, ...scr };
+export function useListNavigationSingleSelectionSortable({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, managedChildrenReturn, rearrangeableChildrenParameters, sortableChildrenParameters, ...void3 }) {
+    const { rearrangeableChildrenReturn, sortableChildrenReturn, ...void1 } = useSortableChildren({ rearrangeableChildrenParameters, sortableChildrenParameters });
+    const { indexDemangler, indexMangler } = rearrangeableChildrenReturn;
+    const { propsStable, childrenHaveFocusParameters, context, linearNavigationReturn, managedChildrenParameters, rovingTabIndexReturn, singleSelectionReturn, typeaheadNavigationReturn, ...void2 } = useListNavigationSingleSelection({ linearNavigationParameters: { ...linearNavigationParameters, indexDemangler, indexMangler }, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, managedChildrenReturn });
+    assertEmptyObject(void1);
+    assertEmptyObject(void2);
+    assertEmptyObject(void3);
+    return {
+        context,
+        propsStable,
+        childrenHaveFocusParameters,
+        linearNavigationReturn,
+        managedChildrenParameters,
+        rearrangeableChildrenReturn,
+        rovingTabIndexReturn,
+        singleSelectionReturn,
+        sortableChildrenReturn,
+        typeaheadNavigationReturn
+    };
 }
-export function useListNavigationSingleSelectionSortableChild({ managedChildParameters: { index, ..._void5 }, rovingTabIndexChildParameters, singleSelectionChildParameters, singleSelectionContext, rovingTabIndexChildContext, typeaheadNavigationChildContext, refElementReturn, textContentParameters, ..._void1 }) {
+export function useListNavigationSingleSelectionSortableChild({ managedChildParameters: { index, ..._void5 }, rovingTabIndexChildParameters, singleSelectionChildParameters, context, refElementReturn, textContentParameters, ..._void1 }) {
     const lnsscr = useListNavigationSingleSelectionChild({
         managedChildParameters: { index },
         rovingTabIndexChildParameters,
         singleSelectionChildParameters,
-        singleSelectionContext,
-        rovingTabIndexChildContext,
-        typeaheadNavigationChildContext,
+        context,
         refElementReturn,
         textContentParameters
     });

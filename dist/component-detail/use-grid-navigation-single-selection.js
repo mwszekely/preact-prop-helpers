@@ -1,4 +1,6 @@
+import { useMergedProps } from "../dom-helpers/use-merged-props.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
+import { useStableObject } from "../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../util/assert.js";
 import { useGridNavigation, useGridNavigationCell, useGridNavigationRow } from "./use-grid-navigation-partial.js";
 import { useSingleSelection, useSingleSelectionChild } from "./use-single-selection.js";
@@ -11,39 +13,53 @@ import { useSingleSelection, useSingleSelectionChild } from "./use-single-select
  */
 const _dummy = 0;
 export function useGridNavigationSingleSelection({ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, managedChildrenReturn, typeaheadNavigationParameters, singleSelectionParameters, ..._void2 }) {
-    const gnr = useGridNavigation({
+    const { context: { gridNavigationRowContext, rovingTabIndexContext, typeaheadNavigationContext }, linearNavigationReturn, managedChildrenParameters, propsStable, rovingTabIndexReturn, typeaheadNavigationReturn, } = useGridNavigation({
         gridNavigationParameters,
         linearNavigationParameters,
         managedChildrenReturn,
         rovingTabIndexParameters,
         typeaheadNavigationParameters
     });
-    const { rovingTabIndexReturn } = gnr;
-    const ssr = useSingleSelection({
+    const { childrenHaveFocusParameters, context: { singleSelectionContext }, singleSelectionReturn } = useSingleSelection({
         managedChildrenReturn,
         rovingTabIndexReturn,
         singleSelectionParameters
     });
     assertEmptyObject(_void2);
     return {
-        ...gnr,
-        ...ssr,
+        context: useStableObject({
+            gridNavigationRowContext,
+            rovingTabIndexContext,
+            singleSelectionContext,
+            typeaheadNavigationContext
+        }),
+        childrenHaveFocusParameters,
+        linearNavigationReturn,
+        managedChildrenParameters,
+        propsStable,
+        rovingTabIndexReturn,
+        singleSelectionReturn,
+        typeaheadNavigationReturn
     };
 }
-export function useGridNavigationSingleSelectionRow({ managedChildParameters, singleSelectionChildParameters, singleSelectionContext, gridNavigationRowContext, linearNavigationParameters, managedChildrenReturn, refElementReturn, rovingTabIndexChildContext, rovingTabIndexChildParameters, rovingTabIndexParameters, textContentParameters, typeaheadNavigationChildContext, typeaheadNavigationParameters, ..._void1 }) {
-    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ..._void3 }, ...ssr } = useSingleSelectionChild({ managedChildParameters, singleSelectionChildParameters, singleSelectionContext });
-    const { rowAsChildOfGridReturn: { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ..._void2 }, ...rowAsChildOfGridReturn }, rowAsParentOfCellsReturn } = useGridNavigationRow({ gridNavigationRowContext, linearNavigationParameters, managedChildParameters, managedChildrenReturn, refElementReturn, rovingTabIndexChildContext, rovingTabIndexChildParameters, rovingTabIndexParameters, textContentParameters, typeaheadNavigationChildContext, typeaheadNavigationParameters });
-    const onCurrentFocusedInnerChanged = useStableCallback((focused, prevFocused, e) => { ocfic1?.(focused, prevFocused, e); ocfic2?.(focused, prevFocused, e); });
+export function useGridNavigationSingleSelectionRow({ managedChildParameters: mcp1, singleSelectionChildParameters, linearNavigationParameters, managedChildrenReturn, refElementReturn, rovingTabIndexChildParameters, rovingTabIndexParameters, textContentParameters, typeaheadNavigationParameters, context: { gridNavigationRowContext, rovingTabIndexContext, singleSelectionContext, typeaheadNavigationContext }, ..._void1 }) {
+    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1 }, managedChildParameters: mcp2, props: propsSS, singleSelectionChildReturn } = useSingleSelectionChild({ managedChildParameters: mcp1, singleSelectionChildParameters, context: { singleSelectionContext } });
+    const { context, gridNavigationRowParameters, hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2 }, linearNavigationReturn, managedChildrenParameters, pressParameters: { excludeSpace }, props: propsGN, rovingTabIndexChildReturn, rovingTabIndexReturn, textContentReturn, typeaheadNavigationReturn } = useGridNavigationRow({ context: { gridNavigationRowContext, rovingTabIndexContext, typeaheadNavigationContext }, linearNavigationParameters, managedChildParameters: mcp1, managedChildrenReturn, refElementReturn, rovingTabIndexChildParameters, rovingTabIndexParameters, textContentParameters, typeaheadNavigationParameters });
     assertEmptyObject(_void1);
-    assertEmptyObject(_void2);
-    assertEmptyObject(_void3);
     return {
-        rowAsChildOfGridReturn: {
-            hasCurrentFocusParameters: { onCurrentFocusedInnerChanged },
-            ...ssr,
-            ...rowAsChildOfGridReturn
-        },
-        rowAsParentOfCellsReturn
+        context,
+        gridNavigationRowParameters,
+        linearNavigationReturn,
+        managedChildParameters: mcp2,
+        managedChildrenParameters,
+        pressParameters: { excludeSpace },
+        hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: useStableCallback((hasFocus, hadFocus) => { ocfic1?.(hasFocus, hadFocus); ocfic2?.(hasFocus, hadFocus); }) },
+        props: useMergedProps(propsGN, propsSS),
+        rovingTabIndexChildReturn,
+        rovingTabIndexReturn,
+        singleSelectionChildReturn,
+        textContentReturn,
+        typeaheadNavigationReturn
     };
 }
 // EZ

@@ -17,10 +17,10 @@ export function useChildrenHaveFocus(args) {
     }));
     return {
         childrenHaveFocusReturn: { getAnyFocused },
-        childrenHaveFocusChildContext: useStableObject({ childrenHaveFocusChildParameters: useStableObject({ setFocusCount }) }),
+        context: useStableObject({ childrenHaveFocusChildContext: useStableObject({ setFocusCount }) }),
     };
 }
-export function useChildrenHaveFocusChild({ childrenHaveFocusChildContext: { childrenHaveFocusChildParameters: { setFocusCount } } }) {
+export function useChildrenHaveFocusChild({ context: { childrenHaveFocusChildContext: { setFocusCount } } }) {
     return {
         hasCurrentFocusParameters: {
             onCurrentFocusedInnerChanged: useStableCallback((focused, prev, e) => {

@@ -16,12 +16,12 @@ export interface UseTypeaheadNavigationReturnType<ParentOrChildElement extends E
         typeaheadStatus: "invalid" | "valid" | "none";
     }
     propsStable: h.JSX.HTMLAttributes<ParentOrChildElement>;
-    typeaheadNavigationChildContext: UseTypeaheadNavigationContext;
+    context: UseTypeaheadNavigationContext;
 }
 
 export interface UseTypeaheadNavigationContext {
 
-    typeaheadNavigationChildParameters: {
+    typeaheadNavigationContext: {
         excludeSpace: () => boolean;
         sortedTypeaheadInfo: Array<TypeaheadInfo>;
         insertingComparator: (lhs: string | null, rhs: TypeaheadInfo) => number;
@@ -59,7 +59,7 @@ export interface UseTypeaheadNavigationChildParameters<ChildElement extends Elem
     managedChildParameters: Pick<UseRovingTabIndexChildParameters<ChildElement>["managedChildParameters"], "index">;
     textContentParameters: Pick<UseTextContentParameters<ChildElement>["textContentParameters"], "getText" | "hidden">;
     refElementReturn: Pick<UseRefElementReturnType<ChildElement>["refElementReturn"], "getElement">;
-    typeaheadNavigationChildContext: UseTypeaheadNavigationContext
+    context: UseTypeaheadNavigationContext
 }
 
 export interface UseTypeaheadNavigationChildReturnType extends UseTextContentReturnType {
@@ -210,8 +210,8 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
     const excludeSpace = useStableCallback(() => { return typeaheadStatus != "none" });
 
     return {
-        typeaheadNavigationChildContext: useStableObject({
-            typeaheadNavigationChildParameters: useStableObject({
+        context: useStableObject({
+            typeaheadNavigationContext: useStableObject({
                 insertingComparator,
                 sortedTypeaheadInfo: sortedTypeaheadInfo.current,
                 excludeSpace
@@ -319,7 +319,7 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
 export function useTypeaheadNavigationChild<ChildElement extends Element>({
     managedChildParameters: { index, ...void1 },
     textContentParameters: { getText, hidden, ...void5 },
-    typeaheadNavigationChildContext: { typeaheadNavigationChildParameters: { sortedTypeaheadInfo, insertingComparator, excludeSpace, ...void2 } },
+    context: { typeaheadNavigationContext: { sortedTypeaheadInfo, insertingComparator, excludeSpace, ...void2 } },
     refElementReturn: { getElement, ...void3 },
     ...void4
 }: UseTypeaheadNavigationChildParameters<ChildElement>): UseTypeaheadNavigationChildReturnType {
