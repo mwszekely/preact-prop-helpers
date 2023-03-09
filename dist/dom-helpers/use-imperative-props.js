@@ -1,5 +1,16 @@
-import { useCallback, useRef } from "preact/hooks";
+import { createElement } from "preact";
+import { useCallback, useImperativeHandle, useRef } from "preact/hooks";
 import { useMergedProps } from "./use-merged-props.js";
+import { useRefElement } from "./use-ref-element.js";
+import { forwardRef, memo } from "preact/compat";
+/**
+ * Easy access to an HTMLElement that can be controlled imperatively.
+ *
+ * The HTMLElement rendered is controlled by the `tag` prop (e.g. "span", "div").
+ *
+ * The `handle` prop should be e.g. `useRef<ImperativeHandle<HTMLDivElement>>(null)`
+ */
+export const ImperativeElement = memo(forwardRef(ImperativeElementU));
 export function useImperativeProps({ refElementReturn: { getElement } }) {
     const currentImperativeProps = useRef({ className: new Set(), style: {}, children: null, others: {} });
     const hasClass = useCallback((cls) => { return currentImperativeProps.current.className.has(cls); }, []);
@@ -70,8 +81,14 @@ export function useImperativeProps({ refElementReturn: { getElement } }) {
             setEventHandler,
             setChildren
         }).current,
-        propsUnstable: useMergedProps({ className: [...currentImperativeProps.current.className].join(" "), style: currentImperativeProps.current.style }, currentImperativeProps.current.others)
+        props: useMergedProps({ className: [...currentImperativeProps.current.className].join(" "), style: currentImperativeProps.current.style }, currentImperativeProps.current.others)
     };
+}
+function ImperativeElementU({ tag: Tag, handle, ...props }, ref) {
+    const { propsStable, refElementReturn } = useRefElement({ refElementParameters: {} });
+    const { props: iprops, imperativeHandle } = useImperativeProps({ refElementReturn });
+    useImperativeHandle(handle, () => imperativeHandle);
+    return (createElement(Tag, useMergedProps(propsStable, iprops, props, { ref })));
 }
 const EventMapping = {
     abort: "onAbort",

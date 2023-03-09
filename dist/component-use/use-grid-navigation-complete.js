@@ -22,7 +22,7 @@ export function useCompleteGridNavigation({ gridNavigationParameters, linearNavi
             return false;
         return true;
     }, []);
-    const { childrenHaveFocusParameters, managedChildrenParameters, rovingTabIndexChildContext, singleSelectionContext, typeaheadNavigationChildContext, gridNavigationRowContext, rearrangeableChildrenReturn, ...gridNavigationSingleSelectionReturn } = useGridNavigationSingleSelectionSortable({
+    const { childrenHaveFocusParameters, managedChildrenParameters, rovingTabIndexChildContext, singleSelectionContext, typeaheadNavigationChildContext, gridNavigationRowContext, rearrangeableChildrenReturn, propsStable, ...gridNavigationSingleSelectionReturn } = useGridNavigationSingleSelectionSortable({
         gridNavigationParameters,
         linearNavigationParameters: { getHighestIndex: getHighestChildIndex, isValid, ...linearNavigationParameters },
         managedChildrenReturn: { getChildren },
@@ -42,7 +42,7 @@ export function useCompleteGridNavigation({ gridNavigationParameters, linearNavi
     const { context: { managedChildContext }, managedChildrenReturn } = mcr; // TODO: This is split into two lines for TypeScript reasons? Can this be fixed? E.G. like    vvvvvvvvvvvvvvvvvvvvvvvvvvvvvv  why doesn't that work?
     const { paginatedChildrenReturn, paginatedChildrenReturn: { refreshPagination }, managedChildrenParameters: { onChildCountChange }, context: { paginatedChildContext } } = usePaginatedChildren({ managedChildrenReturn, paginatedChildrenParameters, linearNavigationParameters: { indexDemangler } });
     const { context: { staggeredChildContext }, staggeredChildrenReturn } = useStaggeredChildren({ managedChildrenReturn, staggeredChildrenParameters });
-    const props = useMergedProps(linearNavigationReturn.propsStable, typeaheadNavigationReturn.propsStable);
+    //const props = useMergedProps(linearNavigationReturn.propsStable, typeaheadNavigationReturn.propsStable);
     const context = useStableObject({
         singleSelectionContext,
         managedChildContext,
@@ -55,7 +55,7 @@ export function useCompleteGridNavigation({ gridNavigationParameters, linearNavi
     });
     return {
         context,
-        props,
+        propsStable,
         managedChildrenReturn,
         rearrangeableChildrenReturn,
         staggeredChildrenReturn,
@@ -80,7 +80,7 @@ export function useCompleteGridNavigationRow({ rowAsChildOfGridParameters: { man
             return false;
         return true;
     }, []);
-    const { refElementReturn } = useRefElement({ refElementParameters: {} });
+    const { refElementReturn, propsStable } = useRefElement({ refElementParameters: {} });
     const r = useGridNavigationSingleSelectionRow({
         rowAsParentOfCellsParameters: {
             ...rowAsParentOfCellsParameters,
@@ -103,7 +103,7 @@ export function useCompleteGridNavigationRow({ rowAsChildOfGridParameters: { man
             managedChildrenReturn: { getChildren },
         }
     });
-    const { rowAsChildOfGridReturn, rowAsParentOfCellsReturn } = r;
+    const { rowAsChildOfGridReturn: { props: propsRowAsChild, ...rowAsChildOfGridReturn }, rowAsParentOfCellsReturn: { propsStable: propsParentOfCells, ...rowAsParentOfCellsReturn } } = r;
     const { context: { managedChildContext }, managedChildrenReturn } = useManagedChildren({ managedChildrenParameters: r.rowAsParentOfCellsReturn.managedChildrenParameters });
     const { getElement } = refElementReturn;
     const baseInfo = {
@@ -137,30 +137,30 @@ export function useCompleteGridNavigationRow({ rowAsChildOfGridParameters: { man
     const { hasCurrentFocusParameters } = useChildrenHaveFocusChild({ childrenHaveFocusChildContext });
     //const { refElementReturn } = useRefElement<RowElement>({ refElementParameters: {} })
     const { hasCurrentFocusReturn } = useHasCurrentFocus({ refElementReturn, hasCurrentFocusParameters: { ...hasCurrentFocusParameters, onCurrentFocusedChanged: null } });
-    const props = useMergedProps(refElementReturn.propsStable, 
+    const props = useMergedProps(propsStable, 
     // TODO: Rows don't use tabIndex, but just excluding props here is...weird.
-    //r.rowAsChildOfGridReturn.rovingTabIndexChildReturn.propsUnstable,
-    r.rowAsChildOfGridReturn.singleSelectionChildReturn.propsUnstable, r.rowAsParentOfCellsReturn.linearNavigationReturn.propsStable, r.rowAsParentOfCellsReturn.typeaheadNavigationReturn.propsStable, hasCurrentFocusReturn.propsStable, paginationProps, staggeredProps);
+    propsParentOfCells, r.rowAsChildOfGridReturn.props, hasCurrentFocusReturn.propsStable, paginationProps, staggeredProps);
     return {
-        context,
-        props,
         rowAsParentOfCellsReturn: {
             ...rowAsParentOfCellsReturn,
-            managedChildrenReturn
+            hasCurrentFocusReturn,
+            managedChildrenReturn,
+            propsStable: props,
+            context,
         },
         rowAsChildOfGridReturn: {
             ...rowAsChildOfGridReturn,
+            props: propsRowAsChild,
             managedChildReturn,
             staggeredChildReturn: { isStaggered, hideBecauseStaggered },
             paginatedChildReturn: { isPaginated, paginatedVisible, hideBecausePaginated }
-        },
-        hasCurrentFocusReturn
+        }
     };
 }
 export function useCompleteGridNavigationCell({ gridNavigationCellParameters, managedChildParameters, context: { gridNavigationCellContext, managedChildContext, rovingTabIndexChildContext, typeaheadNavigationChildContext }, rovingTabIndexChildParameters: { hidden }, rovingTabIndexChildParameters, textContentParameters, completeGridNavigationCellParameters: { focusSelf, ...completeGridNavigationCellParameters }, }) {
     const { index } = managedChildParameters;
-    const { refElementReturn } = useRefElement({ refElementParameters: {} });
-    const { hasCurrentFocusParameters, rovingTabIndexChildReturn, textContentReturn, pressParameters } = useGridNavigationSingleSelectionCell({
+    const { refElementReturn, propsStable } = useRefElement({ refElementParameters: {} });
+    const { hasCurrentFocusParameters, rovingTabIndexChildReturn, textContentReturn, pressParameters, props: propsRti } = useGridNavigationSingleSelectionCell({
         gridNavigationCellContext,
         gridNavigationCellParameters,
         managedChildParameters,
@@ -187,7 +187,7 @@ export function useCompleteGridNavigationCell({ gridNavigationCellParameters, ma
         ...baseInfo,
         ...completeGridNavigationCellParameters
     });
-    const props = useMergedProps(refElementReturn.propsStable, rovingTabIndexChildReturn.propsUnstable, hasCurrentFocusReturn.propsStable);
+    const props = useMergedProps(propsStable, propsRti, hasCurrentFocusReturn.propsStable);
     return {
         props,
         refElementReturn,

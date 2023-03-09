@@ -2,9 +2,9 @@ import { jsx as _jsx, Fragment as _Fragment } from "preact/jsx-runtime";
 import { cloneElement } from "preact";
 import { createPortal } from "preact/compat";
 import { useCallback, useLayoutEffect, useMemo } from "preact/hooks";
-import { generateRandomId } from "../preact-extensions/use-before-layout-effect.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useState } from "../preact-extensions/use-state.js";
+import { generateRandomId } from "../util/random-id.js";
 /**
  * Very basic hook for a root-level component to use to allow any children within the whole app to push children to a portal somewhere.
  *

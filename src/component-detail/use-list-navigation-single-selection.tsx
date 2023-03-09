@@ -1,3 +1,4 @@
+import { useMergedProps } from "../dom-helpers/use-merged-props.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { assertEmptyObject } from "../util/assert.js";
 import { OmitStrong } from "../util/types.js";
@@ -20,15 +21,16 @@ export function useListNavigationSingleSelection<ParentOrChildElement extends El
     managedChildrenReturn,
     ..._void3
 }: UseListNavigationSingleSelectionParameters<ParentOrChildElement, ChildElement, M>): UseListNavigationSingleSelectionReturnType<ParentOrChildElement, ChildElement> {
-    const lnr = useListNavigation<ParentOrChildElement, ChildElement, M>({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, managedChildrenReturn });
+    const { propsStable, ...lnr } = useListNavigation<ParentOrChildElement, ChildElement, M>({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, managedChildrenReturn });
     const { rovingTabIndexReturn } = lnr;
-    const ssr = useSingleSelection<ChildElement>({ rovingTabIndexReturn, managedChildrenReturn, singleSelectionParameters });
+    const { ...ssr } = useSingleSelection<ChildElement>({ rovingTabIndexReturn, managedChildrenReturn, singleSelectionParameters });
 
     assertEmptyObject(_void3);
 
     return {
         ...ssr,
         ...lnr,
+        propsStable
     }
 }
 
@@ -55,6 +57,7 @@ export function useListNavigationSingleSelectionChild<ChildElement extends Eleme
     const {
         hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ..._void3 },
         pressParameters: { onPressSync },
+        props: propsSS,
         ...sscr
     } = useSingleSelectionChild<ChildElement>({
         managedChildParameters: { index },
@@ -65,6 +68,7 @@ export function useListNavigationSingleSelectionChild<ChildElement extends Eleme
     const {
         hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ..._void6 },
         pressParameters: { excludeSpace },
+        props: propsLN,
         ...lncr
     } = useListNavigationChild<ChildElement>({
         managedChildParameters: { index },
@@ -89,6 +93,7 @@ export function useListNavigationSingleSelectionChild<ChildElement extends Eleme
             })
         },
         pressParameters: { onPressSync, excludeSpace },
+        props: useMergedProps(propsLN, propsSS),
         ...sscr,
         ...lncr
     }

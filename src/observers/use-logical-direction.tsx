@@ -1,5 +1,5 @@
 import { useCallback } from "preact/hooks";
-import { ElementSize } from "../dom-helpers/use-element-size.js";
+import { ElementSize } from "./use-element-size.js";
 
 //export type BlockFlowDirection = "downwards" | "leftwards" | "rightwards";
 export type PhysicalDirection = "ltr" | "rtl" | "ttb" | "btt";

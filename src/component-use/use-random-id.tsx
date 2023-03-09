@@ -1,12 +1,6 @@
 import { h } from "preact";
 import { useId, useRef } from "preact/hooks";
-import { generateRandomId } from "../preact-extensions/use-before-layout-effect.js";
 import { useEnsureStability } from "../preact-extensions/use-passive-state.js";
-export { generateRandomId };
-
-
-
-
 
 export interface UseRandomIdReturnType<S extends Element, T extends Element> {
     propsSource: h.JSX.HTMLAttributes<S>;
@@ -14,8 +8,6 @@ export interface UseRandomIdReturnType<S extends Element, T extends Element> {
     
     randomIdReturn: { id: string; };
 }
-
-
 
 export interface UseRandomIdParameters {
     randomIdParameters: {

@@ -57,8 +57,8 @@ export interface UsePressReturnType<E extends Element> {
          * Similar to pseudoActive, but for if the button as been pressed down for a determined length of time.
          */
         longPress: boolean | null;
-        propsUnstable: h.JSX.HTMLAttributes<E>;
     };
+    props: h.JSX.HTMLAttributes<E>;
 }
 /**
  * Adds the necessary event handlers to create a "press"-like event for

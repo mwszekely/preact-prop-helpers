@@ -1,6 +1,5 @@
 
 import { useCallback, useEffect } from "preact/hooks";
-//import { UseManagedChildParameters, useManagedChildren, UseManagedChildrenParameters, UseManagedChildrenReturnTypeInfo } from "./use-child-manager";
 import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
 import { returnFalse, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useActiveElement, UseActiveElementParameters, UseActiveElementReturnType } from "./use-active-element.js";

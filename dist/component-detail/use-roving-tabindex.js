@@ -139,11 +139,11 @@ export function useRovingTabIndexChild({ managedChildParameters: { index, ..._vo
             })
         },
         rovingTabIndexChildReturn: {
-            propsUnstable: { tabIndex: (tabbable ? 0 : -1) },
             tabbable,
             getTabbable,
             setTabbable
-        }
+        },
+        props: { tabIndex: (tabbable ? 0 : -1) },
     };
 }
 //# sourceMappingURL=use-roving-tabindex.js.map

@@ -12,6 +12,7 @@ const { offsetHeight, ...otherSizes } = (size ?? {});
 return <div {...useElementSizeProps(props)}>I'm {offsetHeight} pixels tall!</div>
 ```
 
+The name (Preact Prop Helpers) comes from the fact that most of these hooks require modifying the props that were going to be passed to an element in order to function (generally just the `ref` on those props, but still).  It's since grown in scope to include a bunch of general helper hooks as well (like `useAsync`), but `useMergedProps` truly was the core at one point.
 
 This library follows a few conventions:
 * Re-render as few times as possible. In general this means instead of a hook returning a value, it will accept an `onChange`-ish handler that will let you explicitly do that.
@@ -26,10 +27,11 @@ This library follows a few conventions:
     // ✔✔✔
     // We're explicitly saying "I don't need `size` during render, just for events and such"
     const { elementSizeReturn: { getSize }, props } = useElementSize({ onSizeChange: null });
-    return <div onClick={() => console.log(getSize)} {...props} />
+    return <div onClick={() => console.log(getSize())} {...props} />
 
     // ✖✖✖ Does not compile!!!
-    // The hook is not designed like this because what if `size` is only used in an event handler, or an effect? We'd render twice for no reason
+    // The hook is not designed like this because what if `size` is only used 
+    // in an event handler, or an effect? We'd render twice for no reason
     const { elementSizeReturn: { size }, props } = useElementState();
     useEffect(() => { console.log(size.x); }, [size.x]);
     return <div {...props} />  // Nothing ever changes but the entire diffing algorithm still always runs!
@@ -47,35 +49,35 @@ This library follows a few conventions:
     const { elementSizeReturn: { getSize }, props } = useElementSize({ onSizeChange: setSize });
     return <div {...props} />
     ```
-* As much as possible, no specific DOM restrictions are imposed and, for hooks with children, those children can be anywhere descendent in the tree (except for `useSortableChildren`, which can be anywhere descendant but must all be contiguous). Nesting hooks, even of the same type, is also fine.
+* As much as possible, no specific DOM restrictions are imposed and, for hooks with children (lists, grids, etc.), those children can be anywhere descendent in the tree (except for `useSortableChildren`, which can be anywhere descendant but must all be contiguous). Nesting hooks, even of the same type, is also fine.
     *  E.G. `useRovingTabIndex` returns information that you can toss into a `Context` so that each child can call `useRovingTabIndexChild` with that information, and this can happen pretty much anywhere decendent in the DOM that you'd like. A child can use `useRovingTabIndex` and `useRovingTabIndexChild` to both be a child that can be tabbed to and have children that can be tabbed to (which is what `useGridNavigation` does).
+* Children provide their data to the parent, never the other way around. E.G. `useListNavigation` can filter children, but it doesn't take an array of which children to filter out; each child reports its own status as filtered/unfiltered with, say, a `hidden` prop, and the parent responds to that.
+    * This means that the child data is *always* the single source of truth, and maps nicely to how components are built and diffed.
 * Organizationally, some hooks exist primarily to be used as a part of a larger hook.  Hooks within the `component-use` folder are generally "ready-to-use" and don't require much passing of parameters back and forth, but are not fully extensible.  Hooks within `component-detail` are the lower-level building blocks that make up those "ready-to-use" complete hooks, but they're much more time-consuming to use.
     * You can also just copy and paste one of the complete hooks somewhere else and use it as a new building block...
-* Children provide their data to the parent, never the other way around. E.G. `useListNavigation` can filter children, but it doesn't take an array of which children to filter out; each child reports its own status as filtered/unfiltered, and the parent responds to that.
-    * This means that the child data is *always* the single source of truth, and maps nicely to how components are built and diffed.
-* Be composable in predictable and obvious ways, because there are a lot of intertwined dependencies:
+* Hooks composable in predictable and obvious ways, because there are a lot of intertwined dependencies:
     * A hook, `useFoo`, will always take paramaters like `{ fooParameters: {...} }`.
         * E.G. `useElementRef({ elementRefParameters: { onMount: ... } })`
     * A hook, `useFoo`, will always return objects like `{ fooReturn: { ... } }`
         * E.G. `const { refElementReturn: { getElement } } = useElementRef(...)`
-    * A hook, `useFoo` may also return `{ props: {...} }` or, rarely, `{ propsStable: {...} }`. These must be spread onto the element you're rendering, or the hook will not function (see `useMergedProps` if you need to use other props in addition to the returned props). 
+    * A hook, `useFoo` may also return `{ props: {...} }` or, instead rarely, `{ propsStable: {...} }`. These must be spread onto the element you're rendering, or the hook will not function (see `useMergedProps` if you need to use other props in addition to the returned props). 
         * E.G. `const { propsStable } = useElementRef(...)`, then `<div {...propsStable} />`
     * A hook, `useFoo` may also return `{ context: { ... } }` that children rely on.
         1. E.G. Parent calls `const { context } = useFoo(...);`
         1. Parent renders `<MyContext.Provider value={context}>{children}</MyContext.Provider>`
         1. Then child calls `useFooChild({ context: useContext(MyContext), fooChildParameters: {...} })`
-    * When hooks are nested:
-        * If `useFoo` calls `useBar` directly, then it will take parameters like `{ fooParameters: {...}, barParameters: {...} }` and return objects like `{ fooReturn: {...}, barReturn: {...} }`. This is the most common case.
-        * If `useFoo` relies on `useBar` (but doesn't call it itself!), then it will take parameters like `{ fooParameters: { ... }, barReturn: { ... } }`. This is less common and usually for performance (many, many hooks rely on `elementRefReturn.getElement`)
+    * When hooks themselves use other hooks:
+        * If `useFoo` calls `useBar` directly, then it will take parameters like `{ fooParameters: {...}, barParameters: {...} }` and return objects like `{ fooReturn: {...}, barReturn: {...} }`.
+        * If `useFoo` relies on `useBar` (but doesn't call it itself!), then will do one of the following:
+            * Take parameters like `{ fooParameters: { ... }, barReturn: { ... } }`, if it needs the return value of `useBar`.
+            * Return values like `{ fooReturn: { ... }, barParameters: { ... } }`, if it needs `useBar` to be called with specific parameters in order to function (usually callbacks).
+        * (The difference between those two is usually based on performance -- many, many hooks rely on `elementRefReturn.getElement`, for example, so the latter pattern allows us to just call `useRefElement` once and pass the result around to whoever needs it)
         * If `useFoo` and `useBar` both return a top-level `props`, they will be merged into one.
         * If `useFoo` and `useBar` both return a top-level `context`, they will be merged into one.
         * Occasionally, `props` or `context` may be suffixed with the specific role they refer to:
             * `useRandomId` returns `propsSource` and `propsReferencer` (and no `props`).
         
 
-These rules should ideally make swizzling all these different parameters back and forth as foolproof as possible:
-
-The name (Preact Prop Helpers) comes from the fact that most of these hooks require modifying the props that were going to be passed to an element in order to function (generally just the `ref` on those props, but still).  It's since grown in scope to include a bunch of general helper hooks as well (like `useAsync`), but `useMergedProps` truly was the core at one point.
 
 ## Summary of available hooks
 
@@ -121,9 +123,9 @@ The name (Preact Prop Helpers) comes from the fact that most of these hooks requ
     <tr><th colspan="3">Hooks that expand on build-in Preact functionality</th></tr>
     <tr><td>useAsync</td><td>Turn an async function into a sync one for use with APIs that only handle sync functions, along with additional metainfo about the current state that you can react to.</td><td>useAsyncEffect, useAsyncHandler</td></tr>
     <tr><td>useAsyncEffect</td><td>Like useEffect, but if the previous async effect is still running, this one is delayed until that one finishes (and all the other useAsync rules).</td></tr>
-    <tr><td>useManagedChildren</td><td>Allows a parent component to react to changes in what its children are doing, when they've mounted/unmounted, etc. Also allows more fine communication between parents and children, or children and other children.</td><td>Too many to list</td></tr>
+    <tr><td>useManagedChildren</td><td>Allows a parent component to react to changes in what its children are doing, when they've mounted/unmounted, etc. Also allows more fine communication between parents and children, or children and other children.</td><td>Explicitly: useCompleteListNavigation, useCompleteGridNavigation<br /><br />Implicitly: useRovingTabIndex, useSingleSelection, useListNavigationPartial, useGridNavigationPartial, usePaginatedChildren, useStaggeredChildren</td></tr>
     <tr><td>useChildrenFlag</td><td>When you need to have exactly <strong>one or zero</strong> children as "the selected child" or "the focusable child" or "the currently-processing child" or whatever, this hook helps set that up so that at maximum a change in the selected(/whatever) index only results in two children re-rendering themselves.</td><td>useRovingTabIndex, useSingleSelection</td></tr>
-    <tr><td>useForceUpdate</td><td>Returns a stable function that forces <strong>just this</strong> component to re-render itself (children onwards use the normal rendering rules)</td><td>useSortableChildren, usePress</td></tr>
+    <tr><td>useForceUpdate</td><td>Returns a stable function that forces <strong>just this</strong> component to re-render itself (children onwards use the normal rendering/diffing rules)</td><td>useRearrangeableChildren</td></tr>
     <tr><td>usePassiveState</td><td>For when you need to run useState, and even need to run useEffect on changes to your state, but that state might not even be used during rendering and so you don't necessarily want to re-render when that state changes. Like useEffect, you can specify a function that runs when the value changes and returns a cleanup function that is run beforehand the next time.</td><td>Too many to list</td></tr>
     <tr><td>usePersistentState</td><td>State that is saved to localStorage</td></tr>
     <tr><td>useStableCallback &amp; useStableGetter</td><td>Allows a function (or any arbitrary value) to be used in any callback/effect without specifiying them as dependencies. The returned functions are perfectly stable, but cannot be called during render, as their values are indeterminate until the commit phase.</td><td>Too many to list</td></tr>
@@ -131,7 +133,7 @@ The name (Preact Prop Helpers) comes from the fact that most of these hooks requ
     <tr><th colspan="3">Hooks based around timing</th></tr>
     <tr><td>useTimeout</td><td>Run some code after after waiting the specified amount of time from the component first rendering, or from any time the component renders if you want. This can be used like useEffect but with a delay very easily.</td><td>useTypeaheadNavigation</td></tr>
     <tr><td>useInterval</td><td>Like useTimeout, but with a repeating interval instead.</td><td></td></tr>
-    <tr><td>useAnimationFrame</td><td>Run some code on every frame this component is mounted</td><td></td></tr>
+    <tr><td>useAnimationFrame</td><td>Run some code on every frame this component is mounted. Can be batched with the `ProvideBatchedAnimationFrames` component to improve performance if you have many dozens of components calling `requestAnimationFrame`</td><td></td></tr>
     </tbody>
 </table>
 

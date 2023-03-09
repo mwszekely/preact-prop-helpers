@@ -1,6 +1,4 @@
 import { h } from "preact";
-import { generateRandomId } from "../preact-extensions/use-before-layout-effect.js";
-export { generateRandomId };
 export interface UseRandomIdReturnType<S extends Element, T extends Element> {
     propsSource: h.JSX.HTMLAttributes<S>;
     propsReferencer: h.JSX.HTMLAttributes<T>;

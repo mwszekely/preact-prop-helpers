@@ -24,8 +24,8 @@ export function DemoUseModal(props: { parentDepth?: number }) {
     const focusOpener = () =>buttonRef.current?.focus();
 
     const {
-        propsPopup,
-        propsSource,
+        propsStablePopup,
+        propsStableSource,
         propsFocusContainer
     } = useModal<"lost-focus" | "backdrop" | "escape", HTMLDivElement, HTMLButtonElement, HTMLDivElement>({
         focusTrapParameters: {
@@ -43,7 +43,7 @@ export function DemoUseModal(props: { parentDepth?: number }) {
         },
         escapeDismissParameters: { getWindow, parentDepth }
     })
-    let a = propsSource.role;
+    
     return (
         <div style={{ border: `${depth}px solid black` }}>
             <div>useModal demo:</div>
@@ -56,13 +56,13 @@ export function DemoUseModal(props: { parentDepth?: number }) {
                 <br />
             </div>
             <div>Last reason for closing: {closeReason ?? "(hasn't been closed yet)"}</div>
-            <button {...propsSource} onClick={() => setOpen(true)}>Open Modal</button>
-            <div {...useMergedProps(propsFocusContainer, propsPopup)} style={`border: ${depth}px dotted red; background: #ccc`}>
+            <button {...propsStableSource} onClick={() => setOpen(true)}>Open Modal</button>
+            <div {...useMergedProps(propsFocusContainer, propsStablePopup)} style={`border: ${depth}px dotted red; background: #ccc`}>
                 <div style={{ display: open ? "flex" : "none", flexDirection: "column" }}>
                     <div>Modal element at depth {depth} with {hasChild ? "a" : "no"} child</div>
                     <label><input type="checkbox" checked={hasChild} onInput={e => setHasChild(e.currentTarget.checked)} ref={buttonRef} /> Add a child modal</label>
                     {hasChild && <DemoUseModal parentDepth={depth} />}
-                    <button {...propsSource} onClick={() => setOpen(false)}>Close modal programmatically</button>
+                    <button {...propsStableSource} onClick={() => setOpen(false)}>Close modal programmatically</button>
                 </div>
             </div>
         </div>

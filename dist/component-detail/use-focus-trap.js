@@ -1,11 +1,9 @@
 import { useEffect } from "preact/hooks";
 import { isFocusable, isTabbable } from "tabbable";
 import { useBlockingElement } from "../dom-helpers/use-blocking-element.js";
-import { useRefElement } from "../dom-helpers/use-ref-element.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 //const elementsToRestoreFocusTo = new Map<Element | null, (Node & HTMLOrSVGElement)>();
-export function useFocusTrap({ focusTrapParameters: { onlyMoveFocus, trapActive, focusPopup: focusSelfUnstable, focusOpener: focusOpenerUnstable }, refElementParameters }) {
-    const { onElementChange, ...rest } = (refElementParameters || {});
+export function useFocusTrap({ focusTrapParameters: { onlyMoveFocus, trapActive, focusPopup: focusSelfUnstable, focusOpener: focusOpenerUnstable }, refElementReturn }) {
     const focusSelf = useStableCallback(focusSelfUnstable);
     const focusOpener = useStableCallback(focusOpenerUnstable);
     useEffect(() => {
@@ -28,14 +26,11 @@ export function useFocusTrap({ focusTrapParameters: { onlyMoveFocus, trapActive,
                 focusOpener(lastActive);
         }
     }, [trapActive]);
-    const { refElementReturn } = useRefElement({
-        refElementParameters: { onElementChange, ...rest }
-    });
     const { getElement } = refElementReturn;
     const { getTop, getLastActiveWhenClosed, getLastActiveWhenOpen } = useBlockingElement(trapActive && !onlyMoveFocus, getElement);
     return {
-        refElementReturn,
-        focusTrapReturn: { propsUnstable: { "aria-modal": trapActive ? "true" : undefined } }
+        props: { "aria-modal": trapActive ? "true" : undefined },
+        focusTrapReturn: {}
     };
 }
 /**

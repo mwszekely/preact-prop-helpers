@@ -16,7 +16,7 @@ export function useGridNavigation({ gridNavigationParameters: { onTabbableColumn
         if (nextRow != null)
             children.getAt(nextRow)?.setTabbableColumnIndex(nextColumn, reason, false);
     });
-    const { linearNavigationReturn, rovingTabIndexReturn, typeaheadNavigationReturn, managedChildrenParameters, rovingTabIndexChildContext, typeaheadNavigationChildContext, ...void1 } = useListNavigation({
+    const { linearNavigationReturn, rovingTabIndexReturn, typeaheadNavigationReturn, managedChildrenParameters, rovingTabIndexChildContext, typeaheadNavigationChildContext, propsStable, ...void1 } = useListNavigation({
         linearNavigationParameters: { navigationDirection: "vertical", ...linearNavigationParameters },
         rovingTabIndexParameters: { onTabbableIndexChange: onTabbableIndexChangeOverride, ...rovingTabIndexParameters },
         managedChildrenReturn,
@@ -26,6 +26,7 @@ export function useGridNavigation({ gridNavigationParameters: { onTabbableColumn
     assertEmptyObject(_void2);
     assertEmptyObject(void3);
     return {
+        propsStable,
         managedChildrenParameters,
         rovingTabIndexChildContext,
         typeaheadNavigationChildContext,
@@ -68,11 +69,10 @@ export function useGridNavigationRow({ rowAsChildOfGridParameters: { gridNavigat
     const untabbable = !lncr.rovingTabIndexChildReturn.tabbable;
     const lnr = useListNavigation({ ...asParentRowOfCellsP, rovingTabIndexParameters: { untabbable, ...rovingTabIndexParameters }, linearNavigationParameters: { navigationDirection: "horizontal", ...linearNavigationParameters } });
     assertEmptyObject(_void1);
-    const { rovingTabIndexReturn: { setTabbableIndex }, rovingTabIndexReturn, linearNavigationReturn, managedChildrenParameters, rovingTabIndexChildContext, typeaheadNavigationChildContext, typeaheadNavigationReturn } = lnr;
+    const { rovingTabIndexReturn: { setTabbableIndex } } = lnr;
     return {
         rowAsChildOfGridReturn: { gridNavigationRowParameters: { focusSelf, setTabbableColumnIndex: setTabbableIndex }, ...lncr, },
         rowAsParentOfCellsReturn: {
-            ...lnr,
             gridNavigationCellContext: useStableObject({
                 gridNavigationCellParameters: useStableObject({
                     setTabbableRow,
@@ -82,12 +82,7 @@ export function useGridNavigationRow({ rowAsChildOfGridParameters: { gridNavigat
                     setTabbableCell: setTabbableIndex
                 })
             }),
-            linearNavigationReturn,
-            managedChildrenParameters,
-            rovingTabIndexChildContext,
-            rovingTabIndexReturn,
-            typeaheadNavigationChildContext,
-            typeaheadNavigationReturn,
+            ...lnr,
         }
     };
 }
@@ -97,19 +92,18 @@ rovingTabIndexChildContext, typeaheadNavigationChildContext,
 //typeaheadNavigationChildParameters,
 rovingTabIndexChildParameters, managedChildParameters, refElementReturn, textContentParameters, gridNavigationCellParameters: { colSpan }, gridNavigationCellContext: { gridNavigationCellParameters: { getRowIndex, setTabbableRow, getCurrentTabbableColumn: _getCurrentColumn, setCurrentTabbableColumn, setTabbableCell } }, ..._void1 }) {
     const { index } = managedChildParameters;
-    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1 }, rovingTabIndexChildReturn, textContentReturn, pressParameters, ...void2 } = useListNavigationChild({
+    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1 }, rovingTabIndexChildReturn, textContentReturn, pressParameters, props, ...void2 } = useListNavigationChild({
         rovingTabIndexChildParameters,
         managedChildParameters,
         rovingTabIndexChildContext,
         typeaheadNavigationChildContext,
         textContentParameters,
-        //typeaheadNavigationChildParameters,
         refElementReturn
     });
     assertEmptyObject(_void1);
     assertEmptyObject(void2);
-    //    assertEmptyObject(void3);
     return {
+        props,
         rovingTabIndexChildReturn,
         textContentReturn,
         pressParameters,

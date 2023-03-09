@@ -11,9 +11,9 @@ const _dummy = 0;
 export function useListNavigationSingleSelectionSortable({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, managedChildrenReturn, rearrangeableChildrenParameters, sortableChildrenParameters, ..._void3 }) {
     const scr = useSortableChildren({ rearrangeableChildrenParameters, sortableChildrenParameters });
     const { rearrangeableChildrenReturn: { indexDemangler, indexMangler } } = scr;
-    const lnssr = useListNavigationSingleSelection({ linearNavigationParameters: { ...linearNavigationParameters, indexDemangler, indexMangler }, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, managedChildrenReturn });
+    const { propsStable, ...lnssr } = useListNavigationSingleSelection({ linearNavigationParameters: { ...linearNavigationParameters, indexDemangler, indexMangler }, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, managedChildrenReturn });
     assertEmptyObject(_void3);
-    return { ...lnssr, ...scr };
+    return { propsStable, ...lnssr, ...scr };
 }
 export function useListNavigationSingleSelectionSortableChild({ managedChildParameters: { index, ..._void5 }, rovingTabIndexChildParameters, singleSelectionChildParameters, singleSelectionContext, rovingTabIndexChildContext, typeaheadNavigationChildContext, refElementReturn, textContentParameters, ..._void1 }) {
     const lnsscr = useListNavigationSingleSelectionChild({

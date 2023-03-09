@@ -109,6 +109,7 @@ export function useGridNavigation<ParentOrRowElement extends Element, RowElement
         managedChildrenParameters,
         rovingTabIndexChildContext,
         typeaheadNavigationChildContext,
+        propsStable,
         ...void1
     } = useListNavigation<ParentOrRowElement, RowElement, RM>({
         linearNavigationParameters: { navigationDirection: "vertical", ...linearNavigationParameters },
@@ -122,6 +123,7 @@ export function useGridNavigation<ParentOrRowElement extends Element, RowElement
     assertEmptyObject(void3);
 
     return {
+        propsStable,
         managedChildrenParameters,
         rovingTabIndexChildContext,
         typeaheadNavigationChildContext,
@@ -173,13 +175,12 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
 
     assertEmptyObject(_void1);
 
-    const { rovingTabIndexReturn: { setTabbableIndex },rovingTabIndexReturn, linearNavigationReturn, managedChildrenParameters, rovingTabIndexChildContext, typeaheadNavigationChildContext, typeaheadNavigationReturn } = lnr;
+    const { rovingTabIndexReturn: { setTabbableIndex } } = lnr;
 
 
     return {
         rowAsChildOfGridReturn: { gridNavigationRowParameters: { focusSelf, setTabbableColumnIndex: setTabbableIndex }, ...lncr, },
         rowAsParentOfCellsReturn: {
-            ...lnr ,
             gridNavigationCellContext: useStableObject ({
                 gridNavigationCellParameters: useStableObject({
                     setTabbableRow,
@@ -189,13 +190,7 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
                     setTabbableCell: setTabbableIndex
                 })
             }),
-            linearNavigationReturn,
-            managedChildrenParameters,
-            rovingTabIndexChildContext,
-            rovingTabIndexReturn,
-            typeaheadNavigationChildContext,
-            typeaheadNavigationReturn,
-
+            ...lnr,
         }
     }
 
@@ -231,6 +226,7 @@ export function useGridNavigationCell<CellElement extends Element>({
         rovingTabIndexChildReturn,
         textContentReturn,
         pressParameters,
+        props,
         ...void2
     } = useListNavigationChild<CellElement>({
         rovingTabIndexChildParameters,
@@ -238,15 +234,14 @@ export function useGridNavigationCell<CellElement extends Element>({
         rovingTabIndexChildContext,
         typeaheadNavigationChildContext,
         textContentParameters,
-        //typeaheadNavigationChildParameters,
         refElementReturn
     });
 
     assertEmptyObject(_void1);
     assertEmptyObject(void2);
-//    assertEmptyObject(void3);
 
     return {
+        props,
         rovingTabIndexChildReturn,
         textContentReturn,
         pressParameters,

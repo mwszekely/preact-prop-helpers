@@ -31,9 +31,9 @@ export function useRefElement(args) {
     // Return both the element and the hook that modifies 
     // the props and allows us to actually find the element
     return {
+        propsStable: propsStable.current,
         refElementReturn: {
             getElement,
-            propsStable: propsStable.current
         }
     };
 }

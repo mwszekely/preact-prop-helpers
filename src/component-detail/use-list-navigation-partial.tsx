@@ -1,8 +1,11 @@
+import { useRef } from "preact/hooks";
 import { assertEmptyObject } from "../util/assert.js";
 import { OmitStrong } from "../util/types.js";
 import { useLinearNavigation, UseLinearNavigationParameters, UseLinearNavigationReturnType } from "./use-linear-navigation.js";
 import { useRovingTabIndex, useRovingTabIndexChild, UseRovingTabIndexChildInfo, UseRovingTabIndexChildParameters, UseRovingTabIndexChildReturnType, UseRovingTabIndexParameters, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
 import { useTypeaheadNavigation, useTypeaheadNavigationChild, UseTypeaheadNavigationChildParameters, UseTypeaheadNavigationChildReturnType, UseTypeaheadNavigationParameters, UseTypeaheadNavigationReturnType } from "./use-typeahead-navigation.js";
+import { h } from "preact";
+import { useMergedProps } from "../dom-helpers/use-merged-props.js";
 
 /**
  * 
@@ -77,17 +80,23 @@ export function useListNavigation<ParentOrChildElement extends Element, ChildEle
     ..._void1
 }: UseListNavigationParameters<ParentOrChildElement, ChildElement, M>): UseListNavigationReturnType<ParentOrChildElement, ChildElement> {
 
-    const rtir = useRovingTabIndex<ChildElement, M>({ managedChildrenReturn, rovingTabIndexParameters });
+    const { ...rtir } = useRovingTabIndex<ChildElement, M>({ managedChildrenReturn, rovingTabIndexParameters });
     const { rovingTabIndexReturn } = rtir;
-    const tnr = useTypeaheadNavigation<ParentOrChildElement, ChildElement>({ rovingTabIndexReturn, typeaheadNavigationParameters, });
-    const lnr = useLinearNavigation<ParentOrChildElement, ChildElement>({ rovingTabIndexReturn, linearNavigationParameters, });
+    const { propsStable: propsStableTN, ...tnr } = useTypeaheadNavigation<ParentOrChildElement, ChildElement>({ rovingTabIndexReturn, typeaheadNavigationParameters, });
+    const { propsStable: propsStableLN, ...lnr } = useLinearNavigation<ParentOrChildElement, ChildElement>({ rovingTabIndexReturn, linearNavigationParameters, });
 
     assertEmptyObject(_void1);
+
+    // Merge the props while keeping them stable
+    // (TODO: We run this merge logic every render but only need the first render's result because it's stable)
+    const p = useMergedProps(propsStableTN, propsStableLN);
+    const propsStable = useRef<h.JSX.HTMLAttributes<ParentOrChildElement>>(p)
 
     return {
         ...lnr,
         ...tnr,
-        ...rtir
+        ...rtir,
+        propsStable: propsStable.current
     }
 }
 
@@ -101,12 +110,13 @@ export function useListNavigationChild<ChildElement extends Element>({
     ..._void2
 }: UseListNavigationChildParameters<ChildElement>): UseListNavigationChildReturnType<ChildElement> {
 
-    const rticr = useRovingTabIndexChild<ChildElement>({ rovingTabIndexChildContext, rovingTabIndexChildParameters, managedChildParameters });
-    const tncr = useTypeaheadNavigationChild<ChildElement>({ refElementReturn, typeaheadNavigationChildContext, managedChildParameters, textContentParameters });
+    const { props, ...rticr } = useRovingTabIndexChild<ChildElement>({ rovingTabIndexChildContext, rovingTabIndexChildParameters, managedChildParameters });
+    const { ...tncr } = useTypeaheadNavigationChild<ChildElement>({ refElementReturn, typeaheadNavigationChildContext, managedChildParameters, textContentParameters });
 
     assertEmptyObject(_void2);
 
     return {
+        props,
         ...tncr,
         ...rticr
     }

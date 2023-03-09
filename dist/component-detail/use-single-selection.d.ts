@@ -61,6 +61,7 @@ export interface UseSingleSelectionChildParameters<E extends Element> {
     managedChildParameters: Pick<SelectableChildInfo<E>, "index">;
 }
 export interface UseSingleSelectionChildReturnType<E extends Element> extends UseChildrenHaveFocusChildReturnType<E> {
+    props: h.JSX.HTMLAttributes<E>;
     singleSelectionChildReturn: {
         selected: boolean;
         getSelected(): boolean;
@@ -74,7 +75,6 @@ export interface UseSingleSelectionChildReturnType<E extends Element> extends Us
         selectedOffset: number | null;
         getSelectedOffset: () => (number | null);
         setThisOneSelected: (event: Event) => void;
-        propsUnstable: h.JSX.HTMLAttributes<E>;
     };
     managedChildParameters: Pick<SelectableChildInfo<E>, "setLocalSelected">;
     pressParameters: Pick<UsePressParameters<E>["pressParameters"], "onPressSync">;

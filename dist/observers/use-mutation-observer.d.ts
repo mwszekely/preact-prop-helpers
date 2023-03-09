@@ -20,7 +20,6 @@ export interface UseMutationObserverParameters<E extends Element> extends UseRef
 export declare function useMutationObserver<E extends Element>({ refElementParameters, mutationObserverParameters: { attributeFilter, subtree, onChildList, characterDataOldValue, onCharacterData, onAttributes, attributeOldValue } }: UseMutationObserverParameters<E>): {
     refElementReturn: {
         getElement(): E | null;
-        propsStable: import("preact").JSX.HTMLAttributes<E>;
     };
     mutationObserverReturn: {};
 };

@@ -2,9 +2,9 @@
 import { cloneElement, h, VNode } from "preact";
 import { createPortal } from "preact/compat";
 import { useCallback, useLayoutEffect, useMemo } from "preact/hooks";
-import { generateRandomId } from "../preact-extensions/use-before-layout-effect.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useState } from "../preact-extensions/use-state.js";
+import { generateRandomId } from "../util/random-id.js";
 
 export interface UsePortalChildrenParameters {
     target: string | Element | null;

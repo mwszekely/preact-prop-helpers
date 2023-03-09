@@ -84,25 +84,20 @@ export function useGridNavigationSingleSelectionRow<RowElement extends Element, 
     rowAsParentOfCellsParameters,
     ..._void1
 }: UseGridNavigationSingleSelectionRowParameters<RowElement, CellElement, RM, CM>): UseGridNavigationSingleSelectionRowReturnType<RowElement, CellElement> {
-    const { managedChildParameters, hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ..._void3 }, singleSelectionChildReturn } = useSingleSelectionChild<RowElement>(rowAsChildOfGridParameters);
-    const { rowAsChildOfGridReturn: { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ..._void2 }, gridNavigationRowParameters, rovingTabIndexChildReturn, textContentReturn, pressParameters, ...void4 }, rowAsParentOfCellsReturn } = useGridNavigationRow<RowElement, CellElement, RM, CM>({ rowAsChildOfGridParameters, rowAsParentOfCellsParameters });
+    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ..._void3 }, ...ssr } = useSingleSelectionChild<RowElement>(rowAsChildOfGridParameters);
+    const { rowAsChildOfGridReturn: { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ..._void2 }, ...rowAsChildOfGridReturn }, rowAsParentOfCellsReturn } = useGridNavigationRow<RowElement, CellElement, RM, CM>({ rowAsChildOfGridParameters, rowAsParentOfCellsParameters });
     const onCurrentFocusedInnerChanged = useStableCallback<NonNullable<typeof ocfic2>>((focused, prevFocused, e) => { ocfic1?.(focused, prevFocused, e); ocfic2?.(focused, prevFocused, e); })
 
     assertEmptyObject(_void1);
     assertEmptyObject(_void2);
     assertEmptyObject(_void3);
-    assertEmptyObject(void4);
 
     return {
-        rowAsChildOfGridReturn: { 
-            pressParameters,
-            textContentReturn,
-            managedChildParameters, 
+        rowAsChildOfGridReturn: {
             hasCurrentFocusParameters: { onCurrentFocusedInnerChanged }, 
-            gridNavigationRowParameters,
-            rovingTabIndexChildReturn, 
-            singleSelectionChildReturn
-         },
+            ...ssr,
+            ...rowAsChildOfGridReturn
+        },
         rowAsParentOfCellsReturn
     }
 

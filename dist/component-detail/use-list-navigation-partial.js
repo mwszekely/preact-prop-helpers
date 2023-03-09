@@ -1,7 +1,9 @@
+import { useRef } from "preact/hooks";
 import { assertEmptyObject } from "../util/assert.js";
 import { useLinearNavigation } from "./use-linear-navigation.js";
 import { useRovingTabIndex, useRovingTabIndexChild } from "./use-roving-tabindex.js";
 import { useTypeaheadNavigation, useTypeaheadNavigationChild } from "./use-typeahead-navigation.js";
+import { useMergedProps } from "../dom-helpers/use-merged-props.js";
 /**
  *
  * TODO: This table was scrapped when this was changed to just accept a collator directly,
@@ -47,22 +49,28 @@ const _dummy = null;
  * Navigating forwards/backwards can be done with the arrow keys, Home/End keys, or any text for typeahead to focus the next item that matches.
  */
 export function useListNavigation({ linearNavigationParameters, typeaheadNavigationParameters, rovingTabIndexParameters, managedChildrenReturn, ..._void1 }) {
-    const rtir = useRovingTabIndex({ managedChildrenReturn, rovingTabIndexParameters });
+    const { ...rtir } = useRovingTabIndex({ managedChildrenReturn, rovingTabIndexParameters });
     const { rovingTabIndexReturn } = rtir;
-    const tnr = useTypeaheadNavigation({ rovingTabIndexReturn, typeaheadNavigationParameters, });
-    const lnr = useLinearNavigation({ rovingTabIndexReturn, linearNavigationParameters, });
+    const { propsStable: propsStableTN, ...tnr } = useTypeaheadNavigation({ rovingTabIndexReturn, typeaheadNavigationParameters, });
+    const { propsStable: propsStableLN, ...lnr } = useLinearNavigation({ rovingTabIndexReturn, linearNavigationParameters, });
     assertEmptyObject(_void1);
+    // Merge the props while keeping them stable
+    // (TODO: We run this merge logic every render but only need the first render's result because it's stable)
+    const p = useMergedProps(propsStableTN, propsStableLN);
+    const propsStable = useRef(p);
     return {
         ...lnr,
         ...tnr,
-        ...rtir
+        ...rtir,
+        propsStable: propsStable.current
     };
 }
 export function useListNavigationChild({ rovingTabIndexChildParameters, rovingTabIndexChildContext, typeaheadNavigationChildContext, managedChildParameters, refElementReturn, textContentParameters, ..._void2 }) {
-    const rticr = useRovingTabIndexChild({ rovingTabIndexChildContext, rovingTabIndexChildParameters, managedChildParameters });
-    const tncr = useTypeaheadNavigationChild({ refElementReturn, typeaheadNavigationChildContext, managedChildParameters, textContentParameters });
+    const { props, ...rticr } = useRovingTabIndexChild({ rovingTabIndexChildContext, rovingTabIndexChildParameters, managedChildParameters });
+    const { ...tncr } = useTypeaheadNavigationChild({ refElementReturn, typeaheadNavigationChildContext, managedChildParameters, textContentParameters });
     assertEmptyObject(_void2);
     return {
+        props,
         ...tncr,
         ...rticr
     };

@@ -42,7 +42,7 @@ export const DemoUseRovingTabIndex = memo(() => {
 
 
     const {
-        props,
+        propsStable,
         context,
         rovingTabIndexReturn: { setTabbableIndex },
         singleSelectionReturn: { changeSelectedIndex },
@@ -101,7 +101,7 @@ export const DemoUseRovingTabIndex = memo(() => {
 
             <SelectionModeContext.Provider value={selectionMode}>
                 <ListNavigationSingleSelectionChildContext.Provider value={context}>
-                    <ol start={0} {...props}>{useRearrangedChildren(jsxChildren)}</ol>
+                    <ol start={0} {...propsStable}>{useRearrangedChildren(jsxChildren)}</ol>
                 </ListNavigationSingleSelectionChildContext.Provider>
             </SelectionModeContext.Provider>
             {<div>Typeahead status: {typeaheadStatus}</div>}
@@ -116,9 +116,8 @@ interface CustomInfoType extends UseCompleteListNavigationChildInfo<HTMLLIElemen
 const SelectionModeContext = createContext("focus" as "focus" | "activation");
 const _Prefix = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
-    // FIXME: A hole in the array works for nagivation but not for sorting.
-    //if (index == 1)
-    //    return <li>(Item #${index} isn't rendered; it's a hole in the array)</li>;
+    if (index == 1)
+        return <li>(Item {index} is a <strong>hole in the array</strong> and does not exist)</li>;
 
     const selectionMode = useContext(SelectionModeContext);
     let disabled = (index == 6);
@@ -134,7 +133,7 @@ const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
 
     const {
         props,
-        rovingTabIndexChildReturn: { tabbable, propsUnstable: p2 },
+        rovingTabIndexChildReturn: { tabbable },
         singleSelectionChildReturn: { selected, selectedOffset },
         paginatedChildReturn: { hideBecausePaginated },
         staggeredChildReturn: { hideBecauseStaggered },
@@ -150,16 +149,16 @@ const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
         textContentParameters: { getText: useCallback((e) => { return e?.textContent ?? "" }, []) }
     });
 
-    const { pressReturn } = usePress<HTMLLIElement>({
+    const { pressReturn, props: propsPress } = usePress<HTMLLIElement>({
         refElementReturn,
         pressParameters: { ...pressParameters, focusSelf },
     });
 
-    const props2 = useMergedProps(props, pressReturn.propsUnstable);
+    const props2 = useMergedProps(props, propsPress);
 
     const text = `${randomWord} This is item #${index} (offset: ${selectedOffset}) ${hidden ? " (hidden)" : ""}${disabled ? " (disabled)" : ""}${selected ? " (selected)" : " (not selected)"} (${tabbable ? "Tabbable" : "Not tabbable"})`;
 
     return (
-        <li {...props2} style={{ opacity: hideBecausePaginated ? 0.25 : 1, transform: `translateX(${hideBecauseStaggered ? "50%" : "0%"})` }}>{text}<input {...useMergedProps(p2, { type: "number" }) as any} style={{ width: "5ch" }} /></li>
+        <li {...props2} style={{ opacity: hideBecausePaginated ? 0.25 : 1, transform: `translateX(${hideBecauseStaggered ? "50%" : "0%"})` }}>{text}<input {...useMergedProps({ type: "number", tabIndex: props.tabIndex }) as any} style={{ width: "5ch" }} /></li>
     )
 }));

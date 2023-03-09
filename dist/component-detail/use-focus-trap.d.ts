@@ -1,6 +1,7 @@
 import { h } from "preact";
-import { UseRefElementParameters, UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
-export interface UseFocusTrapParameters<SourceElement extends Element | null, PopupElement extends Element> extends UseRefElementParameters<PopupElement> {
+import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
+export interface UseFocusTrapParameters<SourceElement extends Element | null, PopupElement extends Element> {
+    refElementReturn: Pick<UseRefElementReturnType<NonNullable<PopupElement>>["refElementReturn"], "getElement">;
     focusTrapParameters: {
         /**
          * Whether or not the focus trap is currently active (or, when used as part of a larger component, whether it is activatable)
@@ -36,12 +37,11 @@ export interface UseFocusTrapParameters<SourceElement extends Element | null, Po
         focusOpener(lastFocused: SourceElement | null): void;
     };
 }
-export interface UseFocusTrapReturnType<E extends Element> extends UseRefElementReturnType<E> {
-    focusTrapReturn: {
-        propsUnstable: h.JSX.HTMLAttributes<E>;
-    };
+export interface UseFocusTrapReturnType<E extends Element> {
+    props: h.JSX.HTMLAttributes<E>;
+    focusTrapReturn: {};
 }
-export declare function useFocusTrap<SourceElement extends Element | null, PopupElement extends Element>({ focusTrapParameters: { onlyMoveFocus, trapActive, focusPopup: focusSelfUnstable, focusOpener: focusOpenerUnstable }, refElementParameters }: UseFocusTrapParameters<SourceElement, PopupElement>): UseFocusTrapReturnType<PopupElement>;
+export declare function useFocusTrap<SourceElement extends Element | null, PopupElement extends Element>({ focusTrapParameters: { onlyMoveFocus, trapActive, focusPopup: focusSelfUnstable, focusOpener: focusOpenerUnstable }, refElementReturn }: UseFocusTrapParameters<SourceElement, PopupElement>): UseFocusTrapReturnType<PopupElement>;
 /**
  * Returns the first focusable element contained within the given node, or null if none are found.
  * @param element

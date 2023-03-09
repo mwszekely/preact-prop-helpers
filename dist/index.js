@@ -18,12 +18,11 @@ export { useCompleteListNavigation, useCompleteListNavigationChild } from "./com
 export { useModal } from "./component-use/use-modal.js";
 export { setPressVibrate, usePress } from "./component-use/use-press.js";
 export { useRandomDualIds } from "./component-use/use-random-dual-ids.js";
-export { generateRandomId, useRandomId } from "./component-use/use-random-id.js";
+export { useRandomId } from "./component-use/use-random-id.js";
 export { useAsyncHandler } from "./dom-helpers/use-async-handler.js";
 export { getDocument, useDocumentClass } from "./dom-helpers/use-document-class.js";
 export { useDraggable } from "./dom-helpers/use-draggable.js";
 export { DroppableFileError, useDroppable } from "./dom-helpers/use-droppable.js";
-export { useElementSize } from "./dom-helpers/use-element-size.js";
 export { useGlobalHandler, useLocalHandler } from "./dom-helpers/use-event-handler.js";
 export { useHideScroll } from "./dom-helpers/use-hide-scroll.js";
 export { useImperativeProps } from "./dom-helpers/use-imperative-props.js";
@@ -36,6 +35,7 @@ export { useRefElement } from "./dom-helpers/use-ref-element.js";
 export { useTextContent } from "./dom-helpers/use-text-content.js";
 export { useActiveElement } from "./observers/use-active-element.js";
 export { useChildrenHaveFocus, useChildrenHaveFocusChild } from "./observers/use-children-have-focus.js";
+export { useElementSize } from "./observers/use-element-size.js";
 export { useHasCurrentFocus } from "./observers/use-has-current-focus.js";
 export { useHasLastFocus } from "./observers/use-has-last-focus.js";
 export { useLogicalDirection } from "./observers/use-logical-direction.js";
@@ -57,5 +57,7 @@ export { ProvideBatchedAnimationFrames, useAnimationFrame } from "./timing/use-a
 export { useInterval } from "./timing/use-interval.js";
 export { useTimeout } from "./timing/use-timeout.js";
 export { assertEmptyObject } from "./util/assert.js";
+export { asyncToSync } from "./util/async-to-sync.js";
 export { getBuildMode } from "./util/mode.js";
+export { generateRandomId } from "./util/random-id.js";
 //# sourceMappingURL=index.js.map

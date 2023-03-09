@@ -1,15 +1,12 @@
 import { h } from "preact";
 import { DismissListenerTypes, UseDismissParameters, UseDismissReturnType } from "../component-detail/use-dismiss.js";
 import { UseFocusTrapParameters, UseFocusTrapReturnType } from "../component-detail/use-focus-trap.js";
-import { OmitStrong } from "../util/types.js";
 export interface UseModalParameters<Listeners extends DismissListenerTypes> extends UseDismissParameters<Listeners> {
     focusTrapParameters: UseFocusTrapParameters<any, any>["focusTrapParameters"];
 }
 export interface UseModalReturnType<FocusContainerElement extends Element | null, SourceElement extends Element | null, PopupElement extends Element> extends UseDismissReturnType<SourceElement, PopupElement> {
     propsFocusContainer: h.JSX.HTMLAttributes<NonNullable<FocusContainerElement>>;
-    propsPopup: h.JSX.HTMLAttributes<PopupElement>;
-    propsSource: h.JSX.HTMLAttributes<NonNullable<SourceElement>>;
-    focusTrapReturn: OmitStrong<UseFocusTrapReturnType<NonNullable<FocusContainerElement>>["focusTrapReturn"], "propsUnstable">;
+    focusTrapReturn: UseFocusTrapReturnType<NonNullable<FocusContainerElement>>["focusTrapReturn"];
 }
 /**
  * Combines dismissal hooks and focus trap hooks into one.

@@ -77,6 +77,8 @@ export interface UseSingleSelectionChildParameters<E extends Element> {
 }
 
 export interface UseSingleSelectionChildReturnType<E extends Element> extends UseChildrenHaveFocusChildReturnType<E> {
+    props: h.JSX.HTMLAttributes<E>;
+
     singleSelectionChildReturn: {
         // These two are already available as managedChild info,
         // but we're keeping them because RTI does the same thing, and it's convenient.
@@ -96,7 +98,6 @@ export interface UseSingleSelectionChildReturnType<E extends Element> extends Us
         // Used to programmatically set this as the selected element;
         // it requests the parent to actually change the numeric index to this one's.
         setThisOneSelected: (event: Event) => void;
-        propsUnstable: h.JSX.HTMLAttributes<E>;
     }
     managedChildParameters: Pick<SelectableChildInfo<E>, "setLocalSelected">;
     pressParameters: Pick<UsePressParameters<E>["pressParameters"], "onPressSync">;
@@ -225,10 +226,10 @@ export function useSingleSelectionChild<ChildElement extends Element>(args: UseS
             }),
             getSelectedOffset: getDirection,
             selectedOffset: direction,
-            getSelected: getLocalSelected,
-            propsUnstable: ariaPropName == null || selectionMode == "disabled" ? {} : { 
-                [`${propParts[0]}-${propParts[1]}`]: (localSelected? (propParts[1] == "current"? `${propParts[2]}` : `true`) : "false") 
-            }
+            getSelected: getLocalSelected
+        },
+        props: ariaPropName == null || selectionMode == "disabled" ? {} : { 
+            [`${propParts[0]}-${propParts[1]}`]: (localSelected? (propParts[1] == "current"? `${propParts[2]}` : `true`) : "false") 
         },
         pressParameters: { onPressSync },
         hasCurrentFocusParameters: { onCurrentFocusedInnerChanged }

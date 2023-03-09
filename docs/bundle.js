@@ -1,13 +1,13 @@
-var bundle = (function (exports) {
+(function () {
   'use strict';
 
-  var n,l$1,u$1,t$1,r$2,o$2,f$1,e$1={},c$1=[],s$1=/acit|ex(?:s|g|n|p|$)|rph|grid|ows|mnc|ntw|ine[ch]|zoo|^ord|itera/i;function a$1(n,l){for(var u in l)n[u]=l[u];return n}function h$1(n){var l=n.parentNode;l&&l.removeChild(n);}function v$1(l,u,i){var t,r,o,f={};for(o in u)"key"==o?t=u[o]:"ref"==o?r=u[o]:f[o]=u[o];if(arguments.length>2&&(f.children=arguments.length>3?n.call(arguments,2):i),"function"==typeof l&&null!=l.defaultProps)for(o in l.defaultProps)void 0===f[o]&&(f[o]=l.defaultProps[o]);return y$1(l,f,t,r,null)}function y$1(n,i,t,r,o){var f={type:n,props:i,key:t,ref:r,__k:null,__:null,__b:0,__e:null,__d:void 0,__c:null,__h:null,constructor:void 0,__v:null==o?++u$1:o};return null==o&&null!=l$1.vnode&&l$1.vnode(f),f}function d$1(n){return n.children}function _$2(n,l){this.props=n,this.context=l;}function k$1(n,l){if(null==l)return n.__?k$1(n.__,n.__.__k.indexOf(n)+1):null;for(var u;l<n.__k.length;l++)if(null!=(u=n.__k[l])&&null!=u.__e)return u.__e;return "function"==typeof n.type?k$1(n):null}function b$1(n){var l,u;if(null!=(n=n.__)&&null!=n.__c){for(n.__e=n.__c.base=null,l=0;l<n.__k.length;l++)if(null!=(u=n.__k[l])&&null!=u.__e){n.__e=n.__c.base=u.__e;break}return b$1(n)}}function g$2(n){(!n.__d&&(n.__d=!0)&&t$1.push(n)&&!m$1.__r++||r$2!==l$1.debounceRendering)&&((r$2=l$1.debounceRendering)||o$2)(m$1);}function m$1(){var n,l,u,i,r,o,f,e;for(t$1.sort(function(n,l){return n.__v.__b-l.__v.__b});n=t$1.shift();)n.__d&&(l=t$1.length,i=void 0,r=void 0,f=(o=(u=n).__v).__e,(e=u.__P)&&(i=[],(r=a$1({},o)).__v=o.__v+1,z$2(e,o,r,u.__n,void 0!==e.ownerSVGElement,null!=o.__h?[f]:null,i,null==f?k$1(o):f,o.__h),L$1(i,o),o.__e!=f&&b$1(o)),t$1.length>l&&t$1.sort(function(n,l){return n.__v.__b-l.__v.__b}));m$1.__r=0;}function w$2(n,l,u,i,t,r,o,f,s,a){var h,v,p,_,b,g,m,w=i&&i.__k||c$1,A=w.length;for(u.__k=[],h=0;h<l.length;h++)if(null!=(_=u.__k[h]=null==(_=l[h])||"boolean"==typeof _?null:"string"==typeof _||"number"==typeof _||"bigint"==typeof _?y$1(null,_,null,null,_):Array.isArray(_)?y$1(d$1,{children:_},null,null,null):_.__b>0?y$1(_.type,_.props,_.key,_.ref?_.ref:null,_.__v):_)){if(_.__=u,_.__b=u.__b+1,null===(p=w[h])||p&&_.key==p.key&&_.type===p.type)w[h]=void 0;else for(v=0;v<A;v++){if((p=w[v])&&_.key==p.key&&_.type===p.type){w[v]=void 0;break}p=null;}z$2(n,_,p=p||e$1,t,r,o,f,s,a),b=_.__e,(v=_.ref)&&p.ref!=v&&(m||(m=[]),p.ref&&m.push(p.ref,null,_),m.push(v,_.__c||b,_)),null!=b?(null==g&&(g=b),"function"==typeof _.type&&_.__k===p.__k?_.__d=s=x$1(_,s,n):s=P$1(n,_,p,w,b,s),"function"==typeof u.type&&(u.__d=s)):s&&p.__e==s&&s.parentNode!=n&&(s=k$1(p));}for(u.__e=g,h=A;h--;)null!=w[h]&&("function"==typeof u.type&&null!=w[h].__e&&w[h].__e==u.__d&&(u.__d=C$1(i).nextSibling),O(w[h],w[h]));if(m)for(h=0;h<m.length;h++)N(m[h],m[++h],m[++h]);}function x$1(n,l,u){for(var i,t=n.__k,r=0;t&&r<t.length;r++)(i=t[r])&&(i.__=n,l="function"==typeof i.type?x$1(i,l,u):P$1(u,i,i,t,i.__e,l));return l}function A(n,l){return l=l||[],null==n||"boolean"==typeof n||(Array.isArray(n)?n.some(function(n){A(n,l);}):l.push(n)),l}function P$1(n,l,u,i,t,r){var o,f,e;if(void 0!==l.__d)o=l.__d,l.__d=void 0;else if(null==u||t!=r||null==t.parentNode)n:if(null==r||r.parentNode!==n)n.appendChild(t),o=null;else {for(f=r,e=0;(f=f.nextSibling)&&e<i.length;e+=1)if(f==t)break n;n.insertBefore(t,r),o=r;}return void 0!==o?o:t.nextSibling}function C$1(n){var l,u,i;if(null==n.type||"string"==typeof n.type)return n.__e;if(n.__k)for(l=n.__k.length-1;l>=0;l--)if((u=n.__k[l])&&(i=C$1(u)))return i;return null}function $$1(n,l,u,i,t){var r;for(r in u)"children"===r||"key"===r||r in l||I$1(n,r,null,u[r],i);for(r in l)t&&"function"!=typeof l[r]||"children"===r||"key"===r||"value"===r||"checked"===r||u[r]===l[r]||I$1(n,r,l[r],u[r],i);}function H$1(n,l,u){"-"===l[0]?n.setProperty(l,null==u?"":u):n[l]=null==u?"":"number"!=typeof u||s$1.test(l)?u:u+"px";}function I$1(n,l,u,i,t){var r;n:if("style"===l)if("string"==typeof u)n.style.cssText=u;else {if("string"==typeof i&&(n.style.cssText=i=""),i)for(l in i)u&&l in u||H$1(n.style,l,"");if(u)for(l in u)i&&u[l]===i[l]||H$1(n.style,l,u[l]);}else if("o"===l[0]&&"n"===l[1])r=l!==(l=l.replace(/Capture$/,"")),l=l.toLowerCase()in n?l.toLowerCase().slice(2):l.slice(2),n.l||(n.l={}),n.l[l+r]=u,u?i||n.addEventListener(l,r?j$2:T$2,r):n.removeEventListener(l,r?j$2:T$2,r);else if("dangerouslySetInnerHTML"!==l){if(t)l=l.replace(/xlink(H|:h)/,"h").replace(/sName$/,"s");else if("width"!==l&&"height"!==l&&"href"!==l&&"list"!==l&&"form"!==l&&"tabIndex"!==l&&"download"!==l&&l in n)try{n[l]=null==u?"":u;break n}catch(n){}"function"==typeof u||(null==u||!1===u&&-1==l.indexOf("-")?n.removeAttribute(l):n.setAttribute(l,u));}}function T$2(n){return this.l[n.type+!1](l$1.event?l$1.event(n):n)}function j$2(n){return this.l[n.type+!0](l$1.event?l$1.event(n):n)}function z$2(n,u,i,t,r,o,f,e,c){var s,h,v,y,p,k,b,g,m,x,A,P,C,$,H,I=u.type;if(void 0!==u.constructor)return null;null!=i.__h&&(c=i.__h,e=u.__e=i.__e,u.__h=null,o=[e]),(s=l$1.__b)&&s(u);try{n:if("function"==typeof I){if(g=u.props,m=(s=I.contextType)&&t[s.__c],x=s?m?m.props.value:s.__:t,i.__c?b=(h=u.__c=i.__c).__=h.__E:("prototype"in I&&I.prototype.render?u.__c=h=new I(g,x):(u.__c=h=new _$2(g,x),h.constructor=I,h.render=S),m&&m.sub(h),h.props=g,h.state||(h.state={}),h.context=x,h.__n=t,v=h.__d=!0,h.__h=[],h._sb=[]),null==h.__s&&(h.__s=h.state),null!=I.getDerivedStateFromProps&&(h.__s==h.state&&(h.__s=a$1({},h.__s)),a$1(h.__s,I.getDerivedStateFromProps(g,h.__s))),y=h.props,p=h.state,h.__v=u,v)null==I.getDerivedStateFromProps&&null!=h.componentWillMount&&h.componentWillMount(),null!=h.componentDidMount&&h.__h.push(h.componentDidMount);else {if(null==I.getDerivedStateFromProps&&g!==y&&null!=h.componentWillReceiveProps&&h.componentWillReceiveProps(g,x),!h.__e&&null!=h.shouldComponentUpdate&&!1===h.shouldComponentUpdate(g,h.__s,x)||u.__v===i.__v){for(u.__v!==i.__v&&(h.props=g,h.state=h.__s,h.__d=!1),h.__e=!1,u.__e=i.__e,u.__k=i.__k,u.__k.forEach(function(n){n&&(n.__=u);}),A=0;A<h._sb.length;A++)h.__h.push(h._sb[A]);h._sb=[],h.__h.length&&f.push(h);break n}null!=h.componentWillUpdate&&h.componentWillUpdate(g,h.__s,x),null!=h.componentDidUpdate&&h.__h.push(function(){h.componentDidUpdate(y,p,k);});}if(h.context=x,h.props=g,h.__P=n,P=l$1.__r,C=0,"prototype"in I&&I.prototype.render){for(h.state=h.__s,h.__d=!1,P&&P(u),s=h.render(h.props,h.state,h.context),$=0;$<h._sb.length;$++)h.__h.push(h._sb[$]);h._sb=[];}else do{h.__d=!1,P&&P(u),s=h.render(h.props,h.state,h.context),h.state=h.__s;}while(h.__d&&++C<25);h.state=h.__s,null!=h.getChildContext&&(t=a$1(a$1({},t),h.getChildContext())),v||null==h.getSnapshotBeforeUpdate||(k=h.getSnapshotBeforeUpdate(y,p)),H=null!=s&&s.type===d$1&&null==s.key?s.props.children:s,w$2(n,Array.isArray(H)?H:[H],u,i,t,r,o,f,e,c),h.base=u.__e,u.__h=null,h.__h.length&&f.push(h),b&&(h.__E=h.__=null),h.__e=!1;}else null==o&&u.__v===i.__v?(u.__k=i.__k,u.__e=i.__e):u.__e=M(i.__e,u,i,t,r,o,f,c);(s=l$1.diffed)&&s(u);}catch(n){u.__v=null,(c||null!=o)&&(u.__e=e,u.__h=!!c,o[o.indexOf(e)]=null),l$1.__e(n,u,i);}}function L$1(n,u){l$1.__c&&l$1.__c(u,n),n.some(function(u){try{n=u.__h,u.__h=[],n.some(function(n){n.call(u);});}catch(n){l$1.__e(n,u.__v);}});}function M(l,u,i,t,r,o,f,c){var s,a,v,y=i.props,p=u.props,d=u.type,_=0;if("svg"===d&&(r=!0),null!=o)for(;_<o.length;_++)if((s=o[_])&&"setAttribute"in s==!!d&&(d?s.localName===d:3===s.nodeType)){l=s,o[_]=null;break}if(null==l){if(null===d)return document.createTextNode(p);l=r?document.createElementNS("http://www.w3.org/2000/svg",d):document.createElement(d,p.is&&p),o=null,c=!1;}if(null===d)y===p||c&&l.data===p||(l.data=p);else {if(o=o&&n.call(l.childNodes),a=(y=i.props||e$1).dangerouslySetInnerHTML,v=p.dangerouslySetInnerHTML,!c){if(null!=o)for(y={},_=0;_<l.attributes.length;_++)y[l.attributes[_].name]=l.attributes[_].value;(v||a)&&(v&&(a&&v.__html==a.__html||v.__html===l.innerHTML)||(l.innerHTML=v&&v.__html||""));}if($$1(l,p,y,r,c),v)u.__k=[];else if(_=u.props.children,w$2(l,Array.isArray(_)?_:[_],u,i,t,r&&"foreignObject"!==d,o,f,o?o[0]:i.__k&&k$1(i,0),c),null!=o)for(_=o.length;_--;)null!=o[_]&&h$1(o[_]);c||("value"in p&&void 0!==(_=p.value)&&(_!==l.value||"progress"===d&&!_||"option"===d&&_!==y.value)&&I$1(l,"value",_,y.value,!1),"checked"in p&&void 0!==(_=p.checked)&&_!==l.checked&&I$1(l,"checked",_,y.checked,!1));}return l}function N(n,u,i){try{"function"==typeof n?n(u):n.current=u;}catch(n){l$1.__e(n,i);}}function O(n,u,i){var t,r;if(l$1.unmount&&l$1.unmount(n),(t=n.ref)&&(t.current&&t.current!==n.__e||N(t,null,u)),null!=(t=n.__c)){if(t.componentWillUnmount)try{t.componentWillUnmount();}catch(n){l$1.__e(n,u);}t.base=t.__P=null,n.__c=void 0;}if(t=n.__k)for(r=0;r<t.length;r++)t[r]&&O(t[r],u,i||"function"!=typeof n.type);i||null==n.__e||h$1(n.__e),n.__=n.__e=n.__d=void 0;}function S(n,l,u){return this.constructor(n,u)}function q$1(u,i,t){var r,o,f;l$1.__&&l$1.__(u,i),o=(r="function"==typeof t)?null:t&&t.__k||i.__k,f=[],z$2(i,u=(!r&&t||i).__k=v$1(d$1,null,[u]),o||e$1,e$1,void 0!==i.ownerSVGElement,!r&&t?[t]:o?null:i.firstChild?n.call(i.childNodes):null,f,!r&&t?t:o?o.__e:i.firstChild,r),L$1(f,u);}function D$1(l,u,i){var t,r,o,f=a$1({},l.props);for(o in u)"key"==o?t=u[o]:"ref"==o?r=u[o]:f[o]=u[o];return arguments.length>2&&(f.children=arguments.length>3?n.call(arguments,2):i),y$1(l.type,f,t||l.key,r||l.ref,null)}function E(n,l){var u={__c:l="__cC"+f$1++,__:n,Consumer:function(n,l){return n.children(l)},Provider:function(n){var u,i;return this.getChildContext||(u=[],(i={})[l]=this,this.getChildContext=function(){return i},this.shouldComponentUpdate=function(n){this.props.value!==n.value&&u.some(function(n){n.__e=!0,g$2(n);});},this.sub=function(n){u.push(n);var l=n.componentWillUnmount;n.componentWillUnmount=function(){u.splice(u.indexOf(n),1),l&&l.call(n);};}),n.children}};return u.Provider.__=u.Consumer.contextType=u}n=c$1.slice,l$1={__e:function(n,l,u,i){for(var t,r,o;l=l.__;)if((t=l.__c)&&!t.__)try{if((r=t.constructor)&&null!=r.getDerivedStateFromError&&(t.setState(r.getDerivedStateFromError(n)),o=t.__d),null!=t.componentDidCatch&&(t.componentDidCatch(n,i||{}),o=t.__d),o)return t.__E=t}catch(l){n=l;}throw n}},u$1=0,_$2.prototype.setState=function(n,l){var u;u=null!=this.__s&&this.__s!==this.state?this.__s:this.__s=a$1({},this.state),"function"==typeof n&&(n=n(a$1({},u),this.props)),n&&a$1(u,n),null!=n&&this.__v&&(l&&this._sb.push(l),g$2(this));},_$2.prototype.forceUpdate=function(n){this.__v&&(this.__e=!0,n&&this.__h.push(n),g$2(this));},_$2.prototype.render=d$1,t$1=[],o$2="function"==typeof Promise?Promise.prototype.then.bind(Promise.resolve()):setTimeout,m$1.__r=0,f$1=0;
+  var n,l$1,u$1,t$1,r$2,o$2,f$1,e$1={},c$1=[],s$1=/acit|ex(?:s|g|n|p|$)|rph|grid|ows|mnc|ntw|ine[ch]|zoo|^ord|itera/i;function a$1(n,l){for(var u in l)n[u]=l[u];return n}function h$1(n){var l=n.parentNode;l&&l.removeChild(n);}function v$1(l,u,i){var t,r,o,f={};for(o in u)"key"==o?t=u[o]:"ref"==o?r=u[o]:f[o]=u[o];if(arguments.length>2&&(f.children=arguments.length>3?n.call(arguments,2):i),"function"==typeof l&&null!=l.defaultProps)for(o in l.defaultProps)void 0===f[o]&&(f[o]=l.defaultProps[o]);return y$1(l,f,t,r,null)}function y$1(n,i,t,r,o){var f={type:n,props:i,key:t,ref:r,__k:null,__:null,__b:0,__e:null,__d:void 0,__c:null,__h:null,constructor:void 0,__v:null==o?++u$1:o};return null==o&&null!=l$1.vnode&&l$1.vnode(f),f}function d$1(n){return n.children}function _$2(n,l){this.props=n,this.context=l;}function k$2(n,l){if(null==l)return n.__?k$2(n.__,n.__.__k.indexOf(n)+1):null;for(var u;l<n.__k.length;l++)if(null!=(u=n.__k[l])&&null!=u.__e)return u.__e;return "function"==typeof n.type?k$2(n):null}function b$1(n){var l,u;if(null!=(n=n.__)&&null!=n.__c){for(n.__e=n.__c.base=null,l=0;l<n.__k.length;l++)if(null!=(u=n.__k[l])&&null!=u.__e){n.__e=n.__c.base=u.__e;break}return b$1(n)}}function g$2(n){(!n.__d&&(n.__d=!0)&&t$1.push(n)&&!m$1.__r++||r$2!==l$1.debounceRendering)&&((r$2=l$1.debounceRendering)||o$2)(m$1);}function m$1(){var n,l,u,i,r,o,f,e;for(t$1.sort(function(n,l){return n.__v.__b-l.__v.__b});n=t$1.shift();)n.__d&&(l=t$1.length,i=void 0,r=void 0,f=(o=(u=n).__v).__e,(e=u.__P)&&(i=[],(r=a$1({},o)).__v=o.__v+1,z$2(e,o,r,u.__n,void 0!==e.ownerSVGElement,null!=o.__h?[f]:null,i,null==f?k$2(o):f,o.__h),L$1(i,o),o.__e!=f&&b$1(o)),t$1.length>l&&t$1.sort(function(n,l){return n.__v.__b-l.__v.__b}));m$1.__r=0;}function w$2(n,l,u,i,t,r,o,f,s,a){var h,v,p,_,b,g,m,w=i&&i.__k||c$1,A=w.length;for(u.__k=[],h=0;h<l.length;h++)if(null!=(_=u.__k[h]=null==(_=l[h])||"boolean"==typeof _?null:"string"==typeof _||"number"==typeof _||"bigint"==typeof _?y$1(null,_,null,null,_):Array.isArray(_)?y$1(d$1,{children:_},null,null,null):_.__b>0?y$1(_.type,_.props,_.key,_.ref?_.ref:null,_.__v):_)){if(_.__=u,_.__b=u.__b+1,null===(p=w[h])||p&&_.key==p.key&&_.type===p.type)w[h]=void 0;else for(v=0;v<A;v++){if((p=w[v])&&_.key==p.key&&_.type===p.type){w[v]=void 0;break}p=null;}z$2(n,_,p=p||e$1,t,r,o,f,s,a),b=_.__e,(v=_.ref)&&p.ref!=v&&(m||(m=[]),p.ref&&m.push(p.ref,null,_),m.push(v,_.__c||b,_)),null!=b?(null==g&&(g=b),"function"==typeof _.type&&_.__k===p.__k?_.__d=s=x$1(_,s,n):s=P$1(n,_,p,w,b,s),"function"==typeof u.type&&(u.__d=s)):s&&p.__e==s&&s.parentNode!=n&&(s=k$2(p));}for(u.__e=g,h=A;h--;)null!=w[h]&&("function"==typeof u.type&&null!=w[h].__e&&w[h].__e==u.__d&&(u.__d=C$1(i).nextSibling),O(w[h],w[h]));if(m)for(h=0;h<m.length;h++)N$1(m[h],m[++h],m[++h]);}function x$1(n,l,u){for(var i,t=n.__k,r=0;t&&r<t.length;r++)(i=t[r])&&(i.__=n,l="function"==typeof i.type?x$1(i,l,u):P$1(u,i,i,t,i.__e,l));return l}function A$1(n,l){return l=l||[],null==n||"boolean"==typeof n||(Array.isArray(n)?n.some(function(n){A$1(n,l);}):l.push(n)),l}function P$1(n,l,u,i,t,r){var o,f,e;if(void 0!==l.__d)o=l.__d,l.__d=void 0;else if(null==u||t!=r||null==t.parentNode)n:if(null==r||r.parentNode!==n)n.appendChild(t),o=null;else {for(f=r,e=0;(f=f.nextSibling)&&e<i.length;e+=1)if(f==t)break n;n.insertBefore(t,r),o=r;}return void 0!==o?o:t.nextSibling}function C$1(n){var l,u,i;if(null==n.type||"string"==typeof n.type)return n.__e;if(n.__k)for(l=n.__k.length-1;l>=0;l--)if((u=n.__k[l])&&(i=C$1(u)))return i;return null}function $$1(n,l,u,i,t){var r;for(r in u)"children"===r||"key"===r||r in l||I$1(n,r,null,u[r],i);for(r in l)t&&"function"!=typeof l[r]||"children"===r||"key"===r||"value"===r||"checked"===r||u[r]===l[r]||I$1(n,r,l[r],u[r],i);}function H$1(n,l,u){"-"===l[0]?n.setProperty(l,null==u?"":u):n[l]=null==u?"":"number"!=typeof u||s$1.test(l)?u:u+"px";}function I$1(n,l,u,i,t){var r;n:if("style"===l)if("string"==typeof u)n.style.cssText=u;else {if("string"==typeof i&&(n.style.cssText=i=""),i)for(l in i)u&&l in u||H$1(n.style,l,"");if(u)for(l in u)i&&u[l]===i[l]||H$1(n.style,l,u[l]);}else if("o"===l[0]&&"n"===l[1])r=l!==(l=l.replace(/Capture$/,"")),l=l.toLowerCase()in n?l.toLowerCase().slice(2):l.slice(2),n.l||(n.l={}),n.l[l+r]=u,u?i||n.addEventListener(l,r?j$2:T$2,r):n.removeEventListener(l,r?j$2:T$2,r);else if("dangerouslySetInnerHTML"!==l){if(t)l=l.replace(/xlink(H|:h)/,"h").replace(/sName$/,"s");else if("width"!==l&&"height"!==l&&"href"!==l&&"list"!==l&&"form"!==l&&"tabIndex"!==l&&"download"!==l&&l in n)try{n[l]=null==u?"":u;break n}catch(n){}"function"==typeof u||(null==u||!1===u&&-1==l.indexOf("-")?n.removeAttribute(l):n.setAttribute(l,u));}}function T$2(n){return this.l[n.type+!1](l$1.event?l$1.event(n):n)}function j$2(n){return this.l[n.type+!0](l$1.event?l$1.event(n):n)}function z$2(n,u,i,t,r,o,f,e,c){var s,h,v,y,p,k,b,g,m,x,A,P,C,$,H,I=u.type;if(void 0!==u.constructor)return null;null!=i.__h&&(c=i.__h,e=u.__e=i.__e,u.__h=null,o=[e]),(s=l$1.__b)&&s(u);try{n:if("function"==typeof I){if(g=u.props,m=(s=I.contextType)&&t[s.__c],x=s?m?m.props.value:s.__:t,i.__c?b=(h=u.__c=i.__c).__=h.__E:("prototype"in I&&I.prototype.render?u.__c=h=new I(g,x):(u.__c=h=new _$2(g,x),h.constructor=I,h.render=S),m&&m.sub(h),h.props=g,h.state||(h.state={}),h.context=x,h.__n=t,v=h.__d=!0,h.__h=[],h._sb=[]),null==h.__s&&(h.__s=h.state),null!=I.getDerivedStateFromProps&&(h.__s==h.state&&(h.__s=a$1({},h.__s)),a$1(h.__s,I.getDerivedStateFromProps(g,h.__s))),y=h.props,p=h.state,h.__v=u,v)null==I.getDerivedStateFromProps&&null!=h.componentWillMount&&h.componentWillMount(),null!=h.componentDidMount&&h.__h.push(h.componentDidMount);else {if(null==I.getDerivedStateFromProps&&g!==y&&null!=h.componentWillReceiveProps&&h.componentWillReceiveProps(g,x),!h.__e&&null!=h.shouldComponentUpdate&&!1===h.shouldComponentUpdate(g,h.__s,x)||u.__v===i.__v){for(u.__v!==i.__v&&(h.props=g,h.state=h.__s,h.__d=!1),h.__e=!1,u.__e=i.__e,u.__k=i.__k,u.__k.forEach(function(n){n&&(n.__=u);}),A=0;A<h._sb.length;A++)h.__h.push(h._sb[A]);h._sb=[],h.__h.length&&f.push(h);break n}null!=h.componentWillUpdate&&h.componentWillUpdate(g,h.__s,x),null!=h.componentDidUpdate&&h.__h.push(function(){h.componentDidUpdate(y,p,k);});}if(h.context=x,h.props=g,h.__P=n,P=l$1.__r,C=0,"prototype"in I&&I.prototype.render){for(h.state=h.__s,h.__d=!1,P&&P(u),s=h.render(h.props,h.state,h.context),$=0;$<h._sb.length;$++)h.__h.push(h._sb[$]);h._sb=[];}else do{h.__d=!1,P&&P(u),s=h.render(h.props,h.state,h.context),h.state=h.__s;}while(h.__d&&++C<25);h.state=h.__s,null!=h.getChildContext&&(t=a$1(a$1({},t),h.getChildContext())),v||null==h.getSnapshotBeforeUpdate||(k=h.getSnapshotBeforeUpdate(y,p)),H=null!=s&&s.type===d$1&&null==s.key?s.props.children:s,w$2(n,Array.isArray(H)?H:[H],u,i,t,r,o,f,e,c),h.base=u.__e,u.__h=null,h.__h.length&&f.push(h),b&&(h.__E=h.__=null),h.__e=!1;}else null==o&&u.__v===i.__v?(u.__k=i.__k,u.__e=i.__e):u.__e=M(i.__e,u,i,t,r,o,f,c);(s=l$1.diffed)&&s(u);}catch(n){u.__v=null,(c||null!=o)&&(u.__e=e,u.__h=!!c,o[o.indexOf(e)]=null),l$1.__e(n,u,i);}}function L$1(n,u){l$1.__c&&l$1.__c(u,n),n.some(function(u){try{n=u.__h,u.__h=[],n.some(function(n){n.call(u);});}catch(n){l$1.__e(n,u.__v);}});}function M(l,u,i,t,r,o,f,c){var s,a,v,y=i.props,p=u.props,d=u.type,_=0;if("svg"===d&&(r=!0),null!=o)for(;_<o.length;_++)if((s=o[_])&&"setAttribute"in s==!!d&&(d?s.localName===d:3===s.nodeType)){l=s,o[_]=null;break}if(null==l){if(null===d)return document.createTextNode(p);l=r?document.createElementNS("http://www.w3.org/2000/svg",d):document.createElement(d,p.is&&p),o=null,c=!1;}if(null===d)y===p||c&&l.data===p||(l.data=p);else {if(o=o&&n.call(l.childNodes),a=(y=i.props||e$1).dangerouslySetInnerHTML,v=p.dangerouslySetInnerHTML,!c){if(null!=o)for(y={},_=0;_<l.attributes.length;_++)y[l.attributes[_].name]=l.attributes[_].value;(v||a)&&(v&&(a&&v.__html==a.__html||v.__html===l.innerHTML)||(l.innerHTML=v&&v.__html||""));}if($$1(l,p,y,r,c),v)u.__k=[];else if(_=u.props.children,w$2(l,Array.isArray(_)?_:[_],u,i,t,r&&"foreignObject"!==d,o,f,o?o[0]:i.__k&&k$2(i,0),c),null!=o)for(_=o.length;_--;)null!=o[_]&&h$1(o[_]);c||("value"in p&&void 0!==(_=p.value)&&(_!==l.value||"progress"===d&&!_||"option"===d&&_!==y.value)&&I$1(l,"value",_,y.value,!1),"checked"in p&&void 0!==(_=p.checked)&&_!==l.checked&&I$1(l,"checked",_,y.checked,!1));}return l}function N$1(n,u,i){try{"function"==typeof n?n(u):n.current=u;}catch(n){l$1.__e(n,i);}}function O(n,u,i){var t,r;if(l$1.unmount&&l$1.unmount(n),(t=n.ref)&&(t.current&&t.current!==n.__e||N$1(t,null,u)),null!=(t=n.__c)){if(t.componentWillUnmount)try{t.componentWillUnmount();}catch(n){l$1.__e(n,u);}t.base=t.__P=null,n.__c=void 0;}if(t=n.__k)for(r=0;r<t.length;r++)t[r]&&O(t[r],u,i||"function"!=typeof n.type);i||null==n.__e||h$1(n.__e),n.__=n.__e=n.__d=void 0;}function S(n,l,u){return this.constructor(n,u)}function q$1(u,i,t){var r,o,f;l$1.__&&l$1.__(u,i),o=(r="function"==typeof t)?null:t&&t.__k||i.__k,f=[],z$2(i,u=(!r&&t||i).__k=v$1(d$1,null,[u]),o||e$1,e$1,void 0!==i.ownerSVGElement,!r&&t?[t]:o?null:i.firstChild?n.call(i.childNodes):null,f,!r&&t?t:o?o.__e:i.firstChild,r),L$1(f,u);}function D$1(l,u,i){var t,r,o,f=a$1({},l.props);for(o in u)"key"==o?t=u[o]:"ref"==o?r=u[o]:f[o]=u[o];return arguments.length>2&&(f.children=arguments.length>3?n.call(arguments,2):i),y$1(l.type,f,t||l.key,r||l.ref,null)}function E(n,l){var u={__c:l="__cC"+f$1++,__:n,Consumer:function(n,l){return n.children(l)},Provider:function(n){var u,i;return this.getChildContext||(u=[],(i={})[l]=this,this.getChildContext=function(){return i},this.shouldComponentUpdate=function(n){this.props.value!==n.value&&u.some(function(n){n.__e=!0,g$2(n);});},this.sub=function(n){u.push(n);var l=n.componentWillUnmount;n.componentWillUnmount=function(){u.splice(u.indexOf(n),1),l&&l.call(n);};}),n.children}};return u.Provider.__=u.Consumer.contextType=u}n=c$1.slice,l$1={__e:function(n,l,u,i){for(var t,r,o;l=l.__;)if((t=l.__c)&&!t.__)try{if((r=t.constructor)&&null!=r.getDerivedStateFromError&&(t.setState(r.getDerivedStateFromError(n)),o=t.__d),null!=t.componentDidCatch&&(t.componentDidCatch(n,i||{}),o=t.__d),o)return t.__E=t}catch(l){n=l;}throw n}},u$1=0,_$2.prototype.setState=function(n,l){var u;u=null!=this.__s&&this.__s!==this.state?this.__s:this.__s=a$1({},this.state),"function"==typeof n&&(n=n(a$1({},u),this.props)),n&&a$1(u,n),null!=n&&this.__v&&(l&&this._sb.push(l),g$2(this));},_$2.prototype.forceUpdate=function(n){this.__v&&(this.__e=!0,n&&this.__h.push(n),g$2(this));},_$2.prototype.render=d$1,t$1=[],o$2="function"==typeof Promise?Promise.prototype.then.bind(Promise.resolve()):setTimeout,m$1.__r=0,f$1=0;
 
   var _$1=0;function o$1(o,e,n,t,f,l){var s,u,a={};for(u in e)"ref"==u?s=e[u]:a[u]=e[u];var i={type:o,props:a,key:n,ref:s,__k:null,__:null,__b:0,__e:null,__d:void 0,__c:null,__h:null,constructor:void 0,__v:--_$1,__source:f,__self:l};if("function"==typeof o&&(s=o.defaultProps))for(u in s)void 0===a[u]&&(a[u]=s[u]);return l$1.vnode&&l$1.vnode(i),i}
 
-  var t,r$1,u,i,o=0,f=[],c=[],e=l$1.__b,a=l$1.__r,v=l$1.diffed,l=l$1.__c,m=l$1.unmount;function d(t,u){l$1.__h&&l$1.__h(r$1,t,o||u),o=0;var i=r$1.__H||(r$1.__H={__:[],__h:[]});return t>=i.__.length&&i.__.push({__V:c}),i.__[t]}function p(n){return o=1,y(B$1,n)}function y(n,u,i){var o=d(t++,2);if(o.t=n,!o.__c&&(o.__=[i?i(u):B$1(void 0,u),function(n){var t=o.__N?o.__N[0]:o.__[0],r=o.t(t,n);t!==r&&(o.__N=[r,o.__[1]],o.__c.setState({}));}],o.__c=r$1,!r$1.u)){r$1.u=!0;var f=r$1.shouldComponentUpdate;r$1.shouldComponentUpdate=function(n,t,r){if(!o.__c.__H)return !0;var u=o.__c.__H.__.filter(function(n){return n.__c});if(u.every(function(n){return !n.__N}))return !f||f.call(this,n,t,r);var i=!1;return u.forEach(function(n){if(n.__N){var t=n.__[0];n.__=n.__N,n.__N=void 0,t!==n.__[0]&&(i=!0);}}),!(!i&&o.__c.props===n)&&(!f||f.call(this,n,t,r))};}return o.__N||o.__}function h(u,i){var o=d(t++,3);!l$1.__s&&z$1(o.__H,i)&&(o.__=u,o.i=i,r$1.__H.__h.push(o));}function s(u,i){var o=d(t++,4);!l$1.__s&&z$1(o.__H,i)&&(o.__=u,o.i=i,r$1.__h.push(o));}function _(n){return o=5,F$1(function(){return {current:n}},[])}function F$1(n,r){var u=d(t++,7);return z$1(u.__H,r)?(u.__V=n(),u.i=r,u.__h=n,u.__V):u.__}function T$1(n,t){return o=8,F$1(function(){return n},t)}function q(n){var u=r$1.context[n.__c],i=d(t++,9);return i.c=n,u?(null==i.__&&(i.__=!0,u.sub(r$1)),u.props.value):n.__}function V$1(){var n=d(t++,11);if(!n.__){for(var u=r$1.__v;null!==u&&!u.__m&&null!==u.__;)u=u.__;var i=u.__m||(u.__m=[0,0]);n.__="P"+i[0]+"-"+i[1]++;}return n.__}function b(){for(var t;t=f.shift();)if(t.__P&&t.__H)try{t.__H.__h.forEach(k),t.__H.__h.forEach(w$1),t.__H.__h=[];}catch(r){t.__H.__h=[],l$1.__e(r,t.__v);}}l$1.__b=function(n){r$1=null,e&&e(n);},l$1.__r=function(n){a&&a(n),t=0;var i=(r$1=n.__c).__H;i&&(u===r$1?(i.__h=[],r$1.__h=[],i.__.forEach(function(n){n.__N&&(n.__=n.__N),n.__V=c,n.__N=n.i=void 0;})):(i.__h.forEach(k),i.__h.forEach(w$1),i.__h=[])),u=r$1;},l$1.diffed=function(t){v&&v(t);var o=t.__c;o&&o.__H&&(o.__H.__h.length&&(1!==f.push(o)&&i===l$1.requestAnimationFrame||((i=l$1.requestAnimationFrame)||j$1)(b)),o.__H.__.forEach(function(n){n.i&&(n.__H=n.i),n.__V!==c&&(n.__=n.__V),n.i=void 0,n.__V=c;})),u=r$1=null;},l$1.__c=function(t,r){r.some(function(t){try{t.__h.forEach(k),t.__h=t.__h.filter(function(n){return !n.__||w$1(n)});}catch(u){r.some(function(n){n.__h&&(n.__h=[]);}),r=[],l$1.__e(u,t.__v);}}),l&&l(t,r);},l$1.unmount=function(t){m&&m(t);var r,u=t.__c;u&&u.__H&&(u.__H.__.forEach(function(n){try{k(n);}catch(n){r=n;}}),u.__H=void 0,r&&l$1.__e(r,u.__v));};var g$1="function"==typeof requestAnimationFrame;function j$1(n){var t,r=function(){clearTimeout(u),g$1&&cancelAnimationFrame(t),setTimeout(n);},u=setTimeout(r,100);g$1&&(t=requestAnimationFrame(r));}function k(n){var t=r$1,u=n.__c;"function"==typeof u&&(n.__c=void 0,u()),r$1=t;}function w$1(n){var t=r$1;n.__c=n.__(),r$1=t;}function z$1(n,t){return !n||n.length!==t.length||t.some(function(t,r){return t!==n[r]})}function B$1(n,t){return "function"==typeof t?t(n):t}
+  var t,r$1,u,i,o=0,f=[],c=[],e=l$1.__b,a=l$1.__r,v=l$1.diffed,l=l$1.__c,m=l$1.unmount;function d(t,u){l$1.__h&&l$1.__h(r$1,t,o||u),o=0;var i=r$1.__H||(r$1.__H={__:[],__h:[]});return t>=i.__.length&&i.__.push({__V:c}),i.__[t]}function p(n){return o=1,y(B$1,n)}function y(n,u,i){var o=d(t++,2);if(o.t=n,!o.__c&&(o.__=[i?i(u):B$1(void 0,u),function(n){var t=o.__N?o.__N[0]:o.__[0],r=o.t(t,n);t!==r&&(o.__N=[r,o.__[1]],o.__c.setState({}));}],o.__c=r$1,!r$1.u)){r$1.u=!0;var f=r$1.shouldComponentUpdate;r$1.shouldComponentUpdate=function(n,t,r){if(!o.__c.__H)return !0;var u=o.__c.__H.__.filter(function(n){return n.__c});if(u.every(function(n){return !n.__N}))return !f||f.call(this,n,t,r);var i=!1;return u.forEach(function(n){if(n.__N){var t=n.__[0];n.__=n.__N,n.__N=void 0,t!==n.__[0]&&(i=!0);}}),!(!i&&o.__c.props===n)&&(!f||f.call(this,n,t,r))};}return o.__N||o.__}function h(u,i){var o=d(t++,3);!l$1.__s&&z$1(o.__H,i)&&(o.__=u,o.i=i,r$1.__H.__h.push(o));}function s(u,i){var o=d(t++,4);!l$1.__s&&z$1(o.__H,i)&&(o.__=u,o.i=i,r$1.__h.push(o));}function _(n){return o=5,F$1(function(){return {current:n}},[])}function A(n,t,r){o=6,s(function(){return "function"==typeof n?(n(t()),function(){return n(null)}):n?(n.current=t(),function(){return n.current=null}):void 0},null==r?r:r.concat(n));}function F$1(n,r){var u=d(t++,7);return z$1(u.__H,r)?(u.__V=n(),u.i=r,u.__h=n,u.__V):u.__}function T$1(n,t){return o=8,F$1(function(){return n},t)}function q(n){var u=r$1.context[n.__c],i=d(t++,9);return i.c=n,u?(null==i.__&&(i.__=!0,u.sub(r$1)),u.props.value):n.__}function V$1(){var n=d(t++,11);if(!n.__){for(var u=r$1.__v;null!==u&&!u.__m&&null!==u.__;)u=u.__;var i=u.__m||(u.__m=[0,0]);n.__="P"+i[0]+"-"+i[1]++;}return n.__}function b(){for(var t;t=f.shift();)if(t.__P&&t.__H)try{t.__H.__h.forEach(k$1),t.__H.__h.forEach(w$1),t.__H.__h=[];}catch(r){t.__H.__h=[],l$1.__e(r,t.__v);}}l$1.__b=function(n){r$1=null,e&&e(n);},l$1.__r=function(n){a&&a(n),t=0;var i=(r$1=n.__c).__H;i&&(u===r$1?(i.__h=[],r$1.__h=[],i.__.forEach(function(n){n.__N&&(n.__=n.__N),n.__V=c,n.__N=n.i=void 0;})):(i.__h.forEach(k$1),i.__h.forEach(w$1),i.__h=[])),u=r$1;},l$1.diffed=function(t){v&&v(t);var o=t.__c;o&&o.__H&&(o.__H.__h.length&&(1!==f.push(o)&&i===l$1.requestAnimationFrame||((i=l$1.requestAnimationFrame)||j$1)(b)),o.__H.__.forEach(function(n){n.i&&(n.__H=n.i),n.__V!==c&&(n.__=n.__V),n.i=void 0,n.__V=c;})),u=r$1=null;},l$1.__c=function(t,r){r.some(function(t){try{t.__h.forEach(k$1),t.__h=t.__h.filter(function(n){return !n.__||w$1(n)});}catch(u){r.some(function(n){n.__h&&(n.__h=[]);}),r=[],l$1.__e(u,t.__v);}}),l&&l(t,r);},l$1.unmount=function(t){m&&m(t);var r,u=t.__c;u&&u.__H&&(u.__H.__.forEach(function(n){try{k$1(n);}catch(n){r=n;}}),u.__H=void 0,r&&l$1.__e(r,u.__v));};var g$1="function"==typeof requestAnimationFrame;function j$1(n){var t,r=function(){clearTimeout(u),g$1&&cancelAnimationFrame(t),setTimeout(n);},u=setTimeout(r,100);g$1&&(t=requestAnimationFrame(r));}function k$1(n){var t=r$1,u=n.__c;"function"==typeof u&&(n.__c=void 0,u()),r$1=t;}function w$1(n){var t=r$1;n.__c=n.__(),r$1=t;}function z$1(n,t){return !n||n.length!==t.length||t.some(function(t,r){return t!==n[r]})}function B$1(n,t){return "function"==typeof t?t(n):t}
 
-  function g(n,t){for(var e in t)n[e]=t[e];return n}function C(n,t){for(var e in n)if("__source"!==e&&!(e in t))return !0;for(var r in t)if("__source"!==r&&n[r]!==t[r])return !0;return !1}function w(n){this.props=n;}function x(n,e){function r(n){var t=this.props.ref,r=t==n.ref;return !r&&t&&(t.call?t(null):t.current=null),e?!e(this.props,n)||!r:C(this.props,n)}function u(e){return this.shouldComponentUpdate=r,v$1(n,e)}return u.displayName="Memo("+(n.displayName||n.name)+")",u.prototype.isReactComponent=!0,u.__f=!0,u}(w.prototype=new _$2).isPureReactComponent=!0,w.prototype.shouldComponentUpdate=function(n,t){return C(this.props,n)||C(this.state,t)};var R=l$1.__b;l$1.__b=function(n){n.type&&n.type.__f&&n.ref&&(n.props.ref=n.ref,n.ref=null),R&&R(n);};var T=l$1.__e;l$1.__e=function(n,t,e,r){if(n.then)for(var u,o=t;o=o.__;)if((u=o.__c)&&u.__c)return null==t.__e&&(t.__e=e.__e,t.__k=e.__k),u.__c(n,t);T(n,t,e,r);};var I=l$1.unmount;function L(n,t,e){return n&&(n.__c&&n.__c.__H&&(n.__c.__H.__.forEach(function(n){"function"==typeof n.__c&&n.__c();}),n.__c.__H=null),null!=(n=g({},n)).__c&&(n.__c.__P===e&&(n.__c.__P=t),n.__c=null),n.__k=n.__k&&n.__k.map(function(n){return L(n,t,e)})),n}function U(n,t,e){return n&&(n.__v=null,n.__k=n.__k&&n.__k.map(function(n){return U(n,t,e)}),n.__c&&n.__c.__P===t&&(n.__e&&e.insertBefore(n.__e,n.__d),n.__c.__e=!0,n.__c.__P=e)),n}function D(){this.__u=0,this.t=null,this.__b=null;}function F(n){var t=n.__.__c;return t&&t.__a&&t.__a(n)}function V(){this.u=null,this.o=null;}l$1.unmount=function(n){var t=n.__c;t&&t.__R&&t.__R(),t&&!0===n.__h&&(n.type=null),I&&I(n);},(D.prototype=new _$2).__c=function(n,t){var e=t.__c,r=this;null==r.t&&(r.t=[]),r.t.push(e);var u=F(r.__v),o=!1,i=function(){o||(o=!0,e.__R=null,u?u(l):l());};e.__R=i;var l=function(){if(!--r.__u){if(r.state.__a){var n=r.state.__a;r.__v.__k[0]=U(n,n.__c.__P,n.__c.__O);}var t;for(r.setState({__a:r.__b=null});t=r.t.pop();)t.forceUpdate();}},c=!0===t.__h;r.__u++||c||r.setState({__a:r.__b=r.__v.__k[0]}),n.then(i,i);},D.prototype.componentWillUnmount=function(){this.t=[];},D.prototype.render=function(n,e){if(this.__b){if(this.__v.__k){var r=document.createElement("div"),o=this.__v.__k[0].__c;this.__v.__k[0]=L(this.__b,r,o.__O=o.__P);}this.__b=null;}var i=e.__a&&v$1(d$1,null,n.fallback);return i&&(i.__h=null),[v$1(d$1,null,e.__a?null:n.children),i]};var W=function(n,t,e){if(++e[1]===e[0]&&n.o.delete(t),n.props.revealOrder&&("t"!==n.props.revealOrder[0]||!n.o.size))for(e=n.u;e;){for(;e.length>3;)e.pop()();if(e[1]<e[0])break;n.u=e=e[2];}};function P(n){return this.getChildContext=function(){return n.context},n.children}function $(n){var e=this,r=n.i;e.componentWillUnmount=function(){q$1(null,e.l),e.l=null,e.i=null;},e.i&&e.i!==r&&e.componentWillUnmount(),n.__v?(e.l||(e.i=r,e.l={nodeType:1,parentNode:r,childNodes:[],appendChild:function(n){this.childNodes.push(n),e.i.appendChild(n);},insertBefore:function(n,t){this.childNodes.push(n),e.i.appendChild(n);},removeChild:function(n){this.childNodes.splice(this.childNodes.indexOf(n)>>>1,1),e.i.removeChild(n);}}),q$1(v$1(P,{context:e.context},n.__v),e.l)):e.l&&e.componentWillUnmount();}function j(n,e){var r=v$1($,{__v:n,i:e});return r.containerInfo=e,r}(V.prototype=new _$2).__a=function(n){var t=this,e=F(t.__v),r=t.o.get(n);return r[0]++,function(u){var o=function(){t.props.revealOrder?(r.push(u),W(t,n,r)):u();};e?e(o):o();}},V.prototype.render=function(n){this.u=null,this.o=new Map;var t=A(n.children);n.revealOrder&&"b"===n.revealOrder[0]&&t.reverse();for(var e=t.length;e--;)this.o.set(t[e],this.u=[1,0,this.u]);return n.children},V.prototype.componentDidUpdate=V.prototype.componentDidMount=function(){var n=this;this.o.forEach(function(t,e){W(n,e,t);});};var z="undefined"!=typeof Symbol&&Symbol.for&&Symbol.for("react.element")||60103,B=/^(?:accent|alignment|arabic|baseline|cap|clip(?!PathU)|color|dominant|fill|flood|font|glyph(?!R)|horiz|image|letter|lighting|marker(?!H|W|U)|overline|paint|pointer|shape|stop|strikethrough|stroke|text(?!L)|transform|underline|unicode|units|v|vector|vert|word|writing|x(?!C))[A-Z]/,H="undefined"!=typeof document,Z=function(n){return ("undefined"!=typeof Symbol&&"symbol"==typeof Symbol()?/fil|che|rad/i:/fil|che|ra/i).test(n)};_$2.prototype.isReactComponent={},["componentWillMount","componentWillReceiveProps","componentWillUpdate"].forEach(function(t){Object.defineProperty(_$2.prototype,t,{configurable:!0,get:function(){return this["UNSAFE_"+t]},set:function(n){Object.defineProperty(this,t,{configurable:!0,writable:!0,value:n});}});});var G=l$1.event;function J(){}function K(){return this.cancelBubble}function Q(){return this.defaultPrevented}l$1.event=function(n){return G&&(n=G(n)),n.persist=J,n.isPropagationStopped=K,n.isDefaultPrevented=Q,n.nativeEvent=n};var nn={configurable:!0,get:function(){return this.class}},tn=l$1.vnode;l$1.vnode=function(n){var t=n.type,e=n.props,u=e;if("string"==typeof t){var o=-1===t.indexOf("-");for(var i in u={},e){var l=e[i];H&&"children"===i&&"noscript"===t||"value"===i&&"defaultValue"in e&&null==l||("defaultValue"===i&&"value"in e&&null==e.value?i="value":"download"===i&&!0===l?l="":/ondoubleclick/i.test(i)?i="ondblclick":/^onchange(textarea|input)/i.test(i+t)&&!Z(e.type)?i="oninput":/^onfocus$/i.test(i)?i="onfocusin":/^onblur$/i.test(i)?i="onfocusout":/^on(Ani|Tra|Tou|BeforeInp|Compo)/.test(i)?i=i.toLowerCase():o&&B.test(i)?i=i.replace(/[A-Z0-9]/g,"-$&").toLowerCase():null===l&&(l=void 0),/^oninput$/i.test(i)&&(i=i.toLowerCase(),u[i]&&(i="oninputCapture")),u[i]=l);}"select"==t&&u.multiple&&Array.isArray(u.value)&&(u.value=A(e.children).forEach(function(n){n.props.selected=-1!=u.value.indexOf(n.props.value);})),"select"==t&&null!=u.defaultValue&&(u.value=A(e.children).forEach(function(n){n.props.selected=u.multiple?-1!=u.defaultValue.indexOf(n.props.value):u.defaultValue==n.props.value;})),n.props=u,e.class!=e.className&&(nn.enumerable="className"in e,null!=e.className&&(u.class=e.className),Object.defineProperty(u,"className",nn));}n.$$typeof=z,tn&&tn(n);};var en=l$1.__r;l$1.__r=function(n){en&&en(n),n.__c;};var rn=l$1.diffed;l$1.diffed=function(n){rn&&rn(n);var t=n.props,e=n.__e;null!=e&&"textarea"===n.type&&"value"in t&&t.value!==e.value&&(e.value=null==t.value?"":t.value);};
+  function g(n,t){for(var e in t)n[e]=t[e];return n}function C(n,t){for(var e in n)if("__source"!==e&&!(e in t))return !0;for(var r in t)if("__source"!==r&&n[r]!==t[r])return !0;return !1}function w(n){this.props=n;}function x(n,e){function r(n){var t=this.props.ref,r=t==n.ref;return !r&&t&&(t.call?t(null):t.current=null),e?!e(this.props,n)||!r:C(this.props,n)}function u(e){return this.shouldComponentUpdate=r,v$1(n,e)}return u.displayName="Memo("+(n.displayName||n.name)+")",u.prototype.isReactComponent=!0,u.__f=!0,u}(w.prototype=new _$2).isPureReactComponent=!0,w.prototype.shouldComponentUpdate=function(n,t){return C(this.props,n)||C(this.state,t)};var R=l$1.__b;l$1.__b=function(n){n.type&&n.type.__f&&n.ref&&(n.props.ref=n.ref,n.ref=null),R&&R(n);};var N="undefined"!=typeof Symbol&&Symbol.for&&Symbol.for("react.forward_ref")||3911;function k(n){function t(t){var e=g({},t);return delete e.ref,n(e,t.ref||null)}return t.$$typeof=N,t.render=t,t.prototype.isReactComponent=t.__f=!0,t.displayName="ForwardRef("+(n.displayName||n.name)+")",t}var T=l$1.__e;l$1.__e=function(n,t,e,r){if(n.then)for(var u,o=t;o=o.__;)if((u=o.__c)&&u.__c)return null==t.__e&&(t.__e=e.__e,t.__k=e.__k),u.__c(n,t);T(n,t,e,r);};var I=l$1.unmount;function L(n,t,e){return n&&(n.__c&&n.__c.__H&&(n.__c.__H.__.forEach(function(n){"function"==typeof n.__c&&n.__c();}),n.__c.__H=null),null!=(n=g({},n)).__c&&(n.__c.__P===e&&(n.__c.__P=t),n.__c=null),n.__k=n.__k&&n.__k.map(function(n){return L(n,t,e)})),n}function U(n,t,e){return n&&(n.__v=null,n.__k=n.__k&&n.__k.map(function(n){return U(n,t,e)}),n.__c&&n.__c.__P===t&&(n.__e&&e.insertBefore(n.__e,n.__d),n.__c.__e=!0,n.__c.__P=e)),n}function D(){this.__u=0,this.t=null,this.__b=null;}function F(n){var t=n.__.__c;return t&&t.__a&&t.__a(n)}function V(){this.u=null,this.o=null;}l$1.unmount=function(n){var t=n.__c;t&&t.__R&&t.__R(),t&&!0===n.__h&&(n.type=null),I&&I(n);},(D.prototype=new _$2).__c=function(n,t){var e=t.__c,r=this;null==r.t&&(r.t=[]),r.t.push(e);var u=F(r.__v),o=!1,i=function(){o||(o=!0,e.__R=null,u?u(l):l());};e.__R=i;var l=function(){if(!--r.__u){if(r.state.__a){var n=r.state.__a;r.__v.__k[0]=U(n,n.__c.__P,n.__c.__O);}var t;for(r.setState({__a:r.__b=null});t=r.t.pop();)t.forceUpdate();}},c=!0===t.__h;r.__u++||c||r.setState({__a:r.__b=r.__v.__k[0]}),n.then(i,i);},D.prototype.componentWillUnmount=function(){this.t=[];},D.prototype.render=function(n,e){if(this.__b){if(this.__v.__k){var r=document.createElement("div"),o=this.__v.__k[0].__c;this.__v.__k[0]=L(this.__b,r,o.__O=o.__P);}this.__b=null;}var i=e.__a&&v$1(d$1,null,n.fallback);return i&&(i.__h=null),[v$1(d$1,null,e.__a?null:n.children),i]};var W=function(n,t,e){if(++e[1]===e[0]&&n.o.delete(t),n.props.revealOrder&&("t"!==n.props.revealOrder[0]||!n.o.size))for(e=n.u;e;){for(;e.length>3;)e.pop()();if(e[1]<e[0])break;n.u=e=e[2];}};function P(n){return this.getChildContext=function(){return n.context},n.children}function $(n){var e=this,r=n.i;e.componentWillUnmount=function(){q$1(null,e.l),e.l=null,e.i=null;},e.i&&e.i!==r&&e.componentWillUnmount(),n.__v?(e.l||(e.i=r,e.l={nodeType:1,parentNode:r,childNodes:[],appendChild:function(n){this.childNodes.push(n),e.i.appendChild(n);},insertBefore:function(n,t){this.childNodes.push(n),e.i.appendChild(n);},removeChild:function(n){this.childNodes.splice(this.childNodes.indexOf(n)>>>1,1),e.i.removeChild(n);}}),q$1(v$1(P,{context:e.context},n.__v),e.l)):e.l&&e.componentWillUnmount();}function j(n,e){var r=v$1($,{__v:n,i:e});return r.containerInfo=e,r}(V.prototype=new _$2).__a=function(n){var t=this,e=F(t.__v),r=t.o.get(n);return r[0]++,function(u){var o=function(){t.props.revealOrder?(r.push(u),W(t,n,r)):u();};e?e(o):o();}},V.prototype.render=function(n){this.u=null,this.o=new Map;var t=A$1(n.children);n.revealOrder&&"b"===n.revealOrder[0]&&t.reverse();for(var e=t.length;e--;)this.o.set(t[e],this.u=[1,0,this.u]);return n.children},V.prototype.componentDidUpdate=V.prototype.componentDidMount=function(){var n=this;this.o.forEach(function(t,e){W(n,e,t);});};var z="undefined"!=typeof Symbol&&Symbol.for&&Symbol.for("react.element")||60103,B=/^(?:accent|alignment|arabic|baseline|cap|clip(?!PathU)|color|dominant|fill|flood|font|glyph(?!R)|horiz|image|letter|lighting|marker(?!H|W|U)|overline|paint|pointer|shape|stop|strikethrough|stroke|text(?!L)|transform|underline|unicode|units|v|vector|vert|word|writing|x(?!C))[A-Z]/,H="undefined"!=typeof document,Z=function(n){return ("undefined"!=typeof Symbol&&"symbol"==typeof Symbol()?/fil|che|rad/i:/fil|che|ra/i).test(n)};_$2.prototype.isReactComponent={},["componentWillMount","componentWillReceiveProps","componentWillUpdate"].forEach(function(t){Object.defineProperty(_$2.prototype,t,{configurable:!0,get:function(){return this["UNSAFE_"+t]},set:function(n){Object.defineProperty(this,t,{configurable:!0,writable:!0,value:n});}});});var G=l$1.event;function J(){}function K(){return this.cancelBubble}function Q(){return this.defaultPrevented}l$1.event=function(n){return G&&(n=G(n)),n.persist=J,n.isPropagationStopped=K,n.isDefaultPrevented=Q,n.nativeEvent=n};var nn={configurable:!0,get:function(){return this.class}},tn=l$1.vnode;l$1.vnode=function(n){var t=n.type,e=n.props,u=e;if("string"==typeof t){var o=-1===t.indexOf("-");for(var i in u={},e){var l=e[i];H&&"children"===i&&"noscript"===t||"value"===i&&"defaultValue"in e&&null==l||("defaultValue"===i&&"value"in e&&null==e.value?i="value":"download"===i&&!0===l?l="":/ondoubleclick/i.test(i)?i="ondblclick":/^onchange(textarea|input)/i.test(i+t)&&!Z(e.type)?i="oninput":/^onfocus$/i.test(i)?i="onfocusin":/^onblur$/i.test(i)?i="onfocusout":/^on(Ani|Tra|Tou|BeforeInp|Compo)/.test(i)?i=i.toLowerCase():o&&B.test(i)?i=i.replace(/[A-Z0-9]/g,"-$&").toLowerCase():null===l&&(l=void 0),/^oninput$/i.test(i)&&(i=i.toLowerCase(),u[i]&&(i="oninputCapture")),u[i]=l);}"select"==t&&u.multiple&&Array.isArray(u.value)&&(u.value=A$1(e.children).forEach(function(n){n.props.selected=-1!=u.value.indexOf(n.props.value);})),"select"==t&&null!=u.defaultValue&&(u.value=A$1(e.children).forEach(function(n){n.props.selected=u.multiple?-1!=u.defaultValue.indexOf(n.props.value):u.defaultValue==n.props.value;})),n.props=u,e.class!=e.className&&(nn.enumerable="className"in e,null!=e.className&&(u.class=e.className),Object.defineProperty(u,"className",nn));}n.$$typeof=z,tn&&tn(n);};var en=l$1.__r;l$1.__r=function(n){en&&en(n),n.__c;};var rn=l$1.diffed;l$1.diffed=function(n){rn&&rn(n);var t=n.props,e=n.__e;null!=e&&"textarea"===n.type&&"value"in t&&t.value!==e.value&&(e.value=null==t.value?"":t.value);};
 
   /** Detect free variable `global` from Node.js. */
   var freeGlobal = typeof global == 'object' && global && global.Object === Object && global;
@@ -1945,12 +1945,12 @@ var bundle = (function (exports) {
    *
    *
    * (This is here, in this particular file, to avoid circular dependencies
-   * without also making a utilities file.
-   * Once we can remove this hook, we can put this function back with useRandomId)
+   * because useBeforeLayoutEffect also needs random IDs for its own reasons)
    */
   function generateRandomId(prefix) {
     return "".concat(prefix !== null && prefix !== void 0 ? prefix : "id-").concat(random64Bits().map(n => base64(n)).join(""));
   }
+
   const previousInputs = new Map();
   const toRun = new Map();
   // TODO: Whether this goes in options.diffed or options._commit
@@ -2411,9 +2411,9 @@ var bundle = (function (exports) {
     // Return both the element and the hook that modifies 
     // the props and allows us to actually find the element
     return {
+      propsStable: propsStable.current,
       refElementReturn: {
-        getElement,
-        propsStable: propsStable.current
+        getElement
       }
     };
   }
@@ -2783,12 +2783,14 @@ var bundle = (function (exports) {
       }
     } = _ref4;
     const {
-      refElementReturn: refElementSourceReturn
+      refElementReturn: refElementSourceReturn,
+      propsStable: propsStableSource
     } = useRefElement({
       refElementParameters: {}
     });
     const {
-      refElementReturn: refElementPopupReturn
+      refElementReturn: refElementPopupReturn,
+      propsStable: propsStablePopup
     } = useRefElement({
       refElementParameters: {}
     });
@@ -2839,7 +2841,9 @@ var bundle = (function (exports) {
     });
     return {
       refElementSourceReturn,
-      refElementPopupReturn
+      refElementPopupReturn,
+      propsStableSource,
+      propsStablePopup
     };
   }
 
@@ -4325,12 +4329,8 @@ var bundle = (function (exports) {
         focusPopup: focusSelfUnstable,
         focusOpener: focusOpenerUnstable
       },
-      refElementParameters
+      refElementReturn
     } = _ref;
-    const {
-      onElementChange,
-      ...rest
-    } = refElementParameters || {};
     const focusSelf = useStableCallback(focusSelfUnstable);
     const focusOpener = useStableCallback(focusOpenerUnstable);
     h(() => {
@@ -4349,14 +4349,6 @@ var bundle = (function (exports) {
       }
     }, [trapActive]);
     const {
-      refElementReturn
-    } = useRefElement({
-      refElementParameters: {
-        onElementChange,
-        ...rest
-      }
-    });
-    const {
       getElement
     } = refElementReturn;
     const {
@@ -4365,12 +4357,10 @@ var bundle = (function (exports) {
       getLastActiveWhenOpen
     } = useBlockingElement(trapActive && !onlyMoveFocus, getElement);
     return {
-      refElementReturn,
-      focusTrapReturn: {
-        propsUnstable: {
-          "aria-modal": trapActive ? "true" : undefined
-        }
-      }
+      props: {
+        "aria-modal": trapActive ? "true" : undefined
+      },
+      focusTrapReturn: {}
     };
   }
   /**
@@ -4416,39 +4406,14 @@ var bundle = (function (exports) {
       getTabbableIndex,
       setTabbableIndex
     } = rovingTabIndexReturn;
-    const navigateAbsolute = T$1((i, e, fromUserInteraction) => {
-      const targetUnmangled = indexDemangler(i);
-      const {
-        valueUnmangled
-      } = tryNavigateToIndex({
-        isValid,
-        highestChildIndex: getHighestIndex(),
-        indexDemangler,
-        indexMangler,
-        searchDirection: -1,
-        targetUnmangled
-      });
-      setTabbableIndex(valueUnmangled, e, fromUserInteraction);
-    }, []);
-    const navigateToFirst = useStableCallback((e, fromUserInteraction) => {
-      navigateAbsolute(0, e, fromUserInteraction);
-    });
-    const navigateToLast = useStableCallback((e, fromUserInteraction) => {
-      navigateAbsolute(getHighestIndex(), e, fromUserInteraction);
-    });
-    const navigateRelative2 = useStableCallback((e, offset, fromUserInteraction, mode) => {
+    const navigateAbsolute = T$1((requestedIndexMangled, searchDirection, e, fromUserInteraction, mode) => {
       var _getTabbableIndex;
+      //const targetUnmangled = indexDemangler(requestedIndexMangled);
+      //const { valueUnmangled } = tryNavigateToIndex({ isValid, highestChildIndex: getHighestIndex(), indexDemangler, indexMangler, searchDirection: -1, targetUnmangled });
+      //setTabbableIndex(valueUnmangled, e, fromUserInteraction);
       const highestChildIndex = getHighestIndex();
-      const searchDirection = Math.sign(offset) || 1;
-      const original = (_getTabbableIndex = getTabbableIndex()) !== null && _getTabbableIndex !== void 0 ? _getTabbableIndex : 0;
-      /**
-       * To get the target, we need to add (or subtract) 1 to our current value,
-       * but it need to be relative to any sorting/rearranging that's happened.
-       *
-       * We mangle the index to get its "visual" position, add our offset,
-       * and then demangle it to get the child that corresponds to the next child "visually".
-       */
-      const targetUnmangled = indexDemangler(indexMangler(original) + offset);
+      (_getTabbableIndex = getTabbableIndex()) !== null && _getTabbableIndex !== void 0 ? _getTabbableIndex : 0;
+      const targetUnmangled = indexDemangler(requestedIndexMangled);
       const {
         status,
         valueUnmangled
@@ -4497,6 +4462,27 @@ var bundle = (function (exports) {
         setTabbableIndex(valueUnmangled, e, fromUserInteraction);
         return "stop";
       }
+    }, []);
+    const navigateToFirst = useStableCallback((e, fromUserInteraction) => {
+      return navigateAbsolute(0, -1, e, fromUserInteraction, "single");
+    });
+    const navigateToLast = useStableCallback((e, fromUserInteraction) => {
+      return navigateAbsolute(getHighestIndex(), 1, e, fromUserInteraction, "single");
+    });
+    const navigateRelative2 = useStableCallback((e, offset, fromUserInteraction, mode) => {
+      var _getTabbableIndex2;
+      getHighestIndex();
+      const searchDirection = Math.sign(offset) || 1;
+      const original = (_getTabbableIndex2 = getTabbableIndex()) !== null && _getTabbableIndex2 !== void 0 ? _getTabbableIndex2 : 0;
+      /**
+       * To get the target, we need to add (or subtract) 1 to our current value,
+       * but it need to be relative to any sorting/rearranging that's happened.
+       *
+       * We mangle the index to get its "visual" position, add our offset,
+       * and then demangle it to get the child that corresponds to the next child "visually".
+       */
+      const targetMangled = indexMangler(original) + offset;
+      return navigateAbsolute(targetMangled, searchDirection, e, fromUserInteraction, mode);
     });
     const navigateToNext = useStableCallback((e, fromUserInteraction) => {
       return navigateRelative2(e, 1, fromUserInteraction, "single");
@@ -4523,7 +4509,7 @@ var bundle = (function (exports) {
         if (truePageNavigationSize < 1) {
           truePageNavigationSize = Math.round(pageNavigationSize * Math.max(100, getHighestIndex() + 1));
         }
-        let result = null;
+        let result = "passthrough";
         // Arrow keys only take effect for components oriented in that direction,
         // so we want to make sure we only listen for left/right or up/down when appropriate.
         let keyPressIsValidForOrientation = true;
@@ -4550,15 +4536,14 @@ var bundle = (function (exports) {
             case "PageUp":
             case "PageDown":
               if (truePageNavigationSize > 0) {
-                navigateRelative2(e, truePageNavigationSize * (e.key.endsWith('n') ? -1 : 1), true, "page");
-                result = 'passthrough';
+                result = navigateRelative2(e, truePageNavigationSize * (e.key.endsWith('n') ? -1 : 1), true, "page");
               }
               break;
             case "Home":
             case "End":
               if (!disableHomeEndKeys) {
                 if (e.key.endsWith('e')) navigateToFirst(e, true);else navigateToLast(e, true);
-                result = 'passthrough';
+                result = 'stop';
               }
               break;
           }
@@ -4647,9 +4632,8 @@ var bundle = (function (exports) {
     });
 
     return {
-      linearNavigationReturn: {
-        propsStable: stableProps.current
-      }
+      linearNavigationReturn: {},
+      propsStable: stableProps.current
     };
   }
   function tryNavigateToIndex(_ref2) {
@@ -5262,12 +5246,12 @@ var bundle = (function (exports) {
         })
       },
       rovingTabIndexChildReturn: {
-        propsUnstable: {
-          tabIndex: tabbable ? 0 : -1
-        },
         tabbable,
         getTabbable,
         setTabbable
+      },
+      props: {
+        tabIndex: tabbable ? 0 : -1
       }
     };
   }
@@ -5429,9 +5413,9 @@ var bundle = (function (exports) {
       }),
       typeaheadNavigationReturn: {
         getCurrentTypeahead,
-        typeaheadStatus,
-        propsStable: propsStable.current
-      }
+        typeaheadStatus
+      },
+      propsStable: propsStable.current
     };
     function updateBasedOnTypeaheadChange(currentTypeahead, reason) {
       if (currentTypeahead && sortedTypeaheadInfo.current.length) {
@@ -5615,25 +5599,38 @@ var bundle = (function (exports) {
       managedChildrenReturn,
       ..._void1
     } = _ref;
-    const rtir = useRovingTabIndex({
+    const {
+      ...rtir
+    } = useRovingTabIndex({
       managedChildrenReturn,
       rovingTabIndexParameters
     });
     const {
       rovingTabIndexReturn
     } = rtir;
-    const tnr = useTypeaheadNavigation({
+    const {
+      propsStable: propsStableTN,
+      ...tnr
+    } = useTypeaheadNavigation({
       rovingTabIndexReturn,
       typeaheadNavigationParameters
     });
-    const lnr = useLinearNavigation({
+    const {
+      propsStable: propsStableLN,
+      ...lnr
+    } = useLinearNavigation({
       rovingTabIndexReturn,
       linearNavigationParameters
     });
+    // Merge the props while keeping them stable
+    // (TODO: We run this merge logic every render but only need the first render's result because it's stable)
+    const p = useMergedProps(propsStableTN, propsStableLN);
+    const propsStable = _(p);
     return {
       ...lnr,
       ...tnr,
-      ...rtir
+      ...rtir,
+      propsStable: propsStable.current
     };
   }
   function useListNavigationChild(_ref2) {
@@ -5646,18 +5643,24 @@ var bundle = (function (exports) {
       textContentParameters,
       ..._void2
     } = _ref2;
-    const rticr = useRovingTabIndexChild({
+    const {
+      props,
+      ...rticr
+    } = useRovingTabIndexChild({
       rovingTabIndexChildContext,
       rovingTabIndexChildParameters,
       managedChildParameters
     });
-    const tncr = useTypeaheadNavigationChild({
+    const {
+      ...tncr
+    } = useTypeaheadNavigationChild({
       refElementReturn,
       typeaheadNavigationChildContext,
       managedChildParameters,
       textContentParameters
     });
     return {
+      props,
       ...tncr,
       ...rticr
     };
@@ -5702,6 +5705,7 @@ var bundle = (function (exports) {
       managedChildrenParameters,
       rovingTabIndexChildContext,
       typeaheadNavigationChildContext,
+      propsStable,
       ...void1
     } = useListNavigation({
       linearNavigationParameters: {
@@ -5716,6 +5720,7 @@ var bundle = (function (exports) {
       typeaheadNavigationParameters
     });
     return {
+      propsStable,
       managedChildrenParameters,
       rovingTabIndexChildContext,
       typeaheadNavigationChildContext,
@@ -5797,13 +5802,7 @@ var bundle = (function (exports) {
     const {
       rovingTabIndexReturn: {
         setTabbableIndex
-      },
-      rovingTabIndexReturn,
-      linearNavigationReturn,
-      managedChildrenParameters,
-      rovingTabIndexChildContext,
-      typeaheadNavigationChildContext,
-      typeaheadNavigationReturn
+      }
     } = lnr;
     return {
       rowAsChildOfGridReturn: {
@@ -5814,7 +5813,6 @@ var bundle = (function (exports) {
         ...lncr
       },
       rowAsParentOfCellsReturn: {
-        ...lnr,
         gridNavigationCellContext: useStableObject({
           gridNavigationCellParameters: useStableObject({
             setTabbableRow,
@@ -5824,12 +5822,7 @@ var bundle = (function (exports) {
             setTabbableCell: setTabbableIndex
           })
         }),
-        linearNavigationReturn,
-        managedChildrenParameters,
-        rovingTabIndexChildContext,
-        rovingTabIndexReturn,
-        typeaheadNavigationChildContext,
-        typeaheadNavigationReturn
+        ...lnr
       }
     };
   }
@@ -5867,6 +5860,7 @@ var bundle = (function (exports) {
       rovingTabIndexChildReturn,
       textContentReturn,
       pressParameters,
+      props,
       ...void2
     } = useListNavigationChild({
       rovingTabIndexChildParameters,
@@ -5874,11 +5868,10 @@ var bundle = (function (exports) {
       rovingTabIndexChildContext,
       typeaheadNavigationChildContext,
       textContentParameters,
-      //typeaheadNavigationChildParameters,
       refElementReturn
     });
-    //    assertEmptyObject(void3);
     return {
+      props,
       rovingTabIndexChildReturn,
       textContentReturn,
       pressParameters,
@@ -6006,10 +5999,10 @@ var bundle = (function (exports) {
         }),
         getSelectedOffset: getDirection,
         selectedOffset: direction,
-        getSelected: getLocalSelected,
-        propsUnstable: ariaPropName == null || selectionMode == "disabled" ? {} : {
-          ["".concat(propParts[0], "-").concat(propParts[1])]: localSelected ? propParts[1] == "current" ? "".concat(propParts[2]) : "true" : "false"
-        }
+        getSelected: getLocalSelected
+      },
+      props: ariaPropName == null || selectionMode == "disabled" ? {} : {
+        ["".concat(propParts[0], "-").concat(propParts[1])]: localSelected ? propParts[1] == "current" ? "".concat(propParts[2]) : "true" : "false"
       },
       pressParameters: {
         onPressSync
@@ -6057,12 +6050,11 @@ var bundle = (function (exports) {
       ..._void1
     } = _ref2;
     const {
-      managedChildParameters,
       hasCurrentFocusParameters: {
         onCurrentFocusedInnerChanged: ocfic2,
         ..._void3
       },
-      singleSelectionChildReturn
+      ...ssr
     } = useSingleSelectionChild(rowAsChildOfGridParameters);
     const {
       rowAsChildOfGridReturn: {
@@ -6070,11 +6062,7 @@ var bundle = (function (exports) {
           onCurrentFocusedInnerChanged: ocfic1,
           ..._void2
         },
-        gridNavigationRowParameters,
-        rovingTabIndexChildReturn,
-        textContentReturn,
-        pressParameters,
-        ...void4
+        ...rowAsChildOfGridReturn
       },
       rowAsParentOfCellsReturn
     } = useGridNavigationRow({
@@ -6087,15 +6075,11 @@ var bundle = (function (exports) {
     });
     return {
       rowAsChildOfGridReturn: {
-        pressParameters,
-        textContentReturn,
-        managedChildParameters,
         hasCurrentFocusParameters: {
           onCurrentFocusedInnerChanged
         },
-        gridNavigationRowParameters,
-        rovingTabIndexChildReturn,
-        singleSelectionChildReturn
+        ...ssr,
+        ...rowAsChildOfGridReturn
       },
       rowAsParentOfCellsReturn
     };
@@ -6345,7 +6329,10 @@ var bundle = (function (exports) {
       managedChildrenReturn,
       ..._void3
     } = _ref;
-    const lnr = useListNavigation({
+    const {
+      propsStable,
+      ...lnr
+    } = useListNavigation({
       linearNavigationParameters,
       rovingTabIndexParameters,
       typeaheadNavigationParameters,
@@ -6354,14 +6341,17 @@ var bundle = (function (exports) {
     const {
       rovingTabIndexReturn
     } = lnr;
-    const ssr = useSingleSelection({
+    const {
+      ...ssr
+    } = useSingleSelection({
       rovingTabIndexReturn,
       managedChildrenReturn,
       singleSelectionParameters
     });
     return {
       ...ssr,
-      ...lnr
+      ...lnr,
+      propsStable
     };
   }
   function useListNavigationSingleSelectionChild(_ref2) {
@@ -6390,6 +6380,7 @@ var bundle = (function (exports) {
       pressParameters: {
         onPressSync
       },
+      props: propsSS,
       ...sscr
     } = useSingleSelectionChild({
       managedChildParameters: {
@@ -6406,6 +6397,7 @@ var bundle = (function (exports) {
       pressParameters: {
         excludeSpace
       },
+      props: propsLN,
       ...lncr
     } = useListNavigationChild({
       managedChildParameters: {
@@ -6430,6 +6422,7 @@ var bundle = (function (exports) {
         onPressSync,
         excludeSpace
       },
+      props: useMergedProps(propsLN, propsSS),
       ...sscr,
       ...lncr
     };
@@ -6456,7 +6449,10 @@ var bundle = (function (exports) {
         indexMangler
       }
     } = scr;
-    const lnssr = useListNavigationSingleSelection({
+    const {
+      propsStable,
+      ...lnssr
+    } = useListNavigationSingleSelection({
       linearNavigationParameters: {
         ...linearNavigationParameters,
         indexDemangler,
@@ -6468,6 +6464,7 @@ var bundle = (function (exports) {
       managedChildrenReturn
     });
     return {
+      propsStable,
       ...lnssr,
       ...scr
     };
@@ -6859,6 +6856,7 @@ var bundle = (function (exports) {
       typeaheadNavigationChildContext,
       gridNavigationRowContext,
       rearrangeableChildrenReturn,
+      propsStable,
       ...gridNavigationSingleSelectionReturn
     } = useGridNavigationSingleSelectionSortable({
       gridNavigationParameters,
@@ -6887,10 +6885,6 @@ var bundle = (function (exports) {
       },
       sortableChildrenParameters
     });
-    const {
-      linearNavigationReturn,
-      typeaheadNavigationReturn
-    } = gridNavigationSingleSelectionReturn;
     const {
       indexDemangler
     } = rearrangeableChildrenReturn;
@@ -6939,7 +6933,7 @@ var bundle = (function (exports) {
       managedChildrenReturn,
       staggeredChildrenParameters
     });
-    const props = useMergedProps(linearNavigationReturn.propsStable, typeaheadNavigationReturn.propsStable);
+    //const props = useMergedProps(linearNavigationReturn.propsStable, typeaheadNavigationReturn.propsStable);
     const context = useStableObject({
       singleSelectionContext,
       managedChildContext,
@@ -6952,7 +6946,7 @@ var bundle = (function (exports) {
     });
     return {
       context,
-      props,
+      propsStable,
       managedChildrenReturn,
       rearrangeableChildrenReturn,
       staggeredChildrenReturn,
@@ -7043,7 +7037,8 @@ var bundle = (function (exports) {
       return true;
     }, []);
     const {
-      refElementReturn
+      refElementReturn,
+      propsStable
     } = useRefElement({
       refElementParameters: {}
     });
@@ -7090,8 +7085,14 @@ var bundle = (function (exports) {
       }
     });
     const {
-      rowAsChildOfGridReturn,
-      rowAsParentOfCellsReturn
+      rowAsChildOfGridReturn: {
+        props: propsRowAsChild,
+        ...rowAsChildOfGridReturn
+      },
+      rowAsParentOfCellsReturn: {
+        propsStable: propsParentOfCells,
+        ...rowAsParentOfCellsReturn
+      }
     } = r;
     const {
       context: {
@@ -7159,19 +7160,20 @@ var bundle = (function (exports) {
         onCurrentFocusedChanged: null
       }
     });
-    const props = useMergedProps(refElementReturn.propsStable,
+    const props = useMergedProps(propsStable,
     // TODO: Rows don't use tabIndex, but just excluding props here is...weird.
-    //r.rowAsChildOfGridReturn.rovingTabIndexChildReturn.propsUnstable,
-    r.rowAsChildOfGridReturn.singleSelectionChildReturn.propsUnstable, r.rowAsParentOfCellsReturn.linearNavigationReturn.propsStable, r.rowAsParentOfCellsReturn.typeaheadNavigationReturn.propsStable, hasCurrentFocusReturn.propsStable, paginationProps, staggeredProps);
+    propsParentOfCells, r.rowAsChildOfGridReturn.props, hasCurrentFocusReturn.propsStable, paginationProps, staggeredProps);
     return {
-      context,
-      props,
       rowAsParentOfCellsReturn: {
         ...rowAsParentOfCellsReturn,
-        managedChildrenReturn
+        hasCurrentFocusReturn,
+        managedChildrenReturn,
+        propsStable: props,
+        context
       },
       rowAsChildOfGridReturn: {
         ...rowAsChildOfGridReturn,
+        props: propsRowAsChild,
         managedChildReturn,
         staggeredChildReturn: {
           isStaggered,
@@ -7182,8 +7184,7 @@ var bundle = (function (exports) {
           paginatedVisible,
           hideBecausePaginated
         }
-      },
-      hasCurrentFocusReturn
+      }
     };
   }
   function useCompleteGridNavigationCell(_ref3) {
@@ -7210,7 +7211,8 @@ var bundle = (function (exports) {
       index
     } = managedChildParameters;
     const {
-      refElementReturn
+      refElementReturn,
+      propsStable
     } = useRefElement({
       refElementParameters: {}
     });
@@ -7218,7 +7220,8 @@ var bundle = (function (exports) {
       hasCurrentFocusParameters,
       rovingTabIndexChildReturn,
       textContentReturn,
-      pressParameters
+      pressParameters,
+      props: propsRti
     } = useGridNavigationSingleSelectionCell({
       gridNavigationCellContext,
       gridNavigationCellParameters,
@@ -7263,7 +7266,7 @@ var bundle = (function (exports) {
       ...baseInfo,
       ...completeGridNavigationCellParameters
     });
-    const props = useMergedProps(refElementReturn.propsStable, rovingTabIndexChildReturn.propsUnstable, hasCurrentFocusReturn.propsStable);
+    const props = useMergedProps(propsStable, propsRti, hasCurrentFocusReturn.propsStable);
     return {
       props,
       refElementReturn,
@@ -7319,7 +7322,8 @@ var bundle = (function (exports) {
       singleSelectionReturn,
       typeaheadNavigationReturn,
       rearrangeableChildrenReturn,
-      sortableChildrenReturn
+      sortableChildrenReturn,
+      propsStable
     } = useListNavigationSingleSelectionSortable({
       managedChildrenReturn: {
         getChildren
@@ -7393,7 +7397,6 @@ var bundle = (function (exports) {
       managedChildrenReturn,
       staggeredChildrenParameters
     });
-    const props = useMergedProps(linearNavigationReturn.propsStable, typeaheadNavigationReturn.propsStable);
     const context = useStableObject({
       singleSelectionContext,
       managedChildContext,
@@ -7405,7 +7408,7 @@ var bundle = (function (exports) {
     });
     return {
       context,
-      props,
+      propsStable,
       managedChildrenReturn,
       rearrangeableChildrenReturn,
       staggeredChildrenReturn,
@@ -7489,7 +7492,8 @@ var bundle = (function (exports) {
     } = singleSelectionChildParameters;
     if (hidden) disabled = true;
     const {
-      refElementReturn
+      refElementReturn,
+      propsStable
     } = useRefElement({
       refElementParameters: {}
     });
@@ -7505,7 +7509,8 @@ var bundle = (function (exports) {
       singleSelectionChildReturn,
       managedChildParameters: {
         setLocalSelected
-      }
+      },
+      props: propsLs
     } = useListNavigationSingleSelectionChild({
       managedChildParameters: {
         index
@@ -7586,7 +7591,7 @@ var bundle = (function (exports) {
       },
       refElementReturn
     });
-    const props = useMergedProps(refElementReturn.propsStable, hasCurrentFocusReturn.propsStable, rovingTabIndexChildReturn.propsUnstable, singleSelectionChildReturn.propsUnstable, paginationProps, staggeredProps);
+    const props = useMergedProps(propsStable, hasCurrentFocusReturn.propsStable, propsLs, paginationProps, staggeredProps);
     return {
       props,
       pressParameters,
@@ -7624,40 +7629,34 @@ var bundle = (function (exports) {
     } = dismissParameters;
     const {
       refElementPopupReturn,
-      refElementSourceReturn
+      refElementSourceReturn,
+      propsStablePopup,
+      propsStableSource
     } = useDismiss({
       dismissParameters,
       escapeDismissParameters
     });
     const {
-      focusTrapReturn,
+      propsStable,
       refElementReturn
+    } = useRefElement({});
+    const {
+      focusTrapReturn,
+      props
     } = useFocusTrap({
       focusTrapParameters: {
         trapActive: open && trapActive,
         ...focusTrapParameters
       },
-      refElementParameters: {}
+      refElementReturn
     });
-    const {
-      propsStable: pp1
-    } = refElementPopupReturn;
-    const {
-      propsStable: ps2
-    } = refElementSourceReturn;
-    const {
-      propsUnstable: pp3
-    } = focusTrapReturn;
-    const {
-      propsStable: pp4
-    } = refElementReturn;
     return {
-      propsPopup: pp1,
-      propsFocusContainer: useMergedProps(pp3, pp4),
-      propsSource: ps2,
+      propsFocusContainer: useMergedProps(propsStable, props),
       refElementPopupReturn,
       refElementSourceReturn,
-      focusTrapReturn
+      focusTrapReturn,
+      propsStablePopup,
+      propsStableSource
     };
   }
 
@@ -7990,6 +7989,7 @@ var bundle = (function (exports) {
           (element === null || element === void 0 ? void 0 : element.tagName) == 'input' && element.type == 'radio' && element.checked) {
             // Intentional, for now. Programmatic clicks shouldn't happen in most cases.
             // TODO: Remove this when I'm confident stray clicks won't be handled.
+            /* eslint-disable no-debugger */
             debugger;
             console.log("onclick was fired and will be handled as it doesn't look like it came from a pointer event", e);
             setIsPressing(true, e);
@@ -8011,23 +8011,23 @@ var bundle = (function (exports) {
       pressReturn: {
         pressing: pointerDownStartedHere && hovering || waitingForSpaceUp || false,
         getIsPressing,
-        longPress,
-        propsUnstable: {
-          onKeyDown,
-          onKeyUp,
-          onTouchStart: !hasPressEvent ? undefined : !p ? onTouchStart : undefined,
-          onTouchCancel: !hasPressEvent ? undefined : !p ? onTouchEnd : undefined,
-          onTouchMove: !hasPressEvent ? undefined : !p ? onTouchMove : undefined,
-          onTouchEnd: !hasPressEvent ? undefined : !p ? onTouchEnd : undefined,
-          onPointerDown: !hasPressEvent ? undefined : p ? onPointerDown : undefined,
-          onPointerCancel: !hasPressEvent ? undefined : p ? onPointerDown : undefined,
-          onPointerMove: !pointerDownStartedHere || !hasPressEvent ? undefined : p ? onPointerMove : undefined,
-          onPointerUp: !hasPressEvent ? undefined : p ? onPointerUp : undefined,
-          onPointerEnter: !hasPressEvent ? undefined : p ? onPointerEnter : undefined,
-          onPointerLeave: !hasPressEvent ? undefined : p ? onPointerLeave : undefined,
-          onfocusout: onFocusOut,
-          onClick
-        }
+        longPress
+      },
+      props: {
+        onKeyDown,
+        onKeyUp,
+        onTouchStart: !hasPressEvent ? undefined : !p ? onTouchStart : undefined,
+        onTouchCancel: !hasPressEvent ? undefined : !p ? onTouchEnd : undefined,
+        onTouchMove: !hasPressEvent ? undefined : !p ? onTouchMove : undefined,
+        onTouchEnd: !hasPressEvent ? undefined : !p ? onTouchEnd : undefined,
+        onPointerDown: !hasPressEvent ? undefined : p ? onPointerDown : undefined,
+        onPointerCancel: !hasPressEvent ? undefined : p ? onPointerDown : undefined,
+        onPointerMove: !pointerDownStartedHere || !hasPressEvent ? undefined : p ? onPointerMove : undefined,
+        onPointerUp: !hasPressEvent ? undefined : p ? onPointerUp : undefined,
+        onPointerEnter: !hasPressEvent ? undefined : p ? onPointerEnter : undefined,
+        onPointerLeave: !hasPressEvent ? undefined : p ? onPointerLeave : undefined,
+        onfocusout: onFocusOut,
+        onClick
       }
     };
   }
@@ -8088,121 +8088,6 @@ var bundle = (function (exports) {
     };
   }
 
-  function identityCapture() {
-    for (var _len = arguments.length, t = new Array(_len), _key = 0; _key < _len; _key++) {
-      t[_key] = arguments[_key];
-    }
-    return t;
-  }
-  const AsyncFunction = async function () {}.constructor;
-  /**
-   * Given an async function, returns a function that's suitable for non-async APIs,
-   * along with other information about the current run's status.
-   *
-   * See also `useAsyncHandler` for a version that's specialized for DOM event handlers.
-   *
-   * When called multiple times in quick succession, (i.e. before the handler has finished),
-   * this works like Lodash's `throttle` function with the `wait` option always
-   * set to however long the handler takes to complete. A second call to the sync function will be
-   * throttled until the first call has finished. The return value of the function is the result
-   * of the previous invocation, or `undefined` on the first call.
-   *
-   * The handler is only ever delayed if one is currently running, so, e.g. for iOS touch events the
-   * first call happens in the same event handler (which means things like calls to `element.focus()`
-   * will work as intended, since that fails when the event is "split up")
-   *
-   * Finally, because the sync handler may be invoked on a delay, any property references on the arguments
-   * provided might be stale by the time it's actually invoked (e.g. accessing `event.currentTarget.checked`
-   * is not stable across time because it's a "live" value -- you almost always want the value that it
-   * had at the original time the handler was called). The `capture` option allows you to save that kind of
-   * dynamic data at the time it runs; the `AP` and `SP` type parameters likewise control
-   * the parameters the async handler and sync handler expect respectively.
-   *
-   */
-  function useAsync(asyncHandler2, options) {
-    // Things related to current execution
-    // Because we can both return and throw undefined, 
-    // we need separate state to track their existance too.
-    const [pending, setPending, _getPending] = useState(false);
-    const [result, setResult, _getResult] = useState(undefined);
-    const [error, setError, _getError] = useState(undefined);
-    const [hasError, setHasError, _getHasError] = useState(false);
-    const [hasResult, setHasResult, _getHasResult] = useState(false);
-    const [asyncDebouncing, setAsyncDebouncing] = useState(false);
-    const [syncDebouncing, setSyncDebouncing] = useState(false);
-    const [invocationResult, setInvocationResult] = useState(asyncHandler2 instanceof AsyncFunction ? "async" : null);
-    const incrementCallCount = T$1(() => {
-      setRunCount(c => c + 1);
-    }, []);
-    const incrementResolveCount = T$1(() => {
-      setResolveCount(c => c + 1);
-    }, []);
-    const incrementRejectCount = T$1(() => {
-      setRejectCount(c => c + 1);
-    }, []);
-    const incrementFinallyCount = T$1(() => {
-      setSettleCount(c => c + 1);
-    }, []);
-    /* eslint-disable prefer-const */
-    let {
-      throttle,
-      debounce,
-      capture: captureUnstable
-    } = options !== null && options !== void 0 ? options : {};
-    const captureStable = useStableCallback(captureUnstable !== null && captureUnstable !== void 0 ? captureUnstable : identityCapture);
-    const asyncHandlerStable = useStableCallback(asyncHandler2 !== null && asyncHandler2 !== void 0 ? asyncHandler2 : identity);
-    const {
-      flush,
-      syncOutput,
-      cancel
-    } = F$1(() => {
-      return asyncToSync({
-        asyncInput: asyncHandlerStable,
-        capture: captureStable,
-        onAsyncDebounce: setAsyncDebouncing,
-        onError: setError,
-        onPending: setPending,
-        onReturnValue: setResult,
-        onSyncDebounce: setSyncDebouncing,
-        onHasError: setHasError,
-        onHasResult: setHasResult,
-        onInvoked: setInvocationResult,
-        onInvoke: incrementCallCount,
-        onFinally: incrementFinallyCount,
-        onReject: incrementRejectCount,
-        onResolve: incrementResolveCount,
-        throttle: options === null || options === void 0 ? void 0 : options.throttle,
-        wait: options === null || options === void 0 ? void 0 : options.debounce
-      });
-    }, [throttle, debounce]);
-    h(() => {
-      return () => cancel();
-    }, [cancel]);
-    // We keep, like, a lot of render-state, but it only ever triggers a re-render
-    // when we start/stop an async action.
-    // Keep track of this for the caller's sake -- we don't really care.
-    /*const [currentType, setCurrentType] = useState<null | "sync" | "async">(null);*/
-    const [runCount, setRunCount] = useState(0);
-    const [settleCount, setSettleCount] = useState(0);
-    const [resolveCount, setResolveCount] = useState(0);
-    const [rejectCount, setRejectCount] = useState(0);
-    return {
-      syncHandler: syncOutput,
-      pending,
-      result,
-      error,
-      hasError: hasError || false,
-      hasResult: hasResult || false,
-      resolveCount,
-      rejectCount,
-      settleCount,
-      debouncingAsync: asyncDebouncing,
-      debouncingSync: syncDebouncing,
-      invocationResult,
-      callCount: runCount,
-      flushDebouncedPromise: flush
-    };
-  }
   function isPromise(p) {
     return p instanceof Promise;
   }
@@ -8318,7 +8203,8 @@ var bundle = (function (exports) {
       lodashOptions.maxWait = throttle;
     }
     const syncDebounced = debounce(() => {
-      // 3. Instead of calling the sync version of our function directly, we allow it to be throttled/debounced.
+      // 3. Instead of calling the sync version of our function directly, we allow it to be throttled/debounced (above)
+      // and now that we're done throttling/debouncing, notify anyone who cares of this fact (below).
       onSyncDebounce(syncDebouncing = false);
       if (!pending) {
         // 4a. If this is the first invocation, or if we're not still waiting for a previous invocation to finish its async call,
@@ -8334,18 +8220,134 @@ var bundle = (function (exports) {
     }, wait || undefined, lodashOptions);
     return {
       syncOutput: function () {
-        // 1. We call the sync version of our async function.
-        // 2. We capture the arguments into a form that won't become stale if/when the function is called with a (possibly seconds-long) delay (e.g. event.currentTarget.value on an <input> element).
+        // 1. Someone just called the sync version of our async function.
+        // 2. We capture the arguments in a way that won't become stale if/when the function is called with a (possibly seconds-long) delay (e.g. event.currentTarget.value on an <input> element).
         currentCapture = capture(...arguments);
         onSyncDebounce(syncDebouncing = true);
         syncDebounced();
       },
-      flush: () => {
+      flushSyncDebounce: () => {
         syncDebounced.flush();
       },
-      cancel: () => {
+      cancelSyncDebounce: () => {
         syncDebounced.cancel();
       }
+    };
+  }
+
+  function identityCapture() {
+    for (var _len = arguments.length, t = new Array(_len), _key = 0; _key < _len; _key++) {
+      t[_key] = arguments[_key];
+    }
+    return t;
+  }
+  const AsyncFunction = async function () {}.constructor;
+  /**
+   * Given an async function, returns a function that's suitable for non-async APIs,
+   * along with other information about the current run's status.
+   *
+   * See also `useAsyncHandler` for a version that's specialized for DOM event handlers.
+   *
+   * When called multiple times in quick succession, (i.e. before the handler has finished),
+   * this works like Lodash's `throttle` function with the `wait` option always
+   * set to however long the handler takes to complete. A second call to the sync function will be
+   * throttled until the first call has finished. The return value of the function is the result
+   * of the previous invocation, or `undefined` on the first call.
+   *
+   * The handler is only ever delayed if one is currently running, so, e.g. for iOS touch events the
+   * first call happens in the same event handler (which means things like calls to `element.focus()`
+   * will work as intended, since that fails when the event is "split up")
+   *
+   * Finally, because the sync handler may be invoked on a delay, any property references on the arguments
+   * provided might be stale by the time it's actually invoked (e.g. accessing `event.currentTarget.checked`
+   * is not stable across time because it's a "live" value -- you almost always want the value that it
+   * had at the original time the handler was called). The `capture` option allows you to save that kind of
+   * dynamic data at the time it runs; the `AP` and `SP` type parameters likewise control
+   * the parameters the async handler and sync handler expect respectively.
+   *
+   */
+  function useAsync(asyncHandler2, options) {
+    // Things related to current execution
+    // Because we can both return and throw undefined, 
+    // we need separate state to track their existance too.
+    //
+    // We keep, like, a *lot* of render-state, but it only ever triggers a re-render
+    // when we start/stop an async action.
+    const [pending, setPending, _getPending] = useState(false);
+    const [result, setResult, _getResult] = useState(undefined);
+    const [error, setError, _getError] = useState(undefined);
+    const [hasError, setHasError, _getHasError] = useState(false);
+    const [hasResult, setHasResult, _getHasResult] = useState(false);
+    const [asyncDebouncing, setAsyncDebouncing] = useState(false);
+    const [syncDebouncing, setSyncDebouncing] = useState(false);
+    const [invocationResult, setInvocationResult] = useState(asyncHandler2 instanceof AsyncFunction ? "async" : null);
+    // Keep track of this for the caller's sake -- we don't really care.
+    const [runCount, setRunCount] = useState(0);
+    const [settleCount, setSettleCount] = useState(0);
+    const [resolveCount, setResolveCount] = useState(0);
+    const [rejectCount, setRejectCount] = useState(0);
+    const incrementCallCount = T$1(() => {
+      setRunCount(c => c + 1);
+    }, []);
+    const incrementResolveCount = T$1(() => {
+      setResolveCount(c => c + 1);
+    }, []);
+    const incrementRejectCount = T$1(() => {
+      setRejectCount(c => c + 1);
+    }, []);
+    const incrementFinallyCount = T$1(() => {
+      setSettleCount(c => c + 1);
+    }, []);
+    /* eslint-disable prefer-const */
+    let {
+      throttle,
+      debounce,
+      capture: captureUnstable
+    } = options !== null && options !== void 0 ? options : {};
+    const captureStable = useStableCallback(captureUnstable !== null && captureUnstable !== void 0 ? captureUnstable : identityCapture);
+    const asyncHandlerStable = useStableCallback(asyncHandler2 !== null && asyncHandler2 !== void 0 ? asyncHandler2 : identity);
+    const {
+      flushSyncDebounce,
+      syncOutput,
+      cancelSyncDebounce
+    } = F$1(() => {
+      return asyncToSync({
+        asyncInput: asyncHandlerStable,
+        capture: captureStable,
+        onAsyncDebounce: setAsyncDebouncing,
+        onError: setError,
+        onPending: setPending,
+        onReturnValue: setResult,
+        onSyncDebounce: setSyncDebouncing,
+        onHasError: setHasError,
+        onHasResult: setHasResult,
+        onInvoked: setInvocationResult,
+        onInvoke: incrementCallCount,
+        onFinally: incrementFinallyCount,
+        onReject: incrementRejectCount,
+        onResolve: incrementResolveCount,
+        throttle: options === null || options === void 0 ? void 0 : options.throttle,
+        wait: options === null || options === void 0 ? void 0 : options.debounce
+      });
+    }, [throttle, debounce]);
+    h(() => {
+      return () => cancelSyncDebounce();
+    }, [cancelSyncDebounce]);
+    return {
+      syncHandler: syncOutput,
+      pending,
+      result,
+      error,
+      hasError: hasError || false,
+      hasResult: hasResult || false,
+      resolveCount,
+      rejectCount,
+      settleCount,
+      debouncingAsync: asyncDebouncing,
+      debouncingSync: syncDebouncing,
+      invocationResult,
+      callCount: runCount,
+      flushDebouncedPromise: flushSyncDebounce
     };
   }
 
@@ -8697,6 +8699,205 @@ var bundle = (function (exports) {
   }
 
   /**
+   * Easy access to an HTMLElement that can be controlled imperatively.
+   *
+   * The HTMLElement rendered is controlled by the `tag` prop (e.g. "span", "div").
+   *
+   * The `handle` prop should be e.g. `useRef<ImperativeHandle<HTMLDivElement>>(null)`
+   */
+  x(k(ImperativeElementU));
+  function useImperativeProps(_ref) {
+    let {
+      refElementReturn: {
+        getElement
+      }
+    } = _ref;
+    const currentImperativeProps = _({
+      className: new Set(),
+      style: {},
+      children: null,
+      others: {}
+    });
+    const hasClass = T$1(cls => {
+      return currentImperativeProps.current.className.has(cls);
+    }, []);
+    const setClass = T$1((cls, enabled) => {
+      if (hasClass(cls) == !enabled) {
+        var _getElement;
+        (_getElement = getElement()) === null || _getElement === void 0 ? void 0 : _getElement.classList[enabled ? "add" : "remove"](cls);
+        currentImperativeProps.current.className[enabled ? "add" : "delete"](cls);
+      }
+    }, []);
+    const setStyle = T$1((prop, value) => {
+      const element = getElement();
+      if (element) {
+        if (currentImperativeProps.current.style[prop] != value) {
+          currentImperativeProps.current.style[prop] = value;
+          if (prop.startsWith("--")) {
+            if (value != null) element.style.setProperty(prop, "".concat(value));else element.style.removeProperty(prop);
+          } else {
+            element.style[prop] = value !== null && value !== void 0 ? value : "";
+          }
+        }
+      }
+    }, []);
+    const setChildren = T$1(children => {
+      let e = getElement();
+      if (e && currentImperativeProps.current.children != children) {
+        currentImperativeProps.current.children = children;
+        e.textContent = children;
+      }
+    }, []);
+    const getAttribute = T$1(prop => {
+      return currentImperativeProps.current.others[prop];
+    }, []);
+    const setAttribute = T$1((prop, value) => {
+      if (value != null) {
+        var _getElement2;
+        currentImperativeProps.current.others[prop] = value;
+        (_getElement2 = getElement()) === null || _getElement2 === void 0 ? void 0 : _getElement2.setAttribute(prop, value);
+      } else {
+        var _getElement3;
+        delete currentImperativeProps.current.others[prop];
+        (_getElement3 = getElement()) === null || _getElement3 === void 0 ? void 0 : _getElement3.removeAttribute(prop);
+      }
+    }, []);
+    const setEventHandler = T$1((type, handler, options) => {
+      const element = getElement();
+      const mappedKey = EventMapping[type];
+      if (element) {
+        if (handler) {
+          element.addEventListener(type, handler, options);
+          currentImperativeProps.current.others[mappedKey] = handler;
+        } else if (currentImperativeProps.current.others[mappedKey]) {
+          element.removeEventListener(type, currentImperativeProps.current.others[mappedKey], options);
+          currentImperativeProps.current.others[mappedKey] = undefined;
+        }
+      }
+    }, []);
+    return {
+      imperativeHandle: _({
+        hasClass,
+        setClass,
+        setStyle,
+        getAttribute,
+        setAttribute,
+        setEventHandler,
+        setChildren
+      }).current,
+      props: useMergedProps({
+        className: [...currentImperativeProps.current.className].join(" "),
+        style: currentImperativeProps.current.style
+      }, currentImperativeProps.current.others)
+    };
+  }
+  function ImperativeElementU(_ref2, ref) {
+    let {
+      tag: Tag,
+      handle,
+      ...props
+    } = _ref2;
+    const {
+      propsStable,
+      refElementReturn
+    } = useRefElement({
+      refElementParameters: {}
+    });
+    const {
+      props: iprops,
+      imperativeHandle
+    } = useImperativeProps({
+      refElementReturn
+    });
+    A(handle, () => imperativeHandle);
+    return v$1(Tag, useMergedProps(propsStable, iprops, props, {
+      ref
+    }));
+  }
+  const EventMapping = {
+    abort: "onAbort",
+    animationend: "onAnimationEnd",
+    animationstart: "onAnimationStart",
+    animationiteration: "onAnimationIteration",
+    beforeinput: "onBeforeInput",
+    blur: "onBlur",
+    canplay: "onCanPlay",
+    canplaythrough: "onCanPlayThrough",
+    change: "onChange",
+    click: "onClick",
+    compositionend: "onCompositionEnd",
+    compositionstart: "onCompositionStart",
+    compositionupdate: "onCompositionUpdate",
+    contextmenu: "onContextMenu",
+    cut: "onCut",
+    dblclick: "onDblClick",
+    drag: "onDrag",
+    dragend: "onDragEnd",
+    dragenter: "onDragEnter",
+    dragleave: "onDragLeave",
+    dragover: "onDragOver",
+    dragstart: "onDragStart",
+    drop: "onDrop",
+    durationchange: "onDurationChange",
+    emptied: "onEmptied",
+    ended: "onEnded",
+    error: "onError",
+    focus: "onFocus",
+    focusin: "onfocusin",
+    focusout: "onfocusout",
+    formdata: "onFormData",
+    gotpointercapture: "onGotPointerCapture",
+    input: "onInput",
+    invalid: "onInvalid",
+    keydown: "onKeyDown",
+    keypress: "onKeyPress",
+    keyup: "onKeyUp",
+    load: "onLoad",
+    loadeddata: "onLoadedData",
+    loadedmetadata: "onLoadedMetadata",
+    loadstart: "onLoadStart",
+    lostpointercapture: "onLostPointerCapture",
+    mousedown: "onMouseDown",
+    mouseenter: "onMouseEnter",
+    mouseleave: "onMouseLeave",
+    mousemove: "onMouseMove",
+    mouseout: "onMouseOut",
+    mouseover: "onMouseOver",
+    mouseup: "onMouseUp",
+    paste: "onPaste",
+    pause: "onPause",
+    play: "onPlay",
+    playing: "onPlaying",
+    pointercancel: "onPointerCancel",
+    pointerdown: "onPointerDown",
+    pointerenter: "onPointerEnter",
+    pointerleave: "onPointerLeave",
+    pointermove: "onPointerMove",
+    pointerout: "onPointerOut",
+    pointerover: "onPointerOver",
+    pointerup: "onPointerUp",
+    progress: "onProgress",
+    reset: "onReset",
+    scroll: "onScroll",
+    seeked: "onSeeked",
+    seeking: "onSeeking",
+    select: "onSelect",
+    stalled: "onStalled",
+    submit: "onSubmit",
+    suspend: "onSuspend",
+    timeupdate: "onTimeUpdate",
+    toggle: "onToggle",
+    touchcancel: "onTouchCancel",
+    touchend: "onTouchEnd",
+    touchmove: "onTouchMove",
+    touchstart: "onTouchStart",
+    transitionend: "onTransitionEnd",
+    volumechange: "onVolumeChange",
+    waiting: "onWaiting",
+    wheel: "onWheel"
+  };
+
+  /**
    * Very basic hook for a root-level component to use to allow any children within the whole app to push children to a portal somewhere.
    *
    * Returns the portal (as `children`, and functions to add, remove, or update a child to the portaled area)
@@ -8925,8 +9126,8 @@ var bundle = (function (exports) {
       return (_buttonRef$current = buttonRef.current) === null || _buttonRef$current === void 0 ? void 0 : _buttonRef$current.focus();
     };
     const {
-      propsPopup,
-      propsSource,
+      propsStablePopup,
+      propsStableSource,
       propsFocusContainer
     } = useModal({
       focusTrapParameters: {
@@ -8953,7 +9154,6 @@ var bundle = (function (exports) {
         parentDepth
       }
     });
-    propsSource.role;
     return o$1("div", {
       style: {
         border: "".concat(depth, "px solid black")
@@ -8996,11 +9196,11 @@ var bundle = (function (exports) {
       }), o$1("div", {
         children: ["Last reason for closing: ", closeReason !== null && closeReason !== void 0 ? closeReason : "(hasn't been closed yet)"]
       }), o$1("button", {
-        ...propsSource,
+        ...propsStableSource,
         onClick: () => setOpen(true),
         children: "Open Modal"
       }), o$1("div", {
-        ...useMergedProps(propsFocusContainer, propsPopup),
+        ...useMergedProps(propsFocusContainer, propsStablePopup),
         style: "border: ".concat(depth, "px dotted red; background: #ccc"),
         children: o$1("div", {
           style: {
@@ -9019,7 +9219,7 @@ var bundle = (function (exports) {
           }), hasChild && o$1(DemoUseModal, {
             parentDepth: depth
           }), o$1("button", {
-            ...propsSource,
+            ...propsStableSource,
             onClick: () => setOpen(false),
             children: "Close modal programmatically"
           })]
@@ -9080,7 +9280,7 @@ var bundle = (function (exports) {
       }
     });
     const {
-      props,
+      propsStable,
       context,
       rovingTabIndexReturn: {
         setTabbableIndex
@@ -9253,7 +9453,7 @@ var bundle = (function (exports) {
           value: context,
           children: o$1("ol", {
             start: 0,
-            ...props,
+            ...propsStable,
             children: useRearrangedChildren(jsxChildren)
           })
         })
@@ -9267,9 +9467,11 @@ var bundle = (function (exports) {
     let {
       index
     } = _ref;
-    // FIXME: A hole in the array works for nagivation but not for sorting.
-    //if (index == 1)
-    //    return <li>(Item #${index} isn't rendered; it's a hole in the array)</li>;
+    if (index == 1) return o$1("li", {
+      children: ["(Item ", index, " is a ", o$1("strong", {
+        children: "hole in the array"
+      }), " and does not exist)"]
+    });
     const selectionMode = q(SelectionModeContext);
     let disabled = index == 6;
     let hidden = index == 7;
@@ -9285,8 +9487,7 @@ var bundle = (function (exports) {
     const {
       props,
       rovingTabIndexChildReturn: {
-        tabbable,
-        propsUnstable: p2
+        tabbable
       },
       singleSelectionChildReturn: {
         selected,
@@ -9328,7 +9529,8 @@ var bundle = (function (exports) {
       }
     });
     const {
-      pressReturn
+      pressReturn,
+      props: propsPress
     } = usePress({
       refElementReturn,
       pressParameters: {
@@ -9336,7 +9538,7 @@ var bundle = (function (exports) {
         focusSelf
       }
     });
-    const props2 = useMergedProps(props, pressReturn.propsUnstable);
+    const props2 = useMergedProps(props, propsPress);
     const text = "".concat(randomWord, " This is item #").concat(index, " (offset: ").concat(selectedOffset, ") ").concat(hidden ? " (hidden)" : "").concat(disabled ? " (disabled)" : "").concat(selected ? " (selected)" : " (not selected)", " (").concat(tabbable ? "Tabbable" : "Not tabbable", ")");
     return o$1("li", {
       ...props2,
@@ -9345,8 +9547,9 @@ var bundle = (function (exports) {
         transform: "translateX(".concat(hideBecauseStaggered ? "50%" : "0%", ")")
       },
       children: [text, o$1("input", {
-        ...useMergedProps(p2, {
-          type: "number"
+        ...useMergedProps({
+          type: "number",
+          tabIndex: props.tabIndex
         }),
         style: {
           width: "5ch"
@@ -9391,6 +9594,264 @@ var bundle = (function (exports) {
   };
 
   const RandomWords = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
+  //const GridRowContext = createContext<UseGridNavigationRow<HTMLTableRowElement, HTMLTableCellElement, {}, {}, string, string>>(null!);
+  //const GridCellContext = createContext<UseGridNavigationCell<HTMLTableCellElement, {}, string>>(null!);
+  const DemoUseGrid = x(() => {
+    const [tabbableColumn, setTabbableColumn, _getTabbableColumn] = useState(null);
+    const [selectedRow, setSelectedRow, _getSelectedRow] = useState(null);
+    const [tabbableRow, setTabbableRow] = useState(null);
+    const ret = useCompleteGridNavigation({
+      singleSelectionParameters: {
+        initiallySelectedIndex: selectedRow,
+        onSelectedIndexChange: setSelectedRow
+      },
+      gridNavigationParameters: {
+        onTabbableColumnChange: setTabbableColumn
+      },
+      linearNavigationParameters: {
+        disableArrowKeys: false,
+        disableHomeEndKeys: false,
+        navigatePastEnd: "wrap",
+        navigatePastStart: "wrap",
+        pageNavigationSize: 0.1
+      },
+      //managedChildrenReturn: { getChildren },
+      rovingTabIndexParameters: {
+        onTabbableIndexChange: setTabbableRow,
+        untabbable: false
+      },
+      typeaheadNavigationParameters: {
+        collator: null,
+        noTypeahead: false,
+        typeaheadTimeout: 1000
+      },
+      rearrangeableChildrenParameters: {
+        getIndex: T$1(a => a.props.index, [])
+      },
+      sortableChildrenParameters: {
+        compare: T$1((rhs, lhs) => {
+          return lhs.index - rhs.index;
+        }, [])
+      },
+      paginatedChildrenParameters: {
+        paginationMin: null,
+        paginationMax: null
+      },
+      staggeredChildrenParameters: {
+        staggered: false
+      }
+    });
+    const {
+      context,
+      propsStable,
+      rearrangeableChildrenReturn: {
+        useRearrangedChildren
+      }
+    } = ret;
+    return o$1("div", {
+      class: "demo",
+      children: [o$1("h2", {
+        children: "useGridNavigationComplete"
+      }), o$1("p", {
+        children: ["Like ", o$1("code", {
+          children: "useCompleteListNavigation"
+        }), " but for 2D navigation. Cells can span multiple columns. Rows can be filtered, sorted, and arbitrarily re-arranged."]
+      }), o$1("div", {
+        children: ["Current row: ", tabbableRow]
+      }), o$1("div", {
+        children: ["Current column: ", tabbableColumn]
+      }), o$1("table", {
+        ...{
+          border: "2"
+        },
+        style: {
+          whiteSpace: "nowrap"
+        },
+        children: [o$1("thead", {
+          children: o$1("tr", {
+            children: [o$1("th", {
+              children: "Row is tabbable?"
+            }), o$1("th", {
+              children: "Column 1"
+            }), o$1("th", {
+              children: "Column 2"
+            }), o$1("th", {
+              children: "Column 3"
+            })]
+          })
+        }), o$1(GridRowContext.Provider, {
+          value: context,
+          children: o$1("tbody", {
+            ...propsStable,
+            children: useRearrangedChildren(Array.from(function* () {
+              for (let i = 0; i < 10; ++i) {
+                yield o$1(DemoUseGridRow, {
+                  index: i
+                }, i);
+              }
+            }()))
+          })
+        })]
+      })]
+    });
+  });
+  //type GridRowContext<ParentElement extends Element, RowElement extends Element> = CompleteGridNavigationContext<ParentElement, RowElement>;
+  //type GridCellContext<RowElement extends Element, CellElement extends Element> = CompleteGridNavigationRowContext<RowElement, CellElement>;
+  const GridRowContext = E(null);
+  const GridCellContext = E(null);
+  const DemoUseGridRow = x(_ref => {
+    let {
+      index
+    } = _ref;
+    useState(() => RandomWords[index /*Math.floor(Math.random() * (RandomWords.length - 1))*/]);
+    const [_tabbableColumn, setTabbableColumn, _getTabbableColumn] = useState(null);
+    //const getHighestIndex = useCallback(() => getChildren().getHighestIndex(), []);
+    //const getChildren = useCallback(() => { return getChildren2() }, []);
+    const hidden = index === 3;
+    const disabled = hidden;
+    const contextFromParent = q(GridRowContext);
+    const ret = useCompleteGridNavigationRow({
+      rowAsChildOfGridParameters: {
+        completeGridNavigationRowParameters: {
+          foo: "bar"
+        },
+        sortableChildParameters: {
+          getSortValue: returnNull
+        },
+        context: contextFromParent,
+        rovingTabIndexChildParameters: {
+          hidden
+        },
+        managedChildParameters: {
+          index
+        },
+        singleSelectionChildParameters: {
+          disabled,
+          ariaPropName: "aria-checked",
+          selectionMode: "focus"
+        },
+        textContentParameters: {
+          getText: T$1(e => {
+            var _e$textContent;
+            return (_e$textContent = e === null || e === void 0 ? void 0 : e.textContent) !== null && _e$textContent !== void 0 ? _e$textContent : "";
+          }, [])
+        }
+      },
+      rowAsParentOfCellsParameters: {
+        linearNavigationParameters: {
+          disableArrowKeys: false,
+          disableHomeEndKeys: false,
+          navigatePastEnd: "wrap",
+          navigatePastStart: "wrap"
+        },
+        rovingTabIndexParameters: {
+          onTabbableIndexChange: useStableCallback(i => {
+            setTabbableColumn(i);
+          })
+        },
+        typeaheadNavigationParameters: {
+          collator: null,
+          noTypeahead: false,
+          typeaheadTimeout: 1000
+        }
+      }
+    });
+    const {
+      rowAsParentOfCellsReturn: {
+        propsStable,
+        context: contextToChild
+      },
+      rowAsChildOfGridReturn: {
+        rovingTabIndexChildReturn: {
+          tabbable
+        }
+      }
+    } = ret;
+    return o$1("tr", {
+      ...propsStable,
+      "data-tabbable": ret.rowAsChildOfGridReturn.rovingTabIndexChildReturn.tabbable,
+      children: o$1(GridCellContext.Provider, {
+        value: contextToChild,
+        children: [o$1("td", {
+          children: [_tabbableColumn, ", ", tabbable.toString()]
+        }), Array.from(function* () {
+          for (let i = 0; i < 3; ++i) {
+            yield o$1(DemoUseGridCell, {
+              index: i,
+              row: index,
+              rowIsTabbable: tabbable
+            }, i);
+          }
+        }())]
+      })
+    });
+  });
+  const DemoUseGridCell = _ref2 => {
+    let {
+      index,
+      row,
+      rowIsTabbable
+    } = _ref2;
+    if (row >= 6 && row % 2 == 0 && index > 1) return null;
+    let hiddenText = row === 3 ? " (row hidden)" : "";
+    const context = q(GridCellContext);
+    const {
+      props,
+      rovingTabIndexChildReturn: {
+        tabbable
+      }
+    } = useCompleteGridNavigationCell({
+      gridNavigationCellParameters: {
+        colSpan: 1
+      },
+      managedChildParameters: {
+        index
+      },
+      rovingTabIndexChildParameters: {
+        hidden: false
+      },
+      context,
+      completeGridNavigationCellParameters: {
+        bar: "baz",
+        focusSelf: useStableCallback(e => e.focus())
+      },
+      textContentParameters: {
+        getText: T$1(e => {
+          var _e$textContent2;
+          return (_e$textContent2 = e === null || e === void 0 ? void 0 : e.textContent) !== null && _e$textContent2 !== void 0 ? _e$textContent2 : "";
+        }, [])
+      }
+      //pressParameters: { exclude: index <= 1, focusSelf: useStableCallback(e => e.focus()), onPressSync: null }
+    });
+
+    const t = tabbable ? "(Tabbable)" : "(Not tabbable)";
+    if (index === 0) return o$1("td", {
+      ...props,
+      children: rowIsTabbable.toString()
+    });else {
+      if (row < 6 || row % 2 != 0) {
+        if (index === 1) return o$1("td", {
+          ...props,
+          children: ["Grid cell #", index + 1, " ", t, hiddenText]
+        });else return o$1("td", {
+          children: o$1("label", {
+            children: [o$1("button", {
+              ...props,
+              type: "button",
+              children: "Select row"
+            }), " ", t, hiddenText]
+          })
+        });
+      } else {
+        if (index === 1) return o$1("td", {
+          ...props,
+          colSpan: 2,
+          children: ["Grid cell #", index + 1, ", span 2 ", t, hiddenText]
+        });else return null;
+      }
+    }
+  };
+
   const DemoUseDroppable = () => {
     const {
       droppedFiles,
@@ -9566,7 +10027,8 @@ var bundle = (function (exports) {
       childrenHaveFocusChildContext: q(ChildrenHaveFocusContext)
     });
     const {
-      refElementReturn
+      refElementReturn,
+      propsStable
     } = useRefElement({
       refElementParameters: {}
     });
@@ -9581,7 +10043,7 @@ var bundle = (function (exports) {
     });
     return o$1("div", {
       tabIndex: 0,
-      ...useMergedProps(refElementReturn.propsStable, hasCurrentFocusReturn.propsStable),
+      ...useMergedProps(propsStable, hasCurrentFocusReturn.propsStable),
       children: ["Focusable child #", index, o$1("input", {}), o$1("input", {})]
     });
   };
@@ -9594,12 +10056,12 @@ var bundle = (function (exports) {
     } = _ref4;
     const [active, setActive] = useState(false);
     const {
-      focusTrapReturn: {
-        propsUnstable
-      },
-      refElementReturn: {
-        propsStable
-      }
+      propsStable,
+      refElementReturn
+    } = useRefElement({});
+    const {
+      props,
+      focusTrapReturn
     } = useFocusTrap({
       focusTrapParameters: {
         trapActive: active,
@@ -9610,12 +10072,10 @@ var bundle = (function (exports) {
           return (_f = f()) === null || _f === void 0 ? void 0 : _f.focus();
         }
       },
-      refElementParameters: {
-        onElementChange: undefined
-      }
+      refElementReturn
     });
     //const { useRovingTabIndexChild, useRovingTabIndexProps } = useRovingTabIndex<HTMLUListElement, RovingTabIndexChildInfo>({ tabbableIndex, focusOnChange: false });
-    const divProps = useMergedProps(propsUnstable, propsStable, {
+    const divProps = useMergedProps(props, propsStable, {
       ref: undefined,
       className: "focus-trap-demo"
     });
@@ -9937,15 +10397,13 @@ var bundle = (function (exports) {
     const [lastFocused, setLastFocused] = useState(false);
     const [lastFocusedInner, setLastFocusedInner] = useState(false);
     const {
-      refElementReturn
+      refElementReturn,
+      propsStable: p2
     } = useRefElement({
       refElementParameters: {
         onElementChange: undefined
       }
     });
-    const {
-      propsStable: p2
-    } = refElementReturn;
     const {
       hasCurrentFocusReturn: {
         propsStable: p1
@@ -10031,261 +10489,6 @@ var bundle = (function (exports) {
       })]
     });
   });
-  //const GridRowContext = createContext<UseGridNavigationRow<HTMLTableRowElement, HTMLTableCellElement, {}, {}, string, string>>(null!);
-  //const GridCellContext = createContext<UseGridNavigationCell<HTMLTableCellElement, {}, string>>(null!);
-  const DemoUseGrid = x(() => {
-    const [tabbableColumn, setTabbableColumn, _getTabbableColumn] = useState(null);
-    const [selectedRow, setSelectedRow, _getSelectedRow] = useState(null);
-    const [tabbableRow, setTabbableRow] = useState(null);
-    const ret = useCompleteGridNavigation({
-      singleSelectionParameters: {
-        initiallySelectedIndex: selectedRow,
-        onSelectedIndexChange: setSelectedRow
-      },
-      gridNavigationParameters: {
-        onTabbableColumnChange: setTabbableColumn
-      },
-      linearNavigationParameters: {
-        disableArrowKeys: false,
-        disableHomeEndKeys: false,
-        navigatePastEnd: "wrap",
-        navigatePastStart: "wrap",
-        pageNavigationSize: 0.1
-      },
-      //managedChildrenReturn: { getChildren },
-      rovingTabIndexParameters: {
-        onTabbableIndexChange: setTabbableRow,
-        untabbable: false
-      },
-      typeaheadNavigationParameters: {
-        collator: null,
-        noTypeahead: false,
-        typeaheadTimeout: 1000
-      },
-      rearrangeableChildrenParameters: {
-        getIndex: T$1(a => a.props.index, [])
-      },
-      sortableChildrenParameters: {
-        compare: T$1((rhs, lhs) => {
-          return lhs.index - rhs.index;
-        }, [])
-      },
-      paginatedChildrenParameters: {
-        paginationMin: 1,
-        paginationMax: 2
-      },
-      staggeredChildrenParameters: {
-        staggered: false
-      }
-    });
-    const {
-      context,
-      props,
-      rearrangeableChildrenReturn: {
-        useRearrangedChildren
-      }
-    } = ret;
-    return o$1("div", {
-      class: "demo",
-      children: [o$1("h2", {
-        children: "useGridNavigationComplete"
-      }), o$1("p", {
-        children: ["Like ", o$1("code", {
-          children: "useCompleteListNavigation"
-        }), " but for 2D navigation. Cells can span multiple columns. Rows can be filtered, sorted, and arbitrarily re-arranged."]
-      }), o$1("div", {
-        children: ["Current row: ", tabbableRow]
-      }), o$1("div", {
-        children: ["Current column: ", tabbableColumn]
-      }), o$1("table", {
-        ...{
-          border: "2"
-        },
-        style: {
-          whiteSpace: "nowrap"
-        },
-        children: [o$1("thead", {
-          children: o$1("tr", {
-            children: [o$1("th", {
-              children: "Row is tabbable?"
-            }), o$1("th", {
-              children: "Column 1"
-            }), o$1("th", {
-              children: "Column 2"
-            }), o$1("th", {
-              children: "Column 3"
-            })]
-          })
-        }), o$1(GridRowContext.Provider, {
-          value: context,
-          children: o$1("tbody", {
-            ...props,
-            children: useRearrangedChildren(Array.from(function* () {
-              for (let i = 0; i < 10; ++i) {
-                yield o$1(DemoUseGridRow, {
-                  index: i
-                }, i);
-              }
-            }()))
-          })
-        })]
-      })]
-    });
-  });
-  //type GridRowContext<ParentElement extends Element, RowElement extends Element> = CompleteGridNavigationContext<ParentElement, RowElement>;
-  //type GridCellContext<RowElement extends Element, CellElement extends Element> = CompleteGridNavigationRowContext<RowElement, CellElement>;
-  const GridRowContext = E(null);
-  const GridCellContext = E(null);
-  const DemoUseGridRow = x(_ref6 => {
-    let {
-      index
-    } = _ref6;
-    useState(() => RandomWords[index /*Math.floor(Math.random() * (RandomWords.length - 1))*/]);
-    const [_tabbableColumn, setTabbableColumn, _getTabbableColumn] = useState(null);
-    //const getHighestIndex = useCallback(() => getChildren().getHighestIndex(), []);
-    //const getChildren = useCallback(() => { return getChildren2() }, []);
-    const hidden = index === 3;
-    const disabled = hidden;
-    const contextFromParent = q(GridRowContext);
-    const ret = useCompleteGridNavigationRow({
-      rowAsChildOfGridParameters: {
-        completeGridNavigationRowParameters: {
-          foo: "bar"
-        },
-        sortableChildParameters: {
-          getSortValue: returnNull
-        },
-        context: contextFromParent,
-        rovingTabIndexChildParameters: {
-          hidden
-        },
-        managedChildParameters: {
-          index
-        },
-        singleSelectionChildParameters: {
-          disabled,
-          ariaPropName: "aria-checked",
-          selectionMode: "focus"
-        },
-        textContentParameters: {
-          getText: T$1(e => {
-            var _e$textContent;
-            return (_e$textContent = e === null || e === void 0 ? void 0 : e.textContent) !== null && _e$textContent !== void 0 ? _e$textContent : "";
-          }, [])
-        }
-      },
-      rowAsParentOfCellsParameters: {
-        linearNavigationParameters: {
-          disableArrowKeys: false,
-          disableHomeEndKeys: false,
-          navigatePastEnd: "wrap",
-          navigatePastStart: "wrap"
-        },
-        rovingTabIndexParameters: {
-          onTabbableIndexChange: useStableCallback(i => {
-            setTabbableColumn(i);
-          })
-        },
-        typeaheadNavigationParameters: {
-          collator: null,
-          noTypeahead: false,
-          typeaheadTimeout: 1000
-        }
-      }
-    });
-    const {
-      rowAsChildOfGridReturn: {
-        rovingTabIndexChildReturn: {
-          tabbable
-        }
-      },
-      context: contextToChild,
-      props
-    } = ret;
-    return o$1("tr", {
-      ...props,
-      "data-tabbable": ret.rowAsChildOfGridReturn.rovingTabIndexChildReturn.tabbable,
-      children: o$1(GridCellContext.Provider, {
-        value: contextToChild,
-        children: [o$1("td", {
-          children: [_tabbableColumn, ", ", tabbable.toString()]
-        }), Array.from(function* () {
-          for (let i = 0; i < 3; ++i) {
-            yield o$1(DemoUseGridCell, {
-              index: i,
-              row: index,
-              rowIsTabbable: tabbable
-            }, i);
-          }
-        }())]
-      })
-    });
-  });
-  const DemoUseGridCell = _ref7 => {
-    let {
-      index,
-      row,
-      rowIsTabbable
-    } = _ref7;
-    if (row >= 6 && row % 2 == 0 && index > 1) return null;
-    let hiddenText = row === 3 ? " (row hidden)" : "";
-    const context = q(GridCellContext);
-    const {
-      props,
-      rovingTabIndexChildReturn: {
-        tabbable
-      }
-    } = useCompleteGridNavigationCell({
-      gridNavigationCellParameters: {
-        colSpan: 1
-      },
-      managedChildParameters: {
-        index
-      },
-      rovingTabIndexChildParameters: {
-        hidden: false
-      },
-      context,
-      completeGridNavigationCellParameters: {
-        bar: "baz",
-        focusSelf: useStableCallback(e => e.focus())
-      },
-      textContentParameters: {
-        getText: T$1(e => {
-          var _e$textContent2;
-          return (_e$textContent2 = e === null || e === void 0 ? void 0 : e.textContent) !== null && _e$textContent2 !== void 0 ? _e$textContent2 : "";
-        }, [])
-      }
-      //pressParameters: { exclude: index <= 1, focusSelf: useStableCallback(e => e.focus()), onPressSync: null }
-    });
-
-    const t = tabbable ? "(Tabbable)" : "(Not tabbable)";
-    if (index === 0) return o$1("td", {
-      ...props,
-      children: rowIsTabbable.toString()
-    });else {
-      if (row < 6 || row % 2 != 0) {
-        if (index === 1) return o$1("td", {
-          ...props,
-          children: ["Grid cell #", index + 1, " ", t, hiddenText]
-        });else return o$1("td", {
-          children: o$1("label", {
-            children: [o$1("button", {
-              ...props,
-              type: "button",
-              children: "Select row"
-            }), " ", t, hiddenText]
-          })
-        });
-      } else {
-        if (index === 1) return o$1("td", {
-          ...props,
-          colSpan: 2,
-          children: ["Grid cell #", index + 1, ", span 2 ", t, hiddenText]
-        });else return null;
-      }
-    }
-  };
   function DemoLabel() {
     const {
       propsInput,
@@ -10312,22 +10515,20 @@ var bundle = (function (exports) {
       })]
     });
   }
-  function DemoPress(_ref8) {
+  function DemoPress(_ref6) {
     let {
       remaining
-    } = _ref8;
+    } = _ref6;
     const [count, setCount] = useState(0);
     const {
       refElementReturn,
-      refElementReturn: {
-        propsStable: p1
-      }
+      propsStable: p1
     } = useRefElement({
       refElementParameters: {}
     });
     const {
+      props: p2,
       pressReturn: {
-        propsUnstable: p2,
         pressing,
         longPress
       }
@@ -10467,11 +10668,11 @@ var bundle = (function (exports) {
       }, mode)]
     });
   }
-  const DemoGlobalHandlerChildren = x(function DemoGlobalHandlerChildren(_ref9) {
+  const DemoGlobalHandlerChildren = x(function DemoGlobalHandlerChildren(_ref7) {
     let {
       count,
       mode
-    } = _ref9;
+    } = _ref7;
     return o$1(d$1, {
       children: [...function* () {
         for (let i = 0; i < count; ++i) {
@@ -10483,11 +10684,11 @@ var bundle = (function (exports) {
       }()]
     });
   });
-  const DemoGlobalHandlerChild = x(function DemoGlobalHandlerChild(_ref10) {
+  const DemoGlobalHandlerChild = x(function DemoGlobalHandlerChild(_ref8) {
     let {
       mode,
       target
-    } = _ref10;
+    } = _ref8;
     useGlobalHandler(target, "click", mode == null ? null : e => {
       var _e$target;
       if (((_e$target = e.target) === null || _e$target === void 0 ? void 0 : _e$target.id) != "global-handler-test2") return;
@@ -10564,10 +10765,10 @@ var bundle = (function (exports) {
       })
     });
   });
-  const DemoStaggeredChildren = x(_ref11 => {
+  const DemoStaggeredChildren = x(_ref9 => {
     let {
       childCount
-    } = _ref11;
+    } = _ref9;
     return o$1(d$1, {
       children: Array.from(function* () {
         for (let i = 0; i < childCount; ++i) {
@@ -10578,10 +10779,10 @@ var bundle = (function (exports) {
       }())
     });
   });
-  const DemoStaggeredChild = x(_ref12 => {
+  const DemoStaggeredChild = x(_ref10 => {
     let {
       index
-    } = _ref12;
+    } = _ref10;
     const context = q(StaggeredContext);
     const {
       managedChildParameters: {
@@ -10638,9 +10839,5 @@ var bundle = (function (exports) {
     q$1(o$1(Component, {}), document.getElementById("root"));
   });
 
-  exports.DemoUseGrid = DemoUseGrid;
-
-  return exports;
-
-})({});
+})();
 //# sourceMappingURL=bundle.js.map

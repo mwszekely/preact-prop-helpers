@@ -14,8 +14,8 @@ export interface UseTypeaheadNavigationReturnType<ParentOrChildElement extends E
     typeaheadNavigationReturn: {
         getCurrentTypeahead(): string | null;
         typeaheadStatus: "invalid" | "valid" | "none";
-        propsStable: h.JSX.HTMLAttributes<ParentOrChildElement>;
     }
+    propsStable: h.JSX.HTMLAttributes<ParentOrChildElement>;
     typeaheadNavigationChildContext: UseTypeaheadNavigationContext;
 }
 
@@ -220,9 +220,9 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
         }),
         typeaheadNavigationReturn: {
             getCurrentTypeahead,
-            typeaheadStatus,
-            propsStable: propsStable.current
-        }
+            typeaheadStatus
+        },
+        propsStable: propsStable.current
     }
 
 

@@ -5,9 +5,8 @@ export interface LinearNavigationResult {
     status: "normal" | "past-start" | "past-end";
 }
 export interface UseLinearNavigationReturnType<ParentOrChildElement extends Element> {
-    linearNavigationReturn: {
-        propsStable: h.JSX.HTMLAttributes<ParentOrChildElement>;
-    };
+    linearNavigationReturn: {};
+    propsStable: h.JSX.HTMLAttributes<ParentOrChildElement>;
 }
 /** Arguments passed to the parent `useLinearNavigation` */
 export interface UseLinearNavigationParameters<_ParentOrChildElement extends Element, ChildElement extends Element> {

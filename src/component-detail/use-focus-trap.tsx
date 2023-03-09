@@ -2,10 +2,12 @@ import { h } from "preact";
 import { useEffect } from "preact/hooks";
 import { isFocusable, isTabbable } from "tabbable";
 import { useBlockingElement } from "../dom-helpers/use-blocking-element.js";
-import { useRefElement, UseRefElementParameters, UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
+import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 
-export interface UseFocusTrapParameters<SourceElement extends Element | null, PopupElement extends Element> extends UseRefElementParameters<PopupElement> {
+export interface UseFocusTrapParameters<SourceElement extends Element | null, PopupElement extends Element> {
+    refElementReturn: Pick<UseRefElementReturnType<NonNullable<PopupElement>>["refElementReturn"], "getElement">;
+
     focusTrapParameters: {
         /**
          * Whether or not the focus trap is currently active (or, when used as part of a larger component, whether it is activatable)
@@ -46,18 +48,17 @@ export interface UseFocusTrapParameters<SourceElement extends Element | null, Po
     }
 }
 
-export interface UseFocusTrapReturnType<E extends Element> extends UseRefElementReturnType<E> {
-    focusTrapReturn: { propsUnstable: h.JSX.HTMLAttributes<E> }
+export interface UseFocusTrapReturnType<E extends Element> {
+    props: h.JSX.HTMLAttributes<E>;
+    focusTrapReturn: {  }
 }
 
 //const elementsToRestoreFocusTo = new Map<Element | null, (Node & HTMLOrSVGElement)>();
 
 export function useFocusTrap<SourceElement extends Element | null, PopupElement extends Element>({
     focusTrapParameters: { onlyMoveFocus, trapActive, focusPopup: focusSelfUnstable, focusOpener: focusOpenerUnstable },
-    refElementParameters
+    refElementReturn
 }: UseFocusTrapParameters<SourceElement, PopupElement>): UseFocusTrapReturnType<PopupElement> {
-
-    const { onElementChange, ...rest } = (refElementParameters || {});
 
     type E = PopupElement;
 
@@ -84,19 +85,16 @@ export function useFocusTrap<SourceElement extends Element | null, PopupElement 
             if (lastActive)
                 focusOpener(lastActive as any as SourceElement);
         }
-    }, [trapActive])
+    }, [trapActive]);
 
-    const { refElementReturn } = useRefElement<E>({
-        refElementParameters: { onElementChange, ...rest }
-    })
     const { getElement } = refElementReturn;
 
     const { getTop, getLastActiveWhenClosed, getLastActiveWhenOpen } = useBlockingElement(trapActive && !onlyMoveFocus, getElement);
 
 
     return {
-        refElementReturn,
-        focusTrapReturn: { propsUnstable: { "aria-modal": trapActive ? "true" : undefined } as h.JSX.HTMLAttributes<E> }
+        props: { "aria-modal": trapActive ? "true" : undefined } as h.JSX.HTMLAttributes<E>,
+        focusTrapReturn: {  }
     };
 }
 

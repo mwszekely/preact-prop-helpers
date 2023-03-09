@@ -122,9 +122,9 @@ export function useTypeaheadNavigation({ typeaheadNavigationParameters: { collat
         }),
         typeaheadNavigationReturn: {
             getCurrentTypeahead,
-            typeaheadStatus,
-            propsStable: propsStable.current
-        }
+            typeaheadStatus
+        },
+        propsStable: propsStable.current
     };
     function updateBasedOnTypeaheadChange(currentTypeahead, reason) {
         if (currentTypeahead && sortedTypeaheadInfo.current.length) {

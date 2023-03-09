@@ -1,7 +1,5 @@
 import { useId, useRef } from "preact/hooks";
-import { generateRandomId } from "../preact-extensions/use-before-layout-effect.js";
 import { useEnsureStability } from "../preact-extensions/use-passive-state.js";
-export { generateRandomId };
 export function useRandomId({ randomIdParameters: { prefix, otherReferencerProp } }) {
     const id = (prefix + useId());
     useEnsureStability("useRandomId", prefix, id);

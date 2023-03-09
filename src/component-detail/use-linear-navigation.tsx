@@ -12,9 +12,8 @@ export interface LinearNavigationResult {
 
 
 export interface UseLinearNavigationReturnType<ParentOrChildElement extends Element> {
-    linearNavigationReturn: {
-        propsStable: h.JSX.HTMLAttributes<ParentOrChildElement>;
-    }
+    linearNavigationReturn: {}
+    propsStable: h.JSX.HTMLAttributes<ParentOrChildElement>;
 }
 
 /** Arguments passed to the parent `useLinearNavigation` */
@@ -109,25 +108,14 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
     const { getHighestIndex, indexDemangler, indexMangler, isValid, navigatePastEnd, navigatePastStart } = linearNavigationParameters;
     const { getTabbableIndex, setTabbableIndex } = rovingTabIndexReturn;
 
-    const navigateAbsolute = useCallback((i: number, e: R, fromUserInteraction: boolean) => {
-        const targetUnmangled = indexDemangler(i);
-        const { valueUnmangled } = tryNavigateToIndex({ isValid, highestChildIndex: getHighestIndex(), indexDemangler, indexMangler, searchDirection: -1, targetUnmangled });
-        setTabbableIndex(valueUnmangled, e, fromUserInteraction);
-    }, []);
-    const navigateToFirst = useStableCallback((e: R, fromUserInteraction: boolean) => { navigateAbsolute(0, e, fromUserInteraction); });
-    const navigateToLast = useStableCallback((e: R, fromUserInteraction: boolean) => { navigateAbsolute(getHighestIndex(), e, fromUserInteraction); });
-    const navigateRelative2 = useStableCallback((e: R, offset: number, fromUserInteraction: boolean, mode: "page" | "single"): "passthrough" | "stop" => {
+    const navigateAbsolute = useCallback((requestedIndexMangled: number, searchDirection: -1 | 1, e: R, fromUserInteraction: boolean, mode: "page" | "single") => {
+        //const targetUnmangled = indexDemangler(requestedIndexMangled);
+        //const { valueUnmangled } = tryNavigateToIndex({ isValid, highestChildIndex: getHighestIndex(), indexDemangler, indexMangler, searchDirection: -1, targetUnmangled });
+        //setTabbableIndex(valueUnmangled, e, fromUserInteraction);
         const highestChildIndex = getHighestIndex();
-        const searchDirection = (Math.sign(offset) || 1) as 1 | -1;
         const original = (getTabbableIndex() ?? 0);
-        /**
-         * To get the target, we need to add (or subtract) 1 to our current value,
-         * but it need to be relative to any sorting/rearranging that's happened.
-         * 
-         * We mangle the index to get its "visual" position, add our offset,
-         * and then demangle it to get the child that corresponds to the next child "visually".
-         */
-        const targetUnmangled = indexDemangler(indexMangler(original) + offset);
+
+        const targetUnmangled = indexDemangler(requestedIndexMangled);
         const { status, valueUnmangled } = tryNavigateToIndex({ isValid, highestChildIndex, indexDemangler, indexMangler, searchDirection, targetUnmangled });
         if (status == "past-end") {
             if (navigatePastEnd == "wrap") {
@@ -182,6 +170,22 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
             setTabbableIndex(valueUnmangled, e, fromUserInteraction);
             return "stop";
         }
+    }, []);
+    const navigateToFirst = useStableCallback((e: R, fromUserInteraction: boolean) => { return navigateAbsolute(0, -1, e, fromUserInteraction, "single"); });
+    const navigateToLast = useStableCallback((e: R, fromUserInteraction: boolean) => { return navigateAbsolute(getHighestIndex(), 1, e, fromUserInteraction, "single"); });
+    const navigateRelative2 = useStableCallback((e: R, offset: number, fromUserInteraction: boolean, mode: "page" | "single"): "passthrough" | "stop" => {
+        const highestChildIndex = getHighestIndex();
+        const searchDirection = (Math.sign(offset) || 1) as 1 | -1;
+        const original = (getTabbableIndex() ?? 0);
+        /**
+         * To get the target, we need to add (or subtract) 1 to our current value,
+         * but it need to be relative to any sorting/rearranging that's happened.
+         * 
+         * We mangle the index to get its "visual" position, add our offset,
+         * and then demangle it to get the child that corresponds to the next child "visually".
+         */
+        const targetMangled = indexMangler(original) + offset;
+        return navigateAbsolute(targetMangled, searchDirection, e, fromUserInteraction, mode);
     })
     const navigateToNext = useStableCallback((e: R, fromUserInteraction: boolean) => {
         return navigateRelative2(e, 1, fromUserInteraction, "single");
@@ -215,7 +219,7 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
                 truePageNavigationSize = Math.round(pageNavigationSize * Math.max(100, getHighestIndex() + 1));
             }
 
-            let result: "passthrough" | "stop" | null = null;
+            let result: "passthrough" | "stop" = "passthrough";
 
             // Arrow keys only take effect for components oriented in that direction,
             // so we want to make sure we only listen for left/right or up/down when appropriate.
@@ -237,7 +241,7 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
                     case "ArrowLeft":
                         result = navigateToPrev(e, true);
                         break;
-                        
+
                     case "ArrowDown":
                     case "ArrowRight":
                         result = navigateToNext(e, true);
@@ -246,8 +250,7 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
                     case "PageUp":
                     case "PageDown":
                         if (truePageNavigationSize > 0) {
-                            navigateRelative2(e, truePageNavigationSize * (e.key.endsWith('n') ? -1 : 1), true, "page");
-                            result = 'passthrough';
+                            result = navigateRelative2(e, truePageNavigationSize * (e.key.endsWith('n') ? -1 : 1), true, "page");
                         }
                         break;
 
@@ -258,7 +261,7 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
                                 navigateToFirst(e, true);
                             else
                                 navigateToLast(e, true);
-                            result = 'passthrough';
+                            result = 'stop';
                         }
                         break;
                 }
@@ -352,9 +355,8 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
 
 
     return {
-        linearNavigationReturn: {
-            propsStable: stableProps.current
-        }
+        linearNavigationReturn: {},
+        propsStable: stableProps.current
     }
 
 

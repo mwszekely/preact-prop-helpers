@@ -83,7 +83,7 @@ export function useElementSize<E extends Element>({ elementSizeParameters: { get
         }
     }, [])
 
-    const { refElementReturn } = useRefElement<E>({
+    const { refElementReturn, ...rest } = useRefElement<E>({
         refElementParameters: {
             onElementChange: useCallback((e: E | null, p: E | null | undefined) => { needANewObserver(e, getObserveBox?.()); onElementChange?.(e, p); }, []),
             onMount,
@@ -91,7 +91,7 @@ export function useElementSize<E extends Element>({ elementSizeParameters: { get
         }
     });
 
-    const { getElement } = refElementReturn
+    const { getElement } = refElementReturn;
 
     useEffect(() => {
         if (getObserveBox) {
@@ -102,7 +102,8 @@ export function useElementSize<E extends Element>({ elementSizeParameters: { get
 
     return {
         elementSizeReturn: { getSize },
-        refElementReturn
+        refElementReturn,
+        ...rest
     }
 
 

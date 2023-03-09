@@ -175,8 +175,8 @@ export function useBackdropDismiss({ backdropDismissParameters: { open, onClose:
  * This is similar to the "complete" series of list/grid navigation, in that it's the "outermost" hook of its type.
  */
 export function useDismiss({ dismissParameters: { open: globalOpen, onClose: globalOnClose, closeOnBackdrop, closeOnEscape, closeOnLostFocus }, escapeDismissParameters: { getWindow, parentDepth } }) {
-    const { refElementReturn: refElementSourceReturn } = useRefElement({ refElementParameters: {} });
-    const { refElementReturn: refElementPopupReturn } = useRefElement({ refElementParameters: {} });
+    const { refElementReturn: refElementSourceReturn, propsStable: propsStableSource } = useRefElement({ refElementParameters: {} });
+    const { refElementReturn: refElementPopupReturn, propsStable: propsStablePopup } = useRefElement({ refElementParameters: {} });
     const onCloseBackdrop = useCallback(() => { return globalOnClose?.("backdrop"); }, [globalOnClose]);
     const onCloseEscape = useCallback(() => { return globalOnClose?.("escape"); }, [globalOnClose]);
     const onCloseFocus = useCallback(() => { return globalOnClose?.("lost-focus"); }, [globalOnClose]);
@@ -189,7 +189,9 @@ export function useDismiss({ dismissParameters: { open: globalOpen, onClose: glo
     const { activeElementReturn: { getActiveElement: _getActiveElement, getLastActiveElement: _getLastActiveElement, getWindowFocused: _getWindowFocused } } = useActiveElement({ activeElementParameters: { ...activeElementParameters, getWindow, getDocument } });
     return {
         refElementSourceReturn,
-        refElementPopupReturn
+        refElementPopupReturn,
+        propsStableSource,
+        propsStablePopup
     };
 }
 //# sourceMappingURL=use-dismiss.js.map

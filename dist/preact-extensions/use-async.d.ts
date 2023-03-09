@@ -1,3 +1,6 @@
+import { CaptureFunctionType } from "../util/async-to-sync.js";
+type SyncFunctionType<SP extends unknown[], R> = (...args: SP) => (R | undefined);
+type AsyncFunctionType<AP extends unknown[], R> = ((...args: AP) => (R | Promise<R>));
 export interface UseAsyncParameters<AP extends unknown[], SP extends unknown[] = AP> {
     /**
      * If provided, adds a debounce behavior *in addition* to
@@ -5,7 +8,7 @@ export interface UseAsyncParameters<AP extends unknown[], SP extends unknown[] =
      */
     debounce?: number;
     /**
-     * By default, `useAsync` with auto-throttle based on how long it takes
+     * By default, `useAsync` will auto-throttle based on how long it takes
      * for the operation to complete.  If you would like there to be a
      * minimum amount of time to wait before allowing a second operation,
      * the `throttle` parameter can be used in addition to that behavior.
@@ -143,9 +146,6 @@ export interface UseAsyncReturnType<SP extends unknown[], R> {
      */
     syncHandler: SyncFunctionType<SP, void>;
 }
-type SyncFunctionType<SP extends unknown[], R> = (...args: SP) => (R | undefined);
-type AsyncFunctionType<AP extends unknown[], R> = ((...args: AP) => (R | Promise<R>));
-type CaptureFunctionType<AP extends unknown[], SP extends unknown[] = AP> = (...args: SP) => AP;
 /**
  * Given an async function, returns a function that's suitable for non-async APIs,
  * along with other information about the current run's status.

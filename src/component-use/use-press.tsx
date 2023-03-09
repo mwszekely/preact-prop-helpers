@@ -77,8 +77,9 @@ export interface UsePressReturnType<E extends Element> {
          * Similar to pseudoActive, but for if the button as been pressed down for a determined length of time.
          */
         longPress: boolean | null;
-        propsUnstable: h.JSX.HTMLAttributes<E>;
     }
+
+    props: h.JSX.HTMLAttributes<E>;
 }
 
 function supportsPointerEvents() {
@@ -402,6 +403,7 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
                 ) {
                     // Intentional, for now. Programmatic clicks shouldn't happen in most cases.
                     // TODO: Remove this when I'm confident stray clicks won't be handled.
+                    /* eslint-disable no-debugger */
                     debugger;
                     console.log("onclick was fired and will be handled as it doesn't look like it came from a pointer event", e);
 
@@ -429,25 +431,25 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
         pressReturn: {
             pressing: ((pointerDownStartedHere && hovering) || waitingForSpaceUp || false),
             getIsPressing,
-            longPress,
-            propsUnstable: {
-                onKeyDown,
-                onKeyUp,
+            longPress
+        },
+        props: {
+            onKeyDown,
+            onKeyUp,
 
-                onTouchStart: !hasPressEvent ? undefined : (!p ? onTouchStart : undefined),
-                onTouchCancel: !hasPressEvent ? undefined : (!p ? onTouchEnd : undefined),
-                onTouchMove: !hasPressEvent ? undefined : (!p ? onTouchMove : undefined),
-                onTouchEnd: !hasPressEvent ? undefined : (!p ? onTouchEnd : undefined),
-                onPointerDown: !hasPressEvent ? undefined : (p ? onPointerDown : undefined),
-                onPointerCancel: !hasPressEvent ? undefined : (p ? onPointerDown : undefined),
-                onPointerMove: !pointerDownStartedHere || !hasPressEvent ? undefined : (p ? onPointerMove : undefined),
-                onPointerUp: !hasPressEvent ? undefined : (p ? onPointerUp : undefined),
-                onPointerEnter: !hasPressEvent ? undefined : (p ? onPointerEnter : undefined),
-                onPointerLeave: !hasPressEvent ? undefined : (p ? onPointerLeave : undefined),
-                onfocusout: onFocusOut,
-                onClick
-            },
-        }
+            onTouchStart: !hasPressEvent ? undefined : (!p ? onTouchStart : undefined),
+            onTouchCancel: !hasPressEvent ? undefined : (!p ? onTouchEnd : undefined),
+            onTouchMove: !hasPressEvent ? undefined : (!p ? onTouchMove : undefined),
+            onTouchEnd: !hasPressEvent ? undefined : (!p ? onTouchEnd : undefined),
+            onPointerDown: !hasPressEvent ? undefined : (p ? onPointerDown : undefined),
+            onPointerCancel: !hasPressEvent ? undefined : (p ? onPointerDown : undefined),
+            onPointerMove: !pointerDownStartedHere || !hasPressEvent ? undefined : (p ? onPointerMove : undefined),
+            onPointerUp: !hasPressEvent ? undefined : (p ? onPointerUp : undefined),
+            onPointerEnter: !hasPressEvent ? undefined : (p ? onPointerEnter : undefined),
+            onPointerLeave: !hasPressEvent ? undefined : (p ? onPointerLeave : undefined),
+            onfocusout: onFocusOut,
+            onClick
+        },
     };
 }
 

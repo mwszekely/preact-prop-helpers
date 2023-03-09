@@ -158,16 +158,16 @@ export interface UseRovingTabIndexChildReturnType<ChildElement extends Element> 
          * Internal use only, pass to `useManagedChild`
          */
         setTabbable: StateUpdater<boolean>;
-
-        /** 
-         * *Unstable*
-         * 
-         * The props that must be applied to this child in order for this hook to work.
-         * 
-         * The object itself, as well as the properties within it, are unstable and should be rendered by the same component that uses this hook.
-         */
-        propsUnstable: h.JSX.HTMLAttributes<ChildElement>;
     }
+
+    /** 
+     * *Unstable*
+     * 
+     * The props that must be applied to this child in order for this hook to work.
+     * 
+     * The object itself, as well as the properties within it, are unstable and should be rendered by the same component that uses this hook.
+     */
+    props: h.JSX.HTMLAttributes<ChildElement>;
 }
 
 
@@ -336,10 +336,10 @@ export function useRovingTabIndexChild<ChildElement extends Element>({
             })
         },
         rovingTabIndexChildReturn: {
-            propsUnstable: { tabIndex: (tabbable ? 0 : -1) },
             tabbable,
             getTabbable,
             setTabbable
-        }
+        },
+        props: { tabIndex: (tabbable ? 0 : -1) },
     }
 }

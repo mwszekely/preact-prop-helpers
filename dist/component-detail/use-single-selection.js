@@ -81,10 +81,10 @@ export function useSingleSelectionChild(args) {
             }),
             getSelectedOffset: getDirection,
             selectedOffset: direction,
-            getSelected: getLocalSelected,
-            propsUnstable: ariaPropName == null || selectionMode == "disabled" ? {} : {
-                [`${propParts[0]}-${propParts[1]}`]: (localSelected ? (propParts[1] == "current" ? `${propParts[2]}` : `true`) : "false")
-            }
+            getSelected: getLocalSelected
+        },
+        props: ariaPropName == null || selectionMode == "disabled" ? {} : {
+            [`${propParts[0]}-${propParts[1]}`]: (localSelected ? (propParts[1] == "current" ? `${propParts[2]}` : `true`) : "false")
         },
         pressParameters: { onPressSync },
         hasCurrentFocusParameters: { onCurrentFocusedInnerChanged }

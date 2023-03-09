@@ -1,7 +1,8 @@
-import { h } from "preact";
-import { useCallback, useRef } from "preact/hooks";
+import { Ref, RenderableProps, createElement, h } from "preact";
+import { useCallback, useImperativeHandle, useRef } from "preact/hooks";
 import { useMergedProps } from "./use-merged-props.js";
-import { useRefElement, UseRefElementParameters, UseRefElementReturnType } from "./use-ref-element.js";
+import { UseRefElementReturnType, useRefElement } from "./use-ref-element.js";
+import { forwardRef, memo } from "preact/compat";
 
 export type SetChildren = ((children: string | null) => void);
 export type GetClass = (cls: string) => boolean;
@@ -24,6 +25,20 @@ export interface ImperativeHandle<T extends Element> {
 export interface UseImperativePropsParameters<E extends Element> {
     refElementReturn: Pick<UseRefElementReturnType<E>["refElementReturn"], "getElement">;
 }
+
+export interface ImperativeElementProps<T extends keyof HTMLElementTagNameMap> extends h.JSX.HTMLAttributes<HTMLElementTagNameMap[T]> {
+    tag: T;
+    handle: Ref<ImperativeHandle<HTMLElementTagNameMap[T]>>;
+}
+
+/**
+ * Easy access to an HTMLElement that can be controlled imperatively.
+ * 
+ * The HTMLElement rendered is controlled by the `tag` prop (e.g. "span", "div").
+ * 
+ * The `handle` prop should be e.g. `useRef<ImperativeHandle<HTMLDivElement>>(null)`
+ */
+export const ImperativeElement = memo(forwardRef(ImperativeElementU)) as typeof ImperativeElementU;
 
 export function useImperativeProps<E extends Element>({ refElementReturn: { getElement } }: UseImperativePropsParameters<E>) {
     const currentImperativeProps = useRef<{ className: Set<string>, style: h.JSX.CSSProperties, children: string | null, others: h.JSX.HTMLAttributes<E> }>({ className: new Set(), style: {}, children: null, others: {} });
@@ -103,7 +118,7 @@ export function useImperativeProps<E extends Element>({ refElementReturn: { getE
             setEventHandler,
             setChildren
         }).current,
-        propsUnstable: useMergedProps<E>(
+        props: useMergedProps<E>(
             { className: [...currentImperativeProps.current.className].join(" "), style: currentImperativeProps.current.style },
             currentImperativeProps.current.others
         )
@@ -111,6 +126,12 @@ export function useImperativeProps<E extends Element>({ refElementReturn: { getE
     }
 }
 
+function ImperativeElementU<T extends keyof HTMLElementTagNameMap>({ tag: Tag, handle, ...props }: RenderableProps<ImperativeElementProps<T>>, ref: Ref<HTMLElementTagNameMap[T]>) {
+    const { propsStable, refElementReturn } = useRefElement<HTMLElementTagNameMap[T]>({ refElementParameters: {} })
+    const { props: iprops, imperativeHandle } = useImperativeProps<HTMLElementTagNameMap[T]>({ refElementReturn });
+    useImperativeHandle(handle, () => imperativeHandle);
+    return (createElement(Tag, useMergedProps(propsStable, iprops, props, { ref })));
+}
 
 
 const EventMapping: Partial<{ [K in keyof HTMLElementEventMap]: (keyof h.JSX.HTMLAttributes<any> & `on${string}`) }> = {

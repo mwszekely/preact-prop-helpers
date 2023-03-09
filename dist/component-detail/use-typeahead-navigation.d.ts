@@ -7,8 +7,8 @@ export interface UseTypeaheadNavigationReturnType<ParentOrChildElement extends E
     typeaheadNavigationReturn: {
         getCurrentTypeahead(): string | null;
         typeaheadStatus: "invalid" | "valid" | "none";
-        propsStable: h.JSX.HTMLAttributes<ParentOrChildElement>;
     };
+    propsStable: h.JSX.HTMLAttributes<ParentOrChildElement>;
     typeaheadNavigationChildContext: UseTypeaheadNavigationContext;
 }
 export interface UseTypeaheadNavigationContext {

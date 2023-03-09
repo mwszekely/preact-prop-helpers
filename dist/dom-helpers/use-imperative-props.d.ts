@@ -1,4 +1,4 @@
-import { h } from "preact";
+import { Ref, RenderableProps, createElement, h } from "preact";
 import { UseRefElementReturnType } from "./use-ref-element.js";
 export type SetChildren = ((children: string | null) => void);
 export type GetClass = (cls: string) => boolean;
@@ -19,8 +19,22 @@ export interface ImperativeHandle<T extends Element> {
 export interface UseImperativePropsParameters<E extends Element> {
     refElementReturn: Pick<UseRefElementReturnType<E>["refElementReturn"], "getElement">;
 }
+export interface ImperativeElementProps<T extends keyof HTMLElementTagNameMap> extends h.JSX.HTMLAttributes<HTMLElementTagNameMap[T]> {
+    tag: T;
+    handle: Ref<ImperativeHandle<HTMLElementTagNameMap[T]>>;
+}
+/**
+ * Easy access to an HTMLElement that can be controlled imperatively.
+ *
+ * The HTMLElement rendered is controlled by the `tag` prop (e.g. "span", "div").
+ *
+ * The `handle` prop should be e.g. `useRef<ImperativeHandle<HTMLDivElement>>(null)`
+ */
+export declare const ImperativeElement: typeof ImperativeElementU;
 export declare function useImperativeProps<E extends Element>({ refElementReturn: { getElement } }: UseImperativePropsParameters<E>): {
     imperativeHandle: ImperativeHandle<E>;
-    propsUnstable: h.JSX.HTMLAttributes<E>;
+    props: createElement.JSX.HTMLAttributes<E>;
 };
+declare function ImperativeElementU<T extends keyof HTMLElementTagNameMap>({ tag: Tag, handle, ...props }: RenderableProps<ImperativeElementProps<T>>, ref: Ref<HTMLElementTagNameMap[T]>): import("preact").VNode<any>;
+export {};
 //# sourceMappingURL=use-imperative-props.d.ts.map

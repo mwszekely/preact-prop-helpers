@@ -316,6 +316,9 @@ export interface UseDismissReturnType<SourceElement extends Element | null, Popu
      */
     refElementPopupReturn: UseRefElementReturnType<PopupElement>["refElementReturn"];
 
+    propsStableSource: h.JSX.HTMLAttributes<NonNullable<SourceElement>>;
+    propsStablePopup: h.JSX.HTMLAttributes<NonNullable<PopupElement>>;
+
 }
 
 /**
@@ -325,8 +328,8 @@ export interface UseDismissReturnType<SourceElement extends Element | null, Popu
  */
 export function useDismiss<Listeners extends DismissListenerTypes, SourceElement extends Element | null, PopupElement extends Element>({ dismissParameters: { open: globalOpen, onClose: globalOnClose, closeOnBackdrop, closeOnEscape, closeOnLostFocus }, escapeDismissParameters: { getWindow, parentDepth } }: UseDismissParameters<Listeners>): UseDismissReturnType<SourceElement, PopupElement> {
 
-    const { refElementReturn: refElementSourceReturn } = useRefElement<NonNullable<SourceElement>>({ refElementParameters: {} });
-    const { refElementReturn: refElementPopupReturn } = useRefElement<PopupElement>({ refElementParameters: {} });
+    const { refElementReturn: refElementSourceReturn, propsStable: propsStableSource } = useRefElement<NonNullable<SourceElement>>({ refElementParameters: {} });
+    const { refElementReturn: refElementPopupReturn, propsStable: propsStablePopup } = useRefElement<PopupElement>({ refElementParameters: {} });
 
     const onCloseBackdrop = useCallback(() => { return globalOnClose?.("backdrop" as Listeners); }, [globalOnClose]);
     const onCloseEscape = useCallback(() => { return globalOnClose?.("escape" as Listeners); }, [globalOnClose]);
@@ -349,6 +352,8 @@ export function useDismiss<Listeners extends DismissListenerTypes, SourceElement
 
     return {
         refElementSourceReturn,
-        refElementPopupReturn
+        refElementPopupReturn,
+        propsStableSource,
+        propsStablePopup
     }
 }

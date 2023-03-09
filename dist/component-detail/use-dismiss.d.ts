@@ -1,3 +1,4 @@
+import { h } from "preact";
 import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
 import { UseActiveElementParameters } from "../observers/use-active-element.js";
 export interface UseEscapeDismissParameters<PopupElement extends Element> {
@@ -121,6 +122,8 @@ export interface UseDismissReturnType<SourceElement extends Element | null, Popu
      * This one's always required though
      */
     refElementPopupReturn: UseRefElementReturnType<PopupElement>["refElementReturn"];
+    propsStableSource: h.JSX.HTMLAttributes<NonNullable<SourceElement>>;
+    propsStablePopup: h.JSX.HTMLAttributes<NonNullable<PopupElement>>;
 }
 /**
  * Combines all the methods of dismissing a modal-ish or popup-ish component into one combined hook.

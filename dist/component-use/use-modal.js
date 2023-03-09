@@ -1,6 +1,7 @@
 import { useDismiss } from "../component-detail/use-dismiss.js";
 import { useFocusTrap } from "../component-detail/use-focus-trap.js";
 import { useMergedProps } from "../dom-helpers/use-merged-props.js";
+import { useRefElement } from "../dom-helpers/use-ref-element.js";
 /**
  * Combines dismissal hooks and focus trap hooks into one.
  *
@@ -13,22 +14,19 @@ import { useMergedProps } from "../dom-helpers/use-merged-props.js";
  */
 export function useModal({ dismissParameters, escapeDismissParameters, focusTrapParameters: { trapActive, ...focusTrapParameters } }) {
     const { open } = dismissParameters;
-    const { refElementPopupReturn, refElementSourceReturn } = useDismiss({ dismissParameters, escapeDismissParameters });
-    const { focusTrapReturn, refElementReturn } = useFocusTrap({
+    const { refElementPopupReturn, refElementSourceReturn, propsStablePopup, propsStableSource } = useDismiss({ dismissParameters, escapeDismissParameters });
+    const { propsStable, refElementReturn } = useRefElement({});
+    const { focusTrapReturn, props } = useFocusTrap({
         focusTrapParameters: { trapActive: open && trapActive, ...focusTrapParameters },
-        refElementParameters: {}
+        refElementReturn
     });
-    const { propsStable: pp1 } = refElementPopupReturn;
-    const { propsStable: ps2 } = refElementSourceReturn;
-    const { propsUnstable: pp3 } = focusTrapReturn;
-    const { propsStable: pp4 } = refElementReturn;
     return {
-        propsPopup: pp1,
-        propsFocusContainer: useMergedProps(pp3, pp4),
-        propsSource: ps2,
+        propsFocusContainer: useMergedProps(propsStable, props),
         refElementPopupReturn,
         refElementSourceReturn,
         focusTrapReturn,
+        propsStablePopup,
+        propsStableSource
     };
 }
 //# sourceMappingURL=use-modal.js.map

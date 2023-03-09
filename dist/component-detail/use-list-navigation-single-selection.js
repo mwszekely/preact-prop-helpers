@@ -1,24 +1,26 @@
+import { useMergedProps } from "../dom-helpers/use-merged-props.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { assertEmptyObject } from "../util/assert.js";
 import { useListNavigation, useListNavigationChild } from "./use-list-navigation-partial.js";
 import { useSingleSelection, useSingleSelectionChild } from "./use-single-selection.js";
 export function useListNavigationSingleSelection({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, managedChildrenReturn, ..._void3 }) {
-    const lnr = useListNavigation({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, managedChildrenReturn });
+    const { propsStable, ...lnr } = useListNavigation({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, managedChildrenReturn });
     const { rovingTabIndexReturn } = lnr;
-    const ssr = useSingleSelection({ rovingTabIndexReturn, managedChildrenReturn, singleSelectionParameters });
+    const { ...ssr } = useSingleSelection({ rovingTabIndexReturn, managedChildrenReturn, singleSelectionParameters });
     assertEmptyObject(_void3);
     return {
         ...ssr,
         ...lnr,
+        propsStable
     };
 }
 export function useListNavigationSingleSelectionChild({ managedChildParameters: { index, ..._void5 }, rovingTabIndexChildParameters: { hidden, ...void7 }, singleSelectionChildParameters, singleSelectionContext, rovingTabIndexChildContext, typeaheadNavigationChildContext, refElementReturn, textContentParameters, ..._void1 }) {
-    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ..._void3 }, pressParameters: { onPressSync }, ...sscr } = useSingleSelectionChild({
+    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ..._void3 }, pressParameters: { onPressSync }, props: propsSS, ...sscr } = useSingleSelectionChild({
         managedChildParameters: { index },
         singleSelectionChildParameters,
         singleSelectionContext
     });
-    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ..._void6 }, pressParameters: { excludeSpace }, ...lncr } = useListNavigationChild({
+    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ..._void6 }, pressParameters: { excludeSpace }, props: propsLN, ...lncr } = useListNavigationChild({
         managedChildParameters: { index },
         rovingTabIndexChildParameters: { hidden },
         rovingTabIndexChildContext,
@@ -39,6 +41,7 @@ export function useListNavigationSingleSelectionChild({ managedChildParameters: 
             })
         },
         pressParameters: { onPressSync, excludeSpace },
+        props: useMergedProps(propsLN, propsSS),
         ...sscr,
         ...lncr
     };
