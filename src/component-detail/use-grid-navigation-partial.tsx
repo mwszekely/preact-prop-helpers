@@ -213,6 +213,9 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
         setTabbableCell: setTabbableIndex
     })
 
+    const props = useMergedProps(propsLN, propsLNC);
+    props.tabIndex = -1;
+
     return {
         context: useStableObject({
             rovingTabIndexContext: rtiContext,
@@ -223,7 +226,7 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
         linearNavigationReturn,
         managedChildrenParameters,
         pressParameters,
-        props: useMergedProps(propsLN, propsLNC),
+        props,
         rovingTabIndexChildReturn,
         rovingTabIndexReturn,
         textContentReturn,

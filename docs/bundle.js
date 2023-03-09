@@ -5853,6 +5853,8 @@
       setCurrentTabbableColumn,
       setTabbableCell: setTabbableIndex
     });
+    const props = useMergedProps(propsLN, propsLNC);
+    props.tabIndex = -1;
     return {
       context: useStableObject({
         rovingTabIndexContext: rtiContext,
@@ -5863,7 +5865,7 @@
       linearNavigationReturn,
       managedChildrenParameters,
       pressParameters,
-      props: useMergedProps(propsLN, propsLNC),
+      props,
       rovingTabIndexChildReturn,
       rovingTabIndexReturn,
       textContentReturn,
