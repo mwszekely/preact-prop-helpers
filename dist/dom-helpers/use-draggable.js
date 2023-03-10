@@ -1,5 +1,7 @@
 import { useState } from "../preact-extensions/use-state.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 export function useDraggable({ effectAllowed, data, dragImage, dragImageXOffset, dragImageYOffset }) {
+    monitorCallCount(useDraggable);
     const [dragging, setDragging, getDragging] = useState(false);
     const [lastDropEffect, setLastDropEffect, getLastDropEffect] = useState(null);
     const onDragStart = (e) => {

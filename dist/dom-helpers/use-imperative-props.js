@@ -1,8 +1,9 @@
 import { createElement } from "preact";
+import { forwardRef, memo } from "preact/compat";
 import { useCallback, useImperativeHandle, useRef } from "preact/hooks";
+import { monitorCallCount } from "../util/use-call-count.js";
 import { useMergedProps } from "./use-merged-props.js";
 import { useRefElement } from "./use-ref-element.js";
-import { forwardRef, memo } from "preact/compat";
 /**
  * Easy access to an HTMLElement that can be controlled imperatively.
  *
@@ -12,6 +13,7 @@ import { forwardRef, memo } from "preact/compat";
  */
 export const ImperativeElement = memo(forwardRef(ImperativeElementU));
 export function useImperativeProps({ refElementReturn: { getElement } }) {
+    monitorCallCount(useImperativeProps);
     const currentImperativeProps = useRef({ className: new Set(), style: {}, children: null, others: {} });
     const hasClass = useCallback((cls) => { return currentImperativeProps.current.className.has(cls); }, []);
     const setClass = useCallback((cls, enabled) => {

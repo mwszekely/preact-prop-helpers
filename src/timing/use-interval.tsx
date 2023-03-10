@@ -1,6 +1,7 @@
 import { useEffect } from "preact/hooks";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useStableGetter } from "../preact-extensions/use-stable-getter.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 
 
 
@@ -17,6 +18,8 @@ export interface UseIntervalParameters {
 }
 
 export function useInterval({ interval, callback }: UseIntervalParameters) {
+    monitorCallCount(useInterval);
+    
     // Get a wrapper around the given callback that's stable
     const stableCallback = useStableCallback(callback);
     const getInterval = useStableGetter(interval);

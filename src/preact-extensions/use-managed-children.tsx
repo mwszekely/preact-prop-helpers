@@ -1,6 +1,7 @@
 import { useCallback, useLayoutEffect, useRef } from "preact/hooks";
 import { assertEmptyObject } from "../util/assert.js";
-import { debounceRendering, OnPassiveStateChange, PassiveStateUpdater, useEnsureStability, usePassiveState } from "./use-passive-state.js";
+import { monitorCallCount } from "../util/use-call-count.js";
+import { OnPassiveStateChange, PassiveStateUpdater, debounceRendering, useEnsureStability, usePassiveState } from "./use-passive-state.js";
 import { useStableCallback } from "./use-stable-callback.js";
 import { useStableObject } from "./use-stable-getter.js";
 
@@ -167,6 +168,8 @@ interface InternalChildInfo<M extends ManagedChildInfo<string | number>> {
  * 
  */
 export function useManagedChildren<M extends ManagedChildInfo<string | number>>(parentParameters: UseManagedChildrenParameters<M>): UseManagedChildrenReturnType<M> {
+    monitorCallCount(useManagedChildren);
+    
     type IndexType = M["index"];
     type Info = M;
 
@@ -320,6 +323,8 @@ export function useManagedChildren<M extends ManagedChildInfo<string | number>>(
 
 
 export function useManagedChild<M extends ManagedChildInfo<number | string>>(info: UseManagedChildParameters<M>, managedChildParameters: M): UseManagedChildReturnType<M> {
+    monitorCallCount(useManagedChild);
+
     type IndexType = M["index"];
 
     const { managedChildContext: { getChildren, managedChildrenArray, remoteULEChildMounted, remoteULEChildChanged } } = (info.context ?? { managedChildContext: {} });

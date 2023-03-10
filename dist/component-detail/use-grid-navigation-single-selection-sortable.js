@@ -1,3 +1,4 @@
+import { monitorCallCount } from "../util/use-call-count.js";
 import { useGridNavigationCell } from "./use-grid-navigation-partial.js";
 import { useGridNavigationSingleSelection, useGridNavigationSingleSelectionRow } from "./use-grid-navigation-single-selection.js";
 import { useSortableChildren } from "./use-sortable-children.js";
@@ -8,6 +9,7 @@ import { useSortableChildren } from "./use-sortable-children.js";
  */
 const _dummy = 0;
 export function useGridNavigationSingleSelectionSortable({ rearrangeableChildrenParameters, sortableChildrenParameters, linearNavigationParameters, ...gridNavigationSingleSelectionParameters }) {
+    monitorCallCount(useGridNavigationSingleSelectionSortable);
     const { ...scr } = useSortableChildren({ rearrangeableChildrenParameters, sortableChildrenParameters });
     const { rearrangeableChildrenReturn: { indexDemangler, indexMangler } } = scr;
     const gnr = useGridNavigationSingleSelection({
@@ -17,10 +19,12 @@ export function useGridNavigationSingleSelectionSortable({ rearrangeableChildren
     return { ...gnr, ...scr, };
 }
 export function useGridNavigationSingleSelectionSortableRow(p) {
+    monitorCallCount(useGridNavigationSingleSelectionSortableRow);
     return useGridNavigationSingleSelectionRow(p);
 }
 // EZ
 export function useGridNavigationSingleSelectionSortableCell(p) {
+    monitorCallCount(useGridNavigationSingleSelectionSortableCell);
     return useGridNavigationCell(p);
 }
 //# sourceMappingURL=use-grid-navigation-single-selection-sortable.js.map

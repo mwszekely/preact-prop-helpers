@@ -3,6 +3,7 @@ import { h } from "preact";
 import { OnPassiveStateChange, PassiveStateUpdater, returnFalse, runImmediately, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useStableObject } from "../preact-extensions/use-stable-getter.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 import { UseHasCurrentFocusParameters } from "./use-has-current-focus.js";
 
 
@@ -46,6 +47,8 @@ export interface UseChildrenHaveFocusChildParameters<T extends Element> {
  * I.E. you can use this without needing a parent `<div>` to listen for a `focusout` event.
  */
 export function useChildrenHaveFocus<ChildElement extends Element>(args: UseChildrenHaveFocusParameters<ChildElement>): UseChildrenHaveFocusReturnType<ChildElement> {
+    monitorCallCount(useChildrenHaveFocus);
+
     type R = h.JSX.TargetedEvent<ChildElement>;
     const { childrenHaveFocusParameters: { onCompositeFocusChange } } = args;
 
@@ -62,6 +65,8 @@ export function useChildrenHaveFocus<ChildElement extends Element>(args: UseChil
 }
 
 export function useChildrenHaveFocusChild<E extends Element>({ context: { childrenHaveFocusChildContext: { setFocusCount } } }: UseChildrenHaveFocusChildParameters<E>): UseChildrenHaveFocusChildReturnType<E> {
+    monitorCallCount(useChildrenHaveFocusChild);
+    
     return {
         hasCurrentFocusParameters: {
             onCurrentFocusedInnerChanged: useStableCallback((focused, prev, e) => {

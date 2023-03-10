@@ -2,6 +2,7 @@ import { useAsync, UseAsyncParameters, UseAsyncReturnType } from "../preact-exte
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useState } from "../preact-extensions/use-state.js";
 import { OmitStrong } from "../util/types.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 
 export type AsyncHandler<EventType, CaptureType> = ((c: CaptureType, e: EventType) => (Promise<void> | void));
 
@@ -110,7 +111,8 @@ export interface UseAsyncHandlerReturnType<EventType, CaptureType> extends UseAs
  * @see useAsync A more general version of this hook that can work with any type of handler, not just DOM event handlers.
  */
 export function useAsyncHandler<EventType, CaptureType>({ asyncHandler, capture: originalCapture, ...restAsyncOptions }: UseAsyncHandlerParameters<EventType, CaptureType>): UseAsyncHandlerReturnType<EventType, CaptureType> {
-    
+    monitorCallCount(useAsyncHandler);
+
     // We need to differentiate between "nothing captured yet" and "`undefined` was captured"
     const [currentCapture, setCurrentCapture, getCurrentCapture] = useState<CaptureType | undefined>(undefined);
     const [hasCapture, setHasCapture] = useState(false);

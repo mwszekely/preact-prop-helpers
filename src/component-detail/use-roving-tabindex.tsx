@@ -7,6 +7,7 @@ import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useStableGetter, useStableObject } from "../preact-extensions/use-stable-getter.js";
 import { useState } from "../preact-extensions/use-state.js";
 import { assertEmptyObject } from "../util/assert.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 
 export type SetTabbableIndex = (updater: Parameters<PassiveStateUpdater<number | null, Event>>[0], reason: Event | undefined, fromUserInteraction: boolean) => void;
 export type OnTabbableIndexChange = (tabbableIndex: number | null) => void;
@@ -208,6 +209,8 @@ export function useRovingTabIndex<ChildElement extends Element, M extends UseRov
     rovingTabIndexParameters: { untabbable, initiallyTabbedIndex, onTabbableIndexChange },
     ..._void1
 }: UseRovingTabIndexParameters<ChildElement, M>): UseRovingTabIndexReturnType<ChildElement> {
+    monitorCallCount(useRovingTabIndex);
+
     assertEmptyObject(_void1);
 
     const getUntabbable = useStableGetter(untabbable);
@@ -318,6 +321,8 @@ export function useRovingTabIndexChild<ChildElement extends Element>({
     rovingTabIndexChildParameters,
     ..._void3
 }: UseRovingTabIndexChildParameters<ChildElement>): UseRovingTabIndexChildReturnType<ChildElement> {
+    monitorCallCount(useRovingTabIndexChild);
+
     const { hidden, ..._void1 } = rovingTabIndexChildParameters;
     const [tabbable, setTabbable, getTabbable] = useState(getInitiallyTabbedIndex() === index);
 

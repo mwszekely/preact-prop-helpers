@@ -5,6 +5,7 @@ import { useActiveElement } from "../observers/use-active-element.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useStableGetter } from "../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../util/assert.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 /**
  * In general, each soft dismiss hook takes an `open` and an `onClose` prop.
  *
@@ -43,6 +44,7 @@ function getElementDepth(element) {
  * @returns
  */
 export function useEscapeDismiss({ escapeDismissParameters: { onClose, open, getWindow: unstableGetWindow, parentDepth, ...void1 }, refElementPopupReturn: { getElement, ...void2 } }) {
+    monitorCallCount(useEscapeDismiss);
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     const stableOnClose = useStableCallback(onClose);
@@ -124,6 +126,7 @@ export function useEscapeDismiss({ escapeDismissParameters: { onClose, open, get
  * @returns
  */
 export function useLostFocusDismiss({ refElementPopupReturn: { getElement: getPopupElement, ...void3 }, refElementSourceReturn, lostFocusDismiss: { open, onClose }, ...void1 }) {
+    monitorCallCount(useLostFocusDismiss);
     const { getElement: getSourceElement, ...void2 } = (refElementSourceReturn ?? {});
     assertEmptyObject(void1);
     assertEmptyObject(void2);
@@ -147,6 +150,7 @@ export function useLostFocusDismiss({ refElementPopupReturn: { getElement: getPo
  * @param param0
  */
 export function useBackdropDismiss({ backdropDismissParameters: { open, onClose: onCloseUnstable, ...void1 }, refElementPopupReturn: { getElement, ...void3 }, ...void2 }) {
+    monitorCallCount(useBackdropDismiss);
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     assertEmptyObject(void3);
@@ -175,6 +179,7 @@ export function useBackdropDismiss({ backdropDismissParameters: { open, onClose:
  * This is similar to the "complete" series of list/grid navigation, in that it's the "outermost" hook of its type.
  */
 export function useDismiss({ dismissParameters: { open: globalOpen, onClose: globalOnClose, closeOnBackdrop, closeOnEscape, closeOnLostFocus }, escapeDismissParameters: { getWindow, parentDepth } }) {
+    monitorCallCount(useDismiss);
     const { refElementReturn: refElementSourceReturn, propsStable: propsStableSource } = useRefElement({ refElementParameters: {} });
     const { refElementReturn: refElementPopupReturn, propsStable: propsStablePopup } = useRefElement({ refElementParameters: {} });
     const onCloseBackdrop = useCallback(() => { return globalOnClose?.("backdrop"); }, [globalOnClose]);

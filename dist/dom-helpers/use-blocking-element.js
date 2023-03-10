@@ -5,6 +5,7 @@ import { useActiveElement } from "../observers/use-active-element.js";
 import { returnNull, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { getDocument } from "./use-document-class.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 function blockingElements() { return getDocument().$blockingElements; }
 /**
  * Allows an element to trap focus by applying the "inert" attribute to all sibling, aunt, and uncle nodes.
@@ -15,6 +16,7 @@ function blockingElements() { return getDocument().$blockingElements; }
  * @param target
  */
 export function useBlockingElement(enabled, getTarget) {
+    monitorCallCount(useBlockingElement);
     const stableGetTarget = useStableCallback(getTarget);
     const getDocument = useStableCallback(() => (getTarget()?.ownerDocument ?? globalThis.document));
     useActiveElement({

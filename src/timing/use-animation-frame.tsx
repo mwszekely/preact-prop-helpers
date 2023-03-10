@@ -2,6 +2,7 @@ import { noop } from "lodash-es";
 import { ComponentChildren, createContext } from "preact";
 import { useCallback, useContext, useEffect, useRef } from "preact/hooks";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 
 type RafCallbackType = (msSinceLast: number, tag?: any) => void;
 
@@ -69,6 +70,8 @@ export interface UseAnimationFrameParameters {
  * **This hook does not return anything at all, including no prop-modifying hooks**
  */
 export function useAnimationFrame({ callback }: UseAnimationFrameParameters): void {
+    monitorCallCount(useAnimationFrame);
+    
     // Get a wrapper around the given callback that's stable
     const stableCallback = useStableCallback(callback ?? noop);
     const hasCallback = (callback != null);

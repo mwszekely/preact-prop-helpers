@@ -1,8 +1,9 @@
 import { h } from "preact";
 import { useCallback, useEffect, useRef } from "preact/hooks";
 import { getDocument } from "../dom-helpers/use-document-class.js";
-import { useRefElement, UseRefElementParameters, UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
+import { UseRefElementParameters, UseRefElementReturnType, useRefElement } from "../dom-helpers/use-ref-element.js";
 import { OnPassiveStateChange, returnNull, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 
 export interface UseElementSizeParameters<T extends Element> extends UseRefElementParameters<T> {
     elementSizeParameters: {
@@ -47,6 +48,7 @@ export interface UseElementSizeReturnType<E extends Element> extends UseRefEleme
 
 
 export function useElementSize<E extends Element>({ elementSizeParameters: { getObserveBox, onSizeChange }, refElementParameters }: UseElementSizeParameters<E>): UseElementSizeReturnType<E> {
+    monitorCallCount(useElementSize);
 
     const { onElementChange, onMount, onUnmount } = (refElementParameters || {})
 

@@ -1,4 +1,5 @@
 import { assertEmptyObject } from "../util/assert.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 import { useListNavigationSingleSelection, useListNavigationSingleSelectionChild } from "./use-list-navigation-single-selection.js";
 import { useSortableChildren } from "./use-sortable-children.js";
 /**
@@ -9,6 +10,7 @@ import { useSortableChildren } from "./use-sortable-children.js";
  */
 const _dummy = 0;
 export function useListNavigationSingleSelectionSortable({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, managedChildrenReturn, rearrangeableChildrenParameters, sortableChildrenParameters, ...void3 }) {
+    monitorCallCount(useListNavigationSingleSelectionSortable);
     const { rearrangeableChildrenReturn, sortableChildrenReturn, ...void1 } = useSortableChildren({ rearrangeableChildrenParameters, sortableChildrenParameters });
     const { indexDemangler, indexMangler } = rearrangeableChildrenReturn;
     const { propsStable, childrenHaveFocusParameters, context, linearNavigationReturn, managedChildrenParameters, rovingTabIndexReturn, singleSelectionReturn, typeaheadNavigationReturn, ...void2 } = useListNavigationSingleSelection({ linearNavigationParameters: { ...linearNavigationParameters, indexDemangler, indexMangler }, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, managedChildrenReturn });
@@ -29,6 +31,7 @@ export function useListNavigationSingleSelectionSortable({ linearNavigationParam
     };
 }
 export function useListNavigationSingleSelectionSortableChild({ managedChildParameters: { index, ..._void5 }, rovingTabIndexChildParameters, singleSelectionChildParameters, context, refElementReturn, textContentParameters, ..._void1 }) {
+    monitorCallCount(useListNavigationSingleSelectionSortableChild);
     const lnsscr = useListNavigationSingleSelectionChild({
         managedChildParameters: { index },
         rovingTabIndexChildParameters,

@@ -4,6 +4,7 @@ import { returnFalse, usePassiveState } from "../preact-extensions/use-passive-s
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useState } from "../preact-extensions/use-state.js";
 import { useTimeout } from "../timing/use-timeout.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 function supportsPointerEvents() {
     return ("onpointerup" in window);
 }
@@ -28,6 +29,7 @@ function supportsPointerEvents() {
  * @param exclude Whether the polyfill shouldn't apply (can specify for specific interactions)
  */
 export function usePress(args) {
+    monitorCallCount(usePress);
     const { refElementReturn: { getElement }, pressParameters: { focusSelf, onPressSync, allowRepeatPresses, longPressThreshold, excludeEnter: ee, excludePointer: ep, excludeSpace: es, onPressingChange: opc } } = args;
     const excludeEnter = useStableCallback(ee ?? returnFalse);
     const excludeSpace = useStableCallback(es ?? returnFalse);
@@ -182,8 +184,8 @@ export function usePress(args) {
     useTimeout({
         callback: () => {
             const element = getElement();
-            setLongPress(pointerDownStartedHere && hovering);
-            if (element && pointerDownStartedHere && hovering) {
+            setLongPress(pointerDownStartedHere && getHovering());
+            if (element && pointerDownStartedHere && getHovering()) {
                 focusSelf(element);
                 if (longPressThreshold) {
                     setWaitingForSpaceUp(false);
@@ -193,7 +195,7 @@ export function usePress(args) {
             }
         },
         timeout: longPressThreshold ?? null,
-        triggerIndex: longPress ? true : (pointerDownStartedHere && hovering)
+        triggerIndex: longPress ? true : (pointerDownStartedHere && getHovering())
     });
     const handlePress = useStableCallback((e) => {
         setWaitingForSpaceUp(false);

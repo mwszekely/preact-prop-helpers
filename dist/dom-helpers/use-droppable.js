@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "preact/hooks";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useState } from "../preact-extensions/use-state.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 export class DroppableFileError extends Error {
     fileName;
     errorType;
@@ -11,6 +12,7 @@ export class DroppableFileError extends Error {
     }
 }
 export function useDroppable({ effect }) {
+    monitorCallCount(useDroppable);
     const [filesForConsideration, setFilesForConsideration] = useState(null);
     const [stringsForConsideration, setStringsForConsideration] = useState(null);
     const [droppedFiles, setDroppedFiles] = useState(null);

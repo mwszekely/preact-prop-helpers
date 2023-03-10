@@ -1,8 +1,9 @@
 import { Ref, RenderableProps, createElement, h } from "preact";
+import { forwardRef, memo } from "preact/compat";
 import { useCallback, useImperativeHandle, useRef } from "preact/hooks";
+import { monitorCallCount } from "../util/use-call-count.js";
 import { useMergedProps } from "./use-merged-props.js";
 import { UseRefElementReturnType, useRefElement } from "./use-ref-element.js";
-import { forwardRef, memo } from "preact/compat";
 
 export type SetChildren = ((children: string | null) => void);
 export type GetClass = (cls: string) => boolean;
@@ -41,6 +42,8 @@ export interface ImperativeElementProps<T extends keyof HTMLElementTagNameMap> e
 export const ImperativeElement = memo(forwardRef(ImperativeElementU)) as typeof ImperativeElementU;
 
 export function useImperativeProps<E extends Element>({ refElementReturn: { getElement } }: UseImperativePropsParameters<E>) {
+    monitorCallCount(useImperativeProps);
+    
     const currentImperativeProps = useRef<{ className: Set<string>, style: h.JSX.CSSProperties, children: string | null, others: h.JSX.HTMLAttributes<E> }>({ className: new Set(), style: {}, children: null, others: {} });
 
 

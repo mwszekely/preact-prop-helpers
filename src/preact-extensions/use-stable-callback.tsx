@@ -1,6 +1,7 @@
 import { useCallback as useCallbackNative } from "preact/hooks";
 import { useEnsureStability } from "./use-passive-state.js";
 import { useStableGetter } from "./use-stable-getter.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 
 
 //const _IS_STABLE_GETTER = Symbol("STABLE");
@@ -33,6 +34,8 @@ function setIsStableGetter<T extends (..._args: any[]) => any>(obj: T): Stable<T
  * truly has no dependencies/only stable dependencies!!
  */
 export function useStableCallback<T extends Function | null | undefined>(fn: NonNullable<T>, noDeps?: [] | null | undefined): Stable<NonNullable<T>> {
+    monitorCallCount(useStableCallback);
+    
     type U = (NonNullable<T> & ((...args: any) => any));
     useEnsureStability("useStableCallback", noDeps == null, noDeps?.length, isStableGetter<U>(fn as U));
     if (isStableGetter(fn))

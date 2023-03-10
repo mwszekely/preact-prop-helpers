@@ -2,6 +2,7 @@ import { useDismiss } from "../component-detail/use-dismiss.js";
 import { useFocusTrap } from "../component-detail/use-focus-trap.js";
 import { useMergedProps } from "../dom-helpers/use-merged-props.js";
 import { useRefElement } from "../dom-helpers/use-ref-element.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 /**
  * Combines dismissal hooks and focus trap hooks into one.
  *
@@ -13,6 +14,7 @@ import { useRefElement } from "../dom-helpers/use-ref-element.js";
  * @returns
  */
 export function useModal({ dismissParameters, escapeDismissParameters, focusTrapParameters: { trapActive, ...focusTrapParameters } }) {
+    monitorCallCount(useModal);
     const { open } = dismissParameters;
     const { refElementPopupReturn, refElementSourceReturn, propsStablePopup, propsStableSource } = useDismiss({ dismissParameters, escapeDismissParameters });
     const { propsStable, refElementReturn } = useRefElement({});

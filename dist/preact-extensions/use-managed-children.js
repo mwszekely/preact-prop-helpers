@@ -1,5 +1,6 @@
 import { useCallback, useLayoutEffect, useRef } from "preact/hooks";
 import { assertEmptyObject } from "../util/assert.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 import { debounceRendering, useEnsureStability, usePassiveState } from "./use-passive-state.js";
 import { useStableCallback } from "./use-stable-callback.js";
 import { useStableObject } from "./use-stable-getter.js";
@@ -36,6 +37,7 @@ const _comments = void (0);
  *
  */
 export function useManagedChildren(parentParameters) {
+    monitorCallCount(useManagedChildren);
     const { managedChildrenParameters: { onAfterChildLayoutEffect, onChildrenMountChange, onChildCountChange }, ...rest } = parentParameters;
     assertEmptyObject(rest);
     useEnsureStability("useManagedChildren", onAfterChildLayoutEffect, onChildrenMountChange, onChildCountChange);
@@ -163,6 +165,7 @@ export function useManagedChildren(parentParameters) {
     };
 }
 export function useManagedChild(info, managedChildParameters) {
+    monitorCallCount(useManagedChild);
     const { managedChildContext: { getChildren, managedChildrenArray, remoteULEChildMounted, remoteULEChildChanged } } = (info.context ?? { managedChildContext: {} });
     const index = managedChildParameters.index;
     // Any time our child props change, make that information available

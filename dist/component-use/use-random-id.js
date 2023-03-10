@@ -1,6 +1,8 @@
 import { useId, useRef } from "preact/hooks";
 import { useEnsureStability } from "../preact-extensions/use-passive-state.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 export function useRandomId({ randomIdParameters: { prefix, otherReferencerProp } }) {
+    monitorCallCount(useRandomId);
     const id = (prefix + useId());
     useEnsureStability("useRandomId", prefix, id);
     const referencerElementProps = useRef(otherReferencerProp == null ? {} : { [otherReferencerProp]: id });

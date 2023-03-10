@@ -1,5 +1,6 @@
 import { useLayoutEffect, useRef } from "preact/hooks";
 import { useState } from "../preact-extensions/use-state.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 
 /**
  * 
@@ -15,6 +16,8 @@ import { useState } from "../preact-extensions/use-state.js";
  * @returns `UseMediaQueryReturnType`
  */
 export function useMediaQuery(query: string | null | undefined, defaultGuess?: boolean): UseMediaQueryReturnType {
+    monitorCallCount(useMediaQuery);
+    
     const queryList = useRef<MediaQueryList | null>();
 
     // queryList.current ??= (query == null ? null : matchMedia(query))

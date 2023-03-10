@@ -1,6 +1,7 @@
 import { h } from "preact";
 import { useId, useRef } from "preact/hooks";
 import { useEnsureStability } from "../preact-extensions/use-passive-state.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 
 export interface UseRandomIdReturnType<S extends Element, T extends Element> {
     propsSource: h.JSX.HTMLAttributes<S>;
@@ -24,6 +25,8 @@ export interface UseRandomIdParameters {
 }
 
 export function useRandomId<S extends Element, T extends Element>({ randomIdParameters: { prefix, otherReferencerProp } }: UseRandomIdParameters): UseRandomIdReturnType<S, T> {
+    monitorCallCount(useRandomId);
+
     const id = (prefix + useId());
     useEnsureStability("useRandomId", prefix, id);
 

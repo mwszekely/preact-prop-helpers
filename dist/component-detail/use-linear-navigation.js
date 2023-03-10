@@ -1,6 +1,7 @@
 import { useCallback, useRef } from "preact/hooks";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useStableGetter } from "../preact-extensions/use-stable-getter.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 /**
  * When used in tandem with `useRovingTabIndex`, allows control of
  * the tabbable index with the arrow keys.
@@ -8,6 +9,7 @@ import { useStableGetter } from "../preact-extensions/use-stable-getter.js";
  * @see useListNavigation, which packages everything up together.
  */
 export function useLinearNavigation({ rovingTabIndexReturn, linearNavigationParameters }) {
+    monitorCallCount(useLinearNavigation);
     const { getHighestIndex, indexDemangler, indexMangler, isValid, navigatePastEnd, navigatePastStart } = linearNavigationParameters;
     const { getTabbableIndex, setTabbableIndex } = rovingTabIndexReturn;
     const navigateAbsolute = useCallback((requestedIndexMangled, searchDirection, e, fromUserInteraction, mode) => {

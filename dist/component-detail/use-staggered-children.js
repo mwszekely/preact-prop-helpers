@@ -2,6 +2,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef } from "preact/hooks";
 import { returnNull, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableObject } from "../preact-extensions/use-stable-getter.js";
 import { useState } from "../preact-extensions/use-state.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 /**
  * Allows children to each wait until the previous has finished rendering before itself rendering.
  *
@@ -11,6 +12,7 @@ import { useState } from "../preact-extensions/use-state.js";
  * delay other complicated or heavy logic, until the child is no longer staggered.
  */
 export function useStaggeredChildren({ managedChildrenReturn: { getChildren }, staggeredChildrenParameters: { staggered } }) {
+    monitorCallCount(useStaggeredChildren);
     // By default, when a child mounts, we tell the next child to mount and simply repeat.
     // If a child is missing, however, it will break that chain.
     // To guard against that, we also wait for 50ms, and if it hasn't loaded by then, we just continue as if it did.
@@ -108,6 +110,7 @@ export function useStaggeredChildren({ managedChildrenReturn: { getChildren }, s
     };
 }
 export function useStaggeredChild({ managedChildParameters: { index }, context: { staggeredChildContext: { childCallsThisToTellTheParentTheHighestIndex, getDefaultIsStaggered, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne } } }) {
+    monitorCallCount(useStaggeredChild);
     const [parentIsStaggered, setParentIsStaggered] = useState(getDefaultIsStaggered);
     const [staggeredVisible, setStaggeredVisible] = useState(getDefaultStaggeredVisible(index));
     useLayoutEffect(() => {

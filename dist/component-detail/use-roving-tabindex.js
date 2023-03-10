@@ -5,6 +5,7 @@ import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useStableGetter, useStableObject } from "../preact-extensions/use-stable-getter.js";
 import { useState } from "../preact-extensions/use-state.js";
 import { assertEmptyObject } from "../util/assert.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 /**
  * Implements a roving tabindex system where only one "focusable"
  * component in a set is able to receive a tab focus. *Which*
@@ -35,6 +36,7 @@ import { assertEmptyObject } from "../util/assert.js";
  * regardless of if it's the whole app or just a given component.
  */
 export function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovingTabIndexParameters: { untabbable, initiallyTabbedIndex, onTabbableIndexChange }, ..._void1 }) {
+    monitorCallCount(useRovingTabIndex);
     assertEmptyObject(_void1);
     const getUntabbable = useStableGetter(untabbable);
     // Override the actual setter to include some extra logic related to avoiding hidden children, 
@@ -122,6 +124,7 @@ export function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovi
     };
 }
 export function useRovingTabIndexChild({ managedChildParameters: { index, ..._void2 }, context: { rovingTabIndexContext: { reevaluateClosestFit, setTabbableIndex, getInitiallyTabbedIndex } }, rovingTabIndexChildParameters, ..._void3 }) {
+    monitorCallCount(useRovingTabIndexChild);
     const { hidden, ..._void1 } = rovingTabIndexChildParameters;
     const [tabbable, setTabbable, getTabbable] = useState(getInitiallyTabbedIndex() === index);
     useEffect(() => {

@@ -1,4 +1,5 @@
 import { useCallback } from "preact/hooks";
+import { monitorCallCount } from "../util/use-call-count.js";
 import { ElementSize } from "./use-element-size.js";
 
 //export type BlockFlowDirection = "downwards" | "leftwards" | "rightwards";
@@ -54,6 +55,7 @@ export interface LogicalElementSize {
  * * `convertToPhysicalOrientation`:  Based on the current direction, converts "inline" or "block" to "horizontal" or "vertical".
  */
 export function useLogicalDirection({  }: UseLogicalDirectionParameters): UseLogicalDirectionReturnType {
+    monitorCallCount(useLogicalDirection);
 
 //    useEnsureStability("useLogicalDirection", onLogicalDirectionChange);
 

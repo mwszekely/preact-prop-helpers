@@ -2,6 +2,7 @@
 import { Component, options, VNode } from "preact";
 import { EffectCallback, Inputs, useEffect, useState } from "preact/hooks";
 import { generateRandomId } from "../util/random-id.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 
 const previousInputs = new Map<string, Inputs | undefined>();
 const toRun = new Map<string, { effect: EffectCallback, inputs?: Inputs, cleanup: null | undefined | void | (() => void) }>();
@@ -47,6 +48,7 @@ options[commitName] = newCommit as never
  * @param inputs 
  */
 export function useBeforeLayoutEffect(effect: EffectCallback | null, inputs?: Inputs) {
+    monitorCallCount(useBeforeLayoutEffect);
 
     const [id] = useState(() => generateRandomId());
     if (effect)

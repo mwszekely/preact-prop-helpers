@@ -4,6 +4,7 @@ import { isFocusable, isTabbable } from "tabbable";
 import { useBlockingElement } from "../dom-helpers/use-blocking-element.js";
 import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 
 export interface UseFocusTrapParameters<SourceElement extends Element | null, PopupElement extends Element> {
     refElementReturn: Pick<UseRefElementReturnType<NonNullable<PopupElement>>["refElementReturn"], "getElement">;
@@ -59,6 +60,7 @@ export function useFocusTrap<SourceElement extends Element | null, PopupElement 
     focusTrapParameters: { onlyMoveFocus, trapActive, focusPopup: focusSelfUnstable, focusOpener: focusOpenerUnstable },
     refElementReturn
 }: UseFocusTrapParameters<SourceElement, PopupElement>): UseFocusTrapReturnType<PopupElement> {
+    monitorCallCount(useFocusTrap);
 
     type E = PopupElement;
 

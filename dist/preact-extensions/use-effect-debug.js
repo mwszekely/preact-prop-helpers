@@ -1,4 +1,5 @@
 import { useEffect as useEffectNative, useRef } from "preact/hooks";
+import { monitorCallCount } from "../util/use-call-count.js";
 /**
  * Wrap the native `useEffect` to add arguments
  * that allow accessing the previous value as the first argument,
@@ -10,6 +11,7 @@ import { useEffect as useEffectNative, useRef } from "preact/hooks";
  * passing one of them as this argument. By default, it's `useEffect`.
  */
 export function useEffectDebug(effect, inputs, impl = useEffectNative) {
+    monitorCallCount(useEffectDebug);
     const prevInputs = useRef(undefined);
     const effect2 = () => {
         const changes = [];

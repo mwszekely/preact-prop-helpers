@@ -1,14 +1,15 @@
-import { UsePressParameters } from "../component-use/use-press.js";
 import { h } from "preact";
 import { useCallback, useLayoutEffect, useRef } from "preact/hooks";
+import { UsePressParameters } from "../component-use/use-press.js";
 import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
 import { UseTextContentParameters, UseTextContentReturnType, useTextContent } from "../dom-helpers/use-text-content.js";
 import { OnPassiveStateChange, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useStableGetter, useStableObject } from "../preact-extensions/use-stable-getter.js";
 import { useState } from "../preact-extensions/use-state.js";
-import { UseRovingTabIndexChildParameters, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
 import { assertEmptyObject } from "../util/assert.js";
+import { monitorCallCount } from "../util/use-call-count.js";
+import { UseRovingTabIndexChildParameters, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
 
 export interface UseTypeaheadNavigationReturnType<ParentOrChildElement extends Element> {
     typeaheadNavigationReturn: {
@@ -79,6 +80,7 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
     rovingTabIndexReturn: { getTabbableIndex: getIndex, setTabbableIndex: setIndex, ..._void1 },
     ..._void2
 }: UseTypeaheadNavigationParameters<ChildElement>): UseTypeaheadNavigationReturnType<ParentOrChildElement> {
+    monitorCallCount(useTypeaheadNavigation);
 
     assertEmptyObject(_void1);
     assertEmptyObject(_void2);
@@ -323,6 +325,7 @@ export function useTypeaheadNavigationChild<ChildElement extends Element>({
     refElementReturn: { getElement, ...void3 },
     ...void4
 }: UseTypeaheadNavigationChildParameters<ChildElement>): UseTypeaheadNavigationChildReturnType {
+    monitorCallCount(useTypeaheadNavigationChild);
 
     assertEmptyObject(void1);
     assertEmptyObject(void2);

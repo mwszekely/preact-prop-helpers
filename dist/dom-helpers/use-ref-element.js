@@ -1,5 +1,6 @@
 import { useCallback, useRef } from "preact/hooks";
 import { returnNull, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 /*
 export function useRefElementProps<E extends Element>(r: UseRefElementReturnType<E>, ...otherProps: h.JSX.HTMLAttributes<E>[]): h.JSX.HTMLAttributes<E>[] {
     return [r.refElementReturn.propsStable, ...otherProps];
@@ -14,6 +15,7 @@ export function useRefElementProps<E extends Element>(r: UseRefElementReturnType
  * @returns The element, and the sub-hook that makes it retrievable.
  */
 export function useRefElement(args) {
+    monitorCallCount(useRefElement);
     const { onElementChange, onMount, onUnmount } = (args.refElementParameters || {});
     useEnsureStability("useRefElement", onElementChange, onMount, onUnmount);
     // Called (indirectly) by the ref that the element receives.

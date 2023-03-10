@@ -5,6 +5,7 @@ import { useCallback, useLayoutEffect, useMemo } from "preact/hooks";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useState } from "../preact-extensions/use-state.js";
 import { generateRandomId } from "../util/random-id.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 
 export interface UsePortalChildrenParameters {
     target: string | Element | null;
@@ -29,6 +30,7 @@ export interface UsePortalChildrenReturnType {
  * @returns 
  */
 export function usePortalChildren({ target }: UsePortalChildrenParameters) {
+    monitorCallCount(usePortalChildren);
 
     const [pushChild, setPushChild] = useState<PushPortalChild | null>(null);
     const [updateChild, setUpdateChild] = useState<UpdatePortalChild | null>(null);

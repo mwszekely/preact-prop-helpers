@@ -1,1 +1,1 @@
-{"version":3,"file":"use-hide-scroll.d.ts","sourceRoot":"","sources":["../../src/dom-helpers/use-hide-scroll.tsx"],"names":[],"mappings":"AAIA;;;;;GAKG;AACF,wBAAgB,aAAa,CAAC,UAAU,EAAE,OAAO;;;EAsEjD"}
+{"version":3,"file":"use-hide-scroll.d.ts","sourceRoot":"","sources":["../../src/dom-helpers/use-hide-scroll.tsx"],"names":[],"mappings":"AAKA;;;;;GAKG;AACF,wBAAgB,aAAa,CAAC,UAAU,EAAE,OAAO;;;EAwEjD"}

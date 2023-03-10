@@ -1,4 +1,5 @@
 import { useCallback } from "preact/hooks";
+import { monitorCallCount } from "../util/use-call-count.js";
 function capitalize(str) {
     return (str[0].toUpperCase() + str.substring(1));
 }
@@ -19,6 +20,7 @@ function capitalize(str) {
  * * `convertToPhysicalOrientation`:  Based on the current direction, converts "inline" or "block" to "horizontal" or "vertical".
  */
 export function useLogicalDirection({}) {
+    monitorCallCount(useLogicalDirection);
     //    useEnsureStability("useLogicalDirection", onLogicalDirectionChange);
     //const [getComputedStyles, setComputedStyles] = usePassiveState<CSSStyleDeclaration | null>(null, returnNull);
     // TODO: There's no way to refresh which writing mode we have once mounted.

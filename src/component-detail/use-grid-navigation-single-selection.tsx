@@ -3,6 +3,7 @@ import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useStableObject } from "../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../util/assert.js";
 import { OmitStrong } from "../util/types.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 import { GridChildCellInfo as gcci, GridChildRowInfo as gcri, useGridNavigation, useGridNavigationCell, UseGridNavigationCellContext, UseGridNavigationCellParameters, UseGridNavigationCellReturnType, UseGridNavigationParameters, UseGridNavigationReturnType, useGridNavigationRow, UseGridNavigationRowContext, UseGridNavigationRowParameters, UseGridNavigationRowReturnType } from "./use-grid-navigation-partial.js";
 import { SelectableChildInfo, useSingleSelection, useSingleSelectionChild, UseSingleSelectionChildParameters, UseSingleSelectionChildReturnType, UseSingleSelectionContext, UseSingleSelectionParameters, UseSingleSelectionReturnType } from "./use-single-selection.js";
 
@@ -65,6 +66,8 @@ export function useGridNavigationSingleSelection<ParentOrRowElement extends Elem
     singleSelectionParameters,
     ..._void2
 }: UseGridNavigationSingleSelectionParameters<ParentOrRowElement, RowElement, CellElement, RM>): UseGridNavigationSingleSelectionReturnType<ParentOrRowElement, RowElement, CellElement, RM, CM> {
+    monitorCallCount(useGridNavigationSingleSelection);
+
     const {
         context: { gridNavigationRowContext, rovingTabIndexContext, typeaheadNavigationContext },
         linearNavigationReturn,
@@ -122,6 +125,7 @@ export function useGridNavigationSingleSelectionRow<RowElement extends Element, 
     context: { gridNavigationRowContext, rovingTabIndexContext, singleSelectionContext, typeaheadNavigationContext },
     ..._void1
 }: UseGridNavigationSingleSelectionRowParameters<RowElement, CellElement, RM, CM>): UseGridNavigationSingleSelectionRowReturnType<RowElement, CellElement> {
+    monitorCallCount(useGridNavigationSingleSelectionRow);
     const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1 }, managedChildParameters: mcp2, props: propsSS, singleSelectionChildReturn } = useSingleSelectionChild<RowElement>({ managedChildParameters: mcp1, singleSelectionChildParameters, context: { singleSelectionContext } });
     const { context, gridNavigationRowParameters, hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2 }, linearNavigationReturn, managedChildrenParameters, pressParameters: { excludeSpace }, props: propsGN, rovingTabIndexChildReturn, rovingTabIndexReturn, textContentReturn, typeaheadNavigationReturn } = useGridNavigationRow<RowElement, CellElement, RM, CM>({ context: { gridNavigationRowContext, rovingTabIndexContext, typeaheadNavigationContext }, linearNavigationParameters, managedChildParameters: mcp1, managedChildrenReturn, refElementReturn, rovingTabIndexChildParameters, rovingTabIndexParameters, textContentParameters, typeaheadNavigationParameters });
 
@@ -147,5 +151,6 @@ export function useGridNavigationSingleSelectionRow<RowElement extends Element, 
 
 // EZ
 export function useGridNavigationSingleSelectionCell<CellElement extends Element>(p: UseGridNavigationSingleSelectionCellParameters<any, CellElement>): UseGridNavigationSingleSelectionCellReturnType<CellElement> {
+    monitorCallCount(useGridNavigationSingleSelectionCell);
     return useGridNavigationCell<CellElement>(p);
 }

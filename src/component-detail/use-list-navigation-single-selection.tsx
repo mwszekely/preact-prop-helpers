@@ -3,6 +3,7 @@ import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useStableObject } from "../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../util/assert.js";
 import { OmitStrong } from "../util/types.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 import { useListNavigation, useListNavigationChild, UseListNavigationChildInfo, UseListNavigationChildParameters, UseListNavigationChildReturnType, UseListNavigationContext, UseListNavigationParameters, UseListNavigationReturnType } from "./use-list-navigation-partial.js";
 import { SelectableChildInfo, useSingleSelection, useSingleSelectionChild, UseSingleSelectionChildParameters, UseSingleSelectionChildReturnType, UseSingleSelectionContext, UseSingleSelectionParameters, UseSingleSelectionReturnType } from "./use-single-selection.js";
 
@@ -30,6 +31,7 @@ export function useListNavigationSingleSelection<ParentOrChildElement extends El
     managedChildrenReturn,
     ..._void3
 }: UseListNavigationSingleSelectionParameters<ParentOrChildElement, ChildElement, M>): UseListNavigationSingleSelectionReturnType<ParentOrChildElement, ChildElement> {
+    monitorCallCount(useListNavigationSingleSelection);
     const { context: { rovingTabIndexContext, typeaheadNavigationContext }, propsStable, rovingTabIndexReturn, typeaheadNavigationReturn, managedChildrenParameters, linearNavigationReturn, ...void1 } = useListNavigation<ParentOrChildElement, ChildElement, M>({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, managedChildrenReturn });
     const { context: { singleSelectionContext }, childrenHaveFocusParameters, singleSelectionReturn, ...void2 } = useSingleSelection<ChildElement>({ rovingTabIndexReturn, managedChildrenReturn, singleSelectionParameters });
 
@@ -72,7 +74,8 @@ export function useListNavigationSingleSelectionChild<ChildElement extends Eleme
     textContentParameters,
     ..._void1
 }: UseListNavigationSingleSelectionChildParameters<ChildElement>): UseListNavigationSingleSelectionChildReturnType<ChildElement> {
-
+    monitorCallCount(useListNavigationSingleSelectionChild);
+    
     const {
         hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ..._void3 },
         managedChildParameters,

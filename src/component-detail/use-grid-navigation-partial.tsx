@@ -4,8 +4,9 @@ import { OnPassiveStateChange, PassiveStateUpdater, usePassiveState } from "../p
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useStableObject } from "../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../util/assert.js";
-import { OmitStrong, OmitTargeted } from "../util/types.js";
-import { useListNavigation, useListNavigationChild, UseListNavigationChildInfo, UseListNavigationChildParameters, UseListNavigationChildReturnType, UseListNavigationContext, UseListNavigationParameters, UseListNavigationReturnType } from "./use-list-navigation-partial.js";
+import { OmitStrong } from "../util/types.js";
+import { monitorCallCount } from "../util/use-call-count.js";
+import { UseListNavigationChildInfo, UseListNavigationChildParameters, UseListNavigationChildReturnType, UseListNavigationContext, UseListNavigationParameters, UseListNavigationReturnType, useListNavigation, useListNavigationChild } from "./use-list-navigation-partial.js";
 import { SetTabbableIndex } from "./use-roving-tabindex.js";
 
 export interface GridChildRowInfo<RowElement extends Element, _CellElement extends Element> extends UseListNavigationChildInfo<RowElement> { setTabbableColumnIndex: SetTabbableIndex }
@@ -90,6 +91,8 @@ export function useGridNavigation<ParentOrRowElement extends Element, RowElement
     typeaheadNavigationParameters,
     ..._void2
 }: UseGridNavigationParameters<ParentOrRowElement, RowElement, CellElement, RM>): UseGridNavigationReturnType<ParentOrRowElement, RowElement, CellElement, RM, CM> {
+    monitorCallCount(useGridNavigation);
+    
     const { getChildren } = managedChildrenReturn;
     const { initiallyTabbedIndex } = rovingTabIndexParameters
 
@@ -160,6 +163,8 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
     typeaheadNavigationParameters,
     ..._void1
 }: UseGridNavigationRowParameters<RowElement, CellElement, RM, CM>): UseGridNavigationRowReturnType<RowElement, CellElement> {
+    monitorCallCount(useGridNavigationRow);
+
     const { getChildren } = managedChildrenReturn;
     const getIndex = useStableCallback(() => { return managedChildParameters.index })
     const focusSelf = useStableCallback((e: RowElement) => {
@@ -258,6 +263,8 @@ export function useGridNavigationCell<CellElement extends Element>({
     },
     ..._void1
 }: UseGridNavigationCellParameters<any, CellElement>): UseGridNavigationCellReturnType<CellElement> {
+    monitorCallCount(useGridNavigationCell);
+
     const { index } = managedChildParameters;
     const {
         hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1 },

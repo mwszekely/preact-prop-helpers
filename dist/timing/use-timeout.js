@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useRef } from "preact/hooks";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useStableGetter } from "../preact-extensions/use-stable-getter.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 export function useTimeout({ timeout, callback, triggerIndex }) {
+    monitorCallCount(useTimeout);
     const stableCallback = useStableCallback(() => { startTimeRef.current = null; callback(); });
     const getTimeout = useStableGetter(timeout);
     // Set any time we start timeout.

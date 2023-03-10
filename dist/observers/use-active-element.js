@@ -1,5 +1,6 @@
 import { useEffect } from "preact/hooks";
 import { returnNull, returnTrue, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 /**
  *
  * There are several different ways that a focus event can happen.  Assume
@@ -95,6 +96,7 @@ function windowBlur(e) {
  * If you need the component to re-render when the active element changes, use the `on*Change` arguments to set some state on your end.
  */
 export function useActiveElement({ activeElementParameters: { onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument, getWindow } }) {
+    monitorCallCount(useActiveElement);
     useEnsureStability("useActiveElement", onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument, getWindow);
     useEffect(() => {
         const document = getDocument();

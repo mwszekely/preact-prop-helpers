@@ -2,6 +2,7 @@ import { h } from "preact";
 import { useEffect, useRef } from "preact/hooks";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useState } from "../preact-extensions/use-state.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 
 /*
 export function useDroppableProps<E extends Element>(r: UseDroppableReturnType<E>, ...otherProps: h.JSX.HTMLAttributes<E>[]): h.JSX.HTMLAttributes<E>[] {
@@ -75,6 +76,7 @@ export class DroppableFileError extends Error {
 
 
 export function useDroppable<E extends Element>({ effect }: UseDroppableParameters): UseDroppableReturnType<E> {
+    monitorCallCount(useDroppable);
 
     const [filesForConsideration, setFilesForConsideration] = useState<null | DropFileMetadata[]>(null);
     const [stringsForConsideration, setStringsForConsideration] = useState<null | Set<string>>(null);

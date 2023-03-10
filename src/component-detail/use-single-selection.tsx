@@ -2,13 +2,13 @@
 import { noop } from "lodash-es";
 import { h } from "preact";
 import { useCallback, useEffect } from "preact/hooks";
-import { UsePressParameters } from "../component-use/use-press.js";
 import { UseChildrenHaveFocusChildReturnType, UseChildrenHaveFocusParameters } from "../observers/use-children-have-focus.js";
-import { useChildrenFlag, UseManagedChildrenReturnType } from "../preact-extensions/use-managed-children.js";
+import { UseManagedChildrenReturnType, useChildrenFlag } from "../preact-extensions/use-managed-children.js";
 import { OnPassiveStateChange, PassiveStateUpdater, useEnsureStability } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useStableGetter, useStableObject } from "../preact-extensions/use-stable-getter.js";
 import { useState } from "../preact-extensions/use-state.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
 
 
@@ -133,6 +133,8 @@ export function useSingleSelection<ChildElement extends Element>({
     rovingTabIndexReturn: { setTabbableIndex },
     singleSelectionParameters: { onSelectedIndexChange: onSelectedIndexChange_U, initiallySelectedIndex }
 }: UseSingleSelectionParameters<ChildElement>): UseSingleSelectionReturnType<ChildElement> {
+    monitorCallCount(useSingleSelection);
+
     type R = Event;
     const onSelectedIndexChange = useStableCallback(onSelectedIndexChange_U ?? noop);
 
@@ -189,6 +191,7 @@ export function useSingleSelection<ChildElement extends Element>({
 
 
 export function useSingleSelectionChild<ChildElement extends Element>(args: UseSingleSelectionChildParameters<ChildElement>): UseSingleSelectionChildReturnType<ChildElement> {
+    monitorCallCount(useSingleSelectionChild);
     type R = Event;
     const {
         context: { singleSelectionContext: { getSelectedIndex, onSelectedIndexChange } },

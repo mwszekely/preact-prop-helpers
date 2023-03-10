@@ -5,12 +5,14 @@ import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useStableGetter, useStableObject } from "../preact-extensions/use-stable-getter.js";
 import { useState } from "../preact-extensions/use-state.js";
 import { assertEmptyObject } from "../util/assert.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 /**
  * Allows for the selection of a managed child by typing the given text associated with it.
  *
  * @see useListNavigation, which packages everything up together.
  */
 export function useTypeaheadNavigation({ typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead, isValid, ..._void3 }, rovingTabIndexReturn: { getTabbableIndex: getIndex, setTabbableIndex: setIndex, ..._void1 }, ..._void2 }) {
+    monitorCallCount(useTypeaheadNavigation);
     assertEmptyObject(_void1);
     assertEmptyObject(_void2);
     assertEmptyObject(_void3);
@@ -198,6 +200,7 @@ export function useTypeaheadNavigation({ typeaheadNavigationParameters: { collat
     }
 }
 export function useTypeaheadNavigationChild({ managedChildParameters: { index, ...void1 }, textContentParameters: { getText, hidden, ...void5 }, context: { typeaheadNavigationContext: { sortedTypeaheadInfo, insertingComparator, excludeSpace, ...void2 } }, refElementReturn: { getElement, ...void3 }, ...void4 }) {
+    monitorCallCount(useTypeaheadNavigationChild);
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     assertEmptyObject(void3);

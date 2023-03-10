@@ -2,8 +2,10 @@ import { useEffect } from "preact/hooks";
 import { isFocusable, isTabbable } from "tabbable";
 import { useBlockingElement } from "../dom-helpers/use-blocking-element.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 //const elementsToRestoreFocusTo = new Map<Element | null, (Node & HTMLOrSVGElement)>();
 export function useFocusTrap({ focusTrapParameters: { onlyMoveFocus, trapActive, focusPopup: focusSelfUnstable, focusOpener: focusOpenerUnstable }, refElementReturn }) {
+    monitorCallCount(useFocusTrap);
     const focusSelf = useStableCallback(focusSelfUnstable);
     const focusOpener = useStableCallback(focusOpenerUnstable);
     useEffect(() => {

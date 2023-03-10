@@ -3,6 +3,7 @@ import { noop } from "lodash-es";
 import { createContext } from "preact";
 import { useCallback, useContext, useEffect, useRef } from "preact/hooks";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 const SharedAnimationFrameContext = createContext(null);
 /**
  * When a bunch of unrelated components all use `requestAnimationFrame`,
@@ -41,6 +42,7 @@ export function ProvideBatchedAnimationFrames({ children }) {
  * **This hook does not return anything at all, including no prop-modifying hooks**
  */
 export function useAnimationFrame({ callback }) {
+    monitorCallCount(useAnimationFrame);
     // Get a wrapper around the given callback that's stable
     const stableCallback = useStableCallback(callback ?? noop);
     const hasCallback = (callback != null);

@@ -4,6 +4,7 @@ import { useCallback, useLayoutEffect, useRef } from "preact/hooks";
 import { useForceUpdate } from "../preact-extensions/use-force-update.js";
 import { returnNull, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableGetter } from "../preact-extensions/use-stable-getter.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 /**
  * Hook that allows for the **direct descendant** children of this component to be re-ordered and sorted.
  *
@@ -26,6 +27,7 @@ import { useStableGetter } from "../preact-extensions/use-stable-getter.js";
  * there's no other time or place this can happen other than exactly within the parent component's render function.
  */
 export function useRearrangeableChildren({ rearrangeableChildrenParameters: { getIndex, onRearranged } }) {
+    monitorCallCount(useRearrangeableChildren);
     // These are used to keep track of a mapping between unsorted index <---> sorted index.
     // These are needed for navigation with the arrow keys.
     const mangleMap = useRef(new Map());
@@ -66,6 +68,7 @@ export function useRearrangeableChildren({ rearrangeableChildrenParameters: { ge
         getForceUpdate()?.();
     }, []);
     const useRearrangedChildren = useCallback((children) => {
+        monitorCallCount(useRearrangedChildren);
         console.assert(Array.isArray(children));
         const forceUpdate = useForceUpdate();
         useLayoutEffect(() => { setForceUpdate(_prev => forceUpdate); }, [forceUpdate]);
@@ -121,6 +124,7 @@ export function useRearrangeableChildren({ rearrangeableChildrenParameters: { ge
  * there's no other time or place this can happen other than exactly within the parent component's render function.
  */
 export function useSortableChildren({ rearrangeableChildrenParameters, sortableChildrenParameters: { compare: userCompare } }) {
+    monitorCallCount(useSortableChildren);
     const getCompare = useStableGetter(userCompare ?? defaultCompare);
     const { rearrangeableChildrenReturn } = useRearrangeableChildren({ rearrangeableChildrenParameters });
     const { rearrange } = rearrangeableChildrenReturn;

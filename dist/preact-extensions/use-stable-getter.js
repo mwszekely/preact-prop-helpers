@@ -1,4 +1,5 @@
 import { useCallback, useRef } from "preact/hooks";
+import { monitorCallCount } from "../util/use-call-count.js";
 import { useBeforeLayoutEffect } from "./use-before-layout-effect.js";
 import { useEnsureStability } from "./use-passive-state.js";
 const Unset = Symbol("unset");
@@ -13,6 +14,7 @@ const Unset = Symbol("unset");
  * @returns
  */
 export function useStableGetter(value) {
+    monitorCallCount(useStableGetter);
     const ref = useRef(Unset);
     useBeforeLayoutEffect((() => { ref.current = value; }), [value]);
     return useCallback(() => {

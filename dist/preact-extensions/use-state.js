@@ -1,4 +1,5 @@
 import { useCallback, useRef, useState as useStateP } from "preact/hooks";
+import { monitorCallCount } from "../util/use-call-count.js";
 /**
  * Slightly enhanced version of `useState` that includes a getter that remains constant
  * (i.e. you can use it in `useEffect` and friends without it being a dependency).
@@ -7,6 +8,7 @@ import { useCallback, useRef, useState as useStateP } from "preact/hooks";
  * @returns
  */
 export function useState(initialState) {
+    monitorCallCount(useState);
     // We keep both, but overrride the `setState` functionality
     const [state, setStateP] = useStateP(initialState);
     const ref = useRef(state);

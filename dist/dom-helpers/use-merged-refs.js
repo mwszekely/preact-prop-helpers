@@ -1,4 +1,5 @@
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 function processRef(instance, ref) {
     if (typeof ref === "function") {
         ref(instance);
@@ -19,6 +20,7 @@ function processRef(instance, ref) {
  * @returns
  */
 export function useMergedRefs(rhs, lhs) {
+    monitorCallCount(useMergedRefs);
     // This *must* be stable in order to prevent repeated reset `null` calls after every render.
     const combined = useStableCallback(function combined(current) {
         processRef(current, lhs);

@@ -1,5 +1,6 @@
 
 import { StateUpdater, useCallback, useRef, useState as useStateP } from "preact/hooks";
+import { monitorCallCount } from "../util/use-call-count.js";
 
 /**
  * Slightly enhanced version of `useState` that includes a getter that remains constant
@@ -9,6 +10,7 @@ import { StateUpdater, useCallback, useRef, useState as useStateP } from "preact
  * @returns 
  */
 export function useState<T>(initialState: T | (() => T)): readonly [value: T, setValue: StateUpdater<T>, getValue: () => T] {
+    monitorCallCount(useState);
 
     // We keep both, but overrride the `setState` functionality
     const [state, setStateP] = useStateP(initialState);

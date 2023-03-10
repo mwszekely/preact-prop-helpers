@@ -1,6 +1,7 @@
 import { options } from "preact";
 import { useEffect, useState } from "preact/hooks";
 import { generateRandomId } from "../util/random-id.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 const previousInputs = new Map();
 const toRun = new Map();
 // TODO: Whether this goes in options.diffed or options._commit
@@ -41,6 +42,7 @@ options[commitName] = newCommit;
  * @param inputs
  */
 export function useBeforeLayoutEffect(effect, inputs) {
+    monitorCallCount(useBeforeLayoutEffect);
     const [id] = useState(() => generateRandomId());
     if (effect)
         toRun.set(id, { effect, inputs, cleanup: null });

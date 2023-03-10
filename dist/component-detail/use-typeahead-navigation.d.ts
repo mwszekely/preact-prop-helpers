@@ -1,5 +1,5 @@
-import { UsePressParameters } from "../component-use/use-press.js";
 import { h } from "preact";
+import { UsePressParameters } from "../component-use/use-press.js";
 import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
 import { UseTextContentParameters, UseTextContentReturnType } from "../dom-helpers/use-text-content.js";
 import { UseRovingTabIndexChildParameters, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";

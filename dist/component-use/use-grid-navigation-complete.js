@@ -11,7 +11,9 @@ import { useHasCurrentFocus } from "../observers/use-has-current-focus.js";
 import { useManagedChild, useManagedChildren } from "../preact-extensions/use-managed-children.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useStableObject } from "../preact-extensions/use-stable-getter.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 export function useCompleteGridNavigation({ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, typeaheadNavigationParameters, sortableChildrenParameters, rearrangeableChildrenParameters, paginatedChildrenParameters, staggeredChildrenParameters }) {
+    monitorCallCount(useCompleteGridNavigation);
     const getChildren = useCallback(() => managedChildrenReturn.getChildren(), []);
     const getHighestChildIndex = useCallback(() => getChildren().getHighestIndex(), []);
     const isValid = useCallback((i) => {
@@ -65,6 +67,7 @@ export function useCompleteGridNavigation({ gridNavigationParameters, linearNavi
     };
 }
 export function useCompleteGridNavigationRow({ managedChildParameters, context: contextIncomingForRowAsChildOfTable, completeGridNavigationRowParameters, singleSelectionChildParameters, rovingTabIndexChildParameters, rovingTabIndexChildParameters: { hidden }, textContentParameters, linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, sortableChildParameters }) {
+    monitorCallCount(useCompleteGridNavigationRow);
     const { index } = managedChildParameters;
     const { managedChildParameters: { setChildCountIfPaginated, setPaginationVisible, setParentIsPaginated }, paginatedChildReturn: { paginatedVisible, isPaginated, hideBecausePaginated }, props: paginationProps } = usePaginatedChild({ managedChildParameters: { index }, context: contextIncomingForRowAsChildOfTable });
     const { managedChildParameters: { setParentIsStaggered, setStaggeredVisible }, staggeredChildReturn: { isStaggered, hideBecauseStaggered }, props: staggeredProps } = useStaggeredChild({ managedChildParameters: { index }, context: contextIncomingForRowAsChildOfTable });
@@ -146,6 +149,7 @@ export function useCompleteGridNavigationRow({ managedChildParameters, context: 
     };
 }
 export function useCompleteGridNavigationCell({ gridNavigationCellParameters, managedChildParameters, context: { gridNavigationCellContext, managedChildContext, rovingTabIndexContext, typeaheadNavigationContext }, rovingTabIndexChildParameters: { hidden }, rovingTabIndexChildParameters, textContentParameters, completeGridNavigationCellParameters: { focusSelf, ...completeGridNavigationCellParameters }, }) {
+    monitorCallCount(useCompleteGridNavigationCell);
     const { index } = managedChildParameters;
     const { refElementReturn, propsStable } = useRefElement({ refElementParameters: {} });
     const { hasCurrentFocusParameters, rovingTabIndexChildReturn, textContentReturn, pressParameters, props: propsRti } = useGridNavigationSingleSelectionCell({

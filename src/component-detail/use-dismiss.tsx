@@ -1,12 +1,13 @@
 import { h } from "preact";
 import { useCallback, useEffect } from "preact/hooks";
 import { useGlobalHandler } from "../dom-helpers/use-event-handler.js";
-import { useRefElement, UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
-import { useActiveElement, UseActiveElementParameters } from "../observers/use-active-element.js";
+import { UseRefElementReturnType, useRefElement } from "../dom-helpers/use-ref-element.js";
+import { UseActiveElementParameters, useActiveElement } from "../observers/use-active-element.js";
 import { OnPassiveStateChange } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useStableGetter } from "../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../util/assert.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 
 /**
  * In general, each soft dismiss hook takes an `open` and an `onClose` prop.
@@ -86,6 +87,7 @@ function getElementDepth(element: Element) {
  * @returns 
  */
 export function useEscapeDismiss<PopupElement extends Element>({ escapeDismissParameters: { onClose, open, getWindow: unstableGetWindow, parentDepth, ...void1 }, refElementPopupReturn: { getElement, ...void2 } }: UseEscapeDismissParameters<PopupElement>): void {
+    monitorCallCount(useEscapeDismiss);
     assertEmptyObject(void1);
     assertEmptyObject(void2);
 
@@ -197,7 +199,7 @@ export interface UseLostFocusDismissReturnType<_SourceElement extends Element | 
  * @returns 
  */
 export function useLostFocusDismiss<SourceElement extends Element | null, PopupElement extends Element>({ refElementPopupReturn: { getElement: getPopupElement, ...void3 }, refElementSourceReturn, lostFocusDismiss: { open, onClose }, ...void1 }: UseLostFocusDismissParameters<SourceElement, PopupElement>): UseLostFocusDismissReturnType<SourceElement, PopupElement> {
-
+    monitorCallCount(useLostFocusDismiss);
     const { getElement: getSourceElement, ...void2 } = (refElementSourceReturn ?? {});
 
     assertEmptyObject(void1);
@@ -231,6 +233,7 @@ export interface UseBackdropDismissParameters<PopupElement extends Element> {
  * @param param0 
  */
 export function useBackdropDismiss<PopupElement extends Element>({ backdropDismissParameters: { open, onClose: onCloseUnstable, ...void1 }, refElementPopupReturn: { getElement, ...void3 }, ...void2 }: UseBackdropDismissParameters<PopupElement>): void {
+    monitorCallCount(useBackdropDismiss);
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     assertEmptyObject(void3);
@@ -327,7 +330,8 @@ export interface UseDismissReturnType<SourceElement extends Element | null, Popu
  * This is similar to the "complete" series of list/grid navigation, in that it's the "outermost" hook of its type.
  */
 export function useDismiss<Listeners extends DismissListenerTypes, SourceElement extends Element | null, PopupElement extends Element>({ dismissParameters: { open: globalOpen, onClose: globalOnClose, closeOnBackdrop, closeOnEscape, closeOnLostFocus }, escapeDismissParameters: { getWindow, parentDepth } }: UseDismissParameters<Listeners>): UseDismissReturnType<SourceElement, PopupElement> {
-
+    monitorCallCount(useDismiss);
+    
     const { refElementReturn: refElementSourceReturn, propsStable: propsStableSource } = useRefElement<NonNullable<SourceElement>>({ refElementParameters: {} });
     const { refElementReturn: refElementPopupReturn, propsStable: propsStablePopup } = useRefElement<PopupElement>({ refElementParameters: {} });
 

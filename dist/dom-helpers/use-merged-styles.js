@@ -1,3 +1,4 @@
+import { monitorCallCount } from "../util/use-call-count.js";
 function styleStringToObject(style) {
     // TODO: This sucks D:
     return Object.fromEntries(style.split(";").map(statement => statement.split(":")));
@@ -10,6 +11,7 @@ function styleStringToObject(style) {
  * @returns A CSS object containing the properties of both objects.
  */
 export function useMergedStyles(lhs, rhs) {
+    monitorCallCount(useMergedStyles);
     // Easy case, when there are no styles to merge return nothing.
     if (!lhs && !rhs)
         return undefined;

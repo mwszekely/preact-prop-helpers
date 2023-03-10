@@ -1,6 +1,7 @@
 import { Inputs, useEffect } from "preact/hooks";
 import { OmitStrong } from "../util/types.js";
 import { useAsync, UseAsyncParameters } from "./use-async.js";
+import { monitorCallCount } from "../util/use-call-count.js"
 
 /**
  * Combines the semantics of `useAsync` and `useEffect`. 
@@ -13,6 +14,7 @@ import { useAsync, UseAsyncParameters } from "./use-async.js";
  * @returns All values from `useAsync`, except for `syncHandler`.
  */
 export function useAsyncEffect<I extends Inputs>(effect: () => Promise<(void | (() => void))>, inputs?: I, options?: OmitStrong<UseAsyncParameters<[void], [void]>, "capture">) {
+    monitorCallCount(useAsyncEffect);
     const { syncHandler, ...rest } = useAsync(effect, options);
     useEffect(syncHandler, inputs);
     return rest;

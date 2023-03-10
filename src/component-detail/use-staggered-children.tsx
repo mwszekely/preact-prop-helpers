@@ -4,6 +4,7 @@ import { UseManagedChildrenReturnType } from "../preact-extensions/use-managed-c
 import { returnNull, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableObject } from "../preact-extensions/use-stable-getter.js";
 import { useState } from "../preact-extensions/use-state.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 import { UseRovingTabIndexChildInfo } from "./use-roving-tabindex.js";
 
 export interface UseStaggeredChildrenInfo<E extends Element> extends Pick<UseRovingTabIndexChildInfo<E>, "hidden" | "index"> {
@@ -44,6 +45,7 @@ export function useStaggeredChildren<E extends Element, M extends UseStaggeredCh
     managedChildrenReturn: { getChildren },
     staggeredChildrenParameters: { staggered }
 }: UseStaggeredChildrenParameters<E, M>): UseStaggeredChildrenReturnType {
+    monitorCallCount(useStaggeredChildren);
 
     // By default, when a child mounts, we tell the next child to mount and simply repeat.
     // If a child is missing, however, it will break that chain.
@@ -187,6 +189,8 @@ export interface UseStaggeredChildReturn<ChildElement extends Element> {
 
 
 export function useStaggeredChild<ChildElement extends Element>({ managedChildParameters: { index }, context: { staggeredChildContext: { childCallsThisToTellTheParentTheHighestIndex, getDefaultIsStaggered, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne } } }: UseStaggeredChildParameters): UseStaggeredChildReturn<ChildElement> {
+    monitorCallCount(useStaggeredChild);
+    
     const [parentIsStaggered, setParentIsStaggered] = useState(getDefaultIsStaggered);
     const [staggeredVisible, setStaggeredVisible] = useState(getDefaultStaggeredVisible(index));
 

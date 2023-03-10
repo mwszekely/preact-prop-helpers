@@ -1,5 +1,6 @@
 import { useEffect } from "preact/hooks";
 import { usePassiveState } from "../preact-extensions/use-passive-state.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 /**
  * Allows for hiding the scroll bar of the root HTML element
  * without shifting the layout of the page more than adding a fow pixels
@@ -7,6 +8,7 @@ import { usePassiveState } from "../preact-extensions/use-passive-state.js";
  * @param hideScroll
  */
 export function useHideScroll(hideScroll) {
+    monitorCallCount(useHideScroll);
     const [getScrollbarWidth, setScrollbarWidth] = usePassiveState(null);
     const [getScrollbarHeight, setScrollbarHeight] = usePassiveState(null);
     useEffect(() => {

@@ -1,6 +1,7 @@
 
 import { StateUpdater, useEffect } from "preact/hooks";
 import { OnPassiveStateChange, returnNull, returnTrue, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 
 
 /**
@@ -172,6 +173,7 @@ export interface UseActiveElementReturnType {
  * If you need the component to re-render when the active element changes, use the `on*Change` arguments to set some state on your end.
  */
 export function useActiveElement({ activeElementParameters: { onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument, getWindow } }: UseActiveElementParameters): UseActiveElementReturnType {
+    monitorCallCount(useActiveElement);
 
     useEnsureStability("useActiveElement", onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument, getWindow);
 

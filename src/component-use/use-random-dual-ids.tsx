@@ -1,5 +1,6 @@
 import { h } from "preact";
 import { useMergedProps } from "../dom-helpers/use-merged-props.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 import { useRandomId, UseRandomIdParameters, UseRandomIdReturnType } from "./use-random-id.js";
 
 
@@ -22,6 +23,7 @@ export function useRandomDualIds<InputElement extends Element, LabelElement exte
     randomIdInputParameters,
     randomIdLabelParameters,
 }: UseRandomDualIdsParameters): UseRandomDualIdsReturnType<InputElement, LabelElement> {
+    monitorCallCount(useRandomDualIds);
 
     const { randomIdReturn: randomIdInputReturn, propsReferencer: propsLabelAsReferencer, propsSource: propsInputAsSource } = useRandomId<InputElement, LabelElement>({ randomIdParameters: randomIdInputParameters });
     const { randomIdReturn: randomIdLabelReturn, propsReferencer: propsInputAsReferencer, propsSource: propsLabelAsSource } = useRandomId<LabelElement, InputElement>({ randomIdParameters: randomIdLabelParameters });

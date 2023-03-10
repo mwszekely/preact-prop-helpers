@@ -1,5 +1,6 @@
 import { useEffect } from "preact/hooks";
 import { OnPassiveStateChange, returnNull, runImmediately, usePassiveState } from "../preact-extensions/use-passive-state.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 import { UseRefElementReturnType } from "./use-ref-element.js";
 
 export interface UseTextContentParameters<E extends Element> {
@@ -20,6 +21,8 @@ export interface UseTextContentReturnType {
 }
 
 export function useTextContent<E extends Element>({ refElementReturn: { getElement }, textContentParameters: { getText, onTextContentChange, hidden } }: UseTextContentParameters<E>): UseTextContentReturnType {
+    monitorCallCount(useTextContent);
+    
     const [getTextContent, setTextContent] = usePassiveState<string | null, never>(onTextContentChange, returnNull, runImmediately);
     useEffect(() => {
         if (!hidden) {

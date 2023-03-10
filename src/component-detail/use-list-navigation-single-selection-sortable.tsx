@@ -1,5 +1,6 @@
 import { assertEmptyObject } from "../util/assert.js";
 import { OmitTargeted } from "../util/types.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 import { useListNavigationSingleSelection, useListNavigationSingleSelectionChild, UseListNavigationSingleSelectionChildInfo, UseListNavigationSingleSelectionChildParameters, UseListNavigationSingleSelectionChildReturnType, UseListNavigationSingleSelectionParameters, UseListNavigationSingleSelectionReturnType } from "./use-list-navigation-single-selection.js";
 import { UseSortableChildInfo, useSortableChildren, UseSortableChildrenParameters, UseSortableChildrenReturnType } from "./use-sortable-children.js";
 
@@ -27,6 +28,7 @@ export function useListNavigationSingleSelectionSortable<ParentOrChildElement ex
     sortableChildrenParameters,
     ...void3
 }: UseListNavigationSingleSelectionSortableParameters<ParentOrChildElement, ChildElement, M>): UseListNavigationSingleSelectionSortableReturnType<ParentOrChildElement, ChildElement, M> {
+    monitorCallCount(useListNavigationSingleSelectionSortable);
     const { rearrangeableChildrenReturn, sortableChildrenReturn, ...void1 } = useSortableChildren<M>({ rearrangeableChildrenParameters, sortableChildrenParameters });
     const { indexDemangler, indexMangler } = rearrangeableChildrenReturn;
     const { propsStable, childrenHaveFocusParameters, context, linearNavigationReturn, managedChildrenParameters, rovingTabIndexReturn, singleSelectionReturn, typeaheadNavigationReturn, ...void2 } = useListNavigationSingleSelection<ParentOrChildElement, ChildElement, M>({ linearNavigationParameters: { ...linearNavigationParameters, indexDemangler, indexMangler }, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, managedChildrenReturn });
@@ -59,6 +61,7 @@ export function useListNavigationSingleSelectionSortableChild<ChildElement exten
     textContentParameters,
     ..._void1
 }: UseListNavigationSingleSelectionSortableChildParameters<ChildElement>): UseListNavigationSingleSelectionSortableChildReturnType<ChildElement> {
+    monitorCallCount(useListNavigationSingleSelectionSortableChild);
 
     const lnsscr = useListNavigationSingleSelectionChild<ChildElement>({
         managedChildParameters: { index },

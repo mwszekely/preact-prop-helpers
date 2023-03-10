@@ -5,7 +5,9 @@ import { useEnsureStability } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useStableGetter, useStableObject } from "../preact-extensions/use-stable-getter.js";
 import { useState } from "../preact-extensions/use-state.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 export function useSingleSelection({ managedChildrenReturn: { getChildren }, rovingTabIndexReturn: { setTabbableIndex }, singleSelectionParameters: { onSelectedIndexChange: onSelectedIndexChange_U, initiallySelectedIndex } }) {
+    monitorCallCount(useSingleSelection);
     const onSelectedIndexChange = useStableCallback(onSelectedIndexChange_U ?? noop);
     const getSelectedAt = useCallback((m) => { return m.getSelected(); }, []);
     const setSelectedAt = useCallback((m, t, newSelectedIndex, prevSelectedIndex) => {
@@ -53,6 +55,7 @@ export function useSingleSelection({ managedChildrenReturn: { getChildren }, rov
     };
 }
 export function useSingleSelectionChild(args) {
+    monitorCallCount(useSingleSelectionChild);
     const { context: { singleSelectionContext: { getSelectedIndex, onSelectedIndexChange } }, singleSelectionChildParameters: { ariaPropName, selectionMode, disabled }, managedChildParameters: { index } } = args;
     useEnsureStability("useSingleSelectionChild", getSelectedIndex, onSelectedIndexChange);
     const getDisabled = useStableGetter(disabled);

@@ -2,6 +2,7 @@ import { h, Ref, RefObject } from "preact";
 import { useCallback, useRef } from "preact/hooks";
 import { useEnsureStability } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 
 
 function processRef<T>(instance: T | null, ref: Ref<T> | null | undefined) {
@@ -26,6 +27,7 @@ function processRef<T>(instance: T | null, ref: Ref<T> | null | undefined) {
  * @returns 
  */
 export function useMergedRefs<E extends EventTarget>(rhs: h.JSX.HTMLAttributes<E>["ref"], lhs: h.JSX.HTMLAttributes<E>["ref"]) {
+    monitorCallCount(useMergedRefs);
     
     // This *must* be stable in order to prevent repeated reset `null` calls after every render.
     const combined = useStableCallback(function combined(current: E | null) {

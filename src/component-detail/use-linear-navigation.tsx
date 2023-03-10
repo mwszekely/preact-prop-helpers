@@ -3,6 +3,7 @@ import { useCallback, useRef } from "preact/hooks";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useStableGetter } from "../preact-extensions/use-stable-getter.js";
 import { OmitStrong } from "../util/types.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 import { UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
 
 export interface LinearNavigationResult {
@@ -104,6 +105,8 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
     rovingTabIndexReturn,
     linearNavigationParameters
 }: UseLinearNavigationParameters<ParentOrChildElement, ChildElement>): UseLinearNavigationReturnType<ParentOrChildElement> {
+    monitorCallCount(useLinearNavigation);
+
     type R = Event;
     const { getHighestIndex, indexDemangler, indexMangler, isValid, navigatePastEnd, navigatePastStart } = linearNavigationParameters;
     const { getTabbableIndex, setTabbableIndex } = rovingTabIndexReturn;

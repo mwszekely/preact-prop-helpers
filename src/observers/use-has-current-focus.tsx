@@ -3,6 +3,7 @@ import { h } from "preact";
 import { useCallback, useEffect, useRef } from "preact/hooks";
 import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
 import { OnPassiveStateChange, returnFalse, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 
 export interface UseHasCurrentFocusParameters<T extends Node> {
     refElementReturn: Required<Pick<UseRefElementReturnType<T>["refElementReturn"], "getElement">>;
@@ -41,6 +42,8 @@ export interface UseHasCurrentFocusReturnType<E extends Node> {
 }
 
 export function useHasCurrentFocus<T extends Node>(args: UseHasCurrentFocusParameters<T>): UseHasCurrentFocusReturnType<T> {
+    monitorCallCount(useHasCurrentFocus);
+    
     type R = h.JSX.TargetedFocusEvent<T>;
     const {
         hasCurrentFocusParameters: { onCurrentFocusedChanged: onFocusedChanged, onCurrentFocusedInnerChanged: onFocusedInnerChanged },

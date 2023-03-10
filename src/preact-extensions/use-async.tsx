@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo } from "preact/hooks";
 import { useStableCallback } from "./use-stable-callback.js";
 import { useState } from "./use-state.js";
 import { CaptureFunctionType, asyncToSync } from "../util/async-to-sync.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 
 type SyncFunctionType<SP extends unknown[], R> = (...args: SP) => (R | undefined);
 type AsyncFunctionType<AP extends unknown[], R> = ((...args: AP) => (R | Promise<R>));
@@ -205,6 +206,7 @@ const AsyncFunction = ((async function () {}).constructor)
  * 
  */
 export function useAsync<AP extends unknown[], R, SP extends unknown[] = AP>(asyncHandler2: AsyncFunctionType<AP, R> | null, options?: UseAsyncParameters<AP, SP>): UseAsyncReturnType<SP, R> {
+    monitorCallCount(useAsync);
 
 
     // Things related to current execution

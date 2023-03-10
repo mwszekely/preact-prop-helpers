@@ -517,6 +517,8 @@ const DemoStaggeredChild = memo(({ index }: { index: number }) => {
 
 const Component = () => {
     // return <DemoUseAsyncHandler2 />;
+    return <DemoPress remaining={2} />;
+    
     return <div class="flex" style={{ flexWrap: "wrap" }}>
         <DemoPress remaining={2} />
         <input />

@@ -3,6 +3,7 @@ import { useMergedChildren } from "./use-merged-children.js";
 import { useMergedClasses } from "./use-merged-classes.js";
 import { useMergedRefs } from "./use-merged-refs.js";
 import { useMergedStyles } from "./use-merged-styles.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 let log = console.warn;
 export function enableLoggingPropConflicts(log2) {
     log = log2;
@@ -16,6 +17,7 @@ export function enableLoggingPropConflicts(log2) {
  * @returns
  */
 export function useMergedProps(...allProps) {
+    monitorCallCount(useMergedProps);
     useEnsureStability("useMergedProps", allProps.length);
     let ret = {};
     for (let nextProps of allProps) {

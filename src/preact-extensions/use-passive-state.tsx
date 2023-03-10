@@ -1,6 +1,7 @@
 import { options } from "preact";
 import { useCallback, useLayoutEffect, useRef } from "preact/hooks";
 import { getBuildMode } from "../util/mode.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 
 /** Takes a new value or a function that updates a value, unlike `OnPassiveStateChange` which reacts to those updates */
 export type PassiveStateUpdater<S, R> = ((value: S | ((prevState: S | undefined) => S), reason?: R) => void);//[R] extends [never]? ((value: S | ((prevState: S | undefined) => S), reason?: R) => void) : ((value: S | ((prevState: S | undefined) => S), reason: R) => void);
@@ -69,6 +70,7 @@ export function debounceRendering(f: () => void) {
  * @returns 
  */
 export function usePassiveState<T, R>(onChange: undefined | null | OnPassiveStateChange<T, R>, getInitialValue?: () => T, customDebounceRendering?: typeof debounceRendering): readonly [getStateStable: () => T, setStateStable: PassiveStateUpdater<T, R>] {
+    monitorCallCount(usePassiveState);
 
     const valueRef = useRef<T | typeof Unset>(Unset);
     const reasonRef = useRef<R | typeof Unset>(Unset);

@@ -1,5 +1,6 @@
 import { clsx } from "clsx";
 import { h } from "preact";
+import { monitorCallCount } from "../util/use-call-count.js";
 type C = h.JSX.HTMLAttributes<EventTarget>["className"];
 /**
  * Given two sets of props, merges their `class` and `className` properties.
@@ -10,6 +11,7 @@ type C = h.JSX.HTMLAttributes<EventTarget>["className"];
  * @returns A string representing all combined classes from both arguments.
  */
 export function useMergedClasses(lhsClass: C, lhsClassName: C, rhsClass: C, rhsClassName: C): string | undefined {
+    monitorCallCount(useMergedClasses);
 
     // Note: For the sake of forward compatibility, this function is labelled as
     // a hook, but as it uses no other hooks it technically isn't one.

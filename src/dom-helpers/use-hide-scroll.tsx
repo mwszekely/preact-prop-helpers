@@ -1,5 +1,6 @@
 import { useEffect } from "preact/hooks";
 import { usePassiveState } from "../preact-extensions/use-passive-state.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 
 
 /**
@@ -9,6 +10,8 @@ import { usePassiveState } from "../preact-extensions/use-passive-state.js";
  * @param hideScroll 
  */
  export function useHideScroll(hideScroll: boolean) {
+    monitorCallCount(useHideScroll);
+
     const [getScrollbarWidth, setScrollbarWidth] = usePassiveState<number | null, never>(null);
     const [getScrollbarHeight, setScrollbarHeight] = usePassiveState<number | null, never>(null);
 

@@ -1,6 +1,7 @@
 import { returnFalse, runImmediately, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useStableObject } from "../preact-extensions/use-stable-getter.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 /**
  * Allows a composite component (such as a radio group or listbox) to listen
  * for an "overall focusin/out" event; this hook lets you know when focus has
@@ -9,6 +10,7 @@ import { useStableObject } from "../preact-extensions/use-stable-getter.js";
  * I.E. you can use this without needing a parent `<div>` to listen for a `focusout` event.
  */
 export function useChildrenHaveFocus(args) {
+    monitorCallCount(useChildrenHaveFocus);
     const { childrenHaveFocusParameters: { onCompositeFocusChange } } = args;
     const [getAnyFocused, setAnyFocused] = usePassiveState(onCompositeFocusChange, returnFalse, runImmediately);
     const [_getFocusCount, setFocusCount] = usePassiveState(useStableCallback((anyFocused, anyPreviouslyFocused, e) => {
@@ -21,6 +23,7 @@ export function useChildrenHaveFocus(args) {
     };
 }
 export function useChildrenHaveFocusChild({ context: { childrenHaveFocusChildContext: { setFocusCount } } }) {
+    monitorCallCount(useChildrenHaveFocusChild);
     return {
         hasCurrentFocusParameters: {
             onCurrentFocusedInnerChanged: useStableCallback((focused, prev, e) => {

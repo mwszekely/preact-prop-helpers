@@ -1,4 +1,5 @@
 import { OmitTargeted } from "../util/types.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 import { useGridNavigationCell, UseGridNavigationCellParameters, UseGridNavigationCellReturnType } from "./use-grid-navigation-partial.js";
 import { GridSingleSelectChildCellInfo, GridSingleSelectChildRowInfo, useGridNavigationSingleSelection, UseGridNavigationSingleSelectionParameters, UseGridNavigationSingleSelectionReturnType, useGridNavigationSingleSelectionRow, UseGridNavigationSingleSelectionRowParameters, UseGridNavigationSingleSelectionRowReturnType } from "./use-grid-navigation-single-selection.js";
 import { UseSortableChildInfo, useSortableChildren, UseSortableChildrenParameters, UseSortableChildrenReturnType } from "./use-sortable-children.js";
@@ -11,7 +12,7 @@ import { UseSortableChildInfo, useSortableChildren, UseSortableChildrenParameter
 const _dummy = 0;
 
 export interface GridSingleSelectSortableChildRowInfo<RowElement extends Element, CellElement extends Element> extends GridSingleSelectChildRowInfo<RowElement, CellElement>, UseSortableChildInfo { }
-export interface GridSingleSelectSortableChildCellInfo<CellElement extends Element> extends GridSingleSelectChildCellInfo<CellElement> {}
+export interface GridSingleSelectSortableChildCellInfo<CellElement extends Element> extends GridSingleSelectChildCellInfo<CellElement> { }
 
 export interface UseGridNavigationSingleSelectionSortableParameters<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, M extends GridSingleSelectChildRowInfo<RowElement, CellElement>> extends OmitTargeted<UseGridNavigationSingleSelectionParameters<ParentOrRowElement, RowElement, CellElement, M>, "linearNavigationParameters", "indexDemangler" | "indexMangler">, UseSortableChildrenParameters<M> { }
 export interface UseGridNavigationSingleSelectionSortableReturnType<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, RM extends GridSingleSelectSortableChildRowInfo<RowElement, CellElement>, CM extends GridSingleSelectSortableChildCellInfo<CellElement>> extends UseGridNavigationSingleSelectionReturnType<ParentOrRowElement, RowElement, CellElement, RM, CM>, UseSortableChildrenReturnType<RM> { }
@@ -26,6 +27,8 @@ export function useGridNavigationSingleSelectionSortable<ParentOrRowElement exte
     linearNavigationParameters,
     ...gridNavigationSingleSelectionParameters
 }: UseGridNavigationSingleSelectionSortableParameters<ParentOrRowElement, RowElement, CellElement, RM>): UseGridNavigationSingleSelectionSortableReturnType<ParentOrRowElement, RowElement, CellElement, RM, CM> {
+    monitorCallCount(useGridNavigationSingleSelectionSortable);
+
     const { ...scr } = useSortableChildren<RM>({ rearrangeableChildrenParameters, sortableChildrenParameters });
     const { rearrangeableChildrenReturn: { indexDemangler, indexMangler } } = scr;
     const gnr = useGridNavigationSingleSelection<ParentOrRowElement, RowElement, CellElement, RM, CM>({
@@ -37,10 +40,12 @@ export function useGridNavigationSingleSelectionSortable<ParentOrRowElement exte
 }
 
 export function useGridNavigationSingleSelectionSortableRow<RowElement extends Element, CellElement extends Element, RM extends GridSingleSelectSortableChildRowInfo<RowElement, CellElement>, CM extends GridSingleSelectSortableChildCellInfo<CellElement>>(p: UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM>): UseGridNavigationSingleSelectionSortableRowReturnType<RowElement, CellElement> {
+    monitorCallCount(useGridNavigationSingleSelectionSortableRow);
     return useGridNavigationSingleSelectionRow<RowElement, CellElement, RM, CM>(p);
 }
 
 // EZ
 export function useGridNavigationSingleSelectionSortableCell<CellElement extends Element>(p: UseGridNavigationSingleSelectionSortableCellParameters<any, CellElement>): UseGridNavigationSingleSelectionSortableCellReturnType<CellElement> {
+    monitorCallCount(useGridNavigationSingleSelectionSortableCell);
     return useGridNavigationCell<CellElement>(p);
 }

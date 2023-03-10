@@ -2,9 +2,11 @@ import { useMergedProps } from "../dom-helpers/use-merged-props.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useStableObject } from "../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../util/assert.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 import { useListNavigation, useListNavigationChild } from "./use-list-navigation-partial.js";
 import { useSingleSelection, useSingleSelectionChild } from "./use-single-selection.js";
 export function useListNavigationSingleSelection({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, managedChildrenReturn, ..._void3 }) {
+    monitorCallCount(useListNavigationSingleSelection);
     const { context: { rovingTabIndexContext, typeaheadNavigationContext }, propsStable, rovingTabIndexReturn, typeaheadNavigationReturn, managedChildrenParameters, linearNavigationReturn, ...void1 } = useListNavigation({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, managedChildrenReturn });
     const { context: { singleSelectionContext }, childrenHaveFocusParameters, singleSelectionReturn, ...void2 } = useSingleSelection({ rovingTabIndexReturn, managedChildrenReturn, singleSelectionParameters });
     assertEmptyObject(_void3);
@@ -26,6 +28,7 @@ export function useListNavigationSingleSelection({ linearNavigationParameters, r
     };
 }
 export function useListNavigationSingleSelectionChild({ managedChildParameters: { index, ..._void5 }, rovingTabIndexChildParameters: { hidden, ...void7 }, singleSelectionChildParameters, context, refElementReturn, textContentParameters, ..._void1 }) {
+    monitorCallCount(useListNavigationSingleSelectionChild);
     const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ..._void3 }, managedChildParameters, singleSelectionChildReturn, props: propsSS, ...void9 } = useSingleSelectionChild({
         managedChildParameters: { index },
         singleSelectionChildParameters,

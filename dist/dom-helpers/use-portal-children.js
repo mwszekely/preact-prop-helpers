@@ -5,6 +5,7 @@ import { useCallback, useLayoutEffect, useMemo } from "preact/hooks";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useState } from "../preact-extensions/use-state.js";
 import { generateRandomId } from "../util/random-id.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 /**
  * Very basic hook for a root-level component to use to allow any children within the whole app to push children to a portal somewhere.
  *
@@ -16,6 +17,7 @@ import { generateRandomId } from "../util/random-id.js";
  * @returns
  */
 export function usePortalChildren({ target }) {
+    monitorCallCount(usePortalChildren);
     const [pushChild, setPushChild] = useState(null);
     const [updateChild, setUpdateChild] = useState(null);
     const [removeChild, setRemoveChild] = useState(null);

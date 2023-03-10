@@ -25,7 +25,7 @@ export { UseDraggableParameters, UseDraggableReturnType, useDraggable } from "./
 export { DropFile, DropFileMetadata, DroppableFileError, UseDroppableParameters, UseDroppableReturnType, useDroppable } from "./dom-helpers/use-droppable.js";
 export { useGlobalHandler, useLocalHandler } from "./dom-helpers/use-event-handler.js";
 export { useHideScroll } from "./dom-helpers/use-hide-scroll.js";
-export { ImperativeHandle, SetAttribute, SetChildren, SetClass, SetStyle, UseImperativePropsParameters, useImperativeProps } from "./dom-helpers/use-imperative-props.js";
+export { ImperativeElement, ImperativeElementProps, ImperativeHandle, SetAttribute, SetChildren, SetClass, SetStyle, UseImperativePropsParameters, useImperativeProps } from "./dom-helpers/use-imperative-props.js";
 export { useMergedClasses } from "./dom-helpers/use-merged-classes.js";
 export { enableLoggingPropConflicts, mergeFunctions, useMergedProps } from "./dom-helpers/use-merged-props.js";
 export { useMergedRefs } from "./dom-helpers/use-merged-refs.js";
@@ -60,4 +60,5 @@ export { assertEmptyObject } from "./util/assert.js";
 export { AsyncToSyncParameters, AsyncToSyncReturn, CaptureFunctionType, asyncToSync } from "./util/async-to-sync.js";
 export { getBuildMode } from "./util/mode.js";
 export { generateRandomId } from "./util/random-id.js";
+export { hideCallCount, monitorCallCount } from "./util/use-call-count.js"
 

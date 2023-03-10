@@ -1,6 +1,7 @@
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from "@rollup/plugin-commonjs";
 import typescript from '@rollup/plugin-typescript';
+import replace from '@rollup/plugin-replace'
 import { babel } from '@rollup/plugin-babel';
 import path from "path";
 import sourcemaps from "rollup-plugin-sourcemaps"
@@ -18,6 +19,7 @@ export default {
     treeshake: "recommended",
     plugins: [
         typescript({ sourceMap: true, moduleResolution: "nodenext" }), 
+        replace({ 'process.env.NODE_ENV': JSON.stringify('development'), preventAssignment: true }),
         commonjs({ sourceMap: true, extensions }), 
         resolve({ extensions, dedupe: ['preact', "preact/compat", "preact/hooks"] }),   // TODO: Why, exactly, is this needed? It doesn't not make sense, but specifically. Why.
         babel({

@@ -1,5 +1,6 @@
 import { useLayoutEffect } from "preact/hooks";
 import { useGlobalHandler } from "../dom-helpers/use-event-handler.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 import { useStableCallback } from "./use-stable-callback.js";
 import { useStableGetter } from "./use-stable-getter.js";
 import { useState } from "./use-state.js";
@@ -46,6 +47,7 @@ export function storeToLocalStorage(key, value, converter = JSON.stringify, stor
  * @returns
  */
 export function usePersistentState(key, initialValue, fromString = JSON.parse, toString = JSON.stringify, storage = localStorage) {
+    monitorCallCount(usePersistentState);
     const [localCopy, setLocalCopy, getLocalCopy] = useState(() => ((key ? (getFromLocalStorage(key, fromString, storage)) : null) ?? initialValue));
     const getInitialValue = useStableGetter(initialValue);
     // Ensure that if our key changes, we also update `localCopy` to match.

@@ -1,4 +1,5 @@
 import { h } from "preact";
+import { monitorCallCount } from "../util/use-call-count.js";
 
 function styleStringToObject(style: string): h.JSX.CSSProperties {
     // TODO: This sucks D:
@@ -13,6 +14,7 @@ function styleStringToObject(style: string): h.JSX.CSSProperties {
  * @returns A CSS object containing the properties of both objects.
  */
 export function useMergedStyles(lhs: h.JSX.HTMLAttributes<EventTarget>["style"], rhs: h.JSX.HTMLAttributes<EventTarget>["style"]): h.JSX.HTMLAttributes<EventTarget>["style"] {
+    monitorCallCount(useMergedStyles);
 
     // Easy case, when there are no styles to merge return nothing.
     if (!lhs && !rhs)

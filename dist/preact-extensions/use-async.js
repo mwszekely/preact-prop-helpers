@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo } from "preact/hooks";
 import { useStableCallback } from "./use-stable-callback.js";
 import { useState } from "./use-state.js";
 import { asyncToSync } from "../util/async-to-sync.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 function identityCapture(...t) { return t; }
 const AsyncFunction = ((async function () { }).constructor);
 /**
@@ -30,6 +31,7 @@ const AsyncFunction = ((async function () { }).constructor);
  *
  */
 export function useAsync(asyncHandler2, options) {
+    monitorCallCount(useAsync);
     // Things related to current execution
     // Because we can both return and throw undefined, 
     // we need separate state to track their existance too.

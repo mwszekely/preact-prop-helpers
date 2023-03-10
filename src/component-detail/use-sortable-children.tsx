@@ -5,6 +5,7 @@ import { useForceUpdate } from "../preact-extensions/use-force-update.js";
 import { ManagedChildInfo, ManagedChildren } from "../preact-extensions/use-managed-children.js";
 import { returnNull, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableGetter } from "../preact-extensions/use-stable-getter.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 
 export type GetIndex<P> = (row: VNode<P>) => (number | null | undefined);
 export type GetValid = (index: number) => boolean;
@@ -137,6 +138,7 @@ export interface UseSortableChildInfo extends ManagedChildInfo<number> {
 export function useRearrangeableChildren<M extends UseSortableChildInfo>({
     rearrangeableChildrenParameters: { getIndex, onRearranged }
 }: UseRearrangeableChildrenParameters): UseRearrangeableChildrenReturnType<M> {
+    monitorCallCount(useRearrangeableChildren);
 
     // These are used to keep track of a mapping between unsorted index <---> sorted index.
     // These are needed for navigation with the arrow keys.
@@ -190,6 +192,8 @@ export function useRearrangeableChildren<M extends UseSortableChildInfo>({
     }, []);
 
     const useRearrangedChildren = useCallback((children: VNode[]) => {
+        monitorCallCount(useRearrangedChildren);
+
         console.assert(Array.isArray(children));
 
         const forceUpdate = useForceUpdate();
@@ -254,6 +258,7 @@ export function useSortableChildren<M extends UseSortableChildInfo>({
     rearrangeableChildrenParameters,
     sortableChildrenParameters: { compare: userCompare }
 }: UseSortableChildrenParameters<M>): UseSortableChildrenReturnType<M> {
+        monitorCallCount(useSortableChildren);
 
     const getCompare = useStableGetter<Compare<M>>(userCompare ?? defaultCompare);
 

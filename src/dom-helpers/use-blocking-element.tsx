@@ -6,6 +6,7 @@ import { useActiveElement } from "../observers/use-active-element.js";
 import { returnNull, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { getDocument } from "./use-document-class.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 
 function blockingElements() { return (getDocument() as DocumentWithBlockingElements).$blockingElements }
 /**
@@ -17,6 +18,7 @@ function blockingElements() { return (getDocument() as DocumentWithBlockingEleme
  * @param target 
  */
 export function useBlockingElement<E extends Element>(enabled: boolean, getTarget: () => (E | null)) {
+    monitorCallCount(useBlockingElement);
 
     const stableGetTarget = useStableCallback(getTarget);
 

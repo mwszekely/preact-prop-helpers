@@ -1,6 +1,7 @@
 import { options } from "preact";
 import { useCallback, useLayoutEffect, useRef } from "preact/hooks";
 import { getBuildMode } from "../util/mode.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 /**
  * Debug hook.
  *
@@ -54,6 +55,7 @@ export function debounceRendering(f) {
  * @returns
  */
 export function usePassiveState(onChange, getInitialValue, customDebounceRendering) {
+    monitorCallCount(usePassiveState);
     const valueRef = useRef(Unset);
     const reasonRef = useRef(Unset);
     const warningRef = useRef(false);

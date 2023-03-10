@@ -1,6 +1,7 @@
 import { useCallback as useCallbackNative } from "preact/hooks";
 import { useEnsureStability } from "./use-passive-state.js";
 import { useStableGetter } from "./use-stable-getter.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 /**
  * We keep track of which callbacks are stable with a WeakMap instead of, say, a symbol because
  * `useCallback` will return a function that's stable across *all* renders, meaning
@@ -25,6 +26,7 @@ function setIsStableGetter(obj) {
  * truly has no dependencies/only stable dependencies!!
  */
 export function useStableCallback(fn, noDeps) {
+    monitorCallCount(useStableCallback);
     useEnsureStability("useStableCallback", noDeps == null, noDeps?.length, isStableGetter(fn));
     if (isStableGetter(fn))
         return fn;

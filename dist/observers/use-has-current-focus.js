@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef } from "preact/hooks";
 import { returnFalse, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 export function useHasCurrentFocus(args) {
+    monitorCallCount(useHasCurrentFocus);
     const { hasCurrentFocusParameters: { onCurrentFocusedChanged: onFocusedChanged, onCurrentFocusedInnerChanged: onFocusedInnerChanged }, refElementReturn: { getElement } } = args;
     useEnsureStability("useHasCurrentFocus", onFocusedChanged, onFocusedInnerChanged, getElement);
     const [getFocused, setFocused] = usePassiveState(onFocusedChanged, returnFalse, runImmediately);
