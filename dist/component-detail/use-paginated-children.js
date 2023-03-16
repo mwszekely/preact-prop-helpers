@@ -36,7 +36,7 @@ export function usePaginatedChildren({ managedChildrenReturn: { getChildren }, l
             })
         }),
         managedChildrenParameters: {
-            onChildCountChange: useStableCallback((count) => {
+            onChildrenCountChange: useStableCallback((count) => {
                 if (paginationMax != null || paginationMin != null) {
                     setChildCount(count);
                     const min = (paginationMin ?? 0);

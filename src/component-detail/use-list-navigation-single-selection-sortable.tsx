@@ -31,23 +31,17 @@ export function useListNavigationSingleSelectionSortable<ParentOrChildElement ex
     monitorCallCount(useListNavigationSingleSelectionSortable);
     const { rearrangeableChildrenReturn, sortableChildrenReturn, ...void1 } = useSortableChildren<M>({ rearrangeableChildrenParameters, sortableChildrenParameters });
     const { indexDemangler, indexMangler } = rearrangeableChildrenReturn;
-    const { propsStable, childrenHaveFocusParameters, context, linearNavigationReturn, managedChildrenParameters, rovingTabIndexReturn, singleSelectionReturn, typeaheadNavigationReturn, ...void2 } = useListNavigationSingleSelection<ParentOrChildElement, ChildElement, M>({ linearNavigationParameters: { ...linearNavigationParameters, indexDemangler, indexMangler }, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, managedChildrenReturn });
+    const { propsStable, context, ...restLN } = useListNavigationSingleSelection<ParentOrChildElement, ChildElement, M>({ linearNavigationParameters: { ...linearNavigationParameters, indexDemangler, indexMangler }, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, managedChildrenReturn });
     
     assertEmptyObject(void1);
-    assertEmptyObject(void2);
     assertEmptyObject(void3);
 
     return {
         context,
         propsStable,
-        childrenHaveFocusParameters,
-        linearNavigationReturn,
-        managedChildrenParameters,
         rearrangeableChildrenReturn,
-        rovingTabIndexReturn,
-        singleSelectionReturn,
         sortableChildrenReturn,
-        typeaheadNavigationReturn
+        ...restLN
     }
 }
 

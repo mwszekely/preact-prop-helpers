@@ -2,6 +2,8 @@
 
 A small set of hooks related to modifying Preact props, but also a number of other useful things. These are all hooks that I have found to be extremely useful when building UIs with Preact--everything from keyboard navigation to `localStorage` state management.
 
+The name (Preact Prop Helpers) comes from the fact that most of these hooks require modifying the props that were going to be passed to an element in order to function (generally just the `ref` on those props, but still).  It's since grown in scope to include a bunch of general helper hooks as well (like `useAsync`), but `useMergedProps` truly was the core at one point.
+
 ```tsx 
 const [size, setSize] = useState<ElementSize | null>(null);
 const { useElementSizeProps } = useElementSize<HTMLDivElement>({ onSizeChange: setSize });
@@ -12,14 +14,168 @@ const { offsetHeight, ...otherSizes } = (size ?? {});
 return <div {...useElementSizeProps(props)}>I'm {offsetHeight} pixels tall!</div>
 ```
 
-The name (Preact Prop Helpers) comes from the fact that most of these hooks require modifying the props that were going to be passed to an element in order to function (generally just the `ref` on those props, but still).  It's since grown in scope to include a bunch of general helper hooks as well (like `useAsync`), but `useMergedProps` truly was the core at one point.
 
-This library follows a few conventions:
+## Summary of available hooks
+
+* [`useMergedProps`](#useMergedProps): Merges two or more sets of props together. Can handle `class` & `className`, `style`, `ref`, `children`, and all event handlers.
+* `useRefElement`: Access the `Element` that rendered these props.
+* `useManagedChildren`: Low-level hook that is effectively the concept of `Context` but reversed for child to parent communication. Query the status of managed children and be notified when they change.
+* `useListNavigationComplete`: Create a composite component that only has a single tab stop among its many children. Combines the following hooks, and wraps them all up with `useManagedChildren` at the end:
+    * `useListNavigation`: Combines the following hooks: (does not call `useManagedChildren`)
+        * `useRovingTabIndex`: Only one child among all children is tabbable at any given moment
+        * `useLinearNavigation`: Which child is the tabbable child is controlled by pressing Up, Page Down, Home, etc.
+        * `useTypeaheadNavigation`: Which child is the tabbable child is controlled by typing the child's name/content
+    * `useSingleSelection`: Only one child among all children is selected (can be disabled for multi-select)
+    * `useSortableChildren`: Children can be sorted (or arbitrarily rearranged)
+    * `usePaginatedChildren`: Tell children to show/hide themselves if they are within a narrow window
+    * `useStaggeredChildren`: Only render a child when the one above it has called its first `useEffect`.
+    * (It is perfectly possible to build this hook yourself from its component pieces &mdash; it's provided for convenience)
+* `useGridNavigationComplete`: 2-dimensional `useListNavigationComplete`
+* `useImperativeProps`: Control the attributes, text content, classes, event handlers etc. of a children remotely without props. Even if the child re-renders with props of its own the imperative changes will be remembered and re-merged.
+* `usePortalChildren`: Allows adding/removing children to an arbitrary part of the DOM (e.g. pushing a Toast notification).
+* `useTextContent`: Access the text of the `Element` that rendered these props.
+* `useElementSize`: React to changes in the size of the `Element` that rendered these props
+* `useMediaQuery`: Watch a CSS media query and get notified when its condition is or is not satisfied.
+* `useMutationObserver`: Allows you to use a low-level `MutationObserver` on the `Element` that rendered these props.
+* `useActiveElement`: React to changes in `document.activeElement`
+* `useHasCurrentFocus`: Is the `Element` focused or not?
+* `useHasLastFocus`: Is the `Element` focused, or, if nothing's focused, was it the most recently focused `Element`?
+* `useStableCallback`: Makes a function stable so that it can be excluded from dependency arguments.
+    * `useStableGetter`: Like the above, but for any arbitrary object.
+* `useState`: Same as the built-in, but returns `[state, setState, getState]` with that third return value there.
+* `usePassiveState`: Want to keep state around, but don't **need** to re-render when it changes? Passive state lets you run a `useEffect`-like callback and cleanup, so if you want to re-render, you can, and if you don't need to re-render, you don't have to.
+* `usePersistentState`: State hooked up to `localStorage` (or `sessionStorage`)
+* `useForceUpdate`: Force your component to re-render itself even if no other state has changed.
+* `useAnimationFrame`: Run code just before the browser paints each frame while the element is mounted.
+* `useInterval`: Run code periodially while the element is mounted.
+* `useTimeout`: For all intents and purposes, this is `useEffect` but with a delay.
+* `useAsyncHandler`: Pass an `async` DOM handler, get a sync one back (and a lot of metadata about its current status). Only one handler ever runs at a time.
+    * `useAsync`: Generalized version of the above that can transform *any* `async` function, not just DOM handlers
+    * `useAsyncEffect`: The logic of `useAsync` hooked up to `useEffect`.
+
+## `useMergedProps`
+
+Merges two or more sets of props together. Can handle `class` & `className`, `style`, `ref`, `children`, and all event handlers.
+
+```tsx
+const a = { className: "foo" };
+const b = { className: "bar" };
+// [etc ...]
+return <div {...useMergedProps(a,b,c,d)} />
+```
+
+## `useRefElement`
+
+Access the `Element` that rendered these props.
+
+```tsx
+// Example 1: Basic usage ("I don't need access to the element while rendering, only during effects and event handlers")
+const { refElementReturn: { getElement }, propsStable } = useRefElement<HTMLDivElement>({});
+useEffect(() => { console.log(getElement()); }, [/* Empty! */])
+return <div {...propsStable} />
+```
+
+```tsx
+// Example 2: ("I need the element during rendering specifically, even at the cost of re-rendering")
+// (This is uncommon, consider useElementSize, useMutationObserver, etc.)
+const [element, setElement] = useState<HTMLDivElement | null>(null);
+const { propsStable } = useRefElement<HTMLDivElement>({ onElementChange: setElement });
+return <div {...propsStable} data-x={element?.offsetLeft} />
+```
+
+|Parameter|Requirements|Description|
+|-|-|-|
+|`onElementChange`|Optional, **Stable**|Called when the element has rendered with that `Element`, or `null` when unmounting. This happens during the `ref` phase (after commit, before effects)|
+|`onMount`|Optional, **Stable**|Called when the element has rendered.|
+|`onUnmount`|Optional, **Stable**|Called when the has element unmounted.|
+
+|Return|Guarantees|Description|
+|-|-|-|
+|`getElement`|**Stable**|Returns the element that has been rendered, or `null` if it hasn't been rendered yet.|
+|`propsStable`|**Stable**|Recommended to use with `useMergedProps`|
+
+## `useManagedChildren`
+Low-level hook that is effectively the concept of `Context` but reversed for child to parent communication. Query the status of managed children and be notified when they change.
+
+Any hook that uses `useMergedChildren` must define an Info type that extends `ManagedChildInfo<string | number>`. Any additional properties you define will be available from the parent, so if you need to do something like `child[71].areYouHidden()? foo() : bar()` be sure to add `areYouHidden` as a property in your derived type.
+
+Additionally, each child of `useManagedChildren` must have either:
+* A numeric, 0-based integer index that represents this child's position in an imaginary array (sparse arrays are fine and handled gracefully, so you can leave as many gaps as you need)
+* A unique string index (sequentiality does not apply)
+
+This concept is separate from the `key` prop.
+
+### `useManagedChildren`
+
+|Parameter|Requirements|Description|
+|-|-|-|
+|`onAfterChildLayoutEffect`|Optional, **Stable**|Once all children have rendered and run `useLayoutEffect`, a microtick later, `onAfterChildLayoutEffect` is called once. If more children render, this will again only be called once per microtick.|
+|`onChildrenMountChange`|Optional, **Stable**|When one or more child elements mount/unmount, a microtick later this will fire with which children mounted as the first argument and which unmounted as the second.|
+|`onChildrenCountChange`|Optional, **Stable**|Identical to the above, but simply counts the highest-indexed child.|
+
+|Return|Guarantees|Description|
+|-|-|-|
+|`getChildren`|**Stable**|Returns a `ManagedChildren` object that abstracts over all mounted children|
+|`context`|**Stable**|Must be passed into a `Context` so the child can access it.|
+
+`ManagedChildren` interface:
+* `getAt(index)`: Returns the child that mounted with that index, or `undefined`.
+* `getHighestIndex()`: Returns the index of the child that's mounted with the highest numeric index. The range of all children is [0, `getHighestIndex()`] or [0, `getHighestIndex()` + 1)
+* `forEach(fn)`: Runs the given function on every child. If you return `"break"`, the loop will end early.
+* `arraySlice()`: Internal use only for implementing `useSortableChildren`, but will return an array copy of all children with a numeric index.
+
+### `useManagedChild`
+
+`useManagedChild` is called with the `context` from its parent as the first argument, then its actual parent-shared data as the second argument.
+
+|Return|Guarantees|Description|
+|-|-|-|
+|`getChildren`|**Stable**|The same as what the parent returns, in case children need to communicate with each other.|
+
+## `useCompleteListNavigation`
+
+Create a composite component that only has a single tab stop among its many children. Functionally combines many hooks together that can be used individually (but generally aren't):
+
+### `useRovingTabIndex`
+Only one child among all children is tabbable at any given moment.
+
+Any attempt to change focus to a child that does not exist or cannot accept focus at the moment (because it's disabled, hidden, etc.) will instead send focus to the closest matching child to ensure that, no matter what, at least one child can be focused at all times.
+
+#### `useRovingTabIndex`
+|Parameter|Requirements|Description|
+|-|-|-|
+|`initiallyTabbedIndex`|Optional|When first mounted, which child will receive focus? (After that, which child is tabbable can be controlled imperatively but not declaratively for performance reasons)|
+|`untabbable`|Optional|When true, none of the children will be tabbable, as if the entire component is hidden. This does not actually change the currently tabbable index; if this is set to `false`, the last tabbable child is remembered.|
+|`onTabbableIndexChange`|Optional, **Stable**|Called any time a new child is made focusable. If you want the parent to render differently based on which child is focusable, use this.|
+
+|Return|Guarantees|Description|
+|-|-|-|
+|`getTabbableIndex`|**Stable**|Returns a number from 0 to `getHighestIndex` representing which child is currently tabbable. `null` if none are tabbable. If `untabbable` is `true`, this will still return the last tabbable index.|
+|`setTabbableIndex`|**Stable**|Changes which child is tabbable to the newly requested index. If `null`, the component is effectively hidden from keyboard users.|
+|`focusSelf`|**Stable**|Sends focus to whichever child is currently focusable.|
+|`context`|**Stable**|Must be passed into a `Context` so the child can access it.|
+
+#### `useRovingTabIndexChild`
+|Parameter|Requirements|Description|
+|-|-|-|
+|`hidden`| |If a child exists at this index but cannot be focused (because it's `display: none`, for example), then `hidden` **must** be `true` to indicate this.|
+|`untabbable`|Optional|When true, none of the children will be tabbable, as if the entire component is hidden. This does not actually change the currently tabbable index; if this is set to `false`, the last tabbable child is remembered.|
+|`onTabbableIndexChange`|Optional, **Stable**|Called any time a new child is made focusable. If you want the parent to render differently based on which child is focusable, use this.|
+
+|Return|Guarantees|Description|
+|-|-|-|
+|`tabbable`||Is this the currently tabbable child?|
+|`getTabbable`|**Stable**|Stable function of the above|
+|`propsStable`| |Recommended to use with `useMergedProps`|
+
+
+## Conventions and goals
+
 * Re-render as few times as possible. In general this means instead of a hook returning a value, it will accept an `onChange`-ish handler that will let you explicitly do that.
     * `useElementSize`, for example, has no way of returning the size the first time its component renders. It needs to fully render *and then* run an effect that measures it. Once the element's been measured, *you* are responsible for choosing if the component is re-rendered with this new information or not.
     ```tsx
     // ✔✔✔
-    // We're explicitly saying "I need `size` during render, so I'm opting-into a re-render"
+    // We're explicitly saying "I need `size` during render, so I'm opting into a re-render"
     const [size, setSize] = useState(null);
     const { props } = useElementSize({ onSizeChange: setSize });
     return <div data-x={size?.x} {...props} />
@@ -51,18 +207,19 @@ This library follows a few conventions:
     ```
 * As much as possible, no specific DOM restrictions are imposed and, for hooks with children (lists, grids, etc.), those children can be anywhere descendent in the tree (except for `useSortableChildren`, which can be anywhere descendant but must all be contiguous). Nesting hooks, even of the same type, is also fine.
     *  E.G. `useRovingTabIndex` returns information that you can toss into a `Context` so that each child can call `useRovingTabIndexChild` with that information, and this can happen pretty much anywhere decendent in the DOM that you'd like. A child can use `useRovingTabIndex` and `useRovingTabIndexChild` to both be a child that can be tabbed to and have children that can be tabbed to (which is what `useGridNavigation` does).
-* Children provide their data to the parent, never the other way around. E.G. `useListNavigation` can filter children, but it doesn't take an array of which children to filter out; each child reports its own status as filtered/unfiltered with, say, a `hidden` prop, and the parent responds to that.
+* A parent hook never needs to be directly passed child data because the children will provide it themselves. E.G. `useListNavigation` can filter children, but it doesn't take an array of which children to filter out; each child reports its own status as filtered/unfiltered with, say, a `hidden` prop, and the parent responds to that.
     * This means that the child data is *always* the single source of truth, and maps nicely to how components are built and diffed.
 * Organizationally, some hooks exist primarily to be used as a part of a larger hook.  Hooks within the `component-use` folder are generally "ready-to-use" and don't require much passing of parameters back and forth, but are not fully extensible.  Hooks within `component-detail` are the lower-level building blocks that make up those "ready-to-use" complete hooks, but they're much more time-consuming to use.
     * You can also just copy and paste one of the complete hooks somewhere else and use it as a new building block...
-* Hooks composable in predictable and obvious ways, because there are a lot of intertwined dependencies:
-    * A hook, `useFoo`, will always take paramaters like `{ fooParameters: {...} }`.
+* Hooks composable in predictable and obvious ways, because there are a lot of intertwined dependencies. If we have `useFoo`, it:
+    * ...will always take paramaters like `{ fooParameters: {...} }`.
         * E.G. `useElementRef({ elementRefParameters: { onMount: ... } })`
-    * A hook, `useFoo`, will always return objects like `{ fooReturn: { ... } }`
+    * ...will always return objects like `{ fooReturn: { ... } }`
         * E.G. `const { refElementReturn: { getElement } } = useElementRef(...)`
-    * A hook, `useFoo` may also return `{ props: {...} }` or, instead rarely, `{ propsStable: {...} }`. These must be spread onto the element you're rendering, or the hook will not function (see `useMergedProps` if you need to use other props in addition to the returned props). 
+    * ...may also return `{ props: {...} }` or, rarely, `{ propsStable: {...} }`. These must be spread onto the element you're rendering, or the hook will not function (see `useMergedProps` if you need to use other props in addition to the returned props). 
         * E.G. `const { propsStable } = useElementRef(...)`, then `<div {...propsStable} />`
-    * A hook, `useFoo` may also return `{ context: { ... } }` that children rely on.
+        * `propsStable` indicates that nothing about the object ever changes including the identity of the object itself and all its fields.
+    * ...may also return `{ context: { ... } }` that children rely on.
         1. E.G. Parent calls `const { context } = useFoo(...);`
         1. Parent renders `<MyContext.Provider value={context}>{children}</MyContext.Provider>`
         1. Then child calls `useFooChild({ context: useContext(MyContext), fooChildParameters: {...} })`
@@ -78,6 +235,7 @@ This library follows a few conventions:
             * `useRandomId` returns `propsSource` and `propsReferencer` (and no `props`).
         
 
+These rules should ideally make swizzling all these different parameters back and forth as foolproof as possible.
 
 ## Summary of available hooks
 
@@ -136,6 +294,21 @@ This library follows a few conventions:
     <tr><td>useAnimationFrame</td><td>Run some code on every frame this component is mounted. Can be batched with the `ProvideBatchedAnimationFrames` component to improve performance if you have many dozens of components calling `requestAnimationFrame`</td><td></td></tr>
     </tbody>
 </table>
+
+# Preact Extensions
+These are hooks that extend native built-in Preact behavior, or add onto it in natural ways.
+
+## `useAsync`
+
+Turns an async function into a sync function (and a lot of metadata about the invocations of that sync function).  This hook is used as a base for more useful hooks like `useAsyncHandler` (useful for DOM events) and `useAsyncEffect` (which is `useEffect`, but async).
+
+|Argument|Description|
+|-|-|-|
+|`capture`|-|
+|`throttle`|-|
+|`debounce`|-|
+
+## `useAsyncEffect`
 
 
 # General Purpose Prop Hooks

@@ -66,7 +66,7 @@ export interface UseRovingTabIndexParameters<TabbableChildElement extends Elemen
          * 
          * **MUST** be stable!
          */
-        onTabbableIndexChange: null | OnPassiveStateChange<number | null, Event>;
+        onTabbableIndexChange?: undefined | null | OnPassiveStateChange<number | null, Event>;
     };
 }
 
@@ -282,7 +282,7 @@ export function useRovingTabIndex<ChildElement extends Element, M extends UseRov
     const isTabbableValid = useCallback((m: UseRovingTabIndexChildInfo<ChildElement>) => { return !m.hidden }, []);
     const { changeIndex: changeTabbableIndex, getCurrentIndex: getTabbableIndex, reevaluateClosestFit } = useChildrenFlag<UseRovingTabIndexChildInfo<ChildElement>, Event>({
         initialIndex: initiallyTabbedIndex ?? (untabbable ? null : 0),
-        onIndexChange: onTabbableIndexChange,
+        onIndexChange: onTabbableIndexChange || null,
         getChildren,
         closestFit: true,
         getAt: getTabbableAt,

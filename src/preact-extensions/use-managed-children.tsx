@@ -1,5 +1,6 @@
 import { useCallback, useLayoutEffect, useRef } from "preact/hooks";
 import { assertEmptyObject } from "../util/assert.js";
+import { OmitStrong } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 import { OnPassiveStateChange, PassiveStateUpdater, debounceRendering, useEnsureStability, usePassiveState } from "./use-passive-state.js";
 import { useStableCallback } from "./use-stable-callback.js";
@@ -44,9 +45,7 @@ export interface UseManagedChildrenContext<M extends ManagedChildInfo<any>> {
 /**
  * Information that children and parents use to communicate with each other.
  * 
- * * `index` refers to which child this is.
- * * `flags` are quick-and-easy getters and setters that you can optionally use
- * * `subInfo` is anything used by a derived hook. `useRovingTabIndex`, for example, needs to know how to focus an arbitrary child, so the child populates `info` with an object containing a method called `focusSelf`.
+ * Other hooks will inherit from this to provide more complicated behavior.
  */
 export interface ManagedChildInfo<T extends string | number> {
     index: T;
@@ -75,16 +74,15 @@ export interface UseManagedChildrenParameters<M extends ManagedChildInfo<any>> {
          */
         onChildrenMountChange?: null | undefined | OnChildrenMountChange<M["index"]>;
 
-        onChildCountChange?: null | undefined | ((count: number) => void);
+        onChildrenCountChange?: null | undefined | ((count: number) => void);
     }
 }
 
-// MCSubInfo contains the entirety of the saved data for this child.  All of it. Even types the user will never be able to pass in because they're internally derived.
-// SubbestInfo refers to the actual parameters the user passes in that could be totally unrelated. 
+
 export interface UseManagedChildParameters<M extends ManagedChildInfo<any>> {
     // This is the only property shared among all managed children.
     // Technically this is redundant with the second argument, which is...eh. But the types are clear.
-    managedChildParameters: Pick<M, "index">;
+    // managedChildParameters: Pick<M, "index">;
 
     /**
      * In general, this shouldn't be null, but for convenience's sake you are allowed to, which disables all behavior, and also means `getChildren` will be `undefined`!
@@ -130,7 +128,7 @@ export interface ManagedChildren<M extends ManagedChildInfo<any>> {
     /** STABLE */
     getHighestIndex(): number;
     /** STABLE */
-    forEach: (f: (child: M) => void) => void;
+    forEach: (f: (child: M) => void) => void | "break";
 
     /**
      * **UNSTABLE**, 
@@ -169,16 +167,16 @@ interface InternalChildInfo<M extends ManagedChildInfo<string | number>> {
  */
 export function useManagedChildren<M extends ManagedChildInfo<string | number>>(parentParameters: UseManagedChildrenParameters<M>): UseManagedChildrenReturnType<M> {
     monitorCallCount(useManagedChildren);
-    
+
     type IndexType = M["index"];
     type Info = M;
 
-    const { managedChildrenParameters: { onAfterChildLayoutEffect, onChildrenMountChange, onChildCountChange }, ...rest } = parentParameters;
+    const { managedChildrenParameters: { onAfterChildLayoutEffect, onChildrenMountChange, onChildrenCountChange }, ...rest } = parentParameters;
     assertEmptyObject(rest);
 
-    useEnsureStability("useManagedChildren", onAfterChildLayoutEffect, onChildrenMountChange, onChildCountChange);
+    useEnsureStability("useManagedChildren", onAfterChildLayoutEffect, onChildrenMountChange, onChildrenCountChange);
 
-    //const [getMountCount, setMountCount] = usePassiveState(onChildCountChange, returnZero, runImmediately);
+    //const [getMountCount, setMountCount] = usePassiveState(onChildrenCountChange, returnZero, runImmediately);
 
     const getHighestIndex = useCallback((): number => {
         return managedChildrenArray.current.highestIndex;
@@ -193,15 +191,18 @@ export function useManagedChildren<M extends ManagedChildInfo<string | number>>(
     // TODO: The primary use for this is flaggable closest fits
     // which needs to search all children for that closest fit.
     // It would be nice if there was something better for that.
-    const forEachChild = useCallback((f: (child: Info) => void) => {
+    const forEachChild = useCallback((f: (child: Info) => (void | "break")) => {
         for (const child of managedChildrenArray.current.arr) {
-            if (child)
-                f(child);
+            if (child) {
+                if (f(child) == 'break')
+                    return;
+            }
         }
         for (const field in managedChildrenArray.current.rec) {
             const child: Info | undefined = managedChildrenArray.current.rec[field as keyof Record<IndexType, Info>];
             if (child)
-                f(child);
+                if (f(child) == 'break')
+                    return;
         }
     }, [])
 
@@ -255,10 +256,10 @@ export function useManagedChildren<M extends ManagedChildInfo<string | number>>(
                 mounts: new Set(),
                 unmounts: new Set(),
             };
-            if (onChildCountChange || onChildrenMountChange) {
+            if (onChildrenCountChange || onChildrenMountChange) {
                 debounceRendering(() => {
                     onChildrenMountChange?.(hasRemoteULEChildMounted.current!.mounts, hasRemoteULEChildMounted.current!.unmounts);
-                    onChildCountChange?.(getChildren().getHighestIndex() + 1);
+                    onChildrenCountChange?.(getChildren().getHighestIndex() + 1);
                     hasRemoteULEChildMounted.current = null;
                 });
             }
@@ -322,12 +323,12 @@ export function useManagedChildren<M extends ManagedChildInfo<string | number>>(
 
 
 
-export function useManagedChild<M extends ManagedChildInfo<number | string>>(info: UseManagedChildParameters<M>, managedChildParameters: M): UseManagedChildReturnType<M> {
+export function useManagedChild<M extends ManagedChildInfo<number | string>>({ context }: UseManagedChildParameters<M>, managedChildParameters: M): UseManagedChildReturnType<M> {
     monitorCallCount(useManagedChild);
 
     type IndexType = M["index"];
 
-    const { managedChildContext: { getChildren, managedChildrenArray, remoteULEChildMounted, remoteULEChildChanged } } = (info.context ?? { managedChildContext: {} });
+    const { managedChildContext: { getChildren, managedChildrenArray, remoteULEChildMounted, remoteULEChildChanged } } = (context ?? { managedChildContext: {} });
     const index = managedChildParameters.index;
     // Any time our child props change, make that information available
     // the parent if they need it.
@@ -344,7 +345,7 @@ export function useManagedChild<M extends ManagedChildInfo<number | string>>(inf
             managedChildrenArray.rec[index as IndexType] = { ...managedChildParameters };
         }
         return remoteULEChildChanged(index as IndexType);
-    }, [...Object.entries(info).flat(9)]);  // 9 is infinity, right? Sure. Unrelated: TODO.
+    }, [...Object.entries(managedChildParameters).flat(9)]);  // 9 is infinity, right? Sure. Unrelated: TODO.
 
     // When we mount, notify the parent via queueMicrotask
     // (every child does this, so everything's coordinated to only queue a single microtask per tick)

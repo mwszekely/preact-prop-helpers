@@ -38,10 +38,10 @@ const _comments = void (0);
  */
 export function useManagedChildren(parentParameters) {
     monitorCallCount(useManagedChildren);
-    const { managedChildrenParameters: { onAfterChildLayoutEffect, onChildrenMountChange, onChildCountChange }, ...rest } = parentParameters;
+    const { managedChildrenParameters: { onAfterChildLayoutEffect, onChildrenMountChange, onChildrenCountChange }, ...rest } = parentParameters;
     assertEmptyObject(rest);
-    useEnsureStability("useManagedChildren", onAfterChildLayoutEffect, onChildrenMountChange, onChildCountChange);
-    //const [getMountCount, setMountCount] = usePassiveState(onChildCountChange, returnZero, runImmediately);
+    useEnsureStability("useManagedChildren", onAfterChildLayoutEffect, onChildrenMountChange, onChildrenCountChange);
+    //const [getMountCount, setMountCount] = usePassiveState(onChildrenCountChange, returnZero, runImmediately);
     const getHighestIndex = useCallback(() => {
         return managedChildrenArray.current.highestIndex;
     }, []);
@@ -55,13 +55,16 @@ export function useManagedChildren(parentParameters) {
     // It would be nice if there was something better for that.
     const forEachChild = useCallback((f) => {
         for (const child of managedChildrenArray.current.arr) {
-            if (child)
-                f(child);
+            if (child) {
+                if (f(child) == 'break')
+                    return;
+            }
         }
         for (const field in managedChildrenArray.current.rec) {
             const child = managedChildrenArray.current.rec[field];
             if (child)
-                f(child);
+                if (f(child) == 'break')
+                    return;
         }
     }, []);
     // Retrieves the information associated with the child with the given index.
@@ -108,10 +111,10 @@ export function useManagedChildren(parentParameters) {
                 mounts: new Set(),
                 unmounts: new Set(),
             };
-            if (onChildCountChange || onChildrenMountChange) {
+            if (onChildrenCountChange || onChildrenMountChange) {
                 debounceRendering(() => {
                     onChildrenMountChange?.(hasRemoteULEChildMounted.current.mounts, hasRemoteULEChildMounted.current.unmounts);
-                    onChildCountChange?.(getChildren().getHighestIndex() + 1);
+                    onChildrenCountChange?.(getChildren().getHighestIndex() + 1);
                     hasRemoteULEChildMounted.current = null;
                 });
             }
@@ -164,9 +167,9 @@ export function useManagedChildren(parentParameters) {
         managedChildrenReturn: { getChildren }
     };
 }
-export function useManagedChild(info, managedChildParameters) {
+export function useManagedChild({ context }, managedChildParameters) {
     monitorCallCount(useManagedChild);
-    const { managedChildContext: { getChildren, managedChildrenArray, remoteULEChildMounted, remoteULEChildChanged } } = (info.context ?? { managedChildContext: {} });
+    const { managedChildContext: { getChildren, managedChildrenArray, remoteULEChildMounted, remoteULEChildChanged } } = (context ?? { managedChildContext: {} });
     const index = managedChildParameters.index;
     // Any time our child props change, make that information available
     // the parent if they need it.
@@ -183,7 +186,7 @@ export function useManagedChild(info, managedChildParameters) {
             managedChildrenArray.rec[index] = { ...managedChildParameters };
         }
         return remoteULEChildChanged(index);
-    }, [...Object.entries(info).flat(9)]); // 9 is infinity, right? Sure. Unrelated: TODO.
+    }, [...Object.entries(managedChildParameters).flat(9)]); // 9 is infinity, right? Sure. Unrelated: TODO.
     // When we mount, notify the parent via queueMicrotask
     // (every child does this, so everything's coordinated to only queue a single microtask per tick)
     // Do the same on unmount.

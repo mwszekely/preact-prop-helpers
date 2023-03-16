@@ -10,9 +10,7 @@ export interface UseManagedChildrenContext<M extends ManagedChildInfo<any>> {
 /**
  * Information that children and parents use to communicate with each other.
  *
- * * `index` refers to which child this is.
- * * `flags` are quick-and-easy getters and setters that you can optionally use
- * * `subInfo` is anything used by a derived hook. `useRovingTabIndex`, for example, needs to know how to focus an arbitrary child, so the child populates `info` with an object containing a method called `focusSelf`.
+ * Other hooks will inherit from this to provide more complicated behavior.
  */
 export interface ManagedChildInfo<T extends string | number> {
     index: T;
@@ -34,11 +32,10 @@ export interface UseManagedChildrenParameters<M extends ManagedChildInfo<any>> {
          * Same as the above, but only for mount/unmount (or when a child changes its index)
          */
         onChildrenMountChange?: null | undefined | OnChildrenMountChange<M["index"]>;
-        onChildCountChange?: null | undefined | ((count: number) => void);
+        onChildrenCountChange?: null | undefined | ((count: number) => void);
     };
 }
 export interface UseManagedChildParameters<M extends ManagedChildInfo<any>> {
-    managedChildParameters: Pick<M, "index">;
     /**
      * In general, this shouldn't be null, but for convenience's sake you are allowed to, which disables all behavior, and also means `getChildren` will be `undefined`!
      */
@@ -76,7 +73,7 @@ export interface ManagedChildren<M extends ManagedChildInfo<any>> {
     /** STABLE */
     getHighestIndex(): number;
     /** STABLE */
-    forEach: (f: (child: M) => void) => void;
+    forEach: (f: (child: M) => void) => void | "break";
     /**
      * **UNSTABLE**,
      * also internal-use only,
@@ -111,7 +108,7 @@ interface InternalChildInfo<M extends ManagedChildInfo<string | number>> {
  *
  */
 export declare function useManagedChildren<M extends ManagedChildInfo<string | number>>(parentParameters: UseManagedChildrenParameters<M>): UseManagedChildrenReturnType<M>;
-export declare function useManagedChild<M extends ManagedChildInfo<number | string>>(info: UseManagedChildParameters<M>, managedChildParameters: M): UseManagedChildReturnType<M>;
+export declare function useManagedChild<M extends ManagedChildInfo<number | string>>({ context }: UseManagedChildParameters<M>, managedChildParameters: M): UseManagedChildReturnType<M>;
 export interface UseChildrenFlagParameters<M extends ManagedChildInfo<any>, R> {
     /**
      * Which child is considered active on mount.

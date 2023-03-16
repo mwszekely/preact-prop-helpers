@@ -51,7 +51,7 @@ export interface UseRovingTabIndexParameters<TabbableChildElement extends Elemen
          *
          * **MUST** be stable!
          */
-        onTabbableIndexChange: null | OnPassiveStateChange<number | null, Event>;
+        onTabbableIndexChange?: undefined | null | OnPassiveStateChange<number | null, Event>;
     };
 }
 export interface UseRovingTabIndexReturnType<TabbableChildElement extends Element> {

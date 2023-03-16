@@ -7,45 +7,39 @@ import { useListNavigation, useListNavigationChild } from "./use-list-navigation
 import { useSingleSelection, useSingleSelectionChild } from "./use-single-selection.js";
 export function useListNavigationSingleSelection({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, managedChildrenReturn, ..._void3 }) {
     monitorCallCount(useListNavigationSingleSelection);
-    const { context: { rovingTabIndexContext, typeaheadNavigationContext }, propsStable, rovingTabIndexReturn, typeaheadNavigationReturn, managedChildrenParameters, linearNavigationReturn, ...void1 } = useListNavigation({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, managedChildrenReturn });
-    const { context: { singleSelectionContext }, childrenHaveFocusParameters, singleSelectionReturn, ...void2 } = useSingleSelection({ rovingTabIndexReturn, managedChildrenReturn, singleSelectionParameters });
+    const { context: contextLN, propsStable, rovingTabIndexReturn, ...retLN } = useListNavigation({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, managedChildrenReturn });
+    const { context: contextSS, ...retSS } = useSingleSelection({ rovingTabIndexReturn, managedChildrenReturn, singleSelectionParameters });
     assertEmptyObject(_void3);
-    assertEmptyObject(void1);
-    assertEmptyObject(void2);
     return {
-        childrenHaveFocusParameters,
         rovingTabIndexReturn,
-        singleSelectionReturn,
-        typeaheadNavigationReturn,
-        linearNavigationReturn,
-        managedChildrenParameters,
+        ...retSS,
+        ...retLN,
         context: useStableObject({
-            rovingTabIndexContext,
-            singleSelectionContext,
-            typeaheadNavigationContext
+            ...contextLN,
+            ...contextSS
         }),
         propsStable
     };
 }
-export function useListNavigationSingleSelectionChild({ managedChildParameters: { index, ..._void5 }, rovingTabIndexChildParameters: { hidden, ...void7 }, singleSelectionChildParameters, context, refElementReturn, textContentParameters, ..._void1 }) {
+export function useListNavigationSingleSelectionChild({ managedChildParameters: { index, ...void5 }, rovingTabIndexChildParameters, singleSelectionChildParameters, context, refElementReturn, textContentParameters, ...void1 }) {
     monitorCallCount(useListNavigationSingleSelectionChild);
-    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ..._void3 }, managedChildParameters, singleSelectionChildReturn, props: propsSS, ...void9 } = useSingleSelectionChild({
+    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ...void3 }, managedChildParameters: { setLocalSelected, ...void4 }, singleSelectionChildReturn, props: propsSS, ...void9 } = useSingleSelectionChild({
         managedChildParameters: { index },
         singleSelectionChildParameters,
         context
     });
-    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ..._void6 }, pressParameters, rovingTabIndexChildReturn, textContentReturn, props: propsLN, ...void8 } = useListNavigationChild({
+    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void6 }, pressParameters, rovingTabIndexChildReturn, textContentReturn, props: propsLN, ...void8 } = useListNavigationChild({
         managedChildParameters: { index },
-        rovingTabIndexChildParameters: { hidden },
+        rovingTabIndexChildParameters,
         context,
         refElementReturn,
         textContentParameters
     });
-    assertEmptyObject(_void1);
-    assertEmptyObject(_void3);
-    assertEmptyObject(_void5);
-    assertEmptyObject(_void6);
-    assertEmptyObject(void7);
+    assertEmptyObject(void1);
+    assertEmptyObject(void3);
+    assertEmptyObject(void4);
+    assertEmptyObject(void5);
+    assertEmptyObject(void6);
     assertEmptyObject(void8);
     assertEmptyObject(void9);
     return {
@@ -56,7 +50,7 @@ export function useListNavigationSingleSelectionChild({ managedChildParameters: 
             })
         },
         pressParameters,
-        managedChildParameters,
+        managedChildParameters: { setLocalSelected },
         rovingTabIndexChildReturn,
         singleSelectionChildReturn,
         textContentReturn,

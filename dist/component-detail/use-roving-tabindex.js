@@ -95,7 +95,7 @@ export function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovi
     const isTabbableValid = useCallback((m) => { return !m.hidden; }, []);
     const { changeIndex: changeTabbableIndex, getCurrentIndex: getTabbableIndex, reevaluateClosestFit } = useChildrenFlag({
         initialIndex: initiallyTabbedIndex ?? (untabbable ? null : 0),
-        onIndexChange: onTabbableIndexChange,
+        onIndexChange: onTabbableIndexChange || null,
         getChildren,
         closestFit: true,
         getAt: getTabbableAt,

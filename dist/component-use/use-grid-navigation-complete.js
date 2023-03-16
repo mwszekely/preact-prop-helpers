@@ -40,9 +40,9 @@ export function useCompleteGridNavigation({ gridNavigationParameters, linearNavi
     const { linearNavigationReturn, typeaheadNavigationReturn } = gridNavigationSingleSelectionReturn;
     const { indexDemangler } = rearrangeableChildrenReturn;
     const { context: { childrenHaveFocusChildContext }, childrenHaveFocusReturn } = useChildrenHaveFocus({ childrenHaveFocusParameters });
-    const mcr = useManagedChildren({ managedChildrenParameters: { onChildCountChange: useStableCallback(c => onChildCountChange(c)), ...managedChildrenParameters } });
+    const mcr = useManagedChildren({ managedChildrenParameters: { onChildrenCountChange: useStableCallback(c => onChildrenCountChange(c)), ...managedChildrenParameters } });
     const { context: { managedChildContext }, managedChildrenReturn } = mcr; // TODO: This is split into two lines for TypeScript reasons? Can this be fixed? E.G. like    vvvvvvvvvvvvvvvvvvvvvvvvvvvvvv  why doesn't that work?
-    const { paginatedChildrenReturn, paginatedChildrenReturn: { refreshPagination }, managedChildrenParameters: { onChildCountChange }, context: { paginatedChildContext } } = usePaginatedChildren({ managedChildrenReturn, paginatedChildrenParameters, linearNavigationParameters: { indexDemangler } });
+    const { paginatedChildrenReturn, paginatedChildrenReturn: { refreshPagination }, managedChildrenParameters: { onChildrenCountChange }, context: { paginatedChildContext } } = usePaginatedChildren({ managedChildrenReturn, paginatedChildrenParameters, linearNavigationParameters: { indexDemangler } });
     const { context: { staggeredChildContext }, staggeredChildrenReturn } = useStaggeredChildren({ managedChildrenReturn, staggeredChildrenParameters });
     //const props = useMergedProps(linearNavigationReturn.propsStable, typeaheadNavigationReturn.propsStable);
     const context = useStableObject({
@@ -120,7 +120,7 @@ export function useCompleteGridNavigationRow({ managedChildParameters, context: 
         setParentIsStaggered,
         setStaggeredVisible
     };
-    const { managedChildReturn } = useManagedChild({ context: contextIncomingForRowAsChildOfTable, managedChildParameters: { index } }, { ...baseInfo, ...completeGridNavigationRowParameters });
+    const { managedChildReturn } = useManagedChild({ context: contextIncomingForRowAsChildOfTable }, { ...baseInfo, ...completeGridNavigationRowParameters });
     const context = useStableObject({
         ...contextGNR,
         ...contextMC
@@ -170,13 +170,7 @@ export function useCompleteGridNavigationCell({ gridNavigationCellParameters, ma
         setTabbable: rovingTabIndexChildReturn.setTabbable,
         tabbable: rovingTabIndexChildReturn.tabbable,
     };
-    const { managedChildReturn } = useManagedChild({
-        context: { managedChildContext },
-        managedChildParameters: { index }
-    }, {
-        ...baseInfo,
-        ...completeGridNavigationCellParameters
-    });
+    const { managedChildReturn } = useManagedChild({ context: { managedChildContext } }, { ...baseInfo, ...completeGridNavigationCellParameters });
     const props = useMergedProps(propsStable, propsRti, hasCurrentFocusReturn.propsStable);
     return {
         props,

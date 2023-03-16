@@ -29,7 +29,7 @@ export interface UsePaginatedChildContext {
 
 export interface UsePaginatedChildrenReturnType {
     managedChildrenParameters: {
-        onChildCountChange: (count: number) => void;
+        onChildrenCountChange: (count: number) => void;
     };
     paginatedChildrenReturn: {
         refreshPagination: (min: number | null, max: number | null) => void;
@@ -84,7 +84,7 @@ export function usePaginatedChildren<E extends Element, M extends UsePaginatedCh
             })
         }),
         managedChildrenParameters: {
-            onChildCountChange: useStableCallback((count: number) => {
+            onChildrenCountChange: useStableCallback((count: number) => {
                 if (paginationMax != null || paginationMin != null) {
                     setChildCount(count);
                     const min = (paginationMin ?? 0);

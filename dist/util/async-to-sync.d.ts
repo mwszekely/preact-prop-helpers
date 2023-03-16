@@ -106,18 +106,18 @@ export interface AsyncToSyncParameters<AsyncArgs extends any[], SyncArgs extends
      */
     wait: number | undefined;
     /**
-     * When the handler is about to run, this is set to `null`.
+     * When the handler is about to run, this is called with `null`.
      *
-     * If the handler throws, then this will be set to `true`. If it resolves, this will be set to `false`.
+     * If the handler throws, then this will be called with `true`. If it resolves, this will be called with `false`.
      *
      * This is the same for sync and async functions;
      * sync functions will result in this function being called twice in one frame.
      */
     onHasError(hasError: boolean | null): void;
     /**
-     * When the handler is about to run, this is set to `null`.
+     * When the handler is about to run, this is called with `null`.
      *
-     * If the handler resolves successfully, then this will be set to `true`. If it throws, this will be set to `false`.
+     * If the handler resolves successfully, then this will be called with `true`. If it throws, this will be called with `false`.
      *
      * This is the same for sync and async functions;
      * sync functions will result in this function being called twice in one frame.

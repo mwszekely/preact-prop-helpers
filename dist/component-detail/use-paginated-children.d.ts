@@ -23,7 +23,7 @@ export interface UsePaginatedChildContext {
 }
 export interface UsePaginatedChildrenReturnType {
     managedChildrenParameters: {
-        onChildCountChange: (count: number) => void;
+        onChildrenCountChange: (count: number) => void;
     };
     paginatedChildrenReturn: {
         refreshPagination: (min: number | null, max: number | null) => void;
