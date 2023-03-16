@@ -14,12 +14,12 @@ export interface UseHasLastFocusParameters<T extends Node> extends UseActiveElem
          * 
          * This is always `true` while `focused` is `true`. If `focused` is `false`, this may be `true` or `false`.
          */
-        onLastFocusedChanged: null | ((focused: boolean, prevFocused: boolean | undefined) => void);
+        onLastFocusedChanged?: undefined | null | ((focused: boolean, prevFocused: boolean | undefined) => void);
 
         /**
          * Combines the implications of `onFocusedChanged` and `onFocusedChanged`.
          */
-        onLastFocusedInnerChanged: null | ((focused: boolean, prevFocused: boolean | undefined) => void);
+        onLastFocusedInnerChanged?: undefined | null | ((focused: boolean, prevFocused: boolean | undefined) => void);
     }
 }
 
@@ -34,7 +34,7 @@ export interface UseHasLastFocusReturnType extends UseActiveElementReturnType {
 
 export function useHasLastFocus<T extends Node>(args: UseHasLastFocusParameters<T>): UseHasLastFocusReturnType {
     monitorCallCount(useHasLastFocus);
-    
+
     const {
         refElementReturn: { getElement },
         activeElementParameters: { onLastActiveElementChange, ...activeElementParameters },
@@ -43,7 +43,7 @@ export function useHasLastFocus<T extends Node>(args: UseHasLastFocusParameters<
 
 
     useEnsureStability("useHasFocus", onLastFocusedChanged, onLastFocusedInnerChanged);
-    
+
     const [getLastFocused, setLastFocused] = usePassiveState<boolean, UIEvent>(onLastFocusedChanged, returnFalse, runImmediately);
     const [getLastFocusedInner, setLastFocusedInner] = usePassiveState<boolean, UIEvent>(onLastFocusedInnerChanged, returnFalse, runImmediately);
 

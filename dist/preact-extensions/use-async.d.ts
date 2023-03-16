@@ -129,16 +129,6 @@ export interface UseAsyncReturnType<SP extends unknown[], R> {
      */
     flushDebouncedPromise: () => void;
     /**
-     * Based on the type of handler passed in, this returned value will
-     * represent what type of handler it was, just in case you
-     * yourself need to know that and don't have access to the original
-     * to find out without it actually being run.
-     *
-     * Until a handler is called, this will be null.  Naturally, if
-     * different handlers are passed in, it can flip back and
-     * forth between "async" and "sync" as well.
-     */
-    /**
      * The transformed version of the async handler provided,
      * now synchronous and/or throttled and/or debounced
      *

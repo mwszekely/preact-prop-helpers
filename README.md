@@ -486,9 +486,25 @@ Allows an element to become modal, stopping any attempt to interact with anythin
 
 ## `useHasCurrentFocus`, `useHasLastFocus`
 
-Allows you to inspect if the given element is focused.  "Current focus" refers to just attaching `focusIn` and `focusOut` events and literally looking at where the user's focus has moved within the element. "Last focus" refers to whatever was most recently focused, disregarding times where the element loses focus but a new element hasn't been given focus yet (e.g. when clicking on the body, "current focus" is lost, but "last focus" remains until a new non-body element is focused).
+Allows you to react to an element gaining or losing focus.
 
-In either case, you can differentiate between whether or not just the element itself is focused, or the element and/or any element inside of it is focused.
+### `useHasCurrentFocus`
+Specifically track whether an element is the *currently* focused element; if the element is de-focused (blurred) by, for example, clicking the `body`, then the element is no longer the *currently* focused element, and the change handler will be called.
+
+|Parameter|Requirements|Description|
+|-|-|-|
+|`onCurrentFocusedChanged`|Optional, **Stable**|Called when the element itself gains or loses focus (`true` when focused, `false` when not focused)|
+|`onCurrentFocusedInnerChanged`|Optional, **Stable**|Called when the element or any element within it gains or loses focus (`true` when any are focused, `false` when none are focused)|
+|`refElementReturn`|`getElement`|`useRefElement` must be called before calling this hook.|
+
+### `useHasLastFocus`
+Specifically track whether an element is the *most recently* focused element. If the element is de-focused (blurred) by, for example, clicking the `body`, then the element is *still* the most recently focused element. The change handler will not be called until a new element gains focus.
+
+|Parameter|Requirements|Description|
+|-|-|-|
+|`onLastFocusedChanged`|Optional, **Stable**|Called when this element is focused (with `true`), or when another element is focused (`false`). Not called when|
+|`onLastFocusedInnerChanged`|Optional, **Stable**|Called when the element or any element within it gains or loses focus (`true` when any are focused, `false` when none are focused)|
+|`refElementReturn`|`getElement`|`useRefElement` must be called before calling this hook.|
 
 ## `useLogicalDirection`
 
@@ -546,6 +562,24 @@ element it references.
 `useAsync` works identically to `useAsyncHandler`, but with different use semantics; `useAsyncHandler` returns functions like `(event: Event) => void`, while `useAsync`'s returns functions like `() => T`.
 
 ## `useActiveElement`
+
+Allows you to react to changes in `document.activeElement` &mdash; basically any change of focus that happens on the page.
+
+This hook does not re-render the component that uses it (unless you do).
+
+|Parameter|Requirements|Description|
+|---------|----|-----------|
+|`onActiveElementChange`|Optional, **Stable**|Called any time `document.activeElement` changes with the new `Element`, or `null` if the currently focused element was de-focused (e.g. by clicking the `body`).|
+|`onLastActiveElementChange`|Optional, **Stable**|Called any time `document.activeElement` changes to a focusable element, meaning this is *not* called when, for example, the the `body` is clicked to de-focus an `input`.|
+|`onWindowFocusChange`|Optional, **Stable**|Called when the window loses or regains focus|
+|`getDocument`|Required, **Stable**|Must return the current `Document` associated with the component that's being rendered. Generally just something like `() => element.ownerDocument`|
+|`getWindow`|Optional, **Stable**|Must return the current `Window` associated with the component that's being rendered. The default is `() => getDocument().defaultView`|
+
+|Return|Guarantees|Description|
+|------|----------|-----------|
+|`getActiveElement`|**Stable**|Getter that corresponds to the last value sent to `onActiveElementChange`|
+|`getLastActiveElement`|**Stable**|Getter that corresponds to the last value sent to `onLastActiveElementChange`|
+|`onWindowFocusChange`|**Stable**|Getter that corresponds to the last value sent to `onLastActiveElementChange`|
 
 Allows you to inspect which element in the `document` currently has focus, which was most recently focused if none are currently, and whether or not the window has focus by returning the following functions:
 * `getActiveElement()`

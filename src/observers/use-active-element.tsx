@@ -108,18 +108,18 @@ export interface UseActiveElementParameters {
         /**
          * Called any time the active element changes. Must be stable.
          */
-        onActiveElementChange?: OnPassiveStateChange<Element | null, FocusEvent>;
+        onActiveElementChange?: OnPassiveStateChange<Element | null, FocusEvent> | null | undefined;
 
         /**
          * Called any time the active element changes and is not null. 
          * Must be stable.
          */
-        onLastActiveElementChange?: OnPassiveStateChange<Element, FocusEvent>;
+        onLastActiveElementChange?: OnPassiveStateChange<Element, FocusEvent> | null | undefined;
 
         /**
          * Called any time the window gains/loses focus. Must be stable.
          */
-        onWindowFocusedChange?: OnPassiveStateChange<boolean, FocusEvent>;
+        onWindowFocusedChange?: OnPassiveStateChange<boolean, FocusEvent> | null | undefined;
 
         /**
          * This must be a function that returns the document associated with whatever elements we're listening to.
@@ -136,7 +136,7 @@ export interface UseActiveElementParameters {
          * 
          * **MUST** be stable
          */
-        getWindow?(document: Document): Window;
+        getWindow?: ((document: Document) => Window) | null | undefined;
     }
 }
 

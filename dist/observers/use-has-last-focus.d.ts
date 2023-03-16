@@ -8,11 +8,11 @@ export interface UseHasLastFocusParameters<T extends Node> extends UseActiveElem
          *
          * This is always `true` while `focused` is `true`. If `focused` is `false`, this may be `true` or `false`.
          */
-        onLastFocusedChanged: null | ((focused: boolean, prevFocused: boolean | undefined) => void);
+        onLastFocusedChanged?: undefined | null | ((focused: boolean, prevFocused: boolean | undefined) => void);
         /**
          * Combines the implications of `onFocusedChanged` and `onFocusedChanged`.
          */
-        onLastFocusedInnerChanged: null | ((focused: boolean, prevFocused: boolean | undefined) => void);
+        onLastFocusedInnerChanged?: undefined | null | ((focused: boolean, prevFocused: boolean | undefined) => void);
     };
 }
 export interface UseHasLastFocusReturnType extends UseActiveElementReturnType {
