@@ -55,7 +55,7 @@ export function usePaginatedChildren({ managedChildrenReturn: { getChildren }, l
         paginatedChildrenReturn: { refreshPagination, childCount }
     };
 }
-export function usePaginatedChild({ managedChildParameters: { index }, context: { paginatedChildContext: { getDefaultPaginationVisible, getDefaultIsPaginated } } }) {
+export function usePaginatedChild({ info: { index }, context: { paginatedChildContext: { getDefaultPaginationVisible, getDefaultIsPaginated } } }) {
     monitorCallCount(usePaginatedChild);
     const [parentIsPaginated, setParentIsPaginated] = useState(getDefaultIsPaginated());
     const [childCountIfPaginated, setChildCountIfPaginated] = useState(null);
@@ -63,7 +63,7 @@ export function usePaginatedChild({ managedChildParameters: { index }, context: 
     return {
         props: !parentIsPaginated ? {} : { "aria-setsize": childCountIfPaginated ?? undefined, "aria-posinset": (index + 1) },
         paginatedChildReturn: { paginatedVisible, isPaginated: parentIsPaginated, hideBecausePaginated: parentIsPaginated ? !paginatedVisible : false },
-        managedChildParameters: {
+        info: {
             setPaginationVisible: setPaginatedVisible,
             setChildCountIfPaginated,
             setParentIsPaginated

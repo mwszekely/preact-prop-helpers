@@ -167,10 +167,10 @@ export function useManagedChildren(parentParameters) {
         managedChildrenReturn: { getChildren }
     };
 }
-export function useManagedChild({ context }, managedChildParameters) {
+export function useManagedChild({ context, info }) {
     monitorCallCount(useManagedChild);
     const { managedChildContext: { getChildren, managedChildrenArray, remoteULEChildMounted, remoteULEChildChanged } } = (context ?? { managedChildContext: {} });
-    const index = managedChildParameters.index;
+    const index = info.index;
     // Any time our child props change, make that information available
     // the parent if they need it.
     // The parent can listen for all updates and only act on the ones it cares about,
@@ -180,13 +180,13 @@ export function useManagedChild({ context }, managedChildParameters) {
             return;
         // Insert this information in-place
         if (typeof index == "number") {
-            managedChildrenArray.arr[index] = { ...managedChildParameters };
+            managedChildrenArray.arr[index] = { ...info };
         }
         else {
-            managedChildrenArray.rec[index] = { ...managedChildParameters };
+            managedChildrenArray.rec[index] = { ...info };
         }
         return remoteULEChildChanged(index);
-    }, [...Object.entries(managedChildParameters).flat(9)]); // 9 is infinity, right? Sure. Unrelated: TODO.
+    }, [...Object.entries(info).flat(9)]); // 9 is infinity, right? Sure. Unrelated: TODO.
     // When we mount, notify the parent via queueMicrotask
     // (every child does this, so everything's coordinated to only queue a single microtask per tick)
     // Do the same on unmount.

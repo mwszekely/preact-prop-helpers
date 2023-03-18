@@ -507,8 +507,8 @@ const DemoStaggeredChildren = memo(({ childCount }: { childCount: number }) => {
 
 const DemoStaggeredChild = memo(({ index }: { index: number }) => {
     const context = useContext(StaggeredContext);
-    const { managedChildParameters: { setParentIsStaggered, setStaggeredVisible }, props, staggeredChildReturn: { hideBecauseStaggered, isStaggered } } = useStaggeredChild<HTMLDivElement>({ context: context, managedChildParameters: { index } });
-    const { managedChildReturn } = useManagedChild<UseStaggeredChildrenInfo<HTMLDivElement>>({ context }, { hidden: false, index, setParentIsStaggered, setStaggeredVisible });
+    const { info: { setParentIsStaggered, setStaggeredVisible }, props, staggeredChildReturn: { hideBecauseStaggered, isStaggered } } = useStaggeredChild<HTMLDivElement>({ context: context, info: { index } });
+    const { managedChildReturn } = useManagedChild<UseStaggeredChildrenInfo<HTMLDivElement>>({ context, info: { hidden: false, index, setParentIsStaggered, setStaggeredVisible } });
 
     return (
         <div {...useMergedProps(props, { style: hideBecauseStaggered ? { opacity: 0.25 } : {} })}>Child #{index}{isStaggered ? hideBecauseStaggered ? "(pending)" : "" : "(not staggered)"}</div>
@@ -517,7 +517,6 @@ const DemoStaggeredChild = memo(({ index }: { index: number }) => {
 
 const Component = () => {
     // return <DemoUseAsyncHandler2 />;
-    return <DemoPress remaining={2} />;
     
     return <div class="flex" style={{ flexWrap: "wrap" }}>
         <DemoPress remaining={2} />

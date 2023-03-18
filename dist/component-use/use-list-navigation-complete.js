@@ -1,6 +1,6 @@
 import { useCallback } from "preact/hooks";
-import { useListNavigationSingleSelectionSortable } from "../component-detail/use-list-navigation-single-selection-sortable.js";
-import { useListNavigationSingleSelectionChild } from "../component-detail/use-list-navigation-single-selection.js";
+import { useListNavigationSingleSelectionSortable } from "../component-detail/keyboard-navigation/use-list-navigation-single-selection-sortable.js";
+import { useListNavigationSingleSelectionChild } from "../component-detail/keyboard-navigation/use-list-navigation-single-selection.js";
 import { usePaginatedChild, usePaginatedChildren } from "../component-detail/use-paginated-children.js";
 import { useStaggeredChild, useStaggeredChildren } from "../component-detail/use-staggered-children.js";
 import { useMergedProps } from "../dom-helpers/use-merged-props.js";
@@ -82,19 +82,21 @@ export function useCompleteListNavigation({ linearNavigationParameters, rearrang
         childrenHaveFocusReturn
     };
 }
-export function useCompleteListNavigationChild({ completeListNavigationChildParameters: { focusSelf, ...completeListNavigationChildParameters }, singleSelectionChildParameters, rovingTabIndexChildParameters: { hidden }, managedChildParameters, textContentParameters, context: { childrenHaveFocusChildContext, managedChildContext, rovingTabIndexContext, paginatedChildContext, staggeredChildContext, singleSelectionContext, typeaheadNavigationContext }, sortableChildParameters, ..._void }) {
+export function useCompleteListNavigationChild({ 
+//completeListNavigationChildParameters: { focusSelf, ...completeListNavigationChildParameters },
+singleSelectionChildParameters, rovingTabIndexChildParameters: { hidden }, info, textContentParameters, context: { childrenHaveFocusChildContext, managedChildContext, rovingTabIndexContext, paginatedChildContext, staggeredChildContext, singleSelectionContext, typeaheadNavigationContext }, sortableChildParameters, ..._void }) {
     monitorCallCount(useCompleteListNavigationChild);
     assertEmptyObject(_void);
-    const { index } = managedChildParameters;
-    const { managedChildParameters: mcp3, paginatedChildReturn, paginatedChildReturn: { hideBecausePaginated }, props: paginationProps } = usePaginatedChild({ managedChildParameters: { index }, context: { paginatedChildContext } });
-    const { managedChildParameters: mcp4, staggeredChildReturn, staggeredChildReturn: { hideBecauseStaggered }, props: staggeredProps } = useStaggeredChild({ managedChildParameters, context: { staggeredChildContext } });
+    const { index, focusSelf } = info;
+    const { info: mcp3, paginatedChildReturn, paginatedChildReturn: { hideBecausePaginated }, props: paginationProps } = usePaginatedChild({ info: { index }, context: { paginatedChildContext } });
+    const { info: mcp4, staggeredChildReturn, staggeredChildReturn: { hideBecauseStaggered }, props: staggeredProps } = useStaggeredChild({ info, context: { staggeredChildContext } });
     hidden ||= (hideBecausePaginated || hideBecauseStaggered);
     let { disabled } = singleSelectionChildParameters;
     if (hidden)
         disabled = true;
     const { refElementReturn, propsStable } = useRefElement({ refElementParameters: {} });
-    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1 }, pressParameters, rovingTabIndexChildReturn, singleSelectionChildReturn, managedChildParameters: mcp5, props: propsLs } = useListNavigationSingleSelectionChild({
-        managedChildParameters: { index },
+    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1 }, pressParameters, textContentReturn, singleSelectionChildReturn, info: mcp5, props: propsLs, rovingTabIndexChildReturn } = useListNavigationSingleSelectionChild({
+        info: { index },
         rovingTabIndexChildParameters: { hidden },
         singleSelectionChildParameters: { ...singleSelectionChildParameters },
         context: { rovingTabIndexContext, singleSelectionContext, typeaheadNavigationContext },
@@ -102,25 +104,17 @@ export function useCompleteListNavigationChild({ completeListNavigationChildPara
         textContentParameters: { hidden, ...textContentParameters }
     });
     const mcp1 = {
-        selected: singleSelectionChildReturn.selected,
-        getSelected: singleSelectionChildReturn.getSelected,
-        tabbable: rovingTabIndexChildReturn.tabbable,
-        getTabbable: rovingTabIndexChildReturn.getTabbable,
-        setTabbable: rovingTabIndexChildReturn.setTabbable,
-        getElement: refElementReturn.getElement,
-        setLocalSelected: mcp5.setLocalSelected,
-        getSortValue: sortableChildParameters.getSortValue,
-        setChildCountIfPaginated: mcp3.setChildCountIfPaginated,
-        setPaginationVisible: mcp3.setPaginationVisible,
-        setParentIsPaginated: mcp3.setParentIsPaginated,
-        setParentIsStaggered: mcp4.setParentIsStaggered,
-        setStaggeredVisible: mcp4.setStaggeredVisible,
-        disabled,
-        focusSelf,
-        hidden,
         index,
+        focusSelf,
+        getElement: refElementReturn.getElement,
+        getSortValue: sortableChildParameters.getSortValue,
+        disabled,
+        hidden,
+        ...mcp4,
+        ...mcp3,
+        ...mcp5,
     };
-    const { managedChildReturn } = useManagedChild({ context: { managedChildContext } }, { ...mcp1, ...completeListNavigationChildParameters });
+    const { managedChildReturn } = useManagedChild({ context: { managedChildContext }, info: { ...mcp1, ...info } });
     const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2 } } = useChildrenHaveFocusChild({ context: { childrenHaveFocusChildContext } });
     const onCurrentFocusedInnerChanged = useStableCallback((focused, prev, e) => {
         ocfic1?.(focused, prev, e);
@@ -132,12 +126,12 @@ export function useCompleteListNavigationChild({ completeListNavigationChildPara
         props,
         pressParameters,
         refElementReturn,
-        rovingTabIndexChildReturn,
         singleSelectionChildReturn,
         hasCurrentFocusReturn,
         managedChildReturn,
         paginatedChildReturn,
-        staggeredChildReturn
+        staggeredChildReturn,
+        rovingTabIndexChildReturn
     };
 }
 //# sourceMappingURL=use-list-navigation-complete.js.map

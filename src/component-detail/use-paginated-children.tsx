@@ -1,12 +1,12 @@
 import { h } from "preact";
 import { useCallback, useLayoutEffect, useRef } from "preact/hooks";
+import { UseLinearNavigationParameters } from "./keyboard-navigation/use-linear-navigation.js";
+import { UseRovingTabIndexChildInfo } from "./keyboard-navigation/use-roving-tabindex.js";
 import { UseManagedChildrenReturnType } from "../preact-extensions/use-managed-children.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useStableObject } from "../preact-extensions/use-stable-getter.js";
 import { useState } from "../preact-extensions/use-state.js";
 import { monitorCallCount } from "../util/use-call-count.js";
-import { UseLinearNavigationParameters } from "./use-linear-navigation.js";
-import { UseRovingTabIndexChildInfo } from "./use-roving-tabindex.js";
 
 export interface UsePaginatedChildrenInfo<E extends Element> extends UseRovingTabIndexChildInfo<E> {
     setParentIsPaginated(parentIsPaginated: boolean): void;
@@ -16,7 +16,7 @@ export interface UsePaginatedChildrenInfo<E extends Element> extends UseRovingTa
 
 export interface UsePaginatedChildrenParameters<E extends Element, M extends UsePaginatedChildrenInfo<E>> {
     managedChildrenReturn: UseManagedChildrenReturnType<M>["managedChildrenReturn"];
-    linearNavigationParameters: Pick<UseLinearNavigationParameters<any, E>["linearNavigationParameters"], "indexDemangler">;
+    linearNavigationParameters: Pick<UseLinearNavigationParameters<any, E, M>["linearNavigationParameters"], "indexDemangler">;
     paginatedChildrenParameters: { paginationMin: number | null; paginationMax: number | null; }
 }
 
@@ -107,7 +107,7 @@ export function usePaginatedChildren<E extends Element, M extends UsePaginatedCh
 
 
 export interface UsePaginatedChildParameters {
-    managedChildParameters: { index: number; }
+    info: { index: number; }
     context: UsePaginatedChildContext;
 }
 
@@ -118,11 +118,11 @@ export interface UsePaginatedChildReturn<ChildElement extends Element> {
         isPaginated: boolean;
         hideBecausePaginated: boolean;
     };
-    managedChildParameters: Pick<UsePaginatedChildrenInfo<ChildElement>, "setPaginationVisible" | "setChildCountIfPaginated" | "setParentIsPaginated">
+    info: Pick<UsePaginatedChildrenInfo<ChildElement>, "setPaginationVisible" | "setChildCountIfPaginated" | "setParentIsPaginated">
 }
 
 
-export function usePaginatedChild<ChildElement extends Element>({ managedChildParameters: { index }, context: { paginatedChildContext: { getDefaultPaginationVisible, getDefaultIsPaginated } } }: UsePaginatedChildParameters): UsePaginatedChildReturn<ChildElement> {
+export function usePaginatedChild<ChildElement extends Element>({ info: { index }, context: { paginatedChildContext: { getDefaultPaginationVisible, getDefaultIsPaginated } } }: UsePaginatedChildParameters): UsePaginatedChildReturn<ChildElement> {
     monitorCallCount(usePaginatedChild);
 
     const [parentIsPaginated, setParentIsPaginated] = useState(getDefaultIsPaginated());
@@ -134,7 +134,7 @@ export function usePaginatedChild<ChildElement extends Element>({ managedChildPa
     return {
         props: !parentIsPaginated ? {} : (({ "aria-setsize": childCountIfPaginated ?? undefined, "aria-posinset": (index + 1) } as h.JSX.HTMLAttributes<ChildElement>)),
         paginatedChildReturn: { paginatedVisible, isPaginated: parentIsPaginated, hideBecausePaginated: parentIsPaginated ? !paginatedVisible : false },
-        managedChildParameters: {
+        info: {
             setPaginationVisible: setPaginatedVisible,
             setChildCountIfPaginated,
             setParentIsPaginated

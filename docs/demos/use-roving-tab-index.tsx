@@ -31,7 +31,7 @@ export const DemoUseRovingTabIndex = memo(() => {
         rovingTabIndexParameters: { onTabbableIndexChange: null, untabbable: false },
         singleSelectionParameters: { initiallySelectedIndex: 0, onSelectedIndexChange: useStableCallback(newIndex => { /*setLocalSelectedIndex(newIndex);*/ changeSelectedIndex(newIndex); }) },
         typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000 },
-        linearNavigationParameters: { disableArrowKeys: false, disableHomeEndKeys: false, navigationDirection: "vertical", navigatePastEnd: "wrap", navigatePastStart: "wrap", pageNavigationSize: 0.1 },
+        linearNavigationParameters: { disableHomeEndKeys: false, arrowKeyDirection: "vertical", navigatePastEnd: "wrap", navigatePastStart: "wrap", pageNavigationSize: 0.1 },
         rearrangeableChildrenParameters: {
             getIndex: useCallback<GetIndex<{ index: number }>>((a: VNode<{ index: number }>) => a.props.index, []),
         },
@@ -52,7 +52,7 @@ export const DemoUseRovingTabIndex = memo(() => {
         //        rearrangeableChildrenReturn: { useRearrangedChildren: useSortableProps, shuffle }
     } = r;
     //useSingleSelectionDeclarative({ singleSelectionReturn: {  changeSelectedIndex }, singleSelectionDeclarativeParameters: { selectedIndex } });
-    const children = getChildren();
+
 
 
     const jsxChildren = Array.from((function* () {
@@ -87,8 +87,8 @@ export const DemoUseRovingTabIndex = memo(() => {
             <p>The biggest restriction of this method is that every child needs a 0-based numeric index.</p>
 
             <label># of items<input type="number" value={count} min={0} onInput={e => { e.preventDefault(); setCount(e.currentTarget.valueAsNumber) }} /></label>
-            <button onClick={() => shuffle(children)}>Shuffle</button>
-            <button onClick={() => reverse(children)}>Reverse</button>
+            <button onClick={() => shuffle()}>Shuffle</button>
+            <button onClick={() => {debugger; reverse()}}>Reverse</button>
             <label>Imperatively set the tabbable index to: <input type="number" onInput={e => { e.preventDefault(); setTabbableIndex(e.currentTarget.valueAsNumber, e, false); }} /></label>
             <label>Imperatively set the selected index to: <input type="number" onInput={e => { e.preventDefault(); changeSelectedIndex(e.currentTarget.valueAsNumber); }} /></label>
             <label>Pagination window starts at: <input type="number" value={min ?? undefined} min={0} max={max ?? undefined} onInput={e => { e.preventDefault(); setMin(e.currentTarget.valueAsNumber); }} /></label>
@@ -140,11 +140,10 @@ const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
         pressParameters: { excludeSpace },
         refElementReturn
     } = useCompleteListNavigationChild<HTMLLIElement, CustomInfoType, never>({
-        managedChildParameters: { index },
+        info: { index, focusSelf, foo: "bar" },
         rovingTabIndexChildParameters: { hidden },
         sortableChildParameters: { getSortValue },
         singleSelectionChildParameters: { ariaPropName: "aria-selected", selectionMode, disabled },
-        completeListNavigationChildParameters: { focusSelf, foo: "bar" },
         context,
         textContentParameters: { getText: useCallback((e) => { return e?.textContent ?? "" }, []) }
     });

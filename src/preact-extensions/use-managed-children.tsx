@@ -80,14 +80,15 @@ export interface UseManagedChildrenParameters<M extends ManagedChildInfo<any>> {
 
 
 export interface UseManagedChildParameters<M extends ManagedChildInfo<any>> {
-    // This is the only property shared among all managed children.
-    // Technically this is redundant with the second argument, which is...eh. But the types are clear.
-    // managedChildParameters: Pick<M, "index">;
-
     /**
      * In general, this shouldn't be null, but for convenience's sake you are allowed to, which disables all behavior, and also means `getChildren` will be `undefined`!
      */
     context: UseManagedChildrenContext<M> | null;
+
+    /**
+     * The exact data that's available from the parent/each sibling element via `getAt` or the other methods on `ManagedChildren`.
+     */
+    info: M;
 }
 
 
@@ -323,13 +324,13 @@ export function useManagedChildren<M extends ManagedChildInfo<string | number>>(
 
 
 
-export function useManagedChild<M extends ManagedChildInfo<number | string>>({ context }: UseManagedChildParameters<M>, managedChildParameters: M): UseManagedChildReturnType<M> {
+export function useManagedChild<M extends ManagedChildInfo<number | string>>({ context, info }: UseManagedChildParameters<M>): UseManagedChildReturnType<M> {
     monitorCallCount(useManagedChild);
 
     type IndexType = M["index"];
 
     const { managedChildContext: { getChildren, managedChildrenArray, remoteULEChildMounted, remoteULEChildChanged } } = (context ?? { managedChildContext: {} });
-    const index = managedChildParameters.index;
+    const index = info.index;
     // Any time our child props change, make that information available
     // the parent if they need it.
     // The parent can listen for all updates and only act on the ones it cares about,
@@ -339,13 +340,13 @@ export function useManagedChild<M extends ManagedChildInfo<number | string>>({ c
 
         // Insert this information in-place
         if (typeof index == "number") {
-            managedChildrenArray.arr[index as number] = { ...managedChildParameters };
+            managedChildrenArray.arr[index as number] = { ...info };
         }
         else {
-            managedChildrenArray.rec[index as IndexType] = { ...managedChildParameters };
+            managedChildrenArray.rec[index as IndexType] = { ...info };
         }
         return remoteULEChildChanged(index as IndexType);
-    }, [...Object.entries(managedChildParameters).flat(9)]);  // 9 is infinity, right? Sure. Unrelated: TODO.
+    }, [...Object.entries(info).flat(9)]);  // 9 is infinity, right? Sure. Unrelated: TODO.
 
     // When we mount, notify the parent via queueMicrotask
     // (every child does this, so everything's coordinated to only queue a single microtask per tick)

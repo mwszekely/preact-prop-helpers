@@ -16,7 +16,7 @@ export const DemoUseGrid = memo(() => {
     const ret: UseCompleteGridNavigationReturnType<HTMLTableSectionElement, HTMLTableRowElement, HTMLTableCellElement, CustomGridInfo, CustomGridRowInfo> = useCompleteGridNavigation<HTMLTableSectionElement, HTMLTableRowElement, HTMLTableCellElement, CustomGridInfo, CustomGridRowInfo>({
         singleSelectionParameters: { initiallySelectedIndex: selectedRow, onSelectedIndexChange: setSelectedRow },
         gridNavigationParameters: { onTabbableColumnChange: setTabbableColumn },
-        linearNavigationParameters: { disableArrowKeys: false, disableHomeEndKeys: false, navigatePastEnd: "wrap", navigatePastStart: "wrap", pageNavigationSize: 0.1 },
+        linearNavigationParameters: { disableHomeEndKeys: false, navigatePastEnd: "wrap", navigatePastStart: "wrap", pageNavigationSize: 0.1 },
         //managedChildrenReturn: { getChildren },
         rovingTabIndexParameters: { onTabbableIndexChange: setTabbableRow, untabbable: false },
         typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000 },
@@ -88,15 +88,14 @@ const DemoUseGridRow = memo((({ index }: { index: number }) => {
     const contextFromParent = useContext(GridRowContext) as CompleteGridNavigationContext<HTMLTableSectionElement, HTMLTableRowElement, HTMLTableCellElement, CustomGridInfo, CustomGridRowInfo>;
     const ret: UseCompleteGridNavigationRowReturnType<HTMLTableRowElement, HTMLTableCellElement, CustomGridInfo, CustomGridRowInfo> = useCompleteGridNavigationRow<HTMLTableRowElement, HTMLTableCellElement, CustomGridInfo, CustomGridRowInfo>({
 
-        completeGridNavigationRowParameters: { foo: "bar" },
         sortableChildParameters: { getSortValue: returnNull },
         context: contextFromParent,
         rovingTabIndexChildParameters: { hidden },
-        managedChildParameters: { index },
+        info: { index, foo: "bar" },
         singleSelectionChildParameters: { disabled, ariaPropName: "aria-checked", selectionMode: "focus" },
         textContentParameters: { getText: useCallback((e: Element | null) => { return e?.textContent ?? "" }, []) },
 
-        linearNavigationParameters: { disableArrowKeys: false, disableHomeEndKeys: false, navigatePastEnd: "wrap", navigatePastStart: "wrap" },
+        linearNavigationParameters: { disableHomeEndKeys: false, navigatePastEnd: "wrap", navigatePastStart: "wrap" },
         rovingTabIndexParameters: { onTabbableIndexChange: useStableCallback((i: number | null) => { setTabbableColumn(i) }) },
         typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000 }
 
@@ -140,15 +139,11 @@ const DemoUseGridCell = (({ index, row, rowIsTabbable }: { index: number, row: n
 
     } = useCompleteGridNavigationCell<HTMLTableCellElement, CustomGridRowInfo>({
         gridNavigationCellParameters: { colSpan: 1 },
-        managedChildParameters: { index },
+        info: { index, bar: "baz", focusSelf: useStableCallback((e: HTMLElement) => e.focus()) },
         rovingTabIndexChildParameters: { hidden: false },
         context,
-        completeGridNavigationCellParameters: { bar: "baz", focusSelf: useStableCallback((e: HTMLElement) => e.focus()) },
         textContentParameters: { getText: useCallback((e: Element | null) => { return e?.textContent ?? "" }, []) },
-        //pressParameters: { exclude: index <= 1, focusSelf: useStableCallback(e => e.focus()), onPressSync: null }
     });
-
-
 
     const t = (tabbable ? "(Tabbable)" : "(Not tabbable)")
 

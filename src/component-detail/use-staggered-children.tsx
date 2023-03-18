@@ -1,11 +1,11 @@
 import { h } from "preact";
 import { useCallback, useEffect, useLayoutEffect, useRef } from "preact/hooks";
+import { UseRovingTabIndexChildInfo } from "./keyboard-navigation/use-roving-tabindex.js";
 import { UseManagedChildrenReturnType } from "../preact-extensions/use-managed-children.js";
 import { returnNull, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableObject } from "../preact-extensions/use-stable-getter.js";
 import { useState } from "../preact-extensions/use-state.js";
 import { monitorCallCount } from "../util/use-call-count.js";
-import { UseRovingTabIndexChildInfo } from "./use-roving-tabindex.js";
 
 export interface UseStaggeredChildrenInfo<E extends Element> extends Pick<UseRovingTabIndexChildInfo<E>, "hidden" | "index"> {
     setParentIsStaggered(parentIsStaggered: boolean): void;
@@ -167,7 +167,7 @@ export function useStaggeredChildren<E extends Element, M extends UseStaggeredCh
 
 
 export interface UseStaggeredChildParameters {
-    managedChildParameters: { index: number; }
+    info: { index: number; }
     context: UseStaggeredChildContext;
 }
 
@@ -184,11 +184,11 @@ export interface UseStaggeredChildReturn<ChildElement extends Element> {
          */
         hideBecauseStaggered: boolean;
     };
-    managedChildParameters: Pick<UseStaggeredChildrenInfo<ChildElement>, "setParentIsStaggered" | "setStaggeredVisible">
+    info: Pick<UseStaggeredChildrenInfo<ChildElement>, "setParentIsStaggered" | "setStaggeredVisible">
 }
 
 
-export function useStaggeredChild<ChildElement extends Element>({ managedChildParameters: { index }, context: { staggeredChildContext: { childCallsThisToTellTheParentTheHighestIndex, getDefaultIsStaggered, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne } } }: UseStaggeredChildParameters): UseStaggeredChildReturn<ChildElement> {
+export function useStaggeredChild<ChildElement extends Element>({ info: { index }, context: { staggeredChildContext: { childCallsThisToTellTheParentTheHighestIndex, getDefaultIsStaggered, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne } } }: UseStaggeredChildParameters): UseStaggeredChildReturn<ChildElement> {
     monitorCallCount(useStaggeredChild);
     
     const [parentIsStaggered, setParentIsStaggered] = useState(getDefaultIsStaggered);
@@ -206,7 +206,7 @@ export function useStaggeredChild<ChildElement extends Element>({ managedChildPa
     return {
         props: !parentIsStaggered ? {} : { "aria-busy": (!staggeredVisible).toString() } as {},
         staggeredChildReturn: { isStaggered: parentIsStaggered, hideBecauseStaggered: parentIsStaggered? !staggeredVisible : false },
-        managedChildParameters: {
+        info: {
             setStaggeredVisible: setStaggeredVisible,
             setParentIsStaggered,
         }

@@ -40,6 +40,10 @@ export interface UseManagedChildParameters<M extends ManagedChildInfo<any>> {
      * In general, this shouldn't be null, but for convenience's sake you are allowed to, which disables all behavior, and also means `getChildren` will be `undefined`!
      */
     context: UseManagedChildrenContext<M> | null;
+    /**
+     * The exact data that's available from the parent/each sibling element via `getAt` or the other methods on `ManagedChildren`.
+     */
+    info: M;
 }
 export interface UseManagedChildrenReturnType<M extends ManagedChildInfo<any>> {
     /**
@@ -108,7 +112,7 @@ interface InternalChildInfo<M extends ManagedChildInfo<string | number>> {
  *
  */
 export declare function useManagedChildren<M extends ManagedChildInfo<string | number>>(parentParameters: UseManagedChildrenParameters<M>): UseManagedChildrenReturnType<M>;
-export declare function useManagedChild<M extends ManagedChildInfo<number | string>>({ context }: UseManagedChildParameters<M>, managedChildParameters: M): UseManagedChildReturnType<M>;
+export declare function useManagedChild<M extends ManagedChildInfo<number | string>>({ context, info }: UseManagedChildParameters<M>): UseManagedChildReturnType<M>;
 export interface UseChildrenFlagParameters<M extends ManagedChildInfo<any>, R> {
     /**
      * Which child is considered active on mount.

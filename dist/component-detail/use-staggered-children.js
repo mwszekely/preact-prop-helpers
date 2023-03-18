@@ -109,7 +109,7 @@ export function useStaggeredChildren({ managedChildrenReturn: { getChildren }, s
         }),
     };
 }
-export function useStaggeredChild({ managedChildParameters: { index }, context: { staggeredChildContext: { childCallsThisToTellTheParentTheHighestIndex, getDefaultIsStaggered, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne } } }) {
+export function useStaggeredChild({ info: { index }, context: { staggeredChildContext: { childCallsThisToTellTheParentTheHighestIndex, getDefaultIsStaggered, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne } } }) {
     monitorCallCount(useStaggeredChild);
     const [parentIsStaggered, setParentIsStaggered] = useState(getDefaultIsStaggered);
     const [staggeredVisible, setStaggeredVisible] = useState(getDefaultStaggeredVisible(index));
@@ -123,7 +123,7 @@ export function useStaggeredChild({ managedChildParameters: { index }, context: 
     return {
         props: !parentIsStaggered ? {} : { "aria-busy": (!staggeredVisible).toString() },
         staggeredChildReturn: { isStaggered: parentIsStaggered, hideBecauseStaggered: parentIsStaggered ? !staggeredVisible : false },
-        managedChildParameters: {
+        info: {
             setStaggeredVisible: setStaggeredVisible,
             setParentIsStaggered,
         }

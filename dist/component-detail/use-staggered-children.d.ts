@@ -1,6 +1,6 @@
 import { h } from "preact";
+import { UseRovingTabIndexChildInfo } from "./keyboard-navigation/use-roving-tabindex.js";
 import { UseManagedChildrenReturnType } from "../preact-extensions/use-managed-children.js";
-import { UseRovingTabIndexChildInfo } from "./use-roving-tabindex.js";
 export interface UseStaggeredChildrenInfo<E extends Element> extends Pick<UseRovingTabIndexChildInfo<E>, "hidden" | "index"> {
     setParentIsStaggered(parentIsStaggered: boolean): void;
     setStaggeredVisible(visible: boolean): void;
@@ -35,7 +35,7 @@ export interface UseStaggeredChildrenReturnType {
  */
 export declare function useStaggeredChildren<E extends Element, M extends UseStaggeredChildrenInfo<E>>({ managedChildrenReturn: { getChildren }, staggeredChildrenParameters: { staggered } }: UseStaggeredChildrenParameters<E, M>): UseStaggeredChildrenReturnType;
 export interface UseStaggeredChildParameters {
-    managedChildParameters: {
+    info: {
         index: number;
     };
     context: UseStaggeredChildContext;
@@ -52,7 +52,7 @@ export interface UseStaggeredChildReturn<ChildElement extends Element> {
          */
         hideBecauseStaggered: boolean;
     };
-    managedChildParameters: Pick<UseStaggeredChildrenInfo<ChildElement>, "setParentIsStaggered" | "setStaggeredVisible">;
+    info: Pick<UseStaggeredChildrenInfo<ChildElement>, "setParentIsStaggered" | "setStaggeredVisible">;
 }
-export declare function useStaggeredChild<ChildElement extends Element>({ managedChildParameters: { index }, context: { staggeredChildContext: { childCallsThisToTellTheParentTheHighestIndex, getDefaultIsStaggered, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne } } }: UseStaggeredChildParameters): UseStaggeredChildReturn<ChildElement>;
+export declare function useStaggeredChild<ChildElement extends Element>({ info: { index }, context: { staggeredChildContext: { childCallsThisToTellTheParentTheHighestIndex, getDefaultIsStaggered, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne } } }: UseStaggeredChildParameters): UseStaggeredChildReturn<ChildElement>;
 //# sourceMappingURL=use-staggered-children.d.ts.map
