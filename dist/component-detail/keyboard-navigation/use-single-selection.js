@@ -99,9 +99,10 @@ export function useSingleSelectionChild(args) {
 /**
  * Let's face it, declarative is nicer to use than imperative, so this is a shortcut.
  */
-export function useSingleSelectionDeclarative({ singleSelectionReturn: { changeSelectedIndex }, singleSelectionDeclarativeParameters: { selectedIndex } }) {
+export function useSingleSelectionDeclarative({ singleSelectionReturn: { changeSelectedIndex }, singleSelectionDeclarativeParameters: { selectedIndex, setSelectedIndex } }) {
     useEffect(() => {
         changeSelectedIndex(selectedIndex);
     }, [selectedIndex]);
+    return { singleSelectionParameters: { onSelectedIndexChange: setSelectedIndex } };
 }
 //# sourceMappingURL=use-single-selection.js.map

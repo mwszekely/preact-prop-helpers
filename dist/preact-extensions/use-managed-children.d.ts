@@ -142,23 +142,6 @@ export interface UseChildrenFlagParameters<M extends ManagedChildInfo<any>, R> {
     getAt(index: M): boolean;
     isValid(index: M): boolean;
 }
-export interface ChildFlagOperations {
-    /**
-     * Must return whether the current child is active
-     */
-    get: () => boolean;
-    /**
-     * The child must set itself as active/inactive, whatever that entails.
-     * This could be as simple as a setState function.
-     */
-    set: (active: boolean) => void;
-    /**
-     * Must return true if this child is a valid candidate to be flagged, and false if not.
-     * Most children should return true. Returning false is only useful to mark a child as "invalid" in some way.
-     * Removing a child from the list does effectively the same thing, but this lets you keep the child around.
-     */
-    isValid(): boolean;
-}
 export interface UseChildrenFlagReturnType<M extends ManagedChildInfo<any>, R> {
     /**
      * **STABLE**

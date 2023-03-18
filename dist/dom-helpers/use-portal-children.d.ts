@@ -26,7 +26,7 @@ export declare function usePortalChildren({ target }: UsePortalChildrenParameter
     removeChild: RemovePortalChild;
     portalElement: Element | null;
 };
-export type StateUpdater<S> = (value: ((prevState: S) => S)) => void;
+export type PortalChildUpdater<S> = (value: ((prevState: S) => S)) => void;
 export type PushPortalChild = (child: h.JSX.Element) => number;
 export type UpdatePortalChild = (index: number, child: h.JSX.Element) => void;
 export type RemovePortalChild = (index: number) => void;

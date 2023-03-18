@@ -1,9 +1,6 @@
 import { createContext, VNode } from "preact";
 import { memo, useCallback, useContext } from "preact/compat";
-import { GetIndex, useMergedProps, usePress, useStableCallback } from "../../dist/index.js";
-import { useState } from "../../dist/index.js";
-import { CompleteListNavigationContext, useCompleteListNavigation, useCompleteListNavigationChild, UseCompleteListNavigationReturnType } from "../../dist/index.js";
-import { UseCompleteListNavigationChildInfo } from "../../dist/index.js";
+import { CompleteListNavigationContext, GetIndex, useCompleteListNavigationChild, UseCompleteListNavigationChildInfo, useCompleteListNavigationDeclarative, UseCompleteListNavigationDeclarativeReturnType, useMergedProps, usePress, useStableCallback, useState } from "../../dist/index.js";
 
 const RandomWords = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
 
@@ -14,7 +11,7 @@ function _getDocument() {
 const ListNavigationSingleSelectionChildContext = createContext<CompleteListNavigationContext<HTMLOListElement, HTMLLIElement, CustomInfoType>>(null!)
 export const DemoUseRovingTabIndex = memo(() => {
 
-
+    const [selectedIndex, setSelectedIndex] = useState(null as number | null);
     const [selectionMode, setSelectionMode] = useState("activation" as "focus" | "activation");
     const [count, setCount] = useState(10);
     let [min, setMin] = useState<number | null>(null);
@@ -27,9 +24,9 @@ export const DemoUseRovingTabIndex = memo(() => {
         max = null!;
 
 
-    const r: UseCompleteListNavigationReturnType<HTMLOListElement, HTMLLIElement, CustomInfoType> = useCompleteListNavigation<HTMLOListElement, HTMLLIElement, CustomInfoType>({
+    const r: UseCompleteListNavigationDeclarativeReturnType<HTMLOListElement, HTMLLIElement, CustomInfoType> = useCompleteListNavigationDeclarative<HTMLOListElement, HTMLLIElement, CustomInfoType>({
         rovingTabIndexParameters: { onTabbableIndexChange: null, untabbable: false },
-        singleSelectionParameters: { initiallySelectedIndex: 0, onSelectedIndexChange: useStableCallback(newIndex => { /*setLocalSelectedIndex(newIndex);*/ changeSelectedIndex(newIndex); }) },
+        singleSelectionDeclarativeParameters: { selectedIndex, setSelectedIndex },
         typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000 },
         linearNavigationParameters: { disableHomeEndKeys: false, arrowKeyDirection: "vertical", navigatePastEnd: "wrap", navigatePastStart: "wrap", pageNavigationSize: 0.1 },
         rearrangeableChildrenParameters: {
@@ -45,7 +42,6 @@ export const DemoUseRovingTabIndex = memo(() => {
         propsStable,
         context,
         rovingTabIndexReturn: { setTabbableIndex },
-        singleSelectionReturn: { changeSelectedIndex },
         managedChildrenReturn: { getChildren },
         typeaheadNavigationReturn: { typeaheadStatus },
         rearrangeableChildrenReturn: { useRearrangedChildren, shuffle, reverse }
@@ -90,7 +86,7 @@ export const DemoUseRovingTabIndex = memo(() => {
             <button onClick={() => shuffle()}>Shuffle</button>
             <button onClick={() => {debugger; reverse()}}>Reverse</button>
             <label>Imperatively set the tabbable index to: <input type="number" onInput={e => { e.preventDefault(); setTabbableIndex(e.currentTarget.valueAsNumber, e, false); }} /></label>
-            <label>Imperatively set the selected index to: <input type="number" onInput={e => { e.preventDefault(); changeSelectedIndex(e.currentTarget.valueAsNumber); }} /></label>
+            <label>Imperatively set the selected index to: <input type="number" onInput={e => { e.preventDefault(); setSelectedIndex(e.currentTarget.valueAsNumber); }} /> (currently {selectedIndex})</label>
             <label>Pagination window starts at: <input type="number" value={min ?? undefined} min={0} max={max ?? undefined} onInput={e => { e.preventDefault(); setMin(e.currentTarget.valueAsNumber); }} /></label>
             <label>Pagination window ends at: <input type="number" value={max ?? undefined} min={min ?? undefined} max={count} onInput={e => { e.preventDefault(); setMax(e.currentTarget.valueAsNumber); }} /></label>
             <label>Stagger delay: <input type="checkbox" checked={staggered} onInput={e => { e.preventDefault(); setStaggered(e.currentTarget.checked); }} /></label>
@@ -139,7 +135,7 @@ const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
         staggeredChildReturn: { hideBecauseStaggered },
         pressParameters: { excludeSpace },
         refElementReturn
-    } = useCompleteListNavigationChild<HTMLLIElement, CustomInfoType, never>({
+    } = useCompleteListNavigationChild<HTMLLIElement, CustomInfoType>({
         info: { index, focusSelf, foo: "bar" },
         rovingTabIndexChildParameters: { hidden },
         sortableChildParameters: { getSortValue },

@@ -3357,6 +3357,28 @@
         }
       };
     }
+    /**
+     * Let's face it, declarative is nicer to use than imperative, so this is a shortcut.
+     */
+    function useSingleSelectionDeclarative(_ref2) {
+      let {
+        singleSelectionReturn: {
+          changeSelectedIndex
+        },
+        singleSelectionDeclarativeParameters: {
+          selectedIndex,
+          setSelectedIndex
+        }
+      } = _ref2;
+      h(() => {
+        changeSelectedIndex(selectedIndex);
+      }, [selectedIndex]);
+      return {
+        singleSelectionParameters: {
+          onSelectedIndexChange: setSelectedIndex
+        }
+      };
+    }
 
     function useGridNavigationSingleSelection(_ref) {
       let {
@@ -7106,6 +7128,51 @@
         rovingTabIndexChildReturn
       };
     }
+    function useCompleteListNavigationDeclarative(_ref3) {
+      let {
+        linearNavigationParameters,
+        paginatedChildrenParameters,
+        rearrangeableChildrenParameters,
+        rovingTabIndexParameters,
+        singleSelectionDeclarativeParameters,
+        sortableChildrenParameters,
+        staggeredChildrenParameters,
+        typeaheadNavigationParameters
+      } = _ref3;
+      const ret = useCompleteListNavigation({
+        linearNavigationParameters,
+        paginatedChildrenParameters,
+        rearrangeableChildrenParameters,
+        rovingTabIndexParameters,
+        singleSelectionParameters: {
+          initiallySelectedIndex: singleSelectionDeclarativeParameters.selectedIndex,
+          onSelectedIndexChange: useStableCallback(a => onSelectedIndexChange(a))
+        },
+        sortableChildrenParameters,
+        staggeredChildrenParameters,
+        typeaheadNavigationParameters
+      });
+      const {
+        singleSelectionParameters: {
+          onSelectedIndexChange
+        }
+      } = useSingleSelectionDeclarative({
+        singleSelectionDeclarativeParameters,
+        singleSelectionReturn: ret.singleSelectionReturn
+      });
+      const {
+        singleSelectionReturn: {
+          getSelectedIndex
+        },
+        ...ret2
+      } = ret;
+      return {
+        ...ret2,
+        singleSelectionReturn: {
+          getSelectedIndex
+        }
+      };
+    }
 
     /**
      * Combines dismissal hooks and focus trap hooks into one.
@@ -8747,6 +8814,7 @@
     const ListNavigationSingleSelectionChildContext = E(null);
     const DemoUseRovingTabIndex = x(() => {
       var _min, _max, _min2, _max2, _max3, _min3;
+      const [selectedIndex, setSelectedIndex] = useState(null);
       const [selectionMode, setSelectionMode] = useState("activation");
       const [count, setCount] = useState(10);
       let [min, setMin] = useState(null);
@@ -8754,16 +8822,14 @@
       const [staggered, setStaggered] = useState(false);
       if (!isFinite((_min = min) !== null && _min !== void 0 ? _min : NaN)) min = null;
       if (!isFinite((_max = max) !== null && _max !== void 0 ? _max : NaN)) max = null;
-      const r = useCompleteListNavigation({
+      const r = useCompleteListNavigationDeclarative({
         rovingTabIndexParameters: {
           onTabbableIndexChange: null,
           untabbable: false
         },
-        singleSelectionParameters: {
-          initiallySelectedIndex: 0,
-          onSelectedIndexChange: useStableCallback(newIndex => {
-            /*setLocalSelectedIndex(newIndex);*/changeSelectedIndex(newIndex);
-          })
+        singleSelectionDeclarativeParameters: {
+          selectedIndex,
+          setSelectedIndex
         },
         typeaheadNavigationParameters: {
           collator: null,
@@ -8798,9 +8864,6 @@
         context,
         rovingTabIndexReturn: {
           setTabbableIndex
-        },
-        singleSelectionReturn: {
-          changeSelectedIndex
         },
         managedChildrenReturn: {
           getChildren
@@ -8907,9 +8970,9 @@
             type: "number",
             onInput: e => {
               e.preventDefault();
-              changeSelectedIndex(e.currentTarget.valueAsNumber);
+              setSelectedIndex(e.currentTarget.valueAsNumber);
             }
-          })]
+          }), " (currently ", selectedIndex, ")"]
         }), o$1("label", {
           children: ["Pagination window starts at: ", o$1("input", {
             type: "number",

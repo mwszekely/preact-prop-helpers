@@ -6,6 +6,7 @@ import { useMergedProps } from "../dom-helpers/use-merged-props.js";
 import { useRefElement } from "../dom-helpers/use-ref-element.js";
 import { useGridNavigationSingleSelectionSortable } from "../component-detail/keyboard-navigation/use-grid-navigation-single-selection-sortable.js";
 import { useGridNavigationSingleSelectionCell, useGridNavigationSingleSelectionRow } from "../component-detail/keyboard-navigation/use-grid-navigation-single-selection.js";
+import { useSingleSelectionDeclarative } from "../component-detail/keyboard-navigation/use-single-selection.js";
 import { useChildrenHaveFocus, useChildrenHaveFocusChild } from "../observers/use-children-have-focus.js";
 import { useHasCurrentFocus } from "../observers/use-has-current-focus.js";
 import { useManagedChild, useManagedChildren } from "../preact-extensions/use-managed-children.js";
@@ -171,5 +172,21 @@ export function useCompleteGridNavigationCell({ gridNavigationCellParameters, co
         managedChildReturn,
         textContentReturn
     };
+}
+export function useCompleteGridNavigationDeclarative({ gridNavigationParameters, linearNavigationParameters, paginatedChildrenParameters, rearrangeableChildrenParameters, rovingTabIndexParameters, singleSelectionDeclarativeParameters, sortableChildrenParameters, staggeredChildrenParameters, typeaheadNavigationParameters }) {
+    const ret = useCompleteGridNavigation({
+        linearNavigationParameters,
+        paginatedChildrenParameters,
+        rearrangeableChildrenParameters,
+        rovingTabIndexParameters,
+        singleSelectionParameters: { initiallySelectedIndex: singleSelectionDeclarativeParameters.selectedIndex, onSelectedIndexChange: useStableCallback((a) => onSelectedIndexChange(a)) },
+        sortableChildrenParameters,
+        staggeredChildrenParameters,
+        typeaheadNavigationParameters,
+        gridNavigationParameters
+    });
+    const { singleSelectionParameters: { onSelectedIndexChange } } = useSingleSelectionDeclarative({ singleSelectionDeclarativeParameters, singleSelectionReturn: ret.singleSelectionReturn });
+    const { singleSelectionReturn: { getSelectedIndex }, ...ret2 } = ret;
+    return { ...ret2, singleSelectionReturn: { getSelectedIndex } };
 }
 //# sourceMappingURL=use-grid-navigation-complete.js.map

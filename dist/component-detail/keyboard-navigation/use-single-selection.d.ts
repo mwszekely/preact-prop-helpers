@@ -1,4 +1,5 @@
 import { h } from "preact";
+import { StateUpdater } from "preact/hooks";
 import { UseChildrenHaveFocusChildReturnType, UseChildrenHaveFocusParameters } from "../../observers/use-children-have-focus.js";
 import { UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
 import { PassiveStateUpdater } from "../../preact-extensions/use-passive-state.js";
@@ -102,16 +103,21 @@ export interface UseSingleSelectionContext<ChildElement extends Element, M exten
 }
 export declare function useSingleSelection<ChildElement extends Element, M extends UseSingleSelectionChildInfo<ChildElement>>({ managedChildrenReturn: { getChildren }, rovingTabIndexReturn: { setTabbableIndex }, singleSelectionParameters: { onSelectedIndexChange: onSelectedIndexChange_U, initiallySelectedIndex } }: UseSingleSelectionParameters<ChildElement, M>): UseSingleSelectionReturnType<ChildElement, M>;
 export declare function useSingleSelectionChild<ChildElement extends Element, M extends UseSingleSelectionChildInfo<ChildElement>>(args: UseSingleSelectionChildParameters<ChildElement, M>): UseSingleSelectionChildReturnType<ChildElement>;
-export interface UseSingleSelectionDeclarativeParameters<ChildElement extends Element, M extends UseSingleSelectionChildInfo<ChildElement>> {
+export interface UseSingleSelectionDeclarativeParameters {
     singleSelectionDeclarativeParameters: {
         selectedIndex: number | null;
+        setSelectedIndex: StateUpdater<number | null>;
     };
-    singleSelectionReturn: Pick<UseSingleSelectionReturnType<any, M>["singleSelectionReturn"], "changeSelectedIndex">;
+    singleSelectionReturn: Pick<UseSingleSelectionReturnType<any, any>["singleSelectionReturn"], "changeSelectedIndex">;
 }
-export type MakeSingleSelectionDeclarativeParameters<P, ChildElement extends Element, M extends UseSingleSelectionChildInfo<ChildElement>> = Omit<P, "singleSelectionParameters"> & UseSingleSelectionDeclarativeParameters<ChildElement, M>;
+export type MakeSingleSelectionDeclarativeParameters<P> = Omit<P, "singleSelectionParameters"> & UseSingleSelectionDeclarativeParameters;
 export type MakeSingleSelectionDeclarativeReturnType<R> = Omit<R, "singleSelectionReturn">;
 /**
  * Let's face it, declarative is nicer to use than imperative, so this is a shortcut.
  */
-export declare function useSingleSelectionDeclarative<ChildElement extends Element, M extends UseSingleSelectionChildInfo<ChildElement>>({ singleSelectionReturn: { changeSelectedIndex }, singleSelectionDeclarativeParameters: { selectedIndex } }: UseSingleSelectionDeclarativeParameters<ChildElement, M>): void;
+export declare function useSingleSelectionDeclarative<ChildElement extends Element, M extends UseSingleSelectionChildInfo<ChildElement>>({ singleSelectionReturn: { changeSelectedIndex }, singleSelectionDeclarativeParameters: { selectedIndex, setSelectedIndex } }: UseSingleSelectionDeclarativeParameters): {
+    singleSelectionParameters: {
+        onSelectedIndexChange: StateUpdater<number | null>;
+    };
+};
 //# sourceMappingURL=use-single-selection.d.ts.map

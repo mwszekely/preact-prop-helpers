@@ -1,6 +1,7 @@
 import { useCallback } from "preact/hooks";
 import { useListNavigationSingleSelectionSortable } from "../component-detail/keyboard-navigation/use-list-navigation-single-selection-sortable.js";
 import { useListNavigationSingleSelectionChild } from "../component-detail/keyboard-navigation/use-list-navigation-single-selection.js";
+import { useSingleSelectionDeclarative } from "../component-detail/keyboard-navigation/use-single-selection.js";
 import { usePaginatedChild, usePaginatedChildren } from "../component-detail/use-paginated-children.js";
 import { useStaggeredChild, useStaggeredChildren } from "../component-detail/use-staggered-children.js";
 import { useMergedProps } from "../dom-helpers/use-merged-props.js";
@@ -133,5 +134,20 @@ singleSelectionChildParameters, rovingTabIndexChildParameters: { hidden }, info,
         staggeredChildReturn,
         rovingTabIndexChildReturn
     };
+}
+export function useCompleteListNavigationDeclarative({ linearNavigationParameters, paginatedChildrenParameters, rearrangeableChildrenParameters, rovingTabIndexParameters, singleSelectionDeclarativeParameters, sortableChildrenParameters, staggeredChildrenParameters, typeaheadNavigationParameters }) {
+    const ret = useCompleteListNavigation({
+        linearNavigationParameters,
+        paginatedChildrenParameters,
+        rearrangeableChildrenParameters,
+        rovingTabIndexParameters,
+        singleSelectionParameters: { initiallySelectedIndex: singleSelectionDeclarativeParameters.selectedIndex, onSelectedIndexChange: useStableCallback((a) => onSelectedIndexChange(a)) },
+        sortableChildrenParameters,
+        staggeredChildrenParameters,
+        typeaheadNavigationParameters
+    });
+    const { singleSelectionParameters: { onSelectedIndexChange } } = useSingleSelectionDeclarative({ singleSelectionDeclarativeParameters, singleSelectionReturn: ret.singleSelectionReturn });
+    const { singleSelectionReturn: { getSelectedIndex }, ...ret2 } = ret;
+    return { ...ret2, singleSelectionReturn: { getSelectedIndex } };
 }
 //# sourceMappingURL=use-list-navigation-complete.js.map

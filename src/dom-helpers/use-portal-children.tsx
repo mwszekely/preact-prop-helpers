@@ -61,7 +61,7 @@ export function usePortalChildren({ target }: UsePortalChildrenParameters) {
 }
 
 
-export type StateUpdater<S> = (value: ((prevState: S) => S)) => void;
+export type PortalChildUpdater<S> = (value: ((prevState: S) => S)) => void;
 export type PushPortalChild = (child: h.JSX.Element) => number;
 export type UpdatePortalChild = (index: number, child: h.JSX.Element) => void;
 export type RemovePortalChild = (index: number) => void;
@@ -70,7 +70,7 @@ export type RemovePortalChild = (index: number) => void;
 /**
  * Implementation
  */
-function PortalChildren({ setPushChild, setUpdateChild, setRemoveChild }: { setPushChild: StateUpdater<PushPortalChild | null>, setUpdateChild: StateUpdater<UpdatePortalChild | null>, setRemoveChild: StateUpdater<RemovePortalChild | null> }) {
+function PortalChildren({ setPushChild, setUpdateChild, setRemoveChild }: { setPushChild: PortalChildUpdater<PushPortalChild | null>, setUpdateChild: PortalChildUpdater<UpdatePortalChild | null>, setRemoveChild: PortalChildUpdater<RemovePortalChild | null> }) {
     const [children, setChildren, getChildren] = useState<h.JSX.Element[]>([]);
     const pushChild: PushPortalChild | null = useCallback((child: h.JSX.Element) => {
         const randomKey = generateRandomId();

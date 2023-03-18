@@ -1,7 +1,7 @@
 
 import { noop } from "lodash-es";
 import { h } from "preact";
-import { useCallback, useEffect } from "preact/hooks";
+import { StateUpdater, useCallback, useEffect } from "preact/hooks";
 import { UseChildrenHaveFocusChildReturnType, UseChildrenHaveFocusParameters } from "../../observers/use-children-have-focus.js";
 import { UseManagedChildrenReturnType, useChildrenFlag } from "../../preact-extensions/use-managed-children.js";
 import { OnPassiveStateChange, PassiveStateUpdater, useEnsureStability } from "../../preact-extensions/use-passive-state.js";
@@ -247,21 +247,23 @@ export function useSingleSelectionChild<ChildElement extends Element, M extends 
 
 
 
-export interface UseSingleSelectionDeclarativeParameters<ChildElement extends Element, M extends UseSingleSelectionChildInfo<ChildElement>> {
-    singleSelectionDeclarativeParameters: { selectedIndex: number | null }
-    singleSelectionReturn: Pick<UseSingleSelectionReturnType<any, M>["singleSelectionReturn"], "changeSelectedIndex">;
+export interface UseSingleSelectionDeclarativeParameters {
+    singleSelectionDeclarativeParameters: { selectedIndex: number | null, setSelectedIndex: StateUpdater<number | null>; }
+    singleSelectionReturn: Pick<UseSingleSelectionReturnType<any, any>["singleSelectionReturn"], "changeSelectedIndex">;
 }
 
-export type MakeSingleSelectionDeclarativeParameters<P, ChildElement extends Element, M extends UseSingleSelectionChildInfo<ChildElement>> = Omit<P, "singleSelectionParameters"> & UseSingleSelectionDeclarativeParameters<ChildElement, M>;
+export type MakeSingleSelectionDeclarativeParameters<P> = Omit<P, "singleSelectionParameters"> & UseSingleSelectionDeclarativeParameters;
 export type MakeSingleSelectionDeclarativeReturnType<R> = Omit<R, "singleSelectionReturn">;
 
 /**
  * Let's face it, declarative is nicer to use than imperative, so this is a shortcut.
  */
-export function useSingleSelectionDeclarative<ChildElement extends Element, M extends UseSingleSelectionChildInfo<ChildElement>>({ singleSelectionReturn: { changeSelectedIndex }, singleSelectionDeclarativeParameters: { selectedIndex } }: UseSingleSelectionDeclarativeParameters<ChildElement, M>) {
+export function useSingleSelectionDeclarative<ChildElement extends Element, M extends UseSingleSelectionChildInfo<ChildElement>>({ singleSelectionReturn: { changeSelectedIndex }, singleSelectionDeclarativeParameters: { selectedIndex, setSelectedIndex } }: UseSingleSelectionDeclarativeParameters) {
     useEffect(() => {
         changeSelectedIndex(selectedIndex);
     }, [selectedIndex]);
+
+    return { singleSelectionParameters: { onSelectedIndexChange: setSelectedIndex } }
 }
 
 
