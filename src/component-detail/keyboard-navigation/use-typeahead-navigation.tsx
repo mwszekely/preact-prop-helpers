@@ -29,9 +29,9 @@ export interface UseTypeaheadNavigationContext {
     }
 }
 
-export interface UseTypeaheadNavigationChildInfo<TabbableChildElement extends Element> extends UseRovingTabIndexChildInfo<TabbableChildElement> {}
+export interface UseTypeaheadNavigationChildInfo<TabbableChildElement extends Element> extends Pick<UseRovingTabIndexChildInfo<TabbableChildElement>, "index"> {}
 
-export interface UseTypeaheadNavigationParameters<TabbableChildElement extends Element, M extends UseTypeaheadNavigationChildInfo<TabbableChildElement>> {
+export interface UseTypeaheadNavigationParameters<TabbableChildElement extends Element, _M extends UseTypeaheadNavigationChildInfo<TabbableChildElement>> {
     typeaheadNavigationParameters: {
 
 
@@ -54,12 +54,12 @@ export interface UseTypeaheadNavigationParameters<TabbableChildElement extends E
         typeaheadTimeout: number;
     };
 
-    rovingTabIndexReturn: Pick<UseRovingTabIndexReturnType<TabbableChildElement, M>["rovingTabIndexReturn"], "getTabbableIndex" | "setTabbableIndex">
+    rovingTabIndexReturn: Pick<UseRovingTabIndexReturnType<TabbableChildElement, any>["rovingTabIndexReturn"], "getTabbableIndex" | "setTabbableIndex">
 }
 
 /** Arguments passed to the child `useTypeaheadNavigationChild` */
-export interface UseTypeaheadNavigationChildParameters<ChildElement extends Element, M extends UseRovingTabIndexChildInfo<ChildElement>> {
-    info: Pick<UseRovingTabIndexChildParameters<ChildElement, M>["info"], "index">;
+export interface UseTypeaheadNavigationChildParameters<ChildElement extends Element, _M extends UseTypeaheadNavigationChildInfo<ChildElement>> {
+    info: Pick<UseRovingTabIndexChildParameters<ChildElement, UseRovingTabIndexChildInfo<ChildElement>>["info"], "index">;
     textContentParameters: Pick<UseTextContentParameters<ChildElement>["textContentParameters"], "getText" | "hidden">;
     refElementReturn: Pick<UseRefElementReturnType<ChildElement>["refElementReturn"], "getElement">;
     context: UseTypeaheadNavigationContext

@@ -5,6 +5,7 @@ import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { OmitStrong } from "../../util/types.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
+import { ManagedChildInfo } from "../../index.js";
 
 export interface LinearNavigationResult {
     valueUnmangled: number | null;
@@ -17,12 +18,12 @@ export interface UseLinearNavigationReturnType<ParentOrChildElement extends Elem
     propsStable: h.JSX.HTMLAttributes<ParentOrChildElement>;
 }
 
-export interface UseLinearNavigationChildInfo<ChildElement extends Element> extends UseRovingTabIndexChildInfo<ChildElement> {}
+export interface UseLinearNavigationChildInfo<ChildElement extends Element> extends ManagedChildInfo<number> {}
 
 /** Arguments passed to the parent `useLinearNavigation` */
-export interface UseLinearNavigationParameters<_ParentOrChildElement extends Element, ChildElement extends Element, M extends UseLinearNavigationChildInfo<ChildElement>> {
+export interface UseLinearNavigationParameters<_ParentOrChildElement extends Element, ChildElement extends Element, _M extends UseLinearNavigationChildInfo<ChildElement>> {
 
-    rovingTabIndexReturn: Pick<UseRovingTabIndexReturnType<ChildElement, M>["rovingTabIndexReturn"], "getTabbableIndex" | "setTabbableIndex">;
+    rovingTabIndexReturn: Pick<UseRovingTabIndexReturnType<ChildElement, UseRovingTabIndexChildInfo<ChildElement>>["rovingTabIndexReturn"], "getTabbableIndex" | "setTabbableIndex">;
 
     linearNavigationParameters: {
 

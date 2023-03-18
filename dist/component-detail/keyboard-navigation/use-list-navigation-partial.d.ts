@@ -1,4 +1,4 @@
-import { OmitStrong } from "../../util/types.js";
+import { ExtendMerge, OmitStrong } from "../../util/types.js";
 import { UseLinearNavigationParameters, UseLinearNavigationReturnType } from "./use-linear-navigation.js";
 import { RovingTabIndexChildContext, UseRovingTabIndexChildInfo, UseRovingTabIndexChildParameters, UseRovingTabIndexChildReturnType, UseRovingTabIndexParameters, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
 import { UseTypeaheadNavigationChildParameters, UseTypeaheadNavigationChildReturnType, UseTypeaheadNavigationContext, UseTypeaheadNavigationParameters, UseTypeaheadNavigationReturnType } from "./use-typeahead-navigation.js";
@@ -13,7 +13,7 @@ export interface UseListNavigationParameters<ParentOrChildElement extends Elemen
 export interface UseListNavigationReturnType<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationChildInfo<ChildElement>> extends OmitStrong<UseRovingTabIndexReturnType<ChildElement, M>, "managedChildrenParameters" | "context">, OmitStrong<UseTypeaheadNavigationReturnType<ParentOrChildElement>, "context">, UseLinearNavigationReturnType<ParentOrChildElement>, UseRovingTabIndexReturnType<ChildElement, M> {
     context: OmitStrong<UseListNavigationContext<ParentOrChildElement, ChildElement, M>, "managedChildContext">;
 }
-export interface UseListNavigationChildParameters<ChildElement extends Element, M extends UseListNavigationChildInfo<ChildElement>> extends OmitStrong<UseRovingTabIndexChildParameters<ChildElement, M>, "context">, OmitStrong<UseTypeaheadNavigationChildParameters<ChildElement, M>, "context"> {
+export interface UseListNavigationChildParameters<ChildElement extends Element, M extends UseListNavigationChildInfo<ChildElement>> extends ExtendMerge<OmitStrong<UseRovingTabIndexChildParameters<ChildElement, M>, "context">, OmitStrong<UseTypeaheadNavigationChildParameters<ChildElement, M>, "context">> {
     context: OmitStrong<UseListNavigationContext<Element, ChildElement, M>, "managedChildContext">;
 }
 export interface UseListNavigationContext<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationChildInfo<ChildElement>> extends RovingTabIndexChildContext<ChildElement, M>, UseTypeaheadNavigationContext {
