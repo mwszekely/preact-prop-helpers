@@ -1,12 +1,12 @@
 import { identity } from "lodash-es";
 import { useCallback } from "preact/hooks";
+import { useGridNavigationSingleSelectionSortable } from "../component-detail/keyboard-navigation/use-grid-navigation-single-selection-sortable.js";
+import { useGridNavigationSingleSelectionCell, useGridNavigationSingleSelectionRow } from "../component-detail/keyboard-navigation/use-grid-navigation-single-selection.js";
+import { useSingleSelectionDeclarative } from "../component-detail/keyboard-navigation/use-single-selection.js";
 import { usePaginatedChild, usePaginatedChildren } from "../component-detail/use-paginated-children.js";
 import { useStaggeredChild, useStaggeredChildren } from "../component-detail/use-staggered-children.js";
 import { useMergedProps } from "../dom-helpers/use-merged-props.js";
 import { useRefElement } from "../dom-helpers/use-ref-element.js";
-import { useGridNavigationSingleSelectionSortable } from "../component-detail/keyboard-navigation/use-grid-navigation-single-selection-sortable.js";
-import { useGridNavigationSingleSelectionCell, useGridNavigationSingleSelectionRow } from "../component-detail/keyboard-navigation/use-grid-navigation-single-selection.js";
-import { useSingleSelectionDeclarative } from "../component-detail/keyboard-navigation/use-single-selection.js";
 import { useChildrenHaveFocus, useChildrenHaveFocusChild } from "../observers/use-children-have-focus.js";
 import { useHasCurrentFocus } from "../observers/use-has-current-focus.js";
 import { useManagedChild, useManagedChildren } from "../preact-extensions/use-managed-children.js";
@@ -38,7 +38,6 @@ export function useCompleteGridNavigation({ gridNavigationParameters, linearNavi
         },
         sortableChildrenParameters
     });
-    const { linearNavigationReturn, typeaheadNavigationReturn } = gridNavigationSingleSelectionReturn;
     const { indexDemangler } = rearrangeableChildrenReturn;
     const { context: { childrenHaveFocusChildContext }, childrenHaveFocusReturn } = useChildrenHaveFocus({ childrenHaveFocusParameters });
     const mcr = useManagedChildren({ managedChildrenParameters: { onChildrenCountChange: useStableCallback(c => onChildrenCountChange(c)), ...managedChildrenParameters } });
@@ -97,7 +96,8 @@ export function useCompleteGridNavigationRow({ info: { index, ...info5 }, contex
         info: { index, ...info5 },
         textContentParameters: { hidden, ...textContentParameters },
     });
-    const { gridNavigationRowParameters: { focusSelf, setTabbableColumnIndex }, linearNavigationReturn, managedChildrenParameters, pressParameters, rovingTabIndexChildReturn, rovingTabIndexReturn, singleSelectionChildReturn, textContentReturn, typeaheadNavigationReturn, context: contextGNR, info: info2, } = r;
+    const { gridNavigationRowParameters: { focusSelf, setTabbableColumnIndex }, linearNavigationReturn, managedChildrenParameters, pressParameters: { excludeSpace }, // TODO: Pass this through context?
+    rovingTabIndexChildReturn, rovingTabIndexReturn, singleSelectionChildReturn, textContentReturn, typeaheadNavigationReturn, context: contextGNR, info: info2, } = r;
     //const { rowAsChildOfGridReturn: { props: propsRowAsChild, ...rowAsChildOfGridReturn }, rowAsParentOfCellsReturn: { propsStable: propsParentOfCells, ...rowAsParentOfCellsReturn } } = r;
     const { context: contextMC, managedChildrenReturn } = useManagedChildren({ managedChildrenParameters });
     const baseInfo = {
@@ -179,7 +179,7 @@ export function useCompleteGridNavigationDeclarative({ gridNavigationParameters,
         paginatedChildrenParameters,
         rearrangeableChildrenParameters,
         rovingTabIndexParameters,
-        singleSelectionParameters: { initiallySelectedIndex: singleSelectionDeclarativeParameters.selectedIndex, onSelectedIndexChange: useStableCallback((a) => onSelectedIndexChange(a)) },
+        singleSelectionParameters: { initiallySelectedIndex: singleSelectionDeclarativeParameters.selectedIndex, onSelectedIndexChange: useStableCallback((a, e) => onSelectedIndexChange?.(a, e)) },
         sortableChildrenParameters,
         staggeredChildrenParameters,
         typeaheadNavigationParameters,

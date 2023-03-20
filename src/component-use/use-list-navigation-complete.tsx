@@ -155,7 +155,7 @@ export interface UseCompleteListNavigationChildParameters<ChildElement extends E
 }
 
 export interface UseCompleteListNavigationChildReturnType<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>>
-    extends Pick<UseListNavigationSingleSelectionSortableChildReturnType<ChildElement, M>, "rovingTabIndexChildReturn" | "singleSelectionChildReturn" | "pressParameters">, OmitStrong<UseRefElementReturnType<ChildElement>, "propsStable"> {
+    extends Pick<UseListNavigationSingleSelectionSortableChildReturnType<ChildElement, M>, "textContentReturn" | "rovingTabIndexChildReturn" | "singleSelectionChildReturn" | "pressParameters">, OmitStrong<UseRefElementReturnType<ChildElement>, "propsStable"> {
     hasCurrentFocusReturn: UseHasCurrentFocusReturnType<ChildElement>["hasCurrentFocusReturn"];
     managedChildReturn: UseManagedChildReturnType<M>["managedChildReturn"];
     props: h.JSX.HTMLAttributes<ChildElement>;
@@ -237,6 +237,7 @@ export function useCompleteListNavigationChild<ChildElement extends Element, M e
 
     return {
         props,
+        textContentReturn,
         pressParameters,
         refElementReturn,
         singleSelectionChildReturn,
@@ -259,7 +260,7 @@ export function useCompleteListNavigationDeclarative<ParentElement extends Eleme
         paginatedChildrenParameters,
         rearrangeableChildrenParameters,
         rovingTabIndexParameters,
-        singleSelectionParameters: { initiallySelectedIndex: singleSelectionDeclarativeParameters.selectedIndex, onSelectedIndexChange: useStableCallback((a) => onSelectedIndexChange(a)) },
+        singleSelectionParameters: { initiallySelectedIndex: singleSelectionDeclarativeParameters.selectedIndex, onSelectedIndexChange: useStableCallback((a, e) => onSelectedIndexChange?.(a, e)) },
         sortableChildrenParameters,
         staggeredChildrenParameters,
         typeaheadNavigationParameters

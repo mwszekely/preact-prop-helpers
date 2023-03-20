@@ -1,8 +1,8 @@
 import { h } from "preact";
-import { StateUpdater } from "preact/hooks";
 import { UseChildrenHaveFocusChildReturnType, UseChildrenHaveFocusParameters } from "../../observers/use-children-have-focus.js";
 import { UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
 import { PassiveStateUpdater } from "../../preact-extensions/use-passive-state.js";
+import { PickTargeted } from "../../util/types.js";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
 /** Anything that's selectable must be tabbable, so we DO use rovingtabindex instead of just managedchildren */
 export interface UseSingleSelectionChildInfo<E extends Element> extends UseRovingTabIndexChildInfo<E> {
@@ -106,7 +106,7 @@ export declare function useSingleSelectionChild<ChildElement extends Element, M 
 export interface UseSingleSelectionDeclarativeParameters {
     singleSelectionDeclarativeParameters: {
         selectedIndex: number | null;
-        setSelectedIndex: StateUpdater<number | null>;
+        setSelectedIndex: null | ((index: number | null, reason: Event | undefined) => void);
     };
     singleSelectionReturn: Pick<UseSingleSelectionReturnType<any, any>["singleSelectionReturn"], "changeSelectedIndex">;
 }
@@ -115,9 +115,5 @@ export type MakeSingleSelectionDeclarativeReturnType<R> = Omit<R, "singleSelecti
 /**
  * Let's face it, declarative is nicer to use than imperative, so this is a shortcut.
  */
-export declare function useSingleSelectionDeclarative<ChildElement extends Element, M extends UseSingleSelectionChildInfo<ChildElement>>({ singleSelectionReturn: { changeSelectedIndex }, singleSelectionDeclarativeParameters: { selectedIndex, setSelectedIndex } }: UseSingleSelectionDeclarativeParameters): {
-    singleSelectionParameters: {
-        onSelectedIndexChange: StateUpdater<number | null>;
-    };
-};
+export declare function useSingleSelectionDeclarative<ChildElement extends Element, _M extends UseSingleSelectionChildInfo<ChildElement>>({ singleSelectionReturn: { changeSelectedIndex }, singleSelectionDeclarativeParameters: { selectedIndex, setSelectedIndex } }: UseSingleSelectionDeclarativeParameters): PickTargeted<UseSingleSelectionParameters<ChildElement, _M>, "singleSelectionParameters", "initiallySelectedIndex">;
 //# sourceMappingURL=use-single-selection.d.ts.map

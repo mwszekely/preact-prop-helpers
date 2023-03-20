@@ -125,6 +125,7 @@ singleSelectionChildParameters, rovingTabIndexChildParameters: { hidden }, info,
     const props = useMergedProps(propsStable, hasCurrentFocusReturn.propsStable, propsLs, paginationProps, staggeredProps);
     return {
         props,
+        textContentReturn,
         pressParameters,
         refElementReturn,
         singleSelectionChildReturn,
@@ -141,7 +142,7 @@ export function useCompleteListNavigationDeclarative({ linearNavigationParameter
         paginatedChildrenParameters,
         rearrangeableChildrenParameters,
         rovingTabIndexParameters,
-        singleSelectionParameters: { initiallySelectedIndex: singleSelectionDeclarativeParameters.selectedIndex, onSelectedIndexChange: useStableCallback((a) => onSelectedIndexChange(a)) },
+        singleSelectionParameters: { initiallySelectedIndex: singleSelectionDeclarativeParameters.selectedIndex, onSelectedIndexChange: useStableCallback((a, e) => onSelectedIndexChange?.(a, e)) },
         sortableChildrenParameters,
         staggeredChildrenParameters,
         typeaheadNavigationParameters
