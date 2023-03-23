@@ -1174,21 +1174,51 @@
 
     let timeoutHandle = null;
     function callCountU(hook) {
-      var _window, _window$_hookCallCoun, _window$_hookCallCoun2, _window$_hookCallCoun3, _window$_hookCallCoun4, _window$_hookCallCoun5;
+      var _window, _window$_hookCallCoun, _window$_hookCallCoun2, _window$_hookCallCoun3;
       const name = hook.name;
       if (filters.has(name)) return;
+      console.assert(name.length > 0);
       (_window$_hookCallCoun = (_window = window)._hookCallCount) !== null && _window$_hookCallCoun !== void 0 ? _window$_hookCallCoun : _window._hookCallCount = {
-        callCountsMoment: {},
-        callCountsTotal: {}
+        callCounts: {}
       };
-      (_window$_hookCallCoun3 = (_window$_hookCallCoun2 = window._hookCallCount.callCountsMoment)[name]) !== null && _window$_hookCallCoun3 !== void 0 ? _window$_hookCallCoun3 : _window$_hookCallCoun2[name] = 0;
-      (_window$_hookCallCoun5 = (_window$_hookCallCoun4 = window._hookCallCount.callCountsTotal)[name]) !== null && _window$_hookCallCoun5 !== void 0 ? _window$_hookCallCoun5 : _window$_hookCallCoun4[name] = 0;
-      window._hookCallCount.callCountsMoment[name] += 1;
-      window._hookCallCount.callCountsTotal[name] += 1;
+      (_window$_hookCallCoun3 = (_window$_hookCallCoun2 = window._hookCallCount.callCounts)[name]) !== null && _window$_hookCallCoun3 !== void 0 ? _window$_hookCallCoun3 : _window$_hookCallCoun2[name] = {
+        moment: 0,
+        total: 0
+      };
+      window._hookCallCount.callCounts[name].moment += 1;
+      window._hookCallCount.callCounts[name].total += 1;
       if (timeoutHandle == null) {
         timeoutHandle = requestIdleCallback(() => {
-          console.log(window._hookCallCount.callCountsMoment);
-          window._hookCallCount.callCountsMoment = {};
+          //console.log((window as WindowWithHookCallCount)._hookCallCount.callCountsMoment);
+          //(window as WindowWithHookCallCount)._hookCallCount.callCountsMoment = {};
+          console.table(Object.entries(window._hookCallCount.callCounts).map(_ref => {
+            let [hook, counts] = _ref;
+            return {
+              hook,
+              moment: counts === null || counts === void 0 ? void 0 : counts.moment,
+              total: counts === null || counts === void 0 ? void 0 : counts.total
+            };
+          }).filter(_ref2 => {
+            let {
+              moment
+            } = _ref2;
+            return !!moment;
+          }).sort((_ref3, _ref4) => {
+            let {
+              moment: lhsM
+            } = _ref3;
+            let {
+              moment: rhsM
+            } = _ref4;
+            if (!lhsM && !rhsM) return 0;
+            lhsM || (lhsM = Infinity);
+            rhsM || (rhsM = Infinity);
+            return lhsM - rhsM;
+          }), ['hook', 'moment', 'total']);
+          Object.entries(window._hookCallCount.callCounts).forEach(_ref5 => {
+            let [, counts] = _ref5;
+            counts.moment = 0;
+          });
           timeoutHandle = null;
         });
       }
