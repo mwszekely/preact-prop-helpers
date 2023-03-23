@@ -14,13 +14,17 @@ function callCountU(hook) {
         timeoutHandle = requestIdleCallback(() => {
             //console.log((window as WindowWithHookCallCount)._hookCallCount.callCountsMoment);
             //(window as WindowWithHookCallCount)._hookCallCount.callCountsMoment = {};
-            console.table(Object.entries(window._hookCallCount.callCounts).map(([hook, counts]) => { return { hook, moment: counts?.moment, total: counts?.total }; }).filter(({ moment }) => { return !!moment; }).sort(({ moment: lhsM }, { moment: rhsM }) => {
+            const o = Object.entries(window._hookCallCount.callCounts)
+                .map(([hook, counts]) => { return { Hook: hook || "?", Now: counts?.moment || 0, Total: counts?.total || 0 }; })
+                .filter(({ Now }) => { return !!Now; })
+                .sort(({ Now: lhsM }, { Now: rhsM }) => {
                 if (!lhsM && !rhsM)
                     return 0;
                 lhsM ||= Infinity;
                 rhsM ||= Infinity;
                 return lhsM - rhsM;
-            }), ['hook', 'moment', 'total']);
+            });
+            console.table(o, ['Hook', 'Now', 'Total']);
             Object.entries(window._hookCallCount.callCounts).forEach(([, counts]) => { counts.moment = 0; });
             timeoutHandle = null;
         });

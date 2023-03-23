@@ -17,7 +17,7 @@ function callCountU(hook: Function) {
         return;
 
     console.assert(name.length > 0);
-    
+
     (window as WindowWithHookCallCount)._hookCallCount ??= { callCounts: {} };
     (window as WindowWithHookCallCount)._hookCallCount.callCounts[name] ??= { moment: 0, total: 0 };
     (window as WindowWithHookCallCount)._hookCallCount.callCounts[name]!.moment += 1;
@@ -27,13 +27,18 @@ function callCountU(hook: Function) {
         timeoutHandle = requestIdleCallback(() => {
             //console.log((window as WindowWithHookCallCount)._hookCallCount.callCountsMoment);
             //(window as WindowWithHookCallCount)._hookCallCount.callCountsMoment = {};
-            console.table(Object.entries((window as WindowWithHookCallCount)._hookCallCount.callCounts).map(([hook, counts]) => { return { hook, moment: counts?.moment, total: counts?.total } as const }).filter(({ moment }) => { return !!moment }).sort(({ moment: lhsM }, { moment: rhsM }) => {
-                if (!lhsM && !rhsM)
-                    return 0;
-                lhsM ||= Infinity;
-                rhsM ||= Infinity;
-                return lhsM - rhsM;
-            }), ['hook', 'moment', 'total']);
+            const o: Array<{ readonly Hook: string; readonly Now: number; readonly Total: number; }> =
+                Object.entries((window as WindowWithHookCallCount)._hookCallCount.callCounts)
+                    .map(([hook, counts]) => { return { Hook: hook || "?", Now: counts?.moment || 0, Total: counts?.total || 0 } as const })
+                    .filter(({ Now }) => { return !!Now })
+                    .sort(({ Now: lhsM }, { Now: rhsM }) => {
+                        if (!lhsM && !rhsM)
+                            return 0;
+                        lhsM ||= Infinity;
+                        rhsM ||= Infinity;
+                        return lhsM - rhsM;
+                    });
+            console.table(o, ['Hook', 'Now', 'Total']);
             Object.entries((window as WindowWithHookCallCount)._hookCallCount.callCounts).forEach(([, counts]) => { counts!.moment = 0; });
             timeoutHandle = null;
         });

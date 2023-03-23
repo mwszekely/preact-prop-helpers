@@ -1191,30 +1191,31 @@
         timeoutHandle = requestIdleCallback(() => {
           //console.log((window as WindowWithHookCallCount)._hookCallCount.callCountsMoment);
           //(window as WindowWithHookCallCount)._hookCallCount.callCountsMoment = {};
-          console.table(Object.entries(window._hookCallCount.callCounts).map(_ref => {
+          const o = Object.entries(window._hookCallCount.callCounts).map(_ref => {
             let [hook, counts] = _ref;
             return {
-              hook,
-              moment: counts === null || counts === void 0 ? void 0 : counts.moment,
-              total: counts === null || counts === void 0 ? void 0 : counts.total
+              Hook: hook || "?",
+              Now: (counts === null || counts === void 0 ? void 0 : counts.moment) || 0,
+              Total: (counts === null || counts === void 0 ? void 0 : counts.total) || 0
             };
           }).filter(_ref2 => {
             let {
-              moment
+              Now
             } = _ref2;
-            return !!moment;
+            return !!Now;
           }).sort((_ref3, _ref4) => {
             let {
-              moment: lhsM
+              Now: lhsM
             } = _ref3;
             let {
-              moment: rhsM
+              Now: rhsM
             } = _ref4;
             if (!lhsM && !rhsM) return 0;
             lhsM || (lhsM = Infinity);
             rhsM || (rhsM = Infinity);
             return lhsM - rhsM;
-          }), ['hook', 'moment', 'total']);
+          });
+          console.table(o, ['Hook', 'Now', 'Total']);
           Object.entries(window._hookCallCount.callCounts).forEach(_ref5 => {
             let [, counts] = _ref5;
             counts.moment = 0;
