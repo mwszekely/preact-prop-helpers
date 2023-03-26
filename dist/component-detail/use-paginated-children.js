@@ -61,7 +61,7 @@ export function usePaginatedChild({ info: { index }, context: { paginatedChildCo
     const [childCountIfPaginated, setChildCountIfPaginated] = useState(null);
     const [paginatedVisible, setPaginatedVisible] = useState(getDefaultPaginationVisible(index));
     return {
-        props: !parentIsPaginated ? {} : (({ "aria-setsize": childCountIfPaginated ?? undefined, "aria-posinset": (index + 1) })),
+        props: !parentIsPaginated ? {} : { "aria-setsize": childCountIfPaginated ?? undefined, "aria-posinset": (index + 1) },
         paginatedChildReturn: { paginatedVisible, isPaginated: parentIsPaginated, hideBecausePaginated: parentIsPaginated ? !paginatedVisible : false },
         info: {
             setPaginationVisible: setPaginatedVisible,

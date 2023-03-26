@@ -1,4 +1,4 @@
-import { KeyboardEvent, SyntheticEvent, useCallback, useRef } from "react";
+import { SyntheticEvent, useCallback, useRef } from "react";
 import { ManagedChildInfo } from "../../index.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
@@ -196,8 +196,8 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
     const getPageNavigationSize = useStableGetter(linearNavigationParameters.pageNavigationSize);
 
 
-    const stableProps = useRef({
-        onKeyDown: (e: KeyboardEvent<ParentOrChildElement>) => {
+    const stableProps = useRef<ElementProps<ParentOrChildElement>>({
+        onKeyDown: (e) => {
             // Not handled by typeahead (i.e. assume this is a keyboard shortcut)
             if (e.ctrlKey || e.metaKey)
                 return;

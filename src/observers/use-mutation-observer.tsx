@@ -1,5 +1,5 @@
 import { useCallback, useEffect } from "react";
-import { useRefElement, UseRefElementParameters } from "../dom-helpers/use-ref-element.js";
+import { UseRefElementParameters, useRefElement } from "../dom-helpers/use-ref-element.js";
 import { returnNull, runImmediately, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { monitorCallCount } from "../util/use-call-count.js";

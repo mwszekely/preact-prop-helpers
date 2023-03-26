@@ -29,7 +29,7 @@ export interface UseRefElementParameters<T> {
 
 
 /*
-export function useRefElementProps<E extends Element>(r: UseRefElementReturnType<E>, ...otherProps: HTMLAttributes<E>[]): HTMLAttributes<E>[] {
+export function useRefElementProps<E extends Element>(r: UseRefElementReturnType<E>, ...otherProps: ElementProps<E>[]): ElementProps<E>[] {
     return [r.refElementReturn.propsStable, ...otherProps];
 }*/
 

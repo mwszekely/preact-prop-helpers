@@ -1,6 +1,6 @@
 import { Ref } from "react";
 import { useEnsureStability } from "../preact-extensions/use-passive-state.js";
-import { ElementProps } from "../util/types.js";
+import { ElementProps, ElementToTag } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 import { useMergedChildren } from "./use-merged-children.js";
 import { useMergedClasses } from "./use-merged-classes.js";
@@ -17,16 +17,21 @@ export function enableLoggingPropConflicts(log2: typeof console["log"]) {
  * Given two sets of props, merges them and returns the result.
  * 
  * The hook is aware of and can intelligently merge `className`, `class`, `style`, `ref`, and all event handlers.
+ * 
+ * TODO: In React, there are two overloads: one for the "generic, fast, non-conflicting" prop types, and one for users that handles inputs and {type:"number"} and whatnot.
+ * 
  * @param lhs2 
  * @param rhs2 
  * @returns 
  */
-export function useMergedProps<E extends EventTarget>(...allProps: {}[]) {
+export function useMergedProps<E extends EventTarget>(...allProps: ElementProps<E>[]): ElementProps<E>;
+export function useMergedProps<E extends EventTarget>(...allProps: JSX.IntrinsicElements[ElementToTag<E> & keyof JSX.IntrinsicElements][]): ElementProps<E>;
+export function useMergedProps<E extends EventTarget>(...allProps: any[]): ElementProps<E> {
     monitorCallCount(useMergedProps);
     useEnsureStability("useMergedProps", allProps.length);
     let ret: ElementProps<E> = {};
     for (let nextProps of allProps) {
-        ret = useMergedProps2<E>(ret, nextProps);
+        ret = useMergedProps2<E>(ret, nextProps as any);
     }
 
     return ret;
@@ -76,11 +81,11 @@ function mergeUnknown(key: string, lhsValue: unknown, rhsValue: unknown) {
  * This is one of the most commonly called functions in this and consumer libraries,
  * so it trades a bit of readability for speed (i.e. we don't decompose objects and just do regular property access, iterate with `for...in`, instead of `Object.entries`, etc.)
  */
-function useMergedProps2<E extends EventTarget>(lhsAll: any, rhsAll: any): ElementProps<E> {
+function useMergedProps2<E extends EventTarget>(lhsAll: ElementProps<E>, rhsAll: ElementProps<E>): ElementProps<E> {
 
-    
-    const ret: any = {
-        ref: useMergedRefs<E>(lhsAll.ref as Ref<E>, rhsAll.ref as Ref<E>),
+
+    const ret: ElementProps<E> = {
+        ref: useMergedRefs<E>(lhsAll.ref, rhsAll.ref),
         style: useMergedStyles(lhsAll.style, rhsAll.style),
         className: useMergedClasses(lhsAll.className, rhsAll.className),
         children: useMergedChildren(lhsAll.children, rhsAll.children),
@@ -92,17 +97,17 @@ function useMergedProps2<E extends EventTarget>(lhsAll: any, rhsAll: any): Eleme
     if (ret.children === undefined) delete ret.children;
 
     for (const lhsKeyU in lhsAll) {
-        const lhsKey = lhsKeyU as keyof typeof lhsAll;
-        if (knowns.has(lhsKey as string))
+        const lhsKey = lhsKeyU as (keyof typeof lhsAll) & string & (keyof ElementProps<E>);
+        if (knowns.has(lhsKey))
             continue;
-        ret[lhsKey] = lhsAll[lhsKey];
+        ret[lhsKey as never] = lhsAll[lhsKey] as never;
     }
 
     for (const rhsKeyU in rhsAll) {
-        const rhsKey = rhsKeyU as (keyof typeof rhsAll) & string;
+        const rhsKey = rhsKeyU as (keyof typeof rhsAll) & string & (keyof ElementProps<E>);
         if (knowns.has(rhsKey as string))
             continue;
-        ret[rhsKey] = mergeUnknown(rhsKey, ret[rhsKey], rhsAll[rhsKey]);
+        ret[rhsKey as never] = mergeUnknown(rhsKey, ret[rhsKey], rhsAll[rhsKey]) as never;
     }
 
     return ret;

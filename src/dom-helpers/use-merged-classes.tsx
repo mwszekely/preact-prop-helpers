@@ -1,7 +1,7 @@
 import { clsx } from "clsx";
-import { HTMLAttributes } from "react";
+import { ElementProps } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
-type C = HTMLAttributes<EventTarget>["className"];
+type C = ElementProps<EventTarget>["className"];
 /**
  * Given two sets of props, merges their `class` and `className` properties.
  * Duplicate classes are removed (order doesn't matter anyway).

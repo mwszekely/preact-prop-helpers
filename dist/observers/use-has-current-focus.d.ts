@@ -19,7 +19,7 @@ export interface UseHasCurrentFocusParameters<T extends Node> {
         onCurrentFocusedInnerChanged?: undefined | null | OnPassiveStateChange<boolean, FocusEvent<T>>;
     };
 }
-export interface UseHasCurrentFocusReturnType<E extends Node> {
+export interface UseHasCurrentFocusReturnType<E extends Element> {
     hasCurrentFocusReturn: {
         propsStable: ElementProps<E>;
         /**
@@ -31,5 +31,5 @@ export interface UseHasCurrentFocusReturnType<E extends Node> {
         getCurrentFocusedInner(): boolean;
     };
 }
-export declare function useHasCurrentFocus<T extends Node>(args: UseHasCurrentFocusParameters<T>): UseHasCurrentFocusReturnType<T>;
+export declare function useHasCurrentFocus<T extends Element>(args: UseHasCurrentFocusParameters<T>): UseHasCurrentFocusReturnType<T>;
 //# sourceMappingURL=use-has-current-focus.d.ts.map

@@ -1,4 +1,4 @@
-import { DetailedHTMLProps, HTMLAttributes, AllHTMLAttributes, Ref, useRef, ReactHTMLElement, HTMLProps, ComponentProps } from "react";
+import { DetailedHTMLProps, HTMLAttributes, AllHTMLAttributes, Ref, useRef, ReactHTMLElement, HTMLProps, ComponentProps, AriaAttributes } from "react";
 
 export type OmitStrong<T, K extends keyof T> = Omit<T, K>;
 export type OmitTargeted<T, K extends keyof T, L extends keyof T[K]> = OmitStrong<T, K> & { [M in K]: OmitStrong<T[K], L> };
@@ -10,9 +10,12 @@ type PickByType<T, Value> = {
 }
 
 export type ElementToTag<T extends EventTarget> = keyof PickByType<JSX.IntrinsicElements, DetailedHTMLProps<HTMLAttributes<T>, T>>;
+type EventHandlerNames = (keyof HTMLProps<any> & `on${string}`);
+type AriaNames = keyof AriaAttributes;
+type NonConflictingAttributes = "id" | "children" | "htmlFor" | "ref" | "className" | "tabIndex" | "style" | "tabIndex" | "draggable";
 // React typing is a nightmare to figure out, so this is a temporary stopgap.
 // We only pick the types we use, avoiding the more problematic types when possible.
-export type ElementProps<T extends EventTarget> = Pick<Partial<HTMLProps<T>>, "htmlFor" | "ref" | "className" | "tabIndex" | "onKeyDown" | "onClick" | "style" | "onPointerDown" | "onKeyUp" | "onTouchStart" | "onTouchCancel" | "onTouchMove" | "onTouchEnd" | "onPointerCancel" | "onPointerMove" | "onPointerUp" | "onPointerEnter" | "onPointerLeave" | "onFocus" | "onBlur" | "aria-modal" | "onDrag" | "onDrop" | "tabIndex" | "draggable" | "aria-posinset" | "onDragStart" | "onDragEnd" | "aria-setsize">; //{ ref?: Ref<T> }; //JSX.IntrinsicElements[ElementToTag<T> & keyof JSX.IntrinsicElements];
+export type ElementProps<T extends EventTarget> = Pick<Partial<HTMLProps<T>>, EventHandlerNames | AriaNames | NonConflictingAttributes>; //{ ref?: Ref<T> }; //JSX.IntrinsicElements[ElementToTag<T> & keyof JSX.IntrinsicElements];
 //export type ElementProps<T extends EventTarget> = ComponentProps<ElementToTag<T> & keyof JSX.IntrinsicElements>;
 
 function test<T extends Element>(lhs: ElementProps<T>, rhs: ElementProps<T>): ElementProps<T> {

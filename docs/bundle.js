@@ -5138,14 +5138,6 @@
   }
 
   let log = console.warn;
-  /**
-   * Given two sets of props, merges them and returns the result.
-   *
-   * The hook is aware of and can intelligently merge `className`, `class`, `style`, `ref`, and all event handlers.
-   * @param lhs2
-   * @param rhs2
-   * @returns
-   */
   function useMergedProps() {
     monitorCallCount(useMergedProps);
     for (var _len = arguments.length, allProps = new Array(_len), _key = 0; _key < _len; _key++) {
@@ -7528,7 +7520,7 @@
   }
 
   /*
-  export function useRefElementProps<E extends Element>(r: UseRefElementReturnType<E>, ...otherProps: HTMLAttributes<E>[]): HTMLAttributes<E>[] {
+  export function useRefElementProps<E extends Element>(r: UseRefElementReturnType<E>, ...otherProps: ElementProps<E>[]): ElementProps<E>[] {
       return [r.refElementReturn.propsStable, ...otherProps];
   }*/
   /**

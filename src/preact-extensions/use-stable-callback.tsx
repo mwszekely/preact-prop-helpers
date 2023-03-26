@@ -1,7 +1,7 @@
 import { useCallback as useCallbackNative } from "react";
+import { monitorCallCount } from "../util/use-call-count.js";
 import { useEnsureStability } from "./use-passive-state.js";
 import { useStableGetter } from "./use-stable-getter.js";
-import { monitorCallCount } from "../util/use-call-count.js";
 
 
 //const _IS_STABLE_GETTER = Symbol("STABLE");

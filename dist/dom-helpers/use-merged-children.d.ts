@@ -1,3 +1,3 @@
-import { HTMLAttributes } from "react";
-export declare function useMergedChildren(lhs: HTMLAttributes<EventTarget>["children"], rhs: HTMLAttributes<EventTarget>["children"]): HTMLAttributes<EventTarget>["children"];
+import { ElementProps } from "../util/types.js";
+export declare function useMergedChildren(lhs: ElementProps<EventTarget>["children"], rhs: ElementProps<EventTarget>["children"]): ElementProps<EventTarget>["children"];
 //# sourceMappingURL=use-merged-children.d.ts.map

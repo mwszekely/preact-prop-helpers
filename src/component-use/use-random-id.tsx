@@ -1,7 +1,7 @@
 import { useId, useRef } from "react";
 import { useEnsureStability } from "../preact-extensions/use-passive-state.js";
-import { monitorCallCount } from "../util/use-call-count.js";
 import { ElementProps } from "../util/types.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 
 export interface UseRandomIdReturnType<S extends Element, T extends Element> {
     propsSource: ElementProps<S>;
@@ -30,8 +30,8 @@ export function useRandomId<S extends Element, T extends Element>({ randomIdPara
     const id = (prefix + useId());
     useEnsureStability("useRandomId", prefix, id);
 
-    const referencerElementProps = useRef<ElementProps<any>>(otherReferencerProp == null ? {} : { [otherReferencerProp]: id } as never);
-    const sourceElementProps = useRef<ElementProps<S>>({ id } as never);
+    const referencerElementProps = useRef<ElementProps<any>>(otherReferencerProp == null ? {} : { [otherReferencerProp]: id });
+    const sourceElementProps = useRef<ElementProps<S>>({ id });
     useEnsureStability("useRandomIdReferencerElement", otherReferencerProp);
     
 

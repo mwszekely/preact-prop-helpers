@@ -95,7 +95,7 @@ export function useFocusTrap<SourceElement extends Element | null, PopupElement 
 
 
     return {
-        props: { "aria-modal": trapActive ? "true" : undefined },
+        props: { "aria-modal": trapActive ? "true" : undefined } as ElementProps<E>,
         focusTrapReturn: {  }
     };
 }

@@ -1,4 +1,5 @@
-import { HTMLAttributes, CSSProperties } from "react";
+import { CSSProperties, HTMLAttributes } from "react";
+import { ElementProps } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 
 /**
@@ -8,7 +9,7 @@ import { monitorCallCount } from "../util/use-call-count.js";
  * @param obj The CSS properties you want added to the user-given style
  * @returns A CSS object containing the properties of both objects.
  */
-export function useMergedStyles(lhs: HTMLAttributes<EventTarget>["style"], rhs: HTMLAttributes<EventTarget>["style"]): HTMLAttributes<EventTarget>["style"] {
+export function useMergedStyles(lhs: ElementProps<EventTarget>["style"], rhs: ElementProps<EventTarget>["style"]): ElementProps<EventTarget>["style"] {
     monitorCallCount(useMergedStyles);
 
     // Easy case, when there are no styles to merge return nothing.

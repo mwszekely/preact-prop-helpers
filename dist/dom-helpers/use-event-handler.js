@@ -1,8 +1,8 @@
-import { useEnsureStability } from "../preact-extensions/use-passive-state.js";
 import { useCallback, useEffect } from "react";
+import { useEnsureStability } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
-import { useMergedProps } from "./use-merged-props.js";
 import { monitorCallCount } from "../util/use-call-count.js";
+import { useMergedProps } from "./use-merged-props.js";
 /**
  * Allows attaching an event handler to any *non-Preact* element, and removing it when the component using the hook unmounts. The callback does not need to be stable across renders.
  *

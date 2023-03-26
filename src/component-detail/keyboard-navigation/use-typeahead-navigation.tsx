@@ -1,4 +1,4 @@
-import { CompositionEvent, KeyboardEvent, SyntheticEvent, useCallback, useLayoutEffect, useRef } from "react";
+import { SyntheticEvent, useCallback, useLayoutEffect, useRef } from "react";
 import { UsePressParameters } from "../../component-use/use-press.js";
 import { UseRefElementReturnType } from "../../dom-helpers/use-ref-element.js";
 import { UseTextContentParameters, UseTextContentReturnType, useTextContent } from "../../dom-helpers/use-text-content.js";
@@ -82,6 +82,8 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
     rovingTabIndexReturn: { getTabbableIndex: getIndex, setTabbableIndex: setIndex, ..._void1 },
     ..._void2
 }: UseTypeaheadNavigationParameters<ChildElement, M>): UseTypeaheadNavigationReturnType<ParentOrChildElement> {
+    type EventType = Parameters<NonNullable<ElementProps<ParentOrChildElement>["onKeyDown"]>>[0];
+
     monitorCallCount(useTypeaheadNavigation);
 
     assertEmptyObject(_void1);
@@ -156,8 +158,8 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
     const isDisabled = useStableGetter(noTypeahead);
 
 
-    const propsStable = useRef({
-        onKeyDown: useStableCallback((e: KeyboardEvent<ParentOrChildElement>) => {
+    const propsStable = useRef<ElementProps<ParentOrChildElement>>({
+        onKeyDown: useStableCallback((e) => {
             if (isDisabled())
                 return;
 
@@ -171,7 +173,7 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
 
             if (!imeActive && e.key === "Backspace") {
                 // Remove the last character in a way that doesn't split UTF-16 surrogates.
-                setCurrentTypeahead(t => t == null ? null : [...t].reverse().slice(1).reverse().join(""), e as KeyboardEvent<any>);
+                setCurrentTypeahead(t => t == null ? null : [...t].reverse().slice(1).reverse().join(""), e);
                 e.preventDefault();
                 e.stopPropagation();
                 return;
@@ -204,11 +206,11 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
             }
 
         }),
-        onCompositionStart: useStableCallback((e: CompositionEvent) => {
+        onCompositionStart: useStableCallback((e) => {
             setNextTypeaheadChar(e.data);
             setImeActive(false);
         }),
-        onCompositionEnd: useStableCallback((_e: CompositionEvent) => { setImeActive(true) }),
+        onCompositionEnd: useStableCallback((_e) => { setImeActive(true) }),
     });
 
     const excludeSpace = useStableCallback(() => { return typeaheadStatus != "none" });

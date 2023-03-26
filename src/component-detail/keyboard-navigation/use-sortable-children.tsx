@@ -1,7 +1,7 @@
 import { shuffle as lodashShuffle } from "lodash-es";
 import { createElement, useCallback, useLayoutEffect, useRef } from "react";
 import { useForceUpdate } from "../../preact-extensions/use-force-update.js";
-import { ManagedChildInfo, ManagedChildren, UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
+import { ManagedChildInfo, UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
 import { returnNull, useEnsureStability, usePassiveState } from "../../preact-extensions/use-passive-state.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { monitorCallCount } from "../../util/use-call-count.js";

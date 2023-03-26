@@ -8,14 +8,6 @@ let log = console.warn;
 export function enableLoggingPropConflicts(log2) {
     log = log2;
 }
-/**
- * Given two sets of props, merges them and returns the result.
- *
- * The hook is aware of and can intelligently merge `className`, `class`, `style`, `ref`, and all event handlers.
- * @param lhs2
- * @param rhs2
- * @returns
- */
 export function useMergedProps(...allProps) {
     monitorCallCount(useMergedProps);
     useEnsureStability("useMergedProps", allProps.length);

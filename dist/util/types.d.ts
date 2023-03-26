@@ -1,4 +1,4 @@
-import { DetailedHTMLProps, HTMLAttributes, HTMLProps } from "react";
+import { DetailedHTMLProps, HTMLAttributes, HTMLProps, AriaAttributes } from "react";
 export type OmitStrong<T, K extends keyof T> = Omit<T, K>;
 export type OmitTargeted<T, K extends keyof T, L extends keyof T[K]> = OmitStrong<T, K> & {
     [M in K]: OmitStrong<T[K], L>;
@@ -13,6 +13,9 @@ type PickByType<T, Value> = {
     [P in keyof T as T[P] extends Value | undefined ? P : never]: T[P];
 };
 export type ElementToTag<T extends EventTarget> = keyof PickByType<JSX.IntrinsicElements, DetailedHTMLProps<HTMLAttributes<T>, T>>;
-export type ElementProps<T extends EventTarget> = Pick<Partial<HTMLProps<T>>, "htmlFor" | "ref" | "className" | "tabIndex" | "onKeyDown" | "onClick" | "style" | "onPointerDown" | "onKeyUp" | "onTouchStart" | "onTouchCancel" | "onTouchMove" | "onTouchEnd" | "onPointerCancel" | "onPointerMove" | "onPointerUp" | "onPointerEnter" | "onPointerLeave" | "onFocus" | "onBlur" | "aria-modal" | "onDrag" | "onDrop" | "tabIndex" | "draggable" | "aria-posinset" | "onDragStart" | "onDragEnd" | "aria-setsize">;
+type EventHandlerNames = (keyof HTMLProps<any> & `on${string}`);
+type AriaNames = keyof AriaAttributes;
+type NonConflictingAttributes = "id" | "children" | "htmlFor" | "ref" | "className" | "tabIndex" | "style" | "tabIndex" | "draggable";
+export type ElementProps<T extends EventTarget> = Pick<Partial<HTMLProps<T>>, EventHandlerNames | AriaNames | NonConflictingAttributes>;
 export {};
 //# sourceMappingURL=types.d.ts.map

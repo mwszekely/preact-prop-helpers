@@ -2,8 +2,8 @@
 import { FocusEvent, FocusEventHandler, useCallback, useEffect, useRef } from "react";
 import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
 import { OnPassiveStateChange, returnFalse, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
-import { monitorCallCount } from "../util/use-call-count.js";
 import { ElementProps } from "../util/types.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 
 export interface UseHasCurrentFocusParameters<T extends Node> {
     refElementReturn: Required<Pick<UseRefElementReturnType<T>["refElementReturn"], "getElement">>;
@@ -26,9 +26,9 @@ export interface UseHasCurrentFocusParameters<T extends Node> {
     }
 }
 
-export interface UseHasCurrentFocusReturnType<E extends Node> {
+export interface UseHasCurrentFocusReturnType<E extends Element> {
     hasCurrentFocusReturn: {
-        propsStable: ElementProps<E>
+        propsStable: ElementProps<E>;
         /**
          * Modifies the element to be able to track its own focus state
          */
@@ -41,7 +41,7 @@ export interface UseHasCurrentFocusReturnType<E extends Node> {
     }
 }
 
-export function useHasCurrentFocus<T extends Node>(args: UseHasCurrentFocusParameters<T>): UseHasCurrentFocusReturnType<T> {
+export function useHasCurrentFocus<T extends Element>(args: UseHasCurrentFocusParameters<T>): UseHasCurrentFocusReturnType<T> {
     monitorCallCount(useHasCurrentFocus);
 
     const {

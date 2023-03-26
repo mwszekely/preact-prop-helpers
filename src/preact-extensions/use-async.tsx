@@ -1,10 +1,10 @@
 
 import { identity } from "lodash-es";
 import { useCallback, useEffect, useMemo } from "react";
-import { useStableCallback } from "./use-stable-callback.js";
-import { useState } from "./use-state.js";
 import { CaptureFunctionType, asyncToSync } from "../util/async-to-sync.js";
 import { monitorCallCount } from "../util/use-call-count.js";
+import { useStableCallback } from "./use-stable-callback.js";
+import { useState } from "./use-state.js";
 
 type SyncFunctionType<SP extends unknown[], R> = (...args: SP) => (R | undefined);
 type AsyncFunctionType<AP extends unknown[], R> = ((...args: AP) => (R | Promise<R>));

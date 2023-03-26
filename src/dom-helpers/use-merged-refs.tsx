@@ -1,9 +1,10 @@
-import { MutableRefObject, Ref } from "react";
+import { LegacyRef, MutableRefObject, Ref } from "react";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
+import { ElementProps } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 
 
-function processRef<E extends EventTarget>(instance: E | null, ref: Ref<E> | null | undefined) {
+function processRef<E extends EventTarget>(instance: E | null, ref: LegacyRef<E> | Ref<E> | null | undefined) {
     if (typeof ref === "string") {
         console.error(`Legacy string-based refs are not supported`)
     }
@@ -27,7 +28,7 @@ function processRef<E extends EventTarget>(instance: E | null, ref: Ref<E> | nul
  * @param rhs 
  * @returns 
  */
-export function useMergedRefs<E extends EventTarget>(rhs: Ref<E> | null | undefined, lhs: Ref<E> | null | undefined) {
+export function useMergedRefs<E extends EventTarget>(rhs: ElementProps<E>["ref"], lhs: ElementProps<E>["ref"]) {
     monitorCallCount(useMergedRefs);
 
     // This *must* be stable in order to prevent repeated reset `null` calls after every render.

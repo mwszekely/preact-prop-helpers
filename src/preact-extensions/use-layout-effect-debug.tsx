@@ -1,6 +1,6 @@
 import { DependencyList, useLayoutEffect as useLayoutEffectNative } from "react";
-import { EffectChange, useEffectDebug } from "./use-effect-debug.js";
 import { monitorCallCount } from "../util/use-call-count.js";
+import { EffectChange, useEffectDebug } from "./use-effect-debug.js";
 
 /**
  * Wrap the native `useLayoutEffect` to add arguments 

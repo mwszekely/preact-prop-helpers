@@ -2,7 +2,7 @@
 import { noop } from "lodash-es";
 import { SyntheticEvent, useCallback, useEffect } from "react";
 import { UseChildrenHaveFocusChildReturnType, UseChildrenHaveFocusParameters } from "../../observers/use-children-have-focus.js";
-import { useChildrenFlag, UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
+import { UseManagedChildrenReturnType, useChildrenFlag } from "../../preact-extensions/use-managed-children.js";
 import { OnPassiveStateChange, PassiveStateUpdater, useEnsureStability } from "../../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useStableGetter, useStableObject } from "../../preact-extensions/use-stable-getter.js";

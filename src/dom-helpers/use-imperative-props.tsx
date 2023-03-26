@@ -137,7 +137,7 @@ function ImperativeElementU<T extends keyof HTMLElementTagNameMap>({ tag: Tag, h
     const { propsStable, refElementReturn } = useRefElement<HTMLElementTagNameMap[T]>({ refElementParameters: {} })
     const { props: iprops, imperativeHandle } = useImperativeProps<HTMLElementTagNameMap[T]>({ refElementReturn });
     useImperativeHandle(handle, () => imperativeHandle);
-    return (createElement(Tag, useMergedProps(propsStable, iprops, props, { ref })));
+    return (createElement(Tag, useMergedProps(propsStable, iprops, props as ElementProps<HTMLElementTagNameMap[T]>, { ref })));
 }
 
 

@@ -1,5 +1,5 @@
-import { getBuildMode } from "./mode.js";
 import { noop } from "lodash-es";
+import { getBuildMode } from "./mode.js";
 
 let timeoutHandle = null as number | null;
 

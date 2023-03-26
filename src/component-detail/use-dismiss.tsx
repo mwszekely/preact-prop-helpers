@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react";
+import { SyntheticEvent, useCallback, useEffect } from "react";
 import { useGlobalHandler } from "../dom-helpers/use-event-handler.js";
 import { UseRefElementReturnType, useRefElement } from "../dom-helpers/use-ref-element.js";
 import { UseActiveElementParameters, useActiveElement } from "../observers/use-active-element.js";
