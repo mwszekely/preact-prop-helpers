@@ -1,5 +1,5 @@
-import { h } from "preact";
-type C = h.JSX.HTMLAttributes<EventTarget>["className"];
+import { ElementProps } from "../util/types.js";
+type C = ElementProps<EventTarget>["className"];
 /**
  * Given two sets of props, merges their `class` and `className` properties.
  * Duplicate classes are removed (order doesn't matter anyway).

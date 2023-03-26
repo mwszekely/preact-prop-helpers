@@ -247,7 +247,7 @@ const M = {
 
 export interface UseLogicalDirectionReturnType {
     /** **STABLE** */
-    //useLogicalDirectionProps: (props: h.JSX.HTMLAttributes<T>) => h.JSX.HTMLAttributes<T>;
+    //useLogicalDirectionProps: (props: ElementProps<T>) => ElementProps<T>;
     /** **STABLE** */
     //getElement: () => T | null;
     /** **STABLE** */

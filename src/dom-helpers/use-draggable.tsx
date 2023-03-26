@@ -1,15 +1,15 @@
-import { h } from "preact";
 import { useState } from "../preact-extensions/use-state.js";
+import { ElementProps } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 
 /*
-export function useDraggableProps<E extends EventTarget>(r: UseDraggableReturnType<E>, ...otherProps: h.JSX.HTMLAttributes<E>[]): h.JSX.HTMLAttributes<E>[] {
+export function useDraggableProps<E extends EventTarget>(r: UseDraggableReturnType<E>, ...otherProps: ElementProps<E>[]): ElementProps<E>[] {
     return [r.propsUnstable, ...otherProps];
 }*/
 
 export interface UseDraggableReturnType<E extends EventTarget> {
     /** *Unstable* */
-    propsUnstable: h.JSX.HTMLAttributes<E>;
+    propsUnstable: ElementProps<E>;
 
     /**
      * Returns true if the element in question is currently being dragged

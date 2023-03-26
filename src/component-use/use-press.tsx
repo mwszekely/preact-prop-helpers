@@ -1,21 +1,18 @@
 import { noop } from "lodash-es";
-import { h } from "preact";
+import type { JSX } from "preact";
 import { useCallback } from "preact/hooks";
 import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
 import { OnPassiveStateChange, returnFalse, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useState } from "../preact-extensions/use-state.js";
 import { useTimeout } from "../timing/use-timeout.js";
+import { ElementProps } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
-/*
-export function usePressProps<E extends Element>(r: UsePressReturnType<E>, ...otherProps: h.JSX.HTMLAttributes<E>[]): h.JSX.HTMLAttributes<E>[] {
-    return [r.pressReturn.propsStable, ...otherProps];
-}*/
 
 export interface UsePressParameters<E extends Node> {
     refElementReturn: Required<Pick<UseRefElementReturnType<E>["refElementReturn"], "getElement">>;
     pressParameters: {
-        onPressingChange?: OnPassiveStateChange<boolean, h.JSX.TargetedEvent<E>>;
+        onPressingChange?: OnPassiveStateChange<boolean, JSX.TargetedEvent<E>>;
 
         /**
          * What should happen when this widget has been "pressed".
@@ -24,7 +21,7 @@ export interface UsePressParameters<E extends Node> {
          * 
          * Setting to `null` or `undefined` effectively disables the press event handler.
          */
-        onPressSync: ((e: h.JSX.TargetedEvent<E>) => void) | null | undefined;
+        onPressSync: ((e: JSX.TargetedEvent<E>) => void) | null | undefined;
 
         /** Pass a function that returns `true` to prevent the spacebar from contributing to press events */
         excludeSpace?(): boolean;
@@ -80,7 +77,7 @@ export interface UsePressReturnType<E extends Element> {
         longPress: boolean | null;
     }
 
-    props: h.JSX.HTMLAttributes<E>;
+    props: ElementProps<E>;
 }
 
 function supportsPointerEvents() {
@@ -121,7 +118,7 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
     const excludePointer = useStableCallback(ep ?? returnFalse);
     const onPressingChange = useStableCallback(opc ?? noop);
 
-    const [getIsPressing, setIsPressing] = usePassiveState<boolean, h.JSX.TargetedEvent<E>>(onPressingChange, returnFalse);
+    const [getIsPressing, setIsPressing] = usePassiveState<boolean, JSX.TargetedEvent<E>>(onPressingChange, returnFalse);
     const hasPressEvent = (onPressSync != null);
 
     /**
@@ -156,7 +153,7 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
     // a programmatic onClick event, which could come from any non-user source.
     // We want to handle those just like GUI clicks, but we don't want to double-up on press events.
     // So if we handle a press from pointerup, we ignore any subsequent click events, at least for a tick.
-    const [getJustHandled, setJustHandled] = usePassiveState<boolean, h.JSX.TargetedEvent<E>>(useStableCallback((justHandled, _p, reason) => {
+    const [getJustHandled, setJustHandled] = usePassiveState<boolean, JSX.TargetedEvent<E>>(useStableCallback((justHandled, _p, reason) => {
         if (justHandled) {
             const h = setTimeout(() => {
                 setJustHandled(false, reason);
@@ -169,7 +166,7 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
     const [waitingForSpaceUp, setWaitingForSpaceUp, getWaitingForSpaceUp] = useState(false);
     const [pointerDownStartedHere, setPointerDownStartedHere, getPointerDownStartedHere] = useState(false);
     const [hovering, setHovering, getHovering] = useState(false);
-    const onTouchStart = useCallback((e: h.JSX.TargetedTouchEvent<E>) => {
+    const onTouchStart = useCallback((e: JSX.TargetedTouchEvent<E>) => {
         e.preventDefault();
         e.stopPropagation();
         setIsPressing(true, e);
@@ -181,7 +178,7 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
         if (element)
             focusSelf(element);
     }, []);
-    const onTouchMove = useCallback((e: h.JSX.TargetedTouchEvent<E>) => {
+    const onTouchMove = useCallback((e: JSX.TargetedTouchEvent<E>) => {
         e.preventDefault();
         e.stopPropagation();
         const element = getElement();
@@ -202,7 +199,7 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
         setIsPressing(hoveringAtAnyPoint && getPointerDownStartedHere(), e);
         setHovering(hoveringAtAnyPoint);
     }, []);
-    const onTouchEnd = useCallback((e: h.JSX.TargetedTouchEvent<E>) => {
+    const onTouchEnd = useCallback((e: JSX.TargetedTouchEvent<E>) => {
         e.preventDefault();
         e.stopPropagation();
         const hovering = getHovering();
@@ -218,7 +215,7 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
         setIsPressing(false, e);
     }, []);
 
-    const onPointerDown = useCallback((e: h.JSX.TargetedPointerEvent<E>) => {
+    const onPointerDown = useCallback((e: JSX.TargetedPointerEvent<E>) => {
         if (!excludePointer()) {
             if ((e.buttons & 1)) {
                 e.preventDefault();
@@ -234,7 +231,7 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
             }
         }
     }, []);
-    const onPointerMove = useStableCallback((e: h.JSX.TargetedPointerEvent<E>) => {
+    const onPointerMove = useStableCallback((e: JSX.TargetedPointerEvent<E>) => {
         let listeningForPress = getPointerDownStartedHere();
         // If we're hovering over this element and not holding down the mouse button (or whatever other primary button)
         // then we're definitely not in a press anymore (if we could we'd just wait for onPointerUp, but it could happen outside this element)
@@ -253,7 +250,7 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
         }
 
     })
-    const onPointerUp = useCallback((e: h.JSX.TargetedPointerEvent<E>) => {
+    const onPointerUp = useCallback((e: JSX.TargetedPointerEvent<E>) => {
         const hovering = getHovering();
         const pointerDownStartedHere = getPointerDownStartedHere();
 
@@ -272,10 +269,10 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
         setIsPressing(false, e);
 
     }, []);
-    const onPointerEnter = useCallback((_e: h.JSX.TargetedPointerEvent<E>) => {
+    const onPointerEnter = useCallback((_e: JSX.TargetedPointerEvent<E>) => {
         setHovering(true);
     }, [])
-    const onPointerLeave = useCallback((_e: h.JSX.TargetedPointerEvent<E>) => {
+    const onPointerLeave = useCallback((_e: JSX.TargetedPointerEvent<E>) => {
         setHovering(false);
         setLongPress(false);
     }, []);
@@ -354,7 +351,7 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
     });
 
 
-    const onKeyDown = useStableCallback((e: h.JSX.TargetedKeyboardEvent<E>) => {
+    const onKeyDown = useStableCallback((e: JSX.TargetedKeyboardEvent<E>) => {
         if (onPressSync) {
             if (e.key == " " && !excludeSpace()) {
                 // We don't actually activate it on a space keydown
@@ -374,7 +371,7 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
         }
     })
 
-    const onKeyUp = useStableCallback((e: h.JSX.TargetedKeyboardEvent<E>) => {
+    const onKeyUp = useStableCallback((e: JSX.TargetedKeyboardEvent<E>) => {
         const waitingForSpaceUp = getWaitingForSpaceUp();
         if (waitingForSpaceUp && e.key == " " && !excludeSpace()) {
             handlePress(e);
@@ -382,7 +379,7 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
         }
     })
 
-    const onClick = useStableCallback((e: h.JSX.TargetedMouseEvent<E>) => {
+    const onClick = useStableCallback((e: JSX.TargetedMouseEvent<E>) => {
         const element = getElement();
         if (onPressSync) {
             e.preventDefault();
@@ -422,7 +419,7 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
     });
 
 
-    const onFocusOut = useStableCallback((e: h.JSX.TargetedFocusEvent<E>) => {
+    const onFocusOut = useStableCallback((e: JSX.TargetedFocusEvent<E>) => {
         setWaitingForSpaceUp(false);
         setIsPressing(false, e);
     })

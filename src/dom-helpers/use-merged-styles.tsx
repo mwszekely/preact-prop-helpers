@@ -1,9 +1,10 @@
-import { h } from "preact";
+import type { JSX } from "preact";
+import { ElementProps } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 
-function styleStringToObject(style: string): h.JSX.CSSProperties {
+function styleStringToObject(style: string): JSX.CSSProperties {
     // TODO: This sucks D:
-    return Object.fromEntries(style.split(";").map(statement => statement.split(":"))) as unknown as h.JSX.CSSProperties;
+    return Object.fromEntries(style.split(";").map(statement => statement.split(":"))) as unknown as JSX.CSSProperties;
 }
 
 /**
@@ -13,7 +14,7 @@ function styleStringToObject(style: string): h.JSX.CSSProperties {
  * @param obj The CSS properties you want added to the user-given style
  * @returns A CSS object containing the properties of both objects.
  */
-export function useMergedStyles(lhs: h.JSX.HTMLAttributes<EventTarget>["style"], rhs: h.JSX.HTMLAttributes<EventTarget>["style"]): h.JSX.HTMLAttributes<EventTarget>["style"] {
+export function useMergedStyles(lhs: ElementProps<EventTarget>["style"], rhs: ElementProps<EventTarget>["style"]): ElementProps<EventTarget>["style"] {
     monitorCallCount(useMergedStyles);
 
     // Easy case, when there are no styles to merge return nothing.
@@ -32,9 +33,9 @@ export function useMergedStyles(lhs: h.JSX.HTMLAttributes<EventTarget>["style"],
         if (lhs && rhs) {
             // (useMergedStyles isn't a true hook -- this isn't a violation)
             if (typeof lhs == "string")
-                return useMergedStyles(styleStringToObject(lhs as string), rhs) as h.JSX.CSSProperties;
+                return useMergedStyles(styleStringToObject(lhs as string), rhs) as JSX.CSSProperties;
             if (typeof rhs == "string")
-                return useMergedStyles(lhs, styleStringToObject(rhs as string)) as h.JSX.CSSProperties;
+                return useMergedStyles(lhs, styleStringToObject(rhs as string)) as JSX.CSSProperties;
         }
 
         // Logic???
@@ -48,8 +49,8 @@ export function useMergedStyles(lhs: h.JSX.HTMLAttributes<EventTarget>["style"],
 
     // They're both objects, just merge them.
     return {
-        ...(lhs ?? {}) as h.JSX.CSSProperties,
-        ...(rhs ?? {}) as h.JSX.CSSProperties
-    } as unknown as h.JSX.CSSProperties
+        ...(lhs ?? {}) as JSX.CSSProperties,
+        ...(rhs ?? {}) as JSX.CSSProperties
+    } as unknown as JSX.CSSProperties
 }
 

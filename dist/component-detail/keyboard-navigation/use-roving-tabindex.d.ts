@@ -1,9 +1,8 @@
-import { h } from "preact";
 import { StateUpdater } from "preact/hooks";
 import { UseHasCurrentFocusParameters } from "../../observers/use-has-current-focus.js";
 import { ManagedChildInfo, UseManagedChildParameters, UseManagedChildrenContext, UseManagedChildrenParameters, UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
 import { OnPassiveStateChange, PassiveStateUpdater } from "../../preact-extensions/use-passive-state.js";
-import { OmitStrong } from "../../util/types.js";
+import { ElementProps, OmitStrong } from "../../util/types.js";
 export type SetTabbableIndex = (updater: Parameters<PassiveStateUpdater<number | null, Event>>[0], reason: Event | undefined, fromUserInteraction: boolean) => void;
 export type OnTabbableIndexChange = (tabbableIndex: number | null) => void;
 export interface UseRovingTabIndexChildInfo<TabbableChildElement extends Element> extends ManagedChildInfo<number> {
@@ -135,7 +134,7 @@ export interface UseRovingTabIndexChildReturnType<ChildElement extends Element, 
      *
      * The object itself, as well as the properties within it, are unstable and should be rendered by the same component that uses this hook.
      */
-    props: h.JSX.HTMLAttributes<ChildElement>;
+    props: ElementProps<ChildElement>;
 }
 /**
  * Implements a roving tabindex system where only one "focusable"

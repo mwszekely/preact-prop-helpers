@@ -1,5 +1,5 @@
 
-import { cloneElement, h, VNode } from "preact";
+import { cloneElement, type JSX, type VNode } from "preact";
 import { createPortal } from "preact/compat";
 import { useCallback, useLayoutEffect, useMemo } from "preact/hooks";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
@@ -62,8 +62,8 @@ export function usePortalChildren({ target }: UsePortalChildrenParameters) {
 
 
 export type PortalChildUpdater<S> = (value: ((prevState: S) => S)) => void;
-export type PushPortalChild = (child: h.JSX.Element) => number;
-export type UpdatePortalChild = (index: number, child: h.JSX.Element) => void;
+export type PushPortalChild = (child: JSX.Element) => number;
+export type UpdatePortalChild = (index: number, child: JSX.Element) => void;
 export type RemovePortalChild = (index: number) => void;
 
 
@@ -71,15 +71,15 @@ export type RemovePortalChild = (index: number) => void;
  * Implementation
  */
 function PortalChildren({ setPushChild, setUpdateChild, setRemoveChild }: { setPushChild: PortalChildUpdater<PushPortalChild | null>, setUpdateChild: PortalChildUpdater<UpdatePortalChild | null>, setRemoveChild: PortalChildUpdater<RemovePortalChild | null> }) {
-    const [children, setChildren, getChildren] = useState<h.JSX.Element[]>([]);
-    const pushChild: PushPortalChild | null = useCallback((child: h.JSX.Element) => {
+    const [children, setChildren, getChildren] = useState<JSX.Element[]>([]);
+    const pushChild: PushPortalChild | null = useCallback((child: JSX.Element) => {
         const randomKey = generateRandomId();
         let index = getChildren().length;
         setChildren(prev => ([...prev, cloneElement(child, { key: randomKey, index })]));
         return index;
     }, []);
 
-    const updateChild: UpdatePortalChild | null = useCallback((index: number, child: h.JSX.Element) => {
+    const updateChild: UpdatePortalChild | null = useCallback((index: number, child: JSX.Element) => {
         const key = getChildren()[index]?.key;
         console.assert(key);
         if (key) {

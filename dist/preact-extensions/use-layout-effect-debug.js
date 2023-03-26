@@ -1,6 +1,6 @@
 import { useLayoutEffect as useLayoutEffectNative } from "preact/hooks";
-import { useEffectDebug } from "./use-effect-debug.js";
 import { monitorCallCount } from "../util/use-call-count.js";
+import { useEffectDebug } from "./use-effect-debug.js";
 /**
  * Wrap the native `useLayoutEffect` to add arguments
  * that allow accessing the previous value as the first argument,

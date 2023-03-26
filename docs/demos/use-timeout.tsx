@@ -1,4 +1,4 @@
-import { h } from "preact";
+import type { JSX } from "preact";
 import { useState } from "preact/hooks";
 import { useTimeout } from "../../dist/index.js";
 

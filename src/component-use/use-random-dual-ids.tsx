@@ -1,5 +1,5 @@
-import { h } from "preact";
 import { useMergedProps } from "../dom-helpers/use-merged-props.js";
+import { ElementProps } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 import { useRandomId, UseRandomIdParameters, UseRandomIdReturnType } from "./use-random-id.js";
 
@@ -10,8 +10,8 @@ export interface UseRandomDualIdsParameters {
 }
 
 export interface UseRandomDualIdsReturnType<InputElement extends Element, LabelElement extends Element> {
-    propsInput: h.JSX.HTMLAttributes<InputElement>;
-    propsLabel: h.JSX.HTMLAttributes<LabelElement>;
+    propsInput: ElementProps<InputElement>;
+    propsLabel: ElementProps<LabelElement>;
     randomIdInputReturn: UseRandomIdReturnType<InputElement, LabelElement>["randomIdReturn"];
     randomIdLabelReturn: UseRandomIdReturnType<LabelElement, InputElement>["randomIdReturn"];
 }

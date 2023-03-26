@@ -1,11 +1,10 @@
-import { h } from "preact";
 import { useCallback, useRef } from "preact/hooks";
+import { ManagedChildInfo } from "../../index.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
-import { OmitStrong } from "../../util/types.js";
+import { ElementProps, OmitStrong } from "../../util/types.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
-import { ManagedChildInfo } from "../../index.js";
 
 export interface LinearNavigationResult {
     valueUnmangled: number | null;
@@ -15,7 +14,7 @@ export interface LinearNavigationResult {
 
 export interface UseLinearNavigationReturnType<ParentOrChildElement extends Element> {
     linearNavigationReturn: {}
-    propsStable: h.JSX.HTMLAttributes<ParentOrChildElement>;
+    propsStable: ElementProps<ParentOrChildElement>;
 }
 
 export interface UseLinearNavigationChildInfo<ChildElement extends Element> extends ManagedChildInfo<number> {}
@@ -197,8 +196,8 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
     const getPageNavigationSize = useStableGetter(linearNavigationParameters.pageNavigationSize);
 
 
-    const stableProps = useRef<h.JSX.HTMLAttributes<ParentOrChildElement>>({
-        onKeyDown: (e: h.JSX.TargetedKeyboardEvent<ParentOrChildElement>) => {
+    const stableProps = useRef<ElementProps<ParentOrChildElement>>({
+        onKeyDown: (e) => {
             // Not handled by typeahead (i.e. assume this is a keyboard shortcut)
             if (e.ctrlKey || e.metaKey)
                 return;

@@ -1,5 +1,5 @@
-import { h } from "preact";
 import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
+import { ElementProps } from "../util/types.js";
 export interface UseFocusTrapParameters<SourceElement extends Element | null, PopupElement extends Element> {
     refElementReturn: Pick<UseRefElementReturnType<NonNullable<PopupElement>>["refElementReturn"], "getElement">;
     focusTrapParameters: {
@@ -38,7 +38,7 @@ export interface UseFocusTrapParameters<SourceElement extends Element | null, Po
     };
 }
 export interface UseFocusTrapReturnType<E extends Element> {
-    props: h.JSX.HTMLAttributes<E>;
+    props: ElementProps<E>;
     focusTrapReturn: {};
 }
 export declare function useFocusTrap<SourceElement extends Element | null, PopupElement extends Element>({ focusTrapParameters: { onlyMoveFocus, trapActive, focusPopup: focusSelfUnstable, focusOpener: focusOpenerUnstable }, refElementReturn }: UseFocusTrapParameters<SourceElement, PopupElement>): UseFocusTrapReturnType<PopupElement>;

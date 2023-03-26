@@ -1,14 +1,14 @@
-import { h } from "preact";
 import { UsePressParameters } from "../../component-use/use-press.js";
 import { UseRefElementReturnType } from "../../dom-helpers/use-ref-element.js";
 import { UseTextContentParameters, UseTextContentReturnType } from "../../dom-helpers/use-text-content.js";
+import { ElementProps } from "../../util/types.js";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexChildParameters, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
 export interface UseTypeaheadNavigationReturnType<ParentOrChildElement extends Element> {
     typeaheadNavigationReturn: {
         getCurrentTypeahead(): string | null;
         typeaheadStatus: "invalid" | "valid" | "none";
     };
-    propsStable: h.JSX.HTMLAttributes<ParentOrChildElement>;
+    propsStable: ElementProps<ParentOrChildElement>;
     context: UseTypeaheadNavigationContext;
 }
 export interface UseTypeaheadNavigationContext {

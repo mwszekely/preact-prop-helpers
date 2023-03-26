@@ -1,5 +1,5 @@
 
-import { Component, options, VNode } from "preact";
+import { options } from "preact";
 import { EffectCallback, Inputs, useEffect, useState } from "preact/hooks";
 import { generateRandomId } from "../util/random-id.js";
 import { monitorCallCount } from "../util/use-call-count.js";

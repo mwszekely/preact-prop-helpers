@@ -1,5 +1,5 @@
 
-import { h } from "preact";
+import type { JSX } from "preact";
 import { OnPassiveStateChange, PassiveStateUpdater, returnFalse, runImmediately, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useStableObject } from "../preact-extensions/use-stable-getter.js";
@@ -12,7 +12,7 @@ export interface UseChildrenHaveFocusParameters<T extends Element> {
         /**
          * Fires `true` once any of the children have become focused, and `false` once all of the children have become unfocused.
          */
-        onCompositeFocusChange: null | OnPassiveStateChange<boolean, h.JSX.TargetedEvent<T>>;
+        onCompositeFocusChange: null | OnPassiveStateChange<boolean, JSX.TargetedEvent<T>>;
     }
 }
 
@@ -28,7 +28,7 @@ export interface UseChildrenHaveFocusReturnType<T extends Element> {
 export interface UseChildrenHaveFocusContext<T extends Element> {
     childrenHaveFocusChildContext: {
         /** **STABLE** */
-        setFocusCount: PassiveStateUpdater<number, h.JSX.TargetedEvent<T>>;
+        setFocusCount: PassiveStateUpdater<number, JSX.TargetedEvent<T>>;
     }
 }
 
@@ -49,7 +49,7 @@ export interface UseChildrenHaveFocusChildParameters<T extends Element> {
 export function useChildrenHaveFocus<ChildElement extends Element>(args: UseChildrenHaveFocusParameters<ChildElement>): UseChildrenHaveFocusReturnType<ChildElement> {
     monitorCallCount(useChildrenHaveFocus);
 
-    type R = h.JSX.TargetedEvent<ChildElement>;
+    type R = JSX.TargetedEvent<ChildElement>;
     const { childrenHaveFocusParameters: { onCompositeFocusChange } } = args;
 
     const [getAnyFocused, setAnyFocused] = usePassiveState<boolean, R>(onCompositeFocusChange, returnFalse, runImmediately);

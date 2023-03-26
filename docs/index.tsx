@@ -1,12 +1,12 @@
-import { createContext, h, render, VNode } from "preact";
+import { JSX, createContext, render } from "preact";
 import { memo } from "preact/compat";
-import { useCallback, useContext, useRef } from "preact/hooks";
-import { CompleteGridNavigationContext, CompleteGridNavigationRowContext, UseStaggeredChildContext, ElementSize, GetIndex, returnNull, useAnimationFrame, useAsyncHandler, useChildrenHaveFocus, useChildrenHaveFocusChild, UseChildrenHaveFocusChildParameters, useCompleteGridNavigation, useCompleteGridNavigationCell, UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationReturnType, useCompleteGridNavigationRow, UseCompleteGridNavigationRowInfo, UseCompleteGridNavigationRowReturnType, useDraggable, useDroppable, useElementSize, useFocusTrap, useGlobalHandler, useHasCurrentFocus, useHasLastFocus, useInterval, useManagedChildren, UseManagedChildrenContext, useMergedProps, usePortalChildren, usePress, useRandomDualIds, useRefElement, useStableCallback, UseStaggeredChildrenInfo, useState, useStaggeredChildren, useManagedChild, useStaggeredChild } from "../dist/index.js";
+import { useContext, useRef } from "preact/hooks";
+import { ElementSize, UseChildrenHaveFocusChildParameters, UseManagedChildrenContext, UseStaggeredChildContext, UseStaggeredChildrenInfo, useAnimationFrame, useAsyncHandler, useChildrenHaveFocus, useChildrenHaveFocusChild, useDraggable, useDroppable, useElementSize, useFocusTrap, useGlobalHandler, useHasCurrentFocus, useHasLastFocus, useInterval, useManagedChild, useManagedChildren, useMergedProps, usePortalChildren, usePress, useRandomDualIds, useRefElement, useStableCallback, useStaggeredChild, useStaggeredChildren, useState } from "../dist/index.js";
+import { DemoUseGrid } from "./demos/use-grid.js";
 import { DemoUseInterval } from "./demos/use-interval.js";
 import { DemoUseModal } from "./demos/use-modal.js";
 import { DemoUseRovingTabIndex } from "./demos/use-roving-tab-index.js";
 import { DemoUseTimeout } from "./demos/use-timeout.js";
-import { DemoUseGrid } from "./demos/use-grid.js";
 
 const DemoUseDroppable = () => {
     const { droppedFiles, droppedStrings, filesForConsideration, stringsForConsideration, propsStable: props, dropError } = useDroppable<HTMLDivElement>({ effect: "copy" });
@@ -175,7 +175,7 @@ const DemoUseAsyncHandler1 = memo(() => {
     const [shouldThrow, setShouldThrow, getShouldThrow] = useState(false);
     const [disableConsecutive, setDisableConsecutive] = useState(false);
 
-    const asyncOnClick = ((_v: void, _e: h.JSX.TargetedMouseEvent<HTMLButtonElement>) => new Promise<void>((resolve, reject) => window.setTimeout(() => getShouldThrow() ? reject() : resolve(), timeout)));
+    const asyncOnClick = ((_v: void, _e: JSX.TargetedMouseEvent<HTMLButtonElement>) => new Promise<void>((resolve, reject) => window.setTimeout(() => getShouldThrow() ? reject() : resolve(), timeout)));
     const {
         callCount,
         settleCount,
@@ -185,7 +185,7 @@ const DemoUseAsyncHandler1 = memo(() => {
         hasError,
         rejectCount,
         resolveCount
-    } = useAsyncHandler<h.JSX.TargetedMouseEvent<HTMLButtonElement>, void>({ asyncHandler: asyncOnClick, capture: () => { }, debounce: debounce == 0 ? undefined : debounce });
+    } = useAsyncHandler<JSX.TargetedMouseEvent<HTMLButtonElement>, void>({ asyncHandler: asyncOnClick, capture: () => { }, debounce: debounce == 0 ? undefined : debounce });
 
     const onClick = pending ? undefined : syncHandler;
 
@@ -248,9 +248,9 @@ const DemoUseAsyncHandler2 = memo(() => {
         resolveCount,
         debouncingAsync,
         debouncingSync
-    } = useAsyncHandler<h.JSX.TargetedEvent<HTMLInputElement>, string>({
+    } = useAsyncHandler<JSX.TargetedEvent<HTMLInputElement>, string>({
         asyncHandler: onInputAsync,
-        capture: (e: h.JSX.TargetedEvent<HTMLInputElement>) => { e.preventDefault(); return e.currentTarget.value },
+        capture: (e: JSX.TargetedEvent<HTMLInputElement>) => { e.preventDefault(); return e.currentTarget.value },
         debounce: debounce == 0 ? undefined : debounce,
         throttle: throttle == 0 ? undefined : throttle
     });
@@ -461,7 +461,7 @@ const DemoGlobalHandlerChildren = memo(function DemoGlobalHandlerChildren({ coun
 
 const DemoGlobalHandlerChild = memo(function DemoGlobalHandlerChild({ mode, target }: { target: Window | Document, mode: "grouped" | "single" | null }) {
 
-    useGlobalHandler(target, "click", mode == null ? null : (e: h.JSX.TargetedMouseEvent<HTMLButtonElement>) => {
+    useGlobalHandler(target, "click", mode == null ? null : (e: JSX.TargetedMouseEvent<HTMLButtonElement>) => {
         if ((e.target as Element | null)?.id != "global-handler-test2")
             return;
         (window as any)._demo_event = ((window as any)._demo_event || 0) + 1

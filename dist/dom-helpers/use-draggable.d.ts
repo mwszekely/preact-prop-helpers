@@ -1,7 +1,7 @@
-import { h } from "preact";
+import { ElementProps } from "../util/types.js";
 export interface UseDraggableReturnType<E extends EventTarget> {
     /** *Unstable* */
-    propsUnstable: h.JSX.HTMLAttributes<E>;
+    propsUnstable: ElementProps<E>;
     /**
      * Returns true if the element in question is currently being dragged
      */

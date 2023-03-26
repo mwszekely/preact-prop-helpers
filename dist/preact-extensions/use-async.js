@@ -1,9 +1,9 @@
 import { identity } from "lodash-es";
 import { useCallback, useEffect, useMemo } from "preact/hooks";
-import { useStableCallback } from "./use-stable-callback.js";
-import { useState } from "./use-state.js";
 import { asyncToSync } from "../util/async-to-sync.js";
 import { monitorCallCount } from "../util/use-call-count.js";
+import { useStableCallback } from "./use-stable-callback.js";
+import { useState } from "./use-state.js";
 function identityCapture(...t) { return t; }
 const AsyncFunction = ((async function () { }).constructor);
 /**

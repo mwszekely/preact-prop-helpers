@@ -1,10 +1,10 @@
-import { h } from "preact";
 import { useCallback, useRef } from "preact/hooks";
 import { OnPassiveStateChange, returnNull, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
+import { ElementProps } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 
 export interface UseRefElementReturnType<T extends EventTarget> {
-    propsStable: h.JSX.HTMLAttributes<T>;
+    propsStable: ElementProps<T>;
 
     refElementReturn: {
         /** **STABLE** */
@@ -29,7 +29,7 @@ export interface UseRefElementParameters<T> {
 
 
 /*
-export function useRefElementProps<E extends Element>(r: UseRefElementReturnType<E>, ...otherProps: h.JSX.HTMLAttributes<E>[]): h.JSX.HTMLAttributes<E>[] {
+export function useRefElementProps<E extends Element>(r: UseRefElementReturnType<E>, ...otherProps: ElementProps<E>[]): ElementProps<E>[] {
     return [r.refElementReturn.propsStable, ...otherProps];
 }*/
 
@@ -62,7 +62,7 @@ export function useRefElement<T extends EventTarget>(args: UseRefElementParamete
 
     // Let us store the actual (reference to) the element we capture
     const [getElement, setElement] = usePassiveState<T | null, never>(handler, returnNull, runImmediately);
-    const propsStable = useRef<h.JSX.HTMLAttributes<T>>({ ref: setElement });
+    const propsStable = useRef<ElementProps<T>>({ ref: setElement });
 
     // Return both the element and the hook that modifies 
     // the props and allows us to actually find the element

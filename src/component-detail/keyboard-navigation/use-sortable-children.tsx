@@ -1,8 +1,8 @@
 import { shuffle as lodashShuffle } from "lodash-es";
-import { h, VNode } from "preact";
-import { MutableRef, useCallback, useLayoutEffect, useRef } from "preact/hooks";
+import { VNode, createElement } from "preact";
+import { useCallback, useLayoutEffect, useRef } from "preact/hooks";
 import { useForceUpdate } from "../../preact-extensions/use-force-update.js";
-import { ManagedChildInfo, ManagedChildren, UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
+import { ManagedChildInfo, UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
 import { returnNull, useEnsureStability, usePassiveState } from "../../preact-extensions/use-passive-state.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
@@ -215,7 +215,7 @@ export function useRearrangeableChildren<M extends UseSortableChildInfo>({
             .map(child => ({ child, mangledIndex: indexMangler(getIndex(child)!), demangledIndex: getIndex(child) }))
             .sort((lhs, rhs) => { return lhs.mangledIndex - rhs.mangledIndex })
             .map(({ child, mangledIndex, demangledIndex }) => {
-                return h(child.type as any, { ...child.props, key: demangledIndex, "data-mangled-index": mangledIndex, "data-unmangled-index": demangledIndex });
+                return createElement(child.type as any, { ...child.props, key: demangledIndex, "data-mangled-index": mangledIndex, "data-unmangled-index": demangledIndex });
             });
     }, []);
 

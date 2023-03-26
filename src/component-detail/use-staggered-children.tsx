@@ -1,11 +1,11 @@
-import { h } from "preact";
 import { useCallback, useEffect, useLayoutEffect, useRef } from "preact/hooks";
-import { UseRovingTabIndexChildInfo } from "./keyboard-navigation/use-roving-tabindex.js";
 import { UseManagedChildrenReturnType } from "../preact-extensions/use-managed-children.js";
 import { returnNull, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableObject } from "../preact-extensions/use-stable-getter.js";
 import { useState } from "../preact-extensions/use-state.js";
+import { ElementProps } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
+import { UseRovingTabIndexChildInfo } from "./keyboard-navigation/use-roving-tabindex.js";
 
 export interface UseStaggeredChildrenInfo<E extends Element> extends Pick<UseRovingTabIndexChildInfo<E>, "hidden" | "index"> {
     setParentIsStaggered(parentIsStaggered: boolean): void;
@@ -172,7 +172,7 @@ export interface UseStaggeredChildParameters {
 }
 
 export interface UseStaggeredChildReturn<ChildElement extends Element> {
-    props: h.JSX.HTMLAttributes<ChildElement>;
+    props: ElementProps<ChildElement>;
     staggeredChildReturn: {
         /** Whether the parent has indicated that all of its children, including this one, are staggered. */
         isStaggered: boolean;

@@ -1,4 +1,4 @@
-import { h } from "preact";
+import type { JSX } from "preact";
 import { useCallback, useEffect, useRef } from "preact/hooks";
 import { getDocument } from "../dom-helpers/use-document-class.js";
 import { UseRefElementParameters, UseRefElementReturnType, useRefElement } from "../dom-helpers/use-ref-element.js";
@@ -14,7 +14,7 @@ export interface UseElementSizeParameters<T extends Element> extends UseRefEleme
          * values you use if you'd like.
          * @param sizeInfo 
          */
-        onSizeChange(sizeInfo: ElementSize, prevSize: ElementSize | undefined, entries: ResizeObserverEntry[] | h.JSX.TargetedEvent<T>): void;
+        onSizeChange(sizeInfo: ElementSize, prevSize: ElementSize | undefined, entries: ResizeObserverEntry[] | JSX.TargetedEvent<T>): void;
 
         /**
          * Passed as an argument to the created ResizeObserver.

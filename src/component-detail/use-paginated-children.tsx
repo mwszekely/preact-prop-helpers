@@ -1,12 +1,12 @@
-import { h } from "preact";
 import { useCallback, useLayoutEffect, useRef } from "preact/hooks";
-import { UseLinearNavigationParameters } from "./keyboard-navigation/use-linear-navigation.js";
-import { UseRovingTabIndexChildInfo } from "./keyboard-navigation/use-roving-tabindex.js";
 import { UseManagedChildrenReturnType } from "../preact-extensions/use-managed-children.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useStableObject } from "../preact-extensions/use-stable-getter.js";
 import { useState } from "../preact-extensions/use-state.js";
+import { ElementProps } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
+import { UseLinearNavigationParameters } from "./keyboard-navigation/use-linear-navigation.js";
+import { UseRovingTabIndexChildInfo } from "./keyboard-navigation/use-roving-tabindex.js";
 
 export interface UsePaginatedChildrenInfo<E extends Element> extends UseRovingTabIndexChildInfo<E> {
     setParentIsPaginated(parentIsPaginated: boolean): void;
@@ -112,7 +112,7 @@ export interface UsePaginatedChildParameters {
 }
 
 export interface UsePaginatedChildReturn<ChildElement extends Element> {
-    props: h.JSX.HTMLAttributes<ChildElement>;
+    props: ElementProps<ChildElement>;
     paginatedChildReturn: {
         paginatedVisible: boolean;
         isPaginated: boolean;
@@ -132,7 +132,7 @@ export function usePaginatedChild<ChildElement extends Element>({ info: { index 
 
 
     return {
-        props: !parentIsPaginated ? {} : (({ "aria-setsize": childCountIfPaginated ?? undefined, "aria-posinset": (index + 1) } as h.JSX.HTMLAttributes<ChildElement>)),
+        props: !parentIsPaginated ? {} : (({ "aria-setsize": childCountIfPaginated ?? undefined, "aria-posinset": (index + 1) } as ElementProps<ChildElement>)),
         paginatedChildReturn: { paginatedVisible, isPaginated: parentIsPaginated, hideBecausePaginated: parentIsPaginated ? !paginatedVisible : false },
         info: {
             setPaginationVisible: setPaginatedVisible,

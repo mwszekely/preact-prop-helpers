@@ -1,13 +1,13 @@
-import { h } from "preact";
-import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
 import { ManagedChildInfo } from "../../index.js";
+import { ElementProps } from "../../util/types.js";
+import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
 export interface LinearNavigationResult {
     valueUnmangled: number | null;
     status: "normal" | "past-start" | "past-end";
 }
 export interface UseLinearNavigationReturnType<ParentOrChildElement extends Element> {
     linearNavigationReturn: {};
-    propsStable: h.JSX.HTMLAttributes<ParentOrChildElement>;
+    propsStable: ElementProps<ParentOrChildElement>;
 }
 export interface UseLinearNavigationChildInfo<ChildElement extends Element> extends ManagedChildInfo<number> {
 }

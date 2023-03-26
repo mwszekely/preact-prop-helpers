@@ -1,7 +1,8 @@
-import { createElement, Fragment, h } from "preact";
+import { createElement, Fragment } from "preact";
+import { ElementProps } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 
-export function useMergedChildren(lhs: h.JSX.HTMLAttributes<EventTarget>["children"], rhs: h.JSX.HTMLAttributes<EventTarget>["children"]): h.JSX.HTMLAttributes<EventTarget>["children"] {
+export function useMergedChildren(lhs: ElementProps<EventTarget>["children"], rhs: ElementProps<EventTarget>["children"]): ElementProps<EventTarget>["children"] {
     monitorCallCount(useMergedChildren);
     
     if (lhs == null && rhs == null) {

@@ -1,6 +1,6 @@
-import { h } from "preact";
-import { UseRovingTabIndexChildInfo } from "./keyboard-navigation/use-roving-tabindex.js";
 import { UseManagedChildrenReturnType } from "../preact-extensions/use-managed-children.js";
+import { ElementProps } from "../util/types.js";
+import { UseRovingTabIndexChildInfo } from "./keyboard-navigation/use-roving-tabindex.js";
 export interface UseStaggeredChildrenInfo<E extends Element> extends Pick<UseRovingTabIndexChildInfo<E>, "hidden" | "index"> {
     setParentIsStaggered(parentIsStaggered: boolean): void;
     setStaggeredVisible(visible: boolean): void;
@@ -41,7 +41,7 @@ export interface UseStaggeredChildParameters {
     context: UseStaggeredChildContext;
 }
 export interface UseStaggeredChildReturn<ChildElement extends Element> {
-    props: h.JSX.HTMLAttributes<ChildElement>;
+    props: ElementProps<ChildElement>;
     staggeredChildReturn: {
         /** Whether the parent has indicated that all of its children, including this one, are staggered. */
         isStaggered: boolean;

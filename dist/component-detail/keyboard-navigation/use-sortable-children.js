@@ -1,5 +1,5 @@
 import { shuffle as lodashShuffle } from "lodash-es";
-import { h } from "preact";
+import { createElement } from "preact";
 import { useCallback, useLayoutEffect, useRef } from "preact/hooks";
 import { useForceUpdate } from "../../preact-extensions/use-force-update.js";
 import { returnNull, useEnsureStability, usePassiveState } from "../../preact-extensions/use-passive-state.js";
@@ -80,7 +80,7 @@ export function useRearrangeableChildren({ rearrangeableChildrenParameters: { ge
             .map(child => ({ child, mangledIndex: indexMangler(getIndex(child)), demangledIndex: getIndex(child) }))
             .sort((lhs, rhs) => { return lhs.mangledIndex - rhs.mangledIndex; })
             .map(({ child, mangledIndex, demangledIndex }) => {
-            return h(child.type, { ...child.props, key: demangledIndex, "data-mangled-index": mangledIndex, "data-unmangled-index": demangledIndex });
+            return createElement(child.type, { ...child.props, key: demangledIndex, "data-mangled-index": mangledIndex, "data-unmangled-index": demangledIndex });
         });
     }, []);
     const toJsonArray = useCallback((transform) => {

@@ -1,4 +1,4 @@
-import { h, VNode } from "preact";
+import { type JSX, type VNode } from "preact";
 export interface UsePortalChildrenParameters {
     target: string | Element | null;
 }
@@ -27,7 +27,7 @@ export declare function usePortalChildren({ target }: UsePortalChildrenParameter
     portalElement: Element | null;
 };
 export type PortalChildUpdater<S> = (value: ((prevState: S) => S)) => void;
-export type PushPortalChild = (child: h.JSX.Element) => number;
-export type UpdatePortalChild = (index: number, child: h.JSX.Element) => void;
+export type PushPortalChild = (child: JSX.Element) => number;
+export type UpdatePortalChild = (index: number, child: JSX.Element) => void;
 export type RemovePortalChild = (index: number) => void;
 //# sourceMappingURL=use-portal-children.d.ts.map

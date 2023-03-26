@@ -1,11 +1,12 @@
-import { Ref, RenderableProps, createElement, h } from "preact";
+import { type JSX, type Ref, type RenderableProps } from "preact";
 import { UseRefElementReturnType } from "./use-ref-element.js";
+import { ElementProps } from "../util/types.js";
 export type SetChildren = ((children: string | null) => void);
 export type GetClass = (cls: string) => boolean;
 export type SetClass = (cls: string, enabled: boolean) => void;
-export type SetStyle = <T extends (keyof CSSStyleDeclaration) & string>(prop: T, value: h.JSX.CSSProperties[T] | null) => void;
-export type GetAttribute<T extends Element> = <K extends keyof h.JSX.HTMLAttributes<T>>(prop: K) => h.JSX.HTMLAttributes<T>[K];
-export type SetAttribute<T extends Element> = <K extends keyof h.JSX.HTMLAttributes<T>>(prop: K, value: h.JSX.HTMLAttributes<T>[K] | null) => void;
+export type SetStyle = <T extends (keyof CSSStyleDeclaration) & string>(prop: T, value: JSX.CSSProperties[T] | null) => void;
+export type GetAttribute<T extends Element> = <K extends keyof ElementProps<T>>(prop: K) => ElementProps<T>[K];
+export type SetAttribute<T extends Element> = <K extends keyof ElementProps<T>>(prop: K, value: ElementProps<T>[K] | null) => void;
 export type SetEventHandler = <K extends keyof HTMLElementEventMap>(type: K, listener: null | ((this: HTMLElement, ev: HTMLElementEventMap[K]) => void), options: AddEventListenerOptions) => void;
 export interface ImperativeHandle<T extends Element> {
     hasClass: GetClass;
@@ -19,7 +20,7 @@ export interface ImperativeHandle<T extends Element> {
 export interface UseImperativePropsParameters<E extends Element> {
     refElementReturn: Pick<UseRefElementReturnType<E>["refElementReturn"], "getElement">;
 }
-export interface ImperativeElementProps<T extends keyof HTMLElementTagNameMap> extends h.JSX.HTMLAttributes<HTMLElementTagNameMap[T]> {
+export interface ImperativeElementProps<T extends keyof HTMLElementTagNameMap> extends ElementProps<HTMLElementTagNameMap[T]> {
     tag: T;
     handle: Ref<ImperativeHandle<HTMLElementTagNameMap[T]>>;
 }
@@ -33,7 +34,7 @@ export interface ImperativeElementProps<T extends keyof HTMLElementTagNameMap> e
 export declare const ImperativeElement: typeof ImperativeElementU;
 export declare function useImperativeProps<E extends Element>({ refElementReturn: { getElement } }: UseImperativePropsParameters<E>): {
     imperativeHandle: ImperativeHandle<E>;
-    props: createElement.JSX.HTMLAttributes<E>;
+    props: ElementProps<E>;
 };
 declare function ImperativeElementU<T extends keyof HTMLElementTagNameMap>({ tag: Tag, handle, ...props }: RenderableProps<ImperativeElementProps<T>>, ref: Ref<HTMLElementTagNameMap[T]>): import("preact").VNode<any>;
 export {};

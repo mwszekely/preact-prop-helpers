@@ -1,3 +1,3 @@
-import { h } from "preact";
-export declare function useMergedChildren(lhs: h.JSX.HTMLAttributes<EventTarget>["children"], rhs: h.JSX.HTMLAttributes<EventTarget>["children"]): h.JSX.HTMLAttributes<EventTarget>["children"];
+import { ElementProps } from "../util/types.js";
+export declare function useMergedChildren(lhs: ElementProps<EventTarget>["children"], rhs: ElementProps<EventTarget>["children"]): ElementProps<EventTarget>["children"];
 //# sourceMappingURL=use-merged-children.d.ts.map

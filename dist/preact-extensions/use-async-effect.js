@@ -1,6 +1,6 @@
 import { useEffect } from "preact/hooks";
-import { useAsync } from "./use-async.js";
 import { monitorCallCount } from "../util/use-call-count.js";
+import { useAsync } from "./use-async.js";
 /**
  * Combines the semantics of `useAsync` and `useEffect`.
  *

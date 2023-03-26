@@ -1,10 +1,10 @@
-import { h } from "preact";
 import { useEnsureStability } from "../preact-extensions/use-passive-state.js";
+import { ElementProps } from "../util/types.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 import { useMergedChildren } from "./use-merged-children.js";
 import { useMergedClasses } from "./use-merged-classes.js";
 import { useMergedRefs } from "./use-merged-refs.js";
 import { useMergedStyles } from "./use-merged-styles.js";
-import { monitorCallCount } from "../util/use-call-count.js";
 
 let log = console.warn;
 
@@ -21,10 +21,10 @@ export function enableLoggingPropConflicts(log2: typeof console["log"]) {
  * @param rhs2 
  * @returns 
  */
-export function useMergedProps<E extends EventTarget>(...allProps: h.JSX.HTMLAttributes<E>[]) {
+export function useMergedProps<E extends EventTarget>(...allProps: ElementProps<E>[]) {
     monitorCallCount(useMergedProps);
     useEnsureStability("useMergedProps", allProps.length);
-    let ret: h.JSX.HTMLAttributes<E> = {};
+    let ret: ElementProps<E> = {};
     for (let nextProps of allProps) {
         ret = useMergedProps2<E>(ret, nextProps);
     }
@@ -76,10 +76,10 @@ function mergeUnknown(key: string, lhsValue: unknown, rhsValue: unknown) {
  * This is one of the most commonly called functions in this and consumer libraries,
  * so it trades a bit of readability for speed (i.e. we don't decompose objects and just do regular property access, iterate with `for...in`, instead of `Object.entries`, etc.)
  */
-function useMergedProps2<E extends EventTarget>(lhsAll: h.JSX.HTMLAttributes<E>, rhsAll: h.JSX.HTMLAttributes<E>): h.JSX.HTMLAttributes<E> {
+function useMergedProps2<E extends EventTarget>(lhsAll: ElementProps<E>, rhsAll: ElementProps<E>): ElementProps<E> {
 
     
-    const ret: h.JSX.HTMLAttributes<E> = {
+    const ret: ElementProps<E> = {
         ref: useMergedRefs<E>(lhsAll.ref, rhsAll.ref),
         style: useMergedStyles(lhsAll.style, rhsAll.style),
         className: useMergedClasses(lhsAll["class"], lhsAll.className, rhsAll["class"], rhsAll.className),

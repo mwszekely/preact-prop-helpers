@@ -1,8 +1,7 @@
-import { h } from "preact";
 import { UseChildrenHaveFocusChildReturnType, UseChildrenHaveFocusParameters } from "../../observers/use-children-have-focus.js";
 import { UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
 import { PassiveStateUpdater } from "../../preact-extensions/use-passive-state.js";
-import { PickTargeted } from "../../util/types.js";
+import { ElementProps, PickTargeted } from "../../util/types.js";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
 /** Anything that's selectable must be tabbable, so we DO use rovingtabindex instead of just managedchildren */
 export interface UseSingleSelectionChildInfo<E extends Element> extends UseRovingTabIndexChildInfo<E> {
@@ -61,7 +60,7 @@ export interface UseSingleSelectionChildParameters<E extends Element, M extends 
     info: Pick<UseSingleSelectionChildInfo<E>, "index">;
 }
 export interface UseSingleSelectionChildReturnType<E extends Element> extends UseChildrenHaveFocusChildReturnType<E> {
-    props: h.JSX.HTMLAttributes<E>;
+    props: ElementProps<E>;
     info: Pick<UseSingleSelectionChildInfo<E>, "getSelected" | "setLocalSelected" | "selected">;
     singleSelectionChildReturn: {
         selected: boolean;

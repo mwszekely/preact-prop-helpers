@@ -1,11 +1,12 @@
-import { h } from "preact";
+import type { JSX } from "preact";
 import { useId, useRef } from "preact/hooks";
 import { useEnsureStability } from "../preact-extensions/use-passive-state.js";
 import { monitorCallCount } from "../util/use-call-count.js";
+import { ElementProps } from "../util/types.js";
 
 export interface UseRandomIdReturnType<S extends Element, T extends Element> {
-    propsSource: h.JSX.HTMLAttributes<S>;
-    propsReferencer: h.JSX.HTMLAttributes<T>;
+    propsSource: ElementProps<S>;
+    propsReferencer: ElementProps<T>;
     
     randomIdReturn: { id: string; };
 }
@@ -20,7 +21,7 @@ export interface UseRandomIdParameters {
         prefix: string;
     
         /** This is the prop on the **OTHER** element that will use our ID.  E.G. The `input` calls `useRandomId` and passes `for` as `referencerProp`. */
-        otherReferencerProp: keyof h.JSX.HTMLAttributes<any> | null;
+        otherReferencerProp: keyof ElementProps<any> | null;
     }
 }
 
@@ -30,8 +31,8 @@ export function useRandomId<S extends Element, T extends Element>({ randomIdPara
     const id = (prefix + useId());
     useEnsureStability("useRandomId", prefix, id);
 
-    const referencerElementProps = useRef<h.JSX.HTMLAttributes<any>>(otherReferencerProp == null ? {} : { [otherReferencerProp]: id });
-    const sourceElementProps = useRef<h.JSX.HTMLAttributes<S>>({ id });
+    const referencerElementProps = useRef<ElementProps<any>>(otherReferencerProp == null ? {} : { [otherReferencerProp]: id });
+    const sourceElementProps = useRef<ElementProps<S>>({ id });
     useEnsureStability("useRandomIdReferencerElement", otherReferencerProp);
     
 

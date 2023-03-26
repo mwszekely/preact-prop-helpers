@@ -1,9 +1,9 @@
 import { useEnsureStability } from "../preact-extensions/use-passive-state.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 import { useMergedChildren } from "./use-merged-children.js";
 import { useMergedClasses } from "./use-merged-classes.js";
 import { useMergedRefs } from "./use-merged-refs.js";
 import { useMergedStyles } from "./use-merged-styles.js";
-import { monitorCallCount } from "../util/use-call-count.js";
 let log = console.warn;
 export function enableLoggingPropConflicts(log2) {
     log = log2;

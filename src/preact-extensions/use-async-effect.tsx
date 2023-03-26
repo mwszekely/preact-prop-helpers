@@ -1,7 +1,7 @@
 import { Inputs, useEffect } from "preact/hooks";
 import { OmitStrong } from "../util/types.js";
-import { useAsync, UseAsyncParameters } from "./use-async.js";
-import { monitorCallCount } from "../util/use-call-count.js"
+import { monitorCallCount } from "../util/use-call-count.js";
+import { UseAsyncParameters, useAsync } from "./use-async.js";
 
 /**
  * Combines the semantics of `useAsync` and `useEffect`. 

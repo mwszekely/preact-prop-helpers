@@ -1,7 +1,7 @@
 import { clsx } from "clsx";
-import { h } from "preact";
+import { ElementProps } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
-type C = h.JSX.HTMLAttributes<EventTarget>["className"];
+type C = ElementProps<EventTarget>["className"];
 /**
  * Given two sets of props, merges their `class` and `className` properties.
  * Duplicate classes are removed (order doesn't matter anyway).

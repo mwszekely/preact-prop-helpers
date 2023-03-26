@@ -1,12 +1,12 @@
-import { h } from "preact";
+import { ElementProps } from "../util/types.js";
 import { UseRandomIdParameters, UseRandomIdReturnType } from "./use-random-id.js";
 export interface UseRandomDualIdsParameters {
     randomIdInputParameters: UseRandomIdParameters["randomIdParameters"];
     randomIdLabelParameters: UseRandomIdParameters["randomIdParameters"];
 }
 export interface UseRandomDualIdsReturnType<InputElement extends Element, LabelElement extends Element> {
-    propsInput: h.JSX.HTMLAttributes<InputElement>;
-    propsLabel: h.JSX.HTMLAttributes<LabelElement>;
+    propsInput: ElementProps<InputElement>;
+    propsLabel: ElementProps<LabelElement>;
     randomIdInputReturn: UseRandomIdReturnType<InputElement, LabelElement>["randomIdReturn"];
     randomIdLabelReturn: UseRandomIdReturnType<LabelElement, InputElement>["randomIdReturn"];
 }

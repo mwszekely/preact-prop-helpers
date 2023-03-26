@@ -10,7 +10,7 @@ export default function RandomId({ id, prefix }: { id?: string, prefix?: string 
 
   return (
     <div>
-      <label {...useReferencedIdProps("for")<h.JSX.HTMLAttributes<HTMLLabelElement>>({ for: id })}></label>
+      <label {...useReferencedIdProps("for")<JSX.HTMLAttributes<HTMLLabelElement>>({ for: id })}></label>
       <input {...useRandomIdProps({ id })} />
     </div>
   );
