@@ -23,7 +23,7 @@ export declare function useAsyncEffect<I extends DependencyList>(effect: () => P
     hasResult: boolean;
     error: unknown;
     hasError: boolean;
-    invocationResult: "async" | "sync" | "throw" | null;
+    invocationResult: "async" | "throw" | "sync" | null;
     flushDebouncedPromise: () => void;
 };
 //# sourceMappingURL=use-async-effect.d.ts.map
