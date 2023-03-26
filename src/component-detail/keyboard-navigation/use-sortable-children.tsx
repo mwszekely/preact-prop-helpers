@@ -202,7 +202,7 @@ export function useRearrangeableChildren<M extends UseSortableChildInfo>({
         getForceUpdate()?.();
     }, []);
 
-    const useRearrangedChildren = useCallback((children: VNode[]) => {
+    const useRearrangedChildren = useCallback(function useRearrangedChildren(children: VNode[]) {
         monitorCallCount(useRearrangedChildren);
 
         console.assert(Array.isArray(children));

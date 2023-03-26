@@ -2,7 +2,6 @@ import { options } from "preact";
 import { useEffect, useState } from "preact/hooks";
 import { generateRandomId } from "../util/random-id.js";
 import { monitorCallCount } from "../util/use-call-count.js";
-const previousInputs = new Map();
 const toRun = new Map();
 // TODO: Whether this goes in options.diffed or options._commit
 // is a post-suspense question.
@@ -17,20 +16,23 @@ const toRun = new Map();
 // which is cool and means we won't need this at all soon.
 // So for now we'll stick with diff to prevent any weirdness with
 // commit being private and all.
+//
+// Also, in theory this could be replaced with `useInsertionEffect`,
+// but that probably won't be available in Preact for awhile.
 const commitName = "diffed";
-const originalCommit = options[commitName];
-const newCommit = (...args) => {
+const newCommit = (vnode, ...args) => {
     for (const [id, effectInfo] of toRun) {
-        const oldInputs = previousInputs.get(id);
+        const oldInputs = effectInfo.prevInputs;
         if (argsChanged(oldInputs, effectInfo.inputs)) {
             effectInfo.cleanup?.();
             effectInfo.cleanup = effectInfo.effect();
-            previousInputs.set(id, effectInfo.inputs);
+            effectInfo.prevInputs = effectInfo.inputs;
         }
     }
     toRun.clear();
-    originalCommit?.(...args);
+    originalCommit?.(vnode, ...args);
 };
+const originalCommit = options[commitName];
 options[commitName] = newCommit;
 /**
  * Semi-private function to allow stable callbacks even within `useLayoutEffect` and ref assignment.
@@ -51,7 +53,6 @@ export function useBeforeLayoutEffect(effect, inputs) {
     useEffect(() => {
         return () => {
             toRun.delete(id);
-            previousInputs.delete(id);
         };
     }, [id]);
 }

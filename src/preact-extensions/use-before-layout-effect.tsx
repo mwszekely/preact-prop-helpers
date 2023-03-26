@@ -4,8 +4,7 @@ import { EffectCallback, Inputs, useEffect, useState } from "preact/hooks";
 import { generateRandomId } from "../util/random-id.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 
-const previousInputs = new Map<string, Inputs | undefined>();
-const toRun = new Map<string, { effect: EffectCallback, inputs?: Inputs, cleanup: null | undefined | void | (() => void) }>();
+const toRun = new Map<string, { effect: EffectCallback, prevInputs?: Inputs | undefined, inputs?: Inputs, cleanup: null | undefined | void | (() => void) }>();
 
 
 // TODO: Whether this goes in options.diffed or options._commit
@@ -21,21 +20,26 @@ const toRun = new Map<string, { effect: EffectCallback, inputs?: Inputs, cleanup
 // which is cool and means we won't need this at all soon.
 // So for now we'll stick with diff to prevent any weirdness with
 // commit being private and all.
+//
+// Also, in theory this could be replaced with `useInsertionEffect`,
+// but that probably won't be available in Preact for awhile.
 const commitName = "diffed";
 
-const originalCommit = options[commitName] as (vnode: VNode, commitQueue: Component[]) => void;
-const newCommit: typeof originalCommit = (...args) => {
+const newCommit: typeof originalCommit = (vnode, ...args) => {
     for (const [id, effectInfo] of toRun) {
-        const oldInputs = previousInputs.get(id);
+        const oldInputs = effectInfo.prevInputs;
         if (argsChanged(oldInputs, effectInfo.inputs)) {
             effectInfo.cleanup?.();
             effectInfo.cleanup = effectInfo.effect();
-            previousInputs.set(id, effectInfo.inputs);
+            effectInfo.prevInputs = effectInfo.inputs;
         }
     }
     toRun.clear();
-    originalCommit?.(...args);
+    originalCommit?.(vnode, ...args);
 }
+
+
+const originalCommit = options[commitName];
 options[commitName] = newCommit as never
 
 /**
@@ -59,7 +63,6 @@ export function useBeforeLayoutEffect(effect: EffectCallback | null, inputs?: In
     useEffect(() => {
         return () => {
             toRun.delete(id);
-            previousInputs.delete(id);
         }
     }, [id])
 }

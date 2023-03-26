@@ -70,7 +70,7 @@ export function useRearrangeableChildren({ rearrangeableChildrenParameters: { ge
         onRearrangedGetter()?.();
         getForceUpdate()?.();
     }, []);
-    const useRearrangedChildren = useCallback((children) => {
+    const useRearrangedChildren = useCallback(function useRearrangedChildren(children) {
         monitorCallCount(useRearrangedChildren);
         console.assert(Array.isArray(children));
         const forceUpdate = useForceUpdate();
