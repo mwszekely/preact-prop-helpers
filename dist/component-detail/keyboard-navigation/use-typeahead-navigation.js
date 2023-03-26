@@ -1,4 +1,4 @@
-import { useCallback, useLayoutEffect, useRef } from "preact/hooks";
+import { useCallback, useLayoutEffect, useRef } from "react";
 import { useTextContent } from "../../dom-helpers/use-text-content.js";
 import { usePassiveState } from "../../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";

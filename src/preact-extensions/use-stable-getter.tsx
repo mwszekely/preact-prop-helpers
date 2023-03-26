@@ -1,4 +1,4 @@
-import { useCallback, useRef } from "preact/hooks";
+import { useCallback, useRef } from "react";
 import { monitorCallCount } from "../util/use-call-count.js";
 import { useBeforeLayoutEffect } from "./use-before-layout-effect.js";
 import { useEnsureStability } from "./use-passive-state.js";

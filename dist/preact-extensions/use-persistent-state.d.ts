@@ -1,4 +1,4 @@
-import { StateUpdater } from "preact/hooks";
+import { Dispatch, SetStateAction } from "react";
 /**
  * All types allowed by `usePersistentState`.
  *
@@ -34,5 +34,5 @@ export declare function storeToLocalStorage<Key extends (keyof PersistentStates)
  * @param toString
  * @returns
  */
-export declare function usePersistentState<Key extends keyof PersistentStates, T = PersistentStates[Key]>(key: Key | null, initialValue: T, fromString?: ((value: string) => T), toString?: ((value: T) => string), storage?: Storage): [T, StateUpdater<T>, () => T];
+export declare function usePersistentState<Key extends keyof PersistentStates, T = PersistentStates[Key]>(key: Key | null, initialValue: T, fromString?: ((value: string) => T), toString?: ((value: T) => string), storage?: Storage): [T, Dispatch<SetStateAction<T>>, () => T];
 //# sourceMappingURL=use-persistent-state.d.ts.map

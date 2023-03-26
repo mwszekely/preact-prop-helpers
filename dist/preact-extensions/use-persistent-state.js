@@ -1,4 +1,4 @@
-import { useLayoutEffect } from "preact/hooks";
+import { useLayoutEffect } from "react";
 import { useGlobalHandler } from "../dom-helpers/use-event-handler.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 import { useStableCallback } from "./use-stable-callback.js";

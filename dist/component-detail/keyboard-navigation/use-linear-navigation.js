@@ -1,4 +1,4 @@
-import { useCallback, useRef } from "preact/hooks";
+import { useCallback, useRef } from "react";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { monitorCallCount } from "../../util/use-call-count.js";

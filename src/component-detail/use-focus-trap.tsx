@@ -1,9 +1,9 @@
-import { h } from "preact";
-import { useEffect } from "preact/hooks";
+import { useEffect } from "react";
 import { isFocusable, isTabbable } from "tabbable";
 import { useBlockingElement } from "../dom-helpers/use-blocking-element.js";
 import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
+import { ElementProps } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 
 export interface UseFocusTrapParameters<SourceElement extends Element | null, PopupElement extends Element> {
@@ -50,7 +50,7 @@ export interface UseFocusTrapParameters<SourceElement extends Element | null, Po
 }
 
 export interface UseFocusTrapReturnType<E extends Element> {
-    props: h.JSX.HTMLAttributes<E>;
+    props: ElementProps<E>;
     focusTrapReturn: {  }
 }
 
@@ -95,7 +95,7 @@ export function useFocusTrap<SourceElement extends Element | null, PopupElement 
 
 
     return {
-        props: { "aria-modal": trapActive ? "true" : undefined } as h.JSX.HTMLAttributes<E>,
+        props: { "aria-modal": trapActive ? "true" : undefined },
         focusTrapReturn: {  }
     };
 }

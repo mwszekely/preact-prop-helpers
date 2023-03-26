@@ -1,4 +1,4 @@
-import { useEffect } from "preact/hooks";
+import { useEffect } from "react";
 import { isFocusable, isTabbable } from "tabbable";
 import { useBlockingElement } from "../dom-helpers/use-blocking-element.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";

@@ -1,19 +1,20 @@
-import { createContext, h, render, VNode } from "preact";
-import { memo } from "preact/compat";
-import { useCallback, useContext, useRef } from "preact/hooks";
+import { createContext, createElement, DetailedHTMLFactory, DetailedHTMLProps, HTMLAttributes, MouseEvent, SyntheticEvent } from "react";
+import { memo } from "react";
+import { useCallback, useContext, useRef } from "react";
 import { CompleteGridNavigationContext, CompleteGridNavigationRowContext, UseStaggeredChildContext, ElementSize, GetIndex, returnNull, useAnimationFrame, useAsyncHandler, useChildrenHaveFocus, useChildrenHaveFocusChild, UseChildrenHaveFocusChildParameters, useCompleteGridNavigation, useCompleteGridNavigationCell, UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationReturnType, useCompleteGridNavigationRow, UseCompleteGridNavigationRowInfo, UseCompleteGridNavigationRowReturnType, useDraggable, useDroppable, useElementSize, useFocusTrap, useGlobalHandler, useHasCurrentFocus, useHasLastFocus, useInterval, useManagedChildren, UseManagedChildrenContext, useMergedProps, usePortalChildren, usePress, useRandomDualIds, useRefElement, useStableCallback, UseStaggeredChildrenInfo, useState, useStaggeredChildren, useManagedChild, useStaggeredChild } from "../dist/index.js";
 import { DemoUseInterval } from "./demos/use-interval.js";
 import { DemoUseModal } from "./demos/use-modal.js";
 import { DemoUseRovingTabIndex } from "./demos/use-roving-tab-index.js";
 import { DemoUseTimeout } from "./demos/use-timeout.js";
 import { DemoUseGrid } from "./demos/use-grid.js";
+import { createRoot } from 'react-dom/client';
 
 const DemoUseDroppable = () => {
     const { droppedFiles, droppedStrings, filesForConsideration, stringsForConsideration, propsStable: props, dropError } = useDroppable<HTMLDivElement>({ effect: "copy" });
 
     const { ref: _ref } = useMergedProps<HTMLInputElement>({}, { ref: useRef<HTMLInputElement>(null!) })
 
-    const p = useMergedProps(props, { className: "demo droppable" });
+    const p = useMergedProps<HTMLDivElement>(props, { className: "demo droppable" });
 
     return (
         <div {...p}>
@@ -21,7 +22,7 @@ const DemoUseDroppable = () => {
             {droppedStrings != null && <div>Data dropped: <ul>{(Object.entries(droppedStrings) as [keyof typeof stringsForConsideration, string][]).map(([type, value]) => <li>{type}: {value}</li>)}</ul></div>}
             {droppedFiles != null && <div>Files dropped: <table>
                 <thead><tr><th>Name</th><th>Size</th><th>Type</th><th>Last modified</th></tr></thead>
-                <tbody>{droppedFiles.map(f => <tr><td>{f.name}</td>{f.data.byteLength}<td>{f.type}</td><td>{new Date(f.lastModified ?? 0)}</td></tr>)}</tbody>
+                <tbody>{droppedFiles.map(f => <tr><td>{f.name}</td>{f.data.byteLength}<td>{f.type}</td><td>{new Date(f.lastModified ?? 0).toLocaleString()}</td></tr>)}</tbody>
             </table></div>}
             <hr />
 
@@ -68,8 +69,8 @@ const DemoUseChildrenHaveFocus = () => {
         <div {...useMergedProps({}, { className: "demo" })}>
             <h2>useChildrenHaveFocus</h2>
             <p>If you want to see if any of your children have focus, the easiest way is to just attach a <code>focusIn</code> handler to the parent DOM node. But what if you don't have just one single parent DOM node? This hook lets you coordinate all the children to give you that information as if you were able to take that easy parent node route.</p>
-            <div><label><input type="number" min={0} value={minChildCount} onInput={e => { e.preventDefault(); setMinChildCount(e.currentTarget.valueAsNumber) }} /> Min # of children</label></div>
-            <div><label><input type="number" min={minChildCount} value={maxChildCount} onInput={e => { e.preventDefault(); setMaxChildCount(e.currentTarget.valueAsNumber) }} /> Max # of children</label></div>
+            <div><label><input type="number" min={0} value={minChildCount} onChange={e => { e.preventDefault(); setMinChildCount(e.currentTarget.valueAsNumber) }} /> Min # of children</label></div>
+            <div><label><input type="number" min={minChildCount} value={maxChildCount} onChange={e => { e.preventDefault(); setMaxChildCount(e.currentTarget.valueAsNumber) }} /> Max # of children</label></div>
             <div>Current # of children: {currentChildCount}</div>
             <ChildrenHaveFocusContext.Provider value={context}>
                 <div>Any children focused: {anyFocused.toString()}</div>
@@ -114,7 +115,7 @@ const DemoUseElementSizeAnimation = () => {
     });
 
     return (
-        <div style="height: 300px; width: 300px; contain: strict;">
+        <div style={{ height: "300px", width: "300px", contain: "strict" }}>
             <div {...useMergedProps(propsStable, { ref: undefined, className: "demo", style: { height: `${(height * 100) + 100}px` } })}>
                 <pre>{JSON.stringify(elementSize, null, 2)}</pre>
             </div>
@@ -139,13 +140,13 @@ const DemoUseFocusTrap = memo(({ depth }: { depth?: number }) => {
     });
     //const { useRovingTabIndexChild, useRovingTabIndexProps } = useRovingTabIndex<HTMLUListElement, RovingTabIndexChildInfo>({ tabbableIndex, focusOnChange: false });
 
-    const divProps = useMergedProps(props, propsStable, { ref: undefined, className: "focus-trap-demo" });
+    const divProps = useMergedProps<HTMLDivElement>(props, propsStable, { ref: undefined, className: "focus-trap-demo" });
     if (depth == 2)
         return <div />;
 
     return (
         <div className="demo">
-            <label>Active: <input type="checkbox" checked={active} onInput={e => { e.preventDefault(); setActive(e.currentTarget.checked); }} /></label>
+            <label>Active: <input type="checkbox" checked={active} onChange={e => { e.preventDefault(); setActive(e.currentTarget.checked); }} /></label>
             <div {...divProps} >
                 <DemoUseFocusTrapChild active={active} setActive={setActive} depth={depth ?? 0} />
             </div>
@@ -162,7 +163,7 @@ const DemoUseFocusTrapChild = memo(({ setActive, active }: { active: boolean, se
             <button>Button 1</button>
             <button>Button 2</button>
             <button>Button 3</button>
-            <label>Active: <input type="checkbox" checked={active} onInput={e => { e.preventDefault(); setActive(e.currentTarget.checked); }} /></label>
+            <label>Active: <input type="checkbox" checked={active} onChange={e => { e.preventDefault(); setActive(e.currentTarget.checked); }} /></label>
 
         </>
     );
@@ -175,7 +176,7 @@ const DemoUseAsyncHandler1 = memo(() => {
     const [shouldThrow, setShouldThrow, getShouldThrow] = useState(false);
     const [disableConsecutive, setDisableConsecutive] = useState(false);
 
-    const asyncOnClick = ((_v: void, _e: h.JSX.TargetedMouseEvent<HTMLButtonElement>) => new Promise<void>((resolve, reject) => window.setTimeout(() => getShouldThrow() ? reject() : resolve(), timeout)));
+    const asyncOnClick = ((_v: void, _e: MouseEvent<HTMLButtonElement>) => new Promise<void>((resolve, reject) => window.setTimeout(() => getShouldThrow() ? reject() : resolve(), timeout)));
     const {
         callCount,
         settleCount,
@@ -185,17 +186,17 @@ const DemoUseAsyncHandler1 = memo(() => {
         hasError,
         rejectCount,
         resolveCount
-    } = useAsyncHandler<h.JSX.TargetedMouseEvent<HTMLButtonElement>, void>({ asyncHandler: asyncOnClick, capture: () => { }, debounce: debounce == 0 ? undefined : debounce });
+    } = useAsyncHandler<MouseEvent<HTMLButtonElement>, void>({ asyncHandler: asyncOnClick, capture: () => { }, debounce: debounce == 0 ? undefined : debounce });
 
     const onClick = pending ? undefined : syncHandler;
 
     return (
         <div className="demo">
             <button disabled={pending && disableConsecutive} onClick={onClick}>Click me!</button>
-            <label>Sleep for: <input type="number" value={timeout} onInput={e => setTimeout(e.currentTarget.valueAsNumber)} /></label>
-            <label>Throw an error <input type="checkbox" checked={shouldThrow} onInput={e => setShouldThrow(e.currentTarget.checked)} /></label>
-            <label>Disabled while pending <input type="checkbox" checked={disableConsecutive} onInput={e => setDisableConsecutive(e.currentTarget.checked)} /></label>
-            <label>Debounce: <input type="number" value={debounce} onInput={e => setDebounce(e.currentTarget.valueAsNumber)} /></label>
+            <label>Sleep for: <input type="number" value={timeout} onChange={e => setTimeout(e.currentTarget.valueAsNumber)} /></label>
+            <label>Throw an error <input type="checkbox" checked={shouldThrow} onChange={e => setShouldThrow(e.currentTarget.checked)} /></label>
+            <label>Disabled while pending <input type="checkbox" checked={disableConsecutive} onChange={e => setDisableConsecutive(e.currentTarget.checked)} /></label>
+            <label>Debounce: <input type="number" value={debounce} onChange={e => setDebounce(e.currentTarget.valueAsNumber)} /></label>
             <table>
                 <thead>
                     <tr>
@@ -226,7 +227,7 @@ const DemoUseAsyncHandler2 = memo(() => {
 
     const [text, setText] = useState("");
 
-    const onInputAsync = async (v: string, _e: any) => new Promise<void>((resolve, reject) => window.setTimeout(() => {
+    const onChangeAsync = async (v: string, _e: any) => new Promise<void>((resolve, reject) => window.setTimeout(() => {
         if (getShouldThrow()) {
             reject();
         }
@@ -248,9 +249,9 @@ const DemoUseAsyncHandler2 = memo(() => {
         resolveCount,
         debouncingAsync,
         debouncingSync
-    } = useAsyncHandler<h.JSX.TargetedEvent<HTMLInputElement>, string>({
-        asyncHandler: onInputAsync,
-        capture: (e: h.JSX.TargetedEvent<HTMLInputElement>) => { e.preventDefault(); return e.currentTarget.value },
+    } = useAsyncHandler<SyntheticEvent<HTMLInputElement>, string>({
+        asyncHandler: onChangeAsync,
+        capture: (e: SyntheticEvent<HTMLInputElement>) => { e.preventDefault(); return e.currentTarget.value },
         debounce: debounce == 0 ? undefined : debounce,
         throttle: throttle == 0 ? undefined : throttle
     });
@@ -260,13 +261,13 @@ const DemoUseAsyncHandler2 = memo(() => {
 
     return (
         <div className="demo">
-            <label>Demo text: <input value={hasCapture ? currentCapture : text} disabled={pending && disableConsecutive} onInput={syncHandler} /></label>
+            <label>Demo text: <input value={hasCapture ? currentCapture : text} disabled={pending && disableConsecutive} onChange={syncHandler} /></label>
             <hr />
-            <label># of milliseconds the async handler takes to run: <input type="number" value={timeout} onInput={e => setTimeout(e.currentTarget.valueAsNumber)} /></label>
-            <label>Throw an error <input type="checkbox" checked={shouldThrow} onInput={e => setShouldThrow(e.currentTarget.checked)} /></label>
-            <label>Disabled while pending <input type="checkbox" checked={disableConsecutive} onInput={e => setDisableConsecutive(e.currentTarget.checked)} /></label>
-            <label>Debounce: <input type="number" value={debounce} onInput={e => setDebounce(e.currentTarget.valueAsNumber)} /></label>
-            <label>Throttle: <input type="number" value={throttle} onInput={e => setThrottle(e.currentTarget.valueAsNumber)} /></label>
+            <label># of milliseconds the async handler takes to run: <input type="number" value={timeout} onChange={e => setTimeout(e.currentTarget.valueAsNumber)} /></label>
+            <label>Throw an error <input type="checkbox" checked={shouldThrow} onChange={e => setShouldThrow(e.currentTarget.checked)} /></label>
+            <label>Disabled while pending <input type="checkbox" checked={disableConsecutive} onChange={e => setDisableConsecutive(e.currentTarget.checked)} /></label>
+            <label>Debounce: <input type="number" value={debounce} onChange={e => setDebounce(e.currentTarget.valueAsNumber)} /></label>
+            <label>Throttle: <input type="number" value={throttle} onChange={e => setThrottle(e.currentTarget.valueAsNumber)} /></label>
             <table>
                 <thead>
                     <tr>
@@ -338,7 +339,7 @@ const DemoFocus = memo(() => {
         }
     });
     return (
-        <div class="demo">
+        <div className="demo">
             <h2>useHasFocus</h2>
             <p>Tracks focus related to the component:</p>
             <ul>
@@ -366,7 +367,7 @@ const DemoFocus = memo(() => {
 
 
 function DemoLabel() {
-    const { propsInput, propsLabel } = useRandomDualIds<HTMLInputElement, HTMLLabelElement>({ randomIdInputParameters: { prefix: "input-", otherReferencerProp: "for" }, randomIdLabelParameters: { prefix: "label-", otherReferencerProp: "aria-labelledby" as never } })
+    const { propsInput, propsLabel } = useRandomDualIds<HTMLInputElement, HTMLLabelElement>({ randomIdInputParameters: { prefix: "input-", otherReferencerProp: "htmlFor" }, randomIdLabelParameters: { prefix: "label-", otherReferencerProp: "aria-labelledby" as never } })
     return (
         <div className="demo">
             <h2>Labels</h2>
@@ -425,11 +426,11 @@ function DemoGlobalHandler() {
     return (
         <div className="demo">
             <div>Global event handlers:</div>
-            <label># of event handlers<input type="number" value={count} min={0} onInput={e => { e.preventDefault(); setCount(e.currentTarget.valueAsNumber) }} /></label>
+            <label># of event handlers<input type="number" value={count} min={0} onChange={e => { e.preventDefault(); setCount(e.currentTarget.valueAsNumber) }} /></label>
             <div>
-                <label><input onInput={e => { e.preventDefault(); if (e.currentTarget.checked) setMode("grouped"); }} type="radio" name="global-handler-mode" /> Grouped</label>
-                <label><input onInput={e => { e.preventDefault(); if (e.currentTarget.checked) setMode("single"); }} type="radio" name="global-handler-mode" /> Single</label>
-                <label><input onInput={e => { e.preventDefault(); if (e.currentTarget.checked) setMode(null); }} type="radio" name="global-handler-mode" /> Off</label>
+                <label><input onChange={e => { e.preventDefault(); if (e.currentTarget.checked) setMode("grouped"); }} type="radio" name="global-handler-mode" /> Grouped</label>
+                <label><input onChange={e => { e.preventDefault(); if (e.currentTarget.checked) setMode("single"); }} type="radio" name="global-handler-mode" /> Single</label>
+                <label><input onChange={e => { e.preventDefault(); if (e.currentTarget.checked) setMode(null); }} type="radio" name="global-handler-mode" /> Off</label>
             </div>
 
             <button id="global-handler-test" onClick={() => {
@@ -461,7 +462,7 @@ const DemoGlobalHandlerChildren = memo(function DemoGlobalHandlerChildren({ coun
 
 const DemoGlobalHandlerChild = memo(function DemoGlobalHandlerChild({ mode, target }: { target: Window | Document, mode: "grouped" | "single" | null }) {
 
-    useGlobalHandler(target, "click", mode == null ? null : (e: h.JSX.TargetedMouseEvent<HTMLButtonElement>) => {
+    useGlobalHandler(target, "click", mode == null ? null : (e: MouseEvent<HTMLButtonElement>) => {
         if ((e.target as Element | null)?.id != "global-handler-test2")
             return;
         (window as any)._demo_event = ((window as any)._demo_event || 0) + 1
@@ -480,13 +481,13 @@ const DemoStaggered = memo(() => {
     const { context: scc, staggeredChildrenReturn } = useStaggeredChildren({ managedChildrenReturn, staggeredChildrenParameters: { staggered } })
     return (
         <StaggeredContext.Provider value={{ ...mcc, ...scc }}>
-            <div class="demo">
-                <label><input type="checkbox" checked={checked} onInput={e => { e.preventDefault(); setChecked(e.currentTarget.checked) }} /> Children mounted</label>
-                <label><input type="checkbox" checked={staggered} onInput={e => { e.preventDefault(); setStaggered(e.currentTarget.checked) }} /> Children Staggered</label>
-                <label><input type="number" value={childCount} onInput={e => { e.preventDefault(); setChildCount(e.currentTarget.valueAsNumber) }} /> # of children</label>
+            <div className="demo">
+                <label><input type="checkbox" checked={checked} onChange={e => { e.preventDefault(); setChecked(e.currentTarget.checked) }} /> Children mounted</label>
+                <label><input type="checkbox" checked={staggered} onChange={e => { e.preventDefault(); setStaggered(e.currentTarget.checked) }} /> Children Staggered</label>
+                <label><input type="number" value={childCount} onChange={e => { e.preventDefault(); setChildCount(e.currentTarget.valueAsNumber) }} /> # of children</label>
                 <div>
                     <div>Status: {staggered ? staggeredChildrenReturn.stillStaggering ? "staggering" : "done staggering" : "(not staggering)"}</div>
-                    <div style="display:flex;flex-wrap: wrap;">{checked && <DemoStaggeredChildren childCount={childCount} />}</div>
+                    <div style={{ display: "flex", flexWrap: "wrap" }}>{checked && <DemoStaggeredChildren childCount={childCount} />}</div>
                 </div>
             </div>
         </StaggeredContext.Provider>
@@ -517,11 +518,11 @@ const DemoStaggeredChild = memo(({ index }: { index: number }) => {
 
 const Component = () => {
     // return <DemoUseAsyncHandler2 />;
-    
-    return <div class="flex" style={{ flexWrap: "wrap" }}>
+
+    return <div className="flex" style={{ flexWrap: "wrap" }}>
         <DemoPress remaining={2} />
         <input />
-        <div style="display:grid;grid-template-columns:1fr 1fr">
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr" }}>
             <DemoUseModal />
             <DemoUseModal />
         </div>
@@ -565,5 +566,6 @@ const Component = () => {
 }
 
 requestAnimationFrame(() => {
-    render(<Component />, document.getElementById("root")!);
+    const root = createRoot(document.getElementById("root")!, {  });
+    root.render(<Component />);
 })

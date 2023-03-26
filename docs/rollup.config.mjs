@@ -21,7 +21,7 @@ export default {
         typescript({ sourceMap: true, moduleResolution: "nodenext" }), 
         replace({ 'process.env.NODE_ENV': JSON.stringify('development'), preventAssignment: true }),
         commonjs({ sourceMap: true, extensions }), 
-        resolve({ extensions, dedupe: ['preact', "preact/compat", "preact/hooks"] }),   // TODO: Why, exactly, is this needed? It doesn't not make sense, but specifically. Why.
+        resolve({ extensions, dedupe: ['react', "react-dom", "react-dom/client"] }),   // TODO: Why, exactly, is this needed? It doesn't not make sense, but specifically. Why.
         babel({
             configFile: path.resolve(".babelrc"),
             sourceMaps: true,

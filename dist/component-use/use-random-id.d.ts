@@ -1,7 +1,7 @@
-import { h } from "preact";
+import { ElementProps } from "../util/types.js";
 export interface UseRandomIdReturnType<S extends Element, T extends Element> {
-    propsSource: h.JSX.HTMLAttributes<S>;
-    propsReferencer: h.JSX.HTMLAttributes<T>;
+    propsSource: ElementProps<S>;
+    propsReferencer: ElementProps<T>;
     randomIdReturn: {
         id: string;
     };
@@ -15,7 +15,7 @@ export interface UseRandomIdParameters {
          */
         prefix: string;
         /** This is the prop on the **OTHER** element that will use our ID.  E.G. The `input` calls `useRandomId` and passes `for` as `referencerProp`. */
-        otherReferencerProp: keyof h.JSX.HTMLAttributes<any> | null;
+        otherReferencerProp: keyof ElementProps<any> | null;
     };
 }
 export declare function useRandomId<S extends Element, T extends Element>({ randomIdParameters: { prefix, otherReferencerProp } }: UseRandomIdParameters): UseRandomIdReturnType<S, T>;

@@ -1,5 +1,5 @@
 import { noop } from "lodash-es";
-import { useCallback } from "preact/hooks";
+import { useCallback } from "react";
 import { returnFalse, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useState } from "../preact-extensions/use-state.js";
@@ -99,10 +99,10 @@ export function usePress(args) {
         // Be as generous as possible with touch events by checking all four corners of the radius too
         const offsets = [
             [0, 0],
-            [-touch.radiusX, -touch.radiusY],
-            [+touch.radiusX, -touch.radiusY],
-            [-touch.radiusX, +touch.radiusY],
-            [+touch.radiusX, +touch.radiusY]
+            /*[-touch.radiusX, -touch.radiusY] as const,
+            [+touch.radiusX, -touch.radiusY] as const,
+            [-touch.radiusX, +touch.radiusY] as const,
+            [+touch.radiusX, +touch.radiusY] as const*/
         ];
         let hoveringAtAnyPoint = false;
         for (const [x, y] of offsets) {
@@ -272,7 +272,7 @@ export function usePress(args) {
         if (onPressSync) {
             e.preventDefault();
             if (e.detail > 1) {
-                e.stopImmediatePropagation();
+                //e.stopImmediatePropagation();
                 e.stopPropagation();
             }
             else {
@@ -326,7 +326,7 @@ export function usePress(args) {
             onPointerUp: !hasPressEvent ? undefined : (p ? onPointerUp : undefined),
             onPointerEnter: !hasPressEvent ? undefined : (p ? onPointerEnter : undefined),
             onPointerLeave: !hasPressEvent ? undefined : (p ? onPointerLeave : undefined),
-            onfocusout: onFocusOut,
+            onBlur: onFocusOut,
             onClick
         },
     };

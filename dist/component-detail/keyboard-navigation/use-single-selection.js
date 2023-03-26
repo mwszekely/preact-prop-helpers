@@ -1,5 +1,5 @@
 import { noop } from "lodash-es";
-import { useCallback, useEffect } from "preact/hooks";
+import { useCallback, useEffect } from "react";
 import { useChildrenFlag } from "../../preact-extensions/use-managed-children.js";
 import { useEnsureStability } from "../../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";

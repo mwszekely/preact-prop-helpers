@@ -1,16 +1,17 @@
-import { Ref, RenderableProps, createElement, h } from "preact";
-import { forwardRef, memo } from "preact/compat";
-import { useCallback, useImperativeHandle, useRef } from "preact/hooks";
+import { Ref, PropsWithChildren, CSSProperties, createElement, AllHTMLAttributes } from "react";
+import { forwardRef, memo } from "react";
+import { useCallback, useImperativeHandle, useRef } from "react";
 import { monitorCallCount } from "../util/use-call-count.js";
 import { useMergedProps } from "./use-merged-props.js";
 import { UseRefElementReturnType, useRefElement } from "./use-ref-element.js";
+import { ElementProps } from "../util/types.js";
 
 export type SetChildren = ((children: string | null) => void);
 export type GetClass = (cls: string) => boolean;
 export type SetClass = (cls: string, enabled: boolean) => void;
-export type SetStyle = <T extends (keyof CSSStyleDeclaration) & string>(prop: T, value: h.JSX.CSSProperties[T] | null) => void;
-export type GetAttribute<T extends Element> = <K extends keyof h.JSX.HTMLAttributes<T>>(prop: K) => h.JSX.HTMLAttributes<T>[K];
-export type SetAttribute<T extends Element> = <K extends keyof h.JSX.HTMLAttributes<T>>(prop: K, value: h.JSX.HTMLAttributes<T>[K] | null) => void;
+export type SetStyle = <T extends (keyof CSSProperties) & (keyof CSSStyleDeclaration) & string>(prop: T, value: CSSProperties[T] | null) => void;
+export type GetAttribute<T extends Element> = <K extends keyof JSX.IntrinsicAttributes>(prop: K) => ElementProps<T>[K & keyof ElementProps<T>];
+export type SetAttribute<T extends Element> = <K extends keyof JSX.IntrinsicAttributes>(prop: K, value: ElementProps<T>[K & keyof ElementProps<T>] | null) => void;
 export type SetEventHandler = <K extends keyof HTMLElementEventMap>(type: K, listener: null | ((this: HTMLElement, ev: HTMLElementEventMap[K]) => void), options: AddEventListenerOptions) => void;
 
 export interface ImperativeHandle<T extends Element> {
@@ -26,10 +27,11 @@ export interface ImperativeHandle<T extends Element> {
 export interface UseImperativePropsParameters<E extends Element> {
     refElementReturn: Pick<UseRefElementReturnType<E>["refElementReturn"], "getElement">;
 }
+type Get<T, K extends keyof T> = T[K];
 
-export interface ImperativeElementProps<T extends keyof HTMLElementTagNameMap> extends h.JSX.HTMLAttributes<HTMLElementTagNameMap[T]> {
+export type ImperativeElementProps<T extends keyof JSX.IntrinsicElements> = JSX.IntrinsicElements[T] & {
     tag: T;
-    handle: Ref<ImperativeHandle<HTMLElementTagNameMap[T]>>;
+    handle: Ref<ImperativeHandle<HTMLElementTagNameMap[T & keyof HTMLElementTagNameMap]>>;
 }
 
 /**
@@ -39,12 +41,12 @@ export interface ImperativeElementProps<T extends keyof HTMLElementTagNameMap> e
  * 
  * The `handle` prop should be e.g. `useRef<ImperativeHandle<HTMLDivElement>>(null)`
  */
-export const ImperativeElement = memo(forwardRef(ImperativeElementU)) as typeof ImperativeElementU;
+export const ImperativeElement = memo(forwardRef(ImperativeElementU));// as any as typeof ImperativeElementU;
 
 export function useImperativeProps<E extends Element>({ refElementReturn: { getElement } }: UseImperativePropsParameters<E>) {
     monitorCallCount(useImperativeProps);
-    
-    const currentImperativeProps = useRef<{ className: Set<string>, style: h.JSX.CSSProperties, children: string | null, others: h.JSX.HTMLAttributes<E> }>({ className: new Set(), style: {}, children: null, others: {} });
+
+    const currentImperativeProps = useRef<{ className: Set<string>, style: CSSProperties, children: string | null, others: ElementProps<E> }>({ className: new Set(), style: {}, children: null, others: {} });
 
 
     const hasClass = useCallback<GetClass>((cls: string) => { return currentImperativeProps.current.className.has(cls); }, [])
@@ -59,7 +61,7 @@ export function useImperativeProps<E extends Element>({ refElementReturn: { getE
         const element = (getElement() as Element as HTMLElement | undefined);
         if (element) {
             if (currentImperativeProps.current.style[prop] != value) {
-                currentImperativeProps.current.style[prop] = value;
+                (currentImperativeProps.current.style as any)[prop] = value;
                 if ((prop as string).startsWith("--")) {
                     if (value != null)
                         element.style.setProperty(prop, `${value}`);
@@ -82,31 +84,31 @@ export function useImperativeProps<E extends Element>({ refElementReturn: { getE
     }, []);
 
     const getAttribute = useCallback<GetAttribute<E>>((prop) => {
-        return currentImperativeProps.current.others[prop];
+        return currentImperativeProps.current.others[prop as never];
     }, []);
 
     const setAttribute = useCallback<SetAttribute<E>>((prop, value) => {
         if (value != null) {
-            currentImperativeProps.current.others[prop] = value;
-            getElement()?.setAttribute(prop, value);
+            currentImperativeProps.current.others[prop as never] = value as never;
+            getElement()?.setAttribute(prop, value as never);
         }
         else {
-            delete currentImperativeProps.current.others[prop];
+            delete currentImperativeProps.current.others[prop as never];
             getElement()?.removeAttribute(prop);
         }
     }, []);
 
     const setEventHandler = useCallback<SetEventHandler>((type, handler, options) => {
         const element = (getElement() as Element as HTMLElement | undefined);
-        const mappedKey = EventMapping[type] as keyof h.JSX.HTMLAttributes<E>;
+        const mappedKey = EventMapping[type] as keyof ElementProps<E>;
         if (element) {
             if (handler) {
                 element.addEventListener(type, handler, options);
-                currentImperativeProps.current.others[mappedKey] = handler;
+                currentImperativeProps.current.others[mappedKey as never] = handler as never;
             }
-            else if (currentImperativeProps.current.others[mappedKey]) {
-                element.removeEventListener(type, currentImperativeProps.current.others[mappedKey], options);
-                currentImperativeProps.current.others[mappedKey] = undefined;
+            else if (currentImperativeProps.current.others[mappedKey as never]) {
+                element.removeEventListener(type, currentImperativeProps.current.others[mappedKey as never], options);
+                currentImperativeProps.current.others[mappedKey as never] = undefined as never;
             }
         }
     }, [])
@@ -129,7 +131,9 @@ export function useImperativeProps<E extends Element>({ refElementReturn: { getE
     }
 }
 
-function ImperativeElementU<T extends keyof HTMLElementTagNameMap>({ tag: Tag, handle, ...props }: RenderableProps<ImperativeElementProps<T>>, ref: Ref<HTMLElementTagNameMap[T]>) {
+
+
+function ImperativeElementU<T extends keyof HTMLElementTagNameMap>({ tag: Tag, handle, ...props }: PropsWithChildren<ImperativeElementProps<T>>, ref: Ref<HTMLElementTagNameMap[T]>) {
     const { propsStable, refElementReturn } = useRefElement<HTMLElementTagNameMap[T]>({ refElementParameters: {} })
     const { props: iprops, imperativeHandle } = useImperativeProps<HTMLElementTagNameMap[T]>({ refElementReturn });
     useImperativeHandle(handle, () => imperativeHandle);
@@ -137,7 +141,7 @@ function ImperativeElementU<T extends keyof HTMLElementTagNameMap>({ tag: Tag, h
 }
 
 
-const EventMapping: Partial<{ [K in keyof HTMLElementEventMap]: (keyof h.JSX.HTMLAttributes<any> & `on${string}`) }> = {
+const EventMapping: Partial<{ [K in (keyof HTMLElementEventMap)]: (keyof AllHTMLAttributes<any> & `on${string}`) }> = {
     abort: "onAbort",
     animationend: "onAnimationEnd",
     animationstart: "onAnimationStart",
@@ -153,7 +157,7 @@ const EventMapping: Partial<{ [K in keyof HTMLElementEventMap]: (keyof h.JSX.HTM
     compositionupdate: "onCompositionUpdate",
     contextmenu: "onContextMenu",
     cut: "onCut",
-    dblclick: "onDblClick",
+    dblclick: "onDoubleClick",
     drag: "onDrag",
     dragend: "onDragEnd",
     dragenter: "onDragEnter",
@@ -166,9 +170,6 @@ const EventMapping: Partial<{ [K in keyof HTMLElementEventMap]: (keyof h.JSX.HTM
     ended: "onEnded",
     error: "onError",
     focus: "onFocus",
-    focusin: "onfocusin",
-    focusout: "onfocusout",
-    formdata: "onFormData",
     gotpointercapture: "onGotPointerCapture",
     input: "onInput",
     invalid: "onInvalid",
@@ -209,7 +210,6 @@ const EventMapping: Partial<{ [K in keyof HTMLElementEventMap]: (keyof h.JSX.HTM
     submit: "onSubmit",
     suspend: "onSuspend",
     timeupdate: "onTimeUpdate",
-    toggle: "onToggle",
     touchcancel: "onTouchCancel",
     touchend: "onTouchEnd",
     touchmove: "onTouchMove",
@@ -217,5 +217,6 @@ const EventMapping: Partial<{ [K in keyof HTMLElementEventMap]: (keyof h.JSX.HTM
     transitionend: "onTransitionEnd",
     volumechange: "onVolumeChange",
     waiting: "onWaiting",
-    wheel: "onWheel"
+    wheel: "onWheel",
+    resize: "onResize"
 }

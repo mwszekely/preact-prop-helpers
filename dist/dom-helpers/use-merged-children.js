@@ -1,4 +1,4 @@
-import { createElement, Fragment } from "preact";
+import { createElement, Fragment } from "react";
 import { monitorCallCount } from "../util/use-call-count.js";
 export function useMergedChildren(lhs, rhs) {
     monitorCallCount(useMergedChildren);

@@ -1,17 +1,17 @@
-import { h } from "preact";
+import { Ref } from "react";
 import { useEnsureStability } from "../preact-extensions/use-passive-state.js";
+import { ElementProps } from "../util/types.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 import { useMergedChildren } from "./use-merged-children.js";
 import { useMergedClasses } from "./use-merged-classes.js";
 import { useMergedRefs } from "./use-merged-refs.js";
 import { useMergedStyles } from "./use-merged-styles.js";
-import { monitorCallCount } from "../util/use-call-count.js";
 
 let log = console.warn;
 
 export function enableLoggingPropConflicts(log2: typeof console["log"]) {
     log = log2
 }
-
 
 /**
  * Given two sets of props, merges them and returns the result.
@@ -21,10 +21,10 @@ export function enableLoggingPropConflicts(log2: typeof console["log"]) {
  * @param rhs2 
  * @returns 
  */
-export function useMergedProps<E extends EventTarget>(...allProps: h.JSX.HTMLAttributes<E>[]) {
+export function useMergedProps<E extends EventTarget>(...allProps: {}[]) {
     monitorCallCount(useMergedProps);
     useEnsureStability("useMergedProps", allProps.length);
-    let ret: h.JSX.HTMLAttributes<E> = {};
+    let ret: ElementProps<E> = {};
     for (let nextProps of allProps) {
         ret = useMergedProps2<E>(ret, nextProps);
     }
@@ -76,32 +76,31 @@ function mergeUnknown(key: string, lhsValue: unknown, rhsValue: unknown) {
  * This is one of the most commonly called functions in this and consumer libraries,
  * so it trades a bit of readability for speed (i.e. we don't decompose objects and just do regular property access, iterate with `for...in`, instead of `Object.entries`, etc.)
  */
-function useMergedProps2<E extends EventTarget>(lhsAll: h.JSX.HTMLAttributes<E>, rhsAll: h.JSX.HTMLAttributes<E>): h.JSX.HTMLAttributes<E> {
+function useMergedProps2<E extends EventTarget>(lhsAll: any, rhsAll: any): ElementProps<E> {
 
     
-    const ret: h.JSX.HTMLAttributes<E> = {
-        ref: useMergedRefs<E>(lhsAll.ref, rhsAll.ref),
+    const ret: any = {
+        ref: useMergedRefs<E>(lhsAll.ref as Ref<E>, rhsAll.ref as Ref<E>),
         style: useMergedStyles(lhsAll.style, rhsAll.style),
-        className: useMergedClasses(lhsAll["class"], lhsAll.className, rhsAll["class"], rhsAll.className),
+        className: useMergedClasses(lhsAll.className, rhsAll.className),
         children: useMergedChildren(lhsAll.children, rhsAll.children),
     } as any;
 
     if (ret.ref === undefined) delete ret.ref;
     if (ret.style === undefined) delete ret.style;
     if (ret.className === undefined) delete ret.className;
-    if (ret["class"] === undefined) delete ret["class"];
     if (ret.children === undefined) delete ret.children;
 
     for (const lhsKeyU in lhsAll) {
         const lhsKey = lhsKeyU as keyof typeof lhsAll;
-        if (knowns.has(lhsKey))
+        if (knowns.has(lhsKey as string))
             continue;
         ret[lhsKey] = lhsAll[lhsKey];
     }
 
     for (const rhsKeyU in rhsAll) {
-        const rhsKey = rhsKeyU as keyof typeof rhsAll;
-        if (knowns.has(rhsKey))
+        const rhsKey = rhsKeyU as (keyof typeof rhsAll) & string;
+        if (knowns.has(rhsKey as string))
             continue;
         ret[rhsKey] = mergeUnknown(rhsKey, ret[rhsKey], rhsAll[rhsKey]);
     }

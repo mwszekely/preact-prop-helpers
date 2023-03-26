@@ -1,5 +1,5 @@
-import { h } from "preact";
-type C = h.JSX.HTMLAttributes<EventTarget>["className"];
+import { HTMLAttributes } from "react";
+type C = HTMLAttributes<EventTarget>["className"];
 /**
  * Given two sets of props, merges their `class` and `className` properties.
  * Duplicate classes are removed (order doesn't matter anyway).
@@ -8,6 +8,6 @@ type C = h.JSX.HTMLAttributes<EventTarget>["className"];
  * @param rhs Classes of the second component
  * @returns A string representing all combined classes from both arguments.
  */
-export declare function useMergedClasses(lhsClass: C, lhsClassName: C, rhsClass: C, rhsClassName: C): string | undefined;
+export declare function useMergedClasses(lhsClassName: C, rhsClassName: C): string | undefined;
 export {};
 //# sourceMappingURL=use-merged-classes.d.ts.map

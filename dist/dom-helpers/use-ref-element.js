@@ -1,8 +1,8 @@
-import { useCallback, useRef } from "preact/hooks";
+import { useCallback, useRef } from "react";
 import { returnNull, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 /*
-export function useRefElementProps<E extends Element>(r: UseRefElementReturnType<E>, ...otherProps: h.JSX.HTMLAttributes<E>[]): h.JSX.HTMLAttributes<E>[] {
+export function useRefElementProps<E extends Element>(r: UseRefElementReturnType<E>, ...otherProps: HTMLAttributes<E>[]): HTMLAttributes<E>[] {
     return [r.refElementReturn.propsStable, ...otherProps];
 }*/
 /**

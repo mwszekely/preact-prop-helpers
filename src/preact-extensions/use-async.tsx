@@ -1,6 +1,6 @@
 
 import { identity } from "lodash-es";
-import { useCallback, useEffect, useMemo } from "preact/hooks";
+import { useCallback, useEffect, useMemo } from "react";
 import { useStableCallback } from "./use-stable-callback.js";
 import { useState } from "./use-state.js";
 import { CaptureFunctionType, asyncToSync } from "../util/async-to-sync.js";

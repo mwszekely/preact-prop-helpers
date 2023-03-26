@@ -1,9 +1,10 @@
-import { h, PreactDOMAttributes } from "preact";
+import {  DOMAttributes } from "react";
 import { useEnsureStability } from "../preact-extensions/use-passive-state.js";
-import { useCallback, useEffect } from "preact/hooks";
+import { useCallback, useEffect } from "react";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useMergedProps } from "./use-merged-props.js";
 import { monitorCallCount } from "../util/use-call-count.js";
+import { ElementProps } from "../util/types.js";
 
 /**
  * This is used to select *just* the typed addEventListener 
@@ -159,12 +160,12 @@ function useGlobalHandlerSingle<T extends EventTarget, EventType extends TypedEv
  * ```
  */
 export function useLocalHandler<ElementType extends (HTMLElementTagNameMap[keyof HTMLElementTagNameMap] | SVGElementTagNameMap[keyof SVGElementTagNameMap])>() {
-    return useCallback(<EventType extends Exclude<keyof h.JSX.DOMAttributes<ElementType>, keyof PreactDOMAttributes>>(type: EventType, handler: NonNullable<h.JSX.DOMAttributes<ElementType>[EventType]>) => {
+    return useCallback(<EventType extends Exclude<keyof DOMAttributes<ElementType>, keyof DOMAttributes<any>>>(type: EventType, handler: NonNullable<DOMAttributes<ElementType>[EventType]>) => {
 
         const stableHandler = useStableCallback(handler);
 
-        const useLocalEventHandlerProps = useCallback((props: h.JSX.HTMLAttributes<ElementType>) => {
-            return useMergedProps<ElementType>({ [type]: stableHandler } as h.JSX.HTMLAttributes<ElementType>, props) as h.JSX.HTMLAttributes<ElementType>;
+        const useLocalEventHandlerProps = useCallback((props: ElementProps<ElementType>) => {
+            return useMergedProps<ElementType>({ [type]: stableHandler } , props) ;
         }, [type]);
 
         return { useLocalEventHandlerProps };

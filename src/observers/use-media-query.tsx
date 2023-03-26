@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef } from "preact/hooks";
+import { useLayoutEffect, useRef } from "react";
 import { useState } from "../preact-extensions/use-state.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 

@@ -1,5 +1,5 @@
 import { useEnsureStability } from "../preact-extensions/use-passive-state.js";
-import { useCallback, useEffect } from "preact/hooks";
+import { useCallback, useEffect } from "react";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useMergedProps } from "./use-merged-props.js";
 import { monitorCallCount } from "../util/use-call-count.js";

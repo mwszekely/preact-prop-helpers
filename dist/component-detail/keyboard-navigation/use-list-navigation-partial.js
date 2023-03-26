@@ -1,4 +1,4 @@
-import { useRef } from "preact/hooks";
+import { useRef } from "react";
 import { useMergedProps } from "../../dom-helpers/use-merged-props.js";
 import { useStableObject } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";

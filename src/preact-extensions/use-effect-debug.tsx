@@ -1,4 +1,4 @@
-import { Inputs, useEffect as useEffectNative, useRef } from "preact/hooks";
+import { DependencyList, useEffect as useEffectNative, useRef } from "react";
 import { monitorCallCount } from "../util/use-call-count.js";
 
 /**
@@ -11,7 +11,7 @@ import { monitorCallCount } from "../util/use-call-count.js";
  * @param impl You can choose whether to use `useEffect` or `useLayoutEffect` by
  * passing one of them as this argument. By default, it's `useEffect`.
  */
-export function useEffectDebug<I extends Inputs>(effect: (prev: I | undefined, changes: EffectChange<I, number>[]) => (void | (() => void)), inputs?: I, impl = useEffectNative) {
+export function useEffectDebug<I extends DependencyList>(effect: (prev: I | undefined, changes: EffectChange<I, number>[]) => (void | (() => void)), inputs?: I, impl = useEffectNative) {
     monitorCallCount(useEffectDebug);
 
     const prevInputs = useRef<undefined | I>(undefined);
@@ -31,4 +31,4 @@ export function useEffectDebug<I extends Inputs>(effect: (prev: I | undefined, c
     impl(effect2, inputs);
 }
 
-export interface EffectChange<I extends Inputs, N extends number> { from: I[N], to: I[N] }
+export interface EffectChange<I extends DependencyList, N extends number> { from: I[N], to: I[N] }

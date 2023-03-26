@@ -1,6 +1,6 @@
-import { createElement } from "preact";
-import { forwardRef, memo } from "preact/compat";
-import { useCallback, useImperativeHandle, useRef } from "preact/hooks";
+import { createElement } from "react";
+import { forwardRef, memo } from "react";
+import { useCallback, useImperativeHandle, useRef } from "react";
 import { monitorCallCount } from "../util/use-call-count.js";
 import { useMergedProps } from "./use-merged-props.js";
 import { useRefElement } from "./use-ref-element.js";
@@ -11,7 +11,7 @@ import { useRefElement } from "./use-ref-element.js";
  *
  * The `handle` prop should be e.g. `useRef<ImperativeHandle<HTMLDivElement>>(null)`
  */
-export const ImperativeElement = memo(forwardRef(ImperativeElementU));
+export const ImperativeElement = memo(forwardRef(ImperativeElementU)); // as any as typeof ImperativeElementU;
 export function useImperativeProps({ refElementReturn: { getElement } }) {
     monitorCallCount(useImperativeProps);
     const currentImperativeProps = useRef({ className: new Set(), style: {}, children: null, others: {} });
@@ -108,7 +108,7 @@ const EventMapping = {
     compositionupdate: "onCompositionUpdate",
     contextmenu: "onContextMenu",
     cut: "onCut",
-    dblclick: "onDblClick",
+    dblclick: "onDoubleClick",
     drag: "onDrag",
     dragend: "onDragEnd",
     dragenter: "onDragEnter",
@@ -121,9 +121,6 @@ const EventMapping = {
     ended: "onEnded",
     error: "onError",
     focus: "onFocus",
-    focusin: "onfocusin",
-    focusout: "onfocusout",
-    formdata: "onFormData",
     gotpointercapture: "onGotPointerCapture",
     input: "onInput",
     invalid: "onInvalid",
@@ -164,7 +161,6 @@ const EventMapping = {
     submit: "onSubmit",
     suspend: "onSuspend",
     timeupdate: "onTimeUpdate",
-    toggle: "onToggle",
     touchcancel: "onTouchCancel",
     touchend: "onTouchEnd",
     touchmove: "onTouchMove",
@@ -172,6 +168,7 @@ const EventMapping = {
     transitionend: "onTransitionEnd",
     volumechange: "onVolumeChange",
     waiting: "onWaiting",
-    wheel: "onWheel"
+    wheel: "onWheel",
+    resize: "onResize"
 };
 //# sourceMappingURL=use-imperative-props.js.map

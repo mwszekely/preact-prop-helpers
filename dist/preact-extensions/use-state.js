@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState as useStateP } from "preact/hooks";
+import { useCallback, useRef, useState as useStateP } from "react";
 import { monitorCallCount } from "../util/use-call-count.js";
 /**
  * Slightly enhanced version of `useState` that includes a getter that remains constant
@@ -17,7 +17,7 @@ export function useState(initialState) {
     const setState = useCallback(value => {
         if (typeof value === "function") {
             const callback = value;
-            setStateP(prevValue => {
+            return setStateP(prevValue => {
                 const nextValue = callback(prevValue);
                 ref.current = nextValue;
                 return nextValue;
@@ -25,7 +25,7 @@ export function useState(initialState) {
         }
         else {
             ref.current = value;
-            setStateP(value);
+            return setStateP(value);
         }
     }, []);
     const getState = useCallback(() => { return ref.current; }, []);

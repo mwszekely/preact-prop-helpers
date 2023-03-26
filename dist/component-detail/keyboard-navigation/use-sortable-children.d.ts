@@ -1,6 +1,5 @@
-import { VNode } from "preact";
 import { ManagedChildInfo, UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
-export type GetIndex<P> = (row: VNode<P>) => (number | null | undefined);
+export type GetIndex = (row: JSX.Element) => (number | null | undefined);
 export type GetValid = (index: number) => boolean;
 export type GetHighestChildIndex = () => number;
 export type Compare<M extends UseRearrangeableChildInfo> = (lhs: M, rhs: M) => number;
@@ -19,7 +18,7 @@ export interface UseRearrangeableChildrenParameters<M extends UseRearrangeableCh
          *
          * In general, this corresponds to the `index` prop, so something like `vnode => vnode.props.index` is what you're usually looking for.
          */
-        getIndex: GetIndex<any>;
+        getIndex: GetIndex;
         onRearranged: null | (() => void);
     };
 }
@@ -73,7 +72,7 @@ export interface UseRearrangeableChildrenReturnType<M extends UseRearrangeableCh
          * Call this on your props (that contain the children to sort!!) to allow them to be sortable.
          *
          */
-        useRearrangedChildren: (children: VNode[]) => VNode[];
+        useRearrangedChildren: (children: JSX.Element[]) => JSX.Element[];
         toJsonArray(transform?: (info: M) => object): object;
     };
 }

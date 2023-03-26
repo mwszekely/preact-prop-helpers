@@ -1,4 +1,4 @@
-import { useEffect } from "preact/hooks";
+import { useEffect } from "react";
 import { useAsync } from "./use-async.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 /**

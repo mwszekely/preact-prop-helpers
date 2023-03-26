@@ -1,4 +1,4 @@
-import { h } from "preact";
+import { HTMLAttributes } from "react";
 /**
  * Merges two style objects, returning the result.
  *
@@ -6,5 +6,5 @@ import { h } from "preact";
  * @param obj The CSS properties you want added to the user-given style
  * @returns A CSS object containing the properties of both objects.
  */
-export declare function useMergedStyles(lhs: h.JSX.HTMLAttributes<EventTarget>["style"], rhs: h.JSX.HTMLAttributes<EventTarget>["style"]): h.JSX.HTMLAttributes<EventTarget>["style"];
+export declare function useMergedStyles(lhs: HTMLAttributes<EventTarget>["style"], rhs: HTMLAttributes<EventTarget>["style"]): HTMLAttributes<EventTarget>["style"];
 //# sourceMappingURL=use-merged-styles.d.ts.map

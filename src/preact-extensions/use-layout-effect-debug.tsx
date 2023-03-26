@@ -1,4 +1,4 @@
-import { Inputs, useLayoutEffect as useLayoutEffectNative } from "preact/hooks";
+import { DependencyList, useLayoutEffect as useLayoutEffectNative } from "react";
 import { EffectChange, useEffectDebug } from "./use-effect-debug.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 
@@ -10,7 +10,7 @@ import { monitorCallCount } from "../util/use-call-count.js";
  * @param effect 
  * @param inputs 
  */
-export function useLayoutEffectDebug<I extends Inputs>(effect: (prev: I | undefined, changes: EffectChange<I, number>[]) => (void | (() => void)), inputs?: I) {
+export function useLayoutEffectDebug<I extends DependencyList>(effect: (prev: I | undefined, changes: EffectChange<I, number>[]) => (void | (() => void)), inputs?: I) {
     monitorCallCount(useLayoutEffectDebug);
 
     return useEffectDebug(effect, inputs, useLayoutEffectNative);

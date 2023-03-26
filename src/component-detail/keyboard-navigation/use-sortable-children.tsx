@@ -1,6 +1,5 @@
 import { shuffle as lodashShuffle } from "lodash-es";
-import { h, VNode } from "preact";
-import { MutableRef, useCallback, useLayoutEffect, useRef } from "preact/hooks";
+import { createElement, useCallback, useLayoutEffect, useRef } from "react";
 import { useForceUpdate } from "../../preact-extensions/use-force-update.js";
 import { ManagedChildInfo, ManagedChildren, UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
 import { returnNull, useEnsureStability, usePassiveState } from "../../preact-extensions/use-passive-state.js";
@@ -9,7 +8,7 @@ import { monitorCallCount } from "../../util/use-call-count.js";
 
 
 
-export type GetIndex<P> = (row: VNode<P>) => (number | null | undefined);
+export type GetIndex = (row: JSX.Element) => (number | null | undefined);
 export type GetValid = (index: number) => boolean;
 export type GetHighestChildIndex = () => number;
 export type Compare<M extends UseRearrangeableChildInfo> = (lhs: M, rhs: M) => number;
@@ -31,7 +30,7 @@ export interface UseRearrangeableChildrenParameters<M extends UseRearrangeableCh
          * 
          * In general, this corresponds to the `index` prop, so something like `vnode => vnode.props.index` is what you're usually looking for.
          */
-        getIndex: GetIndex<any>;
+        getIndex: GetIndex;
 
 
         onRearranged: null | (() => void);
@@ -98,7 +97,7 @@ export interface UseRearrangeableChildrenReturnType<M extends UseRearrangeableCh
          * Call this on your props (that contain the children to sort!!) to allow them to be sortable.
          * 
          */
-        useRearrangedChildren: (children: VNode[]) => VNode[];
+        useRearrangedChildren: (children: JSX.Element[]) => JSX.Element[];
 
         toJsonArray(transform?: (info: M) => object): object;
 
@@ -202,7 +201,7 @@ export function useRearrangeableChildren<M extends UseSortableChildInfo>({
         getForceUpdate()?.();
     }, []);
 
-    const useRearrangedChildren = useCallback((children: VNode[]) => {
+    const useRearrangedChildren = useCallback(function useRearrangedChildren(children: JSX.Element[]) {
         monitorCallCount(useRearrangedChildren);
 
         console.assert(Array.isArray(children));
@@ -210,12 +209,12 @@ export function useRearrangeableChildren<M extends UseSortableChildInfo>({
         const forceUpdate = useForceUpdate();
         useLayoutEffect(() => { setForceUpdate(_prev => forceUpdate); }, [forceUpdate])
 
-        return (children as VNode<any>[])
+        return (children as JSX.Element[])
             .slice()
             .map(child => ({ child, mangledIndex: indexMangler(getIndex(child)!), demangledIndex: getIndex(child) }))
             .sort((lhs, rhs) => { return lhs.mangledIndex - rhs.mangledIndex })
             .map(({ child, mangledIndex, demangledIndex }) => {
-                return h(child.type as any, { ...child.props, key: demangledIndex, "data-mangled-index": mangledIndex, "data-unmangled-index": demangledIndex });
+                return createElement(child.type as any, { ...child.props, key: demangledIndex, "data-mangled-index": mangledIndex, "data-unmangled-index": demangledIndex });
             });
     }, []);
 

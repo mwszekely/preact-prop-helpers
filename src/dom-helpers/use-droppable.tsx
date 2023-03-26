@@ -1,11 +1,12 @@
-import { h } from "preact";
-import { useEffect, useRef } from "preact/hooks";
+import { DragEvent } from "react";
+import { useEffect, useRef } from "react";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useState } from "../preact-extensions/use-state.js";
 import { monitorCallCount } from "../util/use-call-count.js";
+import { ElementProps } from "../util/types.js";
 
 /*
-export function useDroppableProps<E extends Element>(r: UseDroppableReturnType<E>, ...otherProps: h.JSX.HTMLAttributes<E>[]): h.JSX.HTMLAttributes<E>[] {
+export function useDroppableProps<E extends Element>(r: UseDroppableReturnType<E>, ...otherProps: ElementProps<E>[]): ElementProps<E>[] {
     return [r.propsStable, ...otherProps];
 }*/
 
@@ -16,7 +17,7 @@ export interface UseDroppableReturnType<E extends Element> {
      * 
      * *Unstable*
      */
-    propsStable: h.JSX.HTMLAttributes<E>;
+    propsStable: ElementProps<E>;
 
     /**
      * While something is being dragged over this element, this will contain any information about any files included in that drop.

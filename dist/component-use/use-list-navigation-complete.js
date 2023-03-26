@@ -1,4 +1,4 @@
-import { useCallback } from "preact/hooks";
+import { useCallback } from "react";
 import { useListNavigationSingleSelectionSortable } from "../component-detail/keyboard-navigation/use-list-navigation-single-selection-sortable.js";
 import { useListNavigationSingleSelectionChild } from "../component-detail/keyboard-navigation/use-list-navigation-single-selection.js";
 import { useSingleSelectionDeclarative } from "../component-detail/keyboard-navigation/use-single-selection.js";

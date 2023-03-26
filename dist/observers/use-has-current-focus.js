@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from "preact/hooks";
+import { useCallback, useEffect, useRef } from "react";
 import { returnFalse, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 export function useHasCurrentFocus(args) {
@@ -25,8 +25,8 @@ export function useHasCurrentFocus(args) {
         };
     }, []);
     const propsStable = useRef({
-        onfocusin: onFocusIn,
-        onfocusout: onFocusOut
+        onFocus: onFocusIn,
+        onBlur: onFocusOut
     });
     useEffect(() => {
         return () => {

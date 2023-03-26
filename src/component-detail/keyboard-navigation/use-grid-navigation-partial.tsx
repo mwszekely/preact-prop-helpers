@@ -1,3 +1,4 @@
+import { SyntheticEvent } from "react";
 import { useMergedProps } from "../../dom-helpers/use-merged-props.js";
 import { UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
 import { OnPassiveStateChange, PassiveStateUpdater, usePassiveState } from "../../preact-extensions/use-passive-state.js";
@@ -16,7 +17,7 @@ export interface UseGridNavigationParameters<ParentOrChildElement extends Elemen
     OmitStrong<UseListNavigationParameters<ParentOrChildElement, RowElement, M>, "linearNavigationParameters"> {
     linearNavigationParameters: OmitStrong<UseListNavigationParameters<ParentOrChildElement, RowElement, M>["linearNavigationParameters"], "arrowKeyDirection">
     gridNavigationParameters: {
-        onTabbableColumnChange: OnPassiveStateChange<number | null, Event> | null;
+        onTabbableColumnChange: OnPassiveStateChange<number | null, SyntheticEvent> | null;
     };
 }
 export interface UseGridNavigationReturnType<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, RM extends GridChildRowInfo<RowElement, CellElement>, CM extends GridChildCellInfo<CellElement>> extends
@@ -30,7 +31,7 @@ export interface UseGridNavigationRowContext<ParentOrRowElement extends Element,
         _c?: CellElement;
         setTabbableRow: SetTabbableIndex; // (updater: Parameters<StateUpdater<number | null>>[0], fromUserInteraction: boolean) => void;
         getCurrentTabbableColumn: () => (number | null);
-        setCurrentTabbableColumn: PassiveStateUpdater<number | null, Event>;
+        setCurrentTabbableColumn: PassiveStateUpdater<number | null, SyntheticEvent>;
     }
 }
 
@@ -75,7 +76,7 @@ export interface UseGridNavigationCellContext<RowElement extends Element, CellEl
         getRowIndex: () => number;
         setTabbableRow: SetTabbableIndex; //(u: Parameters<StateUpdater<number | null>>[0], fromUserInteraction: boolean) => void;
         getCurrentTabbableColumn: () => (number | null);
-        setCurrentTabbableColumn: PassiveStateUpdater<number | null, Event>;
+        setCurrentTabbableColumn: PassiveStateUpdater<number | null, SyntheticEvent>;
         setTabbableCell: SetTabbableIndex; //(updater: Parameters<StateUpdater<number | null>>[0], fromUserInteraction: boolean) => void;
     }
 }
@@ -95,9 +96,9 @@ export function useGridNavigation<ParentOrRowElement extends Element, RowElement
     const { getChildren } = managedChildrenReturn;
     const { initiallyTabbedIndex } = rovingTabIndexParameters
 
-    const [getCurrentTabbableColumn, setCurrentTabbableColumn] = usePassiveState<number | null, Event>(onTabbableColumnChange, useStableCallback(() => { return (initiallyTabbedIndex ?? 0) }));
+    const [getCurrentTabbableColumn, setCurrentTabbableColumn] = usePassiveState<number | null, SyntheticEvent>(onTabbableColumnChange, useStableCallback(() => { return (initiallyTabbedIndex ?? 0) }));
 
-    const onTabbableIndexChangeOverride = useStableCallback((nextRow: number | null, previousRow: number | null | undefined, reason: Event | undefined) => {
+    const onTabbableIndexChangeOverride = useStableCallback((nextRow: number | null, previousRow: number | null | undefined, reason: SyntheticEvent | undefined) => {
         const children = getChildren();
         onTabbableIndexChange?.(nextRow, previousRow, reason);
         const nextColumn = getCurrentTabbableColumn();
@@ -220,7 +221,7 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
         setTabbableCell: setTabbableIndex
     })
 
-    const props = useMergedProps(propsLN, propsLNC);
+    const props = useMergedProps<RowElement>(propsLN, propsLNC);
     props.tabIndex = -1;
 
     return {

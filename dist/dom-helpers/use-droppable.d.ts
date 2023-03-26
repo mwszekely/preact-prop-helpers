@@ -1,11 +1,11 @@
-import { h } from "preact";
+import { ElementProps } from "../util/types.js";
 export interface UseDroppableReturnType<E extends Element> {
     /**
      * Hook for modifying the props you were going to pass to your drop target Element.
      *
      * *Unstable*
      */
-    propsStable: h.JSX.HTMLAttributes<E>;
+    propsStable: ElementProps<E>;
     /**
      * While something is being dragged over this element, this will contain any information about any files included in that drop.
      * Otherwise, it'll be null, meaning nothing is being dragged over this element.

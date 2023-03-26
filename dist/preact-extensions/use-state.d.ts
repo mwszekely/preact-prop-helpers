@@ -1,4 +1,4 @@
-import { StateUpdater } from "preact/hooks";
+import { SetStateAction, Dispatch } from "react";
 /**
  * Slightly enhanced version of `useState` that includes a getter that remains constant
  * (i.e. you can use it in `useEffect` and friends without it being a dependency).
@@ -6,5 +6,5 @@ import { StateUpdater } from "preact/hooks";
  * @param initialState
  * @returns
  */
-export declare function useState<T>(initialState: T | (() => T)): readonly [value: T, setValue: StateUpdater<T>, getValue: () => T];
+export declare function useState<T>(initialState: T | (() => T)): readonly [value: T, setValue: Dispatch<SetStateAction<T>>, getValue: () => T];
 //# sourceMappingURL=use-state.d.ts.map

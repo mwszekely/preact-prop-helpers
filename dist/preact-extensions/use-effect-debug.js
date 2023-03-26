@@ -1,4 +1,4 @@
-import { useEffect as useEffectNative, useRef } from "preact/hooks";
+import { useEffect as useEffectNative, useRef } from "react";
 import { monitorCallCount } from "../util/use-call-count.js";
 /**
  * Wrap the native `useEffect` to add arguments

@@ -1,22 +1,21 @@
-import { h } from "preact";
-import { useCallback } from "preact/hooks";
-import { useListNavigationSingleSelectionSortable, UseListNavigationSingleSelectionSortableChildInfo, UseListNavigationSingleSelectionSortableChildParameters, UseListNavigationSingleSelectionSortableChildReturnType, UseListNavigationSingleSelectionSortableParameters, UseListNavigationSingleSelectionSortableReturnType } from "../component-detail/keyboard-navigation/use-list-navigation-single-selection-sortable.js";
+import { DetailedHTMLProps, useCallback } from "react";
+import { UseListNavigationSingleSelectionSortableChildInfo, UseListNavigationSingleSelectionSortableChildParameters, UseListNavigationSingleSelectionSortableChildReturnType, UseListNavigationSingleSelectionSortableParameters, UseListNavigationSingleSelectionSortableReturnType, useListNavigationSingleSelectionSortable } from "../component-detail/keyboard-navigation/use-list-navigation-single-selection-sortable.js";
 import { useListNavigationSingleSelectionChild } from "../component-detail/keyboard-navigation/use-list-navigation-single-selection.js";
 import { RovingTabIndexChildContext } from "../component-detail/keyboard-navigation/use-roving-tabindex.js";
 import { MakeSingleSelectionDeclarativeParameters, UseSingleSelectionContext, useSingleSelectionDeclarative } from "../component-detail/keyboard-navigation/use-single-selection.js";
 import { UseSortableChildInfo } from "../component-detail/keyboard-navigation/use-sortable-children.js";
 import { UseTypeaheadNavigationContext } from "../component-detail/keyboard-navigation/use-typeahead-navigation.js";
-import { usePaginatedChild, UsePaginatedChildContext, usePaginatedChildren, UsePaginatedChildrenInfo, UsePaginatedChildrenParameters, UsePaginatedChildrenReturnType, UsePaginatedChildReturn } from "../component-detail/use-paginated-children.js";
-import { useStaggeredChild, UseStaggeredChildContext, useStaggeredChildren, UseStaggeredChildrenInfo, UseStaggeredChildrenParameters, UseStaggeredChildrenReturnType, UseStaggeredChildReturn } from "../component-detail/use-staggered-children.js";
+import { UsePaginatedChildContext, UsePaginatedChildReturn, UsePaginatedChildrenInfo, UsePaginatedChildrenParameters, UsePaginatedChildrenReturnType, usePaginatedChild, usePaginatedChildren } from "../component-detail/use-paginated-children.js";
+import { UseStaggeredChildContext, UseStaggeredChildReturn, UseStaggeredChildrenInfo, UseStaggeredChildrenParameters, UseStaggeredChildrenReturnType, useStaggeredChild, useStaggeredChildren } from "../component-detail/use-staggered-children.js";
 import { useMergedProps } from "../dom-helpers/use-merged-props.js";
-import { useRefElement, UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
-import { useChildrenHaveFocus, useChildrenHaveFocusChild, UseChildrenHaveFocusContext, UseChildrenHaveFocusReturnType } from "../observers/use-children-have-focus.js";
-import { useHasCurrentFocus, UseHasCurrentFocusReturnType } from "../observers/use-has-current-focus.js";
-import { ManagedChildren, useManagedChild, useManagedChildren, UseManagedChildrenContext, UseManagedChildrenReturnType, UseManagedChildReturnType } from "../preact-extensions/use-managed-children.js";
+import { UseRefElementReturnType, useRefElement } from "../dom-helpers/use-ref-element.js";
+import { UseChildrenHaveFocusContext, UseChildrenHaveFocusReturnType, useChildrenHaveFocus, useChildrenHaveFocusChild } from "../observers/use-children-have-focus.js";
+import { UseHasCurrentFocusReturnType, useHasCurrentFocus } from "../observers/use-has-current-focus.js";
+import { ManagedChildren, UseManagedChildReturnType, UseManagedChildrenContext, UseManagedChildrenReturnType, useManagedChild, useManagedChildren } from "../preact-extensions/use-managed-children.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useStableObject } from "../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../util/assert.js";
-import { OmitStrong, OmitTargeted, PickTargeted } from "../util/types.js";
+import { ElementProps, OmitStrong, OmitTargeted, PickTargeted } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 
 export interface UseCompleteListNavigationChildInfo<ChildElement extends Element> extends UseListNavigationSingleSelectionSortableChildInfo<ChildElement>, UsePaginatedChildrenInfo<ChildElement>, UseStaggeredChildrenInfo<ChildElement> { }
@@ -37,7 +36,7 @@ export interface UseCompleteListNavigationReturnType<ParentElement extends Eleme
     Pick<UsePaginatedChildrenReturnType, "paginatedChildrenReturn">,
     Pick<UseStaggeredChildrenReturnType, "staggeredChildrenReturn">,
     OmitStrong<UseListNavigationSingleSelectionSortableReturnType<ParentElement, ChildElement, M>, "context" | "propsStable" | "childrenHaveFocusParameters" | "managedChildrenParameters"> {
-    propsStable: h.JSX.HTMLAttributes<ParentElement>;
+    propsStable: ElementProps<ParentElement>;
     context: CompleteListNavigationContext<ParentElement, ChildElement, M>;
 
     managedChildrenReturn: UseManagedChildrenReturnType<M>["managedChildrenReturn"];
@@ -158,7 +157,7 @@ export interface UseCompleteListNavigationChildReturnType<ChildElement extends E
     extends Pick<UseListNavigationSingleSelectionSortableChildReturnType<ChildElement, M>, "textContentReturn" | "rovingTabIndexChildReturn" | "singleSelectionChildReturn" | "pressParameters">, OmitStrong<UseRefElementReturnType<ChildElement>, "propsStable"> {
     hasCurrentFocusReturn: UseHasCurrentFocusReturnType<ChildElement>["hasCurrentFocusReturn"];
     managedChildReturn: UseManagedChildReturnType<M>["managedChildReturn"];
-    props: h.JSX.HTMLAttributes<ChildElement>;
+    props: ElementProps<ChildElement>;
     paginatedChildReturn: UsePaginatedChildReturn<ChildElement>["paginatedChildReturn"];
     staggeredChildReturn: UseStaggeredChildReturn<ChildElement>["staggeredChildReturn"];
 }

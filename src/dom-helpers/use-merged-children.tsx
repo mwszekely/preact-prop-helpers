@@ -1,7 +1,7 @@
-import { createElement, Fragment, h } from "preact";
+import { createElement, Fragment, HTMLAttributes, ReactNode } from "react";
 import { monitorCallCount } from "../util/use-call-count.js";
 
-export function useMergedChildren(lhs: h.JSX.HTMLAttributes<EventTarget>["children"], rhs: h.JSX.HTMLAttributes<EventTarget>["children"]): h.JSX.HTMLAttributes<EventTarget>["children"] {
+export function useMergedChildren(lhs: HTMLAttributes<EventTarget>["children"], rhs: HTMLAttributes<EventTarget>["children"]): HTMLAttributes<EventTarget>["children"] {
     monitorCallCount(useMergedChildren);
     
     if (lhs == null && rhs == null) {

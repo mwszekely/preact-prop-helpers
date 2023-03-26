@@ -1,7 +1,7 @@
-import { h } from "preact";
+import { UseManagedChildrenReturnType } from "../preact-extensions/use-managed-children.js";
+import { ElementProps } from "../util/types.js";
 import { UseLinearNavigationParameters } from "./keyboard-navigation/use-linear-navigation.js";
 import { UseRovingTabIndexChildInfo } from "./keyboard-navigation/use-roving-tabindex.js";
-import { UseManagedChildrenReturnType } from "../preact-extensions/use-managed-children.js";
 export interface UsePaginatedChildrenInfo<E extends Element> extends UseRovingTabIndexChildInfo<E> {
     setParentIsPaginated(parentIsPaginated: boolean): void;
     setPaginationVisible(visible: boolean): void;
@@ -44,7 +44,7 @@ export interface UsePaginatedChildParameters {
     context: UsePaginatedChildContext;
 }
 export interface UsePaginatedChildReturn<ChildElement extends Element> {
-    props: h.JSX.HTMLAttributes<ChildElement>;
+    props: ElementProps<ChildElement>;
     paginatedChildReturn: {
         paginatedVisible: boolean;
         isPaginated: boolean;

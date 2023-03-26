@@ -1,4 +1,5 @@
-import { EffectCallback, Inputs } from "preact/hooks";
+import { DependencyList } from "react";
+import { EffectCallback } from "react";
 /**
  * Semi-private function to allow stable callbacks even within `useLayoutEffect` and ref assignment.
  *
@@ -8,5 +9,5 @@ import { EffectCallback, Inputs } from "preact/hooks";
  * @param effect
  * @param inputs
  */
-export declare function useBeforeLayoutEffect(effect: EffectCallback | null, inputs?: Inputs): void;
+export declare function useBeforeLayoutEffect(effect: EffectCallback | null, inputs?: DependencyList): void;
 //# sourceMappingURL=use-before-layout-effect.d.ts.map

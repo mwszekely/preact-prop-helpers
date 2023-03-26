@@ -1,6 +1,5 @@
 import { shuffle as lodashShuffle } from "lodash-es";
-import { h } from "preact";
-import { useCallback, useLayoutEffect, useRef } from "preact/hooks";
+import { createElement, useCallback, useLayoutEffect, useRef } from "react";
 import { useForceUpdate } from "../../preact-extensions/use-force-update.js";
 import { returnNull, useEnsureStability, usePassiveState } from "../../preact-extensions/use-passive-state.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
@@ -70,7 +69,7 @@ export function useRearrangeableChildren({ rearrangeableChildrenParameters: { ge
         onRearrangedGetter()?.();
         getForceUpdate()?.();
     }, []);
-    const useRearrangedChildren = useCallback((children) => {
+    const useRearrangedChildren = useCallback(function useRearrangedChildren(children) {
         monitorCallCount(useRearrangedChildren);
         console.assert(Array.isArray(children));
         const forceUpdate = useForceUpdate();
@@ -80,7 +79,7 @@ export function useRearrangeableChildren({ rearrangeableChildrenParameters: { ge
             .map(child => ({ child, mangledIndex: indexMangler(getIndex(child)), demangledIndex: getIndex(child) }))
             .sort((lhs, rhs) => { return lhs.mangledIndex - rhs.mangledIndex; })
             .map(({ child, mangledIndex, demangledIndex }) => {
-            return h(child.type, { ...child.props, key: demangledIndex, "data-mangled-index": mangledIndex, "data-unmangled-index": demangledIndex });
+            return createElement(child.type, { ...child.props, key: demangledIndex, "data-mangled-index": mangledIndex, "data-unmangled-index": demangledIndex });
         });
     }, []);
     const toJsonArray = useCallback((transform) => {

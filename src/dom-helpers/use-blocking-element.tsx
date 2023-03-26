@@ -1,6 +1,6 @@
 import "blocking-elements";
 import { DocumentWithBlockingElements } from "blocking-elements";
-import { useLayoutEffect } from "preact/hooks";
+import { useLayoutEffect } from "react";
 import "wicg-inert";
 import { useActiveElement } from "../observers/use-active-element.js";
 import { returnNull, usePassiveState } from "../preact-extensions/use-passive-state.js";

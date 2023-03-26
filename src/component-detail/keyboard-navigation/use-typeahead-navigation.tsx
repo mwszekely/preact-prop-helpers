@@ -1,5 +1,4 @@
-import { h } from "preact";
-import { useCallback, useLayoutEffect, useRef } from "preact/hooks";
+import { CompositionEvent, KeyboardEvent, SyntheticEvent, useCallback, useLayoutEffect, useRef } from "react";
 import { UsePressParameters } from "../../component-use/use-press.js";
 import { UseRefElementReturnType } from "../../dom-helpers/use-ref-element.js";
 import { UseTextContentParameters, UseTextContentReturnType, useTextContent } from "../../dom-helpers/use-text-content.js";
@@ -8,6 +7,7 @@ import { useStableCallback } from "../../preact-extensions/use-stable-callback.j
 import { useStableGetter, useStableObject } from "../../preact-extensions/use-stable-getter.js";
 import { useState } from "../../preact-extensions/use-state.js";
 import { assertEmptyObject } from "../../util/assert.js";
+import { ElementProps } from "../../util/types.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexChildParameters, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
 
@@ -16,7 +16,7 @@ export interface UseTypeaheadNavigationReturnType<ParentOrChildElement extends E
         getCurrentTypeahead(): string | null;
         typeaheadStatus: "invalid" | "valid" | "none";
     }
-    propsStable: h.JSX.HTMLAttributes<ParentOrChildElement>;
+    propsStable: ElementProps<ParentOrChildElement>;
     context: UseTypeaheadNavigationContext;
 }
 
@@ -92,7 +92,7 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
     // and also clear it every 1000 ms since the last time it changed.
     // Next, keep a mapping of typeahead values to indices for faster searching.
     // And, for the user's sake, let them know when their typeahead can't match anything anymore
-    const [getCurrentTypeahead, setCurrentTypeahead] = usePassiveState<string | null, Event>(useStableCallback((currentTypeahead, prev, reason) => {
+    const [getCurrentTypeahead, setCurrentTypeahead] = usePassiveState<string | null, SyntheticEvent<ParentOrChildElement>>(useStableCallback((currentTypeahead, prev, reason) => {
         const handle = setTimeout(() => { setCurrentTypeahead(null, undefined!); setTypeaheadStatus("none"); }, typeaheadTimeout ?? 1000);
         updateBasedOnTypeaheadChange(currentTypeahead, reason!);
         return () => clearTimeout(handle);
@@ -156,8 +156,8 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
     const isDisabled = useStableGetter(noTypeahead);
 
 
-    const propsStable = useRef<h.JSX.HTMLAttributes<ParentOrChildElement>>({
-        onKeyDown: useStableCallback((e: h.JSX.TargetedKeyboardEvent<ParentOrChildElement>) => {
+    const propsStable = useRef({
+        onKeyDown: useStableCallback((e: KeyboardEvent<ParentOrChildElement>) => {
             if (isDisabled())
                 return;
 
@@ -171,7 +171,7 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
 
             if (!imeActive && e.key === "Backspace") {
                 // Remove the last character in a way that doesn't split UTF-16 surrogates.
-                setCurrentTypeahead(t => t == null ? null : [...t].reverse().slice(1).reverse().join(""), e as h.JSX.TargetedKeyboardEvent<any>);
+                setCurrentTypeahead(t => t == null ? null : [...t].reverse().slice(1).reverse().join(""), e as KeyboardEvent<any>);
                 e.preventDefault();
                 e.stopPropagation();
                 return;
@@ -234,7 +234,7 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
 
 
 
-    function updateBasedOnTypeaheadChange(currentTypeahead: string | null, reason: Event) {
+    function updateBasedOnTypeaheadChange(currentTypeahead: string | null, reason: SyntheticEvent<ParentOrChildElement>) {
         if (currentTypeahead && sortedTypeaheadInfo.current.length) {
 
 

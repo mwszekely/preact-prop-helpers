@@ -1,5 +1,4 @@
-import { h } from "preact";
-import { useState } from "preact/hooks";
+import { useState } from "react";
 import { useTimeout } from "../../dist/index.js";
 
 
@@ -12,11 +11,11 @@ export const DemoUseTimeout = () => {
     useTimeout({ timeout, triggerIndex, callback: () => setFireCount(i => ++i) })
 
     return (
-        <div class="demo">
+        <div className="demo">
             <h2>useTimeout</h2>
             <p><code>useEffect</code> but on a timer</p>
-            <label>Timeout duration: <input type="number" value={timeout} onInput={e => setTimeout(e.currentTarget.valueAsNumber)} /></label>
-            <label>Refresh key: <input type="text" value={triggerIndex} onInput={e => setTriggerIndex(e.currentTarget.value)} /></label>
+            <label>Timeout duration: <input type="number" value={timeout} onChange={e => setTimeout(e.currentTarget.valueAsNumber)} /></label>
+            <label>Refresh key: <input type="text" value={triggerIndex} onChange={e => setTriggerIndex(e.currentTarget.value)} /></label>
             <div>The callback has been called {fireCount} time{fireCount === 1 ? "" : "s"}.</div>
         </div>
     )

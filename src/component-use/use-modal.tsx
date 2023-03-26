@@ -1,8 +1,8 @@
-import { h } from "preact";
 import { DismissListenerTypes, useDismiss, UseDismissParameters, UseDismissReturnType } from "../component-detail/use-dismiss.js";
 import { useFocusTrap, UseFocusTrapParameters, UseFocusTrapReturnType } from "../component-detail/use-focus-trap.js";
 import { useMergedProps } from "../dom-helpers/use-merged-props.js";
 import { useRefElement } from "../dom-helpers/use-ref-element.js";
+import { ElementProps } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 
 export interface UseModalParameters<Listeners extends DismissListenerTypes> extends UseDismissParameters<Listeners> {
@@ -10,7 +10,7 @@ export interface UseModalParameters<Listeners extends DismissListenerTypes> exte
 }
 
 export interface UseModalReturnType<FocusContainerElement extends Element | null, SourceElement extends Element | null, PopupElement extends Element> extends UseDismissReturnType<SourceElement, PopupElement> {
-    propsFocusContainer: h.JSX.HTMLAttributes<NonNullable<FocusContainerElement>>;
+    propsFocusContainer: ElementProps<NonNullable<FocusContainerElement>>;
     focusTrapReturn: UseFocusTrapReturnType<NonNullable<FocusContainerElement>>["focusTrapReturn"];
 }
 

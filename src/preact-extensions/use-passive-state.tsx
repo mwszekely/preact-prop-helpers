@@ -1,5 +1,4 @@
-import { options } from "preact";
-import { useCallback, useLayoutEffect, useRef } from "preact/hooks";
+import { useCallback, useLayoutEffect, useRef } from "react";
 import { getBuildMode } from "../util/mode.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 
@@ -47,7 +46,7 @@ export function useEnsureStability<T extends any[]>(parentHookName: string, ...v
 }
 
 export function debounceRendering(f: () => void) {
-    (options.debounceRendering ?? queueMicrotask)(f);
+    (setTimeout)(f);
 }
 
 /**

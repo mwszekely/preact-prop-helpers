@@ -8,15 +8,17 @@ import { monitorCallCount } from "../util/use-call-count.js";
  * @param rhs Classes of the second component
  * @returns A string representing all combined classes from both arguments.
  */
-export function useMergedClasses(lhsClass, lhsClassName, rhsClass, rhsClassName) {
+export function useMergedClasses(lhsClassName, rhsClassName) {
     monitorCallCount(useMergedClasses);
     // Note: For the sake of forward compatibility, this function is labelled as
     // a hook, but as it uses no other hooks it technically isn't one.
-    if (lhsClass || rhsClass || lhsClassName || rhsClassName) {
-        const lhsClasses = clsx(lhsClass, lhsClassName).split(" ");
-        const rhsClasses = clsx(rhsClass, rhsClassName).split(" ");
-        const allClasses = new Set([...Array.from(lhsClasses), ...Array.from(rhsClasses)]);
-        return Array.from(allClasses).join(" ");
+    if (lhsClassName || rhsClassName) {
+        return clsx(lhsClassName, rhsClassName);
+        /*const lhsClasses = (lhsClassName || "").split(" ");
+        const rhsClasses = (rhsClassName || "").split(" ");
+        const allClasses = new Set([...Array.from(lhsClasses), ...Array.from(rhsClasses)])
+
+        return Array.from(allClasses).join(" ");*/
     }
     else {
         return undefined;

@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "preact/hooks";
+import { useCallback, useEffect } from "react";
 import { useRefElement } from "../dom-helpers/use-ref-element.js";
 import { returnNull, runImmediately, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";

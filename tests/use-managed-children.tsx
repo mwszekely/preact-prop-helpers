@@ -1,6 +1,6 @@
 import { mount } from 'enzyme';
 import { createContext, RenderableProps } from "preact";
-import { useContext, useState } from "preact/hooks";
+import { useContext, useState } from "react";
 import { useLayoutEffect, useStableCallback } from "../src/index";
 import { ManagedChildInfo, UseManagedChild, useManagedChildren } from "../src/use-child-manager";
 

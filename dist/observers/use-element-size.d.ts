@@ -1,4 +1,4 @@
-import { h } from "preact";
+import { SyntheticEvent } from "react";
 import { UseRefElementParameters, UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
 export interface UseElementSizeParameters<T extends Element> extends UseRefElementParameters<T> {
     elementSizeParameters: {
@@ -9,7 +9,7 @@ export interface UseElementSizeParameters<T extends Element> extends UseRefEleme
          * values you use if you'd like.
          * @param sizeInfo
          */
-        onSizeChange(sizeInfo: ElementSize, prevSize: ElementSize | undefined, entries: ResizeObserverEntry[] | h.JSX.TargetedEvent<T>): void;
+        onSizeChange(sizeInfo: ElementSize, prevSize: ElementSize | undefined, entries: ResizeObserverEntry[] | SyntheticEvent<T>): void;
         /**
          * Passed as an argument to the created ResizeObserver.
          *

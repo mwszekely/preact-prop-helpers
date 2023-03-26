@@ -1,3 +1,4 @@
+import { SyntheticEvent } from "react";
 import { UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
 import { OnPassiveStateChange, PassiveStateUpdater } from "../../preact-extensions/use-passive-state.js";
 import { OmitStrong } from "../../util/types.js";
@@ -11,7 +12,7 @@ export interface GridChildCellInfo<CellElement extends Element> extends UseListN
 export interface UseGridNavigationParameters<ParentOrChildElement extends Element, RowElement extends Element, CellElement extends Element, M extends GridChildRowInfo<RowElement, CellElement>> extends OmitStrong<UseListNavigationParameters<ParentOrChildElement, RowElement, M>, "linearNavigationParameters"> {
     linearNavigationParameters: OmitStrong<UseListNavigationParameters<ParentOrChildElement, RowElement, M>["linearNavigationParameters"], "arrowKeyDirection">;
     gridNavigationParameters: {
-        onTabbableColumnChange: OnPassiveStateChange<number | null, Event> | null;
+        onTabbableColumnChange: OnPassiveStateChange<number | null, SyntheticEvent> | null;
     };
 }
 export interface UseGridNavigationReturnType<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, RM extends GridChildRowInfo<RowElement, CellElement>, CM extends GridChildCellInfo<CellElement>> extends OmitStrong<UseListNavigationReturnType<ParentOrRowElement, RowElement, RM>, "context"> {
@@ -23,7 +24,7 @@ export interface UseGridNavigationRowContext<ParentOrRowElement extends Element,
         _c?: CellElement;
         setTabbableRow: SetTabbableIndex;
         getCurrentTabbableColumn: () => (number | null);
-        setCurrentTabbableColumn: PassiveStateUpdater<number | null, Event>;
+        setCurrentTabbableColumn: PassiveStateUpdater<number | null, SyntheticEvent>;
     };
 }
 export interface UseGridNavigationRowParameters<RowElement extends Element, CellElement extends Element, RM extends GridChildRowInfo<RowElement, CellElement>, CM extends GridChildCellInfo<CellElement>> extends OmitStrong<UseListNavigationChildParameters<RowElement, RM>, "context">, OmitStrong<UseListNavigationParameters<RowElement, CellElement, CM>, "linearNavigationParameters" | "rovingTabIndexParameters"> {
@@ -50,7 +51,7 @@ export interface UseGridNavigationCellContext<RowElement extends Element, CellEl
         getRowIndex: () => number;
         setTabbableRow: SetTabbableIndex;
         getCurrentTabbableColumn: () => (number | null);
-        setCurrentTabbableColumn: PassiveStateUpdater<number | null, Event>;
+        setCurrentTabbableColumn: PassiveStateUpdater<number | null, SyntheticEvent>;
         setTabbableCell: SetTabbableIndex;
     };
 }

@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "preact/hooks";
+import { useCallback, useEffect } from "react";
 import { useChildrenFlag } from "../../preact-extensions/use-managed-children.js";
 import { usePassiveState } from "../../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
@@ -147,7 +147,7 @@ export function useRovingTabIndexChild({ info: { index, ..._void2 }, context: { 
             // setTabbable
         },
         info: { setLocallyTabbable: setTabbable, getLocallyTabbable: getTabbable, tabbable },
-        props: { tabIndex: (tabbable ? 0 : -1) },
+        props: { tabIndex: (tabbable ? 0 : -1) }
     };
 }
 //# sourceMappingURL=use-roving-tabindex.js.map

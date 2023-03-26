@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "preact/hooks";
+import { useCallback, useEffect } from "react";
 import { useGlobalHandler } from "../dom-helpers/use-event-handler.js";
 import { useRefElement } from "../dom-helpers/use-ref-element.js";
 import { useActiveElement } from "../observers/use-active-element.js";

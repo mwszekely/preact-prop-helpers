@@ -1,23 +1,22 @@
 import { identity } from "lodash-es";
-import { h } from "preact";
-import { useCallback } from "preact/hooks";
+import { useCallback } from "react";
 import { UseGridNavigationCellContext, UseGridNavigationRowContext } from "../component-detail/keyboard-navigation/use-grid-navigation-partial.js";
-import { GridSingleSelectSortableChildCellInfo, GridSingleSelectSortableChildRowInfo, useGridNavigationSingleSelectionSortable, UseGridNavigationSingleSelectionSortableCellReturnType, UseGridNavigationSingleSelectionSortableParameters, UseGridNavigationSingleSelectionSortableReturnType, UseGridNavigationSingleSelectionSortableRowParameters, UseGridNavigationSingleSelectionSortableRowReturnType } from "../component-detail/keyboard-navigation/use-grid-navigation-single-selection-sortable.js";
-import { useGridNavigationSingleSelectionCell, UseGridNavigationSingleSelectionCellParameters, UseGridNavigationSingleSelectionParameters, useGridNavigationSingleSelectionRow, UseGridNavigationSingleSelectionRowReturnType } from "../component-detail/keyboard-navigation/use-grid-navigation-single-selection.js";
+import { GridSingleSelectSortableChildCellInfo, GridSingleSelectSortableChildRowInfo, UseGridNavigationSingleSelectionSortableCellReturnType, UseGridNavigationSingleSelectionSortableParameters, UseGridNavigationSingleSelectionSortableReturnType, UseGridNavigationSingleSelectionSortableRowParameters, UseGridNavigationSingleSelectionSortableRowReturnType, useGridNavigationSingleSelectionSortable } from "../component-detail/keyboard-navigation/use-grid-navigation-single-selection-sortable.js";
+import { UseGridNavigationSingleSelectionCellParameters, UseGridNavigationSingleSelectionParameters, UseGridNavigationSingleSelectionRowReturnType, useGridNavigationSingleSelectionCell, useGridNavigationSingleSelectionRow } from "../component-detail/keyboard-navigation/use-grid-navigation-single-selection.js";
 import { RovingTabIndexChildContext } from "../component-detail/keyboard-navigation/use-roving-tabindex.js";
 import { MakeSingleSelectionDeclarativeParameters, UseSingleSelectionContext, useSingleSelectionDeclarative } from "../component-detail/keyboard-navigation/use-single-selection.js";
 import { UseSortableChildInfo } from "../component-detail/keyboard-navigation/use-sortable-children.js";
 import { UseTypeaheadNavigationContext } from "../component-detail/keyboard-navigation/use-typeahead-navigation.js";
-import { usePaginatedChild, UsePaginatedChildContext, usePaginatedChildren, UsePaginatedChildrenInfo, UsePaginatedChildrenParameters, UsePaginatedChildrenReturnType, UsePaginatedChildReturn } from "../component-detail/use-paginated-children.js";
-import { useStaggeredChild, UseStaggeredChildContext, useStaggeredChildren, UseStaggeredChildrenInfo, UseStaggeredChildrenParameters, UseStaggeredChildrenReturnType, UseStaggeredChildReturn } from "../component-detail/use-staggered-children.js";
+import { UsePaginatedChildContext, UsePaginatedChildReturn, UsePaginatedChildrenInfo, UsePaginatedChildrenParameters, UsePaginatedChildrenReturnType, usePaginatedChild, usePaginatedChildren } from "../component-detail/use-paginated-children.js";
+import { UseStaggeredChildContext, UseStaggeredChildReturn, UseStaggeredChildrenInfo, UseStaggeredChildrenParameters, UseStaggeredChildrenReturnType, useStaggeredChild, useStaggeredChildren } from "../component-detail/use-staggered-children.js";
 import { useMergedProps } from "../dom-helpers/use-merged-props.js";
-import { useRefElement, UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
-import { useChildrenHaveFocus, useChildrenHaveFocusChild, UseChildrenHaveFocusContext, UseChildrenHaveFocusReturnType } from "../observers/use-children-have-focus.js";
-import { useHasCurrentFocus, UseHasCurrentFocusReturnType } from "../observers/use-has-current-focus.js";
-import { ManagedChildren, useManagedChild, useManagedChildren, UseManagedChildrenContext, UseManagedChildrenReturnType, UseManagedChildReturnType } from "../preact-extensions/use-managed-children.js";
+import { UseRefElementReturnType, useRefElement } from "../dom-helpers/use-ref-element.js";
+import { UseChildrenHaveFocusContext, UseChildrenHaveFocusReturnType, useChildrenHaveFocus, useChildrenHaveFocusChild } from "../observers/use-children-have-focus.js";
+import { UseHasCurrentFocusReturnType, useHasCurrentFocus } from "../observers/use-has-current-focus.js";
+import { ManagedChildren, UseManagedChildReturnType, UseManagedChildrenContext, UseManagedChildrenReturnType, useManagedChild, useManagedChildren } from "../preact-extensions/use-managed-children.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useStableObject } from "../preact-extensions/use-stable-getter.js";
-import { OmitStrong, OmitTargeted } from "../util/types.js";
+import { ElementProps, OmitStrong, OmitTargeted } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 
 export interface UseCompleteGridNavigationRowInfo<RowElement extends Element, CellElement extends Element> extends GridSingleSelectSortableChildRowInfo<RowElement, CellElement>, UsePaginatedChildrenInfo<RowElement>, UseStaggeredChildrenInfo<RowElement> { }
@@ -90,7 +89,7 @@ export interface UseCompleteGridNavigationRowReturnType<RowElement extends Eleme
     OmitStrong<UseGridNavigationSingleSelectionSortableRowReturnType<RowElement, CellElement, RM, CM>, "context" | "gridNavigationRowParameters" | "managedChildrenParameters" | "info" | "pressParameters" | "textContentReturn"> {
     managedChildrenReturn: UseManagedChildrenReturnType<CM>["managedChildrenReturn"];
     hasCurrentFocusReturn: UseHasCurrentFocusReturnType<RowElement>["hasCurrentFocusReturn"];
-    //propsStable: h.JSX.HTMLAttributes<RowElement>;
+    //propsStable: HTMLAttributes<RowElement>;
     context: CompleteGridNavigationCellContext<RowElement, CellElement, CM>;
     managedChildReturn: UseManagedChildReturnType<RM>["managedChildReturn"];
     paginatedChildReturn: UsePaginatedChildReturn<RowElement>["paginatedChildReturn"];
@@ -104,7 +103,7 @@ export interface UseCompleteGridNavigationCellReturnType<CellElement extends Ele
     OmitStrong<UseRefElementReturnType<CellElement>, "propsStable">,
     UseHasCurrentFocusReturnType<CellElement>,
     UseManagedChildReturnType<CM> {
-    props: h.JSX.HTMLAttributes<CellElement>;
+    props: ElementProps<CellElement>;
 
 }
 
@@ -293,7 +292,7 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
     const { hasCurrentFocusParameters } = useChildrenHaveFocusChild<RowElement>({ context: contextIncomingForRowAsChildOfTable });
     //const { refElementReturn } = useRefElement<RowElement>({ refElementParameters: {} })
     const { hasCurrentFocusReturn } = useHasCurrentFocus<RowElement>({ refElementReturn, hasCurrentFocusParameters: { ...hasCurrentFocusParameters, onCurrentFocusedChanged: null } });
-    const props = useMergedProps(
+    const props = useMergedProps<RowElement>(
         propsStable,
         // TODO: Rows don't use tabIndex, but just excluding props here is...weird.
         r.props,
@@ -362,7 +361,7 @@ export function useCompleteGridNavigationCell<CellElement extends Element, CM ex
 
     const { managedChildReturn } = useManagedChild<CM>({ context: { managedChildContext }, info: { ...baseInfo, ...info } as CM })
 
-    const props = useMergedProps(
+    const props = useMergedProps<CellElement>(
         propsStable,
         propsRti,
         hasCurrentFocusReturn.propsStable

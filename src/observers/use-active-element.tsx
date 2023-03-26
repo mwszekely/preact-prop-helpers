@@ -1,5 +1,5 @@
 
-import { StateUpdater, useEffect } from "preact/hooks";
+import { type Dispatch, type SetStateAction, useEffect } from "react";
 import { OnPassiveStateChange, returnNull, returnTrue, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 
@@ -194,8 +194,8 @@ export function useActiveElement({ activeElementParameters: { onActiveElementCha
         const localLastActiveElementUpdaters = lastActiveElementUpdaters.get(window) ?? new Set();
         const localWindowFocusedUpdaters = windowFocusedUpdaters.get(window) ?? new Set();
 
-        const laeu = { send: setActiveElement as StateUpdater<Node | null>, lastSent: undefined }
-        const llaeu = { send: setLastActiveElement as StateUpdater<Node>, lastSent: undefined };
+        const laeu = { send: setActiveElement as Dispatch<SetStateAction<Node | null>>, lastSent: undefined }
+        const llaeu = { send: setLastActiveElement as Dispatch<SetStateAction<Node>>, lastSent: undefined };
         const lwfu = { send: setWindowFocused, lastSent: undefined };
 
         localActiveElementUpdaters.add(laeu);

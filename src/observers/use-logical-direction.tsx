@@ -1,4 +1,4 @@
-import { useCallback } from "preact/hooks";
+import { useCallback } from "react";
 import { monitorCallCount } from "../util/use-call-count.js";
 import { ElementSize } from "./use-element-size.js";
 
@@ -247,7 +247,7 @@ const M = {
 
 export interface UseLogicalDirectionReturnType {
     /** **STABLE** */
-    //useLogicalDirectionProps: (props: h.JSX.HTMLAttributes<T>) => h.JSX.HTMLAttributes<T>;
+    //useLogicalDirectionProps: (props: HTMLAttributes<T>) => HTMLAttributes<T>;
     /** **STABLE** */
     //getElement: () => T | null;
     /** **STABLE** */

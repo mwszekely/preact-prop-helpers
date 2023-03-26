@@ -1,7 +1,6 @@
-import { jsx as _jsx, Fragment as _Fragment } from "preact/jsx-runtime";
-import { cloneElement } from "preact";
-import { createPortal } from "preact/compat";
-import { useCallback, useLayoutEffect, useMemo } from "preact/hooks";
+import { jsx as _jsx, Fragment as _Fragment } from "react/jsx-runtime";
+import { cloneElement, useCallback, useLayoutEffect, useMemo } from "react";
+import { createPortal } from "react-dom";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useState } from "../preact-extensions/use-state.js";
 import { generateRandomId } from "../util/random-id.js";
@@ -53,7 +52,7 @@ function PortalChildren({ setPushChild, setUpdateChild, setRemoveChild }) {
     }, []);
     const updateChild = useCallback((index, child) => {
         const key = getChildren()[index]?.key;
-        console.assert(key);
+        console.assert(!!key);
         if (key) {
             setChildren(prev => {
                 let newChildren = prev.slice();
@@ -65,7 +64,7 @@ function PortalChildren({ setPushChild, setUpdateChild, setRemoveChild }) {
     }, []);
     const removeChild = useCallback((index) => {
         const key = getChildren()[index]?.key;
-        console.assert(key);
+        console.assert(!!key);
         if (key) {
             setChildren(prev => {
                 let newChildren = prev.slice();

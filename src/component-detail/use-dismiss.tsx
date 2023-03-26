@@ -1,5 +1,4 @@
-import { h } from "preact";
-import { useCallback, useEffect } from "preact/hooks";
+import { useCallback, useEffect } from "react";
 import { useGlobalHandler } from "../dom-helpers/use-event-handler.js";
 import { UseRefElementReturnType, useRefElement } from "../dom-helpers/use-ref-element.js";
 import { UseActiveElementParameters, useActiveElement } from "../observers/use-active-element.js";
@@ -7,6 +6,7 @@ import { OnPassiveStateChange } from "../preact-extensions/use-passive-state.js"
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useStableGetter } from "../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../util/assert.js";
+import { ElementProps } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 
 /**
@@ -209,7 +209,7 @@ export function useLostFocusDismiss<SourceElement extends Element | null, PopupE
 
     const stableOnClose = useStableCallback(onClose);
     const getOpen = useStableGetter(open);
-    const onLastActiveElementChange = useCallback<OnPassiveStateChange<Element | null, h.JSX.TargetedFocusEvent<any>>>((newElement, _prevElement, _e) => {
+    const onLastActiveElementChange = useCallback<OnPassiveStateChange<Element | null, FocusEvent>>((newElement, _prevElement, _e) => {
         const open = getOpen();
         const sourceElement = getSourceElement?.();
         const popupElement = getPopupElement();
@@ -240,7 +240,7 @@ export function useBackdropDismiss<PopupElement extends Element>({ backdropDismi
     const getOpen = useStableGetter(open);
     const onClose = useStableCallback(onCloseUnstable);
 
-    const onBackdropClick = useCallback(function onBackdropClick(e: h.JSX.TargetedEvent<any>) {
+    const onBackdropClick = useCallback(function onBackdropClick(e: Event) {
         if (!getOpen())
             return;
 
@@ -319,8 +319,8 @@ export interface UseDismissReturnType<SourceElement extends Element | null, Popu
      */
     refElementPopupReturn: UseRefElementReturnType<PopupElement>["refElementReturn"];
 
-    propsStableSource: h.JSX.HTMLAttributes<NonNullable<SourceElement>>;
-    propsStablePopup: h.JSX.HTMLAttributes<NonNullable<PopupElement>>;
+    propsStableSource: ElementProps<NonNullable<SourceElement>>;
+    propsStablePopup: ElementProps<NonNullable<PopupElement>>;
 
 }
 

@@ -1,14 +1,13 @@
 
 import { noop } from "lodash-es";
-import { h } from "preact";
-import { useCallback, useEffect } from "preact/hooks";
+import { SyntheticEvent, useCallback, useEffect } from "react";
 import { UseChildrenHaveFocusChildReturnType, UseChildrenHaveFocusParameters } from "../../observers/use-children-have-focus.js";
 import { useChildrenFlag, UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
 import { OnPassiveStateChange, PassiveStateUpdater, useEnsureStability } from "../../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useStableGetter, useStableObject } from "../../preact-extensions/use-stable-getter.js";
 import { useState } from "../../preact-extensions/use-state.js";
-import { PickTargeted } from "../../util/types.js";
+import { ElementProps, PickTargeted } from "../../util/types.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
 
@@ -58,7 +57,7 @@ export interface UseSingleSelectionParameters<ChildElement extends Element, M ex
          * 
          * In general, this should only be `null` when single selection is entirely disabled.
          */
-        onSelectedIndexChange: null | ((index: number | null, reason: Event | undefined) => void);
+        onSelectedIndexChange: null | ((index: number | null, reason: SyntheticEvent<any> | undefined) => void);
 
     }
 }
@@ -78,7 +77,7 @@ export interface UseSingleSelectionChildParameters<E extends Element, M extends 
 }
 
 export interface UseSingleSelectionChildReturnType<E extends Element> extends UseChildrenHaveFocusChildReturnType<E> {
-    props: h.JSX.HTMLAttributes<E>;
+    props: ElementProps<E>;
 
     info: Pick<UseSingleSelectionChildInfo<E>, "getSelected" | "setLocalSelected" | "selected">;
 
@@ -100,7 +99,7 @@ export interface UseSingleSelectionChildReturnType<E extends Element> extends Us
 
         // Used to programmatically set this as the selected element;
         // it requests the parent to actually change the numeric index to this one's.
-        setThisOneSelected: (event: Event) => void;
+        setThisOneSelected: (event: SyntheticEvent<any>) => void;
     }
 }
 
@@ -194,7 +193,7 @@ export function useSingleSelection<ChildElement extends Element, M extends UseSi
 
 export function useSingleSelectionChild<ChildElement extends Element, M extends UseSingleSelectionChildInfo<ChildElement>>(args: UseSingleSelectionChildParameters<ChildElement, M>): UseSingleSelectionChildReturnType<ChildElement> {
     monitorCallCount(useSingleSelectionChild);
-    type R = Event;
+    type R = SyntheticEvent<any>;
     const {
         context: { singleSelectionContext: { getSelectedIndex, onSelectedIndexChange } },
         singleSelectionChildParameters: { ariaPropName, selectionMode, disabled },
@@ -249,7 +248,7 @@ export function useSingleSelectionChild<ChildElement extends Element, M extends 
 
 
 export interface UseSingleSelectionDeclarativeParameters {
-    singleSelectionDeclarativeParameters: { selectedIndex: number | null, setSelectedIndex: null | ((index: number | null, reason: Event | undefined) => void); }
+    singleSelectionDeclarativeParameters: { selectedIndex: number | null, setSelectedIndex: null | ((index: number | null, reason: SyntheticEvent | undefined) => void); }
     singleSelectionReturn: Pick<UseSingleSelectionReturnType<any, any>["singleSelectionReturn"], "changeSelectedIndex">;
 }
 

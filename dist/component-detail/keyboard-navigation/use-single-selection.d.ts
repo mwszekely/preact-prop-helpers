@@ -1,8 +1,8 @@
-import { h } from "preact";
+import { SyntheticEvent } from "react";
 import { UseChildrenHaveFocusChildReturnType, UseChildrenHaveFocusParameters } from "../../observers/use-children-have-focus.js";
 import { UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
 import { PassiveStateUpdater } from "../../preact-extensions/use-passive-state.js";
-import { PickTargeted } from "../../util/types.js";
+import { ElementProps, PickTargeted } from "../../util/types.js";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
 /** Anything that's selectable must be tabbable, so we DO use rovingtabindex instead of just managedchildren */
 export interface UseSingleSelectionChildInfo<E extends Element> extends UseRovingTabIndexChildInfo<E> {
@@ -44,7 +44,7 @@ export interface UseSingleSelectionParameters<ChildElement extends Element, M ex
          *
          * In general, this should only be `null` when single selection is entirely disabled.
          */
-        onSelectedIndexChange: null | ((index: number | null, reason: Event | undefined) => void);
+        onSelectedIndexChange: null | ((index: number | null, reason: SyntheticEvent<any> | undefined) => void);
     };
 }
 export interface UseSingleSelectionChildParameters<E extends Element, M extends UseSingleSelectionChildInfo<E>> {
@@ -61,7 +61,7 @@ export interface UseSingleSelectionChildParameters<E extends Element, M extends 
     info: Pick<UseSingleSelectionChildInfo<E>, "index">;
 }
 export interface UseSingleSelectionChildReturnType<E extends Element> extends UseChildrenHaveFocusChildReturnType<E> {
-    props: h.JSX.HTMLAttributes<E>;
+    props: ElementProps<E>;
     info: Pick<UseSingleSelectionChildInfo<E>, "getSelected" | "setLocalSelected" | "selected">;
     singleSelectionChildReturn: {
         selected: boolean;
@@ -75,7 +75,7 @@ export interface UseSingleSelectionChildReturnType<E extends Element> extends Us
          */
         selectedOffset: number | null;
         getSelectedOffset: () => (number | null);
-        setThisOneSelected: (event: Event) => void;
+        setThisOneSelected: (event: SyntheticEvent<any>) => void;
     };
 }
 export interface UseSingleSelectionReturnType<ChildElement extends Element, M extends UseSingleSelectionChildInfo<ChildElement>> {
@@ -106,7 +106,7 @@ export declare function useSingleSelectionChild<ChildElement extends Element, M 
 export interface UseSingleSelectionDeclarativeParameters {
     singleSelectionDeclarativeParameters: {
         selectedIndex: number | null;
-        setSelectedIndex: null | ((index: number | null, reason: Event | undefined) => void);
+        setSelectedIndex: null | ((index: number | null, reason: SyntheticEvent | undefined) => void);
     };
     singleSelectionReturn: Pick<UseSingleSelectionReturnType<any, any>["singleSelectionReturn"], "changeSelectedIndex">;
 }

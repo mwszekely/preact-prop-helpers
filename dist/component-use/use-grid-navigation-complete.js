@@ -1,5 +1,5 @@
 import { identity } from "lodash-es";
-import { useCallback } from "preact/hooks";
+import { useCallback } from "react";
 import { useGridNavigationSingleSelectionSortable } from "../component-detail/keyboard-navigation/use-grid-navigation-single-selection-sortable.js";
 import { useGridNavigationSingleSelectionCell, useGridNavigationSingleSelectionRow } from "../component-detail/keyboard-navigation/use-grid-navigation-single-selection.js";
 import { useSingleSelectionDeclarative } from "../component-detail/keyboard-navigation/use-single-selection.js";

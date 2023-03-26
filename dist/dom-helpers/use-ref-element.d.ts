@@ -1,7 +1,7 @@
-import { h } from "preact";
 import { OnPassiveStateChange } from "../preact-extensions/use-passive-state.js";
+import { ElementProps } from "../util/types.js";
 export interface UseRefElementReturnType<T extends EventTarget> {
-    propsStable: h.JSX.HTMLAttributes<T>;
+    propsStable: ElementProps<T>;
     refElementReturn: {
         /** **STABLE** */
         getElement(): T | null;

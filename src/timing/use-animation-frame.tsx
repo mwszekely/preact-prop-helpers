@@ -1,6 +1,6 @@
 import { noop } from "lodash-es";
-import { ComponentChildren, createContext } from "preact";
-import { useCallback, useContext, useEffect, useRef } from "preact/hooks";
+import { createContext } from "react";
+import { useCallback, useContext, useEffect, useRef, ReactNode } from "react";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 
@@ -20,7 +20,7 @@ const SharedAnimationFrameContext = createContext<null | ContextType>(null);
  * @param param0 
  * @returns 
  */
-export function ProvideBatchedAnimationFrames({ children }: { children: ComponentChildren }) {
+export function ProvideBatchedAnimationFrames({ children }: { children: ReactNode }) {
 
     const addCallback = useCallback<ContextType["addCallback"]>((callbackToBeBatched, tag) => { allCallbacks.current.set(callbackToBeBatched, tag); }, []);
     const removeCallback = useCallback<ContextType["removeCallback"]>((callback) => { allCallbacks.current.delete(callback); }, []);

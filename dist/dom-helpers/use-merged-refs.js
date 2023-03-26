@@ -1,7 +1,10 @@
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 function processRef(instance, ref) {
-    if (typeof ref === "function") {
+    if (typeof ref === "string") {
+        console.error(`Legacy string-based refs are not supported`);
+    }
+    else if (typeof ref === "function") {
         ref(instance);
     }
     else if (ref != null) {

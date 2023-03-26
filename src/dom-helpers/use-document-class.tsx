@@ -1,5 +1,5 @@
 import { clsx } from "clsx";
-import { useEffect } from "preact/hooks";
+import { useEffect } from "react";
 import { monitorCallCount } from "../util/use-call-count.js";
 
 export function getDocument(element?: Node) { return (element?.ownerDocument ?? document ?? window.document ?? globalThis.document); }

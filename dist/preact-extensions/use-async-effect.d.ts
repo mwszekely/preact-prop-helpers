@@ -1,4 +1,4 @@
-import { Inputs } from "preact/hooks";
+import { DependencyList } from "react";
 import { OmitStrong } from "../util/types.js";
 import { UseAsyncParameters } from "./use-async.js";
 /**
@@ -11,7 +11,7 @@ import { UseAsyncParameters } from "./use-async.js";
  *
  * @returns All values from `useAsync`, except for `syncHandler`.
  */
-export declare function useAsyncEffect<I extends Inputs>(effect: () => Promise<(void | (() => void))>, inputs?: I, options?: OmitStrong<UseAsyncParameters<[void], [void]>, "capture">): {
+export declare function useAsyncEffect<I extends DependencyList>(effect: () => Promise<(void | (() => void))>, inputs?: I, options?: OmitStrong<UseAsyncParameters<[void], [void]>, "capture">): {
     pending: boolean;
     debouncingSync: boolean;
     debouncingAsync: boolean;
@@ -23,7 +23,7 @@ export declare function useAsyncEffect<I extends Inputs>(effect: () => Promise<(
     hasResult: boolean;
     error: unknown;
     hasError: boolean;
-    invocationResult: "sync" | "async" | "throw" | null;
+    invocationResult: "async" | "sync" | "throw" | null;
     flushDebouncedPromise: () => void;
 };
 //# sourceMappingURL=use-async-effect.d.ts.map

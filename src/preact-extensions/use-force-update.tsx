@@ -1,4 +1,4 @@
-import { useRef, useState } from "preact/hooks";
+import { useRef, useState } from "react";
 import { monitorCallCount } from "../util/use-call-count.js";
 
 /**

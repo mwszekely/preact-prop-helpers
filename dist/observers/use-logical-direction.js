@@ -1,4 +1,4 @@
-import { useCallback } from "preact/hooks";
+import { useCallback } from "react";
 import { monitorCallCount } from "../util/use-call-count.js";
 function capitalize(str) {
     return (str[0].toUpperCase() + str.substring(1));

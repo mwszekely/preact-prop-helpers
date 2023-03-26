@@ -1,9 +1,9 @@
-import { h, VNode } from "preact";
+import { ReactPortal } from "react";
 export interface UsePortalChildrenParameters {
     target: string | Element | null;
 }
 export interface UsePortalChildrenReturnType {
-    children: VNode;
+    children: ReactPortal;
     portalElement: Element | null;
     pushChild: PushPortalChild;
     updateChild: UpdatePortalChild;
@@ -20,14 +20,14 @@ export interface UsePortalChildrenReturnType {
  * @returns
  */
 export declare function usePortalChildren({ target }: UsePortalChildrenParameters): {
-    children: VNode<any> | null;
+    children: ReactPortal | null;
     pushChild: PushPortalChild;
     updateChild: UpdatePortalChild;
     removeChild: RemovePortalChild;
     portalElement: Element | null;
 };
 export type PortalChildUpdater<S> = (value: ((prevState: S) => S)) => void;
-export type PushPortalChild = (child: h.JSX.Element) => number;
-export type UpdatePortalChild = (index: number, child: h.JSX.Element) => void;
+export type PushPortalChild = (child: JSX.Element) => number;
+export type UpdatePortalChild = (index: number, child: JSX.Element) => void;
 export type RemovePortalChild = (index: number) => void;
 //# sourceMappingURL=use-portal-children.d.ts.map

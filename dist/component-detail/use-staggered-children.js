@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useRef } from "preact/hooks";
+import { useCallback, useEffect, useLayoutEffect, useRef } from "react";
 import { returnNull, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableObject } from "../preact-extensions/use-stable-getter.js";
 import { useState } from "../preact-extensions/use-state.js";

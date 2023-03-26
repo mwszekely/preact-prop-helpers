@@ -1,4 +1,4 @@
-import { useCallback } from "preact/hooks";
+import { useCallback } from "react";
 import { useActiveElement } from "../../dist/index.js";
 import { useState } from "../../dist/index.js";
 

@@ -1,9 +1,9 @@
 import { useEnsureStability } from "../preact-extensions/use-passive-state.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 import { useMergedChildren } from "./use-merged-children.js";
 import { useMergedClasses } from "./use-merged-classes.js";
 import { useMergedRefs } from "./use-merged-refs.js";
 import { useMergedStyles } from "./use-merged-styles.js";
-import { monitorCallCount } from "../util/use-call-count.js";
 let log = console.warn;
 export function enableLoggingPropConflicts(log2) {
     log = log2;
@@ -69,7 +69,7 @@ function useMergedProps2(lhsAll, rhsAll) {
     const ret = {
         ref: useMergedRefs(lhsAll.ref, rhsAll.ref),
         style: useMergedStyles(lhsAll.style, rhsAll.style),
-        className: useMergedClasses(lhsAll["class"], lhsAll.className, rhsAll["class"], rhsAll.className),
+        className: useMergedClasses(lhsAll.className, rhsAll.className),
         children: useMergedChildren(lhsAll.children, rhsAll.children),
     };
     if (ret.ref === undefined)
@@ -78,8 +78,6 @@ function useMergedProps2(lhsAll, rhsAll) {
         delete ret.style;
     if (ret.className === undefined)
         delete ret.className;
-    if (ret["class"] === undefined)
-        delete ret["class"];
     if (ret.children === undefined)
         delete ret.children;
     for (const lhsKeyU in lhsAll) {

@@ -1,4 +1,4 @@
-import { Inputs, useEffect as useEffectNative } from "preact/hooks";
+import { DependencyList, useEffect as useEffectNative } from "react";
 /**
  * Wrap the native `useEffect` to add arguments
  * that allow accessing the previous value as the first argument,
@@ -9,8 +9,8 @@ import { Inputs, useEffect as useEffectNative } from "preact/hooks";
  * @param impl You can choose whether to use `useEffect` or `useLayoutEffect` by
  * passing one of them as this argument. By default, it's `useEffect`.
  */
-export declare function useEffectDebug<I extends Inputs>(effect: (prev: I | undefined, changes: EffectChange<I, number>[]) => (void | (() => void)), inputs?: I, impl?: typeof useEffectNative): void;
-export interface EffectChange<I extends Inputs, N extends number> {
+export declare function useEffectDebug<I extends DependencyList>(effect: (prev: I | undefined, changes: EffectChange<I, number>[]) => (void | (() => void)), inputs?: I, impl?: typeof useEffectNative): void;
+export interface EffectChange<I extends DependencyList, N extends number> {
     from: I[N];
     to: I[N];
 }
