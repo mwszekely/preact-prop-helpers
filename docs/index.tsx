@@ -1,7 +1,7 @@
 import { createContext, render } from "preact";
 import { memo } from "preact/compat";
 import { useContext, useRef } from "preact/hooks";
-import { ElementSize, EventType, UseChildrenHaveFocusChildParameters, UseManagedChildrenContext, UseStaggeredChildContext, UseStaggeredChildrenInfo, useAnimationFrame, useAsyncHandler, useChildrenHaveFocus, useChildrenHaveFocusChild, useDraggable, useDroppable, useElementSize, useFocusTrap, useGlobalHandler, useHasCurrentFocus, useHasLastFocus, useInterval, useManagedChild, useManagedChildren, useMergedProps, usePortalChildren, usePress, useRandomDualIds, useRefElement, useStableCallback, useStaggeredChild, useStaggeredChildren, useState } from "../dist/index.js";
+import { ElementSize, EventType, MouseEventType, UseChildrenHaveFocusChildParameters, UseManagedChildrenContext, UseStaggeredChildContext, UseStaggeredChildrenInfo, useAnimationFrame, useAsyncHandler, useChildrenHaveFocus, useChildrenHaveFocusChild, useDraggable, useDroppable, useElementSize, useFocusTrap, useGlobalHandler, useHasCurrentFocus, useHasLastFocus, useInterval, useManagedChild, useManagedChildren, useMergedProps, usePortalChildren, usePress, useRandomDualIds, useRefElement, useStableCallback, useStaggeredChild, useStaggeredChildren, useState } from "../dist/index.js";
 import { DemoUseGrid } from "./demos/use-grid.js";
 import { DemoUseInterval } from "./demos/use-interval.js";
 import { DemoUseModal } from "./demos/use-modal.js";
@@ -175,7 +175,7 @@ const DemoUseAsyncHandler1 = memo(() => {
     const [shouldThrow, setShouldThrow, getShouldThrow] = useState(false);
     const [disableConsecutive, setDisableConsecutive] = useState(false);
 
-    const asyncOnClick = ((_v: void, _e: EventType<HTMLButtonElement, MouseEvent>) => new Promise<void>((resolve, reject) => window.setTimeout(() => getShouldThrow() ? reject() : resolve(), timeout)));
+    const asyncOnClick = ((_v: void, _e: MouseEventType<HTMLButtonElement>) => new Promise<void>((resolve, reject) => window.setTimeout(() => getShouldThrow() ? reject() : resolve(), timeout)));
     const {
         callCount,
         settleCount,
@@ -185,7 +185,7 @@ const DemoUseAsyncHandler1 = memo(() => {
         hasError,
         rejectCount,
         resolveCount
-    } = useAsyncHandler<EventType<HTMLButtonElement, MouseEvent>, void>({ asyncHandler: asyncOnClick, capture: () => { }, debounce: debounce == 0 ? undefined : debounce });
+    } = useAsyncHandler<MouseEventType<HTMLButtonElement>, void>({ asyncHandler: asyncOnClick, capture: () => { }, debounce: debounce == 0 ? undefined : debounce });
 
     const onClick = pending ? undefined : syncHandler;
 
@@ -461,7 +461,7 @@ const DemoGlobalHandlerChildren = memo(function DemoGlobalHandlerChildren({ coun
 
 const DemoGlobalHandlerChild = memo(function DemoGlobalHandlerChild({ mode, target }: { target: Window | Document, mode: "grouped" | "single" | null }) {
 
-    useGlobalHandler(target, "click", mode == null ? null : (e: EventType<HTMLButtonElement, MouseEvent>) => {
+    useGlobalHandler(target, "click", mode == null ? null : (e: MouseEventType<HTMLButtonElement>) => {
         if ((e.target as Element | null)?.id != "global-handler-test2")
             return;
         (window as any)._demo_event = ((window as any)._demo_event || 0) + 1

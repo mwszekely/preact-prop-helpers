@@ -1,5 +1,4 @@
-import type { RefObject } from "preact";
-import { ElementProps } from "../util/types.js";
+import { ElementProps, RefObject } from "../util/types.js";
 /**
  * Combines two refs into one. This allows a component to both use its own ref *and* forward a ref that was given to it.
  * @param lhs

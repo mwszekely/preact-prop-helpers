@@ -1,7 +1,7 @@
-import { createElement, type JSX, type Ref, type RenderableProps } from "preact";
+import { createElement, type JSX, type RenderableProps } from "preact";
 import { forwardRef, memo } from "preact/compat";
 import { useCallback, useImperativeHandle, useRef } from "preact/hooks";
-import { CSSProperties, ElementProps } from "../util/types.js";
+import { CSSProperties, ElementProps, Ref } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 import { useMergedProps } from "./use-merged-props.js";
 import { useRefElement, UseRefElementReturnType } from "./use-ref-element.js";

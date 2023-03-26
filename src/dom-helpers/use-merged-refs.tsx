@@ -1,6 +1,6 @@
-import type { Ref, RefObject } from "preact";
+
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
-import { ElementProps } from "../util/types.js";
+import { ElementProps, Ref, RefObject } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 
 

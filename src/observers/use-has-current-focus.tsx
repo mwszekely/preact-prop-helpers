@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef } from "preact/hooks";
 import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
 import { OnPassiveStateChange, returnFalse, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
-import { ElementProps, EventType } from "../util/types.js";
+import { ElementProps, FocusEventType } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 
 export interface UseHasCurrentFocusParameters<T extends Node> {
@@ -14,14 +14,14 @@ export interface UseHasCurrentFocusParameters<T extends Node> {
          * 
          * `prevFocused` is generally the opposite of `focused`, but on mount it's `undefined` while `focused` is probably false (both falsy)
          */
-        onCurrentFocusedChanged?: undefined | null | OnPassiveStateChange<boolean, EventType<T, FocusEvent>>;
+        onCurrentFocusedChanged?: undefined | null | OnPassiveStateChange<boolean, FocusEventType<T>>;
 
         /**
          * Like `onFocusedChanged`, but also *additionally* if any child elements are focused.
          * 
          * @see this.onFocusedChanged
          */
-        onCurrentFocusedInnerChanged?: undefined | null | OnPassiveStateChange<boolean, EventType<T, FocusEvent>>;
+        onCurrentFocusedInnerChanged?: undefined | null | OnPassiveStateChange<boolean, FocusEventType<T>>;
     }
 }
 
@@ -43,7 +43,6 @@ export interface UseHasCurrentFocusReturnType<E extends Element> {
 export function useHasCurrentFocus<T extends Element>(args: UseHasCurrentFocusParameters<T>): UseHasCurrentFocusReturnType<T> {
     monitorCallCount(useHasCurrentFocus);
 
-    type R = EventType<T, FocusEvent>;
     const {
         hasCurrentFocusParameters: { onCurrentFocusedChanged: onFocusedChanged, onCurrentFocusedInnerChanged: onFocusedInnerChanged },
         refElementReturn: { getElement }
@@ -52,15 +51,15 @@ export function useHasCurrentFocus<T extends Element>(args: UseHasCurrentFocusPa
 
     useEnsureStability("useHasCurrentFocus", onFocusedChanged, onFocusedInnerChanged, getElement);
 
-    const [getFocused, setFocused] = usePassiveState<boolean, R>(onFocusedChanged, returnFalse, runImmediately);
-    const [getFocusedInner, setFocusedInner] = usePassiveState<boolean, R>(onFocusedInnerChanged, returnFalse, runImmediately);
+    const [getFocused, setFocused] = usePassiveState<boolean, FocusEventType<T>>(onFocusedChanged, returnFalse, runImmediately);
+    const [getFocusedInner, setFocusedInner] = usePassiveState<boolean, FocusEventType<T>>(onFocusedInnerChanged, returnFalse, runImmediately);
 
-    const onFocusIn = useCallback((e: R) => {
+    const onFocusIn = useCallback((e: FocusEventType<T>) => {
         setFocusedInner(true, e);
         setFocused(e.target == getElement(), e)
     }, []);
 
-    const onFocusOut = useCallback((e: R) => {
+    const onFocusOut = useCallback((e: FocusEventType<T>) => {
         // Even if we're focusOut-ing to another inner element,
         // that'll be caught during onFocusIn,
         // so just set everything to false and let that revert things back to true if necessary.
