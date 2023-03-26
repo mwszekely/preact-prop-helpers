@@ -1,4 +1,4 @@
-import { DetailedHTMLProps, HTMLAttributes, useCallback, useRef } from "react";
+import { useCallback, useRef } from "react";
 import { OnPassiveStateChange, returnNull, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { ElementProps } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";

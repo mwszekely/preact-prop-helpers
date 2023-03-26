@@ -1,5 +1,4 @@
-import { DependencyList } from "react";
-import { EffectCallback } from "react";
+import { DependencyList, EffectCallback } from "react";
 /**
  * Semi-private function to allow stable callbacks even within `useLayoutEffect` and ref assignment.
  *

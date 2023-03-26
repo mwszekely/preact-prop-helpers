@@ -1,4 +1,4 @@
-import { SetStateAction, Dispatch } from "react";
+import { Dispatch, SetStateAction } from "react";
 /**
  * Slightly enhanced version of `useState` that includes a getter that remains constant
  * (i.e. you can use it in `useEffect` and friends without it being a dependency).

@@ -1,6 +1,6 @@
+import { noop } from "lodash-es";
 import { useInsertionEffect } from "react";
 import { monitorCallCount } from "../util/use-call-count.js";
-import { noop } from "lodash-es";
 /**
  * Semi-private function to allow stable callbacks even within `useLayoutEffect` and ref assignment.
  *

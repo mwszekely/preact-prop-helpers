@@ -1,5 +1,5 @@
 
-import { type Dispatch, type SetStateAction, useEffect } from "react";
+import { useEffect, type Dispatch, type SetStateAction } from "react";
 import { OnPassiveStateChange, returnNull, returnTrue, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 

@@ -1,6 +1,6 @@
-import { Ref, CSSProperties } from "react";
-import { UseRefElementReturnType } from "./use-ref-element.js";
+import { CSSProperties, Ref } from "react";
 import { ElementProps } from "../util/types.js";
+import { UseRefElementReturnType } from "./use-ref-element.js";
 export type SetChildren = ((children: string | null) => void);
 export type GetClass = (cls: string) => boolean;
 export type SetClass = (cls: string, enabled: boolean) => void;

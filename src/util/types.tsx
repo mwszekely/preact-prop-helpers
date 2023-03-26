@@ -1,4 +1,4 @@
-import { DetailedHTMLProps, HTMLAttributes, AllHTMLAttributes, Ref, useRef, ReactHTMLElement, HTMLProps, ComponentProps, AriaAttributes } from "react";
+import { AriaAttributes, DetailedHTMLProps, HTMLAttributes, HTMLProps } from "react";
 
 export type OmitStrong<T, K extends keyof T> = Omit<T, K>;
 export type OmitTargeted<T, K extends keyof T, L extends keyof T[K]> = OmitStrong<T, K> & { [M in K]: OmitStrong<T[K], L> };

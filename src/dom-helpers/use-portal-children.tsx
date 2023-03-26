@@ -1,6 +1,6 @@
 
 import { cloneElement, ReactPortal, useCallback, useLayoutEffect, useMemo } from "react";
-import { createPortal } from "react-dom"
+import { createPortal } from "react-dom";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useState } from "../preact-extensions/use-state.js";
 import { generateRandomId } from "../util/random-id.js";

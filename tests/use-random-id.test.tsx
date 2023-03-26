@@ -1,8 +1,5 @@
-import { h } from "preact"
-import { configure, mount, render } from 'enzyme';
-import Adapter from 'enzyme-adapter-preact-pure';
-import { useRandomId, useState } from "../src/index";
-import { act } from "preact/test-utils"
+import { mount } from 'enzyme';
+import { useRandomId } from "../src/index";
 
 
 export default function RandomId({ id, prefix }: { id?: string, prefix?: string }) {

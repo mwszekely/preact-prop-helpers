@@ -1,4 +1,3 @@
-import { Ref } from "react";
 import { useEnsureStability } from "../preact-extensions/use-passive-state.js";
 import { ElementProps, ElementToTag } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";

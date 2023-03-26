@@ -5,8 +5,8 @@ import "wicg-inert";
 import { useActiveElement } from "../observers/use-active-element.js";
 import { returnNull, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
-import { getDocument } from "./use-document-class.js";
 import { monitorCallCount } from "../util/use-call-count.js";
+import { getDocument } from "./use-document-class.js";
 
 function blockingElements() { return (getDocument() as DocumentWithBlockingElements).$blockingElements }
 /**
