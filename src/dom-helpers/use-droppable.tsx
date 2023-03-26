@@ -4,11 +4,6 @@ import { useState } from "../preact-extensions/use-state.js";
 import { ElementProps } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 
-/*
-export function useDroppableProps<E extends Element>(r: UseDroppableReturnType<E>, ...otherProps: ElementProps<E>[]): ElementProps<E>[] {
-    return [r.propsStable, ...otherProps];
-}*/
-
 export interface UseDroppableReturnType<E extends Element> {
 
     /**
