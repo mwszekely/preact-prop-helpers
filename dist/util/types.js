@@ -3,5 +3,4 @@ function test(lhs, rhs) {
     return null;
 }
 export {};
-//test<HTMLInputElement>({ type: "number" }, { ref: useRef<HTMLInputElement>(null), onClick: (e) => { e.currentTarget.valueAsNumber; } });
 //# sourceMappingURL=types.js.map

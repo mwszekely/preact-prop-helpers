@@ -1,5 +1,4 @@
-import { CSSProperties, HTMLAttributes } from "react";
-import { ElementProps } from "../util/types.js";
+import { CSSProperties, ElementProps } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 
 /**
@@ -21,8 +20,6 @@ export function useMergedStyles(lhs: ElementProps<EventTarget>["style"], rhs: El
             return lhs;
         if (!lhs && rhs)
             return rhs;
-
-            const a: HTMLAttributes<any>["style"] = {};
 
     // They're both objects, just merge them.
     return {

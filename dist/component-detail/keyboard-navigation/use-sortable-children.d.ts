@@ -1,5 +1,6 @@
 import { ManagedChildInfo, UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
-export type GetIndex = (row: JSX.Element) => (number | null | undefined);
+import { VNode } from "../../util/types.js";
+export type GetIndex = (row: VNode) => (number | null | undefined);
 export type GetValid = (index: number) => boolean;
 export type GetHighestChildIndex = () => number;
 export type Compare<M extends UseRearrangeableChildInfo> = (lhs: M, rhs: M) => number;

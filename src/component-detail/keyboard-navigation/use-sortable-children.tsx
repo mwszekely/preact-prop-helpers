@@ -4,11 +4,12 @@ import { useForceUpdate } from "../../preact-extensions/use-force-update.js";
 import { ManagedChildInfo, UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
 import { returnNull, useEnsureStability, usePassiveState } from "../../preact-extensions/use-passive-state.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
+import { VNode } from "../../util/types.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
 
 
 
-export type GetIndex = (row: JSX.Element) => (number | null | undefined);
+export type GetIndex = (row: VNode) => (number | null | undefined);
 export type GetValid = (index: number) => boolean;
 export type GetHighestChildIndex = () => number;
 export type Compare<M extends UseRearrangeableChildInfo> = (lhs: M, rhs: M) => number;
@@ -209,7 +210,7 @@ export function useRearrangeableChildren<M extends UseSortableChildInfo>({
         const forceUpdate = useForceUpdate();
         useLayoutEffect(() => { setForceUpdate(_prev => forceUpdate); }, [forceUpdate])
 
-        return (children as JSX.Element[])
+        return (children as VNode[])
             .slice()
             .map(child => ({ child, mangledIndex: indexMangler(getIndex(child)!), demangledIndex: getIndex(child) }))
             .sort((lhs, rhs) => { return lhs.mangledIndex - rhs.mangledIndex })

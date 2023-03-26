@@ -1,4 +1,4 @@
-import { AriaAttributes, DetailedHTMLProps, HTMLAttributes, HTMLProps } from "react";
+import { AriaAttributes, CSSProperties, DetailedHTMLProps, HTMLAttributes, HTMLProps, SyntheticEvent } from "react";
 
 export type OmitStrong<T, K extends keyof T> = Omit<T, K>;
 export type OmitTargeted<T, K extends keyof T, L extends keyof T[K]> = OmitStrong<T, K> & { [M in K]: OmitStrong<T[K], L> };
@@ -22,4 +22,7 @@ function test<T extends Element>(lhs: ElementProps<T>, rhs: ElementProps<T>): El
   return null!;
 }
 
-//test<HTMLInputElement>({ type: "number" }, { ref: useRef<HTMLInputElement>(null), onClick: (e) => { e.currentTarget.valueAsNumber; } });
+
+export type EventType<T extends EventTarget, E extends Event> = SyntheticEvent<T, E>;
+export { CSSProperties };
+export type VNode = JSX.Element;

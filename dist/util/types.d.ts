@@ -1,4 +1,4 @@
-import { AriaAttributes, DetailedHTMLProps, HTMLAttributes, HTMLProps } from "react";
+import { AriaAttributes, CSSProperties, DetailedHTMLProps, HTMLAttributes, HTMLProps, SyntheticEvent } from "react";
 export type OmitStrong<T, K extends keyof T> = Omit<T, K>;
 export type OmitTargeted<T, K extends keyof T, L extends keyof T[K]> = OmitStrong<T, K> & {
     [M in K]: OmitStrong<T[K], L>;
@@ -17,5 +17,7 @@ type EventHandlerNames = (keyof HTMLProps<any> & `on${string}`);
 type AriaNames = keyof AriaAttributes;
 type NonConflictingAttributes = "id" | "children" | "htmlFor" | "ref" | "className" | "tabIndex" | "style" | "tabIndex" | "draggable";
 export type ElementProps<T extends EventTarget> = Pick<Partial<HTMLProps<T>>, EventHandlerNames | AriaNames | NonConflictingAttributes>;
-export {};
+export type EventType<T extends EventTarget, E extends Event> = SyntheticEvent<T, E>;
+export { CSSProperties };
+export type VNode = JSX.Element;
 //# sourceMappingURL=types.d.ts.map

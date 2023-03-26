@@ -1,5 +1,5 @@
 import { createContext, memo, useCallback, useContext } from "react";
-import { CompleteListNavigationContext, GetIndex, UseCompleteListNavigationChildInfo, UseCompleteListNavigationDeclarativeReturnType, useCompleteListNavigationChild, useCompleteListNavigationDeclarative, useMergedProps, usePress, useStableCallback, useState } from "../../dist/index.js";
+import { CompleteListNavigationContext, GetIndex, UseCompleteListNavigationChildInfo, UseCompleteListNavigationDeclarativeReturnType, VNode, useCompleteListNavigationChild, useCompleteListNavigationDeclarative, useMergedProps, usePress, useStableCallback, useState } from "../../dist/index.js";
 
 const RandomWords = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
 
@@ -29,7 +29,7 @@ export const DemoUseRovingTabIndex = memo(() => {
         typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000 },
         linearNavigationParameters: { disableHomeEndKeys: false, arrowKeyDirection: "vertical", navigatePastEnd: "wrap", navigatePastStart: "wrap", pageNavigationSize: 0.1 },
         rearrangeableChildrenParameters: {
-            getIndex: useCallback<GetIndex>((a: JSX.Element) => a.props.index, []),
+            getIndex: useCallback<GetIndex>((a: VNode) => a.props.index, []),
         },
         paginatedChildrenParameters: { paginationMin: min, paginationMax: max },
         sortableChildrenParameters: { compare: useCallback((rhs: CustomInfoType, lhs: CustomInfoType) => { return lhs.index - rhs.index }, []) },

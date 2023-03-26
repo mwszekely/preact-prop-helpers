@@ -2,7 +2,7 @@
 import { FocusEvent, FocusEventHandler, useCallback, useEffect, useRef } from "react";
 import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
 import { OnPassiveStateChange, returnFalse, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
-import { ElementProps } from "../util/types.js";
+import { ElementProps, EventType } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 
 export interface UseHasCurrentFocusParameters<T extends Node> {

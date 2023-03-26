@@ -18822,7 +18822,7 @@
     const [shouldThrow, setShouldThrow, getShouldThrow] = useState(false);
     const [disableConsecutive, setDisableConsecutive] = useState(false);
     const [text, setText] = useState("");
-    const onChangeAsync = async (v, _e) => new Promise((resolve, reject) => window.setTimeout(() => {
+    const onInputAsync = async (v, _e) => new Promise((resolve, reject) => window.setTimeout(() => {
       if (getShouldThrow()) {
         reject();
       } else {
@@ -18843,7 +18843,7 @@
       debouncingAsync,
       debouncingSync
     } = useAsyncHandler({
-      asyncHandler: onChangeAsync,
+      asyncHandler: onInputAsync,
       capture: e => {
         e.preventDefault();
         return e.currentTarget.value;

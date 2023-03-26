@@ -1,4 +1,5 @@
 import { ReactPortal } from "react";
+import { VNode } from "../util/types.js";
 export interface UsePortalChildrenParameters {
     target: string | Element | null;
 }
@@ -27,7 +28,7 @@ export declare function usePortalChildren({ target }: UsePortalChildrenParameter
     portalElement: Element | null;
 };
 export type PortalChildUpdater<S> = (value: ((prevState: S) => S)) => void;
-export type PushPortalChild = (child: JSX.Element) => number;
-export type UpdatePortalChild = (index: number, child: JSX.Element) => void;
+export type PushPortalChild = (child: VNode) => number;
+export type UpdatePortalChild = (index: number, child: VNode) => void;
 export type RemovePortalChild = (index: number) => void;
 //# sourceMappingURL=use-portal-children.d.ts.map

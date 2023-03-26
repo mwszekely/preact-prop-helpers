@@ -1,6 +1,6 @@
 import { createContext, memo, MouseEvent, SyntheticEvent, useContext, useRef } from "react";
 import { createRoot } from 'react-dom/client';
-import { ElementSize, useAnimationFrame, useAsyncHandler, useChildrenHaveFocus, useChildrenHaveFocusChild, UseChildrenHaveFocusChildParameters, useDraggable, useDroppable, useElementSize, useFocusTrap, useGlobalHandler, useHasCurrentFocus, useHasLastFocus, useInterval, useManagedChild, useManagedChildren, UseManagedChildrenContext, useMergedProps, usePortalChildren, usePress, useRandomDualIds, useRefElement, useStableCallback, useStaggeredChild, UseStaggeredChildContext, useStaggeredChildren, UseStaggeredChildrenInfo, useState } from "../dist/index.js";
+import { ElementSize, EventType, useAnimationFrame, useAsyncHandler, useChildrenHaveFocus, useChildrenHaveFocusChild, UseChildrenHaveFocusChildParameters, useDraggable, useDroppable, useElementSize, useFocusTrap, useGlobalHandler, useHasCurrentFocus, useHasLastFocus, useInterval, useManagedChild, useManagedChildren, UseManagedChildrenContext, useMergedProps, usePortalChildren, usePress, useRandomDualIds, useRefElement, useStableCallback, useStaggeredChild, UseStaggeredChildContext, useStaggeredChildren, UseStaggeredChildrenInfo, useState } from "../dist/index.js";
 import { DemoUseGrid } from "./demos/use-grid.js";
 import { DemoUseInterval } from "./demos/use-interval.js";
 import { DemoUseModal } from "./demos/use-modal.js";
@@ -225,7 +225,7 @@ const DemoUseAsyncHandler2 = memo(() => {
 
     const [text, setText] = useState("");
 
-    const onChangeAsync = async (v: string, _e: any) => new Promise<void>((resolve, reject) => window.setTimeout(() => {
+    const onInputAsync = async (v: string, _e: any) => new Promise<void>((resolve, reject) => window.setTimeout(() => {
         if (getShouldThrow()) {
             reject();
         }
@@ -247,9 +247,9 @@ const DemoUseAsyncHandler2 = memo(() => {
         resolveCount,
         debouncingAsync,
         debouncingSync
-    } = useAsyncHandler<SyntheticEvent<HTMLInputElement>, string>({
-        asyncHandler: onChangeAsync,
-        capture: (e: SyntheticEvent<HTMLInputElement>) => { e.preventDefault(); return e.currentTarget.value },
+    } = useAsyncHandler<EventType<HTMLInputElement, Event>, string>({
+        asyncHandler: onInputAsync,
+        capture: (e: EventType<HTMLInputElement, Event>) => { e.preventDefault(); return e.currentTarget.value },
         debounce: debounce == 0 ? undefined : debounce,
         throttle: throttle == 0 ? undefined : throttle
     });

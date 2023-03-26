@@ -139,7 +139,7 @@ function ImperativeElementU<T extends keyof HTMLElementTagNameMap>({ tag: Tag, h
 }
 
 
-const EventMapping: Partial<{ [K in (keyof HTMLElementEventMap)]: (keyof AllHTMLAttributes<any> & `on${string}`) }> = {
+const EventMapping: Partial<{ [K in keyof HTMLElementEventMap]: (keyof JSX.IntrinsicElements["div"] & `on${string}`) }> = {
     abort: "onAbort",
     animationend: "onAnimationEnd",
     animationstart: "onAnimationStart",

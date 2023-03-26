@@ -6,7 +6,7 @@ import { OnPassiveStateChange } from "../preact-extensions/use-passive-state.js"
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useStableGetter } from "../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../util/assert.js";
-import { ElementProps } from "../util/types.js";
+import { ElementProps, EventType } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 
 /**

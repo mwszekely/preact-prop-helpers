@@ -16,7 +16,6 @@ export function useMergedStyles(lhs, rhs) {
         return lhs;
     if (!lhs && rhs)
         return rhs;
-    const a = {};
     // They're both objects, just merge them.
     return {
         ...(lhs ?? {}),
