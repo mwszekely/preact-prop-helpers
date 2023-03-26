@@ -22,7 +22,6 @@ function test<T extends Element>(lhs: ElementProps<T>, rhs: ElementProps<T>): El
   return null!;
 }
 
-
 export type EventType<T extends EventTarget, E extends Event> = SyntheticEvent<T, E>;
 export type FocusEventType<E extends EventTarget> = FocusEvent<E>;
 export type KeyboardEventType<E extends EventTarget> = KeyboardEvent<E>;

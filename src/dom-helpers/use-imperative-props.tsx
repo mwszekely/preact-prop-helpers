@@ -43,7 +43,6 @@ export const ImperativeElement = memo(forwardRef(ImperativeElementU));// as any 
 
 export function useImperativeProps<E extends Element>({ refElementReturn: { getElement } }: UseImperativePropsParameters<E>) {
     monitorCallCount(useImperativeProps);
-
     const currentImperativeProps = useRef<{ className: Set<string>, style: CSSProperties, children: string | null, others: ElementProps<E> }>({ className: new Set(), style: {}, children: null, others: {} });
 
 
