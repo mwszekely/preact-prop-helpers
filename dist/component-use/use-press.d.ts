@@ -1,11 +1,10 @@
-import type { JSX } from "preact";
 import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
 import { OnPassiveStateChange } from "../preact-extensions/use-passive-state.js";
-import { ElementProps } from "../util/types.js";
+import { ElementProps, EventType } from "../util/types.js";
 export interface UsePressParameters<E extends Node> {
     refElementReturn: Required<Pick<UseRefElementReturnType<E>["refElementReturn"], "getElement">>;
     pressParameters: {
-        onPressingChange?: OnPassiveStateChange<boolean, JSX.TargetedEvent<E>>;
+        onPressingChange?: OnPassiveStateChange<boolean, EventType<E, Event>>;
         /**
          * What should happen when this widget has been "pressed".
          *
@@ -13,7 +12,7 @@ export interface UsePressParameters<E extends Node> {
          *
          * Setting to `null` or `undefined` effectively disables the press event handler.
          */
-        onPressSync: ((e: JSX.TargetedEvent<E>) => void) | null | undefined;
+        onPressSync: ((e: EventType<E, Event>) => void) | null | undefined;
         /** Pass a function that returns `true` to prevent the spacebar from contributing to press events */
         excludeSpace?(): boolean;
         /** Pass a function that returns `true` to prevent the enter key from contributing to press events */

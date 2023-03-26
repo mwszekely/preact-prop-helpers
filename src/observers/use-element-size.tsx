@@ -1,8 +1,8 @@
-import type { JSX } from "preact";
 import { useCallback, useEffect, useRef } from "preact/hooks";
 import { getDocument } from "../dom-helpers/use-document-class.js";
 import { UseRefElementParameters, UseRefElementReturnType, useRefElement } from "../dom-helpers/use-ref-element.js";
 import { OnPassiveStateChange, returnNull, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
+import { EventType } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 
 export interface UseElementSizeParameters<T extends Element> extends UseRefElementParameters<T> {
@@ -14,7 +14,7 @@ export interface UseElementSizeParameters<T extends Element> extends UseRefEleme
          * values you use if you'd like.
          * @param sizeInfo 
          */
-        onSizeChange(sizeInfo: ElementSize, prevSize: ElementSize | undefined, entries: ResizeObserverEntry[] | JSX.TargetedEvent<T>): void;
+        onSizeChange(sizeInfo: ElementSize, prevSize: ElementSize | undefined, entries: ResizeObserverEntry[] | EventType<T, Event>): void;
 
         /**
          * Passed as an argument to the created ResizeObserver.

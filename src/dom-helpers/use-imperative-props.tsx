@@ -1,7 +1,7 @@
 import { createElement, type JSX, type Ref, type RenderableProps } from "preact";
 import { forwardRef, memo } from "preact/compat";
 import { useCallback, useImperativeHandle, useRef } from "preact/hooks";
-import { ElementProps } from "../util/types.js";
+import { CSSProperties, ElementProps } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 import { useMergedProps } from "./use-merged-props.js";
 import { useRefElement, UseRefElementReturnType } from "./use-ref-element.js";
@@ -9,7 +9,7 @@ import { useRefElement, UseRefElementReturnType } from "./use-ref-element.js";
 export type SetChildren = ((children: string | null) => void);
 export type GetClass = (cls: string) => boolean;
 export type SetClass = (cls: string, enabled: boolean) => void;
-export type SetStyle = <T extends (keyof CSSStyleDeclaration) & string>(prop: T, value: JSX.CSSProperties[T] | null) => void;
+export type SetStyle = <T extends (keyof CSSStyleDeclaration) & string>(prop: T, value: CSSProperties[T] | null) => void;
 export type GetAttribute<T extends Element> = <K extends keyof ElementProps<T>>(prop: K) => ElementProps<T>[K];
 export type SetAttribute<T extends Element> = <K extends keyof ElementProps<T>>(prop: K, value: ElementProps<T>[K] | null) => void;
 export type SetEventHandler = <K extends keyof HTMLElementEventMap>(type: K, listener: null | ((this: HTMLElement, ev: HTMLElementEventMap[K]) => void), options: AddEventListenerOptions) => void;
@@ -45,7 +45,7 @@ export const ImperativeElement = memo(forwardRef(ImperativeElementU)) as typeof 
 export function useImperativeProps<E extends Element>({ refElementReturn: { getElement } }: UseImperativePropsParameters<E>) {
     monitorCallCount(useImperativeProps);
     
-    const currentImperativeProps = useRef<{ className: Set<string>, style: JSX.CSSProperties, children: string | null, others: ElementProps<E> }>({ className: new Set(), style: {}, children: null, others: {} });
+    const currentImperativeProps = useRef<{ className: Set<string>, style: CSSProperties, children: string | null, others: ElementProps<E> }>({ className: new Set(), style: {}, children: null, others: {} });
 
 
     const hasClass = useCallback<GetClass>((cls: string) => { return currentImperativeProps.current.className.has(cls); }, [])
@@ -138,7 +138,7 @@ function ImperativeElementU<T extends keyof HTMLElementTagNameMap>({ tag: Tag, h
 }
 
 
-const EventMapping: Partial<{ [K in keyof HTMLElementEventMap]: (keyof JSX.HTMLAttributes<any> & `on${string}`) }> = {
+const EventMapping: Partial<{ [K in keyof HTMLElementEventMap]: (keyof JSX.IntrinsicElements["div"] & `on${string}`) }> = {
     abort: "onAbort",
     animationend: "onAnimationEnd",
     animationstart: "onAnimationStart",

@@ -10,4 +10,7 @@ export type ExtendMerge<A, B> = {
     [K in (keyof A) | (keyof B)]: K extends keyof A ? (K extends keyof B ? (A[K] & B[K]) : A[K]) : K extends keyof B ? B[K] : unknown;
 };
 export type ElementProps<E extends EventTarget> = JSX.HTMLAttributes<E>;
+export type EventType<T extends EventTarget, E extends Event> = JSX.TargetedEvent<T, E>;
+export type CSSProperties = JSX.CSSProperties;
+export type VNode = JSX.Element;
 //# sourceMappingURL=types.d.ts.map

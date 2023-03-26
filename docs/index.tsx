@@ -1,7 +1,7 @@
-import { JSX, createContext, render } from "preact";
+import { createContext, render } from "preact";
 import { memo } from "preact/compat";
 import { useContext, useRef } from "preact/hooks";
-import { ElementSize, UseChildrenHaveFocusChildParameters, UseManagedChildrenContext, UseStaggeredChildContext, UseStaggeredChildrenInfo, useAnimationFrame, useAsyncHandler, useChildrenHaveFocus, useChildrenHaveFocusChild, useDraggable, useDroppable, useElementSize, useFocusTrap, useGlobalHandler, useHasCurrentFocus, useHasLastFocus, useInterval, useManagedChild, useManagedChildren, useMergedProps, usePortalChildren, usePress, useRandomDualIds, useRefElement, useStableCallback, useStaggeredChild, useStaggeredChildren, useState } from "../dist/index.js";
+import { ElementSize, EventType, UseChildrenHaveFocusChildParameters, UseManagedChildrenContext, UseStaggeredChildContext, UseStaggeredChildrenInfo, useAnimationFrame, useAsyncHandler, useChildrenHaveFocus, useChildrenHaveFocusChild, useDraggable, useDroppable, useElementSize, useFocusTrap, useGlobalHandler, useHasCurrentFocus, useHasLastFocus, useInterval, useManagedChild, useManagedChildren, useMergedProps, usePortalChildren, usePress, useRandomDualIds, useRefElement, useStableCallback, useStaggeredChild, useStaggeredChildren, useState } from "../dist/index.js";
 import { DemoUseGrid } from "./demos/use-grid.js";
 import { DemoUseInterval } from "./demos/use-interval.js";
 import { DemoUseModal } from "./demos/use-modal.js";
@@ -175,7 +175,7 @@ const DemoUseAsyncHandler1 = memo(() => {
     const [shouldThrow, setShouldThrow, getShouldThrow] = useState(false);
     const [disableConsecutive, setDisableConsecutive] = useState(false);
 
-    const asyncOnClick = ((_v: void, _e: JSX.TargetedMouseEvent<HTMLButtonElement>) => new Promise<void>((resolve, reject) => window.setTimeout(() => getShouldThrow() ? reject() : resolve(), timeout)));
+    const asyncOnClick = ((_v: void, _e: EventType<HTMLButtonElement, MouseEvent>) => new Promise<void>((resolve, reject) => window.setTimeout(() => getShouldThrow() ? reject() : resolve(), timeout)));
     const {
         callCount,
         settleCount,
@@ -185,7 +185,7 @@ const DemoUseAsyncHandler1 = memo(() => {
         hasError,
         rejectCount,
         resolveCount
-    } = useAsyncHandler<JSX.TargetedMouseEvent<HTMLButtonElement>, void>({ asyncHandler: asyncOnClick, capture: () => { }, debounce: debounce == 0 ? undefined : debounce });
+    } = useAsyncHandler<EventType<HTMLButtonElement, MouseEvent>, void>({ asyncHandler: asyncOnClick, capture: () => { }, debounce: debounce == 0 ? undefined : debounce });
 
     const onClick = pending ? undefined : syncHandler;
 
@@ -248,9 +248,9 @@ const DemoUseAsyncHandler2 = memo(() => {
         resolveCount,
         debouncingAsync,
         debouncingSync
-    } = useAsyncHandler<JSX.TargetedEvent<HTMLInputElement>, string>({
+    } = useAsyncHandler<EventType<HTMLInputElement, Event>, string>({
         asyncHandler: onInputAsync,
-        capture: (e: JSX.TargetedEvent<HTMLInputElement>) => { e.preventDefault(); return e.currentTarget.value },
+        capture: (e: EventType<HTMLInputElement, Event>) => { e.preventDefault(); return e.currentTarget.value },
         debounce: debounce == 0 ? undefined : debounce,
         throttle: throttle == 0 ? undefined : throttle
     });
@@ -461,7 +461,7 @@ const DemoGlobalHandlerChildren = memo(function DemoGlobalHandlerChildren({ coun
 
 const DemoGlobalHandlerChild = memo(function DemoGlobalHandlerChild({ mode, target }: { target: Window | Document, mode: "grouped" | "single" | null }) {
 
-    useGlobalHandler(target, "click", mode == null ? null : (e: JSX.TargetedMouseEvent<HTMLButtonElement>) => {
+    useGlobalHandler(target, "click", mode == null ? null : (e: EventType<HTMLButtonElement, MouseEvent>) => {
         if ((e.target as Element | null)?.id != "global-handler-test2")
             return;
         (window as any)._demo_event = ((window as any)._demo_event || 0) + 1
@@ -517,7 +517,7 @@ const DemoStaggeredChild = memo(({ index }: { index: number }) => {
 
 const Component = () => {
     // return <DemoUseAsyncHandler2 />;
-    
+
     return <div class="flex" style={{ flexWrap: "wrap" }}>
         <DemoPress remaining={2} />
         <input />

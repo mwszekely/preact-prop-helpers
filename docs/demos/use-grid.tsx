@@ -1,7 +1,7 @@
-import { createContext, VNode } from "preact";
+import { createContext } from "preact";
 import { memo } from "preact/compat";
 import { useCallback, useContext } from "preact/hooks";
-import { CompleteGridNavigationContext, CompleteGridNavigationRowContext, GetIndex, returnNull, useCompleteGridNavigation, useCompleteGridNavigationCell, UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationReturnType, useCompleteGridNavigationRow, UseCompleteGridNavigationRowInfo, UseCompleteGridNavigationRowReturnType, useStableCallback, useState } from "../../dist/index.js";
+import { CompleteGridNavigationContext, CompleteGridNavigationRowContext, GetIndex, UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationReturnType, UseCompleteGridNavigationRowInfo, UseCompleteGridNavigationRowReturnType, VNode, returnNull, useCompleteGridNavigation, useCompleteGridNavigationCell, useCompleteGridNavigationRow, useStableCallback, useState } from "../../dist/index.js";
 
 const RandomWords = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
 
@@ -21,7 +21,7 @@ export const DemoUseGrid = memo(() => {
         rovingTabIndexParameters: { onTabbableIndexChange: setTabbableRow, untabbable: false },
         typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000 },
         rearrangeableChildrenParameters: {
-            getIndex: useCallback<GetIndex<{ index: number }>>((a: VNode<{ index: number }>) => a.props.index, [])
+            getIndex: useCallback<GetIndex>((a: VNode) => a.props.index, [])
         },
         sortableChildrenParameters: { compare: useCallback((rhs: CustomGridInfo, lhs: CustomGridInfo) => { return lhs.index - rhs.index }, []) },
         paginatedChildrenParameters: { paginationMin: null, paginationMax: null },

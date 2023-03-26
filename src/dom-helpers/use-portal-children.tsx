@@ -1,10 +1,10 @@
-
-import { cloneElement, type JSX, type VNode } from "preact";
+import { cloneElement } from "preact";
 import { createPortal } from "preact/compat";
 import { useCallback, useLayoutEffect, useMemo } from "preact/hooks";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useState } from "../preact-extensions/use-state.js";
 import { generateRandomId } from "../util/random-id.js";
+import { VNode } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 
 export interface UsePortalChildrenParameters {
@@ -62,8 +62,8 @@ export function usePortalChildren({ target }: UsePortalChildrenParameters) {
 
 
 export type PortalChildUpdater<S> = (value: ((prevState: S) => S)) => void;
-export type PushPortalChild = (child: JSX.Element) => number;
-export type UpdatePortalChild = (index: number, child: JSX.Element) => void;
+export type PushPortalChild = (child: VNode) => number;
+export type UpdatePortalChild = (index: number, child: VNode) => void;
 export type RemovePortalChild = (index: number) => void;
 
 
@@ -71,15 +71,15 @@ export type RemovePortalChild = (index: number) => void;
  * Implementation
  */
 function PortalChildren({ setPushChild, setUpdateChild, setRemoveChild }: { setPushChild: PortalChildUpdater<PushPortalChild | null>, setUpdateChild: PortalChildUpdater<UpdatePortalChild | null>, setRemoveChild: PortalChildUpdater<RemovePortalChild | null> }) {
-    const [children, setChildren, getChildren] = useState<JSX.Element[]>([]);
-    const pushChild: PushPortalChild | null = useCallback((child: JSX.Element) => {
+    const [children, setChildren, getChildren] = useState<VNode[]>([]);
+    const pushChild: PushPortalChild | null = useCallback((child: VNode) => {
         const randomKey = generateRandomId();
         let index = getChildren().length;
         setChildren(prev => ([...prev, cloneElement(child, { key: randomKey, index })]));
         return index;
     }, []);
 
-    const updateChild: UpdatePortalChild | null = useCallback((index: number, child: JSX.Element) => {
+    const updateChild: UpdatePortalChild | null = useCallback((index: number, child: VNode) => {
         const key = getChildren()[index]?.key;
         console.assert(key);
         if (key) {

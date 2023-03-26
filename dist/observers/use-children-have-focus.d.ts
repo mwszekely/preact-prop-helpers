@@ -1,4 +1,4 @@
-import type { JSX } from "preact";
+import { EventType } from "../index.js";
 import { OnPassiveStateChange, PassiveStateUpdater } from "../preact-extensions/use-passive-state.js";
 import { UseHasCurrentFocusParameters } from "./use-has-current-focus.js";
 export interface UseChildrenHaveFocusParameters<T extends Element> {
@@ -6,7 +6,7 @@ export interface UseChildrenHaveFocusParameters<T extends Element> {
         /**
          * Fires `true` once any of the children have become focused, and `false` once all of the children have become unfocused.
          */
-        onCompositeFocusChange: null | OnPassiveStateChange<boolean, JSX.TargetedEvent<T>>;
+        onCompositeFocusChange: null | OnPassiveStateChange<boolean, EventType<T, Event>>;
     };
 }
 export interface UseChildrenHaveFocusChildReturnType<E extends Element> {
@@ -21,7 +21,7 @@ export interface UseChildrenHaveFocusReturnType<T extends Element> {
 export interface UseChildrenHaveFocusContext<T extends Element> {
     childrenHaveFocusChildContext: {
         /** **STABLE** */
-        setFocusCount: PassiveStateUpdater<number, JSX.TargetedEvent<T>>;
+        setFocusCount: PassiveStateUpdater<number, EventType<T, Event>>;
     };
 }
 export interface UseChildrenHaveFocusChildParameters<T extends Element> {

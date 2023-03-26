@@ -1,5 +1,5 @@
-import type { JSX } from "preact";
 import { UseRefElementParameters, UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
+import { EventType } from "../util/types.js";
 export interface UseElementSizeParameters<T extends Element> extends UseRefElementParameters<T> {
     elementSizeParameters: {
         /**
@@ -9,7 +9,7 @@ export interface UseElementSizeParameters<T extends Element> extends UseRefEleme
          * values you use if you'd like.
          * @param sizeInfo
          */
-        onSizeChange(sizeInfo: ElementSize, prevSize: ElementSize | undefined, entries: ResizeObserverEntry[] | JSX.TargetedEvent<T>): void;
+        onSizeChange(sizeInfo: ElementSize, prevSize: ElementSize | undefined, entries: ResizeObserverEntry[] | EventType<T, Event>): void;
         /**
          * Passed as an argument to the created ResizeObserver.
          *

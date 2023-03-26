@@ -1,15 +1,16 @@
 import { shuffle as lodashShuffle } from "lodash-es";
-import { VNode, createElement } from "preact";
+import { createElement } from "preact";
 import { useCallback, useLayoutEffect, useRef } from "preact/hooks";
 import { useForceUpdate } from "../../preact-extensions/use-force-update.js";
 import { ManagedChildInfo, UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
 import { returnNull, useEnsureStability, usePassiveState } from "../../preact-extensions/use-passive-state.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
+import { VNode } from "../../util/types.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
 
 
 
-export type GetIndex<P> = (row: VNode<P>) => (number | null | undefined);
+export type GetIndex = (row: VNode) => (number | null | undefined);
 export type GetValid = (index: number) => boolean;
 export type GetHighestChildIndex = () => number;
 export type Compare<M extends UseRearrangeableChildInfo> = (lhs: M, rhs: M) => number;
@@ -31,7 +32,7 @@ export interface UseRearrangeableChildrenParameters<M extends UseRearrangeableCh
          * 
          * In general, this corresponds to the `index` prop, so something like `vnode => vnode.props.index` is what you're usually looking for.
          */
-        getIndex: GetIndex<any>;
+        getIndex: GetIndex;
 
 
         onRearranged: null | (() => void);
@@ -210,7 +211,7 @@ export function useRearrangeableChildren<M extends UseSortableChildInfo>({
         const forceUpdate = useForceUpdate();
         useLayoutEffect(() => { setForceUpdate(_prev => forceUpdate); }, [forceUpdate])
 
-        return (children as VNode<any>[])
+        return (children as VNode[])
             .slice()
             .map(child => ({ child, mangledIndex: indexMangler(getIndex(child)!), demangledIndex: getIndex(child) }))
             .sort((lhs, rhs) => { return lhs.mangledIndex - rhs.mangledIndex })

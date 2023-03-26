@@ -1,10 +1,10 @@
-import { type JSX, type Ref, type RenderableProps } from "preact";
-import { ElementProps } from "../util/types.js";
+import { type Ref, type RenderableProps } from "preact";
+import { CSSProperties, ElementProps } from "../util/types.js";
 import { UseRefElementReturnType } from "./use-ref-element.js";
 export type SetChildren = ((children: string | null) => void);
 export type GetClass = (cls: string) => boolean;
 export type SetClass = (cls: string, enabled: boolean) => void;
-export type SetStyle = <T extends (keyof CSSStyleDeclaration) & string>(prop: T, value: JSX.CSSProperties[T] | null) => void;
+export type SetStyle = <T extends (keyof CSSStyleDeclaration) & string>(prop: T, value: CSSProperties[T] | null) => void;
 export type GetAttribute<T extends Element> = <K extends keyof ElementProps<T>>(prop: K) => ElementProps<T>[K];
 export type SetAttribute<T extends Element> = <K extends keyof ElementProps<T>>(prop: K, value: ElementProps<T>[K] | null) => void;
 export type SetEventHandler = <K extends keyof HTMLElementEventMap>(type: K, listener: null | ((this: HTMLElement, ev: HTMLElementEventMap[K]) => void), options: AddEventListenerOptions) => void;

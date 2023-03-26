@@ -1,10 +1,9 @@
-import type { JSX } from "preact";
-import { ElementProps } from "../util/types.js";
+import { CSSProperties, ElementProps } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 
-function styleStringToObject(style: string): JSX.CSSProperties {
+function styleStringToObject(style: string): CSSProperties {
     // TODO: This sucks D:
-    return Object.fromEntries(style.split(";").map(statement => statement.split(":"))) as unknown as JSX.CSSProperties;
+    return Object.fromEntries(style.split(";").map(statement => statement.split(":"))) as unknown as CSSProperties;
 }
 
 /**
@@ -33,9 +32,9 @@ export function useMergedStyles(lhs: ElementProps<EventTarget>["style"], rhs: El
         if (lhs && rhs) {
             // (useMergedStyles isn't a true hook -- this isn't a violation)
             if (typeof lhs == "string")
-                return useMergedStyles(styleStringToObject(lhs as string), rhs) as JSX.CSSProperties;
+                return useMergedStyles(styleStringToObject(lhs as string), rhs) as CSSProperties;
             if (typeof rhs == "string")
-                return useMergedStyles(lhs, styleStringToObject(rhs as string)) as JSX.CSSProperties;
+                return useMergedStyles(lhs, styleStringToObject(rhs as string)) as CSSProperties;
         }
 
         // Logic???
@@ -49,8 +48,8 @@ export function useMergedStyles(lhs: ElementProps<EventTarget>["style"], rhs: El
 
     // They're both objects, just merge them.
     return {
-        ...(lhs ?? {}) as JSX.CSSProperties,
-        ...(rhs ?? {}) as JSX.CSSProperties
-    } as unknown as JSX.CSSProperties
+        ...(lhs ?? {}) as CSSProperties,
+        ...(rhs ?? {}) as CSSProperties
+    } as unknown as CSSProperties
 }
 

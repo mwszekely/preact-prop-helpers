@@ -1,7 +1,6 @@
-import type { JSX } from "preact";
 import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
 import { OnPassiveStateChange } from "../preact-extensions/use-passive-state.js";
-import { ElementProps } from "../util/types.js";
+import { ElementProps, EventType } from "../util/types.js";
 export interface UseHasCurrentFocusParameters<T extends Node> {
     refElementReturn: Required<Pick<UseRefElementReturnType<T>["refElementReturn"], "getElement">>;
     hasCurrentFocusParameters: {
@@ -10,13 +9,13 @@ export interface UseHasCurrentFocusParameters<T extends Node> {
          *
          * `prevFocused` is generally the opposite of `focused`, but on mount it's `undefined` while `focused` is probably false (both falsy)
          */
-        onCurrentFocusedChanged?: undefined | null | OnPassiveStateChange<boolean, JSX.TargetedFocusEvent<T>>;
+        onCurrentFocusedChanged?: undefined | null | OnPassiveStateChange<boolean, EventType<T, FocusEvent>>;
         /**
          * Like `onFocusedChanged`, but also *additionally* if any child elements are focused.
          *
          * @see this.onFocusedChanged
          */
-        onCurrentFocusedInnerChanged?: undefined | null | OnPassiveStateChange<boolean, JSX.TargetedFocusEvent<T>>;
+        onCurrentFocusedInnerChanged?: undefined | null | OnPassiveStateChange<boolean, EventType<T, FocusEvent>>;
     };
 }
 export interface UseHasCurrentFocusReturnType<E extends Element> {

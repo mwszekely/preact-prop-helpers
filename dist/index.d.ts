@@ -60,6 +60,6 @@ export { assertEmptyObject } from "./util/assert.js";
 export { AsyncToSyncParameters, AsyncToSyncReturn, CaptureFunctionType, asyncToSync } from "./util/async-to-sync.js";
 export { getBuildMode } from "./util/mode.js";
 export { generateRandomId } from "./util/random-id.js";
-export type { ElementProps } from "./util/types.js";
+export type { CSSProperties, ElementProps, EventType, VNode } from "./util/types.js";
 export { hideCallCount, monitorCallCount } from "./util/use-call-count.js";
 //# sourceMappingURL=index.d.ts.map

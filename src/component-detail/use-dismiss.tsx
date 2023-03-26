@@ -1,4 +1,3 @@
-import type { JSX } from "preact";
 import { useCallback, useEffect } from "preact/hooks";
 import { useGlobalHandler } from "../dom-helpers/use-event-handler.js";
 import { UseRefElementReturnType, useRefElement } from "../dom-helpers/use-ref-element.js";
@@ -7,7 +6,7 @@ import { OnPassiveStateChange } from "../preact-extensions/use-passive-state.js"
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useStableGetter } from "../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../util/assert.js";
-import { ElementProps } from "../util/types.js";
+import { ElementProps, EventType } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 
 /**
@@ -210,7 +209,7 @@ export function useLostFocusDismiss<SourceElement extends Element | null, PopupE
 
     const stableOnClose = useStableCallback(onClose);
     const getOpen = useStableGetter(open);
-    const onLastActiveElementChange = useCallback<OnPassiveStateChange<Element | null, JSX.TargetedFocusEvent<any>>>((newElement, _prevElement, _e) => {
+    const onLastActiveElementChange = useCallback<OnPassiveStateChange<Element | null, EventType<any, FocusEvent>>>((newElement, _prevElement, _e) => {
         const open = getOpen();
         const sourceElement = getSourceElement?.();
         const popupElement = getPopupElement();
@@ -241,7 +240,7 @@ export function useBackdropDismiss<PopupElement extends Element>({ backdropDismi
     const getOpen = useStableGetter(open);
     const onClose = useStableCallback(onCloseUnstable);
 
-    const onBackdropClick = useCallback(function onBackdropClick(e: JSX.TargetedEvent<any>) {
+    const onBackdropClick = useCallback(function onBackdropClick(e: EventType<any, Event>) {
         if (!getOpen())
             return;
 
