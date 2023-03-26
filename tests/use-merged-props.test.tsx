@@ -1,4 +1,3 @@
-import { h } from "preact"
 import { mount } from 'enzyme';
 import { useMergedProps } from "../src/index";
 

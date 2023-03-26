@@ -1,9 +1,8 @@
-import type { JSX } from "preact";
 import { useEffect, useRef } from "preact/hooks";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useState } from "../preact-extensions/use-state.js";
-import { monitorCallCount } from "../util/use-call-count.js";
 import { ElementProps } from "../util/types.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 
 export interface UseDroppableReturnType<E extends Element> {
 

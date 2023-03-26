@@ -1,10 +1,10 @@
 import { createElement, type JSX, type Ref, type RenderableProps } from "preact";
 import { forwardRef, memo } from "preact/compat";
 import { useCallback, useImperativeHandle, useRef } from "preact/hooks";
+import { ElementProps } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 import { useMergedProps } from "./use-merged-props.js";
-import { UseRefElementReturnType, useRefElement } from "./use-ref-element.js";
-import { ElementProps } from "../util/types.js";
+import { useRefElement, UseRefElementReturnType } from "./use-ref-element.js";
 
 export type SetChildren = ((children: string | null) => void);
 export type GetClass = (cls: string) => boolean;

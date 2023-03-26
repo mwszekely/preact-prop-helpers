@@ -1,8 +1,8 @@
-import { ComponentChildren, h } from "preact"
 import { mount } from 'enzyme';
+import { ComponentChildren } from "preact";
 import { useLayoutEffect } from "../src/index";
-import { useEffect } from "../src/use-effect";
 import { useBeforeLayoutEffect } from "../src/use-before-layout-effect";
+import { useEffect } from "../src/use-effect";
 
 // Primarily to test useBeforeLayoutEffect
 

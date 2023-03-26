@@ -1,4 +1,3 @@
-import type { JSX } from "preact";
 import { useInterval, useState } from "../../dist/index.js";
 
 
