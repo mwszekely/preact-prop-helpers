@@ -1,6 +1,6 @@
-import { LegacyRef, MutableRefObject, Ref } from "react";
+import { LegacyRef, MutableRefObject } from "react";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
-import { ElementProps } from "../util/types.js";
+import { ElementProps, Ref } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 
 

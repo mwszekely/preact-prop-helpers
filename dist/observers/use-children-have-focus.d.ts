@@ -1,12 +1,12 @@
-import { EventType } from "../index.js";
 import { OnPassiveStateChange, PassiveStateUpdater } from "../preact-extensions/use-passive-state.js";
+import { FocusEventType } from "../util/types.js";
 import { UseHasCurrentFocusParameters } from "./use-has-current-focus.js";
 export interface UseChildrenHaveFocusParameters<T extends Element> {
     childrenHaveFocusParameters: {
         /**
          * Fires `true` once any of the children have become focused, and `false` once all of the children have become unfocused.
          */
-        onCompositeFocusChange: null | OnPassiveStateChange<boolean, EventType<T, Event>>;
+        onCompositeFocusChange: null | OnPassiveStateChange<boolean, FocusEventType<T>>;
     };
 }
 export interface UseChildrenHaveFocusChildReturnType<E extends Element> {
@@ -21,7 +21,7 @@ export interface UseChildrenHaveFocusReturnType<T extends Element> {
 export interface UseChildrenHaveFocusContext<T extends Element> {
     childrenHaveFocusChildContext: {
         /** **STABLE** */
-        setFocusCount: PassiveStateUpdater<number, EventType<T, Event>>;
+        setFocusCount: PassiveStateUpdater<number, FocusEventType<T>>;
     };
 }
 export interface UseChildrenHaveFocusChildParameters<T extends Element> {

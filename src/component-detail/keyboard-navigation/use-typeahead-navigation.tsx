@@ -7,7 +7,7 @@ import { useStableCallback } from "../../preact-extensions/use-stable-callback.j
 import { useStableGetter, useStableObject } from "../../preact-extensions/use-stable-getter.js";
 import { useState } from "../../preact-extensions/use-state.js";
 import { assertEmptyObject } from "../../util/assert.js";
-import { ElementProps } from "../../util/types.js";
+import { CompositionEventType, ElementProps } from "../../util/types.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexChildParameters, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
 
@@ -206,11 +206,11 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
             }
 
         }),
-        onCompositionStart: useStableCallback((e) => {
+        onCompositionStart: useStableCallback((e: CompositionEventType<ParentOrChildElement>) => {
             setNextTypeaheadChar(e.data);
             setImeActive(false);
         }),
-        onCompositionEnd: useStableCallback((_e) => { setImeActive(true) }),
+        onCompositionEnd: useStableCallback((_e: CompositionEventType<ParentOrChildElement>) => { setImeActive(true) }),
     });
 
     const excludeSpace = useStableCallback(() => { return typeaheadStatus != "none" });

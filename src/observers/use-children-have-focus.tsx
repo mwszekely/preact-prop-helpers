@@ -1,7 +1,7 @@
-import { EventType } from "../index.js";
 import { OnPassiveStateChange, PassiveStateUpdater, returnFalse, runImmediately, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useStableObject } from "../preact-extensions/use-stable-getter.js";
+import { FocusEventType } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 import { UseHasCurrentFocusParameters } from "./use-has-current-focus.js";
 
@@ -11,7 +11,7 @@ export interface UseChildrenHaveFocusParameters<T extends Element> {
         /**
          * Fires `true` once any of the children have become focused, and `false` once all of the children have become unfocused.
          */
-        onCompositeFocusChange: null | OnPassiveStateChange<boolean, EventType<T, Event>>;
+        onCompositeFocusChange: null | OnPassiveStateChange<boolean, FocusEventType<T>>;
     }
 }
 
@@ -27,7 +27,7 @@ export interface UseChildrenHaveFocusReturnType<T extends Element> {
 export interface UseChildrenHaveFocusContext<T extends Element> {
     childrenHaveFocusChildContext: {
         /** **STABLE** */
-        setFocusCount: PassiveStateUpdater<number, EventType<T, Event>>;
+        setFocusCount: PassiveStateUpdater<number, FocusEventType<T>>;
     }
 }
 
@@ -48,11 +48,10 @@ export interface UseChildrenHaveFocusChildParameters<T extends Element> {
 export function useChildrenHaveFocus<ChildElement extends Element>(args: UseChildrenHaveFocusParameters<ChildElement>): UseChildrenHaveFocusReturnType<ChildElement> {
     monitorCallCount(useChildrenHaveFocus);
 
-    type R = EventType<ChildElement, Event>;
     const { childrenHaveFocusParameters: { onCompositeFocusChange } } = args;
 
-    const [getAnyFocused, setAnyFocused] = usePassiveState<boolean, R>(onCompositeFocusChange, returnFalse, runImmediately);
-    const [_getFocusCount, setFocusCount] = usePassiveState<number, R>(useStableCallback<OnPassiveStateChange<number, R>>((anyFocused, anyPreviouslyFocused, e) => {
+    const [getAnyFocused, setAnyFocused] = usePassiveState<boolean, FocusEventType<ChildElement>>(onCompositeFocusChange, returnFalse, runImmediately);
+    const [_getFocusCount, setFocusCount] = usePassiveState<number, FocusEventType<ChildElement>>(useStableCallback<OnPassiveStateChange<number, FocusEventType<ChildElement>>>((anyFocused, anyPreviouslyFocused, e) => {
         console.assert(anyFocused >= 0 && anyFocused <= 1);
         setAnyFocused(!!(anyFocused && !anyPreviouslyFocused), e);
     }));
