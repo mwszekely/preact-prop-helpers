@@ -1,4 +1,4 @@
-import { AllHTMLAttributes, CSSProperties, PropsWithChildren, Ref, createElement, forwardRef, memo, useCallback, useImperativeHandle, useRef } from "react";
+import { CSSProperties, PropsWithChildren, Ref, createElement, forwardRef, memo, useCallback, useImperativeHandle, useRef } from "react";
 import { ElementProps } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 import { useMergedProps } from "./use-merged-props.js";

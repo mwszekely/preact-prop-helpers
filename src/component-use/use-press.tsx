@@ -1,5 +1,5 @@
 import { noop } from "lodash-es";
-import { FocusEvent, KeyboardEvent, MouseEvent, PointerEvent, SyntheticEvent, TouchEvent, useCallback } from "react";
+import { useCallback } from "react";
 import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
 import { OnPassiveStateChange, returnFalse, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";

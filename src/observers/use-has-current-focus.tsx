@@ -1,5 +1,5 @@
 
-import { FocusEvent, FocusEventHandler, useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
 import { OnPassiveStateChange, returnFalse, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { ElementProps, FocusEventType } from "../util/types.js";
