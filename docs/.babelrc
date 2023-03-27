@@ -1,5 +1,6 @@
 {
     "comments": true,
+    "sourceMaps": true,
     "presets": [
         "@babel/preset-env"
     ],
