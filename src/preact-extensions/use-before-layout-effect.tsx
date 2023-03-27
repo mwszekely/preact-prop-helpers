@@ -1,10 +1,9 @@
 
 import { options } from "preact";
-import { EffectCallback, Inputs, useEffect, useState } from "preact/hooks";
-import { generateRandomId } from "../util/random-id.js";
+import { EffectCallback, Inputs, useRef } from "preact/hooks";
 import { monitorCallCount } from "../util/use-call-count.js";
 
-const toRun = new Map<string, { effect: EffectCallback, prevInputs?: Inputs | undefined, inputs?: Inputs, cleanup: null | undefined | void | (() => void) }>();
+const toRun = new Map<number, { effect: EffectCallback, prevInputs?: Inputs | undefined, inputs?: Inputs, cleanup: null | undefined | void | (() => void) }>();
 
 
 // TODO: Whether this goes in options.diffed or options._commit
@@ -42,6 +41,8 @@ const newCommit: typeof originalCommit = (vnode, ...args) => {
 const originalCommit = options[commitName];
 options[commitName] = newCommit as never
 
+let incrementingId = 0;
+
 /**
  * Semi-private function to allow stable callbacks even within `useLayoutEffect` and ref assignment.
  * 
@@ -54,17 +55,24 @@ options[commitName] = newCommit as never
 export function useBeforeLayoutEffect(effect: EffectCallback | null, inputs?: Inputs) {
     monitorCallCount(useBeforeLayoutEffect);
 
-    const [id] = useState(() => generateRandomId());
+    // Note to self: This is by far the most called hook by sheer volume of dependencies.
+    // So it should ideally be as quick as possible.
+
+    const ref = useRef<number>(null!);
+    ref.current ??= ++incrementingId;
+    const id = ref.current;
+
     if (effect)
         toRun.set(id, { effect, inputs, cleanup: null });
     else
         toRun.delete(id);
 
-    useEffect(() => {
+    // Not needed, because the insertion cleanup would run before useEffect anyway, I think?
+    /*useEffect(() => {
         return () => {
             toRun.delete(id);
         }
-    }, [id])
+    }, [id])*/
 }
 
 function argsChanged(oldArgs?: Inputs, newArgs?: Inputs): boolean {

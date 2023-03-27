@@ -147,7 +147,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         n[l] = null == u ? "" : u;
         break n;
       } catch (n) {}
-      "function" == typeof u || (null == u || !1 === u && "-" !== l[4] ? n.removeAttribute(l) : n.setAttribute(l, u));
+      "function" == typeof u || (null == u || !1 === u && -1 == l.indexOf("-") ? n.removeAttribute(l) : n.setAttribute(l, u));
     }
   }
   function j$2(n) {
@@ -729,7 +729,6 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     return K && (n = K(n)), n.persist = Q, n.isPropagationStopped = X, n.isDefaultPrevented = nn, n.nativeEvent = n;
   };
   var en = {
-      enumerable: !1,
       configurable: !0,
       get: function () {
         return this.class;
@@ -737,23 +736,24 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     },
     rn = l$1.vnode;
   l$1.vnode = function (n) {
-    "string" == typeof n.type && function (n) {
-      var t = n.props,
-        e = n.type,
-        u = {};
-      for (var o in t) {
-        var i = t[o];
-        if (!("value" === o && "defaultValue" in t && null == i || $ && "children" === o && "noscript" === e || "class" === o || "className" === o)) {
+    var t = n.type,
+      e = n.props,
+      u = e;
+    if ("string" == typeof t) {
+      for (var o in u = {}, e) {
+        var i = e[o];
+        if (!("value" === o && "defaultValue" in e && null == i || $ && "children" === o && "noscript" === t)) {
           var l = o.toLowerCase();
-          "defaultValue" === o && "value" in t && null == t.value ? o = "value" : "download" === o && !0 === i ? i = "" : "ondoubleclick" === l ? o = "ondblclick" : "onchange" !== l || "input" !== e && "textarea" !== e || q(t.type) ? "onfocus" === l ? o = "onfocusin" : "onblur" === l ? o = "onfocusout" : Z.test(o) ? o = l : -1 === e.indexOf("-") && H.test(o) ? o = o.replace(Y, "-$&").toLowerCase() : null === i && (i = void 0) : l = o = "oninput", "oninput" === l && u[o = l] && (o = "oninputCapture"), u[o] = i;
+          "defaultValue" === o && "value" in e && null == e.value ? o = "value" : "download" === o && !0 === i ? i = "" : "ondoubleclick" === l ? o = "ondblclick" : "onchange" !== l || "input" !== t && "textarea" !== t || q(e.type) ? "onfocus" === l ? o = "onfocusin" : "onblur" === l ? o = "onfocusout" : Z.test(o) ? o = l : -1 === t.indexOf("-") && H.test(o) ? o = o.replace(Y, "-$&").toLowerCase() : null === i && (i = void 0) : l = o = "oninput", "oninput" === l && u[o = l] && (o = "oninputCapture"), u[o] = i;
         }
       }
-      "select" == e && u.multiple && Array.isArray(u.value) && (u.value = P$1(t.children).forEach(function (n) {
+      "select" == t && u.multiple && Array.isArray(u.value) && (u.value = P$1(e.children).forEach(function (n) {
         n.props.selected = -1 != u.value.indexOf(n.props.value);
-      })), "select" == e && null != u.defaultValue && (u.value = P$1(t.children).forEach(function (n) {
+      })), "select" == t && null != u.defaultValue && (u.value = P$1(e.children).forEach(function (n) {
         n.props.selected = u.multiple ? -1 != u.defaultValue.indexOf(n.props.value) : u.defaultValue == n.props.value;
-      })), t.class && !t.className ? (u.class = t.class, Object.defineProperty(u, "className", en)) : (t.className && !t.class || t.class && t.className) && (u.class = u.className = t.className), n.props = u;
-    }(n), n.$$typeof = B, rn && rn(n);
+      })), n.props = u, e.class != e.className && (en.enumerable = "className" in e, null != e.className && (u.class = e.className), Object.defineProperty(u, "className", en));
+    }
+    n.$$typeof = B, rn && rn(n);
   };
   var un = l$1.__r;
   l$1.__r = function (n) {
@@ -2197,28 +2197,6 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       return undefined;
     }
   }
-  const Table = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-";
-  function base64(value) {
-    return Table[value];
-  }
-  function random6Bits() {
-    return Math.floor(Math.random() * 0b1000000);
-  }
-  function random64Bits() {
-    return [random6Bits(), random6Bits(), random6Bits(), random6Bits(), random6Bits(), random6Bits(), random6Bits(), random6Bits(), random6Bits(), random6Bits(), random6Bits()];
-  }
-  /**
-   * Returns a randomly-generated ID with an optional prefix.
-   * Note that if the prefix is *explicitly* set to "", then
-   * IDs that are not valid under HTML4 may be generated. Oh no.
-   *
-   *
-   * (This is here, in this particular file, to avoid circular dependencies
-   * because useBeforeLayoutEffect also needs random IDs for its own reasons)
-   */
-  function generateRandomId(prefix) {
-    return "".concat(prefix !== null && prefix !== void 0 ? prefix : "id-").concat(random64Bits().map(n => base64(n)).join(""));
-  }
   const toRun = new Map();
   // TODO: Whether this goes in options.diffed or options._commit
   // is a post-suspense question.
@@ -2255,6 +2233,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
   };
   const originalCommit = l$1[commitName];
   l$1[commitName] = newCommit;
+  let incrementingId = 0;
   /**
    * Semi-private function to allow stable callbacks even within `useLayoutEffect` and ref assignment.
    *
@@ -2265,19 +2244,26 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
    * @param inputs
    */
   function useBeforeLayoutEffect(effect, inputs) {
+    var _ref$current;
     monitorCallCount(useBeforeLayoutEffect);
-    const [id] = h(() => generateRandomId());
+    // Note to self: This is by far the most called hook by sheer volume of dependencies.
+    // So it should ideally be as quick as possible.
+    const ref = _(null);
+    (_ref$current = ref.current) !== null && _ref$current !== void 0 ? _ref$current : ref.current = ++incrementingId;
+    const id = ref.current;
     if (effect) toRun.set(id, {
       effect,
       inputs,
       cleanup: null
     });else toRun.delete(id);
-    p(() => {
-      return () => {
-        toRun.delete(id);
-      };
-    }, [id]);
+    // Not needed, because the insertion cleanup would run before useEffect anyway, I think?
+    /*useEffect(() => {
+        return () => {
+            toRun.delete(id);
+        }
+    }, [id])*/
   }
+
   function argsChanged(oldArgs, newArgs) {
     return !!(!oldArgs || oldArgs.length !== (newArgs === null || newArgs === void 0 ? void 0 : newArgs.length) || newArgs !== null && newArgs !== void 0 && newArgs.some((arg, index) => arg !== oldArgs[index]));
   }
@@ -9221,6 +9207,28 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     waiting: "onWaiting",
     wheel: "onWheel"
   };
+  const Table = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-";
+  function base64(value) {
+    return Table[value];
+  }
+  function random6Bits() {
+    return Math.floor(Math.random() * 0b1000000);
+  }
+  function random64Bits() {
+    return [random6Bits(), random6Bits(), random6Bits(), random6Bits(), random6Bits(), random6Bits(), random6Bits(), random6Bits(), random6Bits(), random6Bits(), random6Bits()];
+  }
+  /**
+   * Returns a randomly-generated ID with an optional prefix.
+   * Note that if the prefix is *explicitly* set to "", then
+   * IDs that are not valid under HTML4 may be generated. Oh no.
+   *
+   *
+   * (This is here, in this particular file, to avoid circular dependencies
+   * because useBeforeLayoutEffect also needs random IDs for its own reasons)
+   */
+  function generateRandomId(prefix) {
+    return "".concat(prefix !== null && prefix !== void 0 ? prefix : "id-").concat(random64Bits().map(n => base64(n)).join(""));
+  }
 
   /**
    * Very basic hook for a root-level component to use to allow any children within the whole app to push children to a portal somewhere.
