@@ -5,7 +5,5 @@ declare global {
         } | undefined;
     };
 }
-declare function getBuildModeUnmemoized(): "production" | "development";
-export declare const getBuildMode: typeof getBuildModeUnmemoized;
-export {};
+export declare function getBuildMode(): "production" | "development";
 //# sourceMappingURL=mode.d.ts.map
