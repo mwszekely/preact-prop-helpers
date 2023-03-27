@@ -1,5 +1,5 @@
 import type { JSX } from "preact";
-export type { Ref, RefObject, RefCallback } from "preact";
+export type { Ref, RefCallback, RefObject } from "preact";
 export type OmitStrong<T, K extends keyof T> = Omit<T, K>;
 export type OmitTargeted<T, K extends keyof T, L extends keyof T[K]> = OmitStrong<T, K> & {
     [M in K]: OmitStrong<T[K], L>;
