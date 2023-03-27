@@ -1,6 +1,6 @@
 import { StateUpdater, useCallback, useEffect } from "preact/hooks";
 import { UseHasCurrentFocusParameters } from "../../observers/use-has-current-focus.js";
-import { ManagedChildInfo, UseManagedChildParameters, UseManagedChildrenContext, UseManagedChildrenParameters, UseManagedChildrenReturnType, useChildrenFlag } from "../../preact-extensions/use-managed-children.js";
+import { ManagedChildInfo, useChildrenFlag, UseManagedChildParameters, UseManagedChildrenContext, UseManagedChildrenParameters, UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
 import { OnPassiveStateChange, PassiveStateUpdater, usePassiveState } from "../../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useStableGetter, useStableObject } from "../../preact-extensions/use-stable-getter.js";

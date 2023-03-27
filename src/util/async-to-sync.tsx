@@ -1,4 +1,4 @@
-import { DebounceSettings, debounce as LodashDebounce } from "lodash-es";
+import { debounce as LodashDebounce, DebounceSettings } from "lodash-es";
 
 
 export type CaptureFunctionType<AP extends unknown[], SP extends unknown[] = AP> = (...args: SP) => AP;

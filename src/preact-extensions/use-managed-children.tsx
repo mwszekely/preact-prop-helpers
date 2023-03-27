@@ -1,7 +1,7 @@
 import { useCallback, useLayoutEffect, useRef } from "preact/hooks";
 import { assertEmptyObject } from "../util/assert.js";
 import { monitorCallCount } from "../util/use-call-count.js";
-import { OnPassiveStateChange, PassiveStateUpdater, debounceRendering, useEnsureStability, usePassiveState } from "./use-passive-state.js";
+import { debounceRendering, OnPassiveStateChange, PassiveStateUpdater, useEnsureStability, usePassiveState } from "./use-passive-state.js";
 import { useStableCallback } from "./use-stable-callback.js";
 import { useStableObject } from "./use-stable-getter.js";
 

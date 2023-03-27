@@ -53,7 +53,7 @@ export interface UseSingleSelectionChildParameters<E extends Element, M extends 
         /**
          * What property will be used to mark this item as selected.
          *
-         * **IMPORTANT**: The `aria-current` options should be used with caution as they are semantically very different from the usual selection cases.
+         * **importANT**: The `aria-current` options should be used with caution as they are semantically very different from the usual selection cases.
          */
         ariaPropName: `aria-${"pressed" | "selected" | "checked" | `current-${"page" | "step" | "date" | "time" | "location" | "true"}`}` | null;
     } & Pick<UseSingleSelectionChildInfo<E>, "disabled">;

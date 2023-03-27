@@ -2,7 +2,7 @@
 import { noop } from "lodash-es";
 import { useCallback, useEffect } from "preact/hooks";
 import { UseChildrenHaveFocusChildReturnType, UseChildrenHaveFocusParameters } from "../../observers/use-children-have-focus.js";
-import { UseManagedChildrenReturnType, useChildrenFlag } from "../../preact-extensions/use-managed-children.js";
+import { useChildrenFlag, UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
 import { OnPassiveStateChange, PassiveStateUpdater, useEnsureStability } from "../../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useStableGetter, useStableObject } from "../../preact-extensions/use-stable-getter.js";
@@ -69,7 +69,7 @@ export interface UseSingleSelectionChildParameters<E extends Element, M extends 
         /**
          * What property will be used to mark this item as selected.
          * 
-         * **IMPORTANT**: The `aria-current` options should be used with caution as they are semantically very different from the usual selection cases.
+         * **importANT**: The `aria-current` options should be used with caution as they are semantically very different from the usual selection cases.
          */
         ariaPropName: `aria-${"pressed" | "selected" | "checked" | `current-${"page" | "step" | "date" | "time" | "location" | "true"}`}` | null;
     } & Pick<UseSingleSelectionChildInfo<E>, "disabled">;

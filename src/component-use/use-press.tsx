@@ -5,7 +5,7 @@ import { OnPassiveStateChange, returnFalse, usePassiveState } from "../preact-ex
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useState } from "../preact-extensions/use-state.js";
 import { useTimeout } from "../timing/use-timeout.js";
-import { ElementProps, FocusEventType, KeyboardEventType, MouseEventType, PointerEventType, TouchEventType, } from "../util/types.js";
+import { ElementProps, FocusEventType, KeyboardEventType, MouseEventType, PointerEventType, TouchEventType } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 
 export type PressEventReason<E extends Node> = MouseEventType<E> | KeyboardEventType<E> | TouchEventType<E> | PointerEventType<E>;

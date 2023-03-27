@@ -1,6 +1,6 @@
 import { createContext } from "preact";
 import { memo, useCallback, useContext } from "preact/compat";
-import { CompleteListNavigationContext, GetIndex, UseCompleteListNavigationChildInfo, UseCompleteListNavigationDeclarativeReturnType, VNode, useCompleteListNavigationChild, useCompleteListNavigationDeclarative, useMergedProps, usePress, useStableCallback, useState } from "../../dist/index.js";
+import { CompleteListNavigationContext, GetIndex, useCompleteListNavigationChild, UseCompleteListNavigationChildInfo, useCompleteListNavigationDeclarative, UseCompleteListNavigationDeclarativeReturnType, useMergedProps, usePress, useStableCallback, useState, VNode } from "../../dist/index.js";
 
 const RandomWords = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
 

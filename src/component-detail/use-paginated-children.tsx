@@ -34,7 +34,7 @@ export interface UsePaginatedChildrenReturnType {
     paginatedChildrenReturn: {
         refreshPagination: (min: number | null, max: number | null) => void;
         /**
-         * **IMPORTANT**: This is only tracked when pagination is enabled.
+         * **importANT**: This is only tracked when pagination is enabled.
          * 
          * If pagination is not enabled, this is either `null` or some undefined previous number.
          */

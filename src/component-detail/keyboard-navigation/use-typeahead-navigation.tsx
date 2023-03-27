@@ -1,7 +1,7 @@
 import { useCallback, useLayoutEffect, useRef } from "preact/hooks";
 import { UsePressParameters } from "../../component-use/use-press.js";
 import { UseRefElementReturnType } from "../../dom-helpers/use-ref-element.js";
-import { UseTextContentParameters, UseTextContentReturnType, useTextContent } from "../../dom-helpers/use-text-content.js";
+import { useTextContent, UseTextContentParameters, UseTextContentReturnType } from "../../dom-helpers/use-text-content.js";
 import { OnPassiveStateChange, usePassiveState } from "../../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useStableGetter, useStableObject } from "../../preact-extensions/use-stable-getter.js";
