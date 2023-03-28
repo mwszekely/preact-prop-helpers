@@ -35,9 +35,9 @@ import { monitorCallCount } from "../../util/use-call-count.js";
  * And just as well! Children should be allowed at the root,
  * regardless of if it's the whole app or just a given component.
  */
-export function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovingTabIndexParameters: { untabbable, initiallyTabbedIndex, onTabbableIndexChange }, ..._void1 }) {
+export function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovingTabIndexParameters: { untabbable, initiallyTabbedIndex, onTabbableIndexChange }, ...void1 }) {
     monitorCallCount(useRovingTabIndex);
-    assertEmptyObject(_void1);
+    assertEmptyObject(void1);
     const getUntabbable = useStableGetter(untabbable);
     // Override the actual setter to include some extra logic related to avoiding hidden children, 
     // what to do when we're untabbable, what to do when we're tabbable but given `null`, etc.
@@ -123,16 +123,14 @@ export function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovi
         context: useStableObject({ rovingTabIndexContext })
     };
 }
-export function useRovingTabIndexChild({ info: { index, ..._void2 }, context: { rovingTabIndexContext: { reevaluateClosestFit, setTabbableIndex, getInitiallyTabbedIndex } }, rovingTabIndexChildParameters, ..._void3 }) {
+export function useRovingTabIndexChild({ info: { index, hidden, ...void2 }, context: { rovingTabIndexContext: { reevaluateClosestFit, setTabbableIndex, getInitiallyTabbedIndex } }, ...void3 }) {
     monitorCallCount(useRovingTabIndexChild);
-    const { hidden, ..._void1 } = rovingTabIndexChildParameters;
     const [tabbable, setTabbable, getTabbable] = useState(getInitiallyTabbedIndex() === index);
     useEffect(() => {
         reevaluateClosestFit();
     }, [!!hidden]);
-    assertEmptyObject(_void1);
-    assertEmptyObject(_void2);
-    assertEmptyObject(_void3);
+    assertEmptyObject(void2);
+    assertEmptyObject(void3);
     return {
         hasCurrentFocusParameters: {
             onCurrentFocusedInnerChanged: useStableCallback((focused, _prevFocused, e) => {

@@ -1,7 +1,7 @@
 import { useCallback, useLayoutEffect, useRef } from "preact/hooks";
 import { UsePressParameters } from "../../component-use/use-press.js";
 import { UseRefElementReturnType } from "../../dom-helpers/use-ref-element.js";
-import { useTextContent, UseTextContentParameters, UseTextContentReturnType } from "../../dom-helpers/use-text-content.js";
+import { UseTextContentParameters, UseTextContentReturnType, useTextContent } from "../../dom-helpers/use-text-content.js";
 import { OnPassiveStateChange, usePassiveState } from "../../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useStableGetter, useStableObject } from "../../preact-extensions/use-stable-getter.js";
@@ -78,17 +78,17 @@ interface TypeaheadInfo { text: string | null; unsortedIndex: number; }
  * @see useListNavigation, which packages everything up together.
  */
 export function useTypeaheadNavigation<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseTypeaheadNavigationChildInfo<ChildElement>>({
-    typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead, isValid, ..._void3 },
-    rovingTabIndexReturn: { getTabbableIndex: getIndex, setTabbableIndex: setIndex, ..._void1 },
-    ..._void2
+    typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead, isValid, ...void3 },
+    rovingTabIndexReturn: { getTabbableIndex: getIndex, setTabbableIndex: setIndex, ...void1 },
+    ...void2
 }: UseTypeaheadNavigationParameters<ChildElement, M>): UseTypeaheadNavigationReturnType<ParentOrChildElement> {
     type EventType = Parameters<NonNullable<ElementProps<ParentOrChildElement>["onKeyDown"]>>[0];
 
     monitorCallCount(useTypeaheadNavigation);
 
-    assertEmptyObject(_void1);
-    assertEmptyObject(_void2);
-    assertEmptyObject(_void3);
+    assertEmptyObject(void1);
+    assertEmptyObject(void2);
+    assertEmptyObject(void3);
 
     // For typeahead, keep track of what our current "search" string is (if we have one)
     // and also clear it every 1000 ms since the last time it changed.

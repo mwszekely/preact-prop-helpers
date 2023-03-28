@@ -11,11 +11,11 @@ import { monitorCallCount } from "../../util/use-call-count.js";
  *
  * @see useListNavigation, which packages everything up together.
  */
-export function useTypeaheadNavigation({ typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead, isValid, ..._void3 }, rovingTabIndexReturn: { getTabbableIndex: getIndex, setTabbableIndex: setIndex, ..._void1 }, ..._void2 }) {
+export function useTypeaheadNavigation({ typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead, isValid, ...void3 }, rovingTabIndexReturn: { getTabbableIndex: getIndex, setTabbableIndex: setIndex, ...void1 }, ...void2 }) {
     monitorCallCount(useTypeaheadNavigation);
-    assertEmptyObject(_void1);
-    assertEmptyObject(_void2);
-    assertEmptyObject(_void3);
+    assertEmptyObject(void1);
+    assertEmptyObject(void2);
+    assertEmptyObject(void3);
     // For typeahead, keep track of what our current "search" string is (if we have one)
     // and also clear it every 1000 ms since the last time it changed.
     // Next, keep a mapping of typeahead values to indices for faster searching.

@@ -34,6 +34,13 @@ const newCommit = (vnode, ...args) => {
 const originalCommit = options[commitName];
 options[commitName] = newCommit;
 let incrementingId = 0;
+function nextId() {
+    let next = ++incrementingId;
+    // TODO: This seems reasonable, but is is necessary or are we orders of magnitude from having to worry about overflow?
+    if (incrementingId >= Number.MAX_SAFE_INTEGER)
+        incrementingId = -Number.MAX_SAFE_INTEGER;
+    return next;
+}
 /**
  * Semi-private function to allow stable callbacks even within `useLayoutEffect` and ref assignment.
  *
@@ -48,7 +55,7 @@ export function useBeforeLayoutEffect(effect, inputs) {
     // Note to self: This is by far the most called hook by sheer volume of dependencies.
     // So it should ideally be as quick as possible.
     const ref = useRef(null);
-    ref.current ??= ++incrementingId;
+    ref.current ??= nextId();
     const id = ref.current;
     if (effect)
         toRun.set(id, { effect, inputs, cleanup: null });

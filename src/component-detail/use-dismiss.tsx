@@ -1,7 +1,7 @@
 import { useCallback, useEffect } from "preact/hooks";
 import { useGlobalHandler } from "../dom-helpers/use-event-handler.js";
-import { useRefElement, UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
-import { useActiveElement, UseActiveElementParameters } from "../observers/use-active-element.js";
+import { UseRefElementReturnType, useRefElement } from "../dom-helpers/use-ref-element.js";
+import { UseActiveElementParameters, useActiveElement } from "../observers/use-active-element.js";
 import { OnPassiveStateChange } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useStableGetter } from "../preact-extensions/use-stable-getter.js";

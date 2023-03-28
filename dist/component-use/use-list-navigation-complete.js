@@ -85,21 +85,18 @@ export function useCompleteListNavigation({ linearNavigationParameters, rearrang
 }
 export function useCompleteListNavigationChild({ 
 //completeListNavigationChildParameters: { focusSelf, ...completeListNavigationChildParameters },
-singleSelectionChildParameters, rovingTabIndexChildParameters: { hidden }, info, textContentParameters, context: { childrenHaveFocusChildContext, managedChildContext, rovingTabIndexContext, paginatedChildContext, staggeredChildContext, singleSelectionContext, typeaheadNavigationContext }, sortableChildParameters, ..._void }) {
+info, textContentParameters, context: { childrenHaveFocusChildContext, managedChildContext, rovingTabIndexContext, paginatedChildContext, staggeredChildContext, singleSelectionContext, typeaheadNavigationContext }, sortableChildParameters, ...void1 }) {
     monitorCallCount(useCompleteListNavigationChild);
-    assertEmptyObject(_void);
-    const { index, focusSelf } = info;
+    assertEmptyObject(void1);
+    let { index, focusSelf, hidden, disabled } = info;
     const { info: mcp3, paginatedChildReturn, paginatedChildReturn: { hideBecausePaginated }, props: paginationProps } = usePaginatedChild({ info: { index }, context: { paginatedChildContext } });
     const { info: mcp4, staggeredChildReturn, staggeredChildReturn: { hideBecauseStaggered }, props: staggeredProps } = useStaggeredChild({ info, context: { staggeredChildContext } });
     hidden ||= (hideBecausePaginated || hideBecauseStaggered);
-    let { disabled } = singleSelectionChildParameters;
     if (hidden)
         disabled = true;
     const { refElementReturn, propsStable } = useRefElement({ refElementParameters: {} });
     const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1 }, pressParameters, textContentReturn, singleSelectionChildReturn, info: mcp5, props: propsLs, rovingTabIndexChildReturn } = useListNavigationSingleSelectionChild({
-        info: { index },
-        rovingTabIndexChildParameters: { hidden },
-        singleSelectionChildParameters: { ...singleSelectionChildParameters },
+        info: { index, disabled, hidden },
         context: { rovingTabIndexContext, singleSelectionContext, typeaheadNavigationContext },
         refElementReturn,
         textContentParameters: { hidden, ...textContentParameters }
@@ -136,13 +133,17 @@ singleSelectionChildParameters, rovingTabIndexChildParameters: { hidden }, info,
         rovingTabIndexChildReturn
     };
 }
-export function useCompleteListNavigationDeclarative({ linearNavigationParameters, paginatedChildrenParameters, rearrangeableChildrenParameters, rovingTabIndexParameters, singleSelectionDeclarativeParameters, sortableChildrenParameters, staggeredChildrenParameters, typeaheadNavigationParameters }) {
+export function useCompleteListNavigationDeclarative({ linearNavigationParameters, paginatedChildrenParameters, rearrangeableChildrenParameters, rovingTabIndexParameters, singleSelectionDeclarativeParameters, sortableChildrenParameters, staggeredChildrenParameters, typeaheadNavigationParameters, singleSelectionParameters }) {
     const ret = useCompleteListNavigation({
         linearNavigationParameters,
         paginatedChildrenParameters,
         rearrangeableChildrenParameters,
         rovingTabIndexParameters,
-        singleSelectionParameters: { initiallySelectedIndex: singleSelectionDeclarativeParameters.selectedIndex, onSelectedIndexChange: useStableCallback((a, e) => onSelectedIndexChange?.(a, e)) },
+        singleSelectionParameters: {
+            initiallySelectedIndex: singleSelectionDeclarativeParameters.selectedIndex,
+            onSelectedIndexChange: useStableCallback((a, e) => onSelectedIndexChange?.(a, e)),
+            ...singleSelectionParameters
+        },
         sortableChildrenParameters,
         staggeredChildrenParameters,
         typeaheadNavigationParameters

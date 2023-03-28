@@ -1,8 +1,8 @@
 import { assertEmptyObject } from "../../util/assert.js";
 import { ExtendMerge, OmitTargeted } from "../../util/types.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
-import { useListNavigationSingleSelection, useListNavigationSingleSelectionChild, UseListNavigationSingleSelectionChildInfo, UseListNavigationSingleSelectionChildParameters, UseListNavigationSingleSelectionChildReturnType, UseListNavigationSingleSelectionParameters, UseListNavigationSingleSelectionReturnType } from "./use-list-navigation-single-selection.js";
-import { UseSortableChildInfo, useSortableChildren, UseSortableChildrenParameters, UseSortableChildrenReturnType } from "./use-sortable-children.js";
+import { UseListNavigationSingleSelectionChildInfo, UseListNavigationSingleSelectionChildParameters, UseListNavigationSingleSelectionChildReturnType, UseListNavigationSingleSelectionParameters, UseListNavigationSingleSelectionReturnType, useListNavigationSingleSelection, useListNavigationSingleSelectionChild } from "./use-list-navigation-single-selection.js";
+import { UseSortableChildInfo, UseSortableChildrenParameters, UseSortableChildrenReturnType, useSortableChildren } from "./use-sortable-children.js";
 
 /**
  * We're just gluing together the single selection list navigation and sortable children hooks,
@@ -47,27 +47,19 @@ export function useListNavigationSingleSelectionSortable<ParentOrChildElement ex
 
 
 export function useListNavigationSingleSelectionSortableChild<ChildElement extends Element, M extends UseListNavigationSingleSelectionSortableChildInfo<ChildElement>>({
-    info: { index, ..._void5 },
-    rovingTabIndexChildParameters,
-    singleSelectionChildParameters,
+    info,
     context,
     refElementReturn,
     textContentParameters,
-    ..._void1
+    ...void1
 }: UseListNavigationSingleSelectionSortableChildParameters<ChildElement, M>): UseListNavigationSingleSelectionSortableChildReturnType<ChildElement, M> {
     monitorCallCount(useListNavigationSingleSelectionSortableChild);
+    assertEmptyObject(void1);
 
-    const lnsscr = useListNavigationSingleSelectionChild<ChildElement, M>({
-        info: { index },
-        rovingTabIndexChildParameters,
-        singleSelectionChildParameters,
+    return useListNavigationSingleSelectionChild<ChildElement, M>({
+        info,
         context,
         refElementReturn,
         textContentParameters,
-    })
-
-    assertEmptyObject(_void1);
-    assertEmptyObject(_void5);
-
-    return { ...lnsscr }
+    });
 }

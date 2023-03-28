@@ -43,6 +43,14 @@ options[commitName] = newCommit as never
 
 let incrementingId = 0;
 
+function nextId() {
+    let next = ++incrementingId;
+    // TODO: This seems reasonable, but is is necessary or are we orders of magnitude from having to worry about overflow?
+    if (incrementingId >= Number.MAX_SAFE_INTEGER)
+        incrementingId = -Number.MAX_SAFE_INTEGER;
+    return next;
+}
+
 /**
  * Semi-private function to allow stable callbacks even within `useLayoutEffect` and ref assignment.
  * 
@@ -59,7 +67,7 @@ export function useBeforeLayoutEffect(effect: EffectCallback | null, inputs?: In
     // So it should ideally be as quick as possible.
 
     const ref = useRef<number>(null!);
-    ref.current ??= ++incrementingId;
+    ref.current ??= nextId();
     const id = ref.current;
 
     if (effect)

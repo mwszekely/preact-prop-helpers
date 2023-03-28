@@ -50,15 +50,15 @@ const _dummy = null;
  * In the document order, there will be only one "focused" or "tabbable" element, making it act more like one complete unit in comparison to everything around it.
  * Navigating forwards/backwards can be done with the arrow keys, Home/End keys, or any text for typeahead to focus the next item that matches.
  */
-export function useListNavigation({ linearNavigationParameters, typeaheadNavigationParameters, rovingTabIndexParameters, managedChildrenReturn, ..._void1 }) {
+export function useListNavigation({ linearNavigationParameters, typeaheadNavigationParameters, rovingTabIndexParameters, managedChildrenReturn, ...void1 }) {
     monitorCallCount(useListNavigation);
-    const { context: { rovingTabIndexContext }, managedChildrenParameters, rovingTabIndexReturn, ..._void2 } = useRovingTabIndex({ managedChildrenReturn, rovingTabIndexParameters });
-    const { context: { typeaheadNavigationContext }, propsStable: propsStableTN, typeaheadNavigationReturn, ..._void3 } = useTypeaheadNavigation({ rovingTabIndexReturn, typeaheadNavigationParameters, });
-    const { propsStable: propsStableLN, linearNavigationReturn, ..._void4 } = useLinearNavigation({ rovingTabIndexReturn, linearNavigationParameters, });
-    assertEmptyObject(_void1);
-    assertEmptyObject(_void2);
-    assertEmptyObject(_void3);
-    assertEmptyObject(_void4);
+    const { context: { rovingTabIndexContext }, managedChildrenParameters, rovingTabIndexReturn, ...void2 } = useRovingTabIndex({ managedChildrenReturn, rovingTabIndexParameters });
+    const { context: { typeaheadNavigationContext }, propsStable: propsStableTN, typeaheadNavigationReturn, ...void3 } = useTypeaheadNavigation({ rovingTabIndexReturn, typeaheadNavigationParameters, });
+    const { propsStable: propsStableLN, linearNavigationReturn, ...void4 } = useLinearNavigation({ rovingTabIndexReturn, linearNavigationParameters, });
+    assertEmptyObject(void1);
+    assertEmptyObject(void2);
+    assertEmptyObject(void3);
+    assertEmptyObject(void4);
     // Merge the props while keeping them stable
     // (TODO: We run this merge logic every render but only need the first render's result because it's stable)
     const p = useMergedProps(propsStableTN, propsStableLN);
@@ -75,11 +75,11 @@ export function useListNavigation({ linearNavigationParameters, typeaheadNavigat
         propsStable: propsStable.current
     };
 }
-export function useListNavigationChild({ rovingTabIndexChildParameters, info, context, refElementReturn, textContentParameters, ..._void2 }) {
+export function useListNavigationChild({ info, context, refElementReturn, textContentParameters, ...void2 }) {
     monitorCallCount(useListNavigationChild);
-    const { props, ...rticr } = useRovingTabIndexChild({ rovingTabIndexChildParameters, context, info });
+    const { props, ...rticr } = useRovingTabIndexChild({ context, info });
     const { ...tncr } = useTypeaheadNavigationChild({ refElementReturn, textContentParameters, context, info });
-    assertEmptyObject(_void2);
+    assertEmptyObject(void2);
     return {
         props,
         ...tncr,

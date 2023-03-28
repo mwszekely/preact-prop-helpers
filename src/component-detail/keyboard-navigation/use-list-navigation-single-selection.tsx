@@ -4,13 +4,13 @@ import { useStableObject } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { ExtendMerge, OmitStrong } from "../../util/types.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
-import { useListNavigation, useListNavigationChild, UseListNavigationChildInfo, UseListNavigationChildParameters, UseListNavigationChildReturnType, UseListNavigationContext, UseListNavigationParameters, UseListNavigationReturnType } from "./use-list-navigation-partial.js";
-import { useSingleSelection, useSingleSelectionChild, UseSingleSelectionChildInfo, UseSingleSelectionChildParameters, UseSingleSelectionChildReturnType, UseSingleSelectionContext, UseSingleSelectionParameters, UseSingleSelectionReturnType } from "./use-single-selection.js";
+import { UseListNavigationChildInfo, UseListNavigationChildParameters, UseListNavigationChildReturnType, UseListNavigationContext, UseListNavigationParameters, UseListNavigationReturnType, useListNavigation, useListNavigationChild } from "./use-list-navigation-partial.js";
+import { UseSingleSelectionChildInfo, UseSingleSelectionChildParameters, UseSingleSelectionChildReturnType, UseSingleSelectionContext, UseSingleSelectionParameters, UseSingleSelectionReturnType, useSingleSelection, useSingleSelectionChild } from "./use-single-selection.js";
 
 export interface UseListNavigationSingleSelectionChildInfo<TabbableChildElement extends Element> extends UseListNavigationChildInfo<TabbableChildElement>, UseSingleSelectionChildInfo<TabbableChildElement> { }
 export interface UseListNavigationSingleSelectionParameters<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationSingleSelectionChildInfo<ChildElement>> extends ExtendMerge<UseListNavigationParameters<ParentOrChildElement, ChildElement, M>, OmitStrong<UseSingleSelectionParameters<ChildElement, M>, "rovingTabIndexReturn">> { }
 export interface UseListNavigationSingleSelectionReturnType<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationSingleSelectionChildInfo<ChildElement>> extends ExtendMerge<UseListNavigationReturnType<ParentOrChildElement, ChildElement, M>, UseSingleSelectionReturnType<ChildElement, M>> { }
-export interface UseListNavigationSingleSelectionChildContext<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationSingleSelectionChildInfo<ChildElement>> extends UseListNavigationContext<ParentOrChildElement, ChildElement, M>, UseSingleSelectionContext<ChildElement, M> { }
+export interface UseListNavigationSingleSelectionChildContext extends UseListNavigationContext, UseSingleSelectionContext { }
 export interface UseListNavigationSingleSelectionChildParameters<ChildElement extends Element, M extends UseListNavigationSingleSelectionChildInfo<ChildElement>> extends ExtendMerge<UseListNavigationChildParameters<ChildElement, M>, UseSingleSelectionChildParameters<ChildElement, M>> { }
 export interface UseListNavigationSingleSelectionChildReturnType<ChildElement extends Element, M extends UseListNavigationSingleSelectionChildInfo<ChildElement>> extends ExtendMerge<UseListNavigationChildReturnType<ChildElement, M>, UseSingleSelectionChildReturnType<ChildElement>> { }
 
@@ -20,13 +20,13 @@ export function useListNavigationSingleSelection<ParentOrChildElement extends El
     typeaheadNavigationParameters,
     singleSelectionParameters,
     managedChildrenReturn,
-    ..._void3
+    ...void3
 }: UseListNavigationSingleSelectionParameters<ParentOrChildElement, ChildElement, M>): UseListNavigationSingleSelectionReturnType<ParentOrChildElement, ChildElement, M> {
     monitorCallCount(useListNavigationSingleSelection);
     const { context: contextLN, propsStable, rovingTabIndexReturn, ...retLN } = useListNavigation<ParentOrChildElement, ChildElement, M>({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, managedChildrenReturn });
     const { context: contextSS, ...retSS } = useSingleSelection<ChildElement, M>({ rovingTabIndexReturn, managedChildrenReturn, singleSelectionParameters });
 
-    assertEmptyObject(_void3);
+    assertEmptyObject(void3);
 
     return {
         rovingTabIndexReturn,
@@ -42,26 +42,22 @@ export function useListNavigationSingleSelection<ParentOrChildElement extends El
 
 
 export function useListNavigationSingleSelectionChild<ChildElement extends Element, M extends UseListNavigationSingleSelectionChildInfo<ChildElement>>({
-    info: { index, ...void5 },
-    rovingTabIndexChildParameters,
-    singleSelectionChildParameters,
+    info,
     context,
     refElementReturn,
     textContentParameters,
-    info,
     ...void1
 }: UseListNavigationSingleSelectionChildParameters<ChildElement, M>): UseListNavigationSingleSelectionChildReturnType<ChildElement, M> {
     monitorCallCount(useListNavigationSingleSelectionChild);
 
     const {
         hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ...void3 },
-        info: info3,
+        info: infoSS,
         singleSelectionChildReturn,
         props: propsSS,
         ...void9
     } = useSingleSelectionChild<ChildElement, M>({
-        info: { index },
-        singleSelectionChildParameters,
+        info,
         context
     });
 
@@ -71,11 +67,10 @@ export function useListNavigationSingleSelectionChild<ChildElement extends Eleme
         rovingTabIndexChildReturn,
         textContentReturn,
         props: propsLN,
-        info: info2,
+        info: infoLN,
         ...void8
     } = useListNavigationChild<ChildElement, M>({
-        info: { index },
-        rovingTabIndexChildParameters,
+        info,
         context,
         refElementReturn,
         textContentParameters
@@ -83,7 +78,6 @@ export function useListNavigationSingleSelectionChild<ChildElement extends Eleme
 
     assertEmptyObject(void1);
     assertEmptyObject(void3);
-    assertEmptyObject(void5);
     assertEmptyObject(void6);
     assertEmptyObject(void8);
     assertEmptyObject(void9);
@@ -96,7 +90,7 @@ export function useListNavigationSingleSelectionChild<ChildElement extends Eleme
             })
         },
         pressParameters,
-        info: { ...info3, ...info2 },
+        info: { ...infoSS, ...infoLN },
         rovingTabIndexChildReturn,
         singleSelectionChildReturn,
         textContentReturn,

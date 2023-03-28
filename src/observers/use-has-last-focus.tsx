@@ -2,8 +2,9 @@
 import { useCallback, useEffect } from "preact/hooks";
 import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
 import { returnFalse, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
+import { assertEmptyObject } from "../util/assert.js";
 import { monitorCallCount } from "../util/use-call-count.js";
-import { useActiveElement, UseActiveElementParameters, UseActiveElementReturnType } from "./use-active-element.js";
+import { UseActiveElementParameters, UseActiveElementReturnType, useActiveElement } from "./use-active-element.js";
 
 export interface UseHasLastFocusParameters<T extends Node> extends UseActiveElementParameters {
     refElementReturn: Pick<UseRefElementReturnType<T>["refElementReturn"], "getElement">;
@@ -38,8 +39,10 @@ export function useHasLastFocus<T extends Node>(args: UseHasLastFocusParameters<
     const {
         refElementReturn: { getElement },
         activeElementParameters: { onLastActiveElementChange, ...activeElementParameters },
-        hasLastFocusParameters: { onLastFocusedChanged, onLastFocusedInnerChanged, ..._void }
+        hasLastFocusParameters: { onLastFocusedChanged, onLastFocusedInnerChanged, ...void1 }
     } = args;
+
+    assertEmptyObject(void1);
 
 
     useEnsureStability("useHasFocus", onLastFocusedChanged, onLastFocusedInnerChanged);

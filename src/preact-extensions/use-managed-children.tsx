@@ -1,7 +1,7 @@
 import { useCallback, useLayoutEffect, useRef } from "preact/hooks";
 import { assertEmptyObject } from "../util/assert.js";
 import { monitorCallCount } from "../util/use-call-count.js";
-import { debounceRendering, OnPassiveStateChange, PassiveStateUpdater, useEnsureStability, usePassiveState } from "./use-passive-state.js";
+import { OnPassiveStateChange, PassiveStateUpdater, debounceRendering, useEnsureStability, usePassiveState } from "./use-passive-state.js";
 import { useStableCallback } from "./use-stable-callback.js";
 import { useStableObject } from "./use-stable-getter.js";
 
@@ -29,8 +29,6 @@ import { useStableObject } from "./use-stable-getter.js";
 const _comments = void (0);
 
 export interface UseManagedChildrenContext<M extends ManagedChildInfo<any>> {
-    //managedChildrenReturn: UseManagedChildrenReturnType<M>["managedChildrenReturn"]
-
     managedChildContext: {
         getChildren(): ManagedChildren<M>;
         managedChildrenArray: InternalChildInfo<M>;
