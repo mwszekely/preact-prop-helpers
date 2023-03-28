@@ -51,12 +51,16 @@ export function useImperativeProps({ refElementReturn: { getElement } }) {
     }, []);
     const setAttribute = useCallback((prop, value) => {
         if (value != null) {
-            currentImperativeProps.current.others[prop] = value;
-            getElement()?.setAttribute(prop, value);
+            if (getAttribute(prop) != value) {
+                currentImperativeProps.current.others[prop] = value;
+                getElement()?.setAttribute(prop, value);
+            }
         }
         else {
-            delete currentImperativeProps.current.others[prop];
-            getElement()?.removeAttribute(prop);
+            if (getAttribute(prop) != undefined) {
+                delete currentImperativeProps.current.others[prop];
+                getElement()?.removeAttribute(prop);
+            }
         }
     }, []);
     const setEventHandler = useCallback((type, handler, options) => {

@@ -9064,13 +9064,17 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     }, []);
     const setAttribute = T$1((prop, value) => {
       if (value != null) {
-        var _getElement2;
-        currentImperativeProps.current.others[prop] = value;
-        (_getElement2 = getElement()) === null || _getElement2 === void 0 ? void 0 : _getElement2.setAttribute(prop, value);
+        if (getAttribute(prop) != value) {
+          var _getElement2;
+          currentImperativeProps.current.others[prop] = value;
+          (_getElement2 = getElement()) === null || _getElement2 === void 0 ? void 0 : _getElement2.setAttribute(prop, value);
+        }
       } else {
-        var _getElement3;
-        delete currentImperativeProps.current.others[prop];
-        (_getElement3 = getElement()) === null || _getElement3 === void 0 ? void 0 : _getElement3.removeAttribute(prop);
+        if (getAttribute(prop) != undefined) {
+          var _getElement3;
+          delete currentImperativeProps.current.others[prop];
+          (_getElement3 = getElement()) === null || _getElement3 === void 0 ? void 0 : _getElement3.removeAttribute(prop);
+        }
       }
     }, []);
     const setEventHandler = T$1((type, handler, options) => {
