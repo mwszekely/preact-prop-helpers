@@ -7689,7 +7689,6 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
   }
   function useCompleteListNavigationChild(_ref52) {
     let {
-      //completeListNavigationChildParameters: { focusSelf, ...completeListNavigationChildParameters },
       info,
       textContentParameters,
       context: {
@@ -8965,6 +8964,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       className: new Set(),
       style: {},
       children: null,
+      html: null,
       others: {}
     });
     const hasClass = T$1(cls => {
@@ -8994,7 +8994,16 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       let e = getElement();
       if (e && currentImperativeProps.current.children != children) {
         currentImperativeProps.current.children = children;
+        currentImperativeProps.current.html = null;
         e.textContent = children;
+      }
+    }, []);
+    const dangerouslySetInnerHTML = T$1(children => {
+      let e = getElement();
+      if (e && currentImperativeProps.current.html != children) {
+        currentImperativeProps.current.html = children;
+        currentImperativeProps.current.children = null;
+        e.innerHTML = children;
       }
     }, []);
     const getAttribute = T$1(prop => {
@@ -9036,7 +9045,8 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         getAttribute,
         setAttribute,
         setEventHandler,
-        setChildren
+        setChildren,
+        dangerouslySetInnerHTML
       }).current,
       props: useMergedProps({
         className: [...currentImperativeProps.current.className].join(" "),
@@ -9363,7 +9373,9 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     const ret = useCompleteGridNavigation({
       singleSelectionParameters: {
         initiallySelectedIndex: selectedRow,
-        onSelectedIndexChange: setSelectedRow
+        onSelectedIndexChange: setSelectedRow,
+        ariaPropName: "aria-checked",
+        selectionMode: "focus"
       },
       gridNavigationParameters: {
         onTabbableColumnChange: setTabbableColumn
@@ -9474,17 +9486,11 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         getSortValue: returnNull
       },
       context: contextFromParent,
-      rovingTabIndexChildParameters: {
-        hidden
-      },
       info: {
         index,
-        foo: "bar"
-      },
-      singleSelectionChildParameters: {
+        foo: "bar",
         disabled,
-        ariaPropName: "aria-checked",
-        selectionMode: "focus"
+        hidden
       },
       textContentParameters: {
         getText: T$1(e => {
@@ -9555,9 +9561,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       info: {
         index,
         bar: "baz",
-        focusSelf: useStableCallback(e => e.focus())
-      },
-      rovingTabIndexChildParameters: {
+        focusSelf: useStableCallback(e => e.focus()),
         hidden: false
       },
       context,
@@ -9789,6 +9793,10 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       },
       staggeredChildrenParameters: {
         staggered
+      },
+      singleSelectionParameters: {
+        ariaPropName: "aria-selected",
+        selectionMode
       }
     });
     const {
@@ -9958,22 +9966,18 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
             }
           }), " On activation (click, tap, Enter, Space, etc.)"]
         })]
-      }), o$1(SelectionModeContext.Provider, {
-        value: selectionMode,
-        children: o$1(ListNavigationSingleSelectionChildContext.Provider, {
-          value: context,
-          children: o$1("ol", {
-            start: 0,
-            ...propsStable,
-            children: useRearrangedChildren(jsxChildren)
-          })
+      }), o$1(ListNavigationSingleSelectionChildContext.Provider, {
+        value: context,
+        children: o$1("ol", {
+          start: 0,
+          ...propsStable,
+          children: useRearrangedChildren(jsxChildren)
         })
       }), o$1("div", {
         children: ["Typeahead status: ", typeaheadStatus]
       })]
     });
   });
-  const SelectionModeContext = F$2("focus");
   const DemoUseRovingTabIndexChild = x(_ref69 => {
     let {
       index
@@ -9983,7 +9987,6 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         children: "hole in the array"
       }), " and does not exist)"]
     });
-    const selectionMode = q$1(SelectionModeContext);
     let disabled = index == 6;
     let hidden = index == 7;
     if (index == 8) {
@@ -10019,18 +10022,12 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       info: {
         index,
         focusSelf,
-        foo: "bar"
-      },
-      rovingTabIndexChildParameters: {
-        hidden
+        foo: "bar",
+        hidden,
+        disabled
       },
       sortableChildParameters: {
         getSortValue
-      },
-      singleSelectionChildParameters: {
-        ariaPropName: "aria-selected",
-        selectionMode,
-        disabled
       },
       context,
       textContentParameters: {

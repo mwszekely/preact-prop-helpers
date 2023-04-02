@@ -14,7 +14,7 @@ export const DemoUseGrid = memo(() => {
     const [tabbableRow, setTabbableRow] = useState<number | null>(null);
 
     const ret: UseCompleteGridNavigationReturnType<HTMLTableSectionElement, HTMLTableRowElement, HTMLTableCellElement, CustomGridInfo, CustomGridRowInfo> = useCompleteGridNavigation<HTMLTableSectionElement, HTMLTableRowElement, HTMLTableCellElement, CustomGridInfo, CustomGridRowInfo>({
-        singleSelectionParameters: { initiallySelectedIndex: selectedRow, onSelectedIndexChange: setSelectedRow },
+        singleSelectionParameters: { initiallySelectedIndex: selectedRow, onSelectedIndexChange: setSelectedRow, ariaPropName: "aria-checked", selectionMode: "focus" },
         gridNavigationParameters: { onTabbableColumnChange: setTabbableColumn },
         linearNavigationParameters: { disableHomeEndKeys: false, navigatePastEnd: "wrap", navigatePastStart: "wrap", pageNavigationSize: 0.1 },
         //managedChildrenReturn: { getChildren },
@@ -90,9 +90,7 @@ const DemoUseGridRow = memo((({ index }: { index: number }) => {
 
         sortableChildParameters: { getSortValue: returnNull },
         context: contextFromParent,
-        rovingTabIndexChildParameters: { hidden },
-        info: { index, foo: "bar" },
-        singleSelectionChildParameters: { disabled, ariaPropName: "aria-checked", selectionMode: "focus" },
+        info: { index, foo: "bar", disabled, hidden },
         textContentParameters: { getText: useCallback((e: Element | null) => { return e?.textContent ?? "" }, []) },
 
         linearNavigationParameters: { disableHomeEndKeys: false, navigatePastEnd: "wrap", navigatePastStart: "wrap" },
@@ -139,8 +137,7 @@ const DemoUseGridCell = (({ index, row, rowIsTabbable }: { index: number, row: n
 
     } = useCompleteGridNavigationCell<HTMLTableCellElement, CustomGridRowInfo>({
         gridNavigationCellParameters: { colSpan: 1 },
-        info: { index, bar: "baz", focusSelf: useStableCallback((e: HTMLElement) => e.focus()) },
-        rovingTabIndexChildParameters: { hidden: false },
+        info: { index, bar: "baz", focusSelf: useStableCallback((e: HTMLElement) => e.focus()), hidden: false },
         context,
         textContentParameters: { getText: useCallback((e: Element | null) => { return e?.textContent ?? "" }, []) },
     });

@@ -34,7 +34,8 @@ export const DemoUseRovingTabIndex = memo(() => {
         },
         paginatedChildrenParameters: { paginationMin: min, paginationMax: max },
         sortableChildrenParameters: { compare: useCallback((rhs: CustomInfoType, lhs: CustomInfoType) => { return lhs.index - rhs.index }, []) },
-        staggeredChildrenParameters: { staggered }
+        staggeredChildrenParameters: { staggered },
+        singleSelectionParameters: { ariaPropName: "aria-selected", selectionMode }
     });
 
 
@@ -84,7 +85,7 @@ export const DemoUseRovingTabIndex = memo(() => {
 
             <label># of items<input type="number" value={count} min={0} onInput={e => { e.preventDefault(); setCount(e.currentTarget.valueAsNumber) }} /></label>
             <button onClick={() => shuffle()}>Shuffle</button>
-            <button onClick={() => {debugger; reverse()}}>Reverse</button>
+            <button onClick={() => { debugger; reverse() }}>Reverse</button>
             <label>Imperatively set the tabbable index to: <input type="number" onInput={e => { e.preventDefault(); setTabbableIndex(e.currentTarget.valueAsNumber, e, false); }} /></label>
             <label>Imperatively set the selected index to: <input type="number" onInput={e => { e.preventDefault(); setSelectedIndex(e.currentTarget.valueAsNumber); }} /> (currently {selectedIndex})</label>
             <label>Pagination window starts at: <input type="number" value={min ?? undefined} min={0} max={max ?? undefined} onInput={e => { e.preventDefault(); setMin(e.currentTarget.valueAsNumber); }} /></label>
@@ -95,11 +96,9 @@ export const DemoUseRovingTabIndex = memo(() => {
                 <label><input name="rti-demo-selection-mode" type="radio" checked={selectionMode == 'activation'} onInput={e => { e.preventDefault(); setSelectionMode("activation"); }} /> On activation (click, tap, Enter, Space, etc.)</label>
             </label>
 
-            <SelectionModeContext.Provider value={selectionMode}>
-                <ListNavigationSingleSelectionChildContext.Provider value={context}>
-                    <ol start={0} {...propsStable}>{useRearrangedChildren(jsxChildren)}</ol>
-                </ListNavigationSingleSelectionChildContext.Provider>
-            </SelectionModeContext.Provider>
+            <ListNavigationSingleSelectionChildContext.Provider value={context}>
+                <ol start={0} {...propsStable}>{useRearrangedChildren(jsxChildren)}</ol>
+            </ListNavigationSingleSelectionChildContext.Provider>
             {<div>Typeahead status: {typeaheadStatus}</div>}
         </div>
     );
@@ -109,13 +108,11 @@ interface CustomInfoType extends UseCompleteListNavigationChildInfo<HTMLLIElemen
     foo: "bar";
 }
 
-const SelectionModeContext = createContext("focus" as "focus" | "activation");
 const _Prefix = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
     if (index == 1)
         return <li>(Item {index} is a <strong>hole in the array</strong> and does not exist)</li>;
 
-    const selectionMode = useContext(SelectionModeContext);
     let disabled = (index == 6);
     let hidden = (index == 7);
     if (index == 8) {
@@ -136,10 +133,8 @@ const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
         pressParameters: { excludeSpace },
         refElementReturn
     } = useCompleteListNavigationChild<HTMLLIElement, CustomInfoType>({
-        info: { index, focusSelf, foo: "bar" },
-        rovingTabIndexChildParameters: { hidden },
+        info: { index, focusSelf, foo: "bar", hidden, disabled },
         sortableChildParameters: { getSortValue },
-        singleSelectionChildParameters: { ariaPropName: "aria-selected", selectionMode, disabled },
         context,
         textContentParameters: { getText: useCallback((e) => { return e?.textContent ?? "" }, []) }
     });

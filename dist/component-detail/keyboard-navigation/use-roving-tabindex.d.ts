@@ -85,8 +85,9 @@ export interface UseRovingTabIndexReturnType<TabbableChildElement extends Elemen
         focusSelf: (reason?: any) => void;
     };
 }
+export type UseRovingTabIndexChildInfoKeys = "index" | "hidden";
 export interface UseRovingTabIndexChildParameters<TabbableChildElement extends Element, M extends UseRovingTabIndexChildInfo<TabbableChildElement>> extends OmitStrong<UseManagedChildParameters<M>, "info" | "context"> {
-    info: Pick<UseManagedChildParameters<M>["info"], "index" | "hidden">;
+    info: Pick<UseManagedChildParameters<M>["info"], UseRovingTabIndexChildInfoKeys>;
     /**
      * The information provided by the parent hook
      */

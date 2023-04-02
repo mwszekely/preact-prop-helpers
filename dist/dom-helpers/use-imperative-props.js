@@ -14,7 +14,7 @@ import { useRefElement } from "./use-ref-element.js";
 export const ImperativeElement = memo(forwardRef(ImperativeElementU));
 export function useImperativeProps({ refElementReturn: { getElement } }) {
     monitorCallCount(useImperativeProps);
-    const currentImperativeProps = useRef({ className: new Set(), style: {}, children: null, others: {} });
+    const currentImperativeProps = useRef({ className: new Set(), style: {}, children: null, html: null, others: {} });
     const hasClass = useCallback((cls) => { return currentImperativeProps.current.className.has(cls); }, []);
     const setClass = useCallback((cls, enabled) => {
         if (hasClass(cls) == !enabled) {
@@ -43,7 +43,16 @@ export function useImperativeProps({ refElementReturn: { getElement } }) {
         let e = getElement();
         if (e && currentImperativeProps.current.children != children) {
             currentImperativeProps.current.children = children;
+            currentImperativeProps.current.html = null;
             e.textContent = children;
+        }
+    }, []);
+    const dangerouslySetInnerHTML = useCallback((children) => {
+        let e = getElement();
+        if (e && currentImperativeProps.current.html != children) {
+            currentImperativeProps.current.html = children;
+            currentImperativeProps.current.children = null;
+            e.innerHTML = children;
         }
     }, []);
     const getAttribute = useCallback((prop) => {
@@ -85,7 +94,8 @@ export function useImperativeProps({ refElementReturn: { getElement } }) {
             getAttribute,
             setAttribute,
             setEventHandler,
-            setChildren
+            setChildren,
+            dangerouslySetInnerHTML
         }).current,
         props: useMergedProps({ className: [...currentImperativeProps.current.className].join(" "), style: currentImperativeProps.current.style }, currentImperativeProps.current.others)
     };

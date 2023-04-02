@@ -3,17 +3,16 @@ import { UseLinearNavigationParameters, UseLinearNavigationReturnType } from "./
 import { RovingTabIndexChildContext, UseRovingTabIndexChildInfo, UseRovingTabIndexChildParameters, UseRovingTabIndexChildReturnType, UseRovingTabIndexParameters, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
 import { UseTypeaheadNavigationChildParameters, UseTypeaheadNavigationChildReturnType, UseTypeaheadNavigationContext, UseTypeaheadNavigationParameters, UseTypeaheadNavigationReturnType } from "./use-typeahead-navigation.js";
 export interface UseListNavigationChildInfo<TabbableChildElement extends Element> extends UseRovingTabIndexChildInfo<TabbableChildElement> {
-    _e?: TabbableChildElement;
 }
 /**
  * @param fromUserInteraction Whether the user interacted with this child as a means of navigating to it.  In that was the case, the child is also focused. Otherwise, focus moves as the browser determines.
  */
 export interface UseListNavigationParameters<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationChildInfo<ChildElement>> extends UseRovingTabIndexParameters<ChildElement, M>, OmitStrong<UseTypeaheadNavigationParameters<ChildElement, M>, "rovingTabIndexReturn">, OmitStrong<UseLinearNavigationParameters<ParentOrChildElement, ChildElement, M>, "rovingTabIndexReturn"> {
 }
-export interface UseListNavigationReturnType<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationChildInfo<ChildElement>> extends OmitStrong<UseRovingTabIndexReturnType<ChildElement, M>, "managedChildrenParameters" | "context">, OmitStrong<UseTypeaheadNavigationReturnType<ParentOrChildElement>, "context">, UseLinearNavigationReturnType<ParentOrChildElement>, UseRovingTabIndexReturnType<ChildElement, M> {
+export interface UseListNavigationReturnType<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationChildInfo<ChildElement>> extends OmitStrong<UseRovingTabIndexReturnType<ChildElement, M>, "managedChildrenParameters">, UseTypeaheadNavigationReturnType<ParentOrChildElement>, UseLinearNavigationReturnType<ParentOrChildElement>, UseRovingTabIndexReturnType<ChildElement, M> {
     context: UseListNavigationContext;
 }
-export interface UseListNavigationChildParameters<ChildElement extends Element, M extends UseListNavigationChildInfo<ChildElement>> extends ExtendMerge<OmitStrong<UseRovingTabIndexChildParameters<ChildElement, M>, "context">, OmitStrong<UseTypeaheadNavigationChildParameters<ChildElement, M>, "context">> {
+export interface UseListNavigationChildParameters<ChildElement extends Element, M extends UseListNavigationChildInfo<ChildElement>> extends ExtendMerge<UseRovingTabIndexChildParameters<ChildElement, M>, UseTypeaheadNavigationChildParameters<ChildElement, M>> {
     context: UseListNavigationContext;
 }
 export interface UseListNavigationContext extends RovingTabIndexChildContext, UseTypeaheadNavigationContext {

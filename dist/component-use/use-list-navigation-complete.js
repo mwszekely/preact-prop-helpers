@@ -83,9 +83,7 @@ export function useCompleteListNavigation({ linearNavigationParameters, rearrang
         childrenHaveFocusReturn
     };
 }
-export function useCompleteListNavigationChild({ 
-//completeListNavigationChildParameters: { focusSelf, ...completeListNavigationChildParameters },
-info, textContentParameters, context: { childrenHaveFocusChildContext, managedChildContext, rovingTabIndexContext, paginatedChildContext, staggeredChildContext, singleSelectionContext, typeaheadNavigationContext }, sortableChildParameters, ...void1 }) {
+export function useCompleteListNavigationChild({ info, textContentParameters, context: { childrenHaveFocusChildContext, managedChildContext, rovingTabIndexContext, paginatedChildContext, staggeredChildContext, singleSelectionContext, typeaheadNavigationContext }, sortableChildParameters, ...void1 }) {
     monitorCallCount(useCompleteListNavigationChild);
     assertEmptyObject(void1);
     let { index, focusSelf, hidden, disabled } = info;
