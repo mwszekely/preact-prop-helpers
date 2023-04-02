@@ -168,7 +168,6 @@ export interface UseCompleteListNavigationChildReturnType<ChildElement extends E
 }
 
 export function useCompleteListNavigationChild<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>>({
-    //completeListNavigationChildParameters: { focusSelf, ...completeListNavigationChildParameters },
     info,
     textContentParameters,
     context: { childrenHaveFocusChildContext, managedChildContext, rovingTabIndexContext, paginatedChildContext, staggeredChildContext, singleSelectionContext, typeaheadNavigationContext },

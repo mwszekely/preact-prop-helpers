@@ -13,6 +13,7 @@ export type SetStyle = <T extends (keyof CSSStyleDeclaration) & string>(prop: T,
 export type GetAttribute<T extends Element> = <K extends keyof ElementProps<T>>(prop: K) => ElementProps<T>[K];
 export type SetAttribute<T extends Element> = <K extends keyof ElementProps<T>>(prop: K, value: ElementProps<T>[K] | null) => void;
 export type SetEventHandler = <K extends keyof HTMLElementEventMap>(type: K, listener: null | ((this: HTMLElement, ev: HTMLElementEventMap[K]) => void), options: AddEventListenerOptions) => void;
+export type DangerouslySetInnerHTML = (html: string) => void;
 
 export interface ImperativeHandle<T extends Element> {
     hasClass: GetClass;
@@ -21,6 +22,7 @@ export interface ImperativeHandle<T extends Element> {
     getAttribute: GetAttribute<T>;
     setAttribute: SetAttribute<T>;
     setChildren: SetChildren;
+    dangerouslySetInnerHTML: DangerouslySetInnerHTML;
     setEventHandler: SetEventHandler;
 }
 
@@ -45,7 +47,7 @@ export const ImperativeElement = memo(forwardRef(ImperativeElementU)) as typeof 
 export function useImperativeProps<E extends Element>({ refElementReturn: { getElement } }: UseImperativePropsParameters<E>) {
     monitorCallCount(useImperativeProps);
     
-    const currentImperativeProps = useRef<{ className: Set<string>, style: CSSProperties, children: string | null, others: ElementProps<E> }>({ className: new Set(), style: {}, children: null, others: {} });
+    const currentImperativeProps = useRef<{ className: Set<string>, style: CSSProperties, children: string | null, html: string | null, others: ElementProps<E> }>({ className: new Set(), style: {}, children: null, html: null, others: {} });
 
 
     const hasClass = useCallback<GetClass>((cls: string) => { return currentImperativeProps.current.className.has(cls); }, [])
@@ -78,7 +80,17 @@ export function useImperativeProps<E extends Element>({ refElementReturn: { getE
         let e = getElement();
         if (e && currentImperativeProps.current.children != children) {
             currentImperativeProps.current.children = children;
+            currentImperativeProps.current.html = null;
             e.textContent = children;
+        }
+    }, []);
+
+    const dangerouslySetInnerHTML = useCallback<DangerouslySetInnerHTML>((children: string) => {
+        let e = getElement();
+        if (e && currentImperativeProps.current.html != children) {
+            currentImperativeProps.current.html = children;
+            currentImperativeProps.current.children = null;
+            e.innerHTML = children;
         }
     }, []);
 
@@ -124,7 +136,8 @@ export function useImperativeProps<E extends Element>({ refElementReturn: { getE
             getAttribute,
             setAttribute,
             setEventHandler,
-            setChildren
+            setChildren,
+            dangerouslySetInnerHTML
         }).current,
         props: useMergedProps<E>(
             { className: [...currentImperativeProps.current.className].join(" "), style: currentImperativeProps.current.style },

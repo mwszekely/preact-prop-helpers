@@ -72,9 +72,11 @@ export interface UseSingleSelectionParameters<ChildElement extends Element, M ex
     }
 }
 
+export type UseSingleSelectionChildInfoKeys = "index" | "disabled";
+
 export interface UseSingleSelectionChildParameters<E extends Element, M extends UseSingleSelectionChildInfo<E>> {
     context:UseSingleSelectionContext;
-    info: Pick<UseSingleSelectionChildInfo<E>, "index" | "disabled">;
+    info: Pick<UseSingleSelectionChildInfo<E>, UseSingleSelectionChildInfoKeys>;
 }
 
 export interface UseSingleSelectionChildReturnType<E extends Element> extends UseChildrenHaveFocusChildReturnType<E> {
