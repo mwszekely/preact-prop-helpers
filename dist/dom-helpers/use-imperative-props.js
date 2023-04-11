@@ -4,6 +4,13 @@ import { useCallback, useImperativeHandle, useRef } from "preact/hooks";
 import { monitorCallCount } from "../util/use-call-count.js";
 import { useMergedProps } from "./use-merged-props.js";
 import { useRefElement } from "./use-ref-element.js";
+let templateElement = null;
+function htmlToElement(parent, html) {
+    const document = parent.ownerDocument;
+    templateElement ??= document.createElement("template");
+    templateElement.innerHTML = html.trim(); // TODO: Trim ensures whitespace doesn't add anything, but with a better explanation of why
+    return templateElement.content.firstChild;
+}
 /**
  * Easy access to an HTMLElement that can be controlled imperatively.
  *
@@ -55,6 +62,12 @@ export function useImperativeProps({ refElementReturn: { getElement } }) {
             e.innerHTML = children;
         }
     }, []);
+    const dangerouslyAppendHTML = useCallback((children) => {
+        let e = getElement();
+        if (e) {
+            e.appendChild(htmlToElement(e, children));
+        }
+    }, []);
     const getAttribute = useCallback((prop) => {
         return currentImperativeProps.current.others[prop];
     }, []);
@@ -95,7 +108,8 @@ export function useImperativeProps({ refElementReturn: { getElement } }) {
             setAttribute,
             setEventHandler,
             setChildren,
-            dangerouslySetInnerHTML
+            dangerouslySetInnerHTML,
+            dangerouslyAppendHTML
         }).current,
         props: useMergedProps({ className: [...currentImperativeProps.current.className].join(" "), style: currentImperativeProps.current.style }, currentImperativeProps.current.others)
     };

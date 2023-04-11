@@ -9,7 +9,7 @@ specifiers:
   eslint: ^8.37.0
   lodash-es: ^4.17.21
   npm-run-all: ^4.1.5
-  preact: ^10.13.0
+  preact: ^10.13.2
   tabbable: ^6.1.1
   typescript: ^5.0.3
   wicg-inert: ^3.1.2
@@ -18,7 +18,7 @@ dependencies:
   blocking-elements: 0.1.1
   clsx: 1.2.1
   lodash-es: 4.17.21
-  preact: 10.13.1
+  preact: 10.13.2
   tabbable: 6.1.1
   wicg-inert: 3.1.2
 
@@ -1273,8 +1273,8 @@ packages:
     engines: {node: '>=4'}
     dev: true
 
-  /preact/10.13.1:
-    resolution: {integrity: sha512-KyoXVDU5OqTpG9LXlB3+y639JAGzl8JSBXLn1J9HTSB3gbKcuInga7bZnXLlxmK94ntTs1EFeZp0lrja2AuBYQ==}
+  /preact/10.13.2:
+    resolution: {integrity: sha512-q44QFLhOhty2Bd0Y46fnYW0gD/cbVM9dUVtNTDKPcdXSMA7jfY+Jpd6rk3GB0lcQss0z5s/6CmVP0Z/hV+g6pw==}
     dev: false
 
   /prelude-ls/1.2.1:

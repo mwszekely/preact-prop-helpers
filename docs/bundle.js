@@ -147,7 +147,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         n[l] = null == u ? "" : u;
         break n;
       } catch (n) {}
-      "function" == typeof u || (null == u || !1 === u && -1 == l.indexOf("-") ? n.removeAttribute(l) : n.setAttribute(l, u));
+      "function" == typeof u || (null == u || !1 === u && "-" !== l[4] ? n.removeAttribute(l) : n.setAttribute(l, u));
     }
   }
   function j$2(n) {
@@ -729,6 +729,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     return K && (n = K(n)), n.persist = Q, n.isPropagationStopped = X, n.isDefaultPrevented = nn, n.nativeEvent = n;
   };
   var en = {
+      enumerable: !1,
       configurable: !0,
       get: function () {
         return this.class;
@@ -736,24 +737,23 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     },
     rn = l$1.vnode;
   l$1.vnode = function (n) {
-    var t = n.type,
-      e = n.props,
-      u = e;
-    if ("string" == typeof t) {
-      for (var o in u = {}, e) {
-        var i = e[o];
-        if (!("value" === o && "defaultValue" in e && null == i || $ && "children" === o && "noscript" === t)) {
+    "string" == typeof n.type && function (n) {
+      var t = n.props,
+        e = n.type,
+        u = {};
+      for (var o in t) {
+        var i = t[o];
+        if (!("value" === o && "defaultValue" in t && null == i || $ && "children" === o && "noscript" === e || "class" === o || "className" === o)) {
           var l = o.toLowerCase();
-          "defaultValue" === o && "value" in e && null == e.value ? o = "value" : "download" === o && !0 === i ? i = "" : "ondoubleclick" === l ? o = "ondblclick" : "onchange" !== l || "input" !== t && "textarea" !== t || q(e.type) ? "onfocus" === l ? o = "onfocusin" : "onblur" === l ? o = "onfocusout" : Z.test(o) ? o = l : -1 === t.indexOf("-") && H.test(o) ? o = o.replace(Y, "-$&").toLowerCase() : null === i && (i = void 0) : l = o = "oninput", "oninput" === l && u[o = l] && (o = "oninputCapture"), u[o] = i;
+          "defaultValue" === o && "value" in t && null == t.value ? o = "value" : "download" === o && !0 === i ? i = "" : "ondoubleclick" === l ? o = "ondblclick" : "onchange" !== l || "input" !== e && "textarea" !== e || q(t.type) ? "onfocus" === l ? o = "onfocusin" : "onblur" === l ? o = "onfocusout" : Z.test(o) ? o = l : -1 === e.indexOf("-") && H.test(o) ? o = o.replace(Y, "-$&").toLowerCase() : null === i && (i = void 0) : l = o = "oninput", "oninput" === l && u[o = l] && (o = "oninputCapture"), u[o] = i;
         }
       }
-      "select" == t && u.multiple && Array.isArray(u.value) && (u.value = P$1(e.children).forEach(function (n) {
+      "select" == e && u.multiple && Array.isArray(u.value) && (u.value = P$1(t.children).forEach(function (n) {
         n.props.selected = -1 != u.value.indexOf(n.props.value);
-      })), "select" == t && null != u.defaultValue && (u.value = P$1(e.children).forEach(function (n) {
+      })), "select" == e && null != u.defaultValue && (u.value = P$1(t.children).forEach(function (n) {
         n.props.selected = u.multiple ? -1 != u.defaultValue.indexOf(n.props.value) : u.defaultValue == n.props.value;
-      })), n.props = u, e.class != e.className && (en.enumerable = "className" in e, null != e.className && (u.class = e.className), Object.defineProperty(u, "className", en));
-    }
-    n.$$typeof = B, rn && rn(n);
+      })), t.class && !t.className ? (u.class = t.class, Object.defineProperty(u, "className", en)) : (t.className && !t.class || t.class && t.className) && (u.class = u.className = t.className), n.props = u;
+    }(n), n.$$typeof = B, rn && rn(n);
   };
   var un = l$1.__r;
   l$1.__r = function (n) {
@@ -8944,7 +8944,14 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       dropError
     };
   }
-
+  let templateElement = null;
+  function htmlToElement(parent, html) {
+    var _templateElement;
+    const document = parent.ownerDocument;
+    (_templateElement = templateElement) !== null && _templateElement !== void 0 ? _templateElement : templateElement = document.createElement("template");
+    templateElement.innerHTML = html.trim(); // TODO: Trim ensures whitespace doesn't add anything, but with a better explanation of why
+    return templateElement.content.firstChild;
+  }
   /**
    * Easy access to an HTMLElement that can be controlled imperatively.
    *
@@ -9006,6 +9013,12 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         e.innerHTML = children;
       }
     }, []);
+    const dangerouslyAppendHTML = T$1(children => {
+      let e = getElement();
+      if (e) {
+        e.appendChild(htmlToElement(e, children));
+      }
+    }, []);
     const getAttribute = T$1(prop => {
       return currentImperativeProps.current.others[prop];
     }, []);
@@ -9046,7 +9059,8 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         setAttribute,
         setEventHandler,
         setChildren,
-        dangerouslySetInnerHTML
+        dangerouslySetInnerHTML,
+        dangerouslyAppendHTML
       }).current,
       props: useMergedProps({
         className: [...currentImperativeProps.current.className].join(" "),

@@ -17,6 +17,7 @@ export interface ImperativeHandle<T extends Element> {
     setAttribute: SetAttribute<T>;
     setChildren: SetChildren;
     dangerouslySetInnerHTML: DangerouslySetInnerHTML;
+    dangerouslyAppendHTML: DangerouslySetInnerHTML;
     setEventHandler: SetEventHandler;
 }
 export interface UseImperativePropsParameters<E extends Element> {

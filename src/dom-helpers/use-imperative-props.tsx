@@ -23,6 +23,7 @@ export interface ImperativeHandle<T extends Element> {
     setAttribute: SetAttribute<T>;
     setChildren: SetChildren;
     dangerouslySetInnerHTML: DangerouslySetInnerHTML;
+    dangerouslyAppendHTML: DangerouslySetInnerHTML;
     setEventHandler: SetEventHandler;
 }
 
@@ -33,6 +34,15 @@ export interface UseImperativePropsParameters<E extends Element> {
 export interface ImperativeElementProps<T extends keyof HTMLElementTagNameMap> extends ElementProps<HTMLElementTagNameMap[T]> {
     tag: T;
     handle: Ref<ImperativeHandle<HTMLElementTagNameMap[T]>>;
+}
+
+let templateElement: HTMLTemplateElement | null = null;
+
+function htmlToElement(parent: Element, html: string) {
+    const document = parent.ownerDocument;
+    templateElement ??= document.createElement("template");
+    templateElement.innerHTML = html.trim();   // TODO: Trim ensures whitespace doesn't add anything, but with a better explanation of why
+    return templateElement.content.firstChild! as Element;
 }
 
 /**
@@ -94,6 +104,13 @@ export function useImperativeProps<E extends Element>({ refElementReturn: { getE
         }
     }, []);
 
+    const dangerouslyAppendHTML = useCallback<DangerouslySetInnerHTML>((children: string) => {
+        let e = getElement();
+        if (e) {
+            e.appendChild(htmlToElement(e, children));
+        }
+    }, [])
+
     const getAttribute = useCallback<GetAttribute<E>>((prop) => {
         return currentImperativeProps.current.others[prop];
     }, []);
@@ -137,7 +154,8 @@ export function useImperativeProps<E extends Element>({ refElementReturn: { getE
             setAttribute,
             setEventHandler,
             setChildren,
-            dangerouslySetInnerHTML
+            dangerouslySetInnerHTML,
+            dangerouslyAppendHTML
         }).current,
         props: useMergedProps<E>(
             { className: [...currentImperativeProps.current.className].join(" "), style: currentImperativeProps.current.style },
