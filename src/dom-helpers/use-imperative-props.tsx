@@ -14,6 +14,7 @@ export type GetAttribute<T extends Element> = <K extends keyof ElementProps<T>>(
 export type SetAttribute<T extends Element> = <K extends keyof ElementProps<T>>(prop: K, value: ElementProps<T>[K] | null) => void;
 export type SetEventHandler = <K extends keyof HTMLElementEventMap>(type: K, listener: null | ((this: HTMLElement, ev: HTMLElementEventMap[K]) => void), options: AddEventListenerOptions) => void;
 export type DangerouslySetInnerHTML = (html: string) => void;
+export type DangerouslyAppendHTML = (html: string) => Element;
 
 export interface ImperativeHandle<T extends Element> {
     hasClass: GetClass;
@@ -23,7 +24,7 @@ export interface ImperativeHandle<T extends Element> {
     setAttribute: SetAttribute<T>;
     setChildren: SetChildren;
     dangerouslySetInnerHTML: DangerouslySetInnerHTML;
-    dangerouslyAppendHTML: DangerouslySetInnerHTML;
+    dangerouslyAppendHTML: DangerouslyAppendHTML;
     setEventHandler: SetEventHandler;
 }
 
@@ -104,16 +105,17 @@ export function useImperativeProps<E extends Element>({ refElementReturn: { getE
         }
     }, []);
 
-    const dangerouslyAppendHTML = useCallback<DangerouslySetInnerHTML>((children: string) => {
+    const dangerouslyAppendHTML = useCallback<DangerouslyAppendHTML>((children: string) => {
         let e = getElement();
-        if (e) {
+        if (e && children) {
             const newChild = htmlToElement(e, children);
             console.assert((newChild && newChild instanceof Node));
             if (newChild && newChild instanceof Node) {
                 e.appendChild(newChild);
-                e.append
+                return newChild;
             }
         }
+        return null!;
     }, [])
 
     const getAttribute = useCallback<GetAttribute<E>>((prop) => {

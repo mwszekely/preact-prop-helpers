@@ -9015,14 +9015,15 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     }, []);
     const dangerouslyAppendHTML = T$1(children => {
       let e = getElement();
-      if (e) {
+      if (e && children) {
         const newChild = htmlToElement(e, children);
         console.assert(newChild && newChild instanceof Node);
         if (newChild && newChild instanceof Node) {
           e.appendChild(newChild);
-          e.append;
+          return newChild;
         }
       }
+      return null;
     }, []);
     const getAttribute = T$1(prop => {
       return currentImperativeProps.current.others[prop];

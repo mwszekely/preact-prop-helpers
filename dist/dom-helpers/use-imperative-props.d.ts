@@ -9,6 +9,7 @@ export type GetAttribute<T extends Element> = <K extends keyof ElementProps<T>>(
 export type SetAttribute<T extends Element> = <K extends keyof ElementProps<T>>(prop: K, value: ElementProps<T>[K] | null) => void;
 export type SetEventHandler = <K extends keyof HTMLElementEventMap>(type: K, listener: null | ((this: HTMLElement, ev: HTMLElementEventMap[K]) => void), options: AddEventListenerOptions) => void;
 export type DangerouslySetInnerHTML = (html: string) => void;
+export type DangerouslyAppendHTML = (html: string) => Element;
 export interface ImperativeHandle<T extends Element> {
     hasClass: GetClass;
     setClass: SetClass;
@@ -17,7 +18,7 @@ export interface ImperativeHandle<T extends Element> {
     setAttribute: SetAttribute<T>;
     setChildren: SetChildren;
     dangerouslySetInnerHTML: DangerouslySetInnerHTML;
-    dangerouslyAppendHTML: DangerouslySetInnerHTML;
+    dangerouslyAppendHTML: DangerouslyAppendHTML;
     setEventHandler: SetEventHandler;
 }
 export interface UseImperativePropsParameters<E extends Element> {
