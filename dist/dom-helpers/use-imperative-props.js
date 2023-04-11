@@ -65,7 +65,12 @@ export function useImperativeProps({ refElementReturn: { getElement } }) {
     const dangerouslyAppendHTML = useCallback((children) => {
         let e = getElement();
         if (e) {
-            e.appendChild(htmlToElement(e, children));
+            const newChild = htmlToElement(e, children);
+            console.assert((newChild && newChild instanceof Node));
+            if (newChild && newChild instanceof Node) {
+                e.appendChild(newChild);
+                e.append;
+            }
         }
     }, []);
     const getAttribute = useCallback((prop) => {

@@ -56,7 +56,7 @@ export const ImperativeElement = memo(forwardRef(ImperativeElementU)) as typeof 
 
 export function useImperativeProps<E extends Element>({ refElementReturn: { getElement } }: UseImperativePropsParameters<E>) {
     monitorCallCount(useImperativeProps);
-    
+
     const currentImperativeProps = useRef<{ className: Set<string>, style: CSSProperties, children: string | null, html: string | null, others: ElementProps<E> }>({ className: new Set(), style: {}, children: null, html: null, others: {} });
 
 
@@ -107,7 +107,12 @@ export function useImperativeProps<E extends Element>({ refElementReturn: { getE
     const dangerouslyAppendHTML = useCallback<DangerouslySetInnerHTML>((children: string) => {
         let e = getElement();
         if (e) {
-            e.appendChild(htmlToElement(e, children));
+            const newChild = htmlToElement(e, children);
+            console.assert((newChild && newChild instanceof Node));
+            if (newChild && newChild instanceof Node) {
+                e.appendChild(newChild);
+                e.append
+            }
         }
     }, [])
 
