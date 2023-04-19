@@ -21,6 +21,7 @@
     "watch": "npx npm-run-all --npm-path npm -pc clean watch:*",
     "watch:ts": "tsc --watch",
     "build:ts": "tsc",
+    "start-demo": "npx serve ./docs",
     "test": "jest",
     "lint": "npx eslint ./src",
     "clean": "tsc --build --clean",
@@ -32,11 +33,17 @@
     "preact": "^10.13.2"
   },
   "devDependencies": {
+    "@playwright/test": "^1.32.3",
     "@types/lodash-es": "^4.17.7",
+    "@types/node": "^18.15.11",
+    "@types/serve-handler": "^6.1.1",
     "@typescript-eslint/eslint-plugin": "^5.57.0",
     "@typescript-eslint/parser": "^5.57.0",
     "eslint": "^8.37.0",
+    "micro": "^10.0.1",
     "npm-run-all": "^4.1.5",
+    "serve": "^14.2.0",
+    "serve-handler": "^6.1.5",
     "typescript": "^5.0.3"
   },
   "dependencies": {
