@@ -20,10 +20,10 @@ export function asyncToSync({ asyncInput, onInvoke, onInvoked, onFinally: onFina
     const onFinally = () => {
         // 8. This is run at the end of every invocation of the async handler,
         // whether it completed or not, and whether it was async or not.
-        onFinallyAny();
-        onPending(pending = false);
+        onFinallyAny?.();
+        onPending?.(pending = false);
         let nothingElseToDo = (!asyncDebouncing);
-        onAsyncDebounce(asyncDebouncing = false);
+        onAsyncDebounce?.(asyncDebouncing = false);
         if (nothingElseToDo) {
             // 9a. After completing the async handler, we found that it wasn't called again since the last time.
             // This means we can just end. We're done. Mission accomplished.
@@ -34,7 +34,7 @@ export function asyncToSync({ asyncInput, onInvoke, onInvoked, onFinally: onFina
             // We also clear that flag, because we're handling it now. It'll be set again if the handler is called again while *this* one is running
             console.assert(currentCapture !== Unset);
             if (currentCapture != Unset) {
-                onSyncDebounce(syncDebouncing = true);
+                onSyncDebounce?.(syncDebouncing = true);
                 syncDebounced();
             }
         }
@@ -42,47 +42,47 @@ export function asyncToSync({ asyncInput, onInvoke, onInvoked, onFinally: onFina
     const sync = (...args) => {
         // 5. We're finally running the async version of the function, so notify the caller that the return value is pending.
         // And because the fact that we're here means the debounce/throttle period is over, we can clear that flag too.
-        onPending(pending = true);
+        onPending?.(pending = true);
         console.assert(syncDebouncing == false);
-        onHasError(null);
-        onHasResult(null);
+        onHasError?.(null);
+        onHasResult?.(null);
         let promiseOrReturn;
         let hadSyncError = false;
         try {
             // 6. Run the function we were given.
             // Because it may be sync, or it may throw before returning, we must still wrap it in a try/catch...
             // Also important is that we preserve the async-ness (or lack thereof) on the original input function.
-            onInvoke();
+            onInvoke?.();
             promiseOrReturn = asyncInput(...args);
-            onHasError(false);
+            onHasError?.(false);
         }
         catch (ex) {
             hadSyncError = true;
-            onError(ex);
-            onInvoked("throw");
+            onError?.(ex);
+            onInvoked?.("throw");
         }
         // 7. Either end immediately, or schedule to end when completed.
         if (isPromise(promiseOrReturn)) {
-            onInvoked("async");
+            onInvoked?.("async");
             promiseOrReturn
-                .then(r => { onResolve(); onHasResult(true); onReturnValue(r); return r; })
-                .catch(e => { onReject(); onHasError(true); onError(e); return e; })
+                .then(r => { onResolve?.(); onHasResult?.(true); onReturnValue?.(r); return r; })
+                .catch(e => { onReject?.(); onHasError?.(true); onError?.(e); return e; })
                 .finally(onFinally);
         }
         else {
-            onInvoked("sync");
+            onInvoked?.("sync");
             if (!hadSyncError) {
-                onResolve();
-                onHasResult(true);
-                onHasError(false);
+                onResolve?.();
+                onHasResult?.(true);
+                onHasError?.(false);
             }
             else {
-                onReject();
-                onHasResult(false);
-                onHasError(true);
+                onReject?.();
+                onHasResult?.(false);
+                onHasError?.(true);
             }
-            onReturnValue(promiseOrReturn);
-            onPending(pending = false);
+            onReturnValue?.(promiseOrReturn);
+            onPending?.(pending = false);
             onFinally();
         }
     };
@@ -99,7 +99,7 @@ export function asyncToSync({ asyncInput, onInvoke, onInvoked, onFinally: onFina
     const syncDebounced = LodashDebounce(() => {
         // 3. Instead of calling the sync version of our function directly, we allow it to be throttled/debounced (above)
         // and now that we're done throttling/debouncing, notify anyone who cares of this fact (below).
-        onSyncDebounce(syncDebouncing = false);
+        onSyncDebounce?.(syncDebouncing = false);
         if (!pending) {
             // 4a. If this is the first invocation, or if we're not still waiting for a previous invocation to finish its async call,
             // then we can just go ahead and run the debounced version of our function.
@@ -110,15 +110,15 @@ export function asyncToSync({ asyncInput, onInvoke, onInvoked, onFinally: onFina
             // 4b. If we were called while still waiting for the (or a) previous invocation to finish,
             // then we'll need to delay this one. When that previous invocation finishes, it'll check
             // to see if it needs to run again, and it will use these new captured arguments from step 2.
-            onAsyncDebounce(asyncDebouncing = true);
+            onAsyncDebounce?.(asyncDebouncing = true);
         }
     }, wait || undefined, lodashOptions);
     return {
         syncOutput: (...args) => {
             // 1. Someone just called the sync version of our async function.
             // 2. We capture the arguments in a way that won't become stale if/when the function is called with a (possibly seconds-long) delay (e.g. event.currentTarget.value on an <input> element).
-            currentCapture = capture(...args);
-            onSyncDebounce(syncDebouncing = true);
+            currentCapture = capture?.(...args); // Intentional!? because void == undefined.
+            onSyncDebounce?.(syncDebouncing = true);
             syncDebounced();
         },
         flushSyncDebounce: () => {

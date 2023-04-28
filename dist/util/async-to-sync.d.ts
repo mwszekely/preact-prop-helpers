@@ -11,7 +11,7 @@ export interface AsyncToSyncParameters<AsyncArgs extends any[], SyncArgs extends
      * This is the same for sync and async functions. When
      * a sync function is used, onPending will be called twice on the same frame.
      */
-    onPending(pending: boolean): void;
+    onPending?(pending: boolean): void;
     /**
      * When the *sync handler is invoked* (even if the async handler doesn't run yet), this is set to `true`.
      *
@@ -20,7 +20,7 @@ export interface AsyncToSyncParameters<AsyncArgs extends any[], SyncArgs extends
      * This is the same even when not using `wait` or `throttle`. In this case, `onSyncDebounce` will be called twice on the same frame.
      * @param debouncing
      */
-    onSyncDebounce(debouncing: boolean): void;
+    onSyncDebounce?(debouncing: boolean): void;
     /**
      * When the async handler is about to start running (after debouncing and throttling have finished),
      * but must wait for another in-process handler to finish, this is set to `true`.
@@ -29,7 +29,7 @@ export interface AsyncToSyncParameters<AsyncArgs extends any[], SyncArgs extends
      *
      * @param debouncing
      */
-    onAsyncDebounce(debouncing: boolean): void;
+    onAsyncDebounce?(debouncing: boolean): void;
     /**
      * When the handler returns, its return value will be passed to this function (after awaiting it if necessary).
      *
@@ -38,7 +38,7 @@ export interface AsyncToSyncParameters<AsyncArgs extends any[], SyncArgs extends
      * This value is not reset at any time! See `setHasReturn` to determine if there is a value at any given time.
      * @param ret
      */
-    onReturnValue(ret: Return): void;
+    onReturnValue?(ret: Return): void;
     /**
      * When the handler `throw`s, the value thrown will be passed to this function.
      *
@@ -46,14 +46,14 @@ export interface AsyncToSyncParameters<AsyncArgs extends any[], SyncArgs extends
      *
      * @param ex
      */
-    onError(ex: unknown): void;
+    onError?(ex: unknown): void;
     /**
      * Immediately before the handler will be called (after all methods of debouncing and throttling and such)
      * this is always called once.
      *
      * @see onInvoked (called immediately after instead)
      */
-    onInvoke(): void;
+    onInvoke?(): void;
     /**
      * Immediately after the handler has been called, this is called once with the result of the call.
      *
@@ -61,27 +61,27 @@ export interface AsyncToSyncParameters<AsyncArgs extends any[], SyncArgs extends
      *
      * @see onInvoke (called immediately before instead)
      */
-    onInvoked(result: "async" | "throw" | "sync"): void;
+    onInvoked?(result: "async" | "throw" | "sync"): void;
     /**
      * When the handler returns successfully, this will be called once.
      *
      * @see onFinally
      * @see onReject
      */
-    onResolve(): void;
+    onResolve?(): void;
     /**
      * When the handler rejects, for any reason, this will be called once.
      *
      * @see onResolve
      * @see onFinally
      */
-    onReject(): void;
+    onReject?(): void;
     /**
      * When the handler resolves, for any reason, this will be called once.
      * @see onResolve
      * @see onReject
      */
-    onFinally(): void;
+    onFinally?(): void;
     /**
      * It's frequently necessary (especially with DOM events) to save
      * values so that they don't become stale.  For example, referencing
@@ -96,15 +96,15 @@ export interface AsyncToSyncParameters<AsyncArgs extends any[], SyncArgs extends
      *
      * For example, `e => [e, e.currentTarget.value]`
      */
-    capture: CaptureFunctionType<AsyncArgs, SyncArgs>;
+    capture?: CaptureFunctionType<AsyncArgs, SyncArgs>;
     /**
      * Identical to Lodash's `throttle` function, applying *before* waiting for any prior async handlers to finish.
      */
-    throttle: number | undefined;
+    throttle?: number | undefined;
     /**
      * Identical to Lodash's `debounce` function, applying *before* waiting for any prior async handlers to finish.
      */
-    wait: number | undefined;
+    wait?: number | undefined;
     /**
      * When the handler is about to run, this is called with `null`.
      *
@@ -113,7 +113,7 @@ export interface AsyncToSyncParameters<AsyncArgs extends any[], SyncArgs extends
      * This is the same for sync and async functions;
      * sync functions will result in this function being called twice in one frame.
      */
-    onHasError(hasError: boolean | null): void;
+    onHasError?(hasError: boolean | null): void;
     /**
      * When the handler is about to run, this is called with `null`.
      *
@@ -122,7 +122,7 @@ export interface AsyncToSyncParameters<AsyncArgs extends any[], SyncArgs extends
      * This is the same for sync and async functions;
      * sync functions will result in this function being called twice in one frame.
      */
-    onHasResult(hasResult: boolean | null): void;
+    onHasResult?(hasResult: boolean | null): void;
 }
 export interface AsyncToSyncReturn<SyncArgs extends any[]> {
     /**
