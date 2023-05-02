@@ -1,4 +1,4 @@
-import { CaptureFunctionType } from "../util/async-to-sync.js";
+import { CaptureFunctionType } from "async-to-sync";
 type SyncFunctionType<SP extends unknown[], R> = (...args: SP) => (R | undefined);
 type AsyncFunctionType<AP extends unknown[], R> = ((...args: AP) => (R | Promise<R>));
 export interface UseAsyncParameters<AP extends unknown[], SP extends unknown[] = AP> {

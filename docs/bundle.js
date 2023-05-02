@@ -8402,17 +8402,17 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     const onFinally = () => {
       // 8. This is run at the end of every invocation of the async handler,
       // whether it completed or not, and whether it was async or not.
-      onFinallyAny();
-      onPending(pending = false);
+      onFinallyAny === null || onFinallyAny === void 0 ? void 0 : onFinallyAny();
+      onPending === null || onPending === void 0 ? void 0 : onPending(pending = false);
       let nothingElseToDo = !asyncDebouncing;
-      onAsyncDebounce(asyncDebouncing = false);
+      onAsyncDebounce === null || onAsyncDebounce === void 0 ? void 0 : onAsyncDebounce(asyncDebouncing = false);
       if (nothingElseToDo) ;else {
         // 9b. Another request to run the async handler came in while we were running this one.
         // Instead of stopping, we're just going to immediately run again using the arguments that were given to us most recently.
         // We also clear that flag, because we're handling it now. It'll be set again if the handler is called again while *this* one is running
         console.assert(currentCapture !== Unset);
         if (currentCapture != Unset) {
-          onSyncDebounce(syncDebouncing = true);
+          onSyncDebounce === null || onSyncDebounce === void 0 ? void 0 : onSyncDebounce(syncDebouncing = true);
           syncDebounced();
         }
       }
@@ -8420,51 +8420,51 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     const sync = function () {
       // 5. We're finally running the async version of the function, so notify the caller that the return value is pending.
       // And because the fact that we're here means the debounce/throttle period is over, we can clear that flag too.
-      onPending(pending = true);
+      onPending === null || onPending === void 0 ? void 0 : onPending(pending = true);
       console.assert(syncDebouncing == false);
-      onHasError(null);
-      onHasResult(null);
+      onHasError === null || onHasError === void 0 ? void 0 : onHasError(null);
+      onHasResult === null || onHasResult === void 0 ? void 0 : onHasResult(null);
       let promiseOrReturn;
       let hadSyncError = false;
       try {
         // 6. Run the function we were given.
         // Because it may be sync, or it may throw before returning, we must still wrap it in a try/catch...
         // Also important is that we preserve the async-ness (or lack thereof) on the original input function.
-        onInvoke();
+        onInvoke === null || onInvoke === void 0 ? void 0 : onInvoke();
         promiseOrReturn = asyncInput(...arguments);
-        onHasError(false);
+        onHasError === null || onHasError === void 0 ? void 0 : onHasError(false);
       } catch (ex) {
         hadSyncError = true;
-        onError(ex);
-        onInvoked("throw");
+        onError === null || onError === void 0 ? void 0 : onError(ex);
+        onInvoked === null || onInvoked === void 0 ? void 0 : onInvoked("throw");
       }
       // 7. Either end immediately, or schedule to end when completed.
       if (isPromise(promiseOrReturn)) {
-        onInvoked("async");
+        onInvoked === null || onInvoked === void 0 ? void 0 : onInvoked("async");
         promiseOrReturn.then(r => {
-          onResolve();
-          onHasResult(true);
-          onReturnValue(r);
+          onResolve === null || onResolve === void 0 ? void 0 : onResolve();
+          onHasResult === null || onHasResult === void 0 ? void 0 : onHasResult(true);
+          onReturnValue === null || onReturnValue === void 0 ? void 0 : onReturnValue(r);
           return r;
         }).catch(e => {
-          onReject();
-          onHasError(true);
-          onError(e);
+          onReject === null || onReject === void 0 ? void 0 : onReject();
+          onHasError === null || onHasError === void 0 ? void 0 : onHasError(true);
+          onError === null || onError === void 0 ? void 0 : onError(e);
           return e;
         }).finally(onFinally);
       } else {
-        onInvoked("sync");
+        onInvoked === null || onInvoked === void 0 ? void 0 : onInvoked("sync");
         if (!hadSyncError) {
-          onResolve();
-          onHasResult(true);
-          onHasError(false);
+          onResolve === null || onResolve === void 0 ? void 0 : onResolve();
+          onHasResult === null || onHasResult === void 0 ? void 0 : onHasResult(true);
+          onHasError === null || onHasError === void 0 ? void 0 : onHasError(false);
         } else {
-          onReject();
-          onHasResult(false);
-          onHasError(true);
+          onReject === null || onReject === void 0 ? void 0 : onReject();
+          onHasResult === null || onHasResult === void 0 ? void 0 : onHasResult(false);
+          onHasError === null || onHasError === void 0 ? void 0 : onHasError(true);
         }
-        onReturnValue(promiseOrReturn);
-        onPending(pending = false);
+        onReturnValue === null || onReturnValue === void 0 ? void 0 : onReturnValue(promiseOrReturn);
+        onPending === null || onPending === void 0 ? void 0 : onPending(pending = false);
         onFinally();
       }
     };
@@ -8480,7 +8480,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     const syncDebounced = debounce(() => {
       // 3. Instead of calling the sync version of our function directly, we allow it to be throttled/debounced (above)
       // and now that we're done throttling/debouncing, notify anyone who cares of this fact (below).
-      onSyncDebounce(syncDebouncing = false);
+      onSyncDebounce === null || onSyncDebounce === void 0 ? void 0 : onSyncDebounce(syncDebouncing = false);
       if (!pending) {
         // 4a. If this is the first invocation, or if we're not still waiting for a previous invocation to finish its async call,
         // then we can just go ahead and run the debounced version of our function.
@@ -8490,15 +8490,19 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         // 4b. If we were called while still waiting for the (or a) previous invocation to finish,
         // then we'll need to delay this one. When that previous invocation finishes, it'll check
         // to see if it needs to run again, and it will use these new captured arguments from step 2.
-        onAsyncDebounce(asyncDebouncing = true);
+        onAsyncDebounce === null || onAsyncDebounce === void 0 ? void 0 : onAsyncDebounce(asyncDebouncing = true);
       }
     }, wait || undefined, lodashOptions);
     return {
       syncOutput: function () {
+        var _capture;
+        for (var _len4 = arguments.length, args = new Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
+          args[_key4] = arguments[_key4];
+        }
         // 1. Someone just called the sync version of our async function.
         // 2. We capture the arguments in a way that won't become stale if/when the function is called with a (possibly seconds-long) delay (e.g. event.currentTarget.value on an <input> element).
-        currentCapture = capture(...arguments);
-        onSyncDebounce(syncDebouncing = true);
+        currentCapture = (_capture = capture === null || capture === void 0 ? void 0 : capture(...args)) !== null && _capture !== void 0 ? _capture : [];
+        onSyncDebounce === null || onSyncDebounce === void 0 ? void 0 : onSyncDebounce(syncDebouncing = true);
         syncDebounced();
       },
       flushSyncDebounce: () => {
@@ -8510,8 +8514,8 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     };
   }
   function identityCapture() {
-    for (var _len4 = arguments.length, t = new Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
-      t[_key4] = arguments[_key4];
+    for (var _len5 = arguments.length, t = new Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
+      t[_key5] = arguments[_key5];
     }
     return t;
   }
