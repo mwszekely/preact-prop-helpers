@@ -4,6 +4,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
 (function () {
   'use strict';
 
+  var _window, _window$requestIdleCa;
   var n,
     l$1,
     u$1,
@@ -1942,16 +1943,29 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     var func = isArray$1(collection) ? arrayShuffle : baseShuffle;
     return func(collection);
   }
+
+  // TODO: This shouldn't be in every build, I don't think it's in core-js? I think?
+  // And it's extremely small anyway and basically does nothing.
+  (_window$requestIdleCa = (_window = window).requestIdleCallback) !== null && _window$requestIdleCa !== void 0 ? _window$requestIdleCa : _window.requestIdleCallback = callback => {
+    return setTimeout(() => {
+      callback({
+        didTimeout: false,
+        timeRemaining: () => {
+          return 0;
+        }
+      });
+    }, 5);
+  };
   let timeoutHandle = null;
   function callCountU(hook) {
-    var _window, _window$_hookCallCoun, _window$_hookCallCoun2, _window$_hookCallCoun3;
+    var _window2, _window2$_hookCallCou, _window$_hookCallCoun, _window$_hookCallCoun2;
     const name = hook.name;
     if (filters.has(name)) return;
     console.assert(name.length > 0);
-    (_window$_hookCallCoun = (_window = window)._hookCallCount) !== null && _window$_hookCallCoun !== void 0 ? _window$_hookCallCoun : _window._hookCallCount = {
+    (_window2$_hookCallCou = (_window2 = window)._hookCallCount) !== null && _window2$_hookCallCou !== void 0 ? _window2$_hookCallCou : _window2._hookCallCount = {
       callCounts: {}
     };
-    (_window$_hookCallCoun3 = (_window$_hookCallCoun2 = window._hookCallCount.callCounts)[name]) !== null && _window$_hookCallCoun3 !== void 0 ? _window$_hookCallCoun3 : _window$_hookCallCoun2[name] = {
+    (_window$_hookCallCoun2 = (_window$_hookCallCoun = window._hookCallCount.callCounts)[name]) !== null && _window$_hookCallCoun2 !== void 0 ? _window$_hookCallCoun2 : _window$_hookCallCoun[name] = {
       moment: 0,
       total: 0
     };

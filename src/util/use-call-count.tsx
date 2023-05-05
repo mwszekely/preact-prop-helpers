@@ -1,6 +1,12 @@
 import { noop } from "lodash-es";
 import { getBuildMode } from "./mode.js";
 
+// TODO: This shouldn't be in every build, I don't think it's in core-js? I think?
+// And it's extremely small anyway and basically does nothing.
+window.requestIdleCallback ??= (callback) => {
+    return setTimeout(() => { callback({ didTimeout: false, timeRemaining: () => { return 0; }, }); }, 5);
+};
+
 let timeoutHandle = null as number | null;
 
 interface HookCallCount {
