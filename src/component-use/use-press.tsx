@@ -365,9 +365,9 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
 
             if (e.key == "Enter" && !excludeEnter() && (!e.repeat || (allowRepeatPresses ?? false))) {
                 setIsPressing(true, e);
+                handlePress(e);
                 requestAnimationFrame(() => {
                     setIsPressing(false, e);
-                    handlePress(e);
                 });
             }
         }

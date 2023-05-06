@@ -253,9 +253,9 @@ export function usePress(args) {
             }
             if (e.key == "Enter" && !excludeEnter() && (!e.repeat || (allowRepeatPresses ?? false))) {
                 setIsPressing(true, e);
+                handlePress(e);
                 requestAnimationFrame(() => {
                     setIsPressing(false, e);
-                    handlePress(e);
                 });
             }
         }

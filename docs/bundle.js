@@ -8243,9 +8243,9 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         }
         if (e.key == "Enter" && !excludeEnter() && (!e.repeat || (allowRepeatPresses !== null && allowRepeatPresses !== void 0 ? allowRepeatPresses : false))) {
           setIsPressing(true, e);
+          handlePress(e);
           requestAnimationFrame(() => {
             setIsPressing(false, e);
-            handlePress(e);
           });
         }
       }
