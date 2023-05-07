@@ -38,6 +38,7 @@ import { monitorCallCount } from "../../util/use-call-count.js";
 export function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovingTabIndexParameters: { untabbable, initiallyTabbedIndex, onTabbableIndexChange }, ...void1 }) {
     monitorCallCount(useRovingTabIndex);
     assertEmptyObject(void1);
+    const getInitiallyTabbedIndex = useStableGetter(initiallyTabbedIndex);
     const getUntabbable = useStableGetter(untabbable);
     // Override the actual setter to include some extra logic related to avoiding hidden children, 
     // what to do when we're untabbable, what to do when we're tabbable but given `null`, etc.
@@ -104,7 +105,12 @@ export function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovi
     });
     const focusSelf = useCallback((reason) => {
         const children = getChildren();
-        const index = getTabbableIndex();
+        let index = getTabbableIndex();
+        const untabbable = getUntabbable();
+        if (!untabbable) {
+            // If we change from untabbable to tabbable, it's possible `index` might still be null.
+            index ??= getInitiallyTabbedIndex();
+        }
         if (index != null) {
             const element = children.getAt(index)?.getElement();
             children.getAt(index)?.focusSelf?.(element);

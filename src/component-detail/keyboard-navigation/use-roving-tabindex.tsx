@@ -210,6 +210,7 @@ export function useRovingTabIndex<ChildElement extends Element, M extends UseRov
 
     assertEmptyObject(void1);
 
+    const getInitiallyTabbedIndex = useStableGetter(initiallyTabbedIndex);
     const getUntabbable = useStableGetter(untabbable);
 
     // Override the actual setter to include some extra logic related to avoiding hidden children, 
@@ -289,7 +290,13 @@ export function useRovingTabIndex<ChildElement extends Element, M extends UseRov
 
     const focusSelf = useCallback((reason?: unknown) => {
         const children = getChildren();
-        const index = getTabbableIndex();
+        let index = getTabbableIndex();
+        const untabbable = getUntabbable();
+        if (!untabbable) {
+            // If we change from untabbable to tabbable, it's possible `index` might still be null.
+            index ??= getInitiallyTabbedIndex();
+        }
+
         if (index != null) {
             const element = children.getAt(index)?.getElement();
             children.getAt(index)?.focusSelf?.(element!);
@@ -339,7 +346,7 @@ export function useRovingTabIndexChild<ChildElement extends Element, M extends U
         rovingTabIndexChildReturn: {
             tabbable,
             getTabbable,
-           // setTabbable
+            // setTabbable
         },
         info: { setLocallyTabbable: setTabbable, getLocallyTabbable: getTabbable, tabbable },
         props: { tabIndex: (tabbable ? 0 : -1) },

@@ -3191,6 +3191,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       ...void1
     } = _ref14;
     monitorCallCount(useRovingTabIndex);
+    const getInitiallyTabbedIndex = useStableGetter(initiallyTabbedIndex);
     const getUntabbable = useStableGetter(untabbable);
     // Override the actual setter to include some extra logic related to avoiding hidden children, 
     // what to do when we're untabbable, what to do when we're tabbable but given `null`, etc.
@@ -3260,7 +3261,13 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     });
     const focusSelf = T$1(reason => {
       const children = getChildren();
-      const index = getTabbableIndex();
+      let index = getTabbableIndex();
+      const untabbable = getUntabbable();
+      if (!untabbable) {
+        var _index;
+        // If we change from untabbable to tabbable, it's possible `index` might still be null.
+        (_index = index) !== null && _index !== void 0 ? _index : index = getInitiallyTabbedIndex();
+      }
       if (index != null) {
         var _children$getAt, _children$getAt2, _children$getAt2$focu;
         const element = (_children$getAt = children.getAt(index)) === null || _children$getAt === void 0 ? void 0 : _children$getAt.getElement();
