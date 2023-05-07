@@ -3264,9 +3264,9 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       let index = getTabbableIndex();
       const untabbable = getUntabbable();
       if (!untabbable) {
-        var _index;
+        var _index, _getInitiallyTabbedIn;
         // If we change from untabbable to tabbable, it's possible `index` might still be null.
-        (_index = index) !== null && _index !== void 0 ? _index : index = getInitiallyTabbedIndex();
+        (_index = index) !== null && _index !== void 0 ? _index : index = (_getInitiallyTabbedIn = getInitiallyTabbedIndex()) !== null && _getInitiallyTabbedIn !== void 0 ? _getInitiallyTabbedIn : children.getHighestIndex() >= 0 ? 0 : null;
       }
       if (index != null) {
         var _children$getAt, _children$getAt2, _children$getAt2$focu;

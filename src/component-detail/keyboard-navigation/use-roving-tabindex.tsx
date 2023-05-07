@@ -294,7 +294,7 @@ export function useRovingTabIndex<ChildElement extends Element, M extends UseRov
         const untabbable = getUntabbable();
         if (!untabbable) {
             // If we change from untabbable to tabbable, it's possible `index` might still be null.
-            index ??= getInitiallyTabbedIndex();
+            index ??= getInitiallyTabbedIndex() ?? (children.getHighestIndex() >= 0? 0 : null);
         }
 
         if (index != null) {
