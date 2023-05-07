@@ -9,8 +9,8 @@ export function useFocusTrap({ focusTrapParameters: { onlyMoveFocus, trapActive,
     const focusSelf = useStableCallback(focusSelfUnstable);
     const focusOpener = useStableCallback(focusOpenerUnstable);
     useEffect(() => {
-        let top = getTop();
         if (trapActive) {
+            let top = getTop();
             const lastFocusedInThisComponent = getLastActiveWhenOpen();
             if (false && lastFocusedInThisComponent && lastFocusedInThisComponent?.isConnected) {
                 focusSelf(lastFocusedInThisComponent, () => lastFocusedInThisComponent);
@@ -28,6 +28,7 @@ export function useFocusTrap({ focusTrapParameters: { onlyMoveFocus, trapActive,
             // Restore focus to whatever caused this trap to trigger,
             // but only if it wasn't caused by explicitly focusing something else 
             // (generally if `onlyMoveFocus` is true)
+            let top = refElementReturn.getElement();
             if (currentFocus == document.body || currentFocus == null || top == currentFocus || top?.contains(currentFocus)) {
                 if (lastActive)
                     focusOpener(lastActive);

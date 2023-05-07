@@ -6766,8 +6766,8 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     const focusSelf = useStableCallback(focusSelfUnstable);
     const focusOpener = useStableCallback(focusOpenerUnstable);
     p(() => {
-      let top = getTop();
       if (trapActive) {
+        let top = getTop();
         getLastActiveWhenOpen();
         {
           var _top;
@@ -6776,13 +6776,13 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
           if (top) focusSelf(top, () => findFirstFocusable(top));
         }
       } else {
-        var _top2;
         const lastActive = getLastActiveWhenClosed();
         let currentFocus = document.activeElement;
         // Restore focus to whatever caused this trap to trigger,
         // but only if it wasn't caused by explicitly focusing something else 
         // (generally if `onlyMoveFocus` is true)
-        if (currentFocus == document.body || currentFocus == null || top == currentFocus || (_top2 = top) !== null && _top2 !== void 0 && _top2.contains(currentFocus)) {
+        let top = refElementReturn.getElement();
+        if (currentFocus == document.body || currentFocus == null || top == currentFocus || top !== null && top !== void 0 && top.contains(currentFocus)) {
           if (lastActive) focusOpener(lastActive);
         }
       }
