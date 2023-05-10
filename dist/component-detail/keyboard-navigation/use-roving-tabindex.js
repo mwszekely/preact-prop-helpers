@@ -120,6 +120,7 @@ export function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovi
     }, []);
     const rovingTabIndexContext = useStableObject({
         setTabbableIndex,
+        refocusParent: focusSelf,
         getInitiallyTabbedIndex: useCallback(() => { return initiallyTabbedIndex ?? (untabbable ? null : 0); }, []),
         reevaluateClosestFit
     });
@@ -141,17 +142,20 @@ export function useRovingTabIndexChild({ info: { index, hidden, ...void2 }, cont
         hasCurrentFocusParameters: {
             onCurrentFocusedInnerChanged: useStableCallback((focused, _prevFocused, e) => {
                 if (focused) {
-                    setTabbableIndex(index, e, false);
+                    if (!hidden)
+                        setTabbableIndex(index, e, false);
                 }
             })
         },
         rovingTabIndexChildReturn: {
             tabbable,
             getTabbable,
-            // setTabbable
         },
         info: { setLocallyTabbable: setTabbable, getLocallyTabbable: getTabbable, tabbable },
-        props: { tabIndex: (tabbable ? 0 : -1) },
+        props: {
+            tabIndex: (tabbable ? 0 : -1),
+            ...{ inert: hidden } // This inert is to prevent the edge case of clicking a hidden item and it focusing itself
+        },
     };
 }
 //# sourceMappingURL=use-roving-tabindex.js.map

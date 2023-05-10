@@ -3,6 +3,7 @@ import { usePassiveState } from "../../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useStableObject } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
+import { focus } from "../../util/focus.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
 import { useListNavigation, useListNavigationChild } from "./use-list-navigation-partial.js";
 export function useGridNavigation({ gridNavigationParameters: { onTabbableColumnChange, ...void3 }, linearNavigationParameters, rovingTabIndexParameters: { onTabbableIndexChange, ...rovingTabIndexParameters }, managedChildrenReturn, typeaheadNavigationParameters, ...void2 }) {
@@ -67,7 +68,7 @@ export function useGridNavigationRow({ context: { rovingTabIndexContext: context
             child.focusSelf(e);
         }
         else {
-            e?.focus?.();
+            focus(e);
         }
     }, []);
     const { hasCurrentFocusParameters, pressParameters, props: propsLNC, rovingTabIndexChildReturn, textContentReturn, info, ...void2 } = useListNavigationChild({ info: managedChildParameters, refElementReturn, textContentParameters, context: { rovingTabIndexContext: contextRTI, typeaheadNavigationContext: contextTN } });

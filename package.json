@@ -21,7 +21,7 @@
     "watch": "npx npm-run-all --npm-path npm -pc clean watch:*",
     "watch:ts": "tsc --watch",
     "build:ts": "tsc",
-    "test": "jest",
+    "test": "playwright test --ui",
     "lint": "npx eslint ./src",
     "clean": "tsc --build --clean",
     "rebuild": "rm \"./pnpm-lock.yaml\" && rm -R \"./node_modules\" && pnpm install && pnpm run build"
@@ -40,6 +40,7 @@
     "typescript": "^5.0.4"
   },
   "dependencies": {
+    "@playwright/test": "^1.33.0",
     "async-to-sync": "github:mwszekely/async-to-sync",
     "blocking-elements": "^0.1.1",
     "clsx": "^1.2.1",

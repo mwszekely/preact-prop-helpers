@@ -184,6 +184,8 @@ export function usePress(args) {
     useTimeout({
         callback: () => {
             const element = getElement();
+            console.log("Pointer started here: ", pointerDownStartedHere);
+            console.log("Hovering: ", getHovering());
             setLongPress(pointerDownStartedHere && getHovering());
             if (element && pointerDownStartedHere && getHovering()) {
                 focusSelf(element);

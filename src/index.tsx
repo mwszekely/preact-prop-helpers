@@ -57,6 +57,7 @@ export { ProvideBatchedAnimationFrames, UseAnimationFrameParameters, useAnimatio
 export { UseIntervalParameters, useInterval } from "./timing/use-interval.js";
 export { UseTimeoutParameters, useTimeout } from "./timing/use-timeout.js";
 export { assertEmptyObject } from "./util/assert.js";
+export { focus } from "./util/focus.js";
 export { getBuildMode } from "./util/mode.js";
 export { generateRandomId } from "./util/random-id.js";
 export type { CSSProperties, CompositionEventType, ElementProps, EventType, FocusEventType, KeyboardEventType, MouseEventType, PointerEventType, Ref, RefCallback, RefObject, TouchEventType, VNode } from "./util/types.js";

@@ -11,8 +11,8 @@ export interface UsePaginatedChildrenParameters<E extends Element, M extends Use
     managedChildrenReturn: UseManagedChildrenReturnType<M>["managedChildrenReturn"];
     linearNavigationParameters: Pick<UseLinearNavigationParameters<any, E, M>["linearNavigationParameters"], "indexDemangler">;
     paginatedChildrenParameters: {
-        paginationMin: number | null;
-        paginationMax: number | null;
+        paginationMin: number | null | undefined;
+        paginationMax: number | null | undefined;
     };
 }
 export interface UsePaginatedChildContext {
@@ -26,7 +26,7 @@ export interface UsePaginatedChildrenReturnType {
         onChildrenCountChange: (count: number) => void;
     };
     paginatedChildrenReturn: {
-        refreshPagination: (min: number | null, max: number | null) => void;
+        refreshPagination: (min: number | null | undefined, max: number | null | undefined) => void;
         /**
          * **importANT**: This is only tracked when pagination is enabled.
          *

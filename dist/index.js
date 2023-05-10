@@ -57,6 +57,7 @@ export { ProvideBatchedAnimationFrames, useAnimationFrame } from "./timing/use-a
 export { useInterval } from "./timing/use-interval.js";
 export { useTimeout } from "./timing/use-timeout.js";
 export { assertEmptyObject } from "./util/assert.js";
+export { focus } from "./util/focus.js";
 export { getBuildMode } from "./util/mode.js";
 export { generateRandomId } from "./util/random-id.js";
 export { hideCallCount, monitorCallCount } from "./util/use-call-count.js";

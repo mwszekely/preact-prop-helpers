@@ -1,29 +1,38 @@
 {
-  "name": "preact-prop-helpers",
+  "name": "tests",
   "type": "module",
-  "version": "0.0.1",
-  "description": "A small set of hooks and other functions related to modifying Preact props.",
-  "source": "./index.js",
+  "version": "1.0.0",
+  "description": "",
   "main": "index.js",
-  "module": "index.js",
-  "types": "index.d.ts",
-  "packageManager": "pnpm@7.26.2",
   "scripts": {
-    "test": "jest"
+    "build": "npx npm-run-all --npm-path npm -pc build:sass build:js",
+    "watch": "npx npm-run-all --npm-path npm -s build watch-impl",
+    "watch-impl": "npx npm-run-all --npm-path npm -p watch:*",
+    "build:sass": "sass --load-path=\"./node_modules\" ./stage/index.scss:./stage/index.css",
+    "build:js": "rollup --config stage/rollup.config.js",
+    "watch:sass": "sass --load-path=\"./node_modules\" ./stage/index.scss:./stage/index.css --watch",
+    "watch:js": "rollup --config stage/rollup.config.js --watch --no-watch.clearScreen",
+    "serve": "npx serve ..",
+    "start": "npx npm-run-all --npm-path npm -p watch serve"
   },
+  "keywords": [],
   "author": "",
-  "license": "ISC",
-  "peerDependencies": {
-    "preact": "^10.11.1"
-  },
-  "devDependencies": {
-    "@testing-library/preact": "^3.2.3",
-    "@types/jest": "^29.2.5",
-    "@types/jsdom": "^20.0.1",
-    "jest": "^29.3.1",
-    "typescript": "^5.0.2"
-  },
   "dependencies": {
-    "preact": "^10.13.2"
+    "@axe-core/playwright": "^4.7.0",
+    "@babel/core": "^7.21.8",
+    "@babel/preset-env": "^7.21.5",
+    "@rollup/plugin-alias": "^5.0.0",
+    "@rollup/plugin-babel": "^6.0.3",
+    "@rollup/plugin-commonjs": "^24.1.0",
+    "@rollup/plugin-node-resolve": "^15.0.2",
+    "@rollup/plugin-replace": "^5.0.2",
+    "@rollup/plugin-typescript": "^11.1.0",
+    "preact-prop-helpers": "github:mwszekely/preact-prop-helpers",
+    "preact-hash-router": "github:mwszekely/preact-hash-router",
+    "rollup": "^3.21.5",
+    "rollup-plugin-sourcemaps": "^0.6.3",
+    "sass": "^1.62.1",
+    "serve": "^14.2.0",
+    "tslib": "^2.5.0"
   }
 }

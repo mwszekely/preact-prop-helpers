@@ -17,7 +17,7 @@ export interface UsePaginatedChildrenInfo<E extends Element> extends UseRovingTa
 export interface UsePaginatedChildrenParameters<E extends Element, M extends UsePaginatedChildrenInfo<E>> {
     managedChildrenReturn: UseManagedChildrenReturnType<M>["managedChildrenReturn"];
     linearNavigationParameters: Pick<UseLinearNavigationParameters<any, E, M>["linearNavigationParameters"], "indexDemangler">;
-    paginatedChildrenParameters: { paginationMin: number | null; paginationMax: number | null; }
+    paginatedChildrenParameters: { paginationMin: number | null | undefined; paginationMax: number | null | undefined; }
 }
 
 export interface UsePaginatedChildContext {
@@ -32,7 +32,7 @@ export interface UsePaginatedChildrenReturnType {
         onChildrenCountChange: (count: number) => void;
     };
     paginatedChildrenReturn: {
-        refreshPagination: (min: number | null, max: number | null) => void;
+        refreshPagination: (min: number | null | undefined, max: number | null | undefined) => void;
         /**
          * **importANT**: This is only tracked when pagination is enabled.
          * 
@@ -53,7 +53,7 @@ export function usePaginatedChildren<E extends Element, M extends UsePaginatedCh
     const parentIsPaginated = (paginationMin != null || paginationMax != null);
 
     const lastPagination = useRef({ paginationMax: null as null | number, paginationMin: null as null | number });
-    const refreshPagination = useCallback((paginationMin: number | null, paginationMax: number | null) => {
+    const refreshPagination = useCallback((paginationMin: number | null | undefined, paginationMax: number | null | undefined) => {
         const childMax = (getChildren().getHighestIndex() + 1);
         for (let i = 0; i <= childMax; ++i) {
             const visible = (i >= (paginationMin ?? -Infinity) && i < (paginationMax ?? Infinity));
@@ -66,8 +66,8 @@ export function usePaginatedChildren<E extends Element, M extends UsePaginatedCh
     }, [/* Must be empty */])
     useLayoutEffect(() => {
         refreshPagination(paginationMin, paginationMax);
-        lastPagination.current.paginationMax = paginationMax;
-        lastPagination.current.paginationMin = paginationMin;
+        lastPagination.current.paginationMax = paginationMax ?? null;
+        lastPagination.current.paginationMin = paginationMin ?? null;
     }, [paginationMax, paginationMin]);
 
     // TODO: Modification during render

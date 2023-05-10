@@ -4,6 +4,7 @@ import { OnPassiveStateChange, PassiveStateUpdater, usePassiveState } from "../.
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useStableObject } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
+import { focus } from "../../util/focus.js";
 import { OmitStrong } from "../../util/types.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
 import { UseListNavigationChildInfo, UseListNavigationChildParameters, UseListNavigationChildReturnType, UseListNavigationContext, UseListNavigationParameters, UseListNavigationReturnType, useListNavigation, useListNavigationChild } from "./use-list-navigation-partial.js";
@@ -178,7 +179,7 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
             child.focusSelf(e);
         }
         else {
-            (e as Element as HTMLElement)?.focus?.();
+            focus(e);
         }
     }, []);
 

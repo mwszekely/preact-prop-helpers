@@ -20,8 +20,8 @@ export function usePaginatedChildren({ managedChildrenReturn: { getChildren }, l
     }, [ /* Must be empty */]);
     useLayoutEffect(() => {
         refreshPagination(paginationMin, paginationMax);
-        lastPagination.current.paginationMax = paginationMax;
-        lastPagination.current.paginationMin = paginationMin;
+        lastPagination.current.paginationMax = paginationMax ?? null;
+        lastPagination.current.paginationMin = paginationMin ?? null;
     }, [paginationMax, paginationMin]);
     // TODO: Modification during render
     const p = useRef(parentIsPaginated);

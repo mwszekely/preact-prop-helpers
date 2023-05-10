@@ -128,7 +128,7 @@ export interface RovingTabIndexChildContext {
          * (This is technically the same as what's passed to onChildrenMountChange,
          * but it serves a slightly different purpose and is separate for clarity)
          */
-        reevaluateClosestFit: () => void;
+        reevaluateClosestFit: (requestedIndex?: number) => void;
     }
 }
 
@@ -294,7 +294,7 @@ export function useRovingTabIndex<ChildElement extends Element, M extends UseRov
         const untabbable = getUntabbable();
         if (!untabbable) {
             // If we change from untabbable to tabbable, it's possible `index` might still be null.
-            index ??= getInitiallyTabbedIndex() ?? (children.getHighestIndex() >= 0? 0 : null);
+            index ??= getInitiallyTabbedIndex() ?? (children.getHighestIndex() >= 0 ? 0 : null);
         }
 
         if (index != null) {
@@ -307,6 +307,7 @@ export function useRovingTabIndex<ChildElement extends Element, M extends UseRov
 
     const rovingTabIndexContext = useStableObject({
         setTabbableIndex,
+        refocusParent: focusSelf,
         getInitiallyTabbedIndex: useCallback(() => { return initiallyTabbedIndex ?? (untabbable ? null : 0) }, []),
         reevaluateClosestFit
     });
@@ -339,16 +340,20 @@ export function useRovingTabIndexChild<ChildElement extends Element, M extends U
         hasCurrentFocusParameters: {
             onCurrentFocusedInnerChanged: useStableCallback((focused: boolean, _prevFocused: boolean | undefined, e) => {
                 if (focused) {
-                    setTabbableIndex(index, e, false);
+                    if (!hidden)
+                        setTabbableIndex(index, e, false);
+
                 }
             })
         },
         rovingTabIndexChildReturn: {
             tabbable,
             getTabbable,
-            // setTabbable
         },
         info: { setLocallyTabbable: setTabbable, getLocallyTabbable: getTabbable, tabbable },
-        props: { tabIndex: (tabbable ? 0 : -1) },
+        props: { 
+            tabIndex: (tabbable ? 0 : -1), 
+            ...{inert: hidden} // This inert is to prevent the edge case of clicking a hidden item and it focusing itself
+        },
     }
 }
