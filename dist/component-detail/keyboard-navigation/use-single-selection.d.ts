@@ -48,7 +48,7 @@ export interface UseSingleSelectionParameters<ParentOrChildElement extends Eleme
         /**
          * What property will be used to mark this item as selected.
          *
-         * **importANT**: The `aria-current` options should be used with caution as they are semantically very different from the usual selection cases.
+         * **IMPORTANT**: The `aria-current` options should be used with caution as they are semantically very different from the usual selection cases.
          */
         ariaPropName: `aria-${"pressed" | "selected" | "checked" | `current-${"page" | "step" | "date" | "time" | "location" | "true"}`}` | null;
     };
@@ -57,6 +57,7 @@ export type UseSingleSelectionChildInfoKeys = "index" | "disabled";
 export interface UseSingleSelectionChildParameters<E extends Element, M extends UseSingleSelectionChildInfo<E>> {
     context: UseSingleSelectionContext;
     info: Pick<UseSingleSelectionChildInfo<E>, UseSingleSelectionChildInfoKeys>;
+    singleSelectionParameters: Pick<UseSingleSelectionParameters<any, E, M>["singleSelectionParameters"], "ariaPropName" | "selectionMode">;
 }
 export interface UseSingleSelectionChildReturnType<E extends Element> extends UseChildrenHaveFocusChildReturnType<E> {
     props: ElementProps<E>;
@@ -96,7 +97,7 @@ export interface UseSingleSelectionContext {
     singleSelectionContext: {
         onSelectedIndexChange: UseSingleSelectionParameters<any, any, any>["singleSelectionParameters"]["onSelectedIndexChange"];
         getSelectedIndex(): number | null;
-    } & Pick<UseSingleSelectionParameters<any, any, any>["singleSelectionParameters"], "ariaPropName" | "selectionMode">;
+    };
 }
 export declare function useSingleSelection<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseSingleSelectionChildInfo<ChildElement>>({ managedChildrenReturn: { getChildren }, rovingTabIndexReturn: { setTabbableIndex }, singleSelectionParameters: { onSelectedIndexChange: onSelectedIndexChange_U, initiallySelectedIndex, ariaPropName, selectionMode } }: UseSingleSelectionParameters<ParentOrChildElement, ChildElement, M>): UseSingleSelectionReturnType<ChildElement, M>;
 export declare function useSingleSelectionChild<ChildElement extends Element, M extends UseSingleSelectionChildInfo<ChildElement>>(args: UseSingleSelectionChildParameters<ChildElement, M>): UseSingleSelectionChildReturnType<ChildElement>;

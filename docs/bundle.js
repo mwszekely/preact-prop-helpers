@@ -4045,7 +4045,6 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         selectionMode
       }
     } = _ref19;
-    useEnsureStability("useSingleSelection", ariaPropName, selectionMode);
     const onSelectedIndexChange = useStableCallback(onSelectedIndexChange_U !== null && onSelectedIndexChange_U !== void 0 ? onSelectedIndexChange_U : noop);
     const getSelectedAt = T$1(m => {
       return m.getSelected();
@@ -4083,9 +4082,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       context: useStableObject({
         singleSelectionContext: useStableObject({
           getSelectedIndex,
-          onSelectedIndexChange: onSelectedIndexChange,
-          ariaPropName,
-          selectionMode
+          onSelectedIndexChange: onSelectedIndexChange
         })
       }),
       childrenHaveFocusParameters: {
@@ -4103,8 +4100,6 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     const {
       context: {
         singleSelectionContext: {
-          ariaPropName,
-          selectionMode,
           getSelectedIndex,
           onSelectedIndexChange
         }
@@ -4112,6 +4107,10 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       info: {
         index,
         disabled
+      },
+      singleSelectionParameters: {
+        ariaPropName,
+        selectionMode
       }
     } = args;
     useEnsureStability("useSingleSelectionChild", getSelectedIndex, onSelectedIndexChange);
@@ -4249,6 +4248,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         singleSelectionContext,
         typeaheadNavigationContext
       },
+      singleSelectionParameters,
       ...void1
     } = _ref22;
     const {
@@ -4263,7 +4263,8 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       info: mcp1,
       context: {
         singleSelectionContext
-      }
+      },
+      singleSelectionParameters
     });
     const {
       context,
@@ -4624,6 +4625,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       refElementReturn,
       textContentParameters,
       rovingTabIndexParameters,
+      singleSelectionParameters,
       ...void1
     } = _ref28;
     const {
@@ -4637,7 +4639,8 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       ...void9
     } = useSingleSelectionChild({
       info,
-      context
+      context,
+      singleSelectionParameters
     });
     const {
       hasCurrentFocusParameters: {
@@ -7314,7 +7317,8 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       linearNavigationParameters,
       rovingTabIndexParameters,
       typeaheadNavigationParameters,
-      sortableChildParameters
+      sortableChildParameters,
+      singleSelectionParameters
     } = _ref44;
     const {
       info: infoPaginatedChild,
@@ -7382,7 +7386,8 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       textContentParameters: {
         hidden: info.hidden,
         ...textContentParameters
-      }
+      },
+      singleSelectionParameters
     });
     const {
       gridNavigationRowParameters: {
@@ -7483,7 +7488,8 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       },
       textContentParameters,
       rovingTabIndexParameters,
-      info
+      info,
+      ...void1
     } = _ref45;
     const {
       refElementReturn,
@@ -8095,13 +8101,15 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         typeaheadNavigationContext
       },
       sortableChildParameters,
-      pressParameters: {
-        onPressSync,
-        ...pressParameters1
-      },
+      pressParameters,
       rovingTabIndexParameters,
+      singleSelectionParameters,
       ...void1
     } = _ref48;
+    const {
+      onPressSync,
+      ...pressParameters1
+    } = pressParameters !== null && pressParameters !== void 0 ? pressParameters : {};
     let {
       index,
       focusSelf,
@@ -8173,10 +8181,13 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         hidden,
         ...textContentParameters
       },
-      rovingTabIndexParameters
+      rovingTabIndexParameters,
+      singleSelectionParameters
     });
     const onPress = useStableCallback(e => {
-      singleSelectionChildReturn.setThisOneSelected(e);
+      var _singleSelectionConte;
+      if (singleSelectionParameters.selectionMode == "activation") (_singleSelectionConte = singleSelectionContext.onSelectedIndexChange) === null || _singleSelectionConte === void 0 ? void 0 : _singleSelectionConte.call(singleSelectionContext, index, e);
+      onPressSync === null || onPressSync === void 0 ? void 0 : onPressSync(e);
     });
     const {
       propsStable: pressRefProps,
@@ -8190,6 +8201,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     } = usePress({
       refElementReturn: pressRefElementReturn,
       pressParameters: {
+        focusSelf,
         ...pressParameters1,
         ...pressParameters2,
         onPressSync: rovingTabIndexParameters.untabbable || info.disabled || info.hidden ? null : onPress,
@@ -9579,6 +9591,10 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         collator: null,
         noTypeahead: false,
         typeaheadTimeout: 1000
+      },
+      singleSelectionParameters: {
+        ariaPropName: "aria-selected",
+        selectionMode: "focus"
       }
     });
     const {
@@ -9817,6 +9833,8 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     });
   }
   const RandomWords = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
+  const SelectionModeContext = F$2("activation");
+  const UntabbableContext = F$2(false);
   const ListNavigationSingleSelectionChildContext = F$2(null);
   const DemoUseRovingTabIndex = x(() => {
     var _min, _max, _min2, _max2, _max3, _min3;
@@ -9828,10 +9846,11 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     const [staggered, setStaggered] = useState(false);
     if (!isFinite((_min = min) !== null && _min !== void 0 ? _min : NaN)) min = null;
     if (!isFinite((_max = max) !== null && _max !== void 0 ? _max : NaN)) max = null;
+    const untabbable = false;
     const r = useCompleteListNavigationDeclarative({
       rovingTabIndexParameters: {
         onTabbableIndexChange: null,
-        untabbable: false
+        untabbable
       },
       singleSelectionDeclarativeParameters: {
         selectedIndex,
@@ -10036,12 +10055,18 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
             }
           }), " On activation (click, tap, Enter, Space, etc.)"]
         })]
-      }), o$1(ListNavigationSingleSelectionChildContext.Provider, {
-        value: context,
-        children: o$1("ol", {
-          start: 0,
-          ...props,
-          children: useRearrangedChildren(jsxChildren)
+      }), o$1(UntabbableContext.Provider, {
+        value: untabbable,
+        children: o$1(SelectionModeContext.Provider, {
+          value: selectionMode,
+          children: o$1(ListNavigationSingleSelectionChildContext.Provider, {
+            value: context,
+            children: o$1("ol", {
+              start: 0,
+              ...props,
+              children: useRearrangedChildren(jsxChildren)
+            })
+          })
         })
       }), o$1("div", {
         children: ["Typeahead status: ", typeaheadStatus]
@@ -10101,9 +10126,13 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         focusSelf
       },
       rovingTabIndexParameters: {
-        untabbable: false
+        untabbable: q$1(UntabbableContext)
       },
       context,
+      singleSelectionParameters: {
+        ariaPropName: "aria-selected",
+        selectionMode: q$1(SelectionModeContext)
+      },
       textContentParameters: {
         getText: T$1(e => {
           var _e$textContent3;

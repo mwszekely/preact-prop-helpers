@@ -49,6 +49,7 @@ export function useListNavigationSingleSelectionChild<ChildElement extends Eleme
     refElementReturn,
     textContentParameters,
     rovingTabIndexParameters,
+    singleSelectionParameters,
     ...void1
 }: UseListNavigationSingleSelectionChildParameters<ChildElement, M>): UseListNavigationSingleSelectionChildReturnType<ChildElement, M> {
     monitorCallCount(useListNavigationSingleSelectionChild);
@@ -61,7 +62,8 @@ export function useListNavigationSingleSelectionChild<ChildElement extends Eleme
         ...void9
     } = useSingleSelectionChild<ChildElement, M>({
         info,
-        context
+        context,
+        singleSelectionParameters
     });
 
     const {

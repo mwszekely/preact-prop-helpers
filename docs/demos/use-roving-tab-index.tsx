@@ -8,6 +8,8 @@ function _getDocument() {
     return window.document;
 }
 
+const SelectionModeContext = createContext<"activation" | "focus">("activation");
+const UntabbableContext = createContext(false);
 const ListNavigationSingleSelectionChildContext = createContext<CompleteListNavigationContext<HTMLOListElement, HTMLLIElement, CustomInfoType>>(null!)
 export const DemoUseRovingTabIndex = memo(() => {
 
@@ -23,9 +25,10 @@ export const DemoUseRovingTabIndex = memo(() => {
     if (!isFinite(max ?? NaN))
         max = null!;
 
+    const untabbable = false;
 
     const r: UseCompleteListNavigationDeclarativeReturnType<HTMLOListElement, HTMLLIElement, CustomInfoType> = useCompleteListNavigationDeclarative<HTMLOListElement, HTMLLIElement, CustomInfoType>({
-        rovingTabIndexParameters: { onTabbableIndexChange: null, untabbable: false },
+        rovingTabIndexParameters: { onTabbableIndexChange: null, untabbable },
         singleSelectionDeclarativeParameters: { selectedIndex, setSelectedIndex },
         typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000 },
         linearNavigationParameters: { disableHomeEndKeys: false, arrowKeyDirection: "vertical", navigatePastEnd: "wrap", navigatePastStart: "wrap", pageNavigationSize: 0.1 },
@@ -96,9 +99,12 @@ export const DemoUseRovingTabIndex = memo(() => {
                 <label><input name="rti-demo-selection-mode" type="radio" checked={selectionMode == 'activation'} onInput={e => { e.preventDefault(); setSelectionMode("activation"); }} /> On activation (click, tap, Enter, Space, etc.)</label>
             </label>
 
-            <ListNavigationSingleSelectionChildContext.Provider value={context}>
-                <ol start={0} {...props}>{useRearrangedChildren(jsxChildren)}</ol>
-            </ListNavigationSingleSelectionChildContext.Provider>
+            <UntabbableContext.Provider value={untabbable}>
+                <SelectionModeContext.Provider value={selectionMode}>
+                    <ListNavigationSingleSelectionChildContext.Provider value={context}>
+                        <ol start={0} {...props}>{useRearrangedChildren(jsxChildren)}</ol>
+                    </ListNavigationSingleSelectionChildContext.Provider></SelectionModeContext.Provider>
+            </UntabbableContext.Provider>
             {<div>Typeahead status: {typeaheadStatus}</div>}
         </div>
     );
@@ -135,8 +141,9 @@ const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
         info: { index, focusSelf, foo: "bar", hidden, disabled },
         sortableChildParameters: { getSortValue },
         pressParameters: { onPressSync: null, focusSelf },
-        rovingTabIndexParameters: { untabbable: false },
+        rovingTabIndexParameters: { untabbable: useContext(UntabbableContext) },
         context,
+        singleSelectionParameters: { ariaPropName: "aria-selected", selectionMode: useContext(SelectionModeContext) },
         textContentParameters: { getText: useCallback((e) => { return e?.textContent ?? "" }, []) }
     });
 

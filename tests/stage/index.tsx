@@ -4,12 +4,18 @@ import { TestBasesButton } from "./stage-press.js";
 import { TestBasesListNav } from "./stage-list-nav.js";
 import { TestingConstants } from "./util.js";
 import { TestBasesFocus } from "./stage-focus.js";
+import type { SharedFixtures } from "../fixtures/shared.js";
 
 
 declare module globalThis {
     let installTestingHandler: <K extends keyof TestingConstants, K2 extends keyof TestingConstants[K]>(key: K, Key2: K2, func: TestingConstants[K][K2]) => void;
     let _TestingConstants: TestingConstants;
     let getTestingHandler: <K extends keyof TestingConstants, K2 extends keyof TestingConstants[K]>(key: K, Key2: K2) => TestingConstants[K][K2];
+
+    // TODO: Rename run, both here and in Playwright.
+    // This is here so that both sides can just call run and it just works,
+    // but it should have a different name in that case.
+    let run: SharedFixtures["run"];
 }
 
 
@@ -25,6 +31,7 @@ globalThis.getTestingHandler = function getTestingHandler<K extends keyof Testin
     (globalThis)._TestingConstants[key] ??= {} as any;
     return (globalThis)._TestingConstants[key][Key2] ?? undefined!; // || (noop as never);
 };
+globalThis.run = (key, key2, ...args) => ((globalThis).getTestingHandler?.(key, key2) as Function | null)?.(...(args as any[]));
 
 function noop() { }
 /*

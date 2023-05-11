@@ -1,6 +1,6 @@
 import { UseListNavigationSingleSelectionSortableChildInfo, UseListNavigationSingleSelectionSortableChildParameters, UseListNavigationSingleSelectionSortableChildReturnType, UseListNavigationSingleSelectionSortableParameters, UseListNavigationSingleSelectionSortableReturnType } from "../component-detail/keyboard-navigation/use-list-navigation-single-selection-sortable.js";
-import { RovingTabIndexChildContext, UseRovingTabIndexParameters } from "../component-detail/keyboard-navigation/use-roving-tabindex.js";
-import { MakeSingleSelectionDeclarativeParameters, UseSingleSelectionContext } from "../component-detail/keyboard-navigation/use-single-selection.js";
+import { RovingTabIndexChildContext, UseRovingTabIndexChildParameters } from "../component-detail/keyboard-navigation/use-roving-tabindex.js";
+import { MakeSingleSelectionDeclarativeParameters, UseSingleSelectionChildParameters, UseSingleSelectionContext } from "../component-detail/keyboard-navigation/use-single-selection.js";
 import { UseSortableChildInfo } from "../component-detail/keyboard-navigation/use-sortable-children.js";
 import { UseTypeaheadNavigationContext } from "../component-detail/keyboard-navigation/use-typeahead-navigation.js";
 import { UsePaginatedChildContext, UsePaginatedChildrenInfo, UsePaginatedChildrenParameters, UsePaginatedChildrenReturnType, UsePaginatedChildReturn } from "../component-detail/use-paginated-children.js";
@@ -32,11 +32,17 @@ export interface CompleteListNavigationContext<_ParentElement extends Element, C
 }
 export interface UseCompleteListNavigationChildParameters<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> {
     context: CompleteListNavigationContext<any, ChildElement, M>;
-    pressParameters: OmitStrong<UsePressParameters<any>["pressParameters"], "excludeSpace">;
+    /**
+     * **NOTE**: Unusually, the press parameters are entirely optional.
+     *
+     * Pass `null` as the entire `pressParameters` object to disable default press behavior entirely.
+     */
+    pressParameters: OmitStrong<UsePressParameters<any>["pressParameters"], "excludeSpace"> | null;
     textContentParameters: OmitStrong<UseListNavigationSingleSelectionSortableChildParameters<ChildElement, M>["textContentParameters"], "hidden">;
     info: Omit<M, Exclude<keyof UseCompleteListNavigationChildInfo<ChildElement>, "index" | "focusSelf" | "hidden" | "disabled">>;
     sortableChildParameters: Pick<UseSortableChildInfo, "getSortValue">;
-    rovingTabIndexParameters: Pick<UseRovingTabIndexParameters<any, any, any>["rovingTabIndexParameters"], "untabbable">;
+    rovingTabIndexParameters: UseRovingTabIndexChildParameters<any, any>["rovingTabIndexParameters"];
+    singleSelectionParameters: UseSingleSelectionChildParameters<any, any>["singleSelectionParameters"];
 }
 export interface UseCompleteListNavigationChildReturnType<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends Pick<UsePressReturnType<any>, "pressReturn">, Pick<UseListNavigationSingleSelectionSortableChildReturnType<ChildElement, M>, "textContentReturn" | "rovingTabIndexChildReturn" | "singleSelectionChildReturn">, OmitStrong<UseRefElementReturnType<ChildElement>, "propsStable"> {
     hasCurrentFocusReturn: UseHasCurrentFocusReturnType<ChildElement>["hasCurrentFocusReturn"];
@@ -63,7 +69,7 @@ export interface UseCompleteListNavigationChildReturnType<ChildElement extends E
  * @returns
  */
 export declare function useCompleteListNavigation<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>>({ linearNavigationParameters, rearrangeableChildrenParameters, sortableChildrenParameters, typeaheadNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, paginatedChildrenParameters, staggeredChildrenParameters, ...completeListNavigationParameters }: UseCompleteListNavigationParameters<ParentElement, ChildElement, M>): UseCompleteListNavigationReturnType<ParentElement, ChildElement, M>;
-export declare function useCompleteListNavigationChild<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>>({ info, textContentParameters, context: { childrenHaveFocusChildContext, managedChildContext, rovingTabIndexContext, paginatedChildContext, staggeredChildContext, singleSelectionContext, typeaheadNavigationContext }, sortableChildParameters, pressParameters: { onPressSync, ...pressParameters1 }, rovingTabIndexParameters, ...void1 }: UseCompleteListNavigationChildParameters<ChildElement, M>): UseCompleteListNavigationChildReturnType<ChildElement, M>;
+export declare function useCompleteListNavigationChild<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>>({ info, textContentParameters, context: { childrenHaveFocusChildContext, managedChildContext, rovingTabIndexContext, paginatedChildContext, staggeredChildContext, singleSelectionContext, typeaheadNavigationContext }, sortableChildParameters, pressParameters, rovingTabIndexParameters, singleSelectionParameters, ...void1 }: UseCompleteListNavigationChildParameters<ChildElement, M>): UseCompleteListNavigationChildReturnType<ChildElement, M>;
 export interface UseCompleteListNavigationDeclarativeParameters<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends OmitStrong<MakeSingleSelectionDeclarativeParameters<UseCompleteListNavigationParameters<ParentElement, ChildElement, M>>, "singleSelectionReturn"> {
 }
 export interface UseCompleteListNavigationDeclarativeReturnType<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends OmitTargeted<UseCompleteListNavigationReturnType<ParentElement, ChildElement, M>, "singleSelectionReturn", "changeSelectedIndex"> {

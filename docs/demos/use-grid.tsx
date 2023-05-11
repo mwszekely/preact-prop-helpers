@@ -95,7 +95,8 @@ const DemoUseGridRow = memo((({ index }: { index: number }) => {
 
         linearNavigationParameters: { disableHomeEndKeys: false, navigatePastEnd: "wrap", navigatePastStart: "wrap" },
         rovingTabIndexParameters: { onTabbableIndexChange: useStableCallback((i: number | null) => { setTabbableColumn(i) }), untabbable: false },
-        typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000 }
+        typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000 },
+        singleSelectionParameters: { ariaPropName: "aria-selected", selectionMode: "focus" }
 
     });
 

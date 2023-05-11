@@ -102,7 +102,14 @@ test("Untabbability works", async ({ page, listNav, shared: {  run, install } })
 
 test("Selection", async ({ page, listNav, shared: { run, install } }) => {
     await run("ListNav", "setSelectionMode", "activation");
-    await install("ListNav", "onSelectedIndexChange", async (i) => { await run("ListNav", "setSelectedIndex", i) })
+
+    // Before we install the onSelectedIndexChange handler, there should be no way to activate the list.
+    await listNav.list.locator(`li:nth-child(${1})`).click({ force: true });
+    await expect(listNav.list.locator("[aria-selected=true]").first()).toBeHidden();
+
+
+    // Install the handler and continue normally.
+    await install("ListNav", "onSelectedIndexChange", async (i) => { await run("ListNav", "setSelectedIndex", i) });
     await expect(listNav.list.locator("[aria-selected=true]").first()).toBeHidden();
 
     // Test the first 10 items, some of which have special properties related to selection (being disabled, hidden, etc.)

@@ -8,7 +8,6 @@ import { useState } from "../../preact-extensions/use-state.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
 export function useSingleSelection({ managedChildrenReturn: { getChildren }, rovingTabIndexReturn: { setTabbableIndex }, singleSelectionParameters: { onSelectedIndexChange: onSelectedIndexChange_U, initiallySelectedIndex, ariaPropName, selectionMode } }) {
     monitorCallCount(useSingleSelection);
-    useEnsureStability("useSingleSelection", ariaPropName, selectionMode);
     const onSelectedIndexChange = useStableCallback(onSelectedIndexChange_U ?? noop);
     const getSelectedAt = useCallback((m) => { return m.getSelected(); }, []);
     const setSelectedAt = useCallback((m, t, newSelectedIndex, prevSelectedIndex) => {
@@ -42,8 +41,6 @@ export function useSingleSelection({ managedChildrenReturn: { getChildren }, rov
             singleSelectionContext: useStableObject({
                 getSelectedIndex,
                 onSelectedIndexChange: onSelectedIndexChange,
-                ariaPropName,
-                selectionMode
             }),
         }),
         childrenHaveFocusParameters: {
@@ -59,7 +56,7 @@ export function useSingleSelection({ managedChildrenReturn: { getChildren }, rov
 }
 export function useSingleSelectionChild(args) {
     monitorCallCount(useSingleSelectionChild);
-    const { context: { singleSelectionContext: { ariaPropName, selectionMode, getSelectedIndex, onSelectedIndexChange } }, info: { index, disabled } } = args;
+    const { context: { singleSelectionContext: { getSelectedIndex, onSelectedIndexChange } }, info: { index, disabled }, singleSelectionParameters: { ariaPropName, selectionMode }, } = args;
     useEnsureStability("useSingleSelectionChild", getSelectedIndex, onSelectedIndexChange);
     const getDisabled = useStableGetter(disabled);
     const [localSelected, setLocalSelected, getLocalSelected] = useState(getSelectedIndex() == index);

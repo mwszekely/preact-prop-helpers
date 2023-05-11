@@ -86,9 +86,10 @@ export function useCompleteListNavigation({ linearNavigationParameters, rearrang
         childrenHaveFocusReturn
     };
 }
-export function useCompleteListNavigationChild({ info, textContentParameters, context: { childrenHaveFocusChildContext, managedChildContext, rovingTabIndexContext, paginatedChildContext, staggeredChildContext, singleSelectionContext, typeaheadNavigationContext }, sortableChildParameters, pressParameters: { onPressSync, ...pressParameters1 }, rovingTabIndexParameters, ...void1 }) {
+export function useCompleteListNavigationChild({ info, textContentParameters, context: { childrenHaveFocusChildContext, managedChildContext, rovingTabIndexContext, paginatedChildContext, staggeredChildContext, singleSelectionContext, typeaheadNavigationContext }, sortableChildParameters, pressParameters, rovingTabIndexParameters, singleSelectionParameters, ...void1 }) {
     monitorCallCount(useCompleteListNavigationChild);
     assertEmptyObject(void1);
+    const { onPressSync, ...pressParameters1 } = (pressParameters ?? {});
     let { index, focusSelf, hidden, disabled } = info;
     const { info: mcp3, paginatedChildReturn, paginatedChildReturn: { hideBecausePaginated }, props: paginationProps } = usePaginatedChild({ info: { index }, context: { paginatedChildContext } });
     const { info: mcp4, staggeredChildReturn, staggeredChildReturn: { hideBecauseStaggered }, props: staggeredProps } = useStaggeredChild({ info, context: { staggeredChildContext } });
@@ -101,13 +102,19 @@ export function useCompleteListNavigationChild({ info, textContentParameters, co
         context: { rovingTabIndexContext, singleSelectionContext, typeaheadNavigationContext },
         refElementReturn,
         textContentParameters: { hidden, ...textContentParameters },
-        rovingTabIndexParameters
+        rovingTabIndexParameters,
+        singleSelectionParameters
     });
-    const onPress = useStableCallback((e) => { singleSelectionChildReturn.setThisOneSelected(e); });
+    const onPress = useStableCallback((e) => {
+        if (singleSelectionParameters.selectionMode == "activation")
+            singleSelectionContext.onSelectedIndexChange?.(index, e);
+        onPressSync?.(e);
+    });
     const { propsStable: pressRefProps, refElementReturn: pressRefElementReturn } = useRefElement({ refElementParameters: {} });
     const { pressReturn, props: pressProps } = usePress({
         refElementReturn: pressRefElementReturn,
         pressParameters: {
+            focusSelf,
             ...pressParameters1,
             ...pressParameters2,
             onPressSync: (rovingTabIndexParameters.untabbable || info.disabled || info.hidden) ? null : onPress,

@@ -65,7 +65,7 @@ export interface UseSingleSelectionParameters<ParentOrChildElement extends Eleme
         /**
          * What property will be used to mark this item as selected.
          * 
-         * **importANT**: The `aria-current` options should be used with caution as they are semantically very different from the usual selection cases.
+         * **IMPORTANT**: The `aria-current` options should be used with caution as they are semantically very different from the usual selection cases.
          */
         ariaPropName: `aria-${"pressed" | "selected" | "checked" | `current-${"page" | "step" | "date" | "time" | "location" | "true"}`}` | null;
 
@@ -77,6 +77,7 @@ export type UseSingleSelectionChildInfoKeys = "index" | "disabled";
 export interface UseSingleSelectionChildParameters<E extends Element, M extends UseSingleSelectionChildInfo<E>> {
     context:UseSingleSelectionContext;
     info: Pick<UseSingleSelectionChildInfo<E>, UseSingleSelectionChildInfoKeys>;
+    singleSelectionParameters: Pick<UseSingleSelectionParameters<any, E, M>["singleSelectionParameters"], "ariaPropName" | "selectionMode">;
 }
 
 export interface UseSingleSelectionChildReturnType<E extends Element> extends UseChildrenHaveFocusChildReturnType<E> {
@@ -127,7 +128,7 @@ export interface UseSingleSelectionContext {
     singleSelectionContext: {
         onSelectedIndexChange: UseSingleSelectionParameters<any, any, any>["singleSelectionParameters"]["onSelectedIndexChange"];
         getSelectedIndex(): number | null;
-    } & Pick<UseSingleSelectionParameters<any, any, any>["singleSelectionParameters"], "ariaPropName" | "selectionMode">
+    }
 }
 
 
@@ -137,7 +138,6 @@ export function useSingleSelection<ParentOrChildElement extends Element, ChildEl
     singleSelectionParameters: { onSelectedIndexChange: onSelectedIndexChange_U, initiallySelectedIndex, ariaPropName, selectionMode }
 }: UseSingleSelectionParameters<ParentOrChildElement, ChildElement, M>): UseSingleSelectionReturnType<ChildElement, M> {
     monitorCallCount(useSingleSelection);
-    useEnsureStability("useSingleSelection", ariaPropName, selectionMode);
 
     type R = Event;
     const onSelectedIndexChange = useStableCallback(onSelectedIndexChange_U ?? noop);
@@ -179,8 +179,6 @@ export function useSingleSelection<ParentOrChildElement extends Element, ChildEl
             singleSelectionContext: useStableObject({
                 getSelectedIndex,
                 onSelectedIndexChange: onSelectedIndexChange,
-                ariaPropName,
-                selectionMode
             }),
         }),
         childrenHaveFocusParameters: {
@@ -200,8 +198,9 @@ export function useSingleSelectionChild<ChildElement extends Element, M extends 
     monitorCallCount(useSingleSelectionChild);
     type R = Event;
     const {
-        context: { singleSelectionContext: { ariaPropName, selectionMode, getSelectedIndex, onSelectedIndexChange } },
-        info: { index, disabled }
+        context: { singleSelectionContext: { getSelectedIndex, onSelectedIndexChange } },
+        info: { index, disabled },
+        singleSelectionParameters: {ariaPropName, selectionMode },
     } = args;
 
     useEnsureStability("useSingleSelectionChild", getSelectedIndex, onSelectedIndexChange);

@@ -3,8 +3,8 @@ import { useCallback } from "preact/hooks";
 import { UseGridNavigationCellContext, UseGridNavigationRowContext } from "../component-detail/keyboard-navigation/use-grid-navigation-partial.js";
 import { GridSingleSelectSortableChildCellInfo, GridSingleSelectSortableChildRowInfo, UseGridNavigationSingleSelectionSortableCellReturnType, UseGridNavigationSingleSelectionSortableParameters, UseGridNavigationSingleSelectionSortableReturnType, UseGridNavigationSingleSelectionSortableRowParameters, UseGridNavigationSingleSelectionSortableRowReturnType, useGridNavigationSingleSelectionSortable } from "../component-detail/keyboard-navigation/use-grid-navigation-single-selection-sortable.js";
 import { UseGridNavigationSingleSelectionCellParameters, UseGridNavigationSingleSelectionParameters, UseGridNavigationSingleSelectionRowReturnType, useGridNavigationSingleSelectionCell, useGridNavigationSingleSelectionRow } from "../component-detail/keyboard-navigation/use-grid-navigation-single-selection.js";
-import { RovingTabIndexChildContext } from "../component-detail/keyboard-navigation/use-roving-tabindex.js";
-import { MakeSingleSelectionDeclarativeParameters, UseSingleSelectionContext, useSingleSelectionDeclarative } from "../component-detail/keyboard-navigation/use-single-selection.js";
+import { RovingTabIndexChildContext, UseRovingTabIndexChildParameters, UseRovingTabIndexParameters } from "../component-detail/keyboard-navigation/use-roving-tabindex.js";
+import { MakeSingleSelectionDeclarativeParameters, UseSingleSelectionChildParameters, UseSingleSelectionContext, useSingleSelectionDeclarative } from "../component-detail/keyboard-navigation/use-single-selection.js";
 import { UseSortableChildInfo } from "../component-detail/keyboard-navigation/use-sortable-children.js";
 import { UseTypeaheadNavigationContext } from "../component-detail/keyboard-navigation/use-typeahead-navigation.js";
 import { UsePaginatedChildContext, UsePaginatedChildReturn, UsePaginatedChildrenInfo, UsePaginatedChildrenParameters, UsePaginatedChildrenReturnType, usePaginatedChild, usePaginatedChildren } from "../component-detail/use-paginated-children.js";
@@ -16,9 +16,9 @@ import { UseHasCurrentFocusReturnType, useHasCurrentFocus } from "../observers/u
 import { ManagedChildren, UseManagedChildReturnType, UseManagedChildrenContext, UseManagedChildrenReturnType, useManagedChild, useManagedChildren } from "../preact-extensions/use-managed-children.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useStableObject } from "../preact-extensions/use-stable-getter.js";
+import { assertEmptyObject } from "../util/assert.js";
 import { ElementProps, OmitStrong, OmitTargeted } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
-
 export interface UseCompleteGridNavigationRowInfo<RowElement extends Element, CellElement extends Element> extends GridSingleSelectSortableChildRowInfo<RowElement, CellElement>, UsePaginatedChildrenInfo<RowElement>, UseStaggeredChildrenInfo<RowElement> { }
 export interface UseCompleteGridNavigationCellInfo<CellElement extends Element> extends GridSingleSelectSortableChildCellInfo<CellElement> { }
 
@@ -42,8 +42,10 @@ export interface UseCompleteGridNavigationRowParameters<RowElement extends Eleme
 
     linearNavigationParameters: OmitStrong<UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM>["linearNavigationParameters"], "getHighestIndex" | "pageNavigationSize" | "isValid" | "indexMangler" | "indexDemangler">;
     typeaheadNavigationParameters: OmitStrong<UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM>["typeaheadNavigationParameters"], "isValid">;
-    rovingTabIndexParameters: OmitStrong<UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM>["rovingTabIndexParameters"], "initiallyTabbedIndex">;
+    //rovingTabIndexParameters: OmitStrong<UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM>["rovingTabIndexParameters"], "initiallyTabbedIndex">;
 
+    rovingTabIndexParameters: UseRovingTabIndexParameters<RowElement, CellElement, CM>["rovingTabIndexParameters"] | UseRovingTabIndexChildParameters<RowElement, RM>["rovingTabIndexParameters"];
+    singleSelectionParameters: UseSingleSelectionChildParameters<any, any>["singleSelectionParameters"];
 }
 
 export interface UseCompleteGridNavigationCellParameters<CellElement extends Element, CM extends UseCompleteGridNavigationCellInfo<CellElement>> extends
@@ -53,6 +55,9 @@ export interface UseCompleteGridNavigationCellParameters<CellElement extends Ele
     info: Omit<CM, Exclude<keyof UseCompleteGridNavigationCellInfo<CellElement>, "index" | "hidden" | "focusSelf">>;
     //completeGridNavigationCellParameters: Pick<CM, "focusSelf"> & OmitStrong<CM, keyof UseCompleteGridNavigationCellInfo<CellElement>>;
     context: CompleteGridNavigationCellContext<any, CellElement, CM>;
+    
+    rovingTabIndexParameters: UseRovingTabIndexChildParameters<any, any>["rovingTabIndexParameters"];
+    //singleSelectionParameters: UseSingleSelectionChildParameters<any, any>["singleSelectionParameters"];
 }
 
 
@@ -203,7 +208,8 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
     linearNavigationParameters,
     rovingTabIndexParameters,
     typeaheadNavigationParameters,
-    sortableChildParameters
+    sortableChildParameters,
+    singleSelectionParameters
 
 }: UseCompleteGridNavigationRowParameters<RowElement, CellElement, RM, CM>): UseCompleteGridNavigationRowReturnType<RowElement, CellElement, RM, CM> {
     monitorCallCount(useCompleteGridNavigationRow);
@@ -246,6 +252,7 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
         context: contextIncomingForRowAsChildOfTable,
         info,
         textContentParameters: { hidden: info.hidden, ...textContentParameters },
+        singleSelectionParameters
     });
 
     const {
@@ -321,9 +328,11 @@ export function useCompleteGridNavigationCell<CellElement extends Element, CM ex
     context: { gridNavigationCellContext, managedChildContext, rovingTabIndexContext, typeaheadNavigationContext },
     textContentParameters,
     rovingTabIndexParameters,
-    info
+    info,
+    ...void1
 }: UseCompleteGridNavigationCellParameters<CellElement, CM>): UseCompleteGridNavigationCellReturnType<CellElement, CM> {
     monitorCallCount(useCompleteGridNavigationCell);
+    assertEmptyObject(void1);
 
     const { refElementReturn, propsStable } = useRefElement<CellElement>({ refElementParameters: {} });
 
@@ -340,7 +349,7 @@ export function useCompleteGridNavigationCell<CellElement extends Element, CM ex
         context: { gridNavigationCellContext, rovingTabIndexContext, typeaheadNavigationContext },
         refElementReturn,
         textContentParameters: { hidden: info.hidden, ...textContentParameters },
-        rovingTabIndexParameters
+        rovingTabIndexParameters,
     });
 
     const { hasCurrentFocusReturn } = useHasCurrentFocus<CellElement>({ hasCurrentFocusParameters: { onCurrentFocusedChanged: null, ...hasCurrentFocusParameters }, refElementReturn });

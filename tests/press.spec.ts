@@ -6,7 +6,7 @@ import { test } from "./fixtures/press.js"
 const buttonTypes = ["button", "div"] as const;
 
 test.describe("Press events", () => {
-    const eventTypes = ["Clicking a ", "Pressing Enter on a ", "Releasing the spacebar on a "] as const;
+    const eventTypes = ["Clicking a", "Pressing Enter on a", "Releasing the spacebar on a"] as const;
 
     // We're testing presses on <button>s and <div>s
     for (const buttonType of buttonTypes) {
@@ -46,12 +46,12 @@ test.describe("Press events", () => {
                 expect(getCounter(), "We haven't clicked the button, so the counter should still be 0").toBe(0);
 
                 switch (eventType) {
-                    case "Clicking a ":
+                    case "Clicking a":
                         // We click a button and press occurs immediately
                         await button.click({ force: true });
                         expect(getCounter()).toBe(1);
                         break;
-                    case "Pressing Enter on a ":
+                    case "Pressing Enter on a":
                         // We press Enter on a button and press occurs immediately
                         await button.focus();
                         await page.keyboard.down("Enter");
@@ -59,7 +59,7 @@ test.describe("Press events", () => {
                         await page.keyboard.up("Enter");
                         expect(getCounter()).toBe(1);
                         break;
-                    case "Releasing the spacebar on a ":
+                    case "Releasing the spacebar on a":
                         // We press the spacebar on a button and press occurs on key up
                         await button.focus();
                         await page.keyboard.down("Space");

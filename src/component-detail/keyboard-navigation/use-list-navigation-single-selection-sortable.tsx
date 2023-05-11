@@ -54,6 +54,7 @@ export function useListNavigationSingleSelectionSortableChild<ChildElement exten
     refElementReturn,
     textContentParameters,
     rovingTabIndexParameters,
+    singleSelectionParameters,
     ...void1
 }: UseListNavigationSingleSelectionSortableChildParameters<ChildElement, M>): UseListNavigationSingleSelectionSortableChildReturnType<ChildElement, M> {
     monitorCallCount(useListNavigationSingleSelectionSortableChild);
@@ -65,5 +66,6 @@ export function useListNavigationSingleSelectionSortableChild<ChildElement exten
         refElementReturn,
         textContentParameters,
         rovingTabIndexParameters,
+        singleSelectionParameters,
     });
 }

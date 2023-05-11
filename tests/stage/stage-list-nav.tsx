@@ -35,6 +35,8 @@ export function TestBasesListNav() {
     return (<TestBasesListNavImpl />);
 }
 
+const AriaPropNameContext = createContext("aria-selected" as UseSingleSelectionParameters<any, any, any>["singleSelectionParameters"]["ariaPropName"]);
+const SelectionModeContext = createContext("activation" as UseSingleSelectionParameters<any, any, any>["singleSelectionParameters"]["selectionMode"]);
 function TestBasesListNavImpl() {
     const childCount = useTestSyncState("ListNav", "setChildCount", 10);
     const arrowKeyDirection = useTestSyncState("ListNav", "setArrowKeyDirection", "vertical");
@@ -51,18 +53,18 @@ function TestBasesListNavImpl() {
     const selectionMode = useTestSyncState("ListNav", "setSelectionMode", "activation");
     const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
-    let u = useRef(false);
+    installTestingHandler("ListNav", "setSelectedIndex", setSelectedIndex);
+
+    /*let u = useRef(false);
     useEffect(() => {
         window.addEventListener("keydown", e => {
             if (e.code == "Escape") {
                 getTestingHandler("ListNav", "setUntabbable")(u.current = !u.current);
             }
         })
-    }, [])
+    }, [])*/
 
     console.log(untabbable);
-
-    installTestingHandler("ListNav", "setSelectedIndex", setSelectedIndex);
 
     const [t, setT] = useState<number | null>(null);
     const {
@@ -84,21 +86,32 @@ function TestBasesListNavImpl() {
         rearrangeableChildrenParameters: { getIndex: useCallback(info => info.props.index, []) },
         rovingTabIndexParameters: { untabbable, onTabbableIndexChange: setT },
         singleSelectionParameters: { ariaPropName, selectionMode },
-        singleSelectionDeclarativeParameters: { selectedIndex, setSelectedIndex: ((i, e) => { setSelectedIndex(i); /*getTestingHandler("ListNav", "onSelectedIndexChange")?.(i!, e!);*/ }) },
+        singleSelectionDeclarativeParameters: {
+            selectedIndex, setSelectedIndex: ((i, e) => {
+                console.log("TEST");
+                const f = getTestingHandler("ListNav", "onSelectedIndexChange");
+                console.log(f, i, e);
+                f?.(i!, e!);
+            })
+        },
         sortableChildrenParameters: { compare: useCallback<Compare<UseCompleteListNavigationChildInfo<HTMLLIElement>>>((lhs, rhs) => { return (lhs.getSortValue() as number) - (rhs.getSortValue() as number) }, []) },
         staggeredChildrenParameters: { staggered },
         typeaheadNavigationParameters: { collator: null, noTypeahead, typeaheadTimeout }
     });
 
     return (
-        <UntabbableContext.Provider value={untabbable}>
-            <Context.Provider value={context}>
-                {untabbable.toString()}, {t}
-                <ol role="toolbar" data-still-staggering={stillStaggering} data-typeahead-status={typeaheadStatus} {...props}>
-                    <TestBasesListNavChildren count={childCount} />
-                </ol>
-            </Context.Provider>
-        </UntabbableContext.Provider>
+        <AriaPropNameContext.Provider value={ariaPropName}>
+            <SelectionModeContext.Provider value={selectionMode}>
+                <UntabbableContext.Provider value={untabbable}>
+                    <Context.Provider value={context}>
+                        {untabbable.toString()}, {t}
+                        <ol role="toolbar" data-still-staggering={stillStaggering} data-typeahead-status={typeaheadStatus} {...props}>
+                            <TestBasesListNavChildren count={childCount} />
+                        </ol>
+                    </Context.Provider>
+                </UntabbableContext.Provider>
+            </SelectionModeContext.Provider>
+        </AriaPropNameContext.Provider>
     )
 }
 
@@ -157,7 +170,8 @@ function TestBasesListNavChild({ index }: { index: number }) {
         },
         rovingTabIndexParameters: { untabbable: useContext(UntabbableContext) },
         sortableChildParameters: { getSortValue: getTextContent },
-        textContentParameters: { getText: getTextContent }
+        textContentParameters: { getText: getTextContent },
+        singleSelectionParameters: { ariaPropName: useContext(AriaPropNameContext), selectionMode: useContext(SelectionModeContext) },
     })
     return (
         <>

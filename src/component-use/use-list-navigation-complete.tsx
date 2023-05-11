@@ -1,8 +1,8 @@
 import { useCallback } from "preact/hooks";
 import { useListNavigationSingleSelectionSortable, UseListNavigationSingleSelectionSortableChildInfo, UseListNavigationSingleSelectionSortableChildParameters, UseListNavigationSingleSelectionSortableChildReturnType, UseListNavigationSingleSelectionSortableParameters, UseListNavigationSingleSelectionSortableReturnType } from "../component-detail/keyboard-navigation/use-list-navigation-single-selection-sortable.js";
 import { useListNavigationSingleSelectionChild } from "../component-detail/keyboard-navigation/use-list-navigation-single-selection.js";
-import { RovingTabIndexChildContext, UseRovingTabIndexParameters } from "../component-detail/keyboard-navigation/use-roving-tabindex.js";
-import { MakeSingleSelectionDeclarativeParameters, UseSingleSelectionContext, useSingleSelectionDeclarative } from "../component-detail/keyboard-navigation/use-single-selection.js";
+import { RovingTabIndexChildContext, UseRovingTabIndexChildParameters } from "../component-detail/keyboard-navigation/use-roving-tabindex.js";
+import { MakeSingleSelectionDeclarativeParameters, UseSingleSelectionChildParameters, UseSingleSelectionContext, useSingleSelectionDeclarative } from "../component-detail/keyboard-navigation/use-single-selection.js";
 import { UseSortableChildInfo } from "../component-detail/keyboard-navigation/use-sortable-children.js";
 import { UseTypeaheadNavigationContext } from "../component-detail/keyboard-navigation/use-typeahead-navigation.js";
 import { usePaginatedChild, UsePaginatedChildContext, usePaginatedChildren, UsePaginatedChildrenInfo, UsePaginatedChildrenParameters, UsePaginatedChildrenReturnType, UsePaginatedChildReturn } from "../component-detail/use-paginated-children.js";
@@ -57,11 +57,17 @@ export interface CompleteListNavigationContext<_ParentElement extends Element, C
 
 export interface UseCompleteListNavigationChildParameters<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> {
     context: CompleteListNavigationContext<any, ChildElement, M>;
-    pressParameters: OmitStrong<UsePressParameters<any>["pressParameters"], "excludeSpace">,
+    /**
+     * **NOTE**: Unusually, the press parameters are entirely optional.  
+     * 
+     * Pass `null` as the entire `pressParameters` object to disable default press behavior entirely.
+     */
+    pressParameters: OmitStrong<UsePressParameters<any>["pressParameters"], "excludeSpace"> | null,
     textContentParameters: OmitStrong<UseListNavigationSingleSelectionSortableChildParameters<ChildElement, M>["textContentParameters"], "hidden">;
     info: Omit<M, Exclude<keyof UseCompleteListNavigationChildInfo<ChildElement>, "index" | "focusSelf" | "hidden" | "disabled">>;
     sortableChildParameters: Pick<UseSortableChildInfo, "getSortValue">;
-    rovingTabIndexParameters: Pick<UseRovingTabIndexParameters<any, any, any>["rovingTabIndexParameters"], "untabbable">;
+    rovingTabIndexParameters: UseRovingTabIndexChildParameters<any, any>["rovingTabIndexParameters"];
+    singleSelectionParameters: UseSingleSelectionChildParameters<any, any>["singleSelectionParameters"];
 }
 
 export interface UseCompleteListNavigationChildReturnType<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>>
@@ -188,12 +194,14 @@ export function useCompleteListNavigationChild<ChildElement extends Element, M e
     textContentParameters,
     context: { childrenHaveFocusChildContext, managedChildContext, rovingTabIndexContext, paginatedChildContext, staggeredChildContext, singleSelectionContext, typeaheadNavigationContext },
     sortableChildParameters,
-    pressParameters: { onPressSync, ...pressParameters1 },
+    pressParameters,
     rovingTabIndexParameters,
+    singleSelectionParameters,
     ...void1
 }: UseCompleteListNavigationChildParameters<ChildElement, M>): UseCompleteListNavigationChildReturnType<ChildElement, M> {
     monitorCallCount(useCompleteListNavigationChild);
     assertEmptyObject(void1);
+    const { onPressSync, ...pressParameters1 } = (pressParameters ?? {});
 
     let { index, focusSelf, hidden, disabled } = info;
     const { info: mcp3, paginatedChildReturn, paginatedChildReturn: { hideBecausePaginated }, props: paginationProps } = usePaginatedChild<ChildElement>({ info: { index }, context: { paginatedChildContext } })
@@ -218,9 +226,14 @@ export function useCompleteListNavigationChild<ChildElement extends Element, M e
         context: { rovingTabIndexContext, singleSelectionContext, typeaheadNavigationContext },
         refElementReturn,
         textContentParameters: { hidden, ...textContentParameters },
-        rovingTabIndexParameters
+        rovingTabIndexParameters,
+        singleSelectionParameters
     });
-    const onPress = useStableCallback((e: PressEventReason<any>) => { singleSelectionChildReturn.setThisOneSelected(e) });
+    const onPress = useStableCallback((e: PressEventReason<any>) => {
+        if (singleSelectionParameters.selectionMode == "activation")
+            singleSelectionContext.onSelectedIndexChange?.(index, e);
+        onPressSync?.(e);
+    });
     const { propsStable: pressRefProps, refElementReturn: pressRefElementReturn } = useRefElement<any>({ refElementParameters: {} })
     const {
         pressReturn,
@@ -228,6 +241,7 @@ export function useCompleteListNavigationChild<ChildElement extends Element, M e
     } = usePress({
         refElementReturn: pressRefElementReturn,
         pressParameters: {
+            focusSelf,
             ...pressParameters1,
             ...pressParameters2,
             onPressSync: (rovingTabIndexParameters.untabbable || info.disabled || info.hidden) ? null : onPress,

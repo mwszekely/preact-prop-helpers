@@ -33,7 +33,6 @@ export const test = base.extend<{ shared: SharedFixtures }>({
             },
             run: async function run<K extends keyof TestingConstants, K2 extends keyof TestingConstants[K]>(key: K, Key2: K2, ...args: TestingConstants[K][K2] extends (...args: any) => any ? Parameters<TestingConstants[K][K2]> : never): Promise<TestingConstants[K][K2] extends (...args: any) => any ? ReturnType<TestingConstants[K][K2]> : never> {
                 return await page.evaluate(async ([key, Key2, ...args]: any[] | any) => {
-                    // getTestingHandler is globally in scope on the testing page
                     const handler = getTestingHandler<K, K2>(key, Key2) as (TestingConstants[K][K2] & Function);
                     return await handler(...(args as [any, any]));
                 }, [key, Key2, ...args] as const);
@@ -43,7 +42,7 @@ export const test = base.extend<{ shared: SharedFixtures }>({
     }
 })
 
-interface SharedFixtures {
+export interface SharedFixtures {
 
     generateText(childIndex: number): string;
     
