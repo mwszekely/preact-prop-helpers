@@ -60,6 +60,6 @@ export { assertEmptyObject } from "./util/assert.js";
 export { focus } from "./util/focus.js";
 export { getBuildMode } from "./util/mode.js";
 export { generateRandomId } from "./util/random-id.js";
-export type { CSSProperties, CompositionEventType, ElementProps, EventType, FocusEventType, KeyboardEventType, MouseEventType, PointerEventType, Ref, RefCallback, RefObject, TouchEventType, VNode } from "./util/types.js";
+export type { OmitStrong, ExtendMerge, CSSProperties, CompositionEventType, ElementProps, EventType, FocusEventType, KeyboardEventType, MouseEventType, PointerEventType, Ref, RefCallback, RefObject, TouchEventType, VNode } from "./util/types.js";
 export { hideCallCount, monitorCallCount } from "./util/use-call-count.js";
 //# sourceMappingURL=index.d.ts.map
