@@ -1,5 +1,5 @@
 import { useCallback, useRef } from "preact/hooks";
-import { ManagedChildInfo } from "../../index.js";
+import { ManagedChildInfo } from "../../preact-extensions/use-managed-children.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { ElementProps, OmitStrong } from "../../util/types.js";
@@ -20,9 +20,9 @@ export interface UseLinearNavigationReturnType<ParentOrChildElement extends Elem
 export interface UseLinearNavigationChildInfo<ChildElement extends Element> extends ManagedChildInfo<number> {}
 
 /** Arguments passed to the parent `useLinearNavigation` */
-export interface UseLinearNavigationParameters<_ParentOrChildElement extends Element, ChildElement extends Element, _M extends UseLinearNavigationChildInfo<ChildElement>> {
+export interface UseLinearNavigationParameters<ParentOrChildElement extends Element, ChildElement extends Element, _M extends UseLinearNavigationChildInfo<ChildElement>> {
 
-    rovingTabIndexReturn: Pick<UseRovingTabIndexReturnType<ChildElement, UseRovingTabIndexChildInfo<ChildElement>>["rovingTabIndexReturn"], "getTabbableIndex" | "setTabbableIndex">;
+    rovingTabIndexReturn: Pick<UseRovingTabIndexReturnType<ParentOrChildElement, ChildElement, UseRovingTabIndexChildInfo<ChildElement>>["rovingTabIndexReturn"], "getTabbableIndex" | "setTabbableIndex">;
 
     linearNavigationParameters: {
 

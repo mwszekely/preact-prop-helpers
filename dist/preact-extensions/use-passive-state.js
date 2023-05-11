@@ -56,6 +56,7 @@ export function debounceRendering(f) {
  */
 export function usePassiveState(onChange, getInitialValue, customDebounceRendering) {
     monitorCallCount(usePassiveState);
+    //let [id, ,getId] = useState(() => generateRandomId());
     const valueRef = useRef(Unset);
     const reasonRef = useRef(Unset);
     const warningRef = useRef(false);
@@ -104,7 +105,9 @@ export function usePassiveState(onChange, getInitialValue, customDebounceRenderi
     const setValue = useCallback((arg, reason) => {
         // Regardless of anything else, figure out what our next value is about to be.
         const nextValue = (arg instanceof Function ? arg(valueRef.current === Unset ? undefined : valueRef.current) : arg);
-        if (dependencyToCompareAgainst.current === Unset && nextValue !== valueRef.current) {
+        //let id = getId();
+        //console.log((nextValue !== valueRef.current? "" : "NOT ") + "Scheduling effect ", id, " with value ", nextValue);
+        if ( /*dependencyToCompareAgainst.current === Unset &&*/nextValue !== valueRef.current) {
             // This is the first request to change this value.
             // Evaluate the request immediately, then queue up the onChange function
             // Save our current value so that we can compare against it later
@@ -118,13 +121,18 @@ export function usePassiveState(onChange, getInitialValue, customDebounceRenderi
                 const nextReason = reasonRef.current;
                 const nextDep = valueRef.current;
                 const prevDep = dependencyToCompareAgainst.current;
+                //let id = getId();
+                //console.log(((dependencyToCompareAgainst.current != valueRef.current)? "" : "NOT ") + "Running effect ", id, " with value ", nextDep);
                 if (dependencyToCompareAgainst.current != valueRef.current) {
+                    // TODO: This needs to happen here in order to make recursive onChanges work
+                    // but it feels better to have it happen after onChange...
+                    valueRef.current = dependencyToCompareAgainst.current = Unset;
                     warningRef.current = true;
                     try {
                         // Call any registered cleanup function
                         onShouldCleanUp();
+                        valueRef.current = nextDep; // Needs to happen before onChange in case onChange is recursive (e.g. focusing causing a focus causing a focus)
                         cleanupCallbackRef.current = (onChange?.(nextDep, prevDep === Unset ? undefined : prevDep, nextReason) ?? undefined);
-                        valueRef.current = nextDep;
                     }
                     finally {
                         // Allow the user to normally call getValue again
@@ -137,7 +145,7 @@ export function usePassiveState(onChange, getInitialValue, customDebounceRenderi
         }
         // Update the value immediately.
         // This will be checked against prevDep to see if we should actually call onChange
-        valueRef.current = nextValue;
+        //valueRef.current = nextValue;
     }, []);
     return [getValue, setValue];
 }

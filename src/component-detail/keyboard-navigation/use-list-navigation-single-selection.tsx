@@ -8,7 +8,7 @@ import { UseListNavigationChildInfo, UseListNavigationChildParameters, UseListNa
 import { UseSingleSelectionChildInfo, UseSingleSelectionChildParameters, UseSingleSelectionChildReturnType, UseSingleSelectionContext, UseSingleSelectionParameters, UseSingleSelectionReturnType, useSingleSelection, useSingleSelectionChild } from "./use-single-selection.js";
 
 export interface UseListNavigationSingleSelectionChildInfo<TabbableChildElement extends Element> extends UseListNavigationChildInfo<TabbableChildElement>, UseSingleSelectionChildInfo<TabbableChildElement> { }
-export interface UseListNavigationSingleSelectionParameters<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationSingleSelectionChildInfo<ChildElement>> extends ExtendMerge<UseListNavigationParameters<ParentOrChildElement, ChildElement, M>, OmitStrong<UseSingleSelectionParameters<ChildElement, M>, "rovingTabIndexReturn">> { }
+export interface UseListNavigationSingleSelectionParameters<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationSingleSelectionChildInfo<ChildElement>> extends ExtendMerge<UseListNavigationParameters<ParentOrChildElement, ChildElement, M>, OmitStrong<UseSingleSelectionParameters<ParentOrChildElement, ChildElement, M>, "rovingTabIndexReturn">> { }
 export interface UseListNavigationSingleSelectionReturnType<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationSingleSelectionChildInfo<ChildElement>> extends ExtendMerge<UseListNavigationReturnType<ParentOrChildElement, ChildElement, M>, UseSingleSelectionReturnType<ChildElement, M>> { }
 export interface UseListNavigationSingleSelectionChildContext extends UseListNavigationContext, UseSingleSelectionContext { }
 export interface UseListNavigationSingleSelectionChildParameters<ChildElement extends Element, M extends UseListNavigationSingleSelectionChildInfo<ChildElement>> extends ExtendMerge<UseListNavigationChildParameters<ChildElement, M>, UseSingleSelectionChildParameters<ChildElement, M>> { }
@@ -20,11 +20,12 @@ export function useListNavigationSingleSelection<ParentOrChildElement extends El
     typeaheadNavigationParameters,
     singleSelectionParameters,
     managedChildrenReturn,
+    refElementReturn,
     ...void3
 }: UseListNavigationSingleSelectionParameters<ParentOrChildElement, ChildElement, M>): UseListNavigationSingleSelectionReturnType<ParentOrChildElement, ChildElement, M> {
     monitorCallCount(useListNavigationSingleSelection);
-    const { context: contextLN, propsStable, rovingTabIndexReturn, ...retLN } = useListNavigation<ParentOrChildElement, ChildElement, M>({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, managedChildrenReturn });
-    const { context: contextSS, ...retSS } = useSingleSelection<ChildElement, M>({ rovingTabIndexReturn, managedChildrenReturn, singleSelectionParameters });
+    const { context: contextLN, propsParent, propsStableParentOrChild, rovingTabIndexReturn, ...retLN } = useListNavigation<ParentOrChildElement, ChildElement, M>({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, managedChildrenReturn, refElementReturn });
+    const { context: contextSS, ...retSS } = useSingleSelection<ParentOrChildElement, ChildElement, M>({ rovingTabIndexReturn, managedChildrenReturn, singleSelectionParameters });
 
     assertEmptyObject(void3);
 
@@ -36,7 +37,8 @@ export function useListNavigationSingleSelection<ParentOrChildElement extends El
             ...contextLN,
             ...contextSS
         }),
-        propsStable
+        propsParent, 
+        propsStableParentOrChild
     }
 }
 
@@ -46,6 +48,7 @@ export function useListNavigationSingleSelectionChild<ChildElement extends Eleme
     context,
     refElementReturn,
     textContentParameters,
+    rovingTabIndexParameters,
     ...void1
 }: UseListNavigationSingleSelectionChildParameters<ChildElement, M>): UseListNavigationSingleSelectionChildReturnType<ChildElement, M> {
     monitorCallCount(useListNavigationSingleSelectionChild);
@@ -73,7 +76,8 @@ export function useListNavigationSingleSelectionChild<ChildElement extends Eleme
         info,
         context,
         refElementReturn,
-        textContentParameters
+        textContentParameters,
+        rovingTabIndexParameters
     });
 
     assertEmptyObject(void1);

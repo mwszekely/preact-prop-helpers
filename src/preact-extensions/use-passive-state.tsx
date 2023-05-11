@@ -2,6 +2,8 @@ import { options } from "preact";
 import { useCallback, useLayoutEffect, useRef } from "preact/hooks";
 import { getBuildMode } from "../util/mode.js";
 import { monitorCallCount } from "../util/use-call-count.js";
+import { generateRandomId } from "../util/random-id.js";
+import { useState } from "./use-state.js";
 
 /** Takes a new value or a function that updates a value, unlike `OnPassiveStateChange` which reacts to those updates */
 export type PassiveStateUpdater<S, R> = ((value: S | ((prevState: S | undefined) => S), reason?: R) => void);//[R] extends [never]? ((value: S | ((prevState: S | undefined) => S), reason?: R) => void) : ((value: S | ((prevState: S | undefined) => S), reason: R) => void);
@@ -71,6 +73,7 @@ export function debounceRendering(f: () => void) {
  */
 export function usePassiveState<T, R>(onChange: undefined | null | OnPassiveStateChange<T, R>, getInitialValue?: () => T, customDebounceRendering?: typeof debounceRendering): readonly [getStateStable: () => T, setStateStable: PassiveStateUpdater<T, R>] {
     monitorCallCount(usePassiveState);
+    //let [id, ,getId] = useState(() => generateRandomId());
 
     const valueRef = useRef<T | typeof Unset>(Unset);
     const reasonRef = useRef<R | typeof Unset>(Unset);
@@ -131,8 +134,10 @@ export function usePassiveState<T, R>(onChange: undefined | null | OnPassiveStat
         // Regardless of anything else, figure out what our next value is about to be.
         const nextValue = (arg instanceof Function ? arg(valueRef.current === Unset ? undefined : valueRef.current) : arg);
 
+        //let id = getId();
+        //console.log((nextValue !== valueRef.current? "" : "NOT ") + "Scheduling effect ", id, " with value ", nextValue);
 
-        if (dependencyToCompareAgainst.current === Unset && nextValue !== valueRef.current) {
+        if (/*dependencyToCompareAgainst.current === Unset &&*/ nextValue !== valueRef.current) {
             // This is the first request to change this value.
             // Evaluate the request immediately, then queue up the onChange function
 
@@ -146,17 +151,25 @@ export function usePassiveState<T, R>(onChange: undefined | null | OnPassiveStat
 
             // Schedule the actual check and invocation of onChange later to let effects settle
             (customDebounceRendering ?? debounceRendering)(() => {
+
                 const nextReason = reasonRef.current! as R;
                 const nextDep = valueRef.current! as T;
                 const prevDep = dependencyToCompareAgainst.current;
+
+                //let id = getId();
+                //console.log(((dependencyToCompareAgainst.current != valueRef.current)? "" : "NOT ") + "Running effect ", id, " with value ", nextDep);
                 if (dependencyToCompareAgainst.current != valueRef.current) {
+                    // TODO: This needs to happen here in order to make recursive onChanges work
+                    // but it feels better to have it happen after onChange...
+                    valueRef.current = dependencyToCompareAgainst.current = Unset;
+
                     warningRef.current = true;
 
                     try {
                         // Call any registered cleanup function
                         onShouldCleanUp();
+                        valueRef.current = nextDep; // Needs to happen before onChange in case onChange is recursive (e.g. focusing causing a focus causing a focus)
                         cleanupCallbackRef.current = (onChange?.(nextDep, prevDep === Unset ? undefined : prevDep, nextReason) ?? undefined);
-                        valueRef.current = nextDep;
                     }
                     finally {
                         // Allow the user to normally call getValue again
@@ -173,7 +186,7 @@ export function usePassiveState<T, R>(onChange: undefined | null | OnPassiveStat
 
         // Update the value immediately.
         // This will be checked against prevDep to see if we should actually call onChange
-        valueRef.current = nextValue;
+        //valueRef.current = nextValue;
 
     }, []);
 

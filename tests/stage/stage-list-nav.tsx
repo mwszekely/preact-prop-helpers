@@ -1,5 +1,5 @@
-import { useCallback, useContext, useState } from "preact/hooks";
-import { Compare, CompleteListNavigationContext, UseCompleteListNavigationChildInfo, UseSingleSelectionParameters, useCompleteListNavigation, useCompleteListNavigationChild, useCompleteListNavigationDeclarative, useStableGetter } from "../../dist/index.js";
+import { useCallback, useContext, useEffect, useRef, useState } from "preact/hooks";
+import { Compare, CompleteListNavigationContext, UseCompleteListNavigationChildInfo, UseSingleSelectionParameters, useCompleteListNavigation, useCompleteListNavigationChild, useCompleteListNavigationDeclarative, useMergedProps, useStableGetter } from "../../dist/index.js";
 import { TestItem, useTestSyncState } from "./util.js";
 import { createContext } from "preact";
 import { LoremIpsum } from "../lorem.js";
@@ -16,12 +16,13 @@ export interface ListNavConstants {
     setPagination(size: [number, number] | null): Promise<void>;
     setArrowKeyDirection(direction: "horizontal" | "vertical"): Promise<void>;
     setNavigatePastStartEnd(op: "wrap" | "passthrough"): Promise<void>;
-    setAriaPropName(ariaPropName: UseSingleSelectionParameters<any, any>["singleSelectionParameters"]["ariaPropName"]): Promise<void>;
-    setSelectionMode(ariaPropName: UseSingleSelectionParameters<any, any>["singleSelectionParameters"]["selectionMode"]): Promise<void>;
+    setAriaPropName(ariaPropName: UseSingleSelectionParameters<any, any, any>["singleSelectionParameters"]["ariaPropName"]): Promise<void>;
+    setSelectionMode(ariaPropName: UseSingleSelectionParameters<any, any, any>["singleSelectionParameters"]["selectionMode"]): Promise<void>;
     setStaggered(staggered: boolean): Promise<void>;
     setCollator(id: string): Promise<void>;
     setNoTypeahead(noTypeahead: boolean): Promise<void>;
     setTypeaheadTimeout(timeout: number): Promise<void>;
+    onSelectedIndexChange(index: number, e: Event): (void | Promise<void>);
 }
 
 const Context = createContext<CompleteListNavigationContext<HTMLOListElement, HTMLLIElement, UseCompleteListNavigationChildInfo<HTMLLIElement>>>(null!);
@@ -48,17 +49,29 @@ function TestBasesListNavImpl() {
     const noTypeahead = useTestSyncState("ListNav", "setNoTypeahead", false);
     const typeaheadTimeout = useTestSyncState("ListNav", "setTypeaheadTimeout", 1000);
     const selectionMode = useTestSyncState("ListNav", "setSelectionMode", "activation");
-    const [selectedIndex, setSelectedIndex] = useState<number | null>(0);
+    const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+
+    let u = useRef(false);
+    useEffect(() => {
+        window.addEventListener("keydown", e => {
+            if (e.code == "Escape") {
+                getTestingHandler("ListNav", "setUntabbable")(u.current = !u.current);
+            }
+        })
+    }, [])
+
+    console.log(untabbable);
 
     installTestingHandler("ListNav", "setSelectedIndex", setSelectedIndex);
 
+    const [t, setT] = useState<number | null>(null);
     const {
         childrenHaveFocusReturn: { getAnyFocused },
         context,
         linearNavigationReturn: { },
         managedChildrenReturn: { getChildren },
         paginatedChildrenReturn: { refreshPagination },
-        propsStable,
+        props,
         rearrangeableChildrenReturn: { indexDemangler, indexMangler, rearrange, reverse, shuffle, toJsonArray, useRearrangedChildren },
         rovingTabIndexReturn: { focusSelf, getTabbableIndex, setTabbableIndex },
         singleSelectionReturn: { getSelectedIndex },
@@ -69,20 +82,23 @@ function TestBasesListNavImpl() {
         linearNavigationParameters: { arrowKeyDirection, disableHomeEndKeys, navigatePastEnd: navigatePastStartEnd, navigatePastStart: navigatePastStartEnd, pageNavigationSize },
         paginatedChildrenParameters: { paginationMin: pagination?.[0], paginationMax: pagination?.[1] },
         rearrangeableChildrenParameters: { getIndex: useCallback(info => info.props.index, []) },
-        rovingTabIndexParameters: { untabbable },
+        rovingTabIndexParameters: { untabbable, onTabbableIndexChange: setT },
         singleSelectionParameters: { ariaPropName, selectionMode },
-        singleSelectionDeclarativeParameters: { selectedIndex, setSelectedIndex },
+        singleSelectionDeclarativeParameters: { selectedIndex, setSelectedIndex: ((i, e) => { setSelectedIndex(i); /*getTestingHandler("ListNav", "onSelectedIndexChange")?.(i!, e!);*/ }) },
         sortableChildrenParameters: { compare: useCallback<Compare<UseCompleteListNavigationChildInfo<HTMLLIElement>>>((lhs, rhs) => { return (lhs.getSortValue() as number) - (rhs.getSortValue() as number) }, []) },
         staggeredChildrenParameters: { staggered },
         typeaheadNavigationParameters: { collator: null, noTypeahead, typeaheadTimeout }
     });
 
     return (
-        <Context.Provider value={context}>
-            <ol role="toolbar" data-still-staggering={stillStaggering} data-typeahead-status={typeaheadStatus} {...propsStable}>
-                <TestBasesListNavChildren count={childCount} />
-            </ol>
-        </Context.Provider>
+        <UntabbableContext.Provider value={untabbable}>
+            <Context.Provider value={context}>
+                {untabbable.toString()}, {t}
+                <ol role="toolbar" data-still-staggering={stillStaggering} data-typeahead-status={typeaheadStatus} {...props}>
+                    <TestBasesListNavChildren count={childCount} />
+                </ol>
+            </Context.Provider>
+        </UntabbableContext.Provider>
     )
 }
 
@@ -106,21 +122,22 @@ const DisabledIndex = 4;
 const MissingIndex = 6;
 const HiddenIndex = 8;
 
+const UntabbableContext = createContext(false);
 function TestBasesListNavChild({ index }: { index: number }) {
     const textContent = LoremIpsum[index % LoremIpsum.length];
     const getTextContent = useStableGetter(textContent);
     const disabled = (index === DisabledIndex);
-    const missing =  (index === MissingIndex);
-    const hidden =   (index === HiddenIndex);
+    const missing = (index === MissingIndex);
+    const hidden = (index === HiddenIndex);
     if (missing)
         return <li>(The #{index}-th item is missing)</li>;
-        
+
     const {
         hasCurrentFocusReturn: { getCurrentFocused, getCurrentFocusedInner },
         managedChildReturn: { getChildren },
         paginatedChildReturn: { hideBecausePaginated, isPaginated, paginatedVisible },
-        pressParameters: { excludeSpace },
         props,
+        propsPressStable,
         refElementReturn: { getElement },
         rovingTabIndexChildReturn: { getTabbable, tabbable },
         singleSelectionChildReturn: { getSelected, getSelectedOffset, selected, selectedOffset, setThisOneSelected },
@@ -128,12 +145,17 @@ function TestBasesListNavChild({ index }: { index: number }) {
         textContentReturn: { }
     } = useCompleteListNavigationChild<HTMLLIElement, UseCompleteListNavigationChildInfo<HTMLLIElement>>({
         context: useContext(Context),
+        pressParameters: {
+            focusSelf: e => e.focus(),
+            onPressSync: null
+        },
         info: {
             disabled,
-            focusSelf: e => { debugger; e.focus()},
+            focusSelf: e => { e.focus() },
             hidden,
             index
         },
+        rovingTabIndexParameters: { untabbable: useContext(UntabbableContext) },
         sortableChildParameters: { getSortValue: getTextContent },
         textContentParameters: { getText: getTextContent }
     })
@@ -149,7 +171,9 @@ function TestBasesListNavChild({ index }: { index: number }) {
                 data-selected={selected}
                 data-selected-offset={selectedOffset}
                 data-is-staggered={isStaggered}
-                {...props}>{textContent}{hidden && " (hidden)"}{disabled && " (disabled)"}</li>
+                {...useMergedProps(props, propsPressStable)}>{textContent}{hidden && " (hidden)"}{disabled && " (disabled)"}</li>
         </>
     )
 }
+
+

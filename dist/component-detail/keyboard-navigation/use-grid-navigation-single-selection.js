@@ -13,14 +13,15 @@ import { useSingleSelection, useSingleSelectionChild } from "./use-single-select
  * Highly recommended to make the `selectionMode` *not* be `"focus"`, but it's up to you, ultimately.
  */
 const _dummy = 0;
-export function useGridNavigationSingleSelection({ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, managedChildrenReturn, typeaheadNavigationParameters, singleSelectionParameters, ...void2 }) {
+export function useGridNavigationSingleSelection({ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, managedChildrenReturn, typeaheadNavigationParameters, singleSelectionParameters, refElementReturn, ...void2 }) {
     monitorCallCount(useGridNavigationSingleSelection);
-    const { context: { gridNavigationRowContext, rovingTabIndexContext, typeaheadNavigationContext }, linearNavigationReturn, managedChildrenParameters, propsStable, rovingTabIndexReturn, typeaheadNavigationReturn, } = useGridNavigation({
+    const { context: { gridNavigationRowContext, rovingTabIndexContext, typeaheadNavigationContext }, linearNavigationReturn, managedChildrenParameters, propsParent, propsStableParentOrChild, rovingTabIndexReturn, typeaheadNavigationReturn, } = useGridNavigation({
         gridNavigationParameters,
         linearNavigationParameters,
         managedChildrenReturn,
         rovingTabIndexParameters,
-        typeaheadNavigationParameters
+        typeaheadNavigationParameters,
+        refElementReturn
     });
     const { childrenHaveFocusParameters, context: { singleSelectionContext }, singleSelectionReturn, } = useSingleSelection({
         managedChildrenReturn,
@@ -38,7 +39,8 @@ export function useGridNavigationSingleSelection({ gridNavigationParameters, lin
         childrenHaveFocusParameters,
         linearNavigationReturn,
         managedChildrenParameters,
-        propsStable,
+        propsParent,
+        propsStableParentOrChild,
         rovingTabIndexReturn,
         singleSelectionReturn,
         typeaheadNavigationReturn

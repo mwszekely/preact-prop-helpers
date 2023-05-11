@@ -5,9 +5,9 @@ import { assertEmptyObject } from "../../util/assert.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
 import { useListNavigation, useListNavigationChild } from "./use-list-navigation-partial.js";
 import { useSingleSelection, useSingleSelectionChild } from "./use-single-selection.js";
-export function useListNavigationSingleSelection({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, managedChildrenReturn, ...void3 }) {
+export function useListNavigationSingleSelection({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, managedChildrenReturn, refElementReturn, ...void3 }) {
     monitorCallCount(useListNavigationSingleSelection);
-    const { context: contextLN, propsStable, rovingTabIndexReturn, ...retLN } = useListNavigation({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, managedChildrenReturn });
+    const { context: contextLN, propsParent, propsStableParentOrChild, rovingTabIndexReturn, ...retLN } = useListNavigation({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, managedChildrenReturn, refElementReturn });
     const { context: contextSS, ...retSS } = useSingleSelection({ rovingTabIndexReturn, managedChildrenReturn, singleSelectionParameters });
     assertEmptyObject(void3);
     return {
@@ -18,10 +18,11 @@ export function useListNavigationSingleSelection({ linearNavigationParameters, r
             ...contextLN,
             ...contextSS
         }),
-        propsStable
+        propsParent,
+        propsStableParentOrChild
     };
 }
-export function useListNavigationSingleSelectionChild({ info, context, refElementReturn, textContentParameters, ...void1 }) {
+export function useListNavigationSingleSelectionChild({ info, context, refElementReturn, textContentParameters, rovingTabIndexParameters, ...void1 }) {
     monitorCallCount(useListNavigationSingleSelectionChild);
     const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ...void3 }, info: infoSS, singleSelectionChildReturn, props: propsSS, ...void9 } = useSingleSelectionChild({
         info,
@@ -31,7 +32,8 @@ export function useListNavigationSingleSelectionChild({ info, context, refElemen
         info,
         context,
         refElementReturn,
-        textContentParameters
+        textContentParameters,
+        rovingTabIndexParameters
     });
     assertEmptyObject(void1);
     assertEmptyObject(void3);

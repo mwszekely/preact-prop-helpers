@@ -1,4 +1,4 @@
-import { ManagedChildInfo } from "../../index.js";
+import { ManagedChildInfo } from "../../preact-extensions/use-managed-children.js";
 import { ElementProps } from "../../util/types.js";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
 export interface LinearNavigationResult {
@@ -12,8 +12,8 @@ export interface UseLinearNavigationReturnType<ParentOrChildElement extends Elem
 export interface UseLinearNavigationChildInfo<ChildElement extends Element> extends ManagedChildInfo<number> {
 }
 /** Arguments passed to the parent `useLinearNavigation` */
-export interface UseLinearNavigationParameters<_ParentOrChildElement extends Element, ChildElement extends Element, _M extends UseLinearNavigationChildInfo<ChildElement>> {
-    rovingTabIndexReturn: Pick<UseRovingTabIndexReturnType<ChildElement, UseRovingTabIndexChildInfo<ChildElement>>["rovingTabIndexReturn"], "getTabbableIndex" | "setTabbableIndex">;
+export interface UseLinearNavigationParameters<ParentOrChildElement extends Element, ChildElement extends Element, _M extends UseLinearNavigationChildInfo<ChildElement>> {
+    rovingTabIndexReturn: Pick<UseRovingTabIndexReturnType<ParentOrChildElement, ChildElement, UseRovingTabIndexChildInfo<ChildElement>>["rovingTabIndexReturn"], "getTabbableIndex" | "setTabbableIndex">;
     linearNavigationParameters: {
         /**
          * Must return true if the given child can be navigated to.

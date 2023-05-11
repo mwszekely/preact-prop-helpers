@@ -23,9 +23,9 @@ export interface UseSingleSelectionChildInfo<E extends Element> extends UseRovin
      */
     disabled: boolean;
 }
-export interface UseSingleSelectionParameters<ChildElement extends Element, M extends UseSingleSelectionChildInfo<ChildElement>> {
+export interface UseSingleSelectionParameters<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseSingleSelectionChildInfo<ChildElement>> {
     managedChildrenReturn: Pick<UseManagedChildrenReturnType<UseSingleSelectionChildInfo<ChildElement>>["managedChildrenReturn"], "getChildren">;
-    rovingTabIndexReturn: Pick<UseRovingTabIndexReturnType<ChildElement, M>["rovingTabIndexReturn"], "setTabbableIndex">;
+    rovingTabIndexReturn: Pick<UseRovingTabIndexReturnType<ParentOrChildElement, ChildElement, M>["rovingTabIndexReturn"], "setTabbableIndex">;
     singleSelectionParameters: {
         /**
          * This is imperative, as opposed to declarative,
@@ -94,11 +94,11 @@ export interface UseSingleSelectionReturnType<ChildElement extends Element, M ex
 }
 export interface UseSingleSelectionContext {
     singleSelectionContext: {
-        onSelectedIndexChange: UseSingleSelectionParameters<any, any>["singleSelectionParameters"]["onSelectedIndexChange"];
+        onSelectedIndexChange: UseSingleSelectionParameters<any, any, any>["singleSelectionParameters"]["onSelectedIndexChange"];
         getSelectedIndex(): number | null;
-    } & Pick<UseSingleSelectionParameters<any, any>["singleSelectionParameters"], "ariaPropName" | "selectionMode">;
+    } & Pick<UseSingleSelectionParameters<any, any, any>["singleSelectionParameters"], "ariaPropName" | "selectionMode">;
 }
-export declare function useSingleSelection<ChildElement extends Element, M extends UseSingleSelectionChildInfo<ChildElement>>({ managedChildrenReturn: { getChildren }, rovingTabIndexReturn: { setTabbableIndex }, singleSelectionParameters: { onSelectedIndexChange: onSelectedIndexChange_U, initiallySelectedIndex, ariaPropName, selectionMode } }: UseSingleSelectionParameters<ChildElement, M>): UseSingleSelectionReturnType<ChildElement, M>;
+export declare function useSingleSelection<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseSingleSelectionChildInfo<ChildElement>>({ managedChildrenReturn: { getChildren }, rovingTabIndexReturn: { setTabbableIndex }, singleSelectionParameters: { onSelectedIndexChange: onSelectedIndexChange_U, initiallySelectedIndex, ariaPropName, selectionMode } }: UseSingleSelectionParameters<ParentOrChildElement, ChildElement, M>): UseSingleSelectionReturnType<ChildElement, M>;
 export declare function useSingleSelectionChild<ChildElement extends Element, M extends UseSingleSelectionChildInfo<ChildElement>>(args: UseSingleSelectionChildParameters<ChildElement, M>): UseSingleSelectionChildReturnType<ChildElement>;
 export interface UseSingleSelectionDeclarativeParameters {
     singleSelectionDeclarativeParameters: {
@@ -108,13 +108,13 @@ export interface UseSingleSelectionDeclarativeParameters {
     singleSelectionReturn: Pick<UseSingleSelectionReturnType<any, any>["singleSelectionReturn"], "changeSelectedIndex">;
 }
 export type MakeSingleSelectionDeclarativeParameters<P> = Omit<P, "singleSelectionParameters"> & UseSingleSelectionDeclarativeParameters & {
-    singleSelectionParameters: Pick<UseSingleSelectionParameters<any, any>["singleSelectionParameters"], "ariaPropName" | "selectionMode">;
+    singleSelectionParameters: Pick<UseSingleSelectionParameters<any, any, any>["singleSelectionParameters"], "ariaPropName" | "selectionMode">;
 };
 export type MakeSingleSelectionDeclarativeReturnType<R> = Omit<R, "singleSelectionReturn">;
 /**
  * Let's face it, declarative is nicer to use than imperative, so this is a shortcut.
  */
-export declare function useSingleSelectionDeclarative<ChildElement extends Element, _M extends UseSingleSelectionChildInfo<ChildElement>>({ singleSelectionReturn: { changeSelectedIndex }, singleSelectionDeclarativeParameters: { selectedIndex, setSelectedIndex } }: UseSingleSelectionDeclarativeParameters): {
+export declare function useSingleSelectionDeclarative<ParentOrChildElement extends Element, ChildElement extends Element, _M extends UseSingleSelectionChildInfo<ChildElement>>({ singleSelectionReturn: { changeSelectedIndex }, singleSelectionDeclarativeParameters: { selectedIndex, setSelectedIndex } }: UseSingleSelectionDeclarativeParameters): {
     singleSelectionParameters: {
         onSelectedIndexChange: ((index: number | null, reason: Event | undefined) => void) | null;
     };

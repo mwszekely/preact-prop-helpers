@@ -50,9 +50,9 @@ const _dummy = null;
  * In the document order, there will be only one "focused" or "tabbable" element, making it act more like one complete unit in comparison to everything around it.
  * Navigating forwards/backwards can be done with the arrow keys, Home/End keys, or any text for typeahead to focus the next item that matches.
  */
-export function useListNavigation({ linearNavigationParameters, typeaheadNavigationParameters, rovingTabIndexParameters, managedChildrenReturn, ...void1 }) {
+export function useListNavigation({ linearNavigationParameters, typeaheadNavigationParameters, rovingTabIndexParameters, managedChildrenReturn, refElementReturn, ...void1 }) {
     monitorCallCount(useListNavigation);
-    const { context: { rovingTabIndexContext }, managedChildrenParameters, rovingTabIndexReturn, ...void2 } = useRovingTabIndex({ managedChildrenReturn, rovingTabIndexParameters });
+    const { context: { rovingTabIndexContext }, managedChildrenParameters, rovingTabIndexReturn, props: propsRTI, ...void2 } = useRovingTabIndex({ managedChildrenReturn, rovingTabIndexParameters, refElementReturn });
     const { context: { typeaheadNavigationContext }, propsStable: propsStableTN, typeaheadNavigationReturn, ...void3 } = useTypeaheadNavigation({ rovingTabIndexReturn, typeaheadNavigationParameters, });
     const { propsStable: propsStableLN, linearNavigationReturn, ...void4 } = useLinearNavigation({ rovingTabIndexReturn, linearNavigationParameters, });
     assertEmptyObject(void1);
@@ -72,12 +72,13 @@ export function useListNavigation({ linearNavigationParameters, typeaheadNavigat
             typeaheadNavigationContext
         }),
         linearNavigationReturn,
-        propsStable: propsStable.current
+        propsStableParentOrChild: propsStable.current,
+        propsParent: propsRTI
     };
 }
-export function useListNavigationChild({ info, context, refElementReturn, textContentParameters, ...void2 }) {
+export function useListNavigationChild({ info, context, refElementReturn, textContentParameters, rovingTabIndexParameters, ...void2 }) {
     monitorCallCount(useListNavigationChild);
-    const { props, ...rticr } = useRovingTabIndexChild({ context, info });
+    const { props, ...rticr } = useRovingTabIndexChild({ rovingTabIndexParameters, context, info });
     const { ...tncr } = useTypeaheadNavigationChild({ refElementReturn, textContentParameters, context, info });
     assertEmptyObject(void2);
     return {

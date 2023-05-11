@@ -34,20 +34,20 @@ export interface UseGridNavigationRowContext extends UseListNavigationContext {
 }
 
 export interface UseGridNavigationRowParameters<RowElement extends Element, CellElement extends Element, RM extends GridChildRowInfo<RowElement, CellElement>, CM extends GridChildCellInfo<CellElement>> extends
-    OmitStrong<UseListNavigationChildParameters<RowElement, RM>, "context">,
-    OmitStrong<UseListNavigationParameters<RowElement, CellElement, CM>, "linearNavigationParameters" | "rovingTabIndexParameters"> {
+    OmitStrong<UseListNavigationChildParameters<RowElement, RM>, "rovingTabIndexParameters" | "context">,
+    OmitStrong<UseListNavigationParameters<RowElement, CellElement, CM>, "rovingTabIndexParameters" | "linearNavigationParameters"> {
 
     managedChildrenReturn: Pick<UseManagedChildrenReturnType<CM>["managedChildrenReturn"], "getChildren">;
     context: UseGridNavigationRowContext;
-    rovingTabIndexParameters: OmitStrong<UseListNavigationParameters<RowElement, CellElement, CM>["rovingTabIndexParameters"], "untabbable">
     linearNavigationParameters: OmitStrong<UseListNavigationParameters<RowElement, CellElement, CM>["linearNavigationParameters"], "arrowKeyDirection">
 
+    rovingTabIndexParameters: OmitStrong<UseListNavigationParameters<RowElement, CellElement, CM>["rovingTabIndexParameters"], never>
 
 }
 
 export interface UseGridNavigationRowReturnType<RowElement extends Element, CellElement extends Element, RM extends GridChildRowInfo<RowElement, CellElement>, CM extends GridChildCellInfo<CellElement>> extends
     UseListNavigationChildReturnType<RowElement, RM>,
-    OmitStrong<UseListNavigationReturnType<RowElement, CellElement, CM>, "context" | "propsStable" | "rovingTabIndexReturn"> {
+    OmitStrong<UseListNavigationReturnType<RowElement, CellElement, CM>, "propsStableParentOrChild" | "propsParent" | "context" | "rovingTabIndexReturn"> {
     gridNavigationRowParameters: Pick<GridChildRowInfo<RowElement, CellElement>, "focusSelf" | "setTabbableColumnIndex">;
     rovingTabIndexReturn: OmitStrong<UseListNavigationReturnType<RowElement, CellElement, CM>["rovingTabIndexReturn"], "focusSelf">;
     context: UseGridNavigationCellContext;
@@ -85,6 +85,7 @@ export function useGridNavigation<ParentOrRowElement extends Element, RowElement
     rovingTabIndexParameters: { onTabbableIndexChange, ...rovingTabIndexParameters },
     managedChildrenReturn,
     typeaheadNavigationParameters,
+    refElementReturn,
     ...void2
 }: UseGridNavigationParameters<ParentOrRowElement, RowElement, CellElement, RM>): UseGridNavigationReturnType<ParentOrRowElement, RowElement, CellElement, RM, CM> {
     monitorCallCount(useGridNavigation);
@@ -111,11 +112,13 @@ export function useGridNavigation<ParentOrRowElement extends Element, RowElement
         typeaheadNavigationReturn,
         managedChildrenParameters,
         context: { rovingTabIndexContext, typeaheadNavigationContext },
-        propsStable,
+        propsParent,
+        propsStableParentOrChild,
         ...void1
     } = useListNavigation<ParentOrRowElement, RowElement, RM>({
         linearNavigationParameters: { arrowKeyDirection: "vertical", ...linearNavigationParameters },
         rovingTabIndexParameters: { onTabbableIndexChange: onTabbableIndexChangeOverride, ...rovingTabIndexParameters },
+        refElementReturn,
         managedChildrenReturn,
         typeaheadNavigationParameters
     });
@@ -131,7 +134,8 @@ export function useGridNavigation<ParentOrRowElement extends Element, RowElement
     })
 
     return {
-        propsStable,
+        propsParent,
+        propsStableParentOrChild,
         managedChildrenParameters,
         context: useStableObject({
             gridNavigationRowContext,
@@ -150,7 +154,8 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
         typeaheadNavigationContext: contextTN,
         gridNavigationRowContext: { setTabbableRow, getCurrentTabbableColumn, setCurrentTabbableColumn }
     },
-    linearNavigationParameters, rovingTabIndexParameters: { ...rovingTabIndexParameters },
+    linearNavigationParameters, 
+    rovingTabIndexParameters: { untabbable, ...rovingTabIndexParameters },
     info: managedChildParameters,
     managedChildrenReturn,
     refElementReturn,
@@ -191,16 +196,17 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
         textContentReturn,
         info,
         ...void2
-    } = useListNavigationChild<RowElement, RM>({ info: managedChildParameters, refElementReturn, textContentParameters, context: { rovingTabIndexContext: contextRTI, typeaheadNavigationContext: contextTN } });
-    const untabbable = !rovingTabIndexChildReturn.tabbable;
+    } = useListNavigationChild<RowElement, RM>({ info: managedChildParameters, refElementReturn, textContentParameters, context: { rovingTabIndexContext: contextRTI, typeaheadNavigationContext: contextTN }, rovingTabIndexParameters: { untabbable: false, ...rovingTabIndexParameters } });
+    const allChildCellsAreUntabbable = !rovingTabIndexChildReturn.tabbable;
     const {
         linearNavigationReturn,
         managedChildrenParameters,
-        propsStable: propsLN,
+        propsStableParentOrChild: propsLN,
+        propsParent: propsLN2,
         rovingTabIndexReturn,
         typeaheadNavigationReturn,
         context: { rovingTabIndexContext: rtiContext, typeaheadNavigationContext: tnContext }
-    } = useListNavigation<RowElement, CellElement, CM>({ managedChildrenReturn, typeaheadNavigationParameters, rovingTabIndexParameters: { untabbable, ...rovingTabIndexParameters }, linearNavigationParameters: { arrowKeyDirection: "horizontal", ...linearNavigationParameters } });
+    } = useListNavigation<RowElement, CellElement, CM>({ managedChildrenReturn, refElementReturn, typeaheadNavigationParameters, rovingTabIndexParameters: { untabbable: allChildCellsAreUntabbable, ...rovingTabIndexParameters }, linearNavigationParameters: { arrowKeyDirection: "horizontal", ...linearNavigationParameters } });
 
 
     assertEmptyObject(void1);
@@ -216,7 +222,10 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
         setTabbableCell: setTabbableIndex
     })
 
-    const props = useMergedProps(propsLN, propsLNC);
+    // TODO: propsLN2 (awful name) is just the tabIndex=0 or -1 from rovingTabIndex, which flips around when `untabbable` flips.
+    // We can ignore it here, because our tabIndex is entirely controlled by our own list navigation,
+    // but it shouldn't just be ignored wholesale like this.
+    const props = useMergedProps(propsLN, /*propsLN2,*/ propsLNC);
     props.tabIndex = -1;
 
     return {
@@ -259,6 +268,7 @@ export function useGridNavigationCell<CellElement extends Element, CM extends Gr
     gridNavigationCellParameters: {
         colSpan
     },
+    rovingTabIndexParameters,
     ...void1
 }: UseGridNavigationCellParameters<any, CellElement, CM>): UseGridNavigationCellReturnType<CellElement, CM> {
     monitorCallCount(useGridNavigationCell);
@@ -276,7 +286,8 @@ export function useGridNavigationCell<CellElement extends Element, CM extends Gr
         info,
         context: { rovingTabIndexContext, typeaheadNavigationContext },
         textContentParameters,
-        refElementReturn
+        refElementReturn,
+        rovingTabIndexParameters
     });
 
     assertEmptyObject(void1);

@@ -18,7 +18,7 @@ const _dummy = 0;
 
 export interface GridSingleSelectChildRowInfo<RowElement extends Element, CellElement extends Element> extends gcri<RowElement, CellElement>, UseSingleSelectionChildInfo<RowElement> { }
 export interface GridSingleSelectChildCellInfo<CellElement extends Element> extends gcci<CellElement> { }
-export interface UseGridNavigationSingleSelectionParameters<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, RM extends GridSingleSelectChildRowInfo<RowElement, CellElement>> extends ExtendMerge<UseGridNavigationParameters<ParentOrRowElement, RowElement, CellElement, RM>, OmitStrong<UseSingleSelectionParameters<RowElement, RM>, "rovingTabIndexReturn">> { }
+export interface UseGridNavigationSingleSelectionParameters<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, RM extends GridSingleSelectChildRowInfo<RowElement, CellElement>> extends ExtendMerge<UseGridNavigationParameters<ParentOrRowElement, RowElement, CellElement, RM>, OmitStrong<UseSingleSelectionParameters<ParentOrRowElement, RowElement, RM>, "rovingTabIndexReturn">> { }
 export interface UseGridNavigationSingleSelectionReturnType<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, RM extends GridSingleSelectChildRowInfo<RowElement, CellElement>, CM extends GridSingleSelectChildCellInfo<CellElement>> extends ExtendMerge<UseGridNavigationReturnType<ParentOrRowElement, RowElement, CellElement, RM, CM>, UseSingleSelectionReturnType<RowElement, RM>> { }
 export interface UseGridNavigationRowSingleSelectionContext extends UseGridNavigationRowContext, UseSingleSelectionContext { }
 export interface UseGridNavigationCellSingleSelectionContext extends UseGridNavigationCellContext, UseSingleSelectionContext { }
@@ -34,6 +34,7 @@ export function useGridNavigationSingleSelection<ParentOrRowElement extends Elem
     managedChildrenReturn,
     typeaheadNavigationParameters,
     singleSelectionParameters,
+    refElementReturn,
     ...void2
 }: UseGridNavigationSingleSelectionParameters<ParentOrRowElement, RowElement, CellElement, RM>): UseGridNavigationSingleSelectionReturnType<ParentOrRowElement, RowElement, CellElement, RM, CM> {
     monitorCallCount(useGridNavigationSingleSelection);
@@ -42,7 +43,8 @@ export function useGridNavigationSingleSelection<ParentOrRowElement extends Elem
         context: { gridNavigationRowContext, rovingTabIndexContext, typeaheadNavigationContext },
         linearNavigationReturn,
         managedChildrenParameters,
-        propsStable,
+        propsParent,
+        propsStableParentOrChild,
         rovingTabIndexReturn,
         typeaheadNavigationReturn,
     } = useGridNavigation<ParentOrRowElement, RowElement, CellElement, RM, CM>({
@@ -50,14 +52,15 @@ export function useGridNavigationSingleSelection<ParentOrRowElement extends Elem
         linearNavigationParameters,
         managedChildrenReturn,
         rovingTabIndexParameters,
-        typeaheadNavigationParameters
+        typeaheadNavigationParameters,
+        refElementReturn
     });
 
     const {
         childrenHaveFocusParameters,
         context: { singleSelectionContext },
         singleSelectionReturn,
-    } = useSingleSelection<RowElement, RM>({
+    } = useSingleSelection<ParentOrRowElement, RowElement, RM>({
         managedChildrenReturn,
         rovingTabIndexReturn,
         singleSelectionParameters
@@ -75,7 +78,8 @@ export function useGridNavigationSingleSelection<ParentOrRowElement extends Elem
         childrenHaveFocusParameters,
         linearNavigationReturn,
         managedChildrenParameters,
-        propsStable,
+        propsParent,
+        propsStableParentOrChild,
         rovingTabIndexReturn,
         singleSelectionReturn,
         typeaheadNavigationReturn
@@ -102,7 +106,6 @@ export function useGridNavigationSingleSelectionRow<RowElement extends Element, 
     assertEmptyObject(void3);
 
     return {
-
         context,
         gridNavigationRowParameters,
         linearNavigationReturn,

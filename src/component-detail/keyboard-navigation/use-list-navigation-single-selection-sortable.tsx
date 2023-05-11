@@ -26,19 +26,21 @@ export function useListNavigationSingleSelectionSortable<ParentOrChildElement ex
     managedChildrenReturn,
     rearrangeableChildrenParameters,
     sortableChildrenParameters,
+    refElementReturn,
     ...void3
 }: UseListNavigationSingleSelectionSortableParameters<ParentOrChildElement, ChildElement, M>): UseListNavigationSingleSelectionSortableReturnType<ParentOrChildElement, ChildElement, M> {
     monitorCallCount(useListNavigationSingleSelectionSortable);
     const { rearrangeableChildrenReturn, sortableChildrenReturn, ...void1 } = useSortableChildren<M>({ rearrangeableChildrenParameters, sortableChildrenParameters, managedChildrenReturn });
     const { indexDemangler, indexMangler } = rearrangeableChildrenReturn;
-    const { propsStable, context, ...restLN } = useListNavigationSingleSelection<ParentOrChildElement, ChildElement, M>({ linearNavigationParameters: { ...linearNavigationParameters, indexDemangler, indexMangler }, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, managedChildrenReturn });
+    const { propsParent, propsStableParentOrChild, context, ...restLN } = useListNavigationSingleSelection<ParentOrChildElement, ChildElement, M>({ linearNavigationParameters: { ...linearNavigationParameters, indexDemangler, indexMangler }, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, managedChildrenReturn, refElementReturn });
     
     assertEmptyObject(void1);
     assertEmptyObject(void3);
 
     return {
         context,
-        propsStable,
+        propsParent, 
+        propsStableParentOrChild,
         rearrangeableChildrenReturn,
         sortableChildrenReturn,
         ...restLN
@@ -51,6 +53,7 @@ export function useListNavigationSingleSelectionSortableChild<ChildElement exten
     context,
     refElementReturn,
     textContentParameters,
+    rovingTabIndexParameters,
     ...void1
 }: UseListNavigationSingleSelectionSortableChildParameters<ChildElement, M>): UseListNavigationSingleSelectionSortableChildReturnType<ChildElement, M> {
     monitorCallCount(useListNavigationSingleSelectionSortableChild);
@@ -61,5 +64,6 @@ export function useListNavigationSingleSelectionSortableChild<ChildElement exten
         context,
         refElementReturn,
         textContentParameters,
+        rovingTabIndexParameters,
     });
 }

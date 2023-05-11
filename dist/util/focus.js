@@ -3,6 +3,6 @@
  * here:
  */
 export function focus(e) {
-    e.focus?.();
+    e?.focus?.();
 }
 //# sourceMappingURL=focus.js.map

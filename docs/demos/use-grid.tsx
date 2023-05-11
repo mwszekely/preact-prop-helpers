@@ -30,7 +30,7 @@ export const DemoUseGrid = memo(() => {
 
     const {
         context,
-        propsStable,
+        props,
         rearrangeableChildrenReturn: { useRearrangedChildren }
     } = ret;
 
@@ -53,7 +53,7 @@ export const DemoUseGrid = memo(() => {
                     </tr>
                 </thead>
                 <GridRowContext.Provider value={context}>
-                    <tbody {...propsStable}>{useRearrangedChildren(Array.from((function* () {
+                    <tbody {...props}>{useRearrangedChildren(Array.from((function* () {
                         for (let i = 0; i < 10; ++i) {
                             yield <DemoUseGridRow index={i} key={i} />
                         }
@@ -94,7 +94,7 @@ const DemoUseGridRow = memo((({ index }: { index: number }) => {
         textContentParameters: { getText: useCallback((e: Element | null) => { return e?.textContent ?? "" }, []) },
 
         linearNavigationParameters: { disableHomeEndKeys: false, navigatePastEnd: "wrap", navigatePastStart: "wrap" },
-        rovingTabIndexParameters: { onTabbableIndexChange: useStableCallback((i: number | null) => { setTabbableColumn(i) }) },
+        rovingTabIndexParameters: { onTabbableIndexChange: useStableCallback((i: number | null) => { setTabbableColumn(i) }), untabbable: false },
         typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000 }
 
     });
@@ -140,6 +140,7 @@ const DemoUseGridCell = (({ index, row, rowIsTabbable }: { index: number, row: n
         info: { index, bar: "baz", focusSelf: useStableCallback((e: HTMLElement) => e.focus()), hidden: false },
         context,
         textContentParameters: { getText: useCallback((e: Element | null) => { return e?.textContent ?? "" }, []) },
+        rovingTabIndexParameters: { untabbable: false }
     });
 
     const t = (tabbable ? "(Tabbable)" : "(Not tabbable)")

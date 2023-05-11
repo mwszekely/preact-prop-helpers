@@ -40,7 +40,7 @@ export const DemoUseRovingTabIndex = memo(() => {
 
 
     const {
-        propsStable,
+        props,
         context,
         rovingTabIndexReturn: { setTabbableIndex },
         managedChildrenReturn: { getChildren },
@@ -97,7 +97,7 @@ export const DemoUseRovingTabIndex = memo(() => {
             </label>
 
             <ListNavigationSingleSelectionChildContext.Provider value={context}>
-                <ol start={0} {...propsStable}>{useRearrangedChildren(jsxChildren)}</ol>
+                <ol start={0} {...props}>{useRearrangedChildren(jsxChildren)}</ol>
             </ListNavigationSingleSelectionChildContext.Provider>
             {<div>Typeahead status: {typeaheadStatus}</div>}
         </div>
@@ -130,25 +130,19 @@ const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
         singleSelectionChildReturn: { selected, selectedOffset, setThisOneSelected },
         paginatedChildReturn: { hideBecausePaginated },
         staggeredChildReturn: { hideBecauseStaggered },
-        pressParameters: { excludeSpace },
         refElementReturn
     } = useCompleteListNavigationChild<HTMLLIElement, CustomInfoType>({
         info: { index, focusSelf, foo: "bar", hidden, disabled },
         sortableChildParameters: { getSortValue },
+        pressParameters: { onPressSync: null, focusSelf },
+        rovingTabIndexParameters: { untabbable: false },
         context,
         textContentParameters: { getText: useCallback((e) => { return e?.textContent ?? "" }, []) }
     });
 
-    const { pressReturn, props: propsPress } = usePress<HTMLLIElement>({
-        refElementReturn,
-        pressParameters: { excludeSpace, onPressSync: setThisOneSelected, focusSelf },
-    });
-
-    const props2 = useMergedProps(props, propsPress);
-
     const text = `${randomWord} This is item #${index} (offset: ${selectedOffset}) ${hidden ? " (hidden)" : ""}${disabled ? " (disabled)" : ""}${selected ? " (selected)" : " (not selected)"} (${tabbable ? "Tabbable" : "Not tabbable"})`;
 
     return (
-        <li {...props2} style={{ opacity: hideBecausePaginated ? 0.25 : 1, transform: `translateX(${hideBecauseStaggered ? "50%" : "0%"})` }}>{text}<input {...useMergedProps({ type: "number", tabIndex: props.tabIndex }) as any} style={{ width: "5ch" }} /></li>
+        <li {...props} style={{ opacity: hideBecausePaginated ? 0.25 : 1, transform: `translateX(${hideBecauseStaggered ? "50%" : "0%"})` }}>{text}<input {...useMergedProps({ type: "number", tabIndex: props.tabIndex }) as any} style={{ width: "5ch" }} /></li>
     )
 }));

@@ -3,6 +3,7 @@ import { useSearchParams } from "preact-hash-router";
 import { TestBasesButton } from "./stage-press.js";
 import { TestBasesListNav } from "./stage-list-nav.js";
 import { TestingConstants } from "./util.js";
+import { TestBasesFocus } from "./stage-focus.js";
 
 
 declare module globalThis {
@@ -26,12 +27,12 @@ globalThis.getTestingHandler = function getTestingHandler<K extends keyof Testin
 };
 
 function noop() { }
-
+/*
 let old = HTMLElement.prototype.focus
 HTMLElement.prototype.focus = function (e) {
     debugger;
     old.bind(this)();
-}
+}*/
 
 
 /*
@@ -64,6 +65,7 @@ const TestBases = {
     "sanity-check": <TestBasesSanityCheck />,
     "press": <TestBasesButton />,
     "list-navigation": <TestBasesListNav />,
+    "focus": <TestBasesFocus />,
     /*"menu": <TestBasesMenu />,*/
 }
 

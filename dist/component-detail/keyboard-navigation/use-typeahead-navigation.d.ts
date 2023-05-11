@@ -36,7 +36,7 @@ export interface UseTypeaheadNavigationParameters<TabbableChildElement extends E
         noTypeahead: boolean;
         typeaheadTimeout: number;
     };
-    rovingTabIndexReturn: Pick<UseRovingTabIndexReturnType<TabbableChildElement, any>["rovingTabIndexReturn"], "getTabbableIndex" | "setTabbableIndex">;
+    rovingTabIndexReturn: Pick<UseRovingTabIndexReturnType<any, TabbableChildElement, any>["rovingTabIndexReturn"], "getTabbableIndex" | "setTabbableIndex">;
 }
 /** Arguments passed to the child `useTypeaheadNavigationChild` */
 export interface UseTypeaheadNavigationChildParameters<ChildElement extends Element, _M extends UseTypeaheadNavigationChildInfo<ChildElement>> {

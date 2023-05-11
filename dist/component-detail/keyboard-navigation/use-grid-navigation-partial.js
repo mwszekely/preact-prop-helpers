@@ -6,7 +6,7 @@ import { assertEmptyObject } from "../../util/assert.js";
 import { focus } from "../../util/focus.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
 import { useListNavigation, useListNavigationChild } from "./use-list-navigation-partial.js";
-export function useGridNavigation({ gridNavigationParameters: { onTabbableColumnChange, ...void3 }, linearNavigationParameters, rovingTabIndexParameters: { onTabbableIndexChange, ...rovingTabIndexParameters }, managedChildrenReturn, typeaheadNavigationParameters, ...void2 }) {
+export function useGridNavigation({ gridNavigationParameters: { onTabbableColumnChange, ...void3 }, linearNavigationParameters, rovingTabIndexParameters: { onTabbableIndexChange, ...rovingTabIndexParameters }, managedChildrenReturn, typeaheadNavigationParameters, refElementReturn, ...void2 }) {
     monitorCallCount(useGridNavigation);
     const { getChildren } = managedChildrenReturn;
     const { initiallyTabbedIndex } = rovingTabIndexParameters;
@@ -20,9 +20,10 @@ export function useGridNavigation({ gridNavigationParameters: { onTabbableColumn
         if (nextRow != null)
             children.getAt(nextRow)?.setTabbableColumnIndex(nextColumn, reason, false);
     });
-    const { linearNavigationReturn, rovingTabIndexReturn, typeaheadNavigationReturn, managedChildrenParameters, context: { rovingTabIndexContext, typeaheadNavigationContext }, propsStable, ...void1 } = useListNavigation({
+    const { linearNavigationReturn, rovingTabIndexReturn, typeaheadNavigationReturn, managedChildrenParameters, context: { rovingTabIndexContext, typeaheadNavigationContext }, propsParent, propsStableParentOrChild, ...void1 } = useListNavigation({
         linearNavigationParameters: { arrowKeyDirection: "vertical", ...linearNavigationParameters },
         rovingTabIndexParameters: { onTabbableIndexChange: onTabbableIndexChangeOverride, ...rovingTabIndexParameters },
+        refElementReturn,
         managedChildrenReturn,
         typeaheadNavigationParameters
     });
@@ -35,7 +36,8 @@ export function useGridNavigation({ gridNavigationParameters: { onTabbableColumn
         setCurrentTabbableColumn
     });
     return {
-        propsStable,
+        propsParent,
+        propsStableParentOrChild,
         managedChildrenParameters,
         context: useStableObject({
             gridNavigationRowContext,
@@ -47,7 +49,7 @@ export function useGridNavigation({ gridNavigationParameters: { onTabbableColumn
         typeaheadNavigationReturn
     };
 }
-export function useGridNavigationRow({ context: { rovingTabIndexContext: contextRTI, typeaheadNavigationContext: contextTN, gridNavigationRowContext: { setTabbableRow, getCurrentTabbableColumn, setCurrentTabbableColumn } }, linearNavigationParameters, rovingTabIndexParameters: { ...rovingTabIndexParameters }, info: managedChildParameters, managedChildrenReturn, refElementReturn, textContentParameters, typeaheadNavigationParameters, ...void1 }) {
+export function useGridNavigationRow({ context: { rovingTabIndexContext: contextRTI, typeaheadNavigationContext: contextTN, gridNavigationRowContext: { setTabbableRow, getCurrentTabbableColumn, setCurrentTabbableColumn } }, linearNavigationParameters, rovingTabIndexParameters: { untabbable, ...rovingTabIndexParameters }, info: managedChildParameters, managedChildrenReturn, refElementReturn, textContentParameters, typeaheadNavigationParameters, ...void1 }) {
     monitorCallCount(useGridNavigationRow);
     const { getChildren } = managedChildrenReturn;
     const getIndex = useStableCallback(() => { return managedChildParameters.index; });
@@ -71,9 +73,9 @@ export function useGridNavigationRow({ context: { rovingTabIndexContext: context
             focus(e);
         }
     }, []);
-    const { hasCurrentFocusParameters, pressParameters, props: propsLNC, rovingTabIndexChildReturn, textContentReturn, info, ...void2 } = useListNavigationChild({ info: managedChildParameters, refElementReturn, textContentParameters, context: { rovingTabIndexContext: contextRTI, typeaheadNavigationContext: contextTN } });
-    const untabbable = !rovingTabIndexChildReturn.tabbable;
-    const { linearNavigationReturn, managedChildrenParameters, propsStable: propsLN, rovingTabIndexReturn, typeaheadNavigationReturn, context: { rovingTabIndexContext: rtiContext, typeaheadNavigationContext: tnContext } } = useListNavigation({ managedChildrenReturn, typeaheadNavigationParameters, rovingTabIndexParameters: { untabbable, ...rovingTabIndexParameters }, linearNavigationParameters: { arrowKeyDirection: "horizontal", ...linearNavigationParameters } });
+    const { hasCurrentFocusParameters, pressParameters, props: propsLNC, rovingTabIndexChildReturn, textContentReturn, info, ...void2 } = useListNavigationChild({ info: managedChildParameters, refElementReturn, textContentParameters, context: { rovingTabIndexContext: contextRTI, typeaheadNavigationContext: contextTN }, rovingTabIndexParameters: { untabbable: false, ...rovingTabIndexParameters } });
+    const allChildCellsAreUntabbable = !rovingTabIndexChildReturn.tabbable;
+    const { linearNavigationReturn, managedChildrenParameters, propsStableParentOrChild: propsLN, propsParent: propsLN2, rovingTabIndexReturn, typeaheadNavigationReturn, context: { rovingTabIndexContext: rtiContext, typeaheadNavigationContext: tnContext } } = useListNavigation({ managedChildrenReturn, refElementReturn, typeaheadNavigationParameters, rovingTabIndexParameters: { untabbable: allChildCellsAreUntabbable, ...rovingTabIndexParameters }, linearNavigationParameters: { arrowKeyDirection: "horizontal", ...linearNavigationParameters } });
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     const { setTabbableIndex } = rovingTabIndexReturn;
@@ -84,7 +86,10 @@ export function useGridNavigationRow({ context: { rovingTabIndexContext: context
         setCurrentTabbableColumn,
         setTabbableCell: setTabbableIndex
     });
-    const props = useMergedProps(propsLN, propsLNC);
+    // TODO: propsLN2 (awful name) is just the tabIndex=0 or -1 from rovingTabIndex, which flips around when `untabbable` flips.
+    // We can ignore it here, because our tabIndex is entirely controlled by our own list navigation,
+    // but it shouldn't just be ignored wholesale like this.
+    const props = useMergedProps(propsLN, /*propsLN2,*/ propsLNC);
     props.tabIndex = -1;
     return {
         context: useStableObject({
@@ -105,14 +110,15 @@ export function useGridNavigationRow({ context: { rovingTabIndexContext: context
         gridNavigationRowParameters: { focusSelf, setTabbableColumnIndex: setTabbableIndex },
     };
 }
-export function useGridNavigationCell({ context: { gridNavigationCellContext: { getRowIndex, setTabbableRow, getCurrentTabbableColumn: _getCurrentColumn, setCurrentTabbableColumn, setTabbableCell }, rovingTabIndexContext, typeaheadNavigationContext }, info, refElementReturn, textContentParameters, gridNavigationCellParameters: { colSpan }, ...void1 }) {
+export function useGridNavigationCell({ context: { gridNavigationCellContext: { getRowIndex, setTabbableRow, getCurrentTabbableColumn: _getCurrentColumn, setCurrentTabbableColumn, setTabbableCell }, rovingTabIndexContext, typeaheadNavigationContext }, info, refElementReturn, textContentParameters, gridNavigationCellParameters: { colSpan }, rovingTabIndexParameters, ...void1 }) {
     monitorCallCount(useGridNavigationCell);
     const { index } = info;
     const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void3 }, rovingTabIndexChildReturn, textContentReturn, pressParameters, props, info: infoLs, ...void2 } = useListNavigationChild({
         info,
         context: { rovingTabIndexContext, typeaheadNavigationContext },
         textContentParameters,
-        refElementReturn
+        refElementReturn,
+        rovingTabIndexParameters
     });
     assertEmptyObject(void1);
     assertEmptyObject(void2);

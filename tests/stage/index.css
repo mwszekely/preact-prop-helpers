@@ -1,5 +1,7 @@
 *:focus {
   outline: 2px solid rgba(0, 0, 0, 0.67);
+  background: rgba(0, 0, 0, 0.22);
+  box-shadow: 0 0 2px 4px rgb(97, 0, 0);
 }
 
 /*# sourceMappingURL=index.css.map */

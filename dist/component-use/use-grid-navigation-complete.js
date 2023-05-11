@@ -25,13 +25,15 @@ export function useCompleteGridNavigation({ gridNavigationParameters, linearNavi
             return false;
         return true;
     }, []);
-    const { childrenHaveFocusParameters, managedChildrenParameters, context: { gridNavigationRowContext, rovingTabIndexContext, singleSelectionContext, typeaheadNavigationContext }, rearrangeableChildrenReturn, propsStable, ...gridNavigationSingleSelectionReturn } = useGridNavigationSingleSelectionSortable({
+    const { refElementReturn } = useRefElement({});
+    const { childrenHaveFocusParameters, managedChildrenParameters, context: { gridNavigationRowContext, rovingTabIndexContext, singleSelectionContext, typeaheadNavigationContext }, rearrangeableChildrenReturn, propsParent, propsStableParentOrChild, ...gridNavigationSingleSelectionReturn } = useGridNavigationSingleSelectionSortable({
         gridNavigationParameters,
         linearNavigationParameters: { getHighestIndex: getHighestChildIndex, isValid, ...linearNavigationParameters },
         managedChildrenReturn: { getChildren },
         rovingTabIndexParameters: { initiallyTabbedIndex: singleSelectionParameters.initiallySelectedIndex, ...rovingTabIndexParameters },
         singleSelectionParameters,
         typeaheadNavigationParameters: { isValid, ...typeaheadNavigationParameters },
+        refElementReturn,
         rearrangeableChildrenParameters: {
             onRearranged: useStableCallback(() => { refreshPagination(paginatedChildrenParameters.paginationMin, paginatedChildrenParameters.paginationMax); }),
             ...rearrangeableChildrenParameters
@@ -57,7 +59,7 @@ export function useCompleteGridNavigation({ gridNavigationParameters, linearNavi
     });
     return {
         context,
-        propsStable,
+        props: useMergedProps(propsParent, propsStableParentOrChild),
         managedChildrenReturn,
         rearrangeableChildrenReturn,
         staggeredChildrenReturn,
@@ -136,7 +138,7 @@ export function useCompleteGridNavigationRow({ info, context: contextIncomingFor
         props,
     };
 }
-export function useCompleteGridNavigationCell({ gridNavigationCellParameters, context: { gridNavigationCellContext, managedChildContext, rovingTabIndexContext, typeaheadNavigationContext }, textContentParameters, info }) {
+export function useCompleteGridNavigationCell({ gridNavigationCellParameters, context: { gridNavigationCellContext, managedChildContext, rovingTabIndexContext, typeaheadNavigationContext }, textContentParameters, rovingTabIndexParameters, info }) {
     monitorCallCount(useCompleteGridNavigationCell);
     const { refElementReturn, propsStable } = useRefElement({ refElementParameters: {} });
     const { hasCurrentFocusParameters, rovingTabIndexChildReturn, textContentReturn, pressParameters, props: propsRti, info: info2 } = useGridNavigationSingleSelectionCell({
@@ -144,7 +146,8 @@ export function useCompleteGridNavigationCell({ gridNavigationCellParameters, co
         info,
         context: { gridNavigationCellContext, rovingTabIndexContext, typeaheadNavigationContext },
         refElementReturn,
-        textContentParameters: { hidden: info.hidden, ...textContentParameters }
+        textContentParameters: { hidden: info.hidden, ...textContentParameters },
+        rovingTabIndexParameters
     });
     const { hasCurrentFocusReturn } = useHasCurrentFocus({ hasCurrentFocusParameters: { onCurrentFocusedChanged: null, ...hasCurrentFocusParameters }, refElementReturn });
     const baseInfo = {
@@ -166,7 +169,7 @@ export function useCompleteGridNavigationCell({ gridNavigationCellParameters, co
         textContentReturn
     };
 }
-export function useCompleteGridNavigationDeclarative({ gridNavigationParameters, linearNavigationParameters, paginatedChildrenParameters, rearrangeableChildrenParameters, rovingTabIndexParameters, singleSelectionDeclarativeParameters, sortableChildrenParameters, staggeredChildrenParameters, typeaheadNavigationParameters, singleSelectionParameters }) {
+export function useCompleteGridNavigationDeclarative({ gridNavigationParameters, linearNavigationParameters, paginatedChildrenParameters, rearrangeableChildrenParameters, rovingTabIndexParameters, singleSelectionDeclarativeParameters, sortableChildrenParameters, staggeredChildrenParameters, typeaheadNavigationParameters, singleSelectionParameters, }) {
     const ret = useCompleteGridNavigation({
         linearNavigationParameters,
         paginatedChildrenParameters,
@@ -176,7 +179,7 @@ export function useCompleteGridNavigationDeclarative({ gridNavigationParameters,
         sortableChildrenParameters,
         staggeredChildrenParameters,
         typeaheadNavigationParameters,
-        gridNavigationParameters
+        gridNavigationParameters,
     });
     const { singleSelectionParameters: { onSelectedIndexChange } } = useSingleSelectionDeclarative({ singleSelectionDeclarativeParameters, singleSelectionReturn: ret.singleSelectionReturn });
     const { singleSelectionReturn: { getSelectedIndex }, ...ret2 } = ret;

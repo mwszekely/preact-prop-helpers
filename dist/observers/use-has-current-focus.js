@@ -3,10 +3,10 @@ import { returnFalse, runImmediately, useEnsureStability, usePassiveState } from
 import { monitorCallCount } from "../util/use-call-count.js";
 export function useHasCurrentFocus(args) {
     monitorCallCount(useHasCurrentFocus);
-    const { hasCurrentFocusParameters: { onCurrentFocusedChanged: onFocusedChanged, onCurrentFocusedInnerChanged: onFocusedInnerChanged }, refElementReturn: { getElement } } = args;
-    useEnsureStability("useHasCurrentFocus", onFocusedChanged, onFocusedInnerChanged, getElement);
-    const [getFocused, setFocused] = usePassiveState(onFocusedChanged, returnFalse, runImmediately);
-    const [getFocusedInner, setFocusedInner] = usePassiveState(onFocusedInnerChanged, returnFalse, runImmediately);
+    const { hasCurrentFocusParameters: { onCurrentFocusedChanged, onCurrentFocusedInnerChanged }, refElementReturn: { getElement } } = args;
+    useEnsureStability("useHasCurrentFocus", onCurrentFocusedChanged, onCurrentFocusedInnerChanged, getElement);
+    const [getFocused, setFocused] = usePassiveState(onCurrentFocusedChanged, returnFalse, runImmediately);
+    const [getFocusedInner, setFocusedInner] = usePassiveState(onCurrentFocusedInnerChanged, returnFalse, runImmediately);
     const onFocusIn = useCallback((e) => {
         setFocusedInner(true, e);
         setFocused(e.target == getElement(), e);
