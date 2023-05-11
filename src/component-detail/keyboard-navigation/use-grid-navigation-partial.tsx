@@ -41,7 +41,21 @@ export interface UseGridNavigationRowParameters<RowElement extends Element, Cell
     context: UseGridNavigationRowContext;
     linearNavigationParameters: OmitStrong<UseListNavigationParameters<RowElement, CellElement, CM>["linearNavigationParameters"], "arrowKeyDirection">
 
-    rovingTabIndexParameters: OmitStrong<UseListNavigationParameters<RowElement, CellElement, CM>["rovingTabIndexParameters"], never>
+    /**
+     * TODO: Awful names. But because it's theoretically possible for a row to be untabbable while the whole grid isn't,
+     * these do need to be separated. 
+     * 
+     * (As in, it's perfectly reasonable for a row to arbitrarily say "I and my cells are all untabbable"
+     * completely independently of whether the grid as a whole is in some slightly esoteric scenarios)
+     * 
+     * This should be fixed by making the "pass constants from parent to child" its own thing.
+     * It's awkward because they can't be with the rest of the context stuff (which must be stable).
+     * 
+     * G2R is "grid to row", represents the parameters the grid got that the row needs.
+     * R2C is "row to cell", represents the parameters the row got that the cell needs.
+     */
+    rovingTabIndexParametersG2R: OmitStrong<UseListNavigationChildParameters<CellElement, CM>["rovingTabIndexParameters"], never>;
+    rovingTabIndexParametersR2C: OmitStrong<UseListNavigationParameters<RowElement, CellElement, CM>["rovingTabIndexParameters"], never>;
 
 }
 
@@ -155,7 +169,8 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
         gridNavigationRowContext: { setTabbableRow, getCurrentTabbableColumn, setCurrentTabbableColumn }
     },
     linearNavigationParameters, 
-    rovingTabIndexParameters: { untabbable, ...rovingTabIndexParameters },
+    rovingTabIndexParametersG2R: { untabbable: rowIsUntabbableBecauseOfGrid, ...void3 },
+    rovingTabIndexParametersR2C: { untabbable: rowIsUntabbableAndSoAreCells, initiallyTabbedIndex, onTabbableIndexChange, ...void4 },
     info: managedChildParameters,
     managedChildrenReturn,
     refElementReturn,
@@ -196,7 +211,7 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
         textContentReturn,
         info,
         ...void2
-    } = useListNavigationChild<RowElement, RM>({ info: managedChildParameters, refElementReturn, textContentParameters, context: { rovingTabIndexContext: contextRTI, typeaheadNavigationContext: contextTN }, rovingTabIndexParameters: { untabbable: false, ...rovingTabIndexParameters } });
+    } = useListNavigationChild<RowElement, RM>({ info: managedChildParameters, refElementReturn, textContentParameters, context: { rovingTabIndexContext: contextRTI, typeaheadNavigationContext: contextTN }, rovingTabIndexParameters: { untabbable: rowIsUntabbableBecauseOfGrid } });
     const allChildCellsAreUntabbable = !rovingTabIndexChildReturn.tabbable;
     const {
         linearNavigationReturn,
@@ -206,11 +221,13 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
         rovingTabIndexReturn,
         typeaheadNavigationReturn,
         context: { rovingTabIndexContext: rtiContext, typeaheadNavigationContext: tnContext }
-    } = useListNavigation<RowElement, CellElement, CM>({ managedChildrenReturn, refElementReturn, typeaheadNavigationParameters, rovingTabIndexParameters: { untabbable: allChildCellsAreUntabbable, ...rovingTabIndexParameters }, linearNavigationParameters: { arrowKeyDirection: "horizontal", ...linearNavigationParameters } });
+    } = useListNavigation<RowElement, CellElement, CM>({ managedChildrenReturn, refElementReturn, typeaheadNavigationParameters, rovingTabIndexParameters: { untabbable: allChildCellsAreUntabbable || rowIsUntabbableAndSoAreCells, initiallyTabbedIndex, onTabbableIndexChange }, linearNavigationParameters: { arrowKeyDirection: "horizontal", ...linearNavigationParameters } });
 
 
     assertEmptyObject(void1);
     assertEmptyObject(void2);
+    assertEmptyObject(void3);
+    assertEmptyObject(void4);
 
     const { setTabbableIndex } = rovingTabIndexReturn;
 

@@ -69,7 +69,7 @@ export function useCompleteGridNavigation({ gridNavigationParameters, linearNavi
         paginatedChildrenReturn,
     };
 }
-export function useCompleteGridNavigationRow({ info, context: contextIncomingForRowAsChildOfTable, textContentParameters, linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, sortableChildParameters, singleSelectionParameters }) {
+export function useCompleteGridNavigationRow({ info, context: contextIncomingForRowAsChildOfTable, textContentParameters, linearNavigationParameters, rovingTabIndexParametersG2R, rovingTabIndexParametersR2C, typeaheadNavigationParameters, sortableChildParameters, singleSelectionParameters }) {
     monitorCallCount(useCompleteGridNavigationRow);
     const { info: infoPaginatedChild, paginatedChildReturn: { paginatedVisible, isPaginated, hideBecausePaginated }, props: paginationProps } = usePaginatedChild({ info, context: contextIncomingForRowAsChildOfTable });
     const { info: infoStaggeredChild, // { setParentIsStaggered, setStaggeredVisible },
@@ -88,7 +88,8 @@ export function useCompleteGridNavigationRow({ info, context: contextIncomingFor
     }, []);
     const { refElementReturn, propsStable } = useRefElement({ refElementParameters: {} });
     const r = useGridNavigationSingleSelectionRow({
-        rovingTabIndexParameters: { initiallyTabbedIndex: 0, ...rovingTabIndexParameters },
+        rovingTabIndexParametersG2R,
+        rovingTabIndexParametersR2C,
         typeaheadNavigationParameters: { isValid, ...typeaheadNavigationParameters },
         linearNavigationParameters: { isValid, getHighestIndex: getHighestChildIndex, pageNavigationSize: 0, indexDemangler: identity, indexMangler: identity, ...linearNavigationParameters },
         managedChildrenReturn: { getChildren },
@@ -98,7 +99,7 @@ export function useCompleteGridNavigationRow({ info, context: contextIncomingFor
         textContentParameters: { hidden: info.hidden, ...textContentParameters },
         singleSelectionParameters
     });
-    const { gridNavigationRowParameters: { focusSelf, setTabbableColumnIndex }, linearNavigationReturn, managedChildrenParameters, pressParameters: { excludeSpace }, // TODO: Pass this through context?
+    const { gridNavigationRowParameters: { focusSelf, setTabbableColumnIndex }, linearNavigationReturn, managedChildrenParameters, pressParameters: { excludeSpace }, // TODO: Pass this through context? (this is for children, so it doesn't actually matter, but for completeness...)
     rovingTabIndexChildReturn, rovingTabIndexReturn, singleSelectionChildReturn, textContentReturn, typeaheadNavigationReturn, context: contextGNR, info: infoRowReturn, } = r;
     //const { rowAsChildOfGridReturn: { props: propsRowAsChild, ...rowAsChildOfGridReturn }, rowAsParentOfCellsReturn: { propsStable: propsParentOfCells, ...rowAsParentOfCellsReturn } } = r;
     const { context: contextMC, managedChildrenReturn } = useManagedChildren({ managedChildrenParameters });

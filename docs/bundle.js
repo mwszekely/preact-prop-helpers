@@ -3841,9 +3841,15 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         }
       },
       linearNavigationParameters,
-      rovingTabIndexParameters: {
-        untabbable,
-        ...rovingTabIndexParameters
+      rovingTabIndexParametersG2R: {
+        untabbable: rowIsUntabbableBecauseOfGrid,
+        ...void3
+      },
+      rovingTabIndexParametersR2C: {
+        untabbable: rowIsUntabbableAndSoAreCells,
+        initiallyTabbedIndex,
+        onTabbableIndexChange,
+        ...void4
       },
       info: managedChildParameters,
       managedChildrenReturn,
@@ -3895,8 +3901,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         typeaheadNavigationContext: contextTN
       },
       rovingTabIndexParameters: {
-        untabbable: false,
-        ...rovingTabIndexParameters
+        untabbable: rowIsUntabbableBecauseOfGrid
       }
     });
     const allChildCellsAreUntabbable = !rovingTabIndexChildReturn.tabbable;
@@ -3916,8 +3921,9 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       refElementReturn,
       typeaheadNavigationParameters,
       rovingTabIndexParameters: {
-        untabbable: allChildCellsAreUntabbable,
-        ...rovingTabIndexParameters
+        untabbable: allChildCellsAreUntabbable || rowIsUntabbableAndSoAreCells,
+        initiallyTabbedIndex,
+        onTabbableIndexChange
       },
       linearNavigationParameters: {
         arrowKeyDirection: "horizontal",
@@ -4239,7 +4245,8 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       linearNavigationParameters,
       managedChildrenReturn,
       refElementReturn,
-      rovingTabIndexParameters,
+      rovingTabIndexParametersG2R,
+      rovingTabIndexParametersR2C,
       textContentParameters,
       typeaheadNavigationParameters,
       context: {
@@ -4294,7 +4301,8 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       info: mcp1,
       managedChildrenReturn,
       refElementReturn,
-      rovingTabIndexParameters,
+      rovingTabIndexParametersG2R,
+      rovingTabIndexParametersR2C,
       textContentParameters,
       typeaheadNavigationParameters
     });
@@ -7315,7 +7323,8 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       context: contextIncomingForRowAsChildOfTable,
       textContentParameters,
       linearNavigationParameters,
-      rovingTabIndexParameters,
+      rovingTabIndexParametersG2R,
+      rovingTabIndexParametersR2C,
       typeaheadNavigationParameters,
       sortableChildParameters,
       singleSelectionParameters
@@ -7361,10 +7370,8 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       refElementParameters: {}
     });
     const r = useGridNavigationSingleSelectionRow({
-      rovingTabIndexParameters: {
-        initiallyTabbedIndex: 0,
-        ...rovingTabIndexParameters
-      },
+      rovingTabIndexParametersG2R,
+      rovingTabIndexParametersR2C,
       typeaheadNavigationParameters: {
         isValid,
         ...typeaheadNavigationParameters
@@ -7399,7 +7406,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       pressParameters: {
         excludeSpace
       },
-      // TODO: Pass this through context?
+      // TODO: Pass this through context? (this is for children, so it doesn't actually matter, but for completeness...)
       rovingTabIndexChildReturn,
       rovingTabIndexReturn,
       singleSelectionChildReturn,
@@ -9581,11 +9588,15 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         navigatePastEnd: "wrap",
         navigatePastStart: "wrap"
       },
-      rovingTabIndexParameters: {
+      rovingTabIndexParametersG2R: {
+        untabbable: false
+      },
+      rovingTabIndexParametersR2C: {
         onTabbableIndexChange: useStableCallback(i => {
           setTabbableColumn(i);
         }),
-        untabbable: false
+        untabbable: false,
+        initiallyTabbedIndex: 0
       },
       typeaheadNavigationParameters: {
         collator: null,

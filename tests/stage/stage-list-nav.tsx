@@ -64,8 +64,6 @@ function TestBasesListNavImpl() {
         })
     }, [])*/
 
-    console.log(untabbable);
-
     const [t, setT] = useState<number | null>(null);
     const {
         childrenHaveFocusReturn: { getAnyFocused },
@@ -88,9 +86,7 @@ function TestBasesListNavImpl() {
         singleSelectionParameters: { ariaPropName, selectionMode },
         singleSelectionDeclarativeParameters: {
             selectedIndex, setSelectedIndex: ((i, e) => {
-                console.log("TEST");
                 const f = getTestingHandler("ListNav", "onSelectedIndexChange");
-                console.log(f, i, e);
                 f?.(i!, e!);
             })
         },

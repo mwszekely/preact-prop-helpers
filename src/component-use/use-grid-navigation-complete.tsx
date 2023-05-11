@@ -17,7 +17,7 @@ import { ManagedChildren, UseManagedChildReturnType, UseManagedChildrenContext, 
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useStableObject } from "../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../util/assert.js";
-import { ElementProps, OmitStrong, OmitTargeted } from "../util/types.js";
+import { ElementProps, ExtendMerge, OmitStrong, OmitTargeted } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 export interface UseCompleteGridNavigationRowInfo<RowElement extends Element, CellElement extends Element> extends GridSingleSelectSortableChildRowInfo<RowElement, CellElement>, UsePaginatedChildrenInfo<RowElement>, UseStaggeredChildrenInfo<RowElement> { }
 export interface UseCompleteGridNavigationCellInfo<CellElement extends Element> extends GridSingleSelectSortableChildCellInfo<CellElement> { }
@@ -33,7 +33,7 @@ export interface UseCompleteGridNavigationParameters<ParentOrRowElement extends 
 }
 
 export interface UseCompleteGridNavigationRowParameters<RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement, CellElement>, CM extends UseCompleteGridNavigationCellInfo<CellElement>> extends
-    OmitStrong<UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM>, "context" | "textContentParameters" | "managedChildrenReturn" | "refElementReturn" | "rovingTabIndexParameters" | "linearNavigationParameters" | "typeaheadNavigationParameters"> {
+    OmitStrong<UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM>, "context" | "textContentParameters" | "managedChildrenReturn" | "refElementReturn" | "linearNavigationParameters" | "typeaheadNavigationParameters"> {
 
     context: CompleteGridNavigationRowContext<any, RowElement, CellElement, RM, CM>;
     info: OmitStrong<RM, Exclude<keyof UseCompleteGridNavigationRowInfo<RowElement, CellElement>, "index" | "hidden" | "disabled">>;
@@ -44,7 +44,6 @@ export interface UseCompleteGridNavigationRowParameters<RowElement extends Eleme
     typeaheadNavigationParameters: OmitStrong<UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM>["typeaheadNavigationParameters"], "isValid">;
     //rovingTabIndexParameters: OmitStrong<UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM>["rovingTabIndexParameters"], "initiallyTabbedIndex">;
 
-    rovingTabIndexParameters: UseRovingTabIndexParameters<RowElement, CellElement, CM>["rovingTabIndexParameters"] | UseRovingTabIndexChildParameters<RowElement, RM>["rovingTabIndexParameters"];
     singleSelectionParameters: UseSingleSelectionChildParameters<any, any>["singleSelectionParameters"];
 }
 
@@ -206,7 +205,8 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
     textContentParameters,
 
     linearNavigationParameters,
-    rovingTabIndexParameters,
+    rovingTabIndexParametersG2R,
+    rovingTabIndexParametersR2C,
     typeaheadNavigationParameters,
     sortableChildParameters,
     singleSelectionParameters
@@ -244,7 +244,8 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
 
 
     const r: UseGridNavigationSingleSelectionRowReturnType<RowElement, CellElement, RM, CM> = useGridNavigationSingleSelectionRow<RowElement, CellElement, RM, CM>({
-        rovingTabIndexParameters: { initiallyTabbedIndex: 0, ...rovingTabIndexParameters },
+        rovingTabIndexParametersG2R,
+        rovingTabIndexParametersR2C,
         typeaheadNavigationParameters: { isValid, ...typeaheadNavigationParameters },
         linearNavigationParameters: { isValid, getHighestIndex: getHighestChildIndex, pageNavigationSize: 0, indexDemangler: identity, indexMangler: identity, ...linearNavigationParameters },
         managedChildrenReturn: { getChildren },
@@ -259,7 +260,7 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
         gridNavigationRowParameters: { focusSelf, setTabbableColumnIndex },
         linearNavigationReturn,
         managedChildrenParameters,
-        pressParameters: { excludeSpace },  // TODO: Pass this through context?
+        pressParameters: { excludeSpace },  // TODO: Pass this through context? (this is for children, so it doesn't actually matter, but for completeness...)
         rovingTabIndexChildReturn,
         rovingTabIndexReturn,
         singleSelectionChildReturn,

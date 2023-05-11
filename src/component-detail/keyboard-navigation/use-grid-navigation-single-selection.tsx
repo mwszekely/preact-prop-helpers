@@ -91,7 +91,8 @@ export function useGridNavigationSingleSelectionRow<RowElement extends Element, 
     linearNavigationParameters,
     managedChildrenReturn,
     refElementReturn,
-    rovingTabIndexParameters,
+    rovingTabIndexParametersG2R,
+    rovingTabIndexParametersR2C,
     textContentParameters,
     typeaheadNavigationParameters,
     context: { gridNavigationRowContext, rovingTabIndexContext, singleSelectionContext, typeaheadNavigationContext },
@@ -100,7 +101,7 @@ export function useGridNavigationSingleSelectionRow<RowElement extends Element, 
 }: UseGridNavigationSingleSelectionRowParameters<RowElement, CellElement, RM, CM>): UseGridNavigationSingleSelectionRowReturnType<RowElement, CellElement, RM, CM> {
     monitorCallCount(useGridNavigationSingleSelectionRow);
     const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1 }, info: mcp2, props: propsSS, singleSelectionChildReturn, ...void2 } = useSingleSelectionChild<RowElement, RM>({ info: mcp1, context: { singleSelectionContext }, singleSelectionParameters });
-    const { context, gridNavigationRowParameters, hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2 }, linearNavigationReturn, managedChildrenParameters, pressParameters: { excludeSpace }, props: propsGN, rovingTabIndexChildReturn, rovingTabIndexReturn, textContentReturn, typeaheadNavigationReturn, info: mcp3, ...void3 } = useGridNavigationRow<RowElement, CellElement, RM, CM>({ context: { gridNavigationRowContext, rovingTabIndexContext, typeaheadNavigationContext }, linearNavigationParameters, info: mcp1, managedChildrenReturn, refElementReturn, rovingTabIndexParameters, textContentParameters, typeaheadNavigationParameters });
+    const { context, gridNavigationRowParameters, hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2 }, linearNavigationReturn, managedChildrenParameters, pressParameters: { excludeSpace }, props: propsGN, rovingTabIndexChildReturn, rovingTabIndexReturn, textContentReturn, typeaheadNavigationReturn, info: mcp3, ...void3 } = useGridNavigationRow<RowElement, CellElement, RM, CM>({ context: { gridNavigationRowContext, rovingTabIndexContext, typeaheadNavigationContext }, linearNavigationParameters, info: mcp1, managedChildrenReturn, refElementReturn, rovingTabIndexParametersG2R, rovingTabIndexParametersR2C, textContentParameters, typeaheadNavigationParameters });
 
     assertEmptyObject(void1);
     assertEmptyObject(void2);
