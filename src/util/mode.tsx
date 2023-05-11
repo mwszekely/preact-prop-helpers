@@ -1,5 +1,8 @@
 
 declare global {
+    // Sometimes there will be an error here if @types/node is included,
+    // and sometimes there won't...not much we can do.
+    /// @ts-ignore
     const process: { env: { NODE_ENV?: string | undefined } | undefined };
 }
 

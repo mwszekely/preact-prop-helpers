@@ -8,6 +8,7 @@
     "declarationMap": true,                   /* Generates a sourcemap for each corresponding '.d.ts' file. */
     "sourceMap": true,                        /* Generates corresponding '.map' file. */
     "outDir": "./dist",
+    "rootDir": "./src/",
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "exactOptionalPropertyTypes": false,    
     "strict": true,                            /* Enable all strict type-checking options. */

@@ -41,6 +41,7 @@ export { UseHasLastFocusParameters, UseHasLastFocusReturnType, useHasLastFocus }
 export { LogicalDirectionInfo, LogicalElementSize, LogicalOrientation, PhysicalDirection, PhysicalOrientation, PhysicalSize, UseLogicalDirectionParameters, UseLogicalDirectionReturnType, useLogicalDirection } from "./observers/use-logical-direction.js";
 export { UseMediaQueryReturnType, useMediaQuery } from "./observers/use-media-query.js";
 export { UseMutationObserverParameters, useMutationObserver } from "./observers/use-mutation-observer.js";
+export { useUrl } from "./observers/use-url.js";
 export { useAsyncEffect } from "./preact-extensions/use-async-effect.js";
 export { UseAsyncParameters, UseAsyncReturnType, useAsync } from "./preact-extensions/use-async.js";
 export { useEffectDebug } from "./preact-extensions/use-effect-debug.js";
@@ -49,6 +50,7 @@ export { useLayoutEffectDebug } from "./preact-extensions/use-layout-effect-debu
 export { ManagedChildInfo, ManagedChildren, OnAfterChildLayoutEffect, OnChildrenMountChange, UseChildrenFlagParameters, UseChildrenFlagReturnType, UseManagedChildParameters, UseManagedChildReturnType, UseManagedChildrenContext, UseManagedChildrenParameters, UseManagedChildrenReturnType, useChildrenFlag, useManagedChild, useManagedChildren } from "./preact-extensions/use-managed-children.js";
 export { OnPassiveStateChange, PassiveStateUpdater, debounceRendering, returnFalse, returnNull, returnTrue, returnUndefined, returnZero, runImmediately, useEnsureStability, usePassiveState } from "./preact-extensions/use-passive-state.js";
 export { PersistentStates, getFromLocalStorage, storeToLocalStorage, usePersistentState } from "./preact-extensions/use-persistent-state.js";
+export { OnParamValueChanged, SearchParamStates, SetParamWithHistory, UseSearchParamStateParameters, useSearchParamState, useSearchParamStateDeclarative } from "./preact-extensions/use-search-param-state.js";
 export { useStableCallback } from "./preact-extensions/use-stable-callback.js";
 export { useStableGetter, useStableObject } from "./preact-extensions/use-stable-getter.js";
 export { useState } from "./preact-extensions/use-state.js";
@@ -60,6 +62,6 @@ export { assertEmptyObject } from "./util/assert.js";
 export { focus } from "./util/focus.js";
 export { getBuildMode } from "./util/mode.js";
 export { generateRandomId } from "./util/random-id.js";
-export type { OmitStrong, ExtendMerge, CSSProperties, CompositionEventType, ElementProps, EventType, FocusEventType, KeyboardEventType, MouseEventType, PointerEventType, Ref, RefCallback, RefObject, TouchEventType, VNode } from "./util/types.js";
+export type { CSSProperties, CompositionEventType, ElementProps, EventType, ExtendMerge, FocusEventType, KeyboardEventType, MouseEventType, OmitStrong, PointerEventType, Ref, RefCallback, RefObject, TouchEventType, VNode } from "./util/types.js";
 export { hideCallCount, monitorCallCount } from "./util/use-call-count.js";
 //# sourceMappingURL=index.d.ts.map

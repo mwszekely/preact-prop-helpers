@@ -41,6 +41,7 @@ export { useHasLastFocus } from "./observers/use-has-last-focus.js";
 export { useLogicalDirection } from "./observers/use-logical-direction.js";
 export { useMediaQuery } from "./observers/use-media-query.js";
 export { useMutationObserver } from "./observers/use-mutation-observer.js";
+export { useUrl } from "./observers/use-url.js";
 export { useAsyncEffect } from "./preact-extensions/use-async-effect.js";
 export { useAsync } from "./preact-extensions/use-async.js";
 export { useEffectDebug } from "./preact-extensions/use-effect-debug.js";
@@ -49,6 +50,7 @@ export { useLayoutEffectDebug } from "./preact-extensions/use-layout-effect-debu
 export { useChildrenFlag, useManagedChild, useManagedChildren } from "./preact-extensions/use-managed-children.js";
 export { debounceRendering, returnFalse, returnNull, returnTrue, returnUndefined, returnZero, runImmediately, useEnsureStability, usePassiveState } from "./preact-extensions/use-passive-state.js";
 export { getFromLocalStorage, storeToLocalStorage, usePersistentState } from "./preact-extensions/use-persistent-state.js";
+export { useSearchParamState, useSearchParamStateDeclarative } from "./preact-extensions/use-search-param-state.js";
 export { useStableCallback } from "./preact-extensions/use-stable-callback.js";
 export { useStableGetter, useStableObject } from "./preact-extensions/use-stable-getter.js";
 export { useState } from "./preact-extensions/use-state.js";

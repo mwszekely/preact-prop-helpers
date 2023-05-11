@@ -1,10 +1,11 @@
 import { RenderableProps, render } from "preact";
-import { useSearchParams } from "preact-hash-router";
 import { TestBasesButton } from "./stage-press.js";
 import { TestBasesListNav } from "./stage-list-nav.js";
 import { TestingConstants } from "./util.js";
 import { TestBasesFocus } from "./stage-focus.js";
 import type { SharedFixtures } from "../fixtures/shared.js";
+import { useSearchParamState, useState } from "../../dist/index.js"
+import { useSearchParamStateDeclarative } from "../../dist/preact-extensions/use-search-param-state.js";
 
 
 declare module globalThis {
@@ -76,9 +77,14 @@ const TestBases = {
     /*"menu": <TestBasesMenu />,*/
 }
 
+declare module "../../dist/index.js" {
+    export interface SearchParamStates {
+        "test-base": string;
+    }
+}
+
 function TestsContainer() {
-    const [getBase, setBase] = useSearchParams("test-base", "string");
-    const base = getBase();
+    const [base, setBase, getBase] = useSearchParamStateDeclarative({ key: "test-base", initialValue: "", fromString: value => value });
 
     if (!base) {
         return (
