@@ -14,13 +14,13 @@ export interface FocusConstants {
 
 export function TestBasesFocus() {
     return (
-        <TestItem>
+        <>
             <Impl tag="div" tabIndex={0}>Focusable div</Impl>
             <Impl tag="button" tabIndex={0}>Focusable button</Impl>
             <Impl tag="div" tabIndex={-1}>Untabbable div</Impl>
             <Impl tag="button" tabIndex={-1}>Untabbable button</Impl>
             <input id="steal-focus" />
-        </TestItem>
+        </>
     )
 }
 

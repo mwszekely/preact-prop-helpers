@@ -82,8 +82,9 @@ export function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovi
                 if (nextChild != null && fromUserInteraction) {
                     const element = nextChild.getElement();
                     if (element) {
-                        if (document.activeElement == null || !element.contains(document.activeElement))
+                        if (document.activeElement == document.body || document.activeElement == null || !element.contains(document.activeElement)) {
                             nextChild.focusSelf(element);
+                        }
                     }
                 }
             }

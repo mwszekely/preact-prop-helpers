@@ -271,8 +271,9 @@ export function useRovingTabIndex<ParentElement extends Element, ChildElement ex
                 if (nextChild != null && fromUserInteraction) {
                     const element = nextChild.getElement();
                     if (element) {
-                        if (document.activeElement == null || !element.contains(document.activeElement))
+                        if (document.activeElement == document.body || document.activeElement == null || !element.contains(document.activeElement)) {
                             nextChild.focusSelf(element);
+                        }
                     }
                 }
             }
@@ -354,7 +355,7 @@ export function useRovingTabIndex<ParentElement extends Element, ChildElement ex
             // (otherwise focus gets lost to the body, and useEffect thinks that it shouldn't
             // focus the child because focus wasn't within the list). 
             // It's also just consistent. 
-            tabIndex: untabbable? 0 : -1 
+            tabIndex: untabbable ? 0 : -1
         }
     };
 }

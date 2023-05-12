@@ -1,5 +1,5 @@
 import { useCallback, useContext, useEffect, useRef, useState } from "preact/hooks";
-import { Compare, CompleteListNavigationContext, UseCompleteListNavigationChildInfo, UseSingleSelectionParameters, useCompleteListNavigation, useCompleteListNavigationChild, useCompleteListNavigationDeclarative, useMergedProps, useStableGetter } from "../../dist/index.js";
+import { Compare, CompleteListNavigationContext, UseCompleteListNavigationChildInfo, UseSingleSelectionParameters, useCompleteListNavigation, useCompleteListNavigationChild, useCompleteListNavigationDeclarative, useMergedProps, useStableGetter, useStaggeredChildren } from "../../dist/index.js";
 import { TestItem, useTestSyncState } from "./util.js";
 import { createContext } from "preact";
 import { LoremIpsum } from "../lorem.js";
@@ -29,16 +29,7 @@ const Context = createContext<CompleteListNavigationContext<HTMLOListElement, HT
 
 export function TestBasesListNav() {
     const mounted = useTestSyncState("ListNav", "setMounted", true);
-    if (!mounted)
-        return <ol />;
-
-    return (<TestBasesListNavImpl />);
-}
-
-const AriaPropNameContext = createContext("aria-selected" as UseSingleSelectionParameters<any, any, any>["singleSelectionParameters"]["ariaPropName"]);
-const SelectionModeContext = createContext("activation" as UseSingleSelectionParameters<any, any, any>["singleSelectionParameters"]["selectionMode"]);
-function TestBasesListNavImpl() {
-    const childCount = useTestSyncState("ListNav", "setChildCount", 10);
+    const childCount = useTestSyncState("ListNav", "setChildCount", 20);
     const arrowKeyDirection = useTestSyncState("ListNav", "setArrowKeyDirection", "vertical");
     const pagination = useTestSyncState("ListNav", "setPagination", null);
     const disableHomeEndKeys = useTestSyncState("ListNav", "setDisableHomeEndKeys", false);
@@ -52,9 +43,42 @@ function TestBasesListNavImpl() {
     const typeaheadTimeout = useTestSyncState("ListNav", "setTypeaheadTimeout", 1000);
     const selectionMode = useTestSyncState("ListNav", "setSelectionMode", "activation");
     const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+    console.log(pagination);
+
+    const a = { untabbable, staggered, collatorId, noTypeahead, typeaheadTimeout, selectionMode }
 
     installTestingHandler("ListNav", "setSelectedIndex", setSelectedIndex);
+    if (!mounted)
+        return <ol />;
 
+    return (
+            <TestBasesListNavImpl selectedIndex={selectedIndex} childCount={childCount} collatorId={collatorId} disableHomeEndKeys={disableHomeEndKeys} navigatePastStartEnd={navigatePastStartEnd} noTypeahead={noTypeahead} pageNavigationSize={pageNavigationSize} pagination={pagination} selectionMode={selectionMode} staggered={staggered} typeaheadTimeout={typeaheadTimeout} untabbable={untabbable} arrowKeyDirection={arrowKeyDirection} ariaPropName={ariaPropName} />
+    );
+}
+
+interface A {
+    childCount: number;
+    arrowKeyDirection: "horizontal" | "vertical";
+    pagination: [number, number] | null;
+    disableHomeEndKeys: boolean;
+    pageNavigationSize: number;
+    navigatePastStartEnd: "wrap" | "passthrough";
+    ariaPropName: "aria-pressed" | "aria-selected" | "aria-checked" | "aria-current-page" | "aria-current-step" | "aria-current-date" | "aria-current-time" | "aria-current-location" | "aria-current-true" | null;
+    untabbable: boolean;
+    staggered: boolean;
+    collatorId: string;
+    noTypeahead: boolean;
+    typeaheadTimeout: number;
+    selectionMode: "focus" | "activation" | "disabled";
+    selectedIndex: number | null;
+}
+
+const UntabbableContext = createContext(false);
+const AriaPropNameContext = createContext("aria-selected" as UseSingleSelectionParameters<any, any, any>["singleSelectionParameters"]["ariaPropName"]);
+const SelectionModeContext = createContext("activation" as UseSingleSelectionParameters<any, any, any>["singleSelectionParameters"]["selectionMode"]);
+function TestBasesListNavImpl({ ariaPropName, selectedIndex, arrowKeyDirection, childCount, collatorId, disableHomeEndKeys, navigatePastStartEnd, noTypeahead, pageNavigationSize, pagination, selectionMode, staggered, typeaheadTimeout, untabbable }: A) {
+
+    console.log(pagination);
     /*let u = useRef(false);
     useEffect(() => {
         window.addEventListener("keydown", e => {
@@ -85,7 +109,8 @@ function TestBasesListNavImpl() {
         rovingTabIndexParameters: { untabbable, onTabbableIndexChange: setT },
         singleSelectionParameters: { ariaPropName, selectionMode },
         singleSelectionDeclarativeParameters: {
-            selectedIndex, setSelectedIndex: ((i, e) => {
+            selectedIndex,
+            setSelectedIndex: ((i, e) => {
                 const f = getTestingHandler("ListNav", "onSelectedIndexChange");
                 f?.(i!, e!);
             })
@@ -99,12 +124,16 @@ function TestBasesListNavImpl() {
         <AriaPropNameContext.Provider value={ariaPropName}>
             <SelectionModeContext.Provider value={selectionMode}>
                 <UntabbableContext.Provider value={untabbable}>
-                    <Context.Provider value={context}>
-                        {untabbable.toString()}, {t}
-                        <ol role="toolbar" data-still-staggering={stillStaggering} data-typeahead-status={typeaheadStatus} {...props}>
-                            <TestBasesListNavChildren count={childCount} />
-                        </ol>
-                    </Context.Provider>
+                    <PaginatedContext.Provider value={pagination != null}>
+                        <StaggeredContext.Provider value={staggered}>
+                            <Context.Provider value={context}>
+                                {untabbable.toString()}, {t}
+                                <ol role="toolbar" data-still-staggering={stillStaggering} data-typeahead-status={typeaheadStatus} {...props}>
+                                    <TestBasesListNavChildren count={childCount} />
+                                </ol>
+                            </Context.Provider>
+                        </StaggeredContext.Provider>
+                    </PaginatedContext.Provider>
                 </UntabbableContext.Provider>
             </SelectionModeContext.Provider>
         </AriaPropNameContext.Provider>
@@ -131,7 +160,8 @@ const DisabledIndex = 4;
 const MissingIndex = 6;
 const HiddenIndex = 8;
 
-const UntabbableContext = createContext(false);
+const PaginatedContext = createContext(false);
+const StaggeredContext = createContext(false);
 function TestBasesListNavChild({ index }: { index: number }) {
     const textContent = LoremIpsum[index % LoremIpsum.length];
     const getTextContent = useStableGetter(textContent);
@@ -154,6 +184,8 @@ function TestBasesListNavChild({ index }: { index: number }) {
         textContentReturn: { }
     } = useCompleteListNavigationChild<HTMLLIElement, UseCompleteListNavigationChildInfo<HTMLLIElement>>({
         context: useContext(Context),
+        paginatedChildrenParameters: { paginated: useContext(PaginatedContext) },
+        staggeredChildrenParameters: { staggered: useContext(StaggeredContext) },
         pressParameters: {
             focusSelf: e => e.focus(),
             onPressSync: null
@@ -181,7 +213,7 @@ function TestBasesListNavChild({ index }: { index: number }) {
                 data-selected={selected}
                 data-selected-offset={selectedOffset}
                 data-is-staggered={isStaggered}
-                {...useMergedProps(props, propsPressStable)}>{textContent}{hidden && " (hidden)"}{disabled && " (disabled)"}</li>
+                {...useMergedProps(props, propsPressStable)}>{(hideBecausePaginated || hideBecauseStaggered) ? "" : textContent}{hidden && " (hidden)"}{disabled && " (disabled)"}</li>
         </>
     )
 }

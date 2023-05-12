@@ -2,7 +2,6 @@ import { UseManagedChildrenReturnType } from "../preact-extensions/use-managed-c
 import { ElementProps } from "../util/types.js";
 import { UseRovingTabIndexChildInfo } from "./keyboard-navigation/use-roving-tabindex.js";
 export interface UseStaggeredChildrenInfo<E extends Element> extends Pick<UseRovingTabIndexChildInfo<E>, "hidden" | "index"> {
-    setParentIsStaggered(parentIsStaggered: boolean): void;
     setStaggeredVisible(visible: boolean): void;
 }
 export interface UseStaggeredChildrenParameters<E extends Element, M extends UseStaggeredChildrenInfo<E>> {
@@ -16,7 +15,6 @@ export interface UseStaggeredChildContext {
         childCallsThisToTellTheParentToMountTheNextOne(index: number): void;
         childCallsThisToTellTheParentTheHighestIndex(index: number): void;
         getDefaultStaggeredVisible(i: number): boolean;
-        getDefaultIsStaggered(): boolean;
     };
 }
 export interface UseStaggeredChildrenReturnType {
@@ -35,6 +33,9 @@ export interface UseStaggeredChildrenReturnType {
  */
 export declare function useStaggeredChildren<E extends Element, M extends UseStaggeredChildrenInfo<E>>({ managedChildrenReturn: { getChildren }, staggeredChildrenParameters: { staggered } }: UseStaggeredChildrenParameters<E, M>): UseStaggeredChildrenReturnType;
 export interface UseStaggeredChildParameters {
+    staggeredChildrenParameters: {
+        staggered: boolean;
+    };
     info: {
         index: number;
     };
@@ -52,7 +53,7 @@ export interface UseStaggeredChildReturn<ChildElement extends Element> {
          */
         hideBecauseStaggered: boolean;
     };
-    info: Pick<UseStaggeredChildrenInfo<ChildElement>, "setParentIsStaggered" | "setStaggeredVisible">;
+    info: Pick<UseStaggeredChildrenInfo<ChildElement>, "setStaggeredVisible">;
 }
-export declare function useStaggeredChild<ChildElement extends Element>({ info: { index }, context: { staggeredChildContext: { childCallsThisToTellTheParentTheHighestIndex, getDefaultIsStaggered, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne } } }: UseStaggeredChildParameters): UseStaggeredChildReturn<ChildElement>;
+export declare function useStaggeredChild<ChildElement extends Element>({ info: { index }, staggeredChildrenParameters: { staggered: parentIsStaggered }, context: { staggeredChildContext: { childCallsThisToTellTheParentTheHighestIndex, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne } } }: UseStaggeredChildParameters): UseStaggeredChildReturn<ChildElement>;
 //# sourceMappingURL=use-staggered-children.d.ts.map

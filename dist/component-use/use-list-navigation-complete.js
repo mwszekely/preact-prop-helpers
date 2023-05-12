@@ -53,7 +53,7 @@ export function useCompleteListNavigation({ linearNavigationParameters, rearrang
         ...completeListNavigationParameters,
     });
     const { context: { childrenHaveFocusChildContext }, childrenHaveFocusReturn } = useChildrenHaveFocus({ childrenHaveFocusParameters });
-    const { paginatedChildrenReturn, paginatedChildrenReturn: { refreshPagination }, managedChildrenParameters: { onChildrenCountChange }, context: { paginatedChildContext } } = usePaginatedChildren({ managedChildrenReturn: { getChildren: useStableCallback(() => managedChildrenReturn.getChildren()) }, paginatedChildrenParameters, linearNavigationParameters: { indexDemangler: rearrangeableChildrenReturn.indexDemangler } });
+    const { paginatedChildrenReturn, paginatedChildrenReturn: { refreshPagination }, managedChildrenParameters: { onChildrenCountChange }, context: { paginatedChildContext } } = usePaginatedChildren({ refElementReturn, managedChildrenReturn: { getChildren: useStableCallback(() => managedChildrenReturn.getChildren()) }, rovingTabIndexReturn, paginatedChildrenParameters, linearNavigationParameters: { indexDemangler: rearrangeableChildrenReturn.indexDemangler } });
     const { context: { staggeredChildContext }, staggeredChildrenReturn } = useStaggeredChildren({ managedChildrenReturn: { getChildren: useStableCallback(() => managedChildrenReturn.getChildren()) }, staggeredChildrenParameters });
     const { context: { managedChildContext }, managedChildrenReturn } = useManagedChildren({
         managedChildrenParameters: {
@@ -86,13 +86,13 @@ export function useCompleteListNavigation({ linearNavigationParameters, rearrang
         childrenHaveFocusReturn
     };
 }
-export function useCompleteListNavigationChild({ info, textContentParameters, context: { childrenHaveFocusChildContext, managedChildContext, rovingTabIndexContext, paginatedChildContext, staggeredChildContext, singleSelectionContext, typeaheadNavigationContext }, sortableChildParameters, pressParameters, rovingTabIndexParameters, singleSelectionParameters, ...void1 }) {
+export function useCompleteListNavigationChild({ info, textContentParameters, context: { childrenHaveFocusChildContext, managedChildContext, rovingTabIndexContext, paginatedChildContext, staggeredChildContext, singleSelectionContext, typeaheadNavigationContext }, sortableChildParameters, pressParameters, rovingTabIndexParameters, singleSelectionParameters, staggeredChildrenParameters, paginatedChildrenParameters, ...void1 }) {
     monitorCallCount(useCompleteListNavigationChild);
     assertEmptyObject(void1);
     const { onPressSync, ...pressParameters1 } = (pressParameters ?? {});
     let { index, focusSelf, hidden, disabled } = info;
-    const { info: mcp3, paginatedChildReturn, paginatedChildReturn: { hideBecausePaginated }, props: paginationProps } = usePaginatedChild({ info: { index }, context: { paginatedChildContext } });
-    const { info: mcp4, staggeredChildReturn, staggeredChildReturn: { hideBecauseStaggered }, props: staggeredProps } = useStaggeredChild({ info, context: { staggeredChildContext } });
+    const { info: mcp3, paginatedChildReturn, paginatedChildReturn: { hideBecausePaginated }, props: paginationProps } = usePaginatedChild({ info: { index }, context: { paginatedChildContext }, paginatedChildrenParameters });
+    const { info: mcp4, staggeredChildReturn, staggeredChildReturn: { hideBecauseStaggered }, props: staggeredProps } = useStaggeredChild({ info, context: { staggeredChildContext }, staggeredChildrenParameters });
     hidden ||= (hideBecausePaginated || hideBecauseStaggered);
     if (hidden)
         disabled = true;

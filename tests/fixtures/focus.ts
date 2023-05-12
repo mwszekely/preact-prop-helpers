@@ -10,9 +10,10 @@ declare global {
 }
 
 export const test = base.extend<{ press: { div: Locator, button: Locator } }>({
-    press: async ({ page, shared: { locator } }, use) => {
+    press: async ({ page, shared: { focusableFirst, locator } }, use) => {
         await page.goto("/tests/stage/?test-base=focus");
-        use({
+        await focusableFirst.focus();
+        await use({
             div: locator.locator("div[role=button]"),
             button: locator.locator("button")
         });

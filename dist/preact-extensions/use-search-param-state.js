@@ -1,6 +1,6 @@
-import { useCallback, useRef } from "preact/hooks";
+import { useCallback, useLayoutEffect, useRef } from "preact/hooks";
 import { useUrl } from "../observers/use-url.js";
-import { usePassiveState } from "./use-passive-state.js";
+import { runImmediately, usePassiveState } from "./use-passive-state.js";
 import { useStableCallback } from "./use-stable-callback.js";
 import { useState } from "./use-state.js";
 function parseParam(url, paramKey, fromString = JSON.parse) {
@@ -50,11 +50,9 @@ export function useSearchParamState({ key: paramKey, defaultReason, fromString, 
     // so we might as well keep this state around locally to compensate.
     const savedParamValue = useRef(initialValue);
     const [getSavedParamValue, setSavedParamValue] = usePassiveState(onValueChange, useStableCallback(() => {
-        debugger;
         return savedParamValue.current = (parseParam(null, paramKey, fromString) ?? initialValue);
-    }));
+    }), runImmediately);
     const setParamWithHistory = useStableCallback((newValueOrUpdater, reason) => {
-        debugger;
         let prevValue = parseParam(null, paramKey, fromString) ?? initialValue;
         let nextValue = (typeof newValueOrUpdater == "function" ? newValueOrUpdater(prevValue) : newValueOrUpdater);
         let newParams = new URLSearchParams((new URL(window.location.toString()).searchParams));
@@ -68,7 +66,6 @@ export function useSearchParamState({ key: paramKey, defaultReason, fromString, 
     // Any time the URL changes, it means the Search Param we care about might have changed.
     // Parse it out and save it.
     const [, setUrl] = useUrl(useStableCallback(url => {
-        debugger;
         const newParam = parseParam(null, paramKey, fromString) ?? initialValue;
         setSavedParamValue(newParam);
     }));
@@ -76,7 +73,7 @@ export function useSearchParamState({ key: paramKey, defaultReason, fromString, 
     return [useCallback(() => { return savedParamValue.current; }, []), setParamWithHistory];
 }
 export function useSearchParamStateDeclarative({ key, defaultReason, fromString, initialValue, toString }) {
-    const [value, setValue, getValue] = useState(initialValue);
+    const [value, setValue, getValue] = useState(parseParam(null, key, fromString) ?? initialValue);
     useSearchParamState({
         key,
         fromString,
@@ -85,6 +82,10 @@ export function useSearchParamStateDeclarative({ key, defaultReason, fromString,
         onValueChange: setValue,
         toString
     });
+    useLayoutEffect(() => {
+        const p = parseParam(null, key, fromString);
+        setValue(p);
+    }, []);
     return [value, setValue, getValue];
 }
 function prettyPrintParams(params) {

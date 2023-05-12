@@ -1,5 +1,5 @@
 import { RenderableProps } from "preact";
-import { StateUpdater, useCallback, useEffect, useRef, useState } from "preact/hooks";
+import { StateUpdater, useCallback, useEffect, useLayoutEffect, useRef, useState } from "preact/hooks";
 import { ListNavConstants } from "./stage-list-nav.js";
 import { useForceUpdate } from "../../dist/index.js";
 import { PressConstants } from "./stage-press.js";
@@ -32,10 +32,11 @@ function useTestSyncState2<S>(initialState: S | (() => S)): [S, (...args: Parame
     const forceUpdate = useForceUpdate();
 
     // Explicitly wait until we've had a chance to draw (i.e. all component children have also rendered) with useEffect
-    useEffect(() => {
+    useLayoutEffect(() => {
         // Also wait for a short moment afterwards just in case there's more settling that needs to be done
-        let handle = setTimeout(() => { resolveRef.current?.(); resolveRef.current = promiseRef.current = null; }, 50);
-        return () => clearTimeout(handle);
+        resolveRef.current?.();
+        //let handle = setTimeout(() => { resolveRef.current?.(); resolveRef.current = promiseRef.current = null; }, 50);
+        //return () => clearTimeout(handle);
     });
 
     return [value, useCallback(async (...args: Parameters<StateUpdater<S>>) => {
@@ -47,8 +48,8 @@ function useTestSyncState2<S>(initialState: S | (() => S)): [S, (...args: Parame
 
 export function TestItem({ children }: RenderableProps<{}>) {
     return (
-        <>
+        <div class="tests-container">
             {children}
-        </>
+        </div>
     )
 }

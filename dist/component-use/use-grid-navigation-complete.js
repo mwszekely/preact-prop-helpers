@@ -27,7 +27,7 @@ export function useCompleteGridNavigation({ gridNavigationParameters, linearNavi
         return true;
     }, []);
     const { refElementReturn } = useRefElement({});
-    const { childrenHaveFocusParameters, managedChildrenParameters, context: { gridNavigationRowContext, rovingTabIndexContext, singleSelectionContext, typeaheadNavigationContext }, rearrangeableChildrenReturn, propsParent, propsStableParentOrChild, ...gridNavigationSingleSelectionReturn } = useGridNavigationSingleSelectionSortable({
+    const { childrenHaveFocusParameters, managedChildrenParameters, context: { gridNavigationRowContext, rovingTabIndexContext, singleSelectionContext, typeaheadNavigationContext }, rearrangeableChildrenReturn, propsParent, propsStableParentOrChild, rovingTabIndexReturn, ...gridNavigationSingleSelectionReturn } = useGridNavigationSingleSelectionSortable({
         gridNavigationParameters,
         linearNavigationParameters: { getHighestIndex: getHighestChildIndex, isValid, ...linearNavigationParameters },
         managedChildrenReturn: { getChildren },
@@ -44,8 +44,8 @@ export function useCompleteGridNavigation({ gridNavigationParameters, linearNavi
     const { indexDemangler } = rearrangeableChildrenReturn;
     const { context: { childrenHaveFocusChildContext }, childrenHaveFocusReturn } = useChildrenHaveFocus({ childrenHaveFocusParameters });
     const mcr = useManagedChildren({ managedChildrenParameters: { onChildrenCountChange: useStableCallback(c => onChildrenCountChange(c)), ...managedChildrenParameters } });
-    const { context: { managedChildContext }, managedChildrenReturn } = mcr; // TODO: This is split into two lines for TypeScript reasons? Can this be fixed? E.G. like    vvvvvvvvvvvvvvvvvvvvvvvvvvvvvv  why doesn't that work?
-    const { paginatedChildrenReturn, paginatedChildrenReturn: { refreshPagination }, managedChildrenParameters: { onChildrenCountChange }, context: { paginatedChildContext } } = usePaginatedChildren({ managedChildrenReturn, paginatedChildrenParameters, linearNavigationParameters: { indexDemangler } });
+    const { context: { managedChildContext }, managedChildrenReturn } = mcr; // TODO: This is split into two lines for TypeScript reasons? Can this be fixed? E.G. like vvvvvvvvvvvvvvvvvvvvvvvvvvvvvv  why doesn't that work?
+    const { paginatedChildrenReturn, paginatedChildrenReturn: { refreshPagination }, managedChildrenParameters: { onChildrenCountChange }, context: { paginatedChildContext } } = usePaginatedChildren({ refElementReturn, managedChildrenReturn, paginatedChildrenParameters, rovingTabIndexReturn, linearNavigationParameters: { indexDemangler } });
     const { context: { staggeredChildContext }, staggeredChildrenReturn } = useStaggeredChildren({ managedChildrenReturn, staggeredChildrenParameters });
     //const props = useMergedProps(linearNavigationReturn.propsStable, typeaheadNavigationReturn.propsStable);
     const context = useStableObject({
@@ -64,16 +64,17 @@ export function useCompleteGridNavigation({ gridNavigationParameters, linearNavi
         managedChildrenReturn,
         rearrangeableChildrenReturn,
         staggeredChildrenReturn,
-        ...gridNavigationSingleSelectionReturn,
+        rovingTabIndexReturn,
         childrenHaveFocusReturn,
         paginatedChildrenReturn,
+        ...gridNavigationSingleSelectionReturn,
     };
 }
 export function useCompleteGridNavigationRow({ info, context: contextIncomingForRowAsChildOfTable, textContentParameters, linearNavigationParameters, rovingTabIndexParametersG2R, rovingTabIndexParametersR2C, typeaheadNavigationParameters, sortableChildParameters, singleSelectionParameters }) {
     monitorCallCount(useCompleteGridNavigationRow);
-    const { info: infoPaginatedChild, paginatedChildReturn: { paginatedVisible, isPaginated, hideBecausePaginated }, props: paginationProps } = usePaginatedChild({ info, context: contextIncomingForRowAsChildOfTable });
+    const { info: infoPaginatedChild, paginatedChildReturn: { paginatedVisible, isPaginated, hideBecausePaginated }, props: paginationProps } = usePaginatedChild({ info, context: contextIncomingForRowAsChildOfTable, paginatedChildrenParameters: { paginated: false } });
     const { info: infoStaggeredChild, // { setParentIsStaggered, setStaggeredVisible },
-    staggeredChildReturn: { isStaggered, hideBecauseStaggered }, props: staggeredProps } = useStaggeredChild({ info, context: contextIncomingForRowAsChildOfTable });
+    staggeredChildReturn: { isStaggered, hideBecauseStaggered }, props: staggeredProps } = useStaggeredChild({ info, context: contextIncomingForRowAsChildOfTable, staggeredChildrenParameters: { staggered: false } });
     info.hidden ||= (hideBecausePaginated || hideBecauseStaggered);
     info.disabled ||= info.hidden;
     const getChildren = useCallback(() => managedChildrenReturn.getChildren(), []);

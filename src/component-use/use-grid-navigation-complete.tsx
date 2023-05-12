@@ -28,7 +28,7 @@ export interface UseCompleteGridNavigationParameters<ParentOrRowElement extends 
     typeaheadNavigationParameters: OmitStrong<UseGridNavigationSingleSelectionParameters<ParentOrRowElement, RowElement, CellElement, M>["typeaheadNavigationParameters"], "isValid">;
     rearrangeableChildrenParameters: OmitStrong<UseGridNavigationSingleSelectionSortableParameters<ParentOrRowElement, RowElement, CellElement, M>["rearrangeableChildrenParameters"], "onRearranged">;
     rovingTabIndexParameters: OmitStrong<UseGridNavigationSingleSelectionSortableParameters<ParentOrRowElement, RowElement, CellElement, M>["rovingTabIndexParameters"], "initiallyTabbedIndex">;
-    paginatedChildrenParameters: Pick<UsePaginatedChildrenParameters<RowElement, M>, "paginatedChildrenParameters">["paginatedChildrenParameters"];
+    paginatedChildrenParameters: Pick<UsePaginatedChildrenParameters<ParentOrRowElement, RowElement, M>, "paginatedChildrenParameters">["paginatedChildrenParameters"];
     staggeredChildrenParameters: Pick<UseStaggeredChildrenParameters<RowElement, M>, "staggeredChildrenParameters">["staggeredChildrenParameters"];
 }
 
@@ -147,6 +147,7 @@ export function useCompleteGridNavigation<ParentOrRowElement extends Element, Ro
         rearrangeableChildrenReturn,
         propsParent,
         propsStableParentOrChild,
+        rovingTabIndexReturn,
         ...gridNavigationSingleSelectionReturn
     }: UseGridNavigationSingleSelectionSortableReturnType<ParentOrRowElement, RowElement, CellElement, RM, CM> = useGridNavigationSingleSelectionSortable<ParentOrRowElement, RowElement, CellElement, RM, CM>({
         gridNavigationParameters,
@@ -168,8 +169,8 @@ export function useCompleteGridNavigation<ParentOrRowElement extends Element, Ro
 
     const { context: { childrenHaveFocusChildContext }, childrenHaveFocusReturn } = useChildrenHaveFocus<RowElement>({ childrenHaveFocusParameters });
     const mcr: UseManagedChildrenReturnType<RM> = useManagedChildren<RM>({ managedChildrenParameters: { onChildrenCountChange: useStableCallback(c => onChildrenCountChange(c)), ...managedChildrenParameters } });
-    const { context: { managedChildContext }, managedChildrenReturn } = mcr;    // TODO: This is split into two lines for TypeScript reasons? Can this be fixed? E.G. like    vvvvvvvvvvvvvvvvvvvvvvvvvvvvvv  why doesn't that work?
-    const { paginatedChildrenReturn, paginatedChildrenReturn: { refreshPagination }, managedChildrenParameters: { onChildrenCountChange }, context: { paginatedChildContext } }: UsePaginatedChildrenReturnType = usePaginatedChildren<RowElement, RM>({ managedChildrenReturn, paginatedChildrenParameters, linearNavigationParameters: { indexDemangler } });
+    const { context: { managedChildContext }, managedChildrenReturn } = mcr;          // TODO: This is split into two lines for TypeScript reasons? Can this be fixed? E.G. like vvvvvvvvvvvvvvvvvvvvvvvvvvvvvv  why doesn't that work?
+    const { paginatedChildrenReturn, paginatedChildrenReturn: { refreshPagination }, managedChildrenParameters: { onChildrenCountChange }, context: { paginatedChildContext } }: UsePaginatedChildrenReturnType = usePaginatedChildren<ParentOrRowElement, RowElement, RM>({ refElementReturn, managedChildrenReturn, paginatedChildrenParameters, rovingTabIndexReturn, linearNavigationParameters: { indexDemangler } });
     const { context: { staggeredChildContext }, staggeredChildrenReturn }: UseStaggeredChildrenReturnType = useStaggeredChildren({ managedChildrenReturn, staggeredChildrenParameters })
     //const props = useMergedProps(linearNavigationReturn.propsStable, typeaheadNavigationReturn.propsStable);
 
@@ -191,9 +192,10 @@ export function useCompleteGridNavigation<ParentOrRowElement extends Element, Ro
         managedChildrenReturn,
         rearrangeableChildrenReturn,
         staggeredChildrenReturn,
-        ...gridNavigationSingleSelectionReturn,
+        rovingTabIndexReturn,
         childrenHaveFocusReturn,
         paginatedChildrenReturn,
+        ...gridNavigationSingleSelectionReturn,
     }
 
 }
@@ -218,13 +220,13 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
         info: infoPaginatedChild,
         paginatedChildReturn: { paginatedVisible, isPaginated, hideBecausePaginated },
         props: paginationProps
-    } = usePaginatedChild<RowElement>({ info, context: contextIncomingForRowAsChildOfTable });
+    } = usePaginatedChild<RowElement>({ info, context: contextIncomingForRowAsChildOfTable, paginatedChildrenParameters: { paginated: false } });
 
     const {
         info: infoStaggeredChild, // { setParentIsStaggered, setStaggeredVisible },
         staggeredChildReturn: { isStaggered, hideBecauseStaggered },
         props: staggeredProps
-    } = useStaggeredChild<RowElement>({ info, context: contextIncomingForRowAsChildOfTable })
+    } = useStaggeredChild<RowElement>({ info, context: contextIncomingForRowAsChildOfTable, staggeredChildrenParameters: { staggered: false } })
 
     info.hidden ||= (hideBecausePaginated || hideBecauseStaggered);
     info.disabled ||= info.hidden;

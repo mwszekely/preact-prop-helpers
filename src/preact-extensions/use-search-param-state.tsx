@@ -1,8 +1,8 @@
 
-import { useCallback, useRef } from "preact/hooks";
+import { useCallback, useLayoutEffect, useRef } from "preact/hooks";
 import { useUrl } from "../observers/use-url.js";
 import { OmitStrong } from "../util/types.js";
-import { OnPassiveStateChange, usePassiveState } from "./use-passive-state.js";
+import { OnPassiveStateChange, runImmediately, usePassiveState } from "./use-passive-state.js";
 import { useStableCallback } from "./use-stable-callback.js";
 import { useState } from "./use-state.js";
 
@@ -88,12 +88,9 @@ export function useSearchParamState<Key extends keyof SearchParamStates>({ key: 
     // so we might as well keep this state around locally to compensate.
     const savedParamValue = useRef(initialValue);
     const [getSavedParamValue, setSavedParamValue] = usePassiveState<T, never>(onValueChange, useStableCallback(() => {
-        debugger;
         return savedParamValue.current = (parseParam<Key, T>(null, paramKey, fromString) ?? initialValue);
-    }));
+    }), runImmediately);
     const setParamWithHistory = useStableCallback<SetParamWithHistory<T>>((newValueOrUpdater, reason?: "push" | "replace") => {
-        debugger;
-
         let prevValue: T = parseParam<Key, T>(null, paramKey, fromString) ?? initialValue;
         let nextValue: T = (typeof newValueOrUpdater == "function" ? (newValueOrUpdater as Function)(prevValue) : newValueOrUpdater);
 
@@ -109,8 +106,7 @@ export function useSearchParamState<Key extends keyof SearchParamStates>({ key: 
 
     // Any time the URL changes, it means the Search Param we care about might have changed.
     // Parse it out and save it.
-    const [,setUrl] = useUrl(useStableCallback(url => {
-        debugger;
+    const [, setUrl] = useUrl(useStableCallback(url => {
         const newParam = parseParam<Key, T>(null, paramKey, fromString) ?? initialValue;
         setSavedParamValue(newParam);
     }));
@@ -119,8 +115,8 @@ export function useSearchParamState<Key extends keyof SearchParamStates>({ key: 
     return [useCallback(() => { return savedParamValue.current; }, []), setParamWithHistory] as const;
 }
 
-export function useSearchParamStateDeclarative<Key extends keyof SearchParamStates>({ key, defaultReason, fromString, initialValue, toString}: OmitStrong<UseSearchParamStateParameters<Key, SearchParamStates[Key]>, "onValueChange">) {
-    const [value, setValue, getValue] = useState<SearchParamStates[Key]>(initialValue);
+export function useSearchParamStateDeclarative<Key extends keyof SearchParamStates>({ key, defaultReason, fromString, initialValue, toString }: OmitStrong<UseSearchParamStateParameters<Key, SearchParamStates[Key]>, "onValueChange">) {
+    const [value, setValue, getValue] = useState<SearchParamStates[Key]>(parseParam<Key>(null, key, fromString) ?? initialValue);
     useSearchParamState<Key>({
         key,
         fromString,
@@ -129,6 +125,12 @@ export function useSearchParamStateDeclarative<Key extends keyof SearchParamStat
         onValueChange: setValue,
         toString
     });
+
+
+    useLayoutEffect(() => {
+        const p = parseParam(null, key, fromString);
+        setValue(p!);
+    }, [])
 
     return [value, setValue, getValue] as const;
 

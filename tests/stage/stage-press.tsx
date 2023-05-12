@@ -13,10 +13,10 @@ export interface PressConstants {
 
 export function TestBasesButton() {
     return (
-        <TestItem>
+        <>
             <TestBasesButtonImpl tag="button" />
             <TestBasesButtonImpl tag="div" />
-        </TestItem>
+        </>
     )
 }
 

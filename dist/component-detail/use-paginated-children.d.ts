@@ -1,23 +1,24 @@
 import { UseManagedChildrenReturnType } from "../preact-extensions/use-managed-children.js";
 import { ElementProps } from "../util/types.js";
 import { UseLinearNavigationParameters } from "./keyboard-navigation/use-linear-navigation.js";
-import { UseRovingTabIndexChildInfo } from "./keyboard-navigation/use-roving-tabindex.js";
-export interface UsePaginatedChildrenInfo<E extends Element> extends UseRovingTabIndexChildInfo<E> {
-    setParentIsPaginated(parentIsPaginated: boolean): void;
+import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "./keyboard-navigation/use-roving-tabindex.js";
+import { UseRefElementReturnType } from "../index.js";
+export interface UsePaginatedChildrenInfo<TabbableChildElement extends Element> extends UseRovingTabIndexChildInfo<TabbableChildElement> {
     setPaginationVisible(visible: boolean): void;
     setChildCountIfPaginated(count: number): void;
 }
-export interface UsePaginatedChildrenParameters<E extends Element, M extends UsePaginatedChildrenInfo<E>> {
+export interface UsePaginatedChildrenParameters<ParentElement extends Element, TabbableChildElement extends Element, M extends UsePaginatedChildrenInfo<TabbableChildElement>> {
     managedChildrenReturn: UseManagedChildrenReturnType<M>["managedChildrenReturn"];
-    linearNavigationParameters: Pick<UseLinearNavigationParameters<any, E, M>["linearNavigationParameters"], "indexDemangler">;
+    linearNavigationParameters: Pick<UseLinearNavigationParameters<any, TabbableChildElement, M>["linearNavigationParameters"], "indexDemangler">;
     paginatedChildrenParameters: {
         paginationMin: number | null | undefined;
         paginationMax: number | null | undefined;
     };
+    rovingTabIndexReturn: Pick<UseRovingTabIndexReturnType<any, TabbableChildElement, M>["rovingTabIndexReturn"], "getTabbableIndex" | "setTabbableIndex">;
+    refElementReturn: Pick<UseRefElementReturnType<ParentElement>["refElementReturn"], "getElement">;
 }
 export interface UsePaginatedChildContext {
     paginatedChildContext: {
-        getDefaultIsPaginated(): boolean;
         getDefaultPaginationVisible(i: number): boolean;
     };
 }
@@ -36,8 +37,11 @@ export interface UsePaginatedChildrenReturnType {
     };
     context: UsePaginatedChildContext;
 }
-export declare function usePaginatedChildren<E extends Element, M extends UsePaginatedChildrenInfo<E>>({ managedChildrenReturn: { getChildren }, linearNavigationParameters: { indexDemangler }, paginatedChildrenParameters: { paginationMax, paginationMin } }: UsePaginatedChildrenParameters<E, M>): UsePaginatedChildrenReturnType;
+export declare function usePaginatedChildren<ParentElement extends Element, TabbableChildElement extends Element, M extends UsePaginatedChildrenInfo<TabbableChildElement>>({ managedChildrenReturn: { getChildren }, linearNavigationParameters: { indexDemangler }, paginatedChildrenParameters: { paginationMax, paginationMin }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex }, refElementReturn: { getElement } }: UsePaginatedChildrenParameters<ParentElement, TabbableChildElement, M>): UsePaginatedChildrenReturnType;
 export interface UsePaginatedChildParameters {
+    paginatedChildrenParameters: {
+        paginated: boolean;
+    };
     info: {
         index: number;
     };
@@ -50,7 +54,7 @@ export interface UsePaginatedChildReturn<ChildElement extends Element> {
         isPaginated: boolean;
         hideBecausePaginated: boolean;
     };
-    info: Pick<UsePaginatedChildrenInfo<ChildElement>, "setPaginationVisible" | "setChildCountIfPaginated" | "setParentIsPaginated">;
+    info: Pick<UsePaginatedChildrenInfo<ChildElement>, "setPaginationVisible" | "setChildCountIfPaginated">;
 }
-export declare function usePaginatedChild<ChildElement extends Element>({ info: { index }, context: { paginatedChildContext: { getDefaultPaginationVisible, getDefaultIsPaginated } } }: UsePaginatedChildParameters): UsePaginatedChildReturn<ChildElement>;
+export declare function usePaginatedChild<ChildElement extends Element>({ info: { index }, paginatedChildrenParameters: { paginated: parentIsPaginated }, context: { paginatedChildContext: { getDefaultPaginationVisible } } }: UsePaginatedChildParameters): UsePaginatedChildReturn<ChildElement>;
 //# sourceMappingURL=use-paginated-children.d.ts.map

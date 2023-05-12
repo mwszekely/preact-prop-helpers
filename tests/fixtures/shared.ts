@@ -17,11 +17,15 @@ declare global {
 
 export const test = base.extend<{ shared: SharedFixtures }>({
     shared: async ({ page }, use) => {
-        
+
         let counter = 0;
         page.exposeFunction("increment", () => counter += 1);
 
-        use({
+        const focusableFirst = page.locator("#focusable-first");
+        const focusableLast = page.locator("#focusable-last");
+        await use({
+            focusableFirst,
+            focusableLast,
             getCounter() { return counter; },
             generateText(childIndex: number) { return LoremIpsum[childIndex % LoremIpsum.length] },
             resetCounter() { counter = 0; },
@@ -44,8 +48,11 @@ export const test = base.extend<{ shared: SharedFixtures }>({
 
 export interface SharedFixtures {
 
+    focusableFirst: Locator;
+    focusableLast: Locator;
+
     generateText(childIndex: number): string;
-    
+
     locator: Locator;
 
     /**

@@ -27,6 +27,7 @@ test('Sanity checks', async ({ page, shared: { getCounter, resetCounter } }) => 
     });
 
     const locator = page.locator(".tests-container");
+    await expect(locator).toBeAttached();
     await expect(locator.locator(".default")).toContainText("default");
     await expect(locator.locator(".encoding")).toContainText("符号化テスト");
 });

@@ -68,9 +68,6 @@ export function useStaggeredChildren({ managedChildrenReturn: { getChildren }, s
     const childCallsThisToTellTheParentToMountTheNextOne = useCallback((index) => {
         setDisplayedStaggerIndex(s => Math.min((getTargetStaggerIndex() ?? 0), 1 + (Math.max(s ?? 0, index + 1))));
     }, []);
-    useLayoutEffect(() => {
-        getChildren().forEach(child => child.setParentIsStaggered(parentIsStaggered));
-    }, [parentIsStaggered]);
     const childCallsThisToTellTheParentTheHighestIndex = useCallback((mountedIndex) => {
         setTargetStaggerIndex(i => Math.max((i ?? 0), 1 + mountedIndex));
     }, []);
@@ -109,9 +106,8 @@ export function useStaggeredChildren({ managedChildrenReturn: { getChildren }, s
         }),
     };
 }
-export function useStaggeredChild({ info: { index }, context: { staggeredChildContext: { childCallsThisToTellTheParentTheHighestIndex, getDefaultIsStaggered, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne } } }) {
+export function useStaggeredChild({ info: { index }, staggeredChildrenParameters: { staggered: parentIsStaggered }, context: { staggeredChildContext: { childCallsThisToTellTheParentTheHighestIndex, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne } } }) {
     monitorCallCount(useStaggeredChild);
-    const [parentIsStaggered, setParentIsStaggered] = useState(getDefaultIsStaggered);
     const [staggeredVisible, setStaggeredVisible] = useState(getDefaultStaggeredVisible(index));
     useLayoutEffect(() => {
         childCallsThisToTellTheParentTheHighestIndex(index);
@@ -123,10 +119,7 @@ export function useStaggeredChild({ info: { index }, context: { staggeredChildCo
     return {
         props: !parentIsStaggered ? {} : { "aria-busy": (!staggeredVisible).toString() },
         staggeredChildReturn: { isStaggered: parentIsStaggered, hideBecauseStaggered: parentIsStaggered ? !staggeredVisible : false },
-        info: {
-            setStaggeredVisible: setStaggeredVisible,
-            setParentIsStaggered,
-        }
+        info: { setStaggeredVisible: setStaggeredVisible, }
     };
 }
 //# sourceMappingURL=use-staggered-children.js.map

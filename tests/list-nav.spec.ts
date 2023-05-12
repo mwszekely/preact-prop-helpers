@@ -55,7 +55,7 @@ test("Navigation", async ({ page, listNav }) => {
     });
 });
 
-test("Untabbability works", async ({ page, listNav, shared: {  run, install } }) => {
+test("Untabbability works", async ({ page, listNav, shared: { run, install } }) => {
     // When tabbing into the list, it should focus each item but not select anything.
     // Move down to the second item, because we're about to make sure that focus is restored properly,
     // and "is the second item still focusable" is a more durable question than "is the 0th child still focusable"
@@ -145,10 +145,75 @@ test("Selection", async ({ page, listNav, shared: { run, install } }) => {
     await expect(listNav.list.locator("li:nth-child(2)")).toBeFocused();
     await expect(listNav.list.locator(`li:first-child`).first()).toHaveAttribute("aria-selected", "true");
 });
-/*
-test("Staggering", ({ page, listNav }) => {
-    expect(listNav.list).toHaveAttribute("role", "")
-});
 
+test("Pagination", async ({ page, listNav, shared: { focusableFirst, focusableLast, install, run }}) => {
+    let count = 200;
+    let max = count - 1;  // There's always one "missing" list item that will never have any of the attributes we're looking for.
+    await expect(focusableFirst).toBeFocused();
+    await run("ListNav", "setMounted", false);
+    await expect(focusableFirst).toBeFocused();
+    await run("ListNav", "setChildCount", count);
+    await expect(focusableFirst).toBeFocused();
+    await run("ListNav", "setPagination", [10, 20]);
+    await expect(focusableFirst).toBeFocused();
+    await run("ListNav", "setMounted", true);
+    await expect(focusableFirst).toBeFocused();
+
+    await expect(listNav.list.locator("li:nth-child(5)")).toHaveAttribute("data-hide-because-paginated", "true");
+    await expect(listNav.list.locator("li:nth-child(15)")).toHaveAttribute("data-hide-because-paginated", "false");
+    await expect(listNav.list.locator("li:nth-child(25)")).toHaveAttribute("data-hide-because-paginated", "true");
+    await page.keyboard.press("Tab");
+    await expect(listNav.list.locator("li").nth(10)).toBeFocused();
+
+    await run("ListNav", "setPagination", [20, 30]);
+    await expect(listNav.list.locator("li:nth-child(15)")).toHaveAttribute("data-hide-because-paginated", "true");
+    await expect(listNav.list.locator("li:nth-child(25)")).toHaveAttribute("data-hide-because-paginated", "false");
+    await expect(listNav.list.locator("li:nth-child(35)")).toHaveAttribute("data-hide-because-paginated", "true");
+    await expect(listNav.list.locator("li").nth(10)).not.toBeFocused();
+    await expect(page.locator("body")).not.toBeFocused()
+    //await expect(listNav.list.locator("li").nth(20)).toBeFocused();
+})
+
+test("Staggering", async ({ page, listNav, shared: { install, run } }) => {
+    let count = 200;
+    let max = count - 1;  // There's always one "missing" list item that will never have any of the attributes we're looking for.
+    await run("ListNav", "setMounted", false);
+    await run("ListNav", "setChildCount", count);
+    await run("ListNav", "setStaggered", true);
+    await run("ListNav", "setMounted", true);
+    //await expect(20).toBeLessThan(50);
+    await new Promise(resolve => setTimeout(resolve, 100));
+    await expect(await listNav.list.locator("li[data-hide-because-staggered=false]").count()).toBeLessThan(100);
+    await expect(await listNav.list.locator("li[data-hide-because-staggered=true]").count()).toBeGreaterThan(100);
+    await new Promise(resolve => setTimeout(resolve, 100));
+    await expect(listNav.list.locator("li[data-hide-because-staggered]")).toHaveCount(max);
+    await new Promise(resolve => setTimeout(resolve, 500));
+    await expect(listNav.list.locator("li[data-hide-because-staggered=true]")).toHaveCount(0);
+    await expect(listNav.list.locator("li[data-hide-because-staggered=false]")).toHaveCount(max);
+
+    // Unmounting and re-mounting should cause it to happen again,
+    // and we're also going to test adding children.
+    await run("ListNav", "setMounted", false);
+    await run("ListNav", "setChildCount", 100)
+    await run("ListNav", "setMounted", true);
+    await new Promise(resolve => setTimeout(resolve, 50));
+    await expect(await listNav.list.locator("li[data-hide-because-staggered=false]").count()).toBeLessThan(50);
+    await expect(await listNav.list.locator("li[data-hide-because-staggered=true]").count()).toBeGreaterThan(50);
+
+    await run("ListNav", "setChildCount", count)
+    await expect(listNav.list.locator("li[data-hide-because-staggered=false]")).toHaveCount(max);
+    await expect(listNav.list.locator("li[data-hide-because-staggered=true]")).toHaveCount(0);
+
+    // Adding more children should "re-continue" the staggering effect.
+    let newCount = count * 2;
+    let newMax = newCount - 1;
+    await run("ListNav", "setChildCount", newCount);
+    await expect(await listNav.list.locator("li[data-hide-because-staggered=false]").count()).toBeGreaterThanOrEqual(max);
+    await expect(await listNav.list.locator("li[data-hide-because-staggered=true]").count()).toBeGreaterThan(50);
+    await expect(listNav.list.locator("li[data-hide-because-staggered=true]")).toHaveCount(0);
+    await expect(listNav.list.locator("li[data-hide-because-staggered=false]")).toHaveCount(newMax);
+
+});
+/*
 test("Pagination", ({ page, listNav }) => {
 });*/

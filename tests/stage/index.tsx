@@ -1,11 +1,12 @@
 import { RenderableProps, render } from "preact";
 import { TestBasesButton } from "./stage-press.js";
 import { TestBasesListNav } from "./stage-list-nav.js";
-import { TestingConstants } from "./util.js";
+import { TestItem, TestingConstants } from "./util.js";
 import { TestBasesFocus } from "./stage-focus.js";
 import type { SharedFixtures } from "../fixtures/shared.js";
 import { useSearchParamState, useState } from "../../dist/index.js"
 import { useSearchParamStateDeclarative } from "../../dist/preact-extensions/use-search-param-state.js";
+import { useEffect, useLayoutEffect } from "preact/hooks";
 
 
 declare module globalThis {
@@ -86,6 +87,10 @@ declare module "../../dist/index.js" {
 function TestsContainer() {
     const [base, setBase, getBase] = useSearchParamStateDeclarative({ key: "test-base", initialValue: "", fromString: value => value });
 
+    useEffect(() => {
+        debugger;
+        document.getElementById("focusable-first")?.focus?.();
+    }, [])
     if (!base) {
         return (
             <>
@@ -95,15 +100,21 @@ function TestsContainer() {
         );
     }
     return (
-        <div class="tests-container">
-            {Object.entries(TestBases).map(([name, component]) => {
-                if (name === base)
-                    return component;
-                return null;
-            })}
-        </div>
+        <>
+            <input id="focusable-first" />
+            <TestItem>
+                {Object.entries(TestBases).map(([name, component]) => {
+                    if (name === base)
+                        return component;
+                    return null;
+                })}
+
+            </TestItem>
+            <input id="focusable-last" />
+        </>
     )
 }
+
 
 document.addEventListener("DOMContentLoaded", () => {
 

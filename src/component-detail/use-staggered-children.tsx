@@ -8,15 +8,13 @@ import { monitorCallCount } from "../util/use-call-count.js";
 import { UseRovingTabIndexChildInfo } from "./keyboard-navigation/use-roving-tabindex.js";
 
 export interface UseStaggeredChildrenInfo<E extends Element> extends Pick<UseRovingTabIndexChildInfo<E>, "hidden" | "index"> {
-    setParentIsStaggered(parentIsStaggered: boolean): void;
+    //setParentIsStaggered(parentIsStaggered: boolean): void;
     setStaggeredVisible(visible: boolean): void;
 }
 
 export interface UseStaggeredChildrenParameters<E extends Element, M extends UseStaggeredChildrenInfo<E>> {
     managedChildrenReturn: UseManagedChildrenReturnType<M>["managedChildrenReturn"];
-    staggeredChildrenParameters: {
-        staggered: boolean;
-    }
+    staggeredChildrenParameters: { staggered: boolean; }
 }
 
 export interface UseStaggeredChildContext {
@@ -24,7 +22,7 @@ export interface UseStaggeredChildContext {
         childCallsThisToTellTheParentToMountTheNextOne(index: number): void;
         childCallsThisToTellTheParentTheHighestIndex(index: number): void;
         getDefaultStaggeredVisible(i: number): boolean;
-        getDefaultIsStaggered(): boolean;
+        //getDefaultIsStaggered(): boolean;
     }
 }
 
@@ -118,11 +116,6 @@ export function useStaggeredChildren<E extends Element, M extends UseStaggeredCh
         setDisplayedStaggerIndex(s => Math.min((getTargetStaggerIndex() ?? 0), 1 + (Math.max(s ?? 0, index + 1))));
     }, []);
 
-    useLayoutEffect(() => {
-        getChildren().forEach(child => child.setParentIsStaggered(parentIsStaggered));
-
-    }, [parentIsStaggered]);
-
     const childCallsThisToTellTheParentTheHighestIndex = useCallback((mountedIndex: number) => {
         setTargetStaggerIndex(i => Math.max((i ?? 0), 1 + mountedIndex))
     }, []);
@@ -167,6 +160,7 @@ export function useStaggeredChildren<E extends Element, M extends UseStaggeredCh
 
 
 export interface UseStaggeredChildParameters {
+    staggeredChildrenParameters: { staggered: boolean; }
     info: { index: number; }
     context: UseStaggeredChildContext;
 }
@@ -184,14 +178,13 @@ export interface UseStaggeredChildReturn<ChildElement extends Element> {
          */
         hideBecauseStaggered: boolean;
     };
-    info: Pick<UseStaggeredChildrenInfo<ChildElement>, "setParentIsStaggered" | "setStaggeredVisible">
+    info: Pick<UseStaggeredChildrenInfo<ChildElement>, "setStaggeredVisible">
 }
 
 
-export function useStaggeredChild<ChildElement extends Element>({ info: { index }, context: { staggeredChildContext: { childCallsThisToTellTheParentTheHighestIndex, getDefaultIsStaggered, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne } } }: UseStaggeredChildParameters): UseStaggeredChildReturn<ChildElement> {
+export function useStaggeredChild<ChildElement extends Element>({ info: { index }, staggeredChildrenParameters: { staggered: parentIsStaggered }, context: { staggeredChildContext: { childCallsThisToTellTheParentTheHighestIndex, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne } } }: UseStaggeredChildParameters): UseStaggeredChildReturn<ChildElement> {
     monitorCallCount(useStaggeredChild);
-    
-    const [parentIsStaggered, setParentIsStaggered] = useState(getDefaultIsStaggered);
+
     const [staggeredVisible, setStaggeredVisible] = useState(getDefaultStaggeredVisible(index));
 
     useLayoutEffect(() => {
@@ -205,10 +198,7 @@ export function useStaggeredChild<ChildElement extends Element>({ info: { index 
 
     return {
         props: !parentIsStaggered ? {} : { "aria-busy": (!staggeredVisible).toString() } as {},
-        staggeredChildReturn: { isStaggered: parentIsStaggered, hideBecauseStaggered: parentIsStaggered? !staggeredVisible : false },
-        info: {
-            setStaggeredVisible: setStaggeredVisible,
-            setParentIsStaggered,
-        }
+        staggeredChildReturn: { isStaggered: parentIsStaggered, hideBecauseStaggered: parentIsStaggered ? !staggeredVisible : false },
+        info: { setStaggeredVisible: setStaggeredVisible, }
     }
 }

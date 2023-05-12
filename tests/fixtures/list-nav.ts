@@ -10,10 +10,11 @@ declare global {
 }
 
 export const test = base.extend<{listNav: ListNavFixtures}>({
-    listNav: async ({ page, shared: { locator } }, use) => {
+    listNav: async ({ page, shared: { focusableFirst, locator } }, use) => {
         const list = locator.locator("[role=toolbar]");
         await page.goto("/tests/stage/?test-base=list-navigation");
-        use({ list });
+        await focusableFirst.focus();
+        await use({ list });
     },
 });
 

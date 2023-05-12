@@ -3,7 +3,7 @@ import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useStableObject } from "../preact-extensions/use-stable-getter.js";
 import { useState } from "../preact-extensions/use-state.js";
 import { monitorCallCount } from "../util/use-call-count.js";
-export function usePaginatedChildren({ managedChildrenReturn: { getChildren }, linearNavigationParameters: { indexDemangler }, paginatedChildrenParameters: { paginationMax, paginationMin } }) {
+export function usePaginatedChildren({ managedChildrenReturn: { getChildren }, linearNavigationParameters: { indexDemangler }, paginatedChildrenParameters: { paginationMax, paginationMin }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex }, refElementReturn: { getElement } }) {
     monitorCallCount(usePaginatedChildren);
     const [childCount, setChildCount] = useState(null);
     const parentIsPaginated = (paginationMin != null || paginationMax != null);
@@ -12,13 +12,25 @@ export function usePaginatedChildren({ managedChildrenReturn: { getChildren }, l
         const childMax = (getChildren().getHighestIndex() + 1);
         for (let i = 0; i <= childMax; ++i) {
             const visible = (i >= (paginationMin ?? -Infinity) && i < (paginationMax ?? Infinity));
-            getChildren().getAt(indexDemangler(i))?.setParentIsPaginated(parentIsPaginated);
             getChildren().getAt(indexDemangler(i))?.setPaginationVisible(visible);
             if (visible)
                 getChildren().getAt(indexDemangler(i))?.setChildCountIfPaginated(getChildren().getHighestIndex() + 1);
         }
     }, [ /* Must be empty */]);
     useLayoutEffect(() => {
+        let tabbableIndex = getTabbableIndex();
+        if (tabbableIndex != null) {
+            let shouldFocus = getElement()?.contains(document.activeElement) || document.activeElement == null || (document.activeElement === document.body);
+            if (paginationMin != null && tabbableIndex < paginationMin) {
+                setTabbableIndex(paginationMin, undefined, shouldFocus); // TODO: This isn't a user interaction, but we need to ensure the old element doesn't remain focused, yeesh.
+            }
+            else if (paginationMax != null && tabbableIndex >= paginationMax) {
+                let next = paginationMax - 1;
+                if (next == -1)
+                    next = null;
+                setTabbableIndex(next, undefined, shouldFocus); // TODO: This isn't a user interaction, but we need to ensure the old element doesn't remain focused, yeesh.
+            }
+        }
         refreshPagination(paginationMin, paginationMax);
         lastPagination.current.paginationMax = paginationMax ?? null;
         lastPagination.current.paginationMin = paginationMin ?? null;
@@ -42,7 +54,6 @@ export function usePaginatedChildren({ managedChildrenReturn: { getChildren }, l
                     const min = (paginationMin ?? 0);
                     const max = (paginationMax ?? count);
                     for (let i = min; i < max; ++i) {
-                        getChildren().getAt(i)?.setParentIsPaginated(parentIsPaginated);
                         getChildren().getAt(i)?.setChildCountIfPaginated(count);
                     }
                 }
@@ -55,9 +66,9 @@ export function usePaginatedChildren({ managedChildrenReturn: { getChildren }, l
         paginatedChildrenReturn: { refreshPagination, childCount }
     };
 }
-export function usePaginatedChild({ info: { index }, context: { paginatedChildContext: { getDefaultPaginationVisible, getDefaultIsPaginated } } }) {
+export function usePaginatedChild({ info: { index }, paginatedChildrenParameters: { paginated: parentIsPaginated }, context: { paginatedChildContext: { getDefaultPaginationVisible } } }) {
     monitorCallCount(usePaginatedChild);
-    const [parentIsPaginated, setParentIsPaginated] = useState(getDefaultIsPaginated());
+    //const parentIsPaginated = (paginationMin != null || paginationMax != null);
     const [childCountIfPaginated, setChildCountIfPaginated] = useState(null);
     const [paginatedVisible, setPaginatedVisible] = useState(getDefaultPaginationVisible(index));
     return {
@@ -65,8 +76,7 @@ export function usePaginatedChild({ info: { index }, context: { paginatedChildCo
         paginatedChildReturn: { paginatedVisible, isPaginated: parentIsPaginated, hideBecausePaginated: parentIsPaginated ? !paginatedVisible : false },
         info: {
             setPaginationVisible: setPaginatedVisible,
-            setChildCountIfPaginated,
-            setParentIsPaginated
+            setChildCountIfPaginated
         }
     };
 }

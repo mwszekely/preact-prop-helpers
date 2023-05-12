@@ -1,4 +1,4 @@
-import { useCallback } from "preact/hooks";
+import { useCallback, useLayoutEffect } from "preact/hooks";
 import { usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useGlobalHandler } from "../dom-helpers/use-event-handler.js";
