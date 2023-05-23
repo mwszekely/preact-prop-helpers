@@ -1,6 +1,6 @@
 import { OnPassiveStateChange, PassiveStateUpdater, returnFalse, runImmediately, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
-import { useStableObject } from "../preact-extensions/use-stable-getter.js";
+import { useMemoObject } from "../preact-extensions/use-stable-getter.js";
 import { FocusEventType } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 import { UseHasCurrentFocusParameters } from "./use-has-current-focus.js";
@@ -58,7 +58,7 @@ export function useChildrenHaveFocus<ChildElement extends Element>(args: UseChil
 
     return {
         childrenHaveFocusReturn: { getAnyFocused },
-        context: useStableObject({ childrenHaveFocusChildContext: useStableObject({ setFocusCount }) }),
+        context: useMemoObject({ childrenHaveFocusChildContext: useMemoObject({ setFocusCount }) }),
     }
 }
 

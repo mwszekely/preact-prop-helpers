@@ -3188,7 +3188,9 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
           if (nextChild != null && fromUserInteraction) {
             const element = nextChild.getElement();
             if (element) {
-              if (document.activeElement == null || !element.contains(document.activeElement)) nextChild.focusSelf(element);
+              if (document.activeElement == document.body || document.activeElement == null || !element.contains(document.activeElement)) {
+                nextChild.focusSelf(element);
+              }
             }
           }
         }
@@ -6836,6 +6838,13 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       paginatedChildrenParameters: {
         paginationMax,
         paginationMin
+      },
+      rovingTabIndexReturn: {
+        getTabbableIndex,
+        setTabbableIndex
+      },
+      refElementReturn: {
+        getElement
       }
     } = _ref38;
     const [childCount, setChildCount] = useState(null);
@@ -6847,34 +6856,40 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     const refreshPagination = T$1((paginationMin, paginationMax) => {
       const childMax = getChildren().getHighestIndex() + 1;
       for (let i = 0; i <= childMax; ++i) {
-        var _getChildren$getAt, _getChildren$getAt2, _getChildren$getAt3;
+        var _getChildren$getAt, _getChildren$getAt2;
         const visible = i >= (paginationMin !== null && paginationMin !== void 0 ? paginationMin : -Infinity) && i < (paginationMax !== null && paginationMax !== void 0 ? paginationMax : Infinity);
-        (_getChildren$getAt = getChildren().getAt(indexDemangler(i))) === null || _getChildren$getAt === void 0 ? void 0 : _getChildren$getAt.setParentIsPaginated(parentIsPaginated);
-        (_getChildren$getAt2 = getChildren().getAt(indexDemangler(i))) === null || _getChildren$getAt2 === void 0 ? void 0 : _getChildren$getAt2.setPaginationVisible(visible);
-        if (visible) (_getChildren$getAt3 = getChildren().getAt(indexDemangler(i))) === null || _getChildren$getAt3 === void 0 ? void 0 : _getChildren$getAt3.setChildCountIfPaginated(getChildren().getHighestIndex() + 1);
+        (_getChildren$getAt = getChildren().getAt(indexDemangler(i))) === null || _getChildren$getAt === void 0 ? void 0 : _getChildren$getAt.setPaginationVisible(visible);
+        if (visible) (_getChildren$getAt2 = getChildren().getAt(indexDemangler(i))) === null || _getChildren$getAt2 === void 0 ? void 0 : _getChildren$getAt2.setChildCountIfPaginated(getChildren().getHighestIndex() + 1);
       }
     }, [/* Must be empty */]);
     y(() => {
+      let tabbableIndex = getTabbableIndex();
+      if (tabbableIndex != null) {
+        var _getElement2;
+        let shouldFocus = ((_getElement2 = getElement()) === null || _getElement2 === void 0 ? void 0 : _getElement2.contains(document.activeElement)) || document.activeElement == null || document.activeElement === document.body;
+        if (paginationMin != null && tabbableIndex < paginationMin) {
+          setTabbableIndex(paginationMin, undefined, shouldFocus); // TODO: This isn't a user interaction, but we need to ensure the old element doesn't remain focused, yeesh.
+        } else if (paginationMax != null && tabbableIndex >= paginationMax) {
+          let next = paginationMax - 1;
+          if (next == -1) next = null;
+          setTabbableIndex(next, undefined, shouldFocus); // TODO: This isn't a user interaction, but we need to ensure the old element doesn't remain focused, yeesh.
+        }
+      }
+
       refreshPagination(paginationMin, paginationMax);
       lastPagination.current.paginationMax = paginationMax !== null && paginationMax !== void 0 ? paginationMax : null;
       lastPagination.current.paginationMin = paginationMin !== null && paginationMin !== void 0 ? paginationMin : null;
     }, [paginationMax, paginationMin]);
-    // TODO: Modification during render
-    const p = _(parentIsPaginated);
-    p.current = parentIsPaginated;
+    const paginatedChildContext = F$1(() => ({
+      parentIsPaginated,
+      getDefaultPaginationVisible: T$1(i => {
+        return i >= (paginationMin !== null && paginationMin !== void 0 ? paginationMin : -Infinity) && i < (paginationMax !== null && paginationMax !== void 0 ? paginationMax : Infinity);
+      }, [])
+    }), [parentIsPaginated]);
     return {
-      context: useStableObject({
-        paginatedChildContext: useStableObject({
-          getDefaultIsPaginated: T$1(() => {
-            return p.current;
-          }, []),
-          // This is only used during setState on mount, so this is fine.
-          // (If we change from paginated to not paginated, this is caught during useLayoutEffect)
-          getDefaultPaginationVisible: T$1(i => {
-            return p.current ? i >= (paginationMin !== null && paginationMin !== void 0 ? paginationMin : -Infinity) && i < (paginationMax !== null && paginationMax !== void 0 ? paginationMax : Infinity) : true;
-          }, [])
-        })
-      }),
+      context: F$1(() => ({
+        paginatedChildContext
+      }), [paginatedChildContext]),
       managedChildrenParameters: {
         onChildrenCountChange: useStableCallback(count => {
           if (paginationMax != null || paginationMin != null) {
@@ -6882,9 +6897,8 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
             const min = paginationMin !== null && paginationMin !== void 0 ? paginationMin : 0;
             const max = paginationMax !== null && paginationMax !== void 0 ? paginationMax : count;
             for (let i = min; i < max; ++i) {
-              var _getChildren$getAt4, _getChildren$getAt5;
-              (_getChildren$getAt4 = getChildren().getAt(i)) === null || _getChildren$getAt4 === void 0 ? void 0 : _getChildren$getAt4.setParentIsPaginated(parentIsPaginated);
-              (_getChildren$getAt5 = getChildren().getAt(i)) === null || _getChildren$getAt5 === void 0 ? void 0 : _getChildren$getAt5.setChildCountIfPaginated(count);
+              var _getChildren$getAt3;
+              (_getChildren$getAt3 = getChildren().getAt(i)) === null || _getChildren$getAt3 === void 0 ? void 0 : _getChildren$getAt3.setChildCountIfPaginated(count);
             }
           } else {
             // TODO: Make this debug only.
@@ -6905,14 +6919,14 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       },
       context: {
         paginatedChildContext: {
-          getDefaultPaginationVisible,
-          getDefaultIsPaginated
+          parentIsPaginated,
+          getDefaultPaginationVisible
         }
       }
     } = _ref39;
-    const [parentIsPaginated, setParentIsPaginated] = useState(getDefaultIsPaginated());
+    //const parentIsPaginated = (paginationMin != null || paginationMax != null);
     const [childCountIfPaginated, setChildCountIfPaginated] = useState(null);
-    const [paginatedVisible, setPaginatedVisible] = useState(getDefaultPaginationVisible(index));
+    const [paginatedVisible, setPaginatedVisible] = useState(parentIsPaginated ? getDefaultPaginationVisible(index) : true);
     return {
       props: !parentIsPaginated ? {} : {
         "aria-setsize": childCountIfPaginated !== null && childCountIfPaginated !== void 0 ? childCountIfPaginated : undefined,
@@ -6925,8 +6939,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       },
       info: {
         setPaginationVisible: setPaginatedVisible,
-        setChildCountIfPaginated,
-        setParentIsPaginated
+        setChildCountIfPaginated
       }
     };
   }
@@ -6993,8 +7006,8 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       // Either way, tell the next child to show itself.
       // Also make sure that anyone we skipped somehow show themselves as well.
       for (let i = prevIndex !== null && prevIndex !== void 0 ? prevIndex : 0; i < newIndex; ++i) {
-        var _getChildren$getAt6;
-        (_getChildren$getAt6 = getChildren().getAt(i)) === null || _getChildren$getAt6 === void 0 ? void 0 : _getChildren$getAt6.setStaggeredVisible(true);
+        var _getChildren$getAt4;
+        (_getChildren$getAt4 = getChildren().getAt(i)) === null || _getChildren$getAt4 === void 0 ? void 0 : _getChildren$getAt4.setStaggeredVisible(true);
       }
       // Set a new emergency timeout
       resetEmergencyTimeout();
@@ -7006,9 +7019,6 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         return Math.min((_getTargetStaggerInde2 = getTargetStaggerIndex()) !== null && _getTargetStaggerInde2 !== void 0 ? _getTargetStaggerInde2 : 0, 1 + Math.max(s !== null && s !== void 0 ? s : 0, index + 1));
       });
     }, []);
-    y(() => {
-      getChildren().forEach(child => child.setParentIsStaggered(parentIsStaggered));
-    }, [parentIsStaggered]);
     const childCallsThisToTellTheParentTheHighestIndex = T$1(mountedIndex => {
       setTargetStaggerIndex(i => Math.max(i !== null && i !== void 0 ? i : 0, 1 + mountedIndex));
     }, []);
@@ -7016,35 +7026,27 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     // but also probably fine because parents render before children? Does that include suspense?)
     const s = _(parentIsStaggered);
     s.current = parentIsStaggered;
+    const staggeredChildContext = F$1(() => ({
+      parentIsStaggered,
+      childCallsThisToTellTheParentToMountTheNextOne,
+      childCallsThisToTellTheParentTheHighestIndex,
+      getDefaultStaggeredVisible: T$1(i => {
+        if (s.current) {
+          const staggerIndex = getDisplayedStaggerIndex();
+          if (staggerIndex == null) return false;
+          return i < staggerIndex;
+        } else {
+          return true;
+        }
+      }, [])
+    }), [parentIsStaggered]);
     return {
       staggeredChildrenReturn: {
         stillStaggering: currentlyStaggering
       },
-      context: useStableObject({
-        staggeredChildContext: useStableObject({
-          childCallsThisToTellTheParentToMountTheNextOne,
-          childCallsThisToTellTheParentTheHighestIndex,
-          // These are used during setState, so just once during mount.
-          // It's okay that the dependencies aren't included.
-          // It's more important that these can be called during render.
-          //
-          // (If we switch, this is caught during useLayoutEffect anyway,
-          // but only if we switch *after* the children mount! The ref
-          // is to take care of the case where we switch *before* they mount)
-          getDefaultIsStaggered: T$1(() => {
-            return s.current;
-          }, []),
-          getDefaultStaggeredVisible: T$1(i => {
-            if (s.current) {
-              const staggerIndex = getDisplayedStaggerIndex();
-              if (staggerIndex == null) return false;
-              return i < staggerIndex;
-            } else {
-              return true;
-            }
-          }, [])
-        })
-      })
+      context: F$1(() => ({
+        staggeredChildContext
+      }), [staggeredChildContext])
     };
   }
   function useStaggeredChild(_ref41) {
@@ -7054,14 +7056,13 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       },
       context: {
         staggeredChildContext: {
+          parentIsStaggered,
           childCallsThisToTellTheParentTheHighestIndex,
-          getDefaultIsStaggered,
           getDefaultStaggeredVisible,
           childCallsThisToTellTheParentToMountTheNextOne
         }
       }
     } = _ref41;
-    const [parentIsStaggered, setParentIsStaggered] = useState(getDefaultIsStaggered);
     const [staggeredVisible, setStaggeredVisible] = useState(getDefaultStaggeredVisible(index));
     y(() => {
       childCallsThisToTellTheParentTheHighestIndex(index);
@@ -7078,8 +7079,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         hideBecauseStaggered: parentIsStaggered ? !staggeredVisible : false
       },
       info: {
-        setStaggeredVisible: setStaggeredVisible,
-        setParentIsStaggered
+        setStaggeredVisible: setStaggeredVisible
       }
     };
   }
@@ -7216,6 +7216,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       rearrangeableChildrenReturn,
       propsParent,
       propsStableParentOrChild,
+      rovingTabIndexReturn,
       ...gridNavigationSingleSelectionReturn
     } = useGridNavigationSingleSelectionSortable({
       gridNavigationParameters,
@@ -7267,7 +7268,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         managedChildContext
       },
       managedChildrenReturn
-    } = mcr; // TODO: This is split into two lines for TypeScript reasons? Can this be fixed? E.G. like    vvvvvvvvvvvvvvvvvvvvvvvvvvvvvv  why doesn't that work?
+    } = mcr; // TODO: This is split into two lines for TypeScript reasons? Can this be fixed? E.G. like vvvvvvvvvvvvvvvvvvvvvvvvvvvvvv  why doesn't that work?
     const {
       paginatedChildrenReturn,
       paginatedChildrenReturn: {
@@ -7280,8 +7281,10 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         paginatedChildContext
       }
     } = usePaginatedChildren({
+      refElementReturn,
       managedChildrenReturn,
       paginatedChildrenParameters,
+      rovingTabIndexReturn,
       linearNavigationParameters: {
         indexDemangler
       }
@@ -7312,9 +7315,10 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       managedChildrenReturn,
       rearrangeableChildrenReturn,
       staggeredChildrenReturn,
-      ...gridNavigationSingleSelectionReturn,
+      rovingTabIndexReturn,
       childrenHaveFocusReturn,
-      paginatedChildrenReturn
+      paginatedChildrenReturn,
+      ...gridNavigationSingleSelectionReturn
     };
   }
   function useCompleteGridNavigationRow(_ref44) {
@@ -8037,9 +8041,11 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         paginatedChildContext
       }
     } = usePaginatedChildren({
+      refElementReturn,
       managedChildrenReturn: {
         getChildren: useStableCallback(() => managedChildrenReturn.getChildren())
       },
+      rovingTabIndexReturn,
       paginatedChildrenParameters,
       linearNavigationParameters: {
         indexDemangler: rearrangeableChildrenReturn.indexDemangler
@@ -9047,8 +9053,8 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     }, []);
     const setClass = T$1((cls, enabled) => {
       if (hasClass(cls) == !enabled) {
-        var _getElement2;
-        (_getElement2 = getElement()) === null || _getElement2 === void 0 ? void 0 : _getElement2.classList[enabled ? "add" : "remove"](cls);
+        var _getElement3;
+        (_getElement3 = getElement()) === null || _getElement3 === void 0 ? void 0 : _getElement3.classList[enabled ? "add" : "remove"](cls);
         currentImperativeProps.current.className[enabled ? "add" : "delete"](cls);
       }
     }, []);
@@ -9099,15 +9105,15 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     const setAttribute = T$1((prop, value) => {
       if (value != null) {
         if (getAttribute(prop) != value) {
-          var _getElement3;
+          var _getElement4;
           currentImperativeProps.current.others[prop] = value;
-          (_getElement3 = getElement()) === null || _getElement3 === void 0 ? void 0 : _getElement3.setAttribute(prop, value);
+          (_getElement4 = getElement()) === null || _getElement4 === void 0 ? void 0 : _getElement4.setAttribute(prop, value);
         }
       } else {
         if (getAttribute(prop) != undefined) {
-          var _getElement4;
+          var _getElement5;
           delete currentImperativeProps.current.others[prop];
-          (_getElement4 = getElement()) === null || _getElement4 === void 0 ? void 0 : _getElement4.removeAttribute(prop);
+          (_getElement5 = getElement()) === null || _getElement5 === void 0 ? void 0 : _getElement5.removeAttribute(prop);
         }
       }
     }, []);
@@ -11136,10 +11142,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     } = _ref73;
     const context = q$1(StaggeredContext);
     const {
-      info: {
-        setParentIsStaggered,
-        setStaggeredVisible
-      },
+      info,
       props,
       staggeredChildReturn: {
         hideBecauseStaggered,
@@ -11154,10 +11157,9 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     useManagedChild({
       context,
       info: {
+        ...info,
         hidden: false,
-        index,
-        setParentIsStaggered,
-        setStaggeredVisible
+        index
       }
     });
     return o$1("div", {

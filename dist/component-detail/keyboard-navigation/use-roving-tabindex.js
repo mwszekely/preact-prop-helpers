@@ -2,7 +2,7 @@ import { useCallback, useEffect } from "preact/hooks";
 import { useChildrenFlag } from "../../preact-extensions/use-managed-children.js";
 import { usePassiveState } from "../../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
-import { useStableGetter, useStableObject } from "../../preact-extensions/use-stable-getter.js";
+import { useStableGetter, useMemoObject } from "../../preact-extensions/use-stable-getter.js";
 import { useState } from "../../preact-extensions/use-state.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { focus } from "../../util/focus.js";
@@ -140,7 +140,7 @@ export function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovi
         else
             setTabbableIndex(null, reason, true);
     }, []);
-    const rovingTabIndexContext = useStableObject({
+    const rovingTabIndexContext = useMemoObject({
         setTabbableIndex,
         parentFocusSelf: focusSelf,
         getInitiallyTabbedIndex: useCallback(() => { return initiallyTabbedIndex ?? (untabbable ? null : 0); }, []),
@@ -149,7 +149,7 @@ export function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovi
     return {
         managedChildrenParameters: { onChildrenMountChange: reevaluateClosestFit, },
         rovingTabIndexReturn: { setTabbableIndex, getTabbableIndex, focusSelf },
-        context: useStableObject({ rovingTabIndexContext }),
+        context: useMemoObject({ rovingTabIndexContext }),
         props: {
             // Note: Making this -1 instead of null is partially intentional --
             // it gives us time during useEffect to move focus back to the last focused element

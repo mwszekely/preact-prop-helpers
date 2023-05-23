@@ -12,6 +12,7 @@ export interface UseStaggeredChildrenParameters<E extends Element, M extends Use
 }
 export interface UseStaggeredChildContext {
     staggeredChildContext: {
+        parentIsStaggered: boolean;
         childCallsThisToTellTheParentToMountTheNextOne(index: number): void;
         childCallsThisToTellTheParentTheHighestIndex(index: number): void;
         getDefaultStaggeredVisible(i: number): boolean;
@@ -23,19 +24,7 @@ export interface UseStaggeredChildrenReturnType {
     };
     context: UseStaggeredChildContext;
 }
-/**
- * Allows children to each wait until the previous has finished rendering before itself rendering.
- *
- * E.G. Child #3 waits until #2 renders. #2 waits until #1 renders, etc.
- *
- * Note that the child itself will still render, but you can delay rendering *its* children, or
- * delay other complicated or heavy logic, until the child is no longer staggered.
- */
-export declare function useStaggeredChildren<E extends Element, M extends UseStaggeredChildrenInfo<E>>({ managedChildrenReturn: { getChildren }, staggeredChildrenParameters: { staggered } }: UseStaggeredChildrenParameters<E, M>): UseStaggeredChildrenReturnType;
 export interface UseStaggeredChildParameters {
-    staggeredChildrenParameters: {
-        staggered: boolean;
-    };
     info: {
         index: number;
     };
@@ -55,5 +44,14 @@ export interface UseStaggeredChildReturn<ChildElement extends Element> {
     };
     info: Pick<UseStaggeredChildrenInfo<ChildElement>, "setStaggeredVisible">;
 }
-export declare function useStaggeredChild<ChildElement extends Element>({ info: { index }, staggeredChildrenParameters: { staggered: parentIsStaggered }, context: { staggeredChildContext: { childCallsThisToTellTheParentTheHighestIndex, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne } } }: UseStaggeredChildParameters): UseStaggeredChildReturn<ChildElement>;
+/**
+ * Allows children to each wait until the previous has finished rendering before itself rendering.
+ *
+ * E.G. Child #3 waits until #2 renders. #2 waits until #1 renders, etc.
+ *
+ * Note that the child itself will still render, but you can delay rendering *its* children, or
+ * delay other complicated or heavy logic, until the child is no longer staggered.
+ */
+export declare function useStaggeredChildren<E extends Element, M extends UseStaggeredChildrenInfo<E>>({ managedChildrenReturn: { getChildren }, staggeredChildrenParameters: { staggered } }: UseStaggeredChildrenParameters<E, M>): UseStaggeredChildrenReturnType;
+export declare function useStaggeredChild<ChildElement extends Element>({ info: { index }, context: { staggeredChildContext: { parentIsStaggered, childCallsThisToTellTheParentTheHighestIndex, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne } } }: UseStaggeredChildParameters): UseStaggeredChildReturn<ChildElement>;
 //# sourceMappingURL=use-staggered-children.d.ts.map

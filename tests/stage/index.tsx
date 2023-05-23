@@ -88,7 +88,6 @@ function TestsContainer() {
     const [base, setBase, getBase] = useSearchParamStateDeclarative({ key: "test-base", initialValue: "", fromString: value => value });
 
     useEffect(() => {
-        debugger;
         document.getElementById("focusable-first")?.focus?.();
     }, [])
     if (!base) {

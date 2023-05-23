@@ -4,7 +4,7 @@ import { UseRefElementReturnType } from "../../dom-helpers/use-ref-element.js";
 import { UseTextContentParameters, UseTextContentReturnType, useTextContent } from "../../dom-helpers/use-text-content.js";
 import { OnPassiveStateChange, usePassiveState } from "../../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
-import { useStableGetter, useStableObject } from "../../preact-extensions/use-stable-getter.js";
+import { useStableGetter, useMemoObject } from "../../preact-extensions/use-stable-getter.js";
 import { useState } from "../../preact-extensions/use-state.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { CompositionEventType, ElementProps } from "../../util/types.js";
@@ -216,8 +216,8 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
     const excludeSpace = useStableCallback(() => { return typeaheadStatus != "none" });
 
     return {
-        context: useStableObject({
-            typeaheadNavigationContext: useStableObject({
+        context: useMemoObject({
+            typeaheadNavigationContext: useMemoObject({
                 insertingComparator,
                 sortedTypeaheadInfo: sortedTypeaheadInfo.current,
                 excludeSpace

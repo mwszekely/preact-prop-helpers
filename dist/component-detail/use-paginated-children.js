@@ -1,6 +1,5 @@
-import { useCallback, useLayoutEffect, useRef } from "preact/hooks";
+import { useCallback, useLayoutEffect, useMemo, useRef } from "preact/hooks";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
-import { useStableObject } from "../preact-extensions/use-stable-getter.js";
 import { useState } from "../preact-extensions/use-state.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 export function usePaginatedChildren({ managedChildrenReturn: { getChildren }, linearNavigationParameters: { indexDemangler }, paginatedChildrenParameters: { paginationMax, paginationMin }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex }, refElementReturn: { getElement } }) {
@@ -35,18 +34,13 @@ export function usePaginatedChildren({ managedChildrenReturn: { getChildren }, l
         lastPagination.current.paginationMax = paginationMax ?? null;
         lastPagination.current.paginationMin = paginationMin ?? null;
     }, [paginationMax, paginationMin]);
-    // TODO: Modification during render
-    const p = useRef(parentIsPaginated);
-    p.current = parentIsPaginated;
+    const getDefaultPaginationVisible = useCallback((i) => { return (i >= (paginationMin ?? -Infinity) && i < (paginationMax ?? Infinity)); }, []);
+    const paginatedChildContext = useMemo(() => ({
+        parentIsPaginated,
+        getDefaultPaginationVisible
+    }), [parentIsPaginated]);
     return {
-        context: useStableObject({
-            paginatedChildContext: useStableObject({
-                getDefaultIsPaginated: useCallback(() => { return p.current; }, []),
-                // This is only used during setState on mount, so this is fine.
-                // (If we change from paginated to not paginated, this is caught during useLayoutEffect)
-                getDefaultPaginationVisible: useCallback((i) => { return p.current ? (i >= (paginationMin ?? -Infinity) && i < (paginationMax ?? Infinity)) : true; }, [])
-            })
-        }),
+        context: useMemo(() => ({ paginatedChildContext }), [paginatedChildContext]),
         managedChildrenParameters: {
             onChildrenCountChange: useStableCallback((count) => {
                 if (paginationMax != null || paginationMin != null) {
@@ -66,11 +60,11 @@ export function usePaginatedChildren({ managedChildrenReturn: { getChildren }, l
         paginatedChildrenReturn: { refreshPagination, childCount }
     };
 }
-export function usePaginatedChild({ info: { index }, paginatedChildrenParameters: { paginated: parentIsPaginated }, context: { paginatedChildContext: { getDefaultPaginationVisible } } }) {
+export function usePaginatedChild({ info: { index }, context: { paginatedChildContext: { parentIsPaginated, getDefaultPaginationVisible } } }) {
     monitorCallCount(usePaginatedChild);
     //const parentIsPaginated = (paginationMin != null || paginationMax != null);
     const [childCountIfPaginated, setChildCountIfPaginated] = useState(null);
-    const [paginatedVisible, setPaginatedVisible] = useState(getDefaultPaginationVisible(index));
+    const [paginatedVisible, setPaginatedVisible] = useState(parentIsPaginated ? getDefaultPaginationVisible(index) : true);
     return {
         props: !parentIsPaginated ? {} : { "aria-setsize": childCountIfPaginated ?? undefined, "aria-posinset": (index + 1) },
         paginatedChildReturn: { paginatedVisible, isPaginated: parentIsPaginated, hideBecausePaginated: parentIsPaginated ? !paginatedVisible : false },

@@ -15,7 +15,7 @@ import { UseChildrenHaveFocusContext, UseChildrenHaveFocusReturnType, useChildre
 import { UseHasCurrentFocusReturnType, useHasCurrentFocus } from "../observers/use-has-current-focus.js";
 import { ManagedChildren, UseManagedChildReturnType, UseManagedChildrenContext, UseManagedChildrenReturnType, useManagedChild, useManagedChildren } from "../preact-extensions/use-managed-children.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
-import { useStableObject } from "../preact-extensions/use-stable-getter.js";
+import { useMemoObject } from "../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../util/assert.js";
 import { ElementProps, ExtendMerge, OmitStrong, OmitTargeted } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
@@ -174,7 +174,7 @@ export function useCompleteGridNavigation<ParentOrRowElement extends Element, Ro
     const { context: { staggeredChildContext }, staggeredChildrenReturn }: UseStaggeredChildrenReturnType = useStaggeredChildren({ managedChildrenReturn, staggeredChildrenParameters })
     //const props = useMergedProps(linearNavigationReturn.propsStable, typeaheadNavigationReturn.propsStable);
 
-    const context = useStableObject<CompleteGridNavigationRowContext<ParentOrRowElement, RowElement, CellElement, RM, CM>>({
+    const context = useMemoObject<CompleteGridNavigationRowContext<ParentOrRowElement, RowElement, CellElement, RM, CM>>({
         singleSelectionContext,
         managedChildContext,
         rovingTabIndexContext,
@@ -220,13 +220,13 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
         info: infoPaginatedChild,
         paginatedChildReturn: { paginatedVisible, isPaginated, hideBecausePaginated },
         props: paginationProps
-    } = usePaginatedChild<RowElement>({ info, context: contextIncomingForRowAsChildOfTable, paginatedChildrenParameters: { paginated: false } });
+    } = usePaginatedChild<RowElement>({ info, context: contextIncomingForRowAsChildOfTable });
 
     const {
         info: infoStaggeredChild, // { setParentIsStaggered, setStaggeredVisible },
         staggeredChildReturn: { isStaggered, hideBecauseStaggered },
         props: staggeredProps
-    } = useStaggeredChild<RowElement>({ info, context: contextIncomingForRowAsChildOfTable, staggeredChildrenParameters: { staggered: false } })
+    } = useStaggeredChild<RowElement>({ info, context: contextIncomingForRowAsChildOfTable })
 
     info.hidden ||= (hideBecausePaginated || hideBecauseStaggered);
     info.disabled ||= info.hidden;
@@ -292,7 +292,7 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
     const { managedChildReturn } = useManagedChild<RM>({ context: contextIncomingForRowAsChildOfTable, info: completeInfo as RM })
 
 
-    const context = useStableObject<CompleteGridNavigationCellContext<RowElement, CellElement, CM>>({
+    const context = useMemoObject<CompleteGridNavigationCellContext<RowElement, CellElement, CM>>({
         ...contextGNR,
         ...contextMC
     });

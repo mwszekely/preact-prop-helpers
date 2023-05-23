@@ -10,7 +10,7 @@ import { useChildrenHaveFocus, useChildrenHaveFocusChild } from "../observers/us
 import { useHasCurrentFocus } from "../observers/use-has-current-focus.js";
 import { useManagedChild, useManagedChildren } from "../preact-extensions/use-managed-children.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
-import { useStableObject } from "../preact-extensions/use-stable-getter.js";
+import { useMemoObject } from "../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../util/assert.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 import { usePress } from "./use-press.js";
@@ -62,7 +62,7 @@ export function useCompleteListNavigation({ linearNavigationParameters, rearrang
             ...managedChildrenParameters
         }
     });
-    const context = useStableObject(useStableObject({
+    const context = useMemoObject(useMemoObject({
         childrenHaveFocusChildContext,
         managedChildContext,
         paginatedChildContext,
@@ -86,13 +86,13 @@ export function useCompleteListNavigation({ linearNavigationParameters, rearrang
         childrenHaveFocusReturn
     };
 }
-export function useCompleteListNavigationChild({ info, textContentParameters, context: { childrenHaveFocusChildContext, managedChildContext, rovingTabIndexContext, paginatedChildContext, staggeredChildContext, singleSelectionContext, typeaheadNavigationContext }, sortableChildParameters, pressParameters, rovingTabIndexParameters, singleSelectionParameters, staggeredChildrenParameters, paginatedChildrenParameters, ...void1 }) {
+export function useCompleteListNavigationChild({ info, textContentParameters, context: { childrenHaveFocusChildContext, managedChildContext, rovingTabIndexContext, paginatedChildContext, staggeredChildContext, singleSelectionContext, typeaheadNavigationContext }, sortableChildParameters, pressParameters, rovingTabIndexParameters, singleSelectionParameters, ...void1 }) {
     monitorCallCount(useCompleteListNavigationChild);
     assertEmptyObject(void1);
     const { onPressSync, ...pressParameters1 } = (pressParameters ?? {});
     let { index, focusSelf, hidden, disabled } = info;
-    const { info: mcp3, paginatedChildReturn, paginatedChildReturn: { hideBecausePaginated }, props: paginationProps } = usePaginatedChild({ info: { index }, context: { paginatedChildContext }, paginatedChildrenParameters });
-    const { info: mcp4, staggeredChildReturn, staggeredChildReturn: { hideBecauseStaggered }, props: staggeredProps } = useStaggeredChild({ info, context: { staggeredChildContext }, staggeredChildrenParameters });
+    const { info: mcp3, paginatedChildReturn, paginatedChildReturn: { hideBecausePaginated }, props: paginationProps } = usePaginatedChild({ info: { index }, context: { paginatedChildContext } });
+    const { info: mcp4, staggeredChildReturn, staggeredChildReturn: { hideBecauseStaggered }, props: staggeredProps } = useStaggeredChild({ info, context: { staggeredChildContext } });
     hidden ||= (hideBecausePaginated || hideBecauseStaggered);
     if (hidden)
         disabled = true;

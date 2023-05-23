@@ -3,7 +3,7 @@ import { assertEmptyObject } from "../util/assert.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 import { debounceRendering, useEnsureStability, usePassiveState } from "./use-passive-state.js";
 import { useStableCallback } from "./use-stable-callback.js";
-import { useStableObject } from "./use-stable-getter.js";
+import { useMemoObject } from "./use-stable-getter.js";
 /**
  * Reminder of order of execution:
  *
@@ -139,7 +139,7 @@ export function useManagedChildren(parentParameters) {
         }
         hasRemoteULEChildMounted.current[mounted ? "mounts" : "unmounts"].add(index);
     }, [ /* Must remain stable */]);
-    const managedChildren = useStableObject({
+    const managedChildren = useMemoObject({
         ...{ _: managedChildrenArray.current },
         forEach: forEachChild,
         getAt: getManagedChildInfo,
@@ -156,8 +156,8 @@ export function useManagedChildren(parentParameters) {
     });
     const getChildren = useCallback(() => managedChildren, []);
     return {
-        context: useStableObject({
-            managedChildContext: useStableObject({
+        context: useMemoObject({
+            managedChildContext: useMemoObject({
                 managedChildrenArray: managedChildrenArray.current,
                 remoteULEChildMounted,
                 remoteULEChildChanged,

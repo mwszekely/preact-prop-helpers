@@ -52,7 +52,7 @@ export function TestBasesListNav() {
         return <ol />;
 
     return (
-            <TestBasesListNavImpl selectedIndex={selectedIndex} childCount={childCount} collatorId={collatorId} disableHomeEndKeys={disableHomeEndKeys} navigatePastStartEnd={navigatePastStartEnd} noTypeahead={noTypeahead} pageNavigationSize={pageNavigationSize} pagination={pagination} selectionMode={selectionMode} staggered={staggered} typeaheadTimeout={typeaheadTimeout} untabbable={untabbable} arrowKeyDirection={arrowKeyDirection} ariaPropName={ariaPropName} />
+        <TestBasesListNavImpl selectedIndex={selectedIndex} childCount={childCount} collatorId={collatorId} disableHomeEndKeys={disableHomeEndKeys} navigatePastStartEnd={navigatePastStartEnd} noTypeahead={noTypeahead} pageNavigationSize={pageNavigationSize} pagination={pagination} selectionMode={selectionMode} staggered={staggered} typeaheadTimeout={typeaheadTimeout} untabbable={untabbable} arrowKeyDirection={arrowKeyDirection} ariaPropName={ariaPropName} />
     );
 }
 
@@ -104,7 +104,6 @@ function TestBasesListNavImpl({ ariaPropName, selectedIndex, arrowKeyDirection, 
         typeaheadNavigationReturn: { getCurrentTypeahead, typeaheadStatus }
     } = useCompleteListNavigationDeclarative<HTMLOListElement, HTMLLIElement, UseCompleteListNavigationChildInfo<HTMLLIElement>>({
         linearNavigationParameters: { arrowKeyDirection, disableHomeEndKeys, navigatePastEnd: navigatePastStartEnd, navigatePastStart: navigatePastStartEnd, pageNavigationSize },
-        paginatedChildrenParameters: { paginationMin: pagination?.[0], paginationMax: pagination?.[1] },
         rearrangeableChildrenParameters: { getIndex: useCallback(info => info.props.index, []) },
         rovingTabIndexParameters: { untabbable, onTabbableIndexChange: setT },
         singleSelectionParameters: { ariaPropName, selectionMode },
@@ -117,6 +116,7 @@ function TestBasesListNavImpl({ ariaPropName, selectedIndex, arrowKeyDirection, 
         },
         sortableChildrenParameters: { compare: useCallback<Compare<UseCompleteListNavigationChildInfo<HTMLLIElement>>>((lhs, rhs) => { return (lhs.getSortValue() as number) - (rhs.getSortValue() as number) }, []) },
         staggeredChildrenParameters: { staggered },
+        paginatedChildrenParameters: { paginationMin: pagination?.[0], paginationMax: pagination?.[1] },
         typeaheadNavigationParameters: { collator: null, noTypeahead, typeaheadTimeout }
     });
 
@@ -124,16 +124,12 @@ function TestBasesListNavImpl({ ariaPropName, selectedIndex, arrowKeyDirection, 
         <AriaPropNameContext.Provider value={ariaPropName}>
             <SelectionModeContext.Provider value={selectionMode}>
                 <UntabbableContext.Provider value={untabbable}>
-                    <PaginatedContext.Provider value={pagination != null}>
-                        <StaggeredContext.Provider value={staggered}>
-                            <Context.Provider value={context}>
-                                {untabbable.toString()}, {t}
-                                <ol role="toolbar" data-still-staggering={stillStaggering} data-typeahead-status={typeaheadStatus} {...props}>
-                                    <TestBasesListNavChildren count={childCount} />
-                                </ol>
-                            </Context.Provider>
-                        </StaggeredContext.Provider>
-                    </PaginatedContext.Provider>
+                    <Context.Provider value={context}>
+                        {untabbable.toString()}, {t}
+                        <ol role="toolbar" data-still-staggering={stillStaggering} data-typeahead-status={typeaheadStatus} {...props}>
+                            <TestBasesListNavChildren count={childCount} />
+                        </ol>
+                    </Context.Provider>
                 </UntabbableContext.Provider>
             </SelectionModeContext.Provider>
         </AriaPropNameContext.Provider>
@@ -160,8 +156,7 @@ const DisabledIndex = 4;
 const MissingIndex = 6;
 const HiddenIndex = 8;
 
-const PaginatedContext = createContext(false);
-const StaggeredContext = createContext(false);
+
 function TestBasesListNavChild({ index }: { index: number }) {
     const textContent = LoremIpsum[index % LoremIpsum.length];
     const getTextContent = useStableGetter(textContent);
@@ -184,8 +179,6 @@ function TestBasesListNavChild({ index }: { index: number }) {
         textContentReturn: { }
     } = useCompleteListNavigationChild<HTMLLIElement, UseCompleteListNavigationChildInfo<HTMLLIElement>>({
         context: useContext(Context),
-        paginatedChildrenParameters: { paginated: useContext(PaginatedContext) },
-        staggeredChildrenParameters: { staggered: useContext(StaggeredContext) },
         pressParameters: {
             focusSelf: e => e.focus(),
             onPressSync: null

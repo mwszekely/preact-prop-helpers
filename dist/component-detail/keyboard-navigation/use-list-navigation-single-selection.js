@@ -1,6 +1,6 @@
 import { useMergedProps } from "../../dom-helpers/use-merged-props.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
-import { useStableObject } from "../../preact-extensions/use-stable-getter.js";
+import { useMemoObject } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
 import { useListNavigation, useListNavigationChild } from "./use-list-navigation-partial.js";
@@ -14,7 +14,7 @@ export function useListNavigationSingleSelection({ linearNavigationParameters, r
         rovingTabIndexReturn,
         ...retSS,
         ...retLN,
-        context: useStableObject({
+        context: useMemoObject({
             ...contextLN,
             ...contextSS
         }),

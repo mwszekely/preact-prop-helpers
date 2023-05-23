@@ -1,8 +1,9 @@
+import { useCallback } from "preact/hooks";
 import { useMergedProps } from "../../dom-helpers/use-merged-props.js";
 import { UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
 import { OnPassiveStateChange, PassiveStateUpdater, usePassiveState } from "../../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
-import { useStableObject } from "../../preact-extensions/use-stable-getter.js";
+import { useMemoObject } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { focus } from "../../util/focus.js";
 import { OmitStrong } from "../../util/types.js";
@@ -141,7 +142,7 @@ export function useGridNavigation<ParentOrRowElement extends Element, RowElement
     assertEmptyObject(void2);
     assertEmptyObject(void3);
 
-    const gridNavigationRowContext = useStableObject({
+    const gridNavigationRowContext = useMemoObject({
         setTabbableRow: rovingTabIndexReturn.setTabbableIndex,
         getCurrentTabbableColumn,
         setCurrentTabbableColumn
@@ -151,7 +152,7 @@ export function useGridNavigation<ParentOrRowElement extends Element, RowElement
         propsParent,
         propsStableParentOrChild,
         managedChildrenParameters,
-        context: useStableObject({
+        context: useMemoObject({
             gridNavigationRowContext,
             rovingTabIndexContext,
             typeaheadNavigationContext
@@ -182,7 +183,7 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
 
     const { getChildren } = managedChildrenReturn;
     const getIndex = useStableCallback(() => { return managedChildParameters.index })
-    const focusSelf = useStableCallback((e: RowElement) => {
+    const whenThisRowIsFocused = useStableCallback((e: RowElement) => {
         let index = (getCurrentTabbableColumn() ?? 0);
         let child = getChildren().getAt(index);
         let highestIndex = getChildren().getHighestIndex();
@@ -202,6 +203,7 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
             focus(e);
         }
     }, []);
+    const focusSelf = whenThisRowIsFocused;
 
     const {
         hasCurrentFocusParameters,
@@ -231,7 +233,7 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
 
     const { setTabbableIndex } = rovingTabIndexReturn;
 
-    const gridNavigationCellContext = useStableObject({
+    const gridNavigationCellContext = useMemoObject({
         setTabbableRow,
         getRowIndex: getIndex,
         getCurrentTabbableColumn,
@@ -242,11 +244,14 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
     // TODO: propsLN2 (awful name) is just the tabIndex=0 or -1 from rovingTabIndex, which flips around when `untabbable` flips.
     // We can ignore it here, because our tabIndex is entirely controlled by our own list navigation,
     // but it shouldn't just be ignored wholesale like this.
-    const props = useMergedProps(propsLN, /*propsLN2,*/ propsLNC);
+    const props = useMergedProps(propsLN, /*propsLN2,*/ propsLNC, {
+        // Ensure that if the browser focuses the row for whatever reason, we transfer the focus to a child cell.
+        onFocus: useStableCallback(e => whenThisRowIsFocused(e.currentTarget))
+    });
     props.tabIndex = -1;
 
     return {
-        context: useStableObject({
+        context: useMemoObject({
             rovingTabIndexContext: rtiContext,
             gridNavigationCellContext,
             typeaheadNavigationContext: tnContext

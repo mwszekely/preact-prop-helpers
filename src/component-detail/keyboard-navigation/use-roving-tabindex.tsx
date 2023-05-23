@@ -4,7 +4,7 @@ import { UseHasCurrentFocusParameters } from "../../observers/use-has-current-fo
 import { ManagedChildInfo, UseManagedChildParameters, UseManagedChildrenParameters, UseManagedChildrenReturnType, useChildrenFlag } from "../../preact-extensions/use-managed-children.js";
 import { OnPassiveStateChange, PassiveStateUpdater, usePassiveState } from "../../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
-import { useStableGetter, useStableObject } from "../../preact-extensions/use-stable-getter.js";
+import { useStableGetter, useMemoObject } from "../../preact-extensions/use-stable-getter.js";
 import { useState } from "../../preact-extensions/use-state.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { focus } from "../../util/focus.js";
@@ -338,7 +338,7 @@ export function useRovingTabIndex<ParentElement extends Element, ChildElement ex
             setTabbableIndex(null, reason as any, true);
     }, []);
 
-    const rovingTabIndexContext = useStableObject({
+    const rovingTabIndexContext = useMemoObject({
         setTabbableIndex,
         parentFocusSelf: focusSelf,
         getInitiallyTabbedIndex: useCallback(() => { return initiallyTabbedIndex ?? (untabbable ? null : 0) }, []),
@@ -348,7 +348,7 @@ export function useRovingTabIndex<ParentElement extends Element, ChildElement ex
     return {
         managedChildrenParameters: { onChildrenMountChange: reevaluateClosestFit, },
         rovingTabIndexReturn: { setTabbableIndex, getTabbableIndex, focusSelf },
-        context: useStableObject({ rovingTabIndexContext }),
+        context: useMemoObject({ rovingTabIndexContext }),
         props: {
             // Note: Making this -1 instead of null is partially intentional --
             // it gives us time during useEffect to move focus back to the last focused element

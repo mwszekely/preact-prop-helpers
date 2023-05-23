@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useLayoutEffect, useRef } from "preact/hooks";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from "preact/hooks";
 import { UseManagedChildrenReturnType } from "../preact-extensions/use-managed-children.js";
 import { returnNull, usePassiveState } from "../preact-extensions/use-passive-state.js";
-import { useStableObject } from "../preact-extensions/use-stable-getter.js";
+import { useMemoObject } from "../preact-extensions/use-stable-getter.js";
 import { useState } from "../preact-extensions/use-state.js";
 import { ElementProps } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
@@ -19,6 +19,7 @@ export interface UseStaggeredChildrenParameters<E extends Element, M extends Use
 
 export interface UseStaggeredChildContext {
     staggeredChildContext: {
+        parentIsStaggered: boolean;
         childCallsThisToTellTheParentToMountTheNextOne(index: number): void;
         childCallsThisToTellTheParentTheHighestIndex(index: number): void;
         getDefaultStaggeredVisible(i: number): boolean;
@@ -30,6 +31,30 @@ export interface UseStaggeredChildrenReturnType {
     staggeredChildrenReturn: { stillStaggering: boolean }
     context: UseStaggeredChildContext;
 }
+
+
+export interface UseStaggeredChildParameters {
+    // staggeredChildrenParameters: { staggered: boolean; }
+    info: { index: number; }
+    context: UseStaggeredChildContext;
+}
+
+export interface UseStaggeredChildReturn<ChildElement extends Element> {
+    props: ElementProps<ChildElement>;
+    staggeredChildReturn: {
+        /** Whether the parent has indicated that all of its children, including this one, are staggered. */
+        isStaggered: boolean;
+        //staggeredVisible: boolean;
+        /** 
+         * If this is true, you should delay showing *your* children or running other heavy logic until this becomes false.
+         * 
+         * Can be as simple as `<div>{hideBecauseStaggered? null : children}</div>`
+         */
+        hideBecauseStaggered: boolean;
+    };
+    info: Pick<UseStaggeredChildrenInfo<ChildElement>, "setStaggeredVisible">
+}
+
 
 /**
  * Allows children to each wait until the previous has finished rendering before itself rendering.
@@ -125,64 +150,36 @@ export function useStaggeredChildren<E extends Element, M extends UseStaggeredCh
     const s = useRef(parentIsStaggered);
     s.current = parentIsStaggered;
 
+    const getDefaultStaggeredVisible = useCallback((i: number) => {
+        if (s.current) {
+            const staggerIndex = getDisplayedStaggerIndex();
+            if (staggerIndex == null)
+                return false;
+            return i < staggerIndex;
+        }
+        else {
+            return true;
+        }
+    }, []);
+
+    const staggeredChildContext = useMemo<UseStaggeredChildContext["staggeredChildContext"]>(() => ({
+        parentIsStaggered,
+        childCallsThisToTellTheParentToMountTheNextOne,
+        childCallsThisToTellTheParentTheHighestIndex,
+        getDefaultStaggeredVisible
+    }), [parentIsStaggered]);
+
     return {
         staggeredChildrenReturn: { stillStaggering: currentlyStaggering },
-        context: useStableObject({
-            staggeredChildContext: useStableObject({
-                childCallsThisToTellTheParentToMountTheNextOne,
-                childCallsThisToTellTheParentTheHighestIndex,
-                // These are used during setState, so just once during mount.
-                // It's okay that the dependencies aren't included.
-                // It's more important that these can be called during render.
-                //
-                // (If we switch, this is caught during useLayoutEffect anyway,
-                // but only if we switch *after* the children mount! The ref
-                // is to take care of the case where we switch *before* they mount)
-                getDefaultIsStaggered: useCallback(() => {
-                    return s.current;
-                }, []),
-                getDefaultStaggeredVisible: useCallback((i) => {
-                    if (s.current) {
-                        const staggerIndex = getDisplayedStaggerIndex();
-                        if (staggerIndex == null)
-                            return false;
-                        return i < staggerIndex;
-                    }
-                    else {
-                        return true;
-                    }
-                }, [])
-            })
-        }),
+        context: useMemo(() => ({
+            staggeredChildContext
+        }), [staggeredChildContext]),
     }
 }
 
 
 
-export interface UseStaggeredChildParameters {
-    staggeredChildrenParameters: { staggered: boolean; }
-    info: { index: number; }
-    context: UseStaggeredChildContext;
-}
-
-export interface UseStaggeredChildReturn<ChildElement extends Element> {
-    props: ElementProps<ChildElement>;
-    staggeredChildReturn: {
-        /** Whether the parent has indicated that all of its children, including this one, are staggered. */
-        isStaggered: boolean;
-        //staggeredVisible: boolean;
-        /** 
-         * If this is true, you should delay showing *your* children or running other heavy logic until this becomes false.
-         * 
-         * Can be as simple as `<div>{hideBecauseStaggered? null : children}</div>`
-         */
-        hideBecauseStaggered: boolean;
-    };
-    info: Pick<UseStaggeredChildrenInfo<ChildElement>, "setStaggeredVisible">
-}
-
-
-export function useStaggeredChild<ChildElement extends Element>({ info: { index }, staggeredChildrenParameters: { staggered: parentIsStaggered }, context: { staggeredChildContext: { childCallsThisToTellTheParentTheHighestIndex, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne } } }: UseStaggeredChildParameters): UseStaggeredChildReturn<ChildElement> {
+export function useStaggeredChild<ChildElement extends Element>({ info: { index }, context: { staggeredChildContext: { parentIsStaggered, childCallsThisToTellTheParentTheHighestIndex, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne } } }: UseStaggeredChildParameters): UseStaggeredChildReturn<ChildElement> {
     monitorCallCount(useStaggeredChild);
 
     const [staggeredVisible, setStaggeredVisible] = useState(getDefaultStaggeredVisible(index));

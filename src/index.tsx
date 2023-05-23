@@ -52,7 +52,7 @@ export { OnPassiveStateChange, PassiveStateUpdater, debounceRendering, returnFal
 export { PersistentStates, getFromLocalStorage, storeToLocalStorage, usePersistentState } from "./preact-extensions/use-persistent-state.js";
 export { OnParamValueChanged, SearchParamStates, SetParamWithHistory, UseSearchParamStateParameters, useSearchParamState, useSearchParamStateDeclarative } from "./preact-extensions/use-search-param-state.js";
 export { useStableCallback } from "./preact-extensions/use-stable-callback.js";
-export { useStableGetter, useStableObject } from "./preact-extensions/use-stable-getter.js";
+export { useStableGetter, useMemoObject } from "./preact-extensions/use-stable-getter.js";
 export { useState } from "./preact-extensions/use-state.js";
 export { useWhatCausedRender } from "./preact-extensions/use-what-caused-render.js";
 export { ProvideBatchedAnimationFrames, UseAnimationFrameParameters, useAnimationFrame } from "./timing/use-animation-frame.js";

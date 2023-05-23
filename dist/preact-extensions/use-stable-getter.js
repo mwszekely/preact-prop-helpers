@@ -1,4 +1,4 @@
-import { useCallback, useRef } from "preact/hooks";
+import { useCallback, useMemo, useRef } from "preact/hooks";
 import { monitorCallCount } from "../util/use-call-count.js";
 import { useBeforeLayoutEffect } from "./use-before-layout-effect.js";
 import { useEnsureStability } from "./use-passive-state.js";
@@ -30,9 +30,12 @@ export function useStableGetter(value) {
  * @param t
  * @returns
  */
-export function useStableObject(t) {
+function useStableObject(t) {
     const e = Object.entries(t);
     useEnsureStability("useStableObject", e.length, ...e.map(([_k, v]) => v));
     return useRef(t).current;
+}
+export function useMemoObject(t) {
+    return useMemo(() => { return t; }, Object.values(t));
 }
 //# sourceMappingURL=use-stable-getter.js.map

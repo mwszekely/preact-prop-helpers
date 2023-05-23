@@ -11,7 +11,7 @@ import { useChildrenHaveFocus, useChildrenHaveFocusChild } from "../observers/us
 import { useHasCurrentFocus } from "../observers/use-has-current-focus.js";
 import { useManagedChild, useManagedChildren } from "../preact-extensions/use-managed-children.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
-import { useStableObject } from "../preact-extensions/use-stable-getter.js";
+import { useMemoObject } from "../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../util/assert.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 export function useCompleteGridNavigation({ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, typeaheadNavigationParameters, sortableChildrenParameters, rearrangeableChildrenParameters, paginatedChildrenParameters, staggeredChildrenParameters }) {
@@ -48,7 +48,7 @@ export function useCompleteGridNavigation({ gridNavigationParameters, linearNavi
     const { paginatedChildrenReturn, paginatedChildrenReturn: { refreshPagination }, managedChildrenParameters: { onChildrenCountChange }, context: { paginatedChildContext } } = usePaginatedChildren({ refElementReturn, managedChildrenReturn, paginatedChildrenParameters, rovingTabIndexReturn, linearNavigationParameters: { indexDemangler } });
     const { context: { staggeredChildContext }, staggeredChildrenReturn } = useStaggeredChildren({ managedChildrenReturn, staggeredChildrenParameters });
     //const props = useMergedProps(linearNavigationReturn.propsStable, typeaheadNavigationReturn.propsStable);
-    const context = useStableObject({
+    const context = useMemoObject({
         singleSelectionContext,
         managedChildContext,
         rovingTabIndexContext,
@@ -72,9 +72,9 @@ export function useCompleteGridNavigation({ gridNavigationParameters, linearNavi
 }
 export function useCompleteGridNavigationRow({ info, context: contextIncomingForRowAsChildOfTable, textContentParameters, linearNavigationParameters, rovingTabIndexParametersG2R, rovingTabIndexParametersR2C, typeaheadNavigationParameters, sortableChildParameters, singleSelectionParameters }) {
     monitorCallCount(useCompleteGridNavigationRow);
-    const { info: infoPaginatedChild, paginatedChildReturn: { paginatedVisible, isPaginated, hideBecausePaginated }, props: paginationProps } = usePaginatedChild({ info, context: contextIncomingForRowAsChildOfTable, paginatedChildrenParameters: { paginated: false } });
+    const { info: infoPaginatedChild, paginatedChildReturn: { paginatedVisible, isPaginated, hideBecausePaginated }, props: paginationProps } = usePaginatedChild({ info, context: contextIncomingForRowAsChildOfTable });
     const { info: infoStaggeredChild, // { setParentIsStaggered, setStaggeredVisible },
-    staggeredChildReturn: { isStaggered, hideBecauseStaggered }, props: staggeredProps } = useStaggeredChild({ info, context: contextIncomingForRowAsChildOfTable, staggeredChildrenParameters: { staggered: false } });
+    staggeredChildReturn: { isStaggered, hideBecauseStaggered }, props: staggeredProps } = useStaggeredChild({ info, context: contextIncomingForRowAsChildOfTable });
     info.hidden ||= (hideBecausePaginated || hideBecauseStaggered);
     info.disabled ||= info.hidden;
     const getChildren = useCallback(() => managedChildrenReturn.getChildren(), []);
@@ -115,7 +115,7 @@ export function useCompleteGridNavigationRow({ info, context: contextIncomingFor
         ...infoStaggeredChild
     };
     const { managedChildReturn } = useManagedChild({ context: contextIncomingForRowAsChildOfTable, info: completeInfo });
-    const context = useStableObject({
+    const context = useMemoObject({
         ...contextGNR,
         ...contextMC
     });

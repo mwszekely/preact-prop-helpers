@@ -1,6 +1,5 @@
-import { useCallback, useEffect, useLayoutEffect, useRef } from "preact/hooks";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from "preact/hooks";
 import { returnNull, usePassiveState } from "../preact-extensions/use-passive-state.js";
-import { useStableObject } from "../preact-extensions/use-stable-getter.js";
 import { useState } from "../preact-extensions/use-state.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 /**
@@ -75,38 +74,31 @@ export function useStaggeredChildren({ managedChildrenReturn: { getChildren }, s
     // but also probably fine because parents render before children? Does that include suspense?)
     const s = useRef(parentIsStaggered);
     s.current = parentIsStaggered;
+    const getDefaultStaggeredVisible = useCallback((i) => {
+        if (s.current) {
+            const staggerIndex = getDisplayedStaggerIndex();
+            if (staggerIndex == null)
+                return false;
+            return i < staggerIndex;
+        }
+        else {
+            return true;
+        }
+    }, []);
+    const staggeredChildContext = useMemo(() => ({
+        parentIsStaggered,
+        childCallsThisToTellTheParentToMountTheNextOne,
+        childCallsThisToTellTheParentTheHighestIndex,
+        getDefaultStaggeredVisible
+    }), [parentIsStaggered]);
     return {
         staggeredChildrenReturn: { stillStaggering: currentlyStaggering },
-        context: useStableObject({
-            staggeredChildContext: useStableObject({
-                childCallsThisToTellTheParentToMountTheNextOne,
-                childCallsThisToTellTheParentTheHighestIndex,
-                // These are used during setState, so just once during mount.
-                // It's okay that the dependencies aren't included.
-                // It's more important that these can be called during render.
-                //
-                // (If we switch, this is caught during useLayoutEffect anyway,
-                // but only if we switch *after* the children mount! The ref
-                // is to take care of the case where we switch *before* they mount)
-                getDefaultIsStaggered: useCallback(() => {
-                    return s.current;
-                }, []),
-                getDefaultStaggeredVisible: useCallback((i) => {
-                    if (s.current) {
-                        const staggerIndex = getDisplayedStaggerIndex();
-                        if (staggerIndex == null)
-                            return false;
-                        return i < staggerIndex;
-                    }
-                    else {
-                        return true;
-                    }
-                }, [])
-            })
-        }),
+        context: useMemo(() => ({
+            staggeredChildContext
+        }), [staggeredChildContext]),
     };
 }
-export function useStaggeredChild({ info: { index }, staggeredChildrenParameters: { staggered: parentIsStaggered }, context: { staggeredChildContext: { childCallsThisToTellTheParentTheHighestIndex, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne } } }) {
+export function useStaggeredChild({ info: { index }, context: { staggeredChildContext: { parentIsStaggered, childCallsThisToTellTheParentTheHighestIndex, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne } } }) {
     monitorCallCount(useStaggeredChild);
     const [staggeredVisible, setStaggeredVisible] = useState(getDefaultStaggeredVisible(index));
     useLayoutEffect(() => {

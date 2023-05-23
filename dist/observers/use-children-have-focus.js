@@ -1,6 +1,6 @@
 import { returnFalse, runImmediately, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
-import { useStableObject } from "../preact-extensions/use-stable-getter.js";
+import { useMemoObject } from "../preact-extensions/use-stable-getter.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 /**
  * Allows a composite component (such as a radio group or listbox) to listen
@@ -19,7 +19,7 @@ export function useChildrenHaveFocus(args) {
     }));
     return {
         childrenHaveFocusReturn: { getAnyFocused },
-        context: useStableObject({ childrenHaveFocusChildContext: useStableObject({ setFocusCount }) }),
+        context: useMemoObject({ childrenHaveFocusChildContext: useMemoObject({ setFocusCount }) }),
     };
 }
 export function useChildrenHaveFocusChild({ context: { childrenHaveFocusChildContext: { setFocusCount } } }) {

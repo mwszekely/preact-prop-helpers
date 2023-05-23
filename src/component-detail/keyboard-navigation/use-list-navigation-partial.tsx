@@ -1,6 +1,6 @@
 import { useRef } from "preact/hooks";
 import { useMergedProps } from "../../dom-helpers/use-merged-props.js";
-import { useStableObject } from "../../preact-extensions/use-stable-getter.js";
+import { useMemoObject } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { ElementProps, ExtendMerge, OmitStrong } from "../../util/types.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
@@ -110,7 +110,7 @@ export function useListNavigation<ParentOrChildElement extends Element, ChildEle
         managedChildrenParameters,
         rovingTabIndexReturn,
         typeaheadNavigationReturn,
-        context: useStableObject({
+        context: useMemoObject({
             rovingTabIndexContext,
             typeaheadNavigationContext
         }),

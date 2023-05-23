@@ -1,6 +1,6 @@
 import { useMergedProps } from "../../dom-helpers/use-merged-props.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
-import { useStableObject } from "../../preact-extensions/use-stable-getter.js";
+import { useMemoObject } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { ExtendMerge, OmitStrong } from "../../util/types.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
@@ -69,7 +69,7 @@ export function useGridNavigationSingleSelection<ParentOrRowElement extends Elem
     assertEmptyObject(void2);
 
     return {
-        context: useStableObject({
+        context: useMemoObject({
             gridNavigationRowContext,
             rovingTabIndexContext,
             singleSelectionContext,

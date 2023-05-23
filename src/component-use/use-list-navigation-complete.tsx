@@ -13,7 +13,7 @@ import { useChildrenHaveFocus, useChildrenHaveFocusChild, UseChildrenHaveFocusCo
 import { useHasCurrentFocus, UseHasCurrentFocusReturnType } from "../observers/use-has-current-focus.js";
 import { ManagedChildren, useManagedChild, useManagedChildren, UseManagedChildrenContext, UseManagedChildrenReturnType, UseManagedChildReturnType } from "../preact-extensions/use-managed-children.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
-import { useStableObject } from "../preact-extensions/use-stable-getter.js";
+import { useMemoObject } from "../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../util/assert.js";
 import { ElementProps, OmitStrong, OmitTargeted, PickTargeted } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
@@ -68,8 +68,6 @@ export interface UseCompleteListNavigationChildParameters<ChildElement extends E
     sortableChildParameters: Pick<UseSortableChildInfo, "getSortValue">;
     rovingTabIndexParameters: UseRovingTabIndexChildParameters<any, any>["rovingTabIndexParameters"];
     singleSelectionParameters: UseSingleSelectionChildParameters<any, any>["singleSelectionParameters"];
-    staggeredChildrenParameters: UseStaggeredChildParameters["staggeredChildrenParameters"];
-    paginatedChildrenParameters: UsePaginatedChildParameters["paginatedChildrenParameters"];
 }
 
 export interface UseCompleteListNavigationChildReturnType<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>>
@@ -164,7 +162,7 @@ export function useCompleteListNavigation<ParentElement extends Element, ChildEl
             ...managedChildrenParameters
         }
     });
-    const context = useStableObject<CompleteListNavigationContext<ParentElement, ChildElement, M>>(useStableObject({
+    const context = useMemoObject<CompleteListNavigationContext<ParentElement, ChildElement, M>>(useMemoObject({
         childrenHaveFocusChildContext,
         managedChildContext,
         paginatedChildContext,
@@ -199,8 +197,6 @@ export function useCompleteListNavigationChild<ChildElement extends Element, M e
     pressParameters,
     rovingTabIndexParameters,
     singleSelectionParameters,
-    staggeredChildrenParameters,
-    paginatedChildrenParameters,
     ...void1
 }: UseCompleteListNavigationChildParameters<ChildElement, M>): UseCompleteListNavigationChildReturnType<ChildElement, M> {
     monitorCallCount(useCompleteListNavigationChild);
@@ -208,8 +204,8 @@ export function useCompleteListNavigationChild<ChildElement extends Element, M e
     const { onPressSync, ...pressParameters1 } = (pressParameters ?? {});
 
     let { index, focusSelf, hidden, disabled } = info;
-    const { info: mcp3, paginatedChildReturn, paginatedChildReturn: { hideBecausePaginated }, props: paginationProps } = usePaginatedChild<ChildElement>({ info: { index }, context: { paginatedChildContext }, paginatedChildrenParameters })
-    const { info: mcp4, staggeredChildReturn, staggeredChildReturn: { hideBecauseStaggered }, props: staggeredProps } = useStaggeredChild<ChildElement>({ info, context: { staggeredChildContext }, staggeredChildrenParameters });
+    const { info: mcp3, paginatedChildReturn, paginatedChildReturn: { hideBecausePaginated }, props: paginationProps } = usePaginatedChild<ChildElement>({ info: { index }, context: { paginatedChildContext } })
+    const { info: mcp4, staggeredChildReturn, staggeredChildReturn: { hideBecauseStaggered }, props: staggeredProps } = useStaggeredChild<ChildElement>({ info, context: { staggeredChildContext } });
 
     hidden ||= (hideBecausePaginated || hideBecauseStaggered);
 

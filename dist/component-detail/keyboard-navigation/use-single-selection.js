@@ -3,7 +3,7 @@ import { useCallback, useEffect } from "preact/hooks";
 import { useChildrenFlag } from "../../preact-extensions/use-managed-children.js";
 import { useEnsureStability } from "../../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
-import { useStableGetter, useStableObject } from "../../preact-extensions/use-stable-getter.js";
+import { useStableGetter, useMemoObject } from "../../preact-extensions/use-stable-getter.js";
 import { useState } from "../../preact-extensions/use-state.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
 export function useSingleSelection({ managedChildrenReturn: { getChildren }, rovingTabIndexReturn: { setTabbableIndex }, singleSelectionParameters: { onSelectedIndexChange: onSelectedIndexChange_U, initiallySelectedIndex, ariaPropName, selectionMode } }) {
@@ -33,12 +33,12 @@ export function useSingleSelection({ managedChildrenReturn: { getChildren }, rov
         closestFit: false
     });
     return {
-        singleSelectionReturn: useStableObject({
+        singleSelectionReturn: useMemoObject({
             getSelectedIndex,
             changeSelectedIndex
         }),
-        context: useStableObject({
-            singleSelectionContext: useStableObject({
+        context: useMemoObject({
+            singleSelectionContext: useMemoObject({
                 getSelectedIndex,
                 onSelectedIndexChange: onSelectedIndexChange,
             }),
