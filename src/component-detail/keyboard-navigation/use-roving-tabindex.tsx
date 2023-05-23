@@ -246,6 +246,9 @@ export function useRovingTabIndex<ParentElement extends Element, ChildElement ex
 
                 // TODO: Replace this and the other focus(getElement())
                 // with a user-replaceable focusParent, like item.focusSelf?
+                //
+                // Also TODO: Should these take fromUserInteraction into consideration?
+                // Do we always move focus when we become untabbable?
                 if (!parentElement!.contains(document.activeElement))
                     focus(getElement());
                 return null;
@@ -293,7 +296,7 @@ export function useRovingTabIndex<ParentElement extends Element, ChildElement ex
 
     // Any time we switch to being untabbable, set the current tabbable index accordingly.
     useEffect(() => {
-        let shouldFocusParentAfterwards = (getElement()?.contains(document.activeElement))
+        let shouldFocusParentAfterwards = (getElement()?.contains(document.activeElement));
         if (untabbable)
             changeTabbableIndex(null, undefined!);
         else

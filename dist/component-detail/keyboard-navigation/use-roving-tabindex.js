@@ -60,6 +60,9 @@ export function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovi
                 // Focus the parent, since it's what's in the tab order right now
                 // TODO: Replace this and the other focus(getElement())
                 // with a user-replaceable focusParent, like item.focusSelf?
+                //
+                // Also TODO: Should these take fromUserInteraction into consideration?
+                // Do we always move focus when we become untabbable?
                 if (!parentElement.contains(document.activeElement))
                     focus(getElement());
                 return null;

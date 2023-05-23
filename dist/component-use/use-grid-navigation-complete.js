@@ -70,7 +70,7 @@ export function useCompleteGridNavigation({ gridNavigationParameters, linearNavi
         ...gridNavigationSingleSelectionReturn,
     };
 }
-export function useCompleteGridNavigationRow({ info, context: contextIncomingForRowAsChildOfTable, textContentParameters, linearNavigationParameters, rovingTabIndexParametersG2R, rovingTabIndexParametersR2C, typeaheadNavigationParameters, sortableChildParameters, singleSelectionParameters }) {
+export function useCompleteGridNavigationRow({ info, context: contextIncomingForRowAsChildOfTable, textContentParameters, linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, sortableChildParameters, singleSelectionParameters }) {
     monitorCallCount(useCompleteGridNavigationRow);
     const { info: infoPaginatedChild, paginatedChildReturn: { paginatedVisible, isPaginated, hideBecausePaginated }, props: paginationProps } = usePaginatedChild({ info, context: contextIncomingForRowAsChildOfTable });
     const { info: infoStaggeredChild, // { setParentIsStaggered, setStaggeredVisible },
@@ -89,8 +89,7 @@ export function useCompleteGridNavigationRow({ info, context: contextIncomingFor
     }, []);
     const { refElementReturn, propsStable } = useRefElement({ refElementParameters: {} });
     const r = useGridNavigationSingleSelectionRow({
-        rovingTabIndexParametersG2R,
-        rovingTabIndexParametersR2C,
+        rovingTabIndexParameters,
         typeaheadNavigationParameters: { isValid, ...typeaheadNavigationParameters },
         linearNavigationParameters: { isValid, getHighestIndex: getHighestChildIndex, pageNavigationSize: 0, indexDemangler: identity, indexMangler: identity, ...linearNavigationParameters },
         managedChildrenReturn: { getChildren },

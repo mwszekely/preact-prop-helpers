@@ -207,8 +207,7 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
     textContentParameters,
 
     linearNavigationParameters,
-    rovingTabIndexParametersG2R,
-    rovingTabIndexParametersR2C,
+    rovingTabIndexParameters,
     typeaheadNavigationParameters,
     sortableChildParameters,
     singleSelectionParameters
@@ -246,8 +245,7 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
 
 
     const r: UseGridNavigationSingleSelectionRowReturnType<RowElement, CellElement, RM, CM> = useGridNavigationSingleSelectionRow<RowElement, CellElement, RM, CM>({
-        rovingTabIndexParametersG2R,
-        rovingTabIndexParametersR2C,
+        rovingTabIndexParameters,
         typeaheadNavigationParameters: { isValid, ...typeaheadNavigationParameters },
         linearNavigationParameters: { isValid, getHighestIndex: getHighestChildIndex, pageNavigationSize: 0, indexDemangler: identity, indexMangler: identity, ...linearNavigationParameters },
         managedChildrenReturn: { getChildren },
