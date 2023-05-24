@@ -4829,6 +4829,13 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
    * @returns The element, and the sub-hook that makes it retrievable.
    */
   function useRefElement(args) {
+    const nonElementWarn = _(false);
+    if (nonElementWarn.current) {
+      nonElementWarn.current = false;
+      // There are two of these to catch the problem in the two most useful areas --
+      // when it initially happens, and also in the component stack.
+      console.assert(false, "useRefElement was used on a component that didn't forward its ref onto a DOM element, so it's attached to that component's VNode instead.");
+    }
     const {
       onElementChange,
       onMount,
@@ -4837,7 +4844,10 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     useEnsureStability("useRefElement", onElementChange, onMount, onUnmount);
     // Called (indirectly) by the ref that the element receives.
     const handler = T$1((e, prevValue) => {
-      console.assert(e == null || e instanceof Element, "useRefElement was used on a component that didn't forward its ref onto a DOM element, so it's attached to that component's VNode instead.");
+      if (!(e == null || e instanceof Element)) {
+        console.assert(e == null || e instanceof Element, "useRefElement was used on a component that didn't forward its ref onto a DOM element, so it's attached to that component's VNode instead.");
+        nonElementWarn.current = true;
+      }
       const cleanup = onElementChange === null || onElementChange === void 0 ? void 0 : onElementChange(e, prevValue);
       if (prevValue) onUnmount === null || onUnmount === void 0 ? void 0 : onUnmount(prevValue);
       if (e) onMount === null || onMount === void 0 ? void 0 : onMount(e);

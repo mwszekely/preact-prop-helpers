@@ -16,11 +16,21 @@ export function useRefElementProps<E extends Element>(r: UseRefElementReturnType
  */
 export function useRefElement(args) {
     monitorCallCount(useRefElement);
+    const nonElementWarn = useRef(false);
+    if (nonElementWarn.current) {
+        nonElementWarn.current = false;
+        // There are two of these to catch the problem in the two most useful areas --
+        // when it initially happens, and also in the component stack.
+        console.assert(false, `useRefElement was used on a component that didn't forward its ref onto a DOM element, so it's attached to that component's VNode instead.`);
+    }
     const { onElementChange, onMount, onUnmount } = (args.refElementParameters || {});
     useEnsureStability("useRefElement", onElementChange, onMount, onUnmount);
     // Called (indirectly) by the ref that the element receives.
     const handler = useCallback((e, prevValue) => {
-        console.assert(e == null || e instanceof Element, `useRefElement was used on a component that didn't forward its ref onto a DOM element, so it's attached to that component's VNode instead.`);
+        if (!(e == null || e instanceof Element)) {
+            console.assert(e == null || e instanceof Element, `useRefElement was used on a component that didn't forward its ref onto a DOM element, so it's attached to that component's VNode instead.`);
+            nonElementWarn.current = true;
+        }
         const cleanup = onElementChange?.(e, prevValue);
         if (prevValue)
             onUnmount?.(prevValue);
