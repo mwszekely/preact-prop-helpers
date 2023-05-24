@@ -20,6 +20,7 @@ export function useRefElement(args) {
     useEnsureStability("useRefElement", onElementChange, onMount, onUnmount);
     // Called (indirectly) by the ref that the element receives.
     const handler = useCallback((e, prevValue) => {
+        console.assert(e == null || e instanceof Element, `useRefElement was used on a component that didn't forward its ref onto a DOM element, so it's attached to that component's VNode instead.`);
         const cleanup = onElementChange?.(e, prevValue);
         if (prevValue)
             onUnmount?.(prevValue);

@@ -3202,7 +3202,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       var _getElement;
       let shouldFocusParentAfterwards = (_getElement = getElement()) === null || _getElement === void 0 ? void 0 : _getElement.contains(document.activeElement);
       if (untabbable) changeTabbableIndex(null, undefined);else changeTabbableIndex(getLastNonNullIndex(), undefined);
-      if (untabbable && shouldFocusParentAfterwards) focusSelf();
+      if (shouldFocusParentAfterwards) focusSelf();
     }, [untabbable]);
     // Boilerplate related to notifying individual children when they become tabbable/untabbable
     const getTabbableAt = T$1(m => {
@@ -4837,6 +4837,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     useEnsureStability("useRefElement", onElementChange, onMount, onUnmount);
     // Called (indirectly) by the ref that the element receives.
     const handler = T$1((e, prevValue) => {
+      console.assert(e == null || e instanceof Element, "useRefElement was used on a component that didn't forward its ref onto a DOM element, so it's attached to that component's VNode instead.");
       const cleanup = onElementChange === null || onElementChange === void 0 ? void 0 : onElementChange(e, prevValue);
       if (prevValue) onUnmount === null || onUnmount === void 0 ? void 0 : onUnmount(prevValue);
       if (e) onMount === null || onMount === void 0 ? void 0 : onMount(e);
