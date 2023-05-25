@@ -3,7 +3,7 @@ import { UseManagedChildrenReturnType } from "../../preact-extensions/use-manage
 import { PassiveStateUpdater } from "../../preact-extensions/use-passive-state.js";
 import { ElementProps } from "../../util/types.js";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
-import { EnhancedEventHandler } from "../../util/event.js";
+import { EnhancedEventHandler, TargetedEnhancedEvent } from "../../util/event.js";
 /** Anything that's selectable must be tabbable, so we DO use rovingtabindex instead of just managedchildren */
 export interface UseSingleSelectionChildInfo<E extends Element> extends UseRovingTabIndexChildInfo<E> {
     selected: boolean;
@@ -24,7 +24,10 @@ export interface UseSingleSelectionChildInfo<E extends Element> extends UseRovin
      */
     disabled: boolean;
 }
-export type SelectedIndexChangeEvent = EnhancedEventHandler<Event, {
+export type SelectedIndexChangeHandler = EnhancedEventHandler<Event, {
+    selectedIndex: number;
+}>;
+export type SelectedIndexChangeEvent = TargetedEnhancedEvent<Event, {
     selectedIndex: number;
 }>;
 export interface UseSingleSelectionParameters<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseSingleSelectionChildInfo<ChildElement>> {
@@ -47,7 +50,7 @@ export interface UseSingleSelectionParameters<ParentOrChildElement extends Eleme
          *
          * In general, this should only be `null` when single selection is entirely disabled.
          */
-        onSelectedIndexChange: null | SelectedIndexChangeEvent;
+        onSelectedIndexChange: null | SelectedIndexChangeHandler;
         selectionMode: "focus" | "activation" | "disabled";
         /**
          * What property will be used to mark this item as selected.

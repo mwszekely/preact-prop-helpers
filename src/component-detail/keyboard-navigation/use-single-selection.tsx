@@ -10,7 +10,7 @@ import { useState } from "../../preact-extensions/use-state.js";
 import { ElementProps } from "../../util/types.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
-import { EnhancedEventHandler, enhanceEvent } from "../../util/event.js";
+import { EnhancedEventHandler, TargetedEnhancedEvent, enhanceEvent } from "../../util/event.js";
 
 
 /** Anything that's selectable must be tabbable, so we DO use rovingtabindex instead of just managedchildren */
@@ -37,7 +37,8 @@ export interface UseSingleSelectionChildInfo<E extends Element> extends UseRovin
 
 //export interface UseSingleSelectionChildInfo<ChildElement extends Element> extends UseRovingTabIndexChildInfo<ChildElement> {}
 
-export type SelectedIndexChangeEvent = EnhancedEventHandler<Event, { selectedIndex: number }>;
+export type SelectedIndexChangeHandler = EnhancedEventHandler<Event, { selectedIndex: number }>;
+export type SelectedIndexChangeEvent = TargetedEnhancedEvent<Event, { selectedIndex: number }>;
 
 export interface UseSingleSelectionParameters<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseSingleSelectionChildInfo<ChildElement>> {
     managedChildrenReturn: Pick<UseManagedChildrenReturnType<UseSingleSelectionChildInfo<ChildElement>>["managedChildrenReturn"], "getChildren">;
@@ -60,7 +61,7 @@ export interface UseSingleSelectionParameters<ParentOrChildElement extends Eleme
          * 
          * In general, this should only be `null` when single selection is entirely disabled.
          */
-        onSelectedIndexChange: null | SelectedIndexChangeEvent; // ((index: number | null, reason: Event | undefined) => void);
+        onSelectedIndexChange: null | SelectedIndexChangeHandler; // ((index: number | null, reason: Event | undefined) => void);
 
 
         selectionMode: "focus" | "activation" | "disabled";
