@@ -191,7 +191,7 @@ export function useCompleteListNavigation<ParentElement extends Element, ChildEl
 }
 
 export function useCompleteListNavigationChild<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>>({
-    info,
+    info: { index, focusSelf, unselectable, untabbable, ...info },  // The "...info" is empty if M is the same as UCLNCI<ChildElement>.
     textContentParameters,
     context: { childrenHaveFocusChildContext, managedChildContext, rovingTabIndexContext, paginatedChildContext, staggeredChildContext, singleSelectionContext, typeaheadNavigationContext },
     sortableChildParameters,
@@ -204,9 +204,8 @@ export function useCompleteListNavigationChild<ChildElement extends Element, M e
     assertEmptyObject(void1);
     const { onPressSync, ...pressParameters1 } = (pressParameters ?? {});
 
-    let { index, focusSelf, unselectable, untabbable } = info;
     const { info: mcp3, paginatedChildReturn, paginatedChildReturn: { hideBecausePaginated }, props: paginationProps } = usePaginatedChild<ChildElement>({ info: { index }, context: { paginatedChildContext } })
-    const { info: mcp4, staggeredChildReturn, staggeredChildReturn: { hideBecauseStaggered }, props: staggeredProps } = useStaggeredChild<ChildElement>({ info, context: { staggeredChildContext } });
+    const { info: mcp4, staggeredChildReturn, staggeredChildReturn: { hideBecauseStaggered }, props: staggeredProps } = useStaggeredChild<ChildElement>({ info: { index }, context: { staggeredChildContext } });
 
     untabbable ||= (hideBecausePaginated || hideBecauseStaggered);
     unselectable ||= (hideBecausePaginated || hideBecauseStaggered);
@@ -246,7 +245,7 @@ export function useCompleteListNavigationChild<ChildElement extends Element, M e
             focusSelf,
             ...pressParameters1,
             ...pressParameters2,
-            onPressSync: (rovingTabIndexParameters.untabbable || info.unselectable || info.untabbable) ? null : onPress,
+            onPressSync: (rovingTabIndexParameters.untabbable || unselectable || untabbable) ? null : onPress,
             excludeSpace: useStableCallback(() => { return excludeSpace?.() || false; }),
         }
     });

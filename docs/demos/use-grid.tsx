@@ -91,7 +91,7 @@ const DemoUseGridRow = memo((({ index }: { index: number }) => {
 
         sortableChildParameters: { getSortValue: returnNull },
         context: contextFromParent,
-        info: { index, foo: "bar", disabled, hidden },
+        info: { index, foo: "bar", unselectable: disabled, untabbable: hidden },
         textContentParameters: { getText: useCallback((e: Element | null) => { return e?.textContent ?? "" }, []) },
 
         linearNavigationParameters: { disableHomeEndKeys: false, navigatePastEnd: "wrap", navigatePastStart: "wrap" },
@@ -139,7 +139,7 @@ const DemoUseGridCell = (({ index, row, rowIsTabbable }: { index: number, row: n
 
     } = useCompleteGridNavigationCell<HTMLTableCellElement, CustomGridRowInfo>({
         gridNavigationCellParameters: { colSpan: 1 },
-        info: { index, bar: "baz", focusSelf: useStableCallback((e: HTMLElement) => e.focus()), hidden: false },
+        info: { index, bar: "baz", focusSelf: useStableCallback((e: HTMLElement) => e.focus()), untabbable: false },
         context,
         textContentParameters: { getText: useCallback((e: Element | null) => { return e?.textContent ?? "" }, []) },
         rovingTabIndexParameters: { untabbable: false }

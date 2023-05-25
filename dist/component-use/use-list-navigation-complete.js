@@ -87,13 +87,13 @@ export function useCompleteListNavigation({ linearNavigationParameters, rearrang
         childrenHaveFocusReturn
     };
 }
-export function useCompleteListNavigationChild({ info, textContentParameters, context: { childrenHaveFocusChildContext, managedChildContext, rovingTabIndexContext, paginatedChildContext, staggeredChildContext, singleSelectionContext, typeaheadNavigationContext }, sortableChildParameters, pressParameters, rovingTabIndexParameters, singleSelectionParameters, ...void1 }) {
+export function useCompleteListNavigationChild({ info: { index, focusSelf, unselectable, untabbable, ...info }, // The "...info" is empty if M is the same as UCLNCI<ChildElement>.
+textContentParameters, context: { childrenHaveFocusChildContext, managedChildContext, rovingTabIndexContext, paginatedChildContext, staggeredChildContext, singleSelectionContext, typeaheadNavigationContext }, sortableChildParameters, pressParameters, rovingTabIndexParameters, singleSelectionParameters, ...void1 }) {
     monitorCallCount(useCompleteListNavigationChild);
     assertEmptyObject(void1);
     const { onPressSync, ...pressParameters1 } = (pressParameters ?? {});
-    let { index, focusSelf, unselectable, untabbable } = info;
     const { info: mcp3, paginatedChildReturn, paginatedChildReturn: { hideBecausePaginated }, props: paginationProps } = usePaginatedChild({ info: { index }, context: { paginatedChildContext } });
-    const { info: mcp4, staggeredChildReturn, staggeredChildReturn: { hideBecauseStaggered }, props: staggeredProps } = useStaggeredChild({ info, context: { staggeredChildContext } });
+    const { info: mcp4, staggeredChildReturn, staggeredChildReturn: { hideBecauseStaggered }, props: staggeredProps } = useStaggeredChild({ info: { index }, context: { staggeredChildContext } });
     untabbable ||= (hideBecausePaginated || hideBecauseStaggered);
     unselectable ||= (hideBecausePaginated || hideBecauseStaggered);
     if (untabbable)
@@ -119,7 +119,7 @@ export function useCompleteListNavigationChild({ info, textContentParameters, co
             focusSelf,
             ...pressParameters1,
             ...pressParameters2,
-            onPressSync: (rovingTabIndexParameters.untabbable || info.unselectable || info.untabbable) ? null : onPress,
+            onPressSync: (rovingTabIndexParameters.untabbable || unselectable || untabbable) ? null : onPress,
             excludeSpace: useStableCallback(() => { return excludeSpace?.() || false; }),
         }
     });

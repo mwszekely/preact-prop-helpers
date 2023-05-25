@@ -138,7 +138,7 @@ const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
         staggeredChildReturn: { hideBecauseStaggered },
         refElementReturn
     } = useCompleteListNavigationChild<HTMLLIElement, CustomInfoType>({
-        info: { index, focusSelf, foo: "bar", hidden, disabled },
+        info: { index, focusSelf, foo: "bar", untabbable: hidden, unselectable: disabled },
         sortableChildParameters: { getSortValue },
         pressParameters: { onPressSync: null, focusSelf },
         rovingTabIndexParameters: { untabbable: useContext(UntabbableContext) },

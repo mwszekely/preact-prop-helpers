@@ -508,7 +508,7 @@ const DemoStaggeredChildren = memo(({ childCount }: { childCount: number }) => {
 const DemoStaggeredChild = memo(({ index }: { index: number }) => {
     const context = useContext(StaggeredContext);
     const { info, props, staggeredChildReturn: { hideBecauseStaggered, isStaggered } } = useStaggeredChild<HTMLDivElement>({ context: context, info: { index } });
-    const { managedChildReturn } = useManagedChild<UseStaggeredChildrenInfo<HTMLDivElement>>({ context, info: { ...info, hidden: false, index } });
+    const { managedChildReturn } = useManagedChild<UseStaggeredChildrenInfo<HTMLDivElement>>({ context, info: { ...info, index } });
 
     return (
         <div {...useMergedProps(props, { style: hideBecauseStaggered ? { opacity: 0.25 } : {} })}>Child #{index}{isStaggered ? hideBecauseStaggered ? "(pending)" : "" : "(not staggered)"}</div>

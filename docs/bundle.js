@@ -8173,7 +8173,14 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
   }
   function useCompleteListNavigationChild(_ref48) {
     let {
-      info,
+      info: {
+        index,
+        focusSelf,
+        unselectable,
+        untabbable,
+        ...info
+      },
+      // The "...info" is empty if M is the same as UCLNCI<ChildElement>.
       textContentParameters,
       context: {
         childrenHaveFocusChildContext,
@@ -8194,12 +8201,6 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       onPressSync,
       ...pressParameters1
     } = pressParameters !== null && pressParameters !== void 0 ? pressParameters : {};
-    let {
-      index,
-      focusSelf,
-      unselectable,
-      untabbable
-    } = info;
     const {
       info: mcp3,
       paginatedChildReturn,
@@ -8223,7 +8224,9 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       },
       props: staggeredProps
     } = useStaggeredChild({
-      info,
+      info: {
+        index
+      },
       context: {
         staggeredChildContext
       }
@@ -8288,7 +8291,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         focusSelf,
         ...pressParameters1,
         ...pressParameters2,
-        onPressSync: rovingTabIndexParameters.untabbable || info.unselectable || info.untabbable ? null : onPress,
+        onPressSync: rovingTabIndexParameters.untabbable || unselectable || untabbable ? null : onPress,
         excludeSpace: useStableCallback(() => {
           return (excludeSpace === null || excludeSpace === void 0 ? void 0 : excludeSpace()) || false;
         })
@@ -9661,8 +9664,8 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       info: {
         index,
         foo: "bar",
-        disabled,
-        hidden
+        unselectable: disabled,
+        untabbable: hidden
       },
       textContentParameters: {
         getText: T$1(e => {
@@ -9740,7 +9743,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         index,
         bar: "baz",
         focusSelf: useStableCallback(e => e.focus()),
-        hidden: false
+        untabbable: false
       },
       context,
       textContentParameters: {
@@ -10212,8 +10215,8 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         index,
         focusSelf,
         foo: "bar",
-        hidden,
-        disabled
+        untabbable: hidden,
+        unselectable: disabled
       },
       sortableChildParameters: {
         getSortValue
@@ -11238,7 +11241,6 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       context,
       info: {
         ...info,
-        hidden: false,
         index
       }
     });
