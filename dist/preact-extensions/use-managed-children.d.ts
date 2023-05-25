@@ -141,7 +141,7 @@ export interface UseChildrenFlagParameters<M extends ManagedChildInfo<any>, R> {
     setAt(index: M, value: boolean, newSelectedIndex: M["index"] | null, prevSelectedIndex: M["index"] | null): void;
     getAt(index: M): boolean;
     /** Must be at least quasi-stable (always stable, doesn't need to be called during render) */
-    isValid2(index: M): boolean;
+    isValid(index: M): boolean;
 }
 export interface UseChildrenFlagReturnType<M extends ManagedChildInfo<any>, R> {
     /**

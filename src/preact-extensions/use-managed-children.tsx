@@ -396,7 +396,7 @@ export interface UseChildrenFlagParameters<M extends ManagedChildInfo<any>, R> {
     getAt(index: M): boolean;
 
     /** Must be at least quasi-stable (always stable, doesn't need to be called during render) */
-    isValid2(index: M): boolean;
+    isValid(index: M): boolean;
 }
 
 export interface UseChildrenFlagReturnType<M extends ManagedChildInfo<any>, R> {
