@@ -1,7 +1,7 @@
 import { UseManagedChildrenReturnType } from "../preact-extensions/use-managed-children.js";
 import { ElementProps } from "../util/types.js";
 import { UseRovingTabIndexChildInfo } from "./keyboard-navigation/use-roving-tabindex.js";
-export interface UseStaggeredChildrenInfo<E extends Element> extends Pick<UseRovingTabIndexChildInfo<E>, "hidden" | "index"> {
+export interface UseStaggeredChildrenInfo<E extends Element> extends Pick<UseRovingTabIndexChildInfo<E>, "index"> {
     setStaggeredVisible(visible: boolean): void;
 }
 export interface UseStaggeredChildrenParameters<E extends Element, M extends UseStaggeredChildrenInfo<E>> {

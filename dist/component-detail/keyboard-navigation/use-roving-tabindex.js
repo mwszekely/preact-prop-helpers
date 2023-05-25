@@ -2,7 +2,7 @@ import { useCallback, useEffect } from "preact/hooks";
 import { useChildrenFlag } from "../../preact-extensions/use-managed-children.js";
 import { usePassiveState } from "../../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
-import { useStableGetter, useMemoObject } from "../../preact-extensions/use-stable-getter.js";
+import { useMemoObject, useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { useState } from "../../preact-extensions/use-state.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { focus } from "../../util/focus.js";
@@ -81,7 +81,7 @@ export function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovi
             // then focus that element too
             if (prevIndex != nextIndex) {
                 const nextChild = children.getAt(nextIndex);
-                console.assert(!nextChild?.hidden);
+                //console.assert(!nextChild?.untabbablyHidden);
                 if (nextChild != null && fromUserInteraction) {
                     const element = nextChild.getElement();
                     if (element) {
@@ -112,16 +112,16 @@ export function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovi
             focusSelf();
     }, [untabbable]);
     // Boilerplate related to notifying individual children when they become tabbable/untabbable
-    const getTabbableAt = useCallback((m) => { return m.getLocallyTabbable(); }, []);
-    const setTabbableAt = useCallback((m, t) => { m.setLocallyTabbable(t); }, []);
-    const isTabbableValid = useCallback((m) => { return !m.hidden; }, []);
+    const getTabbableAt = useCallback((child) => { return child.getLocallyTabbable(); }, []);
+    const setTabbableAt = useCallback((child, t) => { child.setLocallyTabbable(t); }, []);
+    const isTabbableValid = useStableCallback((child) => { return !child.untabbable; });
     const { changeIndex: changeTabbableIndex, getCurrentIndex: getTabbableIndex, reevaluateClosestFit } = useChildrenFlag({
         initialIndex: initiallyTabbedIndex ?? (untabbable ? null : 0),
         onIndexChange: onTabbableIndexChange || null,
         getChildren,
         closestFit: true,
         getAt: getTabbableAt,
-        isValid: isTabbableValid,
+        isValid2: isTabbableValid,
         setAt: setTabbableAt,
     });
     const focusSelf = useCallback((reason) => {
@@ -163,19 +163,19 @@ export function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovi
         }
     };
 }
-export function useRovingTabIndexChild({ info: { index, hidden, ...void2 }, context: { rovingTabIndexContext: { reevaluateClosestFit, setTabbableIndex, getInitiallyTabbedIndex, parentFocusSelf } }, rovingTabIndexParameters: { untabbable }, ...void3 }) {
+export function useRovingTabIndexChild({ info: { index, untabbable: iAmUntabbable, ...void2 }, context: { rovingTabIndexContext: { reevaluateClosestFit, setTabbableIndex, getInitiallyTabbedIndex, parentFocusSelf } }, rovingTabIndexParameters: { untabbable: parentIsUntabbable }, ...void3 }) {
     monitorCallCount(useRovingTabIndexChild);
     const [tabbable, setTabbable, getTabbable] = useState(getInitiallyTabbedIndex() === index);
     useEffect(() => {
         reevaluateClosestFit();
-    }, [!!hidden]);
+    }, [!!iAmUntabbable]);
     assertEmptyObject(void2);
     assertEmptyObject(void3);
     return {
         hasCurrentFocusParameters: {
             onCurrentFocusedInnerChanged: useStableCallback((focused, _prevFocused, e) => {
                 if (focused) {
-                    if (!untabbable && !hidden)
+                    if (!parentIsUntabbable && !iAmUntabbable)
                         setTabbableIndex(index, e, false);
                     else
                         parentFocusSelf();
@@ -186,10 +186,10 @@ export function useRovingTabIndexChild({ info: { index, hidden, ...void2 }, cont
             tabbable,
             getTabbable,
         },
-        info: { setLocallyTabbable: setTabbable, getLocallyTabbable: getTabbable, tabbable },
+        info: { setLocallyTabbable: setTabbable, getLocallyTabbable: getTabbable },
         props: {
             tabIndex: (tabbable ? 0 : -1),
-            ...{ inert: hidden } // This inert is to prevent the edge case of clicking a hidden item and it focusing itself
+            ...{ inert: iAmUntabbable } // This inert is to prevent the edge case of clicking a hidden item and it focusing itself
         },
     };
 }

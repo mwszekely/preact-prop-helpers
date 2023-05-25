@@ -184,9 +184,9 @@ function TestBasesListNavChild({ index }: { index: number }) {
             onPressSync: null
         },
         info: {
-            disabled,
+            unselectable: disabled,
             focusSelf: e => { e.focus() },
-            hidden,
+            untabbable: hidden,
             index
         },
         rovingTabIndexParameters: { untabbable: useContext(UntabbableContext) },

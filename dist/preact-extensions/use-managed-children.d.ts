@@ -140,7 +140,8 @@ export interface UseChildrenFlagParameters<M extends ManagedChildInfo<any>, R> {
     onIndexChange: null | OnPassiveStateChange<M["index"] | null, R>;
     setAt(index: M, value: boolean, newSelectedIndex: M["index"] | null, prevSelectedIndex: M["index"] | null): void;
     getAt(index: M): boolean;
-    isValid(index: M): boolean;
+    /** Must be at least quasi-stable (always stable, doesn't need to be called during render) */
+    isValid2(index: M): boolean;
 }
 export interface UseChildrenFlagReturnType<M extends ManagedChildInfo<any>, R> {
     /**
@@ -179,6 +180,6 @@ export interface UseChildrenFlagReturnType<M extends ManagedChildInfo<any>, R> {
  * @param param0
  * @returns
  */
-export declare function useChildrenFlag<M extends ManagedChildInfo<number | string>, R>({ getChildren, initialIndex, closestFit, onIndexChange, getAt, setAt, isValid, }: UseChildrenFlagParameters<M, R>): UseChildrenFlagReturnType<M, R>;
+export declare function useChildrenFlag<M extends ManagedChildInfo<number | string>, R>({ getChildren, initialIndex, closestFit, onIndexChange, getAt, setAt, isValid2: isValid, }: UseChildrenFlagParameters<M, R>): UseChildrenFlagReturnType<M, R>;
 export {};
 //# sourceMappingURL=use-managed-children.d.ts.map

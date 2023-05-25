@@ -18,14 +18,18 @@ export interface UseRovingTabIndexChildInfo<TabbableChildElement extends Element
     focusSelf(e: TabbableChildElement): void;
     getElement(): TabbableChildElement | null;
     /**
-     * If true, this child cannot be given focus because it does not exist, is not visible, is disabled, etc. Any attempt to focus this element will focus its closest neighbor instead.
+     * If a child **exists** but **can't be tabbed to**, then set this to `true`.
      *
-     * This ***MUST*** be true if the child is `display: none`, `visibility: hidden`, and other cases where the element's focusability is removed in a way that's not detectible.
+     * This cannot be calculated automatically. It's *possible* to catch something like `display: none` with some reflow-forcing `getComputedStyles` or something,
+     * but if the child is untabbable because it's disabled or staggered or paginated or something we just have no way of knowing.
+     * It could be untabbable for any arbitrary reason the user decides.
+     *
+     * If the child is **missing** instead (i.e. it does not exist), then there's no issue. You couldn't even supply this property because the child who would supply it is, by definition, missing. This is, to be clear, about **existing** children whomst are untabbable for any reason at all.
+     *
      */
-    hidden: boolean;
+    untabbable: boolean;
     setLocallyTabbable: StateUpdater<boolean>;
     getLocallyTabbable: () => boolean;
-    tabbable: boolean;
 }
 export interface UseRovingTabIndexParameters<ParentElement extends Element, TabbableChildElement extends Element, M extends UseRovingTabIndexChildInfo<TabbableChildElement>> {
     /** When children mount/unmount, RTI needs access to all known children in case we unmounted the currently tabbable child */
@@ -88,7 +92,7 @@ export interface UseRovingTabIndexReturnType<ParentElement extends Element, Tabb
         focusSelf: (reason?: any) => void;
     };
 }
-export type UseRovingTabIndexChildInfoKeys = "index" | "hidden";
+export type UseRovingTabIndexChildInfoKeys = "index" | "untabbable";
 export interface UseRovingTabIndexChildParameters<TabbableChildElement extends Element, M extends UseRovingTabIndexChildInfo<TabbableChildElement>> extends OmitStrong<UseManagedChildParameters<M>, "info" | "context"> {
     info: Pick<UseManagedChildParameters<M>["info"], UseRovingTabIndexChildInfoKeys>;
     rovingTabIndexParameters: Pick<UseRovingTabIndexParameters<any, TabbableChildElement, M>["rovingTabIndexParameters"], "untabbable">;
@@ -127,7 +131,7 @@ export interface UseRovingTabIndexChildReturnType<ChildElement extends Element, 
         /** **STABLE** */
         getTabbable(): boolean;
     };
-    info: Pick<UseRovingTabIndexChildInfo<ChildElement>, "tabbable" | "getLocallyTabbable" | "setLocallyTabbable">;
+    info: Pick<UseRovingTabIndexChildInfo<ChildElement>, "getLocallyTabbable" | "setLocallyTabbable">;
     /**
      * *Unstable*
      *
@@ -167,5 +171,5 @@ export interface UseRovingTabIndexChildReturnType<ChildElement extends Element, 
  * regardless of if it's the whole app or just a given component.
  */
 export declare function useRovingTabIndex<ParentElement extends Element, ChildElement extends Element, M extends UseRovingTabIndexChildInfo<ChildElement>>({ managedChildrenReturn: { getChildren }, rovingTabIndexParameters: { untabbable, initiallyTabbedIndex, onTabbableIndexChange }, refElementReturn: { getElement }, ...void1 }: UseRovingTabIndexParameters<ParentElement, ChildElement, M>): UseRovingTabIndexReturnType<ParentElement, ChildElement, M>;
-export declare function useRovingTabIndexChild<ChildElement extends Element, M extends UseRovingTabIndexChildInfo<ChildElement>>({ info: { index, hidden, ...void2 }, context: { rovingTabIndexContext: { reevaluateClosestFit, setTabbableIndex, getInitiallyTabbedIndex, parentFocusSelf } }, rovingTabIndexParameters: { untabbable }, ...void3 }: UseRovingTabIndexChildParameters<ChildElement, M>): UseRovingTabIndexChildReturnType<ChildElement, M>;
+export declare function useRovingTabIndexChild<ChildElement extends Element, M extends UseRovingTabIndexChildInfo<ChildElement>>({ info: { index, untabbable: iAmUntabbable, ...void2 }, context: { rovingTabIndexContext: { reevaluateClosestFit, setTabbableIndex, getInitiallyTabbedIndex, parentFocusSelf } }, rovingTabIndexParameters: { untabbable: parentIsUntabbable }, ...void3 }: UseRovingTabIndexChildParameters<ChildElement, M>): UseRovingTabIndexChildReturnType<ChildElement, M>;
 //# sourceMappingURL=use-roving-tabindex.d.ts.map

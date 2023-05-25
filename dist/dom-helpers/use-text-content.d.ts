@@ -8,7 +8,6 @@ export interface UseTextContentParameters<E extends Element> {
          */
         getText(e: E | null): string | null;
         onTextContentChange: OnPassiveStateChange<string | null, never>;
-        hidden: boolean;
     };
 }
 export interface UseTextContentReturnType {
@@ -16,5 +15,5 @@ export interface UseTextContentReturnType {
         getTextContent: () => string | null;
     };
 }
-export declare function useTextContent<E extends Element>({ refElementReturn: { getElement }, textContentParameters: { getText, onTextContentChange, hidden } }: UseTextContentParameters<E>): UseTextContentReturnType;
+export declare function useTextContent<E extends Element>({ refElementReturn: { getElement }, textContentParameters: { getText, onTextContentChange } }: UseTextContentParameters<E>): UseTextContentReturnType;
 //# sourceMappingURL=use-text-content.d.ts.map

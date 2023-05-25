@@ -18,11 +18,11 @@ export interface UseSingleSelectionChildInfo<E extends Element> extends UseRovin
      */
     setLocalSelected(selected: boolean, direction: number | null): void;
     /**
-     * This is similar to `hidden` for `useRovingTabIndex`, but for selection.
+     * This is similar to `untabbable` for `useRovingTabIndex`, but for selection.
      *
-     * Disables selecting this child. Being `hidden` must imply being `disabled`, but you can of course have something that's disabled (unselectable) but not hidden (untabbable).
+     * Disables selecting this child. Being `untabbable` must imply being `unselectable`, but you can of course have something that's unselectable but not untabbable.
      */
-    disabled: boolean;
+    unselectable: boolean;
 }
 export type SelectedIndexChangeHandler = EnhancedEventHandler<Event, {
     selectedIndex: number;
@@ -60,7 +60,7 @@ export interface UseSingleSelectionParameters<ParentOrChildElement extends Eleme
         ariaPropName: `aria-${"pressed" | "selected" | "checked" | `current-${"page" | "step" | "date" | "time" | "location" | "true"}`}` | null;
     };
 }
-export type UseSingleSelectionChildInfoKeys = "index" | "disabled";
+export type UseSingleSelectionChildInfoKeys = "index" | "unselectable";
 export interface UseSingleSelectionChildParameters<E extends Element, M extends UseSingleSelectionChildInfo<E>> {
     context: UseSingleSelectionContext;
     info: Pick<UseSingleSelectionChildInfo<E>, UseSingleSelectionChildInfoKeys>;

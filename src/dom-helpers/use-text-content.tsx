@@ -11,27 +11,23 @@ export interface UseTextContentParameters<E extends Element> {
          */
         getText(e: E | null): string | null;
         onTextContentChange: OnPassiveStateChange<string | null, never>;
-
-        hidden: boolean;
     }
 }
 
 export interface UseTextContentReturnType {
-    textContentReturn: { getTextContent: () => string | null; } 
+    textContentReturn: { getTextContent: () => string | null; }
 }
 
-export function useTextContent<E extends Element>({ refElementReturn: { getElement }, textContentParameters: { getText, onTextContentChange, hidden } }: UseTextContentParameters<E>): UseTextContentReturnType {
+export function useTextContent<E extends Element>({ refElementReturn: { getElement }, textContentParameters: { getText, onTextContentChange } }: UseTextContentParameters<E>): UseTextContentReturnType {
     monitorCallCount(useTextContent);
-    
+
     const [getTextContent, setTextContent] = usePassiveState<string | null, never>(onTextContentChange, returnNull, runImmediately);
     useEffect(() => {
-        if (!hidden) {
-            const element = getElement();
-            if (element) {
-                const textContent = getText(element);
-                if (textContent) {
-                    setTextContent(textContent);
-                }
+        const element = getElement();
+        if (element) {
+            const textContent = getText(element);
+            if (textContent) {
+                setTextContent(textContent);
             }
         }
     });

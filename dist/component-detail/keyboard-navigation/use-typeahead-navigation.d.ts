@@ -41,7 +41,7 @@ export interface UseTypeaheadNavigationParameters<TabbableChildElement extends E
 /** Arguments passed to the child `useTypeaheadNavigationChild` */
 export interface UseTypeaheadNavigationChildParameters<ChildElement extends Element, _M extends UseTypeaheadNavigationChildInfo<ChildElement>> {
     info: Pick<UseRovingTabIndexChildParameters<ChildElement, UseRovingTabIndexChildInfo<ChildElement>>["info"], "index">;
-    textContentParameters: Pick<UseTextContentParameters<ChildElement>["textContentParameters"], "getText" | "hidden">;
+    textContentParameters: Pick<UseTextContentParameters<ChildElement>["textContentParameters"], "getText">;
     refElementReturn: Pick<UseRefElementReturnType<ChildElement>["refElementReturn"], "getElement">;
     context: UseTypeaheadNavigationContext;
 }
@@ -58,7 +58,7 @@ interface TypeaheadInfo {
  * @see useListNavigation, which packages everything up together.
  */
 export declare function useTypeaheadNavigation<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseTypeaheadNavigationChildInfo<ChildElement>>({ typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead, isValid, ...void3 }, rovingTabIndexReturn: { getTabbableIndex: getIndex, setTabbableIndex: setIndex, ...void1 }, ...void2 }: UseTypeaheadNavigationParameters<ChildElement, M>): UseTypeaheadNavigationReturnType<ParentOrChildElement>;
-export declare function useTypeaheadNavigationChild<ChildElement extends Element, M extends UseTypeaheadNavigationChildInfo<ChildElement>>({ info: { index, ...void1 }, textContentParameters: { getText, hidden, ...void5 }, context: { typeaheadNavigationContext: { sortedTypeaheadInfo, insertingComparator, excludeSpace, ...void2 } }, refElementReturn: { getElement, ...void3 }, ...void4 }: UseTypeaheadNavigationChildParameters<ChildElement, M>): UseTypeaheadNavigationChildReturnType;
+export declare function useTypeaheadNavigationChild<ChildElement extends Element, M extends UseTypeaheadNavigationChildInfo<ChildElement>>({ info: { index, ...void1 }, textContentParameters: { getText, ...void5 }, context: { typeaheadNavigationContext: { sortedTypeaheadInfo, insertingComparator, excludeSpace, ...void2 } }, refElementReturn: { getElement, ...void3 }, ...void4 }: UseTypeaheadNavigationChildParameters<ChildElement, M>): UseTypeaheadNavigationChildReturnType;
 /**
  * Your usual binary search implementation.
  *

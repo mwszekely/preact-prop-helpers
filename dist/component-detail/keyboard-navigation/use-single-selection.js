@@ -12,7 +12,7 @@ export function useSingleSelection({ managedChildrenReturn: { getChildren }, rov
     const onSelectedIndexChange = useStableCallback(onSelectedIndexChange_U ?? noop);
     const getSelectedAt = useCallback((m) => { return m.getSelected(); }, []);
     const setSelectedAt = useCallback((m, t, newSelectedIndex, prevSelectedIndex) => {
-        if (m.hidden) {
+        if (m.untabbable) {
             console.assert(false);
         }
         const directionComparison = (newSelectedIndex == m.index ? prevSelectedIndex : newSelectedIndex);
@@ -23,14 +23,14 @@ export function useSingleSelection({ managedChildrenReturn: { getChildren }, rov
             console.assert(newSelectedIndex === m.index);
         m.setLocalSelected(t, direction);
     }, []);
-    const isSelectedValid = useCallback((m) => { return !m.hidden; }, []);
+    const isSelectedValid = useCallback((m) => { return !m.unselectable; }, []);
     const { changeIndex: changeSelectedIndex, getCurrentIndex: getSelectedIndex } = useChildrenFlag({
         getChildren,
         onIndexChange: null,
         initialIndex: initiallySelectedIndex,
         getAt: getSelectedAt,
         setAt: setSelectedAt,
-        isValid: isSelectedValid,
+        isValid2: isSelectedValid,
         closestFit: false
     });
     return {
@@ -57,9 +57,9 @@ export function useSingleSelection({ managedChildrenReturn: { getChildren }, rov
 }
 export function useSingleSelectionChild(args) {
     monitorCallCount(useSingleSelectionChild);
-    const { context: { singleSelectionContext: { getSelectedIndex, onSelectedIndexChange } }, info: { index, disabled }, singleSelectionParameters: { ariaPropName, selectionMode }, } = args;
+    const { context: { singleSelectionContext: { getSelectedIndex, onSelectedIndexChange } }, info: { index, unselectable }, singleSelectionParameters: { ariaPropName, selectionMode }, } = args;
     useEnsureStability("useSingleSelectionChild", getSelectedIndex, onSelectedIndexChange);
-    const getDisabled = useStableGetter(disabled);
+    const getUnselectable = useStableGetter(unselectable);
     const [localSelected, setLocalSelected, getLocalSelected] = useState(getSelectedIndex() == index);
     const [direction, setDirection, getDirection] = useState(getSelectedIndex() == null ? null : (getSelectedIndex() - index));
     const onCurrentFocusedInnerChanged = useStableCallback((focused, _prev, e) => {
@@ -81,10 +81,10 @@ export function useSingleSelectionChild(args) {
             selected: localSelected,
             // This is the thing that's passed to onPress or onClick or whatever
             setThisOneSelected: useStableCallback((event) => {
-                console.assert(!getDisabled());
+                console.assert(!getUnselectable());
                 if (selectionMode == "disabled")
                     return;
-                if (!disabled)
+                if (!unselectable)
                     onSelectedIndexChange?.(enhanceEvent(event, { selectedIndex: index }));
             }),
             getSelectedOffset: getDirection,

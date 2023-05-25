@@ -22,7 +22,7 @@ export function useCompleteGridNavigation({ gridNavigationParameters, linearNavi
         const child = getChildren().getAt(i);
         if (child == null)
             return false;
-        if (child.hidden)
+        if (child.untabbable)
             return false;
         return true;
     }, []);
@@ -75,15 +75,15 @@ export function useCompleteGridNavigationRow({ info, context: contextIncomingFor
     const { info: infoPaginatedChild, paginatedChildReturn: { paginatedVisible, isPaginated, hideBecausePaginated }, props: paginationProps } = usePaginatedChild({ info, context: contextIncomingForRowAsChildOfTable });
     const { info: infoStaggeredChild, // { setParentIsStaggered, setStaggeredVisible },
     staggeredChildReturn: { isStaggered, hideBecauseStaggered }, props: staggeredProps } = useStaggeredChild({ info, context: contextIncomingForRowAsChildOfTable });
-    info.hidden ||= (hideBecausePaginated || hideBecauseStaggered);
-    info.disabled ||= info.hidden;
+    info.untabbable ||= (hideBecausePaginated || hideBecauseStaggered);
+    info.unselectable ||= info.untabbable;
     const getChildren = useCallback(() => managedChildrenReturn.getChildren(), []);
     const getHighestChildIndex = useCallback(() => getChildren().getHighestIndex(), []);
     const isValid = useCallback((i) => {
         const child = getChildren().getAt(i);
         if (child == null)
             return false;
-        if (child.hidden)
+        if (child.untabbable)
             return false;
         return true;
     }, []);
@@ -96,7 +96,7 @@ export function useCompleteGridNavigationRow({ info, context: contextIncomingFor
         refElementReturn,
         context: contextIncomingForRowAsChildOfTable,
         info,
-        textContentParameters: { hidden: info.hidden, ...textContentParameters },
+        textContentParameters,
         singleSelectionParameters
     });
     const { gridNavigationRowParameters: { focusSelf, setTabbableColumnIndex }, linearNavigationReturn, managedChildrenParameters, pressParameters: { excludeSpace }, // TODO: Pass this through context? (this is for children, so it doesn't actually matter, but for completeness...)
@@ -150,7 +150,7 @@ export function useCompleteGridNavigationCell({ gridNavigationCellParameters, co
         info,
         context: { gridNavigationCellContext, rovingTabIndexContext, typeaheadNavigationContext },
         refElementReturn,
-        textContentParameters: { hidden: info.hidden, ...textContentParameters },
+        textContentParameters,
         rovingTabIndexParameters,
     });
     const { hasCurrentFocusReturn } = useHasCurrentFocus({ hasCurrentFocusParameters: { onCurrentFocusedChanged: null, ...hasCurrentFocusParameters }, refElementReturn });

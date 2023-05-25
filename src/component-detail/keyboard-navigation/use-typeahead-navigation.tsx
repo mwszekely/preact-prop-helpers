@@ -60,7 +60,7 @@ export interface UseTypeaheadNavigationParameters<TabbableChildElement extends E
 /** Arguments passed to the child `useTypeaheadNavigationChild` */
 export interface UseTypeaheadNavigationChildParameters<ChildElement extends Element, _M extends UseTypeaheadNavigationChildInfo<ChildElement>> {
     info: Pick<UseRovingTabIndexChildParameters<ChildElement, UseRovingTabIndexChildInfo<ChildElement>>["info"], "index">;
-    textContentParameters: Pick<UseTextContentParameters<ChildElement>["textContentParameters"], "getText" | "hidden">;
+    textContentParameters: Pick<UseTextContentParameters<ChildElement>["textContentParameters"], "getText">;
     refElementReturn: Pick<UseRefElementReturnType<ChildElement>["refElementReturn"], "getElement">;
     context: UseTypeaheadNavigationContext
 }
@@ -324,7 +324,7 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
 
 export function useTypeaheadNavigationChild<ChildElement extends Element, M extends UseTypeaheadNavigationChildInfo<ChildElement>>({
     info: { index, ...void1 },
-    textContentParameters: { getText, hidden, ...void5 },
+    textContentParameters: { getText, ...void5 },
     context: { typeaheadNavigationContext: { sortedTypeaheadInfo, insertingComparator, excludeSpace, ...void2 } },
     refElementReturn: { getElement, ...void3 },
     ...void4
@@ -341,7 +341,6 @@ export function useTypeaheadNavigationChild<ChildElement extends Element, M exte
         refElementReturn: { getElement },
         textContentParameters: {
             getText,
-            hidden,
             onTextContentChange: useCallback<OnPassiveStateChange<string | null, never>>((text: string | null) => {
                 if (text) {
                     // Find where to insert this item.

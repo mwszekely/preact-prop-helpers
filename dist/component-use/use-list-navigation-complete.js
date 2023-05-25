@@ -34,7 +34,7 @@ export function useCompleteListNavigation({ linearNavigationParameters, rearrang
         const child = getChildren().getAt(i);
         if (!child)
             return false;
-        if (child.hidden)
+        if (child.untabbable)
             return false;
         return true;
     }, []);
@@ -91,18 +91,19 @@ export function useCompleteListNavigationChild({ info, textContentParameters, co
     monitorCallCount(useCompleteListNavigationChild);
     assertEmptyObject(void1);
     const { onPressSync, ...pressParameters1 } = (pressParameters ?? {});
-    let { index, focusSelf, hidden, disabled } = info;
+    let { index, focusSelf, unselectable, untabbable } = info;
     const { info: mcp3, paginatedChildReturn, paginatedChildReturn: { hideBecausePaginated }, props: paginationProps } = usePaginatedChild({ info: { index }, context: { paginatedChildContext } });
     const { info: mcp4, staggeredChildReturn, staggeredChildReturn: { hideBecauseStaggered }, props: staggeredProps } = useStaggeredChild({ info, context: { staggeredChildContext } });
-    hidden ||= (hideBecausePaginated || hideBecauseStaggered);
-    if (hidden)
-        disabled = true;
+    untabbable ||= (hideBecausePaginated || hideBecauseStaggered);
+    unselectable ||= (hideBecausePaginated || hideBecauseStaggered);
+    if (untabbable)
+        unselectable = true;
     const { refElementReturn, propsStable } = useRefElement({ refElementParameters: {} });
     const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1 }, pressParameters: { excludeSpace, ...pressParameters2 }, textContentReturn, singleSelectionChildReturn, info: mcp5, props: propsLs, rovingTabIndexChildReturn } = useListNavigationSingleSelectionChild({
-        info: { index, disabled, hidden },
+        info: { index, unselectable, untabbable },
         context: { rovingTabIndexContext, singleSelectionContext, typeaheadNavigationContext },
         refElementReturn,
-        textContentParameters: { hidden, ...textContentParameters },
+        textContentParameters,
         rovingTabIndexParameters,
         singleSelectionParameters
     });
@@ -118,7 +119,7 @@ export function useCompleteListNavigationChild({ info, textContentParameters, co
             focusSelf,
             ...pressParameters1,
             ...pressParameters2,
-            onPressSync: (rovingTabIndexParameters.untabbable || info.disabled || info.hidden) ? null : onPress,
+            onPressSync: (rovingTabIndexParameters.untabbable || info.unselectable || info.untabbable) ? null : onPress,
             excludeSpace: useStableCallback(() => { return excludeSpace?.() || false; }),
         }
     });
@@ -127,8 +128,8 @@ export function useCompleteListNavigationChild({ info, textContentParameters, co
         focusSelf,
         getElement: refElementReturn.getElement,
         getSortValue: sortableChildParameters.getSortValue,
-        disabled,
-        hidden,
+        unselectable,
+        untabbable,
         ...mcp4,
         ...mcp3,
         ...mcp5,

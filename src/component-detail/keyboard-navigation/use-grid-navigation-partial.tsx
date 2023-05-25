@@ -174,11 +174,11 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
         let index = (getCurrentTabbableColumn() ?? 0);
         let child = getChildren().getAt(index);
         let highestIndex = getChildren().getHighestIndex();
-        while ((!child || child.hidden) && index > 0) {
+        while ((!child || child.untabbable) && index > 0) {
             --index;
             child = getChildren().getAt(index);
         }
-        while ((!child || child.hidden) && index <= highestIndex) {
+        while ((!child || child.untabbable) && index <= highestIndex) {
             ++index;
             child = getChildren().getAt(index);
         }

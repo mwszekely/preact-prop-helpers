@@ -28,11 +28,11 @@ export interface UseSingleSelectionChildInfo<E extends Element> extends UseRovin
     setLocalSelected(selected: boolean, direction: number | null): void;
 
     /**
-     * This is similar to `hidden` for `useRovingTabIndex`, but for selection.
+     * This is similar to `untabbable` for `useRovingTabIndex`, but for selection.
      * 
-     * Disables selecting this child. Being `hidden` must imply being `disabled`, but you can of course have something that's disabled (unselectable) but not hidden (untabbable).
+     * Disables selecting this child. Being `untabbable` must imply being `unselectable`, but you can of course have something that's unselectable but not untabbable.
      */
-    disabled: boolean;
+    unselectable: boolean;
 }
 
 //export interface UseSingleSelectionChildInfo<ChildElement extends Element> extends UseRovingTabIndexChildInfo<ChildElement> {}
@@ -76,7 +76,7 @@ export interface UseSingleSelectionParameters<ParentOrChildElement extends Eleme
     }
 }
 
-export type UseSingleSelectionChildInfoKeys = "index" | "disabled";
+export type UseSingleSelectionChildInfoKeys = "index" | "unselectable";
 
 export interface UseSingleSelectionChildParameters<E extends Element, M extends UseSingleSelectionChildInfo<E>> {
     context: UseSingleSelectionContext;
@@ -148,7 +148,7 @@ export function useSingleSelection<ParentOrChildElement extends Element, ChildEl
 
     const getSelectedAt = useCallback((m: UseSingleSelectionChildInfo<ChildElement>) => { return m.getSelected(); }, []);
     const setSelectedAt = useCallback((m: UseSingleSelectionChildInfo<ChildElement>, t: boolean, newSelectedIndex: number | null, prevSelectedIndex: number | null) => {
-        if (m.hidden) {
+        if (m.untabbable) {
             console.assert(false);
         }
         const directionComparison = (newSelectedIndex == m.index ? prevSelectedIndex : newSelectedIndex);
@@ -160,7 +160,7 @@ export function useSingleSelection<ParentOrChildElement extends Element, ChildEl
 
         m.setLocalSelected(t, direction);
     }, []);
-    const isSelectedValid = useCallback((m: UseSingleSelectionChildInfo<ChildElement>) => { return !m.hidden; }, []);
+    const isSelectedValid = useCallback((m: UseSingleSelectionChildInfo<ChildElement>) => { return !m.unselectable; }, []);
 
     const {
         changeIndex: changeSelectedIndex,
@@ -171,7 +171,7 @@ export function useSingleSelection<ParentOrChildElement extends Element, ChildEl
         initialIndex: initiallySelectedIndex,
         getAt: getSelectedAt,
         setAt: setSelectedAt,
-        isValid: isSelectedValid,
+        isValid2: isSelectedValid,
         closestFit: false
     });
     return {
@@ -203,12 +203,12 @@ export function useSingleSelectionChild<ChildElement extends Element, M extends 
     type R = Event;
     const {
         context: { singleSelectionContext: { getSelectedIndex, onSelectedIndexChange } },
-        info: { index, disabled },
+        info: { index, unselectable },
         singleSelectionParameters: { ariaPropName, selectionMode },
     } = args;
 
     useEnsureStability("useSingleSelectionChild", getSelectedIndex, onSelectedIndexChange);
-    const getDisabled = useStableGetter(disabled);
+    const getUnselectable = useStableGetter(unselectable);
 
     const [localSelected, setLocalSelected, getLocalSelected] = useState(getSelectedIndex() == index);
     const [direction, setDirection, getDirection] = useState(getSelectedIndex() == null ? null : (getSelectedIndex()! - index));
@@ -235,10 +235,10 @@ export function useSingleSelectionChild<ChildElement extends Element, M extends 
             selected: localSelected,
             // This is the thing that's passed to onPress or onClick or whatever
             setThisOneSelected: useStableCallback((event) => {
-                console.assert(!getDisabled());
+                console.assert(!getUnselectable());
                 if (selectionMode == "disabled")
                     return;
-                if (!disabled)
+                if (!unselectable)
                     onSelectedIndexChange?.(enhanceEvent(event, { selectedIndex: index }));
             }),
             getSelectedOffset: getDirection,

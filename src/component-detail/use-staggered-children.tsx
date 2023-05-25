@@ -7,7 +7,7 @@ import { ElementProps } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 import { UseRovingTabIndexChildInfo } from "./keyboard-navigation/use-roving-tabindex.js";
 
-export interface UseStaggeredChildrenInfo<E extends Element> extends Pick<UseRovingTabIndexChildInfo<E>, "hidden" | "index"> {
+export interface UseStaggeredChildrenInfo<E extends Element> extends Pick<UseRovingTabIndexChildInfo<E>, "index"> {
     //setParentIsStaggered(parentIsStaggered: boolean): void;
     setStaggeredVisible(visible: boolean): void;
 }

@@ -2970,7 +2970,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       onIndexChange,
       getAt,
       setAt,
-      isValid
+      isValid2: isValid
     } = _ref7;
     useEnsureStability("useChildrenFlag", onIndexChange, getAt, setAt, isValid);
     // TODO (maybe?): Even if there is an initial index, it's not set until mount. Is that fine?
@@ -3178,7 +3178,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         // then focus that element too
         if (prevIndex != nextIndex) {
           const nextChild = children.getAt(nextIndex);
-          console.assert(!(nextChild !== null && nextChild !== void 0 && nextChild.hidden));
+          //console.assert(!nextChild?.untabbablyHidden);
           if (nextChild != null && fromUserInteraction) {
             const element = nextChild.getElement();
             if (element) {
@@ -3205,15 +3205,15 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       if (shouldFocusParentAfterwards) focusSelf();
     }, [untabbable]);
     // Boilerplate related to notifying individual children when they become tabbable/untabbable
-    const getTabbableAt = T$1(m => {
-      return m.getLocallyTabbable();
+    const getTabbableAt = T$1(child => {
+      return child.getLocallyTabbable();
     }, []);
-    const setTabbableAt = T$1((m, t) => {
-      m.setLocallyTabbable(t);
+    const setTabbableAt = T$1((child, t) => {
+      child.setLocallyTabbable(t);
     }, []);
-    const isTabbableValid = T$1(m => {
-      return !m.hidden;
-    }, []);
+    const isTabbableValid = useStableCallback(child => {
+      return !child.untabbable;
+    });
     const {
       changeIndex: changeTabbableIndex,
       getCurrentIndex: getTabbableIndex,
@@ -3224,7 +3224,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       getChildren,
       closestFit: true,
       getAt: getTabbableAt,
-      isValid: isTabbableValid,
+      isValid2: isTabbableValid,
       setAt: setTabbableAt
     });
     const focusSelf = T$1(reason => {
@@ -3278,7 +3278,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     let {
       info: {
         index,
-        hidden,
+        untabbable: iAmUntabbable,
         ...void2
       },
       context: {
@@ -3290,19 +3290,19 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         }
       },
       rovingTabIndexParameters: {
-        untabbable
+        untabbable: parentIsUntabbable
       },
       ...void3
     } = _ref9;
     const [tabbable, setTabbable, getTabbable] = useState(getInitiallyTabbedIndex() === index);
     p(() => {
       reevaluateClosestFit();
-    }, [!!hidden]);
+    }, [!!iAmUntabbable]);
     return {
       hasCurrentFocusParameters: {
         onCurrentFocusedInnerChanged: useStableCallback((focused, _prevFocused, e) => {
           if (focused) {
-            if (!untabbable && !hidden) setTabbableIndex(index, e, false);else parentFocusSelf();
+            if (!parentIsUntabbable && !iAmUntabbable) setTabbableIndex(index, e, false);else parentFocusSelf();
           }
         })
       },
@@ -3312,13 +3312,12 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       },
       info: {
         setLocallyTabbable: setTabbable,
-        getLocallyTabbable: getTabbable,
-        tabbable
+        getLocallyTabbable: getTabbable
       },
       props: {
         tabIndex: tabbable ? 0 : -1,
         ...{
-          inert: hidden
+          inert: iAmUntabbable
         } // This inert is to prevent the edge case of clicking a hidden item and it focusing itself
       }
     };
@@ -3331,19 +3330,16 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       },
       textContentParameters: {
         getText,
-        onTextContentChange,
-        hidden
+        onTextContentChange
       }
     } = _ref10;
     const [getTextContent, setTextContent] = usePassiveState(onTextContentChange, returnNull, runImmediately);
     p(() => {
-      if (!hidden) {
-        const element = getElement();
-        if (element) {
-          const textContent = getText(element);
-          if (textContent) {
-            setTextContent(textContent);
-          }
+      const element = getElement();
+      if (element) {
+        const textContent = getText(element);
+        if (textContent) {
+          setTextContent(textContent);
         }
       }
     });
@@ -3556,7 +3552,6 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       },
       textContentParameters: {
         getText,
-        hidden,
         ...void5
       },
       context: {
@@ -3581,7 +3576,6 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       },
       textContentParameters: {
         getText,
-        hidden,
         onTextContentChange: T$1(text => {
           if (text) {
             // Find where to insert this item.
@@ -3865,11 +3859,11 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       let index = (_getCurrentTabbableCo = getCurrentTabbableColumn()) !== null && _getCurrentTabbableCo !== void 0 ? _getCurrentTabbableCo : 0;
       let child = getChildren().getAt(index);
       let highestIndex = getChildren().getHighestIndex();
-      while ((!child || child.hidden) && index > 0) {
+      while ((!child || child.untabbable) && index > 0) {
         --index;
         child = getChildren().getAt(index);
       }
-      while ((!child || child.hidden) && index <= highestIndex) {
+      while ((!child || child.untabbable) && index <= highestIndex) {
         ++index;
         child = getChildren().getAt(index);
       }
@@ -4070,7 +4064,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       return m.getSelected();
     }, []);
     const setSelectedAt = T$1((m, t, newSelectedIndex, prevSelectedIndex) => {
-      if (m.hidden) {
+      if (m.untabbable) {
         console.assert(false);
       }
       const directionComparison = newSelectedIndex == m.index ? prevSelectedIndex : newSelectedIndex;
@@ -4080,7 +4074,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       m.setLocalSelected(t, direction);
     }, []);
     const isSelectedValid = T$1(m => {
-      return !m.hidden;
+      return !m.unselectable;
     }, []);
     const {
       changeIndex: changeSelectedIndex,
@@ -4091,7 +4085,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       initialIndex: initiallySelectedIndex,
       getAt: getSelectedAt,
       setAt: setSelectedAt,
-      isValid: isSelectedValid,
+      isValid2: isSelectedValid,
       closestFit: false
     });
     return {
@@ -4126,7 +4120,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       },
       info: {
         index,
-        disabled
+        unselectable
       },
       singleSelectionParameters: {
         ariaPropName,
@@ -4134,7 +4128,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       }
     } = args;
     useEnsureStability("useSingleSelectionChild", getSelectedIndex, onSelectedIndexChange);
-    const getDisabled = useStableGetter(disabled);
+    const getUnselectable = useStableGetter(unselectable);
     const [localSelected, setLocalSelected, getLocalSelected] = useState(getSelectedIndex() == index);
     const [direction, setDirection, getDirection] = useState(getSelectedIndex() == null ? null : getSelectedIndex() - index);
     const onCurrentFocusedInnerChanged = useStableCallback((focused, _prev, e) => {
@@ -4158,9 +4152,9 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         selected: localSelected,
         // This is the thing that's passed to onPress or onClick or whatever
         setThisOneSelected: useStableCallback(event => {
-          console.assert(!getDisabled());
+          console.assert(!getUnselectable());
           if (selectionMode == "disabled") return;
-          if (!disabled) onSelectedIndexChange === null || onSelectedIndexChange === void 0 ? void 0 : onSelectedIndexChange(enhanceEvent(event, {
+          if (!unselectable) onSelectedIndexChange === null || onSelectedIndexChange === void 0 ? void 0 : onSelectedIndexChange(enhanceEvent(event, {
             selectedIndex: index
           }));
         }),
@@ -7229,7 +7223,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     const isValid = T$1(i => {
       const child = getChildren().getAt(i);
       if (child == null) return false;
-      if (child.hidden) return false;
+      if (child.untabbable) return false;
       return true;
     }, []);
     const {
@@ -7387,14 +7381,14 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       info,
       context: contextIncomingForRowAsChildOfTable
     });
-    info.hidden || (info.hidden = hideBecausePaginated || hideBecauseStaggered);
-    info.disabled || (info.disabled = info.hidden);
+    info.untabbable || (info.untabbable = hideBecausePaginated || hideBecauseStaggered);
+    info.unselectable || (info.unselectable = info.untabbable);
     const getChildren = T$1(() => managedChildrenReturn.getChildren(), []);
     const getHighestChildIndex = T$1(() => getChildren().getHighestIndex(), []);
     const isValid = T$1(i => {
       const child = getChildren().getAt(i);
       if (child == null) return false;
-      if (child.hidden) return false;
+      if (child.untabbable) return false;
       return true;
     }, []);
     const {
@@ -7423,10 +7417,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       refElementReturn,
       context: contextIncomingForRowAsChildOfTable,
       info,
-      textContentParameters: {
-        hidden: info.hidden,
-        ...textContentParameters
-      },
+      textContentParameters,
       singleSelectionParameters
     });
     const {
@@ -7553,10 +7544,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         typeaheadNavigationContext
       },
       refElementReturn,
-      textContentParameters: {
-        hidden: info.hidden,
-        ...textContentParameters
-      },
+      textContentParameters,
       rovingTabIndexParameters
     });
     const {
@@ -8050,7 +8038,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     const isValid = T$1(i => {
       const child = getChildren().getAt(i);
       if (!child) return false;
-      if (child.hidden) return false;
+      if (child.untabbable) return false;
       return true;
     }, []);
     const {
@@ -8209,8 +8197,8 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     let {
       index,
       focusSelf,
-      hidden,
-      disabled
+      unselectable,
+      untabbable
     } = info;
     const {
       info: mcp3,
@@ -8240,8 +8228,9 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         staggeredChildContext
       }
     });
-    hidden || (hidden = hideBecausePaginated || hideBecauseStaggered);
-    if (hidden) disabled = true;
+    untabbable || (untabbable = hideBecausePaginated || hideBecauseStaggered);
+    unselectable || (unselectable = hideBecausePaginated || hideBecauseStaggered);
+    if (untabbable) unselectable = true;
     const {
       refElementReturn,
       propsStable
@@ -8264,8 +8253,8 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     } = useListNavigationSingleSelectionChild({
       info: {
         index,
-        disabled,
-        hidden
+        unselectable,
+        untabbable
       },
       context: {
         rovingTabIndexContext,
@@ -8273,10 +8262,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         typeaheadNavigationContext
       },
       refElementReturn,
-      textContentParameters: {
-        hidden,
-        ...textContentParameters
-      },
+      textContentParameters,
       rovingTabIndexParameters,
       singleSelectionParameters
     });
@@ -8302,7 +8288,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         focusSelf,
         ...pressParameters1,
         ...pressParameters2,
-        onPressSync: rovingTabIndexParameters.untabbable || info.disabled || info.hidden ? null : onPress,
+        onPressSync: rovingTabIndexParameters.untabbable || info.unselectable || info.untabbable ? null : onPress,
         excludeSpace: useStableCallback(() => {
           return (excludeSpace === null || excludeSpace === void 0 ? void 0 : excludeSpace()) || false;
         })
@@ -8313,8 +8299,8 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       focusSelf,
       getElement: refElementReturn.getElement,
       getSortValue: sortableChildParameters.getSortValue,
-      disabled,
-      hidden,
+      unselectable,
+      untabbable,
       ...mcp4,
       ...mcp3,
       ...mcp5

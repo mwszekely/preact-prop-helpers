@@ -36,9 +36,9 @@ export interface UseCompleteGridNavigationRowParameters<RowElement extends Eleme
     OmitStrong<UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM>, "context" | "textContentParameters" | "managedChildrenReturn" | "refElementReturn" | "linearNavigationParameters" | "typeaheadNavigationParameters"> {
 
     context: CompleteGridNavigationRowContext<any, RowElement, CellElement, RM, CM>;
-    info: OmitStrong<RM, Exclude<keyof UseCompleteGridNavigationRowInfo<RowElement, CellElement>, "index" | "hidden" | "disabled">>;
+    info: OmitStrong<RM, Exclude<keyof UseCompleteGridNavigationRowInfo<RowElement, CellElement>, "index" | "untabbable" | "unselectable">>;
     sortableChildParameters: Pick<UseSortableChildInfo, "getSortValue">;
-    textContentParameters: OmitStrong<UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM>["textContentParameters"], "hidden">;
+    textContentParameters: OmitStrong<UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM>["textContentParameters"], never>;
 
     linearNavigationParameters: OmitStrong<UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM>["linearNavigationParameters"], "getHighestIndex" | "pageNavigationSize" | "isValid" | "indexMangler" | "indexDemangler">;
     typeaheadNavigationParameters: OmitStrong<UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM>["typeaheadNavigationParameters"], "isValid">;
@@ -48,10 +48,10 @@ export interface UseCompleteGridNavigationRowParameters<RowElement extends Eleme
 }
 
 export interface UseCompleteGridNavigationCellParameters<CellElement extends Element, CM extends UseCompleteGridNavigationCellInfo<CellElement>> extends
-    OmitStrong<UseGridNavigationSingleSelectionCellParameters<any, CellElement, CM>, "context" | "textContentParameters" | "refElementReturn"> {
-    textContentParameters: OmitStrong<UseGridNavigationSingleSelectionCellParameters<any, CellElement, CM>["textContentParameters"], "hidden">;
+    OmitStrong<UseGridNavigationSingleSelectionCellParameters<any, CellElement, CM>, "info" | "context" | "textContentParameters" | "refElementReturn"> {
+    textContentParameters: OmitStrong<UseGridNavigationSingleSelectionCellParameters<any, CellElement, CM>["textContentParameters"], never>;
 
-    info: Omit<CM, Exclude<keyof UseCompleteGridNavigationCellInfo<CellElement>, "index" | "hidden" | "focusSelf">>;
+    info: Omit<CM, Exclude<keyof UseCompleteGridNavigationCellInfo<CellElement>, "index" | "untabbable" | "focusSelf">>;
     //completeGridNavigationCellParameters: Pick<CM, "focusSelf"> & OmitStrong<CM, keyof UseCompleteGridNavigationCellInfo<CellElement>>;
     context: CompleteGridNavigationCellContext<any, CellElement, CM>;
     
@@ -133,7 +133,7 @@ export function useCompleteGridNavigation<ParentOrRowElement extends Element, Ro
         const child = getChildren().getAt(i);
         if (child == null)
             return false;
-        if (child.hidden)
+        if (child.untabbable)
             return false;
         return true;
     }, []);
@@ -227,8 +227,8 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
         props: staggeredProps
     } = useStaggeredChild<RowElement>({ info, context: contextIncomingForRowAsChildOfTable })
 
-    info.hidden ||= (hideBecausePaginated || hideBecauseStaggered);
-    info.disabled ||= info.hidden;
+    info.untabbable ||= (hideBecausePaginated || hideBecauseStaggered);
+    info.unselectable ||= info.untabbable;
 
     const getChildren = useCallback(() => managedChildrenReturn.getChildren(), []);
     const getHighestChildIndex: (() => number) = useCallback<() => number>(() => getChildren().getHighestIndex(), []);
@@ -236,7 +236,7 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
         const child = getChildren().getAt(i);
         if (child == null)
             return false;
-        if (child.hidden)
+        if (child.untabbable)
             return false;
         return true;
     }, []);
@@ -252,7 +252,7 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
         refElementReturn,
         context: contextIncomingForRowAsChildOfTable,
         info,
-        textContentParameters: { hidden: info.hidden, ...textContentParameters },
+        textContentParameters,
         singleSelectionParameters
     });
 
@@ -349,7 +349,7 @@ export function useCompleteGridNavigationCell<CellElement extends Element, CM ex
         info,
         context: { gridNavigationCellContext, rovingTabIndexContext, typeaheadNavigationContext },
         refElementReturn,
-        textContentParameters: { hidden: info.hidden, ...textContentParameters },
+        textContentParameters,
         rovingTabIndexParameters,
     });
 
