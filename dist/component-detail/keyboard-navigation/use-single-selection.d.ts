@@ -24,6 +24,9 @@ export interface UseSingleSelectionChildInfo<E extends Element> extends UseRovin
      */
     disabled: boolean;
 }
+export type SelectedIndexChangeEvent = EnhancedEventHandler<Event, {
+    selectedIndex: number;
+}>;
 export interface UseSingleSelectionParameters<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseSingleSelectionChildInfo<ChildElement>> {
     managedChildrenReturn: Pick<UseManagedChildrenReturnType<UseSingleSelectionChildInfo<ChildElement>>["managedChildrenReturn"], "getChildren">;
     rovingTabIndexReturn: Pick<UseRovingTabIndexReturnType<ParentOrChildElement, ChildElement, M>["rovingTabIndexReturn"], "setTabbableIndex">;
@@ -44,9 +47,7 @@ export interface UseSingleSelectionParameters<ParentOrChildElement extends Eleme
          *
          * In general, this should only be `null` when single selection is entirely disabled.
          */
-        onSelectedIndexChange: null | EnhancedEventHandler<Event, {
-            selectedIndex: number;
-        }>;
+        onSelectedIndexChange: null | SelectedIndexChangeEvent;
         selectionMode: "focus" | "activation" | "disabled";
         /**
          * What property will be used to mark this item as selected.
