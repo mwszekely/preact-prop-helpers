@@ -1,7 +1,7 @@
 import { createContext } from "preact";
 import { memo } from "preact/compat";
 import { useCallback, useContext } from "preact/hooks";
-import { CompleteGridNavigationContext, CompleteGridNavigationRowContext, GetIndex, UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationReturnType, UseCompleteGridNavigationRowInfo, UseCompleteGridNavigationRowReturnType, VNode, returnNull, useCompleteGridNavigation, useCompleteGridNavigationCell, useCompleteGridNavigationRow, useStableCallback, useState } from "../../dist/index.js";
+import { CompleteGridNavigationContext, CompleteGridNavigationRowContext, EventDetail, GetIndex, UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationReturnType, UseCompleteGridNavigationRowInfo, UseCompleteGridNavigationRowReturnType, VNode, returnNull, useCompleteGridNavigation, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useStableCallback, useState } from "../../dist/index.js";
 
 const RandomWords = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
 
@@ -13,8 +13,9 @@ export const DemoUseGrid = memo(() => {
     const [selectedRow, setSelectedRow, _getSelectedRow] = useState<number | null>(null);
     const [tabbableRow, setTabbableRow] = useState<number | null>(null);
 
-    const ret: UseCompleteGridNavigationReturnType<HTMLTableSectionElement, HTMLTableRowElement, HTMLTableCellElement, CustomGridInfo, CustomGridRowInfo> = useCompleteGridNavigation<HTMLTableSectionElement, HTMLTableRowElement, HTMLTableCellElement, CustomGridInfo, CustomGridRowInfo>({
-        singleSelectionParameters: { initiallySelectedIndex: selectedRow, onSelectedIndexChange: setSelectedRow, ariaPropName: "aria-checked", selectionMode: "focus" },
+    const ret = useCompleteGridNavigationDeclarative<HTMLTableSectionElement, HTMLTableRowElement, HTMLTableCellElement, CustomGridInfo, CustomGridRowInfo>({
+        singleSelectionParameters: { ariaPropName: "aria-checked", selectionMode: "focus" },
+        singleSelectionDeclarativeParameters: {  selectedIndex: selectedRow, setSelectedIndex: useStableCallback((e) => {setSelectedRow(e[EventDetail].selectedIndex)}, []) },
         gridNavigationParameters: { onTabbableColumnChange: setTabbableColumn },
         linearNavigationParameters: { disableHomeEndKeys: false, navigatePastEnd: "wrap", navigatePastStart: "wrap", pageNavigationSize: 0.1 },
         //managedChildrenReturn: { getChildren },

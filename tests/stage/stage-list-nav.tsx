@@ -1,5 +1,5 @@
 import { useCallback, useContext, useEffect, useRef, useState } from "preact/hooks";
-import { Compare, CompleteListNavigationContext, UseCompleteListNavigationChildInfo, UseSingleSelectionParameters, useCompleteListNavigation, useCompleteListNavigationChild, useCompleteListNavigationDeclarative, useMergedProps, useStableGetter, useStaggeredChildren } from "../../dist/index.js";
+import { Compare, CompleteListNavigationContext, EventDetail, UseCompleteListNavigationChildInfo, UseSingleSelectionParameters, useCompleteListNavigation, useCompleteListNavigationChild, useCompleteListNavigationDeclarative, useMergedProps, useStableCallback, useStableGetter, useStaggeredChildren } from "../../dist/index.js";
 import { TestItem, useTestSyncState } from "./util.js";
 import { createContext } from "preact";
 import { LoremIpsum } from "../lorem.js";
@@ -22,7 +22,7 @@ export interface ListNavConstants {
     setCollator(id: string): Promise<void>;
     setNoTypeahead(noTypeahead: boolean): Promise<void>;
     setTypeaheadTimeout(timeout: number): Promise<void>;
-    onSelectedIndexChange(index: number, e: Event): (void | Promise<void>);
+    onSelectedIndexChange(index: number): (void | Promise<void>);
 }
 
 const Context = createContext<CompleteListNavigationContext<HTMLOListElement, HTMLLIElement, UseCompleteListNavigationChildInfo<HTMLLIElement>>>(null!);
@@ -109,10 +109,10 @@ function TestBasesListNavImpl({ ariaPropName, selectedIndex, arrowKeyDirection, 
         singleSelectionParameters: { ariaPropName, selectionMode },
         singleSelectionDeclarativeParameters: {
             selectedIndex,
-            setSelectedIndex: ((i, e) => {
+            onSelectedIndexChange: useStableCallback((e) => {
                 const f = getTestingHandler("ListNav", "onSelectedIndexChange");
-                f?.(i!, e!);
-            })
+                f?.(e[EventDetail].selectedIndex);
+            }, [])
         },
         sortableChildrenParameters: { compare: useCallback<Compare<UseCompleteListNavigationChildInfo<HTMLLIElement>>>((lhs, rhs) => { return (lhs.getSortValue() as number) - (rhs.getSortValue() as number) }, []) },
         staggeredChildrenParameters: { staggered },

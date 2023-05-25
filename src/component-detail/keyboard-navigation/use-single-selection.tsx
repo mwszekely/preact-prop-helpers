@@ -252,7 +252,7 @@ export function useSingleSelectionChild<ChildElement extends Element, M extends 
 
 
 export interface UseSingleSelectionDeclarativeParameters {
-    singleSelectionDeclarativeParameters: { selectedIndex: number | null, setSelectedIndex: null | EnhancedEventHandler<Event, { selectedIndex: number }> }
+    singleSelectionDeclarativeParameters: { selectedIndex: number | null, onSelectedIndexChange: null | EnhancedEventHandler<Event, { selectedIndex: number }> }
     singleSelectionReturn: Pick<UseSingleSelectionReturnType<any, any>["singleSelectionReturn"], "changeSelectedIndex">;
 }
 
@@ -262,12 +262,12 @@ export type MakeSingleSelectionDeclarativeReturnType<R> = Omit<R, "singleSelecti
 /**
  * Let's face it, declarative is nicer to use than imperative, so this is a shortcut.
  */
-export function useSingleSelectionDeclarative<ParentOrChildElement extends Element, ChildElement extends Element, _M extends UseSingleSelectionChildInfo<ChildElement>>({ singleSelectionReturn: { changeSelectedIndex }, singleSelectionDeclarativeParameters: { selectedIndex, setSelectedIndex } }: UseSingleSelectionDeclarativeParameters) {
+export function useSingleSelectionDeclarative<ParentOrChildElement extends Element, ChildElement extends Element, _M extends UseSingleSelectionChildInfo<ChildElement>>({ singleSelectionReturn: { changeSelectedIndex }, singleSelectionDeclarativeParameters: { selectedIndex, onSelectedIndexChange } }: UseSingleSelectionDeclarativeParameters) {
     useEffect(() => {
         changeSelectedIndex(selectedIndex);
     }, [selectedIndex]);
 
-    return { singleSelectionParameters: { onSelectedIndexChange: setSelectedIndex } satisfies Pick<UseSingleSelectionParameters<ParentOrChildElement, ChildElement, any>["singleSelectionParameters"], "onSelectedIndexChange"> }
+    return { singleSelectionParameters: { onSelectedIndexChange } satisfies Pick<UseSingleSelectionParameters<ParentOrChildElement, ChildElement, any>["singleSelectionParameters"], "onSelectedIndexChange"> }
 }
 
 

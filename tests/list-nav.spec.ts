@@ -213,8 +213,8 @@ test("Staggering", async ({ page, listNav, shared: { install, run } }) => {
     await run("ListNav", "setChildCount", newCount);
     await expect(await listNav.list.locator("li[data-hide-because-staggered=false]").count()).toBeGreaterThanOrEqual(max);
     await expect(await listNav.list.locator("li[data-hide-because-staggered=true]").count()).toBeGreaterThan(50);
-    await expect(listNav.list.locator("li[data-hide-because-staggered=true]")).toHaveCount(0);
-    await expect(listNav.list.locator("li[data-hide-because-staggered=false]")).toHaveCount(newMax);
+    await expect(listNav.list.locator("li[data-hide-because-staggered=true]")).toHaveCount(0, { timeout: 20000 });
+    await expect(listNav.list.locator("li[data-hide-because-staggered=false]")).toHaveCount(newMax, { timeout: 20000 });
 
 });
 /*

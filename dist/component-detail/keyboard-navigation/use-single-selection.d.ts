@@ -107,7 +107,7 @@ export declare function useSingleSelectionChild<ChildElement extends Element, M 
 export interface UseSingleSelectionDeclarativeParameters {
     singleSelectionDeclarativeParameters: {
         selectedIndex: number | null;
-        setSelectedIndex: null | EnhancedEventHandler<Event, {
+        onSelectedIndexChange: null | EnhancedEventHandler<Event, {
             selectedIndex: number;
         }>;
     };
@@ -120,7 +120,7 @@ export type MakeSingleSelectionDeclarativeReturnType<R> = Omit<R, "singleSelecti
 /**
  * Let's face it, declarative is nicer to use than imperative, so this is a shortcut.
  */
-export declare function useSingleSelectionDeclarative<ParentOrChildElement extends Element, ChildElement extends Element, _M extends UseSingleSelectionChildInfo<ChildElement>>({ singleSelectionReturn: { changeSelectedIndex }, singleSelectionDeclarativeParameters: { selectedIndex, setSelectedIndex } }: UseSingleSelectionDeclarativeParameters): {
+export declare function useSingleSelectionDeclarative<ParentOrChildElement extends Element, ChildElement extends Element, _M extends UseSingleSelectionChildInfo<ChildElement>>({ singleSelectionReturn: { changeSelectedIndex }, singleSelectionDeclarativeParameters: { selectedIndex, onSelectedIndexChange } }: UseSingleSelectionDeclarativeParameters): {
     singleSelectionParameters: {
         onSelectedIndexChange: EnhancedEventHandler<Event, {
             selectedIndex: number;

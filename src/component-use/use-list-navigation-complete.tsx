@@ -2,7 +2,7 @@ import { useCallback } from "preact/hooks";
 import { useListNavigationSingleSelectionSortable, UseListNavigationSingleSelectionSortableChildInfo, UseListNavigationSingleSelectionSortableChildParameters, UseListNavigationSingleSelectionSortableChildReturnType, UseListNavigationSingleSelectionSortableParameters, UseListNavigationSingleSelectionSortableReturnType } from "../component-detail/keyboard-navigation/use-list-navigation-single-selection-sortable.js";
 import { useListNavigationSingleSelectionChild } from "../component-detail/keyboard-navigation/use-list-navigation-single-selection.js";
 import { RovingTabIndexChildContext, UseRovingTabIndexChildParameters } from "../component-detail/keyboard-navigation/use-roving-tabindex.js";
-import { MakeSingleSelectionDeclarativeParameters, UseSingleSelectionChildParameters, UseSingleSelectionContext, useSingleSelectionDeclarative } from "../component-detail/keyboard-navigation/use-single-selection.js";
+import { MakeSingleSelectionDeclarativeParameters, UseSingleSelectionChildParameters, UseSingleSelectionContext, useSingleSelectionDeclarative, UseSingleSelectionParameters } from "../component-detail/keyboard-navigation/use-single-selection.js";
 import { UseSortableChildInfo } from "../component-detail/keyboard-navigation/use-sortable-children.js";
 import { UseTypeaheadNavigationContext } from "../component-detail/keyboard-navigation/use-typeahead-navigation.js";
 import { usePaginatedChild, UsePaginatedChildContext, UsePaginatedChildParameters, usePaginatedChildren, UsePaginatedChildrenInfo, UsePaginatedChildrenParameters, UsePaginatedChildrenReturnType, UsePaginatedChildReturn } from "../component-detail/use-paginated-children.js";
@@ -296,7 +296,10 @@ export function useCompleteListNavigationChild<ChildElement extends Element, M e
 
 }
 
-export interface UseCompleteListNavigationDeclarativeParameters<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends OmitStrong<MakeSingleSelectionDeclarativeParameters<UseCompleteListNavigationParameters<ParentElement, ChildElement, M>>, "singleSelectionReturn"> { }
+export interface UseCompleteListNavigationDeclarativeParameters<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends OmitStrong<MakeSingleSelectionDeclarativeParameters<UseCompleteListNavigationParameters<ParentElement, ChildElement, M>>, "singleSelectionParameters" | "singleSelectionReturn"> {
+    singleSelectionParameters: OmitStrong<UseSingleSelectionParameters<ParentElement, ChildElement, M>["singleSelectionParameters"], "initiallySelectedIndex" | "onSelectedIndexChange">;
+}
+
 export interface UseCompleteListNavigationDeclarativeReturnType<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends OmitTargeted<UseCompleteListNavigationReturnType<ParentElement, ChildElement, M>, "singleSelectionReturn", "changeSelectedIndex"> { }
 
 export function useCompleteListNavigationDeclarative<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>>({
