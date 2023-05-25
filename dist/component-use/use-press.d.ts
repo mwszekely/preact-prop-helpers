@@ -1,9 +1,9 @@
 import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
 import { OnPassiveStateChange } from "../preact-extensions/use-passive-state.js";
 import { ElementProps, FocusEventType, KeyboardEventType, MouseEventType, PointerEventType, TouchEventType } from "../util/types.js";
-export type PressEventReason<E extends Node> = MouseEventType<E> | KeyboardEventType<E> | TouchEventType<E> | PointerEventType<E>;
-export type PressChangeEventReason<E extends Node> = MouseEventType<E> | KeyboardEventType<E> | TouchEventType<E> | PointerEventType<E> | FocusEventType<E>;
-export interface UsePressParameters<E extends Node> {
+export type PressEventReason<E extends EventTarget> = MouseEventType<E> | KeyboardEventType<E> | TouchEventType<E> | PointerEventType<E>;
+export type PressChangeEventReason<E extends EventTarget> = MouseEventType<E> | KeyboardEventType<E> | TouchEventType<E> | PointerEventType<E> | FocusEventType<E>;
+export interface UsePressParameters<E extends EventTarget> {
     refElementReturn: Required<Pick<UseRefElementReturnType<E>["refElementReturn"], "getElement">>;
     pressParameters: {
         onPressingChange?: OnPassiveStateChange<boolean, PressChangeEventReason<E>>;
