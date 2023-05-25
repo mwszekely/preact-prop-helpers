@@ -15,7 +15,7 @@ export const DemoUseGrid = memo(() => {
 
     const ret = useCompleteGridNavigationDeclarative<HTMLTableSectionElement, HTMLTableRowElement, HTMLTableCellElement, CustomGridInfo, CustomGridRowInfo>({
         singleSelectionParameters: { ariaPropName: "aria-checked", selectionMode: "focus" },
-        singleSelectionDeclarativeParameters: {  selectedIndex: selectedRow, setSelectedIndex: useStableCallback((e) => {setSelectedRow(e[EventDetail].selectedIndex)}, []) },
+        singleSelectionDeclarativeParameters: {  selectedIndex: selectedRow, onSelectedIndexChange: useStableCallback((e) => {setSelectedRow(e[EventDetail].selectedIndex)}, []) },
         gridNavigationParameters: { onTabbableColumnChange: setTabbableColumn },
         linearNavigationParameters: { disableHomeEndKeys: false, navigatePastEnd: "wrap", navigatePastStart: "wrap", pageNavigationSize: 0.1 },
         //managedChildrenReturn: { getChildren },

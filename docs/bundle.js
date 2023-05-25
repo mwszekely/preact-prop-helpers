@@ -4186,7 +4186,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       },
       singleSelectionDeclarativeParameters: {
         selectedIndex,
-        setSelectedIndex
+        onSelectedIndexChange
       }
     } = _ref19;
     p(() => {
@@ -4194,7 +4194,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     }, [selectedIndex]);
     return {
       singleSelectionParameters: {
-        onSelectedIndexChange: setSelectedIndex
+        onSelectedIndexChange
       }
     };
   }
@@ -9559,7 +9559,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       },
       singleSelectionDeclarativeParameters: {
         selectedIndex: selectedRow,
-        setSelectedIndex: useStableCallback(e => {
+        onSelectedIndexChange: useStableCallback(e => {
           setSelectedRow(e[EventDetail].selectedIndex);
         }, [])
       },
@@ -9963,7 +9963,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       },
       singleSelectionDeclarativeParameters: {
         selectedIndex,
-        setSelectedIndex: useStableCallback(e => {
+        onSelectedIndexChange: useStableCallback(e => {
           setSelectedIndex(e[EventDetail].selectedIndex);
         }, [])
       },

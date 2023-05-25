@@ -29,7 +29,7 @@ export const DemoUseRovingTabIndex = memo(() => {
 
     const r: UseCompleteListNavigationDeclarativeReturnType<HTMLOListElement, HTMLLIElement, CustomInfoType> = useCompleteListNavigationDeclarative<HTMLOListElement, HTMLLIElement, CustomInfoType>({
         rovingTabIndexParameters: { onTabbableIndexChange: null, untabbable },
-        singleSelectionDeclarativeParameters: { selectedIndex, setSelectedIndex: useStableCallback((e) => { setSelectedIndex(e[EventDetail].selectedIndex) }, []) },
+        singleSelectionDeclarativeParameters: { selectedIndex, onSelectedIndexChange: useStableCallback((e) => { setSelectedIndex(e[EventDetail].selectedIndex) }, []) },
         typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000 },
         linearNavigationParameters: { disableHomeEndKeys: false, arrowKeyDirection: "vertical", navigatePastEnd: "wrap", navigatePastStart: "wrap", pageNavigationSize: 0.1 },
         rearrangeableChildrenParameters: {
