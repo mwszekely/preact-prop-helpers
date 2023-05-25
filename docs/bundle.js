@@ -2970,7 +2970,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       onIndexChange,
       getAt,
       setAt,
-      isValid2: isValid
+      isValid
     } = _ref7;
     useEnsureStability("useChildrenFlag", onIndexChange, getAt, setAt, isValid);
     // TODO (maybe?): Even if there is an initial index, it's not set until mount. Is that fine?
@@ -3224,7 +3224,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       getChildren,
       closestFit: true,
       getAt: getTabbableAt,
-      isValid2: isTabbableValid,
+      isValid: isTabbableValid,
       setAt: setTabbableAt
     });
     const focusSelf = T$1(reason => {
@@ -4085,7 +4085,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       initialIndex: initiallySelectedIndex,
       getAt: getSelectedAt,
       setAt: setSelectedAt,
-      isValid2: isSelectedValid,
+      isValid: isSelectedValid,
       closestFit: false
     });
     return {

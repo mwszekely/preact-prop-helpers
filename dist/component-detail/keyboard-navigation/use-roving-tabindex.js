@@ -121,7 +121,7 @@ export function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovi
         getChildren,
         closestFit: true,
         getAt: getTabbableAt,
-        isValid2: isTabbableValid,
+        isValid: isTabbableValid,
         setAt: setTabbableAt,
     });
     const focusSelf = useCallback((reason) => {

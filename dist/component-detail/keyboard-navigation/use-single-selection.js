@@ -30,7 +30,7 @@ export function useSingleSelection({ managedChildrenReturn: { getChildren }, rov
         initialIndex: initiallySelectedIndex,
         getAt: getSelectedAt,
         setAt: setSelectedAt,
-        isValid2: isSelectedValid,
+        isValid: isSelectedValid,
         closestFit: false
     });
     return {

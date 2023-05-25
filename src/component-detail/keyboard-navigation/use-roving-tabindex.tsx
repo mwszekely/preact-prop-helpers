@@ -322,7 +322,7 @@ export function useRovingTabIndex<ParentElement extends Element, ChildElement ex
         getChildren,
         closestFit: true,
         getAt: getTabbableAt,
-        isValid2: isTabbableValid,
+        isValid: isTabbableValid,
         setAt: setTabbableAt,
     });
 

@@ -437,7 +437,7 @@ export interface UseChildrenFlagReturnType<M extends ManagedChildInfo<any>, R> {
  * @param param0 
  * @returns 
  */
-export function useChildrenFlag<M extends ManagedChildInfo<number | string>, R>({ getChildren, initialIndex, closestFit, onIndexChange, getAt, setAt, isValid2: isValid, }: UseChildrenFlagParameters<M, R>): UseChildrenFlagReturnType<M, R> {
+export function useChildrenFlag<M extends ManagedChildInfo<number | string>, R>({ getChildren, initialIndex, closestFit, onIndexChange, getAt, setAt, isValid }: UseChildrenFlagParameters<M, R>): UseChildrenFlagReturnType<M, R> {
     useEnsureStability("useChildrenFlag", onIndexChange, getAt, setAt, isValid);
 
     // TODO (maybe?): Even if there is an initial index, it's not set until mount. Is that fine?

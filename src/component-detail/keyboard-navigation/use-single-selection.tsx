@@ -171,7 +171,7 @@ export function useSingleSelection<ParentOrChildElement extends Element, ChildEl
         initialIndex: initiallySelectedIndex,
         getAt: getSelectedAt,
         setAt: setSelectedAt,
-        isValid2: isSelectedValid,
+        isValid: isSelectedValid,
         closestFit: false
     });
     return {

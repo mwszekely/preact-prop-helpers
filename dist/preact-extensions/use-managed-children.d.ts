@@ -180,6 +180,6 @@ export interface UseChildrenFlagReturnType<M extends ManagedChildInfo<any>, R> {
  * @param param0
  * @returns
  */
-export declare function useChildrenFlag<M extends ManagedChildInfo<number | string>, R>({ getChildren, initialIndex, closestFit, onIndexChange, getAt, setAt, isValid2: isValid, }: UseChildrenFlagParameters<M, R>): UseChildrenFlagReturnType<M, R>;
+export declare function useChildrenFlag<M extends ManagedChildInfo<number | string>, R>({ getChildren, initialIndex, closestFit, onIndexChange, getAt, setAt, isValid }: UseChildrenFlagParameters<M, R>): UseChildrenFlagReturnType<M, R>;
 export {};
 //# sourceMappingURL=use-managed-children.d.ts.map
