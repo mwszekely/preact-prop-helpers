@@ -14,6 +14,7 @@ import { useMemoObject } from "../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../util/assert.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 import { usePress } from "./use-press.js";
+import { enhanceEvent } from "../util/event.js";
 /**
  * All the list-related hooks combined into one giant hook that encapsulates everything.
  *
@@ -107,7 +108,7 @@ export function useCompleteListNavigationChild({ info, textContentParameters, co
     });
     const onPress = useStableCallback((e) => {
         if (singleSelectionParameters.selectionMode == "activation")
-            singleSelectionContext.onSelectedIndexChange?.(index, e);
+            singleSelectionContext.onSelectedIndexChange?.(enhanceEvent(e, { selectedIndex: index }));
         onPressSync?.(e);
     });
     const { propsStable: pressRefProps, refElementReturn: pressRefElementReturn } = useRefElement({ refElementParameters: {} });
@@ -162,7 +163,8 @@ export function useCompleteListNavigationDeclarative({ linearNavigationParameter
         rovingTabIndexParameters,
         singleSelectionParameters: {
             initiallySelectedIndex: singleSelectionDeclarativeParameters.selectedIndex,
-            onSelectedIndexChange: useStableCallback((a, e) => onSelectedIndexChange?.(a, e)),
+            // Needs to be a (stable) callback because of declaration order
+            onSelectedIndexChange: useStableCallback((...e) => onSelectedIndexChange?.(...e)),
             ...singleSelectionParameters
         },
         sortableChildrenParameters,

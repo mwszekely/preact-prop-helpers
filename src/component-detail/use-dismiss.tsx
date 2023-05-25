@@ -8,6 +8,7 @@ import { useStableGetter } from "../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../util/assert.js";
 import { ElementProps, FocusEventType, MouseEventType } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
+import { EnhancedEventHandler, enhanceEvent } from "../util/event.js";
 
 /**
  * In general, each soft dismiss hook takes an `open` and an `onClose` prop.
@@ -28,7 +29,7 @@ export interface UseEscapeDismissParameters<PopupElement extends Element> {
          * 
          * Presumably you'll set some state that changes `open` to false during this, otherwise it's not a soft dismiss, but you can do whatever you want I guess.
          */
-        onClose(reason: "escape" | "lost-focus"): void;
+        onClose: EnhancedEventHandler<KeyboardEvent, { reason: "escape" | "lost-focus"}>;
 
         /** 
          * Whether the surface controlled by the `Escape` key is currently open. 
@@ -137,7 +138,7 @@ export function useEscapeDismiss<PopupElement extends Element>({ escapeDismissPa
 
 
                 // This is what at least one of the elements will call
-                const onClose2 = () => { stableOnClose("escape"); };
+                const onClose2 = () => { stableOnClose(enhanceEvent(e, { reason: "escape" })); };
                 const element = getElement();
                 if (element) {
                     const treeDepth = getElementDepth(element);
@@ -223,7 +224,7 @@ export function useLostFocusDismiss<SourceElement extends Element | null, PopupE
 }
 
 export interface UseBackdropDismissParameters<PopupElement extends Element> {
-    backdropDismissParameters: { open: boolean, onClose(): void; };
+    backdropDismissParameters: { open: boolean, onClose: EnhancedEventHandler<MouseEvent, { reason: "escape" | "lost-focus" }>; };
     refElementPopupReturn: Pick<UseRefElementReturnType<PopupElement>["refElementReturn"], "getElement">;
 }
 
@@ -257,7 +258,7 @@ export function useBackdropDismiss<PopupElement extends Element>({ backdropDismi
         }
 
         if (!foundInsideClick) {
-            onClose();
+            onClose(enhanceEvent(e, { reason: "escape" }));
         }
     }, []);
 

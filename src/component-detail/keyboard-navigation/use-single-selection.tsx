@@ -10,6 +10,7 @@ import { useState } from "../../preact-extensions/use-state.js";
 import { ElementProps } from "../../util/types.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
+import { EnhancedEventHandler, enhanceEvent } from "../../util/event.js";
 
 
 /** Anything that's selectable must be tabbable, so we DO use rovingtabindex instead of just managedchildren */
@@ -57,7 +58,7 @@ export interface UseSingleSelectionParameters<ParentOrChildElement extends Eleme
          * 
          * In general, this should only be `null` when single selection is entirely disabled.
          */
-        onSelectedIndexChange: null | ((index: number | null, reason: Event | undefined) => void);
+        onSelectedIndexChange: null | EnhancedEventHandler<Event, { selectedIndex: number }>; // ((index: number | null, reason: Event | undefined) => void);
 
 
         selectionMode: "focus" | "activation" | "disabled";
@@ -75,7 +76,7 @@ export interface UseSingleSelectionParameters<ParentOrChildElement extends Eleme
 export type UseSingleSelectionChildInfoKeys = "index" | "disabled";
 
 export interface UseSingleSelectionChildParameters<E extends Element, M extends UseSingleSelectionChildInfo<E>> {
-    context:UseSingleSelectionContext;
+    context: UseSingleSelectionContext;
     info: Pick<UseSingleSelectionChildInfo<E>, UseSingleSelectionChildInfoKeys>;
     singleSelectionParameters: Pick<UseSingleSelectionParameters<any, E, M>["singleSelectionParameters"], "ariaPropName" | "selectionMode">;
 }
@@ -200,7 +201,7 @@ export function useSingleSelectionChild<ChildElement extends Element, M extends 
     const {
         context: { singleSelectionContext: { getSelectedIndex, onSelectedIndexChange } },
         info: { index, disabled },
-        singleSelectionParameters: {ariaPropName, selectionMode },
+        singleSelectionParameters: { ariaPropName, selectionMode },
     } = args;
 
     useEnsureStability("useSingleSelectionChild", getSelectedIndex, onSelectedIndexChange);
@@ -211,7 +212,7 @@ export function useSingleSelectionChild<ChildElement extends Element, M extends 
 
     const onCurrentFocusedInnerChanged = useStableCallback<OnPassiveStateChange<boolean, R>>((focused, _prev, e) => {
         if (selectionMode == 'focus' && focused) {
-            onSelectedIndexChange?.(index, e);
+            onSelectedIndexChange?.(enhanceEvent(e!, { selectedIndex: index }));
         }
     });
 
@@ -235,7 +236,7 @@ export function useSingleSelectionChild<ChildElement extends Element, M extends 
                 if (selectionMode == "disabled")
                     return;
                 if (!disabled)
-                    onSelectedIndexChange?.(index, event as R);
+                    onSelectedIndexChange?.(enhanceEvent(event, { selectedIndex: index }));
             }),
             getSelectedOffset: getDirection,
             selectedOffset: direction,
@@ -251,7 +252,7 @@ export function useSingleSelectionChild<ChildElement extends Element, M extends 
 
 
 export interface UseSingleSelectionDeclarativeParameters {
-    singleSelectionDeclarativeParameters: { selectedIndex: number | null, setSelectedIndex: null | ((index: number | null, reason: Event | undefined) => void); }
+    singleSelectionDeclarativeParameters: { selectedIndex: number | null, setSelectedIndex: null | EnhancedEventHandler<Event, { selectedIndex: number }> }
     singleSelectionReturn: Pick<UseSingleSelectionReturnType<any, any>["singleSelectionReturn"], "changeSelectedIndex">;
 }
 

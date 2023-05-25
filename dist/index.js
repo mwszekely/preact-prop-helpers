@@ -52,13 +52,14 @@ export { debounceRendering, returnFalse, returnNull, returnTrue, returnUndefined
 export { getFromLocalStorage, storeToLocalStorage, usePersistentState } from "./preact-extensions/use-persistent-state.js";
 export { useSearchParamState, useSearchParamStateDeclarative } from "./preact-extensions/use-search-param-state.js";
 export { useStableCallback } from "./preact-extensions/use-stable-callback.js";
-export { useStableGetter, useMemoObject } from "./preact-extensions/use-stable-getter.js";
+export { useMemoObject, useStableGetter } from "./preact-extensions/use-stable-getter.js";
 export { useState } from "./preact-extensions/use-state.js";
 export { useWhatCausedRender } from "./preact-extensions/use-what-caused-render.js";
 export { ProvideBatchedAnimationFrames, useAnimationFrame } from "./timing/use-animation-frame.js";
 export { useInterval } from "./timing/use-interval.js";
 export { useTimeout } from "./timing/use-timeout.js";
 export { assertEmptyObject } from "./util/assert.js";
+export { EventDetail, enhanceEvent } from "./util/event.js";
 export { focus } from "./util/focus.js";
 export { getBuildMode } from "./util/mode.js";
 export { generateRandomId } from "./util/random-id.js";

@@ -18,6 +18,7 @@ import { assertEmptyObject } from "../util/assert.js";
 import { ElementProps, OmitStrong, OmitTargeted, PickTargeted } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 import { PressEventReason, usePress, UsePressParameters, UsePressReturnType } from "./use-press.js";
+import { enhanceEvent } from "../util/event.js";
 
 export interface UseCompleteListNavigationChildInfo<ChildElement extends Element> extends UseListNavigationSingleSelectionSortableChildInfo<ChildElement>, UsePaginatedChildrenInfo<ChildElement>, UseStaggeredChildrenInfo<ChildElement> { }
 
@@ -231,7 +232,7 @@ export function useCompleteListNavigationChild<ChildElement extends Element, M e
     });
     const onPress = useStableCallback((e: PressEventReason<any>) => {
         if (singleSelectionParameters.selectionMode == "activation")
-            singleSelectionContext.onSelectedIndexChange?.(index, e);
+            singleSelectionContext.onSelectedIndexChange?.(enhanceEvent(e, { selectedIndex: index }));
         onPressSync?.(e);
     });
     const { propsStable: pressRefProps, refElementReturn: pressRefElementReturn } = useRefElement<any>({ refElementParameters: {} })
@@ -317,7 +318,8 @@ export function useCompleteListNavigationDeclarative<ParentElement extends Eleme
         rovingTabIndexParameters,
         singleSelectionParameters: {
             initiallySelectedIndex: singleSelectionDeclarativeParameters.selectedIndex,
-            onSelectedIndexChange: useStableCallback((a, e) => onSelectedIndexChange?.(a, e)),
+            // Needs to be a (stable) callback because of declaration order
+            onSelectedIndexChange: useStableCallback((...e) => onSelectedIndexChange?.(...e)),
             ...singleSelectionParameters
         },
         sortableChildrenParameters,

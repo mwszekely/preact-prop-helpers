@@ -3,6 +3,7 @@ import { UseManagedChildrenReturnType } from "../../preact-extensions/use-manage
 import { PassiveStateUpdater } from "../../preact-extensions/use-passive-state.js";
 import { ElementProps } from "../../util/types.js";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
+import { EnhancedEventHandler } from "../../util/event.js";
 /** Anything that's selectable must be tabbable, so we DO use rovingtabindex instead of just managedchildren */
 export interface UseSingleSelectionChildInfo<E extends Element> extends UseRovingTabIndexChildInfo<E> {
     selected: boolean;
@@ -43,7 +44,9 @@ export interface UseSingleSelectionParameters<ParentOrChildElement extends Eleme
          *
          * In general, this should only be `null` when single selection is entirely disabled.
          */
-        onSelectedIndexChange: null | ((index: number | null, reason: Event | undefined) => void);
+        onSelectedIndexChange: null | EnhancedEventHandler<Event, {
+            selectedIndex: number;
+        }>;
         selectionMode: "focus" | "activation" | "disabled";
         /**
          * What property will be used to mark this item as selected.
@@ -104,7 +107,9 @@ export declare function useSingleSelectionChild<ChildElement extends Element, M 
 export interface UseSingleSelectionDeclarativeParameters {
     singleSelectionDeclarativeParameters: {
         selectedIndex: number | null;
-        setSelectedIndex: null | ((index: number | null, reason: Event | undefined) => void);
+        setSelectedIndex: null | EnhancedEventHandler<Event, {
+            selectedIndex: number;
+        }>;
     };
     singleSelectionReturn: Pick<UseSingleSelectionReturnType<any, any>["singleSelectionReturn"], "changeSelectedIndex">;
 }
@@ -117,7 +122,9 @@ export type MakeSingleSelectionDeclarativeReturnType<R> = Omit<R, "singleSelecti
  */
 export declare function useSingleSelectionDeclarative<ParentOrChildElement extends Element, ChildElement extends Element, _M extends UseSingleSelectionChildInfo<ChildElement>>({ singleSelectionReturn: { changeSelectedIndex }, singleSelectionDeclarativeParameters: { selectedIndex, setSelectedIndex } }: UseSingleSelectionDeclarativeParameters): {
     singleSelectionParameters: {
-        onSelectedIndexChange: ((index: number | null, reason: Event | undefined) => void) | null;
+        onSelectedIndexChange: EnhancedEventHandler<Event, {
+            selectedIndex: number;
+        }> | null;
     };
 };
 //# sourceMappingURL=use-single-selection.d.ts.map

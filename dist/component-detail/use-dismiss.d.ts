@@ -1,6 +1,7 @@
 import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
 import { UseActiveElementParameters } from "../observers/use-active-element.js";
 import { ElementProps } from "../util/types.js";
+import { EnhancedEventHandler } from "../util/event.js";
 export interface UseEscapeDismissParameters<PopupElement extends Element> {
     refElementPopupReturn: Pick<UseRefElementReturnType<PopupElement>["refElementReturn"], "getElement">;
     escapeDismissParameters: {
@@ -9,7 +10,9 @@ export interface UseEscapeDismissParameters<PopupElement extends Element> {
          *
          * Presumably you'll set some state that changes `open` to false during this, otherwise it's not a soft dismiss, but you can do whatever you want I guess.
          */
-        onClose(reason: "escape" | "lost-focus"): void;
+        onClose: EnhancedEventHandler<KeyboardEvent, {
+            reason: "escape" | "lost-focus";
+        }>;
         /**
          * Whether the surface controlled by the `Escape` key is currently open.
          * Can also be `false` to force the `Escape` key to do nothing.
@@ -67,7 +70,9 @@ export declare function useLostFocusDismiss<SourceElement extends Element | null
 export interface UseBackdropDismissParameters<PopupElement extends Element> {
     backdropDismissParameters: {
         open: boolean;
-        onClose(): void;
+        onClose: EnhancedEventHandler<MouseEvent, {
+            reason: "escape" | "lost-focus";
+        }>;
     };
     refElementPopupReturn: Pick<UseRefElementReturnType<PopupElement>["refElementReturn"], "getElement">;
 }

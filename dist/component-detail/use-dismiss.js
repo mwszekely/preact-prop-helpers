@@ -6,6 +6,7 @@ import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useStableGetter } from "../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../util/assert.js";
 import { monitorCallCount } from "../util/use-call-count.js";
+import { enhanceEvent } from "../util/event.js";
 /**
  * In general, each soft dismiss hook takes an `open` and an `onClose` prop.
  *
@@ -81,7 +82,7 @@ export function useEscapeDismiss({ escapeDismissParameters: { onClose, open, get
                 e.preventDefault();
                 e.stopPropagation();
                 // This is what at least one of the elements will call
-                const onClose2 = () => { stableOnClose("escape"); };
+                const onClose2 = () => { stableOnClose(enhanceEvent(e, { reason: "escape" })); };
                 const element = getElement();
                 if (element) {
                     const treeDepth = getElementDepth(element);
@@ -167,7 +168,7 @@ export function useBackdropDismiss({ backdropDismissParameters: { open, onClose:
             foundInsideClick = true;
         }
         if (!foundInsideClick) {
-            onClose();
+            onClose(enhanceEvent(e, { reason: "escape" }));
         }
     }, []);
     useGlobalHandler(window, "mousedown", open ? onBackdropClick : null, { capture: true });

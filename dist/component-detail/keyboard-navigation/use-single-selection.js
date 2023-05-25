@@ -6,6 +6,7 @@ import { useStableCallback } from "../../preact-extensions/use-stable-callback.j
 import { useStableGetter, useMemoObject } from "../../preact-extensions/use-stable-getter.js";
 import { useState } from "../../preact-extensions/use-state.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
+import { enhanceEvent } from "../../util/event.js";
 export function useSingleSelection({ managedChildrenReturn: { getChildren }, rovingTabIndexReturn: { setTabbableIndex }, singleSelectionParameters: { onSelectedIndexChange: onSelectedIndexChange_U, initiallySelectedIndex, ariaPropName, selectionMode } }) {
     monitorCallCount(useSingleSelection);
     const onSelectedIndexChange = useStableCallback(onSelectedIndexChange_U ?? noop);
@@ -63,7 +64,7 @@ export function useSingleSelectionChild(args) {
     const [direction, setDirection, getDirection] = useState(getSelectedIndex() == null ? null : (getSelectedIndex() - index));
     const onCurrentFocusedInnerChanged = useStableCallback((focused, _prev, e) => {
         if (selectionMode == 'focus' && focused) {
-            onSelectedIndexChange?.(index, e);
+            onSelectedIndexChange?.(enhanceEvent(e, { selectedIndex: index }));
         }
     });
     const propParts = ariaPropName?.split("-") ?? [];
@@ -84,7 +85,7 @@ export function useSingleSelectionChild(args) {
                 if (selectionMode == "disabled")
                     return;
                 if (!disabled)
-                    onSelectedIndexChange?.(index, event);
+                    onSelectedIndexChange?.(enhanceEvent(event, { selectedIndex: index }));
             }),
             getSelectedOffset: getDirection,
             selectedOffset: direction,

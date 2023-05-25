@@ -402,7 +402,7 @@ export function useCompleteGridNavigationDeclarative<ParentOrRowElement extends 
         paginatedChildrenParameters,
         rearrangeableChildrenParameters,
         rovingTabIndexParameters,
-        singleSelectionParameters: { initiallySelectedIndex: singleSelectionDeclarativeParameters.selectedIndex, onSelectedIndexChange: useStableCallback((a, e) => onSelectedIndexChange?.(a, e)), ...singleSelectionParameters },
+        singleSelectionParameters: { initiallySelectedIndex: singleSelectionDeclarativeParameters.selectedIndex, onSelectedIndexChange: useStableCallback((...e) => onSelectedIndexChange?.(...e)), ...singleSelectionParameters },
         sortableChildrenParameters,
         staggeredChildrenParameters,
         typeaheadNavigationParameters,
