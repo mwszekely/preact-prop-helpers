@@ -9,5 +9,5 @@
  * a path, or a specific query parameter value, not the
  * entire URL.
  */
-export declare function useUrl(onUrlChange: (url: string) => void): readonly [() => string, import("../preact-extensions/use-passive-state.js").PassiveStateUpdater<string, never>];
+export declare function useUrl(onUrlChange: (url: string) => void): readonly [() => string, (newUrlOrSetter: string | ((prev: string | undefined) => string), history2: "push" | "replace") => void];
 //# sourceMappingURL=use-url.d.ts.map

@@ -23,8 +23,8 @@ export interface UseSearchParamStateParameters<Key extends keyof SearchParamStat
     initialValue: T;
     defaultReason?: "push" | "replace";
     onValueChange?: OnParamValueChanged<T> | null | undefined;
-    fromString: ((value: string) => T | null);
-    toString?: ((value: T | null) => (string | null)) | undefined;
+    stringToValue: ((value: string | null) => T | null);
+    valueToString?: ((value: T | null) => (string | null)) | undefined;
 }
 /**
  * Provides access to the requested Search Param's value
@@ -37,6 +37,6 @@ export interface UseSearchParamStateParameters<Key extends keyof SearchParamStat
  * @param type The type of data encode/decode (`"string"` | `"boolean"` | `"number"` | `"bigint"`)
  * @param onParamValueChanged Will be called any time the requested Search Parameter's value changes.
  */
-export declare function useSearchParamState<Key extends keyof SearchParamStates>({ key: paramKey, defaultReason, fromString, initialValue, onValueChange, toString }: UseSearchParamStateParameters<Key, SearchParamStates[Key]>): readonly [() => SearchParamStates[Key], SetParamWithHistory<SearchParamStates[Key]>];
-export declare function useSearchParamStateDeclarative<Key extends keyof SearchParamStates>({ key, defaultReason, fromString, initialValue, toString }: OmitStrong<UseSearchParamStateParameters<Key, SearchParamStates[Key]>, "onValueChange">): readonly [SearchParamStates[Key], import("preact/hooks").StateUpdater<SearchParamStates[Key]>, () => SearchParamStates[Key]];
+export declare function useSearchParamState<Key extends keyof SearchParamStates>({ key: paramKey, defaultReason, stringToValue, initialValue, onValueChange, valueToString }: UseSearchParamStateParameters<Key, SearchParamStates[Key]>): readonly [() => SearchParamStates[Key], SetParamWithHistory<SearchParamStates[Key]>];
+export declare function useSearchParamStateDeclarative<Key extends keyof SearchParamStates>({ key, defaultReason, stringToValue, initialValue, valueToString }: OmitStrong<UseSearchParamStateParameters<Key, SearchParamStates[Key]>, "onValueChange">): readonly [SearchParamStates[Key], SetParamWithHistory<SearchParamStates[Key]>, () => SearchParamStates[Key]];
 //# sourceMappingURL=use-search-param-state.d.ts.map

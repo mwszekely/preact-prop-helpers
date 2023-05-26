@@ -166,15 +166,25 @@ test("Pagination", async ({ page, listNav, shared: { focusableFirst, focusableLa
     await expect(listNav.list.locator("li:nth-child(25)")).toHaveAttribute("data-hide-because-paginated", "true");
     await page.keyboard.press("Tab");
     await expect(listNav.list.locator("li").nth(10)).toBeFocused();
-
+    await page.keyboard.press("ArrowUp");
+    await expect(listNav.list.locator("li").nth(10), "Pressing up should keep focus on the topmost list item").toBeFocused();
+    await page.keyboard.press("ArrowDown");
+    await expect(listNav.list.locator("li").nth(11), "Pressing down should now focus the 11th item -- it should not get stuck or jump anywhere else").toBeFocused();
+    await page.keyboard.press("End");
+    await expect(listNav.list.locator("li").nth(19), "Pressing End should focus the last item within the paginated range").toBeFocused();
+    await page.keyboard.press("ArrowDown");
+    await expect(listNav.list.locator("li").nth(19), "Pressing down should keep the focus on the last list item within the paginated range").toBeFocused();
+    await page.keyboard.press("ArrowUp");
+    await expect(listNav.list.locator("li").nth(18), "Pressing up should keep focus on the topmost list item").toBeFocused();
+    
     await run("ListNav", "setPagination", [20, 30]);
     await expect(listNav.list.locator("li:nth-child(15)")).toHaveAttribute("data-hide-because-paginated", "true");
     await expect(listNav.list.locator("li:nth-child(25)")).toHaveAttribute("data-hide-because-paginated", "false");
     await expect(listNav.list.locator("li:nth-child(35)")).toHaveAttribute("data-hide-because-paginated", "true");
     await expect(listNav.list.locator("li").nth(10)).not.toBeFocused();
     // TODO
-    //await expect(page.locator("body")).not.toBeFocused()
-    //await expect(listNav.list.locator("li").nth(20)).toBeFocused();
+    await expect(page.locator("body")).not.toBeFocused()
+    await expect(listNav.list.locator("li").nth(20)).toBeFocused();
 })
 
 test("Staggering", async ({ page, listNav, shared: { install, run } }) => {
@@ -186,6 +196,7 @@ test("Staggering", async ({ page, listNav, shared: { install, run } }) => {
     await run("ListNav", "setMounted", true);
     //await expect(20).toBeLessThan(50);
     await new Promise(resolve => setTimeout(resolve, 100));
+    await expect(await listNav.list.locator("li").count()).toBe(count);
     await expect(await listNav.list.locator("li[data-hide-because-staggered=false]").count()).toBeLessThan(100);
     await expect(await listNav.list.locator("li[data-hide-because-staggered=true]").count()).toBeGreaterThan(100);
     await new Promise(resolve => setTimeout(resolve, 100));

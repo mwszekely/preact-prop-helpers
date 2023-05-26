@@ -15,6 +15,8 @@ test('Sanity checks', async ({ page, shared: { getCounter, resetCounter } }) => 
     resetCounter();
     expect(getCounter()).toBe(0);
 
+    await page.waitForURL(/sanity-check=10/);
+
     await page.on('console', (msg) => {
         if (msg && msg.text) {
             let contents = (typeof msg.text == "function"? msg.text() : msg.text) as string;

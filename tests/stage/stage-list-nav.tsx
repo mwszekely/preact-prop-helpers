@@ -1,6 +1,6 @@
 import { useCallback, useContext, useEffect, useRef, useState } from "preact/hooks";
-import { Compare, CompleteListNavigationContext, EventDetail, UseCompleteListNavigationChildInfo, UseSingleSelectionParameters, useCompleteListNavigation, useCompleteListNavigationChild, useCompleteListNavigationDeclarative, useMergedProps, useStableCallback, useStableGetter, useStaggeredChildren } from "../../dist/index.js";
-import { TestItem, useTestSyncState } from "./util.js";
+import { Compare, CompleteListNavigationContext, EventDetail, UseCompleteListNavigationChildInfo, UseSingleSelectionParameters, useCompleteListNavigation, useCompleteListNavigationChild, useCompleteListNavigationDeclarative, useMergedProps, useStableCallback, useStableGetter, useStaggeredChildren, useTimeout } from "../../dist/index.js";
+import { TestItem, fromStringArray, fromStringBoolean, fromStringNumber, fromStringString, useTestSyncState } from "./util.js";
 import { createContext } from "preact";
 import { LoremIpsum } from "../lorem.js";
 
@@ -28,20 +28,20 @@ export interface ListNavConstants {
 const Context = createContext<CompleteListNavigationContext<HTMLOListElement, HTMLLIElement, UseCompleteListNavigationChildInfo<HTMLLIElement>>>(null!);
 
 export function TestBasesListNav() {
-    const mounted = useTestSyncState("ListNav", "setMounted", true);
-    const childCount = useTestSyncState("ListNav", "setChildCount", 20);
-    const arrowKeyDirection = useTestSyncState("ListNav", "setArrowKeyDirection", "vertical");
-    const pagination = useTestSyncState("ListNav", "setPagination", null);
-    const disableHomeEndKeys = useTestSyncState("ListNav", "setDisableHomeEndKeys", false);
-    const pageNavigationSize = useTestSyncState("ListNav", "setPageNavigationSize", 0.1);
-    const navigatePastStartEnd = useTestSyncState("ListNav", "setNavigatePastStartEnd", "wrap");
-    const ariaPropName = useTestSyncState("ListNav", "setAriaPropName", "aria-selected");
-    const untabbable = useTestSyncState("ListNav", "setUntabbable", false);
-    const staggered = useTestSyncState("ListNav", "setStaggered", false);
-    const collatorId = useTestSyncState("ListNav", "setCollator", "");
-    const noTypeahead = useTestSyncState("ListNav", "setNoTypeahead", false);
-    const typeaheadTimeout = useTestSyncState("ListNav", "setTypeaheadTimeout", 1000);
-    const selectionMode = useTestSyncState("ListNav", "setSelectionMode", "activation");
+    const [mounted] = useTestSyncState("ListNav", "setMounted", true, fromStringBoolean);
+    const [childCount] = useTestSyncState("ListNav", "setChildCount", 20, fromStringNumber);
+    const [arrowKeyDirection] = useTestSyncState("ListNav", "setArrowKeyDirection", "vertical", fromStringString);
+    const [pagination, setPagination] = useTestSyncState("ListNav", "setPagination", null, fromStringArray(fromStringNumber));
+    const [disableHomeEndKeys] = useTestSyncState("ListNav", "setDisableHomeEndKeys", false, fromStringBoolean);
+    const [pageNavigationSize] = useTestSyncState("ListNav", "setPageNavigationSize", 0.1, fromStringNumber);
+    const [navigatePastStartEnd] = useTestSyncState("ListNav", "setNavigatePastStartEnd", "wrap", fromStringString);
+    const [ariaPropName] = useTestSyncState("ListNav", "setAriaPropName", "aria-selected", fromStringString);
+    const [untabbable] = useTestSyncState("ListNav", "setUntabbable", false, fromStringBoolean);
+    const [staggered] = useTestSyncState("ListNav", "setStaggered", false, fromStringBoolean);
+    const [collatorId] = useTestSyncState("ListNav", "setCollator", "", fromStringString);
+    const [noTypeahead] = useTestSyncState("ListNav", "setNoTypeahead", false, fromStringBoolean);
+    const [typeaheadTimeout] = useTestSyncState("ListNav", "setTypeaheadTimeout", 1000, fromStringNumber);
+    const [selectionMode] = useTestSyncState("ListNav", "setSelectionMode", "activation", fromStringString);
     const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
     console.log(pagination);
 

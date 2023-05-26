@@ -1,4 +1,4 @@
-import { useCallback, useLayoutEffect, useMemo, useRef } from "preact/hooks";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from "preact/hooks";
 import { UseManagedChildrenReturnType } from "../preact-extensions/use-managed-children.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useMemoObject } from "../preact-extensions/use-stable-getter.js";
@@ -69,20 +69,29 @@ export function usePaginatedChildren<ParentElement extends Element, TabbableChil
         }
 
     }, [/* Must be empty */])
-    useLayoutEffect(() => {
+    useEffect(() => {
+        // At this point, the children have not yet updated themselves to match the pagination.
+        // We need to tell them to update, but also handle where the focus is.
+        // If a current list item is focused, then we need to move focus to a paginated one
+        // but we can't do it until they all re-render...
+        // TODO: Something better than setTimeout for this, please...
         let tabbableIndex = getTabbableIndex();
         if (tabbableIndex != null) {
-            let shouldFocus = getElement()?.contains(document.activeElement) || document.activeElement == null || (document.activeElement === document.body);
+            let shouldFocus = getElement()?.contains(document.activeElement) || false;
 
-            if (paginationMin != null && tabbableIndex < paginationMin) {
-                setTabbableIndex(paginationMin, undefined, shouldFocus);   // TODO: This isn't a user interaction, but we need to ensure the old element doesn't remain focused, yeesh.
-            }
-            else if (paginationMax != null && tabbableIndex >= paginationMax) {
-                let next: number | null = paginationMax - 1;
-                if (next == -1)
-                    next = null;
-                setTabbableIndex(next, undefined, shouldFocus);   // TODO: This isn't a user interaction, but we need to ensure the old element doesn't remain focused, yeesh.
-            }
+            setTimeout(() => {
+
+                if (paginationMin != null && tabbableIndex! < paginationMin) {
+                    setTabbableIndex(paginationMin, undefined, shouldFocus);   // TODO: This isn't a user interaction, but we need to ensure the old element doesn't remain focused, yeesh.
+                }
+                else if (paginationMax != null && tabbableIndex! >= paginationMax) {
+                    let next: number | null = paginationMax - 1;
+                    if (next == -1)
+                        next = null;
+                    setTabbableIndex(next, undefined, shouldFocus);   // TODO: This isn't a user interaction, but we need to ensure the old element doesn't remain focused, yeesh.
+                }
+            }, 1)
+
         }
 
         refreshPagination(paginationMin, paginationMax);

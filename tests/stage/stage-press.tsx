@@ -1,6 +1,6 @@
 import { h } from "preact";
 import { useMergedProps, usePress, useRefElement, useStableGetter } from "../../dist/index.js";
-import { TestItem, useTestSyncState } from "./util.js";
+import { TestItem, fromStringBoolean, useTestSyncState } from "./util.js";
 
 export interface PressConstants {
     onPress(e: Event): (void | Promise<void>);
@@ -21,10 +21,10 @@ export function TestBasesButton() {
 }
 
 export function TestBasesButtonImpl<T extends HTMLButtonElement | HTMLDivElement>({ tag }: { tag: T extends HTMLButtonElement ? "button" : "div" }) {
-    const excludeEnter = useStableGetter(useTestSyncState("Press", "setExcludeEnter", false));
-    const excludeSpace = useStableGetter(useTestSyncState("Press", "setExcludeSpace", false));
-    const excludePointer = useStableGetter(useTestSyncState("Press", "setExcludePointer", false));
-    const allowRepeatPresses = useTestSyncState("Press", "setAllowRepeatPresses", false);
+    const [,,excludeEnter] = useTestSyncState("Press", "setExcludeEnter", false, fromStringBoolean);
+    const [,,excludeSpace] = useTestSyncState("Press", "setExcludeSpace", false, fromStringBoolean);
+    const [,,excludePointer] = useTestSyncState("Press", "setExcludePointer", false, fromStringBoolean);
+    const [allowRepeatPresses] = useTestSyncState("Press", "setAllowRepeatPresses", false, fromStringBoolean);
 
     const { refElementReturn } = useRefElement<T>({ refElementParameters: {} });
     const { pressReturn: { getIsPressing, longPress, pressing }, props } = usePress({

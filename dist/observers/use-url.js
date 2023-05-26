@@ -24,6 +24,18 @@ export function useUrl(onUrlChange) {
         console.assert(window.location.toString() === document.location.toString());
         setUrl(window.location.toString());
     });
-    return [getUrl, setUrl];
+    return [getUrl, useCallback((newUrlOrSetter, history2) => {
+            if (typeof newUrlOrSetter == "function") {
+                setUrl(prev => {
+                    let newUrl = newUrlOrSetter(prev);
+                    history[`${history2 ?? "replace"}State`]({}, document.title, newUrl);
+                    return newUrl;
+                });
+            }
+            else {
+                history[`${history2 ?? "replace"}State`]({}, document.title, newUrlOrSetter);
+                setUrl(newUrlOrSetter);
+            }
+        }, [])];
 }
 //# sourceMappingURL=use-url.js.map

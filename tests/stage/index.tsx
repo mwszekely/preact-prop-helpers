@@ -1,12 +1,12 @@
 import { RenderableProps, render } from "preact";
 import { TestBasesButton } from "./stage-press.js";
 import { TestBasesListNav } from "./stage-list-nav.js";
-import { TestItem, TestingConstants } from "./util.js";
+import { TestItem, TestingConstants, fromStringBoolean, fromStringNumber } from "./util.js";
 import { TestBasesFocus } from "./stage-focus.js";
 import type { SharedFixtures } from "../fixtures/shared.js";
 import { useSearchParamState, useState } from "../../dist/index.js"
 import { useSearchParamStateDeclarative } from "../../dist/preact-extensions/use-search-param-state.js";
-import { useEffect, useLayoutEffect } from "preact/hooks";
+import { useEffect, useLayoutEffect, useRef } from "preact/hooks";
 
 
 declare module globalThis {
@@ -61,6 +61,18 @@ function TestBasesMenu() {
 }
 */
 function TestBasesSanityCheck() {
+
+    let which = useRef(9);
+    const [s, setS] = useSearchParamStateDeclarative({ key: "sanity-check", initialValue: 9, stringToValue: fromStringNumber, defaultReason: "replace" });
+
+    console.assert(s == which.current);
+    console.assert(new URL(window.location.toString()).searchParams.get("sanity-check") == (which.current as number | string));
+
+    useEffect(() => {
+        which.current = 10;
+        setS(10);
+    }, []);
+
     // Please, it's 2023, this should never ever fail, surely, please. (please)
     return (
         <>
@@ -81,11 +93,15 @@ const TestBases = {
 declare module "../../dist/index.js" {
     export interface SearchParamStates {
         "test-base": string;
+        "test-bool": boolean | null;
+        "sanity-check": number;
     }
 }
 
 function TestsContainer() {
-    const [base, setBase, getBase] = useSearchParamStateDeclarative({ key: "test-base", initialValue: "", fromString: value => value });
+    const [bool, setBool, getBool] = useSearchParamStateDeclarative({ key: "test-bool", initialValue: null, stringToValue: fromStringBoolean });
+
+    const [base, setBase, getBase] = useSearchParamStateDeclarative({ key: "test-base", initialValue: "", stringToValue: value => value });
 
     useEffect(() => {
         document.getElementById("focusable-first")?.focus?.();
@@ -95,6 +111,7 @@ function TestsContainer() {
             <>
                 <p><strong>No test selected</strong>. View any of the available bases below:</p>
                 <ul>{Object.entries(TestBases).map(([name, component]) => <li><code><a href={`?test-base=${name}`}>{name}</a></code></li>)}</ul>
+                <button onClick={() => setBool(b => { debugger; return !b; })}>Currently {(bool ?? "null").toString()}</button>
             </>
         );
     }

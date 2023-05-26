@@ -29,5 +29,17 @@ export function useUrl(onUrlChange: (url: string) => void) {
         setUrl(window.location.toString());
     });
 
-    return [getUrl, setUrl] as const;
+    return [getUrl, useCallback((newUrlOrSetter: (string | ((prev: string | undefined) => string)), history2: "push" | "replace") => {
+        if (typeof newUrlOrSetter == "function") {
+            setUrl(prev => {
+                let newUrl = newUrlOrSetter(prev);
+                history[`${history2 ?? "replace"}State`]({}, document.title, newUrl);
+                return newUrl;
+            })
+        }
+        else {
+            history[`${history2 ?? "replace"}State`]({}, document.title, newUrlOrSetter);
+            setUrl(newUrlOrSetter);
+        }
+    }, [])] as const;
 }
