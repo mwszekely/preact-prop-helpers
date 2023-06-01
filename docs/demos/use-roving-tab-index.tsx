@@ -141,9 +141,7 @@ const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
         info: { index, focusSelf, foo: "bar", untabbable: hidden, unselectable: disabled },
         sortableChildParameters: { getSortValue },
         pressParameters: { onPressSync: null, focusSelf },
-        rovingTabIndexParameters: { untabbable: useContext(UntabbableContext) },
         context,
-        singleSelectionParameters: { ariaPropName: "aria-selected", selectionMode: useContext(SelectionModeContext) },
         textContentParameters: { getText: useCallback((e) => { return e?.textContent ?? "" }, []) }
     });
 

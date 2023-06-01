@@ -81,7 +81,7 @@ export type UseSingleSelectionChildInfoKeys = "index" | "unselectable";
 export interface UseSingleSelectionChildParameters<E extends Element, M extends UseSingleSelectionChildInfo<E>> {
     context: UseSingleSelectionContext;
     info: Pick<UseSingleSelectionChildInfo<E>, UseSingleSelectionChildInfoKeys>;
-    singleSelectionParameters: Pick<UseSingleSelectionParameters<any, E, M>["singleSelectionParameters"], "ariaPropName" | "selectionMode">;
+    //singleSelectionParameters: Pick<UseSingleSelectionParameters<any, E, M>["singleSelectionParameters"], "ariaPropName" | "selectionMode">;
 }
 
 export interface UseSingleSelectionChildReturnType<E extends Element> extends UseChildrenHaveFocusChildReturnType<E> {
@@ -129,7 +129,7 @@ export interface UseSingleSelectionReturnType<ChildElement extends Element, M ex
 }
 
 export interface UseSingleSelectionContext {
-    singleSelectionContext: {
+    singleSelectionContext: Pick<UseSingleSelectionParameters<any, any, any>["singleSelectionParameters"], "ariaPropName" | "selectionMode"> & {
         onSelectedIndexChange: UseSingleSelectionParameters<any, any, any>["singleSelectionParameters"]["onSelectedIndexChange"];
         getSelectedIndex(): number | null;
     }
@@ -183,6 +183,8 @@ export function useSingleSelection<ParentOrChildElement extends Element, ChildEl
             singleSelectionContext: useMemoObject({
                 getSelectedIndex,
                 onSelectedIndexChange: onSelectedIndexChange,
+                ariaPropName,
+                selectionMode
             }),
         }),
         childrenHaveFocusParameters: {
@@ -202,9 +204,8 @@ export function useSingleSelectionChild<ChildElement extends Element, M extends 
     monitorCallCount(useSingleSelectionChild);
     type R = Event;
     const {
-        context: { singleSelectionContext: { getSelectedIndex, onSelectedIndexChange } },
+        context: { singleSelectionContext: { getSelectedIndex, onSelectedIndexChange, ariaPropName, selectionMode } },
         info: { index, unselectable },
-        singleSelectionParameters: { ariaPropName, selectionMode },
     } = args;
 
     useEnsureStability("useSingleSelectionChild", getSelectedIndex, onSelectedIndexChange);

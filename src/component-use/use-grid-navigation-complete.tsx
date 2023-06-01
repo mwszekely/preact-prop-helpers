@@ -44,7 +44,7 @@ export interface UseCompleteGridNavigationRowParameters<RowElement extends Eleme
     typeaheadNavigationParameters: OmitStrong<UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM>["typeaheadNavigationParameters"], "isValid">;
     //rovingTabIndexParameters: OmitStrong<UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM>["rovingTabIndexParameters"], "initiallyTabbedIndex">;
 
-    singleSelectionParameters: UseSingleSelectionChildParameters<any, any>["singleSelectionParameters"];
+    //singleSelectionParameters: UseSingleSelectionChildParameters<any, any>["singleSelectionParameters"];
 }
 
 export interface UseCompleteGridNavigationCellParameters<CellElement extends Element, CM extends UseCompleteGridNavigationCellInfo<CellElement>> extends
@@ -55,7 +55,7 @@ export interface UseCompleteGridNavigationCellParameters<CellElement extends Ele
     //completeGridNavigationCellParameters: Pick<CM, "focusSelf"> & OmitStrong<CM, keyof UseCompleteGridNavigationCellInfo<CellElement>>;
     context: CompleteGridNavigationCellContext<any, CellElement, CM>;
     
-    rovingTabIndexParameters: UseRovingTabIndexChildParameters<any, any>["rovingTabIndexParameters"];
+    //rovingTabIndexParameters: UseRovingTabIndexChildParameters<any, any>["rovingTabIndexParameters"];
     //singleSelectionParameters: UseSingleSelectionChildParameters<any, any>["singleSelectionParameters"];
 }
 
@@ -121,10 +121,11 @@ export function useCompleteGridNavigation<ParentOrRowElement extends Element, Ro
     sortableChildrenParameters,
     rearrangeableChildrenParameters,
     paginatedChildrenParameters,
-    staggeredChildrenParameters
+    staggeredChildrenParameters,
+    ...void1
 }: UseCompleteGridNavigationParameters<ParentOrRowElement, RowElement, CellElement, RM>): UseCompleteGridNavigationReturnType<ParentOrRowElement, RowElement, CellElement, RM, CM> {
     monitorCallCount(useCompleteGridNavigation);
-
+    assertEmptyObject(void1);
     const getChildren: () => ManagedChildren<RM> = useCallback<() => ManagedChildren<RM>>(() => managedChildrenReturn.getChildren(), []);
     const getHighestChildIndex: (() => number) = useCallback<() => number>(() => getChildren().getHighestIndex(), []);
 
@@ -210,10 +211,11 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
     rovingTabIndexParameters,
     typeaheadNavigationParameters,
     sortableChildParameters,
-    singleSelectionParameters
+    ...void1
 
 }: UseCompleteGridNavigationRowParameters<RowElement, CellElement, RM, CM>): UseCompleteGridNavigationRowReturnType<RowElement, CellElement, RM, CM> {
     monitorCallCount(useCompleteGridNavigationRow);
+    assertEmptyObject(void1);
 
     const {
         info: infoPaginatedChild,
@@ -252,8 +254,7 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
         refElementReturn,
         context: contextIncomingForRowAsChildOfTable,
         info,
-        textContentParameters,
-        singleSelectionParameters
+        textContentParameters
     });
 
     const {
@@ -328,12 +329,10 @@ export function useCompleteGridNavigationCell<CellElement extends Element, CM ex
     gridNavigationCellParameters,
     context: { gridNavigationCellContext, managedChildContext, rovingTabIndexContext, typeaheadNavigationContext },
     textContentParameters,
-    rovingTabIndexParameters,
     info,
     ...void1
 }: UseCompleteGridNavigationCellParameters<CellElement, CM>): UseCompleteGridNavigationCellReturnType<CellElement, CM> {
     monitorCallCount(useCompleteGridNavigationCell);
-    assertEmptyObject(void1);
 
     const { refElementReturn, propsStable } = useRefElement<CellElement>({ refElementParameters: {} });
 
@@ -343,15 +342,17 @@ export function useCompleteGridNavigationCell<CellElement extends Element, CM ex
         textContentReturn,
         pressParameters,
         props: propsRti,
-        info: info2
+        info: info2,
+        ...void2
     } = useGridNavigationSingleSelectionCell<CellElement, CM>({
         gridNavigationCellParameters,
         info,
         context: { gridNavigationCellContext, rovingTabIndexContext, typeaheadNavigationContext },
         refElementReturn,
         textContentParameters,
-        rovingTabIndexParameters,
     });
+    assertEmptyObject(void1);
+    assertEmptyObject(void2);
 
     const { hasCurrentFocusReturn } = useHasCurrentFocus<CellElement>({ hasCurrentFocusParameters: { onCurrentFocusedChanged: null, ...hasCurrentFocusParameters }, refElementReturn });
 

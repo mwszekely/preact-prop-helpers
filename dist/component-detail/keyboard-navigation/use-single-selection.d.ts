@@ -64,7 +64,6 @@ export type UseSingleSelectionChildInfoKeys = "index" | "unselectable";
 export interface UseSingleSelectionChildParameters<E extends Element, M extends UseSingleSelectionChildInfo<E>> {
     context: UseSingleSelectionContext;
     info: Pick<UseSingleSelectionChildInfo<E>, UseSingleSelectionChildInfoKeys>;
-    singleSelectionParameters: Pick<UseSingleSelectionParameters<any, E, M>["singleSelectionParameters"], "ariaPropName" | "selectionMode">;
 }
 export interface UseSingleSelectionChildReturnType<E extends Element> extends UseChildrenHaveFocusChildReturnType<E> {
     props: ElementProps<E>;
@@ -101,7 +100,7 @@ export interface UseSingleSelectionReturnType<ChildElement extends Element, M ex
     childrenHaveFocusParameters: Pick<UseChildrenHaveFocusParameters<ChildElement>["childrenHaveFocusParameters"], "onCompositeFocusChange">;
 }
 export interface UseSingleSelectionContext {
-    singleSelectionContext: {
+    singleSelectionContext: Pick<UseSingleSelectionParameters<any, any, any>["singleSelectionParameters"], "ariaPropName" | "selectionMode"> & {
         onSelectedIndexChange: UseSingleSelectionParameters<any, any, any>["singleSelectionParameters"]["onSelectedIndexChange"];
         getSelectedIndex(): number | null;
     };

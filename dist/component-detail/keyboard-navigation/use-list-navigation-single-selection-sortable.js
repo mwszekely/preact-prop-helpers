@@ -25,7 +25,7 @@ export function useListNavigationSingleSelectionSortable({ linearNavigationParam
         ...restLN
     };
 }
-export function useListNavigationSingleSelectionSortableChild({ info, context, refElementReturn, textContentParameters, rovingTabIndexParameters, singleSelectionParameters, ...void1 }) {
+export function useListNavigationSingleSelectionSortableChild({ info, context, refElementReturn, textContentParameters, ...void1 }) {
     monitorCallCount(useListNavigationSingleSelectionSortableChild);
     assertEmptyObject(void1);
     return useListNavigationSingleSelectionChild({
@@ -33,8 +33,6 @@ export function useListNavigationSingleSelectionSortableChild({ info, context, r
         context,
         refElementReturn,
         textContentParameters,
-        rovingTabIndexParameters,
-        singleSelectionParameters,
     });
 }
 //# sourceMappingURL=use-list-navigation-single-selection-sortable.js.map

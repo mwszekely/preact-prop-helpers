@@ -97,8 +97,6 @@ const DemoUseGridRow = memo((({ index }: { index: number }) => {
         linearNavigationParameters: { disableHomeEndKeys: false, navigatePastEnd: "wrap", navigatePastStart: "wrap" },
         rovingTabIndexParameters: { onTabbableIndexChange: useStableCallback((i: number | null) => { setTabbableColumn(i) }), untabbable: false, initiallyTabbedIndex: 0 },
         typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000 },
-        singleSelectionParameters: { ariaPropName: "aria-selected", selectionMode: "focus" }
-
     });
 
     const {
@@ -142,7 +140,6 @@ const DemoUseGridCell = (({ index, row, rowIsTabbable }: { index: number, row: n
         info: { index, bar: "baz", focusSelf: useStableCallback((e: HTMLElement) => e.focus()), untabbable: false },
         context,
         textContentParameters: { getText: useCallback((e: Element | null) => { return e?.textContent ?? "" }, []) },
-        rovingTabIndexParameters: { untabbable: false }
     });
 
     const t = (tabbable ? "(Tabbable)" : "(Not tabbable)")

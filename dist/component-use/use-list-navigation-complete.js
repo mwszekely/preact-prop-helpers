@@ -88,7 +88,7 @@ export function useCompleteListNavigation({ linearNavigationParameters, rearrang
     };
 }
 export function useCompleteListNavigationChild({ info: { index, focusSelf, unselectable, untabbable, ...info }, // The "...info" is empty if M is the same as UCLNCI<ChildElement>.
-textContentParameters, context: { childrenHaveFocusChildContext, managedChildContext, rovingTabIndexContext, paginatedChildContext, staggeredChildContext, singleSelectionContext, typeaheadNavigationContext }, sortableChildParameters, pressParameters, rovingTabIndexParameters, singleSelectionParameters, ...void1 }) {
+textContentParameters, context: { childrenHaveFocusChildContext, managedChildContext, rovingTabIndexContext, paginatedChildContext, staggeredChildContext, singleSelectionContext, typeaheadNavigationContext }, sortableChildParameters, pressParameters, ...void1 }) {
     monitorCallCount(useCompleteListNavigationChild);
     assertEmptyObject(void1);
     const { onPressSync, ...pressParameters1 } = (pressParameters ?? {});
@@ -103,12 +103,10 @@ textContentParameters, context: { childrenHaveFocusChildContext, managedChildCon
         info: { index, unselectable, untabbable },
         context: { rovingTabIndexContext, singleSelectionContext, typeaheadNavigationContext },
         refElementReturn,
-        textContentParameters,
-        rovingTabIndexParameters,
-        singleSelectionParameters
+        textContentParameters
     });
     const onPress = useStableCallback((e) => {
-        if (singleSelectionParameters.selectionMode == "activation")
+        if (singleSelectionContext.selectionMode == "activation")
             singleSelectionContext.onSelectedIndexChange?.(enhanceEvent(e, { selectedIndex: index }));
         onPressSync?.(e);
     });
@@ -119,7 +117,7 @@ textContentParameters, context: { childrenHaveFocusChildContext, managedChildCon
             focusSelf,
             ...pressParameters1,
             ...pressParameters2,
-            onPressSync: (rovingTabIndexParameters.untabbable || unselectable || untabbable) ? null : onPress,
+            onPressSync: (rovingTabIndexContext.untabbable || unselectable || untabbable) ? null : onPress,
             excludeSpace: useStableCallback(() => { return excludeSpace?.() || false; }),
         }
     });

@@ -73,9 +73,6 @@ interface A {
     selectedIndex: number | null;
 }
 
-const UntabbableContext = createContext(false);
-const AriaPropNameContext = createContext("aria-selected" as UseSingleSelectionParameters<any, any, any>["singleSelectionParameters"]["ariaPropName"]);
-const SelectionModeContext = createContext("activation" as UseSingleSelectionParameters<any, any, any>["singleSelectionParameters"]["selectionMode"]);
 function TestBasesListNavImpl({ ariaPropName, selectedIndex, arrowKeyDirection, childCount, collatorId, disableHomeEndKeys, navigatePastStartEnd, noTypeahead, pageNavigationSize, pagination, selectionMode, staggered, typeaheadTimeout, untabbable }: A) {
 
     console.log(pagination);
@@ -121,18 +118,12 @@ function TestBasesListNavImpl({ ariaPropName, selectedIndex, arrowKeyDirection, 
     });
 
     return (
-        <AriaPropNameContext.Provider value={ariaPropName}>
-            <SelectionModeContext.Provider value={selectionMode}>
-                <UntabbableContext.Provider value={untabbable}>
                     <Context.Provider value={context}>
                         {untabbable.toString()}, {t}
                         <ol role="toolbar" data-still-staggering={stillStaggering} data-typeahead-status={typeaheadStatus} {...props}>
                             <TestBasesListNavChildren count={childCount} />
                         </ol>
                     </Context.Provider>
-                </UntabbableContext.Provider>
-            </SelectionModeContext.Provider>
-        </AriaPropNameContext.Provider>
     )
 }
 
@@ -189,10 +180,8 @@ function TestBasesListNavChild({ index }: { index: number }) {
             untabbable: hidden,
             index
         },
-        rovingTabIndexParameters: { untabbable: useContext(UntabbableContext) },
         sortableChildParameters: { getSortValue: getTextContent },
-        textContentParameters: { getText: getTextContent },
-        singleSelectionParameters: { ariaPropName: useContext(AriaPropNameContext), selectionMode: useContext(SelectionModeContext) },
+        textContentParameters: { getText: getTextContent }
     })
     return (
         <>

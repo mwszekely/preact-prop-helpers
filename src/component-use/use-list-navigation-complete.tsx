@@ -67,8 +67,8 @@ export interface UseCompleteListNavigationChildParameters<ChildElement extends E
     textContentParameters: OmitStrong<UseListNavigationSingleSelectionSortableChildParameters<ChildElement, M>["textContentParameters"], never>;
     info: Omit<M, Exclude<keyof UseCompleteListNavigationChildInfo<ChildElement>, "index" | "focusSelf" | "untabbable" | "unselectable">>;
     sortableChildParameters: Pick<UseSortableChildInfo, "getSortValue">;
-    rovingTabIndexParameters: UseRovingTabIndexChildParameters<any, any>["rovingTabIndexParameters"];
-    singleSelectionParameters: UseSingleSelectionChildParameters<any, any>["singleSelectionParameters"];
+    //rovingTabIndexParameters: UseRovingTabIndexChildParameters<any, any>["rovingTabIndexParameters"];
+    //singleSelectionParameters: UseSingleSelectionChildParameters<any, any>["singleSelectionParameters"];
 }
 
 export interface UseCompleteListNavigationChildReturnType<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>>
@@ -196,8 +196,6 @@ export function useCompleteListNavigationChild<ChildElement extends Element, M e
     context: { childrenHaveFocusChildContext, managedChildContext, rovingTabIndexContext, paginatedChildContext, staggeredChildContext, singleSelectionContext, typeaheadNavigationContext },
     sortableChildParameters,
     pressParameters,
-    rovingTabIndexParameters,
-    singleSelectionParameters,
     ...void1
 }: UseCompleteListNavigationChildParameters<ChildElement, M>): UseCompleteListNavigationChildReturnType<ChildElement, M> {
     monitorCallCount(useCompleteListNavigationChild);
@@ -226,12 +224,10 @@ export function useCompleteListNavigationChild<ChildElement extends Element, M e
         info: { index, unselectable, untabbable },
         context: { rovingTabIndexContext, singleSelectionContext, typeaheadNavigationContext },
         refElementReturn,
-        textContentParameters,
-        rovingTabIndexParameters,
-        singleSelectionParameters
+        textContentParameters
     });
     const onPress = useStableCallback((e: PressEventReason<any>) => {
-        if (singleSelectionParameters.selectionMode == "activation")
+        if (singleSelectionContext.selectionMode == "activation")
             singleSelectionContext.onSelectedIndexChange?.(enhanceEvent(e, { selectedIndex: index }));
         onPressSync?.(e);
     });
@@ -245,7 +241,7 @@ export function useCompleteListNavigationChild<ChildElement extends Element, M e
             focusSelf,
             ...pressParameters1,
             ...pressParameters2,
-            onPressSync: (rovingTabIndexParameters.untabbable || unselectable || untabbable) ? null : onPress,
+            onPressSync: (rovingTabIndexContext.untabbable || unselectable || untabbable) ? null : onPress,
             excludeSpace: useStableCallback(() => { return excludeSpace?.() || false; }),
         }
     });

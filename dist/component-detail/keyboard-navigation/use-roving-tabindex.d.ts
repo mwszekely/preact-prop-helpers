@@ -95,7 +95,6 @@ export interface UseRovingTabIndexReturnType<ParentElement extends Element, Tabb
 export type UseRovingTabIndexChildInfoKeys = "index" | "untabbable";
 export interface UseRovingTabIndexChildParameters<TabbableChildElement extends Element, M extends UseRovingTabIndexChildInfo<TabbableChildElement>> extends OmitStrong<UseManagedChildParameters<M>, "info" | "context"> {
     info: Pick<UseManagedChildParameters<M>["info"], UseRovingTabIndexChildInfoKeys>;
-    rovingTabIndexParameters: Pick<UseRovingTabIndexParameters<any, TabbableChildElement, M>["rovingTabIndexParameters"], "untabbable">;
     /**
      * The information provided by the parent hook
      */
@@ -103,6 +102,7 @@ export interface UseRovingTabIndexChildParameters<TabbableChildElement extends E
 }
 export interface RovingTabIndexChildContext {
     rovingTabIndexContext: {
+        untabbable: boolean;
         parentFocusSelf: () => void;
         setTabbableIndex: SetTabbableIndex;
         getInitiallyTabbedIndex(): number | null;
@@ -171,5 +171,5 @@ export interface UseRovingTabIndexChildReturnType<ChildElement extends Element, 
  * regardless of if it's the whole app or just a given component.
  */
 export declare function useRovingTabIndex<ParentElement extends Element, ChildElement extends Element, M extends UseRovingTabIndexChildInfo<ChildElement>>({ managedChildrenReturn: { getChildren }, rovingTabIndexParameters: { untabbable, initiallyTabbedIndex, onTabbableIndexChange }, refElementReturn: { getElement }, ...void1 }: UseRovingTabIndexParameters<ParentElement, ChildElement, M>): UseRovingTabIndexReturnType<ParentElement, ChildElement, M>;
-export declare function useRovingTabIndexChild<ChildElement extends Element, M extends UseRovingTabIndexChildInfo<ChildElement>>({ info: { index, untabbable: iAmUntabbable, ...void2 }, context: { rovingTabIndexContext: { reevaluateClosestFit, setTabbableIndex, getInitiallyTabbedIndex, parentFocusSelf } }, rovingTabIndexParameters: { untabbable: parentIsUntabbable }, ...void3 }: UseRovingTabIndexChildParameters<ChildElement, M>): UseRovingTabIndexChildReturnType<ChildElement, M>;
+export declare function useRovingTabIndexChild<ChildElement extends Element, M extends UseRovingTabIndexChildInfo<ChildElement>>({ info: { index, untabbable: iAmUntabbable, ...void2 }, context: { rovingTabIndexContext: { untabbable: parentIsUntabbable, reevaluateClosestFit, setTabbableIndex, getInitiallyTabbedIndex, parentFocusSelf } }, ...void3 }: UseRovingTabIndexChildParameters<ChildElement, M>): UseRovingTabIndexChildReturnType<ChildElement, M>;
 //# sourceMappingURL=use-roving-tabindex.d.ts.map

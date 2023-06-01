@@ -14,8 +14,9 @@ import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useMemoObject } from "../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../util/assert.js";
 import { monitorCallCount } from "../util/use-call-count.js";
-export function useCompleteGridNavigation({ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, typeaheadNavigationParameters, sortableChildrenParameters, rearrangeableChildrenParameters, paginatedChildrenParameters, staggeredChildrenParameters }) {
+export function useCompleteGridNavigation({ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, typeaheadNavigationParameters, sortableChildrenParameters, rearrangeableChildrenParameters, paginatedChildrenParameters, staggeredChildrenParameters, ...void1 }) {
     monitorCallCount(useCompleteGridNavigation);
+    assertEmptyObject(void1);
     const getChildren = useCallback(() => managedChildrenReturn.getChildren(), []);
     const getHighestChildIndex = useCallback(() => getChildren().getHighestIndex(), []);
     const isValid = useCallback((i) => {
@@ -70,8 +71,9 @@ export function useCompleteGridNavigation({ gridNavigationParameters, linearNavi
         ...gridNavigationSingleSelectionReturn,
     };
 }
-export function useCompleteGridNavigationRow({ info, context: contextIncomingForRowAsChildOfTable, textContentParameters, linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, sortableChildParameters, singleSelectionParameters }) {
+export function useCompleteGridNavigationRow({ info, context: contextIncomingForRowAsChildOfTable, textContentParameters, linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, sortableChildParameters, ...void1 }) {
     monitorCallCount(useCompleteGridNavigationRow);
+    assertEmptyObject(void1);
     const { info: infoPaginatedChild, paginatedChildReturn: { paginatedVisible, isPaginated, hideBecausePaginated }, props: paginationProps } = usePaginatedChild({ info, context: contextIncomingForRowAsChildOfTable });
     const { info: infoStaggeredChild, // { setParentIsStaggered, setStaggeredVisible },
     staggeredChildReturn: { isStaggered, hideBecauseStaggered }, props: staggeredProps } = useStaggeredChild({ info, context: contextIncomingForRowAsChildOfTable });
@@ -96,8 +98,7 @@ export function useCompleteGridNavigationRow({ info, context: contextIncomingFor
         refElementReturn,
         context: contextIncomingForRowAsChildOfTable,
         info,
-        textContentParameters,
-        singleSelectionParameters
+        textContentParameters
     });
     const { gridNavigationRowParameters: { focusSelf, setTabbableColumnIndex }, linearNavigationReturn, managedChildrenParameters, pressParameters: { excludeSpace }, // TODO: Pass this through context? (this is for children, so it doesn't actually matter, but for completeness...)
     rovingTabIndexChildReturn, rovingTabIndexReturn, singleSelectionChildReturn, textContentReturn, typeaheadNavigationReturn, context: contextGNR, info: infoRowReturn, } = r;
@@ -141,18 +142,18 @@ export function useCompleteGridNavigationRow({ info, context: contextIncomingFor
         props,
     };
 }
-export function useCompleteGridNavigationCell({ gridNavigationCellParameters, context: { gridNavigationCellContext, managedChildContext, rovingTabIndexContext, typeaheadNavigationContext }, textContentParameters, rovingTabIndexParameters, info, ...void1 }) {
+export function useCompleteGridNavigationCell({ gridNavigationCellParameters, context: { gridNavigationCellContext, managedChildContext, rovingTabIndexContext, typeaheadNavigationContext }, textContentParameters, info, ...void1 }) {
     monitorCallCount(useCompleteGridNavigationCell);
-    assertEmptyObject(void1);
     const { refElementReturn, propsStable } = useRefElement({ refElementParameters: {} });
-    const { hasCurrentFocusParameters, rovingTabIndexChildReturn, textContentReturn, pressParameters, props: propsRti, info: info2 } = useGridNavigationSingleSelectionCell({
+    const { hasCurrentFocusParameters, rovingTabIndexChildReturn, textContentReturn, pressParameters, props: propsRti, info: info2, ...void2 } = useGridNavigationSingleSelectionCell({
         gridNavigationCellParameters,
         info,
         context: { gridNavigationCellContext, rovingTabIndexContext, typeaheadNavigationContext },
         refElementReturn,
         textContentParameters,
-        rovingTabIndexParameters,
     });
+    assertEmptyObject(void1);
+    assertEmptyObject(void2);
     const { hasCurrentFocusReturn } = useHasCurrentFocus({ hasCurrentFocusParameters: { onCurrentFocusedChanged: null, ...hasCurrentFocusParameters }, refElementReturn });
     const baseInfo = {
         getElement: refElementReturn.getElement,

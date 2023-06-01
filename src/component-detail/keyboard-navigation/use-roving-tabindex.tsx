@@ -120,7 +120,7 @@ export type UseRovingTabIndexChildInfoKeys = "index" | "untabbable";
 export interface UseRovingTabIndexChildParameters<TabbableChildElement extends Element, M extends UseRovingTabIndexChildInfo<TabbableChildElement>> extends OmitStrong<UseManagedChildParameters<M>, "info" | "context"> {
     info: Pick<UseManagedChildParameters<M>["info"], UseRovingTabIndexChildInfoKeys>;
 
-    rovingTabIndexParameters: Pick<UseRovingTabIndexParameters<any, TabbableChildElement, M>["rovingTabIndexParameters"], "untabbable">;
+    //rovingTabIndexParameters: Pick<UseRovingTabIndexParameters<any, TabbableChildElement, M>["rovingTabIndexParameters"], "untabbable">;
 
     /**
      * The information provided by the parent hook
@@ -132,6 +132,8 @@ export interface UseRovingTabIndexChildParameters<TabbableChildElement extends E
 
 export interface RovingTabIndexChildContext {
     rovingTabIndexContext: {
+
+        untabbable: boolean;
 
         parentFocusSelf: () => void;
 
@@ -351,7 +353,8 @@ export function useRovingTabIndex<ParentElement extends Element, ChildElement ex
         setTabbableIndex,
         parentFocusSelf: focusSelf,
         getInitiallyTabbedIndex: useCallback(() => { return initiallyTabbedIndex ?? (untabbable ? null : 0) }, []),
-        reevaluateClosestFit
+        reevaluateClosestFit,
+        untabbable
     });
 
     return {
@@ -372,8 +375,7 @@ export function useRovingTabIndex<ParentElement extends Element, ChildElement ex
 
 export function useRovingTabIndexChild<ChildElement extends Element, M extends UseRovingTabIndexChildInfo<ChildElement>>({
     info: { index, untabbable: iAmUntabbable, ...void2 },
-    context: { rovingTabIndexContext: { reevaluateClosestFit, setTabbableIndex, getInitiallyTabbedIndex, parentFocusSelf } },
-    rovingTabIndexParameters: { untabbable: parentIsUntabbable },
+    context: { rovingTabIndexContext: { untabbable: parentIsUntabbable, reevaluateClosestFit, setTabbableIndex, getInitiallyTabbedIndex, parentFocusSelf } },
     ...void3
 }: UseRovingTabIndexChildParameters<ChildElement, M>): UseRovingTabIndexChildReturnType<ChildElement, M> {
     monitorCallCount(useRovingTabIndexChild);

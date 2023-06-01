@@ -42,6 +42,8 @@ export function useSingleSelection({ managedChildrenReturn: { getChildren }, rov
             singleSelectionContext: useMemoObject({
                 getSelectedIndex,
                 onSelectedIndexChange: onSelectedIndexChange,
+                ariaPropName,
+                selectionMode
             }),
         }),
         childrenHaveFocusParameters: {
@@ -57,7 +59,7 @@ export function useSingleSelection({ managedChildrenReturn: { getChildren }, rov
 }
 export function useSingleSelectionChild(args) {
     monitorCallCount(useSingleSelectionChild);
-    const { context: { singleSelectionContext: { getSelectedIndex, onSelectedIndexChange } }, info: { index, unselectable }, singleSelectionParameters: { ariaPropName, selectionMode }, } = args;
+    const { context: { singleSelectionContext: { getSelectedIndex, onSelectedIndexChange, ariaPropName, selectionMode } }, info: { index, unselectable }, } = args;
     useEnsureStability("useSingleSelectionChild", getSelectedIndex, onSelectedIndexChange);
     const getUnselectable = useStableGetter(unselectable);
     const [localSelected, setLocalSelected, getLocalSelected] = useState(getSelectedIndex() == index);

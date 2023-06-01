@@ -3250,7 +3250,8 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       getInitiallyTabbedIndex: T$1(() => {
         return initiallyTabbedIndex !== null && initiallyTabbedIndex !== void 0 ? initiallyTabbedIndex : untabbable ? null : 0;
       }, []),
-      reevaluateClosestFit
+      reevaluateClosestFit,
+      untabbable
     });
     return {
       managedChildrenParameters: {
@@ -3283,14 +3284,12 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       },
       context: {
         rovingTabIndexContext: {
+          untabbable: parentIsUntabbable,
           reevaluateClosestFit,
           setTabbableIndex,
           getInitiallyTabbedIndex,
           parentFocusSelf
         }
-      },
-      rovingTabIndexParameters: {
-        untabbable: parentIsUntabbable
       },
       ...void3
     } = _ref9;
@@ -3717,14 +3716,12 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       context,
       refElementReturn,
       textContentParameters,
-      rovingTabIndexParameters,
       ...void2
     } = _ref14;
     const {
       props,
       ...rticr
     } = useRovingTabIndexChild({
-      rovingTabIndexParameters,
       context,
       info
     });
@@ -3803,7 +3800,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       typeaheadNavigationParameters
     });
     const gridNavigationRowContext = useMemoObject({
-      rowIsUntabbableBecauseOfGrid: !!untabbable,
+      //rowIsUntabbableBecauseOfGrid: !!untabbable,
       setTabbableRow: rovingTabIndexReturn.setTabbableIndex,
       getCurrentTabbableColumn,
       setCurrentTabbableColumn
@@ -3830,8 +3827,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         gridNavigationRowContext: {
           setTabbableRow,
           getCurrentTabbableColumn,
-          setCurrentTabbableColumn,
-          rowIsUntabbableBecauseOfGrid
+          setCurrentTabbableColumn
         }
       },
       linearNavigationParameters,
@@ -3890,9 +3886,6 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       context: {
         rovingTabIndexContext: contextRTI,
         typeaheadNavigationContext: contextTN
-      },
-      rovingTabIndexParameters: {
-        untabbable: rowIsUntabbableBecauseOfGrid
       }
     });
     const allChildCellsAreUntabbable = !rovingTabIndexChildReturn.tabbable;
@@ -3980,7 +3973,6 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       gridNavigationCellParameters: {
         colSpan
       },
-      rovingTabIndexParameters,
       ...void1
     } = _ref17;
     const {
@@ -4004,8 +3996,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         typeaheadNavigationContext
       },
       textContentParameters,
-      refElementReturn,
-      rovingTabIndexParameters
+      refElementReturn
     });
     return {
       info: infoLs,
@@ -4096,7 +4087,9 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       context: useMemoObject({
         singleSelectionContext: useMemoObject({
           getSelectedIndex,
-          onSelectedIndexChange: onSelectedIndexChange
+          onSelectedIndexChange: onSelectedIndexChange,
+          ariaPropName,
+          selectionMode
         })
       }),
       childrenHaveFocusParameters: {
@@ -4115,16 +4108,14 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       context: {
         singleSelectionContext: {
           getSelectedIndex,
-          onSelectedIndexChange
+          onSelectedIndexChange,
+          ariaPropName,
+          selectionMode
         }
       },
       info: {
         index,
         unselectable
-      },
-      singleSelectionParameters: {
-        ariaPropName,
-        selectionMode
       }
     } = args;
     useEnsureStability("useSingleSelectionChild", getSelectedIndex, onSelectedIndexChange);
@@ -4266,7 +4257,6 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         singleSelectionContext,
         typeaheadNavigationContext
       },
-      singleSelectionParameters,
       ...void1
     } = _ref21;
     const {
@@ -4281,8 +4271,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       info: mcp1,
       context: {
         singleSelectionContext
-      },
-      singleSelectionParameters
+      }
     });
     const {
       context,
@@ -4642,8 +4631,6 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       context,
       refElementReturn,
       textContentParameters,
-      rovingTabIndexParameters,
-      singleSelectionParameters,
       ...void1
     } = _ref27;
     const {
@@ -4657,8 +4644,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       ...void9
     } = useSingleSelectionChild({
       info,
-      context,
-      singleSelectionParameters
+      context
     });
     const {
       hasCurrentFocusParameters: {
@@ -4675,8 +4661,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       info,
       context,
       refElementReturn,
-      textContentParameters,
-      rovingTabIndexParameters
+      textContentParameters
     });
     return {
       hasCurrentFocusParameters: {
@@ -6885,20 +6870,26 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         if (visible) (_getChildren$getAt2 = getChildren().getAt(indexDemangler(i))) === null || _getChildren$getAt2 === void 0 ? void 0 : _getChildren$getAt2.setChildCountIfPaginated(getChildren().getHighestIndex() + 1);
       }
     }, [/* Must be empty */]);
-    y(() => {
+    p(() => {
+      // At this point, the children have not yet updated themselves to match the pagination.
+      // We need to tell them to update, but also handle where the focus is.
+      // If a current list item is focused, then we need to move focus to a paginated one
+      // but we can't do it until they all re-render...
+      // TODO: Something better than setTimeout for this, please...
       let tabbableIndex = getTabbableIndex();
       if (tabbableIndex != null) {
         var _getElement2;
-        let shouldFocus = ((_getElement2 = getElement()) === null || _getElement2 === void 0 ? void 0 : _getElement2.contains(document.activeElement)) || document.activeElement == null || document.activeElement === document.body;
-        if (paginationMin != null && tabbableIndex < paginationMin) {
-          setTabbableIndex(paginationMin, undefined, shouldFocus); // TODO: This isn't a user interaction, but we need to ensure the old element doesn't remain focused, yeesh.
-        } else if (paginationMax != null && tabbableIndex >= paginationMax) {
-          let next = paginationMax - 1;
-          if (next == -1) next = null;
-          setTabbableIndex(next, undefined, shouldFocus); // TODO: This isn't a user interaction, but we need to ensure the old element doesn't remain focused, yeesh.
-        }
+        let shouldFocus = ((_getElement2 = getElement()) === null || _getElement2 === void 0 ? void 0 : _getElement2.contains(document.activeElement)) || false;
+        setTimeout(() => {
+          if (paginationMin != null && tabbableIndex < paginationMin) {
+            setTabbableIndex(paginationMin, undefined, shouldFocus); // TODO: This isn't a user interaction, but we need to ensure the old element doesn't remain focused, yeesh.
+          } else if (paginationMax != null && tabbableIndex >= paginationMax) {
+            let next = paginationMax - 1;
+            if (next == -1) next = null;
+            setTabbableIndex(next, undefined, shouldFocus); // TODO: This isn't a user interaction, but we need to ensure the old element doesn't remain focused, yeesh.
+          }
+        }, 1);
       }
-
       refreshPagination(paginationMin, paginationMax);
       lastPagination.current.paginationMax = paginationMax !== null && paginationMax !== void 0 ? paginationMax : null;
       lastPagination.current.paginationMin = paginationMin !== null && paginationMin !== void 0 ? paginationMin : null;
@@ -7216,7 +7207,8 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       sortableChildrenParameters,
       rearrangeableChildrenParameters,
       paginatedChildrenParameters,
-      staggeredChildrenParameters
+      staggeredChildrenParameters,
+      ...void1
     } = _ref42;
     const getChildren = T$1(() => managedChildrenReturn.getChildren(), []);
     const getHighestChildIndex = T$1(() => getChildren().getHighestIndex(), []);
@@ -7355,7 +7347,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       rovingTabIndexParameters,
       typeaheadNavigationParameters,
       sortableChildParameters,
-      singleSelectionParameters
+      ...void1
     } = _ref43;
     const {
       info: infoPaginatedChild,
@@ -7417,8 +7409,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       refElementReturn,
       context: contextIncomingForRowAsChildOfTable,
       info,
-      textContentParameters,
-      singleSelectionParameters
+      textContentParameters
     });
     const {
       gridNavigationRowParameters: {
@@ -7518,7 +7509,6 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         typeaheadNavigationContext
       },
       textContentParameters,
-      rovingTabIndexParameters,
       info,
       ...void1
     } = _ref44;
@@ -7534,7 +7524,8 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       textContentReturn,
       pressParameters,
       props: propsRti,
-      info: info2
+      info: info2,
+      ...void2
     } = useGridNavigationSingleSelectionCell({
       gridNavigationCellParameters,
       info,
@@ -7544,8 +7535,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         typeaheadNavigationContext
       },
       refElementReturn,
-      textContentParameters,
-      rovingTabIndexParameters
+      textContentParameters
     });
     const {
       hasCurrentFocusReturn
@@ -8193,8 +8183,6 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       },
       sortableChildParameters,
       pressParameters,
-      rovingTabIndexParameters,
-      singleSelectionParameters,
       ...void1
     } = _ref48;
     const {
@@ -8265,13 +8253,11 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         typeaheadNavigationContext
       },
       refElementReturn,
-      textContentParameters,
-      rovingTabIndexParameters,
-      singleSelectionParameters
+      textContentParameters
     });
     const onPress = useStableCallback(e => {
       var _singleSelectionConte;
-      if (singleSelectionParameters.selectionMode == "activation") (_singleSelectionConte = singleSelectionContext.onSelectedIndexChange) === null || _singleSelectionConte === void 0 ? void 0 : _singleSelectionConte.call(singleSelectionContext, enhanceEvent(e, {
+      if (singleSelectionContext.selectionMode == "activation") (_singleSelectionConte = singleSelectionContext.onSelectedIndexChange) === null || _singleSelectionConte === void 0 ? void 0 : _singleSelectionConte.call(singleSelectionContext, enhanceEvent(e, {
         selectedIndex: index
       }));
       onPressSync === null || onPressSync === void 0 ? void 0 : onPressSync(e);
@@ -8291,7 +8277,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         focusSelf,
         ...pressParameters1,
         ...pressParameters2,
-        onPressSync: rovingTabIndexParameters.untabbable || unselectable || untabbable ? null : onPress,
+        onPressSync: rovingTabIndexContext.untabbable || unselectable || untabbable ? null : onPress,
         excludeSpace: useStableCallback(() => {
           return (excludeSpace === null || excludeSpace === void 0 ? void 0 : excludeSpace()) || false;
         })
@@ -9689,10 +9675,6 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         collator: null,
         noTypeahead: false,
         typeaheadTimeout: 1000
-      },
-      singleSelectionParameters: {
-        ariaPropName: "aria-selected",
-        selectionMode: "focus"
       }
     });
     const {
@@ -9751,9 +9733,6 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
           var _e$textContent2;
           return (_e$textContent2 = e === null || e === void 0 ? void 0 : e.textContent) !== null && _e$textContent2 !== void 0 ? _e$textContent2 : "";
         }, [])
-      },
-      rovingTabIndexParameters: {
-        untabbable: false
       }
     });
     const t = tabbable ? "(Tabbable)" : "(Not tabbable)";
@@ -10225,14 +10204,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         onPressSync: null,
         focusSelf
       },
-      rovingTabIndexParameters: {
-        untabbable: q$1(UntabbableContext)
-      },
       context,
-      singleSelectionParameters: {
-        ariaPropName: "aria-selected",
-        selectionMode: q$1(SelectionModeContext)
-      },
       textContentParameters: {
         getText: T$1(e => {
           var _e$textContent3;
