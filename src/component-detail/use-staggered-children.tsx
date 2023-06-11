@@ -113,7 +113,7 @@ export function useStaggeredChildren<E extends Element, M extends UseStaggeredCh
     }, [/* Must be empty */]), returnNull);
 
     const [getDisplayedStaggerIndex, setDisplayedStaggerIndex] = usePassiveState<number | null, never>(useCallback((newIndex: number | null, prevIndex: number | null | undefined) => {
-        if (newIndex == null) {
+        if (newIndex == null || !s.current) {
             return;
         }
 

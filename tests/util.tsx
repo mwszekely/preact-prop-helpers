@@ -1,8 +1,8 @@
 import { RenderableProps } from "preact";
 import { StateUpdater, useCallback, useEffect, useLayoutEffect, useRef, useState } from "preact/hooks";
-import { ListNavConstants } from "./stage-list-nav.js";
-import { useForceUpdate, useSearchParamStateDeclarative } from "../../dist/index.js";
-import { PressConstants } from "./stage-press.js";
+import { ListNavConstants } from "./fixtures/list-nav.stage.js";
+import { useForceUpdate, useSearchParamStateDeclarative } from "../dist/index.js";
+import { PressConstants } from "./fixtures/press.stage.js";
 
 
 export interface TestingConstants {

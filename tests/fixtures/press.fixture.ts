@@ -1,13 +1,13 @@
 
 import { Locator } from "@playwright/test";
-import { test as base } from "./shared.js"
+import { test as base } from "./base.fixture.js"
 
-
+/*
 declare global {
     interface Window {
         increment(): Promise<void>;
     }
-}
+}*/
 
 export const test = base.extend<{ press: { div: Locator, button: Locator } }>({
     press: async ({ page, shared: { focusableFirst, locator } }, use) => {

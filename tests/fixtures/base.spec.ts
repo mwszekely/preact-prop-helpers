@@ -1,5 +1,12 @@
 import { expect } from '@playwright/test';
-import { test } from "./fixtures/shared.js"
+import { test } from "./base.fixture.js"
+
+declare global {
+    interface Window {
+        increment?(): Promise<void>;
+        onRender?(id: string): Promise<void>;
+    }
+}
 
 test('Sanity checks', async ({ page, shared: { getCounter, resetCounter } }) => {
     await page.goto("/tests/stage/?test-base=sanity-check");
@@ -8,9 +15,9 @@ test('Sanity checks', async ({ page, shared: { getCounter, resetCounter } }) => 
 
 
     expect(getCounter()).toBe(0);
-    await page.evaluate(async () => { await window.increment(); });
+    await page.evaluate(async () => { await window.increment?.(); });
     expect(getCounter()).toBe(1);
-    await page.evaluate(async () => { await window.increment(); });
+    await page.evaluate(async () => { await window.increment?.(); });
     expect(getCounter()).toBe(2);
     resetCounter();
     expect(getCounter()).toBe(0);
@@ -18,6 +25,7 @@ test('Sanity checks', async ({ page, shared: { getCounter, resetCounter } }) => 
     await page.waitForURL(/sanity-check=10/);
 
     await page.on('console', (msg) => {
+        expect(msg.type()).not.toBe("error");
         if (msg && msg.text) {
             let contents = (typeof msg.text == "function"? msg.text() : msg.text) as string;
             if (msg.type() != "error")
@@ -27,6 +35,9 @@ test('Sanity checks', async ({ page, shared: { getCounter, resetCounter } }) => 
             console.log('PAGE LOG:', msg);
         }
     });
+    page.on("pageerror", page => {
+        expect(page.message).toBeFalsy();
+    })
 
     const locator = page.locator(".tests-container");
     await expect(locator).toBeAttached();

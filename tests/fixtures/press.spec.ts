@@ -1,5 +1,5 @@
 import { Page, expect } from '@playwright/test';
-import { test } from "./fixtures/press.js"
+import { test } from "./press.fixture.js"
 
 
 
@@ -13,7 +13,7 @@ test.describe("Press events", () => {
         
         // First, test clicking in detail.
         test(`Clicking must release over the ${buttonType} itself`, async ({ page, press, shared: { getCounter, install, run, locator, resetCounter } }) => {
-            await install("Press", "onPress", (e) => { window.increment(); });
+            await install("Press", "onPress", (e) => { window.increment?.(); });
             const button = press[buttonType];
 
             // This is our control test -- click the button normally.
@@ -41,7 +41,7 @@ test.describe("Press events", () => {
                 const button = press[buttonType];
                 resetCounter();
 
-                await install("Press", "onPress", (e) => { window.increment(); });
+                await install("Press", "onPress", (e) => { window.increment?.(); });
 
                 expect(getCounter(), "We haven't clicked the button, so the counter should still be 0").toBe(0);
 
@@ -79,7 +79,7 @@ test.describe("Pressing and long pressing", () => {
     for (const buttonType of buttonTypes) {
         test(`A ${buttonType} can be "being pressed"`, async ({ page, press, shared: { getCounter, resetCounter, install, generateText, locator, run } }) => {
             resetCounter();
-            await install("Press", "onPress", (e) => { window.increment(); });
+            await install("Press", "onPress", (e) => { window.increment?.(); });
 
             const button = press[buttonType];
             await button.focus();
@@ -93,7 +93,7 @@ test.describe("Pressing and long pressing", () => {
 
         test(`Long pressing a ${buttonType}`, async ({ page, press, shared: { getCounter, install, run, resetCounter, generateText, locator } }) => {
             resetCounter();
-            await install("Press", "onPress", (e) => { window.increment(); });
+            await install("Press", "onPress", (e) => { window.increment?.(); });
 
             const button = press[buttonType];
             await button.hover();

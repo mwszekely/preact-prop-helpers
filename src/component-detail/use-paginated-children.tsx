@@ -64,7 +64,7 @@ export function usePaginatedChildren<ParentElement extends Element, TabbableChil
         for (let i = 0; i <= childMax; ++i) {
             const visible = (i >= (paginationMin ?? -Infinity) && i < (paginationMax ?? Infinity));
             getChildren().getAt(indexDemangler(i))?.setPaginationVisible(visible);
-            if (visible)
+            if (visible && (paginationMax != null || paginationMin != null))
                 getChildren().getAt(indexDemangler(i))?.setChildCountIfPaginated(getChildren().getHighestIndex() + 1);
         }
 

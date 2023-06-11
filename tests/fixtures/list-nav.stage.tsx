@@ -1,8 +1,9 @@
 import { useCallback, useContext, useEffect, useRef, useState } from "preact/hooks";
-import { Compare, CompleteListNavigationContext, EventDetail, UseCompleteListNavigationChildInfo, UseSingleSelectionParameters, useCompleteListNavigation, useCompleteListNavigationChild, useCompleteListNavigationDeclarative, useMergedProps, useStableCallback, useStableGetter, useStaggeredChildren, useTimeout } from "../../dist/index.js";
-import { TestItem, fromStringArray, fromStringBoolean, fromStringNumber, fromStringString, useTestSyncState } from "./util.js";
+import { Compare, CompleteListNavigationContext, EventDetail, UseCompleteListNavigationChildInfo, UseSingleSelectionParameters, useCompleteListNavigation, useCompleteListNavigationChild, useCompleteListNavigationDeclarative, useImperativeProps, useMergedProps, useRefElement, useStableCallback, useStableGetter, useStaggeredChildren, useTimeout } from "../../dist/index.js";
+import { TestItem, fromStringArray, fromStringBoolean, fromStringNumber, fromStringString, useTestSyncState } from "../util.js";
 import { createContext } from "preact";
 import { LoremIpsum } from "../lorem.js";
+import { DefaultChildCount, DisabledIndex, HiddenIndex, MissingIndex } from "./list-nav.constants.js";
 
 
 
@@ -29,7 +30,7 @@ const Context = createContext<CompleteListNavigationContext<HTMLOListElement, HT
 
 export function TestBasesListNav() {
     const [mounted] = useTestSyncState("ListNav", "setMounted", true, fromStringBoolean);
-    const [childCount] = useTestSyncState("ListNav", "setChildCount", 20, fromStringNumber);
+    const [childCount] = useTestSyncState("ListNav", "setChildCount", DefaultChildCount, fromStringNumber);
     const [arrowKeyDirection] = useTestSyncState("ListNav", "setArrowKeyDirection", "vertical", fromStringString);
     const [pagination, setPagination] = useTestSyncState("ListNav", "setPagination", null, fromStringArray(fromStringNumber));
     const [disableHomeEndKeys] = useTestSyncState("ListNav", "setDisableHomeEndKeys", false, fromStringBoolean);
@@ -56,7 +57,7 @@ export function TestBasesListNav() {
     );
 }
 
-interface A {
+interface TestBasesListNavImplProps {
     childCount: number;
     arrowKeyDirection: "horizontal" | "vertical";
     pagination: [number, number] | null;
@@ -73,19 +74,26 @@ interface A {
     selectedIndex: number | null;
 }
 
-function TestBasesListNavImpl({ ariaPropName, selectedIndex, arrowKeyDirection, childCount, collatorId, disableHomeEndKeys, navigatePastStartEnd, noTypeahead, pageNavigationSize, pagination, selectionMode, staggered, typeaheadTimeout, untabbable }: A) {
+function useOnRender(id: string) {
+    window.onRender ??= async (id) => { console.log("RENDER:" + id); }
+    let promise = window.onRender?.(id);
+    const { propsStable, refElementReturn } = useRefElement<any>({})
+    const { imperativeHandle, props } = useImperativeProps<any>({ refElementReturn });
+    imperativeHandle.setAttribute(("data-render-pending-" + id) as never, "true" as never);
+    useEffect(() => {
+        imperativeHandle.setAttribute(("data-render-pending-" + id) as never, "true" as never);
+        promise?.finally(() => { imperativeHandle.setAttribute(("data-render-pending-" + id) as never, "false" as never); });
+    }, [promise])
+
+    return { props: useMergedProps(props, propsStable) }
+}
+
+function TestBasesListNavImpl({ ariaPropName, selectedIndex, arrowKeyDirection, childCount, collatorId, disableHomeEndKeys, navigatePastStartEnd, noTypeahead, pageNavigationSize, pagination, selectionMode, staggered, typeaheadTimeout, untabbable }: TestBasesListNavImplProps) {
 
     console.log(pagination);
-    /*let u = useRef(false);
-    useEffect(() => {
-        window.addEventListener("keydown", e => {
-            if (e.code == "Escape") {
-                getTestingHandler("ListNav", "setUntabbable")(u.current = !u.current);
-            }
-        })
-    }, [])*/
 
-    const [t, setT] = useState<number | null>(null);
+    useOnRender("parent");
+
     const {
         childrenHaveFocusReturn: { getAnyFocused },
         context,
@@ -102,7 +110,7 @@ function TestBasesListNavImpl({ ariaPropName, selectedIndex, arrowKeyDirection, 
     } = useCompleteListNavigationDeclarative<HTMLOListElement, HTMLLIElement, UseCompleteListNavigationChildInfo<HTMLLIElement>>({
         linearNavigationParameters: { arrowKeyDirection, disableHomeEndKeys, navigatePastEnd: navigatePastStartEnd, navigatePastStart: navigatePastStartEnd, pageNavigationSize },
         rearrangeableChildrenParameters: { getIndex: useCallback(info => info.props.index, []) },
-        rovingTabIndexParameters: { untabbable, onTabbableIndexChange: setT },
+        rovingTabIndexParameters: { untabbable, onTabbableIndexChange: null },
         singleSelectionParameters: { ariaPropName, selectionMode },
         singleSelectionDeclarativeParameters: {
             selectedIndex,
@@ -118,12 +126,11 @@ function TestBasesListNavImpl({ ariaPropName, selectedIndex, arrowKeyDirection, 
     });
 
     return (
-                    <Context.Provider value={context}>
-                        {untabbable.toString()}, {t}
-                        <ol role="toolbar" data-still-staggering={stillStaggering} data-typeahead-status={typeaheadStatus} {...props}>
-                            <TestBasesListNavChildren count={childCount} />
-                        </ol>
-                    </Context.Provider>
+        <Context.Provider value={context}>
+            <ol role="toolbar" data-still-staggering={stillStaggering} data-typeahead-status={typeaheadStatus} {...props}>
+                <TestBasesListNavChildren count={childCount} />
+            </ol>
+        </Context.Provider>
     )
 }
 
@@ -142,13 +149,12 @@ function TestBasesListNavChildren({ count }: { count: number }) {
     )
 }
 
-// TODO: Need to copy these back and forth
-const DisabledIndex = 4;
-const MissingIndex = 6;
-const HiddenIndex = 8;
 
 
 function TestBasesListNavChild({ index }: { index: number }) {
+    useOnRender("children");
+    useOnRender("child-" + index);
+
     const textContent = LoremIpsum[index % LoremIpsum.length];
     const getTextContent = useStableGetter(textContent);
     const disabled = (index === DisabledIndex);

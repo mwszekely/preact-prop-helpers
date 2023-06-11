@@ -1,5 +1,5 @@
 import { options } from "preact";
-import { useCallback, useLayoutEffect, useRef } from "preact/hooks";
+import { useCallback, useLayoutEffect, useMemo, useRef } from "preact/hooks";
 import { getBuildMode } from "../util/mode.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 import { generateRandomId } from "../util/random-id.js";
@@ -22,7 +22,7 @@ export type OnPassiveStateChange<S, R> = ((value: S, prevValue: S | undefined, r
 export function useEnsureStability<T extends any[]>(parentHookName: string, ...values: T) {
     if (getBuildMode() == 'production')
         return;
-    
+
     const helperToEnsureStability = useRef<Array<T>>([]);
     const shownError = useRef<Array<boolean>>([]);
     useHelper(values.length as any, -1);
@@ -41,7 +41,7 @@ export function useEnsureStability<T extends any[]>(parentHookName: string, ...v
             if (!shownError.current[index]) {
                 /* eslint-disable no-debugger */
                 debugger;
-                console.error(`The hook ${parentHookName} requires some or all of its arguments remain stable across each render; please check the ${i}-indexed argument (${i >= 0? JSON.stringify(values[i]) : "the number of supposedly stable elements"}).`);
+                console.error(`The hook ${parentHookName} requires some or all of its arguments remain stable across each render; please check the ${i}-indexed argument (${i >= 0 ? JSON.stringify(values[i]) : "the number of supposedly stable elements"}).`);
                 shownError.current[index] = true;
             }
         }
@@ -72,6 +72,7 @@ export function debounceRendering(f: () => void) {
  * @returns 
  */
 export function usePassiveState<T, R>(onChange: undefined | null | OnPassiveStateChange<T, R>, getInitialValue?: () => T, customDebounceRendering?: typeof debounceRendering): readonly [getStateStable: () => T, setStateStable: PassiveStateUpdater<T, R>] {
+
     monitorCallCount(usePassiveState);
     //let [id, ,getId] = useState(() => generateRandomId());
 
@@ -130,7 +131,7 @@ export function usePassiveState<T, R>(onChange: undefined | null | OnPassiveStat
 
     // The actual code the user calls to (possibly) run a new effect.
     const setValue = useCallback<PassiveStateUpdater<T, R>>((arg: Parameters<PassiveStateUpdater<T, R>>[0], reason: Parameters<PassiveStateUpdater<T, R>>[1]) => {
-
+       
         // Regardless of anything else, figure out what our next value is about to be.
         const nextValue = (arg instanceof Function ? arg(valueRef.current === Unset ? undefined : valueRef.current) : arg);
 

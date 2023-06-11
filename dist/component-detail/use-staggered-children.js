@@ -47,7 +47,7 @@ export function useStaggeredChildren({ managedChildrenReturn: { getChildren }, s
         }
     }, [ /* Must be empty */]), returnNull);
     const [getDisplayedStaggerIndex, setDisplayedStaggerIndex] = usePassiveState(useCallback((newIndex, prevIndex) => {
-        if (newIndex == null) {
+        if (newIndex == null || !s.current) {
             return;
         }
         setCurrentlyStaggering(newIndex < (getTargetStaggerIndex() ?? 0));

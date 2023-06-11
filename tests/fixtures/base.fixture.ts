@@ -1,5 +1,5 @@
-import { Locator, Page, test as base } from "@playwright/test";
-import { TestingConstants } from "../stage/util.js";
+import { Locator, Page, test as base, expect } from "@playwright/test";
+import { TestingConstants } from "../util.js";
 import { LoremIpsum } from "../lorem.js";
 
 
@@ -19,11 +19,15 @@ export const test = base.extend<{ shared: SharedFixtures }>({
     shared: async ({ page }, use) => {
 
         let counter = 0;
+        let renderCounts: Partial<Record<string, number>> = {};
         page.exposeFunction("increment", () => counter += 1);
+        page.exposeFunction("onRender", (id: string) => { renderCounts[id] = ((renderCounts[id] ?? 0) + 1); });
 
         const focusableFirst = page.locator("#focusable-first");
         const focusableLast = page.locator("#focusable-last");
         await use({
+            getRenderCount(id: string) { return renderCounts[id] ?? 0; },
+            async awaitRender(id: string) { return await expect(page.locator("[data-render-pending-" + id + "]")).toHaveAttribute("data-render-pending-" + id, "false") },
             focusableFirst,
             focusableLast,
             getCounter() { return counter; },
@@ -54,6 +58,16 @@ export interface SharedFixtures {
     generateText(childIndex: number): string;
 
     locator: Locator;
+
+    /**
+     * If a testing component calls `window.onRender(id)`, you can call `getRenderCount` to return the
+     * number of times `onRender` has been called with that id.
+     * 
+     * @param id 
+     */
+    getRenderCount(id: string): number;
+
+    awaitRender(id: string): Promise<void>;
 
     /**
      * The page exposes a function called `increment`, which controls the value returned by this function.
