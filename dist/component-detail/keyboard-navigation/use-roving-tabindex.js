@@ -5,7 +5,6 @@ import { useStableCallback } from "../../preact-extensions/use-stable-callback.j
 import { useMemoObject, useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { useState } from "../../preact-extensions/use-state.js";
 import { assertEmptyObject } from "../../util/assert.js";
-import { focus } from "../../util/focus.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
 /**
  * Implements a roving tabindex system where only one "focusable"
@@ -36,8 +35,9 @@ import { monitorCallCount } from "../../util/use-call-count.js";
  * And just as well! Children should be allowed at the root,
  * regardless of if it's the whole app or just a given component.
  */
-export function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovingTabIndexParameters: { untabbable, initiallyTabbedIndex, onTabbableIndexChange }, refElementReturn: { getElement }, ...void1 }) {
+export function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovingTabIndexParameters: { focusSelfParent: focusSelfParentUnstable, untabbable, untabbableBehavior, initiallyTabbedIndex, onTabbableIndexChange }, refElementReturn: { getElement }, ...void1 }) {
     monitorCallCount(useRovingTabIndex);
+    const focusSelfParent = useStableCallback(focusSelfParentUnstable);
     assertEmptyObject(void1);
     const getInitiallyTabbedIndex = useStableGetter(initiallyTabbedIndex);
     const getUntabbable = useStableGetter(untabbable);
@@ -64,7 +64,7 @@ export function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovi
                 // Also TODO: Should these take fromUserInteraction into consideration?
                 // Do we always move focus when we become untabbable?
                 if (!parentElement.contains(document.activeElement))
-                    focus(getElement());
+                    focusSelfParent(getElement());
                 return null;
             }
             // If the requested index is hidden, then there's no need to focus any elements or run any extra logic.
@@ -74,7 +74,7 @@ export function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovi
                 // doable with the `tabbable` library, but it doesn't have a next() function or anything,
                 // so that needs to be manually done with a TreeWalker or something?
                 if (!parentElement.contains(document.activeElement))
-                    focus(getElement());
+                    focusSelfParent(getElement());
                 return null;
             }
             // If we've made a change, and it was because the user clicked on it or something,
@@ -133,8 +133,9 @@ export function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovi
             index ??= getInitiallyTabbedIndex() ?? (children.getHighestIndex() >= 0 ? 0 : null);
         }
         if (untabbable) {
-            if (document.activeElement != getElement())
-                focus(getElement());
+            if (document.activeElement != getElement()) {
+                focusSelfParent(getElement());
+            }
         }
         else if (!untabbable && index != null) {
             const element = children.getAt(index)?.getElement();
@@ -148,7 +149,8 @@ export function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovi
         parentFocusSelf: focusSelf,
         getInitiallyTabbedIndex: useCallback(() => { return initiallyTabbedIndex ?? (untabbable ? null : 0); }, []),
         reevaluateClosestFit,
-        untabbable
+        untabbable,
+        untabbableBehavior
     });
     return {
         managedChildrenParameters: { onChildrenMountChange: reevaluateClosestFit, },
@@ -164,7 +166,7 @@ export function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovi
         }
     };
 }
-export function useRovingTabIndexChild({ info: { index, untabbable: iAmUntabbable, ...void2 }, context: { rovingTabIndexContext: { untabbable: parentIsUntabbable, reevaluateClosestFit, setTabbableIndex, getInitiallyTabbedIndex, parentFocusSelf } }, ...void3 }) {
+export function useRovingTabIndexChild({ info: { index, untabbable: iAmUntabbable, ...void2 }, context: { rovingTabIndexContext: { untabbable: parentIsUntabbable, untabbableBehavior, reevaluateClosestFit, setTabbableIndex, getInitiallyTabbedIndex, parentFocusSelf } }, ...void3 }) {
     monitorCallCount(useRovingTabIndexChild);
     const [tabbable, setTabbable, getTabbable] = useState(getInitiallyTabbedIndex() === index);
     useEffect(() => {
@@ -176,7 +178,7 @@ export function useRovingTabIndexChild({ info: { index, untabbable: iAmUntabbabl
         hasCurrentFocusParameters: {
             onCurrentFocusedInnerChanged: useStableCallback((focused, _prevFocused, e) => {
                 if (focused) {
-                    if (!parentIsUntabbable && !iAmUntabbable)
+                    if ((!parentIsUntabbable && !iAmUntabbable) || untabbableBehavior == "leave-child-focused")
                         setTabbableIndex(index, e, false);
                     else
                         parentFocusSelf();

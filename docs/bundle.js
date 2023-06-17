@@ -2470,6 +2470,9 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
    */
   function focus(e) {
     var _e$focus;
+    if ((e === null || e === void 0 ? void 0 : e.tagName.toUpperCase()) == "TR") {
+      debugger;
+    }
     e === null || e === void 0 ? void 0 : (_e$focus = e.focus) === null || _e$focus === void 0 ? void 0 : _e$focus.call(e);
   }
 
@@ -3064,27 +3067,62 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
   }
 
   /**
+   *
+   * @returns A function that retrieves the stack at the time this hook was called (in development mode only).
+   */
+  function useStack() {
+    const stack = F$1(() => {
+      if (getBuildMode() === 'development') {
+        try {
+          throw new Error();
+        } catch (e) {
+          return e.stack;
+        }
+      }
+      return undefined;
+    }, []);
+    const getStack = T$1(() => stack, []);
+    return getStack;
+  }
+
+  /**
    * Slightly enhanced version of `useState` that includes a getter that remains constant
    * (i.e. you can use it in `useEffect` and friends without it being a dependency).
+   *
+   * If `getBuildMode()` returns `"development"`, then any calls to `setState` will also
+   * take the stack at the time the hook was called and save it to `window._setState_stack`.
+   * Useful if you want to trace whose state is being updated.
    *
    * @param initialState
    * @returns
    */
   function useState(initialState) {
+    const getStack = useStack();
     // We keep both, but overrride the `setState` functionality
     const [state, setStateP] = h(initialState);
     const ref = _(state);
     // Hijack the normal setter function 
     // to also set our ref to the new value
     const setState = T$1(value => {
+      if (getBuildMode() === 'development') {
+        window._setState_stack = getStack();
+      }
       if (typeof value === "function") {
         const callback = value;
         setStateP(prevValue => {
           const nextValue = callback(prevValue);
+          if (ref.current !== nextValue) {
+            // put a breakpoint here if you want
+            ref.current = nextValue;
+          }
           ref.current = nextValue;
           return nextValue;
         });
       } else {
+        if (ref.current !== value) {
+          // put a breakpoint here if you want
+          ref.current = value;
+        }
         ref.current = value;
         setStateP(value);
       }
@@ -3130,7 +3168,9 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         getChildren
       },
       rovingTabIndexParameters: {
+        focusSelfParent: focusSelfParentUnstable,
         untabbable,
+        untabbableBehavior,
         initiallyTabbedIndex,
         onTabbableIndexChange
       },
@@ -3139,6 +3179,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       },
       ...void1
     } = _ref8;
+    const focusSelfParent = useStableCallback(focusSelfParentUnstable);
     const getInitiallyTabbedIndex = useStableGetter(initiallyTabbedIndex);
     const getUntabbable = useStableGetter(untabbable);
     // Override the actual setter to include some extra logic related to avoiding hidden children, 
@@ -3162,7 +3203,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
           //
           // Also TODO: Should these take fromUserInteraction into consideration?
           // Do we always move focus when we become untabbable?
-          if (!parentElement.contains(document.activeElement)) focus(getElement());
+          if (!parentElement.contains(document.activeElement)) focusSelfParent(getElement());
           return null;
         }
         // If the requested index is hidden, then there's no need to focus any elements or run any extra logic.
@@ -3171,7 +3212,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
           // TODO: Find the next/prev element and focus that instead,
           // doable with the `tabbable` library, but it doesn't have a next() function or anything,
           // so that needs to be manually done with a TreeWalker or something?
-          if (!parentElement.contains(document.activeElement)) focus(getElement());
+          if (!parentElement.contains(document.activeElement)) focusSelfParent(getElement());
           return null;
         }
         // If we've made a change, and it was because the user clicked on it or something,
@@ -3237,7 +3278,9 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         (_index = index) !== null && _index !== void 0 ? _index : index = (_getInitiallyTabbedIn = getInitiallyTabbedIndex()) !== null && _getInitiallyTabbedIn !== void 0 ? _getInitiallyTabbedIn : children.getHighestIndex() >= 0 ? 0 : null;
       }
       if (untabbable) {
-        if (document.activeElement != getElement()) focus(getElement());
+        if (document.activeElement != getElement()) {
+          focusSelfParent(getElement());
+        }
       } else if (!untabbable && index != null) {
         var _children$getAt, _children$getAt2, _children$getAt2$focu;
         const element = (_children$getAt = children.getAt(index)) === null || _children$getAt === void 0 ? void 0 : _children$getAt.getElement();
@@ -3251,7 +3294,8 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         return initiallyTabbedIndex !== null && initiallyTabbedIndex !== void 0 ? initiallyTabbedIndex : untabbable ? null : 0;
       }, []),
       reevaluateClosestFit,
-      untabbable
+      untabbable,
+      untabbableBehavior
     });
     return {
       managedChildrenParameters: {
@@ -3285,6 +3329,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       context: {
         rovingTabIndexContext: {
           untabbable: parentIsUntabbable,
+          untabbableBehavior,
           reevaluateClosestFit,
           setTabbableIndex,
           getInitiallyTabbedIndex,
@@ -3301,7 +3346,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       hasCurrentFocusParameters: {
         onCurrentFocusedInnerChanged: useStableCallback((focused, _prevFocused, e) => {
           if (focused) {
-            if (!parentIsUntabbable && !iAmUntabbable) setTabbableIndex(index, e, false);else parentFocusSelf();
+            if (!parentIsUntabbable && !iAmUntabbable || untabbableBehavior == "leave-child-focused") setTabbableIndex(index, e, false);else parentFocusSelf();
           }
         })
       },
@@ -3835,6 +3880,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         untabbable: rowIsUntabbableAndSoAreCells,
         initiallyTabbedIndex,
         onTabbableIndexChange,
+        focusSelfParent,
         ...void4
       },
       info: managedChildParameters,
@@ -3905,6 +3951,8 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       refElementReturn,
       typeaheadNavigationParameters,
       rovingTabIndexParameters: {
+        untabbableBehavior: "leave-child-focused",
+        focusSelfParent,
         untabbable: allChildCellsAreUntabbable || rowIsUntabbableAndSoAreCells,
         initiallyTabbedIndex,
         onTabbableIndexChange
@@ -3918,6 +3966,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       setTabbableIndex
     } = rovingTabIndexReturn;
     const gridNavigationCellContext = useMemoObject({
+      allChildCellsAreUntabbable,
       setTabbableRow,
       getRowIndex: getIndex,
       getCurrentTabbableColumn,
@@ -6867,7 +6916,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         var _getChildren$getAt, _getChildren$getAt2;
         const visible = i >= (paginationMin !== null && paginationMin !== void 0 ? paginationMin : -Infinity) && i < (paginationMax !== null && paginationMax !== void 0 ? paginationMax : Infinity);
         (_getChildren$getAt = getChildren().getAt(indexDemangler(i))) === null || _getChildren$getAt === void 0 ? void 0 : _getChildren$getAt.setPaginationVisible(visible);
-        if (visible) (_getChildren$getAt2 = getChildren().getAt(indexDemangler(i))) === null || _getChildren$getAt2 === void 0 ? void 0 : _getChildren$getAt2.setChildCountIfPaginated(getChildren().getHighestIndex() + 1);
+        if (visible && (paginationMax != null || paginationMin != null)) (_getChildren$getAt2 = getChildren().getAt(indexDemangler(i))) === null || _getChildren$getAt2 === void 0 ? void 0 : _getChildren$getAt2.setChildCountIfPaginated(getChildren().getHighestIndex() + 1);
       }
     }, [/* Must be empty */]);
     p(() => {
@@ -7010,7 +7059,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     }, [/* Must be empty */]), returnNull);
     const [getDisplayedStaggerIndex, setDisplayedStaggerIndex] = usePassiveState(T$1((newIndex, prevIndex) => {
       var _getTargetStaggerInde;
-      if (newIndex == null) {
+      if (newIndex == null || !s.current) {
         return;
       }
       setCurrentlyStaggering(newIndex < ((_getTargetStaggerInde = getTargetStaggerIndex()) !== null && _getTargetStaggerInde !== void 0 ? _getTargetStaggerInde : 0));
@@ -7247,6 +7296,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       },
       rovingTabIndexParameters: {
         initiallyTabbedIndex: singleSelectionParameters.initiallySelectedIndex,
+        untabbableBehavior: "focus-parent",
         ...rovingTabIndexParameters
       },
       singleSelectionParameters,
@@ -8069,6 +8119,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       },
       rovingTabIndexParameters: {
         initiallyTabbedIndex: initiallySelectedIndex,
+        untabbableBehavior: "focus-parent",
         ...rovingTabIndexParameters
       },
       singleSelectionParameters,
@@ -9550,7 +9601,8 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       //managedChildrenReturn: { getChildren },
       rovingTabIndexParameters: {
         onTabbableIndexChange: setTabbableRow,
-        untabbable: false
+        untabbable: false,
+        focusSelfParent: focus
       },
       typeaheadNavigationParameters: {
         collator: null,
@@ -9665,6 +9717,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         navigatePastStart: "wrap"
       },
       rovingTabIndexParameters: {
+        focusSelfParent: focus,
         onTabbableIndexChange: useStableCallback(i => {
           setTabbableColumn(i);
         }),
@@ -9927,7 +9980,8 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     const r = useCompleteListNavigationDeclarative({
       rovingTabIndexParameters: {
         onTabbableIndexChange: null,
-        untabbable
+        untabbable,
+        focusSelfParent: focus
       },
       singleSelectionDeclarativeParameters: {
         selectedIndex,

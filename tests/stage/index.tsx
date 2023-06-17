@@ -7,6 +7,7 @@ import { TestBasesFocus } from "../fixtures/focus.stage.js";
 import { TestBasesListNav } from "../fixtures/list-nav.stage.js";
 import { TestBasesButton } from "../fixtures/press.stage.js";
 import { TestItem, TestingConstants, fromStringBoolean, fromStringNumber } from "../util.js";
+import { TestBasesGridNav } from "../fixtures/grid-nav.stage.js";
 
 
 declare module globalThis {
@@ -86,6 +87,7 @@ const TestBases = {
     "sanity-check": <TestBasesSanityCheck />,
     "press": <TestBasesButton />,
     "list-navigation": <TestBasesListNav />,
+    "grid-navigation": <TestBasesGridNav />,
     "focus": <TestBasesFocus />,
     /*"menu": <TestBasesMenu />,*/
 }

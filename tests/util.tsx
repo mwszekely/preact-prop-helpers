@@ -1,6 +1,7 @@
 import { RenderableProps } from "preact";
 import { StateUpdater, useCallback, useEffect, useLayoutEffect, useRef, useState } from "preact/hooks";
 import { ListNavConstants } from "./fixtures/list-nav.stage.js";
+import { GridNavConstants } from "./fixtures/grid-nav.stage.js";
 import { useForceUpdate, useSearchParamStateDeclarative } from "../dist/index.js";
 import { PressConstants } from "./fixtures/press.stage.js";
 
@@ -8,6 +9,7 @@ import { PressConstants } from "./fixtures/press.stage.js";
 export interface TestingConstants {
     Press: PressConstants;
     ListNav: ListNavConstants;
+    GridNav: GridNavConstants;
 }
 
 type TCP<K extends keyof TestingConstants, K2 extends keyof TestingConstants[K]> = TestingConstants[K][K2] extends (...args: any[]) => any ? Parameters<TestingConstants[K][K2]>[0] : never;

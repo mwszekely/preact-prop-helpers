@@ -3,6 +3,9 @@
  * here:
  */
 export function focus(e) {
+    if (e?.tagName.toUpperCase() == "TR") {
+        debugger;
+    }
     e?.focus?.();
 }
 //# sourceMappingURL=focus.js.map

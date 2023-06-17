@@ -4,5 +4,8 @@
  * here:
  */
 export function focus(e: Element | null) {
+    if (e?.tagName.toUpperCase() == "TR") {
+        debugger;
+    }
     (e as HTMLElement)?.focus?.();
 }

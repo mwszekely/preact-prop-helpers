@@ -1,5 +1,5 @@
 import { useCallback, useContext, useEffect, useRef, useState } from "preact/hooks";
-import { Compare, CompleteListNavigationContext, EventDetail, UseCompleteListNavigationChildInfo, UseSingleSelectionParameters, useCompleteListNavigation, useCompleteListNavigationChild, useCompleteListNavigationDeclarative, useImperativeProps, useMergedProps, useRefElement, useStableCallback, useStableGetter, useStaggeredChildren, useTimeout } from "../../dist/index.js";
+import { Compare, CompleteListNavigationContext, EventDetail, UseCompleteListNavigationChildInfo, UseSingleSelectionParameters, focus, useCompleteListNavigation, useCompleteListNavigationChild, useCompleteListNavigationDeclarative, useImperativeProps, useMergedProps, useRefElement, useStableCallback, useStableGetter, useStaggeredChildren, useTimeout } from "../../dist/index.js";
 import { TestItem, fromStringArray, fromStringBoolean, fromStringNumber, fromStringString, useTestSyncState } from "../util.js";
 import { createContext } from "preact";
 import { LoremIpsum } from "../lorem.js";
@@ -110,7 +110,7 @@ function TestBasesListNavImpl({ ariaPropName, selectedIndex, arrowKeyDirection, 
     } = useCompleteListNavigationDeclarative<HTMLOListElement, HTMLLIElement, UseCompleteListNavigationChildInfo<HTMLLIElement>>({
         linearNavigationParameters: { arrowKeyDirection, disableHomeEndKeys, navigatePastEnd: navigatePastStartEnd, navigatePastStart: navigatePastStartEnd, pageNavigationSize },
         rearrangeableChildrenParameters: { getIndex: useCallback(info => info.props.index, []) },
-        rovingTabIndexParameters: { untabbable, onTabbableIndexChange: null },
+        rovingTabIndexParameters: { untabbable, onTabbableIndexChange: null, focusSelfParent: focus },
         singleSelectionParameters: { ariaPropName, selectionMode },
         singleSelectionDeclarativeParameters: {
             selectedIndex,

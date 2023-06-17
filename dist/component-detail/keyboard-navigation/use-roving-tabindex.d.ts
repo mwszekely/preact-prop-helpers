@@ -37,6 +37,8 @@ export interface UseRovingTabIndexParameters<ParentElement extends Element, Tabb
     refElementReturn: Pick<UseRefElementReturnType<ParentElement>["refElementReturn"], "getElement">;
     /** The only parameters RTI needs directly is the initial index to be tabbable */
     rovingTabIndexParameters: {
+        /** When `untabbable` is true, instead of a child focusing itself, the parent will via this `focusSelf` argument. */
+        focusSelfParent(e: ParentElement | null): void;
         /**
          * This is imperative, not declarative;
          * it is better if we can keep re-renders on the parent to a minimum anyway.
@@ -50,6 +52,15 @@ export interface UseRovingTabIndexParameters<ParentElement extends Element, Tabb
          * This does not actually change the currently tabbable index; if this is set to `false`, the last tabbable child is remembered.
          */
         untabbable: boolean;
+        /**
+         * When the parent is untabbable and a child gains focus via some means, we need to decide what to do.
+         *
+         * Sometimes, it's better to just send focus back to the parent.
+         * Sometimes, it's better to just let the child be focused this one time.
+         *
+         * If `untabbable` is false, then this has no effect.
+         */
+        untabbableBehavior: "focus-parent" | "leave-child-focused";
         /**
          * If you would like to have an event run whenever a new index becomes tabbable
          * (e.g. to call `setState` to render that tabbable index...for some reason...)
@@ -103,6 +114,7 @@ export interface UseRovingTabIndexChildParameters<TabbableChildElement extends E
 export interface RovingTabIndexChildContext {
     rovingTabIndexContext: {
         untabbable: boolean;
+        untabbableBehavior: "focus-parent" | "leave-child-focused";
         parentFocusSelf: () => void;
         setTabbableIndex: SetTabbableIndex;
         getInitiallyTabbedIndex(): number | null;
@@ -170,6 +182,6 @@ export interface UseRovingTabIndexChildReturnType<ChildElement extends Element, 
  * And just as well! Children should be allowed at the root,
  * regardless of if it's the whole app or just a given component.
  */
-export declare function useRovingTabIndex<ParentElement extends Element, ChildElement extends Element, M extends UseRovingTabIndexChildInfo<ChildElement>>({ managedChildrenReturn: { getChildren }, rovingTabIndexParameters: { untabbable, initiallyTabbedIndex, onTabbableIndexChange }, refElementReturn: { getElement }, ...void1 }: UseRovingTabIndexParameters<ParentElement, ChildElement, M>): UseRovingTabIndexReturnType<ParentElement, ChildElement, M>;
-export declare function useRovingTabIndexChild<ChildElement extends Element, M extends UseRovingTabIndexChildInfo<ChildElement>>({ info: { index, untabbable: iAmUntabbable, ...void2 }, context: { rovingTabIndexContext: { untabbable: parentIsUntabbable, reevaluateClosestFit, setTabbableIndex, getInitiallyTabbedIndex, parentFocusSelf } }, ...void3 }: UseRovingTabIndexChildParameters<ChildElement, M>): UseRovingTabIndexChildReturnType<ChildElement, M>;
+export declare function useRovingTabIndex<ParentElement extends Element, ChildElement extends Element, M extends UseRovingTabIndexChildInfo<ChildElement>>({ managedChildrenReturn: { getChildren }, rovingTabIndexParameters: { focusSelfParent: focusSelfParentUnstable, untabbable, untabbableBehavior, initiallyTabbedIndex, onTabbableIndexChange }, refElementReturn: { getElement }, ...void1 }: UseRovingTabIndexParameters<ParentElement, ChildElement, M>): UseRovingTabIndexReturnType<ParentElement, ChildElement, M>;
+export declare function useRovingTabIndexChild<ChildElement extends Element, M extends UseRovingTabIndexChildInfo<ChildElement>>({ info: { index, untabbable: iAmUntabbable, ...void2 }, context: { rovingTabIndexContext: { untabbable: parentIsUntabbable, untabbableBehavior, reevaluateClosestFit, setTabbableIndex, getInitiallyTabbedIndex, parentFocusSelf } }, ...void3 }: UseRovingTabIndexChildParameters<ChildElement, M>): UseRovingTabIndexChildReturnType<ChildElement, M>;
 //# sourceMappingURL=use-roving-tabindex.d.ts.map
