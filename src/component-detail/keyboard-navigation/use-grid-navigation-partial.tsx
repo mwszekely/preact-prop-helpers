@@ -43,7 +43,7 @@ export interface UseGridNavigationRowParameters<RowElement extends Element, Cell
     context: UseGridNavigationRowContext;
     linearNavigationParameters: OmitStrong<UseListNavigationParameters<RowElement, CellElement, CM>["linearNavigationParameters"], "arrowKeyDirection">
     /** (These are the parameters for the row controlling the cells, not any other combination of parent/child/row/cell) */
-    rovingTabIndexParameters: OmitStrong<UseListNavigationParameters<RowElement, CellElement, CM>["rovingTabIndexParameters"], "untabbableBehavior">;
+    rovingTabIndexParameters: OmitStrong<UseListNavigationParameters<RowElement, CellElement, CM>["rovingTabIndexParameters"], "focusSelfParent" | "untabbableBehavior">;
 
 }
 
@@ -159,7 +159,7 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
         gridNavigationRowContext: { setTabbableRow, getCurrentTabbableColumn, setCurrentTabbableColumn }
     },
     linearNavigationParameters,
-    rovingTabIndexParameters: { untabbable: rowIsUntabbableAndSoAreCells, initiallyTabbedIndex, onTabbableIndexChange, focusSelfParent, ...void4 },
+    rovingTabIndexParameters: { untabbable: rowIsUntabbableAndSoAreCells, initiallyTabbedIndex, onTabbableIndexChange, ...void4 },
     info: managedChildParameters,
     managedChildrenReturn,
     refElementReturn,
@@ -215,7 +215,7 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
         managedChildrenReturn, 
         refElementReturn, 
         typeaheadNavigationParameters, 
-        rovingTabIndexParameters: { untabbableBehavior: "leave-child-focused", focusSelfParent, untabbable: allChildCellsAreUntabbable || rowIsUntabbableAndSoAreCells, initiallyTabbedIndex, onTabbableIndexChange }, 
+        rovingTabIndexParameters: { untabbableBehavior: "leave-child-focused", focusSelfParent: whenThisRowIsFocused, untabbable: allChildCellsAreUntabbable || rowIsUntabbableAndSoAreCells, initiallyTabbedIndex, onTabbableIndexChange }, 
         linearNavigationParameters: { arrowKeyDirection: "horizontal", ...linearNavigationParameters } 
     });
 

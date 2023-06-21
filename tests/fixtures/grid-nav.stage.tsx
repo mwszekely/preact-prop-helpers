@@ -187,7 +187,7 @@ function TestBaseGridNavRow({ index }: { index: number }) {
             index
         },
         linearNavigationParameters: { disableHomeEndKeys: false, navigatePastEnd: "wrap", navigatePastStart: "wrap" },
-        rovingTabIndexParameters: { initiallyTabbedIndex: 0, untabbable: false, onTabbableIndexChange: null, focusSelfParent: focus },
+        rovingTabIndexParameters: { initiallyTabbedIndex: 0, untabbable: false, onTabbableIndexChange: null },
         typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000 },
         sortableChildParameters: { getSortValue: getTextContent },
         textContentParameters: { getText: getTextContent }

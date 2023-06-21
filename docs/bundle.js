@@ -3880,7 +3880,6 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         untabbable: rowIsUntabbableAndSoAreCells,
         initiallyTabbedIndex,
         onTabbableIndexChange,
-        focusSelfParent,
         ...void4
       },
       info: managedChildParameters,
@@ -3952,7 +3951,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       typeaheadNavigationParameters,
       rovingTabIndexParameters: {
         untabbableBehavior: "leave-child-focused",
-        focusSelfParent,
+        focusSelfParent: whenThisRowIsFocused,
         untabbable: allChildCellsAreUntabbable || rowIsUntabbableAndSoAreCells,
         initiallyTabbedIndex,
         onTabbableIndexChange
@@ -9717,7 +9716,6 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         navigatePastStart: "wrap"
       },
       rovingTabIndexParameters: {
-        focusSelfParent: focus,
         onTabbableIndexChange: useStableCallback(i => {
           setTabbableColumn(i);
         }),
