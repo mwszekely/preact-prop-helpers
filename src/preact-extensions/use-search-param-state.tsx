@@ -59,7 +59,12 @@ function unparseParam<Key extends keyof SearchParamStates, T = SearchParamStates
 
 export interface UseSearchParamStateParameters<Key extends keyof SearchParamStates, T = SearchParamStates[Key]> {
     key: Key;
+    /** If there is no valu in the URL for this state, then `initialValue` will be used instead. */
     initialValue: T;
+    /** 
+     * How is the user's history modified when the state changes if not otherwise specified? 
+     * "`replace`" is recommended unless you *really* have a good reason to clog up the back button. 
+     */
     defaultReason?: "push" | "replace";
     onValueChange?: OnParamValueChanged<T> | null | undefined;
     stringToValue: ((value: string | null) => T | null);
@@ -96,7 +101,7 @@ export function useSearchParamState<Key extends keyof SearchParamStates>({ key: 
     // because changing it is actually an asyncronous operation
     // and we can't know when it ends aside from just "did the URL change or not"
     // so we might as well keep this state around locally to compensate.
-    const savedParamValue = useRef(initialValue);
+    const savedParamValue = useRef(parseParam<Key, T>(null, paramKey, stringToValue) ?? initialValue);
     const [getSavedParamValue, setSavedParamValue] = usePassiveState<T, never>(onValueChange, useStableCallback(() => {
         return savedParamValue.current = (parseParam<Key, T>(null, paramKey, stringToValue) ?? getInitialValue());
     }), runImmediately);

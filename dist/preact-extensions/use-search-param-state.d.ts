@@ -20,7 +20,12 @@ export interface SearchParamStates {
 }
 export interface UseSearchParamStateParameters<Key extends keyof SearchParamStates, T = SearchParamStates[Key]> {
     key: Key;
+    /** If there is no valu in the URL for this state, then `initialValue` will be used instead. */
     initialValue: T;
+    /**
+     * How is the user's history modified when the state changes if not otherwise specified?
+     * "`replace`" is recommended unless you *really* have a good reason to clog up the back button.
+     */
     defaultReason?: "push" | "replace";
     onValueChange?: OnParamValueChanged<T> | null | undefined;
     stringToValue: ((value: string | null) => T | null);

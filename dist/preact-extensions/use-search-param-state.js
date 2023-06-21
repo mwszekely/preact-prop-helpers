@@ -54,7 +54,7 @@ export function useSearchParamState({ key: paramKey, defaultReason, stringToValu
     // because changing it is actually an asyncronous operation
     // and we can't know when it ends aside from just "did the URL change or not"
     // so we might as well keep this state around locally to compensate.
-    const savedParamValue = useRef(initialValue);
+    const savedParamValue = useRef(parseParam(null, paramKey, stringToValue) ?? initialValue);
     const [getSavedParamValue, setSavedParamValue] = usePassiveState(onValueChange, useStableCallback(() => {
         return savedParamValue.current = (parseParam(null, paramKey, stringToValue) ?? getInitialValue());
     }), runImmediately);
