@@ -38,6 +38,7 @@ import { monitorCallCount } from "../../util/use-call-count.js";
 export function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovingTabIndexParameters: { focusSelfParent: focusSelfParentUnstable, untabbable, untabbableBehavior, initiallyTabbedIndex, onTabbableIndexChange }, refElementReturn: { getElement }, ...void1 }) {
     monitorCallCount(useRovingTabIndex);
     const focusSelfParent = useStableCallback(focusSelfParentUnstable);
+    untabbableBehavior ||= "focus-parent";
     assertEmptyObject(void1);
     const getInitiallyTabbedIndex = useStableGetter(initiallyTabbedIndex);
     const getUntabbable = useStableGetter(untabbable);
@@ -63,7 +64,7 @@ export function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovi
                 //
                 // Also TODO: Should these take fromUserInteraction into consideration?
                 // Do we always move focus when we become untabbable?
-                if (!parentElement.contains(document.activeElement))
+                if (!parentElement.contains(document.activeElement) && untabbableBehavior != 'leave-child-focused')
                     focusSelfParent(getElement());
                 return null;
             }
@@ -73,7 +74,7 @@ export function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovi
                 // TODO: Find the next/prev element and focus that instead,
                 // doable with the `tabbable` library, but it doesn't have a next() function or anything,
                 // so that needs to be manually done with a TreeWalker or something?
-                if (!parentElement.contains(document.activeElement))
+                if (!parentElement.contains(document.activeElement) && untabbableBehavior != 'leave-child-focused')
                     focusSelfParent(getElement());
                 return null;
             }
@@ -133,7 +134,7 @@ export function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovi
             index ??= getInitiallyTabbedIndex() ?? (children.getHighestIndex() >= 0 ? 0 : null);
         }
         if (untabbable) {
-            if (document.activeElement != getElement()) {
+            if (document.activeElement != getElement() && untabbableBehavior != 'leave-child-focused') {
                 focusSelfParent(getElement());
             }
         }
@@ -178,7 +179,7 @@ export function useRovingTabIndexChild({ info: { index, untabbable: iAmUntabbabl
         hasCurrentFocusParameters: {
             onCurrentFocusedInnerChanged: useStableCallback((focused, _prevFocused, e) => {
                 if (focused) {
-                    if ((!parentIsUntabbable && !iAmUntabbable) || untabbableBehavior == "leave-child-focused")
+                    if ((!parentIsUntabbable && !iAmUntabbable) || untabbableBehavior != "focus-parent")
                         setTabbableIndex(index, e, false);
                     else
                         parentFocusSelf();

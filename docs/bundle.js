@@ -3180,6 +3180,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       ...void1
     } = _ref8;
     const focusSelfParent = useStableCallback(focusSelfParentUnstable);
+    untabbableBehavior || (untabbableBehavior = "focus-parent");
     const getInitiallyTabbedIndex = useStableGetter(initiallyTabbedIndex);
     const getUntabbable = useStableGetter(untabbable);
     // Override the actual setter to include some extra logic related to avoiding hidden children, 
@@ -3203,7 +3204,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
           //
           // Also TODO: Should these take fromUserInteraction into consideration?
           // Do we always move focus when we become untabbable?
-          if (!parentElement.contains(document.activeElement)) focusSelfParent(getElement());
+          if (!parentElement.contains(document.activeElement) && untabbableBehavior != 'leave-child-focused') focusSelfParent(getElement());
           return null;
         }
         // If the requested index is hidden, then there's no need to focus any elements or run any extra logic.
@@ -3212,7 +3213,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
           // TODO: Find the next/prev element and focus that instead,
           // doable with the `tabbable` library, but it doesn't have a next() function or anything,
           // so that needs to be manually done with a TreeWalker or something?
-          if (!parentElement.contains(document.activeElement)) focusSelfParent(getElement());
+          if (!parentElement.contains(document.activeElement) && untabbableBehavior != 'leave-child-focused') focusSelfParent(getElement());
           return null;
         }
         // If we've made a change, and it was because the user clicked on it or something,
@@ -3278,7 +3279,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         (_index = index) !== null && _index !== void 0 ? _index : index = (_getInitiallyTabbedIn = getInitiallyTabbedIndex()) !== null && _getInitiallyTabbedIn !== void 0 ? _getInitiallyTabbedIn : children.getHighestIndex() >= 0 ? 0 : null;
       }
       if (untabbable) {
-        if (document.activeElement != getElement()) {
+        if (document.activeElement != getElement() && untabbableBehavior != 'leave-child-focused') {
           focusSelfParent(getElement());
         }
       } else if (!untabbable && index != null) {
@@ -3346,7 +3347,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       hasCurrentFocusParameters: {
         onCurrentFocusedInnerChanged: useStableCallback((focused, _prevFocused, e) => {
           if (focused) {
-            if (!parentIsUntabbable && !iAmUntabbable || untabbableBehavior == "leave-child-focused") setTabbableIndex(index, e, false);else parentFocusSelf();
+            if (!parentIsUntabbable && !iAmUntabbable || untabbableBehavior != "focus-parent") setTabbableIndex(index, e, false);else parentFocusSelf();
           }
         })
       },

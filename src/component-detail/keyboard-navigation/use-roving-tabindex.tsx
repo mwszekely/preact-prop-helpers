@@ -242,6 +242,7 @@ export function useRovingTabIndex<ParentElement extends Element, ChildElement ex
 }: UseRovingTabIndexParameters<ParentElement, ChildElement, M>): UseRovingTabIndexReturnType<ParentElement, ChildElement, M> {
     monitorCallCount(useRovingTabIndex);
     const focusSelfParent = useStableCallback(focusSelfParentUnstable);
+    untabbableBehavior ||= "focus-parent";
 
     assertEmptyObject(void1);
 
@@ -274,7 +275,7 @@ export function useRovingTabIndex<ParentElement extends Element, ChildElement ex
                 //
                 // Also TODO: Should these take fromUserInteraction into consideration?
                 // Do we always move focus when we become untabbable?
-                if (!parentElement!.contains(document.activeElement))
+                if (!parentElement!.contains(document.activeElement) && untabbableBehavior != 'leave-child-focused')
                     focusSelfParent(getElement());
                 return null;
             }
@@ -285,7 +286,7 @@ export function useRovingTabIndex<ParentElement extends Element, ChildElement ex
                 // TODO: Find the next/prev element and focus that instead,
                 // doable with the `tabbable` library, but it doesn't have a next() function or anything,
                 // so that needs to be manually done with a TreeWalker or something?
-                if (!parentElement!.contains(document.activeElement))
+                if (!parentElement!.contains(document.activeElement) && untabbableBehavior != 'leave-child-focused')
                     focusSelfParent(getElement());
                 return null;
             }
@@ -355,7 +356,7 @@ export function useRovingTabIndex<ParentElement extends Element, ChildElement ex
         }
 
         if (untabbable) {
-            if (document.activeElement != getElement()) {
+            if (document.activeElement != getElement() && untabbableBehavior != 'leave-child-focused') {
                 focusSelfParent(getElement());
             }
         }
@@ -413,7 +414,7 @@ export function useRovingTabIndexChild<ChildElement extends Element, M extends U
             onCurrentFocusedInnerChanged: useStableCallback((focused: boolean, _prevFocused: boolean | undefined, e) => {
                 if (focused) {
 
-                    if ((!parentIsUntabbable && !iAmUntabbable) || untabbableBehavior == "leave-child-focused")
+                    if ((!parentIsUntabbable && !iAmUntabbable) || untabbableBehavior != "focus-parent")
                         setTabbableIndex(index, e, false);
                     else
                         parentFocusSelf();
