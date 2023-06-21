@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "packageManager": "pnpm@8.5.1",
+  "packageManager": "pnpm@8.6.3",
   "scripts": {
     "build": "npx npm-run-all --npm-path npm -pc build:sass build:js",
     "watch": "npx npm-run-all --npm-path npm -s build watch-impl",
@@ -19,19 +19,20 @@
   "keywords": [],
   "author": "",
   "dependencies": {
-    "@axe-core/playwright": "^4.7.0",
-    "@babel/core": "^7.21.8",
-    "@babel/preset-env": "^7.21.5",
+    "@axe-core/playwright": "^4.7.3",
+    "@babel/core": "^7.22.5",
+    "@babel/plugin-proposal-nullish-coalescing-operator": "^7.18.6",
+    "@babel/preset-env": "^7.22.5",
     "@rollup/plugin-alias": "^5.0.0",
     "@rollup/plugin-babel": "^6.0.3",
-    "@rollup/plugin-commonjs": "^24.1.0",
-    "@rollup/plugin-node-resolve": "^15.0.2",
+    "@rollup/plugin-commonjs": "^25.0.2",
+    "@rollup/plugin-node-resolve": "^15.1.0",
     "@rollup/plugin-replace": "^5.0.2",
-    "@rollup/plugin-typescript": "^11.1.0",
-    "rollup": "^3.21.5",
+    "@rollup/plugin-typescript": "^11.1.1",
+    "rollup": "^3.25.1",
     "rollup-plugin-sourcemaps": "^0.6.3",
-    "sass": "^1.62.1",
+    "sass": "^1.63.5",
     "serve": "^14.2.0",
-    "tslib": "^2.5.0"
+    "tslib": "^2.5.3"
   }
 }
