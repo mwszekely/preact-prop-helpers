@@ -20,6 +20,6 @@ function getBuildModeUnmemoized() {
     }
 }
 export function getBuildMode() {
-    return cached ??= (getBuildModeUnmemoized());
+    return cached ||= (getBuildModeUnmemoized());
 }
 //# sourceMappingURL=mode.js.map

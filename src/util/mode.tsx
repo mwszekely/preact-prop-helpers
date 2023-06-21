@@ -31,5 +31,5 @@ function getBuildModeUnmemoized(): "production" | "development" {
 }
 
 export function getBuildMode() {
-    return cached ??= (getBuildModeUnmemoized());
+    return cached ||= (getBuildModeUnmemoized());
 }

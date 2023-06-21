@@ -789,8 +789,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     }
   }
   function getBuildMode() {
-    var _cached;
-    return (_cached = cached) !== null && _cached !== void 0 ? _cached : cached = getBuildModeUnmemoized();
+    return cached || (cached = getBuildModeUnmemoized());
   }
 
   /** Detect free variable `global` from Node.js. */
@@ -2464,6 +2463,24 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       if (lv instanceof Promise || rv instanceof Promise) return Promise.all([lv, rv]);
     };
   }
+  function generateStack() {
+    if (getBuildMode() === 'development') {
+      try {
+        throw new Error();
+      } catch (e) {
+        return e.stack;
+      }
+    }
+    return undefined;
+  }
+  /**
+   * @returns A function that retrieves the stack at the time this hook was called (in development mode only).
+   */
+  function useStack() {
+    const stack = F$1(generateStack, []);
+    const getStack = T$1(() => stack, []);
+    return getStack;
+  }
 
   /**
    * If you want a single place to put a debugger for tracking focus,
@@ -2471,8 +2488,9 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
    */
   function focus(e) {
     var _e$focus;
-    if ((e === null || e === void 0 ? void 0 : e.tagName.toUpperCase()) == "TR") {
-      debugger;
+    if (getBuildMode() === 'development' && window.LOG_FOCUS_CHANGES === true) {
+      console.log("Focus changed to ".concat(((e === null || e === void 0 ? void 0 : e.tagName) || "").toLowerCase().padStart(6), ":"), e);
+      console.log(generateStack());
     }
     e === null || e === void 0 ? void 0 : (_e$focus = e.focus) === null || _e$focus === void 0 ? void 0 : _e$focus.call(e);
   }
@@ -3065,25 +3083,6 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       reevaluateClosestFit,
       getCurrentIndex
     };
-  }
-
-  /**
-   *
-   * @returns A function that retrieves the stack at the time this hook was called (in development mode only).
-   */
-  function useStack() {
-    const stack = F$1(() => {
-      if (getBuildMode() === 'development') {
-        try {
-          throw new Error();
-        } catch (e) {
-          return e.stack;
-        }
-      }
-      return undefined;
-    }, []);
-    const getStack = T$1(() => stack, []);
-    return getStack;
   }
 
   /**
