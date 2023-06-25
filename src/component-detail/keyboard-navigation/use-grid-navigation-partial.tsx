@@ -36,7 +36,7 @@ export interface UseGridNavigationRowContext extends UseListNavigationContext {
 
 export interface UseGridNavigationRowParameters<RowElement extends Element, CellElement extends Element, RM extends GridChildRowInfo<RowElement, CellElement>, CM extends GridChildCellInfo<CellElement>> extends
     OmitStrong<UseListNavigationChildParameters<RowElement, RM>, "context">,
-    OmitStrong<UseListNavigationParameters<RowElement, CellElement, CM>, "rovingTabIndexParameters" | "linearNavigationParameters"> {
+    OmitStrong<UseListNavigationParameters<RowElement, CellElement, CM>, "refElementReturn" | "rovingTabIndexParameters" | "linearNavigationParameters"> {
 
     managedChildrenReturn: Pick<UseManagedChildrenReturnType<CM>["managedChildrenReturn"], "getChildren">;
     context: UseGridNavigationRowContext;

@@ -60,7 +60,7 @@ export { UseIntervalParameters, useInterval } from "./timing/use-interval.js";
 export { UseTimeoutParameters, useTimeout } from "./timing/use-timeout.js";
 export { assertEmptyObject } from "./util/assert.js";
 export { EnhancedEventHandler, EventDetail, TargetedEnhancedEvent, enhanceEvent } from "./util/event.js";
-export { focus } from "./util/focus.js";
+export { findBackupFocus, focus } from "./util/focus.js";
 export { getBuildMode } from "./util/mode.js";
 export { generateRandomId } from "./util/random-id.js";
 export { useStack } from "./util/stack.js";

@@ -30,7 +30,7 @@ const Context = createContext<CompleteListNavigationContext<HTMLOListElement, HT
 
 export function TestBasesListNav() {
     const [mounted] = useTestSyncState("ListNav", "setMounted", true, fromStringBoolean);
-    const [childCount] = useTestSyncState("ListNav", "setChildCount", DefaultChildCount, fromStringNumber);
+    const [childCount, setChildCount] = useTestSyncState("ListNav", "setChildCount", DefaultChildCount, fromStringNumber);
     const [arrowKeyDirection] = useTestSyncState("ListNav", "setArrowKeyDirection", "vertical", fromStringString);
     const [pagination, setPagination] = useTestSyncState("ListNav", "setPagination", null, fromStringArray(fromStringNumber));
     const [disableHomeEndKeys] = useTestSyncState("ListNav", "setDisableHomeEndKeys", false, fromStringBoolean);
@@ -44,7 +44,6 @@ export function TestBasesListNav() {
     const [typeaheadTimeout] = useTestSyncState("ListNav", "setTypeaheadTimeout", 1000, fromStringNumber);
     const [selectionMode] = useTestSyncState("ListNav", "setSelectionMode", "activation", fromStringString);
     const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
-    console.log(pagination);
 
     const a = { untabbable, staggered, collatorId, noTypeahead, typeaheadTimeout, selectionMode }
 

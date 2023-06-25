@@ -111,13 +111,13 @@ export function useManagedChildren(parentParameters) {
                 mounts: new Set(),
                 unmounts: new Set(),
             };
-            if (onChildrenCountChange || onChildrenMountChange) {
-                debounceRendering(() => {
+            debounceRendering(() => {
+                if (onChildrenCountChange || onChildrenMountChange) {
                     onChildrenMountChange?.(hasRemoteULEChildMounted.current.mounts, hasRemoteULEChildMounted.current.unmounts);
                     onChildrenCountChange?.(getChildren().getHighestIndex() + 1);
                     hasRemoteULEChildMounted.current = null;
-                });
-            }
+                }
+            });
         }
         if (mounted) {
             if (typeof index == "number")
@@ -137,7 +137,7 @@ export function useManagedChildren(parentParameters) {
             if (typeof index == "number")
                 managedChildrenArray.current.highestIndex = managedChildrenArray.current.arr.length - 1;
         }
-        hasRemoteULEChildMounted.current[mounted ? "mounts" : "unmounts"].add(index);
+        hasRemoteULEChildMounted?.current?.[mounted ? "mounts" : "unmounts"]?.add?.(index);
     }, [ /* Must remain stable */]);
     const managedChildren = useMemoObject({
         ...{ _: managedChildrenArray.current },
@@ -217,7 +217,7 @@ export function useManagedChild({ context, info }) {
  * @param param0
  * @returns
  */
-export function useChildrenFlag({ getChildren, initialIndex, closestFit, onIndexChange, getAt, setAt, isValid }) {
+export function useChildrenFlag({ getChildren, initialIndex, closestFit, onClosestFit, onIndexChange, getAt, setAt, isValid }) {
     useEnsureStability("useChildrenFlag", onIndexChange, getAt, setAt, isValid);
     // TODO (maybe?): Even if there is an initial index, it's not set until mount. Is that fine?
     const [getCurrentIndex, setCurrentIndex] = usePassiveState(onIndexChange);
@@ -240,6 +240,9 @@ export function useChildrenFlag({ getChildren, initialIndex, closestFit, onIndex
         });
         return closestIndex;
     }, [ /* Must remain stable! */]);
+    if (closestFit) {
+        console.assert(onClosestFit != null, "When closestFit is used, onClosestFit must be provided");
+    }
     // Any time a child mounts/unmounts, we need to double-check to see if that affects 
     // the "currently selected" (or whatever) index.  The two cases we're looking for:
     // 1. The currently selected child unmounted
@@ -259,6 +262,10 @@ export function useChildrenFlag({ getChildren, initialIndex, closestFit, onIndex
                 const closestFitChild = children.getAt(closestFitIndex);
                 console.assert(closestFitChild != null, "Internal logic???");
                 setAt(closestFitChild, true, closestFitIndex, currentIndex);
+                onClosestFit(closestFitIndex);
+            }
+            else {
+                onClosestFit(null);
             }
         }
     });

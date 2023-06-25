@@ -78,7 +78,7 @@ export function useListNavigation({ linearNavigationParameters, typeaheadNavigat
 }
 export function useListNavigationChild({ info, context, refElementReturn, textContentParameters, ...void2 }) {
     monitorCallCount(useListNavigationChild);
-    const { props, ...rticr } = useRovingTabIndexChild({ context, info });
+    const { props, ...rticr } = useRovingTabIndexChild({ context, info, refElementReturn });
     const { ...tncr } = useTypeaheadNavigationChild({ refElementReturn, textContentParameters, context, info });
     assertEmptyObject(void2);
     return {

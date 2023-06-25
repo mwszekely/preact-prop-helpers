@@ -1,7 +1,7 @@
-import { Page, expect } from '@playwright/test';
-import { test } from "./list-nav.fixture.js"
+import { expect } from '@playwright/test';
 import { LoremIpsum } from '../lorem.js';
-import { DefaultChildCount, DisabledIndex, HiddenIndex, MissingIndex } from './list-nav.constants.js';
+import { DisabledIndex, HiddenIndex, MissingIndex } from './list-nav.constants.js';
+import { test } from "./list-nav.fixture.js";
 
 
 
@@ -50,6 +50,42 @@ test("Navigation", async ({ page, listNav, shared: { getRenderCount } }) => {
         await page.keyboard.type(LoremIpsum[HiddenIndex - 1]);
         await expect(page.locator("li").nth(HiddenIndex - 1), `Typeahead should work as expected`).toBeFocused();
     });
+});
+
+
+test("Child mounting/unmounting", async ({ page, listNav: { list }, shared: { run, install, focusableFirst, focusableLast } }) => {
+    let count = 10;
+    await run("ListNav", "setChildCount", count);
+    await page.locator("li").nth(count - 1).focus();
+
+    // Ensure that as we decrease the # of children,
+    // focus is managed properly and never gets sent to the body.
+    for (let c = count - 1; c >= 0; --c) {
+        await run("ListNav", "setChildCount", c);
+        let next = c - 1;
+        if (next == MissingIndex || next == HiddenIndex)
+            next -= 1;
+        if (next == -1)
+            await expect.soft(focusableLast).toBeFocused();
+        else
+            await expect(page.locator("li").nth(next)).toBeFocused();
+    }
+
+    // That should still happen even if it's not decremented one by one
+    count = 10;
+    await run("ListNav", "setChildCount", count);
+    await page.locator("li").nth(count - 1).focus();
+
+    await run("ListNav", "setChildCount", 0);
+    await expect.soft(focusableLast).toBeFocused();
+
+    // Focus shouldn't move if it wasn't within the list
+    count = 10;
+    await run("ListNav", "setChildCount", count);
+    await focusableFirst.focus();
+
+    await run("ListNav", "setChildCount", 0);
+    await focusableFirst.focus();
 });
 
 test("Untabbability works", async ({ page, listNav, shared: { run, install } }) => {
@@ -143,7 +179,7 @@ test("Selection", async ({ page, listNav, shared: { run, install } }) => {
     await expect(listNav.list.locator(`li:first-child`).first()).toHaveAttribute("aria-selected", "true");
 });
 
-test("Pagination", async ({ page, listNav, shared: { focusableFirst, focusableLast, install, run }}) => {
+test("Pagination", async ({ page, listNav, shared: { focusableFirst, focusableLast, install, run } }) => {
     let count = 200;
     let max = count - 1;  // There's always one "missing" list item that will never have any of the attributes we're looking for.
     await expect(focusableFirst).toBeFocused();
@@ -173,7 +209,7 @@ test("Pagination", async ({ page, listNav, shared: { focusableFirst, focusableLa
     await expect(listNav.list.locator("li").nth(19), "Pressing down should keep the focus on the last list item within the paginated range").toBeFocused();
     await page.keyboard.press("ArrowUp");
     await expect(listNav.list.locator("li").nth(18), "Pressing up should keep focus on the topmost list item").toBeFocused();
-    
+
     await run("ListNav", "setPagination", [20, 30]);
     await expect(listNav.list.locator("li:nth-child(15)")).toHaveAttribute("data-hide-because-paginated", "true");
     await expect(listNav.list.locator("li:nth-child(25)")).toHaveAttribute("data-hide-because-paginated", "false");

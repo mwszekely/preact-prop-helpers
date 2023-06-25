@@ -131,6 +131,7 @@ export interface UseChildrenFlagParameters<M extends ManagedChildInfo<any>, R> {
      * while the parent thinks it shouldn't be could cause issues.
      */
     closestFit: boolean;
+    onClosestFit: ((newFit: number | null) => void) | null;
     getChildren(): ManagedChildren<M>;
     /**
      * Called whenever a new index is selected.
@@ -181,6 +182,6 @@ export interface UseChildrenFlagReturnType<M extends ManagedChildInfo<any>, R> {
  * @param param0
  * @returns
  */
-export declare function useChildrenFlag<M extends ManagedChildInfo<number | string>, R>({ getChildren, initialIndex, closestFit, onIndexChange, getAt, setAt, isValid }: UseChildrenFlagParameters<M, R>): UseChildrenFlagReturnType<M, R>;
+export declare function useChildrenFlag<M extends ManagedChildInfo<number | string>, R>({ getChildren, initialIndex, closestFit, onClosestFit, onIndexChange, getAt, setAt, isValid }: UseChildrenFlagParameters<M, R>): UseChildrenFlagReturnType<M, R>;
 export {};
 //# sourceMappingURL=use-managed-children.d.ts.map

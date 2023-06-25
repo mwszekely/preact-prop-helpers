@@ -31,7 +31,8 @@ export function useSingleSelection({ managedChildrenReturn: { getChildren }, rov
         getAt: getSelectedAt,
         setAt: setSelectedAt,
         isValid: isSelectedValid,
-        closestFit: false
+        closestFit: false,
+        onClosestFit: null
     });
     return {
         singleSelectionReturn: useMemoObject({

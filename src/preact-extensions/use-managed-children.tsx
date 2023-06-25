@@ -255,13 +255,13 @@ export function useManagedChildren<M extends ManagedChildInfo<string | number>>(
                 mounts: new Set(),
                 unmounts: new Set(),
             };
-            if (onChildrenCountChange || onChildrenMountChange) {
-                debounceRendering(() => {
+            debounceRendering(() => {
+                if (onChildrenCountChange || onChildrenMountChange) {
                     onChildrenMountChange?.(hasRemoteULEChildMounted.current!.mounts, hasRemoteULEChildMounted.current!.unmounts);
                     onChildrenCountChange?.(getChildren().getHighestIndex() + 1);
                     hasRemoteULEChildMounted.current = null;
-                });
-            }
+                }
+            });
         }
 
         if (mounted) {
@@ -284,7 +284,7 @@ export function useManagedChildren<M extends ManagedChildInfo<string | number>>(
                 managedChildrenArray.current.highestIndex = managedChildrenArray.current.arr.length - 1;
         }
 
-        hasRemoteULEChildMounted.current[mounted ? "mounts" : "unmounts"].add(index);
+        hasRemoteULEChildMounted?.current?.[mounted ? "mounts" : "unmounts"]?.add?.(index);
     }, [/* Must remain stable */]);
 
 
@@ -382,6 +382,8 @@ export interface UseChildrenFlagParameters<M extends ManagedChildInfo<any>, R> {
      */
     closestFit: boolean;
 
+    onClosestFit: ((newFit: number | null)=> void) | null;
+
     getChildren(): ManagedChildren<M>;
 
 
@@ -438,7 +440,7 @@ export interface UseChildrenFlagReturnType<M extends ManagedChildInfo<any>, R> {
  * @param param0 
  * @returns 
  */
-export function useChildrenFlag<M extends ManagedChildInfo<number | string>, R>({ getChildren, initialIndex, closestFit, onIndexChange, getAt, setAt, isValid }: UseChildrenFlagParameters<M, R>): UseChildrenFlagReturnType<M, R> {
+export function useChildrenFlag<M extends ManagedChildInfo<number | string>, R>({ getChildren, initialIndex, closestFit, onClosestFit, onIndexChange, getAt, setAt, isValid }: UseChildrenFlagParameters<M, R>): UseChildrenFlagReturnType<M, R> {
     useEnsureStability("useChildrenFlag", onIndexChange, getAt, setAt, isValid);
 
     // TODO (maybe?): Even if there is an initial index, it's not set until mount. Is that fine?
@@ -466,6 +468,10 @@ export function useChildrenFlag<M extends ManagedChildInfo<number | string>, R>(
         return closestIndex;
     }, [/* Must remain stable! */]);
 
+    if (closestFit) {
+        console.assert(onClosestFit != null, "When closestFit is used, onClosestFit must be provided")
+    }
+
     // Any time a child mounts/unmounts, we need to double-check to see if that affects 
     // the "currently selected" (or whatever) index.  The two cases we're looking for:
     // 1. The currently selected child unmounted
@@ -487,6 +493,10 @@ export function useChildrenFlag<M extends ManagedChildInfo<number | string>, R>(
                 const closestFitChild = children.getAt(closestFitIndex)!;
                 console.assert(closestFitChild != null, "Internal logic???");
                 setAt(closestFitChild, true, closestFitIndex, currentIndex);
+                onClosestFit!(closestFitIndex);
+            }
+            else {
+                onClosestFit!(null);
             }
 
         }

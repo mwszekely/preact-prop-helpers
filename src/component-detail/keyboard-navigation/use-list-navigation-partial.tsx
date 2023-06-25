@@ -129,7 +129,7 @@ export function useListNavigationChild<ChildElement extends Element, M extends U
 }: UseListNavigationChildParameters<ChildElement, M>): UseListNavigationChildReturnType<ChildElement, M> {
     monitorCallCount(useListNavigationChild);
 
-    const { props, ...rticr } = useRovingTabIndexChild<ChildElement, M>({ context, info });
+    const { props, ...rticr } = useRovingTabIndexChild<ChildElement, M>({ context, info, refElementReturn });
     const { ...tncr } = useTypeaheadNavigationChild<ChildElement, M>({ refElementReturn, textContentParameters, context, info });
 
     assertEmptyObject(void2);
