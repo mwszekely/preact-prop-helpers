@@ -12,9 +12,9 @@ import { useManagedChild, useManagedChildren } from "../preact-extensions/use-ma
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useMemoObject } from "../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../util/assert.js";
+import { enhanceEvent } from "../util/event.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 import { usePress } from "./use-press.js";
-import { enhanceEvent } from "../util/event.js";
 /**
  * All the list-related hooks combined into one giant hook that encapsulates everything.
  *

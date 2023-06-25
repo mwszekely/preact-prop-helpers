@@ -1,4 +1,5 @@
 import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
+import { Nullable } from "../util/types.js";
 import { UseActiveElementParameters, UseActiveElementReturnType } from "./use-active-element.js";
 export interface UseHasLastFocusParameters<T extends Node> extends UseActiveElementParameters {
     refElementReturn: Pick<UseRefElementReturnType<T>["refElementReturn"], "getElement">;
@@ -8,11 +9,11 @@ export interface UseHasLastFocusParameters<T extends Node> extends UseActiveElem
          *
          * This is always `true` while `focused` is `true`. If `focused` is `false`, this may be `true` or `false`.
          */
-        onLastFocusedChanged?: undefined | null | ((focused: boolean, prevFocused: boolean | undefined) => void);
+        onLastFocusedChanged?: Nullable<((focused: boolean, prevFocused: boolean | undefined) => void)>;
         /**
          * Combines the implications of `onFocusedChanged` and `onFocusedChanged`.
          */
-        onLastFocusedInnerChanged?: undefined | null | ((focused: boolean, prevFocused: boolean | undefined) => void);
+        onLastFocusedInnerChanged?: Nullable<((focused: boolean, prevFocused: boolean | undefined) => void)>;
     };
 }
 export interface UseHasLastFocusReturnType extends UseActiveElementReturnType {

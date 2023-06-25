@@ -3,6 +3,7 @@ import { useCallback, useEffect } from "preact/hooks";
 import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
 import { returnFalse, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { assertEmptyObject } from "../util/assert.js";
+import { Nullable } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 import { UseActiveElementParameters, UseActiveElementReturnType, useActiveElement } from "./use-active-element.js";
 
@@ -15,12 +16,12 @@ export interface UseHasLastFocusParameters<T extends Node> extends UseActiveElem
          * 
          * This is always `true` while `focused` is `true`. If `focused` is `false`, this may be `true` or `false`.
          */
-        onLastFocusedChanged?: undefined | null | ((focused: boolean, prevFocused: boolean | undefined) => void);
+        onLastFocusedChanged?: Nullable<((focused: boolean, prevFocused: boolean | undefined) => void)>;
 
         /**
          * Combines the implications of `onFocusedChanged` and `onFocusedChanged`.
          */
-        onLastFocusedInnerChanged?: undefined | null | ((focused: boolean, prevFocused: boolean | undefined) => void);
+        onLastFocusedInnerChanged?: Nullable<((focused: boolean, prevFocused: boolean | undefined) => void)>;
     }
 }
 

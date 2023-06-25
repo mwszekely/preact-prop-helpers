@@ -1,7 +1,7 @@
 import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
 import { UseActiveElementParameters } from "../observers/use-active-element.js";
-import { ElementProps } from "../util/types.js";
 import { EnhancedEventHandler } from "../util/event.js";
+import { ElementProps, Nullable } from "../util/types.js";
 export interface UseEscapeDismissParameters<PopupElement extends Element> {
     refElementPopupReturn: Pick<UseRefElementReturnType<PopupElement>["refElementReturn"], "getElement">;
     escapeDismissParameters: {
@@ -54,7 +54,7 @@ export interface UseLostFocusDismissParameters<SourceElement extends Element | n
         open: boolean;
         onClose(): void;
     };
-    refElementSourceReturn: null | Pick<UseRefElementReturnType<NonNullable<SourceElement>>["refElementReturn"], "getElement">;
+    refElementSourceReturn: Nullable<Pick<UseRefElementReturnType<NonNullable<SourceElement>>["refElementReturn"], "getElement">>;
     refElementPopupReturn: Pick<UseRefElementReturnType<PopupElement>["refElementReturn"], "getElement">;
 }
 export interface UseLostFocusDismissReturnType<_SourceElement extends Element | null, _PopupElement extends Element> {

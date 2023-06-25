@@ -1,3 +1,4 @@
+import { Nullable } from "../util/types.js";
 /** Takes a new value or a function that updates a value, unlike `OnPassiveStateChange` which reacts to those updates */
 export type PassiveStateUpdater<S, R> = ((value: S | ((prevState: S | undefined) => S), reason?: R) => void);
 /** Responds to a change in a value, unlike `PassiveStateUpdater` which causes the updates */
@@ -30,7 +31,7 @@ export declare function debounceRendering(f: () => void): void;
  * @param customDebounceRendering By default, changes to passive state are delayed by one tick so that we only check for changes in a similar way to Preact. You can override this to, for example, always run immediately instead.
  * @returns
  */
-export declare function usePassiveState<T, R>(onChange: undefined | null | OnPassiveStateChange<T, R>, getInitialValue?: () => T, customDebounceRendering?: typeof debounceRendering): readonly [getStateStable: () => T, setStateStable: PassiveStateUpdater<T, R>];
+export declare function usePassiveState<T, R>(onChange: Nullable<OnPassiveStateChange<T, R>>, getInitialValue?: () => T, customDebounceRendering?: typeof debounceRendering): readonly [getStateStable: () => T, setStateStable: PassiveStateUpdater<T, R>];
 export declare function returnTrue(): boolean;
 export declare function returnFalse(): boolean;
 export declare function returnNull(): null;

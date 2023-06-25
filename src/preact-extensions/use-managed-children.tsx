@@ -1,5 +1,6 @@
 import { useCallback, useLayoutEffect, useRef } from "preact/hooks";
 import { assertEmptyObject } from "../util/assert.js";
+import { Nullable } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 import { OnPassiveStateChange, PassiveStateUpdater, debounceRendering, useEnsureStability, usePassiveState } from "./use-passive-state.js";
 import { useStableCallback } from "./use-stable-callback.js";
@@ -64,14 +65,14 @@ export interface UseManagedChildrenParameters<M extends ManagedChildInfo<any>> {
          * 
          * TODO: This ended up not being needed by anything. Is it necessary? Does it cost anything?
          */
-        onAfterChildLayoutEffect?: null | undefined | OnAfterChildLayoutEffect<M["index"]>;
+        onAfterChildLayoutEffect?: Nullable<OnAfterChildLayoutEffect<M["index"]>>;
 
         /**
          * Same as the above, but only for mount/unmount (or when a child changes its index)
          */
-        onChildrenMountChange?: null | undefined | OnChildrenMountChange<M["index"]>;
+        onChildrenMountChange?: Nullable<OnChildrenMountChange<M["index"]>>;
 
-        onChildrenCountChange?: null | undefined | ((count: number) => void);
+        onChildrenCountChange?: Nullable<((count: number) => void)>;
     }
 }
 
@@ -271,7 +272,7 @@ export function useManagedChildren<M extends ManagedChildInfo<string | number>>(
             if (typeof index == "number") {
                 delete managedChildrenArray.current.arr[index as number];
                 let shave = 0;
-                while (shave <= managedChildrenArray.current.arr.length && managedChildrenArray.current.arr[managedChildrenArray.current.arr.length - 1 - shave] === undefined) {
+                while (shave <= managedChildrenArray.current.arr.length && managedChildrenArray.current.arr[managedChildrenArray.current.arr.length - 1 - shave] == undefined) {
                     ++shave;
                 }
                 managedChildrenArray.current.arr.splice(managedChildrenArray.current.arr.length - shave, shave);

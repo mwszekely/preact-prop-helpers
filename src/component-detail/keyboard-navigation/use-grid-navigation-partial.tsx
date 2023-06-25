@@ -1,4 +1,3 @@
-import { useCallback } from "preact/hooks";
 import { useMergedProps } from "../../dom-helpers/use-merged-props.js";
 import { UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
 import { OnPassiveStateChange, PassiveStateUpdater, usePassiveState } from "../../preact-extensions/use-passive-state.js";

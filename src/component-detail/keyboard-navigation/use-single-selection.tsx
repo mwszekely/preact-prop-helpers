@@ -5,12 +5,12 @@ import { UseChildrenHaveFocusChildReturnType, UseChildrenHaveFocusParameters } f
 import { UseManagedChildrenReturnType, useChildrenFlag } from "../../preact-extensions/use-managed-children.js";
 import { OnPassiveStateChange, PassiveStateUpdater, useEnsureStability } from "../../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
-import { useStableGetter, useMemoObject } from "../../preact-extensions/use-stable-getter.js";
+import { useMemoObject, useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { useState } from "../../preact-extensions/use-state.js";
-import { ElementProps } from "../../util/types.js";
+import { EnhancedEventHandler, TargetedEnhancedEvent, enhanceEvent } from "../../util/event.js";
+import { ElementProps, Nullable } from "../../util/types.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
-import { EnhancedEventHandler, TargetedEnhancedEvent, enhanceEvent } from "../../util/event.js";
 
 
 /** Anything that's selectable must be tabbable, so we DO use rovingtabindex instead of just managedchildren */
@@ -102,7 +102,7 @@ export interface UseSingleSelectionChildReturnType<E extends Element> extends Us
          * 
          * This useful for things like animations or transitions.
          */
-        selectedOffset: number | null;
+        selectedOffset: Nullable<number>;
         getSelectedOffset: () => (number | null);
 
         // Used to programmatically set this as the selected element;

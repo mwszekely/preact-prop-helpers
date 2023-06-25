@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef } from "preact/hooks";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useStableGetter } from "../preact-extensions/use-stable-getter.js";
+import { Nullable } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 
 export interface UseTimeoutParameters {
@@ -8,7 +9,7 @@ export interface UseTimeoutParameters {
      * The number of ms to wait before invoking `callback`.  
      * If `null`, cancels the timeout immediately.
      */
-    timeout: number | null;
+    timeout: Nullable<number>;
 
     /**
      * Changes to this prop between renders can be used to clear the current timeout and create a new one.

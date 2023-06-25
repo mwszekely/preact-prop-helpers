@@ -7,8 +7,7 @@ import { useStableCallback } from "../../preact-extensions/use-stable-callback.j
 import { useMemoObject, useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { useState } from "../../preact-extensions/use-state.js";
 import { assertEmptyObject } from "../../util/assert.js";
-import { focus } from "../../util/focus.js";
-import { ElementProps, OmitStrong } from "../../util/types.js";
+import { ElementProps, Nullable, OmitStrong } from "../../util/types.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
 
 export type SetTabbableIndex = (updater: Parameters<PassiveStateUpdater<number | null, Event>>[0], reason: Event | undefined, fromUserInteraction: boolean) => void;
@@ -88,7 +87,7 @@ export interface UseRovingTabIndexParameters<ParentElement extends Element, Tabb
          * 
          * **MUST** be stable!
          */
-        onTabbableIndexChange?: undefined | null | OnPassiveStateChange<number | null, Event>;
+        onTabbableIndexChange?: Nullable<OnPassiveStateChange<number | null, Event>>;
 
     };
 }

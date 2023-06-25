@@ -62,7 +62,7 @@ export { assertEmptyObject } from "./util/assert.js";
 export { EventDetail, enhanceEvent } from "./util/event.js";
 export { focus } from "./util/focus.js";
 export { getBuildMode } from "./util/mode.js";
-export { useStack } from "./util/stack.js";
 export { generateRandomId } from "./util/random-id.js";
+export { useStack } from "./util/stack.js";
 export { hideCallCount, monitorCallCount } from "./util/use-call-count.js";
 //# sourceMappingURL=index.js.map

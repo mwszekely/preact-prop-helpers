@@ -1,6 +1,6 @@
 import { h } from "preact";
-import { useMergedProps, usePress, useRefElement, useStableGetter } from "../../dist/index.js";
-import { TestItem, fromStringBoolean, useTestSyncState } from "../util.js";
+import { useMergedProps, usePress, useRefElement } from "../../dist/index.js";
+import { fromStringBoolean, useTestSyncState } from "../util.js";
 
 export interface PressConstants {
     onPress(e: Event): (void | Promise<void>);

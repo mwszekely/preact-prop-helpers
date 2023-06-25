@@ -1,3 +1,4 @@
+import { Nullable } from "../util/types.js";
 import { OnPassiveStateChange, PassiveStateUpdater } from "./use-passive-state.js";
 export interface UseManagedChildrenContext<M extends ManagedChildInfo<any>> {
     managedChildContext: {
@@ -27,12 +28,12 @@ export interface UseManagedChildrenParameters<M extends ManagedChildInfo<any>> {
          *
          * TODO: This ended up not being needed by anything. Is it necessary? Does it cost anything?
          */
-        onAfterChildLayoutEffect?: null | undefined | OnAfterChildLayoutEffect<M["index"]>;
+        onAfterChildLayoutEffect?: Nullable<OnAfterChildLayoutEffect<M["index"]>>;
         /**
          * Same as the above, but only for mount/unmount (or when a child changes its index)
          */
-        onChildrenMountChange?: null | undefined | OnChildrenMountChange<M["index"]>;
-        onChildrenCountChange?: null | undefined | ((count: number) => void);
+        onChildrenMountChange?: Nullable<OnChildrenMountChange<M["index"]>>;
+        onChildrenCountChange?: Nullable<((count: number) => void)>;
     };
 }
 export interface UseManagedChildParameters<M extends ManagedChildInfo<any>> {

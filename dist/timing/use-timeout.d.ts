@@ -1,9 +1,10 @@
+import { Nullable } from "../util/types.js";
 export interface UseTimeoutParameters {
     /**
      * The number of ms to wait before invoking `callback`.
      * If `null`, cancels the timeout immediately.
      */
-    timeout: number | null;
+    timeout: Nullable<number>;
     /**
      * Changes to this prop between renders can be used to clear the current timeout and create a new one.
      */

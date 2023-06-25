@@ -1,8 +1,8 @@
+import { UseRefElementReturnType } from "../index.js";
 import { UseManagedChildrenReturnType } from "../preact-extensions/use-managed-children.js";
-import { ElementProps } from "../util/types.js";
+import { ElementProps, Nullable } from "../util/types.js";
 import { UseLinearNavigationParameters } from "./keyboard-navigation/use-linear-navigation.js";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "./keyboard-navigation/use-roving-tabindex.js";
-import { UseRefElementReturnType } from "../index.js";
 export interface UsePaginatedChildrenInfo<TabbableChildElement extends Element> extends UseRovingTabIndexChildInfo<TabbableChildElement> {
     setPaginationVisible(visible: boolean): void;
     setChildCountIfPaginated(count: number): void;
@@ -11,8 +11,8 @@ export interface UsePaginatedChildrenParameters<ParentElement extends Element, T
     managedChildrenReturn: UseManagedChildrenReturnType<M>["managedChildrenReturn"];
     linearNavigationParameters: Pick<UseLinearNavigationParameters<any, TabbableChildElement, M>["linearNavigationParameters"], "indexDemangler">;
     paginatedChildrenParameters: {
-        paginationMin: number | null | undefined;
-        paginationMax: number | null | undefined;
+        paginationMin: Nullable<number>;
+        paginationMax: Nullable<number>;
     };
     rovingTabIndexReturn: Pick<UseRovingTabIndexReturnType<any, TabbableChildElement, M>["rovingTabIndexReturn"], "getTabbableIndex" | "setTabbableIndex">;
     refElementReturn: Pick<UseRefElementReturnType<ParentElement>["refElementReturn"], "getElement">;
@@ -28,13 +28,13 @@ export interface UsePaginatedChildrenReturnType {
         onChildrenCountChange: (count: number) => void;
     };
     paginatedChildrenReturn: {
-        refreshPagination: (min: number | null | undefined, max: number | null | undefined) => void;
+        refreshPagination: (min: Nullable<number>, max: Nullable<number>) => void;
         /**
-         * **importANT**: This is only tracked when pagination is enabled.
+         * **IMPORTANT**: This is only tracked when pagination is enabled.
          *
          * If pagination is not enabled, this is either `null` or some undefined previous number.
          */
-        childCount: number | null;
+        childCount: Nullable<number>;
     };
     context: UsePaginatedChildContext;
 }

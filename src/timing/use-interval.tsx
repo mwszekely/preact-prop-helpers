@@ -1,6 +1,7 @@
 import { useEffect } from "preact/hooks";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useStableGetter } from "../preact-extensions/use-stable-getter.js";
+import { Nullable } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 
 
@@ -9,7 +10,7 @@ export interface UseIntervalParameters {
     /**
      * The number of ms to wait before invoking `callback`.
      */
-    interval: number | null;
+    interval: Nullable<number>;
 
     /**
      * Called `timeout` ms after mount, or the last change to `triggerIndex`.

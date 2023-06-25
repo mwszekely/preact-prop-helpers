@@ -1,5 +1,5 @@
 
-import { useCallback, useEffect, useLayoutEffect, useRef } from "preact/hooks";
+import { useCallback, useEffect, useRef } from "preact/hooks";
 import { useUrl } from "../observers/use-url.js";
 import { OmitStrong } from "../util/types.js";
 import { OnPassiveStateChange, runImmediately, usePassiveState } from "./use-passive-state.js";

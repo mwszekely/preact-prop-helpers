@@ -1,9 +1,10 @@
 
 import { options } from "preact";
 import { EffectCallback, Inputs, useRef } from "preact/hooks";
+import { Nullable } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 
-const toRun = new Map<number, { effect: EffectCallback, prevInputs?: Inputs | undefined, inputs?: Inputs, cleanup: null | undefined | void | (() => void) }>();
+const toRun = new Map<number, { effect: EffectCallback, prevInputs?: Inputs | undefined, inputs?: Inputs, cleanup: Nullable<void | (() => void)> }>();
 
 
 // TODO: Whether this goes in options.diffed or options._commit

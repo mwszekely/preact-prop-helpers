@@ -127,7 +127,7 @@ export function useManagedChildren(parentParameters) {
             if (typeof index == "number") {
                 delete managedChildrenArray.current.arr[index];
                 let shave = 0;
-                while (shave <= managedChildrenArray.current.arr.length && managedChildrenArray.current.arr[managedChildrenArray.current.arr.length - 1 - shave] === undefined) {
+                while (shave <= managedChildrenArray.current.arr.length && managedChildrenArray.current.arr[managedChildrenArray.current.arr.length - 1 - shave] == undefined) {
                     ++shave;
                 }
                 managedChildrenArray.current.arr.splice(managedChildrenArray.current.arr.length - shave, shave);

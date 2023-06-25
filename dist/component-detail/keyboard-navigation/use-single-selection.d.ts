@@ -1,9 +1,9 @@
 import { UseChildrenHaveFocusChildReturnType, UseChildrenHaveFocusParameters } from "../../observers/use-children-have-focus.js";
 import { UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
 import { PassiveStateUpdater } from "../../preact-extensions/use-passive-state.js";
-import { ElementProps } from "../../util/types.js";
-import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
 import { EnhancedEventHandler, TargetedEnhancedEvent } from "../../util/event.js";
+import { ElementProps, Nullable } from "../../util/types.js";
+import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
 /** Anything that's selectable must be tabbable, so we DO use rovingtabindex instead of just managedchildren */
 export interface UseSingleSelectionChildInfo<E extends Element> extends UseRovingTabIndexChildInfo<E> {
     selected: boolean;
@@ -78,7 +78,7 @@ export interface UseSingleSelectionChildReturnType<E extends Element> extends Us
          *
          * This useful for things like animations or transitions.
          */
-        selectedOffset: number | null;
+        selectedOffset: Nullable<number>;
         getSelectedOffset: () => (number | null);
         setThisOneSelected: (event: Event) => void;
     };

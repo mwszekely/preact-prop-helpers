@@ -6,9 +6,9 @@ import { OnPassiveStateChange } from "../preact-extensions/use-passive-state.js"
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useStableGetter } from "../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../util/assert.js";
-import { ElementProps, FocusEventType, MouseEventType } from "../util/types.js";
-import { monitorCallCount } from "../util/use-call-count.js";
 import { EnhancedEventHandler, enhanceEvent } from "../util/event.js";
+import { ElementProps, FocusEventType, MouseEventType, Nullable } from "../util/types.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 
 /**
  * In general, each soft dismiss hook takes an `open` and an `onClose` prop.
@@ -185,7 +185,7 @@ export function useEscapeDismiss<PopupElement extends Element>({ escapeDismissPa
 
 export interface UseLostFocusDismissParameters<SourceElement extends Element | null, PopupElement extends Element> {
     lostFocusDismiss: { open: boolean, onClose(): void; };
-    refElementSourceReturn: null | Pick<UseRefElementReturnType<NonNullable<SourceElement>>["refElementReturn"], "getElement">;
+    refElementSourceReturn: Nullable<Pick<UseRefElementReturnType<NonNullable<SourceElement>>["refElementReturn"], "getElement">>;
     refElementPopupReturn: Pick<UseRefElementReturnType<PopupElement>["refElementReturn"], "getElement">;
 }
 

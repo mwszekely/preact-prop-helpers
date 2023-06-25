@@ -4,10 +4,10 @@ import { useSearchParamState, useState } from "../../dist/index.js";
 import { useSearchParamStateDeclarative } from "../../dist/preact-extensions/use-search-param-state.js";
 import type { SharedFixtures } from "../fixtures/base.fixture.js";
 import { TestBasesFocus } from "../fixtures/focus.stage.js";
+import { TestBasesGridNav } from "../fixtures/grid-nav.stage.js";
 import { TestBasesListNav } from "../fixtures/list-nav.stage.js";
 import { TestBasesButton } from "../fixtures/press.stage.js";
 import { TestItem, TestingConstants, fromStringBoolean, fromStringNumber } from "../util.js";
-import { TestBasesGridNav } from "../fixtures/grid-nav.stage.js";
 
 
 declare module globalThis {
