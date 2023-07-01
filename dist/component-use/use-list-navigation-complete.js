@@ -14,7 +14,6 @@ import { useMemoObject } from "../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../util/assert.js";
 import { enhanceEvent } from "../util/event.js";
 import { monitorCallCount } from "../util/use-call-count.js";
-import { usePress } from "./use-press.js";
 /**
  * All the list-related hooks combined into one giant hook that encapsulates everything.
  *
@@ -88,10 +87,12 @@ export function useCompleteListNavigation({ linearNavigationParameters, rearrang
     };
 }
 export function useCompleteListNavigationChild({ info: { index, focusSelf, unselectable, untabbable, ...info }, // The "...info" is empty if M is the same as UCLNCI<ChildElement>.
-textContentParameters, context: { childrenHaveFocusChildContext, managedChildContext, rovingTabIndexContext, paginatedChildContext, staggeredChildContext, singleSelectionContext, typeaheadNavigationContext }, sortableChildParameters, pressParameters, ...void1 }) {
+textContentParameters, context: { childrenHaveFocusChildContext, managedChildContext, rovingTabIndexContext, paginatedChildContext, staggeredChildContext, singleSelectionContext, typeaheadNavigationContext }, sortableChildParameters, 
+//pressParameters,
+...void1 }) {
     monitorCallCount(useCompleteListNavigationChild);
     assertEmptyObject(void1);
-    const { onPressSync, ...pressParameters1 } = (pressParameters ?? {});
+    //const { onPressSync, ...pressParameters1 } = (pressParameters ?? {});
     const { info: mcp3, paginatedChildReturn, paginatedChildReturn: { hideBecausePaginated }, props: paginationProps } = usePaginatedChild({ info: { index }, context: { paginatedChildContext } });
     const { info: mcp4, staggeredChildReturn, staggeredChildReturn: { hideBecauseStaggered }, props: staggeredProps } = useStaggeredChild({ info: { index }, context: { staggeredChildContext } });
     untabbable ||= (hideBecausePaginated || hideBecauseStaggered);
@@ -108,19 +109,9 @@ textContentParameters, context: { childrenHaveFocusChildContext, managedChildCon
     const onPress = useStableCallback((e) => {
         if (singleSelectionContext.selectionMode == "activation")
             singleSelectionContext.onSelectedIndexChange?.(enhanceEvent(e, { selectedIndex: index }));
-        onPressSync?.(e);
     });
-    const { propsStable: pressRefProps, refElementReturn: pressRefElementReturn } = useRefElement({ refElementParameters: {} });
-    const { pressReturn, props: pressProps } = usePress({
-        refElementReturn: pressRefElementReturn,
-        pressParameters: {
-            focusSelf,
-            ...pressParameters1,
-            ...pressParameters2,
-            onPressSync: (rovingTabIndexContext.untabbable || unselectable || untabbable) ? null : onPress,
-            excludeSpace: useStableCallback(() => { return excludeSpace?.() || false; }),
-        }
-    });
+    const onPressSync = (rovingTabIndexContext.untabbable || unselectable || untabbable) ? null : onPress;
+    //const { propsStable: pressRefProps, refElementReturn: pressRefElementReturn } = useRefElement<any>({ refElementParameters: {} })
     const mcp1 = {
         index,
         focusSelf,
@@ -142,7 +133,10 @@ textContentParameters, context: { childrenHaveFocusChildContext, managedChildCon
     const props = useMergedProps(propsStable, hasCurrentFocusReturn.propsStable, propsLs, paginationProps, staggeredProps);
     return {
         props,
-        pressReturn,
+        pressParameters: {
+            onPressSync,
+            excludeSpace
+        },
         textContentReturn,
         refElementReturn,
         singleSelectionChildReturn,
@@ -151,7 +145,7 @@ textContentParameters, context: { childrenHaveFocusChildContext, managedChildCon
         paginatedChildReturn,
         staggeredChildReturn,
         rovingTabIndexChildReturn,
-        propsPressStable: useMergedProps(pressProps, pressRefProps)
+        //propsPressStable: useMergedProps(pressProps, pressRefProps)
     };
 }
 export function useCompleteListNavigationDeclarative({ linearNavigationParameters, paginatedChildrenParameters, rearrangeableChildrenParameters, rovingTabIndexParameters, singleSelectionDeclarativeParameters, sortableChildrenParameters, staggeredChildrenParameters, typeaheadNavigationParameters, singleSelectionParameters }) {

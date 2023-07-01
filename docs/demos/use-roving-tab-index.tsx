@@ -1,6 +1,6 @@
 import { createContext } from "preact";
 import { memo, useCallback, useContext } from "preact/compat";
-import { CompleteListNavigationContext, EventDetail, GetIndex, UseCompleteListNavigationChildInfo, UseCompleteListNavigationDeclarativeReturnType, VNode, focus, useCompleteListNavigationChild, useCompleteListNavigationDeclarative, useMergedProps, useStableCallback, useState } from "../../dist/index.js";
+import { CompleteListNavigationContext, EventDetail, GetIndex, UseCompleteListNavigationChildInfo, UseCompleteListNavigationDeclarativeReturnType, VNode, focus, useCompleteListNavigationChild, useCompleteListNavigationDeclarative, useMergedProps, usePress, useStableCallback, useState } from "../../dist/index.js";
 
 const RandomWords = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
 
@@ -136,18 +136,20 @@ const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
         singleSelectionChildReturn: { selected, selectedOffset, setThisOneSelected },
         paginatedChildReturn: { hideBecausePaginated },
         staggeredChildReturn: { hideBecauseStaggered },
+        pressParameters: { onPressSync, excludeSpace },
         refElementReturn
     } = useCompleteListNavigationChild<HTMLLIElement, CustomInfoType>({
         info: { index, focusSelf, foo: "bar", untabbable: hidden, unselectable: disabled },
         sortableChildParameters: { getSortValue },
-        pressParameters: { onPressSync: null, focusSelf },
         context,
         textContentParameters: { getText: useCallback((e) => { return e?.textContent ?? "" }, []) }
     });
 
+    const { pressReturn, props: p2 } = usePress<HTMLLIElement>({ pressParameters: { focusSelf, onPressSync, excludeSpace }, refElementReturn })
+
     const text = `${randomWord} This is item #${index} (offset: ${selectedOffset}) ${hidden ? " (hidden)" : ""}${disabled ? " (disabled)" : ""}${selected ? " (selected)" : " (not selected)"} (${tabbable ? "Tabbable" : "Not tabbable"})`;
 
     return (
-        <li {...props} style={{ opacity: hideBecausePaginated ? 0.25 : 1, transform: `translateX(${hideBecauseStaggered ? "50%" : "0%"})` }}>{text}<input {...useMergedProps({ type: "number", tabIndex: props.tabIndex }) as any} style={{ width: "5ch" }} /></li>
+        <li {...useMergedProps(props, p2)} style={{ opacity: hideBecausePaginated ? 0.25 : 1, transform: `translateX(${hideBecauseStaggered ? "50%" : "0%"})` }}>{text}<input {...useMergedProps({ type: "number", tabIndex: props.tabIndex }) as any} style={{ width: "5ch" }} /></li>
     )
 }));

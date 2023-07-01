@@ -23,6 +23,7 @@ export interface UseTypeaheadNavigationReturnType<ParentOrChildElement extends E
 export interface UseTypeaheadNavigationContext {
 
     typeaheadNavigationContext: {
+        /** **STABLE** (Don't call during render) */
         excludeSpace: () => boolean;
         sortedTypeaheadInfo: Array<TypeaheadInfo>;
         insertingComparator: (lhs: string | null, rhs: TypeaheadInfo) => number;

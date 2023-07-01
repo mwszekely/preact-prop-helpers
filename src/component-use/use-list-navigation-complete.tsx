@@ -18,7 +18,7 @@ import { assertEmptyObject } from "../util/assert.js";
 import { enhanceEvent } from "../util/event.js";
 import { ElementProps, ExtendMerge, OmitStrong, OmitTargeted, PickTargeted } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
-import { PressEventReason, usePress, UsePressParameters, UsePressReturnType } from "./use-press.js";
+import { PressEventReason, UsePressParameters } from "./use-press.js";
 
 export interface UseCompleteListNavigationChildInfo<ChildElement extends Element> extends ExtendMerge<UseListNavigationSingleSelectionSortableChildInfo<ChildElement>, ExtendMerge<UsePaginatedChildrenInfo<ChildElement>, UseStaggeredChildrenInfo<ChildElement>>> { }
 
@@ -63,7 +63,7 @@ export interface UseCompleteListNavigationChildParameters<ChildElement extends E
      * 
      * Pass `null` as the entire `pressParameters` object to disable default press behavior entirely.
      */
-    pressParameters: OmitStrong<UsePressParameters<any>["pressParameters"], "excludeSpace"> | null,
+    //pressParameters: OmitStrong<UsePressParameters<any>["pressParameters"], "excludeSpace"> | null,
     textContentParameters: OmitStrong<UseListNavigationSingleSelectionSortableChildParameters<ChildElement, M>["textContentParameters"], never>;
     info: Omit<M, Exclude<keyof UseCompleteListNavigationChildInfo<ChildElement>, "index" | "focusSelf" | "untabbable" | "unselectable">>;
     sortableChildParameters: Pick<UseSortableChildInfo, "getSortValue">;
@@ -72,7 +72,7 @@ export interface UseCompleteListNavigationChildParameters<ChildElement extends E
 }
 
 export interface UseCompleteListNavigationChildReturnType<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>>
-    extends Pick<UsePressReturnType<any>, "pressReturn">, Pick<UseListNavigationSingleSelectionSortableChildReturnType<ChildElement, M>, "textContentReturn" | "rovingTabIndexChildReturn" | "singleSelectionChildReturn">, OmitStrong<UseRefElementReturnType<ChildElement>, "propsStable"> {
+    extends Pick<UseListNavigationSingleSelectionSortableChildReturnType<ChildElement, M>, "textContentReturn" | "rovingTabIndexChildReturn" | "singleSelectionChildReturn">, OmitStrong<UseRefElementReturnType<ChildElement>, "propsStable"> {
     hasCurrentFocusReturn: UseHasCurrentFocusReturnType<ChildElement>["hasCurrentFocusReturn"];
     managedChildReturn: UseManagedChildReturnType<M>["managedChildReturn"];
     props: ElementProps<ChildElement>;
@@ -82,7 +82,8 @@ export interface UseCompleteListNavigationChildReturnType<ChildElement extends E
      * **Optional**, as it's entirely possible that this list item isn't selected with a simple press but some more complicated process, like in a grid list.
      * 
      * */
-    propsPressStable: ElementProps<any>;
+    //propsPressStable: ElementProps<any>;
+    pressParameters: Pick<UsePressParameters<any>["pressParameters"], "onPressSync" | "excludeSpace">;
     paginatedChildReturn: UsePaginatedChildReturn<ChildElement>["paginatedChildReturn"];
     staggeredChildReturn: UseStaggeredChildReturn<ChildElement>["staggeredChildReturn"];
 }
@@ -195,12 +196,12 @@ export function useCompleteListNavigationChild<ChildElement extends Element, M e
     textContentParameters,
     context: { childrenHaveFocusChildContext, managedChildContext, rovingTabIndexContext, paginatedChildContext, staggeredChildContext, singleSelectionContext, typeaheadNavigationContext },
     sortableChildParameters,
-    pressParameters,
+    //pressParameters,
     ...void1
 }: UseCompleteListNavigationChildParameters<ChildElement, M>): UseCompleteListNavigationChildReturnType<ChildElement, M> {
     monitorCallCount(useCompleteListNavigationChild);
     assertEmptyObject(void1);
-    const { onPressSync, ...pressParameters1 } = (pressParameters ?? {});
+    //const { onPressSync, ...pressParameters1 } = (pressParameters ?? {});
 
     const { info: mcp3, paginatedChildReturn, paginatedChildReturn: { hideBecausePaginated }, props: paginationProps } = usePaginatedChild<ChildElement>({ info: { index }, context: { paginatedChildContext } })
     const { info: mcp4, staggeredChildReturn, staggeredChildReturn: { hideBecauseStaggered }, props: staggeredProps } = useStaggeredChild<ChildElement>({ info: { index }, context: { staggeredChildContext } });
@@ -229,22 +230,10 @@ export function useCompleteListNavigationChild<ChildElement extends Element, M e
     const onPress = useStableCallback((e: PressEventReason<any>) => {
         if (singleSelectionContext.selectionMode == "activation")
             singleSelectionContext.onSelectedIndexChange?.(enhanceEvent(e, { selectedIndex: index }));
-        onPressSync?.(e);
     });
-    const { propsStable: pressRefProps, refElementReturn: pressRefElementReturn } = useRefElement<any>({ refElementParameters: {} })
-    const {
-        pressReturn,
-        props: pressProps
-    } = usePress({
-        refElementReturn: pressRefElementReturn,
-        pressParameters: {
-            focusSelf,
-            ...pressParameters1,
-            ...pressParameters2,
-            onPressSync: (rovingTabIndexContext.untabbable || unselectable || untabbable) ? null : onPress,
-            excludeSpace: useStableCallback(() => { return excludeSpace?.() || false; }),
-        }
-    });
+    const onPressSync = (rovingTabIndexContext.untabbable || unselectable || untabbable) ? null : onPress;
+    //const { propsStable: pressRefProps, refElementReturn: pressRefElementReturn } = useRefElement<any>({ refElementParameters: {} })
+
 
     const mcp1: UseCompleteListNavigationChildInfo<ChildElement> = {
         index,
@@ -278,7 +267,10 @@ export function useCompleteListNavigationChild<ChildElement extends Element, M e
 
     return {
         props,
-        pressReturn,
+        pressParameters: {
+            onPressSync,
+            excludeSpace
+        },
         textContentReturn,
         refElementReturn,
         singleSelectionChildReturn,
@@ -287,7 +279,7 @@ export function useCompleteListNavigationChild<ChildElement extends Element, M e
         paginatedChildReturn,
         staggeredChildReturn,
         rovingTabIndexChildReturn,
-        propsPressStable: useMergedProps(pressProps, pressRefProps)
+        //propsPressStable: useMergedProps(pressProps, pressRefProps)
     }
 
 }

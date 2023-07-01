@@ -1,6 +1,6 @@
 import { createContext } from "preact";
 import { useCallback, useContext, useEffect, useState } from "preact/hooks";
-import { Compare, CompleteListNavigationContext, EventDetail, UseCompleteListNavigationChildInfo, UseSingleSelectionParameters, focus, useCompleteListNavigationChild, useCompleteListNavigationDeclarative, useImperativeProps, useMergedProps, useRefElement, useStableCallback, useStableGetter } from "../../dist/index.js";
+import { Compare, CompleteListNavigationContext, EventDetail, UseCompleteListNavigationChildInfo, UseSingleSelectionParameters, focus, useCompleteListNavigationChild, useCompleteListNavigationDeclarative, useImperativeProps, useMergedProps, usePress, useRefElement, useStableCallback, useStableGetter } from "../../dist/index.js";
 import { LoremIpsum } from "../lorem.js";
 import { fromStringArray, fromStringBoolean, fromStringNumber, fromStringString, useTestSyncState } from "../util.js";
 import { DefaultChildCount, DisabledIndex, HiddenIndex, MissingIndex } from "./list-nav.constants.js";
@@ -162,36 +162,36 @@ function TestBasesListNavChild({ index }: { index: number }) {
     if (missing)
         return <li>(The #{index}-th item is missing)</li>;
 
+    const focusSelf = (e: HTMLLIElement) => { e.focus() };
     const {
         hasCurrentFocusReturn: { getCurrentFocused, getCurrentFocusedInner },
         managedChildReturn: { getChildren },
         paginatedChildReturn: { hideBecausePaginated, isPaginated, paginatedVisible },
         props,
-        propsPressStable,
-        refElementReturn: { getElement },
+        refElementReturn,
         rovingTabIndexChildReturn: { getTabbable, tabbable },
         singleSelectionChildReturn: { getSelected, getSelectedOffset, selected, selectedOffset, setThisOneSelected },
         staggeredChildReturn: { hideBecauseStaggered, isStaggered },
-        textContentReturn: { }
+        textContentReturn: { },
+        pressParameters: { onPressSync, excludeSpace }
     } = useCompleteListNavigationChild<HTMLLIElement, UseCompleteListNavigationChildInfo<HTMLLIElement>>({
         context: useContext(Context),
-        pressParameters: {
-            focusSelf: e => e.focus(),
-            onPressSync: null
-        },
         info: {
             unselectable: disabled,
-            focusSelf: e => { e.focus() },
+            focusSelf,
             untabbable: hidden,
             index
         },
         sortableChildParameters: { getSortValue: getTextContent },
         textContentParameters: { getText: getTextContent }
-    })
+    });
+    const { pressReturn: { getIsPressing, longPress, pressing }, props: propsPressStable } = usePress({ pressParameters: { focusSelf, onPressSync, excludeSpace }, refElementReturn });
     return (
         <>
             <li
                 data-index={index}
+                data-pressing={pressing}
+                data-long-pressing={longPress}
                 data-hide-because-paginated={hideBecausePaginated}
                 data-is-paginated={isPaginated}
                 data-paginated-visible={paginatedVisible}
