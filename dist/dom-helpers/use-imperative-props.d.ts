@@ -1,4 +1,4 @@
-import { type RenderableProps } from "preact";
+import { type RenderableProps } from "../util/lib.js";
 import { CSSProperties, ElementProps, Ref } from "../util/types.js";
 import { UseRefElementReturnType } from "./use-ref-element.js";
 export type SetChildren = ((children: string | null) => void);

@@ -1,4 +1,3 @@
-import { useCallback, useEffect } from "preact/hooks";
 import { useGlobalHandler } from "../dom-helpers/use-event-handler.js";
 import { useRefElement } from "../dom-helpers/use-ref-element.js";
 import { useActiveElement } from "../observers/use-active-element.js";
@@ -6,6 +5,7 @@ import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useStableGetter } from "../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../util/assert.js";
 import { enhanceEvent } from "../util/event.js";
+import { useCallback, useEffect } from "../util/lib.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 /**
  * In general, each soft dismiss hook takes an `open` and an `onClose` prop.

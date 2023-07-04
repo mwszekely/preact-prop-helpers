@@ -1,4 +1,4 @@
-import { Inputs, useEffect as useEffectNative } from "preact/hooks";
+import { Inputs, useEffect as useEffectNative } from "../util/lib.js";
 /**
  * Wrap the native `useEffect` to add arguments
  * that allow accessing the previous value as the first argument,

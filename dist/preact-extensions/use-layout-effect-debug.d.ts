@@ -1,4 +1,4 @@
-import { Inputs } from "preact/hooks";
+import { Inputs } from "../util/lib.js";
 import { EffectChange } from "./use-effect-debug.js";
 /**
  * Wrap the native `useLayoutEffect` to add arguments

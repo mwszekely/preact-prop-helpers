@@ -1,4 +1,3 @@
-import { useCallback, useEffect, useRef } from "preact/hooks";
 import { useChildrenFlag } from "../../preact-extensions/use-managed-children.js";
 import { usePassiveState } from "../../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
@@ -6,6 +5,7 @@ import { useMemoObject, useStableGetter } from "../../preact-extensions/use-stab
 import { useState } from "../../preact-extensions/use-state.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { findBackupFocus } from "../../util/focus.js";
+import { useCallback, useEffect, useRef } from "../../util/lib.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
 /**
  * Implements a roving tabindex system where only one "focusable"

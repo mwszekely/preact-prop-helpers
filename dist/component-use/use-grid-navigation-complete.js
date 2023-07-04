@@ -1,5 +1,4 @@
 import { identity } from "lodash-es";
-import { useCallback } from "preact/hooks";
 import { useGridNavigationSingleSelectionSortable } from "../component-detail/keyboard-navigation/use-grid-navigation-single-selection-sortable.js";
 import { useGridNavigationSingleSelectionCell, useGridNavigationSingleSelectionRow } from "../component-detail/keyboard-navigation/use-grid-navigation-single-selection.js";
 import { useSingleSelectionDeclarative } from "../component-detail/keyboard-navigation/use-single-selection.js";
@@ -13,6 +12,7 @@ import { useManagedChild, useManagedChildren } from "../preact-extensions/use-ma
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useMemoObject } from "../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../util/assert.js";
+import { useCallback } from "../util/lib.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 export function useCompleteGridNavigation({ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, typeaheadNavigationParameters, sortableChildrenParameters, rearrangeableChildrenParameters, paginatedChildrenParameters, staggeredChildrenParameters, ...void1 }) {
     monitorCallCount(useCompleteGridNavigation);

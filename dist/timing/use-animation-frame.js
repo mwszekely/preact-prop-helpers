@@ -1,8 +1,7 @@
 import { jsx as _jsx } from "preact/jsx-runtime";
 import { noop } from "lodash-es";
-import { createContext } from "preact";
-import { useCallback, useContext, useEffect, useRef } from "preact/hooks";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
+import { createContext, useCallback, useContext, useEffect, useRef } from "../util/lib.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 const SharedAnimationFrameContext = createContext(null);
 /**

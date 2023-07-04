@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from "preact/hooks";
 import { UseManagedChildrenReturnType } from "../preact-extensions/use-managed-children.js";
 import { returnNull, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useState } from "../preact-extensions/use-state.js";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from "../util/lib.js";
 import { ElementProps } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 import { UseRovingTabIndexChildInfo } from "./keyboard-navigation/use-roving-tabindex.js";

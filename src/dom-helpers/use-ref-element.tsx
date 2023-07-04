@@ -1,5 +1,5 @@
-import { useCallback, useRef } from "preact/hooks";
 import { OnPassiveStateChange, returnNull, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
+import { useCallback, useRef } from "../util/lib.js";
 import { ElementProps } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 

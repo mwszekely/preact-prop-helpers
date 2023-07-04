@@ -1,7 +1,7 @@
-import { useRef } from "preact/hooks";
 import { useMergedProps } from "../../dom-helpers/use-merged-props.js";
 import { useMemoObject } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
+import { useRef } from "../../util/lib.js";
 import { ElementProps, ExtendMerge, OmitStrong } from "../../util/types.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
 import { UseLinearNavigationParameters, UseLinearNavigationReturnType, useLinearNavigation } from "./use-linear-navigation.js";

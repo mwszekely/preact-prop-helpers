@@ -1,4 +1,4 @@
-import { createElement, Fragment } from "preact";
+import { createElement, Fragment } from "../util/lib.js";
 import { ElementProps } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 

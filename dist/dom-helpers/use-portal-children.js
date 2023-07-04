@@ -1,9 +1,7 @@
 import { jsx as _jsx, Fragment as _Fragment } from "preact/jsx-runtime";
-import { cloneElement } from "preact";
-import { createPortal } from "preact/compat";
-import { useCallback, useLayoutEffect, useMemo } from "preact/hooks";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useState } from "../preact-extensions/use-state.js";
+import { cloneElement, createPortal, useCallback, useLayoutEffect, useMemo } from "../util/lib.js";
 import { generateRandomId } from "../util/random-id.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 /**

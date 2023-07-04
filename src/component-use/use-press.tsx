@@ -1,10 +1,10 @@
 import { noop } from "lodash-es";
-import { useCallback } from "preact/hooks";
 import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
 import { OnPassiveStateChange, returnFalse, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useState } from "../preact-extensions/use-state.js";
 import { useTimeout } from "../timing/use-timeout.js";
+import { useCallback } from "../util/lib.js";
 import { ElementProps, FocusEventType, KeyboardEventType, MouseEventType, Nullable, PointerEventType, TouchEventType } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 

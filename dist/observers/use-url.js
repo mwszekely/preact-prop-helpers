@@ -1,7 +1,7 @@
-import { useCallback } from "preact/hooks";
 import { useGlobalHandler } from "../dom-helpers/use-event-handler.js";
 import { usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
+import { useCallback } from "../util/lib.js";
 /**
  * Allows you to inspect when the entire URL changes,
  * either because the hash changed or because the Back/Forward

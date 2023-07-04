@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useMemo, useRef } from "preact/hooks";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useState } from "../preact-extensions/use-state.js";
+import { useCallback, useEffect, useMemo, useRef } from "../util/lib.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 export function usePaginatedChildren({ managedChildrenReturn: { getChildren }, linearNavigationParameters: { indexDemangler }, paginatedChildrenParameters: { paginationMax, paginationMin }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex }, refElementReturn: { getElement } }) {
     monitorCallCount(usePaginatedChildren);

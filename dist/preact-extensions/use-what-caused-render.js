@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "preact/hooks";
+import { useEffect, useRef } from "../util/lib.js";
 export function useWhatCausedRender(who, { props, state }) {
     const prevProps = useRef(undefined);
     const prevState = useRef(undefined);

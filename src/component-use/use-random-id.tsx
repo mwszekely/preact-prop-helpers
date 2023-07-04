@@ -1,5 +1,5 @@
-import { useId, useRef } from "preact/hooks";
 import { useEnsureStability } from "../preact-extensions/use-passive-state.js";
+import { useId, useRef } from "../util/lib.js";
 import { ElementProps } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 

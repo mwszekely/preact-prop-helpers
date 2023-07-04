@@ -1,3 +1,4 @@
+import { debounceRendering } from "../util/lib.js";
 import { Nullable } from "../util/types.js";
 /** Takes a new value or a function that updates a value, unlike `OnPassiveStateChange` which reacts to those updates */
 export type PassiveStateUpdater<S, R> = ((value: S | ((prevState: S | undefined) => S), reason?: R) => void);
@@ -11,7 +12,6 @@ export type OnPassiveStateChange<S, R> = ((value: S, prevValue: S | undefined, r
  * Eventually, when useEvent lands, we hopefully won't need this.
  */
 export declare function useEnsureStability<T extends any[]>(parentHookName: string, ...values: T): void;
-export declare function debounceRendering(f: () => void): void;
 /**
  * Similar to `useState`, but for values that aren't "render-important" &ndash; updates don't cause a re-render and so the value shouldn't be used during render (though it certainly can, at least by re-rendering again).
  *

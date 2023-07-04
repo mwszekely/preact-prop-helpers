@@ -1,5 +1,5 @@
-import { useId, useRef } from "preact/hooks";
 import { useEnsureStability } from "../preact-extensions/use-passive-state.js";
+import { useId, useRef } from "../util/lib.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 export function useRandomId({ randomIdParameters: { prefix, otherReferencerProp } }) {
     monitorCallCount(useRandomId);

@@ -1,6 +1,6 @@
-import { useEffect } from "preact/hooks";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useStableGetter } from "../preact-extensions/use-stable-getter.js";
+import { useEffect } from "../util/lib.js";
 import { Nullable } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 

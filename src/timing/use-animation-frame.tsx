@@ -1,7 +1,7 @@
 import { noop } from "lodash-es";
-import { ComponentChildren, createContext } from "preact";
-import { useCallback, useContext, useEffect, useRef } from "preact/hooks";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
+import { createContext, useCallback, useContext, useEffect, useRef } from "../util/lib.js";
+import { ElementProps } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 
 type RafCallbackType = (msSinceLast: number, tag?: any) => void;
@@ -20,7 +20,7 @@ const SharedAnimationFrameContext = createContext<null | ContextType>(null);
  * @param param0 
  * @returns 
  */
-export function ProvideBatchedAnimationFrames({ children }: { children: ComponentChildren }) {
+export function ProvideBatchedAnimationFrames({ children }: { children: ElementProps<EventTarget>["children"] }) {
 
     const addCallback = useCallback<ContextType["addCallback"]>((callbackToBeBatched, tag) => { allCallbacks.current.set(callbackToBeBatched, tag); }, []);
     const removeCallback = useCallback<ContextType["removeCallback"]>((callback) => { allCallbacks.current.delete(callback); }, []);

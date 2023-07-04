@@ -1,7 +1,7 @@
-import { useCallback, useRef } from "preact/hooks";
 import { useEnsureStability } from "../../index.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
+import { useCallback, useRef } from "../../util/lib.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
 /**
  * When used in tandem with `useRovingTabIndex`, allows control of

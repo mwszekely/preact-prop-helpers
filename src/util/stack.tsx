@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "preact/hooks";
+import { useCallback, useMemo } from "./lib.js";
 import { getBuildMode } from "./mode.js";
 
 export function generateStack() {

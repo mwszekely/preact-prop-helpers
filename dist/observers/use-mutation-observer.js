@@ -1,7 +1,7 @@
-import { useCallback, useEffect } from "preact/hooks";
 import { useRefElement } from "../dom-helpers/use-ref-element.js";
 import { returnNull, runImmediately, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
+import { useCallback, useEffect } from "../util/lib.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 export function useMutationObserver({ refElementParameters, mutationObserverParameters: { attributeFilter, subtree, onChildList, characterDataOldValue, onCharacterData, onAttributes, attributeOldValue } }) {
     monitorCallCount(useMutationObserver);

@@ -1,9 +1,9 @@
 import { noop } from "lodash-es";
-import { useCallback } from "preact/hooks";
 import { returnFalse, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useState } from "../preact-extensions/use-state.js";
 import { useTimeout } from "../timing/use-timeout.js";
+import { useCallback } from "../util/lib.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 function supportsPointerEvents() {
     return ("onpointerup" in window);

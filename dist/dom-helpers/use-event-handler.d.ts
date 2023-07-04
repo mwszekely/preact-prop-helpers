@@ -1,5 +1,3 @@
-import type { JSX } from "preact";
-import { ElementProps } from "../util/types.js";
 /**
  * This is used to select *just* the typed addEventListener
  * and not the generic "I'll accept any string and any handler" one.
@@ -41,20 +39,5 @@ type TypedEventHandlerEvent<E extends EventTarget, T extends TypedEventListenerT
  * *
  */
 export declare function useGlobalHandler<T extends EventTarget, EventType extends TypedEventListenerTypes<T>, H extends TypedEventHandlerEvent<T, EventType>>(target: T, type: EventType, handler: null | ((e: H) => void), options?: Parameters<TypedAddEventListener<T>>[2], mode?: "grouped" | "single"): void;
-/**
- * An alternative way to add an event handler to an element. Useful primarily when integrating 3rd party libraries that expect a generic "add event handler" function.
- *
- * Returns a function that allows you to modify a set of props to apply this handler.
- *
- * For typing reasons, this function is split into two.  Usage is like the following:
- *
- * ```
- * const { useLocalEventHandlerProps } = useLocalEventHandler<HTMLDivElement>()("onMouseDown", e => {  });
- * const divProps = useLocalEventHandlerProps(props);
- * ```
- */
-export declare function useLocalHandler<ElementType extends (HTMLElementTagNameMap[keyof HTMLElementTagNameMap] | SVGElementTagNameMap[keyof SVGElementTagNameMap])>(): <EventType extends "onLoad" | "onLoadCapture" | "onError" | "onErrorCapture" | "onCopy" | "onCopyCapture" | "onCut" | "onCutCapture" | "onPaste" | "onPasteCapture" | "onCompositionEnd" | "onCompositionEndCapture" | "onCompositionStart" | "onCompositionStartCapture" | "onCompositionUpdate" | "onCompositionUpdateCapture" | "onToggle" | "onFocus" | "onFocusCapture" | "onfocusin" | "onfocusinCapture" | "onfocusout" | "onfocusoutCapture" | "onBlur" | "onBlurCapture" | "onChange" | "onChangeCapture" | "onInput" | "onInputCapture" | "onBeforeInput" | "onBeforeInputCapture" | "onSearch" | "onSearchCapture" | "onSubmit" | "onSubmitCapture" | "onInvalid" | "onInvalidCapture" | "onReset" | "onResetCapture" | "onFormData" | "onFormDataCapture" | "onKeyDown" | "onKeyDownCapture" | "onKeyPress" | "onKeyPressCapture" | "onKeyUp" | "onKeyUpCapture" | "onAbort" | "onAbortCapture" | "onCanPlay" | "onCanPlayCapture" | "onCanPlayThrough" | "onCanPlayThroughCapture" | "onDurationChange" | "onDurationChangeCapture" | "onEmptied" | "onEmptiedCapture" | "onEncrypted" | "onEncryptedCapture" | "onEnded" | "onEndedCapture" | "onLoadedData" | "onLoadedDataCapture" | "onLoadedMetadata" | "onLoadedMetadataCapture" | "onLoadStart" | "onLoadStartCapture" | "onPause" | "onPauseCapture" | "onPlay" | "onPlayCapture" | "onPlaying" | "onPlayingCapture" | "onProgress" | "onProgressCapture" | "onRateChange" | "onRateChangeCapture" | "onSeeked" | "onSeekedCapture" | "onSeeking" | "onSeekingCapture" | "onStalled" | "onStalledCapture" | "onSuspend" | "onSuspendCapture" | "onTimeUpdate" | "onTimeUpdateCapture" | "onVolumeChange" | "onVolumeChangeCapture" | "onWaiting" | "onWaitingCapture" | "onClick" | "onClickCapture" | "onContextMenu" | "onContextMenuCapture" | "onDblClick" | "onDblClickCapture" | "onDrag" | "onDragCapture" | "onDragEnd" | "onDragEndCapture" | "onDragEnter" | "onDragEnterCapture" | "onDragExit" | "onDragExitCapture" | "onDragLeave" | "onDragLeaveCapture" | "onDragOver" | "onDragOverCapture" | "onDragStart" | "onDragStartCapture" | "onDrop" | "onDropCapture" | "onMouseDown" | "onMouseDownCapture" | "onMouseEnter" | "onMouseEnterCapture" | "onMouseLeave" | "onMouseLeaveCapture" | "onMouseMove" | "onMouseMoveCapture" | "onMouseOut" | "onMouseOutCapture" | "onMouseOver" | "onMouseOverCapture" | "onMouseUp" | "onMouseUpCapture" | "onSelect" | "onSelectCapture" | "onTouchCancel" | "onTouchCancelCapture" | "onTouchEnd" | "onTouchEndCapture" | "onTouchMove" | "onTouchMoveCapture" | "onTouchStart" | "onTouchStartCapture" | "onPointerOver" | "onPointerOverCapture" | "onPointerEnter" | "onPointerEnterCapture" | "onPointerDown" | "onPointerDownCapture" | "onPointerMove" | "onPointerMoveCapture" | "onPointerUp" | "onPointerUpCapture" | "onPointerCancel" | "onPointerCancelCapture" | "onPointerOut" | "onPointerOutCapture" | "onPointerLeave" | "onPointerLeaveCapture" | "onGotPointerCapture" | "onGotPointerCaptureCapture" | "onLostPointerCapture" | "onLostPointerCaptureCapture" | "onScroll" | "onScrollCapture" | "onWheel" | "onWheelCapture" | "onAnimationStart" | "onAnimationStartCapture" | "onAnimationEnd" | "onAnimationEndCapture" | "onAnimationIteration" | "onAnimationIterationCapture" | "onTransitionEnd" | "onTransitionEndCapture">(type: EventType, handler: NonNullable<JSX.DOMAttributes<ElementType>[EventType]>) => {
-    useLocalEventHandlerProps: (props: ElementProps<ElementType>) => ElementProps<ElementType>;
-};
 export {};
 //# sourceMappingURL=use-event-handler.d.ts.map

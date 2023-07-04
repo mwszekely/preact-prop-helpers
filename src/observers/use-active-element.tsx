@@ -1,6 +1,6 @@
 
-import { StateUpdater, useEffect } from "preact/hooks";
 import { OnPassiveStateChange, returnNull, returnTrue, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
+import { StateUpdater, useEffect } from "../util/lib.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 
 

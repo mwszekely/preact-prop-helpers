@@ -1,5 +1,4 @@
-import { options } from "preact";
-import { useCallback, useLayoutEffect, useRef } from "preact/hooks";
+import { debounceRendering, useCallback, useLayoutEffect, useRef } from "../util/lib.js";
 import { getBuildMode } from "../util/mode.js";
 import { Nullable } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
@@ -47,9 +46,6 @@ export function useEnsureStability<T extends any[]>(parentHookName: string, ...v
     }
 }
 
-export function debounceRendering(f: () => void) {
-    (options.debounceRendering ?? queueMicrotask)(f);
-}
 
 /**
  * Similar to `useState`, but for values that aren't "render-important" &ndash; updates don't cause a re-render and so the value shouldn't be used during render (though it certainly can, at least by re-rendering again).

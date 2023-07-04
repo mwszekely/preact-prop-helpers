@@ -1,4 +1,4 @@
-import { Inputs, useLayoutEffect as useLayoutEffectNative } from "preact/hooks";
+import { Inputs, useLayoutEffect as useLayoutEffectNative } from "../util/lib.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 import { EffectChange, useEffectDebug } from "./use-effect-debug.js";
 

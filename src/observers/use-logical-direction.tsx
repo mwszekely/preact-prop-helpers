@@ -1,4 +1,4 @@
-import { useCallback } from "preact/hooks";
+import { useCallback } from "../util/lib.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 import { ElementSize } from "./use-element-size.js";
 

@@ -1,5 +1,5 @@
 
-import { StateUpdater, useCallback, useRef, useState as useStateP } from "preact/hooks";
+import { StateUpdater, useCallback, useRef, useState as useStateP } from "../util/lib.js";
 import { getBuildMode } from "../util/mode.js";
 import { useStack } from "../util/stack.js";
 import { monitorCallCount } from "../util/use-call-count.js";

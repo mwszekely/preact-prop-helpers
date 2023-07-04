@@ -1,4 +1,4 @@
-import { useCallback as useCallbackNative } from "preact/hooks";
+import { useCallback as useCallbackNative } from "../util/lib.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 import { useEnsureStability } from "./use-passive-state.js";
 import { useStableGetter } from "./use-stable-getter.js";

@@ -1,4 +1,3 @@
-import { StateUpdater, useCallback, useEffect, useRef } from "preact/hooks";
 import { UseRefElementReturnType } from "../../dom-helpers/use-ref-element.js";
 import { UseHasCurrentFocusParameters } from "../../observers/use-has-current-focus.js";
 import { ManagedChildInfo, UseManagedChildParameters, UseManagedChildrenParameters, UseManagedChildrenReturnType, useChildrenFlag } from "../../preact-extensions/use-managed-children.js";
@@ -8,6 +7,7 @@ import { useMemoObject, useStableGetter } from "../../preact-extensions/use-stab
 import { useState } from "../../preact-extensions/use-state.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { findBackupFocus } from "../../util/focus.js";
+import { StateUpdater, useCallback, useEffect, useRef } from "../../util/lib.js";
 import { ElementProps, Nullable, OmitStrong } from "../../util/types.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
 

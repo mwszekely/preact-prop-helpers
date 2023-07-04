@@ -1,8 +1,8 @@
-import { useEffect } from "preact/hooks";
 import { isFocusable, isTabbable } from "tabbable";
 import { useBlockingElement } from "../dom-helpers/use-blocking-element.js";
 import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
+import { useEffect } from "../util/lib.js";
 import { ElementProps } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 

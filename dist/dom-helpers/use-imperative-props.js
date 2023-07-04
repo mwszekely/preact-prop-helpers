@@ -1,6 +1,4 @@
-import { createElement } from "preact";
-import { forwardRef, memo } from "preact/compat";
-import { useCallback, useImperativeHandle, useRef } from "preact/hooks";
+import { createElement, forwardRef, memo, useCallback, useImperativeHandle, useRef } from "../util/lib.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 import { useMergedProps } from "./use-merged-props.js";
 import { useRefElement } from "./use-ref-element.js";

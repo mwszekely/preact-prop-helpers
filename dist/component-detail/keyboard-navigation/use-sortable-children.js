@@ -1,9 +1,8 @@
 import { shuffle as lodashShuffle } from "lodash-es";
-import { createElement } from "preact";
-import { useCallback, useLayoutEffect, useRef } from "preact/hooks";
 import { useForceUpdate } from "../../preact-extensions/use-force-update.js";
 import { returnNull, useEnsureStability, usePassiveState } from "../../preact-extensions/use-passive-state.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
+import { createElement, useCallback, useLayoutEffect, useRef } from "../../util/lib.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
 /**
  * Hook that allows for the **direct descendant** children of this component to be re-ordered and sorted.

@@ -1,4 +1,4 @@
-import { Inputs } from "preact/hooks";
+import { Inputs } from "../util/lib.js";
 import { OmitStrong } from "../util/types.js";
 import { UseAsyncParameters } from "./use-async.js";
 /**

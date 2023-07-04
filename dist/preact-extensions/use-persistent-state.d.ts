@@ -1,4 +1,4 @@
-import { StateUpdater } from "preact/hooks";
+import { StateUpdater } from "../util/lib.js";
 /**
  * All types allowed by `usePersistentState`.
  *

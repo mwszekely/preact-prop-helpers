@@ -1,4 +1,3 @@
-import { useCallback } from "preact/hooks";
 import { useListNavigationSingleSelectionSortable } from "../component-detail/keyboard-navigation/use-list-navigation-single-selection-sortable.js";
 import { useListNavigationSingleSelectionChild } from "../component-detail/keyboard-navigation/use-list-navigation-single-selection.js";
 import { useSingleSelectionDeclarative } from "../component-detail/keyboard-navigation/use-single-selection.js";
@@ -13,6 +12,7 @@ import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useMemoObject } from "../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../util/assert.js";
 import { enhanceEvent } from "../util/event.js";
+import { useCallback } from "../util/lib.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 /**
  * All the list-related hooks combined into one giant hook that encapsulates everything.

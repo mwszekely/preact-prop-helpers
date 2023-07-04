@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useRef } from "preact/hooks";
 import { getDocument } from "../dom-helpers/use-document-class.js";
 import { UseRefElementParameters, UseRefElementReturnType, useRefElement } from "../dom-helpers/use-ref-element.js";
 import { OnPassiveStateChange, returnNull, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
+import { useCallback, useEffect, useRef } from "../util/lib.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 
 export interface UseElementSizeParameters<T extends Element> extends UseRefElementParameters<T> {

@@ -1,8 +1,7 @@
-import { useCallback, useEffect } from "preact/hooks";
 import { useEnsureStability } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
+import { useEffect } from "../util/lib.js";
 import { monitorCallCount } from "../util/use-call-count.js";
-import { useMergedProps } from "./use-merged-props.js";
 /**
  * Allows attaching an event handler to any *non-Preact* element, and removing it when the component using the hook unmounts. The callback does not need to be stable across renders.
  *
@@ -83,26 +82,5 @@ function useGlobalHandlerSingle(target, type, handler, options) {
             return () => target.removeEventListener(type, stableHandler, options);
         }
     }, [target, type, stableHandler]);
-}
-/**
- * An alternative way to add an event handler to an element. Useful primarily when integrating 3rd party libraries that expect a generic "add event handler" function.
- *
- * Returns a function that allows you to modify a set of props to apply this handler.
- *
- * For typing reasons, this function is split into two.  Usage is like the following:
- *
- * ```
- * const { useLocalEventHandlerProps } = useLocalEventHandler<HTMLDivElement>()("onMouseDown", e => {  });
- * const divProps = useLocalEventHandlerProps(props);
- * ```
- */
-export function useLocalHandler() {
-    return useCallback((type, handler) => {
-        const stableHandler = useStableCallback(handler);
-        const useLocalEventHandlerProps = useCallback((props) => {
-            return useMergedProps({ [type]: stableHandler }, props);
-        }, [type]);
-        return { useLocalEventHandlerProps };
-    }, []);
 }
 //# sourceMappingURL=use-event-handler.js.map

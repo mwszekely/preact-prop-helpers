@@ -1,4 +1,4 @@
-import { ComponentChildren } from "preact";
+import { ElementProps } from "../util/types.js";
 /**
  * When a bunch of unrelated components all use `requestAnimationFrame`,
  * yes, this actually is faster. I wish it wasn't. It's lame.
@@ -7,8 +7,8 @@ import { ComponentChildren } from "preact";
  * @returns
  */
 export declare function ProvideBatchedAnimationFrames({ children }: {
-    children: ComponentChildren;
-}): import("preact").JSX.Element;
+    children: ElementProps<EventTarget>["children"];
+}): import("../util/lib.js").JSX.Element;
 export interface UseAnimationFrameParameters {
     /**
      * Callback with effectively the same rules as `requestAnimationFrame`

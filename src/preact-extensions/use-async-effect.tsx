@@ -1,4 +1,4 @@
-import { Inputs, useEffect } from "preact/hooks";
+import { Inputs, useEffect } from "../util/lib.js";
 import { OmitStrong } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 import { UseAsyncParameters, useAsync } from "./use-async.js";

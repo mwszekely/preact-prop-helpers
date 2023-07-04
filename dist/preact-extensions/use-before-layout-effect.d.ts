@@ -1,4 +1,4 @@
-import { EffectCallback, Inputs } from "preact/hooks";
+import { EffectCallback, Inputs } from "../util/lib.js";
 /**
  * Semi-private function to allow stable callbacks even within `useLayoutEffect` and ref assignment.
  *

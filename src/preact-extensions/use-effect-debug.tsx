@@ -1,4 +1,4 @@
-import { Inputs, useEffect as useEffectNative, useRef } from "preact/hooks";
+import { Inputs, useEffect as useEffectNative, useRef } from "../util/lib.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 
 /**

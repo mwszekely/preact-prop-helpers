@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useRef } from "preact/hooks";
 import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
 import { OnPassiveStateChange, returnFalse, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
+import { useCallback, useEffect, useRef } from "../util/lib.js";
 import { ElementProps, FocusEventType, Nullable } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 

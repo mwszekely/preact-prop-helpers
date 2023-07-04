@@ -1,7 +1,7 @@
 
 import { CaptureFunctionType, asyncToSync } from "async-to-sync";
 import { identity } from "lodash-es";
-import { useCallback, useEffect, useMemo } from "preact/hooks";
+import { useCallback, useEffect, useMemo } from "../util/lib.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 import { useStableCallback } from "./use-stable-callback.js";
 import { useState } from "./use-state.js";

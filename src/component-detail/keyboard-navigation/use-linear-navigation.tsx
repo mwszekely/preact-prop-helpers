@@ -1,8 +1,8 @@
-import { useCallback, useRef } from "preact/hooks";
 import { useEnsureStability } from "../../index.js";
 import { ManagedChildInfo } from "../../preact-extensions/use-managed-children.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
+import { useCallback, useRef } from "../../util/lib.js";
 import { ElementProps, KeyboardEventType, Nullable, OmitStrong } from "../../util/types.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";

@@ -1,5 +1,5 @@
-import { useEffect } from "preact/hooks";
 import { returnNull, returnTrue, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
+import { useEffect } from "../util/lib.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 /**
  *

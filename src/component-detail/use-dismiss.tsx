@@ -1,4 +1,3 @@
-import { useCallback, useEffect } from "preact/hooks";
 import { useGlobalHandler } from "../dom-helpers/use-event-handler.js";
 import { UseRefElementReturnType, useRefElement } from "../dom-helpers/use-ref-element.js";
 import { UseActiveElementParameters, useActiveElement } from "../observers/use-active-element.js";
@@ -7,6 +6,7 @@ import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useStableGetter } from "../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../util/assert.js";
 import { EnhancedEventHandler, enhanceEvent } from "../util/event.js";
+import { useCallback, useEffect } from "../util/lib.js";
 import { ElementProps, FocusEventType, MouseEventType, Nullable } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 

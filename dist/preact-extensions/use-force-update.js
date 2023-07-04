@@ -1,4 +1,4 @@
-import { useRef, useState } from "preact/hooks";
+import { useRef, useState } from "../util/lib.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 /**
  * Returns a function that will, when called, force the component

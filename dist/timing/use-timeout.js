@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useRef } from "preact/hooks";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useStableGetter } from "../preact-extensions/use-stable-getter.js";
+import { useCallback, useEffect, useRef } from "../util/lib.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 export function useTimeout({ timeout, callback, triggerIndex }) {
     monitorCallCount(useTimeout);

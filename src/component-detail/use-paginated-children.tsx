@@ -1,8 +1,8 @@
-import { useCallback, useEffect, useMemo, useRef } from "preact/hooks";
 import { UseRefElementReturnType } from "../index.js";
 import { UseManagedChildrenReturnType } from "../preact-extensions/use-managed-children.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useState } from "../preact-extensions/use-state.js";
+import { useCallback, useEffect, useMemo, useRef } from "../util/lib.js";
 import { ElementProps, Nullable } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 import { UseLinearNavigationParameters } from "./keyboard-navigation/use-linear-navigation.js";

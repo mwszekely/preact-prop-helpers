@@ -1,10 +1,7 @@
-import type { JSX, PreactDOMAttributes } from "preact";
-import { useCallback, useEffect } from "preact/hooks";
 import { useEnsureStability } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
-import { ElementProps } from "../util/types.js";
+import { useEffect } from "../util/lib.js";
 import { monitorCallCount } from "../util/use-call-count.js";
-import { useMergedProps } from "./use-merged-props.js";
 
 /**
  * This is used to select *just* the typed addEventListener 
@@ -144,31 +141,4 @@ function useGlobalHandlerSingle<T extends EventTarget, EventType extends TypedEv
             return () => target.removeEventListener(type, stableHandler, options);
         }
     }, [target, type, stableHandler]);
-}
-
-
-/**
- * An alternative way to add an event handler to an element. Useful primarily when integrating 3rd party libraries that expect a generic "add event handler" function.
- * 
- * Returns a function that allows you to modify a set of props to apply this handler.
- * 
- * For typing reasons, this function is split into two.  Usage is like the following:
- * 
- * ```
- * const { useLocalEventHandlerProps } = useLocalEventHandler<HTMLDivElement>()("onMouseDown", e => {  });
- * const divProps = useLocalEventHandlerProps(props);
- * ```
- */
-export function useLocalHandler<ElementType extends (HTMLElementTagNameMap[keyof HTMLElementTagNameMap] | SVGElementTagNameMap[keyof SVGElementTagNameMap])>() {
-    return useCallback(<EventType extends Exclude<keyof JSX.DOMAttributes<ElementType>, keyof PreactDOMAttributes>>(type: EventType, handler: NonNullable<JSX.DOMAttributes<ElementType>[EventType]>) => {
-
-        const stableHandler = useStableCallback(handler);
-
-        const useLocalEventHandlerProps = useCallback((props: ElementProps<ElementType>) => {
-            return useMergedProps<ElementType>({ [type]: stableHandler } as ElementProps<ElementType>, props) as ElementProps<ElementType>;
-        }, [type]);
-
-        return { useLocalEventHandlerProps };
-
-    }, []);
 }
