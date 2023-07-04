@@ -236,7 +236,9 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
         linearNavigationParameters: {
             onNavigateLinear: useStableCallback((next, event) => {
                 setTabbableColumn(prev => ({ ideal: next, literal: prev?.literal ?? next }), event);
-            }), arrowKeyDirection: "horizontal", ...linearNavigationParameters
+            }), 
+            arrowKeyDirection: "horizontal", 
+            ...linearNavigationParameters
         }
     });
 
