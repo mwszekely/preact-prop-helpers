@@ -77,7 +77,9 @@ export function useGridNavigationRow({ context: { rovingTabIndexContext: context
     const focusSelf = whenThisRowIsFocused;
     const { hasCurrentFocusParameters, pressParameters, props: propsLNC, rovingTabIndexChildReturn, textContentReturn, info, ...void2 } = useListNavigationChild({ info: managedChildParameters, refElementReturn, textContentParameters, context: { rovingTabIndexContext: contextRTI, typeaheadNavigationContext: contextTN } });
     const allChildCellsAreUntabbable = !rovingTabIndexChildReturn.tabbable;
-    const { linearNavigationReturn, managedChildrenParameters, propsStableParentOrChild: propsLN, propsParent: propsLN2, rovingTabIndexReturn, typeaheadNavigationReturn, context: { rovingTabIndexContext: rtiContext, typeaheadNavigationContext: tnContext } } = useListNavigation({
+    const { linearNavigationReturn, managedChildrenParameters, propsStableParentOrChild: propsLN, 
+    // This is just tabIndex = 0 or -1, see the TODO below
+    propsParent: propsLN2, rovingTabIndexReturn, typeaheadNavigationReturn, context: { rovingTabIndexContext: rtiContext, typeaheadNavigationContext: tnContext } } = useListNavigation({
         managedChildrenReturn,
         refElementReturn,
         typeaheadNavigationParameters,

@@ -44,13 +44,24 @@ export interface UseCompleteListNavigationChildParameters<ChildElement extends E
 export interface UseCompleteListNavigationChildReturnType<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends Pick<UseListNavigationSingleSelectionSortableChildReturnType<ChildElement, M>, "textContentReturn" | "rovingTabIndexChildReturn" | "singleSelectionChildReturn">, OmitStrong<UseRefElementReturnType<ChildElement>, "propsStable"> {
     hasCurrentFocusReturn: UseHasCurrentFocusReturnType<ChildElement>["hasCurrentFocusReturn"];
     managedChildReturn: UseManagedChildReturnType<M>["managedChildReturn"];
-    props: ElementProps<ChildElement>;
     /**
-     * Spread these props onto whatever element is the "clickable" part of this list item.
+     * These props should be passed to whichever element is tabbable.
+     * This may be the same element as `propsChild`, in which case `useMergedProps` is recommended.
      *
-     * **Optional**, as it's entirely possible that this list item isn't selected with a simple press but some more complicated process, like in a grid list.
+     * @see propsChild
+     */
+    propsTabbable: ElementProps<any>;
+    /**
+     * These props should be passed to whichever element is considered the child element of the list (e.g. the `li` in an `ol`).
+     * This may be the same element as `propsChild`, in which case `useMergedProps` is recommended.
+     * But it may also be different, e.g. if that `li` contains an `input`.
      *
-     * */
+     * @see propsTabbable
+     */
+    propsChild: ElementProps<any>;
+    /**
+     * This hook does not include `usePress`, so when you call it for whatever element is responsible for selecting this child, pass it these parameters.
+     */
     pressParameters: Pick<UsePressParameters<any>["pressParameters"], "onPressSync" | "excludeSpace">;
     paginatedChildReturn: UsePaginatedChildReturn<ChildElement>["paginatedChildReturn"];
     staggeredChildReturn: UseStaggeredChildReturn<ChildElement>["staggeredChildReturn"];

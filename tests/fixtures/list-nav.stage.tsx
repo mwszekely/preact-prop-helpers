@@ -167,7 +167,8 @@ function TestBasesListNavChild({ index }: { index: number }) {
         hasCurrentFocusReturn: { getCurrentFocused, getCurrentFocusedInner },
         managedChildReturn: { getChildren },
         paginatedChildReturn: { hideBecausePaginated, isPaginated, paginatedVisible },
-        props,
+        propsChild,
+        propsTabbable,
         refElementReturn,
         rovingTabIndexChildReturn: { getTabbable, tabbable },
         singleSelectionChildReturn: { getSelected, getSelectedOffset, selected, selectedOffset, setThisOneSelected },
@@ -200,7 +201,7 @@ function TestBasesListNavChild({ index }: { index: number }) {
                 data-selected={selected}
                 data-selected-offset={selectedOffset}
                 data-is-staggered={isStaggered}
-                {...useMergedProps(props, propsPressStable)}>{(hideBecausePaginated || hideBecauseStaggered) ? "" : textContent}{hidden && " (hidden)"}{disabled && " (disabled)"}</li>
+                {...useMergedProps(propsChild, propsTabbable, propsPressStable)}>{(hideBecausePaginated || hideBecauseStaggered) ? "" : textContent}{hidden && " (hidden)"}{disabled && " (disabled)"}</li>
         </>
     )
 }

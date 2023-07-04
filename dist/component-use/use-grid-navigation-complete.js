@@ -117,7 +117,8 @@ export function useCompleteGridNavigationRow({ info, context: contextIncomingFor
     const { managedChildReturn } = useManagedChild({ context: contextIncomingForRowAsChildOfTable, info: completeInfo });
     const context = useMemoObject({
         ...contextGNR,
-        ...contextMC
+        ...contextMC,
+        completeGridNavigationCellContext: { excludeSpace }
     });
     const { hasCurrentFocusParameters } = useChildrenHaveFocusChild({ context: contextIncomingForRowAsChildOfTable });
     //const { refElementReturn } = useRefElement<RowElement>({ refElementParameters: {} })
@@ -142,10 +143,10 @@ export function useCompleteGridNavigationRow({ info, context: contextIncomingFor
         props,
     };
 }
-export function useCompleteGridNavigationCell({ gridNavigationCellParameters, context: { gridNavigationCellContext, managedChildContext, rovingTabIndexContext, typeaheadNavigationContext }, textContentParameters, info, ...void1 }) {
+export function useCompleteGridNavigationCell({ gridNavigationCellParameters, context: { gridNavigationCellContext, managedChildContext, rovingTabIndexContext, typeaheadNavigationContext, completeGridNavigationCellContext: { excludeSpace: es2 } }, textContentParameters, info, ...void1 }) {
     monitorCallCount(useCompleteGridNavigationCell);
     const { refElementReturn, propsStable } = useRefElement({ refElementParameters: {} });
-    const { hasCurrentFocusParameters, rovingTabIndexChildReturn, textContentReturn, pressParameters, props: propsRti, info: info2, ...void2 } = useGridNavigationSingleSelectionCell({
+    const { hasCurrentFocusParameters, rovingTabIndexChildReturn, textContentReturn, pressParameters: { excludeSpace: es1 }, props: propsRti, info: info2, ...void2 } = useGridNavigationSingleSelectionCell({
         gridNavigationCellParameters,
         info,
         context: { gridNavigationCellContext, rovingTabIndexContext, typeaheadNavigationContext },
@@ -168,7 +169,7 @@ export function useCompleteGridNavigationCell({ gridNavigationCellParameters, co
         props,
         refElementReturn,
         rovingTabIndexChildReturn,
-        pressParameters,
+        pressParameters: { excludeSpace: useStableCallback(() => (es1?.() || es2?.() || false)) },
         hasCurrentFocusReturn,
         managedChildReturn,
         textContentReturn

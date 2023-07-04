@@ -100,7 +100,7 @@ textContentParameters, context: { childrenHaveFocusChildContext, managedChildCon
     if (untabbable)
         unselectable = true;
     const { refElementReturn, propsStable } = useRefElement({ refElementParameters: {} });
-    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1 }, pressParameters: { excludeSpace, ...pressParameters2 }, textContentReturn, singleSelectionChildReturn, info: mcp5, props: propsLs, rovingTabIndexChildReturn } = useListNavigationSingleSelectionChild({
+    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1 }, pressParameters: { excludeSpace, ...pressParameters2 }, textContentReturn, singleSelectionChildReturn, info: mcp5, rovingTabIndexChildReturn, propsChild, propsTabbable } = useListNavigationSingleSelectionChild({
         info: { index, unselectable, untabbable },
         context: { rovingTabIndexContext, singleSelectionContext, typeaheadNavigationContext },
         refElementReturn,
@@ -130,9 +130,10 @@ textContentParameters, context: { childrenHaveFocusChildContext, managedChildCon
         ocfic2?.(focused, prev, e);
     });
     const { hasCurrentFocusReturn } = useHasCurrentFocus({ hasCurrentFocusParameters: { onCurrentFocusedInnerChanged, onCurrentFocusedChanged: null }, refElementReturn });
-    const props = useMergedProps(propsStable, hasCurrentFocusReturn.propsStable, propsLs, paginationProps, staggeredProps);
+    const props = useMergedProps(propsStable, hasCurrentFocusReturn.propsStable, propsChild, paginationProps, staggeredProps);
     return {
-        props,
+        propsChild: props,
+        propsTabbable,
         pressParameters: {
             onPressSync,
             excludeSpace

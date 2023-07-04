@@ -54,7 +54,7 @@ export interface UseCompleteGridNavigationCellParameters<CellElement extends Ele
     info: Omit<CM, Exclude<keyof UseCompleteGridNavigationCellInfo<CellElement>, "index" | "untabbable" | "focusSelf">>;
     //completeGridNavigationCellParameters: Pick<CM, "focusSelf"> & OmitStrong<CM, keyof UseCompleteGridNavigationCellInfo<CellElement>>;
     context: CompleteGridNavigationCellContext<any, CellElement, CM>;
-    
+
     //rovingTabIndexParameters: UseRovingTabIndexChildParameters<any, any>["rovingTabIndexParameters"];
     //singleSelectionParameters: UseSingleSelectionChildParameters<any, any>["singleSelectionParameters"];
 }
@@ -75,7 +75,9 @@ export interface CompleteGridNavigationCellContext<ParentElement extends Element
     UseManagedChildrenContext<CM>,
     UseTypeaheadNavigationContext,
     RovingTabIndexChildContext,
-    UseGridNavigationCellContext { }
+    UseGridNavigationCellContext {
+    completeGridNavigationCellContext: { excludeSpace: undefined | (() => boolean); }
+}
 
 
 export interface UseCompleteGridNavigationReturnType<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement, CellElement>, CM extends UseCompleteGridNavigationCellInfo<CellElement>>
@@ -108,7 +110,6 @@ export interface UseCompleteGridNavigationCellReturnType<CellElement extends Ele
     UseHasCurrentFocusReturnType<CellElement>,
     UseManagedChildReturnType<CM> {
     props: ElementProps<CellElement>;
-
 }
 
 
@@ -293,7 +294,8 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
 
     const context = useMemoObject<CompleteGridNavigationCellContext<RowElement, CellElement, CM>>({
         ...contextGNR,
-        ...contextMC
+        ...contextMC,
+        completeGridNavigationCellContext: { excludeSpace }
     });
     const { hasCurrentFocusParameters } = useChildrenHaveFocusChild<RowElement>({ context: contextIncomingForRowAsChildOfTable });
     //const { refElementReturn } = useRefElement<RowElement>({ refElementParameters: {} })
@@ -327,7 +329,7 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
 
 export function useCompleteGridNavigationCell<CellElement extends Element, CM extends UseCompleteGridNavigationCellInfo<CellElement>>({
     gridNavigationCellParameters,
-    context: { gridNavigationCellContext, managedChildContext, rovingTabIndexContext, typeaheadNavigationContext },
+    context: { gridNavigationCellContext, managedChildContext, rovingTabIndexContext, typeaheadNavigationContext, completeGridNavigationCellContext: { excludeSpace: es2 } },
     textContentParameters,
     info,
     ...void1
@@ -340,7 +342,7 @@ export function useCompleteGridNavigationCell<CellElement extends Element, CM ex
         hasCurrentFocusParameters,
         rovingTabIndexChildReturn,
         textContentReturn,
-        pressParameters,
+        pressParameters: { excludeSpace: es1 },
         props: propsRti,
         info: info2,
         ...void2
@@ -376,7 +378,7 @@ export function useCompleteGridNavigationCell<CellElement extends Element, CM ex
         props,
         refElementReturn,
         rovingTabIndexChildReturn,
-        pressParameters,
+        pressParameters: { excludeSpace: useStableCallback(() => (es1?.() || es2?.() || false)) },
         hasCurrentFocusReturn,
         managedChildReturn,
         textContentReturn

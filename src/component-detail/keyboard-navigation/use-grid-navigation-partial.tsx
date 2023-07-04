@@ -206,6 +206,7 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
         linearNavigationReturn,
         managedChildrenParameters,
         propsStableParentOrChild: propsLN,
+        // This is just tabIndex = 0 or -1, see the TODO below
         propsParent: propsLN2,
         rovingTabIndexReturn,
         typeaheadNavigationReturn,

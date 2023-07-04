@@ -1,4 +1,3 @@
-import { useMergedProps } from "../../dom-helpers/use-merged-props.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useMemoObject } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
@@ -51,7 +50,8 @@ export function useListNavigationSingleSelectionChild({ info, context, refElemen
         rovingTabIndexChildReturn,
         singleSelectionChildReturn,
         textContentReturn,
-        props: useMergedProps(propsLN, propsSS),
+        propsChild: propsSS,
+        propsTabbable: propsLN
     };
 }
 //# sourceMappingURL=use-list-navigation-single-selection.js.map

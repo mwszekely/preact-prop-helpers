@@ -1,8 +1,7 @@
-import { useMergedProps } from "../../dom-helpers/use-merged-props.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useMemoObject } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
-import { ExtendMerge, OmitStrong } from "../../util/types.js";
+import { ElementProps, ExtendMerge, OmitStrong } from "../../util/types.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
 import { UseListNavigationChildInfo, UseListNavigationChildParameters, UseListNavigationChildReturnType, UseListNavigationContext, UseListNavigationParameters, UseListNavigationReturnType, useListNavigation, useListNavigationChild } from "./use-list-navigation-partial.js";
 import { UseSingleSelectionChildInfo, UseSingleSelectionChildParameters, UseSingleSelectionChildReturnType, UseSingleSelectionContext, UseSingleSelectionParameters, UseSingleSelectionReturnType, useSingleSelection, useSingleSelectionChild } from "./use-single-selection.js";
@@ -12,7 +11,10 @@ export interface UseListNavigationSingleSelectionParameters<ParentOrChildElement
 export interface UseListNavigationSingleSelectionReturnType<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationSingleSelectionChildInfo<ChildElement>> extends ExtendMerge<UseListNavigationReturnType<ParentOrChildElement, ChildElement, M>, UseSingleSelectionReturnType<ChildElement, M>> { }
 export interface UseListNavigationSingleSelectionChildContext extends UseListNavigationContext, UseSingleSelectionContext { }
 export interface UseListNavigationSingleSelectionChildParameters<ChildElement extends Element, M extends UseListNavigationSingleSelectionChildInfo<ChildElement>> extends ExtendMerge<UseListNavigationChildParameters<ChildElement, M>, UseSingleSelectionChildParameters<ChildElement, M>> { }
-export interface UseListNavigationSingleSelectionChildReturnType<ChildElement extends Element, M extends UseListNavigationSingleSelectionChildInfo<ChildElement>> extends ExtendMerge<UseListNavigationChildReturnType<ChildElement, M>, UseSingleSelectionChildReturnType<ChildElement>> { }
+export interface UseListNavigationSingleSelectionChildReturnType<ChildElement extends Element, M extends UseListNavigationSingleSelectionChildInfo<ChildElement>> extends OmitStrong<ExtendMerge<UseListNavigationChildReturnType<ChildElement, M>, UseSingleSelectionChildReturnType<ChildElement>>, "props"> {
+    propsTabbable: ElementProps<any>;
+    propsChild: ElementProps<any>;
+ }
 
 export function useListNavigationSingleSelection<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationSingleSelectionChildInfo<ChildElement>>({
     linearNavigationParameters,
@@ -96,6 +98,7 @@ export function useListNavigationSingleSelectionChild<ChildElement extends Eleme
         rovingTabIndexChildReturn,
         singleSelectionChildReturn,
         textContentReturn,
-        props: useMergedProps(propsLN, propsSS),
+        propsChild: propsSS,
+        propsTabbable: propsLN
     }
 }
