@@ -1,8 +1,9 @@
 import { useCallback, useRef } from "preact/hooks";
+import { useEnsureStability } from "../../index.js";
 import { ManagedChildInfo } from "../../preact-extensions/use-managed-children.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
-import { ElementProps, OmitStrong } from "../../util/types.js";
+import { ElementProps, KeyboardEventType, Nullable, OmitStrong } from "../../util/types.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
 
@@ -25,6 +26,8 @@ export interface UseLinearNavigationParameters<ParentOrChildElement extends Elem
     rovingTabIndexReturn: Pick<UseRovingTabIndexReturnType<ParentOrChildElement, ChildElement, UseRovingTabIndexChildInfo<ChildElement>>["rovingTabIndexReturn"], "getTabbableIndex" | "setTabbableIndex">;
 
     linearNavigationParameters: {
+
+        onNavigateLinear: Nullable<(newIndex: number | null, event: KeyboardEventType<ChildElement>) => void>;
 
         /**
          * Must return true if the given child can be navigated to.
@@ -103,8 +106,10 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
     monitorCallCount(useLinearNavigation);
 
     type R = Event;
-    const { getHighestIndex, indexDemangler, indexMangler, isValid, navigatePastEnd, navigatePastStart } = linearNavigationParameters;
+    const { getHighestIndex, indexDemangler, indexMangler, isValid, navigatePastEnd, navigatePastStart, onNavigateLinear } = linearNavigationParameters;
     const { getTabbableIndex, setTabbableIndex } = rovingTabIndexReturn;
+
+    useEnsureStability("useLinearNavigation", onNavigateLinear);
 
     const navigateAbsolute = useCallback((requestedIndexMangled: number, searchDirection: -1 | 1, e: R, fromUserInteraction: boolean, mode: "page" | "single") => {
         //const targetUnmangled = indexDemangler(requestedIndexMangled);
@@ -166,6 +171,7 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
         }
         else {
             setTabbableIndex(valueUnmangled, e, fromUserInteraction);
+            onNavigateLinear?.(valueUnmangled, e as KeyboardEventType<ChildElement>);
             return "stop";
         }
     }, []);
@@ -246,7 +252,7 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
                     case "PageUp":
                     case "PageDown":
                         if (truePageNavigationSize > 0) {
-                            result = navigateRelative2(e, truePageNavigationSize * (e.key.endsWith('n') ? -1 : 1), true, "page");
+                            result = navigateRelative2(e, truePageNavigationSize * (e.key.endsWith('n') ? 1 : -1), true, "page");
                         }
                         break;
 

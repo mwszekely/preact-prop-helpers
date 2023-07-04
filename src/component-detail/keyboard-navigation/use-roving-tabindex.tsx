@@ -342,7 +342,11 @@ export function useRovingTabIndex<ParentElement extends Element, ChildElement ex
     const isTabbableValid = useStableCallback((child: M) => { return !child.untabbable; });
     const { changeIndex: changeTabbableIndex, getCurrentIndex: getTabbableIndex, reevaluateClosestFit } = useChildrenFlag<M, Event>({
         initialIndex: initiallyTabbedIndex ?? (untabbable ? null : 0),
-        onIndexChange: onTabbableIndexChange || null,
+        onIndexChange: useStableCallback((n, p, r) => {
+            // Ensure that changes to `untabbable` don't affect the user-provided onTabbableIndexChange
+            if ((!(n == null && untabbable)) && n != getLastNonNullIndex())
+                onTabbableIndexChange?.(n, p, r);
+        }),
         getChildren,
         closestFit: true,
         getAt: getTabbableAt,

@@ -1,4 +1,5 @@
 import { useCallback, useRef } from "preact/hooks";
+import { useEnsureStability } from "../../index.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
@@ -10,8 +11,9 @@ import { monitorCallCount } from "../../util/use-call-count.js";
  */
 export function useLinearNavigation({ rovingTabIndexReturn, linearNavigationParameters }) {
     monitorCallCount(useLinearNavigation);
-    const { getHighestIndex, indexDemangler, indexMangler, isValid, navigatePastEnd, navigatePastStart } = linearNavigationParameters;
+    const { getHighestIndex, indexDemangler, indexMangler, isValid, navigatePastEnd, navigatePastStart, onNavigateLinear } = linearNavigationParameters;
     const { getTabbableIndex, setTabbableIndex } = rovingTabIndexReturn;
+    useEnsureStability("useLinearNavigation", onNavigateLinear);
     const navigateAbsolute = useCallback((requestedIndexMangled, searchDirection, e, fromUserInteraction, mode) => {
         //const targetUnmangled = indexDemangler(requestedIndexMangled);
         //const { valueUnmangled } = tryNavigateToIndex({ isValid, highestChildIndex: getHighestIndex(), indexDemangler, indexMangler, searchDirection: -1, targetUnmangled });
@@ -70,6 +72,7 @@ export function useLinearNavigation({ rovingTabIndexReturn, linearNavigationPara
         }
         else {
             setTabbableIndex(valueUnmangled, e, fromUserInteraction);
+            onNavigateLinear?.(valueUnmangled, e);
             return "stop";
         }
     }, []);
@@ -140,7 +143,7 @@ export function useLinearNavigation({ rovingTabIndexReturn, linearNavigationPara
                     case "PageUp":
                     case "PageDown":
                         if (truePageNavigationSize > 0) {
-                            result = navigateRelative2(e, truePageNavigationSize * (e.key.endsWith('n') ? -1 : 1), true, "page");
+                            result = navigateRelative2(e, truePageNavigationSize * (e.key.endsWith('n') ? 1 : -1), true, "page");
                         }
                         break;
                     case "Home":

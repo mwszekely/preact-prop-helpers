@@ -7,7 +7,7 @@ import { useStableCallback } from "../../preact-extensions/use-stable-callback.j
 import { useMemoObject, useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { useState } from "../../preact-extensions/use-state.js";
 import { assertEmptyObject } from "../../util/assert.js";
-import { CompositionEventType, ElementProps } from "../../util/types.js";
+import { CompositionEventType, ElementProps, KeyboardEventType, Nullable } from "../../util/types.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexChildParameters, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
 
@@ -30,10 +30,12 @@ export interface UseTypeaheadNavigationContext {
     }
 }
 
-export interface UseTypeaheadNavigationChildInfo<TabbableChildElement extends Element> extends Pick<UseRovingTabIndexChildInfo<TabbableChildElement>, "index"> {}
+export interface UseTypeaheadNavigationChildInfo<TabbableChildElement extends Element> extends Pick<UseRovingTabIndexChildInfo<TabbableChildElement>, "index"> { }
 
 export interface UseTypeaheadNavigationParameters<TabbableChildElement extends Element, _M extends UseTypeaheadNavigationChildInfo<TabbableChildElement>> {
     typeaheadNavigationParameters: {
+
+        onNavigateTypeahead: Nullable<(newIndex: number | null, event: KeyboardEventType<TabbableChildElement>) => void>;
 
 
         /**
@@ -79,7 +81,7 @@ interface TypeaheadInfo { text: string | null; unsortedIndex: number; }
  * @see useListNavigation, which packages everything up together.
  */
 export function useTypeaheadNavigation<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseTypeaheadNavigationChildInfo<ChildElement>>({
-    typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead, isValid, ...void3 },
+    typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead, isValid, onNavigateTypeahead, ...void3 },
     rovingTabIndexReturn: { getTabbableIndex: getIndex, setTabbableIndex: setIndex, ...void1 },
     ...void2
 }: UseTypeaheadNavigationParameters<ChildElement, M>): UseTypeaheadNavigationReturnType<ParentOrChildElement> {
@@ -313,10 +315,17 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
                     ++i;
                 }
 
+                let toSet: number | null = null;
+
                 if (lowestUnsortedIndexNext !== null)
-                    setIndex(sortedTypeaheadInfo.current[lowestSortedIndexNext].unsortedIndex, reason, true);
+                    toSet = sortedTypeaheadInfo.current[lowestSortedIndexNext].unsortedIndex;
                 else if (lowestUnsortedIndexAll !== null)
-                    setIndex(sortedTypeaheadInfo.current[lowestSortedIndexAll].unsortedIndex, reason, true);
+                    toSet = sortedTypeaheadInfo.current[lowestSortedIndexAll].unsortedIndex;
+
+                if (toSet != null) {
+                    setIndex(toSet, reason, true);
+                    onNavigateTypeahead?.(toSet, reason as KeyboardEventType<any>);
+                }
             }
         }
     }

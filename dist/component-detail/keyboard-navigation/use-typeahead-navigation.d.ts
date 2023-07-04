@@ -1,7 +1,7 @@
 import { UsePressParameters } from "../../component-use/use-press.js";
 import { UseRefElementReturnType } from "../../dom-helpers/use-ref-element.js";
 import { UseTextContentParameters, UseTextContentReturnType } from "../../dom-helpers/use-text-content.js";
-import { ElementProps } from "../../util/types.js";
+import { ElementProps, KeyboardEventType, Nullable } from "../../util/types.js";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexChildParameters, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
 export interface UseTypeaheadNavigationReturnType<ParentOrChildElement extends Element> {
     typeaheadNavigationReturn: {
@@ -23,6 +23,7 @@ export interface UseTypeaheadNavigationChildInfo<TabbableChildElement extends El
 }
 export interface UseTypeaheadNavigationParameters<TabbableChildElement extends Element, _M extends UseTypeaheadNavigationChildInfo<TabbableChildElement>> {
     typeaheadNavigationParameters: {
+        onNavigateTypeahead: Nullable<(newIndex: number | null, event: KeyboardEventType<TabbableChildElement>) => void>;
         /**
          * Must return true if the given child can be navigated to.
          *
@@ -58,7 +59,7 @@ interface TypeaheadInfo {
  *
  * @see useListNavigation, which packages everything up together.
  */
-export declare function useTypeaheadNavigation<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseTypeaheadNavigationChildInfo<ChildElement>>({ typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead, isValid, ...void3 }, rovingTabIndexReturn: { getTabbableIndex: getIndex, setTabbableIndex: setIndex, ...void1 }, ...void2 }: UseTypeaheadNavigationParameters<ChildElement, M>): UseTypeaheadNavigationReturnType<ParentOrChildElement>;
+export declare function useTypeaheadNavigation<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseTypeaheadNavigationChildInfo<ChildElement>>({ typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead, isValid, onNavigateTypeahead, ...void3 }, rovingTabIndexReturn: { getTabbableIndex: getIndex, setTabbableIndex: setIndex, ...void1 }, ...void2 }: UseTypeaheadNavigationParameters<ChildElement, M>): UseTypeaheadNavigationReturnType<ParentOrChildElement>;
 export declare function useTypeaheadNavigationChild<ChildElement extends Element, M extends UseTypeaheadNavigationChildInfo<ChildElement>>({ info: { index, ...void1 }, textContentParameters: { getText, ...void5 }, context: { typeaheadNavigationContext: { sortedTypeaheadInfo, insertingComparator, excludeSpace, ...void2 } }, refElementReturn: { getElement, ...void3 }, ...void4 }: UseTypeaheadNavigationChildParameters<ChildElement, M>): UseTypeaheadNavigationChildReturnType;
 /**
  * Your usual binary search implementation.

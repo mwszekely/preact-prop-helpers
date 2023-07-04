@@ -3,7 +3,7 @@ import { useCallback, useContext, useEffect, useState } from "preact/hooks";
 import { Compare, CompleteGridNavigationContext, CompleteGridNavigationRowContext, EventDetail, UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationRowInfo, UseSingleSelectionParameters, focus, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useImperativeProps, useMergedProps, useRefElement, useStableCallback, useStableGetter } from "../../dist/index.js";
 import { LoremIpsum } from "../lorem.js";
 import { fromStringArray, fromStringBoolean, fromStringNumber, fromStringString, useTestSyncState } from "../util.js";
-import { DefaultChildCount, DisabledIndex, HiddenIndex, MissingIndex } from "./grid-nav.constants.js";
+import { DefaultChildCount, DisabledIndex, HiddenIndex, MissingIndex, WithColSpanIndex } from "./grid-nav.constants.js";
 
 
 
@@ -213,7 +213,9 @@ function TestBaseGridNavRow({ index }: { index: number }) {
                 {...useMergedProps(props, { onFocus: e => { console.error("A grid row has received focus"); setRowFocused(true); throw new Error("A grid row has received focus");  } })}>
                 {...Array.from(function* () {
                     for (let i = 0; i < 10; ++i) {
-                        yield (<TestBaseGridNavCell index={i} row={index} />)
+                        const colSpan = (i === WithColSpanIndex? (index % 10) : 0) + 1;
+                        yield (<TestBaseGridNavCell index={i} row={index} colSpan={colSpan} />);
+                        i += (colSpan - 1);
                     }
                 }())}</tr>
         </CellContext.Provider>
@@ -223,7 +225,7 @@ function TestBaseGridNavRow({ index }: { index: number }) {
 
 
 
-function TestBaseGridNavCell({ index, row }: { row: number, index: number }) {
+function TestBaseGridNavCell({ index, row, colSpan }: { row: number, index: number, colSpan: number }) {
     useOnRender("children");
     useOnRender("child-" + index);
 
@@ -235,7 +237,7 @@ function TestBaseGridNavCell({ index, row }: { row: number, index: number }) {
     const missing = (index === MissingIndex);
     const hidden = (index === HiddenIndex);
     if (missing)
-        return <td>(The #{index}-th item is missing)</td>;
+        return <td colSpan={colSpan}>(The #{index}-th item is missing)</td>;
 
     const {
         hasCurrentFocusReturn: { getCurrentFocused, getCurrentFocusedInner },
@@ -247,13 +249,14 @@ function TestBaseGridNavCell({ index, row }: { row: number, index: number }) {
         textContentReturn: { getTextContent }
     } = useCompleteGridNavigationCell<HTMLTableCellElement, UseCompleteGridNavigationCellInfo<HTMLTableCellElement>>({
         context: useContext(CellContext),
-        gridNavigationCellParameters: { colSpan: 1 },
+        gridNavigationCellParameters: { colSpan },
         info: { index, untabbable: false, focusSelf: e => e.focus() },
         textContentParameters: { getText: useStableCallback(() => textContent) }
     })
     return (
         <>
             <td
+                colSpan={colSpan}
                 role="cell"
                 data-index={index}
                 /*data-hide-because-paginated={hideBecausePaginated}

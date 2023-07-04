@@ -259,7 +259,7 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
     });
 
     const {
-        gridNavigationRowParameters: { focusSelf, setTabbableColumnIndex },
+        gridNavigationRowParameters: { focusSelf },
         linearNavigationReturn,
         managedChildrenParameters,
         pressParameters: { excludeSpace },  // TODO: Pass this through context? (this is for children, so it doesn't actually matter, but for completeness...)
@@ -280,7 +280,6 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
     const completeInfo: UseCompleteGridNavigationRowInfo<RowElement, CellElement> = {
         getElement: refElementReturn.getElement,
         focusSelf,
-        setTabbableColumnIndex,
         getSortValue: sortableChildParameters.getSortValue,
         ...info,
         ...infoRowReturn,

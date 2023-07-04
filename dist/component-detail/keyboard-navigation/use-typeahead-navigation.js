@@ -11,7 +11,7 @@ import { monitorCallCount } from "../../util/use-call-count.js";
  *
  * @see useListNavigation, which packages everything up together.
  */
-export function useTypeaheadNavigation({ typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead, isValid, ...void3 }, rovingTabIndexReturn: { getTabbableIndex: getIndex, setTabbableIndex: setIndex, ...void1 }, ...void2 }) {
+export function useTypeaheadNavigation({ typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead, isValid, onNavigateTypeahead, ...void3 }, rovingTabIndexReturn: { getTabbableIndex: getIndex, setTabbableIndex: setIndex, ...void1 }, ...void2 }) {
     monitorCallCount(useTypeaheadNavigation);
     assertEmptyObject(void1);
     assertEmptyObject(void2);
@@ -191,10 +191,15 @@ export function useTypeaheadNavigation({ typeaheadNavigationParameters: { collat
                     updateBestFit(sortedTypeaheadInfo.current[i].unsortedIndex);
                     ++i;
                 }
+                let toSet = null;
                 if (lowestUnsortedIndexNext !== null)
-                    setIndex(sortedTypeaheadInfo.current[lowestSortedIndexNext].unsortedIndex, reason, true);
+                    toSet = sortedTypeaheadInfo.current[lowestSortedIndexNext].unsortedIndex;
                 else if (lowestUnsortedIndexAll !== null)
-                    setIndex(sortedTypeaheadInfo.current[lowestSortedIndexAll].unsortedIndex, reason, true);
+                    toSet = sortedTypeaheadInfo.current[lowestSortedIndexAll].unsortedIndex;
+                if (toSet != null) {
+                    setIndex(toSet, reason, true);
+                    onNavigateTypeahead?.(toSet, reason);
+                }
             }
         }
     }

@@ -3,4 +3,5 @@
 export const DisabledIndex = 4;
 export const MissingIndex = 6;
 export const HiddenIndex = 8;
+export const WithColSpanIndex = 3;
 export const DefaultChildCount = 20

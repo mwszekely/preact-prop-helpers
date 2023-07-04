@@ -1,5 +1,5 @@
 import { ManagedChildInfo } from "../../preact-extensions/use-managed-children.js";
-import { ElementProps } from "../../util/types.js";
+import { ElementProps, KeyboardEventType, Nullable } from "../../util/types.js";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
 export interface LinearNavigationResult {
     valueUnmangled: number | null;
@@ -15,6 +15,7 @@ export interface UseLinearNavigationChildInfo<ChildElement extends Element> exte
 export interface UseLinearNavigationParameters<ParentOrChildElement extends Element, ChildElement extends Element, _M extends UseLinearNavigationChildInfo<ChildElement>> {
     rovingTabIndexReturn: Pick<UseRovingTabIndexReturnType<ParentOrChildElement, ChildElement, UseRovingTabIndexChildInfo<ChildElement>>["rovingTabIndexReturn"], "getTabbableIndex" | "setTabbableIndex">;
     linearNavigationParameters: {
+        onNavigateLinear: Nullable<(newIndex: number | null, event: KeyboardEventType<ChildElement>) => void>;
         /**
          * Must return true if the given child can be navigated to.
          *
