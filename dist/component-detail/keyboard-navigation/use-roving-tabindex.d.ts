@@ -126,7 +126,7 @@ export interface RovingTabIndexChildContext {
         reevaluateClosestFit: (requestedIndex?: number) => void;
     };
 }
-export interface UseRovingTabIndexChildReturnType<ChildElement extends Element, _M extends UseRovingTabIndexChildInfo<ChildElement>> {
+export interface UseRovingTabIndexChildReturnType<ChildElement extends Element, M extends UseRovingTabIndexChildInfo<ChildElement>> {
     /**
      * This is used to handle the case where a user clicks on an element or manually focuses it in some other way.
      *
@@ -144,7 +144,10 @@ export interface UseRovingTabIndexChildReturnType<ChildElement extends Element, 
         /** **STABLE** */
         getTabbable(): boolean;
     };
-    info: Pick<UseRovingTabIndexChildInfo<ChildElement>, "getLocallyTabbable" | "setLocallyTabbable">;
+    /**
+     * Pass this to `useManagedChild`.
+     */
+    info: Pick<M, "getLocallyTabbable" | "setLocallyTabbable">;
     /**
      * *Unstable*
      *

@@ -167,7 +167,7 @@ export interface RovingTabIndexChildContext {
     }
 }
 
-export interface UseRovingTabIndexChildReturnType<ChildElement extends Element, _M extends UseRovingTabIndexChildInfo<ChildElement>> {
+export interface UseRovingTabIndexChildReturnType<ChildElement extends Element, M extends UseRovingTabIndexChildInfo<ChildElement>> {
 
     /** 
      * This is used to handle the case where a user clicks on an element or manually focuses it in some other way.
@@ -184,16 +184,16 @@ export interface UseRovingTabIndexChildReturnType<ChildElement extends Element, 
          * Whether this child, individually, is *the* currently tabbable child.
          */
         tabbable: boolean;
+
         /** **STABLE** */
         getTabbable(): boolean;
-        /** **STABLE**
-         * 
-         * Internal use only, pass to `useManagedChild`
-         */
-        //setTabbable: StateUpdater<boolean>;
+        
     }
 
-    info: Pick<UseRovingTabIndexChildInfo<ChildElement>, "getLocallyTabbable" | "setLocallyTabbable">;
+    /**
+     * Pass this to `useManagedChild`.
+     */
+    info: Pick<M, "getLocallyTabbable" | "setLocallyTabbable">;
 
     /** 
      * *Unstable*

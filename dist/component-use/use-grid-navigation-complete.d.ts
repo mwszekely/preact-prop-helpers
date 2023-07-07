@@ -50,7 +50,7 @@ export interface UseCompleteGridNavigationReturnType<ParentOrRowElement extends 
     managedChildrenReturn: UseManagedChildrenReturnType<RM>["managedChildrenReturn"];
     childrenHaveFocusReturn: UseChildrenHaveFocusReturnType<RowElement>["childrenHaveFocusReturn"];
 }
-export interface UseCompleteGridNavigationRowReturnType<RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement, CellElement>, CM extends UseCompleteGridNavigationCellInfo<CellElement>> extends OmitStrong<UseGridNavigationSingleSelectionSortableRowReturnType<RowElement, CellElement, RM, CM>, "context" | "gridNavigationRowParameters" | "managedChildrenParameters" | "info" | "pressParameters" | "textContentReturn"> {
+export interface UseCompleteGridNavigationRowReturnType<RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement, CellElement>, CM extends UseCompleteGridNavigationCellInfo<CellElement>> extends OmitStrong<UseGridNavigationSingleSelectionSortableRowReturnType<RowElement, CellElement, RM, CM>, "context" | "managedChildrenParameters" | "info" | "pressParameters" | "textContentReturn"> {
     managedChildrenReturn: UseManagedChildrenReturnType<CM>["managedChildrenReturn"];
     hasCurrentFocusReturn: UseHasCurrentFocusReturnType<RowElement>["hasCurrentFocusReturn"];
     context: CompleteGridNavigationCellContext<RowElement, CellElement, CM>;

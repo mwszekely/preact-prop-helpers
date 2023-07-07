@@ -92,7 +92,7 @@ export interface UseCompleteGridNavigationReturnType<ParentOrRowElement extends 
 }
 
 export interface UseCompleteGridNavigationRowReturnType<RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement, CellElement>, CM extends UseCompleteGridNavigationCellInfo<CellElement>> extends
-    OmitStrong<UseGridNavigationSingleSelectionSortableRowReturnType<RowElement, CellElement, RM, CM>, "context" | "gridNavigationRowParameters" | "managedChildrenParameters" | "info" | "pressParameters" | "textContentReturn"> {
+    OmitStrong<UseGridNavigationSingleSelectionSortableRowReturnType<RowElement, CellElement, RM, CM>, "context" | "managedChildrenParameters" | "info" | "pressParameters" | "textContentReturn"> {
     managedChildrenReturn: UseManagedChildrenReturnType<CM>["managedChildrenReturn"];
     hasCurrentFocusReturn: UseHasCurrentFocusReturnType<RowElement>["hasCurrentFocusReturn"];
     //propsStable: ElementProps<RowElement>;
@@ -259,7 +259,6 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
     });
 
     const {
-        gridNavigationRowParameters: { focusSelf },
         linearNavigationReturn,
         managedChildrenParameters,
         pressParameters: { excludeSpace },  // TODO: Pass this through context? (this is for children, so it doesn't actually matter, but for completeness...)
@@ -271,15 +270,10 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
         context: contextGNR,
         info: infoRowReturn,
     } = r;
-
-    //const { rowAsChildOfGridReturn: { props: propsRowAsChild, ...rowAsChildOfGridReturn }, rowAsParentOfCellsReturn: { propsStable: propsParentOfCells, ...rowAsParentOfCellsReturn } } = r;
-
-
     const { context: contextMC, managedChildrenReturn } = useManagedChildren<CM>({ managedChildrenParameters });
 
     const completeInfo: UseCompleteGridNavigationRowInfo<RowElement, CellElement> = {
         getElement: refElementReturn.getElement,
-        focusSelf,
         getSortValue: sortableChildParameters.getSortValue,
         ...info,
         ...infoRowReturn,
