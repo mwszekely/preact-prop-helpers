@@ -10,12 +10,13 @@ export type Nullable<T = null> = null | undefined | T;
 /** Like Omit, but with type completion */
 export type OmitStrong<T, K extends keyof T> = Omit<T, K>;
 /** Given an object, omits the given props in the given sub-object. All other types remain. */
-export type OmitTargeted<T, K extends keyof T, L extends keyof T[K]> = OmitStrong<T, K> & {
+/** "**Pick**, then **omit**". Given an object, omits everything but the given props in the given sub-object, including other sub-objects. */
+export type TargetedOmit<T, K extends keyof T, L extends keyof T[K]> = {
     [M in K]: OmitStrong<T[K], L>;
 };
-/** Given an object, omits everything but the given props in the given sub-object, including other sub-objects. */
-export type PickTargeted<T, K extends keyof T, L extends keyof T[K]> = {
-    [M in K]: OmitStrong<T[K], L>;
+/** "**Pick**, then **pick** again". Given an object, omits everything but the given props in the given sub-object, including other sub-objects. */
+export type TargetedPick<T, K extends keyof T, L extends keyof T[K]> = {
+    [M in K]: Pick<T[K], L>;
 };
 /** Combines two interfaces in a way that leaves them still able to be extended (via class, another interface, etc.) */
 export type ExtendMerge<A, B> = {

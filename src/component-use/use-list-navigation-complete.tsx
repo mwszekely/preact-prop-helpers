@@ -15,8 +15,8 @@ import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useMemoObject } from "../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../util/assert.js";
 import { enhanceEvent } from "../util/event.js";
-import { useCallback } from "../util/lib.js";
-import { ElementProps, ExtendMerge, OmitStrong, OmitTargeted, PickTargeted } from "../util/types.js";
+import { TargetedOmit, useCallback } from "../util/lib.js";
+import { ElementProps, ExtendMerge, OmitStrong } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 import { PressEventReason, UsePressParameters } from "./use-press.js";
 
@@ -26,11 +26,10 @@ export interface UseCompleteListNavigationParameters<ParentElement extends Eleme
     Pick<UseListNavigationSingleSelectionSortableParameters<ParentElement, ChildElement, M>, "singleSelectionParameters" | "sortableChildrenParameters">,
     Pick<UsePaginatedChildrenParameters<ParentElement, ChildElement, M>, "paginatedChildrenParameters">,
     Pick<UseStaggeredChildrenParameters<ChildElement, M>, "staggeredChildrenParameters">,
-    PickTargeted<UseListNavigationSingleSelectionSortableParameters<ParentElement, ChildElement, M>, "linearNavigationParameters", "getHighestIndex" | "isValid">,
-    PickTargeted<UseListNavigationSingleSelectionSortableParameters<ParentElement, ChildElement, M>, "linearNavigationParameters", "getHighestIndex" | "isValid">,
-    PickTargeted<UseListNavigationSingleSelectionSortableParameters<ParentElement, ChildElement, M>, "typeaheadNavigationParameters", "isValid">,
-    PickTargeted<UseListNavigationSingleSelectionSortableParameters<ParentElement, ChildElement, M>, "rearrangeableChildrenParameters", "onRearranged">,
-    PickTargeted<UseListNavigationSingleSelectionSortableParameters<ParentElement, ChildElement, M>, "rovingTabIndexParameters", "initiallyTabbedIndex" | "untabbableBehavior"> { }
+    TargetedOmit<UseListNavigationSingleSelectionSortableParameters<ParentElement, ChildElement, M>, "linearNavigationParameters", "getHighestIndex" | "isValid">,
+    TargetedOmit<UseListNavigationSingleSelectionSortableParameters<ParentElement, ChildElement, M>, "typeaheadNavigationParameters", "isValid">,
+    TargetedOmit<UseListNavigationSingleSelectionSortableParameters<ParentElement, ChildElement, M>, "rearrangeableChildrenParameters", "onRearranged">,
+    TargetedOmit<UseListNavigationSingleSelectionSortableParameters<ParentElement, ChildElement, M>, "rovingTabIndexParameters", "initiallyTabbedIndex" | "untabbableBehavior"> { }
 
 export interface UseCompleteListNavigationReturnType<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends
     Pick<UsePaginatedChildrenReturnType, "paginatedChildrenReturn">,
@@ -296,11 +295,13 @@ export function useCompleteListNavigationChild<ChildElement extends Element, M e
 
 }
 
-export interface UseCompleteListNavigationDeclarativeParameters<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends OmitStrong<MakeSingleSelectionDeclarativeParameters<UseCompleteListNavigationParameters<ParentElement, ChildElement, M>>, "singleSelectionParameters" | "singleSelectionReturn"> {
-    singleSelectionParameters: OmitStrong<UseSingleSelectionParameters<ParentElement, ChildElement, M>["singleSelectionParameters"], "initiallySelectedIndex" | "onSelectedIndexChange">;
-}
+export interface UseCompleteListNavigationDeclarativeParameters<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends
+    OmitStrong<MakeSingleSelectionDeclarativeParameters<UseCompleteListNavigationParameters<ParentElement, ChildElement, M>>, "singleSelectionParameters" | "singleSelectionReturn">,
+    TargetedOmit<UseSingleSelectionParameters<ParentElement, ChildElement, M>, "singleSelectionParameters", "initiallySelectedIndex" | "onSelectedIndexChange"> { }
 
-export interface UseCompleteListNavigationDeclarativeReturnType<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends OmitTargeted<UseCompleteListNavigationReturnType<ParentElement, ChildElement, M>, "singleSelectionReturn", "changeSelectedIndex"> { }
+export interface UseCompleteListNavigationDeclarativeReturnType<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends
+    TargetedOmit<UseCompleteListNavigationReturnType<ParentElement, ChildElement, M>, "singleSelectionReturn", "changeSelectedIndex">,
+    OmitStrong<UseCompleteListNavigationReturnType<ParentElement, ChildElement, M>, "singleSelectionReturn"> { }
 
 export function useCompleteListNavigationDeclarative<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>>({
     linearNavigationParameters,
