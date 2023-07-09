@@ -1,8 +1,7 @@
 import { shuffle as lodashShuffle } from "lodash-es";
-import { useForceUpdate } from "../../preact-extensions/use-force-update.js";
 import { returnNull, useEnsureStability, usePassiveState } from "../../preact-extensions/use-passive-state.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
-import { createElement, useCallback, useLayoutEffect, useRef } from "../../util/lib.js";
+import { createElement, useCallback, useRef } from "../../util/lib.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
 /**
  * Hook that allows for the **direct descendant** children of this component to be re-ordered and sorted.
@@ -72,8 +71,6 @@ export function useRearrangeableChildren({ rearrangeableChildrenParameters: { ge
     const useRearrangedChildren = useCallback(function useRearrangedChildren(children) {
         monitorCallCount(useRearrangedChildren);
         console.assert(Array.isArray(children));
-        const forceUpdate = useForceUpdate();
-        useLayoutEffect(() => { setForceUpdate(_prev => forceUpdate); }, [forceUpdate]);
         return children
             .slice()
             .map(child => ({ child, mangledIndex: indexMangler(getIndex(child)), demangledIndex: getIndex(child) }))

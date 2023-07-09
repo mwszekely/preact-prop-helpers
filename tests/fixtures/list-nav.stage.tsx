@@ -166,13 +166,13 @@ function TestBasesListNavChild({ index }: { index: number }) {
     const {
         hasCurrentFocusReturn: { getCurrentFocused, getCurrentFocusedInner },
         managedChildReturn: { getChildren },
-        paginatedChildReturn: { hideBecausePaginated, isPaginated, paginatedVisible },
+        paginatedChildReturn: { hideBecausePaginated, parentIsPaginated, paginatedVisible },
         propsChild,
         propsTabbable,
         refElementReturn,
         rovingTabIndexChildReturn: { getTabbable, tabbable },
         singleSelectionChildReturn: { getSelected, getSelectedOffset, selected, selectedOffset, setThisOneSelected },
-        staggeredChildReturn: { hideBecauseStaggered, isStaggered },
+        staggeredChildReturn: { hideBecauseStaggered, parentIsStaggered },
         textContentReturn: { },
         pressParameters: { onPressSync, excludeSpace }
     } = useCompleteListNavigationChild<HTMLLIElement, UseCompleteListNavigationChildInfo<HTMLLIElement>>({
@@ -194,13 +194,13 @@ function TestBasesListNavChild({ index }: { index: number }) {
                 data-pressing={pressing}
                 data-long-pressing={longPress}
                 data-hide-because-paginated={hideBecausePaginated}
-                data-is-paginated={isPaginated}
+                data-parent-is-paginated={parentIsPaginated}
                 data-paginated-visible={paginatedVisible}
                 data-tabbable={tabbable}
                 data-hide-because-staggered={hideBecauseStaggered}
                 data-selected={selected}
                 data-selected-offset={selectedOffset}
-                data-is-staggered={isStaggered}
+                data-parent-is-staggered={parentIsStaggered}
                 {...useMergedProps(propsChild, propsTabbable, propsPressStable)}>{(hideBecausePaginated || hideBecauseStaggered) ? "" : textContent}{hidden && " (hidden)"}{disabled && " (disabled)"}</li>
         </>
     )

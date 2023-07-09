@@ -34,7 +34,7 @@ export interface UseStaggeredChildReturn<ChildElement extends Element> {
     props: ElementProps<ChildElement>;
     staggeredChildReturn: {
         /** Whether the parent has indicated that all of its children, including this one, are staggered. */
-        isStaggered: boolean;
+        parentIsStaggered: boolean;
         /**
          * If this is true, you should delay showing *your* children or running other heavy logic until this becomes false.
          *

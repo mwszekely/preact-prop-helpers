@@ -110,7 +110,7 @@ export function useStaggeredChild({ info: { index }, context: { staggeredChildCo
     }, [index, (parentIsStaggered && staggeredVisible)]);
     return {
         props: !parentIsStaggered ? {} : { "aria-busy": (!staggeredVisible).toString() },
-        staggeredChildReturn: { isStaggered: parentIsStaggered, hideBecauseStaggered: parentIsStaggered ? !staggeredVisible : false },
+        staggeredChildReturn: { parentIsStaggered, hideBecauseStaggered: parentIsStaggered ? !staggeredVisible : false },
         info: { setStaggeredVisible: setStaggeredVisible, }
     };
 }

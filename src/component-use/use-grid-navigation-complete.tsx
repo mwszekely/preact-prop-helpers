@@ -169,7 +169,7 @@ export function useCompleteGridNavigation<ParentOrRowElement extends Element, Ro
     const { indexDemangler } = rearrangeableChildrenReturn;
 
     const { context: { childrenHaveFocusChildContext }, childrenHaveFocusReturn } = useChildrenHaveFocus<RowElement>({ childrenHaveFocusParameters });
-    const mcr: UseManagedChildrenReturnType<RM> = useManagedChildren<RM>({ managedChildrenParameters: { onChildrenCountChange: useStableCallback(c => onChildrenCountChange(c)), ...managedChildrenParameters } });
+    const mcr: UseManagedChildrenReturnType<RM> = useManagedChildren<RM>({ managedChildrenParameters: { onChildrenCountChange: useStableCallback(c => onChildrenCountChange?.(c)), ...managedChildrenParameters } });
     const { context: { managedChildContext }, managedChildrenReturn } = mcr;          // TODO: This is split into two lines for TypeScript reasons? Can this be fixed? E.G. like vvvvvvvvvvvvvvvvvvvvvvvvvvvvvv  why doesn't that work?
     const { paginatedChildrenReturn, paginatedChildrenReturn: { refreshPagination }, managedChildrenParameters: { onChildrenCountChange }, context: { paginatedChildContext } }: UsePaginatedChildrenReturnType = usePaginatedChildren<ParentOrRowElement, RowElement, RM>({ refElementReturn, managedChildrenReturn, paginatedChildrenParameters, rovingTabIndexReturn, linearNavigationParameters: { indexDemangler } });
     const { context: { staggeredChildContext }, staggeredChildrenReturn }: UseStaggeredChildrenReturnType = useStaggeredChildren({ managedChildrenReturn, staggeredChildrenParameters })
@@ -219,17 +219,17 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
 
     const {
         info: infoPaginatedChild,
-        paginatedChildReturn: { paginatedVisible, isPaginated, hideBecausePaginated },
+        paginatedChildReturn,
         props: paginationProps
     } = usePaginatedChild<RowElement>({ info, context: contextIncomingForRowAsChildOfTable });
 
     const {
         info: infoStaggeredChild, // { setParentIsStaggered, setStaggeredVisible },
-        staggeredChildReturn: { isStaggered, hideBecauseStaggered },
+        staggeredChildReturn,
         props: staggeredProps
     } = useStaggeredChild<RowElement>({ info, context: contextIncomingForRowAsChildOfTable })
 
-    info.untabbable ||= (hideBecausePaginated || hideBecauseStaggered);
+    info.untabbable ||= (paginatedChildReturn.hideBecausePaginated || staggeredChildReturn.hideBecauseStaggered);
     info.unselectable ||= info.untabbable;
 
     const getChildren = useCallback(() => managedChildrenReturn.getChildren(), []);
@@ -307,8 +307,8 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
         managedChildrenReturn,
         context,
         managedChildReturn,
-        staggeredChildReturn: { isStaggered, hideBecauseStaggered },
-        paginatedChildReturn: { isPaginated, paginatedVisible, hideBecausePaginated },
+        staggeredChildReturn,
+        paginatedChildReturn,
         linearNavigationReturn,
         rovingTabIndexChildReturn,
         rovingTabIndexReturn,

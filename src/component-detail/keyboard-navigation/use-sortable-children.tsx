@@ -1,9 +1,8 @@
 import { shuffle as lodashShuffle } from "lodash-es";
-import { useForceUpdate } from "../../preact-extensions/use-force-update.js";
 import { ManagedChildInfo, UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
 import { returnNull, useEnsureStability, usePassiveState } from "../../preact-extensions/use-passive-state.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
-import { createElement, useCallback, useLayoutEffect, useRef } from "../../util/lib.js";
+import { createElement, useCallback, useRef } from "../../util/lib.js";
 import { VNode } from "../../util/types.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
 
@@ -206,9 +205,6 @@ export function useRearrangeableChildren<M extends UseSortableChildInfo>({
         monitorCallCount(useRearrangedChildren);
 
         console.assert(Array.isArray(children));
-
-        const forceUpdate = useForceUpdate();
-        useLayoutEffect(() => { setForceUpdate(_prev => forceUpdate); }, [forceUpdate])
 
         return (children as VNode[])
             .slice()

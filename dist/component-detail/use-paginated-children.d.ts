@@ -1,5 +1,6 @@
 import { UseRefElementReturnType } from "../index.js";
-import { UseManagedChildrenReturnType } from "../preact-extensions/use-managed-children.js";
+import { UseManagedChildrenParameters, UseManagedChildrenReturnType } from "../preact-extensions/use-managed-children.js";
+import { TargetedPick } from "../util/lib.js";
 import { ElementProps, Nullable } from "../util/types.js";
 import { UseLinearNavigationParameters } from "./keyboard-navigation/use-linear-navigation.js";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "./keyboard-navigation/use-roving-tabindex.js";
@@ -23,10 +24,7 @@ export interface UsePaginatedChildContext {
         getDefaultPaginationVisible(i: number): boolean;
     };
 }
-export interface UsePaginatedChildrenReturnType {
-    managedChildrenParameters: {
-        onChildrenCountChange: (count: number) => void;
-    };
+export interface UsePaginatedChildrenReturnType extends TargetedPick<UseManagedChildrenParameters<any>, "managedChildrenParameters", "onChildrenCountChange"> {
     paginatedChildrenReturn: {
         refreshPagination: (min: Nullable<number>, max: Nullable<number>) => void;
         /**
@@ -49,7 +47,7 @@ export interface UsePaginatedChildReturn<ChildElement extends Element> {
     props: ElementProps<ChildElement>;
     paginatedChildReturn: {
         paginatedVisible: boolean;
-        isPaginated: boolean;
+        parentIsPaginated: boolean;
         hideBecausePaginated: boolean;
     };
     info: Pick<UsePaginatedChildrenInfo<ChildElement>, "setPaginationVisible" | "setChildCountIfPaginated">;

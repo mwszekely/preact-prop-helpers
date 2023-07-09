@@ -137,7 +137,7 @@ export function useCompleteListNavigation<ParentElement extends Element, ChildEl
 
     const {
         childrenHaveFocusParameters,
-        managedChildrenParameters: { onChildrenMountChange, ...managedChildrenParameters },
+        managedChildrenParameters: { onChildrenMountChange, ...mcp1 },
         context: { rovingTabIndexContext, singleSelectionContext, typeaheadNavigationContext },
         linearNavigationReturn,
         rovingTabIndexReturn,
@@ -163,16 +163,17 @@ export function useCompleteListNavigation<ParentElement extends Element, ChildEl
     });
 
     const { context: { childrenHaveFocusChildContext }, childrenHaveFocusReturn } = useChildrenHaveFocus({ childrenHaveFocusParameters });
-    const { paginatedChildrenReturn, paginatedChildrenReturn: { refreshPagination }, managedChildrenParameters: { onChildrenCountChange }, context: { paginatedChildContext } } = usePaginatedChildren<ParentElement, ChildElement, M>({ refElementReturn, managedChildrenReturn: { getChildren: useStableCallback(() => managedChildrenReturn.getChildren()) }, rovingTabIndexReturn, paginatedChildrenParameters, linearNavigationParameters: { indexDemangler: rearrangeableChildrenReturn.indexDemangler } });
-    const { context: { staggeredChildContext }, staggeredChildrenReturn } = useStaggeredChildren({ managedChildrenReturn: { getChildren: useStableCallback(() => managedChildrenReturn.getChildren()) }, staggeredChildrenParameters });
+    const { paginatedChildrenReturn, paginatedChildrenReturn: { refreshPagination }, managedChildrenParameters: mcp2, context: { paginatedChildContext } }: UsePaginatedChildrenReturnType = usePaginatedChildren<ParentElement, ChildElement, M>({ refElementReturn, managedChildrenReturn: { getChildren: useStableCallback(() => managedChildrenReturn.getChildren()) }, rovingTabIndexReturn, paginatedChildrenParameters, linearNavigationParameters: { indexDemangler: rearrangeableChildrenReturn.indexDemangler } });
+    const { context: { staggeredChildContext }, staggeredChildrenReturn }: UseStaggeredChildrenReturnType = useStaggeredChildren({ managedChildrenReturn: { getChildren: useStableCallback((): ManagedChildren<M> => managedChildrenReturn.getChildren()) }, staggeredChildrenParameters });
 
-    const { context: { managedChildContext }, managedChildrenReturn } = useManagedChildren<M>({
+    const mcr: UseManagedChildrenReturnType<M> = useManagedChildren<M>({
         managedChildrenParameters: {
-            onChildrenCountChange: useStableCallback((c) => { onChildrenCountChange(c) }),
             onChildrenMountChange,
-            ...managedChildrenParameters
+            ...mcp2,
+            ...mcp1
         }
     });
+    const { context: { managedChildContext }, managedChildrenReturn } = mcr;
     const context = useMemoObject<CompleteListNavigationContext<ParentElement, ChildElement, M>>(useMemoObject({
         childrenHaveFocusChildContext,
         managedChildContext,

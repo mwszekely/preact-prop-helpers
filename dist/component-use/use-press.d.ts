@@ -22,13 +22,6 @@ export interface UsePressParameters<E extends EventTarget> {
         /** Pass a function that returns `true` to prevent the pointer (mouse, touch, etc.) from contributing to press events */
         excludePointer?(): boolean;
         /**
-         * Whether certain methods of pressing this component should be deactivated.
-         *
-         * For example, during typeahead, the space key shouldn't count as a press, it should just count for the search.
-         *
-         * If true, then all presses are disabled.  If false/undefined/null, no presses are disabled.
-         */
-        /**
          * Ensures that when a button is pressed it properly receives focus (even on iOS Safari).
          *
          * Generally, this should just be `e => e.focus()`

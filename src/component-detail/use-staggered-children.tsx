@@ -42,7 +42,7 @@ export interface UseStaggeredChildReturn<ChildElement extends Element> {
     props: ElementProps<ChildElement>;
     staggeredChildReturn: {
         /** Whether the parent has indicated that all of its children, including this one, are staggered. */
-        isStaggered: boolean;
+        parentIsStaggered: boolean;
         //staggeredVisible: boolean;
         /** 
          * If this is true, you should delay showing *your* children or running other heavy logic until this becomes false.
@@ -194,7 +194,7 @@ export function useStaggeredChild<ChildElement extends Element>({ info: { index 
 
     return {
         props: !parentIsStaggered ? {} : { "aria-busy": (!staggeredVisible).toString() } as {},
-        staggeredChildReturn: { isStaggered: parentIsStaggered, hideBecauseStaggered: parentIsStaggered ? !staggeredVisible : false },
+        staggeredChildReturn: { parentIsStaggered, hideBecauseStaggered: parentIsStaggered ? !staggeredVisible : false },
         info: { setStaggeredVisible: setStaggeredVisible, }
     }
 }

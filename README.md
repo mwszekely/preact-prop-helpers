@@ -30,7 +30,7 @@ return <div {...useElementSizeProps(props)}>I'm {offsetHeight} pixels tall!</div
     * `usePaginatedChildren`: Tell children to show/hide themselves if they are within a narrow window
     * `useStaggeredChildren`: Only render a child when the one above it has called its first `useEffect`.
     * (It is perfectly possible to build this hook yourself from its component pieces &mdash; it's provided for convenience)
-* `useGridNavigationComplete`: 2-dimensional `useListNavigationComplete`
+* `useGridNavigationComplete`: 2-dimensional `useListNavigationComplete` (selection, sortability, pagination, etc. apply to rows but not to columns)
 * `useImperativeProps`: Control the attributes, text content, classes, event handlers etc. of a children remotely without props. Even if the child re-renders with props of its own the imperative changes will be remembered and re-merged.
 * `usePortalChildren`: Allows adding/removing children to an arbitrary part of the DOM (e.g. pushing a Toast notification).
 * `useTextContent`: Access the text of the `Element` that rendered these props.
@@ -52,6 +52,75 @@ return <div {...useElementSizeProps(props)}>I'm {offsetHeight} pixels tall!</div
 * `useAsyncHandler`: Pass an `async` DOM handler, get a sync one back (and a lot of metadata about its current status). Only one handler ever runs at a time.
     * `useAsync`: Generalized version of the above that can transform *any* `async` function, not just DOM handlers
     * `useAsyncEffect`: The logic of `useAsync` hooked up to `useEffect`.
+
+
+## Conventions and goals
+
+* As much as possible, no specific DOM restrictions are imposed and, for hooks with children (lists, grids, etc.), those children can be anywhere descendent in the tree (except for `useSortableChildren`, which can be anywhere descendant but must all be in an array). Nesting hooks, even of the same type, is also fine.
+    *  E.G. `useRovingTabIndexChild` can call its own `useRovingTabIndex`, which is how `useGridNavigation` works.
+* A parent hook never needs to be directly passed child data because the children will provide it themselves. E.G. `useListNavigation` can filter children, but it doesn't take an array of which children to filter out; each child reports its own status as filtered/unfiltered with, say, a `hidden` prop, and the parent responds to that.
+* Re-render as few times as possible. In general this means instead of a hook returning a value, it will accept an `onChange`-ish handler that will let you explicitly do that.
+    * `useElementSize`, for example, has no way of returning the size the first time its component renders. It needs to fully render *and then* run an effect that measures it. Once the element's been measured, *you* are responsible for choosing if the component is re-rendered with this new information or not.
+    ```tsx
+    // ✔✔✔
+    // We're explicitly saying "I need `size` during render, so I'm opting into a re-render"
+    const [size, setSize] = useState(null);
+    const { props } = useElementSize({ onSizeChange: setSize });
+    return <div data-x={size?.x} {...props} />
+
+    // ✔✔✔
+    // We're explicitly saying "I don't need `size` during render, just for events and such"
+    const { elementSizeReturn: { getSize }, props } = useElementSize({ onSizeChange: null });
+    return <div onClick={() => console.log(getSize())} {...props} />
+
+    // ✖✖✖ Does not compile!!!
+    // The hook is not designed like this because what if `size` is only used 
+    // in an event handler, or an effect? We'd render twice for no reason
+    const { elementSizeReturn: { size }, props } = useElementState();
+    useEffect(() => { console.log(size.x); }, [size.x]);
+    return <div {...props} />  // Nothing ever changes but the entire diffing algorithm still always runs!
+
+    // ✖✖✖ Throws a runtime error!!!
+    // The fact that these values cannot be used until rendering has completed is strictly enforced:
+    const { elementSizeReturn: { getSize }, props } = useElementState();
+    useEffect(() => { console.log(size.x); }, [size.x]);
+    return <div data-x={getSize()?.x} {...props} />  // `getSize` can't return a meaningful value until rendering is over and measurement can happen!
+    ```
+    * That last example can be rewritten with `usePassiveState`, which mimics `useEffect` for non-render state:
+    ```tsx
+    const onSizeChange = useCallback((size) => { console.log(size); }, [])
+    const [getSize, setSize] = usePassiveState(onSizeChange);   // instead of `useState` or `useEffect`
+    const { elementSizeReturn: { getSize }, props } = useElementSize({ onSizeChange: setSize });
+    return <div {...props} />
+    ```
+    * This means that the child data is *always* the single source of truth, and maps nicely to how components are built and diffed.
+* Some of these hooks, like `useGridNavigationRow`, have **extremely** complicated dependencies. To manage this, most hooks take a single parameter and return a single object with everything labelled consistently and designed to be discoverable via auto-complete. If we have `useFoo`, it:
+    * ...will always take parameters like `{ fooParameters: {...} }`.
+        * E.G. `useElementRef({ elementRefParameters: { onMount: ... } })`
+    * ...will always return objects like `{ fooReturn: { ... } }`
+        * E.G. `const { refElementReturn: { getElement } } = useElementRef(...)`
+    * ...may also return `{ props: {...} }`. These must be spread onto the element you're rendering, or the hook will not function (see `useMergedProps` if you need to use other props in addition to the returned props). It may occasionally be called something else starting with `props`, e.g. `propsStable`, `propsTarget`, etc.
+        * E.G. `const { propsStable } = useElementRef(...)`, then `<div {...propsStable} />`
+        * `propsStable` indicates that nothing about the object ever changes including the identity of the object itself and all its fields.
+    * ...may also return `{ context: { ... } }` that children rely on.
+        1. E.G. Parent calls `const { context } = useFoo(...);`
+        1. Parent renders `<MyContext.Provider value={context}>{children}</MyContext.Provider>`
+        1. Then child calls `useFooChild({ context: useContext(MyContext), fooChildParameters: {...} })`
+    * ...may also require or return `{ info: { ... } }` if it has something to contribute to `useManagedChild`'s special `info` parameter.
+    * When hooks themselves use other hooks:
+        * If `useFoo` calls `useBar` directly, then it will take parameters like `{ fooParameters: {...}, barParameters: {...} }` and return objects like `{ fooReturn: {...}, barReturn: {...} }`.
+        * If `useFoo` relies on `useBar` (but doesn't call it itself!), then will do one of the following:
+            * Take parameters like `{ fooParameters: { ... }, barReturn: { ... } }`, if it needs the return value of `useBar`.
+            * Return values like `{ fooReturn: { ... }, barParameters: { ... } }`, if it needs `useBar` to be called with specific parameters in order to function (usually callbacks).
+        * (The difference between those two is usually based on performance -- many, many hooks rely on `elementRefReturn.getElement`, for example, so the latter pattern allows us to just call `useRefElement` once and pass the result around to whoever needs it)
+        * If `useFoo` and `useBar` both return a top-level `props`, they will be merged into one.
+        * If `useFoo` and `useBar` both return a top-level `context`, they will be merged into one.
+        * If `useFoo` and `useBar` both return a top-level `info`, they will be merged into one.
+        * Occasionally, `props` or `context` may be suffixed with the specific role they refer to:
+            * `useRandomId` returns `propsSource` and `propsReferencer` (and no `props`).
+* Organizationally, some hooks exist primarily to be used as a part of a larger hook.  Hooks within the `component-use` folder are generally "ready-to-use" and don't require much passing of parameters back and forth, but are not fully extensible.  Hooks within `component-detail` are the lower-level building blocks that make up those "ready-to-use" complete hooks, but they're much more time-consuming to use.
+    * You can also just copy and paste one of the complete hooks somewhere else and use it as a new building block...
+
 
 ## `useMergedProps`
 
@@ -291,76 +360,6 @@ If you need to be able to rearrange your children, but don't necessarily need so
 |`indexDemangler`|**Stable**|The inverse of `indexMangler`|
 
 
-
-## Conventions and goals
-
-* Re-render as few times as possible. In general this means instead of a hook returning a value, it will accept an `onChange`-ish handler that will let you explicitly do that.
-    * `useElementSize`, for example, has no way of returning the size the first time its component renders. It needs to fully render *and then* run an effect that measures it. Once the element's been measured, *you* are responsible for choosing if the component is re-rendered with this new information or not.
-    ```tsx
-    // ✔✔✔
-    // We're explicitly saying "I need `size` during render, so I'm opting into a re-render"
-    const [size, setSize] = useState(null);
-    const { props } = useElementSize({ onSizeChange: setSize });
-    return <div data-x={size?.x} {...props} />
-
-    // ✔✔✔
-    // We're explicitly saying "I don't need `size` during render, just for events and such"
-    const { elementSizeReturn: { getSize }, props } = useElementSize({ onSizeChange: null });
-    return <div onClick={() => console.log(getSize())} {...props} />
-
-    // ✖✖✖ Does not compile!!!
-    // The hook is not designed like this because what if `size` is only used 
-    // in an event handler, or an effect? We'd render twice for no reason
-    const { elementSizeReturn: { size }, props } = useElementState();
-    useEffect(() => { console.log(size.x); }, [size.x]);
-    return <div {...props} />  // Nothing ever changes but the entire diffing algorithm still always runs!
-
-    // ✖✖✖ Throws a runtime error!!!
-    // The fact that these values cannot be used until rendering has completed is strictly enforced:
-    const { elementSizeReturn: { getSize }, props } = useElementState();
-    useEffect(() => { console.log(size.x); }, [size.x]);
-    return <div data-x={getSize()?.x} {...props} />  // `getSize` can't return a meaningful value until rendering is over and measurement can happen!
-    ```
-    * That last example can be rewritten with `usePassiveState`, which mimics `useEffect` for non-render state:
-    ```tsx
-    const onSizeChange = useCallback((size) => { console.log(size); }, [])
-    const [getSize, setSize] = usePassiveState(onSizeChange);   // instead of `useState` or `useEffect`
-    const { elementSizeReturn: { getSize }, props } = useElementSize({ onSizeChange: setSize });
-    return <div {...props} />
-    ```
-* As much as possible, no specific DOM restrictions are imposed and, for hooks with children (lists, grids, etc.), those children can be anywhere descendent in the tree (except for `useSortableChildren`, which can be anywhere descendant but must all be contiguous). Nesting hooks, even of the same type, is also fine.
-    *  E.G. `useRovingTabIndex` returns information that you can toss into a `Context` so that each child can call `useRovingTabIndexChild` with that information, and this can happen pretty much anywhere decendent in the DOM that you'd like. A child can use `useRovingTabIndex` and `useRovingTabIndexChild` to both be a child that can be tabbed to and have children that can be tabbed to (which is what `useGridNavigation` does).
-* A parent hook never needs to be directly passed child data because the children will provide it themselves. E.G. `useListNavigation` can filter children, but it doesn't take an array of which children to filter out; each child reports its own status as filtered/unfiltered with, say, a `hidden` prop, and the parent responds to that.
-    * This means that the child data is *always* the single source of truth, and maps nicely to how components are built and diffed.
-* Organizationally, some hooks exist primarily to be used as a part of a larger hook.  Hooks within the `component-use` folder are generally "ready-to-use" and don't require much passing of parameters back and forth, but are not fully extensible.  Hooks within `component-detail` are the lower-level building blocks that make up those "ready-to-use" complete hooks, but they're much more time-consuming to use.
-    * You can also just copy and paste one of the complete hooks somewhere else and use it as a new building block...
-* Hooks composable in predictable and obvious ways, because there are a lot of intertwined dependencies. If we have `useFoo`, it:
-    * ...will always take paramaters like `{ fooParameters: {...} }`.
-        * E.G. `useElementRef({ elementRefParameters: { onMount: ... } })`
-    * ...will always return objects like `{ fooReturn: { ... } }`
-        * E.G. `const { refElementReturn: { getElement } } = useElementRef(...)`
-    * ...may also return `{ props: {...} }` or, rarely, `{ propsStable: {...} }`. These must be spread onto the element you're rendering, or the hook will not function (see `useMergedProps` if you need to use other props in addition to the returned props). 
-        * E.G. `const { propsStable } = useElementRef(...)`, then `<div {...propsStable} />`
-        * `propsStable` indicates that nothing about the object ever changes including the identity of the object itself and all its fields.
-    * ...may also return `{ context: { ... } }` that children rely on.
-        1. E.G. Parent calls `const { context } = useFoo(...);`
-        1. Parent renders `<MyContext.Provider value={context}>{children}</MyContext.Provider>`
-        1. Then child calls `useFooChild({ context: useContext(MyContext), fooChildParameters: {...} })`
-    * ...may also require or return `{ info: { ... } }` if it has something to contribute to `useManagedChild`'s special `info` parameter.
-    * When hooks themselves use other hooks:
-        * If `useFoo` calls `useBar` directly, then it will take parameters like `{ fooParameters: {...}, barParameters: {...} }` and return objects like `{ fooReturn: {...}, barReturn: {...} }`.
-        * If `useFoo` relies on `useBar` (but doesn't call it itself!), then will do one of the following:
-            * Take parameters like `{ fooParameters: { ... }, barReturn: { ... } }`, if it needs the return value of `useBar`.
-            * Return values like `{ fooReturn: { ... }, barParameters: { ... } }`, if it needs `useBar` to be called with specific parameters in order to function (usually callbacks).
-        * (The difference between those two is usually based on performance -- many, many hooks rely on `elementRefReturn.getElement`, for example, so the latter pattern allows us to just call `useRefElement` once and pass the result around to whoever needs it)
-        * If `useFoo` and `useBar` both return a top-level `props`, they will be merged into one.
-        * If `useFoo` and `useBar` both return a top-level `context`, they will be merged into one.
-        * If `useFoo` and `useBar` both return a top-level `info`, they will be merged into one.
-        * Occasionally, `props` or `context` may be suffixed with the specific role they refer to:
-            * `useRandomId` returns `propsSource` and `propsReferencer` (and no `props`).
-        
-
-These rules should ideally make swizzling all these different parameters back and forth as foolproof as possible.
 
 
 

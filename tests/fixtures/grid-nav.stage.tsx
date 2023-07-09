@@ -168,7 +168,7 @@ function TestBaseGridNavRow({ index }: { index: number }) {
     const {
         hasCurrentFocusReturn: { getCurrentFocused, getCurrentFocusedInner },
         managedChildReturn: { getChildren },
-        paginatedChildReturn: { hideBecausePaginated, isPaginated, paginatedVisible },
+        paginatedChildReturn: { hideBecausePaginated, parentIsPaginated, paginatedVisible },
         props,
         context,
         hasCurrentFocusParameters: { onCurrentFocusedInnerChanged },
@@ -177,7 +177,7 @@ function TestBaseGridNavRow({ index }: { index: number }) {
         typeaheadNavigationReturn: { getCurrentTypeahead, typeaheadStatus },
         rovingTabIndexChildReturn: { getTabbable, tabbable },
         singleSelectionChildReturn: { getSelected, getSelectedOffset, selected, selectedOffset, setThisOneSelected },
-        staggeredChildReturn: { hideBecauseStaggered, isStaggered },
+        staggeredChildReturn: { hideBecauseStaggered, parentIsStaggered },
         textContentReturn: { },
     } = useCompleteGridNavigationRow<HTMLTableRowElement, HTMLTableCellElement, UseCompleteGridNavigationRowInfo<HTMLTableRowElement, HTMLTableCellElement>, UseCompleteGridNavigationCellInfo<HTMLTableCellElement>>({
         context: useContext(RowContext),
@@ -203,13 +203,13 @@ function TestBaseGridNavRow({ index }: { index: number }) {
                 role="row"
                 data-index={index}
                 data-hide-because-paginated={hideBecausePaginated}
-                data-is-paginated={isPaginated}
+                data-parent-is-paginated={parentIsPaginated}
                 data-paginated-visible={paginatedVisible}
                 data-tabbable={tabbable}
                 data-hide-because-staggered={hideBecauseStaggered}
                 data-selected={selected}
                 data-selected-offset={selectedOffset}
-                data-is-staggered={isStaggered}
+                data-parent-is-staggered={parentIsStaggered}
                 {...useMergedProps(props, { onFocus: e => { console.error("A grid row has received focus"); setRowFocused(true); throw new Error("A grid row has received focus");  } })}>
                 {...Array.from(function* () {
                     for (let i = 0; i < 10; ++i) {
