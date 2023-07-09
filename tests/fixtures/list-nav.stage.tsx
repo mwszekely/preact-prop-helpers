@@ -171,7 +171,7 @@ function TestBasesListNavChild({ index }: { index: number }) {
         propsTabbable,
         refElementReturn,
         rovingTabIndexChildReturn: { getTabbable, tabbable },
-        singleSelectionChildReturn: { getSelected, getSelectedOffset, selected, selectedOffset, setThisOneSelected },
+        singleSelectionChildReturn: { getSelected, getSelectedOffset, selected, selectedOffset },
         staggeredChildReturn: { hideBecauseStaggered, parentIsStaggered },
         textContentReturn: { },
         pressParameters: { onPressSync, excludeSpace }

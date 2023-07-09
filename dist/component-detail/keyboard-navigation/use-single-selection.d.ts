@@ -69,7 +69,11 @@ export interface UseSingleSelectionChildReturnType<E extends Element> extends Us
     props: ElementProps<E>;
     info: Pick<UseSingleSelectionChildInfo<E>, "getSelected" | "setLocalSelected" | "selected">;
     singleSelectionChildReturn: {
+        /**
+         * Is this child currently the selected child among all its siblings?
+         */
         selected: boolean;
+        /** @see selected */
         getSelected(): boolean;
         /**
          * Any time `selected` changes to or from being visible, this will represent the direction and magnitude of the change.
@@ -79,8 +83,8 @@ export interface UseSingleSelectionChildReturnType<E extends Element> extends Us
          * This useful for things like animations or transitions.
          */
         selectedOffset: Nullable<number>;
+        /** @see selectedOffset */
         getSelectedOffset: () => (number | null);
-        setThisOneSelected: (event: Event) => void;
     };
 }
 export interface UseSingleSelectionReturnType<ChildElement extends Element, M extends UseSingleSelectionChildInfo<ChildElement>> {

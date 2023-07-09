@@ -5,7 +5,15 @@ import { ElementProps, KeyboardEventType, Nullable } from "../../util/types.js";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexChildParameters, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
 export interface UseTypeaheadNavigationReturnType<ParentOrChildElement extends Element> {
     typeaheadNavigationReturn: {
+        /** Returns the string currently typed by the user. Stable, but cannot be called during render. */
         getCurrentTypeahead(): string | null;
+        /**
+         * What the current status of the user's input is:
+         *
+         * * `"none"`: Typeahead is not in progress; the user has not typed anything (or has not for the given timeout period).
+         * * `"valid"`: The string the user has typed so far corresponds to at least one child
+         * * `"invalid"`: The string the user has typed so does not correspond to any child
+         */
         typeaheadStatus: "invalid" | "valid" | "none";
     };
     propsStable: ElementProps<ParentOrChildElement>;
@@ -23,6 +31,12 @@ export interface UseTypeaheadNavigationChildInfo<TabbableChildElement extends El
 }
 export interface UseTypeaheadNavigationParameters<TabbableChildElement extends Element, _M extends UseTypeaheadNavigationChildInfo<TabbableChildElement>> {
     typeaheadNavigationParameters: {
+        /**
+         * **Optional**
+         *
+         * Called any time the currently tabbable index changes as a result of a typeahead-related keypress
+         *
+         */
         onNavigateTypeahead: Nullable<(newIndex: number | null, event: KeyboardEventType<TabbableChildElement>) => void>;
         /**
          * Must return true if the given child can be navigated to.
@@ -32,10 +46,17 @@ export interface UseTypeaheadNavigationParameters<TabbableChildElement extends E
          */
         isValid(i: number): boolean;
         /**
-         * A collator to use when comparing. If not provided, simply uses `localeCompare` after transforming each to lowercase, which will, at best, work okay in English.
+         * A collator to use when comparing.
+         * If not provided, simply uses `localeCompare` after transforming each to lowercase, which will, at best, work okay in English.
          */
         collator: null | Intl.Collator;
+        /**
+         * If true, no typeahead-related processing will occur, effectively disabling this invocation of `useTypeaheadNavigation` altogether.
+         */
         noTypeahead: boolean;
+        /**
+         * How long after the user's last typeahead-related keypress does it take for the system to reset?
+         */
         typeaheadTimeout: number;
     };
     rovingTabIndexReturn: Pick<UseRovingTabIndexReturnType<any, TabbableChildElement, any>["rovingTabIndexReturn"], "getTabbableIndex" | "setTabbableIndex">;

@@ -176,7 +176,7 @@ function TestBaseGridNavRow({ index }: { index: number }) {
         rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex },
         typeaheadNavigationReturn: { getCurrentTypeahead, typeaheadStatus },
         rovingTabIndexChildReturn: { getTabbable, tabbable },
-        singleSelectionChildReturn: { getSelected, getSelectedOffset, selected, selectedOffset, setThisOneSelected },
+        singleSelectionChildReturn: { getSelected, getSelectedOffset, selected, selectedOffset },
         staggeredChildReturn: { hideBecauseStaggered, parentIsStaggered },
         textContentReturn: { },
     } = useCompleteGridNavigationRow<HTMLTableRowElement, HTMLTableCellElement, UseCompleteGridNavigationRowInfo<HTMLTableRowElement, HTMLTableCellElement>, UseCompleteGridNavigationCellInfo<HTMLTableCellElement>>({

@@ -27,12 +27,6 @@ export interface UseRefElementParameters<T> {
     }
 }
 
-
-/*
-export function useRefElementProps<E extends Element>(r: UseRefElementReturnType<E>, ...otherProps: ElementProps<E>[]): ElementProps<E>[] {
-    return [r.refElementReturn.propsStable, ...otherProps];
-}*/
-
 /**
  * Allows accessing the element a ref references as soon as it does so.
  * *This hook itself returns a hook*--useRefElementProps modifies the props that you were going to pass to an HTMLElement, 

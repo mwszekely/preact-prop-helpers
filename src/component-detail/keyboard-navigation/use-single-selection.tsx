@@ -91,8 +91,14 @@ export interface UseSingleSelectionChildReturnType<E extends Element> extends Us
 
     singleSelectionChildReturn: {
         // These two are already available as managedChild info,
-        // but we're keeping them because RTI does the same thing, and it's convenient.
-        selected: boolean,
+        // but we're keeping them because RTI does the same thing, and it's convenient (info is kinda semi-private).
+
+        /**
+         * Is this child currently the selected child among all its siblings?
+         */
+        selected: boolean;
+
+        /** @see selected */
         getSelected(): boolean;
 
         /**
@@ -103,11 +109,13 @@ export interface UseSingleSelectionChildReturnType<E extends Element> extends Us
          * This useful for things like animations or transitions.
          */
         selectedOffset: Nullable<number>;
+
+        /** @see selectedOffset */
         getSelectedOffset: () => (number | null);
 
         // Used to programmatically set this as the selected element;
         // it requests the parent to actually change the numeric index to this one's.
-        setThisOneSelected: (event: Event) => void;
+        //setThisOneSelected: (event: Event) => void;
     }
 }
 
@@ -236,13 +244,13 @@ export function useSingleSelectionChild<ChildElement extends Element, M extends 
         singleSelectionChildReturn: {
             selected: localSelected,
             // This is the thing that's passed to onPress or onClick or whatever
-            setThisOneSelected: useStableCallback((event) => {
+            /*setThisOneSelected: useStableCallback((event) => {
                 console.assert(!getUnselectable());
                 if (selectionMode == "disabled")
                     return;
                 if (!unselectable)
                     onSelectedIndexChange?.(enhanceEvent(event, { selectedIndex: index }));
-            }),
+            }),*/
             getSelectedOffset: getDirection,
             selectedOffset: direction,
             getSelected: getLocalSelected

@@ -16,6 +16,9 @@ export interface UseRovingTabIndexChildInfo<TabbableChildElement extends Element
      * and also by the `focusSelf` value returned by the parent (i.e. `parent.focusSelf` calls one child's `focusSelf`)
      */
     focusSelf(e: TabbableChildElement): void;
+    /**
+     * Get from `useRefElement`
+     */
     getElement(): TabbableChildElement | null;
     /**
      * If a child **exists** but **can't be tabbed to**, then set this to `true`.

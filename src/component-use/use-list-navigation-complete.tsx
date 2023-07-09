@@ -52,19 +52,11 @@ export interface CompleteListNavigationContext<_ParentElement extends Element, C
     RovingTabIndexChildContext { }
 
 
-export interface UseCompleteListNavigationChildParameters<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> {
+export interface UseCompleteListNavigationChildParameters<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends 
+Pick<UseListNavigationSingleSelectionSortableChildParameters<ChildElement, M>, "textContentParameters"> {
     context: CompleteListNavigationContext<any, ChildElement, M>;
-    /**
-     * **NOTE**: Unusually, the press parameters are entirely optional.  
-     * 
-     * Pass `null` as the entire `pressParameters` object to disable default press behavior entirely.
-     */
-    //pressParameters: OmitStrong<UsePressParameters<any>["pressParameters"], "excludeSpace"> | null,
-    textContentParameters: OmitStrong<UseListNavigationSingleSelectionSortableChildParameters<ChildElement, M>["textContentParameters"], never>;
     info: Omit<M, Exclude<keyof UseCompleteListNavigationChildInfo<ChildElement>, "index" | "focusSelf" | "untabbable" | "unselectable">>;
     sortableChildParameters: Pick<UseSortableChildInfo, "getSortValue">;
-    //rovingTabIndexParameters: UseRovingTabIndexChildParameters<any, any>["rovingTabIndexParameters"];
-    //singleSelectionParameters: UseSingleSelectionChildParameters<any, any>["singleSelectionParameters"];
 }
 
 export interface UseCompleteListNavigationChildReturnType<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>>

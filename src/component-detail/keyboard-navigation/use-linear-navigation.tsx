@@ -71,6 +71,9 @@ export interface UseLinearNavigationParameters<ParentOrChildElement extends Elem
          */
         indexDemangler: (n: number) => number;
 
+        /**
+         * From `useManagedChildren`
+         */
         getHighestIndex(): number;  // [0, n], not [0, n)
 
         /**

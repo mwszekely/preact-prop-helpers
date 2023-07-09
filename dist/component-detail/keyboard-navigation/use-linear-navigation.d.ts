@@ -54,6 +54,9 @@ export interface UseLinearNavigationParameters<ParentOrChildElement extends Elem
          * Turn an unsorted `index` into its visual display `index`. Use `identity` if you don't care.
          */
         indexDemangler: (n: number) => number;
+        /**
+         * From `useManagedChildren`
+         */
         getHighestIndex(): number;
         /**
          * Controls which arrow keys are used to navigate through the component.

@@ -22,14 +22,8 @@ export interface UseCompleteListNavigationReturnType<ParentElement extends Eleme
 }
 export interface CompleteListNavigationContext<_ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends UseManagedChildrenContext<M>, UsePaginatedChildContext, UseStaggeredChildContext, UseChildrenHaveFocusContext<ChildElement>, UseTypeaheadNavigationContext, UseSingleSelectionContext, RovingTabIndexChildContext {
 }
-export interface UseCompleteListNavigationChildParameters<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> {
+export interface UseCompleteListNavigationChildParameters<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends Pick<UseListNavigationSingleSelectionSortableChildParameters<ChildElement, M>, "textContentParameters"> {
     context: CompleteListNavigationContext<any, ChildElement, M>;
-    /**
-     * **NOTE**: Unusually, the press parameters are entirely optional.
-     *
-     * Pass `null` as the entire `pressParameters` object to disable default press behavior entirely.
-     */
-    textContentParameters: OmitStrong<UseListNavigationSingleSelectionSortableChildParameters<ChildElement, M>["textContentParameters"], never>;
     info: Omit<M, Exclude<keyof UseCompleteListNavigationChildInfo<ChildElement>, "index" | "focusSelf" | "untabbable" | "unselectable">>;
     sortableChildParameters: Pick<UseSortableChildInfo, "getSortValue">;
 }

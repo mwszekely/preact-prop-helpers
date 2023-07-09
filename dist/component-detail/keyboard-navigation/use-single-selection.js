@@ -83,13 +83,13 @@ export function useSingleSelectionChild(args) {
         singleSelectionChildReturn: {
             selected: localSelected,
             // This is the thing that's passed to onPress or onClick or whatever
-            setThisOneSelected: useStableCallback((event) => {
+            /*setThisOneSelected: useStableCallback((event) => {
                 console.assert(!getUnselectable());
                 if (selectionMode == "disabled")
                     return;
                 if (!unselectable)
                     onSelectedIndexChange?.(enhanceEvent(event, { selectedIndex: index }));
-            }),
+            }),*/
             getSelectedOffset: getDirection,
             selectedOffset: direction,
             getSelected: getLocalSelected

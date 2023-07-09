@@ -25,6 +25,9 @@ export interface UseRovingTabIndexChildInfo<TabbableChildElement extends Element
      */
     focusSelf(e: TabbableChildElement): void;
 
+    /**
+     * Get from `useRefElement`
+     */
     getElement(): TabbableChildElement | null;
 
     /**
