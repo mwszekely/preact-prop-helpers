@@ -107,7 +107,7 @@ function TestBasesListNavImpl({ ariaPropName, selectedIndex, arrowKeyDirection, 
         staggeredChildrenReturn: { stillStaggering },
         typeaheadNavigationReturn: { getCurrentTypeahead, typeaheadStatus }
     } = useCompleteListNavigationDeclarative<HTMLOListElement, HTMLLIElement, UseCompleteListNavigationChildInfo<HTMLLIElement>>({
-        linearNavigationParameters: { arrowKeyDirection, disableHomeEndKeys, navigatePastEnd: navigatePastStartEnd, navigatePastStart: navigatePastStartEnd, pageNavigationSize },
+        linearNavigationParameters: { arrowKeyDirection, disableHomeEndKeys, navigatePastEnd: navigatePastStartEnd, navigatePastStart: navigatePastStartEnd, pageNavigationSize, onNavigateLinear: null },
         rearrangeableChildrenParameters: { getIndex: useCallback(info => info.props.index, []) },
         rovingTabIndexParameters: { untabbable, onTabbableIndexChange: null, focusSelfParent: focus },
         singleSelectionParameters: { ariaPropName, selectionMode },
@@ -121,7 +121,7 @@ function TestBasesListNavImpl({ ariaPropName, selectedIndex, arrowKeyDirection, 
         sortableChildrenParameters: { compare: useCallback<Compare<UseCompleteListNavigationChildInfo<HTMLLIElement>>>((lhs, rhs) => { return (lhs.getSortValue() as number) - (rhs.getSortValue() as number) }, []) },
         staggeredChildrenParameters: { staggered },
         paginatedChildrenParameters: { paginationMin: pagination?.[0], paginationMax: pagination?.[1] },
-        typeaheadNavigationParameters: { collator: null, noTypeahead, typeaheadTimeout }
+        typeaheadNavigationParameters: { collator: null, noTypeahead, typeaheadTimeout, onNavigateTypeahead: null }
     });
 
     return (

@@ -34,14 +34,17 @@ export interface UseRovingTabIndexChildInfo<TabbableChildElement extends Element
      * but if the child is untabbable because it's disabled or staggered or paginated or something we just have no way of knowing. 
      * It could be untabbable for any arbitrary reason the user decides.
      * 
-     * If the child is **missing** instead (i.e. it does not exist), then there's no issue. You couldn't even supply this property because the child who would supply it is, by definition, missing. This is, to be clear, about **existing** children whomst are untabbable for any reason at all.
+     * If the child is **missing** instead (i.e. it does not exist), then there's no issue. 
+     * You couldn't even supply this property because the child who would supply it is, by definition, missing. 
+     * This is, to be clear, about **existing** children whomst are untabbable for any reason at all.
      * 
      */
     untabbable: boolean;
 
+    /** Provided by `useRovingTabIndexChild` */
     setLocallyTabbable: StateUpdater<boolean>;
+    /** Provided by `useRovingTabIndexChild` */
     getLocallyTabbable: () => boolean;
-    //tabbable: boolean;
 
 }
 
@@ -129,13 +132,12 @@ export interface UseRovingTabIndexReturnType<ParentElement extends Element, Tabb
     }
 }
 
-export type UseRovingTabIndexChildInfoKeys = "index" | "untabbable";
+export type UseRovingTabIndexChildInfoKeysParameters = "index" | "untabbable";
+export type UseRovingTabIndexChildInfoKeysReturnType = "setLocallyTabbable" | "getLocallyTabbable";
 
-export interface UseRovingTabIndexChildParameters<TabbableChildElement extends Element, M extends UseRovingTabIndexChildInfo<TabbableChildElement>> extends Pick<UseRefElementReturnType<TabbableChildElement>, "refElementReturn">, OmitStrong<UseManagedChildParameters<M>, "info" | "context"> {
-    info: Pick<UseManagedChildParameters<M>["info"], UseRovingTabIndexChildInfoKeys>;
-
-    //rovingTabIndexParameters: Pick<UseRovingTabIndexParameters<any, TabbableChildElement, M>["rovingTabIndexParameters"], "untabbable">;
-
+export interface UseRovingTabIndexChildParameters<TabbableChildElement extends Element, M extends UseRovingTabIndexChildInfo<TabbableChildElement>> extends
+    Pick<UseRefElementReturnType<TabbableChildElement>, "refElementReturn">,
+    OmitStrong<UseManagedChildParameters<M, UseRovingTabIndexChildInfoKeysParameters>, "context"> {
     /**
      * The information provided by the parent hook
      */
@@ -187,13 +189,13 @@ export interface UseRovingTabIndexChildReturnType<ChildElement extends Element, 
 
         /** **STABLE** */
         getTabbable(): boolean;
-        
+
     }
 
     /**
      * Pass this to `useManagedChild`.
      */
-    info: Pick<M, "getLocallyTabbable" | "setLocallyTabbable">;
+    info: Pick<M, UseRovingTabIndexChildInfoKeysReturnType>;
 
     /** 
      * *Unstable*

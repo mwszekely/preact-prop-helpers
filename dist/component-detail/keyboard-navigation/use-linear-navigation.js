@@ -1,4 +1,4 @@
-import { useEnsureStability } from "../../index.js";
+import { useEnsureStability } from "../../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { useCallback, useRef } from "../../util/lib.js";

@@ -95,7 +95,6 @@ export interface UseCompleteGridNavigationRowReturnType<RowElement extends Eleme
     OmitStrong<UseGridNavigationSingleSelectionSortableRowReturnType<RowElement, CellElement, RM, CM>, "context" | "managedChildrenParameters" | "info" | "pressParameters" | "textContentReturn"> {
     managedChildrenReturn: UseManagedChildrenReturnType<CM>["managedChildrenReturn"];
     hasCurrentFocusReturn: UseHasCurrentFocusReturnType<RowElement>["hasCurrentFocusReturn"];
-    //propsStable: ElementProps<RowElement>;
     context: CompleteGridNavigationCellContext<RowElement, CellElement, CM>;
     managedChildReturn: UseManagedChildReturnType<RM>["managedChildReturn"];
     paginatedChildReturn: UsePaginatedChildReturn<RowElement>["paginatedChildReturn"];

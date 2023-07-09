@@ -77,7 +77,7 @@ export interface UseManagedChildrenParameters<M extends ManagedChildInfo<any>> {
 }
 
 
-export interface UseManagedChildParameters<M extends ManagedChildInfo<any>> {
+export interface UseManagedChildParameters<M extends ManagedChildInfo<any>, InfoParameterKeys extends keyof M> {
     /**
      * In general, this shouldn't be null, but for convenience's sake you are allowed to, which disables all behavior, and also means `getChildren` will be `undefined`!
      */
@@ -86,7 +86,7 @@ export interface UseManagedChildParameters<M extends ManagedChildInfo<any>> {
     /**
      * The exact data that's available from the parent/each sibling element via `getAt` or the other methods on `ManagedChildren`.
      */
-    info: M;
+    info: Pick<M, InfoParameterKeys>;
 }
 
 
@@ -322,7 +322,7 @@ export function useManagedChildren<M extends ManagedChildInfo<string | number>>(
 
 
 
-export function useManagedChild<M extends ManagedChildInfo<number | string>>({ context, info }: UseManagedChildParameters<M>): UseManagedChildReturnType<M> {
+export function useManagedChild<M extends ManagedChildInfo<number | string>>({ context, info }: UseManagedChildParameters<M, keyof M>): UseManagedChildReturnType<M> {
     monitorCallCount(useManagedChild);
 
     type IndexType = M["index"];
