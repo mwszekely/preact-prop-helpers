@@ -167,7 +167,6 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
         
         let index = (ideal ?? 0);
         let child = getChildren().getAt(index);
-        debugger;
         let lowestIndex = getChildren().getLowestIndex();
         let highestIndex = getChildren().getHighestIndex();
         while ((!child || child.untabbable) && index > lowestIndex) {
