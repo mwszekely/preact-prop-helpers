@@ -29,16 +29,16 @@ export function useUrl(onUrlChange: (url: string) => void) {
         setUrl(window.location.toString());
     });
 
-    return [getUrl, useCallback((newUrlOrSetter: (string | ((prev: string | undefined) => string)), history2: "push" | "replace") => {
+    return [getUrl, useCallback((newUrlOrSetter: (string | ((prev: string | undefined) => string)), action: "push" | "replace") => {
         if (typeof newUrlOrSetter == "function") {
             setUrl(prev => {
                 let newUrl = newUrlOrSetter(prev);
-                history[`${history2 ?? "replace"}State`]({}, document.title, newUrl);
+                history[`${action ?? "replace"}State`]({}, document.title, newUrl);
                 return newUrl;
             })
         }
         else {
-            history[`${history2 ?? "replace"}State`]({}, document.title, newUrlOrSetter);
+            history[`${action ?? "replace"}State`]({}, document.title, newUrlOrSetter);
             setUrl(newUrlOrSetter);
         }
     }, [])] as const;
