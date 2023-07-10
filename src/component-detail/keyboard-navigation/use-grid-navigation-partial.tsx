@@ -38,8 +38,8 @@ export interface UseGridNavigationRowContext extends UseListNavigationContext {
 
 export interface UseGridNavigationRowParameters<RowElement extends Element, CellElement extends Element, RM extends GridChildRowInfo<RowElement, CellElement>, CM extends GridChildCellInfo<CellElement>> extends
     OmitStrong<UseListNavigationChildParameters<RowElement, RM>, "context">,
-    TargetedOmit<UseListNavigationParameters<RowElement, CellElement, CM>,"linearNavigationParameters", "onNavigateLinear" | "arrowKeyDirection">,
-    TargetedOmit<UseListNavigationParameters<RowElement, CellElement, CM>,"rovingTabIndexParameters", "focusSelfParent" | "untabbableBehavior">,
+    TargetedOmit<UseListNavigationParameters<RowElement, CellElement, CM>, "linearNavigationParameters", "disableHomeEndKeys" | "onNavigateLinear" | "arrowKeyDirection">,
+    TargetedOmit<UseListNavigationParameters<RowElement, CellElement, CM>, "rovingTabIndexParameters", "focusSelfParent" | "untabbableBehavior">,
     OmitStrong<UseListNavigationParameters<RowElement, CellElement, CM>, "refElementReturn" | "rovingTabIndexParameters" | "linearNavigationParameters"> {
 
     managedChildrenReturn: Pick<UseManagedChildrenReturnType<CM>["managedChildrenReturn"], "getChildren">;
@@ -164,7 +164,7 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
         const { getChildren } = managedChildrenReturn;
 
         let { ideal, actual } = (getTabbableColumn());
-        console.log(`${managedChildParameters.index}.whenThisRowIsFocused(${ideal}, ${actual})`)
+        
         let index = (ideal ?? 0);
         let child = getChildren().getAt(index);
         let highestIndex = getChildren().getHighestIndex();
@@ -214,6 +214,7 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
             onNavigateLinear: useStableCallback((next, event) => {
                 setTabbableColumn(prev => ({ ideal: next, actual: prev?.actual ?? next }), event);
             }),
+            disableHomeEndKeys: true,
             arrowKeyDirection: "horizontal",
             ...linearNavigationParameters
         }

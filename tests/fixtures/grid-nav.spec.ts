@@ -1,55 +1,72 @@
-import { Page, expect } from '@playwright/test';
-import { test } from "./grid-nav.fixture.js"
-import { LoremIpsum } from '../lorem.js';
-import { DefaultChildCount, DisabledIndex, HiddenIndex, MissingIndex } from './grid-nav.constants.js';
+import { expect } from '@playwright/test';
+import { MissingIndex, WithColSpanIndex } from './grid-nav.constants.js';
+import { test } from "./grid-nav.fixture.js";
 
 
 
-test("Navigation", async ({ page, gridNav, shared: { getRenderCount } }) => {
 
-    await test.step("Arrow key navigation works", async () => {
-        //expect(getRenderCount("parent"), "Before anything happens, the grid should only have rendered once").toBe(1);
-        //expect(getRenderCount("children"), "Before anything happens, each child should only render itself once").toBe(DefaultChildCount);
-        await page.keyboard.press("Tab");
-        await expect(page.locator("[role=row]").nth(0).locator("[role=cell]").nth(0), "The {x:0,y:0}-th item should be focused by default").toBeFocused();
-        await page.keyboard.press("ArrowRight");
-        await expect(page.locator("[role=row]").nth(0).locator("[role=cell]").nth(1), "The {x:1,y:0}-th item should be focused after pressing Right").toBeFocused();
+test("Basic arrow key navigation works", async ({ page, gridNav: { grid, getRows, getCells }, shared: { getRenderCount } }) => {
+    //expect(getRenderCount("parent"), "Before anything happens, the grid should only have rendered once").toBe(1);
+    //expect(getRenderCount("children"), "Before anything happens, each child should only render itself once").toBe(DefaultChildCount);
+    const rows = getRows();
+    const row0Cells = getCells(rows.nth(0))
+    const row1Cells = getCells(rows.nth(1))
+    await page.keyboard.press("Tab");
+    await expect(row0Cells.nth(0), "The {x:0,y:0}-th item should be focused by default").toBeFocused();
+    await page.keyboard.press("ArrowRight");
+    await expect(row0Cells.nth(1), "The {x:1,y:0}-th item should be focused after pressing Right").toBeFocused();
+    await page.keyboard.press("ArrowDown");
+    await expect(row1Cells.nth(1), "The {x:1,y:1}-th item should be focused after pressing Down").toBeFocused();
+    await page.keyboard.press("Tab");
+    await expect(page.locator("#focusable-last")).toBeFocused();
+    await page.keyboard.press("Shift+Tab");
+    await expect(row1Cells.nth(1), "The focus should remain where it was after tabbing out and back in").toBeFocused();
+    await page.keyboard.press("Shift+Tab");
+    await expect(page.locator("#focusable-first")).toBeFocused();
+    await page.keyboard.press("Tab");
+    await expect(row1Cells.nth(1), "The focus should remain where it was after tabbing out and back in").toBeFocused();
+});
+
+test("Arrow key navigation works with missing items", async ({ page, gridNav: { grid, getRows, getCells }, shared: { getRenderCount } }) => {
+    /*await page.keyboard.press("Tab");
+    let currentRow = 0;
+    let downPressesRemaining = (MissingIndex - 1);
+    while (downPressesRemaining >= 0) {
+        await expect(getCells(getRows().nth(currentRow)).nth(0)).toBeFocused();
         await page.keyboard.press("ArrowDown");
-        await expect(page.locator("[role=row]").nth(1).locator("[role=cell]").nth(1), "The {x:1,y:1}-th item should be focused after pressing Down").toBeFocused();
-        await page.keyboard.press("Tab");
-        await expect(page.locator("#focusable-last")).toBeFocused();
-        await page.keyboard.press("Shift+Tab");
-        await expect(page.locator("[role=row]").nth(1).locator("[role=cell]").nth(1), "The focus should remain where it was after tabbing out and back in").toBeFocused();
-        await page.keyboard.press("Shift+Tab");
-        await expect(page.locator("#focusable-first")).toBeFocused();
-        await page.keyboard.press("Tab");
-        await expect(page.locator("[role=row]").nth(1).locator("[role=cell]").nth(1), "The focus should remain where it was after tabbing out and back in").toBeFocused();
-        //expect(getRenderCount("parent"), "After tabbing, the parent should not re-render itself").toBe(1);
-        //expect(getRenderCount("children"), "After tabbing to the first child, nothing should change and no child should re-render").toBe(DefaultChildCount);
-        /*await page.keyboard.press("ArrowDown");
-        await expect(page.locator("li").nth(1), "Pressing down should focus the 1-th element").toBeFocused();
-        //expect(getRenderCount("parent"), "Tabbing to a new child should not cause a re-render").toBe(1);
-        //expect(getRenderCount("children"), "Tabbing to a new child should cause a max of 2 children to re-render themselves").toBe(DefaultChildCount + 2);
-        await page.keyboard.press("ArrowDown");
-        await expect(page.locator("li").nth(2), "Pressing down again should focus the 2-th element").toBeFocused();
+        --downPressesRemaining;
+        ++currentRow;
+    }*/
 
-        await page.locator("li").nth(DisabledIndex - 1).focus();
-        await page.keyboard.press("ArrowDown");
-        await expect(page.locator("li").nth(DisabledIndex), `The ${DisabledIndex}-th element is disabled, but can still be focused`).toBeFocused();
+    // Click a cell just before the row that's missing, then arrow key over it.
+    await getCells(getRows().nth(MissingIndex - 1)).nth(0).click();
+    await expect(getCells(getRows().nth(MissingIndex - 1)).nth(0)).toBeFocused();
+    await page.keyboard.press("ArrowDown");
+    await expect(getCells(getRows().nth(MissingIndex + 1)).nth(0)).toBeFocused();
+    await page.keyboard.press("ArrowUp");
+    await expect(getCells(getRows().nth(MissingIndex - 1)).nth(0)).toBeFocused();
 
 
-        await page.locator("li").nth(HiddenIndex - 1).focus();
-        await page.keyboard.press("ArrowDown");
-        await expect(page.locator("li").nth(HiddenIndex + 1), `The ${HiddenIndex}-th element is hidden, so it should not be focused when navigated to`).toBeFocused();
-        await page.locator("li").nth(HiddenIndex).focus();
-        await expect(page.locator("li").nth(HiddenIndex), `The ${HiddenIndex}-th element is hidden, so it should not be focused when clicked`).not.toBeFocused();
+    // Click a cell just above a cell with colspan, then arrow key over it.
+    // The focus should return to the correct cell:
 
-        await page.locator("li").nth(MissingIndex - 1).focus();
-        await page.keyboard.press("ArrowDown");
-        await expect(page.locator("li").nth(MissingIndex + 1), `The ${MissingIndex}-th element is missing, so the item after it should be focused`).toBeFocused();
-        await page.locator("li").nth(MissingIndex).focus();
-        await expect(page.locator("li").nth(MissingIndex), `The ${MissingIndex}-th element is missing -- how is it focused (when clicked)?`).not.toBeFocused();*/
-    });
+    // In this case, focus returns to the original cell on the right side:
+    await getCells(getRows().nth(0)).nth(WithColSpanIndex + 1).click();
+    await expect(getCells(getRows().nth(0)).nth(WithColSpanIndex + 1)).toBeFocused();
+    await page.keyboard.press("ArrowDown");
+    await expect(getCells(getRows().nth(1)).nth(WithColSpanIndex + 0)).toBeFocused();
+    await page.keyboard.press("ArrowUp");
+    await expect(getCells(getRows().nth(0)).nth(WithColSpanIndex + 1)).toBeFocused();
+
+    // In this case, focus "returns" to the original cell on the left side: (really it just stays in the same place)
+    await getCells(getRows().nth(0)).nth(WithColSpanIndex).click();
+    await expect(getCells(getRows().nth(0)).nth(WithColSpanIndex)).toBeFocused();
+    await page.keyboard.press("ArrowDown");
+    await expect(getCells(getRows().nth(1)).nth(WithColSpanIndex)).toBeFocused();
+    await page.keyboard.press("ArrowUp");
+    await expect(getCells(getRows().nth(0)).nth(WithColSpanIndex)).toBeFocused();
+});
+
 
     /*await test.step("Home/end works", async () => {
         await page.keyboard.press("Home");
@@ -62,7 +79,6 @@ test("Navigation", async ({ page, gridNav, shared: { getRenderCount } }) => {
         await page.keyboard.type(LoremIpsum[HiddenIndex - 1]);
         await expect(page.locator("li").nth(HiddenIndex - 1), `Typeahead should work as expected`).toBeFocused();
     });*/
-});
 
 /*
 test("Untabbability works", async ({ page, gridNav, shared: { run, install } }) => {

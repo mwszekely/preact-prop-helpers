@@ -51,7 +51,6 @@ refElementReturn, ...void1 }) {
     const whenThisRowIsFocused = useStableCallback((e) => {
         const { getChildren } = managedChildrenReturn;
         let { ideal, actual } = (getTabbableColumn());
-        console.log(`${managedChildParameters.index}.whenThisRowIsFocused(${ideal}, ${actual})`);
         let index = (ideal ?? 0);
         let child = getChildren().getAt(index);
         let highestIndex = getChildren().getHighestIndex();
@@ -91,6 +90,7 @@ refElementReturn, ...void1 }) {
             onNavigateLinear: useStableCallback((next, event) => {
                 setTabbableColumn(prev => ({ ideal: next, actual: prev?.actual ?? next }), event);
             }),
+            disableHomeEndKeys: true,
             arrowKeyDirection: "horizontal",
             ...linearNavigationParameters
         }

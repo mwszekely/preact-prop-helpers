@@ -129,14 +129,14 @@ function TestBasesGridNavImpl({ ariaPropName, selectedIndex, arrowKeyDirection, 
 
     return (
         <RowContext.Provider value={context}>
-            <table {...{border: 1} as {}} role="grid" data-still-staggering={stillStaggering} data-typeahead-status={typeaheadStatus} {...props}>
-                <TestBaseGridNavRowren count={childCount} />
+            <table data-grid-nav {...{ border: 1 } as {}} role="grid" data-still-staggering={stillStaggering} data-typeahead-status={typeaheadStatus} {...props}>
+                <TestBaseGridNavRows count={childCount} />
             </table>
         </RowContext.Provider>
     )
 }
 
-function TestBaseGridNavRowren({ count }: { count: number }) {
+function TestBaseGridNavRows({ count }: { count: number }) {
 
     return (
         <>
@@ -163,7 +163,7 @@ function TestBaseGridNavRow({ index }: { index: number }) {
     const missing = (index === MissingIndex);
     const hidden = (index === HiddenIndex);
     if (missing)
-        return <tr>(The #{index}-th item is missing)</tr>;
+        return <tr data-grid-nav-row><td colSpan={1000 - 1}>(The #{index}-th item is missing)</td></tr>;
 
     const {
         hasCurrentFocusReturn: { getCurrentFocused, getCurrentFocusedInner },
@@ -186,7 +186,7 @@ function TestBaseGridNavRow({ index }: { index: number }) {
             untabbable: hidden,
             index
         },
-        linearNavigationParameters: { disableHomeEndKeys: false, navigatePastEnd: "wrap", navigatePastStart: "wrap" },
+        linearNavigationParameters: { navigatePastEnd: "wrap", navigatePastStart: "wrap" },
         rovingTabIndexParameters: { initiallyTabbedIndex: 0, untabbable: false, onTabbableIndexChange: null },
         typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000, onNavigateTypeahead: null },
         sortableChildParameters: { getSortValue: getTextContent },
@@ -200,6 +200,7 @@ function TestBaseGridNavRow({ index }: { index: number }) {
     return (
         <CellContext.Provider value={context}>
             <tr
+                data-grid-nav-row
                 role="row"
                 data-index={index}
                 data-hide-because-paginated={hideBecausePaginated}
@@ -210,10 +211,10 @@ function TestBaseGridNavRow({ index }: { index: number }) {
                 data-selected={selected}
                 data-selected-offset={selectedOffset}
                 data-parent-is-staggered={parentIsStaggered}
-                {...useMergedProps(props, { onFocus: e => { console.error("A grid row has received focus"); setRowFocused(true); throw new Error("A grid row has received focus");  } })}>
+                {...useMergedProps(props, { onFocus: e => { console.error("A grid row has received focus"); setRowFocused(true); throw new Error("A grid row has received focus"); } })}>
                 {...Array.from(function* () {
                     for (let i = 0; i < 10; ++i) {
-                        const colSpan = (i === WithColSpanIndex? (index % 10) : 0) + 1;
+                        const colSpan = (i === WithColSpanIndex ? (index % 10) : 0) + 1;
                         yield (<TestBaseGridNavCell index={i} row={index} colSpan={colSpan} />);
                         i += (colSpan - 1);
                     }
@@ -231,13 +232,13 @@ function TestBaseGridNavCell({ index, row, colSpan }: { row: number, index: numb
 
     let textContent = LoremIpsum[(index + row) % LoremIpsum.length];
     let t = textContent.indexOf(" ")
-    textContent = textContent.substring(0, t == -1? textContent.length : t);
+    textContent = textContent.substring(0, t == -1 ? textContent.length : t);
     // const getTextContent = useStableGetter(textContent);
     const disabled = (index === DisabledIndex);
     const missing = (index === MissingIndex);
     const hidden = (index === HiddenIndex);
     if (missing)
-        return <td colSpan={colSpan}>(The #{index}-th item is missing)</td>;
+        return <td data-grid-nav-cell colSpan={colSpan}>(The #{index}-th item is missing)</td>;
 
     const {
         hasCurrentFocusReturn: { getCurrentFocused, getCurrentFocusedInner },
@@ -256,6 +257,7 @@ function TestBaseGridNavCell({ index, row, colSpan }: { row: number, index: numb
     return (
         <>
             <td
+                data-grid-nav-cell
                 colSpan={colSpan}
                 role="cell"
                 data-index={index}
