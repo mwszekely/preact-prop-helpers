@@ -28,6 +28,7 @@ export function useCompleteListNavigation({ linearNavigationParameters, rearrang
     monitorCallCount(useCompleteListNavigation);
     const { initiallySelectedIndex } = singleSelectionParameters;
     const getChildren = useCallback(() => managedChildrenReturn.getChildren(), []);
+    const getLowestIndex = useCallback(() => getChildren().getLowestIndex(), []);
     const getHighestIndex = useCallback(() => getChildren().getHighestIndex(), []);
     const isValid = useCallback((i) => {
         const child = getChildren().getAt(i);
@@ -40,7 +41,7 @@ export function useCompleteListNavigation({ linearNavigationParameters, rearrang
     const { propsStable: propsRef, refElementReturn } = useRefElement({});
     const { childrenHaveFocusParameters, managedChildrenParameters: { onChildrenMountChange, ...mcp1 }, context: { rovingTabIndexContext, singleSelectionContext, typeaheadNavigationContext }, linearNavigationReturn, rovingTabIndexReturn, singleSelectionReturn, typeaheadNavigationReturn, rearrangeableChildrenReturn, sortableChildrenReturn, propsParent, propsStableParentOrChild } = useListNavigationSingleSelectionSortable({
         managedChildrenReturn: { getChildren },
-        linearNavigationParameters: { getHighestIndex, isValid, ...linearNavigationParameters },
+        linearNavigationParameters: { getLowestIndex, getHighestIndex, isValid, ...linearNavigationParameters },
         typeaheadNavigationParameters: { isValid, ...typeaheadNavigationParameters },
         rovingTabIndexParameters: { initiallyTabbedIndex: initiallySelectedIndex, untabbableBehavior: "focus-parent", ...rovingTabIndexParameters },
         singleSelectionParameters,

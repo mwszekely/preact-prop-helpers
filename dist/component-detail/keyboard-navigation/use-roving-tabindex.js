@@ -136,7 +136,7 @@ export function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovi
         const untabbable = getUntabbable();
         if (!untabbable) {
             // If we change from untabbable to tabbable, it's possible `index` might still be null.
-            index ??= getInitiallyTabbedIndex() ?? (children.getHighestIndex() >= 0 ? 0 : null);
+            index ??= getInitiallyTabbedIndex() ?? children.getLowestIndex();
         }
         if (untabbable) {
             if (document.activeElement != getElement() && untabbableBehavior != 'leave-child-focused') {

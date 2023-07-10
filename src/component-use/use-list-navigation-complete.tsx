@@ -26,7 +26,7 @@ export interface UseCompleteListNavigationParameters<ParentElement extends Eleme
     Pick<UseListNavigationSingleSelectionSortableParameters<ParentElement, ChildElement, M>, "singleSelectionParameters" | "sortableChildrenParameters">,
     Pick<UsePaginatedChildrenParameters<ParentElement, ChildElement, M>, "paginatedChildrenParameters">,
     Pick<UseStaggeredChildrenParameters<ChildElement, M>, "staggeredChildrenParameters">,
-    TargetedOmit<UseListNavigationSingleSelectionSortableParameters<ParentElement, ChildElement, M>, "linearNavigationParameters", "getHighestIndex" | "isValid">,
+    TargetedOmit<UseListNavigationSingleSelectionSortableParameters<ParentElement, ChildElement, M>, "linearNavigationParameters", "getLowestIndex" | "getHighestIndex" | "isValid">,
     TargetedOmit<UseListNavigationSingleSelectionSortableParameters<ParentElement, ChildElement, M>, "typeaheadNavigationParameters", "isValid">,
     TargetedOmit<UseListNavigationSingleSelectionSortableParameters<ParentElement, ChildElement, M>, "rearrangeableChildrenParameters", "onRearranged">,
     TargetedOmit<UseListNavigationSingleSelectionSortableParameters<ParentElement, ChildElement, M>, "rovingTabIndexParameters", "initiallyTabbedIndex" | "untabbableBehavior"> { }
@@ -115,6 +115,7 @@ export function useCompleteListNavigation<ParentElement extends Element, ChildEl
 
     const { initiallySelectedIndex } = singleSelectionParameters;
     const getChildren: () => ManagedChildren<M> = useCallback(() => managedChildrenReturn.getChildren(), []);
+    const getLowestIndex: (() => number) = useCallback<() => number>(() => getChildren().getLowestIndex(), []);
     const getHighestIndex: (() => number) = useCallback<() => number>(() => getChildren().getHighestIndex(), []);
     const isValid = useCallback((i: number) => {
         const child = getChildren().getAt(i);
@@ -141,7 +142,7 @@ export function useCompleteListNavigation<ParentElement extends Element, ChildEl
         propsStableParentOrChild
     } = useListNavigationSingleSelectionSortable<ParentElement, ChildElement, M>({
         managedChildrenReturn: { getChildren },
-        linearNavigationParameters: { getHighestIndex, isValid, ...linearNavigationParameters },
+        linearNavigationParameters: { getLowestIndex, getHighestIndex, isValid, ...linearNavigationParameters },
         typeaheadNavigationParameters: { isValid, ...typeaheadNavigationParameters },
         rovingTabIndexParameters: { initiallyTabbedIndex: initiallySelectedIndex, untabbableBehavior: "focus-parent", ...rovingTabIndexParameters },
         singleSelectionParameters,

@@ -57,7 +57,8 @@ export function usePaginatedChildren<ParentElement extends Element, TabbableChil
     const lastPagination = useRef({ paginationMax: null as null | number, paginationMin: null as number | null});
     const refreshPagination = useCallback((paginationMin: Nullable<number>, paginationMax: Nullable<number>) => {
         const childMax = (getChildren().getHighestIndex() + 1);
-        for (let i = 0; i <= childMax; ++i) {
+        const childMin = (getChildren().getLowestIndex());
+        for (let i = childMin; i <= childMax; ++i) {
             const visible = (i >= (paginationMin ?? -Infinity) && i < (paginationMax ?? Infinity));
             getChildren().getAt(indexDemangler(i))?.setPaginationVisible(visible);
             if (visible && (paginationMax != null || paginationMin != null))

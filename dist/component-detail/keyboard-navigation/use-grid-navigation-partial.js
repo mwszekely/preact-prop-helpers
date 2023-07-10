@@ -53,8 +53,10 @@ refElementReturn, ...void1 }) {
         let { ideal, actual } = (getTabbableColumn());
         let index = (ideal ?? 0);
         let child = getChildren().getAt(index);
+        debugger;
+        let lowestIndex = getChildren().getLowestIndex();
         let highestIndex = getChildren().getHighestIndex();
-        while ((!child || child.untabbable) && index > 0) {
+        while ((!child || child.untabbable) && index > lowestIndex) {
             --index;
             child = getChildren().getAt(index);
         }
@@ -80,8 +82,11 @@ refElementReturn, ...void1 }) {
         refElementReturn,
         typeaheadNavigationParameters,
         rovingTabIndexParameters: {
-            untabbableBehavior: "leave-child-focused", focusSelfParent: whenThisRowIsFocused, untabbable: allChildCellsAreUntabbable || rowIsUntabbableAndSoAreCells, initiallyTabbedIndex, onTabbableIndexChange: useStableCallback((v, p, r) => {
-                debugger;
+            untabbableBehavior: "leave-child-focused",
+            focusSelfParent: whenThisRowIsFocused,
+            untabbable: allChildCellsAreUntabbable || rowIsUntabbableAndSoAreCells,
+            initiallyTabbedIndex,
+            onTabbableIndexChange: useStableCallback((v, p, r) => {
                 setTabbableColumn({ ideal: v, actual: v });
                 onTabbableIndexChange?.(v, p, r);
             })

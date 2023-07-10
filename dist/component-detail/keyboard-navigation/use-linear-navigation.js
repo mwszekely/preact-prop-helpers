@@ -11,13 +11,10 @@ import { monitorCallCount } from "../../util/use-call-count.js";
  */
 export function useLinearNavigation({ rovingTabIndexReturn, linearNavigationParameters }) {
     monitorCallCount(useLinearNavigation);
-    const { getHighestIndex, indexDemangler, indexMangler, isValid, navigatePastEnd, navigatePastStart, onNavigateLinear } = linearNavigationParameters;
+    const { getLowestIndex, getHighestIndex, indexDemangler, indexMangler, isValid, navigatePastEnd, navigatePastStart, onNavigateLinear } = linearNavigationParameters;
     const { getTabbableIndex, setTabbableIndex } = rovingTabIndexReturn;
     useEnsureStability("useLinearNavigation", onNavigateLinear);
     const navigateAbsolute = useCallback((requestedIndexMangled, searchDirection, e, fromUserInteraction, mode) => {
-        //const targetUnmangled = indexDemangler(requestedIndexMangled);
-        //const { valueUnmangled } = tryNavigateToIndex({ isValid, highestChildIndex: getHighestIndex(), indexDemangler, indexMangler, searchDirection: -1, targetUnmangled });
-        //setTabbableIndex(valueUnmangled, e, fromUserInteraction);
         const highestChildIndex = getHighestIndex();
         const original = (getTabbableIndex() ?? 0);
         const targetUnmangled = indexDemangler(requestedIndexMangled);
@@ -76,7 +73,7 @@ export function useLinearNavigation({ rovingTabIndexReturn, linearNavigationPara
             return "stop";
         }
     }, []);
-    const navigateToFirst = useStableCallback((e, fromUserInteraction) => { return navigateAbsolute(0, -1, e, fromUserInteraction, "single"); });
+    const navigateToFirst = useStableCallback((e, fromUserInteraction) => { return navigateAbsolute(getLowestIndex(), -1, e, fromUserInteraction, "single"); });
     const navigateToLast = useStableCallback((e, fromUserInteraction) => { return navigateAbsolute(getHighestIndex(), 1, e, fromUserInteraction, "single"); });
     const navigateRelative2 = useStableCallback((e, offset, fromUserInteraction, mode) => {
         const highestChildIndex = getHighestIndex();
@@ -114,7 +111,7 @@ export function useLinearNavigation({ rovingTabIndexReturn, linearNavigationPara
             const allowsHorizontalNavigation = (arrowKeyDirection == "horizontal" || arrowKeyDirection == "either");
             let truePageNavigationSize = pageNavigationSize;
             if (truePageNavigationSize < 1) {
-                truePageNavigationSize = Math.round(pageNavigationSize * Math.max(100, getHighestIndex() + 1));
+                truePageNavigationSize = Math.round(pageNavigationSize * Math.max(100, (getHighestIndex() - getLowestIndex()) + 1));
             }
             let result = "passthrough";
             // Arrow keys only take effect for components oriented in that direction,

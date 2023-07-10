@@ -124,8 +124,14 @@ export interface UseManagedChildReturnType<M extends ManagedChildInfo<any>> {
 export interface ManagedChildren<M extends ManagedChildInfo<any>> {
     /** STABLE */
     getAt(index: M["index"]): M | undefined;
-    /** STABLE */
+    /** 
+     * STABLE
+     * 
+     * @returns The highest number corresponding to a child. Inclusive. Use `<=`.
+     */
     getHighestIndex(): number;
+    /** STABLE */
+    getLowestIndex(): number;
     /** STABLE */
     forEach: (f: (child: M) => void) => void | "break";
 
@@ -177,9 +183,9 @@ export function useManagedChildren<M extends ManagedChildInfo<string | number>>(
 
     //const [getMountCount, setMountCount] = usePassiveState(onChildrenCountChange, returnZero, runImmediately);
 
-    const getHighestIndex = useCallback((): number => {
-        return managedChildrenArray.current.highestIndex;
-    }, []);
+    const getHighestIndex = useCallback((): number => { return managedChildrenArray.current.highestIndex; }, []);
+
+    const getLowestIndex = useCallback((): number => { return managedChildrenArray.current.lowestIndex; }, []);
 
     // All the information we have about our children is stored in this **stable** array.
     // Any mutations to this array **DO NOT** trigger any sort of a re-render.
@@ -265,8 +271,10 @@ export function useManagedChildren<M extends ManagedChildInfo<string | number>>(
         }
 
         if (mounted) {
-            if (typeof index == "number")
+            if (typeof index == "number") {
                 managedChildrenArray.current.highestIndex = Math.max(managedChildrenArray.current.highestIndex, index);
+                managedChildrenArray.current.lowestIndex = Math.min(managedChildrenArray.current.lowestIndex, index);
+            }
         }
         else {
             if (typeof index == "number") {
@@ -280,8 +288,13 @@ export function useManagedChildren<M extends ManagedChildInfo<string | number>>(
             else
                 delete managedChildrenArray.current.rec[index as IndexType];
 
-            if (typeof index == "number")
+            if (typeof index == "number") {
                 managedChildrenArray.current.highestIndex = managedChildrenArray.current.arr.length - 1;
+
+                // TODO: length automatically adjusts to give us the highest index,
+                // but there's no corresponding property to get the lowest index when it changes...
+                // managedChildrenArray.current.lowestIndex = managedChildrenArray.current.arr.length - 1;
+            }
         }
 
         hasRemoteULEChildMounted?.current?.[mounted ? "mounts" : "unmounts"]?.add?.(index);
@@ -293,6 +306,7 @@ export function useManagedChildren<M extends ManagedChildInfo<string | number>>(
         forEach: forEachChild,
         getAt: getManagedChildInfo,
         getHighestIndex: getHighestIndex,
+        getLowestIndex: getLowestIndex,
         arraySlice: useCallback(() => {
             let ret = managedChildrenArray.current.arr.slice();
             const max = getHighestIndex();
@@ -382,7 +396,7 @@ export interface UseChildrenFlagParameters<M extends ManagedChildInfo<any>, R> {
      */
     closestFit: boolean;
 
-    onClosestFit: ((newFit: number | null)=> void) | null;
+    onClosestFit: ((newFit: number | null) => void) | null;
 
     getChildren(): ManagedChildren<M>;
 

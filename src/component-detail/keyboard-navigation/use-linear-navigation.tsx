@@ -72,9 +72,13 @@ export interface UseLinearNavigationParameters<ParentOrChildElement extends Elem
         indexDemangler: (n: number) => number;
 
         /**
-         * From `useManagedChildren`
+         * From `useManagedChildren`.
+         * 
+         * This can be higher than the *actual* highest index if you need it to be.
          */
         getHighestIndex(): number;  // [0, n], not [0, n)
+        /** @see {@link getHighestIndex} */
+        getLowestIndex(): number;
 
         /**
          * Controls which arrow keys are used to navigate through the component.
@@ -109,15 +113,12 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
     monitorCallCount(useLinearNavigation);
 
     type R = Event;
-    const { getHighestIndex, indexDemangler, indexMangler, isValid, navigatePastEnd, navigatePastStart, onNavigateLinear } = linearNavigationParameters;
+    const { getLowestIndex, getHighestIndex, indexDemangler, indexMangler, isValid, navigatePastEnd, navigatePastStart, onNavigateLinear } = linearNavigationParameters;
     const { getTabbableIndex, setTabbableIndex } = rovingTabIndexReturn;
 
     useEnsureStability("useLinearNavigation", onNavigateLinear);
 
     const navigateAbsolute = useCallback((requestedIndexMangled: number, searchDirection: -1 | 1, e: R, fromUserInteraction: boolean, mode: "page" | "single") => {
-        //const targetUnmangled = indexDemangler(requestedIndexMangled);
-        //const { valueUnmangled } = tryNavigateToIndex({ isValid, highestChildIndex: getHighestIndex(), indexDemangler, indexMangler, searchDirection: -1, targetUnmangled });
-        //setTabbableIndex(valueUnmangled, e, fromUserInteraction);
         const highestChildIndex = getHighestIndex();
         const original = (getTabbableIndex() ?? 0);
 
@@ -178,7 +179,7 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
             return "stop";
         }
     }, []);
-    const navigateToFirst = useStableCallback((e: R, fromUserInteraction: boolean) => { return navigateAbsolute(0, -1, e, fromUserInteraction, "single"); });
+    const navigateToFirst = useStableCallback((e: R, fromUserInteraction: boolean) => { return navigateAbsolute(getLowestIndex(), -1, e, fromUserInteraction, "single"); });
     const navigateToLast = useStableCallback((e: R, fromUserInteraction: boolean) => { return navigateAbsolute(getHighestIndex(), 1, e, fromUserInteraction, "single"); });
     const navigateRelative2 = useStableCallback((e: R, offset: number, fromUserInteraction: boolean, mode: "page" | "single"): "passthrough" | "stop" => {
         const highestChildIndex = getHighestIndex();
@@ -221,7 +222,7 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
 
             let truePageNavigationSize = pageNavigationSize;
             if (truePageNavigationSize < 1) {
-                truePageNavigationSize = Math.round(pageNavigationSize * Math.max(100, getHighestIndex() + 1));
+                truePageNavigationSize = Math.round(pageNavigationSize * Math.max(100, (getHighestIndex() - getLowestIndex()) + 1));
             }
 
             let result: "passthrough" | "stop" = "passthrough";

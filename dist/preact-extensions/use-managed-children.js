@@ -42,9 +42,8 @@ export function useManagedChildren(parentParameters) {
     assertEmptyObject(rest);
     useEnsureStability("useManagedChildren", onAfterChildLayoutEffect, onChildrenMountChange, onChildrenCountChange);
     //const [getMountCount, setMountCount] = usePassiveState(onChildrenCountChange, returnZero, runImmediately);
-    const getHighestIndex = useCallback(() => {
-        return managedChildrenArray.current.highestIndex;
-    }, []);
+    const getHighestIndex = useCallback(() => { return managedChildrenArray.current.highestIndex; }, []);
+    const getLowestIndex = useCallback(() => { return managedChildrenArray.current.lowestIndex; }, []);
     // All the information we have about our children is stored in this **stable** array.
     // Any mutations to this array **DO NOT** trigger any sort of a re-render.
     const managedChildrenArray = useRef({ arr: [], rec: {}, highestIndex: 0, lowestIndex: 0 });
@@ -120,8 +119,10 @@ export function useManagedChildren(parentParameters) {
             });
         }
         if (mounted) {
-            if (typeof index == "number")
+            if (typeof index == "number") {
                 managedChildrenArray.current.highestIndex = Math.max(managedChildrenArray.current.highestIndex, index);
+                managedChildrenArray.current.lowestIndex = Math.min(managedChildrenArray.current.lowestIndex, index);
+            }
         }
         else {
             if (typeof index == "number") {
@@ -134,8 +135,12 @@ export function useManagedChildren(parentParameters) {
             }
             else
                 delete managedChildrenArray.current.rec[index];
-            if (typeof index == "number")
+            if (typeof index == "number") {
                 managedChildrenArray.current.highestIndex = managedChildrenArray.current.arr.length - 1;
+                // TODO: length automatically adjusts to give us the highest index,
+                // but there's no corresponding property to get the lowest index when it changes...
+                // managedChildrenArray.current.lowestIndex = managedChildrenArray.current.arr.length - 1;
+            }
         }
         hasRemoteULEChildMounted?.current?.[mounted ? "mounts" : "unmounts"]?.add?.(index);
     }, [ /* Must remain stable */]);
@@ -144,6 +149,7 @@ export function useManagedChildren(parentParameters) {
         forEach: forEachChild,
         getAt: getManagedChildInfo,
         getHighestIndex: getHighestIndex,
+        getLowestIndex: getLowestIndex,
         arraySlice: useCallback(() => {
             let ret = managedChildrenArray.current.arr.slice();
             const max = getHighestIndex();

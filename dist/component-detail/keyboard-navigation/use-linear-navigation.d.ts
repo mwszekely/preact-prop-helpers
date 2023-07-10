@@ -55,9 +55,13 @@ export interface UseLinearNavigationParameters<ParentOrChildElement extends Elem
          */
         indexDemangler: (n: number) => number;
         /**
-         * From `useManagedChildren`
+         * From `useManagedChildren`.
+         *
+         * This can be higher than the *actual* highest index if you need it to be.
          */
         getHighestIndex(): number;
+        /** @see {@link getHighestIndex} */
+        getLowestIndex(): number;
         /**
          * Controls which arrow keys are used to navigate through the component.
          * Not relative to the writing mode -- these are the literal keys that need to be pressed.

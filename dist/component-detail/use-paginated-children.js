@@ -9,7 +9,8 @@ export function usePaginatedChildren({ managedChildrenReturn: { getChildren }, l
     const lastPagination = useRef({ paginationMax: null, paginationMin: null });
     const refreshPagination = useCallback((paginationMin, paginationMax) => {
         const childMax = (getChildren().getHighestIndex() + 1);
-        for (let i = 0; i <= childMax; ++i) {
+        const childMin = (getChildren().getLowestIndex());
+        for (let i = childMin; i <= childMax; ++i) {
             const visible = (i >= (paginationMin ?? -Infinity) && i < (paginationMax ?? Infinity));
             getChildren().getAt(indexDemangler(i))?.setPaginationVisible(visible);
             if (visible && (paginationMax != null || paginationMin != null))

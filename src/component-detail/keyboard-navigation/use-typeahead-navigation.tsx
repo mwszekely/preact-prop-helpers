@@ -87,7 +87,7 @@ export interface UseTypeaheadNavigationChildParameters<ChildElement extends Elem
     info: Pick<UseRovingTabIndexChildParameters<ChildElement, UseRovingTabIndexChildInfo<ChildElement>>["info"], "index">;
     textContentParameters: Pick<UseTextContentParameters<ChildElement>["textContentParameters"], "getText">;
     refElementReturn: Pick<UseRefElementReturnType<ChildElement>["refElementReturn"], "getElement">;
-    context: UseTypeaheadNavigationContext
+    context: UseTypeaheadNavigationContext;
 }
 
 export interface UseTypeaheadNavigationChildReturnType extends UseTextContentReturnType {

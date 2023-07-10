@@ -75,8 +75,14 @@ export interface UseManagedChildReturnType<M extends ManagedChildInfo<any>> {
 export interface ManagedChildren<M extends ManagedChildInfo<any>> {
     /** STABLE */
     getAt(index: M["index"]): M | undefined;
-    /** STABLE */
+    /**
+     * STABLE
+     *
+     * @returns The highest number corresponding to a child. Inclusive. Use `<=`.
+     */
     getHighestIndex(): number;
+    /** STABLE */
+    getLowestIndex(): number;
     /** STABLE */
     forEach: (f: (child: M) => void) => void | "break";
     /**

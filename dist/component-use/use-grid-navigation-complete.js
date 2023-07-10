@@ -18,6 +18,7 @@ export function useCompleteGridNavigation({ gridNavigationParameters, linearNavi
     monitorCallCount(useCompleteGridNavigation);
     assertEmptyObject(void1);
     const getChildren = useCallback(() => managedChildrenReturn.getChildren(), []);
+    const getLowestChildIndex = useCallback(() => getChildren().getLowestIndex(), []);
     const getHighestChildIndex = useCallback(() => getChildren().getHighestIndex(), []);
     const isValid = useCallback((i) => {
         const child = getChildren().getAt(i);
@@ -30,7 +31,7 @@ export function useCompleteGridNavigation({ gridNavigationParameters, linearNavi
     const { refElementReturn } = useRefElement({});
     const { childrenHaveFocusParameters, managedChildrenParameters, context: { gridNavigationRowContext, rovingTabIndexContext, singleSelectionContext, typeaheadNavigationContext }, rearrangeableChildrenReturn, propsParent, propsStableParentOrChild, rovingTabIndexReturn, ...gridNavigationSingleSelectionReturn } = useGridNavigationSingleSelectionSortable({
         gridNavigationParameters,
-        linearNavigationParameters: { getHighestIndex: getHighestChildIndex, isValid, ...linearNavigationParameters },
+        linearNavigationParameters: { getLowestIndex: getLowestChildIndex, getHighestIndex: getHighestChildIndex, isValid, ...linearNavigationParameters },
         managedChildrenReturn: { getChildren },
         rovingTabIndexParameters: { initiallyTabbedIndex: singleSelectionParameters.initiallySelectedIndex, untabbableBehavior: "focus-parent", ...rovingTabIndexParameters },
         singleSelectionParameters,
@@ -81,6 +82,7 @@ export function useCompleteGridNavigationRow({ info, context: contextIncomingFor
     info.unselectable ||= info.untabbable;
     const getChildren = useCallback(() => managedChildrenReturn.getChildren(), []);
     const getHighestChildIndex = useCallback(() => getChildren().getHighestIndex(), []);
+    const getLowestChildIndex = useCallback(() => getChildren().getLowestIndex(), []);
     const isValid = useCallback((i) => {
         const child = getChildren().getAt(i);
         if (child == null)
@@ -93,7 +95,7 @@ export function useCompleteGridNavigationRow({ info, context: contextIncomingFor
     const r = useGridNavigationSingleSelectionRow({
         rovingTabIndexParameters,
         typeaheadNavigationParameters: { isValid, ...typeaheadNavigationParameters },
-        linearNavigationParameters: { isValid, getHighestIndex: getHighestChildIndex, pageNavigationSize: 0, indexDemangler: identity, indexMangler: identity, ...linearNavigationParameters },
+        linearNavigationParameters: { isValid, getHighestIndex: getHighestChildIndex, getLowestIndex: getLowestChildIndex, pageNavigationSize: 0, indexDemangler: identity, indexMangler: identity, ...linearNavigationParameters },
         managedChildrenReturn: { getChildren },
         refElementReturn,
         context: contextIncomingForRowAsChildOfTable,
