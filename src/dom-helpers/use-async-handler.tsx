@@ -52,7 +52,7 @@ export interface UseAsyncHandlerReturnType<EventType, CaptureType> extends UseAs
 }
 
 /**
- * Given an asyncronous event handler, returns a syncronous one that works on the DOM,
+ * Given an asynchronous event handler, returns a synchronous one that works on the DOM,
  * along with some other information related to the current state.
  * Does not modify any props.
  * 
@@ -103,8 +103,8 @@ export interface UseAsyncHandlerReturnType<EventType, CaptureType> extends UseAs
  * 
  * 
  * You may optionally *also* specify debounce and throttle parameters that wait until the
- * syncronous handler has not been called for the specified number of
- * milliseconds, at which point we *actually* run the asyncronous handler
+ * synchronous handler has not been called for the specified number of
+ * milliseconds, at which point we *actually* run the asynchronous handler
  * according to the logic in the previous paragraph. This is in
  * *addition* to throttling the handler, and does not replace that behavior.
  * 

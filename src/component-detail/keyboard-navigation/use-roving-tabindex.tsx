@@ -14,7 +14,16 @@ import { monitorCallCount } from "../../util/use-call-count.js";
 export type SetTabbableIndex = (updater: Parameters<PassiveStateUpdater<number | null, Event>>[0], reason: Event | undefined, fromUserInteraction: boolean) => void;
 export type OnTabbableIndexChange = (tabbableIndex: number | null) => void;
 
-export interface UseRovingTabIndexChildInfo<TabbableChildElement extends Element> extends Pick<ManagedChildInfo<number>, "index"> {
+export interface UseRovingTabIndexChildInfo<TabbableChildElement extends Element> extends ManagedChildInfo<number> {
+
+
+    /**
+     * A **unique integer** (among siblings) representing this child like the index to an array. 
+     * There can be holes/gaps, and even negative numbers, though iterating over a gap is still O(n) on the size of the gap (kinda low priority TODO cause computers can count fast).
+     */
+    index: number;
+
+
     /**
      * When we navigate to a child and focus it, we need to know how that child wants to be focused.
      * Generally, this is just getElement().focus(), but you're allowed to supply anything you want here.
@@ -31,7 +40,7 @@ export interface UseRovingTabIndexChildInfo<TabbableChildElement extends Element
     getElement(): TabbableChildElement | null;
 
     /**
-     * If a child **exists** but **can't be tabbed to**, then set this to `true`.
+     * If a child **exists** (i.e. calls `useRovingTabIndexChild` or its derivatives in some way) but **can't be tabbed to** (because it's e.g. `display: none`), then set this to `true`.
      * 
      * This cannot be calculated automatically. It's *possible* to catch something like `display: none` with some reflow-forcing `getComputedStyles` or something,
      * but if the child is untabbable because it's disabled or staggered or paginated or something we just have no way of knowing. 
@@ -44,9 +53,15 @@ export interface UseRovingTabIndexChildInfo<TabbableChildElement extends Element
      */
     untabbable: boolean;
 
-    /** Provided by `useRovingTabIndexChild` */
+    /** 
+     * Provided by `useRovingTabIndexChild`. 
+     * 
+     * Used by the parent to control a child's internal tabbable state. */
     setLocallyTabbable: StateUpdater<boolean>;
-    /** Provided by `useRovingTabIndexChild` */
+
+    /** 
+     * @see {@link setLocallyTabbable} 
+     */
     getLocallyTabbable: () => boolean;
 
 }
@@ -282,7 +297,6 @@ export function useRovingTabIndex<ParentElement extends Element, ChildElement ex
             // then focus that element too
             if (prevIndex != nextIndex) {
                 const nextChild = children.getAt(nextIndex);
-                //console.assert(!nextChild?.untabbablyHidden);
 
                 if (nextChild != null && fromUserInteraction) {
                     const element = nextChild.getElement();

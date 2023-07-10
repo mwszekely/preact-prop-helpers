@@ -211,7 +211,7 @@ export function useRearrangeableChildren<M extends UseSortableChildInfo>({
             .map(child => ({ child, mangledIndex: indexMangler(getIndex(child)!), demangledIndex: getIndex(child) }))
             .sort((lhs, rhs) => { return lhs.mangledIndex - rhs.mangledIndex })
             .map(({ child, mangledIndex, demangledIndex }) => {
-                return createElement(child.type as any, { ...child.props, key: demangledIndex, "data-mangled-index": mangledIndex, "data-unmangled-index": demangledIndex });
+                return createElement(child.type as any, { ...child.props, key: demangledIndex, "data-mangled-index": mangledIndex, "data-demangled-index": demangledIndex });
             });
     }, []);
 

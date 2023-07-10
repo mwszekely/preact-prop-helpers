@@ -46,6 +46,13 @@ export interface UseManagedChildrenContext<M extends ManagedChildInfo<any>> {
  * Other hooks will inherit from this to provide more complicated behavior.
  */
 export interface ManagedChildInfo<T extends string | number> {
+    /**
+     * A unique value representing this child.
+     * 
+     * If a `number`, then it's like the index to an array. There can be holes/gaps, even negative numbers, but children are contiguous to a degree. There can be a child "before" or "after" this one.
+     * 
+     * If a `string`, then it's like a key into an object. There's no well-relationship between children. You can access a known child or all children, but nothing in between.
+     */
     index: T;
 }
 
@@ -144,7 +151,7 @@ export interface ManagedChildren<M extends ManagedChildInfo<any>> {
      * WHAT THIS DOES:
      * 
      * This function takes the children, slices the array containing them, 
-     * and, *crutially*, fills in any holes in the array with a pseudo-child that just contains an index.
+     * and, *crucially*, fills in any holes in the array with a pseudo-child that just contains an index.
      * 
      * This behavior, to be clear, is only necessary for sorting and rearranging because
      * sorting and rearranging require knowing perfectly which index maps to which.

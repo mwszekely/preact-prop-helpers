@@ -20,7 +20,7 @@ export interface SearchParamStates {
 }
 export interface UseSearchParamStateParameters<Key extends keyof SearchParamStates, T = SearchParamStates[Key]> {
     key: Key;
-    /** If there is no valu in the URL for this state, then `initialValue` will be used instead. */
+    /** If there is no value in the URL for this state, then `initialValue` will be used instead. */
     initialValue: T;
     /**
      * How is the user's history modified when the state changes if not otherwise specified?
@@ -35,7 +35,7 @@ export interface UseSearchParamStateParameters<Key extends keyof SearchParamStat
  * Provides access to the requested Search Param's value
  *
  * Note that while this function is like usePassiveState (itself like useState and useEffect combined),
- * the `setState` return function is, due to browser limitations, not syncronous, but that's
+ * the `setState` return function is, due to browser limitations, not synchronous, but that's
  * like most calls to `setState` anyway I guess?
  *
  * @param paramKey The name of the URL search parameter to reference

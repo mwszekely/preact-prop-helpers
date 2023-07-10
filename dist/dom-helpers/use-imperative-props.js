@@ -120,9 +120,9 @@ export function useImperativeProps({ refElementReturn: { getElement } }) {
 }
 function ImperativeElementU({ tag: Tag, handle, ...props }, ref) {
     const { propsStable, refElementReturn } = useRefElement({ refElementParameters: {} });
-    const { props: iprops, imperativeHandle } = useImperativeProps({ refElementReturn });
+    const { props: imperativeProps, imperativeHandle } = useImperativeProps({ refElementReturn });
     useImperativeHandle(handle, () => imperativeHandle);
-    return (createElement(Tag, useMergedProps(propsStable, iprops, props, { ref })));
+    return (createElement(Tag, useMergedProps(propsStable, imperativeProps, props, { ref })));
 }
 const EventMapping = {
     abort: "onAbort",

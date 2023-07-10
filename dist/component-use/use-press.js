@@ -336,7 +336,7 @@ export function usePress(args) {
  * so here's a workaround for that.
  *
  * We also only look for the selection end to only catch the
- * essense of a non-existant "selectionstop" event.
+ * essence of a non-existent "SelectionStop" event.
  *
  * @param element
  * @returns

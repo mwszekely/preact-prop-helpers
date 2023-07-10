@@ -2,7 +2,7 @@ import { ManagedChildInfo } from "../../preact-extensions/use-managed-children.j
 import { ElementProps, KeyboardEventType, Nullable } from "../../util/types.js";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
 export interface LinearNavigationResult {
-    valueUnmangled: number | null;
+    valueDemangled: number | null;
     status: "normal" | "past-start" | "past-end";
 }
 export interface UseLinearNavigationReturnType<ParentOrChildElement extends Element> {
@@ -87,12 +87,13 @@ export interface UseLinearNavigationParameters<ParentOrChildElement extends Elem
  */
 export declare function useLinearNavigation<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseLinearNavigationChildInfo<ChildElement>>({ rovingTabIndexReturn, linearNavigationParameters }: UseLinearNavigationParameters<ParentOrChildElement, ChildElement, M>): UseLinearNavigationReturnType<ParentOrChildElement>;
 export interface TryNavigateToIndexParameters {
+    lowestChildIndex: number;
     highestChildIndex: number;
     isValid(index: number): boolean;
-    targetUnmangled: number;
+    targetDemangled: number;
     searchDirection: 1 | -1;
     indexMangler: (n: number) => number;
     indexDemangler: (n: number) => number;
 }
-export declare function tryNavigateToIndex({ isValid, highestChildIndex, searchDirection, indexDemangler, indexMangler, targetUnmangled }: TryNavigateToIndexParameters): LinearNavigationResult;
+export declare function tryNavigateToIndex({ isValid, highestChildIndex, lowestChildIndex, searchDirection, indexDemangler, indexMangler, targetDemangled }: TryNavigateToIndexParameters): LinearNavigationResult;
 //# sourceMappingURL=use-linear-navigation.d.ts.map

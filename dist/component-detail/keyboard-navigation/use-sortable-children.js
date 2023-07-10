@@ -76,7 +76,7 @@ export function useRearrangeableChildren({ rearrangeableChildrenParameters: { ge
             .map(child => ({ child, mangledIndex: indexMangler(getIndex(child)), demangledIndex: getIndex(child) }))
             .sort((lhs, rhs) => { return lhs.mangledIndex - rhs.mangledIndex; })
             .map(({ child, mangledIndex, demangledIndex }) => {
-            return createElement(child.type, { ...child.props, key: demangledIndex, "data-mangled-index": mangledIndex, "data-unmangled-index": demangledIndex });
+            return createElement(child.type, { ...child.props, key: demangledIndex, "data-mangled-index": mangledIndex, "data-demangled-index": demangledIndex });
         });
     }, []);
     const toJsonArray = useCallback((transform) => {

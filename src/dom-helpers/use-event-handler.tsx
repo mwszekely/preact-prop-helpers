@@ -8,7 +8,7 @@ import { monitorCallCount } from "../util/use-call-count.js";
  * and not the generic "I'll accept any string and any handler" one.
  * 
  * TODO: This """works""" but it's not great and implicitly relies on
- * lib.dom.ts always giveing the two overloads in the same order, with the
+ * lib.dom.ts always giving the two overloads in the same order, with the
  * typed one first. *That* probably won't change, but if more overloads
  * are ever added this will need adjustment.
  * 
@@ -62,7 +62,7 @@ export function useGlobalHandler<T extends EventTarget, EventType extends TypedE
     if (mode === "grouped") {
         // Note to self: The typing doesn't improve even if this is split up into a sub-function.
         // No matter what, it seems impossible to get the handler's event object typed perfectly.
-        // It seems like it's guaranteed to always be a union of all available tupes.
+        // It seems like it's guaranteed to always be a union of all available types.
         // Again, no matter what combination of sub- or sub-sub-functions used.
         useGlobalHandlerGrouped<T, EventType, H>(target, type, handler, options);
     }

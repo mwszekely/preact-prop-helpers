@@ -9,8 +9,6 @@ export type PhysicalSize = "width" | "height";
 
 export type LogicalOrientation = "inline" | "block";
 
-//export type LineOrientation = "upright" | "leftright" | "downright" | "rightright";
-
 type WritingMode = "horizontal-tb" | "vertical-lr" | "sideways-rl" | "vertical-rl" | "sideways-lr";
 type Direction = "ltr" | "rtl";
 type TextOrientation = "mixed" | "upright" | "sideways";

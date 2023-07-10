@@ -116,7 +116,7 @@ export interface UseDismissParameters<Listeners extends DismissListenerTypes> {
 }
 export interface UseDismissReturnType<SourceElement extends Element | null, PopupElement extends Element> {
     /**
-     * If this dismissable component has a specific element that caused it to appear (a button, for example),
+     * If this dismissible component has a specific element that caused it to appear (a button, for example),
      * provide it with these props.
      *
      * * REQUIRED for things like menus that pop up from a button and for whom losing focus counts as requesting closure.

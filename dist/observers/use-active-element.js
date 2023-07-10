@@ -41,7 +41,7 @@ const activeElementUpdaters = new Map();
 const lastActiveElementUpdaters = new Map();
 const windowFocusedUpdaters = new Map();
 const windowsFocusedUpdaters = new Map();
-// The focusin and focusout events often fire syncronously in the middle of running code.
+// The focusin and focusout events often fire synchronously in the middle of running code.
 // E.G. calling element.focus() can cause a focusin event handler to immediately interrupt that code.
 // For the purpose of improving stability, we debounce all focus events to the next microtask.
 function forEachUpdater(window, map, value, reason) {

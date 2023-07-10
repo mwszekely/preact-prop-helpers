@@ -2,7 +2,7 @@ import { createElement, forwardRef, memo, useCallback, useImperativeHandle, useR
 import { CSSProperties, ElementProps, Ref } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 import { useMergedProps } from "./use-merged-props.js";
-import { useRefElement, UseRefElementReturnType } from "./use-ref-element.js";
+import { UseRefElementReturnType, useRefElement } from "./use-ref-element.js";
 
 export type SetChildren = ((children: string | null) => void);
 export type GetClass = (cls: string) => boolean;
@@ -172,9 +172,9 @@ export function useImperativeProps<E extends Element>({ refElementReturn: { getE
 
 function ImperativeElementU<T extends keyof HTMLElementTagNameMap>({ tag: Tag, handle, ...props }: RenderableProps<ImperativeElementProps<T>>, ref: Ref<HTMLElementTagNameMap[T]>) {
     const { propsStable, refElementReturn } = useRefElement<HTMLElementTagNameMap[T]>({ refElementParameters: {} })
-    const { props: iprops, imperativeHandle } = useImperativeProps<HTMLElementTagNameMap[T]>({ refElementReturn });
+    const { props: imperativeProps, imperativeHandle } = useImperativeProps<HTMLElementTagNameMap[T]>({ refElementReturn });
     useImperativeHandle(handle, () => imperativeHandle);
-    return (createElement(Tag, useMergedProps(propsStable, iprops, props, { ref })));
+    return (createElement(Tag, useMergedProps(propsStable, imperativeProps, props, { ref })));
 }
 
 

@@ -68,7 +68,6 @@ export function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovi
             // then focus that element too
             if (prevIndex != nextIndex) {
                 const nextChild = children.getAt(nextIndex);
-                //console.assert(!nextChild?.untabbablyHidden);
                 if (nextChild != null && fromUserInteraction) {
                     const element = nextChild.getElement();
                     if (element) {

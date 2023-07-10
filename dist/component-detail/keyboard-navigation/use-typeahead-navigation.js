@@ -150,7 +150,7 @@ export function useTypeaheadNavigation({ typeaheadNavigationParameters: { collat
                   It's not specified in WAI-ARIA what to do in that case.  I suppose wrap back to the start?
                   Though there's also a case for just going upwards to the nearest to prevent jumpiness.
                   But if you're already doing typeahead on an unsorted list, like, jumpiness can't be avoided.
-                  I dunno. Going back to the start is the simplist though.
+                  I dunno. Going back to the start is the simplest though.
     
                   Basically what this does: Starting from where we found ourselves after our binary search,
                   scan backwards and forwards through all adjacent entries that also compare equally so that

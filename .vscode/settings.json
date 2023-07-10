@@ -1,3 +1,22 @@
 {
-    "typescript.tsdk": "node_modules/typescript/lib"
+    "typescript.tsdk": "node_modules/typescript/lib",
+    // english never got the vowels it needed so now we're all stuck with spellcheck yay
+    "cSpell.words": [
+        "clsx",
+        "demangle",
+        "demangled",
+        "demangler",
+        "flaggable",
+        "preact",
+        "rearrangeable",
+        "referencer",
+        "renderable",
+        "typeahead",
+        "unfocusable",
+        "unmemoized",
+        "unparse",
+        "unselectable",
+        "untabbable",
+        "vnode"
+    ]
 }

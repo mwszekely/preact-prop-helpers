@@ -20,7 +20,7 @@ export function useGlobalHandler(target, type, handler, options, mode) {
     if (mode === "grouped") {
         // Note to self: The typing doesn't improve even if this is split up into a sub-function.
         // No matter what, it seems impossible to get the handler's event object typed perfectly.
-        // It seems like it's guaranteed to always be a union of all available tupes.
+        // It seems like it's guaranteed to always be a union of all available types.
         // Again, no matter what combination of sub- or sub-sub-functions used.
         useGlobalHandlerGrouped(target, type, handler, options);
     }

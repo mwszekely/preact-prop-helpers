@@ -4,7 +4,7 @@ import { PassiveStateUpdater } from "../../preact-extensions/use-passive-state.j
 import { EnhancedEventHandler, TargetedEnhancedEvent } from "../../util/event.js";
 import { ElementProps, Nullable } from "../../util/types.js";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
-/** Anything that's selectable must be tabbable, so we DO use rovingtabindex instead of just managedchildren */
+/** Anything that's selectable must be tabbable, so we DO use rovingTabIndex instead of just managedChildren */
 export interface UseSingleSelectionChildInfo<E extends Element> extends UseRovingTabIndexChildInfo<E> {
     selected: boolean;
     getSelected(): boolean;

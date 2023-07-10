@@ -13,7 +13,7 @@ import { monitorCallCount } from "../util/use-call-count.js";
 /**
  * In general, each soft dismiss hook takes an `open` and an `onClose` prop.
  * 
- * `open` in all cases referes to both whether or not the controlled surface is currently being shown,
+ * `open` in all cases refers to both whether or not the controlled surface is currently being shown,
  * but also whether that particular method of soft dismiss is enabled or not.
  * 
  * E.G. If `escape` key dismissing is disabled, just have `open` false at all times for `escapeDismissParameters`.
@@ -307,7 +307,7 @@ export interface UseDismissParameters<Listeners extends DismissListenerTypes> {
 
 export interface UseDismissReturnType<SourceElement extends Element | null, PopupElement extends Element> {
     /**
-     * If this dismissable component has a specific element that caused it to appear (a button, for example),
+     * If this dismissible component has a specific element that caused it to appear (a button, for example),
      * provide it with these props.
      * 
      * * REQUIRED for things like menus that pop up from a button and for whom losing focus counts as requesting closure. 

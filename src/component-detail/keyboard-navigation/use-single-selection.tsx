@@ -13,7 +13,7 @@ import { monitorCallCount } from "../../util/use-call-count.js";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
 
 
-/** Anything that's selectable must be tabbable, so we DO use rovingtabindex instead of just managedchildren */
+/** Anything that's selectable must be tabbable, so we DO use rovingTabIndex instead of just managedChildren */
 export interface UseSingleSelectionChildInfo<E extends Element> extends UseRovingTabIndexChildInfo<E> {
     selected: boolean;
     getSelected(): boolean;

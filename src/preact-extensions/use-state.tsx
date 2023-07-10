@@ -20,7 +20,7 @@ export function useState<T>(initialState: T | (() => T)): readonly [value: T, se
 
     monitorCallCount(useState);
 
-    // We keep both, but overrride the `setState` functionality
+    // We keep both, but override the `setState` functionality
     const [state, setStateP] = useStateP(initialState);
     const ref = useRef(state);
 

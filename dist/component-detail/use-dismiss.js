@@ -10,7 +10,7 @@ import { monitorCallCount } from "../util/use-call-count.js";
 /**
  * In general, each soft dismiss hook takes an `open` and an `onClose` prop.
  *
- * `open` in all cases referes to both whether or not the controlled surface is currently being shown,
+ * `open` in all cases refers to both whether or not the controlled surface is currently being shown,
  * but also whether that particular method of soft dismiss is enabled or not.
  *
  * E.G. If `escape` key dismissing is disabled, just have `open` false at all times for `escapeDismissParameters`.

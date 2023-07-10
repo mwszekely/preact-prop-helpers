@@ -34,7 +34,7 @@ export function useAsync(asyncHandler2, options) {
     monitorCallCount(useAsync);
     // Things related to current execution
     // Because we can both return and throw undefined, 
-    // we need separate state to track their existance too.
+    // we need separate state to track their existence too.
     //
     // We keep, like, a *lot* of render-state, but it only ever triggers a re-render
     // when we start/stop an async action.

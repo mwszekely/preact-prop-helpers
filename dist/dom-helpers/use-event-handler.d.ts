@@ -3,7 +3,7 @@
  * and not the generic "I'll accept any string and any handler" one.
  *
  * TODO: This """works""" but it's not great and implicitly relies on
- * lib.dom.ts always giveing the two overloads in the same order, with the
+ * lib.dom.ts always giving the two overloads in the same order, with the
  * typed one first. *That* probably won't change, but if more overloads
  * are ever added this will need adjustment.
  *

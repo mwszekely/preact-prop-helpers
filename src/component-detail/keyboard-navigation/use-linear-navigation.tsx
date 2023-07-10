@@ -8,7 +8,7 @@ import { monitorCallCount } from "../../util/use-call-count.js";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
 
 export interface LinearNavigationResult {
-    valueUnmangled: number | null;
+    valueDemangled: number | null;
     status: "normal" | "past-start" | "past-end"
 }
 
@@ -18,7 +18,7 @@ export interface UseLinearNavigationReturnType<ParentOrChildElement extends Elem
     propsStable: ElementProps<ParentOrChildElement>;
 }
 
-export interface UseLinearNavigationChildInfo<ChildElement extends Element> extends ManagedChildInfo<number> {}
+export interface UseLinearNavigationChildInfo<ChildElement extends Element> extends ManagedChildInfo<number> { }
 
 /** Arguments passed to the parent `useLinearNavigation` */
 export interface UseLinearNavigationParameters<ParentOrChildElement extends Element, ChildElement extends Element, _M extends UseLinearNavigationChildInfo<ChildElement>> {
@@ -120,10 +120,11 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
 
     const navigateAbsolute = useCallback((requestedIndexMangled: number, searchDirection: -1 | 1, e: R, fromUserInteraction: boolean, mode: "page" | "single") => {
         const highestChildIndex = getHighestIndex();
+        const lowestChildIndex = getLowestIndex();
         const original = (getTabbableIndex() ?? 0);
 
-        const targetUnmangled = indexDemangler(requestedIndexMangled);
-        const { status, valueUnmangled } = tryNavigateToIndex({ isValid, highestChildIndex, indexDemangler, indexMangler, searchDirection, targetUnmangled });
+        const targetDemangled = indexDemangler(requestedIndexMangled);
+        const { status, valueDemangled } = tryNavigateToIndex({ isValid, lowestChildIndex, highestChildIndex, indexDemangler, indexMangler, searchDirection, targetDemangled });
         if (status == "past-end") {
             if (navigatePastEnd == "wrap") {
                 if (mode == "single")
@@ -135,7 +136,7 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
                     // It works fine, the problem isn't that -- the problem is it just feels wrong. 
                     // Page Up/Down don't feel like they should wrap, even if normally requested. 
                     // That's the arrow keys' domain.
-                    if (false && (valueUnmangled == getTabbableIndex()))
+                    if (false && (valueDemangled == getTabbableIndex()))
                         navigateToFirst(e, fromUserInteraction);
                     else
                         navigateToLast(e, fromUserInteraction);
@@ -158,7 +159,7 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
                 else {
                     /* eslint-disable no-constant-condition */
                     // See above. It works fine but just feels wrong to wrap on Page Up/Down.
-                    if (false && valueUnmangled == getTabbableIndex())
+                    if (false && valueDemangled == getTabbableIndex())
                         navigateToLast(e, fromUserInteraction);
                     else
                         navigateToFirst(e, fromUserInteraction);
@@ -174,8 +175,8 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
             }
         }
         else {
-            setTabbableIndex(valueUnmangled, e, fromUserInteraction);
-            onNavigateLinear?.(valueUnmangled, e as KeyboardEventType<ChildElement>);
+            setTabbableIndex(valueDemangled, e, fromUserInteraction);
+            onNavigateLinear?.(valueDemangled, e as KeyboardEventType<ChildElement>);
             return "stop";
         }
     }, []);
@@ -293,64 +294,65 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
 
 export interface TryNavigateToIndexParameters {
     //children: ManagedChildren<number, unknown, K>;
+    lowestChildIndex: number;
     highestChildIndex: number; // [0, n], not [0, n)
     isValid(index: number): boolean;
 
     //default: number;
-    targetUnmangled: number;
+    targetDemangled: number;
     searchDirection: 1 | -1;
     indexMangler: (n: number) => number;
     indexDemangler: (n: number) => number;
 
 }
 
-export function tryNavigateToIndex({ isValid, highestChildIndex, searchDirection, indexDemangler, indexMangler, targetUnmangled }: TryNavigateToIndexParameters): LinearNavigationResult {
+export function tryNavigateToIndex({ isValid, highestChildIndex, lowestChildIndex, searchDirection, indexDemangler, indexMangler, targetDemangled }: TryNavigateToIndexParameters): LinearNavigationResult {
 
     if (searchDirection === -1) {
         let bestUpResult: LinearNavigationResult | undefined = undefined;
-        bestUpResult = tryNavigateUp({ isValid, indexDemangler, indexMangler, targetUnmangled });
-        bestUpResult ??= tryNavigateDown({ isValid, indexDemangler, indexMangler, targetUnmangled, highestChildIndex });
-        return bestUpResult || { valueUnmangled: targetUnmangled, status: "normal" };
+        bestUpResult = tryNavigateUp({ isValid, indexDemangler, indexMangler, targetDemangled, lowestChildIndex });
+        bestUpResult ??= tryNavigateDown({ isValid, indexDemangler, indexMangler, targetDemangled, highestChildIndex });
+        return bestUpResult || { valueDemangled: targetDemangled, status: "normal" };
     }
     else {
         let bestDownResult: LinearNavigationResult | undefined = undefined;
-        bestDownResult = tryNavigateDown({ isValid, indexDemangler, indexMangler, targetUnmangled, highestChildIndex });
-        bestDownResult ??= tryNavigateUp({ isValid, indexDemangler, indexMangler, targetUnmangled });
-        return bestDownResult || { valueUnmangled: targetUnmangled, status: "normal" };
+        bestDownResult = tryNavigateDown({ isValid, indexDemangler, indexMangler, targetDemangled, highestChildIndex });
+        bestDownResult ??= tryNavigateUp({ isValid, indexDemangler, indexMangler, targetDemangled, lowestChildIndex });
+        return bestDownResult || { valueDemangled: targetDemangled, status: "normal" };
     }
 }
 
-function tryNavigateUp({ isValid, indexDemangler, indexMangler, targetUnmangled }: OmitStrong<TryNavigateToIndexParameters, "highestChildIndex" | "searchDirection">): LinearNavigationResult | undefined {
-    const lower = 0;
-    while (targetUnmangled >= lower && !isValid(targetUnmangled)) {
-        targetUnmangled = indexDemangler(indexMangler(targetUnmangled) - 1);
+function tryNavigateUp({ isValid, indexDemangler, indexMangler, lowestChildIndex: lower, targetDemangled }: OmitStrong<TryNavigateToIndexParameters, "highestChildIndex" | "searchDirection">): LinearNavigationResult | undefined {
+
+    while (targetDemangled >= lower && !isValid(targetDemangled)) {
+        targetDemangled = indexDemangler(indexMangler(targetDemangled) - 1);
     }
 
-    if (!isValid(targetUnmangled)) {
+    if (!isValid(targetDemangled)) {
         return undefined;
     }
-    if (targetUnmangled < lower) {
-        return { valueUnmangled: indexDemangler(lower), status: "past-start" };
+    if (targetDemangled < lower) {
+        return { valueDemangled: indexDemangler(lower), status: "past-start" };
     }
     else {
-        return { valueUnmangled: targetUnmangled, status: "normal" };
+        return { valueDemangled: targetDemangled, status: "normal" };
     }
 }
 
-function tryNavigateDown({ isValid, indexDemangler, indexMangler, targetUnmangled, highestChildIndex: upper }: OmitStrong<TryNavigateToIndexParameters, "searchDirection">): LinearNavigationResult | undefined {
+function tryNavigateDown({ isValid, indexDemangler, indexMangler, targetDemangled, highestChildIndex: upper }: OmitStrong<TryNavigateToIndexParameters, "lowestChildIndex" | "searchDirection">): LinearNavigationResult | undefined {
 
-    while (targetUnmangled <= upper && !isValid(targetUnmangled)) {
-        targetUnmangled = indexDemangler(indexMangler(targetUnmangled) + 1);
+    while (targetDemangled <= upper && !isValid(targetDemangled)) {
+        targetDemangled = indexDemangler(indexMangler(targetDemangled) + 1);
     }
 
-    if (!isValid(targetUnmangled)) {
+    if (!isValid(targetDemangled)) {
         return undefined;
     }
-    if (targetUnmangled > upper) {
-        return { valueUnmangled: indexDemangler(upper), status: "past-end" };
+    if (targetDemangled > upper) {
+        return { valueDemangled: indexDemangler(upper), status: "past-end" };
     }
     else {
-        return { valueUnmangled: targetUnmangled, status: "normal" };
+        return { valueDemangled: targetDemangled, status: "normal" };
     }
 }
 

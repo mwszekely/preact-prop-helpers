@@ -45,7 +45,7 @@ export function findBackupFocus(unmountingElement: Element | null | undefined): 
         }
 
         if (pos & Node.DOCUMENT_POSITION_PRECEDING) {
-            // The unmounting element is before this element we're treewalking.
+            // The unmounting element is before this element we're tree-walking.
             // That means the next tabbable element we find is the candidate we really want.
             if (node instanceof Element) {
                 if (isTabbable(node)) {
@@ -55,7 +55,7 @@ export function findBackupFocus(unmountingElement: Element | null | undefined): 
             }
         }
         else if (pos & Node.DOCUMENT_POSITION_FOLLOWING) {
-            // The unmounting element is after this element we're treewalking.
+            // The unmounting element is after this element we're tree-walking.
             // That means the we're getting closer and closer.
             // If this element is tabbable, then it's even closer than any other tabbable element we've saved up to this point.
             if (node instanceof Element) {

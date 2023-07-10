@@ -59,7 +59,7 @@ function unparseParam<Key extends keyof SearchParamStates, T = SearchParamStates
 
 export interface UseSearchParamStateParameters<Key extends keyof SearchParamStates, T = SearchParamStates[Key]> {
     key: Key;
-    /** If there is no valu in the URL for this state, then `initialValue` will be used instead. */
+    /** If there is no value in the URL for this state, then `initialValue` will be used instead. */
     initialValue: T;
     /** 
      * How is the user's history modified when the state changes if not otherwise specified? 
@@ -76,7 +76,7 @@ export interface UseSearchParamStateParameters<Key extends keyof SearchParamStat
  * Provides access to the requested Search Param's value
  * 
  * Note that while this function is like usePassiveState (itself like useState and useEffect combined),
- * the `setState` return function is, due to browser limitations, not syncronous, but that's
+ * the `setState` return function is, due to browser limitations, not synchronous, but that's
  * like most calls to `setState` anyway I guess?
  * 
  * @param paramKey The name of the URL search parameter to reference 
@@ -98,7 +98,7 @@ export function useSearchParamState<Key extends keyof SearchParamStates>({ key: 
     }, [])
 
     // We keep a local copy of our current Search Param value
-    // because changing it is actually an asyncronous operation
+    // because changing it is actually an asynchronous operation
     // and we can't know when it ends aside from just "did the URL change or not"
     // so we might as well keep this state around locally to compensate.
     const savedParamValue = useRef(parseParam<Key, T>(null, paramKey, stringToValue) ?? initialValue);
