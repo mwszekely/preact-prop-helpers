@@ -1,6 +1,7 @@
 import { shuffle as lodashShuffle } from "lodash-es";
+import { useForceUpdate } from "../../preact-extensions/use-force-update.js";
 import { ManagedChildInfo, UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
-import { returnNull, useEnsureStability, usePassiveState } from "../../preact-extensions/use-passive-state.js";
+import { useEnsureStability } from "../../preact-extensions/use-passive-state.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { TargetedPick, createElement, useCallback, useRef } from "../../util/lib.js";
 import { VNode } from "../../util/types.js";
@@ -189,7 +190,8 @@ export function useRearrangeableChildren<M extends UseSortableChildInfo>({
     // this hook, but it's tbody that actually needs updating), we need to remotely
     // get and set a forceUpdate function.
     //const [getForceUpdate, setForceUpdate] = usePassiveState<null | (() => void)>(null, returnNull);
-    const [getForceUpdate, setForceUpdate] = usePassiveState<null | (() => void), never>(null, returnNull);
+    //const [getForceUpdate, setForceUpdate] = usePassiveState<null | (() => void), never>(null, returnNull);
+    const forceUpdate = useForceUpdate();
 
     const rearrange = useCallback((originalRows: M[], sortedRows: M[]) => {
         console.assert(originalRows != sortedRows);
@@ -209,7 +211,7 @@ export function useRearrangeableChildren<M extends UseSortableChildInfo>({
         }
 
         onRearrangedGetter()?.();
-        getForceUpdate()?.();
+        forceUpdate();
     }, []);
 
     const useRearrangedChildren = useCallback(function useRearrangedChildren(children: VNode[]) {
