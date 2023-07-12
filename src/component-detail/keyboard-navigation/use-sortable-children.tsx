@@ -172,7 +172,7 @@ export function useRearrangeableChildren<M extends UseSortableChildInfo>({
     const shuffle = useCallback((): Promise<void> | void => {
         const managedRows = getChildren();
         const originalRows = managedRows.arraySlice();
-        const shuffledRows = lodashShuffle(originalRows);
+        const shuffledRows = lodashShuffle(originalRows.slice());
         return rearrange(originalRows, shuffledRows);
     }, [/* Must remain stable */]);
 
@@ -192,7 +192,8 @@ export function useRearrangeableChildren<M extends UseSortableChildInfo>({
     const [getForceUpdate, setForceUpdate] = usePassiveState<null | (() => void), never>(null, returnNull);
 
     const rearrange = useCallback((originalRows: M[], sortedRows: M[]) => {
-
+        console.assert(originalRows != sortedRows);
+        
         mangleMap.current.clear();
         demangleMap.current.clear();
 
@@ -289,7 +290,7 @@ export function useSortableChildren<M extends UseSortableChildInfo>({
         const compare = getCompare();
         const originalRows = managedRows.arraySlice();
 
-        const sortedRows = compare ? originalRows.sort((lhsRow, rhsRow) => {
+        const sortedRows = compare ? originalRows.slice().sort((lhsRow, rhsRow) => {
 
             const lhsValue = lhsRow;
             const rhsValue = rhsRow;

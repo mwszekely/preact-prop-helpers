@@ -38,7 +38,7 @@ export function useRearrangeableChildren({ rearrangeableChildrenParameters: { ge
     const shuffle = useCallback(() => {
         const managedRows = getChildren();
         const originalRows = managedRows.arraySlice();
-        const shuffledRows = lodashShuffle(originalRows);
+        const shuffledRows = lodashShuffle(originalRows.slice());
         return rearrange(originalRows, shuffledRows);
     }, [ /* Must remain stable */]);
     const reverse = useCallback(() => {
@@ -54,6 +54,7 @@ export function useRearrangeableChildren({ rearrangeableChildrenParameters: { ge
     //const [getForceUpdate, setForceUpdate] = usePassiveState<null | (() => void)>(null, returnNull);
     const [getForceUpdate, setForceUpdate] = usePassiveState(null, returnNull);
     const rearrange = useCallback((originalRows, sortedRows) => {
+        console.assert(originalRows != sortedRows);
         mangleMap.current.clear();
         demangleMap.current.clear();
         // Update our sorted <--> unsorted indices map 
@@ -133,7 +134,7 @@ export function useSortableChildren({ rearrangeableChildrenParameters, sortableC
         const managedRows = getChildren();
         const compare = getCompare();
         const originalRows = managedRows.arraySlice();
-        const sortedRows = compare ? originalRows.sort((lhsRow, rhsRow) => {
+        const sortedRows = compare ? originalRows.slice().sort((lhsRow, rhsRow) => {
             const lhsValue = lhsRow;
             const rhsValue = rhsRow;
             const result = compare(lhsValue, rhsValue);
