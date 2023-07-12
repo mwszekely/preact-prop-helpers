@@ -4,10 +4,10 @@ import { useEnsureStability } from "../../preact-extensions/use-passive-state.js
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useMemoObject, useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { useState } from "../../preact-extensions/use-state.js";
+import { assertEmptyObject } from "../../util/assert.js";
 import { enhanceEvent } from "../../util/event.js";
 import { useCallback, useEffect } from "../../util/lib.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
-import { assertEmptyObject } from "../../index.js";
 export function useSingleSelection({ managedChildrenReturn: { getChildren, ...void1 }, rovingTabIndexReturn: { setTabbableIndex, ...void2 }, singleSelectionParameters: { onSelectedIndexChange: onSelectedIndexChange_U, initiallySelectedIndex, ariaPropName, selectionMode, ...void3 }, ...void4 }) {
     monitorCallCount(useSingleSelection);
     assertEmptyObject(void1);

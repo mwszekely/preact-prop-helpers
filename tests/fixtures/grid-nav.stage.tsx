@@ -184,12 +184,12 @@ function TestBaseGridNavRow({ index }: { index: number }) {
         info: {
             unselectable: disabled,
             untabbable: hidden,
-            index
+            index,
+            getSortValue: getTextContent
         },
         linearNavigationParameters: { navigatePastEnd: "wrap", navigatePastStart: "wrap" },
         rovingTabIndexParameters: { initiallyTabbedIndex: 0, untabbable: false, onTabbableIndexChange: null },
         typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000, onNavigateTypeahead: null },
-        sortableChildParameters: { getSortValue: getTextContent },
         textContentParameters: { getText: getTextContent }
     });
 

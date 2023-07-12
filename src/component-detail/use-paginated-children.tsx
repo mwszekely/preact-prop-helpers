@@ -1,4 +1,4 @@
-import { UseRefElementReturnType } from "../index.js";
+import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
 import { UseManagedChildrenParameters, UseManagedChildrenReturnType } from "../preact-extensions/use-managed-children.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useState } from "../preact-extensions/use-state.js";

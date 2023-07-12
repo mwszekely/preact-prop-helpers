@@ -1,4 +1,4 @@
-import { UseRefElementReturnType } from "../index.js";
+import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
 import { UseManagedChildrenParameters, UseManagedChildrenReturnType } from "../preact-extensions/use-managed-children.js";
 import { TargetedPick } from "../util/lib.js";
 import { ElementProps, Nullable } from "../util/types.js";

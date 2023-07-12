@@ -6,12 +6,12 @@ import { OnPassiveStateChange, PassiveStateUpdater, useEnsureStability } from ".
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useMemoObject, useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { useState } from "../../preact-extensions/use-state.js";
+import { assertEmptyObject } from "../../util/assert.js";
 import { EnhancedEventHandler, TargetedEnhancedEvent, enhanceEvent } from "../../util/event.js";
 import { TargetedPick, useCallback, useEffect } from "../../util/lib.js";
 import { ElementProps, Nullable } from "../../util/types.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
-import { assertEmptyObject } from "../../index.js";
 
 
 /** Anything that's selectable must be tabbable, so we DO use rovingTabIndex instead of just managedChildren */
