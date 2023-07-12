@@ -88,10 +88,8 @@ export function useCompleteListNavigation({ linearNavigationParameters, rearrang
         childrenHaveFocusReturn
     };
 }
-export function useCompleteListNavigationChild({ info: { index, focusSelf, unselectable, untabbable, ...info }, // The "...info" is empty if M is the same as UCLNCI<ChildElement>.
-textContentParameters, context: { childrenHaveFocusChildContext, managedChildContext, rovingTabIndexContext, paginatedChildContext, staggeredChildContext, singleSelectionContext, typeaheadNavigationContext }, sortableChildParameters, 
-//pressParameters,
-...void1 }) {
+export function useCompleteListNavigationChild({ info: { index, focusSelf, unselectable, untabbable, getSortValue, ...info }, // The "...info" is empty if M is the same as UCLNCI<ChildElement>.
+textContentParameters, context: { childrenHaveFocusChildContext, managedChildContext, rovingTabIndexContext, paginatedChildContext, staggeredChildContext, singleSelectionContext, typeaheadNavigationContext }, ...void1 }) {
     monitorCallCount(useCompleteListNavigationChild);
     assertEmptyObject(void1);
     //const { onPressSync, ...pressParameters1 } = (pressParameters ?? {});
@@ -118,7 +116,7 @@ textContentParameters, context: { childrenHaveFocusChildContext, managedChildCon
         index,
         focusSelf,
         getElement: refElementReturn.getElement,
-        getSortValue: sortableChildParameters.getSortValue,
+        getSortValue,
         unselectable,
         untabbable,
         ...mcp4,

@@ -55,8 +55,7 @@ export interface CompleteListNavigationContext<_ParentElement extends Element, C
 export interface UseCompleteListNavigationChildParameters<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends 
 Pick<UseListNavigationSingleSelectionSortableChildParameters<ChildElement, M>, "textContentParameters"> {
     context: CompleteListNavigationContext<any, ChildElement, M>;
-    info: Omit<M, Exclude<keyof UseCompleteListNavigationChildInfo<ChildElement>, "index" | "focusSelf" | "untabbable" | "unselectable">>;
-    sortableChildParameters: Pick<UseSortableChildInfo, "getSortValue">;
+    info: Omit<M, Exclude<keyof UseCompleteListNavigationChildInfo<ChildElement>, "getSortValue" | "index" | "focusSelf" | "untabbable" | "unselectable">>;
 }
 
 export interface UseCompleteListNavigationChildReturnType<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>>
@@ -195,11 +194,9 @@ export function useCompleteListNavigation<ParentElement extends Element, ChildEl
 }
 
 export function useCompleteListNavigationChild<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>>({
-    info: { index, focusSelf, unselectable, untabbable, ...info },  // The "...info" is empty if M is the same as UCLNCI<ChildElement>.
+    info: { index, focusSelf, unselectable, untabbable, getSortValue, ...info },  // The "...info" is empty if M is the same as UCLNCI<ChildElement>.
     textContentParameters,
     context: { childrenHaveFocusChildContext, managedChildContext, rovingTabIndexContext, paginatedChildContext, staggeredChildContext, singleSelectionContext, typeaheadNavigationContext },
-    sortableChildParameters,
-    //pressParameters,
     ...void1
 }: UseCompleteListNavigationChildParameters<ChildElement, M>): UseCompleteListNavigationChildReturnType<ChildElement, M> {
     monitorCallCount(useCompleteListNavigationChild);
@@ -243,7 +240,7 @@ export function useCompleteListNavigationChild<ChildElement extends Element, M e
         index,
         focusSelf,
         getElement: refElementReturn.getElement,
-        getSortValue: sortableChildParameters.getSortValue,
+        getSortValue,
         unselectable,
         untabbable,
         ...mcp4,

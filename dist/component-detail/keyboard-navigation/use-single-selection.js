@@ -7,8 +7,13 @@ import { useState } from "../../preact-extensions/use-state.js";
 import { enhanceEvent } from "../../util/event.js";
 import { useCallback, useEffect } from "../../util/lib.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
-export function useSingleSelection({ managedChildrenReturn: { getChildren }, rovingTabIndexReturn: { setTabbableIndex }, singleSelectionParameters: { onSelectedIndexChange: onSelectedIndexChange_U, initiallySelectedIndex, ariaPropName, selectionMode } }) {
+import { assertEmptyObject } from "../../index.js";
+export function useSingleSelection({ managedChildrenReturn: { getChildren, ...void1 }, rovingTabIndexReturn: { setTabbableIndex, ...void2 }, singleSelectionParameters: { onSelectedIndexChange: onSelectedIndexChange_U, initiallySelectedIndex, ariaPropName, selectionMode, ...void3 }, ...void4 }) {
     monitorCallCount(useSingleSelection);
+    assertEmptyObject(void1);
+    assertEmptyObject(void2);
+    assertEmptyObject(void3);
+    assertEmptyObject(void4);
     const onSelectedIndexChange = useStableCallback(onSelectedIndexChange_U ?? noop);
     const getSelectedAt = useCallback((m) => { return m.getSelected(); }, []);
     const setSelectedAt = useCallback((m, t, newSelectedIndex, prevSelectedIndex) => {
@@ -58,9 +63,12 @@ export function useSingleSelection({ managedChildrenReturn: { getChildren }, rov
         }
     };
 }
-export function useSingleSelectionChild(args) {
+export function useSingleSelectionChild({ context: { singleSelectionContext: { getSelectedIndex, onSelectedIndexChange, ariaPropName, selectionMode, ...void1 }, ...void2 }, info: { index, unselectable, ...void3 }, ...void4 }) {
     monitorCallCount(useSingleSelectionChild);
-    const { context: { singleSelectionContext: { getSelectedIndex, onSelectedIndexChange, ariaPropName, selectionMode } }, info: { index, unselectable }, } = args;
+    assertEmptyObject(void1);
+    assertEmptyObject(void2);
+    assertEmptyObject(void3);
+    assertEmptyObject(void4);
     useEnsureStability("useSingleSelectionChild", getSelectedIndex, onSelectedIndexChange);
     const getUnselectable = useStableGetter(unselectable);
     const [localSelected, setLocalSelected, getLocalSelected] = useState(getSelectedIndex() == index);
@@ -82,17 +90,9 @@ export function useSingleSelectionChild(args) {
         },
         singleSelectionChildReturn: {
             selected: localSelected,
-            // This is the thing that's passed to onPress or onClick or whatever
-            /*setThisOneSelected: useStableCallback((event) => {
-                console.assert(!getUnselectable());
-                if (selectionMode == "disabled")
-                    return;
-                if (!unselectable)
-                    onSelectedIndexChange?.(enhanceEvent(event, { selectedIndex: index }));
-            }),*/
-            getSelectedOffset: getDirection,
+            getSelected: getLocalSelected,
             selectedOffset: direction,
-            getSelected: getLocalSelected
+            getSelectedOffset: getDirection,
         },
         props: ariaPropName == null || selectionMode == "disabled" ? {} : {
             [`${propParts[0]}-${propParts[1]}`]: (localSelected ? (propParts[1] == "current" ? `${propParts[2]}` : `true`) : "false")

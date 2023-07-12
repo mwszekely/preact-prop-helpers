@@ -6,6 +6,60 @@ import { StateUpdater, TargetedPick } from "../../util/lib.js";
 import { ElementProps, Nullable, OmitStrong } from "../../util/types.js";
 export type SetTabbableIndex = (updater: Parameters<PassiveStateUpdater<number | null, Event>>[0], reason: Event | undefined, fromUserInteraction: boolean) => void;
 export type OnTabbableIndexChange = (tabbableIndex: number | null) => void;
+export interface UseRovingTabIndexParametersSelf<ParentElement extends Element, TabbableChildElement extends Element, M extends UseRovingTabIndexChildInfo<TabbableChildElement>> {
+    /** When `untabbable` is true, instead of a child focusing itself, the parent will via this `focusSelf` argument. */
+    focusSelfParent(e: ParentElement | null): void;
+    /**
+     * This is imperative, not declarative;
+     * it is better if we can keep re-renders on the parent to a minimum anyway.
+     *
+     * You can manually control this with `onTabbableIndexChange` and `setTabbableIndex` if you need.
+     */
+    initiallyTabbedIndex: number | null;
+    /**
+     * When true, none of the children will be tabbable, as if the entire component is hidden.
+     *
+     * This does not actually change the currently tabbable index; if this is set to `false`, the last tabbable child is remembered.
+     */
+    untabbable: boolean;
+    /**
+     * When the parent is `untabbable` and a child gains focus via some means, we need to decide what to do.
+     *
+     * Sometimes, it's better to just send focus back to the parent.
+     * Sometimes, it's better to just let the child be focused this one time (especially if focusing means that `untabbable` is going to change to `true`).
+     *
+     * If `untabbable` is false, then this has no effect.
+     */
+    untabbableBehavior: "focus-parent" | "leave-child-focused";
+    /**
+     * If you would like to have an event run whenever a new index becomes tabbable
+     * (e.g. to call `setState` to render that tabbable index...for some reason...)
+     * you can do that here.
+     *
+     * **MUST** be stable!
+     */
+    onTabbableIndexChange?: Nullable<OnPassiveStateChange<number | null, Event>>;
+}
+export interface UseRovingTabIndexReturnTypeSelf {
+    /**
+     * **STABLE**
+     *
+     * Can be used to programmatically change which child is the currently tabbable one.
+     *
+     * `fromUserInteraction` determines if this was a user-generated event that should focus the newly tabbable child,
+     * or a programmatic event that should leave the user's focus where the user currently is, because they didn't do that.
+     *
+     */
+    setTabbableIndex: SetTabbableIndex;
+    /** **STABLE** */
+    getTabbableIndex: () => number | null;
+    /**
+     * **STABLE**
+     *
+     * Call to focus the currently tabbable child.
+     */
+    focusSelf: (reason?: any) => void;
+}
 export interface UseRovingTabIndexChildInfo<TabbableChildElement extends Element> extends ManagedChildInfo<number> {
     /**
      * A **unique integer** (among siblings) representing this child like the index to an array.
@@ -51,40 +105,7 @@ export interface UseRovingTabIndexChildInfo<TabbableChildElement extends Element
 export interface UseRovingTabIndexParameters<ParentElement extends Element, TabbableChildElement extends Element, M extends UseRovingTabIndexChildInfo<TabbableChildElement>> extends TargetedPick<UseManagedChildrenReturnType<M>, "managedChildrenReturn", "getChildren">, TargetedPick<UseRefElementReturnType<ParentElement>, "refElementReturn", "getElement"> {
     /** When children mount/unmount, RTI needs access to all known children in case we unmounted the currently tabbable child */
     /** The only parameters RTI needs directly is the initial index to be tabbable */
-    rovingTabIndexParameters: {
-        /** When `untabbable` is true, instead of a child focusing itself, the parent will via this `focusSelf` argument. */
-        focusSelfParent(e: ParentElement | null): void;
-        /**
-         * This is imperative, not declarative;
-         * it is better if we can keep re-renders on the parent to a minimum anyway.
-         *
-         * You can manually control this with `onTabbableIndexChange` and `setTabbableIndex` if you need.
-         */
-        initiallyTabbedIndex: number | null;
-        /**
-         * When true, none of the children will be tabbable, as if the entire component is hidden.
-         *
-         * This does not actually change the currently tabbable index; if this is set to `false`, the last tabbable child is remembered.
-         */
-        untabbable: boolean;
-        /**
-         * When the parent is `untabbable` and a child gains focus via some means, we need to decide what to do.
-         *
-         * Sometimes, it's better to just send focus back to the parent.
-         * Sometimes, it's better to just let the child be focused this one time (especially if focusing means that `untabbable` is going to change to `true`).
-         *
-         * If `untabbable` is false, then this has no effect.
-         */
-        untabbableBehavior: "focus-parent" | "leave-child-focused";
-        /**
-         * If you would like to have an event run whenever a new index becomes tabbable
-         * (e.g. to call `setState` to render that tabbable index...for some reason...)
-         * you can do that here.
-         *
-         * **MUST** be stable!
-         */
-        onTabbableIndexChange?: Nullable<OnPassiveStateChange<number | null, Event>>;
-    };
+    rovingTabIndexParameters: UseRovingTabIndexParametersSelf<ParentElement, TabbableChildElement, M>;
 }
 export interface UseRovingTabIndexReturnType<ParentElement extends Element, TabbableChildElement extends Element, _M extends UseRovingTabIndexChildInfo<TabbableChildElement>> extends TargetedPick<UseManagedChildrenParameters<UseRovingTabIndexChildInfo<TabbableChildElement>>, "managedChildrenParameters", "onChildrenMountChange"> {
     /** RTI runs logic when its children mount/unmount themselves */
@@ -96,26 +117,7 @@ export interface UseRovingTabIndexReturnType<ParentElement extends Element, Tabb
     /**
      * Return information that lets the user update/query/focus the currently tabbable child
      */
-    rovingTabIndexReturn: {
-        /**
-         * **STABLE**
-         *
-         * Can be used to programmatically change which child is the currently tabbable one.
-         *
-         * `fromUserInteraction` determines if this was a user-generated event that should focus the newly tabbable child,
-         * or a programmatic event that should leave the user's focus where the user currently is, because they didn't do that.
-         *
-         */
-        setTabbableIndex: SetTabbableIndex;
-        /** **STABLE** */
-        getTabbableIndex: () => number | null;
-        /**
-         * **STABLE**
-         *
-         * Call to focus the currently tabbable child.
-         */
-        focusSelf: (reason?: any) => void;
-    };
+    rovingTabIndexReturn: UseRovingTabIndexReturnTypeSelf;
 }
 export type UseRovingTabIndexChildInfoKeysParameters = "index" | "untabbable";
 export type UseRovingTabIndexChildInfoKeysReturnType = "setLocallyTabbable" | "getLocallyTabbable";
@@ -125,20 +127,21 @@ export interface UseRovingTabIndexChildParameters<TabbableChildElement extends E
      */
     context: RovingTabIndexChildContext;
 }
+export interface RovingTabIndexChildContextSelf {
+    untabbable: boolean;
+    untabbableBehavior: "focus-parent" | "leave-child-focused";
+    parentFocusSelf: () => void;
+    giveParentFocusedElement(element: Element): void;
+    setTabbableIndex: SetTabbableIndex;
+    getInitiallyTabbedIndex(): number | null;
+    /**
+     * (This is technically the same as what's passed to onChildrenMountChange,
+     * but it serves a slightly different purpose and is separate for clarity)
+     */
+    reevaluateClosestFit: (requestedIndex?: number) => void;
+}
 export interface RovingTabIndexChildContext {
-    rovingTabIndexContext: {
-        untabbable: boolean;
-        untabbableBehavior: "focus-parent" | "leave-child-focused";
-        parentFocusSelf: () => void;
-        giveParentFocusedElement(element: Element): void;
-        setTabbableIndex: SetTabbableIndex;
-        getInitiallyTabbedIndex(): number | null;
-        /**
-         * (This is technically the same as what's passed to onChildrenMountChange,
-         * but it serves a slightly different purpose and is separate for clarity)
-         */
-        reevaluateClosestFit: (requestedIndex?: number) => void;
-    };
+    rovingTabIndexContext: RovingTabIndexChildContextSelf;
 }
 export interface UseRovingTabIndexChildReturnType<ChildElement extends Element, M extends UseRovingTabIndexChildInfo<ChildElement>> extends Required<TargetedPick<UseHasCurrentFocusParameters<ChildElement>, "hasCurrentFocusParameters", "onCurrentFocusedInnerChanged">> {
     /** Return information about the tabbable state of this child */

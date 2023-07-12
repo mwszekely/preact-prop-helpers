@@ -2,7 +2,7 @@ import { shuffle as lodashShuffle } from "lodash-es";
 import { ManagedChildInfo, UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
 import { returnNull, useEnsureStability, usePassiveState } from "../../preact-extensions/use-passive-state.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
-import { createElement, useCallback, useRef } from "../../util/lib.js";
+import { TargetedPick, createElement, useCallback, useRef } from "../../util/lib.js";
 import { VNode } from "../../util/types.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
 
@@ -13,106 +13,116 @@ export type GetValid = (index: number) => boolean;
 export type GetHighestChildIndex = () => number;
 export type Compare<M extends UseRearrangeableChildInfo> = (lhs: M, rhs: M) => number;
 
+export interface UseRearrangeableChildrenParametersSelf {
+    /**
+     * This must return the index of this child relative to all its sortable siblings from its `VNode`.
+     * 
+     * In general, this corresponds to the `index` prop, so something like `vnode => vnode.props.index` is what you're usually looking for.
+     */
+    getIndex: GetIndex;
+
+
+    /**
+     * Called after the children have been rearranged.
+     */
+    onRearranged: null | (() => void);
+}
+
+export interface UseSortableChildrenParametersSelf<M extends UseRearrangeableChildInfo> {
+    /**
+     * Controls how values compare against each other when `sort` is called.
+     * 
+     * If null, a default sort is used that assumes `getSortValue` returns a value that works well with the `-` operator (so, like, a number, string, `Date`, `null`, etc.)
+     * 
+     * @param lhs 
+     * @param rhs 
+     */
+    compare: null | Compare<M>;
+}
+
 /**
  * All of these functions **MUST** be stable across renders.
  */
-export interface UseRearrangeableChildrenParameters<M extends UseRearrangeableChildInfo> {
-
-    managedChildrenReturn: Pick<UseManagedChildrenReturnType<M>["managedChildrenReturn"], "getChildren">;
-
-    /**
-     * Must return, e.g., the row index of this child
-     * (Usually just an `index` prop)
-     */
-    rearrangeableChildrenParameters: {
-        /**
-         * This must return the index of this child relative to all its sortable siblings.
-         * 
-         * In general, this corresponds to the `index` prop, so something like `vnode => vnode.props.index` is what you're usually looking for.
-         */
-        getIndex: GetIndex;
-
-
-        onRearranged: null | (() => void);
-    }
+export interface UseRearrangeableChildrenParameters<M extends UseRearrangeableChildInfo> extends TargetedPick<UseManagedChildrenReturnType<M>, "managedChildrenReturn", "getChildren"> {
+    rearrangeableChildrenParameters: UseRearrangeableChildrenParametersSelf;
 }
 
 /**
  * All of these functions **MUST** be stable across renders.
  */
 export interface UseSortableChildrenParameters<M extends UseRearrangeableChildInfo> extends UseRearrangeableChildrenParameters<M> {
-    sortableChildrenParameters: {
-        /**
-         * Controls how values compare against each other when `sort` is called.
-         * 
-         * If null, a default sort is used that assumes `getSortValue` returns a value that works well with the `-` operator (so, like, a number, string, `Date`, `null`, etc.)
-         * 
-         * @param lhs 
-         * @param rhs 
-         */
-        compare: null | Compare<M>;
-    }
+    sortableChildrenParameters: UseSortableChildrenParametersSelf<M>;
 }
 
 
 export interface UseRearrangeableChildrenReturnType<M extends UseRearrangeableChildInfo> {
 
-    rearrangeableChildrenReturn: {
-
-        /**
-         * Pass an array of not-sorted child information to this function
-         * and the children will re-arrange themselves to match.
-         *  
-         * **STABLE**
-         *  
-         * 
-         */
-        rearrange: (originalRows: M[], rowsInOrder: M[]) => void;
-
-        /** **STABLE** */
-        shuffle: () => Promise<void> | void;
-
-        /** **STABLE** */
-        reverse: () => Promise<void> | void;
-
-        /** 
-         * **STABLE**
-         *
-         * This function takes a component's original `index` prop and outputs a new index that represents its re-arranged position.
-         * In conjunction with `indexDemangler`, this can be used to perform math on indices (incrementing, decrementing, etc.)
-         *  
-         * E.G. to decrement a component's index "c": indexDemangler(indexMangler(c) - 1)
-         */
-        indexMangler: (n: number) => number;
-        /** **STABLE** */
-        indexDemangler: (n: number) => number;
-        /** **STABLE** */
-        //mangleMap: MutableRef<Map<number, number>>;
-        /** **STABLE** */
-        //demangleMap: MutableRef<Map<number, number>>;
-
-        /** 
-         * **STABLE**
-         * 
-         * Call this on your props (that contain the children to sort!!) to allow them to be sortable.
-         * 
-         */
-        useRearrangedChildren: (children: VNode[]) => VNode[];
-
-        toJsonArray(transform?: (info: M) => object): object;
-
-    }
+    rearrangeableChildrenReturn: UseRearrangeableChildrenReturnTypeSelf<M>;
 }
 
+export interface UseRearrangeableChildrenReturnTypeSelf<M extends UseRearrangeableChildInfo> {
+
+    /**
+     * Pass an array of not-sorted child information to this function
+     * and the children will re-arrange themselves to match.
+     *  
+     * **STABLE**
+     *  
+     * 
+     */
+    rearrange: (originalRows: M[], rowsInOrder: M[]) => void;
+
+    /** **STABLE** */
+    shuffle: () => Promise<void> | void;
+
+    /** **STABLE** */
+    reverse: () => Promise<void> | void;
+
+    /** 
+     * **STABLE**
+     *
+     * This function takes a component's original `index` prop and outputs a new index that represents its re-arranged position.
+     * In conjunction with `indexDemangler`, this can be used to perform math on indices (incrementing, decrementing, etc.)
+     *  
+     * E.G. to decrement a component's index "c": indexDemangler(indexMangler(c) - 1)
+     */
+    indexMangler: (n: number) => number;
+    /** **STABLE** */
+    indexDemangler: (n: number) => number;
+    /** **STABLE** */
+    //mangleMap: MutableRef<Map<number, number>>;
+    /** **STABLE** */
+    //demangleMap: MutableRef<Map<number, number>>;
+
+    /** 
+     * **STABLE**
+     * 
+     * Call this on your props (that contain the children to sort!!) to allow them to be sortable.
+     * 
+     */
+    useRearrangedChildren: (children: VNode[]) => VNode[];
+
+    toJsonArray(transform?: (info: M) => object): object;
+
+}
+
+
+export interface UseSortableChildrenReturnTypeSelf<M extends UseRearrangeableChildInfo> {
+    /** 
+     * **STABLE** 
+     * 
+     * Call to rearrange the children in ascending or descending order.
+     * 
+     */
+    sort: (direction: "ascending" | "descending") => Promise<void> | void;
+
+}
 
 export interface UseSortableChildrenReturnType<M extends UseRearrangeableChildInfo> extends UseRearrangeableChildrenReturnType<M> {
-    sortableChildrenReturn: {
-        /** **STABLE** */
-        sort: (direction: "ascending" | "descending") => Promise<void> | void;
-    }
+    sortableChildrenReturn: UseSortableChildrenReturnTypeSelf<M>;
 }
 
-export interface UseRearrangeableChildInfo extends ManagedChildInfo<number> {}
+export interface UseRearrangeableChildInfo extends ManagedChildInfo<number> { }
 
 export interface UseSortableChildInfo extends UseRearrangeableChildInfo {
     getSortValue(): unknown;
@@ -267,7 +277,7 @@ export function useSortableChildren<M extends UseSortableChildInfo>({
     sortableChildrenParameters: { compare: userCompare },
     managedChildrenReturn: { getChildren }
 }: UseSortableChildrenParameters<M>): UseSortableChildrenReturnType<M> {
-        monitorCallCount(useSortableChildren);
+    monitorCallCount(useSortableChildren);
 
     const getCompare = useStableGetter<Compare<M>>(userCompare ?? defaultCompare);
 

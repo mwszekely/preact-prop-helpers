@@ -72,7 +72,7 @@ export function useCompleteGridNavigation({ gridNavigationParameters, linearNavi
         ...gridNavigationSingleSelectionReturn,
     };
 }
-export function useCompleteGridNavigationRow({ info, context: contextIncomingForRowAsChildOfTable, textContentParameters, linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, sortableChildParameters, ...void1 }) {
+export function useCompleteGridNavigationRow({ info, context: contextIncomingForRowAsChildOfTable, textContentParameters, linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, ...void1 }) {
     monitorCallCount(useCompleteGridNavigationRow);
     assertEmptyObject(void1);
     const { info: infoPaginatedChild, paginatedChildReturn, props: paginationProps } = usePaginatedChild({ info, context: contextIncomingForRowAsChildOfTable });
@@ -107,7 +107,6 @@ export function useCompleteGridNavigationRow({ info, context: contextIncomingFor
     const { context: contextMC, managedChildrenReturn } = useManagedChildren({ managedChildrenParameters });
     const completeInfo = {
         getElement: refElementReturn.getElement,
-        getSortValue: sortableChildParameters.getSortValue,
         ...info,
         ...infoRowReturn,
         ...infoPaginatedChild,

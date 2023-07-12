@@ -103,7 +103,7 @@ refElementReturn, ...void1 }) {
     assertEmptyObject(void4);
     const { setTabbableIndex } = ulnRet.rovingTabIndexReturn;
     const gridNavigationCellContext = useMemoObject({
-        allChildCellsAreUntabbable,
+        //allChildCellsAreUntabbable,
         setTabbableRow,
         getRowIndex: getIndex,
         getTabbableColumn,
@@ -126,12 +126,13 @@ refElementReturn, ...void1 }) {
         context: contextToChildren,
         props,
         info: { focusSelf, ...info },
-        //gridNavigationRowParameters: { focusSelf },
         ...ulncRet,
         ...ulnRet,
     };
 }
-export function useGridNavigationCell({ context: { gridNavigationCellContext: { getRowIndex, setTabbableRow, getTabbableColumn: _getCurrentColumn, setTabbableColumn, setTabbableCell }, rovingTabIndexContext, typeaheadNavigationContext }, info, refElementReturn, textContentParameters, gridNavigationCellParameters: { colSpan }, ...void1 }) {
+export function useGridNavigationCell({ context: { gridNavigationCellContext: { getRowIndex, setTabbableRow, getTabbableColumn: _getCurrentColumn, setTabbableColumn, setTabbableCell, 
+//allChildCellsAreUntabbable,
+...void4 }, rovingTabIndexContext, typeaheadNavigationContext, ...void5 }, info, refElementReturn, textContentParameters, gridNavigationCellParameters: { colSpan, ...void6 }, ...void1 }) {
     monitorCallCount(useGridNavigationCell);
     const { index } = info;
     const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void3 }, rovingTabIndexChildReturn, textContentReturn, pressParameters, props, info: infoLs, ...void2 } = useListNavigationChild({
@@ -143,6 +144,9 @@ export function useGridNavigationCell({ context: { gridNavigationCellContext: { 
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     assertEmptyObject(void3);
+    assertEmptyObject(void4);
+    assertEmptyObject(void5);
+    assertEmptyObject(void6);
     return {
         info: infoLs,
         props: useMergedProps(props, { onClick: () => setTabbableColumn(prev => ({ ideal: index, actual: (prev?.actual ?? index) })) }),

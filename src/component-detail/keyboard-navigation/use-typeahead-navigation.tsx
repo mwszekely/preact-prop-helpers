@@ -6,92 +6,98 @@ import { useStableCallback } from "../../preact-extensions/use-stable-callback.j
 import { useMemoObject, useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { useState } from "../../preact-extensions/use-state.js";
 import { assertEmptyObject } from "../../util/assert.js";
-import { useCallback, useLayoutEffect, useRef } from "../../util/lib.js";
+import { TargetedPick, useCallback, useLayoutEffect, useRef } from "../../util/lib.js";
 import { CompositionEventType, ElementProps, KeyboardEventType, Nullable } from "../../util/types.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexChildParameters, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
 
-export interface UseTypeaheadNavigationReturnType<ParentOrChildElement extends Element> {
-    typeaheadNavigationReturn: {
-        /** Returns the string currently typed by the user. Stable, but cannot be called during render. */
-        getCurrentTypeahead(): string | null;
+export interface UseTypeaheadNavigationReturnTypeSelf<ParentOrChildElement extends Element> {
+    /** Returns the string currently typed by the user. Stable, but cannot be called during render. */
+    getCurrentTypeahead(): string | null;
 
-        /**
-         * What the current status of the user's input is:
-         * 
-         * * `"none"`: Typeahead is not in progress; the user has not typed anything (or has not for the given timeout period).
-         * * `"valid"`: The string the user has typed so far corresponds to at least one child
-         * * `"invalid"`: The string the user has typed so does not correspond to any child
-         */
-        typeaheadStatus: "invalid" | "valid" | "none";
-    }
+    /**
+     * What the current status of the user's input is:
+     * 
+     * * `"none"`: Typeahead is not in progress; the user has not typed anything (or has not for the given timeout period).
+     * * `"valid"`: The string the user has typed so far corresponds to at least one child
+     * * `"invalid"`: The string the user has typed so does not correspond to any child
+     */
+    typeaheadStatus: "invalid" | "valid" | "none";
+}
+
+export interface UseTypeaheadNavigationContextSelf {
+    /** **STABLE** (Don't call during render) */
+    excludeSpace: () => boolean;
+    sortedTypeaheadInfo: Array<TypeaheadInfo>;
+    insertingComparator: (lhs: string | null, rhs: TypeaheadInfo) => number;
+}
+
+export interface UseTypeaheadNavigationParametersSelf<TabbableChildElement extends Element> {
+
+    /**
+     * **Optional**
+     * 
+     * Called any time the currently tabbable index changes as a result of a typeahead-related keypress
+     * 
+     */
+    onNavigateTypeahead: Nullable<(newIndex: number | null, event: KeyboardEventType<TabbableChildElement>) => void>;
+
+
+    /**
+     * Must return true if the given child can be navigated to.
+     * 
+     * Generally corresponds to a `hidden` or `disabled` prop.
+     * @param i 
+     */
+    isValid(i: number): boolean;
+
+
+    /**
+     * A collator to use when comparing. 
+     * If not provided, simply uses `localeCompare` after transforming each to lowercase, which will, at best, work okay in English.
+     */
+    collator: null | Intl.Collator;
+
+    /**
+     * If true, no typeahead-related processing will occur, effectively disabling this invocation of `useTypeaheadNavigation` altogether.
+     */
+    noTypeahead: boolean;
+
+    /**
+     * How long after the user's last typeahead-related keypress does it take for the system to reset?
+     */
+    typeaheadTimeout: number;
+}
+
+export interface UseTypeaheadNavigationReturnType<ParentOrChildElement extends Element> {
+    typeaheadNavigationReturn: UseTypeaheadNavigationReturnTypeSelf<ParentOrChildElement>;
     propsStable: ElementProps<ParentOrChildElement>;
     context: UseTypeaheadNavigationContext;
 }
 
 export interface UseTypeaheadNavigationContext {
-
-    typeaheadNavigationContext: {
-        /** **STABLE** (Don't call during render) */
-        excludeSpace: () => boolean;
-        sortedTypeaheadInfo: Array<TypeaheadInfo>;
-        insertingComparator: (lhs: string | null, rhs: TypeaheadInfo) => number;
-    }
+    typeaheadNavigationContext: UseTypeaheadNavigationContextSelf;
 }
+
 
 export interface UseTypeaheadNavigationChildInfo<TabbableChildElement extends Element> extends Pick<UseRovingTabIndexChildInfo<TabbableChildElement>, "index"> { }
 
-export interface UseTypeaheadNavigationParameters<TabbableChildElement extends Element, _M extends UseTypeaheadNavigationChildInfo<TabbableChildElement>> {
-    typeaheadNavigationParameters: {
 
-        /**
-         * **Optional**
-         * 
-         * Called any time the currently tabbable index changes as a result of a typeahead-related keypress
-         * 
-         */
-        onNavigateTypeahead: Nullable<(newIndex: number | null, event: KeyboardEventType<TabbableChildElement>) => void>;
-
-
-        /**
-         * Must return true if the given child can be navigated to.
-         * 
-         * Generally corresponds to a `hidden` or `disabled` prop.
-         * @param i 
-         */
-        isValid(i: number): boolean;
-
-
-        /**
-         * A collator to use when comparing. 
-         * If not provided, simply uses `localeCompare` after transforming each to lowercase, which will, at best, work okay in English.
-         */
-        collator: null | Intl.Collator;
-
-        /**
-         * If true, no typeahead-related processing will occur, effectively disabling this invocation of `useTypeaheadNavigation` altogether.
-         */
-        noTypeahead: boolean;
-
-        /**
-         * How long after the user's last typeahead-related keypress does it take for the system to reset?
-         */
-        typeaheadTimeout: number;
-    };
-
-    rovingTabIndexReturn: Pick<UseRovingTabIndexReturnType<any, TabbableChildElement, any>["rovingTabIndexReturn"], "getTabbableIndex" | "setTabbableIndex">
+export interface UseTypeaheadNavigationParameters<TabbableChildElement extends Element, _M extends UseTypeaheadNavigationChildInfo<TabbableChildElement>> extends TargetedPick<UseRovingTabIndexReturnType<any, TabbableChildElement, any>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex"> {
+    typeaheadNavigationParameters: UseTypeaheadNavigationParametersSelf<TabbableChildElement>;
 }
 
 /** Arguments passed to the child `useTypeaheadNavigationChild` */
-export interface UseTypeaheadNavigationChildParameters<ChildElement extends Element, _M extends UseTypeaheadNavigationChildInfo<ChildElement>> {
-    info: Pick<UseRovingTabIndexChildParameters<ChildElement, UseRovingTabIndexChildInfo<ChildElement>>["info"], "index">;
-    textContentParameters: Pick<UseTextContentParameters<ChildElement>["textContentParameters"], "getText">;
-    refElementReturn: Pick<UseRefElementReturnType<ChildElement>["refElementReturn"], "getElement">;
+export interface UseTypeaheadNavigationChildParameters<ChildElement extends Element, M extends UseTypeaheadNavigationChildInfo<ChildElement>> extends
+    TargetedPick<UseTextContentParameters<ChildElement>, "textContentParameters", "getText">,
+    TargetedPick<UseRefElementReturnType<ChildElement>, "refElementReturn", "getElement"> {
+    info: Pick<M, "index">;
     context: UseTypeaheadNavigationContext;
 }
 
-export interface UseTypeaheadNavigationChildReturnType extends UseTextContentReturnType {
-    pressParameters: Pick<UsePressParameters<any>["pressParameters"], "excludeSpace">;
+export interface UseTypeaheadNavigationChildReturnType extends
+    UseTextContentReturnType,
+    TargetedPick<UsePressParameters<any>, "pressParameters", "excludeSpace"> {
 }
 
 interface TypeaheadInfo { text: string | null; unsortedIndex: number; }

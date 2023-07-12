@@ -7,10 +7,11 @@ import { useStableCallback } from "../../preact-extensions/use-stable-callback.j
 import { useMemoObject, useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { useState } from "../../preact-extensions/use-state.js";
 import { EnhancedEventHandler, TargetedEnhancedEvent, enhanceEvent } from "../../util/event.js";
-import { useCallback, useEffect } from "../../util/lib.js";
+import { TargetedPick, useCallback, useEffect } from "../../util/lib.js";
 import { ElementProps, Nullable } from "../../util/types.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
+import { assertEmptyObject } from "../../index.js";
 
 
 /** Anything that's selectable must be tabbable, so we DO use rovingTabIndex instead of just managedChildren */
@@ -40,116 +41,128 @@ export interface UseSingleSelectionChildInfo<E extends Element> extends UseRovin
 export type SelectedIndexChangeHandler = EnhancedEventHandler<Event, { selectedIndex: number }>;
 export type SelectedIndexChangeEvent = TargetedEnhancedEvent<Event, { selectedIndex: number }>;
 
-export interface UseSingleSelectionParameters<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseSingleSelectionChildInfo<ChildElement>> {
-    managedChildrenReturn: Pick<UseManagedChildrenReturnType<UseSingleSelectionChildInfo<ChildElement>>["managedChildrenReturn"], "getChildren">;
-    rovingTabIndexReturn: Pick<UseRovingTabIndexReturnType<ParentOrChildElement, ChildElement, M>["rovingTabIndexReturn"], "setTabbableIndex">
-    singleSelectionParameters: {
-        /**
-         * This is imperative, as opposed to declarative, 
-         * to save on re-rendering the parent whenever the selected index changes.
-         */
-        initiallySelectedIndex: number | null;
+export interface UseSingleSelectionParametersSelf {
+    /**
+     * This is imperative, as opposed to declarative, 
+     * to save on re-rendering the parent whenever the selected index changes.
+     */
+    initiallySelectedIndex: number | null;
 
-        /**
-         * Called when a child is selected (via a press or other method).
-         * 
-         * If this component is declaratively controlled (with e.g. `useSingleSelectionDeclarative`),
-         * then you should use this to `setState` somewhere that'll change your `selectedIndex`.
-         * 
-         * If this component is imperatively controlled, then you should hook this up to the
-         * returned `changeSelectedIndex` function to have the desired change occur.
-         * 
-         * In general, this should only be `null` when single selection is entirely disabled.
-         */
-        onSelectedIndexChange: null | SelectedIndexChangeHandler; // ((index: number | null, reason: Event | undefined) => void);
+    /**
+     * Called when a child is selected (via a press or other method).
+     * 
+     * If this component is declaratively controlled (with e.g. `useSingleSelectionDeclarative`),
+     * then you should use this to `setState` somewhere that'll change your `selectedIndex`.
+     * 
+     * If this component is imperatively controlled, then you should hook this up to the
+     * returned `changeSelectedIndex` function to have the desired change occur.
+     * 
+     * In general, this should only be `null` when single selection is entirely disabled.
+     */
+    onSelectedIndexChange: null | SelectedIndexChangeHandler; // ((index: number | null, reason: Event | undefined) => void);
 
 
-        selectionMode: "focus" | "activation" | "disabled";
+    selectionMode: "focus" | "activation" | "disabled";
 
-        /**
-         * What property will be used to mark this item as selected.
-         * 
-         * **IMPORTANT**: The `aria-current` options should be used with caution as they are semantically very different from the usual selection cases.
-         */
-        ariaPropName: `aria-${"pressed" | "selected" | "checked" | `current-${"page" | "step" | "date" | "time" | "location" | "true"}`}` | null;
+    /**
+     * What property will be used to mark this item as selected.
+     * 
+     * **IMPORTANT**: The `aria-current` options should be used with caution as they are semantically very different from the usual selection cases.
+     */
+    ariaPropName: `aria-${"pressed" | "selected" | "checked" | `current-${"page" | "step" | "date" | "time" | "location" | "true"}`}` | null;
 
-    }
 }
 
-export type UseSingleSelectionChildInfoKeys = "index" | "unselectable";
+export interface UseSingleSelectionReturnTypeSelf {
+    /**
+     * A function that, when called, internally updates the selected index to the one you provide,
+     * and tells the relevant children that they are/are not selected.
+     * 
+     * If you are creating an imperative component, this is what how you can force the value to change in response to something.
+     * 
+     * If you are creating a declarative component, this is what you call in `useEffect` when your `selectedIndex` changes.
+     */
+    changeSelectedIndex: PassiveStateUpdater<number | null, Event>;
+    getSelectedIndex(): number | null;
+}
+
+export interface UseSingleSelectionChildReturnTypeSelf {
+    // These two are already available as managedChild info,
+    // but we're keeping them because RTI does the same thing, and it's convenient (info is kinda semi-private).
+
+    /**
+     * Is this child currently the selected child among all its siblings?
+     */
+    selected: boolean;
+
+    /** @see selected */
+    getSelected(): boolean;
+
+    /**
+     * Any time `selected` changes to or from being visible, this will represent the direction and magnitude of the change.
+     * 
+     * It will never be zero; when `selected` is `true`, then this will be the most recently-used offset.
+     * 
+     * This useful for things like animations or transitions.
+     */
+    selectedOffset: Nullable<number>;
+
+    /** @see selectedOffset */
+    getSelectedOffset: () => (number | null);
+
+    // Used to programmatically set this as the selected element;
+    // it requests the parent to actually change the numeric index to this one's.
+    //setThisOneSelected: (event: Event) => void;
+}
+
+export interface UseSingleSelectionParameters<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseSingleSelectionChildInfo<ChildElement>> extends
+    TargetedPick<UseManagedChildrenReturnType<UseSingleSelectionChildInfo<ChildElement>>, "managedChildrenReturn", "getChildren">,
+    TargetedPick<UseRovingTabIndexReturnType<ParentOrChildElement, ChildElement, M>, "rovingTabIndexReturn", "setTabbableIndex"> {
+    singleSelectionParameters: UseSingleSelectionParametersSelf;
+}
+
+export type UseSingleSelectionChildInfoParameterKeys = "index" | "unselectable";
+export type UseSingleSelectionChildInfoReturnKeys = "getSelected" | "setLocalSelected" | "selected";
 
 export interface UseSingleSelectionChildParameters<E extends Element, M extends UseSingleSelectionChildInfo<E>> {
     context: UseSingleSelectionContext;
-    info: Pick<UseSingleSelectionChildInfo<E>, UseSingleSelectionChildInfoKeys>;
-    //singleSelectionParameters: Pick<UseSingleSelectionParameters<any, E, M>["singleSelectionParameters"], "ariaPropName" | "selectionMode">;
+    info: Pick<UseSingleSelectionChildInfo<E>, UseSingleSelectionChildInfoParameterKeys>;
 }
+
 
 export interface UseSingleSelectionChildReturnType<E extends Element> extends UseChildrenHaveFocusChildReturnType<E> {
     props: ElementProps<E>;
 
-    info: Pick<UseSingleSelectionChildInfo<E>, "getSelected" | "setLocalSelected" | "selected">;
+    info: Pick<UseSingleSelectionChildInfo<E>, UseSingleSelectionChildInfoReturnKeys>;
 
-    singleSelectionChildReturn: {
-        // These two are already available as managedChild info,
-        // but we're keeping them because RTI does the same thing, and it's convenient (info is kinda semi-private).
-
-        /**
-         * Is this child currently the selected child among all its siblings?
-         */
-        selected: boolean;
-
-        /** @see selected */
-        getSelected(): boolean;
-
-        /**
-         * Any time `selected` changes to or from being visible, this will represent the direction and magnitude of the change.
-         * 
-         * It will never be zero; when `selected` is `true`, then this will be the most recently-used offset.
-         * 
-         * This useful for things like animations or transitions.
-         */
-        selectedOffset: Nullable<number>;
-
-        /** @see selectedOffset */
-        getSelectedOffset: () => (number | null);
-
-        // Used to programmatically set this as the selected element;
-        // it requests the parent to actually change the numeric index to this one's.
-        //setThisOneSelected: (event: Event) => void;
-    }
+    singleSelectionChildReturn: UseSingleSelectionChildReturnTypeSelf;
 }
 
-export interface UseSingleSelectionReturnType<ChildElement extends Element, M extends UseSingleSelectionChildInfo<ChildElement>> {
-    singleSelectionReturn: {
-        /**
-         * A function that, when called, internally updates the selected index to the one you provide,
-         * and tells the relevant children that they are/are not selected.
-         * 
-         * If you are creating an imperative component, this is what how you can force the value to change in response to something.
-         * 
-         * If you are creating a declarative component, this is what you call in `useEffect` when your `selectedIndex` changes.
-         */
-        changeSelectedIndex: PassiveStateUpdater<number | null, Event>;
-        getSelectedIndex(): number | null;
-    }
+export interface UseSingleSelectionReturnType<ChildElement extends Element, M extends UseSingleSelectionChildInfo<ChildElement>> extends TargetedPick<UseChildrenHaveFocusParameters<ChildElement>, "childrenHaveFocusParameters", "onCompositeFocusChange"> {
+    singleSelectionReturn: UseSingleSelectionReturnTypeSelf;
     context: UseSingleSelectionContext;
-    childrenHaveFocusParameters: Pick<UseChildrenHaveFocusParameters<ChildElement>["childrenHaveFocusParameters"], "onCompositeFocusChange">
+}
+
+export interface SingleSelectionContextSelf extends Pick<UseSingleSelectionParametersSelf, "ariaPropName" | "selectionMode" | "onSelectedIndexChange"> {
+    getSelectedIndex(): number | null;
 }
 
 export interface UseSingleSelectionContext {
-    singleSelectionContext: Pick<UseSingleSelectionParameters<any, any, any>["singleSelectionParameters"], "ariaPropName" | "selectionMode"> & {
-        onSelectedIndexChange: UseSingleSelectionParameters<any, any, any>["singleSelectionParameters"]["onSelectedIndexChange"];
-        getSelectedIndex(): number | null;
-    }
+    singleSelectionContext: SingleSelectionContextSelf;
 }
 
 
 export function useSingleSelection<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseSingleSelectionChildInfo<ChildElement>>({
-    managedChildrenReturn: { getChildren },
-    rovingTabIndexReturn: { setTabbableIndex },
-    singleSelectionParameters: { onSelectedIndexChange: onSelectedIndexChange_U, initiallySelectedIndex, ariaPropName, selectionMode }
+    managedChildrenReturn: { getChildren, ...void1 },
+    rovingTabIndexReturn: { setTabbableIndex, ...void2 },
+    singleSelectionParameters: { onSelectedIndexChange: onSelectedIndexChange_U, initiallySelectedIndex, ariaPropName, selectionMode, ...void3 },
+    ...void4
 }: UseSingleSelectionParameters<ParentOrChildElement, ChildElement, M>): UseSingleSelectionReturnType<ChildElement, M> {
     monitorCallCount(useSingleSelection);
+    assertEmptyObject(void1);
+    assertEmptyObject(void2);
+    assertEmptyObject(void3);
+    assertEmptyObject(void4);
 
     type R = Event;
     const onSelectedIndexChange = useStableCallback(onSelectedIndexChange_U ?? noop);
@@ -209,13 +222,18 @@ export function useSingleSelection<ParentOrChildElement extends Element, ChildEl
 }
 
 
-export function useSingleSelectionChild<ChildElement extends Element, M extends UseSingleSelectionChildInfo<ChildElement>>(args: UseSingleSelectionChildParameters<ChildElement, M>): UseSingleSelectionChildReturnType<ChildElement> {
+export function useSingleSelectionChild<ChildElement extends Element, M extends UseSingleSelectionChildInfo<ChildElement>>({
+    context: { singleSelectionContext: { getSelectedIndex, onSelectedIndexChange, ariaPropName, selectionMode, ...void1 }, ...void2 },
+    info: { index, unselectable, ...void3 },
+     ...void4
+}: UseSingleSelectionChildParameters<ChildElement, M>): UseSingleSelectionChildReturnType<ChildElement> {
     monitorCallCount(useSingleSelectionChild);
     type R = Event;
-    const {
-        context: { singleSelectionContext: { getSelectedIndex, onSelectedIndexChange, ariaPropName, selectionMode } },
-        info: { index, unselectable },
-    } = args;
+
+    assertEmptyObject(void1);
+    assertEmptyObject(void2);
+    assertEmptyObject(void3);
+    assertEmptyObject(void4);
 
     useEnsureStability("useSingleSelectionChild", getSelectedIndex, onSelectedIndexChange);
     const getUnselectable = useStableGetter(unselectable);
@@ -243,17 +261,9 @@ export function useSingleSelectionChild<ChildElement extends Element, M extends 
         },
         singleSelectionChildReturn: {
             selected: localSelected,
-            // This is the thing that's passed to onPress or onClick or whatever
-            /*setThisOneSelected: useStableCallback((event) => {
-                console.assert(!getUnselectable());
-                if (selectionMode == "disabled")
-                    return;
-                if (!unselectable)
-                    onSelectedIndexChange?.(enhanceEvent(event, { selectedIndex: index }));
-            }),*/
-            getSelectedOffset: getDirection,
+            getSelected: getLocalSelected,
             selectedOffset: direction,
-            getSelected: getLocalSelected
+            getSelectedOffset: getDirection,
         },
         props: ariaPropName == null || selectionMode == "disabled" ? {} : {
             [`${propParts[0]}-${propParts[1]}`]: (localSelected ? (propParts[1] == "current" ? `${propParts[2]}` : `true`) : "false")

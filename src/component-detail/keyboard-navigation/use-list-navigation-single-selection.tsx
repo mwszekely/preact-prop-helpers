@@ -14,7 +14,7 @@ export interface UseListNavigationSingleSelectionChildParameters<ChildElement ex
 export interface UseListNavigationSingleSelectionChildReturnType<ChildElement extends Element, M extends UseListNavigationSingleSelectionChildInfo<ChildElement>> extends OmitStrong<ExtendMerge<UseListNavigationChildReturnType<ChildElement, M>, UseSingleSelectionChildReturnType<ChildElement>>, "props"> {
     propsTabbable: ElementProps<any>;
     propsChild: ElementProps<any>;
- }
+}
 
 export function useListNavigationSingleSelection<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationSingleSelectionChildInfo<ChildElement>>({
     linearNavigationParameters,
