@@ -111,7 +111,7 @@ function TestBasesGridNavImpl({ ariaPropName, selectedIndex, arrowKeyDirection, 
     } = useCompleteGridNavigationDeclarative<HTMLTableElement, HTMLTableRowElement, HTMLTableCellElement, UseCompleteGridNavigationRowInfo<HTMLTableRowElement, HTMLTableCellElement>, UseCompleteGridNavigationCellInfo<HTMLTableCellElement>>({
         linearNavigationParameters: { disableHomeEndKeys, navigatePastEnd: navigatePastStartEnd, navigatePastStart: navigatePastStartEnd, pageNavigationSize, onNavigateLinear: null },
         gridNavigationParameters: { onTabbableColumnChange: null },
-        rearrangeableChildrenParameters: { getIndex: useCallback(info => info.props.index, []) },
+        rearrangeableChildrenParameters: { getIndex: useCallback(info => info.props.index, []), onRearranged: null },
         rovingTabIndexParameters: { untabbable, onTabbableIndexChange: null, focusSelfParent: focus },
         singleSelectionParameters: { ariaPropName, selectionMode },
         singleSelectionDeclarativeParameters: {
