@@ -30,8 +30,8 @@ export const DemoUseRovingTabIndex = memo(() => {
     const r: UseCompleteListNavigationDeclarativeReturnType<HTMLOListElement, HTMLLIElement, CustomInfoType> = useCompleteListNavigationDeclarative<HTMLOListElement, HTMLLIElement, CustomInfoType>({
         rovingTabIndexParameters: { onTabbableIndexChange: null, untabbable, focusSelfParent: focus },
         singleSelectionDeclarativeParameters: { selectedIndex, onSelectedIndexChange: useStableCallback((e) => { setSelectedIndex(e[EventDetail].selectedIndex) }, []) },
-        typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000 },
-        linearNavigationParameters: { disableHomeEndKeys: false, arrowKeyDirection: "vertical", navigatePastEnd: "wrap", navigatePastStart: "wrap", pageNavigationSize: 0.1 },
+        typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000, onNavigateTypeahead: null },
+        linearNavigationParameters: { disableHomeEndKeys: false, arrowKeyDirection: "vertical", navigatePastEnd: "wrap", navigatePastStart: "wrap", pageNavigationSize: 0.1, onNavigateLinear: null },
         rearrangeableChildrenParameters: {
             getIndex: useCallback<GetIndex>((a: VNode) => a.props.index, []),
         },
@@ -131,16 +131,16 @@ const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
     const getSortValue = useStableCallback(() => index);
 
     const {
-        props,
+        propsChild, 
+        propsTabbable,
         rovingTabIndexChildReturn: { tabbable },
-        singleSelectionChildReturn: { selected, selectedOffset, setThisOneSelected },
+        singleSelectionChildReturn: { selected, selectedOffset },
         paginatedChildReturn: { hideBecausePaginated },
         staggeredChildReturn: { hideBecauseStaggered },
         pressParameters: { onPressSync, excludeSpace },
         refElementReturn
     } = useCompleteListNavigationChild<HTMLLIElement, CustomInfoType>({
-        info: { index, focusSelf, foo: "bar", untabbable: hidden, unselectable: disabled },
-        sortableChildParameters: { getSortValue },
+        info: { index, focusSelf, foo: "bar", untabbable: hidden, unselectable: disabled, getSortValue },
         context,
         textContentParameters: { getText: useCallback((e) => { return e?.textContent ?? "" }, []) }
     });
@@ -150,6 +150,6 @@ const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
     const text = `${randomWord} This is item #${index} (offset: ${selectedOffset}) ${hidden ? " (hidden)" : ""}${disabled ? " (disabled)" : ""}${selected ? " (selected)" : " (not selected)"} (${tabbable ? "Tabbable" : "Not tabbable"})`;
 
     return (
-        <li {...useMergedProps(props, p2)} style={{ opacity: hideBecausePaginated ? 0.25 : 1, transform: `translateX(${hideBecauseStaggered ? "50%" : "0%"})` }}>{text}<input {...useMergedProps({ type: "number", tabIndex: props.tabIndex }) as any} style={{ width: "5ch" }} /></li>
+        <li {...useMergedProps(propsChild, p2)} style={{ opacity: hideBecausePaginated ? 0.25 : 1, transform: `translateX(${hideBecauseStaggered ? "50%" : "0%"})` }}>{text}<input {...useMergedProps({ type: "number" }, propsTabbable) as any} style={{ width: "5ch" }} /></li>
     )
 }));

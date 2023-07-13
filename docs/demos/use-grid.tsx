@@ -1,6 +1,7 @@
 import { createContext } from "preact";
 import { memo } from "preact/compat";
 import { useCallback, useContext } from "preact/hooks";
+import { TabbableColumnInfo } from "../../dist/component-detail/keyboard-navigation/use-grid-navigation-partial.js";
 import { CompleteGridNavigationContext, CompleteGridNavigationRowContext, EventDetail, GetIndex, UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationRowInfo, UseCompleteGridNavigationRowReturnType, VNode, focus, returnNull, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useStableCallback, useState } from "../../dist/index.js";
 
 const RandomWords = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
@@ -9,7 +10,7 @@ const RandomWords = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, se
 //const GridCellContext = createContext<UseGridNavigationCell<HTMLTableCellElement, {}, string>>(null!);
 export const DemoUseGrid = memo(() => {
 
-    const [tabbableColumn, setTabbableColumn, _getTabbableColumn] = useState<number | null>(null);
+    const [tabbableColumn, setTabbableColumn, _getTabbableColumn] = useState<TabbableColumnInfo | null>(null);
     const [selectedRow, setSelectedRow, _getSelectedRow] = useState<number | null>(null);
     const [tabbableRow, setTabbableRow] = useState<number | null>(null);
 
@@ -17,12 +18,13 @@ export const DemoUseGrid = memo(() => {
         singleSelectionParameters: { ariaPropName: "aria-checked", selectionMode: "focus" },
         singleSelectionDeclarativeParameters: {  selectedIndex: selectedRow, onSelectedIndexChange: useStableCallback((e) => {setSelectedRow(e[EventDetail].selectedIndex)}, []) },
         gridNavigationParameters: { onTabbableColumnChange: setTabbableColumn },
-        linearNavigationParameters: { disableHomeEndKeys: false, navigatePastEnd: "wrap", navigatePastStart: "wrap", pageNavigationSize: 0.1 },
+        linearNavigationParameters: { disableHomeEndKeys: false, navigatePastEnd: "wrap", navigatePastStart: "wrap", pageNavigationSize: 0.1, onNavigateLinear: null },
         //managedChildrenReturn: { getChildren },
         rovingTabIndexParameters: { onTabbableIndexChange: setTabbableRow, untabbable: false, focusSelfParent: focus },
-        typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000 },
+        typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000, onNavigateTypeahead: null },
         rearrangeableChildrenParameters: {
-            getIndex: useCallback<GetIndex>((a: VNode) => a.props.index, [])
+            getIndex: useCallback<GetIndex>((a: VNode) => a.props.index, []),
+            onRearranged: null
         },
         sortableChildrenParameters: { compare: useCallback((rhs: CustomGridInfo, lhs: CustomGridInfo) => { return lhs.index - rhs.index }, []) },
         paginatedChildrenParameters: { paginationMin: null, paginationMax: null },
@@ -89,14 +91,13 @@ const DemoUseGridRow = memo((({ index }: { index: number }) => {
     const contextFromParent = useContext(GridRowContext) as CompleteGridNavigationContext<HTMLTableSectionElement, HTMLTableRowElement, HTMLTableCellElement, CustomGridInfo, CustomGridRowInfo>;
     const ret: UseCompleteGridNavigationRowReturnType<HTMLTableRowElement, HTMLTableCellElement, CustomGridInfo, CustomGridRowInfo> = useCompleteGridNavigationRow<HTMLTableRowElement, HTMLTableCellElement, CustomGridInfo, CustomGridRowInfo>({
 
-        sortableChildParameters: { getSortValue: returnNull },
         context: contextFromParent,
-        info: { index, foo: "bar", unselectable: disabled, untabbable: hidden },
+        info: { index, foo: "bar", unselectable: disabled, untabbable: hidden, getSortValue: returnNull },
         textContentParameters: { getText: useCallback((e: Element | null) => { return e?.textContent ?? "" }, []) },
 
-        linearNavigationParameters: { disableHomeEndKeys: false, navigatePastEnd: "wrap", navigatePastStart: "wrap" },
+        linearNavigationParameters: { navigatePastEnd: "wrap", navigatePastStart: "wrap" },
         rovingTabIndexParameters: { onTabbableIndexChange: useStableCallback((i: number | null) => { setTabbableColumn(i) }), untabbable: false, initiallyTabbedIndex: 0 },
-        typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000 },
+        typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000, onNavigateTypeahead: null },
     });
 
     const {
