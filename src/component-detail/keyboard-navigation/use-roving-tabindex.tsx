@@ -411,7 +411,14 @@ export function useRovingTabIndex<ParentElement extends Element, ChildElement ex
             // (otherwise focus gets lost to the body, and useEffect thinks that it shouldn't
             // focus the child because focus wasn't within the list). 
             // It's also just consistent. 
-            tabIndex: untabbable ? 0 : -1
+            tabIndex: untabbable ? 0 : -1,
+            // TODO: When a hidden child is clicked, some browsers focus the parent, just because it's got a role and a tabindex.
+            // But this won't work to avoid that, because it messes with grid navigation
+            /*onFocus: useCallback((e: FocusEvent) => {
+                if (!untabbable) {
+                    focusSelf(e);
+                }
+            }, [untabbable])*/
         }
     };
 }

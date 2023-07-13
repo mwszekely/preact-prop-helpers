@@ -3692,6 +3692,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       }
     });
     const focusSelf = T$1(reason => {
+      debugger;
       const children = getChildren();
       let index = getTabbableIndex();
       const untabbable = getUntabbable();
@@ -3741,7 +3742,12 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         // (otherwise focus gets lost to the body, and useEffect thinks that it shouldn't
         // focus the child because focus wasn't within the list). 
         // It's also just consistent. 
-        tabIndex: untabbable ? 0 : -1
+        tabIndex: untabbable ? 0 : -1,
+        onFocus: T$1(e => {
+          if (!untabbable) {
+            focusSelf(e);
+          }
+        }, [untabbable])
       }
     };
   }
@@ -10430,7 +10436,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     });
     const text = "".concat(randomWord, " This is item #").concat(index, " (offset: ").concat(selectedOffset, ") ").concat(hidden ? " (hidden)" : "").concat(disabled ? " (disabled)" : "").concat(selected ? " (selected)" : " (not selected)", " (").concat(tabbable ? "Tabbable" : "Not tabbable", ")");
     return o$1("li", {
-      ...useMergedProps(propsChild, p2),
+      ...useMergedProps(propsChild, propsTabbable, p2),
       style: {
         opacity: hideBecausePaginated ? 0.25 : 1,
         transform: "translateX(".concat(hideBecauseStaggered ? "50%" : "0%", ")")
