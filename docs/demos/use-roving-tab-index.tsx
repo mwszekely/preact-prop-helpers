@@ -131,8 +131,11 @@ const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
     const getSortValue = useStableCallback(() => index);
 
     const {
-        propsChild, 
+        hasCurrentFocusReturn,
+        managedChildReturn,
+        propsChild,
         propsTabbable,
+        textContentReturn,
         rovingTabIndexChildReturn: { tabbable },
         singleSelectionChildReturn: { selected, selectedOffset },
         paginatedChildReturn: { hideBecausePaginated },
@@ -150,6 +153,6 @@ const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
     const text = `${randomWord} This is item #${index} (offset: ${selectedOffset}) ${hidden ? " (hidden)" : ""}${disabled ? " (disabled)" : ""}${selected ? " (selected)" : " (not selected)"} (${tabbable ? "Tabbable" : "Not tabbable"})`;
 
     return (
-        <li {...useMergedProps(propsChild, propsTabbable, p2)} style={{ opacity: hideBecausePaginated ? 0.25 : 1, transform: `translateX(${hideBecauseStaggered ? "50%" : "0%"})` }}>{text}<input {...useMergedProps({ type: "number" }, propsTabbable) as any} style={{ width: "5ch" }} /></li>
+        <li {...useMergedProps(propsChild, propsTabbable, p2)} style={{ opacity: hideBecausePaginated ? 0.25 : 1, transform: `translateX(${hideBecauseStaggered ? "50%" : "0%"})` }}>{text}<input {...useMergedProps(propsTabbable, { type: "number" }) as any} style={{ width: "5ch" }} /></li>
     )
 }));

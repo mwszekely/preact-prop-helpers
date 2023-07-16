@@ -1,3 +1,25 @@
+/**
+ * # Preact Prop Helpers
+ * 
+ * A selection of custom hooks for Preact.
+ * 
+ * ```md
+ * ## `useMergedProps`
+ * ### `useMergedClasses`
+ * ### `useMergedRefs`
+ * ### `useMergedStyles`
+ * ### `useMergedChildren`
+ * ```
+ * 
+ * @include {@link useMergedProps}
+ * 
+ * ## `useCompleteListNavigation`
+ * 
+ * @include {@link useCompleteListNavigation}
+ *
+ * @packageDocumentation
+ */
+
 export { GridChildCellInfo, GridChildRowInfo, TabbableColumnInfo, UseGridNavigationCellContext, UseGridNavigationCellContextSelf, UseGridNavigationCellParameters, UseGridNavigationCellParametersSelf, UseGridNavigationCellReturnType, UseGridNavigationParameters, UseGridNavigationParametersSelf, UseGridNavigationReturnType, UseGridNavigationRowContext, UseGridNavigationRowContextSelf, UseGridNavigationRowParameters, UseGridNavigationRowReturnType, useGridNavigation, useGridNavigationCell, useGridNavigationRow } from "./component-detail/keyboard-navigation/use-grid-navigation-partial.js";
 export { GridSingleSelectSortableChildCellInfo, GridSingleSelectSortableChildRowInfo, UseGridNavigationSingleSelectionSortableCellParameters, UseGridNavigationSingleSelectionSortableCellReturnType, UseGridNavigationSingleSelectionSortableParameters, UseGridNavigationSingleSelectionSortableReturnType, UseGridNavigationSingleSelectionSortableRowParameters, UseGridNavigationSingleSelectionSortableRowReturnType, useGridNavigationSingleSelectionSortable, useGridNavigationSingleSelectionSortableCell, useGridNavigationSingleSelectionSortableRow } from "./component-detail/keyboard-navigation/use-grid-navigation-single-selection-sortable.js";
 export { GridSingleSelectChildCellInfo, GridSingleSelectChildRowInfo, UseGridNavigationCellSingleSelectionContext, UseGridNavigationRowSingleSelectionContext, UseGridNavigationSingleSelectionCellParameters, UseGridNavigationSingleSelectionCellReturnType, UseGridNavigationSingleSelectionParameters, UseGridNavigationSingleSelectionReturnType, UseGridNavigationSingleSelectionRowParameters, UseGridNavigationSingleSelectionRowReturnType, useGridNavigationSingleSelection, useGridNavigationSingleSelectionCell, useGridNavigationSingleSelectionRow } from "./component-detail/keyboard-navigation/use-grid-navigation-single-selection.js";
@@ -67,4 +89,6 @@ export { generateRandomId } from "./util/random-id.js";
 export { generateStack, useStack } from "./util/stack.js";
 export type { CSSProperties, CompositionEventType, ElementProps, EventType, ExtendMerge, FocusEventType, KeyboardEventType, MouseEventType, Nullable, OmitStrong, PointerEventType, Ref, RefCallback, RefObject, TouchEventType, VNode } from "./util/types.js";
 export { hideCallCount, monitorCallCount } from "./util/use-call-count.js";
+
+export * from "./util/temp.js";
 

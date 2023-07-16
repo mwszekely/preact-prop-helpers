@@ -1,0 +1,19 @@
+{
+  "name": "docs-gen",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@microsoft/tsdoc": "^0.14.2",
+    "@rushstack/node-core-library": "^3.59.4",
+    "colors": "^1.4.0",
+    "ts-node": "^10.9.1"
+  }
+}

@@ -8,15 +8,14 @@ export interface UsePaginatedChildrenInfo<TabbableChildElement extends Element> 
     setPaginationVisible(visible: boolean): void;
     setChildCountIfPaginated(count: number): void;
 }
-export interface UsePaginatedChildrenParameters<ParentElement extends Element, TabbableChildElement extends Element, M extends UsePaginatedChildrenInfo<TabbableChildElement>> {
-    managedChildrenReturn: UseManagedChildrenReturnType<M>["managedChildrenReturn"];
+export interface UsePaginatedChildrenParameters<ParentElement extends Element, TabbableChildElement extends Element, M extends UsePaginatedChildrenInfo<TabbableChildElement>> extends Pick<UseManagedChildrenReturnType<M>, "managedChildrenReturn"> {
     linearNavigationParameters: Pick<UseLinearNavigationParameters<any, TabbableChildElement, M>["linearNavigationParameters"], "indexDemangler">;
+    rovingTabIndexReturn: Pick<UseRovingTabIndexReturnType<any, TabbableChildElement, M>["rovingTabIndexReturn"], "getTabbableIndex" | "setTabbableIndex">;
+    refElementReturn: Pick<UseRefElementReturnType<ParentElement>["refElementReturn"], "getElement">;
     paginatedChildrenParameters: {
         paginationMin: Nullable<number>;
         paginationMax: Nullable<number>;
     };
-    rovingTabIndexReturn: Pick<UseRovingTabIndexReturnType<any, TabbableChildElement, M>["rovingTabIndexReturn"], "getTabbableIndex" | "setTabbableIndex">;
-    refElementReturn: Pick<UseRefElementReturnType<ParentElement>["refElementReturn"], "getElement">;
 }
 export interface UsePaginatedChildContextSelf {
     parentIsPaginated: boolean;

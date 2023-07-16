@@ -1,0 +1,15 @@
+{
+    "$schema": "https://developer.microsoft.com/json-schemas/tsdoc/v0/tsdoc.schema.json",
+    "tagDefinitions": [
+      {
+        "tagName": "@docTopic",
+        "syntaxKind": "block",
+        "allowMultiple": true
+      },
+      {
+        "tagName": "@include",
+        "syntaxKind": "block",
+        "allowMultiple": true
+      }
+    ]
+  }

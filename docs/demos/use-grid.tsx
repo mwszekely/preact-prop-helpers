@@ -23,8 +23,7 @@ export const DemoUseGrid = memo(() => {
         rovingTabIndexParameters: { onTabbableIndexChange: setTabbableRow, untabbable: false, focusSelfParent: focus },
         typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000, onNavigateTypeahead: null },
         rearrangeableChildrenParameters: {
-            getIndex: useCallback<GetIndex>((a: VNode) => a.props.index, []),
-            onRearranged: null
+            getIndex: useCallback<GetIndex>((a: VNode) => a.props.index, [])
         },
         sortableChildrenParameters: { compare: useCallback((rhs: CustomGridInfo, lhs: CustomGridInfo) => { return lhs.index - rhs.index }, []) },
         paginatedChildrenParameters: { paginationMin: null, paginationMax: null },

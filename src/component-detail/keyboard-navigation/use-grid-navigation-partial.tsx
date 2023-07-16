@@ -10,7 +10,7 @@ import { monitorCallCount } from "../../util/use-call-count.js";
 import { UseListNavigationChildInfo, UseListNavigationChildParameters, UseListNavigationChildReturnType, UseListNavigationContext, UseListNavigationParameters, UseListNavigationReturnType, useListNavigation, useListNavigationChild } from "./use-list-navigation-partial.js";
 import { SetTabbableIndex, UseRovingTabIndexChildInfoKeysReturnType } from "./use-roving-tabindex.js";
 
-export interface GridChildRowInfo<RowElement extends Element, _CellElement extends Element> extends UseListNavigationChildInfo<RowElement> { }
+export interface GridChildRowInfo<RowElement extends Element, _CellElement extends Element> extends UseListNavigationChildInfo<RowElement> {}
 export interface GridChildCellInfo<CellElement extends Element> extends UseListNavigationChildInfo<CellElement> { }
 
 export interface UseGridNavigationCellParametersSelf {
@@ -334,7 +334,7 @@ export function useGridNavigationCell<CellElement extends Element, CM extends Gr
 
                 if (focused) {
                     setTabbableRow(getRowIndex(), e, false);
-                    setTabbableColumn(prev => { return { actual: index, ideal: prev?.ideal ?? index }; }, e);
+                    setTabbableColumn(prev => { debugger; return { actual: index, ideal: prev?.ideal ?? index }; }, e);
                     setTabbableCell((prev) => {
                         if (prev != null && (prev < index || prev > index + colSpan)) {
                             return prev;

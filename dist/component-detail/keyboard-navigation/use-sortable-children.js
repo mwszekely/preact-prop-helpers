@@ -1,6 +1,5 @@
 import { shuffle as lodashShuffle } from "lodash-es";
-import { useForceUpdate } from "../../preact-extensions/use-force-update.js";
-import { useEnsureStability } from "../../preact-extensions/use-passive-state.js";
+import { returnNull, useEnsureStability, usePassiveState } from "../../preact-extensions/use-passive-state.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { createElement, useCallback, useRef } from "../../util/lib.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
@@ -39,7 +38,7 @@ export function useRearrangeableChildren({ rearrangeableChildrenParameters: { ge
     const shuffle = useCallback(() => {
         const managedRows = getChildren();
         const originalRows = managedRows.arraySlice();
-        const shuffledRows = lodashShuffle(originalRows.slice());
+        const shuffledRows = lodashShuffle(originalRows);
         return rearrange(originalRows, shuffledRows);
     }, [ /* Must remain stable */]);
     const reverse = useCallback(() => {
@@ -53,10 +52,8 @@ export function useRearrangeableChildren({ rearrangeableChildrenParameters: { ge
     // this hook, but it's tbody that actually needs updating), we need to remotely
     // get and set a forceUpdate function.
     //const [getForceUpdate, setForceUpdate] = usePassiveState<null | (() => void)>(null, returnNull);
-    //const [getForceUpdate, setForceUpdate] = usePassiveState<null | (() => void), never>(null, returnNull);
-    const forceUpdate = useForceUpdate();
+    const [getForceUpdate, setForceUpdate] = usePassiveState(null, returnNull);
     const rearrange = useCallback((originalRows, sortedRows) => {
-        console.assert(originalRows != sortedRows);
         mangleMap.current.clear();
         demangleMap.current.clear();
         // Update our sorted <--> unsorted indices map 
@@ -69,7 +66,7 @@ export function useRearrangeableChildren({ rearrangeableChildrenParameters: { ge
             }
         }
         onRearrangedGetter()?.();
-        forceUpdate();
+        getForceUpdate()?.();
     }, []);
     const useRearrangedChildren = useCallback(function useRearrangedChildren(children) {
         monitorCallCount(useRearrangedChildren);
@@ -136,7 +133,7 @@ export function useSortableChildren({ rearrangeableChildrenParameters, sortableC
         const managedRows = getChildren();
         const compare = getCompare();
         const originalRows = managedRows.arraySlice();
-        const sortedRows = compare ? originalRows.slice().sort((lhsRow, rhsRow) => {
+        const sortedRows = compare ? originalRows.sort((lhsRow, rhsRow) => {
             const lhsValue = lhsRow;
             const rhsValue = rhsRow;
             const result = compare(lhsValue, rhsValue);
