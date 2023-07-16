@@ -265,6 +265,7 @@ export function useRovingTabIndex<ParentElement extends Element, ChildElement ex
             let nextIndex = ((typeof updater === "function") ? updater(prevIndex ?? null) : updater) as M["index"];
             const untabbable = getUntabbable();
             let parentElement = getElement();
+            console.assert(!!parentElement);
 
             // Whether or not we're currently tabbable, make sure that when we switch from untabbable to tabbable,
             // that we know which index to switch back to.
@@ -281,7 +282,7 @@ export function useRovingTabIndex<ParentElement extends Element, ChildElement ex
                 // Also TODO: Should these take fromUserInteraction into consideration?
                 // Do we always move focus when we become untabbable?
                 if (!parentElement!.contains(document.activeElement) && untabbableBehavior != 'leave-child-focused')
-                    focusSelfParent(getElement());
+                    focusSelfParent(parentElement);
                 return null;
             }
 
@@ -292,7 +293,7 @@ export function useRovingTabIndex<ParentElement extends Element, ChildElement ex
                 // doable with the `tabbable` library, but it doesn't have a next() function or anything,
                 // so that needs to be manually done with a TreeWalker or something?
                 if (!parentElement!.contains(document.activeElement) && untabbableBehavior != 'leave-child-focused')
-                    focusSelfParent(getElement());
+                    focusSelfParent(parentElement);
                 return null;
             }
 
@@ -414,11 +415,16 @@ export function useRovingTabIndex<ParentElement extends Element, ChildElement ex
             tabIndex: untabbable ? 0 : -1,
             // TODO: When a hidden child is clicked, some browsers focus the parent, just because it's got a role and a tabindex.
             // But this won't work to avoid that, because it messes with grid navigation
-            /*onFocus: useCallback((e: FocusEvent) => {
-                if (!untabbable) {
-                    focusSelf(e);
+            /*onFocus: useStableCallback((e: FocusEvent) => {
+                const parentElement = getElement();
+                console.assert(!!parentElement);
+                if (e.target == getElement()) {
+                    debugger;
+                    if (!untabbable) {
+                        focusSelf(e);
+                    }
                 }
-            }, [untabbable])*/
+            })*/
         }
     };
 }

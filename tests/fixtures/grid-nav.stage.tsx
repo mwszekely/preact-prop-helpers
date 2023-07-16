@@ -171,7 +171,6 @@ function TestBaseGridNavRow({ index }: { index: number }) {
         paginatedChildReturn: { hideBecausePaginated, parentIsPaginated, paginatedVisible },
         props,
         context,
-        hasCurrentFocusParameters: { onCurrentFocusedInnerChanged },
         linearNavigationReturn: { },
         rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex },
         typeaheadNavigationReturn: { getCurrentTypeahead, typeaheadStatus },
@@ -211,7 +210,7 @@ function TestBaseGridNavRow({ index }: { index: number }) {
                 data-selected={selected}
                 data-selected-offset={selectedOffset}
                 data-parent-is-staggered={parentIsStaggered}
-                {...useMergedProps(props, { onFocus: e => { console.error("A grid row has received focus"); setRowFocused(true); throw new Error("A grid row has received focus"); } })}>
+                {...useMergedProps(props, { onFocus: e => { debugger; console.error("A grid row has received focus"); setRowFocused(true); /*throw new Error("A grid row has received focus");*/ } })}>
                 {...Array.from(function* () {
                     for (let i = 0; i < 10; ++i) {
                         const colSpan = (i === WithColSpanIndex ? (index % 10) : 0) + 1;

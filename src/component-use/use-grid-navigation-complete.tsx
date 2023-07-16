@@ -27,7 +27,7 @@ export interface UseCompleteGridNavigationParameters<ParentOrRowElement extends 
     TargetedOmit<UseGridNavigationSingleSelectionParameters<ParentOrRowElement, RowElement, CellElement, M>, "typeaheadNavigationParameters", "isValid">,
     TargetedOmit<UseGridNavigationSingleSelectionSortableParameters<ParentOrRowElement, RowElement, CellElement, M>, "rearrangeableChildrenParameters", never>,
     TargetedOmit<UseGridNavigationSingleSelectionSortableParameters<ParentOrRowElement, RowElement, CellElement, M>, "rovingTabIndexParameters", "initiallyTabbedIndex" | "untabbableBehavior">,
-    
+
     Pick<UsePaginatedChildrenParameters<ParentOrRowElement, RowElement, M>, "paginatedChildrenParameters">,
     Pick<UseStaggeredChildrenParameters<RowElement, M>, "staggeredChildrenParameters"> {
 
@@ -87,7 +87,7 @@ export interface UseCompleteGridNavigationReturnType<ParentOrRowElement extends 
 }
 
 export interface UseCompleteGridNavigationRowReturnType<RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement, CellElement>, CM extends UseCompleteGridNavigationCellInfo<CellElement>> extends
-    OmitStrong<UseGridNavigationSingleSelectionSortableRowReturnType<RowElement, CellElement, RM, CM>, "context" | "managedChildrenParameters" | "info" | "pressParameters" | "textContentReturn">,
+    OmitStrong<UseGridNavigationSingleSelectionSortableRowReturnType<RowElement, CellElement, RM, CM>, "hasCurrentFocusParameters" | "context" | "managedChildrenParameters" | "info" | "pressParameters" | "textContentReturn">,
     Pick<UseManagedChildrenReturnType<CM>, "managedChildrenReturn">,
     Pick<UseHasCurrentFocusReturnType<RowElement>, "hasCurrentFocusReturn">,
     Pick<UseManagedChildReturnType<RM>, "managedChildReturn">,
@@ -209,7 +209,6 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
 
 }: UseCompleteGridNavigationRowParameters<RowElement, CellElement, RM, CM>): UseCompleteGridNavigationRowReturnType<RowElement, CellElement, RM, CM> {
     monitorCallCount(useCompleteGridNavigationRow);
-    assertEmptyObject(void1);
 
     const {
         info: infoPaginatedChild,
@@ -263,6 +262,9 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
         typeaheadNavigationReturn,
         context: contextGNR,
         info: infoRowReturn,
+        props: p3,
+        hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void3 },
+        ...void2
     } = r;
     const { context: contextMC, managedChildrenReturn } = useManagedChildren<CM>({ managedChildrenParameters });
 
@@ -275,6 +277,7 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
     }
 
 
+
     const { managedChildReturn } = useManagedChild<RM>({ context: contextIncomingForRowAsChildOfTable, info: completeInfo as RM })
 
 
@@ -283,20 +286,23 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
         ...contextMC,
         completeGridNavigationCellContext: { excludeSpace }
     });
-    const { hasCurrentFocusParameters } = useChildrenHaveFocusChild<RowElement>({ context: contextIncomingForRowAsChildOfTable });
+    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ...void4 } } = useChildrenHaveFocusChild<RowElement>({ context: contextIncomingForRowAsChildOfTable });
     //const { refElementReturn } = useRefElement<RowElement>({ refElementParameters: {} })
-    const { hasCurrentFocusReturn } = useHasCurrentFocus<RowElement>({ refElementReturn, hasCurrentFocusParameters: { ...hasCurrentFocusParameters, onCurrentFocusedChanged: null } });
+    const { hasCurrentFocusReturn } = useHasCurrentFocus<RowElement>({ refElementReturn, hasCurrentFocusParameters: { onCurrentFocusedChanged: useStableCallback((a, b) => { ocfic1?.(a, b); ocfic2?.(a, b) }) } });
     const props = useMergedProps(
         propsStable,
-        // TODO: Rows don't use tabIndex, but just excluding props here is...weird.
-        r.props,
+        p3,
         hasCurrentFocusReturn.propsStable,
         paginationProps,
         staggeredProps
     );
 
+    assertEmptyObject(void1);
+    assertEmptyObject(void2);
+    assertEmptyObject(void3);
+    assertEmptyObject(void4);
+
     return {
-        hasCurrentFocusParameters,
         hasCurrentFocusReturn,
         managedChildrenReturn,
         context,

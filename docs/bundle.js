@@ -3600,6 +3600,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         let nextIndex = typeof updater === "function" ? updater(prevIndex !== null && prevIndex !== void 0 ? prevIndex : null) : updater;
         const untabbable = getUntabbable();
         let parentElement = getElement();
+        console.assert(!!parentElement);
         // Whether or not we're currently tabbable, make sure that when we switch from untabbable to tabbable,
         // that we know which index to switch back to.
         if (nextIndex != null) setLastNonNullIndex(nextIndex);
@@ -3611,7 +3612,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
           //
           // Also TODO: Should these take fromUserInteraction into consideration?
           // Do we always move focus when we become untabbable?
-          if (!parentElement.contains(document.activeElement) && untabbableBehavior != 'leave-child-focused') focusSelfParent(getElement());
+          if (!parentElement.contains(document.activeElement) && untabbableBehavior != 'leave-child-focused') focusSelfParent(parentElement);
           return null;
         }
         // If the requested index is hidden, then there's no need to focus any elements or run any extra logic.
@@ -3620,7 +3621,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
           // TODO: Find the next/prev element and focus that instead,
           // doable with the `tabbable` library, but it doesn't have a next() function or anything,
           // so that needs to be manually done with a TreeWalker or something?
-          if (!parentElement.contains(document.activeElement) && untabbableBehavior != 'leave-child-focused') focusSelfParent(getElement());
+          if (!parentElement.contains(document.activeElement) && untabbableBehavior != 'leave-child-focused') focusSelfParent(parentElement);
           return null;
         }
         // If we've made a change, and it was because the user clicked on it or something,
@@ -3692,7 +3693,6 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       }
     });
     const focusSelf = T$1(reason => {
-      debugger;
       const children = getChildren();
       let index = getTabbableIndex();
       const untabbable = getUntabbable();
@@ -3742,12 +3742,19 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         // (otherwise focus gets lost to the body, and useEffect thinks that it shouldn't
         // focus the child because focus wasn't within the list). 
         // It's also just consistent. 
-        tabIndex: untabbable ? 0 : -1,
-        onFocus: T$1(e => {
-          if (!untabbable) {
-            focusSelf(e);
-          }
-        }, [untabbable])
+        tabIndex: untabbable ? 0 : -1
+        // TODO: When a hidden child is clicked, some browsers focus the parent, just because it's got a role and a tabindex.
+        // But this won't work to avoid that, because it messes with grid navigation
+        /*onFocus: useStableCallback((e: FocusEvent) => {
+            const parentElement = getElement();
+            console.assert(!!parentElement);
+            if (e.target == getElement()) {
+                debugger;
+                if (!untabbable) {
+                    focusSelf(e);
+                }
+            }
+        })*/
       }
     };
   }
@@ -7655,7 +7662,13 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       textContentReturn,
       typeaheadNavigationReturn,
       context: contextGNR,
-      info: infoRowReturn
+      info: infoRowReturn,
+      props: p3,
+      hasCurrentFocusParameters: {
+        onCurrentFocusedInnerChanged: ocfic1,
+        ...void3
+      },
+      ...void2
     } = r;
     const {
       context: contextMC,
@@ -7684,7 +7697,10 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       }
     });
     const {
-      hasCurrentFocusParameters
+      hasCurrentFocusParameters: {
+        onCurrentFocusedInnerChanged: ocfic2,
+        ...void4
+      }
     } = useChildrenHaveFocusChild({
       context: contextIncomingForRowAsChildOfTable
     });
@@ -7694,15 +7710,14 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     } = useHasCurrentFocus({
       refElementReturn,
       hasCurrentFocusParameters: {
-        ...hasCurrentFocusParameters,
-        onCurrentFocusedChanged: null
+        onCurrentFocusedChanged: useStableCallback((a, b) => {
+          ocfic1 === null || ocfic1 === void 0 ? void 0 : ocfic1(a, b);
+          ocfic2 === null || ocfic2 === void 0 ? void 0 : ocfic2(a, b);
+        })
       }
     });
-    const props = useMergedProps(propsStable,
-    // TODO: Rows don't use tabIndex, but just excluding props here is...weird.
-    r.props, hasCurrentFocusReturn.propsStable, paginationProps, staggeredProps);
+    const props = useMergedProps(propsStable, p3, hasCurrentFocusReturn.propsStable, paginationProps, staggeredProps);
     return {
-      hasCurrentFocusParameters,
       hasCurrentFocusReturn,
       managedChildrenReturn,
       context,
