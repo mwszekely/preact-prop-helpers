@@ -1,3 +1,24 @@
+/**
+ * # Preact Prop Helpers
+ *
+ * A selection of custom hooks for Preact.
+ *
+ * ```md
+ * ## `useMergedProps`
+ * ### `useMergedClasses`
+ * ### `useMergedRefs`
+ * ### `useMergedStyles`
+ * ### `useMergedChildren`
+ * ```
+ *
+ * @include {@link useMergedProps}
+ *
+ * ## `useCompleteListNavigation`
+ *
+ * @include {@link useCompleteListNavigation}
+ *
+ * @packageDocumentation
+ */
 export { useGridNavigation, useGridNavigationCell, useGridNavigationRow } from "./component-detail/keyboard-navigation/use-grid-navigation-partial.js";
 export { useGridNavigationSingleSelectionSortable, useGridNavigationSingleSelectionSortableCell, useGridNavigationSingleSelectionSortableRow } from "./component-detail/keyboard-navigation/use-grid-navigation-single-selection-sortable.js";
 export { useGridNavigationSingleSelection, useGridNavigationSingleSelectionCell, useGridNavigationSingleSelectionRow } from "./component-detail/keyboard-navigation/use-grid-navigation-single-selection.js";
@@ -66,4 +87,5 @@ export { getBuildMode } from "./util/mode.js";
 export { generateRandomId } from "./util/random-id.js";
 export { generateStack, useStack } from "./util/stack.js";
 export { hideCallCount, monitorCallCount } from "./util/use-call-count.js";
+export * from "./util/temp.js";
 //# sourceMappingURL=index.js.map

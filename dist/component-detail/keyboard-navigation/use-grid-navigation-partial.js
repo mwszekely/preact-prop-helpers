@@ -158,7 +158,7 @@ export function useGridNavigationCell({ context: { gridNavigationCellContext: { 
                 ocfic1?.(focused, prev, e);
                 if (focused) {
                     setTabbableRow(getRowIndex(), e, false);
-                    setTabbableColumn(prev => { return { actual: index, ideal: prev?.ideal ?? index }; }, e);
+                    setTabbableColumn(prev => { debugger; return { actual: index, ideal: prev?.ideal ?? index }; }, e);
                     setTabbableCell((prev) => {
                         if (prev != null && (prev < index || prev > index + colSpan)) {
                             return prev;

@@ -8,6 +8,13 @@ import { DemoUseModal } from "./demos/use-modal.js";
 import { DemoUseRovingTabIndex } from "./demos/use-roving-tab-index.js";
 import { DemoUseTimeout } from "./demos/use-timeout.js";
 
+import untypedJson from "./api.json";
+import { ApiBlock, ApiPackage, ApiParamBlockSectionNode, MemberIdentifier, MemberReference } from "./json-types.js";
+
+const json = untypedJson as ApiPackage;
+
+
+
 const DemoUseDroppable = () => {
     const { droppedFiles, droppedStrings, filesForConsideration, stringsForConsideration, propsStable: props, dropError } = useDroppable<HTMLDivElement>({ effect: "copy" });
 
@@ -515,8 +522,87 @@ const DemoStaggeredChild = memo(({ index }: { index: number }) => {
     )
 })
 
+const RenderApiBlock = (node: ApiBlock["content"]["nodes"][number] & { omitSoftBreaks?: boolean }) => {
+    switch (node.kind) {
+        case "Paragraph": return <p>{node.nodes.map(node => {
+            return <RenderApiBlockInner {...node} />
+        })}</p>
+        case "FencedCode":
+            return <span class={`fenced-code fenced-code-lang-${node.language}`}>{node.code}</span>
+    }
+}
+
+const RenderApiBlockInner = (node: ApiParamBlockSectionNode & { omitSoftBreaks?: boolean }) => {
+    switch (node.kind) {
+        case "PlainText": return <>{node.text}</>;
+        case "CodeSpan": return <span class="code-span">{node.code}</span>;
+        case "FencedCode": return <span class={`fenced-code fenced-code-lang-${node.language}`}>{node.code}</span>;
+        case "ErrorText": return <span class="error-text"><span class="error-text-message">{node.errorMessage}</span><span class="error-location">{node.errorLocation}</span></span>;
+        case "LinkTag": return <span class="link-tag">{node.codeDestination.memberReferences.map(ref => <RenderMemberReference {...ref} />)}</span>;
+        case "SoftBreak": return node.omitSoftBreaks ? null : <br />;
+    }
+}
+
+const RenderMemberReference = ({ hasDot, kind, memberIdentifier }: MemberReference) => {
+
+    return (
+        <>
+            {hasDot ? "." : ""}
+            <RenderMemberIdentifier {...memberIdentifier} />
+        </>
+    )
+}
+
+const RenderMemberIdentifier = ({ hasQuotes, identifier, kind }: MemberIdentifier) => {
+    return (
+        <>{hasQuotes ? "\"" : ""}{identifier}{hasQuotes ? "\"" : ""}</>
+    )
+}
+/*
+const FullReference = () => {
+    json.entryPoints[0].
+}*/
+
 const Component = () => {
-    // return <DemoUseAsyncHandler2 />;
+
+    const docTopics = json.tsdocComment?.customBlocks.filter((customBlock) => {
+        return customBlock.blockTag.tagName === "@docTopic"
+    }) || [];
+
+    return (
+        <div class="main-container">
+            <nav>
+                <ul>
+                    <li>Topics
+                        <ul>{docTopics.map(customBlock => {
+                            let headerNode = customBlock.content.nodes[0];
+                            return <li>{headerNode.kind == "Paragraph" ? headerNode.nodes.map(node => <RenderApiBlockInner {...node} omitSoftBreaks={true} />) : headerNode.code}</li>
+                        })}</ul>
+                    </li>
+                    <li>A-Z reference</li>
+                </ul>
+            </nav>
+            <main>
+                <h2>Preact Prop Helpers</h2>
+                {json.tsdocComment?.summarySection.nodes.map(node => { return <RenderApiBlock {...node} /> })}
+                {json.tsdocComment?.remarksBlock?.content.nodes.map(node => <RenderApiBlock {...node} />)}
+                {json.tsdocComment?.customBlocks.filter((customBlock) => {
+                    return customBlock.blockTag.tagName === "@docTopic"
+                }).map(customBlock => {
+                    return customBlock.content.nodes.map((node, i) => {
+                        if (i == 0) {
+                            return (
+                                <h3>{node.kind == "Paragraph" ? node.nodes.map(node => <RenderApiBlockInner {...node} omitSoftBreaks={true} />) : node.code}</h3>
+                            )
+                        }
+                        else {
+                            return <RenderApiBlock {...node} />;
+                        }
+                    });
+                })}
+            </main>
+        </div>
+    )
 
     return <div class="flex" style={{ flexWrap: "wrap" }}>
         <DemoPress remaining={2} />

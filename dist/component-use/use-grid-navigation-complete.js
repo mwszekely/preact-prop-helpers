@@ -14,7 +14,7 @@ import { useMemoObject } from "../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../util/assert.js";
 import { useCallback } from "../util/lib.js";
 import { monitorCallCount } from "../util/use-call-count.js";
-export function useCompleteGridNavigation({ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, typeaheadNavigationParameters, sortableChildrenParameters, rearrangeableChildrenParameters: { onRearranged, ...rearrangeableChildrenParameters }, paginatedChildrenParameters, staggeredChildrenParameters, ...void1 }) {
+export function useCompleteGridNavigation({ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, typeaheadNavigationParameters, sortableChildrenParameters, rearrangeableChildrenParameters, paginatedChildrenParameters, staggeredChildrenParameters, ...void1 }) {
     monitorCallCount(useCompleteGridNavigation);
     assertEmptyObject(void1);
     const getChildren = useCallback(() => managedChildrenReturn.getChildren(), []);
@@ -38,7 +38,7 @@ export function useCompleteGridNavigation({ gridNavigationParameters, linearNavi
         typeaheadNavigationParameters: { isValid, ...typeaheadNavigationParameters },
         refElementReturn,
         rearrangeableChildrenParameters: {
-            onRearranged: useStableCallback(() => { refreshPagination(paginatedChildrenParameters.paginationMin, paginatedChildrenParameters.paginationMax); onRearranged?.(); }),
+            onRearranged: useStableCallback(() => { refreshPagination(paginatedChildrenParameters.paginationMin, paginatedChildrenParameters.paginationMax); }),
             ...rearrangeableChildrenParameters
         },
         sortableChildrenParameters

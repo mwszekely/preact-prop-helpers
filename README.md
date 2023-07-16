@@ -15,22 +15,23 @@ return <div {...useElementSizeProps(props)}>I'm {offsetHeight} pixels tall!</div
 ```
 
 
-## Summary of available hooks
 
-* [`useMergedProps`](#useMergedProps): Merges two or more sets of props together. Can handle `class` & `className`, `style`, `ref`, `children`, and all event handlers.
-* `useRefElement`: Access the `Element` that rendered these props.
-* `useManagedChildren`: Low-level hook that represents reversed `Context`: child to parent communication. Query the status of managed children and be notified when they change.
-* `useListNavigationComplete`: Create a composite component that only has a single tab stop among its many children. Combines the following hooks, and wraps them all up with `useManagedChildren` at the end:
-    * `useListNavigation`: Combines the following hooks: (does not call `useManagedChildren`)
+## Summary of available hooks
+(In approximate order of usefulness)
+* [`useMergedProps`](#useMergedProps): Merges two (or more) sets of props together. Can handle `class` & `className`, `style`, `ref`, `children`, and all event handlers.
+* `useRefElement`: Immediately access the `Element` that rendered these props, like `<div ref={setElement} />` but without the re-render.
+* `useListNavigationComplete` &amp; `useGridNavigationComplete`: Create a **composite widget** that only has a single tab stop among its many children and supports many list-common features like selection and sorting. Combines the following hooks, and wraps them all up with `useManagedChildren` at the end:
+    * `useListNavigation`: Create a single-tab-stop composite widget by combining:
         * `useRovingTabIndex`: Only one child among all children is tabbable at any given moment
-        * `useLinearNavigation`: Which child is the tabbable child is controlled by pressing Up, Page Down, Home, etc.
-        * `useTypeaheadNavigation`: Which child is the tabbable child is controlled by typing the child's name/content
+        * `useLinearNavigation`: Change which one is tabbable by pressing Up, Page Down, Home, etc.
+        * `useTypeaheadNavigation`: Change which one is tabbable by typing the child's name/content
     * `useSingleSelection`: Only one child among all children is selected (can be disabled for multi-select)
     * `useSortableChildren`: Children can be sorted (or arbitrarily rearranged)
     * `usePaginatedChildren`: Tell children to show/hide themselves if they are within a narrow window
     * `useStaggeredChildren`: Only render a child when the one above it has called its first `useEffect`.
-    * (It is perfectly possible to build this hook yourself from its component pieces &mdash; it's provided for convenience)
-* `useGridNavigationComplete`: 2-dimensional `useListNavigationComplete` (selection, sortability, pagination, etc. apply to rows but not to columns)
+    * `useManagedChildren`: (See below)
+    * (It is perfectly possible to build `useListNavigationComplete` & `useGridNavigationComplete` yourself from their component pieces &mdash; they're provided for convenience)
+* `useManagedChildren`: Like reversed `Context`: child to parent communication. Query the status of managed children and be notified when they change. A very **low-level** hook used primarily as parts of other, larger hooks.
 * `useImperativeProps`: Control the attributes, text content, classes, event handlers etc. of a children remotely without props. Even if the child re-renders with props of its own the imperative changes will be remembered and re-merged.
 * `usePortalChildren`: Allows adding/removing children to an arbitrary part of the DOM (e.g. pushing a Toast notification).
 * `useTextContent`: Access the text of the `Element` that rendered these props.
@@ -38,11 +39,12 @@ return <div {...useElementSizeProps(props)}>I'm {offsetHeight} pixels tall!</div
 * `useMediaQuery`: Watch a CSS media query and get notified when its condition is or is not satisfied.
 * `useMutationObserver`: Allows you to use a low-level `MutationObserver` on the `Element` that rendered these props.
 * `useActiveElement`: React to changes in `document.activeElement`
-* `useHasCurrentFocus`: Is the `Element` focused or not?
-* `useHasLastFocus`: Is the `Element` focused, or, if nothing's focused, was it the most recently focused `Element`?
+* `useHasCurrentFocus`: Is the `Element` currently focused or not?
+* `useHasLastFocus`: Is the `Element` currently focused or (if nothing's focused) the most recently focused?
 * `useStableCallback`: Makes a function stable so that it can be excluded from dependency arguments.
     * `useStableGetter`: Like the above, but for any arbitrary object.
-* `useState`: Same as the built-in, but returns `[state, setState, getState]` with that third return value there.
+    * `useMemoObject`: Returns the same object when its parts are the same, and a different object when its parts are different, recursively. Geared towards `Context` (which can handle a change every now and again) instead of dependencies (which, if stable, **cannot** change)
+* `useState`: Same as the built-in, but returns `[state, setState, getState]` with that third getter function there.
 * `usePassiveState`: Want to keep state around, but don't **need** to re-render when it changes? Passive state lets you run a `useEffect`-like callback and cleanup, so if you want to re-render, you can, and if you don't need to re-render, you don't have to.
 * `usePersistentState`: State hooked up to `localStorage` (or `sessionStorage`)
 * `useForceUpdate`: Force your component to re-render itself even if no other state has changed.

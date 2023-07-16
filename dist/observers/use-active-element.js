@@ -1,6 +1,7 @@
 import { returnNull, returnTrue, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useEffect } from "../util/lib.js";
 import { monitorCallCount } from "../util/use-call-count.js";
+import { MapOfSets } from "map-and-set-extensions";
 /**
  *
  * There are several different ways that a focus event can happen.  Assume
@@ -47,13 +48,11 @@ const windowsFocusedUpdaters = new Map();
 function forEachUpdater(window, map, value, reason) {
     const updaters = map.get(window);
     if (updaters) {
-        if (updaters) {
-            for (const updater of updaters) {
-                const { lastSent, send } = updater;
-                if (value !== lastSent) {
-                    send(value, reason);
-                    updater.lastSent = value;
-                }
+        for (const updater of updaters) {
+            const { lastSent, send } = updater;
+            if (value !== lastSent) {
+                send(value, reason);
+                updater.lastSent = value;
             }
         }
     }
@@ -107,24 +106,16 @@ export function useActiveElement({ activeElementParameters: { onActiveElementCha
             window?.addEventListener("focus", windowFocus, { passive: true });
             window?.addEventListener("blur", windowBlur, { passive: true });
         }
-        // Add them even if they're undefined to more easily
-        // manage the ">0 means don't add handlers" logic.
-        const localActiveElementUpdaters = activeElementUpdaters.get(window) ?? new Set();
-        const localLastActiveElementUpdaters = lastActiveElementUpdaters.get(window) ?? new Set();
-        const localWindowFocusedUpdaters = windowFocusedUpdaters.get(window) ?? new Set();
         const laeu = { send: setActiveElement, lastSent: undefined };
         const llaeu = { send: setLastActiveElement, lastSent: undefined };
         const lwfu = { send: setWindowFocused, lastSent: undefined };
-        localActiveElementUpdaters.add(laeu);
-        localLastActiveElementUpdaters.add(llaeu);
-        localWindowFocusedUpdaters.add(lwfu);
-        activeElementUpdaters.set(window, localActiveElementUpdaters);
-        lastActiveElementUpdaters.set(window, localLastActiveElementUpdaters);
-        windowFocusedUpdaters.set(window, localWindowFocusedUpdaters);
+        MapOfSets.add(activeElementUpdaters, window, laeu);
+        MapOfSets.add(lastActiveElementUpdaters, window, llaeu);
+        MapOfSets.add(windowFocusedUpdaters, window, lwfu);
         return () => {
-            activeElementUpdaters.get(window).delete(laeu);
-            lastActiveElementUpdaters.get(window).delete(laeu);
-            windowFocusedUpdaters.get(window).delete(lwfu);
+            MapOfSets.delete(activeElementUpdaters, window, laeu);
+            MapOfSets.delete(lastActiveElementUpdaters, window, llaeu);
+            MapOfSets.delete(windowFocusedUpdaters, window, lwfu);
             if (activeElementUpdaters.size === 0) {
                 document?.removeEventListener("focusin", focusin);
                 document?.removeEventListener("focusout", focusout);

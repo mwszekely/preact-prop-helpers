@@ -1,7 +1,6 @@
 import { shuffle as lodashShuffle } from "lodash-es";
-import { useForceUpdate } from "../../preact-extensions/use-force-update.js";
 import { ManagedChildInfo, UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
-import { useEnsureStability } from "../../preact-extensions/use-passive-state.js";
+import { returnNull, useEnsureStability, usePassiveState } from "../../preact-extensions/use-passive-state.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { TargetedPick, createElement, useCallback, useRef } from "../../util/lib.js";
 import { VNode } from "../../util/types.js";
@@ -173,7 +172,7 @@ export function useRearrangeableChildren<M extends UseSortableChildInfo>({
     const shuffle = useCallback((): Promise<void> | void => {
         const managedRows = getChildren();
         const originalRows = managedRows.arraySlice();
-        const shuffledRows = lodashShuffle(originalRows.slice());
+        const shuffledRows = lodashShuffle(originalRows);
         return rearrange(originalRows, shuffledRows);
     }, [/* Must remain stable */]);
 
@@ -190,12 +189,10 @@ export function useRearrangeableChildren<M extends UseSortableChildInfo>({
     // this hook, but it's tbody that actually needs updating), we need to remotely
     // get and set a forceUpdate function.
     //const [getForceUpdate, setForceUpdate] = usePassiveState<null | (() => void)>(null, returnNull);
-    //const [getForceUpdate, setForceUpdate] = usePassiveState<null | (() => void), never>(null, returnNull);
-    const forceUpdate = useForceUpdate();
+    const [getForceUpdate, setForceUpdate] = usePassiveState<null | (() => void), never>(null, returnNull);
 
     const rearrange = useCallback((originalRows: M[], sortedRows: M[]) => {
-        console.assert(originalRows != sortedRows);
-        
+
         mangleMap.current.clear();
         demangleMap.current.clear();
 
@@ -211,7 +208,7 @@ export function useRearrangeableChildren<M extends UseSortableChildInfo>({
         }
 
         onRearrangedGetter()?.();
-        forceUpdate();
+        getForceUpdate()?.();
     }, []);
 
     const useRearrangedChildren = useCallback(function useRearrangedChildren(children: VNode[]) {
@@ -292,7 +289,7 @@ export function useSortableChildren<M extends UseSortableChildInfo>({
         const compare = getCompare();
         const originalRows = managedRows.arraySlice();
 
-        const sortedRows = compare ? originalRows.slice().sort((lhsRow, rhsRow) => {
+        const sortedRows = compare ? originalRows.sort((lhsRow, rhsRow) => {
 
             const lhsValue = lhsRow;
             const rhsValue = rhsRow;
