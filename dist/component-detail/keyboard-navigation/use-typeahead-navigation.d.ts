@@ -4,7 +4,7 @@ import { UseTextContentParameters, UseTextContentReturnType } from "../../dom-he
 import { TargetedPick } from "../../util/lib.js";
 import { ElementProps, KeyboardEventType, Nullable } from "../../util/types.js";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
-export interface UseTypeaheadNavigationReturnTypeSelf<ParentOrChildElement extends Element> {
+export interface UseTypeaheadNavigationReturnTypeSelf {
     /** Returns the string currently typed by the user. Stable, but cannot be called during render. */
     getCurrentTypeahead(): string | null;
     /**
@@ -52,7 +52,7 @@ export interface UseTypeaheadNavigationParametersSelf<TabbableChildElement exten
     typeaheadTimeout: number;
 }
 export interface UseTypeaheadNavigationReturnType<ParentOrChildElement extends Element> {
-    typeaheadNavigationReturn: UseTypeaheadNavigationReturnTypeSelf<ParentOrChildElement>;
+    typeaheadNavigationReturn: UseTypeaheadNavigationReturnTypeSelf;
     propsStable: ElementProps<ParentOrChildElement>;
     context: UseTypeaheadNavigationContext;
 }

@@ -13,7 +13,7 @@ import { SetTabbableIndex, UseRovingTabIndexChildInfoKeysReturnType } from "./us
 export interface GridChildRowInfo<RowElement extends Element, _CellElement extends Element> extends UseListNavigationChildInfo<RowElement> { }
 export interface GridChildCellInfo<CellElement extends Element> extends UseListNavigationChildInfo<CellElement> { }
 
-export interface UseGridNavigationCellParamersSelf {
+export interface UseGridNavigationCellParametersSelf {
     colSpan: number;
 }
 
@@ -80,7 +80,7 @@ export interface UseGridNavigationRowReturnType<RowElement extends Element, Cell
 
 
 export interface UseGridNavigationCellParameters<RowElement extends Element, CellElement extends Element, CM extends GridChildCellInfo<CellElement>> extends UseListNavigationChildParameters<CellElement, CM> {
-    gridNavigationCellParameters: UseGridNavigationCellParamersSelf;
+    gridNavigationCellParameters: UseGridNavigationCellParametersSelf;
     context: UseGridNavigationCellContext;
 }
 

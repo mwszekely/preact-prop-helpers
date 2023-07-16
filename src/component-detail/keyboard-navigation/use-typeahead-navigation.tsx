@@ -9,9 +9,9 @@ import { assertEmptyObject } from "../../util/assert.js";
 import { TargetedPick, useCallback, useLayoutEffect, useRef } from "../../util/lib.js";
 import { CompositionEventType, ElementProps, KeyboardEventType, Nullable } from "../../util/types.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
-import { UseRovingTabIndexChildInfo, UseRovingTabIndexChildParameters, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
+import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
 
-export interface UseTypeaheadNavigationReturnTypeSelf<ParentOrChildElement extends Element> {
+export interface UseTypeaheadNavigationReturnTypeSelf {
     /** Returns the string currently typed by the user. Stable, but cannot be called during render. */
     getCurrentTypeahead(): string | null;
 
@@ -70,7 +70,7 @@ export interface UseTypeaheadNavigationParametersSelf<TabbableChildElement exten
 }
 
 export interface UseTypeaheadNavigationReturnType<ParentOrChildElement extends Element> {
-    typeaheadNavigationReturn: UseTypeaheadNavigationReturnTypeSelf<ParentOrChildElement>;
+    typeaheadNavigationReturn: UseTypeaheadNavigationReturnTypeSelf;
     propsStable: ElementProps<ParentOrChildElement>;
     context: UseTypeaheadNavigationContext;
 }

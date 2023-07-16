@@ -21,24 +21,31 @@ export interface UsePaginatedChildrenParameters<ParentElement extends Element, T
     refElementReturn: Pick<UseRefElementReturnType<ParentElement>["refElementReturn"], "getElement">;
 }
 
-export interface UsePaginatedChildContext {
-    paginatedChildContext: {
-        // UNSTABLE, changes in this will cause the context to re-create itself.
-        parentIsPaginated: boolean;
-        getDefaultPaginationVisible(i: number): boolean;
-    }
+export interface UsePaginatedChildContextSelf {
+    // UNSTABLE, changes in this will cause the context to re-create itself.
+    parentIsPaginated: boolean;
+    getDefaultPaginationVisible(i: number): boolean;
 }
 
-export interface UsePaginatedChildrenReturnType extends TargetedPick<UseManagedChildrenParameters<any>, "managedChildrenParameters","onChildrenCountChange"> {
-    paginatedChildrenReturn: {
-        refreshPagination: (min: Nullable<number>, max: Nullable<number>) => void;
-        /**
-         * **IMPORTANT**: This is only tracked when pagination is enabled.
-         * 
-         * If pagination is not enabled, this is either `null` or some undefined previous number.
-         */
-        childCount: Nullable<number>;
-    };
+export interface UsePaginatedChildContext {
+    paginatedChildContext: UsePaginatedChildContextSelf;
+}
+
+export interface UsePaginatedChildrenReturnTypeSelf {
+
+    refreshPagination: (min: Nullable<number>, max: Nullable<number>) => void;
+
+    /**
+     * **IMPORTANT**: This is only tracked when pagination is enabled.
+     * 
+     * If pagination is not enabled, this is either `null` or some undefined previous number.
+     */
+    childCount: Nullable<number>;
+}
+
+export interface UsePaginatedChildrenReturnType extends TargetedPick<UseManagedChildrenParameters<any>, "managedChildrenParameters", "onChildrenCountChange"> {
+    paginatedChildrenReturn: UsePaginatedChildrenReturnTypeSelf;
+
     context: UsePaginatedChildContext;
 }
 
@@ -54,7 +61,7 @@ export function usePaginatedChildren<ParentElement extends Element, TabbableChil
     const [childCount, setChildCount] = useState(null as number | null);
     const parentIsPaginated = (paginationMin != null || paginationMax != null);
 
-    const lastPagination = useRef({ paginationMax: null as null | number, paginationMin: null as number | null});
+    const lastPagination = useRef({ paginationMax: null as null | number, paginationMin: null as number | null });
     const refreshPagination = useCallback((paginationMin: Nullable<number>, paginationMax: Nullable<number>) => {
         const childMax = (getChildren().getHighestIndex() + 1);
         const childMin = (getChildren().getLowestIndex());

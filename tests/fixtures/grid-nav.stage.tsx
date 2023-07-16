@@ -1,6 +1,6 @@
 import { createContext } from "preact";
 import { useCallback, useContext, useEffect, useState } from "preact/hooks";
-import { Compare, CompleteGridNavigationContext, CompleteGridNavigationRowContext, EventDetail, UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationRowInfo, UseSingleSelectionParameters, focus, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useImperativeProps, useMergedProps, useRefElement, useStableCallback, useStableGetter } from "../../dist/index.js";
+import { Compare, CompleteGridNavigationCellContext, CompleteGridNavigationRowContext, EventDetail, UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationRowInfo, UseSingleSelectionParameters, focus, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useImperativeProps, useMergedProps, useRefElement, useStableCallback, useStableGetter } from "../../dist/index.js";
 import { LoremIpsum } from "../lorem.js";
 import { fromStringArray, fromStringBoolean, fromStringNumber, fromStringString, useTestSyncState } from "../util.js";
 import { DefaultChildCount, DisabledIndex, HiddenIndex, MissingIndex, WithColSpanIndex } from "./grid-nav.constants.js";
@@ -26,8 +26,8 @@ export interface GridNavConstants {
     onSelectedIndexChange(index: number): (void | Promise<void>);
 }
 
-const RowContext = createContext<CompleteGridNavigationContext<HTMLTableElement, HTMLTableRowElement, HTMLTableCellElement, UseCompleteGridNavigationRowInfo<HTMLTableRowElement, HTMLTableCellElement>, UseCompleteGridNavigationCellInfo<HTMLTableCellElement>>>(null!);
-const CellContext = createContext<CompleteGridNavigationRowContext<HTMLTableRowElement, HTMLTableCellElement, UseCompleteGridNavigationCellInfo<HTMLTableCellElement>>>(null!);
+const RowContext = createContext<CompleteGridNavigationRowContext<HTMLTableElement, HTMLTableRowElement, HTMLTableCellElement, UseCompleteGridNavigationRowInfo<HTMLTableRowElement, HTMLTableCellElement>, UseCompleteGridNavigationCellInfo<HTMLTableCellElement>>>(null!);
+const CellContext = createContext<CompleteGridNavigationCellContext<HTMLTableRowElement, HTMLTableCellElement, UseCompleteGridNavigationCellInfo<HTMLTableCellElement>>>(null!);
 
 export function TestBasesGridNav() {
     const [mounted] = useTestSyncState("GridNav", "setMounted", true, fromStringBoolean);

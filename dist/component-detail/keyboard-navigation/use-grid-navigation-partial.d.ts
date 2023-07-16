@@ -7,7 +7,7 @@ export interface GridChildRowInfo<RowElement extends Element, _CellElement exten
 }
 export interface GridChildCellInfo<CellElement extends Element> extends UseListNavigationChildInfo<CellElement> {
 }
-export interface UseGridNavigationCellParamersSelf {
+export interface UseGridNavigationCellParametersSelf {
     colSpan: number;
 }
 export interface UseGridNavigationCellContextSelf {
@@ -45,7 +45,7 @@ export interface UseGridNavigationRowReturnType<RowElement extends Element, Cell
     info: Pick<RM, UseRovingTabIndexChildInfoKeysReturnType | "focusSelf">;
 }
 export interface UseGridNavigationCellParameters<RowElement extends Element, CellElement extends Element, CM extends GridChildCellInfo<CellElement>> extends UseListNavigationChildParameters<CellElement, CM> {
-    gridNavigationCellParameters: UseGridNavigationCellParamersSelf;
+    gridNavigationCellParameters: UseGridNavigationCellParametersSelf;
     context: UseGridNavigationCellContext;
 }
 export interface TabbableColumnInfo {

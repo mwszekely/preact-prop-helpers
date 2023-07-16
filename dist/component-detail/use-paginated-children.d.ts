@@ -18,22 +18,24 @@ export interface UsePaginatedChildrenParameters<ParentElement extends Element, T
     rovingTabIndexReturn: Pick<UseRovingTabIndexReturnType<any, TabbableChildElement, M>["rovingTabIndexReturn"], "getTabbableIndex" | "setTabbableIndex">;
     refElementReturn: Pick<UseRefElementReturnType<ParentElement>["refElementReturn"], "getElement">;
 }
+export interface UsePaginatedChildContextSelf {
+    parentIsPaginated: boolean;
+    getDefaultPaginationVisible(i: number): boolean;
+}
 export interface UsePaginatedChildContext {
-    paginatedChildContext: {
-        parentIsPaginated: boolean;
-        getDefaultPaginationVisible(i: number): boolean;
-    };
+    paginatedChildContext: UsePaginatedChildContextSelf;
+}
+export interface UsePaginatedChildrenReturnTypeSelf {
+    refreshPagination: (min: Nullable<number>, max: Nullable<number>) => void;
+    /**
+     * **IMPORTANT**: This is only tracked when pagination is enabled.
+     *
+     * If pagination is not enabled, this is either `null` or some undefined previous number.
+     */
+    childCount: Nullable<number>;
 }
 export interface UsePaginatedChildrenReturnType extends TargetedPick<UseManagedChildrenParameters<any>, "managedChildrenParameters", "onChildrenCountChange"> {
-    paginatedChildrenReturn: {
-        refreshPagination: (min: Nullable<number>, max: Nullable<number>) => void;
-        /**
-         * **IMPORTANT**: This is only tracked when pagination is enabled.
-         *
-         * If pagination is not enabled, this is either `null` or some undefined previous number.
-         */
-        childCount: Nullable<number>;
-    };
+    paginatedChildrenReturn: UsePaginatedChildrenReturnTypeSelf;
     context: UsePaginatedChildContext;
 }
 export declare function usePaginatedChildren<ParentElement extends Element, TabbableChildElement extends Element, M extends UsePaginatedChildrenInfo<TabbableChildElement>>({ managedChildrenReturn: { getChildren }, linearNavigationParameters: { indexDemangler }, paginatedChildrenParameters: { paginationMax, paginationMin }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex }, refElementReturn: { getElement } }: UsePaginatedChildrenParameters<ParentElement, TabbableChildElement, M>): UsePaginatedChildrenReturnType;

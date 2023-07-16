@@ -4,19 +4,20 @@ import { UseRovingTabIndexChildInfo } from "./keyboard-navigation/use-roving-tab
 export interface UseStaggeredChildrenInfo<E extends Element> extends Pick<UseRovingTabIndexChildInfo<E>, "index"> {
     setStaggeredVisible(visible: boolean): void;
 }
-export interface UseStaggeredChildrenParameters<E extends Element, M extends UseStaggeredChildrenInfo<E>> {
-    managedChildrenReturn: UseManagedChildrenReturnType<M>["managedChildrenReturn"];
-    staggeredChildrenParameters: {
-        staggered: boolean;
-    };
+export interface UseStaggeredChildrenParametersSelf {
+    staggered: boolean;
+}
+export interface UseStaggeredChildrenParameters<E extends Element, M extends UseStaggeredChildrenInfo<E>> extends Pick<UseManagedChildrenReturnType<M>, "managedChildrenReturn"> {
+    staggeredChildrenParameters: UseStaggeredChildrenParametersSelf;
+}
+export interface UseStaggeredChildContextSelf {
+    parentIsStaggered: boolean;
+    childCallsThisToTellTheParentToMountTheNextOne(index: number): void;
+    childCallsThisToTellTheParentTheHighestIndex(index: number): void;
+    getDefaultStaggeredVisible(i: number): boolean;
 }
 export interface UseStaggeredChildContext {
-    staggeredChildContext: {
-        parentIsStaggered: boolean;
-        childCallsThisToTellTheParentToMountTheNextOne(index: number): void;
-        childCallsThisToTellTheParentTheHighestIndex(index: number): void;
-        getDefaultStaggeredVisible(i: number): boolean;
-    };
+    staggeredChildContext: UseStaggeredChildContextSelf;
 }
 export interface UseStaggeredChildrenReturnType {
     staggeredChildrenReturn: {
@@ -30,18 +31,19 @@ export interface UseStaggeredChildParameters {
     };
     context: UseStaggeredChildContext;
 }
+export interface UseStaggeredChildReturnSelf {
+    /** Whether the parent has indicated that all of its children, including this one, are staggered. */
+    parentIsStaggered: boolean;
+    /**
+     * If this is true, you should delay showing *your* children or running other heavy logic until this becomes false.
+     *
+     * Can be as simple as `<div>{hideBecauseStaggered? null : children}</div>`
+     */
+    hideBecauseStaggered: boolean;
+}
 export interface UseStaggeredChildReturn<ChildElement extends Element> {
     props: ElementProps<ChildElement>;
-    staggeredChildReturn: {
-        /** Whether the parent has indicated that all of its children, including this one, are staggered. */
-        parentIsStaggered: boolean;
-        /**
-         * If this is true, you should delay showing *your* children or running other heavy logic until this becomes false.
-         *
-         * Can be as simple as `<div>{hideBecauseStaggered? null : children}</div>`
-         */
-        hideBecauseStaggered: boolean;
-    };
+    staggeredChildReturn: UseStaggeredChildReturnSelf;
     info: Pick<UseStaggeredChildrenInfo<ChildElement>, "setStaggeredVisible">;
 }
 /**
