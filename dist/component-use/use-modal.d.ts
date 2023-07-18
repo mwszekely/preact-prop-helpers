@@ -15,7 +15,6 @@ export interface UseModalReturnType<FocusContainerElement extends Element | null
  *
  * Use for dialogs, menus, etc.  Anything that can be dismissed and might trap focus, basically.
  *
- * @param param0
  * @returns
  */
 export declare function useModal<Listeners extends DismissListenerTypes, FocusContainerElement extends Element | null, SourceElement extends Element | null, PopupElement extends Element>({ dismissParameters, escapeDismissParameters, focusTrapParameters: { trapActive, ...focusTrapParameters } }: UseModalParameters<Listeners>): UseModalReturnType<FocusContainerElement, SourceElement, PopupElement>;

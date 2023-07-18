@@ -41,7 +41,6 @@ function getElementDepth(element) {
  *
  * One press of the `Escape` key is guaranteed to only call `onClose` for *only one* component, and it is called on the component deepest in the DOM tree, differentiated by passing context information between parent and child.
  *
- * @param param0
  * @returns
  */
 export function useEscapeDismiss({ escapeDismissParameters: { onClose, open, getWindow: unstableGetWindow, parentDepth, ...void1 }, refElementPopupReturn: { getElement, ...void2 } }) {
@@ -123,7 +122,6 @@ export function useEscapeDismiss({ escapeDismissParameters: { onClose, open, get
 /**
  * Handles events for dismiss events for things like popup menus or transient dialogs -- things where moving focus to a new area of the page means this component should close itself.
  *
- * @param param0
  * @returns
  */
 export function useLostFocusDismiss({ refElementPopupReturn: { getElement: getPopupElement, ...void3 }, refElementSourceReturn, lostFocusDismiss: { open, onClose }, ...void1 }) {
@@ -147,8 +145,6 @@ export function useLostFocusDismiss({ refElementPopupReturn: { getElement: getPo
 }
 /**
  * Handles events for a backdrop on a modal dialog -- the kind where the user expects the modal to close when they click/tap outside of it.
- *
- * @param param0
  */
 export function useBackdropDismiss({ backdropDismissParameters: { open, onClose: onCloseUnstable, ...void1 }, refElementPopupReturn: { getElement, ...void3 }, ...void2 }) {
     monitorCallCount(useBackdropDismiss);

@@ -8,6 +8,13 @@ import { assertEmptyObject } from "../../util/assert.js";
 import { enhanceEvent } from "../../util/event.js";
 import { useCallback, useEffect } from "../../util/lib.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
+/**
+ *
+ *
+ * @hasChild {@link useSingleSelectionChild}
+ *
+ * @compositeParams
+ */
 export function useSingleSelection({ managedChildrenReturn: { getChildren, ...void1 }, rovingTabIndexReturn: { setTabbableIndex, ...void2 }, singleSelectionParameters: { onSelectedIndexChange: onSelectedIndexChange_U, initiallySelectedIndex, ariaPropName, selectionMode, ...void3 }, ...void4 }) {
     monitorCallCount(useSingleSelection);
     assertEmptyObject(void1);
@@ -63,6 +70,11 @@ export function useSingleSelection({ managedChildrenReturn: { getChildren, ...vo
         }
     };
 }
+/**
+ *
+ *
+ * @compositeParams
+ */
 export function useSingleSelectionChild({ context: { singleSelectionContext: { getSelectedIndex, onSelectedIndexChange, ariaPropName, selectionMode, ...void1 }, ...void2 }, info: { index, unselectable, ...void3 }, ...void4 }) {
     monitorCallCount(useSingleSelectionChild);
     assertEmptyObject(void1);

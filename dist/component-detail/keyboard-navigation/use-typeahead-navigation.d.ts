@@ -34,9 +34,9 @@ export interface UseTypeaheadNavigationParametersSelf<TabbableChildElement exten
      * Must return true if the given child can be navigated to.
      *
      * Generally corresponds to a `hidden` or `disabled` prop.
-     * @param i
+     * @param index - Which child to query
      */
-    isValid(i: number): boolean;
+    isValid(index: number): boolean;
     /**
      * A collator to use when comparing.
      * If not provided, simply uses `localeCompare` after transforming each to lowercase, which will, at best, work okay in English.
@@ -79,16 +79,24 @@ interface TypeaheadInfo {
  * Allows for the selection of a managed child by typing the given text associated with it.
  *
  * @see useListNavigation, which packages everything up together.
+ *
+ * @hasChild {@link useTypeaheadNavigationChild}
+ *
+ * @compositeParams
  */
 export declare function useTypeaheadNavigation<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseTypeaheadNavigationChildInfo<ChildElement>>({ typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead, isValid, onNavigateTypeahead, ...void3 }, rovingTabIndexReturn: { getTabbableIndex: getIndex, setTabbableIndex: setIndex, ...void1 }, ...void2 }: UseTypeaheadNavigationParameters<ChildElement, M>): UseTypeaheadNavigationReturnType<ParentOrChildElement>;
+/**
+ *
+ * @compositeParams
+ */
 export declare function useTypeaheadNavigationChild<ChildElement extends Element, M extends UseTypeaheadNavigationChildInfo<ChildElement>>({ info: { index, ...void1 }, textContentParameters: { getText, ...void5 }, context: { typeaheadNavigationContext: { sortedTypeaheadInfo, insertingComparator, excludeSpace, ...void2 } }, refElementReturn: { getElement, ...void3 }, ...void4 }: UseTypeaheadNavigationChildParameters<ChildElement, M>): UseTypeaheadNavigationChildReturnType;
 /**
  * Your usual binary search implementation.
  *
  * It's used here to quickly find a good spot to start searching for our next typeahead candidate.
- * @param array The array to search through
- * @param wanted The value you'd like to find
- * @param comparator Compares `wanted` with the current value in `array`
+ * @param array - The array to search through
+ * @param wanted - The value you'd like to find
+ * @param comparator - Compares `wanted` with the current value in `array`
  * @returns A non-negative value if `wanted` was found, and a negative number if not.
  * The absolute value of this number, minus one, is where `wanted` *would* be found if it *was* in `array`
  */

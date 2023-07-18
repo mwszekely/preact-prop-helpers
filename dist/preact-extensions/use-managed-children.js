@@ -219,9 +219,6 @@ export function useManagedChild({ context, info }) {
  *
  * Also because of that, the types of this function are rather odd.  It's better to start off using a hook that already uses a flag, such as `useRovingTabIndex`, as an example.
  *
- *
- * @param param0
- * @returns
  */
 export function useChildrenFlag({ getChildren, initialIndex, closestFit, onClosestFit, onIndexChange, getAt, setAt, isValid }) {
     useEnsureStability("useChildrenFlag", onIndexChange, getAt, setAt, isValid);

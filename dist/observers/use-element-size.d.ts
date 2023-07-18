@@ -6,7 +6,6 @@ export interface UseElementSizeParameters<T extends Element> extends UseRefEleme
          * on the element. Does not need to be stable, so you
          * can pass an anonymous function that only sets the
          * values you use if you'd like.
-         * @param sizeInfo
          */
         onSizeChange(sizeInfo: ElementSize, prevSize: ElementSize | undefined, entries: ResizeObserverEntry[] | UIEvent): void;
         /**

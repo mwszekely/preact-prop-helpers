@@ -22,7 +22,7 @@ import { monitorCallCount } from "../util/use-call-count.js";
  *
  *
  *
- * @returns
+ * @compositeParams
  */
 export function useCompleteListNavigation({ linearNavigationParameters, rearrangeableChildrenParameters, sortableChildrenParameters, typeaheadNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, paginatedChildrenParameters, staggeredChildrenParameters, ...completeListNavigationParameters }) {
     monitorCallCount(useCompleteListNavigation);

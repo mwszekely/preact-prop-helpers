@@ -45,7 +45,6 @@ export interface UseEscapeDismissParameters<PopupElement extends Element> {
  *
  * One press of the `Escape` key is guaranteed to only call `onClose` for *only one* component, and it is called on the component deepest in the DOM tree, differentiated by passing context information between parent and child.
  *
- * @param param0
  * @returns
  */
 export declare function useEscapeDismiss<PopupElement extends Element>({ escapeDismissParameters: { onClose, open, getWindow: unstableGetWindow, parentDepth, ...void1 }, refElementPopupReturn: { getElement, ...void2 } }: UseEscapeDismissParameters<PopupElement>): void;
@@ -63,7 +62,6 @@ export interface UseLostFocusDismissReturnType<_SourceElement extends Element | 
 /**
  * Handles events for dismiss events for things like popup menus or transient dialogs -- things where moving focus to a new area of the page means this component should close itself.
  *
- * @param param0
  * @returns
  */
 export declare function useLostFocusDismiss<SourceElement extends Element | null, PopupElement extends Element>({ refElementPopupReturn: { getElement: getPopupElement, ...void3 }, refElementSourceReturn, lostFocusDismiss: { open, onClose }, ...void1 }: UseLostFocusDismissParameters<SourceElement, PopupElement>): UseLostFocusDismissReturnType<SourceElement, PopupElement>;
@@ -78,8 +76,6 @@ export interface UseBackdropDismissParameters<PopupElement extends Element> {
 }
 /**
  * Handles events for a backdrop on a modal dialog -- the kind where the user expects the modal to close when they click/tap outside of it.
- *
- * @param param0
  */
 export declare function useBackdropDismiss<PopupElement extends Element>({ backdropDismissParameters: { open, onClose: onCloseUnstable, ...void1 }, refElementPopupReturn: { getElement, ...void3 }, ...void2 }: UseBackdropDismissParameters<PopupElement>): void;
 export type DismissListenerTypes = "backdrop" | "lost-focus" | "escape";

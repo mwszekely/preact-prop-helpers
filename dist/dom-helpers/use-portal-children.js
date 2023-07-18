@@ -10,9 +10,6 @@ import { monitorCallCount } from "../util/use-call-count.js";
  * Returns the portal (as `children`, and functions to add, remove, or update a child to the portaled area)
  *
  * TODO: Can't push a child until after the very first `useLayoutEffect`
- *
- * @param param0
- * @returns
  */
 export function usePortalChildren({ target }) {
     monitorCallCount(usePortalChildren);

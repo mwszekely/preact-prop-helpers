@@ -12,9 +12,6 @@ const Unset = Symbol("unset");
  * 
  * This uses `options.diffed` in order to run before everything, even
  * ref assignment. This means this getter is safe to use anywhere ***except the render phase***.
- * 
- * @param value 
- * @returns 
  */
 export function useStableGetter<T>(value: T) {
     monitorCallCount(useStableGetter);

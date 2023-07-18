@@ -44,16 +44,12 @@ export function useFocusTrap({ focusTrapParameters: { onlyMoveFocus, trapActive,
 }
 /**
  * Returns the first focusable element contained within the given node, or null if none are found.
- * @param element
- * @returns
  */
 export function findFirstFocusable(element) {
     return findFirstCondition(element, node => node instanceof Element && isFocusable(node));
 }
 /**
  * Returns the first tabbable element contained within the given node, or null if none are found.
- * @param element
- * @returns
  */
 export function findFirstTabbable(element) {
     return findFirstCondition(element, node => node instanceof Element && isTabbable(node));

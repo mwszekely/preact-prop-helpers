@@ -15,9 +15,6 @@ function processRef(instance, ref) {
 }
 /**
  * Combines two refs into one. This allows a component to both use its own ref *and* forward a ref that was given to it.
- * @param lhs
- * @param rhs
- * @returns
  */
 export function useMergedRefs(rhs, lhs) {
     monitorCallCount(useMergedRefs);

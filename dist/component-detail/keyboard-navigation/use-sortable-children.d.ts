@@ -23,8 +23,8 @@ export interface UseSortableChildrenParametersSelf<M extends UseRearrangeableChi
      *
      * If null, a default sort is used that assumes `getSortValue` returns a value that works well with the `-` operator (so, like, a number, string, `Date`, `null`, etc.)
      *
-     * @param lhs
-     * @param rhs
+     * @param lhs - The first value to compare
+     * @param rhs - The second value to compare
      */
     compare: null | Compare<M>;
 }
@@ -116,6 +116,8 @@ export interface UseSortableChildInfo extends UseRearrangeableChildInfo {
  * the prop-modifying hook inspects the given children, then re-creates them with new `key`s.
  * Because keys are given special treatment and a child has no way of modifying its own key
  * there's no other time or place this can happen other than exactly within the parent component's render function.
+ *
+ * @compositeParams
  */
 export declare function useRearrangeableChildren<M extends UseSortableChildInfo>({ rearrangeableChildrenParameters: { getIndex, onRearranged }, managedChildrenReturn: { getChildren } }: UseRearrangeableChildrenParameters<M>): UseRearrangeableChildrenReturnType<M>;
 /**

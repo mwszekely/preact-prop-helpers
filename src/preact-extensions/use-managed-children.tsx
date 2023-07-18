@@ -457,9 +457,6 @@ export interface UseChildrenFlagReturnType<M extends ManagedChildInfo<any>, R> {
  * 
  * Also because of that, the types of this function are rather odd.  It's better to start off using a hook that already uses a flag, such as `useRovingTabIndex`, as an example.
  * 
- * 
- * @param param0 
- * @returns 
  */
 export function useChildrenFlag<M extends ManagedChildInfo<number | string>, R>({ getChildren, initialIndex, closestFit, onClosestFit, onIndexChange, getAt, setAt, isValid }: UseChildrenFlagParameters<M, R>): UseChildrenFlagReturnType<M, R> {
     useEnsureStability("useChildrenFlag", onIndexChange, getAt, setAt, isValid);

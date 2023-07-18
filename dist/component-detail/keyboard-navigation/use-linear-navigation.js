@@ -8,6 +8,10 @@ import { monitorCallCount } from "../../util/use-call-count.js";
  * the tabbable index with the arrow keys.
  *
  * @see useListNavigation, which packages everything up together.
+ *
+ * @hasChild {@link useLinearNavigationChild}
+ *
+ * @compositeParams
  */
 export function useLinearNavigation({ rovingTabIndexReturn, linearNavigationParameters }) {
     monitorCallCount(useLinearNavigation);

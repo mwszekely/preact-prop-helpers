@@ -31,7 +31,7 @@ export interface UseAsyncHandlerReturnType<EventType, CaptureType> extends UseAs
      * back" while you're waiting for the handler to finish.
      * 
      * Something like `value={pending? currentCapture : value}` is good for checkboxes,
-     * something like `value={(pending || hasFocus)? currentCapture : value} for text fields.
+     * something like `value={(pending || hasFocus)? currentCapture : value\}` for text fields.
      * 
      * @see hasCapture
      */

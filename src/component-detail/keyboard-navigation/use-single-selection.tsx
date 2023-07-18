@@ -23,8 +23,8 @@ export interface UseSingleSelectionChildInfo<E extends Element> extends UseRovin
      * 
      * When the `selectedIndex` changes, the relevant children's `setLocalSelected` are called (max of 2).
      * 
-     * @param selected This is the selected child (out of all of them)
-     * @param direction How far to the `selectedIndex` this child is
+     * @param selected - This is the selected child (out of all of them)
+     * @param direction - How far to the `selectedIndex` this child is
      */
     setLocalSelected(selected: boolean, direction: number | null): void;
 
@@ -151,7 +151,13 @@ export interface UseSingleSelectionContext {
     singleSelectionContext: SingleSelectionContextSelf;
 }
 
-
+/**
+ * 
+ * 
+ * @hasChild {@link useSingleSelectionChild}
+ * 
+ * @compositeParams
+ */
 export function useSingleSelection<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseSingleSelectionChildInfo<ChildElement>>({
     managedChildrenReturn: { getChildren, ...void1 },
     rovingTabIndexReturn: { setTabbableIndex, ...void2 },
@@ -222,6 +228,11 @@ export function useSingleSelection<ParentOrChildElement extends Element, ChildEl
 }
 
 
+/**
+ * 
+ * 
+ * @compositeParams
+ */
 export function useSingleSelectionChild<ChildElement extends Element, M extends UseSingleSelectionChildInfo<ChildElement>>({
     context: { singleSelectionContext: { getSelectedIndex, onSelectedIndexChange, ariaPropName, selectionMode, ...void1 }, ...void2 },
     info: { index, unselectable, ...void3 },

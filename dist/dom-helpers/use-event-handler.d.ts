@@ -34,8 +34,7 @@ type TypedEventHandlerEvent<E extends EventTarget, T extends TypedEventListenerT
  *
  * The default, `"grouped"`, is faster when you have, say, a button component, used hundreds of times on a page, that each installs a global event handler.
  *
- * @param target A *non-Preact* node to attach the event to.
- * @returns
+ * @param target - A *non-Preact* node to attach the event to.
  * *
  */
 export declare function useGlobalHandler<T extends EventTarget, EventType extends TypedEventListenerTypes<T>, H extends TypedEventHandlerEvent<T, EventType>>(target: T, type: EventType, handler: null | ((e: H) => void), options?: Parameters<TypedAddEventListener<T>>[2], mode?: "grouped" | "single"): void;

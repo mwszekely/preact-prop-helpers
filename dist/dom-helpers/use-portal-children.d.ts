@@ -15,9 +15,6 @@ export interface UsePortalChildrenReturnType {
  * Returns the portal (as `children`, and functions to add, remove, or update a child to the portaled area)
  *
  * TODO: Can't push a child until after the very first `useLayoutEffect`
- *
- * @param param0
- * @returns
  */
 export declare function usePortalChildren({ target }: UsePortalChildrenParameters): {
     children: import("preact").VNode<any> | null;

@@ -43,7 +43,7 @@ export interface UseFocusTrapParameters<SourceElement extends Element | null, Po
          * 
          * This is tracked for you; by default, just call `lastFocused?.focus()`, but you can also override this behavior
          * and just do whatever you want with any element.  
-         * @param lastFocused 
+         * @param lastFocused - The element that was focused before the modal was opened
          */
         focusOpener(lastFocused: SourceElement | null): void;
     }
@@ -110,8 +110,6 @@ export function useFocusTrap<SourceElement extends Element | null, PopupElement 
 
 /**
  * Returns the first focusable element contained within the given node, or null if none are found.
- * @param element 
- * @returns 
  */
 export function findFirstFocusable<T extends Node>(element: T): T | null {
     return findFirstCondition<T>(element, node => node instanceof Element && isFocusable(node));
@@ -119,8 +117,6 @@ export function findFirstFocusable<T extends Node>(element: T): T | null {
 
 /**
  * Returns the first tabbable element contained within the given node, or null if none are found.
- * @param element 
- * @returns 
  */
 export function findFirstTabbable<T extends Node>(element: T): T | null {
     return findFirstCondition<T>(element, node => node instanceof Element && isTabbable(node));

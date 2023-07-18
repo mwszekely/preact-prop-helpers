@@ -4,6 +4,7 @@ import { DocBlock, DocCodeSpan, DocComment, DocFencedCode, DocLinkTag, DocNode, 
 import { RecursiveMap } from "map-and-set-extensions";
 import { dirname, join } from "path";
 import { fileURLToPath } from 'url';
+import { generateReadme } from "./readme-gen.js";
 
 const KnownTypes = {
     DocSection: new Set(["Paragraph", "FencedCode"]),
@@ -79,6 +80,8 @@ if (!apiPackage.tsdocComment?.modifierTagSet.isPackageDocumentation()) {
 }
 
 let packageDocumentation = apiPackage.tsdocComment!;
+let ret = generateReadme(packageDocumentation, { api: apiPackage, model: apiModel });
+debugger;
 let baseMarkdown = `${toMarkdown(packageDocumentation, MDContextDefault())}`;
 debugger;
 

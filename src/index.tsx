@@ -3,19 +3,25 @@
  * 
  * A selection of custom hooks for Preact.
  * 
- * ```md
- * ## `useMergedProps`
- * ### `useMergedClasses`
- * ### `useMergedRefs`
- * ### `useMergedStyles`
- * ### `useMergedChildren`
- * ```
+ * ## List of hooks (in rough order of priority)
  * 
- * @include {@link useMergedProps}
+ * This is the first hook: {@include } {@link useMergedProps}
  * 
- * ## `useCompleteListNavigation`
+ * {@include } {@link useCompleteListNavigation}
  * 
- * @include {@link useCompleteListNavigation}
+ * {@include } {@link useRovingTabIndex}
+ * 
+ * {@include } {@link useLinearNavigation}
+ * 
+ * {@include } {@link useTypeaheadNavigation}
+ * 
+ * {@include } {@link useSingleSelection}
+ * 
+ * {@include } {@link useRearrangeableChildren}
+ * 
+ * {@include } {@link usePaginatedChildren}
+ * 
+ * {@include } {@link useStaggeredChildren}
  *
  * @packageDocumentation
  */

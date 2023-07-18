@@ -18,7 +18,12 @@ import { monitorCallCount } from "../../util/use-call-count.js";
  * lets you change the tabbable index with typeahead, or
  * `useListNavigation(Complete)` if you just want everything bundled together.
  *
- * @param - {@link UseRovingTabIndexParameters}
+ *
+ * @hasChild {@link useRovingTabIndexChild}
+ *
+ * @compositeParams
+ *
+ * @param args - {@link UseRovingTabIndexParameters}
  * @returns - {@link UseRovingTabIndexReturnType}
  */
 export function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovingTabIndexParameters: { focusSelfParent: focusSelfParentUnstable, untabbable, untabbableBehavior, initiallyTabbedIndex, onTabbableIndexChange }, refElementReturn: { getElement }, ...void1 }) {
@@ -188,8 +193,8 @@ export function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovi
 }
 /**
  * @see {@link useRovingTabIndex}
- * @param - {@link UseRovingTabIndexChildParameters}
- * @return - {@link UseRovingTabIndexChildReturnType}
+ * @param args - {@link UseRovingTabIndexChildParameters}
+ * @returns - {@link UseRovingTabIndexChildReturnType}
  */
 export function useRovingTabIndexChild({ info: { index, untabbable: iAmUntabbable, ...void2 }, context: { rovingTabIndexContext: { giveParentFocusedElement, untabbable: parentIsUntabbable, untabbableBehavior, reevaluateClosestFit, setTabbableIndex, getInitiallyTabbedIndex, parentFocusSelf } }, refElementReturn: { getElement }, ...void3 }) {
     monitorCallCount(useRovingTabIndexChild);

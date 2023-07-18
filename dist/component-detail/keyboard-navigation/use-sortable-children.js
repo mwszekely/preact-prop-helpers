@@ -23,6 +23,8 @@ import { monitorCallCount } from "../../util/use-call-count.js";
  * the prop-modifying hook inspects the given children, then re-creates them with new `key`s.
  * Because keys are given special treatment and a child has no way of modifying its own key
  * there's no other time or place this can happen other than exactly within the parent component's render function.
+ *
+ * @compositeParams
  */
 export function useRearrangeableChildren({ rearrangeableChildrenParameters: { getIndex, onRearranged }, managedChildrenReturn: { getChildren } }) {
     monitorCallCount(useRearrangeableChildren);

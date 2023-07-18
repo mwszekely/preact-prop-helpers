@@ -10,7 +10,7 @@ function supportsPointerEvents() {
 }
 /**
  * Adds the necessary event handlers to create a "press"-like event for
- * any element, whether it's a native &lt;button> or regular &lt;div>,
+ * any element, whether it's a native &lt;button&gt; or regular &lt;div&gt;,
  * and allows for a "long press" that can be used to,
  * e.g., show a tooltip *instead* of activating a press.
  *
@@ -25,8 +25,6 @@ function supportsPointerEvents() {
  * in that `hover` won't mess up mobile devices that see `hover` and mess up your click events,
  * and in that `active` accurately displays when a press would occur or not.
  *
- * @param onClickSync
- * @param exclude Whether the polyfill shouldn't apply (can specify for specific interactions)
  */
 export function usePress(args) {
     monitorCallCount(usePress);
@@ -358,8 +356,7 @@ let pulse = (("vibrate" in navigator) && (navigator.vibrate instanceof Function)
  * This function can be used to enable/disable button vibration pulses on an app-wide scale.
  *
  *
- * @param func The function to run when a button is tapped.
- * (Default is `() => navigator.vibrate(10)` in browsers that support it, a noop otherwise)
+ * @param func - The function to run when a button is tapped. (Default is `() => navigator.vibrate(10)` in browsers that support it, a noop otherwise)
  */
 export function setPressVibrate(func) {
     pulse = func;

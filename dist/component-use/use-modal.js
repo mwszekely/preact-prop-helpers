@@ -10,7 +10,6 @@ import { monitorCallCount } from "../util/use-call-count.js";
  *
  * Use for dialogs, menus, etc.  Anything that can be dismissed and might trap focus, basically.
  *
- * @param param0
  * @returns
  */
 export function useModal({ dismissParameters, escapeDismissParameters, focusTrapParameters: { trapActive, ...focusTrapParameters } }) {

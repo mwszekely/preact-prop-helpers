@@ -32,18 +32,18 @@ export function storeToLocalStorage(key, value, converter = JSON.stringify, stor
 /**
  * Use module augmentation to get the correct types for this function.
  *
- * ````
+ * ```typescript
  * declare module 'preact-prop-helpers' {
  *     interface PersistentStates {
  *         numberState: number;
  *         stringState: string;
- *     }
- * }
- * ````
- * @param key
- * @param initialValue
- * @param fromString
- * @param toString
+ *     \}
+ * \}
+ * ```
+ * @param key -
+ * @param initialValue -
+ * @param fromString -
+ * @param toString -
  * @returns
  */
 export function usePersistentState(key, initialValue, fromString = JSON.parse, toString = JSON.stringify, storage = localStorage) {

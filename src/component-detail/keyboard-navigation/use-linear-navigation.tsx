@@ -43,8 +43,8 @@ export interface UseLinearNavigationParametersSelf<ChildElement extends Element>
      * Controls how many elements are skipped over when page up/down are pressed.
      * 
      * * When 0: Page Up/Down are disabled
-     * * When >= 1: Page Up/Down moves that number of elements up or down
-     * * When 0 < x < 1, Page Up/Down moves by that percentage of all elements, or of 100 elements, whichever is higher. In other words, 0.1 jumps by 10 elements when there are fewer then 100 elements, and 20 elements when there are 200 elements.
+     * * When &gt;= 1: Page Up/Down moves that number of elements up or down
+     * * When 0 &lt; x &lt; 1, Page Up/Down moves by that percentage of all elements, or of 100 elements, whichever is higher. In other words, 0.1 jumps by 10 elements when there are fewer then 100 elements, and 20 elements when there are 200 elements.
      */
     pageNavigationSize: number;
 
@@ -112,6 +112,10 @@ export interface UseLinearNavigationParametersSelf<ChildElement extends Element>
  * the tabbable index with the arrow keys.
  * 
  * @see useListNavigation, which packages everything up together.
+ * 
+ * @hasChild {@link useLinearNavigationChild}
+ * 
+ * @compositeParams
  */
 export function useLinearNavigation<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseLinearNavigationChildInfo<ChildElement>>({
     rovingTabIndexReturn,

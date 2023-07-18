@@ -6,10 +6,25 @@
         "syntaxKind": "block",
         "allowMultiple": true
       },
+      // When followed immediately by a @link tag,
+      // generates the documentation for that item
+      // and includes it in the current markup generation.
       {
         "tagName": "@include",
+        "syntaxKind": "inline",
+        "allowMultiple": true
+      },
+      // Refers to the child version of a function (e.g. useRovingTabIndexChild)
+      {
+        "tagName": "@hasChild",
         "syntaxKind": "block",
         "allowMultiple": true
+      },
+      {
+        // Indicates that this is one of those special functions with special parameter handling
+        "tagName": "@compositeParams",
+        "syntaxKind": "modifier",
+        "allowMultiple": false
       }
     ]
   }

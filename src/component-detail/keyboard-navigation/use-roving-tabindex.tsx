@@ -234,7 +234,12 @@ export interface UseRovingTabIndexChildReturnType<ChildElement extends Element, 
  * lets you change the tabbable index with typeahead, or
  * `useListNavigation(Complete)` if you just want everything bundled together.
  * 
- * @param - {@link UseRovingTabIndexParameters}
+ * 
+ * @hasChild {@link useRovingTabIndexChild}
+ * 
+ * @compositeParams
+ * 
+ * @param args - {@link UseRovingTabIndexParameters}
  * @returns - {@link UseRovingTabIndexReturnType}
  */
 export function useRovingTabIndex<ParentElement extends Element, ChildElement extends Element, M extends UseRovingTabIndexChildInfo<ChildElement>>({
@@ -431,8 +436,8 @@ export function useRovingTabIndex<ParentElement extends Element, ChildElement ex
 
 /**
  * @see {@link useRovingTabIndex}
- * @param - {@link UseRovingTabIndexChildParameters}
- * @return - {@link UseRovingTabIndexChildReturnType}
+ * @param args - {@link UseRovingTabIndexChildParameters}
+ * @returns - {@link UseRovingTabIndexChildReturnType}
  */
 export function useRovingTabIndexChild<ChildElement extends Element, M extends UseRovingTabIndexChildInfo<ChildElement>>({
     info: { index, untabbable: iAmUntabbable, ...void2 },

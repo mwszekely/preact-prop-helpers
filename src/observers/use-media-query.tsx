@@ -11,8 +11,8 @@ import { monitorCallCount } from "../util/use-call-count.js";
  * stores the result of the media query. This can be mitigated with the `defaultGuess`
  * parameter -- if you guess correctly (`true`/`false`), then there's no penalty. Hooray.
  * 
- * @param query Must be in parens, e.g. `(max-width: 600px)`
- * @param defaultGuess Optional. If you pass the same value that's measured after rendering, no re-render will occur.
+ * @param query - Must be in parens, e.g. `(max-width: 600px)`
+ * @param defaultGuess - Optional. If you pass the same value that's measured after rendering, no re-render will occur.
  * @returns `UseMediaQueryReturnType`
  */
 export function useMediaQuery(query: string | null | undefined, defaultGuess?: boolean): UseMediaQueryReturnType {

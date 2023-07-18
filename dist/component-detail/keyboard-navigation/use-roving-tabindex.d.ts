@@ -178,14 +178,19 @@ export interface UseRovingTabIndexChildReturnType<ChildElement extends Element, 
  * lets you change the tabbable index with typeahead, or
  * `useListNavigation(Complete)` if you just want everything bundled together.
  *
- * @param - {@link UseRovingTabIndexParameters}
+ *
+ * @hasChild {@link useRovingTabIndexChild}
+ *
+ * @compositeParams
+ *
+ * @param args - {@link UseRovingTabIndexParameters}
  * @returns - {@link UseRovingTabIndexReturnType}
  */
 export declare function useRovingTabIndex<ParentElement extends Element, ChildElement extends Element, M extends UseRovingTabIndexChildInfo<ChildElement>>({ managedChildrenReturn: { getChildren }, rovingTabIndexParameters: { focusSelfParent: focusSelfParentUnstable, untabbable, untabbableBehavior, initiallyTabbedIndex, onTabbableIndexChange }, refElementReturn: { getElement }, ...void1 }: UseRovingTabIndexParameters<ParentElement, ChildElement, M>): UseRovingTabIndexReturnType<ParentElement, ChildElement, M>;
 /**
  * @see {@link useRovingTabIndex}
- * @param - {@link UseRovingTabIndexChildParameters}
- * @return - {@link UseRovingTabIndexChildReturnType}
+ * @param args - {@link UseRovingTabIndexChildParameters}
+ * @returns - {@link UseRovingTabIndexChildReturnType}
  */
 export declare function useRovingTabIndexChild<ChildElement extends Element, M extends UseRovingTabIndexChildInfo<ChildElement>>({ info: { index, untabbable: iAmUntabbable, ...void2 }, context: { rovingTabIndexContext: { giveParentFocusedElement, untabbable: parentIsUntabbable, untabbableBehavior, reevaluateClosestFit, setTabbableIndex, getInitiallyTabbedIndex, parentFocusSelf } }, refElementReturn: { getElement }, ...void3 }: UseRovingTabIndexChildParameters<ChildElement, M>): UseRovingTabIndexChildReturnType<ChildElement, M>;
 //# sourceMappingURL=use-roving-tabindex.d.ts.map

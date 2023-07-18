@@ -17,9 +17,7 @@ export function enableLoggingPropConflicts(log2: typeof console["log"]) {
  * Given two sets of props, merges them and returns the result.
  * 
  * The hook is aware of and can intelligently merge `className`, `class`, `style`, `ref`, and all event handlers.
- * @param lhs2 
- * @param rhs2 
- * @returns 
+ * @param allProps - A variadic number of props to merge into one
  */
 export function useMergedProps<E extends EventTarget>(...allProps: ElementProps<E>[]) {
     monitorCallCount(useMergedProps);
