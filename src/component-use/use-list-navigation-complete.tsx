@@ -3,8 +3,8 @@ import { useListNavigationSingleSelectionChild } from "../component-detail/keybo
 import { RovingTabIndexChildContext } from "../component-detail/keyboard-navigation/use-roving-tabindex.js";
 import { MakeSingleSelectionDeclarativeParameters, UseSingleSelectionContext, useSingleSelectionDeclarative, UseSingleSelectionParameters } from "../component-detail/keyboard-navigation/use-single-selection.js";
 import { UseTypeaheadNavigationContext } from "../component-detail/keyboard-navigation/use-typeahead-navigation.js";
-import { usePaginatedChild, UsePaginatedChildContext, usePaginatedChildren, UsePaginatedChildrenInfo, UsePaginatedChildrenParameters, UsePaginatedChildrenReturnType, UsePaginatedChildReturn } from "../component-detail/use-paginated-children.js";
-import { useStaggeredChild, UseStaggeredChildContext, useStaggeredChildren, UseStaggeredChildrenInfo, UseStaggeredChildrenParameters, UseStaggeredChildrenReturnType, UseStaggeredChildReturn } from "../component-detail/use-staggered-children.js";
+import { usePaginatedChild, UsePaginatedChildContext, usePaginatedChildren, UsePaginatedChildrenInfo, UsePaginatedChildrenParameters, UsePaginatedChildrenReturnType, UsePaginatedChildReturnType } from "../component-detail/use-paginated-children.js";
+import { useStaggeredChild, UseStaggeredChildContext, useStaggeredChildren, UseStaggeredChildrenInfo, UseStaggeredChildrenParameters, UseStaggeredChildrenReturnType, UseStaggeredChildReturnType } from "../component-detail/use-staggered-children.js";
 import { useMergedProps } from "../dom-helpers/use-merged-props.js";
 import { useRefElement, UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
 import { useChildrenHaveFocus, useChildrenHaveFocusChild, UseChildrenHaveFocusContext, UseChildrenHaveFocusReturnType } from "../observers/use-children-have-focus.js";
@@ -83,8 +83,8 @@ export interface UseCompleteListNavigationChildReturnType<ChildElement extends E
      * This hook does not include `usePress`, so when you call it for whatever element is responsible for selecting this child, pass it these parameters.
      */
     pressParameters: Pick<UsePressParameters<any>["pressParameters"], "onPressSync" | "excludeSpace">;
-    paginatedChildReturn: UsePaginatedChildReturn<ChildElement>["paginatedChildReturn"];
-    staggeredChildReturn: UseStaggeredChildReturn<ChildElement>["staggeredChildReturn"];
+    paginatedChildReturn: UsePaginatedChildReturnType<ChildElement>["paginatedChildReturn"];
+    staggeredChildReturn: UseStaggeredChildReturnType<ChildElement>["staggeredChildReturn"];
 }
 
 

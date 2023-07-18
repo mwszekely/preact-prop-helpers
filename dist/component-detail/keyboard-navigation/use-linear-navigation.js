@@ -9,8 +9,6 @@ import { monitorCallCount } from "../../util/use-call-count.js";
  *
  * @see useListNavigation, which packages everything up together.
  *
- * @hasChild {@link useLinearNavigationChild}
- *
  * @compositeParams
  */
 export function useLinearNavigation({ rovingTabIndexReturn, linearNavigationParameters }) {

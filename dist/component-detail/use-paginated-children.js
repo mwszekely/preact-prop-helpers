@@ -2,6 +2,11 @@ import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useState } from "../preact-extensions/use-state.js";
 import { useCallback, useEffect, useMemo, useRef } from "../util/lib.js";
 import { monitorCallCount } from "../util/use-call-count.js";
+/**
+ * @compositeParams
+ *
+ * @hasChild {@link usePaginatedChild}
+ */
 export function usePaginatedChildren({ managedChildrenReturn: { getChildren }, linearNavigationParameters: { indexDemangler }, paginatedChildrenParameters: { paginationMax, paginationMin }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex }, refElementReturn: { getElement } }) {
     monitorCallCount(usePaginatedChildren);
     const [childCount, setChildCount] = useState(null);
@@ -68,6 +73,9 @@ export function usePaginatedChildren({ managedChildrenReturn: { getChildren }, l
         paginatedChildrenReturn: { refreshPagination, childCount }
     };
 }
+/**
+ * @compositeParams
+ */
 export function usePaginatedChild({ info: { index }, context: { paginatedChildContext: { parentIsPaginated, getDefaultPaginationVisible } } }) {
     monitorCallCount(usePaginatedChild);
     //const parentIsPaginated = (paginationMin != null || paginationMax != null);

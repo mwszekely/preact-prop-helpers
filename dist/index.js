@@ -1,27 +1,81 @@
 /**
  * # Preact Prop Helpers
  *
- * A selection of custom hooks for Preact.
+ * A small set of hooks related to modifying HTML attributes to do useful things, but also a number of other tricks and tools that I have found to be extremely useful when building UIs with Preact
+ *
+ * Everything from keyboard navigation to modal traps to `localStorage` state management is here and heavily dog-fooded.
+ *
+ * The name (Preact Prop Helpers) came because most of these hooks require modifying the props that were going to be passed to an element (generally just the `ref` on those props, but often other attributes too, like `tabIndex` and such).  It's since grown in scope to include a bunch of general helper hooks as well (like `useAsync` and `useStableCallback`).
  *
  * ## List of hooks (in rough order of priority)
  *
- * This is the first hook: {@include } {@link useMergedProps}
- *
+ * {@tableOfContents start}
+ * {@tableOfContents header Common}
+ * {@tableOfContents subheader These hooks are used extremely commonly or provide uncommonly useful behavior}
+ * {@include } {@link useMergedProps}
+ * {@include } {@link useRefElement}
+ * {@include } {@link usePress}
  * {@include } {@link useCompleteListNavigation}
- *
+ * {@include } {@link useCompleteGridNavigation}
+ * {@include } {@link useModal}
+ * {@include } {@link useAsyncHandler}
+ * {@include } {@link useManagedChildren}
+ * {@tableOfContents header Less common but still useful}
+ * {@tableOfContents subheader These hooks are useful, but in more specific circumstances}
+ * {@include } {@link useRandomId}
+ * {@include } {@link useRandomDualIds}
+ * {@include } {@link useHasCurrentFocus}
+ * {@include } {@link useHasLastFocus}
+ * {@include } {@link useChildrenHaveFocus}
+ * {@include } {@link useHideScroll}
+ * {@include } {@link useGlobalHandler}
+ * {@include } {@link useDocumentClass}
+ * {@include } {@link useElementSize}
+ * {@tableOfContents header Niche}
+ * {@include } {@link useMediaQuery}
+ * {@include } {@link useAsyncEffect}
+ * {@include } {@link useMutationObserver}
+ * {@include } {@link useImperativeProps}
+ * {@include } {@link useTextContent}
+ * {@include } {@link usePortalChildren}
+ * {@include } {@link useActiveElement}
+ * {@include } {@link useDraggable}
+ * {@include } {@link useDroppable}
+ * {@include } {@link useLogicalDirection}
+ * {@tableOfContents header Extensions}
+ * {@tableOfContents subheader These hooks don't do anything with HTML elements but are useful extensions to Preact's built-in hooks}
+ * {@include } {@link useForceUpdate}
+ * {@include } {@link useState}
+ * {@include } {@link usePassiveState}
+ * {@include } {@link usePersistentState}
+ * {@include } {@link useSearchParamState}
+ * {@include } {@link useStableGetter}
+ * {@include } {@link useStableCallback}
+ * {@include } {@link useMemoObject}
+ * {@include } {@link useAnimationFrame}
+ * {@include } {@link useInterval}
+ * {@include } {@link useTimeout}
+ * {@include } {@link useEffectDebug}
+ * {@include } {@link useLayoutEffectDebug}
+ * {@include } {@link useTimeout}
+ * {@tableOfContents header Helpers for list navigation (and others)}
+ * {@tableOfContents subheader These hooks are primarily used to build larger hooks, but can be used alone}
+ * {@include } {@link useListNavigation}
+ * {@include } {@link useGridNavigation}
  * {@include } {@link useRovingTabIndex}
- *
  * {@include } {@link useLinearNavigation}
- *
  * {@include } {@link useTypeaheadNavigation}
- *
  * {@include } {@link useSingleSelection}
- *
  * {@include } {@link useRearrangeableChildren}
- *
  * {@include } {@link usePaginatedChildren}
- *
  * {@include } {@link useStaggeredChildren}
+ * {@include } {@link useAsync}
+ * {@include } {@link useUrl}
+ * {@include } {@link useMergedRefs}
+ * {@include } {@link useMergedClasses}
+ * {@include } {@link useMergedChildren}
+ * {@include } {@link useMergedStyles}
+ * {@tableOfContents end}
  *
  * @packageDocumentation
  */

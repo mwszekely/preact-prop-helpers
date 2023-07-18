@@ -25,6 +25,14 @@
         "tagName": "@compositeParams",
         "syntaxKind": "modifier",
         "allowMultiple": false
+      },
+      // In @packageDocumentation, helps to build the ToC.
+      // Format: {@tableOfContents [start|end|header|subheader] [header/subheader content]}
+      // e.g. {@tableOfContents subheader This is the subheader}
+      {
+        "tagName": "@tableOfContents",
+        "syntaxKind": "inline",
+        "allowMultiple": true
       }
     ]
   }

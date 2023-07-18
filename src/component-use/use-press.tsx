@@ -83,6 +83,7 @@ function supportsPointerEvents() {
  * and allows for a "long press" that can be used to, 
  * e.g., show a tooltip *instead* of activating a press.
  * 
+ * @remarks 
  * Notably, the following cases are covered:
  * * The target element is properly focused, even on iOS Safari (*especially* on iOS Safari)
  * * Double-clicks won't select text, it just presses the button twice.
@@ -93,6 +94,8 @@ function supportsPointerEvents() {
  * In addition, returns a "more accurate" CSS `active` and `hover`; more accurate
  * in that `hover` won't mess up mobile devices that see `hover` and mess up your click events,
  * and in that `active` accurately displays when a press would occur or not.
+ * 
+ * @see {@link setPressVibrate}
  * 
  */
 export function usePress<E extends Element>(args: UsePressParameters<E>): UsePressReturnType<E> {

@@ -143,18 +143,19 @@ export interface RovingTabIndexChildContextSelf {
 export interface RovingTabIndexChildContext {
     rovingTabIndexContext: RovingTabIndexChildContextSelf;
 }
+export interface UseRovingTabIndexChildReturnTypeSelf {
+    /**
+     * *Unstable*
+     *
+     * Whether this child, individually, is *the* currently tabbable child.
+     */
+    tabbable: boolean;
+    /** **STABLE** */
+    getTabbable(): boolean;
+}
 export interface UseRovingTabIndexChildReturnType<ChildElement extends Element, M extends UseRovingTabIndexChildInfo<ChildElement>> extends Required<TargetedPick<UseHasCurrentFocusParameters<ChildElement>, "hasCurrentFocusParameters", "onCurrentFocusedInnerChanged">> {
     /** Return information about the tabbable state of this child */
-    rovingTabIndexChildReturn: {
-        /**
-         * *Unstable*
-         *
-         * Whether this child, individually, is *the* currently tabbable child.
-         */
-        tabbable: boolean;
-        /** **STABLE** */
-        getTabbable(): boolean;
-    };
+    rovingTabIndexChildReturn: UseRovingTabIndexChildReturnTypeSelf;
     /**
      * Pass this to `useManagedChild`.
      */
@@ -188,6 +189,8 @@ export interface UseRovingTabIndexChildReturnType<ChildElement extends Element, 
  */
 export declare function useRovingTabIndex<ParentElement extends Element, ChildElement extends Element, M extends UseRovingTabIndexChildInfo<ChildElement>>({ managedChildrenReturn: { getChildren }, rovingTabIndexParameters: { focusSelfParent: focusSelfParentUnstable, untabbable, untabbableBehavior, initiallyTabbedIndex, onTabbableIndexChange }, refElementReturn: { getElement }, ...void1 }: UseRovingTabIndexParameters<ParentElement, ChildElement, M>): UseRovingTabIndexReturnType<ParentElement, ChildElement, M>;
 /**
+ * @compositeParams
+ *
  * @see {@link useRovingTabIndex}
  * @param args - {@link UseRovingTabIndexChildParameters}
  * @returns - {@link UseRovingTabIndexChildReturnType}

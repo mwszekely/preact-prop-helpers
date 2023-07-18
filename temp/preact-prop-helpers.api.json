@@ -132,6 +132,11 @@
         {
           "tagName": "@compositeParams",
           "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@tableOfContents",
+          "syntaxKind": "inline",
+          "allowMultiple": true
         }
       ],
       "reportUnsupportedHtmlElements": false
@@ -139,7 +144,7 @@
   },
   "kind": "Package",
   "canonicalReference": "preact-prop-helpers!",
-  "docComment": "/**\n * # Preact Prop Helpers\n *\n * A selection of custom hooks for Preact.\n *\n * ## List of hooks (in rough order of priority)\n *\n * This is the first hook: {@include} {@link useMergedProps}\n *\n * {@include} {@link useCompleteListNavigation}\n *\n * {@include} {@link useRovingTabIndex}\n *\n * {@include} {@link useLinearNavigation}\n *\n * {@include} {@link useTypeaheadNavigation}\n *\n * {@include} {@link useSingleSelection}\n *\n * {@include} {@link useRearrangeableChildren}\n *\n * {@include} {@link usePaginatedChildren}\n *\n * {@include} {@link useStaggeredChildren}\n *\n * @packageDocumentation\n */\n",
+  "docComment": "/**\n * # Preact Prop Helpers\n *\n * A small set of hooks related to modifying HTML attributes to do useful things, but also a number of other tricks and tools that I have found to be extremely useful when building UIs with Preact\n *\n * Everything from keyboard navigation to modal traps to `localStorage` state management is here and heavily dog-fooded.\n *\n * The name (Preact Prop Helpers) came because most of these hooks require modifying the props that were going to be passed to an element (generally just the `ref` on those props, but often other attributes too, like `tabIndex` and such). It's since grown in scope to include a bunch of general helper hooks as well (like `useAsync` and `useStableCallback`).\n *\n * ## List of hooks (in rough order of priority)\n *\n * {@tableOfContents start} {@tableOfContents header Common} {@tableOfContents subheader These hooks are used extremely commonly or provide uncommonly useful behavior} {@include} {@link useMergedProps} {@include} {@link useRefElement} {@include} {@link usePress} {@include} {@link useCompleteListNavigation} {@include} {@link useCompleteGridNavigation} {@include} {@link useModal} {@include} {@link useAsyncHandler} {@include} {@link useManagedChildren} {@tableOfContents header Less common but still useful} {@tableOfContents subheader These hooks are useful, but in more specific circumstances} {@include} {@link useRandomId} {@include} {@link useRandomDualIds} {@include} {@link useHasCurrentFocus} {@include} {@link useHasLastFocus} {@include} {@link useChildrenHaveFocus} {@include} {@link useHideScroll} {@include} {@link useGlobalHandler} {@include} {@link useDocumentClass} {@include} {@link useElementSize} {@tableOfContents header Niche} {@include} {@link useMediaQuery} {@include} {@link useAsyncEffect} {@include} {@link useMutationObserver} {@include} {@link useImperativeProps} {@include} {@link useTextContent} {@include} {@link usePortalChildren} {@include} {@link useActiveElement} {@include} {@link useDraggable} {@include} {@link useDroppable} {@include} {@link useLogicalDirection} {@tableOfContents header Extensions} {@tableOfContents subheader These hooks don't do anything with HTML elements but are useful extensions to Preact's built-in hooks} {@include} {@link useForceUpdate} {@include} {@link useState} {@include} {@link usePassiveState} {@include} {@link usePersistentState} {@include} {@link useSearchParamState} {@include} {@link useStableGetter} {@include} {@link useStableCallback} {@include} {@link useMemoObject} {@include} {@link useAnimationFrame} {@include} {@link useInterval} {@include} {@link useTimeout} {@include} {@link useEffectDebug} {@include} {@link useLayoutEffectDebug} {@include} {@link useTimeout} {@tableOfContents header Helpers for list navigation (and others)} {@tableOfContents subheader These hooks are primarily used to build larger hooks, but can be used alone} {@include} {@link useListNavigation} {@include} {@link useGridNavigation} {@include} {@link useRovingTabIndex} {@include} {@link useLinearNavigation} {@include} {@link useTypeaheadNavigation} {@include} {@link useSingleSelection} {@include} {@link useRearrangeableChildren} {@include} {@link usePaginatedChildren} {@include} {@link useStaggeredChildren} {@include} {@link useAsync} {@include} {@link useUrl} {@include} {@link useMergedRefs} {@include} {@link useMergedClasses} {@include} {@link useMergedChildren} {@include} {@link useMergedStyles} {@tableOfContents end}\n *\n * @packageDocumentation\n */\n",
   "name": "preact-prop-helpers",
   "preserveMemberOrder": false,
   "members": [
@@ -13933,8 +13938,8 @@
             },
             {
               "kind": "Reference",
-              "text": "UsePaginatedChildReturn",
-              "canonicalReference": "preact-prop-helpers!UsePaginatedChildReturn:interface"
+              "text": "UsePaginatedChildReturnType",
+              "canonicalReference": "preact-prop-helpers!UsePaginatedChildReturnType:interface"
             },
             {
               "kind": "Content",
@@ -13955,8 +13960,8 @@
             },
             {
               "kind": "Reference",
-              "text": "UseStaggeredChildReturn",
-              "canonicalReference": "preact-prop-helpers!UseStaggeredChildReturn:interface"
+              "text": "UseStaggeredChildReturnType",
+              "canonicalReference": "preact-prop-helpers!UseStaggeredChildReturnType:interface"
             },
             {
               "kind": "Content",
@@ -14790,8 +14795,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "UsePaginatedChildReturn",
-                  "canonicalReference": "preact-prop-helpers!UsePaginatedChildReturn:interface"
+                  "text": "UsePaginatedChildReturnType",
+                  "canonicalReference": "preact-prop-helpers!UsePaginatedChildReturnType:interface"
                 },
                 {
                   "kind": "Content",
@@ -14927,8 +14932,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "UseStaggeredChildReturn",
-                  "canonicalReference": "preact-prop-helpers!UseStaggeredChildReturn:interface"
+                  "text": "UseStaggeredChildReturnType",
+                  "canonicalReference": "preact-prop-helpers!UseStaggeredChildReturnType:interface"
                 },
                 {
                   "kind": "Content",
@@ -24261,7 +24266,7 @@
         {
           "kind": "Function",
           "canonicalReference": "preact-prop-helpers!useLinearNavigation:function(1)",
-          "docComment": "/**\n * When used in tandem with `useRovingTabIndex`, allows control of the tabbable index with the arrow keys.\n *\n * @hasChild\n *\n * {@link useLinearNavigationChild}\n *\n * @see\n *\n * useListNavigation, which packages everything up together.\n *\n * @compositeParams\n */\n",
+          "docComment": "/**\n * When used in tandem with `useRovingTabIndex`, allows control of the tabbable index with the arrow keys.\n *\n * @see\n *\n * useListNavigation, which packages everything up together.\n *\n * @compositeParams\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -29278,7 +29283,7 @@
         {
           "kind": "Function",
           "canonicalReference": "preact-prop-helpers!useMergedProps:function(1)",
-          "docComment": "/**\n * Given two sets of props, merges them and returns the result.\n *\n * The hook is aware of and can intelligently merge `className`, `class`, `style`, `ref`, and all event handlers.\n *\n * @param allProps - A variadic number of props to merge into one\n */\n",
+          "docComment": "/**\n * Given two sets of props, merges them and returns the result.\n *\n * @remarks\n *\n * The hook is aware of and can intelligently merge `className`, `class`, `style`, `ref`, `children`, and all event handlers.\n *\n * If two sets of props both specify the same attribute, e.g. both specify two different `id`s, then an error will be printed to the console (customize this with {@link enableLoggingPropConflicts}), as this conflict needs to be arbitrated on by you.\n *\n * @param allProps - A variadic number of props to merge into one\n *\n * @returns A single object with all the provided props merged into one.\n *\n * @see\n *\n * {@link useMergedRefs}\n *\n * @see\n *\n * {@link useMergedStyles}\n *\n * @see\n *\n * {@link useMergedClasses}\n *\n * @see\n *\n * {@link useMergedChildren}\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -30190,7 +30195,7 @@
         {
           "kind": "Function",
           "canonicalReference": "preact-prop-helpers!usePaginatedChild:function(1)",
-          "docComment": "",
+          "docComment": "/**\n * @compositeParams\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -30243,8 +30248,8 @@
             },
             {
               "kind": "Reference",
-              "text": "UsePaginatedChildReturn",
-              "canonicalReference": "preact-prop-helpers!UsePaginatedChildReturn:interface"
+              "text": "UsePaginatedChildReturnType",
+              "canonicalReference": "preact-prop-helpers!UsePaginatedChildReturnType:interface"
             },
             {
               "kind": "Content",
@@ -30499,7 +30504,7 @@
         {
           "kind": "Function",
           "canonicalReference": "preact-prop-helpers!usePaginatedChildren:function(1)",
-          "docComment": "",
+          "docComment": "/**\n * @hasChild\n *\n * {@link usePaginatedChild}\n *\n * @compositeParams\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -30548,7 +30553,7 @@
             {
               "kind": "Reference",
               "text": "linearNavigationParameters",
-              "canonicalReference": "preact-prop-helpers!UsePaginatedChildrenParameters#linearNavigationParameters"
+              "canonicalReference": "preact-prop-helpers!~linearNavigationParameters"
             },
             {
               "kind": "Content",
@@ -30566,7 +30571,7 @@
             {
               "kind": "Reference",
               "text": "rovingTabIndexReturn",
-              "canonicalReference": "preact-prop-helpers!UsePaginatedChildrenParameters#rovingTabIndexReturn"
+              "canonicalReference": "preact-prop-helpers!~rovingTabIndexReturn"
             },
             {
               "kind": "Content",
@@ -30575,7 +30580,7 @@
             {
               "kind": "Reference",
               "text": "refElementReturn",
-              "canonicalReference": "preact-prop-helpers!UsePaginatedChildrenParameters#refElementReturn"
+              "canonicalReference": "preact-prop-helpers!~refElementReturn"
             },
             {
               "kind": "Content",
@@ -30866,6 +30871,72 @@
             },
             {
               "kind": "Content",
+              "text": ", "
+            },
+            {
+              "kind": "Reference",
+              "text": "TargetedPick",
+              "canonicalReference": "preact-prop-helpers!~TargetedPick:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "UseLinearNavigationParameters",
+              "canonicalReference": "preact-prop-helpers!UseLinearNavigationParameters:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<any, TabbableChildElement, M>, \"linearNavigationParameters\", \"indexDemangler\">"
+            },
+            {
+              "kind": "Content",
+              "text": ", "
+            },
+            {
+              "kind": "Reference",
+              "text": "TargetedPick",
+              "canonicalReference": "preact-prop-helpers!~TargetedPick:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "UseRovingTabIndexReturnType",
+              "canonicalReference": "preact-prop-helpers!UseRovingTabIndexReturnType:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<any, TabbableChildElement, M>, \"rovingTabIndexReturn\", \"getTabbableIndex\" | \"setTabbableIndex\">"
+            },
+            {
+              "kind": "Content",
+              "text": ", "
+            },
+            {
+              "kind": "Reference",
+              "text": "TargetedPick",
+              "canonicalReference": "preact-prop-helpers!~TargetedPick:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "UseRefElementReturnType",
+              "canonicalReference": "preact-prop-helpers!UseRefElementReturnType:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<ParentElement>, \"refElementReturn\", \"getElement\">"
+            },
+            {
+              "kind": "Content",
               "text": " "
             }
           ],
@@ -30911,47 +30982,6 @@
           "members": [
             {
               "kind": "PropertySignature",
-              "canonicalReference": "preact-prop-helpers!UsePaginatedChildrenParameters#linearNavigationParameters:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "linearNavigationParameters: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Pick",
-                  "canonicalReference": "!Pick:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "UseLinearNavigationParameters",
-                  "canonicalReference": "preact-prop-helpers!UseLinearNavigationParameters:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<any, TabbableChildElement, M>[\"linearNavigationParameters\"], \"indexDemangler\">"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isReadonly": false,
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "linearNavigationParameters",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 5
-              }
-            },
-            {
-              "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UsePaginatedChildrenParameters#paginatedChildrenParameters:member",
               "docComment": "",
               "excerptTokens": [
@@ -30960,26 +30990,9 @@
                   "text": "paginatedChildrenParameters: "
                 },
                 {
-                  "kind": "Content",
-                  "text": "{\n        paginationMin: "
-                },
-                {
                   "kind": "Reference",
-                  "text": "Nullable",
-                  "canonicalReference": "preact-prop-helpers!Nullable:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<number>;\n        paginationMax: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Nullable",
-                  "canonicalReference": "preact-prop-helpers!Nullable:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<number>;\n    }"
+                  "text": "UsePaginatedChildrenParametersSelf",
+                  "canonicalReference": "preact-prop-helpers!UsePaginatedChildrenParametersSelf:interface"
                 },
                 {
                   "kind": "Content",
@@ -30992,89 +31005,7 @@
               "name": "paginatedChildrenParameters",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
-                "endIndex": 6
-              }
-            },
-            {
-              "kind": "PropertySignature",
-              "canonicalReference": "preact-prop-helpers!UsePaginatedChildrenParameters#refElementReturn:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "refElementReturn: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Pick",
-                  "canonicalReference": "!Pick:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "UseRefElementReturnType",
-                  "canonicalReference": "preact-prop-helpers!UseRefElementReturnType:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<ParentElement>[\"refElementReturn\"], \"getElement\">"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isReadonly": false,
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "refElementReturn",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 5
-              }
-            },
-            {
-              "kind": "PropertySignature",
-              "canonicalReference": "preact-prop-helpers!UsePaginatedChildrenParameters#rovingTabIndexReturn:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "rovingTabIndexReturn: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Pick",
-                  "canonicalReference": "!Pick:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "UseRovingTabIndexReturnType",
-                  "canonicalReference": "preact-prop-helpers!UseRovingTabIndexReturnType:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<any, TabbableChildElement, M>[\"rovingTabIndexReturn\"], \"getTabbableIndex\" | \"setTabbableIndex\">"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isReadonly": false,
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "rovingTabIndexReturn",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 5
+                "endIndex": 2
               }
             }
           ],
@@ -31082,8 +31013,102 @@
             {
               "startIndex": 8,
               "endIndex": 12
+            },
+            {
+              "startIndex": 13,
+              "endIndex": 17
+            },
+            {
+              "startIndex": 18,
+              "endIndex": 22
+            },
+            {
+              "startIndex": 23,
+              "endIndex": 27
             }
           ]
+        },
+        {
+          "kind": "Interface",
+          "canonicalReference": "preact-prop-helpers!UsePaginatedChildrenParametersSelf:interface",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export interface UsePaginatedChildrenParametersSelf "
+            }
+          ],
+          "fileUrlPath": "src/component-detail/use-paginated-children.tsx",
+          "releaseTag": "Public",
+          "name": "UsePaginatedChildrenParametersSelf",
+          "preserveMemberOrder": false,
+          "members": [
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "preact-prop-helpers!UsePaginatedChildrenParametersSelf#paginationMax:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "paginationMax: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Nullable",
+                  "canonicalReference": "preact-prop-helpers!Nullable:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<number>"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "paginationMax",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 3
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "preact-prop-helpers!UsePaginatedChildrenParametersSelf#paginationMin:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "paginationMin: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Nullable",
+                  "canonicalReference": "preact-prop-helpers!Nullable:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<number>"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "paginationMin",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 3
+              }
+            }
+          ],
+          "extendsTokenRanges": []
         },
         {
           "kind": "Interface",
@@ -31283,12 +31308,12 @@
         },
         {
           "kind": "Interface",
-          "canonicalReference": "preact-prop-helpers!UsePaginatedChildReturn:interface",
+          "canonicalReference": "preact-prop-helpers!UsePaginatedChildReturnType:interface",
           "docComment": "",
           "excerptTokens": [
             {
               "kind": "Content",
-              "text": "export interface UsePaginatedChildReturn<ChildElement extends "
+              "text": "export interface UsePaginatedChildReturnType<ChildElement extends "
             },
             {
               "kind": "Reference",
@@ -31315,12 +31340,12 @@
               }
             }
           ],
-          "name": "UsePaginatedChildReturn",
+          "name": "UsePaginatedChildReturnType",
           "preserveMemberOrder": false,
           "members": [
             {
               "kind": "PropertySignature",
-              "canonicalReference": "preact-prop-helpers!UsePaginatedChildReturn#info:member",
+              "canonicalReference": "preact-prop-helpers!UsePaginatedChildReturnType#info:member",
               "docComment": "",
               "excerptTokens": [
                 {
@@ -31361,7 +31386,7 @@
             },
             {
               "kind": "PropertySignature",
-              "canonicalReference": "preact-prop-helpers!UsePaginatedChildReturn#paginatedChildReturn:member",
+              "canonicalReference": "preact-prop-helpers!UsePaginatedChildReturnType#paginatedChildReturn:member",
               "docComment": "",
               "excerptTokens": [
                 {
@@ -31369,8 +31394,9 @@
                   "text": "paginatedChildReturn: "
                 },
                 {
-                  "kind": "Content",
-                  "text": "{\n        paginatedVisible: boolean;\n        parentIsPaginated: boolean;\n        hideBecausePaginated: boolean;\n    }"
+                  "kind": "Reference",
+                  "text": "UsePaginatedChildReturnTypeSelf",
+                  "canonicalReference": "preact-prop-helpers!UsePaginatedChildReturnTypeSelf:interface"
                 },
                 {
                   "kind": "Content",
@@ -31388,7 +31414,7 @@
             },
             {
               "kind": "PropertySignature",
-              "canonicalReference": "preact-prop-helpers!UsePaginatedChildReturn#props:member",
+              "canonicalReference": "preact-prop-helpers!UsePaginatedChildReturnType#props:member",
               "docComment": "",
               "excerptTokens": [
                 {
@@ -31416,6 +31442,105 @@
               "propertyTypeTokenRange": {
                 "startIndex": 1,
                 "endIndex": 3
+              }
+            }
+          ],
+          "extendsTokenRanges": []
+        },
+        {
+          "kind": "Interface",
+          "canonicalReference": "preact-prop-helpers!UsePaginatedChildReturnTypeSelf:interface",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export interface UsePaginatedChildReturnTypeSelf "
+            }
+          ],
+          "fileUrlPath": "src/component-detail/use-paginated-children.tsx",
+          "releaseTag": "Public",
+          "name": "UsePaginatedChildReturnTypeSelf",
+          "preserveMemberOrder": false,
+          "members": [
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "preact-prop-helpers!UsePaginatedChildReturnTypeSelf#hideBecausePaginated:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "hideBecausePaginated: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "boolean"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "hideBecausePaginated",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "preact-prop-helpers!UsePaginatedChildReturnTypeSelf#paginatedVisible:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "paginatedVisible: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "boolean"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "paginatedVisible",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "preact-prop-helpers!UsePaginatedChildReturnTypeSelf#parentIsPaginated:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "parentIsPaginated: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "boolean"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "parentIsPaginated",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
               }
             }
           ],
@@ -32029,7 +32154,7 @@
         {
           "kind": "Function",
           "canonicalReference": "preact-prop-helpers!usePress:function(1)",
-          "docComment": "/**\n * Adds the necessary event handlers to create a \"press\"-like event for any element, whether it's a native &lt;button&gt; or regular &lt;div&gt;, and allows for a \"long press\" that can be used to, e.g., show a tooltip *instead* of activating a press.\n *\n * Notably, the following cases are covered: * The target element is properly focused, even on iOS Safari (*especially* on iOS Safari) * Double-clicks won't select text, it just presses the button twice. * Text selection that happens to end/start with this element won't invoke a press. * The `enter` key immediately invokes a press (by default just once until pressed again), while the `space` key invokes it when released, if focus hasn't moved away from the button. * Haptic feedback (on, like, the one browser combination that supports it &mdash; this can be disabled app-wide with `setButtonVibrate`)\n *\n * In addition, returns a \"more accurate\" CSS `active` and `hover`; more accurate in that `hover` won't mess up mobile devices that see `hover` and mess up your click events, and in that `active` accurately displays when a press would occur or not.\n */\n",
+          "docComment": "/**\n * Adds the necessary event handlers to create a \"press\"-like event for any element, whether it's a native &lt;button&gt; or regular &lt;div&gt;, and allows for a \"long press\" that can be used to, e.g., show a tooltip *instead* of activating a press.\n *\n * @remarks\n *\n * Notably, the following cases are covered: * The target element is properly focused, even on iOS Safari (*especially* on iOS Safari) * Double-clicks won't select text, it just presses the button twice. * Text selection that happens to end/start with this element won't invoke a press. * The `enter` key immediately invokes a press (by default just once until pressed again), while the `space` key invokes it when released, if focus hasn't moved away from the button. * Haptic feedback (on, like, the one browser combination that supports it &mdash; this can be disabled app-wide with `setButtonVibrate`)\n *\n * In addition, returns a \"more accurate\" CSS `active` and `hover`; more accurate in that `hover` won't mess up mobile devices that see `hover` and mess up your click events, and in that `active` accurately displays when a press would occur or not.\n *\n * @see\n *\n * {@link setPressVibrate}\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -33708,7 +33833,7 @@
         {
           "kind": "Function",
           "canonicalReference": "preact-prop-helpers!useRefElement:function(1)",
-          "docComment": "/**\n * Allows accessing the element a ref references as soon as it does so. *This hook itself returns a hook*--useRefElementProps modifies the props that you were going to pass to an HTMLElement, adding a RefCallback and merging it with any existing ref that existed on the props.\n *\n * Don't forget to provide the Element as the type argument!\n *\n * @returns The element, and the sub-hook that makes it retrievable.\n */\n",
+          "docComment": "/**\n * Allows you to access the `HTMLElement` rendered by this hook/these props, either as soon as it's available (as a callback), or whenever you need it (as a getter function).\n *\n * @remarks\n *\n * This hook, like many others, works with either `useState` or {@link usePassiveState}. Why use one over the other?\n *\n * * `useState` is familiar and easy to use, but causes the component to re-render itself, which is slow. * `usePassiveState` is faster and more scalable, but its state can't be accessed during render and it's more complex.\n *\n * @example\n *\n * Easiest way to use (but causes an extra re-render 🐌)\n * ```typescript\n * const [element, setElement] = useState<HTMLButtonElement | null>(null);\n * const { propsStable } = useRefElement({ onElementChange: setElement });\n * useEffect(() => {\n *     element.doSomethingFunny();\n * }, [element])\n * ```\n *\n * @example\n *\n * Fastest (but slightly more verbose)\n * ```typescript\n * // The code in useEffect is moved into this callback, but runs at the same time\n * const onElementChange = useCallback(element => element.doSomethingFunny(), []);\n * const [getElement, setElement] = usePassiveState<HTMLButtonElement | null>(onElementChange, returnNull);\n * const { propsStable } = useRefElement({ onElementChange: setElement });\n * ```\n *\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -34108,7 +34233,7 @@
         {
           "kind": "Function",
           "canonicalReference": "preact-prop-helpers!useRovingTabIndexChild:function(1)",
-          "docComment": "/**\n * @param args - {@link UseRovingTabIndexChildParameters}\n *\n * @returns - {@link UseRovingTabIndexChildReturnType}\n *\n * @see\n *\n * {@link useRovingTabIndex}\n */\n",
+          "docComment": "/**\n * @param args - {@link UseRovingTabIndexChildParameters}\n *\n * @returns - {@link UseRovingTabIndexChildReturnType}\n *\n * @see\n *\n * {@link useRovingTabIndex}\n *\n * @compositeParams\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -34885,8 +35010,9 @@
                   "text": "rovingTabIndexChildReturn: "
                 },
                 {
-                  "kind": "Content",
-                  "text": "{\n        tabbable: boolean;\n        getTabbable(): boolean;\n    }"
+                  "kind": "Reference",
+                  "text": "UseRovingTabIndexChildReturnTypeSelf",
+                  "canonicalReference": "preact-prop-helpers!UseRovingTabIndexChildReturnTypeSelf:interface"
                 },
                 {
                   "kind": "Content",
@@ -34909,6 +35035,79 @@
               "endIndex": 12
             }
           ]
+        },
+        {
+          "kind": "Interface",
+          "canonicalReference": "preact-prop-helpers!UseRovingTabIndexChildReturnTypeSelf:interface",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export interface UseRovingTabIndexChildReturnTypeSelf "
+            }
+          ],
+          "fileUrlPath": "src/component-detail/keyboard-navigation/use-roving-tabindex.tsx",
+          "releaseTag": "Public",
+          "name": "UseRovingTabIndexChildReturnTypeSelf",
+          "preserveMemberOrder": false,
+          "members": [
+            {
+              "kind": "MethodSignature",
+              "canonicalReference": "preact-prop-helpers!UseRovingTabIndexChildReturnTypeSelf#getTabbable:member(1)",
+              "docComment": "/**\n * **STABLE**\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "getTabbable(): "
+                },
+                {
+                  "kind": "Content",
+                  "text": "boolean"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isOptional": false,
+              "returnTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "releaseTag": "Public",
+              "overloadIndex": 1,
+              "parameters": [],
+              "name": "getTabbable"
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "preact-prop-helpers!UseRovingTabIndexChildReturnTypeSelf#tabbable:member",
+              "docComment": "/**\n * *Unstable*\n *\n * Whether this child, individually, is *the* currently tabbable child.\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "tabbable: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "boolean"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "tabbable",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            }
+          ],
+          "extendsTokenRanges": []
         },
         {
           "kind": "Interface",
@@ -38641,7 +38840,7 @@
         {
           "kind": "Function",
           "canonicalReference": "preact-prop-helpers!useStaggeredChild:function(1)",
-          "docComment": "",
+          "docComment": "/**\n * @compositeParams\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -38694,8 +38893,8 @@
             },
             {
               "kind": "Reference",
-              "text": "UseStaggeredChildReturn",
-              "canonicalReference": "preact-prop-helpers!UseStaggeredChildReturn:interface"
+              "text": "UseStaggeredChildReturnType",
+              "canonicalReference": "preact-prop-helpers!UseStaggeredChildReturnType:interface"
             },
             {
               "kind": "Content",
@@ -39040,7 +39239,7 @@
         {
           "kind": "Function",
           "canonicalReference": "preact-prop-helpers!useStaggeredChildren:function(1)",
-          "docComment": "/**\n * Allows children to each wait until the previous has finished rendering before itself rendering.\n *\n * E.G. Child #3 waits until #2 renders. #2 waits until #1 renders, etc.\n *\n * Note that the child itself will still render, but you can delay rendering *its* children, or delay other complicated or heavy logic, until the child is no longer staggered.\n */\n",
+          "docComment": "/**\n * Allows children to each wait until the previous has finished rendering before itself rendering.\n *\n * E.G. Child #3 waits until #2 renders. #2 waits until #1 renders, etc.\n *\n * Note that the child itself will still render, but you can delay rendering *its* children, or delay other complicated or heavy logic, until the child is no longer staggered.\n *\n * @hasChild\n *\n * {@link useStaggeredChild}\n *\n * @compositeParams\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -39481,8 +39680,9 @@
                   "text": "staggeredChildrenReturn: "
                 },
                 {
-                  "kind": "Content",
-                  "text": "{\n        stillStaggering: boolean;\n    }"
+                  "kind": "Reference",
+                  "text": "UseStaggeredChildrenReturnTypeSelf",
+                  "canonicalReference": "preact-prop-helpers!UseStaggeredChildrenReturnTypeSelf:interface"
                 },
                 {
                   "kind": "Content",
@@ -39503,12 +39703,57 @@
         },
         {
           "kind": "Interface",
-          "canonicalReference": "preact-prop-helpers!UseStaggeredChildReturn:interface",
+          "canonicalReference": "preact-prop-helpers!UseStaggeredChildrenReturnTypeSelf:interface",
           "docComment": "",
           "excerptTokens": [
             {
               "kind": "Content",
-              "text": "export interface UseStaggeredChildReturn<ChildElement extends "
+              "text": "export interface UseStaggeredChildrenReturnTypeSelf "
+            }
+          ],
+          "fileUrlPath": "src/component-detail/use-staggered-children.tsx",
+          "releaseTag": "Public",
+          "name": "UseStaggeredChildrenReturnTypeSelf",
+          "preserveMemberOrder": false,
+          "members": [
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "preact-prop-helpers!UseStaggeredChildrenReturnTypeSelf#stillStaggering:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "stillStaggering: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "boolean"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "stillStaggering",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            }
+          ],
+          "extendsTokenRanges": []
+        },
+        {
+          "kind": "Interface",
+          "canonicalReference": "preact-prop-helpers!UseStaggeredChildReturnType:interface",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export interface UseStaggeredChildReturnType<ChildElement extends "
             },
             {
               "kind": "Reference",
@@ -39535,12 +39780,12 @@
               }
             }
           ],
-          "name": "UseStaggeredChildReturn",
+          "name": "UseStaggeredChildReturnType",
           "preserveMemberOrder": false,
           "members": [
             {
               "kind": "PropertySignature",
-              "canonicalReference": "preact-prop-helpers!UseStaggeredChildReturn#info:member",
+              "canonicalReference": "preact-prop-helpers!UseStaggeredChildReturnType#info:member",
               "docComment": "",
               "excerptTokens": [
                 {
@@ -39581,7 +39826,7 @@
             },
             {
               "kind": "PropertySignature",
-              "canonicalReference": "preact-prop-helpers!UseStaggeredChildReturn#props:member",
+              "canonicalReference": "preact-prop-helpers!UseStaggeredChildReturnType#props:member",
               "docComment": "",
               "excerptTokens": [
                 {
@@ -39613,7 +39858,7 @@
             },
             {
               "kind": "PropertySignature",
-              "canonicalReference": "preact-prop-helpers!UseStaggeredChildReturn#staggeredChildReturn:member",
+              "canonicalReference": "preact-prop-helpers!UseStaggeredChildReturnType#staggeredChildReturn:member",
               "docComment": "",
               "excerptTokens": [
                 {
@@ -39622,8 +39867,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "UseStaggeredChildReturnSelf",
-                  "canonicalReference": "preact-prop-helpers!UseStaggeredChildReturnSelf:interface"
+                  "text": "UseStaggeredChildReturnTypeSelf",
+                  "canonicalReference": "preact-prop-helpers!UseStaggeredChildReturnTypeSelf:interface"
                 },
                 {
                   "kind": "Content",
@@ -39644,22 +39889,22 @@
         },
         {
           "kind": "Interface",
-          "canonicalReference": "preact-prop-helpers!UseStaggeredChildReturnSelf:interface",
+          "canonicalReference": "preact-prop-helpers!UseStaggeredChildReturnTypeSelf:interface",
           "docComment": "",
           "excerptTokens": [
             {
               "kind": "Content",
-              "text": "export interface UseStaggeredChildReturnSelf "
+              "text": "export interface UseStaggeredChildReturnTypeSelf "
             }
           ],
           "fileUrlPath": "src/component-detail/use-staggered-children.tsx",
           "releaseTag": "Public",
-          "name": "UseStaggeredChildReturnSelf",
+          "name": "UseStaggeredChildReturnTypeSelf",
           "preserveMemberOrder": false,
           "members": [
             {
               "kind": "PropertySignature",
-              "canonicalReference": "preact-prop-helpers!UseStaggeredChildReturnSelf#hideBecauseStaggered:member",
+              "canonicalReference": "preact-prop-helpers!UseStaggeredChildReturnTypeSelf#hideBecauseStaggered:member",
               "docComment": "/**\n * If this is true, you should delay showing *your* children or running other heavy logic until this becomes false.\n *\n * Can be as simple as `<div>{hideBecauseStaggered? null : children}</div>`\n */\n",
               "excerptTokens": [
                 {
@@ -39686,7 +39931,7 @@
             },
             {
               "kind": "PropertySignature",
-              "canonicalReference": "preact-prop-helpers!UseStaggeredChildReturnSelf#parentIsStaggered:member",
+              "canonicalReference": "preact-prop-helpers!UseStaggeredChildReturnTypeSelf#parentIsStaggered:member",
               "docComment": "/**\n * Whether the parent has indicated that all of its children, including this one, are staggered.\n */\n",
               "excerptTokens": [
                 {

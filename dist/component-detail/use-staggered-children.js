@@ -9,6 +9,11 @@ import { monitorCallCount } from "../util/use-call-count.js";
  *
  * Note that the child itself will still render, but you can delay rendering *its* children, or
  * delay other complicated or heavy logic, until the child is no longer staggered.
+ *
+ *
+ * @compositeParams
+ *
+ * @hasChild {@link useStaggeredChild}
  */
 export function useStaggeredChildren({ managedChildrenReturn: { getChildren }, staggeredChildrenParameters: { staggered } }) {
     monitorCallCount(useStaggeredChildren);
@@ -98,6 +103,9 @@ export function useStaggeredChildren({ managedChildrenReturn: { getChildren }, s
         }), [staggeredChildContext]),
     };
 }
+/**
+ * @compositeParams
+ */
 export function useStaggeredChild({ info: { index }, context: { staggeredChildContext: { parentIsStaggered, childCallsThisToTellTheParentTheHighestIndex, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne } } }) {
     monitorCallCount(useStaggeredChild);
     const [staggeredVisible, setStaggeredVisible] = useState(getDefaultStaggeredVisible(index));

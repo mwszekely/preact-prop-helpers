@@ -92,8 +92,6 @@ export interface UseLinearNavigationParametersSelf<ChildElement extends Element>
  *
  * @see useListNavigation, which packages everything up together.
  *
- * @hasChild {@link useLinearNavigationChild}
- *
  * @compositeParams
  */
 export declare function useLinearNavigation<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseLinearNavigationChildInfo<ChildElement>>({ rovingTabIndexReturn, linearNavigationParameters }: UseLinearNavigationParameters<ParentOrChildElement, ChildElement, M>): UseLinearNavigationReturnType<ParentOrChildElement>;

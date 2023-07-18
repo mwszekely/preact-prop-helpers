@@ -13,15 +13,17 @@ export interface UsePaginatedChildrenInfo<TabbableChildElement extends Element> 
     setChildCountIfPaginated(count: number): void;
 }
 
+export interface UsePaginatedChildrenParametersSelf {
+    paginationMin: Nullable<number>;
+    paginationMax: Nullable<number>;
+}
+
 export interface UsePaginatedChildrenParameters<ParentElement extends Element, TabbableChildElement extends Element, M extends UsePaginatedChildrenInfo<TabbableChildElement>>
-    extends Pick<UseManagedChildrenReturnType<M>, "managedChildrenReturn"> {
-    linearNavigationParameters: Pick<UseLinearNavigationParameters<any, TabbableChildElement, M>["linearNavigationParameters"], "indexDemangler">;
-    rovingTabIndexReturn: Pick<UseRovingTabIndexReturnType<any, TabbableChildElement, M>["rovingTabIndexReturn"], "getTabbableIndex" | "setTabbableIndex">;
-    refElementReturn: Pick<UseRefElementReturnType<ParentElement>["refElementReturn"], "getElement">;
-    paginatedChildrenParameters: { 
-        paginationMin: Nullable<number>; 
-        paginationMax: Nullable<number>; 
-    }
+    extends Pick<UseManagedChildrenReturnType<M>, "managedChildrenReturn">,
+    TargetedPick<UseLinearNavigationParameters<any, TabbableChildElement, M>, "linearNavigationParameters", "indexDemangler">,
+    TargetedPick<UseRovingTabIndexReturnType<any, TabbableChildElement, M>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex">,
+    TargetedPick<UseRefElementReturnType<ParentElement>, "refElementReturn", "getElement"> {
+    paginatedChildrenParameters: UsePaginatedChildrenParametersSelf;
 }
 
 export interface UsePaginatedChildContextSelf {
@@ -52,6 +54,11 @@ export interface UsePaginatedChildrenReturnType extends TargetedPick<UseManagedC
     context: UsePaginatedChildContext;
 }
 
+/**
+ * @compositeParams
+ * 
+ * @hasChild {@link usePaginatedChild}
+ */
 export function usePaginatedChildren<ParentElement extends Element, TabbableChildElement extends Element, M extends UsePaginatedChildrenInfo<TabbableChildElement>>({
     managedChildrenReturn: { getChildren },
     linearNavigationParameters: { indexDemangler },
@@ -142,18 +149,22 @@ export interface UsePaginatedChildParameters {
     context: UsePaginatedChildContext;
 }
 
-export interface UsePaginatedChildReturn<ChildElement extends Element> {
+export interface UsePaginatedChildReturnType<ChildElement extends Element> {
     props: ElementProps<ChildElement>;
-    paginatedChildReturn: {
-        paginatedVisible: boolean;
-        parentIsPaginated: boolean;
-        hideBecausePaginated: boolean;
-    };
+    paginatedChildReturn: UsePaginatedChildReturnTypeSelf;
     info: Pick<UsePaginatedChildrenInfo<ChildElement>, "setPaginationVisible" | "setChildCountIfPaginated">
 }
 
+export interface UsePaginatedChildReturnTypeSelf {
+    paginatedVisible: boolean;
+    parentIsPaginated: boolean;
+    hideBecausePaginated: boolean;
+}
 
-export function usePaginatedChild<ChildElement extends Element>({ info: { index }, context: { paginatedChildContext: { parentIsPaginated, getDefaultPaginationVisible } } }: UsePaginatedChildParameters): UsePaginatedChildReturn<ChildElement> {
+/**
+ * @compositeParams
+ */
+export function usePaginatedChild<ChildElement extends Element>({ info: { index }, context: { paginatedChildContext: { parentIsPaginated, getDefaultPaginationVisible } } }: UsePaginatedChildParameters): UsePaginatedChildReturnType<ChildElement> {
     monitorCallCount(usePaginatedChild);
     //const parentIsPaginated = (paginationMin != null || paginationMax != null);
 

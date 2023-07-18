@@ -20,10 +20,11 @@ export interface UseStaggeredChildContext {
     staggeredChildContext: UseStaggeredChildContextSelf;
 }
 export interface UseStaggeredChildrenReturnType {
-    staggeredChildrenReturn: {
-        stillStaggering: boolean;
-    };
+    staggeredChildrenReturn: UseStaggeredChildrenReturnTypeSelf;
     context: UseStaggeredChildContext;
+}
+export interface UseStaggeredChildrenReturnTypeSelf {
+    stillStaggering: boolean;
 }
 export interface UseStaggeredChildParameters {
     info: {
@@ -31,7 +32,7 @@ export interface UseStaggeredChildParameters {
     };
     context: UseStaggeredChildContext;
 }
-export interface UseStaggeredChildReturnSelf {
+export interface UseStaggeredChildReturnTypeSelf {
     /** Whether the parent has indicated that all of its children, including this one, are staggered. */
     parentIsStaggered: boolean;
     /**
@@ -41,9 +42,9 @@ export interface UseStaggeredChildReturnSelf {
      */
     hideBecauseStaggered: boolean;
 }
-export interface UseStaggeredChildReturn<ChildElement extends Element> {
+export interface UseStaggeredChildReturnType<ChildElement extends Element> {
     props: ElementProps<ChildElement>;
-    staggeredChildReturn: UseStaggeredChildReturnSelf;
+    staggeredChildReturn: UseStaggeredChildReturnTypeSelf;
     info: Pick<UseStaggeredChildrenInfo<ChildElement>, "setStaggeredVisible">;
 }
 /**
@@ -53,7 +54,15 @@ export interface UseStaggeredChildReturn<ChildElement extends Element> {
  *
  * Note that the child itself will still render, but you can delay rendering *its* children, or
  * delay other complicated or heavy logic, until the child is no longer staggered.
+ *
+ *
+ * @compositeParams
+ *
+ * @hasChild {@link useStaggeredChild}
  */
 export declare function useStaggeredChildren<E extends Element, M extends UseStaggeredChildrenInfo<E>>({ managedChildrenReturn: { getChildren }, staggeredChildrenParameters: { staggered } }: UseStaggeredChildrenParameters<E, M>): UseStaggeredChildrenReturnType;
-export declare function useStaggeredChild<ChildElement extends Element>({ info: { index }, context: { staggeredChildContext: { parentIsStaggered, childCallsThisToTellTheParentTheHighestIndex, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne } } }: UseStaggeredChildParameters): UseStaggeredChildReturn<ChildElement>;
+/**
+ * @compositeParams
+ */
+export declare function useStaggeredChild<ChildElement extends Element>({ info: { index }, context: { staggeredChildContext: { parentIsStaggered, childCallsThisToTellTheParentTheHighestIndex, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne } } }: UseStaggeredChildParameters): UseStaggeredChildReturnType<ChildElement>;
 //# sourceMappingURL=use-staggered-children.d.ts.map

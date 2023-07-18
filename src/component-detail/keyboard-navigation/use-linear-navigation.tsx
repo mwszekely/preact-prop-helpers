@@ -113,8 +113,6 @@ export interface UseLinearNavigationParametersSelf<ChildElement extends Element>
  * 
  * @see useListNavigation, which packages everything up together.
  * 
- * @hasChild {@link useLinearNavigationChild}
- * 
  * @compositeParams
  */
 export function useLinearNavigation<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseLinearNavigationChildInfo<ChildElement>>({

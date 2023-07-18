@@ -192,6 +192,8 @@ export function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovi
     };
 }
 /**
+ * @compositeParams
+ *
  * @see {@link useRovingTabIndex}
  * @param args - {@link UseRovingTabIndexChildParameters}
  * @returns - {@link UseRovingTabIndexChildReturnType}
