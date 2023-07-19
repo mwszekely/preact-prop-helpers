@@ -24,6 +24,13 @@ export interface UseTimeoutParameters {
     callback: () => void;
 }
 
+/**
+ * Runs a function the specified number of milliseconds after the component renders.
+ * 
+ * @remarks This is particularly useful to function as "useEffect on a delay".
+ * 
+ * {@include } {@link UseTimeoutParameters}
+ */
 export function useTimeout({ timeout, callback, triggerIndex }: UseTimeoutParameters) {
     monitorCallCount(useTimeout);
    

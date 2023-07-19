@@ -30,11 +30,13 @@ const _comments = void (0);
  * Allows a parent component to access information about certain
  * child components once they have rendered.
  *
- * This hook is designed to be lightweight, in that the parent keeps no state
+ * @remarks This hook is designed to be lightweight, in that the parent keeps no state
  * and runs no effects.  Each child *does* run an effect, but with no state
  * changes unless you explicitly request them.
  *
+ * @hasChild {@link useManagedChild}
  *
+ * @compositeParams
  */
 export function useManagedChildren(parentParameters) {
     monitorCallCount(useManagedChildren);
@@ -173,6 +175,9 @@ export function useManagedChildren(parentParameters) {
         managedChildrenReturn: { getChildren }
     };
 }
+/**
+ * @compositeParams
+ */
 export function useManagedChild({ context, info }) {
     monitorCallCount(useManagedChild);
     const { managedChildContext: { getChildren, managedChildrenArray, remoteULEChildMounted, remoteULEChildChanged } } = (context ?? { managedChildContext: {} });

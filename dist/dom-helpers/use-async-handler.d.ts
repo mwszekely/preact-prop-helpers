@@ -44,7 +44,7 @@ export interface UseAsyncHandlerReturnType<EventType, CaptureType> extends UseAs
  * along with some other information related to the current state.
  * Does not modify any props.
  *
- * Note that because the handler you provide may be called with a delay, and
+ * @remarks Note that because the handler you provide may be called with a delay, and
  * because the value of, e.g., an `<input>` element will likely be stale by the
  * time the delay is over, a `capture` function is necessary in order to
  * capture the relevant information from the DOM. Any other simple event data,
@@ -95,6 +95,8 @@ export interface UseAsyncHandlerReturnType<EventType, CaptureType> extends UseAs
  * milliseconds, at which point we *actually* run the asynchronous handler
  * according to the logic in the previous paragraph. This is in
  * *addition* to throttling the handler, and does not replace that behavior.
+ *
+ * {@include } {@link UseAsyncHandlerParameters}
  *
  * @see useAsync A more general version of this hook that can work with any type of handler, not just DOM event handlers.
  */

@@ -3,7 +3,7 @@ import "wicg-inert";
 /**
  * Allows an element to trap focus by applying the "inert" attribute to all sibling, aunt, and uncle nodes.
  *
- * Automatically handles consecutive calls with a loosely applied stack operation
+ * @remarks Automatically handles consecutive calls with a loosely applied stack operation
  * (specifically via `blockingElements`, with a small polyfill because I'm not sure how long
  * it'll take to find its way into the spec, if ever)
  * @param target

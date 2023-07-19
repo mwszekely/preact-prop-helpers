@@ -5,19 +5,18 @@ import { useRefElement } from "../dom-helpers/use-ref-element.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 /**
  * Combines dismissal hooks and focus trap hooks into one.
- *
- * Another in the "complete" series, alongside list/grid navigation and dismissal itself.
- *
  * Use for dialogs, menus, etc.  Anything that can be dismissed and might trap focus, basically.
  *
- * @returns
+ * @remarks Another in the "complete" series, alongside list/grid navigation and dismissal itself.
+ *
+ * @compositeParams
  */
 export function useModal({ dismissParameters, escapeDismissParameters, focusTrapParameters: { trapActive, ...focusTrapParameters } }) {
     monitorCallCount(useModal);
     const { open } = dismissParameters;
     const { refElementPopupReturn, refElementSourceReturn, propsStablePopup, propsStableSource } = useDismiss({ dismissParameters, escapeDismissParameters });
     const { propsStable, refElementReturn } = useRefElement({});
-    const { focusTrapReturn, props } = useFocusTrap({
+    const { props } = useFocusTrap({
         focusTrapParameters: { trapActive: open && trapActive, ...focusTrapParameters },
         refElementReturn
     });
@@ -25,7 +24,6 @@ export function useModal({ dismissParameters, escapeDismissParameters, focusTrap
         propsFocusContainer: useMergedProps(propsStable, props),
         refElementPopupReturn,
         refElementSourceReturn,
-        focusTrapReturn,
         propsStablePopup,
         propsStableSource
     };

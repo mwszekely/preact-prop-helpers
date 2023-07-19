@@ -6,7 +6,7 @@ import { UseAsyncParameters, useAsync } from "./use-async.js";
 /**
  * Combines the semantics of `useAsync` and `useEffect`. 
  * 
- * More specifically, if an event would run again, but the previous async event is still running,
+ * @remarks More specifically, if an event would run again, but the previous async event is still running,
  * then we'll wait until it finishes to run the new effect. 
  * And while waiting, further new effect runs will bump old ones off,
  * only remembering the most recent request.

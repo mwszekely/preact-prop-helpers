@@ -40,5 +40,11 @@ export interface UseDraggableParameters {
         [mimeType: string]: string;
     };
 }
+/**
+ * Allows an element to start a drag operation.
+ *
+ * {@include } {@link UseDraggableParameters}
+ * {@include } {@link UseDraggableReturnType}
+ */
 export declare function useDraggable<E extends Element>({ effectAllowed, data, dragImage, dragImageXOffset, dragImageYOffset }: UseDraggableParameters): UseDraggableReturnType<E>;
 //# sourceMappingURL=use-draggable.d.ts.map

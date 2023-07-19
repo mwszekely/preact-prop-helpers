@@ -1,5 +1,11 @@
 import { useState } from "../preact-extensions/use-state.js";
 import { monitorCallCount } from "../util/use-call-count.js";
+/**
+ * Allows an element to start a drag operation.
+ *
+ * {@include } {@link UseDraggableParameters}
+ * {@include } {@link UseDraggableReturnType}
+ */
 export function useDraggable({ effectAllowed, data, dragImage, dragImageXOffset, dragImageYOffset }) {
     monitorCallCount(useDraggable);
     const [dragging, setDragging, getDragging] = useState(false);

@@ -1,7 +1,7 @@
+import { MapOfSets } from "map-and-set-extensions";
 import { returnNull, returnTrue, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useEffect } from "../util/lib.js";
 import { monitorCallCount } from "../util/use-call-count.js";
-import { MapOfSets } from "map-and-set-extensions";
 /**
  *
  * There are several different ways that a focus event can happen.  Assume
@@ -83,16 +83,15 @@ function windowBlur(e) {
     forEachUpdater(window, windowFocusedUpdaters, false, e);
 }
 /**
- * Allows you to inspect which element in the `document` currently has focus, which was most recently focused if none are currently, and whether or not the window has focus by returning the following functions:
- * * `getActiveElement()`
- * * `getLastActiveElement()`
- * * `getWindowFocused()`
+ * Allows you to inspect which element in the `document` currently has focus, which was most recently focused if none are currently, and whether or not the window has focus
  *
- * (The document's body receiving focus, like it does when you click on an empty area, is counted as no element having focus for all intents and purposes)
+ * @remarks The document's body receiving focus, like it does when you click on an empty area, is counted as no element having focus for all intents and purposes
  *
  * This is a passive hook, so by default it returns getter functions that report this information but the component will not re-render by default when the active element changes.
  *
  * If you need the component to re-render when the active element changes, use the `on*Change` arguments to set some state on your end.
+ *
+ * @compositeParams
  */
 export function useActiveElement({ activeElementParameters: { onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument, getWindow } }) {
     monitorCallCount(useActiveElement);

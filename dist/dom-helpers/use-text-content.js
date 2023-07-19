@@ -1,6 +1,9 @@
 import { returnNull, runImmediately, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useEffect } from "../util/lib.js";
 import { monitorCallCount } from "../util/use-call-count.js";
+/**
+ * @compositeParams
+ */
 export function useTextContent({ refElementReturn: { getElement }, textContentParameters: { getText, onTextContentChange } }) {
     monitorCallCount(useTextContent);
     const [getTextContent, setTextContent] = usePassiveState(onTextContentChange, returnNull, runImmediately);

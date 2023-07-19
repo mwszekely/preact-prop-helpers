@@ -56,7 +56,13 @@ export interface UseDraggableParameters {
     data: { [mimeType: string]: string };
 }
 
-export function useDraggable<E extends Element>({ effectAllowed, data, dragImage, dragImageXOffset, dragImageYOffset }: UseDraggableParameters) {
+/**
+ * Allows an element to start a drag operation.
+ * 
+ * {@include } {@link UseDraggableParameters}
+ * {@include } {@link UseDraggableReturnType}
+ */
+export function useDraggable<E extends Element>({ effectAllowed, data, dragImage, dragImageXOffset, dragImageYOffset }: UseDraggableParameters): UseDraggableReturnType<E> {
     monitorCallCount(useDraggable);
 
     const [dragging, setDragging, getDragging] = useState(false);

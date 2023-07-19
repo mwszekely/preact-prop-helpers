@@ -50,7 +50,7 @@ export function storeToLocalStorage<Key extends (keyof PersistentStates) & strin
 }
 
 /**
- * Use module augmentation to get the correct types for this function.
+ * @remarks Use module augmentation to get the correct types for this function.
  * 
  * ```typescript
  * declare module 'preact-prop-helpers' {

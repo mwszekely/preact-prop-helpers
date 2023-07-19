@@ -30,7 +30,7 @@ export function storeToLocalStorage(key, value, converter = JSON.stringify, stor
     }
 }
 /**
- * Use module augmentation to get the correct types for this function.
+ * @remarks Use module augmentation to get the correct types for this function.
  *
  * ```typescript
  * declare module 'preact-prop-helpers' {

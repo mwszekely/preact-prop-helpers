@@ -3,6 +3,11 @@ import { useRefElement } from "../dom-helpers/use-ref-element.js";
 import { returnNull, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useCallback, useEffect, useRef } from "../util/lib.js";
 import { monitorCallCount } from "../util/use-call-count.js";
+/**
+ * Measures an element, allowing you to react to its changes in size.
+ *
+ * @compositeParams
+ */
 export function useElementSize({ elementSizeParameters: { getObserveBox, onSizeChange }, refElementParameters }) {
     monitorCallCount(useElementSize);
     const { onElementChange, onMount, onUnmount } = (refElementParameters || {});

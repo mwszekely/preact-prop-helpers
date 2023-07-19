@@ -14,6 +14,14 @@ import { useMemoObject } from "../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../util/assert.js";
 import { useCallback } from "../util/lib.js";
 import { monitorCallCount } from "../util/use-call-count.js";
+/**
+ * Combines all the grid- (&amp; list-) related hooks into one giant hook that accomplishes everything.
+ *
+ * @compositeParams
+ *
+ * @hasChild {@link useCompleteGridNavigationRow}
+ * @hasChild {@link useCompleteGridNavigationCell}
+ */
 export function useCompleteGridNavigation({ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, typeaheadNavigationParameters, sortableChildrenParameters, rearrangeableChildrenParameters, paginatedChildrenParameters, staggeredChildrenParameters, ...void1 }) {
     monitorCallCount(useCompleteGridNavigation);
     assertEmptyObject(void1);
@@ -72,6 +80,9 @@ export function useCompleteGridNavigation({ gridNavigationParameters, linearNavi
         ...gridNavigationSingleSelectionReturn,
     };
 }
+/**
+ * @compositeParams
+ */
 export function useCompleteGridNavigationRow({ info, context: contextIncomingForRowAsChildOfTable, textContentParameters, linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, ...void1 }) {
     monitorCallCount(useCompleteGridNavigationRow);
     const { info: infoPaginatedChild, paginatedChildReturn, props: paginationProps } = usePaginatedChild({ info, context: contextIncomingForRowAsChildOfTable });
@@ -141,6 +152,9 @@ export function useCompleteGridNavigationRow({ info, context: contextIncomingFor
         props,
     };
 }
+/**
+ * @compositeParams
+ */
 export function useCompleteGridNavigationCell({ gridNavigationCellParameters, context: { gridNavigationCellContext, managedChildContext, rovingTabIndexContext, typeaheadNavigationContext, completeGridNavigationCellContext: { excludeSpace: es2 } }, textContentParameters, info, ...void1 }) {
     monitorCallCount(useCompleteGridNavigationCell);
     const { refElementReturn, propsStable } = useRefElement({ refElementParameters: {} });

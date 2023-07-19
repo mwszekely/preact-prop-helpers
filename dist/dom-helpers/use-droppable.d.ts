@@ -54,6 +54,12 @@ export declare class DroppableFileError extends Error {
     errorType: DroppableFileErrorType;
     constructor(fileName: string, base: DOMException | null);
 }
+/**
+ * Allows an element to start a drag operation.
+ *
+ * {@include } {@link UseDroppableParameters}
+ * {@include } {@link UseDroppableReturnType}
+ */
 export declare function useDroppable<E extends Element>({ effect }: UseDroppableParameters): UseDroppableReturnType<E>;
 export {};
 //# sourceMappingURL=use-droppable.d.ts.map

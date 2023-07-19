@@ -26,7 +26,9 @@ function supportsPointerEvents() {
  * in that `hover` won't mess up mobile devices that see `hover` and mess up your click events,
  * and in that `active` accurately displays when a press would occur or not.
  *
- * @see {@link setPressVibrate}
+ * {@include } {@link setPressVibrate}
+ *
+ * @compositeParams
  *
  */
 export function usePress(args) {

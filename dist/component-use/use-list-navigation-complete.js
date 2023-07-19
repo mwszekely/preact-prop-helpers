@@ -15,9 +15,9 @@ import { enhanceEvent } from "../util/event.js";
 import { useCallback } from "../util/lib.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 /**
- * All the list-related hooks combined into one giant hook that encapsulates everything.
+ * All the list-related hooks combined into one large hook that encapsulates everything.
  *
- * Unlike most others, this hook assume's it's the final one--the "outermost" hook in the component--so it uses `useManagedChildren` and wraps everything up nicely,
+ * @remarks Unlike most others, this hook assume's it's the final one--the "outermost" hook in the component--so it uses `useManagedChildren` and wraps everything up nicely,
  * combining event handlers that are used in multiple sub-hooks, collecting all the necessary context-related data, and merging all known DOM props together.
  *
  *

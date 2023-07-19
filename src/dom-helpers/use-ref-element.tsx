@@ -3,13 +3,18 @@ import { useCallback, useRef } from "../util/lib.js";
 import { ElementProps } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 
+export interface UseRefElementReturnTypeSelf<T extends EventTarget> {
+    /** **STABLE** */
+    getElement(): T | null;
+}
 export interface UseRefElementReturnType<T extends EventTarget> {
     propsStable: ElementProps<T>;
-
-    refElementReturn: {
-        /** **STABLE** */
-        getElement(): T | null;
-    }
+    refElementReturn: UseRefElementReturnTypeSelf<T>;
+}
+export interface UseRefElementParametersSelf<T> {
+    onElementChange?: OnPassiveStateChange<T | null, never>;
+    onMount?: (element: T) => void;
+    onUnmount?: (element: T) => void;
 }
 
 export interface UseRefElementParameters<T> {
@@ -20,11 +25,7 @@ export interface UseRefElementParameters<T> {
      * absence isn't usually because it was forgotten, it's because
      * it doesn't matter.
      */
-    refElementParameters?: {
-        onElementChange?: OnPassiveStateChange<T | null, never>;
-        onMount?: (element: T) => void;
-        onUnmount?: (element: T) => void;
-    }
+    refElementParameters?: UseRefElementParametersSelf<T>;
 }
 
 /**
@@ -55,6 +56,8 @@ export interface UseRefElementParameters<T> {
  * const [getElement, setElement] = usePassiveState<HTMLButtonElement | null>(onElementChange, returnNull);
  * const { propsStable } = useRefElement({ onElementChange: setElement });
  * ```
+ * 
+ * @compositeParams
  */
 export function useRefElement<T extends EventTarget>(args: UseRefElementParameters<T>): UseRefElementReturnType<T> {
     monitorCallCount(useRefElement);

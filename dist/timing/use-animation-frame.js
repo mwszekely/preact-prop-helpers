@@ -33,9 +33,11 @@ export function ProvideBatchedAnimationFrames({ children }) {
 /**
  * The (optionally non-stable) `callback` you provide will start running every frame after the component mounts.
  *
- * Passing `null` is fine and simply stops the effect until you restart it by providing a non-null callback.
+ * @remarks Passing `null` is fine and simply stops the effect until you restart it by providing a non-null callback.
  *
- * **This hook does not return anything at all, including no prop-modifying hooks**
+ * {@include } {@link UseAnimationFrameParameters}
+ *
+ * {@include } {@link ProvideBatchedAnimationFrames}
  */
 export function useAnimationFrame({ callback }) {
     monitorCallCount(useAnimationFrame);

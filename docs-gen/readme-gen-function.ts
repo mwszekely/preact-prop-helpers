@@ -1,6 +1,6 @@
 import { ApiFunction } from "@microsoft/api-extractor-model";
 import { DocLinkTag, DocParagraph } from "@microsoft/tsdoc";
-import { handleParams, handleReturn } from "./readme-gen-function-params.js";
+import { ParamsOrReturnContext, handleParams, handleReturn } from "./readme-gen-function-params.js";
 import { ApiContext, HeaderLevelContext, ModelContext, TrackingContext, doDocBlock, doDocNode, doDocSection, doHeader, doReference } from "./readme-gen-shared.js";
 
 export interface IsCompositeContext {
@@ -8,7 +8,7 @@ export interface IsCompositeContext {
 }
 
 
-export function handleReadmeIncludeFunction<C extends HeaderLevelContext & ApiContext & ModelContext & TrackingContext>(item: ApiFunction, context: C): string {
+export function handleReadmeIncludeFunction<C extends HeaderLevelContext & ApiContext & ModelContext & TrackingContext & Partial<ParamsOrReturnContext>>(item: ApiFunction, ctx: C): string {
     let isCompositeFunction = false;
 
     if (item.tsdocComment?.modifierTagSet.hasTagName("@compositeParams")) {
@@ -17,6 +17,8 @@ export function handleReadmeIncludeFunction<C extends HeaderLevelContext & ApiCo
 
     let childIncludes = new Map<string, ApiFunction | null>();
     let examples = new Array<string>();
+    let context = { ...ctx, api: item, isCompositeFunction };
+
     for (let cb of item.tsdocComment?.customBlocks ?? []) {
         if (cb.blockTag.tagName === '@hasChild') {
             console.assert(cb.content.nodes.length === 1, "A @hasChild tag must be exactly one block-paragraph long with only a @link tag.");
@@ -53,15 +55,15 @@ ${example.map(node => doDocNode(node, context)).join("\n")}`);
 
 ${doDocSection(item.tsdocComment?.summarySection, context)}
 
-${item.tsdocComment?.seeBlocks.length ? `**See also** ${item.tsdocComment?.seeBlocks.map(block => doDocBlock(block, context))}` : ''}
+${item.tsdocComment?.seeBlocks.length ? `**See also** ${item.tsdocComment?.seeBlocks.map(block => doDocBlock(block, context)).join("\n")}` : ''}
 
-${handleParams(item.parameters, { ...context, api: item, isCompositeFunction })}
+${handleParams(item.parameters, context)}
 
-${handleReturn(item, { ...context, api: item, isCompositeFunction })}
+${handleReturn(item, context)}
 
 ${doDocBlock(item.tsdocComment?.remarksBlock, context)}
 
-${examples}
+${examples.join("\n")}
 
 ${Array.from(childIncludes).map(([, func]) => { return func ? handleReadmeIncludeFunction(func, context) : "(Missing reference)" }).join("\n")}
 `;

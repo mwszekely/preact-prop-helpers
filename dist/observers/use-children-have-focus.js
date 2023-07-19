@@ -7,7 +7,11 @@ import { monitorCallCount } from "../util/use-call-count.js";
  * for an "overall focusin/out" event; this hook lets you know when focus has
  * moved in/out of this grouping of children EVEN IF there is no actual parent DOM element.
  *
- * I.E. you can use this without needing a parent `<div>` to listen for a `focusout` event.
+ * @remarks I.E. you can use this without needing a parent `<div>` to listen for a `focusout` event.
+ *
+ * @compositeParams
+ *
+ * @hasChild {@link useChildrenHaveFocusChild}
  */
 export function useChildrenHaveFocus(args) {
     monitorCallCount(useChildrenHaveFocus);
@@ -22,6 +26,9 @@ export function useChildrenHaveFocus(args) {
         context: useMemoObject({ childrenHaveFocusChildContext: useMemoObject({ setFocusCount }) }),
     };
 }
+/**
+ * @compositeParams
+ */
 export function useChildrenHaveFocusChild({ context: { childrenHaveFocusChildContext: { setFocusCount } } }) {
     monitorCallCount(useChildrenHaveFocusChild);
     return {

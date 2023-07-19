@@ -17,6 +17,9 @@ function htmlToElement(parent, html) {
  * The `handle` prop should be e.g. `useRef<ImperativeHandle<HTMLDivElement>>(null)`
  */
 export const ImperativeElement = memo(forwardRef(ImperativeElementU));
+/**
+ * @compositeParams
+ */
 export function useImperativeProps({ refElementReturn: { getElement } }) {
     monitorCallCount(useImperativeProps);
     const currentImperativeProps = useRef({ className: new Set(), style: {}, children: null, html: null, others: {} });
@@ -104,7 +107,7 @@ export function useImperativeProps({ refElementReturn: { getElement } }) {
         }
     }, []);
     return {
-        imperativeHandle: useRef({
+        imperativePropsReturn: useRef({
             hasClass,
             setClass,
             setStyle,
@@ -120,7 +123,7 @@ export function useImperativeProps({ refElementReturn: { getElement } }) {
 }
 function ImperativeElementU({ tag: Tag, handle, ...props }, ref) {
     const { propsStable, refElementReturn } = useRefElement({ refElementParameters: {} });
-    const { props: imperativeProps, imperativeHandle } = useImperativeProps({ refElementReturn });
+    const { props: imperativeProps, imperativePropsReturn: imperativeHandle } = useImperativeProps({ refElementReturn });
     useImperativeHandle(handle, () => imperativeHandle);
     return (createElement(Tag, useMergedProps(propsStable, imperativeProps, props, { ref })));
 }

@@ -1,13 +1,11 @@
 /**
  * # Preact Prop Helpers
  * 
- * A small set of hooks related to modifying HTML attributes to do useful things, but also a number of other tricks and tools that I have found to be extremely useful when building UIs with Preact
+ * A small set of hooks for Preact. The theme is modifying HTML attributes to do useful things, along with a bunch of other useful boilerplate-y hooks.
  * 
- * Everything from keyboard navigation to modal traps to `localStorage` state management is here and heavily dog-fooded.
+ * Everything from keyboard navigation (arrow keys, typeahead) to modal focus traps (dialogs and menus) to simple things like state management *but with localStorage!* are here.
  * 
- * The name (Preact Prop Helpers) came because most of these hooks require modifying the props that were going to be passed to an element (generally just the `ref` on those props, but often other attributes too, like `tabIndex` and such).  It's since grown in scope to include a bunch of general helper hooks as well (like `useAsync` and `useStableCallback`).
- * 
- * ## List of hooks (in rough order of priority)
+ * ## List of hooks (in rough order of usefulness)
  * 
  * {@tableOfContents start}
  * {@tableOfContents header Common}
@@ -22,6 +20,7 @@
  * {@include } {@link useManagedChildren}
  * {@tableOfContents header Less common but still useful}
  * {@tableOfContents subheader These hooks are useful, but in more specific circumstances}
+ * {@include } {@link useMediaQuery}
  * {@include } {@link useRandomId}
  * {@include } {@link useRandomDualIds}
  * {@include } {@link useHasCurrentFocus}
@@ -32,7 +31,6 @@
  * {@include } {@link useDocumentClass}
  * {@include } {@link useElementSize}
  * {@tableOfContents header Niche}
- * {@include } {@link useMediaQuery}
  * {@include } {@link useAsyncEffect}
  * {@include } {@link useMutationObserver}
  * {@include } {@link useImperativeProps}
@@ -58,7 +56,7 @@
  * {@include } {@link useEffectDebug}
  * {@include } {@link useLayoutEffectDebug}
  * {@include } {@link useTimeout}
- * {@tableOfContents header Helpers for list navigation (and others)}
+ * {@tableOfContents header Building blocks and other helpers}
  * {@tableOfContents subheader These hooks are primarily used to build larger hooks, but can be used alone}
  * {@include } {@link useListNavigation}
  * {@include } {@link useGridNavigation}
@@ -67,8 +65,14 @@
  * {@include } {@link useTypeaheadNavigation}
  * {@include } {@link useSingleSelection}
  * {@include } {@link useRearrangeableChildren}
+ * {@include } {@link useSortableChildren}
  * {@include } {@link usePaginatedChildren}
  * {@include } {@link useStaggeredChildren}
+ * {@include } {@link useDismiss}
+ * {@include } {@link useBackdropDismiss}
+ * {@include } {@link useEscapeDismiss}
+ * {@include } {@link useLostFocusDismiss}
+ * {@include } {@link useFocusTrap}
  * {@include } {@link useAsync}
  * {@include } {@link useUrl}
  * {@include } {@link useMergedRefs}
@@ -76,6 +80,47 @@
  * {@include } {@link useMergedChildren}
  * {@include } {@link useMergedStyles}
  * {@tableOfContents end}
+ * 
+ * {@include } {@link ElementProps}
+ * {@include } {@link OmitStrong}
+ * {@include } {@link Nullable}
+ * 
+ * ```md-literal
+ * ## Conventions and goals
+ * 
+ * * As much as possible, no specific DOM restrictions are imposed and, for hooks with children (lists, grids, etc.), those children can be anywhere descendent in the tree (except for `useSortableChildren`, which can be anywhere descendant but must all be in an array). Nesting hooks, even of the same type, is also fine.
+ *     *  E.G. `useRovingTabIndexChild` can call its own `useRovingTabIndex`, which is how `useGridNavigation` works.
+ * * A parent hook never needs to be directly passed child data because the children will provide it themselves. E.G. `useListNavigation` can filter children, but it doesn't take an array of which children to filter out; each child reports its own status as filtered/unfiltered with, say, a `hidden` prop, and the parent responds to that.
+ * * Re-render as few times as possible. In general this means instead of a hook returning a value, it will accept an `onChange`-ish handler that will let you explicitly do that.
+ *     * `useElementSize`, for example, has no way of returning the size the first time its component renders. It needs to fully render *and then* run an effect that measures it. Once the element's been measured, *you* are responsible for choosing if the component is re-rendered with this new information or not.
+ *     * This means that the child data is *always* the single source of truth, and maps nicely to how components are built and diffed.
+ * * Some of these hooks, like `useGridNavigationRow`, have **extremely** complicated dependencies. To manage this, most hooks take a single parameter and return a single object with everything labelled consistently and designed to be discoverable via auto-complete. If we have `useFoo`, it:
+ *     * ...will always take parameters like `{ fooParameters: {...} }`.
+ *         * E.G. `useElementRef({ elementRefParameters: { onMount: ... } })`
+ *     * ...will always return objects like `{ fooReturn: { ... } }`
+ *         * E.G. `const { refElementReturn: { getElement } } = useElementRef(...)`
+ *     * ...may also return `{ props: {...} }`. These must be spread onto the element you're rendering, or the hook will not function (see `useMergedProps` if you need to use other props in addition to the returned props). It may occasionally be called something else starting with `props`, e.g. `propsStable`, `propsTarget`, etc.
+ *         * E.G. `const { propsStable } = useElementRef(...)`, then `<div {...propsStable} />`
+ *         * `propsStable` indicates that nothing about the object ever changes including the identity of the object itself and all its fields.
+ *     * ...may also return `{ context: { ... } }` that children rely on.
+ *         1. E.G. Parent calls `const { context } = useFoo(...);`
+ *         1. Parent renders `<MyContext.Provider value={context}>{children}</MyContext.Provider>`
+ *         1. Then child calls `useFooChild({ context: useContext(MyContext), fooChildParameters: {...} })`
+ *     * ...may also require or return `{ info: { ... } }` if it has something to contribute to `useManagedChild`'s special `info` parameter.
+ *     * When hooks themselves use other hooks:
+ *         * If `useFoo` calls `useBar` directly, then it will take parameters like `{ fooParameters: {...}, barParameters: {...} }` and return objects like `{ fooReturn: {...}, barReturn: {...} }`.
+ *         * If `useFoo` relies on `useBar` (but doesn't call it itself!), then will do one of the following:
+ *             * Take parameters like `{ fooParameters: { ... }, barReturn: { ... } }`, if it needs the return value of `useBar`.
+ *             * Return values like `{ fooReturn: { ... }, barParameters: { ... } }`, if it needs `useBar` to be called with specific parameters in order to function (usually callbacks).
+ *         * (The difference between those two is usually based on performance -- many, many hooks rely on `elementRefReturn.getElement`, for example, so the latter pattern allows us to just call `useRefElement` once and pass the result around to whoever needs it)
+ *         * If `useFoo` and `useBar` both return a top-level `props`, they will be merged into one.
+ *         * If `useFoo` and `useBar` both return a top-level `context`, they will be merged into one.
+ *         * If `useFoo` and `useBar` both return a top-level `info`, they will be merged into one.
+ *         * Occasionally, `props` or `context` may be suffixed with the specific role they refer to:
+ *             * `useRandomId` returns `propsSource` and `propsReferencer` (and no `props`).
+ * * Organizationally, some hooks exist primarily to be used as a part of a larger hook.  Hooks within the `component-use` folder are generally "ready-to-use" and don't require much passing of parameters back and forth, but are not fully extensible.  Hooks within `component-detail` are the lower-level building blocks that make up those "ready-to-use" complete hooks, but they're much more time-consuming to use.
+ *     * You can also just copy and paste one of the complete hooks somewhere else and use it as a new building block...
+ * ```
  *
  * @packageDocumentation
  */
@@ -91,45 +136,46 @@ export { OnTabbableIndexChange, RovingTabIndexChildContext, RovingTabIndexChildC
 export { MakeSingleSelectionDeclarativeParameters, MakeSingleSelectionDeclarativeReturnType, SelectedIndexChangeEvent, SelectedIndexChangeHandler, SingleSelectionContextSelf, UseSingleSelectionChildInfo, UseSingleSelectionChildInfoParameterKeys, UseSingleSelectionChildInfoReturnKeys, UseSingleSelectionChildParameters, UseSingleSelectionChildReturnType, UseSingleSelectionChildReturnTypeSelf, UseSingleSelectionContext, UseSingleSelectionDeclarativeParameters, UseSingleSelectionParameters, UseSingleSelectionParametersSelf, UseSingleSelectionReturnType, UseSingleSelectionReturnTypeSelf, useSingleSelection, useSingleSelectionChild, useSingleSelectionDeclarative } from "./component-detail/keyboard-navigation/use-single-selection.js";
 export { Compare, GetHighestChildIndex, GetIndex, GetValid, UseRearrangeableChildInfo, UseRearrangeableChildrenParameters, UseRearrangeableChildrenParametersSelf, UseRearrangeableChildrenReturnType, UseRearrangeableChildrenReturnTypeSelf, UseSortableChildInfo, UseSortableChildrenParameters, UseSortableChildrenParametersSelf, UseSortableChildrenReturnType, UseSortableChildrenReturnTypeSelf, defaultCompare, useRearrangeableChildren, useSortableChildren } from "./component-detail/keyboard-navigation/use-sortable-children.js";
 export { UseTypeaheadNavigationChildInfo, UseTypeaheadNavigationChildParameters, UseTypeaheadNavigationChildReturnType, UseTypeaheadNavigationContext, UseTypeaheadNavigationContextSelf, UseTypeaheadNavigationParameters, UseTypeaheadNavigationParametersSelf, UseTypeaheadNavigationReturnType, UseTypeaheadNavigationReturnTypeSelf, binarySearch, useTypeaheadNavigation, useTypeaheadNavigationChild } from "./component-detail/keyboard-navigation/use-typeahead-navigation.js";
-export { DismissListenerTypes, UseBackdropDismissParameters, UseDismissParameters, UseDismissReturnType, UseEscapeDismissParameters, UseLostFocusDismissParameters, UseLostFocusDismissReturnType, useBackdropDismiss, useDismiss, useEscapeDismiss, useLostFocusDismiss } from "./component-detail/use-dismiss.js";
-export { UseFocusTrapParameters, UseFocusTrapReturnType, findFirstFocusable, findFirstTabbable, useFocusTrap } from "./component-detail/use-focus-trap.js";
+export { DismissListenerTypes, UseBackdropDismissParameters, UseBackdropDismissParametersSelf, UseDismissParameters, UseDismissParametersSelf, UseDismissReturnType, UseEscapeDismissParameters, UseEscapeDismissParametersSelf, UseLostFocusDismissParameters, UseLostFocusDismissParametersSelf, UseLostFocusDismissReturnType, useBackdropDismiss, useDismiss, useEscapeDismiss, useLostFocusDismiss } from "./component-detail/use-dismiss.js";
+export { UseFocusTrapParameters, UseFocusTrapParametersSelf, UseFocusTrapReturnType, findFirstFocusable, findFirstTabbable, useFocusTrap } from "./component-detail/use-focus-trap.js";
 export { UsePaginatedChildContext, UsePaginatedChildContextSelf, UsePaginatedChildParameters, UsePaginatedChildReturnType, UsePaginatedChildReturnTypeSelf, UsePaginatedChildrenInfo, UsePaginatedChildrenParameters, UsePaginatedChildrenParametersSelf, UsePaginatedChildrenReturnType, UsePaginatedChildrenReturnTypeSelf, usePaginatedChild, usePaginatedChildren } from "./component-detail/use-paginated-children.js";
 export { UseStaggeredChildContext, UseStaggeredChildContextSelf, UseStaggeredChildParameters, UseStaggeredChildReturnType, UseStaggeredChildReturnTypeSelf, UseStaggeredChildrenInfo, UseStaggeredChildrenParameters, UseStaggeredChildrenParametersSelf, UseStaggeredChildrenReturnType, UseStaggeredChildrenReturnTypeSelf, useStaggeredChild, useStaggeredChildren } from "./component-detail/use-staggered-children.js";
 export { CompleteGridNavigationCellContext, CompleteGridNavigationRowContext, UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationCellParameters, UseCompleteGridNavigationCellReturnType, UseCompleteGridNavigationDeclarativeParameters, UseCompleteGridNavigationDeclarativeReturnType, UseCompleteGridNavigationParameters, UseCompleteGridNavigationReturnType, UseCompleteGridNavigationRowInfo, UseCompleteGridNavigationRowParameters, UseCompleteGridNavigationRowReturnType, useCompleteGridNavigation, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow } from "./component-use/use-grid-navigation-complete.js";
 export { CompleteListNavigationContext, UseCompleteListNavigationChildInfo, UseCompleteListNavigationChildParameters, UseCompleteListNavigationChildReturnType, UseCompleteListNavigationDeclarativeParameters, UseCompleteListNavigationDeclarativeReturnType, UseCompleteListNavigationParameters, UseCompleteListNavigationReturnType, useCompleteListNavigation, useCompleteListNavigationChild, useCompleteListNavigationDeclarative } from "./component-use/use-list-navigation-complete.js";
 export { UseModalParameters, UseModalReturnType, useModal } from "./component-use/use-modal.js";
-export { PressChangeEventReason, PressEventReason, UsePressParameters, UsePressReturnType, setPressVibrate, usePress } from "./component-use/use-press.js";
+export { PressChangeEventReason, PressEventReason, UsePressParameters, UsePressParametersSelf, UsePressReturnType, UsePressReturnTypeSelf, setPressVibrate, usePress } from "./component-use/use-press.js";
 export { UseRandomDualIdsParameters, UseRandomDualIdsReturnType, useRandomDualIds } from "./component-use/use-random-dual-ids.js";
-export { UseRandomIdParameters, UseRandomIdReturnType, useRandomId } from "./component-use/use-random-id.js";
+export { UseRandomIdParameters, UseRandomIdParametersSelf, UseRandomIdReturnType, UseRandomIdReturnTypeSelf, useRandomId } from "./component-use/use-random-id.js";
 export { AsyncHandler, UseAsyncHandlerParameters, UseAsyncHandlerReturnType, useAsyncHandler } from "./dom-helpers/use-async-handler.js";
 export { getDocument, useDocumentClass } from "./dom-helpers/use-document-class.js";
 export { UseDraggableParameters, UseDraggableReturnType, useDraggable } from "./dom-helpers/use-draggable.js";
 export { DropFile, DropFileMetadata, DroppableFileError, UseDroppableParameters, UseDroppableReturnType, useDroppable } from "./dom-helpers/use-droppable.js";
 export { useGlobalHandler } from "./dom-helpers/use-event-handler.js";
 export { useHideScroll } from "./dom-helpers/use-hide-scroll.js";
-export { DangerouslyAppendHTML, DangerouslySetInnerHTML, GetAttribute, GetClass, ImperativeElement, ImperativeElementProps, ImperativeHandle, SetAttribute, SetChildren, SetClass, SetEventHandler, SetStyle, UseImperativePropsParameters, useImperativeProps } from "./dom-helpers/use-imperative-props.js";
+export { DangerouslyAppendHTML, DangerouslySetInnerHTML, GetAttribute, GetClass, ImperativeElement, SetAttribute, SetChildren, SetClass, SetEventHandler, SetStyle, UseImperativePropsParameters, UseImperativePropsReturnType, UseImperativePropsReturnTypeSelf, useImperativeProps } from "./dom-helpers/use-imperative-props.js";
+export { useMergedChildren } from "./dom-helpers/use-merged-children.js";
 export { useMergedClasses } from "./dom-helpers/use-merged-classes.js";
 export { enableLoggingPropConflicts, mergeFunctions, useMergedProps } from "./dom-helpers/use-merged-props.js";
 export { useMergedRefs } from "./dom-helpers/use-merged-refs.js";
 export { useMergedStyles } from "./dom-helpers/use-merged-styles.js";
 export { PortalChildUpdater, PushPortalChild, RemovePortalChild, UpdatePortalChild, UsePortalChildrenParameters, UsePortalChildrenReturnType, usePortalChildren } from "./dom-helpers/use-portal-children.js";
-export { UseRefElementParameters, UseRefElementReturnType, useRefElement } from "./dom-helpers/use-ref-element.js";
-export { UseTextContentParameters, UseTextContentReturnType, useTextContent } from "./dom-helpers/use-text-content.js";
-export { UseActiveElementParameters, UseActiveElementReturnType, useActiveElement } from "./observers/use-active-element.js";
-export { UseChildrenHaveFocusChildParameters, UseChildrenHaveFocusChildReturnType, UseChildrenHaveFocusContext, UseChildrenHaveFocusParameters, UseChildrenHaveFocusReturnType, useChildrenHaveFocus, useChildrenHaveFocusChild } from "./observers/use-children-have-focus.js";
-export { ElementSize, UseElementSizeParameters, UseElementSizeReturnType, useElementSize } from "./observers/use-element-size.js";
-export { UseHasCurrentFocusParameters, UseHasCurrentFocusReturnType, useHasCurrentFocus } from "./observers/use-has-current-focus.js";
-export { UseHasLastFocusParameters, UseHasLastFocusReturnType, useHasLastFocus } from "./observers/use-has-last-focus.js";
+export { UseRefElementParameters, UseRefElementParametersSelf, UseRefElementReturnType, UseRefElementReturnTypeSelf, useRefElement } from "./dom-helpers/use-ref-element.js";
+export { UseTextContentParameters, UseTextContentParametersSelf, UseTextContentReturnType, UseTextContentReturnTypeSelf, useTextContent } from "./dom-helpers/use-text-content.js";
+export { UseActiveElementParameters, UseActiveElementParametersSelf, UseActiveElementReturnType, UseActiveElementReturnTypeSelf, useActiveElement } from "./observers/use-active-element.js";
+export { UseChildrenHaveFocusChildParameters, UseChildrenHaveFocusChildReturnType, UseChildrenHaveFocusContext, UseChildrenHaveFocusParameters, UseChildrenHaveFocusParametersSelf, UseChildrenHaveFocusReturnType, UseChildrenHaveFocusReturnTypeSelf, useChildrenHaveFocus, useChildrenHaveFocusChild } from "./observers/use-children-have-focus.js";
+export { ElementSize, UseElementSizeParameters, UseElementSizeParametersSelf, UseElementSizeReturnType, UseElementSizeReturnTypeSelf, useElementSize } from "./observers/use-element-size.js";
+export { UseHasCurrentFocusParameters, UseHasCurrentFocusParametersSelf, UseHasCurrentFocusReturnType, UseHasCurrentFocusReturnTypeSelf, useHasCurrentFocus } from "./observers/use-has-current-focus.js";
+export { HasLastFocusReturnTypeSelf, UseHasLastFocusParameters, UseHasLastFocusParametersSelf, UseHasLastFocusReturnType, useHasLastFocus } from "./observers/use-has-last-focus.js";
 export { LogicalDirectionInfo, LogicalElementSize, LogicalOrientation, PhysicalDirection, PhysicalOrientation, PhysicalSize, UseLogicalDirectionParameters, UseLogicalDirectionReturnType, useLogicalDirection } from "./observers/use-logical-direction.js";
 export { UseMediaQueryReturnType, useMediaQuery } from "./observers/use-media-query.js";
-export { UseMutationObserverParameters, useMutationObserver } from "./observers/use-mutation-observer.js";
+export { UseMutationObserverParameters, UseMutationObserverParametersSelf, UseMutationObserverReturnType, useMutationObserver } from "./observers/use-mutation-observer.js";
 export { useUrl } from "./observers/use-url.js";
 export { useAsyncEffect } from "./preact-extensions/use-async-effect.js";
 export { UseAsyncParameters, UseAsyncReturnType, useAsync } from "./preact-extensions/use-async.js";
 export { useEffectDebug } from "./preact-extensions/use-effect-debug.js";
 export { useForceUpdate } from "./preact-extensions/use-force-update.js";
 export { useLayoutEffectDebug } from "./preact-extensions/use-layout-effect-debug.js";
-export { ManagedChildInfo, ManagedChildren, OnAfterChildLayoutEffect, OnChildrenMountChange, UseChildrenFlagParameters, UseChildrenFlagReturnType, UseManagedChildParameters, UseManagedChildReturnType, UseManagedChildrenContext, UseManagedChildrenParameters, UseManagedChildrenReturnType, useChildrenFlag, useManagedChild, useManagedChildren } from "./preact-extensions/use-managed-children.js";
+export { ManagedChildInfo, ManagedChildren, OnAfterChildLayoutEffect, OnChildrenMountChange, UseChildrenFlagParameters, UseChildrenFlagReturnType, UseManagedChildParameters, UseManagedChildReturnType, UseManagedChildReturnTypeSelf, UseManagedChildrenContext, UseManagedChildrenContextSelf, UseManagedChildrenParameters, UseManagedChildrenParametersSelf, UseManagedChildrenReturnType, UseManagedChildrenReturnTypeSelf, useChildrenFlag, useManagedChild, useManagedChildren } from "./preact-extensions/use-managed-children.js";
 export { OnPassiveStateChange, PassiveStateUpdater, returnFalse, returnNull, returnTrue, returnUndefined, returnZero, runImmediately, useEnsureStability, usePassiveState } from "./preact-extensions/use-passive-state.js";
 export { PersistentStates, getFromLocalStorage, storeToLocalStorage, usePersistentState } from "./preact-extensions/use-persistent-state.js";
 export { OnParamValueChanged, SearchParamStates, SetParamWithHistory, UseSearchParamStateParameters, useSearchParamState, useSearchParamStateDeclarative } from "./preact-extensions/use-search-param-state.js";

@@ -132,7 +132,7 @@ export interface UseSortableChildInfo extends UseRearrangeableChildInfo {
 /**
  * Hook that allows for the **direct descendant** children of this component to be re-ordered and sorted.
  * 
- * *This is **separate** from "managed" children, which can be any level of child needed! Sortable/rearrangeable children must be **direct descendants** of the parent that uses this hook!*
+ * @remarks *This is **separate** from "managed" children, which can be any level of child needed! Sortable/rearrangeable children must be **direct descendants** of the parent that uses this hook!*
  * 
  * It's recommended to use this in conjunction with `useListNavigation`; it takes the same `indexMangler` and `indexDemangler` 
  * functions that this hook returns. `useListNavigation` does not directly use this hook because, as mentioned, 
@@ -256,7 +256,7 @@ export function useRearrangeableChildren<M extends UseSortableChildInfo>({
 /**
  * Hook that allows for the **direct descendant** children of this component to be re-ordered and sorted.
  * 
- * *This is **separate** from "managed" children, which can be any level of child needed! Sortable/rearrangeable children must be **direct descendants** of the parent that uses this hook!* 
+ * @remarks *This is **separate** from "managed" children, which can be any level of child needed! Sortable/rearrangeable children must be **direct descendants** of the parent that uses this hook!* 
  * 
  * It's recommended to use this in conjunction with `useListNavigation`; it takes the same `indexMangler` and `indexDemangler` 
  * functions that this hook returns. `useListNavigation` does not directly use this hook because, as mentioned, 
@@ -273,6 +273,8 @@ export function useRearrangeableChildren<M extends UseSortableChildInfo>({
  * the prop-modifying hook inspects the given children, then re-creates them with new `key`s.
  * Because keys are given special treatment and a child has no way of modifying its own key
  * there's no other time or place this can happen other than exactly within the parent component's render function.
+ * 
+ * @compositeParams
  */
 export function useSortableChildren<M extends UseSortableChildInfo>({
     rearrangeableChildrenParameters,

@@ -105,7 +105,14 @@ export interface UseCompleteGridNavigationCellReturnType<CellElement extends Ele
     props: ElementProps<CellElement>;
 }
 
-
+/**
+ * Combines all the grid- (&amp; list-) related hooks into one giant hook that accomplishes everything.
+ * 
+ * @compositeParams
+ * 
+ * @hasChild {@link useCompleteGridNavigationRow}
+ * @hasChild {@link useCompleteGridNavigationCell}
+ */
 export function useCompleteGridNavigation<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement, CellElement>, CM extends UseCompleteGridNavigationCellInfo<CellElement>>({
     gridNavigationParameters,
     linearNavigationParameters,
@@ -196,6 +203,9 @@ export function useCompleteGridNavigation<ParentOrRowElement extends Element, Ro
 
 }
 
+/**
+ * @compositeParams
+ */
 export function useCompleteGridNavigationRow<RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement, CellElement>, CM extends UseCompleteGridNavigationCellInfo<CellElement>>({
 
     info,
@@ -319,6 +329,9 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
     }
 }
 
+/**
+ * @compositeParams
+ */
 export function useCompleteGridNavigationCell<CellElement extends Element, CM extends UseCompleteGridNavigationCellInfo<CellElement>>({
     gridNavigationCellParameters,
     context: { gridNavigationCellContext, managedChildContext, rovingTabIndexContext, typeaheadNavigationContext, completeGridNavigationCellContext: { excludeSpace: es2 } },

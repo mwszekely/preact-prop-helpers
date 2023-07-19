@@ -9,5 +9,10 @@ export interface UseIntervalParameters {
      */
     callback: () => void;
 }
+/**
+ * Runs a function every time the specified number of milliseconds elapses while the component is mounted.
+ *
+ * {@include } {@link UseIntervalParameters}
+ */
 export declare function useInterval({ interval, callback }: UseIntervalParameters): void;
 //# sourceMappingURL=use-interval.d.ts.map

@@ -3,11 +3,9 @@ import { useState } from "../preact-extensions/use-state.js";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from "../util/lib.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 /**
- * Allows children to each wait until the previous has finished rendering before itself rendering.
+ * Allows children to each wait until the previous has finished rendering before itself rendering. E.G. Child #3 waits until #2 renders. #2 waits until #1 renders, etc.
  *
- * E.G. Child #3 waits until #2 renders. #2 waits until #1 renders, etc.
- *
- * Note that the child itself will still render, but you can delay rendering *its* children, or
+ * @remarks Note that the child itself will still render, but you can delay rendering *its* children, or
  * delay other complicated or heavy logic, until the child is no longer staggered.
  *
  *

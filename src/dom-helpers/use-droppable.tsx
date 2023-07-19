@@ -70,6 +70,12 @@ export class DroppableFileError extends Error {
 
 
 
+/**
+ * Allows an element to start a drag operation.
+ * 
+ * {@include } {@link UseDroppableParameters}
+ * {@include } {@link UseDroppableReturnType}
+ */
 export function useDroppable<E extends Element>({ effect }: UseDroppableParameters): UseDroppableReturnType<E> {
     monitorCallCount(useDroppable);
 

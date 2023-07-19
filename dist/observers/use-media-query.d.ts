@@ -2,7 +2,7 @@
  *
  * Allows a component to use the boolean result of a media query as part of its render.
  *
- * Please note that there is a re-render penalty incurred by using this hook -- it will
+ * @remarks Please note that there is a re-render penalty incurred by using this hook -- it will
  * always cause any component that uses it to re-render one extra time on mount as it
  * stores the result of the media query. This can be mitigated with the `defaultGuess`
  * parameter -- if you guess correctly (`true`/`false`), then there's no penalty. Hooray.

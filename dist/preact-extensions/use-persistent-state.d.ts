@@ -9,8 +9,8 @@ import { StateUpdater } from "../util/lib.js";
  *     interface PersistentStates {
  *         numberState: number;
  *         stringState: string;
- *     \}
- * \}
+ *     }
+ * }
  * ```
  */
 export interface PersistentStates {
@@ -18,15 +18,15 @@ export interface PersistentStates {
 export declare function getFromLocalStorage<Key extends (keyof PersistentStates) & string>(key: Key, converter?: ((input: string) => PersistentStates[Key]), storage?: Storage): PersistentStates[Key] | null;
 export declare function storeToLocalStorage<Key extends (keyof PersistentStates) & string>(key: Key, value: PersistentStates[Key], converter?: ((input: PersistentStates[Key]) => string), storage?: Storage): void;
 /**
- * Use module augmentation to get the correct types for this function.
+ * @remarks Use module augmentation to get the correct types for this function.
  *
  * ```typescript
  * declare module 'preact-prop-helpers' {
  *     interface PersistentStates {
  *         numberState: number;
  *         stringState: string;
- *     \}
- * \}
+ *     }
+ * }
  * ```
  * @param key -
  * @param initialValue -

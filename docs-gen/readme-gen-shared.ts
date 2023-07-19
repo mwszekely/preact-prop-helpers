@@ -1,7 +1,8 @@
 
-import { ApiDocumentedItem, ApiFunction, ApiItem, ApiModel, ExcerptToken } from "@microsoft/api-extractor-model";
-import { DocBlock, DocCodeSpan, DocDeclarationReference, DocFencedCode, DocInlineTag, DocLinkTag, DocNode, DocParagraph, DocPlainText, DocSection, DocSoftBreak } from "@microsoft/tsdoc";
-import { handleReadmeIncludeFunction } from "./readme-gen-function.js";
+import { ApiDocumentedItem, ApiFunction, ApiInterface, ApiItem, ApiModel, ApiTypeAlias, ExcerptToken } from "@microsoft/api-extractor-model";
+import { DocBlock, DocCodeSpan, DocComment, DocDeclarationReference, DocErrorText, DocFencedCode, DocInlineTag, DocLinkTag, DocNode, DocParagraph, DocPlainText, DocSection, DocSoftBreak } from "@microsoft/tsdoc";
+import { ParamsOrReturnContext, doInterfaceToTable } from "./readme-gen-function-params.js";
+import { IsCompositeContext, handleReadmeIncludeFunction } from "./readme-gen-function.js";
 
 export interface TrackingContext { referenced: Set<string>, documented: Set<string> }
 export interface HeaderLevelContext { headerLevel: number }
@@ -71,11 +72,11 @@ export function doString<C extends Partial<InTableContext>>(string: string, cont
     }
 }
 
-export function doDocBlock<C extends Partial<InTableContext> & ApiContext & ModelContext & Partial<IncludeContext> & HeaderLevelContext & TrackingContext>(section: DocBlock | null | undefined, context: C) {
+export function doDocBlock<C extends Partial<InTableContext> & ApiContext & ModelContext & Partial<IncludeContext> & HeaderLevelContext & TrackingContext & Partial<ParamsOrReturnContext> & IsCompositeContext>(section: DocBlock | null | undefined, context: C) {
     return section?.content.nodes.map(node => { return doDocNode(node, context); }).join(!context.inTable ? "\n\n" : "<br />") ?? "";
 }
 
-export function doDocNode<C extends InTableContext & ApiContext & ModelContext & Partial<IncludeContext> & HeaderLevelContext & TrackingContext & InTOCContext & InListContext>(node: DocNode | null | undefined, context: C): string {
+export function doDocNode<C extends InTableContext & ApiContext & ModelContext & Partial<IncludeContext> & HeaderLevelContext & TrackingContext & InTOCContext & InListContext & Partial<ParamsOrReturnContext> & Partial<IsCompositeContext>>(node: DocNode | null | undefined, context: C): string {
     if (!node)
         return "";
 
@@ -86,11 +87,16 @@ export function doDocNode<C extends InTableContext & ApiContext & ModelContext &
             return doDocNodeParagraph(p, context);
         case "FencedCode":
             const fc = (node as DocFencedCode);
-            return `
+            if (fc.language == "md-literal") {
+                return fc.code;
+            }
+            else {
+                return `
 \`\`\`${fc.language}
 ${fc.code}
 \`\`\`
 `;
+            }
         default:
             debugger;
             return "";
@@ -98,7 +104,7 @@ ${fc.code}
     }
 }
 
-export function doDocNodeParagraph<C extends InTableContext & ApiContext & ModelContext & Partial<IncludeContext> & HeaderLevelContext & TrackingContext & InTOCContext & InListContext>(node: DocParagraph, context: C): string {
+export function doDocNodeParagraph<C extends InTableContext & ApiContext & ModelContext & Partial<IncludeContext> & HeaderLevelContext & TrackingContext & InTOCContext & InListContext & Partial<ParamsOrReturnContext> & Partial<IsCompositeContext>>(node: DocParagraph, context: C): string {
 
     let tocTodos: ApiItem[] = [];
 
@@ -184,11 +190,15 @@ export function doDocNodeParagraph<C extends InTableContext & ApiContext & Model
             case "CodeSpan":
                 const codeSpan = paragraph as DocCodeSpan;
                 return `\`${codeSpan.code}\``;
+                case "ErrorText":
+                    const errorText = paragraph as DocErrorText;
+                    debugger;
+                    return `# ERROR: ${errorText}`
             default:
                 debugger;
                 return "";
         }
-    }).join("").trim() + (tocTodos.length ? ("\n\n\n" + tocTodos.map(apiItem => handleReadmeInclude(apiItem, context)).join("\n\n")) : "");
+    }).join("").trim() + (tocTodos.length ? ("\n\n\n" + tocTodos.map(apiItem => handleReadmeInclude(apiItem, context)).join("\n\n<hr />\n\n")) : "");
 
 }
 
@@ -197,7 +207,7 @@ export function doLines<C extends InTableContext & InListContext>(lines: string[
 
 }
 
-export function doDocSection<C extends InTableContext & ApiContext & ModelContext & HeaderLevelContext & TrackingContext & InListContext>(section: DocSection | null | undefined, context: C) {
+export function doDocSection<C extends InTableContext & ApiContext & ModelContext & HeaderLevelContext & TrackingContext & InListContext & Partial<ParamsOrReturnContext> & Partial<IsCompositeContext>>(section: DocSection | null | undefined, context: C) {
     let ret = section?.nodes.map(node => {
         let ret = doDocNode(node, context);
         return ret;
@@ -205,15 +215,74 @@ export function doDocSection<C extends InTableContext & ApiContext & ModelContex
     return ret.join(!(context.inTable || context.inList) ? "\n\n" : "<br />");
 }
 
-function handleReadmeInclude<C extends HeaderLevelContext & ModelContext & ApiContext & TrackingContext>(item: ApiItem, context: C): string {
+function handleReadmeInclude<C extends HeaderLevelContext & ModelContext & ApiContext & TrackingContext & Partial<IsCompositeContext> & Partial<ParamsOrReturnContext>>(item: ApiItem, context: C): string {
     switch (item.kind) {
         case "Function":
             return handleReadmeIncludeFunction(item as ApiFunction, context);
-
+        case "Interface":
+            return doInterfaceToTable((item as ApiInterface), { funcMode: "return", isCompositeFunction: false, ...context });
+        case "TypeAlias":
+            return doTypeAlias(item as ApiTypeAlias, context);
         default:
             debugger;
             return "";
     }
+}
+
+const TypeAliasesToIgnore = new Map([
+    ["EventTarget", "https://developer.mozilla.org/en-US/docs/Web/API/EventTarget"],
+    ["HTMLAttributes", ""],
+    ["JSX.HTMLAttributes", ""],
+    ["Omit", ""]
+]);
+
+function doTypeAlias<C extends HeaderLevelContext & ModelContext & ApiContext & TrackingContext & Partial<IsCompositeContext> & Partial<ParamsOrReturnContext>>(item: ApiTypeAlias, context: C): string {
+    return `${doHeader(item.displayName, context)}
+
+\`\`\`typescript
+${item.excerptTokens.map(token => {
+        switch (token.kind) {
+            case "Content": return token.text;
+            default:
+                return token.text;
+            /*const ref = doReference(token.canonicalReference, context);
+            if (ref.resolvedApiItem) {
+               // return doLink(token.text, ref.resolvedApiItem, context);
+            }
+            if (ref.errorMessage) {
+                if (TypeAliasesToIgnore.has(token.text)) {
+                    if (TypeAliasesToIgnore.get(token.text))
+                        //return `[${token.text}](${TypeAliasesToIgnore.get(token.text)})`;
+                    else
+                        return token.text
+                }
+                debugger;
+                return ref.errorMessage;
+            }
+            return token.text;
+
+
+            return "";*/
+            //case "R": return token.text;
+        }
+    }).join("")}
+\`\`\``
+}
+
+export function doDocComment<C extends InTableContext & InListContext & ApiContext & ModelContext & HeaderLevelContext & TrackingContext & IsCompositeContext>(comment: DocComment | null | undefined, context: C) {
+    let replaceNewlines = (context.inTable || context.inList || false);
+
+    if (!comment)
+        return "";
+
+    let examples = comment.customBlocks.filter(block => block.blockTag.tagNameWithUpperCase == "@EXAMPLE");
+
+    return [
+        doDocSection(comment.summarySection, context),
+        doDocBlock(comment.remarksBlock, context),
+        comment.seeBlocks.length ? `**See also**: ${comment.seeBlocks.map(block => doDocBlock(block, context)).join(" ; ")}` : "",
+        examples.length ? examples.map(block => doDocBlock(block, context)) : ""
+    ].filter(s => !!s).join(replaceNewlines ? "<br />" : "\n\n");
 }
 
 

@@ -171,13 +171,14 @@ export interface UseRovingTabIndexChildReturnType<ChildElement extends Element, 
 }
 /**
  * Implements a roving tabindex system where only one "focusable"
- * component in a set is able to receive a tab focus. *Which*
- * of those elements receives focus is determined by you, but it's
- * recommended to offload that logic then to another hook, like
- * `useLinearNavigation`, which lets you change the tabbable
- * element with the arrow keys, `useTypeaheadNavigation`, which
- * lets you change the tabbable index with typeahead, or
- * `useListNavigation(Complete)` if you just want everything bundled together.
+ * component in a set is able to receive a tab focus.
+ *
+ * @remarks *Which* of those elements receives focus is determined by you,
+ * but it's recommended to offload that logic then to another hook, like
+ * `useLinearNavigation`, which lets you change the tabbable element with
+ * the arrow keys, `useTypeaheadNavigation`, which lets you change the
+ * tabbable index with typeahead, or `useListNavigation(Complete)` if you
+ * just want everything bundled together.
  *
  *
  * @hasChild {@link useRovingTabIndexChild}

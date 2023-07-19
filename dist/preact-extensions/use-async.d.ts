@@ -140,9 +140,9 @@ export interface UseAsyncReturnType<SP extends unknown[], R> {
  * Given an async function, returns a function that's suitable for non-async APIs,
  * along with other information about the current run's status.
  *
- * See also `useAsyncHandler` for a version that's specialized for DOM event handlers.
+ * @see {@link useAsyncHandler} for a version that's specialized for DOM event handlers.
  *
- * When called multiple times in quick succession, (i.e. before the handler has finished),
+ * @remarks When called multiple times in quick succession, (i.e. before the handler has finished),
  * this works like Lodash's `throttle` function with the `wait` option always
  * set to however long the handler takes to complete. A second call to the sync function will be
  * throttled until the first call has finished. The return value of the function is the result
@@ -159,7 +159,12 @@ export interface UseAsyncReturnType<SP extends unknown[], R> {
  * dynamic data at the time it runs; the `AP` and `SP` type parameters likewise control
  * the parameters the async handler and sync handler expect respectively.
  *
+ * {@include } {@link UseAsyncParameters}
+ *
+ * @param asyncHandler - The async function to make sync
+ * @param options - @see {@link UseAsyncParameters}
+ *
  */
-export declare function useAsync<AP extends unknown[], R, SP extends unknown[] = AP>(asyncHandler2: AsyncFunctionType<AP, R> | null, options?: UseAsyncParameters<AP, SP>): UseAsyncReturnType<SP, R>;
+export declare function useAsync<AP extends unknown[], R, SP extends unknown[] = AP>(asyncHandler: AsyncFunctionType<AP, R> | null, options?: UseAsyncParameters<AP, SP>): UseAsyncReturnType<SP, R>;
 export {};
 //# sourceMappingURL=use-async.d.ts.map

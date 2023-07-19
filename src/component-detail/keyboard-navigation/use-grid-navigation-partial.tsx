@@ -98,6 +98,17 @@ export interface UseGridNavigationCellContext extends UseListNavigationContext {
 
 export interface UseGridNavigationCellReturnType<CellElement extends Element, CM extends GridChildCellInfo<CellElement>> extends UseListNavigationChildReturnType<CellElement, CM> { }
 
+/**
+ * Implements 2-dimensional grid-based keyboard navigation, similarly to {@link useListNavigation}.
+ * 
+ * @remarks Due to the complexity of this hook, it is *highly* recommended to use {@link useGridNavigationComplete} instead. 
+ * But if you do need to it's designed to work well with intellisense -- just keep plugging the holes until the errors stop and that's 95% of it right there.
+ * 
+ * @compositeParams
+ * 
+ * @hasChild {@link useGridNavigationRow}
+ * @hasChild {@link useGridNavigationCell}
+ */
 export function useGridNavigation<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, RM extends GridChildRowInfo<RowElement, CellElement>, CM extends GridChildCellInfo<CellElement>>({
     gridNavigationParameters: { onTabbableColumnChange, ...void3 },
     linearNavigationParameters,
@@ -149,6 +160,9 @@ export function useGridNavigation<ParentOrRowElement extends Element, RowElement
     }
 }
 
+/**
+ * @compositeParams
+ */
 export function useGridNavigationRow<RowElement extends Element, CellElement extends Element, RM extends GridChildRowInfo<RowElement, CellElement>, CM extends GridChildCellInfo<CellElement>>({
     // Stuff for the row as a child of the parent grid
     info: managedChildParameters,
@@ -272,7 +286,9 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
 
 }
 
-
+/**
+ * @compositeParams
+ */
 export function useGridNavigationCell<CellElement extends Element, CM extends GridChildCellInfo<CellElement>>({
     context: {
         gridNavigationCellContext: {

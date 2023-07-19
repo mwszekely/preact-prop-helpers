@@ -6,6 +6,17 @@ import { assertEmptyObject } from "../../util/assert.js";
 import { focus } from "../../util/focus.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
 import { useListNavigation, useListNavigationChild } from "./use-list-navigation-partial.js";
+/**
+ * Implements 2-dimensional grid-based keyboard navigation, similarly to {@link useListNavigation}.
+ *
+ * @remarks Due to the complexity of this hook, it is *highly* recommended to use {@link useGridNavigationComplete} instead.
+ * But if you do need to it's designed to work well with intellisense -- just keep plugging the holes until the errors stop and that's 95% of it right there.
+ *
+ * @compositeParams
+ *
+ * @hasChild {@link useGridNavigationRow}
+ * @hasChild {@link useGridNavigationCell}
+ */
 export function useGridNavigation({ gridNavigationParameters: { onTabbableColumnChange, ...void3 }, linearNavigationParameters, ...listNavigationParameters }) {
     monitorCallCount(useGridNavigation);
     const [getTabbableColumn, setTabbableColumn] = usePassiveState(onTabbableColumnChange, useStableCallback(() => {
@@ -38,6 +49,9 @@ export function useGridNavigation({ gridNavigationParameters: { onTabbableColumn
         typeaheadNavigationReturn
     };
 }
+/**
+ * @compositeParams
+ */
 export function useGridNavigationRow({ 
 // Stuff for the row as a child of the parent grid
 info: managedChildParameters, textContentParameters, context: contextFromParent, 
@@ -130,6 +144,9 @@ refElementReturn, ...void1 }) {
         ...ulnRet,
     };
 }
+/**
+ * @compositeParams
+ */
 export function useGridNavigationCell({ context: { gridNavigationCellContext: { getRowIndex, setTabbableRow, getTabbableColumn: _getCurrentColumn, setTabbableColumn, setTabbableCell, 
 //allChildCellsAreUntabbable,
 ...void4 }, rovingTabIndexContext, typeaheadNavigationContext, ...void5 }, info, refElementReturn, textContentParameters, gridNavigationCellParameters: { colSpan, ...void6 }, ...void1 }) {

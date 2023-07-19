@@ -29,6 +29,8 @@ import { monitorCallCount } from "../util/use-call-count.js";
  * const [getElement, setElement] = usePassiveState<HTMLButtonElement | null>(onElementChange, returnNull);
  * const { propsStable } = useRefElement({ onElementChange: setElement });
  * ```
+ *
+ * @compositeParams
  */
 export function useRefElement(args) {
     monitorCallCount(useRefElement);

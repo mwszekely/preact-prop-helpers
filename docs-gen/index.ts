@@ -6,6 +6,17 @@ import { dirname, join } from "path";
 import { fileURLToPath } from 'url';
 import { generateReadme } from "./readme-gen.js";
 
+let oldts = Array.prototype.toString;
+let oldca = console.assert;
+Array.prototype.toString = function (this) { debugger; return this.join(",")  }
+/*console.assert = function(this, condition, ...rest) {
+    if (!condition) {
+        debugger;
+        console.error(...rest);
+    }
+//    return oldca.bind(this)(...rest);
+ }*/
+
 const KnownTypes = {
     DocSection: new Set(["Paragraph", "FencedCode"]),
     DocBlock: new Set(["Paragraph"]),
@@ -80,6 +91,7 @@ if (!apiPackage.tsdocComment?.modifierTagSet.isPackageDocumentation()) {
 }
 
 let packageDocumentation = apiPackage.tsdocComment!;
+debugger;
 let ret = generateReadme(packageDocumentation, { api: apiPackage, model: apiModel });
 debugger;
 let baseMarkdown = `${toMarkdown(packageDocumentation, MDContextDefault())}`;

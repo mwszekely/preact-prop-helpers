@@ -1,6 +1,12 @@
 import { useEnsureStability } from "../preact-extensions/use-passive-state.js";
 import { useId, useRef } from "../util/lib.js";
 import { monitorCallCount } from "../util/use-call-count.js";
+;
+/**
+ * Besides just generating something for the `id` prop, also gives you the props to use on another element if you'd like (e.g. a label's `for`).
+ *
+ * @compositeParams
+ */
 export function useRandomId({ randomIdParameters: { prefix, otherReferencerProp } }) {
     monitorCallCount(useRandomId);
     const id = (prefix + useId());

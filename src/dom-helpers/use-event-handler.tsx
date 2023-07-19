@@ -46,7 +46,7 @@ type TypedEventHandlerEvent<E extends EventTarget, T extends TypedEventListenerT
 /**
  * Allows attaching an event handler to any *non-Preact* element, and removing it when the component using the hook unmounts. The callback does not need to be stable across renders.
  * 
- * `"mode"` controls if there's one handler that calls all your functions (default), or one handler added per function (`"single"`). 
+ * @remarks `"mode"` controls if there's one handler that calls all your functions (default), or one handler added per function (`"single"`). 
  * 
  * The default, `"grouped"`, is faster when you have, say, a button component, used hundreds of times on a page, that each installs a global event handler.
  * 
