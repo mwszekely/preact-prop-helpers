@@ -91,7 +91,6 @@ if (!apiPackage.tsdocComment?.modifierTagSet.isPackageDocumentation()) {
 }
 
 let packageDocumentation = apiPackage.tsdocComment!;
-debugger;
 let ret = generateReadme(packageDocumentation, { api: apiPackage, model: apiModel });
 debugger;
 let baseMarkdown = `${toMarkdown(packageDocumentation, MDContextDefault())}`;

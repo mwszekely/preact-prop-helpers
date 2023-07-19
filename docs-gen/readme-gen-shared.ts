@@ -33,7 +33,7 @@ export function doLink<C extends TrackingContext>(linkText: string | null | unde
 
     context.referenced.add(resolvedApiItem.displayName);
 
-    return `[${linkText || resolvedApiItem.displayName}](#${resolvedApiItem.displayName})`;
+    return `[${linkText || resolvedApiItem.displayName}](#${resolvedApiItem.displayName.toLowerCase().replaceAll(" ", "-")})`;
 }
 
 export function doCodeSpan<C extends InCodeSpanContext>(codeText: string, context: C) {
