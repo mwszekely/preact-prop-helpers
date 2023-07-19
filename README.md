@@ -2534,7 +2534,7 @@ Handles events for a backdrop on a modal dialog -- the kind where the user expec
 |.open|``boolean``||
 |refElementPopupReturn|Pick<UseRefElementReturnType<PopupElement>["refElementReturn"], "getElement">;| |
 
-void
+**Returns**: void
 
 
 
@@ -2574,7 +2574,7 @@ One press of the `Escape` key is guaranteed to only call `onClose` for *only one
 |.parentDepth|``number``|Get this from context somewhere, and increment it in that context.<br />If multiple instances of Preact are on the page, tree depth is used as a tiebreaker|
 |refElementPopupReturn|Pick<UseRefElementReturnType<PopupElement>["refElementReturn"], "getElement">;| |
 
-void
+**Returns**: void
 
 
 

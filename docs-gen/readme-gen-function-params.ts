@@ -76,7 +76,7 @@ export function handleReturn<C extends ModelContext & ApiContext & IsCompositeCo
 
 function handleParamOrReturnComposite<C extends ModelContext & ApiContext & IsCompositeContext & HeaderLevelContext & ParamsOrReturnContext & TrackingContext>(typeExcerpt: Excerpt, context: C) {
     if (typeExcerpt.spannedTokens.length == 1 && typeExcerpt.spannedTokens[0].kind != "Reference") {
-        return typeExcerpt.spannedTokens[0].text;
+        return `**Returns**: ${typeExcerpt.spannedTokens[0].text}`;
     }
     const typeTokens = typeExcerpt.spannedTokens.filter(token => token.kind == "Reference");
     console.assert(typeTokens.length == 1);
