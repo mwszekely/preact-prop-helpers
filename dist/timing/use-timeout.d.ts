@@ -21,6 +21,7 @@ export interface UseTimeoutParameters {
  *
  * @remarks This is particularly useful to function as "useEffect on a delay".
  *
+ * @remarks
  * {@include } {@link UseTimeoutParameters}
  */
 export declare function useTimeout({ timeout, callback, triggerIndex }: UseTimeoutParameters): {

@@ -59,6 +59,7 @@ export interface UseDraggableParameters {
 /**
  * Allows an element to start a drag operation.
  * 
+ * @remarks
  * {@include } {@link UseDraggableParameters}
  * {@include } {@link UseDraggableReturnType}
  */

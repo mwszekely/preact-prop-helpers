@@ -21,6 +21,7 @@ export interface UseIntervalParameters {
 /**
  * Runs a function every time the specified number of milliseconds elapses while the component is mounted.
  * 
+ * @remarks
  * {@include } {@link UseIntervalParameters}
  */
 export function useInterval({ interval, callback }: UseIntervalParameters) {

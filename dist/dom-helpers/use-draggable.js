@@ -3,6 +3,7 @@ import { monitorCallCount } from "../util/use-call-count.js";
 /**
  * Allows an element to start a drag operation.
  *
+ * @remarks
  * {@include } {@link UseDraggableParameters}
  * {@include } {@link UseDraggableReturnType}
  */

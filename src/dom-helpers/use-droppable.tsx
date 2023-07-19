@@ -73,6 +73,7 @@ export class DroppableFileError extends Error {
 /**
  * Allows an element to start a drag operation.
  * 
+ * @remarks
  * {@include } {@link UseDroppableParameters}
  * {@include } {@link UseDroppableReturnType}
  */

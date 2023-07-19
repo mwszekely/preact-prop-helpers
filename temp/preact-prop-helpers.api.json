@@ -16669,7 +16669,7 @@
         {
           "kind": "Function",
           "canonicalReference": "preact-prop-helpers!useDraggable:function(1)",
-          "docComment": "/**\n * Allows an element to start a drag operation.\n *\n * {@include} {@link UseDraggableParameters} {@include} {@link UseDraggableReturnType}\n */\n",
+          "docComment": "/**\n * Allows an element to start a drag operation.\n *\n * @remarks\n *\n * {@include} {@link UseDraggableParameters} {@include} {@link UseDraggableReturnType}\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -17113,7 +17113,7 @@
         {
           "kind": "Function",
           "canonicalReference": "preact-prop-helpers!useDroppable:function(1)",
-          "docComment": "/**\n * Allows an element to start a drag operation.\n *\n * {@include} {@link UseDroppableParameters} {@include} {@link UseDroppableReturnType}\n */\n",
+          "docComment": "/**\n * Allows an element to start a drag operation.\n *\n * @remarks\n *\n * {@include} {@link UseDroppableParameters} {@include} {@link UseDroppableReturnType}\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -25377,7 +25377,7 @@
         {
           "kind": "Function",
           "canonicalReference": "preact-prop-helpers!useInterval:function(1)",
-          "docComment": "/**\n * Runs a function every time the specified number of milliseconds elapses while the component is mounted.\n *\n * {@include} {@link UseIntervalParameters}\n */\n",
+          "docComment": "/**\n * Runs a function every time the specified number of milliseconds elapses while the component is mounted.\n *\n * @remarks\n *\n * {@include} {@link UseIntervalParameters}\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -43244,7 +43244,7 @@
         {
           "kind": "Function",
           "canonicalReference": "preact-prop-helpers!useTimeout:function(1)",
-          "docComment": "/**\n * Runs a function the specified number of milliseconds after the component renders.\n *\n * @remarks\n *\n * This is particularly useful to function as \"useEffect on a delay\".\n *\n * {@include} {@link UseTimeoutParameters}\n */\n",
+          "docComment": "/**\n * Runs a function the specified number of milliseconds after the component renders.\n *\n * @remarks\n *\n * {@include} {@link UseTimeoutParameters}\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",

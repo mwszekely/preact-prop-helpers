@@ -67,72 +67,9 @@ These hooks are useful, but in more specific circumstances
 
  * [useActiveElement](#useActiveElement) Allows you to inspect which element in the `document` currently has focus, which was most recently focused if none are currently, and whether or not the window has focus 
 
- * [useDraggable](#useDraggable) Allows an element to start a drag operation.<br />* [UseDraggableParameters](#UseDraggableParameters)  
+ * [useDraggable](#useDraggable) Allows an element to start a drag operation. 
 
- * [UseDraggableReturnType](#UseDraggableReturnType)
-
-
-
-
-### UseDraggableParameters
-
-
-
-|Member|Type|Description|
-|---------|----|-----------|
-|data|`{<br />        [mimeType: string]: string;<br />    }`|Represents a dictionary mapping of MIME types to data|
-|dragImage|`HTMLCanvasElement \| HTMLImageElement \| HTMLVideoElement`|Can be used to specify a custom drag image instead of the browser default (a transparent render of the original element, generally)|
-|dragImageXOffset|`number`||
-|dragImageYOffset|`number`||
-|effectAllowed|`DataTransfer["effectAllowed"] \| undefined`|Maps to the Drag and Drop API -- allows limiting the areas this element can be dropped. For example, setting this to "copyLink" will allow this this to be dropped onto a droppable with an effect of "copy" or "link", but not "move".|
-
-<hr />
-
-
-
-### UseDraggableReturnType
-
-
-
-|Member|Type|Description|
-|---------|----|-----------|
-|dragging|`boolean`|Returns true if the element in question is currently being dragged|
-|getDragging|`() => boolean`|**STABLE**|
-|getLastDropEffect|`() => (DataTransfer["dropEffect"] \| null)`|**STABLE**|
-|lastDropEffect|`DataTransfer["dropEffect"] \| null`|Once the drag ends, if it was over a valid droppable, this will be set to the `dropEffect` value it had.<br />This can be used to detect when the element has dropped, and then what should be done with it (generally deleted if the effect was "move")|
-|propsUnstable|`ElementProps<E>`|*Unstable*| 
-
- * [useDroppable](#useDroppable) Allows an element to start a drag operation.<br />* [UseDroppableParameters](#UseDroppableParameters)  
-
- * [UseDroppableReturnType](#UseDroppableReturnType)
-
-
-
-
-### UseDroppableParameters
-
-
-
-|Member|Type|Description|
-|---------|----|-----------|
-|effect|`DataTransfer["dropEffect"] \| undefined`|Maps to the Drag and Drop API -- effectively means "as close as possible, what's happening to the data when I drop it here? Am I copying it and leaving the original, am I moving it and deleting the original, or am I linking it to the original?"<br />Whatever is being dragged over this will have its own permission that's checked against this.|
-
-<hr />
-
-
-
-### UseDroppableReturnType
-
-
-
-|Member|Type|Description|
-|---------|----|-----------|
-|dropError|`unknown`||
-|droppedFiles|`DropFile[] \| null`|When files are dropped over the element, their data will be given here. This will update as new drops happen.|
-|droppedStrings|`{<br />        [MimeType: string]: string;<br />    } \| null`|When non-file data is dropped over the element, their data will be given here. This will update as new drops happen.|
-|filesForConsideration|`DropFileMetadata[] \| null`|While something is being dragged over this element, this will contain any information about any files included in that drop. Otherwise, it'll be null, meaning nothing is being dragged over this element.|
-|propsStable|`ElementProps<E>`|Hook for modifying the props you were going to pass to your drop target Element.<br />*Unstable*|
-|stringsForConsideration|`Set<string> \| null`|While something is being dragged over this element, a list of available MIME types for the non-file data will be listed here. Otherwise, it'll be null, meaning nothing is being dragged over this element.| 
+ * [useDroppable](#useDroppable) Allows an element to start a drag operation. 
 
  * [useLogicalDirection](#useLogicalDirection) Inspects the element's style and determines the logical direction that text flows. 
 ### Extensions 
@@ -159,19 +96,7 @@ These hooks don't do anything with HTML elements but are useful extensions to Pr
 
  * [useAnimationFrame](#useAnimationFrame) The (optionally non-stable) `callback` you provide will start running every frame after the component mounts. 
 
- * [useInterval](#useInterval) Runs a function every time the specified number of milliseconds elapses while the component is mounted.<br />* [UseIntervalParameters](#UseIntervalParameters)
-
-
-
-
-### UseIntervalParameters
-
-
-
-|Member|Type|Description|
-|---------|----|-----------|
-|callback|`() => void`|Called `timeout` ms after mount, or the last change to `triggerIndex`.|
-|interval|`Nullable<number>`|The number of ms to wait before invoking `callback`.| 
+ * [useInterval](#useInterval) Runs a function every time the specified number of milliseconds elapses while the component is mounted. 
 
  * [useTimeout](#useTimeout) Runs a function the specified number of milliseconds after the component renders. 
 
@@ -1303,6 +1228,16 @@ If you need the component to re-render when the active element changes, use the 
 
 Allows an element to start a drag operation.
 
+
+
+
+|Parameter|Type|Description|
+|---------|----|-----------|
+|{ effectAllowed, data, dragImage, dragImageXOffset, dragImageYOffset }|[UseDraggableParameters](#UseDraggableParameters)||
+
+
+
+
 ### UseDraggableParameters
 
 
@@ -1332,18 +1267,6 @@ Allows an element to start a drag operation.
 
 
 
-|Parameter|Type|Description|
-|---------|----|-----------|
-|{ effectAllowed, data, dragImage, dragImageXOffset, dragImageYOffset }|[UseDraggableParameters](#UseDraggableParameters)||
-
-
-
-
-
-
-
-
-
 
 
 <hr />
@@ -1352,6 +1275,16 @@ Allows an element to start a drag operation.
 ### useDroppable
 
 Allows an element to start a drag operation.
+
+
+
+
+|Parameter|Type|Description|
+|---------|----|-----------|
+|{ effect }|[UseDroppableParameters](#UseDroppableParameters)||
+
+
+
 
 ### UseDroppableParameters
 
@@ -1375,18 +1308,6 @@ Allows an element to start a drag operation.
 |filesForConsideration|`DropFileMetadata[] \| null`|While something is being dragged over this element, this will contain any information about any files included in that drop. Otherwise, it'll be null, meaning nothing is being dragged over this element.|
 |propsStable|`ElementProps<E>`|Hook for modifying the props you were going to pass to your drop target Element.<br />*Unstable*|
 |stringsForConsideration|`Set<string> \| null`|While something is being dragged over this element, a list of available MIME types for the non-file data will be listed here. Otherwise, it'll be null, meaning nothing is being dragged over this element.|
-
-
-
-
-|Parameter|Type|Description|
-|---------|----|-----------|
-|{ effect }|[UseDroppableParameters](#UseDroppableParameters)||
-
-
-
-
-
 
 
 
@@ -1721,15 +1642,6 @@ When a bunch of unrelated components all use `requestAnimationFrame`, yes, this 
 
 Runs a function every time the specified number of milliseconds elapses while the component is mounted.
 
-### UseIntervalParameters
-
-
-
-|Member|Type|Description|
-|---------|----|-----------|
-|callback|`() => void`|Called `timeout` ms after mount, or the last change to `triggerIndex`.|
-|interval|`Nullable<number>`|The number of ms to wait before invoking `callback`.|
-
 
 
 
@@ -1740,7 +1652,14 @@ Runs a function every time the specified number of milliseconds elapses while th
 
 
 
+### UseIntervalParameters
 
+
+
+|Member|Type|Description|
+|---------|----|-----------|
+|callback|`() => void`|Called `timeout` ms after mount, or the last change to `triggerIndex`.|
+|interval|`Nullable<number>`|The number of ms to wait before invoking `callback`.|
 
 
 
@@ -1763,8 +1682,6 @@ Runs a function the specified number of milliseconds after the component renders
 
 
 
-
-This is particularly useful to function as "useEffect on a delay".
 
 ### UseTimeoutParameters
 
@@ -1848,8 +1765,6 @@ Runs a function the specified number of milliseconds after the component renders
 
 
 
-
-This is particularly useful to function as "useEffect on a delay".
 
 ### UseTimeoutParameters
 
