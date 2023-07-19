@@ -16,8 +16,8 @@ import { useState } from "./use-state.js";
  *     interface PersistentStates {
  *         numberState: number;
  *         stringState: string;
- *     \}
- * \}
+ *     }
+ * }
  * ```
  */
 export interface PersistentStates { }
@@ -57,8 +57,8 @@ export function storeToLocalStorage<Key extends (keyof PersistentStates) & strin
  *     interface PersistentStates {
  *         numberState: number;
  *         stringState: string;
- *     \}
- * \}
+ *     }
+ * }
  * ```
  * @param key -  
  * @param initialValue -  

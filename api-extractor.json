@@ -393,14 +393,11 @@
       "default": {
         "logLevel": "warning"
         // "addToApiReportFile": false
-      }
+      },
 
-      // "ae-extra-release-tag": {
-      //   "logLevel": "warning",
-      //   "addToApiReportFile": true
-      // },
-      //
-      // . . .
+      "ae-missing-release-tag": {
+        "logLevel": "none"
+      }
     },
 
     /**

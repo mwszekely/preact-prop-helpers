@@ -125,7 +125,7 @@ export interface UseRovingTabIndexChildInfo<TabbableChildElement extends Element
     setLocallyTabbable: StateUpdater<boolean>;
 
     /** 
-     * @see {@link setLocallyTabbable} 
+     * @see {@link UseRovingTabIndexChildInfo.setLocallyTabbable} 
      */
     getLocallyTabbable: () => boolean;
 

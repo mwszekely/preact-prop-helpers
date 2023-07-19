@@ -55,6 +55,10 @@ export interface UsePaginatedChildrenReturnType extends TargetedPick<UseManagedC
 }
 
 /**
+ * Allows children to stop themselves from rendering outside of a narrow range.
+ * 
+ * @remarks Each child will still render itself, but it is aware of if it is within/outside of the pagination range, and simply return empty.
+ * 
  * @compositeParams
  * 
  * @hasChild {@link usePaginatedChild}
@@ -144,7 +148,6 @@ export function usePaginatedChildren<ParentElement extends Element, TabbableChil
 
 
 export interface UsePaginatedChildParameters {
-    //paginatedChildrenParameters: { paginated: boolean };
     info: { index: number; }
     context: UsePaginatedChildContext;
 }
@@ -162,11 +165,15 @@ export interface UsePaginatedChildReturnTypeSelf {
 }
 
 /**
+ * Child hook for {@link usePaginatedChildren}.
+ * 
+ * @remarks When a child is paginated, it still renders itself (i.e. it calls this hook, so it's rendering),
+ * so check `hideBecausePaginated` and, if it's true, avoid doing any heavy logic and render with `display: none`.
+ * 
  * @compositeParams
  */
 export function usePaginatedChild<ChildElement extends Element>({ info: { index }, context: { paginatedChildContext: { parentIsPaginated, getDefaultPaginationVisible } } }: UsePaginatedChildParameters): UsePaginatedChildReturnType<ChildElement> {
     monitorCallCount(usePaginatedChild);
-    //const parentIsPaginated = (paginationMin != null || paginationMax != null);
 
     const [childCountIfPaginated, setChildCountIfPaginated] = useState(null as number | null);
     const [paginatedVisible, setPaginatedVisible] = useState(parentIsPaginated ? getDefaultPaginationVisible(index) : true);

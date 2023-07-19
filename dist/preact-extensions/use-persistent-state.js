@@ -37,8 +37,8 @@ export function storeToLocalStorage(key, value, converter = JSON.stringify, stor
  *     interface PersistentStates {
  *         numberState: number;
  *         stringState: string;
- *     \}
- * \}
+ *     }
+ * }
  * ```
  * @param key -
  * @param initialValue -

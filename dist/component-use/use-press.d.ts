@@ -65,11 +65,13 @@ export interface UsePressReturnType<E extends Element> {
  *
  * @remarks
  * Notably, the following cases are covered:
+ * ```md-literal
  * * The target element is properly focused, even on iOS Safari (*especially* on iOS Safari)
  * * Double-clicks won't select text, it just presses the button twice.
  * * Text selection that happens to end/start with this element won't invoke a press.
  * * The `enter` key immediately invokes a press (by default just once until pressed again), while the `space` key invokes it when released, if focus hasn't moved away from the button.
  * * Haptic feedback (on, like, the one browser combination that supports it &mdash; this can be disabled app-wide with `setButtonVibrate`)
+ * ```
  *
  * In addition, returns a "more accurate" CSS `active` and `hover`; more accurate
  * in that `hover` won't mess up mobile devices that see `hover` and mess up your click events,

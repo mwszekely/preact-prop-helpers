@@ -53,13 +53,17 @@ export interface UseStaggeredChildReturnType<ChildElement extends Element> {
  * @remarks Note that the child itself will still render, but you can delay rendering *its* children, or
  * delay other complicated or heavy logic, until the child is no longer staggered.
  *
- *
  * @compositeParams
  *
  * @hasChild {@link useStaggeredChild}
  */
 export declare function useStaggeredChildren<E extends Element, M extends UseStaggeredChildrenInfo<E>>({ managedChildrenReturn: { getChildren }, staggeredChildrenParameters: { staggered } }: UseStaggeredChildrenParameters<E, M>): UseStaggeredChildrenReturnType;
 /**
+ * Child hook for {@link useStaggeredChildren}.
+ *
+ * @remarks When a child is staggered, it still renders itself (i.e. it calls this hook, so it's rendering),
+ * so check `hideBecauseStaggered` and, if it's true, avoid doing any heavy logic and render with `display: none`.
+ *
  * @compositeParams
  */
 export declare function useStaggeredChild<ChildElement extends Element>({ info: { index }, context: { staggeredChildContext: { parentIsStaggered, childCallsThisToTellTheParentTheHighestIndex, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne } } }: UseStaggeredChildParameters): UseStaggeredChildReturnType<ChildElement>;

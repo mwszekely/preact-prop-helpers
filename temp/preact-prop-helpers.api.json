@@ -144,7 +144,7 @@
   },
   "kind": "Package",
   "canonicalReference": "preact-prop-helpers!",
-  "docComment": "/**\n * # Preact Prop Helpers\n *\n * A set of small, compartmentalized hooks for Preact. The theme is modifying HTML attributes to do useful things, along with a bunch of other useful boilerplate-y hooks.\n *\n * Everything from keyboard navigation (arrow keys, typeahead) to modal focus traps (dialogs and menus) to simple things like state management *but with localStorage!* are here.\n *\n * ## List of hooks (in rough order of usefulness)\n *\n * {@tableOfContents start} {@tableOfContents header Common} {@tableOfContents subheader These hooks are used extremely commonly or provide uncommonly useful behavior} {@include} {@link useMergedProps} {@include} {@link useRefElement} {@include} {@link usePress} {@include} {@link useCompleteListNavigation} {@include} {@link useCompleteGridNavigation} {@include} {@link useModal} {@include} {@link useAsyncHandler} {@include} {@link useManagedChildren} {@tableOfContents header Specific} {@tableOfContents subheader Very useful in very specific cases} {@include} {@link useElementSize} {@include} {@link useHideScroll} {@include} {@link useMediaQuery} {@include} {@link useHasCurrentFocus} {@include} {@link useHasLastFocus} {@include} {@link useChildrenHaveFocus} {@include} {@link useRandomId} {@include} {@link useRandomDualIds} {@include} {@link useGlobalHandler} {@include} {@link useDocumentClass} {@tableOfContents header Niche} {@include} {@link useAsyncEffect} {@include} {@link useMutationObserver} {@include} {@link useTextContent} {@include} {@link useImperativeProps} {@include} {@link usePortalChildren} {@include} {@link useActiveElement} {@include} {@link useDraggable} {@include} {@link useDroppable} {@include} {@link useLogicalDirection} {@tableOfContents header Extensions} {@tableOfContents subheader These hooks don't do anything with HTML elements but are useful extensions to Preact's built-in hooks} {@include} {@link useForceUpdate} {@include} {@link useState} {@include} {@link usePassiveState} {@include} {@link usePersistentState} {@include} {@link useSearchParamState} {@include} {@link useStableGetter} {@include} {@link useStableCallback} {@include} {@link useMemoObject} {@include} {@link useAnimationFrame} {@include} {@link useInterval} {@include} {@link useTimeout} {@include} {@link useEffectDebug} {@include} {@link useLayoutEffectDebug} {@include} {@link useTimeout} {@tableOfContents header Building blocks and other helpers} {@tableOfContents subheader These hooks are primarily used to build larger hooks, but can be used alone} {@include} {@link useListNavigation} {@include} {@link useGridNavigation} {@include} {@link useRovingTabIndex} {@include} {@link useLinearNavigation} {@include} {@link useTypeaheadNavigation} {@include} {@link useSingleSelection} {@include} {@link useRearrangeableChildren} {@include} {@link useSortableChildren} {@include} {@link usePaginatedChildren} {@include} {@link useStaggeredChildren} {@include} {@link useDismiss} {@include} {@link useBackdropDismiss} {@include} {@link useEscapeDismiss} {@include} {@link useLostFocusDismiss} {@include} {@link useFocusTrap} {@include} {@link useAsync} {@include} {@link useUrl} {@include} {@link useMergedRefs} {@include} {@link useMergedClasses} {@include} {@link useMergedChildren} {@include} {@link useMergedStyles} {@tableOfContents end}\n *\n * {@include} {@link ElementProps} {@include} {@link OmitStrong} {@include} {@link Nullable}\n * ```md-literal\n * ## Conventions and goals\n *\n * * As much as possible, no specific DOM restrictions are imposed and, for hooks with children (lists, grids, etc.), those children can be anywhere descendent in the tree (except for `useSortableChildren`, which can be anywhere descendant but must all be in an array). Nesting hooks, even of the same type, is also fine.\n *     *  E.G. `useRovingTabIndexChild` can call its own `useRovingTabIndex`, which is how `useGridNavigation` works.\n * * A parent hook never needs to be directly passed child data because the children will provide it themselves. E.G. `useListNavigation` can filter children, but it doesn't take an array of which children to filter out; each child reports its own status as filtered/unfiltered with, say, a `hidden` prop, and the parent responds to that.\n * * Re-render as few times as possible. In general this means instead of a hook returning a value, it will accept an `onChange`-ish handler that will let you explicitly do that.\n *     * `useElementSize`, for example, has no way of returning the size the first time its component renders. It needs to fully render *and then* run an effect that measures it. Once the element's been measured, *you* are responsible for choosing if the component is re-rendered with this new information or not.\n *     * This means that the child data is *always* the single source of truth, and maps nicely to how components are built and diffed.\n * * Some of these hooks, like `useGridNavigationRow`, have **extremely** complicated dependencies. To manage this, most hooks take a single parameter and return a single object with everything labelled consistently and designed to be discoverable via auto-complete. If we have `useFoo`, it:\n *     * ...will always take parameters like `{ fooParameters: {...} }`.\n *         * E.G. `useElementRef({ elementRefParameters: { onMount: ... } })`\n *     * ...will always return objects like `{ fooReturn: { ... } }`\n *         * E.G. `const { refElementReturn: { getElement } } = useElementRef(...)`\n *     * ...may also return `{ props: {...} }`. These must be spread onto the element you're rendering, or the hook will not function (see `useMergedProps` if you need to use other props in addition to the returned props). It may occasionally be called something else starting with `props`, e.g. `propsStable`, `propsTarget`, etc.\n *         * E.G. `const { propsStable } = useElementRef(...)`, then `<div {...propsStable} />`\n *         * `propsStable` indicates that nothing about the object ever changes including the identity of the object itself and all its fields.\n *     * ...may also return `{ context: { ... } }` that children rely on.\n *         1. E.G. Parent calls `const { context } = useFoo(...);`\n *         1. Parent renders `<MyContext.Provider value={context}>{children}</MyContext.Provider>`\n *         1. Then child calls `useFooChild({ context: useContext(MyContext), fooChildParameters: {...} })`\n *     * ...may also require or return `{ info: { ... } }` if it has something to contribute to `useManagedChild`'s special `info` parameter.\n *     * When hooks themselves use other hooks:\n *         * If `useFoo` calls `useBar` directly, then it will take parameters like `{ fooParameters: {...}, barParameters: {...} }` and return objects like `{ fooReturn: {...}, barReturn: {...} }`.\n *         * If `useFoo` relies on `useBar` (but doesn't call it itself!), then will do one of the following:\n *             * Take parameters like `{ fooParameters: { ... }, barReturn: { ... } }`, if it needs the return value of `useBar`.\n *             * Return values like `{ fooReturn: { ... }, barParameters: { ... } }`, if it needs `useBar` to be called with specific parameters in order to function (usually callbacks).\n *         * (The difference between those two is usually based on performance -- many, many hooks rely on `elementRefReturn.getElement`, for example, so the latter pattern allows us to just call `useRefElement` once and pass the result around to whoever needs it)\n *         * If `useFoo` and `useBar` both return a top-level `props`, they will be merged into one.\n *         * If `useFoo` and `useBar` both return a top-level `context`, they will be merged into one.\n *         * If `useFoo` and `useBar` both return a top-level `info`, they will be merged into one.\n *         * Occasionally, `props` or `context` may be suffixed with the specific role they refer to:\n *             * `useRandomId` returns `propsSource` and `propsReferencer` (and no `props`).\n * * Organizationally, some hooks exist primarily to be used as a part of a larger hook.  Hooks within the `component-use` folder are generally \"ready-to-use\" and don't require much passing of parameters back and forth, but are not fully extensible.  Hooks within `component-detail` are the lower-level building blocks that make up those \"ready-to-use\" complete hooks, but they're much more time-consuming to use.\n *     * You can also just copy and paste one of the complete hooks somewhere else and use it as a new building block...\n * ```\n *\n * @packageDocumentation\n */\n",
+  "docComment": "/**\n * # Preact Prop Helpers\n *\n * A set of small, compartmentalized hooks for Preact. The theme is modifying HTML attributes to do useful things, along with a bunch of other useful boilerplate-y hooks.\n *\n * Everything from keyboard navigation (arrow keys, typeahead) to modal focus traps (dialogs and menus) to simple things like state management *but with localStorage!* are here.\n *\n * ## List of hooks (in rough order of usefulness)\n *\n * {@tableOfContents start} {@tableOfContents header Common} {@tableOfContents subheader These hooks are used extremely commonly or provide uncommonly useful behavior} {@include} {@link useMergedProps} {@include} {@link useRefElement} {@include} {@link usePress} {@include} {@link useCompleteListNavigation} {@include} {@link useCompleteGridNavigation} {@include} {@link useModal} {@include} {@link useAsyncHandler} {@tableOfContents header Specific} {@tableOfContents subheader Very useful in very specific cases} {@include} {@link useElementSize} {@include} {@link useHideScroll} {@include} {@link useMediaQuery} {@include} {@link useHasCurrentFocus} {@include} {@link useHasLastFocus} {@include} {@link useChildrenHaveFocus} {@include} {@link useRandomId} {@include} {@link useRandomDualIds} {@include} {@link useGlobalHandler} {@include} {@link useDocumentClass} {@tableOfContents header Niche} {@include} {@link useAsyncEffect} {@include} {@link useMutationObserver} {@include} {@link useTextContent} {@include} {@link useImperativeProps} {@include} {@link usePortalChildren} {@include} {@link useActiveElement} {@include} {@link useDraggable} {@include} {@link useDroppable} {@include} {@link useLogicalDirection} {@tableOfContents header Extensions} {@tableOfContents subheader These hooks don't do anything with HTML elements but are useful extensions to Preact's built-in hooks} {@include} {@link useStableGetter} {@include} {@link useStableCallback} {@include} {@link useMemoObject} {@include} {@link useForceUpdate} {@include} {@link useState} {@include} {@link usePassiveState} {@include} {@link usePersistentState} {@include} {@link useSearchParamState} {@include} {@link useTimeout} {@include} {@link useInterval} {@include} {@link useAnimationFrame} {@include} {@link useEffectDebug} {@include} {@link useLayoutEffectDebug} {@tableOfContents header Building blocks and other helpers} {@tableOfContents subheader These hooks are primarily used to build larger hooks, but can be used alone} {@include} {@link useManagedChildren} {@include} {@link useListNavigation} {@include} {@link useGridNavigation} {@include} {@link useRovingTabIndex} {@include} {@link useLinearNavigation} {@include} {@link useTypeaheadNavigation} {@include} {@link useSingleSelection} {@include} {@link useRearrangeableChildren} {@include} {@link useSortableChildren} {@include} {@link usePaginatedChildren} {@include} {@link useStaggeredChildren} {@include} {@link useDismiss} {@include} {@link useBackdropDismiss} {@include} {@link useEscapeDismiss} {@include} {@link useLostFocusDismiss} {@include} {@link useFocusTrap} {@include} {@link useAsync} {@include} {@link useUrl} {@include} {@link useMergedRefs} {@include} {@link useMergedClasses} {@include} {@link useMergedChildren} {@include} {@link useMergedStyles} {@tableOfContents end}\n *\n * {@include} {@link ElementProps} {@include} {@link OmitStrong} {@include} {@link Nullable}\n * ```md-literal\n * ## Conventions and goals\n *\n * * As much as possible, no specific DOM restrictions are imposed and, for hooks with children (lists, grids, etc.), those children can be anywhere descendent in the tree (except for `useSortableChildren`, which can be anywhere descendant but must all be in an array). Nesting hooks, even of the same type, is also fine.\n *     *  E.G. `useRovingTabIndexChild` can call its own `useRovingTabIndex`, which is how `useGridNavigation` works.\n * * A parent hook never needs to be directly passed child data because the children will provide it themselves. E.G. `useListNavigation` can filter children, but it doesn't take an array of which children to filter out; each child reports its own status as filtered/unfiltered with, say, a `hidden` prop, and the parent responds to that.\n * * Re-render as few times as possible. In general this means instead of a hook returning a value, it will accept an `onChange`-ish handler that will let you explicitly do that.\n *     * `useElementSize`, for example, has no way of returning the size the first time its component renders. It needs to fully render *and then* run an effect that measures it. Once the element's been measured, *you* are responsible for choosing if the component is re-rendered with this new information or not.\n *     * This means that the child data is *always* the single source of truth, and maps nicely to how components are built and diffed.\n * * Some of these hooks, like `useGridNavigationRow`, have **extremely** complicated dependencies. To manage this, most hooks take a single parameter and return a single object with everything labelled consistently and designed to be discoverable via auto-complete. If we have `useFoo`, it:\n *     * ...will always take parameters like `{ fooParameters: {...} }`.\n *         * E.G. `useElementRef({ elementRefParameters: { onMount: ... } })`\n *     * ...will always return objects like `{ fooReturn: { ... } }`\n *         * E.G. `const { refElementReturn: { getElement } } = useElementRef(...)`\n *     * ...may also return `{ props: {...} }`. These must be spread onto the element you're rendering, or the hook will not function (see `useMergedProps` if you need to use other props in addition to the returned props). It may occasionally be called something else starting with `props`, e.g. `propsStable`, `propsTarget`, etc.\n *         * E.G. `const { propsStable } = useElementRef(...)`, then `<div {...propsStable} />`\n *         * `propsStable` indicates that nothing about the object ever changes including the identity of the object itself and all its fields.\n *     * ...may also return `{ context: { ... } }` that children rely on.\n *         1. E.G. Parent calls `const { context } = useFoo(...);`\n *         1. Parent renders `<MyContext.Provider value={context}>{children}</MyContext.Provider>`\n *         1. Then child calls `useFooChild({ context: useContext(MyContext), fooChildParameters: {...} })`\n *     * ...may also require or return `{ info: { ... } }` if it has something to contribute to `useManagedChild`'s special `info` parameter.\n *     * When hooks themselves use other hooks:\n *         * If `useFoo` calls `useBar` directly, then it will take parameters like `{ fooParameters: {...}, barParameters: {...} }` and return objects like `{ fooReturn: {...}, barReturn: {...} }`.\n *         * If `useFoo` relies on `useBar` (but doesn't call it itself!), then will do one of the following:\n *             * Take parameters like `{ fooParameters: { ... }, barReturn: { ... } }`, if it needs the return value of `useBar`.\n *             * Return values like `{ fooReturn: { ... }, barParameters: { ... } }`, if it needs `useBar` to be called with specific parameters in order to function (usually callbacks).\n *         * (The difference between those two is usually based on performance -- many, many hooks rely on `elementRefReturn.getElement`, for example, so the latter pattern allows us to just call `useRefElement` once and pass the result around to whoever needs it)\n *         * If `useFoo` and `useBar` both return a top-level `props`, they will be merged into one.\n *         * If `useFoo` and `useBar` both return a top-level `context`, they will be merged into one.\n *         * If `useFoo` and `useBar` both return a top-level `info`, they will be merged into one.\n *         * Occasionally, `props` or `context` may be suffixed with the specific role they refer to:\n *             * `useRandomId` returns `propsSource` and `propsReferencer` (and no `props`).\n * * Organizationally, some hooks exist primarily to be used as a part of a larger hook.  Hooks within the `component-use` folder are generally \"ready-to-use\" and don't require much passing of parameters back and forth, but are not fully extensible.  Hooks within `component-detail` are the lower-level building blocks that make up those \"ready-to-use\" complete hooks, but they're much more time-consuming to use.\n *     * You can also just copy and paste one of the complete hooks somewhere else and use it as a new building block...\n * ```\n *\n * @packageDocumentation\n */\n",
   "name": "preact-prop-helpers",
   "preserveMemberOrder": false,
   "members": [
@@ -8871,7 +8871,7 @@
         {
           "kind": "Function",
           "canonicalReference": "preact-prop-helpers!useAsyncHandler:function(1)",
-          "docComment": "/**\n * Given an asynchronous event handler, returns a synchronous one that works on the DOM, along with some other information related to the current state. Does not modify any props.\n *\n * @remarks\n *\n * Note that because the handler you provide may be called with a delay, and because the value of, e.g., an `<input>` element will likely be stale by the time the delay is over, a `capture` function is necessary in order to capture the relevant information from the DOM. Any other simple event data, like `mouseX` or `shiftKey` can stay on the event itself and don't need to be captured &ndash; it's never stale.\n * ```tsx\n * const asyncOnInput = async (value: number, e: Event) => {\n *     [...] // Ex. send to a server and setState when done\n * };\n * const {\n *     // A sync version of asyncOnInput\n *     syncHandler,\n *     // True while the handler is running\n *     pending,\n *     // The error thrown, if any\n *     error,\n *     // Show this value while the operation's pending\n *     currentCapture,\n *     // And others, see `UseAsyncHandlerReturnType`\n *     ...rest\n * } = useAsyncHandler<HTMLInputElement>()(asyncOnInput, {\n *     // Pass in the capture function that saves event data\n *     // from being stale.\n *     capture: e => {\n *         // `capture` can have side-effects because\n *         // it's called exactly once per invocation\n *         e.preventDefault();\n *\n *         // Save this value so that it's never stale\n *         return e.currentTarget.valueAsNumber;\n *     }\n * });\n *\n * const onInput = pending? null : syncHandler;\n * ```\n *\n * The handler is automatically throttled to only run one at a time. If the handler is called, and then before it finishes, is called again, it will be put on hold until the current one finishes, at which point the second one will run. If the handler is called a third time before the first has finished, it will *replace* the second, so only the most recently called iteration of the handler will run.\n *\n * You may optionally *also* specify debounce and throttle parameters that wait until the synchronous handler has not been called for the specified number of milliseconds, at which point we *actually* run the asynchronous handler according to the logic in the previous paragraph. This is in *addition* to throttling the handler, and does not replace that behavior.\n *\n * {@include} {@link UseAsyncHandlerParameters}\n *\n * @see\n *\n * useAsync A more general version of this hook that can work with any type of handler, not just DOM event handlers.\n */\n",
+          "docComment": "/**\n * Given an asynchronous event handler, returns a synchronous one that works on the DOM, along with some other information related to the current state. Does not modify any props.\n *\n * @remarks\n *\n * Note that because the handler you provide may be called with a delay, and because the `value` of, e.g., an `<input>` element will likely have changed by the time the delay is over, a `capture` function is necessary in order to save the relevant information from the DOM at call-time. Any other simple event data, like `mouseX` or `shiftKey` can stay on the event itself and don't need to be captured &ndash; it's never stale.\n *\n * The handler is automatically throttled to only run one at a time. If the handler is called, and then before it finishes, is called again, it will be put on hold until the current one finishes, at which point the second one will run. If the handler is called a third time before the first has finished, it will *replace* the second, so only the most recently called iteration of the handler will run.\n *\n * You may optionally *also* specify debounce and throttle parameters that wait until the synchronous handler has not been called for the specified number of milliseconds, at which point we *actually* run the asynchronous handler according to the logic in the previous paragraph. This is in *addition* to throttling the handler, and does not replace that behavior.\n *\n * @example\n *\n * General use\n * ```tsx\n * const asyncHandler = async (value: number, e: Event) => {\n *     [...] // Ex. send to a server and setState when done\n * };\n * const {\n *     // A sync version of asyncHandler\n *     syncHandler,\n *     // True while the handler is running\n *     pending,\n *     // The error thrown, if any\n *     error,\n *     // Show this value while the operation's pending\n *     currentCapture,\n *     // And others, see `UseAsyncHandlerReturnType`\n *     ...rest\n * } = useAsyncHandler<HTMLInputElement>()({\n *     asyncHandler,\n *     // Pass in the capture function that saves event data\n *     // from being stale.\n *     capture: e => {\n *         // `capture` can have side-effects because\n *         // it's called exactly once per invocation\n *         e.preventDefault();\n *\n *         // Save this value so that it's never stale\n *         return e.currentTarget.valueAsNumber;\n *     }\n * });\n *\n * const onInput = pending? null : syncHandler;\n * ```\n *\n * {@include} {@link UseAsyncHandlerParameters}\n *\n * @see\n *\n * useAsync A more general version of this hook that can work with any type of handler, not just DOM event handlers.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -16586,7 +16586,7 @@
         {
           "kind": "Function",
           "canonicalReference": "preact-prop-helpers!useDocumentClass:function(1)",
-          "docComment": "",
+          "docComment": "/**\n * @param className - The class (as a string) to be adding/removing\n *\n * @param active - If `true`, the default, then the class is added to the element. If `false`, it's removed.\n *\n * @param element - The element to affect. By default, it's the root `<html>` element\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -19315,7 +19315,7 @@
         {
           "kind": "Function",
           "canonicalReference": "preact-prop-helpers!useGridNavigation:function(1)",
-          "docComment": "/**\n * Implements 2-dimensional grid-based keyboard navigation, similarly to {@link useListNavigation}.\n *\n * @remarks\n *\n * Due to the complexity of this hook, it is *highly* recommended to use {@link useCompleteGridNavigation} instead. But if you do need to it's designed to work well with intellisense -- just keep plugging the holes until the errors stop and that's 95% of it right there.\n *\n * @hasChild\n *\n * {@link useGridNavigationRow}\n *\n * @hasChild\n *\n * {@link useGridNavigationCell}\n *\n * @compositeParams\n */\n",
+          "docComment": "/**\n * Implements 2-dimensional grid-based keyboard navigation, similarly to {@link useListNavigation}.\n *\n * @remarks\n *\n * Due to the complexity of this hook, it is *highly* recommended to use {@link useCompleteGridNavigation} instead. But if you do need to it's designed to work well with intellisense -- just keep plugging the holes until the errors stop and that's 95% of it right there.\n *\n * Some features and/or limitations of this hook:\n * ```md-literal\n * * Like all other hooks (except sorting), the only DOM restriction is that the rows and cells are decendents of the grid as a whole **somewhere**.\n * * Rows are given priority over columns. Sorting/filtering happens by row, Page Up/Down, the Home/End keys, and typeahead affect the current row, etc.\n * * Cells can have a `colSpan` or be missing, and moving with the arrow keys will \"remember\" the correct column to be in as focus jumps around.\n * ```\n *\n * @hasChild\n *\n * {@link useGridNavigationRow}\n *\n * @hasChild\n *\n * {@link useGridNavigationCell}\n *\n * @compositeParams\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -19489,7 +19489,7 @@
         {
           "kind": "Function",
           "canonicalReference": "preact-prop-helpers!useGridNavigationCell:function(1)",
-          "docComment": "/**\n * @compositeParams\n */\n",
+          "docComment": "/**\n * Child hook for {@link useGridNavigationRow} (and {@link useGridNavigation}).\n *\n * @compositeParams\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -20033,7 +20033,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseGridNavigationCellParametersSelf#colSpan:member",
-              "docComment": "",
+              "docComment": "/**\n * How many columns this cell spans (all cells default to 1).\n *\n * Any following cells should skip over the `index`es this one covered with its `colSpan`. E.G. if this cell is `index=5` and `colSpan=3`, the next cell would be `index=8`, **not** `index=6`\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -20624,7 +20624,7 @@
         {
           "kind": "Function",
           "canonicalReference": "preact-prop-helpers!useGridNavigationRow:function(1)",
-          "docComment": "/**\n * @compositeParams\n */\n",
+          "docComment": "/**\n * Child hook for {@link useGridNavigation}\n *\n * As a row, this hook is responsible for both being a **child** of list navigation, but also a **parent** of list navigation. As such, this is one of the most complicated hooks here in terms of dependencies.\n *\n * @compositeParams\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -24776,7 +24776,7 @@
         {
           "kind": "Function",
           "canonicalReference": "preact-prop-helpers!useHideScroll:function(1)",
-          "docComment": "/**\n * Allows for hiding the scroll bar of the root HTML element without shifting the layout of the page more than adding a fow pixels of padding to the root element if necessary.\n */\n",
+          "docComment": "/**\n * Allows for hiding the scroll bar of the root HTML element without shifting the layout of the page more than adding a few pixels of padding to the root element if necessary.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -25592,7 +25592,7 @@
         {
           "kind": "Function",
           "canonicalReference": "preact-prop-helpers!useLinearNavigation:function(1)",
-          "docComment": "/**\n * When used in tandem with `useRovingTabIndex`, allows control of the tabbable index with the arrow keys.\n *\n * @see\n *\n * useListNavigation, which packages everything up together.\n *\n * @compositeParams\n */\n",
+          "docComment": "/**\n * When used in tandem with `useRovingTabIndex`, allows control of the tabbable index with the arrow keys, Page Up/Page Down, or Home/End.\n *\n * @remarks\n *\n * There is no child version of this hook. That being said, the props returned are stable and work equally well on the child as the parent. If you don't have a parent `HTMLElement`, you can still pass the returned props to each child individually.\n *\n * @see\n *\n * {@link useCompleteListNavigation}, which packages everything up together.\n *\n * @compositeParams\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -25620,10 +25620,6 @@
               "kind": "Reference",
               "text": "UseLinearNavigationChildInfo",
               "canonicalReference": "preact-prop-helpers!UseLinearNavigationChildInfo:interface"
-            },
-            {
-              "kind": "Content",
-              "text": "<ChildElement>"
             },
             {
               "kind": "Content",
@@ -25658,8 +25654,8 @@
           ],
           "fileUrlPath": "src/component-detail/keyboard-navigation/use-linear-navigation.tsx",
           "returnTypeTokenRange": {
-            "startIndex": 11,
-            "endIndex": 13
+            "startIndex": 10,
+            "endIndex": 12
           },
           "releaseTag": "Public",
           "overloadIndex": 1,
@@ -25667,8 +25663,8 @@
             {
               "parameterName": "{ rovingTabIndexReturn, linearNavigationParameters }",
               "parameterTypeTokenRange": {
-                "startIndex": 8,
-                "endIndex": 10
+                "startIndex": 7,
+                "endIndex": 9
               },
               "isOptional": false
             }
@@ -25700,7 +25696,7 @@
               "typeParameterName": "M",
               "constraintTokenRange": {
                 "startIndex": 5,
-                "endIndex": 7
+                "endIndex": 6
               },
               "defaultTypeTokenRange": {
                 "startIndex": 0,
@@ -25717,16 +25713,7 @@
           "excerptTokens": [
             {
               "kind": "Content",
-              "text": "export interface UseLinearNavigationChildInfo<ChildElement extends "
-            },
-            {
-              "kind": "Reference",
-              "text": "Element",
-              "canonicalReference": "!Element:interface"
-            },
-            {
-              "kind": "Content",
-              "text": "> extends "
+              "text": "export interface UseLinearNavigationChildInfo extends "
             },
             {
               "kind": "Reference",
@@ -25744,26 +25731,13 @@
           ],
           "fileUrlPath": "src/component-detail/keyboard-navigation/use-linear-navigation.tsx",
           "releaseTag": "Public",
-          "typeParameters": [
-            {
-              "typeParameterName": "ChildElement",
-              "constraintTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              },
-              "defaultTypeTokenRange": {
-                "startIndex": 0,
-                "endIndex": 0
-              }
-            }
-          ],
           "name": "UseLinearNavigationChildInfo",
           "preserveMemberOrder": false,
           "members": [],
           "extendsTokenRanges": [
             {
-              "startIndex": 3,
-              "endIndex": 5
+              "startIndex": 1,
+              "endIndex": 3
             }
           ]
         },
@@ -25798,10 +25772,6 @@
               "kind": "Reference",
               "text": "UseLinearNavigationChildInfo",
               "canonicalReference": "preact-prop-helpers!UseLinearNavigationChildInfo:interface"
-            },
-            {
-              "kind": "Content",
-              "text": "<ChildElement>"
             },
             {
               "kind": "Content",
@@ -25868,7 +25838,7 @@
               "typeParameterName": "_M",
               "constraintTokenRange": {
                 "startIndex": 5,
-                "endIndex": 7
+                "endIndex": 6
               },
               "defaultTypeTokenRange": {
                 "startIndex": 0,
@@ -25914,8 +25884,8 @@
           ],
           "extendsTokenRanges": [
             {
-              "startIndex": 8,
-              "endIndex": 14
+              "startIndex": 7,
+              "endIndex": 13
             }
           ]
         },
@@ -26013,7 +25983,7 @@
             {
               "kind": "MethodSignature",
               "canonicalReference": "preact-prop-helpers!UseLinearNavigationParametersSelf#getHighestIndex:member(1)",
-              "docComment": "/**\n * From `useManagedChildren`.\n *\n * This can be higher than the *actual* highest index if you need it to be.\n */\n",
+              "docComment": "/**\n * From `useManagedChildren`. This can be higher than the *actual* highest index if you need it to be.\n *\n * @returns [0, n], not [0, n)\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -26041,7 +26011,7 @@
             {
               "kind": "MethodSignature",
               "canonicalReference": "preact-prop-helpers!UseLinearNavigationParametersSelf#getLowestIndex:member(1)",
-              "docComment": "/**\n * @see\n *\n * {@link getHighestIndex}\n */\n",
+              "docComment": "/**\n * From `useManagedChildren`. This can be lower than the *actual* lowest index if you need it to be.\n *\n * @see\n *\n * {@link UseLinearNavigationParametersSelf.getLowestIndex}\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -26069,7 +26039,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseLinearNavigationParametersSelf#indexDemangler:member",
-              "docComment": "/**\n * Turn an unsorted `index` into its visual display `index`. Use `identity` if you don't care.\n */\n",
+              "docComment": "/**\n * @see\n *\n * {@link UseLinearNavigationParametersSelf.indexMangler}, which does the opposite of this.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -26096,7 +26066,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseLinearNavigationParametersSelf#indexMangler:member",
-              "docComment": "/**\n * Turn a sorted `index` into its original, unsorted `index`. Use `identity` if you don't care or this isn't provided for you by any other hook (e.g. `useSortableChildren`).\n *\n * This is what allows our linear keyboard navigation to still work if the children are re-ordered (i.e. how when reverse-sorted, pressing `down` moves from item #9 to item #8).\n *\n * @see\n *\n * {@link useRearrangeableChildren}\n */\n",
+              "docComment": "/**\n * When children are sorted, reversed, or otherwise out of order, `indexMangler` is given the `index` of a child and must return its \"visual\" index -- what its `index` would be at that position.\n *\n * @remarks\n *\n * This is provided by {@link useRearrangeableChildren}. If you use this hook as part of {@link useCompleteListNavigation} or {@link useCompleteGridNavigation}, then everything's already wired up and you don't need to worry about this. Otherwise, it's recommended to simply use {@link lodash-es#identity} here.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -26168,7 +26138,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseLinearNavigationParametersSelf#navigatePastEnd:member",
-              "docComment": "/**\n * What happens when `down` is pressed on the last valid child?\n *\n * @see\n *\n * {@link navigatePastStart}\n */\n",
+              "docComment": "/**\n * What happens when `down` is pressed on the last valid child?\n *\n * @see\n *\n * {@link UseLinearNavigationParametersSelf.navigatePastStart}\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -26195,7 +26165,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseLinearNavigationParametersSelf#navigatePastStart:member",
-              "docComment": "/**\n * What happens when `up` is pressed on the first valid child?\n *\n * * \"wrap\": The focus is sent down to the last child * \"passthrough\": Nothing happens, **and the event is allowed to propagate**. * A function:\n */\n",
+              "docComment": "/**\n * What happens when `up` is pressed on the first valid child?\n * ```md-literal\n * * \"wrap\": The focus is sent down to the last child\n * * \"passthrough\": Nothing happens, **and the event is allowed to propagate**.\n * * A function:\n * ```\n *\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -26263,7 +26233,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseLinearNavigationParametersSelf#pageNavigationSize:member",
-              "docComment": "/**\n * Controls how many elements are skipped over when page up/down are pressed.\n *\n * * When 0: Page Up/Down are disabled * When &gt;= 1: Page Up/Down moves that number of elements up or down * When 0 &lt; x &lt; 1, Page Up/Down moves by that percentage of all elements, or of 100 elements, whichever is higher. In other words, 0.1 jumps by 10 elements when there are fewer then 100 elements, and 20 elements when there are 200 elements.\n */\n",
+              "docComment": "/**\n * Controls how many elements are skipped over when page up/down are pressed.\n * ```md-literal\n * * When 0: Page Up/Down are disabled\n * * When &gt;= 1: Page Up/Down moves that number of elements up or down\n * * When 0 &lt; x &lt; 1, Page Up/Down moves by that percentage of all elements, or of 100 elements, whichever is higher. In other words, 0.1 jumps by 10 elements when there are fewer then 100 elements, and 20 elements when there are 200 elements.\n * ```\n *\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -32363,7 +32333,7 @@
         {
           "kind": "Function",
           "canonicalReference": "preact-prop-helpers!usePaginatedChild:function(1)",
-          "docComment": "/**\n * @compositeParams\n */\n",
+          "docComment": "/**\n * Child hook for {@link usePaginatedChildren}.\n *\n * @remarks\n *\n * When a child is paginated, it still renders itself (i.e. it calls this hook, so it's rendering), so check `hideBecausePaginated` and, if it's true, avoid doing any heavy logic and render with `display: none`.\n *\n * @compositeParams\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -32672,7 +32642,7 @@
         {
           "kind": "Function",
           "canonicalReference": "preact-prop-helpers!usePaginatedChildren:function(1)",
-          "docComment": "/**\n * @hasChild\n *\n * {@link usePaginatedChild}\n *\n * @compositeParams\n */\n",
+          "docComment": "/**\n * Allows children to stop themselves from rendering outside of a narrow range.\n *\n * @remarks\n *\n * Each child will still render itself, but it is aware of if it is within/outside of the pagination range, and simply return empty.\n *\n * @hasChild\n *\n * {@link usePaginatedChild}\n *\n * @compositeParams\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -34322,7 +34292,7 @@
         {
           "kind": "Function",
           "canonicalReference": "preact-prop-helpers!usePress:function(1)",
-          "docComment": "/**\n * Adds the necessary event handlers to create a \"press\"-like event for any element, whether it's a native &lt;button&gt; or regular &lt;div&gt;, and allows for a \"long press\" that can be used to, e.g., show a tooltip *instead* of activating a press.\n *\n * @remarks\n *\n * Notably, the following cases are covered: * The target element is properly focused, even on iOS Safari (*especially* on iOS Safari) * Double-clicks won't select text, it just presses the button twice. * Text selection that happens to end/start with this element won't invoke a press. * The `enter` key immediately invokes a press (by default just once until pressed again), while the `space` key invokes it when released, if focus hasn't moved away from the button. * Haptic feedback (on, like, the one browser combination that supports it &mdash; this can be disabled app-wide with `setButtonVibrate`)\n *\n * In addition, returns a \"more accurate\" CSS `active` and `hover`; more accurate in that `hover` won't mess up mobile devices that see `hover` and mess up your click events, and in that `active` accurately displays when a press would occur or not.\n *\n * {@include} {@link setPressVibrate}\n *\n * @compositeParams\n */\n",
+          "docComment": "/**\n * Adds the necessary event handlers to create a \"press\"-like event for any element, whether it's a native &lt;button&gt; or regular &lt;div&gt;, and allows for a \"long press\" that can be used to, e.g., show a tooltip *instead* of activating a press.\n *\n * @remarks\n *\n * Notably, the following cases are covered:\n * ```md-literal\n * * The target element is properly focused, even on iOS Safari (*especially* on iOS Safari)\n * * Double-clicks won't select text, it just presses the button twice.\n * * Text selection that happens to end/start with this element won't invoke a press.\n * * The `enter` key immediately invokes a press (by default just once until pressed again), while the `space` key invokes it when released, if focus hasn't moved away from the button.\n * * Haptic feedback (on, like, the one browser combination that supports it &mdash; this can be disabled app-wide with `setButtonVibrate`)\n * ```\n *\n * In addition, returns a \"more accurate\" CSS `active` and `hover`; more accurate in that `hover` won't mess up mobile devices that see `hover` and mess up your click events, and in that `active` accurately displays when a press would occur or not.\n *\n * {@include} {@link setPressVibrate}\n *\n * @compositeParams\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -37328,7 +37298,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseRovingTabIndexChildInfo#getLocallyTabbable:member",
-              "docComment": "/**\n * @see\n *\n * {@link setLocallyTabbable}\n */\n",
+              "docComment": "/**\n * @see\n *\n * {@link UseRovingTabIndexChildInfo.setLocallyTabbable}\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -41657,7 +41627,7 @@
         {
           "kind": "Function",
           "canonicalReference": "preact-prop-helpers!useStaggeredChild:function(1)",
-          "docComment": "/**\n * @compositeParams\n */\n",
+          "docComment": "/**\n * Child hook for {@link useStaggeredChildren}.\n *\n * @remarks\n *\n * When a child is staggered, it still renders itself (i.e. it calls this hook, so it's rendering), so check `hideBecauseStaggered` and, if it's true, avoid doing any heavy logic and render with `display: none`.\n *\n * @compositeParams\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",

@@ -17,7 +17,6 @@
  * {@include } {@link useCompleteGridNavigation}
  * {@include } {@link useModal}
  * {@include } {@link useAsyncHandler}
- * {@include } {@link useManagedChildren}
  * {@tableOfContents header Specific}
  * {@tableOfContents subheader Very useful in very specific cases}
  * {@include } {@link useElementSize}
@@ -42,22 +41,22 @@
  * {@include } {@link useLogicalDirection}
  * {@tableOfContents header Extensions}
  * {@tableOfContents subheader These hooks don't do anything with HTML elements but are useful extensions to Preact's built-in hooks}
+ * {@include } {@link useStableGetter}
+ * {@include } {@link useStableCallback}
+ * {@include } {@link useMemoObject}
  * {@include } {@link useForceUpdate}
  * {@include } {@link useState}
  * {@include } {@link usePassiveState}
  * {@include } {@link usePersistentState}
  * {@include } {@link useSearchParamState}
- * {@include } {@link useStableGetter}
- * {@include } {@link useStableCallback}
- * {@include } {@link useMemoObject}
- * {@include } {@link useAnimationFrame}
- * {@include } {@link useInterval}
  * {@include } {@link useTimeout}
+ * {@include } {@link useInterval}
+ * {@include } {@link useAnimationFrame}
  * {@include } {@link useEffectDebug}
  * {@include } {@link useLayoutEffectDebug}
- * {@include } {@link useTimeout}
  * {@tableOfContents header Building blocks and other helpers}
  * {@tableOfContents subheader These hooks are primarily used to build larger hooks, but can be used alone}
+ * {@include } {@link useManagedChildren}
  * {@include } {@link useListNavigation}
  * {@include } {@link useGridNavigation}
  * {@include } {@link useRovingTabIndex}
@@ -127,7 +126,7 @@
 export { GridChildCellInfo, GridChildRowInfo, TabbableColumnInfo, UseGridNavigationCellContext, UseGridNavigationCellContextSelf, UseGridNavigationCellParameters, UseGridNavigationCellParametersSelf, UseGridNavigationCellReturnType, UseGridNavigationParameters, UseGridNavigationParametersSelf, UseGridNavigationReturnType, UseGridNavigationRowContext, UseGridNavigationRowContextSelf, UseGridNavigationRowParameters, UseGridNavigationRowReturnType, useGridNavigation, useGridNavigationCell, useGridNavigationRow } from "./component-detail/keyboard-navigation/use-grid-navigation-partial.js";
 export { GridSingleSelectSortableChildCellInfo, GridSingleSelectSortableChildRowInfo, UseGridNavigationSingleSelectionSortableCellParameters, UseGridNavigationSingleSelectionSortableCellReturnType, UseGridNavigationSingleSelectionSortableParameters, UseGridNavigationSingleSelectionSortableReturnType, UseGridNavigationSingleSelectionSortableRowParameters, UseGridNavigationSingleSelectionSortableRowReturnType, useGridNavigationSingleSelectionSortable, useGridNavigationSingleSelectionSortableCell, useGridNavigationSingleSelectionSortableRow } from "./component-detail/keyboard-navigation/use-grid-navigation-single-selection-sortable.js";
 export { GridSingleSelectChildCellInfo, GridSingleSelectChildRowInfo, UseGridNavigationCellSingleSelectionContext, UseGridNavigationRowSingleSelectionContext, UseGridNavigationSingleSelectionCellParameters, UseGridNavigationSingleSelectionCellReturnType, UseGridNavigationSingleSelectionParameters, UseGridNavigationSingleSelectionReturnType, UseGridNavigationSingleSelectionRowParameters, UseGridNavigationSingleSelectionRowReturnType, useGridNavigationSingleSelection, useGridNavigationSingleSelectionCell, useGridNavigationSingleSelectionRow } from "./component-detail/keyboard-navigation/use-grid-navigation-single-selection.js";
-export { LinearNavigationResult, TryNavigateToIndexParameters, UseLinearNavigationChildInfo, UseLinearNavigationParameters, UseLinearNavigationParametersSelf, UseLinearNavigationReturnType, UseLinearNavigationReturnTypeSelf, tryNavigateToIndex, useLinearNavigation } from "./component-detail/keyboard-navigation/use-linear-navigation.js";
+export { LinearNavigationResult, TryNavigateToIndexParameters, UseLinearNavigationChildInfo, UseLinearNavigationParameters, UseLinearNavigationParametersSelf, UseLinearNavigationReturnType, UseLinearNavigationReturnTypeSelf, identity, tryNavigateToIndex, useLinearNavigation } from "./component-detail/keyboard-navigation/use-linear-navigation.js";
 export { UseListNavigationChildInfo, UseListNavigationChildParameters, UseListNavigationChildReturnType, UseListNavigationContext, UseListNavigationParameters, UseListNavigationReturnType, useListNavigation, useListNavigationChild } from "./component-detail/keyboard-navigation/use-list-navigation-partial.js";
 export { UseListNavigationSingleSelectionSortableChildInfo, UseListNavigationSingleSelectionSortableChildParameters, UseListNavigationSingleSelectionSortableChildReturnType, UseListNavigationSingleSelectionSortableParameters, UseListNavigationSingleSelectionSortableReturnType, useListNavigationSingleSelectionSortable, useListNavigationSingleSelectionSortableChild } from "./component-detail/keyboard-navigation/use-list-navigation-single-selection-sortable.js";
 export { UseListNavigationSingleSelectionChildContext, UseListNavigationSingleSelectionChildInfo, UseListNavigationSingleSelectionChildParameters, UseListNavigationSingleSelectionChildReturnType, UseListNavigationSingleSelectionParameters, UseListNavigationSingleSelectionReturnType, useListNavigationSingleSelection, useListNavigationSingleSelectionChild } from "./component-detail/keyboard-navigation/use-list-navigation-single-selection.js";

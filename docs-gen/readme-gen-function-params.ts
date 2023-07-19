@@ -91,8 +91,9 @@ function handleParamOrReturnComposite<C extends ModelContext & ApiContext & IsCo
 export function doInterfaceToTable<C extends ModelContext & ApiContext & IsCompositeContext & HeaderLevelContext & ParamsOrReturnContext & TrackingContext>(type: ApiInterface, context: C) {
     console.assert(type.kind == "Interface");
 
+    const ctx2 = { ...context, inTable: true, api: type };
     let extendsString = handleCompositeParamsExtends(type, context);
-    let tableString = context.isCompositeFunction ? handleCompositeParamsMembers(type, { ...context, inTable: true }) : handleOtherInterfaceMembers(type, { ...context, inTable: true });
+    let tableString = context.isCompositeFunction ? handleCompositeParamsMembers(type, ctx2) : handleOtherInterfaceMembers(type, ctx2);
 
     return `
 ${doHeader(type.displayName, context)}
@@ -269,31 +270,6 @@ function handleCompositeParamsMembers<C extends ModelContext & ApiContext & IsCo
 }
 
 
-/*
-function docNodeCommentInParams(d: DocNode) {
-    switch (d.kind) {
-        case "Paragraph":
-            return (d as DocParagraph).nodes.map(docNodeCommentInParamsNode)
-        default:
-            debugger;
-            return "";
-    }
-}
-
-function docNodeCommentInParamsNode(d: DocNode) {
-    switch (d.kind) {
-        case "PlainText":
-            return (d as DocPlainText).text;
-        case "SoftBreak":
-            return " ";
-        default:
-            debugger;
-            return "";
-    }
-}*/
-
-
-
 
 /**
  * Helper function to decompose an `interface` into all the `interface`s that make it up
@@ -303,19 +279,7 @@ function docNodeCommentInParamsNode(d: DocNode) {
 function recursiveExtends<C extends ApiContext & ModelContext & ParamsOrReturnContext>(root: ApiInterface, type: ApiInterface, context: C): Map<string, ReturnType<typeof doReference>> {
     let allExtended = type.extendsTypes.flatMap(({ excerpt: { spannedTokens } }) => {
         return spannedTokens.filter(token => token.kind == "Reference" && (token.text.endsWith("Parameters") || token.text.endsWith("ReturnType")))
-    }).map(token => doReference(token.canonicalReference, context))
-    /*if (allExtended.length == 0) {
-        // TODO: Awkward bottom for the recursion
-        // Basically, we only want to add ourselves to the extends train if we're *NOT* the only one in it.
-        // I.E. LNCParameters extends RTIParameters, so RTIParameters is included there,
-        // but also RTIParameters extends RTIParameters (kinda), and we don't want it there.
-        //
-        // That's what this is. It could be detangled a bit -- it's not very clean -- but this works.  
-        if (root != type)
-            return new Map([[type.displayName, { resolvedApiItem: type, errorMessage: undefined }]]);
-        else
-            return new Map();
-    }*/
+    }).map(token => doReference(token.canonicalReference, context));
 
     type T = [string, ReturnType<typeof doReference>];
 

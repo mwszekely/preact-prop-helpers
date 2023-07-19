@@ -1,13 +1,17 @@
+import { identity } from "lodash-es";
 import { useEnsureStability } from "../../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { useCallback, useRef } from "../../util/lib.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
+export { identity };
 /**
  * When used in tandem with `useRovingTabIndex`, allows control of
- * the tabbable index with the arrow keys.
+ * the tabbable index with the arrow keys, Page Up/Page Down, or Home/End.
  *
- * @see useListNavigation, which packages everything up together.
+ * @remarks There is no child version of this hook. That being said, the props returned are stable and work equally well on the child as the parent. If you don't have a parent `HTMLElement`, you can still pass the returned props to each child individually.
+ *
+ * @see {@link useCompleteListNavigation}, which packages everything up together.
  *
  * @compositeParams
  */

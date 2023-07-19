@@ -98,7 +98,7 @@ export interface UseRovingTabIndexChildInfo<TabbableChildElement extends Element
      * Used by the parent to control a child's internal tabbable state. */
     setLocallyTabbable: StateUpdater<boolean>;
     /**
-     * @see {@link setLocallyTabbable}
+     * @see {@link UseRovingTabIndexChildInfo.setLocallyTabbable}
      */
     getLocallyTabbable: () => boolean;
 }
