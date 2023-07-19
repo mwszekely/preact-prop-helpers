@@ -9,6 +9,9 @@ package-lock.json
 !docs/bundle.js
 !docs/bundle.js.map
 !dist/**
+!temp
+!temp/preact-prop-helpers.d.ts
+temp/tsdoc-metadata.json
 
 # Logs
 logs

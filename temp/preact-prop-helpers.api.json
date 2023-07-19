@@ -115,11 +115,6 @@
           "syntaxKind": "modifier"
         },
         {
-          "tagName": "@docTopic",
-          "syntaxKind": "block",
-          "allowMultiple": true
-        },
-        {
           "tagName": "@include",
           "syntaxKind": "inline",
           "allowMultiple": true
