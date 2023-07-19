@@ -1,7 +1,7 @@
 
 # Preact Prop Helpers
 
-A small set of hooks for Preact. The theme is modifying HTML attributes to do useful things, along with a bunch of other useful boilerplate-y hooks.
+A set of small, compartmentalized hooks for Preact. The theme is modifying HTML attributes to do useful things, along with a bunch of other useful boilerplate-y hooks.
 
 Everything from keyboard navigation (arrow keys, typeahead) to modal focus traps (dialogs and menus) to simple things like state management *but with localStorage!* are here.
 
@@ -28,17 +28,17 @@ These hooks are used extremely commonly or provide uncommonly useful behavior
  * [useAsyncHandler](#useasynchandler) Given an asynchronous event handler, returns a synchronous one that works on the DOM, along with some other information related to the current state. Does not modify any props. 
 
  * [useManagedChildren](#usemanagedchildren) Allows a parent component to access information about certain child components once they have rendered. 
-### Less common but still useful 
+### Specific 
 
-These hooks are useful, but in more specific circumstances
+Very useful in very specific cases
 
  
 
+ * [useElementSize](#useelementsize) Measures an element, allowing you to react to its changes in size. 
+
+ * [useHideScroll](#usehidescroll) Allows for hiding the scroll bar of the root HTML element without shifting the layout of the page more than adding a fow pixels of padding to the root element if necessary. 
+
  * [useMediaQuery](#usemediaquery) Allows a component to use the boolean result of a media query as part of its render. 
-
- * [useRandomId](#userandomid) Besides just generating something for the `id` prop, also gives you the props to use on another element if you'd like (e.g. a label's `for`). 
-
- * [useRandomDualIds](#userandomdualids) While `useRandomId` allows the referencer to use the source's ID, sometimes you also want the reverse too (e.g. I `aria-label` you, you `aria-controls` me. That sort of thing). 
 
  * [useHasCurrentFocus](#usehascurrentfocus) Allows monitoring whether the rendered element is or is not focused directly (i.e. would satisfy `:focus`). 
 
@@ -46,22 +46,22 @@ These hooks are useful, but in more specific circumstances
 
  * [useChildrenHaveFocus](#usechildrenhavefocus) Allows a composite component (such as a radio group or listbox) to listen for an "overall focusin/out" event; this hook lets you know when focus has moved in/out of this grouping of children EVEN IF there is no actual parent DOM element. 
 
- * [useHideScroll](#usehidescroll) Allows for hiding the scroll bar of the root HTML element without shifting the layout of the page more than adding a fow pixels of padding to the root element if necessary. 
+ * [useRandomId](#userandomid) Besides just generating something for the `id` prop, also gives you the props to use on another element if you'd like (e.g. a label's `for`). 
+
+ * [useRandomDualIds](#userandomdualids) While `useRandomId` allows the referencer to use the source's ID, sometimes you also want the reverse too (e.g. I `aria-label` you, you `aria-controls` me. That sort of thing). 
 
  * [useGlobalHandler](#useglobalhandler) Allows attaching an event handler to any *non-Preact* element, and removing it when the component using the hook unmounts. The callback does not need to be stable across renders. 
 
  * [useDocumentClass](#usedocumentclass)  
-
- * [useElementSize](#useelementsize) Measures an element, allowing you to react to its changes in size. 
 ### Niche 
 
  * [useAsyncEffect](#useasynceffect) Combines the semantics of `useAsync` and `useEffect`. 
 
  * [useMutationObserver](#usemutationobserver) Effectively just a wrapper around a `MutationObserver`. 
 
- * [useImperativeProps](#useimperativeprops)  
-
  * [useTextContent](#usetextcontent)  
+
+ * [useImperativeProps](#useimperativeprops)  
 
  * [usePortalChildren](#useportalchildren) Very basic hook for a root-level component to use to allow any children within the whole app to push children to a portal somewhere. 
 
@@ -633,6 +633,67 @@ This hook is designed to be lightweight, in that the parent keeps no state and r
 <hr />
 
 
+### useElementSize
+
+Measures an element, allowing you to react to its changes in size.
+
+
+
+
+
+#### UseElementSizeParameters
+
+<small>extends [UseRefElementParameters](#userefelementparameters)</small>
+
+|Member|Type|Description|
+|---------|----|-----------|
+|.getObserveBox|``null \| (() => ResizeObserverOptions["box"])``|Passed as an argument to the created ResizeObserver.<br />**See also**: https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver/observe#parameters|
+|.onSizeChange|Function|Called any time the browser detects a size change on the element. Does not need to be stable, so you can pass an anonymous function that only sets the values you use if you'd like.|
+
+
+
+#### UseElementSizeReturnType
+
+<small>extends [UseRefElementReturnType](#userefelementreturntype)</small>
+
+|Member|Type|Description|
+|---------|----|-----------|
+|.getSize|Function|**STABLE**|
+
+
+
+
+
+
+
+
+<hr />
+
+
+### useHideScroll
+
+Allows for hiding the scroll bar of the root HTML element without shifting the layout of the page more than adding a fow pixels of padding to the root element if necessary.
+
+
+
+
+|Parameter|Type|Description|
+|---------|----|-----------|
+|hideScroll|boolean||
+
+
+
+
+
+
+
+
+
+
+
+<hr />
+
+
 ### useMediaQuery
 
 Allows a component to use the boolean result of a media query as part of its render.
@@ -649,85 +710,6 @@ Allows a component to use the boolean result of a media query as part of its ren
 **Returns** `UseMediaQueryReturnType`
 
 Please note that there is a re-render penalty incurred by using this hook -- it will always cause any component that uses it to re-render one extra time on mount as it stores the result of the media query. This can be mitigated with the `defaultGuess` parameter -- if you guess correctly (`true`/`false`), then there's no penalty. Hooray.
-
-
-
-
-
-
-<hr />
-
-
-### useRandomId
-
-Besides just generating something for the `id` prop, also gives you the props to use on another element if you'd like (e.g. a label's `for`).
-
-
-
-
-
-#### UseRandomIdParameters
-
-
-
-|Member|Type|Description|
-|---------|----|-----------|
-|.otherReferencerProp|``keyof ElementProps<any> \| null``|This is the prop on the **OTHER** element that will use our ID. E.G. The `input` calls `useRandomId` and passes `for` as `referencerProp`.|
-|.prefix|``string``|While all IDs are unique, this can be used to more easily differentiate them.<br />If this is stable, then your props are stable. Simple as that.|
-
-
-
-#### UseRandomIdReturnType
-
-
-
-|Member|Type|Description|
-|---------|----|-----------|
-|.id|``string``||
-|propsReferencer|HTML props|Spread these props onto the HTML element that will use this logic.|
-|propsSource|HTML props|Spread these props onto the HTML element that will use this logic.|
-
-
-
-
-
-
-
-
-<hr />
-
-
-### useRandomDualIds
-
-While `useRandomId` allows the referencer to use the source's ID, sometimes you also want the reverse too (e.g. I `aria-label` you, you `aria-controls` me. That sort of thing).
-
-
-
-
-
-#### UseRandomDualIdsParameters
-
-
-
-|Member|Type|Description|
-|---------|----|-----------|
-|randomIdInputParameters|UseRandomIdParameters["randomIdParameters"];| |
-|randomIdLabelParameters|UseRandomIdParameters["randomIdParameters"];| |
-
-
-
-#### UseRandomDualIdsReturnType
-
-
-
-|Member|Type|Description|
-|---------|----|-----------|
-|randomIdInputReturn|UseRandomIdReturnType<InputElement, LabelElement>["randomIdReturn"];| |
-|randomIdLabelReturn|UseRandomIdReturnType<LabelElement, InputElement>["randomIdReturn"];| |
-|propsInput|HTML props|Spread these props onto the HTML element that will use this logic.|
-|propsLabel|HTML props|Spread these props onto the HTML element that will use this logic.|
-
-
 
 
 
@@ -881,19 +863,74 @@ Every member of `UseChildrenHaveFocusChildReturnType` is inherited (see the inte
 <hr />
 
 
-### useHideScroll
+### useRandomId
 
-Allows for hiding the scroll bar of the root HTML element without shifting the layout of the page more than adding a fow pixels of padding to the root element if necessary.
-
-
+Besides just generating something for the `id` prop, also gives you the props to use on another element if you'd like (e.g. a label's `for`).
 
 
-|Parameter|Type|Description|
+
+
+
+#### UseRandomIdParameters
+
+
+
+|Member|Type|Description|
 |---------|----|-----------|
-|hideScroll|boolean||
+|.otherReferencerProp|``keyof ElementProps<any> \| null``|This is the prop on the **OTHER** element that will use our ID. E.G. The `input` calls `useRandomId` and passes `for` as `referencerProp`.|
+|.prefix|``string``|While all IDs are unique, this can be used to more easily differentiate them.<br />If this is stable, then your props are stable. Simple as that.|
 
 
 
+#### UseRandomIdReturnType
+
+
+
+|Member|Type|Description|
+|---------|----|-----------|
+|.id|``string``||
+|propsReferencer|HTML props|Spread these props onto the HTML element that will use this logic.|
+|propsSource|HTML props|Spread these props onto the HTML element that will use this logic.|
+
+
+
+
+
+
+
+
+<hr />
+
+
+### useRandomDualIds
+
+While `useRandomId` allows the referencer to use the source's ID, sometimes you also want the reverse too (e.g. I `aria-label` you, you `aria-controls` me. That sort of thing).
+
+
+
+
+
+#### UseRandomDualIdsParameters
+
+
+
+|Member|Type|Description|
+|---------|----|-----------|
+|randomIdInputParameters|UseRandomIdParameters["randomIdParameters"];| |
+|randomIdLabelParameters|UseRandomIdParameters["randomIdParameters"];| |
+
+
+
+#### UseRandomDualIdsReturnType
+
+
+
+|Member|Type|Description|
+|---------|----|-----------|
+|randomIdInputReturn|UseRandomIdReturnType<InputElement, LabelElement>["randomIdReturn"];| |
+|randomIdLabelReturn|UseRandomIdReturnType<LabelElement, InputElement>["randomIdReturn"];| |
+|propsInput|HTML props|Spread these props onto the HTML element that will use this logic.|
+|propsLabel|HTML props|Spread these props onto the HTML element that will use this logic.|
 
 
 
@@ -950,43 +987,6 @@ The default, `"grouped"`, is faster when you have, say, a button component, used
 
 
 
-
-
-
-
-
-
-
-
-<hr />
-
-
-### useElementSize
-
-Measures an element, allowing you to react to its changes in size.
-
-
-
-
-
-#### UseElementSizeParameters
-
-<small>extends [UseRefElementParameters](#userefelementparameters)</small>
-
-|Member|Type|Description|
-|---------|----|-----------|
-|.getObserveBox|``null \| (() => ResizeObserverOptions["box"])``|Passed as an argument to the created ResizeObserver.<br />**See also**: https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver/observe#parameters|
-|.onSizeChange|Function|Called any time the browser detects a size change on the element. Does not need to be stable, so you can pass an anonymous function that only sets the values you use if you'd like.|
-
-
-
-#### UseElementSizeReturnType
-
-<small>extends [UseRefElementReturnType](#userefelementreturntype)</small>
-
-|Member|Type|Description|
-|---------|----|-----------|
-|.getSize|Function|**STABLE**|
 
 
 
@@ -1064,6 +1064,43 @@ Every member of `UseMutationObserverReturnType` is inherited (see the interface 
 <hr />
 
 
+### useTextContent
+
+
+
+
+
+
+
+#### UseTextContentParameters
+
+<small>extends [UseRefElementReturnType](#userefelementreturntype)</small>
+
+|Member|Type|Description|
+|---------|----|-----------|
+|.getText|Function|Return the text content of this component. By default, `e => e.textContent` is probably what you want.|
+|.onTextContentChange|``OnPassiveStateChange<string \| null, never>``||
+
+
+
+#### UseTextContentReturnType
+
+
+
+|Member|Type|Description|
+|---------|----|-----------|
+|.getTextContent|``() => string \| null``||
+
+
+
+
+
+
+
+
+<hr />
+
+
 ### useImperativeProps
 
 
@@ -1096,43 +1133,6 @@ Every member of `UseImperativePropsParameters` is inherited (see the interface i
 |.setEventHandler|``SetEventHandler``||
 |.setStyle|``SetStyle``||
 |props|HTML props|Spread these props onto the HTML element that will use this logic.|
-
-
-
-
-
-
-
-
-<hr />
-
-
-### useTextContent
-
-
-
-
-
-
-
-#### UseTextContentParameters
-
-<small>extends [UseRefElementReturnType](#userefelementreturntype)</small>
-
-|Member|Type|Description|
-|---------|----|-----------|
-|.getText|Function|Return the text content of this component. By default, `e => e.textContent` is probably what you want.|
-|.onTextContentChange|``OnPassiveStateChange<string \| null, never>``||
-
-
-
-#### UseTextContentReturnType
-
-
-
-|Member|Type|Description|
-|---------|----|-----------|
-|.getTextContent|``() => string \| null``||
 
 
 

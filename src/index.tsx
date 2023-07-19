@@ -1,7 +1,7 @@
 /**
  * # Preact Prop Helpers
  * 
- * A small set of hooks for Preact. The theme is modifying HTML attributes to do useful things, along with a bunch of other useful boilerplate-y hooks.
+ * A set of small, compartmentalized hooks for Preact. The theme is modifying HTML attributes to do useful things, along with a bunch of other useful boilerplate-y hooks.
  * 
  * Everything from keyboard navigation (arrow keys, typeahead) to modal focus traps (dialogs and menus) to simple things like state management *but with localStorage!* are here.
  * 
@@ -18,23 +18,23 @@
  * {@include } {@link useModal}
  * {@include } {@link useAsyncHandler}
  * {@include } {@link useManagedChildren}
- * {@tableOfContents header Less common but still useful}
- * {@tableOfContents subheader These hooks are useful, but in more specific circumstances}
+ * {@tableOfContents header Specific}
+ * {@tableOfContents subheader Very useful in very specific cases}
+ * {@include } {@link useElementSize}
+ * {@include } {@link useHideScroll}
  * {@include } {@link useMediaQuery}
- * {@include } {@link useRandomId}
- * {@include } {@link useRandomDualIds}
  * {@include } {@link useHasCurrentFocus}
  * {@include } {@link useHasLastFocus}
  * {@include } {@link useChildrenHaveFocus}
- * {@include } {@link useHideScroll}
+ * {@include } {@link useRandomId}
+ * {@include } {@link useRandomDualIds}
  * {@include } {@link useGlobalHandler}
  * {@include } {@link useDocumentClass}
- * {@include } {@link useElementSize}
  * {@tableOfContents header Niche}
  * {@include } {@link useAsyncEffect}
  * {@include } {@link useMutationObserver}
- * {@include } {@link useImperativeProps}
  * {@include } {@link useTextContent}
+ * {@include } {@link useImperativeProps}
  * {@include } {@link usePortalChildren}
  * {@include } {@link useActiveElement}
  * {@include } {@link useDraggable}
