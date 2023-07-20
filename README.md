@@ -201,7 +201,7 @@ Given two sets of props, merges them and returns the result.
 
 |Parameter|Type|Description|
 |---------|----|-----------|
-|allProps|[ElementProps](#elementprops)<E>[]|A variadic number of props to merge into one|
+|allProps|[`ElementProps`](#elementprops)`<E>[]`|A variadic number of props to merge into one|
 
 
 **Returns** A single object with all the provided props merged into one.
@@ -217,7 +217,7 @@ When `useMergedProps` encounters a conflict, the function passed here will be ca
 
 |Parameter|Type|Description|
 |---------|----|-----------|
-|log2|typeof console["log"]||
+|log2|`typeof console["log"]`||
 
 
 *Default*: `console.warn`
@@ -343,7 +343,7 @@ This function can be used to enable/disable button vibration pulses on an app-wi
 
 |Parameter|Type|Description|
 |---------|----|-----------|
-|func|() => void|The function to run when a button is tapped. (Default is `() => navigator.vibrate(10)` in browsers that support it, a noop otherwise)|
+|func|`() => void`|The function to run when a button is tapped. (Default is `() => navigator.vibrate(10)` in browsers that support it, a noop otherwise)|
 
 
 <hr />
@@ -501,7 +501,7 @@ Given an asynchronous event handler, returns a synchronous one that works on the
 
 |Parameter|Type|Description|
 |---------|----|-----------|
-|{ asyncHandler, capture: originalCapture, ...restAsyncOptions }|[UseAsyncHandlerParameters](#useasynchandlerparameters)<EventType, CaptureType>||
+|{ asyncHandler, capture: originalCapture, ...restAsyncOptions }|[`UseAsyncHandlerParameters`](#useasynchandlerparameters)`<EventType, CaptureType>`||
 
 
 Note that because the handler you provide may be called with a delay, and because the `value` of, e.g., an `<input>` element will likely have changed by the time the delay is over, a `capture` function is necessary in order to save the relevant information from the DOM at call-time. Any other simple event data, like `mouseX` or `shiftKey` can stay on the event itself and don't need to be captured &ndash; it's never stale.
@@ -599,7 +599,7 @@ Allows for hiding the scroll bar of the root HTML element without shifting the l
 
 |Parameter|Type|Description|
 |---------|----|-----------|
-|hideScroll|boolean|Whether the scroll bar is hidden or not (i.e. `true` to hide the scroll bar, `false` to allow it to be visible)|
+|hideScroll|`boolean`|Whether the scroll bar is hidden or not (i.e. `true` to hide the scroll bar, `false` to allow it to be visible)|
 
 
 
@@ -615,8 +615,8 @@ Allows a component to use the boolean result of a media query as part of its ren
 
 |Parameter|Type|Description|
 |---------|----|-----------|
-|query|string \| null \| undefined|Must be in parens, e.g. `(max-width: 600px)`|
-|defaultGuess|boolean|Optional. If you pass the same value that's measured after rendering, no re-render will occur.|
+|query|`string \| null \| undefined`|Must be in parens, e.g. `(max-width: 600px)`|
+|defaultGuess|`boolean`|Optional. If you pass the same value that's measured after rendering, no re-render will occur.|
 
 
 **Returns** `UseMediaQueryReturnType`
@@ -828,11 +828,11 @@ Allows attaching an event handler to any *non-Preact* element, and removing it w
 
 |Parameter|Type|Description|
 |---------|----|-----------|
-|target|T|A *non-Preact* node to attach the event to. *|
-|type|EventType||
-|handler|null \| ((e: H) => void)||
-|options|Parameters<TypedAddEventListener<T>>[2]||
-|mode|"grouped" \| "single"||
+|target|`T`|A *non-Preact* node to attach the event to. *|
+|type|`EventType`||
+|handler|`null \| ((e: H) => void)`||
+|options|`Parameters<TypedAddEventListener<T>>[2]`||
+|mode|`"grouped" \| "single"`||
 
 
 `"mode"` controls if there's one handler that calls all your functions (default), or one handler added per function (`"single"`).
@@ -850,9 +850,9 @@ The default, `"grouped"`, is faster when you have, say, a button component, used
 
 |Parameter|Type|Description|
 |---------|----|-----------|
-|className|P[0]|The class (as a string) to be adding/removing|
-|active|boolean|If `true`, the default, then the class is added to the element. If `false`, it's removed.|
-|element|HTMLElement|The element to affect. By default, it's the root `<html>` element|
+|className|`P[0]`|The class (as a string) to be adding/removing|
+|active|`boolean`|If `true`, the default, then the class is added to the element. If `false`, it's removed.|
+|element|`HTMLElement`|The element to affect. By default, it's the root `<html>` element|
 
 
 
@@ -868,9 +868,9 @@ Combines the semantics of `useAsync` and `useEffect`.
 
 |Parameter|Type|Description|
 |---------|----|-----------|
-|effect|() => Promise<(void \| (() => void))>||
-|inputs|I||
-|options|[OmitStrong](#omitstrong)<[UseAsyncParameters](#useasyncparameters)<[void], [void]>, "capture">||
+|effect|`() => Promise<(void \| (() => void))>`||
+|inputs|`I`||
+|options|[`OmitStrong`](#omitstrong)`<`[`UseAsyncParameters`](#useasyncparameters)`<[void], [void]>, "capture">`||
 
 
 **Returns** All values from `useAsync`, except for `syncHandler`.
@@ -992,7 +992,7 @@ Very basic hook for a root-level component to use to allow any children within t
 
 |Parameter|Type|Description|
 |---------|----|-----------|
-|{ target }|[UsePortalChildrenParameters](#useportalchildrenparameters)||
+|{ target }|[`UsePortalChildrenParameters`](#useportalchildrenparameters)||
 
 
 Returns the portal (as `children`, and functions to add, remove, or update a child to the portaled area)
@@ -1062,7 +1062,7 @@ Allows an element to start a drag operation.
 
 |Parameter|Type|Description|
 |---------|----|-----------|
-|{ effectAllowed, data, dragImage, dragImageXOffset, dragImageYOffset }|[UseDraggableParameters](#usedraggableparameters)||
+|{ effectAllowed, data, dragImage, dragImageXOffset, dragImageYOffset }|[`UseDraggableParameters`](#usedraggableparameters)||
 
 
 ### UseDraggableParameters
@@ -1104,7 +1104,7 @@ Allows an element to start a drag operation.
 
 |Parameter|Type|Description|
 |---------|----|-----------|
-|{ effect }|[UseDroppableParameters](#usedroppableparameters)||
+|{ effect }|[`UseDroppableParameters`](#usedroppableparameters)||
 
 
 ### UseDroppableParameters
@@ -1143,7 +1143,7 @@ Inspects the element's style and determines the logical direction that text flow
 
 |Parameter|Type|Description|
 |---------|----|-----------|
-|{}|[UseLogicalDirectionParameters](#uselogicaldirectionparameters)||
+|{}|[`UseLogicalDirectionParameters`](#uselogicaldirectionparameters)||
 
 
 **Returns** An object containing the following functions: * `getLogicalDirection`: retrieves a `LogicalDirectionInfo` representing the current state of the element. (Function is constant between renders) * `convertElementSize`: When used in conjunction with `useElementSize`, allows you to retrieve the logical size of an element instead of the physical size. * `convertToLogicalOrientation`: Based on the current direction, converts "horizontal" or "vertical" to "inline" or "block". * `convertToPhysicalOrientation`: Based on the current direction, converts "inline" or "block" to "horizontal" or "vertical".
@@ -1173,7 +1173,7 @@ Given an input value, returns a constant getter function that can be used inside
 
 |Parameter|Type|Description|
 |---------|----|-----------|
-|value|T||
+|value|`T`||
 
 
 This uses `options.diffed` in order to run before everything, even ref assignment. This means this getter is safe to use anywhere ***except the render phase***.
@@ -1191,8 +1191,8 @@ Alternate useCallback() which always returns the same (wrapped) function referen
 
 |Parameter|Type|Description|
 |---------|----|-----------|
-|fn|NonNullable<T>||
-|noDeps|[] \| null \| undefined||
+|fn|`NonNullable<T>`||
+|noDeps|`[] \| null \| undefined`||
 
 
 In general, just pass the function you want to be stable (but you can't use it during render, so be careful!). Alternatively, if you need a stable callback that **can** be used during render, pass an empty dependency array and it'll act like `useCallback` with an empty dependency array, but with the associated stable typing. In this case, you ***must*** ensure that it truly has no dependencies/only stable dependencies!!
@@ -1208,7 +1208,7 @@ In general, just pass the function you want to be stable (but you can't use it d
 
 |Parameter|Type|Description|
 |---------|----|-----------|
-|t|T||
+|t|`T`||
 
 
 
@@ -1242,7 +1242,7 @@ Slightly enhanced version of `useState` that includes a getter that remains cons
 
 |Parameter|Type|Description|
 |---------|----|-----------|
-|initialState|T \| (() => T)|Same as the built-in `setState`'s|
+|initialState|`T \| (() => T)`|Same as the built-in `setState`'s|
 
 
 If `getBuildMode()` returns `"development"`, then any calls to `setState` will also take the stack at the time the hook was called and save it to `window._setState_stack`. Useful if you want to trace whose state is being updated.
@@ -1260,9 +1260,9 @@ Similar to `useState`, but for values that aren't "render-important" &ndash; upd
 
 |Parameter|Type|Description|
 |---------|----|-----------|
-|onChange|[Nullable](#nullable)<[OnPassiveStateChange](#onpassivestatechange)<T, R>>|The "effect" function to run when the value changes. Effectively the same as `useEffect`'s "effect" function. MUST BE STABLE, either because it has no dependencies, or because it's from useStableCallback, but this will mean you cannot use getState or setState during render.|
-|getInitialValue|() => T|If provided, the effect will be invoked once with this value on mount. MUST BE STABLE, either because it has no dependencies, or because it's from useStableCallback, but this will mean you cannot use getState or setState during render.|
-|customDebounceRendering|typeof debounceRendering|By default, changes to passive state are delayed by one tick so that we only check for changes in a similar way to Preact. You can override this to, for example, always run immediately instead.|
+|onChange|[`Nullable`](#nullable)`<`[`OnPassiveStateChange`](#onpassivestatechange)`<T, R>>`|The "effect" function to run when the value changes. Effectively the same as `useEffect`'s "effect" function. MUST BE STABLE, either because it has no dependencies, or because it's from useStableCallback, but this will mean you cannot use getState or setState during render.|
+|getInitialValue|`() => T`|If provided, the effect will be invoked once with this value on mount. MUST BE STABLE, either because it has no dependencies, or because it's from useStableCallback, but this will mean you cannot use getState or setState during render.|
+|customDebounceRendering|`typeof debounceRendering`|By default, changes to passive state are delayed by one tick so that we only check for changes in a similar way to Preact. You can override this to, for example, always run immediately instead.|
 
 
 **Returns** 
@@ -1292,11 +1292,11 @@ export type OnPassiveStateChange<S, R> = ((value: S, prevValue: S | undefined, r
 
 |Parameter|Type|Description|
 |---------|----|-----------|
-|key|Key \| null||
-|initialValue|T||
-|fromString|((value: string) => T)||
-|toString|((value: T) => string)||
-|storage|Storage||
+|key|`Key \| null`||
+|initialValue|`T`||
+|fromString|`((value: string) => T)`||
+|toString|`((value: T) => string)`||
+|storage|`Storage`||
 
 
 **Returns** 
@@ -1328,7 +1328,7 @@ Provides access to the requested Search Param's value
 
 |Parameter|Type|Description|
 |---------|----|-----------|
-|{ key: paramKey, defaultReason, stringToValue, initialValue, onValueChange, valueToString }|[UseSearchParamStateParameters](#usesearchparamstateparameters)<Key, [SearchParamStates](#searchparamstates)[Key]>||
+|{ key: paramKey, defaultReason, stringToValue, initialValue, onValueChange, valueToString }|[`UseSearchParamStateParameters`](#usesearchparamstateparameters)`<Key, `[`SearchParamStates`](#searchparamstates)`[Key]>`||
 
 
 Note that while this function is like usePassiveState (itself like useState and useEffect combined), the `setState` return function is, due to browser limitations, not synchronous, but that's like most calls to `setState` anyway I guess?
@@ -1365,7 +1365,7 @@ Runs a function the specified number of milliseconds after the component renders
 
 |Parameter|Type|Description|
 |---------|----|-----------|
-|{ timeout, callback, triggerIndex }|[UseTimeoutParameters](#usetimeoutparameters)||
+|{ timeout, callback, triggerIndex }|[`UseTimeoutParameters`](#usetimeoutparameters)||
 
 
 ### UseTimeoutParameters
@@ -1391,7 +1391,7 @@ Runs a function every time the specified number of milliseconds elapses while th
 
 |Parameter|Type|Description|
 |---------|----|-----------|
-|{ interval, callback }|[UseIntervalParameters](#useintervalparameters)||
+|{ interval, callback }|[`UseIntervalParameters`](#useintervalparameters)||
 
 
 ### UseIntervalParameters
@@ -1416,7 +1416,7 @@ The callback you provide will start running every frame after the component moun
 
 |Parameter|Type|Description|
 |---------|----|-----------|
-|{ callback }|[UseAnimationFrameParameters](#useanimationframeparameters)||
+|{ callback }|[`UseAnimationFrameParameters`](#useanimationframeparameters)||
 
 
 Passing `null` is fine and simply stops the effect until you restart it by providing a non-null callback; it doesn't need to be stable.
@@ -1436,7 +1436,7 @@ When a bunch of unrelated components all use `requestAnimationFrame`, yes, this 
 
 |Parameter|Type|Description|
 |---------|----|-----------|
-|{ children }|{<br />    children: [ElementProps](#elementprops)<EventTarget>["children"];<br />}||
+|{ children }|`{<br />    children: `[`ElementProps`](#elementprops)`<EventTarget>["children"];<br />}`||
 
 
 <hr />
@@ -1451,9 +1451,9 @@ Wrap the native `useEffect` to add arguments that allow accessing the previous v
 
 |Parameter|Type|Description|
 |---------|----|-----------|
-|effect|(prev: I \| undefined, changes: EffectChange<I, number>[]) => (void \| (() => void))|Same as the default|
-|inputs|I|Same as the default|
-|impl|typeof useEffectNative|You can choose whether to use `useEffect` or `useLayoutEffect` by passing one of them as this argument. By default, it's `useEffect`.|
+|effect|`(prev: I \| undefined, changes: EffectChange<I, number>[]) => (void \| (() => void))`|Same as the default|
+|inputs|`I`|Same as the default|
+|impl|`typeof useEffectNative`|You can choose whether to use `useEffect` or `useLayoutEffect` by passing one of them as this argument. By default, it's `useEffect`.|
 
 
 
@@ -1469,8 +1469,8 @@ Wrap the native `useLayoutEffect` to add arguments that allow accessing the prev
 
 |Parameter|Type|Description|
 |---------|----|-----------|
-|effect|(prev: I \| undefined, changes: EffectChange<I, number>[]) => (void \| (() => void))|Same as the built-in's|
-|inputs|I|Same as the built-in's|
+|effect|`(prev: I \| undefined, changes: EffectChange<I, number>[]) => (void \| (() => void))`|Same as the built-in's|
+|inputs|`I`|Same as the built-in's|
 
 
 
@@ -2327,8 +2327,8 @@ Given an async function, returns a function that's suitable for non-async APIs, 
 
 |Parameter|Type|Description|
 |---------|----|-----------|
-|asyncHandler|AsyncFunctionType<AP, R> \| null|The async function to make sync|
-|options|[UseAsyncParameters](#useasyncparameters)<AP, SP>||
+|asyncHandler|`AsyncFunctionType<AP, R> \| null`|The async function to make sync|
+|options|[`UseAsyncParameters`](#useasyncparameters)`<AP, SP>`||
 
 
 When called multiple times in quick succession, (i.e. before the handler has finished), this works like Lodash's `throttle` function with the `wait` option always set to however long the handler takes to complete. A second call to the sync function will be throttled until the first call has finished. The return value of the function is the result of the previous invocation, or `undefined` on the first call.
@@ -2360,7 +2360,7 @@ Allows you to inspect when the entire URL changes, either because the hash chang
 
 |Parameter|Type|Description|
 |---------|----|-----------|
-|onUrlChange|(url: string) => void||
+|onUrlChange|`(url: string) => void`||
 
 
 If the URL is set programmatically in a way that doesn't trigger either of those, like `history.replaceState`, well, 🤷 there's no way to track that. So beware of other libraries that modify page history out from under you.
@@ -2380,8 +2380,8 @@ Combines two refs into one. This allows a component to both use its own ref *and
 
 |Parameter|Type|Description|
 |---------|----|-----------|
-|rhs|[ElementProps](#elementprops)<E>["ref"]||
-|lhs|[ElementProps](#elementprops)<E>["ref"]||
+|rhs|[`ElementProps`](#elementprops)`<E>["ref"]`||
+|lhs|[`ElementProps`](#elementprops)`<E>["ref"]`||
 
 
 Or just use [useMergedProps](#usemergedprops)
@@ -2399,7 +2399,7 @@ Merged the `class` and `className` properties of two sets of props into a single
 
 |Parameter|Type|Description|
 |---------|----|-----------|
-|classes|[ElementProps](#elementprops)<EventTarget>["className"][]||
+|classes|[`ElementProps`](#elementprops)`<EventTarget>["className"][]`||
 
 
 Duplicate classes are removed (order doesn't matter anyway).
@@ -2417,8 +2417,8 @@ Combines two `children`.
 
 |Parameter|Type|Description|
 |---------|----|-----------|
-|lhs|[ElementProps](#elementprops)<EventTarget>["children"]||
-|rhs|[ElementProps](#elementprops)<EventTarget>["children"]||
+|lhs|[`ElementProps`](#elementprops)`<EventTarget>["children"]`||
+|rhs|[`ElementProps`](#elementprops)`<EventTarget>["children"]`||
 
 
 This is fairly trivial and not even technically a hook, as it doesn't use any other hooks, but is this way for consistency.
@@ -2436,8 +2436,8 @@ Merges two style objects, returning the result.
 
 |Parameter|Type|Description|
 |---------|----|-----------|
-|lhs|[ElementProps](#elementprops)<EventTarget>["style"]||
-|rhs|[ElementProps](#elementprops)<EventTarget>["style"]||
+|lhs|[`ElementProps`](#elementprops)`<EventTarget>["style"]`||
+|rhs|[`ElementProps`](#elementprops)`<EventTarget>["style"]`||
 
 
 **Returns** A CSS object containing the properties of both objects.
