@@ -1,155 +1,190 @@
+<!-- 
+These docs are auto-generated.
+Changes made to this file will be overwritten.
+Instead, edit the files in src/ and change the TSDoc comments.
+-->
 
 # Preact Prop Helpers
 
-A set of small, compartmentalized hooks for Preact. The theme is modifying HTML attributes to do useful things, along with a bunch of other useful boilerplate-y hooks.
+A set of small, compartmentalized hooks for Preact. The theme is modifying HTML attributes to do useful things, along with a few other boilerplate-y hooks that are just good to have around.
 
-Everything from keyboard navigation (arrow keys, typeahead) to modal focus traps (dialogs and menus) to simple things like state management *but with localStorage!* are here.
+Everything from keyboard navigation (arrow keys, typeahead) to modal focus traps (dialogs and menus) to simple things like `useState` *but with localStorage!* are here.
 
 ## List of hooks (in rough order of usefulness)
 
-### Common 
+### Common
 
 These hooks are used extremely commonly or provide uncommonly useful behavior
 
- 
 
- * [useMergedProps](#usemergedprops) Given two sets of props, merges them and returns the result. 
 
- * [useRefElement](#userefelement) Allows you to access the `HTMLElement` rendered by this hook/these props, either as soon as it's available (as a callback), or whenever you need it (as a getter function). 
+* [useMergedProps](#usemergedprops) Given two sets of props, merges them and returns the result.
 
- * [usePress](#usepress) Adds the necessary event handlers to create a "press"-like event for any element, whether it's a native &lt;button&gt; or regular &lt;div&gt;, and allows for a "long press" that can be used to, e.g., show a tooltip *instead* of activating a press. 
+* [useRefElement](#userefelement) Allows you to access the `HTMLElement`
+ rendered by this hook/these props, either as soon as it's available (as a callback), or whenever you need it (as a getter function).
 
- * [useCompleteListNavigation](#usecompletelistnavigation) All the list-related hooks combined into one large hook that encapsulates everything. 
+* [usePress](#usepress) Adds the necessary event handlers to create a "press"-like event for any element, whether it's a native &lt;button&gt; or regular &lt;div&gt;, and allows for a "long press" that can be used to, e.g., show a tooltip *instead* of activating a press.
 
- * [useCompleteGridNavigation](#usecompletegridnavigation) Combines all the grid- (&amp; list-) related hooks into one giant hook that accomplishes everything. 
+* [useCompleteListNavigation](#usecompletelistnavigation) All the list-related hooks combined into one large hook that encapsulates everything.
 
- * [useModal](#usemodal) Combines dismissal hooks and focus trap hooks into one. Use for dialogs, menus, etc. Anything that can be dismissed and might trap focus, basically. 
+* [useCompleteGridNavigation](#usecompletegridnavigation) Combines all the grid- (&amp; list-) related hooks into one giant hook that accomplishes everything.
 
- * [useAsyncHandler](#useasynchandler) Given an asynchronous event handler, returns a synchronous one that works on the DOM, along with some other information related to the current state. Does not modify any props. 
-### Specific 
+* [useModal](#usemodal) Combines dismissal hooks and focus trap hooks into one. Use for dialogs, menus, etc. Anything that can be dismissed and might trap focus, basically.
+
+* [useAsyncHandler](#useasynchandler) Given an asynchronous event handler, returns a synchronous one that works on the DOM, along with some other information related to the current state. Does not modify any props.
+### Specific
 
 Very useful in very specific cases
 
- 
 
- * [useElementSize](#useelementsize) Measures an element, allowing you to react to its changes in size. 
 
- * [useHideScroll](#usehidescroll) Allows for hiding the scroll bar of the root HTML element without shifting the layout of the page by adding a few pixels of padding to the root element if necessary. 
+* [useElementSize](#useelementsize) Measures an element, allowing you to react to its changes in size.
 
- * [useMediaQuery](#usemediaquery) Allows a component to use the boolean result of a media query as part of its render. 
+* [useHideScroll](#usehidescroll) Allows for hiding the scroll bar of the root HTML element without shifting the layout of the page by adding a few pixels of padding to the root element if necessary.
 
- * [useHasCurrentFocus](#usehascurrentfocus) Allows monitoring whether the rendered element is or is not focused directly (i.e. would satisfy `:focus`). 
+* [useMediaQuery](#usemediaquery) Allows a component to use the boolean result of a media query as part of its render.
 
- * [useHasLastFocus](#usehaslastfocus) Allows monitoring whichever element is/was focused most recently, regardless of if it's *currently* focused. 
+* [useHasCurrentFocus](#usehascurrentfocus) Allows monitoring whether the rendered element is or is not focused directly (i.e. would satisfy `:focus`
+).
 
- * [useChildrenHaveFocus](#usechildrenhavefocus) Allows a composite component (such as a radio group or listbox) to listen for an "overall focusin/out" event; this hook lets you know when focus has moved in/out of this grouping of children EVEN IF there is no actual parent DOM element. 
+* [useHasLastFocus](#usehaslastfocus) Allows monitoring whichever element is/was focused most recently, regardless of if it's *currently* focused.
 
- * [useRandomId](#userandomid) Besides just generating something for the `id` prop, also gives you the props to use on another element if you'd like (e.g. a label's `for`). 
+* [useChildrenHaveFocus](#usechildrenhavefocus) Allows a composite component (such as a radio group or listbox) to listen for an "overall focusin/out" event; this hook lets you know when focus has moved in/out of this grouping of children EVEN IF there is no actual parent DOM element.
 
- * [useRandomDualIds](#userandomdualids) While `useRandomId` allows the referencer to use the source's ID, sometimes you also want the reverse too (e.g. I `aria-label` you, you `aria-controls` me. That sort of thing). 
+* [useRandomId](#userandomid) Besides just generating something for the `id`
+ prop, also gives you the props to use on another element if you'd like (e.g. a label's `for`
+).
 
- * [useGlobalHandler](#useglobalhandler) Allows attaching an event handler to any *non-Preact* element, and removing it when the component using the hook unmounts. The callback does not need to be stable across renders. 
+* [useRandomDualIds](#userandomdualids) While `useRandomId`
+ allows the referencer to use the source's ID, sometimes you also want the reverse too (e.g. I `aria-label`
+ you, you `aria-controls`
+ me. That sort of thing).
 
- * [useDocumentClass](#usedocumentclass)  
-### Niche 
+* [useGlobalHandler](#useglobalhandler) Allows attaching an event handler to any *non-Preact* element, and removing it when the component using the hook unmounts. The callback does not need to be stable across renders.
 
- * [useAsyncEffect](#useasynceffect) Combines the semantics of `useAsync` and `useEffect`. 
+* [useDocumentClass](#usedocumentclass) 
+### Niche
 
- * [useMutationObserver](#usemutationobserver) Effectively just a wrapper around a `MutationObserver`. 
+* [useAsyncEffect](#useasynceffect) Combines the semantics of `useAsync`
+ and `useEffect`
+.
 
- * [useTextContent](#usetextcontent)  
+* [useMutationObserver](#usemutationobserver) Effectively just a wrapper around a `MutationObserver`
+.
 
- * [useImperativeProps](#useimperativeprops) Allows controlling an element's `class`, `style`, etc. with functions like `setStyle` in addition to being reactive to incoming props. 
+* [useTextContent](#usetextcontent) 
 
- * [usePortalChildren](#useportalchildren) Very basic hook for a root-level component to use to allow any children within the whole app to push children to a portal somewhere. 
+* [useImperativeProps](#useimperativeprops) Allows controlling an element's `class`
+, `style`
+, etc. with functions like `setStyle`
+ in addition to being reactive to incoming props.
 
- * [useActiveElement](#useactiveelement) Allows you to inspect which element in the `document` currently has focus, which was most recently focused if none are currently, and whether or not the window has focus 
+* [usePortalChildren](#useportalchildren) Very basic hook for a root-level component to use to allow any children within the whole app to push children to a portal somewhere.
 
- * [useDraggable](#usedraggable) Allows an element to start a drag operation. 
+* [useActiveElement](#useactiveelement) Allows you to inspect which element in the `document`
+ currently has focus, which was most recently focused if none are currently, and whether or not the window has focus
 
- * [useDroppable](#usedroppable) Allows an element to start a drag operation. 
+* [useDraggable](#usedraggable) Allows an element to start a drag operation.
 
- * [useLogicalDirection](#uselogicaldirection) Inspects the element's style and determines the logical direction that text flows. 
-### Extensions 
+* [useDroppable](#usedroppable) Allows an element to start a drag operation.
+
+* [useLogicalDirection](#uselogicaldirection) Inspects the element's style and determines the logical direction that text flows.
+### Extensions
 
 These hooks don't do anything with HTML elements but are useful extensions to Preact's built-in hooks
 
- 
 
- * [useStableGetter](#usestablegetter) Given an input value, returns a constant getter function that can be used inside of `useEffect` and friends without including it in the dependency array. 
 
- * [useStableCallback](#usestablecallback) Alternate useCallback() which always returns the same (wrapped) function reference so that it can be excluded from the dependency arrays of `useEffect` and friends. 
+* [useStableGetter](#usestablegetter) Given an input value, returns a constant getter function that can be used inside of `useEffect`
+ and friends without including it in the dependency array.
 
- * [useMemoObject](#usememoobject)  
+* [useStableCallback](#usestablecallback) Alternate useCallback() which always returns the same (wrapped) function reference so that it can be excluded from the dependency arrays of `useEffect`
+ and friends.
 
- * [useForceUpdate](#useforceupdate) Returns a function that will, when called, force the component that uses this hook to re-render itself. 
+* [useMemoObject](#usememoobject) 
 
- * [useState](#usestate) Slightly enhanced version of `useState` that includes a getter that remains constant (i.e. you can use it in `useEffect` and friends without it being a dependency). 
+* [useForceUpdate](#useforceupdate) Returns a function that will, when called, force the component that uses this hook to re-render itself.
 
- * [usePassiveState](#usepassivestate) Similar to `useState`, but for values that aren't "render-important" &ndash; updates don't cause a re-render and so the value shouldn't be used during render (though it certainly can, at least by re-rendering again). 
+* [useState](#usestate) Slightly enhanced version of `useState`
+ that includes a getter that remains constant (i.e. you can use it in `useEffect`
+ and friends without it being a dependency).
 
- * [usePersistentState](#usepersistentstate)  
+* [usePassiveState](#usepassivestate) Similar to `useState`
+, but for values that aren't "render-important" &ndash; updates don't cause a re-render and so the value shouldn't be used during render (though it certainly can, at least by re-rendering again).
 
- * [useSearchParamState](#usesearchparamstate) Provides access to the requested Search Param's value 
+* [usePersistentState](#usepersistentstate) 
 
- * [useTimeout](#usetimeout) Runs a function the specified number of milliseconds after the component renders. 
+* [useSearchParamState](#usesearchparamstate) Provides access to the requested Search Param's value
 
- * [useInterval](#useinterval) Runs a function every time the specified number of milliseconds elapses while the component is mounted. 
+* [useTimeout](#usetimeout) Runs a function the specified number of milliseconds after the component renders.
 
- * [useAnimationFrame](#useanimationframe) The callback you provide will start running every frame after the component mounts. 
+* [useInterval](#useinterval) Runs a function every time the specified number of milliseconds elapses while the component is mounted.
 
- * [useEffectDebug](#useeffectdebug) Wrap the native `useEffect` to add arguments that allow accessing the previous value as the first argument, as well as the changes that caused the hook to be called as the second argument. 
+* [useAnimationFrame](#useanimationframe) The callback you provide will start running every frame after the component mounts.
 
- * [useLayoutEffectDebug](#uselayouteffectdebug) Wrap the native `useLayoutEffect` to add arguments that allow accessing the previous value as the first argument, as well as the changes that caused the hook to be called as the second argument. 
-### Building blocks and other helpers 
+* [useEffectDebug](#useeffectdebug) Wrap the native `useEffect`
+ to add arguments that allow accessing the previous value as the first argument, as well as the changes that caused the hook to be called as the second argument.
+
+* [useLayoutEffectDebug](#uselayouteffectdebug) Wrap the native `useLayoutEffect`
+ to add arguments that allow accessing the previous value as the first argument, as well as the changes that caused the hook to be called as the second argument.
+### Building blocks and other helpers
 
 These hooks are primarily used to build larger hooks, but can be used alone
 
- 
 
- * [useManagedChildren](#usemanagedchildren) Allows a parent component to access information about certain child components once they have rendered. 
 
- * [useListNavigation](#uselistnavigation) Implements proper keyboard navigation for components like listboxes, button groups, menus, etc. 
+* [useManagedChildren](#usemanagedchildren) Allows a parent component to access information about certain child components once they have rendered.
 
- * [useGridNavigation](#usegridnavigation) Implements 2-dimensional grid-based keyboard navigation, similarly to [useListNavigation](#uselistnavigation). 
+* [useListNavigation](#uselistnavigation) Implements proper keyboard navigation for components like listboxes, button groups, menus, etc.
 
- * [useRovingTabIndex](#userovingtabindex) Implements a roving tabindex system where only one "focusable" component in a set is able to receive a tab focus. 
+* [useGridNavigation](#usegridnavigation) Implements 2-dimensional grid-based keyboard navigation, similarly to [useListNavigation](#uselistnavigation)
+.
 
- * [useLinearNavigation](#uselinearnavigation) When used in tandem with `useRovingTabIndex`, allows control of the tabbable index with the arrow keys, Page Up/Page Down, or Home/End. 
+* [useRovingTabIndex](#userovingtabindex) Implements a roving tabindex system where only one "focusable" component in a set is able to receive a tab focus.
 
- * [useTypeaheadNavigation](#usetypeaheadnavigation) Allows for the selection of a managed child by typing the given text associated with it. 
+* [useLinearNavigation](#uselinearnavigation) When used in tandem with `useRovingTabIndex`
+, allows control of the tabbable index with the arrow keys, Page Up/Page Down, or Home/End.
 
- * [useSingleSelection](#usesingleselection)  
+* [useTypeaheadNavigation](#usetypeaheadnavigation) Allows for the selection of a managed child by typing the given text associated with it.
 
- * [useRearrangeableChildren](#userearrangeablechildren) Hook that allows for the **direct descendant** children of this component to be re-ordered and sorted. 
+* [useSingleSelection](#usesingleselection) 
 
- * [useSortableChildren](#usesortablechildren) Hook that allows for the **direct descendant** children of this component to be re-ordered and sorted. 
+* [useRearrangeableChildren](#userearrangeablechildren) Hook that allows for the **direct descendant** children of this component to be re-ordered and sorted.
 
- * [usePaginatedChildren](#usepaginatedchildren) Allows children to stop themselves from rendering outside of a narrow range. 
+* [useSortableChildren](#usesortablechildren) Hook that allows for the **direct descendant** children of this component to be re-ordered and sorted.
 
- * [useStaggeredChildren](#usestaggeredchildren) Allows children to each wait until the previous has finished rendering before itself rendering. E.G. Child #3 waits until #2 renders. #2 waits until #1 renders, etc. 
+* [usePaginatedChildren](#usepaginatedchildren) Allows children to stop themselves from rendering outside of a narrow range.
 
- * [useDismiss](#usedismiss) Combines all the methods a user can implicitly dismiss a popup component. See [useModal](#usemodal) for a hook that's ready-to-use for dialogs and menus. 
+* [useStaggeredChildren](#usestaggeredchildren) Allows children to each wait until the previous has finished rendering before itself rendering. E.G. Child #3 waits until #2 renders. #2 waits until #1 renders, etc.
 
- * [useBackdropDismiss](#usebackdropdismiss) Handles events for a backdrop on a modal dialog -- the kind where the user expects the modal to close when they click/tap outside of it. 
+* [useDismiss](#usedismiss) Combines all the methods a user can implicitly dismiss a popup component. See [useModal](#usemodal)
+ for a hook that's ready-to-use for dialogs and menus.
 
- * [useEscapeDismiss](#useescapedismiss) Invokes a callback when the `Escape` key is pressed on the topmost component (a max of one invocation per `Escape` press) 
+* [useBackdropDismiss](#usebackdropdismiss) Handles events for a backdrop on a modal dialog -- the kind where the user expects the modal to close when they click/tap outside of it.
 
- * [useLostFocusDismiss](#uselostfocusdismiss) Invokes a callback when focus travels outside of the component's element. 
+* [useEscapeDismiss](#useescapedismiss) Invokes a callback when the `Escape`
+ key is pressed on the topmost component (a max of one invocation per `Escape`
+ press)
 
- * [useFocusTrap](#usefocustrap) Allows you to move focus to an isolated area of the page and restore it when finished. 
+* [useLostFocusDismiss](#uselostfocusdismiss) Invokes a callback when focus travels outside of the component's element.
 
- * [useAsync](#useasync) Given an async function, returns a function that's suitable for non-async APIs, along with other information about the current run's status. 
+* [useFocusTrap](#usefocustrap) Allows you to move focus to an isolated area of the page and restore it when finished.
 
- * [useUrl](#useurl) Allows you to inspect when the entire URL changes, either because the hash changed or because the Back/Forward browser buttons were pressed. 
+* [useAsync](#useasync) Given an async function, returns a function that's suitable for non-async APIs, along with other information about the current run's status.
 
- * [useMergedRefs](#usemergedrefs) Combines two refs into one. This allows a component to both use its own ref *and* forward a ref that was given to it. 
+* [useUrl](#useurl) Allows you to inspect when the entire URL changes, either because the hash changed or because the Back/Forward browser buttons were pressed.
 
- * [useMergedClasses](#usemergedclasses) Merged the `class` and `className` properties of two sets of props into a single string. 
+* [useMergedRefs](#usemergedrefs) Combines two refs into one. This allows a component to both use its own ref *and* forward a ref that was given to it.
 
- * [useMergedChildren](#usemergedchildren) Combines two `children`. 
+* [useMergedClasses](#usemergedclasses) Merged the `class`
+ and `className`
+ properties of two sets of props into a single string.
 
- * [useMergedStyles](#usemergedstyles) Merges two style objects, returning the result.
+* [useMergedChildren](#usemergedchildren) Combines two `children`
+.
+
+* [useMergedStyles](#usemergedstyles) Merges two style objects, returning the result.
+ ## Each hook, individually
 
 
 
@@ -2408,10 +2443,13 @@ Merges two style objects, returning the result.
 **Returns** A CSS object containing the properties of both objects.
 
 
-### ElementProps
+## Miscellanea 
+
+ 
+### Nullable
 
 ```typescript
-export type ElementProps<E extends EventTarget> = JSX.HTMLAttributes<E>;
+export type Nullable<T = null> = null | undefined | T;
 ``` 
 
  
@@ -2422,10 +2460,28 @@ export type OmitStrong<T, K extends keyof T> = Omit<T, K>;
 ``` 
 
  
-### Nullable
+### TargetedPick
 
 ```typescript
-export type Nullable<T = null> = null | undefined | T;
+export type TargetedPick<T, K extends keyof T, L extends keyof T[K]> = {
+    [M in K]: Pick<T[K], L>;
+};
+``` 
+
+ 
+### TargetedOmit
+
+```typescript
+export type TargetedOmit<T, K extends keyof T, L extends keyof T[K]> = {
+    [M in K]: OmitStrong<T[K], L>;
+};
+``` 
+
+ 
+### ElementProps
+
+```typescript
+export type ElementProps<E extends EventTarget> = JSX.HTMLAttributes<E>;
 ```
 
 ## Conventions and goals

@@ -1,9 +1,9 @@
 /**
  * # Preact Prop Helpers
  *
- * A set of small, compartmentalized hooks for Preact. The theme is modifying HTML attributes to do useful things, along with a bunch of other useful boilerplate-y hooks.
+ * A set of small, compartmentalized hooks for Preact. The theme is modifying HTML attributes to do useful things, along with a few other boilerplate-y hooks that are just good to have around.
  *
- * Everything from keyboard navigation (arrow keys, typeahead) to modal focus traps (dialogs and menus) to simple things like state management *but with localStorage!* are here.
+ * Everything from keyboard navigation (arrow keys, typeahead) to modal focus traps (dialogs and menus) to simple things like `useState` *but with localStorage!* are here.
  *
  * ## List of hooks (in rough order of usefulness)
  *
@@ -78,11 +78,15 @@
  * {@include } {@link useMergedClasses}
  * {@include } {@link useMergedChildren}
  * {@include } {@link useMergedStyles}
+ * ## Each hook, individually
  * {@tableOfContents end}
  *
- * {@include } {@link ElementProps}
- * {@include } {@link OmitStrong}
+ * ## Miscellanea
  * {@include } {@link Nullable}
+ * {@include } {@link OmitStrong}
+ * {@include } {@link TargetedPick}
+ * {@include } {@link TargetedOmit}
+ * {@include } {@link ElementProps}
  *
  * ```md-literal
  * ## Conventions and goals
@@ -194,7 +198,7 @@ export { debounceRendering } from "./util/lib.js";
 export { getBuildMode } from "./util/mode.js";
 export { generateRandomId } from "./util/random-id.js";
 export { generateStack, useStack } from "./util/stack.js";
-export type { CSSProperties, CompositionEventType, ElementProps, EventType, ExtendMerge, FocusEventType, KeyboardEventType, MouseEventType, Nullable, OmitStrong, PointerEventType, Ref, RefCallback, RefObject, TouchEventType, VNode } from "./util/types.js";
+export type { CSSProperties, CompositionEventType, ElementProps, EventType, ExtendMerge, FocusEventType, KeyboardEventType, MouseEventType, Nullable, OmitStrong, PointerEventType, Ref, RefCallback, RefObject, TargetedOmit, TargetedPick, TouchEventType, VNode } from "./util/types.js";
 export { hideCallCount, monitorCallCount } from "./util/use-call-count.js";
 export * from "./util/temp.js";
 //# sourceMappingURL=index.d.ts.map

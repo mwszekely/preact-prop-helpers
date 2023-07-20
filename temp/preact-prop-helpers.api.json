@@ -139,7 +139,7 @@
   },
   "kind": "Package",
   "canonicalReference": "preact-prop-helpers!",
-  "docComment": "/**\n * # Preact Prop Helpers\n *\n * A set of small, compartmentalized hooks for Preact. The theme is modifying HTML attributes to do useful things, along with a bunch of other useful boilerplate-y hooks.\n *\n * Everything from keyboard navigation (arrow keys, typeahead) to modal focus traps (dialogs and menus) to simple things like state management *but with localStorage!* are here.\n *\n * ## List of hooks (in rough order of usefulness)\n *\n * {@tableOfContents start} {@tableOfContents header Common} {@tableOfContents subheader These hooks are used extremely commonly or provide uncommonly useful behavior} {@include} {@link useMergedProps} {@include} {@link useRefElement} {@include} {@link usePress} {@include} {@link useCompleteListNavigation} {@include} {@link useCompleteGridNavigation} {@include} {@link useModal} {@include} {@link useAsyncHandler} {@tableOfContents header Specific} {@tableOfContents subheader Very useful in very specific cases} {@include} {@link useElementSize} {@include} {@link useHideScroll} {@include} {@link useMediaQuery} {@include} {@link useHasCurrentFocus} {@include} {@link useHasLastFocus} {@include} {@link useChildrenHaveFocus} {@include} {@link useRandomId} {@include} {@link useRandomDualIds} {@include} {@link useGlobalHandler} {@include} {@link useDocumentClass} {@tableOfContents header Niche} {@include} {@link useAsyncEffect} {@include} {@link useMutationObserver} {@include} {@link useTextContent} {@include} {@link useImperativeProps} {@include} {@link usePortalChildren} {@include} {@link useActiveElement} {@include} {@link useDraggable} {@include} {@link useDroppable} {@include} {@link useLogicalDirection} {@tableOfContents header Extensions} {@tableOfContents subheader These hooks don't do anything with HTML elements but are useful extensions to Preact's built-in hooks} {@include} {@link useStableGetter} {@include} {@link useStableCallback} {@include} {@link useMemoObject} {@include} {@link useForceUpdate} {@include} {@link useState} {@include} {@link usePassiveState} {@include} {@link usePersistentState} {@include} {@link useSearchParamState} {@include} {@link useTimeout} {@include} {@link useInterval} {@include} {@link useAnimationFrame} {@include} {@link useEffectDebug} {@include} {@link useLayoutEffectDebug} {@tableOfContents header Building blocks and other helpers} {@tableOfContents subheader These hooks are primarily used to build larger hooks, but can be used alone} {@include} {@link useManagedChildren} {@include} {@link useListNavigation} {@include} {@link useGridNavigation} {@include} {@link useRovingTabIndex} {@include} {@link useLinearNavigation} {@include} {@link useTypeaheadNavigation} {@include} {@link useSingleSelection} {@include} {@link useRearrangeableChildren} {@include} {@link useSortableChildren} {@include} {@link usePaginatedChildren} {@include} {@link useStaggeredChildren} {@include} {@link useDismiss} {@include} {@link useBackdropDismiss} {@include} {@link useEscapeDismiss} {@include} {@link useLostFocusDismiss} {@include} {@link useFocusTrap} {@include} {@link useAsync} {@include} {@link useUrl} {@include} {@link useMergedRefs} {@include} {@link useMergedClasses} {@include} {@link useMergedChildren} {@include} {@link useMergedStyles} {@tableOfContents end}\n *\n * {@include} {@link ElementProps} {@include} {@link OmitStrong} {@include} {@link Nullable}\n * ```md-literal\n * ## Conventions and goals\n *\n * * As much as possible, no specific DOM restrictions are imposed and, for hooks with children (lists, grids, etc.), those children can be anywhere descendent in the tree (except for `useSortableChildren`, which can be anywhere descendant but must all be in an array). Nesting hooks, even of the same type, is also fine.\n *     *  E.G. `useRovingTabIndexChild` can call its own `useRovingTabIndex`, which is how `useGridNavigation` works.\n * * A parent hook never needs to be directly passed child data because the children will provide it themselves. E.G. `useListNavigation` can filter children, but it doesn't take an array of which children to filter out; each child reports its own status as filtered/unfiltered with, say, a `hidden` prop, and the parent responds to that.\n * * Re-render as few times as possible. In general this means instead of a hook returning a value, it will accept an `onChange`-ish handler that will let you explicitly do that.\n *     * `useElementSize`, for example, has no way of returning the size the first time its component renders. It needs to fully render *and then* run an effect that measures it. Once the element's been measured, *you* are responsible for choosing if the component is re-rendered with this new information or not.\n *     * This means that the child data is *always* the single source of truth, and maps nicely to how components are built and diffed.\n * * Some of these hooks, like `useGridNavigationRow`, have **extremely** complicated dependencies. To manage this, most hooks take a single parameter and return a single object with everything labelled consistently and designed to be discoverable via auto-complete. If we have `useFoo`, it:\n *     * ...will always take parameters like `{ fooParameters: {...} }`.\n *         * E.G. `useElementRef({ elementRefParameters: { onMount: ... } })`\n *     * ...will always return objects like `{ fooReturn: { ... } }`\n *         * E.G. `const { refElementReturn: { getElement } } = useElementRef(...)`\n *     * ...may also return `{ props: {...} }`. These must be spread onto the element you're rendering, or the hook will not function (see `useMergedProps` if you need to use other props in addition to the returned props). It may occasionally be called something else starting with `props`, e.g. `propsStable`, `propsTarget`, etc.\n *         * E.G. `const { propsStable } = useElementRef(...)`, then `<div {...propsStable} />`\n *         * `propsStable` indicates that nothing about the object ever changes including the identity of the object itself and all its fields.\n *     * ...may also return `{ context: { ... } }` that children rely on.\n *         1. E.G. Parent calls `const { context } = useFoo(...);`\n *         1. Parent renders `<MyContext.Provider value={context}>{children}</MyContext.Provider>`\n *         1. Then child calls `useFooChild({ context: useContext(MyContext), fooChildParameters: {...} })`\n *     * ...may also require or return `{ info: { ... } }` if it has something to contribute to `useManagedChild`'s special `info` parameter.\n *     * When hooks themselves use other hooks:\n *         * If `useFoo` calls `useBar` directly, then it will take parameters like `{ fooParameters: {...}, barParameters: {...} }` and return objects like `{ fooReturn: {...}, barReturn: {...} }`.\n *         * If `useFoo` relies on `useBar` (but doesn't call it itself!), then will do one of the following:\n *             * Take parameters like `{ fooParameters: { ... }, barReturn: { ... } }`, if it needs the return value of `useBar`.\n *             * Return values like `{ fooReturn: { ... }, barParameters: { ... } }`, if it needs `useBar` to be called with specific parameters in order to function (usually callbacks).\n *         * (The difference between those two is usually based on performance -- many, many hooks rely on `elementRefReturn.getElement`, for example, so the latter pattern allows us to just call `useRefElement` once and pass the result around to whoever needs it)\n *         * If `useFoo` and `useBar` both return a top-level `props`, they will be merged into one.\n *         * If `useFoo` and `useBar` both return a top-level `context`, they will be merged into one.\n *         * If `useFoo` and `useBar` both return a top-level `info`, they will be merged into one.\n *         * Occasionally, `props` or `context` may be suffixed with the specific role they refer to:\n *             * `useRandomId` returns `propsSource` and `propsReferencer` (and no `props`).\n * * Organizationally, some hooks exist primarily to be used as a part of a larger hook.  Hooks within the `component-use` folder are generally \"ready-to-use\" and don't require much passing of parameters back and forth, but are not fully extensible.  Hooks within `component-detail` are the lower-level building blocks that make up those \"ready-to-use\" complete hooks, but they're much more time-consuming to use.\n *     * You can also just copy and paste one of the complete hooks somewhere else and use it as a new building block...\n * ```\n *\n * @packageDocumentation\n */\n",
+  "docComment": "/**\n * # Preact Prop Helpers\n *\n * A set of small, compartmentalized hooks for Preact. The theme is modifying HTML attributes to do useful things, along with a few other boilerplate-y hooks that are just good to have around.\n *\n * Everything from keyboard navigation (arrow keys, typeahead) to modal focus traps (dialogs and menus) to simple things like `useState` *but with localStorage!* are here.\n *\n * ## List of hooks (in rough order of usefulness)\n *\n * {@tableOfContents start} {@tableOfContents header Common} {@tableOfContents subheader These hooks are used extremely commonly or provide uncommonly useful behavior} {@include} {@link useMergedProps} {@include} {@link useRefElement} {@include} {@link usePress} {@include} {@link useCompleteListNavigation} {@include} {@link useCompleteGridNavigation} {@include} {@link useModal} {@include} {@link useAsyncHandler} {@tableOfContents header Specific} {@tableOfContents subheader Very useful in very specific cases} {@include} {@link useElementSize} {@include} {@link useHideScroll} {@include} {@link useMediaQuery} {@include} {@link useHasCurrentFocus} {@include} {@link useHasLastFocus} {@include} {@link useChildrenHaveFocus} {@include} {@link useRandomId} {@include} {@link useRandomDualIds} {@include} {@link useGlobalHandler} {@include} {@link useDocumentClass} {@tableOfContents header Niche} {@include} {@link useAsyncEffect} {@include} {@link useMutationObserver} {@include} {@link useTextContent} {@include} {@link useImperativeProps} {@include} {@link usePortalChildren} {@include} {@link useActiveElement} {@include} {@link useDraggable} {@include} {@link useDroppable} {@include} {@link useLogicalDirection} {@tableOfContents header Extensions} {@tableOfContents subheader These hooks don't do anything with HTML elements but are useful extensions to Preact's built-in hooks} {@include} {@link useStableGetter} {@include} {@link useStableCallback} {@include} {@link useMemoObject} {@include} {@link useForceUpdate} {@include} {@link useState} {@include} {@link usePassiveState} {@include} {@link usePersistentState} {@include} {@link useSearchParamState} {@include} {@link useTimeout} {@include} {@link useInterval} {@include} {@link useAnimationFrame} {@include} {@link useEffectDebug} {@include} {@link useLayoutEffectDebug} {@tableOfContents header Building blocks and other helpers} {@tableOfContents subheader These hooks are primarily used to build larger hooks, but can be used alone} {@include} {@link useManagedChildren} {@include} {@link useListNavigation} {@include} {@link useGridNavigation} {@include} {@link useRovingTabIndex} {@include} {@link useLinearNavigation} {@include} {@link useTypeaheadNavigation} {@include} {@link useSingleSelection} {@include} {@link useRearrangeableChildren} {@include} {@link useSortableChildren} {@include} {@link usePaginatedChildren} {@include} {@link useStaggeredChildren} {@include} {@link useDismiss} {@include} {@link useBackdropDismiss} {@include} {@link useEscapeDismiss} {@include} {@link useLostFocusDismiss} {@include} {@link useFocusTrap} {@include} {@link useAsync} {@include} {@link useUrl} {@include} {@link useMergedRefs} {@include} {@link useMergedClasses} {@include} {@link useMergedChildren} {@include} {@link useMergedStyles} ## Each hook, individually {@tableOfContents end}\n *\n * ## Miscellanea {@include} {@link Nullable} {@include} {@link OmitStrong} {@include} {@link TargetedPick} {@include} {@link TargetedOmit} {@include} {@link ElementProps}\n * ```md-literal\n * ## Conventions and goals\n *\n * * As much as possible, no specific DOM restrictions are imposed and, for hooks with children (lists, grids, etc.), those children can be anywhere descendent in the tree (except for `useSortableChildren`, which can be anywhere descendant but must all be in an array). Nesting hooks, even of the same type, is also fine.\n *     *  E.G. `useRovingTabIndexChild` can call its own `useRovingTabIndex`, which is how `useGridNavigation` works.\n * * A parent hook never needs to be directly passed child data because the children will provide it themselves. E.G. `useListNavigation` can filter children, but it doesn't take an array of which children to filter out; each child reports its own status as filtered/unfiltered with, say, a `hidden` prop, and the parent responds to that.\n * * Re-render as few times as possible. In general this means instead of a hook returning a value, it will accept an `onChange`-ish handler that will let you explicitly do that.\n *     * `useElementSize`, for example, has no way of returning the size the first time its component renders. It needs to fully render *and then* run an effect that measures it. Once the element's been measured, *you* are responsible for choosing if the component is re-rendered with this new information or not.\n *     * This means that the child data is *always* the single source of truth, and maps nicely to how components are built and diffed.\n * * Some of these hooks, like `useGridNavigationRow`, have **extremely** complicated dependencies. To manage this, most hooks take a single parameter and return a single object with everything labelled consistently and designed to be discoverable via auto-complete. If we have `useFoo`, it:\n *     * ...will always take parameters like `{ fooParameters: {...} }`.\n *         * E.G. `useElementRef({ elementRefParameters: { onMount: ... } })`\n *     * ...will always return objects like `{ fooReturn: { ... } }`\n *         * E.G. `const { refElementReturn: { getElement } } = useElementRef(...)`\n *     * ...may also return `{ props: {...} }`. These must be spread onto the element you're rendering, or the hook will not function (see `useMergedProps` if you need to use other props in addition to the returned props). It may occasionally be called something else starting with `props`, e.g. `propsStable`, `propsTarget`, etc.\n *         * E.G. `const { propsStable } = useElementRef(...)`, then `<div {...propsStable} />`\n *         * `propsStable` indicates that nothing about the object ever changes including the identity of the object itself and all its fields.\n *     * ...may also return `{ context: { ... } }` that children rely on.\n *         1. E.G. Parent calls `const { context } = useFoo(...);`\n *         1. Parent renders `<MyContext.Provider value={context}>{children}</MyContext.Provider>`\n *         1. Then child calls `useFooChild({ context: useContext(MyContext), fooChildParameters: {...} })`\n *     * ...may also require or return `{ info: { ... } }` if it has something to contribute to `useManagedChild`'s special `info` parameter.\n *     * When hooks themselves use other hooks:\n *         * If `useFoo` calls `useBar` directly, then it will take parameters like `{ fooParameters: {...}, barParameters: {...} }` and return objects like `{ fooReturn: {...}, barReturn: {...} }`.\n *         * If `useFoo` relies on `useBar` (but doesn't call it itself!), then will do one of the following:\n *             * Take parameters like `{ fooParameters: { ... }, barReturn: { ... } }`, if it needs the return value of `useBar`.\n *             * Return values like `{ fooReturn: { ... }, barParameters: { ... } }`, if it needs `useBar` to be called with specific parameters in order to function (usually callbacks).\n *         * (The difference between those two is usually based on performance -- many, many hooks rely on `elementRefReturn.getElement`, for example, so the latter pattern allows us to just call `useRefElement` once and pass the result around to whoever needs it)\n *         * If `useFoo` and `useBar` both return a top-level `props`, they will be merged into one.\n *         * If `useFoo` and `useBar` both return a top-level `context`, they will be merged into one.\n *         * If `useFoo` and `useBar` both return a top-level `info`, they will be merged into one.\n *         * Occasionally, `props` or `context` may be suffixed with the specific role they refer to:\n *             * `useRandomId` returns `propsSource` and `propsReferencer` (and no `props`).\n * * Organizationally, some hooks exist primarily to be used as a part of a larger hook.  Hooks within the `component-use` folder are generally \"ready-to-use\" and don't require much passing of parameters back and forth, but are not fully extensible.  Hooks within `component-detail` are the lower-level building blocks that make up those \"ready-to-use\" complete hooks, but they're much more time-consuming to use.\n *     * You can also just copy and paste one of the complete hooks somewhere else and use it as a new building block...\n * ```\n *\n * @packageDocumentation\n */\n",
   "name": "preact-prop-helpers",
   "preserveMemberOrder": false,
   "members": [
@@ -7242,6 +7242,178 @@
           }
         },
         {
+          "kind": "TypeAlias",
+          "canonicalReference": "preact-prop-helpers!TargetedOmit:type",
+          "docComment": "/**\n * \"**Pick**, then **omit**\". Given an object, omits everything but the given props in the given sub-object, including other sub-objects.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type TargetedOmit<T, K extends "
+            },
+            {
+              "kind": "Content",
+              "text": "keyof T"
+            },
+            {
+              "kind": "Content",
+              "text": ", L extends "
+            },
+            {
+              "kind": "Content",
+              "text": "keyof T[K]"
+            },
+            {
+              "kind": "Content",
+              "text": "> = "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    [M in K]: "
+            },
+            {
+              "kind": "Reference",
+              "text": "OmitStrong",
+              "canonicalReference": "preact-prop-helpers!OmitStrong:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<T[K], L>;\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/util/lib.tsx",
+          "releaseTag": "Public",
+          "name": "TargetedOmit",
+          "typeParameters": [
+            {
+              "typeParameterName": "T",
+              "constraintTokenRange": {
+                "startIndex": 0,
+                "endIndex": 0
+              },
+              "defaultTypeTokenRange": {
+                "startIndex": 0,
+                "endIndex": 0
+              }
+            },
+            {
+              "typeParameterName": "K",
+              "constraintTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "defaultTypeTokenRange": {
+                "startIndex": 0,
+                "endIndex": 0
+              }
+            },
+            {
+              "typeParameterName": "L",
+              "constraintTokenRange": {
+                "startIndex": 3,
+                "endIndex": 4
+              },
+              "defaultTypeTokenRange": {
+                "startIndex": 0,
+                "endIndex": 0
+              }
+            }
+          ],
+          "typeTokenRange": {
+            "startIndex": 5,
+            "endIndex": 8
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "preact-prop-helpers!TargetedPick:type",
+          "docComment": "/**\n * \"**Pick**, then **pick** again\". Given an object, omits everything but the given props in the given sub-object, including other sub-objects.\n *\n * @remarks\n *\n * This is particularly useful for the kind of off-brand parameter inheritence that things like grid navigation have going.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type TargetedPick<T, K extends "
+            },
+            {
+              "kind": "Content",
+              "text": "keyof T"
+            },
+            {
+              "kind": "Content",
+              "text": ", L extends "
+            },
+            {
+              "kind": "Content",
+              "text": "keyof T[K]"
+            },
+            {
+              "kind": "Content",
+              "text": "> = "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    [M in K]: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Pick",
+              "canonicalReference": "!Pick:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<T[K], L>;\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/util/lib.tsx",
+          "releaseTag": "Public",
+          "name": "TargetedPick",
+          "typeParameters": [
+            {
+              "typeParameterName": "T",
+              "constraintTokenRange": {
+                "startIndex": 0,
+                "endIndex": 0
+              },
+              "defaultTypeTokenRange": {
+                "startIndex": 0,
+                "endIndex": 0
+              }
+            },
+            {
+              "typeParameterName": "K",
+              "constraintTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "defaultTypeTokenRange": {
+                "startIndex": 0,
+                "endIndex": 0
+              }
+            },
+            {
+              "typeParameterName": "L",
+              "constraintTokenRange": {
+                "startIndex": 3,
+                "endIndex": 4
+              },
+              "defaultTypeTokenRange": {
+                "startIndex": 0,
+                "endIndex": 0
+              }
+            }
+          ],
+          "typeTokenRange": {
+            "startIndex": 5,
+            "endIndex": 8
+          }
+        },
+        {
           "kind": "Class",
           "canonicalReference": "preact-prop-helpers!TestClass:class",
           "docComment": "/**\n * Summary of TestClass\n *\n * @remarks\n *\n * Extra remarks\n *\n * @typeParam T - A type parameter\n */\n",
@@ -10942,7 +11114,7 @@
             {
               "kind": "Reference",
               "text": "TargetedPick",
-              "canonicalReference": "preact-prop-helpers!~TargetedPick:type"
+              "canonicalReference": "preact-prop-helpers!TargetedPick:type"
             },
             {
               "kind": "Content",
@@ -12474,7 +12646,7 @@
             {
               "kind": "Reference",
               "text": "TargetedOmit",
-              "canonicalReference": "preact-prop-helpers!~TargetedOmit:type"
+              "canonicalReference": "preact-prop-helpers!TargetedOmit:type"
             },
             {
               "kind": "Content",
@@ -12663,7 +12835,7 @@
             {
               "kind": "Reference",
               "text": "TargetedOmit",
-              "canonicalReference": "preact-prop-helpers!~TargetedOmit:type"
+              "canonicalReference": "preact-prop-helpers!TargetedOmit:type"
             },
             {
               "kind": "Content",
@@ -12685,7 +12857,7 @@
             {
               "kind": "Reference",
               "text": "TargetedOmit",
-              "canonicalReference": "preact-prop-helpers!~TargetedOmit:type"
+              "canonicalReference": "preact-prop-helpers!TargetedOmit:type"
             },
             {
               "kind": "Content",
@@ -12707,7 +12879,7 @@
             {
               "kind": "Reference",
               "text": "TargetedOmit",
-              "canonicalReference": "preact-prop-helpers!~TargetedOmit:type"
+              "canonicalReference": "preact-prop-helpers!TargetedOmit:type"
             },
             {
               "kind": "Content",
@@ -12729,7 +12901,7 @@
             {
               "kind": "Reference",
               "text": "TargetedOmit",
-              "canonicalReference": "preact-prop-helpers!~TargetedOmit:type"
+              "canonicalReference": "preact-prop-helpers!TargetedOmit:type"
             },
             {
               "kind": "Content",
@@ -13541,7 +13713,7 @@
             {
               "kind": "Reference",
               "text": "TargetedOmit",
-              "canonicalReference": "preact-prop-helpers!~TargetedOmit:type"
+              "canonicalReference": "preact-prop-helpers!TargetedOmit:type"
             },
             {
               "kind": "Content",
@@ -13563,7 +13735,7 @@
             {
               "kind": "Reference",
               "text": "TargetedOmit",
-              "canonicalReference": "preact-prop-helpers!~TargetedOmit:type"
+              "canonicalReference": "preact-prop-helpers!TargetedOmit:type"
             },
             {
               "kind": "Content",
@@ -13585,7 +13757,7 @@
             {
               "kind": "Reference",
               "text": "TargetedOmit",
-              "canonicalReference": "preact-prop-helpers!~TargetedOmit:type"
+              "canonicalReference": "preact-prop-helpers!TargetedOmit:type"
             },
             {
               "kind": "Content",
@@ -15132,7 +15304,7 @@
             {
               "kind": "Reference",
               "text": "TargetedOmit",
-              "canonicalReference": "preact-prop-helpers!~TargetedOmit:type"
+              "canonicalReference": "preact-prop-helpers!TargetedOmit:type"
             },
             {
               "kind": "Content",
@@ -15246,7 +15418,7 @@
             {
               "kind": "Reference",
               "text": "TargetedOmit",
-              "canonicalReference": "preact-prop-helpers!~TargetedOmit:type"
+              "canonicalReference": "preact-prop-helpers!TargetedOmit:type"
             },
             {
               "kind": "Content",
@@ -15448,7 +15620,7 @@
             {
               "kind": "Reference",
               "text": "TargetedOmit",
-              "canonicalReference": "preact-prop-helpers!~TargetedOmit:type"
+              "canonicalReference": "preact-prop-helpers!TargetedOmit:type"
             },
             {
               "kind": "Content",
@@ -15470,7 +15642,7 @@
             {
               "kind": "Reference",
               "text": "TargetedOmit",
-              "canonicalReference": "preact-prop-helpers!~TargetedOmit:type"
+              "canonicalReference": "preact-prop-helpers!TargetedOmit:type"
             },
             {
               "kind": "Content",
@@ -15492,7 +15664,7 @@
             {
               "kind": "Reference",
               "text": "TargetedOmit",
-              "canonicalReference": "preact-prop-helpers!~TargetedOmit:type"
+              "canonicalReference": "preact-prop-helpers!TargetedOmit:type"
             },
             {
               "kind": "Content",
@@ -15514,7 +15686,7 @@
             {
               "kind": "Reference",
               "text": "TargetedOmit",
-              "canonicalReference": "preact-prop-helpers!~TargetedOmit:type"
+              "canonicalReference": "preact-prop-helpers!TargetedOmit:type"
             },
             {
               "kind": "Content",
@@ -16062,7 +16234,7 @@
             {
               "kind": "Reference",
               "text": "TargetedPick",
-              "canonicalReference": "preact-prop-helpers!~TargetedPick:type"
+              "canonicalReference": "preact-prop-helpers!TargetedPick:type"
             },
             {
               "kind": "Content",
@@ -18657,7 +18829,7 @@
             {
               "kind": "Reference",
               "text": "TargetedPick",
-              "canonicalReference": "preact-prop-helpers!~TargetedPick:type"
+              "canonicalReference": "preact-prop-helpers!TargetedPick:type"
             },
             {
               "kind": "Content",
@@ -20228,7 +20400,7 @@
             {
               "kind": "Reference",
               "text": "TargetedOmit",
-              "canonicalReference": "preact-prop-helpers!~TargetedOmit:type"
+              "canonicalReference": "preact-prop-helpers!TargetedOmit:type"
             },
             {
               "kind": "Content",
@@ -21037,7 +21209,7 @@
             {
               "kind": "Reference",
               "text": "TargetedOmit",
-              "canonicalReference": "preact-prop-helpers!~TargetedOmit:type"
+              "canonicalReference": "preact-prop-helpers!TargetedOmit:type"
             },
             {
               "kind": "Content",
@@ -21059,7 +21231,7 @@
             {
               "kind": "Reference",
               "text": "TargetedOmit",
-              "canonicalReference": "preact-prop-helpers!~TargetedOmit:type"
+              "canonicalReference": "preact-prop-helpers!TargetedOmit:type"
             },
             {
               "kind": "Content",
@@ -21103,7 +21275,7 @@
             {
               "kind": "Reference",
               "text": "TargetedPick",
-              "canonicalReference": "preact-prop-helpers!~TargetedPick:type"
+              "canonicalReference": "preact-prop-helpers!TargetedPick:type"
             },
             {
               "kind": "Content",
@@ -21317,7 +21489,7 @@
             {
               "kind": "Reference",
               "text": "TargetedOmit",
-              "canonicalReference": "preact-prop-helpers!~TargetedOmit:type"
+              "canonicalReference": "preact-prop-helpers!TargetedOmit:type"
             },
             {
               "kind": "Content",
@@ -23247,7 +23419,7 @@
             {
               "kind": "Reference",
               "text": "TargetedOmit",
-              "canonicalReference": "preact-prop-helpers!~TargetedOmit:type"
+              "canonicalReference": "preact-prop-helpers!TargetedOmit:type"
             },
             {
               "kind": "Content",
@@ -24001,7 +24173,7 @@
             {
               "kind": "Reference",
               "text": "TargetedPick",
-              "canonicalReference": "preact-prop-helpers!~TargetedPick:type"
+              "canonicalReference": "preact-prop-helpers!TargetedPick:type"
             },
             {
               "kind": "Content",
@@ -24522,7 +24694,7 @@
             {
               "kind": "Reference",
               "text": "TargetedPick",
-              "canonicalReference": "preact-prop-helpers!~TargetedPick:type"
+              "canonicalReference": "preact-prop-helpers!TargetedPick:type"
             },
             {
               "kind": "Content",
@@ -24894,7 +25066,7 @@
             {
               "kind": "Reference",
               "text": "TargetedPick",
-              "canonicalReference": "preact-prop-helpers!~TargetedPick:type"
+              "canonicalReference": "preact-prop-helpers!TargetedPick:type"
             },
             {
               "kind": "Content",
@@ -26125,7 +26297,7 @@
             {
               "kind": "Reference",
               "text": "TargetedPick",
-              "canonicalReference": "preact-prop-helpers!~TargetedPick:type"
+              "canonicalReference": "preact-prop-helpers!TargetedPick:type"
             },
             {
               "kind": "Content",
@@ -29054,7 +29226,7 @@
             {
               "kind": "Reference",
               "text": "TargetedOmit",
-              "canonicalReference": "preact-prop-helpers!~TargetedOmit:type"
+              "canonicalReference": "preact-prop-helpers!TargetedOmit:type"
             },
             {
               "kind": "Content",
@@ -29971,7 +30143,7 @@
             {
               "kind": "Reference",
               "text": "TargetedPick",
-              "canonicalReference": "preact-prop-helpers!~TargetedPick:type"
+              "canonicalReference": "preact-prop-helpers!TargetedPick:type"
             },
             {
               "kind": "Content",
@@ -33352,7 +33524,7 @@
             {
               "kind": "Reference",
               "text": "TargetedPick",
-              "canonicalReference": "preact-prop-helpers!~TargetedPick:type"
+              "canonicalReference": "preact-prop-helpers!TargetedPick:type"
             },
             {
               "kind": "Content",
@@ -33374,7 +33546,7 @@
             {
               "kind": "Reference",
               "text": "TargetedPick",
-              "canonicalReference": "preact-prop-helpers!~TargetedPick:type"
+              "canonicalReference": "preact-prop-helpers!TargetedPick:type"
             },
             {
               "kind": "Content",
@@ -33396,7 +33568,7 @@
             {
               "kind": "Reference",
               "text": "TargetedPick",
-              "canonicalReference": "preact-prop-helpers!~TargetedPick:type"
+              "canonicalReference": "preact-prop-helpers!TargetedPick:type"
             },
             {
               "kind": "Content",
@@ -33598,7 +33770,7 @@
             {
               "kind": "Reference",
               "text": "TargetedPick",
-              "canonicalReference": "preact-prop-helpers!~TargetedPick:type"
+              "canonicalReference": "preact-prop-helpers!TargetedPick:type"
             },
             {
               "kind": "Content",
@@ -34754,7 +34926,7 @@
             {
               "kind": "Reference",
               "text": "TargetedPick",
-              "canonicalReference": "preact-prop-helpers!~TargetedPick:type"
+              "canonicalReference": "preact-prop-helpers!TargetedPick:type"
             },
             {
               "kind": "Content",
@@ -36296,7 +36468,7 @@
             {
               "kind": "Reference",
               "text": "TargetedPick",
-              "canonicalReference": "preact-prop-helpers!~TargetedPick:type"
+              "canonicalReference": "preact-prop-helpers!TargetedPick:type"
             },
             {
               "kind": "Content",
@@ -38032,7 +38204,7 @@
             {
               "kind": "Reference",
               "text": "TargetedPick",
-              "canonicalReference": "preact-prop-helpers!~TargetedPick:type"
+              "canonicalReference": "preact-prop-helpers!TargetedPick:type"
             },
             {
               "kind": "Content",
@@ -38306,7 +38478,7 @@
             {
               "kind": "Reference",
               "text": "TargetedPick",
-              "canonicalReference": "preact-prop-helpers!~TargetedPick:type"
+              "canonicalReference": "preact-prop-helpers!TargetedPick:type"
             },
             {
               "kind": "Content",
@@ -38328,7 +38500,7 @@
             {
               "kind": "Reference",
               "text": "TargetedPick",
-              "canonicalReference": "preact-prop-helpers!~TargetedPick:type"
+              "canonicalReference": "preact-prop-helpers!TargetedPick:type"
             },
             {
               "kind": "Content",
@@ -38735,7 +38907,7 @@
             {
               "kind": "Reference",
               "text": "TargetedPick",
-              "canonicalReference": "preact-prop-helpers!~TargetedPick:type"
+              "canonicalReference": "preact-prop-helpers!TargetedPick:type"
             },
             {
               "kind": "Content",
@@ -40807,7 +40979,7 @@
             {
               "kind": "Reference",
               "text": "TargetedPick",
-              "canonicalReference": "preact-prop-helpers!~TargetedPick:type"
+              "canonicalReference": "preact-prop-helpers!TargetedPick:type"
             },
             {
               "kind": "Content",
@@ -40838,7 +41010,7 @@
             {
               "kind": "Reference",
               "text": "TargetedPick",
-              "canonicalReference": "preact-prop-helpers!~TargetedPick:type"
+              "canonicalReference": "preact-prop-helpers!TargetedPick:type"
             },
             {
               "kind": "Content",
@@ -41103,7 +41275,7 @@
             {
               "kind": "Reference",
               "text": "TargetedPick",
-              "canonicalReference": "preact-prop-helpers!~TargetedPick:type"
+              "canonicalReference": "preact-prop-helpers!TargetedPick:type"
             },
             {
               "kind": "Content",
@@ -43292,7 +43464,7 @@
             {
               "kind": "Reference",
               "text": "TargetedPick",
-              "canonicalReference": "preact-prop-helpers!~TargetedPick:type"
+              "canonicalReference": "preact-prop-helpers!TargetedPick:type"
             },
             {
               "kind": "Content",
@@ -44127,7 +44299,7 @@
             {
               "kind": "Reference",
               "text": "TargetedPick",
-              "canonicalReference": "preact-prop-helpers!~TargetedPick:type"
+              "canonicalReference": "preact-prop-helpers!TargetedPick:type"
             },
             {
               "kind": "Content",
@@ -44149,7 +44321,7 @@
             {
               "kind": "Reference",
               "text": "TargetedPick",
-              "canonicalReference": "preact-prop-helpers!~TargetedPick:type"
+              "canonicalReference": "preact-prop-helpers!TargetedPick:type"
             },
             {
               "kind": "Content",
@@ -44291,7 +44463,7 @@
             {
               "kind": "Reference",
               "text": "TargetedPick",
-              "canonicalReference": "preact-prop-helpers!~TargetedPick:type"
+              "canonicalReference": "preact-prop-helpers!TargetedPick:type"
             },
             {
               "kind": "Content",
@@ -44529,7 +44701,7 @@
             {
               "kind": "Reference",
               "text": "TargetedPick",
-              "canonicalReference": "preact-prop-helpers!~TargetedPick:type"
+              "canonicalReference": "preact-prop-helpers!TargetedPick:type"
             },
             {
               "kind": "Content",
