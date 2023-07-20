@@ -4,6 +4,10 @@ import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useEffect } from "../util/lib.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 /**
+ * Allows you to move focus to an isolated area of the page and restore it when finished.
+ *
+ * @remarks By default, this implements a focus trap using the
+ *
  * @compositeParams
  */
 export function useFocusTrap({ focusTrapParameters: { onlyMoveFocus, trapActive, focusPopup: focusSelfUnstable, focusOpener: focusOpenerUnstable }, refElementReturn }) {

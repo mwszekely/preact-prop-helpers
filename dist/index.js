@@ -123,6 +123,9 @@
  *
  * @packageDocumentation
  */
+export { useBackdropDismiss } from "./component-detail/dismissal/use-backdrop-dismiss.js";
+export { useEscapeDismiss } from "./component-detail/dismissal/use-escape-dismiss.js";
+export { useLostFocusDismiss } from "./component-detail/dismissal/use-lost-focus-dismiss.js";
 export { useGridNavigation, useGridNavigationCell, useGridNavigationRow } from "./component-detail/keyboard-navigation/use-grid-navigation-partial.js";
 export { useGridNavigationSingleSelectionSortable, useGridNavigationSingleSelectionSortableCell, useGridNavigationSingleSelectionSortableRow } from "./component-detail/keyboard-navigation/use-grid-navigation-single-selection-sortable.js";
 export { useGridNavigationSingleSelection, useGridNavigationSingleSelectionCell, useGridNavigationSingleSelectionRow } from "./component-detail/keyboard-navigation/use-grid-navigation-single-selection.js";
@@ -134,7 +137,7 @@ export { useRovingTabIndex, useRovingTabIndexChild } from "./component-detail/ke
 export { useSingleSelection, useSingleSelectionChild, useSingleSelectionDeclarative } from "./component-detail/keyboard-navigation/use-single-selection.js";
 export { defaultCompare, useRearrangeableChildren, useSortableChildren } from "./component-detail/keyboard-navigation/use-sortable-children.js";
 export { binarySearch, useTypeaheadNavigation, useTypeaheadNavigationChild } from "./component-detail/keyboard-navigation/use-typeahead-navigation.js";
-export { useBackdropDismiss, useDismiss, useEscapeDismiss, useLostFocusDismiss } from "./component-detail/use-dismiss.js";
+export { useDismiss } from "./component-detail/use-dismiss.js";
 export { findFirstFocusable, findFirstTabbable, useFocusTrap } from "./component-detail/use-focus-trap.js";
 export { usePaginatedChild, usePaginatedChildren } from "./component-detail/use-paginated-children.js";
 export { useStaggeredChild, useStaggeredChildren } from "./component-detail/use-staggered-children.js";

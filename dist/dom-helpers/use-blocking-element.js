@@ -13,6 +13,7 @@ function blockingElements() { return getDocument().$blockingElements; }
  * @remarks Automatically handles consecutive calls with a loosely applied stack operation
  * (specifically via `blockingElements`, with a small polyfill because I'm not sure how long
  * it'll take to find its way into the spec, if ever)
+ *
  * @param target
  */
 export function useBlockingElement(enabled, getTarget) {

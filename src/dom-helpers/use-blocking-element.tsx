@@ -9,12 +9,14 @@ import { monitorCallCount } from "../util/use-call-count.js";
 import { getDocument } from "./use-document-class.js";
 
 function blockingElements() { return (getDocument() as DocumentWithBlockingElements).$blockingElements }
+
 /**
  * Allows an element to trap focus by applying the "inert" attribute to all sibling, aunt, and uncle nodes.
  * 
  * @remarks Automatically handles consecutive calls with a loosely applied stack operation 
  * (specifically via `blockingElements`, with a small polyfill because I'm not sure how long
  * it'll take to find its way into the spec, if ever)
+ * 
  * @param target 
  */
 export function useBlockingElement<E extends Element>(enabled: boolean, getTarget: () => (E | null)) {

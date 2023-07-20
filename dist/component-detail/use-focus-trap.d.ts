@@ -11,26 +11,27 @@ export interface UseFocusTrapParametersSelf<SourceElement extends Element | null
      */
     onlyMoveFocus: boolean;
     /**
-     * When a modal popup opens, focus must be sent to the first element that makes sense.
+     * This function is called to find where focus should be sent when the dialog (or menu, popup, etc.) opens.
      *
-     * For example, if it's a confirmation dialog about deleting something, it's best to send focus to the "cancel" button.
+     * @remarks This **cannot be done deterministically** across all possible scenarios because this is about what makes the most sense as a human.
      *
-     * In other cases, it makes more sense to focus the dialog's title, first interactive element, etc.
+     * For example, if it's a confirmation dialog about deleting something, *it's best to send focus to the "cancel" button*,
+     * but there's no way to programatically know both a) that should be done and b) how to do it.
      *
-     * This is highly subjective and *almost ALWAYS* more complicated than just "focus the whole dialog element itself",
-     * because that only works if the dialog ***only contains text***, which is uncommon.
+     * Ideally this function is specified *manually* for every dialog you create.
      *
      * If you really, really, ***genuinely*** cannot determine what should be done in your use case,
-     * first of all, keep trying, really,
-     * then as a very last resort, use `findFirstFocusable`, and then if nothing's found focus the body.
+     * as a very very last resort, use `findFirstFocusable`, and then if nothing's found focus the body.
+     *
      * Just please, please make sure that whatever that first focusable is **isn't** a destructive action, at the very least.
      */
     focusPopup(e: PopupElement, findFirstFocusable: () => HTMLOrSVGElement | null): void;
     /**
      * When the focus trap has deactivated, focus must be sent back to the element that opened it.
      *
-     * This is tracked for you; by default, just call `lastFocused?.focus()`, but you can also override this behavior
+     * @remarks This is tracked for you; by default, just call `lastFocused?.focus()`, but you can also override this behavior
      * and just do whatever you want with any element.
+     *
      * @param lastFocused - The element that was focused before the modal was opened
      */
     focusOpener(lastFocused: SourceElement | null): void;
@@ -42,6 +43,10 @@ export interface UseFocusTrapReturnType<E extends Element> {
     props: ElementProps<E>;
 }
 /**
+ * Allows you to move focus to an isolated area of the page and restore it when finished.
+ *
+ * @remarks By default, this implements a focus trap using the
+ *
  * @compositeParams
  */
 export declare function useFocusTrap<SourceElement extends Element | null, PopupElement extends Element>({ focusTrapParameters: { onlyMoveFocus, trapActive, focusPopup: focusSelfUnstable, focusOpener: focusOpenerUnstable }, refElementReturn }: UseFocusTrapParameters<SourceElement, PopupElement>): UseFocusTrapReturnType<PopupElement>;

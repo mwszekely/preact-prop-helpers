@@ -8755,7 +8755,7 @@
             },
             {
               "kind": "Content",
-              "text": "{\n    pending: boolean;\n    debouncingSync: boolean;\n    debouncingAsync: boolean;\n    callCount: number;\n    settleCount: number;\n    resolveCount: number;\n    rejectCount: number;\n    result: void | (() => void) | undefined;\n    hasResult: boolean;\n    error: unknown;\n    hasError: boolean;\n    invocationResult: \"sync\" | \"async\" | \"throw\" | null;\n    flushDebouncedPromise: () => void;\n}"
+              "text": "{\n    pending: boolean;\n    debouncingSync: boolean;\n    debouncingAsync: boolean;\n    callCount: number;\n    settleCount: number;\n    resolveCount: number;\n    rejectCount: number;\n    result: void | (() => void) | undefined;\n    hasResult: boolean;\n    error: unknown;\n    hasError: boolean;\n    invocationResult: \"async\" | \"sync\" | \"throw\" | null;\n    flushDebouncedPromise: () => void;\n}"
             },
             {
               "kind": "Content",

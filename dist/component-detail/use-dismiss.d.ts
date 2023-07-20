@@ -1,88 +1,7 @@
 import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
-import { UseActiveElementParameters } from "../observers/use-active-element.js";
-import { EnhancedEventHandler } from "../util/event.js";
 import { TargetedPick } from "../util/lib.js";
-import { ElementProps, Nullable } from "../util/types.js";
-export interface UseEscapeDismissParametersSelf {
-    /**
-     * Called when the component is dismissed.
-     *
-     * Presumably you'll set some state that changes `open` to false during this, otherwise it's not a soft dismiss, but you can do whatever you want I guess.
-     */
-    onClose: EnhancedEventHandler<KeyboardEvent, {
-        reason: "escape" | "lost-focus";
-    }>;
-    /**
-     * Whether the surface controlled by the `Escape` key is currently open.
-     * Can also be `false` to force the `Escape` key to do nothing.
-     */
-    open: boolean;
-    /**
-     * The escape key event handler is attached onto the window, so we need to know which window.
-     */
-    getWindow(): Window;
-    /**
-     * Get this from context somewhere, and increment it in that context.
-     *
-     * If multiple instances of Preact are on the page, tree depth is used as a tiebreaker
-     */
-    parentDepth: number;
-}
-export interface UseEscapeDismissParameters<PopupElement extends Element> {
-    refElementPopupReturn: Pick<UseRefElementReturnType<PopupElement>["refElementReturn"], "getElement">;
-    escapeDismissParameters: UseEscapeDismissParametersSelf;
-}
-/**
- * Adds event handlers for a modal-like soft-dismiss interaction.
- *
- * That is, any clicks or taps outside of the given component,
- * or any time the Escape key is pressed within the component,
- * (with various browser oddities regarding clicks on blank or inert areas handled)
- * the component will request to close itself.
- *
- * Of course, if you don't do anything in the `onClose` function,
- * it won't be a soft dismiss anymore.
- *
- * Handles events for pressing the `Escape` key to close the any currently open dialogs, tooltips, menus, popups, etc.
- *
- * One press of the `Escape` key is guaranteed to only call `onClose` for *only one* component, and it is called on the component deepest in the DOM tree, differentiated by passing context information between parent and child.
- *
- * @compositeParams
- */
-export declare function useEscapeDismiss<PopupElement extends Element>({ escapeDismissParameters: { onClose, open, getWindow: unstableGetWindow, parentDepth, ...void1 }, refElementPopupReturn: { getElement, ...void2 } }: UseEscapeDismissParameters<PopupElement>): void;
-export interface UseLostFocusDismissParametersSelf {
-    open: boolean;
-    onClose(): void;
-}
-export interface UseLostFocusDismissParameters<SourceElement extends Element | null, PopupElement extends Element> {
-    lostFocusDismissParameters: UseLostFocusDismissParametersSelf;
-    refElementSourceReturn: Nullable<Pick<UseRefElementReturnType<NonNullable<SourceElement>>["refElementReturn"], "getElement">>;
-    refElementPopupReturn: Pick<UseRefElementReturnType<PopupElement>["refElementReturn"], "getElement">;
-}
-export interface UseLostFocusDismissReturnType<_SourceElement extends Element | null, _PopupElement extends Element> extends TargetedPick<UseActiveElementParameters, "activeElementParameters", "onLastActiveElementChange"> {
-}
-/**
- * Handles events for dismiss events for things like popup menus or transient dialogs -- things where moving focus to a new area of the page means this component should close itself.
- *
- * @compositeParams
- */
-export declare function useLostFocusDismiss<SourceElement extends Element | null, PopupElement extends Element>({ refElementPopupReturn: { getElement: getPopupElement, ...void3 }, refElementSourceReturn, lostFocusDismissParameters: { open, onClose, ...void4 }, ...void1 }: UseLostFocusDismissParameters<SourceElement, PopupElement>): UseLostFocusDismissReturnType<SourceElement, PopupElement>;
-export interface UseBackdropDismissParametersSelf {
-    open: boolean;
-    onClose: EnhancedEventHandler<MouseEvent, {
-        reason: "escape" | "lost-focus";
-    }>;
-}
-export interface UseBackdropDismissParameters<PopupElement extends Element> {
-    backdropDismissParameters: UseBackdropDismissParametersSelf;
-    refElementPopupReturn: Pick<UseRefElementReturnType<PopupElement>["refElementReturn"], "getElement">;
-}
-/**
- * Handles events for a backdrop on a modal dialog -- the kind where the user expects the modal to close when they click/tap outside of it.
- *
- * @compositeParams
- */
-export declare function useBackdropDismiss<PopupElement extends Element>({ backdropDismissParameters: { open, onClose: onCloseUnstable, ...void1 }, refElementPopupReturn: { getElement, ...void3 }, ...void2 }: UseBackdropDismissParameters<PopupElement>): void;
+import { ElementProps } from "../util/types.js";
+import { UseEscapeDismissParameters } from "./dismissal/use-escape-dismiss.js";
 export type DismissListenerTypes = "backdrop" | "lost-focus" | "escape";
 export interface UseDismissParametersSelf<Listeners extends DismissListenerTypes> {
     /**
@@ -132,7 +51,7 @@ export interface UseDismissReturnType<SourceElement extends Element | null, Popu
     propsStablePopup: ElementProps<NonNullable<PopupElement>>;
 }
 /**
- * Combines all the methods of dismissing a modal-ish or popup-ish component into one combined hook. This is similar to the "complete" series of list/grid navigation, in that it's the "outermost" hook of its type.
+ * Combines all the methods a user can implicitly dismiss a popup component. See {@link @useModal} for a hook that's ready-to-use for dialogs and menus.
  *
  * @compositeParams
  */

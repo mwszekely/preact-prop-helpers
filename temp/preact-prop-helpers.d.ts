@@ -961,7 +961,7 @@ export declare function useAsyncEffect<I extends Inputs>(effect: () => Promise<(
     hasResult: boolean;
     error: unknown;
     hasError: boolean;
-    invocationResult: "sync" | "async" | "throw" | null;
+    invocationResult: "async" | "sync" | "throw" | null;
     flushDebouncedPromise: () => void;
 };
 
