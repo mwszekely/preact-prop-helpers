@@ -252,7 +252,7 @@ Allows you to access the `HTMLElement` rendered by this hook/these props, either
 
 |Member|Type|Description|
 |---------|----|-----------|
-|.getElement|`() => T | null`|**STABLE**<br />Call to return the element that the props were rendered to, or `null` if they were not rendered to an element.|
+|.getElement|`() => T \| null`|**STABLE**<br />Call to return the element that the props were rendered to, or `null` if they were not rendered to an element.|
 |propsStable|HTML props|Spread these props onto the HTML element that will use this logic.|
 
 This hook, like many others, works with either `useState` or [usePassiveState](#usepassivestate). Why use one over the other?
@@ -299,7 +299,7 @@ Adds the necessary event handlers to create a "press"-like event for any element
 
 #### UsePressParameters
 
-<small>extends [UseRefElementReturnType](#userefelementreturntype)</small>
+<small>`extends` [`UseRefElementReturnType`](#userefelementreturntype)</small>
 
 |Member|Type|Description|
 |---------|----|-----------|
@@ -359,7 +359,7 @@ All the list-related hooks combined into one large hook that encapsulates everyt
 
 #### UseCompleteListNavigationParameters
 
-<small>extends [UseRovingTabIndexParameters](#userovingtabindexparameters), [UseManagedChildrenParameters](#usemanagedchildrenparameters), [UseTypeaheadNavigationParameters](#usetypeaheadnavigationparameters), [UseLinearNavigationParameters](#uselinearnavigationparameters), [UseSingleSelectionParameters](#usesingleselectionparameters), [UseRearrangeableChildrenParameters](#userearrangeablechildrenparameters), [UseSortableChildrenParameters](#usesortablechildrenparameters), [UsePaginatedChildrenParameters](#usepaginatedchildrenparameters), [UseStaggeredChildrenParameters](#usestaggeredchildrenparameters), [UseManagedChildrenReturnType](#usemanagedchildrenreturntype), [UseRefElementReturnType](#userefelementreturntype), [UseRovingTabIndexReturnType](#userovingtabindexreturntype)</small>
+<small>`extends` [`UseRovingTabIndexParameters`](#userovingtabindexparameters), [`UseManagedChildrenParameters`](#usemanagedchildrenparameters), [`UseTypeaheadNavigationParameters`](#usetypeaheadnavigationparameters), [`UseLinearNavigationParameters`](#uselinearnavigationparameters), [`UseSingleSelectionParameters`](#usesingleselectionparameters), [`UseRearrangeableChildrenParameters`](#userearrangeablechildrenparameters), [`UseSortableChildrenParameters`](#usesortablechildrenparameters), [`UsePaginatedChildrenParameters`](#usepaginatedchildrenparameters), [`UseStaggeredChildrenParameters`](#usestaggeredchildrenparameters), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseRefElementReturnType`](#userefelementreturntype), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype)</small>
 
 Every member of `UseCompleteListNavigationParameters` is inherited (see the interfaces it `extends` from).
 
@@ -367,7 +367,7 @@ Every member of `UseCompleteListNavigationParameters` is inherited (see the inte
 
 #### UseCompleteListNavigationReturnType
 
-<small>extends [UsePaginatedChildrenReturnType](#usepaginatedchildrenreturntype), [UseStaggeredChildrenReturnType](#usestaggeredchildrenreturntype), [UseManagedChildrenReturnType](#usemanagedchildrenreturntype), [UseChildrenHaveFocusReturnType](#usechildrenhavefocusreturntype), [UseRovingTabIndexReturnType](#userovingtabindexreturntype), [UseTypeaheadNavigationReturnType](#usetypeaheadnavigationreturntype), [UseLinearNavigationReturnType](#uselinearnavigationreturntype), [UseListNavigationReturnType](#uselistnavigationreturntype), [UseSingleSelectionReturnType](#usesingleselectionreturntype), [UseRearrangeableChildrenReturnType](#userearrangeablechildrenreturntype), [UseSortableChildrenReturnType](#usesortablechildrenreturntype), [UseManagedChildrenParameters](#usemanagedchildrenparameters), [UseChildrenHaveFocusParameters](#usechildrenhavefocusparameters)</small>
+<small>`extends` [`UsePaginatedChildrenReturnType`](#usepaginatedchildrenreturntype), [`UseStaggeredChildrenReturnType`](#usestaggeredchildrenreturntype), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseChildrenHaveFocusReturnType`](#usechildrenhavefocusreturntype), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype), [`UseTypeaheadNavigationReturnType`](#usetypeaheadnavigationreturntype), [`UseLinearNavigationReturnType`](#uselinearnavigationreturntype), [`UseListNavigationReturnType`](#uselistnavigationreturntype), [`UseSingleSelectionReturnType`](#usesingleselectionreturntype), [`UseRearrangeableChildrenReturnType`](#userearrangeablechildrenreturntype), [`UseSortableChildrenReturnType`](#usesortablechildrenreturntype), [`UseManagedChildrenParameters`](#usemanagedchildrenparameters), [`UseChildrenHaveFocusParameters`](#usechildrenhavefocusparameters)</small>
 
 |Member|Type|Description|
 |---------|----|-----------|
@@ -390,7 +390,7 @@ Combines all the grid- (&amp; list-) related hooks into one giant hook that acco
 
 #### UseCompleteGridNavigationParameters
 
-<small>extends [UseRovingTabIndexParameters](#userovingtabindexparameters), [UseManagedChildrenParameters](#usemanagedchildrenparameters), [UseTypeaheadNavigationParameters](#usetypeaheadnavigationparameters), [UseLinearNavigationParameters](#uselinearnavigationparameters), [UseGridNavigationParameters](#usegridnavigationparameters), [UseSingleSelectionParameters](#usesingleselectionparameters), [UseRearrangeableChildrenParameters](#userearrangeablechildrenparameters), [UseSortableChildrenParameters](#usesortablechildrenparameters), [UsePaginatedChildrenParameters](#usepaginatedchildrenparameters), [UseStaggeredChildrenParameters](#usestaggeredchildrenparameters), [UseManagedChildrenReturnType](#usemanagedchildrenreturntype), [UseRefElementReturnType](#userefelementreturntype), [UseRovingTabIndexReturnType](#userovingtabindexreturntype)</small>
+<small>`extends` [`UseRovingTabIndexParameters`](#userovingtabindexparameters), [`UseManagedChildrenParameters`](#usemanagedchildrenparameters), [`UseTypeaheadNavigationParameters`](#usetypeaheadnavigationparameters), [`UseLinearNavigationParameters`](#uselinearnavigationparameters), [`UseGridNavigationParameters`](#usegridnavigationparameters), [`UseSingleSelectionParameters`](#usesingleselectionparameters), [`UseRearrangeableChildrenParameters`](#userearrangeablechildrenparameters), [`UseSortableChildrenParameters`](#usesortablechildrenparameters), [`UsePaginatedChildrenParameters`](#usepaginatedchildrenparameters), [`UseStaggeredChildrenParameters`](#usestaggeredchildrenparameters), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseRefElementReturnType`](#userefelementreturntype), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype)</small>
 
 Every member of `UseCompleteGridNavigationParameters` is inherited (see the interfaces it `extends` from).
 
@@ -398,7 +398,7 @@ Every member of `UseCompleteGridNavigationParameters` is inherited (see the inte
 
 #### UseCompleteGridNavigationReturnType
 
-<small>extends [UsePaginatedChildrenReturnType](#usepaginatedchildrenreturntype), [UseStaggeredChildrenReturnType](#usestaggeredchildrenreturntype), [UseManagedChildrenReturnType](#usemanagedchildrenreturntype), [UseChildrenHaveFocusReturnType](#usechildrenhavefocusreturntype), [UseRovingTabIndexReturnType](#userovingtabindexreturntype), [UseTypeaheadNavigationReturnType](#usetypeaheadnavigationreturntype), [UseLinearNavigationReturnType](#uselinearnavigationreturntype), [UseListNavigationReturnType](#uselistnavigationreturntype), [UseGridNavigationReturnType](#usegridnavigationreturntype), [UseSingleSelectionReturnType](#usesingleselectionreturntype), [UseRearrangeableChildrenReturnType](#userearrangeablechildrenreturntype), [UseSortableChildrenReturnType](#usesortablechildrenreturntype), [UseManagedChildrenParameters](#usemanagedchildrenparameters), [UseChildrenHaveFocusParameters](#usechildrenhavefocusparameters)</small>
+<small>`extends` [`UsePaginatedChildrenReturnType`](#usepaginatedchildrenreturntype), [`UseStaggeredChildrenReturnType`](#usestaggeredchildrenreturntype), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseChildrenHaveFocusReturnType`](#usechildrenhavefocusreturntype), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype), [`UseTypeaheadNavigationReturnType`](#usetypeaheadnavigationreturntype), [`UseLinearNavigationReturnType`](#uselinearnavigationreturntype), [`UseListNavigationReturnType`](#uselistnavigationreturntype), [`UseGridNavigationReturnType`](#usegridnavigationreturntype), [`UseSingleSelectionReturnType`](#usesingleselectionreturntype), [`UseRearrangeableChildrenReturnType`](#userearrangeablechildrenreturntype), [`UseSortableChildrenReturnType`](#usesortablechildrenreturntype), [`UseManagedChildrenParameters`](#usemanagedchildrenparameters), [`UseChildrenHaveFocusParameters`](#usechildrenhavefocusparameters)</small>
 
 |Member|Type|Description|
 |---------|----|-----------|
@@ -413,18 +413,18 @@ Every member of `UseCompleteGridNavigationParameters` is inherited (see the inte
 
 #### UseCompleteGridNavigationRowParameters
 
-<small>extends [UseManagedChildParameters](#usemanagedchildparameters), [UseRovingTabIndexChildInfoKeysParameters](#userovingtabindexchildinfokeysparameters), [UseRovingTabIndexChildParameters](#userovingtabindexchildparameters), [UseTextContentParameters](#usetextcontentparameters), [UseTypeaheadNavigationChildParameters](#usetypeaheadnavigationchildparameters), [UseListNavigationChildParameters](#uselistnavigationchildparameters), [UseRovingTabIndexParameters](#userovingtabindexparameters), [UseManagedChildrenParameters](#usemanagedchildrenparameters), [UseTypeaheadNavigationParameters](#usetypeaheadnavigationparameters), [UseLinearNavigationParameters](#uselinearnavigationparameters), [UseGridNavigationRowParameters](#usegridnavigationrowparameters), [UseSingleSelectionChildParameters](#usesingleselectionchildparameters), [UseRefElementReturnType](#userefelementreturntype), [UseManagedChildrenReturnType](#usemanagedchildrenreturntype), [UseRovingTabIndexReturnType](#userovingtabindexreturntype)</small>
+<small>`extends` [`UseManagedChildParameters`](#usemanagedchildparameters), [`UseRovingTabIndexChildInfoKeysParameters`](#userovingtabindexchildinfokeysparameters), [`UseRovingTabIndexChildParameters`](#userovingtabindexchildparameters), [`UseTextContentParameters`](#usetextcontentparameters), [`UseTypeaheadNavigationChildParameters`](#usetypeaheadnavigationchildparameters), [`UseListNavigationChildParameters`](#uselistnavigationchildparameters), [`UseRovingTabIndexParameters`](#userovingtabindexparameters), [`UseManagedChildrenParameters`](#usemanagedchildrenparameters), [`UseTypeaheadNavigationParameters`](#usetypeaheadnavigationparameters), [`UseLinearNavigationParameters`](#uselinearnavigationparameters), [`UseGridNavigationRowParameters`](#usegridnavigationrowparameters), [`UseSingleSelectionChildParameters`](#usesingleselectionchildparameters), [`UseRefElementReturnType`](#userefelementreturntype), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype)</small>
 
 |Member|Type|Description|
 |---------|----|-----------|
 |context|``CompleteGridNavigationRowContext<any, RowElement, CellElement, RM, CM>``|Functions and data that the parent has made available to each child. Retrieve it with `useContext`|
-|info|``OmitStrong<RM, Exclude<keyof UseCompleteGridNavigationRowInfo<RowElement, CellElement>, "getSortValue" \| "index" \| "untabbable" \| "unselectable">>``|Data the child makes available to the parent. Passed to `useManagedChild`|
+|info|`OmitStrong<RM, Exclude<keyof UseCompleteGridNavigationRowInfo<RowElement, CellElement>, "getSortValue" \| "index" \| "untabbable" \| "unselectable">>`|Data the child makes available to the parent. Passed to `useManagedChild`|
 
 
 
 #### UseCompleteGridNavigationRowReturnType
 
-<small>extends [UseRefElementReturnType](#userefelementreturntype), [UseRovingTabIndexChildReturnType](#userovingtabindexchildreturntype), [UseTextContentReturnType](#usetextcontentreturntype), [UseRovingTabIndexReturnType](#userovingtabindexreturntype), [UseTypeaheadNavigationReturnType](#usetypeaheadnavigationreturntype), [UseLinearNavigationReturnType](#uselinearnavigationreturntype), [UseListNavigationReturnType](#uselistnavigationreturntype), [UseGridNavigationRowReturnType](#usegridnavigationrowreturntype), [UseSingleSelectionChildReturnType](#usesingleselectionchildreturntype), [UseManagedChildrenReturnType](#usemanagedchildrenreturntype), [UseHasCurrentFocusReturnType](#usehascurrentfocusreturntype), [UseManagedChildReturnType](#usemanagedchildreturntype), [UsePaginatedChildReturnType](#usepaginatedchildreturntype), [UseStaggeredChildReturnType](#usestaggeredchildreturntype), [UseHasCurrentFocusParameters](#usehascurrentfocusparameters), [UsePressParameters](#usepressparameters), [UseManagedChildrenParameters](#usemanagedchildrenparameters)</small>
+<small>`extends` [`UseRefElementReturnType`](#userefelementreturntype), [`UseRovingTabIndexChildReturnType`](#userovingtabindexchildreturntype), [`UseTextContentReturnType`](#usetextcontentreturntype), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype), [`UseTypeaheadNavigationReturnType`](#usetypeaheadnavigationreturntype), [`UseLinearNavigationReturnType`](#uselinearnavigationreturntype), [`UseListNavigationReturnType`](#uselistnavigationreturntype), [`UseGridNavigationRowReturnType`](#usegridnavigationrowreturntype), [`UseSingleSelectionChildReturnType`](#usesingleselectionchildreturntype), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseHasCurrentFocusReturnType`](#usehascurrentfocusreturntype), [`UseManagedChildReturnType`](#usemanagedchildreturntype), [`UsePaginatedChildReturnType`](#usepaginatedchildreturntype), [`UseStaggeredChildReturnType`](#usestaggeredchildreturntype), [`UseHasCurrentFocusParameters`](#usehascurrentfocusparameters), [`UsePressParameters`](#usepressparameters), [`UseManagedChildrenParameters`](#usemanagedchildrenparameters)</small>
 
 |Member|Type|Description|
 |---------|----|-----------|
@@ -438,18 +438,18 @@ Every member of `UseCompleteGridNavigationParameters` is inherited (see the inte
 
 #### UseCompleteGridNavigationCellParameters
 
-<small>extends [UseManagedChildParameters](#usemanagedchildparameters), [UseRovingTabIndexChildInfoKeysParameters](#userovingtabindexchildinfokeysparameters), [UseRovingTabIndexChildParameters](#userovingtabindexchildparameters), [UseTextContentParameters](#usetextcontentparameters), [UseTypeaheadNavigationChildParameters](#usetypeaheadnavigationchildparameters), [UseListNavigationChildParameters](#uselistnavigationchildparameters), [UseGridNavigationCellParameters](#usegridnavigationcellparameters), [UseRefElementReturnType](#userefelementreturntype)</small>
+<small>`extends` [`UseManagedChildParameters`](#usemanagedchildparameters), [`UseRovingTabIndexChildInfoKeysParameters`](#userovingtabindexchildinfokeysparameters), [`UseRovingTabIndexChildParameters`](#userovingtabindexchildparameters), [`UseTextContentParameters`](#usetextcontentparameters), [`UseTypeaheadNavigationChildParameters`](#usetypeaheadnavigationchildparameters), [`UseListNavigationChildParameters`](#uselistnavigationchildparameters), [`UseGridNavigationCellParameters`](#usegridnavigationcellparameters), [`UseRefElementReturnType`](#userefelementreturntype)</small>
 
 |Member|Type|Description|
 |---------|----|-----------|
 |context|``CompleteGridNavigationCellContext<any, CellElement, CM>``|Functions and data that the parent has made available to each child. Retrieve it with `useContext`|
-|info|``Omit<CM, Exclude<keyof UseCompleteGridNavigationCellInfo<CellElement>, "index" \| "untabbable" \| "focusSelf">>``|Data the child makes available to the parent. Passed to `useManagedChild`|
+|info|`Omit<CM, Exclude<keyof UseCompleteGridNavigationCellInfo<CellElement>, "index" \| "untabbable" \| "focusSelf">>`|Data the child makes available to the parent. Passed to `useManagedChild`|
 
 
 
 #### UseCompleteGridNavigationCellReturnType
 
-<small>extends [UseRefElementReturnType](#userefelementreturntype), [UseRovingTabIndexChildReturnType](#userovingtabindexchildreturntype), [UseTextContentReturnType](#usetextcontentreturntype), [UseHasCurrentFocusReturnType](#usehascurrentfocusreturntype), [UseManagedChildReturnType](#usemanagedchildreturntype), [UseHasCurrentFocusParameters](#usehascurrentfocusparameters), [UsePressParameters](#usepressparameters)</small>
+<small>`extends` [`UseRefElementReturnType`](#userefelementreturntype), [`UseRovingTabIndexChildReturnType`](#userovingtabindexchildreturntype), [`UseTextContentReturnType`](#usetextcontentreturntype), [`UseHasCurrentFocusReturnType`](#usehascurrentfocusreturntype), [`UseManagedChildReturnType`](#usemanagedchildreturntype), [`UseHasCurrentFocusParameters`](#usehascurrentfocusparameters), [`UsePressParameters`](#usepressparameters)</small>
 
 |Member|Type|Description|
 |---------|----|-----------|
@@ -470,7 +470,7 @@ Combines dismissal hooks and focus trap hooks into one. Use for dialogs, menus, 
 
 #### UseModalParameters
 
-<small>extends [UseEscapeDismissParameters](#useescapedismissparameters), [UseDismissParameters](#usedismissparameters), [UseFocusTrapParameters](#usefocustrapparameters), [UseRefElementReturnType](#userefelementreturntype)</small>
+<small>`extends` [`UseEscapeDismissParameters`](#useescapedismissparameters), [`UseDismissParameters`](#usedismissparameters), [`UseFocusTrapParameters`](#usefocustrapparameters), [`UseRefElementReturnType`](#userefelementreturntype)</small>
 
 Every member of `UseModalParameters` is inherited (see the interfaces it `extends` from).
 
@@ -478,7 +478,7 @@ Every member of `UseModalParameters` is inherited (see the interfaces it `extend
 
 #### UseModalReturnType
 
-<small>extends [UseDismissReturnType](#usedismissreturntype)</small>
+<small>`extends` [`UseDismissReturnType`](#usedismissreturntype)</small>
 
 |Member|Type|Description|
 |---------|----|-----------|
@@ -548,7 +548,7 @@ const onInput = pending? null : syncHandler;
 
 ### UseAsyncHandlerParameters
 
-<small>extends [UseAsyncParameters](#useasyncparameters)</small>
+<small>`extends` [`UseAsyncParameters`](#useasyncparameters)</small>
 
 |Member|Type|Description|
 |---------|----|-----------|
@@ -569,22 +569,22 @@ Measures an element, allowing you to react to its changes in size.
 
 #### UseElementSizeParameters
 
-<small>extends [UseRefElementParameters](#userefelementparameters)</small>
+<small>`extends` [`UseRefElementParameters`](#userefelementparameters)</small>
 
 |Member|Type|Description|
 |---------|----|-----------|
 |.getObserveBox|`null \| (() => ResizeObserverOptions["box"])`|Passed as an argument to the created ResizeObserver.<br />**See also**: https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver/observe#parameters|
-|.onSizeChange|`(sizeInfo?: ElementSize, prevSize?: ElementSize | undefined, entries?: ResizeObserverEntry[] | UIEvent) => void`|Called any time the browser detects a size change on the element. Does not need to be stable, so you can pass an anonymous function that only sets the values you use if you'd like.|
+|.onSizeChange|`(sizeInfo?: ElementSize, prevSize?: ElementSize \| undefined, entries?: ResizeObserverEntry[] \| UIEvent) => void`|Called any time the browser detects a size change on the element. Does not need to be stable, so you can pass an anonymous function that only sets the values you use if you'd like.|
 
 
 
 #### UseElementSizeReturnType
 
-<small>extends [UseRefElementReturnType](#userefelementreturntype)</small>
+<small>`extends` [`UseRefElementReturnType`](#userefelementreturntype)</small>
 
 |Member|Type|Description|
 |---------|----|-----------|
-|.getSize|`() => ElementSize | null`|**STABLE**|
+|.getSize|`() => ElementSize \| null`|**STABLE**|
 
 
 <hr />
@@ -639,7 +639,7 @@ Allows monitoring whether the rendered element is or is not focused directly (i.
 
 #### UseHasCurrentFocusParameters
 
-<small>extends [UseRefElementReturnType](#userefelementreturntype)</small>
+<small>`extends` [`UseRefElementReturnType`](#userefelementreturntype)</small>
 
 |Member|Type|Description|
 |---------|----|-----------|
@@ -674,7 +674,7 @@ Allows monitoring whichever element is/was focused most recently, regardless of 
 
 #### UseHasLastFocusParameters
 
-<small>extends [UseActiveElementParameters](#useactiveelementparameters), [UseRefElementReturnType](#userefelementreturntype)</small>
+<small>`extends` [`UseActiveElementParameters`](#useactiveelementparameters), [`UseRefElementReturnType`](#userefelementreturntype)</small>
 
 |Member|Type|Description|
 |---------|----|-----------|
@@ -685,7 +685,7 @@ Allows monitoring whichever element is/was focused most recently, regardless of 
 
 #### UseHasLastFocusReturnType
 
-<small>extends [UseActiveElementReturnType](#useactiveelementreturntype)</small>
+<small>`extends` [`UseActiveElementReturnType`](#useactiveelementreturntype)</small>
 
 |Member|Type|Description|
 |---------|----|-----------|
@@ -743,7 +743,7 @@ I.E. you can use this without needing a parent `<div>` to listen for a `focusout
 
 #### UseChildrenHaveFocusChildReturnType
 
-<small>extends [UseRefElementReturnType](#userefelementreturntype), [UseHasCurrentFocusParameters](#usehascurrentfocusparameters)</small>
+<small>`extends` [`UseRefElementReturnType`](#userefelementreturntype), [`UseHasCurrentFocusParameters`](#usehascurrentfocusparameters)</small>
 
 Every member of `UseChildrenHaveFocusChildReturnType` is inherited (see the interfaces it `extends` from).
 
@@ -799,8 +799,8 @@ While `useRandomId` allows the referencer to use the source's ID, sometimes you 
 
 |Member|Type|Description|
 |---------|----|-----------|
-|randomIdInputParameters|UseRandomIdParameters["randomIdParameters"];| |
-|randomIdLabelParameters|UseRandomIdParameters["randomIdParameters"];| |
+|randomIdInputParameters|`UseRandomIdParameters["randomIdParameters"];`| |
+|randomIdLabelParameters|`UseRandomIdParameters["randomIdParameters"];`| |
 
 
 
@@ -810,8 +810,8 @@ While `useRandomId` allows the referencer to use the source's ID, sometimes you 
 
 |Member|Type|Description|
 |---------|----|-----------|
-|randomIdInputReturn|UseRandomIdReturnType<InputElement, LabelElement>["randomIdReturn"];| |
-|randomIdLabelReturn|UseRandomIdReturnType<LabelElement, InputElement>["randomIdReturn"];| |
+|randomIdInputReturn|`UseRandomIdReturnType<InputElement, LabelElement>["randomIdReturn"];`| |
+|randomIdLabelReturn|`UseRandomIdReturnType<LabelElement, InputElement>["randomIdReturn"];`| |
 |propsInput|HTML props|Spread these props onto the HTML element that will use this logic.|
 |propsLabel|HTML props|Spread these props onto the HTML element that will use this logic.|
 
@@ -891,7 +891,7 @@ Effectively just a wrapper around a `MutationObserver`.
 
 #### UseMutationObserverParameters
 
-<small>extends [UseRefElementParameters](#userefelementparameters)</small>
+<small>`extends` [`UseRefElementParameters`](#userefelementparameters)</small>
 
 |Member|Type|Description|
 |---------|----|-----------|
@@ -907,7 +907,7 @@ Effectively just a wrapper around a `MutationObserver`.
 
 #### UseMutationObserverReturnType
 
-<small>extends [UseRefElementReturnType](#userefelementreturntype)</small>
+<small>`extends` [`UseRefElementReturnType`](#userefelementreturntype)</small>
 
 Every member of `UseMutationObserverReturnType` is inherited (see the interface it `extends` from).
 
@@ -923,11 +923,11 @@ Every member of `UseMutationObserverReturnType` is inherited (see the interface 
 
 #### UseTextContentParameters
 
-<small>extends [UseRefElementReturnType](#userefelementreturntype)</small>
+<small>`extends` [`UseRefElementReturnType`](#userefelementreturntype)</small>
 
 |Member|Type|Description|
 |---------|----|-----------|
-|.getText|`(e?: E | null) => string | null`|Return the text content of this component. By default, `e => e.textContent` is probably what you want.|
+|.getText|`(e?: E \| null) => string \| null`|Return the text content of this component. By default, `e => e.textContent` is probably what you want.|
 |.onTextContentChange|`OnPassiveStateChange<string \| null, never>`|During `useEffect`, this is called if the text content of the rendered element has changed.<br />**See also**: [useMutationObserver](#usemutationobserver) for a more robust implementation of this idea|
 
 
@@ -954,7 +954,7 @@ Allows controlling an element's `class`, `style`, etc. with functions like `setS
 
 #### UseImperativePropsParameters
 
-<small>extends [UseRefElementReturnType](#userefelementreturntype)</small>
+<small>`extends` [`UseRefElementReturnType`](#userefelementreturntype)</small>
 
 Every member of `UseImperativePropsParameters` is inherited (see the interface it `extends` from).
 
@@ -970,11 +970,11 @@ Every member of `UseImperativePropsParameters` is inherited (see the interface i
 |.dangerouslySetInnerHTML|`(html?: string) => void`|Sets the element's `innerHTML`|
 |.getAttribute|`(prop?: K) => ElementProps<T>[K]`|Returns the current value of the attribute on the element|
 |.hasClass|`(cls?: string) => boolean`|Returns whether the element currently has the current CSS class|
-|.setAttribute|`(prop?: K, value?: ElementProps<T>[K] | null) => void`|Applies the given attribute to the element|
-|.setChildren|`(children?: string | null) => void`|Sets the element's `textContent`|
+|.setAttribute|`(prop?: K, value?: ElementProps<T>[K] \| null) => void`|Applies the given attribute to the element|
+|.setChildren|`(children?: string \| null) => void`|Sets the element's `textContent`|
 |.setClass|`(cls?: string, enabled?: boolean) => void`|Applies or removes the given CSS class to the element|
-|.setEventHandler|`(type?: K, listener?: null | ((this: HTMLElement, ev: HTMLElementEventMap[K]) => void), options?: AddEventListenerOptions) => void`||
-|.setStyle|`(prop?: K, value?: CSSProperties[K] | null) => void`|Applies the given CSS style to the element|
+|.setEventHandler|`(type?: K, listener?: null \| ((this: HTMLElement, ev: HTMLElementEventMap[K]) => void), options?: AddEventListenerOptions) => void`||
+|.setStyle|`(prop?: K, value?: CSSProperties[K] \| null) => void`|Applies the given CSS style to the element|
 |props|HTML props|Spread these props onto the HTML element that will use this logic.|
 
 If the component is re-rendered after the element is modified in some way, those changes are remembered and included in the returned `props` that are meant to be spread to the element in question.
@@ -1521,7 +1521,7 @@ This hook is designed to be lightweight, in that the parent keeps no state and r
 |Member|Type|Description|
 |---------|----|-----------|
 |context|``UseManagedChildrenContext<M> \| null``|Functions and data that the parent has made available to each child. Retrieve it with `useContext`|
-|info|``Pick<M, InfoParameterKeys>``|Data the child makes available to the parent. Passed to `useManagedChild`|
+|info|`Pick<M, InfoParameterKeys>`|Data the child makes available to the parent. Passed to `useManagedChild`|
 
 
 
@@ -1548,7 +1548,7 @@ Implements proper keyboard navigation for components like listboxes, button grou
 
 #### UseListNavigationParameters
 
-<small>extends [UseRovingTabIndexParameters](#userovingtabindexparameters), [UseManagedChildrenParameters](#usemanagedchildrenparameters), [UseTypeaheadNavigationParameters](#usetypeaheadnavigationparameters), [UseLinearNavigationParameters](#uselinearnavigationparameters), [UseManagedChildrenReturnType](#usemanagedchildrenreturntype), [UseRefElementReturnType](#userefelementreturntype), [UseRovingTabIndexReturnType](#userovingtabindexreturntype)</small>
+<small>`extends` [`UseRovingTabIndexParameters`](#userovingtabindexparameters), [`UseManagedChildrenParameters`](#usemanagedchildrenparameters), [`UseTypeaheadNavigationParameters`](#usetypeaheadnavigationparameters), [`UseLinearNavigationParameters`](#uselinearnavigationparameters), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseRefElementReturnType`](#userefelementreturntype), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype)</small>
 
 Every member of `UseListNavigationParameters` is inherited (see the interfaces it `extends` from).
 
@@ -1556,7 +1556,7 @@ Every member of `UseListNavigationParameters` is inherited (see the interfaces i
 
 #### UseListNavigationReturnType
 
-<small>extends [UseRovingTabIndexReturnType](#userovingtabindexreturntype), [UseTypeaheadNavigationReturnType](#usetypeaheadnavigationreturntype), [UseLinearNavigationReturnType](#uselinearnavigationreturntype), [UseManagedChildrenParameters](#usemanagedchildrenparameters)</small>
+<small>`extends` [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype), [`UseTypeaheadNavigationReturnType`](#usetypeaheadnavigationreturntype), [`UseLinearNavigationReturnType`](#uselinearnavigationreturntype), [`UseManagedChildrenParameters`](#usemanagedchildrenparameters)</small>
 
 |Member|Type|Description|
 |---------|----|-----------|
@@ -1574,7 +1574,7 @@ In the document order, there will be only one "focused" or "tabbable" element, m
 
 #### UseListNavigationChildParameters
 
-<small>extends [UseManagedChildParameters](#usemanagedchildparameters), [UseRovingTabIndexChildInfoKeysParameters](#userovingtabindexchildinfokeysparameters), [UseRovingTabIndexChildParameters](#userovingtabindexchildparameters), [UseTextContentParameters](#usetextcontentparameters), [UseTypeaheadNavigationChildParameters](#usetypeaheadnavigationchildparameters), [UseRefElementReturnType](#userefelementreturntype)</small>
+<small>`extends` [`UseManagedChildParameters`](#usemanagedchildparameters), [`UseRovingTabIndexChildInfoKeysParameters`](#userovingtabindexchildinfokeysparameters), [`UseRovingTabIndexChildParameters`](#userovingtabindexchildparameters), [`UseTextContentParameters`](#usetextcontentparameters), [`UseTypeaheadNavigationChildParameters`](#usetypeaheadnavigationchildparameters), [`UseRefElementReturnType`](#userefelementreturntype)</small>
 
 |Member|Type|Description|
 |---------|----|-----------|
@@ -1584,7 +1584,7 @@ In the document order, there will be only one "focused" or "tabbable" element, m
 
 #### UseListNavigationChildReturnType
 
-<small>extends [UseRefElementReturnType](#userefelementreturntype), [UseRovingTabIndexChildReturnType](#userovingtabindexchildreturntype), [UseTextContentReturnType](#usetextcontentreturntype), [UseHasCurrentFocusParameters](#usehascurrentfocusparameters), [UsePressParameters](#usepressparameters)</small>
+<small>`extends` [`UseRefElementReturnType`](#userefelementreturntype), [`UseRovingTabIndexChildReturnType`](#userovingtabindexchildreturntype), [`UseTextContentReturnType`](#usetextcontentreturntype), [`UseHasCurrentFocusParameters`](#usehascurrentfocusparameters), [`UsePressParameters`](#usepressparameters)</small>
 
 Every member of `UseListNavigationChildReturnType` is inherited (see the interfaces it `extends` from).
 
@@ -1603,7 +1603,7 @@ Implements 2-dimensional grid-based keyboard navigation, similarly to [useListNa
 
 #### UseGridNavigationParameters
 
-<small>extends [UseRovingTabIndexParameters](#userovingtabindexparameters), [UseManagedChildrenParameters](#usemanagedchildrenparameters), [UseTypeaheadNavigationParameters](#usetypeaheadnavigationparameters), [UseLinearNavigationParameters](#uselinearnavigationparameters), [UseManagedChildrenReturnType](#usemanagedchildrenreturntype), [UseRefElementReturnType](#userefelementreturntype), [UseRovingTabIndexReturnType](#userovingtabindexreturntype)</small>
+<small>`extends` [`UseRovingTabIndexParameters`](#userovingtabindexparameters), [`UseManagedChildrenParameters`](#usemanagedchildrenparameters), [`UseTypeaheadNavigationParameters`](#usetypeaheadnavigationparameters), [`UseLinearNavigationParameters`](#uselinearnavigationparameters), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseRefElementReturnType`](#userefelementreturntype), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype)</small>
 
 |Member|Type|Description|
 |---------|----|-----------|
@@ -1613,7 +1613,7 @@ Implements 2-dimensional grid-based keyboard navigation, similarly to [useListNa
 
 #### UseGridNavigationReturnType
 
-<small>extends [UseRovingTabIndexReturnType](#userovingtabindexreturntype), [UseTypeaheadNavigationReturnType](#usetypeaheadnavigationreturntype), [UseLinearNavigationReturnType](#uselinearnavigationreturntype), [UseListNavigationReturnType](#uselistnavigationreturntype), [UseManagedChildrenParameters](#usemanagedchildrenparameters)</small>
+<small>`extends` [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype), [`UseTypeaheadNavigationReturnType`](#usetypeaheadnavigationreturntype), [`UseLinearNavigationReturnType`](#uselinearnavigationreturntype), [`UseListNavigationReturnType`](#uselistnavigationreturntype), [`UseManagedChildrenParameters`](#usemanagedchildrenparameters)</small>
 
 |Member|Type|Description|
 |---------|----|-----------|
@@ -1640,7 +1640,7 @@ As a row, this hook is responsible for both being a **child** of list navigation
 
 #### UseGridNavigationRowParameters
 
-<small>extends [UseManagedChildParameters](#usemanagedchildparameters), [UseRovingTabIndexChildInfoKeysParameters](#userovingtabindexchildinfokeysparameters), [UseRovingTabIndexChildParameters](#userovingtabindexchildparameters), [UseTextContentParameters](#usetextcontentparameters), [UseTypeaheadNavigationChildParameters](#usetypeaheadnavigationchildparameters), [UseListNavigationChildParameters](#uselistnavigationchildparameters), [UseRovingTabIndexParameters](#userovingtabindexparameters), [UseManagedChildrenParameters](#usemanagedchildrenparameters), [UseTypeaheadNavigationParameters](#usetypeaheadnavigationparameters), [UseLinearNavigationParameters](#uselinearnavigationparameters), [UseRefElementReturnType](#userefelementreturntype), [UseManagedChildrenReturnType](#usemanagedchildrenreturntype), [UseRovingTabIndexReturnType](#userovingtabindexreturntype)</small>
+<small>`extends` [`UseManagedChildParameters`](#usemanagedchildparameters), [`UseRovingTabIndexChildInfoKeysParameters`](#userovingtabindexchildinfokeysparameters), [`UseRovingTabIndexChildParameters`](#userovingtabindexchildparameters), [`UseTextContentParameters`](#usetextcontentparameters), [`UseTypeaheadNavigationChildParameters`](#usetypeaheadnavigationchildparameters), [`UseListNavigationChildParameters`](#uselistnavigationchildparameters), [`UseRovingTabIndexParameters`](#userovingtabindexparameters), [`UseManagedChildrenParameters`](#usemanagedchildrenparameters), [`UseTypeaheadNavigationParameters`](#usetypeaheadnavigationparameters), [`UseLinearNavigationParameters`](#uselinearnavigationparameters), [`UseRefElementReturnType`](#userefelementreturntype), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype)</small>
 
 |Member|Type|Description|
 |---------|----|-----------|
@@ -1650,12 +1650,12 @@ As a row, this hook is responsible for both being a **child** of list navigation
 
 #### UseGridNavigationRowReturnType
 
-<small>extends [UseRefElementReturnType](#userefelementreturntype), [UseRovingTabIndexChildReturnType](#userovingtabindexchildreturntype), [UseTextContentReturnType](#usetextcontentreturntype), [UseRovingTabIndexReturnType](#userovingtabindexreturntype), [UseTypeaheadNavigationReturnType](#usetypeaheadnavigationreturntype), [UseLinearNavigationReturnType](#uselinearnavigationreturntype), [UseListNavigationReturnType](#uselistnavigationreturntype), [UseHasCurrentFocusParameters](#usehascurrentfocusparameters), [UsePressParameters](#usepressparameters), [UseManagedChildrenParameters](#usemanagedchildrenparameters)</small>
+<small>`extends` [`UseRefElementReturnType`](#userefelementreturntype), [`UseRovingTabIndexChildReturnType`](#userovingtabindexchildreturntype), [`UseTextContentReturnType`](#usetextcontentreturntype), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype), [`UseTypeaheadNavigationReturnType`](#usetypeaheadnavigationreturntype), [`UseLinearNavigationReturnType`](#uselinearnavigationreturntype), [`UseListNavigationReturnType`](#uselistnavigationreturntype), [`UseHasCurrentFocusParameters`](#usehascurrentfocusparameters), [`UsePressParameters`](#usepressparameters), [`UseManagedChildrenParameters`](#usemanagedchildrenparameters)</small>
 
 |Member|Type|Description|
 |---------|----|-----------|
 |context|``UseGridNavigationCellContext``|Functions and data that the parent is making available to each child. Put it in your own `Context` from `createContext`|
-|info|``Pick<RM, UseRovingTabIndexChildInfoKeysReturnType \| "focusSelf">``|Data the child makes available to the parent. Passed to `useManagedChild`|
+|info|`Pick<RM, UseRovingTabIndexChildInfoKeysReturnType \| "focusSelf">`|Data the child makes available to the parent. Passed to `useManagedChild`|
 
 
 
@@ -1667,7 +1667,7 @@ Child hook for [useGridNavigationRow](#usegridnavigationrow) (and [useGridNaviga
 
 #### UseGridNavigationCellParameters
 
-<small>extends [UseManagedChildParameters](#usemanagedchildparameters), [UseRovingTabIndexChildInfoKeysParameters](#userovingtabindexchildinfokeysparameters), [UseRovingTabIndexChildParameters](#userovingtabindexchildparameters), [UseTextContentParameters](#usetextcontentparameters), [UseTypeaheadNavigationChildParameters](#usetypeaheadnavigationchildparameters), [UseListNavigationChildParameters](#uselistnavigationchildparameters), [UseRefElementReturnType](#userefelementreturntype)</small>
+<small>`extends` [`UseManagedChildParameters`](#usemanagedchildparameters), [`UseRovingTabIndexChildInfoKeysParameters`](#userovingtabindexchildinfokeysparameters), [`UseRovingTabIndexChildParameters`](#userovingtabindexchildparameters), [`UseTextContentParameters`](#usetextcontentparameters), [`UseTypeaheadNavigationChildParameters`](#usetypeaheadnavigationchildparameters), [`UseListNavigationChildParameters`](#uselistnavigationchildparameters), [`UseRefElementReturnType`](#userefelementreturntype)</small>
 
 |Member|Type|Description|
 |---------|----|-----------|
@@ -1678,7 +1678,7 @@ Child hook for [useGridNavigationRow](#usegridnavigationrow) (and [useGridNaviga
 
 #### UseGridNavigationCellReturnType
 
-<small>extends [UseRefElementReturnType](#userefelementreturntype), [UseRovingTabIndexChildReturnType](#userovingtabindexchildreturntype), [UseTextContentReturnType](#usetextcontentreturntype), [UseHasCurrentFocusParameters](#usehascurrentfocusparameters), [UsePressParameters](#usepressparameters)</small>
+<small>`extends` [`UseRefElementReturnType`](#userefelementreturntype), [`UseRovingTabIndexChildReturnType`](#userovingtabindexchildreturntype), [`UseTextContentReturnType`](#usetextcontentreturntype), [`UseHasCurrentFocusParameters`](#usehascurrentfocusparameters), [`UsePressParameters`](#usepressparameters)</small>
 
 Every member of `UseGridNavigationCellReturnType` is inherited (see the interfaces it `extends` from).
 
@@ -1697,11 +1697,11 @@ Implements a roving tabindex system where only one "focusable" component in a se
 
 #### UseRovingTabIndexParameters
 
-<small>extends [UseManagedChildrenReturnType](#usemanagedchildrenreturntype), [UseRefElementReturnType](#userefelementreturntype)</small>
+<small>`extends` [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseRefElementReturnType`](#userefelementreturntype)</small>
 
 |Member|Type|Description|
 |---------|----|-----------|
-|.focusSelfParent|`(e?: ParentElement | null) => void`|When `untabbable` is true, instead of a child focusing itself, the parent will via this `focusSelf` argument.|
+|.focusSelfParent|`(e?: ParentElement \| null) => void`|When `untabbable` is true, instead of a child focusing itself, the parent will via this `focusSelf` argument.|
 |.initiallyTabbedIndex|`number \| null`|This is imperative, not declarative; it is better if we can keep re-renders on the parent to a minimum anyway.<br />You can manually control this with `onTabbableIndexChange` and `setTabbableIndex` if you need.|
 |.onTabbableIndexChange?|`Nullable<OnPassiveStateChange<number \| null, Event>>`|If you would like to have an event run whenever a new index becomes tabbable (e.g. to call `setState` to render that tabbable index...for some reason...) you can do that here.<br />**MUST** be stable!|
 |.untabbable|`boolean`|When true, none of the children will be tabbable, as if the entire component is hidden.<br />This does not actually change the currently tabbable index; if this is set to `false`, the last tabbable child is remembered.|
@@ -1711,7 +1711,7 @@ Implements a roving tabindex system where only one "focusable" component in a se
 
 #### UseRovingTabIndexReturnType
 
-<small>extends [UseManagedChildrenParameters](#usemanagedchildrenparameters)</small>
+<small>`extends` [`UseManagedChildrenParameters`](#usemanagedchildrenparameters)</small>
 
 |Member|Type|Description|
 |---------|----|-----------|
@@ -1733,7 +1733,7 @@ Implements a roving tabindex system where only one "focusable" component in a se
 
 #### UseRovingTabIndexChildParameters
 
-<small>extends [UseManagedChildParameters](#usemanagedchildparameters), [UseRovingTabIndexChildInfoKeysParameters](#userovingtabindexchildinfokeysparameters), [UseRefElementReturnType](#userefelementreturntype)</small>
+<small>`extends` [`UseManagedChildParameters`](#usemanagedchildparameters), [`UseRovingTabIndexChildInfoKeysParameters`](#userovingtabindexchildinfokeysparameters), [`UseRefElementReturnType`](#userefelementreturntype)</small>
 
 |Member|Type|Description|
 |---------|----|-----------|
@@ -1743,13 +1743,13 @@ Implements a roving tabindex system where only one "focusable" component in a se
 
 #### UseRovingTabIndexChildReturnType
 
-<small>extends [UseRefElementReturnType](#userefelementreturntype), [UseHasCurrentFocusParameters](#usehascurrentfocusparameters)</small>
+<small>`extends` [`UseRefElementReturnType`](#userefelementreturntype), [`UseHasCurrentFocusParameters`](#usehascurrentfocusparameters)</small>
 
 |Member|Type|Description|
 |---------|----|-----------|
 |.getTabbable|`() => boolean`|**STABLE**|
 |.tabbable|`boolean`|*Unstable*<br />Whether this child, individually, is *the* currently tabbable child.|
-|info|``Pick<M, UseRovingTabIndexChildInfoKeysReturnType>``|Data the child makes available to the parent. Passed to `useManagedChild`|
+|info|`Pick<M, UseRovingTabIndexChildInfoKeysReturnType>`|Data the child makes available to the parent. Passed to `useManagedChild`|
 |props|HTML props|Spread these props onto the HTML element that will use this logic.|
 
 
@@ -1769,7 +1769,7 @@ When used in tandem with `useRovingTabIndex`, allows control of the tabbable ind
 
 #### UseLinearNavigationParameters
 
-<small>extends [UseManagedChildrenParameters](#usemanagedchildrenparameters), [UseRovingTabIndexReturnType](#userovingtabindexreturntype)</small>
+<small>`extends` [`UseManagedChildrenParameters`](#usemanagedchildrenparameters), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype)</small>
 
 |Member|Type|Description|
 |---------|----|-----------|
@@ -1819,7 +1819,7 @@ Allows for the selection of a managed child by typing the given text associated 
 
 #### UseTypeaheadNavigationParameters
 
-<small>extends [UseManagedChildrenParameters](#usemanagedchildrenparameters), [UseRovingTabIndexReturnType](#userovingtabindexreturntype)</small>
+<small>`extends` [`UseManagedChildrenParameters`](#usemanagedchildrenparameters), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype)</small>
 
 |Member|Type|Description|
 |---------|----|-----------|
@@ -1837,7 +1837,7 @@ Allows for the selection of a managed child by typing the given text associated 
 
 |Member|Type|Description|
 |---------|----|-----------|
-|.getCurrentTypeahead|`() => string | null`|Returns the string currently typed by the user. Stable, but cannot be called during render.|
+|.getCurrentTypeahead|`() => string \| null`|Returns the string currently typed by the user. Stable, but cannot be called during render.|
 |.typeaheadStatus|`"invalid" \| "valid" \| "none"`|What the current status of the user's input is:<br />* `"none"`: Typeahead is not in progress; the user has not typed anything (or has not for the given timeout period). * `"valid"`: The string the user has typed so far corresponds to at least one child * `"invalid"`: The string the user has typed so does not correspond to any child|
 |context|``UseTypeaheadNavigationContext``|Functions and data that the parent is making available to each child. Put it in your own `Context` from `createContext`|
 |propsStable|HTML props|Spread these props onto the HTML element that will use this logic.|
@@ -1850,18 +1850,18 @@ Allows for the selection of a managed child by typing the given text associated 
 
 #### UseTypeaheadNavigationChildParameters
 
-<small>extends [UseTextContentParameters](#usetextcontentparameters), [UseRefElementReturnType](#userefelementreturntype)</small>
+<small>`extends` [`UseTextContentParameters`](#usetextcontentparameters), [`UseRefElementReturnType`](#userefelementreturntype)</small>
 
 |Member|Type|Description|
 |---------|----|-----------|
 |context|``UseTypeaheadNavigationContext``|Functions and data that the parent has made available to each child. Retrieve it with `useContext`|
-|info|``Pick<M, "index">``|Data the child makes available to the parent. Passed to `useManagedChild`|
+|info|`Pick<M, "index">`|Data the child makes available to the parent. Passed to `useManagedChild`|
 
 
 
 #### UseTypeaheadNavigationChildReturnType
 
-<small>extends [UseTextContentReturnType](#usetextcontentreturntype), [UseRefElementReturnType](#userefelementreturntype), [UsePressParameters](#usepressparameters)</small>
+<small>`extends` [`UseTextContentReturnType`](#usetextcontentreturntype), [`UseRefElementReturnType`](#userefelementreturntype), [`UsePressParameters`](#usepressparameters)</small>
 
 Every member of `UseTypeaheadNavigationChildReturnType` is inherited (see the interfaces it `extends` from).
 
@@ -1878,7 +1878,7 @@ Every member of `UseTypeaheadNavigationChildReturnType` is inherited (see the in
 
 #### UseSingleSelectionParameters
 
-<small>extends [UseManagedChildrenParameters](#usemanagedchildrenparameters), [UseManagedChildrenReturnType](#usemanagedchildrenreturntype), [UseRovingTabIndexReturnType](#userovingtabindexreturntype)</small>
+<small>`extends` [`UseManagedChildrenParameters`](#usemanagedchildrenparameters), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype)</small>
 
 |Member|Type|Description|
 |---------|----|-----------|
@@ -1891,12 +1891,12 @@ Every member of `UseTypeaheadNavigationChildReturnType` is inherited (see the in
 
 #### UseSingleSelectionReturnType
 
-<small>extends [UseChildrenHaveFocusParameters](#usechildrenhavefocusparameters)</small>
+<small>`extends` [`UseChildrenHaveFocusParameters`](#usechildrenhavefocusparameters)</small>
 
 |Member|Type|Description|
 |---------|----|-----------|
 |.changeSelectedIndex|`PassiveStateUpdater<number \| null, Event>`|A function that, when called, internally updates the selected index to the one you provide, and tells the relevant children that they are/are not selected.<br />If you are creating an imperative component, this is what how you can force the value to change in response to something.<br />If you are creating a declarative component, this is what you call in `useEffect` when your `selectedIndex` changes.|
-|.getSelectedIndex|`() => number | null`||
+|.getSelectedIndex|`() => number \| null`||
 |context|``UseSingleSelectionContext``|Functions and data that the parent is making available to each child. Put it in your own `Context` from `createContext`|
 
 
@@ -1912,13 +1912,13 @@ Every member of `UseTypeaheadNavigationChildReturnType` is inherited (see the in
 |Member|Type|Description|
 |---------|----|-----------|
 |context|``UseSingleSelectionContext``|Functions and data that the parent has made available to each child. Retrieve it with `useContext`|
-|info|``Pick<UseSingleSelectionChildInfo<E>, UseSingleSelectionChildInfoParameterKeys>``|Data the child makes available to the parent. Passed to `useManagedChild`|
+|info|`Pick<UseSingleSelectionChildInfo<E>, UseSingleSelectionChildInfoParameterKeys>`|Data the child makes available to the parent. Passed to `useManagedChild`|
 
 
 
 #### UseSingleSelectionChildReturnType
 
-<small>extends [UseRefElementReturnType](#userefelementreturntype), [UseHasCurrentFocusParameters](#usehascurrentfocusparameters)</small>
+<small>`extends` [`UseRefElementReturnType`](#userefelementreturntype), [`UseHasCurrentFocusParameters`](#usehascurrentfocusparameters)</small>
 
 |Member|Type|Description|
 |---------|----|-----------|
@@ -1926,7 +1926,7 @@ Every member of `UseTypeaheadNavigationChildReturnType` is inherited (see the in
 |.getSelectedOffset|`() => (number \| null)`|**See also**: selectedOffset|
 |.selected|`boolean`|Is this child currently the selected child among all its siblings?|
 |.selectedOffset|`Nullable<number>`|Any time `selected` changes to or from being visible, this will represent the direction and magnitude of the change.<br />It will never be zero; when `selected` is `true`, then this will be the most recently-used offset.<br />This useful for things like animations or transitions.|
-|info|``Pick<UseSingleSelectionChildInfo<E>, UseSingleSelectionChildInfoReturnKeys>``|Data the child makes available to the parent. Passed to `useManagedChild`|
+|info|`Pick<UseSingleSelectionChildInfo<E>, UseSingleSelectionChildInfoReturnKeys>`|Data the child makes available to the parent. Passed to `useManagedChild`|
 |props|HTML props|Spread these props onto the HTML element that will use this logic.|
 
 
@@ -1944,7 +1944,7 @@ Hook that allows for the **direct descendant** children of this component to be 
 
 #### UseRearrangeableChildrenParameters
 
-<small>extends [UseManagedChildrenReturnType](#usemanagedchildrenreturntype)</small>
+<small>`extends` [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype)</small>
 
 |Member|Type|Description|
 |---------|----|-----------|
@@ -1991,7 +1991,7 @@ Hook that allows for the **direct descendant** children of this component to be 
 
 #### UseSortableChildrenParameters
 
-<small>extends [UseRearrangeableChildrenParameters](#userearrangeablechildrenparameters), [UseManagedChildrenReturnType](#usemanagedchildrenreturntype)</small>
+<small>`extends` [`UseRearrangeableChildrenParameters`](#userearrangeablechildrenparameters), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype)</small>
 
 |Member|Type|Description|
 |---------|----|-----------|
@@ -2001,7 +2001,7 @@ Hook that allows for the **direct descendant** children of this component to be 
 
 #### UseSortableChildrenReturnType
 
-<small>extends [UseRearrangeableChildrenReturnType](#userearrangeablechildrenreturntype)</small>
+<small>`extends` [`UseRearrangeableChildrenReturnType`](#userearrangeablechildrenreturntype)</small>
 
 |Member|Type|Description|
 |---------|----|-----------|
@@ -2031,7 +2031,7 @@ Allows children to stop themselves from rendering outside of a narrow range.
 
 #### UsePaginatedChildrenParameters
 
-<small>extends [UseManagedChildrenParameters](#usemanagedchildrenparameters), [UseLinearNavigationParameters](#uselinearnavigationparameters), [UseManagedChildrenReturnType](#usemanagedchildrenreturntype), [UseRovingTabIndexReturnType](#userovingtabindexreturntype), [UseRefElementReturnType](#userefelementreturntype)</small>
+<small>`extends` [`UseManagedChildrenParameters`](#usemanagedchildrenparameters), [`UseLinearNavigationParameters`](#uselinearnavigationparameters), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype), [`UseRefElementReturnType`](#userefelementreturntype)</small>
 
 |Member|Type|Description|
 |---------|----|-----------|
@@ -2042,7 +2042,7 @@ Allows children to stop themselves from rendering outside of a narrow range.
 
 #### UsePaginatedChildrenReturnType
 
-<small>extends [UseManagedChildrenParameters](#usemanagedchildrenparameters)</small>
+<small>`extends` [`UseManagedChildrenParameters`](#usemanagedchildrenparameters)</small>
 
 |Member|Type|Description|
 |---------|----|-----------|
@@ -2067,7 +2067,7 @@ Child hook for [usePaginatedChildren](#usepaginatedchildren).
 |Member|Type|Description|
 |---------|----|-----------|
 |context|``UsePaginatedChildContext``|Functions and data that the parent has made available to each child. Retrieve it with `useContext`|
-|info|``{<br />        index: number;<br />    }``|Data the child makes available to the parent. Passed to `useManagedChild`|
+|info|`{<br />        index: number;<br />    }`|Data the child makes available to the parent. Passed to `useManagedChild`|
 
 
 
@@ -2080,7 +2080,7 @@ Child hook for [usePaginatedChildren](#usepaginatedchildren).
 |.hideBecausePaginated|`boolean`||
 |.paginatedVisible|`boolean`||
 |.parentIsPaginated|`boolean`||
-|info|``Pick<UsePaginatedChildrenInfo<ChildElement>, "setPaginationVisible" \| "setChildCountIfPaginated">``|Data the child makes available to the parent. Passed to `useManagedChild`|
+|info|`Pick<UsePaginatedChildrenInfo<ChildElement>, "setPaginationVisible" \| "setChildCountIfPaginated">`|Data the child makes available to the parent. Passed to `useManagedChild`|
 |props|HTML props|Spread these props onto the HTML element that will use this logic.|
 
 When a child is paginated, it still renders itself (i.e. it calls this hook, so it's rendering), so check `hideBecausePaginated` and, if it's true, avoid doing any heavy logic and render with `display: none`.
@@ -2100,7 +2100,7 @@ Allows children to each wait until the previous has finished rendering before it
 
 #### UseStaggeredChildrenParameters
 
-<small>extends [UseManagedChildrenReturnType](#usemanagedchildrenreturntype)</small>
+<small>`extends` [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype)</small>
 
 |Member|Type|Description|
 |---------|----|-----------|
@@ -2134,7 +2134,7 @@ Child hook for [useStaggeredChildren](#usestaggeredchildren).
 |Member|Type|Description|
 |---------|----|-----------|
 |context|``UseStaggeredChildContext``|Functions and data that the parent has made available to each child. Retrieve it with `useContext`|
-|info|``{<br />        index: number;<br />    }``|Data the child makes available to the parent. Passed to `useManagedChild`|
+|info|`{<br />        index: number;<br />    }`|Data the child makes available to the parent. Passed to `useManagedChild`|
 
 
 
@@ -2146,7 +2146,7 @@ Child hook for [useStaggeredChildren](#usestaggeredchildren).
 |---------|----|-----------|
 |.hideBecauseStaggered|`boolean`|If this is true, you should delay showing *your* children or running other heavy logic until this becomes false.<br />Can be as simple as `<div>{hideBecauseStaggered? null : children}</div>`|
 |.parentIsStaggered|`boolean`|Whether the parent has indicated that all of its children, including this one, are staggered.|
-|info|``Pick<UseStaggeredChildrenInfo<ChildElement>, "setStaggeredVisible">``|Data the child makes available to the parent. Passed to `useManagedChild`|
+|info|`Pick<UseStaggeredChildrenInfo<ChildElement>, "setStaggeredVisible">`|Data the child makes available to the parent. Passed to `useManagedChild`|
 |props|HTML props|Spread these props onto the HTML element that will use this logic.|
 
 When a child is staggered, it still renders itself (i.e. it calls this hook, so it's rendering), so check `hideBecauseStaggered` and, if it's true, avoid doing any heavy logic and render with `display: none`.
@@ -2166,7 +2166,7 @@ Combines all the methods a user can implicitly dismiss a popup component. See [u
 
 #### UseDismissParameters
 
-<small>extends [UseEscapeDismissParameters](#useescapedismissparameters)</small>
+<small>`extends` [`UseEscapeDismissParameters`](#useescapedismissparameters)</small>
 
 |Member|Type|Description|
 |---------|----|-----------|
@@ -2184,8 +2184,8 @@ Combines all the methods a user can implicitly dismiss a popup component. See [u
 
 |Member|Type|Description|
 |---------|----|-----------|
-|refElementPopupReturn|UseRefElementReturnType<PopupElement>["refElementReturn"];| |
-|refElementSourceReturn|UseRefElementReturnType<NonNullable<SourceElement>>["refElementReturn"];| |
+|refElementPopupReturn|`UseRefElementReturnType<PopupElement>["refElementReturn"];`| |
+|refElementSourceReturn|`UseRefElementReturnType<NonNullable<SourceElement>>["refElementReturn"];`| |
 |propsStablePopup|HTML props|Spread these props onto the HTML element that will use this logic.|
 |propsStableSource|HTML props|Spread these props onto the HTML element that will use this logic.|
 
@@ -2209,7 +2209,7 @@ Handles events for a backdrop on a modal dialog -- the kind where the user expec
 |---------|----|-----------|
 |.active|`boolean`|When `true`, `onDismiss` is eligible to be called. When `false`, it will not be called.|
 |.onDismiss|`EnhancedEventHandler<MouseEvent, {<br />        reason: "backdrop";<br />    }>`|Called when the component is dismissed by clicking outside of the element.|
-|refElementPopupReturn|Pick<UseRefElementReturnType<PopupElement>["refElementReturn"], "getElement">;| |
+|refElementPopupReturn|`Pick<UseRefElementReturnType<PopupElement>["refElementReturn"], "getElement">;`| |
 
 **Returns**: void
 
@@ -2235,7 +2235,7 @@ Invokes a callback when the `Escape` key is pressed on the topmost component (a 
 |.getWindow|`() => Window`|The escape key event handler is attached onto the window, so we need to know which window.<br />The returned `Window` should not change throughout the lifetime of the component (i.e. the element in question must not switch to another window via some means, which might not even be possible).|
 |.onDismiss|`EnhancedEventHandler<KeyboardEvent, {<br />        reason: "escape";<br />    }>`|Called when the component is dismissed by pressing the `Escape` key.|
 |.parentDepth|`number`|Get this from context somewhere, and increment it in that context.<br />If multiple instances of Preact are on the page, tree depth is used as a tiebreaker|
-|refElementPopupReturn|Pick<UseRefElementReturnType<PopupElement>["refElementReturn"], "getElement">;| |
+|refElementPopupReturn|`Pick<UseRefElementReturnType<PopupElement>["refElementReturn"], "getElement">;`| |
 
 **Returns**: void
 
@@ -2263,14 +2263,14 @@ Invokes a callback when focus travels outside of the component's element.
 |---------|----|-----------|
 |.active|`boolean`|When `true`, `onDismiss` is eligible to be called. When `false`, it will not be called.|
 |.onDismiss|`EnhancedEventHandler<FocusEventType<any>, {<br />        reason: "lost-focus";<br />    }>`|Called when the component is dismissed by losing focus|
-|refElementPopupReturn|Pick<UseRefElementReturnType<PopupElement>["refElementReturn"], "getElement">;| |
-|refElementSourceReturn|Nullable<Pick<UseRefElementReturnType<NonNullable<SourceElement>>["refElementReturn"], "getElement">>;| |
+|refElementPopupReturn|`Pick<UseRefElementReturnType<PopupElement>["refElementReturn"], "getElement">;`| |
+|refElementSourceReturn|`Nullable<Pick<UseRefElementReturnType<NonNullable<SourceElement>>["refElementReturn"], "getElement">>;`| |
 
 
 
 #### UseLostFocusDismissReturnType
 
-<small>extends [UseActiveElementParameters](#useactiveelementparameters)</small>
+<small>`extends` [`UseActiveElementParameters`](#useactiveelementparameters)</small>
 
 Every member of `UseLostFocusDismissReturnType` is inherited (see the interface it `extends` from).
 
@@ -2290,12 +2290,12 @@ Allows you to move focus to an isolated area of the page and restore it when fin
 
 #### UseFocusTrapParameters
 
-<small>extends [UseRefElementReturnType](#userefelementreturntype)</small>
+<small>`extends` [`UseRefElementReturnType`](#userefelementreturntype)</small>
 
 |Member|Type|Description|
 |---------|----|-----------|
-|.focusOpener|`(lastFocused?: SourceElement | null) => void`|When the focus trap has deactivated, focus must be sent back to the element that opened it.<br />This is tracked for you; by default, just call `lastFocused?.focus()`, but you can also override this behavior and just do whatever you want with any element.|
-|.focusPopup|`(e?: PopupElement, findFirstFocusable?: () => HTMLOrSVGElement | null) => void`|This function is called to find where focus should be sent when the dialog (or menu, popup, etc.) opens.<br />This **cannot be done deterministically** across all possible scenarios because this is about what makes the most sense as a human.<br />For example, if it's a confirmation dialog about deleting something, *it's best to send focus to the "cancel" button*, but there's no way to programmatically know both a) that should be done and b) how to do it.<br />Ideally this function is specified *manually* for every dialog you create.<br />If you really, really, ***genuinely*** cannot determine what should be done in your use case, as a very very last resort, use `findFirstFocusable`, and then if nothing's found focus the body.<br />Just please, please make sure that whatever that first focusable is **isn't** a destructive action, at the very least.|
+|.focusOpener|`(lastFocused?: SourceElement \| null) => void`|When the focus trap has deactivated, focus must be sent back to the element that opened it.<br />This is tracked for you; by default, just call `lastFocused?.focus()`, but you can also override this behavior and just do whatever you want with any element.|
+|.focusPopup|`(e?: PopupElement, findFirstFocusable?: () => HTMLOrSVGElement \| null) => void`|This function is called to find where focus should be sent when the dialog (or menu, popup, etc.) opens.<br />This **cannot be done deterministically** across all possible scenarios because this is about what makes the most sense as a human.<br />For example, if it's a confirmation dialog about deleting something, *it's best to send focus to the "cancel" button*, but there's no way to programmatically know both a) that should be done and b) how to do it.<br />Ideally this function is specified *manually* for every dialog you create.<br />If you really, really, ***genuinely*** cannot determine what should be done in your use case, as a very very last resort, use `findFirstFocusable`, and then if nothing's found focus the body.<br />Just please, please make sure that whatever that first focusable is **isn't** a destructive action, at the very least.|
 |.onlyMoveFocus|`boolean`|If true, focus is not trapped but only moved to the new element.|
 |.trapActive|`boolean`|Whether or not the focus trap is currently active (or, when used as part of a larger component, whether it is activatable)|
 
