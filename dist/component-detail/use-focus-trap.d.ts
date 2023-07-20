@@ -16,7 +16,7 @@ export interface UseFocusTrapParametersSelf<SourceElement extends Element | null
      * @remarks This **cannot be done deterministically** across all possible scenarios because this is about what makes the most sense as a human.
      *
      * For example, if it's a confirmation dialog about deleting something, *it's best to send focus to the "cancel" button*,
-     * but there's no way to programatically know both a) that should be done and b) how to do it.
+     * but there's no way to programmatically know both a) that should be done and b) how to do it.
      *
      * Ideally this function is specified *manually* for every dialog you create.
      *

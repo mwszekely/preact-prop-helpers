@@ -961,7 +961,7 @@ export declare function useAsyncEffect<I extends Inputs>(effect: () => Promise<(
     hasResult: boolean;
     error: unknown;
     hasError: boolean;
-    invocationResult: "async" | "sync" | "throw" | null;
+    invocationResult: "sync" | "async" | "throw" | null;
     flushDebouncedPromise: () => void;
 };
 
@@ -1214,7 +1214,7 @@ export declare interface UseAsyncReturnType<SP extends unknown[], R> {
  *
  * @compositeParams
  */
-export declare function useBackdropDismiss<PopupElement extends Element>({ backdropDismissParameters: { open, onClose: onCloseUnstable, ...void1 }, refElementPopupReturn: { getElement, ...void3 }, ...void2 }: UseBackdropDismissParameters<PopupElement>): void;
+export declare function useBackdropDismiss<PopupElement extends Element>({ backdropDismissParameters: { active: open, onDismiss: onCloseUnstable, ...void1 }, refElementPopupReturn: { getElement, ...void3 }, ...void2 }: UseBackdropDismissParameters<PopupElement>): void;
 
 export declare interface UseBackdropDismissParameters<PopupElement extends Element> {
     backdropDismissParameters: UseBackdropDismissParametersSelf;
@@ -1222,9 +1222,15 @@ export declare interface UseBackdropDismissParameters<PopupElement extends Eleme
 }
 
 export declare interface UseBackdropDismissParametersSelf {
-    open: boolean;
-    onClose: EnhancedEventHandler<MouseEvent, {
-        reason: "escape" | "lost-focus";
+    /**
+     * When `true`, `onDismiss` is eligible to be called. When `false`, it will not be called.
+     */
+    active: boolean;
+    /**
+     * Called when the component is dismissed by clicking outside of the element.
+     */
+    onDismiss: EnhancedEventHandler<MouseEvent, {
+        reason: "backdrop";
     }>;
 }
 
@@ -1475,7 +1481,7 @@ export declare interface UseCompleteListNavigationReturnType<ParentElement exten
 }
 
 /**
- * Combines all the methods of dismissing a modal-ish or popup-ish component into one combined hook. This is similar to the "complete" series of list/grid navigation, in that it's the "outermost" hook of its type.
+ * Combines all the methods a user can implicitly dismiss a popup component. See {@link useModal} for a hook that's ready-to-use for dialogs and menus.
  *
  * @compositeParams
  */
@@ -1698,23 +1704,15 @@ export declare interface UseElementSizeReturnTypeSelf<E extends Element> {
 export declare function useEnsureStability<T extends any[]>(parentHookName: string, ...values: T): void;
 
 /**
- * Adds event handlers for a modal-like soft-dismiss interaction.
+ * Invokes a callback when the `Escape` key is pressed on the topmost component (a max of one invocation per `Escape` press)
  *
- * That is, any clicks or taps outside of the given component,
- * or any time the Escape key is pressed within the component,
- * (with various browser oddities regarding clicks on blank or inert areas handled)
- * the component will request to close itself.
+ * @remarks One press of the `Escape` key is guaranteed to only call `onDismiss` for *only one* component, and it is called on the component deepest in the DOM tree.
  *
- * Of course, if you don't do anything in the `onClose` function,
- * it won't be a soft dismiss anymore.
- *
- * Handles events for pressing the `Escape` key to close the any currently open dialogs, tooltips, menus, popups, etc.
- *
- * One press of the `Escape` key is guaranteed to only call `onClose` for *only one* component, and it is called on the component deepest in the DOM tree, differentiated by passing context information between parent and child.
+ * TODO: Instead of being deepest in the DOM tree (which is usually fine), it should probably be related to what order something was made `active`.
  *
  * @compositeParams
  */
-export declare function useEscapeDismiss<PopupElement extends Element>({ escapeDismissParameters: { onClose, open, getWindow: unstableGetWindow, parentDepth, ...void1 }, refElementPopupReturn: { getElement, ...void2 } }: UseEscapeDismissParameters<PopupElement>): void;
+export declare function useEscapeDismiss<PopupElement extends Element>({ escapeDismissParameters: { onDismiss: onClose, active: open, getWindow: unstableGetWindow, parentDepth, ...void1 }, refElementPopupReturn: { getElement, ...void2 } }: UseEscapeDismissParameters<PopupElement>): void;
 
 export declare interface UseEscapeDismissParameters<PopupElement extends Element> {
     refElementPopupReturn: Pick<UseRefElementReturnType<PopupElement>["refElementReturn"], "getElement">;
@@ -1723,20 +1721,19 @@ export declare interface UseEscapeDismissParameters<PopupElement extends Element
 
 export declare interface UseEscapeDismissParametersSelf {
     /**
-     * Called when the component is dismissed.
-     *
-     * Presumably you'll set some state that changes `open` to false during this, otherwise it's not a soft dismiss, but you can do whatever you want I guess.
+     * Called when the component is dismissed by pressing the `Escape` key.
      */
-    onClose: EnhancedEventHandler<KeyboardEvent, {
-        reason: "escape" | "lost-focus";
+    onDismiss: EnhancedEventHandler<KeyboardEvent, {
+        reason: "escape";
     }>;
     /**
-     * Whether the surface controlled by the `Escape` key is currently open.
-     * Can also be `false` to force the `Escape` key to do nothing.
+     * When `true`, `onDismiss` is eligible to be called. When `false`, it will not be called.
      */
-    open: boolean;
+    active: boolean;
     /**
      * The escape key event handler is attached onto the window, so we need to know which window.
+     *
+     * @remarks The returned `Window` should not change throughout the lifetime of the component (i.e. the element in question must not switch to another window via some means, which might not even be possible).
      */
     getWindow(): Window;
     /**
@@ -1748,6 +1745,10 @@ export declare interface UseEscapeDismissParametersSelf {
 }
 
 /**
+ * Allows you to move focus to an isolated area of the page and restore it when finished.
+ *
+ * @remarks By default, this implements a focus trap using the
+ *
  * @compositeParams
  */
 export declare function useFocusTrap<SourceElement extends Element | null, PopupElement extends Element>({ focusTrapParameters: { onlyMoveFocus, trapActive, focusPopup: focusSelfUnstable, focusOpener: focusOpenerUnstable }, refElementReturn }: UseFocusTrapParameters<SourceElement, PopupElement>): UseFocusTrapReturnType<PopupElement>;
@@ -1766,26 +1767,27 @@ export declare interface UseFocusTrapParametersSelf<SourceElement extends Elemen
      */
     onlyMoveFocus: boolean;
     /**
-     * When a modal popup opens, focus must be sent to the first element that makes sense.
+     * This function is called to find where focus should be sent when the dialog (or menu, popup, etc.) opens.
      *
-     * For example, if it's a confirmation dialog about deleting something, it's best to send focus to the "cancel" button.
+     * @remarks This **cannot be done deterministically** across all possible scenarios because this is about what makes the most sense as a human.
      *
-     * In other cases, it makes more sense to focus the dialog's title, first interactive element, etc.
+     * For example, if it's a confirmation dialog about deleting something, *it's best to send focus to the "cancel" button*,
+     * but there's no way to programmatically know both a) that should be done and b) how to do it.
      *
-     * This is highly subjective and *almost ALWAYS* more complicated than just "focus the whole dialog element itself",
-     * because that only works if the dialog ***only contains text***, which is uncommon.
+     * Ideally this function is specified *manually* for every dialog you create.
      *
      * If you really, really, ***genuinely*** cannot determine what should be done in your use case,
-     * first of all, keep trying, really,
-     * then as a very last resort, use `findFirstFocusable`, and then if nothing's found focus the body.
+     * as a very very last resort, use `findFirstFocusable`, and then if nothing's found focus the body.
+     *
      * Just please, please make sure that whatever that first focusable is **isn't** a destructive action, at the very least.
      */
     focusPopup(e: PopupElement, findFirstFocusable: () => HTMLOrSVGElement | null): void;
     /**
      * When the focus trap has deactivated, focus must be sent back to the element that opened it.
      *
-     * This is tracked for you; by default, just call `lastFocused?.focus()`, but you can also override this behavior
+     * @remarks This is tracked for you; by default, just call `lastFocused?.focus()`, but you can also override this behavior
      * and just do whatever you want with any element.
+     *
      * @param lastFocused - The element that was focused before the modal was opened
      */
     focusOpener(lastFocused: SourceElement | null): void;
@@ -1824,7 +1826,7 @@ export declare function useGlobalHandler<T extends EventTarget, EventType extend
  * Some features and/or limitations of this hook:
  *
  * ```md-literal
- * * Like all other hooks (except sorting), the only DOM restriction is that the rows and cells are decendents of the grid as a whole **somewhere**.
+ * * Like all other hooks (except sorting), the only DOM restriction is that the rows and cells are descendants of the grid as a whole **somewhere**.
  * * Rows are given priority over columns. Sorting/filtering happens by row, Page Up/Down, the Home/End keys, and typeahead affect the current row, etc.
  * * Cells can have a `colSpan` or be missing, and moving with the arrow keys will "remember" the correct column to be in as focus jumps around.
  * ```
@@ -2370,11 +2372,13 @@ export declare interface UseLogicalDirectionReturnType {
 }
 
 /**
- * Handles events for dismiss events for things like popup menus or transient dialogs -- things where moving focus to a new area of the page means this component should close itself.
+ * Invokes a callback when focus travels outside of the component's element.
+ *
+ * @remarks TODO: This is not intended for recursive structures, like dialogs that open dialogs, or menus that open menus, but does properly handle, e.g., the fact that a menu's menubutton having focus still counts as the menu having focus.
  *
  * @compositeParams
  */
-export declare function useLostFocusDismiss<SourceElement extends Element | null, PopupElement extends Element>({ refElementPopupReturn: { getElement: getPopupElement, ...void3 }, refElementSourceReturn, lostFocusDismissParameters: { open, onClose, ...void4 }, ...void1 }: UseLostFocusDismissParameters<SourceElement, PopupElement>): UseLostFocusDismissReturnType<SourceElement, PopupElement>;
+export declare function useLostFocusDismiss<SourceElement extends Element | null, PopupElement extends Element>({ refElementPopupReturn: { getElement: getPopupElement, ...void3 }, refElementSourceReturn, lostFocusDismissParameters: { active: open, onDismiss: onClose, ...void4 }, ...void1 }: UseLostFocusDismissParameters<SourceElement, PopupElement>): UseLostFocusDismissReturnType<SourceElement, PopupElement>;
 
 export declare interface UseLostFocusDismissParameters<SourceElement extends Element | null, PopupElement extends Element> {
     lostFocusDismissParameters: UseLostFocusDismissParametersSelf;
@@ -2383,8 +2387,16 @@ export declare interface UseLostFocusDismissParameters<SourceElement extends Ele
 }
 
 export declare interface UseLostFocusDismissParametersSelf {
-    open: boolean;
-    onClose(): void;
+    /**
+     * Called when the component is dismissed by losing focus
+     */
+    onDismiss: EnhancedEventHandler<FocusEventType<any>, {
+        reason: "lost-focus";
+    }>;
+    /**
+     * When `true`, `onDismiss` is eligible to be called. When `false`, it will not be called.
+     */
+    active: boolean;
 }
 
 export declare interface UseLostFocusDismissReturnType<_SourceElement extends Element | null, _PopupElement extends Element> extends TargetedPick<UseActiveElementParameters, "activeElementParameters", "onLastActiveElementChange"> {

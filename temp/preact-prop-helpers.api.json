@@ -8755,7 +8755,7 @@
             },
             {
               "kind": "Content",
-              "text": "{\n    pending: boolean;\n    debouncingSync: boolean;\n    debouncingAsync: boolean;\n    callCount: number;\n    settleCount: number;\n    resolveCount: number;\n    rejectCount: number;\n    result: void | (() => void) | undefined;\n    hasResult: boolean;\n    error: unknown;\n    hasError: boolean;\n    invocationResult: \"async\" | \"sync\" | \"throw\" | null;\n    flushDebouncedPromise: () => void;\n}"
+              "text": "{\n    pending: boolean;\n    debouncingSync: boolean;\n    debouncingAsync: boolean;\n    callCount: number;\n    settleCount: number;\n    resolveCount: number;\n    rejectCount: number;\n    result: void | (() => void) | undefined;\n    hasResult: boolean;\n    error: unknown;\n    hasError: boolean;\n    invocationResult: \"sync\" | \"async\" | \"throw\" | null;\n    flushDebouncedPromise: () => void;\n}"
             },
             {
               "kind": "Content",
@@ -9778,12 +9778,21 @@
             },
             {
               "kind": "Content",
-              "text": ": { open, "
+              "text": ": { "
             },
             {
               "kind": "Reference",
-              "text": "onClose",
-              "canonicalReference": "preact-prop-helpers!UseBackdropDismissParametersSelf#onClose"
+              "text": "active",
+              "canonicalReference": "preact-prop-helpers!UseBackdropDismissParametersSelf#active"
+            },
+            {
+              "kind": "Content",
+              "text": ": open, "
+            },
+            {
+              "kind": "Reference",
+              "text": "onDismiss",
+              "canonicalReference": "preact-prop-helpers!UseBackdropDismissParametersSelf#onDismiss"
             },
             {
               "kind": "Content",
@@ -9820,19 +9829,19 @@
               "text": ";"
             }
           ],
-          "fileUrlPath": "src/component-detail/use-dismiss.tsx",
+          "fileUrlPath": "src/component-detail/dismissal/use-backdrop-dismiss.tsx",
           "returnTypeTokenRange": {
-            "startIndex": 12,
-            "endIndex": 13
+            "startIndex": 14,
+            "endIndex": 15
           },
           "releaseTag": "Public",
           "overloadIndex": 1,
           "parameters": [
             {
-              "parameterName": "{ backdropDismissParameters: { open, onClose: onCloseUnstable, ...void1 }, refElementPopupReturn: { getElement, ...void3 }, ...void2 }",
+              "parameterName": "{ backdropDismissParameters: { active: open, onDismiss: onCloseUnstable, ...void1 }, refElementPopupReturn: { getElement, ...void3 }, ...void2 }",
               "parameterTypeTokenRange": {
-                "startIndex": 9,
-                "endIndex": 11
+                "startIndex": 11,
+                "endIndex": 13
               },
               "isOptional": false
             }
@@ -9871,7 +9880,7 @@
               "text": "> "
             }
           ],
-          "fileUrlPath": "src/component-detail/use-dismiss.tsx",
+          "fileUrlPath": "src/component-detail/dismissal/use-backdrop-dismiss.tsx",
           "releaseTag": "Public",
           "typeParameters": [
             {
@@ -9971,19 +9980,46 @@
               "text": "export interface UseBackdropDismissParametersSelf "
             }
           ],
-          "fileUrlPath": "src/component-detail/use-dismiss.tsx",
+          "fileUrlPath": "src/component-detail/dismissal/use-backdrop-dismiss.tsx",
           "releaseTag": "Public",
           "name": "UseBackdropDismissParametersSelf",
           "preserveMemberOrder": false,
           "members": [
             {
               "kind": "PropertySignature",
-              "canonicalReference": "preact-prop-helpers!UseBackdropDismissParametersSelf#onClose:member",
-              "docComment": "",
+              "canonicalReference": "preact-prop-helpers!UseBackdropDismissParametersSelf#active:member",
+              "docComment": "/**\n * When `true`, `onDismiss` is eligible to be called. When `false`, it will not be called.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
-                  "text": "onClose: "
+                  "text": "active: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "boolean"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "active",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "preact-prop-helpers!UseBackdropDismissParametersSelf#onDismiss:member",
+              "docComment": "/**\n * Called when the component is dismissed by clicking outside of the element.\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "onDismiss: "
                 },
                 {
                   "kind": "Reference",
@@ -10001,7 +10037,7 @@
                 },
                 {
                   "kind": "Content",
-                  "text": ", {\n        reason: \"escape\" | \"lost-focus\";\n    }>"
+                  "text": ", {\n        reason: \"backdrop\";\n    }>"
                 },
                 {
                   "kind": "Content",
@@ -10011,37 +10047,10 @@
               "isReadonly": false,
               "isOptional": false,
               "releaseTag": "Public",
-              "name": "onClose",
+              "name": "onDismiss",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
                 "endIndex": 5
-              }
-            },
-            {
-              "kind": "PropertySignature",
-              "canonicalReference": "preact-prop-helpers!UseBackdropDismissParametersSelf#open:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "open: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "boolean"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isReadonly": false,
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "open",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
               }
             }
           ],
@@ -15878,7 +15887,7 @@
         {
           "kind": "Function",
           "canonicalReference": "preact-prop-helpers!useDismiss:function(1)",
-          "docComment": "/**\n * Combines all the methods of dismissing a modal-ish or popup-ish component into one combined hook. This is similar to the \"complete\" series of list/grid navigation, in that it's the \"outermost\" hook of its type.\n *\n * @compositeParams\n */\n",
+          "docComment": "/**\n * Combines all the methods a user can implicitly dismiss a popup component. See {@link useModal} for a hook that's ready-to-use for dialogs and menus.\n *\n * @compositeParams\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -18121,7 +18130,7 @@
         {
           "kind": "Function",
           "canonicalReference": "preact-prop-helpers!useEscapeDismiss:function(1)",
-          "docComment": "/**\n * Adds event handlers for a modal-like soft-dismiss interaction.\n *\n * That is, any clicks or taps outside of the given component, or any time the Escape key is pressed within the component, (with various browser oddities regarding clicks on blank or inert areas handled) the component will request to close itself.\n *\n * Of course, if you don't do anything in the `onClose` function, it won't be a soft dismiss anymore.\n *\n * Handles events for pressing the `Escape` key to close the any currently open dialogs, tooltips, menus, popups, etc.\n *\n * One press of the `Escape` key is guaranteed to only call `onClose` for *only one* component, and it is called on the component deepest in the DOM tree, differentiated by passing context information between parent and child.\n *\n * @compositeParams\n */\n",
+          "docComment": "/**\n * Invokes a callback when the `Escape` key is pressed on the topmost component (a max of one invocation per `Escape` press)\n *\n * @remarks\n *\n * One press of the `Escape` key is guaranteed to only call `onDismiss` for *only one* component, and it is called on the component deepest in the DOM tree.\n *\n * TODO: Instead of being deepest in the DOM tree (which is usually fine), it should probably be related to what order something was made `active`.\n *\n * @compositeParams\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -18143,7 +18152,25 @@
             },
             {
               "kind": "Content",
-              "text": ": { onClose, open, "
+              "text": ": { "
+            },
+            {
+              "kind": "Reference",
+              "text": "onDismiss",
+              "canonicalReference": "preact-prop-helpers!UseEscapeDismissParametersSelf#onDismiss"
+            },
+            {
+              "kind": "Content",
+              "text": ": onClose, "
+            },
+            {
+              "kind": "Reference",
+              "text": "active",
+              "canonicalReference": "preact-prop-helpers!UseEscapeDismissParametersSelf#active"
+            },
+            {
+              "kind": "Content",
+              "text": ": open, "
             },
             {
               "kind": "Reference",
@@ -18185,19 +18212,19 @@
               "text": ";"
             }
           ],
-          "fileUrlPath": "src/component-detail/use-dismiss.tsx",
+          "fileUrlPath": "src/component-detail/dismissal/use-escape-dismiss.tsx",
           "returnTypeTokenRange": {
-            "startIndex": 12,
-            "endIndex": 13
+            "startIndex": 16,
+            "endIndex": 17
           },
           "releaseTag": "Public",
           "overloadIndex": 1,
           "parameters": [
             {
-              "parameterName": "{ escapeDismissParameters: { onClose, open, getWindow: unstableGetWindow, parentDepth, ...void1 }, refElementPopupReturn: { getElement, ...void2 } }",
+              "parameterName": "{ escapeDismissParameters: { onDismiss: onClose, active: open, getWindow: unstableGetWindow, parentDepth, ...void1 }, refElementPopupReturn: { getElement, ...void2 } }",
               "parameterTypeTokenRange": {
-                "startIndex": 9,
-                "endIndex": 11
+                "startIndex": 13,
+                "endIndex": 15
               },
               "isOptional": false
             }
@@ -18236,7 +18263,7 @@
               "text": "> "
             }
           ],
-          "fileUrlPath": "src/component-detail/use-dismiss.tsx",
+          "fileUrlPath": "src/component-detail/dismissal/use-escape-dismiss.tsx",
           "releaseTag": "Public",
           "typeParameters": [
             {
@@ -18336,15 +18363,42 @@
               "text": "export interface UseEscapeDismissParametersSelf "
             }
           ],
-          "fileUrlPath": "src/component-detail/use-dismiss.tsx",
+          "fileUrlPath": "src/component-detail/dismissal/use-escape-dismiss.tsx",
           "releaseTag": "Public",
           "name": "UseEscapeDismissParametersSelf",
           "preserveMemberOrder": false,
           "members": [
             {
+              "kind": "PropertySignature",
+              "canonicalReference": "preact-prop-helpers!UseEscapeDismissParametersSelf#active:member",
+              "docComment": "/**\n * When `true`, `onDismiss` is eligible to be called. When `false`, it will not be called.\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "active: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "boolean"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "active",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
               "kind": "MethodSignature",
               "canonicalReference": "preact-prop-helpers!UseEscapeDismissParametersSelf#getWindow:member(1)",
-              "docComment": "/**\n * The escape key event handler is attached onto the window, so we need to know which window.\n */\n",
+              "docComment": "/**\n * The escape key event handler is attached onto the window, so we need to know which window.\n *\n * @remarks\n *\n * The returned `Window` should not change throughout the lifetime of the component (i.e. the element in question must not switch to another window via some means, which might not even be possible).\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -18372,12 +18426,12 @@
             },
             {
               "kind": "PropertySignature",
-              "canonicalReference": "preact-prop-helpers!UseEscapeDismissParametersSelf#onClose:member",
-              "docComment": "/**\n * Called when the component is dismissed.\n *\n * Presumably you'll set some state that changes `open` to false during this, otherwise it's not a soft dismiss, but you can do whatever you want I guess.\n */\n",
+              "canonicalReference": "preact-prop-helpers!UseEscapeDismissParametersSelf#onDismiss:member",
+              "docComment": "/**\n * Called when the component is dismissed by pressing the `Escape` key.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
-                  "text": "onClose: "
+                  "text": "onDismiss: "
                 },
                 {
                   "kind": "Reference",
@@ -18395,7 +18449,7 @@
                 },
                 {
                   "kind": "Content",
-                  "text": ", {\n        reason: \"escape\" | \"lost-focus\";\n    }>"
+                  "text": ", {\n        reason: \"escape\";\n    }>"
                 },
                 {
                   "kind": "Content",
@@ -18405,37 +18459,10 @@
               "isReadonly": false,
               "isOptional": false,
               "releaseTag": "Public",
-              "name": "onClose",
+              "name": "onDismiss",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
                 "endIndex": 5
-              }
-            },
-            {
-              "kind": "PropertySignature",
-              "canonicalReference": "preact-prop-helpers!UseEscapeDismissParametersSelf#open:member",
-              "docComment": "/**\n * Whether the surface controlled by the `Escape` key is currently open. Can also be `false` to force the `Escape` key to do nothing.\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "open: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "boolean"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isReadonly": false,
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "open",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
               }
             },
             {
@@ -18471,7 +18498,7 @@
         {
           "kind": "Function",
           "canonicalReference": "preact-prop-helpers!useFocusTrap:function(1)",
-          "docComment": "/**\n * @compositeParams\n */\n",
+          "docComment": "/**\n * Allows you to move focus to an isolated area of the page and restore it when finished.\n *\n * @remarks\n *\n * By default, this implements a focus trap using the\n *\n * @compositeParams\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -18792,7 +18819,7 @@
             {
               "kind": "MethodSignature",
               "canonicalReference": "preact-prop-helpers!UseFocusTrapParametersSelf#focusOpener:member(1)",
-              "docComment": "/**\n * When the focus trap has deactivated, focus must be sent back to the element that opened it.\n *\n * This is tracked for you; by default, just call `lastFocused?.focus()`, but you can also override this behavior and just do whatever you want with any element.\n *\n * @param lastFocused - The element that was focused before the modal was opened\n */\n",
+              "docComment": "/**\n * When the focus trap has deactivated, focus must be sent back to the element that opened it.\n *\n * @remarks\n *\n * This is tracked for you; by default, just call `lastFocused?.focus()`, but you can also override this behavior and just do whatever you want with any element.\n *\n * @param lastFocused - The element that was focused before the modal was opened\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -18837,7 +18864,7 @@
             {
               "kind": "MethodSignature",
               "canonicalReference": "preact-prop-helpers!UseFocusTrapParametersSelf#focusPopup:member(1)",
-              "docComment": "/**\n * When a modal popup opens, focus must be sent to the first element that makes sense.\n *\n * For example, if it's a confirmation dialog about deleting something, it's best to send focus to the \"cancel\" button.\n *\n * In other cases, it makes more sense to focus the dialog's title, first interactive element, etc.\n *\n * This is highly subjective and *almost ALWAYS* more complicated than just \"focus the whole dialog element itself\", because that only works if the dialog ***only contains text***, which is uncommon.\n *\n * If you really, really, ***genuinely*** cannot determine what should be done in your use case, first of all, keep trying, really, then as a very last resort, use `findFirstFocusable`, and then if nothing's found focus the body. Just please, please make sure that whatever that first focusable is **isn't** a destructive action, at the very least.\n */\n",
+              "docComment": "/**\n * This function is called to find where focus should be sent when the dialog (or menu, popup, etc.) opens.\n *\n * @remarks\n *\n * This **cannot be done deterministically** across all possible scenarios because this is about what makes the most sense as a human.\n *\n * For example, if it's a confirmation dialog about deleting something, *it's best to send focus to the \"cancel\" button*, but there's no way to programmatically know both a) that should be done and b) how to do it.\n *\n * Ideally this function is specified *manually* for every dialog you create.\n *\n * If you really, really, ***genuinely*** cannot determine what should be done in your use case, as a very very last resort, use `findFirstFocusable`, and then if nothing's found focus the body.\n *\n * Just please, please make sure that whatever that first focusable is **isn't** a destructive action, at the very least.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -19257,7 +19284,7 @@
         {
           "kind": "Function",
           "canonicalReference": "preact-prop-helpers!useGridNavigation:function(1)",
-          "docComment": "/**\n * Implements 2-dimensional grid-based keyboard navigation, similarly to {@link useListNavigation}.\n *\n * @remarks\n *\n * Due to the complexity of this hook, it is *highly* recommended to use {@link useCompleteGridNavigation} instead. But if you do need to it's designed to work well with intellisense -- just keep plugging the holes until the errors stop and that's 95% of it right there.\n *\n * Some features and/or limitations of this hook:\n * ```md-literal\n * * Like all other hooks (except sorting), the only DOM restriction is that the rows and cells are decendents of the grid as a whole **somewhere**.\n * * Rows are given priority over columns. Sorting/filtering happens by row, Page Up/Down, the Home/End keys, and typeahead affect the current row, etc.\n * * Cells can have a `colSpan` or be missing, and moving with the arrow keys will \"remember\" the correct column to be in as focus jumps around.\n * ```\n *\n * @hasChild\n *\n * {@link useGridNavigationRow}\n *\n * @hasChild\n *\n * {@link useGridNavigationCell}\n *\n * @compositeParams\n */\n",
+          "docComment": "/**\n * Implements 2-dimensional grid-based keyboard navigation, similarly to {@link useListNavigation}.\n *\n * @remarks\n *\n * Due to the complexity of this hook, it is *highly* recommended to use {@link useCompleteGridNavigation} instead. But if you do need to it's designed to work well with intellisense -- just keep plugging the holes until the errors stop and that's 95% of it right there.\n *\n * Some features and/or limitations of this hook:\n * ```md-literal\n * * Like all other hooks (except sorting), the only DOM restriction is that the rows and cells are descendants of the grid as a whole **somewhere**.\n * * Rows are given priority over columns. Sorting/filtering happens by row, Page Up/Down, the Home/End keys, and typeahead affect the current row, etc.\n * * Cells can have a `colSpan` or be missing, and moving with the arrow keys will \"remember\" the correct column to be in as focus jumps around.\n * ```\n *\n * @hasChild\n *\n * {@link useGridNavigationRow}\n *\n * @hasChild\n *\n * {@link useGridNavigationCell}\n *\n * @compositeParams\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -29489,7 +29516,7 @@
         {
           "kind": "Function",
           "canonicalReference": "preact-prop-helpers!useLostFocusDismiss:function(1)",
-          "docComment": "/**\n * Handles events for dismiss events for things like popup menus or transient dialogs -- things where moving focus to a new area of the page means this component should close itself.\n *\n * @compositeParams\n */\n",
+          "docComment": "/**\n * Invokes a callback when focus travels outside of the component's element.\n *\n * @remarks\n *\n * TODO: This is not intended for recursive structures, like dialogs that open dialogs, or menus that open menus, but does properly handle, e.g., the fact that a menu's menubutton having focus still counts as the menu having focus.\n *\n * @compositeParams\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -29542,7 +29569,25 @@
             },
             {
               "kind": "Content",
-              "text": ": { open, onClose, ...void4 }, ...void1 }: "
+              "text": ": { "
+            },
+            {
+              "kind": "Reference",
+              "text": "active",
+              "canonicalReference": "preact-prop-helpers!UseLostFocusDismissParametersSelf#active"
+            },
+            {
+              "kind": "Content",
+              "text": ": open, "
+            },
+            {
+              "kind": "Reference",
+              "text": "onDismiss",
+              "canonicalReference": "preact-prop-helpers!UseLostFocusDismissParametersSelf#onDismiss"
+            },
+            {
+              "kind": "Content",
+              "text": ": onClose, ...void4 }, ...void1 }: "
             },
             {
               "kind": "Reference",
@@ -29571,19 +29616,19 @@
               "text": ";"
             }
           ],
-          "fileUrlPath": "src/component-detail/use-dismiss.tsx",
+          "fileUrlPath": "src/component-detail/dismissal/use-lost-focus-dismiss.tsx",
           "returnTypeTokenRange": {
-            "startIndex": 15,
-            "endIndex": 17
+            "startIndex": 19,
+            "endIndex": 21
           },
           "releaseTag": "Public",
           "overloadIndex": 1,
           "parameters": [
             {
-              "parameterName": "{ refElementPopupReturn: { getElement: getPopupElement, ...void3 }, refElementSourceReturn, lostFocusDismissParameters: { open, onClose, ...void4 }, ...void1 }",
+              "parameterName": "{ refElementPopupReturn: { getElement: getPopupElement, ...void3 }, refElementSourceReturn, lostFocusDismissParameters: { active: open, onDismiss: onClose, ...void4 }, ...void1 }",
               "parameterTypeTokenRange": {
-                "startIndex": 12,
-                "endIndex": 14
+                "startIndex": 16,
+                "endIndex": 18
               },
               "isOptional": false
             }
@@ -29646,7 +29691,7 @@
               "text": "> "
             }
           ],
-          "fileUrlPath": "src/component-detail/use-dismiss.tsx",
+          "fileUrlPath": "src/component-detail/dismissal/use-lost-focus-dismiss.tsx",
           "releaseTag": "Public",
           "typeParameters": [
             {
@@ -29816,47 +29861,19 @@
               "text": "export interface UseLostFocusDismissParametersSelf "
             }
           ],
-          "fileUrlPath": "src/component-detail/use-dismiss.tsx",
+          "fileUrlPath": "src/component-detail/dismissal/use-lost-focus-dismiss.tsx",
           "releaseTag": "Public",
           "name": "UseLostFocusDismissParametersSelf",
           "preserveMemberOrder": false,
           "members": [
             {
-              "kind": "MethodSignature",
-              "canonicalReference": "preact-prop-helpers!UseLostFocusDismissParametersSelf#onClose:member(1)",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "onClose(): "
-                },
-                {
-                  "kind": "Content",
-                  "text": "void"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "returnTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              },
-              "releaseTag": "Public",
-              "overloadIndex": 1,
-              "parameters": [],
-              "name": "onClose"
-            },
-            {
               "kind": "PropertySignature",
-              "canonicalReference": "preact-prop-helpers!UseLostFocusDismissParametersSelf#open:member",
-              "docComment": "",
+              "canonicalReference": "preact-prop-helpers!UseLostFocusDismissParametersSelf#active:member",
+              "docComment": "/**\n * When `true`, `onDismiss` is eligible to be called. When `false`, it will not be called.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
-                  "text": "open: "
+                  "text": "active: "
                 },
                 {
                   "kind": "Content",
@@ -29870,10 +29887,51 @@
               "isReadonly": false,
               "isOptional": false,
               "releaseTag": "Public",
-              "name": "open",
+              "name": "active",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
                 "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "preact-prop-helpers!UseLostFocusDismissParametersSelf#onDismiss:member",
+              "docComment": "/**\n * Called when the component is dismissed by losing focus\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "onDismiss: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "EnhancedEventHandler",
+                  "canonicalReference": "preact-prop-helpers!EnhancedEventHandler:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "FocusEventType",
+                  "canonicalReference": "preact-prop-helpers!FocusEventType:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<any>, {\n        reason: \"lost-focus\";\n    }>"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "onDismiss",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 5
               }
             }
           ],
@@ -29933,7 +29991,7 @@
               "text": " "
             }
           ],
-          "fileUrlPath": "src/component-detail/use-dismiss.tsx",
+          "fileUrlPath": "src/component-detail/dismissal/use-lost-focus-dismiss.tsx",
           "releaseTag": "Public",
           "typeParameters": [
             {

@@ -51,7 +51,7 @@ export interface UseDismissReturnType<SourceElement extends Element | null, Popu
     propsStablePopup: ElementProps<NonNullable<PopupElement>>;
 }
 /**
- * Combines all the methods a user can implicitly dismiss a popup component. See {@link @useModal} for a hook that's ready-to-use for dialogs and menus.
+ * Combines all the methods a user can implicitly dismiss a popup component. See {@link useModal} for a hook that's ready-to-use for dialogs and menus.
  *
  * @compositeParams
  */

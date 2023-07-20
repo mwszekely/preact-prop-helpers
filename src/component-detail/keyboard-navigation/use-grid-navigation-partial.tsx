@@ -112,7 +112,7 @@ export interface UseGridNavigationCellReturnType<CellElement extends Element, CM
  * Some features and/or limitations of this hook:
  * 
  * ```md-literal
- * * Like all other hooks (except sorting), the only DOM restriction is that the rows and cells are decendents of the grid as a whole **somewhere**.
+ * * Like all other hooks (except sorting), the only DOM restriction is that the rows and cells are descendants of the grid as a whole **somewhere**.
  * * Rows are given priority over columns. Sorting/filtering happens by row, Page Up/Down, the Home/End keys, and typeahead affect the current row, etc.
  * * Cells can have a `colSpan` or be missing, and moving with the arrow keys will "remember" the correct column to be in as focus jumps around.
  * ```

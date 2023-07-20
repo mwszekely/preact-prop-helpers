@@ -15,7 +15,7 @@ import { useLostFocusDismiss } from "./dismissal/use-lost-focus-dismiss.js";
  */
 const _dummy = 0;
 /**
- * Combines all the methods a user can implicitly dismiss a popup component. See {@link @useModal} for a hook that's ready-to-use for dialogs and menus.
+ * Combines all the methods a user can implicitly dismiss a popup component. See {@link useModal} for a hook that's ready-to-use for dialogs and menus.
  *
  * @compositeParams
  */
