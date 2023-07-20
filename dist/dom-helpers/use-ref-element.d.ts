@@ -1,7 +1,11 @@
 import { OnPassiveStateChange } from "../preact-extensions/use-passive-state.js";
 import { ElementProps } from "../util/types.js";
 export interface UseRefElementReturnTypeSelf<T extends EventTarget> {
-    /** **STABLE** */
+    /**
+     * **STABLE**
+     *
+     * Call to return the element that the props were rendered to, or `null` if they were not rendered to an element.
+     */
     getElement(): T | null;
 }
 export interface UseRefElementReturnType<T extends EventTarget> {
@@ -9,8 +13,13 @@ export interface UseRefElementReturnType<T extends EventTarget> {
     refElementReturn: UseRefElementReturnTypeSelf<T>;
 }
 export interface UseRefElementParametersSelf<T> {
+    /**
+     * Called with the `Element` when it mounts, called with `null` when it unmounts.
+     */
     onElementChange?: OnPassiveStateChange<T | null, never>;
+    /** Called when the element mounts */
     onMount?: (element: T) => void;
+    /** Called when the element unmounts */
     onUnmount?: (element: T) => void;
 }
 export interface UseRefElementParameters<T> {

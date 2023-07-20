@@ -151,7 +151,7 @@ export { UseDraggableParameters, UseDraggableReturnType, useDraggable } from "./
 export { DropFile, DropFileMetadata, DroppableFileError, UseDroppableParameters, UseDroppableReturnType, useDroppable } from "./dom-helpers/use-droppable.js";
 export { useGlobalHandler } from "./dom-helpers/use-event-handler.js";
 export { useHideScroll } from "./dom-helpers/use-hide-scroll.js";
-export { DangerouslyAppendHTML, DangerouslySetInnerHTML, GetAttribute, GetClass, ImperativeElement, SetAttribute, SetChildren, SetClass, SetEventHandler, SetStyle, UseImperativePropsParameters, UseImperativePropsReturnType, UseImperativePropsReturnTypeSelf, useImperativeProps } from "./dom-helpers/use-imperative-props.js";
+export { DangerouslyAppendHTML, DangerouslySetInnerHTML, GetAttribute, HasClass, ImperativeElement, SetAttribute, SetChildren, SetClass, SetEventHandler, SetStyle, UseImperativePropsParameters, UseImperativePropsReturnType, UseImperativePropsReturnTypeSelf, useImperativeProps } from "./dom-helpers/use-imperative-props.js";
 export { useMergedChildren } from "./dom-helpers/use-merged-children.js";
 export { useMergedClasses } from "./dom-helpers/use-merged-classes.js";
 export { enableLoggingPropConflicts, mergeFunctions, useMergedProps } from "./dom-helpers/use-merged-props.js";

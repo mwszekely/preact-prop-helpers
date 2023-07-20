@@ -31,9 +31,9 @@ export function ProvideBatchedAnimationFrames({ children }) {
     return (_jsx(SharedAnimationFrameContext.Provider, { value: contextInfo.current, children: children }));
 }
 /**
- * The (optionally non-stable) `callback` you provide will start running every frame after the component mounts.
+ * The callback you provide will start running every frame after the component mounts.
  *
- * @remarks Passing `null` is fine and simply stops the effect until you restart it by providing a non-null callback.
+ * @remarks Passing `null` is fine and simply stops the effect until you restart it by providing a non-null callback; it doesn't need to be stable.
  *
  * {@include } {@link UseAnimationFrameParameters}
  *

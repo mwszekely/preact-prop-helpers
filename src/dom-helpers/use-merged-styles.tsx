@@ -50,6 +50,6 @@ export function useMergedStyles(lhs: ElementProps<EventTarget>["style"], rhs: El
     return {
         ...(lhs ?? {}) as CSSProperties,
         ...(rhs ?? {}) as CSSProperties
-    } as unknown as CSSProperties
+    } as CSSProperties
 }
 

@@ -1123,13 +1123,13 @@
               "text": "export type DangerouslyAppendHTML = "
             },
             {
-              "kind": "Content",
-              "text": "(html: string) => "
+              "kind": "Reference",
+              "text": "UseImperativePropsReturnTypeSelf",
+              "canonicalReference": "preact-prop-helpers!UseImperativePropsReturnTypeSelf:interface"
             },
             {
-              "kind": "Reference",
-              "text": "Element",
-              "canonicalReference": "!Element:interface"
+              "kind": "Content",
+              "text": "<any>[\"dangerouslyAppendHTML\"]"
             },
             {
               "kind": "Content",
@@ -1154,8 +1154,13 @@
               "text": "export type DangerouslySetInnerHTML = "
             },
             {
+              "kind": "Reference",
+              "text": "UseImperativePropsReturnTypeSelf",
+              "canonicalReference": "preact-prop-helpers!UseImperativePropsReturnTypeSelf:interface"
+            },
+            {
               "kind": "Content",
-              "text": "(html: string) => void"
+              "text": "<any>[\"dangerouslySetInnerHTML\"]"
             },
             {
               "kind": "Content",
@@ -1167,7 +1172,7 @@
           "name": "DangerouslySetInnerHTML",
           "typeTokenRange": {
             "startIndex": 1,
-            "endIndex": 2
+            "endIndex": 3
           }
         },
         {
@@ -2042,7 +2047,7 @@
         {
           "kind": "Function",
           "canonicalReference": "preact-prop-helpers!enableLoggingPropConflicts:function(1)",
-          "docComment": "",
+          "docComment": "/**\n * When `useMergedProps` encounters a conflict, the function passed here will be called.\n *\n * @defaultValue\n *\n * `console.warn`\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -2825,26 +2830,13 @@
               "text": "> = "
             },
             {
-              "kind": "Content",
-              "text": "<K extends keyof "
-            },
-            {
               "kind": "Reference",
-              "text": "ElementProps",
-              "canonicalReference": "preact-prop-helpers!ElementProps:type"
+              "text": "UseImperativePropsReturnTypeSelf",
+              "canonicalReference": "preact-prop-helpers!UseImperativePropsReturnTypeSelf:interface"
             },
             {
               "kind": "Content",
-              "text": "<T>>(prop: K) => "
-            },
-            {
-              "kind": "Reference",
-              "text": "ElementProps",
-              "canonicalReference": "preact-prop-helpers!ElementProps:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<T>[K]"
+              "text": "<T>[\"getAttribute\"]"
             },
             {
               "kind": "Content",
@@ -2869,7 +2861,7 @@
           ],
           "typeTokenRange": {
             "startIndex": 3,
-            "endIndex": 8
+            "endIndex": 5
           }
         },
         {
@@ -2899,32 +2891,6 @@
           "overloadIndex": 1,
           "parameters": [],
           "name": "getBuildMode"
-        },
-        {
-          "kind": "TypeAlias",
-          "canonicalReference": "preact-prop-helpers!GetClass:type",
-          "docComment": "",
-          "excerptTokens": [
-            {
-              "kind": "Content",
-              "text": "export type GetClass = "
-            },
-            {
-              "kind": "Content",
-              "text": "(cls: string) => boolean"
-            },
-            {
-              "kind": "Content",
-              "text": ";"
-            }
-          ],
-          "fileUrlPath": "src/dom-helpers/use-imperative-props.tsx",
-          "releaseTag": "Public",
-          "name": "GetClass",
-          "typeTokenRange": {
-            "startIndex": 1,
-            "endIndex": 2
-          }
         },
         {
           "kind": "Function",
@@ -3613,6 +3579,37 @@
               "endIndex": 9
             }
           ]
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "preact-prop-helpers!HasClass:type",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type HasClass = "
+            },
+            {
+              "kind": "Reference",
+              "text": "UseImperativePropsReturnTypeSelf",
+              "canonicalReference": "preact-prop-helpers!UseImperativePropsReturnTypeSelf:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<any>[\"hasClass\"]"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/dom-helpers/use-imperative-props.tsx",
+          "releaseTag": "Public",
+          "name": "HasClass",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 3
+          }
         },
         {
           "kind": "Interface",
@@ -5934,17 +5931,13 @@
               "text": "export type PushPortalChild = "
             },
             {
-              "kind": "Content",
-              "text": "(child: "
-            },
-            {
               "kind": "Reference",
-              "text": "VNode",
-              "canonicalReference": "preact-prop-helpers!VNode:type"
+              "text": "UsePortalChildrenReturnType",
+              "canonicalReference": "preact-prop-helpers!UsePortalChildrenReturnType:interface"
             },
             {
               "kind": "Content",
-              "text": ") => number"
+              "text": "[\"pushChild\"]"
             },
             {
               "kind": "Content",
@@ -5956,7 +5949,7 @@
           "name": "PushPortalChild",
           "typeTokenRange": {
             "startIndex": 1,
-            "endIndex": 4
+            "endIndex": 3
           }
         },
         {
@@ -5969,8 +5962,13 @@
               "text": "export type RemovePortalChild = "
             },
             {
+              "kind": "Reference",
+              "text": "UsePortalChildrenReturnType",
+              "canonicalReference": "preact-prop-helpers!UsePortalChildrenReturnType:interface"
+            },
+            {
               "kind": "Content",
-              "text": "(index: number) => void"
+              "text": "[\"removeChild\"]"
             },
             {
               "kind": "Content",
@@ -5982,7 +5980,7 @@
           "name": "RemovePortalChild",
           "typeTokenRange": {
             "startIndex": 1,
-            "endIndex": 2
+            "endIndex": 3
           }
         },
         {
@@ -6588,26 +6586,13 @@
               "text": "> = "
             },
             {
-              "kind": "Content",
-              "text": "<K extends keyof "
-            },
-            {
               "kind": "Reference",
-              "text": "ElementProps",
-              "canonicalReference": "preact-prop-helpers!ElementProps:type"
+              "text": "UseImperativePropsReturnTypeSelf",
+              "canonicalReference": "preact-prop-helpers!UseImperativePropsReturnTypeSelf:interface"
             },
             {
               "kind": "Content",
-              "text": "<T>>(prop: K, value: "
-            },
-            {
-              "kind": "Reference",
-              "text": "ElementProps",
-              "canonicalReference": "preact-prop-helpers!ElementProps:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<T>[K] | null) => void"
+              "text": "<T>[\"setAttribute\"]"
             },
             {
               "kind": "Content",
@@ -6632,7 +6617,7 @@
           ],
           "typeTokenRange": {
             "startIndex": 3,
-            "endIndex": 8
+            "endIndex": 5
           }
         },
         {
@@ -6645,8 +6630,13 @@
               "text": "export type SetChildren = "
             },
             {
+              "kind": "Reference",
+              "text": "UseImperativePropsReturnTypeSelf",
+              "canonicalReference": "preact-prop-helpers!UseImperativePropsReturnTypeSelf:interface"
+            },
+            {
               "kind": "Content",
-              "text": "((children: string | null) => void)"
+              "text": "<any>[\"setChildren\"]"
             },
             {
               "kind": "Content",
@@ -6658,7 +6648,7 @@
           "name": "SetChildren",
           "typeTokenRange": {
             "startIndex": 1,
-            "endIndex": 2
+            "endIndex": 3
           }
         },
         {
@@ -6671,8 +6661,13 @@
               "text": "export type SetClass = "
             },
             {
+              "kind": "Reference",
+              "text": "UseImperativePropsReturnTypeSelf",
+              "canonicalReference": "preact-prop-helpers!UseImperativePropsReturnTypeSelf:interface"
+            },
+            {
               "kind": "Content",
-              "text": "(cls: string, enabled: boolean) => void"
+              "text": "<any>[\"setClass\"]"
             },
             {
               "kind": "Content",
@@ -6684,7 +6679,7 @@
           "name": "SetClass",
           "typeTokenRange": {
             "startIndex": 1,
-            "endIndex": 2
+            "endIndex": 3
           }
         },
         {
@@ -6697,44 +6692,13 @@
               "text": "export type SetEventHandler = "
             },
             {
-              "kind": "Content",
-              "text": "<K extends keyof "
-            },
-            {
               "kind": "Reference",
-              "text": "HTMLElementEventMap",
-              "canonicalReference": "!HTMLElementEventMap:interface"
+              "text": "UseImperativePropsReturnTypeSelf",
+              "canonicalReference": "preact-prop-helpers!UseImperativePropsReturnTypeSelf:interface"
             },
             {
               "kind": "Content",
-              "text": ">(type: K, listener: null | ((this: "
-            },
-            {
-              "kind": "Reference",
-              "text": "HTMLElement",
-              "canonicalReference": "!HTMLElement:interface"
-            },
-            {
-              "kind": "Content",
-              "text": ", ev: "
-            },
-            {
-              "kind": "Reference",
-              "text": "HTMLElementEventMap",
-              "canonicalReference": "!HTMLElementEventMap:interface"
-            },
-            {
-              "kind": "Content",
-              "text": "[K]) => void), options: "
-            },
-            {
-              "kind": "Reference",
-              "text": "AddEventListenerOptions",
-              "canonicalReference": "!AddEventListenerOptions:interface"
-            },
-            {
-              "kind": "Content",
-              "text": ") => void"
+              "text": "<any>[\"setEventHandler\"]"
             },
             {
               "kind": "Content",
@@ -6746,7 +6710,7 @@
           "name": "SetEventHandler",
           "typeTokenRange": {
             "startIndex": 1,
-            "endIndex": 10
+            "endIndex": 3
           }
         },
         {
@@ -6843,26 +6807,13 @@
               "text": "export type SetStyle = "
             },
             {
-              "kind": "Content",
-              "text": "<T extends (keyof "
-            },
-            {
               "kind": "Reference",
-              "text": "CSSStyleDeclaration",
-              "canonicalReference": "!CSSStyleDeclaration:interface"
+              "text": "UseImperativePropsReturnTypeSelf",
+              "canonicalReference": "preact-prop-helpers!UseImperativePropsReturnTypeSelf:interface"
             },
             {
               "kind": "Content",
-              "text": ") & string>(prop: T, value: "
-            },
-            {
-              "kind": "Reference",
-              "text": "CSSProperties",
-              "canonicalReference": "preact-prop-helpers!CSSProperties:type"
-            },
-            {
-              "kind": "Content",
-              "text": "[T] | null) => void"
+              "text": "<any>[\"setStyle\"]"
             },
             {
               "kind": "Content",
@@ -6874,7 +6825,7 @@
           "name": "SetStyle",
           "typeTokenRange": {
             "startIndex": 1,
-            "endIndex": 6
+            "endIndex": 3
           }
         },
         {
@@ -7996,17 +7947,13 @@
               "text": "export type UpdatePortalChild = "
             },
             {
-              "kind": "Content",
-              "text": "(index: number, child: "
-            },
-            {
               "kind": "Reference",
-              "text": "VNode",
-              "canonicalReference": "preact-prop-helpers!VNode:type"
+              "text": "UsePortalChildrenReturnType",
+              "canonicalReference": "preact-prop-helpers!UsePortalChildrenReturnType:interface"
             },
             {
               "kind": "Content",
-              "text": ") => void"
+              "text": "[\"updateChild\"]"
             },
             {
               "kind": "Content",
@@ -8018,7 +7965,7 @@
           "name": "UpdatePortalChild",
           "typeTokenRange": {
             "startIndex": 1,
-            "endIndex": 4
+            "endIndex": 3
           }
         },
         {
@@ -8518,7 +8465,7 @@
         {
           "kind": "Function",
           "canonicalReference": "preact-prop-helpers!useAnimationFrame:function(1)",
-          "docComment": "/**\n * The (optionally non-stable) `callback` you provide will start running every frame after the component mounts.\n *\n * @remarks\n *\n * Passing `null` is fine and simply stops the effect until you restart it by providing a non-null callback.\n *\n * {@include} {@link UseAnimationFrameParameters}\n *\n * {@include} {@link ProvideBatchedAnimationFrames}\n */\n",
+          "docComment": "/**\n * The callback you provide will start running every frame after the component mounts.\n *\n * @remarks\n *\n * Passing `null` is fine and simply stops the effect until you restart it by providing a non-null callback; it doesn't need to be stable.\n *\n * {@include} {@link UseAnimationFrameParameters}\n *\n * {@include} {@link ProvideBatchedAnimationFrames}\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -24771,7 +24718,7 @@
         {
           "kind": "Function",
           "canonicalReference": "preact-prop-helpers!useHideScroll:function(1)",
-          "docComment": "/**\n * Allows for hiding the scroll bar of the root HTML element without shifting the layout of the page more than adding a few pixels of padding to the root element if necessary.\n */\n",
+          "docComment": "/**\n * Allows for hiding the scroll bar of the root HTML element without shifting the layout of the page by adding a few pixels of padding to the root element if necessary.\n *\n * @param hideScroll - Whether the scroll bar is hidden or not (i.e. `true` to hide the scroll bar, `false` to allow it to be visible)\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -24816,7 +24763,7 @@
         {
           "kind": "Function",
           "canonicalReference": "preact-prop-helpers!useImperativeProps:function(1)",
-          "docComment": "/**\n * @compositeParams\n */\n",
+          "docComment": "/**\n * Allows controlling an element's `class`, `style`, etc. with functions like `setStyle` in addition to being reactive to incoming props.\n *\n * @remarks\n *\n * If the component is re-rendered after the element is modified in some way, those changes are remembered and included in the returned `props` that are meant to be spread to the element in question.\n *\n * @compositeParams\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -25107,74 +25054,113 @@
           "preserveMemberOrder": false,
           "members": [
             {
-              "kind": "PropertySignature",
-              "canonicalReference": "preact-prop-helpers!UseImperativePropsReturnTypeSelf#dangerouslyAppendHTML:member",
-              "docComment": "",
+              "kind": "MethodSignature",
+              "canonicalReference": "preact-prop-helpers!UseImperativePropsReturnTypeSelf#dangerouslyAppendHTML:member(1)",
+              "docComment": "/**\n * Evaluates the given HTML and appends it to the current children.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
-                  "text": "dangerouslyAppendHTML: "
+                  "text": "dangerouslyAppendHTML(html: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
                 },
                 {
                   "kind": "Reference",
-                  "text": "DangerouslyAppendHTML",
-                  "canonicalReference": "preact-prop-helpers!DangerouslyAppendHTML:type"
+                  "text": "Element",
+                  "canonicalReference": "!Element:interface"
                 },
                 {
                   "kind": "Content",
                   "text": ";"
                 }
               ],
-              "isReadonly": false,
               "isOptional": false,
+              "returnTypeTokenRange": {
+                "startIndex": 3,
+                "endIndex": 4
+              },
               "releaseTag": "Public",
-              "name": "dangerouslyAppendHTML",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              }
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "html",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 2
+                  },
+                  "isOptional": false
+                }
+              ],
+              "name": "dangerouslyAppendHTML"
             },
             {
-              "kind": "PropertySignature",
-              "canonicalReference": "preact-prop-helpers!UseImperativePropsReturnTypeSelf#dangerouslySetInnerHTML:member",
-              "docComment": "",
+              "kind": "MethodSignature",
+              "canonicalReference": "preact-prop-helpers!UseImperativePropsReturnTypeSelf#dangerouslySetInnerHTML:member(1)",
+              "docComment": "/**\n * Sets the element's `innerHTML`\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
-                  "text": "dangerouslySetInnerHTML: "
+                  "text": "dangerouslySetInnerHTML(html: "
                 },
                 {
-                  "kind": "Reference",
-                  "text": "DangerouslySetInnerHTML",
-                  "canonicalReference": "preact-prop-helpers!DangerouslySetInnerHTML:type"
+                  "kind": "Content",
+                  "text": "string"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
+                },
+                {
+                  "kind": "Content",
+                  "text": "void"
                 },
                 {
                   "kind": "Content",
                   "text": ";"
                 }
               ],
-              "isReadonly": false,
               "isOptional": false,
+              "returnTypeTokenRange": {
+                "startIndex": 3,
+                "endIndex": 4
+              },
               "releaseTag": "Public",
-              "name": "dangerouslySetInnerHTML",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              }
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "html",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 2
+                  },
+                  "isOptional": false
+                }
+              ],
+              "name": "dangerouslySetInnerHTML"
             },
             {
-              "kind": "PropertySignature",
-              "canonicalReference": "preact-prop-helpers!UseImperativePropsReturnTypeSelf#getAttribute:member",
-              "docComment": "",
+              "kind": "MethodSignature",
+              "canonicalReference": "preact-prop-helpers!UseImperativePropsReturnTypeSelf#getAttribute:member(1)",
+              "docComment": "/**\n * Returns the current value of the attribute on the element\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
-                  "text": "getAttribute: "
+                  "text": "getAttribute<K extends "
+                },
+                {
+                  "kind": "Content",
+                  "text": "keyof "
                 },
                 {
                   "kind": "Reference",
-                  "text": "GetAttribute",
-                  "canonicalReference": "preact-prop-helpers!GetAttribute:type"
+                  "text": "ElementProps",
+                  "canonicalReference": "preact-prop-helpers!ElementProps:type"
                 },
                 {
                   "kind": "Content",
@@ -25182,59 +25168,124 @@
                 },
                 {
                   "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isReadonly": false,
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "getAttribute",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 3
-              }
-            },
-            {
-              "kind": "PropertySignature",
-              "canonicalReference": "preact-prop-helpers!UseImperativePropsReturnTypeSelf#hasClass:member",
-              "docComment": "",
-              "excerptTokens": [
+                  "text": ">(prop: "
+                },
                 {
                   "kind": "Content",
-                  "text": "hasClass: "
+                  "text": "K"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
                 },
                 {
                   "kind": "Reference",
-                  "text": "GetClass",
-                  "canonicalReference": "preact-prop-helpers!GetClass:type"
+                  "text": "ElementProps",
+                  "canonicalReference": "preact-prop-helpers!ElementProps:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<T>[K]"
                 },
                 {
                   "kind": "Content",
                   "text": ";"
                 }
               ],
-              "isReadonly": false,
               "isOptional": false,
+              "returnTypeTokenRange": {
+                "startIndex": 7,
+                "endIndex": 9
+              },
               "releaseTag": "Public",
-              "name": "hasClass",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              }
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "prop",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 5,
+                    "endIndex": 6
+                  },
+                  "isOptional": false
+                }
+              ],
+              "typeParameters": [
+                {
+                  "typeParameterName": "K",
+                  "constraintTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 4
+                  },
+                  "defaultTypeTokenRange": {
+                    "startIndex": 0,
+                    "endIndex": 0
+                  }
+                }
+              ],
+              "name": "getAttribute"
             },
             {
-              "kind": "PropertySignature",
-              "canonicalReference": "preact-prop-helpers!UseImperativePropsReturnTypeSelf#setAttribute:member",
-              "docComment": "",
+              "kind": "MethodSignature",
+              "canonicalReference": "preact-prop-helpers!UseImperativePropsReturnTypeSelf#hasClass:member(1)",
+              "docComment": "/**\n * Returns whether the element currently has the current CSS class\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
-                  "text": "setAttribute: "
+                  "text": "hasClass(cls: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
+                },
+                {
+                  "kind": "Content",
+                  "text": "boolean"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isOptional": false,
+              "returnTypeTokenRange": {
+                "startIndex": 3,
+                "endIndex": 4
+              },
+              "releaseTag": "Public",
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "cls",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 2
+                  },
+                  "isOptional": false
+                }
+              ],
+              "name": "hasClass"
+            },
+            {
+              "kind": "MethodSignature",
+              "canonicalReference": "preact-prop-helpers!UseImperativePropsReturnTypeSelf#setAttribute:member(1)",
+              "docComment": "/**\n * Applies the given attribute to the element\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "setAttribute<K extends "
+                },
+                {
+                  "kind": "Content",
+                  "text": "keyof "
                 },
                 {
                   "kind": "Reference",
-                  "text": "SetAttribute",
-                  "canonicalReference": "preact-prop-helpers!SetAttribute:type"
+                  "text": "ElementProps",
+                  "canonicalReference": "preact-prop-helpers!ElementProps:type"
                 },
                 {
                   "kind": "Content",
@@ -25242,129 +25293,401 @@
                 },
                 {
                   "kind": "Content",
+                  "text": ">(prop: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "K"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", value: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ElementProps",
+                  "canonicalReference": "preact-prop-helpers!ElementProps:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<T>[K] | null"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
+                },
+                {
+                  "kind": "Content",
+                  "text": "void"
+                },
+                {
+                  "kind": "Content",
                   "text": ";"
                 }
               ],
-              "isReadonly": false,
               "isOptional": false,
+              "returnTypeTokenRange": {
+                "startIndex": 10,
+                "endIndex": 11
+              },
               "releaseTag": "Public",
-              "name": "setAttribute",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 3
-              }
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "prop",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 5,
+                    "endIndex": 6
+                  },
+                  "isOptional": false
+                },
+                {
+                  "parameterName": "value",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 7,
+                    "endIndex": 9
+                  },
+                  "isOptional": false
+                }
+              ],
+              "typeParameters": [
+                {
+                  "typeParameterName": "K",
+                  "constraintTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 4
+                  },
+                  "defaultTypeTokenRange": {
+                    "startIndex": 0,
+                    "endIndex": 0
+                  }
+                }
+              ],
+              "name": "setAttribute"
             },
             {
-              "kind": "PropertySignature",
-              "canonicalReference": "preact-prop-helpers!UseImperativePropsReturnTypeSelf#setChildren:member",
+              "kind": "MethodSignature",
+              "canonicalReference": "preact-prop-helpers!UseImperativePropsReturnTypeSelf#setChildren:member(1)",
+              "docComment": "/**\n * Sets the element's `textContent`\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "setChildren(children: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string | null"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
+                },
+                {
+                  "kind": "Content",
+                  "text": "void"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isOptional": false,
+              "returnTypeTokenRange": {
+                "startIndex": 3,
+                "endIndex": 4
+              },
+              "releaseTag": "Public",
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "children",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 2
+                  },
+                  "isOptional": false
+                }
+              ],
+              "name": "setChildren"
+            },
+            {
+              "kind": "MethodSignature",
+              "canonicalReference": "preact-prop-helpers!UseImperativePropsReturnTypeSelf#setClass:member(1)",
+              "docComment": "/**\n * Applies or removes the given CSS class to the element\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "setClass(cls: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", enabled: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "boolean"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
+                },
+                {
+                  "kind": "Content",
+                  "text": "void"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isOptional": false,
+              "returnTypeTokenRange": {
+                "startIndex": 5,
+                "endIndex": 6
+              },
+              "releaseTag": "Public",
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "cls",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 2
+                  },
+                  "isOptional": false
+                },
+                {
+                  "parameterName": "enabled",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 3,
+                    "endIndex": 4
+                  },
+                  "isOptional": false
+                }
+              ],
+              "name": "setClass"
+            },
+            {
+              "kind": "MethodSignature",
+              "canonicalReference": "preact-prop-helpers!UseImperativePropsReturnTypeSelf#setEventHandler:member(1)",
               "docComment": "",
               "excerptTokens": [
                 {
                   "kind": "Content",
-                  "text": "setChildren: "
+                  "text": "setEventHandler<K extends "
+                },
+                {
+                  "kind": "Content",
+                  "text": "keyof "
                 },
                 {
                   "kind": "Reference",
-                  "text": "SetChildren",
-                  "canonicalReference": "preact-prop-helpers!SetChildren:type"
+                  "text": "HTMLElementEventMap",
+                  "canonicalReference": "!HTMLElementEventMap:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ">(type: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "K"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", listener: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "null | ((this: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "HTMLElement",
+                  "canonicalReference": "!HTMLElement:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", ev: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "HTMLElementEventMap",
+                  "canonicalReference": "!HTMLElementEventMap:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "[K]) => void)"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", options: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "AddEventListenerOptions",
+                  "canonicalReference": "!AddEventListenerOptions:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
+                },
+                {
+                  "kind": "Content",
+                  "text": "void"
                 },
                 {
                   "kind": "Content",
                   "text": ";"
                 }
               ],
-              "isReadonly": false,
               "isOptional": false,
+              "returnTypeTokenRange": {
+                "startIndex": 14,
+                "endIndex": 15
+              },
               "releaseTag": "Public",
-              "name": "setChildren",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              }
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "type",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 4,
+                    "endIndex": 5
+                  },
+                  "isOptional": false
+                },
+                {
+                  "parameterName": "listener",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 6,
+                    "endIndex": 11
+                  },
+                  "isOptional": false
+                },
+                {
+                  "parameterName": "options",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 12,
+                    "endIndex": 13
+                  },
+                  "isOptional": false
+                }
+              ],
+              "typeParameters": [
+                {
+                  "typeParameterName": "K",
+                  "constraintTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 3
+                  },
+                  "defaultTypeTokenRange": {
+                    "startIndex": 0,
+                    "endIndex": 0
+                  }
+                }
+              ],
+              "name": "setEventHandler"
             },
             {
-              "kind": "PropertySignature",
-              "canonicalReference": "preact-prop-helpers!UseImperativePropsReturnTypeSelf#setClass:member",
-              "docComment": "",
+              "kind": "MethodSignature",
+              "canonicalReference": "preact-prop-helpers!UseImperativePropsReturnTypeSelf#setStyle:member(1)",
+              "docComment": "/**\n * Applies the given CSS style to the element\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
-                  "text": "setClass: "
+                  "text": "setStyle<K extends "
+                },
+                {
+                  "kind": "Content",
+                  "text": "(keyof "
                 },
                 {
                   "kind": "Reference",
-                  "text": "SetClass",
-                  "canonicalReference": "preact-prop-helpers!SetClass:type"
+                  "text": "CSSStyleDeclaration",
+                  "canonicalReference": "!CSSStyleDeclaration:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ") & string"
+                },
+                {
+                  "kind": "Content",
+                  "text": ">(prop: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "K"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", value: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "CSSProperties",
+                  "canonicalReference": "preact-prop-helpers!CSSProperties:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "[K] | null"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
+                },
+                {
+                  "kind": "Content",
+                  "text": "void"
                 },
                 {
                   "kind": "Content",
                   "text": ";"
                 }
               ],
-              "isReadonly": false,
               "isOptional": false,
+              "returnTypeTokenRange": {
+                "startIndex": 10,
+                "endIndex": 11
+              },
               "releaseTag": "Public",
-              "name": "setClass",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              }
-            },
-            {
-              "kind": "PropertySignature",
-              "canonicalReference": "preact-prop-helpers!UseImperativePropsReturnTypeSelf#setEventHandler:member",
-              "docComment": "",
-              "excerptTokens": [
+              "overloadIndex": 1,
+              "parameters": [
                 {
-                  "kind": "Content",
-                  "text": "setEventHandler: "
+                  "parameterName": "prop",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 5,
+                    "endIndex": 6
+                  },
+                  "isOptional": false
                 },
                 {
-                  "kind": "Reference",
-                  "text": "SetEventHandler",
-                  "canonicalReference": "preact-prop-helpers!SetEventHandler:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
+                  "parameterName": "value",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 7,
+                    "endIndex": 9
+                  },
+                  "isOptional": false
                 }
               ],
-              "isReadonly": false,
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "setEventHandler",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              }
-            },
-            {
-              "kind": "PropertySignature",
-              "canonicalReference": "preact-prop-helpers!UseImperativePropsReturnTypeSelf#setStyle:member",
-              "docComment": "",
-              "excerptTokens": [
+              "typeParameters": [
                 {
-                  "kind": "Content",
-                  "text": "setStyle: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "SetStyle",
-                  "canonicalReference": "preact-prop-helpers!SetStyle:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
+                  "typeParameterName": "K",
+                  "constraintTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 4
+                  },
+                  "defaultTypeTokenRange": {
+                    "startIndex": 0,
+                    "endIndex": 0
+                  }
                 }
               ],
-              "isReadonly": false,
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "setStyle",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              }
+              "name": "setStyle"
             }
           ],
           "extendsTokenRanges": []
@@ -30950,7 +31273,7 @@
         {
           "kind": "Function",
           "canonicalReference": "preact-prop-helpers!useMergedChildren:function(1)",
-          "docComment": "",
+          "docComment": "/**\n * Combines two `children`.\n *\n * @remarks\n *\n * This is fairly trivial and not even technically a hook, as it doesn't use any other hooks, but is this way for consistency.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -31053,43 +31376,29 @@
         {
           "kind": "Function",
           "canonicalReference": "preact-prop-helpers!useMergedClasses:function(1)",
-          "docComment": "/**\n * Given two sets of props, merges their `class` and `className` properties.\n *\n * @remarks\n *\n * Duplicate classes are removed (order doesn't matter anyway).\n *\n * @param lhs - Classes of the first component\n *\n * @param rhs - Classes of the second component\n *\n * @returns A string representing all combined classes from both arguments.\n */\n",
+          "docComment": "/**\n * Merged the `class` and `className` properties of two sets of props into a single string.\n *\n * @remarks\n *\n * Duplicate classes are removed (order doesn't matter anyway).\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
-              "text": "export declare function useMergedClasses(lhsClass: "
+              "text": "export declare function useMergedClasses(...classes: "
             },
             {
               "kind": "Reference",
-              "text": "C",
-              "canonicalReference": "preact-prop-helpers!~C:type"
+              "text": "ElementProps",
+              "canonicalReference": "preact-prop-helpers!ElementProps:type"
             },
             {
               "kind": "Content",
-              "text": ", lhsClassName: "
+              "text": "<"
             },
             {
               "kind": "Reference",
-              "text": "C",
-              "canonicalReference": "preact-prop-helpers!~C:type"
+              "text": "EventTarget",
+              "canonicalReference": "!EventTarget:interface"
             },
             {
               "kind": "Content",
-              "text": ", rhsClass: "
-            },
-            {
-              "kind": "Reference",
-              "text": "C",
-              "canonicalReference": "preact-prop-helpers!~C:type"
-            },
-            {
-              "kind": "Content",
-              "text": ", rhsClassName: "
-            },
-            {
-              "kind": "Reference",
-              "text": "C",
-              "canonicalReference": "preact-prop-helpers!~C:type"
+              "text": ">[\"className\"][]"
             },
             {
               "kind": "Content",
@@ -31106,41 +31415,17 @@
           ],
           "fileUrlPath": "src/dom-helpers/use-merged-classes.tsx",
           "returnTypeTokenRange": {
-            "startIndex": 9,
-            "endIndex": 10
+            "startIndex": 6,
+            "endIndex": 7
           },
           "releaseTag": "Public",
           "overloadIndex": 1,
           "parameters": [
             {
-              "parameterName": "lhsClass",
+              "parameterName": "classes",
               "parameterTypeTokenRange": {
                 "startIndex": 1,
-                "endIndex": 2
-              },
-              "isOptional": false
-            },
-            {
-              "parameterName": "lhsClassName",
-              "parameterTypeTokenRange": {
-                "startIndex": 3,
-                "endIndex": 4
-              },
-              "isOptional": false
-            },
-            {
-              "parameterName": "rhsClass",
-              "parameterTypeTokenRange": {
-                "startIndex": 5,
-                "endIndex": 6
-              },
-              "isOptional": false
-            },
-            {
-              "parameterName": "rhsClassName",
-              "parameterTypeTokenRange": {
-                "startIndex": 7,
-                "endIndex": 8
+                "endIndex": 5
               },
               "isOptional": false
             }
@@ -31227,7 +31512,7 @@
         {
           "kind": "Function",
           "canonicalReference": "preact-prop-helpers!useMergedRefs:function(1)",
-          "docComment": "/**\n * Combines two refs into one. This allows a component to both use its own ref *and* forward a ref that was given to it.\n */\n",
+          "docComment": "/**\n * Combines two refs into one. This allows a component to both use its own ref *and* forward a ref that was given to it.\n *\n * @remarks\n *\n * Or just use {@link useMergedProps}\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -33996,53 +34281,9 @@
               "text": "): "
             },
             {
-              "kind": "Content",
-              "text": "{\n    children: import(\"preact\")."
-            },
-            {
               "kind": "Reference",
-              "text": "VNode",
-              "canonicalReference": "preact!VNode:interface"
-            },
-            {
-              "kind": "Content",
-              "text": "<any> | null;\n    pushChild: "
-            },
-            {
-              "kind": "Reference",
-              "text": "PushPortalChild",
-              "canonicalReference": "preact-prop-helpers!PushPortalChild:type"
-            },
-            {
-              "kind": "Content",
-              "text": ";\n    updateChild: "
-            },
-            {
-              "kind": "Reference",
-              "text": "UpdatePortalChild",
-              "canonicalReference": "preact-prop-helpers!UpdatePortalChild:type"
-            },
-            {
-              "kind": "Content",
-              "text": ";\n    removeChild: "
-            },
-            {
-              "kind": "Reference",
-              "text": "RemovePortalChild",
-              "canonicalReference": "preact-prop-helpers!RemovePortalChild:type"
-            },
-            {
-              "kind": "Content",
-              "text": ";\n    portalElement: "
-            },
-            {
-              "kind": "Reference",
-              "text": "Element",
-              "canonicalReference": "!Element:interface"
-            },
-            {
-              "kind": "Content",
-              "text": " | null;\n}"
+              "text": "UsePortalChildrenReturnType",
+              "canonicalReference": "preact-prop-helpers!UsePortalChildrenReturnType:interface"
             },
             {
               "kind": "Content",
@@ -34052,7 +34293,7 @@
           "fileUrlPath": "src/dom-helpers/use-portal-children.tsx",
           "returnTypeTokenRange": {
             "startIndex": 3,
-            "endIndex": 14
+            "endIndex": 4
           },
           "releaseTag": "Public",
           "overloadIndex": 1,
@@ -34086,7 +34327,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UsePortalChildrenParameters#target:member",
-              "docComment": "",
+              "docComment": "/**\n * The element that will contain the portal's children, or the string of its `id`.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -34140,7 +34381,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UsePortalChildrenReturnType#children:member",
-              "docComment": "",
+              "docComment": "/**\n * The return value of `createPortal`\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -34153,6 +34394,10 @@
                 },
                 {
                   "kind": "Content",
+                  "text": " | null"
+                },
+                {
+                  "kind": "Content",
                   "text": ";"
                 }
               ],
@@ -34162,13 +34407,13 @@
               "name": "children",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
-                "endIndex": 2
+                "endIndex": 3
               }
             },
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UsePortalChildrenReturnType#portalElement:member",
-              "docComment": "",
+              "docComment": "/**\n * The element that the portal was rendered to (even if an `id` was provided)\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -34198,88 +34443,157 @@
               }
             },
             {
-              "kind": "PropertySignature",
-              "canonicalReference": "preact-prop-helpers!UsePortalChildrenReturnType#pushChild:member",
-              "docComment": "",
+              "kind": "MethodSignature",
+              "canonicalReference": "preact-prop-helpers!UsePortalChildrenReturnType#pushChild:member(1)",
+              "docComment": "/**\n * Appends the given child to the portal's existing children, and returns a number that can be used to request updates to it/remove it later if necessary\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
-                  "text": "pushChild: "
+                  "text": "pushChild(child: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "PushPortalChild",
-                  "canonicalReference": "preact-prop-helpers!PushPortalChild:type"
+                  "text": "VNode",
+                  "canonicalReference": "preact-prop-helpers!VNode:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
+                },
+                {
+                  "kind": "Content",
+                  "text": "number"
                 },
                 {
                   "kind": "Content",
                   "text": ";"
                 }
               ],
-              "isReadonly": false,
               "isOptional": false,
+              "returnTypeTokenRange": {
+                "startIndex": 3,
+                "endIndex": 4
+              },
               "releaseTag": "Public",
-              "name": "pushChild",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              }
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "child",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 2
+                  },
+                  "isOptional": false
+                }
+              ],
+              "name": "pushChild"
             },
             {
-              "kind": "PropertySignature",
-              "canonicalReference": "preact-prop-helpers!UsePortalChildrenReturnType#removeChild:member",
-              "docComment": "",
+              "kind": "MethodSignature",
+              "canonicalReference": "preact-prop-helpers!UsePortalChildrenReturnType#removeChild:member(1)",
+              "docComment": "/**\n * Removes the child at the given `index` (the value returned from `pushChild`)\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
-                  "text": "removeChild: "
+                  "text": "removeChild(index: "
                 },
                 {
-                  "kind": "Reference",
-                  "text": "RemovePortalChild",
-                  "canonicalReference": "preact-prop-helpers!RemovePortalChild:type"
+                  "kind": "Content",
+                  "text": "number"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
+                },
+                {
+                  "kind": "Content",
+                  "text": "void"
                 },
                 {
                   "kind": "Content",
                   "text": ";"
                 }
               ],
-              "isReadonly": false,
               "isOptional": false,
+              "returnTypeTokenRange": {
+                "startIndex": 3,
+                "endIndex": 4
+              },
               "releaseTag": "Public",
-              "name": "removeChild",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              }
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "index",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 2
+                  },
+                  "isOptional": false
+                }
+              ],
+              "name": "removeChild"
             },
             {
-              "kind": "PropertySignature",
-              "canonicalReference": "preact-prop-helpers!UsePortalChildrenReturnType#updateChild:member",
-              "docComment": "",
+              "kind": "MethodSignature",
+              "canonicalReference": "preact-prop-helpers!UsePortalChildrenReturnType#updateChild:member(1)",
+              "docComment": "/**\n * Allows a child to be updated with new props. `index` is the value returned from `pushChild`.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
-                  "text": "updateChild: "
+                  "text": "updateChild(index: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "number"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", child: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "UpdatePortalChild",
-                  "canonicalReference": "preact-prop-helpers!UpdatePortalChild:type"
+                  "text": "VNode",
+                  "canonicalReference": "preact-prop-helpers!VNode:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
+                },
+                {
+                  "kind": "Content",
+                  "text": "void"
                 },
                 {
                   "kind": "Content",
                   "text": ";"
                 }
               ],
-              "isReadonly": false,
               "isOptional": false,
+              "returnTypeTokenRange": {
+                "startIndex": 5,
+                "endIndex": 6
+              },
               "releaseTag": "Public",
-              "name": "updateChild",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              }
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "index",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 2
+                  },
+                  "isOptional": false
+                },
+                {
+                  "parameterName": "child",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 3,
+                    "endIndex": 4
+                  },
+                  "isOptional": false
+                }
+              ],
+              "name": "updateChild"
             }
           ],
           "extendsTokenRanges": []
@@ -36597,7 +36911,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseRefElementParametersSelf#onElementChange:member",
-              "docComment": "",
+              "docComment": "/**\n * Called with the `Element` when it mounts, called with `null` when it unmounts.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -36629,7 +36943,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseRefElementParametersSelf#onMount:member",
-              "docComment": "",
+              "docComment": "/**\n * Called when the element mounts\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -36656,7 +36970,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseRefElementParametersSelf#onUnmount:member",
-              "docComment": "",
+              "docComment": "/**\n * Called when the element unmounts\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -36827,7 +37141,7 @@
             {
               "kind": "MethodSignature",
               "canonicalReference": "preact-prop-helpers!UseRefElementReturnTypeSelf#getElement:member(1)",
-              "docComment": "/**\n * **STABLE**\n */\n",
+              "docComment": "/**\n * **STABLE**\n *\n * Call to return the element that the props were rendered to, or `null` if they were not rendered to an element.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -43083,7 +43397,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseTextContentParametersSelf#onTextContentChange:member",
-              "docComment": "",
+              "docComment": "/**\n * During `useEffect`, this is called if the text content of the rendered element has changed.\n *\n * @see\n *\n * {@link useMutationObserver} for a more robust implementation of this idea\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -43179,7 +43493,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseTextContentReturnTypeSelf#getTextContent:member",
-              "docComment": "",
+              "docComment": "/**\n * Returns the last known value of the element's text content\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",

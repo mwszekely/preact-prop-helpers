@@ -18,6 +18,10 @@ function htmlToElement(parent, html) {
  */
 export const ImperativeElement = memo(forwardRef(ImperativeElementU));
 /**
+ * Allows controlling an element's `class`, `style`, etc. with functions like `setStyle` in addition to being reactive to incoming props.
+ *
+ * @remarks If the component is re-rendered after the element is modified in some way, those changes are remembered and included in the returned `props` that are meant to be spread to the element in question.
+ *
  * @compositeParams
  */
 export function useImperativeProps({ refElementReturn: { getElement } }) {
@@ -58,8 +62,8 @@ export function useImperativeProps({ refElementReturn: { getElement } }) {
     const dangerouslySetInnerHTML = useCallback((children) => {
         let e = getElement();
         if (e && currentImperativeProps.current.html != children) {
-            currentImperativeProps.current.html = children;
             currentImperativeProps.current.children = null;
+            currentImperativeProps.current.html = children;
             e.innerHTML = children;
         }
     }, []);
@@ -69,6 +73,9 @@ export function useImperativeProps({ refElementReturn: { getElement } }) {
             const newChild = htmlToElement(e, children);
             console.assert((newChild && newChild instanceof Node));
             if (newChild && newChild instanceof Node) {
+                currentImperativeProps.current.children = null;
+                currentImperativeProps.current.html ||= "";
+                currentImperativeProps.current.html += children;
                 e.appendChild(newChild);
                 return newChild;
             }
@@ -118,7 +125,7 @@ export function useImperativeProps({ refElementReturn: { getElement } }) {
             dangerouslySetInnerHTML,
             dangerouslyAppendHTML
         }).current,
-        props: useMergedProps({ className: [...currentImperativeProps.current.className].join(" "), style: currentImperativeProps.current.style }, currentImperativeProps.current.others)
+        props: useMergedProps({ className: [...currentImperativeProps.current.className].join(" "), style: currentImperativeProps.current.style }, currentImperativeProps.current.html ? { dangerouslySetInnerHTML: { __html: currentImperativeProps.current.html } } : {}, { children: currentImperativeProps.current.children }, currentImperativeProps.current.others)
     };
 }
 function ImperativeElementU({ tag: Tag, handle, ...props }, ref) {

@@ -6,15 +6,28 @@ import { VNode } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 
 export interface UsePortalChildrenParameters {
+    /**
+     * The element that will contain the portal's children, or the string of its `id`.
+     */
     target: string | Element | null;
 }
 
+export type PortalChildUpdater<S> = (value: ((prevState: S) => S)) => void;
+export type PushPortalChild = UsePortalChildrenReturnType["pushChild"];
+export type UpdatePortalChild = UsePortalChildrenReturnType["updateChild"];
+export type RemovePortalChild = UsePortalChildrenReturnType["removeChild"];
+
 export interface UsePortalChildrenReturnType {
-    children: VNode;
+    /** The return value of `createPortal` */
+    children: VNode | null;
+    /** The element that the portal was rendered to (even if an `id` was provided) */
     portalElement: Element | null;
-    pushChild: PushPortalChild;
-    updateChild: UpdatePortalChild;
-    removeChild: RemovePortalChild;
+    /** Appends the given child to the portal's existing children, and returns a number that can be used to request updates to it/remove it later if necessary */
+    pushChild(child: VNode): number;
+    /** Allows a child to be updated with new props. `index` is the value returned from `pushChild`. */
+    updateChild(index: number, child: VNode): void;
+    /** Removes the child at the given `index` (the value returned from `pushChild`) */
+    removeChild(index: number) : void;
 }
 
 /**
@@ -26,7 +39,7 @@ export interface UsePortalChildrenReturnType {
  * 
  * {@include } {@link UsePortalChildrenParameters}
  */
-export function usePortalChildren({ target }: UsePortalChildrenParameters) {
+export function usePortalChildren({ target }: UsePortalChildrenParameters): UsePortalChildrenReturnType {
     monitorCallCount(usePortalChildren);
 
     const [pushChild, setPushChild] = useState<PushPortalChild | null>(null);
@@ -58,10 +71,6 @@ export function usePortalChildren({ target }: UsePortalChildrenParameters) {
 }
 
 
-export type PortalChildUpdater<S> = (value: ((prevState: S) => S)) => void;
-export type PushPortalChild = (child: VNode) => number;
-export type UpdatePortalChild = (index: number, child: VNode) => void;
-export type RemovePortalChild = (index: number) => void;
 
 
 /**

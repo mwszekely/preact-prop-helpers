@@ -165,8 +165,6 @@ export declare type AsyncHandler<EventType, CaptureType> = ((c: CaptureType, e: 
  */
 export declare function binarySearch<T, U, F extends (lhs: U, rhs: T) => number>(array: T[], wanted: U, comparator: F): number;
 
-declare type C = ElementProps<EventTarget>["className"];
-
 declare function callCountU(hook: Function): void;
 
 export declare type Compare<M extends UseRearrangeableChildInfo> = (lhs: M, rhs: M) => number;
@@ -187,9 +185,9 @@ export declare type CompositionEventType<E extends EventTarget> = JSX.TargetedCo
 
 export declare type CSSProperties = JSX.CSSProperties;
 
-export declare type DangerouslyAppendHTML = (html: string) => Element;
+export declare type DangerouslyAppendHTML = UseImperativePropsReturnTypeSelf<any>["dangerouslyAppendHTML"];
 
-export declare type DangerouslySetInnerHTML = (html: string) => void;
+export declare type DangerouslySetInnerHTML = UseImperativePropsReturnTypeSelf<any>["dangerouslySetInnerHTML"];
 
 export declare function debounceRendering(f: () => void): void;
 
@@ -238,6 +236,11 @@ export declare interface ElementSize {
     offsetTop: number | undefined;
 }
 
+/**
+ * When `useMergedProps` encounters a conflict, the function passed here will be called.
+ *
+ * @defaultValue `console.warn`
+ */
 export declare function enableLoggingPropConflicts(log2: typeof console["log"]): void;
 
 export declare type EnhancedEventHandler<E extends Event, Detail> = (e: TargetedEnhancedEvent<E, Detail>) => void;
@@ -328,11 +331,9 @@ export declare function generateRandomId(prefix?: string): string;
 
 export declare function generateStack(): string | undefined;
 
-export declare type GetAttribute<T extends Element> = <K extends keyof ElementProps<T>>(prop: K) => ElementProps<T>[K];
+export declare type GetAttribute<T extends Element> = UseImperativePropsReturnTypeSelf<T>["getAttribute"];
 
 export declare function getBuildMode(): "production" | "development";
-
-export declare type GetClass = (cls: string) => boolean;
 
 export declare function getDocument(element?: Node): Document;
 
@@ -361,6 +362,8 @@ export declare interface GridSingleSelectSortableChildCellInfo<CellElement exten
 
 export declare interface GridSingleSelectSortableChildRowInfo<RowElement extends Element, CellElement extends Element> extends GridSingleSelectChildRowInfo<RowElement, CellElement>, UseSortableChildInfo {
 }
+
+export declare type HasClass = UseImperativePropsReturnTypeSelf<any>["hasClass"];
 
 export declare interface HasLastFocusReturnTypeSelf {
     /** STABLE */
@@ -615,7 +618,7 @@ export declare function ProvideBatchedAnimationFrames({ children }: {
     children: ElementProps<EventTarget>["children"];
 }): JSX_2.Element;
 
-export declare type PushPortalChild = (child: VNode) => number;
+export declare type PushPortalChild = UsePortalChildrenReturnType["pushChild"];
 
 export { Ref }
 
@@ -623,7 +626,7 @@ export { RefCallback }
 
 export { RefObject }
 
-export declare type RemovePortalChild = (index: number) => void;
+export declare type RemovePortalChild = UsePortalChildrenReturnType["removeChild"];
 
 export declare function returnFalse(): boolean;
 
@@ -686,13 +689,13 @@ export declare type SelectedIndexChangeHandler = EnhancedEventHandler<Event, {
     selectedIndex: number;
 }>;
 
-export declare type SetAttribute<T extends Element> = <K extends keyof ElementProps<T>>(prop: K, value: ElementProps<T>[K] | null) => void;
+export declare type SetAttribute<T extends Element> = UseImperativePropsReturnTypeSelf<T>["setAttribute"];
 
-export declare type SetChildren = ((children: string | null) => void);
+export declare type SetChildren = UseImperativePropsReturnTypeSelf<any>["setChildren"];
 
-export declare type SetClass = (cls: string, enabled: boolean) => void;
+export declare type SetClass = UseImperativePropsReturnTypeSelf<any>["setClass"];
 
-export declare type SetEventHandler = <K extends keyof HTMLElementEventMap>(type: K, listener: null | ((this: HTMLElement, ev: HTMLElementEventMap[K]) => void), options: AddEventListenerOptions) => void;
+export declare type SetEventHandler = UseImperativePropsReturnTypeSelf<any>["setEventHandler"];
 
 export declare type SetParamWithHistory<T> = (value: T | ((prevValue: T) => T), reason?: "push" | "replace") => void;
 
@@ -704,7 +707,7 @@ export declare type SetParamWithHistory<T> = (value: T | ((prevValue: T) => T), 
  */
 export declare function setPressVibrate(func: () => void): void;
 
-export declare type SetStyle = <T extends (keyof CSSStyleDeclaration) & string>(prop: T, value: CSSProperties[T] | null) => void;
+export declare type SetStyle = UseImperativePropsReturnTypeSelf<any>["setStyle"];
 
 export declare type SetTabbableIndex = (updater: Parameters<PassiveStateUpdater<number | null, Event>>[0], reason: Event | undefined, fromUserInteraction: boolean) => void;
 
@@ -813,7 +816,7 @@ declare type TypedEventHandlerEvent<E extends EventTarget, T extends TypedEventL
 
 declare type TypedEventListenerTypes<T extends EventTarget> = TypedAddEventListener<T> extends ((type: infer K2, ...args: any[]) => any) ? K2 : string;
 
-export declare type UpdatePortalChild = (index: number, child: VNode) => void;
+export declare type UpdatePortalChild = UsePortalChildrenReturnType["updateChild"];
 
 /**
  * Allows you to inspect which element in the `document` currently has focus, which was most recently focused if none are currently, and whether or not the window has focus
@@ -886,9 +889,9 @@ export declare interface UseActiveElementReturnTypeSelf {
 }
 
 /**
- * The (optionally non-stable) `callback` you provide will start running every frame after the component mounts.
+ * The callback you provide will start running every frame after the component mounts.
  *
- * @remarks Passing `null` is fine and simply stops the effect until you restart it by providing a non-null callback.
+ * @remarks Passing `null` is fine and simply stops the effect until you restart it by providing a non-null callback; it doesn't need to be stable.
  *
  * {@include } {@link UseAnimationFrameParameters}
  *
@@ -2042,8 +2045,10 @@ export declare interface UseHasLastFocusReturnType extends UseActiveElementRetur
 
 /**
  * Allows for hiding the scroll bar of the root HTML element
- * without shifting the layout of the page more than adding a few pixels
+ * without shifting the layout of the page by adding a few pixels
  * of padding to the root element if necessary.
+ *
+ * @param hideScroll - Whether the scroll bar is hidden or not (i.e. `true` to hide the scroll bar, `false` to allow it to be visible)
  */
 export declare function useHideScroll(hideScroll: boolean): {
     getScrollbarWidth: () => number | null;
@@ -2051,6 +2056,10 @@ export declare function useHideScroll(hideScroll: boolean): {
 };
 
 /**
+ * Allows controlling an element's `class`, `style`, etc. with functions like `setStyle` in addition to being reactive to incoming props.
+ *
+ * @remarks If the component is re-rendered after the element is modified in some way, those changes are remembered and included in the returned `props` that are meant to be spread to the element in question.
+ *
  * @compositeParams
  */
 export declare function useImperativeProps<E extends Element>({ refElementReturn: { getElement } }: UseImperativePropsParameters<E>): UseImperativePropsReturnType<E>;
@@ -2064,15 +2073,23 @@ export declare interface UseImperativePropsReturnType<T extends Element> {
 }
 
 export declare interface UseImperativePropsReturnTypeSelf<T extends Element> {
-    hasClass: GetClass;
-    setClass: SetClass;
-    setStyle: SetStyle;
-    getAttribute: GetAttribute<T>;
-    setAttribute: SetAttribute<T>;
-    setChildren: SetChildren;
-    dangerouslySetInnerHTML: DangerouslySetInnerHTML;
-    dangerouslyAppendHTML: DangerouslyAppendHTML;
-    setEventHandler: SetEventHandler;
+    /** Returns whether the element currently has the current CSS class */
+    hasClass(cls: string): boolean;
+    /** Applies or removes the given CSS class to the element */
+    setClass(cls: string, enabled: boolean): void;
+    /** Applies the given CSS style to the element */
+    setStyle<K extends (keyof CSSStyleDeclaration) & string>(prop: K, value: CSSProperties[K] | null): void;
+    /** Returns the current value of the attribute on the element */
+    getAttribute<K extends keyof ElementProps<T>>(prop: K): ElementProps<T>[K];
+    /** Applies the given attribute to the element */
+    setAttribute<K extends keyof ElementProps<T>>(prop: K, value: ElementProps<T>[K] | null): void;
+    /** Sets the element's `textContent` */
+    setChildren(children: string | null): void;
+    /** Sets the element's `innerHTML` */
+    dangerouslySetInnerHTML(html: string): void;
+    /** Evaluates the given HTML and appends it to the current children. */
+    dangerouslyAppendHTML(html: string): Element;
+    setEventHandler<K extends keyof HTMLElementEventMap>(type: K, listener: null | ((this: HTMLElement, ev: HTMLElementEventMap[K]) => void), options: AddEventListenerOptions): void;
 }
 
 /**
@@ -2486,17 +2503,19 @@ export declare interface UseMediaQueryReturnType {
 
 export declare function useMemoObject<T extends {}>(t: T): T;
 
+/**
+ * Combines two `children`.
+ *
+ * @remarks This is fairly trivial and not even technically a hook, as it doesn't use any other hooks, but is this way for consistency.
+ */
 export declare function useMergedChildren(lhs: ElementProps<EventTarget>["children"], rhs: ElementProps<EventTarget>["children"]): ElementProps<EventTarget>["children"];
 
 /**
- * Given two sets of props, merges their `class` and `className` properties.
- * @remarks Duplicate classes are removed (order doesn't matter anyway).
+ * Merged the `class` and `className` properties of two sets of props into a single string.
  *
- * @param lhs - Classes of the first component
- * @param rhs - Classes of the second component
- * @returns A string representing all combined classes from both arguments.
+ * @remarks Duplicate classes are removed (order doesn't matter anyway).
  */
-export declare function useMergedClasses(lhsClass: C, lhsClassName: C, rhsClass: C, rhsClassName: C): string | undefined;
+export declare function useMergedClasses(...classes: ElementProps<EventTarget>["className"][]): string | undefined;
 
 /**
  * Given two sets of props, merges them and returns the result.
@@ -2512,7 +2531,6 @@ export declare function useMergedClasses(lhsClass: C, lhsClassName: C, rhsClass:
  * @see {@link useMergedClasses}
  * @see {@link useMergedChildren}
  *
- *
  * @param allProps - A variadic number of props to merge into one
  *
  * @returns A single object with all the provided props merged into one.
@@ -2521,6 +2539,8 @@ export declare function useMergedProps<E extends EventTarget>(...allProps: Eleme
 
 /**
  * Combines two refs into one. This allows a component to both use its own ref *and* forward a ref that was given to it.
+ *
+ * @remarks Or just use {@link useMergedProps}
  */
 export declare function useMergedRefs<E extends EventTarget>(rhs: ElementProps<E>["ref"], lhs: ElementProps<E>["ref"]): RefObject<E> | RefCallback<E>;
 
@@ -2710,24 +2730,26 @@ export declare function usePersistentState<Key extends keyof PersistentStates, T
  *
  * {@include } {@link UsePortalChildrenParameters}
  */
-export declare function usePortalChildren({ target }: UsePortalChildrenParameters): {
-    children: VNode_2<any> | null;
-    pushChild: PushPortalChild;
-    updateChild: UpdatePortalChild;
-    removeChild: RemovePortalChild;
-    portalElement: Element | null;
-};
+export declare function usePortalChildren({ target }: UsePortalChildrenParameters): UsePortalChildrenReturnType;
 
 export declare interface UsePortalChildrenParameters {
+    /**
+     * The element that will contain the portal's children, or the string of its `id`.
+     */
     target: string | Element | null;
 }
 
 export declare interface UsePortalChildrenReturnType {
-    children: VNode;
+    /** The return value of `createPortal` */
+    children: VNode | null;
+    /** The element that the portal was rendered to (even if an `id` was provided) */
     portalElement: Element | null;
-    pushChild: PushPortalChild;
-    updateChild: UpdatePortalChild;
-    removeChild: RemovePortalChild;
+    /** Appends the given child to the portal's existing children, and returns a number that can be used to request updates to it/remove it later if necessary */
+    pushChild(child: VNode): number;
+    /** Allows a child to be updated with new props. `index` is the value returned from `pushChild`. */
+    updateChild(index: number, child: VNode): void;
+    /** Removes the child at the given `index` (the value returned from `pushChild`) */
+    removeChild(index: number): void;
 }
 
 /**
@@ -2999,8 +3021,13 @@ export declare interface UseRefElementParameters<T> {
 }
 
 export declare interface UseRefElementParametersSelf<T> {
+    /**
+     * Called with the `Element` when it mounts, called with `null` when it unmounts.
+     */
     onElementChange?: OnPassiveStateChange<T | null, never>;
+    /** Called when the element mounts */
     onMount?: (element: T) => void;
+    /** Called when the element unmounts */
     onUnmount?: (element: T) => void;
 }
 
@@ -3010,7 +3037,11 @@ export declare interface UseRefElementReturnType<T extends EventTarget> {
 }
 
 export declare interface UseRefElementReturnTypeSelf<T extends EventTarget> {
-    /** **STABLE** */
+    /**
+     * **STABLE**
+     *
+     * Call to return the element that the props were rendered to, or `null` if they were not rendered to an element.
+     */
     getElement(): T | null;
 }
 
@@ -3571,6 +3602,11 @@ export declare interface UseTextContentParametersSelf<E extends Element> {
      * Return the text content of this component. By default, `e => e.textContent` is probably what you want.
      */
     getText(e: E | null): string | null;
+    /**
+     * During `useEffect`, this is called if the text content of the rendered element has changed.
+     *
+     * @see {@link useMutationObserver} for a more robust implementation of this idea
+     */
     onTextContentChange: OnPassiveStateChange<string | null, never>;
 }
 
@@ -3579,6 +3615,7 @@ export declare interface UseTextContentReturnType {
 }
 
 export declare interface UseTextContentReturnTypeSelf {
+    /** Returns the last known value of the element's text content */
     getTextContent: () => string | null;
 }
 

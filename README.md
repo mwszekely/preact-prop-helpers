@@ -34,7 +34,7 @@ Very useful in very specific cases
 
  * [useElementSize](#useelementsize) Measures an element, allowing you to react to its changes in size. 
 
- * [useHideScroll](#usehidescroll) Allows for hiding the scroll bar of the root HTML element without shifting the layout of the page more than adding a few pixels of padding to the root element if necessary. 
+ * [useHideScroll](#usehidescroll) Allows for hiding the scroll bar of the root HTML element without shifting the layout of the page by adding a few pixels of padding to the root element if necessary. 
 
  * [useMediaQuery](#usemediaquery) Allows a component to use the boolean result of a media query as part of its render. 
 
@@ -59,7 +59,7 @@ Very useful in very specific cases
 
  * [useTextContent](#usetextcontent)  
 
- * [useImperativeProps](#useimperativeprops)  
+ * [useImperativeProps](#useimperativeprops) Allows controlling an element's `class`, `style`, etc. with functions like `setStyle` in addition to being reactive to incoming props. 
 
  * [usePortalChildren](#useportalchildren) Very basic hook for a root-level component to use to allow any children within the whole app to push children to a portal somewhere. 
 
@@ -96,7 +96,7 @@ These hooks don't do anything with HTML elements but are useful extensions to Pr
 
  * [useInterval](#useinterval) Runs a function every time the specified number of milliseconds elapses while the component is mounted. 
 
- * [useAnimationFrame](#useanimationframe) The (optionally non-stable) `callback` you provide will start running every frame after the component mounts. 
+ * [useAnimationFrame](#useanimationframe) The callback you provide will start running every frame after the component mounts. 
 
  * [useEffectDebug](#useeffectdebug) Wrap the native `useEffect` to add arguments that allow accessing the previous value as the first argument, as well as the changes that caused the hook to be called as the second argument. 
 
@@ -145,9 +145,9 @@ These hooks are primarily used to build larger hooks, but can be used alone
 
  * [useMergedRefs](#usemergedrefs) Combines two refs into one. This allows a component to both use its own ref *and* forward a ref that was given to it. 
 
- * [useMergedClasses](#usemergedclasses) Given two sets of props, merges their `class` and `className` properties. 
+ * [useMergedClasses](#usemergedclasses) Merged the `class` and `className` properties of two sets of props into a single string. 
 
- * [useMergedChildren](#usemergedchildren)  
+ * [useMergedChildren](#usemergedchildren) Combines two `children`. 
 
  * [useMergedStyles](#usemergedstyles) Merges two style objects, returning the result.
 
@@ -176,7 +176,7 @@ If two sets of props both specify the same attribute, e.g. both specify two diff
 
 ### enableLoggingPropConflicts
 
-
+When `useMergedProps` encounters a conflict, the function passed here will be called.
 
 
 
@@ -184,6 +184,15 @@ If two sets of props both specify the same attribute, e.g. both specify two diff
 |Parameter|Type|Description|
 |---------|----|-----------|
 |log2|typeof console["log"]||
+
+
+
+
+
+
+*Default*: `console.warn`
+
+
 
 
 
@@ -207,9 +216,9 @@ Allows you to access the `HTMLElement` rendered by this hook/these props, either
 
 |Member|Type|Description|
 |---------|----|-----------|
-|.onElementChange?|`OnPassiveStateChange<T \| null, never>`||
-|.onMount?|`(element: T) => void`||
-|.onUnmount?|`(element: T) => void`||
+|.onElementChange?|`OnPassiveStateChange<T \| null, never>`|Called with the `Element` when it mounts, called with `null` when it unmounts.|
+|.onMount?|`(element: T) => void`|Called when the element mounts|
+|.onUnmount?|`(element: T) => void`|Called when the element unmounts|
 
 
 
@@ -219,12 +228,14 @@ Allows you to access the `HTMLElement` rendered by this hook/these props, either
 
 |Member|Type|Description|
 |---------|----|-----------|
-|.getElement|`() => T | null`|**STABLE**|
+|.getElement|`() => T | null`|**STABLE**<br />Call to return the element that the props were rendered to, or `null` if they were not rendered to an element.|
 |propsStable|HTML props|Spread these props onto the HTML element that will use this logic.|
 
 This hook, like many others, works with either `useState` or [usePassiveState](#usepassivestate). Why use one over the other?
 
 * `useState` is familiar and easy to use, but causes the component to re-render itself, which is slow. * `usePassiveState` is faster and more scalable, but its state can't be accessed during render and it's more complex.
+
+
 
 **Easiest way to use (but causes an extra re-render 🐌)**
 
@@ -321,6 +332,8 @@ This function can be used to enable/disable button vibration pulses on an app-wi
 
 
 
+
+
 <hr />
 
 
@@ -350,6 +363,8 @@ Every member of `UseCompleteListNavigationParameters` is inherited (see the inte
 |props|HTML props|Spread these props onto the HTML element that will use this logic.|
 
 Unlike most others, this hook assume's it's the final one--the "outermost" hook in the component--so it uses `useManagedChildren` and wraps everything up nicely, combining event handlers that are used in multiple sub-hooks, collecting all the necessary context-related data, and merging all known DOM props together.
+
+
 
 
 
@@ -389,6 +404,8 @@ Every member of `UseCompleteGridNavigationParameters` is inherited (see the inte
 
 
 
+
+
 ### useCompleteGridNavigationRow
 
 
@@ -415,6 +432,8 @@ Every member of `UseCompleteGridNavigationParameters` is inherited (see the inte
 |Member|Type|Description|
 |---------|----|-----------|
 |context|``CompleteGridNavigationCellContext<RowElement, CellElement, CM>``|Functions and data that the parent is making available to each child. Put it in your own `Context` from `createContext`|
+
+
 
 
 
@@ -458,6 +477,8 @@ Every member of `UseCompleteGridNavigationParameters` is inherited (see the inte
 
 
 
+
+
 <hr />
 
 
@@ -492,6 +513,8 @@ Another in the "complete" series, alongside list/grid navigation and dismissal i
 
 
 
+
+
 <hr />
 
 
@@ -514,6 +537,8 @@ Note that because the handler you provide may be called with a delay, and becaus
 The handler is automatically throttled to only run one at a time. If the handler is called, and then before it finishes, is called again, it will be put on hold until the current one finishes, at which point the second one will run. If the handler is called a third time before the first has finished, it will *replace* the second, so only the most recently called iteration of the handler will run.
 
 You may optionally *also* specify debounce and throttle parameters that wait until the synchronous handler has not been called for the specified number of milliseconds, at which point we *actually* run the asynchronous handler according to the logic in the previous paragraph. This is in *addition* to throttling the handler, and does not replace that behavior.
+
+
 
 **General use**
 
@@ -600,19 +625,23 @@ Measures an element, allowing you to react to its changes in size.
 
 
 
+
+
 <hr />
 
 
 ### useHideScroll
 
-Allows for hiding the scroll bar of the root HTML element without shifting the layout of the page more than adding a few pixels of padding to the root element if necessary.
+Allows for hiding the scroll bar of the root HTML element without shifting the layout of the page by adding a few pixels of padding to the root element if necessary.
 
 
 
 
 |Parameter|Type|Description|
 |---------|----|-----------|
-|hideScroll|boolean||
+|hideScroll|boolean|Whether the scroll bar is hidden or not (i.e. `true` to hide the scroll bar, `false` to allow it to be visible)|
+
+
 
 
 
@@ -643,6 +672,8 @@ Allows a component to use the boolean result of a media query as part of its ren
 **Returns** `UseMediaQueryReturnType`
 
 Please note that there is a re-render penalty incurred by using this hook -- it will always cause any component that uses it to re-render one extra time on mount as it stores the result of the media query. This can be mitigated with the `defaultGuess` parameter -- if you guess correctly (`true`/`false`), then there's no penalty. Hooray.
+
+
 
 
 
@@ -680,6 +711,8 @@ Allows monitoring whether the rendered element is or is not focused directly (i.
 |.getCurrentFocused|`() => boolean`|STABLE|
 |.getCurrentFocusedInner|`() => boolean`|STABLE|
 |.propsStable|`ElementProps<E>`||
+
+
 
 
 
@@ -726,6 +759,8 @@ Allows monitoring whichever element is/was focused most recently, regardless of 
 
 
 
+
+
 <hr />
 
 
@@ -761,6 +796,8 @@ I.E. you can use this without needing a parent `<div>` to listen for a `focusout
 
 
 
+
+
 ### useChildrenHaveFocusChild
 
 
@@ -784,6 +821,8 @@ I.E. you can use this without needing a parent `<div>` to listen for a `focusout
 <small>extends [UseRefElementReturnType](#userefelementreturntype), [UseHasCurrentFocusParameters](#usehascurrentfocusparameters)</small>
 
 Every member of `UseChildrenHaveFocusChildReturnType` is inherited (see the interfaces it `extends` from).
+
+
 
 
 
@@ -832,6 +871,8 @@ Besides just generating something for the `id` prop, also gives you the props to
 
 
 
+
+
 <hr />
 
 
@@ -872,6 +913,8 @@ While `useRandomId` allows the referencer to use the source's ID, sometimes you 
 
 
 
+
+
 <hr />
 
 
@@ -896,6 +939,8 @@ Allows attaching an event handler to any *non-Preact* element, and removing it w
 `"mode"` controls if there's one handler that calls all your functions (default), or one handler added per function (`"single"`).
 
 The default, `"grouped"`, is faster when you have, say, a button component, used hundreds of times on a page, that each installs a global event handler.
+
+
 
 
 
@@ -928,6 +973,8 @@ The default, `"grouped"`, is faster when you have, say, a button component, used
 
 
 
+
+
 <hr />
 
 
@@ -948,6 +995,8 @@ Combines the semantics of `useAsync` and `useEffect`.
 **Returns** All values from `useAsync`, except for `syncHandler`.
 
 More specifically, if an event would run again, but the previous async event is still running, then we'll wait until it finishes to run the new effect. And while waiting, further new effect runs will bump old ones off, only remembering the most recent request.
+
+
 
 
 
@@ -994,6 +1043,8 @@ Every member of `UseMutationObserverReturnType` is inherited (see the interface 
 
 
 
+
+
 <hr />
 
 
@@ -1012,7 +1063,7 @@ Every member of `UseMutationObserverReturnType` is inherited (see the interface 
 |Member|Type|Description|
 |---------|----|-----------|
 |.getText|`(e?: E | null) => string | null`|Return the text content of this component. By default, `e => e.textContent` is probably what you want.|
-|.onTextContentChange|`OnPassiveStateChange<string \| null, never>`||
+|.onTextContentChange|`OnPassiveStateChange<string \| null, never>`|During `useEffect`, this is called if the text content of the rendered element has changed.<br />**See also**: [useMutationObserver](#usemutationobserver) for a more robust implementation of this idea|
 
 
 
@@ -1022,7 +1073,9 @@ Every member of `UseMutationObserverReturnType` is inherited (see the interface 
 
 |Member|Type|Description|
 |---------|----|-----------|
-|.getTextContent|`() => string \| null`||
+|.getTextContent|`() => string \| null`|Returns the last known value of the element's text content|
+
+
 
 
 
@@ -1036,7 +1089,7 @@ Every member of `UseMutationObserverReturnType` is inherited (see the interface 
 
 ### useImperativeProps
 
-
+Allows controlling an element's `class`, `style`, etc. with functions like `setStyle` in addition to being reactive to incoming props.
 
 
 
@@ -1056,16 +1109,18 @@ Every member of `UseImperativePropsParameters` is inherited (see the interface i
 
 |Member|Type|Description|
 |---------|----|-----------|
-|.dangerouslyAppendHTML|`DangerouslyAppendHTML`||
-|.dangerouslySetInnerHTML|`DangerouslySetInnerHTML`||
-|.getAttribute|`GetAttribute<T>`||
-|.hasClass|`GetClass`||
-|.setAttribute|`SetAttribute<T>`||
-|.setChildren|`SetChildren`||
-|.setClass|`SetClass`||
-|.setEventHandler|`SetEventHandler`||
-|.setStyle|`SetStyle`||
+|.dangerouslyAppendHTML|`(html?: string) => Element`|Evaluates the given HTML and appends it to the current children.|
+|.dangerouslySetInnerHTML|`(html?: string) => void`|Sets the element's `innerHTML`|
+|.getAttribute|`(prop?: K) => ElementProps<T>[K]`|Returns the current value of the attribute on the element|
+|.hasClass|`(cls?: string) => boolean`|Returns whether the element currently has the current CSS class|
+|.setAttribute|`(prop?: K, value?: ElementProps<T>[K] | null) => void`|Applies the given attribute to the element|
+|.setChildren|`(children?: string | null) => void`|Sets the element's `textContent`|
+|.setClass|`(cls?: string, enabled?: boolean) => void`|Applies or removes the given CSS class to the element|
+|.setEventHandler|`(type?: K, listener?: null | ((this: HTMLElement, ev: HTMLElementEventMap[K]) => void), options?: AddEventListenerOptions) => void`||
+|.setStyle|`(prop?: K, value?: CSSProperties[K] | null) => void`|Applies the given CSS style to the element|
 |props|HTML props|Spread these props onto the HTML element that will use this logic.|
+
+If the component is re-rendered after the element is modified in some way, those changes are remembered and included in the returned `props` that are meant to be spread to the element in question.
 
 
 
@@ -1101,7 +1156,9 @@ TODO: Can't push a child until after the very first `useLayoutEffect`
 
 |Member|Type|Description|
 |---------|----|-----------|
-|target|`string \| Element \| null`||
+|target|`string \| Element \| null`|The element that will contain the portal's children, or the string of its `id`.|
+
+
 
 
 
@@ -1148,6 +1205,8 @@ The document's body receiving focus, like it does when you click on an empty are
 This is a passive hook, so by default it returns getter functions that report this information but the component will not re-render by default when the active element changes.
 
 If you need the component to re-render when the active element changes, use the `on*Change` arguments to set some state on your end.
+
+
 
 
 
@@ -1202,6 +1261,8 @@ Allows an element to start a drag operation.
 
 
 
+
+
 <hr />
 
 
@@ -1247,6 +1308,8 @@ Allows an element to start a drag operation.
 
 
 
+
+
 <hr />
 
 
@@ -1281,6 +1344,8 @@ This interface is empty.
 
 
 
+
+
 <hr />
 
 
@@ -1299,6 +1364,8 @@ Given an input value, returns a constant getter function that can be used inside
 
 
 This uses `options.diffed` in order to run before everything, even ref assignment. This means this getter is safe to use anywhere ***except the render phase***.
+
+
 
 
 
@@ -1330,6 +1397,8 @@ In general, just pass the function you want to be stable (but you can't use it d
 
 
 
+
+
 <hr />
 
 
@@ -1343,6 +1412,8 @@ In general, just pass the function you want to be stable (but you can't use it d
 |Parameter|Type|Description|
 |---------|----|-----------|
 |t|T||
+
+
 
 
 
@@ -1378,6 +1449,8 @@ It's a bit smelly, so best to use sparingly.
 
 
 
+
+
 <hr />
 
 
@@ -1396,6 +1469,8 @@ Slightly enhanced version of `useState` that includes a getter that remains cons
 
 
 If `getBuildMode()` returns `"development"`, then any calls to `setState` will also take the stack at the time the hook was called and save it to `window._setState_stack`. Useful if you want to trace whose state is being updated.
+
+
 
 
 
@@ -1440,6 +1515,8 @@ export type OnPassiveStateChange<S, R> = ((value: S, prevValue: S | undefined, r
 
 
 
+
+
 <hr />
 
 
@@ -1473,6 +1550,8 @@ declare module 'preact-prop-helpers' {
 }
 
 ```
+
+
 
 
 
@@ -1525,6 +1604,8 @@ This interface is empty.
 
 
 
+
+
 <hr />
 
 
@@ -1551,6 +1632,8 @@ Runs a function the specified number of milliseconds after the component renders
 |callback|`() => void`|Called `timeout` ms after mount, or the last change to `triggerIndex`.<br />Does *not* need to be stable. Go ahead and pass an anonymous function.|
 |timeout|`Nullable<number>`|The number of ms to wait before invoking `callback`. If `null`, cancels the timeout immediately.|
 |triggerIndex?|`unknown`|Changes to this prop between renders can be used to clear the current timeout and create a new one.|
+
+
 
 
 
@@ -1588,12 +1671,14 @@ Runs a function every time the specified number of milliseconds elapses while th
 
 
 
+
+
 <hr />
 
 
 ### useAnimationFrame
 
-The (optionally non-stable) `callback` you provide will start running every frame after the component mounts.
+The callback you provide will start running every frame after the component mounts.
 
 
 
@@ -1605,7 +1690,7 @@ The (optionally non-stable) `callback` you provide will start running every fram
 
 
 
-Passing `null` is fine and simply stops the effect until you restart it by providing a non-null callback.
+Passing `null` is fine and simply stops the effect until you restart it by providing a non-null callback; it doesn't need to be stable.
 
 ### UseAnimationFrameParameters
 
@@ -1625,6 +1710,8 @@ When a bunch of unrelated components all use `requestAnimationFrame`, yes, this 
 |Parameter|Type|Description|
 |---------|----|-----------|
 |{ children }|{<br />    children: [ElementProps](#elementprops)<EventTarget>["children"];<br />}||
+
+
 
 
 
@@ -1657,6 +1744,8 @@ Wrap the native `useEffect` to add arguments that allow accessing the previous v
 
 
 
+
+
 <hr />
 
 
@@ -1671,6 +1760,8 @@ Wrap the native `useLayoutEffect` to add arguments that allow accessing the prev
 |---------|----|-----------|
 |effect|(prev: I \| undefined, changes: EffectChange<I, number>[]) => (void \| (() => void))|Same as the built-in's|
 |inputs|I|Same as the built-in's|
+
+
 
 
 
@@ -1719,6 +1810,8 @@ This hook is designed to be lightweight, in that the parent keeps no state and r
 
 
 
+
+
 ### useManagedChild
 
 
@@ -1745,6 +1838,8 @@ This hook is designed to be lightweight, in that the parent keeps no state and r
 |Member|Type|Description|
 |---------|----|-----------|
 |.getChildren|`() => ManagedChildren<M>`||
+
+
 
 
 
@@ -1788,6 +1883,8 @@ In the document order, there will be only one "focused" or "tabbable" element, m
 
 
 
+
+
 ### useListNavigationChild
 
 
@@ -1811,6 +1908,8 @@ In the document order, there will be only one "focused" or "tabbable" element, m
 <small>extends [UseRefElementReturnType](#userefelementreturntype), [UseRovingTabIndexChildReturnType](#userovingtabindexchildreturntype), [UseTextContentReturnType](#usetextcontentreturntype), [UseHasCurrentFocusParameters](#usehascurrentfocusparameters), [UsePressParameters](#usepressparameters)</small>
 
 Every member of `UseListNavigationChildReturnType` is inherited (see the interfaces it `extends` from).
+
+
 
 
 
@@ -1863,6 +1962,8 @@ Some features and/or limitations of this hook:
 
 
 
+
+
 ### useGridNavigationRow
 
 Child hook for [useGridNavigation](#usegridnavigation)
@@ -1899,6 +2000,8 @@ As a row, this hook is responsible for both being a **child** of list navigation
 
 
 
+
+
 ### useGridNavigationCell
 
 Child hook for [useGridNavigationRow](#usegridnavigationrow) (and [useGridNavigation](#usegridnavigation)).
@@ -1923,6 +2026,8 @@ Child hook for [useGridNavigationRow](#usegridnavigationrow) (and [useGridNaviga
 <small>extends [UseRefElementReturnType](#userefelementreturntype), [UseRovingTabIndexChildReturnType](#userovingtabindexchildreturntype), [UseTextContentReturnType](#usetextcontentreturntype), [UseHasCurrentFocusParameters](#usehascurrentfocusparameters), [UsePressParameters](#usepressparameters)</small>
 
 Every member of `UseGridNavigationCellReturnType` is inherited (see the interfaces it `extends` from).
+
+
 
 
 
@@ -1974,6 +2079,8 @@ Implements a roving tabindex system where only one "focusable" component in a se
 
 
 
+
+
 ### useRovingTabIndexChild
 
 
@@ -2002,6 +2109,8 @@ Implements a roving tabindex system where only one "focusable" component in a se
 |.tabbable|`boolean`|*Unstable*<br />Whether this child, individually, is *the* currently tabbable child.|
 |info|``Pick<M, UseRovingTabIndexChildInfoKeysReturnType>``|Data the child makes available to the parent. Passed to `useManagedChild`|
 |props|HTML props|Spread these props onto the HTML element that will use this logic.|
+
+
 
 
 
@@ -2063,6 +2172,8 @@ There is no child version of this hook. That being said, the props returned are 
 
 
 
+
+
 <hr />
 
 
@@ -2104,6 +2215,8 @@ Allows for the selection of a managed child by typing the given text associated 
 
 
 
+
+
 ### useTypeaheadNavigationChild
 
 
@@ -2128,6 +2241,8 @@ Allows for the selection of a managed child by typing the given text associated 
 <small>extends [UseTextContentReturnType](#usetextcontentreturntype), [UseRefElementReturnType](#userefelementreturntype), [UsePressParameters](#usepressparameters)</small>
 
 Every member of `UseTypeaheadNavigationChildReturnType` is inherited (see the interfaces it `extends` from).
+
+
 
 
 
@@ -2176,6 +2291,8 @@ Every member of `UseTypeaheadNavigationChildReturnType` is inherited (see the in
 
 
 
+
+
 ### useSingleSelectionChild
 
 
@@ -2207,6 +2324,8 @@ Every member of `UseTypeaheadNavigationChildReturnType` is inherited (see the in
 |.selectedOffset|`Nullable<number>`|Any time `selected` changes to or from being visible, this will represent the direction and magnitude of the change.<br />It will never be zero; when `selected` is `true`, then this will be the most recently-used offset.<br />This useful for things like animations or transitions.|
 |info|``Pick<UseSingleSelectionChildInfo<E>, UseSingleSelectionChildInfoReturnKeys>``|Data the child makes available to the parent. Passed to `useManagedChild`|
 |props|HTML props|Spread these props onto the HTML element that will use this logic.|
+
+
 
 
 
@@ -2267,6 +2386,8 @@ Again, unlike some other hooks, **these children must be direct descendants**. T
 
 
 
+
+
 <hr />
 
 
@@ -2311,6 +2432,8 @@ Again, unlike some other hooks, **these children must be direct descendants**. T
 
 
 
+
+
 <hr />
 
 
@@ -2344,6 +2467,8 @@ Allows children to stop themselves from rendering outside of a narrow range.
 |context|``UsePaginatedChildContext``|Functions and data that the parent is making available to each child. Put it in your own `Context` from `createContext`|
 
 Each child will still render itself, but it is aware of if it is within/outside of the pagination range, and simply return empty.
+
+
 
 
 
@@ -2387,6 +2512,8 @@ When a child is paginated, it still renders itself (i.e. it calls this hook, so 
 
 
 
+
+
 <hr />
 
 
@@ -2422,6 +2549,8 @@ Note that the child itself will still render, but you can delay rendering *its* 
 
 
 
+
+
 ### useStaggeredChild
 
 Child hook for [useStaggeredChildren](#usestaggeredchildren).
@@ -2453,6 +2582,8 @@ Child hook for [useStaggeredChildren](#usestaggeredchildren).
 |props|HTML props|Spread these props onto the HTML element that will use this logic.|
 
 When a child is staggered, it still renders itself (i.e. it calls this hook, so it's rendering), so check `hideBecauseStaggered` and, if it's true, avoid doing any heavy logic and render with `display: none`.
+
+
 
 
 
@@ -2503,6 +2634,8 @@ Combines all the methods of dismissing a modal-ish or popup-ish component into o
 
 
 
+
+
 <hr />
 
 
@@ -2525,6 +2658,8 @@ Handles events for a backdrop on a modal dialog -- the kind where the user expec
 |refElementPopupReturn|Pick<UseRefElementReturnType<PopupElement>["refElementReturn"], "getElement">;| |
 
 **Returns**: void
+
+
 
 
 
@@ -2573,6 +2708,8 @@ One press of the `Escape` key is guaranteed to only call `onClose` for *only one
 
 
 
+
+
 <hr />
 
 
@@ -2602,6 +2739,8 @@ Handles events for dismiss events for things like popup menus or transient dialo
 <small>extends [UseActiveElementParameters](#useactiveelementparameters)</small>
 
 Every member of `UseLostFocusDismissReturnType` is inherited (see the interface it `extends` from).
+
+
 
 
 
@@ -2641,6 +2780,8 @@ Every member of `UseLostFocusDismissReturnType` is inherited (see the interface 
 |Member|Type|Description|
 |---------|----|-----------|
 |props|HTML props|Spread these props onto the HTML element that will use this logic.|
+
+
 
 
 
@@ -2689,6 +2830,8 @@ Finally, because the sync handler may be invoked on a delay, any property refere
 
 
 
+
+
 <hr />
 
 
@@ -2715,6 +2858,8 @@ In general, you'll want to inspect a specific directory of a path, or a specific
 
 
 
+
+
 <hr />
 
 
@@ -2733,6 +2878,8 @@ Combines two refs into one. This allows a component to both use its own ref *and
 
 
 
+Or just use [useMergedProps](#usemergedprops)
+
 
 
 
@@ -2745,22 +2892,21 @@ Combines two refs into one. This allows a component to both use its own ref *and
 
 ### useMergedClasses
 
-Given two sets of props, merges their `class` and `className` properties.
+Merged the `class` and `className` properties of two sets of props into a single string.
 
 
 
 
 |Parameter|Type|Description|
 |---------|----|-----------|
-|lhsClass|C||
-|lhsClassName|C||
-|rhsClass|C||
-|rhsClassName|C||
+|classes|[ElementProps](#elementprops)<EventTarget>["className"][]||
 
 
-**Returns** A string representing all combined classes from both arguments.
+
 
 Duplicate classes are removed (order doesn't matter anyway).
+
+
 
 
 
@@ -2772,7 +2918,7 @@ Duplicate classes are removed (order doesn't matter anyway).
 
 ### useMergedChildren
 
-
+Combines two `children`.
 
 
 
@@ -2784,6 +2930,8 @@ Duplicate classes are removed (order doesn't matter anyway).
 
 
 
+
+This is fairly trivial and not even technically a hook, as it doesn't use any other hooks, but is this way for consistency.
 
 
 
@@ -2809,6 +2957,8 @@ Merges two style objects, returning the result.
 
 
 **Returns** A CSS object containing the properties of both objects.
+
+
 
 
 

@@ -1,13 +1,25 @@
 import { VNode } from "../util/types.js";
 export interface UsePortalChildrenParameters {
+    /**
+     * The element that will contain the portal's children, or the string of its `id`.
+     */
     target: string | Element | null;
 }
+export type PortalChildUpdater<S> = (value: ((prevState: S) => S)) => void;
+export type PushPortalChild = UsePortalChildrenReturnType["pushChild"];
+export type UpdatePortalChild = UsePortalChildrenReturnType["updateChild"];
+export type RemovePortalChild = UsePortalChildrenReturnType["removeChild"];
 export interface UsePortalChildrenReturnType {
-    children: VNode;
+    /** The return value of `createPortal` */
+    children: VNode | null;
+    /** The element that the portal was rendered to (even if an `id` was provided) */
     portalElement: Element | null;
-    pushChild: PushPortalChild;
-    updateChild: UpdatePortalChild;
-    removeChild: RemovePortalChild;
+    /** Appends the given child to the portal's existing children, and returns a number that can be used to request updates to it/remove it later if necessary */
+    pushChild(child: VNode): number;
+    /** Allows a child to be updated with new props. `index` is the value returned from `pushChild`. */
+    updateChild(index: number, child: VNode): void;
+    /** Removes the child at the given `index` (the value returned from `pushChild`) */
+    removeChild(index: number): void;
 }
 /**
  * Very basic hook for a root-level component to use to allow any children within the whole app to push children to a portal somewhere.
@@ -18,15 +30,5 @@ export interface UsePortalChildrenReturnType {
  *
  * {@include } {@link UsePortalChildrenParameters}
  */
-export declare function usePortalChildren({ target }: UsePortalChildrenParameters): {
-    children: import("preact").VNode<any> | null;
-    pushChild: PushPortalChild;
-    updateChild: UpdatePortalChild;
-    removeChild: RemovePortalChild;
-    portalElement: Element | null;
-};
-export type PortalChildUpdater<S> = (value: ((prevState: S) => S)) => void;
-export type PushPortalChild = (child: VNode) => number;
-export type UpdatePortalChild = (index: number, child: VNode) => void;
-export type RemovePortalChild = (index: number) => void;
+export declare function usePortalChildren({ target }: UsePortalChildrenParameters): UsePortalChildrenReturnType;
 //# sourceMappingURL=use-portal-children.d.ts.map

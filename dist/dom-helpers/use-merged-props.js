@@ -5,6 +5,11 @@ import { useMergedClasses } from "./use-merged-classes.js";
 import { useMergedRefs } from "./use-merged-refs.js";
 import { useMergedStyles } from "./use-merged-styles.js";
 let log = console.warn;
+/**
+ * When `useMergedProps` encounters a conflict, the function passed here will be called.
+ *
+ * @defaultValue `console.warn`
+ */
 export function enableLoggingPropConflicts(log2) {
     log = log2;
 }
@@ -21,7 +26,6 @@ export function enableLoggingPropConflicts(log2) {
  * @see {@link useMergedStyles}
  * @see {@link useMergedClasses}
  * @see {@link useMergedChildren}
- *
  *
  * @param allProps - A variadic number of props to merge into one
  *

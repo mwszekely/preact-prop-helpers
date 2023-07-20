@@ -1,4 +1,9 @@
 import { ElementProps } from "../util/types.js";
+/**
+ * When `useMergedProps` encounters a conflict, the function passed here will be called.
+ *
+ * @defaultValue `console.warn`
+ */
 export declare function enableLoggingPropConflicts(log2: typeof console["log"]): void;
 /**
  * Given two sets of props, merges them and returns the result.
@@ -13,7 +18,6 @@ export declare function enableLoggingPropConflicts(log2: typeof console["log"]):
  * @see {@link useMergedStyles}
  * @see {@link useMergedClasses}
  * @see {@link useMergedChildren}
- *
  *
  * @param allProps - A variadic number of props to merge into one
  *

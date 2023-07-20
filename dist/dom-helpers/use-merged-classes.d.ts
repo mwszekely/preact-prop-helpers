@@ -1,13 +1,8 @@
 import { ElementProps } from "../util/types.js";
-type C = ElementProps<EventTarget>["className"];
 /**
- * Given two sets of props, merges their `class` and `className` properties.
- * @remarks Duplicate classes are removed (order doesn't matter anyway).
+ * Merged the `class` and `className` properties of two sets of props into a single string.
  *
- * @param lhs - Classes of the first component
- * @param rhs - Classes of the second component
- * @returns A string representing all combined classes from both arguments.
+ * @remarks Duplicate classes are removed (order doesn't matter anyway).
  */
-export declare function useMergedClasses(lhsClass: C, lhsClassName: C, rhsClass: C, rhsClassName: C): string | undefined;
-export {};
+export declare function useMergedClasses(...classes: ElementProps<EventTarget>["className"][]): string | undefined;
 //# sourceMappingURL=use-merged-classes.d.ts.map
