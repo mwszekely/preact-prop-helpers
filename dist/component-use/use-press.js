@@ -10,23 +10,28 @@ function supportsPointerEvents() {
 }
 /**
  * Adds the necessary event handlers to create a "press"-like event for
- * any element, whether it's a native &lt;button> or regular &lt;div>,
+ * any element, whether it's a native &lt;button&gt; or regular &lt;div&gt;,
  * and allows for a "long press" that can be used to,
  * e.g., show a tooltip *instead* of activating a press.
  *
+ * @remarks
  * Notably, the following cases are covered:
+ * ```md-literal
  * * The target element is properly focused, even on iOS Safari (*especially* on iOS Safari)
  * * Double-clicks won't select text, it just presses the button twice.
  * * Text selection that happens to end/start with this element won't invoke a press.
  * * The `enter` key immediately invokes a press (by default just once until pressed again), while the `space` key invokes it when released, if focus hasn't moved away from the button.
  * * Haptic feedback (on, like, the one browser combination that supports it &mdash; this can be disabled app-wide with `setButtonVibrate`)
+ * ```
  *
  * In addition, returns a "more accurate" CSS `active` and `hover`; more accurate
  * in that `hover` won't mess up mobile devices that see `hover` and mess up your click events,
  * and in that `active` accurately displays when a press would occur or not.
  *
- * @param onClickSync
- * @param exclude Whether the polyfill shouldn't apply (can specify for specific interactions)
+ * {@include } {@link setPressVibrate}
+ *
+ * @compositeParams
+ *
  */
 export function usePress(args) {
     monitorCallCount(usePress);
@@ -358,8 +363,7 @@ let pulse = (("vibrate" in navigator) && (navigator.vibrate instanceof Function)
  * This function can be used to enable/disable button vibration pulses on an app-wide scale.
  *
  *
- * @param func The function to run when a button is tapped.
- * (Default is `() => navigator.vibrate(10)` in browsers that support it, a noop otherwise)
+ * @param func - The function to run when a button is tapped. (Default is `() => navigator.vibrate(10)` in browsers that support it, a noop otherwise)
  */
 export function setPressVibrate(func) {
     pulse = func;

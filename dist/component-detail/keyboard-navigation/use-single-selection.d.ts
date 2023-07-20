@@ -14,8 +14,8 @@ export interface UseSingleSelectionChildInfo<E extends Element> extends UseRovin
      *
      * When the `selectedIndex` changes, the relevant children's `setLocalSelected` are called (max of 2).
      *
-     * @param selected This is the selected child (out of all of them)
-     * @param direction How far to the `selectedIndex` this child is
+     * @param selected - This is the selected child (out of all of them)
+     * @param direction - How far to the `selectedIndex` this child is
      */
     setLocalSelected(selected: boolean, direction: number | null): void;
     /**
@@ -111,7 +111,19 @@ export interface SingleSelectionContextSelf extends Pick<UseSingleSelectionParam
 export interface UseSingleSelectionContext {
     singleSelectionContext: SingleSelectionContextSelf;
 }
+/**
+ *
+ *
+ * @hasChild {@link useSingleSelectionChild}
+ *
+ * @compositeParams
+ */
 export declare function useSingleSelection<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseSingleSelectionChildInfo<ChildElement>>({ managedChildrenReturn: { getChildren, ...void1 }, rovingTabIndexReturn: { setTabbableIndex, ...void2 }, singleSelectionParameters: { onSelectedIndexChange: onSelectedIndexChange_U, initiallySelectedIndex, ariaPropName, selectionMode, ...void3 }, ...void4 }: UseSingleSelectionParameters<ParentOrChildElement, ChildElement, M>): UseSingleSelectionReturnType<ChildElement, M>;
+/**
+ *
+ *
+ * @compositeParams
+ */
 export declare function useSingleSelectionChild<ChildElement extends Element, M extends UseSingleSelectionChildInfo<ChildElement>>({ context: { singleSelectionContext: { getSelectedIndex, onSelectedIndexChange, ariaPropName, selectionMode, ...void1 }, ...void2 }, info: { index, unselectable, ...void3 }, ...void4 }: UseSingleSelectionChildParameters<ChildElement, M>): UseSingleSelectionChildReturnType<ChildElement>;
 export interface UseSingleSelectionDeclarativeParameters {
     singleSelectionDeclarativeParameters: {

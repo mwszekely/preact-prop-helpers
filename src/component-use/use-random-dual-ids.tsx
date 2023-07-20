@@ -18,6 +18,8 @@ export interface UseRandomDualIdsReturnType<InputElement extends Element, LabelE
 
 /**
  * While `useRandomId` allows the referencer to use the source's ID, sometimes you also want the reverse too (e.g. I `aria-label` you, you `aria-controls` me. That sort of thing).
+ * 
+ * @compositeParams
  */
 export function useRandomDualIds<InputElement extends Element, LabelElement extends Element>({
     randomIdInputParameters,

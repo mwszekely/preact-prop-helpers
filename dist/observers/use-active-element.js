@@ -1,3 +1,4 @@
+import { MapOfSets } from "map-and-set-extensions";
 import { returnNull, returnTrue, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useEffect } from "../util/lib.js";
 import { monitorCallCount } from "../util/use-call-count.js";
@@ -47,13 +48,11 @@ const windowsFocusedUpdaters = new Map();
 function forEachUpdater(window, map, value, reason) {
     const updaters = map.get(window);
     if (updaters) {
-        if (updaters) {
-            for (const updater of updaters) {
-                const { lastSent, send } = updater;
-                if (value !== lastSent) {
-                    send(value, reason);
-                    updater.lastSent = value;
-                }
+        for (const updater of updaters) {
+            const { lastSent, send } = updater;
+            if (value !== lastSent) {
+                send(value, reason);
+                updater.lastSent = value;
             }
         }
     }
@@ -84,16 +83,15 @@ function windowBlur(e) {
     forEachUpdater(window, windowFocusedUpdaters, false, e);
 }
 /**
- * Allows you to inspect which element in the `document` currently has focus, which was most recently focused if none are currently, and whether or not the window has focus by returning the following functions:
- * * `getActiveElement()`
- * * `getLastActiveElement()`
- * * `getWindowFocused()`
+ * Allows you to inspect which element in the `document` currently has focus, which was most recently focused if none are currently, and whether or not the window has focus
  *
- * (The document's body receiving focus, like it does when you click on an empty area, is counted as no element having focus for all intents and purposes)
+ * @remarks The document's body receiving focus, like it does when you click on an empty area, is counted as no element having focus for all intents and purposes
  *
  * This is a passive hook, so by default it returns getter functions that report this information but the component will not re-render by default when the active element changes.
  *
  * If you need the component to re-render when the active element changes, use the `on*Change` arguments to set some state on your end.
+ *
+ * @compositeParams
  */
 export function useActiveElement({ activeElementParameters: { onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument, getWindow } }) {
     monitorCallCount(useActiveElement);
@@ -107,24 +105,16 @@ export function useActiveElement({ activeElementParameters: { onActiveElementCha
             window?.addEventListener("focus", windowFocus, { passive: true });
             window?.addEventListener("blur", windowBlur, { passive: true });
         }
-        // Add them even if they're undefined to more easily
-        // manage the ">0 means don't add handlers" logic.
-        const localActiveElementUpdaters = activeElementUpdaters.get(window) ?? new Set();
-        const localLastActiveElementUpdaters = lastActiveElementUpdaters.get(window) ?? new Set();
-        const localWindowFocusedUpdaters = windowFocusedUpdaters.get(window) ?? new Set();
         const laeu = { send: setActiveElement, lastSent: undefined };
         const llaeu = { send: setLastActiveElement, lastSent: undefined };
         const lwfu = { send: setWindowFocused, lastSent: undefined };
-        localActiveElementUpdaters.add(laeu);
-        localLastActiveElementUpdaters.add(llaeu);
-        localWindowFocusedUpdaters.add(lwfu);
-        activeElementUpdaters.set(window, localActiveElementUpdaters);
-        lastActiveElementUpdaters.set(window, localLastActiveElementUpdaters);
-        windowFocusedUpdaters.set(window, localWindowFocusedUpdaters);
+        MapOfSets.add(activeElementUpdaters, window, laeu);
+        MapOfSets.add(lastActiveElementUpdaters, window, llaeu);
+        MapOfSets.add(windowFocusedUpdaters, window, lwfu);
         return () => {
-            activeElementUpdaters.get(window).delete(laeu);
-            lastActiveElementUpdaters.get(window).delete(laeu);
-            windowFocusedUpdaters.get(window).delete(lwfu);
+            MapOfSets.delete(activeElementUpdaters, window, laeu);
+            MapOfSets.delete(lastActiveElementUpdaters, window, llaeu);
+            MapOfSets.delete(windowFocusedUpdaters, window, lwfu);
             if (activeElementUpdaters.size === 0) {
                 document?.removeEventListener("focusin", focusin);
                 document?.removeEventListener("focusout", focusout);

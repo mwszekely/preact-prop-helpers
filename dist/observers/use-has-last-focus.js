@@ -3,6 +3,13 @@ import { assertEmptyObject } from "../util/assert.js";
 import { useCallback, useEffect } from "../util/lib.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 import { useActiveElement } from "./use-active-element.js";
+/**
+ * Allows monitoring whichever element is/was focused most recently, regardless of if it's *currently* focused.
+ *
+ * @see {@link useHasCurrentFocus}, where clicking the `body` is considered losing focus.
+ *
+ * @compositeParams
+ */
 export function useHasLastFocus(args) {
     monitorCallCount(useHasLastFocus);
     const { refElementReturn: { getElement }, activeElementParameters: { onLastActiveElementChange, ...activeElementParameters }, hasLastFocusParameters: { onLastFocusedChanged, onLastFocusedInnerChanged, ...void1 } } = args;

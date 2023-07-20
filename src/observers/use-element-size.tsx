@@ -4,24 +4,26 @@ import { OnPassiveStateChange, returnNull, runImmediately, useEnsureStability, u
 import { useCallback, useEffect, useRef } from "../util/lib.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 
-export interface UseElementSizeParameters<T extends Element> extends UseRefElementParameters<T> {
-    elementSizeParameters: {
-        /**
-         * Called any time the browser detects a size change
-         * on the element. Does not need to be stable, so you
-         * can pass an anonymous function that only sets the
-         * values you use if you'd like.
-         * @param sizeInfo 
-         */
-        onSizeChange(sizeInfo: ElementSize, prevSize: ElementSize | undefined, entries: ResizeObserverEntry[] | UIEvent): void;
+export interface UseElementSizeParametersSelf<T extends Element> extends UseRefElementParameters<T> {
+    /**
+     * Called any time the browser detects a size change
+     * on the element. Does not need to be stable, so you
+     * can pass an anonymous function that only sets the
+     * values you use if you'd like.
+     */
+    onSizeChange(sizeInfo: ElementSize, prevSize: ElementSize | undefined, entries: ResizeObserverEntry[] | UIEvent): void;
 
-        /**
-         * Passed as an argument to the created ResizeObserver.
-         * 
-         * @see https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver/observe#parameters
-         */
-        getObserveBox: null | (() => ResizeObserverOptions["box"]);
-    }
+    /**
+     * Passed as an argument to the created ResizeObserver.
+     * 
+     * @see https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver/observe#parameters
+     */
+    getObserveBox: null | (() => ResizeObserverOptions["box"]);
+}
+
+
+export interface UseElementSizeParameters<T extends Element> extends UseRefElementParameters<T> {
+    elementSizeParameters: UseElementSizeParametersSelf<T>;
 }
 
 export interface ElementSize {
@@ -39,13 +41,21 @@ export interface ElementSize {
     offsetTop: number | undefined;
 }
 
-export interface UseElementSizeReturnType<E extends Element> extends UseRefElementReturnType<E> {
-    elementSizeReturn: {/** **STABLE** */
-        getSize(): ElementSize | null;
-    }
+export interface UseElementSizeReturnTypeSelf<E extends Element> {
+    /** **STABLE** */
+    getSize(): ElementSize | null;
 }
 
 
+export interface UseElementSizeReturnType<E extends Element> extends UseRefElementReturnType<E> {
+    elementSizeReturn: UseElementSizeReturnTypeSelf<E>;
+}
+
+/**
+ * Measures an element, allowing you to react to its changes in size.
+ * 
+ * @compositeParams
+ */
 export function useElementSize<E extends Element>({ elementSizeParameters: { getObserveBox, onSizeChange }, refElementParameters }: UseElementSizeParameters<E>): UseElementSizeReturnType<E> {
     monitorCallCount(useElementSize);
 

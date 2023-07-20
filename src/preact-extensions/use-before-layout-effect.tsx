@@ -55,7 +55,7 @@ function nextId() {
 /**
  * Semi-private function to allow stable callbacks even within `useLayoutEffect` and ref assignment.
  * 
- * Every render, we send the arguments to be evaluated after diffing has completed,
+ * @remarks Every render, we send the arguments to be evaluated after diffing has completed,
  * which happens before.
  * 
  * @param effect 

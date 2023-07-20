@@ -10,15 +10,21 @@ import { monitorCallCount } from "../../util/use-call-count.js";
 ;
 /**
  * Implements a roving tabindex system where only one "focusable"
- * component in a set is able to receive a tab focus. *Which*
- * of those elements receives focus is determined by you, but it's
- * recommended to offload that logic then to another hook, like
- * `useLinearNavigation`, which lets you change the tabbable
- * element with the arrow keys, `useTypeaheadNavigation`, which
- * lets you change the tabbable index with typeahead, or
- * `useListNavigation(Complete)` if you just want everything bundled together.
+ * component in a set is able to receive a tab focus.
  *
- * @param - {@link UseRovingTabIndexParameters}
+ * @remarks *Which* of those elements receives focus is determined by you,
+ * but it's recommended to offload that logic then to another hook, like
+ * `useLinearNavigation`, which lets you change the tabbable element with
+ * the arrow keys, `useTypeaheadNavigation`, which lets you change the
+ * tabbable index with typeahead, or `useListNavigation(Complete)` if you
+ * just want everything bundled together.
+ *
+ *
+ * @hasChild {@link useRovingTabIndexChild}
+ *
+ * @compositeParams
+ *
+ * @param args - {@link UseRovingTabIndexParameters}
  * @returns - {@link UseRovingTabIndexReturnType}
  */
 export function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovingTabIndexParameters: { focusSelfParent: focusSelfParentUnstable, untabbable, untabbableBehavior, initiallyTabbedIndex, onTabbableIndexChange }, refElementReturn: { getElement }, ...void1 }) {
@@ -187,9 +193,11 @@ export function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovi
     };
 }
 /**
+ * @compositeParams
+ *
  * @see {@link useRovingTabIndex}
- * @param - {@link UseRovingTabIndexChildParameters}
- * @return - {@link UseRovingTabIndexChildReturnType}
+ * @param args - {@link UseRovingTabIndexChildParameters}
+ * @returns - {@link UseRovingTabIndexChildReturnType}
  */
 export function useRovingTabIndexChild({ info: { index, untabbable: iAmUntabbable, ...void2 }, context: { rovingTabIndexContext: { giveParentFocusedElement, untabbable: parentIsUntabbable, untabbableBehavior, reevaluateClosestFit, setTabbableIndex, getInitiallyTabbedIndex, parentFocusSelf } }, refElementReturn: { getElement }, ...void3 }) {
     monitorCallCount(useRovingTabIndexChild);

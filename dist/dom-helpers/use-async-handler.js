@@ -7,19 +7,36 @@ import { monitorCallCount } from "../util/use-call-count.js";
  * along with some other information related to the current state.
  * Does not modify any props.
  *
- * Note that because the handler you provide may be called with a delay, and
- * because the value of, e.g., an `<input>` element will likely be stale by the
+ * @remarks Note that because the handler you provide may be called with a delay, and
+ * because the `value` of, e.g., an `<input>` element will likely have changed by the
  * time the delay is over, a `capture` function is necessary in order to
- * capture the relevant information from the DOM. Any other simple event data,
+ * save the relevant information from the DOM at call-time. Any other simple event data,
  * like `mouseX` or `shiftKey` can stay on the event itself and don't
  * need to be captured &ndash; it's never stale.
  *
+ * The handler is automatically throttled to only run one at a time.
+ * If the handler is called, and then before it finishes, is called again,
+ * it will be put on hold until the current one finishes, at which point
+ * the second one will run.  If the handler is called a third time before
+ * the first has finished, it will *replace* the second, so only the most
+ * recently called iteration of the handler will run.
+ *
+ *
+ * You may optionally *also* specify debounce and throttle parameters that wait until the
+ * synchronous handler has not been called for the specified number of
+ * milliseconds, at which point we *actually* run the asynchronous handler
+ * according to the logic in the previous paragraph. This is in
+ * *addition* to throttling the handler, and does not replace that behavior.
+ *
+ *
+ * @example
+ * General use
  * ```tsx
- * const asyncOnInput = async (value: number, e: Event) => {
+ * const asyncHandler = async (value: number, e: Event) => {
  *     [...] // Ex. send to a server and setState when done
  * };
  * const {
- *     // A sync version of asyncOnInput
+ *     // A sync version of asyncHandler
  *     syncHandler,
  *     // True while the handler is running
  *     pending,
@@ -29,7 +46,8 @@ import { monitorCallCount } from "../util/use-call-count.js";
  *     currentCapture,
  *     // And others, see `UseAsyncHandlerReturnType`
  *     ...rest
- * } = useAsyncHandler<HTMLInputElement>()(asyncOnInput, {
+ * } = useAsyncHandler<HTMLInputElement>()({
+ *     asyncHandler,
  *     // Pass in the capture function that saves event data
  *     // from being stale.
  *     capture: e => {
@@ -45,19 +63,7 @@ import { monitorCallCount } from "../util/use-call-count.js";
  * const onInput = pending? null : syncHandler;
  * ```
  *
- * The handler is automatically throttled to only run one at a time.
- * If the handler is called, and then before it finishes, is called again,
- * it will be put on hold until the current one finishes, at which point
- * the second one will run.  If the handler is called a third time before
- * the first has finished, it will *replace* the second, so only the most
- * recently called iteration of the handler will run.
- *
- *
- * You may optionally *also* specify debounce and throttle parameters that wait until the
- * synchronous handler has not been called for the specified number of
- * milliseconds, at which point we *actually* run the asynchronous handler
- * according to the logic in the previous paragraph. This is in
- * *addition* to throttling the handler, and does not replace that behavior.
+ * {@include } {@link UseAsyncHandlerParameters}
  *
  * @see useAsync A more general version of this hook that can work with any type of handler, not just DOM event handlers.
  */

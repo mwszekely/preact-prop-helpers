@@ -6,8 +6,8 @@ import { useEffectDebug } from "./use-effect-debug.js";
  * that allow accessing the previous value as the first argument,
  * as well as the changes that caused the hook to be called as the second argument.
  *
- * @param effect
- * @param inputs
+ * @param effect - Same as the built-in's
+ * @param inputs - Same as the built-in's
  */
 export function useLayoutEffectDebug(effect, inputs) {
     monitorCallCount(useLayoutEffectDebug);

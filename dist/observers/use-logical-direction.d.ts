@@ -22,12 +22,14 @@ export interface LogicalElementSize {
 /**
  * Inspects the element's style and determines the logical direction that text flows.
  *
- * Certain CSS properties, like `block-size`, respect the current writing mode and text direction.
+ * @remarks Certain CSS properties, like `block-size`, respect the current writing mode and text direction.
  * But `transform`, `clip`, etc. don't.
  *
  * This is provided so that CSS properties can consistently use those logical properties.
  *
  * See https://drafts.csswg.org/css-writing-modes/#logical-to-physical
+ *
+ * {@include } {@link UseLogicalDirectionParameters}
  *
  * @returns An object containing the following functions:
  * * `getLogicalDirection`: retrieves a `LogicalDirectionInfo` representing the current state of the element. (Function is constant between renders)

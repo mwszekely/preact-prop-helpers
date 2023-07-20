@@ -11,14 +11,14 @@ import { useState } from "./use-state.js";
  * 
  * Use module augmentation to add new properties to this object that `usePersistentState` will correctly understand:
  * 
- * ````
+ * ```typescript
  * declare module 'preact-prop-helpers' {
  *     interface PersistentStates {
  *         numberState: number;
  *         stringState: string;
  *     }
  * }
- * ````
+ * ```
  */
 export interface PersistentStates { }
 
@@ -50,20 +50,20 @@ export function storeToLocalStorage<Key extends (keyof PersistentStates) & strin
 }
 
 /**
- * Use module augmentation to get the correct types for this function.
+ * @remarks Use module augmentation to get the correct types for this function.
  * 
- * ````
+ * ```typescript
  * declare module 'preact-prop-helpers' {
  *     interface PersistentStates {
  *         numberState: number;
  *         stringState: string;
  *     }
  * }
- * ````
- * @param key 
- * @param initialValue 
- * @param fromString 
- * @param toString 
+ * ```
+ * @param key -  
+ * @param initialValue -  
+ * @param fromString -  
+ * @param toString -  
  * @returns 
  */
 export function usePersistentState<Key extends keyof PersistentStates, T = PersistentStates[Key]>(key: Key | null, initialValue: T, fromString: ((value: string) => T) = JSON.parse, toString: ((value: T) => string) = JSON.stringify, storage: Storage = localStorage): [T, StateUpdater<T>, () => T] {

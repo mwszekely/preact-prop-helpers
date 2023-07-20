@@ -29,13 +29,15 @@ import { useMemoObject } from "./use-stable-getter.js";
  */
 const _comments = void (0);
 
+export interface UseManagedChildrenContextSelf<M extends ManagedChildInfo<any>> {
+    getChildren(): ManagedChildren<M>;
+    managedChildrenArray: InternalChildInfo<M>;
+    remoteULEChildMounted: (index: M["index"], mounted: boolean) => void;
+    remoteULEChildChanged: (index: M["index"]) => (() => void);
+}
+
 export interface UseManagedChildrenContext<M extends ManagedChildInfo<any>> {
-    managedChildContext: {
-        getChildren(): ManagedChildren<M>;
-        managedChildrenArray: InternalChildInfo<M>;
-        remoteULEChildMounted: (index: M["index"], mounted: boolean) => void;
-        remoteULEChildChanged: (index: M["index"]) => (() => void);
-    }
+    managedChildContext: UseManagedChildrenContextSelf<M>
 }
 
 
@@ -61,26 +63,27 @@ export interface ManagedChildInfo<T extends string | number> {
 export type OnChildrenMountChange<T extends string | number> = ((mounted: Set<T>, unmounted: Set<T>) => void);
 export type OnAfterChildLayoutEffect<T extends string | number> = ((causers: Iterable<T>) => void);
 
+export interface UseManagedChildrenParametersSelf<M extends ManagedChildInfo<any>> {
+    /**
+     * Runs after one or more children have updated their information (index, etc.).
+     * 
+     * Only one will run per tick, just like layoutEffect, but it isn't
+     * *guaranteed* to have actually been a change.
+     * 
+     * TODO: This ended up not being needed by anything. Is it necessary? Does it cost anything?
+     */
+    onAfterChildLayoutEffect?: Nullable<OnAfterChildLayoutEffect<M["index"]>>;
+
+    /**
+     * Same as the above, but only for mount/unmount (or when a child changes its index)
+     */
+    onChildrenMountChange?: Nullable<OnChildrenMountChange<M["index"]>>;
+
+    onChildrenCountChange?: Nullable<((count: number) => void)>;
+}
 
 export interface UseManagedChildrenParameters<M extends ManagedChildInfo<any>> {
-    managedChildrenParameters: {
-        /**
-         * Runs after one or more children have updated their information (index, etc.).
-         * 
-         * Only one will run per tick, just like layoutEffect, but it isn't
-         * *guaranteed* to have actually been a change.
-         * 
-         * TODO: This ended up not being needed by anything. Is it necessary? Does it cost anything?
-         */
-        onAfterChildLayoutEffect?: Nullable<OnAfterChildLayoutEffect<M["index"]>>;
-
-        /**
-         * Same as the above, but only for mount/unmount (or when a child changes its index)
-         */
-        onChildrenMountChange?: Nullable<OnChildrenMountChange<M["index"]>>;
-
-        onChildrenCountChange?: Nullable<((count: number) => void)>;
-    }
+    managedChildrenParameters: UseManagedChildrenParametersSelf<M>;
 }
 
 
@@ -96,6 +99,17 @@ export interface UseManagedChildParameters<M extends ManagedChildInfo<any>, Info
     info: Pick<M, InfoParameterKeys>;
 }
 
+export interface UseManagedChildrenReturnTypeSelf<M extends ManagedChildInfo<any>> {
+    /** 
+     * ***STABLE***
+     *
+     * Note that **both** `getChildren` and the `ManagedChildren` object it returns are stable!
+     * 
+     * This is a getter instead of an object because when function calls happen out of order it's easier to just have always been passing and return getters everywhere 
+     */
+    getChildren(): ManagedChildren<M>;
+
+}
 
 export interface UseManagedChildrenReturnType<M extends ManagedChildInfo<any>> {
     /**
@@ -103,25 +117,18 @@ export interface UseManagedChildrenReturnType<M extends ManagedChildInfo<any>> {
      * 
      * **STABLE** (even though it's not a function, the identity of this object never changes)
      */
-    managedChildrenReturn: {
-        /** 
-         * ***STABLE***
-         *
-         * Note that **both** `getChildren` and the `ManagedChildren` object it returns are stable!
-         * 
-         * This is a getter instead of an object because when function calls happen out of order it's easier to just have always been passing and return getters everywhere 
-         */
-        getChildren(): ManagedChildren<M>;
-
-    };
+    managedChildrenReturn: UseManagedChildrenReturnTypeSelf<M>;
 
     context: UseManagedChildrenContext<M>;
 }
 
+export interface UseManagedChildReturnTypeSelf<M extends ManagedChildInfo<any>> {
+    getChildren(): ManagedChildren<M>;
+}
+
+
 export interface UseManagedChildReturnType<M extends ManagedChildInfo<any>> {
-    managedChildReturn: {
-        getChildren(): ManagedChildren<M>;
-    }
+    managedChildReturn: UseManagedChildReturnTypeSelf<M>;
 }
 
 
@@ -171,11 +178,13 @@ interface InternalChildInfo<M extends ManagedChildInfo<string | number>> {
  * Allows a parent component to access information about certain
  * child components once they have rendered.
  * 
- * This hook is designed to be lightweight, in that the parent keeps no state
+ * @remarks This hook is designed to be lightweight, in that the parent keeps no state
  * and runs no effects.  Each child *does* run an effect, but with no state
  * changes unless you explicitly request them.
  * 
+ * @hasChild {@link useManagedChild}
  * 
+ * @compositeParams
  */
 export function useManagedChildren<M extends ManagedChildInfo<string | number>>(parentParameters: UseManagedChildrenParameters<M>): UseManagedChildrenReturnType<M> {
     monitorCallCount(useManagedChildren);
@@ -342,7 +351,9 @@ export function useManagedChildren<M extends ManagedChildInfo<string | number>>(
 
 
 
-
+/**
+ * @compositeParams
+ */
 export function useManagedChild<M extends ManagedChildInfo<number | string>>({ context, info }: UseManagedChildParameters<M, keyof M>): UseManagedChildReturnType<M> {
     monitorCallCount(useManagedChild);
 
@@ -457,9 +468,6 @@ export interface UseChildrenFlagReturnType<M extends ManagedChildInfo<any>, R> {
  * 
  * Also because of that, the types of this function are rather odd.  It's better to start off using a hook that already uses a flag, such as `useRovingTabIndex`, as an example.
  * 
- * 
- * @param param0 
- * @returns 
  */
 export function useChildrenFlag<M extends ManagedChildInfo<number | string>, R>({ getChildren, initialIndex, closestFit, onClosestFit, onIndexChange, getAt, setAt, isValid }: UseChildrenFlagParameters<M, R>): UseChildrenFlagReturnType<M, R> {
     useEnsureStability("useChildrenFlag", onIndexChange, getAt, setAt, isValid);

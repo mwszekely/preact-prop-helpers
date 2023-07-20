@@ -1,0 +1,43 @@
+{
+    "$schema": "https://developer.microsoft.com/json-schemas/tsdoc/v0/tsdoc.schema.json",
+    "tagDefinitions": [
+      // When followed immediately by a @link tag,
+      // generates the documentation for that item
+      // and includes it in the current markup generation.
+      //
+      // TODO: It's theoretically possible to do {@include referenceToWhatever}
+      {
+        "tagName": "@include",
+        "syntaxKind": "inline",
+        "allowMultiple": true
+      },
+      // Refers to the child version of a function (e.g. useRovingTabIndexChild)
+      // and includes that child below itself.
+      {
+        "tagName": "@hasChild",
+        "syntaxKind": "block",
+        "allowMultiple": true
+      },
+      {
+        // Indicates that this is one of those special functions with special composite parameter handling
+        // I.E. This is a function that takes one parameter, that one parameter is an object,
+        // that one object contains members named things like `elementRefParameters` and `linearNavigationReturnType`,
+        // and **those** sub-objects with `Parameter` and `ReturnType` names have the members to document.
+        "tagName": "@compositeParams",
+        "syntaxKind": "modifier",
+        "allowMultiple": false
+      },
+      // In @packageDocumentation, helps to build the Table of Contents.
+      // Format: {@tableOfContents [start|end|header|subheader] [header/subheader content]}
+      // e.g. {@tableOfContents subheader This is the subheader}
+      //
+      // Importantly, the entire Table of Contents needs to be in a single Paragraph,
+      // so there can't be extra newlines strewn about. 
+      // It all needs to be no more spread out than one per line.
+      {
+        "tagName": "@tableOfContents",
+        "syntaxKind": "inline",
+        "allowMultiple": true
+      }
+    ]
+  }

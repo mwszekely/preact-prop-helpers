@@ -1,13 +1,12 @@
 import { shuffle as lodashShuffle } from "lodash-es";
-import { useForceUpdate } from "../../preact-extensions/use-force-update.js";
-import { useEnsureStability } from "../../preact-extensions/use-passive-state.js";
+import { returnNull, useEnsureStability, usePassiveState } from "../../preact-extensions/use-passive-state.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { createElement, useCallback, useRef } from "../../util/lib.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
 /**
  * Hook that allows for the **direct descendant** children of this component to be re-ordered and sorted.
  *
- * *This is **separate** from "managed" children, which can be any level of child needed! Sortable/rearrangeable children must be **direct descendants** of the parent that uses this hook!*
+ * @remarks *This is **separate** from "managed" children, which can be any level of child needed! Sortable/rearrangeable children must be **direct descendants** of the parent that uses this hook!*
  *
  * It's recommended to use this in conjunction with `useListNavigation`; it takes the same `indexMangler` and `indexDemangler`
  * functions that this hook returns. `useListNavigation` does not directly use this hook because, as mentioned,
@@ -24,6 +23,8 @@ import { monitorCallCount } from "../../util/use-call-count.js";
  * the prop-modifying hook inspects the given children, then re-creates them with new `key`s.
  * Because keys are given special treatment and a child has no way of modifying its own key
  * there's no other time or place this can happen other than exactly within the parent component's render function.
+ *
+ * @compositeParams
  */
 export function useRearrangeableChildren({ rearrangeableChildrenParameters: { getIndex, onRearranged }, managedChildrenReturn: { getChildren } }) {
     monitorCallCount(useRearrangeableChildren);
@@ -39,7 +40,7 @@ export function useRearrangeableChildren({ rearrangeableChildrenParameters: { ge
     const shuffle = useCallback(() => {
         const managedRows = getChildren();
         const originalRows = managedRows.arraySlice();
-        const shuffledRows = lodashShuffle(originalRows.slice());
+        const shuffledRows = lodashShuffle(originalRows);
         return rearrange(originalRows, shuffledRows);
     }, [ /* Must remain stable */]);
     const reverse = useCallback(() => {
@@ -53,10 +54,8 @@ export function useRearrangeableChildren({ rearrangeableChildrenParameters: { ge
     // this hook, but it's tbody that actually needs updating), we need to remotely
     // get and set a forceUpdate function.
     //const [getForceUpdate, setForceUpdate] = usePassiveState<null | (() => void)>(null, returnNull);
-    //const [getForceUpdate, setForceUpdate] = usePassiveState<null | (() => void), never>(null, returnNull);
-    const forceUpdate = useForceUpdate();
+    const [getForceUpdate, setForceUpdate] = usePassiveState(null, returnNull);
     const rearrange = useCallback((originalRows, sortedRows) => {
-        console.assert(originalRows != sortedRows);
         mangleMap.current.clear();
         demangleMap.current.clear();
         // Update our sorted <--> unsorted indices map 
@@ -69,7 +68,7 @@ export function useRearrangeableChildren({ rearrangeableChildrenParameters: { ge
             }
         }
         onRearrangedGetter()?.();
-        forceUpdate();
+        getForceUpdate()?.();
     }, []);
     const useRearrangedChildren = useCallback(function useRearrangedChildren(children) {
         monitorCallCount(useRearrangedChildren);
@@ -108,7 +107,7 @@ export function useRearrangeableChildren({ rearrangeableChildrenParameters: { ge
 /**
  * Hook that allows for the **direct descendant** children of this component to be re-ordered and sorted.
  *
- * *This is **separate** from "managed" children, which can be any level of child needed! Sortable/rearrangeable children must be **direct descendants** of the parent that uses this hook!*
+ * @remarks *This is **separate** from "managed" children, which can be any level of child needed! Sortable/rearrangeable children must be **direct descendants** of the parent that uses this hook!*
  *
  * It's recommended to use this in conjunction with `useListNavigation`; it takes the same `indexMangler` and `indexDemangler`
  * functions that this hook returns. `useListNavigation` does not directly use this hook because, as mentioned,
@@ -125,6 +124,8 @@ export function useRearrangeableChildren({ rearrangeableChildrenParameters: { ge
  * the prop-modifying hook inspects the given children, then re-creates them with new `key`s.
  * Because keys are given special treatment and a child has no way of modifying its own key
  * there's no other time or place this can happen other than exactly within the parent component's render function.
+ *
+ * @compositeParams
  */
 export function useSortableChildren({ rearrangeableChildrenParameters, sortableChildrenParameters: { compare: userCompare }, managedChildrenReturn: { getChildren } }) {
     monitorCallCount(useSortableChildren);
@@ -136,7 +137,7 @@ export function useSortableChildren({ rearrangeableChildrenParameters, sortableC
         const managedRows = getChildren();
         const compare = getCompare();
         const originalRows = managedRows.arraySlice();
-        const sortedRows = compare ? originalRows.slice().sort((lhsRow, rhsRow) => {
+        const sortedRows = compare ? originalRows.sort((lhsRow, rhsRow) => {
             const lhsValue = lhsRow;
             const rhsValue = rhsRow;
             const result = compare(lhsValue, rhsValue);

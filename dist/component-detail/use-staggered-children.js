@@ -3,12 +3,14 @@ import { useState } from "../preact-extensions/use-state.js";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from "../util/lib.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 /**
- * Allows children to each wait until the previous has finished rendering before itself rendering.
+ * Allows children to each wait until the previous has finished rendering before itself rendering. E.G. Child #3 waits until #2 renders. #2 waits until #1 renders, etc.
  *
- * E.G. Child #3 waits until #2 renders. #2 waits until #1 renders, etc.
- *
- * Note that the child itself will still render, but you can delay rendering *its* children, or
+ * @remarks Note that the child itself will still render, but you can delay rendering *its* children, or
  * delay other complicated or heavy logic, until the child is no longer staggered.
+ *
+ * @compositeParams
+ *
+ * @hasChild {@link useStaggeredChild}
  */
 export function useStaggeredChildren({ managedChildrenReturn: { getChildren }, staggeredChildrenParameters: { staggered } }) {
     monitorCallCount(useStaggeredChildren);
@@ -98,6 +100,14 @@ export function useStaggeredChildren({ managedChildrenReturn: { getChildren }, s
         }), [staggeredChildContext]),
     };
 }
+/**
+ * Child hook for {@link useStaggeredChildren}.
+ *
+ * @remarks When a child is staggered, it still renders itself (i.e. it calls this hook, so it's rendering),
+ * so check `hideBecauseStaggered` and, if it's true, avoid doing any heavy logic and render with `display: none`.
+ *
+ * @compositeParams
+ */
 export function useStaggeredChild({ info: { index }, context: { staggeredChildContext: { parentIsStaggered, childCallsThisToTellTheParentTheHighestIndex, getDefaultStaggeredVisible, childCallsThisToTellTheParentToMountTheNextOne } } }) {
     monitorCallCount(useStaggeredChild);
     const [staggeredVisible, setStaggeredVisible] = useState(getDefaultStaggeredVisible(index));

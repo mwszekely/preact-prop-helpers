@@ -2,11 +2,9 @@ import { debounceRendering, useCallback, useLayoutEffect, useRef } from "../util
 import { getBuildMode } from "../util/mode.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 /**
- * Debug hook.
+ * Debug hook. Given a value or set of values, emits a console error if any of them change from one render to the next.
  *
- * Given a value or set of values, emits a console error if any of them change from one render to the next.
- *
- * Eventually, when useEvent lands, we hopefully won't need this.
+ * @remarks Eventually, when useEvent lands, we hopefully won't need this.
  */
 export function useEnsureStability(parentHookName, ...values) {
     if (getBuildMode() == 'production')
@@ -34,7 +32,7 @@ export function useEnsureStability(parentHookName, ...values) {
 /**
  * Similar to `useState`, but for values that aren't "render-important" &ndash; updates don't cause a re-render and so the value shouldn't be used during render (though it certainly can, at least by re-rendering again).
  *
- * To compensate for this, you should pass a `useEffect`-esque callback that is run whenever the value changes.  Just like `useEffect`, this callback can return a cleanup function that's run before the value changes.  If you would like to re-render when the value changes (or, say, when the value meets some criteria), this is where you'll want to put in a call to a `setState` function.
+ * @remarks To compensate for this, you should pass a `useEffect`-esque callback that is run whenever the value changes.  Just like `useEffect`, this callback can return a cleanup function that's run before the value changes.  If you would like to re-render when the value changes (or, say, when the value meets some criteria), this is where you'll want to put in a call to a `setState` function.
  *
  * To summarize, it's like a `useState`-`useEffect` mashup:
  *
@@ -45,9 +43,11 @@ export function useEnsureStability(parentHookName, ...values) {
  *
  * Note that while calling `setState` doesn't cause any re-renders, you can do that within your `onChange` function, called whenever the value changes via that `setState`.
  *
- * @param onChange The "effect" function to run when the value changes. Effectively the same as `useEffect`'s "effect" function.  MUST BE STABLE, either because it has no dependencies, or because it's from useStableCallback, but this will mean you cannot use getState or setState during render.
- * @param getInitialValue If provided, the effect will be invoked once with this value on mount. MUST BE STABLE, either because it has no dependencies, or because it's from useStableCallback, but this will mean you cannot use getState or setState during render.
- * @param customDebounceRendering By default, changes to passive state are delayed by one tick so that we only check for changes in a similar way to Preact. You can override this to, for example, always run immediately instead.
+ * {@include } {@link OnPassiveStateChange}
+ *
+ * @param onChange - The "effect" function to run when the value changes. Effectively the same as `useEffect`'s "effect" function.  MUST BE STABLE, either because it has no dependencies, or because it's from useStableCallback, but this will mean you cannot use getState or setState during render.
+ * @param getInitialValue - If provided, the effect will be invoked once with this value on mount. MUST BE STABLE, either because it has no dependencies, or because it's from useStableCallback, but this will mean you cannot use getState or setState during render.
+ * @param customDebounceRendering - By default, changes to passive state are delayed by one tick so that we only check for changes in a similar way to Preact. You can override this to, for example, always run immediately instead.
  * @returns
  */
 export function usePassiveState(onChange, getInitialValue, customDebounceRendering) {

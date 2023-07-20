@@ -11,6 +11,13 @@ export class DroppableFileError extends Error {
         this.errorType = base?.name;
     }
 }
+/**
+ * Allows an element to start a drag operation.
+ *
+ * @remarks
+ * {@include } {@link UseDroppableParameters}
+ * {@include } {@link UseDroppableReturnType}
+ */
 export function useDroppable({ effect }) {
     monitorCallCount(useDroppable);
     const [filesForConsideration, setFilesForConsideration] = useState(null);

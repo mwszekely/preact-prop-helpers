@@ -1,6 +1,13 @@
 import { returnFalse, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useCallback, useEffect, useRef } from "../util/lib.js";
 import { monitorCallCount } from "../util/use-call-count.js";
+/**
+ * Allows monitoring whether the rendered element is or is not focused directly (i.e. would satisfy `:focus`).
+ *
+ * @see {@link useHasLastFocus}, in which even if the `body` is clicked it's not considered a loss in focus.
+ *
+ * @compositeParams
+ */
 export function useHasCurrentFocus(args) {
     monitorCallCount(useHasCurrentFocus);
     const { hasCurrentFocusParameters: { onCurrentFocusedChanged, onCurrentFocusedInnerChanged }, refElementReturn: { getElement } } = args;

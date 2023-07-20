@@ -2,9 +2,6 @@ import { ElementProps } from "../util/types.js";
 /**
  * When a bunch of unrelated components all use `requestAnimationFrame`,
  * yes, this actually is faster. I wish it wasn't. It's lame.
- *
- * @param param0
- * @returns
  */
 export declare function ProvideBatchedAnimationFrames({ children }: {
     children: ElementProps<EventTarget>["children"];
@@ -20,9 +17,11 @@ export interface UseAnimationFrameParameters {
 /**
  * The (optionally non-stable) `callback` you provide will start running every frame after the component mounts.
  *
- * Passing `null` is fine and simply stops the effect until you restart it by providing a non-null callback.
+ * @remarks Passing `null` is fine and simply stops the effect until you restart it by providing a non-null callback.
  *
- * **This hook does not return anything at all, including no prop-modifying hooks**
+ * {@include } {@link UseAnimationFrameParameters}
+ *
+ * {@include } {@link ProvideBatchedAnimationFrames}
  */
 export declare function useAnimationFrame({ callback }: UseAnimationFrameParameters): void;
 //# sourceMappingURL=use-animation-frame.d.ts.map

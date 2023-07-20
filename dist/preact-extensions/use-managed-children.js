@@ -30,11 +30,13 @@ const _comments = void (0);
  * Allows a parent component to access information about certain
  * child components once they have rendered.
  *
- * This hook is designed to be lightweight, in that the parent keeps no state
+ * @remarks This hook is designed to be lightweight, in that the parent keeps no state
  * and runs no effects.  Each child *does* run an effect, but with no state
  * changes unless you explicitly request them.
  *
+ * @hasChild {@link useManagedChild}
  *
+ * @compositeParams
  */
 export function useManagedChildren(parentParameters) {
     monitorCallCount(useManagedChildren);
@@ -173,6 +175,9 @@ export function useManagedChildren(parentParameters) {
         managedChildrenReturn: { getChildren }
     };
 }
+/**
+ * @compositeParams
+ */
 export function useManagedChild({ context, info }) {
     monitorCallCount(useManagedChild);
     const { managedChildContext: { getChildren, managedChildrenArray, remoteULEChildMounted, remoteULEChildChanged } } = (context ?? { managedChildContext: {} });
@@ -219,9 +224,6 @@ export function useManagedChild({ context, info }) {
  *
  * Also because of that, the types of this function are rather odd.  It's better to start off using a hook that already uses a flag, such as `useRovingTabIndex`, as an example.
  *
- *
- * @param param0
- * @returns
  */
 export function useChildrenFlag({ getChildren, initialIndex, closestFit, onClosestFit, onIndexChange, getAt, setAt, isValid }) {
     useEnsureStability("useChildrenFlag", onIndexChange, getAt, setAt, isValid);

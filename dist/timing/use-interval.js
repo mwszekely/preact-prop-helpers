@@ -2,6 +2,12 @@ import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useStableGetter } from "../preact-extensions/use-stable-getter.js";
 import { useEffect } from "../util/lib.js";
 import { monitorCallCount } from "../util/use-call-count.js";
+/**
+ * Runs a function every time the specified number of milliseconds elapses while the component is mounted.
+ *
+ * @remarks
+ * {@include } {@link UseIntervalParameters}
+ */
 export function useInterval({ interval, callback }) {
     monitorCallCount(useInterval);
     // Get a wrapper around the given callback that's stable

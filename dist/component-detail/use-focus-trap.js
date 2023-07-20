@@ -3,7 +3,9 @@ import { useBlockingElement } from "../dom-helpers/use-blocking-element.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useEffect } from "../util/lib.js";
 import { monitorCallCount } from "../util/use-call-count.js";
-//const elementsToRestoreFocusTo = new Map<Element | null, (Node & HTMLOrSVGElement)>();
+/**
+ * @compositeParams
+ */
 export function useFocusTrap({ focusTrapParameters: { onlyMoveFocus, trapActive, focusPopup: focusSelfUnstable, focusOpener: focusOpenerUnstable }, refElementReturn }) {
     monitorCallCount(useFocusTrap);
     const focusSelf = useStableCallback(focusSelfUnstable);
@@ -38,22 +40,17 @@ export function useFocusTrap({ focusTrapParameters: { onlyMoveFocus, trapActive,
     const { getElement } = refElementReturn;
     const { getTop, getLastActiveWhenClosed, getLastActiveWhenOpen } = useBlockingElement(trapActive && !onlyMoveFocus, getElement);
     return {
-        props: { "aria-modal": trapActive ? "true" : undefined },
-        focusTrapReturn: {}
+        props: { "aria-modal": trapActive ? "true" : undefined }
     };
 }
 /**
  * Returns the first focusable element contained within the given node, or null if none are found.
- * @param element
- * @returns
  */
 export function findFirstFocusable(element) {
     return findFirstCondition(element, node => node instanceof Element && isFocusable(node));
 }
 /**
  * Returns the first tabbable element contained within the given node, or null if none are found.
- * @param element
- * @returns
  */
 export function findFirstTabbable(element) {
     return findFirstCondition(element, node => node instanceof Element && isTabbable(node));

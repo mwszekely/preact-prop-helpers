@@ -2,6 +2,12 @@ import { clsx } from "clsx";
 import { useEffect } from "../util/lib.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 export function getDocument(element) { return (element?.ownerDocument ?? document ?? window.document ?? globalThis.document); }
+/**
+ *
+ * @param className - The class (as a string) to be adding/removing
+ * @param active - If `true`, the default, then the class is added to the element. If `false`, it's removed.
+ * @param element - The element to affect. By default, it's the root `<html>` element
+ */
 export function useDocumentClass(className, active, element) {
     monitorCallCount(useDocumentClass);
     element ??= getDocument().documentElement;

@@ -3,6 +3,11 @@ import { returnNull, runImmediately, usePassiveState } from "../preact-extension
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useCallback, useEffect } from "../util/lib.js";
 import { monitorCallCount } from "../util/use-call-count.js";
+/**
+ * Effectively just a wrapper around a `MutationObserver`.
+ *
+ * @compositeParams
+ */
 export function useMutationObserver({ refElementParameters, mutationObserverParameters: { attributeFilter, subtree, onChildList, characterDataOldValue, onCharacterData, onAttributes, attributeOldValue } }) {
     monitorCallCount(useMutationObserver);
     const { onElementChange, ...rest } = (refElementParameters || {});
@@ -54,7 +59,7 @@ export function useMutationObserver({ refElementParameters, mutationObserverPara
     useEffect(() => {
         onNeedMutationObserverReset(getElement());
     }, [attributeKey, attributeOldValue, characterDataOldValue, subtree]);
-    const { refElementReturn } = useRefElement({
+    const { refElementReturn, propsStable } = useRefElement({
         refElementParameters: {
             onElementChange: useStableCallback((e, p) => { onElementChange?.(e, p); onNeedMutationObserverReset(e); }),
             ...rest
@@ -63,7 +68,7 @@ export function useMutationObserver({ refElementParameters, mutationObserverPara
     const { getElement } = refElementReturn;
     return {
         refElementReturn,
-        mutationObserverReturn: {}
+        propsStable
     };
 }
 //# sourceMappingURL=use-mutation-observer.js.map

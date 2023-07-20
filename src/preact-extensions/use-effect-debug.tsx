@@ -6,9 +6,9 @@ import { monitorCallCount } from "../util/use-call-count.js";
  * that allow accessing the previous value as the first argument,
  * as well as the changes that caused the hook to be called as the second argument.
  * 
- * @param effect 
- * @param inputs 
- * @param impl You can choose whether to use `useEffect` or `useLayoutEffect` by
+ * @param effect - Same as the default
+ * @param inputs - Same as the default
+ * @param impl - You can choose whether to use `useEffect` or `useLayoutEffect` by
  * passing one of them as this argument. By default, it's `useEffect`.
  */
 export function useEffectDebug<I extends Inputs>(effect: (prev: I | undefined, changes: EffectChange<I, number>[]) => (void | (() => void)), inputs?: I, impl = useEffectNative) {

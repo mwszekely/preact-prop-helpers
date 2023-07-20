@@ -47,8 +47,12 @@ const _dummy = null;
 /**
  * Implements proper keyboard navigation for components like listboxes, button groups, menus, etc.
  *
- * In the document order, there will be only one "focused" or "tabbable" element, making it act more like one complete unit in comparison to everything around it.
+ * @remarks In the document order, there will be only one "focused" or "tabbable" element, making it act more like one complete unit in comparison to everything around it.
  * Navigating forwards/backwards can be done with the arrow keys, Home/End keys, or any text for typeahead to focus the next item that matches.
+ *
+ * @compositeParams
+ *
+ * @hasChild {@link useListNavigationChild}
  */
 export function useListNavigation({ linearNavigationParameters, typeaheadNavigationParameters, rovingTabIndexParameters, managedChildrenReturn, refElementReturn, ...void1 }) {
     monitorCallCount(useListNavigation);
@@ -76,6 +80,9 @@ export function useListNavigation({ linearNavigationParameters, typeaheadNavigat
         propsParent: propsRTI
     };
 }
+/**
+ * @compositeParams
+ */
 export function useListNavigationChild({ info, context, refElementReturn, textContentParameters, ...void2 }) {
     monitorCallCount(useListNavigationChild);
     const { props, ...rticr } = useRovingTabIndexChild({ context, info, refElementReturn });

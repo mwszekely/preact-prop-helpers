@@ -1,7 +1,9 @@
+import { identity } from "lodash-es";
 import { ManagedChildInfo } from "../../preact-extensions/use-managed-children.js";
 import { TargetedPick } from "../../util/lib.js";
 import { ElementProps, KeyboardEventType, Nullable } from "../../util/types.js";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
+export { identity };
 export interface LinearNavigationResult {
     valueDemangled: number | null;
     status: "normal" | "past-start" | "past-end";
@@ -12,10 +14,10 @@ export interface UseLinearNavigationReturnType<ParentOrChildElement extends Elem
     linearNavigationReturn: UseLinearNavigationReturnTypeSelf;
     propsStable: ElementProps<ParentOrChildElement>;
 }
-export interface UseLinearNavigationChildInfo<ChildElement extends Element> extends ManagedChildInfo<number> {
+export interface UseLinearNavigationChildInfo extends ManagedChildInfo<number> {
 }
 /** Arguments passed to the parent `useLinearNavigation` */
-export interface UseLinearNavigationParameters<ParentOrChildElement extends Element, ChildElement extends Element, _M extends UseLinearNavigationChildInfo<ChildElement>> extends TargetedPick<UseRovingTabIndexReturnType<ParentOrChildElement, ChildElement, UseRovingTabIndexChildInfo<ChildElement>>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex"> {
+export interface UseLinearNavigationParameters<ParentOrChildElement extends Element, ChildElement extends Element, _M extends UseLinearNavigationChildInfo> extends TargetedPick<UseRovingTabIndexReturnType<ParentOrChildElement, ChildElement, UseRovingTabIndexChildInfo<ChildElement>>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex"> {
     linearNavigationParameters: UseLinearNavigationParametersSelf<ChildElement>;
 }
 export interface UseLinearNavigationParametersSelf<ChildElement extends Element> {
@@ -30,23 +32,27 @@ export interface UseLinearNavigationParametersSelf<ChildElement extends Element>
     /**
      * Controls how many elements are skipped over when page up/down are pressed.
      *
+     * ```md-literal
      * * When 0: Page Up/Down are disabled
-     * * When >= 1: Page Up/Down moves that number of elements up or down
-     * * When 0 < x < 1, Page Up/Down moves by that percentage of all elements, or of 100 elements, whichever is higher. In other words, 0.1 jumps by 10 elements when there are fewer then 100 elements, and 20 elements when there are 200 elements.
+     * * When &gt;= 1: Page Up/Down moves that number of elements up or down
+     * * When 0 &lt; x &lt; 1, Page Up/Down moves by that percentage of all elements, or of 100 elements, whichever is higher. In other words, 0.1 jumps by 10 elements when there are fewer then 100 elements, and 20 elements when there are 200 elements.
+     * ```
      */
     pageNavigationSize: number;
     /**
      * What happens when `up` is pressed on the first valid child?
      *
+     * ```md-literal
      * * "wrap": The focus is sent down to the last child
      * * "passthrough": Nothing happens, **and the event is allowed to propagate**.
      * * A function:
+     * ```
      */
     navigatePastStart: "passthrough" | "wrap" | (() => void);
     /**
      * What happens when `down` is pressed on the last valid child?
      *
-     * @see {@link navigatePastStart}
+     * @see {@link UseLinearNavigationParametersSelf.navigatePastStart}
      */
     navigatePastEnd: "passthrough" | "wrap" | (() => void);
     /**
@@ -65,34 +71,41 @@ export interface UseLinearNavigationParametersSelf<ChildElement extends Element>
      */
     disableHomeEndKeys: boolean;
     /**
-     * Turn a sorted `index` into its original, unsorted `index`. Use `identity` if you don't care or this isn't provided for you by any other hook (e.g. `useSortableChildren`).
+     * When children are sorted, reversed, or otherwise out of order, `indexMangler` is given the `index` of a child and must return its "visual" index -- what its `index` would be at that position.
      *
-     * This is what allows our linear keyboard navigation to still work if the children are re-ordered
-     * (i.e. how when reverse-sorted, pressing `down` moves from item #9 to item #8).
-     *
-     * @see {@link useRearrangeableChildren}
+     * @remarks This is provided by {@link useRearrangeableChildren}.
+     * If you use this hook as part of {@link useCompleteListNavigation} or {@link useCompleteGridNavigation}, then everything's already wired up and you don't need to worry about this.
+     * Otherwise, it's recommended to simply use {@link lodash-es#identity} here.
      */
     indexMangler: (n: number) => number;
     /**
-     * Turn an unsorted `index` into its visual display `index`. Use `identity` if you don't care.
+     * @see {@link UseLinearNavigationParametersSelf.indexMangler}, which does the opposite of this.
      */
     indexDemangler: (n: number) => number;
     /**
-     * From `useManagedChildren`.
+     * From `useManagedChildren`. This can be higher than the *actual* highest index if you need it to be.
      *
-     * This can be higher than the *actual* highest index if you need it to be.
+     * @returns [0, n], not [0, n)
      */
     getHighestIndex(): number;
-    /** @see {@link getHighestIndex} */
+    /**
+     * From `useManagedChildren`. This can be lower than the *actual* lowest index if you need it to be.
+     *
+     * @see {@link UseLinearNavigationParametersSelf.getLowestIndex}
+     */
     getLowestIndex(): number;
 }
 /**
  * When used in tandem with `useRovingTabIndex`, allows control of
- * the tabbable index with the arrow keys.
+ * the tabbable index with the arrow keys, Page Up/Page Down, or Home/End.
  *
- * @see useListNavigation, which packages everything up together.
+ * @remarks There is no child version of this hook. That being said, the props returned are stable and work equally well on the child as the parent. If you don't have a parent `HTMLElement`, you can still pass the returned props to each child individually.
+ *
+ * @see {@link useCompleteListNavigation}, which packages everything up together.
+ *
+ * @compositeParams
  */
-export declare function useLinearNavigation<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseLinearNavigationChildInfo<ChildElement>>({ rovingTabIndexReturn, linearNavigationParameters }: UseLinearNavigationParameters<ParentOrChildElement, ChildElement, M>): UseLinearNavigationReturnType<ParentOrChildElement>;
+export declare function useLinearNavigation<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseLinearNavigationChildInfo>({ rovingTabIndexReturn, linearNavigationParameters }: UseLinearNavigationParameters<ParentOrChildElement, ChildElement, M>): UseLinearNavigationReturnType<ParentOrChildElement>;
 export interface TryNavigateToIndexParameters {
     lowestChildIndex: number;
     highestChildIndex: number;

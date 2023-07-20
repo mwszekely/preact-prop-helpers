@@ -10,9 +10,9 @@ const AsyncFunction = ((async function () { }).constructor);
  * Given an async function, returns a function that's suitable for non-async APIs,
  * along with other information about the current run's status.
  *
- * See also `useAsyncHandler` for a version that's specialized for DOM event handlers.
+ * @see {@link useAsyncHandler} for a version that's specialized for DOM event handlers.
  *
- * When called multiple times in quick succession, (i.e. before the handler has finished),
+ * @remarks When called multiple times in quick succession, (i.e. before the handler has finished),
  * this works like Lodash's `throttle` function with the `wait` option always
  * set to however long the handler takes to complete. A second call to the sync function will be
  * throttled until the first call has finished. The return value of the function is the result
@@ -29,8 +29,13 @@ const AsyncFunction = ((async function () { }).constructor);
  * dynamic data at the time it runs; the `AP` and `SP` type parameters likewise control
  * the parameters the async handler and sync handler expect respectively.
  *
+ * {@include } {@link UseAsyncParameters}
+ *
+ * @param asyncHandler - The async function to make sync
+ * @param options - @see {@link UseAsyncParameters}
+ *
  */
-export function useAsync(asyncHandler2, options) {
+export function useAsync(asyncHandler, options) {
     monitorCallCount(useAsync);
     // Things related to current execution
     // Because we can both return and throw undefined, 
@@ -45,7 +50,7 @@ export function useAsync(asyncHandler2, options) {
     const [hasResult, setHasResult, _getHasResult] = useState(false);
     const [asyncDebouncing, setAsyncDebouncing] = useState(false);
     const [syncDebouncing, setSyncDebouncing] = useState(false);
-    const [invocationResult, setInvocationResult] = useState(asyncHandler2 instanceof AsyncFunction ? "async" : null);
+    const [invocationResult, setInvocationResult] = useState(asyncHandler instanceof AsyncFunction ? "async" : null);
     // Keep track of this for the caller's sake -- we don't really care.
     const [runCount, setRunCount] = useState(0);
     const [settleCount, setSettleCount] = useState(0);
@@ -58,7 +63,7 @@ export function useAsync(asyncHandler2, options) {
     /* eslint-disable prefer-const */
     let { throttle, debounce, capture: captureUnstable } = (options ?? {});
     const captureStable = useStableCallback(captureUnstable ?? identityCapture);
-    const asyncHandlerStable = useStableCallback(asyncHandler2 ?? identity);
+    const asyncHandlerStable = useStableCallback(asyncHandler ?? identity);
     const { flushSyncDebounce, syncOutput, cancelSyncDebounce } = useMemo(() => {
         return asyncToSync({
             asyncInput: asyncHandlerStable,

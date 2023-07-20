@@ -41,8 +41,7 @@ function getElementDepth(element) {
  *
  * One press of the `Escape` key is guaranteed to only call `onClose` for *only one* component, and it is called on the component deepest in the DOM tree, differentiated by passing context information between parent and child.
  *
- * @param param0
- * @returns
+ * @compositeParams
  */
 export function useEscapeDismiss({ escapeDismissParameters: { onClose, open, getWindow: unstableGetWindow, parentDepth, ...void1 }, refElementPopupReturn: { getElement, ...void2 } }) {
     monitorCallCount(useEscapeDismiss);
@@ -120,18 +119,19 @@ export function useEscapeDismiss({ escapeDismissParameters: { onClose, open, get
         }
     }, [open]);
 }
+;
 /**
  * Handles events for dismiss events for things like popup menus or transient dialogs -- things where moving focus to a new area of the page means this component should close itself.
  *
- * @param param0
- * @returns
+ * @compositeParams
  */
-export function useLostFocusDismiss({ refElementPopupReturn: { getElement: getPopupElement, ...void3 }, refElementSourceReturn, lostFocusDismiss: { open, onClose }, ...void1 }) {
+export function useLostFocusDismiss({ refElementPopupReturn: { getElement: getPopupElement, ...void3 }, refElementSourceReturn, lostFocusDismissParameters: { open, onClose, ...void4 }, ...void1 }) {
     monitorCallCount(useLostFocusDismiss);
     const { getElement: getSourceElement, ...void2 } = (refElementSourceReturn ?? {});
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     assertEmptyObject(void3);
+    assertEmptyObject(void4);
     const stableOnClose = useStableCallback(onClose);
     const getOpen = useStableGetter(open);
     const onLastActiveElementChange = useCallback((newElement, _prevElement, _e) => {
@@ -148,7 +148,7 @@ export function useLostFocusDismiss({ refElementPopupReturn: { getElement: getPo
 /**
  * Handles events for a backdrop on a modal dialog -- the kind where the user expects the modal to close when they click/tap outside of it.
  *
- * @param param0
+ * @compositeParams
  */
 export function useBackdropDismiss({ backdropDismissParameters: { open, onClose: onCloseUnstable, ...void1 }, refElementPopupReturn: { getElement, ...void3 }, ...void2 }) {
     monitorCallCount(useBackdropDismiss);
@@ -175,9 +175,9 @@ export function useBackdropDismiss({ backdropDismissParameters: { open, onClose:
     useGlobalHandler(window, "touchstart", open ? onBackdropClick : null, { capture: true });
 }
 /**
- * Combines all the methods of dismissing a modal-ish or popup-ish component into one combined hook.
+ * Combines all the methods of dismissing a modal-ish or popup-ish component into one combined hook. This is similar to the "complete" series of list/grid navigation, in that it's the "outermost" hook of its type.
  *
- * This is similar to the "complete" series of list/grid navigation, in that it's the "outermost" hook of its type.
+ * @compositeParams
  */
 export function useDismiss({ dismissParameters: { open: globalOpen, onClose: globalOnClose, closeOnBackdrop, closeOnEscape, closeOnLostFocus }, escapeDismissParameters: { getWindow, parentDepth } }) {
     monitorCallCount(useDismiss);
@@ -188,7 +188,7 @@ export function useDismiss({ dismissParameters: { open: globalOpen, onClose: glo
     const onCloseFocus = useCallback(() => { return globalOnClose?.("lost-focus"); }, [globalOnClose]);
     const _v1 = useBackdropDismiss({ backdropDismissParameters: { onClose: onCloseBackdrop, open: (closeOnBackdrop && globalOpen) }, refElementPopupReturn });
     const _v2 = useEscapeDismiss({ escapeDismissParameters: { getWindow, onClose: onCloseEscape, open: (closeOnEscape && globalOpen), parentDepth }, refElementPopupReturn });
-    const { activeElementParameters } = useLostFocusDismiss({ lostFocusDismiss: { onClose: onCloseFocus, open: (closeOnLostFocus && globalOpen) }, refElementPopupReturn, refElementSourceReturn });
+    const { activeElementParameters } = useLostFocusDismiss({ lostFocusDismissParameters: { onClose: onCloseFocus, open: (closeOnLostFocus && globalOpen) }, refElementPopupReturn, refElementSourceReturn });
     const getDocument = useCallback(() => {
         return getWindow().document;
     }, [getWindow]);

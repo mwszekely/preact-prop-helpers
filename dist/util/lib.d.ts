@@ -9,12 +9,15 @@ export declare function debounceRendering(f: () => void): void;
 export type Nullable<T = null> = null | undefined | T;
 /** Like Omit, but with type completion */
 export type OmitStrong<T, K extends keyof T> = Omit<T, K>;
-/** Given an object, omits the given props in the given sub-object. All other types remain. */
 /** "**Pick**, then **omit**". Given an object, omits everything but the given props in the given sub-object, including other sub-objects. */
 export type TargetedOmit<T, K extends keyof T, L extends keyof T[K]> = {
     [M in K]: OmitStrong<T[K], L>;
 };
-/** "**Pick**, then **pick** again". Given an object, omits everything but the given props in the given sub-object, including other sub-objects. */
+/**
+ * "**Pick**, then **pick** again". Given an object, omits everything but the given props in the given sub-object, including other sub-objects.
+ *
+ * @remarks This is particularly useful for the kind of off-brand parameter inheritence that things like grid navigation have going.
+ */
 export type TargetedPick<T, K extends keyof T, L extends keyof T[K]> = {
     [M in K]: Pick<T[K], L>;
 };

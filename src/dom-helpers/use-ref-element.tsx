@@ -3,13 +3,18 @@ import { useCallback, useRef } from "../util/lib.js";
 import { ElementProps } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 
+export interface UseRefElementReturnTypeSelf<T extends EventTarget> {
+    /** **STABLE** */
+    getElement(): T | null;
+}
 export interface UseRefElementReturnType<T extends EventTarget> {
     propsStable: ElementProps<T>;
-
-    refElementReturn: {
-        /** **STABLE** */
-        getElement(): T | null;
-    }
+    refElementReturn: UseRefElementReturnTypeSelf<T>;
+}
+export interface UseRefElementParametersSelf<T> {
+    onElementChange?: OnPassiveStateChange<T | null, never>;
+    onMount?: (element: T) => void;
+    onUnmount?: (element: T) => void;
 }
 
 export interface UseRefElementParameters<T> {
@@ -20,21 +25,39 @@ export interface UseRefElementParameters<T> {
      * absence isn't usually because it was forgotten, it's because
      * it doesn't matter.
      */
-    refElementParameters?: {
-        onElementChange?: OnPassiveStateChange<T | null, never>;
-        onMount?: (element: T) => void;
-        onUnmount?: (element: T) => void;
-    }
+    refElementParameters?: UseRefElementParametersSelf<T>;
 }
 
 /**
- * Allows accessing the element a ref references as soon as it does so.
- * *This hook itself returns a hook*--useRefElementProps modifies the props that you were going to pass to an HTMLElement, 
- * adding a RefCallback and merging it with any existing ref that existed on the props.
+ * Allows you to access the `HTMLElement` rendered by this hook/these props, either as soon as it's available (as a callback), or whenever you need it (as a getter function).
  * 
- * Don't forget to provide the Element as the type argument!
+ * @remarks
  * 
- * @returns The element, and the sub-hook that makes it retrievable.
+ * This hook, like many others, works with either `useState` or {@link usePassiveState}. Why use one over the other?
+ * 
+ * * `useState` is familiar and easy to use, but causes the component to re-render itself, which is slow.
+ * * `usePassiveState` is faster and more scalable, but its state can't be accessed during render and it's more complex.
+ * 
+ * @example
+ * Easiest way to use (but causes an extra re-render 🐌)
+ * ```typescript
+ * const [element, setElement] = useState<HTMLButtonElement | null>(null);
+ * const { propsStable } = useRefElement({ onElementChange: setElement });
+ * useEffect(() => {
+ *     element.doSomethingFunny();
+ * }, [element])
+ * ```
+ * 
+ * @example
+ * Fastest (but slightly more verbose)
+ * ```typescript
+ * // The code in useEffect is moved into this callback, but runs at the same time
+ * const onElementChange = useCallback(element => element.doSomethingFunny(), []);
+ * const [getElement, setElement] = usePassiveState<HTMLButtonElement | null>(onElementChange, returnNull);
+ * const { propsStable } = useRefElement({ onElementChange: setElement });
+ * ```
+ * 
+ * @compositeParams
  */
 export function useRefElement<T extends EventTarget>(args: UseRefElementParameters<T>): UseRefElementReturnType<T> {
     monitorCallCount(useRefElement);

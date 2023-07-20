@@ -2,6 +2,14 @@ import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useStableGetter } from "../preact-extensions/use-stable-getter.js";
 import { useCallback, useEffect, useRef } from "../util/lib.js";
 import { monitorCallCount } from "../util/use-call-count.js";
+/**
+ * Runs a function the specified number of milliseconds after the component renders.
+ *
+ * @remarks This is particularly useful to function as "useEffect on a delay".
+ *
+ * @remarks
+ * {@include } {@link UseTimeoutParameters}
+ */
 export function useTimeout({ timeout, callback, triggerIndex }) {
     monitorCallCount(useTimeout);
     const stableCallback = useStableCallback(() => { startTimeRef.current = null; callback(); });

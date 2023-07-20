@@ -20,9 +20,6 @@ export function focus(e: Element | null) {
  * If you still have access to the element that's unmounting, or perhaps its parent from beforehand, this will find the next suitable element to send focus to instead of the body.
  * 
  * **Important**: This function is linear on the number of DOM nodes in your document, so it's not particularly fast. Only call it once when you need its value, not every time tab focus changed or something.
- * 
- * @param unmountingElement 
- * @returns 
  */
 export function findBackupFocus(unmountingElement: Element | null | undefined): HTMLElement {
     if (unmountingElement == null)

@@ -125,7 +125,7 @@ export interface UseRovingTabIndexChildInfo<TabbableChildElement extends Element
     setLocallyTabbable: StateUpdater<boolean>;
 
     /** 
-     * @see {@link setLocallyTabbable} 
+     * @see {@link UseRovingTabIndexChildInfo.setLocallyTabbable} 
      */
     getLocallyTabbable: () => boolean;
 
@@ -190,22 +190,24 @@ export interface RovingTabIndexChildContext {
     rovingTabIndexContext: RovingTabIndexChildContextSelf;
 }
 
+export interface UseRovingTabIndexChildReturnTypeSelf {
+    /**
+     * *Unstable*
+     * 
+     * Whether this child, individually, is *the* currently tabbable child.
+     */
+    tabbable: boolean;
+
+    /** **STABLE** */
+    getTabbable(): boolean;
+
+}
+
 export interface UseRovingTabIndexChildReturnType<ChildElement extends Element, M extends UseRovingTabIndexChildInfo<ChildElement>> extends
     Required<TargetedPick<UseHasCurrentFocusParameters<ChildElement>, "hasCurrentFocusParameters", "onCurrentFocusedInnerChanged">> {
 
     /** Return information about the tabbable state of this child */
-    rovingTabIndexChildReturn: {
-        /**
-         * *Unstable*
-         * 
-         * Whether this child, individually, is *the* currently tabbable child.
-         */
-        tabbable: boolean;
-
-        /** **STABLE** */
-        getTabbable(): boolean;
-
-    }
+    rovingTabIndexChildReturn: UseRovingTabIndexChildReturnTypeSelf;
 
     /**
      * Pass this to `useManagedChild`.
@@ -226,15 +228,21 @@ export interface UseRovingTabIndexChildReturnType<ChildElement extends Element, 
 
 /**
  * Implements a roving tabindex system where only one "focusable"
- * component in a set is able to receive a tab focus. *Which*
- * of those elements receives focus is determined by you, but it's
- * recommended to offload that logic then to another hook, like
- * `useLinearNavigation`, which lets you change the tabbable
- * element with the arrow keys, `useTypeaheadNavigation`, which
- * lets you change the tabbable index with typeahead, or
- * `useListNavigation(Complete)` if you just want everything bundled together.
+ * component in a set is able to receive a tab focus. 
  * 
- * @param - {@link UseRovingTabIndexParameters}
+ * @remarks *Which* of those elements receives focus is determined by you, 
+ * but it's recommended to offload that logic then to another hook, like
+ * `useLinearNavigation`, which lets you change the tabbable element with 
+ * the arrow keys, `useTypeaheadNavigation`, which lets you change the 
+ * tabbable index with typeahead, or `useListNavigation(Complete)` if you 
+ * just want everything bundled together.
+ * 
+ * 
+ * @hasChild {@link useRovingTabIndexChild}
+ * 
+ * @compositeParams
+ * 
+ * @param args - {@link UseRovingTabIndexParameters}
  * @returns - {@link UseRovingTabIndexReturnType}
  */
 export function useRovingTabIndex<ParentElement extends Element, ChildElement extends Element, M extends UseRovingTabIndexChildInfo<ChildElement>>({
@@ -430,9 +438,11 @@ export function useRovingTabIndex<ParentElement extends Element, ChildElement ex
 }
 
 /**
+ * @compositeParams
+ * 
  * @see {@link useRovingTabIndex}
- * @param - {@link UseRovingTabIndexChildParameters}
- * @return - {@link UseRovingTabIndexChildReturnType}
+ * @param args - {@link UseRovingTabIndexChildParameters}
+ * @returns - {@link UseRovingTabIndexChildReturnType}
  */
 export function useRovingTabIndexChild<ChildElement extends Element, M extends UseRovingTabIndexChildInfo<ChildElement>>({
     info: { index, untabbable: iAmUntabbable, ...void2 },

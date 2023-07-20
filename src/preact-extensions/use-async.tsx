@@ -173,9 +173,9 @@ const AsyncFunction = ((async function () {}).constructor)
  * Given an async function, returns a function that's suitable for non-async APIs, 
  * along with other information about the current run's status.
  * 
- * See also `useAsyncHandler` for a version that's specialized for DOM event handlers.
+ * @see {@link useAsyncHandler} for a version that's specialized for DOM event handlers.
  * 
- * When called multiple times in quick succession, (i.e. before the handler has finished), 
+ * @remarks When called multiple times in quick succession, (i.e. before the handler has finished), 
  * this works like Lodash's `throttle` function with the `wait` option always
  * set to however long the handler takes to complete. A second call to the sync function will be 
  * throttled until the first call has finished. The return value of the function is the result 
@@ -192,8 +192,13 @@ const AsyncFunction = ((async function () {}).constructor)
  * dynamic data at the time it runs; the `AP` and `SP` type parameters likewise control
  * the parameters the async handler and sync handler expect respectively.
  * 
+ * {@include } {@link UseAsyncParameters}
+ * 
+ * @param asyncHandler - The async function to make sync
+ * @param options - @see {@link UseAsyncParameters}
+ * 
  */
-export function useAsync<AP extends unknown[], R, SP extends unknown[] = AP>(asyncHandler2: AsyncFunctionType<AP, R> | null, options?: UseAsyncParameters<AP, SP>): UseAsyncReturnType<SP, R> {
+export function useAsync<AP extends unknown[], R, SP extends unknown[] = AP>(asyncHandler: AsyncFunctionType<AP, R> | null, options?: UseAsyncParameters<AP, SP>): UseAsyncReturnType<SP, R> {
     monitorCallCount(useAsync);
 
 
@@ -210,7 +215,7 @@ export function useAsync<AP extends unknown[], R, SP extends unknown[] = AP>(asy
     const [hasResult, setHasResult, _getHasResult] = useState<boolean | null>(false);
     const [asyncDebouncing, setAsyncDebouncing] = useState(false);
     const [syncDebouncing, setSyncDebouncing] = useState(false);
-    const [invocationResult, setInvocationResult] = useState<"async" | "sync" | "throw" | null>(asyncHandler2 instanceof AsyncFunction? "async" : null);
+    const [invocationResult, setInvocationResult] = useState<"async" | "sync" | "throw" | null>(asyncHandler instanceof AsyncFunction? "async" : null);
     
     // Keep track of this for the caller's sake -- we don't really care.
     const [runCount, setRunCount] = useState(0);
@@ -225,7 +230,7 @@ export function useAsync<AP extends unknown[], R, SP extends unknown[] = AP>(asy
     /* eslint-disable prefer-const */
     let { throttle, debounce, capture: captureUnstable } = (options ?? {});
     const captureStable = useStableCallback(captureUnstable ?? identityCapture);
-    const asyncHandlerStable = useStableCallback<(...args: AP) => R | Promise<R>>(asyncHandler2 ?? (identity as any));
+    const asyncHandlerStable = useStableCallback<(...args: AP) => R | Promise<R>>(asyncHandler ?? (identity as any));
     const { flushSyncDebounce, syncOutput, cancelSyncDebounce } = useMemo(() => {
         return asyncToSync<AP, SP, R>({
             asyncInput: asyncHandlerStable,

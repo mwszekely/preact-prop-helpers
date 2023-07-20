@@ -1,27 +1,39 @@
-import { UseRefElementParameters, useRefElement } from "../dom-helpers/use-ref-element.js";
+import { UseRefElementParameters, UseRefElementReturnType, useRefElement } from "../dom-helpers/use-ref-element.js";
 import { returnNull, runImmediately, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useCallback, useEffect } from "../util/lib.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 
-export interface UseMutationObserverParameters<E extends Element> extends UseRefElementParameters<E> {
-    mutationObserverParameters: {
-        onChildList: null | ((info: { addedNodes: NodeList, removedNodes: NodeList }) => void);
-        onAttributes: null | ((info: { attributeName: string | null, attributeNamespace: string | null, oldValue?: string | null }) => void);
-        onCharacterData: null | ((info: MutationRecord) => void);
-        subtree: boolean;
-        characterDataOldValue: boolean;
-        attributeOldValue: boolean;
-        attributeFilter: string | string[];
-    }
+export interface UseMutationObserverParametersSelf<E extends Element> extends UseRefElementParameters<E> {
+    onChildList: null | ((info: { addedNodes: NodeList, removedNodes: NodeList }) => void);
+    onAttributes: null | ((info: { attributeName: string | null, attributeNamespace: string | null, oldValue?: string | null }) => void);
+    onCharacterData: null | ((info: MutationRecord) => void);
+    subtree: boolean;
+    characterDataOldValue: boolean;
+    attributeOldValue: boolean;
+    attributeFilter: string | string[];
 }
 
+
+export interface UseMutationObserverParameters<E extends Element> extends UseRefElementParameters<E> {
+    mutationObserverParameters: UseMutationObserverParametersSelf<E>;
+}
+
+export interface UseMutationObserverReturnType<E extends Element> extends UseRefElementReturnType<E> {
+
+}
+
+/**
+ * Effectively just a wrapper around a `MutationObserver`.
+ * 
+ * @compositeParams
+ */
 export function useMutationObserver<E extends Element>({
     refElementParameters,
     mutationObserverParameters: { attributeFilter, subtree, onChildList, characterDataOldValue, onCharacterData, onAttributes, attributeOldValue }
-}: UseMutationObserverParameters<E>) {
+}: UseMutationObserverParameters<E>): UseMutationObserverReturnType<E> {
     monitorCallCount(useMutationObserver);
-    
+
     const { onElementChange, ...rest } = (refElementParameters || {})
 
 
@@ -82,7 +94,7 @@ export function useMutationObserver<E extends Element>({
         onNeedMutationObserverReset(getElement());
     }, [attributeKey, attributeOldValue, characterDataOldValue, subtree])
 
-    const { refElementReturn } = useRefElement<E>({
+    const { refElementReturn, propsStable } = useRefElement<E>({
         refElementParameters: {
             onElementChange: useStableCallback((e: E | null, p: E | null | undefined) => { onElementChange?.(e, p); onNeedMutationObserverReset(e); }),
             ...rest
@@ -91,7 +103,7 @@ export function useMutationObserver<E extends Element>({
     const { getElement } = refElementReturn;
 
     return {
-        refElementReturn,
-        mutationObserverReturn: {}
+        refElementReturn, 
+        propsStable
     };
 }

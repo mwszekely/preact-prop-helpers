@@ -2,6 +2,15 @@ import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useState } from "../preact-extensions/use-state.js";
 import { useCallback, useEffect, useMemo, useRef } from "../util/lib.js";
 import { monitorCallCount } from "../util/use-call-count.js";
+/**
+ * Allows children to stop themselves from rendering outside of a narrow range.
+ *
+ * @remarks Each child will still render itself, but it is aware of if it is within/outside of the pagination range, and simply return empty.
+ *
+ * @compositeParams
+ *
+ * @hasChild {@link usePaginatedChild}
+ */
 export function usePaginatedChildren({ managedChildrenReturn: { getChildren }, linearNavigationParameters: { indexDemangler }, paginatedChildrenParameters: { paginationMax, paginationMin }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex }, refElementReturn: { getElement } }) {
     monitorCallCount(usePaginatedChildren);
     const [childCount, setChildCount] = useState(null);
@@ -68,9 +77,16 @@ export function usePaginatedChildren({ managedChildrenReturn: { getChildren }, l
         paginatedChildrenReturn: { refreshPagination, childCount }
     };
 }
+/**
+ * Child hook for {@link usePaginatedChildren}.
+ *
+ * @remarks When a child is paginated, it still renders itself (i.e. it calls this hook, so it's rendering),
+ * so check `hideBecausePaginated` and, if it's true, avoid doing any heavy logic and render with `display: none`.
+ *
+ * @compositeParams
+ */
 export function usePaginatedChild({ info: { index }, context: { paginatedChildContext: { parentIsPaginated, getDefaultPaginationVisible } } }) {
     monitorCallCount(usePaginatedChild);
-    //const parentIsPaginated = (paginationMin != null || paginationMax != null);
     const [childCountIfPaginated, setChildCountIfPaginated] = useState(null);
     const [paginatedVisible, setPaginatedVisible] = useState(parentIsPaginated ? getDefaultPaginationVisible(index) : true);
     return {

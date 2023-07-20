@@ -181,9 +181,9 @@ function TestBasesListNavChild({ index }: { index: number }) {
             unselectable: disabled,
             focusSelf,
             untabbable: hidden,
-            index,
-            getSortValue: getTextContent
+            index
         },
+        sortableChildParameters: { getSortValue: getTextContent },
         textContentParameters: { getText: getTextContent }
     });
     const { pressReturn: { getIsPressing, longPress, pressing }, props: propsPressStable } = usePress({ pressParameters: { focusSelf, onPressSync, excludeSpace }, refElementReturn });

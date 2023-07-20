@@ -5,9 +5,8 @@ import { monitorCallCount } from "../util/use-call-count.js";
 
 /**
  * Allows for hiding the scroll bar of the root HTML element
- * without shifting the layout of the page more than adding a fow pixels
+ * without shifting the layout of the page more than adding a few pixels
  * of padding to the root element if necessary.
- * @param hideScroll 
  */
  export function useHideScroll(hideScroll: boolean) {
     monitorCallCount(useHideScroll);
