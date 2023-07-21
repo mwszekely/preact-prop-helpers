@@ -126,7 +126,7 @@ export function useCompleteGridNavigationRow({ info, context: contextIncomingFor
     const context = useMemoObject({
         ...contextGNR,
         ...contextMC,
-        completeGridNavigationCellContext: { excludeSpace }
+        //completeGridNavigationCellContext: { excludeSpace }
     });
     const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ...void4 } } = useChildrenHaveFocusChild({ context: contextIncomingForRowAsChildOfTable });
     //const { refElementReturn } = useRefElement<RowElement>({ refElementParameters: {} })
@@ -155,7 +155,7 @@ export function useCompleteGridNavigationRow({ info, context: contextIncomingFor
 /**
  * @compositeParams
  */
-export function useCompleteGridNavigationCell({ gridNavigationCellParameters, context: { gridNavigationCellContext, managedChildContext, rovingTabIndexContext, typeaheadNavigationContext, completeGridNavigationCellContext: { excludeSpace: es2 } }, textContentParameters, info, ...void1 }) {
+export function useCompleteGridNavigationCell({ gridNavigationCellParameters, context: { gridNavigationCellContext, managedChildContext, rovingTabIndexContext, typeaheadNavigationContext }, textContentParameters, info, ...void1 }) {
     monitorCallCount(useCompleteGridNavigationCell);
     const { refElementReturn, propsStable } = useRefElement({ refElementParameters: {} });
     const { hasCurrentFocusParameters, rovingTabIndexChildReturn, textContentReturn, pressParameters: { excludeSpace: es1 }, props: propsRti, info: info2, ...void2 } = useGridNavigationSingleSelectionCell({
@@ -181,7 +181,7 @@ export function useCompleteGridNavigationCell({ gridNavigationCellParameters, co
         props,
         refElementReturn,
         rovingTabIndexChildReturn,
-        pressParameters: { excludeSpace: useStableCallback(() => (es1?.() || es2?.() || false)) },
+        pressParameters: { excludeSpace: useStableCallback(() => (es1?.() || false)) },
         hasCurrentFocusReturn,
         managedChildReturn,
         textContentReturn

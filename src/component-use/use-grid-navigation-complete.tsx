@@ -68,10 +68,10 @@ export interface CompleteGridNavigationCellContext<ParentElement extends Element
     RovingTabIndexChildContext,
     UseGridNavigationCellContext {
 
-    completeGridNavigationCellContext: {
+    /*completeGridNavigationCellContext: {
         // TODO: This should be in the normal version, not the complete version, what happened?
         excludeSpace: undefined | (() => boolean);
-    }
+    }*/
 }
 
 
@@ -294,7 +294,7 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
     const context = useMemoObject<CompleteGridNavigationCellContext<RowElement, CellElement, CM>>({
         ...contextGNR,
         ...contextMC,
-        completeGridNavigationCellContext: { excludeSpace }
+        //completeGridNavigationCellContext: { excludeSpace }
     });
     const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ...void4 } } = useChildrenHaveFocusChild<RowElement>({ context: contextIncomingForRowAsChildOfTable });
     //const { refElementReturn } = useRefElement<RowElement>({ refElementParameters: {} })
@@ -334,7 +334,7 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
  */
 export function useCompleteGridNavigationCell<CellElement extends Element, CM extends UseCompleteGridNavigationCellInfo<CellElement>>({
     gridNavigationCellParameters,
-    context: { gridNavigationCellContext, managedChildContext, rovingTabIndexContext, typeaheadNavigationContext, completeGridNavigationCellContext: { excludeSpace: es2 } },
+    context: { gridNavigationCellContext, managedChildContext, rovingTabIndexContext, typeaheadNavigationContext },
     textContentParameters,
     info,
     ...void1
@@ -383,7 +383,7 @@ export function useCompleteGridNavigationCell<CellElement extends Element, CM ex
         props,
         refElementReturn,
         rovingTabIndexChildReturn,
-        pressParameters: { excludeSpace: useStableCallback(() => (es1?.() || es2?.() || false)) },
+        pressParameters: { excludeSpace: useStableCallback(() => (es1?.() || false)) },
         hasCurrentFocusReturn,
         managedChildReturn,
         textContentReturn

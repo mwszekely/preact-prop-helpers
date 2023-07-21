@@ -2,6 +2,8 @@ import { returnNull, runImmediately, usePassiveState } from "../preact-extension
 import { useEffect } from "../util/lib.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 /**
+ * Allows examining the rendered component's text content whenever it renders and reacting to changes.
+ *
  * @compositeParams
  */
 export function useTextContent({ refElementReturn: { getElement }, textContentParameters: { getText, onTextContentChange } }) {

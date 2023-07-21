@@ -22,6 +22,8 @@ export const ImperativeElement = memo(forwardRef(ImperativeElementU));
  *
  * @remarks If the component is re-rendered after the element is modified in some way, those changes are remembered and included in the returned `props` that are meant to be spread to the element in question.
  *
+ * This is extremely useful for integrating with 3rd party libraries that expect to be able to directly manipulate the DOM because it keeps everything syncced together.
+ *
  * @compositeParams
  */
 export function useImperativeProps({ refElementReturn: { getElement } }) {

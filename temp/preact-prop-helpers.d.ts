@@ -174,9 +174,6 @@ declare function callCountU(hook: Function): void;
 export declare type Compare<M extends UseRearrangeableChildInfo> = (lhs: M, rhs: M) => number;
 
 export declare interface CompleteGridNavigationCellContext<ParentElement extends Element, ChildElement extends Element, CM extends UseCompleteGridNavigationCellInfo<ChildElement>> extends UseManagedChildrenContext<CM>, UseTypeaheadNavigationContext, RovingTabIndexChildContext, UseGridNavigationCellContext {
-    completeGridNavigationCellContext: {
-        excludeSpace: undefined | (() => boolean);
-    };
 }
 
 export declare interface CompleteGridNavigationRowContext<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement, CellElement>, _CM extends UseCompleteGridNavigationCellInfo<CellElement>> extends UseManagedChildrenContext<RM>, UsePaginatedChildContext, UseStaggeredChildContext, UseChildrenHaveFocusContext<RowElement>, UseTypeaheadNavigationContext, UseSingleSelectionContext, RovingTabIndexChildContext, UseGridNavigationRowContext {
@@ -1389,7 +1386,7 @@ export declare function useCompleteGridNavigation<ParentOrRowElement extends Ele
 /**
  * @compositeParams
  */
-export declare function useCompleteGridNavigationCell<CellElement extends Element, CM extends UseCompleteGridNavigationCellInfo<CellElement>>({ gridNavigationCellParameters, context: { gridNavigationCellContext, managedChildContext, rovingTabIndexContext, typeaheadNavigationContext, completeGridNavigationCellContext: { excludeSpace: es2 } }, textContentParameters, info, ...void1 }: UseCompleteGridNavigationCellParameters<CellElement, CM>): UseCompleteGridNavigationCellReturnType<CellElement, CM>;
+export declare function useCompleteGridNavigationCell<CellElement extends Element, CM extends UseCompleteGridNavigationCellInfo<CellElement>>({ gridNavigationCellParameters, context: { gridNavigationCellContext, managedChildContext, rovingTabIndexContext, typeaheadNavigationContext }, textContentParameters, info, ...void1 }: UseCompleteGridNavigationCellParameters<CellElement, CM>): UseCompleteGridNavigationCellReturnType<CellElement, CM>;
 
 export declare interface UseCompleteGridNavigationCellInfo<CellElement extends Element> extends GridSingleSelectSortableChildCellInfo<CellElement> {
 }
@@ -2107,6 +2104,8 @@ export declare function useHideScroll(hideScroll: boolean): {
  *
  * @remarks If the component is re-rendered after the element is modified in some way, those changes are remembered and included in the returned `props` that are meant to be spread to the element in question.
  *
+ * This is extremely useful for integrating with 3rd party libraries that expect to be able to directly manipulate the DOM because it keeps everything syncced together.
+ *
  * @compositeParams
  */
 export declare function useImperativeProps<E extends Element>({ refElementReturn: { getElement } }: UseImperativePropsParameters<E>): UseImperativePropsReturnType<E>;
@@ -2115,27 +2114,33 @@ export declare interface UseImperativePropsParameters<E extends Element> extends
 }
 
 export declare interface UseImperativePropsReturnType<T extends Element> {
+    /**
+     * @stable
+     *
+     *  (The object itself and everything within it are all stable and can be passed around freely)
+     */
     imperativePropsReturn: UseImperativePropsReturnTypeSelf<T>;
     props: ElementProps<T>;
 }
 
 export declare interface UseImperativePropsReturnTypeSelf<T extends Element> {
-    /** Returns whether the element currently has the current CSS class */
+    /** @stable Returns whether the element currently has the current CSS class */
     hasClass(cls: string): boolean;
-    /** Applies or removes the given CSS class to the element */
+    /** @stable Applies or removes the given CSS class to the element and its props */
     setClass(cls: string, enabled: boolean): void;
-    /** Applies the given CSS style to the element */
+    /** @stable Applies the given CSS style to the element and its props */
     setStyle<K extends (keyof CSSStyleDeclaration) & string>(prop: K, value: CSSProperties[K] | null): void;
-    /** Returns the current value of the attribute on the element */
+    /** @stable Returns the current value of the attribute on the element */
     getAttribute<K extends keyof ElementProps<T>>(prop: K): ElementProps<T>[K];
-    /** Applies the given attribute to the element */
+    /** @stable Applies the given attribute to the element and its props */
     setAttribute<K extends keyof ElementProps<T>>(prop: K, value: ElementProps<T>[K] | null): void;
-    /** Sets the element's `textContent` */
+    /** @stable Sets the element's `textContent` and `props.children` */
     setChildren(children: string | null): void;
-    /** Sets the element's `innerHTML` */
+    /** @stable Sets the element's `innerHTML` and `props.dangerouslySetInnerHTML.__html` */
     dangerouslySetInnerHTML(html: string): void;
-    /** Evaluates the given HTML and appends it to the current children. */
+    /** @stable Evaluates the given HTML and appends it to the current children and the current props. */
     dangerouslyAppendHTML(html: string): Element;
+    /** @stable Applies the given event handler to the element and its props */
     setEventHandler<K extends keyof HTMLElementEventMap>(type: K, listener: null | ((this: HTMLElement, ev: HTMLElementEventMap[K]) => void), options: AddEventListenerOptions): void;
 }
 
@@ -2586,6 +2591,8 @@ export declare function useMemoObject<T extends {}>(t: T): T;
  * Combines two `children`.
  *
  * @remarks This is fairly trivial and not even technically a hook, as it doesn't use any other hooks, but is this way for consistency.
+ *
+ * TODO: This could accept a variable number of arguments to be consistent with useMergedProps, but I feel like it might be a performance hit.
  */
 export declare function useMergedChildren(lhs: ElementProps<EventTarget>["children"], rhs: ElementProps<EventTarget>["children"]): ElementProps<EventTarget>["children"];
 
@@ -2824,6 +2831,8 @@ export declare function usePortalChildren({ target }: UsePortalChildrenParameter
 export declare interface UsePortalChildrenParameters {
     /**
      * The element that will contain the portal's children, or the string of its `id`.
+     *
+     * @nonstable
      */
     target: string | Element | null;
 }
@@ -2833,11 +2842,11 @@ export declare interface UsePortalChildrenReturnType {
     children: VNode | null;
     /** The element that the portal was rendered to (even if an `id` was provided) */
     portalElement: Element | null;
-    /** Appends the given child to the portal's existing children, and returns a number that can be used to request updates to it/remove it later if necessary */
+    /** @stable Appends the given child to the portal's existing children, and returns a number that can be used to request updates to it/remove it later if necessary */
     pushChild(child: VNode): number;
-    /** Allows a child to be updated with new props. `index` is the value returned from `pushChild`. */
+    /** @stable Allows a child to be updated with new props. `index` is the value returned from `pushChild`. */
     updateChild(index: number, child: VNode): void;
-    /** Removes the child at the given `index` (the value returned from `pushChild`) */
+    /** @stable Removes the child at the given `index` (the value returned from `pushChild`) */
     removeChild(index: number): void;
 }
 
@@ -3077,19 +3086,21 @@ export declare interface UseRearrangeableChildrenReturnTypeSelf<M extends UseRea
 }
 
 /**
- * Allows you to access the `HTMLElement` rendered by this hook/these props, either as soon as it's available (as a callback), or whenever you need it (as a getter function).
+ * Access `HTMLElement` rendered by this hook/these props, either as soon as it's available (as a callback), or whenever you need it (as a getter function).
  *
  * @remarks
  *
  * This hook, like many others, works with either `useState` or {@link usePassiveState}. Why use one over the other?
  *
  * ```md-literal
- * * `useState` is familiar and easy to use, but causes the component to re-render itself, which is slow.
+ * * `useState` is familiar and easy to use, but calling `setState` causes a re-render, which you might not need/want
  * * `usePassiveState` is faster and more scalable, but its state can't be accessed during render and it's more complex.
  * ```
  *
+ * Suppose we want to call the `HTMLElement`'s `doSomethingFunny` method as soon as the element has been created:
+ *
  * @example
- * Easiest way to use (but causes an extra re-render 🐌)
+ * Easiest way to use (but setElement causes an extra re-render when it's called...)
  * ```typescript
  * const [element, setElement] = useState<HTMLButtonElement | null>(null);
  * const { propsStable } = useRefElement({ onElementChange: setElement });
@@ -3144,6 +3155,7 @@ export declare interface UseRefElementParametersSelf<T> {
 }
 
 export declare interface UseRefElementReturnType<T extends EventTarget> {
+    /** @stable */
     propsStable: ElementProps<T>;
     refElementReturn: UseRefElementReturnTypeSelf<T>;
 }
@@ -3151,7 +3163,7 @@ export declare interface UseRefElementReturnType<T extends EventTarget> {
 export declare interface UseRefElementReturnTypeSelf<T extends EventTarget> {
     /**
      *
-     * Call to return the element that the props were rendered to, or `null` if they were not rendered to an element.
+     * Returns the element that the props were rendered to, or `null` if they were not rendered to an element.
      *
      * @stable
      */
@@ -3727,6 +3739,8 @@ export declare interface UseStaggeredChildReturnTypeSelf {
 export declare function useState<T>(initialState: T | (() => T)): readonly [value: T, setValue: StateUpdater<T>, getValue: () => T];
 
 /**
+ * Allows examining the rendered component's text content whenever it renders and reacting to changes.
+ *
  * @compositeParams
  */
 export declare function useTextContent<E extends Element>({ refElementReturn: { getElement }, textContentParameters: { getText, onTextContentChange } }: UseTextContentParameters<E>): UseTextContentReturnType;
@@ -3738,6 +3752,9 @@ export declare interface UseTextContentParameters<E extends Element> extends Tar
 export declare interface UseTextContentParametersSelf<E extends Element> {
     /**
      * Return the text content of this component. By default, `e => e.textContent` is probably what you want.
+     *
+     * @remarks Reminder that `element.innerText` is heavy and causes layout calculations, but respects `display:none` and such.
+     * `element.textContent` is usually what you want if this is used many times across a page (like as part of a list item).
      */
     getText(e: E | null): string | null;
     /**

@@ -2,6 +2,8 @@ import { VNode } from "../util/types.js";
 export interface UsePortalChildrenParameters {
     /**
      * The element that will contain the portal's children, or the string of its `id`.
+     *
+     * @nonstable
      */
     target: string | Element | null;
 }
@@ -14,11 +16,11 @@ export interface UsePortalChildrenReturnType {
     children: VNode | null;
     /** The element that the portal was rendered to (even if an `id` was provided) */
     portalElement: Element | null;
-    /** Appends the given child to the portal's existing children, and returns a number that can be used to request updates to it/remove it later if necessary */
+    /** @stable Appends the given child to the portal's existing children, and returns a number that can be used to request updates to it/remove it later if necessary */
     pushChild(child: VNode): number;
-    /** Allows a child to be updated with new props. `index` is the value returned from `pushChild`. */
+    /** @stable Allows a child to be updated with new props. `index` is the value returned from `pushChild`. */
     updateChild(index: number, child: VNode): void;
-    /** Removes the child at the given `index` (the value returned from `pushChild`) */
+    /** @stable Removes the child at the given `index` (the value returned from `pushChild`) */
     removeChild(index: number): void;
 }
 /**

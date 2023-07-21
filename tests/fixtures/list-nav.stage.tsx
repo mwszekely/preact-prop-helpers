@@ -77,7 +77,7 @@ function useOnRender(id: string) {
     window.onRender ??= async (id) => { console.log("RENDER:" + id); }
     let promise = window.onRender?.(id);
     const { propsStable, refElementReturn } = useRefElement<any>({})
-    const { imperativeHandle, props } = useImperativeProps<any>({ refElementReturn });
+    const { imperativePropsReturn: imperativeHandle, props } = useImperativeProps<any>({ refElementReturn });
     imperativeHandle.setAttribute(("data-render-pending-" + id) as never, "true" as never);
     useEffect(() => {
         imperativeHandle.setAttribute(("data-render-pending-" + id) as never, "true" as never);
@@ -166,7 +166,7 @@ function TestBasesListNavChild({ index }: { index: number }) {
     const {
         hasCurrentFocusReturn: { getCurrentFocused, getCurrentFocusedInner },
         managedChildReturn: { getChildren },
-        paginatedChildReturn: { hideBecausePaginated, parentIsPaginated, paginatedVisible },
+        paginatedChildReturn: { hideBecausePaginated, parentIsPaginated },
         propsChild,
         propsTabbable,
         refElementReturn,
@@ -181,9 +181,9 @@ function TestBasesListNavChild({ index }: { index: number }) {
             unselectable: disabled,
             focusSelf,
             untabbable: hidden,
-            index
+            index,
+            getSortValue: getTextContent
         },
-        sortableChildParameters: { getSortValue: getTextContent },
         textContentParameters: { getText: getTextContent }
     });
     const { pressReturn: { getIsPressing, longPress, pressing }, props: propsPressStable } = usePress({ pressParameters: { focusSelf, onPressSync, excludeSpace }, refElementReturn });
@@ -195,7 +195,6 @@ function TestBasesListNavChild({ index }: { index: number }) {
                 data-long-pressing={longPress}
                 data-hide-because-paginated={hideBecausePaginated}
                 data-parent-is-paginated={parentIsPaginated}
-                data-paginated-visible={paginatedVisible}
                 data-tabbable={tabbable}
                 data-hide-because-staggered={hideBecauseStaggered}
                 data-selected={selected}

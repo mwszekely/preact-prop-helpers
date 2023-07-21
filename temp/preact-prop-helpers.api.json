@@ -570,35 +570,7 @@
           ],
           "name": "CompleteGridNavigationCellContext",
           "preserveMemberOrder": false,
-          "members": [
-            {
-              "kind": "PropertySignature",
-              "canonicalReference": "preact-prop-helpers!CompleteGridNavigationCellContext#completeGridNavigationCellContext:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "completeGridNavigationCellContext: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "{\n        excludeSpace: undefined | (() => boolean);\n    }"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isReadonly": false,
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "completeGridNavigationCellContext",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              }
-            }
-          ],
+          "members": [],
           "extendsTokenRanges": [
             {
               "startIndex": 8,
@@ -11758,25 +11730,7 @@
             },
             {
               "kind": "Content",
-              "text": ": { gridNavigationCellContext, managedChildContext, rovingTabIndexContext, typeaheadNavigationContext, "
-            },
-            {
-              "kind": "Reference",
-              "text": "completeGridNavigationCellContext",
-              "canonicalReference": "preact-prop-helpers!CompleteGridNavigationCellContext#completeGridNavigationCellContext"
-            },
-            {
-              "kind": "Content",
-              "text": ": { "
-            },
-            {
-              "kind": "Reference",
-              "text": "excludeSpace",
-              "canonicalReference": "preact-prop-helpers!~__type#excludeSpace"
-            },
-            {
-              "kind": "Content",
-              "text": ": es2 } }, textContentParameters, info, ...void1 }: "
+              "text": ": { gridNavigationCellContext, managedChildContext, rovingTabIndexContext, typeaheadNavigationContext }, textContentParameters, info, ...void1 }: "
             },
             {
               "kind": "Reference",
@@ -11807,17 +11761,17 @@
           ],
           "fileUrlPath": "src/component-use/use-grid-navigation-complete.tsx",
           "returnTypeTokenRange": {
-            "startIndex": 15,
-            "endIndex": 17
+            "startIndex": 11,
+            "endIndex": 13
           },
           "releaseTag": "Public",
           "overloadIndex": 1,
           "parameters": [
             {
-              "parameterName": "{ gridNavigationCellParameters, context: { gridNavigationCellContext, managedChildContext, rovingTabIndexContext, typeaheadNavigationContext, completeGridNavigationCellContext: { excludeSpace: es2 } }, textContentParameters, info, ...void1 }",
+              "parameterName": "{ gridNavigationCellParameters, context: { gridNavigationCellContext, managedChildContext, rovingTabIndexContext, typeaheadNavigationContext }, textContentParameters, info, ...void1 }",
               "parameterTypeTokenRange": {
-                "startIndex": 12,
-                "endIndex": 14
+                "startIndex": 8,
+                "endIndex": 10
               },
               "isOptional": false
             }
@@ -24970,7 +24924,7 @@
         {
           "kind": "Function",
           "canonicalReference": "preact-prop-helpers!useImperativeProps:function(1)",
-          "docComment": "/**\n * Allows controlling an element's `class`, `style`, etc. with functions like `setStyle` in addition to being reactive to incoming props.\n *\n * @remarks\n *\n * If the component is re-rendered after the element is modified in some way, those changes are remembered and included in the returned `props` that are meant to be spread to the element in question.\n *\n * @compositeParams\n */\n",
+          "docComment": "/**\n * Allows controlling an element's `class`, `style`, etc. with functions like `setStyle` in addition to being reactive to incoming props.\n *\n * @remarks\n *\n * If the component is re-rendered after the element is modified in some way, those changes are remembered and included in the returned `props` that are meant to be spread to the element in question.\n *\n * This is extremely useful for integrating with 3rd party libraries that expect to be able to directly manipulate the DOM because it keeps everything syncced together.\n *\n * @compositeParams\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -25159,7 +25113,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseImperativePropsReturnType#imperativePropsReturn:member",
-              "docComment": "",
+              "docComment": "/**\n * (The object itself and everything within it are all stable and can be passed around freely)\n *\n * @stable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -25263,7 +25217,7 @@
             {
               "kind": "MethodSignature",
               "canonicalReference": "preact-prop-helpers!UseImperativePropsReturnTypeSelf#dangerouslyAppendHTML:member(1)",
-              "docComment": "/**\n * Evaluates the given HTML and appends it to the current children.\n */\n",
+              "docComment": "/**\n * Evaluates the given HTML and appends it to the current children and the current props.\n *\n * @stable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -25309,7 +25263,7 @@
             {
               "kind": "MethodSignature",
               "canonicalReference": "preact-prop-helpers!UseImperativePropsReturnTypeSelf#dangerouslySetInnerHTML:member(1)",
-              "docComment": "/**\n * Sets the element's `innerHTML`\n */\n",
+              "docComment": "/**\n * Sets the element's `innerHTML` and `props.dangerouslySetInnerHTML.__html`\n *\n * @stable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -25354,7 +25308,7 @@
             {
               "kind": "MethodSignature",
               "canonicalReference": "preact-prop-helpers!UseImperativePropsReturnTypeSelf#getAttribute:member(1)",
-              "docComment": "/**\n * Returns the current value of the attribute on the element\n */\n",
+              "docComment": "/**\n * Returns the current value of the attribute on the element\n *\n * @stable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -25434,7 +25388,7 @@
             {
               "kind": "MethodSignature",
               "canonicalReference": "preact-prop-helpers!UseImperativePropsReturnTypeSelf#hasClass:member(1)",
-              "docComment": "/**\n * Returns whether the element currently has the current CSS class\n */\n",
+              "docComment": "/**\n * Returns whether the element currently has the current CSS class\n *\n * @stable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -25479,7 +25433,7 @@
             {
               "kind": "MethodSignature",
               "canonicalReference": "preact-prop-helpers!UseImperativePropsReturnTypeSelf#setAttribute:member(1)",
-              "docComment": "/**\n * Applies the given attribute to the element\n */\n",
+              "docComment": "/**\n * Applies the given attribute to the element and its props\n *\n * @stable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -25575,7 +25529,7 @@
             {
               "kind": "MethodSignature",
               "canonicalReference": "preact-prop-helpers!UseImperativePropsReturnTypeSelf#setChildren:member(1)",
-              "docComment": "/**\n * Sets the element's `textContent`\n */\n",
+              "docComment": "/**\n * Sets the element's `textContent` and `props.children`\n *\n * @stable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -25620,7 +25574,7 @@
             {
               "kind": "MethodSignature",
               "canonicalReference": "preact-prop-helpers!UseImperativePropsReturnTypeSelf#setClass:member(1)",
-              "docComment": "/**\n * Applies or removes the given CSS class to the element\n */\n",
+              "docComment": "/**\n * Applies or removes the given CSS class to the element and its props\n *\n * @stable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -25681,7 +25635,7 @@
             {
               "kind": "MethodSignature",
               "canonicalReference": "preact-prop-helpers!UseImperativePropsReturnTypeSelf#setEventHandler:member(1)",
-              "docComment": "",
+              "docComment": "/**\n * Applies the given event handler to the element and its props\n *\n * @stable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -25803,7 +25757,7 @@
             {
               "kind": "MethodSignature",
               "canonicalReference": "preact-prop-helpers!UseImperativePropsReturnTypeSelf#setStyle:member(1)",
-              "docComment": "/**\n * Applies the given CSS style to the element\n */\n",
+              "docComment": "/**\n * Applies the given CSS style to the element and its props\n *\n * @stable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -31511,7 +31465,7 @@
         {
           "kind": "Function",
           "canonicalReference": "preact-prop-helpers!useMergedChildren:function(1)",
-          "docComment": "/**\n * Combines two `children`.\n *\n * @remarks\n *\n * This is fairly trivial and not even technically a hook, as it doesn't use any other hooks, but is this way for consistency.\n */\n",
+          "docComment": "/**\n * Combines two `children`.\n *\n * @remarks\n *\n * This is fairly trivial and not even technically a hook, as it doesn't use any other hooks, but is this way for consistency.\n *\n * TODO: This could accept a variable number of arguments to be consistent with useMergedProps, but I feel like it might be a performance hit.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -34538,7 +34492,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UsePortalChildrenParameters#target:member",
-              "docComment": "/**\n * The element that will contain the portal's children, or the string of its `id`.\n */\n",
+              "docComment": "/**\n * The element that will contain the portal's children, or the string of its `id`.\n *\n * @nonstable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -34656,7 +34610,7 @@
             {
               "kind": "MethodSignature",
               "canonicalReference": "preact-prop-helpers!UsePortalChildrenReturnType#pushChild:member(1)",
-              "docComment": "/**\n * Appends the given child to the portal's existing children, and returns a number that can be used to request updates to it/remove it later if necessary\n */\n",
+              "docComment": "/**\n * Appends the given child to the portal's existing children, and returns a number that can be used to request updates to it/remove it later if necessary\n *\n * @stable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -34702,7 +34656,7 @@
             {
               "kind": "MethodSignature",
               "canonicalReference": "preact-prop-helpers!UsePortalChildrenReturnType#removeChild:member(1)",
-              "docComment": "/**\n * Removes the child at the given `index` (the value returned from `pushChild`)\n */\n",
+              "docComment": "/**\n * Removes the child at the given `index` (the value returned from `pushChild`)\n *\n * @stable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -34747,7 +34701,7 @@
             {
               "kind": "MethodSignature",
               "canonicalReference": "preact-prop-helpers!UsePortalChildrenReturnType#updateChild:member(1)",
-              "docComment": "/**\n * Allows a child to be updated with new props. `index` is the value returned from `pushChild`.\n */\n",
+              "docComment": "/**\n * Allows a child to be updated with new props. `index` is the value returned from `pushChild`.\n *\n * @stable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -36954,7 +36908,7 @@
         {
           "kind": "Function",
           "canonicalReference": "preact-prop-helpers!useRefElement:function(1)",
-          "docComment": "/**\n * Allows you to access the `HTMLElement` rendered by this hook/these props, either as soon as it's available (as a callback), or whenever you need it (as a getter function).\n *\n * @remarks\n *\n * This hook, like many others, works with either `useState` or {@link usePassiveState}. Why use one over the other?\n * ```md-literal\n * * `useState` is familiar and easy to use, but causes the component to re-render itself, which is slow.\n * * `usePassiveState` is faster and more scalable, but its state can't be accessed during render and it's more complex.\n * ```\n *\n * @example\n *\n * Easiest way to use (but causes an extra re-render 🐌)\n * ```typescript\n * const [element, setElement] = useState<HTMLButtonElement | null>(null);\n * const { propsStable } = useRefElement({ onElementChange: setElement });\n * useEffect(() => {\n *     element.doSomethingFunny();\n * }, [element])\n * ```\n *\n * @example\n *\n * Fastest (but slightly more verbose)\n * ```typescript\n * // The code in useEffect is moved into this callback, but runs at the same time\n * const onElementChange = useCallback(element => element.doSomethingFunny(), []);\n * const [getElement, setElement] = usePassiveState<HTMLButtonElement | null>(onElementChange, returnNull);\n * const { propsStable } = useRefElement({ onElementChange: setElement });\n * ```\n *\n * @compositeParams\n */\n",
+          "docComment": "/**\n * Access `HTMLElement` rendered by this hook/these props, either as soon as it's available (as a callback), or whenever you need it (as a getter function).\n *\n * @remarks\n *\n * This hook, like many others, works with either `useState` or {@link usePassiveState}. Why use one over the other?\n * ```md-literal\n * * `useState` is familiar and easy to use, but calling `setState` causes a re-render, which you might not need/want\n * * `usePassiveState` is faster and more scalable, but its state can't be accessed during render and it's more complex.\n * ```\n *\n * Suppose we want to call the `HTMLElement`'s `doSomethingFunny` method as soon as the element has been created:\n *\n * @example\n *\n * Easiest way to use (but setElement causes an extra re-render when it's called...)\n * ```typescript\n * const [element, setElement] = useState<HTMLButtonElement | null>(null);\n * const { propsStable } = useRefElement({ onElementChange: setElement });\n * useEffect(() => {\n *     element.doSomethingFunny();\n * }, [element])\n * ```\n *\n * @example\n *\n * Fastest (but slightly more verbose)\n * ```typescript\n * // The code in useEffect is moved into this callback, but runs at the same time\n * const onElementChange = useCallback(element => element.doSomethingFunny(), []);\n * const [getElement, setElement] = usePassiveState<HTMLButtonElement | null>(onElementChange, returnNull);\n * const { propsStable } = useRefElement({ onElementChange: setElement });\n * ```\n *\n * @compositeParams\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -37248,7 +37202,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseRefElementReturnType#propsStable:member",
-              "docComment": "",
+              "docComment": "/**\n * @stable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -37352,7 +37306,7 @@
             {
               "kind": "MethodSignature",
               "canonicalReference": "preact-prop-helpers!UseRefElementReturnTypeSelf#getElement:member(1)",
-              "docComment": "/**\n * Call to return the element that the props were rendered to, or `null` if they were not rendered to an element.\n *\n * @stable\n */\n",
+              "docComment": "/**\n * Returns the element that the props were rendered to, or `null` if they were not rendered to an element.\n *\n * @stable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -43362,7 +43316,7 @@
         {
           "kind": "Function",
           "canonicalReference": "preact-prop-helpers!useTextContent:function(1)",
-          "docComment": "/**\n * @compositeParams\n */\n",
+          "docComment": "/**\n * Allows examining the rendered component's text content whenever it renders and reacting to changes.\n *\n * @compositeParams\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -43589,7 +43543,7 @@
             {
               "kind": "MethodSignature",
               "canonicalReference": "preact-prop-helpers!UseTextContentParametersSelf#getText:member(1)",
-              "docComment": "/**\n * Return the text content of this component. By default, `e => e.textContent` is probably what you want.\n */\n",
+              "docComment": "/**\n * Return the text content of this component. By default, `e => e.textContent` is probably what you want.\n *\n * @remarks\n *\n * Reminder that `element.innerText` is heavy and causes layout calculations, but respects `display:none` and such. `element.textContent` is usually what you want if this is used many times across a page (like as part of a list item).\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",

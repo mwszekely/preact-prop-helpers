@@ -4,6 +4,9 @@ import { UseRefElementReturnType } from "./use-ref-element.js";
 export interface UseTextContentParametersSelf<E extends Element> {
     /**
      * Return the text content of this component. By default, `e => e.textContent` is probably what you want.
+     *
+     * @remarks Reminder that `element.innerText` is heavy and causes layout calculations, but respects `display:none` and such.
+     * `element.textContent` is usually what you want if this is used many times across a page (like as part of a list item).
      */
     getText(e: E | null): string | null;
     /**
@@ -24,6 +27,8 @@ export interface UseTextContentReturnType {
     textContentReturn: UseTextContentReturnTypeSelf;
 }
 /**
+ * Allows examining the rendered component's text content whenever it renders and reacting to changes.
+ *
  * @compositeParams
  */
 export declare function useTextContent<E extends Element>({ refElementReturn: { getElement }, textContentParameters: { getText, onTextContentChange } }: UseTextContentParameters<E>): UseTextContentReturnType;

@@ -20,7 +20,7 @@ These hooks are used extremely commonly or provide uncommonly useful behavior
 
 * [`useMergedProps`](#usemergedprops): Given two sets of props, merges them and returns the result.
 
-* [`useRefElement`](#userefelement): Allows you to access the `HTMLElement`
+* [`useRefElement`](#userefelement): Access `HTMLElement`
  rendered by this hook/these props, either as soon as it's available (as a callback), or whenever you need it (as a getter function).
 
 * [`usePress`](#usepress): Adds the necessary event handlers to create a "press"-like event for any element, whether it's a native &lt;button&gt; or regular &lt;div&gt;, and allows for a "long press" that can be used to, e.g., show a tooltip *instead* of activating a press.
@@ -72,7 +72,7 @@ Very useful in very specific cases
 * [`useMutationObserver`](#usemutationobserver): Effectively just a wrapper around a `MutationObserver`
 .
 
-* [`useTextContent`](#usetextcontent): 
+* [`useTextContent`](#usetextcontent): Allows examining the rendered component's text content whenever it renders and reacting to changes.
 
 * [`useImperativeProps`](#useimperativeprops): Allows controlling an element's `class`
 , `style`
@@ -230,7 +230,7 @@ When `useMergedProps` encounters a conflict, the function passed here will be ca
 
 ### useRefElement
 
-Allows you to access the `HTMLElement` rendered by this hook/these props, either as soon as it's available (as a callback), or whenever you need it (as a getter function).
+Access `HTMLElement` rendered by this hook/these props, either as soon as it's available (as a callback), or whenever you need it (as a getter function).
 
 
 
@@ -252,16 +252,18 @@ Allows you to access the `HTMLElement` rendered by this hook/these props, either
 
 |Member|Type|Description|Is stable?|
 |---------|----|-----------|----------|
-|.getElement|`() => T \| null`|Call to return the element that the props were rendered to, or `null` if they were not rendered to an element.|Yes|
+|.getElement|`() => T \| null`|Returns the element that the props were rendered to, or `null` if they were not rendered to an element.|Yes|
 |propsStable|HTML props|Spread these props onto the HTML element that will use this logic.|-|
 
 This hook, like many others, works with either `useState` or [usePassiveState](#usepassivestate). Why use one over the other?
 
-* `useState` is familiar and easy to use, but causes the component to re-render itself, which is slow.
+* `useState` is familiar and easy to use, but calling `setState` causes a re-render, which you might not need/want
 * `usePassiveState` is faster and more scalable, but its state can't be accessed during render and it's more complex.
 
 
-**Easiest way to use (but causes an extra re-render 🐌)**
+Suppose we want to call the `HTMLElement`'s `doSomethingFunny` method as soon as the element has been created:
+
+**Easiest way to use (but setElement causes an extra re-render when it's called...)**
 
 
 ```typescript
@@ -921,6 +923,8 @@ Every member of `UseMutationObserverReturnType` is inherited (see the interface 
 
 ### useTextContent
 
+Allows examining the rendered component's text content whenever it renders and reacting to changes.
+
 
 
 #### UseTextContentParameters
@@ -929,7 +933,7 @@ Every member of `UseMutationObserverReturnType` is inherited (see the interface 
 
 |Member|Type|Description|Must be stable?|
 |---------|----|-----------|----------|
-|.getText|`(e?: E \| null) => string \| null`|Return the text content of this component. By default, `e => e.textContent` is probably what you want.|-|
+|.getText|`(e?: E \| null) => string \| null`|Return the text content of this component. By default, `e => e.textContent` is probably what you want.<br />Reminder that `element.innerText` is heavy and causes layout calculations, but respects `display:none` and such. `element.textContent` is usually what you want if this is used many times across a page (like as part of a list item).|-|
 |.onTextContentChange|`OnPassiveStateChange<string \| null, never>`|During `useEffect`, this is called if the text content of the rendered element has changed.<br />**See also**: [useMutationObserver](#usemutationobserver) for a more robust implementation of this idea|-|
 
 
@@ -968,18 +972,20 @@ Every member of `UseImperativePropsParameters` is inherited (see the interface i
 
 |Member|Type|Description|Is stable?|
 |---------|----|-----------|----------|
-|.dangerouslyAppendHTML|`(html?: string) => Element`|Evaluates the given HTML and appends it to the current children.|-|
-|.dangerouslySetInnerHTML|`(html?: string) => void`|Sets the element's `innerHTML`|-|
-|.getAttribute|`(prop?: K) => ElementProps<T>[K]`|Returns the current value of the attribute on the element|-|
-|.hasClass|`(cls?: string) => boolean`|Returns whether the element currently has the current CSS class|-|
-|.setAttribute|`(prop?: K, value?: ElementProps<T>[K] \| null) => void`|Applies the given attribute to the element|-|
-|.setChildren|`(children?: string \| null) => void`|Sets the element's `textContent`|-|
-|.setClass|`(cls?: string, enabled?: boolean) => void`|Applies or removes the given CSS class to the element|-|
-|.setEventHandler|`(type?: K, listener?: null \| ((this: HTMLElement, ev: HTMLElementEventMap[K]) => void), options?: AddEventListenerOptions) => void`||-|
-|.setStyle|`(prop?: K, value?: CSSProperties[K] \| null) => void`|Applies the given CSS style to the element|-|
+|.dangerouslyAppendHTML|`(html?: string) => Element`|Evaluates the given HTML and appends it to the current children and the current props.|Yes|
+|.dangerouslySetInnerHTML|`(html?: string) => void`|Sets the element's `innerHTML` and `props.dangerouslySetInnerHTML.__html`|Yes|
+|.getAttribute|`(prop?: K) => ElementProps<T>[K]`|Returns the current value of the attribute on the element|Yes|
+|.hasClass|`(cls?: string) => boolean`|Returns whether the element currently has the current CSS class|Yes|
+|.setAttribute|`(prop?: K, value?: ElementProps<T>[K] \| null) => void`|Applies the given attribute to the element and its props|Yes|
+|.setChildren|`(children?: string \| null) => void`|Sets the element's `textContent` and `props.children`|Yes|
+|.setClass|`(cls?: string, enabled?: boolean) => void`|Applies or removes the given CSS class to the element and its props|Yes|
+|.setEventHandler|`(type?: K, listener?: null \| ((this: HTMLElement, ev: HTMLElementEventMap[K]) => void), options?: AddEventListenerOptions) => void`|Applies the given event handler to the element and its props|Yes|
+|.setStyle|`(prop?: K, value?: CSSProperties[K] \| null) => void`|Applies the given CSS style to the element and its props|Yes|
 |props|HTML props|Spread these props onto the HTML element that will use this logic.|-|
 
 If the component is re-rendered after the element is modified in some way, those changes are remembered and included in the returned `props` that are meant to be spread to the element in question.
+
+This is extremely useful for integrating with 3rd party libraries that expect to be able to directly manipulate the DOM because it keeps everything syncced together.
 
 
 <hr />
@@ -2427,6 +2433,8 @@ Combines two `children`.
 
 
 This is fairly trivial and not even technically a hook, as it doesn't use any other hooks, but is this way for consistency.
+
+TODO: This could accept a variable number of arguments to be consistent with useMergedProps, but I feel like it might be a performance hit.
 
 
 <hr />

@@ -1,6 +1,6 @@
 import { createContext } from "preact";
 import { useCallback, useContext, useEffect, useState } from "preact/hooks";
-import { Compare, CompleteGridNavigationContext, CompleteGridNavigationRowContext, EventDetail, UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationRowInfo, UseSingleSelectionParameters, focus, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useImperativeProps, useMergedProps, useRefElement, useStableCallback, useStableGetter } from "../../dist/index.js";
+import { Compare, CompleteGridNavigationCellContext, CompleteGridNavigationRowContext, EventDetail, UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationRowInfo, UseSingleSelectionParameters, focus, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useImperativeProps, useMergedProps, useRefElement, useStableCallback, useStableGetter } from "../../dist/index.js";
 import { LoremIpsum } from "../lorem.js";
 import { fromStringArray, fromStringBoolean, fromStringNumber, fromStringString, useTestSyncState } from "../util.js";
 import { DefaultChildCount, DisabledIndex, HiddenIndex, MissingIndex, WithColSpanIndex } from "./grid-nav.constants.js";
@@ -26,8 +26,8 @@ export interface GridNavConstants {
     onSelectedIndexChange(index: number): (void | Promise<void>);
 }
 
-const RowContext = createContext<CompleteGridNavigationContext<HTMLTableElement, HTMLTableRowElement, HTMLTableCellElement, UseCompleteGridNavigationRowInfo<HTMLTableRowElement, HTMLTableCellElement>, UseCompleteGridNavigationCellInfo<HTMLTableCellElement>>>(null!);
-const CellContext = createContext<CompleteGridNavigationRowContext<HTMLTableRowElement, HTMLTableCellElement, UseCompleteGridNavigationCellInfo<HTMLTableCellElement>>>(null!);
+const RowContext = createContext<CompleteGridNavigationRowContext<HTMLTableElement, HTMLTableRowElement, HTMLTableCellElement, UseCompleteGridNavigationRowInfo<HTMLTableRowElement, HTMLTableCellElement>, UseCompleteGridNavigationCellInfo<HTMLTableCellElement>>>(null!);
+const CellContext = createContext<CompleteGridNavigationCellContext<HTMLTableRowElement, HTMLTableCellElement, UseCompleteGridNavigationCellInfo<HTMLTableCellElement>>>(null!);
 
 export function TestBasesGridNav() {
     const [mounted] = useTestSyncState("GridNav", "setMounted", true, fromStringBoolean);
@@ -79,7 +79,7 @@ function useOnRender(id: string) {
     window.onRender ??= async (id) => { console.log("RENDER:" + id); }
     let promise = window.onRender?.(id);
     const { propsStable, refElementReturn } = useRefElement<any>({})
-    const { imperativeHandle, props } = useImperativeProps<any>({ refElementReturn });
+    const { imperativePropsReturn: imperativeHandle, props } = useImperativeProps<any>({ refElementReturn });
     imperativeHandle.setAttribute(("data-render-pending-" + id) as never, "true" as never);
     useEffect(() => {
         imperativeHandle.setAttribute(("data-render-pending-" + id) as never, "true" as never);
@@ -168,10 +168,9 @@ function TestBaseGridNavRow({ index }: { index: number }) {
     const {
         hasCurrentFocusReturn: { getCurrentFocused, getCurrentFocusedInner },
         managedChildReturn: { getChildren },
-        paginatedChildReturn: { hideBecausePaginated, parentIsPaginated, paginatedVisible },
+        paginatedChildReturn: { hideBecausePaginated, parentIsPaginated },
         props,
         context,
-        hasCurrentFocusParameters: { onCurrentFocusedInnerChanged },
         linearNavigationReturn: { },
         rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex },
         typeaheadNavigationReturn: { getCurrentTypeahead, typeaheadStatus },
@@ -184,12 +183,12 @@ function TestBaseGridNavRow({ index }: { index: number }) {
         info: {
             unselectable: disabled,
             untabbable: hidden,
-            index
+            index,
+            getSortValue: getTextContent
         },
         linearNavigationParameters: { navigatePastEnd: "wrap", navigatePastStart: "wrap" },
         rovingTabIndexParameters: { initiallyTabbedIndex: 0, untabbable: false, onTabbableIndexChange: null },
         typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000, onNavigateTypeahead: null },
-        sortableChildParameters: { getSortValue: getTextContent },
         textContentParameters: { getText: getTextContent }
     });
 
@@ -205,7 +204,6 @@ function TestBaseGridNavRow({ index }: { index: number }) {
                 data-index={index}
                 data-hide-because-paginated={hideBecausePaginated}
                 data-parent-is-paginated={parentIsPaginated}
-                data-paginated-visible={paginatedVisible}
                 data-tabbable={tabbable}
                 data-hide-because-staggered={hideBecauseStaggered}
                 data-selected={selected}

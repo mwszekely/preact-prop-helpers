@@ -2,19 +2,21 @@ import { returnNull, runImmediately, useEnsureStability, usePassiveState } from 
 import { useCallback, useRef } from "../util/lib.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 /**
- * Allows you to access the `HTMLElement` rendered by this hook/these props, either as soon as it's available (as a callback), or whenever you need it (as a getter function).
+ * Access `HTMLElement` rendered by this hook/these props, either as soon as it's available (as a callback), or whenever you need it (as a getter function).
  *
  * @remarks
  *
  * This hook, like many others, works with either `useState` or {@link usePassiveState}. Why use one over the other?
  *
  * ```md-literal
- * * `useState` is familiar and easy to use, but causes the component to re-render itself, which is slow.
+ * * `useState` is familiar and easy to use, but calling `setState` causes a re-render, which you might not need/want
  * * `usePassiveState` is faster and more scalable, but its state can't be accessed during render and it's more complex.
  * ```
  *
+ * Suppose we want to call the `HTMLElement`'s `doSomethingFunny` method as soon as the element has been created:
+ *
  * @example
- * Easiest way to use (but causes an extra re-render 🐌)
+ * Easiest way to use (but setElement causes an extra re-render when it's called...)
  * ```typescript
  * const [element, setElement] = useState<HTMLButtonElement | null>(null);
  * const { propsStable } = useRefElement({ onElementChange: setElement });

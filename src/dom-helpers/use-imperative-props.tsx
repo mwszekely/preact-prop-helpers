@@ -15,22 +15,23 @@ export type DangerouslyAppendHTML = UseImperativePropsReturnTypeSelf<any>["dange
 export type SetEventHandler = UseImperativePropsReturnTypeSelf<any>["setEventHandler"];
 
 export interface UseImperativePropsReturnTypeSelf<T extends Element> {
-    /** Returns whether the element currently has the current CSS class */
+    /** @stable Returns whether the element currently has the current CSS class */
     hasClass(cls: string): boolean;
-    /** Applies or removes the given CSS class to the element */
+    /** @stable Applies or removes the given CSS class to the element and its props */
     setClass(cls: string, enabled: boolean): void;
-    /** Applies the given CSS style to the element */
+    /** @stable Applies the given CSS style to the element and its props */
     setStyle<K extends (keyof CSSStyleDeclaration) & string>(prop: K, value: CSSProperties[K] | null): void;
-    /** Returns the current value of the attribute on the element */
+    /** @stable Returns the current value of the attribute on the element */
     getAttribute<K extends keyof ElementProps<T>>(prop: K): ElementProps<T>[K];
-    /** Applies the given attribute to the element */
+    /** @stable Applies the given attribute to the element and its props */
     setAttribute<K extends keyof ElementProps<T>>(prop: K, value: ElementProps<T>[K] | null): void;
-    /** Sets the element's `textContent` */
+    /** @stable Sets the element's `textContent` and `props.children` */
     setChildren(children: string | null): void;
-    /** Sets the element's `innerHTML` */
+    /** @stable Sets the element's `innerHTML` and `props.dangerouslySetInnerHTML.__html` */
     dangerouslySetInnerHTML(html: string): void;
-    /** Evaluates the given HTML and appends it to the current children. */
+    /** @stable Evaluates the given HTML and appends it to the current children and the current props. */
     dangerouslyAppendHTML(html: string): Element;
+    /** @stable Applies the given event handler to the element and its props */
     setEventHandler<K extends keyof HTMLElementEventMap>(type: K, listener: null | ((this: HTMLElement, ev: HTMLElementEventMap[K]) => void), options: AddEventListenerOptions): void;
 }
 
@@ -42,6 +43,11 @@ interface ImperativeElementProps<T extends keyof HTMLElementTagNameMap> extends 
 }
 
 export interface UseImperativePropsReturnType<T extends Element> {
+    /**
+     * @stable
+     * 
+     *  (The object itself and everything within it are all stable and can be passed around freely)
+     */
     imperativePropsReturn: UseImperativePropsReturnTypeSelf<T>;
     props: ElementProps<T>;
 }
@@ -68,6 +74,8 @@ export const ImperativeElement = memo(forwardRef(ImperativeElementU)) as typeof 
  * Allows controlling an element's `class`, `style`, etc. with functions like `setStyle` in addition to being reactive to incoming props.
  * 
  * @remarks If the component is re-rendered after the element is modified in some way, those changes are remembered and included in the returned `props` that are meant to be spread to the element in question. 
+ * 
+ * This is extremely useful for integrating with 3rd party libraries that expect to be able to directly manipulate the DOM because it keeps everything syncced together.
  * 
  * @compositeParams
  */
