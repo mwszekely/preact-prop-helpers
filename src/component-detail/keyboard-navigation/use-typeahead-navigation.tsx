@@ -39,6 +39,7 @@ export interface UseTypeaheadNavigationParametersSelf<TabbableChildElement exten
      * 
      * Called any time the currently tabbable index changes as a result of a typeahead-related keypress
      * 
+     * @nonstable
      */
     onNavigateTypeahead: Nullable<(newIndex: number | null, event: KeyboardEventType<TabbableChildElement>) => void>;
 
@@ -48,6 +49,8 @@ export interface UseTypeaheadNavigationParametersSelf<TabbableChildElement exten
      * 
      * Generally corresponds to a `hidden` or `disabled` prop.
      * @param index - Which child to query
+     * 
+     * @nonstable
      */
     isValid(index: number): boolean;
 
@@ -55,6 +58,8 @@ export interface UseTypeaheadNavigationParametersSelf<TabbableChildElement exten
     /**
      * A collator to use when comparing. 
      * If not provided, simply uses `localeCompare` after transforming each to lowercase, which will, at best, work okay in English.
+     * 
+     * @nonstable
      */
     collator: null | Intl.Collator;
 

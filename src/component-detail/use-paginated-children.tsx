@@ -38,6 +38,11 @@ export interface UsePaginatedChildContext {
 
 export interface UsePaginatedChildrenReturnTypeSelf {
 
+    /**
+     * If the values returned by `indexDemangler` change (e.g. when sorting), then this must be called to re-sync everything.
+     * 
+     * @stable
+     */
     refreshPagination: (min: Nullable<number>, max: Nullable<number>) => void;
 
     /**
@@ -159,8 +164,15 @@ export interface UsePaginatedChildReturnType<ChildElement extends Element> {
 }
 
 export interface UsePaginatedChildReturnTypeSelf {
-    paginatedVisible: boolean;
+    //paginatedVisible: boolean;
+    /**
+     * Whether this child is part of a paginated parent component.
+     */
     parentIsPaginated: boolean;
+    
+    /**
+     * Whether this child should hide itself because the parent is paginated and this child is outside of the current range.
+     */
     hideBecausePaginated: boolean;
 }
 
@@ -180,7 +192,7 @@ export function usePaginatedChild<ChildElement extends Element>({ info: { index 
 
     return {
         props: !parentIsPaginated ? {} : (({ "aria-setsize": childCountIfPaginated ?? undefined, "aria-posinset": (index + 1) } as ElementProps<ChildElement>)),
-        paginatedChildReturn: { paginatedVisible, parentIsPaginated, hideBecausePaginated: parentIsPaginated ? !paginatedVisible : false },
+        paginatedChildReturn: { /*paginatedVisible,*/ parentIsPaginated, hideBecausePaginated: parentIsPaginated ? !paginatedVisible : false },
         info: {
             setPaginationVisible: setPaginatedVisible,
             setChildCountIfPaginated

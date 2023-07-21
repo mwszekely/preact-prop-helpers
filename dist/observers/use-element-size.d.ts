@@ -5,12 +5,16 @@ export interface UseElementSizeParametersSelf<T extends Element> extends UseRefE
      * on the element. Does not need to be stable, so you
      * can pass an anonymous function that only sets the
      * values you use if you'd like.
+     *
+     * @stable
      */
     onSizeChange(sizeInfo: ElementSize, prevSize: ElementSize | undefined, entries: ResizeObserverEntry[] | UIEvent): void;
     /**
      * Passed as an argument to the created ResizeObserver.
      *
      * @see https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver/observe#parameters
+     *
+     * @stable
      */
     getObserveBox: null | (() => ResizeObserverOptions["box"]);
 }

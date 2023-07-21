@@ -7,12 +7,16 @@ export interface UseHasCurrentFocusParametersSelf<T extends Node> {
      * Whether the element itself currently has focus.
      *
      * `prevFocused` is generally the opposite of `focused`, but on mount it's `undefined` while `focused` is probably false (both falsy)
+     *
+     * @stable
      */
     onCurrentFocusedChanged?: Nullable<OnPassiveStateChange<boolean, FocusEventType<T>>>;
     /**
      * Like `onFocusedChanged`, but also *additionally* if any child elements are focused.
      *
      * @see this.onFocusedChanged
+     *
+     * @stable
      */
     onCurrentFocusedInnerChanged?: Nullable<OnPassiveStateChange<boolean, FocusEventType<T>>>;
 }
@@ -24,9 +28,9 @@ export interface UseHasCurrentFocusReturnTypeSelf<E extends Element> {
     /**
      * Modifies the element to be able to track its own focus state
      */
-    /** STABLE */
+    /** @stable */
     getCurrentFocused(): boolean;
-    /** STABLE */
+    /** @stable */
     getCurrentFocusedInner(): boolean;
 }
 export interface UseHasCurrentFocusReturnType<E extends Element> {

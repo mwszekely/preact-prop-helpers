@@ -7,6 +7,8 @@ export interface UseBackdropDismissParametersSelf {
     active: boolean;
     /**
      * Called when the component is dismissed by clicking outside of the element.
+     *
+     * @nonstable
      */
     onDismiss: EnhancedEventHandler<MouseEvent, {
         reason: "backdrop";

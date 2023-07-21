@@ -1,5 +1,6 @@
 
 import { noop } from "lodash-es";
+import { PressEventReason, UsePressParameters } from "../../component-use/use-press.js";
 import { UseChildrenHaveFocusChildReturnType, UseChildrenHaveFocusParameters } from "../../observers/use-children-have-focus.js";
 import { UseManagedChildrenReturnType, useChildrenFlag } from "../../preact-extensions/use-managed-children.js";
 import { OnPassiveStateChange, PassiveStateUpdater, useEnsureStability } from "../../preact-extensions/use-passive-state.js";
@@ -58,6 +59,8 @@ export interface UseSingleSelectionParametersSelf {
      * returned `changeSelectedIndex` function to have the desired change occur.
      * 
      * In general, this should only be `null` when single selection is entirely disabled.
+     * 
+     * @nonstable
      */
     onSelectedIndexChange: null | SelectedIndexChangeHandler; // ((index: number | null, reason: Event | undefined) => void);
 
@@ -81,8 +84,14 @@ export interface UseSingleSelectionReturnTypeSelf {
      * If you are creating an imperative component, this is what how you can force the value to change in response to something.
      * 
      * If you are creating a declarative component, this is what you call in `useEffect` when your `selectedIndex` changes.
+     * 
+     * @stable
      */
     changeSelectedIndex: PassiveStateUpdater<number | null, Event>;
+
+    /**
+     * @stable
+     */
     getSelectedIndex(): number | null;
 }
 
@@ -95,7 +104,7 @@ export interface UseSingleSelectionChildReturnTypeSelf {
      */
     selected: boolean;
 
-    /** @see selected */
+    /** @stable */
     getSelected(): boolean;
 
     /**
@@ -107,12 +116,8 @@ export interface UseSingleSelectionChildReturnTypeSelf {
      */
     selectedOffset: Nullable<number>;
 
-    /** @see selectedOffset */
+    /** @stable */
     getSelectedOffset: () => (number | null);
-
-    // Used to programmatically set this as the selected element;
-    // it requests the parent to actually change the numeric index to this one's.
-    //setThisOneSelected: (event: Event) => void;
 }
 
 export interface UseSingleSelectionParameters<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseSingleSelectionChildInfo<ChildElement>> extends
@@ -130,7 +135,7 @@ export interface UseSingleSelectionChildParameters<E extends Element, M extends 
 }
 
 
-export interface UseSingleSelectionChildReturnType<E extends Element> extends UseChildrenHaveFocusChildReturnType<E> {
+export interface UseSingleSelectionChildReturnType<E extends Element> extends UseChildrenHaveFocusChildReturnType<E>, TargetedPick<UsePressParameters<any>, "pressParameters", "onPressSync"> {
     props: ElementProps<E>;
 
     info: Pick<UseSingleSelectionChildInfo<E>, UseSingleSelectionChildInfoReturnKeys>;
@@ -152,7 +157,9 @@ export interface UseSingleSelectionContext {
 }
 
 /**
+ * Allows a single child among all children to be the "selected" child (which can be different from the "focused" child).
  * 
+ * @remarks If you need multi-select instead of single-select and you're using this hook (e.g. as part of {@link useCompleteListNavigation}), you can disable the single-selection behavior either by setting the selected index to `null` or.
  * 
  * @hasChild {@link useSingleSelectionChild}
  * 
@@ -260,6 +267,7 @@ export function useSingleSelectionChild<ChildElement extends Element, M extends 
 
     const propParts = ariaPropName?.split("-") ?? [];
 
+    const onPressSync = useStableCallback((e: PressEventReason<any>) => { onSelectedIndexChange?.(enhanceEvent(e, { selectedIndex: index })) });
 
     return {
         info: {
@@ -279,7 +287,8 @@ export function useSingleSelectionChild<ChildElement extends Element, M extends 
         props: ariaPropName == null || selectionMode == "disabled" ? {} : {
             [`${propParts[0]}-${propParts[1]}`]: (localSelected ? (propParts[1] == "current" ? `${propParts[2]}` : `true`) : "false")
         },
-        hasCurrentFocusParameters: { onCurrentFocusedInnerChanged }
+        hasCurrentFocusParameters: { onCurrentFocusedInnerChanged },
+        pressParameters: { onPressSync: onSelectedIndexChange? onPressSync : null }
     }
 }
 

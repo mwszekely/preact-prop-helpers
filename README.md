@@ -147,7 +147,7 @@ These hooks are primarily used to build larger hooks, but can be used alone
 
 * [`useTypeaheadNavigation`](#usetypeaheadnavigation): Allows for the selection of a managed child by typing the given text associated with it.
 
-* [`useSingleSelection`](#usesingleselection): 
+* [`useSingleSelection`](#usesingleselection): Allows a single child among all children to be the "selected" child (which can be different from the "focused" child).
 
 * [`useRearrangeableChildren`](#userearrangeablechildren): Hook that allows for the **direct descendant** children of this component to be re-ordered and sorted.
 
@@ -238,11 +238,11 @@ Allows you to access the `HTMLElement` rendered by this hook/these props, either
 
 
 
-|Member|Type|Description|
-|---------|----|-----------|
-|.onElementChange?|`OnPassiveStateChange<T \| null, never>`|Called with the `Element` when it mounts, called with `null` when it unmounts.|
-|.onMount?|`(element: T) => void`|Called when the element mounts|
-|.onUnmount?|`(element: T) => void`|Called when the element unmounts|
+|Member|Type|Description|Must be stable?|
+|---------|----|-----------|----------|
+|.onElementChange?|`OnPassiveStateChange<T \| null, never>`|Called with the `Element` when it mounts, called with `null` when it unmounts.|Yes|
+|.onMount?|`(element: T) => void`|Called when the element mounts|Yes|
+|.onUnmount?|`(element: T) => void`|Called when the element unmounts|Yes|
 
 
 
@@ -250,14 +250,16 @@ Allows you to access the `HTMLElement` rendered by this hook/these props, either
 
 
 
-|Member|Type|Description|
-|---------|----|-----------|
-|.getElement|`() => T \| null`|**STABLE**<br />Call to return the element that the props were rendered to, or `null` if they were not rendered to an element.|
-|propsStable|HTML props|Spread these props onto the HTML element that will use this logic.|
+|Member|Type|Description|Is stable?|
+|---------|----|-----------|----------|
+|.getElement|`() => T \| null`|Call to return the element that the props were rendered to, or `null` if they were not rendered to an element.|Yes|
+|propsStable|HTML props|Spread these props onto the HTML element that will use this logic.|-|
 
 This hook, like many others, works with either `useState` or [usePassiveState](#usepassivestate). Why use one over the other?
 
-* `useState` is familiar and easy to use, but causes the component to re-render itself, which is slow. * `usePassiveState` is faster and more scalable, but its state can't be accessed during render and it's more complex.
+* `useState` is familiar and easy to use, but causes the component to re-render itself, which is slow.
+* `usePassiveState` is faster and more scalable, but its state can't be accessed during render and it's more complex.
+
 
 **Easiest way to use (but causes an extra re-render 🐌)**
 
@@ -301,16 +303,16 @@ Adds the necessary event handlers to create a "press"-like event for any element
 
 <small>`extends` [`UseRefElementReturnType`](#userefelementreturntype)</small>
 
-|Member|Type|Description|
-|---------|----|-----------|
-|.allowRepeatPresses?|`Nullable<boolean>`|If `true`, holding down the `Enter` key will repeatedly fire press events as each sequential repeated keyboard event happens.|
-|.excludeEnter?|`() => boolean`|Pass a function that returns `true` to prevent the enter key from contributing to press events|
-|.excludePointer?|`() => boolean`|Pass a function that returns `true` to prevent the pointer (mouse, touch, etc.) from contributing to press events|
-|.excludeSpace?|`() => boolean`|Pass a function that returns `true` to prevent the spacebar from contributing to press events|
-|.focusSelf|`(element?: E) => void`|Ensures that when a button is pressed it properly receives focus (even on iOS Safari).<br />Generally, this should just be `e => e.focus()`|
-|.longPressThreshold?|`Nullable<number>`|After this number of milliseconds have passed pressing down but not up, the returned `longPress` value will be set to `true` and the user's actions will not fire an actual press event.|
-|.onPressingChange?|`Nullable<OnPassiveStateChange<boolean, PressChangeEventReason<E>>>`||
-|.onPressSync|`Nullable<((e: PressEventReason<E>) => void)>`|What should happen when this widget has been "pressed".<br />This must be a sync event handler; async handlers must be taken care of externally.<br />Setting to `null` or `undefined` effectively disables the press event handler.|
+|Member|Type|Description|Must be stable?|
+|---------|----|-----------|----------|
+|.allowRepeatPresses?|`Nullable<boolean>`|If `true`, holding down the `Enter` key will repeatedly fire press events as each sequential repeated keyboard event happens.|-|
+|.excludeEnter?|`() => boolean`|Pass a function that returns `true` to prevent the enter key from contributing to press events|No|
+|.excludePointer?|`() => boolean`|Pass a function that returns `true` to prevent the pointer (mouse, touch, etc.) from contributing to press events|No|
+|.excludeSpace?|`() => boolean`|Pass a function that returns `true` to prevent the spacebar from contributing to press events|No|
+|.focusSelf|`(element?: E) => void`|Ensures that when a button is pressed it properly receives focus (even on iOS Safari).<br />Generally, this should just be `e => e.focus()`|No|
+|.longPressThreshold?|`Nullable<number>`|After this number of milliseconds have passed pressing down but not up, the returned `longPress` value will be set to `true` and the user's actions will not fire an actual press event.|-|
+|.onPressingChange?|`Nullable<OnPassiveStateChange<boolean, PressChangeEventReason<E>>>`||-|
+|.onPressSync|`Nullable<((e: PressEventReason<E>) => void)>`|What should happen when this widget has been "pressed".<br />This must be a sync event handler; async handlers must be taken care of externally.<br />Setting to `null` or `undefined` effectively disables the press event handler.|No|
 
 
 
@@ -318,12 +320,12 @@ Adds the necessary event handlers to create a "press"-like event for any element
 
 
 
-|Member|Type|Description|
-|---------|----|-----------|
-|.getIsPressing|`() => boolean`||
-|.longPress|`boolean \| null`|Similar to pseudoActive, but for if the button as been pressed down for a determined length of time.|
-|.pressing|`boolean`|Sort of like when the CSS `:active` pseudo-element would apply, but specifically for presses only, so it's a more accurate reflection of what will happen for the user. Useful for styling mostly.|
-|props|HTML props|Spread these props onto the HTML element that will use this logic.|
+|Member|Type|Description|Is stable?|
+|---------|----|-----------|----------|
+|.getIsPressing|`() => boolean`||Yes|
+|.longPress|`boolean \| null`|Similar to pseudoActive, but for if the button as been pressed down for a determined length of time.|-|
+|.pressing|`boolean`|Sort of like when the CSS `:active` pseudo-element would apply, but specifically for presses only, so it's a more accurate reflection of what will happen for the user. Useful for styling mostly.|-|
+|props|HTML props|Spread these props onto the HTML element that will use this logic.|-|
 
 Notably, the following cases are covered:
 
@@ -369,10 +371,10 @@ Every member of `UseCompleteListNavigationParameters` is inherited (see the inte
 
 <small>`extends` [`UsePaginatedChildrenReturnType`](#usepaginatedchildrenreturntype), [`UseStaggeredChildrenReturnType`](#usestaggeredchildrenreturntype), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseChildrenHaveFocusReturnType`](#usechildrenhavefocusreturntype), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype), [`UseTypeaheadNavigationReturnType`](#usetypeaheadnavigationreturntype), [`UseLinearNavigationReturnType`](#uselinearnavigationreturntype), [`UseListNavigationReturnType`](#uselistnavigationreturntype), [`UseSingleSelectionReturnType`](#usesingleselectionreturntype), [`UseRearrangeableChildrenReturnType`](#userearrangeablechildrenreturntype), [`UseSortableChildrenReturnType`](#usesortablechildrenreturntype), [`UseManagedChildrenParameters`](#usemanagedchildrenparameters), [`UseChildrenHaveFocusParameters`](#usechildrenhavefocusparameters)</small>
 
-|Member|Type|Description|
-|---------|----|-----------|
-|context|``CompleteListNavigationContext<ParentElement, ChildElement, M>``|Functions and data that the parent is making available to each child. Put it in your own `Context` from `createContext`|
-|props|HTML props|Spread these props onto the HTML element that will use this logic.|
+|Member|Type|Description|Is stable?|
+|---------|----|-----------|----------|
+|context|``CompleteListNavigationContext<ParentElement, ChildElement, M>``|Functions and data that the parent is making available to each child. Put it in your own `Context` from `createContext`|-|
+|props|HTML props|Spread these props onto the HTML element that will use this logic.|-|
 
 Unlike most others, this hook assume's it's the final one--the "outermost" hook in the component--so it uses `useManagedChildren` and wraps everything up nicely, combining event handlers that are used in multiple sub-hooks, collecting all the necessary context-related data, and merging all known DOM props together.
 
@@ -400,10 +402,10 @@ Every member of `UseCompleteGridNavigationParameters` is inherited (see the inte
 
 <small>`extends` [`UsePaginatedChildrenReturnType`](#usepaginatedchildrenreturntype), [`UseStaggeredChildrenReturnType`](#usestaggeredchildrenreturntype), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseChildrenHaveFocusReturnType`](#usechildrenhavefocusreturntype), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype), [`UseTypeaheadNavigationReturnType`](#usetypeaheadnavigationreturntype), [`UseLinearNavigationReturnType`](#uselinearnavigationreturntype), [`UseListNavigationReturnType`](#uselistnavigationreturntype), [`UseGridNavigationReturnType`](#usegridnavigationreturntype), [`UseSingleSelectionReturnType`](#usesingleselectionreturntype), [`UseRearrangeableChildrenReturnType`](#userearrangeablechildrenreturntype), [`UseSortableChildrenReturnType`](#usesortablechildrenreturntype), [`UseManagedChildrenParameters`](#usemanagedchildrenparameters), [`UseChildrenHaveFocusParameters`](#usechildrenhavefocusparameters)</small>
 
-|Member|Type|Description|
-|---------|----|-----------|
-|context|``CompleteGridNavigationRowContext<ParentOrRowElement, RowElement, CellElement, RM, CM>``|Functions and data that the parent is making available to each child. Put it in your own `Context` from `createContext`|
-|props|HTML props|Spread these props onto the HTML element that will use this logic.|
+|Member|Type|Description|Is stable?|
+|---------|----|-----------|----------|
+|context|``CompleteGridNavigationRowContext<ParentOrRowElement, RowElement, CellElement, RM, CM>``|Functions and data that the parent is making available to each child. Put it in your own `Context` from `createContext`|-|
+|props|HTML props|Spread these props onto the HTML element that will use this logic.|-|
 
 
 
@@ -415,10 +417,10 @@ Every member of `UseCompleteGridNavigationParameters` is inherited (see the inte
 
 <small>`extends` [`UseManagedChildParameters`](#usemanagedchildparameters), [`UseRovingTabIndexChildInfoKeysParameters`](#userovingtabindexchildinfokeysparameters), [`UseRovingTabIndexChildParameters`](#userovingtabindexchildparameters), [`UseTextContentParameters`](#usetextcontentparameters), [`UseTypeaheadNavigationChildParameters`](#usetypeaheadnavigationchildparameters), [`UseListNavigationChildParameters`](#uselistnavigationchildparameters), [`UseRovingTabIndexParameters`](#userovingtabindexparameters), [`UseManagedChildrenParameters`](#usemanagedchildrenparameters), [`UseTypeaheadNavigationParameters`](#usetypeaheadnavigationparameters), [`UseLinearNavigationParameters`](#uselinearnavigationparameters), [`UseGridNavigationRowParameters`](#usegridnavigationrowparameters), [`UseSingleSelectionChildParameters`](#usesingleselectionchildparameters), [`UseRefElementReturnType`](#userefelementreturntype), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype)</small>
 
-|Member|Type|Description|
-|---------|----|-----------|
-|context|``CompleteGridNavigationRowContext<any, RowElement, CellElement, RM, CM>``|Functions and data that the parent has made available to each child. Retrieve it with `useContext`|
-|info|`OmitStrong<RM, Exclude<keyof UseCompleteGridNavigationRowInfo<RowElement, CellElement>, "getSortValue" \| "index" \| "untabbable" \| "unselectable">>`|Data the child makes available to the parent. Passed to `useManagedChild`|
+|Member|Type|Description|Must be stable?|
+|---------|----|-----------|----------|
+|context|``CompleteGridNavigationRowContext<any, RowElement, CellElement, RM, CM>``|Functions and data that the parent has made available to each child. Retrieve it with `useContext`|-|
+|info|`OmitStrong<RM, Exclude<keyof UseCompleteGridNavigationRowInfo<RowElement, CellElement>, "getSortValue" \| "index" \| "untabbable" \| "unselectable">>`|Data the child makes available to the parent. Passed to `useManagedChild`|-|
 
 
 
@@ -426,9 +428,9 @@ Every member of `UseCompleteGridNavigationParameters` is inherited (see the inte
 
 <small>`extends` [`UseRefElementReturnType`](#userefelementreturntype), [`UseRovingTabIndexChildReturnType`](#userovingtabindexchildreturntype), [`UseTextContentReturnType`](#usetextcontentreturntype), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype), [`UseTypeaheadNavigationReturnType`](#usetypeaheadnavigationreturntype), [`UseLinearNavigationReturnType`](#uselinearnavigationreturntype), [`UseListNavigationReturnType`](#uselistnavigationreturntype), [`UseGridNavigationRowReturnType`](#usegridnavigationrowreturntype), [`UseSingleSelectionChildReturnType`](#usesingleselectionchildreturntype), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseHasCurrentFocusReturnType`](#usehascurrentfocusreturntype), [`UseManagedChildReturnType`](#usemanagedchildreturntype), [`UsePaginatedChildReturnType`](#usepaginatedchildreturntype), [`UseStaggeredChildReturnType`](#usestaggeredchildreturntype), [`UseHasCurrentFocusParameters`](#usehascurrentfocusparameters), [`UsePressParameters`](#usepressparameters), [`UseManagedChildrenParameters`](#usemanagedchildrenparameters)</small>
 
-|Member|Type|Description|
-|---------|----|-----------|
-|context|``CompleteGridNavigationCellContext<RowElement, CellElement, CM>``|Functions and data that the parent is making available to each child. Put it in your own `Context` from `createContext`|
+|Member|Type|Description|Is stable?|
+|---------|----|-----------|----------|
+|context|``CompleteGridNavigationCellContext<RowElement, CellElement, CM>``|Functions and data that the parent is making available to each child. Put it in your own `Context` from `createContext`|-|
 
 
 
@@ -440,10 +442,10 @@ Every member of `UseCompleteGridNavigationParameters` is inherited (see the inte
 
 <small>`extends` [`UseManagedChildParameters`](#usemanagedchildparameters), [`UseRovingTabIndexChildInfoKeysParameters`](#userovingtabindexchildinfokeysparameters), [`UseRovingTabIndexChildParameters`](#userovingtabindexchildparameters), [`UseTextContentParameters`](#usetextcontentparameters), [`UseTypeaheadNavigationChildParameters`](#usetypeaheadnavigationchildparameters), [`UseListNavigationChildParameters`](#uselistnavigationchildparameters), [`UseGridNavigationCellParameters`](#usegridnavigationcellparameters), [`UseRefElementReturnType`](#userefelementreturntype)</small>
 
-|Member|Type|Description|
-|---------|----|-----------|
-|context|``CompleteGridNavigationCellContext<any, CellElement, CM>``|Functions and data that the parent has made available to each child. Retrieve it with `useContext`|
-|info|`Omit<CM, Exclude<keyof UseCompleteGridNavigationCellInfo<CellElement>, "index" \| "untabbable" \| "focusSelf">>`|Data the child makes available to the parent. Passed to `useManagedChild`|
+|Member|Type|Description|Must be stable?|
+|---------|----|-----------|----------|
+|context|``CompleteGridNavigationCellContext<any, CellElement, CM>``|Functions and data that the parent has made available to each child. Retrieve it with `useContext`|-|
+|info|`Omit<CM, Exclude<keyof UseCompleteGridNavigationCellInfo<CellElement>, "index" \| "untabbable" \| "focusSelf">>`|Data the child makes available to the parent. Passed to `useManagedChild`|-|
 
 
 
@@ -451,9 +453,9 @@ Every member of `UseCompleteGridNavigationParameters` is inherited (see the inte
 
 <small>`extends` [`UseRefElementReturnType`](#userefelementreturntype), [`UseRovingTabIndexChildReturnType`](#userovingtabindexchildreturntype), [`UseTextContentReturnType`](#usetextcontentreturntype), [`UseHasCurrentFocusReturnType`](#usehascurrentfocusreturntype), [`UseManagedChildReturnType`](#usemanagedchildreturntype), [`UseHasCurrentFocusParameters`](#usehascurrentfocusparameters), [`UsePressParameters`](#usepressparameters)</small>
 
-|Member|Type|Description|
-|---------|----|-----------|
-|props|HTML props|Spread these props onto the HTML element that will use this logic.|
+|Member|Type|Description|Is stable?|
+|---------|----|-----------|----------|
+|props|HTML props|Spread these props onto the HTML element that will use this logic.|-|
 
 
 
@@ -480,9 +482,9 @@ Every member of `UseModalParameters` is inherited (see the interfaces it `extend
 
 <small>`extends` [`UseDismissReturnType`](#usedismissreturntype)</small>
 
-|Member|Type|Description|
-|---------|----|-----------|
-|propsFocusContainer|HTML props|Spread these props onto the HTML element that will use this logic.|
+|Member|Type|Description|Is stable?|
+|---------|----|-----------|----------|
+|propsFocusContainer|HTML props|Spread these props onto the HTML element that will use this logic.|-|
 
 Another in the "complete" series, alongside list/grid navigation and dismissal itself.
 
@@ -552,8 +554,8 @@ const onInput = pending? null : syncHandler;
 
 |Member|Type|Description|
 |---------|----|-----------|
-|asyncHandler|`AsyncHandler<EventType, CaptureType> \| null`|The function (either async or sync) that you want to convert to a regular, sync event handler.|
-|capture|`(event: EventType) => CaptureType`|What transient information is captured by this event and presented as the first argument of the event handler?<br />The "capture" parameter answers this question. To implement a checkbox, for example, return `target.checked`.|
+|asyncHandler|`AsyncHandler<EventType, CaptureType> \| null`|The function (either async or sync) that you want to convert to a regular, sync event handler.
+|capture|`(event: EventType) => CaptureType`|What transient information is captured by this event and presented as the first argument of the event handler?<br />The "capture" parameter answers this question. To implement a checkbox, for example, return `target.checked`.
 
 
 <hr />
@@ -571,10 +573,10 @@ Measures an element, allowing you to react to its changes in size.
 
 <small>`extends` [`UseRefElementParameters`](#userefelementparameters)</small>
 
-|Member|Type|Description|
-|---------|----|-----------|
-|.getObserveBox|`null \| (() => ResizeObserverOptions["box"])`|Passed as an argument to the created ResizeObserver.<br />**See also**: https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver/observe#parameters|
-|.onSizeChange|`(sizeInfo?: ElementSize, prevSize?: ElementSize \| undefined, entries?: ResizeObserverEntry[] \| UIEvent) => void`|Called any time the browser detects a size change on the element. Does not need to be stable, so you can pass an anonymous function that only sets the values you use if you'd like.|
+|Member|Type|Description|Must be stable?|
+|---------|----|-----------|----------|
+|.getObserveBox|`null \| (() => ResizeObserverOptions["box"])`|Passed as an argument to the created ResizeObserver.<br />**See also**: https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver/observe#parameters|Yes|
+|.onSizeChange|`(sizeInfo?: ElementSize, prevSize?: ElementSize \| undefined, entries?: ResizeObserverEntry[] \| UIEvent) => void`|Called any time the browser detects a size change on the element. Does not need to be stable, so you can pass an anonymous function that only sets the values you use if you'd like.|Yes|
 
 
 
@@ -582,9 +584,9 @@ Measures an element, allowing you to react to its changes in size.
 
 <small>`extends` [`UseRefElementReturnType`](#userefelementreturntype)</small>
 
-|Member|Type|Description|
-|---------|----|-----------|
-|.getSize|`() => ElementSize \| null`|**STABLE**|
+|Member|Type|Description|Is stable?|
+|---------|----|-----------|----------|
+|.getSize|`() => ElementSize \| null`|**STABLE**|-|
 
 
 <hr />
@@ -641,10 +643,10 @@ Allows monitoring whether the rendered element is or is not focused directly (i.
 
 <small>`extends` [`UseRefElementReturnType`](#userefelementreturntype)</small>
 
-|Member|Type|Description|
-|---------|----|-----------|
-|.onCurrentFocusedChanged?|`Nullable<OnPassiveStateChange<boolean, FocusEventType<T>>>`|Whether the element itself currently has focus.<br />`prevFocused` is generally the opposite of `focused`, but on mount it's `undefined` while `focused` is probably false (both falsy)|
-|.onCurrentFocusedInnerChanged?|`Nullable<OnPassiveStateChange<boolean, FocusEventType<T>>>`|Like `onFocusedChanged`, but also *additionally* if any child elements are focused.<br />**See also**: this.onFocusedChanged|
+|Member|Type|Description|Must be stable?|
+|---------|----|-----------|----------|
+|.onCurrentFocusedChanged?|`Nullable<OnPassiveStateChange<boolean, FocusEventType<T>>>`|Whether the element itself currently has focus.<br />`prevFocused` is generally the opposite of `focused`, but on mount it's `undefined` while `focused` is probably false (both falsy)|Yes|
+|.onCurrentFocusedInnerChanged?|`Nullable<OnPassiveStateChange<boolean, FocusEventType<T>>>`|Like `onFocusedChanged`, but also *additionally* if any child elements are focused.<br />**See also**: this.onFocusedChanged|Yes|
 
 
 
@@ -652,11 +654,11 @@ Allows monitoring whether the rendered element is or is not focused directly (i.
 
 
 
-|Member|Type|Description|
-|---------|----|-----------|
-|.getCurrentFocused|`() => boolean`|STABLE|
-|.getCurrentFocusedInner|`() => boolean`|STABLE|
-|.propsStable|`ElementProps<E>`||
+|Member|Type|Description|Is stable?|
+|---------|----|-----------|----------|
+|.getCurrentFocused|`() => boolean`||Yes|
+|.getCurrentFocusedInner|`() => boolean`||Yes|
+|.propsStable|`ElementProps<E>`||-|
 
 
 <hr />
@@ -676,10 +678,10 @@ Allows monitoring whichever element is/was focused most recently, regardless of 
 
 <small>`extends` [`UseActiveElementParameters`](#useactiveelementparameters), [`UseRefElementReturnType`](#userefelementreturntype)</small>
 
-|Member|Type|Description|
-|---------|----|-----------|
-|.onLastFocusedChanged?|`Nullable<((focused: boolean, prevFocused: boolean \| undefined) => void)>`|Similar to `onFocusedChanged`, but if there is no currently focused element, is `true` if this element that *did* have focus last.<br />This is always `true` while `focused` is `true`. If `focused` is `false`, this may be `true` or `false`.|
-|.onLastFocusedInnerChanged?|`Nullable<((focused: boolean, prevFocused: boolean \| undefined) => void)>`|Combines the implications of `onFocusedChanged` and `onFocusedChanged`.|
+|Member|Type|Description|Must be stable?|
+|---------|----|-----------|----------|
+|.onLastFocusedChanged?|`Nullable<((focused: boolean, prevFocused: boolean \| undefined) => void)>`|Similar to `onFocusedChanged`, but if there is no currently focused element, is `true` if this element that *did* have focus last.<br />This is always `true` while `focused` is `true`. If `focused` is `false`, this may be `true` or `false`.|Yes|
+|.onLastFocusedInnerChanged?|`Nullable<((focused: boolean, prevFocused: boolean \| undefined) => void)>`|Combines the implications of `onFocusedChanged` and `onFocusedChanged`.|Yes|
 
 
 
@@ -687,10 +689,10 @@ Allows monitoring whichever element is/was focused most recently, regardless of 
 
 <small>`extends` [`UseActiveElementReturnType`](#useactiveelementreturntype)</small>
 
-|Member|Type|Description|
-|---------|----|-----------|
-|.getLastFocused|`() => boolean`|STABLE|
-|.getLastFocusedInner|`() => boolean`|STABLE|
+|Member|Type|Description|Is stable?|
+|---------|----|-----------|----------|
+|.getLastFocused|`() => boolean`||Yes|
+|.getLastFocusedInner|`() => boolean`||Yes|
 
 
 <hr />
@@ -708,9 +710,9 @@ Allows a composite component (such as a radio group or listbox) to listen for an
 
 
 
-|Member|Type|Description|
-|---------|----|-----------|
-|.onCompositeFocusChange|`null \| OnPassiveStateChange<boolean, FocusEventType<T>>`|Fires `true` once any of the children have become focused, and `false` once all of the children have become unfocused.|
+|Member|Type|Description|Must be stable?|
+|---------|----|-----------|----------|
+|.onCompositeFocusChange|`null \| OnPassiveStateChange<boolean, FocusEventType<T>>`|Fires `true` once any of the children have become focused, and `false` once all of the children have become unfocused.|Yes|
 
 
 
@@ -718,10 +720,10 @@ Allows a composite component (such as a radio group or listbox) to listen for an
 
 
 
-|Member|Type|Description|
-|---------|----|-----------|
-|.getAnyFocused|`() => boolean`||
-|context|``UseChildrenHaveFocusContext<T>``|Functions and data that the parent is making available to each child. Put it in your own `Context` from `createContext`|
+|Member|Type|Description|Is stable?|
+|---------|----|-----------|----------|
+|.getAnyFocused|`() => boolean`||-|
+|context|``UseChildrenHaveFocusContext<T>``|Functions and data that the parent is making available to each child. Put it in your own `Context` from `createContext`|-|
 
 I.E. you can use this without needing a parent `<div>` to listen for a `focusout` event.
 
@@ -735,9 +737,9 @@ I.E. you can use this without needing a parent `<div>` to listen for a `focusout
 
 
 
-|Member|Type|Description|
-|---------|----|-----------|
-|context|``UseChildrenHaveFocusContext<T>``|Functions and data that the parent has made available to each child. Retrieve it with `useContext`|
+|Member|Type|Description|Must be stable?|
+|---------|----|-----------|----------|
+|context|``UseChildrenHaveFocusContext<T>``|Functions and data that the parent has made available to each child. Retrieve it with `useContext`|-|
 
 
 
@@ -764,10 +766,10 @@ Besides just generating something for the `id` prop, also gives you the props to
 
 
 
-|Member|Type|Description|
-|---------|----|-----------|
-|.otherReferencerProp|`keyof ElementProps<any> \| null`|This is the prop on the **OTHER** element that will use our ID. E.G. The `input` calls `useRandomId` and passes `for` as `referencerProp`.|
-|.prefix|`string`|While all IDs are unique, this can be used to more easily differentiate them.<br />If this is stable, then your props are stable. Simple as that.|
+|Member|Type|Description|Must be stable?|
+|---------|----|-----------|----------|
+|.otherReferencerProp|`keyof ElementProps<any> \| null`|This is the prop on the **OTHER** element that will use our ID. E.G. The `input` calls `useRandomId` and passes `for` as `referencerProp`.|-|
+|.prefix|`string`|While all IDs are unique, this can be used to more easily differentiate them.<br />If this is stable, then your props are stable. Simple as that.|Yes|
 
 
 
@@ -775,11 +777,11 @@ Besides just generating something for the `id` prop, also gives you the props to
 
 
 
-|Member|Type|Description|
-|---------|----|-----------|
-|.id|`string`||
-|propsReferencer|HTML props|Spread these props onto the HTML element that will use this logic.|
-|propsSource|HTML props|Spread these props onto the HTML element that will use this logic.|
+|Member|Type|Description|Is stable?|
+|---------|----|-----------|----------|
+|.id|`string`||-|
+|propsReferencer|HTML props|Spread these props onto the HTML element that will use this logic.|-|
+|propsSource|HTML props|Spread these props onto the HTML element that will use this logic.|-|
 
 
 <hr />
@@ -797,10 +799,10 @@ While `useRandomId` allows the referencer to use the source's ID, sometimes you 
 
 
 
-|Member|Type|Description|
-|---------|----|-----------|
-|randomIdInputParameters|`UseRandomIdParameters["randomIdParameters"];`| |
-|randomIdLabelParameters|`UseRandomIdParameters["randomIdParameters"];`| |
+|Member|Type|Description|Must be stable?|
+|---------|----|-----------|----------|
+|randomIdInputParameters|`UseRandomIdParameters["randomIdParameters"];`| |-|
+|randomIdLabelParameters|`UseRandomIdParameters["randomIdParameters"];`| |-|
 
 
 
@@ -808,12 +810,12 @@ While `useRandomId` allows the referencer to use the source's ID, sometimes you 
 
 
 
-|Member|Type|Description|
-|---------|----|-----------|
-|randomIdInputReturn|`UseRandomIdReturnType<InputElement, LabelElement>["randomIdReturn"];`| |
-|randomIdLabelReturn|`UseRandomIdReturnType<LabelElement, InputElement>["randomIdReturn"];`| |
-|propsInput|HTML props|Spread these props onto the HTML element that will use this logic.|
-|propsLabel|HTML props|Spread these props onto the HTML element that will use this logic.|
+|Member|Type|Description|Is stable?|
+|---------|----|-----------|----------|
+|randomIdInputReturn|`UseRandomIdReturnType<InputElement, LabelElement>["randomIdReturn"];`| |-|
+|randomIdLabelReturn|`UseRandomIdReturnType<LabelElement, InputElement>["randomIdReturn"];`| |-|
+|propsInput|HTML props|Spread these props onto the HTML element that will use this logic.|-|
+|propsLabel|HTML props|Spread these props onto the HTML element that will use this logic.|-|
 
 
 <hr />
@@ -893,15 +895,15 @@ Effectively just a wrapper around a `MutationObserver`.
 
 <small>`extends` [`UseRefElementParameters`](#userefelementparameters)</small>
 
-|Member|Type|Description|
-|---------|----|-----------|
-|.attributeFilter|`string \| string[]`||
-|.attributeOldValue|`boolean`||
-|.characterDataOldValue|`boolean`||
-|.onAttributes|`null \| ((info: {<br />        attributeName: string \| null;<br />        attributeNamespace: string \| null;<br />        oldValue?: string \| null;<br />    }) => void)`||
-|.onCharacterData|`null \| ((info: MutationRecord) => void)`||
-|.onChildList|`null \| ((info: {<br />        addedNodes: NodeList;<br />        removedNodes: NodeList;<br />    }) => void)`||
-|.subtree|`boolean`||
+|Member|Type|Description|Must be stable?|
+|---------|----|-----------|----------|
+|.attributeFilter|`string \| string[]`||-|
+|.attributeOldValue|`boolean`||-|
+|.characterDataOldValue|`boolean`||-|
+|.onAttributes|`null \| ((info: {<br />        attributeName: string \| null;<br />        attributeNamespace: string \| null;<br />        oldValue?: string \| null;<br />    }) => void)`||-|
+|.onCharacterData|`null \| ((info: MutationRecord) => void)`||-|
+|.onChildList|`null \| ((info: {<br />        addedNodes: NodeList;<br />        removedNodes: NodeList;<br />    }) => void)`||-|
+|.subtree|`boolean`||-|
 
 
 
@@ -925,10 +927,10 @@ Every member of `UseMutationObserverReturnType` is inherited (see the interface 
 
 <small>`extends` [`UseRefElementReturnType`](#userefelementreturntype)</small>
 
-|Member|Type|Description|
-|---------|----|-----------|
-|.getText|`(e?: E \| null) => string \| null`|Return the text content of this component. By default, `e => e.textContent` is probably what you want.|
-|.onTextContentChange|`OnPassiveStateChange<string \| null, never>`|During `useEffect`, this is called if the text content of the rendered element has changed.<br />**See also**: [useMutationObserver](#usemutationobserver) for a more robust implementation of this idea|
+|Member|Type|Description|Must be stable?|
+|---------|----|-----------|----------|
+|.getText|`(e?: E \| null) => string \| null`|Return the text content of this component. By default, `e => e.textContent` is probably what you want.|-|
+|.onTextContentChange|`OnPassiveStateChange<string \| null, never>`|During `useEffect`, this is called if the text content of the rendered element has changed.<br />**See also**: [useMutationObserver](#usemutationobserver) for a more robust implementation of this idea|-|
 
 
 
@@ -936,9 +938,9 @@ Every member of `UseMutationObserverReturnType` is inherited (see the interface 
 
 
 
-|Member|Type|Description|
-|---------|----|-----------|
-|.getTextContent|`() => string \| null`|Returns the last known value of the element's text content|
+|Member|Type|Description|Is stable?|
+|---------|----|-----------|----------|
+|.getTextContent|`() => string \| null`|Returns the last known value of the element's text content|-|
 
 
 <hr />
@@ -964,18 +966,18 @@ Every member of `UseImperativePropsParameters` is inherited (see the interface i
 
 
 
-|Member|Type|Description|
-|---------|----|-----------|
-|.dangerouslyAppendHTML|`(html?: string) => Element`|Evaluates the given HTML and appends it to the current children.|
-|.dangerouslySetInnerHTML|`(html?: string) => void`|Sets the element's `innerHTML`|
-|.getAttribute|`(prop?: K) => ElementProps<T>[K]`|Returns the current value of the attribute on the element|
-|.hasClass|`(cls?: string) => boolean`|Returns whether the element currently has the current CSS class|
-|.setAttribute|`(prop?: K, value?: ElementProps<T>[K] \| null) => void`|Applies the given attribute to the element|
-|.setChildren|`(children?: string \| null) => void`|Sets the element's `textContent`|
-|.setClass|`(cls?: string, enabled?: boolean) => void`|Applies or removes the given CSS class to the element|
-|.setEventHandler|`(type?: K, listener?: null \| ((this: HTMLElement, ev: HTMLElementEventMap[K]) => void), options?: AddEventListenerOptions) => void`||
-|.setStyle|`(prop?: K, value?: CSSProperties[K] \| null) => void`|Applies the given CSS style to the element|
-|props|HTML props|Spread these props onto the HTML element that will use this logic.|
+|Member|Type|Description|Is stable?|
+|---------|----|-----------|----------|
+|.dangerouslyAppendHTML|`(html?: string) => Element`|Evaluates the given HTML and appends it to the current children.|-|
+|.dangerouslySetInnerHTML|`(html?: string) => void`|Sets the element's `innerHTML`|-|
+|.getAttribute|`(prop?: K) => ElementProps<T>[K]`|Returns the current value of the attribute on the element|-|
+|.hasClass|`(cls?: string) => boolean`|Returns whether the element currently has the current CSS class|-|
+|.setAttribute|`(prop?: K, value?: ElementProps<T>[K] \| null) => void`|Applies the given attribute to the element|-|
+|.setChildren|`(children?: string \| null) => void`|Sets the element's `textContent`|-|
+|.setClass|`(cls?: string, enabled?: boolean) => void`|Applies or removes the given CSS class to the element|-|
+|.setEventHandler|`(type?: K, listener?: null \| ((this: HTMLElement, ev: HTMLElementEventMap[K]) => void), options?: AddEventListenerOptions) => void`||-|
+|.setStyle|`(prop?: K, value?: CSSProperties[K] \| null) => void`|Applies the given CSS style to the element|-|
+|props|HTML props|Spread these props onto the HTML element that will use this logic.|-|
 
 If the component is re-rendered after the element is modified in some way, those changes are remembered and included in the returned `props` that are meant to be spread to the element in question.
 
@@ -1005,7 +1007,7 @@ TODO: Can't push a child until after the very first `useLayoutEffect`
 
 |Member|Type|Description|
 |---------|----|-----------|
-|target|`string \| Element \| null`|The element that will contain the portal's children, or the string of its `id`.|
+|target|`string \| Element \| null`|The element that will contain the portal's children, or the string of its `id`.
 
 
 <hr />
@@ -1023,13 +1025,13 @@ Allows you to inspect which element in the `document` currently has focus, which
 
 
 
-|Member|Type|Description|
-|---------|----|-----------|
-|.getDocument|`() => Document`|This must be a function that returns the document associated with whatever elements we're listening to.<br />E.G. someDivElement.ownerDocument<br />**MUST** be stable|
-|.getWindow?|`((document: Document) => Window) \| null \| undefined`|By default, event handlers are attached to the document's defaultView Window. If you need something different, override it here.<br />**MUST** be stable|
-|.onActiveElementChange?|`OnPassiveStateChange<Element \| null, FocusEvent> \| null \| undefined`|Called any time the active element changes. Must be stable.|
-|.onLastActiveElementChange?|`OnPassiveStateChange<Element, FocusEvent> \| null \| undefined`|Called any time the active element changes and is not null. Must be stable.|
-|.onWindowFocusedChange?|`OnPassiveStateChange<boolean, FocusEvent> \| null \| undefined`|Called any time the window gains/loses focus. Must be stable.|
+|Member|Type|Description|Must be stable?|
+|---------|----|-----------|----------|
+|.getDocument|`() => Document`|This must be a function that returns the document associated with whatever elements we're listening to.<br />E.G. someDivElement.ownerDocument|Yes|
+|.getWindow?|`((document: Document) => Window) \| null \| undefined`|By default, event handlers are attached to the document's defaultView Window. If you need something different, override it here.|Yes|
+|.onActiveElementChange?|`OnPassiveStateChange<Element \| null, FocusEvent> \| null \| undefined`|Called any time the active element changes.|Yes|
+|.onLastActiveElementChange?|`OnPassiveStateChange<Element, FocusEvent> \| null \| undefined`|Called any time the active element changes and is not null.|Yes|
+|.onWindowFocusedChange?|`OnPassiveStateChange<boolean, FocusEvent> \| null \| undefined`|Called any time the window gains/loses focus.|Yes|
 
 
 
@@ -1037,11 +1039,11 @@ Allows you to inspect which element in the `document` currently has focus, which
 
 
 
-|Member|Type|Description|
-|---------|----|-----------|
-|.getActiveElement|`() => Element \| null`|Returns whatever element is currently focused, or `null` if there's no focused element **STABLE**|
-|.getLastActiveElement|`() => Element`|Returns whatever element is currently focused, or whatever element was most recently focused if there's no focused element **STABLE**|
-|.getWindowFocused|`() => boolean`|Returns if the window itself has focus or not **STABLE**|
+|Member|Type|Description|Is stable?|
+|---------|----|-----------|----------|
+|.getActiveElement|`() => Element \| null`|Returns whatever element is currently focused, or `null` if there's no focused element|Yes|
+|.getLastActiveElement|`() => Element`|Returns whatever element is currently focused, or whatever element was most recently focused if there's no focused element|Yes|
+|.getWindowFocused|`() => boolean`|Returns if the window itself has focus or not|Yes|
 
 The document's body receiving focus, like it does when you click on an empty area, is counted as no element having focus for all intents and purposes
 
@@ -1071,11 +1073,11 @@ Allows an element to start a drag operation.
 
 |Member|Type|Description|
 |---------|----|-----------|
-|data|`{<br />        [mimeType: string]: string;<br />    }`|Represents a dictionary mapping of MIME types to data|
-|dragImage?|`HTMLCanvasElement \| HTMLImageElement \| HTMLVideoElement`|Can be used to specify a custom drag image instead of the browser default (a transparent render of the original element, generally)|
-|dragImageXOffset?|`number`||
-|dragImageYOffset?|`number`||
-|effectAllowed?|`DataTransfer["effectAllowed"] \| undefined`|Maps to the Drag and Drop API -- allows limiting the areas this element can be dropped. For example, setting this to "copyLink" will allow this this to be dropped onto a droppable with an effect of "copy" or "link", but not "move".| 
+|data|`{<br />        [mimeType: string]: string;<br />    }`|Represents a dictionary mapping of MIME types to data
+|dragImage?|`HTMLCanvasElement \| HTMLImageElement \| HTMLVideoElement`|Can be used to specify a custom drag image instead of the browser default (a transparent render of the original element, generally)
+|dragImageXOffset?|`number`|
+|dragImageYOffset?|`number`|
+|effectAllowed?|`DataTransfer["effectAllowed"] \| undefined`|Maps to the Drag and Drop API -- allows limiting the areas this element can be dropped. For example, setting this to "copyLink" will allow this this to be dropped onto a droppable with an effect of "copy" or "link", but not "move". 
 
  
 
@@ -1085,11 +1087,11 @@ Allows an element to start a drag operation.
 
 |Member|Type|Description|
 |---------|----|-----------|
-|dragging|`boolean`|Returns true if the element in question is currently being dragged|
-|getDragging|`() => boolean`|**STABLE**|
-|getLastDropEffect|`() => (DataTransfer["dropEffect"] \| null)`|**STABLE**|
-|lastDropEffect|`DataTransfer["dropEffect"] \| null`|Once the drag ends, if it was over a valid droppable, this will be set to the `dropEffect` value it had.<br />This can be used to detect when the element has dropped, and then what should be done with it (generally deleted if the effect was "move")|
-|propsUnstable|`ElementProps<E>`|*Unstable*|
+|dragging|`boolean`|Returns true if the element in question is currently being dragged
+|getDragging|`() => boolean`|**STABLE**
+|getLastDropEffect|`() => (DataTransfer["dropEffect"] \| null)`|**STABLE**
+|lastDropEffect|`DataTransfer["dropEffect"] \| null`|Once the drag ends, if it was over a valid droppable, this will be set to the `dropEffect` value it had.<br />This can be used to detect when the element has dropped, and then what should be done with it (generally deleted if the effect was "move")
+|propsUnstable|`ElementProps<E>`|*Unstable*
 
 
 <hr />
@@ -1113,7 +1115,7 @@ Allows an element to start a drag operation.
 
 |Member|Type|Description|
 |---------|----|-----------|
-|effect|`DataTransfer["dropEffect"] \| undefined`|Maps to the Drag and Drop API -- effectively means "as close as possible, what's happening to the data when I drop it here? Am I copying it and leaving the original, am I moving it and deleting the original, or am I linking it to the original?"<br />Whatever is being dragged over this will have its own permission that's checked against this.| 
+|effect|`DataTransfer["dropEffect"] \| undefined`|Maps to the Drag and Drop API -- effectively means "as close as possible, what's happening to the data when I drop it here? Am I copying it and leaving the original, am I moving it and deleting the original, or am I linking it to the original?"<br />Whatever is being dragged over this will have its own permission that's checked against this. 
 
  
 
@@ -1123,12 +1125,12 @@ Allows an element to start a drag operation.
 
 |Member|Type|Description|
 |---------|----|-----------|
-|dropError|`unknown`||
-|droppedFiles|`DropFile[] \| null`|When files are dropped over the element, their data will be given here. This will update as new drops happen.|
-|droppedStrings|`{<br />        [MimeType: string]: string;<br />    } \| null`|When non-file data is dropped over the element, their data will be given here. This will update as new drops happen.|
-|filesForConsideration|`DropFileMetadata[] \| null`|While something is being dragged over this element, this will contain any information about any files included in that drop. Otherwise, it'll be null, meaning nothing is being dragged over this element.|
-|propsStable|`ElementProps<E>`|Hook for modifying the props you were going to pass to your drop target Element.<br />*Unstable*|
-|stringsForConsideration|`Set<string> \| null`|While something is being dragged over this element, a list of available MIME types for the non-file data will be listed here. Otherwise, it'll be null, meaning nothing is being dragged over this element.|
+|dropError|`unknown`|
+|droppedFiles|`DropFile[] \| null`|When files are dropped over the element, their data will be given here. This will update as new drops happen.
+|droppedStrings|`{<br />        [MimeType: string]: string;<br />    } \| null`|When non-file data is dropped over the element, their data will be given here. This will update as new drops happen.
+|filesForConsideration|`DropFileMetadata[] \| null`|While something is being dragged over this element, this will contain any information about any files included in that drop. Otherwise, it'll be null, meaning nothing is being dragged over this element.
+|propsStable|`ElementProps<E>`|Hook for modifying the props you were going to pass to your drop target Element.<br />*Unstable*
+|stringsForConsideration|`Set<string> \| null`|While something is being dragged over this element, a list of available MIME types for the non-file data will be listed here. Otherwise, it'll be null, meaning nothing is being dragged over this element.
 
 
 <hr />
@@ -1339,12 +1341,12 @@ Note that while this function is like usePassiveState (itself like useState and 
 
 |Member|Type|Description|
 |---------|----|-----------|
-|defaultReason?|`"push" \| "replace"`|How is the user's history modified when the state changes if not otherwise specified? "`replace`" is recommended unless you *really* have a good reason to clog up the back button.|
-|initialValue|`T`|If there is no value in the URL for this state, then `initialValue` will be used instead.|
-|key|`Key`||
-|onValueChange?|`OnParamValueChanged<T> \| null \| undefined`||
-|stringToValue|`((value: string \| null) => T \| null)`||
-|valueToString?|`((value: T \| null) => (string \| null)) \| undefined`||
+|defaultReason?|`"push" \| "replace"`|How is the user's history modified when the state changes if not otherwise specified? "`replace`" is recommended unless you *really* have a good reason to clog up the back button.
+|initialValue|`T`|If there is no value in the URL for this state, then `initialValue` will be used instead.
+|key|`Key`|
+|onValueChange?|`OnParamValueChanged<T> \| null \| undefined`|
+|stringToValue|`((value: string \| null) => T \| null)`|
+|valueToString?|`((value: T \| null) => (string \| null)) \| undefined`|
 
 #### SearchParamStates
 
@@ -1374,9 +1376,9 @@ Runs a function the specified number of milliseconds after the component renders
 
 |Member|Type|Description|
 |---------|----|-----------|
-|callback|`() => void`|Called `timeout` ms after mount, or the last change to `triggerIndex`.<br />Does *not* need to be stable. Go ahead and pass an anonymous function.|
-|timeout|`Nullable<number>`|The number of ms to wait before invoking `callback`. If `null`, cancels the timeout immediately.|
-|triggerIndex?|`unknown`|Changes to this prop between renders can be used to clear the current timeout and create a new one.|
+|callback|`() => void`|Called `timeout` ms after mount, or the last change to `triggerIndex`.<br />Does *not* need to be stable. Go ahead and pass an anonymous function.
+|timeout|`Nullable<number>`|The number of ms to wait before invoking `callback`. If `null`, cancels the timeout immediately.
+|triggerIndex?|`unknown`|Changes to this prop between renders can be used to clear the current timeout and create a new one.
 
 
 <hr />
@@ -1400,8 +1402,8 @@ Runs a function every time the specified number of milliseconds elapses while th
 
 |Member|Type|Description|
 |---------|----|-----------|
-|callback|`() => void`|Called `timeout` ms after mount, or the last change to `triggerIndex`.|
-|interval|`Nullable<number>`|The number of ms to wait before invoking `callback`.|
+|callback|`() => void`|Called `timeout` ms after mount, or the last change to `triggerIndex`.
+|interval|`Nullable<number>`|The number of ms to wait before invoking `callback`.
 
 
 <hr />
@@ -1427,7 +1429,7 @@ Passing `null` is fine and simply stops the effect until you restart it by provi
 
 |Member|Type|Description|
 |---------|----|-----------|
-|callback|`null \| ((msSinceLast: number) => void)`|Callback with effectively the same rules as `requestAnimationFrame`<br />Doesn't need to be stable.|
+|callback|`null \| ((msSinceLast: number) => void)`|Callback with effectively the same rules as `requestAnimationFrame`<br />Doesn't need to be stable.
 
 #### ProvideBatchedAnimationFrames
 
@@ -1489,11 +1491,11 @@ Allows a parent component to access information about certain child components o
 
 
 
-|Member|Type|Description|
-|---------|----|-----------|
-|.onAfterChildLayoutEffect?|`Nullable<OnAfterChildLayoutEffect<M["index"]>>`|Runs after one or more children have updated their information (index, etc.).<br />Only one will run per tick, just like layoutEffect, but it isn't *guaranteed* to have actually been a change.<br />TODO: This ended up not being needed by anything. Is it necessary? Does it cost anything?|
-|.onChildrenCountChange?|`Nullable<((count: number) => void)>`||
-|.onChildrenMountChange?|`Nullable<OnChildrenMountChange<M["index"]>>`|Same as the above, but only for mount/unmount (or when a child changes its index)|
+|Member|Type|Description|Must be stable?|
+|---------|----|-----------|----------|
+|.onAfterChildLayoutEffect?|`Nullable<OnAfterChildLayoutEffect<M["index"]>>`|Runs after one or more children have updated their information (index, etc.).<br />Only one will run per tick, just like layoutEffect, but it isn't *guaranteed* to have actually been a change.<br />TODO: This ended up not being needed by anything. Is it necessary? Does it cost anything?|Yes|
+|.onChildrenCountChange?|`Nullable<((count: number) => void)>`||Yes|
+|.onChildrenMountChange?|`Nullable<OnChildrenMountChange<M["index"]>>`|Same as the above, but only for mount/unmount (or when a child changes its index)|Yes|
 
 
 
@@ -1501,10 +1503,10 @@ Allows a parent component to access information about certain child components o
 
 
 
-|Member|Type|Description|
-|---------|----|-----------|
-|.getChildren|`() => ManagedChildren<M>`|***STABLE***<br />Note that **both** `getChildren` and the `ManagedChildren` object it returns are stable!<br />This is a getter instead of an object because when function calls happen out of order it's easier to just have always been passing and return getters everywhere|
-|context|``UseManagedChildrenContext<M>``|Functions and data that the parent is making available to each child. Put it in your own `Context` from `createContext`|
+|Member|Type|Description|Is stable?|
+|---------|----|-----------|----------|
+|.getChildren|`() => ManagedChildren<M>`|***STABLE***<br />Note that **both** `getChildren` and the `ManagedChildren` object it returns are stable!<br />This is a getter instead of an object because when function calls happen out of order it's easier to just have always been passing and return getters everywhere|-|
+|context|``UseManagedChildrenContext<M>``|Functions and data that the parent is making available to each child. Put it in your own `Context` from `createContext`|-|
 
 This hook is designed to be lightweight, in that the parent keeps no state and runs no effects. Each child *does* run an effect, but with no state changes unless you explicitly request them.
 
@@ -1518,10 +1520,10 @@ This hook is designed to be lightweight, in that the parent keeps no state and r
 
 
 
-|Member|Type|Description|
-|---------|----|-----------|
-|context|``UseManagedChildrenContext<M> \| null``|Functions and data that the parent has made available to each child. Retrieve it with `useContext`|
-|info|`Pick<M, InfoParameterKeys>`|Data the child makes available to the parent. Passed to `useManagedChild`|
+|Member|Type|Description|Must be stable?|
+|---------|----|-----------|----------|
+|context|``UseManagedChildrenContext<M> \| null``|Functions and data that the parent has made available to each child. Retrieve it with `useContext`|-|
+|info|`Pick<M, InfoParameterKeys>`|Data the child makes available to the parent. Passed to `useManagedChild`|-|
 
 
 
@@ -1529,9 +1531,9 @@ This hook is designed to be lightweight, in that the parent keeps no state and r
 
 
 
-|Member|Type|Description|
-|---------|----|-----------|
-|.getChildren|`() => ManagedChildren<M>`||
+|Member|Type|Description|Is stable?|
+|---------|----|-----------|----------|
+|.getChildren|`() => ManagedChildren<M>`||-|
 
 
 
@@ -1558,11 +1560,11 @@ Every member of `UseListNavigationParameters` is inherited (see the interfaces i
 
 <small>`extends` [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype), [`UseTypeaheadNavigationReturnType`](#usetypeaheadnavigationreturntype), [`UseLinearNavigationReturnType`](#uselinearnavigationreturntype), [`UseManagedChildrenParameters`](#usemanagedchildrenparameters)</small>
 
-|Member|Type|Description|
-|---------|----|-----------|
-|context|``UseListNavigationContext``|Functions and data that the parent is making available to each child. Put it in your own `Context` from `createContext`|
-|propsParent|HTML props|Spread these props onto the HTML element that will use this logic.|
-|propsStableParentOrChild|HTML props|Spread these props onto the HTML element that will use this logic.|
+|Member|Type|Description|Is stable?|
+|---------|----|-----------|----------|
+|context|``UseListNavigationContext``|Functions and data that the parent is making available to each child. Put it in your own `Context` from `createContext`|-|
+|propsParent|HTML props|Spread these props onto the HTML element that will use this logic.|-|
+|propsStableParentOrChild|HTML props|Spread these props onto the HTML element that will use this logic.|-|
 
 In the document order, there will be only one "focused" or "tabbable" element, making it act more like one complete unit in comparison to everything around it. Navigating forwards/backwards can be done with the arrow keys, Home/End keys, or any text for typeahead to focus the next item that matches.
 
@@ -1576,9 +1578,9 @@ In the document order, there will be only one "focused" or "tabbable" element, m
 
 <small>`extends` [`UseManagedChildParameters`](#usemanagedchildparameters), [`UseRovingTabIndexChildInfoKeysParameters`](#userovingtabindexchildinfokeysparameters), [`UseRovingTabIndexChildParameters`](#userovingtabindexchildparameters), [`UseTextContentParameters`](#usetextcontentparameters), [`UseTypeaheadNavigationChildParameters`](#usetypeaheadnavigationchildparameters), [`UseRefElementReturnType`](#userefelementreturntype)</small>
 
-|Member|Type|Description|
-|---------|----|-----------|
-|context|``UseListNavigationContext``|Functions and data that the parent has made available to each child. Retrieve it with `useContext`|
+|Member|Type|Description|Must be stable?|
+|---------|----|-----------|----------|
+|context|``UseListNavigationContext``|Functions and data that the parent has made available to each child. Retrieve it with `useContext`|-|
 
 
 
@@ -1605,9 +1607,9 @@ Implements 2-dimensional grid-based keyboard navigation, similarly to [useListNa
 
 <small>`extends` [`UseRovingTabIndexParameters`](#userovingtabindexparameters), [`UseManagedChildrenParameters`](#usemanagedchildrenparameters), [`UseTypeaheadNavigationParameters`](#usetypeaheadnavigationparameters), [`UseLinearNavigationParameters`](#uselinearnavigationparameters), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseRefElementReturnType`](#userefelementreturntype), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype)</small>
 
-|Member|Type|Description|
-|---------|----|-----------|
-|.onTabbableColumnChange|`OnPassiveStateChange<TabbableColumnInfo, Event> \| null`|TODO: This may be called even when there is no actual change in the numeric values|
+|Member|Type|Description|Must be stable?|
+|---------|----|-----------|----------|
+|.onTabbableColumnChange|`OnPassiveStateChange<TabbableColumnInfo, Event> \| null`|TODO: This may be called even when there is no actual change in the numeric values|Yes|
 
 
 
@@ -1615,9 +1617,9 @@ Implements 2-dimensional grid-based keyboard navigation, similarly to [useListNa
 
 <small>`extends` [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype), [`UseTypeaheadNavigationReturnType`](#usetypeaheadnavigationreturntype), [`UseLinearNavigationReturnType`](#uselinearnavigationreturntype), [`UseListNavigationReturnType`](#uselistnavigationreturntype), [`UseManagedChildrenParameters`](#usemanagedchildrenparameters)</small>
 
-|Member|Type|Description|
-|---------|----|-----------|
-|context|``UseGridNavigationRowContext``|Functions and data that the parent is making available to each child. Put it in your own `Context` from `createContext`|
+|Member|Type|Description|Is stable?|
+|---------|----|-----------|----------|
+|context|``UseGridNavigationRowContext``|Functions and data that the parent is making available to each child. Put it in your own `Context` from `createContext`|-|
 
 Due to the complexity of this hook, it is *highly* recommended to use [useCompleteGridNavigation](#usecompletegridnavigation) instead. But if you do need to it's designed to work well with intellisense -- just keep plugging the holes until the errors stop and that's 95% of it right there.
 
@@ -1642,9 +1644,9 @@ As a row, this hook is responsible for both being a **child** of list navigation
 
 <small>`extends` [`UseManagedChildParameters`](#usemanagedchildparameters), [`UseRovingTabIndexChildInfoKeysParameters`](#userovingtabindexchildinfokeysparameters), [`UseRovingTabIndexChildParameters`](#userovingtabindexchildparameters), [`UseTextContentParameters`](#usetextcontentparameters), [`UseTypeaheadNavigationChildParameters`](#usetypeaheadnavigationchildparameters), [`UseListNavigationChildParameters`](#uselistnavigationchildparameters), [`UseRovingTabIndexParameters`](#userovingtabindexparameters), [`UseManagedChildrenParameters`](#usemanagedchildrenparameters), [`UseTypeaheadNavigationParameters`](#usetypeaheadnavigationparameters), [`UseLinearNavigationParameters`](#uselinearnavigationparameters), [`UseRefElementReturnType`](#userefelementreturntype), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype)</small>
 
-|Member|Type|Description|
-|---------|----|-----------|
-|context|``UseGridNavigationRowContext``|Functions and data that the parent has made available to each child. Retrieve it with `useContext`|
+|Member|Type|Description|Must be stable?|
+|---------|----|-----------|----------|
+|context|``UseGridNavigationRowContext``|Functions and data that the parent has made available to each child. Retrieve it with `useContext`|-|
 
 
 
@@ -1652,10 +1654,10 @@ As a row, this hook is responsible for both being a **child** of list navigation
 
 <small>`extends` [`UseRefElementReturnType`](#userefelementreturntype), [`UseRovingTabIndexChildReturnType`](#userovingtabindexchildreturntype), [`UseTextContentReturnType`](#usetextcontentreturntype), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype), [`UseTypeaheadNavigationReturnType`](#usetypeaheadnavigationreturntype), [`UseLinearNavigationReturnType`](#uselinearnavigationreturntype), [`UseListNavigationReturnType`](#uselistnavigationreturntype), [`UseHasCurrentFocusParameters`](#usehascurrentfocusparameters), [`UsePressParameters`](#usepressparameters), [`UseManagedChildrenParameters`](#usemanagedchildrenparameters)</small>
 
-|Member|Type|Description|
-|---------|----|-----------|
-|context|``UseGridNavigationCellContext``|Functions and data that the parent is making available to each child. Put it in your own `Context` from `createContext`|
-|info|`Pick<RM, UseRovingTabIndexChildInfoKeysReturnType \| "focusSelf">`|Data the child makes available to the parent. Passed to `useManagedChild`|
+|Member|Type|Description|Is stable?|
+|---------|----|-----------|----------|
+|context|``UseGridNavigationCellContext``|Functions and data that the parent is making available to each child. Put it in your own `Context` from `createContext`|-|
+|info|`Pick<RM, UseRovingTabIndexChildInfoKeysReturnType \| "focusSelf">`|Data the child makes available to the parent. Passed to `useManagedChild`|-|
 
 
 
@@ -1669,10 +1671,10 @@ Child hook for [useGridNavigationRow](#usegridnavigationrow) (and [useGridNaviga
 
 <small>`extends` [`UseManagedChildParameters`](#usemanagedchildparameters), [`UseRovingTabIndexChildInfoKeysParameters`](#userovingtabindexchildinfokeysparameters), [`UseRovingTabIndexChildParameters`](#userovingtabindexchildparameters), [`UseTextContentParameters`](#usetextcontentparameters), [`UseTypeaheadNavigationChildParameters`](#usetypeaheadnavigationchildparameters), [`UseListNavigationChildParameters`](#uselistnavigationchildparameters), [`UseRefElementReturnType`](#userefelementreturntype)</small>
 
-|Member|Type|Description|
-|---------|----|-----------|
-|.colSpan|`number`|How many columns this cell spans (all cells default to 1).<br />Any following cells should skip over the `index`es this one covered with its `colSpan`. E.G. if this cell is `index=5` and `colSpan=3`, the next cell would be `index=8`, **not** `index=6`|
-|context|``UseGridNavigationCellContext``|Functions and data that the parent has made available to each child. Retrieve it with `useContext`|
+|Member|Type|Description|Must be stable?|
+|---------|----|-----------|----------|
+|.colSpan|`number`|How many columns this cell spans (all cells default to 1).<br />Any following cells should skip over the `index`es this one covered with its `colSpan`. E.G. if this cell is `index=5` and `colSpan=3`, the next cell would be `index=8`, **not** `index=6`|-|
+|context|``UseGridNavigationCellContext``|Functions and data that the parent has made available to each child. Retrieve it with `useContext`|-|
 
 
 
@@ -1699,13 +1701,13 @@ Implements a roving tabindex system where only one "focusable" component in a se
 
 <small>`extends` [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseRefElementReturnType`](#userefelementreturntype)</small>
 
-|Member|Type|Description|
-|---------|----|-----------|
-|.focusSelfParent|`(e?: ParentElement \| null) => void`|When `untabbable` is true, instead of a child focusing itself, the parent will via this `focusSelf` argument.|
-|.initiallyTabbedIndex|`number \| null`|This is imperative, not declarative; it is better if we can keep re-renders on the parent to a minimum anyway.<br />You can manually control this with `onTabbableIndexChange` and `setTabbableIndex` if you need.|
-|.onTabbableIndexChange?|`Nullable<OnPassiveStateChange<number \| null, Event>>`|If you would like to have an event run whenever a new index becomes tabbable (e.g. to call `setState` to render that tabbable index...for some reason...) you can do that here.<br />**MUST** be stable!|
-|.untabbable|`boolean`|When true, none of the children will be tabbable, as if the entire component is hidden.<br />This does not actually change the currently tabbable index; if this is set to `false`, the last tabbable child is remembered.|
-|.untabbableBehavior|`"focus-parent" \| "leave-child-focused"`|When the parent is `untabbable` and a child gains focus via some means, we need to decide what to do.<br />Sometimes, it's better to just send focus back to the parent. Sometimes, it's better to just let the child be focused this one time (especially if focusing means that `untabbable` is going to change to `true`).<br />If `untabbable` is false, then this has no effect.|
+|Member|Type|Description|Must be stable?|
+|---------|----|-----------|----------|
+|.focusSelfParent|`(e?: ParentElement \| null) => void`|When `untabbable` is true, instead of a child focusing itself, the parent will via this `focusSelf` argument.|-|
+|.initiallyTabbedIndex|`number \| null`|This is imperative, not declarative; it is better if we can keep re-renders on the parent to a minimum anyway.<br />You can manually control this with `onTabbableIndexChange` and `setTabbableIndex` if you need.|-|
+|.onTabbableIndexChange?|`Nullable<OnPassiveStateChange<number \| null, Event>>`|If you would like to have an event run whenever a new index becomes tabbable (e.g. to call `setState` to render that tabbable index...for some reason...) you can do that here.<br />**MUST** be stable!|-|
+|.untabbable|`boolean`|When true, none of the children will be tabbable, as if the entire component is hidden.<br />This does not actually change the currently tabbable index; if this is set to `false`, the last tabbable child is remembered.|-|
+|.untabbableBehavior|`"focus-parent" \| "leave-child-focused"`|When the parent is `untabbable` and a child gains focus via some means, we need to decide what to do.<br />Sometimes, it's better to just send focus back to the parent. Sometimes, it's better to just let the child be focused this one time (especially if focusing means that `untabbable` is going to change to `true`).<br />If `untabbable` is false, then this has no effect.|-|
 
 
 
@@ -1713,13 +1715,13 @@ Implements a roving tabindex system where only one "focusable" component in a se
 
 <small>`extends` [`UseManagedChildrenParameters`](#usemanagedchildrenparameters)</small>
 
-|Member|Type|Description|
-|---------|----|-----------|
-|.focusSelf|`(reason?: any) => void`|**STABLE**<br />Call to focus the currently tabbable child.|
-|.getTabbableIndex|`() => number \| null`|**STABLE**|
-|.setTabbableIndex|`SetTabbableIndex`|**STABLE**<br />Can be used to programmatically change which child is the currently tabbable one.<br />`fromUserInteraction` determines if this was a user-generated event that should focus the newly tabbable child, or a programmatic event that should leave the user's focus where the user currently is, because they didn't do that.|
-|context|``RovingTabIndexChildContext``|Functions and data that the parent is making available to each child. Put it in your own `Context` from `createContext`|
-|props|HTML props|Spread these props onto the HTML element that will use this logic.|
+|Member|Type|Description|Is stable?|
+|---------|----|-----------|----------|
+|.focusSelf|`(reason?: any) => void`|Call to focus the currently tabbable child.|Yes|
+|.getTabbableIndex|`() => number \| null`|Returns the index of the child that is currently tabbable.|Yes|
+|.setTabbableIndex|`SetTabbableIndex`|Can be used to programmatically change which child is the currently tabbable one.<br />`fromUserInteraction` determines if this was a user-generated event that should focus the newly tabbable child, or a programmatic event that should leave the user's focus where the user currently is, because they didn't do that.|Yes|
+|context|``RovingTabIndexChildContext``|Functions and data that the parent is making available to each child. Put it in your own `Context` from `createContext`|-|
+|props|HTML props|Spread these props onto the HTML element that will use this logic.|-|
 
 *Which* of those elements receives focus is determined by you, but it's recommended to offload that logic then to another hook, like `useLinearNavigation`, which lets you change the tabbable element with the arrow keys, `useTypeaheadNavigation`, which lets you change the tabbable index with typeahead, or `useListNavigation(Complete)` if you just want everything bundled together.
 
@@ -1735,9 +1737,9 @@ Implements a roving tabindex system where only one "focusable" component in a se
 
 <small>`extends` [`UseManagedChildParameters`](#usemanagedchildparameters), [`UseRovingTabIndexChildInfoKeysParameters`](#userovingtabindexchildinfokeysparameters), [`UseRefElementReturnType`](#userefelementreturntype)</small>
 
-|Member|Type|Description|
-|---------|----|-----------|
-|context|``RovingTabIndexChildContext``|Functions and data that the parent has made available to each child. Retrieve it with `useContext`|
+|Member|Type|Description|Must be stable?|
+|---------|----|-----------|----------|
+|context|``RovingTabIndexChildContext``|Functions and data that the parent has made available to each child. Retrieve it with `useContext`|-|
 
 
 
@@ -1745,12 +1747,12 @@ Implements a roving tabindex system where only one "focusable" component in a se
 
 <small>`extends` [`UseRefElementReturnType`](#userefelementreturntype), [`UseHasCurrentFocusParameters`](#usehascurrentfocusparameters)</small>
 
-|Member|Type|Description|
-|---------|----|-----------|
-|.getTabbable|`() => boolean`|**STABLE**|
-|.tabbable|`boolean`|*Unstable*<br />Whether this child, individually, is *the* currently tabbable child.|
-|info|`Pick<M, UseRovingTabIndexChildInfoKeysReturnType>`|Data the child makes available to the parent. Passed to `useManagedChild`|
-|props|HTML props|Spread these props onto the HTML element that will use this logic.|
+|Member|Type|Description|Is stable?|
+|---------|----|-----------|----------|
+|.getTabbable|`() => boolean`||Yes|
+|.tabbable|`boolean`|Whether this child, individually, is *the* currently tabbable child.|-|
+|info|`Pick<M, UseRovingTabIndexChildInfoKeysReturnType>`|Data the child makes available to the parent. Passed to `useManagedChild`|-|
+|props|HTML props|Spread these props onto the HTML element that will use this logic.|-|
 
 
 
@@ -1771,25 +1773,25 @@ When used in tandem with `useRovingTabIndex`, allows control of the tabbable ind
 
 <small>`extends` [`UseManagedChildrenParameters`](#usemanagedchildrenparameters), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype)</small>
 
-|Member|Type|Description|
-|---------|----|-----------|
-|.arrowKeyDirection|`"horizontal" \| "vertical" \| "either" \| "none"`|Controls which arrow keys are used to navigate through the component. Not relative to the writing mode -- these are the literal keys that need to be pressed.<br />Use "either" to allow navigation in either direction.<br />Use "none" to disallow navigation with the arrow keys in any direction.|
-|.disableHomeEndKeys|`boolean`|If set to true, navigation with the home & end keys will be disabled, but navigation with the arrow keys will be unaffected.|
-|.getHighestIndex|`() => number`|From `useManagedChildren`. This can be higher than the *actual* highest index if you need it to be.|
-|.getLowestIndex|`() => number`|From `useManagedChildren`. This can be lower than the *actual* lowest index if you need it to be.<br />**See also**: [getLowestIndex](#getlowestindex)|
-|.indexDemangler|`(n: number) => number`|**See also**: [indexMangler](#indexmangler), which does the opposite of this.|
-|.indexMangler|`(n: number) => number`|When children are sorted, reversed, or otherwise out of order, `indexMangler` is given the `index` of a child and must return its "visual" index -- what its `index` would be at that position.<br />This is provided by [useRearrangeableChildren](#userearrangeablechildren). If you use this hook as part of [useCompleteListNavigation](#usecompletelistnavigation) or [useCompleteGridNavigation](#usecompletegridnavigation), then everything's already wired up and you don't need to worry about this. Otherwise, it's recommended to simply use <missing reference> here.|
-|.isValid|`(i?: number) => boolean`|Must return true if the child at this index can be navigated to, e.g. `(i) => !getChildren(i)?.hidden`.|
-|.navigatePastEnd|`"passthrough" \| "wrap" \| (() => void)`|What happens when `down` is pressed on the last valid child?<br />**See also**: [navigatePastStart](#navigatepaststart)|
+|Member|Type|Description|Must be stable?|
+|---------|----|-----------|----------|
+|.arrowKeyDirection|`"horizontal" \| "vertical" \| "either" \| "none"`|Controls which arrow keys are used to navigate through the component. Not relative to the writing mode -- these are the literal keys that need to be pressed.<br />Use "either" to allow navigation in either direction.<br />Use "none" to disallow navigation with the arrow keys in any direction.|-|
+|.disableHomeEndKeys|`boolean`|If set to true, navigation with the home & end keys will be disabled, but navigation with the arrow keys will be unaffected.|-|
+|.getHighestIndex|`() => number`|From `useManagedChildren`. This can be higher than the *actual* highest index if you need it to be.|Yes|
+|.getLowestIndex|`() => number`|From `useManagedChildren`. This can be lower than the *actual* lowest index if you need it to be.<br />**See also**: [getLowestIndex](#getlowestindex)|Yes|
+|.indexDemangler|`(n: number) => number`|**See also**: [indexMangler](#indexmangler), which does the opposite of this.|Yes|
+|.indexMangler|`(n: number) => number`|When children are sorted, reversed, or otherwise out of order, `indexMangler` is given the `index` of a child and must return its "visual" index -- what its `index` would be at that position.<br />This is provided by [useRearrangeableChildren](#userearrangeablechildren). If you use this hook as part of [useCompleteListNavigation](#usecompletelistnavigation) or [useCompleteGridNavigation](#usecompletegridnavigation), then everything's already wired up and you don't need to worry about this. Otherwise, it's recommended to simply use <missing reference> here.|Yes|
+|.isValid|`(i?: number) => boolean`|Must return true if the child at this index can be navigated to, e.g. `(i) => !getChildren(i)?.hidden`.|Yes|
+|.navigatePastEnd|`"passthrough" \| "wrap" \| (() => void)`|What happens when `down` is pressed on the last valid child?<br />**See also**: [navigatePastStart](#navigatepaststart)|-|
 |.navigatePastStart|`"passthrough" \| "wrap" \| (() => void)`|What happens when `up` is pressed on the first valid child?<br />* "wrap": The focus is sent down to the last child
 * "passthrough": Nothing happens, **and the event is allowed to propagate**.
 * A function:
-|
-|.onNavigateLinear|`Nullable<(newIndex: number \| null, event: KeyboardEventType<ChildElement>) => void>`|Called when a navigation change as a result of an arrow/home/end/page up/page down key being pressed.|
+|-|
+|.onNavigateLinear|`Nullable<(newIndex: number \| null, event: KeyboardEventType<ChildElement>) => void>`|Called when a navigation change as a result of an arrow/home/end/page up/page down key being pressed.|Yes|
 |.pageNavigationSize|`number`|Controls how many elements are skipped over when page up/down are pressed.<br />* When 0: Page Up/Down are disabled
 * When &gt;= 1: Page Up/Down moves that number of elements up or down
 * When 0 &lt; x &lt; 1, Page Up/Down moves by that percentage of all elements, or of 100 elements, whichever is higher. In other words, 0.1 jumps by 10 elements when there are fewer then 100 elements, and 20 elements when there are 200 elements.
-|
+|-|
 
 
 
@@ -1797,9 +1799,9 @@ When used in tandem with `useRovingTabIndex`, allows control of the tabbable ind
 
 
 
-|Member|Type|Description|
-|---------|----|-----------|
-|propsStable|HTML props|Spread these props onto the HTML element that will use this logic.|
+|Member|Type|Description|Is stable?|
+|---------|----|-----------|----------|
+|propsStable|HTML props|Spread these props onto the HTML element that will use this logic.|-|
 
 There is no child version of this hook. That being said, the props returned are stable and work equally well on the child as the parent. If you don't have a parent `HTMLElement`, you can still pass the returned props to each child individually.
 
@@ -1821,13 +1823,13 @@ Allows for the selection of a managed child by typing the given text associated 
 
 <small>`extends` [`UseManagedChildrenParameters`](#usemanagedchildrenparameters), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype)</small>
 
-|Member|Type|Description|
-|---------|----|-----------|
-|.collator|`null \| Intl.Collator`|A collator to use when comparing. If not provided, simply uses `localeCompare` after transforming each to lowercase, which will, at best, work okay in English.|
-|.isValid|`(index?: number) => boolean`|Must return true if the given child can be navigated to.<br />Generally corresponds to a `hidden` or `disabled` prop.|
-|.noTypeahead|`boolean`|If true, no typeahead-related processing will occur, effectively disabling this invocation of `useTypeaheadNavigation` altogether.|
-|.onNavigateTypeahead|`Nullable<(newIndex: number \| null, event: KeyboardEventType<TabbableChildElement>) => void>`|**Optional**<br />Called any time the currently tabbable index changes as a result of a typeahead-related keypress|
-|.typeaheadTimeout|`number`|How long after the user's last typeahead-related keypress does it take for the system to reset?|
+|Member|Type|Description|Must be stable?|
+|---------|----|-----------|----------|
+|.collator|`null \| Intl.Collator`|A collator to use when comparing. If not provided, simply uses `localeCompare` after transforming each to lowercase, which will, at best, work okay in English.|No|
+|.isValid|`(index?: number) => boolean`|Must return true if the given child can be navigated to.<br />Generally corresponds to a `hidden` or `disabled` prop.|No|
+|.noTypeahead|`boolean`|If true, no typeahead-related processing will occur, effectively disabling this invocation of `useTypeaheadNavigation` altogether.|-|
+|.onNavigateTypeahead|`Nullable<(newIndex: number \| null, event: KeyboardEventType<TabbableChildElement>) => void>`|**Optional**<br />Called any time the currently tabbable index changes as a result of a typeahead-related keypress|No|
+|.typeaheadTimeout|`number`|How long after the user's last typeahead-related keypress does it take for the system to reset?|-|
 
 
 
@@ -1835,12 +1837,12 @@ Allows for the selection of a managed child by typing the given text associated 
 
 
 
-|Member|Type|Description|
-|---------|----|-----------|
-|.getCurrentTypeahead|`() => string \| null`|Returns the string currently typed by the user. Stable, but cannot be called during render.|
-|.typeaheadStatus|`"invalid" \| "valid" \| "none"`|What the current status of the user's input is:<br />* `"none"`: Typeahead is not in progress; the user has not typed anything (or has not for the given timeout period). * `"valid"`: The string the user has typed so far corresponds to at least one child * `"invalid"`: The string the user has typed so does not correspond to any child|
-|context|``UseTypeaheadNavigationContext``|Functions and data that the parent is making available to each child. Put it in your own `Context` from `createContext`|
-|propsStable|HTML props|Spread these props onto the HTML element that will use this logic.|
+|Member|Type|Description|Is stable?|
+|---------|----|-----------|----------|
+|.getCurrentTypeahead|`() => string \| null`|Returns the string currently typed by the user. Stable, but cannot be called during render.|-|
+|.typeaheadStatus|`"invalid" \| "valid" \| "none"`|What the current status of the user's input is:<br />* `"none"`: Typeahead is not in progress; the user has not typed anything (or has not for the given timeout period). * `"valid"`: The string the user has typed so far corresponds to at least one child * `"invalid"`: The string the user has typed so does not correspond to any child|-|
+|context|``UseTypeaheadNavigationContext``|Functions and data that the parent is making available to each child. Put it in your own `Context` from `createContext`|-|
+|propsStable|HTML props|Spread these props onto the HTML element that will use this logic.|-|
 
 
 
@@ -1852,10 +1854,10 @@ Allows for the selection of a managed child by typing the given text associated 
 
 <small>`extends` [`UseTextContentParameters`](#usetextcontentparameters), [`UseRefElementReturnType`](#userefelementreturntype)</small>
 
-|Member|Type|Description|
-|---------|----|-----------|
-|context|``UseTypeaheadNavigationContext``|Functions and data that the parent has made available to each child. Retrieve it with `useContext`|
-|info|`Pick<M, "index">`|Data the child makes available to the parent. Passed to `useManagedChild`|
+|Member|Type|Description|Must be stable?|
+|---------|----|-----------|----------|
+|context|``UseTypeaheadNavigationContext``|Functions and data that the parent has made available to each child. Retrieve it with `useContext`|-|
+|info|`Pick<M, "index">`|Data the child makes available to the parent. Passed to `useManagedChild`|-|
 
 
 
@@ -1874,18 +1876,20 @@ Every member of `UseTypeaheadNavigationChildReturnType` is inherited (see the in
 
 ### useSingleSelection
 
+Allows a single child among all children to be the "selected" child (which can be different from the "focused" child).
+
 
 
 #### UseSingleSelectionParameters
 
 <small>`extends` [`UseManagedChildrenParameters`](#usemanagedchildrenparameters), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype)</small>
 
-|Member|Type|Description|
-|---------|----|-----------|
-|.ariaPropName|`` `aria-${"pressed" \| "selected" \| "checked" \| `current-${"page" \| "step" \| "date" \| "time" \| "location" \| "true"}`}` \| null``|What property will be used to mark this item as selected.<br />**IMPORTANT**: The `aria-current` options should be used with caution as they are semantically very different from the usual selection cases.|
-|.initiallySelectedIndex|`number \| null`|This is imperative, as opposed to declarative, to save on re-rendering the parent whenever the selected index changes.|
-|.onSelectedIndexChange|`null \| SelectedIndexChangeHandler`|Called when a child is selected (via a press or other method).<br />If this component is declaratively controlled (with e.g. `useSingleSelectionDeclarative`), then you should use this to `setState` somewhere that'll change your `selectedIndex`.<br />If this component is imperatively controlled, then you should hook this up to the returned `changeSelectedIndex` function to have the desired change occur.<br />In general, this should only be `null` when single selection is entirely disabled.|
-|.selectionMode|`"focus" \| "activation" \| "disabled"`||
+|Member|Type|Description|Must be stable?|
+|---------|----|-----------|----------|
+|.ariaPropName|`` `aria-${"pressed" \| "selected" \| "checked" \| `current-${"page" \| "step" \| "date" \| "time" \| "location" \| "true"}`}` \| null``|What property will be used to mark this item as selected.<br />**IMPORTANT**: The `aria-current` options should be used with caution as they are semantically very different from the usual selection cases.|-|
+|.initiallySelectedIndex|`number \| null`|This is imperative, as opposed to declarative, to save on re-rendering the parent whenever the selected index changes.|-|
+|.onSelectedIndexChange|`null \| SelectedIndexChangeHandler`|Called when a child is selected (via a press or other method).<br />If this component is declaratively controlled (with e.g. `useSingleSelectionDeclarative`), then you should use this to `setState` somewhere that'll change your `selectedIndex`.<br />If this component is imperatively controlled, then you should hook this up to the returned `changeSelectedIndex` function to have the desired change occur.<br />In general, this should only be `null` when single selection is entirely disabled.|No|
+|.selectionMode|`"focus" \| "activation" \| "disabled"`||-|
 
 
 
@@ -1893,11 +1897,13 @@ Every member of `UseTypeaheadNavigationChildReturnType` is inherited (see the in
 
 <small>`extends` [`UseChildrenHaveFocusParameters`](#usechildrenhavefocusparameters)</small>
 
-|Member|Type|Description|
-|---------|----|-----------|
-|.changeSelectedIndex|`PassiveStateUpdater<number \| null, Event>`|A function that, when called, internally updates the selected index to the one you provide, and tells the relevant children that they are/are not selected.<br />If you are creating an imperative component, this is what how you can force the value to change in response to something.<br />If you are creating a declarative component, this is what you call in `useEffect` when your `selectedIndex` changes.|
-|.getSelectedIndex|`() => number \| null`||
-|context|``UseSingleSelectionContext``|Functions and data that the parent is making available to each child. Put it in your own `Context` from `createContext`|
+|Member|Type|Description|Is stable?|
+|---------|----|-----------|----------|
+|.changeSelectedIndex|`PassiveStateUpdater<number \| null, Event>`|A function that, when called, internally updates the selected index to the one you provide, and tells the relevant children that they are/are not selected.<br />If you are creating an imperative component, this is what how you can force the value to change in response to something.<br />If you are creating a declarative component, this is what you call in `useEffect` when your `selectedIndex` changes.|Yes|
+|.getSelectedIndex|`() => number \| null`||Yes|
+|context|``UseSingleSelectionContext``|Functions and data that the parent is making available to each child. Put it in your own `Context` from `createContext`|-|
+
+If you need multi-select instead of single-select and you're using this hook (e.g. as part of [useCompleteListNavigation](#usecompletelistnavigation)), you can disable the single-selection behavior either by setting the selected index to `null` or.
 
 
 
@@ -1909,25 +1915,25 @@ Every member of `UseTypeaheadNavigationChildReturnType` is inherited (see the in
 
 
 
-|Member|Type|Description|
-|---------|----|-----------|
-|context|``UseSingleSelectionContext``|Functions and data that the parent has made available to each child. Retrieve it with `useContext`|
-|info|`Pick<UseSingleSelectionChildInfo<E>, UseSingleSelectionChildInfoParameterKeys>`|Data the child makes available to the parent. Passed to `useManagedChild`|
+|Member|Type|Description|Must be stable?|
+|---------|----|-----------|----------|
+|context|``UseSingleSelectionContext``|Functions and data that the parent has made available to each child. Retrieve it with `useContext`|-|
+|info|`Pick<UseSingleSelectionChildInfo<E>, UseSingleSelectionChildInfoParameterKeys>`|Data the child makes available to the parent. Passed to `useManagedChild`|-|
 
 
 
 ##### UseSingleSelectionChildReturnType
 
-<small>`extends` [`UseRefElementReturnType`](#userefelementreturntype), [`UseHasCurrentFocusParameters`](#usehascurrentfocusparameters)</small>
+<small>`extends` [`UseRefElementReturnType`](#userefelementreturntype), [`UseHasCurrentFocusParameters`](#usehascurrentfocusparameters), [`UsePressParameters`](#usepressparameters)</small>
 
-|Member|Type|Description|
-|---------|----|-----------|
-|.getSelected|`() => boolean`|**See also**: selected|
-|.getSelectedOffset|`() => (number \| null)`|**See also**: selectedOffset|
-|.selected|`boolean`|Is this child currently the selected child among all its siblings?|
-|.selectedOffset|`Nullable<number>`|Any time `selected` changes to or from being visible, this will represent the direction and magnitude of the change.<br />It will never be zero; when `selected` is `true`, then this will be the most recently-used offset.<br />This useful for things like animations or transitions.|
-|info|`Pick<UseSingleSelectionChildInfo<E>, UseSingleSelectionChildInfoReturnKeys>`|Data the child makes available to the parent. Passed to `useManagedChild`|
-|props|HTML props|Spread these props onto the HTML element that will use this logic.|
+|Member|Type|Description|Is stable?|
+|---------|----|-----------|----------|
+|.getSelected|`() => boolean`||Yes|
+|.getSelectedOffset|`() => (number \| null)`||Yes|
+|.selected|`boolean`|Is this child currently the selected child among all its siblings?|-|
+|.selectedOffset|`Nullable<number>`|Any time `selected` changes to or from being visible, this will represent the direction and magnitude of the change.<br />It will never be zero; when `selected` is `true`, then this will be the most recently-used offset.<br />This useful for things like animations or transitions.|-|
+|info|`Pick<UseSingleSelectionChildInfo<E>, UseSingleSelectionChildInfoReturnKeys>`|Data the child makes available to the parent. Passed to `useManagedChild`|-|
+|props|HTML props|Spread these props onto the HTML element that will use this logic.|-|
 
 
 
@@ -1946,10 +1952,10 @@ Hook that allows for the **direct descendant** children of this component to be 
 
 <small>`extends` [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype)</small>
 
-|Member|Type|Description|
-|---------|----|-----------|
-|.getIndex|`GetIndex`|This must return the index of this child relative to all its sortable siblings from its `VNode`.<br />In general, this corresponds to the `index` prop, so something like `vnode => vnode.props.index` is what you're usually looking for.|
-|.onRearranged|`null \| (() => void)`|Called after the children have been rearranged.|
+|Member|Type|Description|Must be stable?|
+|---------|----|-----------|----------|
+|.getIndex|`GetIndex`|This must return the index of this child relative to all its sortable siblings from its `VNode`.<br />In general, this corresponds to the `index` prop, so something like `vnode => vnode.props.index` is what you're usually looking for.|Yes|
+|.onRearranged|`null \| (() => void)`|Called after the children have been rearranged.|-|
 
 
 
@@ -1957,15 +1963,15 @@ Hook that allows for the **direct descendant** children of this component to be 
 
 
 
-|Member|Type|Description|
-|---------|----|-----------|
-|.indexDemangler|`(n: number) => number`|**STABLE**|
-|.indexMangler|`(n: number) => number`|**STABLE**<br />This function takes a component's original `index` prop and outputs a new index that represents its re-arranged position. In conjunction with `indexDemangler`, this can be used to perform math on indices (incrementing, decrementing, etc.)<br />E.G. to decrement a component's index "c": indexDemangler(indexMangler(c) - 1)|
-|.rearrange|`(originalRows: M[], rowsInOrder: M[]) => void`|Pass an array of not-sorted child information to this function and the children will re-arrange themselves to match.<br />**STABLE**|
-|.reverse|`() => Promise<void> \| void`|**STABLE**|
-|.shuffle|`() => Promise<void> \| void`|**STABLE**|
-|.toJsonArray|`(transform?: (info: M) => object) => object`||
-|.useRearrangedChildren|`(children: VNode[]) => VNode[]`|**STABLE**<br />Call this on your props (that contain the children to sort!!) to allow them to be sortable.|
+|Member|Type|Description|Is stable?|
+|---------|----|-----------|----------|
+|.indexDemangler|`(n: number) => number`|**STABLE**|-|
+|.indexMangler|`(n: number) => number`|**STABLE**<br />This function takes a component's original `index` prop and outputs a new index that represents its re-arranged position. In conjunction with `indexDemangler`, this can be used to perform math on indices (incrementing, decrementing, etc.)<br />E.G. to decrement a component's index "c": indexDemangler(indexMangler(c) - 1)|-|
+|.rearrange|`(originalRows: M[], rowsInOrder: M[]) => void`|Pass an array of not-sorted child information to this function and the children will re-arrange themselves to match.<br />**STABLE**|-|
+|.reverse|`() => Promise<void> \| void`|**STABLE**|-|
+|.shuffle|`() => Promise<void> \| void`|**STABLE**|-|
+|.toJsonArray|`(transform?: (info: M) => object) => object`||-|
+|.useRearrangedChildren|`(children: VNode[]) => VNode[]`|**STABLE**<br />Call this on your props (that contain the children to sort!!) to allow them to be sortable.|-|
 
 *This is **separate** from "managed" children, which can be any level of child needed! Sortable/rearrangeable children must be **direct descendants** of the parent that uses this hook!*
 
@@ -1993,9 +1999,9 @@ Hook that allows for the **direct descendant** children of this component to be 
 
 <small>`extends` [`UseRearrangeableChildrenParameters`](#userearrangeablechildrenparameters), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype)</small>
 
-|Member|Type|Description|
-|---------|----|-----------|
-|.compare|`null \| Compare<M>`|Controls how values compare against each other when `sort` is called.<br />If null, a default sort is used that assumes `getSortValue` returns a value that works well with the `-` operator (so, like, a number, string, `Date`, `null`, etc.)|
+|Member|Type|Description|Must be stable?|
+|---------|----|-----------|----------|
+|.compare|`null \| Compare<M>`|Controls how values compare against each other when `sort` is called.<br />If null, a default sort is used that assumes `getSortValue` returns a value that works well with the `-` operator (so, like, a number, string, `Date`, `null`, etc.)|-|
 
 
 
@@ -2003,9 +2009,9 @@ Hook that allows for the **direct descendant** children of this component to be 
 
 <small>`extends` [`UseRearrangeableChildrenReturnType`](#userearrangeablechildrenreturntype)</small>
 
-|Member|Type|Description|
-|---------|----|-----------|
-|.sort|`(direction: "ascending" \| "descending") => Promise<void> \| void`|**STABLE**<br />Call to rearrange the children in ascending or descending order.|
+|Member|Type|Description|Is stable?|
+|---------|----|-----------|----------|
+|.sort|`(direction: "ascending" \| "descending") => Promise<void> \| void`|**STABLE**<br />Call to rearrange the children in ascending or descending order.|-|
 
 *This is **separate** from "managed" children, which can be any level of child needed! Sortable/rearrangeable children must be **direct descendants** of the parent that uses this hook!*
 
@@ -2033,10 +2039,10 @@ Allows children to stop themselves from rendering outside of a narrow range.
 
 <small>`extends` [`UseManagedChildrenParameters`](#usemanagedchildrenparameters), [`UseLinearNavigationParameters`](#uselinearnavigationparameters), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype), [`UseRefElementReturnType`](#userefelementreturntype)</small>
 
-|Member|Type|Description|
-|---------|----|-----------|
-|.paginationMax|`Nullable<number>`||
-|.paginationMin|`Nullable<number>`||
+|Member|Type|Description|Must be stable?|
+|---------|----|-----------|----------|
+|.paginationMax|`Nullable<number>`||-|
+|.paginationMin|`Nullable<number>`||-|
 
 
 
@@ -2044,11 +2050,11 @@ Allows children to stop themselves from rendering outside of a narrow range.
 
 <small>`extends` [`UseManagedChildrenParameters`](#usemanagedchildrenparameters)</small>
 
-|Member|Type|Description|
-|---------|----|-----------|
-|.childCount|`Nullable<number>`|**IMPORTANT**: This is only tracked when pagination is enabled.<br />If pagination is not enabled, this is either `null` or some undefined previous number.|
-|.refreshPagination|`(min: Nullable<number>, max: Nullable<number>) => void`||
-|context|``UsePaginatedChildContext``|Functions and data that the parent is making available to each child. Put it in your own `Context` from `createContext`|
+|Member|Type|Description|Is stable?|
+|---------|----|-----------|----------|
+|.childCount|`Nullable<number>`|**IMPORTANT**: This is only tracked when pagination is enabled.<br />If pagination is not enabled, this is either `null` or some undefined previous number.|-|
+|.refreshPagination|`(min: Nullable<number>, max: Nullable<number>) => void`|If the values returned by `indexDemangler` change (e.g. when sorting), then this must be called to re-sync everything.|Yes|
+|context|``UsePaginatedChildContext``|Functions and data that the parent is making available to each child. Put it in your own `Context` from `createContext`|-|
 
 Each child will still render itself, but it is aware of if it is within/outside of the pagination range, and simply return empty.
 
@@ -2064,10 +2070,10 @@ Child hook for [usePaginatedChildren](#usepaginatedchildren).
 
 
 
-|Member|Type|Description|
-|---------|----|-----------|
-|context|``UsePaginatedChildContext``|Functions and data that the parent has made available to each child. Retrieve it with `useContext`|
-|info|`{<br />        index: number;<br />    }`|Data the child makes available to the parent. Passed to `useManagedChild`|
+|Member|Type|Description|Must be stable?|
+|---------|----|-----------|----------|
+|context|``UsePaginatedChildContext``|Functions and data that the parent has made available to each child. Retrieve it with `useContext`|-|
+|info|`{<br />        index: number;<br />    }`|Data the child makes available to the parent. Passed to `useManagedChild`|-|
 
 
 
@@ -2075,13 +2081,12 @@ Child hook for [usePaginatedChildren](#usepaginatedchildren).
 
 
 
-|Member|Type|Description|
-|---------|----|-----------|
-|.hideBecausePaginated|`boolean`||
-|.paginatedVisible|`boolean`||
-|.parentIsPaginated|`boolean`||
-|info|`Pick<UsePaginatedChildrenInfo<ChildElement>, "setPaginationVisible" \| "setChildCountIfPaginated">`|Data the child makes available to the parent. Passed to `useManagedChild`|
-|props|HTML props|Spread these props onto the HTML element that will use this logic.|
+|Member|Type|Description|Is stable?|
+|---------|----|-----------|----------|
+|.hideBecausePaginated|`boolean`|Whether this child should hide itself because the parent is paginated and this child is outside of the current range.|-|
+|.parentIsPaginated|`boolean`|Whether this child is part of a paginated parent component.|-|
+|info|`Pick<UsePaginatedChildrenInfo<ChildElement>, "setPaginationVisible" \| "setChildCountIfPaginated">`|Data the child makes available to the parent. Passed to `useManagedChild`|-|
+|props|HTML props|Spread these props onto the HTML element that will use this logic.|-|
 
 When a child is paginated, it still renders itself (i.e. it calls this hook, so it's rendering), so check `hideBecausePaginated` and, if it's true, avoid doing any heavy logic and render with `display: none`.
 
@@ -2102,9 +2107,9 @@ Allows children to each wait until the previous has finished rendering before it
 
 <small>`extends` [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype)</small>
 
-|Member|Type|Description|
-|---------|----|-----------|
-|.staggered|`boolean`||
+|Member|Type|Description|Must be stable?|
+|---------|----|-----------|----------|
+|.staggered|`boolean`|If true, each child will delay rendering itself until the one before it has.|-|
 
 
 
@@ -2112,10 +2117,10 @@ Allows children to each wait until the previous has finished rendering before it
 
 
 
-|Member|Type|Description|
-|---------|----|-----------|
-|.stillStaggering|`boolean`||
-|context|``UseStaggeredChildContext``|Functions and data that the parent is making available to each child. Put it in your own `Context` from `createContext`|
+|Member|Type|Description|Is stable?|
+|---------|----|-----------|----------|
+|.stillStaggering|`boolean`|Whether any children are still waiting to show themselves because of the staggering behavior|-|
+|context|``UseStaggeredChildContext``|Functions and data that the parent is making available to each child. Put it in your own `Context` from `createContext`|-|
 
 Note that the child itself will still render, but you can delay rendering *its* children, or delay other complicated or heavy logic, until the child is no longer staggered.
 
@@ -2131,10 +2136,10 @@ Child hook for [useStaggeredChildren](#usestaggeredchildren).
 
 
 
-|Member|Type|Description|
-|---------|----|-----------|
-|context|``UseStaggeredChildContext``|Functions and data that the parent has made available to each child. Retrieve it with `useContext`|
-|info|`{<br />        index: number;<br />    }`|Data the child makes available to the parent. Passed to `useManagedChild`|
+|Member|Type|Description|Must be stable?|
+|---------|----|-----------|----------|
+|context|``UseStaggeredChildContext``|Functions and data that the parent has made available to each child. Retrieve it with `useContext`|-|
+|info|`{<br />        index: number;<br />    }`|Data the child makes available to the parent. Passed to `useManagedChild`|-|
 
 
 
@@ -2142,12 +2147,12 @@ Child hook for [useStaggeredChildren](#usestaggeredchildren).
 
 
 
-|Member|Type|Description|
-|---------|----|-----------|
-|.hideBecauseStaggered|`boolean`|If this is true, you should delay showing *your* children or running other heavy logic until this becomes false.<br />Can be as simple as `<div>{hideBecauseStaggered? null : children}</div>`|
-|.parentIsStaggered|`boolean`|Whether the parent has indicated that all of its children, including this one, are staggered.|
-|info|`Pick<UseStaggeredChildrenInfo<ChildElement>, "setStaggeredVisible">`|Data the child makes available to the parent. Passed to `useManagedChild`|
-|props|HTML props|Spread these props onto the HTML element that will use this logic.|
+|Member|Type|Description|Is stable?|
+|---------|----|-----------|----------|
+|.hideBecauseStaggered|`boolean`|If this is true, you should delay showing *your* children or running other heavy logic until this becomes false. Can be as simple as `<div>{hideBecauseStaggered? null : children}</div>`|-|
+|.parentIsStaggered|`boolean`|Whether the parent has indicated that all of its children, including this one, are staggered.|-|
+|info|`Pick<UseStaggeredChildrenInfo<ChildElement>, "setStaggeredVisible">`|Data the child makes available to the parent. Passed to `useManagedChild`|-|
+|props|HTML props|Spread these props onto the HTML element that will use this logic.|-|
 
 When a child is staggered, it still renders itself (i.e. it calls this hook, so it's rendering), so check `hideBecauseStaggered` and, if it's true, avoid doing any heavy logic and render with `display: none`.
 
@@ -2168,13 +2173,13 @@ Combines all the methods a user can implicitly dismiss a popup component. See [u
 
 <small>`extends` [`UseEscapeDismissParameters`](#useescapedismissparameters)</small>
 
-|Member|Type|Description|
-|---------|----|-----------|
-|.closeOnBackdrop|`Listeners extends "backdrop" ? true : false`|If `true`, then this component closes when a click is detected anywhere not within the component (determined by being in a different branch of the DOM)|
-|.closeOnEscape|`Listeners extends "escape" ? true : false`|If `true`, then this component closes when the Escape key is pressed, and no deeper component is listening for that same Escape press (i.e. only one Escape dismiss happens per key press)|
-|.closeOnLostFocus|`Listeners extends "lost-focus" ? true : false`|If `true`, then this component closes whenever focus is sent to an element not contained by this one (using the same rules as `closeOnBackdrop`)|
-|.onClose|`(reason: Listeners) => void`|Called any time the user has requested the component be dismissed for the given reason.<br />You can choose to ignore a reason if you want, but it's better to set `closeOn${reason}` to `false` instead.|
-|.open|`boolean`|Whether or not this component is currently open/showing itself, as opposed to hidden/closed. Event handlers are only attached when this is `true`.|
+|Member|Type|Description|Must be stable?|
+|---------|----|-----------|----------|
+|.closeOnBackdrop|`Listeners extends "backdrop" ? true : false`|If `true`, then this component closes when a click is detected anywhere not within the component (determined by being in a different branch of the DOM)|-|
+|.closeOnEscape|`Listeners extends "escape" ? true : false`|If `true`, then this component closes when the Escape key is pressed, and no deeper component is listening for that same Escape press (i.e. only one Escape dismiss happens per key press)|-|
+|.closeOnLostFocus|`Listeners extends "lost-focus" ? true : false`|If `true`, then this component closes whenever focus is sent to an element not contained by this one (using the same rules as `closeOnBackdrop`)|-|
+|.onClose|`(reason: Listeners) => void`|Called any time the user has requested the component be dismissed for the given reason.<br />You can choose to ignore a reason if you want, but it's better to set `closeOn${reason}` to `false` instead.|No|
+|.open|`boolean`|Whether or not this component is currently open/showing itself, as opposed to hidden/closed. Event handlers are only attached when this is `true`.|-|
 
 
 
@@ -2182,12 +2187,12 @@ Combines all the methods a user can implicitly dismiss a popup component. See [u
 
 
 
-|Member|Type|Description|
-|---------|----|-----------|
-|refElementPopupReturn|`UseRefElementReturnType<PopupElement>["refElementReturn"];`| |
-|refElementSourceReturn|`UseRefElementReturnType<NonNullable<SourceElement>>["refElementReturn"];`| |
-|propsStablePopup|HTML props|Spread these props onto the HTML element that will use this logic.|
-|propsStableSource|HTML props|Spread these props onto the HTML element that will use this logic.|
+|Member|Type|Description|Is stable?|
+|---------|----|-----------|----------|
+|refElementPopupReturn|`UseRefElementReturnType<PopupElement>["refElementReturn"];`| |-|
+|refElementSourceReturn|`UseRefElementReturnType<NonNullable<SourceElement>>["refElementReturn"];`| |-|
+|propsStablePopup|HTML props|Spread these props onto the HTML element that will use this logic.|-|
+|propsStableSource|HTML props|Spread these props onto the HTML element that will use this logic.|-|
 
 
 <hr />
@@ -2205,11 +2210,11 @@ Handles events for a backdrop on a modal dialog -- the kind where the user expec
 
 
 
-|Member|Type|Description|
-|---------|----|-----------|
-|.active|`boolean`|When `true`, `onDismiss` is eligible to be called. When `false`, it will not be called.|
-|.onDismiss|`EnhancedEventHandler<MouseEvent, {<br />        reason: "backdrop";<br />    }>`|Called when the component is dismissed by clicking outside of the element.|
-|refElementPopupReturn|`Pick<UseRefElementReturnType<PopupElement>["refElementReturn"], "getElement">;`| |
+|Member|Type|Description|Must be stable?|
+|---------|----|-----------|----------|
+|.active|`boolean`|When `true`, `onDismiss` is eligible to be called. When `false`, it will not be called.|-|
+|.onDismiss|`EnhancedEventHandler<MouseEvent, {<br />        reason: "backdrop";<br />    }>`|Called when the component is dismissed by clicking outside of the element.|No|
+|refElementPopupReturn|`Pick<UseRefElementReturnType<PopupElement>["refElementReturn"], "getElement">;`| |-|
 
 **Returns**: void
 
@@ -2229,13 +2234,13 @@ Invokes a callback when the `Escape` key is pressed on the topmost component (a 
 
 
 
-|Member|Type|Description|
-|---------|----|-----------|
-|.active|`boolean`|When `true`, `onDismiss` is eligible to be called. When `false`, it will not be called.|
-|.getWindow|`() => Window`|The escape key event handler is attached onto the window, so we need to know which window.<br />The returned `Window` should not change throughout the lifetime of the component (i.e. the element in question must not switch to another window via some means, which might not even be possible).|
-|.onDismiss|`EnhancedEventHandler<KeyboardEvent, {<br />        reason: "escape";<br />    }>`|Called when the component is dismissed by pressing the `Escape` key.|
-|.parentDepth|`number`|Get this from context somewhere, and increment it in that context.<br />If multiple instances of Preact are on the page, tree depth is used as a tiebreaker|
-|refElementPopupReturn|`Pick<UseRefElementReturnType<PopupElement>["refElementReturn"], "getElement">;`| |
+|Member|Type|Description|Must be stable?|
+|---------|----|-----------|----------|
+|.active|`boolean`|When `true`, `onDismiss` is eligible to be called. When `false`, it will not be called.|-|
+|.getWindow|`() => Window`|The escape key event handler is attached onto the window, so we need to know which window.<br />The returned `Window` should not change throughout the lifetime of the component (i.e. the element in question must not switch to another window via some means, which might not even be possible).|No|
+|.onDismiss|`EnhancedEventHandler<KeyboardEvent, {<br />        reason: "escape";<br />    }>`|Called when the component is dismissed by pressing the `Escape` key.|No|
+|.parentDepth|`number`|Get this from context somewhere, and increment it in that context.<br />If multiple instances of Preact are on the page, tree depth is used as a tiebreaker|-|
+|refElementPopupReturn|`Pick<UseRefElementReturnType<PopupElement>["refElementReturn"], "getElement">;`| |-|
 
 **Returns**: void
 
@@ -2259,12 +2264,12 @@ Invokes a callback when focus travels outside of the component's element.
 
 
 
-|Member|Type|Description|
-|---------|----|-----------|
-|.active|`boolean`|When `true`, `onDismiss` is eligible to be called. When `false`, it will not be called.|
-|.onDismiss|`EnhancedEventHandler<FocusEventType<any>, {<br />        reason: "lost-focus";<br />    }>`|Called when the component is dismissed by losing focus|
-|refElementPopupReturn|`Pick<UseRefElementReturnType<PopupElement>["refElementReturn"], "getElement">;`| |
-|refElementSourceReturn|`Nullable<Pick<UseRefElementReturnType<NonNullable<SourceElement>>["refElementReturn"], "getElement">>;`| |
+|Member|Type|Description|Must be stable?|
+|---------|----|-----------|----------|
+|.active|`boolean`|When `true`, `onDismiss` is eligible to be called. When `false`, it will not be called.|-|
+|.onDismiss|`EnhancedEventHandler<FocusEventType<any>, {<br />        reason: "lost-focus";<br />    }>`|Called when the component is dismissed by losing focus|No|
+|refElementPopupReturn|`Pick<UseRefElementReturnType<PopupElement>["refElementReturn"], "getElement">;`| |-|
+|refElementSourceReturn|`Nullable<Pick<UseRefElementReturnType<NonNullable<SourceElement>>["refElementReturn"], "getElement">>;`| |-|
 
 
 
@@ -2292,12 +2297,12 @@ Allows you to move focus to an isolated area of the page and restore it when fin
 
 <small>`extends` [`UseRefElementReturnType`](#userefelementreturntype)</small>
 
-|Member|Type|Description|
-|---------|----|-----------|
-|.focusOpener|`(lastFocused?: SourceElement \| null) => void`|When the focus trap has deactivated, focus must be sent back to the element that opened it.<br />This is tracked for you; by default, just call `lastFocused?.focus()`, but you can also override this behavior and just do whatever you want with any element.|
-|.focusPopup|`(e?: PopupElement, findFirstFocusable?: () => HTMLOrSVGElement \| null) => void`|This function is called to find where focus should be sent when the dialog (or menu, popup, etc.) opens.<br />This **cannot be done deterministically** across all possible scenarios because this is about what makes the most sense as a human.<br />For example, if it's a confirmation dialog about deleting something, *it's best to send focus to the "cancel" button*, but there's no way to programmatically know both a) that should be done and b) how to do it.<br />Ideally this function is specified *manually* for every dialog you create.<br />If you really, really, ***genuinely*** cannot determine what should be done in your use case, as a very very last resort, use `findFirstFocusable`, and then if nothing's found focus the body.<br />Just please, please make sure that whatever that first focusable is **isn't** a destructive action, at the very least.|
-|.onlyMoveFocus|`boolean`|If true, focus is not trapped but only moved to the new element.|
-|.trapActive|`boolean`|Whether or not the focus trap is currently active (or, when used as part of a larger component, whether it is activatable)|
+|Member|Type|Description|Must be stable?|
+|---------|----|-----------|----------|
+|.focusOpener|`(lastFocused?: SourceElement \| null) => void`|When the focus trap has deactivated, focus must be sent back to the element that opened it.<br />This is tracked for you; by default, just call `lastFocused?.focus()`, but you can also override this behavior and just do whatever you want with any element.|No|
+|.focusPopup|`(e?: PopupElement, findFirstFocusable?: () => HTMLOrSVGElement \| null) => void`|This function is called to find where focus should be sent when the dialog (or menu, popup, etc.) opens.<br />This **cannot be done deterministically** across all possible scenarios because this is about what makes the most sense as a human.<br />For example, if it's a confirmation dialog about deleting something, *it's best to send focus to the "cancel" button*, but there's no way to programmatically know both a) that should be done and b) how to do it.<br />Ideally this function is specified *manually* for every dialog you create.<br />If you really, really, ***genuinely*** cannot determine what should be done in your use case, as a very very last resort, use `findFirstFocusable`, and then if nothing's found focus the body.<br />Just please, please make sure that whatever that first focusable is **isn't** a destructive action, at the very least.|No|
+|.onlyMoveFocus|`boolean`|If true, focus is not trapped but only moved to the new element.|-|
+|.trapActive|`boolean`|Whether or not the focus trap is currently active (or, when used as part of a larger component, whether it is activatable)|-|
 
 
 
@@ -2305,9 +2310,9 @@ Allows you to move focus to an isolated area of the page and restore it when fin
 
 
 
-|Member|Type|Description|
-|---------|----|-----------|
-|props|HTML props|Spread these props onto the HTML element that will use this logic.|
+|Member|Type|Description|Is stable?|
+|---------|----|-----------|----------|
+|props|HTML props|Spread these props onto the HTML element that will use this logic.|-|
 
 By default, this implements a focus trap using the
 
@@ -2343,9 +2348,9 @@ Finally, because the sync handler may be invoked on a delay, any property refere
 
 |Member|Type|Description|
 |---------|----|-----------|
-|capture?|`CaptureFunctionType<AP, SP>`|When an async function is debounced due to one already running, it will run on a delay and, as a result, the original arguments that were passed to it may need to be adjusted to account for that.<br />For example, during `onInput`, the `value` of that event isn't stored in the event itself, it's stored in the `HTMLInputElement` that raised it. So when our handler actually runs a few seconds later, it'll read the **next** `event.currentTarget.value`, instead of the one from a few seconds ago that actually raised the event!<br />If the arguments to your handler require referencing data in the arguments that may become "stale" by the time the function actually runs (generally event handlers and other things that reference the properties of existing objects), the `capture` parameter allows you to transform the parameters you were given when the request to run was initially made into parameters that you have guaranteed will still be good by the time the handler actually runs.|
-|debounce?|`number`|If provided, adds a debounce behavior *in addition* to the default "wait until resolved" throttling behavior.|
-|throttle?|`number`|By default, `useAsync` will auto-throttle based on how long it takes for the operation to complete. If you would like there to be a minimum amount of time to wait before allowing a second operation, the `throttle` parameter can be used in addition to that behavior.<br />`throttle` *includes* the time it takes for the async operation to finish. If `throttle` is 500ms, and the async function finishes in 700ms, then another one will be run immediately. If it took 100ms, then we'd wait for the remaining 400ms until allowing a second run.|
+|capture?|`CaptureFunctionType<AP, SP>`|When an async function is debounced due to one already running, it will run on a delay and, as a result, the original arguments that were passed to it may need to be adjusted to account for that.<br />For example, during `onInput`, the `value` of that event isn't stored in the event itself, it's stored in the `HTMLInputElement` that raised it. So when our handler actually runs a few seconds later, it'll read the **next** `event.currentTarget.value`, instead of the one from a few seconds ago that actually raised the event!<br />If the arguments to your handler require referencing data in the arguments that may become "stale" by the time the function actually runs (generally event handlers and other things that reference the properties of existing objects), the `capture` parameter allows you to transform the parameters you were given when the request to run was initially made into parameters that you have guaranteed will still be good by the time the handler actually runs.
+|debounce?|`number`|If provided, adds a debounce behavior *in addition* to the default "wait until resolved" throttling behavior.
+|throttle?|`number`|By default, `useAsync` will auto-throttle based on how long it takes for the operation to complete. If you would like there to be a minimum amount of time to wait before allowing a second operation, the `throttle` parameter can be used in addition to that behavior.<br />`throttle` *includes* the time it takes for the async operation to finish. If `throttle` is 500ms, and the async function finishes in 700ms, then another one will be run immediately. If it took 100ms, then we'd wait for the remaining 400ms until allowing a second run.
 
 
 <hr />

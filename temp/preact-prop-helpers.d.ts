@@ -370,9 +370,9 @@ export declare interface GridSingleSelectSortableChildRowInfo<RowElement extends
 export declare type HasClass = UseImperativePropsReturnTypeSelf<any>["hasClass"];
 
 export declare interface HasLastFocusReturnTypeSelf {
-    /** STABLE */
+    /** @stable */
     getLastFocused(): boolean;
-    /** STABLE */
+    /** @stable */
     getLastFocusedInner(): boolean;
 }
 
@@ -841,16 +841,21 @@ export declare interface UseActiveElementParameters {
 
 export declare interface UseActiveElementParametersSelf {
     /**
-     * Called any time the active element changes. Must be stable.
+     * Called any time the active element changes.
+     *
+     * @stable
      */
     onActiveElementChange?: OnPassiveStateChange<Element | null, FocusEvent> | null | undefined;
     /**
      * Called any time the active element changes and is not null.
-     * Must be stable.
+     *
+     * @stable
      */
     onLastActiveElementChange?: OnPassiveStateChange<Element, FocusEvent> | null | undefined;
     /**
-     * Called any time the window gains/loses focus. Must be stable.
+     * Called any time the window gains/loses focus.
+     *
+     * @stable
      */
     onWindowFocusedChange?: OnPassiveStateChange<boolean, FocusEvent> | null | undefined;
     /**
@@ -858,14 +863,14 @@ export declare interface UseActiveElementParametersSelf {
      *
      * E.G. someDivElement.ownerDocument
      *
-     * **MUST** be stable
+     * @stable
      */
     getDocument(): Document;
     /**
      * By default, event handlers are attached to the document's defaultView Window.
      * If you need something different, override it here.
      *
-     * **MUST** be stable
+     * @stable
      */
     getWindow?: ((document: Document) => Window) | null | undefined;
 }
@@ -877,17 +882,17 @@ export declare interface UseActiveElementReturnType {
 export declare interface UseActiveElementReturnTypeSelf {
     /**
      * Returns whatever element is currently focused, or `null` if there's no focused element
-     * **STABLE**
+     * @stable
      */
     getActiveElement: () => Element | null;
     /**
      * Returns whatever element is currently focused, or whatever element was most recently focused if there's no focused element
-     * **STABLE**
+     * @stable
      */
     getLastActiveElement: () => Element;
     /**
      * Returns if the window itself has focus or not
-     * **STABLE**
+     * @stable
      */
     getWindowFocused: () => boolean;
 }
@@ -1042,6 +1047,8 @@ export declare interface UseAsyncHandlerParameters<EventType, CaptureType> exten
      * and presented as the first argument of the event handler?
      *
      * The "capture" parameter answers this question. To implement a checkbox, for example, return `target.checked`.
+     *
+     * @nonstable
      */
     capture: (event: EventType) => CaptureType;
     /**
@@ -1111,6 +1118,8 @@ export declare interface UseAsyncParameters<AP extends unknown[], SP extends unk
      * the `capture` parameter allows you to transform the parameters you were given
      * when the request to run was initially made into parameters that you have
      * guaranteed will still be good by the time the handler actually runs.
+     *
+     * @nonstable
      */
     capture?: CaptureFunctionType<AP, SP>;
 }
@@ -1232,6 +1241,8 @@ export declare interface UseBackdropDismissParametersSelf {
     active: boolean;
     /**
      * Called when the component is dismissed by clicking outside of the element.
+     *
+     * @nonstable
      */
     onDismiss: EnhancedEventHandler<MouseEvent, {
         reason: "backdrop";
@@ -1278,11 +1289,15 @@ export declare interface UseChildrenFlagParameters<M extends ManagedChildInfo<an
      *
      * Notably, the value can be different than what was called with changeIndex()
      * if the requested index didn't exist or was hidden.
+     *
+     * @stable
      */
     onIndexChange: null | OnPassiveStateChange<M["index"] | null, R>;
+    /** @stable */
     setAt(index: M, value: boolean, newSelectedIndex: M["index"] | null, prevSelectedIndex: M["index"] | null): void;
+    /** @stable */
     getAt(index: M): boolean;
-    /** Must be at least quasi-stable (always stable, doesn't need to be called during render) */
+    /** Must be at least quasi-stable (always stable, doesn't need to be called during render) @stable */
     isValid(index: M): boolean;
 }
 
@@ -1346,6 +1361,8 @@ export declare interface UseChildrenHaveFocusParameters<T extends Element> {
 export declare interface UseChildrenHaveFocusParametersSelf<T extends Element> {
     /**
      * Fires `true` once any of the children have become focused, and `false` once all of the children have become unfocused.
+     *
+     * @stable
      */
     onCompositeFocusChange: null | OnPassiveStateChange<boolean, FocusEventType<T>>;
 }
@@ -1505,6 +1522,8 @@ export declare interface UseDismissParametersSelf<Listeners extends DismissListe
      * Called any time the user has requested the component be dismissed for the given reason.
      *
      * You can choose to ignore a reason if you want, but it's better to set `closeOn${reason}` to `false` instead.
+     *
+     * @nonstable
      */
     onClose: (reason: Listeners) => void;
     /**
@@ -1681,12 +1700,16 @@ export declare interface UseElementSizeParametersSelf<T extends Element> extends
      * on the element. Does not need to be stable, so you
      * can pass an anonymous function that only sets the
      * values you use if you'd like.
+     *
+     * @stable
      */
     onSizeChange(sizeInfo: ElementSize, prevSize: ElementSize | undefined, entries: ResizeObserverEntry[] | UIEvent): void;
     /**
      * Passed as an argument to the created ResizeObserver.
      *
      * @see https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver/observe#parameters
+     *
+     * @stable
      */
     getObserveBox: null | (() => ResizeObserverOptions["box"]);
 }
@@ -1726,6 +1749,8 @@ export declare interface UseEscapeDismissParameters<PopupElement extends Element
 export declare interface UseEscapeDismissParametersSelf {
     /**
      * Called when the component is dismissed by pressing the `Escape` key.
+     *
+     * @nonstable
      */
     onDismiss: EnhancedEventHandler<KeyboardEvent, {
         reason: "escape";
@@ -1738,6 +1763,8 @@ export declare interface UseEscapeDismissParametersSelf {
      * The escape key event handler is attached onto the window, so we need to know which window.
      *
      * @remarks The returned `Window` should not change throughout the lifetime of the component (i.e. the element in question must not switch to another window via some means, which might not even be possible).
+     *
+     * @nonstable
      */
     getWindow(): Window;
     /**
@@ -1784,6 +1811,8 @@ export declare interface UseFocusTrapParametersSelf<SourceElement extends Elemen
      * as a very very last resort, use `findFirstFocusable`, and then if nothing's found focus the body.
      *
      * Just please, please make sure that whatever that first focusable is **isn't** a destructive action, at the very least.
+     *
+     * @nonstable
      */
     focusPopup(e: PopupElement, findFirstFocusable: () => HTMLOrSVGElement | null): void;
     /**
@@ -1793,6 +1822,8 @@ export declare interface UseFocusTrapParametersSelf<SourceElement extends Elemen
      * and just do whatever you want with any element.
      *
      * @param lastFocused - The element that was focused before the modal was opened
+     *
+     * @nonstable
      */
     focusOpener(lastFocused: SourceElement | null): void;
 }
@@ -1888,6 +1919,8 @@ export declare interface UseGridNavigationParameters<ParentOrChildElement extend
 export declare interface UseGridNavigationParametersSelf {
     /**
      * TODO: This may be called even when there is no actual change in the numeric values
+     *
+     * @stable
      */
     onTabbableColumnChange: OnPassiveStateChange<TabbableColumnInfo, Event> | null;
 }
@@ -1994,12 +2027,16 @@ export declare interface UseHasCurrentFocusParametersSelf<T extends Node> {
      * Whether the element itself currently has focus.
      *
      * `prevFocused` is generally the opposite of `focused`, but on mount it's `undefined` while `focused` is probably false (both falsy)
+     *
+     * @stable
      */
     onCurrentFocusedChanged?: Nullable<OnPassiveStateChange<boolean, FocusEventType<T>>>;
     /**
      * Like `onFocusedChanged`, but also *additionally* if any child elements are focused.
      *
      * @see this.onFocusedChanged
+     *
+     * @stable
      */
     onCurrentFocusedInnerChanged?: Nullable<OnPassiveStateChange<boolean, FocusEventType<T>>>;
 }
@@ -2013,9 +2050,9 @@ export declare interface UseHasCurrentFocusReturnTypeSelf<E extends Element> {
     /**
      * Modifies the element to be able to track its own focus state
      */
-    /** STABLE */
+    /** @stable */
     getCurrentFocused(): boolean;
-    /** STABLE */
+    /** @stable */
     getCurrentFocusedInner(): boolean;
 }
 
@@ -2036,11 +2073,15 @@ export declare interface UseHasLastFocusParametersSelf {
     /**
      * Similar to `onFocusedChanged`, but if there is no currently focused element, is `true` if this element that *did* have focus last.
      *
-     * This is always `true` while `focused` is `true`. If `focused` is `false`, this may be `true` or `false`.
+     * @remarks This is always `true` while `focused` is `true`. If `focused` is `false`, this may be `true` or `false`.
+     *
+     * @stable
      */
     onLastFocusedChanged?: Nullable<((focused: boolean, prevFocused: boolean | undefined) => void)>;
     /**
      * Combines the implications of `onFocusedChanged` and `onFocusedChanged`.
+     *
+     * @stable
      */
     onLastFocusedInnerChanged?: Nullable<((focused: boolean, prevFocused: boolean | undefined) => void)>;
 }
@@ -2150,10 +2191,14 @@ export declare interface UseLinearNavigationParameters<ParentOrChildElement exte
 export declare interface UseLinearNavigationParametersSelf<ChildElement extends Element> {
     /**
      * Called when a navigation change as a result of an arrow/home/end/page up/page down key being pressed.
+     *
+     * @stable
      */
     onNavigateLinear: Nullable<(newIndex: number | null, event: KeyboardEventType<ChildElement>) => void>;
     /**
      * Must return true if the child at this index can be navigated to, e.g. `(i) => !getChildren(i)?.hidden`.
+     *
+     * @stable
      */
     isValid(i: number): boolean;
     /**
@@ -2203,22 +2248,30 @@ export declare interface UseLinearNavigationParametersSelf<ChildElement extends 
      * @remarks This is provided by {@link useRearrangeableChildren}.
      * If you use this hook as part of {@link useCompleteListNavigation} or {@link useCompleteGridNavigation}, then everything's already wired up and you don't need to worry about this.
      * Otherwise, it's recommended to simply use {@link lodash-es#identity} here.
+     *
+     * @stable
      */
     indexMangler: (n: number) => number;
     /**
      * @see {@link UseLinearNavigationParametersSelf.indexMangler}, which does the opposite of this.
+     *
+     * @stable
      */
     indexDemangler: (n: number) => number;
     /**
      * From `useManagedChildren`. This can be higher than the *actual* highest index if you need it to be.
      *
      * @returns [0, n], not [0, n)
+     *
+     * @stable
      */
     getHighestIndex(): number;
     /**
      * From `useManagedChildren`. This can be lower than the *actual* lowest index if you need it to be.
      *
      * @see {@link UseLinearNavigationParametersSelf.getLowestIndex}
+     *
+     * @stable
      */
     getLowestIndex(): number;
 }
@@ -2393,6 +2446,8 @@ export declare interface UseLostFocusDismissParameters<SourceElement extends Ele
 export declare interface UseLostFocusDismissParametersSelf {
     /**
      * Called when the component is dismissed by losing focus
+     *
+     * @nonstable
      */
     onDismiss: EnhancedEventHandler<FocusEventType<any>, {
         reason: "lost-focus";
@@ -2459,12 +2514,20 @@ export declare interface UseManagedChildrenParametersSelf<M extends ManagedChild
      * *guaranteed* to have actually been a change.
      *
      * TODO: This ended up not being needed by anything. Is it necessary? Does it cost anything?
+     *
+     * @stable
      */
     onAfterChildLayoutEffect?: Nullable<OnAfterChildLayoutEffect<M["index"]>>;
     /**
      * Same as the above, but only for mount/unmount (or when a child changes its index)
+     *
+     * @stable
      */
     onChildrenMountChange?: Nullable<OnChildrenMountChange<M["index"]>>;
+    /**
+     *
+     * @stable
+     */
     onChildrenCountChange?: Nullable<((count: number) => void)>;
 }
 
@@ -2674,6 +2737,11 @@ export declare interface UsePaginatedChildrenReturnType extends TargetedPick<Use
 }
 
 export declare interface UsePaginatedChildrenReturnTypeSelf {
+    /**
+     * If the values returned by `indexDemangler` change (e.g. when sorting), then this must be called to re-sync everything.
+     *
+     * @stable
+     */
     refreshPagination: (min: Nullable<number>, max: Nullable<number>) => void;
     /**
      * **IMPORTANT**: This is only tracked when pagination is enabled.
@@ -2690,8 +2758,13 @@ export declare interface UsePaginatedChildReturnType<ChildElement extends Elemen
 }
 
 export declare interface UsePaginatedChildReturnTypeSelf {
-    paginatedVisible: boolean;
+    /**
+     * Whether this child is part of a paginated parent component.
+     */
     parentIsPaginated: boolean;
+    /**
+     * Whether this child should hide itself because the parent is paginated and this child is outside of the current range.
+     */
     hideBecausePaginated: boolean;
 }
 
@@ -2807,19 +2880,23 @@ export declare interface UsePressParametersSelf<E extends EventTarget> {
      * This must be a sync event handler; async handlers must be taken care of externally.
      *
      * Setting to `null` or `undefined` effectively disables the press event handler.
+     *
+     * @nonstable
      */
     onPressSync: Nullable<((e: PressEventReason<E>) => void)>;
-    /** Pass a function that returns `true` to prevent the spacebar from contributing to press events */
+    /** Pass a function that returns `true` to prevent the spacebar from contributing to press events @nonstable */
     excludeSpace?(): boolean;
-    /** Pass a function that returns `true` to prevent the enter key from contributing to press events */
+    /** Pass a function that returns `true` to prevent the enter key from contributing to press events @nonstable */
     excludeEnter?(): boolean;
-    /** Pass a function that returns `true` to prevent the pointer (mouse, touch, etc.) from contributing to press events */
+    /** Pass a function that returns `true` to prevent the pointer (mouse, touch, etc.) from contributing to press events @nonstable */
     excludePointer?(): boolean;
     /**
      * Ensures that when a button is pressed it properly receives focus (even on iOS Safari).
      *
      * Generally, this should just be `e => e.focus()`
      * @param element - The element that is (presumably) about to receive focus
+     *
+     * @nonstable
      */
     focusSelf(element: E): void;
     /**
@@ -2845,6 +2922,9 @@ export declare interface UsePressReturnTypeSelf {
      * of what will happen for the user. Useful for styling mostly.
      */
     pressing: boolean;
+    /**
+     * @stable
+     */
     getIsPressing(): boolean;
     /**
      * Similar to pseudoActive, but for if the button as been pressed down for a determined length of time.
@@ -2887,6 +2967,8 @@ export declare interface UseRandomIdParametersSelf {
      * While all IDs are unique, this can be used to more easily differentiate them.
      *
      * If this is stable, then your props are stable. Simple as that.
+     *
+     * @stable
      */
     prefix: string;
     /** This is the prop on the **OTHER** element that will use our ID.  E.G. The `input` calls `useRandomId` and passes `for` as `referencerProp`. */
@@ -2942,7 +3024,9 @@ export declare interface UseRearrangeableChildrenParametersSelf {
     /**
      * This must return the index of this child relative to all its sortable siblings from its `VNode`.
      *
-     * In general, this corresponds to the `index` prop, so something like `vnode => vnode.props.index` is what you're usually looking for.
+     * @remarks In general, this corresponds to the `index` prop, so something like `vnode => vnode.props.index` is what you're usually looking for.
+     *
+     * @stable
      */
     getIndex: GetIndex;
     /**
@@ -2999,8 +3083,10 @@ export declare interface UseRearrangeableChildrenReturnTypeSelf<M extends UseRea
  *
  * This hook, like many others, works with either `useState` or {@link usePassiveState}. Why use one over the other?
  *
+ * ```md-literal
  * * `useState` is familiar and easy to use, but causes the component to re-render itself, which is slow.
  * * `usePassiveState` is faster and more scalable, but its state can't be accessed during render and it's more complex.
+ * ```
  *
  * @example
  * Easiest way to use (but causes an extra re-render 🐌)
@@ -3039,11 +3125,21 @@ export declare interface UseRefElementParameters<T> {
 export declare interface UseRefElementParametersSelf<T> {
     /**
      * Called with the `Element` when it mounts, called with `null` when it unmounts.
+     *
+     * @stable
      */
     onElementChange?: OnPassiveStateChange<T | null, never>;
-    /** Called when the element mounts */
+    /**
+     * Called when the element mounts
+     *
+     * @stable
+     */
     onMount?: (element: T) => void;
-    /** Called when the element unmounts */
+    /**
+     * Called when the element unmounts
+     *
+     * @stable
+     */
     onUnmount?: (element: T) => void;
 }
 
@@ -3054,9 +3150,10 @@ export declare interface UseRefElementReturnType<T extends EventTarget> {
 
 export declare interface UseRefElementReturnTypeSelf<T extends EventTarget> {
     /**
-     * **STABLE**
      *
      * Call to return the element that the props were rendered to, or `null` if they were not rendered to an element.
+     *
+     * @stable
      */
     getElement(): T | null;
 }
@@ -3094,26 +3191,29 @@ export declare function useRovingTabIndexChild<ChildElement extends Element, M e
 export declare interface UseRovingTabIndexChildInfo<TabbableChildElement extends Element> extends ManagedChildInfo<number> {
     /**
      * A **unique integer** (among siblings) representing this child like the index to an array.
-     * There can be holes/gaps, and even negative numbers, though iterating over a gap is still O(n) on the size of the gap (kinda low priority TODO cause computers can count fast).
+     *
+     * @remarks There can be holes/gaps, and even negative numbers, though iterating over a gap is still O(n) on the size of the gap (kinda low priority TODO cause computers can count fast).
      */
     index: number;
     /**
-     * When we navigate to a child and focus it, we need to know how that child wants to be focused.
-     * Generally, this is just getElement().focus(), but you're allowed to supply anything you want here.
-     * Grid rows, for example, don't directly focus themselves but instead call one of their cell's `focusSelf`.
+     * How is this child focused? (Generally just `e => e.focus()`)
+     *
+     * @remarks In certain cases you may want to focus a different element.
+     * When a grid row has its `focusSelf` called, for example, it doesn't focus the row,
+     * but instead sends focus further down to a cell.
      *
      * This is used when the tabbable index changes (we auto-focus the newly tabbable element if applicable),
      * and also by the `focusSelf` value returned by the parent (i.e. `parent.focusSelf` calls one child's `focusSelf`)
      */
     focusSelf(e: TabbableChildElement): void;
     /**
-     * Get from `useRefElement`
+     * Get this from `useRefElement`
      */
     getElement(): TabbableChildElement | null;
     /**
      * If a child **exists** (i.e. calls `useRovingTabIndexChild` or its derivatives in some way) but **can't be tabbed to** (because it's e.g. `display: none`), then set this to `true`.
      *
-     * This cannot be calculated automatically. It's *possible* to catch something like `display: none` with some reflow-forcing `getComputedStyles` or something,
+     * @remarks This cannot be calculated automatically. It's *possible* to catch something like `display: none` with some reflow-forcing `getComputedStyles` or something,
      * but if the child is untabbable because it's disabled or staggered or paginated or something we just have no way of knowing.
      * It could be untabbable for any arbitrary reason the user decides.
      *
@@ -3126,9 +3226,12 @@ export declare interface UseRovingTabIndexChildInfo<TabbableChildElement extends
     /**
      * Provided by `useRovingTabIndexChild`.
      *
-     * Used by the parent to control a child's internal tabbable state. */
+     * @remarks Used by the parent to control a child's internal tabbable state.
+     */
     setLocallyTabbable: StateUpdater<boolean>;
     /**
+     * Provided by `useRovingTabIndexChild`.
+     *
      * @see {@link UseRovingTabIndexChildInfo.setLocallyTabbable}
      */
     getLocallyTabbable: () => boolean;
@@ -3164,12 +3267,12 @@ export declare interface UseRovingTabIndexChildReturnType<ChildElement extends E
 
 export declare interface UseRovingTabIndexChildReturnTypeSelf {
     /**
-     * *Unstable*
-     *
      * Whether this child, individually, is *the* currently tabbable child.
      */
     tabbable: boolean;
-    /** **STABLE** */
+    /**
+     * @stable
+     */
     getTabbable(): boolean;
 }
 
@@ -3229,21 +3332,24 @@ export declare interface UseRovingTabIndexReturnType<ParentElement extends Eleme
 
 export declare interface UseRovingTabIndexReturnTypeSelf {
     /**
-     * **STABLE**
-     *
      * Can be used to programmatically change which child is the currently tabbable one.
      *
      * `fromUserInteraction` determines if this was a user-generated event that should focus the newly tabbable child,
      * or a programmatic event that should leave the user's focus where the user currently is, because they didn't do that.
      *
+     * @stable
      */
     setTabbableIndex: SetTabbableIndex;
-    /** **STABLE** */
+    /**
+     * Returns the index of the child that is currently tabbable.
+     *
+     * @stable
+     */
     getTabbableIndex: () => number | null;
     /**
-     * **STABLE**
-     *
      * Call to focus the currently tabbable child.
+     *
+     * @stable
      */
     focusSelf: (reason?: any) => void;
 }
@@ -3282,7 +3388,9 @@ export declare interface UseSearchParamStateParameters<Key extends keyof SearchP
 }
 
 /**
+ * Allows a single child among all children to be the "selected" child (which can be different from the "focused" child).
  *
+ * @remarks If you need multi-select instead of single-select and you're using this hook (e.g. as part of {@link useCompleteListNavigation}), you can disable the single-selection behavior either by setting the selected index to `null` or.
  *
  * @hasChild {@link useSingleSelectionChild}
  *
@@ -3327,7 +3435,7 @@ export declare interface UseSingleSelectionChildParameters<E extends Element, M 
     info: Pick<UseSingleSelectionChildInfo<E>, UseSingleSelectionChildInfoParameterKeys>;
 }
 
-export declare interface UseSingleSelectionChildReturnType<E extends Element> extends UseChildrenHaveFocusChildReturnType<E> {
+export declare interface UseSingleSelectionChildReturnType<E extends Element> extends UseChildrenHaveFocusChildReturnType<E>, TargetedPick<UsePressParameters<any>, "pressParameters", "onPressSync"> {
     props: ElementProps<E>;
     info: Pick<UseSingleSelectionChildInfo<E>, UseSingleSelectionChildInfoReturnKeys>;
     singleSelectionChildReturn: UseSingleSelectionChildReturnTypeSelf;
@@ -3338,7 +3446,7 @@ export declare interface UseSingleSelectionChildReturnTypeSelf {
      * Is this child currently the selected child among all its siblings?
      */
     selected: boolean;
-    /** @see selected */
+    /** @stable */
     getSelected(): boolean;
     /**
      * Any time `selected` changes to or from being visible, this will represent the direction and magnitude of the change.
@@ -3348,7 +3456,7 @@ export declare interface UseSingleSelectionChildReturnTypeSelf {
      * This useful for things like animations or transitions.
      */
     selectedOffset: Nullable<number>;
-    /** @see selectedOffset */
+    /** @stable */
     getSelectedOffset: () => (number | null);
 }
 
@@ -3397,6 +3505,8 @@ export declare interface UseSingleSelectionParametersSelf {
      * returned `changeSelectedIndex` function to have the desired change occur.
      *
      * In general, this should only be `null` when single selection is entirely disabled.
+     *
+     * @nonstable
      */
     onSelectedIndexChange: null | SelectedIndexChangeHandler;
     selectionMode: "focus" | "activation" | "disabled";
@@ -3421,8 +3531,13 @@ export declare interface UseSingleSelectionReturnTypeSelf {
      * If you are creating an imperative component, this is what how you can force the value to change in response to something.
      *
      * If you are creating a declarative component, this is what you call in `useEffect` when your `selectedIndex` changes.
+     *
+     * @stable
      */
     changeSelectedIndex: PassiveStateUpdater<number | null, Event>;
+    /**
+     * @stable
+     */
     getSelectedIndex(): number | null;
 }
 
@@ -3563,6 +3678,9 @@ export declare interface UseStaggeredChildrenParameters<E extends Element, M ext
 }
 
 export declare interface UseStaggeredChildrenParametersSelf {
+    /**
+     * If true, each child will delay rendering itself until the one before it has.
+     */
     staggered: boolean;
 }
 
@@ -3572,6 +3690,9 @@ export declare interface UseStaggeredChildrenReturnType {
 }
 
 export declare interface UseStaggeredChildrenReturnTypeSelf {
+    /**
+     * Whether any children are still waiting to show themselves because of the staggering behavior
+     */
     stillStaggering: boolean;
 }
 
@@ -3582,11 +3703,12 @@ export declare interface UseStaggeredChildReturnType<ChildElement extends Elemen
 }
 
 export declare interface UseStaggeredChildReturnTypeSelf {
-    /** Whether the parent has indicated that all of its children, including this one, are staggered. */
+    /**
+     * Whether the parent has indicated that all of its children, including this one, are staggered.
+     */
     parentIsStaggered: boolean;
     /**
      * If this is true, you should delay showing *your* children or running other heavy logic until this becomes false.
-     *
      * Can be as simple as `<div>{hideBecauseStaggered? null : children}</div>`
      */
     hideBecauseStaggered: boolean;
@@ -3716,6 +3838,7 @@ export declare interface UseTypeaheadNavigationParametersSelf<TabbableChildEleme
      *
      * Called any time the currently tabbable index changes as a result of a typeahead-related keypress
      *
+     * @nonstable
      */
     onNavigateTypeahead: Nullable<(newIndex: number | null, event: KeyboardEventType<TabbableChildElement>) => void>;
     /**
@@ -3723,11 +3846,15 @@ export declare interface UseTypeaheadNavigationParametersSelf<TabbableChildEleme
      *
      * Generally corresponds to a `hidden` or `disabled` prop.
      * @param index - Which child to query
+     *
+     * @nonstable
      */
     isValid(index: number): boolean;
     /**
      * A collator to use when comparing.
      * If not provided, simply uses `localeCompare` after transforming each to lowercase, which will, at best, work okay in English.
+     *
+     * @nonstable
      */
     collator: null | Intl.Collator;
     /**

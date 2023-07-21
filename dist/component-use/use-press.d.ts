@@ -15,19 +15,23 @@ export interface UsePressParametersSelf<E extends EventTarget> {
      * This must be a sync event handler; async handlers must be taken care of externally.
      *
      * Setting to `null` or `undefined` effectively disables the press event handler.
+     *
+     * @nonstable
      */
     onPressSync: Nullable<((e: PressEventReason<E>) => void)>;
-    /** Pass a function that returns `true` to prevent the spacebar from contributing to press events */
+    /** Pass a function that returns `true` to prevent the spacebar from contributing to press events @nonstable */
     excludeSpace?(): boolean;
-    /** Pass a function that returns `true` to prevent the enter key from contributing to press events */
+    /** Pass a function that returns `true` to prevent the enter key from contributing to press events @nonstable */
     excludeEnter?(): boolean;
-    /** Pass a function that returns `true` to prevent the pointer (mouse, touch, etc.) from contributing to press events */
+    /** Pass a function that returns `true` to prevent the pointer (mouse, touch, etc.) from contributing to press events @nonstable */
     excludePointer?(): boolean;
     /**
      * Ensures that when a button is pressed it properly receives focus (even on iOS Safari).
      *
      * Generally, this should just be `e => e.focus()`
      * @param element - The element that is (presumably) about to receive focus
+     *
+     * @nonstable
      */
     focusSelf(element: E): void;
     /**
@@ -47,6 +51,9 @@ export interface UsePressReturnTypeSelf {
      * of what will happen for the user. Useful for styling mostly.
      */
     pressing: boolean;
+    /**
+     * @stable
+     */
     getIsPressing(): boolean;
     /**
      * Similar to pseudoActive, but for if the button as been pressed down for a determined length of time.

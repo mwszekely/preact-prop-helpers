@@ -48,7 +48,7 @@ export function useGridNavigationSingleSelection({ gridNavigationParameters, lin
 }
 export function useGridNavigationSingleSelectionRow({ info: mcp1, linearNavigationParameters, managedChildrenReturn, refElementReturn, rovingTabIndexParameters, textContentParameters, typeaheadNavigationParameters, context: { gridNavigationRowContext, rovingTabIndexContext, singleSelectionContext, typeaheadNavigationContext }, ...void1 }) {
     monitorCallCount(useGridNavigationSingleSelectionRow);
-    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1 }, info: mcp2, props: propsSS, singleSelectionChildReturn, ...void2 } = useSingleSelectionChild({ info: mcp1, context: { singleSelectionContext } });
+    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1 }, info: mcp2, props: propsSS, singleSelectionChildReturn, pressParameters: { onPressSync }, ...void2 } = useSingleSelectionChild({ info: mcp1, context: { singleSelectionContext } });
     const { context, hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2 }, linearNavigationReturn, managedChildrenParameters, pressParameters: { excludeSpace }, props: propsGN, rovingTabIndexChildReturn, rovingTabIndexReturn, textContentReturn, typeaheadNavigationReturn, info: mcp3, ...void3 } = useGridNavigationRow({ context: { gridNavigationRowContext, rovingTabIndexContext, typeaheadNavigationContext }, linearNavigationParameters, info: mcp1, managedChildrenReturn, refElementReturn, rovingTabIndexParameters, textContentParameters, typeaheadNavigationParameters });
     assertEmptyObject(void1);
     assertEmptyObject(void2);
@@ -58,7 +58,7 @@ export function useGridNavigationSingleSelectionRow({ info: mcp1, linearNavigati
         linearNavigationReturn,
         info: { ...mcp2, ...mcp3 },
         managedChildrenParameters,
-        pressParameters: { excludeSpace },
+        pressParameters: { onPressSync, excludeSpace },
         hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: useStableCallback((hasFocus, hadFocus) => { ocfic1?.(hasFocus, hadFocus); ocfic2?.(hasFocus, hadFocus); }) },
         props: useMergedProps(propsGN, propsSS),
         rovingTabIndexChildReturn,

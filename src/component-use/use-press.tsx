@@ -24,14 +24,16 @@ export interface UsePressParametersSelf<E extends EventTarget> {
      * This must be a sync event handler; async handlers must be taken care of externally.
      * 
      * Setting to `null` or `undefined` effectively disables the press event handler.
+     * 
+     * @nonstable
      */
     onPressSync: Nullable<((e: PressEventReason<E>) => void)>;
 
-    /** Pass a function that returns `true` to prevent the spacebar from contributing to press events */
+    /** Pass a function that returns `true` to prevent the spacebar from contributing to press events @nonstable */
     excludeSpace?(): boolean;
-    /** Pass a function that returns `true` to prevent the enter key from contributing to press events */
+    /** Pass a function that returns `true` to prevent the enter key from contributing to press events @nonstable */
     excludeEnter?(): boolean;
-    /** Pass a function that returns `true` to prevent the pointer (mouse, touch, etc.) from contributing to press events */
+    /** Pass a function that returns `true` to prevent the pointer (mouse, touch, etc.) from contributing to press events @nonstable */
     excludePointer?(): boolean;
 
     /**
@@ -39,6 +41,8 @@ export interface UsePressParametersSelf<E extends EventTarget> {
      * 
      * Generally, this should just be `e => e.focus()`
      * @param element - The element that is (presumably) about to receive focus
+     * 
+     * @nonstable
      */
     focusSelf(element: E): void;
 
@@ -61,6 +65,10 @@ export interface UsePressReturnTypeSelf {
      * of what will happen for the user. Useful for styling mostly.
      */
     pressing: boolean;
+
+    /**
+     * @stable
+     */
     getIsPressing(): boolean;
     /**
      * Similar to pseudoActive, but for if the button as been pressed down for a determined length of time.
@@ -165,7 +173,7 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
     const [waitingForSpaceUp, setWaitingForSpaceUp, getWaitingForSpaceUp] = useState(false);
     const [pointerDownStartedHere, setPointerDownStartedHere, getPointerDownStartedHere] = useState(false);
     const [hovering, setHovering, getHovering] = useState(false);
-    const onTouchStart = useCallback((e: TouchEventType<E>) => {
+    const onTouchStart = useStableCallback((e: TouchEventType<E>) => {
         e.preventDefault();
         e.stopPropagation();
         setIsPressing(true, e);
@@ -176,7 +184,7 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
         const element = getElement();
         if (element)
             focusSelf(element);
-    }, []);
+    });
     const onTouchMove = useCallback((e: TouchEventType<E>) => {
         e.preventDefault();
         e.stopPropagation();
@@ -214,7 +222,7 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
         setIsPressing(false, e);
     }, []);
 
-    const onPointerDown = useCallback((e: PointerEventType<E>) => {
+    const onPointerDown = useStableCallback((e: PointerEventType<E>) => {
         if (!excludePointer()) {
             if ((e.buttons & 1)) {
                 e.preventDefault();
@@ -229,7 +237,7 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
                     focusSelf(element);
             }
         }
-    }, []);
+    });
     const onPointerMove = useStableCallback((e: PointerEventType<E>) => {
         let listeningForPress = getPointerDownStartedHere();
         // If we're hovering over this element and not holding down the mouse button (or whatever other primary button)

@@ -6,20 +6,24 @@ import { monitorCallCount } from "../util/use-call-count.js";
 
 export interface UseHasCurrentFocusParametersSelf<T extends Node> {
 
-        /**
-         * Whether the element itself currently has focus.
-         * 
-         * `prevFocused` is generally the opposite of `focused`, but on mount it's `undefined` while `focused` is probably false (both falsy)
-         */
-        onCurrentFocusedChanged?: Nullable<OnPassiveStateChange<boolean, FocusEventType<T>>>;
+    /**
+     * Whether the element itself currently has focus.
+     * 
+     * `prevFocused` is generally the opposite of `focused`, but on mount it's `undefined` while `focused` is probably false (both falsy)
+     * 
+     * @stable
+     */
+    onCurrentFocusedChanged?: Nullable<OnPassiveStateChange<boolean, FocusEventType<T>>>;
 
-        /**
-         * Like `onFocusedChanged`, but also *additionally* if any child elements are focused.
-         * 
-         * @see this.onFocusedChanged
-         */
-        onCurrentFocusedInnerChanged?: Nullable<OnPassiveStateChange<boolean, FocusEventType<T>>>;
-    }
+    /**
+     * Like `onFocusedChanged`, but also *additionally* if any child elements are focused.
+     * 
+     * @see this.onFocusedChanged
+     * 
+     * @stable
+     */
+    onCurrentFocusedInnerChanged?: Nullable<OnPassiveStateChange<boolean, FocusEventType<T>>>;
+}
 
 export interface UseHasCurrentFocusParameters<T extends Node> extends TargetedPick<UseRefElementReturnType<T>, "refElementReturn", "getElement"> {
     hasCurrentFocusParameters: UseHasCurrentFocusParametersSelf<T>;
@@ -32,9 +36,9 @@ export interface UseHasCurrentFocusReturnTypeSelf<E extends Element> {
      */
     //propsStable: ElementProps<T>;
 
-    /** STABLE */
+    /** @stable */
     getCurrentFocused(): boolean;
-    /** STABLE */
+    /** @stable */
     getCurrentFocusedInner(): boolean;
 }
 

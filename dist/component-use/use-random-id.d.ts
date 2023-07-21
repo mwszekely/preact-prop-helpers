@@ -12,6 +12,8 @@ export interface UseRandomIdParametersSelf {
      * While all IDs are unique, this can be used to more easily differentiate them.
      *
      * If this is stable, then your props are stable. Simple as that.
+     *
+     * @stable
      */
     prefix: string;
     /** This is the prop on the **OTHER** element that will use our ID.  E.G. The `input` calls `useRandomId` and passes `for` as `referencerProp`. */

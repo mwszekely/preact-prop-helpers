@@ -9,7 +9,9 @@ import { enhanceEvent } from "../../util/event.js";
 import { useCallback, useEffect } from "../../util/lib.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
 /**
+ * Allows a single child among all children to be the "selected" child (which can be different from the "focused" child).
  *
+ * @remarks If you need multi-select instead of single-select and you're using this hook (e.g. as part of {@link useCompleteListNavigation}), you can disable the single-selection behavior either by setting the selected index to `null` or.
  *
  * @hasChild {@link useSingleSelectionChild}
  *
@@ -91,6 +93,7 @@ export function useSingleSelectionChild({ context: { singleSelectionContext: { g
         }
     });
     const propParts = ariaPropName?.split("-") ?? [];
+    const onPressSync = useStableCallback((e) => { onSelectedIndexChange?.(enhanceEvent(e, { selectedIndex: index })); });
     return {
         info: {
             setLocalSelected: useStableCallback((selected, direction) => {
@@ -109,7 +112,8 @@ export function useSingleSelectionChild({ context: { singleSelectionContext: { g
         props: ariaPropName == null || selectionMode == "disabled" ? {} : {
             [`${propParts[0]}-${propParts[1]}`]: (localSelected ? (propParts[1] == "current" ? `${propParts[2]}` : `true`) : "false")
         },
-        hasCurrentFocusParameters: { onCurrentFocusedInnerChanged }
+        hasCurrentFocusParameters: { onCurrentFocusedInnerChanged },
+        pressParameters: { onPressSync: onSelectedIndexChange ? onPressSync : null }
     };
 }
 /**

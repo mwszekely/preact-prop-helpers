@@ -85,7 +85,7 @@ export function usePress(args) {
     const [waitingForSpaceUp, setWaitingForSpaceUp, getWaitingForSpaceUp] = useState(false);
     const [pointerDownStartedHere, setPointerDownStartedHere, getPointerDownStartedHere] = useState(false);
     const [hovering, setHovering, getHovering] = useState(false);
-    const onTouchStart = useCallback((e) => {
+    const onTouchStart = useStableCallback((e) => {
         e.preventDefault();
         e.stopPropagation();
         setIsPressing(true, e);
@@ -95,7 +95,7 @@ export function usePress(args) {
         const element = getElement();
         if (element)
             focusSelf(element);
-    }, []);
+    });
     const onTouchMove = useCallback((e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -131,7 +131,7 @@ export function usePress(args) {
         setPointerDownStartedHere(false);
         setIsPressing(false, e);
     }, []);
-    const onPointerDown = useCallback((e) => {
+    const onPointerDown = useStableCallback((e) => {
         if (!excludePointer()) {
             if ((e.buttons & 1)) {
                 e.preventDefault();
@@ -145,7 +145,7 @@ export function usePress(args) {
                     focusSelf(element);
             }
         }
-    }, []);
+    });
     const onPointerMove = useStableCallback((e) => {
         let listeningForPress = getPointerDownStartedHere();
         // If we're hovering over this element and not holding down the mouse button (or whatever other primary button)

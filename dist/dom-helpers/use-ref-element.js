@@ -8,8 +8,10 @@ import { monitorCallCount } from "../util/use-call-count.js";
  *
  * This hook, like many others, works with either `useState` or {@link usePassiveState}. Why use one over the other?
  *
+ * ```md-literal
  * * `useState` is familiar and easy to use, but causes the component to re-render itself, which is slow.
  * * `usePassiveState` is faster and more scalable, but its state can't be accessed during render and it's more complex.
+ * ```
  *
  * @example
  * Easiest way to use (but causes an extra re-render 🐌)

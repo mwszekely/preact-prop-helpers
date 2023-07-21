@@ -23,10 +23,14 @@ export interface UseLinearNavigationParameters<ParentOrChildElement extends Elem
 export interface UseLinearNavigationParametersSelf<ChildElement extends Element> {
     /**
      * Called when a navigation change as a result of an arrow/home/end/page up/page down key being pressed.
+     *
+     * @stable
      */
     onNavigateLinear: Nullable<(newIndex: number | null, event: KeyboardEventType<ChildElement>) => void>;
     /**
      * Must return true if the child at this index can be navigated to, e.g. `(i) => !getChildren(i)?.hidden`.
+     *
+     * @stable
      */
     isValid(i: number): boolean;
     /**
@@ -76,22 +80,30 @@ export interface UseLinearNavigationParametersSelf<ChildElement extends Element>
      * @remarks This is provided by {@link useRearrangeableChildren}.
      * If you use this hook as part of {@link useCompleteListNavigation} or {@link useCompleteGridNavigation}, then everything's already wired up and you don't need to worry about this.
      * Otherwise, it's recommended to simply use {@link lodash-es#identity} here.
+     *
+     * @stable
      */
     indexMangler: (n: number) => number;
     /**
      * @see {@link UseLinearNavigationParametersSelf.indexMangler}, which does the opposite of this.
+     *
+     * @stable
      */
     indexDemangler: (n: number) => number;
     /**
      * From `useManagedChildren`. This can be higher than the *actual* highest index if you need it to be.
      *
      * @returns [0, n], not [0, n)
+     *
+     * @stable
      */
     getHighestIndex(): number;
     /**
      * From `useManagedChildren`. This can be lower than the *actual* lowest index if you need it to be.
      *
      * @see {@link UseLinearNavigationParametersSelf.getLowestIndex}
+     *
+     * @stable
      */
     getLowestIndex(): number;
 }

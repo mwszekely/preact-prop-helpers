@@ -4,6 +4,8 @@ import { UseHasCurrentFocusParameters } from "./use-has-current-focus.js";
 export interface UseChildrenHaveFocusParametersSelf<T extends Element> {
     /**
      * Fires `true` once any of the children have become focused, and `false` once all of the children have become unfocused.
+     *
+     * @stable
      */
     onCompositeFocusChange: null | OnPassiveStateChange<boolean, FocusEventType<T>>;
 }

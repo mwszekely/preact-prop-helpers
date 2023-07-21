@@ -7,6 +7,8 @@ export interface UseAsyncHandlerParameters<EventType, CaptureType> extends OmitS
      * and presented as the first argument of the event handler?
      *
      * The "capture" parameter answers this question. To implement a checkbox, for example, return `target.checked`.
+     *
+     * @nonstable
      */
     capture: (event: EventType) => CaptureType;
     /**

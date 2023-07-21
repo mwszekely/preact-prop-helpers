@@ -46,6 +46,8 @@ export interface UseAsyncParameters<AP extends unknown[], SP extends unknown[] =
      * the `capture` parameter allows you to transform the parameters you were given
      * when the request to run was initially made into parameters that you have
      * guaranteed will still be good by the time the handler actually runs.
+     * 
+     * @nonstable
      */
     capture?: CaptureFunctionType<AP, SP>;
 }

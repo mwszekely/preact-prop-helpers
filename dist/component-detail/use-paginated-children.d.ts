@@ -23,6 +23,11 @@ export interface UsePaginatedChildContext {
     paginatedChildContext: UsePaginatedChildContextSelf;
 }
 export interface UsePaginatedChildrenReturnTypeSelf {
+    /**
+     * If the values returned by `indexDemangler` change (e.g. when sorting), then this must be called to re-sync everything.
+     *
+     * @stable
+     */
     refreshPagination: (min: Nullable<number>, max: Nullable<number>) => void;
     /**
      * **IMPORTANT**: This is only tracked when pagination is enabled.
@@ -57,8 +62,13 @@ export interface UsePaginatedChildReturnType<ChildElement extends Element> {
     info: Pick<UsePaginatedChildrenInfo<ChildElement>, "setPaginationVisible" | "setChildCountIfPaginated">;
 }
 export interface UsePaginatedChildReturnTypeSelf {
-    paginatedVisible: boolean;
+    /**
+     * Whether this child is part of a paginated parent component.
+     */
     parentIsPaginated: boolean;
+    /**
+     * Whether this child should hide itself because the parent is paginated and this child is outside of the current range.
+     */
     hideBecausePaginated: boolean;
 }
 /**

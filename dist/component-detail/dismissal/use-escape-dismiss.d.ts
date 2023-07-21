@@ -3,6 +3,8 @@ import { EnhancedEventHandler } from "../../util/event.js";
 export interface UseEscapeDismissParametersSelf {
     /**
      * Called when the component is dismissed by pressing the `Escape` key.
+     *
+     * @nonstable
      */
     onDismiss: EnhancedEventHandler<KeyboardEvent, {
         reason: "escape";
@@ -15,6 +17,8 @@ export interface UseEscapeDismissParametersSelf {
      * The escape key event handler is attached onto the window, so we need to know which window.
      *
      * @remarks The returned `Window` should not change throughout the lifetime of the component (i.e. the element in question must not switch to another window via some means, which might not even be possible).
+     *
+     * @nonstable
      */
     getWindow(): Window;
     /**

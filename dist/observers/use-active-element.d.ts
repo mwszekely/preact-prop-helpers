@@ -1,16 +1,21 @@
 import { OnPassiveStateChange } from "../preact-extensions/use-passive-state.js";
 export interface UseActiveElementParametersSelf {
     /**
-     * Called any time the active element changes. Must be stable.
+     * Called any time the active element changes.
+     *
+     * @stable
      */
     onActiveElementChange?: OnPassiveStateChange<Element | null, FocusEvent> | null | undefined;
     /**
      * Called any time the active element changes and is not null.
-     * Must be stable.
+     *
+     * @stable
      */
     onLastActiveElementChange?: OnPassiveStateChange<Element, FocusEvent> | null | undefined;
     /**
-     * Called any time the window gains/loses focus. Must be stable.
+     * Called any time the window gains/loses focus.
+     *
+     * @stable
      */
     onWindowFocusedChange?: OnPassiveStateChange<boolean, FocusEvent> | null | undefined;
     /**
@@ -18,14 +23,14 @@ export interface UseActiveElementParametersSelf {
      *
      * E.G. someDivElement.ownerDocument
      *
-     * **MUST** be stable
+     * @stable
      */
     getDocument(): Document;
     /**
      * By default, event handlers are attached to the document's defaultView Window.
      * If you need something different, override it here.
      *
-     * **MUST** be stable
+     * @stable
      */
     getWindow?: ((document: Document) => Window) | null | undefined;
 }
@@ -35,17 +40,17 @@ export interface UseActiveElementParameters {
 export interface UseActiveElementReturnTypeSelf {
     /**
      * Returns whatever element is currently focused, or `null` if there's no focused element
-     * **STABLE**
+     * @stable
      */
     getActiveElement: () => Element | null;
     /**
      * Returns whatever element is currently focused, or whatever element was most recently focused if there's no focused element
-     * **STABLE**
+     * @stable
      */
     getLastActiveElement: () => Element;
     /**
      * Returns if the window itself has focus or not
-     * **STABLE**
+     * @stable
      */
     getWindowFocused: () => boolean;
 }

@@ -23,11 +23,11 @@ export function useListNavigationSingleSelection({ linearNavigationParameters, r
 }
 export function useListNavigationSingleSelectionChild({ info, context, refElementReturn, textContentParameters, ...void1 }) {
     monitorCallCount(useListNavigationSingleSelectionChild);
-    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ...void3 }, info: infoSS, singleSelectionChildReturn, props: propsSS, ...void9 } = useSingleSelectionChild({
+    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ...void3 }, info: infoSS, singleSelectionChildReturn, props: propsSS, pressParameters: { onPressSync }, ...void9 } = useSingleSelectionChild({
         info,
         context,
     });
-    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void6 }, pressParameters, rovingTabIndexChildReturn, textContentReturn, props: propsLN, info: infoLN, ...void8 } = useListNavigationChild({
+    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void6 }, pressParameters: { excludeSpace }, rovingTabIndexChildReturn, textContentReturn, props: propsLN, info: infoLN, ...void8 } = useListNavigationChild({
         info,
         context,
         refElementReturn,
@@ -45,7 +45,7 @@ export function useListNavigationSingleSelectionChild({ info, context, refElemen
                 ocfic2?.(focused, previouslyFocused, e);
             })
         },
-        pressParameters,
+        pressParameters: { onPressSync, excludeSpace },
         info: { ...infoSS, ...infoLN },
         rovingTabIndexChildReturn,
         singleSelectionChildReturn,

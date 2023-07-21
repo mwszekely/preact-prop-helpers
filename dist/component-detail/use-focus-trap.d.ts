@@ -24,6 +24,8 @@ export interface UseFocusTrapParametersSelf<SourceElement extends Element | null
      * as a very very last resort, use `findFirstFocusable`, and then if nothing's found focus the body.
      *
      * Just please, please make sure that whatever that first focusable is **isn't** a destructive action, at the very least.
+     *
+     * @nonstable
      */
     focusPopup(e: PopupElement, findFirstFocusable: () => HTMLOrSVGElement | null): void;
     /**
@@ -33,6 +35,8 @@ export interface UseFocusTrapParametersSelf<SourceElement extends Element | null
      * and just do whatever you want with any element.
      *
      * @param lastFocused - The element that was focused before the modal was opened
+     *
+     * @nonstable
      */
     focusOpener(lastFocused: SourceElement | null): void;
 }

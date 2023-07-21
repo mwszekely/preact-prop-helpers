@@ -6,11 +6,15 @@ export interface UseHasLastFocusParametersSelf {
     /**
      * Similar to `onFocusedChanged`, but if there is no currently focused element, is `true` if this element that *did* have focus last.
      *
-     * This is always `true` while `focused` is `true`. If `focused` is `false`, this may be `true` or `false`.
+     * @remarks This is always `true` while `focused` is `true`. If `focused` is `false`, this may be `true` or `false`.
+     *
+     * @stable
      */
     onLastFocusedChanged?: Nullable<((focused: boolean, prevFocused: boolean | undefined) => void)>;
     /**
      * Combines the implications of `onFocusedChanged` and `onFocusedChanged`.
+     *
+     * @stable
      */
     onLastFocusedInnerChanged?: Nullable<((focused: boolean, prevFocused: boolean | undefined) => void)>;
 }
@@ -18,9 +22,9 @@ export interface UseHasLastFocusParameters<T extends Node> extends UseActiveElem
     hasLastFocusParameters: UseHasLastFocusParametersSelf;
 }
 export interface HasLastFocusReturnTypeSelf {
-    /** STABLE */
+    /** @stable */
     getLastFocused(): boolean;
-    /** STABLE */
+    /** @stable */
     getLastFocusedInner(): boolean;
 }
 export interface UseHasLastFocusReturnType extends UseActiveElementReturnType {

@@ -38,6 +38,18 @@
         "tagName": "@tableOfContents",
         "syntaxKind": "inline",
         "allowMultiple": true
+      },
+      {
+        // Indicates the identity of an object either will never or must never change between invocations of its function
+        "tagName": "@stable",
+        "syntaxKind": "modifier",
+        "allowMultiple": false
+      },
+      {
+        // Indicates the identity of an object either does not need to be stable or is unusually likely to change
+        "tagName": "@nonstable",
+        "syntaxKind": "modifier",
+        "allowMultiple": false
       }
     ]
   }

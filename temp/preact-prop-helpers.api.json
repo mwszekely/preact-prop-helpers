@@ -132,6 +132,14 @@
           "tagName": "@tableOfContents",
           "syntaxKind": "inline",
           "allowMultiple": true
+        },
+        {
+          "tagName": "@stable",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@nonstable",
+          "syntaxKind": "modifier"
         }
       ],
       "reportUnsupportedHtmlElements": false
@@ -3629,7 +3637,7 @@
             {
               "kind": "MethodSignature",
               "canonicalReference": "preact-prop-helpers!HasLastFocusReturnTypeSelf#getLastFocused:member(1)",
-              "docComment": "/**\n * STABLE\n */\n",
+              "docComment": "/**\n * @stable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -3657,7 +3665,7 @@
             {
               "kind": "MethodSignature",
               "canonicalReference": "preact-prop-helpers!HasLastFocusReturnTypeSelf#getLastFocusedInner:member(1)",
-              "docComment": "/**\n * STABLE\n */\n",
+              "docComment": "/**\n * @stable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -8260,7 +8268,7 @@
             {
               "kind": "MethodSignature",
               "canonicalReference": "preact-prop-helpers!UseActiveElementParametersSelf#getDocument:member(1)",
-              "docComment": "/**\n * This must be a function that returns the document associated with whatever elements we're listening to.\n *\n * E.G. someDivElement.ownerDocument\n *\n * **MUST** be stable\n */\n",
+              "docComment": "/**\n * This must be a function that returns the document associated with whatever elements we're listening to.\n *\n * E.G. someDivElement.ownerDocument\n *\n * @stable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -8289,7 +8297,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseActiveElementParametersSelf#getWindow:member",
-              "docComment": "/**\n * By default, event handlers are attached to the document's defaultView Window. If you need something different, override it here.\n *\n * **MUST** be stable\n */\n",
+              "docComment": "/**\n * By default, event handlers are attached to the document's defaultView Window. If you need something different, override it here.\n *\n * @stable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -8334,7 +8342,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseActiveElementParametersSelf#onActiveElementChange:member",
-              "docComment": "/**\n * Called any time the active element changes. Must be stable.\n */\n",
+              "docComment": "/**\n * Called any time the active element changes.\n *\n * @stable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -8384,7 +8392,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseActiveElementParametersSelf#onLastActiveElementChange:member",
-              "docComment": "/**\n * Called any time the active element changes and is not null. Must be stable.\n */\n",
+              "docComment": "/**\n * Called any time the active element changes and is not null.\n *\n * @stable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -8434,7 +8442,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseActiveElementParametersSelf#onWindowFocusedChange:member",
-              "docComment": "/**\n * Called any time the window gains/loses focus. Must be stable.\n */\n",
+              "docComment": "/**\n * Called any time the window gains/loses focus.\n *\n * @stable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -8539,7 +8547,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseActiveElementReturnTypeSelf#getActiveElement:member",
-              "docComment": "/**\n * Returns whatever element is currently focused, or `null` if there's no focused element **STABLE**\n */\n",
+              "docComment": "/**\n * Returns whatever element is currently focused, or `null` if there's no focused element\n *\n * @stable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -8575,7 +8583,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseActiveElementReturnTypeSelf#getLastActiveElement:member",
-              "docComment": "/**\n * Returns whatever element is currently focused, or whatever element was most recently focused if there's no focused element **STABLE**\n */\n",
+              "docComment": "/**\n * Returns whatever element is currently focused, or whatever element was most recently focused if there's no focused element\n *\n * @stable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -8607,7 +8615,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseActiveElementReturnTypeSelf#getWindowFocused:member",
-              "docComment": "/**\n * Returns if the window itself has focus or not **STABLE**\n */\n",
+              "docComment": "/**\n * Returns if the window itself has focus or not\n *\n * @stable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -9166,7 +9174,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseAsyncHandlerParameters#capture:member",
-              "docComment": "/**\n * What transient information is captured by this event and presented as the first argument of the event handler?\n *\n * The \"capture\" parameter answers this question. To implement a checkbox, for example, return `target.checked`.\n */\n",
+              "docComment": "/**\n * What transient information is captured by this event and presented as the first argument of the event handler?\n *\n * The \"capture\" parameter answers this question. To implement a checkbox, for example, return `target.checked`.\n *\n * @nonstable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -9406,7 +9414,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseAsyncParameters#capture:member",
-              "docComment": "/**\n * When an async function is debounced due to one already running, it will run on a delay and, as a result, the original arguments that were passed to it may need to be adjusted to account for that.\n *\n * For example, during `onInput`, the `value` of that event isn't stored in the event itself, it's stored in the `HTMLInputElement` that raised it. So when our handler actually runs a few seconds later, it'll read the **next** `event.currentTarget.value`, instead of the one from a few seconds ago that actually raised the event!\n *\n * If the arguments to your handler require referencing data in the arguments that may become \"stale\" by the time the function actually runs (generally event handlers and other things that reference the properties of existing objects), the `capture` parameter allows you to transform the parameters you were given when the request to run was initially made into parameters that you have guaranteed will still be good by the time the handler actually runs.\n */\n",
+              "docComment": "/**\n * When an async function is debounced due to one already running, it will run on a delay and, as a result, the original arguments that were passed to it may need to be adjusted to account for that.\n *\n * For example, during `onInput`, the `value` of that event isn't stored in the event itself, it's stored in the `HTMLInputElement` that raised it. So when our handler actually runs a few seconds later, it'll read the **next** `event.currentTarget.value`, instead of the one from a few seconds ago that actually raised the event!\n *\n * If the arguments to your handler require referencing data in the arguments that may become \"stale\" by the time the function actually runs (generally event handlers and other things that reference the properties of existing objects), the `capture` parameter allows you to transform the parameters you were given when the request to run was initially made into parameters that you have guaranteed will still be good by the time the handler actually runs.\n *\n * @nonstable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -10187,7 +10195,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseBackdropDismissParametersSelf#onDismiss:member",
-              "docComment": "/**\n * Called when the component is dismissed by clicking outside of the element.\n */\n",
+              "docComment": "/**\n * Called when the component is dismissed by clicking outside of the element.\n *\n * @nonstable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -10402,7 +10410,7 @@
             {
               "kind": "MethodSignature",
               "canonicalReference": "preact-prop-helpers!UseChildrenFlagParameters#getAt:member(1)",
-              "docComment": "",
+              "docComment": "/**\n * @stable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -10507,7 +10515,7 @@
             {
               "kind": "MethodSignature",
               "canonicalReference": "preact-prop-helpers!UseChildrenFlagParameters#isValid:member(1)",
-              "docComment": "/**\n * Must be at least quasi-stable (always stable, doesn't need to be called during render)\n */\n",
+              "docComment": "/**\n * Must be at least quasi-stable (always stable, doesn't need to be called during render)\n *\n * @stable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -10579,7 +10587,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseChildrenFlagParameters#onIndexChange:member",
-              "docComment": "/**\n * Called whenever a new index is selected.\n *\n * Notably, the value can be different than what was called with changeIndex() if the requested index didn't exist or was hidden.\n */\n",
+              "docComment": "/**\n * Called whenever a new index is selected.\n *\n * Notably, the value can be different than what was called with changeIndex() if the requested index didn't exist or was hidden.\n *\n * @stable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -10615,7 +10623,7 @@
             {
               "kind": "MethodSignature",
               "canonicalReference": "preact-prop-helpers!UseChildrenFlagParameters#setAt:member(1)",
-              "docComment": "",
+              "docComment": "/**\n * @stable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -11356,7 +11364,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseChildrenHaveFocusParametersSelf#onCompositeFocusChange:member",
-              "docComment": "/**\n * Fires `true` once any of the children have become focused, and `false` once all of the children have become unfocused.\n */\n",
+              "docComment": "/**\n * Fires `true` once any of the children have become focused, and `false` once all of the children have become unfocused.\n *\n * @stable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -16433,7 +16441,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseDismissParametersSelf#onClose:member",
-              "docComment": "/**\n * Called any time the user has requested the component be dismissed for the given reason.\n *\n * You can choose to ignore a reason if you want, but it's better to set `closeOn${reason}` to `false` instead.\n */\n",
+              "docComment": "/**\n * Called any time the user has requested the component be dismissed for the given reason.\n *\n * You can choose to ignore a reason if you want, but it's better to set `closeOn${reason}` to `false` instead.\n *\n * @nonstable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -17920,7 +17928,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseElementSizeParametersSelf#getObserveBox:member",
-              "docComment": "/**\n * Passed as an argument to the created ResizeObserver.\n *\n * @see\n *\n * https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver/observe#parameters\n */\n",
+              "docComment": "/**\n * Passed as an argument to the created ResizeObserver.\n *\n * @see\n *\n * https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver/observe#parameters\n *\n * @stable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -17956,7 +17964,7 @@
             {
               "kind": "MethodSignature",
               "canonicalReference": "preact-prop-helpers!UseElementSizeParametersSelf#onSizeChange:member(1)",
-              "docComment": "/**\n * Called any time the browser detects a size change on the element. Does not need to be stable, so you can pass an anonymous function that only sets the values you use if you'd like.\n */\n",
+              "docComment": "/**\n * Called any time the browser detects a size change on the element. Does not need to be stable, so you can pass an anonymous function that only sets the values you use if you'd like.\n *\n * @stable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -18570,7 +18578,7 @@
             {
               "kind": "MethodSignature",
               "canonicalReference": "preact-prop-helpers!UseEscapeDismissParametersSelf#getWindow:member(1)",
-              "docComment": "/**\n * The escape key event handler is attached onto the window, so we need to know which window.\n *\n * @remarks\n *\n * The returned `Window` should not change throughout the lifetime of the component (i.e. the element in question must not switch to another window via some means, which might not even be possible).\n */\n",
+              "docComment": "/**\n * The escape key event handler is attached onto the window, so we need to know which window.\n *\n * @remarks\n *\n * The returned `Window` should not change throughout the lifetime of the component (i.e. the element in question must not switch to another window via some means, which might not even be possible).\n *\n * @nonstable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -18599,7 +18607,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseEscapeDismissParametersSelf#onDismiss:member",
-              "docComment": "/**\n * Called when the component is dismissed by pressing the `Escape` key.\n */\n",
+              "docComment": "/**\n * Called when the component is dismissed by pressing the `Escape` key.\n *\n * @nonstable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -18991,7 +18999,7 @@
             {
               "kind": "MethodSignature",
               "canonicalReference": "preact-prop-helpers!UseFocusTrapParametersSelf#focusOpener:member(1)",
-              "docComment": "/**\n * When the focus trap has deactivated, focus must be sent back to the element that opened it.\n *\n * @remarks\n *\n * This is tracked for you; by default, just call `lastFocused?.focus()`, but you can also override this behavior and just do whatever you want with any element.\n *\n * @param lastFocused - The element that was focused before the modal was opened\n */\n",
+              "docComment": "/**\n * When the focus trap has deactivated, focus must be sent back to the element that opened it.\n *\n * @remarks\n *\n * This is tracked for you; by default, just call `lastFocused?.focus()`, but you can also override this behavior and just do whatever you want with any element.\n *\n * @param lastFocused - The element that was focused before the modal was opened\n *\n * @nonstable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -19036,7 +19044,7 @@
             {
               "kind": "MethodSignature",
               "canonicalReference": "preact-prop-helpers!UseFocusTrapParametersSelf#focusPopup:member(1)",
-              "docComment": "/**\n * This function is called to find where focus should be sent when the dialog (or menu, popup, etc.) opens.\n *\n * @remarks\n *\n * This **cannot be done deterministically** across all possible scenarios because this is about what makes the most sense as a human.\n *\n * For example, if it's a confirmation dialog about deleting something, *it's best to send focus to the \"cancel\" button*, but there's no way to programmatically know both a) that should be done and b) how to do it.\n *\n * Ideally this function is specified *manually* for every dialog you create.\n *\n * If you really, really, ***genuinely*** cannot determine what should be done in your use case, as a very very last resort, use `findFirstFocusable`, and then if nothing's found focus the body.\n *\n * Just please, please make sure that whatever that first focusable is **isn't** a destructive action, at the very least.\n */\n",
+              "docComment": "/**\n * This function is called to find where focus should be sent when the dialog (or menu, popup, etc.) opens.\n *\n * @remarks\n *\n * This **cannot be done deterministically** across all possible scenarios because this is about what makes the most sense as a human.\n *\n * For example, if it's a confirmation dialog about deleting something, *it's best to send focus to the \"cancel\" button*, but there's no way to programmatically know both a) that should be done and b) how to do it.\n *\n * Ideally this function is specified *manually* for every dialog you create.\n *\n * If you really, really, ***genuinely*** cannot determine what should be done in your use case, as a very very last resort, use `findFirstFocusable`, and then if nothing's found focus the body.\n *\n * Just please, please make sure that whatever that first focusable is **isn't** a destructive action, at the very least.\n *\n * @nonstable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -20529,7 +20537,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseGridNavigationParametersSelf#onTabbableColumnChange:member",
-              "docComment": "/**\n * TODO: This may be called even when there is no actual change in the numeric values\n */\n",
+              "docComment": "/**\n * TODO: This may be called even when there is no actual change in the numeric values\n *\n * @stable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -24291,7 +24299,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseHasCurrentFocusParametersSelf#onCurrentFocusedChanged:member",
-              "docComment": "/**\n * Whether the element itself currently has focus.\n *\n * `prevFocused` is generally the opposite of `focused`, but on mount it's `undefined` while `focused` is probably false (both falsy)\n */\n",
+              "docComment": "/**\n * Whether the element itself currently has focus.\n *\n * `prevFocused` is generally the opposite of `focused`, but on mount it's `undefined` while `focused` is probably false (both falsy)\n *\n * @stable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -24341,7 +24349,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseHasCurrentFocusParametersSelf#onCurrentFocusedInnerChanged:member",
-              "docComment": "/**\n * Like `onFocusedChanged`, but also *additionally* if any child elements are focused.\n *\n * @see\n *\n * this.onFocusedChanged\n */\n",
+              "docComment": "/**\n * Like `onFocusedChanged`, but also *additionally* if any child elements are focused.\n *\n * @see\n *\n * this.onFocusedChanged\n *\n * @stable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -24503,7 +24511,7 @@
             {
               "kind": "MethodSignature",
               "canonicalReference": "preact-prop-helpers!UseHasCurrentFocusReturnTypeSelf#getCurrentFocused:member(1)",
-              "docComment": "/**\n * STABLE\n */\n",
+              "docComment": "/**\n * @stable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -24531,7 +24539,7 @@
             {
               "kind": "MethodSignature",
               "canonicalReference": "preact-prop-helpers!UseHasCurrentFocusReturnTypeSelf#getCurrentFocusedInner:member(1)",
-              "docComment": "/**\n * STABLE\n */\n",
+              "docComment": "/**\n * @stable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -24790,7 +24798,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseHasLastFocusParametersSelf#onLastFocusedChanged:member",
-              "docComment": "/**\n * Similar to `onFocusedChanged`, but if there is no currently focused element, is `true` if this element that *did* have focus last.\n *\n * This is always `true` while `focused` is `true`. If `focused` is `false`, this may be `true` or `false`.\n */\n",
+              "docComment": "/**\n * Similar to `onFocusedChanged`, but if there is no currently focused element, is `true` if this element that *did* have focus last.\n *\n * @remarks\n *\n * This is always `true` while `focused` is `true`. If `focused` is `false`, this may be `true` or `false`.\n *\n * @stable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -24822,7 +24830,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseHasLastFocusParametersSelf#onLastFocusedInnerChanged:member",
-              "docComment": "/**\n * Combines the implications of `onFocusedChanged` and `onFocusedChanged`.\n */\n",
+              "docComment": "/**\n * Combines the implications of `onFocusedChanged` and `onFocusedChanged`.\n *\n * @stable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -26500,7 +26508,7 @@
             {
               "kind": "MethodSignature",
               "canonicalReference": "preact-prop-helpers!UseLinearNavigationParametersSelf#getHighestIndex:member(1)",
-              "docComment": "/**\n * From `useManagedChildren`. This can be higher than the *actual* highest index if you need it to be.\n *\n * @returns [0, n], not [0, n)\n */\n",
+              "docComment": "/**\n * From `useManagedChildren`. This can be higher than the *actual* highest index if you need it to be.\n *\n * @returns [0, n], not [0, n)\n *\n * @stable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -26528,7 +26536,7 @@
             {
               "kind": "MethodSignature",
               "canonicalReference": "preact-prop-helpers!UseLinearNavigationParametersSelf#getLowestIndex:member(1)",
-              "docComment": "/**\n * From `useManagedChildren`. This can be lower than the *actual* lowest index if you need it to be.\n *\n * @see\n *\n * {@link UseLinearNavigationParametersSelf.getLowestIndex}\n */\n",
+              "docComment": "/**\n * From `useManagedChildren`. This can be lower than the *actual* lowest index if you need it to be.\n *\n * @see\n *\n * {@link UseLinearNavigationParametersSelf.getLowestIndex}\n *\n * @stable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -26556,7 +26564,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseLinearNavigationParametersSelf#indexDemangler:member",
-              "docComment": "/**\n * @see\n *\n * {@link UseLinearNavigationParametersSelf.indexMangler}, which does the opposite of this.\n */\n",
+              "docComment": "/**\n * @see\n *\n * {@link UseLinearNavigationParametersSelf.indexMangler}, which does the opposite of this.\n *\n * @stable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -26583,7 +26591,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseLinearNavigationParametersSelf#indexMangler:member",
-              "docComment": "/**\n * When children are sorted, reversed, or otherwise out of order, `indexMangler` is given the `index` of a child and must return its \"visual\" index -- what its `index` would be at that position.\n *\n * @remarks\n *\n * This is provided by {@link useRearrangeableChildren}. If you use this hook as part of {@link useCompleteListNavigation} or {@link useCompleteGridNavigation}, then everything's already wired up and you don't need to worry about this. Otherwise, it's recommended to simply use {@link lodash-es#identity} here.\n */\n",
+              "docComment": "/**\n * When children are sorted, reversed, or otherwise out of order, `indexMangler` is given the `index` of a child and must return its \"visual\" index -- what its `index` would be at that position.\n *\n * @remarks\n *\n * This is provided by {@link useRearrangeableChildren}. If you use this hook as part of {@link useCompleteListNavigation} or {@link useCompleteGridNavigation}, then everything's already wired up and you don't need to worry about this. Otherwise, it's recommended to simply use {@link lodash-es#identity} here.\n *\n * @stable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -26610,7 +26618,7 @@
             {
               "kind": "MethodSignature",
               "canonicalReference": "preact-prop-helpers!UseLinearNavigationParametersSelf#isValid:member(1)",
-              "docComment": "/**\n * Must return true if the child at this index can be navigated to, e.g. `(i) => !getChildren(i)?.hidden`.\n */\n",
+              "docComment": "/**\n * Must return true if the child at this index can be navigated to, e.g. `(i) => !getChildren(i)?.hidden`.\n *\n * @stable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -26709,7 +26717,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseLinearNavigationParametersSelf#onNavigateLinear:member",
-              "docComment": "/**\n * Called when a navigation change as a result of an arrow/home/end/page up/page down key being pressed.\n */\n",
+              "docComment": "/**\n * Called when a navigation change as a result of an arrow/home/end/page up/page down key being pressed.\n *\n * @stable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -30068,7 +30076,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseLostFocusDismissParametersSelf#onDismiss:member",
-              "docComment": "/**\n * Called when the component is dismissed by losing focus\n */\n",
+              "docComment": "/**\n * Called when the component is dismissed by losing focus\n *\n * @nonstable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -30847,7 +30855,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseManagedChildrenParametersSelf#onAfterChildLayoutEffect:member",
-              "docComment": "/**\n * Runs after one or more children have updated their information (index, etc.).\n *\n * Only one will run per tick, just like layoutEffect, but it isn't *guaranteed* to have actually been a change.\n *\n * TODO: This ended up not being needed by anything. Is it necessary? Does it cost anything?\n */\n",
+              "docComment": "/**\n * Runs after one or more children have updated their information (index, etc.).\n *\n * Only one will run per tick, just like layoutEffect, but it isn't *guaranteed* to have actually been a change.\n *\n * TODO: This ended up not being needed by anything. Is it necessary? Does it cost anything?\n *\n * @stable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -30888,7 +30896,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseManagedChildrenParametersSelf#onChildrenCountChange:member",
-              "docComment": "",
+              "docComment": "/**\n * @stable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -30920,7 +30928,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseManagedChildrenParametersSelf#onChildrenMountChange:member",
-              "docComment": "/**\n * Same as the above, but only for mount/unmount (or when a child changes its index)\n */\n",
+              "docComment": "/**\n * Same as the above, but only for mount/unmount (or when a child changes its index)\n *\n * @stable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -33909,7 +33917,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UsePaginatedChildrenReturnTypeSelf#refreshPagination:member",
-              "docComment": "",
+              "docComment": "/**\n * If the values returned by `indexDemangler` change (e.g. when sorting), then this must be called to re-sync everything.\n *\n * @stable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -34113,7 +34121,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UsePaginatedChildReturnTypeSelf#hideBecausePaginated:member",
-              "docComment": "",
+              "docComment": "/**\n * Whether this child should hide itself because the parent is paginated and this child is outside of the current range.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -34139,35 +34147,8 @@
             },
             {
               "kind": "PropertySignature",
-              "canonicalReference": "preact-prop-helpers!UsePaginatedChildReturnTypeSelf#paginatedVisible:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "paginatedVisible: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "boolean"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isReadonly": false,
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "paginatedVisible",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              }
-            },
-            {
-              "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UsePaginatedChildReturnTypeSelf#parentIsPaginated:member",
-              "docComment": "",
+              "docComment": "/**\n * Whether this child is part of a paginated parent component.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -35076,7 +35057,7 @@
             {
               "kind": "MethodSignature",
               "canonicalReference": "preact-prop-helpers!UsePressParametersSelf#excludeEnter:member(1)",
-              "docComment": "/**\n * Pass a function that returns `true` to prevent the enter key from contributing to press events\n */\n",
+              "docComment": "/**\n * Pass a function that returns `true` to prevent the enter key from contributing to press events\n *\n * @nonstable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -35104,7 +35085,7 @@
             {
               "kind": "MethodSignature",
               "canonicalReference": "preact-prop-helpers!UsePressParametersSelf#excludePointer:member(1)",
-              "docComment": "/**\n * Pass a function that returns `true` to prevent the pointer (mouse, touch, etc.) from contributing to press events\n */\n",
+              "docComment": "/**\n * Pass a function that returns `true` to prevent the pointer (mouse, touch, etc.) from contributing to press events\n *\n * @nonstable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -35132,7 +35113,7 @@
             {
               "kind": "MethodSignature",
               "canonicalReference": "preact-prop-helpers!UsePressParametersSelf#excludeSpace:member(1)",
-              "docComment": "/**\n * Pass a function that returns `true` to prevent the spacebar from contributing to press events\n */\n",
+              "docComment": "/**\n * Pass a function that returns `true` to prevent the spacebar from contributing to press events\n *\n * @nonstable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -35160,7 +35141,7 @@
             {
               "kind": "MethodSignature",
               "canonicalReference": "preact-prop-helpers!UsePressParametersSelf#focusSelf:member(1)",
-              "docComment": "/**\n * Ensures that when a button is pressed it properly receives focus (even on iOS Safari).\n *\n * Generally, this should just be `e => e.focus()`\n *\n * @param element - The element that is (presumably) about to receive focus\n */\n",
+              "docComment": "/**\n * Ensures that when a button is pressed it properly receives focus (even on iOS Safari).\n *\n * Generally, this should just be `e => e.focus()`\n *\n * @param element - The element that is (presumably) about to receive focus\n *\n * @nonstable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -35287,7 +35268,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UsePressParametersSelf#onPressSync:member",
-              "docComment": "/**\n * What should happen when this widget has been \"pressed\".\n *\n * This must be a sync event handler; async handlers must be taken care of externally.\n *\n * Setting to `null` or `undefined` effectively disables the press event handler.\n */\n",
+              "docComment": "/**\n * What should happen when this widget has been \"pressed\".\n *\n * This must be a sync event handler; async handlers must be taken care of externally.\n *\n * Setting to `null` or `undefined` effectively disables the press event handler.\n *\n * @nonstable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -35446,7 +35427,7 @@
             {
               "kind": "MethodSignature",
               "canonicalReference": "preact-prop-helpers!UsePressReturnTypeSelf#getIsPressing:member(1)",
-              "docComment": "",
+              "docComment": "/**\n * @stable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -36093,7 +36074,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseRandomIdParametersSelf#prefix:member",
-              "docComment": "/**\n * While all IDs are unique, this can be used to more easily differentiate them.\n *\n * If this is stable, then your props are stable. Simple as that.\n */\n",
+              "docComment": "/**\n * While all IDs are unique, this can be used to more easily differentiate them.\n *\n * If this is stable, then your props are stable. Simple as that.\n *\n * @stable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -36560,7 +36541,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseRearrangeableChildrenParametersSelf#getIndex:member",
-              "docComment": "/**\n * This must return the index of this child relative to all its sortable siblings from its `VNode`.\n *\n * In general, this corresponds to the `index` prop, so something like `vnode => vnode.props.index` is what you're usually looking for.\n */\n",
+              "docComment": "/**\n * This must return the index of this child relative to all its sortable siblings from its `VNode`.\n *\n * @remarks\n *\n * In general, this corresponds to the `index` prop, so something like `vnode => vnode.props.index` is what you're usually looking for.\n *\n * @stable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -36973,7 +36954,7 @@
         {
           "kind": "Function",
           "canonicalReference": "preact-prop-helpers!useRefElement:function(1)",
-          "docComment": "/**\n * Allows you to access the `HTMLElement` rendered by this hook/these props, either as soon as it's available (as a callback), or whenever you need it (as a getter function).\n *\n * @remarks\n *\n * This hook, like many others, works with either `useState` or {@link usePassiveState}. Why use one over the other?\n *\n * * `useState` is familiar and easy to use, but causes the component to re-render itself, which is slow. * `usePassiveState` is faster and more scalable, but its state can't be accessed during render and it's more complex.\n *\n * @example\n *\n * Easiest way to use (but causes an extra re-render 🐌)\n * ```typescript\n * const [element, setElement] = useState<HTMLButtonElement | null>(null);\n * const { propsStable } = useRefElement({ onElementChange: setElement });\n * useEffect(() => {\n *     element.doSomethingFunny();\n * }, [element])\n * ```\n *\n * @example\n *\n * Fastest (but slightly more verbose)\n * ```typescript\n * // The code in useEffect is moved into this callback, but runs at the same time\n * const onElementChange = useCallback(element => element.doSomethingFunny(), []);\n * const [getElement, setElement] = usePassiveState<HTMLButtonElement | null>(onElementChange, returnNull);\n * const { propsStable } = useRefElement({ onElementChange: setElement });\n * ```\n *\n * @compositeParams\n */\n",
+          "docComment": "/**\n * Allows you to access the `HTMLElement` rendered by this hook/these props, either as soon as it's available (as a callback), or whenever you need it (as a getter function).\n *\n * @remarks\n *\n * This hook, like many others, works with either `useState` or {@link usePassiveState}. Why use one over the other?\n * ```md-literal\n * * `useState` is familiar and easy to use, but causes the component to re-render itself, which is slow.\n * * `usePassiveState` is faster and more scalable, but its state can't be accessed during render and it's more complex.\n * ```\n *\n * @example\n *\n * Easiest way to use (but causes an extra re-render 🐌)\n * ```typescript\n * const [element, setElement] = useState<HTMLButtonElement | null>(null);\n * const { propsStable } = useRefElement({ onElementChange: setElement });\n * useEffect(() => {\n *     element.doSomethingFunny();\n * }, [element])\n * ```\n *\n * @example\n *\n * Fastest (but slightly more verbose)\n * ```typescript\n * // The code in useEffect is moved into this callback, but runs at the same time\n * const onElementChange = useCallback(element => element.doSomethingFunny(), []);\n * const [getElement, setElement] = usePassiveState<HTMLButtonElement | null>(onElementChange, returnNull);\n * const { propsStable } = useRefElement({ onElementChange: setElement });\n * ```\n *\n * @compositeParams\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -37141,7 +37122,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseRefElementParametersSelf#onElementChange:member",
-              "docComment": "/**\n * Called with the `Element` when it mounts, called with `null` when it unmounts.\n */\n",
+              "docComment": "/**\n * Called with the `Element` when it mounts, called with `null` when it unmounts.\n *\n * @stable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -37173,7 +37154,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseRefElementParametersSelf#onMount:member",
-              "docComment": "/**\n * Called when the element mounts\n */\n",
+              "docComment": "/**\n * Called when the element mounts\n *\n * @stable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -37200,7 +37181,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseRefElementParametersSelf#onUnmount:member",
-              "docComment": "/**\n * Called when the element unmounts\n */\n",
+              "docComment": "/**\n * Called when the element unmounts\n *\n * @stable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -37371,7 +37352,7 @@
             {
               "kind": "MethodSignature",
               "canonicalReference": "preact-prop-helpers!UseRefElementReturnTypeSelf#getElement:member(1)",
-              "docComment": "/**\n * **STABLE**\n *\n * Call to return the element that the props were rendered to, or `null` if they were not rendered to an element.\n */\n",
+              "docComment": "/**\n * Call to return the element that the props were rendered to, or `null` if they were not rendered to an element.\n *\n * @stable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -37764,7 +37745,7 @@
             {
               "kind": "MethodSignature",
               "canonicalReference": "preact-prop-helpers!UseRovingTabIndexChildInfo#focusSelf:member(1)",
-              "docComment": "/**\n * When we navigate to a child and focus it, we need to know how that child wants to be focused. Generally, this is just getElement().focus(), but you're allowed to supply anything you want here. Grid rows, for example, don't directly focus themselves but instead call one of their cell's `focusSelf`.\n *\n * This is used when the tabbable index changes (we auto-focus the newly tabbable element if applicable), and also by the `focusSelf` value returned by the parent (i.e. `parent.focusSelf` calls one child's `focusSelf`)\n */\n",
+              "docComment": "/**\n * How is this child focused? (Generally just `e => e.focus()`)\n *\n * @remarks\n *\n * In certain cases you may want to focus a different element. When a grid row has its `focusSelf` called, for example, it doesn't focus the row, but instead sends focus further down to a cell.\n *\n * This is used when the tabbable index changes (we auto-focus the newly tabbable element if applicable), and also by the `focusSelf` value returned by the parent (i.e. `parent.focusSelf` calls one child's `focusSelf`)\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -37809,7 +37790,7 @@
             {
               "kind": "MethodSignature",
               "canonicalReference": "preact-prop-helpers!UseRovingTabIndexChildInfo#getElement:member(1)",
-              "docComment": "/**\n * Get from `useRefElement`\n */\n",
+              "docComment": "/**\n * Get this from `useRefElement`\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -37837,7 +37818,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseRovingTabIndexChildInfo#getLocallyTabbable:member",
-              "docComment": "/**\n * @see\n *\n * {@link UseRovingTabIndexChildInfo.setLocallyTabbable}\n */\n",
+              "docComment": "/**\n * Provided by `useRovingTabIndexChild`.\n *\n * @see\n *\n * {@link UseRovingTabIndexChildInfo.setLocallyTabbable}\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -37864,7 +37845,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseRovingTabIndexChildInfo#index:member",
-              "docComment": "/**\n * A **unique integer** (among siblings) representing this child like the index to an array. There can be holes/gaps, and even negative numbers, though iterating over a gap is still O(n) on the size of the gap (kinda low priority TODO cause computers can count fast).\n */\n",
+              "docComment": "/**\n * A **unique integer** (among siblings) representing this child like the index to an array.\n *\n * @remarks\n *\n * There can be holes/gaps, and even negative numbers, though iterating over a gap is still O(n) on the size of the gap (kinda low priority TODO cause computers can count fast).\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -37891,7 +37872,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseRovingTabIndexChildInfo#setLocallyTabbable:member",
-              "docComment": "/**\n * Provided by `useRovingTabIndexChild`.\n *\n * Used by the parent to control a child's internal tabbable state.\n */\n",
+              "docComment": "/**\n * Provided by `useRovingTabIndexChild`.\n *\n * @remarks\n *\n * Used by the parent to control a child's internal tabbable state.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -37923,7 +37904,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseRovingTabIndexChildInfo#untabbable:member",
-              "docComment": "/**\n * If a child **exists** (i.e. calls `useRovingTabIndexChild` or its derivatives in some way) but **can't be tabbed to** (because it's e.g. `display: none`), then set this to `true`.\n *\n * This cannot be calculated automatically. It's *possible* to catch something like `display: none` with some reflow-forcing `getComputedStyles` or something, but if the child is untabbable because it's disabled or staggered or paginated or something we just have no way of knowing. It could be untabbable for any arbitrary reason the user decides.\n *\n * If the child is **missing** instead (i.e. it does not exist), then there's no issue. You couldn't even supply this property because the child who would supply it is, by definition, missing. This is, to be clear, about **existing** children whomst are untabbable for any reason at all.\n */\n",
+              "docComment": "/**\n * If a child **exists** (i.e. calls `useRovingTabIndexChild` or its derivatives in some way) but **can't be tabbed to** (because it's e.g. `display: none`), then set this to `true`.\n *\n * @remarks\n *\n * This cannot be calculated automatically. It's *possible* to catch something like `display: none` with some reflow-forcing `getComputedStyles` or something, but if the child is untabbable because it's disabled or staggered or paginated or something we just have no way of knowing. It could be untabbable for any arbitrary reason the user decides.\n *\n * If the child is **missing** instead (i.e. it does not exist), then there's no issue. You couldn't even supply this property because the child who would supply it is, by definition, missing. This is, to be clear, about **existing** children whomst are untabbable for any reason at all.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -38380,7 +38361,7 @@
             {
               "kind": "MethodSignature",
               "canonicalReference": "preact-prop-helpers!UseRovingTabIndexChildReturnTypeSelf#getTabbable:member(1)",
-              "docComment": "/**\n * **STABLE**\n */\n",
+              "docComment": "/**\n * @stable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -38408,7 +38389,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseRovingTabIndexChildReturnTypeSelf#tabbable:member",
-              "docComment": "/**\n * *Unstable*\n *\n * Whether this child, individually, is *the* currently tabbable child.\n */\n",
+              "docComment": "/**\n * Whether this child, individually, is *the* currently tabbable child.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -39090,7 +39071,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseRovingTabIndexReturnTypeSelf#focusSelf:member",
-              "docComment": "/**\n * **STABLE**\n *\n * Call to focus the currently tabbable child.\n */\n",
+              "docComment": "/**\n * Call to focus the currently tabbable child.\n *\n * @stable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -39117,7 +39098,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseRovingTabIndexReturnTypeSelf#getTabbableIndex:member",
-              "docComment": "/**\n * **STABLE**\n */\n",
+              "docComment": "/**\n * Returns the index of the child that is currently tabbable.\n *\n * @stable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -39144,7 +39125,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseRovingTabIndexReturnTypeSelf#setTabbableIndex:member",
-              "docComment": "/**\n * **STABLE**\n *\n * Can be used to programmatically change which child is the currently tabbable one.\n *\n * `fromUserInteraction` determines if this was a user-generated event that should focus the newly tabbable child, or a programmatic event that should leave the user's focus where the user currently is, because they didn't do that.\n */\n",
+              "docComment": "/**\n * Can be used to programmatically change which child is the currently tabbable one.\n *\n * `fromUserInteraction` determines if this was a user-generated event that should focus the newly tabbable child, or a programmatic event that should leave the user's focus where the user currently is, because they didn't do that.\n *\n * @stable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -39661,7 +39642,7 @@
         {
           "kind": "Function",
           "canonicalReference": "preact-prop-helpers!useSingleSelection:function(1)",
-          "docComment": "/**\n * @hasChild\n *\n * {@link useSingleSelectionChild}\n *\n * @compositeParams\n */\n",
+          "docComment": "/**\n * Allows a single child among all children to be the \"selected\" child (which can be different from the \"focused\" child).\n *\n * @remarks\n *\n * If you need multi-select instead of single-select and you're using this hook (e.g. as part of {@link useCompleteListNavigation}), you can disable the single-selection behavior either by setting the selected index to `null` or.\n *\n * @hasChild\n *\n * {@link useSingleSelectionChild}\n *\n * @compositeParams\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -40367,6 +40348,28 @@
             },
             {
               "kind": "Content",
+              "text": ", "
+            },
+            {
+              "kind": "Reference",
+              "text": "TargetedPick",
+              "canonicalReference": "preact-prop-helpers!TargetedPick:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "UsePressParameters",
+              "canonicalReference": "preact-prop-helpers!UsePressParameters:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<any>, \"pressParameters\", \"onPressSync\">"
+            },
+            {
+              "kind": "Content",
               "text": " "
             }
           ],
@@ -40503,6 +40506,10 @@
             {
               "startIndex": 3,
               "endIndex": 5
+            },
+            {
+              "startIndex": 6,
+              "endIndex": 10
             }
           ]
         },
@@ -40524,7 +40531,7 @@
             {
               "kind": "MethodSignature",
               "canonicalReference": "preact-prop-helpers!UseSingleSelectionChildReturnTypeSelf#getSelected:member(1)",
-              "docComment": "/**\n * @see\n *\n * selected\n */\n",
+              "docComment": "/**\n * @stable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -40552,7 +40559,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseSingleSelectionChildReturnTypeSelf#getSelectedOffset:member",
-              "docComment": "/**\n * @see\n *\n * selectedOffset\n */\n",
+              "docComment": "/**\n * @stable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -41182,7 +41189,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseSingleSelectionParametersSelf#onSelectedIndexChange:member",
-              "docComment": "/**\n * Called when a child is selected (via a press or other method).\n *\n * If this component is declaratively controlled (with e.g. `useSingleSelectionDeclarative`), then you should use this to `setState` somewhere that'll change your `selectedIndex`.\n *\n * If this component is imperatively controlled, then you should hook this up to the returned `changeSelectedIndex` function to have the desired change occur.\n *\n * In general, this should only be `null` when single selection is entirely disabled.\n */\n",
+              "docComment": "/**\n * Called when a child is selected (via a press or other method).\n *\n * If this component is declaratively controlled (with e.g. `useSingleSelectionDeclarative`), then you should use this to `setState` somewhere that'll change your `selectedIndex`.\n *\n * If this component is imperatively controlled, then you should hook this up to the returned `changeSelectedIndex` function to have the desired change occur.\n *\n * In general, this should only be `null` when single selection is entirely disabled.\n *\n * @nonstable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -41406,7 +41413,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseSingleSelectionReturnTypeSelf#changeSelectedIndex:member",
-              "docComment": "/**\n * A function that, when called, internally updates the selected index to the one you provide, and tells the relevant children that they are/are not selected.\n *\n * If you are creating an imperative component, this is what how you can force the value to change in response to something.\n *\n * If you are creating a declarative component, this is what you call in `useEffect` when your `selectedIndex` changes.\n */\n",
+              "docComment": "/**\n * A function that, when called, internally updates the selected index to the one you provide, and tells the relevant children that they are/are not selected.\n *\n * If you are creating an imperative component, this is what how you can force the value to change in response to something.\n *\n * If you are creating a declarative component, this is what you call in `useEffect` when your `selectedIndex` changes.\n *\n * @stable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -41447,7 +41454,7 @@
             {
               "kind": "MethodSignature",
               "canonicalReference": "preact-prop-helpers!UseSingleSelectionReturnTypeSelf#getSelectedIndex:member(1)",
-              "docComment": "",
+              "docComment": "/**\n * @stable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -42926,7 +42933,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseStaggeredChildrenParametersSelf#staggered:member",
-              "docComment": "",
+              "docComment": "/**\n * If true, each child will delay rendering itself until the one before it has.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -43045,7 +43052,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseStaggeredChildrenReturnTypeSelf#stillStaggering:member",
-              "docComment": "",
+              "docComment": "/**\n * Whether any children are still waiting to show themselves because of the staggering behavior\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -43231,7 +43238,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseStaggeredChildReturnTypeSelf#hideBecauseStaggered:member",
-              "docComment": "/**\n * If this is true, you should delay showing *your* children or running other heavy logic until this becomes false.\n *\n * Can be as simple as `<div>{hideBecauseStaggered? null : children}</div>`\n */\n",
+              "docComment": "/**\n * If this is true, you should delay showing *your* children or running other heavy logic until this becomes false. Can be as simple as `<div>{hideBecauseStaggered? null : children}</div>`\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -44830,7 +44837,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseTypeaheadNavigationParametersSelf#collator:member",
-              "docComment": "/**\n * A collator to use when comparing. If not provided, simply uses `localeCompare` after transforming each to lowercase, which will, at best, work okay in English.\n */\n",
+              "docComment": "/**\n * A collator to use when comparing. If not provided, simply uses `localeCompare` after transforming each to lowercase, which will, at best, work okay in English.\n *\n * @nonstable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -44862,7 +44869,7 @@
             {
               "kind": "MethodSignature",
               "canonicalReference": "preact-prop-helpers!UseTypeaheadNavigationParametersSelf#isValid:member(1)",
-              "docComment": "/**\n * Must return true if the given child can be navigated to.\n *\n * Generally corresponds to a `hidden` or `disabled` prop.\n *\n * @param index - Which child to query\n */\n",
+              "docComment": "/**\n * Must return true if the given child can be navigated to.\n *\n * Generally corresponds to a `hidden` or `disabled` prop.\n *\n * @param index - Which child to query\n *\n * @nonstable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -44934,7 +44941,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseTypeaheadNavigationParametersSelf#onNavigateTypeahead:member",
-              "docComment": "/**\n * **Optional**\n *\n * Called any time the currently tabbable index changes as a result of a typeahead-related keypress\n */\n",
+              "docComment": "/**\n * **Optional**\n *\n * Called any time the currently tabbable index changes as a result of a typeahead-related keypress\n *\n * @nonstable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",

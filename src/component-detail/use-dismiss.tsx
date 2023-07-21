@@ -32,6 +32,8 @@ export interface UseDismissParametersSelf<Listeners extends DismissListenerTypes
      * Called any time the user has requested the component be dismissed for the given reason.
      * 
      * You can choose to ignore a reason if you want, but it's better to set `closeOn${reason}` to `false` instead.
+     * 
+     * @nonstable
      */
     onClose: (reason: Listeners) => void;
 

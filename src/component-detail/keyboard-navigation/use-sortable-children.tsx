@@ -17,7 +17,9 @@ export interface UseRearrangeableChildrenParametersSelf {
     /**
      * This must return the index of this child relative to all its sortable siblings from its `VNode`.
      * 
-     * In general, this corresponds to the `index` prop, so something like `vnode => vnode.props.index` is what you're usually looking for.
+     * @remarks In general, this corresponds to the `index` prop, so something like `vnode => vnode.props.index` is what you're usually looking for.
+     * 
+     * @stable
      */
     getIndex: GetIndex;
 

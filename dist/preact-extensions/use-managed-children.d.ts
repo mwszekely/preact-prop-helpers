@@ -34,12 +34,20 @@ export interface UseManagedChildrenParametersSelf<M extends ManagedChildInfo<any
      * *guaranteed* to have actually been a change.
      *
      * TODO: This ended up not being needed by anything. Is it necessary? Does it cost anything?
+     *
+     * @stable
      */
     onAfterChildLayoutEffect?: Nullable<OnAfterChildLayoutEffect<M["index"]>>;
     /**
      * Same as the above, but only for mount/unmount (or when a child changes its index)
+     *
+     * @stable
      */
     onChildrenMountChange?: Nullable<OnChildrenMountChange<M["index"]>>;
+    /**
+     *
+     * @stable
+     */
     onChildrenCountChange?: Nullable<((count: number) => void)>;
 }
 export interface UseManagedChildrenParameters<M extends ManagedChildInfo<any>> {
@@ -160,11 +168,15 @@ export interface UseChildrenFlagParameters<M extends ManagedChildInfo<any>, R> {
      *
      * Notably, the value can be different than what was called with changeIndex()
      * if the requested index didn't exist or was hidden.
+     *
+     * @stable
      */
     onIndexChange: null | OnPassiveStateChange<M["index"] | null, R>;
+    /** @stable */
     setAt(index: M, value: boolean, newSelectedIndex: M["index"] | null, prevSelectedIndex: M["index"] | null): void;
+    /** @stable */
     getAt(index: M): boolean;
-    /** Must be at least quasi-stable (always stable, doesn't need to be called during render) */
+    /** Must be at least quasi-stable (always stable, doesn't need to be called during render) @stable */
     isValid(index: M): boolean;
 }
 export interface UseChildrenFlagReturnType<M extends ManagedChildInfo<any>, R> {

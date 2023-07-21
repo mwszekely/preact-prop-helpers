@@ -34,6 +34,8 @@ export interface UseGridNavigationCellContextSelf {
 export interface UseGridNavigationParametersSelf {
     /**
      * TODO: This may be called even when there is no actual change in the numeric values
+     * 
+     * @stable
      */
     onTabbableColumnChange: OnPassiveStateChange<TabbableColumnInfo, Event> | null;
 }

@@ -59,6 +59,7 @@ export function useListNavigationSingleSelectionChild<ChildElement extends Eleme
         info: infoSS,
         singleSelectionChildReturn,
         props: propsSS,
+        pressParameters: { onPressSync },
         ...void9
     } = useSingleSelectionChild<ChildElement, M>({
         info,
@@ -67,7 +68,7 @@ export function useListNavigationSingleSelectionChild<ChildElement extends Eleme
 
     const {
         hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void6 },
-        pressParameters,
+        pressParameters: { excludeSpace },
         rovingTabIndexChildReturn,
         textContentReturn,
         props: propsLN,
@@ -93,7 +94,7 @@ export function useListNavigationSingleSelectionChild<ChildElement extends Eleme
                 ocfic2?.(focused, previouslyFocused, e);
             })
         },
-        pressParameters,
+        pressParameters: { onPressSync, excludeSpace },
         info: { ...infoSS, ...infoLN },
         rovingTabIndexChildReturn,
         singleSelectionChildReturn,

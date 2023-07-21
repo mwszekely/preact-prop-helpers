@@ -13,6 +13,8 @@ export interface UseLostFocusDismissParametersSelf {
 
     /**
      * Called when the component is dismissed by losing focus
+     * 
+     * @nonstable
      */
     onDismiss: EnhancedEventHandler<FocusEventType<any>, { reason: "lost-focus" }>;
 

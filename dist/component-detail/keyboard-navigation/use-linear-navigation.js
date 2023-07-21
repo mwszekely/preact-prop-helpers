@@ -19,7 +19,7 @@ export function useLinearNavigation({ rovingTabIndexReturn, linearNavigationPara
     monitorCallCount(useLinearNavigation);
     const { getLowestIndex, getHighestIndex, indexDemangler, indexMangler, isValid, navigatePastEnd, navigatePastStart, onNavigateLinear } = linearNavigationParameters;
     const { getTabbableIndex, setTabbableIndex } = rovingTabIndexReturn;
-    useEnsureStability("useLinearNavigation", onNavigateLinear);
+    useEnsureStability("useLinearNavigation", onNavigateLinear, isValid, indexDemangler, indexMangler);
     const navigateAbsolute = useCallback((requestedIndexMangled, searchDirection, e, fromUserInteraction, mode) => {
         const highestChildIndex = getHighestIndex();
         const lowestChildIndex = getLowestIndex();

@@ -58,22 +58,25 @@ export interface UseRovingTabIndexParametersSelf<ParentElement extends Element, 
 export interface UseRovingTabIndexReturnTypeSelf {
 
     /** 
-     * **STABLE**
-     * 
      * Can be used to programmatically change which child is the currently tabbable one.
      * 
      * `fromUserInteraction` determines if this was a user-generated event that should focus the newly tabbable child,
      * or a programmatic event that should leave the user's focus where the user currently is, because they didn't do that.
      * 
+     * @stable
      */
     setTabbableIndex: SetTabbableIndex;
 
-    /** **STABLE** */
+    /** 
+     * Returns the index of the child that is currently tabbable.
+     * 
+     * @stable
+     */
     getTabbableIndex: () => number | null;
     /** 
-     * **STABLE**
-     * 
      * Call to focus the currently tabbable child.
+     * 
+     * @stable
      */
     focusSelf: (reason?: any) => void;
 }
@@ -81,18 +84,20 @@ export interface UseRovingTabIndexReturnTypeSelf {
 
 export interface UseRovingTabIndexChildInfo<TabbableChildElement extends Element> extends ManagedChildInfo<number> {
 
-
     /**
      * A **unique integer** (among siblings) representing this child like the index to an array. 
-     * There can be holes/gaps, and even negative numbers, though iterating over a gap is still O(n) on the size of the gap (kinda low priority TODO cause computers can count fast).
+     * 
+     * @remarks There can be holes/gaps, and even negative numbers, though iterating over a gap is still O(n) on the size of the gap (kinda low priority TODO cause computers can count fast).
      */
     index: number;
 
 
     /**
-     * When we navigate to a child and focus it, we need to know how that child wants to be focused.
-     * Generally, this is just getElement().focus(), but you're allowed to supply anything you want here.
-     * Grid rows, for example, don't directly focus themselves but instead call one of their cell's `focusSelf`.
+     * How is this child focused? (Generally just `e => e.focus()`)
+     * 
+     * @remarks In certain cases you may want to focus a different element.
+     * When a grid row has its `focusSelf` called, for example, it doesn't focus the row,
+     * but instead sends focus further down to a cell.
      * 
      * This is used when the tabbable index changes (we auto-focus the newly tabbable element if applicable),
      * and also by the `focusSelf` value returned by the parent (i.e. `parent.focusSelf` calls one child's `focusSelf`)
@@ -100,14 +105,14 @@ export interface UseRovingTabIndexChildInfo<TabbableChildElement extends Element
     focusSelf(e: TabbableChildElement): void;
 
     /**
-     * Get from `useRefElement`
+     * Get this from `useRefElement`
      */
     getElement(): TabbableChildElement | null;
 
     /**
      * If a child **exists** (i.e. calls `useRovingTabIndexChild` or its derivatives in some way) but **can't be tabbed to** (because it's e.g. `display: none`), then set this to `true`.
      * 
-     * This cannot be calculated automatically. It's *possible* to catch something like `display: none` with some reflow-forcing `getComputedStyles` or something,
+     * @remarks This cannot be calculated automatically. It's *possible* to catch something like `display: none` with some reflow-forcing `getComputedStyles` or something,
      * but if the child is untabbable because it's disabled or staggered or paginated or something we just have no way of knowing. 
      * It could be untabbable for any arbitrary reason the user decides.
      * 
@@ -121,10 +126,13 @@ export interface UseRovingTabIndexChildInfo<TabbableChildElement extends Element
     /** 
      * Provided by `useRovingTabIndexChild`. 
      * 
-     * Used by the parent to control a child's internal tabbable state. */
+     * @remarks Used by the parent to control a child's internal tabbable state.
+     */
     setLocallyTabbable: StateUpdater<boolean>;
 
     /** 
+     * Provided by `useRovingTabIndexChild`. 
+     * 
      * @see {@link UseRovingTabIndexChildInfo.setLocallyTabbable} 
      */
     getLocallyTabbable: () => boolean;
@@ -191,14 +199,14 @@ export interface RovingTabIndexChildContext {
 }
 
 export interface UseRovingTabIndexChildReturnTypeSelf {
-    /**
-     * *Unstable*
-     * 
+    /** 
      * Whether this child, individually, is *the* currently tabbable child.
      */
     tabbable: boolean;
 
-    /** **STABLE** */
+    /** 
+     * @stable
+     */
     getTabbable(): boolean;
 
 }

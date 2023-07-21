@@ -5,9 +5,10 @@ import { monitorCallCount } from "../util/use-call-count.js";
 
 export interface UseRefElementReturnTypeSelf<T extends EventTarget> {
     /** 
-     * **STABLE**
      * 
      * Call to return the element that the props were rendered to, or `null` if they were not rendered to an element.
+     * 
+     * @stable
      */
     getElement(): T | null;
 }
@@ -18,11 +19,21 @@ export interface UseRefElementReturnType<T extends EventTarget> {
 export interface UseRefElementParametersSelf<T> {
     /**
      * Called with the `Element` when it mounts, called with `null` when it unmounts.
+     * 
+     * @stable
      */
     onElementChange?: OnPassiveStateChange<T | null, never>;
-    /** Called when the element mounts */
+    /** 
+     * Called when the element mounts 
+     * 
+     * @stable
+     */
     onMount?: (element: T) => void;
-    /** Called when the element unmounts */
+    /** 
+     * Called when the element unmounts
+     * 
+     * @stable 
+     */
     onUnmount?: (element: T) => void;
 }
 
@@ -44,8 +55,10 @@ export interface UseRefElementParameters<T> {
  * 
  * This hook, like many others, works with either `useState` or {@link usePassiveState}. Why use one over the other?
  * 
+ * ```md-literal
  * * `useState` is familiar and easy to use, but causes the component to re-render itself, which is slow.
  * * `usePassiveState` is faster and more scalable, but its state can't be accessed during render and it's more complex.
+ * ```
  * 
  * @example
  * Easiest way to use (but causes an extra re-render 🐌)
@@ -105,7 +118,7 @@ export function useRefElement<T extends EventTarget>(args: UseRefElementParamete
     // the props and allows us to actually find the element
     return {
         propsStable: propsStable.current,
-        
+
         refElementReturn: {
             getElement,
         }

@@ -11,7 +11,12 @@ export interface UseStaggeredChildrenInfo<E extends Element> extends Pick<UseRov
     setStaggeredVisible(visible: boolean): void;
 }
 
-export interface UseStaggeredChildrenParametersSelf { staggered: boolean; }
+export interface UseStaggeredChildrenParametersSelf { 
+    /**
+     * If true, each child will delay rendering itself until the one before it has.
+     */
+    staggered: boolean;
+ }
 
 export interface UseStaggeredChildrenParameters<E extends Element, M extends UseStaggeredChildrenInfo<E>> extends Pick<UseManagedChildrenReturnType<M>, "managedChildrenReturn"> {
     staggeredChildrenParameters: UseStaggeredChildrenParametersSelf;
@@ -34,7 +39,12 @@ export interface UseStaggeredChildrenReturnType {
     context: UseStaggeredChildContext;
 }
 
-export interface UseStaggeredChildrenReturnTypeSelf  { stillStaggering: boolean }
+export interface UseStaggeredChildrenReturnTypeSelf  { 
+    /**
+     * Whether any children are still waiting to show themselves because of the staggering behavior
+     */
+    stillStaggering: boolean;
+ }
 
 
 export interface UseStaggeredChildParameters {
@@ -45,12 +55,13 @@ export interface UseStaggeredChildParameters {
 
 export interface UseStaggeredChildReturnTypeSelf {
 
-    /** Whether the parent has indicated that all of its children, including this one, are staggered. */
+    /** 
+     * Whether the parent has indicated that all of its children, including this one, are staggered. 
+     */
     parentIsStaggered: boolean;
 
     /** 
      * If this is true, you should delay showing *your* children or running other heavy logic until this becomes false.
-     * 
      * Can be as simple as `<div>{hideBecauseStaggered? null : children}</div>`
      */
     hideBecauseStaggered: boolean;
