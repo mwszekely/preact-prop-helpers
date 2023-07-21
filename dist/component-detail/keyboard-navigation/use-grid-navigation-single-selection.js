@@ -48,13 +48,17 @@ export function useGridNavigationSingleSelection({ gridNavigationParameters, lin
 }
 export function useGridNavigationSingleSelectionRow({ info: mcp1, linearNavigationParameters, managedChildrenReturn, refElementReturn, rovingTabIndexParameters, textContentParameters, typeaheadNavigationParameters, context: { gridNavigationRowContext, rovingTabIndexContext, singleSelectionContext, typeaheadNavigationContext }, ...void1 }) {
     monitorCallCount(useGridNavigationSingleSelectionRow);
-    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1 }, info: mcp2, props: propsSS, singleSelectionChildReturn, pressParameters: { onPressSync }, ...void2 } = useSingleSelectionChild({ info: mcp1, context: { singleSelectionContext } });
-    const { context, hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2 }, linearNavigationReturn, managedChildrenParameters, pressParameters: { excludeSpace }, props: propsGN, rovingTabIndexChildReturn, rovingTabIndexReturn, textContentReturn, typeaheadNavigationReturn, info: mcp3, ...void3 } = useGridNavigationRow({ context: { gridNavigationRowContext, rovingTabIndexContext, typeaheadNavigationContext }, linearNavigationParameters, info: mcp1, managedChildrenReturn, refElementReturn, rovingTabIndexParameters, textContentParameters, typeaheadNavigationParameters });
+    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void6 }, info: mcp2, props: propsSS, singleSelectionChildReturn, pressParameters: { onPressSync, ...void4 }, ...void2 } = useSingleSelectionChild({ info: mcp1, context: { singleSelectionContext } });
+    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ...void7 }, info: mcp3, props: propsGN, linearNavigationReturn, managedChildrenParameters, pressParameters: { excludeSpace, ...void5 }, rovingTabIndexChildReturn, rovingTabIndexReturn, textContentReturn, typeaheadNavigationReturn, context, ...void3 } = useGridNavigationRow({ context: { gridNavigationRowContext, rovingTabIndexContext, typeaheadNavigationContext }, linearNavigationParameters, info: mcp1, managedChildrenReturn, refElementReturn, rovingTabIndexParameters, textContentParameters, typeaheadNavigationParameters });
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     assertEmptyObject(void3);
+    assertEmptyObject(void4);
+    assertEmptyObject(void5);
+    assertEmptyObject(void6);
+    assertEmptyObject(void7);
     return {
-        context,
+        context: { ...context, singleSelectionContext },
         linearNavigationReturn,
         info: { ...mcp2, ...mcp3 },
         managedChildrenParameters,

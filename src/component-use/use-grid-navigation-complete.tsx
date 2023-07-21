@@ -87,7 +87,7 @@ export interface UseCompleteGridNavigationReturnType<ParentOrRowElement extends 
 }
 
 export interface UseCompleteGridNavigationRowReturnType<RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement, CellElement>, CM extends UseCompleteGridNavigationCellInfo<CellElement>> extends
-    OmitStrong<UseGridNavigationSingleSelectionSortableRowReturnType<RowElement, CellElement, RM, CM>, "hasCurrentFocusParameters" | "context" | "managedChildrenParameters" | "info" | "pressParameters" | "textContentReturn">,
+    OmitStrong<UseGridNavigationSingleSelectionSortableRowReturnType<RowElement, CellElement, RM, CM>, "hasCurrentFocusParameters" | "context" | "managedChildrenParameters" | "info" | "textContentReturn">,
     Pick<UseManagedChildrenReturnType<CM>, "managedChildrenReturn">,
     Pick<UseHasCurrentFocusReturnType<RowElement>, "hasCurrentFocusReturn">,
     Pick<UseManagedChildReturnType<RM>, "managedChildReturn">,
@@ -264,7 +264,7 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
     const {
         linearNavigationReturn,
         managedChildrenParameters,
-        pressParameters: { excludeSpace },  // TODO: Pass this through context? (this is for children, so it doesn't actually matter, but for completeness...)
+        pressParameters,
         rovingTabIndexChildReturn,
         rovingTabIndexReturn,
         singleSelectionChildReturn,
@@ -313,6 +313,7 @@ export function useCompleteGridNavigationRow<RowElement extends Element, CellEle
     assertEmptyObject(void4);
 
     return {
+        pressParameters,
         hasCurrentFocusReturn,
         managedChildrenReturn,
         context,

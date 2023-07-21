@@ -402,7 +402,7 @@ Every member of `UseCompleteGridNavigationParameters` is inherited (see the inte
 
 #### UseCompleteGridNavigationReturnType
 
-<small>`extends` [`UsePaginatedChildrenReturnType`](#usepaginatedchildrenreturntype), [`UseStaggeredChildrenReturnType`](#usestaggeredchildrenreturntype), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseChildrenHaveFocusReturnType`](#usechildrenhavefocusreturntype), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype), [`UseTypeaheadNavigationReturnType`](#usetypeaheadnavigationreturntype), [`UseLinearNavigationReturnType`](#uselinearnavigationreturntype), [`UseListNavigationReturnType`](#uselistnavigationreturntype), [`UseGridNavigationReturnType`](#usegridnavigationreturntype), [`UseSingleSelectionReturnType`](#usesingleselectionreturntype), [`UseRearrangeableChildrenReturnType`](#userearrangeablechildrenreturntype), [`UseSortableChildrenReturnType`](#usesortablechildrenreturntype), [`UseManagedChildrenParameters`](#usemanagedchildrenparameters), [`UseChildrenHaveFocusParameters`](#usechildrenhavefocusparameters)</small>
+<small>`extends` [`UsePaginatedChildrenReturnType`](#usepaginatedchildrenreturntype), [`UseStaggeredChildrenReturnType`](#usestaggeredchildrenreturntype), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseChildrenHaveFocusReturnType`](#usechildrenhavefocusreturntype), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype), [`UseTypeaheadNavigationReturnType`](#usetypeaheadnavigationreturntype), [`UseLinearNavigationReturnType`](#uselinearnavigationreturntype), [`UseListNavigationReturnType`](#uselistnavigationreturntype), [`UseGridNavigationReturnType`](#usegridnavigationreturntype), [`UseSingleSelectionReturnType`](#usesingleselectionreturntype), [`UseGridNavigationSingleSelectionReturnType`](#usegridnavigationsingleselectionreturntype), [`UseRearrangeableChildrenReturnType`](#userearrangeablechildrenreturntype), [`UseSortableChildrenReturnType`](#usesortablechildrenreturntype), [`UseManagedChildrenParameters`](#usemanagedchildrenparameters), [`UseChildrenHaveFocusParameters`](#usechildrenhavefocusparameters)</small>
 
 |Member|Type|Description|Is stable?|
 |---------|----|-----------|----------|
@@ -428,7 +428,7 @@ Every member of `UseCompleteGridNavigationParameters` is inherited (see the inte
 
 ##### UseCompleteGridNavigationRowReturnType
 
-<small>`extends` [`UseRefElementReturnType`](#userefelementreturntype), [`UseRovingTabIndexChildReturnType`](#userovingtabindexchildreturntype), [`UseTextContentReturnType`](#usetextcontentreturntype), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype), [`UseTypeaheadNavigationReturnType`](#usetypeaheadnavigationreturntype), [`UseLinearNavigationReturnType`](#uselinearnavigationreturntype), [`UseListNavigationReturnType`](#uselistnavigationreturntype), [`UseGridNavigationRowReturnType`](#usegridnavigationrowreturntype), [`UseSingleSelectionChildReturnType`](#usesingleselectionchildreturntype), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseHasCurrentFocusReturnType`](#usehascurrentfocusreturntype), [`UseManagedChildReturnType`](#usemanagedchildreturntype), [`UsePaginatedChildReturnType`](#usepaginatedchildreturntype), [`UseStaggeredChildReturnType`](#usestaggeredchildreturntype), [`UseHasCurrentFocusParameters`](#usehascurrentfocusparameters), [`UsePressParameters`](#usepressparameters), [`UseManagedChildrenParameters`](#usemanagedchildrenparameters)</small>
+<small>`extends` [`UseRefElementReturnType`](#userefelementreturntype), [`UseRovingTabIndexChildReturnType`](#userovingtabindexchildreturntype), [`UseTextContentReturnType`](#usetextcontentreturntype), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype), [`UseTypeaheadNavigationReturnType`](#usetypeaheadnavigationreturntype), [`UseLinearNavigationReturnType`](#uselinearnavigationreturntype), [`UseListNavigationReturnType`](#uselistnavigationreturntype), [`UseGridNavigationRowReturnType`](#usegridnavigationrowreturntype), [`UseSingleSelectionChildReturnType`](#usesingleselectionchildreturntype), [`UseGridNavigationSingleSelectionRowReturnType`](#usegridnavigationsingleselectionrowreturntype), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseHasCurrentFocusReturnType`](#usehascurrentfocusreturntype), [`UseManagedChildReturnType`](#usemanagedchildreturntype), [`UsePaginatedChildReturnType`](#usepaginatedchildreturntype), [`UseStaggeredChildReturnType`](#usestaggeredchildreturntype), [`UseHasCurrentFocusParameters`](#usehascurrentfocusparameters), [`UsePressParameters`](#usepressparameters), [`UseManagedChildrenParameters`](#usemanagedchildrenparameters)</small>
 
 |Member|Type|Description|Is stable?|
 |---------|----|-----------|----------|
@@ -2536,7 +2536,9 @@ export type ElementProps<E extends EventTarget> = JSX.HTMLAttributes<E>;
 ## The following items are missing their documentation (or should not have been linked to):
 
 
+##### UseGridNavigationSingleSelectionReturnType
 ##### UseRovingTabIndexChildInfoKeysParameters
+##### UseGridNavigationSingleSelectionRowReturnType
 ##### getLowestIndex
 ##### indexMangler
 ##### navigatePastStart

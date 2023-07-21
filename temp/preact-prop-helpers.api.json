@@ -13961,7 +13961,7 @@
             },
             {
               "kind": "Content",
-              "text": "<RowElement, CellElement, RM, CM>, \"hasCurrentFocusParameters\" | \"context\" | \"managedChildrenParameters\" | \"info\" | \"pressParameters\" | \"textContentReturn\">"
+              "text": "<RowElement, CellElement, RM, CM>, \"hasCurrentFocusParameters\" | \"context\" | \"managedChildrenParameters\" | \"info\" | \"textContentReturn\">"
             },
             {
               "kind": "Content",
@@ -22402,7 +22402,36 @@
           ],
           "name": "UseGridNavigationSingleSelectionReturnType",
           "preserveMemberOrder": false,
-          "members": [],
+          "members": [
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "preact-prop-helpers!UseGridNavigationSingleSelectionReturnType#context:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "context: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "UseGridNavigationRowSingleSelectionContext",
+                  "canonicalReference": "preact-prop-helpers!UseGridNavigationRowSingleSelectionContext:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "context",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            }
+          ],
           "extendsTokenRanges": [
             {
               "startIndex": 13,
@@ -22851,7 +22880,36 @@
           ],
           "name": "UseGridNavigationSingleSelectionRowReturnType",
           "preserveMemberOrder": false,
-          "members": [],
+          "members": [
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "preact-prop-helpers!UseGridNavigationSingleSelectionRowReturnType#context:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "context: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "UseGridNavigationCellSingleSelectionContext",
+                  "canonicalReference": "preact-prop-helpers!UseGridNavigationCellSingleSelectionContext:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "context",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            }
+          ],
           "extendsTokenRanges": [
             {
               "startIndex": 11,

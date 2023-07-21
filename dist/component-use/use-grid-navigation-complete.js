@@ -112,8 +112,7 @@ export function useCompleteGridNavigationRow({ info, context: contextIncomingFor
         info,
         textContentParameters
     });
-    const { linearNavigationReturn, managedChildrenParameters, pressParameters: { excludeSpace }, // TODO: Pass this through context? (this is for children, so it doesn't actually matter, but for completeness...)
-    rovingTabIndexChildReturn, rovingTabIndexReturn, singleSelectionChildReturn, textContentReturn, typeaheadNavigationReturn, context: contextGNR, info: infoRowReturn, props: p3, hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void3 }, ...void2 } = r;
+    const { linearNavigationReturn, managedChildrenParameters, pressParameters, rovingTabIndexChildReturn, rovingTabIndexReturn, singleSelectionChildReturn, textContentReturn, typeaheadNavigationReturn, context: contextGNR, info: infoRowReturn, props: p3, hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void3 }, ...void2 } = r;
     const { context: contextMC, managedChildrenReturn } = useManagedChildren({ managedChildrenParameters });
     const completeInfo = {
         getElement: refElementReturn.getElement,
@@ -137,6 +136,7 @@ export function useCompleteGridNavigationRow({ info, context: contextIncomingFor
     assertEmptyObject(void3);
     assertEmptyObject(void4);
     return {
+        pressParameters,
         hasCurrentFocusReturn,
         managedChildrenReturn,
         context,
