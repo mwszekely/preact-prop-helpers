@@ -240,9 +240,9 @@ Access `HTMLElement` rendered by this hook/these props, either as soon as it's a
 
 |Member|Type|Description|Must be stable?|
 |---------|----|-----------|----------|
-|.onElementChange?|`OnPassiveStateChange<T \| null, never>`|Called with the `Element` when it mounts, called with `null` when it unmounts.|Yes|
-|.onMount?|`(element: T) => void`|Called when the element mounts|Yes|
-|.onUnmount?|`(element: T) => void`|Called when the element unmounts|Yes|
+|.onElementChange?|`Nullable<OnPassiveStateChange<T \| null, never>>`|Called with the `Element` when it mounts, called with `null` when it unmounts.|Yes|
+|.onMount?|`Nullable<(element: T) => void>`|Called when the element mounts|Yes|
+|.onUnmount?|`Nullable<(element: T) => void>`|Called when the element unmounts|Yes|
 
 
 
@@ -307,13 +307,13 @@ Adds the necessary event handlers to create a "press"-like event for any element
 
 |Member|Type|Description|Must be stable?|
 |---------|----|-----------|----------|
-|.allowRepeatPresses?|`Nullable<boolean>`|If `true`, holding down the `Enter` key will repeatedly fire press events as each sequential repeated keyboard event happens.|-|
-|.excludeEnter?|`() => boolean`|Pass a function that returns `true` to prevent the enter key from contributing to press events|No|
-|.excludePointer?|`() => boolean`|Pass a function that returns `true` to prevent the pointer (mouse, touch, etc.) from contributing to press events|No|
-|.excludeSpace?|`() => boolean`|Pass a function that returns `true` to prevent the spacebar from contributing to press events|No|
+|.allowRepeatPresses|`Nullable<boolean>`|If `true`, holding down the `Enter` key will repeatedly fire press events as each sequential repeated keyboard event happens.|-|
+|.excludeEnter|`Nullable<() => boolean>`|Pass a function that returns `true` to prevent the enter key from contributing to press events|No|
+|.excludePointer|`Nullable<() => boolean>`|Pass a function that returns `true` to prevent the pointer (mouse, touch, etc.) from contributing to press events|No|
+|.excludeSpace|`Nullable<() => boolean>`|Pass a function that returns `true` to prevent the spacebar from contributing to press events|No|
 |.focusSelf|`(element?: E) => void`|Ensures that when a button is pressed it properly receives focus (even on iOS Safari).<br />Generally, this should just be `e => e.focus()`|No|
-|.longPressThreshold?|`Nullable<number>`|After this number of milliseconds have passed pressing down but not up, the returned `longPress` value will be set to `true` and the user's actions will not fire an actual press event.|-|
-|.onPressingChange?|`Nullable<OnPassiveStateChange<boolean, PressChangeEventReason<E>>>`||-|
+|.longPressThreshold|`Nullable<number>`|After this number of milliseconds have passed pressing down but not up, the returned `longPress` value will be set to `true` and the user's actions will not fire an actual press event.|-|
+|.onPressingChange|`Nullable<OnPassiveStateChange<boolean, PressChangeEventReason<E>>>`||-|
 |.onPressSync|`Nullable<((e: PressEventReason<E>) => void)>`|What should happen when this widget has been "pressed".<br />This must be a sync event handler; async handlers must be taken care of externally.<br />Setting to `null` or `undefined` effectively disables the press event handler.|No|
 
 
@@ -363,7 +363,7 @@ All the list-related hooks combined into one large hook that encapsulates everyt
 
 #### UseCompleteListNavigationParameters
 
-<small>`extends` [`UseRovingTabIndexParameters`](#userovingtabindexparameters), [`UseManagedChildrenParameters`](#usemanagedchildrenparameters), [`UseTypeaheadNavigationParameters`](#usetypeaheadnavigationparameters), [`UseLinearNavigationParameters`](#uselinearnavigationparameters), [`UseSingleSelectionParameters`](#usesingleselectionparameters), [`UseRearrangeableChildrenParameters`](#userearrangeablechildrenparameters), [`UseSortableChildrenParameters`](#usesortablechildrenparameters), [`UsePaginatedChildrenParameters`](#usepaginatedchildrenparameters), [`UseStaggeredChildrenParameters`](#usestaggeredchildrenparameters), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseRefElementReturnType`](#userefelementreturntype), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype)</small>
+<small>`extends` [`UseRovingTabIndexParameters`](#userovingtabindexparameters), [`UseManagedChildrenParameters`](#usemanagedchildrenparameters), [`UseTypeaheadNavigationParameters`](#usetypeaheadnavigationparameters), [`UsePaginatedChildrenParameters`](#usepaginatedchildrenparameters), [`UseLinearNavigationParameters`](#uselinearnavigationparameters), [`UseSingleSelectionParameters`](#usesingleselectionparameters), [`UseRearrangeableChildrenParameters`](#userearrangeablechildrenparameters), [`UseSortableChildrenParameters`](#usesortablechildrenparameters), [`UseStaggeredChildrenParameters`](#usestaggeredchildrenparameters), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseRefElementReturnType`](#userefelementreturntype), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype)</small>
 
 Every member of `UseCompleteListNavigationParameters` is inherited (see the interfaces it `extends` from).
 
@@ -394,7 +394,7 @@ Combines all the grid- (&amp; list-) related hooks into one giant hook that acco
 
 #### UseCompleteGridNavigationParameters
 
-<small>`extends` [`UseRovingTabIndexParameters`](#userovingtabindexparameters), [`UseManagedChildrenParameters`](#usemanagedchildrenparameters), [`UseTypeaheadNavigationParameters`](#usetypeaheadnavigationparameters), [`UseLinearNavigationParameters`](#uselinearnavigationparameters), [`UseGridNavigationParameters`](#usegridnavigationparameters), [`UseSingleSelectionParameters`](#usesingleselectionparameters), [`UseRearrangeableChildrenParameters`](#userearrangeablechildrenparameters), [`UseSortableChildrenParameters`](#usesortablechildrenparameters), [`UsePaginatedChildrenParameters`](#usepaginatedchildrenparameters), [`UseStaggeredChildrenParameters`](#usestaggeredchildrenparameters), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseRefElementReturnType`](#userefelementreturntype), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype)</small>
+<small>`extends` [`UseRovingTabIndexParameters`](#userovingtabindexparameters), [`UseManagedChildrenParameters`](#usemanagedchildrenparameters), [`UseTypeaheadNavigationParameters`](#usetypeaheadnavigationparameters), [`UsePaginatedChildrenParameters`](#usepaginatedchildrenparameters), [`UseLinearNavigationParameters`](#uselinearnavigationparameters), [`UseGridNavigationParameters`](#usegridnavigationparameters), [`UseSingleSelectionParameters`](#usesingleselectionparameters), [`UseRearrangeableChildrenParameters`](#userearrangeablechildrenparameters), [`UseSortableChildrenParameters`](#usesortablechildrenparameters), [`UseStaggeredChildrenParameters`](#usestaggeredchildrenparameters), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseRefElementReturnType`](#userefelementreturntype), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype)</small>
 
 Every member of `UseCompleteGridNavigationParameters` is inherited (see the interfaces it `extends` from).
 
@@ -417,7 +417,7 @@ Every member of `UseCompleteGridNavigationParameters` is inherited (see the inte
 
 ##### UseCompleteGridNavigationRowParameters
 
-<small>`extends` [`UseManagedChildParameters`](#usemanagedchildparameters), [`UseRovingTabIndexChildInfoKeysParameters`](#userovingtabindexchildinfokeysparameters), [`UseRovingTabIndexChildParameters`](#userovingtabindexchildparameters), [`UseTextContentParameters`](#usetextcontentparameters), [`UseTypeaheadNavigationChildParameters`](#usetypeaheadnavigationchildparameters), [`UseListNavigationChildParameters`](#uselistnavigationchildparameters), [`UseRovingTabIndexParameters`](#userovingtabindexparameters), [`UseManagedChildrenParameters`](#usemanagedchildrenparameters), [`UseTypeaheadNavigationParameters`](#usetypeaheadnavigationparameters), [`UseLinearNavigationParameters`](#uselinearnavigationparameters), [`UseGridNavigationRowParameters`](#usegridnavigationrowparameters), [`UseSingleSelectionChildParameters`](#usesingleselectionchildparameters), [`UseRefElementReturnType`](#userefelementreturntype), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype)</small>
+<small>`extends` [`UseManagedChildParameters`](#usemanagedchildparameters), [`UseRovingTabIndexChildInfoKeysParameters`](#userovingtabindexchildinfokeysparameters), [`UseRovingTabIndexChildParameters`](#userovingtabindexchildparameters), [`UseTextContentParameters`](#usetextcontentparameters), [`UseTypeaheadNavigationChildParameters`](#usetypeaheadnavigationchildparameters), [`UseListNavigationChildParameters`](#uselistnavigationchildparameters), [`UseRovingTabIndexParameters`](#userovingtabindexparameters), [`UseManagedChildrenParameters`](#usemanagedchildrenparameters), [`UseTypeaheadNavigationParameters`](#usetypeaheadnavigationparameters), [`UsePaginatedChildrenParameters`](#usepaginatedchildrenparameters), [`UseLinearNavigationParameters`](#uselinearnavigationparameters), [`UseGridNavigationRowParameters`](#usegridnavigationrowparameters), [`UseSingleSelectionChildParameters`](#usesingleselectionchildparameters), [`UseRefElementReturnType`](#userefelementreturntype), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype)</small>
 
 |Member|Type|Description|Must be stable?|
 |---------|----|-----------|----------|
@@ -1034,10 +1034,10 @@ Allows you to inspect which element in the `document` currently has focus, which
 |Member|Type|Description|Must be stable?|
 |---------|----|-----------|----------|
 |.getDocument|`() => Document`|This must be a function that returns the document associated with whatever elements we're listening to.<br />E.G. someDivElement.ownerDocument|Yes|
-|.getWindow?|`((document: Document) => Window) \| null \| undefined`|By default, event handlers are attached to the document's defaultView Window. If you need something different, override it here.|Yes|
-|.onActiveElementChange?|`OnPassiveStateChange<Element \| null, FocusEvent> \| null \| undefined`|Called any time the active element changes.|Yes|
-|.onLastActiveElementChange?|`OnPassiveStateChange<Element, FocusEvent> \| null \| undefined`|Called any time the active element changes and is not null.|Yes|
-|.onWindowFocusedChange?|`OnPassiveStateChange<boolean, FocusEvent> \| null \| undefined`|Called any time the window gains/loses focus.|Yes|
+|.getWindow?|`Nullable<((document: Document) => Window)>`|By default, event handlers are attached to the document's defaultView Window. If you need something different, override it here.|Yes|
+|.onActiveElementChange?|`Nullable<OnPassiveStateChange<Element \| null, FocusEvent>>`|Called any time the active element changes.|Yes|
+|.onLastActiveElementChange?|`Nullable<OnPassiveStateChange<Element, FocusEvent>>`|Called any time the active element changes and is not null.|Yes|
+|.onWindowFocusedChange?|`Nullable<OnPassiveStateChange<boolean, FocusEvent>>`|Called any time the window gains/loses focus.|Yes|
 
 
 
@@ -1080,10 +1080,10 @@ Allows an element to start a drag operation.
 |Member|Type|Description|
 |---------|----|-----------|
 |data|`{<br />        [mimeType: string]: string;<br />    }`|Represents a dictionary mapping of MIME types to data
-|dragImage?|`HTMLCanvasElement \| HTMLImageElement \| HTMLVideoElement`|Can be used to specify a custom drag image instead of the browser default (a transparent render of the original element, generally)
-|dragImageXOffset?|`number`|
-|dragImageYOffset?|`number`|
-|effectAllowed?|`DataTransfer["effectAllowed"] \| undefined`|Maps to the Drag and Drop API -- allows limiting the areas this element can be dropped. For example, setting this to "copyLink" will allow this this to be dropped onto a droppable with an effect of "copy" or "link", but not "move". 
+|dragImage|`Nullable<HTMLCanvasElement \| HTMLImageElement \| HTMLVideoElement>`|Can be used to specify a custom drag image instead of the browser default (a transparent render of the original element, generally)
+|dragImageXOffset|`Nullable<number>`|
+|dragImageYOffset|`Nullable<number>`|
+|effectAllowed|`Nullable<DataTransfer["effectAllowed"]>`|Maps to the Drag and Drop API -- allows limiting the areas this element can be dropped. For example, setting this to "copyLink" will allow this this to be dropped onto a droppable with an effect of "copy" or "link", but not "move". 
 
  
 
@@ -1347,12 +1347,12 @@ Note that while this function is like usePassiveState (itself like useState and 
 
 |Member|Type|Description|
 |---------|----|-----------|
-|defaultReason?|`"push" \| "replace"`|How is the user's history modified when the state changes if not otherwise specified? "`replace`" is recommended unless you *really* have a good reason to clog up the back button.
+|defaultReason?|`Nullable<"push" \| "replace">`|How is the user's history modified when the state changes if not otherwise specified? "`replace`" is recommended unless you *really* have a good reason to clog up the back button.
 |initialValue|`T`|If there is no value in the URL for this state, then `initialValue` will be used instead.
 |key|`Key`|
-|onValueChange?|`OnParamValueChanged<T> \| null \| undefined`|
+|onValueChange?|`Nullable<OnParamValueChanged<T> \| null \| undefined>`|
 |stringToValue|`((value: string \| null) => T \| null)`|
-|valueToString?|`((value: T \| null) => (string \| null)) \| undefined`|
+|valueToString?|`Nullable<((value: T \| null) => (string \| null)) \| undefined>`|
 
 #### SearchParamStates
 
@@ -1556,7 +1556,7 @@ Implements proper keyboard navigation for components like listboxes, button grou
 
 #### UseListNavigationParameters
 
-<small>`extends` [`UseRovingTabIndexParameters`](#userovingtabindexparameters), [`UseManagedChildrenParameters`](#usemanagedchildrenparameters), [`UseTypeaheadNavigationParameters`](#usetypeaheadnavigationparameters), [`UseLinearNavigationParameters`](#uselinearnavigationparameters), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseRefElementReturnType`](#userefelementreturntype), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype)</small>
+<small>`extends` [`UseRovingTabIndexParameters`](#userovingtabindexparameters), [`UseManagedChildrenParameters`](#usemanagedchildrenparameters), [`UseTypeaheadNavigationParameters`](#usetypeaheadnavigationparameters), [`UsePaginatedChildrenParameters`](#usepaginatedchildrenparameters), [`UseLinearNavigationParameters`](#uselinearnavigationparameters), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseRefElementReturnType`](#userefelementreturntype), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype)</small>
 
 Every member of `UseListNavigationParameters` is inherited (see the interfaces it `extends` from).
 
@@ -1611,11 +1611,11 @@ Implements 2-dimensional grid-based keyboard navigation, similarly to [useListNa
 
 #### UseGridNavigationParameters
 
-<small>`extends` [`UseRovingTabIndexParameters`](#userovingtabindexparameters), [`UseManagedChildrenParameters`](#usemanagedchildrenparameters), [`UseTypeaheadNavigationParameters`](#usetypeaheadnavigationparameters), [`UseLinearNavigationParameters`](#uselinearnavigationparameters), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseRefElementReturnType`](#userefelementreturntype), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype)</small>
+<small>`extends` [`UseRovingTabIndexParameters`](#userovingtabindexparameters), [`UseManagedChildrenParameters`](#usemanagedchildrenparameters), [`UseTypeaheadNavigationParameters`](#usetypeaheadnavigationparameters), [`UsePaginatedChildrenParameters`](#usepaginatedchildrenparameters), [`UseLinearNavigationParameters`](#uselinearnavigationparameters), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseRefElementReturnType`](#userefelementreturntype), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype)</small>
 
 |Member|Type|Description|Must be stable?|
 |---------|----|-----------|----------|
-|.onTabbableColumnChange|`OnPassiveStateChange<TabbableColumnInfo, Event> \| null`|TODO: This may be called even when there is no actual change in the numeric values|Yes|
+|.onTabbableColumnChange|`Nullable<OnPassiveStateChange<TabbableColumnInfo, Event>>`|TODO: This may be called even when there is no actual change in the numeric values|Yes|
 
 
 
@@ -1648,7 +1648,7 @@ As a row, this hook is responsible for both being a **child** of list navigation
 
 ##### UseGridNavigationRowParameters
 
-<small>`extends` [`UseManagedChildParameters`](#usemanagedchildparameters), [`UseRovingTabIndexChildInfoKeysParameters`](#userovingtabindexchildinfokeysparameters), [`UseRovingTabIndexChildParameters`](#userovingtabindexchildparameters), [`UseTextContentParameters`](#usetextcontentparameters), [`UseTypeaheadNavigationChildParameters`](#usetypeaheadnavigationchildparameters), [`UseListNavigationChildParameters`](#uselistnavigationchildparameters), [`UseRovingTabIndexParameters`](#userovingtabindexparameters), [`UseManagedChildrenParameters`](#usemanagedchildrenparameters), [`UseTypeaheadNavigationParameters`](#usetypeaheadnavigationparameters), [`UseLinearNavigationParameters`](#uselinearnavigationparameters), [`UseRefElementReturnType`](#userefelementreturntype), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype)</small>
+<small>`extends` [`UseManagedChildParameters`](#usemanagedchildparameters), [`UseRovingTabIndexChildInfoKeysParameters`](#userovingtabindexchildinfokeysparameters), [`UseRovingTabIndexChildParameters`](#userovingtabindexchildparameters), [`UseTextContentParameters`](#usetextcontentparameters), [`UseTypeaheadNavigationChildParameters`](#usetypeaheadnavigationchildparameters), [`UseListNavigationChildParameters`](#uselistnavigationchildparameters), [`UseRovingTabIndexParameters`](#userovingtabindexparameters), [`UseManagedChildrenParameters`](#usemanagedchildrenparameters), [`UseTypeaheadNavigationParameters`](#usetypeaheadnavigationparameters), [`UsePaginatedChildrenParameters`](#usepaginatedchildrenparameters), [`UseLinearNavigationParameters`](#uselinearnavigationparameters), [`UseRefElementReturnType`](#userefelementreturntype), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype)</small>
 
 |Member|Type|Description|Must be stable?|
 |---------|----|-----------|----------|
@@ -1679,7 +1679,7 @@ Child hook for [useGridNavigationRow](#usegridnavigationrow) (and [useGridNaviga
 
 |Member|Type|Description|Must be stable?|
 |---------|----|-----------|----------|
-|.colSpan|`number`|How many columns this cell spans (all cells default to 1).<br />Any following cells should skip over the `index`es this one covered with its `colSpan`. E.G. if this cell is `index=5` and `colSpan=3`, the next cell would be `index=8`, **not** `index=6`|-|
+|.colSpan|`Nullable<number>`|How many columns this cell spans (all cells default to 1).<br />Any following cells should skip over the `index`es this one covered with its `colSpan`. E.G. if this cell is `index=5` and `colSpan=3`, the next cell would be `index=8`, **not** `index=6`|-|
 |context|``UseGridNavigationCellContext``|Functions and data that the parent has made available to each child. Retrieve it with `useContext`|-|
 
 
@@ -1710,8 +1710,8 @@ Implements a roving tabindex system where only one "focusable" component in a se
 |Member|Type|Description|Must be stable?|
 |---------|----|-----------|----------|
 |.focusSelfParent|`(e?: ParentElement \| null) => void`|When `untabbable` is true, instead of a child focusing itself, the parent will via this `focusSelf` argument.|-|
-|.initiallyTabbedIndex|`number \| null`|This is imperative, not declarative; it is better if we can keep re-renders on the parent to a minimum anyway.<br />You can manually control this with `onTabbableIndexChange` and `setTabbableIndex` if you need.|-|
-|.onTabbableIndexChange?|`Nullable<OnPassiveStateChange<number \| null, Event>>`|If you would like to have an event run whenever a new index becomes tabbable (e.g. to call `setState` to render that tabbable index...for some reason...) you can do that here.<br />**MUST** be stable!|-|
+|.initiallyTabbedIndex|`Nullable<number>`|This is imperative, not declarative; it is better if we can keep re-renders on the parent to a minimum anyway.<br />You can manually control this with `onTabbableIndexChange` and `setTabbableIndex` if you need.|-|
+|.onTabbableIndexChange|`Nullable<OnPassiveStateChange<number \| null, Event>>`|If you would like to have an event run whenever a new index becomes tabbable (e.g. to call `setState` to render that tabbable index...for some reason...) you can do that here.<br />**MUST** be stable!|-|
 |.untabbable|`boolean`|When true, none of the children will be tabbable, as if the entire component is hidden.<br />This does not actually change the currently tabbable index; if this is set to `false`, the last tabbable child is remembered.|-|
 |.untabbableBehavior|`"focus-parent" \| "leave-child-focused"`|When the parent is `untabbable` and a child gains focus via some means, we need to decide what to do.<br />Sometimes, it's better to just send focus back to the parent. Sometimes, it's better to just let the child be focused this one time (especially if focusing means that `untabbable` is going to change to `true`).<br />If `untabbable` is false, then this has no effect.|-|
 
@@ -1777,11 +1777,11 @@ When used in tandem with `useRovingTabIndex`, allows control of the tabbable ind
 
 #### UseLinearNavigationParameters
 
-<small>`extends` [`UseManagedChildrenParameters`](#usemanagedchildrenparameters), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype)</small>
+<small>`extends` [`UseManagedChildrenParameters`](#usemanagedchildrenparameters), [`UsePaginatedChildrenParameters`](#usepaginatedchildrenparameters), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseRefElementReturnType`](#userefelementreturntype)</small>
 
 |Member|Type|Description|Must be stable?|
 |---------|----|-----------|----------|
-|.arrowKeyDirection|`"horizontal" \| "vertical" \| "either" \| "none"`|Controls which arrow keys are used to navigate through the component. Not relative to the writing mode -- these are the literal keys that need to be pressed.<br />Use "either" to allow navigation in either direction.<br />Use "none" to disallow navigation with the arrow keys in any direction.|-|
+|.arrowKeyDirection|`"horizontal" \| "vertical" \| "either" \| "none"`|Controls which arrow keys are used to navigate through the component.<br />Not relative to the writing mode -- these are the literal keys that need to be pressed.<br />Use `"either"` to allow navigation in either direction.<br />Use `"none"` to disallow navigation with the arrow keys in any direction.|-|
 |.disableHomeEndKeys|`boolean`|If set to true, navigation with the home & end keys will be disabled, but navigation with the arrow keys will be unaffected.|-|
 |.getHighestIndex|`() => number`|From `useManagedChildren`. This can be higher than the *actual* highest index if you need it to be.|Yes|
 |.getLowestIndex|`() => number`|From `useManagedChildren`. This can be lower than the *actual* lowest index if you need it to be.<br />**See also**: [getLowestIndex](#getlowestindex)|Yes|
@@ -1794,7 +1794,7 @@ When used in tandem with `useRovingTabIndex`, allows control of the tabbable ind
 * A function:
 |-|
 |.onNavigateLinear|`Nullable<(newIndex: number \| null, event: KeyboardEventType<ChildElement>) => void>`|Called when a navigation change as a result of an arrow/home/end/page up/page down key being pressed.|Yes|
-|.pageNavigationSize|`number`|Controls how many elements are skipped over when page up/down are pressed.<br />* When 0: Page Up/Down are disabled
+|.pageNavigationSize|`Nullable<number>`|Controls how many elements are skipped over when page up/down are pressed.<br />* When 0 or null: Page Up/Down are disabled
 * When &gt;= 1: Page Up/Down moves that number of elements up or down
 * When 0 &lt; x &lt; 1, Page Up/Down moves by that percentage of all elements, or of 100 elements, whichever is higher. In other words, 0.1 jumps by 10 elements when there are fewer then 100 elements, and 20 elements when there are 200 elements.
 |-|
@@ -1831,7 +1831,7 @@ Allows for the selection of a managed child by typing the given text associated 
 
 |Member|Type|Description|Must be stable?|
 |---------|----|-----------|----------|
-|.collator|`null \| Intl.Collator`|A collator to use when comparing. If not provided, simply uses `localeCompare` after transforming each to lowercase, which will, at best, work okay in English.|No|
+|.collator|`Nullable<Intl.Collator>`|A collator to use when comparing. If not provided, simply uses `localeCompare` after transforming each to lowercase, which will, at best, work okay in English.|No|
 |.isValid|`(index?: number) => boolean`|Must return true if the given child can be navigated to.<br />Generally corresponds to a `hidden` or `disabled` prop.|No|
 |.noTypeahead|`boolean`|If true, no typeahead-related processing will occur, effectively disabling this invocation of `useTypeaheadNavigation` altogether.|-|
 |.onNavigateTypeahead|`Nullable<(newIndex: number \| null, event: KeyboardEventType<TabbableChildElement>) => void>`|**Optional**<br />Called any time the currently tabbable index changes as a result of a typeahead-related keypress|No|
@@ -1892,9 +1892,9 @@ Allows a single child among all children to be the "selected" child (which can b
 
 |Member|Type|Description|Must be stable?|
 |---------|----|-----------|----------|
-|.ariaPropName|`` `aria-${"pressed" \| "selected" \| "checked" \| `current-${"page" \| "step" \| "date" \| "time" \| "location" \| "true"}`}` \| null``|What property will be used to mark this item as selected.<br />**IMPORTANT**: The `aria-current` options should be used with caution as they are semantically very different from the usual selection cases.|-|
-|.initiallySelectedIndex|`number \| null`|This is imperative, as opposed to declarative, to save on re-rendering the parent whenever the selected index changes.|-|
-|.onSelectedIndexChange|`null \| SelectedIndexChangeHandler`|Called when a child is selected (via a press or other method).<br />If this component is declaratively controlled (with e.g. `useSingleSelectionDeclarative`), then you should use this to `setState` somewhere that'll change your `selectedIndex`.<br />If this component is imperatively controlled, then you should hook this up to the returned `changeSelectedIndex` function to have the desired change occur.<br />In general, this should only be `null` when single selection is entirely disabled.|No|
+|.ariaPropName|``Nullable<`aria-${"pressed" \| "selected" \| "checked" \| `current-${"page" \| "step" \| "date" \| "time" \| "location" \| "true"}`}`>``|What property will be used to mark this item as selected.<br />**IMPORTANT**: The `aria-current` options should be used with caution as they are semantically very different from the usual selection cases.|-|
+|.initiallySelectedIndex|`Nullable<number>`|This is imperative, as opposed to declarative, to save on re-rendering the parent whenever the selected index changes.|-|
+|.onSelectedIndexChange|`Nullable<SelectedIndexChangeHandler>`|Called when a child is selected (via a press or other method).<br />If this component is declaratively controlled (with e.g. `useSingleSelectionDeclarative`), then you should use this to `setState` somewhere that'll change your `selectedIndex`.<br />If this component is imperatively controlled, then you should hook this up to the returned `changeSelectedIndex` function to have the desired change occur.<br />In general, this should only be `null` when single selection is entirely disabled.|No|
 |.selectionMode|`"focus" \| "activation" \| "disabled"`||-|
 
 
@@ -1961,7 +1961,7 @@ Hook that allows for the **direct descendant** children of this component to be 
 |Member|Type|Description|Must be stable?|
 |---------|----|-----------|----------|
 |.getIndex|`GetIndex`|This must return the index of this child relative to all its sortable siblings from its `VNode`.<br />In general, this corresponds to the `index` prop, so something like `vnode => vnode.props.index` is what you're usually looking for.|Yes|
-|.onRearranged|`null \| (() => void)`|Called after the children have been rearranged.|-|
+|.onRearranged|`Nullable<(() => void)>`|Called after the children have been rearranged.|-|
 
 
 

@@ -1,4 +1,5 @@
 import { identity } from "lodash-es";
+import { assertEmptyObject } from "../../index.js";
 import { ManagedChildInfo } from "../../preact-extensions/use-managed-children.js";
 import { useEnsureStability } from "../../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
@@ -6,6 +7,7 @@ import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { TargetedPick, useCallback, useRef } from "../../util/lib.js";
 import { ElementProps, KeyboardEventType, Nullable, OmitStrong } from "../../util/types.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
+import { UsePaginatedChildrenParameters } from "../use-paginated-children.js";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
 export { identity };
 
@@ -14,7 +16,7 @@ export interface LinearNavigationResult {
     status: "normal" | "past-start" | "past-end"
 }
 
-export interface UseLinearNavigationReturnTypeSelf {}
+export interface UseLinearNavigationReturnTypeSelf { }
 
 export interface UseLinearNavigationReturnType<ParentOrChildElement extends Element> {
     linearNavigationReturn: UseLinearNavigationReturnTypeSelf;
@@ -25,7 +27,8 @@ export interface UseLinearNavigationChildInfo extends ManagedChildInfo<number> {
 
 /** Arguments passed to the parent `useLinearNavigation` */
 export interface UseLinearNavigationParameters<ParentOrChildElement extends Element, ChildElement extends Element, _M extends UseLinearNavigationChildInfo> extends
-    TargetedPick<UseRovingTabIndexReturnType<ParentOrChildElement, ChildElement, UseRovingTabIndexChildInfo<ChildElement>>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex"> {
+    TargetedPick<UseRovingTabIndexReturnType<ParentOrChildElement, ChildElement, UseRovingTabIndexChildInfo<ChildElement>>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex">,
+    TargetedPick<UsePaginatedChildrenParameters<ParentOrChildElement, ChildElement, any>, "paginatedChildrenParameters", "paginationMin" | "paginationMax"> {
     linearNavigationParameters: UseLinearNavigationParametersSelf<ChildElement>;
 }
 
@@ -49,12 +52,12 @@ export interface UseLinearNavigationParametersSelf<ChildElement extends Element>
      * Controls how many elements are skipped over when page up/down are pressed.
      * 
      * ```md-literal
-     * * When 0: Page Up/Down are disabled
+     * * When 0 or null: Page Up/Down are disabled
      * * When &gt;= 1: Page Up/Down moves that number of elements up or down
      * * When 0 &lt; x &lt; 1, Page Up/Down moves by that percentage of all elements, or of 100 elements, whichever is higher. In other words, 0.1 jumps by 10 elements when there are fewer then 100 elements, and 20 elements when there are 200 elements.
      * ```
      */
-    pageNavigationSize: number;
+    pageNavigationSize: Nullable<number>;
 
     /**
      * What happens when `up` is pressed on the first valid child?
@@ -76,11 +79,12 @@ export interface UseLinearNavigationParametersSelf<ChildElement extends Element>
 
     /**
      * Controls which arrow keys are used to navigate through the component.
-     * Not relative to the writing mode -- these are the literal keys that need to be pressed.
      * 
-     * Use "either" to allow navigation in either direction.
+     * @remarks Not relative to the writing mode -- these are the literal keys that need to be pressed.
      * 
-     * Use "none" to disallow navigation with the arrow keys in any direction.
+     * Use `"either"` to allow navigation in either direction.
+     * 
+     * Use `"none"` to disallow navigation with the arrow keys in any direction.
      */
     arrowKeyDirection: "horizontal" | "vertical" | "either" | "none";
 
@@ -101,7 +105,7 @@ export interface UseLinearNavigationParametersSelf<ChildElement extends Element>
      * @stable
      */
     indexMangler: (n: number) => number;
-    
+
     /**
      * @see {@link UseLinearNavigationParametersSelf.indexMangler}, which does the opposite of this.
      * 
@@ -140,9 +144,15 @@ export interface UseLinearNavigationParametersSelf<ChildElement extends Element>
  */
 export function useLinearNavigation<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseLinearNavigationChildInfo>({
     rovingTabIndexReturn,
-    linearNavigationParameters
+    linearNavigationParameters,
+    paginatedChildrenParameters: { paginationMax, paginationMin, ...void2 },
+    ...void1
 }: UseLinearNavigationParameters<ParentOrChildElement, ChildElement, M>): UseLinearNavigationReturnType<ParentOrChildElement> {
     monitorCallCount(useLinearNavigation);
+
+    let getPaginatedRange = useStableGetter(paginationMax == null || paginationMin == null? null : paginationMax - paginationMin);
+
+    assertEmptyObject(void1);
 
     type R = Event;
     const { getLowestIndex, getHighestIndex, indexDemangler, indexMangler, isValid, navigatePastEnd, navigatePastStart, onNavigateLinear } = linearNavigationParameters;
@@ -253,9 +263,13 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
             const allowsVerticalNavigation = (arrowKeyDirection == "vertical" || arrowKeyDirection == "either");
             const allowsHorizontalNavigation = (arrowKeyDirection == "horizontal" || arrowKeyDirection == "either");
 
+
+            let childRange = (getHighestIndex() - getLowestIndex());
+            let paginatedRange = getPaginatedRange() ?? childRange;
+
             let truePageNavigationSize = pageNavigationSize;
-            if (truePageNavigationSize < 1) {
-                truePageNavigationSize = Math.round(pageNavigationSize * Math.max(100, (getHighestIndex() - getLowestIndex()) + 1));
+            if (truePageNavigationSize != null && truePageNavigationSize < 1) {
+                truePageNavigationSize = Math.round(truePageNavigationSize * Math.max(10, paginatedRange + 1));
             }
 
             let result: "passthrough" | "stop" = "passthrough";
@@ -288,9 +302,11 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
 
                     case "PageUp":
                     case "PageDown":
-                        if (truePageNavigationSize > 0) {
+                        if (truePageNavigationSize == null)
+                            break;
+                        else if (truePageNavigationSize > 0) 
                             result = navigateRelative2(e, truePageNavigationSize * (e.key.endsWith('n') ? 1 : -1), true, "page");
-                        }
+                        
                         break;
 
                     case "Home":

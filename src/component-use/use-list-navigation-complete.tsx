@@ -148,6 +148,7 @@ export function useCompleteListNavigation<ParentElement extends Element, ChildEl
             onRearranged: useStableCallback(() => { refreshPagination(paginatedChildrenParameters.paginationMin, paginatedChildrenParameters.paginationMax) }),
             ...rearrangeableChildrenParameters
         },
+        paginatedChildrenParameters,
         refElementReturn,
         sortableChildrenParameters,
         ...completeListNavigationParameters,

@@ -5,12 +5,12 @@ import { useStableCallback } from "../../preact-extensions/use-stable-callback.j
 import { useMemoObject } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { focus } from "../../util/focus.js";
-import { OmitStrong, TargetedOmit, TargetedPick } from "../../util/types.js";
+import { Nullable, OmitStrong, TargetedOmit, TargetedPick } from "../../util/types.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
 import { UseListNavigationChildInfo, UseListNavigationChildParameters, UseListNavigationChildReturnType, UseListNavigationContext, UseListNavigationParameters, UseListNavigationReturnType, useListNavigation, useListNavigationChild } from "./use-list-navigation-partial.js";
 import { SetTabbableIndex, UseRovingTabIndexChildInfoKeysReturnType } from "./use-roving-tabindex.js";
 
-export interface GridChildRowInfo<RowElement extends Element, _CellElement extends Element> extends UseListNavigationChildInfo<RowElement> {}
+export interface GridChildRowInfo<RowElement extends Element, _CellElement extends Element> extends UseListNavigationChildInfo<RowElement> { }
 export interface GridChildCellInfo<CellElement extends Element> extends UseListNavigationChildInfo<CellElement> { }
 
 export interface UseGridNavigationCellParametersSelf {
@@ -19,7 +19,7 @@ export interface UseGridNavigationCellParametersSelf {
      * 
      * Any following cells should skip over the `index`es this one covered with its `colSpan`. E.G. if this cell is `index=5` and `colSpan=3`, the next cell would be `index=8`, **not** `index=6`
      */
-    colSpan: number;
+    colSpan: Nullable<number>;
 }
 
 export interface UseGridNavigationCellContextSelf {
@@ -37,7 +37,7 @@ export interface UseGridNavigationParametersSelf {
      * 
      * @stable
      */
-    onTabbableColumnChange: OnPassiveStateChange<TabbableColumnInfo, Event> | null;
+    onTabbableColumnChange: Nullable<OnPassiveStateChange<TabbableColumnInfo, Event>>;
 }
 
 export interface UseGridNavigationRowContextSelf {
@@ -65,7 +65,7 @@ export interface UseGridNavigationRowParameters<RowElement extends Element, Cell
     OmitStrong<UseListNavigationChildParameters<RowElement, RM>, "context">,
     TargetedOmit<UseListNavigationParameters<RowElement, CellElement, CM>, "linearNavigationParameters", "disableHomeEndKeys" | "onNavigateLinear" | "arrowKeyDirection">,
     TargetedOmit<UseListNavigationParameters<RowElement, CellElement, CM>, "rovingTabIndexParameters", "focusSelfParent" | "untabbableBehavior">,
-    OmitStrong<UseListNavigationParameters<RowElement, CellElement, CM>, "refElementReturn" | "rovingTabIndexParameters" | "linearNavigationParameters">,
+    OmitStrong<UseListNavigationParameters<RowElement, CellElement, CM>, "paginatedChildrenParameters" | "refElementReturn" | "rovingTabIndexParameters" | "linearNavigationParameters">,
     TargetedPick<UseManagedChildrenReturnType<CM>, "managedChildrenReturn", "getChildren"> {
 
     context: UseGridNavigationRowContext;
@@ -264,7 +264,8 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
             disableHomeEndKeys: true,
             arrowKeyDirection: "horizontal",
             ...linearNavigationParameters
-        }
+        },
+        paginatedChildrenParameters: { paginationMin: null, paginationMax: null }
     });
 
 
@@ -336,6 +337,7 @@ export function useGridNavigationCell<CellElement extends Element, CM extends Gr
     ...void1
 }: UseGridNavigationCellParameters<any, CellElement, CM>): UseGridNavigationCellReturnType<CellElement, CM> {
     monitorCallCount(useGridNavigationCell);
+    colSpan ??= 1;
 
     const { index } = info;
     const {
@@ -374,7 +376,7 @@ export function useGridNavigationCell<CellElement extends Element, CM extends Gr
                     setTabbableRow(getRowIndex(), e, false);
                     setTabbableColumn(prev => { debugger; return { actual: index, ideal: prev?.ideal ?? index }; }, e);
                     setTabbableCell((prev) => {
-                        if (prev != null && (prev < index || prev > index + colSpan)) {
+                        if (prev != null && (prev < index || prev > index + (colSpan!))) {
                             return prev;
                         }
                         return index;

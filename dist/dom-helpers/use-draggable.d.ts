@@ -1,4 +1,4 @@
-import { ElementProps } from "../util/types.js";
+import { ElementProps, Nullable } from "../util/types.js";
 export interface UseDraggableReturnType<E extends EventTarget> {
     /** *Unstable* */
     propsUnstable: ElementProps<E>;
@@ -26,13 +26,13 @@ export interface UseDraggableParameters {
      * a droppable with an effect of "copy" or "link", but not "move".
      *
      */
-    effectAllowed?: DataTransfer["effectAllowed"] | undefined;
+    effectAllowed: Nullable<DataTransfer["effectAllowed"]>;
     /**
      * Can be used to specify a custom drag image instead of the browser default (a transparent render of the original element, generally)
      */
-    dragImage?: HTMLCanvasElement | HTMLImageElement | HTMLVideoElement;
-    dragImageXOffset?: number;
-    dragImageYOffset?: number;
+    dragImage: Nullable<HTMLCanvasElement | HTMLImageElement | HTMLVideoElement>;
+    dragImageXOffset: Nullable<number>;
+    dragImageYOffset: Nullable<number>;
     /**
      * Represents a dictionary mapping of MIME types to data
      */

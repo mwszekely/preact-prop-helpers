@@ -13,7 +13,7 @@ import { useSingleSelection, useSingleSelectionChild } from "./use-single-select
  * Highly recommended to make the `selectionMode` *not* be `"focus"`, but it's up to you, ultimately.
  */
 const _dummy = 0;
-export function useGridNavigationSingleSelection({ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, managedChildrenReturn, typeaheadNavigationParameters, singleSelectionParameters, refElementReturn, ...void2 }) {
+export function useGridNavigationSingleSelection({ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, managedChildrenReturn, typeaheadNavigationParameters, singleSelectionParameters, refElementReturn, paginatedChildrenParameters, ...void2 }) {
     monitorCallCount(useGridNavigationSingleSelection);
     const { context: { gridNavigationRowContext, rovingTabIndexContext, typeaheadNavigationContext }, linearNavigationReturn, managedChildrenParameters, propsParent, propsStableParentOrChild, rovingTabIndexReturn, typeaheadNavigationReturn, } = useGridNavigation({
         gridNavigationParameters,
@@ -21,6 +21,7 @@ export function useGridNavigationSingleSelection({ gridNavigationParameters, lin
         managedChildrenReturn,
         rovingTabIndexParameters,
         typeaheadNavigationParameters,
+        paginatedChildrenParameters,
         refElementReturn
     });
     const { childrenHaveFocusParameters, context: { singleSelectionContext }, singleSelectionReturn, } = useSingleSelection({

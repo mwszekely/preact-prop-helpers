@@ -8276,8 +8276,13 @@
                   "text": "getWindow?: "
                 },
                 {
+                  "kind": "Reference",
+                  "text": "Nullable",
+                  "canonicalReference": "preact-prop-helpers!Nullable:type"
+                },
+                {
                   "kind": "Content",
-                  "text": "((document: "
+                  "text": "<((document: "
                 },
                 {
                   "kind": "Reference",
@@ -8295,7 +8300,7 @@
                 },
                 {
                   "kind": "Content",
-                  "text": ") | null | undefined"
+                  "text": ")>"
                 },
                 {
                   "kind": "Content",
@@ -8308,7 +8313,7 @@
               "name": "getWindow",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
-                "endIndex": 6
+                "endIndex": 7
               }
             },
             {
@@ -8319,6 +8324,15 @@
                 {
                   "kind": "Content",
                   "text": "onActiveElementChange?: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Nullable",
+                  "canonicalReference": "preact-prop-helpers!Nullable:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<"
                 },
                 {
                   "kind": "Reference",
@@ -8345,7 +8359,7 @@
                 },
                 {
                   "kind": "Content",
-                  "text": "> | null | undefined"
+                  "text": ">>"
                 },
                 {
                   "kind": "Content",
@@ -8358,7 +8372,7 @@
               "name": "onActiveElementChange",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
-                "endIndex": 7
+                "endIndex": 9
               }
             },
             {
@@ -8369,6 +8383,15 @@
                 {
                   "kind": "Content",
                   "text": "onLastActiveElementChange?: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Nullable",
+                  "canonicalReference": "preact-prop-helpers!Nullable:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<"
                 },
                 {
                   "kind": "Reference",
@@ -8395,7 +8418,7 @@
                 },
                 {
                   "kind": "Content",
-                  "text": "> | null | undefined"
+                  "text": ">>"
                 },
                 {
                   "kind": "Content",
@@ -8408,7 +8431,7 @@
               "name": "onLastActiveElementChange",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
-                "endIndex": 7
+                "endIndex": 9
               }
             },
             {
@@ -8419,6 +8442,15 @@
                 {
                   "kind": "Content",
                   "text": "onWindowFocusedChange?: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Nullable",
+                  "canonicalReference": "preact-prop-helpers!Nullable:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<"
                 },
                 {
                   "kind": "Reference",
@@ -8436,7 +8468,7 @@
                 },
                 {
                   "kind": "Content",
-                  "text": "> | null | undefined"
+                  "text": ">>"
                 },
                 {
                   "kind": "Content",
@@ -8449,7 +8481,7 @@
               "name": "onWindowFocusedChange",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
-                "endIndex": 5
+                "endIndex": 7
               }
             }
           ],
@@ -16873,7 +16905,16 @@
               "excerptTokens": [
                 {
                   "kind": "Content",
-                  "text": "dragImage?: "
+                  "text": "dragImage: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Nullable",
+                  "canonicalReference": "preact-prop-helpers!Nullable:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<"
                 },
                 {
                   "kind": "Reference",
@@ -16900,16 +16941,20 @@
                 },
                 {
                   "kind": "Content",
+                  "text": ">"
+                },
+                {
+                  "kind": "Content",
                   "text": ";"
                 }
               ],
               "isReadonly": false,
-              "isOptional": true,
+              "isOptional": false,
               "releaseTag": "Public",
               "name": "dragImage",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
-                "endIndex": 6
+                "endIndex": 9
               }
             },
             {
@@ -16919,11 +16964,16 @@
               "excerptTokens": [
                 {
                   "kind": "Content",
-                  "text": "dragImageXOffset?: "
+                  "text": "dragImageXOffset: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Nullable",
+                  "canonicalReference": "preact-prop-helpers!Nullable:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "number"
+                  "text": "<number>"
                 },
                 {
                   "kind": "Content",
@@ -16931,12 +16981,12 @@
                 }
               ],
               "isReadonly": false,
-              "isOptional": true,
+              "isOptional": false,
               "releaseTag": "Public",
               "name": "dragImageXOffset",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
-                "endIndex": 2
+                "endIndex": 3
               }
             },
             {
@@ -16946,11 +16996,16 @@
               "excerptTokens": [
                 {
                   "kind": "Content",
-                  "text": "dragImageYOffset?: "
+                  "text": "dragImageYOffset: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Nullable",
+                  "canonicalReference": "preact-prop-helpers!Nullable:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "number"
+                  "text": "<number>"
                 },
                 {
                   "kind": "Content",
@@ -16958,12 +17013,12 @@
                 }
               ],
               "isReadonly": false,
-              "isOptional": true,
+              "isOptional": false,
               "releaseTag": "Public",
               "name": "dragImageYOffset",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
-                "endIndex": 2
+                "endIndex": 3
               }
             },
             {
@@ -16973,7 +17028,16 @@
               "excerptTokens": [
                 {
                   "kind": "Content",
-                  "text": "effectAllowed?: "
+                  "text": "effectAllowed: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Nullable",
+                  "canonicalReference": "preact-prop-helpers!Nullable:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<"
                 },
                 {
                   "kind": "Reference",
@@ -16982,7 +17046,7 @@
                 },
                 {
                   "kind": "Content",
-                  "text": "[\"effectAllowed\"] | undefined"
+                  "text": "[\"effectAllowed\"]>"
                 },
                 {
                   "kind": "Content",
@@ -16990,12 +17054,12 @@
                 }
               ],
               "isReadonly": false,
-              "isOptional": true,
+              "isOptional": false,
               "releaseTag": "Public",
               "name": "effectAllowed",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
-                "endIndex": 3
+                "endIndex": 5
               }
             }
           ],
@@ -20143,8 +20207,13 @@
                   "text": "colSpan: "
                 },
                 {
+                  "kind": "Reference",
+                  "text": "Nullable",
+                  "canonicalReference": "preact-prop-helpers!Nullable:type"
+                },
+                {
                   "kind": "Content",
-                  "text": "number"
+                  "text": "<number>"
                 },
                 {
                   "kind": "Content",
@@ -20157,7 +20226,7 @@
               "name": "colSpan",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
-                "endIndex": 2
+                "endIndex": 3
               }
             }
           ],
@@ -20499,6 +20568,15 @@
                 },
                 {
                   "kind": "Reference",
+                  "text": "Nullable",
+                  "canonicalReference": "preact-prop-helpers!Nullable:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
                   "text": "OnPassiveStateChange",
                   "canonicalReference": "preact-prop-helpers!OnPassiveStateChange:type"
                 },
@@ -20522,7 +20600,7 @@
                 },
                 {
                   "kind": "Content",
-                  "text": "> | null"
+                  "text": ">>"
                 },
                 {
                   "kind": "Content",
@@ -20535,7 +20613,7 @@
               "name": "onTabbableColumnChange",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
-                "endIndex": 7
+                "endIndex": 9
               }
             }
           ],
@@ -21228,7 +21306,7 @@
             },
             {
               "kind": "Content",
-              "text": "<RowElement, CellElement, CM>, \"refElementReturn\" | \"rovingTabIndexParameters\" | \"linearNavigationParameters\">"
+              "text": "<RowElement, CellElement, CM>, \"paginatedChildrenParameters\" | \"refElementReturn\" | \"rovingTabIndexParameters\" | \"linearNavigationParameters\">"
             },
             {
               "kind": "Content",
@@ -21711,7 +21789,7 @@
             },
             {
               "kind": "Content",
-              "text": ">({ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, managedChildrenReturn, typeaheadNavigationParameters, singleSelectionParameters, refElementReturn, ...void2 }: "
+              "text": ">({ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, managedChildrenReturn, typeaheadNavigationParameters, singleSelectionParameters, refElementReturn, paginatedChildrenParameters, ...void2 }: "
             },
             {
               "kind": "Reference",
@@ -21749,7 +21827,7 @@
           "overloadIndex": 1,
           "parameters": [
             {
-              "parameterName": "{ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, managedChildrenReturn, typeaheadNavigationParameters, singleSelectionParameters, refElementReturn, ...void2 }",
+              "parameterName": "{ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, managedChildrenReturn, typeaheadNavigationParameters, singleSelectionParameters, refElementReturn, paginatedChildrenParameters, ...void2 }",
               "parameterTypeTokenRange": {
                 "startIndex": 13,
                 "endIndex": 15
@@ -26160,7 +26238,16 @@
             },
             {
               "kind": "Content",
-              "text": ">({ rovingTabIndexReturn, linearNavigationParameters }: "
+              "text": ">({ rovingTabIndexReturn, linearNavigationParameters, "
+            },
+            {
+              "kind": "Reference",
+              "text": "paginatedChildrenParameters",
+              "canonicalReference": "preact-prop-helpers!~paginatedChildrenParameters"
+            },
+            {
+              "kind": "Content",
+              "text": ": { paginationMax, paginationMin, ...void2 }, ...void1 }: "
             },
             {
               "kind": "Reference",
@@ -26191,17 +26278,17 @@
           ],
           "fileUrlPath": "src/component-detail/keyboard-navigation/use-linear-navigation.tsx",
           "returnTypeTokenRange": {
-            "startIndex": 10,
-            "endIndex": 12
+            "startIndex": 12,
+            "endIndex": 14
           },
           "releaseTag": "Public",
           "overloadIndex": 1,
           "parameters": [
             {
-              "parameterName": "{ rovingTabIndexReturn, linearNavigationParameters }",
+              "parameterName": "{ rovingTabIndexReturn, linearNavigationParameters, paginatedChildrenParameters: { paginationMax, paginationMin, ...void2 }, ...void1 }",
               "parameterTypeTokenRange": {
-                "startIndex": 7,
-                "endIndex": 9
+                "startIndex": 9,
+                "endIndex": 11
               },
               "isOptional": false
             }
@@ -26343,6 +26430,28 @@
             },
             {
               "kind": "Content",
+              "text": ", "
+            },
+            {
+              "kind": "Reference",
+              "text": "TargetedPick",
+              "canonicalReference": "preact-prop-helpers!TargetedPick:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "UsePaginatedChildrenParameters",
+              "canonicalReference": "preact-prop-helpers!UsePaginatedChildrenParameters:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<ParentOrChildElement, ChildElement, any>, \"paginatedChildrenParameters\", \"paginationMin\" | \"paginationMax\">"
+            },
+            {
+              "kind": "Content",
               "text": " "
             }
           ],
@@ -26423,6 +26532,10 @@
             {
               "startIndex": 7,
               "endIndex": 13
+            },
+            {
+              "startIndex": 14,
+              "endIndex": 18
             }
           ]
         },
@@ -26466,7 +26579,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseLinearNavigationParametersSelf#arrowKeyDirection:member",
-              "docComment": "/**\n * Controls which arrow keys are used to navigate through the component. Not relative to the writing mode -- these are the literal keys that need to be pressed.\n *\n * Use \"either\" to allow navigation in either direction.\n *\n * Use \"none\" to disallow navigation with the arrow keys in any direction.\n */\n",
+              "docComment": "/**\n * Controls which arrow keys are used to navigate through the component.\n *\n * @remarks\n *\n * Not relative to the writing mode -- these are the literal keys that need to be pressed.\n *\n * Use `\"either\"` to allow navigation in either direction.\n *\n * Use `\"none\"` to disallow navigation with the arrow keys in any direction.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -26770,15 +26883,20 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseLinearNavigationParametersSelf#pageNavigationSize:member",
-              "docComment": "/**\n * Controls how many elements are skipped over when page up/down are pressed.\n * ```md-literal\n * * When 0: Page Up/Down are disabled\n * * When &gt;= 1: Page Up/Down moves that number of elements up or down\n * * When 0 &lt; x &lt; 1, Page Up/Down moves by that percentage of all elements, or of 100 elements, whichever is higher. In other words, 0.1 jumps by 10 elements when there are fewer then 100 elements, and 20 elements when there are 200 elements.\n * ```\n *\n */\n",
+              "docComment": "/**\n * Controls how many elements are skipped over when page up/down are pressed.\n * ```md-literal\n * * When 0 or null: Page Up/Down are disabled\n * * When &gt;= 1: Page Up/Down moves that number of elements up or down\n * * When 0 &lt; x &lt; 1, Page Up/Down moves by that percentage of all elements, or of 100 elements, whichever is higher. In other words, 0.1 jumps by 10 elements when there are fewer then 100 elements, and 20 elements when there are 200 elements.\n * ```\n *\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
                   "text": "pageNavigationSize: "
                 },
                 {
+                  "kind": "Reference",
+                  "text": "Nullable",
+                  "canonicalReference": "preact-prop-helpers!Nullable:type"
+                },
+                {
                   "kind": "Content",
-                  "text": "number"
+                  "text": "<number>"
                 },
                 {
                   "kind": "Content",
@@ -26791,7 +26909,7 @@
               "name": "pageNavigationSize",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
-                "endIndex": 2
+                "endIndex": 3
               }
             }
           ],
@@ -26952,7 +27070,7 @@
             },
             {
               "kind": "Content",
-              "text": ">({ linearNavigationParameters, typeaheadNavigationParameters, rovingTabIndexParameters, managedChildrenReturn, refElementReturn, ...void1 }: "
+              "text": ">({ linearNavigationParameters, typeaheadNavigationParameters, rovingTabIndexParameters, managedChildrenReturn, refElementReturn, paginatedChildrenParameters, ...void1 }: "
             },
             {
               "kind": "Reference",
@@ -26990,7 +27108,7 @@
           "overloadIndex": 1,
           "parameters": [
             {
-              "parameterName": "{ linearNavigationParameters, typeaheadNavigationParameters, rovingTabIndexParameters, managedChildrenReturn, refElementReturn, ...void1 }",
+              "parameterName": "{ linearNavigationParameters, typeaheadNavigationParameters, rovingTabIndexParameters, managedChildrenReturn, refElementReturn, paginatedChildrenParameters, ...void1 }",
               "parameterTypeTokenRange": {
                 "startIndex": 8,
                 "endIndex": 10
@@ -27905,7 +28023,7 @@
             },
             {
               "kind": "Content",
-              "text": ">({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, managedChildrenReturn, refElementReturn, ...void3 }: "
+              "text": ">({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, managedChildrenReturn, refElementReturn, paginatedChildrenParameters, ...void3 }: "
             },
             {
               "kind": "Reference",
@@ -27943,7 +28061,7 @@
           "overloadIndex": 1,
           "parameters": [
             {
-              "parameterName": "{ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, managedChildrenReturn, refElementReturn, ...void3 }",
+              "parameterName": "{ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, managedChildrenReturn, refElementReturn, paginatedChildrenParameters, ...void3 }",
               "parameterTypeTokenRange": {
                 "startIndex": 8,
                 "endIndex": 10
@@ -28765,7 +28883,7 @@
             },
             {
               "kind": "Content",
-              "text": ">({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, managedChildrenReturn, rearrangeableChildrenParameters, sortableChildrenParameters, refElementReturn, ...void3 }: "
+              "text": ">({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, managedChildrenReturn, rearrangeableChildrenParameters, sortableChildrenParameters, refElementReturn, paginatedChildrenParameters, ...void3 }: "
             },
             {
               "kind": "Reference",
@@ -28803,7 +28921,7 @@
           "overloadIndex": 1,
           "parameters": [
             {
-              "parameterName": "{ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, managedChildrenReturn, rearrangeableChildrenParameters, sortableChildrenParameters, refElementReturn, ...void3 }",
+              "parameterName": "{ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, managedChildrenReturn, rearrangeableChildrenParameters, sortableChildrenParameters, refElementReturn, paginatedChildrenParameters, ...void3 }",
               "parameterTypeTokenRange": {
                 "startIndex": 8,
                 "endIndex": 10
@@ -35041,7 +35159,7 @@
               "excerptTokens": [
                 {
                   "kind": "Content",
-                  "text": "allowRepeatPresses?: "
+                  "text": "allowRepeatPresses: "
                 },
                 {
                   "kind": "Reference",
@@ -35058,7 +35176,7 @@
                 }
               ],
               "isReadonly": false,
-              "isOptional": true,
+              "isOptional": false,
               "releaseTag": "Public",
               "name": "allowRepeatPresses",
               "propertyTypeTokenRange": {
@@ -35067,88 +35185,100 @@
               }
             },
             {
-              "kind": "MethodSignature",
-              "canonicalReference": "preact-prop-helpers!UsePressParametersSelf#excludeEnter:member(1)",
+              "kind": "PropertySignature",
+              "canonicalReference": "preact-prop-helpers!UsePressParametersSelf#excludeEnter:member",
               "docComment": "/**\n * Pass a function that returns `true` to prevent the enter key from contributing to press events\n *\n * @nonstable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
-                  "text": "excludeEnter?(): "
+                  "text": "excludeEnter: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Nullable",
+                  "canonicalReference": "preact-prop-helpers!Nullable:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "boolean"
+                  "text": "<() => boolean>"
                 },
                 {
                   "kind": "Content",
                   "text": ";"
                 }
               ],
-              "isOptional": true,
-              "returnTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              },
+              "isReadonly": false,
+              "isOptional": false,
               "releaseTag": "Public",
-              "overloadIndex": 1,
-              "parameters": [],
-              "name": "excludeEnter"
+              "name": "excludeEnter",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 3
+              }
             },
             {
-              "kind": "MethodSignature",
-              "canonicalReference": "preact-prop-helpers!UsePressParametersSelf#excludePointer:member(1)",
+              "kind": "PropertySignature",
+              "canonicalReference": "preact-prop-helpers!UsePressParametersSelf#excludePointer:member",
               "docComment": "/**\n * Pass a function that returns `true` to prevent the pointer (mouse, touch, etc.) from contributing to press events\n *\n * @nonstable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
-                  "text": "excludePointer?(): "
+                  "text": "excludePointer: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Nullable",
+                  "canonicalReference": "preact-prop-helpers!Nullable:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "boolean"
+                  "text": "<() => boolean>"
                 },
                 {
                   "kind": "Content",
                   "text": ";"
                 }
               ],
-              "isOptional": true,
-              "returnTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              },
+              "isReadonly": false,
+              "isOptional": false,
               "releaseTag": "Public",
-              "overloadIndex": 1,
-              "parameters": [],
-              "name": "excludePointer"
+              "name": "excludePointer",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 3
+              }
             },
             {
-              "kind": "MethodSignature",
-              "canonicalReference": "preact-prop-helpers!UsePressParametersSelf#excludeSpace:member(1)",
+              "kind": "PropertySignature",
+              "canonicalReference": "preact-prop-helpers!UsePressParametersSelf#excludeSpace:member",
               "docComment": "/**\n * Pass a function that returns `true` to prevent the spacebar from contributing to press events\n *\n * @nonstable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
-                  "text": "excludeSpace?(): "
+                  "text": "excludeSpace: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Nullable",
+                  "canonicalReference": "preact-prop-helpers!Nullable:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "boolean"
+                  "text": "<() => boolean>"
                 },
                 {
                   "kind": "Content",
                   "text": ";"
                 }
               ],
-              "isOptional": true,
-              "returnTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              },
+              "isReadonly": false,
+              "isOptional": false,
               "releaseTag": "Public",
-              "overloadIndex": 1,
-              "parameters": [],
-              "name": "excludeSpace"
+              "name": "excludeSpace",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 3
+              }
             },
             {
               "kind": "MethodSignature",
@@ -35202,7 +35332,7 @@
               "excerptTokens": [
                 {
                   "kind": "Content",
-                  "text": "longPressThreshold?: "
+                  "text": "longPressThreshold: "
                 },
                 {
                   "kind": "Reference",
@@ -35219,7 +35349,7 @@
                 }
               ],
               "isReadonly": false,
-              "isOptional": true,
+              "isOptional": false,
               "releaseTag": "Public",
               "name": "longPressThreshold",
               "propertyTypeTokenRange": {
@@ -35234,7 +35364,7 @@
               "excerptTokens": [
                 {
                   "kind": "Content",
-                  "text": "onPressingChange?: "
+                  "text": "onPressingChange: "
                 },
                 {
                   "kind": "Reference",
@@ -35269,7 +35399,7 @@
                 }
               ],
               "isReadonly": false,
-              "isOptional": true,
+              "isOptional": false,
               "releaseTag": "Public",
               "name": "onPressingChange",
               "propertyTypeTokenRange": {
@@ -36588,8 +36718,13 @@
                   "text": "onRearranged: "
                 },
                 {
+                  "kind": "Reference",
+                  "text": "Nullable",
+                  "canonicalReference": "preact-prop-helpers!Nullable:type"
+                },
+                {
                   "kind": "Content",
-                  "text": "null | (() => void)"
+                  "text": "<(() => void)>"
                 },
                 {
                   "kind": "Content",
@@ -36602,7 +36737,7 @@
               "name": "onRearranged",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
-                "endIndex": 2
+                "endIndex": 3
               }
             }
           ],
@@ -37142,12 +37277,21 @@
                 },
                 {
                   "kind": "Reference",
+                  "text": "Nullable",
+                  "canonicalReference": "preact-prop-helpers!Nullable:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
                   "text": "OnPassiveStateChange",
                   "canonicalReference": "preact-prop-helpers!OnPassiveStateChange:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<T | null, never>"
+                  "text": "<T | null, never>>"
                 },
                 {
                   "kind": "Content",
@@ -37160,7 +37304,7 @@
               "name": "onElementChange",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
-                "endIndex": 3
+                "endIndex": 5
               }
             },
             {
@@ -37173,8 +37317,13 @@
                   "text": "onMount?: "
                 },
                 {
+                  "kind": "Reference",
+                  "text": "Nullable",
+                  "canonicalReference": "preact-prop-helpers!Nullable:type"
+                },
+                {
                   "kind": "Content",
-                  "text": "(element: T) => void"
+                  "text": "<(element: T) => void>"
                 },
                 {
                   "kind": "Content",
@@ -37187,7 +37336,7 @@
               "name": "onMount",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
-                "endIndex": 2
+                "endIndex": 3
               }
             },
             {
@@ -37200,8 +37349,13 @@
                   "text": "onUnmount?: "
                 },
                 {
+                  "kind": "Reference",
+                  "text": "Nullable",
+                  "canonicalReference": "preact-prop-helpers!Nullable:type"
+                },
+                {
                   "kind": "Content",
-                  "text": "(element: T) => void"
+                  "text": "<(element: T) => void>"
                 },
                 {
                   "kind": "Content",
@@ -37214,7 +37368,7 @@
               "name": "onUnmount",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
-                "endIndex": 2
+                "endIndex": 3
               }
             }
           ],
@@ -38733,8 +38887,13 @@
                   "text": "initiallyTabbedIndex: "
                 },
                 {
+                  "kind": "Reference",
+                  "text": "Nullable",
+                  "canonicalReference": "preact-prop-helpers!Nullable:type"
+                },
+                {
                   "kind": "Content",
-                  "text": "number | null"
+                  "text": "<number>"
                 },
                 {
                   "kind": "Content",
@@ -38747,7 +38906,7 @@
               "name": "initiallyTabbedIndex",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
-                "endIndex": 2
+                "endIndex": 3
               }
             },
             {
@@ -38757,7 +38916,7 @@
               "excerptTokens": [
                 {
                   "kind": "Content",
-                  "text": "onTabbableIndexChange?: "
+                  "text": "onTabbableIndexChange: "
                 },
                 {
                   "kind": "Reference",
@@ -38792,7 +38951,7 @@
                 }
               ],
               "isReadonly": false,
-              "isOptional": true,
+              "isOptional": false,
               "releaseTag": "Public",
               "name": "onTabbableIndexChange",
               "propertyTypeTokenRange": {
@@ -39491,8 +39650,13 @@
                   "text": "defaultReason?: "
                 },
                 {
+                  "kind": "Reference",
+                  "text": "Nullable",
+                  "canonicalReference": "preact-prop-helpers!Nullable:type"
+                },
+                {
                   "kind": "Content",
-                  "text": "\"push\" | \"replace\""
+                  "text": "<\"push\" | \"replace\">"
                 },
                 {
                   "kind": "Content",
@@ -39505,7 +39669,7 @@
               "name": "defaultReason",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
-                "endIndex": 2
+                "endIndex": 3
               }
             },
             {
@@ -39573,12 +39737,21 @@
                 },
                 {
                   "kind": "Reference",
+                  "text": "Nullable",
+                  "canonicalReference": "preact-prop-helpers!Nullable:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
                   "text": "OnParamValueChanged",
                   "canonicalReference": "preact-prop-helpers!OnParamValueChanged:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<T> | null | undefined"
+                  "text": "<T> | null | undefined>"
                 },
                 {
                   "kind": "Content",
@@ -39591,7 +39764,7 @@
               "name": "onValueChange",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
-                "endIndex": 3
+                "endIndex": 5
               }
             },
             {
@@ -39631,8 +39804,13 @@
                   "text": "valueToString?: "
                 },
                 {
+                  "kind": "Reference",
+                  "text": "Nullable",
+                  "canonicalReference": "preact-prop-helpers!Nullable:type"
+                },
+                {
                   "kind": "Content",
-                  "text": "((value: T | null) => (string | null)) | undefined"
+                  "text": "<((value: T | null) => (string | null)) | undefined>"
                 },
                 {
                   "kind": "Content",
@@ -39645,7 +39823,7 @@
               "name": "valueToString",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
-                "endIndex": 2
+                "endIndex": 3
               }
             }
           ],
@@ -41154,8 +41332,13 @@
                   "text": "ariaPropName: "
                 },
                 {
+                  "kind": "Reference",
+                  "text": "Nullable",
+                  "canonicalReference": "preact-prop-helpers!Nullable:type"
+                },
+                {
                   "kind": "Content",
-                  "text": "`aria-${\"pressed\" | \"selected\" | \"checked\" | `current-${\"page\" | \"step\" | \"date\" | \"time\" | \"location\" | \"true\"}`}` | null"
+                  "text": "<`aria-${\"pressed\" | \"selected\" | \"checked\" | `current-${\"page\" | \"step\" | \"date\" | \"time\" | \"location\" | \"true\"}`}`>"
                 },
                 {
                   "kind": "Content",
@@ -41168,7 +41351,7 @@
               "name": "ariaPropName",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
-                "endIndex": 2
+                "endIndex": 3
               }
             },
             {
@@ -41181,8 +41364,13 @@
                   "text": "initiallySelectedIndex: "
                 },
                 {
+                  "kind": "Reference",
+                  "text": "Nullable",
+                  "canonicalReference": "preact-prop-helpers!Nullable:type"
+                },
+                {
                   "kind": "Content",
-                  "text": "number | null"
+                  "text": "<number>"
                 },
                 {
                   "kind": "Content",
@@ -41195,7 +41383,7 @@
               "name": "initiallySelectedIndex",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
-                "endIndex": 2
+                "endIndex": 3
               }
             },
             {
@@ -41208,13 +41396,22 @@
                   "text": "onSelectedIndexChange: "
                 },
                 {
+                  "kind": "Reference",
+                  "text": "Nullable",
+                  "canonicalReference": "preact-prop-helpers!Nullable:type"
+                },
+                {
                   "kind": "Content",
-                  "text": "null | "
+                  "text": "<"
                 },
                 {
                   "kind": "Reference",
                   "text": "SelectedIndexChangeHandler",
                   "canonicalReference": "preact-prop-helpers!SelectedIndexChangeHandler:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ">"
                 },
                 {
                   "kind": "Content",
@@ -41227,7 +41424,7 @@
               "name": "onSelectedIndexChange",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
-                "endIndex": 3
+                "endIndex": 5
               }
             },
             {
@@ -44856,13 +45053,22 @@
                   "text": "collator: "
                 },
                 {
+                  "kind": "Reference",
+                  "text": "Nullable",
+                  "canonicalReference": "preact-prop-helpers!Nullable:type"
+                },
+                {
                   "kind": "Content",
-                  "text": "null | "
+                  "text": "<"
                 },
                 {
                   "kind": "Reference",
                   "text": "Intl.Collator",
                   "canonicalReference": "!Intl.Collator:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ">"
                 },
                 {
                   "kind": "Content",
@@ -44875,7 +45081,7 @@
               "name": "collator",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
-                "endIndex": 3
+                "endIndex": 5
               }
             },
             {

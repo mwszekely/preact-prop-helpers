@@ -26,7 +26,7 @@ export interface UseRovingTabIndexParametersSelf<ParentElement extends Element, 
      * 
      * You can manually control this with `onTabbableIndexChange` and `setTabbableIndex` if you need.
      */
-    initiallyTabbedIndex: number | null;
+    initiallyTabbedIndex: Nullable<number>;
 
     /**
      * When true, none of the children will be tabbable, as if the entire component is hidden.
@@ -52,7 +52,7 @@ export interface UseRovingTabIndexParametersSelf<ParentElement extends Element, 
      * 
      * **MUST** be stable!
      */
-    onTabbableIndexChange?: Nullable<OnPassiveStateChange<number | null, Event>>;
+    onTabbableIndexChange: Nullable<OnPassiveStateChange<number | null, Event>>;
 }
 
 export interface UseRovingTabIndexReturnTypeSelf {

@@ -124,7 +124,8 @@ refElementReturn, ...void1 }) {
             disableHomeEndKeys: true,
             arrowKeyDirection: "horizontal",
             ...linearNavigationParameters
-        }
+        },
+        paginatedChildrenParameters: { paginationMin: null, paginationMax: null }
     });
     assertEmptyObject(void1);
     assertEmptyObject(void4);
@@ -166,6 +167,7 @@ export function useGridNavigationCell({ context: { gridNavigationCellContext: { 
 //allChildCellsAreUntabbable,
 ...void4 }, rovingTabIndexContext, typeaheadNavigationContext, ...void5 }, info, refElementReturn, textContentParameters, gridNavigationCellParameters: { colSpan, ...void6 }, ...void1 }) {
     monitorCallCount(useGridNavigationCell);
+    colSpan ??= 1;
     const { index } = info;
     const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void3 }, rovingTabIndexChildReturn, textContentReturn, pressParameters, props, info: infoLs, ...void2 } = useListNavigationChild({
         info,
@@ -192,7 +194,7 @@ export function useGridNavigationCell({ context: { gridNavigationCellContext: { 
                     setTabbableRow(getRowIndex(), e, false);
                     setTabbableColumn(prev => { debugger; return { actual: index, ideal: prev?.ideal ?? index }; }, e);
                     setTabbableCell((prev) => {
-                        if (prev != null && (prev < index || prev > index + colSpan)) {
+                        if (prev != null && (prev < index || prev > index + (colSpan))) {
                             return prev;
                         }
                         return index;

@@ -1,4 +1,5 @@
 import { identity } from "lodash-es";
+import { assertEmptyObject } from "../../index.js";
 import { useEnsureStability } from "../../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
@@ -15,8 +16,10 @@ export { identity };
  *
  * @compositeParams
  */
-export function useLinearNavigation({ rovingTabIndexReturn, linearNavigationParameters }) {
+export function useLinearNavigation({ rovingTabIndexReturn, linearNavigationParameters, paginatedChildrenParameters: { paginationMax, paginationMin, ...void2 }, ...void1 }) {
     monitorCallCount(useLinearNavigation);
+    let getPaginatedRange = useStableGetter(paginationMax == null || paginationMin == null ? null : paginationMax - paginationMin);
+    assertEmptyObject(void1);
     const { getLowestIndex, getHighestIndex, indexDemangler, indexMangler, isValid, navigatePastEnd, navigatePastStart, onNavigateLinear } = linearNavigationParameters;
     const { getTabbableIndex, setTabbableIndex } = rovingTabIndexReturn;
     useEnsureStability("useLinearNavigation", onNavigateLinear, isValid, indexDemangler, indexMangler);
@@ -116,9 +119,11 @@ export function useLinearNavigation({ rovingTabIndexReturn, linearNavigationPara
             const pageNavigationSize = getPageNavigationSize();
             const allowsVerticalNavigation = (arrowKeyDirection == "vertical" || arrowKeyDirection == "either");
             const allowsHorizontalNavigation = (arrowKeyDirection == "horizontal" || arrowKeyDirection == "either");
+            let childRange = (getHighestIndex() - getLowestIndex());
+            let paginatedRange = getPaginatedRange() ?? childRange;
             let truePageNavigationSize = pageNavigationSize;
-            if (truePageNavigationSize < 1) {
-                truePageNavigationSize = Math.round(pageNavigationSize * Math.max(100, (getHighestIndex() - getLowestIndex()) + 1));
+            if (truePageNavigationSize != null && truePageNavigationSize < 1) {
+                truePageNavigationSize = Math.round(truePageNavigationSize * Math.max(10, paginatedRange + 1));
             }
             let result = "passthrough";
             // Arrow keys only take effect for components oriented in that direction,
@@ -146,9 +151,10 @@ export function useLinearNavigation({ rovingTabIndexReturn, linearNavigationPara
                         break;
                     case "PageUp":
                     case "PageDown":
-                        if (truePageNavigationSize > 0) {
+                        if (truePageNavigationSize == null)
+                            break;
+                        else if (truePageNavigationSize > 0)
                             result = navigateRelative2(e, truePageNavigationSize * (e.key.endsWith('n') ? 1 : -1), true, "page");
-                        }
                         break;
                     case "Home":
                     case "End":

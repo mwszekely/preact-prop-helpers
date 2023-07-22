@@ -1,7 +1,7 @@
 
 import { MapOfSets } from "map-and-set-extensions";
 import { OnPassiveStateChange, returnNull, returnTrue, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
-import { StateUpdater, useEffect } from "../util/lib.js";
+import { Nullable, StateUpdater, useEffect } from "../util/lib.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 
 
@@ -109,21 +109,21 @@ export interface UseActiveElementParametersSelf {
      * 
      * @stable
      */
-    onActiveElementChange?: OnPassiveStateChange<Element | null, FocusEvent> | null | undefined;
+    onActiveElementChange?: Nullable<OnPassiveStateChange<Element | null, FocusEvent>>;
 
     /**
      * Called any time the active element changes and is not null.
      * 
      * @stable
      */
-    onLastActiveElementChange?: OnPassiveStateChange<Element, FocusEvent> | null | undefined;
+    onLastActiveElementChange?: Nullable<OnPassiveStateChange<Element, FocusEvent>>;
 
     /**
      * Called any time the window gains/loses focus.
      * 
      * @stable
      */
-    onWindowFocusedChange?: OnPassiveStateChange<boolean, FocusEvent> | null | undefined;
+    onWindowFocusedChange?: Nullable<OnPassiveStateChange<boolean, FocusEvent>>;
 
     /**
      * This must be a function that returns the document associated with whatever elements we're listening to.
@@ -140,7 +140,7 @@ export interface UseActiveElementParametersSelf {
      * 
      * @stable
      */
-    getWindow?: ((document: Document) => Window) | null | undefined;
+    getWindow?: Nullable<((document: Document) => Window)>;
 }
 
 

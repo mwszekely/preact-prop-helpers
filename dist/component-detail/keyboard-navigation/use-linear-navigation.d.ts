@@ -2,6 +2,7 @@ import { identity } from "lodash-es";
 import { ManagedChildInfo } from "../../preact-extensions/use-managed-children.js";
 import { TargetedPick } from "../../util/lib.js";
 import { ElementProps, KeyboardEventType, Nullable } from "../../util/types.js";
+import { UsePaginatedChildrenParameters } from "../use-paginated-children.js";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
 export { identity };
 export interface LinearNavigationResult {
@@ -17,7 +18,7 @@ export interface UseLinearNavigationReturnType<ParentOrChildElement extends Elem
 export interface UseLinearNavigationChildInfo extends ManagedChildInfo<number> {
 }
 /** Arguments passed to the parent `useLinearNavigation` */
-export interface UseLinearNavigationParameters<ParentOrChildElement extends Element, ChildElement extends Element, _M extends UseLinearNavigationChildInfo> extends TargetedPick<UseRovingTabIndexReturnType<ParentOrChildElement, ChildElement, UseRovingTabIndexChildInfo<ChildElement>>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex"> {
+export interface UseLinearNavigationParameters<ParentOrChildElement extends Element, ChildElement extends Element, _M extends UseLinearNavigationChildInfo> extends TargetedPick<UseRovingTabIndexReturnType<ParentOrChildElement, ChildElement, UseRovingTabIndexChildInfo<ChildElement>>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex">, TargetedPick<UsePaginatedChildrenParameters<ParentOrChildElement, ChildElement, any>, "paginatedChildrenParameters", "paginationMin" | "paginationMax"> {
     linearNavigationParameters: UseLinearNavigationParametersSelf<ChildElement>;
 }
 export interface UseLinearNavigationParametersSelf<ChildElement extends Element> {
@@ -37,12 +38,12 @@ export interface UseLinearNavigationParametersSelf<ChildElement extends Element>
      * Controls how many elements are skipped over when page up/down are pressed.
      *
      * ```md-literal
-     * * When 0: Page Up/Down are disabled
+     * * When 0 or null: Page Up/Down are disabled
      * * When &gt;= 1: Page Up/Down moves that number of elements up or down
      * * When 0 &lt; x &lt; 1, Page Up/Down moves by that percentage of all elements, or of 100 elements, whichever is higher. In other words, 0.1 jumps by 10 elements when there are fewer then 100 elements, and 20 elements when there are 200 elements.
      * ```
      */
-    pageNavigationSize: number;
+    pageNavigationSize: Nullable<number>;
     /**
      * What happens when `up` is pressed on the first valid child?
      *
@@ -61,11 +62,12 @@ export interface UseLinearNavigationParametersSelf<ChildElement extends Element>
     navigatePastEnd: "passthrough" | "wrap" | (() => void);
     /**
      * Controls which arrow keys are used to navigate through the component.
-     * Not relative to the writing mode -- these are the literal keys that need to be pressed.
      *
-     * Use "either" to allow navigation in either direction.
+     * @remarks Not relative to the writing mode -- these are the literal keys that need to be pressed.
      *
-     * Use "none" to disallow navigation with the arrow keys in any direction.
+     * Use `"either"` to allow navigation in either direction.
+     *
+     * Use `"none"` to disallow navigation with the arrow keys in any direction.
      */
     arrowKeyDirection: "horizontal" | "vertical" | "either" | "none";
     /**
@@ -117,7 +119,7 @@ export interface UseLinearNavigationParametersSelf<ChildElement extends Element>
  *
  * @compositeParams
  */
-export declare function useLinearNavigation<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseLinearNavigationChildInfo>({ rovingTabIndexReturn, linearNavigationParameters }: UseLinearNavigationParameters<ParentOrChildElement, ChildElement, M>): UseLinearNavigationReturnType<ParentOrChildElement>;
+export declare function useLinearNavigation<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseLinearNavigationChildInfo>({ rovingTabIndexReturn, linearNavigationParameters, paginatedChildrenParameters: { paginationMax, paginationMin, ...void2 }, ...void1 }: UseLinearNavigationParameters<ParentOrChildElement, ChildElement, M>): UseLinearNavigationReturnType<ParentOrChildElement>;
 export interface TryNavigateToIndexParameters {
     lowestChildIndex: number;
     highestChildIndex: number;

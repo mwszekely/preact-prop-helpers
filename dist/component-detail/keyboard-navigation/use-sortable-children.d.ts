@@ -1,5 +1,5 @@
 import { ManagedChildInfo, UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
-import { TargetedPick } from "../../util/lib.js";
+import { Nullable, TargetedPick } from "../../util/lib.js";
 import { VNode } from "../../util/types.js";
 export type GetIndex = (row: VNode) => (number | null | undefined);
 export type GetValid = (index: number) => boolean;
@@ -17,7 +17,7 @@ export interface UseRearrangeableChildrenParametersSelf {
     /**
      * Called after the children have been rearranged.
      */
-    onRearranged: null | (() => void);
+    onRearranged: Nullable<(() => void)>;
 }
 export interface UseSortableChildrenParametersSelf<M extends UseRearrangeableChildInfo> {
     /**

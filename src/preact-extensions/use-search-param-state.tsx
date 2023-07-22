@@ -1,6 +1,6 @@
 
 import { useUrl } from "../observers/use-url.js";
-import { useCallback, useEffect, useRef } from "../util/lib.js";
+import { Nullable, useCallback, useEffect, useRef } from "../util/lib.js";
 import { OmitStrong } from "../util/types.js";
 import { OnPassiveStateChange, runImmediately, usePassiveState } from "./use-passive-state.js";
 import { useStableCallback } from "./use-stable-callback.js";
@@ -26,7 +26,7 @@ export type SetParamWithHistory<T> = (value: T | ((prevValue: T) => T), reason?:
  */
 export interface SearchParamStates { }
 
-function parseParam<Key extends keyof SearchParamStates, T = SearchParamStates[Key]>(url: URL | null | undefined, paramKey: Key | null, fromString: ((value: string | null) => T | null)): T | undefined {
+function parseParam<Key extends keyof SearchParamStates, T = SearchParamStates[Key]>(url: Nullable<URL>, paramKey: Nullable<Key>, fromString: ((value: string | null) => T | null)): T | undefined {
     if (paramKey == undefined)
         return paramKey ?? undefined;
 
@@ -36,7 +36,7 @@ function parseParam<Key extends keyof SearchParamStates, T = SearchParamStates[K
     return ret;
 }
 
-function unparseParam<Key extends keyof SearchParamStates, T = SearchParamStates[Key]>(params: URLSearchParams, paramKey: Key | null, value: T, ts2: ((value: T | null) => (string | null))) {
+function unparseParam<Key extends keyof SearchParamStates, T = SearchParamStates[Key]>(params: URLSearchParams, paramKey: Nullable<Key>, value: T, ts2: ((value: T | null) => (string | null))) {
     if (paramKey == null)
         return;
 
@@ -65,11 +65,11 @@ export interface UseSearchParamStateParameters<Key extends keyof SearchParamStat
      * How is the user's history modified when the state changes if not otherwise specified? 
      * "`replace`" is recommended unless you *really* have a good reason to clog up the back button. 
      */
-    defaultReason?: "push" | "replace";
-    onValueChange?: OnParamValueChanged<T> | null | undefined;
+    defaultReason?: Nullable<"push" | "replace">;
+    onValueChange?: Nullable<OnParamValueChanged<T> | null | undefined>;
     stringToValue: ((value: string | null) => T | null);
     // Can't just be named `toString`...
-    valueToString?: ((value: T | null) => (string | null)) | undefined;
+    valueToString?: Nullable<((value: T | null) => (string | null)) | undefined>;
 }
 
 /**

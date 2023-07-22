@@ -1,3 +1,4 @@
+import { Nullable } from "../util/lib.js";
 import { OmitStrong } from "../util/types.js";
 import { OnPassiveStateChange } from "./use-passive-state.js";
 export type OnParamValueChanged<T> = OnPassiveStateChange<T, never>;
@@ -26,10 +27,10 @@ export interface UseSearchParamStateParameters<Key extends keyof SearchParamStat
      * How is the user's history modified when the state changes if not otherwise specified?
      * "`replace`" is recommended unless you *really* have a good reason to clog up the back button.
      */
-    defaultReason?: "push" | "replace";
-    onValueChange?: OnParamValueChanged<T> | null | undefined;
+    defaultReason?: Nullable<"push" | "replace">;
+    onValueChange?: Nullable<OnParamValueChanged<T> | null | undefined>;
     stringToValue: ((value: string | null) => T | null);
-    valueToString?: ((value: T | null) => (string | null)) | undefined;
+    valueToString?: Nullable<((value: T | null) => (string | null)) | undefined>;
 }
 /**
  * Provides access to the requested Search Param's value

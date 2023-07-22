@@ -8,7 +8,7 @@ export interface UsePressParameters<E extends EventTarget> extends TargetedPick<
     pressParameters: UsePressParametersSelf<E>;
 }
 export interface UsePressParametersSelf<E extends EventTarget> {
-    onPressingChange?: Nullable<OnPassiveStateChange<boolean, PressChangeEventReason<E>>>;
+    onPressingChange: Nullable<OnPassiveStateChange<boolean, PressChangeEventReason<E>>>;
     /**
      * What should happen when this widget has been "pressed".
      *
@@ -20,11 +20,11 @@ export interface UsePressParametersSelf<E extends EventTarget> {
      */
     onPressSync: Nullable<((e: PressEventReason<E>) => void)>;
     /** Pass a function that returns `true` to prevent the spacebar from contributing to press events @nonstable */
-    excludeSpace?(): boolean;
+    excludeSpace: Nullable<() => boolean>;
     /** Pass a function that returns `true` to prevent the enter key from contributing to press events @nonstable */
-    excludeEnter?(): boolean;
+    excludeEnter: Nullable<() => boolean>;
     /** Pass a function that returns `true` to prevent the pointer (mouse, touch, etc.) from contributing to press events @nonstable */
-    excludePointer?(): boolean;
+    excludePointer: Nullable<() => boolean>;
     /**
      * Ensures that when a button is pressed it properly receives focus (even on iOS Safari).
      *
@@ -37,12 +37,12 @@ export interface UsePressParametersSelf<E extends EventTarget> {
     /**
      * If `true`, holding down the `Enter` key will repeatedly fire press events as each sequential repeated keyboard event happens.
      */
-    allowRepeatPresses?: Nullable<boolean>;
+    allowRepeatPresses: Nullable<boolean>;
     /**
      * After this number of milliseconds have passed pressing down but not up, the returned `longPress` value will be set to `true`
      * and the user's actions will not fire an actual press event.
      */
-    longPressThreshold?: Nullable<number>;
+    longPressThreshold: Nullable<number>;
 }
 export interface UsePressReturnTypeSelf {
     /**

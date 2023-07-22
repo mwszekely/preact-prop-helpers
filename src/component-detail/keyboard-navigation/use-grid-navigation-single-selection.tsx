@@ -41,6 +41,7 @@ export function useGridNavigationSingleSelection<ParentOrRowElement extends Elem
     typeaheadNavigationParameters,
     singleSelectionParameters,
     refElementReturn,
+    paginatedChildrenParameters,
     ...void2
 }: UseGridNavigationSingleSelectionParameters<ParentOrRowElement, RowElement, CellElement, RM>): UseGridNavigationSingleSelectionReturnType<ParentOrRowElement, RowElement, CellElement, RM, CM> {
     monitorCallCount(useGridNavigationSingleSelection);
@@ -59,6 +60,7 @@ export function useGridNavigationSingleSelection<ParentOrRowElement extends Elem
         managedChildrenReturn,
         rovingTabIndexParameters,
         typeaheadNavigationParameters,
+        paginatedChildrenParameters,
         refElementReturn
     });
 

@@ -87,13 +87,14 @@ export function useListNavigation<ParentOrChildElement extends Element, ChildEle
     rovingTabIndexParameters,
     managedChildrenReturn,
     refElementReturn,
+    paginatedChildrenParameters,
     ...void1
 }: UseListNavigationParameters<ParentOrChildElement, ChildElement, M>): UseListNavigationReturnType<ParentOrChildElement, ChildElement, M> {
     monitorCallCount(useListNavigation);
 
     const { context: { rovingTabIndexContext }, managedChildrenParameters, rovingTabIndexReturn, props: propsRTI, ...void2 } = useRovingTabIndex<ParentOrChildElement, ChildElement, M>({ managedChildrenReturn, rovingTabIndexParameters, refElementReturn });
     const { context: { typeaheadNavigationContext }, propsStable: propsStableTN, typeaheadNavigationReturn, ...void3 } = useTypeaheadNavigation<ParentOrChildElement, ChildElement, M>({ rovingTabIndexReturn, typeaheadNavigationParameters, });
-    const { propsStable: propsStableLN, linearNavigationReturn, ...void4 } = useLinearNavigation<ParentOrChildElement, ChildElement, M>({ rovingTabIndexReturn, linearNavigationParameters, });
+    const { propsStable: propsStableLN, linearNavigationReturn, ...void4 } = useLinearNavigation<ParentOrChildElement, ChildElement, M>({ rovingTabIndexReturn, linearNavigationParameters, paginatedChildrenParameters });
 
     assertEmptyObject(void1);
     assertEmptyObject(void2);

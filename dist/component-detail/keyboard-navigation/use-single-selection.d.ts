@@ -37,7 +37,7 @@ export interface UseSingleSelectionParametersSelf {
      * This is imperative, as opposed to declarative,
      * to save on re-rendering the parent whenever the selected index changes.
      */
-    initiallySelectedIndex: number | null;
+    initiallySelectedIndex: Nullable<number>;
     /**
      * Called when a child is selected (via a press or other method).
      *
@@ -51,14 +51,14 @@ export interface UseSingleSelectionParametersSelf {
      *
      * @nonstable
      */
-    onSelectedIndexChange: null | SelectedIndexChangeHandler;
+    onSelectedIndexChange: Nullable<SelectedIndexChangeHandler>;
     selectionMode: "focus" | "activation" | "disabled";
     /**
      * What property will be used to mark this item as selected.
      *
      * **IMPORTANT**: The `aria-current` options should be used with caution as they are semantically very different from the usual selection cases.
      */
-    ariaPropName: `aria-${"pressed" | "selected" | "checked" | `current-${"page" | "step" | "date" | "time" | "location" | "true"}`}` | null;
+    ariaPropName: Nullable<`aria-${"pressed" | "selected" | "checked" | `current-${"page" | "step" | "date" | "time" | "location" | "true"}`}`>;
 }
 export interface UseSingleSelectionReturnTypeSelf {
     /**

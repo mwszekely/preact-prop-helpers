@@ -2,7 +2,7 @@ import { shuffle as lodashShuffle } from "lodash-es";
 import { ManagedChildInfo, UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
 import { returnNull, useEnsureStability, usePassiveState } from "../../preact-extensions/use-passive-state.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
-import { TargetedPick, createElement, useCallback, useRef } from "../../util/lib.js";
+import { Nullable, TargetedPick, createElement, useCallback, useRef } from "../../util/lib.js";
 import { VNode } from "../../util/types.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
 
@@ -27,7 +27,7 @@ export interface UseRearrangeableChildrenParametersSelf {
     /**
      * Called after the children have been rearranged.
      */
-    onRearranged: null | (() => void);
+    onRearranged: Nullable<(() => void)>;
 }
 
 export interface UseSortableChildrenParametersSelf<M extends UseRearrangeableChildInfo> {

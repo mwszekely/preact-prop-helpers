@@ -1,4 +1,5 @@
 import { OnPassiveStateChange } from "../preact-extensions/use-passive-state.js";
+import { Nullable } from "../util/lib.js";
 import { ElementProps } from "../util/types.js";
 export interface UseRefElementReturnTypeSelf<T extends EventTarget> {
     /**
@@ -20,19 +21,19 @@ export interface UseRefElementParametersSelf<T> {
      *
      * @stable
      */
-    onElementChange?: OnPassiveStateChange<T | null, never>;
+    onElementChange?: Nullable<OnPassiveStateChange<T | null, never>>;
     /**
      * Called when the element mounts
      *
      * @stable
      */
-    onMount?: (element: T) => void;
+    onMount?: Nullable<(element: T) => void>;
     /**
      * Called when the element unmounts
      *
      * @stable
      */
-    onUnmount?: (element: T) => void;
+    onUnmount?: Nullable<(element: T) => void>;
 }
 export interface UseRefElementParameters<T> {
     /**

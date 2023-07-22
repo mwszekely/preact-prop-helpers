@@ -23,10 +23,11 @@ export function useListNavigationSingleSelection<ParentOrChildElement extends El
     singleSelectionParameters,
     managedChildrenReturn,
     refElementReturn,
+    paginatedChildrenParameters,
     ...void3
 }: UseListNavigationSingleSelectionParameters<ParentOrChildElement, ChildElement, M>): UseListNavigationSingleSelectionReturnType<ParentOrChildElement, ChildElement, M> {
     monitorCallCount(useListNavigationSingleSelection);
-    const { context: contextLN, propsParent, propsStableParentOrChild, rovingTabIndexReturn, ...retLN } = useListNavigation<ParentOrChildElement, ChildElement, M>({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, managedChildrenReturn, refElementReturn });
+    const { context: contextLN, propsParent, propsStableParentOrChild, rovingTabIndexReturn, ...retLN } = useListNavigation<ParentOrChildElement, ChildElement, M>({ linearNavigationParameters, rovingTabIndexParameters, paginatedChildrenParameters, typeaheadNavigationParameters, managedChildrenReturn, refElementReturn });
     const { context: contextSS, ...retSS } = useSingleSelection<ParentOrChildElement, ChildElement, M>({ rovingTabIndexReturn, managedChildrenReturn, singleSelectionParameters });
 
     assertEmptyObject(void3);
