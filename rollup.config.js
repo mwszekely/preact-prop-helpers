@@ -31,7 +31,16 @@ export default {
             "react-dom": "ReactDOM"
         }
     },
-    external: ["react", "react-dom"],
+    external: [
+        "react", 
+        "react-dom", 
+        "lodash-es",    
+        "blocking-elements",
+        "clsx",
+        "lodash-es",
+        "tabbable",
+        "wicg-inert",
+    ],
     treeshake: "recommended",
     plugins: [
         ts(),
