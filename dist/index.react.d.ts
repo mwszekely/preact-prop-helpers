@@ -182,7 +182,7 @@ type EnhancedEventHandler<E extends Event, Detail> = (e: TargetedEnhancedEvent<E
 type TargetedEnhancedEvent<E extends Event, Detail> = E & {
     [EventDetail]: Detail;
 };
-declare function getEventDetail(e: TargetedEnhancedEvent<any, any>): any;
+declare function getEventDetail<Detail>(e: TargetedEnhancedEvent<any, Detail>): Detail;
 declare function enhanceEvent<E extends Event | EventType<any, any>, Detail extends object>(e: E, detail: Detail): TargetedEnhancedEvent<E & Event, Detail>;
 interface UseBackdropDismissParametersSelf {
     /**
