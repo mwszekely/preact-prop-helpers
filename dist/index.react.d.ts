@@ -2343,7 +2343,7 @@ interface UseAsyncHandlerParameters<EventType, CaptureType> extends OmitStrong<U
     /**
      * The function (either async or sync) that you want to convert to a regular, sync event handler.
      */
-    asyncHandler: AsyncHandler<EventType, CaptureType> | null;
+    asyncHandler: Nullable<AsyncHandler<EventType, CaptureType>>;
 }
 interface UseAsyncHandlerReturnType<EventType, CaptureType> extends UseAsyncReturnType<[
     EventType

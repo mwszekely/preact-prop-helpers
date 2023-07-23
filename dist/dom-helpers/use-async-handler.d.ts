@@ -1,5 +1,5 @@
 import { UseAsyncParameters, UseAsyncReturnType } from "../preact-extensions/use-async.js";
-import { OmitStrong } from "../util/types.js";
+import { Nullable, OmitStrong } from "../util/types.js";
 export type AsyncHandler<EventType, CaptureType> = ((c: CaptureType, e: EventType) => (Promise<void> | void));
 export interface UseAsyncHandlerParameters<EventType, CaptureType> extends OmitStrong<UseAsyncParameters<[CaptureType, EventType], [EventType]>, "capture"> {
     /**
@@ -14,7 +14,7 @@ export interface UseAsyncHandlerParameters<EventType, CaptureType> extends OmitS
     /**
      * The function (either async or sync) that you want to convert to a regular, sync event handler.
      */
-    asyncHandler: AsyncHandler<EventType, CaptureType> | null;
+    asyncHandler: Nullable<AsyncHandler<EventType, CaptureType>>;
 }
 export interface UseAsyncHandlerReturnType<EventType, CaptureType> extends UseAsyncReturnType<[EventType], void> {
     /**
