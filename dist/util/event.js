@@ -6,6 +6,7 @@
  * Get that extra information from the [EventDetail] symbol.
  */
 export const EventDetail = Symbol("event-detail");
+export function getEventDetail(e) { return e[EventDetail]; }
 export function enhanceEvent(e, detail) {
     const event = (e ?? {});
     event[EventDetail] = detail;

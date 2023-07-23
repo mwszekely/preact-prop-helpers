@@ -12,5 +12,6 @@ export type EnhancedEventHandler<E extends Event, Detail> = (e: TargetedEnhanced
 export type TargetedEnhancedEvent<E extends Event, Detail> = E & {
     [EventDetail]: Detail;
 };
+export declare function getEventDetail(e: TargetedEnhancedEvent<any, any>): any;
 export declare function enhanceEvent<E extends Event | EventType<any, any>, Detail extends object>(e: E, detail: Detail): TargetedEnhancedEvent<E & Event, Detail>;
 //# sourceMappingURL=event.d.ts.map

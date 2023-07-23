@@ -324,7 +324,7 @@ export { ProvideBatchedAnimationFrames, useAnimationFrame } from "./timing/use-a
 export { useInterval } from "./timing/use-interval.js";
 export { useTimeout } from "./timing/use-timeout.js";
 export { assertEmptyObject } from "./util/assert.js";
-export { EventDetail, enhanceEvent } from "./util/event.js";
+export { EventDetail, enhanceEvent, getEventDetail } from "./util/event.js";
 export { findBackupFocus, focus } from "./util/focus.js";
 export { getBuildMode } from "./util/mode.js";
 export { generateRandomId } from "./util/random-id.js";
