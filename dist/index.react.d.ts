@@ -2323,7 +2323,7 @@ interface UseAsyncReturnType<SP extends unknown[], R> {
  * @param options - @see {@link UseAsyncParameters}
  *
  */
-declare function useAsync<AP extends unknown[], R, SP extends unknown[] = AP>(asyncHandler: AsyncFunctionType<AP, R> | null, options?: UseAsyncParameters<AP, SP>): UseAsyncReturnType<SP, R>;
+declare function useAsync<AP extends unknown[], R, SP extends unknown[] = AP>(asyncHandler: Nullable<AsyncFunctionType<AP, R>>, options?: UseAsyncParameters<AP, SP>): UseAsyncReturnType<SP, R>;
 type AsyncHandler<EventType, CaptureType> = ((c: CaptureType, e: EventType) => (Promise<void> | void));
 interface UseAsyncHandlerParameters<EventType, CaptureType> extends OmitStrong<UseAsyncParameters<[
     CaptureType,

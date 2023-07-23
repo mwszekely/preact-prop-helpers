@@ -200,7 +200,7 @@ const AsyncFunction = ((async function () {}).constructor)
  * @param options - @see {@link UseAsyncParameters}
  * 
  */
-export function useAsync<AP extends unknown[], R, SP extends unknown[] = AP>(asyncHandler: AsyncFunctionType<AP, R> | null, options?: UseAsyncParameters<AP, SP>): UseAsyncReturnType<SP, R> {
+export function useAsync<AP extends unknown[], R, SP extends unknown[] = AP>(asyncHandler: Nullable<AsyncFunctionType<AP, R>>, options?: UseAsyncParameters<AP, SP>): UseAsyncReturnType<SP, R> {
     monitorCallCount(useAsync);
 
 
