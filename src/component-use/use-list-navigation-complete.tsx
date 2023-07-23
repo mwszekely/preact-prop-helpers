@@ -14,7 +14,7 @@ import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useMemoObject } from "../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../util/assert.js";
 import { enhanceEvent } from "../util/event.js";
-import { TargetedOmit, useCallback } from "../util/lib.js";
+import { TargetedOmit, TargetedPick, useCallback } from "../util/lib.js";
 import { ElementProps, ExtendMerge, OmitStrong } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 import { PressEventReason, UsePressParameters } from "./use-press.js";
@@ -51,16 +51,20 @@ export interface CompleteListNavigationContext<_ParentElement extends Element, C
     RovingTabIndexChildContext { }
 
 
-export interface UseCompleteListNavigationChildParameters<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends 
-Pick<UseListNavigationSingleSelectionSortableChildParameters<ChildElement, M>, "textContentParameters"> {
+export interface UseCompleteListNavigationChildParameters<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends
+    Pick<UseListNavigationSingleSelectionSortableChildParameters<ChildElement, M>, "textContentParameters"> {
     context: CompleteListNavigationContext<any, ChildElement, M>;
     info: Omit<M, Exclude<keyof UseCompleteListNavigationChildInfo<ChildElement>, "getSortValue" | "index" | "focusSelf" | "untabbable" | "unselectable">>;
 }
 
 export interface UseCompleteListNavigationChildReturnType<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>>
-    extends Pick<UseListNavigationSingleSelectionSortableChildReturnType<ChildElement, M>, "textContentReturn" | "rovingTabIndexChildReturn" | "singleSelectionChildReturn">, OmitStrong<UseRefElementReturnType<ChildElement>, "propsStable"> {
-    hasCurrentFocusReturn: UseHasCurrentFocusReturnType<ChildElement>["hasCurrentFocusReturn"];
-    managedChildReturn: UseManagedChildReturnType<M>["managedChildReturn"];
+    extends Pick<UseListNavigationSingleSelectionSortableChildReturnType<ChildElement, M>, "textContentReturn" | "rovingTabIndexChildReturn" | "singleSelectionChildReturn">,
+    OmitStrong<UseRefElementReturnType<ChildElement>, "propsStable">,
+    Pick<UseHasCurrentFocusReturnType<ChildElement>, "hasCurrentFocusReturn">,
+    Pick<UseManagedChildReturnType<M>, "managedChildReturn">,
+    TargetedPick<UsePressParameters<any>,"pressParameters", "onPressSync" | "excludeSpace">,
+    Pick<UsePaginatedChildReturnType<ChildElement>, "paginatedChildReturn">,
+    Pick<UseStaggeredChildReturnType<ChildElement>, "staggeredChildReturn"> {
 
     /**
      * These props should be passed to whichever element is tabbable. 
@@ -78,13 +82,6 @@ export interface UseCompleteListNavigationChildReturnType<ChildElement extends E
      * @see propsTabbable
      */
     propsChild: ElementProps<any>;
-
-    /**
-     * This hook does not include `usePress`, so when you call it for whatever element is responsible for selecting this child, pass it these parameters.
-     */
-    pressParameters: Pick<UsePressParameters<any>["pressParameters"], "onPressSync" | "excludeSpace">;
-    paginatedChildReturn: UsePaginatedChildReturnType<ChildElement>["paginatedChildReturn"];
-    staggeredChildReturn: UseStaggeredChildReturnType<ChildElement>["staggeredChildReturn"];
 }
 
 
@@ -94,7 +91,7 @@ export interface UseCompleteListNavigationChildReturnType<ChildElement extends E
  * @remarks Unlike most others, this hook assume's it's the final one--the "outermost" hook in the component--so it uses `useManagedChildren` and wraps everything up nicely,
  * combining event handlers that are used in multiple sub-hooks, collecting all the necessary context-related data, and merging all known DOM props together.
  * 
- * 
+ * @hasChild {@link useCompleteListNavigationChild}
  * 
  * @compositeParams
  */
@@ -193,6 +190,10 @@ export function useCompleteListNavigation<ParentElement extends Element, ChildEl
     }
 }
 
+/**
+ * 
+ * @compositeParams
+ */
 export function useCompleteListNavigationChild<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>>({
     info: { index, focusSelf, unselectable, untabbable, getSortValue, ...info },  // The "...info" is empty if M is the same as UCLNCI<ChildElement>.
     textContentParameters,

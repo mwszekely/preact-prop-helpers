@@ -20,7 +20,7 @@ import { monitorCallCount } from "../util/use-call-count.js";
  * @remarks Unlike most others, this hook assume's it's the final one--the "outermost" hook in the component--so it uses `useManagedChildren` and wraps everything up nicely,
  * combining event handlers that are used in multiple sub-hooks, collecting all the necessary context-related data, and merging all known DOM props together.
  *
- *
+ * @hasChild {@link useCompleteListNavigationChild}
  *
  * @compositeParams
  */
@@ -89,6 +89,10 @@ export function useCompleteListNavigation({ linearNavigationParameters, rearrang
         childrenHaveFocusReturn
     };
 }
+/**
+ *
+ * @compositeParams
+ */
 export function useCompleteListNavigationChild({ info: { index, focusSelf, unselectable, untabbable, getSortValue, ...info }, // The "...info" is empty if M is the same as UCLNCI<ChildElement>.
 textContentParameters, context: { childrenHaveFocusChildContext, managedChildContext, rovingTabIndexContext, paginatedChildContext, staggeredChildContext, singleSelectionContext, typeaheadNavigationContext }, ...void1 }) {
     monitorCallCount(useCompleteListNavigationChild);

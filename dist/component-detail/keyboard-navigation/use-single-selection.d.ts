@@ -136,11 +136,8 @@ export declare function useSingleSelection<ParentOrChildElement extends Element,
  */
 export declare function useSingleSelectionChild<ChildElement extends Element, M extends UseSingleSelectionChildInfo<ChildElement>>({ context: { singleSelectionContext: { getSelectedIndex, onSelectedIndexChange, ariaPropName, selectionMode, ...void1 }, ...void2 }, info: { index, unselectable, ...void3 }, ...void4 }: UseSingleSelectionChildParameters<ChildElement, M>): UseSingleSelectionChildReturnType<ChildElement>;
 export interface UseSingleSelectionDeclarativeParameters {
-    singleSelectionDeclarativeParameters: {
+    singleSelectionDeclarativeParameters: Pick<UseSingleSelectionParameters<any, any, any>["singleSelectionParameters"], "onSelectedIndexChange"> & {
         selectedIndex: number | null;
-        onSelectedIndexChange: null | EnhancedEventHandler<Event, {
-            selectedIndex: number;
-        }>;
     };
     singleSelectionReturn: Pick<UseSingleSelectionReturnType<any, any>["singleSelectionReturn"], "changeSelectedIndex">;
 }
@@ -153,9 +150,7 @@ export type MakeSingleSelectionDeclarativeReturnType<R> = Omit<R, "singleSelecti
  */
 export declare function useSingleSelectionDeclarative<ParentOrChildElement extends Element, ChildElement extends Element, _M extends UseSingleSelectionChildInfo<ChildElement>>({ singleSelectionReturn: { changeSelectedIndex }, singleSelectionDeclarativeParameters: { selectedIndex, onSelectedIndexChange } }: UseSingleSelectionDeclarativeParameters): {
     singleSelectionParameters: {
-        onSelectedIndexChange: EnhancedEventHandler<Event, {
-            selectedIndex: number;
-        }> | null;
+        onSelectedIndexChange: Nullable<SelectedIndexChangeHandler>;
     };
 };
 //# sourceMappingURL=use-single-selection.d.ts.map

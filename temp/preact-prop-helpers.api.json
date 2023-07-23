@@ -147,7 +147,7 @@
   },
   "kind": "Package",
   "canonicalReference": "preact-prop-helpers!",
-  "docComment": "/**\n * # Preact Prop Helpers\n *\n * A set of small, compartmentalized hooks for Preact. The theme is modifying HTML attributes to do useful things, along with a few other boilerplate-y hooks that are just good to have around.\n *\n * Everything from keyboard navigation (arrow keys, typeahead) to modal focus traps (dialogs and menus) to simple things like `useState` *but with localStorage!* are here.\n *\n * ## List of hooks (in rough order of usefulness)\n *\n * {@tableOfContents start} {@tableOfContents header Common} {@tableOfContents subheader These hooks are used extremely commonly or provide uncommonly useful behavior} {@include} {@link useMergedProps} {@include} {@link useRefElement} {@include} {@link usePress} {@include} {@link useCompleteListNavigation} {@include} {@link useCompleteGridNavigation} {@include} {@link useModal} {@include} {@link useAsyncHandler} {@tableOfContents header Specific} {@tableOfContents subheader Very useful in very specific cases} {@include} {@link useElementSize} {@include} {@link useHideScroll} {@include} {@link useMediaQuery} {@include} {@link useHasCurrentFocus} {@include} {@link useHasLastFocus} {@include} {@link useChildrenHaveFocus} {@include} {@link useRandomId} {@include} {@link useRandomDualIds} {@include} {@link useGlobalHandler} {@include} {@link useDocumentClass} {@tableOfContents header Niche} {@include} {@link useAsyncEffect} {@include} {@link useMutationObserver} {@include} {@link useTextContent} {@include} {@link useImperativeProps} {@include} {@link usePortalChildren} {@include} {@link useActiveElement} {@include} {@link useDraggable} {@include} {@link useDroppable} {@include} {@link useLogicalDirection} {@tableOfContents header Extensions} {@tableOfContents subheader These hooks don't do anything with HTML elements but are useful extensions to Preact's built-in hooks} {@include} {@link useStableGetter} {@include} {@link useStableCallback} {@include} {@link useMemoObject} {@include} {@link useForceUpdate} {@include} {@link useState} {@include} {@link usePassiveState} {@include} {@link usePersistentState} {@include} {@link useSearchParamState} {@include} {@link useTimeout} {@include} {@link useInterval} {@include} {@link useAnimationFrame} {@include} {@link useEffectDebug} {@include} {@link useLayoutEffectDebug} {@tableOfContents header Building blocks and other helpers} {@tableOfContents subheader These hooks are primarily used to build larger hooks, but can be used alone} {@include} {@link useManagedChildren} {@include} {@link useListNavigation} {@include} {@link useGridNavigation} {@include} {@link useRovingTabIndex} {@include} {@link useLinearNavigation} {@include} {@link useTypeaheadNavigation} {@include} {@link useSingleSelection} {@include} {@link useRearrangeableChildren} {@include} {@link useSortableChildren} {@include} {@link usePaginatedChildren} {@include} {@link useStaggeredChildren} {@include} {@link useDismiss} {@include} {@link useBackdropDismiss} {@include} {@link useEscapeDismiss} {@include} {@link useLostFocusDismiss} {@include} {@link useFocusTrap} {@include} {@link useAsync} {@include} {@link useUrl} {@include} {@link useMergedRefs} {@include} {@link useMergedClasses} {@include} {@link useMergedChildren} {@include} {@link useMergedStyles} ## Each hook, individually {@tableOfContents end}\n *\n * ## Miscellanea {@include} {@link Nullable} {@include} {@link OmitStrong} {@include} {@link TargetedPick} {@include} {@link TargetedOmit} {@include} {@link ElementProps}\n * ```md-literal\n * ## Conventions and goals\n *\n * * As much as possible, no specific DOM restrictions are imposed and, for hooks with children (lists, grids, etc.), those children can be anywhere descendent in the tree (except for `useSortableChildren`, which can be anywhere descendant but must all be in an array). Nesting hooks, even of the same type, is also fine.\n *     *  E.G. `useRovingTabIndexChild` can call its own `useRovingTabIndex`, which is how `useGridNavigation` works.\n * * A parent hook never needs to be directly passed child data because the children will provide it themselves. E.G. `useListNavigation` can filter children, but it doesn't take an array of which children to filter out; each child reports its own status as filtered/unfiltered with, say, a `hidden` prop, and the parent responds to that.\n * * Re-render as few times as possible. In general this means instead of a hook returning a value, it will accept an `onChange`-ish handler that will let you explicitly do that.\n *     * `useElementSize`, for example, has no way of returning the size the first time its component renders. It needs to fully render *and then* run an effect that measures it. Once the element's been measured, *you* are responsible for choosing if the component is re-rendered with this new information or not.\n *     * This means that the child data is *always* the single source of truth, and maps nicely to how components are built and diffed.\n * * Some of these hooks, like `useGridNavigationRow`, have **extremely** complicated dependencies. To manage this, most hooks take a single parameter and return a single object with everything labelled consistently and designed to be discoverable via auto-complete. If we have `useFoo`, it:\n *     * ...will always take parameters like `{ fooParameters: {...} }`.\n *         * E.G. `useElementRef({ elementRefParameters: { onMount: ... } })`\n *     * ...will always return objects like `{ fooReturn: { ... } }`\n *         * E.G. `const { refElementReturn: { getElement } } = useElementRef(...)`\n *     * ...may also return `{ props: {...} }`. These must be spread onto the element you're rendering, or the hook will not function (see `useMergedProps` if you need to use other props in addition to the returned props). It may occasionally be called something else starting with `props`, e.g. `propsStable`, `propsTarget`, etc.\n *         * E.G. `const { propsStable } = useElementRef(...)`, then `<div {...propsStable} />`\n *         * `propsStable` indicates that nothing about the object ever changes including the identity of the object itself and all its fields.\n *     * ...may also return `{ context: { ... } }` that children rely on.\n *         1. E.G. Parent calls `const { context } = useFoo(...);`\n *         1. Parent renders `<MyContext.Provider value={context}>{children}</MyContext.Provider>`\n *         1. Then child calls `useFooChild({ context: useContext(MyContext), fooChildParameters: {...} })`\n *     * ...may also require or return `{ info: { ... } }` if it has something to contribute to `useManagedChild`'s special `info` parameter.\n *     * When hooks themselves use other hooks:\n *         * If `useFoo` calls `useBar` directly, then it will take parameters like `{ fooParameters: {...}, barParameters: {...} }` and return objects like `{ fooReturn: {...}, barReturn: {...} }`.\n *         * If `useFoo` relies on `useBar` (but doesn't call it itself!), then will do one of the following:\n *             * Take parameters like `{ fooParameters: { ... }, barReturn: { ... } }`, if it needs the return value of `useBar`.\n *             * Return values like `{ fooReturn: { ... }, barParameters: { ... } }`, if it needs `useBar` to be called with specific parameters in order to function (usually callbacks).\n *         * (The difference between those two is usually based on performance -- many, many hooks rely on `elementRefReturn.getElement`, for example, so the latter pattern allows us to just call `useRefElement` once and pass the result around to whoever needs it)\n *         * If `useFoo` and `useBar` both return a top-level `props`, they will be merged into one.\n *         * If `useFoo` and `useBar` both return a top-level `context`, they will be merged into one.\n *         * If `useFoo` and `useBar` both return a top-level `info`, they will be merged into one.\n *         * Occasionally, `props` or `context` may be suffixed with the specific role they refer to:\n *             * `useRandomId` returns `propsSource` and `propsReferencer` (and no `props`).\n * * Organizationally, some hooks exist primarily to be used as a part of a larger hook.  Hooks within the `component-use` folder are generally \"ready-to-use\" and don't require much passing of parameters back and forth, but are not fully extensible.  Hooks within `component-detail` are the lower-level building blocks that make up those \"ready-to-use\" complete hooks, but they're much more time-consuming to use.\n *     * You can also just copy and paste one of the complete hooks somewhere else and use it as a new building block...\n * ```\n *\n * @packageDocumentation\n */\n",
+  "docComment": "/**\n * # Preact Prop Helpers\n *\n * A set of small, compartmentalized hooks for Preact. The theme is modifying HTML attributes to do useful things, along with a few other boilerplate-y hooks that are just good to have around.\n *\n * Everything from keyboard navigation (arrow keys, typeahead) to modal focus traps (dialogs and menus) to simple things like `useState` *but with localStorage!* are here.\n *\n * Due to the complex nature of some of these hooks (in particular, grid navigation), all function parameters/return types are very strictly categorized. As a full example:\n * ```typescript\n *\n *    const allReturnInfo = useCompleteGridNavigationDeclarative<HTMLTableSectionElement, HTMLTableRowElement, HTMLTableCellElement, CustomGridInfo, CustomGridRowInfo>({\n *        rovingTabIndexParameters: {\n *            // If true, the entire grid is removed from the tab order\n *            untabbable: false,\n *            // A function provided by you that is only called when no children are tabbable\n *            focusSelfParent: focus,\n *            // This can be used to track when the user navigates between rows for any reason\n *            onTabbableIndexChange: setTabbableRow,\n *        },\n *        typeaheadNavigationParameters: {\n *            // Determines how children are searched for (`Intl.Collator`)\n *            collator: null,\n *            // Whether typeahead behavior is disabled\n *            noTypeahead: false,\n *            // How long a period of no input is required before typeahead clears itself\n *            typeaheadTimeout: 1000,\n *            // This can be used to track when the user navigates between rows via typeahead\n *            onNavigateTypeahead: null\n *        },\n *        linearNavigationParameters: {\n *            // Is navigating to the first/last row with Home/End disabled?\n *            disableHomeEndKeys: false,\n *            // What happens when you press Up on the first row?\n *            navigatePastStart: \"wrap\",\n *            // What happens when you press Down on the last row?\n *            navigatePastEnd: \"wrap\",\n *            // How far do Page Up/Down jump?\n *            pageNavigationSize: 0.1,\n *            // This can be used to track when the user navigates between rows with the arrow keys\n *            onNavigateLinear: null\n *        },\n *        singleSelectionParameters: {\n *            // When a child is selected, it is indicated with this ARIA attribute:\n *            ariaPropName: \"aria-checked\",\n *            // Are children selected when they are activated (e.g. clicked), or focused (e.g. tabbed to)?\n *            selectionMode: \"focus\"\n *        },\n *        singleSelectionDeclarativeParameters: {\n *            // Which child is currently selected?\n *            selectedIndex: selectedRow,\n *            // What happens when the user selects a child?\n *            onSelectedIndexChange: (e) => setSelectedRow(e[EventDetail].selectedIndex)\n *        },\n *        gridNavigationParameters: {\n *            // This can be used by you to track which 0-indexed column is currently the one with focus.\n *            onTabbableColumnChange: setTabbableColumn\n *        },\n *        rearrangeableChildrenParameters: {\n *            // This must return a VNode's 0-based index from its props\n *            getIndex: useCallback<GetIndex>((a: VNode) => a.props.index, [])\n *        },\n *        sortableChildrenParameters: {\n *            // Controls how rows compare against each other\n *            compare: useCallback((rhs: CustomGridInfo, lhs: CustomGridInfo) => { return lhs.index - rhs.index }, [])\n *        },\n *        paginatedChildrenParameters: {\n *            // Controls the current pagination range\n *            paginationMin: null,\n *            paginationMax: null\n *        },\n *        staggeredChildrenParameters: {\n *            // Controls whether children appear staggered as CPU time permits\n *            staggered: false\n *        }\n *    });\n *\n *    const {\n *        // Spread these props to the HTMLElement that will implement this grid behavior\n *        props,\n *        // The child row will useContext this, so provide it to them.\n *        context,\n *        rovingTabIndexReturn: {\n *            // Call to focus the grid, which focuses the current row, which focuses its current cell.\n *            focusSelf,\n *            // Returns the index of the row that is tabbable to\n *            getTabbableIndex,\n *            // Changes which row is currently tabbable\n *            setTabbableIndex\n *        },\n *        typeaheadNavigationReturn: {\n *            // Returns the current value the user has typed for typeahead (cannot be used during render)\n *            getCurrentTypeahead,\n *            // Whether the user's typeahead is invalid/valid/nonexistent.\n *            typeaheadStatus\n *        },\n *        singleSelectionReturn: {\n *            // Largely internal use only (since `selectedIndex` is a prop you pass in for the declarative version)\n *            getSelectedIndex,\n *        },\n *        rearrangeableChildrenReturn: {\n *            // You must call this hook on your array of children to implement the sorting behavior\n *            useRearrangedChildren,\n *            // Largely internal use only\n *            indexDemangler,\n *            // Largely internal use only\n *            indexMangler,\n *            // Largely internal use only, but if you implement a custom sorting algorithm, call this to finalize the rearrangement.\n *            rearrange,\n *            // Reverses all children\n *            reverse,\n *            // Shuffles all children\n *            shuffle\n *        },\n *        sortableChildrenReturn: {\n *            // A table header button would probably call this function to sort all the table rows.\n *            sort\n *        },\n *        linearNavigationReturn: { },\n *        managedChildrenReturn: {\n *            // Returns metadata about each row\n *            getChildren\n *        },\n *        paginatedChildrenReturn: {\n *            // Largely internal use only\n *            refreshPagination\n *        },\n *        staggeredChildrenReturn: {\n *            // When the staggering behavior is currently hiding one or more children, this is true.\n *            stillStaggering\n *        },\n *        childrenHaveFocusReturn: {\n *            // Returns true if any row in this grid is focused\n *            getAnyFocused\n *        },\n *\n *    } = allReturnInfo;\n * ```\n *\n * ## List of hooks (in rough order of usefulness)\n *\n * {@tableOfContents start} {@tableOfContents header Common} {@tableOfContents subheader These hooks are used extremely commonly or provide uncommonly useful behavior} {@include} {@link useMergedProps} {@include} {@link useRefElement} {@include} {@link usePress} {@include} {@link useCompleteListNavigation} {@include} {@link useCompleteGridNavigation} {@include} {@link useModal} {@include} {@link useAsyncHandler} {@tableOfContents header Specific} {@tableOfContents subheader Very useful in very specific cases} {@include} {@link useElementSize} {@include} {@link useHideScroll} {@include} {@link useMediaQuery} {@include} {@link useHasCurrentFocus} {@include} {@link useHasLastFocus} {@include} {@link useChildrenHaveFocus} {@include} {@link useRandomId} {@include} {@link useRandomDualIds} {@include} {@link useGlobalHandler} {@include} {@link useDocumentClass} {@tableOfContents header Niche} {@include} {@link useAsyncEffect} {@include} {@link useMutationObserver} {@include} {@link useTextContent} {@include} {@link useImperativeProps} {@include} {@link usePortalChildren} {@include} {@link useActiveElement} {@include} {@link useDraggable} {@include} {@link useDroppable} {@include} {@link useLogicalDirection} {@tableOfContents header Extensions} {@tableOfContents subheader These hooks don't do anything with HTML elements but are useful extensions to Preact's built-in hooks} {@include} {@link useStableGetter} {@include} {@link useStableCallback} {@include} {@link useMemoObject} {@include} {@link useForceUpdate} {@include} {@link useState} {@include} {@link usePassiveState} {@include} {@link usePersistentState} {@include} {@link useSearchParamState} {@include} {@link useTimeout} {@include} {@link useInterval} {@include} {@link useAnimationFrame} {@include} {@link useEffectDebug} {@include} {@link useLayoutEffectDebug} {@tableOfContents header Building blocks and other helpers} {@tableOfContents subheader These hooks are primarily used to build larger hooks, but can be used alone} {@include} {@link useManagedChildren} {@include} {@link useListNavigation} {@include} {@link useGridNavigation} {@include} {@link useRovingTabIndex} {@include} {@link useLinearNavigation} {@include} {@link useTypeaheadNavigation} {@include} {@link useSingleSelection} {@include} {@link useRearrangeableChildren} {@include} {@link useSortableChildren} {@include} {@link usePaginatedChildren} {@include} {@link useStaggeredChildren} {@include} {@link useDismiss} {@include} {@link useBackdropDismiss} {@include} {@link useEscapeDismiss} {@include} {@link useLostFocusDismiss} {@include} {@link useFocusTrap} {@include} {@link useAsync} {@include} {@link useUrl} {@include} {@link useMergedRefs} {@include} {@link useMergedClasses} {@include} {@link useMergedChildren} {@include} {@link useMergedStyles} ## Each hook, individually {@tableOfContents end}\n *\n * ## Miscellanea {@include} {@link Nullable} {@include} {@link OmitStrong} {@include} {@link TargetedPick} {@include} {@link TargetedOmit} {@include} {@link ElementProps}\n * ```md-literal\n * ## Conventions and goals\n *\n * * As much as possible, no specific DOM restrictions are imposed and, for hooks with children (lists, grids, etc.), those children can be anywhere descendent in the tree (except for `useSortableChildren`, which can be anywhere descendant but must all be in an array). Nesting hooks, even of the same type, is also fine.\n *     *  E.G. `useRovingTabIndexChild` can call its own `useRovingTabIndex`, which is how `useGridNavigation` works.\n * * A parent hook never needs to be directly passed child data because the children will provide it themselves. E.G. `useListNavigation` can filter children, but it doesn't take an array of which children to filter out; each child reports its own status as filtered/unfiltered with, say, a `hidden` prop, and the parent responds to that.\n * * Re-render as few times as possible. In general this means instead of a hook returning a value, it will accept an `onChange`-ish handler that will let you explicitly do that.\n *     * `useElementSize`, for example, has no way of returning the size the first time its component renders. It needs to fully render *and then* run an effect that measures it. Once the element's been measured, *you* are responsible for choosing if the component is re-rendered with this new information or not.\n *     * This means that the child data is *always* the single source of truth, and maps nicely to how components are built and diffed.\n * * Some of these hooks, like `useGridNavigationRow`, have **extremely** complicated dependencies. To manage this, most hooks take a single parameter and return a single object with everything labelled consistently and designed to be discoverable via auto-complete. If we have `useFoo`, it:\n *     * ...will always take parameters like `{ fooParameters: {...} }`.\n *         * E.G. `useElementRef({ elementRefParameters: { onMount: ... } })`\n *     * ...will always return objects like `{ fooReturn: { ... } }`\n *         * E.G. `const { refElementReturn: { getElement } } = useElementRef(...)`\n *     * ...may also return `{ props: {...} }`. These must be spread onto the element you're rendering, or the hook will not function (see `useMergedProps` if you need to use other props in addition to the returned props). It may occasionally be called something else starting with `props`, e.g. `propsStable`, `propsTarget`, etc.\n *         * E.G. `const { propsStable } = useElementRef(...)`, then `<div {...propsStable} />`\n *         * `propsStable` indicates that nothing about the object ever changes including the identity of the object itself and all its fields.\n *     * ...may also return `{ context: { ... } }` that children rely on.\n *         1. E.G. Parent calls `const { context } = useFoo(...);`\n *         1. Parent renders `<MyContext.Provider value={context}>{children}</MyContext.Provider>`\n *         1. Then child calls `useFooChild({ context: useContext(MyContext), fooChildParameters: {...} })`\n *     * ...may also require or return `{ info: { ... } }` if it has something to contribute to `useManagedChild`'s special `info` parameter.\n *     * When hooks themselves use other hooks:\n *         * If `useFoo` calls `useBar` directly, then it will take parameters like `{ fooParameters: {...}, barParameters: {...} }` and return objects like `{ fooReturn: {...}, barReturn: {...} }`.\n *         * If `useFoo` relies on `useBar` (but doesn't call it itself!), then will do one of the following:\n *             * Take parameters like `{ fooParameters: { ... }, barReturn: { ... } }`, if it needs the return value of `useBar`.\n *             * Return values like `{ fooReturn: { ... }, barParameters: { ... } }`, if it needs `useBar` to be called with specific parameters in order to function (usually callbacks).\n *         * (The difference between those two is usually based on performance -- many, many hooks rely on `elementRefReturn.getElement`, for example, so the latter pattern allows us to just call `useRefElement` once and pass the result around to whoever needs it)\n *         * If `useFoo` and `useBar` both return a top-level `props`, they will be merged into one.\n *         * If `useFoo` and `useBar` both return a top-level `context`, they will be merged into one.\n *         * If `useFoo` and `useBar` both return a top-level `info`, they will be merged into one.\n *         * Occasionally, `props` or `context` may be suffixed with the specific role they refer to:\n *             * `useRandomId` returns `propsSource` and `propsReferencer` (and no `props`).\n * * Organizationally, some hooks exist primarily to be used as a part of a larger hook.  Hooks within the `component-use` folder are generally \"ready-to-use\" and don't require much passing of parameters back and forth, but are not fully extensible.  Hooks within `component-detail` are the lower-level building blocks that make up those \"ready-to-use\" complete hooks, but they're much more time-consuming to use.\n *     * You can also just copy and paste one of the complete hooks somewhere else and use it as a new building block...\n * ```\n *\n * @packageDocumentation\n */\n",
   "name": "preact-prop-helpers",
   "preserveMemberOrder": false,
   "members": [
@@ -14250,7 +14250,7 @@
         {
           "kind": "Function",
           "canonicalReference": "preact-prop-helpers!useCompleteListNavigation:function(1)",
-          "docComment": "/**\n * All the list-related hooks combined into one large hook that encapsulates everything.\n *\n * @remarks\n *\n * Unlike most others, this hook assume's it's the final one--the \"outermost\" hook in the component--so it uses `useManagedChildren` and wraps everything up nicely, combining event handlers that are used in multiple sub-hooks, collecting all the necessary context-related data, and merging all known DOM props together.\n *\n * @compositeParams\n */\n",
+          "docComment": "/**\n * All the list-related hooks combined into one large hook that encapsulates everything.\n *\n * @remarks\n *\n * Unlike most others, this hook assume's it's the final one--the \"outermost\" hook in the component--so it uses `useManagedChildren` and wraps everything up nicely, combining event handlers that are used in multiple sub-hooks, collecting all the necessary context-related data, and merging all known DOM props together.\n *\n * @hasChild\n *\n * {@link useCompleteListNavigationChild}\n *\n * @compositeParams\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -14371,7 +14371,7 @@
         {
           "kind": "Function",
           "canonicalReference": "preact-prop-helpers!useCompleteListNavigationChild:function(1)",
-          "docComment": "",
+          "docComment": "/**\n * @compositeParams\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -14826,6 +14826,116 @@
             },
             {
               "kind": "Content",
+              "text": ", "
+            },
+            {
+              "kind": "Reference",
+              "text": "Pick",
+              "canonicalReference": "!Pick:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "UseHasCurrentFocusReturnType",
+              "canonicalReference": "preact-prop-helpers!UseHasCurrentFocusReturnType:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<ChildElement>, \"hasCurrentFocusReturn\">"
+            },
+            {
+              "kind": "Content",
+              "text": ", "
+            },
+            {
+              "kind": "Reference",
+              "text": "Pick",
+              "canonicalReference": "!Pick:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "UseManagedChildReturnType",
+              "canonicalReference": "preact-prop-helpers!UseManagedChildReturnType:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<M>, \"managedChildReturn\">"
+            },
+            {
+              "kind": "Content",
+              "text": ", "
+            },
+            {
+              "kind": "Reference",
+              "text": "TargetedPick",
+              "canonicalReference": "preact-prop-helpers!TargetedPick:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "UsePressParameters",
+              "canonicalReference": "preact-prop-helpers!UsePressParameters:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<any>, \"pressParameters\", \"onPressSync\" | \"excludeSpace\">"
+            },
+            {
+              "kind": "Content",
+              "text": ", "
+            },
+            {
+              "kind": "Reference",
+              "text": "Pick",
+              "canonicalReference": "!Pick:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "UsePaginatedChildReturnType",
+              "canonicalReference": "preact-prop-helpers!UsePaginatedChildReturnType:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<ChildElement>, \"paginatedChildReturn\">"
+            },
+            {
+              "kind": "Content",
+              "text": ", "
+            },
+            {
+              "kind": "Reference",
+              "text": "Pick",
+              "canonicalReference": "!Pick:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "UseStaggeredChildReturnType",
+              "canonicalReference": "preact-prop-helpers!UseStaggeredChildReturnType:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<ChildElement>, \"staggeredChildReturn\">"
+            },
+            {
+              "kind": "Content",
               "text": " "
             }
           ],
@@ -14858,143 +14968,6 @@
           "name": "UseCompleteListNavigationChildReturnType",
           "preserveMemberOrder": false,
           "members": [
-            {
-              "kind": "PropertySignature",
-              "canonicalReference": "preact-prop-helpers!UseCompleteListNavigationChildReturnType#hasCurrentFocusReturn:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "hasCurrentFocusReturn: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "UseHasCurrentFocusReturnType",
-                  "canonicalReference": "preact-prop-helpers!UseHasCurrentFocusReturnType:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<ChildElement>[\"hasCurrentFocusReturn\"]"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isReadonly": false,
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "hasCurrentFocusReturn",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 3
-              }
-            },
-            {
-              "kind": "PropertySignature",
-              "canonicalReference": "preact-prop-helpers!UseCompleteListNavigationChildReturnType#managedChildReturn:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "managedChildReturn: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "UseManagedChildReturnType",
-                  "canonicalReference": "preact-prop-helpers!UseManagedChildReturnType:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<M>[\"managedChildReturn\"]"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isReadonly": false,
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "managedChildReturn",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 3
-              }
-            },
-            {
-              "kind": "PropertySignature",
-              "canonicalReference": "preact-prop-helpers!UseCompleteListNavigationChildReturnType#paginatedChildReturn:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "paginatedChildReturn: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "UsePaginatedChildReturnType",
-                  "canonicalReference": "preact-prop-helpers!UsePaginatedChildReturnType:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<ChildElement>[\"paginatedChildReturn\"]"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isReadonly": false,
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "paginatedChildReturn",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 3
-              }
-            },
-            {
-              "kind": "PropertySignature",
-              "canonicalReference": "preact-prop-helpers!UseCompleteListNavigationChildReturnType#pressParameters:member",
-              "docComment": "/**\n * This hook does not include `usePress`, so when you call it for whatever element is responsible for selecting this child, pass it these parameters.\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "pressParameters: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Pick",
-                  "canonicalReference": "!Pick:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "UsePressParameters",
-                  "canonicalReference": "preact-prop-helpers!UsePressParameters:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<any>[\"pressParameters\"], \"onPressSync\" | \"excludeSpace\">"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isReadonly": false,
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "pressParameters",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 5
-              }
-            },
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseCompleteListNavigationChildReturnType#propsChild:member",
@@ -15058,38 +15031,6 @@
                 "startIndex": 1,
                 "endIndex": 3
               }
-            },
-            {
-              "kind": "PropertySignature",
-              "canonicalReference": "preact-prop-helpers!UseCompleteListNavigationChildReturnType#staggeredChildReturn:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "staggeredChildReturn: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "UseStaggeredChildReturnType",
-                  "canonicalReference": "preact-prop-helpers!UseStaggeredChildReturnType:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<ChildElement>[\"staggeredChildReturn\"]"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isReadonly": false,
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "staggeredChildReturn",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 3
-              }
             }
           ],
           "extendsTokenRanges": [
@@ -15100,6 +15041,26 @@
             {
               "startIndex": 11,
               "endIndex": 15
+            },
+            {
+              "startIndex": 16,
+              "endIndex": 20
+            },
+            {
+              "startIndex": 21,
+              "endIndex": 25
+            },
+            {
+              "startIndex": 26,
+              "endIndex": 30
+            },
+            {
+              "startIndex": 31,
+              "endIndex": 35
+            },
+            {
+              "startIndex": 36,
+              "endIndex": 40
             }
           ]
         },
@@ -40954,8 +40915,8 @@
             },
             {
               "kind": "Reference",
-              "text": "EnhancedEventHandler",
-              "canonicalReference": "preact-prop-helpers!EnhancedEventHandler:type"
+              "text": "Nullable",
+              "canonicalReference": "preact-prop-helpers!Nullable:type"
             },
             {
               "kind": "Content",
@@ -40963,12 +40924,12 @@
             },
             {
               "kind": "Reference",
-              "text": "Event",
-              "canonicalReference": "!Event:interface"
+              "text": "SelectedIndexChangeHandler",
+              "canonicalReference": "preact-prop-helpers!SelectedIndexChangeHandler:type"
             },
             {
               "kind": "Content",
-              "text": ", {\n            selectedIndex: number;\n        }> | null;\n    };\n}"
+              "text": ">;\n    };\n}"
             },
             {
               "kind": "Content",
@@ -41054,13 +41015,9 @@
                   "text": "singleSelectionDeclarativeParameters: "
                 },
                 {
-                  "kind": "Content",
-                  "text": "{\n        selectedIndex: number | null;\n        onSelectedIndexChange: null | "
-                },
-                {
                   "kind": "Reference",
-                  "text": "EnhancedEventHandler",
-                  "canonicalReference": "preact-prop-helpers!EnhancedEventHandler:type"
+                  "text": "Pick",
+                  "canonicalReference": "!Pick:type"
                 },
                 {
                   "kind": "Content",
@@ -41068,12 +41025,12 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Event",
-                  "canonicalReference": "!Event:interface"
+                  "text": "UseSingleSelectionParameters",
+                  "canonicalReference": "preact-prop-helpers!UseSingleSelectionParameters:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": ", {\n            selectedIndex: number;\n        }>;\n    }"
+                  "text": "<any, any, any>[\"singleSelectionParameters\"], \"onSelectedIndexChange\"> & {\n        selectedIndex: number | null;\n    }"
                 },
                 {
                   "kind": "Content",
@@ -41086,7 +41043,7 @@
               "name": "singleSelectionDeclarativeParameters",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
-                "endIndex": 6
+                "endIndex": 5
               }
             },
             {

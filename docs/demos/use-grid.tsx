@@ -14,28 +14,132 @@ export const DemoUseGrid = memo(() => {
     const [selectedRow, setSelectedRow, _getSelectedRow] = useState<number | null>(null);
     const [tabbableRow, setTabbableRow] = useState<number | null>(null);
 
-    const ret = useCompleteGridNavigationDeclarative<HTMLTableSectionElement, HTMLTableRowElement, HTMLTableCellElement, CustomGridInfo, CustomGridRowInfo>({
-        singleSelectionParameters: { ariaPropName: "aria-checked", selectionMode: "focus" },
-        singleSelectionDeclarativeParameters: {  selectedIndex: selectedRow, onSelectedIndexChange: useStableCallback((e) => {setSelectedRow(e[EventDetail].selectedIndex)}, []) },
-        gridNavigationParameters: { onTabbableColumnChange: setTabbableColumn },
-        linearNavigationParameters: { disableHomeEndKeys: false, navigatePastEnd: "wrap", navigatePastStart: "wrap", pageNavigationSize: 0.1, onNavigateLinear: null },
-        //managedChildrenReturn: { getChildren },
-        rovingTabIndexParameters: { onTabbableIndexChange: setTabbableRow, untabbable: false, focusSelfParent: focus },
-        typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000, onNavigateTypeahead: null },
+    const allReturnInfo = useCompleteGridNavigationDeclarative<HTMLTableSectionElement, HTMLTableRowElement, HTMLTableCellElement, CustomGridInfo, CustomGridRowInfo>({
+        rovingTabIndexParameters: {
+            // If true, the entire grid is removed from the tab order
+            untabbable: false,
+            // A function provided by you that is only called when no children are tabbable
+            focusSelfParent: focus,
+            // This can be used to track when the user navigates between rows for any reason
+            onTabbableIndexChange: setTabbableRow,
+        },
+        typeaheadNavigationParameters: {
+            // Determines how children are searched for (`Intl.Collator`)
+            collator: null,
+            // Whether typeahead behavior is disabled
+            noTypeahead: false,
+            // How long a period of no input is required before typeahead clears itself
+            typeaheadTimeout: 1000,
+            // This can be used to track when the user navigates between rows via typeahead
+            onNavigateTypeahead: null
+        },
+        linearNavigationParameters: {
+            // Is navigating to the first/last row with Home/End disabled?
+            disableHomeEndKeys: false,
+            // What happens when you press Up on the first row?
+            navigatePastStart: "wrap",
+            // What happens when you press Down on the last row?
+            navigatePastEnd: "wrap",
+            // How far do Page Up/Down jump?
+            pageNavigationSize: 0.1,
+            // This can be used to track when the user navigates between rows with the arrow keys
+            onNavigateLinear: null
+        },
+        singleSelectionParameters: {
+            // When a child is selected, it is indicated with this ARIA attribute:
+            ariaPropName: "aria-checked",
+            // Are children selected when they are activated (e.g. clicked), or focused (e.g. tabbed to)?
+            selectionMode: "focus"
+        },
+        singleSelectionDeclarativeParameters: {
+            // Which child is currently selected?
+            selectedIndex: selectedRow,
+            // What happens when the user selects a child?
+            onSelectedIndexChange: (e) => setSelectedRow(e[EventDetail].selectedIndex)
+        },
+        gridNavigationParameters: {
+            // This can be used by you to track which 0-indexed column is currently the one with focus.
+            onTabbableColumnChange: setTabbableColumn
+        },
         rearrangeableChildrenParameters: {
+            // This must return a VNode's 0-based index from its props
             getIndex: useCallback<GetIndex>((a: VNode) => a.props.index, [])
         },
-        sortableChildrenParameters: { compare: useCallback((rhs: CustomGridInfo, lhs: CustomGridInfo) => { return lhs.index - rhs.index }, []) },
-        paginatedChildrenParameters: { paginationMin: null, paginationMax: null },
-        staggeredChildrenParameters: { staggered: false }
+        sortableChildrenParameters: {
+            // Controls how rows compare against each other
+            compare: useCallback((rhs: CustomGridInfo, lhs: CustomGridInfo) => { return lhs.index - rhs.index }, [])
+        },
+        paginatedChildrenParameters: {
+            // Controls the current pagination range
+            paginationMin: null,
+            paginationMax: null
+        },
+        staggeredChildrenParameters: {
+            // Controls whether children appear staggered as CPU time permits
+            staggered: false
+        }
     });
 
     const {
-        context,
+        // Spread these props to the HTMLElement that will implement this grid behavior
         props,
-        rearrangeableChildrenReturn: { useRearrangedChildren }
-    } = ret;
+        // The child row will useContext this, so provide it to them.
+        context,
+        rovingTabIndexReturn: {
+            // Call to focus the grid, which focuses the current row, which focuses its current cell.
+            focusSelf,
+            // Returns the index of the row that is tabbable to
+            getTabbableIndex,
+            // Changes which row is currently tabbable
+            setTabbableIndex
+        },
+        typeaheadNavigationReturn: {
+            // Returns the current value the user has typed for typeahead (cannot be used during render)
+            getCurrentTypeahead,
+            // Whether the user's typeahead is invalid/valid/nonexistent.
+            typeaheadStatus
+        },
+        singleSelectionReturn: {
+            // Largely internal use only (since `selectedIndex` is a prop you pass in for the declarative version)
+            getSelectedIndex,
+        },
+        rearrangeableChildrenReturn: {
+            // You must call this hook on your array of children to implement the sorting behavior
+            useRearrangedChildren,
+            // Largely internal use only
+            indexDemangler,
+            // Largely internal use only
+            indexMangler,
+            // Largely internal use only, but if you implement a custom sorting algorithm, call this to finalize the rearrangement. 
+            rearrange,
+            // Reverses all children 
+            reverse,
+            // Shuffles all children
+            shuffle
+        },
+        sortableChildrenReturn: {
+            // A table header button would probably call this function to sort all the table rows.
+            sort
+        },
+        linearNavigationReturn: { },
+        managedChildrenReturn: {
+            // Returns metadata about each row
+            getChildren
+        },
+        paginatedChildrenReturn: {
+            // Largely internal use only
+            refreshPagination
+        },
+        staggeredChildrenReturn: {
+            // When the staggering behavior is currently hiding one or more children, this is true.
+            stillStaggering
+        },
+        childrenHaveFocusReturn: {
+            // Returns true if any row in this grid is focused
+            getAnyFocused
+        },
 
+    } = allReturnInfo;
 
 
     return (

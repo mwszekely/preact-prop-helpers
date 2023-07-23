@@ -295,7 +295,13 @@ export function useSingleSelectionChild<ChildElement extends Element, M extends 
 
 
 export interface UseSingleSelectionDeclarativeParameters {
-    singleSelectionDeclarativeParameters: { selectedIndex: number | null, onSelectedIndexChange: null | EnhancedEventHandler<Event, { selectedIndex: number }> }
+    singleSelectionDeclarativeParameters: Pick<UseSingleSelectionParameters<any, any, any>["singleSelectionParameters"], "onSelectedIndexChange"> & { 
+        selectedIndex: number | null;
+        /**
+         * @nonstable
+         */
+       //onSelectedIndexChange: null | EnhancedEventHandler<Event, { selectedIndex: number }> 
+    }
     singleSelectionReturn: Pick<UseSingleSelectionReturnType<any, any>["singleSelectionReturn"], "changeSelectedIndex">;
 }
 

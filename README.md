@@ -10,6 +10,141 @@ A set of small, compartmentalized hooks for Preact. The theme is modifying HTML 
 
 Everything from keyboard navigation (arrow keys, typeahead) to modal focus traps (dialogs and menus) to simple things like `useState` *but with localStorage!* are here.
 
+Due to the complex nature of some of these hooks (in particular, grid navigation), all function parameters/return types are very strictly categorized. As a full example:
+
+
+```typescript
+
+   const allReturnInfo = useCompleteGridNavigationDeclarative<HTMLTableSectionElement, HTMLTableRowElement, HTMLTableCellElement, CustomGridInfo, CustomGridRowInfo>({
+       rovingTabIndexParameters: {
+           // If true, the entire grid is removed from the tab order
+           untabbable: false,
+           // A function provided by you that is only called when no children are tabbable
+           focusSelfParent: focus,
+           // This can be used to track when the user navigates between rows for any reason
+           onTabbableIndexChange: setTabbableRow,
+       },
+       typeaheadNavigationParameters: {
+           // Determines how children are searched for (`Intl.Collator`)
+           collator: null,
+           // Whether typeahead behavior is disabled
+           noTypeahead: false,
+           // How long a period of no input is required before typeahead clears itself
+           typeaheadTimeout: 1000,
+           // This can be used to track when the user navigates between rows via typeahead
+           onNavigateTypeahead: null
+       },
+       linearNavigationParameters: {
+           // Is navigating to the first/last row with Home/End disabled?
+           disableHomeEndKeys: false,
+           // What happens when you press Up on the first row?
+           navigatePastStart: "wrap",
+           // What happens when you press Down on the last row?
+           navigatePastEnd: "wrap",
+           // How far do Page Up/Down jump?
+           pageNavigationSize: 0.1,
+           // This can be used to track when the user navigates between rows with the arrow keys
+           onNavigateLinear: null
+       },
+       singleSelectionParameters: {
+           // When a child is selected, it is indicated with this ARIA attribute:
+           ariaPropName: "aria-checked",
+           // Are children selected when they are activated (e.g. clicked), or focused (e.g. tabbed to)?
+           selectionMode: "focus"
+       },
+       singleSelectionDeclarativeParameters: {
+           // Which child is currently selected?
+           selectedIndex: selectedRow,
+           // What happens when the user selects a child?
+           onSelectedIndexChange: (e) => setSelectedRow(e[EventDetail].selectedIndex)
+       },
+       gridNavigationParameters: {
+           // This can be used by you to track which 0-indexed column is currently the one with focus.
+           onTabbableColumnChange: setTabbableColumn
+       },
+       rearrangeableChildrenParameters: {
+           // This must return a VNode's 0-based index from its props
+           getIndex: useCallback<GetIndex>((a: VNode) => a.props.index, [])
+       },
+       sortableChildrenParameters: {
+           // Controls how rows compare against each other
+           compare: useCallback((rhs: CustomGridInfo, lhs: CustomGridInfo) => { return lhs.index - rhs.index }, [])
+       },
+       paginatedChildrenParameters: {
+           // Controls the current pagination range
+           paginationMin: null,
+           paginationMax: null
+       },
+       staggeredChildrenParameters: {
+           // Controls whether children appear staggered as CPU time permits
+           staggered: false
+       }
+   });
+
+   const {
+       // Spread these props to the HTMLElement that will implement this grid behavior
+       props,
+       // The child row will useContext this, so provide it to them.
+       context,
+       rovingTabIndexReturn: {
+           // Call to focus the grid, which focuses the current row, which focuses its current cell.
+           focusSelf,
+           // Returns the index of the row that is tabbable to
+           getTabbableIndex,
+           // Changes which row is currently tabbable
+           setTabbableIndex
+       },
+       typeaheadNavigationReturn: {
+           // Returns the current value the user has typed for typeahead (cannot be used during render)
+           getCurrentTypeahead,
+           // Whether the user's typeahead is invalid/valid/nonexistent.
+           typeaheadStatus
+       },
+       singleSelectionReturn: {
+           // Largely internal use only (since `selectedIndex` is a prop you pass in for the declarative version)
+           getSelectedIndex,
+       },
+       rearrangeableChildrenReturn: {
+           // You must call this hook on your array of children to implement the sorting behavior
+           useRearrangedChildren,
+           // Largely internal use only
+           indexDemangler,
+           // Largely internal use only
+           indexMangler,
+           // Largely internal use only, but if you implement a custom sorting algorithm, call this to finalize the rearrangement.
+           rearrange,
+           // Reverses all children
+           reverse,
+           // Shuffles all children
+           shuffle
+       },
+       sortableChildrenReturn: {
+           // A table header button would probably call this function to sort all the table rows.
+           sort
+       },
+       linearNavigationReturn: { },
+       managedChildrenReturn: {
+           // Returns metadata about each row
+           getChildren
+       },
+       paginatedChildrenReturn: {
+           // Largely internal use only
+           refreshPagination
+       },
+       staggeredChildrenReturn: {
+           // When the staggering behavior is currently hiding one or more children, this is true.
+           stillStaggering
+       },
+       childrenHaveFocusReturn: {
+           // Returns true if any row in this grid is focused
+           getAnyFocused
+       },
+
+   } = allReturnInfo;
+
+```
+
+
 ## List of hooks (in rough order of usefulness)
 
 ### Common
@@ -375,10 +510,37 @@ Every member of `UseCompleteListNavigationParameters` is inherited (see the inte
 
 |Member|Type|Description|Is stable?|
 |---------|----|-----------|----------|
-|context|``CompleteListNavigationContext<ParentElement, ChildElement, M>``|Functions and data that the parent is making available to each child. Put it in your own `Context` from `createContext`|-|
+|context|`CompleteListNavigationContext`|Functions and data that the parent is making available to each child. Put it in your own `Context` from `createContext`|-|
 |props|HTML props|Spread these props onto the HTML element that will use this logic.|-|
 
 Unlike most others, this hook assume's it's the final one--the "outermost" hook in the component--so it uses `useManagedChildren` and wraps everything up nicely, combining event handlers that are used in multiple sub-hooks, collecting all the necessary context-related data, and merging all known DOM props together.
+
+
+
+#### useCompleteListNavigationChild
+
+
+
+##### UseCompleteListNavigationChildParameters
+
+<small>`extends` [`UseManagedChildParameters`](#usemanagedchildparameters), [`UseRovingTabIndexChildInfoKeysParameters`](#userovingtabindexchildinfokeysparameters), [`UseRovingTabIndexChildParameters`](#userovingtabindexchildparameters), [`UseTextContentParameters`](#usetextcontentparameters), [`UseTypeaheadNavigationChildParameters`](#usetypeaheadnavigationchildparameters), [`UseListNavigationChildParameters`](#uselistnavigationchildparameters), [`UseSingleSelectionChildParameters`](#usesingleselectionchildparameters), [`UseRefElementReturnType`](#userefelementreturntype)</small>
+
+|Member|Type|Description|Must be stable?|
+|---------|----|-----------|----------|
+|context|`CompleteListNavigationContext`|Functions and data that the parent has made available to each child. Retrieve it with `useContext`|-|
+|info|`Omit<M, Exclude<keyof UseCompleteListNavigationChildInfo<ChildElement>, "getSortValue" \| "index" \| "focusSelf" \| "untabbable" \| "unselectable">>`|Data the child makes available to the parent. Passed to `useManagedChild`|-|
+
+
+
+##### UseCompleteListNavigationChildReturnType
+
+<small>`extends` [`UseRefElementReturnType`](#userefelementreturntype), [`UseRovingTabIndexChildReturnType`](#userovingtabindexchildreturntype), [`UseTextContentReturnType`](#usetextcontentreturntype), [`UseSingleSelectionChildReturnType`](#usesingleselectionchildreturntype), [`UseListNavigationSingleSelectionChildReturnType`](#uselistnavigationsingleselectionchildreturntype), [`UseHasCurrentFocusReturnType`](#usehascurrentfocusreturntype), [`UseManagedChildReturnType`](#usemanagedchildreturntype), [`UsePaginatedChildReturnType`](#usepaginatedchildreturntype), [`UseStaggeredChildReturnType`](#usestaggeredchildreturntype), [`UseHasCurrentFocusParameters`](#usehascurrentfocusparameters), [`UsePressParameters`](#usepressparameters)</small>
+
+|Member|Type|Description|Is stable?|
+|---------|----|-----------|----------|
+|propsChild|HTML props|Spread these props onto the HTML element that will use this logic.|-|
+|propsTabbable|HTML props|Spread these props onto the HTML element that will use this logic.|-|
+
 
 
 <hr />
@@ -406,7 +568,7 @@ Every member of `UseCompleteGridNavigationParameters` is inherited (see the inte
 
 |Member|Type|Description|Is stable?|
 |---------|----|-----------|----------|
-|context|``CompleteGridNavigationRowContext<ParentOrRowElement, RowElement, CellElement, RM, CM>``|Functions and data that the parent is making available to each child. Put it in your own `Context` from `createContext`|-|
+|context|`CompleteGridNavigationRowContext`|Functions and data that the parent is making available to each child. Put it in your own `Context` from `createContext`|-|
 |props|HTML props|Spread these props onto the HTML element that will use this logic.|-|
 
 
@@ -421,7 +583,7 @@ Every member of `UseCompleteGridNavigationParameters` is inherited (see the inte
 
 |Member|Type|Description|Must be stable?|
 |---------|----|-----------|----------|
-|context|``CompleteGridNavigationRowContext<any, RowElement, CellElement, RM, CM>``|Functions and data that the parent has made available to each child. Retrieve it with `useContext`|-|
+|context|`CompleteGridNavigationRowContext`|Functions and data that the parent has made available to each child. Retrieve it with `useContext`|-|
 |info|`OmitStrong<RM, Exclude<keyof UseCompleteGridNavigationRowInfo<RowElement, CellElement>, "getSortValue" \| "index" \| "untabbable" \| "unselectable">>`|Data the child makes available to the parent. Passed to `useManagedChild`|-|
 
 
@@ -432,7 +594,7 @@ Every member of `UseCompleteGridNavigationParameters` is inherited (see the inte
 
 |Member|Type|Description|Is stable?|
 |---------|----|-----------|----------|
-|context|``CompleteGridNavigationCellContext<RowElement, CellElement, CM>``|Functions and data that the parent is making available to each child. Put it in your own `Context` from `createContext`|-|
+|context|`CompleteGridNavigationCellContext`|Functions and data that the parent is making available to each child. Put it in your own `Context` from `createContext`|-|
 
 
 
@@ -446,7 +608,7 @@ Every member of `UseCompleteGridNavigationParameters` is inherited (see the inte
 
 |Member|Type|Description|Must be stable?|
 |---------|----|-----------|----------|
-|context|``CompleteGridNavigationCellContext<any, CellElement, CM>``|Functions and data that the parent has made available to each child. Retrieve it with `useContext`|-|
+|context|`CompleteGridNavigationCellContext`|Functions and data that the parent has made available to each child. Retrieve it with `useContext`|-|
 |info|`Omit<CM, Exclude<keyof UseCompleteGridNavigationCellInfo<CellElement>, "index" \| "untabbable" \| "focusSelf">>`|Data the child makes available to the parent. Passed to `useManagedChild`|-|
 
 
@@ -725,7 +887,7 @@ Allows a composite component (such as a radio group or listbox) to listen for an
 |Member|Type|Description|Is stable?|
 |---------|----|-----------|----------|
 |.getAnyFocused|`() => boolean`||-|
-|context|``UseChildrenHaveFocusContext<T>``|Functions and data that the parent is making available to each child. Put it in your own `Context` from `createContext`|-|
+|context|`UseChildrenHaveFocusContext`|Functions and data that the parent is making available to each child. Put it in your own `Context` from `createContext`|-|
 
 I.E. you can use this without needing a parent `<div>` to listen for a `focusout` event.
 
@@ -741,7 +903,7 @@ I.E. you can use this without needing a parent `<div>` to listen for a `focusout
 
 |Member|Type|Description|Must be stable?|
 |---------|----|-----------|----------|
-|context|``UseChildrenHaveFocusContext<T>``|Functions and data that the parent has made available to each child. Retrieve it with `useContext`|-|
+|context|`UseChildrenHaveFocusContext`|Functions and data that the parent has made available to each child. Retrieve it with `useContext`|-|
 
 
 
@@ -1512,7 +1674,7 @@ Allows a parent component to access information about certain child components o
 |Member|Type|Description|Is stable?|
 |---------|----|-----------|----------|
 |.getChildren|`() => ManagedChildren<M>`|***STABLE***<br />Note that **both** `getChildren` and the `ManagedChildren` object it returns are stable!<br />This is a getter instead of an object because when function calls happen out of order it's easier to just have always been passing and return getters everywhere|-|
-|context|``UseManagedChildrenContext<M>``|Functions and data that the parent is making available to each child. Put it in your own `Context` from `createContext`|-|
+|context|`UseManagedChildrenContext`|Functions and data that the parent is making available to each child. Put it in your own `Context` from `createContext`|-|
 
 This hook is designed to be lightweight, in that the parent keeps no state and runs no effects. Each child *does* run an effect, but with no state changes unless you explicitly request them.
 
@@ -1528,7 +1690,7 @@ This hook is designed to be lightweight, in that the parent keeps no state and r
 
 |Member|Type|Description|Must be stable?|
 |---------|----|-----------|----------|
-|context|``UseManagedChildrenContext<M> \| null``|Functions and data that the parent has made available to each child. Retrieve it with `useContext`|-|
+|context|`UseManagedChildrenContext`|Functions and data that the parent has made available to each child. Retrieve it with `useContext`|-|
 |info|`Pick<M, InfoParameterKeys>`|Data the child makes available to the parent. Passed to `useManagedChild`|-|
 
 
@@ -1568,7 +1730,7 @@ Every member of `UseListNavigationParameters` is inherited (see the interfaces i
 
 |Member|Type|Description|Is stable?|
 |---------|----|-----------|----------|
-|context|``UseListNavigationContext``|Functions and data that the parent is making available to each child. Put it in your own `Context` from `createContext`|-|
+|context|`UseListNavigationContext`|Functions and data that the parent is making available to each child. Put it in your own `Context` from `createContext`|-|
 |propsParent|HTML props|Spread these props onto the HTML element that will use this logic.|-|
 |propsStableParentOrChild|HTML props|Spread these props onto the HTML element that will use this logic.|-|
 
@@ -1586,7 +1748,7 @@ In the document order, there will be only one "focused" or "tabbable" element, m
 
 |Member|Type|Description|Must be stable?|
 |---------|----|-----------|----------|
-|context|``UseListNavigationContext``|Functions and data that the parent has made available to each child. Retrieve it with `useContext`|-|
+|context|`UseListNavigationContext`|Functions and data that the parent has made available to each child. Retrieve it with `useContext`|-|
 
 
 
@@ -1625,7 +1787,7 @@ Implements 2-dimensional grid-based keyboard navigation, similarly to [useListNa
 
 |Member|Type|Description|Is stable?|
 |---------|----|-----------|----------|
-|context|``UseGridNavigationRowContext``|Functions and data that the parent is making available to each child. Put it in your own `Context` from `createContext`|-|
+|context|`UseGridNavigationRowContext`|Functions and data that the parent is making available to each child. Put it in your own `Context` from `createContext`|-|
 
 Due to the complexity of this hook, it is *highly* recommended to use [useCompleteGridNavigation](#usecompletegridnavigation) instead. But if you do need to it's designed to work well with intellisense -- just keep plugging the holes until the errors stop and that's 95% of it right there.
 
@@ -1652,7 +1814,7 @@ As a row, this hook is responsible for both being a **child** of list navigation
 
 |Member|Type|Description|Must be stable?|
 |---------|----|-----------|----------|
-|context|``UseGridNavigationRowContext``|Functions and data that the parent has made available to each child. Retrieve it with `useContext`|-|
+|context|`UseGridNavigationRowContext`|Functions and data that the parent has made available to each child. Retrieve it with `useContext`|-|
 
 
 
@@ -1662,7 +1824,7 @@ As a row, this hook is responsible for both being a **child** of list navigation
 
 |Member|Type|Description|Is stable?|
 |---------|----|-----------|----------|
-|context|``UseGridNavigationCellContext``|Functions and data that the parent is making available to each child. Put it in your own `Context` from `createContext`|-|
+|context|`UseGridNavigationCellContext`|Functions and data that the parent is making available to each child. Put it in your own `Context` from `createContext`|-|
 |info|`Pick<RM, UseRovingTabIndexChildInfoKeysReturnType \| "focusSelf">`|Data the child makes available to the parent. Passed to `useManagedChild`|-|
 
 
@@ -1680,7 +1842,7 @@ Child hook for [useGridNavigationRow](#usegridnavigationrow) (and [useGridNaviga
 |Member|Type|Description|Must be stable?|
 |---------|----|-----------|----------|
 |.colSpan|`Nullable<number>`|How many columns this cell spans (all cells default to 1).<br />Any following cells should skip over the `index`es this one covered with its `colSpan`. E.G. if this cell is `index=5` and `colSpan=3`, the next cell would be `index=8`, **not** `index=6`|-|
-|context|``UseGridNavigationCellContext``|Functions and data that the parent has made available to each child. Retrieve it with `useContext`|-|
+|context|`UseGridNavigationCellContext`|Functions and data that the parent has made available to each child. Retrieve it with `useContext`|-|
 
 
 
@@ -1726,7 +1888,7 @@ Implements a roving tabindex system where only one "focusable" component in a se
 |.focusSelf|`(reason?: any) => void`|Call to focus the currently tabbable child.|Yes|
 |.getTabbableIndex|`() => number \| null`|Returns the index of the child that is currently tabbable.|Yes|
 |.setTabbableIndex|`SetTabbableIndex`|Can be used to programmatically change which child is the currently tabbable one.<br />`fromUserInteraction` determines if this was a user-generated event that should focus the newly tabbable child, or a programmatic event that should leave the user's focus where the user currently is, because they didn't do that.|Yes|
-|context|``RovingTabIndexChildContext``|Functions and data that the parent is making available to each child. Put it in your own `Context` from `createContext`|-|
+|context|`RovingTabIndexChildContext`|Functions and data that the parent is making available to each child. Put it in your own `Context` from `createContext`|-|
 |props|HTML props|Spread these props onto the HTML element that will use this logic.|-|
 
 *Which* of those elements receives focus is determined by you, but it's recommended to offload that logic then to another hook, like `useLinearNavigation`, which lets you change the tabbable element with the arrow keys, `useTypeaheadNavigation`, which lets you change the tabbable index with typeahead, or `useListNavigation(Complete)` if you just want everything bundled together.
@@ -1745,7 +1907,7 @@ Implements a roving tabindex system where only one "focusable" component in a se
 
 |Member|Type|Description|Must be stable?|
 |---------|----|-----------|----------|
-|context|``RovingTabIndexChildContext``|Functions and data that the parent has made available to each child. Retrieve it with `useContext`|-|
+|context|`RovingTabIndexChildContext`|Functions and data that the parent has made available to each child. Retrieve it with `useContext`|-|
 
 
 
@@ -1847,7 +2009,7 @@ Allows for the selection of a managed child by typing the given text associated 
 |---------|----|-----------|----------|
 |.getCurrentTypeahead|`() => string \| null`|Returns the string currently typed by the user. Stable, but cannot be called during render.|-|
 |.typeaheadStatus|`"invalid" \| "valid" \| "none"`|What the current status of the user's input is:<br />* `"none"`: Typeahead is not in progress; the user has not typed anything (or has not for the given timeout period). * `"valid"`: The string the user has typed so far corresponds to at least one child * `"invalid"`: The string the user has typed so does not correspond to any child|-|
-|context|``UseTypeaheadNavigationContext``|Functions and data that the parent is making available to each child. Put it in your own `Context` from `createContext`|-|
+|context|`UseTypeaheadNavigationContext`|Functions and data that the parent is making available to each child. Put it in your own `Context` from `createContext`|-|
 |propsStable|HTML props|Spread these props onto the HTML element that will use this logic.|-|
 
 
@@ -1862,7 +2024,7 @@ Allows for the selection of a managed child by typing the given text associated 
 
 |Member|Type|Description|Must be stable?|
 |---------|----|-----------|----------|
-|context|``UseTypeaheadNavigationContext``|Functions and data that the parent has made available to each child. Retrieve it with `useContext`|-|
+|context|`UseTypeaheadNavigationContext`|Functions and data that the parent has made available to each child. Retrieve it with `useContext`|-|
 |info|`Pick<M, "index">`|Data the child makes available to the parent. Passed to `useManagedChild`|-|
 
 
@@ -1907,7 +2069,7 @@ Allows a single child among all children to be the "selected" child (which can b
 |---------|----|-----------|----------|
 |.changeSelectedIndex|`PassiveStateUpdater<number \| null, Event>`|A function that, when called, internally updates the selected index to the one you provide, and tells the relevant children that they are/are not selected.<br />If you are creating an imperative component, this is what how you can force the value to change in response to something.<br />If you are creating a declarative component, this is what you call in `useEffect` when your `selectedIndex` changes.|Yes|
 |.getSelectedIndex|`() => number \| null`||Yes|
-|context|``UseSingleSelectionContext``|Functions and data that the parent is making available to each child. Put it in your own `Context` from `createContext`|-|
+|context|`UseSingleSelectionContext`|Functions and data that the parent is making available to each child. Put it in your own `Context` from `createContext`|-|
 
 If you need multi-select instead of single-select and you're using this hook (e.g. as part of [useCompleteListNavigation](#usecompletelistnavigation)), you can disable the single-selection behavior either by setting the selected index to `null` or.
 
@@ -1923,7 +2085,7 @@ If you need multi-select instead of single-select and you're using this hook (e.
 
 |Member|Type|Description|Must be stable?|
 |---------|----|-----------|----------|
-|context|``UseSingleSelectionContext``|Functions and data that the parent has made available to each child. Retrieve it with `useContext`|-|
+|context|`UseSingleSelectionContext`|Functions and data that the parent has made available to each child. Retrieve it with `useContext`|-|
 |info|`Pick<UseSingleSelectionChildInfo<E>, UseSingleSelectionChildInfoParameterKeys>`|Data the child makes available to the parent. Passed to `useManagedChild`|-|
 
 
@@ -2060,7 +2222,7 @@ Allows children to stop themselves from rendering outside of a narrow range.
 |---------|----|-----------|----------|
 |.childCount|`Nullable<number>`|**IMPORTANT**: This is only tracked when pagination is enabled.<br />If pagination is not enabled, this is either `null` or some undefined previous number.|-|
 |.refreshPagination|`(min: Nullable<number>, max: Nullable<number>) => void`|If the values returned by `indexDemangler` change (e.g. when sorting), then this must be called to re-sync everything.|Yes|
-|context|``UsePaginatedChildContext``|Functions and data that the parent is making available to each child. Put it in your own `Context` from `createContext`|-|
+|context|`UsePaginatedChildContext`|Functions and data that the parent is making available to each child. Put it in your own `Context` from `createContext`|-|
 
 Each child will still render itself, but it is aware of if it is within/outside of the pagination range, and simply return empty.
 
@@ -2078,7 +2240,7 @@ Child hook for [usePaginatedChildren](#usepaginatedchildren).
 
 |Member|Type|Description|Must be stable?|
 |---------|----|-----------|----------|
-|context|``UsePaginatedChildContext``|Functions and data that the parent has made available to each child. Retrieve it with `useContext`|-|
+|context|`UsePaginatedChildContext`|Functions and data that the parent has made available to each child. Retrieve it with `useContext`|-|
 |info|`{<br />        index: number;<br />    }`|Data the child makes available to the parent. Passed to `useManagedChild`|-|
 
 
@@ -2126,7 +2288,7 @@ Allows children to each wait until the previous has finished rendering before it
 |Member|Type|Description|Is stable?|
 |---------|----|-----------|----------|
 |.stillStaggering|`boolean`|Whether any children are still waiting to show themselves because of the staggering behavior|-|
-|context|``UseStaggeredChildContext``|Functions and data that the parent is making available to each child. Put it in your own `Context` from `createContext`|-|
+|context|`UseStaggeredChildContext`|Functions and data that the parent is making available to each child. Put it in your own `Context` from `createContext`|-|
 
 Note that the child itself will still render, but you can delay rendering *its* children, or delay other complicated or heavy logic, until the child is no longer staggered.
 
@@ -2144,7 +2306,7 @@ Child hook for [useStaggeredChildren](#usestaggeredchildren).
 
 |Member|Type|Description|Must be stable?|
 |---------|----|-----------|----------|
-|context|``UseStaggeredChildContext``|Functions and data that the parent has made available to each child. Retrieve it with `useContext`|-|
+|context|`UseStaggeredChildContext`|Functions and data that the parent has made available to each child. Retrieve it with `useContext`|-|
 |info|`{<br />        index: number;<br />    }`|Data the child makes available to the parent. Passed to `useManagedChild`|-|
 
 
@@ -2536,8 +2698,9 @@ export type ElementProps<E extends EventTarget> = JSX.HTMLAttributes<E>;
 ## The following items are missing their documentation (or should not have been linked to):
 
 
-##### UseGridNavigationSingleSelectionReturnType
 ##### UseRovingTabIndexChildInfoKeysParameters
+##### UseListNavigationSingleSelectionChildReturnType
+##### UseGridNavigationSingleSelectionReturnType
 ##### UseGridNavigationSingleSelectionRowReturnType
 ##### getLowestIndex
 ##### indexMangler
