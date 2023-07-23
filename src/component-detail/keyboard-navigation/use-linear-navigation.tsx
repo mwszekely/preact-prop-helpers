@@ -1,9 +1,9 @@
 import { identity } from "lodash-es";
-import { assertEmptyObject } from "../../index.js";
 import { ManagedChildInfo } from "../../preact-extensions/use-managed-children.js";
 import { useEnsureStability } from "../../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
+import { assertEmptyObject } from "../../util/assert.js";
 import { TargetedPick, useCallback, useRef } from "../../util/lib.js";
 import { ElementProps, KeyboardEventType, Nullable, OmitStrong } from "../../util/types.js";
 import { monitorCallCount } from "../../util/use-call-count.js";

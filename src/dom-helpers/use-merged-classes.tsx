@@ -13,7 +13,8 @@ export function useMergedClasses(...classes: ElementProps<EventTarget>["classNam
     // a hook, but as it uses no other hooks it technically isn't one.
     let classesSet = new Set<ElementProps<EventTarget>["className"]>();
     for (let c of classes) {
-        classesSet.add(c);
+        if (typeof c == "string" && c.trim())
+            classesSet.add(c);
     }
 
     if (classesSet.size) {

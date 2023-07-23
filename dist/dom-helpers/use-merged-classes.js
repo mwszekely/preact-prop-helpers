@@ -10,7 +10,8 @@ export function useMergedClasses(...classes) {
     // a hook, but as it uses no other hooks it technically isn't one.
     let classesSet = new Set();
     for (let c of classes) {
-        classesSet.add(c);
+        if (typeof c == "string" && c.trim())
+            classesSet.add(c);
     }
     if (classesSet.size) {
         return Array.from(classesSet).join(" ");

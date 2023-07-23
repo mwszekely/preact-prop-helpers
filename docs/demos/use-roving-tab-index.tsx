@@ -148,7 +148,7 @@ const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
         textContentParameters: { getText: useCallback((e) => { return e?.textContent ?? "" }, []) }
     });
 
-    const { pressReturn, props: p2 } = usePress<HTMLLIElement>({ pressParameters: { focusSelf, onPressSync, excludeSpace }, refElementReturn })
+    const { pressReturn, props: p2 } = usePress<HTMLLIElement>({ pressParameters: { focusSelf, onPressSync, excludeSpace, allowRepeatPresses: false, excludeEnter: null, excludePointer: null, longPressThreshold: null, onPressingChange: null }, refElementReturn })
 
     const text = `${randomWord} This is item #${index} (offset: ${selectedOffset}) ${hidden ? " (hidden)" : ""}${disabled ? " (disabled)" : ""}${selected ? " (selected)" : " (not selected)"} (${tabbable ? "Tabbable" : "Not tabbable"})`;
 

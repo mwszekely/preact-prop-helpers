@@ -42,7 +42,7 @@ const DemoUseDroppable = () => {
 }
 
 const DemoUseDraggable = () => {
-    const { propsUnstable: props } = useDraggable<HTMLDivElement>({ data: { "text/plain": "This is custom draggable content of type text/plain." } });
+    const { propsUnstable: props } = useDraggable<HTMLDivElement>({ data: { "text/plain": "This is custom draggable content of type text/plain." }, dragImage: null, dragImageXOffset: null, dragImageYOffset: null, effectAllowed: null });
 
 
     return (
@@ -135,7 +135,7 @@ const DemoUseFocusTrap = memo(({ depth }: { depth?: number }) => {
     const [active, setActive] = useState(false);
 
     const { propsStable, refElementReturn } = useRefElement<HTMLDivElement>({})
-    const { props, focusTrapReturn } = useFocusTrap<HTMLDivElement, HTMLDivElement>({
+    const { props } = useFocusTrap<HTMLDivElement, HTMLDivElement>({
         focusTrapParameters: {
             trapActive: active,
             onlyMoveFocus: false,
@@ -388,7 +388,7 @@ function DemoPress({ remaining }: { remaining: number }) {
     const [count, setCount] = useState<number>(0);
     const { refElementReturn, propsStable: p1 } = useRefElement<HTMLDivElement>({ refElementParameters: {} })
     const { props: p2, pressReturn: { pressing, longPress } } = usePress<HTMLDivElement>({
-        pressParameters: { focusSelf: e => { e.focus() }, longPressThreshold: 1000, onPressSync: () => { setCount((c: number) => ++c) } },
+        pressParameters: { focusSelf: e => { e.focus() }, longPressThreshold: 1000, onPressSync: () => { setCount((c: number) => ++c) }, allowRepeatPresses: false, excludeEnter: null, excludePointer: null, excludeSpace: null, onPressingChange: null },
         refElementReturn
     })
     return (
