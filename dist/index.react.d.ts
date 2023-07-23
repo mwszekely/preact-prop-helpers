@@ -2162,7 +2162,7 @@ interface UseAsyncParameters<AP extends unknown[], SP extends unknown[] = AP> {
      * If provided, adds a debounce behavior *in addition* to
      * the default "wait until resolved" throttling behavior.
      */
-    debounce?: number;
+    debounce: Nullable<number>;
     /**
      * By default, `useAsync` will auto-throttle based on how long it takes
      * for the operation to complete.  If you would like there to be a
@@ -2174,7 +2174,7 @@ interface UseAsyncParameters<AP extends unknown[], SP extends unknown[] = AP> {
      * another one will be run immediately. If it took 100ms, then we'd wait
      * for the remaining 400ms until allowing a second run.
      */
-    throttle?: number;
+    throttle: Nullable<number>;
     /**
      * When an async function is debounced due to one already running,
      * it will run on a delay and, as a result, the original arguments
@@ -2195,7 +2195,7 @@ interface UseAsyncParameters<AP extends unknown[], SP extends unknown[] = AP> {
      *
      * @nonstable
      */
-    capture?: CaptureFunctionType<AP, SP>;
+    capture: Nullable<CaptureFunctionType<AP, SP>>;
 }
 interface UseAsyncReturnType<SP extends unknown[], R> {
     /**

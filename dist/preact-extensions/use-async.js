@@ -80,8 +80,8 @@ export function useAsync(asyncHandler, options) {
             onFinally: incrementFinallyCount,
             onReject: incrementRejectCount,
             onResolve: incrementResolveCount,
-            throttle: options?.throttle,
-            wait: options?.debounce
+            throttle: options?.throttle ?? undefined,
+            wait: options?.debounce ?? undefined
         });
     }, [throttle, debounce]);
     useEffect(() => {

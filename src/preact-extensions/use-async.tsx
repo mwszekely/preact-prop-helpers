@@ -1,7 +1,7 @@
 
 import { CaptureFunctionType, asyncToSync } from "async-to-sync";
 import { identity } from "lodash-es";
-import { useCallback, useEffect, useMemo } from "../util/lib.js";
+import { Nullable, useCallback, useEffect, useMemo } from "../util/lib.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 import { useStableCallback } from "./use-stable-callback.js";
 import { useState } from "./use-state.js";
@@ -14,7 +14,7 @@ export interface UseAsyncParameters<AP extends unknown[], SP extends unknown[] =
      * If provided, adds a debounce behavior *in addition* to
      * the default "wait until resolved" throttling behavior.
      */
-    debounce?: number;
+    debounce: Nullable<number>;
 
     /**
      * By default, `useAsync` will auto-throttle based on how long it takes
@@ -27,7 +27,7 @@ export interface UseAsyncParameters<AP extends unknown[], SP extends unknown[] =
      * another one will be run immediately. If it took 100ms, then we'd wait
      * for the remaining 400ms until allowing a second run.
      */
-    throttle?: number;
+    throttle: Nullable<number>;
 
     /**
      * When an async function is debounced due to one already running,
@@ -49,7 +49,7 @@ export interface UseAsyncParameters<AP extends unknown[], SP extends unknown[] =
      * 
      * @nonstable
      */
-    capture?: CaptureFunctionType<AP, SP>;
+    capture: Nullable<CaptureFunctionType<AP, SP>>;
 }
 
 export interface UseAsyncReturnType<SP extends unknown[], R> {
@@ -249,8 +249,8 @@ export function useAsync<AP extends unknown[], R, SP extends unknown[] = AP>(asy
             onFinally: incrementFinallyCount,
             onReject: incrementRejectCount,
             onResolve: incrementResolveCount,
-            throttle: options?.throttle,
-            wait: options?.debounce
+            throttle: options?.throttle ?? undefined,
+            wait: options?.debounce ?? undefined
         })
     }, [throttle, debounce]);
 

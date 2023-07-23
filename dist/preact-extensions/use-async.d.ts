@@ -1,4 +1,5 @@
 import { CaptureFunctionType } from "async-to-sync";
+import { Nullable } from "../util/lib.js";
 type SyncFunctionType<SP extends unknown[], R> = (...args: SP) => (R | undefined);
 type AsyncFunctionType<AP extends unknown[], R> = ((...args: AP) => (R | Promise<R>));
 export interface UseAsyncParameters<AP extends unknown[], SP extends unknown[] = AP> {
@@ -6,7 +7,7 @@ export interface UseAsyncParameters<AP extends unknown[], SP extends unknown[] =
      * If provided, adds a debounce behavior *in addition* to
      * the default "wait until resolved" throttling behavior.
      */
-    debounce?: number;
+    debounce: Nullable<number>;
     /**
      * By default, `useAsync` will auto-throttle based on how long it takes
      * for the operation to complete.  If you would like there to be a
@@ -18,7 +19,7 @@ export interface UseAsyncParameters<AP extends unknown[], SP extends unknown[] =
      * another one will be run immediately. If it took 100ms, then we'd wait
      * for the remaining 400ms until allowing a second run.
      */
-    throttle?: number;
+    throttle: Nullable<number>;
     /**
      * When an async function is debounced due to one already running,
      * it will run on a delay and, as a result, the original arguments
@@ -39,7 +40,7 @@ export interface UseAsyncParameters<AP extends unknown[], SP extends unknown[] =
      *
      * @nonstable
      */
-    capture?: CaptureFunctionType<AP, SP>;
+    capture: Nullable<CaptureFunctionType<AP, SP>>;
 }
 export interface UseAsyncReturnType<SP extends unknown[], R> {
     /**

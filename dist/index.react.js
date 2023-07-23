@@ -4345,8 +4345,8 @@ function useAsync(asyncHandler, options) {
             onFinally: incrementFinallyCount,
             onReject: incrementRejectCount,
             onResolve: incrementResolveCount,
-            throttle: options?.throttle,
-            wait: options?.debounce
+            throttle: options?.throttle ?? undefined,
+            wait: options?.debounce ?? undefined
         });
     }, [throttle, debounce]);
     useEffect(() => {
@@ -5475,7 +5475,7 @@ function useUrl(onUrlChange) {
  */
 function useAsyncEffect(effect, inputs, options) {
     monitorCallCount(useAsyncEffect);
-    const { syncHandler, ...rest } = useAsync(effect, options);
+    const { syncHandler, ...rest } = useAsync(effect, { ...options, capture: null, debounce: null, throttle: null });
     useEffect(syncHandler, inputs);
     return rest;
 }
