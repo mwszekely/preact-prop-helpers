@@ -192,7 +192,12 @@ const DemoUseAsyncHandler1 = memo(() => {
         hasError,
         rejectCount,
         resolveCount
-    } = useAsyncHandler<MouseEventType<HTMLButtonElement>, void>({ asyncHandler: asyncOnClick, capture: () => { }, debounce: debounce == 0 ? undefined : debounce });
+    } = useAsyncHandler<MouseEventType<HTMLButtonElement>, void>({
+        asyncHandler: asyncOnClick,
+        capture: () => { },
+        debounce: debounce == 0 ? undefined : debounce,
+        throttle: null
+    });
 
     const onClick = pending ? undefined : syncHandler;
 

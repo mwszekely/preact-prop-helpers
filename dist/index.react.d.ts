@@ -1,5 +1,6 @@
 import { JSX, RenderableProps, Ref } from "preact";
 import { EffectCallback, Inputs, StateUpdater } from "preact/hooks";
+import { Inputs as Inputs$0 } from "preact/hooks";
 import { useEffect as useEffectNative } from "preact/hooks";
 import { identity } from "lodash-es";
 import { CaptureFunctionType } from "async-to-sync";
@@ -3086,7 +3087,7 @@ declare function useUrl(onUrlChange: (url: string) => void): readonly [
  *
  * @returns All values from `useAsync`, except for `syncHandler`.
  */
-declare function useAsyncEffect<I extends Inputs>(effect: () => Promise<(void | (() => void))>, inputs?: I, options?: OmitStrong<UseAsyncParameters<[
+declare function useAsyncEffect<I extends Inputs$0>(effect: () => Promise<(void | (() => void))>, inputs?: I, options?: OmitStrong<UseAsyncParameters<[
     void
 ], [
     void

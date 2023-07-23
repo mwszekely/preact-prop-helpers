@@ -1,5 +1,5 @@
 import { options } from "preact";
-import { useRef } from "../util/lib.js";
+import { useRef } from "preact/hooks";
 import { monitorCallCount } from "../util/use-call-count.js";
 const toRun = new Map();
 // TODO: Whether this goes in options.diffed or options._commit

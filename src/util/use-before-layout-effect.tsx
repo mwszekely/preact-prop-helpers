@@ -1,6 +1,6 @@
 
 import { options } from "preact";
-import { EffectCallback, Inputs, useRef } from "../util/lib.js";
+import { EffectCallback, Inputs, useRef } from "preact/hooks";
 import { Nullable } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 
