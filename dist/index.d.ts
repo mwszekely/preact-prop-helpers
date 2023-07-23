@@ -332,5 +332,6 @@ export { generateRandomId } from "./util/random-id.js";
 export { generateStack, useStack } from "./util/stack.js";
 export type { CSSProperties, CompositionEventType, ElementProps, EventType, ExtendMerge, FocusEventType, KeyboardEventType, MouseEventType, Nullable, OmitStrong, PointerEventType, Ref, RefCallback, TargetedOmit, TargetedPick, TouchEventType, VNode } from "./util/types.js";
 export { hideCallCount, monitorCallCount } from "./util/use-call-count.js";
+export * as lib from "./util/lib.js";
 export * from "./util/temp.js";
 //# sourceMappingURL=index.d.ts.map

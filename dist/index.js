@@ -331,5 +331,7 @@ export { getBuildMode } from "./util/mode.js";
 export { generateRandomId } from "./util/random-id.js";
 export { generateStack, useStack } from "./util/stack.js";
 export { hideCallCount, monitorCallCount } from "./util/use-call-count.js";
+// Export the Preact/React interop this library uses for others to use
+export * as lib from "./util/lib.js";
 export * from "./util/temp.js";
 //# sourceMappingURL=index.js.map

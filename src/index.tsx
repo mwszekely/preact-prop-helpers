@@ -334,5 +334,7 @@ export { generateStack, useStack } from "./util/stack.js";
 export type { CSSProperties, CompositionEventType, ElementProps, EventType, ExtendMerge, FocusEventType, KeyboardEventType, MouseEventType, Nullable, OmitStrong, PointerEventType, Ref, RefCallback, TargetedOmit, TargetedPick, TouchEventType, VNode } from "./util/types.js";
 export { hideCallCount, monitorCallCount } from "./util/use-call-count.js";
 
+// Export the Preact/React interop this library uses for others to use
+export * as lib from "./util/lib.js";
 export * from "./util/temp.js";
 
