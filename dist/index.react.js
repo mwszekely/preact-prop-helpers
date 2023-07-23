@@ -1,5 +1,7 @@
-import { Fragment, cloneElement, createContext, createElement, forwardRef, memo, useInsertionEffect, useCallback, useContext, useDebugValue, useEffect, useId, useImperativeHandle, useLayoutEffect, useMemo, useReducer, useRef, useState as useState$1 } from 'react';
+import { useRef, useCallback, useLayoutEffect, useInsertionEffect, useMemo, useEffect, createElement, Fragment, useState as useState$1, useId, memo, forwardRef, useImperativeHandle, cloneElement, createContext, useContext } from 'react';
+export { Fragment, cloneElement, createContext, createElement, forwardRef, memo, useInsertionEffect as useBeforeLayoutEffect, useCallback, useContext, useDebugValue, useEffect, useId, useImperativeHandle, useLayoutEffect, useMemo, useReducer, useRef, useState as useStateBasic } from 'react';
 import { createPortal } from 'react-dom';
+export { createPortal } from 'react-dom';
 
 /** These are all the event mappings that are shared between Preact/React */
 const EventMapping$1 = {
@@ -116,36 +118,6 @@ const EventMapping = {
     toggle: null,
     ...EventMapping$1,
 };
-
-// An external bundler (like Rollup) can turn this export 
-// into "./lib-react.js" to create a React version of this library.
-
-var lib = /*#__PURE__*/Object.freeze({
-    __proto__: null,
-    EventMapping: EventMapping,
-    Fragment: Fragment,
-    cloneElement: cloneElement,
-    createContext: createContext,
-    createElement: createElement,
-    createPortal: createPortal,
-    debounceRendering: debounceRendering,
-    forwardRef: forwardRef,
-    memo: memo,
-    onfocusin: onfocusin,
-    onfocusout: onfocusout,
-    useBeforeLayoutEffect: useInsertionEffect,
-    useCallback: useCallback,
-    useContext: useContext,
-    useDebugValue: useDebugValue,
-    useEffect: useEffect,
-    useId: useId,
-    useImperativeHandle: useImperativeHandle,
-    useLayoutEffect: useLayoutEffect,
-    useMemo: useMemo,
-    useReducer: useReducer,
-    useRef: useRef,
-    useState: useState$1
-});
 
 let cached = null;
 function getBuildModeUnmemoized() {
@@ -25381,5 +25353,5 @@ function returnsFunction() {
     };
 }
 
-export { DroppableFileError, EventDetail, ImperativeElement, ProvideBatchedAnimationFrames, TestClass, assertEmptyObject, binarySearch, debounceRendering, defaultCompare, enableLoggingPropConflicts, enhanceEvent, findBackupFocus, findFirstFocusable, findFirstTabbable, focus, generateRandomId, generateStack, getBuildMode, getDocument, getFromLocalStorage, hideCallCount, identity, lib, mergeFunctions, monitorCallCount, returnFalse, returnNull, returnTrue, returnUndefined, returnZero, returnsFunction, runImmediately, setPressVibrate, storeToLocalStorage, tryNavigateToIndex, useActiveElement, useAnimationFrame, useAsync, useAsyncEffect, useAsyncHandler, useBackdropDismiss, useChildrenFlag, useChildrenHaveFocus, useChildrenHaveFocusChild, useCompleteGridNavigation, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useCompleteListNavigation, useCompleteListNavigationChild, useCompleteListNavigationDeclarative, useDismiss, useDocumentClass, useDraggable, useDroppable, useEffectDebug, useElementSize, useEnsureStability, useEscapeDismiss, useFocusTrap, useForceUpdate, useGlobalHandler, useGridNavigation, useGridNavigationCell, useGridNavigationRow, useGridNavigationSingleSelection, useGridNavigationSingleSelectionCell, useGridNavigationSingleSelectionRow, useGridNavigationSingleSelectionSortable, useGridNavigationSingleSelectionSortableCell, useGridNavigationSingleSelectionSortableRow, useHasCurrentFocus, useHasLastFocus, useHideScroll, useImperativeProps, useInterval, useLayoutEffectDebug, useLinearNavigation, useListNavigation, useListNavigationChild, useListNavigationSingleSelection, useListNavigationSingleSelectionChild, useListNavigationSingleSelectionSortable, useListNavigationSingleSelectionSortableChild, useLogicalDirection, useLostFocusDismiss, useManagedChild, useManagedChildren, useMediaQuery, useMemoObject, useMergedChildren, useMergedClasses, useMergedProps, useMergedRefs, useMergedStyles, useModal, useMutationObserver, usePaginatedChild, usePaginatedChildren, usePassiveState, usePersistentState, usePortalChildren, usePress, useRandomDualIds, useRandomId, useRearrangeableChildren, useRefElement, useRovingTabIndex, useRovingTabIndexChild, useSearchParamState, useSearchParamStateDeclarative, useSingleSelection, useSingleSelectionChild, useSingleSelectionDeclarative, useSortableChildren, useStableCallback, useStableGetter, useStack, useStaggeredChild, useStaggeredChildren, useState, useTextContent, useTimeout, useTypeaheadNavigation, useTypeaheadNavigationChild, useUrl, useWhatCausedRender };
+export { DroppableFileError, EventDetail, EventMapping, ImperativeElement, ProvideBatchedAnimationFrames, TestClass, assertEmptyObject, binarySearch, debounceRendering, defaultCompare, enableLoggingPropConflicts, enhanceEvent, findBackupFocus, findFirstFocusable, findFirstTabbable, focus, generateRandomId, generateStack, getBuildMode, getDocument, getFromLocalStorage, hideCallCount, identity, mergeFunctions, monitorCallCount, onfocusin, onfocusout, returnFalse, returnNull, returnTrue, returnUndefined, returnZero, returnsFunction, runImmediately, setPressVibrate, storeToLocalStorage, tryNavigateToIndex, useActiveElement, useAnimationFrame, useAsync, useAsyncEffect, useAsyncHandler, useBackdropDismiss, useChildrenFlag, useChildrenHaveFocus, useChildrenHaveFocusChild, useCompleteGridNavigation, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useCompleteListNavigation, useCompleteListNavigationChild, useCompleteListNavigationDeclarative, useDismiss, useDocumentClass, useDraggable, useDroppable, useEffectDebug, useElementSize, useEnsureStability, useEscapeDismiss, useFocusTrap, useForceUpdate, useGlobalHandler, useGridNavigation, useGridNavigationCell, useGridNavigationRow, useGridNavigationSingleSelection, useGridNavigationSingleSelectionCell, useGridNavigationSingleSelectionRow, useGridNavigationSingleSelectionSortable, useGridNavigationSingleSelectionSortableCell, useGridNavigationSingleSelectionSortableRow, useHasCurrentFocus, useHasLastFocus, useHideScroll, useImperativeProps, useInterval, useLayoutEffectDebug, useLinearNavigation, useListNavigation, useListNavigationChild, useListNavigationSingleSelection, useListNavigationSingleSelectionChild, useListNavigationSingleSelectionSortable, useListNavigationSingleSelectionSortableChild, useLogicalDirection, useLostFocusDismiss, useManagedChild, useManagedChildren, useMediaQuery, useMemoObject, useMergedChildren, useMergedClasses, useMergedProps, useMergedRefs, useMergedStyles, useModal, useMutationObserver, usePaginatedChild, usePaginatedChildren, usePassiveState, usePersistentState, usePortalChildren, usePress, useRandomDualIds, useRandomId, useRearrangeableChildren, useRefElement, useRovingTabIndex, useRovingTabIndexChild, useSearchParamState, useSearchParamStateDeclarative, useSingleSelection, useSingleSelectionChild, useSingleSelectionDeclarative, useSortableChildren, useStableCallback, useStableGetter, useStack, useStaggeredChild, useStaggeredChildren, useState, useTextContent, useTimeout, useTypeaheadNavigation, useTypeaheadNavigationChild, useUrl, useWhatCausedRender };
 //# sourceMappingURL=index.react.js.map
