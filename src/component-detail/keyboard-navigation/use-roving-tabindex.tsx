@@ -7,11 +7,13 @@ import { useMemoObject, useStableGetter } from "../../preact-extensions/use-stab
 import { useState } from "../../preact-extensions/use-state.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { findBackupFocus } from "../../util/focus.js";
-import { StateUpdater, TargetedPick, useCallback, useEffect, useRef } from "../../util/lib.js";
+import { EventType, StateUpdater, TargetedPick, useCallback, useEffect, useRef } from "../../util/lib.js";
 import { ElementProps, Nullable, OmitStrong } from "../../util/types.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
 
-export type SetTabbableIndex = (updater: Parameters<PassiveStateUpdater<number | null, Event>>[0], reason: Event | undefined, fromUserInteraction: boolean) => void;
+//type Event = EventType<any, any>;
+
+export type SetTabbableIndex = (updater: Parameters<PassiveStateUpdater<number | null, EventType<any, any>>>[0], reason: EventType<any, any> | undefined, fromUserInteraction: boolean) => void;
 export type OnTabbableIndexChange = (tabbableIndex: number | null) => void;
 
 
@@ -52,7 +54,7 @@ export interface UseRovingTabIndexParametersSelf<ParentElement extends Element, 
      * 
      * **MUST** be stable!
      */
-    onTabbableIndexChange: Nullable<OnPassiveStateChange<number | null, Event>>;
+    onTabbableIndexChange: Nullable<OnPassiveStateChange<number | null, EventType<any, any>>>;
 }
 
 export interface UseRovingTabIndexReturnTypeSelf {
@@ -339,7 +341,7 @@ export function useRovingTabIndex<ParentElement extends Element, ChildElement ex
 
     // When we switch from tabbable to non/tabbable, we really want to remember the last tabbable child.
     // So every time we change the index for any reason, record that change as a back up here that can be restored.
-    const [getLastNonNullIndex, setLastNonNullIndex] = usePassiveState<number, Event>(null, useCallback(() => (initiallyTabbedIndex ?? 0), []));
+    const [getLastNonNullIndex, setLastNonNullIndex] = usePassiveState<number, EventType<any, any>>(null, useCallback(() => (initiallyTabbedIndex ?? 0), []));
 
     // Any time we switch to being untabbable, set the current tabbable index accordingly.
     useEffect(() => {
@@ -357,7 +359,7 @@ export function useRovingTabIndex<ParentElement extends Element, ChildElement ex
     const getTabbableAt = useCallback((child: M) => { return child.getLocallyTabbable() }, []);
     const setTabbableAt = useCallback((child: M, t: boolean) => { child.setLocallyTabbable(t); }, []);
     const isTabbableValid = useStableCallback((child: M) => { return !child.untabbable; });
-    const { changeIndex: changeTabbableIndex, getCurrentIndex: getTabbableIndex, reevaluateClosestFit } = useChildrenFlag<M, Event>({
+    const { changeIndex: changeTabbableIndex, getCurrentIndex: getTabbableIndex, reevaluateClosestFit } = useChildrenFlag<M, EventType<any, any>>({
         initialIndex: initiallyTabbedIndex ?? (untabbable ? null : 0),
         onIndexChange: useStableCallback((n, p, r) => {
             // Ensure that changes to `untabbable` don't affect the user-provided onTabbableIndexChange

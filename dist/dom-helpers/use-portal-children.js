@@ -1,7 +1,7 @@
-import { jsx as _jsx, Fragment as _Fragment } from "preact/jsx-runtime";
+import { jsx as _jsx } from "preact/jsx-runtime";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useState } from "../preact-extensions/use-state.js";
-import { cloneElement, createPortal, useCallback, useLayoutEffect, useMemo } from "../util/lib.js";
+import { Fragment, cloneElement, createElement, createPortal, useCallback, useLayoutEffect, useMemo } from "../util/lib.js";
 import { generateRandomId } from "../util/random-id.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 /**
@@ -50,7 +50,7 @@ function PortalChildren({ setPushChild, setUpdateChild, setRemoveChild }) {
     }, []);
     const updateChild = useCallback((index, child) => {
         const key = getChildren()[index]?.key;
-        console.assert(key);
+        console.assert(!!key);
         if (key) {
             setChildren(prev => {
                 let newChildren = prev.slice();
@@ -62,7 +62,7 @@ function PortalChildren({ setPushChild, setUpdateChild, setRemoveChild }) {
     }, []);
     const removeChild = useCallback((index) => {
         const key = getChildren()[index]?.key;
-        console.assert(key);
+        console.assert(!!key);
         if (key) {
             setChildren(prev => {
                 let newChildren = prev.slice();
@@ -75,6 +75,6 @@ function PortalChildren({ setPushChild, setUpdateChild, setRemoveChild }) {
     useLayoutEffect(() => { setPushChild(_ => pushChild); }, [pushChild]);
     useLayoutEffect(() => { setUpdateChild(_ => updateChild); }, [updateChild]);
     useLayoutEffect(() => { setRemoveChild(_ => removeChild); }, [removeChild]);
-    return (_jsx(_Fragment, { children: children }));
+    return (createElement(Fragment, {}, children));
 }
 //# sourceMappingURL=use-portal-children.js.map

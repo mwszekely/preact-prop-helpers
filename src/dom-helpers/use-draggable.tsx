@@ -1,5 +1,5 @@
 import { useState } from "../preact-extensions/use-state.js";
-import { ElementProps, Nullable } from "../util/types.js";
+import { DragEventType, ElementProps, Nullable } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 
 /*
@@ -69,7 +69,7 @@ export function useDraggable<E extends Element>({ effectAllowed, data, dragImage
     const [dragging, setDragging, getDragging] = useState(false);
     const [lastDropEffect, setLastDropEffect, getLastDropEffect] = useState<DataTransfer["dropEffect"] | null>(null);
 
-    const onDragStart = (e: DragEvent) => {
+    const onDragStart = (e: DragEventType<E>) => {
         //e.preventDefault();
         setDragging(true);
         if (e.dataTransfer) {
@@ -85,7 +85,7 @@ export function useDraggable<E extends Element>({ effectAllowed, data, dragImage
     }
 
 
-    const onDragEnd = (e: DragEvent) => {
+    const onDragEnd = (e: DragEventType<E>) => {
         e.preventDefault();
         setDragging(false);
         if (e.dataTransfer) {

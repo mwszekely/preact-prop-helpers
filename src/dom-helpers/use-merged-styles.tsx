@@ -43,7 +43,7 @@ export function useMergedStyles(lhs: ElementProps<EventTarget>["style"], rhs: El
 
     // They're both strings, just concatenate them.
     if (typeof lhs == "string") {
-        return `${lhs};${rhs ?? ""}` as unknown as string;
+        return `${lhs};${rhs ?? ""}` as unknown as ElementProps<EventTarget>["style"];
     }
 
     // They're both objects, just merge them.

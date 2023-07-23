@@ -1,6 +1,6 @@
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useState } from "../preact-extensions/use-state.js";
-import { cloneElement, createPortal, useCallback, useLayoutEffect, useMemo } from "../util/lib.js";
+import { Fragment, cloneElement, createElement, createPortal, useCallback, useLayoutEffect, useMemo } from "../util/lib.js";
 import { generateRandomId } from "../util/random-id.js";
 import { VNode } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
@@ -89,7 +89,7 @@ function PortalChildren({ setPushChild, setUpdateChild, setRemoveChild }: { setP
 
     const updateChild: UpdatePortalChild | null = useCallback((index: number, child: VNode) => {
         const key = getChildren()[index]?.key;
-        console.assert(key);
+        console.assert(!!key);
         if (key) {
             setChildren(prev => {
                 let newChildren = prev.slice();
@@ -102,7 +102,7 @@ function PortalChildren({ setPushChild, setUpdateChild, setRemoveChild }: { setP
 
     const removeChild: RemovePortalChild | null = useCallback((index: number) => {
         const key = getChildren()[index]?.key;
-        console.assert(key);
+        console.assert(!!key);
         if (key) {
             setChildren(prev => {
                 let newChildren = prev.slice();
@@ -118,6 +118,6 @@ function PortalChildren({ setPushChild, setUpdateChild, setRemoveChild }: { setP
     useLayoutEffect(() => { setRemoveChild(_ => removeChild); }, [removeChild]);
 
     return (
-        <>{children}</>
+        createElement(Fragment, {}, children)
     );
 }

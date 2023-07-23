@@ -97,14 +97,14 @@ function useMergedProps2<E extends EventTarget>(lhsAll: ElementProps<E>, rhsAll:
     const ret: ElementProps<E> = {
         ref: useMergedRefs<E>(lhsAll.ref, rhsAll.ref),
         style: useMergedStyles(lhsAll.style, rhsAll.style),
-        className: useMergedClasses(lhsAll["class"], lhsAll.className, rhsAll["class"], rhsAll.className),
+        className: useMergedClasses(lhsAll["class" as keyof ElementProps<E>], lhsAll.className, rhsAll["class" as keyof ElementProps<E>], rhsAll.className),
         children: useMergedChildren(lhsAll.children, rhsAll.children),
     } as any;
 
     if (ret.ref === undefined) delete ret.ref;
     if (ret.style === undefined) delete ret.style;
     if (ret.className === undefined) delete ret.className;
-    if (ret["class"] === undefined) delete ret["class"];
+    if (ret["class" as keyof ElementProps<E>] === undefined) delete ret["class" as keyof ElementProps<E>];
     if (ret.children === undefined) delete ret.children;
 
     for (const lhsKeyU in lhsAll) {

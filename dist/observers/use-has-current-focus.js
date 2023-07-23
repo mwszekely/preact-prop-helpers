@@ -1,5 +1,5 @@
 import { returnFalse, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
-import { useCallback, useEffect, useRef } from "../util/lib.js";
+import { onfocusin, onfocusout, useCallback, useEffect, useRef } from "../util/lib.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 /**
  * Allows monitoring whether the rendered element is or is not focused directly (i.e. would satisfy `:focus`).
@@ -32,8 +32,8 @@ export function useHasCurrentFocus(args) {
         };
     }, []);
     const propsStable = useRef({
-        onfocusin: onFocusIn,
-        onfocusout: onFocusOut
+        [onfocusin]: onFocusIn,
+        [onfocusout]: onFocusOut
     });
     useEffect(() => {
         return () => {

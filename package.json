@@ -13,14 +13,21 @@
       "browser": "./dist/index.js",
       "import": "./dist/index.js"
     },
+    "./react": {
+      "types": "./dist/index.react.d.ts",
+      "browser": "./dist/index.react.js",
+      "import": "./dist/index.react.js"
+    },
     "./package.json": "./package.json"
   },
   "typings": "./dist/index.d.ts",
   "scripts": {
     "build": "npx npm-run-all --npm-path npm -pc clean build:*",
     "watch": "npx npm-run-all --npm-path npm -pc clean watch:*",
-    "watch:ts": "tsc --watch",
-    "build:ts": "tsc",
+    "watch:preact": "tsc --watch",
+    "build:preact": "tsc",
+    "watch:react": "npx rollup -c ./rollup.config.js --watch",
+    "build:react": "npx rollup -c ./rollup.config.js",
     "test": "playwright test --ui",
     "lint": "npx eslint ./src",
     "clean": "tsc --build --clean",
@@ -29,7 +36,9 @@
   "author": "",
   "license": "ISC",
   "peerDependencies": {
-    "preact": "^10.13.2"
+    "preact": "^10.13.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "@microsoft/api-documenter": "^7.22.21",
@@ -38,18 +47,18 @@
     "@microsoft/tsdoc": "^0.14.2",
     "@playwright/test": "^1.35.1",
     "@rollup/plugin-commonjs": "^25.0.3",
-    "@rollup/plugin-json": "^6.0.0",
     "@rollup/plugin-node-resolve": "^15.1.0",
     "@rollup/plugin-replace": "^5.0.2",
     "@rollup/plugin-typescript": "^11.1.2",
     "@types/lodash-es": "^4.17.7",
+    "@types/react": "^18.2.15",
+    "@types/react-dom": "^18.2.7",
     "@typescript-eslint/eslint-plugin": "^5.60.0",
     "@typescript-eslint/parser": "^5.60.0",
     "eslint": "^8.43.0",
     "jsdoc": "^4.0.2",
     "npm-run-all": "^4.1.5",
     "rollup": "^3.26.3",
-    "rollup-plugin-dts": "^5.3.0",
     "rollup-plugin-sourcemaps": "^0.6.3",
     "rollup-plugin-ts": "^3.2.0",
     "ts-node": "^10.9.1",

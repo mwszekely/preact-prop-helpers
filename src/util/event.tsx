@@ -7,14 +7,16 @@
  * Get that extra information from the [EventDetail] symbol.
  */
 
+import { EventType } from "./lib.js";
+
 export const EventDetail = Symbol("event-detail");
 export type EventDetail = typeof EventDetail;
 export type EnhancedEventHandler<E extends Event, Detail> = (e: TargetedEnhancedEvent<E, Detail>) => void;
 export type TargetedEnhancedEvent<E extends Event, Detail> = E & { [EventDetail]: Detail; };
 
 
-export function enhanceEvent<E extends Event, Detail extends object>(e: E, detail: Detail): TargetedEnhancedEvent<E, Detail> {
-    const event = (e as TargetedEnhancedEvent<E, Detail> ?? {});
+export function enhanceEvent<E extends Event | EventType<any, any>, Detail extends object>(e: E, detail: Detail): TargetedEnhancedEvent<E & Event, Detail> {
+    const event = (e as TargetedEnhancedEvent<E & Event, Detail> ?? {});
     event[EventDetail] = detail;
     return event;
 }

@@ -1,6 +1,6 @@
 import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
 import { OnPassiveStateChange, returnFalse, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
-import { TargetedPick, useCallback, useEffect, useRef } from "../util/lib.js";
+import { TargetedPick, onfocusin, onfocusout, useCallback, useEffect, useRef } from "../util/lib.js";
 import { ElementProps, FocusEventType, Nullable } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 
@@ -88,8 +88,8 @@ export function useHasCurrentFocus<T extends Element>(args: UseHasCurrentFocusPa
     }, []);
 
     const propsStable = useRef<ElementProps<T>>({
-        onfocusin: onFocusIn,
-        onfocusout: onFocusOut
+        [onfocusin]: onFocusIn,
+        [onfocusout]: onFocusOut
     });
 
     useEffect(() => {

@@ -5,7 +5,6 @@ import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { EnhancedEventHandler, enhanceEvent } from "../../util/event.js";
 import { useCallback } from "../../util/lib.js";
-import { MouseEventType } from "../../util/types.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
 
 export interface UseBackdropDismissParametersSelf {
@@ -41,7 +40,7 @@ export function useBackdropDismiss<PopupElement extends Element>({ backdropDismi
     const getOpen = useStableGetter(open);
     const onClose = useStableCallback(onCloseUnstable);
 
-    const onBackdropClick = useCallback(function onBackdropClick(e: MouseEventType<any>) {
+    const onBackdropClick = useCallback(function onBackdropClick(e: MouseEvent) {
         if (!getOpen())
             return;
 
@@ -58,7 +57,7 @@ export function useBackdropDismiss<PopupElement extends Element>({ backdropDismi
         }
 
         if (!foundInsideClick) {
-            onClose(enhanceEvent(e, { reason: "backdrop" }));
+            onClose(enhanceEvent(e!, { reason: "backdrop" }));
         }
     }, []);
 

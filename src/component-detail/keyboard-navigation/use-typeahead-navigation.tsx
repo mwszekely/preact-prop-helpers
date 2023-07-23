@@ -7,7 +7,7 @@ import { useMemoObject, useStableGetter } from "../../preact-extensions/use-stab
 import { useState } from "../../preact-extensions/use-state.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { TargetedPick, useCallback, useLayoutEffect, useRef } from "../../util/lib.js";
-import { CompositionEventType, ElementProps, KeyboardEventType, Nullable } from "../../util/types.js";
+import { CompositionEventType, ElementProps, EventType, KeyboardEventType, Nullable } from "../../util/types.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
 
@@ -122,7 +122,7 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
     rovingTabIndexReturn: { getTabbableIndex: getIndex, setTabbableIndex: setIndex, ...void1 },
     ...void2
 }: UseTypeaheadNavigationParameters<ChildElement, M>): UseTypeaheadNavigationReturnType<ParentOrChildElement> {
-    type EventType = Parameters<NonNullable<ElementProps<ParentOrChildElement>["onKeyDown"]>>[0];
+    //type EventType = Parameters<NonNullable<ElementProps<ParentOrChildElement>["onKeyDown"]>>[0];
 
     monitorCallCount(useTypeaheadNavigation);
 
@@ -134,7 +134,7 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
     // and also clear it every 1000 ms since the last time it changed.
     // Next, keep a mapping of typeahead values to indices for faster searching.
     // And, for the user's sake, let them know when their typeahead can't match anything anymore
-    const [getCurrentTypeahead, setCurrentTypeahead] = usePassiveState<string | null, EventType>(useStableCallback((currentTypeahead, prev, reason) => {
+    const [getCurrentTypeahead, setCurrentTypeahead] = usePassiveState<string | null, EventType<any, any>>(useStableCallback((currentTypeahead, prev, reason) => {
         const handle = setTimeout(() => { setCurrentTypeahead(null, undefined!); setTypeaheadStatus("none"); }, typeaheadTimeout ?? 1000);
         updateBasedOnTypeaheadChange(currentTypeahead, reason!);
         return () => clearTimeout(handle);
@@ -276,7 +276,7 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
 
 
 
-    function updateBasedOnTypeaheadChange(currentTypeahead: string | null, reason: Event) {
+    function updateBasedOnTypeaheadChange(currentTypeahead: string | null, reason: EventType<any, any>) {
         if (currentTypeahead && sortedTypeaheadInfo.current.length) {
 
 

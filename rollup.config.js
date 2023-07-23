@@ -1,10 +1,8 @@
-//import { getBabelOutputPlugin } from "@rollup/plugin-babel";
 import commonjs from "@rollup/plugin-commonjs";
-import json from '@rollup/plugin-json';
 import resolve from '@rollup/plugin-node-resolve';
 import replace from '@rollup/plugin-replace';
 import sourcemaps from "rollup-plugin-sourcemaps";
-import ts from "rollup-plugin-ts";
+import ts from 'rollup-plugin-ts'; // Used because the default TS plugin doesn't generate .d.ts files D:
 
 const extensions = [".js", ".jsx", ".ts", ".tsx"];
 
@@ -22,22 +20,30 @@ const extensions = [".js", ".jsx", ".ts", ".tsx"];
 
 /** @type {import('rollup').RollupOptions} */
 export default {
-    input: "./src/index.tsx",
+    input: "src/index.tsx",
     output: {
         file: "./dist/index.react.js",
         format: "es",
-        name: "index.preact",
+        name: "index.react",
         sourcemap: true,
-        globals: { react: 'React', "react-dom": 'ReactDOM' }
+        globals: {
+            "react": "React",
+            "react-dom": "ReactDOM"
+        }
     },
     external: ["react", "react-dom"],
     treeshake: "recommended",
     plugins: [
-        ts({  }),
-        json({}),
-        replace({ "lib-preact": "lib-react", preventAssignment: true }),
+        ts(),
+        replace({
+            values: {
+                "./lib-preact.js": "./lib-react.js",
+            },
+            delimiters: ['', ''],
+            preventAssignment: false
+        }),
         commonjs({ extensions, sourceMap: true }),
-        resolve({ extensions, dedupe: ['react', "react-dom"] }),   // TODO: Needed?
-        sourcemaps(),    // TODO: This is deprecated but needed for both Preact's and our own TS source maps.
+        resolve({ extensions, dedupe: ['react', "react-dom"] }),
+        sourcemaps()
     ],
 }

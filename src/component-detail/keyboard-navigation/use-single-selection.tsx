@@ -9,7 +9,7 @@ import { useMemoObject, useStableGetter } from "../../preact-extensions/use-stab
 import { useState } from "../../preact-extensions/use-state.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { EnhancedEventHandler, TargetedEnhancedEvent, enhanceEvent } from "../../util/event.js";
-import { TargetedPick, useCallback, useEffect } from "../../util/lib.js";
+import { EventType, TargetedPick, useCallback, useEffect } from "../../util/lib.js";
 import { ElementProps, Nullable } from "../../util/types.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
@@ -246,7 +246,7 @@ export function useSingleSelectionChild<ChildElement extends Element, M extends 
      ...void4
 }: UseSingleSelectionChildParameters<ChildElement, M>): UseSingleSelectionChildReturnType<ChildElement> {
     monitorCallCount(useSingleSelectionChild);
-    type R = Event;
+    type R = EventType<any, any>;
 
     assertEmptyObject(void1);
     assertEmptyObject(void2);

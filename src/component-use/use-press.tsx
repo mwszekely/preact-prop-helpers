@@ -4,7 +4,7 @@ import { OnPassiveStateChange, returnFalse, usePassiveState } from "../preact-ex
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useState } from "../preact-extensions/use-state.js";
 import { useTimeout } from "../timing/use-timeout.js";
-import { TargetedPick, useCallback } from "../util/lib.js";
+import { TargetedPick, onfocusout, useCallback } from "../util/lib.js";
 import { ElementProps, FocusEventType, KeyboardEventType, MouseEventType, Nullable, PointerEventType, TouchEventType } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 
@@ -193,10 +193,10 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
         // Be as generous as possible with touch events by checking all four corners of the radius too
         const offsets = [
             [0, 0] as const,
-            [-touch.radiusX, -touch.radiusY] as const,
-            [+touch.radiusX, -touch.radiusY] as const,
-            [-touch.radiusX, +touch.radiusY] as const,
-            [+touch.radiusX, +touch.radiusY] as const
+            [-(touch as Touch).radiusX || 0, -(touch as Touch).radiusY || 0] as const,
+            [+(touch as Touch).radiusX || 0, -(touch as Touch).radiusY || 0] as const,
+            [-(touch as Touch).radiusX || 0, +(touch as Touch).radiusY || 0] as const,
+            [+(touch as Touch).radiusX || 0, +(touch as Touch).radiusY || 0] as const
         ] as const;
         let hoveringAtAnyPoint = false;
         for (const [x, y] of offsets) {
@@ -392,7 +392,8 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
             e.preventDefault();
 
             if (e.detail > 1) {
-                e.stopImmediatePropagation();
+                if ("stopImmediatePropagation" in e)
+                    (e as never as Event).stopImmediatePropagation();
                 e.stopPropagation();
             }
             else {
@@ -454,7 +455,7 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
             onPointerUp: !hasPressEvent ? undefined : (p ? onPointerUp : undefined),
             onPointerEnter: !hasPressEvent ? undefined : (p ? onPointerEnter : undefined),
             onPointerLeave: !hasPressEvent ? undefined : (p ? onPointerLeave : undefined),
-            onfocusout: onFocusOut,
+            [onfocusout]: onFocusOut,
             onClick
         },
     };

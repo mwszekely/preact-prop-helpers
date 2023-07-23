@@ -2,9 +2,9 @@ import { UseRefElementReturnType } from "../../dom-helpers/use-ref-element.js";
 import { UseHasCurrentFocusParameters } from "../../observers/use-has-current-focus.js";
 import { ManagedChildInfo, UseManagedChildParameters, UseManagedChildrenParameters, UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
 import { OnPassiveStateChange, PassiveStateUpdater } from "../../preact-extensions/use-passive-state.js";
-import { StateUpdater, TargetedPick } from "../../util/lib.js";
+import { EventType, StateUpdater, TargetedPick } from "../../util/lib.js";
 import { ElementProps, Nullable, OmitStrong } from "../../util/types.js";
-export type SetTabbableIndex = (updater: Parameters<PassiveStateUpdater<number | null, Event>>[0], reason: Event | undefined, fromUserInteraction: boolean) => void;
+export type SetTabbableIndex = (updater: Parameters<PassiveStateUpdater<number | null, EventType<any, any>>>[0], reason: EventType<any, any> | undefined, fromUserInteraction: boolean) => void;
 export type OnTabbableIndexChange = (tabbableIndex: number | null) => void;
 export interface UseRovingTabIndexParametersSelf<ParentElement extends Element, TabbableChildElement extends Element, M extends UseRovingTabIndexChildInfo<TabbableChildElement>> {
     /** When `untabbable` is true, instead of a child focusing itself, the parent will via this `focusSelf` argument. */
@@ -38,7 +38,7 @@ export interface UseRovingTabIndexParametersSelf<ParentElement extends Element, 
      *
      * **MUST** be stable!
      */
-    onTabbableIndexChange: Nullable<OnPassiveStateChange<number | null, Event>>;
+    onTabbableIndexChange: Nullable<OnPassiveStateChange<number | null, EventType<any, any>>>;
 }
 export interface UseRovingTabIndexReturnTypeSelf {
     /**

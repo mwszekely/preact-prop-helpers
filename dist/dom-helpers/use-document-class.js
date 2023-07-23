@@ -3,6 +3,7 @@ import { useEffect } from "../util/lib.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 export function getDocument(element) { return (element?.ownerDocument ?? document ?? window.document ?? globalThis.document); }
 /**
+ * Allows adding/removing a CSS class to the `window`, `document`, or other global `HTMLElement`.
  *
  * @param className - The class (as a string) to be adding/removing
  * @param active - If `true`, the default, then the class is added to the element. If `false`, it's removed.

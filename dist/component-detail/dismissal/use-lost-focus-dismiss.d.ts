@@ -2,14 +2,14 @@ import { UseRefElementReturnType } from "../../dom-helpers/use-ref-element.js";
 import { UseActiveElementParameters } from "../../observers/use-active-element.js";
 import { EnhancedEventHandler } from "../../util/event.js";
 import { TargetedPick } from "../../util/lib.js";
-import { FocusEventType, Nullable } from "../../util/types.js";
+import { Nullable } from "../../util/types.js";
 export interface UseLostFocusDismissParametersSelf {
     /**
      * Called when the component is dismissed by losing focus
      *
      * @nonstable
      */
-    onDismiss: EnhancedEventHandler<FocusEventType<any>, {
+    onDismiss: EnhancedEventHandler<FocusEvent, {
         reason: "lost-focus";
     }>;
     /**

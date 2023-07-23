@@ -16,6 +16,7 @@ import { monitorCallCount } from "../../util/use-call-count.js";
  * @compositeParams
  */
 export function useTypeaheadNavigation({ typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead, isValid, onNavigateTypeahead, ...void3 }, rovingTabIndexReturn: { getTabbableIndex: getIndex, setTabbableIndex: setIndex, ...void1 }, ...void2 }) {
+    //type EventType = Parameters<NonNullable<ElementProps<ParentOrChildElement>["onKeyDown"]>>[0];
     monitorCallCount(useTypeaheadNavigation);
     assertEmptyObject(void1);
     assertEmptyObject(void2);

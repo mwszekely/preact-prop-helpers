@@ -1,4 +1,4 @@
-import { TargetedPick, createElement, forwardRef, memo, useCallback, useImperativeHandle, useRef, type JSX, type RenderableProps } from "../util/lib.js";
+import { EventMapping, TargetedPick, createElement, forwardRef, memo, useCallback, useImperativeHandle, useRef, type RenderableProps } from "../util/lib.js";
 import { CSSProperties, ElementProps, Ref } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 import { useMergedProps } from "./use-merged-props.js";
@@ -14,13 +14,15 @@ export type DangerouslySetInnerHTML = UseImperativePropsReturnTypeSelf<any>["dan
 export type DangerouslyAppendHTML = UseImperativePropsReturnTypeSelf<any>["dangerouslyAppendHTML"];
 export type SetEventHandler = UseImperativePropsReturnTypeSelf<any>["setEventHandler"];
 
+type AvailableStyles = (keyof CSSStyleDeclaration & keyof CSSProperties) & string;
+
 export interface UseImperativePropsReturnTypeSelf<T extends Element> {
     /** @stable Returns whether the element currently has the current CSS class */
     hasClass(cls: string): boolean;
     /** @stable Applies or removes the given CSS class to the element and its props */
     setClass(cls: string, enabled: boolean): void;
     /** @stable Applies the given CSS style to the element and its props */
-    setStyle<K extends (keyof CSSStyleDeclaration) & string>(prop: K, value: CSSProperties[K] | null): void;
+    setStyle<K extends AvailableStyles>(prop: K, value: CSSProperties[K] | null): void;
     /** @stable Returns the current value of the attribute on the element */
     getAttribute<K extends keyof ElementProps<T>>(prop: K): ElementProps<T>[K];
     /** @stable Applies the given attribute to the element and its props */
@@ -34,6 +36,9 @@ export interface UseImperativePropsReturnTypeSelf<T extends Element> {
     /** @stable Applies the given event handler to the element and its props */
     setEventHandler<K extends keyof HTMLElementEventMap>(type: K, listener: null | ((this: HTMLElement, ev: HTMLElementEventMap[K]) => void), options: AddEventListenerOptions): void;
 }
+
+let a: UseImperativePropsReturnTypeSelf<any> = null!;
+
 
 export interface UseImperativePropsParameters<E extends Element> extends TargetedPick<UseRefElementReturnType<E>, "refElementReturn", "getElement"> { }
 
@@ -68,7 +73,7 @@ function htmlToElement(parent: Element, html: string) {
  * 
  * The `handle` prop should be e.g. `useRef<ImperativeHandle<HTMLDivElement>>(null)`
  */
-export const ImperativeElement = memo(forwardRef(ImperativeElementU)) as typeof ImperativeElementU;
+export const ImperativeElement = memo(forwardRef(ImperativeElementU)) as any as typeof ImperativeElementU;
 
 /**
  * Allows controlling an element's `class`, `style`, etc. with functions like `setStyle` in addition to being reactive to incoming props.
@@ -97,7 +102,7 @@ export function useImperativeProps<E extends Element>({ refElementReturn: { getE
         const element = (getElement() as Element as HTMLElement | undefined);
         if (element) {
             if (currentImperativeProps.current.style[prop] != value) {
-                currentImperativeProps.current.style[prop] = value;
+                currentImperativeProps.current.style[prop as never] = value as never;
                 if ((prop as string).startsWith("--")) {
                     if (value != null)
                         element.style.setProperty(prop, `${value}`);
@@ -209,85 +214,3 @@ function ImperativeElementU<T extends keyof HTMLElementTagNameMap>({ tag: Tag, h
 }
 
 
-const EventMapping: Partial<{ [K in keyof HTMLElementEventMap]: (keyof JSX.IntrinsicElements["div"] & `on${string}`) }> = {
-    abort: "onAbort",
-    animationend: "onAnimationEnd",
-    animationstart: "onAnimationStart",
-    animationiteration: "onAnimationIteration",
-    beforeinput: "onBeforeInput",
-    blur: "onBlur",
-    canplay: "onCanPlay",
-    canplaythrough: "onCanPlayThrough",
-    change: "onChange",
-    click: "onClick",
-    compositionend: "onCompositionEnd",
-    compositionstart: "onCompositionStart",
-    compositionupdate: "onCompositionUpdate",
-    contextmenu: "onContextMenu",
-    cut: "onCut",
-    dblclick: "onDblClick",
-    drag: "onDrag",
-    dragend: "onDragEnd",
-    dragenter: "onDragEnter",
-    dragleave: "onDragLeave",
-    dragover: "onDragOver",
-    dragstart: "onDragStart",
-    drop: "onDrop",
-    durationchange: "onDurationChange",
-    emptied: "onEmptied",
-    ended: "onEnded",
-    error: "onError",
-    focus: "onFocus",
-    focusin: "onfocusin",
-    focusout: "onfocusout",
-    formdata: "onFormData",
-    gotpointercapture: "onGotPointerCapture",
-    input: "onInput",
-    invalid: "onInvalid",
-    keydown: "onKeyDown",
-    keypress: "onKeyPress",
-    keyup: "onKeyUp",
-    load: "onLoad",
-    loadeddata: "onLoadedData",
-    loadedmetadata: "onLoadedMetadata",
-    loadstart: "onLoadStart",
-    lostpointercapture: "onLostPointerCapture",
-    mousedown: "onMouseDown",
-    mouseenter: "onMouseEnter",
-    mouseleave: "onMouseLeave",
-    mousemove: "onMouseMove",
-    mouseout: "onMouseOut",
-    mouseover: "onMouseOver",
-    mouseup: "onMouseUp",
-    paste: "onPaste",
-    pause: "onPause",
-    play: "onPlay",
-    playing: "onPlaying",
-    pointercancel: "onPointerCancel",
-    pointerdown: "onPointerDown",
-    pointerenter: "onPointerEnter",
-    pointerleave: "onPointerLeave",
-    pointermove: "onPointerMove",
-    pointerout: "onPointerOut",
-    pointerover: "onPointerOver",
-    pointerup: "onPointerUp",
-    progress: "onProgress",
-    reset: "onReset",
-    scroll: "onScroll",
-    seeked: "onSeeked",
-    seeking: "onSeeking",
-    select: "onSelect",
-    stalled: "onStalled",
-    submit: "onSubmit",
-    suspend: "onSuspend",
-    timeupdate: "onTimeUpdate",
-    toggle: "onToggle",
-    touchcancel: "onTouchCancel",
-    touchend: "onTouchEnd",
-    touchmove: "onTouchMove",
-    touchstart: "onTouchStart",
-    transitionend: "onTransitionEnd",
-    volumechange: "onVolumeChange",
-    waiting: "onWaiting",
-    wheel: "onWheel"
-}

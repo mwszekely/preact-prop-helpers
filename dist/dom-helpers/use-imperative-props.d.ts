@@ -10,13 +10,14 @@ export type SetChildren = UseImperativePropsReturnTypeSelf<any>["setChildren"];
 export type DangerouslySetInnerHTML = UseImperativePropsReturnTypeSelf<any>["dangerouslySetInnerHTML"];
 export type DangerouslyAppendHTML = UseImperativePropsReturnTypeSelf<any>["dangerouslyAppendHTML"];
 export type SetEventHandler = UseImperativePropsReturnTypeSelf<any>["setEventHandler"];
+type AvailableStyles = (keyof CSSStyleDeclaration & keyof CSSProperties) & string;
 export interface UseImperativePropsReturnTypeSelf<T extends Element> {
     /** @stable Returns whether the element currently has the current CSS class */
     hasClass(cls: string): boolean;
     /** @stable Applies or removes the given CSS class to the element and its props */
     setClass(cls: string, enabled: boolean): void;
     /** @stable Applies the given CSS style to the element and its props */
-    setStyle<K extends (keyof CSSStyleDeclaration) & string>(prop: K, value: CSSProperties[K] | null): void;
+    setStyle<K extends AvailableStyles>(prop: K, value: CSSProperties[K] | null): void;
     /** @stable Returns the current value of the attribute on the element */
     getAttribute<K extends keyof ElementProps<T>>(prop: K): ElementProps<T>[K];
     /** @stable Applies the given attribute to the element and its props */

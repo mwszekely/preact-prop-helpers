@@ -3,7 +3,7 @@ import { returnFalse, usePassiveState } from "../preact-extensions/use-passive-s
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useState } from "../preact-extensions/use-state.js";
 import { useTimeout } from "../timing/use-timeout.js";
-import { useCallback } from "../util/lib.js";
+import { onfocusout, useCallback } from "../util/lib.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 function supportsPointerEvents() {
     return ("onpointerup" in window);
@@ -104,10 +104,10 @@ export function usePress(args) {
         // Be as generous as possible with touch events by checking all four corners of the radius too
         const offsets = [
             [0, 0],
-            [-touch.radiusX, -touch.radiusY],
-            [+touch.radiusX, -touch.radiusY],
-            [-touch.radiusX, +touch.radiusY],
-            [+touch.radiusX, +touch.radiusY]
+            [-touch.radiusX || 0, -touch.radiusY || 0],
+            [+touch.radiusX || 0, -touch.radiusY || 0],
+            [-touch.radiusX || 0, +touch.radiusY || 0],
+            [+touch.radiusX || 0, +touch.radiusY || 0]
         ];
         let hoveringAtAnyPoint = false;
         for (const [x, y] of offsets) {
@@ -277,7 +277,8 @@ export function usePress(args) {
         if (onPressSync) {
             e.preventDefault();
             if (e.detail > 1) {
-                e.stopImmediatePropagation();
+                if ("stopImmediatePropagation" in e)
+                    e.stopImmediatePropagation();
                 e.stopPropagation();
             }
             else {
@@ -331,7 +332,7 @@ export function usePress(args) {
             onPointerUp: !hasPressEvent ? undefined : (p ? onPointerUp : undefined),
             onPointerEnter: !hasPressEvent ? undefined : (p ? onPointerEnter : undefined),
             onPointerLeave: !hasPressEvent ? undefined : (p ? onPointerLeave : undefined),
-            onfocusout: onFocusOut,
+            [onfocusout]: onFocusOut,
             onClick
         },
     };

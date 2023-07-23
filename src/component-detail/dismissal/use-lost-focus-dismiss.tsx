@@ -6,7 +6,7 @@ import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { EnhancedEventHandler, enhanceEvent } from "../../util/event.js";
 import { TargetedPick, useCallback } from "../../util/lib.js";
-import { FocusEventType, Nullable } from "../../util/types.js";
+import { Nullable } from "../../util/types.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
 
 export interface UseLostFocusDismissParametersSelf {
@@ -16,7 +16,7 @@ export interface UseLostFocusDismissParametersSelf {
      * 
      * @nonstable
      */
-    onDismiss: EnhancedEventHandler<FocusEventType<any>, { reason: "lost-focus" }>;
+    onDismiss: EnhancedEventHandler<FocusEvent, { reason: "lost-focus" }>;
 
     /** 
      * When `true`, `onDismiss` is eligible to be called. When `false`, it will not be called.
@@ -52,13 +52,13 @@ export function useLostFocusDismiss<SourceElement extends Element | null, PopupE
 
     const stableOnClose = useStableCallback(onClose);
     const getOpen = useStableGetter(open);
-    const onLastActiveElementChange = useCallback<OnPassiveStateChange<Element | null, FocusEventType<any>>>((newElement, _prevElement, e) => {
+    const onLastActiveElementChange = useCallback<OnPassiveStateChange<Element | null, FocusEvent>>((newElement, _prevElement, e) => {
         const open = getOpen();
         const sourceElement = getSourceElement?.();
         const popupElement = getPopupElement();
         if (!(sourceElement?.contains(newElement) || popupElement?.contains(newElement))) {
             if (open)
-                stableOnClose(enhanceEvent(e as FocusEventType<any>, { reason: "lost-focus" }));
+                stableOnClose(enhanceEvent(e!, { reason: "lost-focus" }));
         }
     }, [getSourceElement]);
 

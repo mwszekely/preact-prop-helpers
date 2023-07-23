@@ -1,6 +1,6 @@
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useState } from "../preact-extensions/use-state.js";
-import { useEffect, useRef } from "../util/lib.js";
+import { DragEventType, useEffect, useRef } from "../util/lib.js";
 import { ElementProps } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 
@@ -143,7 +143,7 @@ export function useDroppable<E extends Element>({ effect }: UseDroppableParamete
 
 
     // Handle collecting the current file metadata or MIME types.
-    const onDragEnter = useStableCallback((e: DragEvent) => {
+    const onDragEnter = useStableCallback((e: DragEventType<E>) => {
         e.preventDefault();
         if (e.dataTransfer) {
 
@@ -171,19 +171,19 @@ export function useDroppable<E extends Element>({ effect }: UseDroppableParamete
     });
 
     // Handle resetting the current file metadata or MIME types
-    const onDragLeave = useStableCallback((e: DragEvent) => {
+    const onDragLeave = useStableCallback((e: DragEventType<E>) => {
         e.preventDefault();
         setFilesForConsideration(null);
         setStringsForConsideration(null);
     });
 
     // Boilerplate, I guess
-    const onDragOver = useStableCallback((e: DragEvent) => {
+    const onDragOver = useStableCallback((e: DragEventType<E>) => {
         e.preventDefault();
     })
 
     // Handle getting the drop data asynchronously
-    const onDrop = useStableCallback((e: DragEvent) => {
+    const onDrop = useStableCallback((e: DragEventType<E>) => {
         e.preventDefault();
 
         setFilesForConsideration(null);
@@ -241,7 +241,7 @@ export function useDroppable<E extends Element>({ effect }: UseDroppableParamete
         }));
     })
 
-    const propsStable = useRef({ onDragEnter, onDragLeave, onDragOver, onDrop });
+    const propsStable = useRef<ElementProps<E>>({ onDragEnter, onDragLeave, onDragOver, onDrop });
 
     return {
         propsStable: propsStable.current,

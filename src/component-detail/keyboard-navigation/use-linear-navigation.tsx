@@ -4,7 +4,7 @@ import { useEnsureStability } from "../../preact-extensions/use-passive-state.js
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
-import { TargetedPick, useCallback, useRef } from "../../util/lib.js";
+import { EventType, TargetedPick, useCallback, useRef } from "../../util/lib.js";
 import { ElementProps, KeyboardEventType, Nullable, OmitStrong } from "../../util/types.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
 import { UsePaginatedChildrenParameters } from "../use-paginated-children.js";
@@ -154,7 +154,7 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
 
     assertEmptyObject(void1);
 
-    type R = Event;
+    type R = EventType<any, any>;
     const { getLowestIndex, getHighestIndex, indexDemangler, indexMangler, isValid, navigatePastEnd, navigatePastStart, onNavigateLinear } = linearNavigationParameters;
     const { getTabbableIndex, setTabbableIndex } = rovingTabIndexReturn;
 

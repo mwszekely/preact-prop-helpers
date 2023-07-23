@@ -1,6 +1,6 @@
 
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
-import { ElementProps, Ref, RefObject } from "../util/types.js";
+import { ElementProps, MutableRef, Ref } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 
 
@@ -9,7 +9,7 @@ function processRef<T>(instance: T | null, ref: Ref<T> | null | undefined) {
         ref(instance);
     }
     else if (ref != null) {
-        (ref as RefObject<T | null>).current = instance;
+        (ref as MutableRef<T | null>).current = instance;
     }
     else {
         /* eslint-disable no-debugger */
