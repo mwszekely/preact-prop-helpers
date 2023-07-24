@@ -23,7 +23,7 @@ export interface CompleteListNavigationContext<_ParentElement extends Element, C
 }
 export interface UseCompleteListNavigationChildParameters<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends Pick<UseListNavigationSingleSelectionSortableChildParameters<ChildElement, M>, "textContentParameters"> {
     context: CompleteListNavigationContext<any, ChildElement, M>;
-    info: Omit<M, Exclude<keyof UseCompleteListNavigationChildInfo<ChildElement>, "getSortValue" | "index" | "focusSelf" | "untabbable" | "unselectable">>;
+    info: OmitStrong<M, Exclude<keyof UseCompleteListNavigationChildInfo<ChildElement>, "getSortValue" | "index" | "focusSelf" | "untabbable" | "unselectable">>;
 }
 export interface UseCompleteListNavigationChildReturnType<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends Pick<UseListNavigationSingleSelectionSortableChildReturnType<ChildElement, M>, "textContentReturn" | "rovingTabIndexChildReturn" | "singleSelectionChildReturn">, OmitStrong<UseRefElementReturnType<ChildElement>, "propsStable">, Pick<UseHasCurrentFocusReturnType<ChildElement>, "hasCurrentFocusReturn">, Pick<UseManagedChildReturnType<M>, "managedChildReturn">, TargetedPick<UsePressParameters<any>, "pressParameters", "onPressSync" | "excludeSpace">, Pick<UsePaginatedChildReturnType<ChildElement>, "paginatedChildReturn">, Pick<UseStaggeredChildReturnType<ChildElement>, "staggeredChildReturn"> {
     /**
