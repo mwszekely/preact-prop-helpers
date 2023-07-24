@@ -156,12 +156,12 @@ export function useCompleteGridNavigationRow({ info, context: contextIncomingFor
 /**
  * @compositeParams
  */
-export function useCompleteGridNavigationCell({ gridNavigationCellParameters, context: { gridNavigationCellContext, managedChildContext, rovingTabIndexContext, typeaheadNavigationContext }, textContentParameters, info, ...void1 }) {
+export function useCompleteGridNavigationCell({ gridNavigationCellParameters, context: { gridNavigationCellContext, managedChildContext, rovingTabIndexContext, typeaheadNavigationContext }, textContentParameters, info: { focusSelf, index, untabbable, ...info }, ...void1 }) {
     monitorCallCount(useCompleteGridNavigationCell);
     const { refElementReturn, propsStable } = useRefElement({ refElementParameters: {} });
     const { hasCurrentFocusParameters, rovingTabIndexChildReturn, textContentReturn, pressParameters: { excludeSpace: es1 }, props: propsRti, info: info2, ...void2 } = useGridNavigationSingleSelectionCell({
         gridNavigationCellParameters,
-        info,
+        info: { index, untabbable, ...info },
         context: { gridNavigationCellContext, rovingTabIndexContext, typeaheadNavigationContext },
         refElementReturn,
         textContentParameters,
@@ -173,7 +173,10 @@ export function useCompleteGridNavigationCell({ gridNavigationCellParameters, co
         getElement: refElementReturn.getElement,
         getLocallyTabbable: rovingTabIndexChildReturn.getTabbable,
         setLocallyTabbable: info2.setLocallyTabbable,
-        tabbable: rovingTabIndexChildReturn.tabbable,
+        //tabbable: rovingTabIndexChildReturn.tabbable,
+        focusSelf,
+        index,
+        untabbable,
         ...info
     };
     const { managedChildReturn } = useManagedChild({ context: { managedChildContext }, info: baseInfo });

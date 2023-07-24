@@ -2253,7 +2253,7 @@ function useGridNavigationCell({ context: { gridNavigationCellContext: { getRowI
                 ocfic1?.(focused, prev, e);
                 if (focused) {
                     setTabbableRow(getRowIndex(), e, false);
-                    setTabbableColumn(prev => { debugger; return { actual: index, ideal: prev?.ideal ?? index }; }, e);
+                    setTabbableColumn(prev => { return { actual: index, ideal: prev?.ideal ?? index }; }, e);
                     setTabbableCell((prev) => {
                         if (prev != null && (prev < index || prev > index + (colSpan))) {
                             return prev;
@@ -3487,12 +3487,12 @@ function useCompleteGridNavigationRow({ info, context: contextIncomingForRowAsCh
 /**
  * @compositeParams
  */
-function useCompleteGridNavigationCell({ gridNavigationCellParameters, context: { gridNavigationCellContext, managedChildContext, rovingTabIndexContext, typeaheadNavigationContext }, textContentParameters, info, ...void1 }) {
+function useCompleteGridNavigationCell({ gridNavigationCellParameters, context: { gridNavigationCellContext, managedChildContext, rovingTabIndexContext, typeaheadNavigationContext }, textContentParameters, info: { focusSelf, index, untabbable, ...info }, ...void1 }) {
     monitorCallCount(useCompleteGridNavigationCell);
     const { refElementReturn, propsStable } = useRefElement({ refElementParameters: {} });
     const { hasCurrentFocusParameters, rovingTabIndexChildReturn, textContentReturn, pressParameters: { excludeSpace: es1 }, props: propsRti, info: info2, ...void2 } = useGridNavigationSingleSelectionCell({
         gridNavigationCellParameters,
-        info,
+        info: { index, untabbable, ...info },
         context: { gridNavigationCellContext, rovingTabIndexContext, typeaheadNavigationContext },
         refElementReturn,
         textContentParameters,
@@ -3502,7 +3502,10 @@ function useCompleteGridNavigationCell({ gridNavigationCellParameters, context: 
         getElement: refElementReturn.getElement,
         getLocallyTabbable: rovingTabIndexChildReturn.getTabbable,
         setLocallyTabbable: info2.setLocallyTabbable,
-        tabbable: rovingTabIndexChildReturn.tabbable,
+        //tabbable: rovingTabIndexChildReturn.tabbable,
+        focusSelf,
+        index,
+        untabbable,
         ...info
     };
     const { managedChildReturn } = useManagedChild({ context: { managedChildContext }, info: baseInfo });

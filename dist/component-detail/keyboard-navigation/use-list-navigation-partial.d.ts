@@ -11,7 +11,7 @@ export interface UseListNavigationReturnType<ParentOrChildElement extends Elemen
     propsParent: ElementProps<ParentOrChildElement>;
     context: UseListNavigationContext;
 }
-export interface UseListNavigationChildParameters<ChildElement extends Element, M extends UseListNavigationChildInfo<ChildElement>> extends ExtendMerge<UseRovingTabIndexChildParameters<ChildElement, M>, UseTypeaheadNavigationChildParameters<ChildElement, M>> {
+export interface UseListNavigationChildParameters<ChildElement extends Element, M extends UseListNavigationChildInfo<ChildElement>, InfoParameterKeys extends keyof M> extends ExtendMerge<UseRovingTabIndexChildParameters<ChildElement, M, InfoParameterKeys>, UseTypeaheadNavigationChildParameters<ChildElement, M>> {
     context: UseListNavigationContext;
 }
 export interface UseListNavigationContext extends RovingTabIndexChildContext, UseTypeaheadNavigationContext {
@@ -32,5 +32,5 @@ export declare function useListNavigation<ParentOrChildElement extends Element, 
 /**
  * @compositeParams
  */
-export declare function useListNavigationChild<ChildElement extends Element, M extends UseListNavigationChildInfo<ChildElement>>({ info, context, refElementReturn, textContentParameters, ...void2 }: UseListNavigationChildParameters<ChildElement, M>): UseListNavigationChildReturnType<ChildElement, M>;
+export declare function useListNavigationChild<ChildElement extends Element, M extends UseListNavigationChildInfo<ChildElement>>({ info, context, refElementReturn, textContentParameters, ...void2 }: UseListNavigationChildParameters<ChildElement, M, never>): UseListNavigationChildReturnType<ChildElement, M>;
 //# sourceMappingURL=use-list-navigation-partial.d.ts.map

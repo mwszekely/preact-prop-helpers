@@ -130,7 +130,7 @@ export interface UseRovingTabIndexReturnType<ParentElement extends Element, Tabb
 }
 export type UseRovingTabIndexChildInfoKeysParameters = "index" | "untabbable";
 export type UseRovingTabIndexChildInfoKeysReturnType = "setLocallyTabbable" | "getLocallyTabbable";
-export interface UseRovingTabIndexChildParameters<TabbableChildElement extends Element, M extends UseRovingTabIndexChildInfo<TabbableChildElement>> extends Pick<UseRefElementReturnType<TabbableChildElement>, "refElementReturn">, OmitStrong<UseManagedChildParameters<M, UseRovingTabIndexChildInfoKeysParameters>, "context"> {
+export interface UseRovingTabIndexChildParameters<TabbableChildElement extends Element, M extends UseRovingTabIndexChildInfo<TabbableChildElement>, InfoParameterKeys extends keyof M> extends Pick<UseRefElementReturnType<TabbableChildElement>, "refElementReturn">, OmitStrong<UseManagedChildParameters<M, InfoParameterKeys | UseRovingTabIndexChildInfoKeysParameters>, "context"> {
     /**
      * The information provided by the parent hook
      */
@@ -205,5 +205,5 @@ export declare function useRovingTabIndex<ParentElement extends Element, ChildEl
  * @param args - {@link UseRovingTabIndexChildParameters}
  * @returns - {@link UseRovingTabIndexChildReturnType}
  */
-export declare function useRovingTabIndexChild<ChildElement extends Element, M extends UseRovingTabIndexChildInfo<ChildElement>>({ info: { index, untabbable: iAmUntabbable, ...void2 }, context: { rovingTabIndexContext: { giveParentFocusedElement, untabbable: parentIsUntabbable, untabbableBehavior, reevaluateClosestFit, setTabbableIndex, getInitiallyTabbedIndex, parentFocusSelf } }, refElementReturn: { getElement }, ...void3 }: UseRovingTabIndexChildParameters<ChildElement, M>): UseRovingTabIndexChildReturnType<ChildElement, M>;
+export declare function useRovingTabIndexChild<ChildElement extends Element, M extends UseRovingTabIndexChildInfo<ChildElement>>({ info: { index, untabbable: iAmUntabbable, ...void2 }, context: { rovingTabIndexContext: { giveParentFocusedElement, untabbable: parentIsUntabbable, untabbableBehavior, reevaluateClosestFit, setTabbableIndex, getInitiallyTabbedIndex, parentFocusSelf } }, refElementReturn: { getElement }, ...void3 }: UseRovingTabIndexChildParameters<ChildElement, M, never>): UseRovingTabIndexChildReturnType<ChildElement, M>;
 //# sourceMappingURL=use-roving-tabindex.d.ts.map
