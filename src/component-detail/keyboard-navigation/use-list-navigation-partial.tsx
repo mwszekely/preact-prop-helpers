@@ -62,8 +62,8 @@ export interface UseListNavigationReturnType<ParentOrChildElement extends Elemen
     context: UseListNavigationContext;
 }
 
-export interface UseListNavigationChildParameters<ChildElement extends Element, M extends UseListNavigationChildInfo<ChildElement>> extends
-    ExtendMerge<UseRovingTabIndexChildParameters<ChildElement, M>, UseTypeaheadNavigationChildParameters<ChildElement, M>> {
+export interface UseListNavigationChildParameters<ChildElement extends Element, M extends UseListNavigationChildInfo<ChildElement>, InfoParameterKeys extends keyof M> extends
+    ExtendMerge<UseRovingTabIndexChildParameters<ChildElement, M, InfoParameterKeys>, UseTypeaheadNavigationChildParameters<ChildElement, M>> {
     context: UseListNavigationContext;
 }
 export interface UseListNavigationContext extends RovingTabIndexChildContext, UseTypeaheadNavigationContext { }
@@ -129,7 +129,7 @@ export function useListNavigationChild<ChildElement extends Element, M extends U
     refElementReturn,
     textContentParameters,
     ...void2
-}: UseListNavigationChildParameters<ChildElement, M>): UseListNavigationChildReturnType<ChildElement, M> {
+}: UseListNavigationChildParameters<ChildElement, M, never>): UseListNavigationChildReturnType<ChildElement, M> {
     monitorCallCount(useListNavigationChild);
 
     const { props, ...rticr } = useRovingTabIndexChild<ChildElement, M>({ context, info, refElementReturn });

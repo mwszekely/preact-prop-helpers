@@ -171,9 +171,9 @@ export interface UseRovingTabIndexReturnType<ParentElement extends Element, Tabb
 export type UseRovingTabIndexChildInfoKeysParameters = "index" | "untabbable";
 export type UseRovingTabIndexChildInfoKeysReturnType = "setLocallyTabbable" | "getLocallyTabbable";
 
-export interface UseRovingTabIndexChildParameters<TabbableChildElement extends Element, M extends UseRovingTabIndexChildInfo<TabbableChildElement>> extends
+export interface UseRovingTabIndexChildParameters<TabbableChildElement extends Element, M extends UseRovingTabIndexChildInfo<TabbableChildElement>, InfoParameterKeys extends keyof M> extends
     Pick<UseRefElementReturnType<TabbableChildElement>, "refElementReturn">,
-    OmitStrong<UseManagedChildParameters<M, UseRovingTabIndexChildInfoKeysParameters>, "context"> {
+    OmitStrong<UseManagedChildParameters<M, InfoParameterKeys | UseRovingTabIndexChildInfoKeysParameters>, "context"> {
     /**
      * The information provided by the parent hook
      */
@@ -459,7 +459,7 @@ export function useRovingTabIndexChild<ChildElement extends Element, M extends U
     context: { rovingTabIndexContext: { giveParentFocusedElement, untabbable: parentIsUntabbable, untabbableBehavior, reevaluateClosestFit, setTabbableIndex, getInitiallyTabbedIndex, parentFocusSelf } },
     refElementReturn: { getElement },
     ...void3
-}: UseRovingTabIndexChildParameters<ChildElement, M>): UseRovingTabIndexChildReturnType<ChildElement, M> {
+}: UseRovingTabIndexChildParameters<ChildElement, M, never>): UseRovingTabIndexChildReturnType<ChildElement, M> {
     monitorCallCount(useRovingTabIndexChild);
 
     const [tabbable, setTabbable, getTabbable] = useState(getInitiallyTabbedIndex() === index);

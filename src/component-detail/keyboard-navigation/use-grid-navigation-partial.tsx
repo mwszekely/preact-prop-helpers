@@ -61,8 +61,8 @@ export interface UseGridNavigationRowContext extends UseListNavigationContext {
     gridNavigationRowContext: UseGridNavigationRowContextSelf;
 }
 
-export interface UseGridNavigationRowParameters<RowElement extends Element, CellElement extends Element, RM extends GridChildRowInfo<RowElement, CellElement>, CM extends GridChildCellInfo<CellElement>> extends
-    OmitStrong<UseListNavigationChildParameters<RowElement, RM>, "context">,
+export interface UseGridNavigationRowParameters<RowElement extends Element, CellElement extends Element, RM extends GridChildRowInfo<RowElement, CellElement>, CM extends GridChildCellInfo<CellElement>, InfoParameterKeys extends keyof RM> extends
+    OmitStrong<UseListNavigationChildParameters<RowElement, RM, InfoParameterKeys>, "context">,
     TargetedOmit<UseListNavigationParameters<RowElement, CellElement, CM>, "linearNavigationParameters", "disableHomeEndKeys" | "onNavigateLinear" | "arrowKeyDirection">,
     TargetedOmit<UseListNavigationParameters<RowElement, CellElement, CM>, "rovingTabIndexParameters", "focusSelfParent" | "untabbableBehavior">,
     OmitStrong<UseListNavigationParameters<RowElement, CellElement, CM>, "paginatedChildrenParameters" | "refElementReturn" | "rovingTabIndexParameters" | "linearNavigationParameters">,
@@ -86,7 +86,7 @@ export interface UseGridNavigationRowReturnType<RowElement extends Element, Cell
 
 
 
-export interface UseGridNavigationCellParameters<RowElement extends Element, CellElement extends Element, CM extends GridChildCellInfo<CellElement>> extends UseListNavigationChildParameters<CellElement, CM> {
+export interface UseGridNavigationCellParameters<RowElement extends Element, CellElement extends Element, CM extends GridChildCellInfo<CellElement>, InfoParameterKeys extends keyof CM> extends UseListNavigationChildParameters<CellElement, CM, InfoParameterKeys> {
     gridNavigationCellParameters: UseGridNavigationCellParametersSelf;
     context: UseGridNavigationCellContext;
 }
@@ -198,7 +198,7 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
     // Both/neither
     refElementReturn,
     ...void1
-}: UseGridNavigationRowParameters<RowElement, CellElement, RM, CM>): UseGridNavigationRowReturnType<RowElement, CellElement, RM, CM> {
+}: UseGridNavigationRowParameters<RowElement, CellElement, RM, CM, never>): UseGridNavigationRowReturnType<RowElement, CellElement, RM, CM> {
     monitorCallCount(useGridNavigationRow);
     const { getTabbableColumn, setTabbableColumn, setTabbableRow } = contextFromParent.gridNavigationRowContext;
 
@@ -335,7 +335,7 @@ export function useGridNavigationCell<CellElement extends Element, CM extends Gr
         ...void6
     },
     ...void1
-}: UseGridNavigationCellParameters<any, CellElement, CM>): UseGridNavigationCellReturnType<CellElement, CM> {
+}: UseGridNavigationCellParameters<any, CellElement, CM, never>): UseGridNavigationCellReturnType<CellElement, CM> {
     monitorCallCount(useGridNavigationCell);
     colSpan ??= 1;
 

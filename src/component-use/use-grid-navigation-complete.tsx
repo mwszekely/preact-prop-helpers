@@ -33,20 +33,19 @@ export interface UseCompleteGridNavigationParameters<ParentOrRowElement extends 
 
 }
 
+type S = "getSortValue" | "index" | "untabbable" | "unselectable";
+
 export interface UseCompleteGridNavigationRowParameters<RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement, CellElement>, CM extends UseCompleteGridNavigationCellInfo<CellElement>> extends
-    OmitStrong<UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM>, "context" | "textContentParameters" | "managedChildrenReturn" | "refElementReturn" | "linearNavigationParameters" | "typeaheadNavigationParameters">,
-    TargetedOmit<UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM>, "textContentParameters", never>,
-    TargetedOmit<UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM>, "linearNavigationParameters", "getLowestIndex" | "getHighestIndex" | "pageNavigationSize" | "isValid" | "indexMangler" | "indexDemangler">,
-    TargetedOmit<UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM>, "typeaheadNavigationParameters", "isValid"> {
+    OmitStrong<UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM, S>, "context" | "textContentParameters" | "managedChildrenReturn" | "refElementReturn" | "linearNavigationParameters" | "typeaheadNavigationParameters">,
+    TargetedOmit<UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM, S>, "textContentParameters", never>,
+    TargetedOmit<UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM, S>, "linearNavigationParameters", "getLowestIndex" | "getHighestIndex" | "pageNavigationSize" | "isValid" | "indexMangler" | "indexDemangler">,
+    TargetedOmit<UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM, S>, "typeaheadNavigationParameters", "isValid"> {
 
     context: CompleteGridNavigationRowContext<any, RowElement, CellElement, RM, CM>;
-    info: OmitStrong<RM, Exclude<keyof UseCompleteGridNavigationRowInfo<RowElement, CellElement>, "getSortValue" | "index" | "untabbable" | "unselectable">>;
 }
 
 export interface UseCompleteGridNavigationCellParameters<CellElement extends Element, CM extends UseCompleteGridNavigationCellInfo<CellElement>> extends
-    OmitStrong<UseGridNavigationSingleSelectionCellParameters<any, CellElement, CM>, "info" | "context" | "refElementReturn"> {
-
-    info: Omit<CM, Exclude<keyof UseCompleteGridNavigationCellInfo<CellElement>, "index" | "untabbable" | "focusSelf">>;
+    OmitStrong<UseGridNavigationSingleSelectionCellParameters<any, CellElement, CM, "index" | "untabbable" | "focusSelf">, "context" | "refElementReturn"> {
     context: CompleteGridNavigationCellContext<any, CellElement, CM>;
 }
 
@@ -338,7 +337,7 @@ export function useCompleteGridNavigationCell<CellElement extends Element, CM ex
     gridNavigationCellParameters,
     context: { gridNavigationCellContext, managedChildContext, rovingTabIndexContext, typeaheadNavigationContext },
     textContentParameters,
-    info,
+    info: { focusSelf, index, untabbable, ...info },
     ...void1
 }: UseCompleteGridNavigationCellParameters<CellElement, CM>): UseCompleteGridNavigationCellReturnType<CellElement, CM> {
     monitorCallCount(useCompleteGridNavigationCell);
@@ -355,7 +354,7 @@ export function useCompleteGridNavigationCell<CellElement extends Element, CM ex
         ...void2
     } = useGridNavigationSingleSelectionCell<CellElement, CM>({
         gridNavigationCellParameters,
-        info,
+        info: { index, untabbable, ...info },
         context: { gridNavigationCellContext, rovingTabIndexContext, typeaheadNavigationContext },
         refElementReturn,
         textContentParameters,
@@ -369,7 +368,10 @@ export function useCompleteGridNavigationCell<CellElement extends Element, CM ex
         getElement: refElementReturn.getElement,
         getLocallyTabbable: rovingTabIndexChildReturn.getTabbable,
         setLocallyTabbable: info2.setLocallyTabbable,
-        tabbable: rovingTabIndexChildReturn.tabbable,
+        //tabbable: rovingTabIndexChildReturn.tabbable,
+        focusSelf,
+        index,
+        untabbable,
         ...info
     }
 
