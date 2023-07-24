@@ -3438,7 +3438,7 @@ function useCompleteGridNavigationRow({ info, context: contextIncomingForRowAsCh
         return true;
     }, []);
     const { refElementReturn, propsStable } = useRefElement({ refElementParameters: {} });
-    const r = useGridNavigationSingleSelectionRow({
+    const r = useGridNavigationSingleSelectionSortableRow({
         rovingTabIndexParameters,
         typeaheadNavigationParameters: { isValid, ...typeaheadNavigationParameters },
         linearNavigationParameters: { isValid, getHighestIndex: getHighestChildIndex, getLowestIndex: getLowestChildIndex, pageNavigationSize: 0, indexDemangler: identity, indexMangler: identity, ...linearNavigationParameters },
@@ -3490,7 +3490,7 @@ function useCompleteGridNavigationRow({ info, context: contextIncomingForRowAsCh
 function useCompleteGridNavigationCell({ gridNavigationCellParameters, context: { gridNavigationCellContext, managedChildContext, rovingTabIndexContext, typeaheadNavigationContext }, textContentParameters, info: { focusSelf, index, untabbable, ...info }, ...void1 }) {
     monitorCallCount(useCompleteGridNavigationCell);
     const { refElementReturn, propsStable } = useRefElement({ refElementParameters: {} });
-    const { hasCurrentFocusParameters, rovingTabIndexChildReturn, textContentReturn, pressParameters: { excludeSpace: es1 }, props: propsRti, info: info2, ...void2 } = useGridNavigationSingleSelectionCell({
+    const { hasCurrentFocusParameters, rovingTabIndexChildReturn, textContentReturn, pressParameters: { excludeSpace: es1 }, props: propsRti, info: info2, ...void2 } = useGridNavigationSingleSelectionSortableCell({
         gridNavigationCellParameters,
         info: { index, untabbable, ...info },
         context: { gridNavigationCellContext, rovingTabIndexContext, typeaheadNavigationContext },
