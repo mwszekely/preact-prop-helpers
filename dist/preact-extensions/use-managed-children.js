@@ -36,6 +36,8 @@ const _comments = void (0);
  *
  * @hasChild {@link useManagedChild}
  *
+ * {@include } {@link ManagedChildren}
+ *
  * @compositeParams
  */
 export function useManagedChildren(parentParameters) {
@@ -43,7 +45,6 @@ export function useManagedChildren(parentParameters) {
     const { managedChildrenParameters: { onAfterChildLayoutEffect, onChildrenMountChange, onChildrenCountChange }, ...rest } = parentParameters;
     assertEmptyObject(rest);
     useEnsureStability("useManagedChildren", onAfterChildLayoutEffect, onChildrenMountChange, onChildrenCountChange);
-    //const [getMountCount, setMountCount] = usePassiveState(onChildrenCountChange, returnZero, runImmediately);
     const getHighestIndex = useCallback(() => { return managedChildrenArray.current.highestIndex; }, []);
     const getLowestIndex = useCallback(() => { return managedChildrenArray.current.lowestIndex; }, []);
     // All the information we have about our children is stored in this **stable** array.

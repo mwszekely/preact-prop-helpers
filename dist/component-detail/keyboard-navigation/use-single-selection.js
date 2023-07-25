@@ -2,12 +2,13 @@ import { noop } from "lodash-es";
 import { useChildrenFlag } from "../../preact-extensions/use-managed-children.js";
 import { useEnsureStability } from "../../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
-import { useMemoObject, useStableGetter } from "../../preact-extensions/use-stable-getter.js";
+import { useMemoObject } from "../../preact-extensions/use-stable-getter.js";
 import { useState } from "../../preact-extensions/use-state.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { enhanceEvent } from "../../util/event.js";
 import { useCallback, useEffect } from "../../util/lib.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
+import { useTagProps } from "../../util/use-tag-props.js";
 /**
  * Allows a single child among all children to be the "selected" child (which can be different from the "focused" child).
  *
@@ -84,16 +85,19 @@ export function useSingleSelectionChild({ context: { singleSelectionContext: { g
     assertEmptyObject(void3);
     assertEmptyObject(void4);
     useEnsureStability("useSingleSelectionChild", getSelectedIndex, onSelectedIndexChange);
-    const getUnselectable = useStableGetter(unselectable);
+    //const getUnselectable = useStableGetter(unselectable);
     const [localSelected, setLocalSelected, getLocalSelected] = useState(getSelectedIndex() == index);
     const [direction, setDirection, getDirection] = useState(getSelectedIndex() == null ? null : (getSelectedIndex() - index));
     const onCurrentFocusedInnerChanged = useStableCallback((focused, _prev, e) => {
-        if (selectionMode == 'focus' && focused) {
+        if (selectionMode == 'focus' && focused && !unselectable) {
             onSelectedIndexChange?.(enhanceEvent(e, { selectedIndex: index }));
         }
     });
+    const onPressSync = useStableCallback((e) => {
+        if (selectionMode == 'activation' && !unselectable)
+            onSelectedIndexChange?.(enhanceEvent(e, { selectedIndex: index }));
+    });
     const propParts = ariaPropName?.split("-") ?? [];
-    const onPressSync = useStableCallback((e) => { onSelectedIndexChange?.(enhanceEvent(e, { selectedIndex: index })); });
     return {
         info: {
             setLocalSelected: useStableCallback((selected, direction) => {
@@ -109,9 +113,9 @@ export function useSingleSelectionChild({ context: { singleSelectionContext: { g
             selectedOffset: direction,
             getSelectedOffset: getDirection,
         },
-        props: ariaPropName == null || selectionMode == "disabled" ? {} : {
+        props: useTagProps(ariaPropName == null || selectionMode == "disabled" ? {} : {
             [`${propParts[0]}-${propParts[1]}`]: (localSelected ? (propParts[1] == "current" ? `${propParts[2]}` : `true`) : "false")
-        },
+        }, "data-single-selection-child"),
         hasCurrentFocusParameters: { onCurrentFocusedInnerChanged },
         pressParameters: { onPressSync: onSelectedIndexChange ? onPressSync : null }
     };

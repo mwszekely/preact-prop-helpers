@@ -10,6 +10,7 @@ import { assertEmptyObject } from "../../util/assert.js";
 import { TargetedPick, useCallback, useLayoutEffect, useRef } from "../../util/lib.js";
 import { CompositionEventType, ElementProps, EventType, KeyboardEventType, Nullable } from "../../util/types.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
+import { useTagProps } from "../../util/use-tag-props.js";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
 
 export interface UseTypeaheadNavigationReturnTypeSelf {
@@ -53,7 +54,7 @@ export interface UseTypeaheadNavigationParametersSelf<TabbableChildElement exten
      * 
      * @nonstable
      */
-    isValid(index: number): boolean;
+    isValidForTypeaheadNavigation(index: number): boolean;
 
 
     /**
@@ -89,7 +90,7 @@ export interface UseTypeaheadNavigationContext {
 export interface UseTypeaheadNavigationChildInfo<TabbableChildElement extends Element> extends Pick<UseRovingTabIndexChildInfo<TabbableChildElement>, "index"> { }
 
 
-export interface UseTypeaheadNavigationParameters<TabbableChildElement extends Element, _M extends UseTypeaheadNavigationChildInfo<TabbableChildElement>> extends TargetedPick<UseRovingTabIndexReturnType<any, TabbableChildElement, any>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex"> {
+export interface UseTypeaheadNavigationParameters<TabbableChildElement extends Element> extends TargetedPick<UseRovingTabIndexReturnType<any, TabbableChildElement>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex"> {
     typeaheadNavigationParameters: UseTypeaheadNavigationParametersSelf<TabbableChildElement>;
 }
 
@@ -97,8 +98,8 @@ export type UseTypeaheadNavigationChildInfoKeysParameters = "index";
 export type UseTypeaheadNavigationChildInfoKeysReturnType = never;
 
 /** Arguments passed to the child `useTypeaheadNavigationChild` */
-export interface UseTypeaheadNavigationChildParameters<ChildElement extends Element, M extends UseTypeaheadNavigationChildInfo<ChildElement>> extends
-    UseGenericChildParameters<UseTypeaheadNavigationContext, Pick<M, UseTypeaheadNavigationChildInfoKeysParameters>>,
+export interface UseTypeaheadNavigationChildParameters<ChildElement extends Element> extends
+    UseGenericChildParameters<UseTypeaheadNavigationContext, Pick<UseTypeaheadNavigationChildInfo<ChildElement>, UseTypeaheadNavigationChildInfoKeysParameters>>,
     TargetedPick<UseTextContentParameters<ChildElement>, "textContentParameters", "getText">,
     TargetedPick<UseRefElementReturnType<ChildElement>, "refElementReturn", "getElement"> {
 }
@@ -120,11 +121,11 @@ interface TypeaheadInfo { text: string | null; unsortedIndex: number; }
  * 
  * @compositeParams
  */
-export function useTypeaheadNavigation<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseTypeaheadNavigationChildInfo<ChildElement>>({
-    typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead, isValid, onNavigateTypeahead, ...void3 },
+export function useTypeaheadNavigation<ParentOrChildElement extends Element, ChildElement extends Element>({
+    typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead, isValidForTypeaheadNavigation, onNavigateTypeahead, ...void3 },
     rovingTabIndexReturn: { getTabbableIndex: getIndex, setTabbableIndex: setIndex, ...void1 },
     ...void2
-}: UseTypeaheadNavigationParameters<ChildElement, M>): UseTypeaheadNavigationReturnType<ParentOrChildElement> {
+}: UseTypeaheadNavigationParameters<ChildElement>): UseTypeaheadNavigationReturnType<ParentOrChildElement> {
     //type EventType = Parameters<NonNullable<ElementProps<ParentOrChildElement>["onKeyDown"]>>[0];
 
     monitorCallCount(useTypeaheadNavigation);
@@ -201,7 +202,7 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
     const isDisabled = useStableGetter(noTypeahead);
 
 
-    const propsStable = useRef<ElementProps<ParentOrChildElement>>({
+    const propsStable = useRef<ElementProps<ParentOrChildElement>>(useTagProps({
         onKeyDown: useStableCallback((e) => {
             if (isDisabled())
                 return;
@@ -254,7 +255,7 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
             setImeActive(false);
         }),
         onCompositionEnd: useStableCallback((_e: CompositionEventType<ParentOrChildElement>) => { setImeActive(true) }),
-    });
+    }, "data-typeahead-navigation"));
 
     const excludeSpace = useStableCallback(() => { return typeaheadStatus != "none" });
 
@@ -330,7 +331,7 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
                 let lowestSortedIndexNext = sortedTypeaheadIndex;
 
                 const updateBestFit = (u: number) => {
-                    if (!isValid(u))
+                    if (!isValidForTypeaheadNavigation(u))
                         return;
 
                     if (lowestUnsortedIndexAll == null || u < lowestUnsortedIndexAll) {
@@ -375,13 +376,13 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
  * 
  * @compositeParams
  */
-export function useTypeaheadNavigationChild<ChildElement extends Element, M extends UseTypeaheadNavigationChildInfo<ChildElement>>({
+export function useTypeaheadNavigationChild<ChildElement extends Element>({
     info: { index, ...void1 },
     textContentParameters: { getText, ...void5 },
     context: { typeaheadNavigationContext: { sortedTypeaheadInfo, insertingComparator, excludeSpace, ...void2 } },
     refElementReturn: { getElement, ...void3 },
     ...void4
-}: UseTypeaheadNavigationChildParameters<ChildElement, M>): UseTypeaheadNavigationChildReturnType {
+}: UseTypeaheadNavigationChildParameters<ChildElement>): UseTypeaheadNavigationChildReturnType {
     monitorCallCount(useTypeaheadNavigationChild);
 
     assertEmptyObject(void1);

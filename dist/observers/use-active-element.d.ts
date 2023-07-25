@@ -6,19 +6,19 @@ export interface UseActiveElementParametersSelf {
      *
      * @stable
      */
-    onActiveElementChange?: Nullable<OnPassiveStateChange<Element | null, FocusEvent>>;
+    onActiveElementChange: Nullable<OnPassiveStateChange<Element | null, FocusEvent>>;
     /**
      * Called any time the active element changes and is not null.
      *
      * @stable
      */
-    onLastActiveElementChange?: Nullable<OnPassiveStateChange<Element, FocusEvent>>;
+    onLastActiveElementChange: Nullable<OnPassiveStateChange<Element, FocusEvent>>;
     /**
      * Called any time the window gains/loses focus.
      *
      * @stable
      */
-    onWindowFocusedChange?: Nullable<OnPassiveStateChange<boolean, FocusEvent>>;
+    onWindowFocusedChange: Nullable<OnPassiveStateChange<boolean, FocusEvent>>;
     /**
      * This must be a function that returns the document associated with whatever elements we're listening to.
      *
@@ -27,13 +27,6 @@ export interface UseActiveElementParametersSelf {
      * @stable
      */
     getDocument(): Document;
-    /**
-     * By default, event handlers are attached to the document's defaultView Window.
-     * If you need something different, override it here.
-     *
-     * @stable
-     */
-    getWindow?: Nullable<((document: Document) => Window)>;
 }
 export interface UseActiveElementParameters {
     activeElementParameters: UseActiveElementParametersSelf;
@@ -69,5 +62,5 @@ export interface UseActiveElementReturnType {
  *
  * @compositeParams
  */
-export declare function useActiveElement({ activeElementParameters: { onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument, getWindow } }: UseActiveElementParameters): UseActiveElementReturnType;
+export declare function useActiveElement({ activeElementParameters: { onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument } }: UseActiveElementParameters): UseActiveElementReturnType;
 //# sourceMappingURL=use-active-element.d.ts.map

@@ -3,6 +3,7 @@ import { useBlockingElement } from "../dom-helpers/use-blocking-element.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useEffect } from "../util/lib.js";
 import { monitorCallCount } from "../util/use-call-count.js";
+import { useTagProps } from "../util/use-tag-props.js";
 /**
  * Allows you to move focus to an isolated area of the page and restore it when finished.
  *
@@ -10,7 +11,7 @@ import { monitorCallCount } from "../util/use-call-count.js";
  *
  * @compositeParams
  */
-export function useFocusTrap({ focusTrapParameters: { onlyMoveFocus, trapActive, focusPopup: focusSelfUnstable, focusOpener: focusOpenerUnstable }, refElementReturn }) {
+export function useFocusTrap({ focusTrapParameters: { onlyMoveFocus, trapActive, focusPopup: focusSelfUnstable, focusOpener: focusOpenerUnstable }, activeElementParameters, refElementReturn }) {
     monitorCallCount(useFocusTrap);
     const focusSelf = useStableCallback(focusSelfUnstable);
     const focusOpener = useStableCallback(focusOpenerUnstable);
@@ -42,9 +43,15 @@ export function useFocusTrap({ focusTrapParameters: { onlyMoveFocus, trapActive,
         }
     }, [trapActive]);
     const { getElement } = refElementReturn;
-    const { getTop, getLastActiveWhenClosed, getLastActiveWhenOpen } = useBlockingElement(trapActive && !onlyMoveFocus, getElement);
+    const { getTop, getLastActiveWhenClosed, getLastActiveWhenOpen } = useBlockingElement({
+        activeElementParameters,
+        blockingElementParameters: {
+            enabled: trapActive && !onlyMoveFocus,
+            getTarget: getElement
+        }
+    });
     return {
-        props: { "aria-modal": trapActive ? "true" : undefined }
+        props: useTagProps({ "aria-modal": trapActive ? "true" : undefined }, "data-focus-trap")
     };
 }
 /**

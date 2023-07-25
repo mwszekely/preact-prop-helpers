@@ -16,6 +16,7 @@ export interface UsePressParameters<E extends EventTarget> extends TargetedPick<
 }
 
 export interface UsePressParametersSelf<E extends EventTarget> {
+    /**  */
     onPressingChange: Nullable<OnPassiveStateChange<boolean, PressChangeEventReason<E>>>;
 
     /**

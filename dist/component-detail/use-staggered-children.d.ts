@@ -1,4 +1,4 @@
-import { UseManagedChildrenReturnType } from "../preact-extensions/use-managed-children.js";
+import { UseGenericChildParameters, UseManagedChildrenReturnType } from "../preact-extensions/use-managed-children.js";
 import { ElementProps } from "../util/types.js";
 import { UseRovingTabIndexChildInfo } from "./keyboard-navigation/use-roving-tabindex.js";
 export interface UseStaggeredChildrenInfo<E extends Element> extends Pick<UseRovingTabIndexChildInfo<E>, "index"> {
@@ -10,7 +10,7 @@ export interface UseStaggeredChildrenParametersSelf {
      */
     staggered: boolean;
 }
-export interface UseStaggeredChildrenParameters<E extends Element, M extends UseStaggeredChildrenInfo<E>> extends Pick<UseManagedChildrenReturnType<M>, "managedChildrenReturn"> {
+export interface UseStaggeredChildrenParameters<E extends Element> extends Pick<UseManagedChildrenReturnType<UseStaggeredChildrenInfo<E>>, "managedChildrenReturn"> {
     staggeredChildrenParameters: UseStaggeredChildrenParametersSelf;
 }
 export interface UseStaggeredChildContextSelf {
@@ -32,11 +32,9 @@ export interface UseStaggeredChildrenReturnTypeSelf {
      */
     stillStaggering: boolean;
 }
-export interface UseStaggeredChildParameters {
-    info: {
-        index: number;
-    };
-    context: UseStaggeredChildContext;
+export interface UseStaggeredChildParameters extends UseGenericChildParameters<UseStaggeredChildContext, {
+    index: number;
+}> {
 }
 export interface UseStaggeredChildReturnTypeSelf {
     /**
@@ -64,7 +62,7 @@ export interface UseStaggeredChildReturnType<ChildElement extends Element> {
  *
  * @hasChild {@link useStaggeredChild}
  */
-export declare function useStaggeredChildren<E extends Element, M extends UseStaggeredChildrenInfo<E>>({ managedChildrenReturn: { getChildren }, staggeredChildrenParameters: { staggered } }: UseStaggeredChildrenParameters<E, M>): UseStaggeredChildrenReturnType;
+export declare function useStaggeredChildren<E extends Element>({ managedChildrenReturn: { getChildren }, staggeredChildrenParameters: { staggered } }: UseStaggeredChildrenParameters<E>): UseStaggeredChildrenReturnType;
 /**
  * Child hook for {@link useStaggeredChildren}.
  *

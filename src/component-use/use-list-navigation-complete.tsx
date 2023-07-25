@@ -7,30 +7,28 @@ import { usePaginatedChild, UsePaginatedChildContext, usePaginatedChildren, UseP
 import { useStaggeredChild, UseStaggeredChildContext, useStaggeredChildren, UseStaggeredChildrenInfo, UseStaggeredChildrenParameters, UseStaggeredChildrenReturnType, UseStaggeredChildReturnType } from "../component-detail/use-staggered-children.js";
 import { useMergedProps } from "../dom-helpers/use-merged-props.js";
 import { useRefElement, UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
-import { useChildrenHaveFocus, useChildrenHaveFocusChild, UseChildrenHaveFocusContext, UseChildrenHaveFocusReturnType } from "../observers/use-children-have-focus.js";
 import { useHasCurrentFocus, UseHasCurrentFocusReturnType } from "../observers/use-has-current-focus.js";
 import { ManagedChildInfo, ManagedChildren, UseGenericChildParameters, useManagedChild, useManagedChildren, UseManagedChildrenContext, UseManagedChildrenReturnType, UseManagedChildReturnType } from "../preact-extensions/use-managed-children.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useMemoObject } from "../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../util/assert.js";
-import { enhanceEvent } from "../util/event.js";
 import { TargetedOmit, TargetedPick, useCallback } from "../util/lib.js";
 import { ElementProps, OmitStrong } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
-import { PressEventReason, UsePressParameters } from "./use-press.js";
+import { UsePressParameters } from "./use-press.js";
 
-export interface UseCompleteListNavigationChildInfo<ChildElement extends Element> extends 
-UseListNavigationSingleSelectionSortableChildInfo<ChildElement>, 
-UsePaginatedChildrenInfo<ChildElement>, 
-UseStaggeredChildrenInfo<ChildElement>,
-ManagedChildInfo<number> { }
+export interface UseCompleteListNavigationChildInfo<ChildElement extends Element> extends
+    UseListNavigationSingleSelectionSortableChildInfo<ChildElement>,
+    UsePaginatedChildrenInfo<ChildElement>,
+    UseStaggeredChildrenInfo<ChildElement>,
+    ManagedChildInfo<number> { }
 
 export interface UseCompleteListNavigationParameters<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends
     Pick<UseListNavigationSingleSelectionSortableParameters<ParentElement, ChildElement, M>, "singleSelectionParameters" | "sortableChildrenParameters">,
-    Pick<UsePaginatedChildrenParameters<ParentElement, ChildElement, M>, "paginatedChildrenParameters">,
-    Pick<UseStaggeredChildrenParameters<ChildElement, M>, "staggeredChildrenParameters">,
-    TargetedOmit<UseListNavigationSingleSelectionSortableParameters<ParentElement, ChildElement, M>, "linearNavigationParameters", "getLowestIndex" | "getHighestIndex" | "isValid">,
-    TargetedOmit<UseListNavigationSingleSelectionSortableParameters<ParentElement, ChildElement, M>, "typeaheadNavigationParameters", "isValid">,
+    Pick<UsePaginatedChildrenParameters<ParentElement, ChildElement>, "paginatedChildrenParameters">,
+    Pick<UseStaggeredChildrenParameters<ChildElement>, "staggeredChildrenParameters">,
+    TargetedOmit<UseListNavigationSingleSelectionSortableParameters<ParentElement, ChildElement, M>, "linearNavigationParameters", "getLowestIndex" | "getHighestIndex" | "isValidForLinearNavigation">,
+    TargetedOmit<UseListNavigationSingleSelectionSortableParameters<ParentElement, ChildElement, M>, "typeaheadNavigationParameters", "isValidForTypeaheadNavigation">,
     TargetedOmit<UseListNavigationSingleSelectionSortableParameters<ParentElement, ChildElement, M>, "rearrangeableChildrenParameters", "onRearranged">,
     TargetedOmit<UseListNavigationSingleSelectionSortableParameters<ParentElement, ChildElement, M>, "rovingTabIndexParameters", "initiallyTabbedIndex" | "untabbableBehavior"> { }
 
@@ -38,7 +36,7 @@ export interface UseCompleteListNavigationReturnType<ParentElement extends Eleme
     Pick<UsePaginatedChildrenReturnType, "paginatedChildrenReturn">,
     Pick<UseStaggeredChildrenReturnType, "staggeredChildrenReturn">,
     Pick<UseManagedChildrenReturnType<M>, "managedChildrenReturn">,
-    Pick<UseChildrenHaveFocusReturnType<ChildElement>, "childrenHaveFocusReturn">,
+    //Pick<UseChildrenHaveFocusReturnType<ChildElement>, "childrenHaveFocusReturn">,
     OmitStrong<UseListNavigationSingleSelectionSortableReturnType<ParentElement, ChildElement, M>, "propsStableParentOrChild" | "propsParent" | "context" | "childrenHaveFocusParameters" | "managedChildrenParameters"> {
     props: ElementProps<ParentElement>;
     context: CompleteListNavigationContext<ChildElement, M>;
@@ -49,7 +47,7 @@ export interface CompleteListNavigationContext<ChildElement extends Element, M e
     UseManagedChildrenContext<M>,
     UsePaginatedChildContext,
     UseStaggeredChildContext,
-    UseChildrenHaveFocusContext<ChildElement>,
+    //UseChildrenHaveFocusContext<ChildElement>,
     UseTypeaheadNavigationContext,
     UseSingleSelectionContext,
     RovingTabIndexChildContext { }
@@ -67,16 +65,16 @@ export type UseCompleteListNavigationChildInfoKeysParameters<M extends UseComple
 
 export interface UseCompleteListNavigationChildParameters<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends
     UseGenericChildParameters<CompleteListNavigationContext<ChildElement, M>, Pick<M, UseCompleteListNavigationChildInfoKeysParameters<M>>>,
-    OmitStrong<UseListNavigationSingleSelectionSortableChildParameters<ChildElement, M>, "context" | "info" | "refElementReturn"> {
+    OmitStrong<UseListNavigationSingleSelectionSortableChildParameters<ChildElement>, "context" | "info" | "refElementReturn"> {
 }
 
 export interface UseCompleteListNavigationChildReturnType<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends
-    OmitStrong<UseListNavigationSingleSelectionSortableChildReturnType<ChildElement, M>, "info" | "propsChild" | "propsTabbable" | "hasCurrentFocusParameters" | "pressParameters">,
+    OmitStrong<UseListNavigationSingleSelectionSortableChildReturnType<ChildElement>, "info" | "propsChild" | "propsTabbable" | "hasCurrentFocusParameters" | "pressParameters">,
     OmitStrong<UsePaginatedChildReturnType<ChildElement>, "info" | "props">,
     OmitStrong<UseStaggeredChildReturnType<ChildElement>, "info" | "props">,
     OmitStrong<UseRefElementReturnType<ChildElement>, "propsStable">,
-    OmitStrong<UseHasCurrentFocusReturnType<ChildElement>, never>,
-    OmitStrong<UseManagedChildReturnType<M>, never>,
+    UseHasCurrentFocusReturnType<ChildElement>,
+    UseManagedChildReturnType<M>,
     TargetedPick<UsePressParameters<any>, "pressParameters", "onPressSync" | "excludeSpace"> {
 
     /**
@@ -125,7 +123,7 @@ export function useCompleteListNavigation<ParentElement extends Element, ChildEl
     const getChildren: () => ManagedChildren<M> = useCallback(() => managedChildrenReturn.getChildren(), []);
     const getLowestIndex: (() => number) = useCallback<() => number>(() => getChildren().getLowestIndex(), []);
     const getHighestIndex: (() => number) = useCallback<() => number>(() => getChildren().getHighestIndex(), []);
-    const isValid = useCallback((i: number) => {
+    const isValidForNavigation = useCallback((i: number) => {
         const child = getChildren().getAt(i);
         if (!child)
             return false;
@@ -150,8 +148,8 @@ export function useCompleteListNavigation<ParentElement extends Element, ChildEl
         propsStableParentOrChild
     } = useListNavigationSingleSelectionSortable<ParentElement, ChildElement, M>({
         managedChildrenReturn: { getChildren },
-        linearNavigationParameters: { getLowestIndex, getHighestIndex, isValid, ...linearNavigationParameters },
-        typeaheadNavigationParameters: { isValid, ...typeaheadNavigationParameters },
+        linearNavigationParameters: { getLowestIndex, getHighestIndex, isValidForLinearNavigation: isValidForNavigation, ...linearNavigationParameters },
+        typeaheadNavigationParameters: { isValidForTypeaheadNavigation: isValidForNavigation, ...typeaheadNavigationParameters },
         rovingTabIndexParameters: { initiallyTabbedIndex: initiallySelectedIndex, untabbableBehavior: "focus-parent", ...rovingTabIndexParameters },
         singleSelectionParameters,
         rearrangeableChildrenParameters: {
@@ -163,7 +161,7 @@ export function useCompleteListNavigation<ParentElement extends Element, ChildEl
         sortableChildrenParameters
     });
 
-    const { context: { childrenHaveFocusChildContext }, childrenHaveFocusReturn } = useChildrenHaveFocus({ childrenHaveFocusParameters });
+    //const { context: { childrenHaveFocusChildContext }, childrenHaveFocusReturn } = useChildrenHaveFocus({ childrenHaveFocusParameters });
     const { paginatedChildrenReturn, paginatedChildrenReturn: { refreshPagination }, managedChildrenParameters: mcp2, context: { paginatedChildContext } }: UsePaginatedChildrenReturnType = usePaginatedChildren<ParentElement, ChildElement, M>({ refElementReturn, managedChildrenReturn: { getChildren: useStableCallback(() => managedChildrenReturn.getChildren()) }, rovingTabIndexReturn, paginatedChildrenParameters, linearNavigationParameters: { indexDemangler: rearrangeableChildrenReturn.indexDemangler } });
     const { context: { staggeredChildContext }, staggeredChildrenReturn }: UseStaggeredChildrenReturnType = useStaggeredChildren({ managedChildrenReturn: { getChildren: useStableCallback((): ManagedChildren<M> => managedChildrenReturn.getChildren()) }, staggeredChildrenParameters });
 
@@ -176,7 +174,7 @@ export function useCompleteListNavigation<ParentElement extends Element, ChildEl
     });
     const { context: { managedChildContext }, managedChildrenReturn } = mcr;
     const context = useMemoObject<CompleteListNavigationContext<ChildElement, M>>(useMemoObject({
-        childrenHaveFocusChildContext,
+        //childrenHaveFocusChildContext,
         managedChildContext,
         paginatedChildContext,
         rovingTabIndexContext,
@@ -200,7 +198,7 @@ export function useCompleteListNavigation<ParentElement extends Element, ChildEl
         rovingTabIndexReturn,
         singleSelectionReturn,
         typeaheadNavigationReturn,
-        childrenHaveFocusReturn
+        //childrenHaveFocusReturn
     }
 }
 
@@ -211,12 +209,11 @@ export function useCompleteListNavigation<ParentElement extends Element, ChildEl
 export function useCompleteListNavigationChild<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>>({
     info: { index, focusSelf, unselectable, untabbable, getSortValue, ...customUserInfo },  // The "...info" is empty if M is the same as UCLNCI<ChildElement>.
     textContentParameters,
-    context: { childrenHaveFocusChildContext, managedChildContext, rovingTabIndexContext, paginatedChildContext, staggeredChildContext, singleSelectionContext, typeaheadNavigationContext },
+    context: { managedChildContext, rovingTabIndexContext, paginatedChildContext, staggeredChildContext, singleSelectionContext, typeaheadNavigationContext },
     ...void1
 }: UseCompleteListNavigationChildParameters<ChildElement, M>): UseCompleteListNavigationChildReturnType<ChildElement, M> {
     monitorCallCount(useCompleteListNavigationChild);
-    assertEmptyObject(void1);
-    //const { onPressSync, ...pressParameters1 } = (pressParameters ?? {});
+
 
     const { info: infoFromPaginated, paginatedChildReturn, paginatedChildReturn: { hideBecausePaginated }, props: paginationProps } = usePaginatedChild<ChildElement>({ info: { index }, context: { paginatedChildContext } })
     const { info: infoFromStaggered, staggeredChildReturn, staggeredChildReturn: { hideBecauseStaggered }, props: staggeredProps } = useStaggeredChild<ChildElement>({ info: { index }, context: { staggeredChildContext } });
@@ -229,26 +226,27 @@ export function useCompleteListNavigationChild<ChildElement extends Element, M e
 
     const { refElementReturn, propsStable } = useRefElement<ChildElement>({ refElementParameters: {} });
     const {
-        hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1 },
-        pressParameters: { excludeSpace, ...pressParameters2 },
+        hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void3 },
+        pressParameters: { excludeSpace, onPressSync, ...void2 },
         textContentReturn,
         singleSelectionChildReturn,
         info: infoFromListNav,
         rovingTabIndexChildReturn,
         propsChild,
-        propsTabbable
-    } = useListNavigationSingleSelectionChild<ChildElement, M>({
+        propsTabbable,
+        ...void4
+    } = useListNavigationSingleSelectionChild<ChildElement>({
         info: { index, unselectable, untabbable },
         context: { rovingTabIndexContext, singleSelectionContext, typeaheadNavigationContext },
         refElementReturn,
         textContentParameters
     });
-    const onPress = useStableCallback((e: PressEventReason<any>) => {
+    /*const onPress = useStableCallback((e: PressEventReason<any>) => {
         if (singleSelectionContext.selectionMode == "activation")
             singleSelectionContext.onSelectedIndexChange?.(enhanceEvent(e, { selectedIndex: index }));
-    });
-    
-    const onPressSync = (rovingTabIndexContext.untabbable || unselectable || untabbable) ? null : onPress;
+    });*/
+
+    //const onPressSync = (rovingTabIndexContext.untabbable || unselectable || untabbable) ? null : onPress;
 
 
     const allStandardInfo: UseCompleteListNavigationChildInfo<ChildElement> = {
@@ -265,10 +263,10 @@ export function useCompleteListNavigationChild<ChildElement extends Element, M e
 
     const { managedChildReturn } = useManagedChild<M>({ context: { managedChildContext }, info: { ...allStandardInfo, ...customUserInfo } as M });
 
-    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2 } } = useChildrenHaveFocusChild({ context: { childrenHaveFocusChildContext } });
+    //const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2 } } = useChildrenHaveFocusChild({ context: { childrenHaveFocusChildContext } });
     const onCurrentFocusedInnerChanged = useStableCallback<NonNullable<typeof ocfic1>>((focused, prev, e) => {
         ocfic1?.(focused, prev, e);
-        ocfic2?.(focused, prev, e);
+        //ocfic2?.(focused, prev, e);
     })
     const { hasCurrentFocusReturn } = useHasCurrentFocus<ChildElement>({ hasCurrentFocusParameters: { onCurrentFocusedInnerChanged, onCurrentFocusedChanged: null }, refElementReturn });
 
@@ -281,6 +279,10 @@ export function useCompleteListNavigationChild<ChildElement extends Element, M e
         staggeredProps
     );
 
+    assertEmptyObject(void1);
+    assertEmptyObject(void2);
+    assertEmptyObject(void3);
+    assertEmptyObject(void4);
     return {
         propsChild: props,
         propsTabbable,
@@ -302,7 +304,7 @@ export function useCompleteListNavigationChild<ChildElement extends Element, M e
 
 export interface UseCompleteListNavigationDeclarativeParameters<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends
     OmitStrong<MakeSingleSelectionDeclarativeParameters<UseCompleteListNavigationParameters<ParentElement, ChildElement, M>>, "singleSelectionParameters" | "singleSelectionReturn">,
-    TargetedOmit<UseSingleSelectionParameters<ParentElement, ChildElement, M>, "singleSelectionParameters", "initiallySelectedIndex" | "onSelectedIndexChange"> { }
+    TargetedOmit<UseSingleSelectionParameters<ParentElement, ChildElement>, "singleSelectionParameters", "initiallySelectedIndex" | "onSelectedIndexChange"> { }
 
 export interface UseCompleteListNavigationDeclarativeReturnType<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends
     TargetedOmit<UseCompleteListNavigationReturnType<ParentElement, ChildElement, M>, "singleSelectionReturn", "changeSelectedIndex">,

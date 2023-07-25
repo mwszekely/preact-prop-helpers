@@ -17,9 +17,7 @@ type WindowWithHookCallCount = (Window & typeof globalThis) & {
     _hookCallCount: HookCallCount;
 }
 
-function callCountU(hook: Function) {
-    return;
-    
+function callCountU(hook: Function) {    
     const name = hook.name;
     if (filterAll || filters.has(name))
         return;

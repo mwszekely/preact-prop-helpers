@@ -5,6 +5,7 @@ import { useMemoObject } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { focus } from "../../util/focus.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
+import { useTagProps } from "../../util/use-tag-props.js";
 import { useListNavigation, useListNavigationChild } from "./use-list-navigation-partial.js";
 /**
  * Implements 2-dimensional grid-based keyboard navigation, similarly to {@link useListNavigation}.
@@ -77,25 +78,34 @@ refElementReturn, ...void1 }) {
     const getIndex = useStableCallback(() => { return managedChildParameters.index; });
     const whenThisRowIsFocused = useStableCallback((e) => {
         const { getChildren } = managedChildrenReturn;
-        let { ideal, actual } = (getTabbableColumn());
-        let index = (ideal ?? 0);
-        let child = getChildren().getAt(index);
-        let lowestIndex = getChildren().getLowestIndex();
-        let highestIndex = getChildren().getHighestIndex();
-        while ((!child || child.untabbable) && index > lowestIndex) {
-            --index;
-            child = getChildren().getAt(index);
-        }
-        while ((!child || child.untabbable) && index <= highestIndex) {
-            ++index;
-            child = getChildren().getAt(index);
-        }
-        if (child) {
-            const e = child.getElement();
-            child.focusSelf(e);
+        if (contextFromParent.rovingTabIndexContext.getUntabbable()) {
+            // If the parent is untabbable, and this row was requested to focus itself (as part of parentFocusSelf),
+            // then we focus the parent grid instead of the child cell.
+            contextFromParent.rovingTabIndexContext.parentFocusSelf(true);
         }
         else {
-            focus(e);
+            // If the parent is tabbable (normal behavior), 
+            // then we focus the cell that should be focused in this row.
+            let { ideal, actual } = (getTabbableColumn());
+            let index = (ideal ?? 0);
+            let child = getChildren().getAt(index);
+            let lowestIndex = getChildren().getLowestIndex();
+            let highestIndex = getChildren().getHighestIndex();
+            while ((!child || child.untabbable) && index > lowestIndex) {
+                --index;
+                child = getChildren().getAt(index);
+            }
+            while ((!child || child.untabbable) && index <= highestIndex) {
+                ++index;
+                child = getChildren().getAt(index);
+            }
+            if (child) {
+                const e = child.getElement();
+                child.focusSelf(e);
+            }
+            else {
+                focus(e);
+            }
         }
     }, []);
     const focusSelf = whenThisRowIsFocused;
@@ -141,7 +151,8 @@ refElementReturn, ...void1 }) {
     // TODO: propsLN2 (awful name) is just the tabIndex=0 or -1 from rovingTabIndex, which flips around when `untabbable` flips.
     // We can ignore it here, because our tabIndex is entirely controlled by our own list navigation,
     // but it shouldn't just be ignored wholesale like this.
-    const props = useMergedProps(propsLN, /*propsLN2,*/ propsLNC, {
+    propsLN2.tabIndex = propsLN.tabIndex ?? propsLNC.tabIndex;
+    const props = useMergedProps(propsLN, propsLN2, propsLNC, {
         // Ensure that if the browser focuses the row for whatever reason, we transfer the focus to a child cell.
         onFocus: useStableCallback(e => whenThisRowIsFocused(e.currentTarget))
     });
@@ -152,7 +163,7 @@ refElementReturn, ...void1 }) {
     });
     return {
         context: contextToChildren,
-        props,
+        props: useTagProps(props, "data-use-grid-navigation-partial-row"),
         info: { focusSelf, ...info },
         ...ulncRet,
         ...ulnRet,

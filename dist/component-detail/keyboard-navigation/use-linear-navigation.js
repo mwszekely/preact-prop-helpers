@@ -5,6 +5,7 @@ import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { useCallback, useRef } from "../../util/lib.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
+import { useTagProps } from "../../util/use-tag-props.js";
 export { identity };
 /**
  * When used in tandem with `useRovingTabIndex`, allows control of
@@ -21,15 +22,15 @@ export function useLinearNavigation({ rovingTabIndexReturn, linearNavigationPara
     let getPaginatedRange = useStableGetter(paginationMax == null || paginationMin == null ? null : paginationMax - paginationMin);
     assertEmptyObject(void1);
     assertEmptyObject(void2);
-    const { getLowestIndex, getHighestIndex, indexDemangler, indexMangler, isValid, navigatePastEnd, navigatePastStart, onNavigateLinear } = linearNavigationParameters;
+    const { getLowestIndex, getHighestIndex, indexDemangler, indexMangler, isValidForLinearNavigation, navigatePastEnd, navigatePastStart, onNavigateLinear } = linearNavigationParameters;
     const { getTabbableIndex, setTabbableIndex } = rovingTabIndexReturn;
-    useEnsureStability("useLinearNavigation", onNavigateLinear, isValid, indexDemangler, indexMangler);
+    useEnsureStability("useLinearNavigation", onNavigateLinear, isValidForLinearNavigation, indexDemangler, indexMangler);
     const navigateAbsolute = useCallback((requestedIndexMangled, searchDirection, e, fromUserInteraction, mode) => {
         const highestChildIndex = getHighestIndex();
         const lowestChildIndex = getLowestIndex();
         const original = (getTabbableIndex() ?? 0);
         const targetDemangled = indexDemangler(requestedIndexMangled);
-        const { status, valueDemangled } = tryNavigateToIndex({ isValid, lowestChildIndex, highestChildIndex, indexDemangler, indexMangler, searchDirection, targetDemangled });
+        const { status, valueDemangled } = tryNavigateToIndex({ isValid: isValidForLinearNavigation, lowestChildIndex, highestChildIndex, indexDemangler, indexMangler, searchDirection, targetDemangled });
         if (status == "past-end") {
             if (navigatePastEnd == "wrap") {
                 if (mode == "single")
@@ -109,7 +110,7 @@ export function useLinearNavigation({ rovingTabIndexReturn, linearNavigationPara
     const getDisableHomeEndKeys = useStableGetter(linearNavigationParameters.disableHomeEndKeys);
     const getArrowKeyDirection = useStableGetter(linearNavigationParameters.arrowKeyDirection);
     const getPageNavigationSize = useStableGetter(linearNavigationParameters.pageNavigationSize);
-    const stableProps = useRef({
+    const stableProps = useRef(useTagProps({
         onKeyDown: (e) => {
             // Not handled by typeahead (i.e. assume this is a keyboard shortcut)
             if (e.ctrlKey || e.metaKey)
@@ -174,7 +175,7 @@ export function useLinearNavigation({ rovingTabIndexReturn, linearNavigationPara
                 e.stopPropagation();
             }
         }
-    });
+    }, "data-linear-navigation"));
     return {
         linearNavigationReturn: {},
         propsStable: stableProps.current

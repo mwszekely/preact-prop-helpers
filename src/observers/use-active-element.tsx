@@ -109,21 +109,21 @@ export interface UseActiveElementParametersSelf {
      * 
      * @stable
      */
-    onActiveElementChange?: Nullable<OnPassiveStateChange<Element | null, FocusEvent>>;
+    onActiveElementChange: Nullable<OnPassiveStateChange<Element | null, FocusEvent>>;
 
     /**
      * Called any time the active element changes and is not null.
      * 
      * @stable
      */
-    onLastActiveElementChange?: Nullable<OnPassiveStateChange<Element, FocusEvent>>;
+    onLastActiveElementChange: Nullable<OnPassiveStateChange<Element, FocusEvent>>;
 
     /**
      * Called any time the window gains/loses focus.
      * 
      * @stable
      */
-    onWindowFocusedChange?: Nullable<OnPassiveStateChange<boolean, FocusEvent>>;
+    onWindowFocusedChange: Nullable<OnPassiveStateChange<boolean, FocusEvent>>;
 
     /**
      * This must be a function that returns the document associated with whatever elements we're listening to.
@@ -140,7 +140,7 @@ export interface UseActiveElementParametersSelf {
      * 
      * @stable
      */
-    getWindow?: Nullable<((document: Document) => Window)>;
+    //getWindow: Nullable<((document: Document) => Window)>;
 }
 
 
@@ -182,14 +182,14 @@ export interface UseActiveElementReturnType {
  * 
  * @compositeParams
  */
-export function useActiveElement({ activeElementParameters: { onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument, getWindow } }: UseActiveElementParameters): UseActiveElementReturnType {
+export function useActiveElement({ activeElementParameters: { onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument } }: UseActiveElementParameters): UseActiveElementReturnType {
     monitorCallCount(useActiveElement);
 
-    useEnsureStability("useActiveElement", onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument, getWindow);
+    useEnsureStability("useActiveElement", onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument);
 
     useEffect(() => {
         const document = getDocument();
-        const window = (getWindow?.(document) ?? document?.defaultView);
+        const window = (document?.defaultView);
 
         if ((activeElementUpdaters.get(window)?.size ?? 0) === 0) {
             document?.addEventListener("focusin", focusin, { passive: true });

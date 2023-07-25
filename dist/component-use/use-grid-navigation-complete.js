@@ -5,7 +5,7 @@ import { usePaginatedChild, usePaginatedChildren } from "../component-detail/use
 import { useStaggeredChild, useStaggeredChildren } from "../component-detail/use-staggered-children.js";
 import { useMergedProps } from "../dom-helpers/use-merged-props.js";
 import { useRefElement } from "../dom-helpers/use-ref-element.js";
-import { useChildrenHaveFocus, useChildrenHaveFocusChild } from "../observers/use-children-have-focus.js";
+import { useChildrenHaveFocus } from "../observers/use-children-have-focus.js";
 import { useHasCurrentFocus } from "../observers/use-has-current-focus.js";
 import { useManagedChild, useManagedChildren } from "../preact-extensions/use-managed-children.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
@@ -27,7 +27,7 @@ export function useCompleteGridNavigation({ gridNavigationParameters, linearNavi
     const getChildren = useCallback(() => managedChildrenReturn.getChildren(), []);
     const getLowestChildIndex = useCallback(() => getChildren().getLowestIndex(), []);
     const getHighestChildIndex = useCallback(() => getChildren().getHighestIndex(), []);
-    const isValid = useCallback((i) => {
+    const isValidForNavigation = useCallback((i) => {
         const child = getChildren().getAt(i);
         if (child == null)
             return false;
@@ -35,14 +35,14 @@ export function useCompleteGridNavigation({ gridNavigationParameters, linearNavi
             return false;
         return true;
     }, []);
-    const { refElementReturn } = useRefElement({});
+    const { refElementReturn, propsStable, ...void2 } = useRefElement({});
     const { childrenHaveFocusParameters, managedChildrenParameters, context: { gridNavigationRowContext, rovingTabIndexContext, singleSelectionContext, typeaheadNavigationContext }, rearrangeableChildrenReturn, propsParent, propsStableParentOrChild, rovingTabIndexReturn, ...gridNavigationSingleSelectionReturn } = useGridNavigationSingleSelectionSortable({
         gridNavigationParameters,
-        linearNavigationParameters: { getLowestIndex: getLowestChildIndex, getHighestIndex: getHighestChildIndex, isValid, ...linearNavigationParameters },
+        linearNavigationParameters: { getLowestIndex: getLowestChildIndex, getHighestIndex: getHighestChildIndex, isValidForLinearNavigation: isValidForNavigation, ...linearNavigationParameters },
         managedChildrenReturn: { getChildren },
         rovingTabIndexParameters: { initiallyTabbedIndex: singleSelectionParameters.initiallySelectedIndex, untabbableBehavior: "focus-parent", ...rovingTabIndexParameters },
         singleSelectionParameters,
-        typeaheadNavigationParameters: { isValid, ...typeaheadNavigationParameters },
+        typeaheadNavigationParameters: { isValidForTypeaheadNavigation: isValidForNavigation, ...typeaheadNavigationParameters },
         paginatedChildrenParameters,
         refElementReturn,
         rearrangeableChildrenParameters: {
@@ -69,7 +69,7 @@ export function useCompleteGridNavigation({ gridNavigationParameters, linearNavi
     });
     return {
         context,
-        props: useMergedProps(propsParent, propsStableParentOrChild),
+        props: useMergedProps(propsParent, propsStable, propsStableParentOrChild),
         managedChildrenReturn,
         rearrangeableChildrenReturn,
         staggeredChildrenReturn,
@@ -82,7 +82,7 @@ export function useCompleteGridNavigation({ gridNavigationParameters, linearNavi
 /**
  * @compositeParams
  */
-export function useCompleteGridNavigationRow({ info: { index, unselectable, untabbable, ...customUserInfo }, context: contextIncomingForRowAsChildOfTable, textContentParameters, linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, ...void1 }) {
+export function useCompleteGridNavigationRow({ info: { index, unselectable, untabbable, ...customUserInfo }, context: contextIncomingForRowAsChildOfTable, textContentParameters, linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, hasCurrentFocusParameters: { onCurrentFocusedChanged: ocfc1, onCurrentFocusedInnerChanged: ocfic3, ...void5 }, ...void1 }) {
     monitorCallCount(useCompleteGridNavigationRow);
     const { info: infoPaginatedChild, paginatedChildReturn, props: paginationProps } = usePaginatedChild({ info: { index }, context: contextIncomingForRowAsChildOfTable });
     const { info: infoStaggeredChild, // { setParentIsStaggered, setStaggeredVisible },
@@ -92,7 +92,7 @@ export function useCompleteGridNavigationRow({ info: { index, unselectable, unta
     const getChildren = useCallback(() => managedChildrenReturn.getChildren(), []);
     const getHighestChildIndex = useCallback(() => getChildren().getHighestIndex(), []);
     const getLowestChildIndex = useCallback(() => getChildren().getLowestIndex(), []);
-    const isValid = useCallback((i) => {
+    const isValidForNavigation = useCallback((i) => {
         const child = getChildren().getAt(i);
         if (child == null)
             return false;
@@ -100,11 +100,11 @@ export function useCompleteGridNavigationRow({ info: { index, unselectable, unta
             return false;
         return true;
     }, []);
-    const { refElementReturn, propsStable } = useRefElement({ refElementParameters: {} });
+    const { refElementReturn, propsStable, ...void6 } = useRefElement({ refElementParameters: {} });
     const r = useGridNavigationSingleSelectionSortableRow({
         rovingTabIndexParameters,
-        typeaheadNavigationParameters: { isValid, ...typeaheadNavigationParameters },
-        linearNavigationParameters: { isValid, getHighestIndex: getHighestChildIndex, getLowestIndex: getLowestChildIndex, pageNavigationSize: 0, indexDemangler: identity, indexMangler: identity, ...linearNavigationParameters },
+        typeaheadNavigationParameters: { isValidForTypeaheadNavigation: isValidForNavigation, ...typeaheadNavigationParameters },
+        linearNavigationParameters: { isValidForLinearNavigation: isValidForNavigation, getHighestIndex: getHighestChildIndex, getLowestIndex: getLowestChildIndex, pageNavigationSize: 0, indexDemangler: identity, indexMangler: identity, ...linearNavigationParameters },
         managedChildrenReturn: { getChildren },
         refElementReturn,
         context: contextIncomingForRowAsChildOfTable,
@@ -122,20 +122,30 @@ export function useCompleteGridNavigationRow({ info: { index, unselectable, unta
         ...infoPaginatedChild,
         ...infoStaggeredChild,
     };
-    const { managedChildReturn } = useManagedChild({ context: contextIncomingForRowAsChildOfTable, info: { ...completeInfo, ...customUserInfo } });
+    const { managedChildReturn, ...void4 } = useManagedChild({ context: contextIncomingForRowAsChildOfTable, info: { ...completeInfo, ...customUserInfo } });
     const context = useMemoObject({
         ...contextGNR,
         ...contextMC,
         //completeGridNavigationCellContext: { excludeSpace }
     });
-    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ...void4 } } = useChildrenHaveFocusChild({ context: contextIncomingForRowAsChildOfTable });
-    //const { refElementReturn } = useRefElement<RowElement>({ refElementParameters: {} })
-    const { hasCurrentFocusReturn } = useHasCurrentFocus({ refElementReturn, hasCurrentFocusParameters: { onCurrentFocusedChanged: useStableCallback((a, b) => { ocfic1?.(a, b); ocfic2?.(a, b); }) } });
+    const { hasCurrentFocusReturn } = useHasCurrentFocus({
+        refElementReturn,
+        hasCurrentFocusParameters: {
+            onCurrentFocusedChanged: ocfc1,
+            onCurrentFocusedInnerChanged: useStableCallback((focused, prevFocused) => {
+                // Call grid navigation's focus change
+                ocfic1?.(focused, prevFocused);
+                ocfic3?.(focused, prevFocused);
+            }),
+        }
+    });
     const props = useMergedProps(propsStable, p3, hasCurrentFocusReturn.propsStable, paginationProps, staggeredProps);
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     assertEmptyObject(void3);
     assertEmptyObject(void4);
+    assertEmptyObject(void5);
+    assertEmptyObject(void6);
     return {
         pressParameters,
         hasCurrentFocusReturn,

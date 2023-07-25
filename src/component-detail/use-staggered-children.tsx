@@ -1,9 +1,10 @@
-import { UseManagedChildrenReturnType } from "../preact-extensions/use-managed-children.js";
+import { UseGenericChildParameters, UseManagedChildrenReturnType } from "../preact-extensions/use-managed-children.js";
 import { returnNull, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useState } from "../preact-extensions/use-state.js";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from "../util/lib.js";
 import { ElementProps } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
+import { useTagProps } from "../util/use-tag-props.js";
 import { UseRovingTabIndexChildInfo } from "./keyboard-navigation/use-roving-tabindex.js";
 
 export interface UseStaggeredChildrenInfo<E extends Element> extends Pick<UseRovingTabIndexChildInfo<E>, "index"> {
@@ -18,7 +19,7 @@ export interface UseStaggeredChildrenParametersSelf {
     staggered: boolean;
  }
 
-export interface UseStaggeredChildrenParameters<E extends Element, M extends UseStaggeredChildrenInfo<E>> extends Pick<UseManagedChildrenReturnType<M>, "managedChildrenReturn"> {
+export interface UseStaggeredChildrenParameters<E extends Element> extends Pick<UseManagedChildrenReturnType<UseStaggeredChildrenInfo<E>>, "managedChildrenReturn"> {
     staggeredChildrenParameters: UseStaggeredChildrenParametersSelf;
 }
 
@@ -47,10 +48,7 @@ export interface UseStaggeredChildrenReturnTypeSelf  {
  }
 
 
-export interface UseStaggeredChildParameters {
-    // staggeredChildrenParameters: { staggered: boolean; }
-    info: { index: number; }
-    context: UseStaggeredChildContext;
+export interface UseStaggeredChildParameters extends UseGenericChildParameters<UseStaggeredChildContext,{ index: number; }> {
 }
 
 export interface UseStaggeredChildReturnTypeSelf {
@@ -84,10 +82,10 @@ export interface UseStaggeredChildReturnType<ChildElement extends Element> {
  * 
  * @hasChild {@link useStaggeredChild}
  */
-export function useStaggeredChildren<E extends Element, M extends UseStaggeredChildrenInfo<E>>({
+export function useStaggeredChildren<E extends Element>({
     managedChildrenReturn: { getChildren },
     staggeredChildrenParameters: { staggered }
-}: UseStaggeredChildrenParameters<E, M>): UseStaggeredChildrenReturnType {
+}: UseStaggeredChildrenParameters<E>): UseStaggeredChildrenReturnType {
     monitorCallCount(useStaggeredChildren);
 
     // By default, when a child mounts, we tell the next child to mount and simply repeat.
@@ -221,7 +219,7 @@ export function useStaggeredChild<ChildElement extends Element>({ info: { index 
     }, [index, (parentIsStaggered && staggeredVisible)])
 
     return {
-        props: !parentIsStaggered ? {} : { "aria-busy": (!staggeredVisible).toString() } as {},
+        props: useTagProps(!parentIsStaggered ? {} : { "aria-busy": (!staggeredVisible).toString() } as {}, "data-staggered-children-child"),
         staggeredChildReturn: { parentIsStaggered, hideBecauseStaggered: parentIsStaggered ? !staggeredVisible : false },
         info: { setStaggeredVisible: setStaggeredVisible, }
     }

@@ -154,6 +154,8 @@ interface InternalChildInfo<M extends ManagedChildInfo<string | number>> {
  *
  * @hasChild {@link useManagedChild}
  *
+ * {@include } {@link ManagedChildren}
+ *
  * @compositeParams
  */
 export declare function useManagedChildren<M extends ManagedChildInfo<string | number>>(parentParameters: UseManagedChildrenParameters<M>): UseManagedChildrenReturnType<M>;

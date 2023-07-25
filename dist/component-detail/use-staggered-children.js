@@ -2,6 +2,7 @@ import { returnNull, usePassiveState } from "../preact-extensions/use-passive-st
 import { useState } from "../preact-extensions/use-state.js";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from "../util/lib.js";
 import { monitorCallCount } from "../util/use-call-count.js";
+import { useTagProps } from "../util/use-tag-props.js";
 /**
  * Allows children to each wait until the previous has finished rendering before itself rendering. E.G. Child #3 waits until #2 renders. #2 waits until #1 renders, etc.
  *
@@ -119,7 +120,7 @@ export function useStaggeredChild({ info: { index }, context: { staggeredChildCo
             childCallsThisToTellTheParentToMountTheNextOne(index);
     }, [index, (parentIsStaggered && staggeredVisible)]);
     return {
-        props: !parentIsStaggered ? {} : { "aria-busy": (!staggeredVisible).toString() },
+        props: useTagProps(!parentIsStaggered ? {} : { "aria-busy": (!staggeredVisible).toString() }, "data-staggered-children-child"),
         staggeredChildReturn: { parentIsStaggered, hideBecauseStaggered: parentIsStaggered ? !staggeredVisible : false },
         info: { setStaggeredVisible: setStaggeredVisible, }
     };

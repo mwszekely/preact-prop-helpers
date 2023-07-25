@@ -24,11 +24,11 @@ export interface UseEscapeDismissParametersSelf {
     /**
      * The escape key event handler is attached onto the window, so we need to know which window.
      * 
-     * @remarks The returned `Window` should not change throughout the lifetime of the component (i.e. the element in question must not switch to another window via some means, which might not even be possible).
+     * @remarks The returned `Document` should not change throughout the lifetime of the component (i.e. the element in question must not switch to another window via some means, which might not even be possible).
      * 
      * @nonstable
      */
-    getWindow(): Window;
+    getDocument(): Document;
 
     /**
      * Get this from context somewhere, and increment it in that context.
@@ -70,13 +70,13 @@ function getElementDepth(element: Element) {
  * 
  * @compositeParams 
  */
-export function useEscapeDismiss<PopupElement extends Element>({ escapeDismissParameters: { onDismiss: onClose, active: open, getWindow: unstableGetWindow, parentDepth, ...void1 }, refElementPopupReturn: { getElement, ...void2 } }: UseEscapeDismissParameters<PopupElement>): void {
+export function useEscapeDismiss<PopupElement extends Element>({ escapeDismissParameters: { onDismiss: onClose, active: open, getDocument: unstableGetDocument, parentDepth, ...void1 }, refElementPopupReturn: { getElement, ...void2 } }: UseEscapeDismissParameters<PopupElement>): void {
     monitorCallCount(useEscapeDismiss);
     assertEmptyObject(void1);
     assertEmptyObject(void2);
 
     const stableOnClose = useStableCallback(onClose);
-    const getWindow = useStableCallback(unstableGetWindow);
+    const getDocument = useStableCallback(unstableGetDocument);
     const getDepth = useStableGetter(parentDepth + 1);
 
 
@@ -91,7 +91,8 @@ export function useEscapeDismiss<PopupElement extends Element>({ escapeDismissPa
     // then the first one to do so will wait for a microtask, 
     // then find the deepest element in the document tree to dismiss of all of those components currently open.
     useEffect(() => {
-        const window = getWindow();
+        const document = getDocument();
+        const window = document.defaultView!;
         (window as any)[MagicWindowKey] ??= ({ microtaskQueued: false, elementQueue: new Map() } as WindowEscapeKeyInfo)
         const info = window[MagicWindowKey] as WindowEscapeKeyInfo;
 

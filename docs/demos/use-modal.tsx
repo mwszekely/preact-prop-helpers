@@ -2,7 +2,7 @@
 import { useCallback, useRef, useState } from "preact/hooks";
 import { DismissListenerTypes, useMergedProps, useModal, useStableCallback } from "../../dist/index.js";
 
-function getWindow(): Window { return globalThis.window; }
+function getDocument(): Document { return globalThis.document; }
 
 export function DemoUseModal(props: { parentDepth?: number }) {
 
@@ -41,7 +41,8 @@ export function DemoUseModal(props: { parentDepth?: number }) {
             onClose: useCallback((reason) => { setCloseReason(reason); setOpen(false); }, []),
             open
         },
-        escapeDismissParameters: { getWindow, parentDepth }
+        escapeDismissParameters: { parentDepth },
+        activeElementParameters: { getDocument, onActiveElementChange: null, onLastActiveElementChange: null, onWindowFocusedChange: null },
     })
     
     return (

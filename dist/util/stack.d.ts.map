@@ -1,1 +1,1 @@
-{"version":3,"file":"stack.d.ts","sourceRoot":"","sources":["../../src/util/stack.tsx"],"names":[],"mappings":"AAGA,wBAAgB,aAAa,uBAU5B;AAED;;GAEG;AACH,wBAAgB,QAAQ,6BAIvB"}
+{"version":3,"file":"stack.d.ts","sourceRoot":"","sources":["../../src/util/stack.tsx"],"names":[],"mappings":"AAGA,wBAAgB,aAAa,uBAU5B;AAED;;;;GAIG;AACH,wBAAgB,QAAQ,6BAIvB"}

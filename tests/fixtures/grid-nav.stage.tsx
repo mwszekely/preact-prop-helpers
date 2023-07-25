@@ -1,6 +1,6 @@
 import { createContext } from "preact";
 import { useCallback, useContext, useEffect, useState } from "preact/hooks";
-import { Compare, CompleteGridNavigationCellContext, CompleteGridNavigationRowContext, EventDetail, UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationRowInfo, UseSingleSelectionParameters, focus, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useImperativeProps, useMergedProps, useRefElement, useStableCallback, useStableGetter } from "../../dist/index.js";
+import { Compare, CompleteGridNavigationCellContext, CompleteGridNavigationRowContext, EventDetail, Nullable, UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationRowInfo, UseSingleSelectionParameters, focus, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useImperativeProps, useMergedProps, useRefElement, useStableCallback, useStableGetter } from "../../dist/index.js";
 import { LoremIpsum } from "../lorem.js";
 import { fromStringArray, fromStringBoolean, fromStringNumber, fromStringString, useTestSyncState } from "../util.js";
 import { DefaultChildCount, DisabledIndex, HiddenIndex, MissingIndex, WithColSpanIndex } from "./grid-nav.constants.js";
@@ -17,8 +17,8 @@ export interface GridNavConstants {
     setPagination(size: [number, number] | null): Promise<void>;
     setArrowKeyDirection(direction: "horizontal" | "vertical"): Promise<void>;
     setNavigatePastStartEnd(op: "wrap" | "passthrough"): Promise<void>;
-    setAriaPropName(ariaPropName: UseSingleSelectionParameters<any, any, any>["singleSelectionParameters"]["ariaPropName"]): Promise<void>;
-    setSelectionMode(ariaPropName: UseSingleSelectionParameters<any, any, any>["singleSelectionParameters"]["selectionMode"]): Promise<void>;
+    setAriaPropName(ariaPropName: UseSingleSelectionParameters<any, any>["singleSelectionParameters"]["ariaPropName"]): Promise<void>;
+    setSelectionMode(ariaPropName: UseSingleSelectionParameters<any, any>["singleSelectionParameters"]["selectionMode"]): Promise<void>;
     setStaggered(staggered: boolean): Promise<void>;
     setCollator(id: string): Promise<void>;
     setNoTypeahead(noTypeahead: boolean): Promise<void>;
@@ -26,8 +26,8 @@ export interface GridNavConstants {
     onSelectedIndexChange(index: number): (void | Promise<void>);
 }
 
-const RowContext = createContext<CompleteGridNavigationRowContext<HTMLTableElement, HTMLTableRowElement, HTMLTableCellElement, UseCompleteGridNavigationRowInfo<HTMLTableRowElement, HTMLTableCellElement>, UseCompleteGridNavigationCellInfo<HTMLTableCellElement>>>(null!);
-const CellContext = createContext<CompleteGridNavigationCellContext<HTMLTableRowElement, HTMLTableCellElement, UseCompleteGridNavigationCellInfo<HTMLTableCellElement>>>(null!);
+const RowContext = createContext<CompleteGridNavigationRowContext<HTMLTableRowElement, UseCompleteGridNavigationRowInfo<HTMLTableRowElement>>>(null!);
+const CellContext = createContext<CompleteGridNavigationCellContext<HTMLTableCellElement, UseCompleteGridNavigationCellInfo<HTMLTableCellElement>>>(null!);
 
 export function TestBasesGridNav() {
     const [mounted] = useTestSyncState("GridNav", "setMounted", true, fromStringBoolean);
@@ -38,7 +38,7 @@ export function TestBasesGridNav() {
     const [pageNavigationSize] = useTestSyncState("GridNav", "setPageNavigationSize", 0.1, fromStringNumber);
     const [navigatePastStartEnd] = useTestSyncState("GridNav", "setNavigatePastStartEnd", "wrap", fromStringString);
     const [ariaPropName] = useTestSyncState("GridNav", "setAriaPropName", "aria-selected", fromStringString);
-    const [untabbable] = useTestSyncState("GridNav", "setUntabbable", false, fromStringBoolean);
+    const [untabbable, setUntabbable] = useTestSyncState("GridNav", "setUntabbable", false, fromStringBoolean);
     const [staggered] = useTestSyncState("GridNav", "setStaggered", false, fromStringBoolean);
     const [collatorId] = useTestSyncState("GridNav", "setCollator", "", fromStringString);
     const [noTypeahead] = useTestSyncState("GridNav", "setNoTypeahead", false, fromStringBoolean);
@@ -65,7 +65,7 @@ interface TestBasesGridNavImplProps {
     disableHomeEndKeys: boolean;
     pageNavigationSize: number;
     navigatePastStartEnd: "wrap" | "passthrough";
-    ariaPropName: "aria-pressed" | "aria-selected" | "aria-checked" | "aria-current-page" | "aria-current-step" | "aria-current-date" | "aria-current-time" | "aria-current-location" | "aria-current-true" | null;
+    ariaPropName: Nullable<"aria-pressed" | "aria-selected" | "aria-checked" | "aria-current-page" | "aria-current-step" | "aria-current-date" | "aria-current-time" | "aria-current-location" | "aria-current-true">;
     untabbable: boolean;
     staggered: boolean;
     collatorId: string;
@@ -93,7 +93,7 @@ function TestBasesGridNavImpl({ ariaPropName, selectedIndex, arrowKeyDirection, 
 
     console.log(pagination);
 
-    useOnRender("parent");
+    const { props: p1 } = useOnRender("parent");
 
     const {
         childrenHaveFocusReturn: { getAnyFocused },
@@ -108,7 +108,7 @@ function TestBasesGridNavImpl({ ariaPropName, selectedIndex, arrowKeyDirection, 
         sortableChildrenReturn: { sort },
         staggeredChildrenReturn: { stillStaggering },
         typeaheadNavigationReturn: { getCurrentTypeahead, typeaheadStatus }
-    } = useCompleteGridNavigationDeclarative<HTMLTableElement, HTMLTableRowElement, HTMLTableCellElement, UseCompleteGridNavigationRowInfo<HTMLTableRowElement, HTMLTableCellElement>, UseCompleteGridNavigationCellInfo<HTMLTableCellElement>>({
+    } = useCompleteGridNavigationDeclarative<HTMLTableElement, HTMLTableRowElement, HTMLTableCellElement, UseCompleteGridNavigationRowInfo<HTMLTableRowElement>, UseCompleteGridNavigationCellInfo<HTMLTableCellElement>>({
         linearNavigationParameters: { disableHomeEndKeys, navigatePastEnd: navigatePastStartEnd, navigatePastStart: navigatePastStartEnd, pageNavigationSize, onNavigateLinear: null },
         gridNavigationParameters: { onTabbableColumnChange: null },
         rearrangeableChildrenParameters: { getIndex: useCallback(info => info.props.index, []) },
@@ -121,7 +121,7 @@ function TestBasesGridNavImpl({ ariaPropName, selectedIndex, arrowKeyDirection, 
                 f?.(e[EventDetail].selectedIndex);
             }, [])
         },
-        sortableChildrenParameters: { compare: useCallback<Compare<UseCompleteGridNavigationRowInfo<HTMLDivElement, HTMLDivElement>>>((lhs, rhs) => { return (lhs.getSortValue() as number) - (rhs.getSortValue() as number) }, []) },
+        sortableChildrenParameters: { compare: useCallback<Compare<UseCompleteGridNavigationRowInfo<HTMLDivElement>>>((lhs, rhs) => { return (lhs.getSortValue() as number) - (rhs.getSortValue() as number) }, []) },
         staggeredChildrenParameters: { staggered },
         paginatedChildrenParameters: { paginationMin: pagination?.[0], paginationMax: pagination?.[1] },
         typeaheadNavigationParameters: { collator: null, noTypeahead, typeaheadTimeout, onNavigateTypeahead: null }
@@ -129,7 +129,13 @@ function TestBasesGridNavImpl({ ariaPropName, selectedIndex, arrowKeyDirection, 
 
     return (
         <RowContext.Provider value={context}>
-            <table data-grid-nav {...{ border: 1 } as {}} role="grid" data-still-staggering={stillStaggering} data-typeahead-status={typeaheadStatus} {...props}>
+            <table {...useMergedProps(props, p1, {
+                "data-grid-nav": true,
+                border: 1,
+                role: "grid",
+                "data-still-staggering": stillStaggering,
+                "data-typeahead-status": typeaheadStatus
+            } as {})}>
                 <TestBaseGridNavRows count={childCount} />
             </table>
         </RowContext.Provider>
@@ -154,8 +160,8 @@ function TestBaseGridNavRows({ count }: { count: number }) {
 
 
 function TestBaseGridNavRow({ index }: { index: number }) {
-    useOnRender("children");
-    useOnRender("child-" + index);
+    const { props: p1 } = useOnRender("children");
+    const { props: p2 } = useOnRender("child-" + index);
 
     const textContent = LoremIpsum[index % LoremIpsum.length];
     const getTextContent = useStableGetter(textContent);
@@ -163,7 +169,7 @@ function TestBaseGridNavRow({ index }: { index: number }) {
     const missing = (index === MissingIndex);
     const hidden = (index === HiddenIndex);
     if (missing)
-        return <tr data-grid-nav-row><td colSpan={1000 - 1}>(The #{index}-th item is missing)</td></tr>;
+        return <tr data-grid-nav-row  {...useMergedProps(p1, p2)}><td colSpan={1000 - 1}>(The #{index}-th item is missing)</td></tr>;
 
     const {
         hasCurrentFocusReturn: { getCurrentFocused, getCurrentFocusedInner },
@@ -178,18 +184,18 @@ function TestBaseGridNavRow({ index }: { index: number }) {
         singleSelectionChildReturn: { getSelected, getSelectedOffset, selected, selectedOffset },
         staggeredChildReturn: { hideBecauseStaggered, parentIsStaggered },
         textContentReturn: { },
-    } = useCompleteGridNavigationRow<HTMLTableRowElement, HTMLTableCellElement, UseCompleteGridNavigationRowInfo<HTMLTableRowElement, HTMLTableCellElement>, UseCompleteGridNavigationCellInfo<HTMLTableCellElement>>({
+    } = useCompleteGridNavigationRow<HTMLTableRowElement, HTMLTableCellElement, UseCompleteGridNavigationRowInfo<HTMLTableRowElement>, UseCompleteGridNavigationCellInfo<HTMLTableCellElement>>({
         context: useContext(RowContext),
         info: {
             unselectable: disabled,
             untabbable: hidden,
             index,
-            getSortValue: getTextContent
         },
         linearNavigationParameters: { navigatePastEnd: "wrap", navigatePastStart: "wrap" },
         rovingTabIndexParameters: { initiallyTabbedIndex: 0, untabbable: false, onTabbableIndexChange: null },
         typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000, onNavigateTypeahead: null },
-        textContentParameters: { getText: getTextContent }
+        textContentParameters: { getText: getTextContent },
+        hasCurrentFocusParameters: { onCurrentFocusedChanged: null, onCurrentFocusedInnerChanged: null }
     });
 
     const [rowFocused, setRowFocused] = useState(false);
@@ -199,17 +205,23 @@ function TestBaseGridNavRow({ index }: { index: number }) {
     return (
         <CellContext.Provider value={context}>
             <tr
-                data-grid-nav-row
-                role="row"
-                data-index={index}
-                data-hide-because-paginated={hideBecausePaginated}
-                data-parent-is-paginated={parentIsPaginated}
-                data-tabbable={tabbable}
-                data-hide-because-staggered={hideBecauseStaggered}
-                data-selected={selected}
-                data-selected-offset={selectedOffset}
-                data-parent-is-staggered={parentIsStaggered}
-                {...useMergedProps(props, { onFocus: e => { console.error("A grid row has received focus"); setRowFocused(true); throw new Error("A grid row has received focus"); } })}>
+
+                {...useMergedProps(props, p1, p2,
+                    {
+                        role: "row",
+                        "data-grid-nav-row": true,
+                        "data-index": index,
+                        "data-hide-because-paginated": hideBecausePaginated,
+                        "data-parent-is-paginated": parentIsPaginated,
+                        "data-tabbable": tabbable,
+                        "data-hide-because-staggered": hideBecauseStaggered,
+                        "data-selected": selected,
+                        "data-selected-offset": selectedOffset,
+                        "data-parent-is-staggered": parentIsStaggered,
+                    } as {},
+                    {
+                        onFocus: e => { console.error("A grid row has received focus"); setRowFocused(true); throw new Error("A grid row has received focus"); }
+                    })}>
                 {...Array.from(function* () {
                     for (let i = 0; i < 10; ++i) {
                         const colSpan = (i === WithColSpanIndex ? (index % 10) : 0) + 1;
@@ -225,8 +237,8 @@ function TestBaseGridNavRow({ index }: { index: number }) {
 
 
 function TestBaseGridNavCell({ index, row, colSpan }: { row: number, index: number, colSpan: number }) {
-    useOnRender("children");
-    useOnRender("child-" + index);
+    const { props: p1 } = useOnRender("children");
+    const { props: p2 } = useOnRender("child-" + index);
 
     let textContent = LoremIpsum[(index + row) % LoremIpsum.length];
     let t = textContent.indexOf(" ")
@@ -236,7 +248,7 @@ function TestBaseGridNavCell({ index, row, colSpan }: { row: number, index: numb
     const missing = (index === MissingIndex);
     const hidden = (index === HiddenIndex);
     if (missing)
-        return <td data-grid-nav-cell colSpan={colSpan}>(The #{index}-th item is missing)</td>;
+        return <td data-grid-nav-cell colSpan={colSpan} {...useMergedProps(p1, p2)}>(The #{index}-th item is missing)</td>;
 
     const {
         hasCurrentFocusReturn: { getCurrentFocused, getCurrentFocusedInner },
@@ -249,25 +261,20 @@ function TestBaseGridNavCell({ index, row, colSpan }: { row: number, index: numb
     } = useCompleteGridNavigationCell<HTMLTableCellElement, UseCompleteGridNavigationCellInfo<HTMLTableCellElement>>({
         context: useContext(CellContext),
         gridNavigationCellParameters: { colSpan },
-        info: { index, untabbable: false, focusSelf: e => e.focus() },
+        info: { index, untabbable: false, focusSelf: e => e.focus(), getSortValue: useStableGetter(textContent) },
         textContentParameters: { getText: useStableCallback(() => textContent) }
     })
     return (
         <>
             <td
-                data-grid-nav-cell
-                colSpan={colSpan}
-                role="cell"
-                data-index={index}
-                /*data-hide-because-paginated={hideBecausePaginated}
-                data-is-paginated={isPaginated}
-                data-paginated-visible={paginatedVisible}*/
-                data-tabbable={tabbable}
-                /*data-hide-because-staggered={hideBecauseStaggered}
-                data-selected={selected}
-                data-selected-offset={selectedOffset}
-                data-is-staggered={isStaggered}*/
-                {...props}>{/*(hideBecausePaginated || hideBecauseStaggered) ? "" : */textContent}{hidden && " (hidden)"}{disabled && " (disabled)"}</td>
+
+                {...useMergedProps(props, p1, p2, {
+                    "data-grid-nav-cell": true,
+                    colSpan,
+                    role: "cell",
+                    "data-index": index,
+                    "data-tabbable": tabbable,
+                } as {})}>{textContent}{hidden && " (hidden)"}{disabled && " (disabled)"}</td>
         </>
     )
 }

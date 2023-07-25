@@ -17,8 +17,8 @@ export function useListNavigationSingleSelection({ linearNavigationParameters, r
             ...contextLN,
             ...contextSS
         }),
-        propsParent,
-        propsStableParentOrChild
+        propsStableParentOrChild: propsStableParentOrChild,
+        propsParent: propsParent,
     };
 }
 export function useListNavigationSingleSelectionChild({ info: { index, untabbable, unselectable, ...void2 }, context, refElementReturn, textContentParameters, ...void1 }) {

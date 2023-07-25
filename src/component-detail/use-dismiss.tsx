@@ -1,5 +1,7 @@
 import { UseRefElementReturnType, useRefElement } from "../dom-helpers/use-ref-element.js";
-import { useActiveElement } from "../observers/use-active-element.js";
+import { UseActiveElementParameters, useActiveElement } from "../observers/use-active-element.js";
+import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
+import { assertEmptyObject } from "../util/assert.js";
 import { TargetedPick, useCallback } from "../util/lib.js";
 import { ElementProps } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
@@ -56,7 +58,9 @@ export interface UseDismissParametersSelf<Listeners extends DismissListenerTypes
     closeOnLostFocus: Listeners extends "lost-focus" ? true : false;
 }
 
-export interface UseDismissParameters<Listeners extends DismissListenerTypes> extends TargetedPick<UseEscapeDismissParameters<any>, "escapeDismissParameters", "getWindow" | "parentDepth"> {
+export interface UseDismissParameters<Listeners extends DismissListenerTypes> extends
+    TargetedPick<UseEscapeDismissParameters<any>, "escapeDismissParameters", "parentDepth">,
+    UseActiveElementParameters {
     dismissParameters: UseDismissParametersSelf<Listeners>;
 }
 
@@ -85,7 +89,12 @@ export interface UseDismissReturnType<SourceElement extends Element | null, Popu
  * 
  * @compositeParams
  */
-export function useDismiss<Listeners extends DismissListenerTypes, SourceElement extends Element | null, PopupElement extends Element>({ dismissParameters: { open: globalOpen, onClose: globalOnClose, closeOnBackdrop, closeOnEscape, closeOnLostFocus }, escapeDismissParameters: { getWindow, parentDepth } }: UseDismissParameters<Listeners>): UseDismissReturnType<SourceElement, PopupElement> {
+export function useDismiss<Listeners extends DismissListenerTypes, SourceElement extends Element | null, PopupElement extends Element>({
+    dismissParameters: { open: globalOpen, onClose: globalOnClose, closeOnBackdrop, closeOnEscape, closeOnLostFocus, ...void3 },
+    escapeDismissParameters: { parentDepth, ...void2 },
+    activeElementParameters: { getDocument, onActiveElementChange, onLastActiveElementChange: olaec1, onWindowFocusedChange, ...void5 },
+    ...void4
+}: UseDismissParameters<Listeners>): UseDismissReturnType<SourceElement, PopupElement> {
     monitorCallCount(useDismiss);
 
     const { refElementReturn: refElementSourceReturn, propsStable: propsStableSource } = useRefElement<NonNullable<SourceElement>>({ refElementParameters: {} });
@@ -95,12 +104,9 @@ export function useDismiss<Listeners extends DismissListenerTypes, SourceElement
     const onCloseEscape = useCallback(() => { return globalOnClose?.("escape" as Listeners); }, [globalOnClose]);
     const onCloseFocus = useCallback(() => { return globalOnClose?.("lost-focus" as Listeners); }, [globalOnClose]);
     const _v1: void = useBackdropDismiss<PopupElement>({ backdropDismissParameters: { onDismiss: onCloseBackdrop, active: (closeOnBackdrop && globalOpen) }, refElementPopupReturn });
-    const _v2: void = useEscapeDismiss<PopupElement>({ escapeDismissParameters: { getWindow, onDismiss: onCloseEscape, active: (closeOnEscape && globalOpen), parentDepth }, refElementPopupReturn });
-    const { activeElementParameters } = useLostFocusDismiss<SourceElement, PopupElement>({ lostFocusDismissParameters: { onDismiss: onCloseFocus, active: (closeOnLostFocus && globalOpen) }, refElementPopupReturn, refElementSourceReturn });
+    const _v2: void = useEscapeDismiss<PopupElement>({ escapeDismissParameters: { getDocument, onDismiss: onCloseEscape, active: (closeOnEscape && globalOpen), parentDepth }, refElementPopupReturn });
+    const { activeElementParameters: { onLastActiveElementChange: olaec2, ...void1 } } = useLostFocusDismiss<SourceElement, PopupElement>({ lostFocusDismissParameters: { onDismiss: onCloseFocus, active: (closeOnLostFocus && globalOpen) }, refElementPopupReturn, refElementSourceReturn });
 
-    const getDocument = useCallback(() => {
-        return getWindow().document;
-    }, [getWindow])
 
     const {
         activeElementReturn: {
@@ -108,12 +114,25 @@ export function useDismiss<Listeners extends DismissListenerTypes, SourceElement
             getLastActiveElement: _getLastActiveElement,
             getWindowFocused: _getWindowFocused
         }
-    } = useActiveElement({ activeElementParameters: { ...activeElementParameters, getWindow, getDocument } });
+    } = useActiveElement({
+        activeElementParameters: {
+            onLastActiveElementChange: useStableCallback((a, b) => { olaec2?.(a, b); olaec1?.(a, b); }),
+            onActiveElementChange,
+            onWindowFocusedChange,
+            getDocument
+        }
+    });
+
+    assertEmptyObject(void1);
+    assertEmptyObject(void2);
+    assertEmptyObject(void3);
+    assertEmptyObject(void4);
+    assertEmptyObject(void5);
 
     return {
         refElementSourceReturn,
         refElementPopupReturn,
-        propsStableSource,
-        propsStablePopup
+        propsStableSource: propsStableSource,
+        propsStablePopup: propsStablePopup
     }
 }

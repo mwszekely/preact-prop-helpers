@@ -23,12 +23,12 @@ function getElementDepth(element) {
  *
  * @compositeParams
  */
-export function useEscapeDismiss({ escapeDismissParameters: { onDismiss: onClose, active: open, getWindow: unstableGetWindow, parentDepth, ...void1 }, refElementPopupReturn: { getElement, ...void2 } }) {
+export function useEscapeDismiss({ escapeDismissParameters: { onDismiss: onClose, active: open, getDocument: unstableGetDocument, parentDepth, ...void1 }, refElementPopupReturn: { getElement, ...void2 } }) {
     monitorCallCount(useEscapeDismiss);
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     const stableOnClose = useStableCallback(onClose);
-    const getWindow = useStableCallback(unstableGetWindow);
+    const getDocument = useStableCallback(unstableGetDocument);
     const getDepth = useStableGetter(parentDepth + 1);
     // When this component opens, add an event listener that finds the deepest open soft dismiss element to actually dismiss.
     // Only opened components will add event handlers, and will remove them once closed.
@@ -41,7 +41,8 @@ export function useEscapeDismiss({ escapeDismissParameters: { onDismiss: onClose
     // then the first one to do so will wait for a microtask, 
     // then find the deepest element in the document tree to dismiss of all of those components currently open.
     useEffect(() => {
-        const window = getWindow();
+        const document = getDocument();
+        const window = document.defaultView;
         window[MagicWindowKey] ??= { microtaskQueued: false, elementQueue: new Map() };
         const info = window[MagicWindowKey];
         if (open) {

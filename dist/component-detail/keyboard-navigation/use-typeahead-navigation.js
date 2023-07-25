@@ -6,6 +6,7 @@ import { useState } from "../../preact-extensions/use-state.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { useCallback, useLayoutEffect, useRef } from "../../util/lib.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
+import { useTagProps } from "../../util/use-tag-props.js";
 /**
  * Allows for the selection of a managed child by typing the given text associated with it.
  *
@@ -15,7 +16,7 @@ import { monitorCallCount } from "../../util/use-call-count.js";
  *
  * @compositeParams
  */
-export function useTypeaheadNavigation({ typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead, isValid, onNavigateTypeahead, ...void3 }, rovingTabIndexReturn: { getTabbableIndex: getIndex, setTabbableIndex: setIndex, ...void1 }, ...void2 }) {
+export function useTypeaheadNavigation({ typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead, isValidForTypeaheadNavigation, onNavigateTypeahead, ...void3 }, rovingTabIndexReturn: { getTabbableIndex: getIndex, setTabbableIndex: setIndex, ...void1 }, ...void2 }) {
     //type EventType = Parameters<NonNullable<ElementProps<ParentOrChildElement>["onKeyDown"]>>[0];
     monitorCallCount(useTypeaheadNavigation);
     assertEmptyObject(void1);
@@ -74,7 +75,7 @@ export function useTypeaheadNavigation({ typeaheadNavigationParameters: { collat
         return lhs - rhs;
     });
     const isDisabled = useStableGetter(noTypeahead);
-    const propsStable = useRef({
+    const propsStable = useRef(useTagProps({
         onKeyDown: useStableCallback((e) => {
             if (isDisabled())
                 return;
@@ -117,7 +118,7 @@ export function useTypeaheadNavigation({ typeaheadNavigationParameters: { collat
             setImeActive(false);
         }),
         onCompositionEnd: useStableCallback((_e) => { setImeActive(true); }),
-    });
+    }, "data-typeahead-navigation"));
     const excludeSpace = useStableCallback(() => { return typeaheadStatus != "none"; });
     return {
         context: useMemoObject({
@@ -175,7 +176,7 @@ export function useTypeaheadNavigation({ typeaheadNavigationParameters: { collat
                 let lowestUnsortedIndexNext = null;
                 let lowestSortedIndexNext = sortedTypeaheadIndex;
                 const updateBestFit = (u) => {
-                    if (!isValid(u))
+                    if (!isValidForTypeaheadNavigation(u))
                         return;
                     if (lowestUnsortedIndexAll == null || u < lowestUnsortedIndexAll) {
                         lowestUnsortedIndexAll = u;

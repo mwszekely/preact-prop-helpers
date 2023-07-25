@@ -16,14 +16,17 @@ function blockingElements() { return getDocument().$blockingElements; }
  *
  * @param target
  */
-export function useBlockingElement(enabled, getTarget) {
+export function useBlockingElement({ activeElementParameters: { getDocument, onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, ...void3 }, blockingElementParameters: { enabled, getTarget, ...void1 }, ...void2 }) {
     monitorCallCount(useBlockingElement);
     const stableGetTarget = useStableCallback(getTarget);
-    const getDocument = useStableCallback(() => (getTarget()?.ownerDocument ?? globalThis.document));
+    //const getDocument = useStableCallback(() => (getTarget()?.ownerDocument ?? globalThis.document));
     useActiveElement({
         activeElementParameters: {
             getDocument,
-            onLastActiveElementChange: useStableCallback((e) => {
+            onActiveElementChange,
+            onWindowFocusedChange,
+            onLastActiveElementChange: useStableCallback((e, prev, reason) => {
+                onLastActiveElementChange?.(e, prev, reason);
                 if (e) {
                     if (enabled)
                         setLastActiveWhenOpen(e);

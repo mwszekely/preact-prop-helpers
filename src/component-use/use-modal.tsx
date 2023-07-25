@@ -2,10 +2,13 @@ import { DismissListenerTypes, useDismiss, UseDismissParameters, UseDismissRetur
 import { useFocusTrap, UseFocusTrapParameters } from "../component-detail/use-focus-trap.js";
 import { useMergedProps } from "../dom-helpers/use-merged-props.js";
 import { useRefElement } from "../dom-helpers/use-ref-element.js";
-import { ElementProps } from "../util/types.js";
+import { assertEmptyObject } from "../util/assert.js";
+import { ElementProps, OmitStrong } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 
-export interface UseModalParameters<Listeners extends DismissListenerTypes> extends UseDismissParameters<Listeners>, Pick<UseFocusTrapParameters<any, any>,"focusTrapParameters"> {}
+export interface UseModalParameters<Listeners extends DismissListenerTypes> extends
+    OmitStrong<UseDismissParameters<Listeners>, "activeElementParameters">,
+    Pick<UseFocusTrapParameters<any, any>, "focusTrapParameters" | "activeElementParameters"> { }
 
 export interface UseModalReturnType<FocusContainerElement extends Element | null, SourceElement extends Element | null, PopupElement extends Element> extends UseDismissReturnType<SourceElement, PopupElement> {
     propsFocusContainer: ElementProps<NonNullable<FocusContainerElement>>;
@@ -22,17 +25,26 @@ export interface UseModalReturnType<FocusContainerElement extends Element | null
 export function useModal<Listeners extends DismissListenerTypes, FocusContainerElement extends Element | null, SourceElement extends Element | null, PopupElement extends Element>({
     dismissParameters,
     escapeDismissParameters,
-    focusTrapParameters: { trapActive, ...focusTrapParameters }
+    focusTrapParameters: { trapActive, ...focusTrapParameters },
+    activeElementParameters,
+
+    ...void1
 }: UseModalParameters<Listeners>): UseModalReturnType<FocusContainerElement, SourceElement, PopupElement> {
     monitorCallCount(useModal);
 
     const { open } = dismissParameters;
-    const { refElementPopupReturn, refElementSourceReturn, propsStablePopup, propsStableSource } = useDismiss<Listeners, SourceElement, PopupElement>({ dismissParameters, escapeDismissParameters });
+    const { refElementPopupReturn, refElementSourceReturn, propsStablePopup, propsStableSource } = useDismiss<Listeners, SourceElement, PopupElement>({
+        dismissParameters,
+        escapeDismissParameters,
+        activeElementParameters
+    });
     const { propsStable, refElementReturn } = useRefElement<NonNullable<FocusContainerElement>>({})
     const { props } = useFocusTrap<SourceElement, NonNullable<FocusContainerElement>>({
         focusTrapParameters: { trapActive: open && trapActive, ...focusTrapParameters },
+        activeElementParameters,
         refElementReturn
     });
+    assertEmptyObject(void1);
 
     return {
         propsFocusContainer: useMergedProps(propsStable, props),

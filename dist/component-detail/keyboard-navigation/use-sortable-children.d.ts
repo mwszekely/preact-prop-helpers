@@ -28,7 +28,7 @@ export interface UseSortableChildrenParametersSelf<M extends UseRearrangeableChi
      * @param lhs - The first value to compare
      * @param rhs - The second value to compare
      */
-    compare: null | Compare<M>;
+    compare: Nullable<Compare<M>>;
 }
 /**
  * All of these functions **MUST** be stable across renders.
@@ -70,8 +70,6 @@ export interface UseRearrangeableChildrenReturnTypeSelf<M extends UseRearrangeab
     indexMangler: (n: number) => number;
     /** **STABLE** */
     indexDemangler: (n: number) => number;
-    /** **STABLE** */
-    /** **STABLE** */
     /**
      * **STABLE**
      *

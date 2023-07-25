@@ -6,8 +6,9 @@ import { assertEmptyObject } from "../../util/assert.js";
 import { EventType, TargetedPick, useCallback, useRef } from "../../util/lib.js";
 import { ElementProps, KeyboardEventType, Nullable, OmitStrong } from "../../util/types.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
+import { useTagProps } from "../../util/use-tag-props.js";
 import { UsePaginatedChildrenParameters } from "../use-paginated-children.js";
-import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
+import { UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
 export { identity };
 
 export interface LinearNavigationResult {
@@ -26,8 +27,8 @@ export interface UseLinearNavigationReturnType<ParentOrChildElement extends Elem
 
 /** Arguments passed to the parent `useLinearNavigation` */
 export interface UseLinearNavigationParameters<ParentOrChildElement extends Element, ChildElement extends Element> extends
-    TargetedPick<UseRovingTabIndexReturnType<ParentOrChildElement, ChildElement, UseRovingTabIndexChildInfo<ChildElement>>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex">,
-    TargetedPick<UsePaginatedChildrenParameters<ParentOrChildElement, ChildElement, any>, "paginatedChildrenParameters", "paginationMin" | "paginationMax"> {
+    TargetedPick<UseRovingTabIndexReturnType<ParentOrChildElement, ChildElement>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex">,
+    TargetedPick<UsePaginatedChildrenParameters<ParentOrChildElement, ChildElement>, "paginatedChildrenParameters", "paginationMin" | "paginationMax"> {
     linearNavigationParameters: UseLinearNavigationParametersSelf<ChildElement>;
 }
 
@@ -45,7 +46,7 @@ export interface UseLinearNavigationParametersSelf<ChildElement extends Element>
      * 
      * @stable
      */
-    isValid(i: number): boolean;
+    isValidForLinearNavigation(i: number): boolean;
 
     /**
      * Controls how many elements are skipped over when page up/down are pressed.
@@ -155,10 +156,10 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
     assertEmptyObject(void2);
 
     type R = EventType<any, any>;
-    const { getLowestIndex, getHighestIndex, indexDemangler, indexMangler, isValid, navigatePastEnd, navigatePastStart, onNavigateLinear } = linearNavigationParameters;
+    const { getLowestIndex, getHighestIndex, indexDemangler, indexMangler, isValidForLinearNavigation, navigatePastEnd, navigatePastStart, onNavigateLinear } = linearNavigationParameters;
     const { getTabbableIndex, setTabbableIndex } = rovingTabIndexReturn;
 
-    useEnsureStability("useLinearNavigation", onNavigateLinear, isValid, indexDemangler, indexMangler);
+    useEnsureStability("useLinearNavigation", onNavigateLinear, isValidForLinearNavigation, indexDemangler, indexMangler);
 
     const navigateAbsolute = useCallback((requestedIndexMangled: number, searchDirection: -1 | 1, e: R, fromUserInteraction: boolean, mode: "page" | "single") => {
         const highestChildIndex = getHighestIndex();
@@ -166,7 +167,7 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
         const original = (getTabbableIndex() ?? 0);
 
         const targetDemangled = indexDemangler(requestedIndexMangled);
-        const { status, valueDemangled } = tryNavigateToIndex({ isValid, lowestChildIndex, highestChildIndex, indexDemangler, indexMangler, searchDirection, targetDemangled });
+        const { status, valueDemangled } = tryNavigateToIndex({ isValid: isValidForLinearNavigation, lowestChildIndex, highestChildIndex, indexDemangler, indexMangler, searchDirection, targetDemangled });
         if (status == "past-end") {
             if (navigatePastEnd == "wrap") {
                 if (mode == "single")
@@ -249,7 +250,7 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
     const getPageNavigationSize = useStableGetter(linearNavigationParameters.pageNavigationSize);
 
 
-    const stableProps = useRef<ElementProps<ParentOrChildElement>>({
+    const stableProps = useRef<ElementProps<ParentOrChildElement>>(useTagProps({
         onKeyDown: (e) => {
             // Not handled by typeahead (i.e. assume this is a keyboard shortcut)
             if (e.ctrlKey || e.metaKey)
@@ -327,7 +328,7 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
                 e.stopPropagation();
             }
         }
-    })
+    }, "data-linear-navigation"))
 
 
     return {

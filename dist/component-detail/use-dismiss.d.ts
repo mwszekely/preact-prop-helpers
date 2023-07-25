@@ -1,4 +1,5 @@
 import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
+import { UseActiveElementParameters } from "../observers/use-active-element.js";
 import { TargetedPick } from "../util/lib.js";
 import { ElementProps } from "../util/types.js";
 import { UseEscapeDismissParameters } from "./dismissal/use-escape-dismiss.js";
@@ -33,7 +34,7 @@ export interface UseDismissParametersSelf<Listeners extends DismissListenerTypes
      */
     closeOnLostFocus: Listeners extends "lost-focus" ? true : false;
 }
-export interface UseDismissParameters<Listeners extends DismissListenerTypes> extends TargetedPick<UseEscapeDismissParameters<any>, "escapeDismissParameters", "getWindow" | "parentDepth"> {
+export interface UseDismissParameters<Listeners extends DismissListenerTypes> extends TargetedPick<UseEscapeDismissParameters<any>, "escapeDismissParameters", "parentDepth">, UseActiveElementParameters {
     dismissParameters: UseDismissParametersSelf<Listeners>;
 }
 export interface UseDismissReturnType<SourceElement extends Element | null, PopupElement extends Element> {
@@ -57,5 +58,5 @@ export interface UseDismissReturnType<SourceElement extends Element | null, Popu
  *
  * @compositeParams
  */
-export declare function useDismiss<Listeners extends DismissListenerTypes, SourceElement extends Element | null, PopupElement extends Element>({ dismissParameters: { open: globalOpen, onClose: globalOnClose, closeOnBackdrop, closeOnEscape, closeOnLostFocus }, escapeDismissParameters: { getWindow, parentDepth } }: UseDismissParameters<Listeners>): UseDismissReturnType<SourceElement, PopupElement>;
+export declare function useDismiss<Listeners extends DismissListenerTypes, SourceElement extends Element | null, PopupElement extends Element>({ dismissParameters: { open: globalOpen, onClose: globalOnClose, closeOnBackdrop, closeOnEscape, closeOnLostFocus, ...void3 }, escapeDismissParameters: { parentDepth, ...void2 }, activeElementParameters: { getDocument, onActiveElementChange, onLastActiveElementChange: olaec1, onWindowFocusedChange, ...void5 }, ...void4 }: UseDismissParameters<Listeners>): UseDismissReturnType<SourceElement, PopupElement>;
 //# sourceMappingURL=use-dismiss.d.ts.map

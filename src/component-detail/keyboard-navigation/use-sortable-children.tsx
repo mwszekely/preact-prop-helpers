@@ -39,7 +39,7 @@ export interface UseSortableChildrenParametersSelf<M extends UseRearrangeableChi
      * @param lhs - The first value to compare
      * @param rhs - The second value to compare
      */
-    compare: null | Compare<M>;
+    compare: Nullable<Compare<M>>;
 }
 
 /**
@@ -91,10 +91,6 @@ export interface UseRearrangeableChildrenReturnTypeSelf<M extends UseRearrangeab
     indexMangler: (n: number) => number;
     /** **STABLE** */
     indexDemangler: (n: number) => number;
-    /** **STABLE** */
-    //mangleMap: MutableRef<Map<number, number>>;
-    /** **STABLE** */
-    //demangleMap: MutableRef<Map<number, number>>;
 
     /** 
      * **STABLE**

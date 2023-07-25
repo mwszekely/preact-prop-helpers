@@ -2,6 +2,7 @@ import { OnPassiveStateChange, returnNull, runImmediately, useEnsureStability, u
 import { Nullable, useCallback, useRef } from "../util/lib.js";
 import { ElementProps } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
+import { useTagProps } from "../util/use-tag-props.js";
 
 export interface UseRefElementReturnTypeSelf<T extends EventTarget> {
     /** 
@@ -115,7 +116,7 @@ export function useRefElement<T extends EventTarget>(args: UseRefElementParamete
 
     // Let us store the actual (reference to) the element we capture
     const [getElement, setElement] = usePassiveState<T | null, never>(handler, returnNull, runImmediately);
-    const propsStable = useRef<ElementProps<T>>({ ref: setElement });
+    const propsStable = useRef<ElementProps<T>>(useTagProps({ ref: setElement }, "data-use-ref-element"));
 
     // Return both the element and the hook that modifies 
     // the props and allows us to actually find the element

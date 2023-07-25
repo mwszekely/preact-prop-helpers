@@ -34,6 +34,7 @@ export function TestBasesButtonImpl<T extends HTMLButtonElement | HTMLDivElement
             excludeEnter,
             excludePointer,
             excludeSpace,
+            onPressingChange: null,
             allowRepeatPresses,
             longPressThreshold: 1000,
             onPressSync: (e) => {

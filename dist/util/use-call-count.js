@@ -7,7 +7,6 @@ window.requestIdleCallback ??= (callback) => {
 };
 let timeoutHandle = null;
 function callCountU(hook) {
-    return;
     const name = hook.name;
     if (filterAll || filters.has(name))
         return;

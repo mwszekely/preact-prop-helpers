@@ -142,6 +142,7 @@ const DemoUseFocusTrap = memo(({ depth }: { depth?: number }) => {
             focusOpener: e => e?.focus(),
             focusPopup: (e, f) => f()?.focus(),
         },
+        activeElementParameters: { getDocument, onActiveElementChange: null, onLastActiveElementChange: null, onWindowFocusedChange: null },
         refElementReturn
     });
     //const { useRovingTabIndexChild, useRovingTabIndexProps } = useRovingTabIndex<HTMLUListElement, RovingTabIndexChildInfo>({ tabbableIndex, focusOnChange: false });

@@ -1,5 +1,13 @@
 import "blocking-elements";
 import "wicg-inert";
+import { UseActiveElementParameters } from "../observers/use-active-element.js";
+export interface UseBlockingElementParametersSelf<E extends Element> {
+    enabled: boolean;
+    getTarget(): (E | null);
+}
+export interface UseBlockingElementParameters<E extends Element> extends UseActiveElementParameters {
+    blockingElementParameters: UseBlockingElementParametersSelf<E>;
+}
 /**
  * Allows an element to trap focus by applying the "inert" attribute to all sibling, aunt, and uncle nodes.
  *
@@ -9,7 +17,7 @@ import "wicg-inert";
  *
  * @param target
  */
-export declare function useBlockingElement<E extends Element>(enabled: boolean, getTarget: () => (E | null)): {
+export declare function useBlockingElement<E extends Element>({ activeElementParameters: { getDocument, onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, ...void3 }, blockingElementParameters: { enabled, getTarget, ...void1 }, ...void2 }: UseBlockingElementParameters<E>): {
     getTop: () => HTMLElement | null;
     getLastActiveWhenClosed: () => HTMLElement | null;
     getLastActiveWhenOpen: () => HTMLElement | null;

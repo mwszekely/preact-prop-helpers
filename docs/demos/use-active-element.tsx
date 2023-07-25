@@ -3,8 +3,7 @@ import { useActiveElement, useState } from "../../dist/index.js";
 
 export function UseActiveElementDemo() {
     
-    const getWindow = useCallback(() => { return getDocument().defaultView!; }, []);
-    const getDocument = useCallback(() => { return document }, []);
+    const getDocument = useCallback(() => { return globalThis.document }, []);
 
     const [activeElement, setActiveElement] = useState<Element | null>(null);
     const [lastActiveElement, setLastActiveElement] = useState<Element | null>(null);
@@ -18,7 +17,6 @@ export function UseActiveElementDemo() {
         } } = useActiveElement({
             activeElementParameters: {
                 getDocument,
-                getWindow,
                 onActiveElementChange: setActiveElement,
                 onLastActiveElementChange: setLastActiveElement,
                 onWindowFocusedChange: setWindowFocused

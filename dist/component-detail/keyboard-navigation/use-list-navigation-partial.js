@@ -56,8 +56,8 @@ const _dummy = null;
  */
 export function useListNavigation({ linearNavigationParameters, typeaheadNavigationParameters, rovingTabIndexParameters, managedChildrenReturn, refElementReturn, paginatedChildrenParameters, ...void1 }) {
     monitorCallCount(useListNavigation);
-    const { context: { rovingTabIndexContext }, managedChildrenParameters, rovingTabIndexReturn, props: propsRTI, ...void2 } = useRovingTabIndex({ managedChildrenReturn, rovingTabIndexParameters, refElementReturn });
-    const { context: { typeaheadNavigationContext }, propsStable: propsStableTN, typeaheadNavigationReturn, ...void3 } = useTypeaheadNavigation({ rovingTabIndexReturn, typeaheadNavigationParameters, });
+    const { props: propsRTI, rovingTabIndexReturn, managedChildrenParameters, context: contextRovingTabIndex, ...void2 } = useRovingTabIndex({ managedChildrenReturn, rovingTabIndexParameters, refElementReturn });
+    const { propsStable: propsStableTN, typeaheadNavigationReturn, context: contextTypeahead, ...void3 } = useTypeaheadNavigation({ rovingTabIndexReturn, typeaheadNavigationParameters, });
     const { propsStable: propsStableLN, linearNavigationReturn, ...void4 } = useLinearNavigation({ rovingTabIndexReturn, linearNavigationParameters, paginatedChildrenParameters });
     assertEmptyObject(void1);
     assertEmptyObject(void2);
@@ -72,8 +72,8 @@ export function useListNavigation({ linearNavigationParameters, typeaheadNavigat
         rovingTabIndexReturn,
         typeaheadNavigationReturn,
         context: useMemoObject({
-            rovingTabIndexContext,
-            typeaheadNavigationContext
+            ...contextRovingTabIndex,
+            ...contextTypeahead
         }),
         linearNavigationReturn,
         propsStableParentOrChild: propsStable.current,

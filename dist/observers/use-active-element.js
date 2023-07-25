@@ -93,12 +93,12 @@ function windowBlur(e) {
  *
  * @compositeParams
  */
-export function useActiveElement({ activeElementParameters: { onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument, getWindow } }) {
+export function useActiveElement({ activeElementParameters: { onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument } }) {
     monitorCallCount(useActiveElement);
-    useEnsureStability("useActiveElement", onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument, getWindow);
+    useEnsureStability("useActiveElement", onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument);
     useEffect(() => {
         const document = getDocument();
-        const window = (getWindow?.(document) ?? document?.defaultView);
+        const window = (document?.defaultView);
         if ((activeElementUpdaters.get(window)?.size ?? 0) === 0) {
             document?.addEventListener("focusin", focusin, { passive: true });
             document?.addEventListener("focusout", focusout, { passive: true });

@@ -8,6 +8,7 @@ export interface UsePressParameters<E extends EventTarget> extends TargetedPick<
     pressParameters: UsePressParametersSelf<E>;
 }
 export interface UsePressParametersSelf<E extends EventTarget> {
+    /**  */
     onPressingChange: Nullable<OnPassiveStateChange<boolean, PressChangeEventReason<E>>>;
     /**
      * What should happen when this widget has been "pressed".

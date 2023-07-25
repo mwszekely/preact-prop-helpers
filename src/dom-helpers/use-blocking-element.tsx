@@ -1,7 +1,7 @@
 import "blocking-elements";
 import { DocumentWithBlockingElements } from "blocking-elements";
 import "wicg-inert";
-import { useActiveElement } from "../observers/use-active-element.js";
+import { UseActiveElementParameters, useActiveElement } from "../observers/use-active-element.js";
 import { returnNull, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useLayoutEffect } from "../util/lib.js";
@@ -9,6 +9,15 @@ import { monitorCallCount } from "../util/use-call-count.js";
 import { getDocument } from "./use-document-class.js";
 
 function blockingElements() { return (getDocument() as DocumentWithBlockingElements).$blockingElements }
+
+export interface UseBlockingElementParametersSelf<E extends Element> {
+    enabled: boolean;
+    getTarget(): (E | null)
+}
+
+export interface UseBlockingElementParameters<E extends Element> extends UseActiveElementParameters {
+    blockingElementParameters: UseBlockingElementParametersSelf<E>;
+}
 
 /**
  * Allows an element to trap focus by applying the "inert" attribute to all sibling, aunt, and uncle nodes.
@@ -19,16 +28,34 @@ function blockingElements() { return (getDocument() as DocumentWithBlockingEleme
  * 
  * @param target 
  */
-export function useBlockingElement<E extends Element>(enabled: boolean, getTarget: () => (E | null)) {
+export function useBlockingElement<E extends Element>({
+    activeElementParameters: {
+        getDocument,
+        onActiveElementChange,
+        onLastActiveElementChange,
+        onWindowFocusedChange,
+        ...void3
+    },
+    blockingElementParameters: {
+        enabled,
+        getTarget,
+        ...void1
+    },
+    ...void2
+}: UseBlockingElementParameters<E>) {
     monitorCallCount(useBlockingElement);
 
     const stableGetTarget = useStableCallback(getTarget);
 
-    const getDocument = useStableCallback(() => (getTarget()?.ownerDocument ?? globalThis.document));
+    //const getDocument = useStableCallback(() => (getTarget()?.ownerDocument ?? globalThis.document));
     useActiveElement({
         activeElementParameters: {
             getDocument,
-            onLastActiveElementChange: useStableCallback((e: Element) => {
+            onActiveElementChange,
+            onWindowFocusedChange,
+            onLastActiveElementChange: useStableCallback((e, prev, reason) => {
+                onLastActiveElementChange?.(e, prev, reason);
+
                 if (e) {
                     if (enabled)
                         setLastActiveWhenOpen(e as HTMLElement);

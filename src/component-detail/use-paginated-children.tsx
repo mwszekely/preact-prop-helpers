@@ -5,6 +5,7 @@ import { useState } from "../preact-extensions/use-state.js";
 import { TargetedPick, useCallback, useEffect, useMemo, useRef } from "../util/lib.js";
 import { ElementProps, Nullable } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
+import { useTagProps } from "../util/use-tag-props.js";
 import { UseLinearNavigationParameters } from "./keyboard-navigation/use-linear-navigation.js";
 import { UseRovingTabIndexChildInfo, UseRovingTabIndexReturnType } from "./keyboard-navigation/use-roving-tabindex.js";
 
@@ -18,10 +19,10 @@ export interface UsePaginatedChildrenParametersSelf {
     paginationMax: Nullable<number>;
 }
 
-export interface UsePaginatedChildrenParameters<ParentElement extends Element, TabbableChildElement extends Element, M extends UsePaginatedChildrenInfo<TabbableChildElement>>
-    extends Pick<UseManagedChildrenReturnType<M>, "managedChildrenReturn">,
+export interface UsePaginatedChildrenParameters<ParentElement extends Element, TabbableChildElement extends Element>
+    extends Pick<UseManagedChildrenReturnType<UsePaginatedChildrenInfo<TabbableChildElement>>, "managedChildrenReturn">,
     TargetedPick<UseLinearNavigationParameters<any, TabbableChildElement>, "linearNavigationParameters", "indexDemangler">,
-    TargetedPick<UseRovingTabIndexReturnType<any, TabbableChildElement, M>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex">,
+    TargetedPick<UseRovingTabIndexReturnType<any, TabbableChildElement>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex">,
     TargetedPick<UseRefElementReturnType<ParentElement>, "refElementReturn", "getElement"> {
     paginatedChildrenParameters: UsePaginatedChildrenParametersSelf;
 }
@@ -74,7 +75,7 @@ export function usePaginatedChildren<ParentElement extends Element, TabbableChil
     paginatedChildrenParameters: { paginationMax, paginationMin },
     rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex },
     refElementReturn: { getElement }
-}: UsePaginatedChildrenParameters<ParentElement, TabbableChildElement, M>): UsePaginatedChildrenReturnType {
+}: UsePaginatedChildrenParameters<ParentElement, TabbableChildElement>): UsePaginatedChildrenReturnType {
     monitorCallCount(usePaginatedChildren);
 
     const [childCount, setChildCount] = useState(null as number | null);
@@ -191,7 +192,7 @@ export function usePaginatedChild<ChildElement extends Element>({ info: { index 
     const [paginatedVisible, setPaginatedVisible] = useState(parentIsPaginated ? getDefaultPaginationVisible(index) : true);
 
     return {
-        props: !parentIsPaginated ? {} : (({ "aria-setsize": childCountIfPaginated ?? undefined, "aria-posinset": (index + 1) } as ElementProps<ChildElement>)),
+        props: useTagProps(!parentIsPaginated ? {} : (({ "aria-setsize": childCountIfPaginated ?? undefined, "aria-posinset": (index + 1) } as ElementProps<ChildElement>)), "data-paginated-children-child"),
         paginatedChildReturn: { /*paginatedVisible,*/ parentIsPaginated, hideBecausePaginated: parentIsPaginated ? !paginatedVisible : false },
         info: {
             setPaginationVisible: setPaginatedVisible,

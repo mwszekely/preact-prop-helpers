@@ -16,11 +16,11 @@ export interface UseEscapeDismissParametersSelf {
     /**
      * The escape key event handler is attached onto the window, so we need to know which window.
      *
-     * @remarks The returned `Window` should not change throughout the lifetime of the component (i.e. the element in question must not switch to another window via some means, which might not even be possible).
+     * @remarks The returned `Document` should not change throughout the lifetime of the component (i.e. the element in question must not switch to another window via some means, which might not even be possible).
      *
      * @nonstable
      */
-    getWindow(): Window;
+    getDocument(): Document;
     /**
      * Get this from context somewhere, and increment it in that context.
      *
@@ -41,5 +41,5 @@ export interface UseEscapeDismissParameters<PopupElement extends Element> {
  *
  * @compositeParams
  */
-export declare function useEscapeDismiss<PopupElement extends Element>({ escapeDismissParameters: { onDismiss: onClose, active: open, getWindow: unstableGetWindow, parentDepth, ...void1 }, refElementPopupReturn: { getElement, ...void2 } }: UseEscapeDismissParameters<PopupElement>): void;
+export declare function useEscapeDismiss<PopupElement extends Element>({ escapeDismissParameters: { onDismiss: onClose, active: open, getDocument: unstableGetDocument, parentDepth, ...void1 }, refElementPopupReturn: { getElement, ...void2 } }: UseEscapeDismissParameters<PopupElement>): void;
 //# sourceMappingURL=use-escape-dismiss.d.ts.map

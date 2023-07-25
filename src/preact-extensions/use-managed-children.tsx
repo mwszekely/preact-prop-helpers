@@ -209,6 +209,8 @@ interface InternalChildInfo<M extends ManagedChildInfo<string | number>> {
  * 
  * @hasChild {@link useManagedChild}
  * 
+ * {@include } {@link ManagedChildren}
+ * 
  * @compositeParams
  */
 export function useManagedChildren<M extends ManagedChildInfo<string | number>>(parentParameters: UseManagedChildrenParameters<M>): UseManagedChildrenReturnType<M> {
@@ -222,10 +224,7 @@ export function useManagedChildren<M extends ManagedChildInfo<string | number>>(
 
     useEnsureStability("useManagedChildren", onAfterChildLayoutEffect, onChildrenMountChange, onChildrenCountChange);
 
-    //const [getMountCount, setMountCount] = usePassiveState(onChildrenCountChange, returnZero, runImmediately);
-
     const getHighestIndex = useCallback((): number => { return managedChildrenArray.current.highestIndex; }, []);
-
     const getLowestIndex = useCallback((): number => { return managedChildrenArray.current.lowestIndex; }, []);
 
     // All the information we have about our children is stored in this **stable** array.

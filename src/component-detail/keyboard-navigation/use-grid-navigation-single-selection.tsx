@@ -25,30 +25,31 @@ export type UseGridNavigationSingleSelectionCellInfoKeysParameters = UseListNavi
 
 export interface GridSingleSelectChildRowInfo<RowElement extends Element> extends GridChildRowInfo<RowElement>, UseSingleSelectionChildInfo<RowElement> { }
 export interface GridSingleSelectChildCellInfo<CellElement extends Element> extends GridChildCellInfo<CellElement> { }
-export interface UseGridNavigationSingleSelectionParameters<ParentOrRowElement extends Element, RowElement extends Element, RM extends GridSingleSelectChildRowInfo<RowElement>> extends ExtendMerge<UseGridNavigationParameters<ParentOrRowElement, RowElement, RM>, OmitStrong<UseSingleSelectionParameters<ParentOrRowElement, RowElement, RM>, "rovingTabIndexReturn">> { }
-export interface UseGridNavigationSingleSelectionReturnType<ParentOrRowElement extends Element, RowElement extends Element, RM extends GridSingleSelectChildRowInfo<RowElement>> extends ExtendMerge<UseGridNavigationReturnType<ParentOrRowElement, RowElement, RM>, UseSingleSelectionReturnType<RowElement>> {
+export interface UseGridNavigationSingleSelectionParameters<ParentOrRowElement extends Element, RowElement extends Element, RM extends GridSingleSelectChildRowInfo<RowElement>> extends ExtendMerge<UseGridNavigationParameters<ParentOrRowElement, RowElement, RM>, OmitStrong<UseSingleSelectionParameters<ParentOrRowElement, RowElement>, "rovingTabIndexReturn">> { }
+export interface UseGridNavigationSingleSelectionReturnType<ParentOrRowElement extends Element, RowElement extends Element> extends ExtendMerge<UseGridNavigationReturnType<ParentOrRowElement, RowElement>, UseSingleSelectionReturnType<RowElement>> {
     context: UseGridNavigationRowSingleSelectionContext;
 }
 export interface UseGridNavigationRowSingleSelectionContext extends UseGridNavigationRowContext, UseSingleSelectionContext { }
 export interface UseGridNavigationCellSingleSelectionContext extends UseGridNavigationCellContext, UseSingleSelectionContext { }
-export interface UseGridNavigationSingleSelectionRowParameters<RowElement extends Element, CellElement extends Element, RM extends GridSingleSelectChildRowInfo<RowElement>, CM extends GridSingleSelectChildCellInfo<CellElement>> extends
-    UseGenericChildParameters<UseGridNavigationRowSingleSelectionContext, Pick<RM, UseGridNavigationSingleSelectionRowInfoKeysParameters>>,
-    OmitStrong<UseGridNavigationRowParameters<RowElement, CellElement, RM, CM>, "info" | "context">,
+export interface UseGridNavigationSingleSelectionRowParameters<RowElement extends Element, CellElement extends Element, CM extends GridSingleSelectChildCellInfo<CellElement>> extends
+    UseGenericChildParameters<UseGridNavigationRowSingleSelectionContext, Pick<GridSingleSelectChildRowInfo<RowElement>, UseGridNavigationSingleSelectionRowInfoKeysParameters>>,
+    OmitStrong<UseGridNavigationRowParameters<RowElement, CellElement, CM>, "info" | "context">,
     OmitStrong<UseSingleSelectionChildParameters<RowElement>, "info" | "context"> {
 }
 
-export interface UseGridNavigationSingleSelectionRowReturnType<RowElement extends Element, CellElement extends Element, RM extends GridSingleSelectChildRowInfo<RowElement>, CM extends GridSingleSelectChildCellInfo<CellElement>> extends OmitStrong<ExtendMerge<UseGridNavigationRowReturnType<RowElement, CellElement, RM, CM>, UseSingleSelectionChildReturnType<RowElement>>, "context" | "info"> {
+export interface UseGridNavigationSingleSelectionRowReturnType<RowElement extends Element, CellElement extends Element> extends
+    OmitStrong<ExtendMerge<UseGridNavigationRowReturnType<RowElement, CellElement>, UseSingleSelectionChildReturnType<RowElement>>, "context" | "info"> {
     context: UseGridNavigationCellSingleSelectionContext;
-    info: Pick<RM, "focusSelf" | UseSingleSelectionChildInfoKeysReturnType | UseRovingTabIndexChildInfoKeysReturnType>;
+    info: Pick<GridSingleSelectChildRowInfo<RowElement>, "focusSelf" | UseSingleSelectionChildInfoKeysReturnType | UseRovingTabIndexChildInfoKeysReturnType>;
 }
-export interface UseGridNavigationSingleSelectionCellParameters<CellElement extends Element, CM extends GridSingleSelectChildCellInfo<CellElement>> extends
-    UseGenericChildParameters<UseGridNavigationCellSingleSelectionContext, Pick<CM, UseGridNavigationSingleSelectionCellInfoKeysParameters>>,
-    OmitStrong<UseGridNavigationCellParameters<CellElement, CM>, "context" | "info"> {
-
+export interface UseGridNavigationSingleSelectionCellParameters<CellElement extends Element> extends
+    UseGenericChildParameters<UseGridNavigationCellSingleSelectionContext, Pick<GridSingleSelectChildCellInfo<CellElement>, UseGridNavigationSingleSelectionCellInfoKeysParameters>>,
+    OmitStrong<UseGridNavigationCellParameters<CellElement>, "context" | "info"> {
 }
-export interface UseGridNavigationSingleSelectionCellReturnType<CellElement extends Element, CM extends GridSingleSelectChildCellInfo<CellElement>> extends UseGridNavigationCellReturnType<CellElement, CM> { }
 
-export function useGridNavigationSingleSelection<ParentOrRowElement extends Element, RowElement extends Element, RM extends GridSingleSelectChildRowInfo<RowElement>>({
+export interface UseGridNavigationSingleSelectionCellReturnType<CellElement extends Element> extends UseGridNavigationCellReturnType<CellElement> { }
+
+export function useGridNavigationSingleSelection<ParentOrRowElement extends Element, RowElement extends Element>({
     gridNavigationParameters,
     linearNavigationParameters,
     rovingTabIndexParameters,
@@ -58,7 +59,7 @@ export function useGridNavigationSingleSelection<ParentOrRowElement extends Elem
     refElementReturn,
     paginatedChildrenParameters,
     ...void2
-}: UseGridNavigationSingleSelectionParameters<ParentOrRowElement, RowElement, RM>): UseGridNavigationSingleSelectionReturnType<ParentOrRowElement, RowElement, RM> {
+}: UseGridNavigationSingleSelectionParameters<ParentOrRowElement, RowElement, GridSingleSelectChildRowInfo<RowElement>>): UseGridNavigationSingleSelectionReturnType<ParentOrRowElement, RowElement> {
     monitorCallCount(useGridNavigationSingleSelection);
 
     const {
@@ -69,7 +70,7 @@ export function useGridNavigationSingleSelection<ParentOrRowElement extends Elem
         propsStableParentOrChild,
         rovingTabIndexReturn,
         typeaheadNavigationReturn,
-    } = useGridNavigation<ParentOrRowElement, RowElement, RM>({
+    } = useGridNavigation<ParentOrRowElement, RowElement>({
         gridNavigationParameters,
         linearNavigationParameters,
         managedChildrenReturn,
@@ -83,7 +84,7 @@ export function useGridNavigationSingleSelection<ParentOrRowElement extends Elem
         childrenHaveFocusParameters,
         context: { singleSelectionContext },
         singleSelectionReturn,
-    } = useSingleSelection<ParentOrRowElement, RowElement, RM>({
+    } = useSingleSelection<ParentOrRowElement, RowElement>({
         managedChildrenReturn,
         rovingTabIndexReturn,
         singleSelectionParameters
@@ -109,7 +110,7 @@ export function useGridNavigationSingleSelection<ParentOrRowElement extends Elem
     }
 }
 
-export function useGridNavigationSingleSelectionRow<RowElement extends Element, CellElement extends Element, RM extends GridSingleSelectChildRowInfo<RowElement>, CM extends GridSingleSelectChildCellInfo<CellElement>>({
+export function useGridNavigationSingleSelectionRow<RowElement extends Element, CellElement extends Element>({
     info: mcp1,
     linearNavigationParameters,
     managedChildrenReturn,
@@ -119,10 +120,10 @@ export function useGridNavigationSingleSelectionRow<RowElement extends Element, 
     typeaheadNavigationParameters,
     context,
     ...void1
-}: UseGridNavigationSingleSelectionRowParameters<RowElement, CellElement, RM, CM>): UseGridNavigationSingleSelectionRowReturnType<RowElement, CellElement, RM, CM> {
+}: UseGridNavigationSingleSelectionRowParameters<RowElement, CellElement, GridSingleSelectChildCellInfo<CellElement>>): UseGridNavigationSingleSelectionRowReturnType<RowElement, CellElement> {
     monitorCallCount(useGridNavigationSingleSelectionRow);
     const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void6 }, info: infoSingleSelection, props: propsSingleSelection, singleSelectionChildReturn, pressParameters: { onPressSync, ...void4 }, ...void2 } = useSingleSelectionChild<RowElement>({ info: mcp1, context });
-    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ...void7 }, info: infoGridNavigation, props: propsGridNavigation, linearNavigationReturn, managedChildrenParameters, pressParameters: { excludeSpace, ...void5 }, rovingTabIndexChildReturn, rovingTabIndexReturn, textContentReturn, typeaheadNavigationReturn, context: contextGridNavigation, ...void3 } = useGridNavigationRow<RowElement, CellElement, RM, CM>({ context, linearNavigationParameters, info: mcp1, managedChildrenReturn, refElementReturn, rovingTabIndexParameters, textContentParameters, typeaheadNavigationParameters });
+    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ...void7 }, info: infoGridNavigation, props: propsGridNavigation, linearNavigationReturn, managedChildrenParameters, pressParameters: { excludeSpace, ...void5 }, rovingTabIndexChildReturn, rovingTabIndexReturn, textContentReturn, typeaheadNavigationReturn, context: contextGridNavigation, ...void3 } = useGridNavigationRow<RowElement, CellElement>({ context, linearNavigationParameters, info: mcp1, managedChildrenReturn, refElementReturn, rovingTabIndexParameters, textContentParameters, typeaheadNavigationParameters });
 
     assertEmptyObject(void1);
     assertEmptyObject(void2);
@@ -149,7 +150,7 @@ export function useGridNavigationSingleSelectionRow<RowElement extends Element, 
 }
 
 // EZ
-export function useGridNavigationSingleSelectionCell<CellElement extends Element, CM extends GridSingleSelectChildCellInfo<CellElement>>(p: UseGridNavigationSingleSelectionCellParameters<CellElement, CM>): UseGridNavigationSingleSelectionCellReturnType<CellElement, CM> {
+export function useGridNavigationSingleSelectionCell<CellElement extends Element>(p: UseGridNavigationSingleSelectionCellParameters<CellElement>): UseGridNavigationSingleSelectionCellReturnType<CellElement> {
     monitorCallCount(useGridNavigationSingleSelectionCell);
-    return useGridNavigationCell<CellElement, CM>(p);
+    return useGridNavigationCell<CellElement>(p);
 }

@@ -1,10 +1,11 @@
 import { isFocusable, isTabbable } from "tabbable";
-import { useBlockingElement } from "../dom-helpers/use-blocking-element.js";
+import { UseBlockingElementParameters, useBlockingElement } from "../dom-helpers/use-blocking-element.js";
 import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { TargetedPick, useEffect } from "../util/lib.js";
-import { ElementProps } from "../util/types.js";
+import { ElementProps, OmitStrong } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
+import { useTagProps } from "../util/use-tag-props.js";
 
 export interface UseFocusTrapParametersSelf<SourceElement extends Element | null, PopupElement extends Element> {
     /**
@@ -50,7 +51,9 @@ export interface UseFocusTrapParametersSelf<SourceElement extends Element | null
     focusOpener(lastFocused: SourceElement | null): void;
 }
 
-export interface UseFocusTrapParameters<SourceElement extends Element | null, PopupElement extends Element> extends TargetedPick<UseRefElementReturnType<NonNullable<PopupElement>>, "refElementReturn", "getElement"> {
+export interface UseFocusTrapParameters<SourceElement extends Element | null, PopupElement extends Element> extends
+    TargetedPick<UseRefElementReturnType<NonNullable<PopupElement>>, "refElementReturn", "getElement">,
+    OmitStrong<UseBlockingElementParameters<NonNullable<SourceElement>>, "blockingElementParameters"> {
     focusTrapParameters: UseFocusTrapParametersSelf<SourceElement, PopupElement>;
 }
 
@@ -67,11 +70,10 @@ export interface UseFocusTrapReturnType<E extends Element> {
  */
 export function useFocusTrap<SourceElement extends Element | null, PopupElement extends Element>({
     focusTrapParameters: { onlyMoveFocus, trapActive, focusPopup: focusSelfUnstable, focusOpener: focusOpenerUnstable },
+    activeElementParameters,
     refElementReturn
 }: UseFocusTrapParameters<SourceElement, PopupElement>): UseFocusTrapReturnType<PopupElement> {
     monitorCallCount(useFocusTrap);
-
-    type E = PopupElement;
 
     const focusSelf = useStableCallback(focusSelfUnstable);
     const focusOpener = useStableCallback(focusOpenerUnstable);
@@ -108,11 +110,17 @@ export function useFocusTrap<SourceElement extends Element | null, PopupElement 
 
     const { getElement } = refElementReturn;
 
-    const { getTop, getLastActiveWhenClosed, getLastActiveWhenOpen } = useBlockingElement(trapActive && !onlyMoveFocus, getElement);
+    const { getTop, getLastActiveWhenClosed, getLastActiveWhenOpen } = useBlockingElement({
+        activeElementParameters,
+        blockingElementParameters: {
+            enabled: trapActive && !onlyMoveFocus,
+            getTarget: getElement
+        }
+    });
 
 
     return {
-        props: { "aria-modal": trapActive ? "true" : undefined } as ElementProps<E>
+        props: useTagProps({ "aria-modal": trapActive ? "true" : undefined } as ElementProps<PopupElement>, "data-focus-trap")
     };
 }
 

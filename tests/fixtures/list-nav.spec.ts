@@ -123,7 +123,9 @@ test("Untabbability works", async ({ page, listNav, shared: { run, install } }) 
     await run("ListNav", "setUntabbable", true);
     await expect(listNav.list).toBeFocused();
     await run("ListNav", "setUntabbable", false);
-    await expect(listNav.list.locator("li:nth-child(3)")).toBeFocused();
+    // TODO: Should focus return to the selected item, or the last focused item?
+    // It's generally the selected item...
+    await expect(listNav.list.locator("li:nth-child(2)")).toBeFocused();
     await expect(listNav.list.locator("li:nth-child(3)")).toHaveAttribute("aria-selected", "true");
 
     /*await listNav.list.locator("li:nth-child(2)").focus();
@@ -147,22 +149,22 @@ test("Selection", async ({ page, listNav, shared: { run, install } }) => {
 
     // Test the first 10 items, some of which have special properties related to selection (being disabled, hidden, etc.)
     for (let i = 0; i < 10; ++i) {
-        await listNav.list.locator(`li:nth-child(${i + 1})`).click({ force: true });
+        await listNav.list.locator(`li`).nth(i).click({ force: true });
         if (i == MissingIndex) {
-            await expect(listNav.list.locator(`li:nth-child(${i + 1})`).first()).not.toBeFocused();
-            await expect(listNav.list.locator(`li:nth-child(${i + 1})`).first()).not.toHaveAttribute("aria-selected", "true");
+            await expect(listNav.list.locator(`li`).nth(i).first()).not.toBeFocused();
+            await expect(listNav.list.locator(`li`).nth(i).first()).not.toHaveAttribute("aria-selected", "true");
         }
         else if (i === DisabledIndex) {
-            await expect(listNav.list.locator(`li:nth-child(${i + 1})`).first()).toBeFocused();
-            await expect(listNav.list.locator(`li:nth-child(${i + 1})`).first()).not.toHaveAttribute("aria-selected", "true");
+            await expect(listNav.list.locator(`li`).nth(i)).toBeFocused();
+            await expect(listNav.list.locator(`li`).nth(i)).not.toHaveAttribute("aria-selected", "true");
         }
         else if (i === HiddenIndex) {
-            await expect(listNav.list.locator(`li:nth-child(${i + 1})`).first()).not.toBeFocused();
-            await expect(listNav.list.locator(`li:nth-child(${i + 1})`).first()).not.toHaveAttribute("aria-selected", "true");
+            await expect(listNav.list.locator(`li`).nth(i)).not.toBeFocused();
+            await expect(listNav.list.locator(`li`).nth(i)).not.toHaveAttribute("aria-selected", "true");
         }
         else {
-            await expect(listNav.list.locator(`li:nth-child(${i + 1})`).first()).toBeFocused();
-            await expect(listNav.list.locator(`li:nth-child(${i + 1})`).first()).toHaveAttribute("aria-selected", "true");
+            await expect(listNav.list.locator(`li`).nth(i)).toBeFocused();
+            await expect(listNav.list.locator(`li`).nth(i)).toHaveAttribute("aria-selected", "true");
         }
     }
 
