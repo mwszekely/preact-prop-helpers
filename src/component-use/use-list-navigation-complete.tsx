@@ -9,17 +9,21 @@ import { useMergedProps } from "../dom-helpers/use-merged-props.js";
 import { useRefElement, UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
 import { useChildrenHaveFocus, useChildrenHaveFocusChild, UseChildrenHaveFocusContext, UseChildrenHaveFocusReturnType } from "../observers/use-children-have-focus.js";
 import { useHasCurrentFocus, UseHasCurrentFocusReturnType } from "../observers/use-has-current-focus.js";
-import { ManagedChildren, UseGenericChildParameters, useManagedChild, useManagedChildren, UseManagedChildrenContext, UseManagedChildrenReturnType, UseManagedChildReturnType } from "../preact-extensions/use-managed-children.js";
+import { ManagedChildInfo, ManagedChildren, UseGenericChildParameters, useManagedChild, useManagedChildren, UseManagedChildrenContext, UseManagedChildrenReturnType, UseManagedChildReturnType } from "../preact-extensions/use-managed-children.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useMemoObject } from "../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../util/assert.js";
 import { enhanceEvent } from "../util/event.js";
 import { TargetedOmit, TargetedPick, useCallback } from "../util/lib.js";
-import { ElementProps, ExtendMerge, OmitStrong } from "../util/types.js";
+import { ElementProps, OmitStrong } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 import { PressEventReason, UsePressParameters } from "./use-press.js";
 
-export interface UseCompleteListNavigationChildInfo<ChildElement extends Element> extends ExtendMerge<UseListNavigationSingleSelectionSortableChildInfo<ChildElement>, ExtendMerge<UsePaginatedChildrenInfo<ChildElement>, UseStaggeredChildrenInfo<ChildElement>>> { }
+export interface UseCompleteListNavigationChildInfo<ChildElement extends Element> extends 
+UseListNavigationSingleSelectionSortableChildInfo<ChildElement>, 
+UsePaginatedChildrenInfo<ChildElement>, 
+UseStaggeredChildrenInfo<ChildElement>,
+ManagedChildInfo<number> { }
 
 export interface UseCompleteListNavigationParameters<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends
     Pick<UseListNavigationSingleSelectionSortableParameters<ParentElement, ChildElement, M>, "singleSelectionParameters" | "sortableChildrenParameters">,

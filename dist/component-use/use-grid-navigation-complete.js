@@ -115,12 +115,6 @@ export function useCompleteGridNavigationRow({ info: { index, unselectable, unta
     const { context: contextMC, managedChildrenReturn } = useManagedChildren({ managedChildrenParameters });
     const completeInfo = {
         getElement: refElementReturn.getElement,
-        getSortValue: useCallback(() => {
-            let rows = getChildren();
-            let columnIndex = contextIncomingForRowAsChildOfTable.gridNavigationRowContext.getTabbableColumn() || 0;
-            let cell = rows.getAt(columnIndex);
-            return cell?.getSortValue();
-        }, []),
         index,
         unselectable,
         untabbable,

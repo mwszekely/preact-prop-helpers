@@ -5275,12 +5275,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       rovingTabIndexParameters,
       textContentParameters,
       typeaheadNavigationParameters,
-      context: {
-        gridNavigationRowContext,
-        rovingTabIndexContext,
-        singleSelectionContext,
-        typeaheadNavigationContext
-      },
+      context,
       ...void1
     } = _ref26;
     const {
@@ -5288,8 +5283,8 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         onCurrentFocusedInnerChanged: ocfic1,
         ...void6
       },
-      info: mcp2,
-      props: propsSS,
+      info: infoSingleSelection,
+      props: propsSingleSelection,
       singleSelectionChildReturn,
       pressParameters: {
         onPressSync,
@@ -5298,17 +5293,15 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       ...void2
     } = useSingleSelectionChild({
       info: mcp1,
-      context: {
-        singleSelectionContext
-      }
+      context
     });
     const {
       hasCurrentFocusParameters: {
         onCurrentFocusedInnerChanged: ocfic2,
         ...void7
       },
-      info: mcp3,
-      props: propsGN,
+      info: infoGridNavigation,
+      props: propsGridNavigation,
       linearNavigationReturn,
       managedChildrenParameters,
       pressParameters: {
@@ -5319,14 +5312,10 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       rovingTabIndexReturn,
       textContentReturn,
       typeaheadNavigationReturn,
-      context,
+      context: contextGridNavigation,
       ...void3
     } = useGridNavigationRow({
-      context: {
-        gridNavigationRowContext,
-        rovingTabIndexContext,
-        typeaheadNavigationContext
-      },
+      context,
       linearNavigationParameters,
       info: mcp1,
       managedChildrenReturn,
@@ -5337,13 +5326,13 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     });
     return {
       context: {
-        ...context,
-        singleSelectionContext
+        ...contextGridNavigation,
+        singleSelectionContext: context.singleSelectionContext
       },
       linearNavigationReturn,
       info: {
-        ...mcp2,
-        ...mcp3
+        ...infoSingleSelection,
+        ...infoGridNavigation
       },
       managedChildrenParameters,
       pressParameters: {
@@ -5356,7 +5345,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
           ocfic2 === null || ocfic2 === void 0 ? void 0 : ocfic2(hasFocus, hadFocus);
         })
       },
-      props: useMergedProps(propsGN, propsSS),
+      props: useMergedProps(propsGridNavigation, propsSingleSelection),
       rovingTabIndexChildReturn,
       rovingTabIndexReturn,
       singleSelectionChildReturn,
@@ -5632,7 +5621,16 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       typeaheadNavigationParameters,
       ...void1
     } = _ref31;
-    return useGridNavigationSingleSelectionRow({
+    const getSortValue = T$1(() => {
+      let rows = managedChildrenReturn.getChildren();
+      let columnIndex = context.gridNavigationRowContext.getTabbableColumn() || 0;
+      let cell = rows.getAt(columnIndex);
+      return cell === null || cell === void 0 ? void 0 : cell.getSortValue();
+    }, []);
+    const {
+      info,
+      ...gridNavRet
+    } = useGridNavigationSingleSelectionRow({
       context,
       info: {
         index,
@@ -5646,6 +5644,13 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       textContentParameters,
       typeaheadNavigationParameters
     });
+    return {
+      info: {
+        ...info,
+        getSortValue
+      },
+      ...gridNavRet
+    };
   }
   // EZ
   function useGridNavigationSingleSelectionSortableCell(_ref32) {
@@ -8103,12 +8108,6 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     });
     const completeInfo = {
       getElement: refElementReturn.getElement,
-      getSortValue: T$1(() => {
-        let rows = getChildren();
-        let columnIndex = contextIncomingForRowAsChildOfTable.gridNavigationRowContext.getTabbableColumn() || 0;
-        let cell = rows.getAt(columnIndex);
-        return cell === null || cell === void 0 ? void 0 : cell.getSortValue();
-      }, []),
       index,
       unselectable,
       untabbable,

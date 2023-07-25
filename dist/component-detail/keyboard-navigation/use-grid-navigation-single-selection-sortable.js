@@ -1,4 +1,5 @@
 import { assertEmptyObject } from "../../util/assert.js";
+import { useCallback } from "../../util/lib.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
 import { useGridNavigationSingleSelection, useGridNavigationSingleSelectionCell, useGridNavigationSingleSelectionRow } from "./use-grid-navigation-single-selection.js";
 import { useSortableChildren } from "./use-sortable-children.js";
@@ -29,7 +30,13 @@ export function useGridNavigationSingleSelectionSortableRow({ context, info: { i
     monitorCallCount(useGridNavigationSingleSelectionSortableRow);
     assertEmptyObject(void1);
     assertEmptyObject(void2);
-    return useGridNavigationSingleSelectionRow({
+    const getSortValue = useCallback(() => {
+        let rows = managedChildrenReturn.getChildren();
+        let columnIndex = context.gridNavigationRowContext.getTabbableColumn() || 0;
+        let cell = rows.getAt(columnIndex);
+        return cell?.getSortValue();
+    }, []);
+    const { info, ...gridNavRet } = useGridNavigationSingleSelectionRow({
         context,
         info: { index, unselectable, untabbable },
         linearNavigationParameters,
@@ -39,6 +46,10 @@ export function useGridNavigationSingleSelectionSortableRow({ context, info: { i
         textContentParameters,
         typeaheadNavigationParameters
     });
+    return {
+        info: { ...info, getSortValue },
+        ...gridNavRet
+    };
 }
 // EZ
 export function useGridNavigationSingleSelectionSortableCell({ context, gridNavigationCellParameters, info: { index, untabbable, ...void2 }, refElementReturn, textContentParameters, ...void1 }) {
