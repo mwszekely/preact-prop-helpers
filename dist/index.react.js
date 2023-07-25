@@ -136,16 +136,21 @@ function getBuildModeUnmemoized() {
         // As long as we're returning "production" due to it being unspecified, 
         // try to make sure anyone else who tries does too for consistency.
         // TODO: Good/bad idea?
-        try {
-            globalThis["process"] ??= {};
-            globalThis["process"]["env"] ??= {};
-            globalThis["process"]["env"]["NODE_ENV"] ??= "production";
+        /*try {
+            (globalThis as any)["process"] ??= {};
+            (globalThis as any)["process"]["env"] ??= {};
+            (globalThis as any)["process"]["env"]["NODE_ENV"] ??= "production";
         }
-        finally {
+        finally*/ {
             return "production";
         }
     }
 }
+/**
+ * Controls other development hooks by checking for a global variable called `process.env.NODE_ENV`
+ *
+ * @remarks Bundlers like Rollup will actually noop-out development code if  `process.env.NODE_ENV !== "development"` (which, of course, covers the default case where `process.env.NODE_ENV` just doesn't exist).
+ */
 function getBuildMode() {
     return cached ||= (getBuildModeUnmemoized());
 }
@@ -155,11 +160,40 @@ function getBuildMode() {
 window.requestIdleCallback ??= (callback) => {
     return setTimeout(() => { callback({ didTimeout: false, timeRemaining: () => { return 0; }, }); }, 5);
 };
+let timeoutHandle = null;
 function callCountU(hook) {
-    return;
+    const name = hook.name;
+    if (filterAll || filters.has(name))
+        return;
+    console.assert(name.length > 0);
+    window._hookCallCount ??= { callCounts: {} };
+    window._hookCallCount.callCounts[name] ??= { moment: 0, total: 0 };
+    window._hookCallCount.callCounts[name].moment += 1;
+    window._hookCallCount.callCounts[name].total += 1;
+    if (timeoutHandle == null) {
+        timeoutHandle = requestIdleCallback(() => {
+            //console.log((window as WindowWithHookCallCount)._hookCallCount.callCountsMoment);
+            //(window as WindowWithHookCallCount)._hookCallCount.callCountsMoment = {};
+            const o = Object.entries(window._hookCallCount.callCounts)
+                .map(([hook, counts]) => { return { Hook: hook || "?", Now: counts?.moment || 0, Total: counts?.total || 0 }; })
+                .filter(({ Now }) => { return !!Now; })
+                .sort(({ Now: lhsM }, { Now: rhsM }) => {
+                if (!lhsM && !rhsM)
+                    return 0;
+                lhsM ||= Infinity;
+                rhsM ||= Infinity;
+                return lhsM - rhsM;
+            });
+            console.table(o, ['Hook', 'Now', 'Total']);
+            Object.entries(window._hookCallCount.callCounts).forEach(([, counts]) => { counts.moment = 0; });
+            timeoutHandle = null;
+        });
+    }
 }
+let filterAll = false;
 const filters = new Set();
 function hideCallCount(hook) {
+    filterAll = (hook === "all");
     if (hook != "all")
         filters.add(hook.name);
 }
@@ -537,10 +571,10 @@ function getElementDepth(element) {
  *
  * @compositeParams
  */
-function useEscapeDismiss({ escapeDismissParameters: { onDismiss: onClose, active: open, getWindow: unstableGetWindow, parentDepth, ...void1 }, refElementPopupReturn: { getElement, ...void2 } }) {
+function useEscapeDismiss({ escapeDismissParameters: { onDismiss: onClose, active: open, getDocument: unstableGetDocument, parentDepth, ...void1 }, refElementPopupReturn: { getElement, ...void2 } }) {
     monitorCallCount(useEscapeDismiss);
     const stableOnClose = useStableCallback(onClose);
-    const getWindow = useStableCallback(unstableGetWindow);
+    const getDocument = useStableCallback(unstableGetDocument);
     const getDepth = useStableGetter(parentDepth + 1);
     // When this component opens, add an event listener that finds the deepest open soft dismiss element to actually dismiss.
     // Only opened components will add event handlers, and will remove them once closed.
@@ -553,7 +587,8 @@ function useEscapeDismiss({ escapeDismissParameters: { onDismiss: onClose, activ
     // then the first one to do so will wait for a microtask, 
     // then find the deepest element in the document tree to dismiss of all of those components currently open.
     useEffect(() => {
-        const window = getWindow();
+        const document = getDocument();
+        const window = document.defaultView;
         window[MagicWindowKey] ??= { microtaskQueued: false, elementQueue: new Map() };
         const info = window[MagicWindowKey];
         if (open) {
@@ -884,7 +919,7 @@ function mergeFunctions(lhs, rhs) {
 }
 
 function generateStack() {
-    if (getBuildMode() === 'development') {
+    if (getBuildMode() === 'development' && window._generate_setState_stacks) {
         try {
             throw new Error();
         }
@@ -895,7 +930,9 @@ function generateStack() {
     return undefined;
 }
 /**
- * @returns A function that retrieves the stack at the time this hook was called (in development mode only).
+ * Returns a function that retrieves the stack at the time this hook was called (in development mode only).
+ *
+ *
  */
 function useStack() {
     const stack = useMemo(generateStack, []);
@@ -962,6 +999,89 @@ function findBackupFocus(unmountingElement) {
     return bestCandidateAfter ?? bestCandidateBefore ?? document.body;
 }
 
+var l$1;l$1={__e:function(n,l,u,i){for(var t,r,o;l=l.__;)if((t=l.__c)&&!t.__)try{if((r=t.constructor)&&null!=r.getDerivedStateFromError&&(t.setState(r.getDerivedStateFromError(n)),o=t.__d),null!=t.componentDidCatch&&(t.componentDidCatch(n,i||{}),o=t.__d),o)return t.__E=t}catch(l){n=l;}throw n}},"function"==typeof Promise?Promise.prototype.then.bind(Promise.resolve()):setTimeout;
+
+var t,r,u,i,o$1=0,f=[],c=[],e=l$1.__b,a=l$1.__r,v=l$1.diffed,l=l$1.__c,m=l$1.unmount;function d(t,u){l$1.__h&&l$1.__h(r,t,o$1||u),o$1=0;var i=r.__H||(r.__H={__:[],__h:[]});return t>=i.__.length&&i.__.push({__V:c}),i.__[t]}function h(n){return o$1=1,s(B,n)}function s(n,u,i){var o=d(t++,2);if(o.t=n,!o.__c&&(o.__=[i?i(u):B(void 0,u),function(n){var t=o.__N?o.__N[0]:o.__[0],r=o.t(t,n);t!==r&&(o.__N=[r,o.__[1]],o.__c.setState({}));}],o.__c=r,!r.u)){var f=function(n,t,r){if(!o.__c.__H)return !0;var u=o.__c.__H.__.filter(function(n){return n.__c});if(u.every(function(n){return !n.__N}))return !c||c.call(this,n,t,r);var i=!1;return u.forEach(function(n){if(n.__N){var t=n.__[0];n.__=n.__N,n.__N=void 0,t!==n.__[0]&&(i=!0);}}),!(!i&&o.__c.props===n)&&(!c||c.call(this,n,t,r))};r.u=!0;var c=r.shouldComponentUpdate,e=r.componentWillUpdate;r.componentWillUpdate=function(n,t,r){if(this.__e){var u=c;c=void 0,f(n,t,r),c=u;}e&&e.call(this,n,t,r);},r.shouldComponentUpdate=f;}return o.__N||o.__}function F(n,r){var u=d(t++,7);return z(u.__H,r)?(u.__V=n(),u.i=r,u.__h=n,u.__V):u.__}function b(){for(var t;t=f.shift();)if(t.__P&&t.__H)try{t.__H.__h.forEach(k),t.__H.__h.forEach(w),t.__H.__h=[];}catch(r){t.__H.__h=[],l$1.__e(r,t.__v);}}l$1.__b=function(n){r=null,e&&e(n);},l$1.__r=function(n){a&&a(n),t=0;var i=(r=n.__c).__H;i&&(u===r?(i.__h=[],r.__h=[],i.__.forEach(function(n){n.__N&&(n.__=n.__N),n.__V=c,n.__N=n.i=void 0;})):(i.__h.forEach(k),i.__h.forEach(w),i.__h=[])),u=r;},l$1.diffed=function(t){v&&v(t);var o=t.__c;o&&o.__H&&(o.__H.__h.length&&(1!==f.push(o)&&i===l$1.requestAnimationFrame||((i=l$1.requestAnimationFrame)||j)(b)),o.__H.__.forEach(function(n){n.i&&(n.__H=n.i),n.__V!==c&&(n.__=n.__V),n.i=void 0,n.__V=c;})),u=r=null;},l$1.__c=function(t,r){r.some(function(t){try{t.__h.forEach(k),t.__h=t.__h.filter(function(n){return !n.__||w(n)});}catch(u){r.some(function(n){n.__h&&(n.__h=[]);}),r=[],l$1.__e(u,t.__v);}}),l&&l(t,r);},l$1.unmount=function(t){m&&m(t);var r,u=t.__c;u&&u.__H&&(u.__H.__.forEach(function(n){try{k(n);}catch(n){r=n;}}),u.__H=void 0,r&&l$1.__e(r,u.__v));};var g="function"==typeof requestAnimationFrame;function j(n){var t,r=function(){clearTimeout(u),g&&cancelAnimationFrame(t),setTimeout(n);},u=setTimeout(r,100);g&&(t=requestAnimationFrame(r));}function k(n){var t=r,u=n.__c;"function"==typeof u&&(n.__c=void 0,u()),r=t;}function w(n){var t=r;n.__c=n.__(),r=t;}function z(n,t){return !n||n.length!==t.length||t.some(function(t,r){return t!==n[r]})}function B(n,t){return "function"==typeof t?t(n):t}
+
+/**
+ * Runs a function the specified number of milliseconds after the component renders.
+ *
+ * @remarks This is particularly useful to function as "useEffect on a delay".
+ *
+ * @remarks
+ * {@include } {@link UseTimeoutParameters}
+ */
+function useTimeout({ timeout, callback, triggerIndex }) {
+    monitorCallCount(useTimeout);
+    const stableCallback = useStableCallback(() => { startTimeRef.current = null; callback(); });
+    const getTimeout = useStableGetter(timeout);
+    // Set any time we start timeout.
+    // Unset any time the timeout completes
+    const startTimeRef = useRef(null);
+    const timeoutIsNull = (timeout == null);
+    // Any time the triggerIndex changes (including on mount)
+    // restart the timeout.  The timeout does NOT reset
+    // when the duration or callback changes, only triggerIndex.
+    useEffect(() => {
+        if (!timeoutIsNull) {
+            const timeout = getTimeout();
+            console.assert(timeoutIsNull == (timeout == null));
+            if (timeout != null) {
+                startTimeRef.current = +(new Date());
+                const handle = setTimeout(stableCallback, timeout);
+                return () => clearTimeout(handle);
+            }
+        }
+    }, [triggerIndex, timeoutIsNull]);
+    const getElapsedTime = useCallback(() => {
+        return (+(new Date())) - (+(startTimeRef.current ?? new Date()));
+    }, []);
+    const getRemainingTime = useCallback(() => {
+        const timeout = getTimeout();
+        return timeout == null ? null : Math.max(0, timeout - getElapsedTime());
+    }, []);
+    return { getElapsedTime, getRemainingTime };
+}
+
+let idIndex = 0;
+/**
+ * Debug function that yells at you if your forgot to use the props a hook returns.
+ *
+ * @remarks Like other debug hooks, only has any effect IFF there is a global variable called `process.env.NODE_ENV` and it contains the value `"development"`.
+ *
+ * @param props - The props to return a modified copy of
+ * @param tag - Should be unique
+ * @returns A modified copy of the given props
+ */
+function useTagProps(props, tag) {
+    const [id] = h(() => ++idIndex);
+    const propsIdTag = `data-props-${tag}-${id}`;
+    const getStack = useStack();
+    if (getBuildMode() == 'development') {
+        // Don't have multiple tags of the same type on the same props, means a hook has been called twice!
+        console.assert(!(props && typeof props == "object" && tag in props));
+        useTimeout({
+            callback: () => {
+                let element = document.querySelectorAll(`[${propsIdTag}]`);
+                if (element.length != 1) {
+                    console.error("A hook returned props that were not properly spread to any HTMLElement:");
+                    console.log(getStack());
+                    /* eslint-disable no-debugger */
+                    debugger;
+                }
+            },
+            timeout: 250,
+            triggerIndex: tag
+        });
+        return F(() => {
+            return { ...props, [propsIdTag]: true /*, [tag as never]: true*/ };
+        }, [props, tag]);
+    }
+    else {
+        return props;
+    }
+}
+
 /**
  * When used in tandem with `useRovingTabIndex`, allows control of
  * the tabbable index with the arrow keys, Page Up/Page Down, or Home/End.
@@ -975,15 +1095,15 @@ function findBackupFocus(unmountingElement) {
 function useLinearNavigation({ rovingTabIndexReturn, linearNavigationParameters, paginatedChildrenParameters: { paginationMax, paginationMin, ...void2 }, ...void1 }) {
     monitorCallCount(useLinearNavigation);
     let getPaginatedRange = useStableGetter(paginationMax == null || paginationMin == null ? null : paginationMax - paginationMin);
-    const { getLowestIndex, getHighestIndex, indexDemangler, indexMangler, isValid, navigatePastEnd, navigatePastStart, onNavigateLinear } = linearNavigationParameters;
+    const { getLowestIndex, getHighestIndex, indexDemangler, indexMangler, isValidForLinearNavigation, navigatePastEnd, navigatePastStart, onNavigateLinear } = linearNavigationParameters;
     const { getTabbableIndex, setTabbableIndex } = rovingTabIndexReturn;
-    useEnsureStability("useLinearNavigation", onNavigateLinear, isValid, indexDemangler, indexMangler);
+    useEnsureStability("useLinearNavigation", onNavigateLinear, isValidForLinearNavigation, indexDemangler, indexMangler);
     const navigateAbsolute = useCallback((requestedIndexMangled, searchDirection, e, fromUserInteraction, mode) => {
         const highestChildIndex = getHighestIndex();
         const lowestChildIndex = getLowestIndex();
         (getTabbableIndex() ?? 0);
         const targetDemangled = indexDemangler(requestedIndexMangled);
-        const { status, valueDemangled } = tryNavigateToIndex({ isValid, lowestChildIndex, highestChildIndex, indexDemangler, indexMangler, searchDirection, targetDemangled });
+        const { status, valueDemangled } = tryNavigateToIndex({ isValid: isValidForLinearNavigation, lowestChildIndex, highestChildIndex, indexDemangler, indexMangler, searchDirection, targetDemangled });
         if (status == "past-end") {
             if (navigatePastEnd == "wrap") {
                 if (mode == "single")
@@ -1057,7 +1177,7 @@ function useLinearNavigation({ rovingTabIndexReturn, linearNavigationParameters,
     const getDisableHomeEndKeys = useStableGetter(linearNavigationParameters.disableHomeEndKeys);
     const getArrowKeyDirection = useStableGetter(linearNavigationParameters.arrowKeyDirection);
     const getPageNavigationSize = useStableGetter(linearNavigationParameters.pageNavigationSize);
-    const stableProps = useRef({
+    const stableProps = useRef(useTagProps({
         onKeyDown: (e) => {
             // Not handled by typeahead (i.e. assume this is a keyboard shortcut)
             if (e.ctrlKey || e.metaKey)
@@ -1122,7 +1242,7 @@ function useLinearNavigation({ rovingTabIndexReturn, linearNavigationParameters,
                 e.stopPropagation();
             }
         }
-    });
+    }, "data-linear-navigation"));
     return {
         linearNavigationReturn: {},
         propsStable: stableProps.current
@@ -1181,13 +1301,14 @@ function tryNavigateDown({ isValid, indexDemangler, indexMangler, targetDemangle
  *
  * @hasChild {@link useManagedChild}
  *
+ * {@include } {@link ManagedChildren}
+ *
  * @compositeParams
  */
 function useManagedChildren(parentParameters) {
     monitorCallCount(useManagedChildren);
     const { managedChildrenParameters: { onAfterChildLayoutEffect, onChildrenMountChange, onChildrenCountChange }, ...rest } = parentParameters;
     useEnsureStability("useManagedChildren", onAfterChildLayoutEffect, onChildrenMountChange, onChildrenCountChange);
-    //const [getMountCount, setMountCount] = usePassiveState(onChildrenCountChange, returnZero, runImmediately);
     const getHighestIndex = useCallback(() => { return managedChildrenArray.current.highestIndex; }, []);
     const getLowestIndex = useCallback(() => { return managedChildrenArray.current.lowestIndex; }, []);
     // All the information we have about our children is stored in this **stable** array.
@@ -1557,6 +1678,8 @@ function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovingTabIn
             let nextIndex = ((typeof updater === "function") ? updater(prevIndex ?? null) : updater);
             const untabbable = getUntabbable();
             let parentElement = getElement();
+            if (!parentElement)
+                debugger;
             console.assert(!!parentElement);
             // Whether or not we're currently tabbable, make sure that when we switch from untabbable to tabbable,
             // that we know which index to switch back to.
@@ -1603,7 +1726,7 @@ function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovingTabIn
             // Finally, return the value the user requested the index be set to.
             return nextIndex ?? 0;
         }, reason);
-    }, []);
+    });
     // When we switch from tabbable to non/tabbable, we really want to remember the last tabbable child.
     // So every time we change the index for any reason, record that change as a back up here that can be restored.
     const [getLastNonNullIndex, setLastNonNullIndex] = usePassiveState(null, useCallback(() => (initiallyTabbedIndex ?? 0), []));
@@ -1612,10 +1735,12 @@ function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovingTabIn
         let shouldFocusParentAfterwards = (getElement()?.contains(document.activeElement));
         if (untabbable)
             changeTabbableIndex(null, undefined);
-        else
+        else {
             changeTabbableIndex(getLastNonNullIndex(), undefined);
-        if (shouldFocusParentAfterwards)
-            focusSelf();
+        }
+        if (shouldFocusParentAfterwards) {
+            focusSelf(true);
+        }
     }, [untabbable]);
     // Boilerplate related to notifying individual children when they become tabbable/untabbable
     const getTabbableAt = useCallback((child) => { return child.getLocallyTabbable(); }, []);
@@ -1649,7 +1774,7 @@ function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovingTabIn
             }
         }
     });
-    const focusSelf = useCallback((reason) => {
+    const focusSelf = useCallback((force, reason) => {
         const children = getChildren();
         let index = getTabbableIndex();
         const untabbable = getUntabbable();
@@ -1658,7 +1783,7 @@ function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovingTabIn
             index ??= getInitiallyTabbedIndex() ?? children.getLowestIndex();
         }
         if (untabbable) {
-            if (document.activeElement != getElement() && untabbableBehavior != 'leave-child-focused') {
+            if (document.activeElement != getElement() && (force || untabbableBehavior != 'leave-child-focused')) {
                 focusSelfParent(getElement());
             }
         }
@@ -1674,15 +1799,15 @@ function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovingTabIn
         parentFocusSelf: focusSelf,
         getInitiallyTabbedIndex: useCallback(() => { return initiallyTabbedIndex ?? (untabbable ? null : 0); }, []),
         reevaluateClosestFit,
-        untabbable,
-        untabbableBehavior,
+        getUntabbable: useStableGetter(untabbable),
+        getUntabbableBehavior: useStableGetter(untabbableBehavior),
         giveParentFocusedElement: useCallback((e) => { lastFocused.current = e; }, [])
     });
     return {
         managedChildrenParameters: { onChildrenMountChange: reevaluateClosestFit, },
         rovingTabIndexReturn: { setTabbableIndex, getTabbableIndex, focusSelf },
         context: useMemoObject({ rovingTabIndexContext }),
-        props: {
+        props: useTagProps({
             // Note: Making this -1 instead of null is partially intentional --
             // it gives us time during useEffect to move focus back to the last focused element
             // (otherwise focus gets lost to the body, and useEffect thinks that it shouldn't
@@ -1701,7 +1826,7 @@ function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovingTabIn
                     }
                 }
             })*/
-        }
+        }, "data-roving-tab-index")
     };
 }
 /**
@@ -1711,7 +1836,7 @@ function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovingTabIn
  * @param args - {@link UseRovingTabIndexChildParameters}
  * @returns - {@link UseRovingTabIndexChildReturnType}
  */
-function useRovingTabIndexChild({ info: { index, untabbable: iAmUntabbable, ...void2 }, context: { rovingTabIndexContext: { giveParentFocusedElement, untabbable: parentIsUntabbable, untabbableBehavior, reevaluateClosestFit, setTabbableIndex, getInitiallyTabbedIndex, parentFocusSelf } }, refElementReturn: { getElement }, ...void3 }) {
+function useRovingTabIndexChild({ info: { index, untabbable: iAmUntabbable, ...void2 }, context: { rovingTabIndexContext: { giveParentFocusedElement, getUntabbable: getParentIsUntabbable, getUntabbableBehavior, reevaluateClosestFit, setTabbableIndex, getInitiallyTabbedIndex, parentFocusSelf } }, refElementReturn: { getElement }, ...void3 }) {
     monitorCallCount(useRovingTabIndexChild);
     const [tabbable, setTabbable, getTabbable] = useState(getInitiallyTabbedIndex() === index);
     useEffect(() => {
@@ -1726,10 +1851,12 @@ function useRovingTabIndexChild({ info: { index, untabbable: iAmUntabbable, ...v
         hasCurrentFocusParameters: {
             onCurrentFocusedInnerChanged: useStableCallback((focused, _prevFocused, e) => {
                 if (focused) {
+                    const parentIsUntabbable = getParentIsUntabbable();
+                    const untabbableBehavior = getUntabbableBehavior();
                     if ((!parentIsUntabbable && !iAmUntabbable) || untabbableBehavior != "focus-parent")
                         setTabbableIndex(index, e, false);
                     else
-                        parentFocusSelf();
+                        parentFocusSelf(false);
                 }
             })
         },
@@ -1738,10 +1865,10 @@ function useRovingTabIndexChild({ info: { index, untabbable: iAmUntabbable, ...v
             getTabbable,
         },
         info: { setLocallyTabbable: setTabbable, getLocallyTabbable: getTabbable },
-        props: {
+        props: useTagProps({
             tabIndex: (tabbable ? 0 : -1),
             ...{ inert: iAmUntabbable } // This inert is to prevent the edge case of clicking a hidden item and it focusing itself
-        },
+        }, "data-roving-tab-index-child"),
     };
 }
 
@@ -1774,7 +1901,7 @@ function useTextContent({ refElementReturn: { getElement }, textContentParameter
  *
  * @compositeParams
  */
-function useTypeaheadNavigation({ typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead, isValid, onNavigateTypeahead, ...void3 }, rovingTabIndexReturn: { getTabbableIndex: getIndex, setTabbableIndex: setIndex, ...void1 }, ...void2 }) {
+function useTypeaheadNavigation({ typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead, isValidForTypeaheadNavigation, onNavigateTypeahead, ...void3 }, rovingTabIndexReturn: { getTabbableIndex: getIndex, setTabbableIndex: setIndex, ...void1 }, ...void2 }) {
     //type EventType = Parameters<NonNullable<ElementProps<ParentOrChildElement>["onKeyDown"]>>[0];
     monitorCallCount(useTypeaheadNavigation);
     // For typeahead, keep track of what our current "search" string is (if we have one)
@@ -1830,7 +1957,7 @@ function useTypeaheadNavigation({ typeaheadNavigationParameters: { collator, typ
         return lhs - rhs;
     });
     const isDisabled = useStableGetter(noTypeahead);
-    const propsStable = useRef({
+    const propsStable = useRef(useTagProps({
         onKeyDown: useStableCallback((e) => {
             if (isDisabled())
                 return;
@@ -1869,7 +1996,7 @@ function useTypeaheadNavigation({ typeaheadNavigationParameters: { collator, typ
             setImeActive(false);
         }),
         onCompositionEnd: useStableCallback((_e) => { setImeActive(true); }),
-    });
+    }, "data-typeahead-navigation"));
     const excludeSpace = useStableCallback(() => { return typeaheadStatus != "none"; });
     return {
         context: useMemoObject({
@@ -1927,7 +2054,7 @@ function useTypeaheadNavigation({ typeaheadNavigationParameters: { collator, typ
                 let lowestUnsortedIndexNext = null;
                 let lowestSortedIndexNext = sortedTypeaheadIndex;
                 const updateBestFit = (u) => {
-                    if (!isValid(u))
+                    if (!isValidForTypeaheadNavigation(u))
                         return;
                     if (lowestUnsortedIndexAll == null || u < lowestUnsortedIndexAll) {
                         lowestUnsortedIndexAll = u;
@@ -2043,8 +2170,8 @@ function binarySearch(array, wanted, comparator) {
  */
 function useListNavigation({ linearNavigationParameters, typeaheadNavigationParameters, rovingTabIndexParameters, managedChildrenReturn, refElementReturn, paginatedChildrenParameters, ...void1 }) {
     monitorCallCount(useListNavigation);
-    const { context: { rovingTabIndexContext }, managedChildrenParameters, rovingTabIndexReturn, props: propsRTI, ...void2 } = useRovingTabIndex({ managedChildrenReturn, rovingTabIndexParameters, refElementReturn });
-    const { context: { typeaheadNavigationContext }, propsStable: propsStableTN, typeaheadNavigationReturn, ...void3 } = useTypeaheadNavigation({ rovingTabIndexReturn, typeaheadNavigationParameters, });
+    const { props: propsRTI, rovingTabIndexReturn, managedChildrenParameters, context: contextRovingTabIndex, ...void2 } = useRovingTabIndex({ managedChildrenReturn, rovingTabIndexParameters, refElementReturn });
+    const { propsStable: propsStableTN, typeaheadNavigationReturn, context: contextTypeahead, ...void3 } = useTypeaheadNavigation({ rovingTabIndexReturn, typeaheadNavigationParameters, });
     const { propsStable: propsStableLN, linearNavigationReturn, ...void4 } = useLinearNavigation({ rovingTabIndexReturn, linearNavigationParameters, paginatedChildrenParameters });
     // Merge the props while keeping them stable
     // (TODO: We run this merge logic every render but only need the first render's result because it's stable)
@@ -2055,8 +2182,8 @@ function useListNavigation({ linearNavigationParameters, typeaheadNavigationPara
         rovingTabIndexReturn,
         typeaheadNavigationReturn,
         context: useMemoObject({
-            rovingTabIndexContext,
-            typeaheadNavigationContext
+            ...contextRovingTabIndex,
+            ...contextTypeahead
         }),
         linearNavigationReturn,
         propsStableParentOrChild: propsStable.current,
@@ -2146,25 +2273,34 @@ refElementReturn, ...void1 }) {
     const getIndex = useStableCallback(() => { return managedChildParameters.index; });
     const whenThisRowIsFocused = useStableCallback((e) => {
         const { getChildren } = managedChildrenReturn;
-        let { ideal, actual } = (getTabbableColumn());
-        let index = (ideal ?? 0);
-        let child = getChildren().getAt(index);
-        let lowestIndex = getChildren().getLowestIndex();
-        let highestIndex = getChildren().getHighestIndex();
-        while ((!child || child.untabbable) && index > lowestIndex) {
-            --index;
-            child = getChildren().getAt(index);
-        }
-        while ((!child || child.untabbable) && index <= highestIndex) {
-            ++index;
-            child = getChildren().getAt(index);
-        }
-        if (child) {
-            const e = child.getElement();
-            child.focusSelf(e);
+        if (contextFromParent.rovingTabIndexContext.getUntabbable()) {
+            // If the parent is untabbable, and this row was requested to focus itself (as part of parentFocusSelf),
+            // then we focus the parent grid instead of the child cell.
+            contextFromParent.rovingTabIndexContext.parentFocusSelf(true);
         }
         else {
-            focus(e);
+            // If the parent is tabbable (normal behavior), 
+            // then we focus the cell that should be focused in this row.
+            let { ideal, actual } = (getTabbableColumn());
+            let index = (ideal ?? 0);
+            let child = getChildren().getAt(index);
+            let lowestIndex = getChildren().getLowestIndex();
+            let highestIndex = getChildren().getHighestIndex();
+            while ((!child || child.untabbable) && index > lowestIndex) {
+                --index;
+                child = getChildren().getAt(index);
+            }
+            while ((!child || child.untabbable) && index <= highestIndex) {
+                ++index;
+                child = getChildren().getAt(index);
+            }
+            if (child) {
+                const e = child.getElement();
+                child.focusSelf(e);
+            }
+            else {
+                focus(e);
+            }
         }
     }, []);
     const focusSelf = whenThisRowIsFocused;
@@ -2208,7 +2344,8 @@ refElementReturn, ...void1 }) {
     // TODO: propsLN2 (awful name) is just the tabIndex=0 or -1 from rovingTabIndex, which flips around when `untabbable` flips.
     // We can ignore it here, because our tabIndex is entirely controlled by our own list navigation,
     // but it shouldn't just be ignored wholesale like this.
-    const props = useMergedProps(propsLN, /*propsLN2,*/ propsLNC, {
+    propsLN2.tabIndex = propsLN.tabIndex ?? propsLNC.tabIndex;
+    const props = useMergedProps(propsLN, propsLN2, propsLNC, {
         // Ensure that if the browser focuses the row for whatever reason, we transfer the focus to a child cell.
         onFocus: useStableCallback(e => whenThisRowIsFocused(e.currentTarget))
     });
@@ -2219,7 +2356,7 @@ refElementReturn, ...void1 }) {
     });
     return {
         context: contextToChildren,
-        props,
+        props: useTagProps(props, "data-use-grid-navigation-partial-row"),
         info: { focusSelf, ...info },
         ...ulncRet,
         ...ulnRet,
@@ -2331,16 +2468,19 @@ function useSingleSelection({ managedChildrenReturn: { getChildren, ...void1 }, 
 function useSingleSelectionChild({ context: { singleSelectionContext: { getSelectedIndex, onSelectedIndexChange, ariaPropName, selectionMode, ...void1 }, ...void2 }, info: { index, unselectable, ...void3 }, ...void4 }) {
     monitorCallCount(useSingleSelectionChild);
     useEnsureStability("useSingleSelectionChild", getSelectedIndex, onSelectedIndexChange);
-    useStableGetter(unselectable);
+    //const getUnselectable = useStableGetter(unselectable);
     const [localSelected, setLocalSelected, getLocalSelected] = useState(getSelectedIndex() == index);
     const [direction, setDirection, getDirection] = useState(getSelectedIndex() == null ? null : (getSelectedIndex() - index));
     const onCurrentFocusedInnerChanged = useStableCallback((focused, _prev, e) => {
-        if (selectionMode == 'focus' && focused) {
+        if (selectionMode == 'focus' && focused && !unselectable) {
             onSelectedIndexChange?.(enhanceEvent(e, { selectedIndex: index }));
         }
     });
+    const onPressSync = useStableCallback((e) => {
+        if (selectionMode == 'activation' && !unselectable)
+            onSelectedIndexChange?.(enhanceEvent(e, { selectedIndex: index }));
+    });
     const propParts = ariaPropName?.split("-") ?? [];
-    const onPressSync = useStableCallback((e) => { onSelectedIndexChange?.(enhanceEvent(e, { selectedIndex: index })); });
     return {
         info: {
             setLocalSelected: useStableCallback((selected, direction) => {
@@ -2356,9 +2496,9 @@ function useSingleSelectionChild({ context: { singleSelectionContext: { getSelec
             selectedOffset: direction,
             getSelectedOffset: getDirection,
         },
-        props: ariaPropName == null || selectionMode == "disabled" ? {} : {
+        props: useTagProps(ariaPropName == null || selectionMode == "disabled" ? {} : {
             [`${propParts[0]}-${propParts[1]}`]: (localSelected ? (propParts[1] == "current" ? `${propParts[2]}` : `true`) : "false")
-        },
+        }, "data-single-selection-child"),
         hasCurrentFocusParameters: { onCurrentFocusedInnerChanged },
         pressParameters: { onPressSync: onSelectedIndexChange ? onPressSync : null }
     };
@@ -2656,8 +2796,8 @@ function useListNavigationSingleSelection({ linearNavigationParameters, rovingTa
             ...contextLN,
             ...contextSS
         }),
-        propsParent,
-        propsStableParentOrChild
+        propsStableParentOrChild: propsStableParentOrChild,
+        propsParent: propsParent,
     };
 }
 function useListNavigationSingleSelectionChild({ info: { index, untabbable, unselectable, ...void2 }, context, refElementReturn, textContentParameters, ...void1 }) {
@@ -2774,7 +2914,7 @@ function useRefElement(args) {
     }, []);
     // Let us store the actual (reference to) the element we capture
     const [getElement, setElement] = usePassiveState(handler, returnNull, runImmediately);
-    const propsStable = useRef({ ref: setElement });
+    const propsStable = useRef(useTagProps({ ref: setElement }, "data-use-ref-element"));
     // Return both the element and the hook that modifies 
     // the props and allows us to actually find the element
     return {
@@ -2861,12 +3001,12 @@ function windowBlur(e) {
  *
  * @compositeParams
  */
-function useActiveElement({ activeElementParameters: { onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument, getWindow } }) {
+function useActiveElement({ activeElementParameters: { onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument } }) {
     monitorCallCount(useActiveElement);
-    useEnsureStability("useActiveElement", onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument, getWindow);
+    useEnsureStability("useActiveElement", onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument);
     useEffect(() => {
         const document = getDocument();
-        const window = (getWindow?.(document) ?? document?.defaultView);
+        const window = (document?.defaultView);
         if ((activeElementUpdaters.get(window)?.size ?? 0) === 0) {
             document?.addEventListener("focusin", focusin, { passive: true });
             document?.addEventListener("focusout", focusout, { passive: true });
@@ -2902,7 +3042,7 @@ function useActiveElement({ activeElementParameters: { onActiveElementChange, on
  *
  * @compositeParams
  */
-function useDismiss({ dismissParameters: { open: globalOpen, onClose: globalOnClose, closeOnBackdrop, closeOnEscape, closeOnLostFocus }, escapeDismissParameters: { getWindow, parentDepth } }) {
+function useDismiss({ dismissParameters: { open: globalOpen, onClose: globalOnClose, closeOnBackdrop, closeOnEscape, closeOnLostFocus, ...void3 }, escapeDismissParameters: { parentDepth, ...void2 }, activeElementParameters: { getDocument, onActiveElementChange, onLastActiveElementChange: olaec1, onWindowFocusedChange, ...void5 }, ...void4 }) {
     monitorCallCount(useDismiss);
     const { refElementReturn: refElementSourceReturn, propsStable: propsStableSource } = useRefElement({ refElementParameters: {} });
     const { refElementReturn: refElementPopupReturn, propsStable: propsStablePopup } = useRefElement({ refElementParameters: {} });
@@ -2910,17 +3050,21 @@ function useDismiss({ dismissParameters: { open: globalOpen, onClose: globalOnCl
     const onCloseEscape = useCallback(() => { return globalOnClose?.("escape"); }, [globalOnClose]);
     const onCloseFocus = useCallback(() => { return globalOnClose?.("lost-focus"); }, [globalOnClose]);
     useBackdropDismiss({ backdropDismissParameters: { onDismiss: onCloseBackdrop, active: (closeOnBackdrop && globalOpen) }, refElementPopupReturn });
-    useEscapeDismiss({ escapeDismissParameters: { getWindow, onDismiss: onCloseEscape, active: (closeOnEscape && globalOpen), parentDepth }, refElementPopupReturn });
-    const { activeElementParameters } = useLostFocusDismiss({ lostFocusDismissParameters: { onDismiss: onCloseFocus, active: (closeOnLostFocus && globalOpen) }, refElementPopupReturn, refElementSourceReturn });
-    const getDocument = useCallback(() => {
-        return getWindow().document;
-    }, [getWindow]);
-    useActiveElement({ activeElementParameters: { ...activeElementParameters, getWindow, getDocument } });
+    useEscapeDismiss({ escapeDismissParameters: { getDocument, onDismiss: onCloseEscape, active: (closeOnEscape && globalOpen), parentDepth }, refElementPopupReturn });
+    const { activeElementParameters: { onLastActiveElementChange: olaec2, ...void1 } } = useLostFocusDismiss({ lostFocusDismissParameters: { onDismiss: onCloseFocus, active: (closeOnLostFocus && globalOpen) }, refElementPopupReturn, refElementSourceReturn });
+    useActiveElement({
+        activeElementParameters: {
+            onLastActiveElementChange: useStableCallback((a, b) => { olaec2?.(a, b); olaec1?.(a, b); }),
+            onActiveElementChange,
+            onWindowFocusedChange,
+            getDocument
+        }
+    });
     return {
         refElementSourceReturn,
         refElementPopupReturn,
-        propsStableSource,
-        propsStablePopup
+        propsStableSource: propsStableSource,
+        propsStablePopup: propsStablePopup
     };
 }
 
@@ -2956,14 +3100,17 @@ function blockingElements() { return getDocument().$blockingElements; }
  *
  * @param target
  */
-function useBlockingElement(enabled, getTarget) {
+function useBlockingElement({ activeElementParameters: { getDocument, onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, ...void3 }, blockingElementParameters: { enabled, getTarget, ...void1 }, ...void2 }) {
     monitorCallCount(useBlockingElement);
     const stableGetTarget = useStableCallback(getTarget);
-    const getDocument = useStableCallback(() => (getTarget()?.ownerDocument ?? globalThis.document));
+    //const getDocument = useStableCallback(() => (getTarget()?.ownerDocument ?? globalThis.document));
     useActiveElement({
         activeElementParameters: {
             getDocument,
-            onLastActiveElementChange: useStableCallback((e) => {
+            onActiveElementChange,
+            onWindowFocusedChange,
+            onLastActiveElementChange: useStableCallback((e, prev, reason) => {
+                onLastActiveElementChange?.(e, prev, reason);
                 if (e) {
                     if (enabled)
                         setLastActiveWhenOpen(e);
@@ -3009,7 +3156,7 @@ function useBlockingElement(enabled, getTarget) {
  *
  * @compositeParams
  */
-function useFocusTrap({ focusTrapParameters: { onlyMoveFocus, trapActive, focusPopup: focusSelfUnstable, focusOpener: focusOpenerUnstable }, refElementReturn }) {
+function useFocusTrap({ focusTrapParameters: { onlyMoveFocus, trapActive, focusPopup: focusSelfUnstable, focusOpener: focusOpenerUnstable }, activeElementParameters, refElementReturn }) {
     monitorCallCount(useFocusTrap);
     const focusSelf = useStableCallback(focusSelfUnstable);
     const focusOpener = useStableCallback(focusOpenerUnstable);
@@ -3038,9 +3185,15 @@ function useFocusTrap({ focusTrapParameters: { onlyMoveFocus, trapActive, focusP
         }
     }, [trapActive]);
     const { getElement } = refElementReturn;
-    const { getTop, getLastActiveWhenClosed, getLastActiveWhenOpen } = useBlockingElement(trapActive && !onlyMoveFocus, getElement);
+    const { getTop, getLastActiveWhenClosed, getLastActiveWhenOpen } = useBlockingElement({
+        activeElementParameters,
+        blockingElementParameters: {
+            enabled: trapActive && !onlyMoveFocus,
+            getTarget: getElement
+        }
+    });
     return {
-        props: { "aria-modal": trapActive ? "true" : undefined }
+        props: useTagProps({ "aria-modal": trapActive ? "true" : undefined }, "data-focus-trap")
     };
 }
 /**
@@ -3153,7 +3306,7 @@ function usePaginatedChild({ info: { index }, context: { paginatedChildContext: 
     const [childCountIfPaginated, setChildCountIfPaginated] = useState(null);
     const [paginatedVisible, setPaginatedVisible] = useState(parentIsPaginated ? getDefaultPaginationVisible(index) : true);
     return {
-        props: !parentIsPaginated ? {} : { "aria-setsize": childCountIfPaginated ?? undefined, "aria-posinset": (index + 1) },
+        props: useTagProps(!parentIsPaginated ? {} : { "aria-setsize": childCountIfPaginated ?? undefined, "aria-posinset": (index + 1) }, "data-paginated-children-child"),
         paginatedChildReturn: { /*paginatedVisible,*/ parentIsPaginated, hideBecausePaginated: parentIsPaginated ? !paginatedVisible : false },
         info: {
             setPaginationVisible: setPaginatedVisible,
@@ -3279,7 +3432,7 @@ function useStaggeredChild({ info: { index }, context: { staggeredChildContext: 
             childCallsThisToTellTheParentToMountTheNextOne(index);
     }, [index, (parentIsStaggered && staggeredVisible)]);
     return {
-        props: !parentIsStaggered ? {} : { "aria-busy": (!staggeredVisible).toString() },
+        props: useTagProps(!parentIsStaggered ? {} : { "aria-busy": (!staggeredVisible).toString() }, "data-staggered-children-child"),
         staggeredChildReturn: { parentIsStaggered, hideBecauseStaggered: parentIsStaggered ? !staggeredVisible : false },
         info: { setStaggeredVisible: setStaggeredVisible, }
     };
@@ -3390,7 +3543,7 @@ function useCompleteGridNavigation({ gridNavigationParameters, linearNavigationP
     const getChildren = useCallback(() => managedChildrenReturn.getChildren(), []);
     const getLowestChildIndex = useCallback(() => getChildren().getLowestIndex(), []);
     const getHighestChildIndex = useCallback(() => getChildren().getHighestIndex(), []);
-    const isValid = useCallback((i) => {
+    const isValidForNavigation = useCallback((i) => {
         const child = getChildren().getAt(i);
         if (child == null)
             return false;
@@ -3398,14 +3551,14 @@ function useCompleteGridNavigation({ gridNavigationParameters, linearNavigationP
             return false;
         return true;
     }, []);
-    const { refElementReturn } = useRefElement({});
+    const { refElementReturn, propsStable, ...void2 } = useRefElement({});
     const { childrenHaveFocusParameters, managedChildrenParameters, context: { gridNavigationRowContext, rovingTabIndexContext, singleSelectionContext, typeaheadNavigationContext }, rearrangeableChildrenReturn, propsParent, propsStableParentOrChild, rovingTabIndexReturn, ...gridNavigationSingleSelectionReturn } = useGridNavigationSingleSelectionSortable({
         gridNavigationParameters,
-        linearNavigationParameters: { getLowestIndex: getLowestChildIndex, getHighestIndex: getHighestChildIndex, isValid, ...linearNavigationParameters },
+        linearNavigationParameters: { getLowestIndex: getLowestChildIndex, getHighestIndex: getHighestChildIndex, isValidForLinearNavigation: isValidForNavigation, ...linearNavigationParameters },
         managedChildrenReturn: { getChildren },
         rovingTabIndexParameters: { initiallyTabbedIndex: singleSelectionParameters.initiallySelectedIndex, untabbableBehavior: "focus-parent", ...rovingTabIndexParameters },
         singleSelectionParameters,
-        typeaheadNavigationParameters: { isValid, ...typeaheadNavigationParameters },
+        typeaheadNavigationParameters: { isValidForTypeaheadNavigation: isValidForNavigation, ...typeaheadNavigationParameters },
         paginatedChildrenParameters,
         refElementReturn,
         rearrangeableChildrenParameters: {
@@ -3432,7 +3585,7 @@ function useCompleteGridNavigation({ gridNavigationParameters, linearNavigationP
     });
     return {
         context,
-        props: useMergedProps(propsParent, propsStableParentOrChild),
+        props: useMergedProps(propsParent, propsStable, propsStableParentOrChild),
         managedChildrenReturn,
         rearrangeableChildrenReturn,
         staggeredChildrenReturn,
@@ -3445,7 +3598,7 @@ function useCompleteGridNavigation({ gridNavigationParameters, linearNavigationP
 /**
  * @compositeParams
  */
-function useCompleteGridNavigationRow({ info: { index, unselectable, untabbable, ...customUserInfo }, context: contextIncomingForRowAsChildOfTable, textContentParameters, linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, ...void1 }) {
+function useCompleteGridNavigationRow({ info: { index, unselectable, untabbable, ...customUserInfo }, context: contextIncomingForRowAsChildOfTable, textContentParameters, linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, hasCurrentFocusParameters: { onCurrentFocusedChanged: ocfc1, onCurrentFocusedInnerChanged: ocfic3, ...void5 }, ...void1 }) {
     monitorCallCount(useCompleteGridNavigationRow);
     const { info: infoPaginatedChild, paginatedChildReturn, props: paginationProps } = usePaginatedChild({ info: { index }, context: contextIncomingForRowAsChildOfTable });
     const { info: infoStaggeredChild, // { setParentIsStaggered, setStaggeredVisible },
@@ -3455,7 +3608,7 @@ function useCompleteGridNavigationRow({ info: { index, unselectable, untabbable,
     const getChildren = useCallback(() => managedChildrenReturn.getChildren(), []);
     const getHighestChildIndex = useCallback(() => getChildren().getHighestIndex(), []);
     const getLowestChildIndex = useCallback(() => getChildren().getLowestIndex(), []);
-    const isValid = useCallback((i) => {
+    const isValidForNavigation = useCallback((i) => {
         const child = getChildren().getAt(i);
         if (child == null)
             return false;
@@ -3463,11 +3616,11 @@ function useCompleteGridNavigationRow({ info: { index, unselectable, untabbable,
             return false;
         return true;
     }, []);
-    const { refElementReturn, propsStable } = useRefElement({ refElementParameters: {} });
+    const { refElementReturn, propsStable, ...void6 } = useRefElement({ refElementParameters: {} });
     const r = useGridNavigationSingleSelectionSortableRow({
         rovingTabIndexParameters,
-        typeaheadNavigationParameters: { isValid, ...typeaheadNavigationParameters },
-        linearNavigationParameters: { isValid, getHighestIndex: getHighestChildIndex, getLowestIndex: getLowestChildIndex, pageNavigationSize: 0, indexDemangler: identity, indexMangler: identity, ...linearNavigationParameters },
+        typeaheadNavigationParameters: { isValidForTypeaheadNavigation: isValidForNavigation, ...typeaheadNavigationParameters },
+        linearNavigationParameters: { isValidForLinearNavigation: isValidForNavigation, getHighestIndex: getHighestChildIndex, getLowestIndex: getLowestChildIndex, pageNavigationSize: 0, indexDemangler: identity, indexMangler: identity, ...linearNavigationParameters },
         managedChildrenReturn: { getChildren },
         refElementReturn,
         context: contextIncomingForRowAsChildOfTable,
@@ -3485,15 +3638,23 @@ function useCompleteGridNavigationRow({ info: { index, unselectable, untabbable,
         ...infoPaginatedChild,
         ...infoStaggeredChild,
     };
-    const { managedChildReturn } = useManagedChild({ context: contextIncomingForRowAsChildOfTable, info: { ...completeInfo, ...customUserInfo } });
+    const { managedChildReturn, ...void4 } = useManagedChild({ context: contextIncomingForRowAsChildOfTable, info: { ...completeInfo, ...customUserInfo } });
     const context = useMemoObject({
         ...contextGNR,
         ...contextMC,
         //completeGridNavigationCellContext: { excludeSpace }
     });
-    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ...void4 } } = useChildrenHaveFocusChild({ context: contextIncomingForRowAsChildOfTable });
-    //const { refElementReturn } = useRefElement<RowElement>({ refElementParameters: {} })
-    const { hasCurrentFocusReturn } = useHasCurrentFocus({ refElementReturn, hasCurrentFocusParameters: { onCurrentFocusedChanged: useStableCallback((a, b) => { ocfic1?.(a, b); ocfic2?.(a, b); }) } });
+    const { hasCurrentFocusReturn } = useHasCurrentFocus({
+        refElementReturn,
+        hasCurrentFocusParameters: {
+            onCurrentFocusedChanged: ocfc1,
+            onCurrentFocusedInnerChanged: useStableCallback((focused, prevFocused) => {
+                // Call grid navigation's focus change
+                ocfic1?.(focused, prevFocused);
+                ocfic3?.(focused, prevFocused);
+            }),
+        }
+    });
     const props = useMergedProps(propsStable, p3, hasCurrentFocusReturn.propsStable, paginationProps, staggeredProps);
     return {
         pressParameters,
@@ -3586,7 +3747,7 @@ function useCompleteListNavigation({ linearNavigationParameters, rearrangeableCh
     const getChildren = useCallback(() => managedChildrenReturn.getChildren(), []);
     const getLowestIndex = useCallback(() => getChildren().getLowestIndex(), []);
     const getHighestIndex = useCallback(() => getChildren().getHighestIndex(), []);
-    const isValid = useCallback((i) => {
+    const isValidForNavigation = useCallback((i) => {
         const child = getChildren().getAt(i);
         if (!child)
             return false;
@@ -3597,8 +3758,8 @@ function useCompleteListNavigation({ linearNavigationParameters, rearrangeableCh
     const { propsStable: propsRef, refElementReturn } = useRefElement({});
     const { childrenHaveFocusParameters, managedChildrenParameters: { onChildrenMountChange, ...mcp1 }, context: { rovingTabIndexContext, singleSelectionContext, typeaheadNavigationContext }, linearNavigationReturn, rovingTabIndexReturn, singleSelectionReturn, typeaheadNavigationReturn, rearrangeableChildrenReturn, sortableChildrenReturn, propsParent, propsStableParentOrChild } = useListNavigationSingleSelectionSortable({
         managedChildrenReturn: { getChildren },
-        linearNavigationParameters: { getLowestIndex, getHighestIndex, isValid, ...linearNavigationParameters },
-        typeaheadNavigationParameters: { isValid, ...typeaheadNavigationParameters },
+        linearNavigationParameters: { getLowestIndex, getHighestIndex, isValidForLinearNavigation: isValidForNavigation, ...linearNavigationParameters },
+        typeaheadNavigationParameters: { isValidForTypeaheadNavigation: isValidForNavigation, ...typeaheadNavigationParameters },
         rovingTabIndexParameters: { initiallyTabbedIndex: initiallySelectedIndex, untabbableBehavior: "focus-parent", ...rovingTabIndexParameters },
         singleSelectionParameters,
         rearrangeableChildrenParameters: {
@@ -3609,7 +3770,7 @@ function useCompleteListNavigation({ linearNavigationParameters, rearrangeableCh
         refElementReturn,
         sortableChildrenParameters
     });
-    const { context: { childrenHaveFocusChildContext }, childrenHaveFocusReturn } = useChildrenHaveFocus({ childrenHaveFocusParameters });
+    //const { context: { childrenHaveFocusChildContext }, childrenHaveFocusReturn } = useChildrenHaveFocus({ childrenHaveFocusParameters });
     const { paginatedChildrenReturn, paginatedChildrenReturn: { refreshPagination }, managedChildrenParameters: mcp2, context: { paginatedChildContext } } = usePaginatedChildren({ refElementReturn, managedChildrenReturn: { getChildren: useStableCallback(() => managedChildrenReturn.getChildren()) }, rovingTabIndexReturn, paginatedChildrenParameters, linearNavigationParameters: { indexDemangler: rearrangeableChildrenReturn.indexDemangler } });
     const { context: { staggeredChildContext }, staggeredChildrenReturn } = useStaggeredChildren({ managedChildrenReturn: { getChildren: useStableCallback(() => managedChildrenReturn.getChildren()) }, staggeredChildrenParameters });
     const mcr = useManagedChildren({
@@ -3621,7 +3782,7 @@ function useCompleteListNavigation({ linearNavigationParameters, rearrangeableCh
     });
     const { context: { managedChildContext }, managedChildrenReturn } = mcr;
     const context = useMemoObject(useMemoObject({
-        childrenHaveFocusChildContext,
+        //childrenHaveFocusChildContext,
         managedChildContext,
         paginatedChildContext,
         rovingTabIndexContext,
@@ -3641,7 +3802,7 @@ function useCompleteListNavigation({ linearNavigationParameters, rearrangeableCh
         rovingTabIndexReturn,
         singleSelectionReturn,
         typeaheadNavigationReturn,
-        childrenHaveFocusReturn
+        //childrenHaveFocusReturn
     };
 }
 /**
@@ -3649,9 +3810,8 @@ function useCompleteListNavigation({ linearNavigationParameters, rearrangeableCh
  * @compositeParams
  */
 function useCompleteListNavigationChild({ info: { index, focusSelf, unselectable, untabbable, getSortValue, ...customUserInfo }, // The "...info" is empty if M is the same as UCLNCI<ChildElement>.
-textContentParameters, context: { childrenHaveFocusChildContext, managedChildContext, rovingTabIndexContext, paginatedChildContext, staggeredChildContext, singleSelectionContext, typeaheadNavigationContext }, ...void1 }) {
+textContentParameters, context: { managedChildContext, rovingTabIndexContext, paginatedChildContext, staggeredChildContext, singleSelectionContext, typeaheadNavigationContext }, ...void1 }) {
     monitorCallCount(useCompleteListNavigationChild);
-    //const { onPressSync, ...pressParameters1 } = (pressParameters ?? {});
     const { info: infoFromPaginated, paginatedChildReturn, paginatedChildReturn: { hideBecausePaginated }, props: paginationProps } = usePaginatedChild({ info: { index }, context: { paginatedChildContext } });
     const { info: infoFromStaggered, staggeredChildReturn, staggeredChildReturn: { hideBecauseStaggered }, props: staggeredProps } = useStaggeredChild({ info: { index }, context: { staggeredChildContext } });
     untabbable ||= (hideBecausePaginated || hideBecauseStaggered);
@@ -3659,17 +3819,17 @@ textContentParameters, context: { childrenHaveFocusChildContext, managedChildCon
     if (untabbable)
         unselectable = true;
     const { refElementReturn, propsStable } = useRefElement({ refElementParameters: {} });
-    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1 }, pressParameters: { excludeSpace, ...pressParameters2 }, textContentReturn, singleSelectionChildReturn, info: infoFromListNav, rovingTabIndexChildReturn, propsChild, propsTabbable } = useListNavigationSingleSelectionChild({
+    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void3 }, pressParameters: { excludeSpace, onPressSync, ...void2 }, textContentReturn, singleSelectionChildReturn, info: infoFromListNav, rovingTabIndexChildReturn, propsChild, propsTabbable, ...void4 } = useListNavigationSingleSelectionChild({
         info: { index, unselectable, untabbable },
         context: { rovingTabIndexContext, singleSelectionContext, typeaheadNavigationContext },
         refElementReturn,
         textContentParameters
     });
-    const onPress = useStableCallback((e) => {
+    /*const onPress = useStableCallback((e: PressEventReason<any>) => {
         if (singleSelectionContext.selectionMode == "activation")
             singleSelectionContext.onSelectedIndexChange?.(enhanceEvent(e, { selectedIndex: index }));
-    });
-    const onPressSync = (rovingTabIndexContext.untabbable || unselectable || untabbable) ? null : onPress;
+    });*/
+    //const onPressSync = (rovingTabIndexContext.untabbable || unselectable || untabbable) ? null : onPress;
     const allStandardInfo = {
         index,
         focusSelf,
@@ -3682,10 +3842,10 @@ textContentParameters, context: { childrenHaveFocusChildContext, managedChildCon
         ...infoFromListNav,
     };
     const { managedChildReturn } = useManagedChild({ context: { managedChildContext }, info: { ...allStandardInfo, ...customUserInfo } });
-    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2 } } = useChildrenHaveFocusChild({ context: { childrenHaveFocusChildContext } });
+    //const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2 } } = useChildrenHaveFocusChild({ context: { childrenHaveFocusChildContext } });
     const onCurrentFocusedInnerChanged = useStableCallback((focused, prev, e) => {
         ocfic1?.(focused, prev, e);
-        ocfic2?.(focused, prev, e);
+        //ocfic2?.(focused, prev, e);
     });
     const { hasCurrentFocusReturn } = useHasCurrentFocus({ hasCurrentFocusParameters: { onCurrentFocusedInnerChanged, onCurrentFocusedChanged: null }, refElementReturn });
     const props = useMergedProps(propsStable, hasCurrentFocusReturn.propsStable, propsChild, paginationProps, staggeredProps);
@@ -3735,13 +3895,18 @@ function useCompleteListNavigationDeclarative({ linearNavigationParameters, pagi
  *
  * @compositeParams
  */
-function useModal({ dismissParameters, escapeDismissParameters, focusTrapParameters: { trapActive, ...focusTrapParameters } }) {
+function useModal({ dismissParameters, escapeDismissParameters, focusTrapParameters: { trapActive, ...focusTrapParameters }, activeElementParameters, ...void1 }) {
     monitorCallCount(useModal);
     const { open } = dismissParameters;
-    const { refElementPopupReturn, refElementSourceReturn, propsStablePopup, propsStableSource } = useDismiss({ dismissParameters, escapeDismissParameters });
+    const { refElementPopupReturn, refElementSourceReturn, propsStablePopup, propsStableSource } = useDismiss({
+        dismissParameters,
+        escapeDismissParameters,
+        activeElementParameters
+    });
     const { propsStable, refElementReturn } = useRefElement({});
     const { props } = useFocusTrap({
         focusTrapParameters: { trapActive: open && trapActive, ...focusTrapParameters },
+        activeElementParameters,
         refElementReturn
     });
     return {
@@ -3751,46 +3916,6 @@ function useModal({ dismissParameters, escapeDismissParameters, focusTrapParamet
         propsStablePopup,
         propsStableSource
     };
-}
-
-/**
- * Runs a function the specified number of milliseconds after the component renders.
- *
- * @remarks This is particularly useful to function as "useEffect on a delay".
- *
- * @remarks
- * {@include } {@link UseTimeoutParameters}
- */
-function useTimeout({ timeout, callback, triggerIndex }) {
-    monitorCallCount(useTimeout);
-    const stableCallback = useStableCallback(() => { startTimeRef.current = null; callback(); });
-    const getTimeout = useStableGetter(timeout);
-    // Set any time we start timeout.
-    // Unset any time the timeout completes
-    const startTimeRef = useRef(null);
-    const timeoutIsNull = (timeout == null);
-    // Any time the triggerIndex changes (including on mount)
-    // restart the timeout.  The timeout does NOT reset
-    // when the duration or callback changes, only triggerIndex.
-    useEffect(() => {
-        if (!timeoutIsNull) {
-            const timeout = getTimeout();
-            console.assert(timeoutIsNull == (timeout == null));
-            if (timeout != null) {
-                startTimeRef.current = +(new Date());
-                const handle = setTimeout(stableCallback, timeout);
-                return () => clearTimeout(handle);
-            }
-        }
-    }, [triggerIndex, timeoutIsNull]);
-    const getElapsedTime = useCallback(() => {
-        return (+(new Date())) - (+(startTimeRef.current ?? new Date()));
-    }, []);
-    const getRemainingTime = useCallback(() => {
-        const timeout = getTimeout();
-        return timeout == null ? null : Math.max(0, timeout - getElapsedTime());
-    }, []);
-    return { getElapsedTime, getRemainingTime };
 }
 
 function supportsPointerEvents() {
@@ -4902,9 +5027,7 @@ function ImperativeElementU({ tag: Tag, handle, ...props }, ref) {
     return (createElement(Tag, useMergedProps(propsStable, imperativeProps, props, { ref })));
 }
 
-var l;l={__e:function(n,l,u,i){for(var t,r,o;l=l.__;)if((t=l.__c)&&!t.__)try{if((r=t.constructor)&&null!=r.getDerivedStateFromError&&(t.setState(r.getDerivedStateFromError(n)),o=t.__d),null!=t.componentDidCatch&&(t.componentDidCatch(n,i||{}),o=t.__d),o)return t.__E=t}catch(l){n=l;}throw n}},"function"==typeof Promise?Promise.prototype.then.bind(Promise.resolve()):setTimeout;
-
-var _=0;function o(o,e,n,t,f,l$1){var s,u,a={};for(u in e)"ref"==u?s=e[u]:a[u]=e[u];var i={type:o,props:a,key:n,ref:s,__k:null,__:null,__b:0,__e:null,__d:void 0,__c:null,__h:null,constructor:void 0,__v:--_,__source:f,__self:l$1};if("function"==typeof o&&(s=o.defaultProps))for(u in s)void 0===a[u]&&(a[u]=s[u]);return l.vnode&&l.vnode(i),i}
+var _=0;function o(o,e,n,t,f,l){var s,u,a={};for(u in e)"ref"==u?s=e[u]:a[u]=e[u];var i={type:o,props:a,key:n,ref:s,__k:null,__:null,__b:0,__e:null,__d:void 0,__c:null,__h:null,constructor:void 0,__v:--_,__source:f,__self:l};if("function"==typeof o&&(s=o.defaultProps))for(u in s)void 0===a[u]&&(a[u]=s[u]);return l$1.vnode&&l$1.vnode(i),i}
 
 const Table = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-";
 function base64(value) {
