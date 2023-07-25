@@ -1,5 +1,4 @@
 import { identity } from "lodash-es";
-import { ManagedChildInfo } from "../../preact-extensions/use-managed-children.js";
 import { useEnsureStability } from "../../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
@@ -23,10 +22,10 @@ export interface UseLinearNavigationReturnType<ParentOrChildElement extends Elem
     propsStable: ElementProps<ParentOrChildElement>;
 }
 
-export interface UseLinearNavigationChildInfo extends ManagedChildInfo<number> { }
+//export interface UseLinearNavigationChildInfo { }
 
 /** Arguments passed to the parent `useLinearNavigation` */
-export interface UseLinearNavigationParameters<ParentOrChildElement extends Element, ChildElement extends Element, _M extends UseLinearNavigationChildInfo> extends
+export interface UseLinearNavigationParameters<ParentOrChildElement extends Element, ChildElement extends Element> extends
     TargetedPick<UseRovingTabIndexReturnType<ParentOrChildElement, ChildElement, UseRovingTabIndexChildInfo<ChildElement>>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex">,
     TargetedPick<UsePaginatedChildrenParameters<ParentOrChildElement, ChildElement, any>, "paginatedChildrenParameters", "paginationMin" | "paginationMax"> {
     linearNavigationParameters: UseLinearNavigationParametersSelf<ChildElement>;
@@ -142,17 +141,18 @@ export interface UseLinearNavigationParametersSelf<ChildElement extends Element>
  * 
  * @compositeParams
  */
-export function useLinearNavigation<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseLinearNavigationChildInfo>({
+export function useLinearNavigation<ParentOrChildElement extends Element, ChildElement extends Element>({
     rovingTabIndexReturn,
     linearNavigationParameters,
     paginatedChildrenParameters: { paginationMax, paginationMin, ...void2 },
     ...void1
-}: UseLinearNavigationParameters<ParentOrChildElement, ChildElement, M>): UseLinearNavigationReturnType<ParentOrChildElement> {
+}: UseLinearNavigationParameters<ParentOrChildElement, ChildElement>): UseLinearNavigationReturnType<ParentOrChildElement> {
     monitorCallCount(useLinearNavigation);
 
     let getPaginatedRange = useStableGetter(paginationMax == null || paginationMin == null? null : paginationMax - paginationMin);
 
     assertEmptyObject(void1);
+    assertEmptyObject(void2);
 
     type R = EventType<any, any>;
     const { getLowestIndex, getHighestIndex, indexDemangler, indexMangler, isValid, navigatePastEnd, navigatePastStart, onNavigateLinear } = linearNavigationParameters;

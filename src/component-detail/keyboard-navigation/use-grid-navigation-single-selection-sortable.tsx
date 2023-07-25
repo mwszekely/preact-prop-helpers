@@ -1,7 +1,10 @@
+import { UseGenericChildParameters } from "../../preact-extensions/use-managed-children.js";
+import { assertEmptyObject } from "../../util/assert.js";
 import { OmitStrong, TargetedOmit } from "../../util/types.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
-import { UseGridNavigationCellParameters, UseGridNavigationCellReturnType, useGridNavigationCell } from "./use-grid-navigation-partial.js";
-import { GridSingleSelectChildCellInfo, GridSingleSelectChildRowInfo, UseGridNavigationSingleSelectionParameters, UseGridNavigationSingleSelectionReturnType, UseGridNavigationSingleSelectionRowParameters, UseGridNavigationSingleSelectionRowReturnType, useGridNavigationSingleSelection, useGridNavigationSingleSelectionRow } from "./use-grid-navigation-single-selection.js";
+import { GridSingleSelectChildCellInfo, GridSingleSelectChildRowInfo, UseGridNavigationCellSingleSelectionContext, UseGridNavigationRowSingleSelectionContext, UseGridNavigationSingleSelectionCellParameters, UseGridNavigationSingleSelectionCellReturnType, UseGridNavigationSingleSelectionParameters, UseGridNavigationSingleSelectionReturnType, UseGridNavigationSingleSelectionRowParameters, UseGridNavigationSingleSelectionRowReturnType, useGridNavigationSingleSelection, useGridNavigationSingleSelectionCell, useGridNavigationSingleSelectionRow } from "./use-grid-navigation-single-selection.js";
+import { UseListNavigationChildInfoKeysParameters } from "./use-list-navigation-partial.js";
+import { UseListNavigationSingleSelectionSortableChildInfoKeysParameters } from "./use-list-navigation-single-selection-sortable.js";
 import { UseSortableChildInfo, UseSortableChildrenParameters, UseSortableChildrenReturnType, useSortableChildren } from "./use-sortable-children.js";
 
 /**
@@ -11,25 +14,41 @@ import { UseSortableChildInfo, UseSortableChildrenParameters, UseSortableChildre
  */
 const _dummy = 0;
 
-export interface GridSingleSelectSortableChildRowInfo<RowElement extends Element, CellElement extends Element> extends GridSingleSelectChildRowInfo<RowElement, CellElement>, UseSortableChildInfo { }
-export interface GridSingleSelectSortableChildCellInfo<CellElement extends Element> extends GridSingleSelectChildCellInfo<CellElement> { }
-export interface UseGridNavigationSingleSelectionSortableParameters<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, M extends GridSingleSelectChildRowInfo<RowElement, CellElement>> extends
-    OmitStrong<UseGridNavigationSingleSelectionParameters<ParentOrRowElement, RowElement, CellElement, M>, "linearNavigationParameters" | "managedChildrenReturn">,
-    TargetedOmit<UseGridNavigationSingleSelectionParameters<ParentOrRowElement, RowElement, CellElement, M>, "linearNavigationParameters", "indexDemangler" | "indexMangler">,
-    UseSortableChildrenParameters<M> { }
-export interface UseGridNavigationSingleSelectionSortableReturnType<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, RM extends GridSingleSelectSortableChildRowInfo<RowElement, CellElement>, CM extends GridSingleSelectSortableChildCellInfo<CellElement>> extends UseGridNavigationSingleSelectionReturnType<ParentOrRowElement, RowElement, CellElement, RM, CM>, UseSortableChildrenReturnType<RM> { }
-export interface UseGridNavigationSingleSelectionSortableRowParameters<RowElement extends Element, CellElement extends Element, RM extends GridSingleSelectChildRowInfo<RowElement, CellElement>, CM extends GridSingleSelectChildCellInfo<CellElement>, InfoParameterKeys extends keyof RM> extends UseGridNavigationSingleSelectionRowParameters<RowElement, CellElement, RM, CM, InfoParameterKeys> { }
-export interface UseGridNavigationSingleSelectionSortableRowReturnType<RowElement extends Element, CellElement extends Element, RM extends GridSingleSelectSortableChildRowInfo<RowElement, CellElement>, CM extends GridSingleSelectChildCellInfo<CellElement>> extends UseGridNavigationSingleSelectionRowReturnType<RowElement, CellElement, RM, CM> { }
-export interface UseGridNavigationSingleSelectionSortableCellParameters<RowElement extends Element, CellElement extends Element, CM extends GridSingleSelectSortableChildCellInfo<CellElement>, InfoParameterKeys extends keyof CM> extends UseGridNavigationCellParameters<RowElement, CellElement, CM, InfoParameterKeys> { }
-export interface UseGridNavigationSingleSelectionSortableCellReturnType<CellElement extends Element, CM extends GridSingleSelectSortableChildCellInfo<CellElement>> extends UseGridNavigationCellReturnType<CellElement, CM> { }
+export type UseGridNavigationSingleSelectionSortableRowInfoKeysParameters = UseListNavigationSingleSelectionSortableChildInfoKeysParameters;
+export type UseGridNavigationSingleSelectionSortableCellInfoKeysParameters = UseListNavigationChildInfoKeysParameters;
 
-export function useGridNavigationSingleSelectionSortable<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, RM extends GridSingleSelectSortableChildRowInfo<RowElement, CellElement>, CM extends GridSingleSelectSortableChildCellInfo<CellElement>>({
+export interface UseGridNavigationRowSingleSelectionSortableContext extends UseGridNavigationRowSingleSelectionContext { }
+export interface UseGridNavigationCellSingleSelectionSortableContext extends UseGridNavigationCellSingleSelectionContext { }
+
+export interface GridSingleSelectSortableChildRowInfo<RowElement extends Element> extends GridSingleSelectChildRowInfo<RowElement>, UseSortableChildInfo { }
+export interface GridSingleSelectSortableChildCellInfo<CellElement extends Element> extends GridSingleSelectChildCellInfo<CellElement>, UseSortableChildInfo { }
+export interface UseGridNavigationSingleSelectionSortableParameters<ParentOrRowElement extends Element, RowElement extends Element, M extends GridSingleSelectSortableChildRowInfo<RowElement>> extends
+    OmitStrong<UseGridNavigationSingleSelectionParameters<ParentOrRowElement, RowElement, M>, "linearNavigationParameters" | "managedChildrenReturn">,
+    TargetedOmit<UseGridNavigationSingleSelectionParameters<ParentOrRowElement, RowElement, M>, "linearNavigationParameters", "indexDemangler" | "indexMangler">,
+    UseSortableChildrenParameters<M> { }
+export interface UseGridNavigationSingleSelectionSortableReturnType<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, RM extends GridSingleSelectSortableChildRowInfo<RowElement>, CM extends GridSingleSelectSortableChildCellInfo<CellElement>> extends UseGridNavigationSingleSelectionReturnType<ParentOrRowElement, RowElement, RM>, UseSortableChildrenReturnType<RM> { }
+export interface UseGridNavigationSingleSelectionSortableRowParameters<RowElement extends Element, CellElement extends Element, RM extends GridSingleSelectSortableChildRowInfo<RowElement>, CM extends GridSingleSelectSortableChildCellInfo<CellElement>> extends
+    UseGenericChildParameters<UseGridNavigationRowSingleSelectionSortableContext, Pick<RM, UseGridNavigationSingleSelectionSortableRowInfoKeysParameters>>,
+    OmitStrong<UseGridNavigationSingleSelectionRowParameters<RowElement, CellElement, RM, CM>, "context" | "info"> { }
+export interface UseGridNavigationSingleSelectionSortableRowReturnType<RowElement extends Element, CellElement extends Element, RM extends GridSingleSelectSortableChildRowInfo<RowElement>, CM extends GridSingleSelectSortableChildCellInfo<CellElement>> extends UseGridNavigationSingleSelectionRowReturnType<RowElement, CellElement, RM, CM> { }
+export interface UseGridNavigationSingleSelectionSortableCellParameters<CellElement extends Element, CM extends GridSingleSelectSortableChildCellInfo<CellElement>> extends
+    UseGenericChildParameters<UseGridNavigationCellSingleSelectionSortableContext, Pick<CM, UseGridNavigationSingleSelectionSortableCellInfoKeysParameters>>,
+    OmitStrong<UseGridNavigationSingleSelectionCellParameters<CellElement, CM>, "context" | "info"> { }
+export interface UseGridNavigationSingleSelectionSortableCellReturnType<CellElement extends Element, CM extends GridSingleSelectSortableChildCellInfo<CellElement>> extends UseGridNavigationSingleSelectionCellReturnType<CellElement, CM> { }
+
+export function useGridNavigationSingleSelectionSortable<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, RM extends GridSingleSelectSortableChildRowInfo<RowElement>, CM extends GridSingleSelectSortableChildCellInfo<CellElement>>({
     rearrangeableChildrenParameters,
     sortableChildrenParameters,
     linearNavigationParameters,
     managedChildrenReturn,
-    ...gridNavigationSingleSelectionParameters
-}: UseGridNavigationSingleSelectionSortableParameters<ParentOrRowElement, RowElement, CellElement, RM>): UseGridNavigationSingleSelectionSortableReturnType<ParentOrRowElement, RowElement, CellElement, RM, CM> {
+    gridNavigationParameters,
+    paginatedChildrenParameters,
+    refElementReturn,
+    rovingTabIndexParameters,
+    singleSelectionParameters,
+    typeaheadNavigationParameters,
+    ...void1
+}: UseGridNavigationSingleSelectionSortableParameters<ParentOrRowElement, RowElement, RM>): UseGridNavigationSingleSelectionSortableReturnType<ParentOrRowElement, RowElement, CellElement, RM, CM> {
     monitorCallCount(useGridNavigationSingleSelectionSortable);
 
     const { ...scr } = useSortableChildren<RM>({ rearrangeableChildrenParameters, sortableChildrenParameters, managedChildrenReturn });
@@ -37,19 +56,61 @@ export function useGridNavigationSingleSelectionSortable<ParentOrRowElement exte
     const gnr = useGridNavigationSingleSelection<ParentOrRowElement, RowElement, CellElement, RM, CM>({
         linearNavigationParameters: { indexDemangler, indexMangler, ...linearNavigationParameters },
         managedChildrenReturn,
-        ...gridNavigationSingleSelectionParameters
+        gridNavigationParameters,
+        paginatedChildrenParameters,
+        refElementReturn,
+        rovingTabIndexParameters,
+        singleSelectionParameters,
+        typeaheadNavigationParameters
     });
+    assertEmptyObject(void1);
 
     return { ...gnr, ...scr, }
 }
 
-export function useGridNavigationSingleSelectionSortableRow<RowElement extends Element, CellElement extends Element, RM extends GridSingleSelectSortableChildRowInfo<RowElement, CellElement>, CM extends GridSingleSelectSortableChildCellInfo<CellElement>>(p: UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM, never>): UseGridNavigationSingleSelectionSortableRowReturnType<RowElement, CellElement, RM, CM> {
+export function useGridNavigationSingleSelectionSortableRow<RowElement extends Element, CellElement extends Element, RM extends GridSingleSelectSortableChildRowInfo<RowElement>, CM extends GridSingleSelectSortableChildCellInfo<CellElement>>({
+    context,
+    info: { index, unselectable, untabbable, ...void2 },
+    linearNavigationParameters,
+    managedChildrenReturn,
+    refElementReturn,
+    rovingTabIndexParameters,
+    textContentParameters,
+    typeaheadNavigationParameters,
+    ...void1
+}: UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM>): UseGridNavigationSingleSelectionSortableRowReturnType<RowElement, CellElement, RM, CM> {
     monitorCallCount(useGridNavigationSingleSelectionSortableRow);
-    return useGridNavigationSingleSelectionRow<RowElement, CellElement, RM, CM>(p);
+    assertEmptyObject(void1);
+    assertEmptyObject(void2);
+    return useGridNavigationSingleSelectionRow<RowElement, CellElement, RM, CM>({
+        context,
+        info: { index, unselectable, untabbable },
+        linearNavigationParameters,
+        managedChildrenReturn,
+        refElementReturn,
+        rovingTabIndexParameters,
+        textContentParameters,
+        typeaheadNavigationParameters
+    });
 }
 
 // EZ
-export function useGridNavigationSingleSelectionSortableCell<CellElement extends Element, CM extends GridSingleSelectSortableChildCellInfo<CellElement>>(p: UseGridNavigationSingleSelectionSortableCellParameters<any, CellElement, CM, never>): UseGridNavigationSingleSelectionSortableCellReturnType<CellElement, CM> {
+export function useGridNavigationSingleSelectionSortableCell<CellElement extends Element, CM extends GridSingleSelectSortableChildCellInfo<CellElement>>({
+    context,
+    gridNavigationCellParameters,
+    info: { index, untabbable, ...void2 },
+    refElementReturn,
+    textContentParameters,
+    ...void1
+}: UseGridNavigationSingleSelectionSortableCellParameters<CellElement, CM>): UseGridNavigationSingleSelectionSortableCellReturnType<CellElement, CM> {
     monitorCallCount(useGridNavigationSingleSelectionSortableCell);
-    return useGridNavigationCell<CellElement, CM>(p);
+    assertEmptyObject(void1);
+    assertEmptyObject(void2);
+    return useGridNavigationSingleSelectionCell<CellElement, CM>({
+        context,
+        info: { index, untabbable },
+        gridNavigationCellParameters,
+        refElementReturn,
+        textContentParameters,
+    });
 }

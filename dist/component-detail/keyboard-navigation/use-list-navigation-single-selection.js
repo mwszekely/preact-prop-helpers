@@ -21,19 +21,20 @@ export function useListNavigationSingleSelection({ linearNavigationParameters, r
         propsStableParentOrChild
     };
 }
-export function useListNavigationSingleSelectionChild({ info, context, refElementReturn, textContentParameters, ...void1 }) {
+export function useListNavigationSingleSelectionChild({ info: { index, untabbable, unselectable, ...void2 }, context, refElementReturn, textContentParameters, ...void1 }) {
     monitorCallCount(useListNavigationSingleSelectionChild);
     const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ...void3 }, info: infoSS, singleSelectionChildReturn, props: propsSS, pressParameters: { onPressSync }, ...void9 } = useSingleSelectionChild({
-        info,
+        info: { index, unselectable },
         context,
     });
     const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void6 }, pressParameters: { excludeSpace }, rovingTabIndexChildReturn, textContentReturn, props: propsLN, info: infoLN, ...void8 } = useListNavigationChild({
-        info,
+        info: { index, untabbable },
         context,
         refElementReturn,
         textContentParameters,
     });
     assertEmptyObject(void1);
+    assertEmptyObject(void2);
     assertEmptyObject(void3);
     assertEmptyObject(void6);
     assertEmptyObject(void8);

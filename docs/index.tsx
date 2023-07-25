@@ -570,45 +570,6 @@ const FullReference = () => {
 
 const Component = () => {
 
-    const docTopics = json.tsdocComment?.customBlocks.filter((customBlock) => {
-        return customBlock.blockTag.tagName === "@docTopic"
-    }) || [];
-
-    return (
-        <div class="main-container">
-            <nav>
-                <ul>
-                    <li>Topics
-                        <ul>{docTopics.map(customBlock => {
-                            let headerNode = customBlock.content.nodes[0];
-                            return <li>{headerNode.kind == "Paragraph" ? headerNode.nodes.map(node => <RenderApiBlockInner {...node} omitSoftBreaks={true} />) : headerNode.code}</li>
-                        })}</ul>
-                    </li>
-                    <li>A-Z reference</li>
-                </ul>
-            </nav>
-            <main>
-                <h2>Preact Prop Helpers</h2>
-                {json.tsdocComment?.summarySection.nodes.map(node => { return <RenderApiBlock {...node} /> })}
-                {json.tsdocComment?.remarksBlock?.content.nodes.map(node => <RenderApiBlock {...node} />)}
-                {json.tsdocComment?.customBlocks.filter((customBlock) => {
-                    return customBlock.blockTag.tagName === "@docTopic"
-                }).map(customBlock => {
-                    return customBlock.content.nodes.map((node, i) => {
-                        if (i == 0) {
-                            return (
-                                <h3>{node.kind == "Paragraph" ? node.nodes.map(node => <RenderApiBlockInner {...node} omitSoftBreaks={true} />) : node.code}</h3>
-                            )
-                        }
-                        else {
-                            return <RenderApiBlock {...node} />;
-                        }
-                    });
-                })}
-            </main>
-        </div>
-    )
-
     return <div class="flex" style={{ flexWrap: "wrap" }}>
         <DemoPress remaining={2} />
         <input />

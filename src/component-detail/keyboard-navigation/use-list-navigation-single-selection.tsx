@@ -1,16 +1,29 @@
+import { UseGenericChildParameters } from "../../preact-extensions/use-managed-children.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useMemoObject } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { ElementProps, ExtendMerge, OmitStrong } from "../../util/types.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
-import { UseListNavigationChildInfo, UseListNavigationChildParameters, UseListNavigationChildReturnType, UseListNavigationContext, UseListNavigationParameters, UseListNavigationReturnType, useListNavigation, useListNavigationChild } from "./use-list-navigation-partial.js";
-import { UseSingleSelectionChildInfo, UseSingleSelectionChildParameters, UseSingleSelectionChildReturnType, UseSingleSelectionContext, UseSingleSelectionParameters, UseSingleSelectionReturnType, useSingleSelection, useSingleSelectionChild } from "./use-single-selection.js";
+import { UseListNavigationChildInfo, UseListNavigationChildInfoKeysParameters, UseListNavigationChildInfoKeysReturnType, UseListNavigationChildParameters, UseListNavigationChildReturnType, UseListNavigationContext, UseListNavigationParameters, UseListNavigationReturnType, useListNavigation, useListNavigationChild } from "./use-list-navigation-partial.js";
+import { UseSingleSelectionChildInfo, UseSingleSelectionChildInfoKeysParameters as UseSingleSelectionChildInfoParameterKeys, UseSingleSelectionChildInfoKeysReturnType as UseSingleSelectionChildInfoReturnKeys, UseSingleSelectionChildParameters, UseSingleSelectionChildReturnType, UseSingleSelectionContext, UseSingleSelectionParameters, UseSingleSelectionReturnType, useSingleSelection, useSingleSelectionChild } from "./use-single-selection.js";
 
-export interface UseListNavigationSingleSelectionChildInfo<TabbableChildElement extends Element> extends ExtendMerge<UseListNavigationChildInfo<TabbableChildElement>, UseSingleSelectionChildInfo<TabbableChildElement>> { }
-export interface UseListNavigationSingleSelectionParameters<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationSingleSelectionChildInfo<ChildElement>> extends ExtendMerge<UseListNavigationParameters<ParentOrChildElement, ChildElement, M>, OmitStrong<UseSingleSelectionParameters<ParentOrChildElement, ChildElement, M>, "rovingTabIndexReturn">> { }
-export interface UseListNavigationSingleSelectionReturnType<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationSingleSelectionChildInfo<ChildElement>> extends ExtendMerge<UseListNavigationReturnType<ParentOrChildElement, ChildElement, M>, UseSingleSelectionReturnType<ChildElement, M>> { }
+export interface UseListNavigationSingleSelectionChildInfo<TabbableChildElement extends Element> extends UseListNavigationChildInfo<TabbableChildElement>, UseSingleSelectionChildInfo<TabbableChildElement> { }
 export interface UseListNavigationSingleSelectionChildContext extends UseListNavigationContext, UseSingleSelectionContext { }
-export interface UseListNavigationSingleSelectionChildParameters<ChildElement extends Element, M extends UseListNavigationSingleSelectionChildInfo<ChildElement>, InfoParameterKeys extends keyof M> extends ExtendMerge<UseListNavigationChildParameters<ChildElement, M, InfoParameterKeys>, UseSingleSelectionChildParameters<ChildElement, M>> { }
+
+export interface UseListNavigationSingleSelectionParameters<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationSingleSelectionChildInfo<ChildElement>> extends ExtendMerge<UseListNavigationParameters<ParentOrChildElement, ChildElement, M>, OmitStrong<UseSingleSelectionParameters<ParentOrChildElement, ChildElement, M>, "rovingTabIndexReturn">> { }
+export interface UseListNavigationSingleSelectionReturnType<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationSingleSelectionChildInfo<ChildElement>> extends ExtendMerge<UseListNavigationReturnType<ParentOrChildElement, ChildElement, M>, UseSingleSelectionReturnType<ChildElement>> {
+    context: UseListNavigationSingleSelectionChildContext;
+}
+
+export type UseListNavigationSingleSelectionChildInfoKeysParameters = UseListNavigationChildInfoKeysParameters | UseSingleSelectionChildInfoParameterKeys;
+export type UseListNavigationSingleSelectionChildInfoKeysReturnType = UseListNavigationChildInfoKeysReturnType | UseSingleSelectionChildInfoReturnKeys;
+
+export interface UseListNavigationSingleSelectionChildParameters<ChildElement extends Element, M extends UseListNavigationSingleSelectionChildInfo<ChildElement>> extends
+    UseGenericChildParameters<UseListNavigationSingleSelectionChildContext, Pick<M, UseListNavigationSingleSelectionChildInfoKeysParameters>>,
+    OmitStrong<UseListNavigationChildParameters<ChildElement, M>, "context" | "info">,
+    OmitStrong<UseSingleSelectionChildParameters<ChildElement>, "context" | "info"> {
+}
+
 export interface UseListNavigationSingleSelectionChildReturnType<ChildElement extends Element, M extends UseListNavigationSingleSelectionChildInfo<ChildElement>> extends OmitStrong<ExtendMerge<UseListNavigationChildReturnType<ChildElement, M>, UseSingleSelectionChildReturnType<ChildElement>>, "props"> {
     propsTabbable: ElementProps<any>;
     propsChild: ElementProps<any>;
@@ -47,12 +60,12 @@ export function useListNavigationSingleSelection<ParentOrChildElement extends El
 
 
 export function useListNavigationSingleSelectionChild<ChildElement extends Element, M extends UseListNavigationSingleSelectionChildInfo<ChildElement>>({
-    info,
+    info: { index, untabbable, unselectable, ...void2 },
     context,
     refElementReturn,
     textContentParameters,
     ...void1
-}: UseListNavigationSingleSelectionChildParameters<ChildElement, M, never>): UseListNavigationSingleSelectionChildReturnType<ChildElement, M> {
+}: UseListNavigationSingleSelectionChildParameters<ChildElement, M>): UseListNavigationSingleSelectionChildReturnType<ChildElement, M> {
     monitorCallCount(useListNavigationSingleSelectionChild);
 
     const {
@@ -62,8 +75,8 @@ export function useListNavigationSingleSelectionChild<ChildElement extends Eleme
         props: propsSS,
         pressParameters: { onPressSync },
         ...void9
-    } = useSingleSelectionChild<ChildElement, M>({
-        info,
+    } = useSingleSelectionChild<ChildElement>({
+        info: { index, unselectable },
         context,
     });
 
@@ -76,13 +89,14 @@ export function useListNavigationSingleSelectionChild<ChildElement extends Eleme
         info: infoLN,
         ...void8
     } = useListNavigationChild<ChildElement, M>({
-        info,
+        info: { index, untabbable },
         context,
         refElementReturn,
         textContentParameters,
     });
 
     assertEmptyObject(void1);
+    assertEmptyObject(void2);
     assertEmptyObject(void3);
     assertEmptyObject(void6);
     assertEmptyObject(void8);

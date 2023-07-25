@@ -1,6 +1,7 @@
 import { UsePressParameters } from "../../component-use/use-press.js";
 import { UseRefElementReturnType } from "../../dom-helpers/use-ref-element.js";
 import { UseTextContentParameters, UseTextContentReturnType, useTextContent } from "../../dom-helpers/use-text-content.js";
+import { UseGenericChildParameters } from "../../preact-extensions/use-managed-children.js";
 import { OnPassiveStateChange, usePassiveState } from "../../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useMemoObject, useStableGetter } from "../../preact-extensions/use-stable-getter.js";
@@ -92,12 +93,14 @@ export interface UseTypeaheadNavigationParameters<TabbableChildElement extends E
     typeaheadNavigationParameters: UseTypeaheadNavigationParametersSelf<TabbableChildElement>;
 }
 
+export type UseTypeaheadNavigationChildInfoKeysParameters = "index";
+export type UseTypeaheadNavigationChildInfoKeysReturnType = never;
+
 /** Arguments passed to the child `useTypeaheadNavigationChild` */
 export interface UseTypeaheadNavigationChildParameters<ChildElement extends Element, M extends UseTypeaheadNavigationChildInfo<ChildElement>> extends
+    UseGenericChildParameters<UseTypeaheadNavigationContext, Pick<M, UseTypeaheadNavigationChildInfoKeysParameters>>,
     TargetedPick<UseTextContentParameters<ChildElement>, "textContentParameters", "getText">,
     TargetedPick<UseRefElementReturnType<ChildElement>, "refElementReturn", "getElement"> {
-    info: Pick<M, "index">;
-    context: UseTypeaheadNavigationContext;
 }
 
 export interface UseTypeaheadNavigationChildReturnType extends

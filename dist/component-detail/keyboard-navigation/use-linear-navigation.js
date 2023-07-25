@@ -20,6 +20,7 @@ export function useLinearNavigation({ rovingTabIndexReturn, linearNavigationPara
     monitorCallCount(useLinearNavigation);
     let getPaginatedRange = useStableGetter(paginationMax == null || paginationMin == null ? null : paginationMax - paginationMin);
     assertEmptyObject(void1);
+    assertEmptyObject(void2);
     const { getLowestIndex, getHighestIndex, indexDemangler, indexMangler, isValid, navigatePastEnd, navigatePastStart, onNavigateLinear } = linearNavigationParameters;
     const { getTabbableIndex, setTabbableIndex } = rovingTabIndexReturn;
     useEnsureStability("useLinearNavigation", onNavigateLinear, isValid, indexDemangler, indexMangler);

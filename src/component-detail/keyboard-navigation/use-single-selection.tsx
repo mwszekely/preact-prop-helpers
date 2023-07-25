@@ -2,7 +2,7 @@
 import { noop } from "lodash-es";
 import { PressEventReason, UsePressParameters } from "../../component-use/use-press.js";
 import { UseChildrenHaveFocusChildReturnType, UseChildrenHaveFocusParameters } from "../../observers/use-children-have-focus.js";
-import { UseManagedChildrenReturnType, useChildrenFlag } from "../../preact-extensions/use-managed-children.js";
+import { UseGenericChildParameters, UseManagedChildrenReturnType, useChildrenFlag } from "../../preact-extensions/use-managed-children.js";
 import { OnPassiveStateChange, PassiveStateUpdater, useEnsureStability } from "../../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useMemoObject, useStableGetter } from "../../preact-extensions/use-stable-getter.js";
@@ -126,24 +126,24 @@ export interface UseSingleSelectionParameters<ParentOrChildElement extends Eleme
     singleSelectionParameters: UseSingleSelectionParametersSelf;
 }
 
-export type UseSingleSelectionChildInfoParameterKeys = "index" | "unselectable";
-export type UseSingleSelectionChildInfoReturnKeys = "getSelected" | "setLocalSelected" | "selected";
+export type UseSingleSelectionChildInfoKeysParameters = "index" | "unselectable";
+export type UseSingleSelectionChildInfoKeysReturnType = "getSelected" | "setLocalSelected" | "selected";
 
-export interface UseSingleSelectionChildParameters<E extends Element, M extends UseSingleSelectionChildInfo<E>> {
-    context: UseSingleSelectionContext;
-    info: Pick<UseSingleSelectionChildInfo<E>, UseSingleSelectionChildInfoParameterKeys>;
+export interface UseSingleSelectionChildParameters<E extends Element> extends
+    UseGenericChildParameters<UseSingleSelectionContext, Pick<UseSingleSelectionChildInfo<E>, UseSingleSelectionChildInfoKeysParameters>> {
+
 }
 
 
 export interface UseSingleSelectionChildReturnType<E extends Element> extends UseChildrenHaveFocusChildReturnType<E>, TargetedPick<UsePressParameters<any>, "pressParameters", "onPressSync"> {
     props: ElementProps<E>;
 
-    info: Pick<UseSingleSelectionChildInfo<E>, UseSingleSelectionChildInfoReturnKeys>;
+    info: Pick<UseSingleSelectionChildInfo<E>, UseSingleSelectionChildInfoKeysReturnType>;
 
     singleSelectionChildReturn: UseSingleSelectionChildReturnTypeSelf;
 }
 
-export interface UseSingleSelectionReturnType<ChildElement extends Element, M extends UseSingleSelectionChildInfo<ChildElement>> extends TargetedPick<UseChildrenHaveFocusParameters<ChildElement>, "childrenHaveFocusParameters", "onCompositeFocusChange"> {
+export interface UseSingleSelectionReturnType<ChildElement extends Element> extends TargetedPick<UseChildrenHaveFocusParameters<ChildElement>, "childrenHaveFocusParameters", "onCompositeFocusChange"> {
     singleSelectionReturn: UseSingleSelectionReturnTypeSelf;
     context: UseSingleSelectionContext;
 }
@@ -170,7 +170,7 @@ export function useSingleSelection<ParentOrChildElement extends Element, ChildEl
     rovingTabIndexReturn: { setTabbableIndex, ...void2 },
     singleSelectionParameters: { onSelectedIndexChange: onSelectedIndexChange_U, initiallySelectedIndex, ariaPropName, selectionMode, ...void3 },
     ...void4
-}: UseSingleSelectionParameters<ParentOrChildElement, ChildElement, M>): UseSingleSelectionReturnType<ChildElement, M> {
+}: UseSingleSelectionParameters<ParentOrChildElement, ChildElement, M>): UseSingleSelectionReturnType<ChildElement> {
     monitorCallCount(useSingleSelection);
     assertEmptyObject(void1);
     assertEmptyObject(void2);
@@ -240,11 +240,11 @@ export function useSingleSelection<ParentOrChildElement extends Element, ChildEl
  * 
  * @compositeParams
  */
-export function useSingleSelectionChild<ChildElement extends Element, M extends UseSingleSelectionChildInfo<ChildElement>>({
+export function useSingleSelectionChild<ChildElement extends Element>({
     context: { singleSelectionContext: { getSelectedIndex, onSelectedIndexChange, ariaPropName, selectionMode, ...void1 }, ...void2 },
     info: { index, unselectable, ...void3 },
-     ...void4
-}: UseSingleSelectionChildParameters<ChildElement, M>): UseSingleSelectionChildReturnType<ChildElement> {
+    ...void4
+}: UseSingleSelectionChildParameters<ChildElement>): UseSingleSelectionChildReturnType<ChildElement> {
     monitorCallCount(useSingleSelectionChild);
     type R = EventType<any, any>;
 
@@ -288,21 +288,21 @@ export function useSingleSelectionChild<ChildElement extends Element, M extends 
             [`${propParts[0]}-${propParts[1]}`]: (localSelected ? (propParts[1] == "current" ? `${propParts[2]}` : `true`) : "false")
         },
         hasCurrentFocusParameters: { onCurrentFocusedInnerChanged },
-        pressParameters: { onPressSync: onSelectedIndexChange? onPressSync : null }
+        pressParameters: { onPressSync: onSelectedIndexChange ? onPressSync : null }
     }
 }
 
 
 
 export interface UseSingleSelectionDeclarativeParameters {
-    singleSelectionDeclarativeParameters: Pick<UseSingleSelectionParameters<any, any, any>["singleSelectionParameters"], "onSelectedIndexChange"> & { 
+    singleSelectionDeclarativeParameters: Pick<UseSingleSelectionParameters<any, any, any>["singleSelectionParameters"], "onSelectedIndexChange"> & {
         selectedIndex: number | null;
         /**
          * @nonstable
          */
-       //onSelectedIndexChange: null | EnhancedEventHandler<Event, { selectedIndex: number }> 
+        //onSelectedIndexChange: null | EnhancedEventHandler<Event, { selectedIndex: number }> 
     }
-    singleSelectionReturn: Pick<UseSingleSelectionReturnType<any, any>["singleSelectionReturn"], "changeSelectedIndex">;
+    singleSelectionReturn: Pick<UseSingleSelectionReturnType<any>["singleSelectionReturn"], "changeSelectedIndex">;
 }
 
 export type MakeSingleSelectionDeclarativeParameters<P> = Omit<P, "singleSelectionParameters"> & UseSingleSelectionDeclarativeParameters & { singleSelectionParameters: Pick<UseSingleSelectionParameters<any, any, any>["singleSelectionParameters"], "ariaPropName" | "selectionMode"> };

@@ -10,7 +10,7 @@ function _getDocument() {
 
 const SelectionModeContext = createContext<"activation" | "focus">("activation");
 const UntabbableContext = createContext(false);
-const ListNavigationSingleSelectionChildContext = createContext<CompleteListNavigationContext<HTMLOListElement, HTMLLIElement, CustomInfoType>>(null!)
+const ListNavigationSingleSelectionChildContext = createContext<CompleteListNavigationContext<HTMLLIElement, CustomInfoType>>(null!)
 export const DemoUseRovingTabIndex = memo(() => {
 
     const [selectedIndex, setSelectedIndex] = useState(null as number | null);
@@ -125,7 +125,7 @@ const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
         disabled = hidden = true;
     }
     const [randomWord] = useState(() => RandomWords[index]);
-    const context = useContext(ListNavigationSingleSelectionChildContext) as CompleteListNavigationContext<HTMLOListElement, HTMLLIElement, CustomInfoType>;
+    const context = useContext(ListNavigationSingleSelectionChildContext) as CompleteListNavigationContext<HTMLLIElement, CustomInfoType>;
     const focusSelf = useCallback((e: HTMLElement) => { e.focus() }, []);
 
     const getSortValue = useStableCallback(() => index);

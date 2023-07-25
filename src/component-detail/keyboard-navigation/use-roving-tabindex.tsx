@@ -1,6 +1,6 @@
 import { UseRefElementReturnType } from "../../dom-helpers/use-ref-element.js";
 import { UseHasCurrentFocusParameters } from "../../observers/use-has-current-focus.js";
-import { ManagedChildInfo, UseManagedChildParameters, UseManagedChildrenParameters, UseManagedChildrenReturnType, useChildrenFlag } from "../../preact-extensions/use-managed-children.js";
+import { ManagedChildInfo, UseGenericChildParameters, UseManagedChildrenParameters, UseManagedChildrenReturnType, useChildrenFlag } from "../../preact-extensions/use-managed-children.js";
 import { OnPassiveStateChange, PassiveStateUpdater, usePassiveState } from "../../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useMemoObject, useStableGetter } from "../../preact-extensions/use-stable-getter.js";
@@ -8,7 +8,7 @@ import { useState } from "../../preact-extensions/use-state.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { findBackupFocus } from "../../util/focus.js";
 import { EventType, StateUpdater, TargetedPick, useCallback, useEffect, useRef } from "../../util/lib.js";
-import { ElementProps, Nullable, OmitStrong } from "../../util/types.js";
+import { ElementProps, Nullable } from "../../util/types.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
 
 //type Event = EventType<any, any>;
@@ -168,16 +168,14 @@ export interface UseRovingTabIndexReturnType<ParentElement extends Element, Tabb
     rovingTabIndexReturn: UseRovingTabIndexReturnTypeSelf;
 }
 
+// These are the info parameters required by useRovingTabIndexChild specifically
 export type UseRovingTabIndexChildInfoKeysParameters = "index" | "untabbable";
+// These are the info parameters provided by useRovingTabIndexChild specifically
 export type UseRovingTabIndexChildInfoKeysReturnType = "setLocallyTabbable" | "getLocallyTabbable";
 
-export interface UseRovingTabIndexChildParameters<TabbableChildElement extends Element, M extends UseRovingTabIndexChildInfo<TabbableChildElement>, InfoParameterKeys extends keyof M> extends
-    Pick<UseRefElementReturnType<TabbableChildElement>, "refElementReturn">,
-    OmitStrong<UseManagedChildParameters<M, InfoParameterKeys | UseRovingTabIndexChildInfoKeysParameters>, "context"> {
-    /**
-     * The information provided by the parent hook
-     */
-    context: RovingTabIndexChildContext;
+export interface UseRovingTabIndexChildParameters<TabbableChildElement extends Element, M extends UseRovingTabIndexChildInfo<TabbableChildElement>> extends
+    UseGenericChildParameters<RovingTabIndexChildContext, Pick<M, UseRovingTabIndexChildInfoKeysParameters>>,
+    Pick<UseRefElementReturnType<TabbableChildElement>, "refElementReturn"> {
 }
 
 export interface RovingTabIndexChildContextSelf {
@@ -459,7 +457,7 @@ export function useRovingTabIndexChild<ChildElement extends Element, M extends U
     context: { rovingTabIndexContext: { giveParentFocusedElement, untabbable: parentIsUntabbable, untabbableBehavior, reevaluateClosestFit, setTabbableIndex, getInitiallyTabbedIndex, parentFocusSelf } },
     refElementReturn: { getElement },
     ...void3
-}: UseRovingTabIndexChildParameters<ChildElement, M, never>): UseRovingTabIndexChildReturnType<ChildElement, M> {
+}: UseRovingTabIndexChildParameters<ChildElement, M>): UseRovingTabIndexChildReturnType<ChildElement, M> {
     monitorCallCount(useRovingTabIndexChild);
 
     const [tabbable, setTabbable, getTabbable] = useState(getInitiallyTabbedIndex() === index);
