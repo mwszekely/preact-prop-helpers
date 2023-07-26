@@ -26,7 +26,7 @@
     "watch": "npx npm-run-all --npm-path npm -pc clean watch:*",
     "watch:preact": "tsc --watch",
     "build:preact": "tsc",
-    "watch:react": "npx rollup -c ./rollup.config.js --watch",
+    "watch:react": "npx rollup -c ./rollup.config.js --watch --no-watch.clearScreen",
     "build:react": "npx rollup -c ./rollup.config.js",
     "test": "playwright test --ui",
     "lint": "npx eslint ./src",
