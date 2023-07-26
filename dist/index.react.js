@@ -2,9 +2,9 @@ import { useRef, useCallback, useLayoutEffect, useInsertionEffect, useMemo, useE
 export { Fragment, cloneElement, createContext, createElement, forwardRef, memo, useInsertionEffect as useBeforeLayoutEffect, useCallback, useContext, useDebugValue, useEffect, useId, useImperativeHandle, useLayoutEffect, useMemo, useReducer, useRef, useState as useStateBasic } from 'react';
 import { createPortal } from 'react-dom';
 export { createPortal } from 'react-dom';
+import { isTabbable, isFocusable } from 'tabbable';
 import { noop, shuffle, identity, debounce } from 'lodash-es';
 export { identity } from 'lodash-es';
-import { isTabbable, isFocusable } from 'tabbable';
 import 'blocking-elements';
 import 'wicg-inert';
 import { clsx } from 'clsx';
@@ -125,35 +125,18 @@ const EventMapping = {
     ...EventMapping$1,
 };
 
-let cached = null;
-function getBuildModeUnmemoized() {
-    try {
-        if (process.env.NODE_ENV === "development")
-            return "development";
-        return "production";
-    }
-    catch (_e) {
-        // As long as we're returning "production" due to it being unspecified, 
-        // try to make sure anyone else who tries does too for consistency.
-        // TODO: Good/bad idea?
-        /*try {
-            (globalThis as any)["process"] ??= {};
-            (globalThis as any)["process"]["env"] ??= {};
-            (globalThis as any)["process"]["env"]["NODE_ENV"] ??= "production";
-        }
-        finally*/ {
-            return "production";
-        }
-    }
-}
+// Get the value of process?.env?.NODE_ENV delicately (also fun fact @rollup/plugin-replace works in comments!)
+// (i.e. in a way that doesn't throw an error but has isDevMode be a constant)
+globalThis["process"] ??= {};
+globalThis["process"]["env"] ??= {};
+globalThis["process"]["env"]["NODE_ENV"] ??= "production";
 /**
- * Controls other development hooks by checking for a global variable called `process.env.NODE_ENV`
+ * Controls other development hooks by checking the value of a global variable called `process.env.NODE_ENV`.
  *
- * @remarks Bundlers like Rollup will actually noop-out development code if  `process.env.NODE_ENV !== "development"` (which, of course, covers the default case where `process.env.NODE_ENV` just doesn't exist).
+ * @remarks Bundlers like Rollup will actually noop-out development code if `process.env.NODE_ENV !== "development"`
+ * (which, of course, covers the default case where `process.env.NODE_ENV` just doesn't exist).
  */
-function getBuildMode() {
-    return cached ||= (getBuildModeUnmemoized());
-}
+const BuildMode = (process.env.NODE_ENV === 'development') ? "development" : "production";
 
 // TODO: This shouldn't be in every build, I don't think it's in core-js? I think?
 // And it's extremely small anyway and basically does nothing.
@@ -161,7 +144,14 @@ window.requestIdleCallback ??= (callback) => {
     return setTimeout(() => { callback({ didTimeout: false, timeRemaining: () => { return 0; }, }); }, 5);
 };
 let timeoutHandle = null;
-function callCountU(hook) {
+/**
+ * When called inside a hook, monitors each call of that hook and prints the results to a table once things settle.
+ *
+ * @remarks Re-renders and such are all collected together when the table is printed to the console with `requestIdleCallback`.
+ */
+function monitorCallCount(hook) {
+    if (BuildMode !== 'development')
+        return;
     const name = hook.name;
     if (filterAll || filters.has(name))
         return;
@@ -197,7 +187,6 @@ function hideCallCount(hook) {
     if (hook != "all")
         filters.add(hook.name);
 }
-const monitorCallCount = (getBuildMode() == "development") ? callCountU : noop;
 
 /**
  * Debug hook. Given a value or set of values, emits a console error if any of them change from one render to the next.
@@ -205,7 +194,7 @@ const monitorCallCount = (getBuildMode() == "development") ? callCountU : noop;
  * @remarks Eventually, when useEvent lands, we hopefully won't need this.
  */
 function useEnsureStability(parentHookName, ...values) {
-    if (getBuildMode() == 'production')
+    if (BuildMode !== 'development')
         return;
     const helperToEnsureStability = useRef([]);
     const shownError = useRef([]);
@@ -919,7 +908,7 @@ function mergeFunctions(lhs, rhs) {
 }
 
 function generateStack() {
-    if (getBuildMode() === 'development' && window._generate_setState_stacks) {
+    if (BuildMode === 'development' && window._generate_setState_stacks) {
         try {
             throw new Error();
         }
@@ -935,17 +924,23 @@ function generateStack() {
  *
  */
 function useStack() {
-    const stack = useMemo(generateStack, []);
-    const getStack = useCallback(() => stack, []);
-    return getStack;
+    if (BuildMode === "development") {
+        const stack = useMemo(generateStack, []);
+        const getStack = useCallback(() => stack, []);
+        return getStack;
+    }
+    else {
+        return returnEmptyString;
+    }
 }
+function returnEmptyString() { return ""; }
 
 /**
  * If you want a single place to put a debugger for tracking focus,
  * here:
  */
 function focus(e) {
-    if (getBuildMode() === 'development' && window.LOG_FOCUS_CHANGES === true) {
+    if (BuildMode === 'development' && window.LOG_FOCUS_CHANGES === true) {
         console.log(`Focus changed to ${(e?.tagName || "").toLowerCase().padStart(6)}:`, e);
         console.log(generateStack());
     }
@@ -999,10 +994,6 @@ function findBackupFocus(unmountingElement) {
     return bestCandidateAfter ?? bestCandidateBefore ?? document.body;
 }
 
-var l$1;l$1={__e:function(n,l,u,i){for(var t,r,o;l=l.__;)if((t=l.__c)&&!t.__)try{if((r=t.constructor)&&null!=r.getDerivedStateFromError&&(t.setState(r.getDerivedStateFromError(n)),o=t.__d),null!=t.componentDidCatch&&(t.componentDidCatch(n,i||{}),o=t.__d),o)return t.__E=t}catch(l){n=l;}throw n}},"function"==typeof Promise?Promise.prototype.then.bind(Promise.resolve()):setTimeout;
-
-var t,r,u,i,o$1=0,f=[],c=[],e=l$1.__b,a=l$1.__r,v=l$1.diffed,l=l$1.__c,m=l$1.unmount;function d(t,u){l$1.__h&&l$1.__h(r,t,o$1||u),o$1=0;var i=r.__H||(r.__H={__:[],__h:[]});return t>=i.__.length&&i.__.push({__V:c}),i.__[t]}function h(n){return o$1=1,s(B,n)}function s(n,u,i){var o=d(t++,2);if(o.t=n,!o.__c&&(o.__=[i?i(u):B(void 0,u),function(n){var t=o.__N?o.__N[0]:o.__[0],r=o.t(t,n);t!==r&&(o.__N=[r,o.__[1]],o.__c.setState({}));}],o.__c=r,!r.u)){var f=function(n,t,r){if(!o.__c.__H)return !0;var u=o.__c.__H.__.filter(function(n){return n.__c});if(u.every(function(n){return !n.__N}))return !c||c.call(this,n,t,r);var i=!1;return u.forEach(function(n){if(n.__N){var t=n.__[0];n.__=n.__N,n.__N=void 0,t!==n.__[0]&&(i=!0);}}),!(!i&&o.__c.props===n)&&(!c||c.call(this,n,t,r))};r.u=!0;var c=r.shouldComponentUpdate,e=r.componentWillUpdate;r.componentWillUpdate=function(n,t,r){if(this.__e){var u=c;c=void 0,f(n,t,r),c=u;}e&&e.call(this,n,t,r);},r.shouldComponentUpdate=f;}return o.__N||o.__}function F(n,r){var u=d(t++,7);return z(u.__H,r)?(u.__V=n(),u.i=r,u.__h=n,u.__V):u.__}function b(){for(var t;t=f.shift();)if(t.__P&&t.__H)try{t.__H.__h.forEach(k),t.__H.__h.forEach(w),t.__H.__h=[];}catch(r){t.__H.__h=[],l$1.__e(r,t.__v);}}l$1.__b=function(n){r=null,e&&e(n);},l$1.__r=function(n){a&&a(n),t=0;var i=(r=n.__c).__H;i&&(u===r?(i.__h=[],r.__h=[],i.__.forEach(function(n){n.__N&&(n.__=n.__N),n.__V=c,n.__N=n.i=void 0;})):(i.__h.forEach(k),i.__h.forEach(w),i.__h=[])),u=r;},l$1.diffed=function(t){v&&v(t);var o=t.__c;o&&o.__H&&(o.__H.__h.length&&(1!==f.push(o)&&i===l$1.requestAnimationFrame||((i=l$1.requestAnimationFrame)||j)(b)),o.__H.__.forEach(function(n){n.i&&(n.__H=n.i),n.__V!==c&&(n.__=n.__V),n.i=void 0,n.__V=c;})),u=r=null;},l$1.__c=function(t,r){r.some(function(t){try{t.__h.forEach(k),t.__h=t.__h.filter(function(n){return !n.__||w(n)});}catch(u){r.some(function(n){n.__h&&(n.__h=[]);}),r=[],l$1.__e(u,t.__v);}}),l&&l(t,r);},l$1.unmount=function(t){m&&m(t);var r,u=t.__c;u&&u.__H&&(u.__H.__.forEach(function(n){try{k(n);}catch(n){r=n;}}),u.__H=void 0,r&&l$1.__e(r,u.__v));};var g="function"==typeof requestAnimationFrame;function j(n){var t,r=function(){clearTimeout(u),g&&cancelAnimationFrame(t),setTimeout(n);},u=setTimeout(r,100);g&&(t=requestAnimationFrame(r));}function k(n){var t=r,u=n.__c;"function"==typeof u&&(n.__c=void 0,u()),r=t;}function w(n){var t=r;n.__c=n.__(),r=t;}function z(n,t){return !n||n.length!==t.length||t.some(function(t,r){return t!==n[r]})}function B(n,t){return "function"==typeof t?t(n):t}
-
 /**
  * Runs a function the specified number of milliseconds after the component renders.
  *
@@ -1054,10 +1045,10 @@ let idIndex = 0;
  * @returns A modified copy of the given props
  */
 function useTagProps(props, tag) {
-    const [id] = h(() => ++idIndex);
-    const propsIdTag = `data-props-${tag}-${id}`;
-    const getStack = useStack();
-    if (getBuildMode() == 'development') {
+    if (BuildMode === 'development') {
+        const [id] = useState$1(() => ++idIndex);
+        const propsIdTag = `data-props-${tag}-${id}`;
+        const getStack = useStack();
         // Don't have multiple tags of the same type on the same props, means a hook has been called twice!
         console.assert(!(props && typeof props == "object" && tag in props));
         useTimeout({
@@ -1073,7 +1064,7 @@ function useTagProps(props, tag) {
             timeout: 250,
             triggerIndex: tag
         });
-        return F(() => {
+        return useMemo(() => {
             return { ...props, [propsIdTag]: true /*, [tag as never]: true*/ };
         }, [props, tag]);
     }
@@ -1299,6 +1290,8 @@ function tryNavigateDown({ isValid, indexDemangler, indexMangler, targetDemangle
  * and runs no effects.  Each child *does* run an effect, but with no state
  * changes unless you explicitly request them.
  *
+ * {@include } {@link ManagedChildren}
+ *
  * @hasChild {@link useManagedChild}
  *
  * @compositeParams
@@ -1415,7 +1408,7 @@ function useManagedChildren(parentParameters) {
         getAt: getManagedChildInfo,
         getHighestIndex: getHighestIndex,
         getLowestIndex: getLowestIndex,
-        arraySlice: useCallback(() => {
+        _arraySlice: useCallback(() => {
             let ret = managedChildrenArray.current.arr.slice();
             const max = getHighestIndex();
             for (let i = 0; i <= max; ++i) {
@@ -1612,7 +1605,7 @@ function useState(initialState) {
     // Hijack the normal setter function 
     // to also set our ref to the new value
     const setState = useCallback(value => {
-        if (getBuildMode() === 'development') {
+        if (BuildMode === 'development') {
             window._setState_stack = getStack();
         }
         if (typeof value === "function") {
@@ -1676,8 +1669,6 @@ function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovingTabIn
             let nextIndex = ((typeof updater === "function") ? updater(prevIndex ?? null) : updater);
             const untabbable = getUntabbable();
             let parentElement = getElement();
-            if (!parentElement)
-                debugger;
             console.assert(!!parentElement);
             // Whether or not we're currently tabbable, make sure that when we switch from untabbable to tabbable,
             // that we know which index to switch back to.
@@ -1814,16 +1805,16 @@ function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovingTabIn
             tabIndex: untabbable ? 0 : -1,
             // TODO: When a hidden child is clicked, some browsers focus the parent, just because it's got a role and a tabindex.
             // But this won't work to avoid that, because it messes with grid navigation
-            /*onFocus: useStableCallback((e: FocusEvent) => {
+            onFocus: useStableCallback((e) => {
                 const parentElement = getElement();
                 console.assert(!!parentElement);
                 if (e.target == getElement()) {
                     debugger;
                     if (!untabbable) {
-                        focusSelf(e);
+                        focusSelf(false, e);
                     }
                 }
-            })*/
+            })
         }, "data-roving-tab-index")
     };
 }
@@ -2605,14 +2596,14 @@ function useRearrangeableChildren({ rearrangeableChildrenParameters: { getIndex,
     //const { setTabbableIndex } = rovingTabIndexReturn;
     const shuffle$1 = useCallback(() => {
         const managedRows = getChildren();
-        const originalRows = managedRows.arraySlice();
+        const originalRows = managedRows._arraySlice();
         const shuffledRows = shuffle(originalRows);
         return rearrange(originalRows, shuffledRows);
     }, [ /* Must remain stable */]);
     const reverse = useCallback(() => {
         const managedRows = getChildren();
-        const originalRows = managedRows.arraySlice();
-        const reversedRows = managedRows.arraySlice().reverse();
+        const originalRows = managedRows._arraySlice();
+        const reversedRows = managedRows._arraySlice().reverse();
         return rearrange(originalRows, reversedRows);
     }, [ /* Must remain stable */]);
     // The sort function needs to be able to update whoever has all the sortable children.
@@ -2649,7 +2640,7 @@ function useRearrangeableChildren({ rearrangeableChildrenParameters: { getIndex,
     }, []);
     const toJsonArray = useCallback((transform) => {
         const managedRows = getChildren();
-        return managedRows.arraySlice().map(child => {
+        return managedRows._arraySlice().map(child => {
             if (transform)
                 return (transform(child));
             else
@@ -2702,7 +2693,7 @@ function useSortableChildren({ rearrangeableChildrenParameters, sortableChildren
     const sort = useCallback((direction) => {
         const managedRows = getChildren();
         const compare = getCompare();
-        const originalRows = managedRows.arraySlice();
+        const originalRows = managedRows._arraySlice();
         const sortedRows = compare ? originalRows.sort((lhsRow, rhsRow) => {
             const lhsValue = lhsRow;
             const rhsValue = rhsRow;
@@ -2710,7 +2701,7 @@ function useSortableChildren({ rearrangeableChildrenParameters, sortableChildren
             if (direction[0] == "d")
                 return -result;
             return result;
-        }) : managedRows.arraySlice();
+        }) : managedRows._arraySlice();
         return rearrange(originalRows, sortedRows);
     }, [ /* Must remain stable */]);
     return {
@@ -5028,8 +5019,6 @@ function ImperativeElementU({ tag: Tag, handle, ...props }, ref) {
     return (createElement(Tag, useMergedProps(propsStable, imperativeProps, props, { ref })));
 }
 
-var _=0;function o(o,e,n,t,f,l){var s,u,a={};for(u in e)"ref"==u?s=e[u]:a[u]=e[u];var i={type:o,props:a,key:n,ref:s,__k:null,__:null,__b:0,__e:null,__d:void 0,__c:null,__h:null,constructor:void 0,__v:--_,__source:f,__self:l};if("function"==typeof o&&(s=o.defaultProps))for(u in s)void 0===a[u]&&(a[u]=s[u]);return l$1.vnode&&l$1.vnode(i),i}
-
 const Table = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-";
 function base64(value) {
     return Table[value];
@@ -5077,7 +5066,7 @@ function usePortalChildren({ target }) {
         return removeChild?.(index);
     });
     const element = useMemo(() => { return target == null ? null : typeof target == "string" ? document.getElementById(target) : target; }, [target]);
-    const children = !element ? null : createPortal(o(PortalChildren, { setPushChild: setPushChild, setUpdateChild: setUpdateChild, setRemoveChild: setRemoveChild }), element);
+    const children = !element ? null : createPortal(createElement(PortalChildren, { setPushChild, setUpdateChild, setRemoveChild }), element);
     return {
         children: children,
         pushChild: pushChildStable,
@@ -5947,7 +5936,7 @@ function ProvideBatchedAnimationFrames({ children }) {
         handle = requestAnimationFrame(rafWithBatchedCallbacks);
         return () => cancelAnimationFrame(handle);
     }, []);
-    return (o(SharedAnimationFrameContext.Provider, { value: contextInfo.current, children: children }));
+    return (createElement(SharedAnimationFrameContext.Provider, { value: contextInfo.current, children }));
 }
 /**
  * The callback you provide will start running every frame after the component mounts.
@@ -6020,39 +6009,5 @@ function useInterval({ interval, callback }) {
     }, []);
 }
 
-// This file is for testing documentation-related things
-/**
- * Summary of TestClassBase
- */
-class TestClassBase {
-    constructor(arg) { }
-    /** Summary of frob */
-    frob() { return 0; }
-}
-/**
- * Summary of TestClass
- *
- * @remarks Extra remarks
- *
- * @typeParam T - A type parameter
- */
-class TestClass extends TestClassBase {
-    constructor() {
-        super(0);
-    }
-    /** Summary of frob (overridden) */
-    frob() { return 1; }
-    /** Summary of frob (implemented) */
-    abstractFrob() { return 1; }
-    /** Summary of foo */
-    foo() { return null; }
-}
-/** Summary of returnsFunction */
-function returnsFunction() {
-    return () => {
-        return Math.random();
-    };
-}
-
-export { DroppableFileError, EventDetail, EventMapping, ImperativeElement, ProvideBatchedAnimationFrames, TestClass, assertEmptyObject, binarySearch, debounceRendering, defaultCompare, enableLoggingPropConflicts, enhanceEvent, findBackupFocus, findFirstFocusable, findFirstTabbable, focus, generateRandomId, generateStack, getBuildMode, getDocument, getEventDetail, getFromLocalStorage, getTopElement, hideCallCount, mergeFunctions, monitorCallCount, onfocusin, onfocusout, returnFalse, returnNull, returnTrue, returnUndefined, returnZero, returnsFunction, runImmediately, setPressVibrate, storeToLocalStorage, tryNavigateToIndex, useActiveElement, useAnimationFrame, useAsync, useAsyncEffect, useAsyncHandler, useBackdropDismiss, useBlockingElement, useChildrenFlag, useChildrenHaveFocus, useChildrenHaveFocusChild, useCompleteGridNavigation, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useCompleteListNavigation, useCompleteListNavigationChild, useCompleteListNavigationDeclarative, useDismiss, useDocumentClass, useDraggable, useDroppable, useEffectDebug, useElementSize, useEnsureStability, useEscapeDismiss, useFocusTrap, useForceUpdate, useGlobalHandler, useGridNavigation, useGridNavigationCell, useGridNavigationRow, useGridNavigationSingleSelection, useGridNavigationSingleSelectionCell, useGridNavigationSingleSelectionRow, useGridNavigationSingleSelectionSortable, useGridNavigationSingleSelectionSortableCell, useGridNavigationSingleSelectionSortableRow, useHasCurrentFocus, useHasLastFocus, useHideScroll, useImperativeProps, useInterval, useLayoutEffectDebug, useLinearNavigation, useListNavigation, useListNavigationChild, useListNavigationSingleSelection, useListNavigationSingleSelectionChild, useListNavigationSingleSelectionSortable, useListNavigationSingleSelectionSortableChild, useLogicalDirection, useLostFocusDismiss, useManagedChild, useManagedChildren, useMediaQuery, useMemoObject, useMergedChildren, useMergedClasses, useMergedProps, useMergedRefs, useMergedStyles, useModal, useMutationObserver, usePaginatedChild, usePaginatedChildren, usePassiveState, usePersistentState, usePortalChildren, usePress, useRandomDualIds, useRandomId, useRearrangeableChildren, useRefElement, useRovingTabIndex, useRovingTabIndexChild, useSearchParamState, useSearchParamStateDeclarative, useSingleSelection, useSingleSelectionChild, useSingleSelectionDeclarative, useSortableChildren, useStableCallback, useStableGetter, useStack, useStaggeredChild, useStaggeredChildren, useState, useTextContent, useTimeout, useTypeaheadNavigation, useTypeaheadNavigationChild, useUrl, useWhatCausedRender };
+export { BuildMode, DroppableFileError, EventDetail, EventMapping, ImperativeElement, ProvideBatchedAnimationFrames, assertEmptyObject, binarySearch, debounceRendering, defaultCompare, enableLoggingPropConflicts, enhanceEvent, findBackupFocus, findFirstFocusable, findFirstTabbable, focus, generateRandomId, generateStack, getDocument, getEventDetail, getFromLocalStorage, getTopElement, hideCallCount, mergeFunctions, monitorCallCount, onfocusin, onfocusout, returnFalse, returnNull, returnTrue, returnUndefined, returnZero, runImmediately, setPressVibrate, storeToLocalStorage, tryNavigateToIndex, useActiveElement, useAnimationFrame, useAsync, useAsyncEffect, useAsyncHandler, useBackdropDismiss, useBlockingElement, useChildrenFlag, useChildrenHaveFocus, useChildrenHaveFocusChild, useCompleteGridNavigation, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useCompleteListNavigation, useCompleteListNavigationChild, useCompleteListNavigationDeclarative, useDismiss, useDocumentClass, useDraggable, useDroppable, useEffectDebug, useElementSize, useEnsureStability, useEscapeDismiss, useFocusTrap, useForceUpdate, useGlobalHandler, useGridNavigation, useGridNavigationCell, useGridNavigationRow, useGridNavigationSingleSelection, useGridNavigationSingleSelectionCell, useGridNavigationSingleSelectionRow, useGridNavigationSingleSelectionSortable, useGridNavigationSingleSelectionSortableCell, useGridNavigationSingleSelectionSortableRow, useHasCurrentFocus, useHasLastFocus, useHideScroll, useImperativeProps, useInterval, useLayoutEffectDebug, useLinearNavigation, useListNavigation, useListNavigationChild, useListNavigationSingleSelection, useListNavigationSingleSelectionChild, useListNavigationSingleSelectionSortable, useListNavigationSingleSelectionSortableChild, useLogicalDirection, useLostFocusDismiss, useManagedChild, useManagedChildren, useMediaQuery, useMemoObject, useMergedChildren, useMergedClasses, useMergedProps, useMergedRefs, useMergedStyles, useModal, useMutationObserver, usePaginatedChild, usePaginatedChildren, usePassiveState, usePersistentState, usePortalChildren, usePress, useRandomDualIds, useRandomId, useRearrangeableChildren, useRefElement, useRovingTabIndex, useRovingTabIndexChild, useSearchParamState, useSearchParamStateDeclarative, useSingleSelection, useSingleSelectionChild, useSingleSelectionDeclarative, useSortableChildren, useStableCallback, useStableGetter, useStack, useStaggeredChild, useStaggeredChildren, useState, useTextContent, useTimeout, useTypeaheadNavigation, useTypeaheadNavigationChild, useUrl, useWhatCausedRender };
 //# sourceMappingURL=index.react.js.map

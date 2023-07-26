@@ -4,7 +4,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
 (function () {
   'use strict';
 
-  var _window, _window$requestIdleCa;
+  var _process, _globalThis$_process, _globalThis$process, _env, _globalThis$process$_, _globalThis$process$e, _NODE_ENV, _globalThis$process$e2, _window, _window$requestIdleCa;
   var n,
     l$1,
     u$1,
@@ -869,6 +869,1433 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     webkitanimationstart: null,
     webkittransitionend: null
   };
+
+  // Get the value of process?.env?.NODE_ENV delicately (also fun fact @rollup/plugin-replace works in comments!)
+  // (i.e. in a way that doesn't throw an error but has isDevMode be a constant)
+  (_globalThis$_process = globalThis[_process = "process"]) !== null && _globalThis$_process !== void 0 ? _globalThis$_process : globalThis[_process] = {};
+  (_globalThis$process$_ = (_globalThis$process = globalThis["process"])[_env = "env"]) !== null && _globalThis$process$_ !== void 0 ? _globalThis$process$_ : _globalThis$process[_env] = {};
+  (_globalThis$process$e2 = (_globalThis$process$e = globalThis["process"]["env"])[_NODE_ENV = "NODE_ENV"]) !== null && _globalThis$process$e2 !== void 0 ? _globalThis$process$e2 : _globalThis$process$e[_NODE_ENV] = "production";
+
+  // TODO: This shouldn't be in every build, I don't think it's in core-js? I think?
+  // And it's extremely small anyway and basically does nothing.
+  (_window$requestIdleCa = (_window = window).requestIdleCallback) !== null && _window$requestIdleCa !== void 0 ? _window$requestIdleCa : _window.requestIdleCallback = callback => {
+    return setTimeout(() => {
+      callback({
+        didTimeout: false,
+        timeRemaining: () => {
+          return 0;
+        }
+      });
+    }, 5);
+  };
+  let timeoutHandle = null;
+  /**
+   * When called inside a hook, monitors each call of that hook and prints the results to a table once things settle.
+   *
+   * @remarks Re-renders and such are all collected together when the table is printed to the console with `requestIdleCallback`.
+   */
+  function monitorCallCount(hook) {
+    var _window2, _window2$_hookCallCou, _window$_hookCallCoun, _window$_hookCallCoun2;
+    const name = hook.name;
+    if (filters.has(name)) return;
+    console.assert(name.length > 0);
+    (_window2$_hookCallCou = (_window2 = window)._hookCallCount) !== null && _window2$_hookCallCou !== void 0 ? _window2$_hookCallCou : _window2._hookCallCount = {
+      callCounts: {}
+    };
+    (_window$_hookCallCoun2 = (_window$_hookCallCoun = window._hookCallCount.callCounts)[name]) !== null && _window$_hookCallCoun2 !== void 0 ? _window$_hookCallCoun2 : _window$_hookCallCoun[name] = {
+      moment: 0,
+      total: 0
+    };
+    window._hookCallCount.callCounts[name].moment += 1;
+    window._hookCallCount.callCounts[name].total += 1;
+    if (timeoutHandle == null) {
+      timeoutHandle = requestIdleCallback(() => {
+        //console.log((window as WindowWithHookCallCount)._hookCallCount.callCountsMoment);
+        //(window as WindowWithHookCallCount)._hookCallCount.callCountsMoment = {};
+        const o = Object.entries(window._hookCallCount.callCounts).map(_ref2 => {
+          let [hook, counts] = _ref2;
+          return {
+            Hook: hook || "?",
+            Now: (counts === null || counts === void 0 ? void 0 : counts.moment) || 0,
+            Total: (counts === null || counts === void 0 ? void 0 : counts.total) || 0
+          };
+        }).filter(_ref3 => {
+          let {
+            Now
+          } = _ref3;
+          return !!Now;
+        }).sort((_ref4, _ref5) => {
+          let {
+            Now: lhsM
+          } = _ref4;
+          let {
+            Now: rhsM
+          } = _ref5;
+          if (!lhsM && !rhsM) return 0;
+          lhsM || (lhsM = Infinity);
+          rhsM || (rhsM = Infinity);
+          return lhsM - rhsM;
+        });
+        console.table(o, ['Hook', 'Now', 'Total']);
+        Object.entries(window._hookCallCount.callCounts).forEach(_ref6 => {
+          let [, counts] = _ref6;
+          counts.moment = 0;
+        });
+        timeoutHandle = null;
+      });
+    }
+  }
+  const filters = new Set();
+  const toRun = new Map();
+  // TODO: Whether this goes in options.diffed or options._commit
+  // is a post-suspense question.
+  // Right now, using options._commit has the problem of running
+  // *after* refs are applied, but we need to come before even that
+  // so `ref={someStableFunction}` works.
+  // 
+  // Also it's private.
+  //
+  // ...
+  // Well, useEvent or whatever is finally, finally 4 years later finally here
+  // which is cool and means we won't need this at all soon.
+  // So for now we'll stick with diff to prevent any weirdness with
+  // commit being private and all.
+  //
+  // Also, in theory this could be replaced with `useInsertionEffect`,
+  // but that probably won't be available in Preact for awhile.
+  const commitName = "diffed";
+  const newCommit = function (vnode) {
+    for (const [id, effectInfo] of toRun) {
+      const oldInputs = effectInfo.prevInputs;
+      if (argsChanged(oldInputs, effectInfo.inputs)) {
+        var _effectInfo$cleanup;
+        (_effectInfo$cleanup = effectInfo.cleanup) === null || _effectInfo$cleanup === void 0 ? void 0 : _effectInfo$cleanup.call(effectInfo);
+        effectInfo.cleanup = effectInfo.effect();
+        effectInfo.prevInputs = effectInfo.inputs;
+      }
+    }
+    toRun.clear();
+    for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+      args[_key - 1] = arguments[_key];
+    }
+    originalCommit === null || originalCommit === void 0 ? void 0 : originalCommit(vnode, ...args);
+  };
+  const originalCommit = l$1[commitName];
+  l$1[commitName] = newCommit;
+  let incrementingId = 0;
+  function nextId() {
+    let next = ++incrementingId;
+    // TODO: This seems reasonable, but is is necessary or are we orders of magnitude from having to worry about overflow?
+    if (incrementingId >= Number.MAX_SAFE_INTEGER) incrementingId = -Number.MAX_SAFE_INTEGER;
+    return next;
+  }
+  /**
+   * Semi-private function to allow stable callbacks even within `useLayoutEffect` and ref assignment.
+   *
+   * @remarks Every render, we send the arguments to be evaluated after diffing has completed,
+   * which happens before.
+   *
+   * @param effect
+   * @param inputs
+   */
+  function useBeforeLayoutEffect(effect, inputs) {
+    var _ref$current;
+    monitorCallCount(useBeforeLayoutEffect);
+    // Note to self: This is by far the most called hook by sheer volume of dependencies.
+    // So it should ideally be as quick as possible.
+    const ref = _(null);
+    (_ref$current = ref.current) !== null && _ref$current !== void 0 ? _ref$current : ref.current = nextId();
+    const id = ref.current;
+    if (effect) toRun.set(id, {
+      effect,
+      inputs,
+      cleanup: null
+    });else toRun.delete(id);
+    // Not needed, because the insertion cleanup would run before useEffect anyway, I think?
+    /*useEffect(() => {
+        return () => {
+            toRun.delete(id);
+        }
+    }, [id])*/
+  }
+
+  function argsChanged(oldArgs, newArgs) {
+    return !!(!oldArgs || oldArgs.length !== (newArgs === null || newArgs === void 0 ? void 0 : newArgs.length) || newArgs !== null && newArgs !== void 0 && newArgs.some((arg, index) => arg !== oldArgs[index]));
+  }
+  function debounceRendering(f) {
+    var _l$1$debounceRenderin;
+    ((_l$1$debounceRenderin = l$1.debounceRendering) !== null && _l$1$debounceRenderin !== void 0 ? _l$1$debounceRenderin : queueMicrotask)(f);
+  }
+  const onfocusin = "onfocusin";
+  const onfocusout = "onfocusout";
+  const EventMapping = {
+    dblclick: "onDblClick",
+    focusin: "onfocusin",
+    focusout: "onfocusout",
+    formdata: "onFormData",
+    toggle: "onToggle",
+    ...EventMapping$1
+  };
+
+  /**
+   * Debug hook. Given a value or set of values, emits a console error if any of them change from one render to the next.
+   *
+   * @remarks Eventually, when useEvent lands, we hopefully won't need this.
+   */
+  function useEnsureStability(parentHookName) {
+    for (var _len2 = arguments.length, values = new Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+      values[_key2 - 1] = arguments[_key2];
+    }
+    const helperToEnsureStability = _([]);
+    const shownError = _([]);
+    useHelper(values.length, -1);
+    values.forEach(useHelper);
+    return;
+    function useHelper(value, i) {
+      const index = i + 1;
+      // Make sure that the provided functions are perfectly stable across renders
+      if (helperToEnsureStability.current[index] === undefined) helperToEnsureStability.current[index] = value;
+      if (helperToEnsureStability.current[index] != value) {
+        if (!shownError.current[index]) {
+          /* eslint-disable no-debugger */
+          debugger;
+          console.error("The hook ".concat(parentHookName, " requires some or all of its arguments remain stable across each render; please check the ").concat(i, "-indexed argument (").concat(i >= 0 ? JSON.stringify(values[i]) : "the number of supposedly stable elements", ")."));
+          shownError.current[index] = true;
+        }
+      }
+    }
+  }
+  /**
+   * Similar to `useState`, but for values that aren't "render-important" &ndash; updates don't cause a re-render and so the value shouldn't be used during render (though it certainly can, at least by re-rendering again).
+   *
+   * @remarks To compensate for this, you should pass a `useEffect`-esque callback that is run whenever the value changes.  Just like `useEffect`, this callback can return a cleanup function that's run before the value changes.  If you would like to re-render when the value changes (or, say, when the value meets some criteria), this is where you'll want to put in a call to a `setState` function.
+   *
+   * To summarize, it's like a `useState`-`useEffect` mashup:
+   *
+   * 1. It's like `useState`, except this version of `setState` doesn't re-render the whole component
+   * 2. It's like `useState`, except you can run a function when the value changes that optionally returns a cleanup function
+   * 3. It's like `useEffect`, except you trigger the effect function "remotely" instead of it running after rendering
+   * 4. It's like `useEffect`, except the single "dependency" is based on your calls to `setState`
+   *
+   * Note that while calling `setState` doesn't cause any re-renders, you can do that within your `onChange` function, called whenever the value changes via that `setState`.
+   *
+   * {@include } {@link OnPassiveStateChange}
+   *
+   * @param onChange - The "effect" function to run when the value changes. Effectively the same as `useEffect`'s "effect" function.  MUST BE STABLE, either because it has no dependencies, or because it's from useStableCallback, but this will mean you cannot use getState or setState during render.
+   * @param getInitialValue - If provided, the effect will be invoked once with this value on mount. MUST BE STABLE, either because it has no dependencies, or because it's from useStableCallback, but this will mean you cannot use getState or setState during render.
+   * @param customDebounceRendering - By default, changes to passive state are delayed by one tick so that we only check for changes in a similar way to Preact. You can override this to, for example, always run immediately instead.
+   * @returns
+   */
+  function usePassiveState(onChange, getInitialValue, customDebounceRendering) {
+    monitorCallCount(usePassiveState);
+    //let [id, ,getId] = useState(() => generateRandomId());
+    const valueRef = _(Unset$2);
+    const reasonRef = _(Unset$2);
+    const warningRef = _(false);
+    const dependencyToCompareAgainst = _(Unset$2);
+    const cleanupCallbackRef = _(undefined);
+    // Make sure that the provided functions are perfectly stable across renders
+    useEnsureStability("usePassiveState", onChange, getInitialValue, customDebounceRendering);
+    // Shared between "dependency changed" and "component unmounted".
+    const onShouldCleanUp = T$1(() => {
+      const cleanupCallback = cleanupCallbackRef.current;
+      if (cleanupCallback) cleanupCallback();
+    }, []);
+    // There are a couple places where we'd like to use our initial
+    // value in place of having no value at all yet.
+    // This is the shared code for that, used on mount and whenever
+    // getValue is called.
+    const tryEnsureValue = T$1(() => {
+      if (valueRef.current === Unset$2 && getInitialValue != undefined) {
+        try {
+          var _onChange;
+          const initialValue = getInitialValue();
+          valueRef.current = initialValue;
+          cleanupCallbackRef.current = (_onChange = onChange === null || onChange === void 0 ? void 0 : onChange(initialValue, undefined, undefined)) !== null && _onChange !== void 0 ? _onChange : undefined;
+        } catch (ex) {
+          // Exceptions are intentional to allow bailout (without exposing the Unset symbol)
+        }
+      }
+    }, [/* getInitialValue and onChange intentionally omitted */]);
+    const getValue = T$1(() => {
+      if (warningRef.current) console.warn("During onChange, prefer using the (value, prevValue) arguments instead of getValue -- it's ambiguous as to if you're asking for the old or new value at this point in time for this component.");
+      // The first time we call getValue, if we haven't been given a value yet,
+      // (and we were given an initial value to use)
+      // return the initial value instead of nothing.
+      if (valueRef.current === Unset$2) tryEnsureValue();
+      return valueRef.current === Unset$2 ? undefined : valueRef.current;
+    }, []);
+    y(() => {
+      // Make sure we've run our effect at least once on mount.
+      // (If we have an initial value, of course)
+      tryEnsureValue();
+    }, []);
+    // The actual code the user calls to (possibly) run a new effect.
+    const setValue = T$1((arg, reason) => {
+      // Regardless of anything else, figure out what our next value is about to be.
+      const nextValue = arg instanceof Function ? arg(valueRef.current === Unset$2 ? undefined : valueRef.current) : arg;
+      //let id = getId();
+      //console.log((nextValue !== valueRef.current? "" : "NOT ") + "Scheduling effect ", id, " with value ", nextValue);
+      if ( /*dependencyToCompareAgainst.current === Unset &&*/nextValue !== valueRef.current) {
+        // This is the first request to change this value.
+        // Evaluate the request immediately, then queue up the onChange function
+        // Save our current value so that we can compare against it later
+        // (if we flip back to this state, then we won't send the onChange function)
+        dependencyToCompareAgainst.current = valueRef.current;
+        // It's important to update this here (as well as below) in case customDebounceRendering invokes this immediately
+        valueRef.current = nextValue;
+        reasonRef.current = reason;
+        // Schedule the actual check and invocation of onChange later to let effects settle
+        (customDebounceRendering !== null && customDebounceRendering !== void 0 ? customDebounceRendering : debounceRendering)(() => {
+          const nextReason = reasonRef.current;
+          const nextDep = valueRef.current;
+          const prevDep = dependencyToCompareAgainst.current;
+          //let id = getId();
+          //console.log(((dependencyToCompareAgainst.current != valueRef.current)? "" : "NOT ") + "Running effect ", id, " with value ", nextDep);
+          if (dependencyToCompareAgainst.current != valueRef.current) {
+            // TODO: This needs to happen here in order to make recursive onChanges work
+            // but it feels better to have it happen after onChange...
+            valueRef.current = dependencyToCompareAgainst.current = Unset$2;
+            warningRef.current = true;
+            try {
+              var _onChange2;
+              // Call any registered cleanup function
+              onShouldCleanUp();
+              valueRef.current = nextDep; // Needs to happen before onChange in case onChange is recursive (e.g. focusing causing a focus causing a focus)
+              cleanupCallbackRef.current = (_onChange2 = onChange === null || onChange === void 0 ? void 0 : onChange(nextDep, prevDep === Unset$2 ? undefined : prevDep, nextReason)) !== null && _onChange2 !== void 0 ? _onChange2 : undefined;
+            } finally {
+              // Allow the user to normally call getValue again
+              warningRef.current = false;
+            }
+          }
+          // We've finished with everything, so mark us as being on a clean slate again.
+          dependencyToCompareAgainst.current = Unset$2;
+        });
+      }
+      // Update the value immediately.
+      // This will be checked against prevDep to see if we should actually call onChange
+      //valueRef.current = nextValue;
+    }, []);
+    return [getValue, setValue];
+  }
+  const Unset$2 = Symbol();
+  // Easy constants for getInitialValue
+  function returnTrue() {
+    return true;
+  }
+  function returnFalse() {
+    return false;
+  }
+  function returnNull() {
+    return null;
+  }
+  /**
+   * An alternative to use for `customDebounceRendering` that causes `usePassiveState` to run changes without waiting a tick.
+   */
+  function runImmediately(f) {
+    f();
+  }
+  const Unset$1 = Symbol("unset");
+  /**
+   * Given an input value, returns a constant getter function that can be used
+   * inside of `useEffect` and friends without including it in the dependency array.
+   *
+   * @remarks This uses `options.diffed` in order to run before everything, even
+   * ref assignment. This means this getter is safe to use anywhere ***except the render phase***.
+   */
+  function useStableGetter(value) {
+    monitorCallCount(useStableGetter);
+    const ref = _(Unset$1);
+    useBeforeLayoutEffect(() => {
+      ref.current = value;
+    }, [value]);
+    return T$1(() => {
+      if (ref.current === Unset$1) {
+        throw new Error('Value retrieved from useStableGetter() cannot be called during render.');
+      }
+      return ref.current;
+    }, []);
+  }
+  function useMemoObject(t) {
+    return F$1(() => {
+      return t;
+    }, Object.values(t));
+  }
+
+  /**
+   * We keep track of which callbacks are stable with a WeakMap instead of, say, a symbol because
+   * `useCallback` will return a function that's stable across *all* renders, meaning
+   * we can't use our funny "`if` only works here because it doesn't break the rules of hooks" trick then.
+   */
+  const map = new WeakMap();
+  function isStableGetter(obj) {
+    var _map$get;
+    return (_map$get = map.get(obj)) !== null && _map$get !== void 0 ? _map$get : false;
+  }
+  function setIsStableGetter(obj) {
+    map.set(obj, true);
+    return obj;
+  }
+  /**
+   * Alternate useCallback() which always returns the same (wrapped) function reference
+   * so that it can be excluded from the dependency arrays of `useEffect` and friends.
+   *
+   * @remarks In general, just pass the function you want to be stable (but you can't use it during render,
+   * so be careful!).  Alternatively, if you need a stable callback that **can** be used
+   * during render, pass an empty dependency array and it'll act like `useCallback` with an
+   * empty dependency array, but with the associated stable typing. In this case, you ***must*** ensure that it
+   * truly has no dependencies/only stable dependencies!!
+   */
+  function useStableCallback(fn, noDeps) {
+    monitorCallCount(useStableCallback);
+    useEnsureStability("useStableCallback", noDeps == null, noDeps === null || noDeps === void 0 ? void 0 : noDeps.length, isStableGetter(fn));
+    if (isStableGetter(fn)) return fn;
+    if (noDeps == null) {
+      const currentCallbackGetter = useStableGetter(fn);
+      return setIsStableGetter(T$1(function () {
+        return currentCallbackGetter()(...arguments);
+      }, []));
+    } else {
+      console.assert(noDeps.length === 0);
+      return setIsStableGetter(T$1(fn, []));
+    }
+  }
+
+  /**
+   * Allows attaching an event handler to any *non-Preact* element, and removing it when the component using the hook unmounts. The callback does not need to be stable across renders.
+   *
+   * @remarks `"mode"` controls if there's one handler that calls all your functions (default), or one handler added per function (`"single"`).
+   *
+   * The default, `"grouped"`, is faster when you have, say, a button component, used hundreds of times on a page, that each installs a global event handler.
+   *
+   * @param target - A *non-Preact* node to attach the event to.
+   * *
+   */
+  function useGlobalHandler(target, type, handler, options, mode) {
+    monitorCallCount(useGlobalHandler);
+    mode || (mode = "grouped");
+    useEnsureStability("useGlobalHandler", mode);
+    if (mode === "grouped") {
+      // Note to self: The typing doesn't improve even if this is split up into a sub-function.
+      // No matter what, it seems impossible to get the handler's event object typed perfectly.
+      // It seems like it's guaranteed to always be a union of all available types.
+      // Again, no matter what combination of sub- or sub-sub-functions used.
+      useGlobalHandlerGrouped(target, type, handler, options);
+    } else {
+      useGlobalHandlerSingle(target, type, handler, options);
+    }
+  }
+  let mapThing = new Map();
+  function doMapThing(op, target, type, handler, options) {
+    if (handler) {
+      const optionsKey = JSON.stringify(options);
+      const byType = mapThing.get(target) || new Map();
+      const byOptions = byType.get(type) || new Map();
+      const info = byOptions.get(optionsKey) || {
+        listener: null,
+        listeners: new Set()
+      };
+      op(info, handler);
+      byOptions.set(optionsKey, info);
+      byType.set(type, byOptions);
+      mapThing.set(target, byType);
+    }
+  }
+  function addToMapThing(target, type, handler, options) {
+    doMapThing((info, h) => {
+      info.listeners.add(h);
+      if (info.listener == null) target.addEventListener(type, info.listener = e => info.listeners.forEach(fn => fn(e)), options);
+    }, target, type, handler, options);
+  }
+  function removeFromMapThing(target, type, handler, options) {
+    doMapThing((info, h) => {
+      info.listeners.delete(h);
+      if (info.listener == null) target.removeEventListener(type, info.listener = e => info.listeners.forEach(fn => fn(e)), options);
+    }, target, type, handler, options);
+  }
+  /**
+   * This is way faster for large numbers of event handlers.
+   *
+   * For example, if every button listens for a global click, or something,
+   * it would be nice if it was efficient at least.
+   */
+  function useGlobalHandlerGrouped(target, type, handler, options) {
+    let stableHandler = useStableCallback(handler !== null && handler !== void 0 ? handler : () => {});
+    if (handler == null) stableHandler = null;
+    p(() => {
+      if (stableHandler) {
+        addToMapThing(target, type, stableHandler, options);
+        return () => removeFromMapThing(target, type, stableHandler, options);
+      }
+    }, [target, type, stableHandler]);
+  }
+  function useGlobalHandlerSingle(target, type, handler, options) {
+    let stableHandler = useStableCallback(handler !== null && handler !== void 0 ? handler : () => {});
+    if (handler == null) stableHandler = null;
+    p(() => {
+      if (stableHandler) {
+        target.addEventListener(type, stableHandler, options);
+        return () => target.removeEventListener(type, stableHandler, options);
+      }
+    }, [target, type, stableHandler]);
+  }
+
+  /**
+   * Quick and easy way to add extra information to an event that was fired.
+   *
+   * For example, "this was a click event, but it has information about what list item was pressed too."
+   *
+   * Get that extra information from the [EventDetail] symbol.
+   */
+  const EventDetail = Symbol("event-detail");
+  function enhanceEvent(e, detail) {
+    const event = e !== null && e !== void 0 ? e : {};
+    event[EventDetail] = detail;
+    return event;
+  }
+
+  /**
+   * Handles events for a backdrop on a modal dialog -- the kind where the user expects the modal to close when they click/tap outside of it.
+   *
+   * @compositeParams
+   */
+  function useBackdropDismiss(_ref7) {
+    let {
+      backdropDismissParameters: {
+        active: open,
+        onDismiss: onCloseUnstable,
+        ...void1
+      },
+      refElementPopupReturn: {
+        getElement,
+        ...void3
+      },
+      ...void2
+    } = _ref7;
+    monitorCallCount(useBackdropDismiss);
+    const getOpen = useStableGetter(open);
+    const onClose = useStableCallback(onCloseUnstable);
+    const onBackdropClick = T$1(function onBackdropClick(e) {
+      if (!getOpen()) return;
+      // Basically, "was this event fired on an element not contained by the modal?"
+      // There are multiple ways browser react to "interacting with nothing", and this takes care of everything.
+      let element = getElement();
+      let foundInsideClick = false;
+      if (e.target && element && element.contains(e.target)) {
+        foundInsideClick = true;
+      }
+      if (!foundInsideClick) {
+        onClose(enhanceEvent(e, {
+          reason: "backdrop"
+        }));
+      }
+    }, []);
+    useGlobalHandler(window, "mousedown", open ? onBackdropClick : null, {
+      capture: true
+    });
+    useGlobalHandler(window, "touchstart", open ? onBackdropClick : null, {
+      capture: true
+    });
+  }
+  const MagicWindowKey = "__preact-prop-helpers-escape-key-dismiss__";
+  function getElementDepth(element) {
+    let depth = 0;
+    let parent = element.parentElement;
+    while (parent) {
+      depth += 1;
+      parent = parent.parentElement;
+    }
+    return depth;
+  }
+  /**
+   * Invokes a callback when the `Escape` key is pressed on the topmost component (a max of one invocation per `Escape` press)
+   *
+   * @remarks One press of the `Escape` key is guaranteed to only call `onDismiss` for *only one* component, and it is called on the component deepest in the DOM tree.
+   *
+   * TODO: Instead of being deepest in the DOM tree (which is usually fine), it should probably be related to what order something was made `active`.
+   *
+   * @compositeParams
+   */
+  function useEscapeDismiss(_ref8) {
+    let {
+      escapeDismissParameters: {
+        onDismiss: onClose,
+        active: open,
+        getDocument: unstableGetDocument,
+        parentDepth,
+        ...void1
+      },
+      refElementPopupReturn: {
+        getElement,
+        ...void2
+      }
+    } = _ref8;
+    monitorCallCount(useEscapeDismiss);
+    const stableOnClose = useStableCallback(onClose);
+    const getDocument = useStableCallback(unstableGetDocument);
+    const getDepth = useStableGetter(parentDepth + 1);
+    // When this component opens, add an event listener that finds the deepest open soft dismiss element to actually dismiss.
+    // Only opened components will add event handlers, and will remove them once closed.
+    // The reason this is so complicated is because:
+    // 1. We must only close one soft dismiss component at a time.  If there's a tooltip in a popup, the tooltip must be dismissed.
+    // 2. `keydown` events don't just work on arbitrary elements, for our purposes they must be from the `window`. So we can't rely on normal capturing or bubbling behavior on the element itself.
+    // 3. Event handlers added to the `window` via `addEventHandler` are called in the order of registration, which is completely at odds with #1.
+    //
+    // So all soft dismiss components listen for a keydown of Escape, 
+    // then the first one to do so will wait for a microtask, 
+    // then find the deepest element in the document tree to dismiss of all of those components currently open.
+    p(() => {
+      var _window$MagicWindowKe;
+      const document = getDocument();
+      const window = document.defaultView;
+      (_window$MagicWindowKe = window[MagicWindowKey]) !== null && _window$MagicWindowKe !== void 0 ? _window$MagicWindowKe : window[MagicWindowKey] = {
+        microtaskQueued: false,
+        elementQueue: new Map()
+      };
+      const info = window[MagicWindowKey];
+      if (open) {
+        window.addEventListener("keydown", handler, {
+          capture: true
+        });
+        return () => {
+          const element = getElement();
+          if (element && info.elementQueue) info.elementQueue.delete(element);
+          window.removeEventListener("keydown", handler, {
+            capture: true
+          });
+        };
+      }
+      function handler(e) {
+        if (e.key == "Escape") {
+          // We don't know which of the currently active soft dismisses will actually do something,
+          // but ONE of them definitely will,
+          // so we stop propagation to child nodes, but not to everyone on the window (stopImmediatePropagation).
+          e.preventDefault();
+          e.stopPropagation();
+          // This is what at least one of the elements will call
+          const onClose2 = () => {
+            stableOnClose(enhanceEvent(e, {
+              reason: "escape"
+            }));
+          };
+          const element = getElement();
+          if (element) {
+            const treeDepth = getElementDepth(element);
+            const depth = getDepth();
+            info.elementQueue.set(element, {
+              depth,
+              onClose: onClose2,
+              treeDepth
+            });
+          }
+          if (!info.microtaskQueued) {
+            info.microtaskQueued = true;
+            setTimeout(() => {
+              var _deepestOnClose;
+              const {
+                elementQueue
+              } = info;
+              info.microtaskQueued = false;
+              info.elementQueue = new Map();
+              let deepestDepth = -Infinity;
+              let deepestTreeDepth = -Infinity;
+              let deepestOnClose = null;
+              for (const [element, {
+                depth,
+                onClose,
+                treeDepth
+              }] of elementQueue) {
+                let tieBroken = false;
+                if (depth == deepestDepth) {
+                  if (treeDepth > deepestTreeDepth) {
+                    tieBroken = true;
+                  }
+                }
+                if (depth > deepestDepth || depth == deepestDepth && tieBroken) {
+                  deepestDepth = depth;
+                  deepestTreeDepth = treeDepth;
+                  deepestOnClose = onClose;
+                }
+              }
+              (_deepestOnClose = deepestOnClose) === null || _deepestOnClose === void 0 ? void 0 : _deepestOnClose();
+            }, 0);
+          }
+        }
+      }
+    }, [open]);
+  }
+
+  /**
+   * Invokes a callback when focus travels outside of the component's element.
+   *
+   * @remarks TODO: This is not intended for recursive structures, like dialogs that open dialogs, or menus that open menus, but does properly handle, e.g., the fact that a menu's menubutton having focus still counts as the menu having focus.
+   *
+   * @compositeParams
+   */
+  function useLostFocusDismiss(_ref9) {
+    let {
+      refElementPopupReturn: {
+        getElement: getPopupElement,
+        ...void3
+      },
+      refElementSourceReturn,
+      lostFocusDismissParameters: {
+        active: open,
+        onDismiss: onClose,
+        ...void4
+      },
+      ...void1
+    } = _ref9;
+    monitorCallCount(useLostFocusDismiss);
+    const {
+      getElement: getSourceElement,
+      ...void2
+    } = refElementSourceReturn !== null && refElementSourceReturn !== void 0 ? refElementSourceReturn : {};
+    const stableOnClose = useStableCallback(onClose);
+    const getOpen = useStableGetter(open);
+    const onLastActiveElementChange = T$1((newElement, _prevElement, e) => {
+      const open = getOpen();
+      const sourceElement = getSourceElement === null || getSourceElement === void 0 ? void 0 : getSourceElement();
+      const popupElement = getPopupElement();
+      if (!(sourceElement !== null && sourceElement !== void 0 && sourceElement.contains(newElement) || popupElement !== null && popupElement !== void 0 && popupElement.contains(newElement))) {
+        if (open) stableOnClose(enhanceEvent(e, {
+          reason: "lost-focus"
+        }));
+      }
+    }, [getSourceElement]);
+    return {
+      activeElementParameters: {
+        onLastActiveElementChange
+      }
+    };
+  }
+
+  /**
+   * Combines two `children`.
+   *
+   * @remarks This is fairly trivial and not even technically a hook, as it doesn't use any other hooks, but is this way for consistency.
+   *
+   * TODO: This could accept a variable number of arguments to be consistent with useMergedProps, but I feel like it might be a performance hit.
+   */
+  function useMergedChildren(lhs, rhs) {
+    monitorCallCount(useMergedChildren);
+    if (lhs == null && rhs == null) {
+      return undefined;
+    } else if (lhs == null) {
+      return rhs;
+    } else if (rhs == null) {
+      return lhs;
+    } else {
+      return y$1(k$2, {}, lhs, rhs);
+    }
+  }
+
+  /**
+   * Merged the `class` and `className` properties of two sets of props into a single string.
+   *
+   * @remarks Duplicate classes are removed (order doesn't matter anyway).
+   */
+  function useMergedClasses() {
+    monitorCallCount(useMergedClasses);
+    // Note: For the sake of forward compatibility, this function is labelled as
+    // a hook, but as it uses no other hooks it technically isn't one.
+    let classesSet = new Set();
+    for (var _len3 = arguments.length, classes = new Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+      classes[_key3] = arguments[_key3];
+    }
+    for (let c of classes) {
+      if (typeof c == "string" && c.trim()) classesSet.add(c);
+    }
+    if (classesSet.size) {
+      return Array.from(classesSet).join(" ");
+    } else {
+      return undefined;
+    }
+  }
+  function processRef(instance, ref) {
+    if (typeof ref === "function") {
+      ref(instance);
+    } else if (ref != null) {
+      ref.current = instance;
+    } else {
+      /* eslint-disable no-debugger */
+      debugger;
+      console.assert(false, "Unknown ref type found that was neither a RefCallback nor a RefObject");
+    }
+  }
+  /**
+   * Combines two refs into one. This allows a component to both use its own ref *and* forward a ref that was given to it.
+   *
+   * @remarks Or just use {@link useMergedProps}
+   */
+  function useMergedRefs(rhs, lhs) {
+    monitorCallCount(useMergedRefs);
+    // This *must* be stable in order to prevent repeated reset `null` calls after every render.
+    const combined = useStableCallback(function combined(current) {
+      processRef(current, lhs);
+      processRef(current, rhs);
+    });
+    if (lhs == null && rhs == null) {
+      return undefined;
+    } else if (lhs == null) {
+      return rhs;
+    } else if (rhs == null) {
+      return lhs;
+    } else {
+      return combined;
+    }
+  }
+  function styleStringToObject(style) {
+    // TODO: This sucks D:
+    return Object.fromEntries(style.split(";").map(statement => statement.split(":")));
+  }
+  /**
+   * Merges two style objects, returning the result.
+   *
+   * @param style - The user-given style prop for this component
+   * @param obj - The CSS properties you want added to the user-given style
+   * @returns A CSS object containing the properties of both objects.
+   */
+  function useMergedStyles(lhs, rhs) {
+    monitorCallCount(useMergedStyles);
+    // Easy case, when there are no styles to merge return nothing.
+    if (!lhs && !rhs) return undefined;
+    if (typeof lhs != typeof rhs) {
+      // Easy cases, when one is null and the other isn't.
+      if (lhs && !rhs) return lhs;
+      if (!lhs && rhs) return rhs;
+      // They're both non-null but different types.
+      // Convert the string type to an object bag type and run it again.
+      if (lhs && rhs) {
+        // (useMergedStyles isn't a true hook -- this isn't a violation)
+        if (typeof lhs == "string") return useMergedStyles(styleStringToObject(lhs), rhs);
+        if (typeof rhs == "string") return useMergedStyles(lhs, styleStringToObject(rhs));
+      }
+      // Logic???
+      return undefined;
+    }
+    // They're both strings, just concatenate them.
+    if (typeof lhs == "string") {
+      return "".concat(lhs, ";").concat(rhs !== null && rhs !== void 0 ? rhs : "");
+    }
+    // They're both objects, just merge them.
+    return {
+      ...(lhs !== null && lhs !== void 0 ? lhs : {}),
+      ...(rhs !== null && rhs !== void 0 ? rhs : {})
+    };
+  }
+  let log = console.warn;
+  /**
+   * Given two sets of props, merges them and returns the result.
+   *
+   * @remarks The hook is aware of and can intelligently merge `className`, `class`, `style`, `ref`, `children`, and all event handlers.
+   *
+   * If two sets of props both specify the same attribute, e.g. both specify two different `id`s, then an error will be printed to the console (customize this with {@link enableLoggingPropConflicts}), as this conflict needs to be arbitrated on by you.
+   *
+   * {@include } {@link enableLoggingPropConflicts}
+   *
+   * @see {@link useMergedRefs}
+   * @see {@link useMergedStyles}
+   * @see {@link useMergedClasses}
+   * @see {@link useMergedChildren}
+   *
+   * @param allProps - A variadic number of props to merge into one
+   *
+   * @returns A single object with all the provided props merged into one.
+   */
+  function useMergedProps() {
+    monitorCallCount(useMergedProps);
+    for (var _len4 = arguments.length, allProps = new Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
+      allProps[_key4] = arguments[_key4];
+    }
+    useEnsureStability("useMergedProps", allProps.length);
+    let ret = {};
+    for (let nextProps of allProps) {
+      ret = useMergedProps2(ret, nextProps);
+    }
+    return ret;
+  }
+  const knowns = new Set(["children", "ref", "className", "class", "style"]);
+  function mergeUnknown(key, lhsValue, rhsValue) {
+    if (typeof lhsValue === "function" || typeof rhsValue === "function") {
+      // They're both functions that can be merged (or one's a function and the other's null).
+      // Not an *easy* case, but a well-defined one.
+      const merged = mergeFunctions(lhsValue, rhsValue);
+      return merged;
+    } else {
+      // Uh...they're not both functions so we're here because one of them's null, right?
+      if (lhsValue == null && rhsValue == null) {
+        if (rhsValue === null && lhsValue === undefined) return rhsValue;else return lhsValue;
+      }
+      if (lhsValue == null) return rhsValue;else if (rhsValue == null) return lhsValue;else if (rhsValue == lhsValue) {
+        // I mean, they're the same value at least
+        // so we don't need to do anything.
+        // Not really ideal though.
+        return rhsValue;
+      } else {
+        // Ugh.
+        // No good strategies here, just log it if requested
+        log === null || log === void 0 ? void 0 : log("The prop \"".concat(key, "\" cannot simultaneously be the values ").concat(lhsValue, " and ").concat(rhsValue, ". One must be chosen outside of useMergedProps."));
+        return rhsValue;
+      }
+    }
+  }
+  /**
+   * Helper function.
+   *
+   * This is one of the most commonly called functions in this and consumer libraries,
+   * so it trades a bit of readability for speed (i.e. we don't decompose objects and just do regular property access, iterate with `for...in`, instead of `Object.entries`, etc.)
+   */
+  function useMergedProps2(lhsAll, rhsAll) {
+    const ret = {
+      ref: useMergedRefs(lhsAll.ref, rhsAll.ref),
+      style: useMergedStyles(lhsAll.style, rhsAll.style),
+      className: useMergedClasses(lhsAll["class"], lhsAll.className, rhsAll["class"], rhsAll.className),
+      children: useMergedChildren(lhsAll.children, rhsAll.children)
+    };
+    if (ret.ref === undefined) delete ret.ref;
+    if (ret.style === undefined) delete ret.style;
+    if (ret.className === undefined) delete ret.className;
+    if (ret["class"] === undefined) delete ret["class"];
+    if (ret.children === undefined) delete ret.children;
+    for (const lhsKeyU in lhsAll) {
+      const lhsKey = lhsKeyU;
+      if (knowns.has(lhsKey)) continue;
+      ret[lhsKey] = lhsAll[lhsKey];
+    }
+    for (const rhsKeyU in rhsAll) {
+      const rhsKey = rhsKeyU;
+      if (knowns.has(rhsKey)) continue;
+      ret[rhsKey] = mergeUnknown(rhsKey, ret[rhsKey], rhsAll[rhsKey]);
+    }
+    return ret;
+  }
+  function mergeFunctions(lhs, rhs) {
+    if (!lhs) return rhs;
+    if (!rhs) return lhs;
+    return function () {
+      const lv = lhs(...arguments);
+      const rv = rhs(...arguments);
+      if (lv instanceof Promise || rv instanceof Promise) return Promise.all([lv, rv]);
+    };
+  }
+
+  /*!
+  * tabbable 6.1.2
+  * @license MIT, https://github.com/focus-trap/tabbable/blob/master/LICENSE
+  */
+  // NOTE: separate `:not()` selectors has broader browser support than the newer
+  //  `:not([inert], [inert] *)` (Feb 2023)
+  // CAREFUL: JSDom does not support `:not([inert] *)` as a selector; using it causes
+  //  the entire query to fail, resulting in no nodes found, which will break a lot
+  //  of things... so we have to rely on JS to identify nodes inside an inert container
+  var candidateSelectors = ['input:not([inert])', 'select:not([inert])', 'textarea:not([inert])', 'a[href]:not([inert])', 'button:not([inert])', '[tabindex]:not(slot):not([inert])', 'audio[controls]:not([inert])', 'video[controls]:not([inert])', '[contenteditable]:not([contenteditable="false"]):not([inert])', 'details>summary:first-of-type:not([inert])', 'details:not([inert])'];
+  var candidateSelector = /* #__PURE__ */candidateSelectors.join(',');
+  var NoElement = typeof Element === 'undefined';
+  var matches = NoElement ? function () {} : Element.prototype.matches || Element.prototype.msMatchesSelector || Element.prototype.webkitMatchesSelector;
+  var getRootNode = !NoElement && Element.prototype.getRootNode ? function (element) {
+    var _element$getRootNode;
+    return element === null || element === void 0 ? void 0 : (_element$getRootNode = element.getRootNode) === null || _element$getRootNode === void 0 ? void 0 : _element$getRootNode.call(element);
+  } : function (element) {
+    return element === null || element === void 0 ? void 0 : element.ownerDocument;
+  };
+
+  /**
+   * Determines if a node is inert or in an inert ancestor.
+   * @param {Element} [node]
+   * @param {boolean} [lookUp] If true and `node` is not inert, looks up at ancestors to
+   *  see if any of them are inert. If false, only `node` itself is considered.
+   * @returns {boolean} True if inert itself or by way of being in an inert ancestor.
+   *  False if `node` is falsy.
+   */
+  var isInert = function isInert(node, lookUp) {
+    var _node$getAttribute;
+    if (lookUp === void 0) {
+      lookUp = true;
+    }
+    // CAREFUL: JSDom does not support inert at all, so we can't use the `HTMLElement.inert`
+    //  JS API property; we have to check the attribute, which can either be empty or 'true';
+    //  if it's `null` (not specified) or 'false', it's an active element
+    var inertAtt = node === null || node === void 0 ? void 0 : (_node$getAttribute = node.getAttribute) === null || _node$getAttribute === void 0 ? void 0 : _node$getAttribute.call(node, 'inert');
+    var inert = inertAtt === '' || inertAtt === 'true';
+
+    // NOTE: this could also be handled with `node.matches('[inert], :is([inert] *)')`
+    //  if it weren't for `matches()` not being a function on shadow roots; the following
+    //  code works for any kind of node
+    // CAREFUL: JSDom does not appear to support certain selectors like `:not([inert] *)`
+    //  so it likely would not support `:is([inert] *)` either...
+    var result = inert || lookUp && node && isInert(node.parentNode); // recursive
+
+    return result;
+  };
+
+  /**
+   * Determines if a node's content is editable.
+   * @param {Element} [node]
+   * @returns True if it's content-editable; false if it's not or `node` is falsy.
+   */
+  var isContentEditable = function isContentEditable(node) {
+    var _node$getAttribute2;
+    // CAREFUL: JSDom does not support the `HTMLElement.isContentEditable` API so we have
+    //  to use the attribute directly to check for this, which can either be empty or 'true';
+    //  if it's `null` (not specified) or 'false', it's a non-editable element
+    var attValue = node === null || node === void 0 ? void 0 : (_node$getAttribute2 = node.getAttribute) === null || _node$getAttribute2 === void 0 ? void 0 : _node$getAttribute2.call(node, 'contenteditable');
+    return attValue === '' || attValue === 'true';
+  };
+  var getTabindex = function getTabindex(node, isScope) {
+    if (node.tabIndex < 0) {
+      // in Chrome, <details/>, <audio controls/> and <video controls/> elements get a default
+      // `tabIndex` of -1 when the 'tabindex' attribute isn't specified in the DOM,
+      // yet they are still part of the regular tab order; in FF, they get a default
+      // `tabIndex` of 0; since Chrome still puts those elements in the regular tab
+      // order, consider their tab index to be 0.
+      // Also browsers do not return `tabIndex` correctly for contentEditable nodes;
+      // so if they don't have a tabindex attribute specifically set, assume it's 0.
+      //
+      // isScope is positive for custom element with shadow root or slot that by default
+      // have tabIndex -1, but need to be sorted by document order in order for their
+      // content to be inserted in the correct position
+      if ((isScope || /^(AUDIO|VIDEO|DETAILS)$/.test(node.tagName) || isContentEditable(node)) && isNaN(parseInt(node.getAttribute('tabindex'), 10))) {
+        return 0;
+      }
+    }
+    return node.tabIndex;
+  };
+  var isInput = function isInput(node) {
+    return node.tagName === 'INPUT';
+  };
+  var isHiddenInput = function isHiddenInput(node) {
+    return isInput(node) && node.type === 'hidden';
+  };
+  var isDetailsWithSummary = function isDetailsWithSummary(node) {
+    var r = node.tagName === 'DETAILS' && Array.prototype.slice.apply(node.children).some(function (child) {
+      return child.tagName === 'SUMMARY';
+    });
+    return r;
+  };
+  var getCheckedRadio = function getCheckedRadio(nodes, form) {
+    for (var i = 0; i < nodes.length; i++) {
+      if (nodes[i].checked && nodes[i].form === form) {
+        return nodes[i];
+      }
+    }
+  };
+  var isTabbableRadio = function isTabbableRadio(node) {
+    if (!node.name) {
+      return true;
+    }
+    var radioScope = node.form || getRootNode(node);
+    var queryRadios = function queryRadios(name) {
+      return radioScope.querySelectorAll('input[type="radio"][name="' + name + '"]');
+    };
+    var radioSet;
+    if (typeof window !== 'undefined' && typeof window.CSS !== 'undefined' && typeof window.CSS.escape === 'function') {
+      radioSet = queryRadios(window.CSS.escape(node.name));
+    } else {
+      try {
+        radioSet = queryRadios(node.name);
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.error('Looks like you have a radio button with a name attribute containing invalid CSS selector characters and need the CSS.escape polyfill: %s', err.message);
+        return false;
+      }
+    }
+    var checked = getCheckedRadio(radioSet, node.form);
+    return !checked || checked === node;
+  };
+  var isRadio = function isRadio(node) {
+    return isInput(node) && node.type === 'radio';
+  };
+  var isNonTabbableRadio = function isNonTabbableRadio(node) {
+    return isRadio(node) && !isTabbableRadio(node);
+  };
+
+  // determines if a node is ultimately attached to the window's document
+  var isNodeAttached = function isNodeAttached(node) {
+    var _nodeRoot;
+    // The root node is the shadow root if the node is in a shadow DOM; some document otherwise
+    //  (but NOT _the_ document; see second 'If' comment below for more).
+    // If rootNode is shadow root, it'll have a host, which is the element to which the shadow
+    //  is attached, and the one we need to check if it's in the document or not (because the
+    //  shadow, and all nodes it contains, is never considered in the document since shadows
+    //  behave like self-contained DOMs; but if the shadow's HOST, which is part of the document,
+    //  is hidden, or is not in the document itself but is detached, it will affect the shadow's
+    //  visibility, including all the nodes it contains). The host could be any normal node,
+    //  or a custom element (i.e. web component). Either way, that's the one that is considered
+    //  part of the document, not the shadow root, nor any of its children (i.e. the node being
+    //  tested).
+    // To further complicate things, we have to look all the way up until we find a shadow HOST
+    //  that is attached (or find none) because the node might be in nested shadows...
+    // If rootNode is not a shadow root, it won't have a host, and so rootNode should be the
+    //  document (per the docs) and while it's a Document-type object, that document does not
+    //  appear to be the same as the node's `ownerDocument` for some reason, so it's safer
+    //  to ignore the rootNode at this point, and use `node.ownerDocument`. Otherwise,
+    //  using `rootNode.contains(node)` will _always_ be true we'll get false-positives when
+    //  node is actually detached.
+    // NOTE: If `nodeRootHost` or `node` happens to be the `document` itself (which is possible
+    //  if a tabbable/focusable node was quickly added to the DOM, focused, and then removed
+    //  from the DOM as in https://github.com/focus-trap/focus-trap-react/issues/905), then
+    //  `ownerDocument` will be `null`, hence the optional chaining on it.
+    var nodeRoot = node && getRootNode(node);
+    var nodeRootHost = (_nodeRoot = nodeRoot) === null || _nodeRoot === void 0 ? void 0 : _nodeRoot.host;
+
+    // in some cases, a detached node will return itself as the root instead of a document or
+    //  shadow root object, in which case, we shouldn't try to look further up the host chain
+    var attached = false;
+    if (nodeRoot && nodeRoot !== node) {
+      var _nodeRootHost, _nodeRootHost$ownerDo, _node$ownerDocument;
+      attached = !!((_nodeRootHost = nodeRootHost) !== null && _nodeRootHost !== void 0 && (_nodeRootHost$ownerDo = _nodeRootHost.ownerDocument) !== null && _nodeRootHost$ownerDo !== void 0 && _nodeRootHost$ownerDo.contains(nodeRootHost) || node !== null && node !== void 0 && (_node$ownerDocument = node.ownerDocument) !== null && _node$ownerDocument !== void 0 && _node$ownerDocument.contains(node));
+      while (!attached && nodeRootHost) {
+        var _nodeRoot2, _nodeRootHost2, _nodeRootHost2$ownerD;
+        // since it's not attached and we have a root host, the node MUST be in a nested shadow DOM,
+        //  which means we need to get the host's host and check if that parent host is contained
+        //  in (i.e. attached to) the document
+        nodeRoot = getRootNode(nodeRootHost);
+        nodeRootHost = (_nodeRoot2 = nodeRoot) === null || _nodeRoot2 === void 0 ? void 0 : _nodeRoot2.host;
+        attached = !!((_nodeRootHost2 = nodeRootHost) !== null && _nodeRootHost2 !== void 0 && (_nodeRootHost2$ownerD = _nodeRootHost2.ownerDocument) !== null && _nodeRootHost2$ownerD !== void 0 && _nodeRootHost2$ownerD.contains(nodeRootHost));
+      }
+    }
+    return attached;
+  };
+  var isZeroArea = function isZeroArea(node) {
+    var _node$getBoundingClie = node.getBoundingClientRect(),
+      width = _node$getBoundingClie.width,
+      height = _node$getBoundingClie.height;
+    return width === 0 && height === 0;
+  };
+  var isHidden = function isHidden(node, _ref) {
+    var displayCheck = _ref.displayCheck,
+      getShadowRoot = _ref.getShadowRoot;
+    // NOTE: visibility will be `undefined` if node is detached from the document
+    //  (see notes about this further down), which means we will consider it visible
+    //  (this is legacy behavior from a very long way back)
+    // NOTE: we check this regardless of `displayCheck="none"` because this is a
+    //  _visibility_ check, not a _display_ check
+    if (getComputedStyle(node).visibility === 'hidden') {
+      return true;
+    }
+    var isDirectSummary = matches.call(node, 'details>summary:first-of-type');
+    var nodeUnderDetails = isDirectSummary ? node.parentElement : node;
+    if (matches.call(nodeUnderDetails, 'details:not([open]) *')) {
+      return true;
+    }
+    if (!displayCheck || displayCheck === 'full' || displayCheck === 'legacy-full') {
+      if (typeof getShadowRoot === 'function') {
+        // figure out if we should consider the node to be in an undisclosed shadow and use the
+        //  'non-zero-area' fallback
+        var originalNode = node;
+        while (node) {
+          var parentElement = node.parentElement;
+          var rootNode = getRootNode(node);
+          if (parentElement && !parentElement.shadowRoot && getShadowRoot(parentElement) === true // check if there's an undisclosed shadow
+          ) {
+            // node has an undisclosed shadow which means we can only treat it as a black box, so we
+            //  fall back to a non-zero-area test
+            return isZeroArea(node);
+          } else if (node.assignedSlot) {
+            // iterate up slot
+            node = node.assignedSlot;
+          } else if (!parentElement && rootNode !== node.ownerDocument) {
+            // cross shadow boundary
+            node = rootNode.host;
+          } else {
+            // iterate up normal dom
+            node = parentElement;
+          }
+        }
+        node = originalNode;
+      }
+      // else, `getShadowRoot` might be true, but all that does is enable shadow DOM support
+      //  (i.e. it does not also presume that all nodes might have undisclosed shadows); or
+      //  it might be a falsy value, which means shadow DOM support is disabled
+
+      // Since we didn't find it sitting in an undisclosed shadow (or shadows are disabled)
+      //  now we can just test to see if it would normally be visible or not, provided it's
+      //  attached to the main document.
+      // NOTE: We must consider case where node is inside a shadow DOM and given directly to
+      //  `isTabbable()` or `isFocusable()` -- regardless of `getShadowRoot` option setting.
+
+      if (isNodeAttached(node)) {
+        // this works wherever the node is: if there's at least one client rect, it's
+        //  somehow displayed; it also covers the CSS 'display: contents' case where the
+        //  node itself is hidden in place of its contents; and there's no need to search
+        //  up the hierarchy either
+        return !node.getClientRects().length;
+      }
+
+      // Else, the node isn't attached to the document, which means the `getClientRects()`
+      //  API will __always__ return zero rects (this can happen, for example, if React
+      //  is used to render nodes onto a detached tree, as confirmed in this thread:
+      //  https://github.com/facebook/react/issues/9117#issuecomment-284228870)
+      //
+      // It also means that even window.getComputedStyle(node).display will return `undefined`
+      //  because styles are only computed for nodes that are in the document.
+      //
+      // NOTE: THIS HAS BEEN THE CASE FOR YEARS. It is not new, nor is it caused by tabbable
+      //  somehow. Though it was never stated officially, anyone who has ever used tabbable
+      //  APIs on nodes in detached containers has actually implicitly used tabbable in what
+      //  was later (as of v5.2.0 on Apr 9, 2021) called `displayCheck="none"` mode -- essentially
+      //  considering __everything__ to be visible because of the innability to determine styles.
+      //
+      // v6.0.0: As of this major release, the default 'full' option __no longer treats detached
+      //  nodes as visible with the 'none' fallback.__
+      if (displayCheck !== 'legacy-full') {
+        return true; // hidden
+      }
+      // else, fallback to 'none' mode and consider the node visible
+    } else if (displayCheck === 'non-zero-area') {
+      // NOTE: Even though this tests that the node's client rect is non-zero to determine
+      //  whether it's displayed, and that a detached node will __always__ have a zero-area
+      //  client rect, we don't special-case for whether the node is attached or not. In
+      //  this mode, we do want to consider nodes that have a zero area to be hidden at all
+      //  times, and that includes attached or not.
+      return isZeroArea(node);
+    }
+
+    // visible, as far as we can tell, or per current `displayCheck=none` mode, we assume
+    //  it's visible
+    return false;
+  };
+
+  // form fields (nested) inside a disabled fieldset are not focusable/tabbable
+  //  unless they are in the _first_ <legend> element of the top-most disabled
+  //  fieldset
+  var isDisabledFromFieldset = function isDisabledFromFieldset(node) {
+    if (/^(INPUT|BUTTON|SELECT|TEXTAREA)$/.test(node.tagName)) {
+      var parentNode = node.parentElement;
+      // check if `node` is contained in a disabled <fieldset>
+      while (parentNode) {
+        if (parentNode.tagName === 'FIELDSET' && parentNode.disabled) {
+          // look for the first <legend> among the children of the disabled <fieldset>
+          for (var i = 0; i < parentNode.children.length; i++) {
+            var child = parentNode.children.item(i);
+            // when the first <legend> (in document order) is found
+            if (child.tagName === 'LEGEND') {
+              // if its parent <fieldset> is not nested in another disabled <fieldset>,
+              // return whether `node` is a descendant of its first <legend>
+              return matches.call(parentNode, 'fieldset[disabled] *') ? true : !child.contains(node);
+            }
+          }
+          // the disabled <fieldset> containing `node` has no <legend>
+          return true;
+        }
+        parentNode = parentNode.parentElement;
+      }
+    }
+
+    // else, node's tabbable/focusable state should not be affected by a fieldset's
+    //  enabled/disabled state
+    return false;
+  };
+  var isNodeMatchingSelectorFocusable = function isNodeMatchingSelectorFocusable(options, node) {
+    if (node.disabled ||
+    // we must do an inert look up to filter out any elements inside an inert ancestor
+    //  because we're limited in the type of selectors we can use in JSDom (see related
+    //  note related to `candidateSelectors`)
+    isInert(node) || isHiddenInput(node) || isHidden(node, options) ||
+    // For a details element with a summary, the summary element gets the focus
+    isDetailsWithSummary(node) || isDisabledFromFieldset(node)) {
+      return false;
+    }
+    return true;
+  };
+  var isNodeMatchingSelectorTabbable = function isNodeMatchingSelectorTabbable(options, node) {
+    if (isNonTabbableRadio(node) || getTabindex(node) < 0 || !isNodeMatchingSelectorFocusable(options, node)) {
+      return false;
+    }
+    return true;
+  };
+  var isTabbable = function isTabbable(node, options) {
+    options = options || {};
+    if (!node) {
+      throw new Error('No node provided');
+    }
+    if (matches.call(node, candidateSelector) === false) {
+      return false;
+    }
+    return isNodeMatchingSelectorTabbable(options, node);
+  };
+  var focusableCandidateSelector = /* #__PURE__ */candidateSelectors.concat('iframe').join(',');
+  var isFocusable = function isFocusable(node, options) {
+    options = options || {};
+    if (!node) {
+      throw new Error('No node provided');
+    }
+    if (matches.call(node, focusableCandidateSelector) === false) {
+      return false;
+    }
+    return isNodeMatchingSelectorFocusable(options, node);
+  };
+  function generateStack() {
+    if (window._generate_setState_stacks) {
+      try {
+        throw new Error();
+      } catch (e) {
+        return e.stack;
+      }
+    }
+    return undefined;
+  }
+  /**
+   * Returns a function that retrieves the stack at the time this hook was called (in development mode only).
+   *
+   *
+   */
+  function useStack() {
+    {
+      const stack = F$1(generateStack, []);
+      const getStack = T$1(() => stack, []);
+      return getStack;
+    }
+  }
+
+  /**
+   * If you want a single place to put a debugger for tracking focus,
+   * here:
+   */
+  function focus(e) {
+    var _e$focus;
+    if (window.LOG_FOCUS_CHANGES === true) {
+      console.log("Focus changed to ".concat(((e === null || e === void 0 ? void 0 : e.tagName) || "").toLowerCase().padStart(6), ":"), e);
+      console.log(generateStack());
+    }
+    e === null || e === void 0 ? void 0 : (_e$focus = e.focus) === null || _e$focus === void 0 ? void 0 : _e$focus.call(e);
+  }
+  /**
+   * When an element unmounts, default HTML behavior is to just send focus to the body, which is wildly unhelpful. It means you lose your place in the keyboard tab order.
+   *
+   * If you still have access to the element that's unmounting, or perhaps its parent from beforehand, this will find the next suitable element to send focus to instead of the body.
+   *
+   * **Important**: This function is linear on the number of DOM nodes in your document, so it's not particularly fast. Only call it once when you need its value, not every time tab focus changed or something.
+   */
+  function findBackupFocus(unmountingElement) {
+    var _ref10, _bestCandidateAfter;
+    if (unmountingElement == null) return globalThis.document.body;
+    let document = unmountingElement.ownerDocument;
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_ELEMENT);
+    let node = walker.firstChild();
+    let bestCandidateBefore = null;
+    let bestCandidateAfter = null;
+    let w = false;
+    while (node) {
+      let pos = node.compareDocumentPosition(unmountingElement);
+      if (pos & Node.DOCUMENT_POSITION_DISCONNECTED) {
+        if (!w) console.warn("Can't focus anything near a disconnected element");
+        w = true;
+      }
+      if (pos & Node.DOCUMENT_POSITION_PRECEDING) {
+        // The unmounting element is before this element we're tree-walking.
+        // That means the next tabbable element we find is the candidate we really want.
+        if (node instanceof Element) {
+          if (isTabbable(node)) {
+            bestCandidateAfter = node;
+            break;
+          }
+        }
+      } else if (pos & Node.DOCUMENT_POSITION_FOLLOWING) {
+        // The unmounting element is after this element we're tree-walking.
+        // That means the we're getting closer and closer.
+        // If this element is tabbable, then it's even closer than any other tabbable element we've saved up to this point.
+        if (node instanceof Element) {
+          if (isTabbable(node)) {
+            bestCandidateBefore = node;
+          }
+        }
+      }
+      node = walker.nextNode();
+    }
+    return (_ref10 = (_bestCandidateAfter = bestCandidateAfter) !== null && _bestCandidateAfter !== void 0 ? _bestCandidateAfter : bestCandidateBefore) !== null && _ref10 !== void 0 ? _ref10 : document.body;
+  }
+
+  /**
+   * Runs a function the specified number of milliseconds after the component renders.
+   *
+   * @remarks This is particularly useful to function as "useEffect on a delay".
+   *
+   * @remarks
+   * {@include } {@link UseTimeoutParameters}
+   */
+  function useTimeout(_ref11) {
+    let {
+      timeout,
+      callback,
+      triggerIndex
+    } = _ref11;
+    monitorCallCount(useTimeout);
+    const stableCallback = useStableCallback(() => {
+      startTimeRef.current = null;
+      callback();
+    });
+    const getTimeout = useStableGetter(timeout);
+    // Set any time we start timeout.
+    // Unset any time the timeout completes
+    const startTimeRef = _(null);
+    const timeoutIsNull = timeout == null;
+    // Any time the triggerIndex changes (including on mount)
+    // restart the timeout.  The timeout does NOT reset
+    // when the duration or callback changes, only triggerIndex.
+    p(() => {
+      if (!timeoutIsNull) {
+        const timeout = getTimeout();
+        console.assert(timeoutIsNull == (timeout == null));
+        if (timeout != null) {
+          startTimeRef.current = +new Date();
+          const handle = setTimeout(stableCallback, timeout);
+          return () => clearTimeout(handle);
+        }
+      }
+    }, [triggerIndex, timeoutIsNull]);
+    const getElapsedTime = T$1(() => {
+      var _startTimeRef$current;
+      return +new Date() - +((_startTimeRef$current = startTimeRef.current) !== null && _startTimeRef$current !== void 0 ? _startTimeRef$current : new Date());
+    }, []);
+    const getRemainingTime = T$1(() => {
+      const timeout = getTimeout();
+      return timeout == null ? null : Math.max(0, timeout - getElapsedTime());
+    }, []);
+    return {
+      getElapsedTime,
+      getRemainingTime
+    };
+  }
+  let idIndex = 0;
+  /**
+   * Debug function that yells at you if your forgot to use the props a hook returns.
+   *
+   * @remarks Like other debug hooks, only has any effect IFF there is a global variable called `"development"` and it contains the value `"development"`.
+   *
+   * @param props - The props to return a modified copy of
+   * @param tag - Should be unique
+   * @returns A modified copy of the given props
+   */
+  function useTagProps(props, tag) {
+    {
+      const [id] = h(() => ++idIndex);
+      const propsIdTag = "data-props-".concat(tag, "-").concat(id);
+      const getStack = useStack();
+      // Don't have multiple tags of the same type on the same props, means a hook has been called twice!
+      console.assert(!(props && typeof props == "object" && tag in props));
+      useTimeout({
+        callback: () => {
+          let element = document.querySelectorAll("[".concat(propsIdTag, "]"));
+          if (element.length != 1) {
+            console.error("A hook returned props that were not properly spread to any HTMLElement:");
+            console.log(getStack());
+            /* eslint-disable no-debugger */
+            debugger;
+          }
+        },
+        timeout: 250,
+        triggerIndex: tag
+      });
+      return F$1(() => {
+        return {
+          ...props,
+          [propsIdTag]: true /*, [tag as never]: true*/
+        };
+      }, [props, tag]);
+    }
+  }
 
   /** Detect free variable `global` from Node.js. */
   var freeGlobal = typeof global == 'object' && global && global.Object === Object && global;
@@ -2022,1452 +3449,6 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     var func = isArray$1(collection) ? arrayShuffle : baseShuffle;
     return func(collection);
   }
-  let cached = null;
-  function getBuildModeUnmemoized() {
-    try {
-      if ("development" === "development") return "development";
-      return "production";
-    } catch (_e) {
-      // As long as we're returning "production" due to it being unspecified, 
-      // try to make sure anyone else who tries does too for consistency.
-      // TODO: Good/bad idea?
-      /*try {
-          (globalThis as any)["process"] ??= {};
-          (globalThis as any)["process"]["env"] ??= {};
-          (globalThis as any)["process"]["env"]["NODE_ENV"] ??= "production";
-      }
-      finally*/
-      {
-        return "production";
-      }
-    }
-  }
-  /**
-   * Controls other development hooks by checking for a global variable called `"development"`
-   *
-   * @remarks Bundlers like Rollup will actually noop-out development code if  `"development" !== "development"` (which, of course, covers the default case where `"development"` just doesn't exist).
-   */
-  function getBuildMode() {
-    return cached || (cached = getBuildModeUnmemoized());
-  }
-
-  // TODO: This shouldn't be in every build, I don't think it's in core-js? I think?
-  // And it's extremely small anyway and basically does nothing.
-  (_window$requestIdleCa = (_window = window).requestIdleCallback) !== null && _window$requestIdleCa !== void 0 ? _window$requestIdleCa : _window.requestIdleCallback = callback => {
-    return setTimeout(() => {
-      callback({
-        didTimeout: false,
-        timeRemaining: () => {
-          return 0;
-        }
-      });
-    }, 5);
-  };
-  let timeoutHandle = null;
-  function callCountU(hook) {
-    var _window2, _window2$_hookCallCou, _window$_hookCallCoun, _window$_hookCallCoun2;
-    const name = hook.name;
-    if (filters.has(name)) return;
-    console.assert(name.length > 0);
-    (_window2$_hookCallCou = (_window2 = window)._hookCallCount) !== null && _window2$_hookCallCou !== void 0 ? _window2$_hookCallCou : _window2._hookCallCount = {
-      callCounts: {}
-    };
-    (_window$_hookCallCoun2 = (_window$_hookCallCoun = window._hookCallCount.callCounts)[name]) !== null && _window$_hookCallCoun2 !== void 0 ? _window$_hookCallCoun2 : _window$_hookCallCoun[name] = {
-      moment: 0,
-      total: 0
-    };
-    window._hookCallCount.callCounts[name].moment += 1;
-    window._hookCallCount.callCounts[name].total += 1;
-    if (timeoutHandle == null) {
-      timeoutHandle = requestIdleCallback(() => {
-        //console.log((window as WindowWithHookCallCount)._hookCallCount.callCountsMoment);
-        //(window as WindowWithHookCallCount)._hookCallCount.callCountsMoment = {};
-        const o = Object.entries(window._hookCallCount.callCounts).map(_ref2 => {
-          let [hook, counts] = _ref2;
-          return {
-            Hook: hook || "?",
-            Now: (counts === null || counts === void 0 ? void 0 : counts.moment) || 0,
-            Total: (counts === null || counts === void 0 ? void 0 : counts.total) || 0
-          };
-        }).filter(_ref3 => {
-          let {
-            Now
-          } = _ref3;
-          return !!Now;
-        }).sort((_ref4, _ref5) => {
-          let {
-            Now: lhsM
-          } = _ref4;
-          let {
-            Now: rhsM
-          } = _ref5;
-          if (!lhsM && !rhsM) return 0;
-          lhsM || (lhsM = Infinity);
-          rhsM || (rhsM = Infinity);
-          return lhsM - rhsM;
-        });
-        console.table(o, ['Hook', 'Now', 'Total']);
-        Object.entries(window._hookCallCount.callCounts).forEach(_ref6 => {
-          let [, counts] = _ref6;
-          counts.moment = 0;
-        });
-        timeoutHandle = null;
-      });
-    }
-  }
-  const filters = new Set();
-  const monitorCallCount = getBuildMode() == "development" ? callCountU : noop;
-  const toRun = new Map();
-  // TODO: Whether this goes in options.diffed or options._commit
-  // is a post-suspense question.
-  // Right now, using options._commit has the problem of running
-  // *after* refs are applied, but we need to come before even that
-  // so `ref={someStableFunction}` works.
-  // 
-  // Also it's private.
-  //
-  // ...
-  // Well, useEvent or whatever is finally, finally 4 years later finally here
-  // which is cool and means we won't need this at all soon.
-  // So for now we'll stick with diff to prevent any weirdness with
-  // commit being private and all.
-  //
-  // Also, in theory this could be replaced with `useInsertionEffect`,
-  // but that probably won't be available in Preact for awhile.
-  const commitName = "diffed";
-  const newCommit = function (vnode) {
-    for (const [id, effectInfo] of toRun) {
-      const oldInputs = effectInfo.prevInputs;
-      if (argsChanged(oldInputs, effectInfo.inputs)) {
-        var _effectInfo$cleanup;
-        (_effectInfo$cleanup = effectInfo.cleanup) === null || _effectInfo$cleanup === void 0 ? void 0 : _effectInfo$cleanup.call(effectInfo);
-        effectInfo.cleanup = effectInfo.effect();
-        effectInfo.prevInputs = effectInfo.inputs;
-      }
-    }
-    toRun.clear();
-    for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-      args[_key - 1] = arguments[_key];
-    }
-    originalCommit === null || originalCommit === void 0 ? void 0 : originalCommit(vnode, ...args);
-  };
-  const originalCommit = l$1[commitName];
-  l$1[commitName] = newCommit;
-  let incrementingId = 0;
-  function nextId() {
-    let next = ++incrementingId;
-    // TODO: This seems reasonable, but is is necessary or are we orders of magnitude from having to worry about overflow?
-    if (incrementingId >= Number.MAX_SAFE_INTEGER) incrementingId = -Number.MAX_SAFE_INTEGER;
-    return next;
-  }
-  /**
-   * Semi-private function to allow stable callbacks even within `useLayoutEffect` and ref assignment.
-   *
-   * @remarks Every render, we send the arguments to be evaluated after diffing has completed,
-   * which happens before.
-   *
-   * @param effect
-   * @param inputs
-   */
-  function useBeforeLayoutEffect(effect, inputs) {
-    var _ref$current;
-    monitorCallCount(useBeforeLayoutEffect);
-    // Note to self: This is by far the most called hook by sheer volume of dependencies.
-    // So it should ideally be as quick as possible.
-    const ref = _(null);
-    (_ref$current = ref.current) !== null && _ref$current !== void 0 ? _ref$current : ref.current = nextId();
-    const id = ref.current;
-    if (effect) toRun.set(id, {
-      effect,
-      inputs,
-      cleanup: null
-    });else toRun.delete(id);
-    // Not needed, because the insertion cleanup would run before useEffect anyway, I think?
-    /*useEffect(() => {
-        return () => {
-            toRun.delete(id);
-        }
-    }, [id])*/
-  }
-
-  function argsChanged(oldArgs, newArgs) {
-    return !!(!oldArgs || oldArgs.length !== (newArgs === null || newArgs === void 0 ? void 0 : newArgs.length) || newArgs !== null && newArgs !== void 0 && newArgs.some((arg, index) => arg !== oldArgs[index]));
-  }
-  function debounceRendering(f) {
-    var _l$1$debounceRenderin;
-    ((_l$1$debounceRenderin = l$1.debounceRendering) !== null && _l$1$debounceRenderin !== void 0 ? _l$1$debounceRenderin : queueMicrotask)(f);
-  }
-  const onfocusin = "onfocusin";
-  const onfocusout = "onfocusout";
-  const EventMapping = {
-    dblclick: "onDblClick",
-    focusin: "onfocusin",
-    focusout: "onfocusout",
-    formdata: "onFormData",
-    toggle: "onToggle",
-    ...EventMapping$1
-  };
-
-  /**
-   * Debug hook. Given a value or set of values, emits a console error if any of them change from one render to the next.
-   *
-   * @remarks Eventually, when useEvent lands, we hopefully won't need this.
-   */
-  function useEnsureStability(parentHookName) {
-    for (var _len2 = arguments.length, values = new Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
-      values[_key2 - 1] = arguments[_key2];
-    }
-    if (getBuildMode() == 'production') return;
-    const helperToEnsureStability = _([]);
-    const shownError = _([]);
-    useHelper(values.length, -1);
-    values.forEach(useHelper);
-    return;
-    function useHelper(value, i) {
-      const index = i + 1;
-      // Make sure that the provided functions are perfectly stable across renders
-      if (helperToEnsureStability.current[index] === undefined) helperToEnsureStability.current[index] = value;
-      if (helperToEnsureStability.current[index] != value) {
-        if (!shownError.current[index]) {
-          /* eslint-disable no-debugger */
-          debugger;
-          console.error("The hook ".concat(parentHookName, " requires some or all of its arguments remain stable across each render; please check the ").concat(i, "-indexed argument (").concat(i >= 0 ? JSON.stringify(values[i]) : "the number of supposedly stable elements", ")."));
-          shownError.current[index] = true;
-        }
-      }
-    }
-  }
-  /**
-   * Similar to `useState`, but for values that aren't "render-important" &ndash; updates don't cause a re-render and so the value shouldn't be used during render (though it certainly can, at least by re-rendering again).
-   *
-   * @remarks To compensate for this, you should pass a `useEffect`-esque callback that is run whenever the value changes.  Just like `useEffect`, this callback can return a cleanup function that's run before the value changes.  If you would like to re-render when the value changes (or, say, when the value meets some criteria), this is where you'll want to put in a call to a `setState` function.
-   *
-   * To summarize, it's like a `useState`-`useEffect` mashup:
-   *
-   * 1. It's like `useState`, except this version of `setState` doesn't re-render the whole component
-   * 2. It's like `useState`, except you can run a function when the value changes that optionally returns a cleanup function
-   * 3. It's like `useEffect`, except you trigger the effect function "remotely" instead of it running after rendering
-   * 4. It's like `useEffect`, except the single "dependency" is based on your calls to `setState`
-   *
-   * Note that while calling `setState` doesn't cause any re-renders, you can do that within your `onChange` function, called whenever the value changes via that `setState`.
-   *
-   * {@include } {@link OnPassiveStateChange}
-   *
-   * @param onChange - The "effect" function to run when the value changes. Effectively the same as `useEffect`'s "effect" function.  MUST BE STABLE, either because it has no dependencies, or because it's from useStableCallback, but this will mean you cannot use getState or setState during render.
-   * @param getInitialValue - If provided, the effect will be invoked once with this value on mount. MUST BE STABLE, either because it has no dependencies, or because it's from useStableCallback, but this will mean you cannot use getState or setState during render.
-   * @param customDebounceRendering - By default, changes to passive state are delayed by one tick so that we only check for changes in a similar way to Preact. You can override this to, for example, always run immediately instead.
-   * @returns
-   */
-  function usePassiveState(onChange, getInitialValue, customDebounceRendering) {
-    monitorCallCount(usePassiveState);
-    //let [id, ,getId] = useState(() => generateRandomId());
-    const valueRef = _(Unset$2);
-    const reasonRef = _(Unset$2);
-    const warningRef = _(false);
-    const dependencyToCompareAgainst = _(Unset$2);
-    const cleanupCallbackRef = _(undefined);
-    // Make sure that the provided functions are perfectly stable across renders
-    useEnsureStability("usePassiveState", onChange, getInitialValue, customDebounceRendering);
-    // Shared between "dependency changed" and "component unmounted".
-    const onShouldCleanUp = T$1(() => {
-      const cleanupCallback = cleanupCallbackRef.current;
-      if (cleanupCallback) cleanupCallback();
-    }, []);
-    // There are a couple places where we'd like to use our initial
-    // value in place of having no value at all yet.
-    // This is the shared code for that, used on mount and whenever
-    // getValue is called.
-    const tryEnsureValue = T$1(() => {
-      if (valueRef.current === Unset$2 && getInitialValue != undefined) {
-        try {
-          var _onChange;
-          const initialValue = getInitialValue();
-          valueRef.current = initialValue;
-          cleanupCallbackRef.current = (_onChange = onChange === null || onChange === void 0 ? void 0 : onChange(initialValue, undefined, undefined)) !== null && _onChange !== void 0 ? _onChange : undefined;
-        } catch (ex) {
-          // Exceptions are intentional to allow bailout (without exposing the Unset symbol)
-        }
-      }
-    }, [/* getInitialValue and onChange intentionally omitted */]);
-    const getValue = T$1(() => {
-      if (warningRef.current) console.warn("During onChange, prefer using the (value, prevValue) arguments instead of getValue -- it's ambiguous as to if you're asking for the old or new value at this point in time for this component.");
-      // The first time we call getValue, if we haven't been given a value yet,
-      // (and we were given an initial value to use)
-      // return the initial value instead of nothing.
-      if (valueRef.current === Unset$2) tryEnsureValue();
-      return valueRef.current === Unset$2 ? undefined : valueRef.current;
-    }, []);
-    y(() => {
-      // Make sure we've run our effect at least once on mount.
-      // (If we have an initial value, of course)
-      tryEnsureValue();
-    }, []);
-    // The actual code the user calls to (possibly) run a new effect.
-    const setValue = T$1((arg, reason) => {
-      // Regardless of anything else, figure out what our next value is about to be.
-      const nextValue = arg instanceof Function ? arg(valueRef.current === Unset$2 ? undefined : valueRef.current) : arg;
-      //let id = getId();
-      //console.log((nextValue !== valueRef.current? "" : "NOT ") + "Scheduling effect ", id, " with value ", nextValue);
-      if ( /*dependencyToCompareAgainst.current === Unset &&*/nextValue !== valueRef.current) {
-        // This is the first request to change this value.
-        // Evaluate the request immediately, then queue up the onChange function
-        // Save our current value so that we can compare against it later
-        // (if we flip back to this state, then we won't send the onChange function)
-        dependencyToCompareAgainst.current = valueRef.current;
-        // It's important to update this here (as well as below) in case customDebounceRendering invokes this immediately
-        valueRef.current = nextValue;
-        reasonRef.current = reason;
-        // Schedule the actual check and invocation of onChange later to let effects settle
-        (customDebounceRendering !== null && customDebounceRendering !== void 0 ? customDebounceRendering : debounceRendering)(() => {
-          const nextReason = reasonRef.current;
-          const nextDep = valueRef.current;
-          const prevDep = dependencyToCompareAgainst.current;
-          //let id = getId();
-          //console.log(((dependencyToCompareAgainst.current != valueRef.current)? "" : "NOT ") + "Running effect ", id, " with value ", nextDep);
-          if (dependencyToCompareAgainst.current != valueRef.current) {
-            // TODO: This needs to happen here in order to make recursive onChanges work
-            // but it feels better to have it happen after onChange...
-            valueRef.current = dependencyToCompareAgainst.current = Unset$2;
-            warningRef.current = true;
-            try {
-              var _onChange2;
-              // Call any registered cleanup function
-              onShouldCleanUp();
-              valueRef.current = nextDep; // Needs to happen before onChange in case onChange is recursive (e.g. focusing causing a focus causing a focus)
-              cleanupCallbackRef.current = (_onChange2 = onChange === null || onChange === void 0 ? void 0 : onChange(nextDep, prevDep === Unset$2 ? undefined : prevDep, nextReason)) !== null && _onChange2 !== void 0 ? _onChange2 : undefined;
-            } finally {
-              // Allow the user to normally call getValue again
-              warningRef.current = false;
-            }
-          }
-          // We've finished with everything, so mark us as being on a clean slate again.
-          dependencyToCompareAgainst.current = Unset$2;
-        });
-      }
-      // Update the value immediately.
-      // This will be checked against prevDep to see if we should actually call onChange
-      //valueRef.current = nextValue;
-    }, []);
-    return [getValue, setValue];
-  }
-  const Unset$2 = Symbol();
-  // Easy constants for getInitialValue
-  function returnTrue() {
-    return true;
-  }
-  function returnFalse() {
-    return false;
-  }
-  function returnNull() {
-    return null;
-  }
-  /**
-   * An alternative to use for `customDebounceRendering` that causes `usePassiveState` to run changes without waiting a tick.
-   */
-  function runImmediately(f) {
-    f();
-  }
-  const Unset$1 = Symbol("unset");
-  /**
-   * Given an input value, returns a constant getter function that can be used
-   * inside of `useEffect` and friends without including it in the dependency array.
-   *
-   * @remarks This uses `options.diffed` in order to run before everything, even
-   * ref assignment. This means this getter is safe to use anywhere ***except the render phase***.
-   */
-  function useStableGetter(value) {
-    monitorCallCount(useStableGetter);
-    const ref = _(Unset$1);
-    useBeforeLayoutEffect(() => {
-      ref.current = value;
-    }, [value]);
-    return T$1(() => {
-      if (ref.current === Unset$1) {
-        throw new Error('Value retrieved from useStableGetter() cannot be called during render.');
-      }
-      return ref.current;
-    }, []);
-  }
-  function useMemoObject(t) {
-    return F$1(() => {
-      return t;
-    }, Object.values(t));
-  }
-
-  /**
-   * We keep track of which callbacks are stable with a WeakMap instead of, say, a symbol because
-   * `useCallback` will return a function that's stable across *all* renders, meaning
-   * we can't use our funny "`if` only works here because it doesn't break the rules of hooks" trick then.
-   */
-  const map = new WeakMap();
-  function isStableGetter(obj) {
-    var _map$get;
-    return (_map$get = map.get(obj)) !== null && _map$get !== void 0 ? _map$get : false;
-  }
-  function setIsStableGetter(obj) {
-    map.set(obj, true);
-    return obj;
-  }
-  /**
-   * Alternate useCallback() which always returns the same (wrapped) function reference
-   * so that it can be excluded from the dependency arrays of `useEffect` and friends.
-   *
-   * @remarks In general, just pass the function you want to be stable (but you can't use it during render,
-   * so be careful!).  Alternatively, if you need a stable callback that **can** be used
-   * during render, pass an empty dependency array and it'll act like `useCallback` with an
-   * empty dependency array, but with the associated stable typing. In this case, you ***must*** ensure that it
-   * truly has no dependencies/only stable dependencies!!
-   */
-  function useStableCallback(fn, noDeps) {
-    monitorCallCount(useStableCallback);
-    useEnsureStability("useStableCallback", noDeps == null, noDeps === null || noDeps === void 0 ? void 0 : noDeps.length, isStableGetter(fn));
-    if (isStableGetter(fn)) return fn;
-    if (noDeps == null) {
-      const currentCallbackGetter = useStableGetter(fn);
-      return setIsStableGetter(T$1(function () {
-        return currentCallbackGetter()(...arguments);
-      }, []));
-    } else {
-      console.assert(noDeps.length === 0);
-      return setIsStableGetter(T$1(fn, []));
-    }
-  }
-
-  /**
-   * Allows attaching an event handler to any *non-Preact* element, and removing it when the component using the hook unmounts. The callback does not need to be stable across renders.
-   *
-   * @remarks `"mode"` controls if there's one handler that calls all your functions (default), or one handler added per function (`"single"`).
-   *
-   * The default, `"grouped"`, is faster when you have, say, a button component, used hundreds of times on a page, that each installs a global event handler.
-   *
-   * @param target - A *non-Preact* node to attach the event to.
-   * *
-   */
-  function useGlobalHandler(target, type, handler, options, mode) {
-    monitorCallCount(useGlobalHandler);
-    mode || (mode = "grouped");
-    useEnsureStability("useGlobalHandler", mode);
-    if (mode === "grouped") {
-      // Note to self: The typing doesn't improve even if this is split up into a sub-function.
-      // No matter what, it seems impossible to get the handler's event object typed perfectly.
-      // It seems like it's guaranteed to always be a union of all available types.
-      // Again, no matter what combination of sub- or sub-sub-functions used.
-      useGlobalHandlerGrouped(target, type, handler, options);
-    } else {
-      useGlobalHandlerSingle(target, type, handler, options);
-    }
-  }
-  let mapThing = new Map();
-  function doMapThing(op, target, type, handler, options) {
-    if (handler) {
-      const optionsKey = JSON.stringify(options);
-      const byType = mapThing.get(target) || new Map();
-      const byOptions = byType.get(type) || new Map();
-      const info = byOptions.get(optionsKey) || {
-        listener: null,
-        listeners: new Set()
-      };
-      op(info, handler);
-      byOptions.set(optionsKey, info);
-      byType.set(type, byOptions);
-      mapThing.set(target, byType);
-    }
-  }
-  function addToMapThing(target, type, handler, options) {
-    doMapThing((info, h) => {
-      info.listeners.add(h);
-      if (info.listener == null) target.addEventListener(type, info.listener = e => info.listeners.forEach(fn => fn(e)), options);
-    }, target, type, handler, options);
-  }
-  function removeFromMapThing(target, type, handler, options) {
-    doMapThing((info, h) => {
-      info.listeners.delete(h);
-      if (info.listener == null) target.removeEventListener(type, info.listener = e => info.listeners.forEach(fn => fn(e)), options);
-    }, target, type, handler, options);
-  }
-  /**
-   * This is way faster for large numbers of event handlers.
-   *
-   * For example, if every button listens for a global click, or something,
-   * it would be nice if it was efficient at least.
-   */
-  function useGlobalHandlerGrouped(target, type, handler, options) {
-    let stableHandler = useStableCallback(handler !== null && handler !== void 0 ? handler : () => {});
-    if (handler == null) stableHandler = null;
-    p(() => {
-      if (stableHandler) {
-        addToMapThing(target, type, stableHandler, options);
-        return () => removeFromMapThing(target, type, stableHandler, options);
-      }
-    }, [target, type, stableHandler]);
-  }
-  function useGlobalHandlerSingle(target, type, handler, options) {
-    let stableHandler = useStableCallback(handler !== null && handler !== void 0 ? handler : () => {});
-    if (handler == null) stableHandler = null;
-    p(() => {
-      if (stableHandler) {
-        target.addEventListener(type, stableHandler, options);
-        return () => target.removeEventListener(type, stableHandler, options);
-      }
-    }, [target, type, stableHandler]);
-  }
-
-  /**
-   * Quick and easy way to add extra information to an event that was fired.
-   *
-   * For example, "this was a click event, but it has information about what list item was pressed too."
-   *
-   * Get that extra information from the [EventDetail] symbol.
-   */
-  const EventDetail = Symbol("event-detail");
-  function enhanceEvent(e, detail) {
-    const event = e !== null && e !== void 0 ? e : {};
-    event[EventDetail] = detail;
-    return event;
-  }
-
-  /**
-   * Handles events for a backdrop on a modal dialog -- the kind where the user expects the modal to close when they click/tap outside of it.
-   *
-   * @compositeParams
-   */
-  function useBackdropDismiss(_ref7) {
-    let {
-      backdropDismissParameters: {
-        active: open,
-        onDismiss: onCloseUnstable,
-        ...void1
-      },
-      refElementPopupReturn: {
-        getElement,
-        ...void3
-      },
-      ...void2
-    } = _ref7;
-    monitorCallCount(useBackdropDismiss);
-    const getOpen = useStableGetter(open);
-    const onClose = useStableCallback(onCloseUnstable);
-    const onBackdropClick = T$1(function onBackdropClick(e) {
-      if (!getOpen()) return;
-      // Basically, "was this event fired on an element not contained by the modal?"
-      // There are multiple ways browser react to "interacting with nothing", and this takes care of everything.
-      let element = getElement();
-      let foundInsideClick = false;
-      if (e.target && element && element.contains(e.target)) {
-        foundInsideClick = true;
-      }
-      if (!foundInsideClick) {
-        onClose(enhanceEvent(e, {
-          reason: "backdrop"
-        }));
-      }
-    }, []);
-    useGlobalHandler(window, "mousedown", open ? onBackdropClick : null, {
-      capture: true
-    });
-    useGlobalHandler(window, "touchstart", open ? onBackdropClick : null, {
-      capture: true
-    });
-  }
-  const MagicWindowKey = "__preact-prop-helpers-escape-key-dismiss__";
-  function getElementDepth(element) {
-    let depth = 0;
-    let parent = element.parentElement;
-    while (parent) {
-      depth += 1;
-      parent = parent.parentElement;
-    }
-    return depth;
-  }
-  /**
-   * Invokes a callback when the `Escape` key is pressed on the topmost component (a max of one invocation per `Escape` press)
-   *
-   * @remarks One press of the `Escape` key is guaranteed to only call `onDismiss` for *only one* component, and it is called on the component deepest in the DOM tree.
-   *
-   * TODO: Instead of being deepest in the DOM tree (which is usually fine), it should probably be related to what order something was made `active`.
-   *
-   * @compositeParams
-   */
-  function useEscapeDismiss(_ref8) {
-    let {
-      escapeDismissParameters: {
-        onDismiss: onClose,
-        active: open,
-        getDocument: unstableGetDocument,
-        parentDepth,
-        ...void1
-      },
-      refElementPopupReturn: {
-        getElement,
-        ...void2
-      }
-    } = _ref8;
-    monitorCallCount(useEscapeDismiss);
-    const stableOnClose = useStableCallback(onClose);
-    const getDocument = useStableCallback(unstableGetDocument);
-    const getDepth = useStableGetter(parentDepth + 1);
-    // When this component opens, add an event listener that finds the deepest open soft dismiss element to actually dismiss.
-    // Only opened components will add event handlers, and will remove them once closed.
-    // The reason this is so complicated is because:
-    // 1. We must only close one soft dismiss component at a time.  If there's a tooltip in a popup, the tooltip must be dismissed.
-    // 2. `keydown` events don't just work on arbitrary elements, for our purposes they must be from the `window`. So we can't rely on normal capturing or bubbling behavior on the element itself.
-    // 3. Event handlers added to the `window` via `addEventHandler` are called in the order of registration, which is completely at odds with #1.
-    //
-    // So all soft dismiss components listen for a keydown of Escape, 
-    // then the first one to do so will wait for a microtask, 
-    // then find the deepest element in the document tree to dismiss of all of those components currently open.
-    p(() => {
-      var _window$MagicWindowKe;
-      const document = getDocument();
-      const window = document.defaultView;
-      (_window$MagicWindowKe = window[MagicWindowKey]) !== null && _window$MagicWindowKe !== void 0 ? _window$MagicWindowKe : window[MagicWindowKey] = {
-        microtaskQueued: false,
-        elementQueue: new Map()
-      };
-      const info = window[MagicWindowKey];
-      if (open) {
-        window.addEventListener("keydown", handler, {
-          capture: true
-        });
-        return () => {
-          const element = getElement();
-          if (element && info.elementQueue) info.elementQueue.delete(element);
-          window.removeEventListener("keydown", handler, {
-            capture: true
-          });
-        };
-      }
-      function handler(e) {
-        if (e.key == "Escape") {
-          // We don't know which of the currently active soft dismisses will actually do something,
-          // but ONE of them definitely will,
-          // so we stop propagation to child nodes, but not to everyone on the window (stopImmediatePropagation).
-          e.preventDefault();
-          e.stopPropagation();
-          // This is what at least one of the elements will call
-          const onClose2 = () => {
-            stableOnClose(enhanceEvent(e, {
-              reason: "escape"
-            }));
-          };
-          const element = getElement();
-          if (element) {
-            const treeDepth = getElementDepth(element);
-            const depth = getDepth();
-            info.elementQueue.set(element, {
-              depth,
-              onClose: onClose2,
-              treeDepth
-            });
-          }
-          if (!info.microtaskQueued) {
-            info.microtaskQueued = true;
-            setTimeout(() => {
-              var _deepestOnClose;
-              const {
-                elementQueue
-              } = info;
-              info.microtaskQueued = false;
-              info.elementQueue = new Map();
-              let deepestDepth = -Infinity;
-              let deepestTreeDepth = -Infinity;
-              let deepestOnClose = null;
-              for (const [element, {
-                depth,
-                onClose,
-                treeDepth
-              }] of elementQueue) {
-                let tieBroken = false;
-                if (depth == deepestDepth) {
-                  if (treeDepth > deepestTreeDepth) {
-                    tieBroken = true;
-                  }
-                }
-                if (depth > deepestDepth || depth == deepestDepth && tieBroken) {
-                  deepestDepth = depth;
-                  deepestTreeDepth = treeDepth;
-                  deepestOnClose = onClose;
-                }
-              }
-              (_deepestOnClose = deepestOnClose) === null || _deepestOnClose === void 0 ? void 0 : _deepestOnClose();
-            }, 0);
-          }
-        }
-      }
-    }, [open]);
-  }
-
-  /**
-   * Invokes a callback when focus travels outside of the component's element.
-   *
-   * @remarks TODO: This is not intended for recursive structures, like dialogs that open dialogs, or menus that open menus, but does properly handle, e.g., the fact that a menu's menubutton having focus still counts as the menu having focus.
-   *
-   * @compositeParams
-   */
-  function useLostFocusDismiss(_ref9) {
-    let {
-      refElementPopupReturn: {
-        getElement: getPopupElement,
-        ...void3
-      },
-      refElementSourceReturn,
-      lostFocusDismissParameters: {
-        active: open,
-        onDismiss: onClose,
-        ...void4
-      },
-      ...void1
-    } = _ref9;
-    monitorCallCount(useLostFocusDismiss);
-    const {
-      getElement: getSourceElement,
-      ...void2
-    } = refElementSourceReturn !== null && refElementSourceReturn !== void 0 ? refElementSourceReturn : {};
-    const stableOnClose = useStableCallback(onClose);
-    const getOpen = useStableGetter(open);
-    const onLastActiveElementChange = T$1((newElement, _prevElement, e) => {
-      const open = getOpen();
-      const sourceElement = getSourceElement === null || getSourceElement === void 0 ? void 0 : getSourceElement();
-      const popupElement = getPopupElement();
-      if (!(sourceElement !== null && sourceElement !== void 0 && sourceElement.contains(newElement) || popupElement !== null && popupElement !== void 0 && popupElement.contains(newElement))) {
-        if (open) stableOnClose(enhanceEvent(e, {
-          reason: "lost-focus"
-        }));
-      }
-    }, [getSourceElement]);
-    return {
-      activeElementParameters: {
-        onLastActiveElementChange
-      }
-    };
-  }
-
-  /**
-   * Combines two `children`.
-   *
-   * @remarks This is fairly trivial and not even technically a hook, as it doesn't use any other hooks, but is this way for consistency.
-   *
-   * TODO: This could accept a variable number of arguments to be consistent with useMergedProps, but I feel like it might be a performance hit.
-   */
-  function useMergedChildren(lhs, rhs) {
-    monitorCallCount(useMergedChildren);
-    if (lhs == null && rhs == null) {
-      return undefined;
-    } else if (lhs == null) {
-      return rhs;
-    } else if (rhs == null) {
-      return lhs;
-    } else {
-      return y$1(k$2, {}, lhs, rhs);
-    }
-  }
-
-  /**
-   * Merged the `class` and `className` properties of two sets of props into a single string.
-   *
-   * @remarks Duplicate classes are removed (order doesn't matter anyway).
-   */
-  function useMergedClasses() {
-    monitorCallCount(useMergedClasses);
-    // Note: For the sake of forward compatibility, this function is labelled as
-    // a hook, but as it uses no other hooks it technically isn't one.
-    let classesSet = new Set();
-    for (var _len3 = arguments.length, classes = new Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
-      classes[_key3] = arguments[_key3];
-    }
-    for (let c of classes) {
-      if (typeof c == "string" && c.trim()) classesSet.add(c);
-    }
-    if (classesSet.size) {
-      return Array.from(classesSet).join(" ");
-    } else {
-      return undefined;
-    }
-  }
-  function processRef(instance, ref) {
-    if (typeof ref === "function") {
-      ref(instance);
-    } else if (ref != null) {
-      ref.current = instance;
-    } else {
-      /* eslint-disable no-debugger */
-      debugger;
-      console.assert(false, "Unknown ref type found that was neither a RefCallback nor a RefObject");
-    }
-  }
-  /**
-   * Combines two refs into one. This allows a component to both use its own ref *and* forward a ref that was given to it.
-   *
-   * @remarks Or just use {@link useMergedProps}
-   */
-  function useMergedRefs(rhs, lhs) {
-    monitorCallCount(useMergedRefs);
-    // This *must* be stable in order to prevent repeated reset `null` calls after every render.
-    const combined = useStableCallback(function combined(current) {
-      processRef(current, lhs);
-      processRef(current, rhs);
-    });
-    if (lhs == null && rhs == null) {
-      return undefined;
-    } else if (lhs == null) {
-      return rhs;
-    } else if (rhs == null) {
-      return lhs;
-    } else {
-      return combined;
-    }
-  }
-  function styleStringToObject(style) {
-    // TODO: This sucks D:
-    return Object.fromEntries(style.split(";").map(statement => statement.split(":")));
-  }
-  /**
-   * Merges two style objects, returning the result.
-   *
-   * @param style - The user-given style prop for this component
-   * @param obj - The CSS properties you want added to the user-given style
-   * @returns A CSS object containing the properties of both objects.
-   */
-  function useMergedStyles(lhs, rhs) {
-    monitorCallCount(useMergedStyles);
-    // Easy case, when there are no styles to merge return nothing.
-    if (!lhs && !rhs) return undefined;
-    if (typeof lhs != typeof rhs) {
-      // Easy cases, when one is null and the other isn't.
-      if (lhs && !rhs) return lhs;
-      if (!lhs && rhs) return rhs;
-      // They're both non-null but different types.
-      // Convert the string type to an object bag type and run it again.
-      if (lhs && rhs) {
-        // (useMergedStyles isn't a true hook -- this isn't a violation)
-        if (typeof lhs == "string") return useMergedStyles(styleStringToObject(lhs), rhs);
-        if (typeof rhs == "string") return useMergedStyles(lhs, styleStringToObject(rhs));
-      }
-      // Logic???
-      return undefined;
-    }
-    // They're both strings, just concatenate them.
-    if (typeof lhs == "string") {
-      return "".concat(lhs, ";").concat(rhs !== null && rhs !== void 0 ? rhs : "");
-    }
-    // They're both objects, just merge them.
-    return {
-      ...(lhs !== null && lhs !== void 0 ? lhs : {}),
-      ...(rhs !== null && rhs !== void 0 ? rhs : {})
-    };
-  }
-  let log = console.warn;
-  /**
-   * Given two sets of props, merges them and returns the result.
-   *
-   * @remarks The hook is aware of and can intelligently merge `className`, `class`, `style`, `ref`, `children`, and all event handlers.
-   *
-   * If two sets of props both specify the same attribute, e.g. both specify two different `id`s, then an error will be printed to the console (customize this with {@link enableLoggingPropConflicts}), as this conflict needs to be arbitrated on by you.
-   *
-   * {@include } {@link enableLoggingPropConflicts}
-   *
-   * @see {@link useMergedRefs}
-   * @see {@link useMergedStyles}
-   * @see {@link useMergedClasses}
-   * @see {@link useMergedChildren}
-   *
-   * @param allProps - A variadic number of props to merge into one
-   *
-   * @returns A single object with all the provided props merged into one.
-   */
-  function useMergedProps() {
-    monitorCallCount(useMergedProps);
-    for (var _len4 = arguments.length, allProps = new Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
-      allProps[_key4] = arguments[_key4];
-    }
-    useEnsureStability("useMergedProps", allProps.length);
-    let ret = {};
-    for (let nextProps of allProps) {
-      ret = useMergedProps2(ret, nextProps);
-    }
-    return ret;
-  }
-  const knowns = new Set(["children", "ref", "className", "class", "style"]);
-  function mergeUnknown(key, lhsValue, rhsValue) {
-    if (typeof lhsValue === "function" || typeof rhsValue === "function") {
-      // They're both functions that can be merged (or one's a function and the other's null).
-      // Not an *easy* case, but a well-defined one.
-      const merged = mergeFunctions(lhsValue, rhsValue);
-      return merged;
-    } else {
-      // Uh...they're not both functions so we're here because one of them's null, right?
-      if (lhsValue == null && rhsValue == null) {
-        if (rhsValue === null && lhsValue === undefined) return rhsValue;else return lhsValue;
-      }
-      if (lhsValue == null) return rhsValue;else if (rhsValue == null) return lhsValue;else if (rhsValue == lhsValue) {
-        // I mean, they're the same value at least
-        // so we don't need to do anything.
-        // Not really ideal though.
-        return rhsValue;
-      } else {
-        // Ugh.
-        // No good strategies here, just log it if requested
-        log === null || log === void 0 ? void 0 : log("The prop \"".concat(key, "\" cannot simultaneously be the values ").concat(lhsValue, " and ").concat(rhsValue, ". One must be chosen outside of useMergedProps."));
-        return rhsValue;
-      }
-    }
-  }
-  /**
-   * Helper function.
-   *
-   * This is one of the most commonly called functions in this and consumer libraries,
-   * so it trades a bit of readability for speed (i.e. we don't decompose objects and just do regular property access, iterate with `for...in`, instead of `Object.entries`, etc.)
-   */
-  function useMergedProps2(lhsAll, rhsAll) {
-    const ret = {
-      ref: useMergedRefs(lhsAll.ref, rhsAll.ref),
-      style: useMergedStyles(lhsAll.style, rhsAll.style),
-      className: useMergedClasses(lhsAll["class"], lhsAll.className, rhsAll["class"], rhsAll.className),
-      children: useMergedChildren(lhsAll.children, rhsAll.children)
-    };
-    if (ret.ref === undefined) delete ret.ref;
-    if (ret.style === undefined) delete ret.style;
-    if (ret.className === undefined) delete ret.className;
-    if (ret["class"] === undefined) delete ret["class"];
-    if (ret.children === undefined) delete ret.children;
-    for (const lhsKeyU in lhsAll) {
-      const lhsKey = lhsKeyU;
-      if (knowns.has(lhsKey)) continue;
-      ret[lhsKey] = lhsAll[lhsKey];
-    }
-    for (const rhsKeyU in rhsAll) {
-      const rhsKey = rhsKeyU;
-      if (knowns.has(rhsKey)) continue;
-      ret[rhsKey] = mergeUnknown(rhsKey, ret[rhsKey], rhsAll[rhsKey]);
-    }
-    return ret;
-  }
-  function mergeFunctions(lhs, rhs) {
-    if (!lhs) return rhs;
-    if (!rhs) return lhs;
-    return function () {
-      const lv = lhs(...arguments);
-      const rv = rhs(...arguments);
-      if (lv instanceof Promise || rv instanceof Promise) return Promise.all([lv, rv]);
-    };
-  }
-
-  /*!
-  * tabbable 6.1.2
-  * @license MIT, https://github.com/focus-trap/tabbable/blob/master/LICENSE
-  */
-  // NOTE: separate `:not()` selectors has broader browser support than the newer
-  //  `:not([inert], [inert] *)` (Feb 2023)
-  // CAREFUL: JSDom does not support `:not([inert] *)` as a selector; using it causes
-  //  the entire query to fail, resulting in no nodes found, which will break a lot
-  //  of things... so we have to rely on JS to identify nodes inside an inert container
-  var candidateSelectors = ['input:not([inert])', 'select:not([inert])', 'textarea:not([inert])', 'a[href]:not([inert])', 'button:not([inert])', '[tabindex]:not(slot):not([inert])', 'audio[controls]:not([inert])', 'video[controls]:not([inert])', '[contenteditable]:not([contenteditable="false"]):not([inert])', 'details>summary:first-of-type:not([inert])', 'details:not([inert])'];
-  var candidateSelector = /* #__PURE__ */candidateSelectors.join(',');
-  var NoElement = typeof Element === 'undefined';
-  var matches = NoElement ? function () {} : Element.prototype.matches || Element.prototype.msMatchesSelector || Element.prototype.webkitMatchesSelector;
-  var getRootNode = !NoElement && Element.prototype.getRootNode ? function (element) {
-    var _element$getRootNode;
-    return element === null || element === void 0 ? void 0 : (_element$getRootNode = element.getRootNode) === null || _element$getRootNode === void 0 ? void 0 : _element$getRootNode.call(element);
-  } : function (element) {
-    return element === null || element === void 0 ? void 0 : element.ownerDocument;
-  };
-
-  /**
-   * Determines if a node is inert or in an inert ancestor.
-   * @param {Element} [node]
-   * @param {boolean} [lookUp] If true and `node` is not inert, looks up at ancestors to
-   *  see if any of them are inert. If false, only `node` itself is considered.
-   * @returns {boolean} True if inert itself or by way of being in an inert ancestor.
-   *  False if `node` is falsy.
-   */
-  var isInert = function isInert(node, lookUp) {
-    var _node$getAttribute;
-    if (lookUp === void 0) {
-      lookUp = true;
-    }
-    // CAREFUL: JSDom does not support inert at all, so we can't use the `HTMLElement.inert`
-    //  JS API property; we have to check the attribute, which can either be empty or 'true';
-    //  if it's `null` (not specified) or 'false', it's an active element
-    var inertAtt = node === null || node === void 0 ? void 0 : (_node$getAttribute = node.getAttribute) === null || _node$getAttribute === void 0 ? void 0 : _node$getAttribute.call(node, 'inert');
-    var inert = inertAtt === '' || inertAtt === 'true';
-
-    // NOTE: this could also be handled with `node.matches('[inert], :is([inert] *)')`
-    //  if it weren't for `matches()` not being a function on shadow roots; the following
-    //  code works for any kind of node
-    // CAREFUL: JSDom does not appear to support certain selectors like `:not([inert] *)`
-    //  so it likely would not support `:is([inert] *)` either...
-    var result = inert || lookUp && node && isInert(node.parentNode); // recursive
-
-    return result;
-  };
-
-  /**
-   * Determines if a node's content is editable.
-   * @param {Element} [node]
-   * @returns True if it's content-editable; false if it's not or `node` is falsy.
-   */
-  var isContentEditable = function isContentEditable(node) {
-    var _node$getAttribute2;
-    // CAREFUL: JSDom does not support the `HTMLElement.isContentEditable` API so we have
-    //  to use the attribute directly to check for this, which can either be empty or 'true';
-    //  if it's `null` (not specified) or 'false', it's a non-editable element
-    var attValue = node === null || node === void 0 ? void 0 : (_node$getAttribute2 = node.getAttribute) === null || _node$getAttribute2 === void 0 ? void 0 : _node$getAttribute2.call(node, 'contenteditable');
-    return attValue === '' || attValue === 'true';
-  };
-  var getTabindex = function getTabindex(node, isScope) {
-    if (node.tabIndex < 0) {
-      // in Chrome, <details/>, <audio controls/> and <video controls/> elements get a default
-      // `tabIndex` of -1 when the 'tabindex' attribute isn't specified in the DOM,
-      // yet they are still part of the regular tab order; in FF, they get a default
-      // `tabIndex` of 0; since Chrome still puts those elements in the regular tab
-      // order, consider their tab index to be 0.
-      // Also browsers do not return `tabIndex` correctly for contentEditable nodes;
-      // so if they don't have a tabindex attribute specifically set, assume it's 0.
-      //
-      // isScope is positive for custom element with shadow root or slot that by default
-      // have tabIndex -1, but need to be sorted by document order in order for their
-      // content to be inserted in the correct position
-      if ((isScope || /^(AUDIO|VIDEO|DETAILS)$/.test(node.tagName) || isContentEditable(node)) && isNaN(parseInt(node.getAttribute('tabindex'), 10))) {
-        return 0;
-      }
-    }
-    return node.tabIndex;
-  };
-  var isInput = function isInput(node) {
-    return node.tagName === 'INPUT';
-  };
-  var isHiddenInput = function isHiddenInput(node) {
-    return isInput(node) && node.type === 'hidden';
-  };
-  var isDetailsWithSummary = function isDetailsWithSummary(node) {
-    var r = node.tagName === 'DETAILS' && Array.prototype.slice.apply(node.children).some(function (child) {
-      return child.tagName === 'SUMMARY';
-    });
-    return r;
-  };
-  var getCheckedRadio = function getCheckedRadio(nodes, form) {
-    for (var i = 0; i < nodes.length; i++) {
-      if (nodes[i].checked && nodes[i].form === form) {
-        return nodes[i];
-      }
-    }
-  };
-  var isTabbableRadio = function isTabbableRadio(node) {
-    if (!node.name) {
-      return true;
-    }
-    var radioScope = node.form || getRootNode(node);
-    var queryRadios = function queryRadios(name) {
-      return radioScope.querySelectorAll('input[type="radio"][name="' + name + '"]');
-    };
-    var radioSet;
-    if (typeof window !== 'undefined' && typeof window.CSS !== 'undefined' && typeof window.CSS.escape === 'function') {
-      radioSet = queryRadios(window.CSS.escape(node.name));
-    } else {
-      try {
-        radioSet = queryRadios(node.name);
-      } catch (err) {
-        // eslint-disable-next-line no-console
-        console.error('Looks like you have a radio button with a name attribute containing invalid CSS selector characters and need the CSS.escape polyfill: %s', err.message);
-        return false;
-      }
-    }
-    var checked = getCheckedRadio(radioSet, node.form);
-    return !checked || checked === node;
-  };
-  var isRadio = function isRadio(node) {
-    return isInput(node) && node.type === 'radio';
-  };
-  var isNonTabbableRadio = function isNonTabbableRadio(node) {
-    return isRadio(node) && !isTabbableRadio(node);
-  };
-
-  // determines if a node is ultimately attached to the window's document
-  var isNodeAttached = function isNodeAttached(node) {
-    var _nodeRoot;
-    // The root node is the shadow root if the node is in a shadow DOM; some document otherwise
-    //  (but NOT _the_ document; see second 'If' comment below for more).
-    // If rootNode is shadow root, it'll have a host, which is the element to which the shadow
-    //  is attached, and the one we need to check if it's in the document or not (because the
-    //  shadow, and all nodes it contains, is never considered in the document since shadows
-    //  behave like self-contained DOMs; but if the shadow's HOST, which is part of the document,
-    //  is hidden, or is not in the document itself but is detached, it will affect the shadow's
-    //  visibility, including all the nodes it contains). The host could be any normal node,
-    //  or a custom element (i.e. web component). Either way, that's the one that is considered
-    //  part of the document, not the shadow root, nor any of its children (i.e. the node being
-    //  tested).
-    // To further complicate things, we have to look all the way up until we find a shadow HOST
-    //  that is attached (or find none) because the node might be in nested shadows...
-    // If rootNode is not a shadow root, it won't have a host, and so rootNode should be the
-    //  document (per the docs) and while it's a Document-type object, that document does not
-    //  appear to be the same as the node's `ownerDocument` for some reason, so it's safer
-    //  to ignore the rootNode at this point, and use `node.ownerDocument`. Otherwise,
-    //  using `rootNode.contains(node)` will _always_ be true we'll get false-positives when
-    //  node is actually detached.
-    // NOTE: If `nodeRootHost` or `node` happens to be the `document` itself (which is possible
-    //  if a tabbable/focusable node was quickly added to the DOM, focused, and then removed
-    //  from the DOM as in https://github.com/focus-trap/focus-trap-react/issues/905), then
-    //  `ownerDocument` will be `null`, hence the optional chaining on it.
-    var nodeRoot = node && getRootNode(node);
-    var nodeRootHost = (_nodeRoot = nodeRoot) === null || _nodeRoot === void 0 ? void 0 : _nodeRoot.host;
-
-    // in some cases, a detached node will return itself as the root instead of a document or
-    //  shadow root object, in which case, we shouldn't try to look further up the host chain
-    var attached = false;
-    if (nodeRoot && nodeRoot !== node) {
-      var _nodeRootHost, _nodeRootHost$ownerDo, _node$ownerDocument;
-      attached = !!((_nodeRootHost = nodeRootHost) !== null && _nodeRootHost !== void 0 && (_nodeRootHost$ownerDo = _nodeRootHost.ownerDocument) !== null && _nodeRootHost$ownerDo !== void 0 && _nodeRootHost$ownerDo.contains(nodeRootHost) || node !== null && node !== void 0 && (_node$ownerDocument = node.ownerDocument) !== null && _node$ownerDocument !== void 0 && _node$ownerDocument.contains(node));
-      while (!attached && nodeRootHost) {
-        var _nodeRoot2, _nodeRootHost2, _nodeRootHost2$ownerD;
-        // since it's not attached and we have a root host, the node MUST be in a nested shadow DOM,
-        //  which means we need to get the host's host and check if that parent host is contained
-        //  in (i.e. attached to) the document
-        nodeRoot = getRootNode(nodeRootHost);
-        nodeRootHost = (_nodeRoot2 = nodeRoot) === null || _nodeRoot2 === void 0 ? void 0 : _nodeRoot2.host;
-        attached = !!((_nodeRootHost2 = nodeRootHost) !== null && _nodeRootHost2 !== void 0 && (_nodeRootHost2$ownerD = _nodeRootHost2.ownerDocument) !== null && _nodeRootHost2$ownerD !== void 0 && _nodeRootHost2$ownerD.contains(nodeRootHost));
-      }
-    }
-    return attached;
-  };
-  var isZeroArea = function isZeroArea(node) {
-    var _node$getBoundingClie = node.getBoundingClientRect(),
-      width = _node$getBoundingClie.width,
-      height = _node$getBoundingClie.height;
-    return width === 0 && height === 0;
-  };
-  var isHidden = function isHidden(node, _ref) {
-    var displayCheck = _ref.displayCheck,
-      getShadowRoot = _ref.getShadowRoot;
-    // NOTE: visibility will be `undefined` if node is detached from the document
-    //  (see notes about this further down), which means we will consider it visible
-    //  (this is legacy behavior from a very long way back)
-    // NOTE: we check this regardless of `displayCheck="none"` because this is a
-    //  _visibility_ check, not a _display_ check
-    if (getComputedStyle(node).visibility === 'hidden') {
-      return true;
-    }
-    var isDirectSummary = matches.call(node, 'details>summary:first-of-type');
-    var nodeUnderDetails = isDirectSummary ? node.parentElement : node;
-    if (matches.call(nodeUnderDetails, 'details:not([open]) *')) {
-      return true;
-    }
-    if (!displayCheck || displayCheck === 'full' || displayCheck === 'legacy-full') {
-      if (typeof getShadowRoot === 'function') {
-        // figure out if we should consider the node to be in an undisclosed shadow and use the
-        //  'non-zero-area' fallback
-        var originalNode = node;
-        while (node) {
-          var parentElement = node.parentElement;
-          var rootNode = getRootNode(node);
-          if (parentElement && !parentElement.shadowRoot && getShadowRoot(parentElement) === true // check if there's an undisclosed shadow
-          ) {
-            // node has an undisclosed shadow which means we can only treat it as a black box, so we
-            //  fall back to a non-zero-area test
-            return isZeroArea(node);
-          } else if (node.assignedSlot) {
-            // iterate up slot
-            node = node.assignedSlot;
-          } else if (!parentElement && rootNode !== node.ownerDocument) {
-            // cross shadow boundary
-            node = rootNode.host;
-          } else {
-            // iterate up normal dom
-            node = parentElement;
-          }
-        }
-        node = originalNode;
-      }
-      // else, `getShadowRoot` might be true, but all that does is enable shadow DOM support
-      //  (i.e. it does not also presume that all nodes might have undisclosed shadows); or
-      //  it might be a falsy value, which means shadow DOM support is disabled
-
-      // Since we didn't find it sitting in an undisclosed shadow (or shadows are disabled)
-      //  now we can just test to see if it would normally be visible or not, provided it's
-      //  attached to the main document.
-      // NOTE: We must consider case where node is inside a shadow DOM and given directly to
-      //  `isTabbable()` or `isFocusable()` -- regardless of `getShadowRoot` option setting.
-
-      if (isNodeAttached(node)) {
-        // this works wherever the node is: if there's at least one client rect, it's
-        //  somehow displayed; it also covers the CSS 'display: contents' case where the
-        //  node itself is hidden in place of its contents; and there's no need to search
-        //  up the hierarchy either
-        return !node.getClientRects().length;
-      }
-
-      // Else, the node isn't attached to the document, which means the `getClientRects()`
-      //  API will __always__ return zero rects (this can happen, for example, if React
-      //  is used to render nodes onto a detached tree, as confirmed in this thread:
-      //  https://github.com/facebook/react/issues/9117#issuecomment-284228870)
-      //
-      // It also means that even window.getComputedStyle(node).display will return `undefined`
-      //  because styles are only computed for nodes that are in the document.
-      //
-      // NOTE: THIS HAS BEEN THE CASE FOR YEARS. It is not new, nor is it caused by tabbable
-      //  somehow. Though it was never stated officially, anyone who has ever used tabbable
-      //  APIs on nodes in detached containers has actually implicitly used tabbable in what
-      //  was later (as of v5.2.0 on Apr 9, 2021) called `displayCheck="none"` mode -- essentially
-      //  considering __everything__ to be visible because of the innability to determine styles.
-      //
-      // v6.0.0: As of this major release, the default 'full' option __no longer treats detached
-      //  nodes as visible with the 'none' fallback.__
-      if (displayCheck !== 'legacy-full') {
-        return true; // hidden
-      }
-      // else, fallback to 'none' mode and consider the node visible
-    } else if (displayCheck === 'non-zero-area') {
-      // NOTE: Even though this tests that the node's client rect is non-zero to determine
-      //  whether it's displayed, and that a detached node will __always__ have a zero-area
-      //  client rect, we don't special-case for whether the node is attached or not. In
-      //  this mode, we do want to consider nodes that have a zero area to be hidden at all
-      //  times, and that includes attached or not.
-      return isZeroArea(node);
-    }
-
-    // visible, as far as we can tell, or per current `displayCheck=none` mode, we assume
-    //  it's visible
-    return false;
-  };
-
-  // form fields (nested) inside a disabled fieldset are not focusable/tabbable
-  //  unless they are in the _first_ <legend> element of the top-most disabled
-  //  fieldset
-  var isDisabledFromFieldset = function isDisabledFromFieldset(node) {
-    if (/^(INPUT|BUTTON|SELECT|TEXTAREA)$/.test(node.tagName)) {
-      var parentNode = node.parentElement;
-      // check if `node` is contained in a disabled <fieldset>
-      while (parentNode) {
-        if (parentNode.tagName === 'FIELDSET' && parentNode.disabled) {
-          // look for the first <legend> among the children of the disabled <fieldset>
-          for (var i = 0; i < parentNode.children.length; i++) {
-            var child = parentNode.children.item(i);
-            // when the first <legend> (in document order) is found
-            if (child.tagName === 'LEGEND') {
-              // if its parent <fieldset> is not nested in another disabled <fieldset>,
-              // return whether `node` is a descendant of its first <legend>
-              return matches.call(parentNode, 'fieldset[disabled] *') ? true : !child.contains(node);
-            }
-          }
-          // the disabled <fieldset> containing `node` has no <legend>
-          return true;
-        }
-        parentNode = parentNode.parentElement;
-      }
-    }
-
-    // else, node's tabbable/focusable state should not be affected by a fieldset's
-    //  enabled/disabled state
-    return false;
-  };
-  var isNodeMatchingSelectorFocusable = function isNodeMatchingSelectorFocusable(options, node) {
-    if (node.disabled ||
-    // we must do an inert look up to filter out any elements inside an inert ancestor
-    //  because we're limited in the type of selectors we can use in JSDom (see related
-    //  note related to `candidateSelectors`)
-    isInert(node) || isHiddenInput(node) || isHidden(node, options) ||
-    // For a details element with a summary, the summary element gets the focus
-    isDetailsWithSummary(node) || isDisabledFromFieldset(node)) {
-      return false;
-    }
-    return true;
-  };
-  var isNodeMatchingSelectorTabbable = function isNodeMatchingSelectorTabbable(options, node) {
-    if (isNonTabbableRadio(node) || getTabindex(node) < 0 || !isNodeMatchingSelectorFocusable(options, node)) {
-      return false;
-    }
-    return true;
-  };
-  var isTabbable = function isTabbable(node, options) {
-    options = options || {};
-    if (!node) {
-      throw new Error('No node provided');
-    }
-    if (matches.call(node, candidateSelector) === false) {
-      return false;
-    }
-    return isNodeMatchingSelectorTabbable(options, node);
-  };
-  var focusableCandidateSelector = /* #__PURE__ */candidateSelectors.concat('iframe').join(',');
-  var isFocusable = function isFocusable(node, options) {
-    options = options || {};
-    if (!node) {
-      throw new Error('No node provided');
-    }
-    if (matches.call(node, focusableCandidateSelector) === false) {
-      return false;
-    }
-    return isNodeMatchingSelectorFocusable(options, node);
-  };
-  function generateStack() {
-    if (getBuildMode() === 'development' && window._generate_setState_stacks) {
-      try {
-        throw new Error();
-      } catch (e) {
-        return e.stack;
-      }
-    }
-    return undefined;
-  }
-  /**
-   * Returns a function that retrieves the stack at the time this hook was called (in development mode only).
-   *
-   *
-   */
-  function useStack() {
-    const stack = F$1(generateStack, []);
-    const getStack = T$1(() => stack, []);
-    return getStack;
-  }
-
-  /**
-   * If you want a single place to put a debugger for tracking focus,
-   * here:
-   */
-  function focus(e) {
-    var _e$focus;
-    if (getBuildMode() === 'development' && window.LOG_FOCUS_CHANGES === true) {
-      console.log("Focus changed to ".concat(((e === null || e === void 0 ? void 0 : e.tagName) || "").toLowerCase().padStart(6), ":"), e);
-      console.log(generateStack());
-    }
-    e === null || e === void 0 ? void 0 : (_e$focus = e.focus) === null || _e$focus === void 0 ? void 0 : _e$focus.call(e);
-  }
-  /**
-   * When an element unmounts, default HTML behavior is to just send focus to the body, which is wildly unhelpful. It means you lose your place in the keyboard tab order.
-   *
-   * If you still have access to the element that's unmounting, or perhaps its parent from beforehand, this will find the next suitable element to send focus to instead of the body.
-   *
-   * **Important**: This function is linear on the number of DOM nodes in your document, so it's not particularly fast. Only call it once when you need its value, not every time tab focus changed or something.
-   */
-  function findBackupFocus(unmountingElement) {
-    var _ref10, _bestCandidateAfter;
-    if (unmountingElement == null) return globalThis.document.body;
-    let document = unmountingElement.ownerDocument;
-    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_ELEMENT);
-    let node = walker.firstChild();
-    let bestCandidateBefore = null;
-    let bestCandidateAfter = null;
-    let w = false;
-    while (node) {
-      let pos = node.compareDocumentPosition(unmountingElement);
-      if (pos & Node.DOCUMENT_POSITION_DISCONNECTED) {
-        if (!w) console.warn("Can't focus anything near a disconnected element");
-        w = true;
-      }
-      if (pos & Node.DOCUMENT_POSITION_PRECEDING) {
-        // The unmounting element is before this element we're tree-walking.
-        // That means the next tabbable element we find is the candidate we really want.
-        if (node instanceof Element) {
-          if (isTabbable(node)) {
-            bestCandidateAfter = node;
-            break;
-          }
-        }
-      } else if (pos & Node.DOCUMENT_POSITION_FOLLOWING) {
-        // The unmounting element is after this element we're tree-walking.
-        // That means the we're getting closer and closer.
-        // If this element is tabbable, then it's even closer than any other tabbable element we've saved up to this point.
-        if (node instanceof Element) {
-          if (isTabbable(node)) {
-            bestCandidateBefore = node;
-          }
-        }
-      }
-      node = walker.nextNode();
-    }
-    return (_ref10 = (_bestCandidateAfter = bestCandidateAfter) !== null && _bestCandidateAfter !== void 0 ? _bestCandidateAfter : bestCandidateBefore) !== null && _ref10 !== void 0 ? _ref10 : document.body;
-  }
-
-  /**
-   * Runs a function the specified number of milliseconds after the component renders.
-   *
-   * @remarks This is particularly useful to function as "useEffect on a delay".
-   *
-   * @remarks
-   * {@include } {@link UseTimeoutParameters}
-   */
-  function useTimeout(_ref11) {
-    let {
-      timeout,
-      callback,
-      triggerIndex
-    } = _ref11;
-    monitorCallCount(useTimeout);
-    const stableCallback = useStableCallback(() => {
-      startTimeRef.current = null;
-      callback();
-    });
-    const getTimeout = useStableGetter(timeout);
-    // Set any time we start timeout.
-    // Unset any time the timeout completes
-    const startTimeRef = _(null);
-    const timeoutIsNull = timeout == null;
-    // Any time the triggerIndex changes (including on mount)
-    // restart the timeout.  The timeout does NOT reset
-    // when the duration or callback changes, only triggerIndex.
-    p(() => {
-      if (!timeoutIsNull) {
-        const timeout = getTimeout();
-        console.assert(timeoutIsNull == (timeout == null));
-        if (timeout != null) {
-          startTimeRef.current = +new Date();
-          const handle = setTimeout(stableCallback, timeout);
-          return () => clearTimeout(handle);
-        }
-      }
-    }, [triggerIndex, timeoutIsNull]);
-    const getElapsedTime = T$1(() => {
-      var _startTimeRef$current;
-      return +new Date() - +((_startTimeRef$current = startTimeRef.current) !== null && _startTimeRef$current !== void 0 ? _startTimeRef$current : new Date());
-    }, []);
-    const getRemainingTime = T$1(() => {
-      const timeout = getTimeout();
-      return timeout == null ? null : Math.max(0, timeout - getElapsedTime());
-    }, []);
-    return {
-      getElapsedTime,
-      getRemainingTime
-    };
-  }
-  let idIndex = 0;
-  /**
-   * Debug function that yells at you if your forgot to use the props a hook returns.
-   *
-   * @remarks Like other debug hooks, only has any effect IFF there is a global variable called `"development"` and it contains the value `"development"`.
-   *
-   * @param props - The props to return a modified copy of
-   * @param tag - Should be unique
-   * @returns A modified copy of the given props
-   */
-  function useTagProps(props, tag) {
-    const [id] = h(() => ++idIndex);
-    const propsIdTag = "data-props-".concat(tag, "-").concat(id);
-    const getStack = useStack();
-    if (getBuildMode() == 'development') {
-      // Don't have multiple tags of the same type on the same props, means a hook has been called twice!
-      console.assert(!(props && typeof props == "object" && tag in props));
-      useTimeout({
-        callback: () => {
-          let element = document.querySelectorAll("[".concat(propsIdTag, "]"));
-          if (element.length != 1) {
-            console.error("A hook returned props that were not properly spread to any HTMLElement:");
-            console.log(getStack());
-            /* eslint-disable no-debugger */
-            debugger;
-          }
-        },
-        timeout: 250,
-        triggerIndex: tag
-      });
-      return F$1(() => {
-        return {
-          ...props,
-          [propsIdTag]: true /*, [tag as never]: true*/
-        };
-      }, [props, tag]);
-    } else {
-      return props;
-    }
-  }
 
   /**
    * When used in tandem with `useRovingTabIndex`, allows control of
@@ -4123,7 +4104,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     // Hijack the normal setter function 
     // to also set our ref to the new value
     const setState = T$1(value => {
-      if (getBuildMode() === 'development') {
+      {
         window._setState_stack = getStack();
       }
       if (typeof value === "function") {
@@ -4204,7 +4185,6 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         let nextIndex = typeof updater === "function" ? updater(prevIndex !== null && prevIndex !== void 0 ? prevIndex : null) : updater;
         const untabbable = getUntabbable();
         let parentElement = getElement();
-        if (!parentElement) debugger;
         console.assert(!!parentElement);
         // Whether or not we're currently tabbable, make sure that when we switch from untabbable to tabbable,
         // that we know which index to switch back to.
@@ -4351,19 +4331,19 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         // (otherwise focus gets lost to the body, and useEffect thinks that it shouldn't
         // focus the child because focus wasn't within the list). 
         // It's also just consistent. 
-        tabIndex: untabbable ? 0 : -1
+        tabIndex: untabbable ? 0 : -1,
         // TODO: When a hidden child is clicked, some browsers focus the parent, just because it's got a role and a tabindex.
         // But this won't work to avoid that, because it messes with grid navigation
-        /*onFocus: useStableCallback((e: FocusEvent) => {
-            const parentElement = getElement();
-            console.assert(!!parentElement);
-            if (e.target == getElement()) {
-                debugger;
-                if (!untabbable) {
-                    focusSelf(e);
-                }
+        onFocus: useStableCallback(e => {
+          const parentElement = getElement();
+          console.assert(!!parentElement);
+          if (e.target == getElement()) {
+            debugger;
+            if (!untabbable) {
+              focusSelf(false, e);
             }
-        })*/
+          }
+        })
       }, "data-roving-tab-index")
     };
   }

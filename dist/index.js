@@ -354,7 +354,7 @@ export { useTimeout } from "./timing/use-timeout.js";
 export { assertEmptyObject } from "./util/assert.js";
 export { EventDetail, enhanceEvent, getEventDetail } from "./util/event.js";
 export { findBackupFocus, focus } from "./util/focus.js";
-export { getBuildMode } from "./util/mode.js";
+export { BuildMode } from "./util/mode.js";
 export { generateRandomId } from "./util/random-id.js";
 export { generateStack, useStack } from "./util/stack.js";
 export { hideCallCount, monitorCallCount } from "./util/use-call-count.js";

@@ -1,12 +1,18 @@
-import { noop } from "lodash-es";
-import { getBuildMode } from "./mode.js";
+import { BuildMode } from "./mode.js";
 // TODO: This shouldn't be in every build, I don't think it's in core-js? I think?
 // And it's extremely small anyway and basically does nothing.
 window.requestIdleCallback ??= (callback) => {
     return setTimeout(() => { callback({ didTimeout: false, timeRemaining: () => { return 0; }, }); }, 5);
 };
 let timeoutHandle = null;
-function callCountU(hook) {
+/**
+ * When called inside a hook, monitors each call of that hook and prints the results to a table once things settle.
+ *
+ * @remarks Re-renders and such are all collected together when the table is printed to the console with `requestIdleCallback`.
+ */
+export function monitorCallCount(hook) {
+    if (BuildMode !== 'development')
+        return;
     const name = hook.name;
     if (filterAll || filters.has(name))
         return;
@@ -42,5 +48,4 @@ export function hideCallCount(hook) {
     if (hook != "all")
         filters.add(hook.name);
 }
-export const monitorCallCount = (getBuildMode() == "development") ? callCountU : noop;
 //# sourceMappingURL=use-call-count.js.map

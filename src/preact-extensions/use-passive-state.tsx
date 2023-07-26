@@ -1,5 +1,5 @@
 import { debounceRendering, useCallback, useLayoutEffect, useRef } from "../util/lib.js";
-import { getBuildMode } from "../util/mode.js";
+import { BuildMode } from "../util/mode.js";
 import { Nullable } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 
@@ -16,7 +16,7 @@ export type OnPassiveStateChange<S, R> = ((value: S, prevValue: S | undefined, r
  * @remarks Eventually, when useEvent lands, we hopefully won't need this.
  */
 export function useEnsureStability<T extends any[]>(parentHookName: string, ...values: T) {
-    if (getBuildMode() == 'production')
+    if (BuildMode !== 'development')
         return;
 
     const helperToEnsureStability = useRef<Array<T>>([]);

@@ -7,7 +7,7 @@ import { useMemoObject, useStableGetter } from "../../preact-extensions/use-stab
 import { useState } from "../../preact-extensions/use-state.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { findBackupFocus } from "../../util/focus.js";
-import { EventType, StateUpdater, TargetedPick, useCallback, useEffect, useRef } from "../../util/lib.js";
+import { EventType, FocusEventType, StateUpdater, TargetedPick, useCallback, useEffect, useRef } from "../../util/lib.js";
 import { ElementProps, Nullable } from "../../util/types.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
 import { useTagProps } from "../../util/use-tag-props.js";
@@ -438,7 +438,7 @@ export function useRovingTabIndex<ParentElement extends Element, ChildElement ex
             tabIndex: untabbable ? 0 : -1,
             // TODO: When a hidden child is clicked, some browsers focus the parent, just because it's got a role and a tabindex.
             // But this won't work to avoid that, because it messes with grid navigation
-            onFocus: useStableCallback((e: FocusEvent) => {
+            onFocus: useStableCallback((e: FocusEventType<ParentElement>) => {
                 const parentElement = getElement();
                 console.assert(!!parentElement);
                 if (e.target == getElement()) {
@@ -504,6 +504,6 @@ export function useRovingTabIndexChild<ChildElement extends Element>({
         props: useTagProps({
             tabIndex: (tabbable ? 0 : -1),
             ...{ inert: iAmUntabbable } // This inert is to prevent the edge case of clicking a hidden item and it focusing itself
-        }, "data-roving-tab-index-child"),
+        } as {}, "data-roving-tab-index-child"),
     }
 }

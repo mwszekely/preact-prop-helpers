@@ -1,5 +1,5 @@
 import { debounceRendering, useCallback, useLayoutEffect, useRef } from "../util/lib.js";
-import { getBuildMode } from "../util/mode.js";
+import { BuildMode } from "../util/mode.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 /**
  * Debug hook. Given a value or set of values, emits a console error if any of them change from one render to the next.
@@ -7,7 +7,7 @@ import { monitorCallCount } from "../util/use-call-count.js";
  * @remarks Eventually, when useEvent lands, we hopefully won't need this.
  */
 export function useEnsureStability(parentHookName, ...values) {
-    if (getBuildMode() == 'production')
+    if (BuildMode !== 'development')
         return;
     const helperToEnsureStability = useRef([]);
     const shownError = useRef([]);

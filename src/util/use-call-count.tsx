@@ -1,5 +1,4 @@
-import { noop } from "lodash-es";
-import { getBuildMode } from "./mode.js";
+import { BuildMode } from "./mode.js";
 
 // TODO: This shouldn't be in every build, I don't think it's in core-js? I think?
 // And it's extremely small anyway and basically does nothing.
@@ -17,7 +16,15 @@ type WindowWithHookCallCount = (Window & typeof globalThis) & {
     _hookCallCount: HookCallCount;
 }
 
-function callCountU(hook: Function) {    
+/**
+ * When called inside a hook, monitors each call of that hook and prints the results to a table once things settle.
+ * 
+ * @remarks Re-renders and such are all collected together when the table is printed to the console with `requestIdleCallback`.
+ */
+export function monitorCallCount(hook: Function) {    
+    if (BuildMode !== 'development')
+        return;
+        
     const name = hook.name;
     if (filterAll || filters.has(name))
         return;
@@ -60,5 +67,3 @@ export function hideCallCount(hook: Function | "all") {
     if (hook != "all")
         filters.add(hook.name);
 }
-
-export const monitorCallCount: typeof callCountU = (getBuildMode() == "development") ? callCountU : noop;

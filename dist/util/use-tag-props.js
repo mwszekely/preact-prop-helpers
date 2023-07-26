@@ -1,6 +1,6 @@
 import { useTimeout } from "../timing/use-timeout.js";
 import { useMemo, useState } from "./lib.js";
-import { getBuildMode } from "./mode.js";
+import { BuildMode } from "./mode.js";
 import { useStack } from "./stack.js";
 let idIndex = 0;
 /**
@@ -13,10 +13,10 @@ let idIndex = 0;
  * @returns A modified copy of the given props
  */
 export function useTagProps(props, tag) {
-    const [id] = useState(() => ++idIndex);
-    const propsIdTag = `data-props-${tag}-${id}`;
-    const getStack = useStack();
-    if (getBuildMode() == 'development') {
+    if (BuildMode === 'development') {
+        const [id] = useState(() => ++idIndex);
+        const propsIdTag = `data-props-${tag}-${id}`;
+        const getStack = useStack();
         // Don't have multiple tags of the same type on the same props, means a hook has been called twice!
         console.assert(!(props && typeof props == "object" && tag in props));
         useTimeout({

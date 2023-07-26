@@ -1,8 +1,8 @@
 import { useCallback, useMemo } from "./lib.js";
-import { getBuildMode } from "./mode.js";
+import { BuildMode } from "./mode.js";
 
 export function generateStack() {
-    if (getBuildMode() === 'development' && (window as any)._generate_setState_stacks) {
+    if (BuildMode === 'development' && (window as any)._generate_setState_stacks) {
         try {
             throw new Error();
         }
@@ -19,7 +19,7 @@ export function generateStack() {
  * 
  */
 export function useStack() {
-    if (getBuildMode() == "development") {
+    if (BuildMode === "development") {
         const stack = useMemo(generateStack, []);
         const getStack = useCallback(() => stack, []);
         return getStack;

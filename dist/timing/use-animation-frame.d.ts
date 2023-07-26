@@ -5,7 +5,7 @@ import { ElementProps, Nullable } from "../util/types.js";
  */
 export declare function ProvideBatchedAnimationFrames({ children }: {
     children: ElementProps<EventTarget>["children"];
-}): import("../util/lib.js").JSX.Element;
+}): import("preact").VNode<any>;
 export interface UseAnimationFrameParameters {
     /**
      * Callback with effectively the same rules as `requestAnimationFrame`

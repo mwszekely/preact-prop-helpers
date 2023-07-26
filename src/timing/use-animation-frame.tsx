@@ -1,6 +1,6 @@
 import { noop } from "lodash-es";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
-import { createContext, useCallback, useContext, useEffect, useRef } from "../util/lib.js";
+import { createContext, createElement, useCallback, useContext, useEffect, useRef } from "../util/lib.js";
 import { ElementProps, Nullable } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 
@@ -45,9 +45,8 @@ export function ProvideBatchedAnimationFrames({ children }: { children: ElementP
     }, []);
 
     return (
-        <SharedAnimationFrameContext.Provider value={contextInfo.current}>
-            {children}
-        </SharedAnimationFrameContext.Provider>)
+        createElement(SharedAnimationFrameContext.Provider, { value: contextInfo.current, children })
+    )
 }
 
 export interface UseAnimationFrameParameters {
@@ -70,7 +69,7 @@ export interface UseAnimationFrameParameters {
  */
 export function useAnimationFrame({ callback }: UseAnimationFrameParameters): void {
     monitorCallCount(useAnimationFrame);
-    
+
     // Get a wrapper around the given callback that's stable
     const stableCallback = useStableCallback(callback ?? noop);
     const hasCallback = (callback != null);

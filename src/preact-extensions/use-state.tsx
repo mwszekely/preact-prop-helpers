@@ -1,6 +1,6 @@
 
 import { StateUpdater, useCallback, useRef, useState as useStateP } from "../util/lib.js";
-import { getBuildMode } from "../util/mode.js";
+import { BuildMode } from "../util/mode.js";
 import { useStack } from "../util/stack.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 
@@ -26,7 +26,7 @@ export function useState<T>(initialState: T | (() => T)): readonly [value: T, se
     // Hijack the normal setter function 
     // to also set our ref to the new value
     const setState = useCallback<StateUpdater<T>>(value => {
-        if (getBuildMode() === 'development') {
+        if (BuildMode === 'development') {
             (window as any)._setState_stack = getStack();
         }
         if (typeof value === "function") {

@@ -29,7 +29,7 @@ export interface UsePortalChildrenReturnType {
     /** @stable Allows a child to be updated with new props. `index` is the value returned from `pushChild`. */
     updateChild(index: number, child: VNode): void;
     /** @stable Removes the child at the given `index` (the value returned from `pushChild`) */
-    removeChild(index: number) : void;
+    removeChild(index: number): void;
 }
 
 /**
@@ -60,8 +60,8 @@ export function usePortalChildren({ target }: UsePortalChildrenParameters): UseP
         return removeChild?.(index);
     });
 
-    const element = useMemo(() => { return target == null? null : typeof target == "string"? document.getElementById(target) : target; }, [target]);
-    const children = !element? null : createPortal(<PortalChildren setPushChild={setPushChild} setUpdateChild={setUpdateChild} setRemoveChild={setRemoveChild} />, element!);
+    const element = useMemo(() => { return target == null ? null : typeof target == "string" ? document.getElementById(target) : target; }, [target]);
+    const children = !element ? null : createPortal(createElement(PortalChildren, { setPushChild, setUpdateChild, setRemoveChild }), element!);
 
     return {
         children: children,

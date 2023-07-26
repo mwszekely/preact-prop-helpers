@@ -1,7 +1,6 @@
-import { jsx as _jsx } from "preact/jsx-runtime";
 import { noop } from "lodash-es";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
-import { createContext, useCallback, useContext, useEffect, useRef } from "../util/lib.js";
+import { createContext, createElement, useCallback, useContext, useEffect, useRef } from "../util/lib.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 const SharedAnimationFrameContext = createContext(null);
 /**
@@ -28,7 +27,7 @@ export function ProvideBatchedAnimationFrames({ children }) {
         handle = requestAnimationFrame(rafWithBatchedCallbacks);
         return () => cancelAnimationFrame(handle);
     }, []);
-    return (_jsx(SharedAnimationFrameContext.Provider, { value: contextInfo.current, children: children }));
+    return (createElement(SharedAnimationFrameContext.Provider, { value: contextInfo.current, children }));
 }
 /**
  * The callback you provide will start running every frame after the component mounts.
