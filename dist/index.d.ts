@@ -5,13 +5,20 @@
  *
  * Everything from keyboard navigation (arrow keys, typeahead) to modal focus traps (dialogs and menus) to simple things like `useState` *but with localStorage!* are here.
  *
- * [See below a more complete list of goals](#conventionsandgoals), but in general this library aims to be both performant (no unnecessary re-renders) and impose few to no restrictions on what your rendered HTML must look like in order to achieve any given result.
+ * [See below a more complete list of goals](#conventionsandgoals), but in general this library aims to be both performant (no unnecessary re-renders, no repeat calls to [`useRefElement`](#userefelement) or other super-common hooks) and impose few to no restrictions on what your rendered HTML must look like in order to achieve any given result.
  *
- * Due to the complex nature of some of these hooks (in particular, grid navigation), all function parameters/return types are very strictly categorized. As a full example:
+ * Many of these hooks get really complicated, especially around grid navigation, but everything has been extremely carefully [typed](https://www.typescriptlang.org/) and named so that you can generally just use Intellisense to guide you through the whole process.
+ * Hook dependencies are managed by just swizzling their parameters and return types back and forth &mdash; [see the conventions section below for the naming rules that make it work](#conventionsandgoals).
+ *
+ * As a full example:
  *
  * ```typescript
+ *    // Short, abbreviated version:
+ *    const { ...returnType } = useCompleteGridNavigationDeclarative({ ...params });
  *
- *    const allReturnInfo = useCompleteGridNavigationDeclarative<HTMLTableSectionElement, HTMLTableRowElement, HTMLTableCellElement, CustomGridInfo, CustomGridRowInfo>({
+ *    // Entirely complete, fully spelt-out version:
+ *    const returnType = useCompleteGridNavigationDeclarative<HTMLTableSectionElement, HTMLTableRowElement, HTMLTableCellElement, CustomGridInfo, CustomGridRowInfo>({
+ *        // `useRovingTabIndex` is a separate hook that you can call with these same parameters:
  *        rovingTabIndexParameters: {
  *            // If true, the entire grid is removed from the tab order
  *            untabbable: false,
@@ -20,6 +27,14 @@
  *            // This can be used to track when the user navigates between rows for any reason
  *            onTabbableIndexChange: setTabbableRow,
  *        },
+ *        // `useSingleSelection` is a separate hook that you can call with these parameters:
+ *        singleSelectionParameters: {
+ *            // When a child is selected, it is indicated with this ARIA attribute:
+ *            ariaPropName: "aria-checked",
+ *            // Are children selected when they are activated (e.g. clicked), or focused (e.g. tabbed to)?
+ *            selectionMode: "focus"
+ *        },
+ *        // (etc. etc.)
  *        typeaheadNavigationParameters: {
  *            // Determines how children are searched for (`Intl.Collator`)
  *            collator: null,
@@ -41,12 +56,6 @@
  *            pageNavigationSize: 0.1,
  *            // This can be used to track when the user navigates between rows with the arrow keys
  *            onNavigateLinear: null
- *        },
- *        singleSelectionParameters: {
- *            // When a child is selected, it is indicated with this ARIA attribute:
- *            ariaPropName: "aria-checked",
- *            // Are children selected when they are activated (e.g. clicked), or focused (e.g. tabbed to)?
- *            selectionMode: "focus"
  *        },
  *        singleSelectionDeclarativeParameters: {
  *            // Which child is currently selected?
@@ -77,11 +86,13 @@
  *        }
  *    });
  *
+ *    // Those were the parameters, these are the return types:
  *    const {
  *        // Spread these props to the HTMLElement that will implement this grid behavior
  *        props,
  *        // The child row will useContext this, so provide it to them.
  *        context,
+ *        // This is what `useRovingTabIndex` returned; use it for whatever you need:
  *        rovingTabIndexReturn: {
  *            // Call to focus the grid, which focuses the current row, which focuses its current cell.
  *            focusSelf,
@@ -90,6 +101,12 @@
  *            // Changes which row is currently tabbable
  *            setTabbableIndex
  *        },
+ *        // This is what `useSingleSelection` returned; use it for whatever you need:
+ *        singleSelectionReturn: {
+ *            // Largely internal use only (since `selectedIndex` is a prop you pass in for the declarative version)
+ *            getSelectedIndex,
+ *        },
+ *        // (etc. etc.)
  *        typeaheadNavigationReturn: {
  *            // Returns the current value the user has typed for typeahead (cannot be used during render)
  *            getCurrentTypeahead,
@@ -161,8 +178,6 @@
  *
  * As another aside, for the same reasons as React, a stable callback from [`useStableCallback`](#usestablecallback) (or [`useStableGetter`](#usestablegetter)) [**cannot be called during render**](https://github.com/reactjs/rfcs/pull/220#issuecomment-1118055107).
  * This is because a component may theoretically be called multiple times for a single render, so it's unknown *which* invocation of `useStableCallback` was the one that resulted in a render until that render finally settles. This prevents the problem of a component somewhere else being given the "wrong" value that it got mid-render.
- *
- * Ultimately this generally means for these low-level hooks that if you pass in a parameter that's `useStableCallback`-stable, you'll get back a stable return value that can't be called during render. If you pass in a parameter that's `useCallback`-stable, you'll get back a stable return value that you **can** call during render.
  *
  * ## List of hooks (in rough order of usefulness)
  *
@@ -250,38 +265,44 @@
  * ```md-literal
  * ## Conventions and goals
  *
- * * As much as possible, no specific DOM restrictions are imposed and, for hooks with children (lists, grids, etc.), those children can be anywhere descendent in the tree (except for `useSortableChildren`, which can be anywhere descendant but must all be in an array). Nesting hooks, even of the same type, is also fine.
+ * * As much as possible, no specific DOM restrictions are imposed and, for hooks with children (lists, grids, etc.), those children can be anywhere descendent in the tree (except for `useSortableChildren`, which can be anywhere descendant but must all be in an array due to how the `key` prop works). Nesting hooks, even of the same type, is also fine.
  *     *  E.G. `useRovingTabIndexChild` can call its own `useRovingTabIndex`, which is how `useGridNavigation` works.
- * * A parent hook never needs to be directly passed child data because the children will provide it themselves. E.G. `useListNavigation` can filter children, but it doesn't take an array of which children to filter out; each child reports its own status as filtered/unfiltered with, say, a `hidden` prop, and the parent responds to that.
- * * Re-render as few times as possible. In general this means instead of a hook returning a value, it will accept an `onChange`-ish handler that will let you explicitly do that.
+ * * A parent hook never needs to be directly passed child data because the children will provide it themselves.
+ *     * E.G. `useListNavigation` can filter children, but it doesn't take an array of which children to filter out; each child reports its own status as filtered/unfiltered with, say, a `hidden` prop, and the parent responds to that. If a child that is focused becomes filtered, for example, the parent has enough information to be able to move focus to an adjacent child.
+ *     * This means that the child data is *always* the single source of truth (even if the parent creates those children and the data they use), and maps nicely to how components are built and diffed.
+ * * Re-render as few times as possible. In general this means instead of a hook returning a value to use during render, it will accept an `onChange`-ish handler that will let you explicitly do that if you want (and is no-cost otherwise).
  *     * `useElementSize`, for example, has no way of returning the size the first time its component renders. It needs to fully render *and then* run an effect that measures it. Once the element's been measured, *you* are responsible for choosing if the component is re-rendered with this new information or not.
- *     * This means that the child data is *always* the single source of truth, and maps nicely to how components are built and diffed.
- * * Some of these hooks, like `useGridNavigationRow`, have **extremely** complicated dependencies. To manage this, most hooks take a single parameter and return a single object with everything labelled consistently and designed to be discoverable via auto-complete. If we have `useFoo`, it:
- *     * ...will always take parameters like `{ fooParameters: {...} }`.
- *         * E.G. `useElementRef({ elementRefParameters: { onMount: ... } })`
- *     * ...will always return objects like `{ fooReturn: { ... } }`
- *         * E.G. `const { refElementReturn: { getElement } } = useElementRef(...)`
- *     * ...may also return `{ props: {...} }`. These must be spread onto the element you're rendering, or the hook will not function (see `useMergedProps` if you need to use other props in addition to the returned props). It may occasionally be called something else starting with `props`, e.g. `propsStable`, `propsTarget`, etc.
- *         * E.G. `const { propsStable } = useElementRef(...)`, then `<div {...propsStable} />`
+ * * Some of these hooks, like `useGridNavigationRow`, have **extremely** complicated dependencies. To manage this, most hooks take a single parameter and return a single object with everything labelled consistently and designed to be discoverable via auto-complete. <br /><br />**Example**: E.G. If `useFoo` is one of those complex hooks, then it:
+ *     * ...**will always** take a single parameter that's at least like `{ fooParameters: {...} }`.
+ *         * E.G. `useRefElement({ refElementParameters: { onMount: ... } })`
+ *         * `UseFooParameters` is the type of the hook's 1 argument.
+ *         * `UseFooParametersSelf` is the type of the `fooParameters` member.
+ *     * ...**will always** return a single object that's at least like `{ fooReturn: { ... } }`.
+ *         * E.G. `const { refElementReturn: { getElement } } = useRefElement(...)`
+ *         * `UseFooReturnType` is the type of the hook's return type.
+ *         * `UseFooReturnTypeSelf` is the type of the `fooReturn` member.
+ *     * ...*may also* return `{ props: {...} }`. These must be spread onto the element you're rendering, or the hook will not function (see `useMergedProps` if you need to use other props in addition to the returned props). It may occasionally be called something else starting with `props`, e.g. `propsStable`, `propsSource` and `propsTarget`, etc.
+ *         * E.G. `const { propsStable } = useRefElement(...)`, then `<div {...propsStable} />`
  *         * `propsStable` indicates that nothing about the object ever changes including the identity of the object itself and all its fields.
- *     * ...may also return `{ context: { ... } }` that children rely on.
- *         1. E.G. Parent calls `const { context } = useFoo(...);`
+ *     * ...*may also*, as the parent of child components, return `{ context: { ... } }` that those children rely on.
+ *         1. E.G. Parent does `const { context, ...etc } = useFoo({...});`
  *         1. Parent renders `<MyContext.Provider value={context}>{children}</MyContext.Provider>`
  *         1. Then child calls `useFooChild({ context: useContext(MyContext), fooChildParameters: {...} })`
- *     * ...may also require or return `{ info: { ... } }` if it has something to contribute to `useManagedChild`'s special `info` parameter.
+ *     * ...*may also*, as a child of a parent component, require or return pieces of `{ info: { ... } }` if it has something to contribute to `useManagedChild`'s special `info` parameter.
+ *         * E.G. `useSingleSelectionChild` requires `info.index` to function, and returns some other pieces of the `info` object, like `info.getSelected`. Just keep swizzling back and forth to create the complete `info` object.
+ *         * The `info` type can be customized with a generic type parameter generally named `M` (grid navigation has `RM` for rows' info and `CM` for cells' info).
+ *             * If you have a custom hook that calls this child, you can customize the `info` it expects via that type parameter.
  *     * When hooks themselves use other hooks:
  *         * If `useFoo` calls `useBar` directly, then it will take parameters like `{ fooParameters: {...}, barParameters: {...} }` and return objects like `{ fooReturn: {...}, barReturn: {...} }`.
- *         * If `useFoo` relies on `useBar` (but doesn't call it itself!), then will do one of the following:
+ *         * If `useFoo` relies on `useBar` (but doesn't call it itself, to avoid redundant calls to the same common hook, like [`useRefElement`](#userefelement)), then will do one of the following:
  *             * Take parameters like `{ fooParameters: { ... }, barReturn: { ... } }`, if it needs the return value of `useBar`.
  *             * Return values like `{ fooReturn: { ... }, barParameters: { ... } }`, if it needs `useBar` to be called with specific parameters in order to function (usually callbacks).
- *         * (The difference between those two is usually based on performance -- many, many hooks rely on `elementRefReturn.getElement`, for example, so the latter pattern allows us to just call `useRefElement` once and pass the result around to whoever needs it)
+ *             * (Ultimately the point of this is to allow us to just call `useRefElement` once and pass the result around to whoever needs it)
  *         * If `useFoo` and `useBar` both return a top-level `props`, they will be merged into one.
  *         * If `useFoo` and `useBar` both return a top-level `context`, they will be merged into one.
  *         * If `useFoo` and `useBar` both return a top-level `info`, they will be merged into one.
  *         * Occasionally, `props` or `context` may be suffixed with the specific role they refer to:
  *             * `useRandomId` returns `propsSource` and `propsReferencer` (and no `props`).
- * * Organizationally, some hooks exist primarily to be used as a part of a larger hook.  Hooks within the `component-use` folder are generally "ready-to-use" and don't require much passing of parameters back and forth, but are not fully extensible.  Hooks within `component-detail` are the lower-level building blocks that make up those "ready-to-use" complete hooks, but they're much more time-consuming to use.
- *     * You can also just copy and paste one of the complete hooks somewhere else and use it as a new building block...
  * ```
  *
  * @packageDocumentation
@@ -306,7 +327,7 @@ export { UsePaginatedChildContext, UsePaginatedChildContextSelf, UsePaginatedChi
 export { UseStaggeredChildContext, UseStaggeredChildContextSelf, UseStaggeredChildParameters, UseStaggeredChildReturnType, UseStaggeredChildReturnTypeSelf, UseStaggeredChildrenInfo, UseStaggeredChildrenParameters, UseStaggeredChildrenParametersSelf, UseStaggeredChildrenReturnType, UseStaggeredChildrenReturnTypeSelf, useStaggeredChild, useStaggeredChildren } from "./component-detail/use-staggered-children.js";
 export { CompleteGridNavigationCellContext, CompleteGridNavigationRowContext, UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationCellInfoKeysParameters, UseCompleteGridNavigationCellParameters, UseCompleteGridNavigationCellReturnType, UseCompleteGridNavigationDeclarativeParameters, UseCompleteGridNavigationDeclarativeReturnType, UseCompleteGridNavigationParameters, UseCompleteGridNavigationReturnType, UseCompleteGridNavigationRowInfo, UseCompleteGridNavigationRowInfoKeysParameters, UseCompleteGridNavigationRowParameters, UseCompleteGridNavigationRowReturnType, useCompleteGridNavigation, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow } from "./component-use/use-grid-navigation-complete.js";
 export { CompleteListNavigationContext, UseCompleteListNavigationChildInfo, UseCompleteListNavigationChildInfoKeysParameters, UseCompleteListNavigationChildParameters, UseCompleteListNavigationChildReturnType, UseCompleteListNavigationDeclarativeParameters, UseCompleteListNavigationDeclarativeReturnType, UseCompleteListNavigationParameters, UseCompleteListNavigationReturnType, useCompleteListNavigation, useCompleteListNavigationChild, useCompleteListNavigationDeclarative } from "./component-use/use-list-navigation-complete.js";
-export { UseModalParameters, UseModalReturnType, useModal } from "./component-use/use-modal.js";
+export { UseModalParameters, UseModalParametersSelf, UseModalReturnType, useModal } from "./component-use/use-modal.js";
 export { PressChangeEventReason, PressEventReason, UsePressParameters, UsePressParametersSelf, UsePressReturnType, UsePressReturnTypeSelf, setPressVibrate, usePress } from "./component-use/use-press.js";
 export { UseRandomDualIdsParameters, UseRandomDualIdsReturnType, useRandomDualIds } from "./component-use/use-random-dual-ids.js";
 export { UseRandomIdParameters, UseRandomIdParametersSelf, UseRandomIdReturnType, UseRandomIdReturnTypeSelf, useRandomId } from "./component-use/use-random-id.js";

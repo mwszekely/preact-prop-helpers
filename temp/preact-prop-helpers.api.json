@@ -147,7 +147,7 @@
   },
   "kind": "Package",
   "canonicalReference": "preact-prop-helpers!",
-  "docComment": "/**\n * # Preact Prop Helpers\n *\n * A set of small, compartmentalized hooks for Preact. The theme is modifying HTML attributes to do useful things, along with a few other boilerplate-y hooks that are just good to have around.\n *\n * Everything from keyboard navigation (arrow keys, typeahead) to modal focus traps (dialogs and menus) to simple things like `useState` *but with localStorage!* are here.\n *\n * [See below a more complete list of goals](#conventionsandgoals), but in general this library aims to be both performant (no unnecessary re-renders) and impose few to no restrictions on what your rendered HTML must look like in order to achieve any given result.\n *\n * Due to the complex nature of some of these hooks (in particular, grid navigation), all function parameters/return types are very strictly categorized. As a full example:\n * ```typescript\n *\n *    const allReturnInfo = useCompleteGridNavigationDeclarative<HTMLTableSectionElement, HTMLTableRowElement, HTMLTableCellElement, CustomGridInfo, CustomGridRowInfo>({\n *        rovingTabIndexParameters: {\n *            // If true, the entire grid is removed from the tab order\n *            untabbable: false,\n *            // A function provided by you that is only called when no children are tabbable\n *            focusSelfParent: focus,\n *            // This can be used to track when the user navigates between rows for any reason\n *            onTabbableIndexChange: setTabbableRow,\n *        },\n *        typeaheadNavigationParameters: {\n *            // Determines how children are searched for (`Intl.Collator`)\n *            collator: null,\n *            // Whether typeahead behavior is disabled\n *            noTypeahead: false,\n *            // How long a period of no input is required before typeahead clears itself\n *            typeaheadTimeout: 1000,\n *            // This can be used to track when the user navigates between rows via typeahead\n *            onNavigateTypeahead: null\n *        },\n *        linearNavigationParameters: {\n *            // Is navigating to the first/last row with Home/End disabled?\n *            disableHomeEndKeys: false,\n *            // What happens when you press Up on the first row?\n *            navigatePastStart: \"wrap\",\n *            // What happens when you press Down on the last row?\n *            navigatePastEnd: \"wrap\",\n *            // How far do Page Up/Down jump?\n *            pageNavigationSize: 0.1,\n *            // This can be used to track when the user navigates between rows with the arrow keys\n *            onNavigateLinear: null\n *        },\n *        singleSelectionParameters: {\n *            // When a child is selected, it is indicated with this ARIA attribute:\n *            ariaPropName: \"aria-checked\",\n *            // Are children selected when they are activated (e.g. clicked), or focused (e.g. tabbed to)?\n *            selectionMode: \"focus\"\n *        },\n *        singleSelectionDeclarativeParameters: {\n *            // Which child is currently selected?\n *            selectedIndex: selectedRow,\n *            // What happens when the user selects a child?\n *            onSelectedIndexChange: (e) => setSelectedRow(e[EventDetail].selectedIndex)\n *        },\n *        gridNavigationParameters: {\n *            // This can be used by you to track which 0-indexed column is currently the one with focus.\n *            onTabbableColumnChange: setTabbableColumn\n *        },\n *        rearrangeableChildrenParameters: {\n *            // This must return a VNode's 0-based index from its props\n *            getIndex: useCallback<GetIndex>((a: VNode) => a.props.index, [])\n *        },\n *        sortableChildrenParameters: {\n *            // Controls how rows compare against each other\n *            compare: useCallback((rhs: CustomGridInfo, lhs: CustomGridInfo) => { return lhs.index - rhs.index }, [])\n *        },\n *        paginatedChildrenParameters: {\n *            // Controls the current pagination range\n *            paginationMin: null,\n *            paginationMax: null\n *        },\n *        staggeredChildrenParameters: {\n *            // Controls whether children appear staggered as CPU time permits\n *            staggered: false\n *        }\n *    });\n *\n *    const {\n *        // Spread these props to the HTMLElement that will implement this grid behavior\n *        props,\n *        // The child row will useContext this, so provide it to them.\n *        context,\n *        rovingTabIndexReturn: {\n *            // Call to focus the grid, which focuses the current row, which focuses its current cell.\n *            focusSelf,\n *            // Returns the index of the row that is tabbable to\n *            getTabbableIndex,\n *            // Changes which row is currently tabbable\n *            setTabbableIndex\n *        },\n *        typeaheadNavigationReturn: {\n *            // Returns the current value the user has typed for typeahead (cannot be used during render)\n *            getCurrentTypeahead,\n *            // Whether the user's typeahead is invalid/valid/nonexistent.\n *            typeaheadStatus\n *        },\n *        singleSelectionReturn: {\n *            // Largely internal use only (since `selectedIndex` is a prop you pass in for the declarative version)\n *            getSelectedIndex,\n *        },\n *        rearrangeableChildrenReturn: {\n *            // You must call this hook on your array of children to implement the sorting behavior\n *            useRearrangedChildren,\n *            // Largely internal use only\n *            indexDemangler,\n *            // Largely internal use only\n *            indexMangler,\n *            // Largely internal use only, but if you implement a custom sorting algorithm, call this to finalize the rearrangement.\n *            rearrange,\n *            // Reverses all children\n *            reverse,\n *            // Shuffles all children\n *            shuffle\n *        },\n *        sortableChildrenReturn: {\n *            // A table header button would probably call this function to sort all the table rows.\n *            sort\n *        },\n *        linearNavigationReturn: { },\n *        managedChildrenReturn: {\n *            // Returns metadata about each row\n *            getChildren\n *        },\n *        paginatedChildrenReturn: {\n *            // Largely internal use only\n *            refreshPagination\n *        },\n *        staggeredChildrenReturn: {\n *            // When the staggering behavior is currently hiding one or more children, this is true.\n *            stillStaggering\n *        },\n *        childrenHaveFocusReturn: {\n *            // Returns true if any row in this grid is focused\n *            getAnyFocused\n *        },\n *\n *    } = allReturnInfo;\n * ```\n *\n * ## A note on stability\n *\n * Effects, like in `useEffect`, are great because they let a component say \"let's also make some non-HTML changes\". So we're all on the same page, an *effect* is *triggered* when one of its *dependencies* changes, as we all know.\n *\n * Preact inherits the same issue of \"effect *triggers* (the changes that cause the effect to run) and effect *dependencies* (the data and functions the effect needs to work) are interchangeable\" [that React has](https://github.com/facebook/react/issues/14099) and [is working on](https://github.com/facebook/react/pull/25881), and a few of the hooks here are low-level enough that it sometimes starts to become important to distinguish whether a function/object is \"stable\" or not across renders.\n *\n * An object/function that's \"stable\" doesn't change values when the component renders itself a second (or third, etc.) time:\n * ```tsx\n * function ExampleComponent() {\n *   // Every time <ExampleComponent /> renders, `stableObject` is the same object as last time (e.g. with ===)\n *   let stableObject = useRef({}).current;\n *   // Every time <ExampleComponent /> renders, `unstableObject` is a new, unique object (e.g. !== the one from the last render)\n *   let unstableObject = ({ evenWith: \"a stable value inside\" });\n * }\n * ```\n *\n * All stability **requirements** (for parameters) and **guarantees** (for returned values) are documented. Just use `useCallback`, [`useStableCallback`](#usestablecallback), or [`useStableGetter`](#usestablegetter) as appropriate.\n *\n * As another aside, for the same reasons as React, a stable callback from [`useStableCallback`](#usestablecallback) (or [`useStableGetter`](#usestablegetter)) [**cannot be called during render**](https://github.com/reactjs/rfcs/pull/220#issuecomment-1118055107). This is because a component may theoretically be called multiple times for a single render, so it's unknown *which* invocation of `useStableCallback` was the one that resulted in a render until that render finally settles. This prevents the problem of a component somewhere else being given the \"wrong\" value that it got mid-render.\n *\n * ## List of hooks (in rough order of usefulness)\n *\n * {@tableOfContents start} {@tableOfContents header Common} {@tableOfContents subheader These hooks are used extremely commonly or provide uncommonly useful behavior} {@include} {@link useMergedProps} {@include} {@link useRefElement} {@include} {@link usePress} {@include} {@link useCompleteListNavigation} {@include} {@link useCompleteGridNavigation} {@include} {@link useModal} {@include} {@link useAsyncHandler} {@tableOfContents header Specific} {@tableOfContents subheader Very useful in very specific cases} {@include} {@link useElementSize} {@include} {@link useHideScroll} {@include} {@link useMediaQuery} {@include} {@link useHasCurrentFocus} {@include} {@link useHasLastFocus} {@include} {@link useChildrenHaveFocus} {@include} {@link useRandomId} {@include} {@link useRandomDualIds} {@include} {@link useGlobalHandler} {@include} {@link useDocumentClass} {@tableOfContents header Niche} {@include} {@link useAsyncEffect} {@include} {@link useMutationObserver} {@include} {@link useTextContent} {@include} {@link useImperativeProps} {@include} {@link usePortalChildren} {@include} {@link useActiveElement} {@include} {@link useDraggable} {@include} {@link useDroppable} {@include} {@link useLogicalDirection} {@tableOfContents header Extensions} {@tableOfContents subheader These hooks don't do anything with HTML elements but are useful extensions to Preact's built-in hooks} {@include} {@link useStableGetter} {@include} {@link useStableCallback} {@include} {@link useMemoObject} {@include} {@link useForceUpdate} {@include} {@link useState} {@include} {@link usePassiveState} {@include} {@link usePersistentState} {@include} {@link useSearchParamState} {@include} {@link useTimeout} {@include} {@link useInterval} {@include} {@link useAnimationFrame} {@include} {@link useEffectDebug} {@include} {@link useLayoutEffectDebug} {@tableOfContents header Building blocks and other helpers} {@tableOfContents subheader These hooks are primarily used to build larger hooks, but can be used alone} {@include} {@link useManagedChildren} {@include} {@link useListNavigation} {@include} {@link useGridNavigation} {@include} {@link useRovingTabIndex} {@include} {@link useLinearNavigation} {@include} {@link useTypeaheadNavigation} {@include} {@link useSingleSelection} {@include} {@link useRearrangeableChildren} {@include} {@link useSortableChildren} {@include} {@link usePaginatedChildren} {@include} {@link useStaggeredChildren} {@include} {@link useDismiss} {@include} {@link useBackdropDismiss} {@include} {@link useEscapeDismiss} {@include} {@link useLostFocusDismiss} {@include} {@link useFocusTrap} {@include} {@link useAsync} {@include} {@link useUrl} {@include} {@link useMergedRefs} {@include} {@link useMergedClasses} {@include} {@link useMergedChildren} {@include} {@link useMergedStyles} ## Each hook, individually {@tableOfContents end}\n *\n * ## Miscellanea {@include} {@link Nullable} {@include} {@link OmitStrong} {@include} {@link TargetedPick} {@include} {@link TargetedOmit} {@include} {@link ElementProps}\n * ```md-literal\n * ## Conventions and goals\n *\n * * As much as possible, no specific DOM restrictions are imposed and, for hooks with children (lists, grids, etc.), those children can be anywhere descendent in the tree (except for `useSortableChildren`, which can be anywhere descendant but must all be in an array). Nesting hooks, even of the same type, is also fine.\n *     *  E.G. `useRovingTabIndexChild` can call its own `useRovingTabIndex`, which is how `useGridNavigation` works.\n * * A parent hook never needs to be directly passed child data because the children will provide it themselves. E.G. `useListNavigation` can filter children, but it doesn't take an array of which children to filter out; each child reports its own status as filtered/unfiltered with, say, a `hidden` prop, and the parent responds to that.\n * * Re-render as few times as possible. In general this means instead of a hook returning a value, it will accept an `onChange`-ish handler that will let you explicitly do that.\n *     * `useElementSize`, for example, has no way of returning the size the first time its component renders. It needs to fully render *and then* run an effect that measures it. Once the element's been measured, *you* are responsible for choosing if the component is re-rendered with this new information or not.\n *     * This means that the child data is *always* the single source of truth, and maps nicely to how components are built and diffed.\n * * Some of these hooks, like `useGridNavigationRow`, have **extremely** complicated dependencies. To manage this, most hooks take a single parameter and return a single object with everything labelled consistently and designed to be discoverable via auto-complete. If we have `useFoo`, it:\n *     * ...will always take parameters like `{ fooParameters: {...} }`.\n *         * E.G. `useElementRef({ elementRefParameters: { onMount: ... } })`\n *     * ...will always return objects like `{ fooReturn: { ... } }`\n *         * E.G. `const { refElementReturn: { getElement } } = useElementRef(...)`\n *     * ...may also return `{ props: {...} }`. These must be spread onto the element you're rendering, or the hook will not function (see `useMergedProps` if you need to use other props in addition to the returned props). It may occasionally be called something else starting with `props`, e.g. `propsStable`, `propsTarget`, etc.\n *         * E.G. `const { propsStable } = useElementRef(...)`, then `<div {...propsStable} />`\n *         * `propsStable` indicates that nothing about the object ever changes including the identity of the object itself and all its fields.\n *     * ...may also return `{ context: { ... } }` that children rely on.\n *         1. E.G. Parent calls `const { context } = useFoo(...);`\n *         1. Parent renders `<MyContext.Provider value={context}>{children}</MyContext.Provider>`\n *         1. Then child calls `useFooChild({ context: useContext(MyContext), fooChildParameters: {...} })`\n *     * ...may also require or return `{ info: { ... } }` if it has something to contribute to `useManagedChild`'s special `info` parameter.\n *     * When hooks themselves use other hooks:\n *         * If `useFoo` calls `useBar` directly, then it will take parameters like `{ fooParameters: {...}, barParameters: {...} }` and return objects like `{ fooReturn: {...}, barReturn: {...} }`.\n *         * If `useFoo` relies on `useBar` (but doesn't call it itself!), then will do one of the following:\n *             * Take parameters like `{ fooParameters: { ... }, barReturn: { ... } }`, if it needs the return value of `useBar`.\n *             * Return values like `{ fooReturn: { ... }, barParameters: { ... } }`, if it needs `useBar` to be called with specific parameters in order to function (usually callbacks).\n *         * (The difference between those two is usually based on performance -- many, many hooks rely on `elementRefReturn.getElement`, for example, so the latter pattern allows us to just call `useRefElement` once and pass the result around to whoever needs it)\n *         * If `useFoo` and `useBar` both return a top-level `props`, they will be merged into one.\n *         * If `useFoo` and `useBar` both return a top-level `context`, they will be merged into one.\n *         * If `useFoo` and `useBar` both return a top-level `info`, they will be merged into one.\n *         * Occasionally, `props` or `context` may be suffixed with the specific role they refer to:\n *             * `useRandomId` returns `propsSource` and `propsReferencer` (and no `props`).\n * * Organizationally, some hooks exist primarily to be used as a part of a larger hook.  Hooks within the `component-use` folder are generally \"ready-to-use\" and don't require much passing of parameters back and forth, but are not fully extensible.  Hooks within `component-detail` are the lower-level building blocks that make up those \"ready-to-use\" complete hooks, but they're much more time-consuming to use.\n *     * You can also just copy and paste one of the complete hooks somewhere else and use it as a new building block...\n * ```\n *\n * @packageDocumentation\n */\n",
+  "docComment": "/**\n * # Preact Prop Helpers\n *\n * A set of small, compartmentalized hooks for Preact. The theme is modifying HTML attributes to do useful things, along with a few other boilerplate-y hooks that are just good to have around.\n *\n * Everything from keyboard navigation (arrow keys, typeahead) to modal focus traps (dialogs and menus) to simple things like `useState` *but with localStorage!* are here.\n *\n * [See below a more complete list of goals](#conventionsandgoals), but in general this library aims to be both performant (no unnecessary re-renders, no repeat calls to [`useRefElement`](#userefelement) or other super-common hooks) and impose few to no restrictions on what your rendered HTML must look like in order to achieve any given result.\n *\n * Many of these hooks get really complicated, especially around grid navigation, but everything has been extremely carefully [typed](https://www.typescriptlang.org/) and named so that you can generally just use Intellisense to guide you through the whole process. Hook dependencies are managed by just swizzling their parameters and return types back and forth &mdash; [see the conventions section below for the naming rules that make it work](#conventionsandgoals).\n *\n * As a full example:\n * ```typescript\n *    // Short, abbreviated version:\n *    const { ...returnType } = useCompleteGridNavigationDeclarative({ ...params });\n *\n *    // Entirely complete, fully spelt-out version:\n *    const returnType = useCompleteGridNavigationDeclarative<HTMLTableSectionElement, HTMLTableRowElement, HTMLTableCellElement, CustomGridInfo, CustomGridRowInfo>({\n *        // `useRovingTabIndex` is a separate hook that you can call with these same parameters:\n *        rovingTabIndexParameters: {\n *            // If true, the entire grid is removed from the tab order\n *            untabbable: false,\n *            // A function provided by you that is only called when no children are tabbable\n *            focusSelfParent: focus,\n *            // This can be used to track when the user navigates between rows for any reason\n *            onTabbableIndexChange: setTabbableRow,\n *        },\n *        // `useSingleSelection` is a separate hook that you can call with these parameters:\n *        singleSelectionParameters: {\n *            // When a child is selected, it is indicated with this ARIA attribute:\n *            ariaPropName: \"aria-checked\",\n *            // Are children selected when they are activated (e.g. clicked), or focused (e.g. tabbed to)?\n *            selectionMode: \"focus\"\n *        },\n *        // (etc. etc.)\n *        typeaheadNavigationParameters: {\n *            // Determines how children are searched for (`Intl.Collator`)\n *            collator: null,\n *            // Whether typeahead behavior is disabled\n *            noTypeahead: false,\n *            // How long a period of no input is required before typeahead clears itself\n *            typeaheadTimeout: 1000,\n *            // This can be used to track when the user navigates between rows via typeahead\n *            onNavigateTypeahead: null\n *        },\n *        linearNavigationParameters: {\n *            // Is navigating to the first/last row with Home/End disabled?\n *            disableHomeEndKeys: false,\n *            // What happens when you press Up on the first row?\n *            navigatePastStart: \"wrap\",\n *            // What happens when you press Down on the last row?\n *            navigatePastEnd: \"wrap\",\n *            // How far do Page Up/Down jump?\n *            pageNavigationSize: 0.1,\n *            // This can be used to track when the user navigates between rows with the arrow keys\n *            onNavigateLinear: null\n *        },\n *        singleSelectionDeclarativeParameters: {\n *            // Which child is currently selected?\n *            selectedIndex: selectedRow,\n *            // What happens when the user selects a child?\n *            onSelectedIndexChange: (e) => setSelectedRow(e[EventDetail].selectedIndex)\n *        },\n *        gridNavigationParameters: {\n *            // This can be used by you to track which 0-indexed column is currently the one with focus.\n *            onTabbableColumnChange: setTabbableColumn\n *        },\n *        rearrangeableChildrenParameters: {\n *            // This must return a VNode's 0-based index from its props\n *            getIndex: useCallback<GetIndex>((a: VNode) => a.props.index, [])\n *        },\n *        sortableChildrenParameters: {\n *            // Controls how rows compare against each other\n *            compare: useCallback((rhs: CustomGridInfo, lhs: CustomGridInfo) => { return lhs.index - rhs.index }, [])\n *        },\n *        paginatedChildrenParameters: {\n *            // Controls the current pagination range\n *            paginationMin: null,\n *            paginationMax: null\n *        },\n *        staggeredChildrenParameters: {\n *            // Controls whether children appear staggered as CPU time permits\n *            staggered: false\n *        }\n *    });\n *\n *    // Those were the parameters, these are the return types:\n *    const {\n *        // Spread these props to the HTMLElement that will implement this grid behavior\n *        props,\n *        // The child row will useContext this, so provide it to them.\n *        context,\n *        // This is what `useRovingTabIndex` returned; use it for whatever you need:\n *        rovingTabIndexReturn: {\n *            // Call to focus the grid, which focuses the current row, which focuses its current cell.\n *            focusSelf,\n *            // Returns the index of the row that is tabbable to\n *            getTabbableIndex,\n *            // Changes which row is currently tabbable\n *            setTabbableIndex\n *        },\n *        // This is what `useSingleSelection` returned; use it for whatever you need:\n *        singleSelectionReturn: {\n *            // Largely internal use only (since `selectedIndex` is a prop you pass in for the declarative version)\n *            getSelectedIndex,\n *        },\n *        // (etc. etc.)\n *        typeaheadNavigationReturn: {\n *            // Returns the current value the user has typed for typeahead (cannot be used during render)\n *            getCurrentTypeahead,\n *            // Whether the user's typeahead is invalid/valid/nonexistent.\n *            typeaheadStatus\n *        },\n *        singleSelectionReturn: {\n *            // Largely internal use only (since `selectedIndex` is a prop you pass in for the declarative version)\n *            getSelectedIndex,\n *        },\n *        rearrangeableChildrenReturn: {\n *            // You must call this hook on your array of children to implement the sorting behavior\n *            useRearrangedChildren,\n *            // Largely internal use only\n *            indexDemangler,\n *            // Largely internal use only\n *            indexMangler,\n *            // Largely internal use only, but if you implement a custom sorting algorithm, call this to finalize the rearrangement.\n *            rearrange,\n *            // Reverses all children\n *            reverse,\n *            // Shuffles all children\n *            shuffle\n *        },\n *        sortableChildrenReturn: {\n *            // A table header button would probably call this function to sort all the table rows.\n *            sort\n *        },\n *        linearNavigationReturn: { },\n *        managedChildrenReturn: {\n *            // Returns metadata about each row\n *            getChildren\n *        },\n *        paginatedChildrenReturn: {\n *            // Largely internal use only\n *            refreshPagination\n *        },\n *        staggeredChildrenReturn: {\n *            // When the staggering behavior is currently hiding one or more children, this is true.\n *            stillStaggering\n *        },\n *        childrenHaveFocusReturn: {\n *            // Returns true if any row in this grid is focused\n *            getAnyFocused\n *        },\n *\n *    } = allReturnInfo;\n * ```\n *\n * ## A note on stability\n *\n * Effects, like in `useEffect`, are great because they let a component say \"let's also make some non-HTML changes\". So we're all on the same page, an *effect* is *triggered* when one of its *dependencies* changes, as we all know.\n *\n * Preact inherits the same issue of \"effect *triggers* (the changes that cause the effect to run) and effect *dependencies* (the data and functions the effect needs to work) are interchangeable\" [that React has](https://github.com/facebook/react/issues/14099) and [is working on](https://github.com/facebook/react/pull/25881), and a few of the hooks here are low-level enough that it sometimes starts to become important to distinguish whether a function/object is \"stable\" or not across renders.\n *\n * An object/function that's \"stable\" doesn't change values when the component renders itself a second (or third, etc.) time:\n * ```tsx\n * function ExampleComponent() {\n *   // Every time <ExampleComponent /> renders, `stableObject` is the same object as last time (e.g. with ===)\n *   let stableObject = useRef({}).current;\n *   // Every time <ExampleComponent /> renders, `unstableObject` is a new, unique object (e.g. !== the one from the last render)\n *   let unstableObject = ({ evenWith: \"a stable value inside\" });\n * }\n * ```\n *\n * All stability **requirements** (for parameters) and **guarantees** (for returned values) are documented. Just use `useCallback`, [`useStableCallback`](#usestablecallback), or [`useStableGetter`](#usestablegetter) as appropriate.\n *\n * As another aside, for the same reasons as React, a stable callback from [`useStableCallback`](#usestablecallback) (or [`useStableGetter`](#usestablegetter)) [**cannot be called during render**](https://github.com/reactjs/rfcs/pull/220#issuecomment-1118055107). This is because a component may theoretically be called multiple times for a single render, so it's unknown *which* invocation of `useStableCallback` was the one that resulted in a render until that render finally settles. This prevents the problem of a component somewhere else being given the \"wrong\" value that it got mid-render.\n *\n * ## List of hooks (in rough order of usefulness)\n *\n * {@tableOfContents start} {@tableOfContents header Common} {@tableOfContents subheader These hooks are used extremely commonly or provide uncommonly useful behavior} {@include} {@link useMergedProps} {@include} {@link useRefElement} {@include} {@link usePress} {@include} {@link useCompleteListNavigation} {@include} {@link useCompleteGridNavigation} {@include} {@link useModal} {@include} {@link useAsyncHandler} {@tableOfContents header Specific} {@tableOfContents subheader Very useful in very specific cases} {@include} {@link useElementSize} {@include} {@link useHideScroll} {@include} {@link useMediaQuery} {@include} {@link useHasCurrentFocus} {@include} {@link useHasLastFocus} {@include} {@link useChildrenHaveFocus} {@include} {@link useRandomId} {@include} {@link useRandomDualIds} {@include} {@link useGlobalHandler} {@include} {@link useDocumentClass} {@tableOfContents header Niche} {@include} {@link useAsyncEffect} {@include} {@link useMutationObserver} {@include} {@link useTextContent} {@include} {@link useImperativeProps} {@include} {@link usePortalChildren} {@include} {@link useActiveElement} {@include} {@link useDraggable} {@include} {@link useDroppable} {@include} {@link useLogicalDirection} {@tableOfContents header Extensions} {@tableOfContents subheader These hooks don't do anything with HTML elements but are useful extensions to Preact's built-in hooks} {@include} {@link useStableGetter} {@include} {@link useStableCallback} {@include} {@link useMemoObject} {@include} {@link useForceUpdate} {@include} {@link useState} {@include} {@link usePassiveState} {@include} {@link usePersistentState} {@include} {@link useSearchParamState} {@include} {@link useTimeout} {@include} {@link useInterval} {@include} {@link useAnimationFrame} {@include} {@link useEffectDebug} {@include} {@link useLayoutEffectDebug} {@tableOfContents header Building blocks and other helpers} {@tableOfContents subheader These hooks are primarily used to build larger hooks, but can be used alone} {@include} {@link useManagedChildren} {@include} {@link useListNavigation} {@include} {@link useGridNavigation} {@include} {@link useRovingTabIndex} {@include} {@link useLinearNavigation} {@include} {@link useTypeaheadNavigation} {@include} {@link useSingleSelection} {@include} {@link useRearrangeableChildren} {@include} {@link useSortableChildren} {@include} {@link usePaginatedChildren} {@include} {@link useStaggeredChildren} {@include} {@link useDismiss} {@include} {@link useBackdropDismiss} {@include} {@link useEscapeDismiss} {@include} {@link useLostFocusDismiss} {@include} {@link useFocusTrap} {@include} {@link useAsync} {@include} {@link useUrl} {@include} {@link useMergedRefs} {@include} {@link useMergedClasses} {@include} {@link useMergedChildren} {@include} {@link useMergedStyles} ## Each hook, individually {@tableOfContents end}\n *\n * ## Miscellanea {@include} {@link Nullable} {@include} {@link OmitStrong} {@include} {@link TargetedPick} {@include} {@link TargetedOmit} {@include} {@link ElementProps}\n * ```md-literal\n * ## Conventions and goals\n *\n * * As much as possible, no specific DOM restrictions are imposed and, for hooks with children (lists, grids, etc.), those children can be anywhere descendent in the tree (except for `useSortableChildren`, which can be anywhere descendant but must all be in an array due to how the `key` prop works). Nesting hooks, even of the same type, is also fine.\n *     *  E.G. `useRovingTabIndexChild` can call its own `useRovingTabIndex`, which is how `useGridNavigation` works.\n * * A parent hook never needs to be directly passed child data because the children will provide it themselves.\n *     * E.G. `useListNavigation` can filter children, but it doesn't take an array of which children to filter out; each child reports its own status as filtered/unfiltered with, say, a `hidden` prop, and the parent responds to that. If a child that is focused becomes filtered, for example, the parent has enough information to be able to move focus to an adjacent child.\n *     * This means that the child data is *always* the single source of truth (even if the parent creates those children and the data they use), and maps nicely to how components are built and diffed.\n * * Re-render as few times as possible. In general this means instead of a hook returning a value to use during render, it will accept an `onChange`-ish handler that will let you explicitly do that if you want (and is no-cost otherwise).\n *     * `useElementSize`, for example, has no way of returning the size the first time its component renders. It needs to fully render *and then* run an effect that measures it. Once the element's been measured, *you* are responsible for choosing if the component is re-rendered with this new information or not.\n * * Some of these hooks, like `useGridNavigationRow`, have **extremely** complicated dependencies. To manage this, most hooks take a single parameter and return a single object with everything labelled consistently and designed to be discoverable via auto-complete. <br /><br />**Example**: E.G. If `useFoo` is one of those complex hooks, then it:\n *     * ...**will always** take a single parameter that's at least like `{ fooParameters: {...} }`.\n *         * E.G. `useRefElement({ refElementParameters: { onMount: ... } })`\n *         * `UseFooParameters` is the type of the hook's 1 argument.\n *         * `UseFooParametersSelf` is the type of the `fooParameters` member.\n *     * ...**will always** return a single object that's at least like `{ fooReturn: { ... } }`.\n *         * E.G. `const { refElementReturn: { getElement } } = useRefElement(...)`\n *         * `UseFooReturnType` is the type of the hook's return type.\n *         * `UseFooReturnTypeSelf` is the type of the `fooReturn` member.\n *     * ...*may also* return `{ props: {...} }`. These must be spread onto the element you're rendering, or the hook will not function (see `useMergedProps` if you need to use other props in addition to the returned props). It may occasionally be called something else starting with `props`, e.g. `propsStable`, `propsSource` and `propsTarget`, etc.\n *         * E.G. `const { propsStable } = useRefElement(...)`, then `<div {...propsStable} />`\n *         * `propsStable` indicates that nothing about the object ever changes including the identity of the object itself and all its fields.\n *     * ...*may also*, as the parent of child components, return `{ context: { ... } }` that those children rely on.\n *         1. E.G. Parent does `const { context, ...etc } = useFoo({...});`\n *         1. Parent renders `<MyContext.Provider value={context}>{children}</MyContext.Provider>`\n *         1. Then child calls `useFooChild({ context: useContext(MyContext), fooChildParameters: {...} })`\n *     * ...*may also*, as a child of a parent component, require or return pieces of `{ info: { ... } }` if it has something to contribute to `useManagedChild`'s special `info` parameter.\n *         * E.G. `useSingleSelectionChild` requires `info.index` to function, and returns some other pieces of the `info` object, like `info.getSelected`. Just keep swizzling back and forth to create the complete `info` object.\n *         * The `info` type can be customized with a generic type parameter generally named `M` (grid navigation has `RM` for rows' info and `CM` for cells' info).\n *             * If you have a custom hook that calls this child, you can customize the `info` it expects via that type parameter.\n *     * When hooks themselves use other hooks:\n *         * If `useFoo` calls `useBar` directly, then it will take parameters like `{ fooParameters: {...}, barParameters: {...} }` and return objects like `{ fooReturn: {...}, barReturn: {...} }`.\n *         * If `useFoo` relies on `useBar` (but doesn't call it itself, to avoid redundant calls to the same common hook, like [`useRefElement`](#userefelement)), then will do one of the following:\n *             * Take parameters like `{ fooParameters: { ... }, barReturn: { ... } }`, if it needs the return value of `useBar`.\n *             * Return values like `{ fooReturn: { ... }, barParameters: { ... } }`, if it needs `useBar` to be called with specific parameters in order to function (usually callbacks).\n *             * (Ultimately the point of this is to allow us to just call `useRefElement` once and pass the result around to whoever needs it)\n *         * If `useFoo` and `useBar` both return a top-level `props`, they will be merged into one.\n *         * If `useFoo` and `useBar` both return a top-level `context`, they will be merged into one.\n *         * If `useFoo` and `useBar` both return a top-level `info`, they will be merged into one.\n *         * Occasionally, `props` or `context` may be suffixed with the specific role they refer to:\n *             * `useRandomId` returns `propsSource` and `propsReferencer` (and no `props`).\n * ```\n *\n * @packageDocumentation\n */\n",
   "name": "preact-prop-helpers",
   "preserveMemberOrder": false,
   "members": [
@@ -168,7 +168,7 @@
             },
             {
               "kind": "Content",
-              "text": "{}"
+              "text": "{} | void"
             },
             {
               "kind": "Content",
@@ -176,7 +176,7 @@
             },
             {
               "kind": "Content",
-              "text": "[keyof T] extends [never] ? T : `Unhandled keys in this rest spread object!`"
+              "text": "[keyof T] extends [never] ? T : [T] extends [void] ? void : `Unhandled keys in this rest spread object!`"
             },
             {
               "kind": "Content",
@@ -401,6 +401,55 @@
             }
           ],
           "name": "binarySearch"
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "preact-prop-helpers!BuildMode:type",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type BuildMode = "
+            },
+            {
+              "kind": "Content",
+              "text": "\"production\" | \"development\""
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/util/mode.tsx",
+          "releaseTag": "Public",
+          "name": "BuildMode",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "preact-prop-helpers!BuildMode:var",
+          "docComment": "/**\n * Controls other development hooks by checking the value of a global variable called `process.env.NODE_ENV`.\n *\n * @remarks\n *\n * Bundlers like Rollup will actually noop-out development code if `process.env.NODE_ENV !== \"development\"` (which, of course, covers the default case where `process.env.NODE_ENV` just doesn't exist).\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "BuildMode: "
+            },
+            {
+              "kind": "Content",
+              "text": "string"
+            }
+          ],
+          "fileUrlPath": "src/util/mode.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "BuildMode",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          }
         },
         {
           "kind": "TypeAlias",
@@ -2841,34 +2890,6 @@
         },
         {
           "kind": "Function",
-          "canonicalReference": "preact-prop-helpers!getBuildMode:function(1)",
-          "docComment": "/**\n * Controls other development hooks by checking for a global variable called `process.env.NODE_ENV`\n *\n * @remarks\n *\n * Bundlers like Rollup will actually noop-out development code if `process.env.NODE_ENV !== \"development\"` (which, of course, covers the default case where `process.env.NODE_ENV` just doesn't exist).\n */\n",
-          "excerptTokens": [
-            {
-              "kind": "Content",
-              "text": "export declare function getBuildMode(): "
-            },
-            {
-              "kind": "Content",
-              "text": "\"production\" | \"development\""
-            },
-            {
-              "kind": "Content",
-              "text": ";"
-            }
-          ],
-          "fileUrlPath": "src/util/mode.tsx",
-          "returnTypeTokenRange": {
-            "startIndex": 1,
-            "endIndex": 2
-          },
-          "releaseTag": "Public",
-          "overloadIndex": 1,
-          "parameters": [],
-          "name": "getBuildMode"
-        },
-        {
-          "kind": "Function",
           "canonicalReference": "preact-prop-helpers!getDocument:function(1)",
           "docComment": "",
           "excerptTokens": [
@@ -5013,32 +5034,50 @@
           "name": "mergeFunctions"
         },
         {
-          "kind": "Variable",
-          "canonicalReference": "preact-prop-helpers!monitorCallCount:var",
-          "docComment": "",
+          "kind": "Function",
+          "canonicalReference": "preact-prop-helpers!monitorCallCount:function(1)",
+          "docComment": "/**\n * When called inside a hook, monitors each call of that hook and prints the results to a table once things settle.\n *\n * @remarks\n *\n * Re-renders and such are all collected together when the table is printed to the console with `requestIdleCallback`.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
-              "text": "monitorCallCount: "
-            },
-            {
-              "kind": "Content",
-              "text": "typeof "
+              "text": "export declare function monitorCallCount(hook: "
             },
             {
               "kind": "Reference",
-              "text": "callCountU",
-              "canonicalReference": "preact-prop-helpers!~callCountU:function"
+              "text": "Function",
+              "canonicalReference": "!Function:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "): "
+            },
+            {
+              "kind": "Content",
+              "text": "void"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
             }
           ],
           "fileUrlPath": "src/util/use-call-count.tsx",
-          "isReadonly": true,
+          "returnTypeTokenRange": {
+            "startIndex": 3,
+            "endIndex": 4
+          },
           "releaseTag": "Public",
-          "name": "monitorCallCount",
-          "variableTypeTokenRange": {
-            "startIndex": 1,
-            "endIndex": 3
-          }
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "hook",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "monitorCallCount"
         },
         {
           "kind": "TypeAlias",
@@ -5941,12 +5980,16 @@
             },
             {
               "kind": "Content",
-              "text": "import(\"../util/lib.js\")."
+              "text": "import(\"preact\")."
             },
             {
               "kind": "Reference",
-              "text": "JSX.Element",
-              "canonicalReference": "preact!JSXInternal.Element:interface"
+              "text": "VNode",
+              "canonicalReference": "preact!VNode:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<any>"
             },
             {
               "kind": "Content",
@@ -5956,7 +5999,7 @@
           "fileUrlPath": "src/timing/use-animation-frame.tsx",
           "returnTypeTokenRange": {
             "startIndex": 7,
-            "endIndex": 9
+            "endIndex": 10
           },
           "releaseTag": "Public",
           "overloadIndex": 1,
@@ -6089,34 +6132,6 @@
           "overloadIndex": 1,
           "parameters": [],
           "name": "returnNull"
-        },
-        {
-          "kind": "Function",
-          "canonicalReference": "preact-prop-helpers!returnsFunction:function(1)",
-          "docComment": "/**\n * Summary of returnsFunction\n */\n",
-          "excerptTokens": [
-            {
-              "kind": "Content",
-              "text": "export declare function returnsFunction(): "
-            },
-            {
-              "kind": "Content",
-              "text": "() => number"
-            },
-            {
-              "kind": "Content",
-              "text": ";"
-            }
-          ],
-          "fileUrlPath": "src/util/temp.tsx",
-          "returnTypeTokenRange": {
-            "startIndex": 1,
-            "endIndex": 2
-          },
-          "releaseTag": "Public",
-          "overloadIndex": 1,
-          "parameters": [],
-          "name": "returnsFunction"
         },
         {
           "kind": "Function",
@@ -6396,7 +6411,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!RovingTabIndexChildContextSelf#parentFocusSelf:member",
-              "docComment": "/**\n * `force` refers to if the untabbableBehavior is ignored. E.G. `force` temporarily disables `leave-child-focused`.\n */\n",
+              "docComment": "/**\n * `force` refers to if the untabbableBehavior is ignored. E.G. `force` temporarily disables `leave-child-focused` and allows the parent to focus itself.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -7467,320 +7482,6 @@
           }
         },
         {
-          "kind": "Class",
-          "canonicalReference": "preact-prop-helpers!TestClass:class",
-          "docComment": "/**\n * Summary of TestClass\n *\n * @remarks\n *\n * Extra remarks\n *\n * @typeParam T - A type parameter\n */\n",
-          "excerptTokens": [
-            {
-              "kind": "Content",
-              "text": "export declare class TestClass<T> extends "
-            },
-            {
-              "kind": "Reference",
-              "text": "TestClassBase",
-              "canonicalReference": "preact-prop-helpers!~TestClassBase:class"
-            },
-            {
-              "kind": "Content",
-              "text": " "
-            }
-          ],
-          "fileUrlPath": "src/util/temp.tsx",
-          "releaseTag": "Public",
-          "typeParameters": [
-            {
-              "typeParameterName": "T",
-              "constraintTokenRange": {
-                "startIndex": 0,
-                "endIndex": 0
-              },
-              "defaultTypeTokenRange": {
-                "startIndex": 0,
-                "endIndex": 0
-              }
-            }
-          ],
-          "isAbstract": false,
-          "name": "TestClass",
-          "preserveMemberOrder": false,
-          "members": [
-            {
-              "kind": "Constructor",
-              "canonicalReference": "preact-prop-helpers!TestClass:constructor(1)",
-              "docComment": "/**\n * Constructs a new instance of the `TestClass` class\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "constructor();"
-                }
-              ],
-              "releaseTag": "Public",
-              "isProtected": false,
-              "overloadIndex": 1,
-              "parameters": []
-            },
-            {
-              "kind": "Method",
-              "canonicalReference": "preact-prop-helpers!TestClass#abstractFrob:member(1)",
-              "docComment": "/**\n * Summary of frob (implemented)\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "abstractFrob(): "
-                },
-                {
-                  "kind": "Content",
-                  "text": "number"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isStatic": false,
-              "returnTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              },
-              "releaseTag": "Public",
-              "isProtected": false,
-              "overloadIndex": 1,
-              "parameters": [],
-              "isOptional": false,
-              "isAbstract": false,
-              "name": "abstractFrob"
-            },
-            {
-              "kind": "Method",
-              "canonicalReference": "preact-prop-helpers!TestClass#foo:member(1)",
-              "docComment": "/**\n * Summary of foo\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "foo<T>(): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "NonNullable",
-                  "canonicalReference": "!NonNullable:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<T>"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "typeParameters": [
-                {
-                  "typeParameterName": "T",
-                  "constraintTokenRange": {
-                    "startIndex": 0,
-                    "endIndex": 0
-                  },
-                  "defaultTypeTokenRange": {
-                    "startIndex": 0,
-                    "endIndex": 0
-                  }
-                }
-              ],
-              "isStatic": false,
-              "returnTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 3
-              },
-              "releaseTag": "Public",
-              "isProtected": false,
-              "overloadIndex": 1,
-              "parameters": [],
-              "isOptional": false,
-              "isAbstract": false,
-              "name": "foo"
-            },
-            {
-              "kind": "Method",
-              "canonicalReference": "preact-prop-helpers!TestClass#frob:member(1)",
-              "docComment": "/**\n * Summary of frob (overridden)\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "frob(): "
-                },
-                {
-                  "kind": "Content",
-                  "text": "number"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isStatic": false,
-              "returnTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              },
-              "releaseTag": "Public",
-              "isProtected": false,
-              "overloadIndex": 1,
-              "parameters": [],
-              "isOptional": false,
-              "isAbstract": false,
-              "name": "frob"
-            }
-          ],
-          "extendsTokenRange": {
-            "startIndex": 1,
-            "endIndex": 2
-          },
-          "implementsTokenRanges": []
-        },
-        {
-          "kind": "Enum",
-          "canonicalReference": "preact-prop-helpers!TestEnum:enum",
-          "docComment": "/**\n * Summary of TestEnum\n */\n",
-          "excerptTokens": [
-            {
-              "kind": "Content",
-              "text": "export declare const enum TestEnum "
-            }
-          ],
-          "fileUrlPath": "src/util/temp.tsx",
-          "releaseTag": "Public",
-          "name": "TestEnum",
-          "preserveMemberOrder": false,
-          "members": [
-            {
-              "kind": "EnumMember",
-              "canonicalReference": "preact-prop-helpers!TestEnum.A:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "A = "
-                },
-                {
-                  "kind": "Content",
-                  "text": "0"
-                }
-              ],
-              "initializerTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              },
-              "releaseTag": "Public",
-              "name": "A"
-            },
-            {
-              "kind": "EnumMember",
-              "canonicalReference": "preact-prop-helpers!TestEnum.B:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "B = "
-                },
-                {
-                  "kind": "Content",
-                  "text": "1"
-                }
-              ],
-              "initializerTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              },
-              "releaseTag": "Public",
-              "name": "B"
-            },
-            {
-              "kind": "EnumMember",
-              "canonicalReference": "preact-prop-helpers!TestEnum.C:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "C = "
-                },
-                {
-                  "kind": "Content",
-                  "text": "2"
-                }
-              ],
-              "initializerTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              },
-              "releaseTag": "Public",
-              "name": "C"
-            },
-            {
-              "kind": "EnumMember",
-              "canonicalReference": "preact-prop-helpers!TestEnum.D:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "D = "
-                },
-                {
-                  "kind": "Content",
-                  "text": "3"
-                }
-              ],
-              "initializerTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              },
-              "releaseTag": "Public",
-              "name": "D"
-            },
-            {
-              "kind": "EnumMember",
-              "canonicalReference": "preact-prop-helpers!TestEnum.E:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "E = "
-                },
-                {
-                  "kind": "Content",
-                  "text": "4"
-                }
-              ],
-              "initializerTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              },
-              "releaseTag": "Public",
-              "name": "E"
-            },
-            {
-              "kind": "EnumMember",
-              "canonicalReference": "preact-prop-helpers!TestEnum.F:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "F = "
-                },
-                {
-                  "kind": "Content",
-                  "text": "5"
-                }
-              ],
-              "initializerTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              },
-              "releaseTag": "Public",
-              "name": "F"
-            }
-          ]
-        },
-        {
           "kind": "TypeAlias",
           "canonicalReference": "preact-prop-helpers!TouchEventType:type",
           "docComment": "",
@@ -8104,63 +7805,6 @@
             }
           ],
           "extendsTokenRanges": []
-        },
-        {
-          "kind": "TypeAlias",
-          "canonicalReference": "preact-prop-helpers!TypeAliasBase:type",
-          "docComment": "",
-          "excerptTokens": [
-            {
-              "kind": "Content",
-              "text": "export type TypeAliasBase = "
-            },
-            {
-              "kind": "Content",
-              "text": "'foo'"
-            },
-            {
-              "kind": "Content",
-              "text": ";"
-            }
-          ],
-          "fileUrlPath": "src/util/temp.tsx",
-          "releaseTag": "Public",
-          "name": "TypeAliasBase",
-          "typeTokenRange": {
-            "startIndex": 1,
-            "endIndex": 2
-          }
-        },
-        {
-          "kind": "TypeAlias",
-          "canonicalReference": "preact-prop-helpers!TypeAliasDerived:type",
-          "docComment": "",
-          "excerptTokens": [
-            {
-              "kind": "Content",
-              "text": "export type TypeAliasDerived = "
-            },
-            {
-              "kind": "Reference",
-              "text": "TypeAliasBase",
-              "canonicalReference": "preact-prop-helpers!TypeAliasBase:type"
-            },
-            {
-              "kind": "Content",
-              "text": " | 'bar'"
-            },
-            {
-              "kind": "Content",
-              "text": ";"
-            }
-          ],
-          "fileUrlPath": "src/util/temp.tsx",
-          "releaseTag": "Public",
-          "name": "TypeAliasDerived",
-          "typeTokenRange": {
-            "startIndex": 1,
-            "endIndex": 3
-          }
         },
         {
           "kind": "TypeAlias",
@@ -10018,6 +9662,14 @@
             },
             {
               "kind": "Content",
+              "text": ", B extends "
+            },
+            {
+              "kind": "Content",
+              "text": "boolean"
+            },
+            {
+              "kind": "Content",
               "text": ">({ "
             },
             {
@@ -10031,8 +9683,8 @@
             },
             {
               "kind": "Reference",
-              "text": "active",
-              "canonicalReference": "preact-prop-helpers!UseBackdropDismissParametersSelf#active"
+              "text": "dismissBackdropActive",
+              "canonicalReference": "preact-prop-helpers!UseBackdropDismissParametersSelf#dismissBackdropActive"
             },
             {
               "kind": "Content",
@@ -10040,8 +9692,8 @@
             },
             {
               "kind": "Reference",
-              "text": "onDismiss",
-              "canonicalReference": "preact-prop-helpers!UseBackdropDismissParametersSelf#onDismiss"
+              "text": "onDismissBackdrop",
+              "canonicalReference": "preact-prop-helpers!UseBackdropDismissParametersSelf#onDismissBackdrop"
             },
             {
               "kind": "Content",
@@ -10063,7 +9715,7 @@
             },
             {
               "kind": "Content",
-              "text": "<PopupElement>"
+              "text": "<PopupElement, B>"
             },
             {
               "kind": "Content",
@@ -10080,17 +9732,17 @@
           ],
           "fileUrlPath": "src/component-detail/dismissal/use-backdrop-dismiss.tsx",
           "returnTypeTokenRange": {
-            "startIndex": 14,
-            "endIndex": 15
+            "startIndex": 16,
+            "endIndex": 17
           },
           "releaseTag": "Public",
           "overloadIndex": 1,
           "parameters": [
             {
-              "parameterName": "{ backdropDismissParameters: { active: open, onDismiss: onCloseUnstable, ...void1 }, refElementPopupReturn: { getElement, ...void3 }, ...void2 }",
+              "parameterName": "{ backdropDismissParameters: { dismissBackdropActive: open, onDismissBackdrop: onCloseUnstable, ...void1 }, refElementPopupReturn: { getElement, ...void3 }, ...void2 }",
               "parameterTypeTokenRange": {
-                "startIndex": 11,
-                "endIndex": 13
+                "startIndex": 13,
+                "endIndex": 15
               },
               "isOptional": false
             }
@@ -10101,6 +9753,17 @@
               "constraintTokenRange": {
                 "startIndex": 1,
                 "endIndex": 2
+              },
+              "defaultTypeTokenRange": {
+                "startIndex": 0,
+                "endIndex": 0
+              }
+            },
+            {
+              "typeParameterName": "B",
+              "constraintTokenRange": {
+                "startIndex": 3,
+                "endIndex": 4
               },
               "defaultTypeTokenRange": {
                 "startIndex": 0,
@@ -10126,6 +9789,14 @@
             },
             {
               "kind": "Content",
+              "text": ", B extends "
+            },
+            {
+              "kind": "Content",
+              "text": "boolean"
+            },
+            {
+              "kind": "Content",
               "text": "> "
             }
           ],
@@ -10137,6 +9808,17 @@
               "constraintTokenRange": {
                 "startIndex": 1,
                 "endIndex": 2
+              },
+              "defaultTypeTokenRange": {
+                "startIndex": 0,
+                "endIndex": 0
+              }
+            },
+            {
+              "typeParameterName": "B",
+              "constraintTokenRange": {
+                "startIndex": 3,
+                "endIndex": 4
               },
               "defaultTypeTokenRange": {
                 "startIndex": 0,
@@ -10163,6 +9845,10 @@
                 },
                 {
                   "kind": "Content",
+                  "text": "<B>"
+                },
+                {
+                  "kind": "Content",
                   "text": ";"
                 }
               ],
@@ -10172,7 +9858,7 @@
               "name": "backdropDismissParameters",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
-                "endIndex": 2
+                "endIndex": 3
               }
             },
             {
@@ -10226,26 +9912,47 @@
           "excerptTokens": [
             {
               "kind": "Content",
-              "text": "export interface UseBackdropDismissParametersSelf "
+              "text": "export interface UseBackdropDismissParametersSelf<B extends "
+            },
+            {
+              "kind": "Content",
+              "text": "boolean"
+            },
+            {
+              "kind": "Content",
+              "text": "> "
             }
           ],
           "fileUrlPath": "src/component-detail/dismissal/use-backdrop-dismiss.tsx",
           "releaseTag": "Public",
+          "typeParameters": [
+            {
+              "typeParameterName": "B",
+              "constraintTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "defaultTypeTokenRange": {
+                "startIndex": 0,
+                "endIndex": 0
+              }
+            }
+          ],
           "name": "UseBackdropDismissParametersSelf",
           "preserveMemberOrder": false,
           "members": [
             {
               "kind": "PropertySignature",
-              "canonicalReference": "preact-prop-helpers!UseBackdropDismissParametersSelf#active:member",
+              "canonicalReference": "preact-prop-helpers!UseBackdropDismissParametersSelf#dismissBackdropActive:member",
               "docComment": "/**\n * When `true`, `onDismiss` is eligible to be called. When `false`, it will not be called.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
-                  "text": "active: "
+                  "text": "dismissBackdropActive: "
                 },
                 {
                   "kind": "Content",
-                  "text": "boolean"
+                  "text": "B | false"
                 },
                 {
                   "kind": "Content",
@@ -10255,7 +9962,7 @@
               "isReadonly": false,
               "isOptional": false,
               "releaseTag": "Public",
-              "name": "active",
+              "name": "dismissBackdropActive",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
                 "endIndex": 2
@@ -10263,30 +9970,30 @@
             },
             {
               "kind": "PropertySignature",
-              "canonicalReference": "preact-prop-helpers!UseBackdropDismissParametersSelf#onDismiss:member",
+              "canonicalReference": "preact-prop-helpers!UseBackdropDismissParametersSelf#onDismissBackdrop:member",
               "docComment": "/**\n * Called when the component is dismissed by clicking outside of the element.\n *\n * @nonstable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
-                  "text": "onDismiss: "
+                  "text": "onDismissBackdrop: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "EnhancedEventHandler",
-                  "canonicalReference": "preact-prop-helpers!EnhancedEventHandler:type"
+                  "text": "Nullable",
+                  "canonicalReference": "preact-prop-helpers!Nullable:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<"
+                  "text": "<(e: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "MouseEvent",
-                  "canonicalReference": "!MouseEvent:interface"
+                  "text": "MouseEventType",
+                  "canonicalReference": "preact-prop-helpers!MouseEventType:type"
                 },
                 {
                   "kind": "Content",
-                  "text": ", {\n        reason: \"backdrop\";\n    }>"
+                  "text": "<any>) => void>"
                 },
                 {
                   "kind": "Content",
@@ -10296,7 +10003,7 @@
               "isReadonly": false,
               "isOptional": false,
               "releaseTag": "Public",
-              "name": "onDismiss",
+              "name": "onDismissBackdrop",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
                 "endIndex": 5
@@ -12036,20 +11743,7 @@
             },
             {
               "kind": "Content",
-              "text": ", CM extends "
-            },
-            {
-              "kind": "Reference",
-              "text": "UseCompleteGridNavigationCellInfo",
-              "canonicalReference": "preact-prop-helpers!UseCompleteGridNavigationCellInfo:interface"
-            },
-            {
-              "kind": "Content",
-              "text": "<CellElement>"
-            },
-            {
-              "kind": "Content",
-              "text": ">({ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, typeaheadNavigationParameters, sortableChildrenParameters, rearrangeableChildrenParameters, paginatedChildrenParameters, staggeredChildrenParameters, ...void1 }: "
+              "text": ">({ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, typeaheadNavigationParameters, sortableChildrenParameters, rearrangeableChildrenParameters, paginatedChildrenParameters, staggeredChildrenParameters, refElementParameters, ...void1 }: "
             },
             {
               "kind": "Reference",
@@ -12071,7 +11765,7 @@
             },
             {
               "kind": "Content",
-              "text": "<ParentOrRowElement, RowElement, CellElement, RM>"
+              "text": "<ParentOrRowElement, RowElement, RM>"
             },
             {
               "kind": "Content",
@@ -12080,17 +11774,17 @@
           ],
           "fileUrlPath": "src/component-use/use-grid-navigation-complete.tsx",
           "returnTypeTokenRange": {
-            "startIndex": 16,
-            "endIndex": 18
+            "startIndex": 13,
+            "endIndex": 15
           },
           "releaseTag": "Public",
           "overloadIndex": 1,
           "parameters": [
             {
-              "parameterName": "{ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, typeaheadNavigationParameters, sortableChildrenParameters, rearrangeableChildrenParameters, paginatedChildrenParameters, staggeredChildrenParameters, ...void1 }",
+              "parameterName": "{ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, typeaheadNavigationParameters, sortableChildrenParameters, rearrangeableChildrenParameters, paginatedChildrenParameters, staggeredChildrenParameters, refElementParameters, ...void1 }",
               "parameterTypeTokenRange": {
-                "startIndex": 13,
-                "endIndex": 15
+                "startIndex": 10,
+                "endIndex": 12
               },
               "isOptional": false
             }
@@ -12134,17 +11828,6 @@
               "constraintTokenRange": {
                 "startIndex": 7,
                 "endIndex": 9
-              },
-              "defaultTypeTokenRange": {
-                "startIndex": 0,
-                "endIndex": 0
-              }
-            },
-            {
-              "typeParameterName": "CM",
-              "constraintTokenRange": {
-                "startIndex": 10,
-                "endIndex": 12
               },
               "defaultTypeTokenRange": {
                 "startIndex": 0,
@@ -12790,7 +12473,7 @@
             },
             {
               "kind": "Content",
-              "text": ">({ gridNavigationParameters, linearNavigationParameters, paginatedChildrenParameters, rearrangeableChildrenParameters, rovingTabIndexParameters, singleSelectionDeclarativeParameters, sortableChildrenParameters, staggeredChildrenParameters, typeaheadNavigationParameters, singleSelectionParameters, }: "
+              "text": ">({ gridNavigationParameters, linearNavigationParameters, paginatedChildrenParameters, rearrangeableChildrenParameters, rovingTabIndexParameters, singleSelectionDeclarativeParameters, sortableChildrenParameters, staggeredChildrenParameters, typeaheadNavigationParameters, singleSelectionParameters, refElementParameters, ...void1 }: "
             },
             {
               "kind": "Reference",
@@ -12828,7 +12511,7 @@
           "overloadIndex": 1,
           "parameters": [
             {
-              "parameterName": "{ gridNavigationParameters, linearNavigationParameters, paginatedChildrenParameters, rearrangeableChildrenParameters, rovingTabIndexParameters, singleSelectionDeclarativeParameters, sortableChildrenParameters, staggeredChildrenParameters, typeaheadNavigationParameters, singleSelectionParameters, }",
+              "parameterName": "{ gridNavigationParameters, linearNavigationParameters, paginatedChildrenParameters, rearrangeableChildrenParameters, rovingTabIndexParameters, singleSelectionDeclarativeParameters, sortableChildrenParameters, staggeredChildrenParameters, typeaheadNavigationParameters, singleSelectionParameters, refElementParameters, ...void1 }",
               "parameterTypeTokenRange": {
                 "startIndex": 13,
                 "endIndex": 15
@@ -13092,7 +12775,7 @@
             },
             {
               "kind": "Content",
-              "text": "<ParentOrRowElement, RowElement, CellElement, RM>, \"singleSelectionReturn\", \"changeSelectedIndex\">"
+              "text": "<ParentOrRowElement, RowElement, RM>, \"singleSelectionReturn\", \"changeSelectedIndex\">"
             },
             {
               "kind": "Content",
@@ -13114,7 +12797,7 @@
             },
             {
               "kind": "Content",
-              "text": "<ParentOrRowElement, RowElement, CellElement, RM>, \"singleSelectionReturn\">"
+              "text": "<ParentOrRowElement, RowElement, RM>, \"singleSelectionReturn\">"
             },
             {
               "kind": "Content",
@@ -13355,6 +13038,28 @@
             },
             {
               "kind": "Reference",
+              "text": "UseRefElementParameters",
+              "canonicalReference": "preact-prop-helpers!UseRefElementParameters:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<ParentOrRowElement>, \"refElementParameters\">"
+            },
+            {
+              "kind": "Content",
+              "text": ", "
+            },
+            {
+              "kind": "Reference",
+              "text": "Pick",
+              "canonicalReference": "!Pick:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
               "text": "UsePaginatedChildrenParameters",
               "canonicalReference": "preact-prop-helpers!UsePaginatedChildrenParameters:interface"
             },
@@ -13457,6 +13162,10 @@
             {
               "startIndex": 38,
               "endIndex": 42
+            },
+            {
+              "startIndex": 43,
+              "endIndex": 47
             }
           ]
         },
@@ -13477,15 +13186,6 @@
             {
               "kind": "Content",
               "text": ", RowElement extends "
-            },
-            {
-              "kind": "Reference",
-              "text": "Element",
-              "canonicalReference": "!Element:interface"
-            },
-            {
-              "kind": "Content",
-              "text": ", CellElement extends "
             },
             {
               "kind": "Reference",
@@ -13646,21 +13346,10 @@
               }
             },
             {
-              "typeParameterName": "CellElement",
-              "constraintTokenRange": {
-                "startIndex": 5,
-                "endIndex": 6
-              },
-              "defaultTypeTokenRange": {
-                "startIndex": 0,
-                "endIndex": 0
-              }
-            },
-            {
               "typeParameterName": "RM",
               "constraintTokenRange": {
-                "startIndex": 7,
-                "endIndex": 9
+                "startIndex": 5,
+                "endIndex": 7
               },
               "defaultTypeTokenRange": {
                 "startIndex": 0,
@@ -13738,24 +13427,24 @@
           ],
           "extendsTokenRanges": [
             {
-              "startIndex": 10,
-              "endIndex": 14
+              "startIndex": 8,
+              "endIndex": 12
             },
             {
-              "startIndex": 15,
-              "endIndex": 19
+              "startIndex": 13,
+              "endIndex": 17
             },
             {
-              "startIndex": 20,
-              "endIndex": 24
+              "startIndex": 18,
+              "endIndex": 22
             },
             {
-              "startIndex": 25,
-              "endIndex": 29
+              "startIndex": 23,
+              "endIndex": 27
             },
             {
-              "startIndex": 30,
-              "endIndex": 34
+              "startIndex": 28,
+              "endIndex": 32
             }
           ]
         },
@@ -14767,7 +14456,7 @@
             },
             {
               "kind": "Content",
-              "text": ">({ linearNavigationParameters, rearrangeableChildrenParameters, sortableChildrenParameters, typeaheadNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, paginatedChildrenParameters, staggeredChildrenParameters, ...void1 }: "
+              "text": ">({ linearNavigationParameters, rearrangeableChildrenParameters, sortableChildrenParameters, typeaheadNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, paginatedChildrenParameters, staggeredChildrenParameters, refElementParameters, ...void1 }: "
             },
             {
               "kind": "Reference",
@@ -14805,7 +14494,7 @@
           "overloadIndex": 1,
           "parameters": [
             {
-              "parameterName": "{ linearNavigationParameters, rearrangeableChildrenParameters, sortableChildrenParameters, typeaheadNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, paginatedChildrenParameters, staggeredChildrenParameters, ...void1 }",
+              "parameterName": "{ linearNavigationParameters, rearrangeableChildrenParameters, sortableChildrenParameters, typeaheadNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, paginatedChildrenParameters, staggeredChildrenParameters, refElementParameters, ...void1 }",
               "parameterTypeTokenRange": {
                 "startIndex": 8,
                 "endIndex": 10
@@ -15613,7 +15302,7 @@
             },
             {
               "kind": "Content",
-              "text": ">({ linearNavigationParameters, paginatedChildrenParameters, rearrangeableChildrenParameters, rovingTabIndexParameters, singleSelectionDeclarativeParameters, sortableChildrenParameters, staggeredChildrenParameters, typeaheadNavigationParameters, singleSelectionParameters }: "
+              "text": ">({ linearNavigationParameters, paginatedChildrenParameters, rearrangeableChildrenParameters, rovingTabIndexParameters, singleSelectionDeclarativeParameters, sortableChildrenParameters, staggeredChildrenParameters, typeaheadNavigationParameters, singleSelectionParameters, refElementParameters, ...void1 }: "
             },
             {
               "kind": "Reference",
@@ -15651,7 +15340,7 @@
           "overloadIndex": 1,
           "parameters": [
             {
-              "parameterName": "{ linearNavigationParameters, paginatedChildrenParameters, rearrangeableChildrenParameters, rovingTabIndexParameters, singleSelectionDeclarativeParameters, sortableChildrenParameters, staggeredChildrenParameters, typeaheadNavigationParameters, singleSelectionParameters }",
+              "parameterName": "{ linearNavigationParameters, paginatedChildrenParameters, rearrangeableChildrenParameters, rovingTabIndexParameters, singleSelectionDeclarativeParameters, sortableChildrenParameters, staggeredChildrenParameters, typeaheadNavigationParameters, singleSelectionParameters, refElementParameters, ...void1 }",
               "parameterTypeTokenRange": {
                 "startIndex": 8,
                 "endIndex": 10
@@ -16085,6 +15774,28 @@
             },
             {
               "kind": "Reference",
+              "text": "Pick",
+              "canonicalReference": "!Pick:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "UseRefElementParameters",
+              "canonicalReference": "preact-prop-helpers!UseRefElementParameters:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<ParentElement>, \"refElementParameters\">"
+            },
+            {
+              "kind": "Content",
+              "text": ", "
+            },
+            {
+              "kind": "Reference",
               "text": "TargetedOmit",
               "canonicalReference": "preact-prop-helpers!TargetedOmit:type"
             },
@@ -16240,6 +15951,10 @@
             {
               "startIndex": 38,
               "endIndex": 42
+            },
+            {
+              "startIndex": 43,
+              "endIndex": 47
             }
           ]
         },
@@ -16543,25 +16258,25 @@
             },
             {
               "kind": "Content",
-              "text": ": { "
+              "text": ": { dismissActive, onDismiss, ...void3 }, "
             },
             {
               "kind": "Reference",
-              "text": "open",
-              "canonicalReference": "preact-prop-helpers!UseDismissParametersSelf#open"
+              "text": "backdropDismissParameters",
+              "canonicalReference": "preact-prop-helpers!~backdropDismissParameters"
             },
             {
               "kind": "Content",
-              "text": ": globalOpen, "
+              "text": ": { dismissBackdropActive, onDismissBackdrop, ...void6 }, "
             },
             {
               "kind": "Reference",
-              "text": "onClose",
-              "canonicalReference": "preact-prop-helpers!UseDismissParametersSelf#onClose"
+              "text": "lostFocusDismissParameters",
+              "canonicalReference": "preact-prop-helpers!~lostFocusDismissParameters"
             },
             {
               "kind": "Content",
-              "text": ": globalOnClose, closeOnBackdrop, closeOnEscape, closeOnLostFocus, ...void3 }, "
+              "text": ": { dismissLostFocusActive, onDismissLostFocus, ...void7 }, "
             },
             {
               "kind": "Reference",
@@ -16570,7 +16285,7 @@
             },
             {
               "kind": "Content",
-              "text": ": { parentDepth, ...void2 }, "
+              "text": ": { dismissEscapeActive, onDismissEscape, parentDepth, ...void2 }, "
             },
             {
               "kind": "Reference",
@@ -16626,7 +16341,7 @@
           "overloadIndex": 1,
           "parameters": [
             {
-              "parameterName": "{ dismissParameters: { open: globalOpen, onClose: globalOnClose, closeOnBackdrop, closeOnEscape, closeOnLostFocus, ...void3 }, escapeDismissParameters: { parentDepth, ...void2 }, activeElementParameters: { getDocument, onActiveElementChange, onLastActiveElementChange: olaec1, onWindowFocusedChange, ...void5 }, ...void4 }",
+              "parameterName": "{ dismissParameters: { dismissActive, onDismiss, ...void3 }, backdropDismissParameters: { dismissBackdropActive, onDismissBackdrop, ...void6 }, lostFocusDismissParameters: { dismissLostFocusActive, onDismissLostFocus, ...void7 }, escapeDismissParameters: { dismissEscapeActive, onDismissEscape, parentDepth, ...void2 }, activeElementParameters: { getDocument, onActiveElementChange, onLastActiveElementChange: olaec1, onWindowFocusedChange, ...void5 }, ...void4 }",
               "parameterTypeTokenRange": {
                 "startIndex": 20,
                 "endIndex": 22
@@ -16691,8 +16406,8 @@
             },
             {
               "kind": "Reference",
-              "text": "TargetedPick",
-              "canonicalReference": "preact-prop-helpers!TargetedPick:type"
+              "text": "TargetedOmit",
+              "canonicalReference": "preact-prop-helpers!TargetedOmit:type"
             },
             {
               "kind": "Content",
@@ -16705,7 +16420,51 @@
             },
             {
               "kind": "Content",
-              "text": "<any>, \"escapeDismissParameters\", \"parentDepth\">"
+              "text": "<any, Listeners extends \"escape\" ? true : false>, \"escapeDismissParameters\", \"getDocument\">"
+            },
+            {
+              "kind": "Content",
+              "text": ", "
+            },
+            {
+              "kind": "Reference",
+              "text": "TargetedOmit",
+              "canonicalReference": "preact-prop-helpers!TargetedOmit:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "UseBackdropDismissParameters",
+              "canonicalReference": "preact-prop-helpers!UseBackdropDismissParameters:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<any, Listeners extends \"backdrop\" ? true : false>, \"backdropDismissParameters\", never>"
+            },
+            {
+              "kind": "Content",
+              "text": ", "
+            },
+            {
+              "kind": "Reference",
+              "text": "TargetedOmit",
+              "canonicalReference": "preact-prop-helpers!TargetedOmit:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "UseLostFocusDismissParameters",
+              "canonicalReference": "preact-prop-helpers!UseLostFocusDismissParameters:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<any, any, Listeners extends \"lost-focus\" ? true : false>, \"lostFocusDismissParameters\", never>"
             },
             {
               "kind": "Content",
@@ -16779,7 +16538,15 @@
             },
             {
               "startIndex": 8,
-              "endIndex": 9
+              "endIndex": 12
+            },
+            {
+              "startIndex": 13,
+              "endIndex": 17
+            },
+            {
+              "startIndex": 18,
+              "endIndex": 19
             }
           ]
         },
@@ -16822,120 +16589,12 @@
           "members": [
             {
               "kind": "PropertySignature",
-              "canonicalReference": "preact-prop-helpers!UseDismissParametersSelf#closeOnBackdrop:member",
-              "docComment": "/**\n * If `true`, then this component closes when a click is detected anywhere not within the component (determined by being in a different branch of the DOM)\n */\n",
+              "canonicalReference": "preact-prop-helpers!UseDismissParametersSelf#dismissActive:member",
+              "docComment": "/**\n * Controls all dismiss behaviors at once.\n *\n * @remarks\n *\n * When this is `true`, any of the dismiss behaviors are able to be triggered. When this is `false`, no dismiss behaviors are able to be triggered.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
-                  "text": "closeOnBackdrop: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "Listeners extends \"backdrop\" ? true : false"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isReadonly": false,
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "closeOnBackdrop",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              }
-            },
-            {
-              "kind": "PropertySignature",
-              "canonicalReference": "preact-prop-helpers!UseDismissParametersSelf#closeOnEscape:member",
-              "docComment": "/**\n * If `true`, then this component closes when the Escape key is pressed, and no deeper component is listening for that same Escape press (i.e. only one Escape dismiss happens per key press)\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "closeOnEscape: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "Listeners extends \"escape\" ? true : false"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isReadonly": false,
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "closeOnEscape",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              }
-            },
-            {
-              "kind": "PropertySignature",
-              "canonicalReference": "preact-prop-helpers!UseDismissParametersSelf#closeOnLostFocus:member",
-              "docComment": "/**\n * If `true`, then this component closes whenever focus is sent to an element not contained by this one (using the same rules as `closeOnBackdrop`)\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "closeOnLostFocus: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "Listeners extends \"lost-focus\" ? true : false"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isReadonly": false,
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "closeOnLostFocus",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              }
-            },
-            {
-              "kind": "PropertySignature",
-              "canonicalReference": "preact-prop-helpers!UseDismissParametersSelf#onClose:member",
-              "docComment": "/**\n * Called any time the user has requested the component be dismissed for the given reason.\n *\n * You can choose to ignore a reason if you want, but it's better to set `closeOn${reason}` to `false` instead.\n *\n * @nonstable\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "onClose: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "(reason: Listeners) => void"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isReadonly": false,
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "onClose",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              }
-            },
-            {
-              "kind": "PropertySignature",
-              "canonicalReference": "preact-prop-helpers!UseDismissParametersSelf#open:member",
-              "docComment": "/**\n * Whether or not this component is currently open/showing itself, as opposed to hidden/closed. Event handlers are only attached when this is `true`.\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "open: "
+                  "text": "dismissActive: "
                 },
                 {
                   "kind": "Content",
@@ -16949,10 +16608,46 @@
               "isReadonly": false,
               "isOptional": false,
               "releaseTag": "Public",
-              "name": "open",
+              "name": "dismissActive",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
                 "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "preact-prop-helpers!UseDismissParametersSelf#onDismiss:member",
+              "docComment": "/**\n * Called any time the user has requested the component be dismissed for the given reason.\n *\n * @remarks\n *\n * You can choose to ignore a reason if you want, but it's better to set `closeOn${reason}` to `false` instead.\n *\n * @nonstable\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "onDismiss: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "(e: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "EventType",
+                  "canonicalReference": "preact-prop-helpers!EventType:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<any, any>, reason: Listeners) => void"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "onDismiss",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 4
               }
             }
           ],
@@ -18346,10 +18041,6 @@
                 },
                 {
                   "kind": "Content",
-                  "text": "<T>"
-                },
-                {
-                  "kind": "Content",
                   "text": ";"
                 }
               ],
@@ -18359,7 +18050,7 @@
               "name": "elementSizeParameters",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
-                "endIndex": 3
+                "endIndex": 2
               }
             }
           ],
@@ -18377,46 +18068,11 @@
           "excerptTokens": [
             {
               "kind": "Content",
-              "text": "export interface UseElementSizeParametersSelf<T extends "
-            },
-            {
-              "kind": "Reference",
-              "text": "Element",
-              "canonicalReference": "!Element:interface"
-            },
-            {
-              "kind": "Content",
-              "text": "> extends "
-            },
-            {
-              "kind": "Reference",
-              "text": "UseRefElementParameters",
-              "canonicalReference": "preact-prop-helpers!UseRefElementParameters:interface"
-            },
-            {
-              "kind": "Content",
-              "text": "<T>"
-            },
-            {
-              "kind": "Content",
-              "text": " "
+              "text": "export interface UseElementSizeParametersSelf "
             }
           ],
           "fileUrlPath": "src/observers/use-element-size.tsx",
           "releaseTag": "Public",
-          "typeParameters": [
-            {
-              "typeParameterName": "T",
-              "constraintTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              },
-              "defaultTypeTokenRange": {
-                "startIndex": 0,
-                "endIndex": 0
-              }
-            }
-          ],
           "name": "UseElementSizeParametersSelf",
           "preserveMemberOrder": false,
           "members": [
@@ -18550,12 +18206,7 @@
               "name": "onSizeChange"
             }
           ],
-          "extendsTokenRanges": [
-            {
-              "startIndex": 3,
-              "endIndex": 5
-            }
-          ]
+          "extendsTokenRanges": []
         },
         {
           "kind": "Interface",
@@ -18818,6 +18469,14 @@
             },
             {
               "kind": "Content",
+              "text": ", B extends "
+            },
+            {
+              "kind": "Content",
+              "text": "boolean"
+            },
+            {
+              "kind": "Content",
               "text": ">({ "
             },
             {
@@ -18831,8 +18490,8 @@
             },
             {
               "kind": "Reference",
-              "text": "onDismiss",
-              "canonicalReference": "preact-prop-helpers!UseEscapeDismissParametersSelf#onDismiss"
+              "text": "onDismissEscape",
+              "canonicalReference": "preact-prop-helpers!UseEscapeDismissParametersSelf#onDismissEscape"
             },
             {
               "kind": "Content",
@@ -18840,8 +18499,8 @@
             },
             {
               "kind": "Reference",
-              "text": "active",
-              "canonicalReference": "preact-prop-helpers!UseEscapeDismissParametersSelf#active"
+              "text": "dismissEscapeActive",
+              "canonicalReference": "preact-prop-helpers!UseEscapeDismissParametersSelf#dismissEscapeActive"
             },
             {
               "kind": "Content",
@@ -18872,7 +18531,7 @@
             },
             {
               "kind": "Content",
-              "text": "<PopupElement>"
+              "text": "<PopupElement, B>"
             },
             {
               "kind": "Content",
@@ -18889,17 +18548,17 @@
           ],
           "fileUrlPath": "src/component-detail/dismissal/use-escape-dismiss.tsx",
           "returnTypeTokenRange": {
-            "startIndex": 16,
-            "endIndex": 17
+            "startIndex": 18,
+            "endIndex": 19
           },
           "releaseTag": "Public",
           "overloadIndex": 1,
           "parameters": [
             {
-              "parameterName": "{ escapeDismissParameters: { onDismiss: onClose, active: open, getDocument: unstableGetDocument, parentDepth, ...void1 }, refElementPopupReturn: { getElement, ...void2 } }",
+              "parameterName": "{ escapeDismissParameters: { onDismissEscape: onClose, dismissEscapeActive: open, getDocument: unstableGetDocument, parentDepth, ...void1 }, refElementPopupReturn: { getElement, ...void2 } }",
               "parameterTypeTokenRange": {
-                "startIndex": 13,
-                "endIndex": 15
+                "startIndex": 15,
+                "endIndex": 17
               },
               "isOptional": false
             }
@@ -18910,6 +18569,17 @@
               "constraintTokenRange": {
                 "startIndex": 1,
                 "endIndex": 2
+              },
+              "defaultTypeTokenRange": {
+                "startIndex": 0,
+                "endIndex": 0
+              }
+            },
+            {
+              "typeParameterName": "B",
+              "constraintTokenRange": {
+                "startIndex": 3,
+                "endIndex": 4
               },
               "defaultTypeTokenRange": {
                 "startIndex": 0,
@@ -18935,6 +18605,14 @@
             },
             {
               "kind": "Content",
+              "text": ", B extends "
+            },
+            {
+              "kind": "Content",
+              "text": "boolean"
+            },
+            {
+              "kind": "Content",
               "text": "> "
             }
           ],
@@ -18946,6 +18624,17 @@
               "constraintTokenRange": {
                 "startIndex": 1,
                 "endIndex": 2
+              },
+              "defaultTypeTokenRange": {
+                "startIndex": 0,
+                "endIndex": 0
+              }
+            },
+            {
+              "typeParameterName": "B",
+              "constraintTokenRange": {
+                "startIndex": 3,
+                "endIndex": 4
               },
               "defaultTypeTokenRange": {
                 "startIndex": 0,
@@ -18972,6 +18661,10 @@
                 },
                 {
                   "kind": "Content",
+                  "text": "<B>"
+                },
+                {
+                  "kind": "Content",
                   "text": ";"
                 }
               ],
@@ -18981,7 +18674,7 @@
               "name": "escapeDismissParameters",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
-                "endIndex": 2
+                "endIndex": 3
               }
             },
             {
@@ -19035,26 +18728,47 @@
           "excerptTokens": [
             {
               "kind": "Content",
-              "text": "export interface UseEscapeDismissParametersSelf "
+              "text": "export interface UseEscapeDismissParametersSelf<B extends "
+            },
+            {
+              "kind": "Content",
+              "text": "boolean"
+            },
+            {
+              "kind": "Content",
+              "text": "> "
             }
           ],
           "fileUrlPath": "src/component-detail/dismissal/use-escape-dismiss.tsx",
           "releaseTag": "Public",
+          "typeParameters": [
+            {
+              "typeParameterName": "B",
+              "constraintTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "defaultTypeTokenRange": {
+                "startIndex": 0,
+                "endIndex": 0
+              }
+            }
+          ],
           "name": "UseEscapeDismissParametersSelf",
           "preserveMemberOrder": false,
           "members": [
             {
               "kind": "PropertySignature",
-              "canonicalReference": "preact-prop-helpers!UseEscapeDismissParametersSelf#active:member",
+              "canonicalReference": "preact-prop-helpers!UseEscapeDismissParametersSelf#dismissEscapeActive:member",
               "docComment": "/**\n * When `true`, `onDismiss` is eligible to be called. When `false`, it will not be called.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
-                  "text": "active: "
+                  "text": "dismissEscapeActive: "
                 },
                 {
                   "kind": "Content",
-                  "text": "boolean"
+                  "text": "B | false"
                 },
                 {
                   "kind": "Content",
@@ -19064,7 +18778,7 @@
               "isReadonly": false,
               "isOptional": false,
               "releaseTag": "Public",
-              "name": "active",
+              "name": "dismissEscapeActive",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
                 "endIndex": 2
@@ -19101,30 +18815,30 @@
             },
             {
               "kind": "PropertySignature",
-              "canonicalReference": "preact-prop-helpers!UseEscapeDismissParametersSelf#onDismiss:member",
+              "canonicalReference": "preact-prop-helpers!UseEscapeDismissParametersSelf#onDismissEscape:member",
               "docComment": "/**\n * Called when the component is dismissed by pressing the `Escape` key.\n *\n * @nonstable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
-                  "text": "onDismiss: "
+                  "text": "onDismissEscape: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "EnhancedEventHandler",
-                  "canonicalReference": "preact-prop-helpers!EnhancedEventHandler:type"
+                  "text": "Nullable",
+                  "canonicalReference": "preact-prop-helpers!Nullable:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<"
+                  "text": "<(e: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "KeyboardEvent",
-                  "canonicalReference": "!KeyboardEvent:interface"
+                  "text": "KeyboardEventType",
+                  "canonicalReference": "preact-prop-helpers!KeyboardEventType:type"
                 },
                 {
                   "kind": "Content",
-                  "text": ", {\n        reason: \"escape\";\n    }>"
+                  "text": "<any>) => void>"
                 },
                 {
                   "kind": "Content",
@@ -19134,7 +18848,7 @@
               "isReadonly": false,
               "isOptional": false,
               "releaseTag": "Public",
-              "name": "onDismiss",
+              "name": "onDismissEscape",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
                 "endIndex": 5
@@ -19173,7 +18887,7 @@
         {
           "kind": "Function",
           "canonicalReference": "preact-prop-helpers!useFocusTrap:function(1)",
-          "docComment": "/**\n * Allows you to move focus to an isolated area of the page and restore it when finished.\n *\n * @remarks\n *\n * By default, this implements a focus trap using the\n *\n * @compositeParams\n */\n",
+          "docComment": "/**\n * Allows you to move focus to an isolated area of the page, restore it when finished, and **optionally trap it there** so that you can't tab out of it.\n *\n * @remarks\n *\n * By default, this implements a focus trap using the Blocking Elements...uh...[proposal](https://github.com/whatwg/html/issues/897)? Not that it really looks like it's going anywhere, but until something better comes along, [the polyfill](#https://github.com/PolymerLabs/blocking-elements) has been working pretty great.\n *\n * @compositeParams\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -30487,6 +30201,14 @@
             },
             {
               "kind": "Content",
+              "text": ", B extends "
+            },
+            {
+              "kind": "Content",
+              "text": "boolean"
+            },
+            {
+              "kind": "Content",
               "text": ">({ "
             },
             {
@@ -30518,8 +30240,8 @@
             },
             {
               "kind": "Reference",
-              "text": "active",
-              "canonicalReference": "preact-prop-helpers!UseLostFocusDismissParametersSelf#active"
+              "text": "dismissLostFocusActive",
+              "canonicalReference": "preact-prop-helpers!UseLostFocusDismissParametersSelf#dismissLostFocusActive"
             },
             {
               "kind": "Content",
@@ -30527,8 +30249,8 @@
             },
             {
               "kind": "Reference",
-              "text": "onDismiss",
-              "canonicalReference": "preact-prop-helpers!UseLostFocusDismissParametersSelf#onDismiss"
+              "text": "onDismissLostFocus",
+              "canonicalReference": "preact-prop-helpers!UseLostFocusDismissParametersSelf#onDismissLostFocus"
             },
             {
               "kind": "Content",
@@ -30541,7 +30263,7 @@
             },
             {
               "kind": "Content",
-              "text": "<SourceElement, PopupElement>"
+              "text": "<SourceElement, PopupElement, B>"
             },
             {
               "kind": "Content",
@@ -30563,17 +30285,17 @@
           ],
           "fileUrlPath": "src/component-detail/dismissal/use-lost-focus-dismiss.tsx",
           "returnTypeTokenRange": {
-            "startIndex": 19,
-            "endIndex": 21
+            "startIndex": 21,
+            "endIndex": 23
           },
           "releaseTag": "Public",
           "overloadIndex": 1,
           "parameters": [
             {
-              "parameterName": "{ refElementPopupReturn: { getElement: getPopupElement, ...void3 }, refElementSourceReturn, lostFocusDismissParameters: { active: open, onDismiss: onClose, ...void4 }, ...void1 }",
+              "parameterName": "{ refElementPopupReturn: { getElement: getPopupElement, ...void3 }, refElementSourceReturn, lostFocusDismissParameters: { dismissLostFocusActive: open, onDismissLostFocus: onClose, ...void4 }, ...void1 }",
               "parameterTypeTokenRange": {
-                "startIndex": 16,
-                "endIndex": 18
+                "startIndex": 18,
+                "endIndex": 20
               },
               "isOptional": false
             }
@@ -30595,6 +30317,17 @@
               "constraintTokenRange": {
                 "startIndex": 4,
                 "endIndex": 5
+              },
+              "defaultTypeTokenRange": {
+                "startIndex": 0,
+                "endIndex": 0
+              }
+            },
+            {
+              "typeParameterName": "B",
+              "constraintTokenRange": {
+                "startIndex": 6,
+                "endIndex": 7
               },
               "defaultTypeTokenRange": {
                 "startIndex": 0,
@@ -30633,6 +30366,14 @@
             },
             {
               "kind": "Content",
+              "text": ", B extends "
+            },
+            {
+              "kind": "Content",
+              "text": "boolean"
+            },
+            {
+              "kind": "Content",
               "text": "> "
             }
           ],
@@ -30660,6 +30401,17 @@
                 "startIndex": 0,
                 "endIndex": 0
               }
+            },
+            {
+              "typeParameterName": "B",
+              "constraintTokenRange": {
+                "startIndex": 6,
+                "endIndex": 7
+              },
+              "defaultTypeTokenRange": {
+                "startIndex": 0,
+                "endIndex": 0
+              }
             }
           ],
           "name": "UseLostFocusDismissParameters",
@@ -30681,6 +30433,10 @@
                 },
                 {
                   "kind": "Content",
+                  "text": "<B>"
+                },
+                {
+                  "kind": "Content",
                   "text": ";"
                 }
               ],
@@ -30690,7 +30446,7 @@
               "name": "lostFocusDismissParameters",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
-                "endIndex": 2
+                "endIndex": 3
               }
             },
             {
@@ -30803,26 +30559,47 @@
           "excerptTokens": [
             {
               "kind": "Content",
-              "text": "export interface UseLostFocusDismissParametersSelf "
+              "text": "export interface UseLostFocusDismissParametersSelf<B extends "
+            },
+            {
+              "kind": "Content",
+              "text": "boolean"
+            },
+            {
+              "kind": "Content",
+              "text": "> "
             }
           ],
           "fileUrlPath": "src/component-detail/dismissal/use-lost-focus-dismiss.tsx",
           "releaseTag": "Public",
+          "typeParameters": [
+            {
+              "typeParameterName": "B",
+              "constraintTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "defaultTypeTokenRange": {
+                "startIndex": 0,
+                "endIndex": 0
+              }
+            }
+          ],
           "name": "UseLostFocusDismissParametersSelf",
           "preserveMemberOrder": false,
           "members": [
             {
               "kind": "PropertySignature",
-              "canonicalReference": "preact-prop-helpers!UseLostFocusDismissParametersSelf#active:member",
+              "canonicalReference": "preact-prop-helpers!UseLostFocusDismissParametersSelf#dismissLostFocusActive:member",
               "docComment": "/**\n * When `true`, `onDismiss` is eligible to be called. When `false`, it will not be called.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
-                  "text": "active: "
+                  "text": "dismissLostFocusActive: "
                 },
                 {
                   "kind": "Content",
-                  "text": "boolean"
+                  "text": "B | false"
                 },
                 {
                   "kind": "Content",
@@ -30832,7 +30609,7 @@
               "isReadonly": false,
               "isOptional": false,
               "releaseTag": "Public",
-              "name": "active",
+              "name": "dismissLostFocusActive",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
                 "endIndex": 2
@@ -30840,30 +30617,30 @@
             },
             {
               "kind": "PropertySignature",
-              "canonicalReference": "preact-prop-helpers!UseLostFocusDismissParametersSelf#onDismiss:member",
+              "canonicalReference": "preact-prop-helpers!UseLostFocusDismissParametersSelf#onDismissLostFocus:member",
               "docComment": "/**\n * Called when the component is dismissed by losing focus\n *\n * @nonstable\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
-                  "text": "onDismiss: "
+                  "text": "onDismissLostFocus: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "EnhancedEventHandler",
-                  "canonicalReference": "preact-prop-helpers!EnhancedEventHandler:type"
+                  "text": "Nullable",
+                  "canonicalReference": "preact-prop-helpers!Nullable:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<"
+                  "text": "<(e: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "FocusEvent",
-                  "canonicalReference": "!FocusEvent:interface"
+                  "text": "FocusEventType",
+                  "canonicalReference": "preact-prop-helpers!FocusEventType:type"
                 },
                 {
                   "kind": "Content",
-                  "text": ", {\n        reason: \"lost-focus\";\n    }>"
+                  "text": "<any>) => void>"
                 },
                 {
                   "kind": "Content",
@@ -30873,7 +30650,7 @@
               "isReadonly": false,
               "isOptional": false,
               "releaseTag": "Public",
-              "name": "onDismiss",
+              "name": "onDismissLostFocus",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
                 "endIndex": 5
@@ -32732,7 +32509,7 @@
         {
           "kind": "Function",
           "canonicalReference": "preact-prop-helpers!useModal:function(1)",
-          "docComment": "/**\n * Combines dismissal hooks and focus trap hooks into one. Use for dialogs, menus, etc. Anything that can be dismissed and might trap focus, basically.\n *\n * @remarks\n *\n * Another in the \"complete\" series, alongside list/grid navigation and dismissal itself.\n *\n * @compositeParams\n */\n",
+          "docComment": "/**\n * Combines dismissal hooks and focus trap hooks into one. Use for dialogs, menus, etc. Anything that can be dismissed and might trap focus, basically.\n *\n * @remarks\n *\n * Another in the \"complete\" series, alongside list/grid navigation and dismissal itself.\n *\n * TODO: The HTML &lt;dialog&gt; element is a thing now, and it can be modal or nonmodal, just like this hook. Hmm...\n *\n * @compositeParams\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -32780,7 +32557,25 @@
             },
             {
               "kind": "Content",
-              "text": ">({ dismissParameters, escapeDismissParameters, "
+              "text": ">({ "
+            },
+            {
+              "kind": "Reference",
+              "text": "dismissParameters",
+              "canonicalReference": "preact-prop-helpers!UseDismissParameters#dismissParameters"
+            },
+            {
+              "kind": "Content",
+              "text": ": { dismissActive, onDismiss, ...void2 }, "
+            },
+            {
+              "kind": "Reference",
+              "text": "escapeDismissParameters",
+              "canonicalReference": "preact-prop-helpers!~escapeDismissParameters"
+            },
+            {
+              "kind": "Content",
+              "text": ": { dismissEscapeActive, onDismissEscape, parentDepth, ...void3 }, "
             },
             {
               "kind": "Reference",
@@ -32789,7 +32584,61 @@
             },
             {
               "kind": "Content",
-              "text": ": { trapActive, ...focusTrapParameters }, activeElementParameters, ...void1 }: "
+              "text": ": { trapActive, ...focusTrapParameters }, "
+            },
+            {
+              "kind": "Reference",
+              "text": "activeElementParameters",
+              "canonicalReference": "preact-prop-helpers!UseActiveElementParameters#activeElementParameters"
+            },
+            {
+              "kind": "Content",
+              "text": ": { getDocument, onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, ...void4 }, "
+            },
+            {
+              "kind": "Reference",
+              "text": "backdropDismissParameters",
+              "canonicalReference": "preact-prop-helpers!~backdropDismissParameters"
+            },
+            {
+              "kind": "Content",
+              "text": ": { dismissBackdropActive, onDismissBackdrop, ...void5 }, "
+            },
+            {
+              "kind": "Reference",
+              "text": "lostFocusDismissParameters",
+              "canonicalReference": "preact-prop-helpers!~lostFocusDismissParameters"
+            },
+            {
+              "kind": "Content",
+              "text": ": { dismissLostFocusActive, onDismissLostFocus, ...void6 }, "
+            },
+            {
+              "kind": "Reference",
+              "text": "refElementParameters",
+              "canonicalReference": "preact-prop-helpers!UseRefElementParameters#refElementParameters"
+            },
+            {
+              "kind": "Content",
+              "text": ": { onElementChange, onMount, onUnmount, ...void7 }, "
+            },
+            {
+              "kind": "Reference",
+              "text": "modalParameters",
+              "canonicalReference": "preact-prop-helpers!UseModalParameters#modalParameters"
+            },
+            {
+              "kind": "Content",
+              "text": ": { "
+            },
+            {
+              "kind": "Reference",
+              "text": "active",
+              "canonicalReference": "preact-prop-helpers!UseModalParametersSelf#active"
+            },
+            {
+              "kind": "Content",
+              "text": ": modalActive, ...void8 }, ...void1 }: "
             },
             {
               "kind": "Reference",
@@ -32820,17 +32669,17 @@
           ],
           "fileUrlPath": "src/component-use/use-modal.tsx",
           "returnTypeTokenRange": {
-            "startIndex": 16,
-            "endIndex": 18
+            "startIndex": 32,
+            "endIndex": 34
           },
           "releaseTag": "Public",
           "overloadIndex": 1,
           "parameters": [
             {
-              "parameterName": "{ dismissParameters, escapeDismissParameters, focusTrapParameters: { trapActive, ...focusTrapParameters }, activeElementParameters, ...void1 }",
+              "parameterName": "{ dismissParameters: { dismissActive, onDismiss, ...void2 }, escapeDismissParameters: { dismissEscapeActive, onDismissEscape, parentDepth, ...void3 }, focusTrapParameters: { trapActive, ...focusTrapParameters }, activeElementParameters: { getDocument, onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, ...void4 }, backdropDismissParameters: { dismissBackdropActive, onDismissBackdrop, ...void5 }, lostFocusDismissParameters: { dismissLostFocusActive, onDismissLostFocus, ...void6 }, refElementParameters: { onElementChange, onMount, onUnmount, ...void7 }, modalParameters: { active: modalActive, ...void8 }, ...void1 }",
               "parameterTypeTokenRange": {
-                "startIndex": 13,
-                "endIndex": 15
+                "startIndex": 29,
+                "endIndex": 31
               },
               "isOptional": false
             }
@@ -32903,21 +32752,12 @@
             },
             {
               "kind": "Reference",
-              "text": "OmitStrong",
-              "canonicalReference": "preact-prop-helpers!OmitStrong:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<"
-            },
-            {
-              "kind": "Reference",
               "text": "UseDismissParameters",
               "canonicalReference": "preact-prop-helpers!UseDismissParameters:interface"
             },
             {
               "kind": "Content",
-              "text": "<Listeners>, \"activeElementParameters\">"
+              "text": "<Listeners>"
             },
             {
               "kind": "Content",
@@ -32925,8 +32765,21 @@
             },
             {
               "kind": "Reference",
-              "text": "Pick",
-              "canonicalReference": "!Pick:type"
+              "text": "UseRefElementParameters",
+              "canonicalReference": "preact-prop-helpers!UseRefElementParameters:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<any>"
+            },
+            {
+              "kind": "Content",
+              "text": ", "
+            },
+            {
+              "kind": "Reference",
+              "text": "OmitStrong",
+              "canonicalReference": "preact-prop-helpers!OmitStrong:type"
             },
             {
               "kind": "Content",
@@ -32939,7 +32792,7 @@
             },
             {
               "kind": "Content",
-              "text": "<any, any>, \"focusTrapParameters\" | \"activeElementParameters\">"
+              "text": "<any, any>, \"refElementReturn\">"
             },
             {
               "kind": "Content",
@@ -32963,17 +32816,95 @@
           ],
           "name": "UseModalParameters",
           "preserveMemberOrder": false,
-          "members": [],
+          "members": [
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "preact-prop-helpers!UseModalParameters#modalParameters:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "modalParameters: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "UseModalParametersSelf",
+                  "canonicalReference": "preact-prop-helpers!UseModalParametersSelf:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "modalParameters",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            }
+          ],
           "extendsTokenRanges": [
             {
               "startIndex": 3,
-              "endIndex": 7
+              "endIndex": 5
             },
             {
-              "startIndex": 8,
-              "endIndex": 12
+              "startIndex": 6,
+              "endIndex": 8
+            },
+            {
+              "startIndex": 9,
+              "endIndex": 13
             }
           ]
+        },
+        {
+          "kind": "Interface",
+          "canonicalReference": "preact-prop-helpers!UseModalParametersSelf:interface",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export interface UseModalParametersSelf "
+            }
+          ],
+          "fileUrlPath": "src/component-use/use-modal.tsx",
+          "releaseTag": "Public",
+          "name": "UseModalParametersSelf",
+          "preserveMemberOrder": false,
+          "members": [
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "preact-prop-helpers!UseModalParametersSelf#active:member",
+              "docComment": "/**\n * When `false`, all dismissal/focus trapping behavior is disabled. When `true`, they're allowed via their individual parameters.\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "active: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "boolean"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "active",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            }
+          ],
+          "extendsTokenRanges": []
         },
         {
           "kind": "Interface",
@@ -37842,11 +37773,11 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "preact-prop-helpers!UseRefElementParameters#refElementParameters:member",
-              "docComment": "/**\n * For the sake of convenience, this one is optional, since using this hook is so common, but using its parameter options is so uncommon, and it's absence isn't usually because it was forgotten, it's because it doesn't matter.\n */\n",
+              "docComment": "",
               "excerptTokens": [
                 {
                   "kind": "Content",
-                  "text": "refElementParameters?: "
+                  "text": "refElementParameters: "
                 },
                 {
                   "kind": "Reference",
@@ -37863,7 +37794,7 @@
                 }
               ],
               "isReadonly": false,
-              "isOptional": true,
+              "isOptional": false,
               "releaseTag": "Public",
               "name": "refElementParameters",
               "propertyTypeTokenRange": {
