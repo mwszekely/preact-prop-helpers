@@ -62,9 +62,10 @@ export interface UseFocusTrapReturnType<E extends Element> {
 }
 
 /**
- * Allows you to move focus to an isolated area of the page and restore it when finished.
+ * Allows you to move focus to an isolated area of the page, restore it when finished, and **optionally trap it there** so that you can't tab out of it.
  * 
- * @remarks By default, this implements a focus trap using the 
+ * @remarks By default, this implements a focus trap using the Blocking Elements...uh...[proposal](https://github.com/whatwg/html/issues/897)? 
+ * Not that it really looks like it's going anywhere, but until something better comes along, [the polyfill](#https://github.com/PolymerLabs/blocking-elements) has been working pretty great.
  * 
  * @compositeParams
  */

@@ -35,6 +35,7 @@ export const DemoUseRovingTabIndex = memo(() => {
         rearrangeableChildrenParameters: {
             getIndex: useCallback<GetIndex>((a: VNode) => a.props.index, []),
         },
+        refElementParameters: {},
         paginatedChildrenParameters: { paginationMin: min, paginationMax: max },
         sortableChildrenParameters: { compare: useCallback((rhs: CustomInfoType, lhs: CustomInfoType) => { return lhs.index - rhs.index }, []) },
         staggeredChildrenParameters: { staggered },

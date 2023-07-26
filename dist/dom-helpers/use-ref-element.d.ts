@@ -36,14 +36,7 @@ export interface UseRefElementParametersSelf<T> {
     onUnmount?: Nullable<(element: T) => void>;
 }
 export interface UseRefElementParameters<T> {
-    /**
-     * For the sake of convenience,
-     * this one is optional, since using this hook is so common,
-     * but using its parameter options is so uncommon, and it's
-     * absence isn't usually because it was forgotten, it's because
-     * it doesn't matter.
-     */
-    refElementParameters?: UseRefElementParametersSelf<T>;
+    refElementParameters: UseRefElementParametersSelf<T>;
 }
 /**
  * Access `HTMLElement` rendered by this hook/these props, either as soon as it's available (as a callback), or whenever you need it (as a getter function).

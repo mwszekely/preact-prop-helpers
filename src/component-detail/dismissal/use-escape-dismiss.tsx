@@ -2,24 +2,24 @@ import { UseRefElementReturnType } from "../../dom-helpers/use-ref-element.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
-import { EnhancedEventHandler, enhanceEvent } from "../../util/event.js";
-import { useEffect } from "../../util/lib.js";
+import { enhanceEvent } from "../../util/event.js";
+import { KeyboardEventType, Nullable, useEffect } from "../../util/lib.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
 
 
-export interface UseEscapeDismissParametersSelf {
+export interface UseEscapeDismissParametersSelf<B extends boolean> {
 
     /**
      * Called when the component is dismissed by pressing the `Escape` key.
      * 
      * @nonstable
      */
-    onDismiss: EnhancedEventHandler<KeyboardEvent, { reason: "escape" }>;
+    onDismissEscape: Nullable<(e: KeyboardEventType<any>) => void>;
 
     /** 
      * When `true`, `onDismiss` is eligible to be called. When `false`, it will not be called.
      */
-    active: boolean;
+    dismissEscapeActive: B | false;
 
     /**
      * The escape key event handler is attached onto the window, so we need to know which window.
@@ -38,9 +38,9 @@ export interface UseEscapeDismissParametersSelf {
     parentDepth: number;
 }
 
-export interface UseEscapeDismissParameters<PopupElement extends Element> {
+export interface UseEscapeDismissParameters<PopupElement extends Element, B extends boolean> {
     refElementPopupReturn: Pick<UseRefElementReturnType<PopupElement>["refElementReturn"], "getElement">;
-    escapeDismissParameters: UseEscapeDismissParametersSelf;
+    escapeDismissParameters: UseEscapeDismissParametersSelf<B>;
 }
 
 
@@ -70,12 +70,12 @@ function getElementDepth(element: Element) {
  * 
  * @compositeParams 
  */
-export function useEscapeDismiss<PopupElement extends Element>({ escapeDismissParameters: { onDismiss: onClose, active: open, getDocument: unstableGetDocument, parentDepth, ...void1 }, refElementPopupReturn: { getElement, ...void2 } }: UseEscapeDismissParameters<PopupElement>): void {
+export function useEscapeDismiss<PopupElement extends Element, B extends boolean>({ escapeDismissParameters: { onDismissEscape: onClose, dismissEscapeActive: open, getDocument: unstableGetDocument, parentDepth, ...void1 }, refElementPopupReturn: { getElement, ...void2 } }: UseEscapeDismissParameters<PopupElement, B>): void {
     monitorCallCount(useEscapeDismiss);
     assertEmptyObject(void1);
     assertEmptyObject(void2);
 
-    const stableOnClose = useStableCallback(onClose);
+    const stableOnClose = useStableGetter(onClose);
     const getDocument = useStableCallback(unstableGetDocument);
     const getDepth = useStableGetter(parentDepth + 1);
 
@@ -122,7 +122,7 @@ export function useEscapeDismiss<PopupElement extends Element>({ escapeDismissPa
 
 
                 // This is what at least one of the elements will call
-                const onClose2 = () => { stableOnClose(enhanceEvent(e, { reason: "escape" })); };
+                const onClose2 = () => { stableOnClose()?.(enhanceEvent(e, { reason: "escape" })); };
                 const element = getElement();
                 if (element) {
                     const treeDepth = getElementDepth(element);

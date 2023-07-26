@@ -1,5 +1,5 @@
 import { UseRefElementParameters, UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
-export interface UseElementSizeParametersSelf<T extends Element> extends UseRefElementParameters<T> {
+export interface UseElementSizeParametersSelf {
     /**
      * Called any time the browser detects a size change
      * on the element. Does not need to be stable, so you
@@ -19,7 +19,7 @@ export interface UseElementSizeParametersSelf<T extends Element> extends UseRefE
     getObserveBox: null | (() => ResizeObserverOptions["box"]);
 }
 export interface UseElementSizeParameters<T extends Element> extends UseRefElementParameters<T> {
-    elementSizeParameters: UseElementSizeParametersSelf<T>;
+    elementSizeParameters: UseElementSizeParametersSelf;
 }
 export interface ElementSize {
     clientWidth: number;

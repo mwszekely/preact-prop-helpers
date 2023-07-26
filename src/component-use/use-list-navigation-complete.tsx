@@ -6,7 +6,7 @@ import { UseTypeaheadNavigationContext } from "../component-detail/keyboard-navi
 import { usePaginatedChild, UsePaginatedChildContext, usePaginatedChildren, UsePaginatedChildrenInfo, UsePaginatedChildrenParameters, UsePaginatedChildrenReturnType, UsePaginatedChildReturnType } from "../component-detail/use-paginated-children.js";
 import { useStaggeredChild, UseStaggeredChildContext, useStaggeredChildren, UseStaggeredChildrenInfo, UseStaggeredChildrenParameters, UseStaggeredChildrenReturnType, UseStaggeredChildReturnType } from "../component-detail/use-staggered-children.js";
 import { useMergedProps } from "../dom-helpers/use-merged-props.js";
-import { useRefElement, UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
+import { useRefElement, UseRefElementParameters, UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
 import { useHasCurrentFocus, UseHasCurrentFocusReturnType } from "../observers/use-has-current-focus.js";
 import { ManagedChildInfo, ManagedChildren, UseGenericChildParameters, useManagedChild, useManagedChildren, UseManagedChildrenContext, UseManagedChildrenReturnType, UseManagedChildReturnType } from "../preact-extensions/use-managed-children.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
@@ -27,6 +27,7 @@ export interface UseCompleteListNavigationParameters<ParentElement extends Eleme
     Pick<UseListNavigationSingleSelectionSortableParameters<ParentElement, ChildElement, M>, "singleSelectionParameters" | "sortableChildrenParameters">,
     Pick<UsePaginatedChildrenParameters<ParentElement, ChildElement>, "paginatedChildrenParameters">,
     Pick<UseStaggeredChildrenParameters, "staggeredChildrenParameters">,
+    Pick<UseRefElementParameters<ParentElement>, "refElementParameters">,
     TargetedOmit<UseListNavigationSingleSelectionSortableParameters<ParentElement, ChildElement, M>, "linearNavigationParameters", "getLowestIndex" | "getHighestIndex" | "isValidForLinearNavigation">,
     TargetedOmit<UseListNavigationSingleSelectionSortableParameters<ParentElement, ChildElement, M>, "typeaheadNavigationParameters", "isValidForTypeaheadNavigation">,
     TargetedOmit<UseListNavigationSingleSelectionSortableParameters<ParentElement, ChildElement, M>, "rearrangeableChildrenParameters", "onRearranged">,
@@ -115,6 +116,7 @@ export function useCompleteListNavigation<ParentElement extends Element, ChildEl
     singleSelectionParameters,
     paginatedChildrenParameters,
     staggeredChildrenParameters,
+    refElementParameters,
     ...void1
 }: UseCompleteListNavigationParameters<ParentElement, ChildElement, M>): UseCompleteListNavigationReturnType<ParentElement, ChildElement, M> {
     monitorCallCount(useCompleteListNavigation);
@@ -132,7 +134,7 @@ export function useCompleteListNavigation<ParentElement extends Element, ChildEl
         return true;
     }, []);
 
-    const { propsStable: propsRef, refElementReturn } = useRefElement<ParentElement>({})
+    const { propsStable: propsRef, refElementReturn } = useRefElement<ParentElement>({ refElementParameters })
 
     const {
         childrenHaveFocusParameters,
@@ -319,7 +321,9 @@ export function useCompleteListNavigationDeclarative<ParentElement extends Eleme
     sortableChildrenParameters,
     staggeredChildrenParameters,
     typeaheadNavigationParameters,
-    singleSelectionParameters
+    singleSelectionParameters,
+    refElementParameters,
+    ...void1
 }: UseCompleteListNavigationDeclarativeParameters<ParentElement, ChildElement, M>): UseCompleteListNavigationDeclarativeReturnType<ParentElement, ChildElement, M> {
 
     const ret: UseCompleteListNavigationReturnType<ParentElement, ChildElement, M> = useCompleteListNavigation({
@@ -327,6 +331,7 @@ export function useCompleteListNavigationDeclarative<ParentElement extends Eleme
         paginatedChildrenParameters,
         rearrangeableChildrenParameters,
         rovingTabIndexParameters,
+        refElementParameters,
         singleSelectionParameters: {
             initiallySelectedIndex: singleSelectionDeclarativeParameters.selectedIndex,
             // Needs to be a (stable) callback because of declaration order
@@ -340,5 +345,6 @@ export function useCompleteListNavigationDeclarative<ParentElement extends Eleme
     const { singleSelectionParameters: { onSelectedIndexChange } } = useSingleSelectionDeclarative({ singleSelectionDeclarativeParameters, singleSelectionReturn: ret.singleSelectionReturn });
 
     const { singleSelectionReturn: { getSelectedIndex }, ...ret2 } = ret;
+    assertEmptyObject(void1);
     return { ...ret2, singleSelectionReturn: { getSelectedIndex } };
 }

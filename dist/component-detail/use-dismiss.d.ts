@@ -1,40 +1,28 @@
 import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
 import { UseActiveElementParameters } from "../observers/use-active-element.js";
-import { TargetedPick } from "../util/lib.js";
-import { ElementProps } from "../util/types.js";
+import { ElementProps, EventType, TargetedOmit } from "../util/types.js";
+import { UseBackdropDismissParameters } from "./dismissal/use-backdrop-dismiss.js";
 import { UseEscapeDismissParameters } from "./dismissal/use-escape-dismiss.js";
+import { UseLostFocusDismissParameters } from "./dismissal/use-lost-focus-dismiss.js";
 export type DismissListenerTypes = "backdrop" | "lost-focus" | "escape";
 export interface UseDismissParametersSelf<Listeners extends DismissListenerTypes> {
     /**
-     * Whether or not this component is currently open/showing itself, as opposed to hidden/closed.
-     * Event handlers are only attached when this is `true`.
+     * Controls all dismiss behaviors at once.
+     *
+     * @remarks When this is `true`, any of the dismiss behaviors are able to be triggered.
+     * When this is `false`, no dismiss behaviors are able to be triggered.
      */
-    open: boolean;
+    dismissActive: boolean;
     /**
      * Called any time the user has requested the component be dismissed for the given reason.
      *
-     * You can choose to ignore a reason if you want, but it's better to set `closeOn${reason}` to `false` instead.
+     * @remarks You can choose to ignore a reason if you want, but it's better to set `closeOn${reason}` to `false` instead.
      *
      * @nonstable
      */
-    onClose: (reason: Listeners) => void;
-    /**
-     * If `true`, then this component closes when a click is detected anywhere not within the component
-     * (determined by being in a different branch of the DOM)
-     */
-    closeOnBackdrop: Listeners extends "backdrop" ? true : false;
-    /**
-     * If `true`, then this component closes when the Escape key is pressed, and no deeper component
-     * is listening for that same Escape press (i.e. only one Escape dismiss happens per key press)
-     */
-    closeOnEscape: Listeners extends "escape" ? true : false;
-    /**
-     * If `true`, then this component closes whenever focus is sent to an element not contained by this one
-     * (using the same rules as `closeOnBackdrop`)
-     */
-    closeOnLostFocus: Listeners extends "lost-focus" ? true : false;
+    onDismiss: (e: EventType<any, any>, reason: Listeners) => void;
 }
-export interface UseDismissParameters<Listeners extends DismissListenerTypes> extends TargetedPick<UseEscapeDismissParameters<any>, "escapeDismissParameters", "parentDepth">, UseActiveElementParameters {
+export interface UseDismissParameters<Listeners extends DismissListenerTypes> extends TargetedOmit<UseEscapeDismissParameters<any, Listeners extends "escape" ? true : false>, "escapeDismissParameters", "getDocument">, TargetedOmit<UseBackdropDismissParameters<any, Listeners extends "backdrop" ? true : false>, "backdropDismissParameters", never>, TargetedOmit<UseLostFocusDismissParameters<any, any, Listeners extends "lost-focus" ? true : false>, "lostFocusDismissParameters", never>, UseActiveElementParameters {
     dismissParameters: UseDismissParametersSelf<Listeners>;
 }
 export interface UseDismissReturnType<SourceElement extends Element | null, PopupElement extends Element> {
@@ -58,5 +46,5 @@ export interface UseDismissReturnType<SourceElement extends Element | null, Popu
  *
  * @compositeParams
  */
-export declare function useDismiss<Listeners extends DismissListenerTypes, SourceElement extends Element | null, PopupElement extends Element>({ dismissParameters: { open: globalOpen, onClose: globalOnClose, closeOnBackdrop, closeOnEscape, closeOnLostFocus, ...void3 }, escapeDismissParameters: { parentDepth, ...void2 }, activeElementParameters: { getDocument, onActiveElementChange, onLastActiveElementChange: olaec1, onWindowFocusedChange, ...void5 }, ...void4 }: UseDismissParameters<Listeners>): UseDismissReturnType<SourceElement, PopupElement>;
+export declare function useDismiss<Listeners extends DismissListenerTypes, SourceElement extends Element | null, PopupElement extends Element>({ dismissParameters: { dismissActive, onDismiss, ...void3 }, backdropDismissParameters: { dismissBackdropActive, onDismissBackdrop, ...void6 }, lostFocusDismissParameters: { dismissLostFocusActive, onDismissLostFocus, ...void7 }, escapeDismissParameters: { dismissEscapeActive, onDismissEscape, parentDepth, ...void2 }, activeElementParameters: { getDocument, onActiveElementChange, onLastActiveElementChange: olaec1, onWindowFocusedChange, ...void5 }, ...void4 }: UseDismissParameters<Listeners>): UseDismissReturnType<SourceElement, PopupElement>;
 //# sourceMappingURL=use-dismiss.d.ts.map

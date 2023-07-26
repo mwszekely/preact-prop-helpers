@@ -7,7 +7,7 @@ import { UseTypeaheadNavigationContext } from "../component-detail/keyboard-navi
 import { UsePaginatedChildContext, UsePaginatedChildReturnType, UsePaginatedChildrenInfo, UsePaginatedChildrenParameters, UsePaginatedChildrenReturnType, usePaginatedChild, usePaginatedChildren } from "../component-detail/use-paginated-children.js";
 import { UseStaggeredChildContext, UseStaggeredChildReturnType, UseStaggeredChildrenInfo, UseStaggeredChildrenParameters, UseStaggeredChildrenReturnType, useStaggeredChild, useStaggeredChildren } from "../component-detail/use-staggered-children.js";
 import { useMergedProps } from "../dom-helpers/use-merged-props.js";
-import { UseRefElementReturnType, useRefElement } from "../dom-helpers/use-ref-element.js";
+import { UseRefElementParameters, UseRefElementReturnType, useRefElement } from "../dom-helpers/use-ref-element.js";
 import { UseChildrenHaveFocusContext, UseChildrenHaveFocusReturnType, useChildrenHaveFocus } from "../observers/use-children-have-focus.js";
 import { UseHasCurrentFocusParameters, UseHasCurrentFocusReturnType, useHasCurrentFocus } from "../observers/use-has-current-focus.js";
 import { ManagedChildInfo, ManagedChildren, UseGenericChildParameters, UseManagedChildReturnType, UseManagedChildrenContext, UseManagedChildrenReturnType, useManagedChild, useManagedChildren } from "../preact-extensions/use-managed-children.js";
@@ -41,6 +41,7 @@ export interface UseCompleteGridNavigationParameters<ParentOrRowElement extends 
     TargetedOmit<UseGridNavigationSingleSelectionSortableParameters<ParentOrRowElement, RowElement, M>, "rearrangeableChildrenParameters", "onRearranged">,
     TargetedOmit<UseGridNavigationSingleSelectionSortableParameters<ParentOrRowElement, RowElement, M>, "rovingTabIndexParameters", "initiallyTabbedIndex" | "untabbableBehavior">,
 
+    Pick<UseRefElementParameters<ParentOrRowElement>, "refElementParameters">,
     Pick<UsePaginatedChildrenParameters<ParentOrRowElement, RowElement>, "paginatedChildrenParameters">,
     Pick<UseStaggeredChildrenParameters, "staggeredChildrenParameters"> {
 
@@ -134,6 +135,7 @@ export function useCompleteGridNavigation<ParentOrRowElement extends Element, Ro
     rearrangeableChildrenParameters,
     paginatedChildrenParameters,
     staggeredChildrenParameters,
+    refElementParameters,
     ...void1
 }: UseCompleteGridNavigationParameters<ParentOrRowElement, RowElement, RM>): UseCompleteGridNavigationReturnType<ParentOrRowElement, RowElement, RM> {
     monitorCallCount(useCompleteGridNavigation);
@@ -152,7 +154,7 @@ export function useCompleteGridNavigation<ParentOrRowElement extends Element, Ro
         return true;
     }, []);
 
-    const { refElementReturn, propsStable, ...void2 } = useRefElement<ParentOrRowElement>({})
+    const { refElementReturn, propsStable, ...void2 } = useRefElement<ParentOrRowElement>({ refElementParameters })
 
     const {
         childrenHaveFocusParameters,
@@ -441,6 +443,8 @@ export function useCompleteGridNavigationDeclarative<ParentOrRowElement extends 
     staggeredChildrenParameters,
     typeaheadNavigationParameters,
     singleSelectionParameters,
+    refElementParameters,
+    ...void1
 }: UseCompleteGridNavigationDeclarativeParameters<ParentOrRowElement, RowElement, RM>): UseCompleteGridNavigationDeclarativeReturnType<ParentOrRowElement, RowElement, CellElement, RM, CM> {
     const ret: UseCompleteGridNavigationReturnType<ParentOrRowElement, RowElement, RM> = useCompleteGridNavigation<ParentOrRowElement, RowElement, CellElement, RM>({
         linearNavigationParameters,
@@ -450,11 +454,13 @@ export function useCompleteGridNavigationDeclarative<ParentOrRowElement extends 
         singleSelectionParameters: { initiallySelectedIndex: singleSelectionDeclarativeParameters.selectedIndex, onSelectedIndexChange: useStableCallback((...e) => onSelectedIndexChange?.(...e)), ...singleSelectionParameters },
         sortableChildrenParameters,
         staggeredChildrenParameters,
+        refElementParameters,
         typeaheadNavigationParameters,
         gridNavigationParameters,
     });
     const { singleSelectionParameters: { onSelectedIndexChange } } = useSingleSelectionDeclarative({ singleSelectionDeclarativeParameters, singleSelectionReturn: ret.singleSelectionReturn });
 
     const { singleSelectionReturn: { getSelectedIndex }, ...ret2 } = ret;
+    assertEmptyObject(void1);
     return { ...ret2, singleSelectionReturn: { getSelectedIndex } };
 }

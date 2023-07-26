@@ -1,18 +1,16 @@
 import { UseRefElementReturnType } from "../../dom-helpers/use-ref-element.js";
-import { EnhancedEventHandler } from "../../util/event.js";
-export interface UseEscapeDismissParametersSelf {
+import { KeyboardEventType, Nullable } from "../../util/lib.js";
+export interface UseEscapeDismissParametersSelf<B extends boolean> {
     /**
      * Called when the component is dismissed by pressing the `Escape` key.
      *
      * @nonstable
      */
-    onDismiss: EnhancedEventHandler<KeyboardEvent, {
-        reason: "escape";
-    }>;
+    onDismissEscape: Nullable<(e: KeyboardEventType<any>) => void>;
     /**
      * When `true`, `onDismiss` is eligible to be called. When `false`, it will not be called.
      */
-    active: boolean;
+    dismissEscapeActive: B | false;
     /**
      * The escape key event handler is attached onto the window, so we need to know which window.
      *
@@ -28,9 +26,9 @@ export interface UseEscapeDismissParametersSelf {
      */
     parentDepth: number;
 }
-export interface UseEscapeDismissParameters<PopupElement extends Element> {
+export interface UseEscapeDismissParameters<PopupElement extends Element, B extends boolean> {
     refElementPopupReturn: Pick<UseRefElementReturnType<PopupElement>["refElementReturn"], "getElement">;
-    escapeDismissParameters: UseEscapeDismissParametersSelf;
+    escapeDismissParameters: UseEscapeDismissParametersSelf<B>;
 }
 /**
  * Invokes a callback when the `Escape` key is pressed on the topmost component (a max of one invocation per `Escape` press)
@@ -41,5 +39,5 @@ export interface UseEscapeDismissParameters<PopupElement extends Element> {
  *
  * @compositeParams
  */
-export declare function useEscapeDismiss<PopupElement extends Element>({ escapeDismissParameters: { onDismiss: onClose, active: open, getDocument: unstableGetDocument, parentDepth, ...void1 }, refElementPopupReturn: { getElement, ...void2 } }: UseEscapeDismissParameters<PopupElement>): void;
+export declare function useEscapeDismiss<PopupElement extends Element, B extends boolean>({ escapeDismissParameters: { onDismissEscape: onClose, dismissEscapeActive: open, getDocument: unstableGetDocument, parentDepth, ...void1 }, refElementPopupReturn: { getElement, ...void2 } }: UseEscapeDismissParameters<PopupElement, B>): void;
 //# sourceMappingURL=use-escape-dismiss.d.ts.map

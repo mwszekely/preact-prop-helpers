@@ -23,11 +23,11 @@ function getElementDepth(element) {
  *
  * @compositeParams
  */
-export function useEscapeDismiss({ escapeDismissParameters: { onDismiss: onClose, active: open, getDocument: unstableGetDocument, parentDepth, ...void1 }, refElementPopupReturn: { getElement, ...void2 } }) {
+export function useEscapeDismiss({ escapeDismissParameters: { onDismissEscape: onClose, dismissEscapeActive: open, getDocument: unstableGetDocument, parentDepth, ...void1 }, refElementPopupReturn: { getElement, ...void2 } }) {
     monitorCallCount(useEscapeDismiss);
     assertEmptyObject(void1);
     assertEmptyObject(void2);
-    const stableOnClose = useStableCallback(onClose);
+    const stableOnClose = useStableGetter(onClose);
     const getDocument = useStableCallback(unstableGetDocument);
     const getDepth = useStableGetter(parentDepth + 1);
     // When this component opens, add an event listener that finds the deepest open soft dismiss element to actually dismiss.
@@ -62,7 +62,7 @@ export function useEscapeDismiss({ escapeDismissParameters: { onDismiss: onClose
                 e.preventDefault();
                 e.stopPropagation();
                 // This is what at least one of the elements will call
-                const onClose2 = () => { stableOnClose(enhanceEvent(e, { reason: "escape" })); };
+                const onClose2 = () => { stableOnClose()?.(enhanceEvent(e, { reason: "escape" })); };
                 const element = getElement();
                 if (element) {
                     const treeDepth = getElementDepth(element);

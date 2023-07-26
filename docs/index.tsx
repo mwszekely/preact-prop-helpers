@@ -103,7 +103,7 @@ const DemoUseChildrenHaveFocusChild = ({ index }: { index: number }) => {
 }
 
 const DemoUseElementSizeAnimation = () => {
-    return <div />;
+    //return <div />;
     const [height, setHeight] = useState(0);
     const [angle, setAngle] = useState(0);
     useAnimationFrame({
@@ -134,7 +134,7 @@ const DemoUseFocusTrap = memo(({ depth }: { depth?: number }) => {
 
     const [active, setActive] = useState(false);
 
-    const { propsStable, refElementReturn } = useRefElement<HTMLDivElement>({})
+    const { propsStable, refElementReturn } = useRefElement<HTMLDivElement>({ refElementParameters: {} })
     const { props } = useFocusTrap<HTMLDivElement, HTMLDivElement>({
         focusTrapParameters: {
             trapActive: active,

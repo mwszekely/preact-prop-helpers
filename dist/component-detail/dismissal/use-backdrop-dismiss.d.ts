@@ -1,21 +1,19 @@
 import { UseRefElementReturnType } from "../../dom-helpers/use-ref-element.js";
-import { EnhancedEventHandler } from "../../util/event.js";
-export interface UseBackdropDismissParametersSelf {
+import { MouseEventType, Nullable } from "../../util/lib.js";
+export interface UseBackdropDismissParametersSelf<B extends boolean> {
     /**
      * When `true`, `onDismiss` is eligible to be called. When `false`, it will not be called.
      */
-    active: boolean;
+    dismissBackdropActive: B | false;
     /**
      * Called when the component is dismissed by clicking outside of the element.
      *
      * @nonstable
      */
-    onDismiss: EnhancedEventHandler<MouseEvent, {
-        reason: "backdrop";
-    }>;
+    onDismissBackdrop: Nullable<(e: MouseEventType<any>) => void>;
 }
-export interface UseBackdropDismissParameters<PopupElement extends Element> {
-    backdropDismissParameters: UseBackdropDismissParametersSelf;
+export interface UseBackdropDismissParameters<PopupElement extends Element, B extends boolean> {
+    backdropDismissParameters: UseBackdropDismissParametersSelf<B>;
     refElementPopupReturn: Pick<UseRefElementReturnType<PopupElement>["refElementReturn"], "getElement">;
 }
 /**
@@ -23,5 +21,5 @@ export interface UseBackdropDismissParameters<PopupElement extends Element> {
  *
  * @compositeParams
  */
-export declare function useBackdropDismiss<PopupElement extends Element>({ backdropDismissParameters: { active: open, onDismiss: onCloseUnstable, ...void1 }, refElementPopupReturn: { getElement, ...void3 }, ...void2 }: UseBackdropDismissParameters<PopupElement>): void;
+export declare function useBackdropDismiss<PopupElement extends Element, B extends boolean>({ backdropDismissParameters: { dismissBackdropActive: open, onDismissBackdrop: onCloseUnstable, ...void1 }, refElementPopupReturn: { getElement, ...void3 }, ...void2 }: UseBackdropDismissParameters<PopupElement, B>): void;
 //# sourceMappingURL=use-backdrop-dismiss.d.ts.map

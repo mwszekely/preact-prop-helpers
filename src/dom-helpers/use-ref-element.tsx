@@ -40,14 +40,7 @@ export interface UseRefElementParametersSelf<T> {
 }
 
 export interface UseRefElementParameters<T> {
-    /**
-     * For the sake of convenience,
-     * this one is optional, since using this hook is so common,
-     * but using its parameter options is so uncommon, and it's
-     * absence isn't usually because it was forgotten, it's because
-     * it doesn't matter.
-     */
-    refElementParameters?: UseRefElementParametersSelf<T>;
+    refElementParameters: UseRefElementParametersSelf<T>;
 }
 
 /**

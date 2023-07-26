@@ -1,5 +1,5 @@
 
-import { useCallback, useRef, useState } from "preact/hooks";
+import { useRef, useState } from "preact/hooks";
 import { DismissListenerTypes, useMergedProps, useModal, useStableCallback } from "../../dist/index.js";
 
 function getDocument(): Document { return globalThis.document; }
@@ -35,13 +35,14 @@ export function DemoUseModal(props: { parentDepth?: number }) {
             focusPopup: useStableCallback((e, f) => f()?.focus())
         },
         dismissParameters: {
-            closeOnBackdrop,
-            closeOnEscape,
-            closeOnLostFocus,
-            onClose: useCallback((reason) => { setCloseReason(reason); setOpen(false); }, []),
-            open
+            onDismiss: useStableCallback((event, reason) => { setCloseReason(reason); setOpen(false); }),
+            dismissActive: true
         },
-        escapeDismissParameters: { parentDepth },
+        escapeDismissParameters: { parentDepth, dismissEscapeActive: true, onDismissEscape: null },
+        backdropDismissParameters: { dismissBackdropActive: true, onDismissBackdrop: null },
+        lostFocusDismissParameters: { dismissLostFocusActive: true, onDismissLostFocus: null },
+        modalParameters: { active: open },
+        refElementParameters: {},
         activeElementParameters: { getDocument, onActiveElementChange: null, onLastActiveElementChange: null, onWindowFocusedChange: null },
     })
     

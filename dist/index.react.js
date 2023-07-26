@@ -500,6 +500,33 @@ function useGlobalHandlerSingle(target, type, handler, options) {
 function assertEmptyObject(_a) { }
 
 /**
+ * Handles events for a backdrop on a modal dialog -- the kind where the user expects the modal to close when they click/tap outside of it.
+ *
+ * @compositeParams
+ */
+function useBackdropDismiss({ backdropDismissParameters: { dismissBackdropActive: open, onDismissBackdrop: onCloseUnstable, ...void1 }, refElementPopupReturn: { getElement, ...void3 }, ...void2 }) {
+    monitorCallCount(useBackdropDismiss);
+    const getOpen = useStableGetter(open);
+    const onClose = useStableGetter(onCloseUnstable);
+    const onBackdropClick = useCallback(function onBackdropClick(e) {
+        if (!getOpen())
+            return;
+        // Basically, "was this event fired on an element not contained by the modal?"
+        // There are multiple ways browser react to "interacting with nothing", and this takes care of everything.
+        let element = getElement();
+        let foundInsideClick = false;
+        if (e.target && element && element.contains(e.target)) {
+            foundInsideClick = true;
+        }
+        if (!foundInsideClick) {
+            onClose()?.(e);
+        }
+    }, []);
+    useGlobalHandler(window, "mousedown", open ? onBackdropClick : null, { capture: true });
+    useGlobalHandler(window, "touchstart", open ? onBackdropClick : null, { capture: true });
+}
+
+/**
  * Quick and easy way to add extra information to an event that was fired.
  *
  * For example, "this was a click event, but it has information about what list item was pressed too."
@@ -512,33 +539,6 @@ function enhanceEvent(e, detail) {
     const event = (e ?? {});
     event[EventDetail] = detail;
     return event;
-}
-
-/**
- * Handles events for a backdrop on a modal dialog -- the kind where the user expects the modal to close when they click/tap outside of it.
- *
- * @compositeParams
- */
-function useBackdropDismiss({ backdropDismissParameters: { active: open, onDismiss: onCloseUnstable, ...void1 }, refElementPopupReturn: { getElement, ...void3 }, ...void2 }) {
-    monitorCallCount(useBackdropDismiss);
-    const getOpen = useStableGetter(open);
-    const onClose = useStableCallback(onCloseUnstable);
-    const onBackdropClick = useCallback(function onBackdropClick(e) {
-        if (!getOpen())
-            return;
-        // Basically, "was this event fired on an element not contained by the modal?"
-        // There are multiple ways browser react to "interacting with nothing", and this takes care of everything.
-        let element = getElement();
-        let foundInsideClick = false;
-        if (e.target && element && element.contains(e.target)) {
-            foundInsideClick = true;
-        }
-        if (!foundInsideClick) {
-            onClose(enhanceEvent(e, { reason: "backdrop" }));
-        }
-    }, []);
-    useGlobalHandler(window, "mousedown", open ? onBackdropClick : null, { capture: true });
-    useGlobalHandler(window, "touchstart", open ? onBackdropClick : null, { capture: true });
 }
 
 const MagicWindowKey = ("__preact-prop-helpers-escape-key-dismiss__");
@@ -560,9 +560,9 @@ function getElementDepth(element) {
  *
  * @compositeParams
  */
-function useEscapeDismiss({ escapeDismissParameters: { onDismiss: onClose, active: open, getDocument: unstableGetDocument, parentDepth, ...void1 }, refElementPopupReturn: { getElement, ...void2 } }) {
+function useEscapeDismiss({ escapeDismissParameters: { onDismissEscape: onClose, dismissEscapeActive: open, getDocument: unstableGetDocument, parentDepth, ...void1 }, refElementPopupReturn: { getElement, ...void2 } }) {
     monitorCallCount(useEscapeDismiss);
-    const stableOnClose = useStableCallback(onClose);
+    const stableOnClose = useStableGetter(onClose);
     const getDocument = useStableCallback(unstableGetDocument);
     const getDepth = useStableGetter(parentDepth + 1);
     // When this component opens, add an event listener that finds the deepest open soft dismiss element to actually dismiss.
@@ -597,7 +597,7 @@ function useEscapeDismiss({ escapeDismissParameters: { onDismiss: onClose, activ
                 e.preventDefault();
                 e.stopPropagation();
                 // This is what at least one of the elements will call
-                const onClose2 = () => { stableOnClose(enhanceEvent(e, { reason: "escape" })); };
+                const onClose2 = () => { stableOnClose()?.(enhanceEvent(e, { reason: "escape" })); };
                 const element = getElement();
                 if (element) {
                     const treeDepth = getElementDepth(element);
@@ -641,18 +641,20 @@ function useEscapeDismiss({ escapeDismissParameters: { onDismiss: onClose, activ
  *
  * @compositeParams
  */
-function useLostFocusDismiss({ refElementPopupReturn: { getElement: getPopupElement, ...void3 }, refElementSourceReturn, lostFocusDismissParameters: { active: open, onDismiss: onClose, ...void4 }, ...void1 }) {
+function useLostFocusDismiss({ refElementPopupReturn: { getElement: getPopupElement, ...void3 }, refElementSourceReturn, lostFocusDismissParameters: { dismissLostFocusActive: open, onDismissLostFocus: onClose, ...void4 }, ...void1 }) {
     monitorCallCount(useLostFocusDismiss);
     const { getElement: getSourceElement, ...void2 } = (refElementSourceReturn ?? {});
-    const stableOnClose = useStableCallback(onClose);
+    const stableOnClose = useStableGetter(onClose);
     const getOpen = useStableGetter(open);
     const onLastActiveElementChange = useCallback((newElement, _prevElement, e) => {
         const open = getOpen();
         const sourceElement = getSourceElement?.();
         const popupElement = getPopupElement();
         if (!(sourceElement?.contains(newElement) || popupElement?.contains(newElement))) {
-            if (open)
-                stableOnClose(enhanceEvent(e, { reason: "lost-focus" }));
+            if (open) {
+                console.assert(e != null);
+                stableOnClose()?.(e);
+            }
         }
     }, [getSourceElement]);
     return { activeElementParameters: { onLastActiveElementChange } };
@@ -3031,16 +3033,46 @@ function useActiveElement({ activeElementParameters: { onActiveElementChange, on
  *
  * @compositeParams
  */
-function useDismiss({ dismissParameters: { open: globalOpen, onClose: globalOnClose, closeOnBackdrop, closeOnEscape, closeOnLostFocus, ...void3 }, escapeDismissParameters: { parentDepth, ...void2 }, activeElementParameters: { getDocument, onActiveElementChange, onLastActiveElementChange: olaec1, onWindowFocusedChange, ...void5 }, ...void4 }) {
+function useDismiss({ dismissParameters: { dismissActive, onDismiss, ...void3 }, backdropDismissParameters: { dismissBackdropActive, onDismissBackdrop, ...void6 }, lostFocusDismissParameters: { dismissLostFocusActive, onDismissLostFocus, ...void7 }, escapeDismissParameters: { dismissEscapeActive, onDismissEscape, parentDepth, ...void2 }, activeElementParameters: { getDocument, onActiveElementChange, onLastActiveElementChange: olaec1, onWindowFocusedChange, ...void5 }, ...void4 }) {
     monitorCallCount(useDismiss);
     const { refElementReturn: refElementSourceReturn, propsStable: propsStableSource } = useRefElement({ refElementParameters: {} });
     const { refElementReturn: refElementPopupReturn, propsStable: propsStablePopup } = useRefElement({ refElementParameters: {} });
-    const onCloseBackdrop = useCallback(() => { return globalOnClose?.("backdrop"); }, [globalOnClose]);
-    const onCloseEscape = useCallback(() => { return globalOnClose?.("escape"); }, [globalOnClose]);
-    const onCloseFocus = useCallback(() => { return globalOnClose?.("lost-focus"); }, [globalOnClose]);
-    useBackdropDismiss({ backdropDismissParameters: { onDismiss: onCloseBackdrop, active: (closeOnBackdrop && globalOpen) }, refElementPopupReturn });
-    useEscapeDismiss({ escapeDismissParameters: { getDocument, onDismiss: onCloseEscape, active: (closeOnEscape && globalOpen), parentDepth }, refElementPopupReturn });
-    const { activeElementParameters: { onLastActiveElementChange: olaec2, ...void1 } } = useLostFocusDismiss({ lostFocusDismissParameters: { onDismiss: onCloseFocus, active: (closeOnLostFocus && globalOpen) }, refElementPopupReturn, refElementSourceReturn });
+    //const onCloseBackdrop = useCallback(() => { return globalOnClose?.("backdrop" as Listeners); }, [globalOnClose]);
+    //const onCloseEscape = useCallback(() => { return globalOnClose?.("escape" as Listeners); }, [globalOnClose]);
+    //const onCloseFocus = useCallback(() => { return globalOnClose?.("lost-focus" as Listeners); }, [globalOnClose]);
+    useBackdropDismiss({
+        refElementPopupReturn,
+        backdropDismissParameters: {
+            dismissBackdropActive: (dismissBackdropActive && dismissActive),
+            onDismissBackdrop: useStableCallback((e) => {
+                onDismissBackdrop?.(e);
+                onDismiss(e, "backdrop");
+            }),
+        },
+    });
+    useEscapeDismiss({
+        refElementPopupReturn,
+        escapeDismissParameters: {
+            dismissEscapeActive: (dismissEscapeActive && dismissActive),
+            getDocument,
+            onDismissEscape: useStableCallback((e) => {
+                onDismissEscape?.(e);
+                onDismiss(e, "escape");
+            }),
+            parentDepth,
+        },
+    });
+    const { activeElementParameters: { onLastActiveElementChange: olaec2, ...void1 } } = useLostFocusDismiss({
+        lostFocusDismissParameters: {
+            dismissLostFocusActive: (dismissLostFocusActive && dismissActive),
+            onDismissLostFocus: useStableCallback((e) => {
+                onDismissLostFocus?.(e);
+                onDismiss(e, "lost-focus");
+            }),
+        },
+        refElementPopupReturn,
+        refElementSourceReturn
+    });
     useActiveElement({
         activeElementParameters: {
             onLastActiveElementChange: useStableCallback((a, b) => { olaec2?.(a, b); olaec1?.(a, b); }),
@@ -3142,9 +3174,10 @@ function getTopElement() {
 }
 
 /**
- * Allows you to move focus to an isolated area of the page and restore it when finished.
+ * Allows you to move focus to an isolated area of the page, restore it when finished, and **optionally trap it there** so that you can't tab out of it.
  *
- * @remarks By default, this implements a focus trap using the
+ * @remarks By default, this implements a focus trap using the Blocking Elements...uh...[proposal](https://github.com/whatwg/html/issues/897)?
+ * Not that it really looks like it's going anywhere, but until something better comes along, [the polyfill](#https://github.com/PolymerLabs/blocking-elements) has been working pretty great.
  *
  * @compositeParams
  */
@@ -3530,7 +3563,7 @@ function useHasCurrentFocus(args) {
  * @hasChild {@link useCompleteGridNavigationRow}
  * @hasChild {@link useCompleteGridNavigationCell}
  */
-function useCompleteGridNavigation({ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, typeaheadNavigationParameters, sortableChildrenParameters, rearrangeableChildrenParameters, paginatedChildrenParameters, staggeredChildrenParameters, ...void1 }) {
+function useCompleteGridNavigation({ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, typeaheadNavigationParameters, sortableChildrenParameters, rearrangeableChildrenParameters, paginatedChildrenParameters, staggeredChildrenParameters, refElementParameters, ...void1 }) {
     monitorCallCount(useCompleteGridNavigation);
     const getChildren = useCallback(() => managedChildrenReturn.getChildren(), []);
     const getLowestChildIndex = useCallback(() => getChildren().getLowestIndex(), []);
@@ -3543,7 +3576,7 @@ function useCompleteGridNavigation({ gridNavigationParameters, linearNavigationP
             return false;
         return true;
     }, []);
-    const { refElementReturn, propsStable, ...void2 } = useRefElement({});
+    const { refElementReturn, propsStable, ...void2 } = useRefElement({ refElementParameters });
     const { childrenHaveFocusParameters, managedChildrenParameters, context: { gridNavigationRowContext, rovingTabIndexContext, singleSelectionContext, typeaheadNavigationContext }, rearrangeableChildrenReturn, propsParent, propsStableParentOrChild, rovingTabIndexReturn, ...gridNavigationSingleSelectionReturn } = useGridNavigationSingleSelectionSortable({
         gridNavigationParameters,
         linearNavigationParameters: { getLowestIndex: getLowestChildIndex, getHighestIndex: getHighestChildIndex, isValidForLinearNavigation: isValidForNavigation, ...linearNavigationParameters },
@@ -3706,7 +3739,7 @@ function useCompleteGridNavigationCell({ gridNavigationCellParameters, context, 
         textContentReturn
     };
 }
-function useCompleteGridNavigationDeclarative({ gridNavigationParameters, linearNavigationParameters, paginatedChildrenParameters, rearrangeableChildrenParameters, rovingTabIndexParameters, singleSelectionDeclarativeParameters, sortableChildrenParameters, staggeredChildrenParameters, typeaheadNavigationParameters, singleSelectionParameters, }) {
+function useCompleteGridNavigationDeclarative({ gridNavigationParameters, linearNavigationParameters, paginatedChildrenParameters, rearrangeableChildrenParameters, rovingTabIndexParameters, singleSelectionDeclarativeParameters, sortableChildrenParameters, staggeredChildrenParameters, typeaheadNavigationParameters, singleSelectionParameters, refElementParameters, ...void1 }) {
     const ret = useCompleteGridNavigation({
         linearNavigationParameters,
         paginatedChildrenParameters,
@@ -3715,6 +3748,7 @@ function useCompleteGridNavigationDeclarative({ gridNavigationParameters, linear
         singleSelectionParameters: { initiallySelectedIndex: singleSelectionDeclarativeParameters.selectedIndex, onSelectedIndexChange: useStableCallback((...e) => onSelectedIndexChange?.(...e)), ...singleSelectionParameters },
         sortableChildrenParameters,
         staggeredChildrenParameters,
+        refElementParameters,
         typeaheadNavigationParameters,
         gridNavigationParameters,
     });
@@ -3733,7 +3767,7 @@ function useCompleteGridNavigationDeclarative({ gridNavigationParameters, linear
  *
  * @compositeParams
  */
-function useCompleteListNavigation({ linearNavigationParameters, rearrangeableChildrenParameters, sortableChildrenParameters, typeaheadNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, paginatedChildrenParameters, staggeredChildrenParameters, ...void1 }) {
+function useCompleteListNavigation({ linearNavigationParameters, rearrangeableChildrenParameters, sortableChildrenParameters, typeaheadNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, paginatedChildrenParameters, staggeredChildrenParameters, refElementParameters, ...void1 }) {
     monitorCallCount(useCompleteListNavigation);
     const { initiallySelectedIndex } = singleSelectionParameters;
     const getChildren = useCallback(() => managedChildrenReturn.getChildren(), []);
@@ -3747,7 +3781,7 @@ function useCompleteListNavigation({ linearNavigationParameters, rearrangeableCh
             return false;
         return true;
     }, []);
-    const { propsStable: propsRef, refElementReturn } = useRefElement({});
+    const { propsStable: propsRef, refElementReturn } = useRefElement({ refElementParameters });
     const { childrenHaveFocusParameters, managedChildrenParameters: { onChildrenMountChange, ...mcp1 }, context: { rovingTabIndexContext, singleSelectionContext, typeaheadNavigationContext }, linearNavigationReturn, rovingTabIndexReturn, singleSelectionReturn, typeaheadNavigationReturn, rearrangeableChildrenReturn, sortableChildrenReturn, propsParent, propsStableParentOrChild } = useListNavigationSingleSelectionSortable({
         managedChildrenReturn: { getChildren },
         linearNavigationParameters: { getLowestIndex, getHighestIndex, isValidForLinearNavigation: isValidForNavigation, ...linearNavigationParameters },
@@ -3858,12 +3892,13 @@ textContentParameters, context: { managedChildContext, rovingTabIndexContext, pa
         rovingTabIndexChildReturn
     };
 }
-function useCompleteListNavigationDeclarative({ linearNavigationParameters, paginatedChildrenParameters, rearrangeableChildrenParameters, rovingTabIndexParameters, singleSelectionDeclarativeParameters, sortableChildrenParameters, staggeredChildrenParameters, typeaheadNavigationParameters, singleSelectionParameters }) {
+function useCompleteListNavigationDeclarative({ linearNavigationParameters, paginatedChildrenParameters, rearrangeableChildrenParameters, rovingTabIndexParameters, singleSelectionDeclarativeParameters, sortableChildrenParameters, staggeredChildrenParameters, typeaheadNavigationParameters, singleSelectionParameters, refElementParameters, ...void1 }) {
     const ret = useCompleteListNavigation({
         linearNavigationParameters,
         paginatedChildrenParameters,
         rearrangeableChildrenParameters,
         rovingTabIndexParameters,
+        refElementParameters,
         singleSelectionParameters: {
             initiallySelectedIndex: singleSelectionDeclarativeParameters.selectedIndex,
             // Needs to be a (stable) callback because of declaration order
@@ -3885,20 +3920,23 @@ function useCompleteListNavigationDeclarative({ linearNavigationParameters, pagi
  *
  * @remarks Another in the "complete" series, alongside list/grid navigation and dismissal itself.
  *
+ * TODO: The HTML &lt;dialog&gt; element is a thing now, and it can be modal or nonmodal, just like this hook. Hmm...
+ *
  * @compositeParams
  */
-function useModal({ dismissParameters, escapeDismissParameters, focusTrapParameters: { trapActive, ...focusTrapParameters }, activeElementParameters, ...void1 }) {
+function useModal({ dismissParameters: { dismissActive, onDismiss, ...void2 }, escapeDismissParameters: { dismissEscapeActive, onDismissEscape, parentDepth, ...void3 }, focusTrapParameters: { trapActive, ...focusTrapParameters }, activeElementParameters: { getDocument, onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, ...void4 }, backdropDismissParameters: { dismissBackdropActive, onDismissBackdrop, ...void5 }, lostFocusDismissParameters: { dismissLostFocusActive, onDismissLostFocus, ...void6 }, refElementParameters: { onElementChange, onMount, onUnmount, ...void7 }, modalParameters: { active: modalActive, ...void8 }, ...void1 }) {
     monitorCallCount(useModal);
-    const { open } = dismissParameters;
     const { refElementPopupReturn, refElementSourceReturn, propsStablePopup, propsStableSource } = useDismiss({
-        dismissParameters,
-        escapeDismissParameters,
-        activeElementParameters
+        dismissParameters: { dismissActive: dismissActive && modalActive, onDismiss },
+        escapeDismissParameters: { dismissEscapeActive, onDismissEscape, parentDepth },
+        activeElementParameters: { getDocument, onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange },
+        backdropDismissParameters: { dismissBackdropActive, onDismissBackdrop },
+        lostFocusDismissParameters: { dismissLostFocusActive, onDismissLostFocus },
     });
-    const { propsStable, refElementReturn } = useRefElement({});
+    const { propsStable, refElementReturn } = useRefElement({ refElementParameters: { onElementChange, onMount, onUnmount } });
     const { props } = useFocusTrap({
-        focusTrapParameters: { trapActive: open && trapActive, ...focusTrapParameters },
-        activeElementParameters,
+        focusTrapParameters: { trapActive: trapActive && modalActive, ...focusTrapParameters },
+        activeElementParameters: { getDocument, onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange },
         refElementReturn
     });
     return {

@@ -10,23 +10,33 @@ import { monitorCallCount } from "../util/use-call-count.js";
  *
  * @remarks Another in the "complete" series, alongside list/grid navigation and dismissal itself.
  *
+ * TODO: The HTML &lt;dialog&gt; element is a thing now, and it can be modal or nonmodal, just like this hook. Hmm...
+ *
  * @compositeParams
  */
-export function useModal({ dismissParameters, escapeDismissParameters, focusTrapParameters: { trapActive, ...focusTrapParameters }, activeElementParameters, ...void1 }) {
+export function useModal({ dismissParameters: { dismissActive, onDismiss, ...void2 }, escapeDismissParameters: { dismissEscapeActive, onDismissEscape, parentDepth, ...void3 }, focusTrapParameters: { trapActive, ...focusTrapParameters }, activeElementParameters: { getDocument, onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, ...void4 }, backdropDismissParameters: { dismissBackdropActive, onDismissBackdrop, ...void5 }, lostFocusDismissParameters: { dismissLostFocusActive, onDismissLostFocus, ...void6 }, refElementParameters: { onElementChange, onMount, onUnmount, ...void7 }, modalParameters: { active: modalActive, ...void8 }, ...void1 }) {
     monitorCallCount(useModal);
-    const { open } = dismissParameters;
     const { refElementPopupReturn, refElementSourceReturn, propsStablePopup, propsStableSource } = useDismiss({
-        dismissParameters,
-        escapeDismissParameters,
-        activeElementParameters
+        dismissParameters: { dismissActive: dismissActive && modalActive, onDismiss },
+        escapeDismissParameters: { dismissEscapeActive, onDismissEscape, parentDepth },
+        activeElementParameters: { getDocument, onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange },
+        backdropDismissParameters: { dismissBackdropActive, onDismissBackdrop },
+        lostFocusDismissParameters: { dismissLostFocusActive, onDismissLostFocus },
     });
-    const { propsStable, refElementReturn } = useRefElement({});
+    const { propsStable, refElementReturn } = useRefElement({ refElementParameters: { onElementChange, onMount, onUnmount } });
     const { props } = useFocusTrap({
-        focusTrapParameters: { trapActive: open && trapActive, ...focusTrapParameters },
-        activeElementParameters,
+        focusTrapParameters: { trapActive: trapActive && modalActive, ...focusTrapParameters },
+        activeElementParameters: { getDocument, onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange },
         refElementReturn
     });
     assertEmptyObject(void1);
+    assertEmptyObject(void2);
+    assertEmptyObject(void3);
+    assertEmptyObject(void4);
+    assertEmptyObject(void5);
+    assertEmptyObject(void6);
+    assertEmptyObject(void7);
+    assertEmptyObject(void8);
     return {
         propsFocusContainer: useMergedProps(propsStable, props),
         refElementPopupReturn,

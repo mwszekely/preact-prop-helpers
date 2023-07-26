@@ -77,7 +77,8 @@ export const DemoUseGrid = memo(() => {
         staggeredChildrenParameters: {
             // Controls whether children appear staggered as CPU time permits
             staggered: false
-        }
+        },
+        refElementParameters: {}
     });
 
     const {

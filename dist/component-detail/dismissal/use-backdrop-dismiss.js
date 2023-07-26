@@ -1,8 +1,6 @@
 import { useGlobalHandler } from "../../dom-helpers/use-event-handler.js";
-import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
-import { enhanceEvent } from "../../util/event.js";
 import { useCallback } from "../../util/lib.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
 /**
@@ -10,13 +8,13 @@ import { monitorCallCount } from "../../util/use-call-count.js";
  *
  * @compositeParams
  */
-export function useBackdropDismiss({ backdropDismissParameters: { active: open, onDismiss: onCloseUnstable, ...void1 }, refElementPopupReturn: { getElement, ...void3 }, ...void2 }) {
+export function useBackdropDismiss({ backdropDismissParameters: { dismissBackdropActive: open, onDismissBackdrop: onCloseUnstable, ...void1 }, refElementPopupReturn: { getElement, ...void3 }, ...void2 }) {
     monitorCallCount(useBackdropDismiss);
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     assertEmptyObject(void3);
     const getOpen = useStableGetter(open);
-    const onClose = useStableCallback(onCloseUnstable);
+    const onClose = useStableGetter(onCloseUnstable);
     const onBackdropClick = useCallback(function onBackdropClick(e) {
         if (!getOpen())
             return;
@@ -28,7 +26,7 @@ export function useBackdropDismiss({ backdropDismissParameters: { active: open, 
             foundInsideClick = true;
         }
         if (!foundInsideClick) {
-            onClose(enhanceEvent(e, { reason: "backdrop" }));
+            onClose()?.(e);
         }
     }, []);
     useGlobalHandler(window, "mousedown", open ? onBackdropClick : null, { capture: true });

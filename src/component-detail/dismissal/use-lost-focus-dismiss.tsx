@@ -1,31 +1,29 @@
 import { UseRefElementReturnType } from "../../dom-helpers/use-ref-element.js";
 import { UseActiveElementParameters } from "../../observers/use-active-element.js";
 import { OnPassiveStateChange } from "../../preact-extensions/use-passive-state.js";
-import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
-import { EnhancedEventHandler, enhanceEvent } from "../../util/event.js";
 import { TargetedPick, useCallback } from "../../util/lib.js";
-import { Nullable } from "../../util/types.js";
+import { FocusEventType, Nullable } from "../../util/types.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
 
-export interface UseLostFocusDismissParametersSelf {
+export interface UseLostFocusDismissParametersSelf<B extends boolean> {
 
     /**
      * Called when the component is dismissed by losing focus
      * 
      * @nonstable
      */
-    onDismiss: EnhancedEventHandler<FocusEvent, { reason: "lost-focus" }>;
+    onDismissLostFocus: Nullable<(e: FocusEventType<any>) => void>;
 
     /** 
      * When `true`, `onDismiss` is eligible to be called. When `false`, it will not be called.
      */
-    active: boolean;
+    dismissLostFocusActive: B | false;
 };
 
-export interface UseLostFocusDismissParameters<SourceElement extends Element | null, PopupElement extends Element> {
-    lostFocusDismissParameters: UseLostFocusDismissParametersSelf;
+export interface UseLostFocusDismissParameters<SourceElement extends Element | null, PopupElement extends Element, B extends boolean> {
+    lostFocusDismissParameters: UseLostFocusDismissParametersSelf<B>;
     refElementSourceReturn: Nullable<Pick<UseRefElementReturnType<NonNullable<SourceElement>>["refElementReturn"], "getElement">>;
     refElementPopupReturn: Pick<UseRefElementReturnType<PopupElement>["refElementReturn"], "getElement">;
 }
@@ -40,7 +38,16 @@ export interface UseLostFocusDismissReturnType<_SourceElement extends Element | 
  * 
  * @compositeParams 
  */
-export function useLostFocusDismiss<SourceElement extends Element | null, PopupElement extends Element>({ refElementPopupReturn: { getElement: getPopupElement, ...void3 }, refElementSourceReturn, lostFocusDismissParameters: { active: open, onDismiss: onClose, ...void4 }, ...void1 }: UseLostFocusDismissParameters<SourceElement, PopupElement>): UseLostFocusDismissReturnType<SourceElement, PopupElement> {
+export function useLostFocusDismiss<SourceElement extends Element | null, PopupElement extends Element, B extends boolean>({
+    refElementPopupReturn: { getElement: getPopupElement, ...void3 },
+    refElementSourceReturn,
+    lostFocusDismissParameters: {
+        dismissLostFocusActive: open,
+        onDismissLostFocus: onClose,
+        ...void4
+    },
+    ...void1
+}: UseLostFocusDismissParameters<SourceElement, PopupElement, B>): UseLostFocusDismissReturnType<SourceElement, PopupElement> {
     monitorCallCount(useLostFocusDismiss);
     const { getElement: getSourceElement, ...void2 } = (refElementSourceReturn ?? {});
 
@@ -50,15 +57,17 @@ export function useLostFocusDismiss<SourceElement extends Element | null, PopupE
     assertEmptyObject(void4);
 
 
-    const stableOnClose = useStableCallback(onClose);
+    const stableOnClose = useStableGetter(onClose);
     const getOpen = useStableGetter(open);
-    const onLastActiveElementChange = useCallback<OnPassiveStateChange<Element | null, FocusEvent>>((newElement, _prevElement, e) => {
+    const onLastActiveElementChange = useCallback<OnPassiveStateChange<Element | null, FocusEventType<any>>>((newElement, _prevElement, e) => {
         const open = getOpen();
         const sourceElement = getSourceElement?.();
         const popupElement = getPopupElement();
         if (!(sourceElement?.contains(newElement) || popupElement?.contains(newElement))) {
-            if (open)
-                stableOnClose(enhanceEvent(e!, { reason: "lost-focus" }));
+            if (open) {
+                console.assert(e != null);
+                stableOnClose()?.(e!);
+            }
         }
     }, [getSourceElement]);
 
