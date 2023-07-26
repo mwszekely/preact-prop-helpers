@@ -6,7 +6,7 @@ export interface UseDraggableReturnType<E extends EventTarget> {
      * Returns true if the element in question is currently being dragged
      */
     dragging: boolean;
-    /** **STABLE** */
+    /** @stable */
     getDragging: () => boolean;
     /**
      * Once the drag ends, if it was over a valid droppable, this will be
@@ -16,7 +16,7 @@ export interface UseDraggableReturnType<E extends EventTarget> {
      * and then what should be done with it (generally deleted if the effect was "move")
      */
     lastDropEffect: DataTransfer["dropEffect"] | null;
-    /** **STABLE** */
+    /** @stable */
     getLastDropEffect: () => (DataTransfer["dropEffect"] | null);
 }
 export interface UseDraggableParameters {

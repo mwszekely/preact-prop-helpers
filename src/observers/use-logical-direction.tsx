@@ -246,46 +246,43 @@ const M = {
 
 
 export interface UseLogicalDirectionReturnType {
-    /** **STABLE** */
-    //useLogicalDirectionProps: (props: ElementProps<T>) => ElementProps<T>;
-    /** **STABLE** */
-    //getElement: () => T | null;
-    /** **STABLE** */
+    
+    /** @stable */
     logicalDirectionReturn: {
         getLogicalDirectionInfo: (computedStyles: CSSStyleDeclaration) => LogicalDirectionInfo | null;
 
         /**
          * Given the ElementSize info from useElementSize, converts all those physical properties to their logical counterparts.
          * 
-         * **STABLE**
+         * @stable
          */
         convertToLogicalSize: (computedStyles: CSSStyleDeclaration, elementSize: ElementSize, direction?: LogicalDirectionInfo | null | undefined) => LogicalElementSize | null;
 
         /**
          * Turns `"horizontal" | "vertical"` into `"inline" | "block"`
          * 
-         * **STABLE**
+         * @stable
          */
         convertToLogicalOrientation: (computedStyles: CSSStyleDeclaration, elementOrientation: PhysicalOrientation, direction?: LogicalDirectionInfo | null | undefined) => "inline" | "block";
 
         /**
          * Turns `"inline" | "block"` into `"horizontal" | "vertical"`
          * 
-         * **STABLE**
+         * @stable
          */
         convertToPhysicalOrientation: (computedStyles: CSSStyleDeclaration, elementOrientation: LogicalOrientation, direction?: LogicalDirectionInfo | null | undefined) => "horizontal" | "vertical";
 
         /**
          * Turns `"top" | "bottom" | "left" | "right"` into `"block-start" | "block-end" | "inline-start" | "inline-end"`
          * 
-         * **STABLE**
+         * @stable
          */
         convertToLogicalSide: (computedStyles: CSSStyleDeclaration, side: "top" | "bottom" | "left" | "right", direction?: LogicalDirectionInfo | null | undefined) => "inline-start" | "inline-end" | "block-start" | "block-end";
 
         /**
          * Turns `"block-start" | "block-end" | "inline-start" | "inline-end"` into `"top" | "bottom" | "left" | "right"`
          * 
-         * **STABLE**
+         * @stable
          */
         convertToPhysicalSide: (computedStyles: CSSStyleDeclaration, side: "inline-start" | "inline-end" | "block-start" | "block-end", direction?: LogicalDirectionInfo | null | undefined) => "top" | "bottom" | "left" | "right";
     }

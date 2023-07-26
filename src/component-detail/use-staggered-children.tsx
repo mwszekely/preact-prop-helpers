@@ -7,19 +7,19 @@ import { monitorCallCount } from "../util/use-call-count.js";
 import { useTagProps } from "../util/use-tag-props.js";
 import { UseRovingTabIndexChildInfo } from "./keyboard-navigation/use-roving-tabindex.js";
 
-export interface UseStaggeredChildrenInfo<E extends Element> extends Pick<UseRovingTabIndexChildInfo<E>, "index"> {
+export interface UseStaggeredChildrenInfo extends Pick<UseRovingTabIndexChildInfo<any>, "index"> {
     //setParentIsStaggered(parentIsStaggered: boolean): void;
     setStaggeredVisible(visible: boolean): void;
 }
 
-export interface UseStaggeredChildrenParametersSelf { 
+export interface UseStaggeredChildrenParametersSelf {
     /**
      * If true, each child will delay rendering itself until the one before it has.
      */
     staggered: boolean;
- }
+}
 
-export interface UseStaggeredChildrenParameters<E extends Element> extends Pick<UseManagedChildrenReturnType<UseStaggeredChildrenInfo<E>>, "managedChildrenReturn"> {
+export interface UseStaggeredChildrenParameters extends Pick<UseManagedChildrenReturnType<UseStaggeredChildrenInfo>, "managedChildrenReturn"> {
     staggeredChildrenParameters: UseStaggeredChildrenParametersSelf;
 }
 
@@ -40,15 +40,15 @@ export interface UseStaggeredChildrenReturnType {
     context: UseStaggeredChildContext;
 }
 
-export interface UseStaggeredChildrenReturnTypeSelf  { 
+export interface UseStaggeredChildrenReturnTypeSelf {
     /**
      * Whether any children are still waiting to show themselves because of the staggering behavior
      */
     stillStaggering: boolean;
- }
+}
 
 
-export interface UseStaggeredChildParameters extends UseGenericChildParameters<UseStaggeredChildContext,{ index: number; }> {
+export interface UseStaggeredChildParameters extends UseGenericChildParameters<UseStaggeredChildContext, Pick<UseStaggeredChildrenInfo, "index">> {
 }
 
 export interface UseStaggeredChildReturnTypeSelf {
@@ -68,7 +68,7 @@ export interface UseStaggeredChildReturnTypeSelf {
 export interface UseStaggeredChildReturnType<ChildElement extends Element> {
     props: ElementProps<ChildElement>;
     staggeredChildReturn: UseStaggeredChildReturnTypeSelf;
-    info: Pick<UseStaggeredChildrenInfo<ChildElement>, "setStaggeredVisible">;
+    info: Pick<UseStaggeredChildrenInfo, "setStaggeredVisible">;
 }
 
 
@@ -82,10 +82,10 @@ export interface UseStaggeredChildReturnType<ChildElement extends Element> {
  * 
  * @hasChild {@link useStaggeredChild}
  */
-export function useStaggeredChildren<E extends Element>({
+export function useStaggeredChildren({
     managedChildrenReturn: { getChildren },
     staggeredChildrenParameters: { staggered }
-}: UseStaggeredChildrenParameters<E>): UseStaggeredChildrenReturnType {
+}: UseStaggeredChildrenParameters): UseStaggeredChildrenReturnType {
     monitorCallCount(useStaggeredChildren);
 
     // By default, when a child mounts, we tell the next child to mount and simply repeat.

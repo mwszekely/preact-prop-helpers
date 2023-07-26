@@ -126,7 +126,7 @@ export interface UseManagedChildParameters<M extends ManagedChildInfo<any>> exte
 
 export interface UseManagedChildrenReturnTypeSelf<M extends ManagedChildInfo<any>> {
     /** 
-     * ***STABLE***
+     * @stable
      *
      * Note that **both** `getChildren` and the `ManagedChildren` object it returns are stable!
      * 
@@ -140,7 +140,10 @@ export interface UseManagedChildrenReturnType<M extends ManagedChildInfo<any>> {
     /**
      * Returns information about the child that rendered itself with the requested key.
      * 
-     * **STABLE** (even though it's not a function, the identity of this object never changes)
+     * **Everything about this object is stable**. E.G. `managedChildrenReturn` itself, `managedChildrenReturn.getChildren`,
+     * `managedChildrenReturn.getChildren()`, and `managedChildrenReturn.getChildren().getAt`, are all stable.
+     * 
+     * @stable
      */
     managedChildrenReturn: UseManagedChildrenReturnTypeSelf<M>;
 
@@ -148,6 +151,11 @@ export interface UseManagedChildrenReturnType<M extends ManagedChildInfo<any>> {
 }
 
 export interface UseManagedChildReturnTypeSelf<M extends ManagedChildInfo<any>> {
+    /**
+     * Returns a proxy to all the information each child rendered with. The function, returned object, and every function within it are all stable.
+     * 
+     * @stable
+     */
     getChildren(): ManagedChildren<M>;
 }
 
@@ -161,17 +169,31 @@ export interface UseManagedChildReturnType<M extends ManagedChildInfo<any>> {
  * Abstraction over the managed children
  */
 export interface ManagedChildren<M extends ManagedChildInfo<any>> {
-    /** STABLE */
+    /** 
+     * Returns the `info` of the child at the specified index.
+     * 
+     * @remarks This is the same as what's passed to `useManagedChild`.
+     * 
+     * @stable
+     */
     getAt(index: M["index"]): M | undefined;
     /** 
-     * STABLE
+     * Returns the highest number corresponding to a child. Inclusive. It's `while (i <= highest)`.
      * 
-     * @returns The highest number corresponding to a child. Inclusive. Use `<=`.
+     * @stable
      */
     getHighestIndex(): number;
-    /** STABLE */
+    /**
+     * Returns the lowest number corresponding to a child, often 0. Inclusive, but hopefully that wasn't in question.
+     *  
+     * @stable
+     */
     getLowestIndex(): number;
-    /** STABLE */
+    /**
+     * Executes a callback on every existing child.
+     *  
+     * @stable
+     */
     forEach: (f: (child: M) => void) => void | "break";
 
     /**
@@ -188,8 +210,10 @@ export interface ManagedChildren<M extends ManagedChildInfo<any>> {
      * This behavior, to be clear, is only necessary for sorting and rearranging because
      * sorting and rearranging require knowing perfectly which index maps to which.
      * We don't need any other missing information in the array besides the missing index.
-     * */
-    arraySlice: () => M[];
+     * 
+     * @internal
+     */
+    _arraySlice: () => M[];
 }
 
 interface InternalChildInfo<M extends ManagedChildInfo<string | number>> {
@@ -206,10 +230,10 @@ interface InternalChildInfo<M extends ManagedChildInfo<string | number>> {
  * @remarks This hook is designed to be lightweight, in that the parent keeps no state
  * and runs no effects.  Each child *does* run an effect, but with no state
  * changes unless you explicitly request them.
+ *  
+ * {@include } {@link ManagedChildren}
  * 
  * @hasChild {@link useManagedChild}
- * 
- * {@include } {@link ManagedChildren}
  * 
  * @compositeParams
  */
@@ -347,7 +371,7 @@ export function useManagedChildren<M extends ManagedChildInfo<string | number>>(
         getAt: getManagedChildInfo,
         getHighestIndex: getHighestIndex,
         getLowestIndex: getLowestIndex,
-        arraySlice: useCallback(() => {
+        _arraySlice: useCallback(() => {
             let ret = managedChildrenArray.current.arr.slice();
             const max = getHighestIndex();
             for (let i = 0; i <= max; ++i) {
@@ -464,7 +488,7 @@ export interface UseChildrenFlagParameters<M extends ManagedChildInfo<any>, R> {
 
 export interface UseChildrenFlagReturnType<M extends ManagedChildInfo<any>, R> {
     /** 
-     * **STABLE**
+     * @stable
      * 
      * Manually changes the current index that is (focused/selected/tabbable/whatever).
      * 
@@ -474,12 +498,12 @@ export interface UseChildrenFlagReturnType<M extends ManagedChildInfo<any>, R> {
      */
     changeIndex: PassiveStateUpdater<M["index"] | null, R>;
     /** 
-     * **STABLE**
+     * @stable
      * 
      * Call this whenever a child mounts/unmounts, or whenever calling a child's isValid() would change
-     *  */
+     */
     reevaluateClosestFit: () => void;
-    /** **STABLE** */
+    /** @stable */
     getCurrentIndex: () => M["index"] | null;
 }
 

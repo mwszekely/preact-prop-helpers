@@ -23,7 +23,10 @@ export interface UseChildrenHaveFocusParameters<T extends Element> {
 export interface UseChildrenHaveFocusChildReturnType<E extends Element> extends TargetedPick<UseHasCurrentFocusParameters<E>, "hasCurrentFocusParameters", "onCurrentFocusedInnerChanged"> {
 }
 
-export interface UseChildrenHaveFocusReturnTypeSelf { getAnyFocused(): boolean; }
+export interface UseChildrenHaveFocusReturnTypeSelf { 
+    /** @stable */
+    getAnyFocused(): boolean; 
+}
 
 export interface UseChildrenHaveFocusReturnType<T extends Element> {
     childrenHaveFocusReturn: UseChildrenHaveFocusReturnTypeSelf;
@@ -32,7 +35,7 @@ export interface UseChildrenHaveFocusReturnType<T extends Element> {
 
 export interface UseChildrenHaveFocusContext<T extends Element> {
     childrenHaveFocusChildContext: {
-        /** **STABLE** */
+        /** @stable */
         setFocusCount: PassiveStateUpdater<number, FocusEventType<T>>;
     }
 }

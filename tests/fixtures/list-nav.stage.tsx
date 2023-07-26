@@ -73,7 +73,11 @@ interface TestBasesListNavImplProps {
     selectedIndex: number | null;
 }
 
+const globalLogEnabled = false;
+
 function useOnRender(id: string) {
+    if (!globalLogEnabled)
+        return { props: {} };
     window.onRender ??= async (id) => { console.log("RENDER:" + id); }
     let promise = window.onRender?.(id);
     const { propsStable, refElementReturn } = useRefElement<any>({})

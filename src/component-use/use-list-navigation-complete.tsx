@@ -20,13 +20,13 @@ import { UsePressParameters } from "./use-press.js";
 export interface UseCompleteListNavigationChildInfo<ChildElement extends Element> extends
     UseListNavigationSingleSelectionSortableChildInfo<ChildElement>,
     UsePaginatedChildrenInfo<ChildElement>,
-    UseStaggeredChildrenInfo<ChildElement>,
+    UseStaggeredChildrenInfo,
     ManagedChildInfo<number> { }
 
 export interface UseCompleteListNavigationParameters<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends
     Pick<UseListNavigationSingleSelectionSortableParameters<ParentElement, ChildElement, M>, "singleSelectionParameters" | "sortableChildrenParameters">,
     Pick<UsePaginatedChildrenParameters<ParentElement, ChildElement>, "paginatedChildrenParameters">,
-    Pick<UseStaggeredChildrenParameters<ChildElement>, "staggeredChildrenParameters">,
+    Pick<UseStaggeredChildrenParameters, "staggeredChildrenParameters">,
     TargetedOmit<UseListNavigationSingleSelectionSortableParameters<ParentElement, ChildElement, M>, "linearNavigationParameters", "getLowestIndex" | "getHighestIndex" | "isValidForLinearNavigation">,
     TargetedOmit<UseListNavigationSingleSelectionSortableParameters<ParentElement, ChildElement, M>, "typeaheadNavigationParameters", "isValidForTypeaheadNavigation">,
     TargetedOmit<UseListNavigationSingleSelectionSortableParameters<ParentElement, ChildElement, M>, "rearrangeableChildrenParameters", "onRearranged">,

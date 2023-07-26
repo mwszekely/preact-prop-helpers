@@ -62,11 +62,9 @@ export interface UseLinearNavigationParametersSelf<ChildElement extends Element>
     /**
      * What happens when `up` is pressed on the first valid child?
      * 
-     * ```md-literal
-     * * "wrap": The focus is sent down to the last child
-     * * "passthrough": Nothing happens, **and the event is allowed to propagate**.
-     * * A function: 
-     * ```
+     * @remarks If it's `"wrap"`, the focus is sent down to the last child, and the event does not propagate. 
+     * If it's a function, it's is called, and the event does not propagate.
+     * If it's `"passthrough"`, nothing happens, **and the event is allowed to propagate**.
      */
     navigatePastStart: "passthrough" | "wrap" | (() => void);
 

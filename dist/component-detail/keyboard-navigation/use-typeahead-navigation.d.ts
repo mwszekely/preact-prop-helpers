@@ -18,7 +18,11 @@ export interface UseTypeaheadNavigationReturnTypeSelf {
     typeaheadStatus: "invalid" | "valid" | "none";
 }
 export interface UseTypeaheadNavigationContextSelf {
-    /** **STABLE** (Don't call during render) */
+    /**
+     * Stable, but don't call during render.
+     *
+     * @stable
+     */
     excludeSpace: () => boolean;
     sortedTypeaheadInfo: Array<TypeaheadInfo>;
     insertingComparator: (lhs: string | null, rhs: TypeaheadInfo) => number;

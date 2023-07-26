@@ -36,7 +36,7 @@ export interface ElementSize {
     offsetTop: number | undefined;
 }
 export interface UseElementSizeReturnTypeSelf<E extends Element> {
-    /** **STABLE** */
+    /** @stable */
     getSize(): ElementSize | null;
 }
 export interface UseElementSizeReturnType<E extends Element> extends UseRefElementReturnType<E> {

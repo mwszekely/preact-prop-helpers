@@ -3774,9 +3774,9 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
    * and runs no effects.  Each child *does* run an effect, but with no state
    * changes unless you explicitly request them.
    *
-   * @hasChild {@link useManagedChild}
-   *
    * {@include } {@link ManagedChildren}
+   *
+   * @hasChild {@link useManagedChild}
    *
    * @compositeParams
    */
@@ -3903,7 +3903,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       getAt: getManagedChildInfo,
       getHighestIndex: getHighestIndex,
       getLowestIndex: getLowestIndex,
-      arraySlice: T$1(() => {
+      _arraySlice: T$1(() => {
         let ret = managedChildrenArray.current.arr.slice();
         const max = getHighestIndex();
         for (let i = 0; i <= max; ++i) {
@@ -5607,14 +5607,14 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     //const { setTabbableIndex } = rovingTabIndexReturn;
     const shuffle$1 = T$1(() => {
       const managedRows = getChildren();
-      const originalRows = managedRows.arraySlice();
+      const originalRows = managedRows._arraySlice();
       const shuffledRows = shuffle(originalRows);
       return rearrange(originalRows, shuffledRows);
     }, [/* Must remain stable */]);
     const reverse = T$1(() => {
       const managedRows = getChildren();
-      const originalRows = managedRows.arraySlice();
-      const reversedRows = managedRows.arraySlice().reverse();
+      const originalRows = managedRows._arraySlice();
+      const reversedRows = managedRows._arraySlice().reverse();
       return rearrange(originalRows, reversedRows);
     }, [/* Must remain stable */]);
     // The sort function needs to be able to update whoever has all the sortable children.
@@ -5664,7 +5664,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     }, []);
     const toJsonArray = T$1(transform => {
       const managedRows = getChildren();
-      return managedRows.arraySlice().map(child => {
+      return managedRows._arraySlice().map(child => {
         if (transform) return transform(child);else return child.getSortValue();
       });
     }, []);
@@ -5732,14 +5732,14 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     const sort = T$1(direction => {
       const managedRows = getChildren();
       const compare = getCompare();
-      const originalRows = managedRows.arraySlice();
+      const originalRows = managedRows._arraySlice();
       const sortedRows = compare ? originalRows.sort((lhsRow, rhsRow) => {
         const lhsValue = lhsRow;
         const rhsValue = rhsRow;
         const result = compare(lhsValue, rhsValue);
         if (direction[0] == "d") return -result;
         return result;
-      }) : managedRows.arraySlice();
+      }) : managedRows._arraySlice();
       return rearrange(originalRows, sortedRows);
     }, [/* Must remain stable */]);
     return {

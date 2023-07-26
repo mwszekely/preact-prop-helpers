@@ -19,7 +19,14 @@ export function generateStack() {
  * 
  */
 export function useStack() {
-    const stack = useMemo(generateStack, []);
-    const getStack = useCallback(() => stack, []);
-    return getStack;
+    if (getBuildMode() == "development") {
+        const stack = useMemo(generateStack, []);
+        const getStack = useCallback(() => stack, []);
+        return getStack;
+    }
+    else {
+        return returnEmptyString;
+    }
 }
+
+function returnEmptyString() { return "" }

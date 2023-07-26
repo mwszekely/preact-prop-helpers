@@ -1,5 +1,5 @@
-import { useMemo, useState } from "preact/hooks";
 import { useTimeout } from "../timing/use-timeout.js";
+import { useMemo, useState } from "./lib.js";
 import { getBuildMode } from "./mode.js";
 import { useStack } from "./stack.js";
 let idIndex = 0;

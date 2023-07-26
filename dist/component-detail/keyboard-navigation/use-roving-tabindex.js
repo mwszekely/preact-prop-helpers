@@ -46,8 +46,6 @@ export function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovi
             let nextIndex = ((typeof updater === "function") ? updater(prevIndex ?? null) : updater);
             const untabbable = getUntabbable();
             let parentElement = getElement();
-            if (!parentElement)
-                debugger;
             console.assert(!!parentElement);
             // Whether or not we're currently tabbable, make sure that when we switch from untabbable to tabbable,
             // that we know which index to switch back to.
@@ -184,16 +182,16 @@ export function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovi
             tabIndex: untabbable ? 0 : -1,
             // TODO: When a hidden child is clicked, some browsers focus the parent, just because it's got a role and a tabindex.
             // But this won't work to avoid that, because it messes with grid navigation
-            /*onFocus: useStableCallback((e: FocusEvent) => {
+            onFocus: useStableCallback((e) => {
                 const parentElement = getElement();
                 console.assert(!!parentElement);
                 if (e.target == getElement()) {
                     debugger;
                     if (!untabbable) {
-                        focusSelf(e);
+                        focusSelf(false, e);
                     }
                 }
-            })*/
+            })
         }, "data-roving-tab-index")
     };
 }

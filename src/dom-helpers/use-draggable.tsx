@@ -16,7 +16,7 @@ export interface UseDraggableReturnType<E extends EventTarget> {
      */
     dragging: boolean;
 
-    /** **STABLE** */
+    /** @stable */
     getDragging: () => boolean;
 
     /**
@@ -28,7 +28,7 @@ export interface UseDraggableReturnType<E extends EventTarget> {
      */
     lastDropEffect: DataTransfer["dropEffect"] | null;
 
-    /** **STABLE** */
+    /** @stable */
     getLastDropEffect: () => (DataTransfer["dropEffect"] | null);
 }
 

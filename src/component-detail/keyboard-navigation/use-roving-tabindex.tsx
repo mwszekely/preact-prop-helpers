@@ -75,7 +75,7 @@ export interface UseRovingTabIndexReturnTypeSelf {
      */
     getTabbableIndex: () => number | null;
     /** 
-     * Call to focus the currently tabbable child.
+     * Call to focus the currently tabbable child, or, if we're `untabbable`, the component itself.
      * 
      * @stable
      */
@@ -184,7 +184,7 @@ export interface UseRovingTabIndexChildParameters<TabbableChildElement extends E
 export interface RovingTabIndexChildContextSelf {
     getUntabbable(): boolean;
     getUntabbableBehavior(): "focus-parent" | "leave-child-focused";
-    /** `force` refers to if the untabbableBehavior is ignored. E.G. `force` temporarily disables `leave-child-focused`. */
+    /** `force` refers to if the untabbableBehavior is ignored. E.G. `force` temporarily disables `leave-child-focused` and allows the parent to focus itself. */
     parentFocusSelf: (force: boolean) => void;
     giveParentFocusedElement(element: Element): void;
     setTabbableIndex: SetTabbableIndex;
@@ -286,8 +286,6 @@ export function useRovingTabIndex<ParentElement extends Element, ChildElement ex
             let nextIndex = ((typeof updater === "function") ? updater(prevIndex ?? null) : updater) as M["index"];
             const untabbable = getUntabbable();
             let parentElement = getElement();
-            if (!parentElement)
-                debugger;
             console.assert(!!parentElement);
 
             // Whether or not we're currently tabbable, make sure that when we switch from untabbable to tabbable,
@@ -440,16 +438,16 @@ export function useRovingTabIndex<ParentElement extends Element, ChildElement ex
             tabIndex: untabbable ? 0 : -1,
             // TODO: When a hidden child is clicked, some browsers focus the parent, just because it's got a role and a tabindex.
             // But this won't work to avoid that, because it messes with grid navigation
-            /*onFocus: useStableCallback((e: FocusEvent) => {
+            onFocus: useStableCallback((e: FocusEvent) => {
                 const parentElement = getElement();
                 console.assert(!!parentElement);
                 if (e.target == getElement()) {
                     debugger;
                     if (!untabbable) {
-                        focusSelf(e);
+                        focusSelf(false, e);
                     }
                 }
-            })*/
+            })
         }, "data-roving-tab-index")
     };
 }

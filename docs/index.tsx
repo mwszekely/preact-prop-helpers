@@ -483,13 +483,13 @@ const DemoGlobalHandlerChild = memo(function DemoGlobalHandlerChild({ mode, targ
     return <div hidden />;
 })
 
-const StaggeredContext = createContext<UseManagedChildrenContext<UseStaggeredChildrenInfo<HTMLDivElement>> & UseStaggeredChildContext>(null!);
+const StaggeredContext = createContext<UseManagedChildrenContext<UseStaggeredChildrenInfo> & UseStaggeredChildContext>(null!);
 
 const DemoStaggered = memo(() => {
     const [staggered, setStaggered] = useState(false);
     const [checked, setChecked] = useState(false);
     const [childCount, setChildCount] = useState(100);
-    const { context: mcc, managedChildrenReturn } = useManagedChildren<UseStaggeredChildrenInfo<HTMLDivElement>>({ managedChildrenParameters: {} })
+    const { context: mcc, managedChildrenReturn } = useManagedChildren<UseStaggeredChildrenInfo>({ managedChildrenParameters: {} })
     const { context: scc, staggeredChildrenReturn } = useStaggeredChildren({ managedChildrenReturn, staggeredChildrenParameters: { staggered } })
     return (
         <StaggeredContext.Provider value={{ ...mcc, ...scc }}>
@@ -521,7 +521,7 @@ const DemoStaggeredChildren = memo(({ childCount }: { childCount: number }) => {
 const DemoStaggeredChild = memo(({ index }: { index: number }) => {
     const context = useContext(StaggeredContext);
     const { info, props, staggeredChildReturn: { hideBecauseStaggered, parentIsStaggered } } = useStaggeredChild<HTMLDivElement>({ context: context, info: { index } });
-    const { managedChildReturn } = useManagedChild<UseStaggeredChildrenInfo<HTMLDivElement>>({ context, info: { ...info, index } });
+    const { managedChildReturn } = useManagedChild<UseStaggeredChildrenInfo>({ context, info: { ...info, index } });
 
     return (
         <div {...useMergedProps(props, { style: hideBecauseStaggered ? { opacity: 0.25 } : {} })}>Child #{index}{parentIsStaggered ? hideBecauseStaggered ? "(pending)" : "" : "(not staggered)"}</div>

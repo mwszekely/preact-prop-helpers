@@ -32,8 +32,8 @@ export interface UseAsyncHandlerReturnType<EventType, CaptureType> extends UseAs
     currentCapture: CaptureType | undefined;
     /**
      * The above, but stable, if you need the current capture without it being an explicit dependency.
-     * **STABLE**
-     *  */
+     * @stable
+     */
     getCurrentCapture(): (CaptureType | undefined);
     /**
      * Because you're allowed to have `CaptureType` extend `undefined`,

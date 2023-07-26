@@ -34,9 +34,9 @@ const _comments = void (0);
  * and runs no effects.  Each child *does* run an effect, but with no state
  * changes unless you explicitly request them.
  *
- * @hasChild {@link useManagedChild}
- *
  * {@include } {@link ManagedChildren}
+ *
+ * @hasChild {@link useManagedChild}
  *
  * @compositeParams
  */
@@ -153,7 +153,7 @@ export function useManagedChildren(parentParameters) {
         getAt: getManagedChildInfo,
         getHighestIndex: getHighestIndex,
         getLowestIndex: getLowestIndex,
-        arraySlice: useCallback(() => {
+        _arraySlice: useCallback(() => {
             let ret = managedChildrenArray.current.arr.slice();
             const max = getHighestIndex();
             for (let i = 0; i <= max; ++i) {

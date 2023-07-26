@@ -5,6 +5,8 @@
  *
  * Everything from keyboard navigation (arrow keys, typeahead) to modal focus traps (dialogs and menus) to simple things like `useState` *but with localStorage!* are here.
  *
+ * [See below a more complete list of goals](#conventionsandgoals), but in general this library aims to be both performant (no unnecessary re-renders) and impose few to no restrictions on what your rendered HTML must look like in order to achieve any given result.
+ *
  * Due to the complex nature of some of these hooks (in particular, grid navigation), all function parameters/return types are very strictly categorized. As a full example:
  *
  * ```typescript
@@ -136,6 +138,31 @@
  *
  *    } = allReturnInfo;
  * ```
+ *
+ * ## A note on stability
+ *
+ * Effects, like in `useEffect`, are great because they let a component say "let's also make some non-HTML changes". So we're all on the same page, an *effect* is *triggered* when one of its *dependencies* changes, as we all know.
+ *
+ * Preact inherits the same issue of "effect *triggers* (the changes that cause the effect to run) and effect *dependencies* (the data and functions the effect needs to work) are interchangeable" [that React has](https://github.com/facebook/react/issues/14099) and [is working on](https://github.com/facebook/react/pull/25881), and a few of the hooks here are low-level enough that it sometimes starts to become important to distinguish whether a function/object is "stable" or not across renders.
+ *
+ * An object/function that's "stable" doesn't change values when the component renders itself a second (or third, etc.) time:
+ *
+ * ```tsx
+ * function ExampleComponent() {
+ *   // Every time <ExampleComponent /> renders, `stableObject` is the same object as last time (e.g. with ===)
+ *   let stableObject = useRef({}).current;
+ *   // Every time <ExampleComponent /> renders, `unstableObject` is a new, unique object (e.g. !== the one from the last render)
+ *   let unstableObject = ({ evenWith: "a stable value inside" });
+ * }
+ * ```
+ *
+ * All stability **requirements** (for parameters) and **guarantees** (for returned values) are documented.
+ * Just use `useCallback`, [`useStableCallback`](#usestablecallback), or [`useStableGetter`](#usestablegetter) as appropriate.
+ *
+ * As another aside, for the same reasons as React, a stable callback from [`useStableCallback`](#usestablecallback) (or [`useStableGetter`](#usestablegetter)) [**cannot be called during render**](https://github.com/reactjs/rfcs/pull/220#issuecomment-1118055107).
+ * This is because a component may theoretically be called multiple times for a single render, so it's unknown *which* invocation of `useStableCallback` was the one that resulted in a render until that render finally settles. This prevents the problem of a component somewhere else being given the "wrong" value that it got mid-render.
+ *
+ * Ultimately this generally means for these low-level hooks that if you pass in a parameter that's `useStableCallback`-stable, you'll get back a stable return value that can't be called during render. If you pass in a parameter that's `useCallback`-stable, you'll get back a stable return value that you **can** call during render.
  *
  * ## List of hooks (in rough order of usefulness)
  *
@@ -284,6 +311,7 @@ export { setPressVibrate, usePress } from "./component-use/use-press.js";
 export { useRandomDualIds } from "./component-use/use-random-dual-ids.js";
 export { useRandomId } from "./component-use/use-random-id.js";
 export { useAsyncHandler } from "./dom-helpers/use-async-handler.js";
+export { getTopElement, useBlockingElement } from "./dom-helpers/use-blocking-element.js";
 export { getDocument, useDocumentClass } from "./dom-helpers/use-document-class.js";
 export { useDraggable } from "./dom-helpers/use-draggable.js";
 export { DroppableFileError, useDroppable } from "./dom-helpers/use-droppable.js";
@@ -332,5 +360,4 @@ export { generateStack, useStack } from "./util/stack.js";
 export { hideCallCount, monitorCallCount } from "./util/use-call-count.js";
 // Export the Preact/React interop this library uses for others to use
 export { EventMapping, Fragment, cloneElement, createContext, createElement, createPortal, debounceRendering, forwardRef, memo, onfocusin, onfocusout, useBeforeLayoutEffect, useCallback, useContext, useDebugValue, useEffect, useId, useImperativeHandle, useLayoutEffect, useMemo, useReducer, useRef, useState as useStateBasic } from "./util/lib.js";
-export * from "./util/temp.js";
 //# sourceMappingURL=index.js.map

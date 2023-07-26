@@ -1,7 +1,7 @@
 import { noop } from "lodash-es";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { createContext, useCallback, useContext, useEffect, useRef } from "../util/lib.js";
-import { ElementProps } from "../util/types.js";
+import { ElementProps, Nullable } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 
 type RafCallbackType = (msSinceLast: number, tag?: any) => void;
@@ -56,7 +56,7 @@ export interface UseAnimationFrameParameters {
      * 
      * Doesn't need to be stable.
      */
-    callback: null | ((msSinceLast: number) => void);
+    callback: Nullable<((msSinceLast: number) => void)>;
 }
 
 /**

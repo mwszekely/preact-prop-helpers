@@ -5,6 +5,8 @@
  *
  * Everything from keyboard navigation (arrow keys, typeahead) to modal focus traps (dialogs and menus) to simple things like `useState` *but with localStorage!* are here.
  *
+ * [See below a more complete list of goals](#conventionsandgoals), but in general this library aims to be both performant (no unnecessary re-renders) and impose few to no restrictions on what your rendered HTML must look like in order to achieve any given result.
+ *
  * Due to the complex nature of some of these hooks (in particular, grid navigation), all function parameters/return types are very strictly categorized. As a full example:
  *
  * ```typescript
@@ -137,6 +139,29 @@
  *    } = allReturnInfo;
  * ```
  *
+ * ## A note on stability
+ *
+ * Effects, like in `useEffect`, are great because they let a component say "let's also make some non-HTML changes". So we're all on the same page, an *effect* is *triggered* when one of its *dependencies* changes, as we all know.
+ *
+ * Preact inherits the same issue of "effect *triggers* (the changes that cause the effect to run) and effect *dependencies* (the data and functions the effect needs to work) are interchangeable" [that React has](https://github.com/facebook/react/issues/14099) and [is working on](https://github.com/facebook/react/pull/25881), and a few of the hooks here are low-level enough that it sometimes starts to become important to distinguish whether a function/object is "stable" or not across renders.
+ *
+ * An object/function that's "stable" doesn't change values when the component renders itself a second (or third, etc.) time:
+ *
+ * ```tsx
+ * function ExampleComponent() {
+ *   // Every time <ExampleComponent /> renders, `stableObject` is the same object as last time (e.g. with ===)
+ *   let stableObject = useRef({}).current;
+ *   // Every time <ExampleComponent /> renders, `unstableObject` is a new, unique object (e.g. !== the one from the last render)
+ *   let unstableObject = ({ evenWith: "a stable value inside" });
+ * }
+ * ```
+ *
+ * All stability **requirements** (for parameters) and **guarantees** (for returned values) are documented.
+ * Just use `useCallback`, [`useStableCallback`](#usestablecallback), or [`useStableGetter`](#usestablegetter) as appropriate.
+ *
+ * As another aside, for the same reasons as React, a stable callback from [`useStableCallback`](#usestablecallback) (or [`useStableGetter`](#usestablegetter)) [**cannot be called during render**](https://github.com/reactjs/rfcs/pull/220#issuecomment-1118055107).
+ * This is because a component may theoretically be called multiple times for a single render, so it's unknown *which* invocation of `useStableCallback` was the one that resulted in a render until that render finally settles. This prevents the problem of a component somewhere else being given the "wrong" value that it got mid-render.
+ *
  * ## List of hooks (in rough order of usefulness)
  *
  * {@tableOfContents start}
@@ -261,17 +286,37 @@
  */
 
 import { CaptureFunctionType } from 'async-to-sync';
+import { cloneElement } from 'preact';
 import { clsx } from 'clsx';
+import { createContext } from 'preact';
+import { createElement } from 'preact';
+import { createPortal } from 'preact/compat';
+import { EffectCallback } from 'preact/hooks';
+import { forwardRef } from 'preact/compat';
+import { Fragment } from 'preact';
 import { identity } from 'lodash-es';
 import { Inputs } from 'preact/hooks';
-import type { JSX } from 'preact';
+import { JSX } from 'preact';
 import { JSX as JSX_2 } from '../util/lib.js';
+import { memo } from 'preact/compat';
+import { MutableRef } from 'preact/hooks';
+import { Reducer } from 'preact/hooks';
 import { Ref } from 'preact';
 import { RefCallback } from 'preact';
 import { RefObject } from 'preact';
 import { RenderableProps } from 'preact';
 import { StateUpdater } from 'preact/hooks';
+import { useCallback } from 'preact/hooks';
+import { useContext } from 'preact/hooks';
+import { useDebugValue } from 'preact/hooks';
 import { useEffect } from 'preact/hooks';
+import { useId } from 'preact/hooks';
+import { useImperativeHandle } from 'preact/hooks';
+import { useLayoutEffect } from 'preact/hooks';
+import { useMemo } from 'preact/hooks';
+import { useReducer } from 'preact/hooks';
+import { useRef } from 'preact/hooks';
+import { useState as useStateBasic } from 'preact/hooks';
 import { VNode as VNode_2 } from 'preact';
 
 /**
@@ -289,6 +334,8 @@ declare type AsyncFunctionType<AP extends unknown[], R> = ((...args: AP) => (R |
 
 export declare type AsyncHandler<EventType, CaptureType> = ((c: CaptureType, e: EventType) => (Promise<void> | void));
 
+declare type AvailableStyles = (keyof CSSStyleDeclaration & keyof CSSProperties) & string;
+
 /**
  * Your usual binary search implementation.
  *
@@ -303,18 +350,26 @@ export declare function binarySearch<T, U, F extends (lhs: U, rhs: T) => number>
 
 declare function callCountU(hook: Function): void;
 
+export { cloneElement }
+
 export declare type Compare<M extends UseRearrangeableChildInfo> = (lhs: M, rhs: M) => number;
 
-export declare interface CompleteGridNavigationCellContext<ParentElement extends Element, ChildElement extends Element, CM extends UseCompleteGridNavigationCellInfo<ChildElement>> extends UseManagedChildrenContext<CM>, UseTypeaheadNavigationContext, RovingTabIndexChildContext, UseGridNavigationCellContext {
+export declare interface CompleteGridNavigationCellContext<ChildElement extends Element, CM extends UseCompleteGridNavigationCellInfo<ChildElement>> extends UseManagedChildrenContext<CM>, UseTypeaheadNavigationContext, RovingTabIndexChildContext, UseGridNavigationCellSingleSelectionSortableContext {
 }
 
-export declare interface CompleteGridNavigationRowContext<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement, CellElement>, _CM extends UseCompleteGridNavigationCellInfo<CellElement>> extends UseManagedChildrenContext<RM>, UsePaginatedChildContext, UseStaggeredChildContext, UseChildrenHaveFocusContext<RowElement>, UseTypeaheadNavigationContext, UseSingleSelectionContext, RovingTabIndexChildContext, UseGridNavigationRowContext {
+export declare interface CompleteGridNavigationRowContext<RowElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>> extends UseManagedChildrenContext<RM>, UsePaginatedChildContext, UseStaggeredChildContext, UseChildrenHaveFocusContext<RowElement>, UseTypeaheadNavigationContext, UseSingleSelectionContext, RovingTabIndexChildContext, UseGridNavigationRowContext {
 }
 
-export declare interface CompleteListNavigationContext<_ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends UseManagedChildrenContext<M>, UsePaginatedChildContext, UseStaggeredChildContext, UseChildrenHaveFocusContext<ChildElement>, UseTypeaheadNavigationContext, UseSingleSelectionContext, RovingTabIndexChildContext {
+export declare interface CompleteListNavigationContext<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends UseManagedChildrenContext<M>, UsePaginatedChildContext, UseStaggeredChildContext, UseTypeaheadNavigationContext, UseSingleSelectionContext, RovingTabIndexChildContext {
 }
 
 export declare type CompositionEventType<E extends EventTarget> = JSX.TargetedCompositionEvent<E>;
+
+export { createContext }
+
+export { createElement }
+
+export { createPortal }
 
 export declare type CSSProperties = JSX.CSSProperties;
 
@@ -327,6 +382,8 @@ export declare function debounceRendering(f: () => void): void;
 export declare function defaultCompare(lhs: UseSortableChildInfo | undefined, rhs: UseSortableChildInfo | undefined): number;
 
 export declare type DismissListenerTypes = "backdrop" | "lost-focus" | "escape";
+
+export declare type DragEventType<E extends EventTarget> = JSX.TargetedDragEvent<E>;
 
 export declare interface DropFile extends DropFileMetadata {
     name: string;
@@ -346,6 +403,8 @@ export declare class DroppableFileError extends Error {
 }
 
 declare type DroppableFileErrorType = "IndexSizeError" | "HierarchyRequestError" | "WrongDocumentError" | "InvalidCharacterError" | "NoModificationAllowedError" | "NotFoundError" | "NotSupportedError" | "InvalidStateError" | "InUseAttributeError" | "SyntaxError" | "InvalidModificationError" | "NamespaceError" | "InvalidAccessError" | "TypeMismatchError" | "SecurityError" | "NetworkError" | "AbortError" | "URLMismatchError" | "QuotaExceededError" | "TimeoutError" | "InvalidNodeTypeError" | "DataCloneError" | "EncodingError" | "NotReadableError" | "UnknownError" | "ConstraintError" | "DataError" | "TransactionInactiveError" | "ReadOnlyError" | "VersionError" | "OperationError" | "NotAllowedError";
+
+export { EffectCallback }
 
 declare interface EffectChange<I extends Inputs, N extends number> {
     from: I[N];
@@ -378,18 +437,15 @@ export declare function enableLoggingPropConflicts(log2: typeof console["log"]):
 
 export declare type EnhancedEventHandler<E extends Event, Detail> = (e: TargetedEnhancedEvent<E, Detail>) => void;
 
-export declare function enhanceEvent<E extends Event, Detail extends object>(e: E, detail: Detail): TargetedEnhancedEvent<E, Detail>;
+export declare function enhanceEvent<E extends Event | EventType<any, any>, Detail extends object>(e: E, detail: Detail): TargetedEnhancedEvent<E & Event, Detail>;
 
-/**
- * Quick and easy way to add extra information to an event that was fired.
- *
- * For example, "this was a click event, but it has information about what list item was pressed too."
- *
- * Get that extra information from the [EventDetail] symbol.
- */
 export declare const EventDetail: unique symbol;
 
 export declare type EventDetail = typeof EventDetail;
+
+export declare const EventMapping: {
+    [K in keyof HTMLElementEventMap]: (keyof JSX.IntrinsicElements["div"] & `on${string}`);
+};
 
 export declare type EventType<T extends EventTarget, E extends Event> = JSX.TargetedEvent<T, E>;
 
@@ -451,6 +507,10 @@ export { focus_2 as focus }
 
 export declare type FocusEventType<E extends EventTarget> = JSX.TargetedFocusEvent<E>;
 
+export { forwardRef }
+
+export { Fragment }
+
 /**
  * Returns a randomly-generated ID with an optional prefix.
  * Note that if the prefix is *explicitly* set to "", then
@@ -466,9 +526,16 @@ export declare function generateStack(): string | undefined;
 
 export declare type GetAttribute<T extends Element> = UseImperativePropsReturnTypeSelf<T>["getAttribute"];
 
+/**
+ * Controls other development hooks by checking for a global variable called `process.env.NODE_ENV`
+ *
+ * @remarks Bundlers like Rollup will actually noop-out development code if  `process.env.NODE_ENV !== "development"` (which, of course, covers the default case where `process.env.NODE_ENV` just doesn't exist).
+ */
 export declare function getBuildMode(): "production" | "development";
 
 export declare function getDocument(element?: Node): Document;
+
+export declare function getEventDetail<Detail>(e: TargetedEnhancedEvent<any, Detail>): Detail;
 
 export declare function getFromLocalStorage<Key extends (keyof PersistentStates) & string>(key: Key, converter?: ((input: string) => PersistentStates[Key]), storage?: Storage): PersistentStates[Key] | null;
 
@@ -476,24 +543,26 @@ export declare type GetHighestChildIndex = () => number;
 
 export declare type GetIndex = (row: VNode) => (number | null | undefined);
 
+export declare function getTopElement(): HTMLElement | null;
+
 export declare type GetValid = (index: number) => boolean;
 
 export declare interface GridChildCellInfo<CellElement extends Element> extends UseListNavigationChildInfo<CellElement> {
 }
 
-export declare interface GridChildRowInfo<RowElement extends Element, _CellElement extends Element> extends UseListNavigationChildInfo<RowElement> {
+export declare interface GridChildRowInfo<RowElement extends Element> extends UseListNavigationChildInfo<RowElement> {
 }
 
 export declare interface GridSingleSelectChildCellInfo<CellElement extends Element> extends GridChildCellInfo<CellElement> {
 }
 
-export declare interface GridSingleSelectChildRowInfo<RowElement extends Element, CellElement extends Element> extends GridChildRowInfo<RowElement, CellElement>, UseSingleSelectionChildInfo<RowElement> {
+export declare interface GridSingleSelectChildRowInfo<RowElement extends Element> extends GridChildRowInfo<RowElement>, UseSingleSelectionChildInfo<RowElement> {
 }
 
-export declare interface GridSingleSelectSortableChildCellInfo<CellElement extends Element> extends GridSingleSelectChildCellInfo<CellElement> {
+export declare interface GridSingleSelectSortableChildCellInfo<CellElement extends Element> extends GridSingleSelectChildCellInfo<CellElement>, UseSortableChildInfo {
 }
 
-export declare interface GridSingleSelectSortableChildRowInfo<RowElement extends Element, CellElement extends Element> extends GridSingleSelectChildRowInfo<RowElement, CellElement>, UseSortableChildInfo {
+export declare interface GridSingleSelectSortableChildRowInfo<RowElement extends Element> extends GridSingleSelectChildRowInfo<RowElement>, UseSortableChildInfo {
 }
 
 export declare type HasClass = UseImperativePropsReturnTypeSelf<any>["hasClass"];
@@ -525,12 +594,16 @@ declare interface ImperativeElementProps<T extends keyof HTMLElementTagNameMap> 
 
 declare function ImperativeElementU<T extends keyof HTMLElementTagNameMap>({ tag: Tag, handle, ...props }: RenderableProps<ImperativeElementProps<T>>, ref: Ref<HTMLElementTagNameMap[T]>): VNode_2<any>;
 
+export { Inputs }
+
 declare interface InternalChildInfo<M extends ManagedChildInfo<string | number>> {
     arr: Array<M>;
     rec: Partial<Record<M["index"], M>>;
     highestIndex: number;
     lowestIndex: number;
 }
+
+export { JSX }
 
 export declare type KeyboardEventType<E extends EventTarget> = JSX.TargetedKeyboardEvent<E>;
 
@@ -627,7 +700,7 @@ export declare interface LogicalElementSize {
 export declare type LogicalOrientation = "inline" | "block";
 
 export declare type MakeSingleSelectionDeclarativeParameters<P> = Omit<P, "singleSelectionParameters"> & UseSingleSelectionDeclarativeParameters & {
-    singleSelectionParameters: Pick<UseSingleSelectionParameters<any, any, any>["singleSelectionParameters"], "ariaPropName" | "selectionMode">;
+    singleSelectionParameters: Pick<UseSingleSelectionParameters<any, any>["singleSelectionParameters"], "ariaPropName" | "selectionMode">;
 };
 
 export declare type MakeSingleSelectionDeclarativeReturnType<R> = Omit<R, "singleSelectionReturn">;
@@ -652,17 +725,31 @@ export declare interface ManagedChildInfo<T extends string | number> {
  * Abstraction over the managed children
  */
 export declare interface ManagedChildren<M extends ManagedChildInfo<any>> {
-    /** STABLE */
+    /**
+     * Returns the `info` of the child at the specified index.
+     *
+     * @remarks This is the same as what's passed to `useManagedChild`.
+     *
+     * @stable
+     */
     getAt(index: M["index"]): M | undefined;
     /**
-     * STABLE
+     * Returns the highest number corresponding to a child. Inclusive. It's `while (i <= highest)`.
      *
-     * @returns The highest number corresponding to a child. Inclusive. Use `<=`.
+     * @stable
      */
     getHighestIndex(): number;
-    /** STABLE */
+    /**
+     * Returns the lowest number corresponding to a child, often 0. Inclusive, but hopefully that wasn't in question.
+     *
+     * @stable
+     */
     getLowestIndex(): number;
-    /** STABLE */
+    /**
+     * Executes a callback on every existing child.
+     *
+     * @stable
+     */
     forEach: (f: (child: M) => void) => void | "break";
     /**
      * **UNSTABLE**,
@@ -678,15 +765,21 @@ export declare interface ManagedChildren<M extends ManagedChildInfo<any>> {
      * This behavior, to be clear, is only necessary for sorting and rearranging because
      * sorting and rearranging require knowing perfectly which index maps to which.
      * We don't need any other missing information in the array besides the missing index.
-     * */
-    arraySlice: () => M[];
+     *
+     * @internal
+     */
+    _arraySlice: () => M[];
 }
+
+export { memo }
 
 export declare function mergeFunctions<T extends (...args: any[]) => (void | Promise<void>), U extends (...args: any[]) => (void | Promise<void>)>(lhs: T | null | undefined, rhs: U | null | undefined): T | U | ((...args: Parameters<T>) => Promise<[void, void]> | undefined) | null | undefined;
 
 export declare const monitorCallCount: typeof callCountU;
 
 export declare type MouseEventType<E extends EventTarget> = JSX.TargetedMouseEvent<E>;
+
+export { MutableRef }
 
 /** Opposite of NonNullable */
 export declare type Nullable<T = null> = null | undefined | T;
@@ -697,6 +790,10 @@ export declare type OmitStrong<T, K extends keyof T> = Omit<T, K>;
 export declare type OnAfterChildLayoutEffect<T extends string | number> = ((causers: Iterable<T>) => void);
 
 export declare type OnChildrenMountChange<T extends string | number> = ((mounted: Set<T>, unmounted: Set<T>) => void);
+
+export declare const onfocusin = "onfocusin";
+
+export declare const onfocusout = "onfocusout";
 
 export declare type OnParamValueChanged<T> = OnPassiveStateChange<T, never>;
 
@@ -753,13 +850,15 @@ export declare function ProvideBatchedAnimationFrames({ children }: {
 
 export declare type PushPortalChild = UsePortalChildrenReturnType["pushChild"];
 
+export { Reducer }
+
 export { Ref }
 
 export { RefCallback }
 
-export { RefObject }
-
 export declare type RemovePortalChild = UsePortalChildrenReturnType["removeChild"];
+
+export { RenderableProps }
 
 export declare function returnFalse(): boolean;
 
@@ -779,9 +878,10 @@ export declare interface RovingTabIndexChildContext {
 }
 
 export declare interface RovingTabIndexChildContextSelf {
-    untabbable: boolean;
-    untabbableBehavior: "focus-parent" | "leave-child-focused";
-    parentFocusSelf: () => void;
+    getUntabbable(): boolean;
+    getUntabbableBehavior(): "focus-parent" | "leave-child-focused";
+    /** `force` refers to if the untabbableBehavior is ignored. E.G. `force` temporarily disables `leave-child-focused`. */
+    parentFocusSelf: (force: boolean) => void;
     giveParentFocusedElement(element: Element): void;
     setTabbableIndex: SetTabbableIndex;
     getInitiallyTabbedIndex(): number | null;
@@ -842,13 +942,15 @@ export declare function setPressVibrate(func: () => void): void;
 
 export declare type SetStyle = UseImperativePropsReturnTypeSelf<any>["setStyle"];
 
-export declare type SetTabbableIndex = (updater: Parameters<PassiveStateUpdater<number | null, Event>>[0], reason: Event | undefined, fromUserInteraction: boolean) => void;
+export declare type SetTabbableIndex = (updater: Parameters<PassiveStateUpdater<number | null, EventType<any, any>>>[0], reason: EventType<any, any> | undefined, fromUserInteraction: boolean) => void;
 
 export declare interface SingleSelectionContextSelf extends Pick<UseSingleSelectionParametersSelf, "ariaPropName" | "selectionMode" | "onSelectedIndexChange"> {
     getSelectedIndex(): number | null;
 }
 
 declare type Stable<T> = T;
+
+export { StateUpdater }
 
 export declare function storeToLocalStorage<Key extends (keyof PersistentStates) & string>(key: Key, value: PersistentStates[Key], converter?: ((input: PersistentStates[Key]) => string), storage?: Storage): void;
 
@@ -962,7 +1064,7 @@ export declare type UpdatePortalChild = UsePortalChildrenReturnType["updateChild
  *
  * @compositeParams
  */
-export declare function useActiveElement({ activeElementParameters: { onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument, getWindow } }: UseActiveElementParameters): UseActiveElementReturnType;
+export declare function useActiveElement({ activeElementParameters: { onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, getDocument } }: UseActiveElementParameters): UseActiveElementReturnType;
 
 export declare interface UseActiveElementParameters {
     activeElementParameters: UseActiveElementParametersSelf;
@@ -974,19 +1076,19 @@ export declare interface UseActiveElementParametersSelf {
      *
      * @stable
      */
-    onActiveElementChange?: Nullable<OnPassiveStateChange<Element | null, FocusEvent>>;
+    onActiveElementChange: Nullable<OnPassiveStateChange<Element | null, FocusEvent>>;
     /**
      * Called any time the active element changes and is not null.
      *
      * @stable
      */
-    onLastActiveElementChange?: Nullable<OnPassiveStateChange<Element, FocusEvent>>;
+    onLastActiveElementChange: Nullable<OnPassiveStateChange<Element, FocusEvent>>;
     /**
      * Called any time the window gains/loses focus.
      *
      * @stable
      */
-    onWindowFocusedChange?: Nullable<OnPassiveStateChange<boolean, FocusEvent>>;
+    onWindowFocusedChange: Nullable<OnPassiveStateChange<boolean, FocusEvent>>;
     /**
      * This must be a function that returns the document associated with whatever elements we're listening to.
      *
@@ -995,13 +1097,6 @@ export declare interface UseActiveElementParametersSelf {
      * @stable
      */
     getDocument(): Document;
-    /**
-     * By default, event handlers are attached to the document's defaultView Window.
-     * If you need something different, override it here.
-     *
-     * @stable
-     */
-    getWindow?: Nullable<((document: Document) => Window)>;
 }
 
 export declare interface UseActiveElementReturnType {
@@ -1043,7 +1138,7 @@ export declare interface UseAnimationFrameParameters {
      *
      * Doesn't need to be stable.
      */
-    callback: null | ((msSinceLast: number) => void);
+    callback: Nullable<((msSinceLast: number) => void)>;
 }
 
 /**
@@ -1075,7 +1170,7 @@ export declare interface UseAnimationFrameParameters {
  * @param options - @see {@link UseAsyncParameters}
  *
  */
-export declare function useAsync<AP extends unknown[], R, SP extends unknown[] = AP>(asyncHandler: AsyncFunctionType<AP, R> | null, options?: UseAsyncParameters<AP, SP>): UseAsyncReturnType<SP, R>;
+export declare function useAsync<AP extends unknown[], R, SP extends unknown[] = AP>(asyncHandler: Nullable<AsyncFunctionType<AP, R>>, options?: UseAsyncParameters<AP, SP>): UseAsyncReturnType<SP, R>;
 
 /**
  * Combines the semantics of `useAsync` and `useEffect`.
@@ -1099,7 +1194,7 @@ export declare function useAsyncEffect<I extends Inputs>(effect: () => Promise<(
     hasResult: boolean;
     error: unknown;
     hasError: boolean;
-    invocationResult: "sync" | "async" | "throw" | null;
+    invocationResult: "async" | "sync" | "throw" | null;
     flushDebouncedPromise: () => void;
 };
 
@@ -1183,7 +1278,7 @@ export declare interface UseAsyncHandlerParameters<EventType, CaptureType> exten
     /**
      * The function (either async or sync) that you want to convert to a regular, sync event handler.
      */
-    asyncHandler: AsyncHandler<EventType, CaptureType> | null;
+    asyncHandler: Nullable<AsyncHandler<EventType, CaptureType>>;
 }
 
 export declare interface UseAsyncHandlerReturnType<EventType, CaptureType> extends UseAsyncReturnType<[EventType], void> {
@@ -1202,8 +1297,8 @@ export declare interface UseAsyncHandlerReturnType<EventType, CaptureType> exten
     currentCapture: CaptureType | undefined;
     /**
      * The above, but stable, if you need the current capture without it being an explicit dependency.
-     * **STABLE**
-     *  */
+     * @stable
+     */
     getCurrentCapture(): (CaptureType | undefined);
     /**
      * Because you're allowed to have `CaptureType` extend `undefined`,
@@ -1217,7 +1312,7 @@ export declare interface UseAsyncParameters<AP extends unknown[], SP extends unk
      * If provided, adds a debounce behavior *in addition* to
      * the default "wait until resolved" throttling behavior.
      */
-    debounce?: number;
+    debounce: Nullable<number>;
     /**
      * By default, `useAsync` will auto-throttle based on how long it takes
      * for the operation to complete.  If you would like there to be a
@@ -1229,7 +1324,7 @@ export declare interface UseAsyncParameters<AP extends unknown[], SP extends unk
      * another one will be run immediately. If it took 100ms, then we'd wait
      * for the remaining 400ms until allowing a second run.
      */
-    throttle?: number;
+    throttle: Nullable<number>;
     /**
      * When an async function is debounced due to one already running,
      * it will run on a delay and, as a result, the original arguments
@@ -1250,7 +1345,7 @@ export declare interface UseAsyncParameters<AP extends unknown[], SP extends unk
      *
      * @nonstable
      */
-    capture?: CaptureFunctionType<AP, SP>;
+    capture: Nullable<CaptureFunctionType<AP, SP>>;
 }
 
 export declare interface UseAsyncReturnType<SP extends unknown[], R> {
@@ -1379,6 +1474,43 @@ export declare interface UseBackdropDismissParametersSelf {
 }
 
 /**
+ * Semi-private function to allow stable callbacks even within `useLayoutEffect` and ref assignment.
+ *
+ * @remarks Every render, we send the arguments to be evaluated after diffing has completed,
+ * which happens before.
+ *
+ * @param effect
+ * @param inputs
+ */
+export declare function useBeforeLayoutEffect(effect: EffectCallback | null, inputs?: Inputs): void;
+
+/**
+ * Allows an element to trap focus by applying the "inert" attribute to all sibling, aunt, and uncle nodes.
+ *
+ * @remarks Automatically handles consecutive calls with a loosely applied stack operation
+ * (specifically via `blockingElements`, with a small polyfill because I'm not sure how long
+ * it'll take to find its way into the spec, if ever)
+ *
+ * @param target
+ */
+export declare function useBlockingElement<E extends Element>({ activeElementParameters: { getDocument, onActiveElementChange, onLastActiveElementChange, onWindowFocusedChange, ...void3 }, blockingElementParameters: { enabled, getTarget, ...void1 }, ...void2 }: UseBlockingElementParameters<E>): {
+    getTop: () => HTMLElement | null;
+    getLastActiveWhenClosed: () => HTMLElement | null;
+    getLastActiveWhenOpen: () => HTMLElement | null;
+};
+
+export declare interface UseBlockingElementParameters<E extends Element> extends UseActiveElementParameters {
+    blockingElementParameters: UseBlockingElementParametersSelf<E>;
+}
+
+export declare interface UseBlockingElementParametersSelf<E extends Element> {
+    enabled: boolean;
+    getTarget(): (E | null);
+}
+
+export { useCallback }
+
+/**
  * An extension to useManagedChildren that handles the following common case:
  * 1. You have a bunch of children
  * 2. At any given time, only 1 of them is "selected", "activated", "focusable", whatever (or 0 of them, that's cool too, just 0 or 1 though).
@@ -1432,7 +1564,7 @@ export declare interface UseChildrenFlagParameters<M extends ManagedChildInfo<an
 
 export declare interface UseChildrenFlagReturnType<M extends ManagedChildInfo<any>, R> {
     /**
-     * **STABLE**
+     * @stable
      *
      * Manually changes the current index that is (focused/selected/tabbable/whatever).
      *
@@ -1442,12 +1574,12 @@ export declare interface UseChildrenFlagReturnType<M extends ManagedChildInfo<an
      */
     changeIndex: PassiveStateUpdater<M["index"] | null, R>;
     /**
-     * **STABLE**
+     * @stable
      *
      * Call this whenever a child mounts/unmounts, or whenever calling a child's isValid() would change
-     *  */
+     */
     reevaluateClosestFit: () => void;
-    /** **STABLE** */
+    /** @stable */
     getCurrentIndex: () => M["index"] | null;
 }
 
@@ -1478,7 +1610,7 @@ export declare interface UseChildrenHaveFocusChildReturnType<E extends Element> 
 
 export declare interface UseChildrenHaveFocusContext<T extends Element> {
     childrenHaveFocusChildContext: {
-        /** **STABLE** */
+        /** @stable */
         setFocusCount: PassiveStateUpdater<number, FocusEventType<T>>;
     };
 }
@@ -1502,6 +1634,7 @@ export declare interface UseChildrenHaveFocusReturnType<T extends Element> {
 }
 
 export declare interface UseChildrenHaveFocusReturnTypeSelf {
+    /** @stable */
     getAnyFocused(): boolean;
 }
 
@@ -1513,56 +1646,56 @@ export declare interface UseChildrenHaveFocusReturnTypeSelf {
  * @hasChild {@link useCompleteGridNavigationRow}
  * @hasChild {@link useCompleteGridNavigationCell}
  */
-export declare function useCompleteGridNavigation<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement, CellElement>, CM extends UseCompleteGridNavigationCellInfo<CellElement>>({ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, typeaheadNavigationParameters, sortableChildrenParameters, rearrangeableChildrenParameters, paginatedChildrenParameters, staggeredChildrenParameters, ...void1 }: UseCompleteGridNavigationParameters<ParentOrRowElement, RowElement, CellElement, RM>): UseCompleteGridNavigationReturnType<ParentOrRowElement, RowElement, CellElement, RM, CM>;
+export declare function useCompleteGridNavigation<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>, CM extends UseCompleteGridNavigationCellInfo<CellElement>>({ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, typeaheadNavigationParameters, sortableChildrenParameters, rearrangeableChildrenParameters, paginatedChildrenParameters, staggeredChildrenParameters, ...void1 }: UseCompleteGridNavigationParameters<ParentOrRowElement, RowElement, RM>): UseCompleteGridNavigationReturnType<ParentOrRowElement, RowElement, CellElement, RM>;
 
 /**
  * @compositeParams
  */
-export declare function useCompleteGridNavigationCell<CellElement extends Element, CM extends UseCompleteGridNavigationCellInfo<CellElement>>({ gridNavigationCellParameters, context: { gridNavigationCellContext, managedChildContext, rovingTabIndexContext, typeaheadNavigationContext }, textContentParameters, info, ...void1 }: UseCompleteGridNavigationCellParameters<CellElement, CM>): UseCompleteGridNavigationCellReturnType<CellElement, CM>;
+export declare function useCompleteGridNavigationCell<CellElement extends Element, CM extends UseCompleteGridNavigationCellInfo<CellElement>>({ gridNavigationCellParameters, context, textContentParameters, info: { focusSelf, index, untabbable, getSortValue, ...customUserInfo }, ...void1 }: UseCompleteGridNavigationCellParameters<CellElement, CM>): UseCompleteGridNavigationCellReturnType<CellElement, CM>;
 
-export declare interface UseCompleteGridNavigationCellInfo<CellElement extends Element> extends GridSingleSelectSortableChildCellInfo<CellElement> {
+export declare interface UseCompleteGridNavigationCellInfo<CellElement extends Element> extends GridSingleSelectSortableChildCellInfo<CellElement>, ManagedChildInfo<number> {
 }
 
-export declare interface UseCompleteGridNavigationCellParameters<CellElement extends Element, CM extends UseCompleteGridNavigationCellInfo<CellElement>> extends OmitStrong<UseGridNavigationSingleSelectionCellParameters<any, CellElement, CM>, "info" | "context" | "refElementReturn"> {
-    info: Omit<CM, Exclude<keyof UseCompleteGridNavigationCellInfo<CellElement>, "index" | "untabbable" | "focusSelf">>;
-    context: CompleteGridNavigationCellContext<any, CellElement, CM>;
+export declare type UseCompleteGridNavigationCellInfoKeysParameters<M extends UseCompleteGridNavigationCellInfo<any>> = Exclude<keyof M, keyof UseCompleteGridNavigationCellInfo<any>> | UseGridNavigationSingleSelectionSortableCellInfoKeysParameters | "getSortValue" | "focusSelf";
+
+export declare interface UseCompleteGridNavigationCellParameters<CellElement extends Element, CM extends UseCompleteGridNavigationCellInfo<CellElement>> extends UseGenericChildParameters<CompleteGridNavigationCellContext<CellElement, CM>, Pick<CM, UseCompleteGridNavigationCellInfoKeysParameters<CM>>>, OmitStrong<UseGridNavigationSingleSelectionSortableCellParameters<CellElement, CM>, "info" | "context" | "refElementReturn"> {
 }
 
-export declare interface UseCompleteGridNavigationCellReturnType<CellElement extends Element, CM extends UseCompleteGridNavigationCellInfo<CellElement>> extends OmitStrong<UseGridNavigationSingleSelectionSortableCellReturnType<CellElement, CM>, "hasCurrentFocusParameters" | "info">, OmitStrong<UseRefElementReturnType<CellElement>, "propsStable">, UseHasCurrentFocusReturnType<CellElement>, UseManagedChildReturnType<CM> {
+export declare interface UseCompleteGridNavigationCellReturnType<CellElement extends Element, CM extends UseCompleteGridNavigationCellInfo<CellElement>> extends OmitStrong<UseGridNavigationSingleSelectionSortableCellReturnType<CellElement>, "hasCurrentFocusParameters" | "info">, OmitStrong<UseRefElementReturnType<CellElement>, "propsStable">, UseHasCurrentFocusReturnType<CellElement>, UseManagedChildReturnType<CM> {
     props: ElementProps<CellElement>;
 }
 
-export declare function useCompleteGridNavigationDeclarative<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement, CellElement>, CM extends UseCompleteGridNavigationCellInfo<CellElement>>({ gridNavigationParameters, linearNavigationParameters, paginatedChildrenParameters, rearrangeableChildrenParameters, rovingTabIndexParameters, singleSelectionDeclarativeParameters, sortableChildrenParameters, staggeredChildrenParameters, typeaheadNavigationParameters, singleSelectionParameters, }: UseCompleteGridNavigationDeclarativeParameters<ParentOrRowElement, RowElement, CellElement, RM, CM>): UseCompleteGridNavigationDeclarativeReturnType<ParentOrRowElement, RowElement, CellElement, RM, CM>;
+export declare function useCompleteGridNavigationDeclarative<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>, CM extends UseCompleteGridNavigationCellInfo<CellElement>>({ gridNavigationParameters, linearNavigationParameters, paginatedChildrenParameters, rearrangeableChildrenParameters, rovingTabIndexParameters, singleSelectionDeclarativeParameters, sortableChildrenParameters, staggeredChildrenParameters, typeaheadNavigationParameters, singleSelectionParameters, }: UseCompleteGridNavigationDeclarativeParameters<ParentOrRowElement, RowElement, RM>): UseCompleteGridNavigationDeclarativeReturnType<ParentOrRowElement, RowElement, CellElement, RM, CM>;
 
-export declare interface UseCompleteGridNavigationDeclarativeParameters<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement, CellElement>, CM extends UseCompleteGridNavigationCellInfo<CellElement>> extends OmitStrong<MakeSingleSelectionDeclarativeParameters<UseCompleteGridNavigationParameters<ParentOrRowElement, RowElement, CellElement, RM>>, "singleSelectionReturn"> {
+export declare interface UseCompleteGridNavigationDeclarativeParameters<ParentOrRowElement extends Element, RowElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>> extends OmitStrong<MakeSingleSelectionDeclarativeParameters<UseCompleteGridNavigationParameters<ParentOrRowElement, RowElement, RM>>, "singleSelectionReturn"> {
 }
 
-export declare interface UseCompleteGridNavigationDeclarativeReturnType<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement, CellElement>, CM extends UseCompleteGridNavigationCellInfo<CellElement>> extends TargetedOmit<UseCompleteGridNavigationReturnType<ParentOrRowElement, RowElement, CellElement, RM, CM>, "singleSelectionReturn", "changeSelectedIndex">, OmitStrong<UseCompleteGridNavigationReturnType<ParentOrRowElement, RowElement, CellElement, RM, CM>, "singleSelectionReturn"> {
+export declare interface UseCompleteGridNavigationDeclarativeReturnType<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>, CM extends UseCompleteGridNavigationCellInfo<CellElement>> extends TargetedOmit<UseCompleteGridNavigationReturnType<ParentOrRowElement, RowElement, CellElement, RM>, "singleSelectionReturn", "changeSelectedIndex">, OmitStrong<UseCompleteGridNavigationReturnType<ParentOrRowElement, RowElement, CellElement, RM>, "singleSelectionReturn"> {
 }
 
-export declare interface UseCompleteGridNavigationParameters<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, M extends UseCompleteGridNavigationRowInfo<RowElement, CellElement>> extends OmitStrong<UseGridNavigationSingleSelectionSortableParameters<ParentOrRowElement, RowElement, CellElement, M>, "refElementReturn" | "managedChildrenReturn" | "linearNavigationParameters" | "typeaheadNavigationParameters" | "rearrangeableChildrenParameters" | "rovingTabIndexParameters">, TargetedOmit<UseGridNavigationSingleSelectionParameters<ParentOrRowElement, RowElement, CellElement, M>, "linearNavigationParameters", "getLowestIndex" | "getHighestIndex" | "indexMangler" | "indexDemangler" | "isValid">, TargetedOmit<UseGridNavigationSingleSelectionParameters<ParentOrRowElement, RowElement, CellElement, M>, "typeaheadNavigationParameters", "isValid">, TargetedOmit<UseGridNavigationSingleSelectionSortableParameters<ParentOrRowElement, RowElement, CellElement, M>, "rearrangeableChildrenParameters", "onRearranged">, TargetedOmit<UseGridNavigationSingleSelectionSortableParameters<ParentOrRowElement, RowElement, CellElement, M>, "rovingTabIndexParameters", "initiallyTabbedIndex" | "untabbableBehavior">, Pick<UsePaginatedChildrenParameters<ParentOrRowElement, RowElement, M>, "paginatedChildrenParameters">, Pick<UseStaggeredChildrenParameters<RowElement, M>, "staggeredChildrenParameters"> {
+export declare interface UseCompleteGridNavigationParameters<ParentOrRowElement extends Element, RowElement extends Element, M extends UseCompleteGridNavigationRowInfo<RowElement>> extends OmitStrong<UseGridNavigationSingleSelectionSortableParameters<ParentOrRowElement, RowElement, M>, "refElementReturn" | "managedChildrenReturn" | "linearNavigationParameters" | "typeaheadNavigationParameters" | "rearrangeableChildrenParameters" | "rovingTabIndexParameters">, TargetedOmit<UseGridNavigationSingleSelectionSortableParameters<ParentOrRowElement, RowElement, M>, "linearNavigationParameters", "getLowestIndex" | "getHighestIndex" | "isValidForLinearNavigation">, TargetedOmit<UseGridNavigationSingleSelectionSortableParameters<ParentOrRowElement, RowElement, M>, "typeaheadNavigationParameters", "isValidForTypeaheadNavigation">, TargetedOmit<UseGridNavigationSingleSelectionSortableParameters<ParentOrRowElement, RowElement, M>, "rearrangeableChildrenParameters", "onRearranged">, TargetedOmit<UseGridNavigationSingleSelectionSortableParameters<ParentOrRowElement, RowElement, M>, "rovingTabIndexParameters", "initiallyTabbedIndex" | "untabbableBehavior">, Pick<UsePaginatedChildrenParameters<ParentOrRowElement, RowElement>, "paginatedChildrenParameters">, Pick<UseStaggeredChildrenParameters, "staggeredChildrenParameters"> {
 }
 
-export declare interface UseCompleteGridNavigationReturnType<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement, CellElement>, CM extends UseCompleteGridNavigationCellInfo<CellElement>> extends Pick<UsePaginatedChildrenReturnType, "paginatedChildrenReturn">, Pick<UseStaggeredChildrenReturnType, "staggeredChildrenReturn">, Pick<UseManagedChildrenReturnType<RM>, "managedChildrenReturn">, Pick<UseChildrenHaveFocusReturnType<RowElement>, "childrenHaveFocusReturn">, OmitStrong<UseGridNavigationSingleSelectionSortableReturnType<ParentOrRowElement, RowElement, CellElement, RM, CM>, "propsStableParentOrChild" | "propsParent" | "context" | "childrenHaveFocusParameters" | "managedChildrenParameters"> {
-    context: CompleteGridNavigationRowContext<ParentOrRowElement, RowElement, CellElement, RM, CM>;
+export declare interface UseCompleteGridNavigationReturnType<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>> extends Pick<UsePaginatedChildrenReturnType, "paginatedChildrenReturn">, Pick<UseStaggeredChildrenReturnType, "staggeredChildrenReturn">, Pick<UseManagedChildrenReturnType<RM>, "managedChildrenReturn">, Pick<UseChildrenHaveFocusReturnType<RowElement>, "childrenHaveFocusReturn">, OmitStrong<UseGridNavigationSingleSelectionSortableReturnType<ParentOrRowElement, RowElement, RM>, "propsStableParentOrChild" | "propsParent" | "context" | "childrenHaveFocusParameters" | "managedChildrenParameters"> {
+    context: CompleteGridNavigationRowContext<RowElement, RM>;
     props: ElementProps<ParentOrRowElement>;
 }
 
 /**
  * @compositeParams
  */
-export declare function useCompleteGridNavigationRow<RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement, CellElement>, CM extends UseCompleteGridNavigationCellInfo<CellElement>>({ info, context: contextIncomingForRowAsChildOfTable, textContentParameters, linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, ...void1 }: UseCompleteGridNavigationRowParameters<RowElement, CellElement, RM, CM>): UseCompleteGridNavigationRowReturnType<RowElement, CellElement, RM, CM>;
+export declare function useCompleteGridNavigationRow<RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>, CM extends UseCompleteGridNavigationCellInfo<CellElement>>({ info: { index, unselectable, untabbable, ...customUserInfo }, context: contextIncomingForRowAsChildOfTable, textContentParameters, linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, hasCurrentFocusParameters: { onCurrentFocusedChanged: ocfc1, onCurrentFocusedInnerChanged: ocfic3, ...void5 }, ...void1 }: UseCompleteGridNavigationRowParameters<RowElement, CellElement, RM, CM>): UseCompleteGridNavigationRowReturnType<RowElement, CellElement, RM, CM>;
 
-export declare interface UseCompleteGridNavigationRowInfo<RowElement extends Element, CellElement extends Element> extends GridSingleSelectSortableChildRowInfo<RowElement, CellElement>, UsePaginatedChildrenInfo<RowElement>, UseStaggeredChildrenInfo<RowElement> {
+export declare interface UseCompleteGridNavigationRowInfo<RowElement extends Element> extends GridSingleSelectSortableChildRowInfo<RowElement>, UsePaginatedChildrenInfo<RowElement>, UseStaggeredChildrenInfo, ManagedChildInfo<number> {
 }
 
-export declare interface UseCompleteGridNavigationRowParameters<RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement, CellElement>, CM extends UseCompleteGridNavigationCellInfo<CellElement>> extends OmitStrong<UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM>, "context" | "textContentParameters" | "managedChildrenReturn" | "refElementReturn" | "linearNavigationParameters" | "typeaheadNavigationParameters">, TargetedOmit<UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM>, "textContentParameters", never>, TargetedOmit<UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM>, "linearNavigationParameters", "getLowestIndex" | "getHighestIndex" | "pageNavigationSize" | "isValid" | "indexMangler" | "indexDemangler">, TargetedOmit<UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM>, "typeaheadNavigationParameters", "isValid"> {
-    context: CompleteGridNavigationRowContext<any, RowElement, CellElement, RM, CM>;
-    info: OmitStrong<RM, Exclude<keyof UseCompleteGridNavigationRowInfo<RowElement, CellElement>, "getSortValue" | "index" | "untabbable" | "unselectable">>;
+export declare type UseCompleteGridNavigationRowInfoKeysParameters<M extends UseCompleteGridNavigationRowInfo<any>> = Exclude<keyof M, keyof UseCompleteGridNavigationRowInfo<any>> | UseGridNavigationSingleSelectionSortableRowInfoKeysParameters;
+
+export declare interface UseCompleteGridNavigationRowParameters<RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>, CM extends UseCompleteGridNavigationCellInfo<CellElement>> extends UseGenericChildParameters<CompleteGridNavigationRowContext<RowElement, RM>, Pick<RM, UseCompleteGridNavigationRowInfoKeysParameters<RM>>>, OmitStrong<UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM>, "info" | "context" | "textContentParameters" | "managedChildrenReturn" | "refElementReturn" | "linearNavigationParameters" | "typeaheadNavigationParameters">, Pick<UseHasCurrentFocusParameters<RowElement>, "hasCurrentFocusParameters">, TargetedOmit<UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM>, "textContentParameters", never>, TargetedOmit<UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM>, "linearNavigationParameters", "getLowestIndex" | "getHighestIndex" | "pageNavigationSize" | "isValidForLinearNavigation" | "indexMangler" | "indexDemangler">, TargetedOmit<UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM>, "typeaheadNavigationParameters", "isValidForTypeaheadNavigation"> {
 }
 
-export declare interface UseCompleteGridNavigationRowReturnType<RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement, CellElement>, CM extends UseCompleteGridNavigationCellInfo<CellElement>> extends OmitStrong<UseGridNavigationSingleSelectionSortableRowReturnType<RowElement, CellElement, RM, CM>, "hasCurrentFocusParameters" | "context" | "managedChildrenParameters" | "info" | "textContentReturn">, Pick<UseManagedChildrenReturnType<CM>, "managedChildrenReturn">, Pick<UseHasCurrentFocusReturnType<RowElement>, "hasCurrentFocusReturn">, Pick<UseManagedChildReturnType<RM>, "managedChildReturn">, Pick<UsePaginatedChildReturnType<RowElement>, "paginatedChildReturn">, Pick<UseStaggeredChildReturnType<RowElement>, "staggeredChildReturn">, Pick<UseGridNavigationSingleSelectionSortableRowReturnType<RowElement, CellElement, RM, CM>, "textContentReturn"> {
-    context: CompleteGridNavigationCellContext<RowElement, CellElement, CM>;
+export declare interface UseCompleteGridNavigationRowReturnType<RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>, CM extends UseCompleteGridNavigationCellInfo<CellElement>> extends OmitStrong<UseGridNavigationSingleSelectionSortableRowReturnType<RowElement, CellElement, RM, CM>, "hasCurrentFocusParameters" | "managedChildrenParameters" | "info" | "textContentReturn">, Pick<UseManagedChildrenReturnType<CM>, "managedChildrenReturn">, Pick<UseHasCurrentFocusReturnType<RowElement>, "hasCurrentFocusReturn">, Pick<UseManagedChildReturnType<RM>, "managedChildReturn">, Pick<UsePaginatedChildReturnType<RowElement>, "paginatedChildReturn">, Pick<UseStaggeredChildReturnType<RowElement>, "staggeredChildReturn">, Pick<UseGridNavigationSingleSelectionSortableRowReturnType<RowElement, CellElement, RM, CM>, "textContentReturn"> {
+    context: CompleteGridNavigationCellContext<CellElement, CM>;
 }
 
 /**
@@ -1575,24 +1708,24 @@ export declare interface UseCompleteGridNavigationRowReturnType<RowElement exten
  *
  * @compositeParams
  */
-export declare function useCompleteListNavigation<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>>({ linearNavigationParameters, rearrangeableChildrenParameters, sortableChildrenParameters, typeaheadNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, paginatedChildrenParameters, staggeredChildrenParameters, ...completeListNavigationParameters }: UseCompleteListNavigationParameters<ParentElement, ChildElement, M>): UseCompleteListNavigationReturnType<ParentElement, ChildElement, M>;
+export declare function useCompleteListNavigation<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>>({ linearNavigationParameters, rearrangeableChildrenParameters, sortableChildrenParameters, typeaheadNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, paginatedChildrenParameters, staggeredChildrenParameters, ...void1 }: UseCompleteListNavigationParameters<ParentElement, ChildElement, M>): UseCompleteListNavigationReturnType<ParentElement, ChildElement, M>;
 
 /**
  *
  * @compositeParams
  */
-export declare function useCompleteListNavigationChild<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>>({ info: { index, focusSelf, unselectable, untabbable, getSortValue, ...info }, // The "...info" is empty if M is the same as UCLNCI<ChildElement>.
-    textContentParameters, context: { childrenHaveFocusChildContext, managedChildContext, rovingTabIndexContext, paginatedChildContext, staggeredChildContext, singleSelectionContext, typeaheadNavigationContext }, ...void1 }: UseCompleteListNavigationChildParameters<ChildElement, M>): UseCompleteListNavigationChildReturnType<ChildElement, M>;
+export declare function useCompleteListNavigationChild<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>>({ info: { index, focusSelf, unselectable, untabbable, getSortValue, ...customUserInfo }, // The "...info" is empty if M is the same as UCLNCI<ChildElement>.
+    textContentParameters, context: { managedChildContext, rovingTabIndexContext, paginatedChildContext, staggeredChildContext, singleSelectionContext, typeaheadNavigationContext }, ...void1 }: UseCompleteListNavigationChildParameters<ChildElement, M>): UseCompleteListNavigationChildReturnType<ChildElement, M>;
 
-export declare interface UseCompleteListNavigationChildInfo<ChildElement extends Element> extends ExtendMerge<UseListNavigationSingleSelectionSortableChildInfo<ChildElement>, ExtendMerge<UsePaginatedChildrenInfo<ChildElement>, UseStaggeredChildrenInfo<ChildElement>>> {
+export declare interface UseCompleteListNavigationChildInfo<ChildElement extends Element> extends UseListNavigationSingleSelectionSortableChildInfo<ChildElement>, UsePaginatedChildrenInfo<ChildElement>, UseStaggeredChildrenInfo, ManagedChildInfo<number> {
 }
 
-export declare interface UseCompleteListNavigationChildParameters<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends Pick<UseListNavigationSingleSelectionSortableChildParameters<ChildElement, M>, "textContentParameters"> {
-    context: CompleteListNavigationContext<any, ChildElement, M>;
-    info: Omit<M, Exclude<keyof UseCompleteListNavigationChildInfo<ChildElement>, "getSortValue" | "index" | "focusSelf" | "untabbable" | "unselectable">>;
+export declare type UseCompleteListNavigationChildInfoKeysParameters<M extends UseCompleteListNavigationChildInfo<any>> = Exclude<keyof M, keyof UseCompleteListNavigationChildInfo<any>> | UseListNavigationSingleSelectionSortableChildInfoKeysParameters | "getSortValue" | "focusSelf";
+
+export declare interface UseCompleteListNavigationChildParameters<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends UseGenericChildParameters<CompleteListNavigationContext<ChildElement, M>, Pick<M, UseCompleteListNavigationChildInfoKeysParameters<M>>>, OmitStrong<UseListNavigationSingleSelectionSortableChildParameters<ChildElement>, "context" | "info" | "refElementReturn"> {
 }
 
-export declare interface UseCompleteListNavigationChildReturnType<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends Pick<UseListNavigationSingleSelectionSortableChildReturnType<ChildElement, M>, "textContentReturn" | "rovingTabIndexChildReturn" | "singleSelectionChildReturn">, OmitStrong<UseRefElementReturnType<ChildElement>, "propsStable">, Pick<UseHasCurrentFocusReturnType<ChildElement>, "hasCurrentFocusReturn">, Pick<UseManagedChildReturnType<M>, "managedChildReturn">, TargetedPick<UsePressParameters<any>, "pressParameters", "onPressSync" | "excludeSpace">, Pick<UsePaginatedChildReturnType<ChildElement>, "paginatedChildReturn">, Pick<UseStaggeredChildReturnType<ChildElement>, "staggeredChildReturn"> {
+export declare interface UseCompleteListNavigationChildReturnType<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends OmitStrong<UseListNavigationSingleSelectionSortableChildReturnType<ChildElement>, "info" | "propsChild" | "propsTabbable" | "hasCurrentFocusParameters" | "pressParameters">, OmitStrong<UsePaginatedChildReturnType<ChildElement>, "info" | "props">, OmitStrong<UseStaggeredChildReturnType<ChildElement>, "info" | "props">, OmitStrong<UseRefElementReturnType<ChildElement>, "propsStable">, UseHasCurrentFocusReturnType<ChildElement>, UseManagedChildReturnType<M>, TargetedPick<UsePressParameters<any>, "pressParameters", "onPressSync" | "excludeSpace"> {
     /**
      * These props should be passed to whichever element is tabbable.
      * This may be the same element as `propsChild`, in which case `useMergedProps` is recommended.
@@ -1612,28 +1745,32 @@ export declare interface UseCompleteListNavigationChildReturnType<ChildElement e
 
 export declare function useCompleteListNavigationDeclarative<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>>({ linearNavigationParameters, paginatedChildrenParameters, rearrangeableChildrenParameters, rovingTabIndexParameters, singleSelectionDeclarativeParameters, sortableChildrenParameters, staggeredChildrenParameters, typeaheadNavigationParameters, singleSelectionParameters }: UseCompleteListNavigationDeclarativeParameters<ParentElement, ChildElement, M>): UseCompleteListNavigationDeclarativeReturnType<ParentElement, ChildElement, M>;
 
-export declare interface UseCompleteListNavigationDeclarativeParameters<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends OmitStrong<MakeSingleSelectionDeclarativeParameters<UseCompleteListNavigationParameters<ParentElement, ChildElement, M>>, "singleSelectionParameters" | "singleSelectionReturn">, TargetedOmit<UseSingleSelectionParameters<ParentElement, ChildElement, M>, "singleSelectionParameters", "initiallySelectedIndex" | "onSelectedIndexChange"> {
+export declare interface UseCompleteListNavigationDeclarativeParameters<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends OmitStrong<MakeSingleSelectionDeclarativeParameters<UseCompleteListNavigationParameters<ParentElement, ChildElement, M>>, "singleSelectionParameters" | "singleSelectionReturn">, TargetedOmit<UseSingleSelectionParameters<ParentElement, ChildElement>, "singleSelectionParameters", "initiallySelectedIndex" | "onSelectedIndexChange"> {
 }
 
 export declare interface UseCompleteListNavigationDeclarativeReturnType<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends TargetedOmit<UseCompleteListNavigationReturnType<ParentElement, ChildElement, M>, "singleSelectionReturn", "changeSelectedIndex">, OmitStrong<UseCompleteListNavigationReturnType<ParentElement, ChildElement, M>, "singleSelectionReturn"> {
 }
 
-export declare interface UseCompleteListNavigationParameters<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends Pick<UseListNavigationSingleSelectionSortableParameters<ParentElement, ChildElement, M>, "singleSelectionParameters" | "sortableChildrenParameters">, Pick<UsePaginatedChildrenParameters<ParentElement, ChildElement, M>, "paginatedChildrenParameters">, Pick<UseStaggeredChildrenParameters<ChildElement, M>, "staggeredChildrenParameters">, TargetedOmit<UseListNavigationSingleSelectionSortableParameters<ParentElement, ChildElement, M>, "linearNavigationParameters", "getLowestIndex" | "getHighestIndex" | "isValid">, TargetedOmit<UseListNavigationSingleSelectionSortableParameters<ParentElement, ChildElement, M>, "typeaheadNavigationParameters", "isValid">, TargetedOmit<UseListNavigationSingleSelectionSortableParameters<ParentElement, ChildElement, M>, "rearrangeableChildrenParameters", "onRearranged">, TargetedOmit<UseListNavigationSingleSelectionSortableParameters<ParentElement, ChildElement, M>, "rovingTabIndexParameters", "initiallyTabbedIndex" | "untabbableBehavior"> {
+export declare interface UseCompleteListNavigationParameters<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends Pick<UseListNavigationSingleSelectionSortableParameters<ParentElement, ChildElement, M>, "singleSelectionParameters" | "sortableChildrenParameters">, Pick<UsePaginatedChildrenParameters<ParentElement, ChildElement>, "paginatedChildrenParameters">, Pick<UseStaggeredChildrenParameters, "staggeredChildrenParameters">, TargetedOmit<UseListNavigationSingleSelectionSortableParameters<ParentElement, ChildElement, M>, "linearNavigationParameters", "getLowestIndex" | "getHighestIndex" | "isValidForLinearNavigation">, TargetedOmit<UseListNavigationSingleSelectionSortableParameters<ParentElement, ChildElement, M>, "typeaheadNavigationParameters", "isValidForTypeaheadNavigation">, TargetedOmit<UseListNavigationSingleSelectionSortableParameters<ParentElement, ChildElement, M>, "rearrangeableChildrenParameters", "onRearranged">, TargetedOmit<UseListNavigationSingleSelectionSortableParameters<ParentElement, ChildElement, M>, "rovingTabIndexParameters", "initiallyTabbedIndex" | "untabbableBehavior"> {
 }
 
-export declare interface UseCompleteListNavigationReturnType<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends Pick<UsePaginatedChildrenReturnType, "paginatedChildrenReturn">, Pick<UseStaggeredChildrenReturnType, "staggeredChildrenReturn">, Pick<UseManagedChildrenReturnType<M>, "managedChildrenReturn">, Pick<UseChildrenHaveFocusReturnType<ChildElement>, "childrenHaveFocusReturn">, OmitStrong<UseListNavigationSingleSelectionSortableReturnType<ParentElement, ChildElement, M>, "propsStableParentOrChild" | "propsParent" | "context" | "childrenHaveFocusParameters" | "managedChildrenParameters"> {
+export declare interface UseCompleteListNavigationReturnType<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends Pick<UsePaginatedChildrenReturnType, "paginatedChildrenReturn">, Pick<UseStaggeredChildrenReturnType, "staggeredChildrenReturn">, Pick<UseManagedChildrenReturnType<M>, "managedChildrenReturn">, OmitStrong<UseListNavigationSingleSelectionSortableReturnType<ParentElement, ChildElement, M>, "propsStableParentOrChild" | "propsParent" | "context" | "childrenHaveFocusParameters" | "managedChildrenParameters"> {
     props: ElementProps<ParentElement>;
-    context: CompleteListNavigationContext<ParentElement, ChildElement, M>;
+    context: CompleteListNavigationContext<ChildElement, M>;
 }
+
+export { useContext }
+
+export { useDebugValue }
 
 /**
  * Combines all the methods a user can implicitly dismiss a popup component. See {@link useModal} for a hook that's ready-to-use for dialogs and menus.
  *
  * @compositeParams
  */
-export declare function useDismiss<Listeners extends DismissListenerTypes, SourceElement extends Element | null, PopupElement extends Element>({ dismissParameters: { open: globalOpen, onClose: globalOnClose, closeOnBackdrop, closeOnEscape, closeOnLostFocus }, escapeDismissParameters: { getWindow, parentDepth } }: UseDismissParameters<Listeners>): UseDismissReturnType<SourceElement, PopupElement>;
+export declare function useDismiss<Listeners extends DismissListenerTypes, SourceElement extends Element | null, PopupElement extends Element>({ dismissParameters: { open: globalOpen, onClose: globalOnClose, closeOnBackdrop, closeOnEscape, closeOnLostFocus, ...void3 }, escapeDismissParameters: { parentDepth, ...void2 }, activeElementParameters: { getDocument, onActiveElementChange, onLastActiveElementChange: olaec1, onWindowFocusedChange, ...void5 }, ...void4 }: UseDismissParameters<Listeners>): UseDismissReturnType<SourceElement, PopupElement>;
 
-export declare interface UseDismissParameters<Listeners extends DismissListenerTypes> extends TargetedPick<UseEscapeDismissParameters<any>, "escapeDismissParameters", "getWindow" | "parentDepth"> {
+export declare interface UseDismissParameters<Listeners extends DismissListenerTypes> extends TargetedPick<UseEscapeDismissParameters<any>, "escapeDismissParameters", "parentDepth">, UseActiveElementParameters {
     dismissParameters: UseDismissParametersSelf<Listeners>;
 }
 
@@ -1686,6 +1823,7 @@ export declare interface UseDismissReturnType<SourceElement extends Element | nu
 }
 
 /**
+ * Allows adding/removing a CSS class to the `window`, `document`, or other global `HTMLElement`.
  *
  * @param className - The class (as a string) to be adding/removing
  * @param active - If `true`, the default, then the class is added to the element. If `false`, it's removed.
@@ -1731,7 +1869,7 @@ export declare interface UseDraggableReturnType<E extends EventTarget> {
      * Returns true if the element in question is currently being dragged
      */
     dragging: boolean;
-    /** **STABLE** */
+    /** @stable */
     getDragging: () => boolean;
     /**
      * Once the drag ends, if it was over a valid droppable, this will be
@@ -1741,7 +1879,7 @@ export declare interface UseDraggableReturnType<E extends EventTarget> {
      * and then what should be done with it (generally deleted if the effect was "move")
      */
     lastDropEffect: DataTransfer["dropEffect"] | null;
-    /** **STABLE** */
+    /** @stable */
     getLastDropEffect: () => (DataTransfer["dropEffect"] | null);
 }
 
@@ -1796,6 +1934,8 @@ export declare interface UseDroppableReturnType<E extends Element> {
     dropError: unknown;
 }
 
+export { useEffect }
+
 /**
  * Wrap the native `useEffect` to add arguments
  * that allow accessing the previous value as the first argument,
@@ -1844,7 +1984,7 @@ export declare interface UseElementSizeReturnType<E extends Element> extends Use
 }
 
 export declare interface UseElementSizeReturnTypeSelf<E extends Element> {
-    /** **STABLE** */
+    /** @stable */
     getSize(): ElementSize | null;
 }
 
@@ -1864,7 +2004,7 @@ export declare function useEnsureStability<T extends any[]>(parentHookName: stri
  *
  * @compositeParams
  */
-export declare function useEscapeDismiss<PopupElement extends Element>({ escapeDismissParameters: { onDismiss: onClose, active: open, getWindow: unstableGetWindow, parentDepth, ...void1 }, refElementPopupReturn: { getElement, ...void2 } }: UseEscapeDismissParameters<PopupElement>): void;
+export declare function useEscapeDismiss<PopupElement extends Element>({ escapeDismissParameters: { onDismiss: onClose, active: open, getDocument: unstableGetDocument, parentDepth, ...void1 }, refElementPopupReturn: { getElement, ...void2 } }: UseEscapeDismissParameters<PopupElement>): void;
 
 export declare interface UseEscapeDismissParameters<PopupElement extends Element> {
     refElementPopupReturn: Pick<UseRefElementReturnType<PopupElement>["refElementReturn"], "getElement">;
@@ -1887,11 +2027,11 @@ export declare interface UseEscapeDismissParametersSelf {
     /**
      * The escape key event handler is attached onto the window, so we need to know which window.
      *
-     * @remarks The returned `Window` should not change throughout the lifetime of the component (i.e. the element in question must not switch to another window via some means, which might not even be possible).
+     * @remarks The returned `Document` should not change throughout the lifetime of the component (i.e. the element in question must not switch to another window via some means, which might not even be possible).
      *
      * @nonstable
      */
-    getWindow(): Window;
+    getDocument(): Document;
     /**
      * Get this from context somewhere, and increment it in that context.
      *
@@ -1907,9 +2047,9 @@ export declare interface UseEscapeDismissParametersSelf {
  *
  * @compositeParams
  */
-export declare function useFocusTrap<SourceElement extends Element | null, PopupElement extends Element>({ focusTrapParameters: { onlyMoveFocus, trapActive, focusPopup: focusSelfUnstable, focusOpener: focusOpenerUnstable }, refElementReturn }: UseFocusTrapParameters<SourceElement, PopupElement>): UseFocusTrapReturnType<PopupElement>;
+export declare function useFocusTrap<SourceElement extends Element | null, PopupElement extends Element>({ focusTrapParameters: { onlyMoveFocus, trapActive, focusPopup: focusSelfUnstable, focusOpener: focusOpenerUnstable }, activeElementParameters, refElementReturn }: UseFocusTrapParameters<SourceElement, PopupElement>): UseFocusTrapReturnType<PopupElement>;
 
-export declare interface UseFocusTrapParameters<SourceElement extends Element | null, PopupElement extends Element> extends TargetedPick<UseRefElementReturnType<NonNullable<PopupElement>>, "refElementReturn", "getElement"> {
+export declare interface UseFocusTrapParameters<SourceElement extends Element | null, PopupElement extends Element> extends TargetedPick<UseRefElementReturnType<NonNullable<PopupElement>>, "refElementReturn", "getElement">, OmitStrong<UseBlockingElementParameters<NonNullable<SourceElement>>, "blockingElementParameters"> {
     focusTrapParameters: UseFocusTrapParametersSelf<SourceElement, PopupElement>;
 }
 
@@ -1966,6 +2106,18 @@ export declare interface UseFocusTrapReturnType<E extends Element> {
 export declare function useForceUpdate(): () => void;
 
 /**
+ * Basically all `use*Child` functions contain the same two parameters, plus the extras:
+ *
+ * `context` and `info`
+ *
+ * This provides them both, then you provide all the other `use*Parameters` members.
+ */
+export declare interface UseGenericChildParameters<C extends {} | null, M extends {}> {
+    context: C;
+    info: M;
+}
+
+/**
  * Allows attaching an event handler to any *non-Preact* element, and removing it when the component using the hook unmounts. The callback does not need to be stable across renders.
  *
  * @remarks `"mode"` controls if there's one handler that calls all your functions (default), or one handler added per function (`"single"`).
@@ -1996,14 +2148,14 @@ export declare function useGlobalHandler<T extends EventTarget, EventType extend
  * @hasChild {@link useGridNavigationRow}
  * @hasChild {@link useGridNavigationCell}
  */
-export declare function useGridNavigation<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, RM extends GridChildRowInfo<RowElement, CellElement>, CM extends GridChildCellInfo<CellElement>>({ gridNavigationParameters: { onTabbableColumnChange, ...void3 }, linearNavigationParameters, ...listNavigationParameters }: UseGridNavigationParameters<ParentOrRowElement, RowElement, CellElement, RM>): UseGridNavigationReturnType<ParentOrRowElement, RowElement, CellElement, RM, CM>;
+export declare function useGridNavigation<ParentOrRowElement extends Element, RowElement extends Element>({ gridNavigationParameters: { onTabbableColumnChange, ...void3 }, linearNavigationParameters, ...listNavigationParameters }: UseGridNavigationParameters<ParentOrRowElement, RowElement, GridChildRowInfo<RowElement>>): UseGridNavigationReturnType<ParentOrRowElement, RowElement>;
 
 /**
  * Child hook for {@link useGridNavigationRow} (and {@link useGridNavigation}).
  *
  * @compositeParams
  */
-export declare function useGridNavigationCell<CellElement extends Element, CM extends GridChildCellInfo<CellElement>>({ context: { gridNavigationCellContext: { getRowIndex, setTabbableRow, getTabbableColumn, setTabbableColumn, setTabbableCell, ...void4 }, rovingTabIndexContext, typeaheadNavigationContext, ...void5 }, info, refElementReturn, textContentParameters, gridNavigationCellParameters: { colSpan, ...void6 }, ...void1 }: UseGridNavigationCellParameters<any, CellElement, CM>): UseGridNavigationCellReturnType<CellElement, CM>;
+export declare function useGridNavigationCell<CellElement extends Element>({ context: { gridNavigationCellContext: { getRowIndex, setTabbableRow, getTabbableColumn, setTabbableColumn, setTabbableCell, ...void4 }, rovingTabIndexContext, typeaheadNavigationContext, ...void5 }, info: { index, untabbable, ...void7 }, refElementReturn, textContentParameters, gridNavigationCellParameters: { colSpan, ...void6 }, ...void1 }: UseGridNavigationCellParameters<CellElement>): UseGridNavigationCellReturnType<CellElement>;
 
 export declare interface UseGridNavigationCellContext extends UseListNavigationContext {
     gridNavigationCellContext: UseGridNavigationCellContextSelf;
@@ -2013,13 +2165,14 @@ export declare interface UseGridNavigationCellContextSelf {
     getRowIndex: () => number;
     setTabbableRow: SetTabbableIndex;
     getTabbableColumn: () => TabbableColumnInfo;
-    setTabbableColumn: PassiveStateUpdater<TabbableColumnInfo, Event>;
+    setTabbableColumn: PassiveStateUpdater<TabbableColumnInfo, EventType<any, any>>;
     setTabbableCell: SetTabbableIndex;
 }
 
-export declare interface UseGridNavigationCellParameters<RowElement extends Element, CellElement extends Element, CM extends GridChildCellInfo<CellElement>> extends UseListNavigationChildParameters<CellElement, CM> {
+export declare type UseGridNavigationCellInfoKeysParameters = UseListNavigationChildInfoKeysParameters;
+
+export declare interface UseGridNavigationCellParameters<CellElement extends Element> extends UseGenericChildParameters<UseGridNavigationCellContext, Pick<GridChildCellInfo<CellElement>, UseGridNavigationCellInfoKeysParameters>>, OmitStrong<UseListNavigationChildParameters<CellElement>, "context" | "info"> {
     gridNavigationCellParameters: UseGridNavigationCellParametersSelf;
-    context: UseGridNavigationCellContext;
 }
 
 export declare interface UseGridNavigationCellParametersSelf {
@@ -2031,13 +2184,16 @@ export declare interface UseGridNavigationCellParametersSelf {
     colSpan: Nullable<number>;
 }
 
-export declare interface UseGridNavigationCellReturnType<CellElement extends Element, CM extends GridChildCellInfo<CellElement>> extends UseListNavigationChildReturnType<CellElement, CM> {
+export declare interface UseGridNavigationCellReturnType<CellElement extends Element> extends UseListNavigationChildReturnType<CellElement> {
 }
 
 export declare interface UseGridNavigationCellSingleSelectionContext extends UseGridNavigationCellContext, UseSingleSelectionContext {
 }
 
-export declare interface UseGridNavigationParameters<ParentOrChildElement extends Element, RowElement extends Element, CellElement extends Element, M extends GridChildRowInfo<RowElement, CellElement>> extends OmitStrong<UseListNavigationParameters<ParentOrChildElement, RowElement, M>, "linearNavigationParameters">, TargetedOmit<UseListNavigationParameters<ParentOrChildElement, RowElement, M>, "linearNavigationParameters", "arrowKeyDirection"> {
+export declare interface UseGridNavigationCellSingleSelectionSortableContext extends UseGridNavigationCellSingleSelectionContext {
+}
+
+export declare interface UseGridNavigationParameters<ParentOrChildElement extends Element, RowElement extends Element, RM extends GridChildRowInfo<RowElement>> extends OmitStrong<UseListNavigationParameters<ParentOrChildElement, RowElement, RM>, "linearNavigationParameters">, TargetedOmit<UseListNavigationParameters<ParentOrChildElement, RowElement, RM>, "linearNavigationParameters", "arrowKeyDirection"> {
     gridNavigationParameters: UseGridNavigationParametersSelf;
 }
 
@@ -2047,10 +2203,10 @@ export declare interface UseGridNavigationParametersSelf {
      *
      * @stable
      */
-    onTabbableColumnChange: Nullable<OnPassiveStateChange<TabbableColumnInfo, Event>>;
+    onTabbableColumnChange: Nullable<OnPassiveStateChange<TabbableColumnInfo, EventType<any, any>>>;
 }
 
-export declare interface UseGridNavigationReturnType<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, RM extends GridChildRowInfo<RowElement, CellElement>, CM extends GridChildCellInfo<CellElement>> extends OmitStrong<UseListNavigationReturnType<ParentOrRowElement, RowElement, RM>, "context"> {
+export declare interface UseGridNavigationReturnType<ParentOrRowElement extends Element, RowElement extends Element> extends OmitStrong<UseListNavigationReturnType<ParentOrRowElement, RowElement>, "context"> {
     context: UseGridNavigationRowContext;
 }
 
@@ -2062,7 +2218,7 @@ export declare interface UseGridNavigationReturnType<ParentOrRowElement extends 
  *
  * @compositeParams
  */
-export declare function useGridNavigationRow<RowElement extends Element, CellElement extends Element, RM extends GridChildRowInfo<RowElement, CellElement>, CM extends GridChildCellInfo<CellElement>>({ info: managedChildParameters, textContentParameters, context: contextFromParent, linearNavigationParameters, rovingTabIndexParameters: { untabbable: rowIsUntabbableAndSoAreCells, initiallyTabbedIndex, onTabbableIndexChange, ...void4 }, managedChildrenReturn, typeaheadNavigationParameters, refElementReturn, ...void1 }: UseGridNavigationRowParameters<RowElement, CellElement, RM, CM>): UseGridNavigationRowReturnType<RowElement, CellElement, RM, CM>;
+export declare function useGridNavigationRow<RowElement extends Element, CellElement extends Element>({ info: managedChildParameters, textContentParameters, context: contextFromParent, linearNavigationParameters, rovingTabIndexParameters: { untabbable: rowIsUntabbableAndSoAreCells, initiallyTabbedIndex, onTabbableIndexChange, ...void4 }, managedChildrenReturn, typeaheadNavigationParameters, refElementReturn, ...void1 }: UseGridNavigationRowParameters<RowElement, CellElement, GridChildCellInfo<CellElement>>): UseGridNavigationRowReturnType<RowElement, CellElement>;
 
 export declare interface UseGridNavigationRowContext extends UseListNavigationContext {
     gridNavigationRowContext: UseGridNavigationRowContextSelf;
@@ -2071,69 +2227,85 @@ export declare interface UseGridNavigationRowContext extends UseListNavigationCo
 export declare interface UseGridNavigationRowContextSelf {
     setTabbableRow: SetTabbableIndex;
     getTabbableColumn: () => TabbableColumnInfo;
-    setTabbableColumn: PassiveStateUpdater<TabbableColumnInfo, Event>;
+    setTabbableColumn: PassiveStateUpdater<TabbableColumnInfo, EventType<any, any>>;
 }
 
-export declare interface UseGridNavigationRowParameters<RowElement extends Element, CellElement extends Element, RM extends GridChildRowInfo<RowElement, CellElement>, CM extends GridChildCellInfo<CellElement>> extends OmitStrong<UseListNavigationChildParameters<RowElement, RM>, "context">, TargetedOmit<UseListNavigationParameters<RowElement, CellElement, CM>, "linearNavigationParameters", "disableHomeEndKeys" | "onNavigateLinear" | "arrowKeyDirection">, TargetedOmit<UseListNavigationParameters<RowElement, CellElement, CM>, "rovingTabIndexParameters", "focusSelfParent" | "untabbableBehavior">, OmitStrong<UseListNavigationParameters<RowElement, CellElement, CM>, "paginatedChildrenParameters" | "refElementReturn" | "rovingTabIndexParameters" | "linearNavigationParameters">, TargetedPick<UseManagedChildrenReturnType<CM>, "managedChildrenReturn", "getChildren"> {
-    context: UseGridNavigationRowContext;
+export declare type UseGridNavigationRowInfoKeysParameters = UseListNavigationChildInfoKeysParameters;
+
+export declare interface UseGridNavigationRowParameters<RowElement extends Element, CellElement extends Element, CM extends GridChildCellInfo<CellElement>> extends UseGenericChildParameters<UseGridNavigationRowContext, Pick<GridChildRowInfo<RowElement>, UseGridNavigationRowInfoKeysParameters>>, OmitStrong<UseListNavigationChildParameters<RowElement>, "info" | "context">, TargetedOmit<UseListNavigationParameters<RowElement, CellElement, CM>, "linearNavigationParameters", "disableHomeEndKeys" | "onNavigateLinear" | "arrowKeyDirection">, TargetedOmit<UseListNavigationParameters<RowElement, CellElement, CM>, "rovingTabIndexParameters", "focusSelfParent" | "untabbableBehavior">, OmitStrong<UseListNavigationParameters<RowElement, CellElement, CM>, "paginatedChildrenParameters" | "refElementReturn" | "rovingTabIndexParameters" | "linearNavigationParameters">, TargetedPick<UseManagedChildrenReturnType<CM>, "managedChildrenReturn", "getChildren"> {
 }
 
-export declare interface UseGridNavigationRowReturnType<RowElement extends Element, CellElement extends Element, RM extends GridChildRowInfo<RowElement, CellElement>, CM extends GridChildCellInfo<CellElement>> extends UseListNavigationChildReturnType<RowElement, RM>, OmitStrong<UseListNavigationReturnType<RowElement, CellElement, CM>, "rovingTabIndexReturn" | "propsStableParentOrChild" | "propsParent" | "context">, TargetedOmit<UseListNavigationReturnType<RowElement, CellElement, CM>, "rovingTabIndexReturn", "focusSelf"> {
+export declare interface UseGridNavigationRowReturnType<RowElement extends Element, CellElement extends Element> extends UseListNavigationChildReturnType<RowElement>, OmitStrong<UseListNavigationReturnType<RowElement, CellElement>, "rovingTabIndexReturn" | "propsStableParentOrChild" | "propsParent" | "context">, TargetedOmit<UseListNavigationReturnType<RowElement, CellElement>, "rovingTabIndexReturn", "focusSelf"> {
     context: UseGridNavigationCellContext;
-    info: Pick<RM, UseRovingTabIndexChildInfoKeysReturnType | "focusSelf">;
+    info: Pick<GridChildRowInfo<RowElement>, UseRovingTabIndexChildInfoKeysReturnType | "focusSelf">;
 }
 
 export declare interface UseGridNavigationRowSingleSelectionContext extends UseGridNavigationRowContext, UseSingleSelectionContext {
 }
 
-export declare function useGridNavigationSingleSelection<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, RM extends GridSingleSelectChildRowInfo<RowElement, CellElement>, CM extends GridSingleSelectChildCellInfo<CellElement>>({ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, managedChildrenReturn, typeaheadNavigationParameters, singleSelectionParameters, refElementReturn, paginatedChildrenParameters, ...void2 }: UseGridNavigationSingleSelectionParameters<ParentOrRowElement, RowElement, CellElement, RM>): UseGridNavigationSingleSelectionReturnType<ParentOrRowElement, RowElement, CellElement, RM, CM>;
-
-export declare function useGridNavigationSingleSelectionCell<CellElement extends Element, CM extends GridSingleSelectChildCellInfo<CellElement>>(p: UseGridNavigationSingleSelectionCellParameters<any, CellElement, CM>): UseGridNavigationSingleSelectionCellReturnType<CellElement, CM>;
-
-export declare interface UseGridNavigationSingleSelectionCellParameters<RowElement extends Element, CellElement extends Element, CM extends GridSingleSelectChildCellInfo<CellElement>> extends UseGridNavigationCellParameters<RowElement, CellElement, CM> {
+export declare interface UseGridNavigationRowSingleSelectionSortableContext extends UseGridNavigationRowSingleSelectionContext {
 }
 
-export declare interface UseGridNavigationSingleSelectionCellReturnType<CellElement extends Element, CM extends GridSingleSelectChildCellInfo<CellElement>> extends UseGridNavigationCellReturnType<CellElement, CM> {
+export declare function useGridNavigationSingleSelection<ParentOrRowElement extends Element, RowElement extends Element>({ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, managedChildrenReturn, typeaheadNavigationParameters, singleSelectionParameters, refElementReturn, paginatedChildrenParameters, ...void2 }: UseGridNavigationSingleSelectionParameters<ParentOrRowElement, RowElement, GridSingleSelectChildRowInfo<RowElement>>): UseGridNavigationSingleSelectionReturnType<ParentOrRowElement, RowElement>;
+
+export declare function useGridNavigationSingleSelectionCell<CellElement extends Element>(p: UseGridNavigationSingleSelectionCellParameters<CellElement>): UseGridNavigationSingleSelectionCellReturnType<CellElement>;
+
+export declare type UseGridNavigationSingleSelectionCellInfoKeysParameters = UseListNavigationChildInfoKeysParameters;
+
+export declare interface UseGridNavigationSingleSelectionCellParameters<CellElement extends Element> extends UseGenericChildParameters<UseGridNavigationCellSingleSelectionContext, Pick<GridSingleSelectChildCellInfo<CellElement>, UseGridNavigationSingleSelectionCellInfoKeysParameters>>, OmitStrong<UseGridNavigationCellParameters<CellElement>, "context" | "info"> {
 }
 
-export declare interface UseGridNavigationSingleSelectionParameters<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, RM extends GridSingleSelectChildRowInfo<RowElement, CellElement>> extends ExtendMerge<UseGridNavigationParameters<ParentOrRowElement, RowElement, CellElement, RM>, OmitStrong<UseSingleSelectionParameters<ParentOrRowElement, RowElement, RM>, "rovingTabIndexReturn">> {
+export declare interface UseGridNavigationSingleSelectionCellReturnType<CellElement extends Element> extends UseGridNavigationCellReturnType<CellElement> {
 }
 
-export declare interface UseGridNavigationSingleSelectionReturnType<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, RM extends GridSingleSelectChildRowInfo<RowElement, CellElement>, CM extends GridSingleSelectChildCellInfo<CellElement>> extends ExtendMerge<UseGridNavigationReturnType<ParentOrRowElement, RowElement, CellElement, RM, CM>, UseSingleSelectionReturnType<RowElement, RM>> {
+export declare interface UseGridNavigationSingleSelectionParameters<ParentOrRowElement extends Element, RowElement extends Element, RM extends GridSingleSelectChildRowInfo<RowElement>> extends ExtendMerge<UseGridNavigationParameters<ParentOrRowElement, RowElement, RM>, OmitStrong<UseSingleSelectionParameters<ParentOrRowElement, RowElement>, "rovingTabIndexReturn">> {
+}
+
+export declare interface UseGridNavigationSingleSelectionReturnType<ParentOrRowElement extends Element, RowElement extends Element> extends ExtendMerge<UseGridNavigationReturnType<ParentOrRowElement, RowElement>, UseSingleSelectionReturnType<RowElement>> {
     context: UseGridNavigationRowSingleSelectionContext;
 }
 
-export declare function useGridNavigationSingleSelectionRow<RowElement extends Element, CellElement extends Element, RM extends GridSingleSelectChildRowInfo<RowElement, CellElement>, CM extends GridSingleSelectChildCellInfo<CellElement>>({ info: mcp1, linearNavigationParameters, managedChildrenReturn, refElementReturn, rovingTabIndexParameters, textContentParameters, typeaheadNavigationParameters, context: { gridNavigationRowContext, rovingTabIndexContext, singleSelectionContext, typeaheadNavigationContext }, ...void1 }: UseGridNavigationSingleSelectionRowParameters<RowElement, CellElement, RM, CM>): UseGridNavigationSingleSelectionRowReturnType<RowElement, CellElement, RM, CM>;
+export declare function useGridNavigationSingleSelectionRow<RowElement extends Element, CellElement extends Element>({ info: mcp1, linearNavigationParameters, managedChildrenReturn, refElementReturn, rovingTabIndexParameters, textContentParameters, typeaheadNavigationParameters, context, ...void1 }: UseGridNavigationSingleSelectionRowParameters<RowElement, CellElement, GridSingleSelectChildCellInfo<CellElement>>): UseGridNavigationSingleSelectionRowReturnType<RowElement, CellElement>;
 
-export declare interface UseGridNavigationSingleSelectionRowParameters<RowElement extends Element, CellElement extends Element, RM extends GridSingleSelectChildRowInfo<RowElement, CellElement>, CM extends GridSingleSelectChildCellInfo<CellElement>> extends ExtendMerge<UseGridNavigationRowParameters<RowElement, CellElement, RM, CM>, UseSingleSelectionChildParameters<RowElement, RM>> {
+export declare type UseGridNavigationSingleSelectionRowInfoKeysParameters = UseListNavigationSingleSelectionChildInfoKeysParameters;
+
+export declare interface UseGridNavigationSingleSelectionRowParameters<RowElement extends Element, CellElement extends Element, CM extends GridSingleSelectChildCellInfo<CellElement>> extends UseGenericChildParameters<UseGridNavigationRowSingleSelectionContext, Pick<GridSingleSelectChildRowInfo<RowElement>, UseGridNavigationSingleSelectionRowInfoKeysParameters>>, OmitStrong<UseGridNavigationRowParameters<RowElement, CellElement, CM>, "info" | "context">, OmitStrong<UseSingleSelectionChildParameters<RowElement>, "info" | "context"> {
 }
 
-export declare interface UseGridNavigationSingleSelectionRowReturnType<RowElement extends Element, CellElement extends Element, RM extends GridSingleSelectChildRowInfo<RowElement, CellElement>, CM extends GridSingleSelectChildCellInfo<CellElement>> extends ExtendMerge<UseGridNavigationRowReturnType<RowElement, CellElement, RM, CM>, UseSingleSelectionChildReturnType<RowElement>> {
+export declare interface UseGridNavigationSingleSelectionRowReturnType<RowElement extends Element, CellElement extends Element> extends OmitStrong<ExtendMerge<UseGridNavigationRowReturnType<RowElement, CellElement>, UseSingleSelectionChildReturnType<RowElement>>, "context" | "info"> {
     context: UseGridNavigationCellSingleSelectionContext;
+    info: Pick<GridSingleSelectChildRowInfo<RowElement>, "focusSelf" | UseSingleSelectionChildInfoKeysReturnType | UseRovingTabIndexChildInfoKeysReturnType>;
 }
 
-export declare function useGridNavigationSingleSelectionSortable<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, RM extends GridSingleSelectSortableChildRowInfo<RowElement, CellElement>, CM extends GridSingleSelectSortableChildCellInfo<CellElement>>({ rearrangeableChildrenParameters, sortableChildrenParameters, linearNavigationParameters, managedChildrenReturn, ...gridNavigationSingleSelectionParameters }: UseGridNavigationSingleSelectionSortableParameters<ParentOrRowElement, RowElement, CellElement, RM>): UseGridNavigationSingleSelectionSortableReturnType<ParentOrRowElement, RowElement, CellElement, RM, CM>;
+export declare function useGridNavigationSingleSelectionSortable<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, RM extends GridSingleSelectSortableChildRowInfo<RowElement>>({ rearrangeableChildrenParameters, sortableChildrenParameters, linearNavigationParameters, managedChildrenReturn, gridNavigationParameters, paginatedChildrenParameters, refElementReturn, rovingTabIndexParameters, singleSelectionParameters, typeaheadNavigationParameters, ...void1 }: UseGridNavigationSingleSelectionSortableParameters<ParentOrRowElement, RowElement, RM>): UseGridNavigationSingleSelectionSortableReturnType<ParentOrRowElement, RowElement, RM>;
 
-export declare function useGridNavigationSingleSelectionSortableCell<CellElement extends Element, CM extends GridSingleSelectSortableChildCellInfo<CellElement>>(p: UseGridNavigationSingleSelectionSortableCellParameters<any, CellElement, CM>): UseGridNavigationSingleSelectionSortableCellReturnType<CellElement, CM>;
+export declare function useGridNavigationSingleSelectionSortableCell<CellElement extends Element>({ context, gridNavigationCellParameters, info: { index, untabbable, ...void2 }, refElementReturn, textContentParameters, ...void1 }: UseGridNavigationSingleSelectionSortableCellParameters<CellElement, GridSingleSelectSortableChildCellInfo<CellElement>>): UseGridNavigationSingleSelectionSortableCellReturnType<CellElement>;
 
-export declare interface UseGridNavigationSingleSelectionSortableCellParameters<RowElement extends Element, CellElement extends Element, CM extends GridSingleSelectSortableChildCellInfo<CellElement>> extends UseGridNavigationCellParameters<RowElement, CellElement, CM> {
+export declare type UseGridNavigationSingleSelectionSortableCellInfoKeysParameters = UseListNavigationChildInfoKeysParameters;
+
+export declare interface UseGridNavigationSingleSelectionSortableCellParameters<CellElement extends Element, CM extends GridSingleSelectSortableChildCellInfo<CellElement>> extends UseGenericChildParameters<UseGridNavigationCellSingleSelectionSortableContext, Pick<CM, UseGridNavigationSingleSelectionSortableCellInfoKeysParameters>>, OmitStrong<UseGridNavigationSingleSelectionCellParameters<CellElement>, "context" | "info"> {
 }
 
-export declare interface UseGridNavigationSingleSelectionSortableCellReturnType<CellElement extends Element, CM extends GridSingleSelectSortableChildCellInfo<CellElement>> extends UseGridNavigationCellReturnType<CellElement, CM> {
+export declare interface UseGridNavigationSingleSelectionSortableCellReturnType<CellElement extends Element> extends UseGridNavigationSingleSelectionCellReturnType<CellElement> {
 }
 
-export declare interface UseGridNavigationSingleSelectionSortableParameters<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, M extends GridSingleSelectChildRowInfo<RowElement, CellElement>> extends OmitStrong<UseGridNavigationSingleSelectionParameters<ParentOrRowElement, RowElement, CellElement, M>, "linearNavigationParameters" | "managedChildrenReturn">, TargetedOmit<UseGridNavigationSingleSelectionParameters<ParentOrRowElement, RowElement, CellElement, M>, "linearNavigationParameters", "indexDemangler" | "indexMangler">, UseSortableChildrenParameters<M> {
+export declare interface UseGridNavigationSingleSelectionSortableParameters<ParentOrRowElement extends Element, RowElement extends Element, RM extends GridSingleSelectSortableChildRowInfo<RowElement>> extends OmitStrong<UseGridNavigationSingleSelectionParameters<ParentOrRowElement, RowElement, RM>, "linearNavigationParameters" | "managedChildrenReturn">, TargetedOmit<UseGridNavigationSingleSelectionParameters<ParentOrRowElement, RowElement, RM>, "linearNavigationParameters", "indexDemangler" | "indexMangler">, UseSortableChildrenParameters<RM> {
 }
 
-export declare interface UseGridNavigationSingleSelectionSortableReturnType<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, RM extends GridSingleSelectSortableChildRowInfo<RowElement, CellElement>, CM extends GridSingleSelectSortableChildCellInfo<CellElement>> extends UseGridNavigationSingleSelectionReturnType<ParentOrRowElement, RowElement, CellElement, RM, CM>, UseSortableChildrenReturnType<RM> {
+export declare interface UseGridNavigationSingleSelectionSortableReturnType<ParentOrRowElement extends Element, RowElement extends Element, RM extends GridSingleSelectSortableChildRowInfo<RowElement>> extends UseGridNavigationSingleSelectionReturnType<ParentOrRowElement, RowElement>, UseSortableChildrenReturnType<RM> {
+    context: UseGridNavigationRowSingleSelectionContext;
 }
 
-export declare function useGridNavigationSingleSelectionSortableRow<RowElement extends Element, CellElement extends Element, RM extends GridSingleSelectSortableChildRowInfo<RowElement, CellElement>, CM extends GridSingleSelectSortableChildCellInfo<CellElement>>(p: UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM>): UseGridNavigationSingleSelectionSortableRowReturnType<RowElement, CellElement, RM, CM>;
+export declare function useGridNavigationSingleSelectionSortableRow<RowElement extends Element, CellElement extends Element, RM extends GridSingleSelectSortableChildRowInfo<RowElement>, CM extends GridSingleSelectSortableChildCellInfo<CellElement>>({ context, info: { index, unselectable, untabbable, ...void2 }, linearNavigationParameters, managedChildrenReturn, refElementReturn, rovingTabIndexParameters, textContentParameters, typeaheadNavigationParameters, ...void1 }: UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM>): UseGridNavigationSingleSelectionSortableRowReturnType<RowElement, CellElement, RM, CM>;
 
-export declare interface UseGridNavigationSingleSelectionSortableRowParameters<RowElement extends Element, CellElement extends Element, RM extends GridSingleSelectChildRowInfo<RowElement, CellElement>, CM extends GridSingleSelectChildCellInfo<CellElement>> extends UseGridNavigationSingleSelectionRowParameters<RowElement, CellElement, RM, CM> {
+export declare type UseGridNavigationSingleSelectionSortableRowInfoKeysParameters = UseListNavigationSingleSelectionSortableChildInfoKeysParameters;
+
+export declare interface UseGridNavigationSingleSelectionSortableRowParameters<RowElement extends Element, CellElement extends Element, RM extends GridSingleSelectSortableChildRowInfo<RowElement>, CM extends GridSingleSelectSortableChildCellInfo<CellElement>> extends UseGenericChildParameters<UseGridNavigationRowSingleSelectionSortableContext, Pick<RM, UseGridNavigationSingleSelectionSortableRowInfoKeysParameters>>, OmitStrong<UseGridNavigationSingleSelectionRowParameters<RowElement, CellElement, CM>, "context" | "info"> {
 }
 
-export declare interface UseGridNavigationSingleSelectionSortableRowReturnType<RowElement extends Element, CellElement extends Element, RM extends GridSingleSelectSortableChildRowInfo<RowElement, CellElement>, CM extends GridSingleSelectChildCellInfo<CellElement>> extends UseGridNavigationSingleSelectionRowReturnType<RowElement, CellElement, RM, CM> {
+export declare interface UseGridNavigationSingleSelectionSortableRowReturnType<RowElement extends Element, CellElement extends Element, RM extends GridSingleSelectSortableChildRowInfo<RowElement>, CM extends GridSingleSelectSortableChildCellInfo<CellElement>> extends OmitStrong<UseGridNavigationSingleSelectionRowReturnType<RowElement, CellElement>, "context" | "info"> {
+    info: Pick<RM, "focusSelf" | "getSortValue" | UseRovingTabIndexChildInfoKeysReturnType | UseSingleSelectionChildInfoKeysReturnType>;
+    context: UseGridNavigationCellSingleSelectionContext;
 }
 
 /**
@@ -2157,7 +2329,7 @@ export declare interface UseHasCurrentFocusParametersSelf<T extends Node> {
      *
      * @stable
      */
-    onCurrentFocusedChanged?: Nullable<OnPassiveStateChange<boolean, FocusEventType<T>>>;
+    onCurrentFocusedChanged: Nullable<OnPassiveStateChange<boolean, FocusEventType<T>>>;
     /**
      * Like `onFocusedChanged`, but also *additionally* if any child elements are focused.
      *
@@ -2165,7 +2337,7 @@ export declare interface UseHasCurrentFocusParametersSelf<T extends Node> {
      *
      * @stable
      */
-    onCurrentFocusedInnerChanged?: Nullable<OnPassiveStateChange<boolean, FocusEventType<T>>>;
+    onCurrentFocusedInnerChanged: Nullable<OnPassiveStateChange<boolean, FocusEventType<T>>>;
 }
 
 export declare interface UseHasCurrentFocusReturnType<E extends Element> {
@@ -2204,13 +2376,13 @@ export declare interface UseHasLastFocusParametersSelf {
      *
      * @stable
      */
-    onLastFocusedChanged?: Nullable<((focused: boolean, prevFocused: boolean | undefined) => void)>;
+    onLastFocusedChanged: Nullable<((focused: boolean, prevFocused: boolean | undefined) => void)>;
     /**
      * Combines the implications of `onFocusedChanged` and `onFocusedChanged`.
      *
      * @stable
      */
-    onLastFocusedInnerChanged?: Nullable<((focused: boolean, prevFocused: boolean | undefined) => void)>;
+    onLastFocusedInnerChanged: Nullable<((focused: boolean, prevFocused: boolean | undefined) => void)>;
 }
 
 export declare interface UseHasLastFocusReturnType extends UseActiveElementReturnType {
@@ -2228,6 +2400,10 @@ export declare function useHideScroll(hideScroll: boolean): {
     getScrollbarWidth: () => number | null;
     getScrollbarHeight: () => number | null;
 };
+
+export { useId }
+
+export { useImperativeHandle }
 
 /**
  * Allows controlling an element's `class`, `style`, etc. with functions like `setStyle` in addition to being reactive to incoming props.
@@ -2259,7 +2435,7 @@ export declare interface UseImperativePropsReturnTypeSelf<T extends Element> {
     /** @stable Applies or removes the given CSS class to the element and its props */
     setClass(cls: string, enabled: boolean): void;
     /** @stable Applies the given CSS style to the element and its props */
-    setStyle<K extends (keyof CSSStyleDeclaration) & string>(prop: K, value: CSSProperties[K] | null): void;
+    setStyle<K extends AvailableStyles>(prop: K, value: CSSProperties[K] | null): void;
     /** @stable Returns the current value of the attribute on the element */
     getAttribute<K extends keyof ElementProps<T>>(prop: K): ElementProps<T>[K];
     /** @stable Applies the given attribute to the element and its props */
@@ -2293,6 +2469,8 @@ export declare interface UseIntervalParameters {
     callback: () => void;
 }
 
+export { useLayoutEffect }
+
 /**
  * Wrap the native `useLayoutEffect` to add arguments
  * that allow accessing the previous value as the first argument,
@@ -2313,13 +2491,10 @@ export declare function useLayoutEffectDebug<I extends Inputs>(effect: (prev: I 
  *
  * @compositeParams
  */
-export declare function useLinearNavigation<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseLinearNavigationChildInfo>({ rovingTabIndexReturn, linearNavigationParameters, paginatedChildrenParameters: { paginationMax, paginationMin, ...void2 }, ...void1 }: UseLinearNavigationParameters<ParentOrChildElement, ChildElement, M>): UseLinearNavigationReturnType<ParentOrChildElement>;
-
-export declare interface UseLinearNavigationChildInfo extends ManagedChildInfo<number> {
-}
+export declare function useLinearNavigation<ParentOrChildElement extends Element, ChildElement extends Element>({ rovingTabIndexReturn, linearNavigationParameters, paginatedChildrenParameters: { paginationMax, paginationMin, ...void2 }, ...void1 }: UseLinearNavigationParameters<ParentOrChildElement, ChildElement>): UseLinearNavigationReturnType<ParentOrChildElement>;
 
 /** Arguments passed to the parent `useLinearNavigation` */
-export declare interface UseLinearNavigationParameters<ParentOrChildElement extends Element, ChildElement extends Element, _M extends UseLinearNavigationChildInfo> extends TargetedPick<UseRovingTabIndexReturnType<ParentOrChildElement, ChildElement, UseRovingTabIndexChildInfo<ChildElement>>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex">, TargetedPick<UsePaginatedChildrenParameters<ParentOrChildElement, ChildElement, any>, "paginatedChildrenParameters", "paginationMin" | "paginationMax"> {
+export declare interface UseLinearNavigationParameters<ParentOrChildElement extends Element, ChildElement extends Element> extends TargetedPick<UseRovingTabIndexReturnType<ParentOrChildElement, ChildElement>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex">, TargetedPick<UsePaginatedChildrenParameters<ParentOrChildElement, ChildElement>, "paginatedChildrenParameters", "paginationMin" | "paginationMax"> {
     linearNavigationParameters: UseLinearNavigationParametersSelf<ChildElement>;
 }
 
@@ -2335,7 +2510,7 @@ export declare interface UseLinearNavigationParametersSelf<ChildElement extends 
      *
      * @stable
      */
-    isValid(i: number): boolean;
+    isValidForLinearNavigation(i: number): boolean;
     /**
      * Controls how many elements are skipped over when page up/down are pressed.
      *
@@ -2349,11 +2524,9 @@ export declare interface UseLinearNavigationParametersSelf<ChildElement extends 
     /**
      * What happens when `up` is pressed on the first valid child?
      *
-     * ```md-literal
-     * * "wrap": The focus is sent down to the last child
-     * * "passthrough": Nothing happens, **and the event is allowed to propagate**.
-     * * A function:
-     * ```
+     * @remarks If it's `"wrap"`, the focus is sent down to the last child, and the event does not propagate.
+     * If it's a function, it's is called, and the event does not propagate.
+     * If it's `"passthrough"`, nothing happens, **and the event is allowed to propagate**.
      */
     navigatePastStart: "passthrough" | "wrap" | (() => void);
     /**
@@ -2430,76 +2603,91 @@ export declare interface UseLinearNavigationReturnTypeSelf {
  *
  * @hasChild {@link useListNavigationChild}
  */
-export declare function useListNavigation<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationChildInfo<ChildElement>>({ linearNavigationParameters, typeaheadNavigationParameters, rovingTabIndexParameters, managedChildrenReturn, refElementReturn, paginatedChildrenParameters, ...void1 }: UseListNavigationParameters<ParentOrChildElement, ChildElement, M>): UseListNavigationReturnType<ParentOrChildElement, ChildElement, M>;
+export declare function useListNavigation<ParentOrChildElement extends Element, ChildElement extends Element>({ linearNavigationParameters, typeaheadNavigationParameters, rovingTabIndexParameters, managedChildrenReturn, refElementReturn, paginatedChildrenParameters, ...void1 }: UseListNavigationParameters<ParentOrChildElement, ChildElement, UseListNavigationChildInfo<ChildElement>>): UseListNavigationReturnType<ParentOrChildElement, ChildElement>;
 
 /**
  * @compositeParams
  */
-export declare function useListNavigationChild<ChildElement extends Element, M extends UseListNavigationChildInfo<ChildElement>>({ info, context, refElementReturn, textContentParameters, ...void2 }: UseListNavigationChildParameters<ChildElement, M>): UseListNavigationChildReturnType<ChildElement, M>;
+export declare function useListNavigationChild<ChildElement extends Element>({ info: { index, untabbable, ...void1 }, context, refElementReturn, textContentParameters, ...void2 }: UseListNavigationChildParameters<ChildElement>): UseListNavigationChildReturnType<ChildElement>;
 
-export declare interface UseListNavigationChildInfo<TabbableChildElement extends Element> extends UseRovingTabIndexChildInfo<TabbableChildElement> {
+export declare interface UseListNavigationChildInfo<TabbableChildElement extends Element> extends UseRovingTabIndexChildInfo<TabbableChildElement>, UseTypeaheadNavigationChildInfo<TabbableChildElement> {
 }
 
-export declare interface UseListNavigationChildParameters<ChildElement extends Element, M extends UseListNavigationChildInfo<ChildElement>> extends ExtendMerge<UseRovingTabIndexChildParameters<ChildElement, M>, UseTypeaheadNavigationChildParameters<ChildElement, M>> {
-    context: UseListNavigationContext;
+export declare type UseListNavigationChildInfoKeysParameters = UseRovingTabIndexChildInfoKeysParameters | UseTypeaheadNavigationChildInfoKeysParameters;
+
+export declare type UseListNavigationChildInfoKeysReturnType = UseRovingTabIndexChildInfoKeysReturnType | UseTypeaheadNavigationChildInfoKeysReturnType;
+
+export declare interface UseListNavigationChildParameters<ChildElement extends Element> extends UseGenericChildParameters<UseListNavigationContext, Pick<UseListNavigationChildInfo<ChildElement>, UseRovingTabIndexChildInfoKeysParameters | UseTypeaheadNavigationChildInfoKeysParameters>>, OmitStrong<UseRovingTabIndexChildParameters<ChildElement>, "info" | "context">, OmitStrong<UseTypeaheadNavigationChildParameters<ChildElement>, "info" | "context"> {
 }
 
-export declare interface UseListNavigationChildReturnType<ChildElement extends Element, M extends UseListNavigationChildInfo<ChildElement>> extends UseRovingTabIndexChildReturnType<ChildElement, M>, UseTypeaheadNavigationChildReturnType {
+export declare interface UseListNavigationChildReturnType<ChildElement extends Element> extends UseRovingTabIndexChildReturnType<ChildElement>, UseTypeaheadNavigationChildReturnType {
+    info: Pick<UseListNavigationChildInfo<ChildElement>, UseListNavigationChildInfoKeysReturnType>;
 }
 
 export declare interface UseListNavigationContext extends RovingTabIndexChildContext, UseTypeaheadNavigationContext {
 }
 
-export declare interface UseListNavigationParameters<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationChildInfo<ChildElement>> extends UseRovingTabIndexParameters<ParentOrChildElement, ChildElement, M>, OmitStrong<UseTypeaheadNavigationParameters<ChildElement, M>, "rovingTabIndexReturn">, OmitStrong<UseLinearNavigationParameters<ParentOrChildElement, ChildElement, M>, "rovingTabIndexReturn"> {
+export declare interface UseListNavigationParameters<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationChildInfo<ChildElement>> extends UseRovingTabIndexParameters<ParentOrChildElement, ChildElement, M>, OmitStrong<UseTypeaheadNavigationParameters<ChildElement>, "rovingTabIndexReturn">, OmitStrong<UseLinearNavigationParameters<ParentOrChildElement, ChildElement>, "rovingTabIndexReturn"> {
 }
 
-export declare interface UseListNavigationReturnType<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationChildInfo<ChildElement>> extends OmitStrong<UseRovingTabIndexReturnType<ParentOrChildElement, ChildElement, M>, "props">, OmitStrong<UseTypeaheadNavigationReturnType<ParentOrChildElement>, "propsStable">, OmitStrong<UseLinearNavigationReturnType<ParentOrChildElement>, "propsStable"> {
+export declare interface UseListNavigationReturnType<ParentOrChildElement extends Element, ChildElement extends Element> extends OmitStrong<UseRovingTabIndexReturnType<ParentOrChildElement, ChildElement>, "props">, OmitStrong<UseTypeaheadNavigationReturnType<ParentOrChildElement>, "propsStable">, OmitStrong<UseLinearNavigationReturnType<ParentOrChildElement>, "propsStable"> {
     propsStableParentOrChild: ElementProps<ParentOrChildElement>;
     propsParent: ElementProps<ParentOrChildElement>;
     context: UseListNavigationContext;
 }
 
-export declare function useListNavigationSingleSelection<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationSingleSelectionChildInfo<ChildElement>>({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, managedChildrenReturn, refElementReturn, paginatedChildrenParameters, ...void3 }: UseListNavigationSingleSelectionParameters<ParentOrChildElement, ChildElement, M>): UseListNavigationSingleSelectionReturnType<ParentOrChildElement, ChildElement, M>;
+export declare function useListNavigationSingleSelection<ParentOrChildElement extends Element, ChildElement extends Element>({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, managedChildrenReturn, refElementReturn, paginatedChildrenParameters, ...void3 }: UseListNavigationSingleSelectionParameters<ParentOrChildElement, ChildElement, UseListNavigationSingleSelectionChildInfo<ChildElement>>): UseListNavigationSingleSelectionReturnType<ParentOrChildElement, ChildElement>;
 
-export declare function useListNavigationSingleSelectionChild<ChildElement extends Element, M extends UseListNavigationSingleSelectionChildInfo<ChildElement>>({ info, context, refElementReturn, textContentParameters, ...void1 }: UseListNavigationSingleSelectionChildParameters<ChildElement, M>): UseListNavigationSingleSelectionChildReturnType<ChildElement, M>;
+export declare function useListNavigationSingleSelectionChild<ChildElement extends Element>({ info: { index, untabbable, unselectable, ...void2 }, context, refElementReturn, textContentParameters, ...void1 }: UseListNavigationSingleSelectionChildParameters<ChildElement>): UseListNavigationSingleSelectionChildReturnType<ChildElement>;
 
 export declare interface UseListNavigationSingleSelectionChildContext extends UseListNavigationContext, UseSingleSelectionContext {
 }
 
-export declare interface UseListNavigationSingleSelectionChildInfo<TabbableChildElement extends Element> extends ExtendMerge<UseListNavigationChildInfo<TabbableChildElement>, UseSingleSelectionChildInfo<TabbableChildElement>> {
+export declare interface UseListNavigationSingleSelectionChildInfo<TabbableChildElement extends Element> extends UseListNavigationChildInfo<TabbableChildElement>, UseSingleSelectionChildInfo<TabbableChildElement> {
 }
 
-export declare interface UseListNavigationSingleSelectionChildParameters<ChildElement extends Element, M extends UseListNavigationSingleSelectionChildInfo<ChildElement>> extends ExtendMerge<UseListNavigationChildParameters<ChildElement, M>, UseSingleSelectionChildParameters<ChildElement, M>> {
+export declare type UseListNavigationSingleSelectionChildInfoKeysParameters = UseListNavigationChildInfoKeysParameters | UseSingleSelectionChildInfoKeysParameters;
+
+export declare type UseListNavigationSingleSelectionChildInfoKeysReturnType = UseListNavigationChildInfoKeysReturnType | UseSingleSelectionChildInfoKeysReturnType;
+
+export declare interface UseListNavigationSingleSelectionChildParameters<ChildElement extends Element> extends UseGenericChildParameters<UseListNavigationSingleSelectionChildContext, Pick<UseListNavigationSingleSelectionChildInfo<ChildElement>, UseListNavigationSingleSelectionChildInfoKeysParameters>>, OmitStrong<UseListNavigationChildParameters<ChildElement>, "context" | "info">, OmitStrong<UseSingleSelectionChildParameters<ChildElement>, "context" | "info"> {
 }
 
-export declare interface UseListNavigationSingleSelectionChildReturnType<ChildElement extends Element, M extends UseListNavigationSingleSelectionChildInfo<ChildElement>> extends OmitStrong<ExtendMerge<UseListNavigationChildReturnType<ChildElement, M>, UseSingleSelectionChildReturnType<ChildElement>>, "props"> {
+export declare interface UseListNavigationSingleSelectionChildReturnType<ChildElement extends Element> extends OmitStrong<ExtendMerge<UseListNavigationChildReturnType<ChildElement>, UseSingleSelectionChildReturnType<ChildElement>>, "props"> {
     propsTabbable: ElementProps<any>;
     propsChild: ElementProps<any>;
 }
 
-export declare interface UseListNavigationSingleSelectionParameters<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationSingleSelectionChildInfo<ChildElement>> extends ExtendMerge<UseListNavigationParameters<ParentOrChildElement, ChildElement, M>, OmitStrong<UseSingleSelectionParameters<ParentOrChildElement, ChildElement, M>, "rovingTabIndexReturn">> {
+export declare interface UseListNavigationSingleSelectionParameters<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationSingleSelectionChildInfo<ChildElement>> extends ExtendMerge<UseListNavigationParameters<ParentOrChildElement, ChildElement, M>, OmitStrong<UseSingleSelectionParameters<ParentOrChildElement, ChildElement>, "rovingTabIndexReturn">> {
 }
 
-export declare interface UseListNavigationSingleSelectionReturnType<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationSingleSelectionChildInfo<ChildElement>> extends ExtendMerge<UseListNavigationReturnType<ParentOrChildElement, ChildElement, M>, UseSingleSelectionReturnType<ChildElement, M>> {
+export declare interface UseListNavigationSingleSelectionReturnType<ParentOrChildElement extends Element, ChildElement extends Element> extends ExtendMerge<UseListNavigationReturnType<ParentOrChildElement, ChildElement>, UseSingleSelectionReturnType<ChildElement>> {
+    context: UseListNavigationSingleSelectionChildContext;
 }
 
 export declare function useListNavigationSingleSelectionSortable<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationSingleSelectionSortableChildInfo<ChildElement>>({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, managedChildrenReturn, rearrangeableChildrenParameters, sortableChildrenParameters, refElementReturn, paginatedChildrenParameters, ...void3 }: UseListNavigationSingleSelectionSortableParameters<ParentOrChildElement, ChildElement, M>): UseListNavigationSingleSelectionSortableReturnType<ParentOrChildElement, ChildElement, M>;
 
-export declare function useListNavigationSingleSelectionSortableChild<ChildElement extends Element, M extends UseListNavigationSingleSelectionSortableChildInfo<ChildElement>>({ info, context, refElementReturn, textContentParameters, ...void1 }: UseListNavigationSingleSelectionSortableChildParameters<ChildElement, M>): UseListNavigationSingleSelectionSortableChildReturnType<ChildElement, M>;
+export declare function useListNavigationSingleSelectionSortableChild<ChildElement extends Element>({ info, context, refElementReturn, textContentParameters, ...void1 }: UseListNavigationSingleSelectionSortableChildParameters<ChildElement>): UseListNavigationSingleSelectionSortableChildReturnType<ChildElement>;
+
+export declare type UseListNavigationSingleSelectionSortableChildContext = UseListNavigationSingleSelectionChildContext;
 
 export declare interface UseListNavigationSingleSelectionSortableChildInfo<TabbableChildElement extends Element> extends UseListNavigationSingleSelectionChildInfo<TabbableChildElement>, UseSortableChildInfo {
 }
 
-export declare interface UseListNavigationSingleSelectionSortableChildParameters<ChildElement extends Element, M extends UseListNavigationSingleSelectionSortableChildInfo<ChildElement>> extends UseListNavigationSingleSelectionChildParameters<ChildElement, M> {
+export declare type UseListNavigationSingleSelectionSortableChildInfoKeysParameters = UseListNavigationSingleSelectionChildInfoKeysParameters;
+
+export declare type UseListNavigationSingleSelectionSortableChildInfoKeysReturnType = UseListNavigationSingleSelectionChildInfoKeysReturnType;
+
+export declare interface UseListNavigationSingleSelectionSortableChildParameters<ChildElement extends Element> extends UseGenericChildParameters<UseListNavigationSingleSelectionSortableChildContext, Pick<UseListNavigationSingleSelectionSortableChildInfo<ChildElement>, UseListNavigationSingleSelectionSortableChildInfoKeysParameters>>, UseListNavigationSingleSelectionChildParameters<ChildElement> {
 }
 
-export declare interface UseListNavigationSingleSelectionSortableChildReturnType<ChildElement extends Element, M extends UseListNavigationSingleSelectionSortableChildInfo<ChildElement>> extends UseListNavigationSingleSelectionChildReturnType<ChildElement, M> {
+export declare interface UseListNavigationSingleSelectionSortableChildReturnType<ChildElement extends Element> extends UseListNavigationSingleSelectionChildReturnType<ChildElement> {
 }
 
-export declare interface UseListNavigationSingleSelectionSortableParameters<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationSingleSelectionChildInfo<ChildElement>> extends OmitStrong<UseListNavigationSingleSelectionParameters<ParentOrChildElement, ChildElement, M>, "linearNavigationParameters" | "managedChildrenReturn">, TargetedOmit<UseListNavigationSingleSelectionParameters<ParentOrChildElement, ChildElement, M>, "linearNavigationParameters", "indexDemangler" | "indexMangler">, UseSortableChildrenParameters<M> {
+export declare interface UseListNavigationSingleSelectionSortableParameters<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationSingleSelectionSortableChildInfo<ChildElement>> extends OmitStrong<UseListNavigationSingleSelectionParameters<ParentOrChildElement, ChildElement, M>, "linearNavigationParameters" | "managedChildrenReturn">, TargetedOmit<UseListNavigationSingleSelectionParameters<ParentOrChildElement, ChildElement, M>, "linearNavigationParameters", "indexDemangler" | "indexMangler">, UseSortableChildrenParameters<M> {
 }
 
-export declare interface UseListNavigationSingleSelectionSortableReturnType<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationSingleSelectionSortableChildInfo<ChildElement>> extends UseListNavigationSingleSelectionReturnType<ParentOrChildElement, ChildElement, M>, UseSortableChildrenReturnType<M> {
+export declare interface UseListNavigationSingleSelectionSortableReturnType<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationSingleSelectionSortableChildInfo<ChildElement>> extends UseListNavigationSingleSelectionReturnType<ParentOrChildElement, ChildElement>, UseSortableChildrenReturnType<M> {
 }
 
 /**
@@ -2526,39 +2714,37 @@ export declare interface UseLogicalDirectionParameters {
 }
 
 export declare interface UseLogicalDirectionReturnType {
-    /** **STABLE** */
-    /** **STABLE** */
-    /** **STABLE** */
+    /** @stable */
     logicalDirectionReturn: {
         getLogicalDirectionInfo: (computedStyles: CSSStyleDeclaration) => LogicalDirectionInfo | null;
         /**
          * Given the ElementSize info from useElementSize, converts all those physical properties to their logical counterparts.
          *
-         * **STABLE**
+         * @stable
          */
         convertToLogicalSize: (computedStyles: CSSStyleDeclaration, elementSize: ElementSize, direction?: LogicalDirectionInfo | null | undefined) => LogicalElementSize | null;
         /**
          * Turns `"horizontal" | "vertical"` into `"inline" | "block"`
          *
-         * **STABLE**
+         * @stable
          */
         convertToLogicalOrientation: (computedStyles: CSSStyleDeclaration, elementOrientation: PhysicalOrientation, direction?: LogicalDirectionInfo | null | undefined) => "inline" | "block";
         /**
          * Turns `"inline" | "block"` into `"horizontal" | "vertical"`
          *
-         * **STABLE**
+         * @stable
          */
         convertToPhysicalOrientation: (computedStyles: CSSStyleDeclaration, elementOrientation: LogicalOrientation, direction?: LogicalDirectionInfo | null | undefined) => "horizontal" | "vertical";
         /**
          * Turns `"top" | "bottom" | "left" | "right"` into `"block-start" | "block-end" | "inline-start" | "inline-end"`
          *
-         * **STABLE**
+         * @stable
          */
         convertToLogicalSide: (computedStyles: CSSStyleDeclaration, side: "top" | "bottom" | "left" | "right", direction?: LogicalDirectionInfo | null | undefined) => "inline-start" | "inline-end" | "block-start" | "block-end";
         /**
          * Turns `"block-start" | "block-end" | "inline-start" | "inline-end"` into `"top" | "bottom" | "left" | "right"`
          *
-         * **STABLE**
+         * @stable
          */
         convertToPhysicalSide: (computedStyles: CSSStyleDeclaration, side: "inline-start" | "inline-end" | "block-start" | "block-end", direction?: LogicalDirectionInfo | null | undefined) => "top" | "bottom" | "left" | "right";
     };
@@ -2585,7 +2771,7 @@ export declare interface UseLostFocusDismissParametersSelf {
      *
      * @nonstable
      */
-    onDismiss: EnhancedEventHandler<FocusEventType<any>, {
+    onDismiss: EnhancedEventHandler<FocusEvent, {
         reason: "lost-focus";
     }>;
     /**
@@ -2600,9 +2786,15 @@ export declare interface UseLostFocusDismissReturnType<_SourceElement extends El
 /**
  * @compositeParams
  */
-export declare function useManagedChild<M extends ManagedChildInfo<number | string>>({ context, info }: UseManagedChildParameters<M, keyof M>): UseManagedChildReturnType<M>;
+export declare function useManagedChild<M extends ManagedChildInfo<number | string>>({ context, info }: UseManagedChildParameters<M>): UseManagedChildReturnType<M>;
 
-export declare interface UseManagedChildParameters<M extends ManagedChildInfo<any>, InfoParameterKeys extends keyof M> {
+/**
+ * Note: Child parameter types should not inherit from this unless they actually call `useManagedChild`.
+ *
+ * E.G. `UseRovingTabIndexChildParameters` won't extend this, even though it has `info` and `context` parameters.
+ * They look similar, should there be a GenericChildParameters type that provides those?
+ */
+export declare interface UseManagedChildParameters<M extends ManagedChildInfo<any>> extends UseGenericChildParameters<UseManagedChildrenContext<M> | null, M> {
     /**
      * In general, this shouldn't be null, but for convenience's sake you are allowed to, which disables all behavior, and also means `getChildren` will be `undefined`!
      */
@@ -2610,7 +2802,7 @@ export declare interface UseManagedChildParameters<M extends ManagedChildInfo<an
     /**
      * The exact data that's available from the parent/each sibling element via `getAt` or the other methods on `ManagedChildren`.
      */
-    info: Pick<M, InfoParameterKeys>;
+    info: M;
 }
 
 /**
@@ -2620,6 +2812,8 @@ export declare interface UseManagedChildParameters<M extends ManagedChildInfo<an
  * @remarks This hook is designed to be lightweight, in that the parent keeps no state
  * and runs no effects.  Each child *does* run an effect, but with no state
  * changes unless you explicitly request them.
+ *
+ * {@include } {@link ManagedChildren}
  *
  * @hasChild {@link useManagedChild}
  *
@@ -2671,7 +2865,10 @@ export declare interface UseManagedChildrenReturnType<M extends ManagedChildInfo
     /**
      * Returns information about the child that rendered itself with the requested key.
      *
-     * **STABLE** (even though it's not a function, the identity of this object never changes)
+     * **Everything about this object is stable**. E.G. `managedChildrenReturn` itself, `managedChildrenReturn.getChildren`,
+     * `managedChildrenReturn.getChildren()`, and `managedChildrenReturn.getChildren().getAt`, are all stable.
+     *
+     * @stable
      */
     managedChildrenReturn: UseManagedChildrenReturnTypeSelf<M>;
     context: UseManagedChildrenContext<M>;
@@ -2679,7 +2876,7 @@ export declare interface UseManagedChildrenReturnType<M extends ManagedChildInfo
 
 export declare interface UseManagedChildrenReturnTypeSelf<M extends ManagedChildInfo<any>> {
     /**
-     * ***STABLE***
+     * @stable
      *
      * Note that **both** `getChildren` and the `ManagedChildren` object it returns are stable!
      *
@@ -2693,6 +2890,11 @@ export declare interface UseManagedChildReturnType<M extends ManagedChildInfo<an
 }
 
 export declare interface UseManagedChildReturnTypeSelf<M extends ManagedChildInfo<any>> {
+    /**
+     * Returns a proxy to all the information each child rendered with. The function, returned object, and every function within it are all stable.
+     *
+     * @stable
+     */
     getChildren(): ManagedChildren<M>;
 }
 
@@ -2715,6 +2917,8 @@ export declare interface UseMediaQueryReturnType {
     matches: boolean | null;
     getMatches(): boolean | null;
 }
+
+export { useMemo }
 
 export declare function useMemoObject<T extends {}>(t: T): T;
 
@@ -2778,9 +2982,9 @@ export declare function useMergedStyles(lhs: ElementProps<EventTarget>["style"],
  *
  * @compositeParams
  */
-export declare function useModal<Listeners extends DismissListenerTypes, FocusContainerElement extends Element | null, SourceElement extends Element | null, PopupElement extends Element>({ dismissParameters, escapeDismissParameters, focusTrapParameters: { trapActive, ...focusTrapParameters } }: UseModalParameters<Listeners>): UseModalReturnType<FocusContainerElement, SourceElement, PopupElement>;
+export declare function useModal<Listeners extends DismissListenerTypes, FocusContainerElement extends Element | null, SourceElement extends Element | null, PopupElement extends Element>({ dismissParameters, escapeDismissParameters, focusTrapParameters: { trapActive, ...focusTrapParameters }, activeElementParameters, ...void1 }: UseModalParameters<Listeners>): UseModalReturnType<FocusContainerElement, SourceElement, PopupElement>;
 
-export declare interface UseModalParameters<Listeners extends DismissListenerTypes> extends UseDismissParameters<Listeners>, Pick<UseFocusTrapParameters<any, any>, "focusTrapParameters"> {
+export declare interface UseModalParameters<Listeners extends DismissListenerTypes> extends OmitStrong<UseDismissParameters<Listeners>, "activeElementParameters">, Pick<UseFocusTrapParameters<any, any>, "focusTrapParameters" | "activeElementParameters"> {
 }
 
 export declare interface UseModalReturnType<FocusContainerElement extends Element | null, SourceElement extends Element | null, PopupElement extends Element> extends UseDismissReturnType<SourceElement, PopupElement> {
@@ -2853,14 +3057,14 @@ export declare interface UsePaginatedChildParameters {
  *
  * @hasChild {@link usePaginatedChild}
  */
-export declare function usePaginatedChildren<ParentElement extends Element, TabbableChildElement extends Element, M extends UsePaginatedChildrenInfo<TabbableChildElement>>({ managedChildrenReturn: { getChildren }, linearNavigationParameters: { indexDemangler }, paginatedChildrenParameters: { paginationMax, paginationMin }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex }, refElementReturn: { getElement } }: UsePaginatedChildrenParameters<ParentElement, TabbableChildElement, M>): UsePaginatedChildrenReturnType;
+export declare function usePaginatedChildren<ParentElement extends Element, TabbableChildElement extends Element, M extends UsePaginatedChildrenInfo<TabbableChildElement>>({ managedChildrenReturn: { getChildren }, linearNavigationParameters: { indexDemangler }, paginatedChildrenParameters: { paginationMax, paginationMin }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex }, refElementReturn: { getElement } }: UsePaginatedChildrenParameters<ParentElement, TabbableChildElement>): UsePaginatedChildrenReturnType;
 
 export declare interface UsePaginatedChildrenInfo<TabbableChildElement extends Element> extends UseRovingTabIndexChildInfo<TabbableChildElement> {
     setPaginationVisible(visible: boolean): void;
     setChildCountIfPaginated(count: number): void;
 }
 
-export declare interface UsePaginatedChildrenParameters<ParentElement extends Element, TabbableChildElement extends Element, M extends UsePaginatedChildrenInfo<TabbableChildElement>> extends Pick<UseManagedChildrenReturnType<M>, "managedChildrenReturn">, TargetedPick<UseLinearNavigationParameters<any, TabbableChildElement, M>, "linearNavigationParameters", "indexDemangler">, TargetedPick<UseRovingTabIndexReturnType<any, TabbableChildElement, M>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex">, TargetedPick<UseRefElementReturnType<ParentElement>, "refElementReturn", "getElement"> {
+export declare interface UsePaginatedChildrenParameters<ParentElement extends Element, TabbableChildElement extends Element> extends Pick<UseManagedChildrenReturnType<UsePaginatedChildrenInfo<TabbableChildElement>>, "managedChildrenReturn">, TargetedPick<UseLinearNavigationParameters<any, TabbableChildElement>, "linearNavigationParameters", "indexDemangler">, TargetedPick<UseRovingTabIndexReturnType<any, TabbableChildElement>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex">, TargetedPick<UseRefElementReturnType<ParentElement>, "refElementReturn", "getElement"> {
     paginatedChildrenParameters: UsePaginatedChildrenParametersSelf;
 }
 
@@ -3013,6 +3217,7 @@ export declare interface UsePressParameters<E extends EventTarget> extends Targe
 }
 
 export declare interface UsePressParametersSelf<E extends EventTarget> {
+    /**  */
     onPressingChange: Nullable<OnPassiveStateChange<boolean, PressChangeEventReason<E>>>;
     /**
      * What should happen when this widget has been "pressed".
@@ -3184,17 +3389,25 @@ export declare interface UseRearrangeableChildrenReturnTypeSelf<M extends UseRea
      * Pass an array of not-sorted child information to this function
      * and the children will re-arrange themselves to match.
      *
-     * **STABLE**
+     * @remarks This is only needed if you are implementing your own sort/reordering algorithm, just call this at the end when you're ready.
      *
-     *
+     * @stable
      */
     rearrange: (originalRows: M[], rowsInOrder: M[]) => void;
-    /** **STABLE** */
+    /**
+     * Arranges the children in a random order.
+     *
+     * @stable
+     */
     shuffle: () => Promise<void> | void;
-    /** **STABLE** */
+    /**
+     * Reverses the order of the children
+     *
+     * @stable
+     */
     reverse: () => Promise<void> | void;
     /**
-     * **STABLE**
+     * @stable
      *
      * This function takes a component's original `index` prop and outputs a new index that represents its re-arranged position.
      * In conjunction with `indexDemangler`, this can be used to perform math on indices (incrementing, decrementing, etc.)
@@ -3202,19 +3415,24 @@ export declare interface UseRearrangeableChildrenReturnTypeSelf<M extends UseRea
      * E.G. to decrement a component's index "c": indexDemangler(indexMangler(c) - 1)
      */
     indexMangler: (n: number) => number;
-    /** **STABLE** */
+    /** @stable */
     indexDemangler: (n: number) => number;
-    /** **STABLE** */
-    /** **STABLE** */
     /**
-     * **STABLE**
+     * @stable
      *
      * Call this on your props (that contain the children to sort!!) to allow them to be sortable.
      *
      */
     useRearrangedChildren: (children: VNode[]) => VNode[];
+    /**
+     * Returns an array of each cell's `getSortValue()` result.
+     */
     toJsonArray(transform?: (info: M) => object): object;
 }
+
+export { useReducer }
+
+export { useRef }
 
 /**
  * Access `HTMLElement` rendered by this hook/these props, either as soon as it's available (as a callback), or whenever you need it (as a getter function).
@@ -3320,7 +3538,7 @@ export declare interface UseRefElementReturnTypeSelf<T extends EventTarget> {
  * @param args - {@link UseRovingTabIndexParameters}
  * @returns - {@link UseRovingTabIndexReturnType}
  */
-export declare function useRovingTabIndex<ParentElement extends Element, ChildElement extends Element, M extends UseRovingTabIndexChildInfo<ChildElement>>({ managedChildrenReturn: { getChildren }, rovingTabIndexParameters: { focusSelfParent: focusSelfParentUnstable, untabbable, untabbableBehavior, initiallyTabbedIndex, onTabbableIndexChange }, refElementReturn: { getElement }, ...void1 }: UseRovingTabIndexParameters<ParentElement, ChildElement, M>): UseRovingTabIndexReturnType<ParentElement, ChildElement, M>;
+export declare function useRovingTabIndex<ParentElement extends Element, ChildElement extends Element>({ managedChildrenReturn: { getChildren }, rovingTabIndexParameters: { focusSelfParent: focusSelfParentUnstable, untabbable, untabbableBehavior, initiallyTabbedIndex, onTabbableIndexChange }, refElementReturn: { getElement }, ...void1 }: UseRovingTabIndexParameters<ParentElement, ChildElement, UseRovingTabIndexChildInfo<ChildElement>>): UseRovingTabIndexReturnType<ParentElement, ChildElement>;
 
 /**
  * @compositeParams
@@ -3329,7 +3547,7 @@ export declare function useRovingTabIndex<ParentElement extends Element, ChildEl
  * @param args - {@link UseRovingTabIndexChildParameters}
  * @returns - {@link UseRovingTabIndexChildReturnType}
  */
-export declare function useRovingTabIndexChild<ChildElement extends Element, M extends UseRovingTabIndexChildInfo<ChildElement>>({ info: { index, untabbable: iAmUntabbable, ...void2 }, context: { rovingTabIndexContext: { giveParentFocusedElement, untabbable: parentIsUntabbable, untabbableBehavior, reevaluateClosestFit, setTabbableIndex, getInitiallyTabbedIndex, parentFocusSelf } }, refElementReturn: { getElement }, ...void3 }: UseRovingTabIndexChildParameters<ChildElement, M>): UseRovingTabIndexChildReturnType<ChildElement, M>;
+export declare function useRovingTabIndexChild<ChildElement extends Element>({ info: { index, untabbable: iAmUntabbable, ...void2 }, context: { rovingTabIndexContext: { giveParentFocusedElement, getUntabbable: getParentIsUntabbable, getUntabbableBehavior, reevaluateClosestFit, setTabbableIndex, getInitiallyTabbedIndex, parentFocusSelf } }, refElementReturn: { getElement }, ...void3 }: UseRovingTabIndexChildParameters<ChildElement>): UseRovingTabIndexChildReturnType<ChildElement>;
 
 export declare interface UseRovingTabIndexChildInfo<TabbableChildElement extends Element> extends ManagedChildInfo<number> {
     /**
@@ -3384,20 +3602,16 @@ export declare type UseRovingTabIndexChildInfoKeysParameters = "index" | "untabb
 
 export declare type UseRovingTabIndexChildInfoKeysReturnType = "setLocallyTabbable" | "getLocallyTabbable";
 
-export declare interface UseRovingTabIndexChildParameters<TabbableChildElement extends Element, M extends UseRovingTabIndexChildInfo<TabbableChildElement>> extends Pick<UseRefElementReturnType<TabbableChildElement>, "refElementReturn">, OmitStrong<UseManagedChildParameters<M, UseRovingTabIndexChildInfoKeysParameters>, "context"> {
-    /**
-     * The information provided by the parent hook
-     */
-    context: RovingTabIndexChildContext;
+export declare interface UseRovingTabIndexChildParameters<TabbableChildElement extends Element> extends UseGenericChildParameters<RovingTabIndexChildContext, Pick<UseRovingTabIndexChildInfo<TabbableChildElement>, UseRovingTabIndexChildInfoKeysParameters>>, Pick<UseRefElementReturnType<TabbableChildElement>, "refElementReturn"> {
 }
 
-export declare interface UseRovingTabIndexChildReturnType<ChildElement extends Element, M extends UseRovingTabIndexChildInfo<ChildElement>> extends Required<TargetedPick<UseHasCurrentFocusParameters<ChildElement>, "hasCurrentFocusParameters", "onCurrentFocusedInnerChanged">> {
+export declare interface UseRovingTabIndexChildReturnType<ChildElement extends Element> extends TargetedPick<UseHasCurrentFocusParameters<ChildElement>, "hasCurrentFocusParameters", "onCurrentFocusedInnerChanged"> {
     /** Return information about the tabbable state of this child */
     rovingTabIndexChildReturn: UseRovingTabIndexChildReturnTypeSelf;
     /**
      * Pass this to `useManagedChild`.
      */
-    info: Pick<M, UseRovingTabIndexChildInfoKeysReturnType>;
+    info: Pick<UseRovingTabIndexChildInfo<ChildElement>, UseRovingTabIndexChildInfoKeysReturnType>;
     /**
      * *Unstable*
      *
@@ -3422,10 +3636,10 @@ export declare interface UseRovingTabIndexChildReturnTypeSelf {
 export declare interface UseRovingTabIndexParameters<ParentElement extends Element, TabbableChildElement extends Element, M extends UseRovingTabIndexChildInfo<TabbableChildElement>> extends TargetedPick<UseManagedChildrenReturnType<M>, "managedChildrenReturn", "getChildren">, TargetedPick<UseRefElementReturnType<ParentElement>, "refElementReturn", "getElement"> {
     /** When children mount/unmount, RTI needs access to all known children in case we unmounted the currently tabbable child */
     /** The only parameters RTI needs directly is the initial index to be tabbable */
-    rovingTabIndexParameters: UseRovingTabIndexParametersSelf<ParentElement, TabbableChildElement, M>;
+    rovingTabIndexParameters: UseRovingTabIndexParametersSelf<ParentElement>;
 }
 
-export declare interface UseRovingTabIndexParametersSelf<ParentElement extends Element, TabbableChildElement extends Element, M extends UseRovingTabIndexChildInfo<TabbableChildElement>> {
+export declare interface UseRovingTabIndexParametersSelf<ParentElement extends Element> {
     /** When `untabbable` is true, instead of a child focusing itself, the parent will via this `focusSelf` argument. */
     focusSelfParent(e: ParentElement | null): void;
     /**
@@ -3457,10 +3671,10 @@ export declare interface UseRovingTabIndexParametersSelf<ParentElement extends E
      *
      * **MUST** be stable!
      */
-    onTabbableIndexChange: Nullable<OnPassiveStateChange<number | null, Event>>;
+    onTabbableIndexChange: Nullable<OnPassiveStateChange<number | null, EventType<any, any>>>;
 }
 
-export declare interface UseRovingTabIndexReturnType<ParentElement extends Element, TabbableChildElement extends Element, _M extends UseRovingTabIndexChildInfo<TabbableChildElement>> extends TargetedPick<UseManagedChildrenParameters<UseRovingTabIndexChildInfo<TabbableChildElement>>, "managedChildrenParameters", "onChildrenMountChange"> {
+export declare interface UseRovingTabIndexReturnType<ParentElement extends Element, TabbableChildElement extends Element> extends TargetedPick<UseManagedChildrenParameters<UseRovingTabIndexChildInfo<TabbableChildElement>>, "managedChildrenParameters", "onChildrenMountChange"> {
     /** RTI runs logic when its children mount/unmount themselves */
     props: ElementProps<ParentElement>;
     /**
@@ -3490,7 +3704,7 @@ export declare interface UseRovingTabIndexReturnTypeSelf {
      */
     getTabbableIndex: () => number | null;
     /**
-     * Call to focus the currently tabbable child.
+     * Call to focus the currently tabbable child, or, if we're `untabbable`, the component itself.
      *
      * @stable
      */
@@ -3539,14 +3753,14 @@ export declare interface UseSearchParamStateParameters<Key extends keyof SearchP
  *
  * @compositeParams
  */
-export declare function useSingleSelection<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseSingleSelectionChildInfo<ChildElement>>({ managedChildrenReturn: { getChildren, ...void1 }, rovingTabIndexReturn: { setTabbableIndex, ...void2 }, singleSelectionParameters: { onSelectedIndexChange: onSelectedIndexChange_U, initiallySelectedIndex, ariaPropName, selectionMode, ...void3 }, ...void4 }: UseSingleSelectionParameters<ParentOrChildElement, ChildElement, M>): UseSingleSelectionReturnType<ChildElement, M>;
+export declare function useSingleSelection<ParentOrChildElement extends Element, ChildElement extends Element>({ managedChildrenReturn: { getChildren, ...void1 }, rovingTabIndexReturn: { setTabbableIndex, ...void2 }, singleSelectionParameters: { onSelectedIndexChange: onSelectedIndexChange_U, initiallySelectedIndex, ariaPropName, selectionMode, ...void3 }, ...void4 }: UseSingleSelectionParameters<ParentOrChildElement, ChildElement>): UseSingleSelectionReturnType<ChildElement>;
 
 /**
  *
  *
  * @compositeParams
  */
-export declare function useSingleSelectionChild<ChildElement extends Element, M extends UseSingleSelectionChildInfo<ChildElement>>({ context: { singleSelectionContext: { getSelectedIndex, onSelectedIndexChange, ariaPropName, selectionMode, ...void1 }, ...void2 }, info: { index, unselectable, ...void3 }, ...void4 }: UseSingleSelectionChildParameters<ChildElement, M>): UseSingleSelectionChildReturnType<ChildElement>;
+export declare function useSingleSelectionChild<ChildElement extends Element>({ context: { singleSelectionContext: { getSelectedIndex, onSelectedIndexChange, ariaPropName, selectionMode, ...void1 }, ...void2 }, info: { index, unselectable, ...void3 }, ...void4 }: UseSingleSelectionChildParameters<ChildElement>): UseSingleSelectionChildReturnType<ChildElement>;
 
 /** Anything that's selectable must be tabbable, so we DO use rovingTabIndex instead of just managedChildren */
 export declare interface UseSingleSelectionChildInfo<E extends Element> extends UseRovingTabIndexChildInfo<E> {
@@ -3569,18 +3783,16 @@ export declare interface UseSingleSelectionChildInfo<E extends Element> extends 
     unselectable: boolean;
 }
 
-export declare type UseSingleSelectionChildInfoParameterKeys = "index" | "unselectable";
+export declare type UseSingleSelectionChildInfoKeysParameters = "index" | "unselectable";
 
-export declare type UseSingleSelectionChildInfoReturnKeys = "getSelected" | "setLocalSelected" | "selected";
+export declare type UseSingleSelectionChildInfoKeysReturnType = "getSelected" | "setLocalSelected" | "selected";
 
-export declare interface UseSingleSelectionChildParameters<E extends Element, M extends UseSingleSelectionChildInfo<E>> {
-    context: UseSingleSelectionContext;
-    info: Pick<UseSingleSelectionChildInfo<E>, UseSingleSelectionChildInfoParameterKeys>;
+export declare interface UseSingleSelectionChildParameters<E extends Element> extends UseGenericChildParameters<UseSingleSelectionContext, Pick<UseSingleSelectionChildInfo<E>, UseSingleSelectionChildInfoKeysParameters>> {
 }
 
 export declare interface UseSingleSelectionChildReturnType<E extends Element> extends UseChildrenHaveFocusChildReturnType<E>, TargetedPick<UsePressParameters<any>, "pressParameters", "onPressSync"> {
     props: ElementProps<E>;
-    info: Pick<UseSingleSelectionChildInfo<E>, UseSingleSelectionChildInfoReturnKeys>;
+    info: Pick<UseSingleSelectionChildInfo<E>, UseSingleSelectionChildInfoKeysReturnType>;
     singleSelectionChildReturn: UseSingleSelectionChildReturnTypeSelf;
 }
 
@@ -3610,20 +3822,22 @@ export declare interface UseSingleSelectionContext {
 /**
  * Let's face it, declarative is nicer to use than imperative, so this is a shortcut.
  */
-export declare function useSingleSelectionDeclarative<ParentOrChildElement extends Element, ChildElement extends Element, _M extends UseSingleSelectionChildInfo<ChildElement>>({ singleSelectionReturn: { changeSelectedIndex }, singleSelectionDeclarativeParameters: { selectedIndex, onSelectedIndexChange } }: UseSingleSelectionDeclarativeParameters): {
+export declare function useSingleSelectionDeclarative<ParentOrChildElement extends Element, ChildElement extends Element>({ singleSelectionReturn: { changeSelectedIndex }, singleSelectionDeclarativeParameters: { selectedIndex, onSelectedIndexChange } }: UseSingleSelectionDeclarativeParameters): {
     singleSelectionParameters: {
         onSelectedIndexChange: Nullable<SelectedIndexChangeHandler>;
     };
 };
 
 export declare interface UseSingleSelectionDeclarativeParameters {
-    singleSelectionDeclarativeParameters: Pick<UseSingleSelectionParameters<any, any, any>["singleSelectionParameters"], "onSelectedIndexChange"> & {
-        selectedIndex: number | null;
-    };
-    singleSelectionReturn: Pick<UseSingleSelectionReturnType<any, any>["singleSelectionReturn"], "changeSelectedIndex">;
+    singleSelectionDeclarativeParameters: UseSingleSelectionDeclarativeParametersSelf;
+    singleSelectionReturn: Pick<UseSingleSelectionReturnType<any>["singleSelectionReturn"], "changeSelectedIndex">;
 }
 
-export declare interface UseSingleSelectionParameters<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseSingleSelectionChildInfo<ChildElement>> extends TargetedPick<UseManagedChildrenReturnType<UseSingleSelectionChildInfo<ChildElement>>, "managedChildrenReturn", "getChildren">, TargetedPick<UseRovingTabIndexReturnType<ParentOrChildElement, ChildElement, M>, "rovingTabIndexReturn", "setTabbableIndex"> {
+export declare interface UseSingleSelectionDeclarativeParametersSelf extends Pick<UseSingleSelectionParameters<any, any>["singleSelectionParameters"], "onSelectedIndexChange"> {
+    selectedIndex: number | null;
+}
+
+export declare interface UseSingleSelectionParameters<ParentOrChildElement extends Element, ChildElement extends Element> extends TargetedPick<UseManagedChildrenReturnType<UseSingleSelectionChildInfo<ChildElement>>, "managedChildrenReturn", "getChildren">, TargetedPick<UseRovingTabIndexReturnType<ParentOrChildElement, ChildElement>, "rovingTabIndexReturn", "setTabbableIndex"> {
     singleSelectionParameters: UseSingleSelectionParametersSelf;
 }
 
@@ -3656,7 +3870,7 @@ export declare interface UseSingleSelectionParametersSelf {
     ariaPropName: Nullable<`aria-${"pressed" | "selected" | "checked" | `current-${"page" | "step" | "date" | "time" | "location" | "true"}`}`>;
 }
 
-export declare interface UseSingleSelectionReturnType<ChildElement extends Element, M extends UseSingleSelectionChildInfo<ChildElement>> extends TargetedPick<UseChildrenHaveFocusParameters<ChildElement>, "childrenHaveFocusParameters", "onCompositeFocusChange"> {
+export declare interface UseSingleSelectionReturnType<ChildElement extends Element> extends TargetedPick<UseChildrenHaveFocusParameters<ChildElement>, "childrenHaveFocusParameters", "onCompositeFocusChange"> {
     singleSelectionReturn: UseSingleSelectionReturnTypeSelf;
     context: UseSingleSelectionContext;
 }
@@ -3724,16 +3938,16 @@ export declare interface UseSortableChildrenParametersSelf<M extends UseRearrang
      * @param lhs - The first value to compare
      * @param rhs - The second value to compare
      */
-    compare: null | Compare<M>;
+    compare: Nullable<Compare<M>>;
 }
 
 export declare interface UseSortableChildrenReturnType<M extends UseRearrangeableChildInfo> extends UseRearrangeableChildrenReturnType<M> {
-    sortableChildrenReturn: UseSortableChildrenReturnTypeSelf<M>;
+    sortableChildrenReturn: UseSortableChildrenReturnTypeSelf;
 }
 
-export declare interface UseSortableChildrenReturnTypeSelf<M extends UseRearrangeableChildInfo> {
+export declare interface UseSortableChildrenReturnTypeSelf {
     /**
-     * **STABLE**
+     * @stable
      *
      * Call to rearrange the children in ascending or descending order.
      *
@@ -3763,7 +3977,9 @@ export declare function useStableCallback<T extends Function | null | undefined>
 export declare function useStableGetter<T>(value: T): () => T;
 
 /**
- * @returns A function that retrieves the stack at the time this hook was called (in development mode only).
+ * Returns a function that retrieves the stack at the time this hook was called (in development mode only).
+ *
+ *
  */
 export declare function useStack(): () => string | undefined;
 
@@ -3788,11 +4004,7 @@ export declare interface UseStaggeredChildContextSelf {
     getDefaultStaggeredVisible(i: number): boolean;
 }
 
-export declare interface UseStaggeredChildParameters {
-    info: {
-        index: number;
-    };
-    context: UseStaggeredChildContext;
+export declare interface UseStaggeredChildParameters extends UseGenericChildParameters<UseStaggeredChildContext, Pick<UseStaggeredChildrenInfo, "index">> {
 }
 
 /**
@@ -3805,13 +4017,13 @@ export declare interface UseStaggeredChildParameters {
  *
  * @hasChild {@link useStaggeredChild}
  */
-export declare function useStaggeredChildren<E extends Element, M extends UseStaggeredChildrenInfo<E>>({ managedChildrenReturn: { getChildren }, staggeredChildrenParameters: { staggered } }: UseStaggeredChildrenParameters<E, M>): UseStaggeredChildrenReturnType;
+export declare function useStaggeredChildren({ managedChildrenReturn: { getChildren }, staggeredChildrenParameters: { staggered } }: UseStaggeredChildrenParameters): UseStaggeredChildrenReturnType;
 
-export declare interface UseStaggeredChildrenInfo<E extends Element> extends Pick<UseRovingTabIndexChildInfo<E>, "index"> {
+export declare interface UseStaggeredChildrenInfo extends Pick<UseRovingTabIndexChildInfo<any>, "index"> {
     setStaggeredVisible(visible: boolean): void;
 }
 
-export declare interface UseStaggeredChildrenParameters<E extends Element, M extends UseStaggeredChildrenInfo<E>> extends Pick<UseManagedChildrenReturnType<M>, "managedChildrenReturn"> {
+export declare interface UseStaggeredChildrenParameters extends Pick<UseManagedChildrenReturnType<UseStaggeredChildrenInfo>, "managedChildrenReturn"> {
     staggeredChildrenParameters: UseStaggeredChildrenParametersSelf;
 }
 
@@ -3837,7 +4049,7 @@ export declare interface UseStaggeredChildrenReturnTypeSelf {
 export declare interface UseStaggeredChildReturnType<ChildElement extends Element> {
     props: ElementProps<ChildElement>;
     staggeredChildReturn: UseStaggeredChildReturnTypeSelf;
-    info: Pick<UseStaggeredChildrenInfo<ChildElement>, "setStaggeredVisible">;
+    info: Pick<UseStaggeredChildrenInfo, "setStaggeredVisible">;
 }
 
 export declare interface UseStaggeredChildReturnTypeSelf {
@@ -3863,6 +4075,8 @@ export declare interface UseStaggeredChildReturnTypeSelf {
  * @param initialState - Same as the built-in `setState`'s
  */
 export declare function useState<T>(initialState: T | (() => T)): readonly [value: T, setValue: StateUpdater<T>, getValue: () => T];
+
+export { useStateBasic }
 
 /**
  * Allows examining the rendered component's text content whenever it renders and reacting to changes.
@@ -3940,21 +4154,23 @@ export declare interface UseTimeoutParameters {
  *
  * @compositeParams
  */
-export declare function useTypeaheadNavigation<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseTypeaheadNavigationChildInfo<ChildElement>>({ typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead, isValid, onNavigateTypeahead, ...void3 }, rovingTabIndexReturn: { getTabbableIndex: getIndex, setTabbableIndex: setIndex, ...void1 }, ...void2 }: UseTypeaheadNavigationParameters<ChildElement, M>): UseTypeaheadNavigationReturnType<ParentOrChildElement>;
+export declare function useTypeaheadNavigation<ParentOrChildElement extends Element, ChildElement extends Element>({ typeaheadNavigationParameters: { collator, typeaheadTimeout, noTypeahead, isValidForTypeaheadNavigation, onNavigateTypeahead, ...void3 }, rovingTabIndexReturn: { getTabbableIndex: getIndex, setTabbableIndex: setIndex, ...void1 }, ...void2 }: UseTypeaheadNavigationParameters<ChildElement>): UseTypeaheadNavigationReturnType<ParentOrChildElement>;
 
 /**
  *
  * @compositeParams
  */
-export declare function useTypeaheadNavigationChild<ChildElement extends Element, M extends UseTypeaheadNavigationChildInfo<ChildElement>>({ info: { index, ...void1 }, textContentParameters: { getText, ...void5 }, context: { typeaheadNavigationContext: { sortedTypeaheadInfo, insertingComparator, excludeSpace, ...void2 } }, refElementReturn: { getElement, ...void3 }, ...void4 }: UseTypeaheadNavigationChildParameters<ChildElement, M>): UseTypeaheadNavigationChildReturnType;
+export declare function useTypeaheadNavigationChild<ChildElement extends Element>({ info: { index, ...void1 }, textContentParameters: { getText, ...void5 }, context: { typeaheadNavigationContext: { sortedTypeaheadInfo, insertingComparator, excludeSpace, ...void2 } }, refElementReturn: { getElement, ...void3 }, ...void4 }: UseTypeaheadNavigationChildParameters<ChildElement>): UseTypeaheadNavigationChildReturnType;
 
 export declare interface UseTypeaheadNavigationChildInfo<TabbableChildElement extends Element> extends Pick<UseRovingTabIndexChildInfo<TabbableChildElement>, "index"> {
 }
 
+export declare type UseTypeaheadNavigationChildInfoKeysParameters = "index";
+
+export declare type UseTypeaheadNavigationChildInfoKeysReturnType = never;
+
 /** Arguments passed to the child `useTypeaheadNavigationChild` */
-export declare interface UseTypeaheadNavigationChildParameters<ChildElement extends Element, M extends UseTypeaheadNavigationChildInfo<ChildElement>> extends TargetedPick<UseTextContentParameters<ChildElement>, "textContentParameters", "getText">, TargetedPick<UseRefElementReturnType<ChildElement>, "refElementReturn", "getElement"> {
-    info: Pick<M, "index">;
-    context: UseTypeaheadNavigationContext;
+export declare interface UseTypeaheadNavigationChildParameters<ChildElement extends Element> extends UseGenericChildParameters<UseTypeaheadNavigationContext, Pick<UseTypeaheadNavigationChildInfo<ChildElement>, UseTypeaheadNavigationChildInfoKeysParameters>>, TargetedPick<UseTextContentParameters<ChildElement>, "textContentParameters", "getText">, TargetedPick<UseRefElementReturnType<ChildElement>, "refElementReturn", "getElement"> {
 }
 
 export declare interface UseTypeaheadNavigationChildReturnType extends UseTextContentReturnType, TargetedPick<UsePressParameters<any>, "pressParameters", "excludeSpace"> {
@@ -3965,13 +4181,17 @@ export declare interface UseTypeaheadNavigationContext {
 }
 
 export declare interface UseTypeaheadNavigationContextSelf {
-    /** **STABLE** (Don't call during render) */
+    /**
+     * Stable, but don't call during render.
+     *
+     * @stable
+     */
     excludeSpace: () => boolean;
     sortedTypeaheadInfo: Array<TypeaheadInfo>;
     insertingComparator: (lhs: string | null, rhs: TypeaheadInfo) => number;
 }
 
-export declare interface UseTypeaheadNavigationParameters<TabbableChildElement extends Element, _M extends UseTypeaheadNavigationChildInfo<TabbableChildElement>> extends TargetedPick<UseRovingTabIndexReturnType<any, TabbableChildElement, any>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex"> {
+export declare interface UseTypeaheadNavigationParameters<TabbableChildElement extends Element> extends TargetedPick<UseRovingTabIndexReturnType<any, TabbableChildElement>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex"> {
     typeaheadNavigationParameters: UseTypeaheadNavigationParametersSelf<TabbableChildElement>;
 }
 
@@ -3992,7 +4212,7 @@ export declare interface UseTypeaheadNavigationParametersSelf<TabbableChildEleme
      *
      * @nonstable
      */
-    isValid(index: number): boolean;
+    isValidForTypeaheadNavigation(index: number): boolean;
     /**
      * A collator to use when comparing.
      * If not provided, simply uses `localeCompare` after transforming each to lowercase, which will, at best, work okay in English.

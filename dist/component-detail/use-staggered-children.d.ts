@@ -1,7 +1,7 @@
 import { UseGenericChildParameters, UseManagedChildrenReturnType } from "../preact-extensions/use-managed-children.js";
 import { ElementProps } from "../util/types.js";
 import { UseRovingTabIndexChildInfo } from "./keyboard-navigation/use-roving-tabindex.js";
-export interface UseStaggeredChildrenInfo<E extends Element> extends Pick<UseRovingTabIndexChildInfo<E>, "index"> {
+export interface UseStaggeredChildrenInfo extends Pick<UseRovingTabIndexChildInfo<any>, "index"> {
     setStaggeredVisible(visible: boolean): void;
 }
 export interface UseStaggeredChildrenParametersSelf {
@@ -10,7 +10,7 @@ export interface UseStaggeredChildrenParametersSelf {
      */
     staggered: boolean;
 }
-export interface UseStaggeredChildrenParameters<E extends Element> extends Pick<UseManagedChildrenReturnType<UseStaggeredChildrenInfo<E>>, "managedChildrenReturn"> {
+export interface UseStaggeredChildrenParameters extends Pick<UseManagedChildrenReturnType<UseStaggeredChildrenInfo>, "managedChildrenReturn"> {
     staggeredChildrenParameters: UseStaggeredChildrenParametersSelf;
 }
 export interface UseStaggeredChildContextSelf {
@@ -32,9 +32,7 @@ export interface UseStaggeredChildrenReturnTypeSelf {
      */
     stillStaggering: boolean;
 }
-export interface UseStaggeredChildParameters extends UseGenericChildParameters<UseStaggeredChildContext, {
-    index: number;
-}> {
+export interface UseStaggeredChildParameters extends UseGenericChildParameters<UseStaggeredChildContext, Pick<UseStaggeredChildrenInfo, "index">> {
 }
 export interface UseStaggeredChildReturnTypeSelf {
     /**
@@ -50,7 +48,7 @@ export interface UseStaggeredChildReturnTypeSelf {
 export interface UseStaggeredChildReturnType<ChildElement extends Element> {
     props: ElementProps<ChildElement>;
     staggeredChildReturn: UseStaggeredChildReturnTypeSelf;
-    info: Pick<UseStaggeredChildrenInfo<ChildElement>, "setStaggeredVisible">;
+    info: Pick<UseStaggeredChildrenInfo, "setStaggeredVisible">;
 }
 /**
  * Allows children to each wait until the previous has finished rendering before itself rendering. E.G. Child #3 waits until #2 renders. #2 waits until #1 renders, etc.
@@ -62,7 +60,7 @@ export interface UseStaggeredChildReturnType<ChildElement extends Element> {
  *
  * @hasChild {@link useStaggeredChild}
  */
-export declare function useStaggeredChildren<E extends Element>({ managedChildrenReturn: { getChildren }, staggeredChildrenParameters: { staggered } }: UseStaggeredChildrenParameters<E>): UseStaggeredChildrenReturnType;
+export declare function useStaggeredChildren({ managedChildrenReturn: { getChildren }, staggeredChildrenParameters: { staggered } }: UseStaggeredChildrenParameters): UseStaggeredChildrenReturnType;
 /**
  * Child hook for {@link useStaggeredChildren}.
  *

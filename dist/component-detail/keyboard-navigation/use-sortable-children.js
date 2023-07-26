@@ -39,14 +39,14 @@ export function useRearrangeableChildren({ rearrangeableChildrenParameters: { ge
     //const { setTabbableIndex } = rovingTabIndexReturn;
     const shuffle = useCallback(() => {
         const managedRows = getChildren();
-        const originalRows = managedRows.arraySlice();
+        const originalRows = managedRows._arraySlice();
         const shuffledRows = lodashShuffle(originalRows);
         return rearrange(originalRows, shuffledRows);
     }, [ /* Must remain stable */]);
     const reverse = useCallback(() => {
         const managedRows = getChildren();
-        const originalRows = managedRows.arraySlice();
-        const reversedRows = managedRows.arraySlice().reverse();
+        const originalRows = managedRows._arraySlice();
+        const reversedRows = managedRows._arraySlice().reverse();
         return rearrange(originalRows, reversedRows);
     }, [ /* Must remain stable */]);
     // The sort function needs to be able to update whoever has all the sortable children.
@@ -83,7 +83,7 @@ export function useRearrangeableChildren({ rearrangeableChildrenParameters: { ge
     }, []);
     const toJsonArray = useCallback((transform) => {
         const managedRows = getChildren();
-        return managedRows.arraySlice().map(child => {
+        return managedRows._arraySlice().map(child => {
             if (transform)
                 return (transform(child));
             else
@@ -136,7 +136,7 @@ export function useSortableChildren({ rearrangeableChildrenParameters, sortableC
     const sort = useCallback((direction) => {
         const managedRows = getChildren();
         const compare = getCompare();
-        const originalRows = managedRows.arraySlice();
+        const originalRows = managedRows._arraySlice();
         const sortedRows = compare ? originalRows.sort((lhsRow, rhsRow) => {
             const lhsValue = lhsRow;
             const rhsValue = rhsRow;
@@ -144,7 +144,7 @@ export function useSortableChildren({ rearrangeableChildrenParameters, sortableC
             if (direction[0] == "d")
                 return -result;
             return result;
-        }) : managedRows.arraySlice();
+        }) : managedRows._arraySlice();
         return rearrange(originalRows, sortedRows);
     }, [ /* Must remain stable */]);
     return {

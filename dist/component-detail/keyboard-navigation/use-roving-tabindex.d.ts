@@ -57,7 +57,7 @@ export interface UseRovingTabIndexReturnTypeSelf {
      */
     getTabbableIndex: () => number | null;
     /**
-     * Call to focus the currently tabbable child.
+     * Call to focus the currently tabbable child, or, if we're `untabbable`, the component itself.
      *
      * @stable
      */
@@ -135,7 +135,7 @@ export interface UseRovingTabIndexChildParameters<TabbableChildElement extends E
 export interface RovingTabIndexChildContextSelf {
     getUntabbable(): boolean;
     getUntabbableBehavior(): "focus-parent" | "leave-child-focused";
-    /** `force` refers to if the untabbableBehavior is ignored. E.G. `force` temporarily disables `leave-child-focused`. */
+    /** `force` refers to if the untabbableBehavior is ignored. E.G. `force` temporarily disables `leave-child-focused` and allows the parent to focus itself. */
     parentFocusSelf: (force: boolean) => void;
     giveParentFocusedElement(element: Element): void;
     setTabbableIndex: SetTabbableIndex;

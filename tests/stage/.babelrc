@@ -9,7 +9,7 @@
                 "corejs": 3,
                 "shippedProposals": true,
                 "targets": {
-                    "browsers": "iOS 11"
+                    "browsers": "iOS 13"
                 }
             }
         ]

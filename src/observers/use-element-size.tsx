@@ -46,7 +46,7 @@ export interface ElementSize {
 }
 
 export interface UseElementSizeReturnTypeSelf<E extends Element> {
-    /** **STABLE** */
+    /** @stable */
     getSize(): ElementSize | null;
 }
 

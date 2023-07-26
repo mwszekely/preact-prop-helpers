@@ -50,17 +50,25 @@ export interface UseRearrangeableChildrenReturnTypeSelf<M extends UseRearrangeab
      * Pass an array of not-sorted child information to this function
      * and the children will re-arrange themselves to match.
      *
-     * **STABLE**
+     * @remarks This is only needed if you are implementing your own sort/reordering algorithm, just call this at the end when you're ready.
      *
-     *
+     * @stable
      */
     rearrange: (originalRows: M[], rowsInOrder: M[]) => void;
-    /** **STABLE** */
+    /**
+     * Arranges the children in a random order.
+     *
+     * @stable
+     */
     shuffle: () => Promise<void> | void;
-    /** **STABLE** */
+    /**
+     * Reverses the order of the children
+     *
+     * @stable
+     */
     reverse: () => Promise<void> | void;
     /**
-     * **STABLE**
+     * @stable
      *
      * This function takes a component's original `index` prop and outputs a new index that represents its re-arranged position.
      * In conjunction with `indexDemangler`, this can be used to perform math on indices (incrementing, decrementing, etc.)
@@ -68,20 +76,23 @@ export interface UseRearrangeableChildrenReturnTypeSelf<M extends UseRearrangeab
      * E.G. to decrement a component's index "c": indexDemangler(indexMangler(c) - 1)
      */
     indexMangler: (n: number) => number;
-    /** **STABLE** */
+    /** @stable */
     indexDemangler: (n: number) => number;
     /**
-     * **STABLE**
+     * @stable
      *
      * Call this on your props (that contain the children to sort!!) to allow them to be sortable.
      *
      */
     useRearrangedChildren: (children: VNode[]) => VNode[];
+    /**
+     * Returns an array of each cell's `getSortValue()` result.
+     */
     toJsonArray(transform?: (info: M) => object): object;
 }
-export interface UseSortableChildrenReturnTypeSelf<M extends UseRearrangeableChildInfo> {
+export interface UseSortableChildrenReturnTypeSelf {
     /**
-     * **STABLE**
+     * @stable
      *
      * Call to rearrange the children in ascending or descending order.
      *
@@ -89,7 +100,7 @@ export interface UseSortableChildrenReturnTypeSelf<M extends UseRearrangeableChi
     sort: (direction: "ascending" | "descending") => Promise<void> | void;
 }
 export interface UseSortableChildrenReturnType<M extends UseRearrangeableChildInfo> extends UseRearrangeableChildrenReturnType<M> {
-    sortableChildrenReturn: UseSortableChildrenReturnTypeSelf<M>;
+    sortableChildrenReturn: UseSortableChildrenReturnTypeSelf;
 }
 export interface UseRearrangeableChildInfo extends ManagedChildInfo<number> {
 }
