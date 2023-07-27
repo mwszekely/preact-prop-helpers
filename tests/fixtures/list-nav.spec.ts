@@ -124,8 +124,8 @@ test("Untabbability works", async ({ page, listNav, shared: { run, install } }) 
     await expect(listNav.list).toBeFocused();
     await run("ListNav", "setUntabbable", false);
     // TODO: Should focus return to the selected item, or the last focused item?
-    // It's generally the selected item...
-    await expect(listNav.list.locator("li:nth-child(2)")).toBeFocused();
+    // It's generally the selected item, which is what's tested for here:
+    await expect(listNav.list.locator("li:nth-child(3)")).toBeFocused();
     await expect(listNav.list.locator("li:nth-child(3)")).toHaveAttribute("aria-selected", "true");
 
     /*await listNav.list.locator("li:nth-child(2)").focus();

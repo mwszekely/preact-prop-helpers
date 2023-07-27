@@ -19,6 +19,18 @@ export interface UseListNavigationSingleSelectionChildReturnType<ChildElement ex
     propsTabbable: ElementProps<any>;
     propsChild: ElementProps<any>;
 }
+/**
+ * Combines {@link useListNavigation} and {@link useSingleSelection}.
+ *
+ * @remarks The single-selection behavior is optional, if you decide you need multi-selection instead within the same component.
+ *
+ * @hasChild {@link useListNavigationSingleSelectionChild}
+ *
+ * @compositeParams
+ */
 export declare function useListNavigationSingleSelection<ParentOrChildElement extends Element, ChildElement extends Element>({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, managedChildrenReturn, refElementReturn, paginatedChildrenParameters, ...void3 }: UseListNavigationSingleSelectionParameters<ParentOrChildElement, ChildElement, UseListNavigationSingleSelectionChildInfo<ChildElement>>): UseListNavigationSingleSelectionReturnType<ParentOrChildElement, ChildElement>;
+/**
+ * @compositeParams
+ */
 export declare function useListNavigationSingleSelectionChild<ChildElement extends Element>({ info: { index, untabbable, unselectable, ...void2 }, context, refElementReturn, textContentParameters, ...void1 }: UseListNavigationSingleSelectionChildParameters<ChildElement>): UseListNavigationSingleSelectionChildReturnType<ChildElement>;
 //# sourceMappingURL=use-list-navigation-single-selection.d.ts.map

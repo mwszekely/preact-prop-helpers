@@ -80,7 +80,7 @@ function useOnRender(id: string) {
         return { props: {} };
     window.onRender ??= async (id) => { console.log("RENDER:" + id); }
     let promise = window.onRender?.(id);
-    const { propsStable, refElementReturn } = useRefElement<any>({})
+    const { propsStable, refElementReturn } = useRefElement<any>({ refElementParameters: {} })
     const { imperativePropsReturn: imperativeHandle, props } = useImperativeProps<any>({ refElementReturn });
     imperativeHandle.setAttribute(("data-render-pending-" + id) as never, "true" as never);
     useEffect(() => {
@@ -124,7 +124,8 @@ function TestBasesListNavImpl({ ariaPropName, selectedIndex, arrowKeyDirection, 
         sortableChildrenParameters: { compare: useCallback<Compare<UseCompleteListNavigationChildInfo<HTMLLIElement>>>((lhs, rhs) => { return (lhs.getSortValue() as number) - (rhs.getSortValue() as number) }, []) },
         staggeredChildrenParameters: { staggered },
         paginatedChildrenParameters: { paginationMin: pagination?.[0], paginationMax: pagination?.[1] },
-        typeaheadNavigationParameters: { collator: null, noTypeahead, typeaheadTimeout, onNavigateTypeahead: null }
+        typeaheadNavigationParameters: { collator: null, noTypeahead, typeaheadTimeout, onNavigateTypeahead: null },
+        refElementParameters: {}
     });
 
     return (
@@ -191,7 +192,9 @@ function TestBasesListNavChild({ index }: { index: number }) {
             index,
             getSortValue: getTextContent
         },
-        textContentParameters: { getText: getTextContent }
+        textContentParameters: { getText: getTextContent },
+        hasCurrentFocusParameters: { onCurrentFocusedChanged: null, onCurrentFocusedInnerChanged: null },
+        refElementParameters: {}
     });
     const { pressReturn: { getIsPressing, longPress, pressing }, props: propsPressStable } = usePress({
         pressParameters: {

@@ -519,7 +519,7 @@ Every member of `UseCompleteListNavigationParameters` is inherited (see the inte
 
 #### UseCompleteListNavigationReturnType
 
-<small>`extends` [`UsePaginatedChildrenReturnType`](#usepaginatedchildrenreturntype), [`UseStaggeredChildrenReturnType`](#usestaggeredchildrenreturntype), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype), [`UseTypeaheadNavigationReturnType`](#usetypeaheadnavigationreturntype), [`UseLinearNavigationReturnType`](#uselinearnavigationreturntype), [`UseListNavigationReturnType`](#uselistnavigationreturntype), [`UseSingleSelectionReturnType`](#usesingleselectionreturntype), [`UseListNavigationSingleSelectionReturnType`](#uselistnavigationsingleselectionreturntype), [`UseRearrangeableChildrenReturnType`](#userearrangeablechildrenreturntype), [`UseSortableChildrenReturnType`](#usesortablechildrenreturntype), [`UseManagedChildrenParameters`](#usemanagedchildrenparameters), [`UseChildrenHaveFocusParameters`](#usechildrenhavefocusparameters)</small>
+<small>`extends` [`UsePaginatedChildrenReturnType`](#usepaginatedchildrenreturntype), [`UseStaggeredChildrenReturnType`](#usestaggeredchildrenreturntype), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseChildrenHaveFocusReturnType`](#usechildrenhavefocusreturntype), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype), [`UseTypeaheadNavigationReturnType`](#usetypeaheadnavigationreturntype), [`UseLinearNavigationReturnType`](#uselinearnavigationreturntype), [`UseListNavigationReturnType`](#uselistnavigationreturntype), [`UseSingleSelectionReturnType`](#usesingleselectionreturntype), [`UseListNavigationSingleSelectionReturnType`](#uselistnavigationsingleselectionreturntype), [`UseRearrangeableChildrenReturnType`](#userearrangeablechildrenreturntype), [`UseSortableChildrenReturnType`](#usesortablechildrenreturntype), [`UseManagedChildrenParameters`](#usemanagedchildrenparameters), [`UseChildrenHaveFocusParameters`](#usechildrenhavefocusparameters)</small>
 
 |Member|Type|Description|Is stable?|
 |---------|----|-----------|----------|
@@ -536,7 +536,7 @@ Unlike most others, this hook assume's it's the final one--the "outermost" hook 
 
 ##### UseCompleteListNavigationChildParameters
 
-<small>`extends` [`UseGenericChildParameters`](#usegenericchildparameters), [`UseCompleteListNavigationChildInfoKeysParameters`](#usecompletelistnavigationchildinfokeysparameters), [`UseListNavigationSingleSelectionSortableChildInfoKeysParameters`](#uselistnavigationsingleselectionsortablechildinfokeysparameters), [`UseListNavigationSingleSelectionChildInfoKeysParameters`](#uselistnavigationsingleselectionchildinfokeysparameters), [`UseRovingTabIndexChildInfoKeysParameters`](#userovingtabindexchildinfokeysparameters), [`UseTypeaheadNavigationChildInfoKeysParameters`](#usetypeaheadnavigationchildinfokeysparameters), [`UseTextContentParameters`](#usetextcontentparameters), [`UseSingleSelectionChildInfoKeysParameters`](#usesingleselectionchildinfokeysparameters), [`UseRefElementReturnType`](#userefelementreturntype)</small>
+<small>`extends` [`UseGenericChildParameters`](#usegenericchildparameters), [`UseCompleteListNavigationChildInfoKeysParameters`](#usecompletelistnavigationchildinfokeysparameters), [`UseListNavigationSingleSelectionSortableChildInfoKeysParameters`](#uselistnavigationsingleselectionsortablechildinfokeysparameters), [`UseListNavigationSingleSelectionChildInfoKeysParameters`](#uselistnavigationsingleselectionchildinfokeysparameters), [`UseRovingTabIndexChildInfoKeysParameters`](#userovingtabindexchildinfokeysparameters), [`UseTypeaheadNavigationChildInfoKeysParameters`](#usetypeaheadnavigationchildinfokeysparameters), [`UseTextContentParameters`](#usetextcontentparameters), [`UseSingleSelectionChildInfoKeysParameters`](#usesingleselectionchildinfokeysparameters), [`UseRefElementParameters`](#userefelementparameters), [`UseHasCurrentFocusParameters`](#usehascurrentfocusparameters), [`UseRefElementReturnType`](#userefelementreturntype)</small>
 
 Every member of `UseCompleteListNavigationChildParameters` is inherited (see the interfaces it `extends` from).
 
@@ -589,7 +589,7 @@ Every member of `UseCompleteGridNavigationParameters` is inherited (see the inte
 
 ##### UseCompleteGridNavigationRowParameters
 
-<small>`extends` [`UseGenericChildParameters`](#usegenericchildparameters), [`UseCompleteGridNavigationRowInfoKeysParameters`](#usecompletegridnavigationrowinfokeysparameters), [`UseGridNavigationSingleSelectionSortableRowInfoKeysParameters`](#usegridnavigationsingleselectionsortablerowinfokeysparameters), [`UseGridNavigationSingleSelectionRowInfoKeysParameters`](#usegridnavigationsingleselectionrowinfokeysparameters), [`UseGridNavigationRowInfoKeysParameters`](#usegridnavigationrowinfokeysparameters), [`UseRovingTabIndexChildInfoKeysParameters`](#userovingtabindexchildinfokeysparameters), [`UseTypeaheadNavigationChildInfoKeysParameters`](#usetypeaheadnavigationchildinfokeysparameters), [`UseTextContentParameters`](#usetextcontentparameters), [`UseRovingTabIndexParameters`](#userovingtabindexparameters), [`UseManagedChildrenParameters`](#usemanagedchildrenparameters), [`UseTypeaheadNavigationParameters`](#usetypeaheadnavigationparameters), [`UsePaginatedChildrenParameters`](#usepaginatedchildrenparameters), [`UseLinearNavigationParameters`](#uselinearnavigationparameters), [`UseSingleSelectionChildInfoKeysParameters`](#usesingleselectionchildinfokeysparameters), [`UseHasCurrentFocusParameters`](#usehascurrentfocusparameters), [`UseRefElementReturnType`](#userefelementreturntype), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype)</small>
+<small>`extends` [`UseGenericChildParameters`](#usegenericchildparameters), [`UseCompleteGridNavigationRowInfoKeysParameters`](#usecompletegridnavigationrowinfokeysparameters), [`UseGridNavigationSingleSelectionSortableRowInfoKeysParameters`](#usegridnavigationsingleselectionsortablerowinfokeysparameters), [`UseGridNavigationSingleSelectionRowInfoKeysParameters`](#usegridnavigationsingleselectionrowinfokeysparameters), [`UseGridNavigationRowInfoKeysParameters`](#usegridnavigationrowinfokeysparameters), [`UseRovingTabIndexChildInfoKeysParameters`](#userovingtabindexchildinfokeysparameters), [`UseTypeaheadNavigationChildInfoKeysParameters`](#usetypeaheadnavigationchildinfokeysparameters), [`UseTextContentParameters`](#usetextcontentparameters), [`UseRovingTabIndexParameters`](#userovingtabindexparameters), [`UseManagedChildrenParameters`](#usemanagedchildrenparameters), [`UseTypeaheadNavigationParameters`](#usetypeaheadnavigationparameters), [`UsePaginatedChildrenParameters`](#usepaginatedchildrenparameters), [`UseLinearNavigationParameters`](#uselinearnavigationparameters), [`UseSingleSelectionChildInfoKeysParameters`](#usesingleselectionchildinfokeysparameters), [`UseGridNavigationSingleSelectionRowParameters`](#usegridnavigationsingleselectionrowparameters), [`UseHasCurrentFocusParameters`](#usehascurrentfocusparameters), [`UseRefElementReturnType`](#userefelementreturntype), [`UseManagedChildrenReturnType`](#usemanagedchildrenreturntype), [`UseRovingTabIndexReturnType`](#userovingtabindexreturntype)</small>
 
 Every member of `UseCompleteGridNavigationRowParameters` is inherited (see the interfaces it `extends` from).
 
@@ -611,7 +611,7 @@ Every member of `UseCompleteGridNavigationRowParameters` is inherited (see the i
 
 ##### UseCompleteGridNavigationCellParameters
 
-<small>`extends` [`UseGenericChildParameters`](#usegenericchildparameters), [`UseCompleteGridNavigationCellInfoKeysParameters`](#usecompletegridnavigationcellinfokeysparameters), [`UseGridNavigationSingleSelectionSortableCellInfoKeysParameters`](#usegridnavigationsingleselectionsortablecellinfokeysparameters), [`UseGridNavigationSingleSelectionCellInfoKeysParameters`](#usegridnavigationsingleselectioncellinfokeysparameters), [`UseGridNavigationCellInfoKeysParameters`](#usegridnavigationcellinfokeysparameters), [`UseRovingTabIndexChildInfoKeysParameters`](#userovingtabindexchildinfokeysparameters), [`UseTypeaheadNavigationChildInfoKeysParameters`](#usetypeaheadnavigationchildinfokeysparameters), [`UseTextContentParameters`](#usetextcontentparameters), [`UseGridNavigationCellParameters`](#usegridnavigationcellparameters), [`UseRefElementReturnType`](#userefelementreturntype)</small>
+<small>`extends` [`UseGenericChildParameters`](#usegenericchildparameters), [`UseCompleteGridNavigationCellInfoKeysParameters`](#usecompletegridnavigationcellinfokeysparameters), [`UseGridNavigationSingleSelectionSortableCellInfoKeysParameters`](#usegridnavigationsingleselectionsortablecellinfokeysparameters), [`UseGridNavigationSingleSelectionCellInfoKeysParameters`](#usegridnavigationsingleselectioncellinfokeysparameters), [`UseGridNavigationCellInfoKeysParameters`](#usegridnavigationcellinfokeysparameters), [`UseRovingTabIndexChildInfoKeysParameters`](#userovingtabindexchildinfokeysparameters), [`UseTypeaheadNavigationChildInfoKeysParameters`](#usetypeaheadnavigationchildinfokeysparameters), [`UseTextContentParameters`](#usetextcontentparameters), [`UseGridNavigationCellParameters`](#usegridnavigationcellparameters), [`UseGridNavigationSingleSelectionCellParameters`](#usegridnavigationsingleselectioncellparameters), [`UseRefElementReturnType`](#userefelementreturntype)</small>
 
 Every member of `UseCompleteGridNavigationCellParameters` is inherited (see the interfaces it `extends` from).
 
@@ -619,7 +619,7 @@ Every member of `UseCompleteGridNavigationCellParameters` is inherited (see the 
 
 ##### UseCompleteGridNavigationCellReturnType
 
-<small>`extends` [`UseRefElementReturnType`](#userefelementreturntype), [`UseRovingTabIndexChildReturnType`](#userovingtabindexchildreturntype), [`UseTextContentReturnType`](#usetextcontentreturntype), [`UseListNavigationChildReturnType`](#uselistnavigationchildreturntype), [`UseHasCurrentFocusReturnType`](#usehascurrentfocusreturntype), [`UseManagedChildReturnType`](#usemanagedchildreturntype), [`UseHasCurrentFocusParameters`](#usehascurrentfocusparameters), [`UsePressParameters`](#usepressparameters)</small>
+<small>`extends` [`UseRefElementReturnType`](#userefelementreturntype), [`UseRovingTabIndexChildReturnType`](#userovingtabindexchildreturntype), [`UseTextContentReturnType`](#usetextcontentreturntype), [`UseListNavigationChildReturnType`](#uselistnavigationchildreturntype), [`UseGridNavigationCellReturnType`](#usegridnavigationcellreturntype), [`UseGridNavigationSingleSelectionCellReturnType`](#usegridnavigationsingleselectioncellreturntype), [`UseHasCurrentFocusReturnType`](#usehascurrentfocusreturntype), [`UseManagedChildReturnType`](#usemanagedchildreturntype), [`UseHasCurrentFocusParameters`](#usehascurrentfocusparameters), [`UsePressParameters`](#usepressparameters)</small>
 
 |Member|Type|Description|Is stable?|
 |---------|----|-----------|----------|
@@ -1843,7 +1843,7 @@ Every member of `UseGridNavigationRowParameters` is inherited (see the interface
 |Member|Type|Description|Is stable?|
 |---------|----|-----------|----------|
 |context|`UseGridNavigationCellContext`|Functions and data that the parent is making available to each child. Put it in your own `Context` from `createContext`|-|
-|info|`Pick<GridChildRowInfo<RowElement>, UseRovingTabIndexChildInfoKeysReturnType \| "focusSelf">`|Data the child makes available to the parent. Passed to `useManagedChild`|-|
+|info|`Pick<GridChildRowInfo<RowElement>, UseGridNavigationRowInfoKeysReturnType>`|Data the child makes available to the parent. Passed to `useManagedChild`|-|
 
 
 
@@ -1867,7 +1867,9 @@ Child hook for [useGridNavigationRow](#usegridnavigationrow) (and [useGridNaviga
 
 <small>`extends` [`UseRefElementReturnType`](#userefelementreturntype), [`UseRovingTabIndexChildReturnType`](#userovingtabindexchildreturntype), [`UseTextContentReturnType`](#usetextcontentreturntype), [`UseListNavigationChildReturnType`](#uselistnavigationchildreturntype), [`UseHasCurrentFocusParameters`](#usehascurrentfocusparameters), [`UsePressParameters`](#usepressparameters)</small>
 
-Every member of `UseGridNavigationCellReturnType` is inherited (see the interfaces it `extends` from).
+|Member|Type|Description|Is stable?|
+|---------|----|-----------|----------|
+|info|`Pick<GridChildCellInfo<CellElement>, UseGridNavigationCellInfoKeysReturnType>`|Data the child makes available to the parent. Passed to `useManagedChild`|-|
 
 
 
@@ -2719,12 +2721,15 @@ export type ElementProps<E extends EventTarget> = JSX.HTMLAttributes<E>;
 ##### UseGridNavigationSingleSelectionSortableRowInfoKeysParameters
 ##### UseGridNavigationSingleSelectionRowInfoKeysParameters
 ##### UseGridNavigationRowInfoKeysParameters
+##### UseGridNavigationSingleSelectionRowParameters
 ##### UseGridNavigationSingleSelectionRowReturnType
 ##### UseGridNavigationSingleSelectionSortableRowReturnType
 ##### UseCompleteGridNavigationCellInfoKeysParameters
 ##### UseGridNavigationSingleSelectionSortableCellInfoKeysParameters
 ##### UseGridNavigationSingleSelectionCellInfoKeysParameters
 ##### UseGridNavigationCellInfoKeysParameters
+##### UseGridNavigationSingleSelectionCellParameters
+##### UseGridNavigationSingleSelectionCellReturnType
 ##### UseBlockingElementParameters
 ##### getLowestIndex
 ##### indexMangler

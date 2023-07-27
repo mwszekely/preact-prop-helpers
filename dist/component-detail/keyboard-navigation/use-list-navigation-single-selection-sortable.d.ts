@@ -15,6 +15,18 @@ export interface UseListNavigationSingleSelectionSortableChildParameters<ChildEl
 }
 export interface UseListNavigationSingleSelectionSortableChildReturnType<ChildElement extends Element> extends UseListNavigationSingleSelectionChildReturnType<ChildElement> {
 }
+/**
+ * Combines {@link useListNavigation}, {@link useSingleSelection}, and {@link useSortableChildren}.
+ *
+ * @remarks This is a separate hook because {@link useSortableChildren} imposes unique requirements to the structure of your `children`.
+ *
+ * @hasChild {@link useListNavigationSingleSelectionSortableChild}
+ *
+ * @compositeParams
+ */
 export declare function useListNavigationSingleSelectionSortable<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationSingleSelectionSortableChildInfo<ChildElement>>({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, managedChildrenReturn, rearrangeableChildrenParameters, sortableChildrenParameters, refElementReturn, paginatedChildrenParameters, ...void3 }: UseListNavigationSingleSelectionSortableParameters<ParentOrChildElement, ChildElement, M>): UseListNavigationSingleSelectionSortableReturnType<ParentOrChildElement, ChildElement, M>;
+/**
+ * @compositeParams
+ */
 export declare function useListNavigationSingleSelectionSortableChild<ChildElement extends Element>({ info, context, refElementReturn, textContentParameters, ...void1 }: UseListNavigationSingleSelectionSortableChildParameters<ChildElement>): UseListNavigationSingleSelectionSortableChildReturnType<ChildElement>;
 //# sourceMappingURL=use-list-navigation-single-selection-sortable.d.ts.map

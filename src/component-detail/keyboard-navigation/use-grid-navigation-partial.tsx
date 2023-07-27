@@ -8,8 +8,8 @@ import { focus } from "../../util/focus.js";
 import { EventType, Nullable, OmitStrong, TargetedOmit, TargetedPick } from "../../util/types.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
 import { useTagProps } from "../../util/use-tag-props.js";
-import { UseListNavigationChildInfo, UseListNavigationChildInfoKeysParameters, UseListNavigationChildParameters, UseListNavigationChildReturnType, UseListNavigationContext, UseListNavigationParameters, UseListNavigationReturnType, useListNavigation, useListNavigationChild } from "./use-list-navigation-partial.js";
-import { SetTabbableIndex, UseRovingTabIndexChildInfoKeysReturnType } from "./use-roving-tabindex.js";
+import { UseListNavigationChildInfo, UseListNavigationChildInfoKeysParameters, UseListNavigationChildInfoKeysReturnType, UseListNavigationChildParameters, UseListNavigationChildReturnType, UseListNavigationContext, UseListNavigationParameters, UseListNavigationReturnType, useListNavigation, useListNavigationChild } from "./use-list-navigation-partial.js";
+import { SetTabbableIndex } from "./use-roving-tabindex.js";
 
 export interface GridChildRowInfo<RowElement extends Element> extends UseListNavigationChildInfo<RowElement> { }
 export interface GridChildCellInfo<CellElement extends Element> extends UseListNavigationChildInfo<CellElement> { }
@@ -63,7 +63,9 @@ export interface UseGridNavigationRowContext extends UseListNavigationContext {
 }
 
 export type UseGridNavigationRowInfoKeysParameters = UseListNavigationChildInfoKeysParameters;
+export type UseGridNavigationRowInfoKeysReturnType = UseListNavigationChildInfoKeysReturnType | "focusSelf";
 export type UseGridNavigationCellInfoKeysParameters = UseListNavigationChildInfoKeysParameters;
+export type UseGridNavigationCellInfoKeysReturnType = UseListNavigationChildInfoKeysReturnType;
 
 export interface UseGridNavigationRowParameters<RowElement extends Element, CellElement extends Element, CM extends GridChildCellInfo<CellElement>> extends
     UseGenericChildParameters<UseGridNavigationRowContext, Pick<GridChildRowInfo<RowElement>, UseGridNavigationRowInfoKeysParameters>>,
@@ -81,7 +83,7 @@ export interface UseGridNavigationRowReturnType<RowElement extends Element, Cell
     OmitStrong<UseListNavigationReturnType<RowElement, CellElement>, "rovingTabIndexReturn" | "propsStableParentOrChild" | "propsParent" | "context">,
     TargetedOmit<UseListNavigationReturnType<RowElement, CellElement>, "rovingTabIndexReturn", "focusSelf"> {
     context: UseGridNavigationCellContext;
-    info: Pick<GridChildRowInfo<RowElement>, UseRovingTabIndexChildInfoKeysReturnType | "focusSelf">;
+    info: Pick<GridChildRowInfo<RowElement>, UseGridNavigationRowInfoKeysReturnType>;
 }
 
 
@@ -108,7 +110,9 @@ export interface UseGridNavigationCellContext extends UseListNavigationContext {
 }
 
 
-export interface UseGridNavigationCellReturnType<CellElement extends Element> extends UseListNavigationChildReturnType<CellElement> { }
+export interface UseGridNavigationCellReturnType<CellElement extends Element> extends UseListNavigationChildReturnType<CellElement> {
+    info: Pick<GridChildCellInfo<CellElement>, UseGridNavigationCellInfoKeysReturnType>; 
+}
 
 /**
  * Implements 2-dimensional grid-based keyboard navigation, similarly to {@link useListNavigation}.
@@ -190,7 +194,7 @@ export function useGridNavigation<ParentOrRowElement extends Element, RowElement
  */
 export function useGridNavigationRow<RowElement extends Element, CellElement extends Element>({
     // Stuff for the row as a child of the parent grid
-    info: managedChildParameters,
+    info: { index, untabbable, ...void3 },
     textContentParameters,
     context: contextFromParent,
 
@@ -207,7 +211,10 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
     monitorCallCount(useGridNavigationRow);
     const { getTabbableColumn, setTabbableColumn, setTabbableRow } = contextFromParent.gridNavigationRowContext;
 
-    const getIndex = useStableCallback(() => { return managedChildParameters.index })
+    const getIndex = useStableCallback(() => { return index })
+
+    // When this row is focused from the parent's `useRovingTabIndex`,
+    // instead of focusing the row element, this function focuses the appropriate cell element.
     const whenThisRowIsFocused = useStableCallback((e: RowElement) => {
         const { getChildren } = managedChildrenReturn;
 
@@ -246,17 +253,24 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
 
     const {
         props: propsLNC,
-        info,
-        ...ulncRet
-    } = useListNavigationChild<RowElement>({ info: managedChildParameters, refElementReturn, textContentParameters, context: contextFromParent });
-    const allChildCellsAreUntabbable = !ulncRet.rovingTabIndexChildReturn.tabbable;
+        info: { getLocallyTabbable, setLocallyTabbable, ...void2 },
+        hasCurrentFocusParameters,
+        pressParameters,
+        rovingTabIndexChildReturn,
+        textContentReturn,
+        ...void6
+    } = useListNavigationChild<RowElement>({ info: { index, untabbable }, refElementReturn, textContentParameters, context: contextFromParent });
+    const allChildCellsAreUntabbable = !rovingTabIndexChildReturn.tabbable;
 
     const {
         propsStableParentOrChild: propsLN,
-        // This is just tabIndex = 0 or -1, see the TODO below
         propsParent: propsLN2,
         context: contextULN,
-        ...ulnRet
+        linearNavigationReturn,
+        managedChildrenParameters,
+        rovingTabIndexReturn,
+        typeaheadNavigationReturn,
+        ...void5
     } = useListNavigation<RowElement, CellElement>({
         managedChildrenReturn,
         refElementReturn,
@@ -284,9 +298,13 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
 
 
     assertEmptyObject(void1);
+    assertEmptyObject(void2);
+    assertEmptyObject(void3);
     assertEmptyObject(void4);
+    assertEmptyObject(void5);
+    assertEmptyObject(void6);
 
-    const { setTabbableIndex } = ulnRet.rovingTabIndexReturn;
+    const { setTabbableIndex } = rovingTabIndexReturn;
 
     const gridNavigationCellContext = useMemoObject<UseGridNavigationCellContextSelf>({
         //allChildCellsAreUntabbable,
@@ -316,9 +334,15 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
     return {
         context: contextToChildren,
         props: useTagProps(props, "data-use-grid-navigation-partial-row"),
-        info: { focusSelf, ...info },
-        ...ulncRet,
-        ...ulnRet,
+        info: { focusSelf, getLocallyTabbable, setLocallyTabbable },
+        hasCurrentFocusParameters,
+        pressParameters,
+        rovingTabIndexChildReturn,
+        textContentReturn,
+        linearNavigationReturn,
+        managedChildrenParameters,
+        rovingTabIndexReturn,
+        typeaheadNavigationReturn
     }
 
 }

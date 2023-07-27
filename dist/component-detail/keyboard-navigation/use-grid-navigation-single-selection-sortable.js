@@ -9,6 +9,15 @@ import { useSortableChildren } from "./use-sortable-children.js";
  * The combinations are getting a bit silly but I swear this is the last one.
  */
 const _dummy = 0;
+/**
+ * Combines {@link useGridNavigation}, {@link useSingleSelection}, and {@link useSortableChildren}.
+ *
+ * @remarks This is a separate hook because {@link useSortableChildren} imposes unique requirements to the structure of your `children`.
+ *
+ * @hasChild {@link useGridNavigationSingleSelectionSortableRow}
+ *
+ * @compositeParams
+ */
 export function useGridNavigationSingleSelectionSortable({ rearrangeableChildrenParameters, sortableChildrenParameters, linearNavigationParameters, managedChildrenReturn, gridNavigationParameters, paginatedChildrenParameters, refElementReturn, rovingTabIndexParameters, singleSelectionParameters, typeaheadNavigationParameters, ...void1 }) {
     monitorCallCount(useGridNavigationSingleSelectionSortable);
     const { ...scr } = useSortableChildren({ rearrangeableChildrenParameters, sortableChildrenParameters, managedChildrenReturn });
@@ -26,18 +35,21 @@ export function useGridNavigationSingleSelectionSortable({ rearrangeableChildren
     assertEmptyObject(void1);
     return { ...gnr, ...scr, };
 }
-export function useGridNavigationSingleSelectionSortableRow({ context, info: { index, unselectable, untabbable, ...void2 }, linearNavigationParameters, managedChildrenReturn, refElementReturn, rovingTabIndexParameters, textContentParameters, typeaheadNavigationParameters, ...void1 }) {
+/**
+ * Besides just overriding `focusSelf` for `useRovingTabIndex`, this also overrides `getSortValue` to return the sort value of the current cell.
+ *
+ * @compositeParams
+ */
+export function useGridNavigationSingleSelectionSortableRow({ context: ctxIncoming, info: { index, unselectable, untabbable, ...void2 }, linearNavigationParameters, managedChildrenReturn, refElementReturn, rovingTabIndexParameters, textContentParameters, typeaheadNavigationParameters, ...void1 }) {
     monitorCallCount(useGridNavigationSingleSelectionSortableRow);
-    assertEmptyObject(void1);
-    assertEmptyObject(void2);
     const getSortValue = useCallback(() => {
         let rows = managedChildrenReturn.getChildren();
-        let columnIndex = context.gridNavigationRowContext.getTabbableColumn() || 0;
+        let columnIndex = ctxIncoming.gridNavigationRowContext.getTabbableColumn() || 0;
         let cell = rows.getAt(columnIndex);
         return cell?.getSortValue();
     }, []);
-    const { info, ...gridNavRet } = useGridNavigationSingleSelectionRow({
-        context,
+    const { info: { getLocallyTabbable, getSelected, selected, setLocalSelected, setLocallyTabbable, focusSelf, ...void4 }, context: ctxOutgoing, hasCurrentFocusParameters, linearNavigationReturn, managedChildrenParameters, pressParameters, props, rovingTabIndexChildReturn, rovingTabIndexReturn, singleSelectionChildReturn, textContentReturn, typeaheadNavigationReturn, ...void3 } = useGridNavigationSingleSelectionRow({
+        context: ctxIncoming,
         info: { index, unselectable, untabbable },
         linearNavigationParameters,
         managedChildrenReturn,
@@ -46,12 +58,28 @@ export function useGridNavigationSingleSelectionSortableRow({ context, info: { i
         textContentParameters,
         typeaheadNavigationParameters
     });
+    assertEmptyObject(void1);
+    assertEmptyObject(void2);
+    assertEmptyObject(void3);
+    assertEmptyObject(void4);
     return {
-        info: { ...info, getSortValue },
-        ...gridNavRet
+        info: { getLocallyTabbable, getSelected, selected, setLocallyTabbable, setLocalSelected, getSortValue, focusSelf },
+        context: ctxOutgoing,
+        hasCurrentFocusParameters,
+        linearNavigationReturn,
+        managedChildrenParameters,
+        pressParameters,
+        props,
+        rovingTabIndexChildReturn,
+        rovingTabIndexReturn,
+        singleSelectionChildReturn,
+        textContentReturn,
+        typeaheadNavigationReturn
     };
 }
-// EZ
+/**
+ * @compositeParams
+ */
 export function useGridNavigationSingleSelectionSortableCell({ context, gridNavigationCellParameters, info: { index, untabbable, ...void2 }, refElementReturn, textContentParameters, ...void1 }) {
     monitorCallCount(useGridNavigationSingleSelectionSortableCell);
     assertEmptyObject(void1);

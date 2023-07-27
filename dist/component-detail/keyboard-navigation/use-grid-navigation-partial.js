@@ -68,14 +68,16 @@ export function useGridNavigation({ gridNavigationParameters: { onTabbableColumn
  */
 export function useGridNavigationRow({ 
 // Stuff for the row as a child of the parent grid
-info: managedChildParameters, textContentParameters, context: contextFromParent, 
+info: { index, untabbable, ...void3 }, textContentParameters, context: contextFromParent, 
 // Stuff for the row as a parent of child cells
 linearNavigationParameters, rovingTabIndexParameters: { untabbable: rowIsUntabbableAndSoAreCells, initiallyTabbedIndex, onTabbableIndexChange, ...void4 }, managedChildrenReturn, typeaheadNavigationParameters, 
 // Both/neither
 refElementReturn, ...void1 }) {
     monitorCallCount(useGridNavigationRow);
     const { getTabbableColumn, setTabbableColumn, setTabbableRow } = contextFromParent.gridNavigationRowContext;
-    const getIndex = useStableCallback(() => { return managedChildParameters.index; });
+    const getIndex = useStableCallback(() => { return index; });
+    // When this row is focused from the parent's `useRovingTabIndex`,
+    // instead of focusing the row element, this function focuses the appropriate cell element.
     const whenThisRowIsFocused = useStableCallback((e) => {
         const { getChildren } = managedChildrenReturn;
         if (contextFromParent.rovingTabIndexContext.getUntabbable()) {
@@ -109,11 +111,9 @@ refElementReturn, ...void1 }) {
         }
     }, []);
     const focusSelf = whenThisRowIsFocused;
-    const { props: propsLNC, info, ...ulncRet } = useListNavigationChild({ info: managedChildParameters, refElementReturn, textContentParameters, context: contextFromParent });
-    const allChildCellsAreUntabbable = !ulncRet.rovingTabIndexChildReturn.tabbable;
-    const { propsStableParentOrChild: propsLN, 
-    // This is just tabIndex = 0 or -1, see the TODO below
-    propsParent: propsLN2, context: contextULN, ...ulnRet } = useListNavigation({
+    const { props: propsLNC, info: { getLocallyTabbable, setLocallyTabbable, ...void2 }, hasCurrentFocusParameters, pressParameters, rovingTabIndexChildReturn, textContentReturn, ...void6 } = useListNavigationChild({ info: { index, untabbable }, refElementReturn, textContentParameters, context: contextFromParent });
+    const allChildCellsAreUntabbable = !rovingTabIndexChildReturn.tabbable;
+    const { propsStableParentOrChild: propsLN, propsParent: propsLN2, context: contextULN, linearNavigationReturn, managedChildrenParameters, rovingTabIndexReturn, typeaheadNavigationReturn, ...void5 } = useListNavigation({
         managedChildrenReturn,
         refElementReturn,
         typeaheadNavigationParameters,
@@ -138,8 +138,12 @@ refElementReturn, ...void1 }) {
         paginatedChildrenParameters: { paginationMin: null, paginationMax: null }
     });
     assertEmptyObject(void1);
+    assertEmptyObject(void2);
+    assertEmptyObject(void3);
     assertEmptyObject(void4);
-    const { setTabbableIndex } = ulnRet.rovingTabIndexReturn;
+    assertEmptyObject(void5);
+    assertEmptyObject(void6);
+    const { setTabbableIndex } = rovingTabIndexReturn;
     const gridNavigationCellContext = useMemoObject({
         //allChildCellsAreUntabbable,
         setTabbableRow,
@@ -164,9 +168,15 @@ refElementReturn, ...void1 }) {
     return {
         context: contextToChildren,
         props: useTagProps(props, "data-use-grid-navigation-partial-row"),
-        info: { focusSelf, ...info },
-        ...ulncRet,
-        ...ulnRet,
+        info: { focusSelf, getLocallyTabbable, setLocallyTabbable },
+        hasCurrentFocusParameters,
+        pressParameters,
+        rovingTabIndexChildReturn,
+        textContentReturn,
+        linearNavigationReturn,
+        managedChildrenParameters,
+        rovingTabIndexReturn,
+        typeaheadNavigationReturn
     };
 }
 /**

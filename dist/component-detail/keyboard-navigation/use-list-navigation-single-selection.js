@@ -4,6 +4,15 @@ import { assertEmptyObject } from "../../util/assert.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
 import { useListNavigation, useListNavigationChild } from "./use-list-navigation-partial.js";
 import { useSingleSelection, useSingleSelectionChild } from "./use-single-selection.js";
+/**
+ * Combines {@link useListNavigation} and {@link useSingleSelection}.
+ *
+ * @remarks The single-selection behavior is optional, if you decide you need multi-selection instead within the same component.
+ *
+ * @hasChild {@link useListNavigationSingleSelectionChild}
+ *
+ * @compositeParams
+ */
 export function useListNavigationSingleSelection({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, managedChildrenReturn, refElementReturn, paginatedChildrenParameters, ...void3 }) {
     monitorCallCount(useListNavigationSingleSelection);
     const { context: contextLN, propsParent, propsStableParentOrChild, rovingTabIndexReturn, ...retLN } = useListNavigation({ linearNavigationParameters, rovingTabIndexParameters, paginatedChildrenParameters, typeaheadNavigationParameters, managedChildrenReturn, refElementReturn });
@@ -21,6 +30,9 @@ export function useListNavigationSingleSelection({ linearNavigationParameters, r
         propsParent: propsParent,
     };
 }
+/**
+ * @compositeParams
+ */
 export function useListNavigationSingleSelectionChild({ info: { index, untabbable, unselectable, ...void2 }, context, refElementReturn, textContentParameters, ...void1 }) {
     monitorCallCount(useListNavigationSingleSelectionChild);
     const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ...void3 }, info: infoSS, singleSelectionChildReturn, props: propsSS, pressParameters: { onPressSync }, ...void9 } = useSingleSelectionChild({

@@ -160,7 +160,7 @@
         {
           "kind": "Function",
           "canonicalReference": "preact-prop-helpers!assertEmptyObject:function(1)",
-          "docComment": "/**\n * Does nothing at runtime -- type checking only.\n *\n * Throws a (Typescript compiler) error if the passed object is anything but the empty object `{\\}`.\n *\n * Use this to ensure that your spread operators work correctly and cover all cases.\n *\n * @param _a - The remaining spread parameters of a given object that you expect to be empty (because you properly accounted for all the properties that exist in it, and want to ensure it stays that way)\n */\n",
+          "docComment": "/**\n * Throws a (Typescript compiler) error if the passed object is anything but the empty object `{\\}` or `void`.\n *\n * **Does nothing at runtime -- type checking only.**\n *\n * Use this to ensure that your spread operators work correctly and cover all cases.\n *\n * @param _a - The remaining spread parameters of a given object that you expect to be empty (because you properly accounted for all the properties that exist in it, and want to ensure it stays that way)\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -859,6 +859,19 @@
             },
             {
               "kind": "Reference",
+              "text": "UseChildrenHaveFocusContext",
+              "canonicalReference": "preact-prop-helpers!UseChildrenHaveFocusContext:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<ChildElement>"
+            },
+            {
+              "kind": "Content",
+              "text": ", "
+            },
+            {
+              "kind": "Reference",
               "text": "UseTypeaheadNavigationContext",
               "canonicalReference": "preact-prop-helpers!UseTypeaheadNavigationContext:interface"
             },
@@ -929,15 +942,19 @@
             },
             {
               "startIndex": 13,
-              "endIndex": 14
+              "endIndex": 15
             },
             {
-              "startIndex": 15,
-              "endIndex": 16
+              "startIndex": 16,
+              "endIndex": 17
             },
             {
-              "startIndex": 17,
-              "endIndex": 18
+              "startIndex": 18,
+              "endIndex": 19
+            },
+            {
+              "startIndex": 20,
+              "endIndex": 21
             }
           ]
         },
@@ -14577,7 +14594,25 @@
             },
             {
               "kind": "Content",
-              "text": ": { index, focusSelf, unselectable, untabbable, getSortValue, ...customUserInfo }, // The \"...info\" is empty if M is the same as UCLNCI<ChildElement>.\ntextContentParameters, "
+              "text": ": { index, focusSelf, unselectable, untabbable, getSortValue, ...customUserInfo }, // The \"...info\" is empty if M is the same as UCLNCI<ChildElement>.\ntextContentParameters, refElementParameters, "
+            },
+            {
+              "kind": "Reference",
+              "text": "hasCurrentFocusParameters",
+              "canonicalReference": "preact-prop-helpers!~hasCurrentFocusParameters"
+            },
+            {
+              "kind": "Content",
+              "text": ": { onCurrentFocusedChanged, "
+            },
+            {
+              "kind": "Reference",
+              "text": "onCurrentFocusedInnerChanged",
+              "canonicalReference": "preact-prop-helpers!UseHasCurrentFocusParametersSelf#onCurrentFocusedInnerChanged"
+            },
+            {
+              "kind": "Content",
+              "text": ": ocfic3, ...void7 }, "
             },
             {
               "kind": "Reference",
@@ -14586,7 +14621,7 @@
             },
             {
               "kind": "Content",
-              "text": ": { managedChildContext, rovingTabIndexContext, paginatedChildContext, staggeredChildContext, singleSelectionContext, typeaheadNavigationContext }, ...void1 }: "
+              "text": ": { managedChildContext, rovingTabIndexContext, paginatedChildContext, staggeredChildContext, singleSelectionContext, typeaheadNavigationContext, childrenHaveFocusChildContext, ...void5 }, ...void1 }: "
             },
             {
               "kind": "Reference",
@@ -14617,17 +14652,17 @@
           ],
           "fileUrlPath": "src/component-use/use-list-navigation-complete.tsx",
           "returnTypeTokenRange": {
-            "startIndex": 13,
-            "endIndex": 15
+            "startIndex": 17,
+            "endIndex": 19
           },
           "releaseTag": "Public",
           "overloadIndex": 1,
           "parameters": [
             {
-              "parameterName": "{ info: { index, focusSelf, unselectable, untabbable, getSortValue, ...customUserInfo }, // The \"...info\" is empty if M is the same as UCLNCI<ChildElement>.\ntextContentParameters, context: { managedChildContext, rovingTabIndexContext, paginatedChildContext, staggeredChildContext, singleSelectionContext, typeaheadNavigationContext }, ...void1 }",
+              "parameterName": "{ info: { index, focusSelf, unselectable, untabbable, getSortValue, ...customUserInfo }, // The \"...info\" is empty if M is the same as UCLNCI<ChildElement>.\ntextContentParameters, refElementParameters, hasCurrentFocusParameters: { onCurrentFocusedChanged, onCurrentFocusedInnerChanged: ocfic3, ...void7 }, context: { managedChildContext, rovingTabIndexContext, paginatedChildContext, staggeredChildContext, singleSelectionContext, typeaheadNavigationContext, childrenHaveFocusChildContext, ...void5 }, ...void1 }",
               "parameterTypeTokenRange": {
-                "startIndex": 10,
-                "endIndex": 12
+                "startIndex": 14,
+                "endIndex": 16
               },
               "isOptional": false
             }
@@ -14928,6 +14963,50 @@
             },
             {
               "kind": "Content",
+              "text": ", "
+            },
+            {
+              "kind": "Reference",
+              "text": "Pick",
+              "canonicalReference": "!Pick:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "UseRefElementParameters",
+              "canonicalReference": "preact-prop-helpers!UseRefElementParameters:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<ChildElement>, \"refElementParameters\">"
+            },
+            {
+              "kind": "Content",
+              "text": ", "
+            },
+            {
+              "kind": "Reference",
+              "text": "Pick",
+              "canonicalReference": "!Pick:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "UseHasCurrentFocusParameters",
+              "canonicalReference": "preact-prop-helpers!UseHasCurrentFocusParameters:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<ChildElement>, \"hasCurrentFocusParameters\">"
+            },
+            {
+              "kind": "Content",
               "text": " "
             }
           ],
@@ -14968,6 +15047,14 @@
             {
               "startIndex": 15,
               "endIndex": 19
+            },
+            {
+              "startIndex": 20,
+              "endIndex": 24
+            },
+            {
+              "startIndex": 25,
+              "endIndex": 29
             }
           ]
         },
@@ -16066,6 +16153,28 @@
             },
             {
               "kind": "Reference",
+              "text": "Pick",
+              "canonicalReference": "!Pick:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "UseChildrenHaveFocusReturnType",
+              "canonicalReference": "preact-prop-helpers!UseChildrenHaveFocusReturnType:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<ChildElement>, \"childrenHaveFocusReturn\">"
+            },
+            {
+              "kind": "Content",
+              "text": ", "
+            },
+            {
+              "kind": "Reference",
               "text": "OmitStrong",
               "canonicalReference": "preact-prop-helpers!OmitStrong:type"
             },
@@ -16208,6 +16317,10 @@
             {
               "startIndex": 23,
               "endIndex": 27
+            },
+            {
+              "startIndex": 28,
+              "endIndex": 32
             }
           ]
         },
@@ -20316,6 +20429,33 @@
           }
         },
         {
+          "kind": "TypeAlias",
+          "canonicalReference": "preact-prop-helpers!UseGridNavigationCellInfoKeysReturnType:type",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type UseGridNavigationCellInfoKeysReturnType = "
+            },
+            {
+              "kind": "Reference",
+              "text": "UseListNavigationChildInfoKeysReturnType",
+              "canonicalReference": "preact-prop-helpers!UseListNavigationChildInfoKeysReturnType:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/component-detail/keyboard-navigation/use-grid-navigation-partial.tsx",
+          "releaseTag": "Public",
+          "name": "UseGridNavigationCellInfoKeysReturnType",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          }
+        },
+        {
           "kind": "Interface",
           "canonicalReference": "preact-prop-helpers!UseGridNavigationCellParameters:interface",
           "docComment": "",
@@ -20562,7 +20702,58 @@
           ],
           "name": "UseGridNavigationCellReturnType",
           "preserveMemberOrder": false,
-          "members": [],
+          "members": [
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "preact-prop-helpers!UseGridNavigationCellReturnType#info:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "info: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Pick",
+                  "canonicalReference": "!Pick:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "GridChildCellInfo",
+                  "canonicalReference": "preact-prop-helpers!GridChildCellInfo:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<CellElement>, "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "UseGridNavigationCellInfoKeysReturnType",
+                  "canonicalReference": "preact-prop-helpers!UseGridNavigationCellInfoKeysReturnType:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ">"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "info",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 7
+              }
+            }
+          ],
           "extendsTokenRanges": [
             {
               "startIndex": 3,
@@ -21036,7 +21227,7 @@
             },
             {
               "kind": "Content",
-              "text": ": managedChildParameters, textContentParameters, "
+              "text": ": { index, untabbable, ...void3 }, textContentParameters, "
             },
             {
               "kind": "Reference",
@@ -21110,7 +21301,7 @@
           "overloadIndex": 1,
           "parameters": [
             {
-              "parameterName": "{ info: managedChildParameters, textContentParameters, context: contextFromParent, linearNavigationParameters, rovingTabIndexParameters: { untabbable: rowIsUntabbableAndSoAreCells, initiallyTabbedIndex, onTabbableIndexChange, ...void4 }, managedChildrenReturn, typeaheadNavigationParameters, refElementReturn, ...void1 }",
+              "parameterName": "{ info: { index, untabbable, ...void3 }, textContentParameters, context: contextFromParent, linearNavigationParameters, rovingTabIndexParameters: { untabbable: rowIsUntabbableAndSoAreCells, initiallyTabbedIndex, onTabbableIndexChange, ...void4 }, managedChildrenReturn, typeaheadNavigationParameters, refElementReturn, ...void1 }",
               "parameterTypeTokenRange": {
                 "startIndex": 13,
                 "endIndex": 17
@@ -21357,6 +21548,37 @@
           "typeTokenRange": {
             "startIndex": 1,
             "endIndex": 2
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "preact-prop-helpers!UseGridNavigationRowInfoKeysReturnType:type",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type UseGridNavigationRowInfoKeysReturnType = "
+            },
+            {
+              "kind": "Reference",
+              "text": "UseListNavigationChildInfoKeysReturnType",
+              "canonicalReference": "preact-prop-helpers!UseListNavigationChildInfoKeysReturnType:type"
+            },
+            {
+              "kind": "Content",
+              "text": " | \"focusSelf\""
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/component-detail/keyboard-navigation/use-grid-navigation-partial.tsx",
+          "releaseTag": "Public",
+          "name": "UseGridNavigationRowInfoKeysReturnType",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 3
           }
         },
         {
@@ -21797,12 +22019,12 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "UseRovingTabIndexChildInfoKeysReturnType",
-                  "canonicalReference": "preact-prop-helpers!UseRovingTabIndexChildInfoKeysReturnType:type"
+                  "text": "UseGridNavigationRowInfoKeysReturnType",
+                  "canonicalReference": "preact-prop-helpers!UseGridNavigationRowInfoKeysReturnType:type"
                 },
                 {
                   "kind": "Content",
-                  "text": " | \"focusSelf\">"
+                  "text": ">"
                 },
                 {
                   "kind": "Content",
@@ -21912,7 +22134,7 @@
         {
           "kind": "Function",
           "canonicalReference": "preact-prop-helpers!useGridNavigationSingleSelection:function(1)",
-          "docComment": "",
+          "docComment": "/**\n * Combines {@link useGridNavigation} and {@link useSingleSelection}.\n *\n * @remarks\n *\n * The single-selection behavior is optional, if you decide you need multi-selection instead within the same component.\n *\n * @hasChild\n *\n * {@link useGridNavigationSingleSelectionRow}\n *\n * @hasChild\n *\n * {@link useGridNavigationSingleSelectionCell}\n *\n * @compositeParams\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -22018,7 +22240,7 @@
         {
           "kind": "Function",
           "canonicalReference": "preact-prop-helpers!useGridNavigationSingleSelectionCell:function(1)",
-          "docComment": "",
+          "docComment": "/**\n * @compositeParams\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -22114,6 +22336,33 @@
           "fileUrlPath": "src/component-detail/keyboard-navigation/use-grid-navigation-single-selection.tsx",
           "releaseTag": "Public",
           "name": "UseGridNavigationSingleSelectionCellInfoKeysParameters",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "preact-prop-helpers!UseGridNavigationSingleSelectionCellInfoKeysReturnType:type",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type UseGridNavigationSingleSelectionCellInfoKeysReturnType = "
+            },
+            {
+              "kind": "Reference",
+              "text": "UseGridNavigationCellInfoKeysReturnType",
+              "canonicalReference": "preact-prop-helpers!UseGridNavigationCellInfoKeysReturnType:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/component-detail/keyboard-navigation/use-grid-navigation-single-selection.tsx",
+          "releaseTag": "Public",
+          "name": "UseGridNavigationSingleSelectionCellInfoKeysReturnType",
           "typeTokenRange": {
             "startIndex": 1,
             "endIndex": 2
@@ -22226,7 +22475,58 @@
           ],
           "name": "UseGridNavigationSingleSelectionCellParameters",
           "preserveMemberOrder": false,
-          "members": [],
+          "members": [
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "preact-prop-helpers!UseGridNavigationSingleSelectionCellParameters#info:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "info: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Pick",
+                  "canonicalReference": "!Pick:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "GridSingleSelectChildCellInfo",
+                  "canonicalReference": "preact-prop-helpers!GridSingleSelectChildCellInfo:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<CellElement>, "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "UseGridNavigationSingleSelectionCellInfoKeysParameters",
+                  "canonicalReference": "preact-prop-helpers!UseGridNavigationSingleSelectionCellInfoKeysParameters:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ">"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "info",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 7
+              }
+            }
+          ],
           "extendsTokenRanges": [
             {
               "startIndex": 3,
@@ -22287,7 +22587,58 @@
           ],
           "name": "UseGridNavigationSingleSelectionCellReturnType",
           "preserveMemberOrder": false,
-          "members": [],
+          "members": [
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "preact-prop-helpers!UseGridNavigationSingleSelectionCellReturnType#info:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "info: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Pick",
+                  "canonicalReference": "!Pick:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "GridSingleSelectChildCellInfo",
+                  "canonicalReference": "preact-prop-helpers!GridSingleSelectChildCellInfo:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<CellElement>, "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "UseGridNavigationSingleSelectionCellInfoKeysReturnType",
+                  "canonicalReference": "preact-prop-helpers!UseGridNavigationSingleSelectionCellInfoKeysReturnType:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ">"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "info",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 7
+              }
+            }
+          ],
           "extendsTokenRanges": [
             {
               "startIndex": 3,
@@ -22550,7 +22901,7 @@
         {
           "kind": "Function",
           "canonicalReference": "preact-prop-helpers!useGridNavigationSingleSelectionRow:function(1)",
-          "docComment": "",
+          "docComment": "/**\n * @compositeParams\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -22577,7 +22928,7 @@
             {
               "kind": "Reference",
               "text": "info",
-              "canonicalReference": "preact-prop-helpers!UseGenericChildParameters#info"
+              "canonicalReference": "preact-prop-helpers!UseGridNavigationSingleSelectionRowParameters#info"
             },
             {
               "kind": "Content",
@@ -22687,6 +23038,42 @@
           "typeTokenRange": {
             "startIndex": 1,
             "endIndex": 2
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "preact-prop-helpers!UseGridNavigationSingleSelectionRowInfoKeysReturnType:type",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type UseGridNavigationSingleSelectionRowInfoKeysReturnType = "
+            },
+            {
+              "kind": "Reference",
+              "text": "UseGridNavigationRowInfoKeysReturnType",
+              "canonicalReference": "preact-prop-helpers!UseGridNavigationRowInfoKeysReturnType:type"
+            },
+            {
+              "kind": "Content",
+              "text": " | "
+            },
+            {
+              "kind": "Reference",
+              "text": "UseSingleSelectionChildInfoKeysReturnType",
+              "canonicalReference": "preact-prop-helpers!UseSingleSelectionChildInfoKeysReturnType:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/component-detail/keyboard-navigation/use-grid-navigation-single-selection.tsx",
+          "releaseTag": "Public",
+          "name": "UseGridNavigationSingleSelectionRowInfoKeysReturnType",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 4
           }
         },
         {
@@ -22862,7 +23249,58 @@
           ],
           "name": "UseGridNavigationSingleSelectionRowParameters",
           "preserveMemberOrder": false,
-          "members": [],
+          "members": [
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "preact-prop-helpers!UseGridNavigationSingleSelectionRowParameters#info:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "info: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Pick",
+                  "canonicalReference": "!Pick:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "GridSingleSelectChildRowInfo",
+                  "canonicalReference": "preact-prop-helpers!GridSingleSelectChildRowInfo:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<RowElement>, "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "UseGridNavigationSingleSelectionRowInfoKeysParameters",
+                  "canonicalReference": "preact-prop-helpers!UseGridNavigationSingleSelectionRowInfoKeysParameters:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ">"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "info",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 7
+              }
+            }
+          ],
           "extendsTokenRanges": [
             {
               "startIndex": 8,
@@ -23028,21 +23466,12 @@
                 },
                 {
                   "kind": "Content",
-                  "text": "<RowElement>, \"focusSelf\" | "
+                  "text": "<RowElement>, "
                 },
                 {
                   "kind": "Reference",
-                  "text": "UseSingleSelectionChildInfoKeysReturnType",
-                  "canonicalReference": "preact-prop-helpers!UseSingleSelectionChildInfoKeysReturnType:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": " | "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "UseRovingTabIndexChildInfoKeysReturnType",
-                  "canonicalReference": "preact-prop-helpers!UseRovingTabIndexChildInfoKeysReturnType:type"
+                  "text": "UseGridNavigationSingleSelectionRowInfoKeysReturnType",
+                  "canonicalReference": "preact-prop-helpers!UseGridNavigationSingleSelectionRowInfoKeysReturnType:type"
                 },
                 {
                   "kind": "Content",
@@ -23059,7 +23488,7 @@
               "name": "info",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
-                "endIndex": 9
+                "endIndex": 7
               }
             }
           ],
@@ -23073,7 +23502,7 @@
         {
           "kind": "Function",
           "canonicalReference": "preact-prop-helpers!useGridNavigationSingleSelectionSortable:function(1)",
-          "docComment": "",
+          "docComment": "/**\n * Combines {@link useGridNavigation}, {@link useSingleSelection}, and {@link useSortableChildren}.\n *\n * @remarks\n *\n * This is a separate hook because {@link useSortableChildren} imposes unique requirements to the structure of your `children`.\n *\n * @hasChild\n *\n * {@link useGridNavigationSingleSelectionSortableRow}\n *\n * @compositeParams\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -23087,15 +23516,6 @@
             {
               "kind": "Content",
               "text": ", RowElement extends "
-            },
-            {
-              "kind": "Reference",
-              "text": "Element",
-              "canonicalReference": "!Element:interface"
-            },
-            {
-              "kind": "Content",
-              "text": ", CellElement extends "
             },
             {
               "kind": "Reference",
@@ -23148,8 +23568,8 @@
           ],
           "fileUrlPath": "src/component-detail/keyboard-navigation/use-grid-navigation-single-selection-sortable.tsx",
           "returnTypeTokenRange": {
-            "startIndex": 13,
-            "endIndex": 15
+            "startIndex": 11,
+            "endIndex": 13
           },
           "releaseTag": "Public",
           "overloadIndex": 1,
@@ -23157,8 +23577,8 @@
             {
               "parameterName": "{ rearrangeableChildrenParameters, sortableChildrenParameters, linearNavigationParameters, managedChildrenReturn, gridNavigationParameters, paginatedChildrenParameters, refElementReturn, rovingTabIndexParameters, singleSelectionParameters, typeaheadNavigationParameters, ...void1 }",
               "parameterTypeTokenRange": {
-                "startIndex": 10,
-                "endIndex": 12
+                "startIndex": 8,
+                "endIndex": 10
               },
               "isOptional": false
             }
@@ -23187,21 +23607,10 @@
               }
             },
             {
-              "typeParameterName": "CellElement",
-              "constraintTokenRange": {
-                "startIndex": 5,
-                "endIndex": 6
-              },
-              "defaultTypeTokenRange": {
-                "startIndex": 0,
-                "endIndex": 0
-              }
-            },
-            {
               "typeParameterName": "RM",
               "constraintTokenRange": {
-                "startIndex": 7,
-                "endIndex": 9
+                "startIndex": 5,
+                "endIndex": 7
               },
               "defaultTypeTokenRange": {
                 "startIndex": 0,
@@ -23214,7 +23623,7 @@
         {
           "kind": "Function",
           "canonicalReference": "preact-prop-helpers!useGridNavigationSingleSelectionSortableCell:function(1)",
-          "docComment": "",
+          "docComment": "/**\n * @compositeParams\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -23317,8 +23726,8 @@
             },
             {
               "kind": "Reference",
-              "text": "UseListNavigationChildInfoKeysParameters",
-              "canonicalReference": "preact-prop-helpers!UseListNavigationChildInfoKeysParameters:type"
+              "text": "UseGridNavigationSingleSelectionCellInfoKeysParameters",
+              "canonicalReference": "preact-prop-helpers!UseGridNavigationSingleSelectionCellInfoKeysParameters:type"
             },
             {
               "kind": "Content",
@@ -23328,6 +23737,33 @@
           "fileUrlPath": "src/component-detail/keyboard-navigation/use-grid-navigation-single-selection-sortable.tsx",
           "releaseTag": "Public",
           "name": "UseGridNavigationSingleSelectionSortableCellInfoKeysParameters",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "preact-prop-helpers!UseGridNavigationSingleSelectionSortableCellInfoKeysReturnType:type",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type UseGridNavigationSingleSelectionSortableCellInfoKeysReturnType = "
+            },
+            {
+              "kind": "Reference",
+              "text": "UseGridNavigationSingleSelectionCellInfoKeysReturnType",
+              "canonicalReference": "preact-prop-helpers!UseGridNavigationSingleSelectionCellInfoKeysReturnType:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/component-detail/keyboard-navigation/use-grid-navigation-single-selection-sortable.tsx",
+          "releaseTag": "Public",
+          "name": "UseGridNavigationSingleSelectionSortableCellInfoKeysReturnType",
           "typeTokenRange": {
             "startIndex": 1,
             "endIndex": 2
@@ -23827,7 +24263,7 @@
         {
           "kind": "Function",
           "canonicalReference": "preact-prop-helpers!useGridNavigationSingleSelectionSortableRow:function(1)",
-          "docComment": "",
+          "docComment": "/**\n * Besides just overriding `focusSelf` for `useRovingTabIndex`, this also overrides `getSortValue` to return the sort value of the current cell.\n *\n * @compositeParams\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -23875,7 +24311,16 @@
             },
             {
               "kind": "Content",
-              "text": ">({ context, "
+              "text": ">({ "
+            },
+            {
+              "kind": "Reference",
+              "text": "context",
+              "canonicalReference": "preact-prop-helpers!UseGenericChildParameters#context"
+            },
+            {
+              "kind": "Content",
+              "text": ": ctxIncoming, "
             },
             {
               "kind": "Reference",
@@ -23915,17 +24360,17 @@
           ],
           "fileUrlPath": "src/component-detail/keyboard-navigation/use-grid-navigation-single-selection-sortable.tsx",
           "returnTypeTokenRange": {
-            "startIndex": 16,
-            "endIndex": 18
+            "startIndex": 18,
+            "endIndex": 20
           },
           "releaseTag": "Public",
           "overloadIndex": 1,
           "parameters": [
             {
-              "parameterName": "{ context, info: { index, unselectable, untabbable, ...void2 }, linearNavigationParameters, managedChildrenReturn, refElementReturn, rovingTabIndexParameters, textContentParameters, typeaheadNavigationParameters, ...void1 }",
+              "parameterName": "{ context: ctxIncoming, info: { index, unselectable, untabbable, ...void2 }, linearNavigationParameters, managedChildrenReturn, refElementReturn, rovingTabIndexParameters, textContentParameters, typeaheadNavigationParameters, ...void1 }",
               "parameterTypeTokenRange": {
-                "startIndex": 13,
-                "endIndex": 15
+                "startIndex": 15,
+                "endIndex": 17
               },
               "isOptional": false
             }
@@ -23989,8 +24434,8 @@
             },
             {
               "kind": "Reference",
-              "text": "UseListNavigationSingleSelectionSortableChildInfoKeysParameters",
-              "canonicalReference": "preact-prop-helpers!UseListNavigationSingleSelectionSortableChildInfoKeysParameters:type"
+              "text": "UseGridNavigationSingleSelectionRowInfoKeysParameters",
+              "canonicalReference": "preact-prop-helpers!UseGridNavigationSingleSelectionRowInfoKeysParameters:type"
             },
             {
               "kind": "Content",
@@ -24000,6 +24445,33 @@
           "fileUrlPath": "src/component-detail/keyboard-navigation/use-grid-navigation-single-selection-sortable.tsx",
           "releaseTag": "Public",
           "name": "UseGridNavigationSingleSelectionSortableRowInfoKeysParameters",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "preact-prop-helpers!UseGridNavigationSingleSelectionSortableRowInfoKeysReturnType:type",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type UseGridNavigationSingleSelectionSortableRowInfoKeysReturnType = "
+            },
+            {
+              "kind": "Reference",
+              "text": "UseGridNavigationSingleSelectionRowInfoKeysReturnType",
+              "canonicalReference": "preact-prop-helpers!UseGridNavigationSingleSelectionRowInfoKeysReturnType:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/component-detail/keyboard-navigation/use-grid-navigation-single-selection-sortable.tsx",
+          "releaseTag": "Public",
+          "name": "UseGridNavigationSingleSelectionSortableRowInfoKeysReturnType",
           "typeTokenRange": {
             "startIndex": 1,
             "endIndex": 2
@@ -27432,7 +27904,7 @@
         {
           "kind": "TypeAlias",
           "canonicalReference": "preact-prop-helpers!UseListNavigationChildInfoKeysParameters:type",
-          "docComment": "",
+          "docComment": "/**\n * {@link useListNavigationChild} requires the same `info` that {@link useRovingTabIndexChild} and {@link useTypeaheadNavigationChild} do (there is no `useLinearNavigationChild`)\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -28207,7 +28679,7 @@
         {
           "kind": "Function",
           "canonicalReference": "preact-prop-helpers!useListNavigationSingleSelection:function(1)",
-          "docComment": "",
+          "docComment": "/**\n * Combines {@link useListNavigation} and {@link useSingleSelection}.\n *\n * @remarks\n *\n * The single-selection behavior is optional, if you decide you need multi-selection instead within the same component.\n *\n * @hasChild\n *\n * {@link useListNavigationSingleSelectionChild}\n *\n * @compositeParams\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -28313,7 +28785,7 @@
         {
           "kind": "Function",
           "canonicalReference": "preact-prop-helpers!useListNavigationSingleSelectionChild:function(1)",
-          "docComment": "",
+          "docComment": "/**\n * @compositeParams\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -29135,7 +29607,7 @@
         {
           "kind": "Function",
           "canonicalReference": "preact-prop-helpers!useListNavigationSingleSelectionSortable:function(1)",
-          "docComment": "",
+          "docComment": "/**\n * Combines {@link useListNavigation}, {@link useSingleSelection}, and {@link useSortableChildren}.\n *\n * @remarks\n *\n * This is a separate hook because {@link useSortableChildren} imposes unique requirements to the structure of your `children`.\n *\n * @hasChild\n *\n * {@link useListNavigationSingleSelectionSortableChild}\n *\n * @compositeParams\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -29256,7 +29728,7 @@
         {
           "kind": "Function",
           "canonicalReference": "preact-prop-helpers!useListNavigationSingleSelectionSortableChild:function(1)",
-          "docComment": "",
+          "docComment": "/**\n * @compositeParams\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",

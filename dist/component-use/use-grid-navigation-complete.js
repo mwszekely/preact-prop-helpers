@@ -36,7 +36,7 @@ export function useCompleteGridNavigation({ gridNavigationParameters, linearNavi
         return true;
     }, []);
     const { refElementReturn, propsStable, ...void2 } = useRefElement({ refElementParameters });
-    const { childrenHaveFocusParameters, managedChildrenParameters, context: { gridNavigationRowContext, rovingTabIndexContext, singleSelectionContext, typeaheadNavigationContext }, rearrangeableChildrenReturn, propsParent, propsStableParentOrChild, rovingTabIndexReturn, ...gridNavigationSingleSelectionReturn } = useGridNavigationSingleSelectionSortable({
+    const { childrenHaveFocusParameters, managedChildrenParameters, context: { gridNavigationRowContext, rovingTabIndexContext, singleSelectionContext, typeaheadNavigationContext }, rearrangeableChildrenReturn, propsParent, propsStableParentOrChild, rovingTabIndexReturn, linearNavigationReturn, singleSelectionReturn, sortableChildrenReturn, typeaheadNavigationReturn, ...void3 } = useGridNavigationSingleSelectionSortable({
         gridNavigationParameters,
         linearNavigationParameters: { getLowestIndex: getLowestChildIndex, getHighestIndex: getHighestChildIndex, isValidForLinearNavigation: isValidForNavigation, ...linearNavigationParameters },
         managedChildrenReturn: { getChildren },
@@ -67,6 +67,9 @@ export function useCompleteGridNavigation({ gridNavigationParameters, linearNavi
         staggeredChildContext,
         gridNavigationRowContext
     });
+    assertEmptyObject(void1);
+    assertEmptyObject(void2);
+    assertEmptyObject(void3);
     return {
         context,
         props: useMergedProps(propsParent, propsStable, propsStableParentOrChild),
@@ -76,7 +79,10 @@ export function useCompleteGridNavigation({ gridNavigationParameters, linearNavi
         rovingTabIndexReturn,
         childrenHaveFocusReturn,
         paginatedChildrenReturn,
-        ...gridNavigationSingleSelectionReturn,
+        linearNavigationReturn,
+        singleSelectionReturn,
+        sortableChildrenReturn,
+        typeaheadNavigationReturn
     };
 }
 /**

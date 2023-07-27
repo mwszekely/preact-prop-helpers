@@ -164,8 +164,12 @@ export function useCompleteGridNavigation<ParentOrRowElement extends Element, Ro
         propsParent,
         propsStableParentOrChild,
         rovingTabIndexReturn,
-        ...gridNavigationSingleSelectionReturn
-    }: UseGridNavigationSingleSelectionSortableReturnType<ParentOrRowElement, RowElement, RM> = useGridNavigationSingleSelectionSortable<ParentOrRowElement, RowElement, CellElement, RM>({
+        linearNavigationReturn,
+        singleSelectionReturn,
+        sortableChildrenReturn,
+        typeaheadNavigationReturn,
+        ...void3
+    }: UseGridNavigationSingleSelectionSortableReturnType<ParentOrRowElement, RowElement, RM> = useGridNavigationSingleSelectionSortable<ParentOrRowElement, RowElement, RM>({
         gridNavigationParameters,
         linearNavigationParameters: { getLowestIndex: getLowestChildIndex, getHighestIndex: getHighestChildIndex, isValidForLinearNavigation: isValidForNavigation, ...linearNavigationParameters },
         managedChildrenReturn: { getChildren },
@@ -201,6 +205,10 @@ export function useCompleteGridNavigation<ParentOrRowElement extends Element, Ro
         gridNavigationRowContext
     });
 
+    assertEmptyObject(void1);
+    assertEmptyObject(void2);
+    assertEmptyObject(void3);
+
     return {
         context,
         props: useMergedProps(propsParent, propsStable, propsStableParentOrChild),
@@ -211,7 +219,10 @@ export function useCompleteGridNavigation<ParentOrRowElement extends Element, Ro
         rovingTabIndexReturn,
         childrenHaveFocusReturn,
         paginatedChildrenReturn,
-        ...gridNavigationSingleSelectionReturn,
+        linearNavigationReturn,
+        singleSelectionReturn,
+        sortableChildrenReturn,
+        typeaheadNavigationReturn
     }
 
 }

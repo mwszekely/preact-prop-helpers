@@ -45,6 +45,15 @@ export interface UseListNavigationSingleSelectionSortableChildReturnType<ChildEl
 
 }
 
+/**
+ * Combines {@link useListNavigation}, {@link useSingleSelection}, and {@link useSortableChildren}.
+ * 
+ * @remarks This is a separate hook because {@link useSortableChildren} imposes unique requirements to the structure of your `children`.
+ * 
+ * @hasChild {@link useListNavigationSingleSelectionSortableChild}
+ * 
+ * @compositeParams
+ */
 export function useListNavigationSingleSelectionSortable<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationSingleSelectionSortableChildInfo<ChildElement>>({
     linearNavigationParameters,
     rovingTabIndexParameters,
@@ -76,6 +85,9 @@ export function useListNavigationSingleSelectionSortable<ParentOrChildElement ex
 }
 
 
+/**
+ * @compositeParams
+ */
 export function useListNavigationSingleSelectionSortableChild<ChildElement extends Element>({
     info,
     context,

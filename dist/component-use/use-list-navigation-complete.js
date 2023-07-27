@@ -5,6 +5,7 @@ import { usePaginatedChild, usePaginatedChildren } from "../component-detail/use
 import { useStaggeredChild, useStaggeredChildren } from "../component-detail/use-staggered-children.js";
 import { useMergedProps } from "../dom-helpers/use-merged-props.js";
 import { useRefElement } from "../dom-helpers/use-ref-element.js";
+import { useChildrenHaveFocus, useChildrenHaveFocusChild } from "../observers/use-children-have-focus.js";
 import { useHasCurrentFocus } from "../observers/use-has-current-focus.js";
 import { useManagedChild, useManagedChildren } from "../preact-extensions/use-managed-children.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
@@ -37,7 +38,7 @@ export function useCompleteListNavigation({ linearNavigationParameters, rearrang
         return true;
     }, []);
     const { propsStable: propsRef, refElementReturn } = useRefElement({ refElementParameters });
-    const { childrenHaveFocusParameters, managedChildrenParameters: { onChildrenMountChange, ...mcp1 }, context: { rovingTabIndexContext, singleSelectionContext, typeaheadNavigationContext }, linearNavigationReturn, rovingTabIndexReturn, singleSelectionReturn, typeaheadNavigationReturn, rearrangeableChildrenReturn, sortableChildrenReturn, propsParent, propsStableParentOrChild } = useListNavigationSingleSelectionSortable({
+    const { childrenHaveFocusParameters, managedChildrenParameters: { onChildrenMountChange, ...mcp1 }, context: { rovingTabIndexContext, singleSelectionContext, typeaheadNavigationContext }, linearNavigationReturn, rovingTabIndexReturn, singleSelectionReturn, typeaheadNavigationReturn, rearrangeableChildrenReturn, sortableChildrenReturn, propsParent, propsStableParentOrChild, ...void2 } = useListNavigationSingleSelectionSortable({
         managedChildrenReturn: { getChildren },
         linearNavigationParameters: { getLowestIndex, getHighestIndex, isValidForLinearNavigation: isValidForNavigation, ...linearNavigationParameters },
         typeaheadNavigationParameters: { isValidForTypeaheadNavigation: isValidForNavigation, ...typeaheadNavigationParameters },
@@ -51,7 +52,7 @@ export function useCompleteListNavigation({ linearNavigationParameters, rearrang
         refElementReturn,
         sortableChildrenParameters
     });
-    //const { context: { childrenHaveFocusChildContext }, childrenHaveFocusReturn } = useChildrenHaveFocus({ childrenHaveFocusParameters });
+    const { context: { childrenHaveFocusChildContext }, childrenHaveFocusReturn } = useChildrenHaveFocus({ childrenHaveFocusParameters });
     const { paginatedChildrenReturn, paginatedChildrenReturn: { refreshPagination }, managedChildrenParameters: mcp2, context: { paginatedChildContext } } = usePaginatedChildren({ refElementReturn, managedChildrenReturn: { getChildren: useStableCallback(() => managedChildrenReturn.getChildren()) }, rovingTabIndexReturn, paginatedChildrenParameters, linearNavigationParameters: { indexDemangler: rearrangeableChildrenReturn.indexDemangler } });
     const { context: { staggeredChildContext }, staggeredChildrenReturn } = useStaggeredChildren({ managedChildrenReturn: { getChildren: useStableCallback(() => managedChildrenReturn.getChildren()) }, staggeredChildrenParameters });
     const mcr = useManagedChildren({
@@ -63,7 +64,7 @@ export function useCompleteListNavigation({ linearNavigationParameters, rearrang
     });
     const { context: { managedChildContext }, managedChildrenReturn } = mcr;
     const context = useMemoObject(useMemoObject({
-        //childrenHaveFocusChildContext,
+        childrenHaveFocusChildContext,
         managedChildContext,
         paginatedChildContext,
         rovingTabIndexContext,
@@ -72,6 +73,7 @@ export function useCompleteListNavigation({ linearNavigationParameters, rearrang
         typeaheadNavigationContext
     }));
     assertEmptyObject(void1);
+    assertEmptyObject(void2);
     return {
         context,
         props: useMergedProps(propsParent, propsRef, propsStableParentOrChild),
@@ -84,7 +86,7 @@ export function useCompleteListNavigation({ linearNavigationParameters, rearrang
         rovingTabIndexReturn,
         singleSelectionReturn,
         typeaheadNavigationReturn,
-        //childrenHaveFocusReturn
+        childrenHaveFocusReturn
     };
 }
 /**
@@ -92,26 +94,25 @@ export function useCompleteListNavigation({ linearNavigationParameters, rearrang
  * @compositeParams
  */
 export function useCompleteListNavigationChild({ info: { index, focusSelf, unselectable, untabbable, getSortValue, ...customUserInfo }, // The "...info" is empty if M is the same as UCLNCI<ChildElement>.
-textContentParameters, context: { managedChildContext, rovingTabIndexContext, paginatedChildContext, staggeredChildContext, singleSelectionContext, typeaheadNavigationContext }, ...void1 }) {
+textContentParameters, refElementParameters, hasCurrentFocusParameters: { onCurrentFocusedChanged, onCurrentFocusedInnerChanged: ocfic3, ...void7 }, context: { managedChildContext, rovingTabIndexContext, paginatedChildContext, staggeredChildContext, singleSelectionContext, typeaheadNavigationContext, childrenHaveFocusChildContext, ...void5 }, ...void1 }) {
     monitorCallCount(useCompleteListNavigationChild);
     const { info: infoFromPaginated, paginatedChildReturn, paginatedChildReturn: { hideBecausePaginated }, props: paginationProps } = usePaginatedChild({ info: { index }, context: { paginatedChildContext } });
     const { info: infoFromStaggered, staggeredChildReturn, staggeredChildReturn: { hideBecauseStaggered }, props: staggeredProps } = useStaggeredChild({ info: { index }, context: { staggeredChildContext } });
+    // TODO: uPC and pSC can't exactly return `{ info: { untabbable: false } }`, or can they...? 
+    // (Really it's more about *should* they -- I don't like this hook doing more than just calling sub-hooks, but where else does this logic take place if not here?)
     untabbable ||= (hideBecausePaginated || hideBecauseStaggered);
     unselectable ||= (hideBecausePaginated || hideBecauseStaggered);
+    // TODO: I feel like this needs stronger justification. It's probably correct but why is it here of all places?
+    // I.E. shouldn't it be in useListNavigationSingleSelection?
     if (untabbable)
         unselectable = true;
-    const { refElementReturn, propsStable } = useRefElement({ refElementParameters: {} });
+    const { refElementReturn, propsStable, ...void6 } = useRefElement({ refElementParameters });
     const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void3 }, pressParameters: { excludeSpace, onPressSync, ...void2 }, textContentReturn, singleSelectionChildReturn, info: infoFromListNav, rovingTabIndexChildReturn, propsChild, propsTabbable, ...void4 } = useListNavigationSingleSelectionChild({
         info: { index, unselectable, untabbable },
         context: { rovingTabIndexContext, singleSelectionContext, typeaheadNavigationContext },
         refElementReturn,
         textContentParameters
     });
-    /*const onPress = useStableCallback((e: PressEventReason<any>) => {
-        if (singleSelectionContext.selectionMode == "activation")
-            singleSelectionContext.onSelectedIndexChange?.(enhanceEvent(e, { selectedIndex: index }));
-    });*/
-    //const onPressSync = (rovingTabIndexContext.untabbable || unselectable || untabbable) ? null : onPress;
     const allStandardInfo = {
         index,
         focusSelf,
@@ -124,17 +125,27 @@ textContentParameters, context: { managedChildContext, rovingTabIndexContext, pa
         ...infoFromListNav,
     };
     const { managedChildReturn } = useManagedChild({ context: { managedChildContext }, info: { ...allStandardInfo, ...customUserInfo } });
-    //const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2 } } = useChildrenHaveFocusChild({ context: { childrenHaveFocusChildContext } });
+    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2 } } = useChildrenHaveFocusChild({ context: { childrenHaveFocusChildContext } });
     const onCurrentFocusedInnerChanged = useStableCallback((focused, prev, e) => {
         ocfic1?.(focused, prev, e);
-        //ocfic2?.(focused, prev, e);
+        ocfic2?.(focused, prev, e);
+        ocfic3?.(focused, prev, e);
     });
-    const { hasCurrentFocusReturn } = useHasCurrentFocus({ hasCurrentFocusParameters: { onCurrentFocusedInnerChanged, onCurrentFocusedChanged: null }, refElementReturn });
+    const { hasCurrentFocusReturn } = useHasCurrentFocus({
+        hasCurrentFocusParameters: {
+            onCurrentFocusedInnerChanged,
+            onCurrentFocusedChanged
+        },
+        refElementReturn
+    });
     const props = useMergedProps(propsStable, hasCurrentFocusReturn.propsStable, propsChild, paginationProps, staggeredProps);
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     assertEmptyObject(void3);
     assertEmptyObject(void4);
+    assertEmptyObject(void5);
+    assertEmptyObject(void6);
+    assertEmptyObject(void7);
     return {
         propsChild: props,
         propsTabbable,

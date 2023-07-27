@@ -1,7 +1,7 @@
 /**
- * Does nothing at runtime -- type checking only.
+ * Throws a (Typescript compiler) error if the passed object is anything but the empty object `{\}` or `void`.
  *
- * Throws a (Typescript compiler) error if the passed object is anything but the empty object `{\}`.
+ * **Does nothing at runtime -- type checking only.**
  *
  * Use this to ensure that your spread operators work correctly and cover all cases.
  *

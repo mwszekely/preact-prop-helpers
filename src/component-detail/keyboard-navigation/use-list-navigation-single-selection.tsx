@@ -29,6 +29,15 @@ export interface UseListNavigationSingleSelectionChildReturnType<ChildElement ex
     propsChild: ElementProps<any>;
 }
 
+/**
+ * Combines {@link useListNavigation} and {@link useSingleSelection}.
+ * 
+ * @remarks The single-selection behavior is optional, if you decide you need multi-selection instead within the same component.
+ * 
+ * @hasChild {@link useListNavigationSingleSelectionChild}
+ * 
+ * @compositeParams
+ */
 export function useListNavigationSingleSelection<ParentOrChildElement extends Element, ChildElement extends Element>({
     linearNavigationParameters,
     rovingTabIndexParameters,
@@ -58,7 +67,9 @@ export function useListNavigationSingleSelection<ParentOrChildElement extends El
     }
 }
 
-
+/**
+ * @compositeParams
+ */
 export function useListNavigationSingleSelectionChild<ChildElement extends Element>({
     info: { index, untabbable, unselectable, ...void2 },
     context,
