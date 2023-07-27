@@ -146,7 +146,9 @@ const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
     } = useCompleteListNavigationChild<HTMLLIElement, CustomInfoType>({
         info: { index, focusSelf, foo: "bar", untabbable: hidden, unselectable: disabled, getSortValue },
         context,
-        textContentParameters: { getText: useCallback((e) => { return e?.textContent ?? "" }, []) }
+        textContentParameters: { getText: useCallback((e) => { return e?.textContent ?? "" }, []) },
+        hasCurrentFocusParameters: { onCurrentFocusedChanged: null, onCurrentFocusedInnerChanged: null },
+        refElementParameters: { onElementChange: null, onMount: null, onUnmount: null }
     });
 
     const { pressReturn, props: p2 } = usePress<HTMLLIElement>({ pressParameters: { focusSelf, onPressSync, excludeSpace, allowRepeatPresses: false, excludeEnter: null, excludePointer: null, longPressThreshold: null, onPressingChange: null }, refElementReturn })

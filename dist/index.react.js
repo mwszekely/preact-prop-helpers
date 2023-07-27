@@ -489,9 +489,9 @@ function useGlobalHandlerSingle(target, type, handler, options) {
 }
 
 /**
- * Does nothing at runtime -- type checking only.
+ * Throws a (Typescript compiler) error if the passed object is anything but the empty object `{\}` or `void`.
  *
- * Throws a (Typescript compiler) error if the passed object is anything but the empty object `{\}`.
+ * **Does nothing at runtime -- type checking only.**
  *
  * Use this to ensure that your spread operators work correctly and cover all cases.
  *
@@ -2254,14 +2254,16 @@ function useGridNavigation({ gridNavigationParameters: { onTabbableColumnChange,
  */
 function useGridNavigationRow({ 
 // Stuff for the row as a child of the parent grid
-info: managedChildParameters, textContentParameters, context: contextFromParent, 
+info: { index, untabbable, ...void3 }, textContentParameters, context: contextFromParent, 
 // Stuff for the row as a parent of child cells
 linearNavigationParameters, rovingTabIndexParameters: { untabbable: rowIsUntabbableAndSoAreCells, initiallyTabbedIndex, onTabbableIndexChange, ...void4 }, managedChildrenReturn, typeaheadNavigationParameters, 
 // Both/neither
 refElementReturn, ...void1 }) {
     monitorCallCount(useGridNavigationRow);
     const { getTabbableColumn, setTabbableColumn, setTabbableRow } = contextFromParent.gridNavigationRowContext;
-    const getIndex = useStableCallback(() => { return managedChildParameters.index; });
+    const getIndex = useStableCallback(() => { return index; });
+    // When this row is focused from the parent's `useRovingTabIndex`,
+    // instead of focusing the row element, this function focuses the appropriate cell element.
     const whenThisRowIsFocused = useStableCallback((e) => {
         const { getChildren } = managedChildrenReturn;
         if (contextFromParent.rovingTabIndexContext.getUntabbable()) {
@@ -2295,11 +2297,9 @@ refElementReturn, ...void1 }) {
         }
     }, []);
     const focusSelf = whenThisRowIsFocused;
-    const { props: propsLNC, info, ...ulncRet } = useListNavigationChild({ info: managedChildParameters, refElementReturn, textContentParameters, context: contextFromParent });
-    const allChildCellsAreUntabbable = !ulncRet.rovingTabIndexChildReturn.tabbable;
-    const { propsStableParentOrChild: propsLN, 
-    // This is just tabIndex = 0 or -1, see the TODO below
-    propsParent: propsLN2, context: contextULN, ...ulnRet } = useListNavigation({
+    const { props: propsLNC, info: { getLocallyTabbable, setLocallyTabbable, ...void2 }, hasCurrentFocusParameters, pressParameters, rovingTabIndexChildReturn, textContentReturn, ...void6 } = useListNavigationChild({ info: { index, untabbable }, refElementReturn, textContentParameters, context: contextFromParent });
+    const allChildCellsAreUntabbable = !rovingTabIndexChildReturn.tabbable;
+    const { propsStableParentOrChild: propsLN, propsParent: propsLN2, context: contextULN, linearNavigationReturn, managedChildrenParameters, rovingTabIndexReturn, typeaheadNavigationReturn, ...void5 } = useListNavigation({
         managedChildrenReturn,
         refElementReturn,
         typeaheadNavigationParameters,
@@ -2323,7 +2323,7 @@ refElementReturn, ...void1 }) {
         },
         paginatedChildrenParameters: { paginationMin: null, paginationMax: null }
     });
-    const { setTabbableIndex } = ulnRet.rovingTabIndexReturn;
+    const { setTabbableIndex } = rovingTabIndexReturn;
     const gridNavigationCellContext = useMemoObject({
         //allChildCellsAreUntabbable,
         setTabbableRow,
@@ -2348,9 +2348,15 @@ refElementReturn, ...void1 }) {
     return {
         context: contextToChildren,
         props: useTagProps(props, "data-use-grid-navigation-partial-row"),
-        info: { focusSelf, ...info },
-        ...ulncRet,
-        ...ulnRet,
+        info: { focusSelf, getLocallyTabbable, setLocallyTabbable },
+        hasCurrentFocusParameters,
+        pressParameters,
+        rovingTabIndexChildReturn,
+        textContentReturn,
+        linearNavigationReturn,
+        managedChildrenParameters,
+        rovingTabIndexReturn,
+        typeaheadNavigationReturn
     };
 }
 /**
@@ -2504,6 +2510,16 @@ function useSingleSelectionDeclarative({ singleSelectionReturn: { changeSelected
     return { singleSelectionParameters: { onSelectedIndexChange } };
 }
 
+/**
+ * Combines {@link useGridNavigation} and {@link useSingleSelection}.
+ *
+ * @remarks The single-selection behavior is optional, if you decide you need multi-selection instead within the same component.
+ *
+ * @hasChild {@link useGridNavigationSingleSelectionRow}
+ * @hasChild {@link useGridNavigationSingleSelectionCell}
+ *
+ * @compositeParams
+ */
 function useGridNavigationSingleSelection({ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, managedChildrenReturn, typeaheadNavigationParameters, singleSelectionParameters, refElementReturn, paginatedChildrenParameters, ...void2 }) {
     monitorCallCount(useGridNavigationSingleSelection);
     const { context: { gridNavigationRowContext, rovingTabIndexContext, typeaheadNavigationContext }, linearNavigationReturn, managedChildrenParameters, propsParent, propsStableParentOrChild, rovingTabIndexReturn, typeaheadNavigationReturn, } = useGridNavigation({
@@ -2537,14 +2553,24 @@ function useGridNavigationSingleSelection({ gridNavigationParameters, linearNavi
         typeaheadNavigationReturn
     };
 }
+/**
+ * @compositeParams
+ */
 function useGridNavigationSingleSelectionRow({ info: mcp1, linearNavigationParameters, managedChildrenReturn, refElementReturn, rovingTabIndexParameters, textContentParameters, typeaheadNavigationParameters, context, ...void1 }) {
     monitorCallCount(useGridNavigationSingleSelectionRow);
-    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void6 }, info: infoSingleSelection, props: propsSingleSelection, singleSelectionChildReturn, pressParameters: { onPressSync, ...void4 }, ...void2 } = useSingleSelectionChild({ info: mcp1, context });
-    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ...void7 }, info: infoGridNavigation, props: propsGridNavigation, linearNavigationReturn, managedChildrenParameters, pressParameters: { excludeSpace, ...void5 }, rovingTabIndexChildReturn, rovingTabIndexReturn, textContentReturn, typeaheadNavigationReturn, context: contextGridNavigation, ...void3 } = useGridNavigationRow({ context, linearNavigationParameters, info: mcp1, managedChildrenReturn, refElementReturn, rovingTabIndexParameters, textContentParameters, typeaheadNavigationParameters });
+    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void6 }, info: { getSelected, selected, setLocalSelected, ...void8 }, props: propsSingleSelection, singleSelectionChildReturn, pressParameters: { onPressSync, ...void4 }, ...void2 } = useSingleSelectionChild({ info: mcp1, context });
+    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ...void7 }, info: { focusSelf, getLocallyTabbable, setLocallyTabbable, ...void9 }, props: propsGridNavigation, linearNavigationReturn, managedChildrenParameters, pressParameters: { excludeSpace, ...void5 }, rovingTabIndexChildReturn, rovingTabIndexReturn, textContentReturn, typeaheadNavigationReturn, context: contextGridNavigation, ...void3 } = useGridNavigationRow({ context, linearNavigationParameters, info: mcp1, managedChildrenReturn, refElementReturn, rovingTabIndexParameters, textContentParameters, typeaheadNavigationParameters });
     return {
         context: { ...contextGridNavigation, singleSelectionContext: context.singleSelectionContext },
         linearNavigationReturn,
-        info: { ...infoSingleSelection, ...infoGridNavigation },
+        info: {
+            getLocallyTabbable,
+            getSelected,
+            selected,
+            setLocallyTabbable,
+            setLocalSelected,
+            focusSelf
+        },
         managedChildrenParameters,
         pressParameters: { onPressSync, excludeSpace },
         hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: useStableCallback((hasFocus, hadFocus) => { ocfic1?.(hasFocus, hadFocus); ocfic2?.(hasFocus, hadFocus); }) },
@@ -2556,7 +2582,9 @@ function useGridNavigationSingleSelectionRow({ info: mcp1, linearNavigationParam
         typeaheadNavigationReturn
     };
 }
-// EZ
+/**
+ * @compositeParams
+ */
 function useGridNavigationSingleSelectionCell(p) {
     monitorCallCount(useGridNavigationSingleSelectionCell);
     return useGridNavigationCell(p);
@@ -2724,6 +2752,15 @@ function defaultCompare(lhs, rhs) {
     }
 }
 
+/**
+ * Combines {@link useGridNavigation}, {@link useSingleSelection}, and {@link useSortableChildren}.
+ *
+ * @remarks This is a separate hook because {@link useSortableChildren} imposes unique requirements to the structure of your `children`.
+ *
+ * @hasChild {@link useGridNavigationSingleSelectionSortableRow}
+ *
+ * @compositeParams
+ */
 function useGridNavigationSingleSelectionSortable({ rearrangeableChildrenParameters, sortableChildrenParameters, linearNavigationParameters, managedChildrenReturn, gridNavigationParameters, paginatedChildrenParameters, refElementReturn, rovingTabIndexParameters, singleSelectionParameters, typeaheadNavigationParameters, ...void1 }) {
     monitorCallCount(useGridNavigationSingleSelectionSortable);
     const { ...scr } = useSortableChildren({ rearrangeableChildrenParameters, sortableChildrenParameters, managedChildrenReturn });
@@ -2740,16 +2777,21 @@ function useGridNavigationSingleSelectionSortable({ rearrangeableChildrenParamet
     });
     return { ...gnr, ...scr, };
 }
-function useGridNavigationSingleSelectionSortableRow({ context, info: { index, unselectable, untabbable, ...void2 }, linearNavigationParameters, managedChildrenReturn, refElementReturn, rovingTabIndexParameters, textContentParameters, typeaheadNavigationParameters, ...void1 }) {
+/**
+ * Besides just overriding `focusSelf` for `useRovingTabIndex`, this also overrides `getSortValue` to return the sort value of the current cell.
+ *
+ * @compositeParams
+ */
+function useGridNavigationSingleSelectionSortableRow({ context: ctxIncoming, info: { index, unselectable, untabbable, ...void2 }, linearNavigationParameters, managedChildrenReturn, refElementReturn, rovingTabIndexParameters, textContentParameters, typeaheadNavigationParameters, ...void1 }) {
     monitorCallCount(useGridNavigationSingleSelectionSortableRow);
     const getSortValue = useCallback(() => {
         let rows = managedChildrenReturn.getChildren();
-        let columnIndex = context.gridNavigationRowContext.getTabbableColumn() || 0;
+        let columnIndex = ctxIncoming.gridNavigationRowContext.getTabbableColumn() || 0;
         let cell = rows.getAt(columnIndex);
         return cell?.getSortValue();
     }, []);
-    const { info, ...gridNavRet } = useGridNavigationSingleSelectionRow({
-        context,
+    const { info: { getLocallyTabbable, getSelected, selected, setLocalSelected, setLocallyTabbable, focusSelf, ...void4 }, context: ctxOutgoing, hasCurrentFocusParameters, linearNavigationReturn, managedChildrenParameters, pressParameters, props, rovingTabIndexChildReturn, rovingTabIndexReturn, singleSelectionChildReturn, textContentReturn, typeaheadNavigationReturn, ...void3 } = useGridNavigationSingleSelectionRow({
+        context: ctxIncoming,
         info: { index, unselectable, untabbable },
         linearNavigationParameters,
         managedChildrenReturn,
@@ -2759,11 +2801,23 @@ function useGridNavigationSingleSelectionSortableRow({ context, info: { index, u
         typeaheadNavigationParameters
     });
     return {
-        info: { ...info, getSortValue },
-        ...gridNavRet
+        info: { getLocallyTabbable, getSelected, selected, setLocallyTabbable, setLocalSelected, getSortValue, focusSelf },
+        context: ctxOutgoing,
+        hasCurrentFocusParameters,
+        linearNavigationReturn,
+        managedChildrenParameters,
+        pressParameters,
+        props,
+        rovingTabIndexChildReturn,
+        rovingTabIndexReturn,
+        singleSelectionChildReturn,
+        textContentReturn,
+        typeaheadNavigationReturn
     };
 }
-// EZ
+/**
+ * @compositeParams
+ */
 function useGridNavigationSingleSelectionSortableCell({ context, gridNavigationCellParameters, info: { index, untabbable, ...void2 }, refElementReturn, textContentParameters, ...void1 }) {
     monitorCallCount(useGridNavigationSingleSelectionSortableCell);
     return useGridNavigationSingleSelectionCell({
@@ -2775,6 +2829,15 @@ function useGridNavigationSingleSelectionSortableCell({ context, gridNavigationC
     });
 }
 
+/**
+ * Combines {@link useListNavigation} and {@link useSingleSelection}.
+ *
+ * @remarks The single-selection behavior is optional, if you decide you need multi-selection instead within the same component.
+ *
+ * @hasChild {@link useListNavigationSingleSelectionChild}
+ *
+ * @compositeParams
+ */
 function useListNavigationSingleSelection({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, managedChildrenReturn, refElementReturn, paginatedChildrenParameters, ...void3 }) {
     monitorCallCount(useListNavigationSingleSelection);
     const { context: contextLN, propsParent, propsStableParentOrChild, rovingTabIndexReturn, ...retLN } = useListNavigation({ linearNavigationParameters, rovingTabIndexParameters, paginatedChildrenParameters, typeaheadNavigationParameters, managedChildrenReturn, refElementReturn });
@@ -2791,6 +2854,9 @@ function useListNavigationSingleSelection({ linearNavigationParameters, rovingTa
         propsParent: propsParent,
     };
 }
+/**
+ * @compositeParams
+ */
 function useListNavigationSingleSelectionChild({ info: { index, untabbable, unselectable, ...void2 }, context, refElementReturn, textContentParameters, ...void1 }) {
     monitorCallCount(useListNavigationSingleSelectionChild);
     const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ...void3 }, info: infoSS, singleSelectionChildReturn, props: propsSS, pressParameters: { onPressSync }, ...void9 } = useSingleSelectionChild({
@@ -2820,6 +2886,15 @@ function useListNavigationSingleSelectionChild({ info: { index, untabbable, unse
     };
 }
 
+/**
+ * Combines {@link useListNavigation}, {@link useSingleSelection}, and {@link useSortableChildren}.
+ *
+ * @remarks This is a separate hook because {@link useSortableChildren} imposes unique requirements to the structure of your `children`.
+ *
+ * @hasChild {@link useListNavigationSingleSelectionSortableChild}
+ *
+ * @compositeParams
+ */
 function useListNavigationSingleSelectionSortable({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, managedChildrenReturn, rearrangeableChildrenParameters, sortableChildrenParameters, refElementReturn, paginatedChildrenParameters, ...void3 }) {
     monitorCallCount(useListNavigationSingleSelectionSortable);
     const { rearrangeableChildrenReturn, sortableChildrenReturn, ...void1 } = useSortableChildren({ rearrangeableChildrenParameters, sortableChildrenParameters, managedChildrenReturn });
@@ -2834,6 +2909,9 @@ function useListNavigationSingleSelectionSortable({ linearNavigationParameters, 
         ...restLN
     };
 }
+/**
+ * @compositeParams
+ */
 function useListNavigationSingleSelectionSortableChild({ info, context, refElementReturn, textContentParameters, ...void1 }) {
     monitorCallCount(useListNavigationSingleSelectionSortableChild);
     return useListNavigationSingleSelectionChild({
@@ -3577,7 +3655,7 @@ function useCompleteGridNavigation({ gridNavigationParameters, linearNavigationP
         return true;
     }, []);
     const { refElementReturn, propsStable, ...void2 } = useRefElement({ refElementParameters });
-    const { childrenHaveFocusParameters, managedChildrenParameters, context: { gridNavigationRowContext, rovingTabIndexContext, singleSelectionContext, typeaheadNavigationContext }, rearrangeableChildrenReturn, propsParent, propsStableParentOrChild, rovingTabIndexReturn, ...gridNavigationSingleSelectionReturn } = useGridNavigationSingleSelectionSortable({
+    const { childrenHaveFocusParameters, managedChildrenParameters, context: { gridNavigationRowContext, rovingTabIndexContext, singleSelectionContext, typeaheadNavigationContext }, rearrangeableChildrenReturn, propsParent, propsStableParentOrChild, rovingTabIndexReturn, linearNavigationReturn, singleSelectionReturn, sortableChildrenReturn, typeaheadNavigationReturn, ...void3 } = useGridNavigationSingleSelectionSortable({
         gridNavigationParameters,
         linearNavigationParameters: { getLowestIndex: getLowestChildIndex, getHighestIndex: getHighestChildIndex, isValidForLinearNavigation: isValidForNavigation, ...linearNavigationParameters },
         managedChildrenReturn: { getChildren },
@@ -3617,7 +3695,10 @@ function useCompleteGridNavigation({ gridNavigationParameters, linearNavigationP
         rovingTabIndexReturn,
         childrenHaveFocusReturn,
         paginatedChildrenReturn,
-        ...gridNavigationSingleSelectionReturn,
+        linearNavigationReturn,
+        singleSelectionReturn,
+        sortableChildrenReturn,
+        typeaheadNavigationReturn
     };
 }
 /**
@@ -3782,7 +3863,7 @@ function useCompleteListNavigation({ linearNavigationParameters, rearrangeableCh
         return true;
     }, []);
     const { propsStable: propsRef, refElementReturn } = useRefElement({ refElementParameters });
-    const { childrenHaveFocusParameters, managedChildrenParameters: { onChildrenMountChange, ...mcp1 }, context: { rovingTabIndexContext, singleSelectionContext, typeaheadNavigationContext }, linearNavigationReturn, rovingTabIndexReturn, singleSelectionReturn, typeaheadNavigationReturn, rearrangeableChildrenReturn, sortableChildrenReturn, propsParent, propsStableParentOrChild } = useListNavigationSingleSelectionSortable({
+    const { childrenHaveFocusParameters, managedChildrenParameters: { onChildrenMountChange, ...mcp1 }, context: { rovingTabIndexContext, singleSelectionContext, typeaheadNavigationContext }, linearNavigationReturn, rovingTabIndexReturn, singleSelectionReturn, typeaheadNavigationReturn, rearrangeableChildrenReturn, sortableChildrenReturn, propsParent, propsStableParentOrChild, ...void2 } = useListNavigationSingleSelectionSortable({
         managedChildrenReturn: { getChildren },
         linearNavigationParameters: { getLowestIndex, getHighestIndex, isValidForLinearNavigation: isValidForNavigation, ...linearNavigationParameters },
         typeaheadNavigationParameters: { isValidForTypeaheadNavigation: isValidForNavigation, ...typeaheadNavigationParameters },
@@ -3796,7 +3877,7 @@ function useCompleteListNavigation({ linearNavigationParameters, rearrangeableCh
         refElementReturn,
         sortableChildrenParameters
     });
-    //const { context: { childrenHaveFocusChildContext }, childrenHaveFocusReturn } = useChildrenHaveFocus({ childrenHaveFocusParameters });
+    const { context: { childrenHaveFocusChildContext }, childrenHaveFocusReturn } = useChildrenHaveFocus({ childrenHaveFocusParameters });
     const { paginatedChildrenReturn, paginatedChildrenReturn: { refreshPagination }, managedChildrenParameters: mcp2, context: { paginatedChildContext } } = usePaginatedChildren({ refElementReturn, managedChildrenReturn: { getChildren: useStableCallback(() => managedChildrenReturn.getChildren()) }, rovingTabIndexReturn, paginatedChildrenParameters, linearNavigationParameters: { indexDemangler: rearrangeableChildrenReturn.indexDemangler } });
     const { context: { staggeredChildContext }, staggeredChildrenReturn } = useStaggeredChildren({ managedChildrenReturn: { getChildren: useStableCallback(() => managedChildrenReturn.getChildren()) }, staggeredChildrenParameters });
     const mcr = useManagedChildren({
@@ -3808,7 +3889,7 @@ function useCompleteListNavigation({ linearNavigationParameters, rearrangeableCh
     });
     const { context: { managedChildContext }, managedChildrenReturn } = mcr;
     const context = useMemoObject(useMemoObject({
-        //childrenHaveFocusChildContext,
+        childrenHaveFocusChildContext,
         managedChildContext,
         paginatedChildContext,
         rovingTabIndexContext,
@@ -3828,7 +3909,7 @@ function useCompleteListNavigation({ linearNavigationParameters, rearrangeableCh
         rovingTabIndexReturn,
         singleSelectionReturn,
         typeaheadNavigationReturn,
-        //childrenHaveFocusReturn
+        childrenHaveFocusReturn
     };
 }
 /**
@@ -3836,26 +3917,25 @@ function useCompleteListNavigation({ linearNavigationParameters, rearrangeableCh
  * @compositeParams
  */
 function useCompleteListNavigationChild({ info: { index, focusSelf, unselectable, untabbable, getSortValue, ...customUserInfo }, // The "...info" is empty if M is the same as UCLNCI<ChildElement>.
-textContentParameters, context: { managedChildContext, rovingTabIndexContext, paginatedChildContext, staggeredChildContext, singleSelectionContext, typeaheadNavigationContext }, ...void1 }) {
+textContentParameters, refElementParameters, hasCurrentFocusParameters: { onCurrentFocusedChanged, onCurrentFocusedInnerChanged: ocfic3, ...void7 }, context: { managedChildContext, rovingTabIndexContext, paginatedChildContext, staggeredChildContext, singleSelectionContext, typeaheadNavigationContext, childrenHaveFocusChildContext, ...void5 }, ...void1 }) {
     monitorCallCount(useCompleteListNavigationChild);
     const { info: infoFromPaginated, paginatedChildReturn, paginatedChildReturn: { hideBecausePaginated }, props: paginationProps } = usePaginatedChild({ info: { index }, context: { paginatedChildContext } });
     const { info: infoFromStaggered, staggeredChildReturn, staggeredChildReturn: { hideBecauseStaggered }, props: staggeredProps } = useStaggeredChild({ info: { index }, context: { staggeredChildContext } });
+    // TODO: uPC and pSC can't exactly return `{ info: { untabbable: false } }`, or can they...? 
+    // (Really it's more about *should* they -- I don't like this hook doing more than just calling sub-hooks, but where else does this logic take place if not here?)
     untabbable ||= (hideBecausePaginated || hideBecauseStaggered);
     unselectable ||= (hideBecausePaginated || hideBecauseStaggered);
+    // TODO: I feel like this needs stronger justification. It's probably correct but why is it here of all places?
+    // I.E. shouldn't it be in useListNavigationSingleSelection?
     if (untabbable)
         unselectable = true;
-    const { refElementReturn, propsStable } = useRefElement({ refElementParameters: {} });
+    const { refElementReturn, propsStable, ...void6 } = useRefElement({ refElementParameters });
     const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void3 }, pressParameters: { excludeSpace, onPressSync, ...void2 }, textContentReturn, singleSelectionChildReturn, info: infoFromListNav, rovingTabIndexChildReturn, propsChild, propsTabbable, ...void4 } = useListNavigationSingleSelectionChild({
         info: { index, unselectable, untabbable },
         context: { rovingTabIndexContext, singleSelectionContext, typeaheadNavigationContext },
         refElementReturn,
         textContentParameters
     });
-    /*const onPress = useStableCallback((e: PressEventReason<any>) => {
-        if (singleSelectionContext.selectionMode == "activation")
-            singleSelectionContext.onSelectedIndexChange?.(enhanceEvent(e, { selectedIndex: index }));
-    });*/
-    //const onPressSync = (rovingTabIndexContext.untabbable || unselectable || untabbable) ? null : onPress;
     const allStandardInfo = {
         index,
         focusSelf,
@@ -3868,12 +3948,19 @@ textContentParameters, context: { managedChildContext, rovingTabIndexContext, pa
         ...infoFromListNav,
     };
     const { managedChildReturn } = useManagedChild({ context: { managedChildContext }, info: { ...allStandardInfo, ...customUserInfo } });
-    //const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2 } } = useChildrenHaveFocusChild({ context: { childrenHaveFocusChildContext } });
+    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2 } } = useChildrenHaveFocusChild({ context: { childrenHaveFocusChildContext } });
     const onCurrentFocusedInnerChanged = useStableCallback((focused, prev, e) => {
         ocfic1?.(focused, prev, e);
-        //ocfic2?.(focused, prev, e);
+        ocfic2?.(focused, prev, e);
+        ocfic3?.(focused, prev, e);
     });
-    const { hasCurrentFocusReturn } = useHasCurrentFocus({ hasCurrentFocusParameters: { onCurrentFocusedInnerChanged, onCurrentFocusedChanged: null }, refElementReturn });
+    const { hasCurrentFocusReturn } = useHasCurrentFocus({
+        hasCurrentFocusParameters: {
+            onCurrentFocusedInnerChanged,
+            onCurrentFocusedChanged
+        },
+        refElementReturn
+    });
     const props = useMergedProps(propsStable, hasCurrentFocusReturn.propsStable, propsChild, paginationProps, staggeredProps);
     return {
         propsChild: props,

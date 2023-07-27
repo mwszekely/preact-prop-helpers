@@ -1,14 +1,13 @@
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return typeof key === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (typeof input !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (typeof res !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
-(function () {
+(function (_process, _globalThis$_process, _globalThis$process, _env, _globalThis$process$_, _globalThis$process$e, _NODE_ENV, _globalThis$process$e2, _window, _window$requestIdleCa) {
   'use strict';
 
-  var _process, _globalThis$_process, _globalThis$process, _env, _globalThis$process$_, _globalThis$process$e, _NODE_ENV, _globalThis$process$e2, _window, _window$requestIdleCa;
   var n,
     l$1,
     u$1,
-    t$1,
+    i$1,
     o$2,
     r$1,
     f$1,
@@ -16,8 +15,8 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     c$1 = {},
     s$1 = [],
     a$1 = /acit|ex(?:s|g|n|p|$)|rph|grid|ows|mnc|ntw|ine[ch]|zoo|^ord|itera/i,
-    v$1 = Array.isArray;
-  function h$1(n, l) {
+    h$1 = Array.isArray;
+  function v$1(n, l) {
     for (var u in l) n[u] = l[u];
     return n;
   }
@@ -25,20 +24,20 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     var l = n.parentNode;
     l && l.removeChild(n);
   }
-  function y$1(l, u, i) {
-    var t,
+  function y$1(l, u, t) {
+    var i,
       o,
       r,
       f = {};
-    for (r in u) "key" == r ? t = u[r] : "ref" == r ? o = u[r] : f[r] = u[r];
-    if (arguments.length > 2 && (f.children = arguments.length > 3 ? n.call(arguments, 2) : i), "function" == typeof l && null != l.defaultProps) for (r in l.defaultProps) void 0 === f[r] && (f[r] = l.defaultProps[r]);
-    return d$1(l, f, t, o, null);
+    for (r in u) "key" == r ? i = u[r] : "ref" == r ? o = u[r] : f[r] = u[r];
+    if (arguments.length > 2 && (f.children = arguments.length > 3 ? n.call(arguments, 2) : t), "function" == typeof l && null != l.defaultProps) for (r in l.defaultProps) void 0 === f[r] && (f[r] = l.defaultProps[r]);
+    return d$1(l, f, i, o, null);
   }
-  function d$1(n, i, t, o, r) {
+  function d$1(n, t, i, o, r) {
     var f = {
       type: n,
-      props: i,
-      key: t,
+      props: t,
+      key: i,
       ref: o,
       __k: null,
       __: null,
@@ -74,78 +73,82 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     }
   }
   function w$2(n) {
-    (!n.__d && (n.__d = !0) && t$1.push(n) && !x$1.__r++ || o$2 !== l$1.debounceRendering) && ((o$2 = l$1.debounceRendering) || r$1)(x$1);
+    (!n.__d && (n.__d = !0) && i$1.push(n) && !x$1.__r++ || o$2 !== l$1.debounceRendering) && ((o$2 = l$1.debounceRendering) || r$1)(x$1);
   }
   function x$1() {
-    var n, l, u, i, o, r, e, c;
-    for (t$1.sort(f$1); n = t$1.shift();) n.__d && (l = t$1.length, i = void 0, o = void 0, e = (r = (u = n).__v).__e, (c = u.__P) && (i = [], (o = h$1({}, r)).__v = r.__v + 1, L$1(c, r, o, u.__n, void 0 !== c.ownerSVGElement, null != r.__h ? [e] : null, i, null == e ? g$2(r) : e, r.__h), M(i, r), r.__e != e && m$1(r)), t$1.length > l && t$1.sort(f$1));
+    var n, l, u, t, o, r, e, c, s;
+    for (i$1.sort(f$1); n = i$1.shift();) n.__d && (l = i$1.length, t = void 0, o = void 0, r = void 0, c = (e = (u = n).__v).__e, (s = u.__P) && (t = [], o = [], (r = v$1({}, e)).__v = e.__v + 1, L$1(s, e, r, u.__n, void 0 !== s.ownerSVGElement, null != e.__h ? [c] : null, t, null == c ? g$2(e) : c, e.__h, o), M(t, e, o), e.__e != c && m$1(e)), i$1.length > l && i$1.sort(f$1));
     x$1.__r = 0;
   }
-  function P$1(n, l, u, i, t, o, r, f, e, a) {
-    var h,
-      p,
+  function P$1(n, l, u, t, i, o, r, f, e, a, v) {
+    var p,
       y,
       _,
       b,
+      g,
       m,
       w,
-      x = i && i.__k || s$1,
-      P = x.length;
-    for (u.__k = [], h = 0; h < l.length; h++) if (null != (_ = u.__k[h] = null == (_ = l[h]) || "boolean" == typeof _ || "function" == typeof _ ? null : "string" == typeof _ || "number" == typeof _ || "bigint" == typeof _ ? d$1(null, _, null, null, _) : v$1(_) ? d$1(k$2, {
-      children: _
-    }, null, null, null) : _.__b > 0 ? d$1(_.type, _.props, _.key, _.ref ? _.ref : null, _.__v) : _)) {
-      if (_.__ = u, _.__b = u.__b + 1, null === (y = x[h]) || y && _.key == y.key && _.type === y.type) x[h] = void 0;else for (p = 0; p < P; p++) {
-        if ((y = x[p]) && _.key == y.key && _.type === y.type) {
-          x[p] = void 0;
-          break;
-        }
-        y = null;
-      }
-      L$1(n, _, y = y || c$1, t, o, r, f, e, a), b = _.__e, (p = _.ref) && y.ref != p && (w || (w = []), y.ref && w.push(y.ref, null, _), w.push(p, _.__c || b, _)), null != b ? (null == m && (m = b), "function" == typeof _.type && _.__k === y.__k ? _.__d = e = C$1(_, e, n) : e = $$1(n, _, y, x, b, e), "function" == typeof u.type && (u.__d = e)) : e && y.__e == e && e.parentNode != n && (e = g$2(y));
-    }
-    for (u.__e = m, h = P; h--;) null != x[h] && ("function" == typeof u.type && null != x[h].__e && x[h].__e == u.__d && (u.__d = A$1(i).nextSibling), q$2(x[h], x[h]));
-    if (w) for (h = 0; h < w.length; h++) O(w[h], w[++h], w[++h]);
+      x,
+      P,
+      S,
+      H = 0,
+      I = t && t.__k || s$1,
+      T = I.length,
+      j = T,
+      z = l.length;
+    for (u.__k = [], p = 0; p < z; p++) null != (b = u.__k[p] = null == (b = l[p]) || "boolean" == typeof b || "function" == typeof b ? null : "string" == typeof b || "number" == typeof b || "bigint" == typeof b ? d$1(null, b, null, null, b) : h$1(b) ? d$1(k$2, {
+      children: b
+    }, null, null, null) : b.__b > 0 ? d$1(b.type, b.props, b.key, b.ref ? b.ref : null, b.__v) : b) && (b.__ = u, b.__b = u.__b + 1, -1 === (x = A$1(b, I, w = p + H, j)) ? _ = c$1 : (_ = I[x] || c$1, I[x] = void 0, j--), L$1(n, b, _, i, o, r, f, e, a, v), g = b.__e, (y = b.ref) && _.ref != y && (_.ref && O(_.ref, null, b), v.push(y, b.__c || g, b)), null != g && (null == m && (m = g), S = !(P = _ === c$1 || null === _.__v) && x === w, P ? -1 == x && H-- : x !== w && (x === w + 1 ? (H++, S = !0) : x > w ? j > z - w ? (H += x - w, S = !0) : H-- : H = x < w && x == w - 1 ? x - w : 0), w = p + H, S = S || x == p && !P, "function" != typeof b.type || x === w && _.__k !== b.__k ? "function" == typeof b.type || S ? void 0 !== b.__d ? (e = b.__d, b.__d = void 0) : e = g.nextSibling : e = $$1(n, g, e) : e = C$1(b, e, n), "function" == typeof u.type && (u.__d = e)));
+    for (u.__e = m, p = T; p--;) null != I[p] && ("function" == typeof u.type && null != I[p].__e && I[p].__e == u.__d && (u.__d = I[p].__e.nextSibling), q$2(I[p], I[p]));
   }
   function C$1(n, l, u) {
-    for (var i, t = n.__k, o = 0; t && o < t.length; o++) (i = t[o]) && (i.__ = n, l = "function" == typeof i.type ? C$1(i, l, u) : $$1(u, i, i, t, i.__e, l));
+    for (var t, i = n.__k, o = 0; i && o < i.length; o++) (t = i[o]) && (t.__ = n, l = "function" == typeof t.type ? C$1(t, l, u) : $$1(u, t.__e, l));
     return l;
   }
   function S(n, l) {
-    return l = l || [], null == n || "boolean" == typeof n || (v$1(n) ? n.some(function (n) {
+    return l = l || [], null == n || "boolean" == typeof n || (h$1(n) ? n.some(function (n) {
       S(n, l);
     }) : l.push(n)), l;
   }
-  function $$1(n, l, u, i, t, o) {
-    var r, f, e;
-    if (void 0 !== l.__d) r = l.__d, l.__d = void 0;else if (null == u || t != o || null == t.parentNode) n: if (null == o || o.parentNode !== n) n.appendChild(t), r = null;else {
-      for (f = o, e = 0; (f = f.nextSibling) && e < i.length; e += 1) if (f == t) break n;
-      n.insertBefore(t, o), r = o;
+  function $$1(n, l, u) {
+    return null == u || u.parentNode !== n ? n.insertBefore(l, null) : l == u && null != l.parentNode || n.insertBefore(l, u), l.nextSibling;
+  }
+  function A$1(n, l, u, t) {
+    var i = n.key,
+      o = n.type,
+      r = u - 1,
+      f = u + 1,
+      e = l[u];
+    if (null === e || e && i == e.key && o === e.type) return u;
+    if (t > (null != e ? 1 : 0)) for (; r >= 0 || f < l.length;) {
+      if (r >= 0) {
+        if ((e = l[r]) && i == e.key && o === e.type) return r;
+        r--;
+      }
+      if (f < l.length) {
+        if ((e = l[f]) && i == e.key && o === e.type) return f;
+        f++;
+      }
     }
-    return void 0 !== r ? r : t.nextSibling;
+    return -1;
   }
-  function A$1(n) {
-    var l, u, i;
-    if (null == n.type || "string" == typeof n.type) return n.__e;
-    if (n.__k) for (l = n.__k.length - 1; l >= 0; l--) if ((u = n.__k[l]) && (i = A$1(u))) return i;
-    return null;
-  }
-  function H$1(n, l, u, i, t) {
+  function H$1(n, l, u, t, i) {
     var o;
-    for (o in u) "children" === o || "key" === o || o in l || T$2(n, o, null, u[o], i);
-    for (o in l) t && "function" != typeof l[o] || "children" === o || "key" === o || "value" === o || "checked" === o || u[o] === l[o] || T$2(n, o, l[o], u[o], i);
+    for (o in u) "children" === o || "key" === o || o in l || T$2(n, o, null, u[o], t);
+    for (o in l) i && "function" != typeof l[o] || "children" === o || "key" === o || "value" === o || "checked" === o || u[o] === l[o] || T$2(n, o, l[o], u[o], t);
   }
   function I$1(n, l, u) {
     "-" === l[0] ? n.setProperty(l, null == u ? "" : u) : n[l] = null == u ? "" : "number" != typeof u || a$1.test(l) ? u : u + "px";
   }
-  function T$2(n, l, u, i, t) {
+  function T$2(n, l, u, t, i) {
     var o;
     n: if ("style" === l) {
       if ("string" == typeof u) n.style.cssText = u;else {
-        if ("string" == typeof i && (n.style.cssText = i = ""), i) for (l in i) u && l in u || I$1(n.style, l, "");
-        if (u) for (l in u) i && u[l] === i[l] || I$1(n.style, l, u[l]);
+        if ("string" == typeof t && (n.style.cssText = t = ""), t) for (l in t) u && l in u || I$1(n.style, l, "");
+        if (u) for (l in u) t && u[l] === t[l] || I$1(n.style, l, u[l]);
       }
-    } else if ("o" === l[0] && "n" === l[1]) o = l !== (l = l.replace(/Capture$/, "")), l = l.toLowerCase() in n ? l.toLowerCase().slice(2) : l.slice(2), n.l || (n.l = {}), n.l[l + o] = u, u ? i || n.addEventListener(l, o ? z$2 : j$2, o) : n.removeEventListener(l, o ? z$2 : j$2, o);else if ("dangerouslySetInnerHTML" !== l) {
-      if (t) l = l.replace(/xlink(H|:h)/, "h").replace(/sName$/, "s");else if ("width" !== l && "height" !== l && "href" !== l && "list" !== l && "form" !== l && "tabIndex" !== l && "download" !== l && "rowSpan" !== l && "colSpan" !== l && l in n) try {
+    } else if ("o" === l[0] && "n" === l[1]) o = l !== (l = l.replace(/Capture$/, "")), l = l.toLowerCase() in n ? l.toLowerCase().slice(2) : l.slice(2), n.l || (n.l = {}), n.l[l + o] = u, u ? t || n.addEventListener(l, o ? z$2 : j$2, o) : n.removeEventListener(l, o ? z$2 : j$2, o);else if ("dangerouslySetInnerHTML" !== l) {
+      if (i) l = l.replace(/xlink(H|:h)/, "h").replace(/sName$/, "s");else if ("width" !== l && "height" !== l && "href" !== l && "list" !== l && "form" !== l && "tabIndex" !== l && "download" !== l && "rowSpan" !== l && "colSpan" !== l && l in n) try {
         n[l] = null == u ? "" : u;
         break n;
       } catch (n) {}
@@ -158,9 +161,8 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
   function z$2(n) {
     return this.l[n.type + !0](l$1.event ? l$1.event(n) : n);
   }
-  function L$1(n, u, i, t, o, r, f, e, c) {
-    var s,
-      a,
+  function L$1(n, u, t, i, o, r, f, e, c, s) {
+    var a,
       p,
       y,
       d,
@@ -174,37 +176,39 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       $,
       A,
       H,
-      I = u.type;
+      I,
+      T = u.type;
     if (void 0 !== u.constructor) return null;
-    null != i.__h && (c = i.__h, e = u.__e = i.__e, u.__h = null, r = [e]), (s = l$1.__b) && s(u);
+    null != t.__h && (c = t.__h, e = u.__e = t.__e, u.__h = null, r = [e]), (a = l$1.__b) && a(u);
     try {
-      n: if ("function" == typeof I) {
-        if (m = u.props, w = (s = I.contextType) && t[s.__c], x = s ? w ? w.props.value : s.__ : t, i.__c ? g = (a = u.__c = i.__c).__ = a.__E : ("prototype" in I && I.prototype.render ? u.__c = a = new I(m, x) : (u.__c = a = new b$1(m, x), a.constructor = I, a.render = B$2), w && w.sub(a), a.props = m, a.state || (a.state = {}), a.context = x, a.__n = t, p = a.__d = !0, a.__h = [], a._sb = []), null == a.__s && (a.__s = a.state), null != I.getDerivedStateFromProps && (a.__s == a.state && (a.__s = h$1({}, a.__s)), h$1(a.__s, I.getDerivedStateFromProps(m, a.__s))), y = a.props, d = a.state, a.__v = u, p) null == I.getDerivedStateFromProps && null != a.componentWillMount && a.componentWillMount(), null != a.componentDidMount && a.__h.push(a.componentDidMount);else {
-          if (null == I.getDerivedStateFromProps && m !== y && null != a.componentWillReceiveProps && a.componentWillReceiveProps(m, x), !a.__e && null != a.shouldComponentUpdate && !1 === a.shouldComponentUpdate(m, a.__s, x) || u.__v === i.__v) {
-            for (u.__v !== i.__v && (a.props = m, a.state = a.__s, a.__d = !1), a.__e = !1, u.__e = i.__e, u.__k = i.__k, u.__k.forEach(function (n) {
+      n: if ("function" == typeof T) {
+        if (w = u.props, x = (a = T.contextType) && i[a.__c], C = a ? x ? x.props.value : a.__ : i, t.__c ? m = (p = u.__c = t.__c).__ = p.__E : ("prototype" in T && T.prototype.render ? u.__c = p = new T(w, C) : (u.__c = p = new b$1(w, C), p.constructor = T, p.render = B$2), x && x.sub(p), p.props = w, p.state || (p.state = {}), p.context = C, p.__n = i, y = p.__d = !0, p.__h = [], p._sb = []), null == p.__s && (p.__s = p.state), null != T.getDerivedStateFromProps && (p.__s == p.state && (p.__s = v$1({}, p.__s)), v$1(p.__s, T.getDerivedStateFromProps(w, p.__s))), d = p.props, _ = p.state, p.__v = u, y) null == T.getDerivedStateFromProps && null != p.componentWillMount && p.componentWillMount(), null != p.componentDidMount && p.__h.push(p.componentDidMount);else {
+          if (null == T.getDerivedStateFromProps && w !== d && null != p.componentWillReceiveProps && p.componentWillReceiveProps(w, C), !p.__e && (null != p.shouldComponentUpdate && !1 === p.shouldComponentUpdate(w, p.__s, C) || u.__v === t.__v)) {
+            for (u.__v !== t.__v && (p.props = w, p.state = p.__s, p.__d = !1), u.__e = t.__e, u.__k = t.__k, u.__k.forEach(function (n) {
               n && (n.__ = u);
-            }), C = 0; C < a._sb.length; C++) a.__h.push(a._sb[C]);
-            a._sb = [], a.__h.length && f.push(a);
+            }), S = 0; S < p._sb.length; S++) p.__h.push(p._sb[S]);
+            p._sb = [], p.__h.length && f.push(p);
             break n;
           }
-          null != a.componentWillUpdate && a.componentWillUpdate(m, a.__s, x), null != a.componentDidUpdate && a.__h.push(function () {
-            a.componentDidUpdate(y, d, _);
+          null != p.componentWillUpdate && p.componentWillUpdate(w, p.__s, C), null != p.componentDidUpdate && p.__h.push(function () {
+            p.componentDidUpdate(d, _, g);
           });
         }
-        if (a.context = x, a.props = m, a.__P = n, S = l$1.__r, $ = 0, "prototype" in I && I.prototype.render) {
-          for (a.state = a.__s, a.__d = !1, S && S(u), s = a.render(a.props, a.state, a.context), A = 0; A < a._sb.length; A++) a.__h.push(a._sb[A]);
-          a._sb = [];
+        if (p.context = C, p.props = w, p.__P = n, p.__e = !1, $ = l$1.__r, A = 0, "prototype" in T && T.prototype.render) {
+          for (p.state = p.__s, p.__d = !1, $ && $(u), a = p.render(p.props, p.state, p.context), H = 0; H < p._sb.length; H++) p.__h.push(p._sb[H]);
+          p._sb = [];
         } else do {
-          a.__d = !1, S && S(u), s = a.render(a.props, a.state, a.context), a.state = a.__s;
-        } while (a.__d && ++$ < 25);
-        a.state = a.__s, null != a.getChildContext && (t = h$1(h$1({}, t), a.getChildContext())), p || null == a.getSnapshotBeforeUpdate || (_ = a.getSnapshotBeforeUpdate(y, d)), P$1(n, v$1(H = null != s && s.type === k$2 && null == s.key ? s.props.children : s) ? H : [H], u, i, t, o, r, f, e, c), a.base = u.__e, u.__h = null, a.__h.length && f.push(a), g && (a.__E = a.__ = null), a.__e = !1;
-      } else null == r && u.__v === i.__v ? (u.__k = i.__k, u.__e = i.__e) : u.__e = N$1(i.__e, u, i, t, o, r, f, c);
-      (s = l$1.diffed) && s(u);
+          p.__d = !1, $ && $(u), a = p.render(p.props, p.state, p.context), p.state = p.__s;
+        } while (p.__d && ++A < 25);
+        p.state = p.__s, null != p.getChildContext && (i = v$1(v$1({}, i), p.getChildContext())), y || null == p.getSnapshotBeforeUpdate || (g = p.getSnapshotBeforeUpdate(d, _)), P$1(n, h$1(I = null != a && a.type === k$2 && null == a.key ? a.props.children : a) ? I : [I], u, t, i, o, r, f, e, c, s), p.base = u.__e, u.__h = null, p.__h.length && f.push(p), m && (p.__E = p.__ = null);
+      } else null == r && u.__v === t.__v ? (u.__k = t.__k, u.__e = t.__e) : u.__e = N$1(t.__e, u, t, i, o, r, f, c, s);
+      (a = l$1.diffed) && a(u);
     } catch (n) {
-      u.__v = null, (c || null != r) && (u.__e = e, u.__h = !!c, r[r.indexOf(e)] = null), l$1.__e(n, u, i);
+      u.__v = null, (c || null != r) && (u.__e = e, u.__h = !!c, r[r.indexOf(e)] = null), l$1.__e(n, u, t);
     }
   }
-  function M(n, u) {
+  function M(n, u, t) {
+    for (var i = 0; i < t.length; i++) O(t[i], t[++i], t[++i]);
     l$1.__c && l$1.__c(u, n), n.some(function (u) {
       try {
         n = u.__h, u.__h = [], n.some(function (n) {
@@ -215,67 +219,67 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       }
     });
   }
-  function N$1(l, u, i, t, o, r, f, e) {
-    var s,
-      a,
-      h,
-      y = i.props,
-      d = u.props,
-      _ = u.type,
-      k = 0;
-    if ("svg" === _ && (o = !0), null != r) for (; k < r.length; k++) if ((s = r[k]) && "setAttribute" in s == !!_ && (_ ? s.localName === _ : 3 === s.nodeType)) {
-      l = s, r[k] = null;
+  function N$1(l, u, t, i, o, r, f, e, s) {
+    var a,
+      v,
+      y,
+      d = t.props,
+      _ = u.props,
+      k = u.type,
+      b = 0;
+    if ("svg" === k && (o = !0), null != r) for (; b < r.length; b++) if ((a = r[b]) && "setAttribute" in a == !!k && (k ? a.localName === k : 3 === a.nodeType)) {
+      l = a, r[b] = null;
       break;
     }
     if (null == l) {
-      if (null === _) return document.createTextNode(d);
-      l = o ? document.createElementNS("http://www.w3.org/2000/svg", _) : document.createElement(_, d.is && d), r = null, e = !1;
+      if (null === k) return document.createTextNode(_);
+      l = o ? document.createElementNS("http://www.w3.org/2000/svg", k) : document.createElement(k, _.is && _), r = null, e = !1;
     }
-    if (null === _) y === d || e && l.data === d || (l.data = d);else {
-      if (r = r && n.call(l.childNodes), a = (y = i.props || c$1).dangerouslySetInnerHTML, h = d.dangerouslySetInnerHTML, !e) {
-        if (null != r) for (y = {}, k = 0; k < l.attributes.length; k++) y[l.attributes[k].name] = l.attributes[k].value;
-        (h || a) && (h && (a && h.__html == a.__html || h.__html === l.innerHTML) || (l.innerHTML = h && h.__html || ""));
+    if (null === k) d === _ || e && l.data === _ || (l.data = _);else {
+      if (r = r && n.call(l.childNodes), v = (d = t.props || c$1).dangerouslySetInnerHTML, y = _.dangerouslySetInnerHTML, !e) {
+        if (null != r) for (d = {}, b = 0; b < l.attributes.length; b++) d[l.attributes[b].name] = l.attributes[b].value;
+        (y || v) && (y && (v && y.__html == v.__html || y.__html === l.innerHTML) || (l.innerHTML = y && y.__html || ""));
       }
-      if (H$1(l, d, y, o, e), h) u.__k = [];else if (P$1(l, v$1(k = u.props.children) ? k : [k], u, i, t, o && "foreignObject" !== _, r, f, r ? r[0] : i.__k && g$2(i, 0), e), null != r) for (k = r.length; k--;) null != r[k] && p$1(r[k]);
-      e || ("value" in d && void 0 !== (k = d.value) && (k !== l.value || "progress" === _ && !k || "option" === _ && k !== y.value) && T$2(l, "value", k, y.value, !1), "checked" in d && void 0 !== (k = d.checked) && k !== l.checked && T$2(l, "checked", k, y.checked, !1));
+      if (H$1(l, _, d, o, e), y) u.__k = [];else if (P$1(l, h$1(b = u.props.children) ? b : [b], u, t, i, o && "foreignObject" !== k, r, f, r ? r[0] : t.__k && g$2(t, 0), e, s), null != r) for (b = r.length; b--;) null != r[b] && p$1(r[b]);
+      e || ("value" in _ && void 0 !== (b = _.value) && (b !== l.value || "progress" === k && !b || "option" === k && b !== d.value) && T$2(l, "value", b, d.value, !1), "checked" in _ && void 0 !== (b = _.checked) && b !== l.checked && T$2(l, "checked", b, d.checked, !1));
     }
     return l;
   }
-  function O(n, u, i) {
+  function O(n, u, t) {
     try {
       "function" == typeof n ? n(u) : n.current = u;
     } catch (n) {
-      l$1.__e(n, i);
+      l$1.__e(n, t);
     }
   }
-  function q$2(n, u, i) {
-    var t, o;
-    if (l$1.unmount && l$1.unmount(n), (t = n.ref) && (t.current && t.current !== n.__e || O(t, null, u)), null != (t = n.__c)) {
-      if (t.componentWillUnmount) try {
-        t.componentWillUnmount();
+  function q$2(n, u, t) {
+    var i, o;
+    if (l$1.unmount && l$1.unmount(n), (i = n.ref) && (i.current && i.current !== n.__e || O(i, null, u)), null != (i = n.__c)) {
+      if (i.componentWillUnmount) try {
+        i.componentWillUnmount();
       } catch (n) {
         l$1.__e(n, u);
       }
-      t.base = t.__P = null, n.__c = void 0;
+      i.base = i.__P = null, n.__c = void 0;
     }
-    if (t = n.__k) for (o = 0; o < t.length; o++) t[o] && q$2(t[o], u, i || "function" != typeof n.type);
-    i || null == n.__e || p$1(n.__e), n.__ = n.__e = n.__d = void 0;
+    if (i = n.__k) for (o = 0; o < i.length; o++) i[o] && q$2(i[o], u, t || "function" != typeof n.type);
+    t || null == n.__e || p$1(n.__e), n.__ = n.__e = n.__d = void 0;
   }
   function B$2(n, l, u) {
     return this.constructor(n, u);
   }
-  function D$1(u, i, t) {
-    var o, r, f;
-    l$1.__ && l$1.__(u, i), r = (o = "function" == typeof t) ? null : t && t.__k || i.__k, f = [], L$1(i, u = (!o && t || i).__k = y$1(k$2, null, [u]), r || c$1, c$1, void 0 !== i.ownerSVGElement, !o && t ? [t] : r ? null : i.firstChild ? n.call(i.childNodes) : null, f, !o && t ? t : r ? r.__e : i.firstChild, o), M(f, u);
+  function D$1(u, t, i) {
+    var o, r, f, e;
+    l$1.__ && l$1.__(u, t), r = (o = "function" == typeof i) ? null : i && i.__k || t.__k, f = [], e = [], L$1(t, u = (!o && i || t).__k = y$1(k$2, null, [u]), r || c$1, c$1, void 0 !== t.ownerSVGElement, !o && i ? [i] : r ? null : t.firstChild ? n.call(t.childNodes) : null, f, !o && i ? i : r ? r.__e : t.firstChild, o, e), M(f, u, e);
   }
-  function F$2(l, u, i) {
-    var t,
+  function F$2(l, u, t) {
+    var i,
       o,
       r,
       f,
-      e = h$1({}, l.props);
-    for (r in l.type && l.type.defaultProps && (f = l.type.defaultProps), u) "key" == r ? t = u[r] : "ref" == r ? o = u[r] : e[r] = void 0 === u[r] && void 0 !== f ? f[r] : u[r];
-    return arguments.length > 2 && (e.children = arguments.length > 3 ? n.call(arguments, 2) : i), d$1(l.type, e, t || l.key, o || l.ref, null);
+      e = v$1({}, l.props);
+    for (r in l.type && l.type.defaultProps && (f = l.type.defaultProps), u) "key" == r ? i = u[r] : "ref" == r ? o = u[r] : e[r] = void 0 === u[r] && void 0 !== f ? f[r] : u[r];
+    return arguments.length > 2 && (e.children = arguments.length > 3 ? n.call(arguments, 2) : t), d$1(l.type, e, i || l.key, o || l.ref, null);
   }
   function G(n, l) {
     var u = {
@@ -285,9 +289,9 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         return n.children(l);
       },
       Provider: function (n) {
-        var u, i;
-        return this.getChildContext || (u = [], (i = {})[l] = this, this.getChildContext = function () {
-          return i;
+        var u, t;
+        return this.getChildContext || (u = [], (t = {})[l] = this, this.getChildContext = function () {
+          return t;
         }, this.shouldComponentUpdate = function (n) {
           this.props.value !== n.value && u.some(function (n) {
             n.__e = !0, w$2(n);
@@ -304,9 +308,9 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     return u.Provider.__ = u.Consumer.contextType = u;
   }
   n = s$1.slice, l$1 = {
-    __e: function (n, l, u, i) {
-      for (var t, o, r; l = l.__;) if ((t = l.__c) && !t.__) try {
-        if ((o = t.constructor) && null != o.getDerivedStateFromError && (t.setState(o.getDerivedStateFromError(n)), r = t.__d), null != t.componentDidCatch && (t.componentDidCatch(n, i || {}), r = t.__d), r) return t.__E = t;
+    __e: function (n, l, u, t) {
+      for (var i, o, r; l = l.__;) if ((i = l.__c) && !i.__) try {
+        if ((o = i.constructor) && null != o.getDerivedStateFromError && (i.setState(o.getDerivedStateFromError(n)), r = i.__d), null != i.componentDidCatch && (i.componentDidCatch(n, t || {}), r = i.__d), r) return i.__E = i;
       } catch (l) {
         n = l;
       }
@@ -314,10 +318,10 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     }
   }, u$1 = 0, b$1.prototype.setState = function (n, l) {
     var u;
-    u = null != this.__s && this.__s !== this.state ? this.__s : this.__s = h$1({}, this.state), "function" == typeof n && (n = n(h$1({}, u), this.props)), n && h$1(u, n), null != n && this.__v && (l && this._sb.push(l), w$2(this));
+    u = null != this.__s && this.__s !== this.state ? this.__s : this.__s = v$1({}, this.state), "function" == typeof n && (n = n(v$1({}, u), this.props)), n && v$1(u, n), null != n && this.__v && (l && this._sb.push(l), w$2(this));
   }, b$1.prototype.forceUpdate = function (n) {
     this.__v && (this.__e = !0, n && this.__h.push(n), w$2(this));
-  }, b$1.prototype.render = k$2, t$1 = [], r$1 = "function" == typeof Promise ? Promise.prototype.then.bind(Promise.resolve()) : setTimeout, f$1 = function (n, l) {
+  }, b$1.prototype.render = k$2, i$1 = [], r$1 = "function" == typeof Promise ? Promise.prototype.then.bind(Promise.resolve()) : setTimeout, f$1 = function (n, l) {
     return n.__v.__b - l.__v.__b;
   }, x$1.__r = 0, e$1 = 0;
   var _$1 = 0;
@@ -1783,7 +1787,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
   }
 
   /*!
-  * tabbable 6.1.2
+  * tabbable 6.2.0
   * @license MIT, https://github.com/focus-trap/tabbable/blob/master/LICENSE
   */
   // NOTE: separate `:not()` selectors has broader browser support than the newer
@@ -1844,7 +1848,27 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     var attValue = node === null || node === void 0 ? void 0 : (_node$getAttribute2 = node.getAttribute) === null || _node$getAttribute2 === void 0 ? void 0 : _node$getAttribute2.call(node, 'contenteditable');
     return attValue === '' || attValue === 'true';
   };
-  var getTabindex = function getTabindex(node, isScope) {
+
+  /**
+   * @private
+   * Determines if the node has an explicitly specified `tabindex` attribute.
+   * @param {HTMLElement} node
+   * @returns {boolean} True if so; false if not.
+   */
+  var hasTabIndex = function hasTabIndex(node) {
+    return !isNaN(parseInt(node.getAttribute('tabindex'), 10));
+  };
+
+  /**
+   * Determine the tab index of a given node.
+   * @param {HTMLElement} node
+   * @returns {number} Tab order (negative, 0, or positive number).
+   * @throws {Error} If `node` is falsy.
+   */
+  var getTabIndex = function getTabIndex(node) {
+    if (!node) {
+      throw new Error('No node provided');
+    }
     if (node.tabIndex < 0) {
       // in Chrome, <details/>, <audio controls/> and <video controls/> elements get a default
       // `tabIndex` of -1 when the 'tabindex' attribute isn't specified in the DOM,
@@ -1853,11 +1877,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       // order, consider their tab index to be 0.
       // Also browsers do not return `tabIndex` correctly for contentEditable nodes;
       // so if they don't have a tabindex attribute specifically set, assume it's 0.
-      //
-      // isScope is positive for custom element with shadow root or slot that by default
-      // have tabIndex -1, but need to be sorted by document order in order for their
-      // content to be inserted in the correct position
-      if ((isScope || /^(AUDIO|VIDEO|DETAILS)$/.test(node.tagName) || isContentEditable(node)) && isNaN(parseInt(node.getAttribute('tabindex'), 10))) {
+      if ((/^(AUDIO|VIDEO|DETAILS)$/.test(node.tagName) || isContentEditable(node)) && !hasTabIndex(node)) {
         return 0;
       }
     }
@@ -2102,7 +2122,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     return true;
   };
   var isNodeMatchingSelectorTabbable = function isNodeMatchingSelectorTabbable(options, node) {
-    if (isNonTabbableRadio(node) || getTabindex(node) < 0 || !isNodeMatchingSelectorFocusable(options, node)) {
+    if (isNonTabbableRadio(node) || getTabIndex(node) < 0 || !isNodeMatchingSelectorFocusable(options, node)) {
       return false;
     }
     return true;
@@ -2161,7 +2181,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       console.log("Focus changed to ".concat(((e === null || e === void 0 ? void 0 : e.tagName) || "").toLowerCase().padStart(6), ":"), e);
       console.log(generateStack());
     }
-    e === null || e === void 0 ? void 0 : (_e$focus = e.focus) === null || _e$focus === void 0 ? void 0 : _e$focus.call(e);
+    e === null || e === void 0 || (_e$focus = e.focus) === null || _e$focus === void 0 ? void 0 : _e$focus.call(e);
   }
   /**
    * When an element unmounts, default HTML behavior is to just send focus to the body, which is wildly unhelpful. It means you lose your place in the keyboard tab order.
@@ -3840,7 +3860,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       return () => {};
     }, [/* Must remain stable */]);
     const remoteULEChildMounted = T$1((index, mounted) => {
-      var _hasRemoteULEChildMou, _hasRemoteULEChildMou2, _hasRemoteULEChildMou3;
+      var _hasRemoteULEChildMou, _hasRemoteULEChildMou2;
       if (!hasRemoteULEChildMounted.current) {
         hasRemoteULEChildMounted.current = {
           mounts: new Set(),
@@ -3876,7 +3896,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         }
       }
 
-      hasRemoteULEChildMounted === null || hasRemoteULEChildMounted === void 0 ? void 0 : (_hasRemoteULEChildMou = hasRemoteULEChildMounted.current) === null || _hasRemoteULEChildMou === void 0 ? void 0 : (_hasRemoteULEChildMou2 = _hasRemoteULEChildMou[mounted ? "mounts" : "unmounts"]) === null || _hasRemoteULEChildMou2 === void 0 ? void 0 : (_hasRemoteULEChildMou3 = _hasRemoteULEChildMou2.add) === null || _hasRemoteULEChildMou3 === void 0 ? void 0 : _hasRemoteULEChildMou3.call(_hasRemoteULEChildMou2, index);
+      hasRemoteULEChildMounted === null || hasRemoteULEChildMounted === void 0 || (_hasRemoteULEChildMou = hasRemoteULEChildMounted.current) === null || _hasRemoteULEChildMou === void 0 || (_hasRemoteULEChildMou = _hasRemoteULEChildMou[mounted ? "mounts" : "unmounts"]) === null || _hasRemoteULEChildMou === void 0 || (_hasRemoteULEChildMou2 = _hasRemoteULEChildMou.add) === null || _hasRemoteULEChildMou2 === void 0 ? void 0 : _hasRemoteULEChildMou2.call(_hasRemoteULEChildMou, index);
     }, [/* Must remain stable */]);
     const managedChildren = useMemoObject({
       ...{
@@ -4299,7 +4319,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       } else if (!untabbable && index != null) {
         var _children$getAt, _children$getAt2, _children$getAt2$focu;
         const element = (_children$getAt = children.getAt(index)) === null || _children$getAt === void 0 ? void 0 : _children$getAt.getElement();
-        (_children$getAt2 = children.getAt(index)) === null || _children$getAt2 === void 0 ? void 0 : (_children$getAt2$focu = _children$getAt2.focusSelf) === null || _children$getAt2$focu === void 0 ? void 0 : _children$getAt2$focu.call(_children$getAt2, element);
+        (_children$getAt2 = children.getAt(index)) === null || _children$getAt2 === void 0 || (_children$getAt2$focu = _children$getAt2.focusSelf) === null || _children$getAt2$focu === void 0 ? void 0 : _children$getAt2$focu.call(_children$getAt2, element);
       } else setTabbableIndex(null, reason, true);
     }, []);
     const rovingTabIndexContext = useMemoObject({
@@ -4962,7 +4982,11 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     var _propsLN$tabIndex;
     let {
       // Stuff for the row as a child of the parent grid
-      info: managedChildParameters,
+      info: {
+        index,
+        untabbable,
+        ...void3
+      },
       textContentParameters,
       context: contextFromParent,
       // Stuff for the row as a parent of child cells
@@ -4986,8 +5010,10 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       setTabbableRow
     } = contextFromParent.gridNavigationRowContext;
     const getIndex = useStableCallback(() => {
-      return managedChildParameters.index;
+      return index;
     });
+    // When this row is focused from the parent's `useRovingTabIndex`,
+    // instead of focusing the row element, this function focuses the appropriate cell element.
     const whenThisRowIsFocused = useStableCallback(e => {
       const {
         getChildren
@@ -5026,21 +5052,35 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     const focusSelf = whenThisRowIsFocused;
     const {
       props: propsLNC,
-      info,
-      ...ulncRet
+      info: {
+        getLocallyTabbable,
+        setLocallyTabbable,
+        ...void2
+      },
+      hasCurrentFocusParameters,
+      pressParameters,
+      rovingTabIndexChildReturn,
+      textContentReturn,
+      ...void6
     } = useListNavigationChild({
-      info: managedChildParameters,
+      info: {
+        index,
+        untabbable
+      },
       refElementReturn,
       textContentParameters,
       context: contextFromParent
     });
-    const allChildCellsAreUntabbable = !ulncRet.rovingTabIndexChildReturn.tabbable;
+    const allChildCellsAreUntabbable = !rovingTabIndexChildReturn.tabbable;
     const {
       propsStableParentOrChild: propsLN,
-      // This is just tabIndex = 0 or -1, see the TODO below
       propsParent: propsLN2,
       context: contextULN,
-      ...ulnRet
+      linearNavigationReturn,
+      managedChildrenParameters,
+      rovingTabIndexReturn,
+      typeaheadNavigationReturn,
+      ...void5
     } = useListNavigation({
       managedChildrenReturn,
       refElementReturn,
@@ -5079,7 +5119,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     });
     const {
       setTabbableIndex
-    } = ulnRet.rovingTabIndexReturn;
+    } = rovingTabIndexReturn;
     const gridNavigationCellContext = useMemoObject({
       //allChildCellsAreUntabbable,
       setTabbableRow,
@@ -5106,10 +5146,17 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       props: useTagProps(props, "data-use-grid-navigation-partial-row"),
       info: {
         focusSelf,
-        ...info
+        getLocallyTabbable,
+        setLocallyTabbable
       },
-      ...ulncRet,
-      ...ulnRet
+      hasCurrentFocusParameters,
+      pressParameters,
+      rovingTabIndexChildReturn,
+      textContentReturn,
+      linearNavigationReturn,
+      managedChildrenParameters,
+      rovingTabIndexReturn,
+      typeaheadNavigationReturn
     };
   }
   /**
@@ -5382,6 +5429,17 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       }
     };
   }
+
+  /**
+   * Combines {@link useGridNavigation} and {@link useSingleSelection}.
+   *
+   * @remarks The single-selection behavior is optional, if you decide you need multi-selection instead within the same component.
+   *
+   * @hasChild {@link useGridNavigationSingleSelectionRow}
+   * @hasChild {@link useGridNavigationSingleSelectionCell}
+   *
+   * @compositeParams
+   */
   function useGridNavigationSingleSelection(_ref31) {
     let {
       gridNavigationParameters,
@@ -5444,6 +5502,9 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       typeaheadNavigationReturn
     };
   }
+  /**
+   * @compositeParams
+   */
   function useGridNavigationSingleSelectionRow(_ref32) {
     let {
       info: mcp1,
@@ -5462,7 +5523,12 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         onCurrentFocusedInnerChanged: ocfic1,
         ...void6
       },
-      info: infoSingleSelection,
+      info: {
+        getSelected,
+        selected,
+        setLocalSelected,
+        ...void8
+      },
       props: propsSingleSelection,
       singleSelectionChildReturn,
       pressParameters: {
@@ -5479,7 +5545,12 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         onCurrentFocusedInnerChanged: ocfic2,
         ...void7
       },
-      info: infoGridNavigation,
+      info: {
+        focusSelf,
+        getLocallyTabbable,
+        setLocallyTabbable,
+        ...void9
+      },
       props: propsGridNavigation,
       linearNavigationReturn,
       managedChildrenParameters,
@@ -5510,8 +5581,12 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       },
       linearNavigationReturn,
       info: {
-        ...infoSingleSelection,
-        ...infoGridNavigation
+        getLocallyTabbable,
+        getSelected,
+        selected,
+        setLocallyTabbable,
+        setLocalSelected,
+        focusSelf
       },
       managedChildrenParameters,
       pressParameters: {
@@ -5532,7 +5607,9 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       typeaheadNavigationReturn
     };
   }
-  // EZ
+  /**
+   * @compositeParams
+   */
   function useGridNavigationSingleSelectionCell(p) {
     monitorCallCount(useGridNavigationSingleSelectionCell);
     return useGridNavigationCell(p);
@@ -5741,6 +5818,16 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       return lhs - rhs;
     }
   }
+
+  /**
+   * Combines {@link useGridNavigation}, {@link useSingleSelection}, and {@link useSortableChildren}.
+   *
+   * @remarks This is a separate hook because {@link useSortableChildren} imposes unique requirements to the structure of your `children`.
+   *
+   * @hasChild {@link useGridNavigationSingleSelectionSortableRow}
+   *
+   * @compositeParams
+   */
   function useGridNavigationSingleSelectionSortable(_ref36) {
     let {
       rearrangeableChildrenParameters,
@@ -5788,9 +5875,14 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       ...scr
     };
   }
+  /**
+   * Besides just overriding `focusSelf` for `useRovingTabIndex`, this also overrides `getSortValue` to return the sort value of the current cell.
+   *
+   * @compositeParams
+   */
   function useGridNavigationSingleSelectionSortableRow(_ref37) {
     let {
-      context,
+      context: ctxIncoming,
       info: {
         index,
         unselectable,
@@ -5808,15 +5900,34 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     monitorCallCount(useGridNavigationSingleSelectionSortableRow);
     const getSortValue = T$1(() => {
       let rows = managedChildrenReturn.getChildren();
-      let columnIndex = context.gridNavigationRowContext.getTabbableColumn() || 0;
+      let columnIndex = ctxIncoming.gridNavigationRowContext.getTabbableColumn() || 0;
       let cell = rows.getAt(columnIndex);
       return cell === null || cell === void 0 ? void 0 : cell.getSortValue();
     }, []);
     const {
-      info,
-      ...gridNavRet
+      info: {
+        getLocallyTabbable,
+        getSelected,
+        selected,
+        setLocalSelected,
+        setLocallyTabbable,
+        focusSelf,
+        ...void4
+      },
+      context: ctxOutgoing,
+      hasCurrentFocusParameters,
+      linearNavigationReturn,
+      managedChildrenParameters,
+      pressParameters,
+      props,
+      rovingTabIndexChildReturn,
+      rovingTabIndexReturn,
+      singleSelectionChildReturn,
+      textContentReturn,
+      typeaheadNavigationReturn,
+      ...void3
     } = useGridNavigationSingleSelectionRow({
-      context,
+      context: ctxIncoming,
       info: {
         index,
         unselectable,
@@ -5831,13 +5942,30 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     });
     return {
       info: {
-        ...info,
-        getSortValue
+        getLocallyTabbable,
+        getSelected,
+        selected,
+        setLocallyTabbable,
+        setLocalSelected,
+        getSortValue,
+        focusSelf
       },
-      ...gridNavRet
+      context: ctxOutgoing,
+      hasCurrentFocusParameters,
+      linearNavigationReturn,
+      managedChildrenParameters,
+      pressParameters,
+      props,
+      rovingTabIndexChildReturn,
+      rovingTabIndexReturn,
+      singleSelectionChildReturn,
+      textContentReturn,
+      typeaheadNavigationReturn
     };
   }
-  // EZ
+  /**
+   * @compositeParams
+   */
   function useGridNavigationSingleSelectionSortableCell(_ref38) {
     let {
       context,
@@ -5863,6 +5991,16 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       textContentParameters
     });
   }
+
+  /**
+   * Combines {@link useListNavigation} and {@link useSingleSelection}.
+   *
+   * @remarks The single-selection behavior is optional, if you decide you need multi-selection instead within the same component.
+   *
+   * @hasChild {@link useListNavigationSingleSelectionChild}
+   *
+   * @compositeParams
+   */
   function useListNavigationSingleSelection(_ref39) {
     let {
       linearNavigationParameters,
@@ -5909,6 +6047,9 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       propsParent: propsParent
     };
   }
+  /**
+   * @compositeParams
+   */
   function useListNavigationSingleSelectionChild(_ref40) {
     let {
       info: {
@@ -5986,6 +6127,16 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       propsTabbable: propsLN
     };
   }
+
+  /**
+   * Combines {@link useListNavigation}, {@link useSingleSelection}, and {@link useSortableChildren}.
+   *
+   * @remarks This is a separate hook because {@link useSortableChildren} imposes unique requirements to the structure of your `children`.
+   *
+   * @hasChild {@link useListNavigationSingleSelectionSortableChild}
+   *
+   * @compositeParams
+   */
   function useListNavigationSingleSelectionSortable(_ref41) {
     let {
       linearNavigationParameters,
@@ -8147,7 +8298,11 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       propsParent,
       propsStableParentOrChild,
       rovingTabIndexReturn,
-      ...gridNavigationSingleSelectionReturn
+      linearNavigationReturn,
+      singleSelectionReturn,
+      sortableChildrenReturn,
+      typeaheadNavigationReturn,
+      ...void3
     } = useGridNavigationSingleSelectionSortable({
       gridNavigationParameters,
       linearNavigationParameters: {
@@ -8250,7 +8405,10 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       rovingTabIndexReturn,
       childrenHaveFocusReturn,
       paginatedChildrenReturn,
-      ...gridNavigationSingleSelectionReturn
+      linearNavigationReturn,
+      singleSelectionReturn,
+      sortableChildrenReturn,
+      typeaheadNavigationReturn
     };
   }
   /**
@@ -8625,7 +8783,8 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       rearrangeableChildrenReturn,
       sortableChildrenReturn,
       propsParent,
-      propsStableParentOrChild
+      propsStableParentOrChild,
+      ...void2
     } = useListNavigationSingleSelectionSortable({
       managedChildrenReturn: {
         getChildren
@@ -8656,7 +8815,14 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       refElementReturn,
       sortableChildrenParameters
     });
-    //const { context: { childrenHaveFocusChildContext }, childrenHaveFocusReturn } = useChildrenHaveFocus({ childrenHaveFocusParameters });
+    const {
+      context: {
+        childrenHaveFocusChildContext
+      },
+      childrenHaveFocusReturn
+    } = useChildrenHaveFocus({
+      childrenHaveFocusParameters
+    });
     const {
       paginatedChildrenReturn,
       paginatedChildrenReturn: {
@@ -8702,7 +8868,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       managedChildrenReturn
     } = mcr;
     const context = useMemoObject(useMemoObject({
-      //childrenHaveFocusChildContext,
+      childrenHaveFocusChildContext,
       managedChildContext,
       paginatedChildContext,
       rovingTabIndexContext,
@@ -8721,8 +8887,8 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       linearNavigationReturn,
       rovingTabIndexReturn,
       singleSelectionReturn,
-      typeaheadNavigationReturn
-      //childrenHaveFocusReturn
+      typeaheadNavigationReturn,
+      childrenHaveFocusReturn
     };
   }
   /**
@@ -8741,13 +8907,21 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       },
       // The "...info" is empty if M is the same as UCLNCI<ChildElement>.
       textContentParameters,
+      refElementParameters,
+      hasCurrentFocusParameters: {
+        onCurrentFocusedChanged,
+        onCurrentFocusedInnerChanged: ocfic3,
+        ...void7
+      },
       context: {
         managedChildContext,
         rovingTabIndexContext,
         paginatedChildContext,
         staggeredChildContext,
         singleSelectionContext,
-        typeaheadNavigationContext
+        typeaheadNavigationContext,
+        childrenHaveFocusChildContext,
+        ...void5
       },
       ...void1
     } = _ref58;
@@ -8782,14 +8956,19 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         staggeredChildContext
       }
     });
+    // TODO: uPC and pSC can't exactly return `{ info: { untabbable: false } }`, or can they...? 
+    // (Really it's more about *should* they -- I don't like this hook doing more than just calling sub-hooks, but where else does this logic take place if not here?)
     untabbable || (untabbable = hideBecausePaginated || hideBecauseStaggered);
     unselectable || (unselectable = hideBecausePaginated || hideBecauseStaggered);
+    // TODO: I feel like this needs stronger justification. It's probably correct but why is it here of all places?
+    // I.E. shouldn't it be in useListNavigationSingleSelection?
     if (untabbable) unselectable = true;
     const {
       refElementReturn,
-      propsStable
+      propsStable,
+      ...void6
     } = useRefElement({
-      refElementParameters: {}
+      refElementParameters
     });
     const {
       hasCurrentFocusParameters: {
@@ -8822,11 +9001,6 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       refElementReturn,
       textContentParameters
     });
-    /*const onPress = useStableCallback((e: PressEventReason<any>) => {
-        if (singleSelectionContext.selectionMode == "activation")
-            singleSelectionContext.onSelectedIndexChange?.(enhanceEvent(e, { selectedIndex: index }));
-    });*/
-    //const onPressSync = (rovingTabIndexContext.untabbable || unselectable || untabbable) ? null : onPress;
     const allStandardInfo = {
       index,
       focusSelf,
@@ -8849,18 +9023,26 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         ...customUserInfo
       }
     });
-    //const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2 } } = useChildrenHaveFocusChild({ context: { childrenHaveFocusChildContext } });
+    const {
+      hasCurrentFocusParameters: {
+        onCurrentFocusedInnerChanged: ocfic2
+      }
+    } = useChildrenHaveFocusChild({
+      context: {
+        childrenHaveFocusChildContext
+      }
+    });
     const onCurrentFocusedInnerChanged = useStableCallback((focused, prev, e) => {
       ocfic1 === null || ocfic1 === void 0 ? void 0 : ocfic1(focused, prev, e);
-      //ocfic2?.(focused, prev, e);
+      ocfic2 === null || ocfic2 === void 0 ? void 0 : ocfic2(focused, prev, e);
+      ocfic3 === null || ocfic3 === void 0 ? void 0 : ocfic3(focused, prev, e);
     });
-
     const {
       hasCurrentFocusReturn
     } = useHasCurrentFocus({
       hasCurrentFocusParameters: {
         onCurrentFocusedInnerChanged,
-        onCurrentFocusedChanged: null
+        onCurrentFocusedChanged
       },
       refElementReturn
     });
@@ -11388,6 +11570,15 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
           var _e$textContent3;
           return (_e$textContent3 = e === null || e === void 0 ? void 0 : e.textContent) !== null && _e$textContent3 !== void 0 ? _e$textContent3 : "";
         }, [])
+      },
+      hasCurrentFocusParameters: {
+        onCurrentFocusedChanged: null,
+        onCurrentFocusedInnerChanged: null
+      },
+      refElementParameters: {
+        onElementChange: null,
+        onMount: null,
+        onUnmount: null
       }
     });
     const {
