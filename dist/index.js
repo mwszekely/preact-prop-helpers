@@ -318,12 +318,12 @@ export { useListNavigation, useListNavigationChild } from "./component-detail/ke
 export { useListNavigationSingleSelectionSortable, useListNavigationSingleSelectionSortableChild } from "./component-detail/keyboard-navigation/use-list-navigation-single-selection-sortable.js";
 export { useListNavigationSingleSelection, useListNavigationSingleSelectionChild } from "./component-detail/keyboard-navigation/use-list-navigation-single-selection.js";
 export { useRovingTabIndex, useRovingTabIndexChild } from "./component-detail/keyboard-navigation/use-roving-tabindex.js";
-export { useSingleSelection, useSingleSelectionChild, useSingleSelectionDeclarative } from "./component-detail/keyboard-navigation/use-single-selection.js";
-export { defaultCompare, useRearrangeableChildren, useSortableChildren } from "./component-detail/keyboard-navigation/use-sortable-children.js";
 export { binarySearch, useTypeaheadNavigation, useTypeaheadNavigationChild } from "./component-detail/keyboard-navigation/use-typeahead-navigation.js";
 export { useDismiss } from "./component-detail/use-dismiss.js";
 export { findFirstFocusable, findFirstTabbable, useFocusTrap } from "./component-detail/use-focus-trap.js";
 export { usePaginatedChild, usePaginatedChildren } from "./component-detail/use-paginated-children.js";
+export { useSingleSelection, useSingleSelectionChild, useSingleSelectionDeclarative } from "./component-detail/use-single-selection.js";
+export { defaultCompare, useRearrangeableChildren, useSortableChildren } from "./component-detail/use-sortable-children.js";
 export { useStaggeredChild, useStaggeredChildren } from "./component-detail/use-staggered-children.js";
 export { useCompleteGridNavigation, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow } from "./component-use/use-grid-navigation-complete.js";
 export { useCompleteListNavigation, useCompleteListNavigationChild, useCompleteListNavigationDeclarative } from "./component-use/use-list-navigation-complete.js";

@@ -1,3 +1,4 @@
+import { identity } from "lodash-es";
 import { useMergedProps } from "../../dom-helpers/use-merged-props.js";
 import { usePassiveState } from "../../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
@@ -117,6 +118,7 @@ refElementReturn, ...void1 }) {
         managedChildrenReturn,
         refElementReturn,
         typeaheadNavigationParameters,
+        rearrangeableChildrenReturn: { indexDemangler: identity, indexMangler: identity },
         rovingTabIndexParameters: {
             untabbableBehavior: "leave-child-focused",
             focusSelfParent: whenThisRowIsFocused,
@@ -132,6 +134,7 @@ refElementReturn, ...void1 }) {
                 setTabbableColumn(prev => ({ ideal: next, actual: prev?.actual ?? next }), event);
             }),
             disableHomeEndKeys: true,
+            pageNavigationSize: 0,
             arrowKeyDirection: "horizontal",
             ...linearNavigationParameters
         },

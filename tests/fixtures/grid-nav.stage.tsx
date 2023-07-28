@@ -1,6 +1,6 @@
 import { createContext } from "preact";
 import { useCallback, useContext, useEffect, useState } from "preact/hooks";
-import { Compare, CompleteGridNavigationCellContext, CompleteGridNavigationRowContext, EventDetail, Nullable, UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationRowInfo, UseSingleSelectionParameters, focus, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useImperativeProps, useMergedProps, useRefElement, useStableCallback, useStableGetter } from "../../dist/index.js";
+import { Compare, CompleteGridNavigationCellContext, CompleteGridNavigationRowContext, EventDetail, Nullable, UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationRowInfo, UseSingleSelectionParameters, focus, returnZero, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useImperativeProps, useMergedProps, useRefElement, useStableCallback, useStableGetter } from "../../dist/index.js";
 import { LoremIpsum } from "../lorem.js";
 import { fromStringArray, fromStringBoolean, fromStringNumber, fromStringString, useTestSyncState } from "../util.js";
 import { DefaultChildCount, DisabledIndex, HiddenIndex, MissingIndex, WithColSpanIndex } from "./grid-nav.constants.js";
@@ -78,7 +78,7 @@ interface TestBasesGridNavImplProps {
 function useOnRender(id: string) {
     window.onRender ??= async (id) => { console.log("RENDER:" + id); }
     let promise = window.onRender?.(id);
-    const { propsStable, refElementReturn } = useRefElement<any>({})
+    const { propsStable, refElementReturn } = useRefElement<any>({ refElementParameters: {} })
     const { imperativePropsReturn: imperativeHandle, props } = useImperativeProps<any>({ refElementReturn });
     imperativeHandle.setAttribute(("data-render-pending-" + id) as never, "true" as never);
     useEffect(() => {
@@ -114,6 +114,7 @@ function TestBasesGridNavImpl({ ariaPropName, selectedIndex, arrowKeyDirection, 
         rearrangeableChildrenParameters: { getIndex: useCallback(info => info.props.index, []) },
         rovingTabIndexParameters: { untabbable, onTabbableIndexChange: null, focusSelfParent: focus },
         singleSelectionParameters: { ariaPropName, selectionMode },
+        refElementParameters: {},
         singleSelectionDeclarativeParameters: {
             selectedIndex,
             onSelectedIndexChange: useStableCallback((e) => {
@@ -191,6 +192,7 @@ function TestBaseGridNavRow({ index }: { index: number }) {
             untabbable: hidden,
             index,
         },
+        gridNavigationSingleSelectionSortableRowParameters: { getSortableColumnIndex: returnZero },
         linearNavigationParameters: { navigatePastEnd: "wrap", navigatePastStart: "wrap" },
         rovingTabIndexParameters: { initiallyTabbedIndex: 0, untabbable: false, onTabbableIndexChange: null },
         typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000, onNavigateTypeahead: null },

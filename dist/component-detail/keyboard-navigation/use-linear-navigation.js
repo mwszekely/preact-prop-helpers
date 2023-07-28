@@ -17,13 +17,14 @@ export { identity };
  *
  * @compositeParams
  */
-export function useLinearNavigation({ rovingTabIndexReturn, linearNavigationParameters, paginatedChildrenParameters: { paginationMax, paginationMin, ...void2 }, ...void1 }) {
+export function useLinearNavigation({ linearNavigationParameters: { getLowestIndex, getHighestIndex, isValidForLinearNavigation, navigatePastEnd, navigatePastStart, onNavigateLinear, arrowKeyDirection, disableHomeEndKeys, pageNavigationSize, ...void4 }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex, ...void5 }, paginatedChildrenParameters: { paginationMax, paginationMin, ...void2 }, rearrangeableChildrenReturn: { indexDemangler, indexMangler, ...void3 }, ...void1 }) {
     monitorCallCount(useLinearNavigation);
     let getPaginatedRange = useStableGetter(paginationMax == null || paginationMin == null ? null : paginationMax - paginationMin);
     assertEmptyObject(void1);
     assertEmptyObject(void2);
-    const { getLowestIndex, getHighestIndex, indexDemangler, indexMangler, isValidForLinearNavigation, navigatePastEnd, navigatePastStart, onNavigateLinear } = linearNavigationParameters;
-    const { getTabbableIndex, setTabbableIndex } = rovingTabIndexReturn;
+    assertEmptyObject(void3);
+    assertEmptyObject(void4);
+    assertEmptyObject(void5);
     useEnsureStability("useLinearNavigation", onNavigateLinear, isValidForLinearNavigation, indexDemangler, indexMangler);
     const navigateAbsolute = useCallback((requestedIndexMangled, searchDirection, e, fromUserInteraction, mode) => {
         const highestChildIndex = getHighestIndex();
@@ -107,18 +108,18 @@ export function useLinearNavigation({ rovingTabIndexReturn, linearNavigationPara
     const navigateToPrev = useStableCallback((e, fromUserInteraction) => {
         return navigateRelative2(e, -1, fromUserInteraction, "single");
     });
-    const getDisableHomeEndKeys = useStableGetter(linearNavigationParameters.disableHomeEndKeys);
-    const getArrowKeyDirection = useStableGetter(linearNavigationParameters.arrowKeyDirection);
-    const getPageNavigationSize = useStableGetter(linearNavigationParameters.pageNavigationSize);
+    //const getDisableHomeEndKeys = useStableGetter(disableHomeEndKeys);
+    //const getArrowKeyDirection = useStableGetter(arrowKeyDirection);
+    //const getPageNavigationSize = useStableGetter(pageNavigationSize);
     const stableProps = useRef(useTagProps({
-        onKeyDown: (e) => {
+        onKeyDown: useStableCallback((e) => {
             // Not handled by typeahead (i.e. assume this is a keyboard shortcut)
             if (e.ctrlKey || e.metaKey)
                 return;
             //const info = getLogicalDirectionInfo();
-            const arrowKeyDirection = getArrowKeyDirection();
-            const disableHomeEndKeys = getDisableHomeEndKeys();
-            const pageNavigationSize = getPageNavigationSize();
+            //const arrowKeyDirection = getArrowKeyDirection();
+            //const disableHomeEndKeys = getDisableHomeEndKeys();
+            //const pageNavigationSize = getPageNavigationSize();
             const allowsVerticalNavigation = (arrowKeyDirection == "vertical" || arrowKeyDirection == "either");
             const allowsHorizontalNavigation = (arrowKeyDirection == "horizontal" || arrowKeyDirection == "either");
             let childRange = (getHighestIndex() - getLowestIndex());
@@ -174,7 +175,7 @@ export function useLinearNavigation({ rovingTabIndexReturn, linearNavigationPara
                 e.preventDefault();
                 e.stopPropagation();
             }
-        }
+        })
     }, "data-linear-navigation"));
     return {
         linearNavigationReturn: {},

@@ -8,6 +8,7 @@ import { ElementProps, KeyboardEventType, Nullable, OmitStrong } from "../../uti
 import { monitorCallCount } from "../../util/use-call-count.js";
 import { useTagProps } from "../../util/use-tag-props.js";
 import { UsePaginatedChildrenParameters } from "../use-paginated-children.js";
+import { UseRearrangeableChildrenReturnType } from "../use-sortable-children.js";
 import { UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
 export { identity };
 
@@ -28,6 +29,7 @@ export interface UseLinearNavigationReturnType<ParentOrChildElement extends Elem
 /** Arguments passed to the parent `useLinearNavigation` */
 export interface UseLinearNavigationParameters<ParentOrChildElement extends Element, ChildElement extends Element> extends
     TargetedPick<UseRovingTabIndexReturnType<ParentOrChildElement, ChildElement>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex">,
+    TargetedPick<UseRearrangeableChildrenReturnType<any>, "rearrangeableChildrenReturn", "indexMangler" | "indexDemangler">,
     TargetedPick<UsePaginatedChildrenParameters<ParentOrChildElement, ChildElement>, "paginatedChildrenParameters", "paginationMin" | "paginationMax"> {
     linearNavigationParameters: UseLinearNavigationParametersSelf<ChildElement>;
 }
@@ -102,14 +104,14 @@ export interface UseLinearNavigationParametersSelf<ChildElement extends Element>
      * 
      * @stable
      */
-    indexMangler: (n: number) => number;
+    //indexMangler: (n: number) => number;
 
     /**
      * @see {@link UseLinearNavigationParametersSelf.indexMangler}, which does the opposite of this.
      * 
      * @stable
      */
-    indexDemangler: (n: number) => number;
+    //indexDemangler: (n: number) => number;
 
     /**
      * From `useManagedChildren`. This can be higher than the *actual* highest index if you need it to be.
@@ -141,21 +143,24 @@ export interface UseLinearNavigationParametersSelf<ChildElement extends Element>
  * @compositeParams
  */
 export function useLinearNavigation<ParentOrChildElement extends Element, ChildElement extends Element>({
-    rovingTabIndexReturn,
-    linearNavigationParameters,
+    linearNavigationParameters: { getLowestIndex, getHighestIndex, isValidForLinearNavigation, navigatePastEnd, navigatePastStart, onNavigateLinear, arrowKeyDirection, disableHomeEndKeys, pageNavigationSize, ...void4 },
+    rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex, ...void5 },
     paginatedChildrenParameters: { paginationMax, paginationMin, ...void2 },
+    rearrangeableChildrenReturn: { indexDemangler, indexMangler, ...void3 },
     ...void1
 }: UseLinearNavigationParameters<ParentOrChildElement, ChildElement>): UseLinearNavigationReturnType<ParentOrChildElement> {
+    type R = EventType<any, any>;
+    
     monitorCallCount(useLinearNavigation);
 
     let getPaginatedRange = useStableGetter(paginationMax == null || paginationMin == null? null : paginationMax - paginationMin);
 
     assertEmptyObject(void1);
     assertEmptyObject(void2);
+    assertEmptyObject(void3);
+    assertEmptyObject(void4);
+    assertEmptyObject(void5);
 
-    type R = EventType<any, any>;
-    const { getLowestIndex, getHighestIndex, indexDemangler, indexMangler, isValidForLinearNavigation, navigatePastEnd, navigatePastStart, onNavigateLinear } = linearNavigationParameters;
-    const { getTabbableIndex, setTabbableIndex } = rovingTabIndexReturn;
 
     useEnsureStability("useLinearNavigation", onNavigateLinear, isValidForLinearNavigation, indexDemangler, indexMangler);
 
@@ -243,21 +248,21 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
     const navigateToPrev = useStableCallback((e: R, fromUserInteraction: boolean) => {
         return navigateRelative2(e, -1, fromUserInteraction, "single");
     });
-    const getDisableHomeEndKeys = useStableGetter(linearNavigationParameters.disableHomeEndKeys);
-    const getArrowKeyDirection = useStableGetter(linearNavigationParameters.arrowKeyDirection);
-    const getPageNavigationSize = useStableGetter(linearNavigationParameters.pageNavigationSize);
+    //const getDisableHomeEndKeys = useStableGetter(disableHomeEndKeys);
+    //const getArrowKeyDirection = useStableGetter(arrowKeyDirection);
+    //const getPageNavigationSize = useStableGetter(pageNavigationSize);
 
 
     const stableProps = useRef<ElementProps<ParentOrChildElement>>(useTagProps({
-        onKeyDown: (e) => {
+        onKeyDown: useStableCallback((e) => {
             // Not handled by typeahead (i.e. assume this is a keyboard shortcut)
             if (e.ctrlKey || e.metaKey)
                 return;
 
             //const info = getLogicalDirectionInfo();
-            const arrowKeyDirection = getArrowKeyDirection();
-            const disableHomeEndKeys = getDisableHomeEndKeys();
-            const pageNavigationSize = getPageNavigationSize();
+            //const arrowKeyDirection = getArrowKeyDirection();
+            //const disableHomeEndKeys = getDisableHomeEndKeys();
+            //const pageNavigationSize = getPageNavigationSize();
 
             const allowsVerticalNavigation = (arrowKeyDirection == "vertical" || arrowKeyDirection == "either");
             const allowsHorizontalNavigation = (arrowKeyDirection == "horizontal" || arrowKeyDirection == "either");
@@ -325,7 +330,7 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
                 e.preventDefault();
                 e.stopPropagation();
             }
-        }
+        })
     }, "data-linear-navigation"))
 
 

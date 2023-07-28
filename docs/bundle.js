@@ -1576,749 +1576,6 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     };
   }
 
-  /**
-   * Combines two `children`.
-   *
-   * @remarks This is fairly trivial and not even technically a hook, as it doesn't use any other hooks, but is this way for consistency.
-   *
-   * TODO: This could accept a variable number of arguments to be consistent with useMergedProps, but I feel like it might be a performance hit.
-   */
-  function useMergedChildren(lhs, rhs) {
-    monitorCallCount(useMergedChildren);
-    if (lhs == null && rhs == null) {
-      return undefined;
-    } else if (lhs == null) {
-      return rhs;
-    } else if (rhs == null) {
-      return lhs;
-    } else {
-      return y$1(k$2, {}, lhs, rhs);
-    }
-  }
-
-  /**
-   * Merged the `class` and `className` properties of two sets of props into a single string.
-   *
-   * @remarks Duplicate classes are removed (order doesn't matter anyway).
-   */
-  function useMergedClasses() {
-    monitorCallCount(useMergedClasses);
-    // Note: For the sake of forward compatibility, this function is labelled as
-    // a hook, but as it uses no other hooks it technically isn't one.
-    let classesSet = new Set();
-    for (var _len3 = arguments.length, classes = new Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
-      classes[_key3] = arguments[_key3];
-    }
-    for (let c of classes) {
-      if (typeof c == "string" && c.trim()) classesSet.add(c);
-    }
-    if (classesSet.size) {
-      return Array.from(classesSet).join(" ");
-    } else {
-      return undefined;
-    }
-  }
-  function processRef(instance, ref) {
-    if (typeof ref === "function") {
-      ref(instance);
-    } else if (ref != null) {
-      ref.current = instance;
-    } else {
-      /* eslint-disable no-debugger */
-      debugger;
-      console.assert(false, "Unknown ref type found that was neither a RefCallback nor a RefObject");
-    }
-  }
-  /**
-   * Combines two refs into one. This allows a component to both use its own ref *and* forward a ref that was given to it.
-   *
-   * @remarks Or just use {@link useMergedProps}
-   */
-  function useMergedRefs(rhs, lhs) {
-    monitorCallCount(useMergedRefs);
-    // This *must* be stable in order to prevent repeated reset `null` calls after every render.
-    const combined = useStableCallback(function combined(current) {
-      processRef(current, lhs);
-      processRef(current, rhs);
-    });
-    if (lhs == null && rhs == null) {
-      return undefined;
-    } else if (lhs == null) {
-      return rhs;
-    } else if (rhs == null) {
-      return lhs;
-    } else {
-      return combined;
-    }
-  }
-  function styleStringToObject(style) {
-    // TODO: This sucks D:
-    return Object.fromEntries(style.split(";").map(statement => statement.split(":")));
-  }
-  /**
-   * Merges two style objects, returning the result.
-   *
-   * @param style - The user-given style prop for this component
-   * @param obj - The CSS properties you want added to the user-given style
-   * @returns A CSS object containing the properties of both objects.
-   */
-  function useMergedStyles(lhs, rhs) {
-    monitorCallCount(useMergedStyles);
-    // Easy case, when there are no styles to merge return nothing.
-    if (!lhs && !rhs) return undefined;
-    if (typeof lhs != typeof rhs) {
-      // Easy cases, when one is null and the other isn't.
-      if (lhs && !rhs) return lhs;
-      if (!lhs && rhs) return rhs;
-      // They're both non-null but different types.
-      // Convert the string type to an object bag type and run it again.
-      if (lhs && rhs) {
-        // (useMergedStyles isn't a true hook -- this isn't a violation)
-        if (typeof lhs == "string") return useMergedStyles(styleStringToObject(lhs), rhs);
-        if (typeof rhs == "string") return useMergedStyles(lhs, styleStringToObject(rhs));
-      }
-      // Logic???
-      return undefined;
-    }
-    // They're both strings, just concatenate them.
-    if (typeof lhs == "string") {
-      return "".concat(lhs, ";").concat(rhs !== null && rhs !== void 0 ? rhs : "");
-    }
-    // They're both objects, just merge them.
-    return {
-      ...(lhs !== null && lhs !== void 0 ? lhs : {}),
-      ...(rhs !== null && rhs !== void 0 ? rhs : {})
-    };
-  }
-  let log = console.warn;
-  /**
-   * Given two sets of props, merges them and returns the result.
-   *
-   * @remarks The hook is aware of and can intelligently merge `className`, `class`, `style`, `ref`, `children`, and all event handlers.
-   *
-   * If two sets of props both specify the same attribute, e.g. both specify two different `id`s, then an error will be printed to the console (customize this with {@link enableLoggingPropConflicts}), as this conflict needs to be arbitrated on by you.
-   *
-   * {@include } {@link enableLoggingPropConflicts}
-   *
-   * @see {@link useMergedRefs}
-   * @see {@link useMergedStyles}
-   * @see {@link useMergedClasses}
-   * @see {@link useMergedChildren}
-   *
-   * @param allProps - A variadic number of props to merge into one
-   *
-   * @returns A single object with all the provided props merged into one.
-   */
-  function useMergedProps() {
-    monitorCallCount(useMergedProps);
-    for (var _len4 = arguments.length, allProps = new Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
-      allProps[_key4] = arguments[_key4];
-    }
-    useEnsureStability("useMergedProps", allProps.length);
-    let ret = {};
-    for (let nextProps of allProps) {
-      ret = useMergedProps2(ret, nextProps);
-    }
-    return ret;
-  }
-  const knowns = new Set(["children", "ref", "className", "class", "style"]);
-  function mergeUnknown(key, lhsValue, rhsValue) {
-    if (typeof lhsValue === "function" || typeof rhsValue === "function") {
-      // They're both functions that can be merged (or one's a function and the other's null).
-      // Not an *easy* case, but a well-defined one.
-      const merged = mergeFunctions(lhsValue, rhsValue);
-      return merged;
-    } else {
-      // Uh...they're not both functions so we're here because one of them's null, right?
-      if (lhsValue == null && rhsValue == null) {
-        if (rhsValue === null && lhsValue === undefined) return rhsValue;else return lhsValue;
-      }
-      if (lhsValue == null) return rhsValue;else if (rhsValue == null) return lhsValue;else if (rhsValue == lhsValue) {
-        // I mean, they're the same value at least
-        // so we don't need to do anything.
-        // Not really ideal though.
-        return rhsValue;
-      } else {
-        // Ugh.
-        // No good strategies here, just log it if requested
-        log === null || log === void 0 ? void 0 : log("The prop \"".concat(key, "\" cannot simultaneously be the values ").concat(lhsValue, " and ").concat(rhsValue, ". One must be chosen outside of useMergedProps."));
-        return rhsValue;
-      }
-    }
-  }
-  /**
-   * Helper function.
-   *
-   * This is one of the most commonly called functions in this and consumer libraries,
-   * so it trades a bit of readability for speed (i.e. we don't decompose objects and just do regular property access, iterate with `for...in`, instead of `Object.entries`, etc.)
-   */
-  function useMergedProps2(lhsAll, rhsAll) {
-    const ret = {
-      ref: useMergedRefs(lhsAll.ref, rhsAll.ref),
-      style: useMergedStyles(lhsAll.style, rhsAll.style),
-      className: useMergedClasses(lhsAll["class"], lhsAll.className, rhsAll["class"], rhsAll.className),
-      children: useMergedChildren(lhsAll.children, rhsAll.children)
-    };
-    if (ret.ref === undefined) delete ret.ref;
-    if (ret.style === undefined) delete ret.style;
-    if (ret.className === undefined) delete ret.className;
-    if (ret["class"] === undefined) delete ret["class"];
-    if (ret.children === undefined) delete ret.children;
-    for (const lhsKeyU in lhsAll) {
-      const lhsKey = lhsKeyU;
-      if (knowns.has(lhsKey)) continue;
-      ret[lhsKey] = lhsAll[lhsKey];
-    }
-    for (const rhsKeyU in rhsAll) {
-      const rhsKey = rhsKeyU;
-      if (knowns.has(rhsKey)) continue;
-      ret[rhsKey] = mergeUnknown(rhsKey, ret[rhsKey], rhsAll[rhsKey]);
-    }
-    return ret;
-  }
-  function mergeFunctions(lhs, rhs) {
-    if (!lhs) return rhs;
-    if (!rhs) return lhs;
-    return function () {
-      const lv = lhs(...arguments);
-      const rv = rhs(...arguments);
-      if (lv instanceof Promise || rv instanceof Promise) return Promise.all([lv, rv]);
-    };
-  }
-
-  /*!
-  * tabbable 6.2.0
-  * @license MIT, https://github.com/focus-trap/tabbable/blob/master/LICENSE
-  */
-  // NOTE: separate `:not()` selectors has broader browser support than the newer
-  //  `:not([inert], [inert] *)` (Feb 2023)
-  // CAREFUL: JSDom does not support `:not([inert] *)` as a selector; using it causes
-  //  the entire query to fail, resulting in no nodes found, which will break a lot
-  //  of things... so we have to rely on JS to identify nodes inside an inert container
-  var candidateSelectors = ['input:not([inert])', 'select:not([inert])', 'textarea:not([inert])', 'a[href]:not([inert])', 'button:not([inert])', '[tabindex]:not(slot):not([inert])', 'audio[controls]:not([inert])', 'video[controls]:not([inert])', '[contenteditable]:not([contenteditable="false"]):not([inert])', 'details>summary:first-of-type:not([inert])', 'details:not([inert])'];
-  var candidateSelector = /* #__PURE__ */candidateSelectors.join(',');
-  var NoElement = typeof Element === 'undefined';
-  var matches = NoElement ? function () {} : Element.prototype.matches || Element.prototype.msMatchesSelector || Element.prototype.webkitMatchesSelector;
-  var getRootNode = !NoElement && Element.prototype.getRootNode ? function (element) {
-    var _element$getRootNode;
-    return element === null || element === void 0 ? void 0 : (_element$getRootNode = element.getRootNode) === null || _element$getRootNode === void 0 ? void 0 : _element$getRootNode.call(element);
-  } : function (element) {
-    return element === null || element === void 0 ? void 0 : element.ownerDocument;
-  };
-
-  /**
-   * Determines if a node is inert or in an inert ancestor.
-   * @param {Element} [node]
-   * @param {boolean} [lookUp] If true and `node` is not inert, looks up at ancestors to
-   *  see if any of them are inert. If false, only `node` itself is considered.
-   * @returns {boolean} True if inert itself or by way of being in an inert ancestor.
-   *  False if `node` is falsy.
-   */
-  var isInert = function isInert(node, lookUp) {
-    var _node$getAttribute;
-    if (lookUp === void 0) {
-      lookUp = true;
-    }
-    // CAREFUL: JSDom does not support inert at all, so we can't use the `HTMLElement.inert`
-    //  JS API property; we have to check the attribute, which can either be empty or 'true';
-    //  if it's `null` (not specified) or 'false', it's an active element
-    var inertAtt = node === null || node === void 0 ? void 0 : (_node$getAttribute = node.getAttribute) === null || _node$getAttribute === void 0 ? void 0 : _node$getAttribute.call(node, 'inert');
-    var inert = inertAtt === '' || inertAtt === 'true';
-
-    // NOTE: this could also be handled with `node.matches('[inert], :is([inert] *)')`
-    //  if it weren't for `matches()` not being a function on shadow roots; the following
-    //  code works for any kind of node
-    // CAREFUL: JSDom does not appear to support certain selectors like `:not([inert] *)`
-    //  so it likely would not support `:is([inert] *)` either...
-    var result = inert || lookUp && node && isInert(node.parentNode); // recursive
-
-    return result;
-  };
-
-  /**
-   * Determines if a node's content is editable.
-   * @param {Element} [node]
-   * @returns True if it's content-editable; false if it's not or `node` is falsy.
-   */
-  var isContentEditable = function isContentEditable(node) {
-    var _node$getAttribute2;
-    // CAREFUL: JSDom does not support the `HTMLElement.isContentEditable` API so we have
-    //  to use the attribute directly to check for this, which can either be empty or 'true';
-    //  if it's `null` (not specified) or 'false', it's a non-editable element
-    var attValue = node === null || node === void 0 ? void 0 : (_node$getAttribute2 = node.getAttribute) === null || _node$getAttribute2 === void 0 ? void 0 : _node$getAttribute2.call(node, 'contenteditable');
-    return attValue === '' || attValue === 'true';
-  };
-
-  /**
-   * @private
-   * Determines if the node has an explicitly specified `tabindex` attribute.
-   * @param {HTMLElement} node
-   * @returns {boolean} True if so; false if not.
-   */
-  var hasTabIndex = function hasTabIndex(node) {
-    return !isNaN(parseInt(node.getAttribute('tabindex'), 10));
-  };
-
-  /**
-   * Determine the tab index of a given node.
-   * @param {HTMLElement} node
-   * @returns {number} Tab order (negative, 0, or positive number).
-   * @throws {Error} If `node` is falsy.
-   */
-  var getTabIndex = function getTabIndex(node) {
-    if (!node) {
-      throw new Error('No node provided');
-    }
-    if (node.tabIndex < 0) {
-      // in Chrome, <details/>, <audio controls/> and <video controls/> elements get a default
-      // `tabIndex` of -1 when the 'tabindex' attribute isn't specified in the DOM,
-      // yet they are still part of the regular tab order; in FF, they get a default
-      // `tabIndex` of 0; since Chrome still puts those elements in the regular tab
-      // order, consider their tab index to be 0.
-      // Also browsers do not return `tabIndex` correctly for contentEditable nodes;
-      // so if they don't have a tabindex attribute specifically set, assume it's 0.
-      if ((/^(AUDIO|VIDEO|DETAILS)$/.test(node.tagName) || isContentEditable(node)) && !hasTabIndex(node)) {
-        return 0;
-      }
-    }
-    return node.tabIndex;
-  };
-  var isInput = function isInput(node) {
-    return node.tagName === 'INPUT';
-  };
-  var isHiddenInput = function isHiddenInput(node) {
-    return isInput(node) && node.type === 'hidden';
-  };
-  var isDetailsWithSummary = function isDetailsWithSummary(node) {
-    var r = node.tagName === 'DETAILS' && Array.prototype.slice.apply(node.children).some(function (child) {
-      return child.tagName === 'SUMMARY';
-    });
-    return r;
-  };
-  var getCheckedRadio = function getCheckedRadio(nodes, form) {
-    for (var i = 0; i < nodes.length; i++) {
-      if (nodes[i].checked && nodes[i].form === form) {
-        return nodes[i];
-      }
-    }
-  };
-  var isTabbableRadio = function isTabbableRadio(node) {
-    if (!node.name) {
-      return true;
-    }
-    var radioScope = node.form || getRootNode(node);
-    var queryRadios = function queryRadios(name) {
-      return radioScope.querySelectorAll('input[type="radio"][name="' + name + '"]');
-    };
-    var radioSet;
-    if (typeof window !== 'undefined' && typeof window.CSS !== 'undefined' && typeof window.CSS.escape === 'function') {
-      radioSet = queryRadios(window.CSS.escape(node.name));
-    } else {
-      try {
-        radioSet = queryRadios(node.name);
-      } catch (err) {
-        // eslint-disable-next-line no-console
-        console.error('Looks like you have a radio button with a name attribute containing invalid CSS selector characters and need the CSS.escape polyfill: %s', err.message);
-        return false;
-      }
-    }
-    var checked = getCheckedRadio(radioSet, node.form);
-    return !checked || checked === node;
-  };
-  var isRadio = function isRadio(node) {
-    return isInput(node) && node.type === 'radio';
-  };
-  var isNonTabbableRadio = function isNonTabbableRadio(node) {
-    return isRadio(node) && !isTabbableRadio(node);
-  };
-
-  // determines if a node is ultimately attached to the window's document
-  var isNodeAttached = function isNodeAttached(node) {
-    var _nodeRoot;
-    // The root node is the shadow root if the node is in a shadow DOM; some document otherwise
-    //  (but NOT _the_ document; see second 'If' comment below for more).
-    // If rootNode is shadow root, it'll have a host, which is the element to which the shadow
-    //  is attached, and the one we need to check if it's in the document or not (because the
-    //  shadow, and all nodes it contains, is never considered in the document since shadows
-    //  behave like self-contained DOMs; but if the shadow's HOST, which is part of the document,
-    //  is hidden, or is not in the document itself but is detached, it will affect the shadow's
-    //  visibility, including all the nodes it contains). The host could be any normal node,
-    //  or a custom element (i.e. web component). Either way, that's the one that is considered
-    //  part of the document, not the shadow root, nor any of its children (i.e. the node being
-    //  tested).
-    // To further complicate things, we have to look all the way up until we find a shadow HOST
-    //  that is attached (or find none) because the node might be in nested shadows...
-    // If rootNode is not a shadow root, it won't have a host, and so rootNode should be the
-    //  document (per the docs) and while it's a Document-type object, that document does not
-    //  appear to be the same as the node's `ownerDocument` for some reason, so it's safer
-    //  to ignore the rootNode at this point, and use `node.ownerDocument`. Otherwise,
-    //  using `rootNode.contains(node)` will _always_ be true we'll get false-positives when
-    //  node is actually detached.
-    // NOTE: If `nodeRootHost` or `node` happens to be the `document` itself (which is possible
-    //  if a tabbable/focusable node was quickly added to the DOM, focused, and then removed
-    //  from the DOM as in https://github.com/focus-trap/focus-trap-react/issues/905), then
-    //  `ownerDocument` will be `null`, hence the optional chaining on it.
-    var nodeRoot = node && getRootNode(node);
-    var nodeRootHost = (_nodeRoot = nodeRoot) === null || _nodeRoot === void 0 ? void 0 : _nodeRoot.host;
-
-    // in some cases, a detached node will return itself as the root instead of a document or
-    //  shadow root object, in which case, we shouldn't try to look further up the host chain
-    var attached = false;
-    if (nodeRoot && nodeRoot !== node) {
-      var _nodeRootHost, _nodeRootHost$ownerDo, _node$ownerDocument;
-      attached = !!((_nodeRootHost = nodeRootHost) !== null && _nodeRootHost !== void 0 && (_nodeRootHost$ownerDo = _nodeRootHost.ownerDocument) !== null && _nodeRootHost$ownerDo !== void 0 && _nodeRootHost$ownerDo.contains(nodeRootHost) || node !== null && node !== void 0 && (_node$ownerDocument = node.ownerDocument) !== null && _node$ownerDocument !== void 0 && _node$ownerDocument.contains(node));
-      while (!attached && nodeRootHost) {
-        var _nodeRoot2, _nodeRootHost2, _nodeRootHost2$ownerD;
-        // since it's not attached and we have a root host, the node MUST be in a nested shadow DOM,
-        //  which means we need to get the host's host and check if that parent host is contained
-        //  in (i.e. attached to) the document
-        nodeRoot = getRootNode(nodeRootHost);
-        nodeRootHost = (_nodeRoot2 = nodeRoot) === null || _nodeRoot2 === void 0 ? void 0 : _nodeRoot2.host;
-        attached = !!((_nodeRootHost2 = nodeRootHost) !== null && _nodeRootHost2 !== void 0 && (_nodeRootHost2$ownerD = _nodeRootHost2.ownerDocument) !== null && _nodeRootHost2$ownerD !== void 0 && _nodeRootHost2$ownerD.contains(nodeRootHost));
-      }
-    }
-    return attached;
-  };
-  var isZeroArea = function isZeroArea(node) {
-    var _node$getBoundingClie = node.getBoundingClientRect(),
-      width = _node$getBoundingClie.width,
-      height = _node$getBoundingClie.height;
-    return width === 0 && height === 0;
-  };
-  var isHidden = function isHidden(node, _ref) {
-    var displayCheck = _ref.displayCheck,
-      getShadowRoot = _ref.getShadowRoot;
-    // NOTE: visibility will be `undefined` if node is detached from the document
-    //  (see notes about this further down), which means we will consider it visible
-    //  (this is legacy behavior from a very long way back)
-    // NOTE: we check this regardless of `displayCheck="none"` because this is a
-    //  _visibility_ check, not a _display_ check
-    if (getComputedStyle(node).visibility === 'hidden') {
-      return true;
-    }
-    var isDirectSummary = matches.call(node, 'details>summary:first-of-type');
-    var nodeUnderDetails = isDirectSummary ? node.parentElement : node;
-    if (matches.call(nodeUnderDetails, 'details:not([open]) *')) {
-      return true;
-    }
-    if (!displayCheck || displayCheck === 'full' || displayCheck === 'legacy-full') {
-      if (typeof getShadowRoot === 'function') {
-        // figure out if we should consider the node to be in an undisclosed shadow and use the
-        //  'non-zero-area' fallback
-        var originalNode = node;
-        while (node) {
-          var parentElement = node.parentElement;
-          var rootNode = getRootNode(node);
-          if (parentElement && !parentElement.shadowRoot && getShadowRoot(parentElement) === true // check if there's an undisclosed shadow
-          ) {
-            // node has an undisclosed shadow which means we can only treat it as a black box, so we
-            //  fall back to a non-zero-area test
-            return isZeroArea(node);
-          } else if (node.assignedSlot) {
-            // iterate up slot
-            node = node.assignedSlot;
-          } else if (!parentElement && rootNode !== node.ownerDocument) {
-            // cross shadow boundary
-            node = rootNode.host;
-          } else {
-            // iterate up normal dom
-            node = parentElement;
-          }
-        }
-        node = originalNode;
-      }
-      // else, `getShadowRoot` might be true, but all that does is enable shadow DOM support
-      //  (i.e. it does not also presume that all nodes might have undisclosed shadows); or
-      //  it might be a falsy value, which means shadow DOM support is disabled
-
-      // Since we didn't find it sitting in an undisclosed shadow (or shadows are disabled)
-      //  now we can just test to see if it would normally be visible or not, provided it's
-      //  attached to the main document.
-      // NOTE: We must consider case where node is inside a shadow DOM and given directly to
-      //  `isTabbable()` or `isFocusable()` -- regardless of `getShadowRoot` option setting.
-
-      if (isNodeAttached(node)) {
-        // this works wherever the node is: if there's at least one client rect, it's
-        //  somehow displayed; it also covers the CSS 'display: contents' case where the
-        //  node itself is hidden in place of its contents; and there's no need to search
-        //  up the hierarchy either
-        return !node.getClientRects().length;
-      }
-
-      // Else, the node isn't attached to the document, which means the `getClientRects()`
-      //  API will __always__ return zero rects (this can happen, for example, if React
-      //  is used to render nodes onto a detached tree, as confirmed in this thread:
-      //  https://github.com/facebook/react/issues/9117#issuecomment-284228870)
-      //
-      // It also means that even window.getComputedStyle(node).display will return `undefined`
-      //  because styles are only computed for nodes that are in the document.
-      //
-      // NOTE: THIS HAS BEEN THE CASE FOR YEARS. It is not new, nor is it caused by tabbable
-      //  somehow. Though it was never stated officially, anyone who has ever used tabbable
-      //  APIs on nodes in detached containers has actually implicitly used tabbable in what
-      //  was later (as of v5.2.0 on Apr 9, 2021) called `displayCheck="none"` mode -- essentially
-      //  considering __everything__ to be visible because of the innability to determine styles.
-      //
-      // v6.0.0: As of this major release, the default 'full' option __no longer treats detached
-      //  nodes as visible with the 'none' fallback.__
-      if (displayCheck !== 'legacy-full') {
-        return true; // hidden
-      }
-      // else, fallback to 'none' mode and consider the node visible
-    } else if (displayCheck === 'non-zero-area') {
-      // NOTE: Even though this tests that the node's client rect is non-zero to determine
-      //  whether it's displayed, and that a detached node will __always__ have a zero-area
-      //  client rect, we don't special-case for whether the node is attached or not. In
-      //  this mode, we do want to consider nodes that have a zero area to be hidden at all
-      //  times, and that includes attached or not.
-      return isZeroArea(node);
-    }
-
-    // visible, as far as we can tell, or per current `displayCheck=none` mode, we assume
-    //  it's visible
-    return false;
-  };
-
-  // form fields (nested) inside a disabled fieldset are not focusable/tabbable
-  //  unless they are in the _first_ <legend> element of the top-most disabled
-  //  fieldset
-  var isDisabledFromFieldset = function isDisabledFromFieldset(node) {
-    if (/^(INPUT|BUTTON|SELECT|TEXTAREA)$/.test(node.tagName)) {
-      var parentNode = node.parentElement;
-      // check if `node` is contained in a disabled <fieldset>
-      while (parentNode) {
-        if (parentNode.tagName === 'FIELDSET' && parentNode.disabled) {
-          // look for the first <legend> among the children of the disabled <fieldset>
-          for (var i = 0; i < parentNode.children.length; i++) {
-            var child = parentNode.children.item(i);
-            // when the first <legend> (in document order) is found
-            if (child.tagName === 'LEGEND') {
-              // if its parent <fieldset> is not nested in another disabled <fieldset>,
-              // return whether `node` is a descendant of its first <legend>
-              return matches.call(parentNode, 'fieldset[disabled] *') ? true : !child.contains(node);
-            }
-          }
-          // the disabled <fieldset> containing `node` has no <legend>
-          return true;
-        }
-        parentNode = parentNode.parentElement;
-      }
-    }
-
-    // else, node's tabbable/focusable state should not be affected by a fieldset's
-    //  enabled/disabled state
-    return false;
-  };
-  var isNodeMatchingSelectorFocusable = function isNodeMatchingSelectorFocusable(options, node) {
-    if (node.disabled ||
-    // we must do an inert look up to filter out any elements inside an inert ancestor
-    //  because we're limited in the type of selectors we can use in JSDom (see related
-    //  note related to `candidateSelectors`)
-    isInert(node) || isHiddenInput(node) || isHidden(node, options) ||
-    // For a details element with a summary, the summary element gets the focus
-    isDetailsWithSummary(node) || isDisabledFromFieldset(node)) {
-      return false;
-    }
-    return true;
-  };
-  var isNodeMatchingSelectorTabbable = function isNodeMatchingSelectorTabbable(options, node) {
-    if (isNonTabbableRadio(node) || getTabIndex(node) < 0 || !isNodeMatchingSelectorFocusable(options, node)) {
-      return false;
-    }
-    return true;
-  };
-  var isTabbable = function isTabbable(node, options) {
-    options = options || {};
-    if (!node) {
-      throw new Error('No node provided');
-    }
-    if (matches.call(node, candidateSelector) === false) {
-      return false;
-    }
-    return isNodeMatchingSelectorTabbable(options, node);
-  };
-  var focusableCandidateSelector = /* #__PURE__ */candidateSelectors.concat('iframe').join(',');
-  var isFocusable = function isFocusable(node, options) {
-    options = options || {};
-    if (!node) {
-      throw new Error('No node provided');
-    }
-    if (matches.call(node, focusableCandidateSelector) === false) {
-      return false;
-    }
-    return isNodeMatchingSelectorFocusable(options, node);
-  };
-  function generateStack() {
-    if (window._generate_setState_stacks) {
-      try {
-        throw new Error();
-      } catch (e) {
-        return e.stack;
-      }
-    }
-    return undefined;
-  }
-  /**
-   * Returns a function that retrieves the stack at the time this hook was called (in development mode only).
-   *
-   *
-   */
-  function useStack() {
-    {
-      const stack = F$1(generateStack, []);
-      const getStack = T$1(() => stack, []);
-      return getStack;
-    }
-  }
-
-  /**
-   * If you want a single place to put a debugger for tracking focus,
-   * here:
-   */
-  function focus(e) {
-    var _e$focus;
-    if (window.LOG_FOCUS_CHANGES === true) {
-      console.log("Focus changed to ".concat(((e === null || e === void 0 ? void 0 : e.tagName) || "").toLowerCase().padStart(6), ":"), e);
-      console.log(generateStack());
-    }
-    e === null || e === void 0 || (_e$focus = e.focus) === null || _e$focus === void 0 ? void 0 : _e$focus.call(e);
-  }
-  /**
-   * When an element unmounts, default HTML behavior is to just send focus to the body, which is wildly unhelpful. It means you lose your place in the keyboard tab order.
-   *
-   * If you still have access to the element that's unmounting, or perhaps its parent from beforehand, this will find the next suitable element to send focus to instead of the body.
-   *
-   * **Important**: This function is linear on the number of DOM nodes in your document, so it's not particularly fast. Only call it once when you need its value, not every time tab focus changed or something.
-   */
-  function findBackupFocus(unmountingElement) {
-    var _ref10, _bestCandidateAfter;
-    if (unmountingElement == null) return globalThis.document.body;
-    let document = unmountingElement.ownerDocument;
-    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_ELEMENT);
-    let node = walker.firstChild();
-    let bestCandidateBefore = null;
-    let bestCandidateAfter = null;
-    let w = false;
-    while (node) {
-      let pos = node.compareDocumentPosition(unmountingElement);
-      if (pos & Node.DOCUMENT_POSITION_DISCONNECTED) {
-        if (!w) console.warn("Can't focus anything near a disconnected element");
-        w = true;
-      }
-      if (pos & Node.DOCUMENT_POSITION_PRECEDING) {
-        // The unmounting element is before this element we're tree-walking.
-        // That means the next tabbable element we find is the candidate we really want.
-        if (node instanceof Element) {
-          if (isTabbable(node)) {
-            bestCandidateAfter = node;
-            break;
-          }
-        }
-      } else if (pos & Node.DOCUMENT_POSITION_FOLLOWING) {
-        // The unmounting element is after this element we're tree-walking.
-        // That means the we're getting closer and closer.
-        // If this element is tabbable, then it's even closer than any other tabbable element we've saved up to this point.
-        if (node instanceof Element) {
-          if (isTabbable(node)) {
-            bestCandidateBefore = node;
-          }
-        }
-      }
-      node = walker.nextNode();
-    }
-    return (_ref10 = (_bestCandidateAfter = bestCandidateAfter) !== null && _bestCandidateAfter !== void 0 ? _bestCandidateAfter : bestCandidateBefore) !== null && _ref10 !== void 0 ? _ref10 : document.body;
-  }
-
-  /**
-   * Runs a function the specified number of milliseconds after the component renders.
-   *
-   * @remarks This is particularly useful to function as "useEffect on a delay".
-   *
-   * @remarks
-   * {@include } {@link UseTimeoutParameters}
-   */
-  function useTimeout(_ref11) {
-    let {
-      timeout,
-      callback,
-      triggerIndex
-    } = _ref11;
-    monitorCallCount(useTimeout);
-    const stableCallback = useStableCallback(() => {
-      startTimeRef.current = null;
-      callback();
-    });
-    const getTimeout = useStableGetter(timeout);
-    // Set any time we start timeout.
-    // Unset any time the timeout completes
-    const startTimeRef = _(null);
-    const timeoutIsNull = timeout == null;
-    // Any time the triggerIndex changes (including on mount)
-    // restart the timeout.  The timeout does NOT reset
-    // when the duration or callback changes, only triggerIndex.
-    p(() => {
-      if (!timeoutIsNull) {
-        const timeout = getTimeout();
-        console.assert(timeoutIsNull == (timeout == null));
-        if (timeout != null) {
-          startTimeRef.current = +new Date();
-          const handle = setTimeout(stableCallback, timeout);
-          return () => clearTimeout(handle);
-        }
-      }
-    }, [triggerIndex, timeoutIsNull]);
-    const getElapsedTime = T$1(() => {
-      var _startTimeRef$current;
-      return +new Date() - +((_startTimeRef$current = startTimeRef.current) !== null && _startTimeRef$current !== void 0 ? _startTimeRef$current : new Date());
-    }, []);
-    const getRemainingTime = T$1(() => {
-      const timeout = getTimeout();
-      return timeout == null ? null : Math.max(0, timeout - getElapsedTime());
-    }, []);
-    return {
-      getElapsedTime,
-      getRemainingTime
-    };
-  }
-  let idIndex = 0;
-  /**
-   * Debug function that yells at you if your forgot to use the props a hook returns.
-   *
-   * @remarks Like other debug hooks, only has any effect IFF there is a global variable called `"development"` and it contains the value `"development"`.
-   *
-   * @param props - The props to return a modified copy of
-   * @param tag - Should be unique
-   * @returns A modified copy of the given props
-   */
-  function useTagProps(props, tag) {
-    {
-      const [id] = h(() => ++idIndex);
-      const propsIdTag = "data-props-".concat(tag, "-").concat(id);
-      const getStack = useStack();
-      // Don't have multiple tags of the same type on the same props, means a hook has been called twice!
-      console.assert(!(props && typeof props == "object" && tag in props));
-      useTimeout({
-        callback: () => {
-          let element = document.querySelectorAll("[".concat(propsIdTag, "]"));
-          if (element.length != 1) {
-            console.error("A hook returned props that were not properly spread to any HTMLElement:");
-            console.log(getStack());
-            /* eslint-disable no-debugger */
-            debugger;
-          }
-        },
-        timeout: 250,
-        triggerIndex: tag
-      });
-      return F$1(() => {
-        return {
-          ...props,
-          [propsIdTag]: true /*, [tag as never]: true*/
-        };
-      }, [props, tag]);
-    }
-  }
-
   /** Detect free variable `global` from Node.js. */
   var freeGlobal = typeof global == 'object' && global && global.Object === Object && global;
   var freeGlobal$1 = freeGlobal;
@@ -3473,6 +2730,749 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
   }
 
   /**
+   * Combines two `children`.
+   *
+   * @remarks This is fairly trivial and not even technically a hook, as it doesn't use any other hooks, but is this way for consistency.
+   *
+   * TODO: This could accept a variable number of arguments to be consistent with useMergedProps, but I feel like it might be a performance hit.
+   */
+  function useMergedChildren(lhs, rhs) {
+    monitorCallCount(useMergedChildren);
+    if (lhs == null && rhs == null) {
+      return undefined;
+    } else if (lhs == null) {
+      return rhs;
+    } else if (rhs == null) {
+      return lhs;
+    } else {
+      return y$1(k$2, {}, lhs, rhs);
+    }
+  }
+
+  /**
+   * Merged the `class` and `className` properties of two sets of props into a single string.
+   *
+   * @remarks Duplicate classes are removed (order doesn't matter anyway).
+   */
+  function useMergedClasses() {
+    monitorCallCount(useMergedClasses);
+    // Note: For the sake of forward compatibility, this function is labelled as
+    // a hook, but as it uses no other hooks it technically isn't one.
+    let classesSet = new Set();
+    for (var _len3 = arguments.length, classes = new Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+      classes[_key3] = arguments[_key3];
+    }
+    for (let c of classes) {
+      if (typeof c == "string" && c.trim()) classesSet.add(c);
+    }
+    if (classesSet.size) {
+      return Array.from(classesSet).join(" ");
+    } else {
+      return undefined;
+    }
+  }
+  function processRef(instance, ref) {
+    if (typeof ref === "function") {
+      ref(instance);
+    } else if (ref != null) {
+      ref.current = instance;
+    } else {
+      /* eslint-disable no-debugger */
+      debugger;
+      console.assert(false, "Unknown ref type found that was neither a RefCallback nor a RefObject");
+    }
+  }
+  /**
+   * Combines two refs into one. This allows a component to both use its own ref *and* forward a ref that was given to it.
+   *
+   * @remarks Or just use {@link useMergedProps}
+   */
+  function useMergedRefs(rhs, lhs) {
+    monitorCallCount(useMergedRefs);
+    // This *must* be stable in order to prevent repeated reset `null` calls after every render.
+    const combined = useStableCallback(function combined(current) {
+      processRef(current, lhs);
+      processRef(current, rhs);
+    });
+    if (lhs == null && rhs == null) {
+      return undefined;
+    } else if (lhs == null) {
+      return rhs;
+    } else if (rhs == null) {
+      return lhs;
+    } else {
+      return combined;
+    }
+  }
+  function styleStringToObject(style) {
+    // TODO: This sucks D:
+    return Object.fromEntries(style.split(";").map(statement => statement.split(":")));
+  }
+  /**
+   * Merges two style objects, returning the result.
+   *
+   * @param style - The user-given style prop for this component
+   * @param obj - The CSS properties you want added to the user-given style
+   * @returns A CSS object containing the properties of both objects.
+   */
+  function useMergedStyles(lhs, rhs) {
+    monitorCallCount(useMergedStyles);
+    // Easy case, when there are no styles to merge return nothing.
+    if (!lhs && !rhs) return undefined;
+    if (typeof lhs != typeof rhs) {
+      // Easy cases, when one is null and the other isn't.
+      if (lhs && !rhs) return lhs;
+      if (!lhs && rhs) return rhs;
+      // They're both non-null but different types.
+      // Convert the string type to an object bag type and run it again.
+      if (lhs && rhs) {
+        // (useMergedStyles isn't a true hook -- this isn't a violation)
+        if (typeof lhs == "string") return useMergedStyles(styleStringToObject(lhs), rhs);
+        if (typeof rhs == "string") return useMergedStyles(lhs, styleStringToObject(rhs));
+      }
+      // Logic???
+      return undefined;
+    }
+    // They're both strings, just concatenate them.
+    if (typeof lhs == "string") {
+      return "".concat(lhs, ";").concat(rhs !== null && rhs !== void 0 ? rhs : "");
+    }
+    // They're both objects, just merge them.
+    return {
+      ...(lhs !== null && lhs !== void 0 ? lhs : {}),
+      ...(rhs !== null && rhs !== void 0 ? rhs : {})
+    };
+  }
+  let log = console.warn;
+  /**
+   * Given two sets of props, merges them and returns the result.
+   *
+   * @remarks The hook is aware of and can intelligently merge `className`, `class`, `style`, `ref`, `children`, and all event handlers.
+   *
+   * If two sets of props both specify the same attribute, e.g. both specify two different `id`s, then an error will be printed to the console (customize this with {@link enableLoggingPropConflicts}), as this conflict needs to be arbitrated on by you.
+   *
+   * {@include } {@link enableLoggingPropConflicts}
+   *
+   * @see {@link useMergedRefs}
+   * @see {@link useMergedStyles}
+   * @see {@link useMergedClasses}
+   * @see {@link useMergedChildren}
+   *
+   * @param allProps - A variadic number of props to merge into one
+   *
+   * @returns A single object with all the provided props merged into one.
+   */
+  function useMergedProps() {
+    monitorCallCount(useMergedProps);
+    for (var _len4 = arguments.length, allProps = new Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
+      allProps[_key4] = arguments[_key4];
+    }
+    useEnsureStability("useMergedProps", allProps.length);
+    let ret = {};
+    for (let nextProps of allProps) {
+      ret = useMergedProps2(ret, nextProps);
+    }
+    return ret;
+  }
+  const knowns = new Set(["children", "ref", "className", "class", "style"]);
+  function mergeUnknown(key, lhsValue, rhsValue) {
+    if (typeof lhsValue === "function" || typeof rhsValue === "function") {
+      // They're both functions that can be merged (or one's a function and the other's null).
+      // Not an *easy* case, but a well-defined one.
+      const merged = mergeFunctions(lhsValue, rhsValue);
+      return merged;
+    } else {
+      // Uh...they're not both functions so we're here because one of them's null, right?
+      if (lhsValue == null && rhsValue == null) {
+        if (rhsValue === null && lhsValue === undefined) return rhsValue;else return lhsValue;
+      }
+      if (lhsValue == null) return rhsValue;else if (rhsValue == null) return lhsValue;else if (rhsValue == lhsValue) {
+        // I mean, they're the same value at least
+        // so we don't need to do anything.
+        // Not really ideal though.
+        return rhsValue;
+      } else {
+        // Ugh.
+        // No good strategies here, just log it if requested
+        log === null || log === void 0 ? void 0 : log("The prop \"".concat(key, "\" cannot simultaneously be the values ").concat(lhsValue, " and ").concat(rhsValue, ". One must be chosen outside of useMergedProps."));
+        return rhsValue;
+      }
+    }
+  }
+  /**
+   * Helper function.
+   *
+   * This is one of the most commonly called functions in this and consumer libraries,
+   * so it trades a bit of readability for speed (i.e. we don't decompose objects and just do regular property access, iterate with `for...in`, instead of `Object.entries`, etc.)
+   */
+  function useMergedProps2(lhsAll, rhsAll) {
+    const ret = {
+      ref: useMergedRefs(lhsAll.ref, rhsAll.ref),
+      style: useMergedStyles(lhsAll.style, rhsAll.style),
+      className: useMergedClasses(lhsAll["class"], lhsAll.className, rhsAll["class"], rhsAll.className),
+      children: useMergedChildren(lhsAll.children, rhsAll.children)
+    };
+    if (ret.ref === undefined) delete ret.ref;
+    if (ret.style === undefined) delete ret.style;
+    if (ret.className === undefined) delete ret.className;
+    if (ret["class"] === undefined) delete ret["class"];
+    if (ret.children === undefined) delete ret.children;
+    for (const lhsKeyU in lhsAll) {
+      const lhsKey = lhsKeyU;
+      if (knowns.has(lhsKey)) continue;
+      ret[lhsKey] = lhsAll[lhsKey];
+    }
+    for (const rhsKeyU in rhsAll) {
+      const rhsKey = rhsKeyU;
+      if (knowns.has(rhsKey)) continue;
+      ret[rhsKey] = mergeUnknown(rhsKey, ret[rhsKey], rhsAll[rhsKey]);
+    }
+    return ret;
+  }
+  function mergeFunctions(lhs, rhs) {
+    if (!lhs) return rhs;
+    if (!rhs) return lhs;
+    return function () {
+      const lv = lhs(...arguments);
+      const rv = rhs(...arguments);
+      if (lv instanceof Promise || rv instanceof Promise) return Promise.all([lv, rv]);
+    };
+  }
+
+  /*!
+  * tabbable 6.2.0
+  * @license MIT, https://github.com/focus-trap/tabbable/blob/master/LICENSE
+  */
+  // NOTE: separate `:not()` selectors has broader browser support than the newer
+  //  `:not([inert], [inert] *)` (Feb 2023)
+  // CAREFUL: JSDom does not support `:not([inert] *)` as a selector; using it causes
+  //  the entire query to fail, resulting in no nodes found, which will break a lot
+  //  of things... so we have to rely on JS to identify nodes inside an inert container
+  var candidateSelectors = ['input:not([inert])', 'select:not([inert])', 'textarea:not([inert])', 'a[href]:not([inert])', 'button:not([inert])', '[tabindex]:not(slot):not([inert])', 'audio[controls]:not([inert])', 'video[controls]:not([inert])', '[contenteditable]:not([contenteditable="false"]):not([inert])', 'details>summary:first-of-type:not([inert])', 'details:not([inert])'];
+  var candidateSelector = /* #__PURE__ */candidateSelectors.join(',');
+  var NoElement = typeof Element === 'undefined';
+  var matches = NoElement ? function () {} : Element.prototype.matches || Element.prototype.msMatchesSelector || Element.prototype.webkitMatchesSelector;
+  var getRootNode = !NoElement && Element.prototype.getRootNode ? function (element) {
+    var _element$getRootNode;
+    return element === null || element === void 0 ? void 0 : (_element$getRootNode = element.getRootNode) === null || _element$getRootNode === void 0 ? void 0 : _element$getRootNode.call(element);
+  } : function (element) {
+    return element === null || element === void 0 ? void 0 : element.ownerDocument;
+  };
+
+  /**
+   * Determines if a node is inert or in an inert ancestor.
+   * @param {Element} [node]
+   * @param {boolean} [lookUp] If true and `node` is not inert, looks up at ancestors to
+   *  see if any of them are inert. If false, only `node` itself is considered.
+   * @returns {boolean} True if inert itself or by way of being in an inert ancestor.
+   *  False if `node` is falsy.
+   */
+  var isInert = function isInert(node, lookUp) {
+    var _node$getAttribute;
+    if (lookUp === void 0) {
+      lookUp = true;
+    }
+    // CAREFUL: JSDom does not support inert at all, so we can't use the `HTMLElement.inert`
+    //  JS API property; we have to check the attribute, which can either be empty or 'true';
+    //  if it's `null` (not specified) or 'false', it's an active element
+    var inertAtt = node === null || node === void 0 ? void 0 : (_node$getAttribute = node.getAttribute) === null || _node$getAttribute === void 0 ? void 0 : _node$getAttribute.call(node, 'inert');
+    var inert = inertAtt === '' || inertAtt === 'true';
+
+    // NOTE: this could also be handled with `node.matches('[inert], :is([inert] *)')`
+    //  if it weren't for `matches()` not being a function on shadow roots; the following
+    //  code works for any kind of node
+    // CAREFUL: JSDom does not appear to support certain selectors like `:not([inert] *)`
+    //  so it likely would not support `:is([inert] *)` either...
+    var result = inert || lookUp && node && isInert(node.parentNode); // recursive
+
+    return result;
+  };
+
+  /**
+   * Determines if a node's content is editable.
+   * @param {Element} [node]
+   * @returns True if it's content-editable; false if it's not or `node` is falsy.
+   */
+  var isContentEditable = function isContentEditable(node) {
+    var _node$getAttribute2;
+    // CAREFUL: JSDom does not support the `HTMLElement.isContentEditable` API so we have
+    //  to use the attribute directly to check for this, which can either be empty or 'true';
+    //  if it's `null` (not specified) or 'false', it's a non-editable element
+    var attValue = node === null || node === void 0 ? void 0 : (_node$getAttribute2 = node.getAttribute) === null || _node$getAttribute2 === void 0 ? void 0 : _node$getAttribute2.call(node, 'contenteditable');
+    return attValue === '' || attValue === 'true';
+  };
+
+  /**
+   * @private
+   * Determines if the node has an explicitly specified `tabindex` attribute.
+   * @param {HTMLElement} node
+   * @returns {boolean} True if so; false if not.
+   */
+  var hasTabIndex = function hasTabIndex(node) {
+    return !isNaN(parseInt(node.getAttribute('tabindex'), 10));
+  };
+
+  /**
+   * Determine the tab index of a given node.
+   * @param {HTMLElement} node
+   * @returns {number} Tab order (negative, 0, or positive number).
+   * @throws {Error} If `node` is falsy.
+   */
+  var getTabIndex = function getTabIndex(node) {
+    if (!node) {
+      throw new Error('No node provided');
+    }
+    if (node.tabIndex < 0) {
+      // in Chrome, <details/>, <audio controls/> and <video controls/> elements get a default
+      // `tabIndex` of -1 when the 'tabindex' attribute isn't specified in the DOM,
+      // yet they are still part of the regular tab order; in FF, they get a default
+      // `tabIndex` of 0; since Chrome still puts those elements in the regular tab
+      // order, consider their tab index to be 0.
+      // Also browsers do not return `tabIndex` correctly for contentEditable nodes;
+      // so if they don't have a tabindex attribute specifically set, assume it's 0.
+      if ((/^(AUDIO|VIDEO|DETAILS)$/.test(node.tagName) || isContentEditable(node)) && !hasTabIndex(node)) {
+        return 0;
+      }
+    }
+    return node.tabIndex;
+  };
+  var isInput = function isInput(node) {
+    return node.tagName === 'INPUT';
+  };
+  var isHiddenInput = function isHiddenInput(node) {
+    return isInput(node) && node.type === 'hidden';
+  };
+  var isDetailsWithSummary = function isDetailsWithSummary(node) {
+    var r = node.tagName === 'DETAILS' && Array.prototype.slice.apply(node.children).some(function (child) {
+      return child.tagName === 'SUMMARY';
+    });
+    return r;
+  };
+  var getCheckedRadio = function getCheckedRadio(nodes, form) {
+    for (var i = 0; i < nodes.length; i++) {
+      if (nodes[i].checked && nodes[i].form === form) {
+        return nodes[i];
+      }
+    }
+  };
+  var isTabbableRadio = function isTabbableRadio(node) {
+    if (!node.name) {
+      return true;
+    }
+    var radioScope = node.form || getRootNode(node);
+    var queryRadios = function queryRadios(name) {
+      return radioScope.querySelectorAll('input[type="radio"][name="' + name + '"]');
+    };
+    var radioSet;
+    if (typeof window !== 'undefined' && typeof window.CSS !== 'undefined' && typeof window.CSS.escape === 'function') {
+      radioSet = queryRadios(window.CSS.escape(node.name));
+    } else {
+      try {
+        radioSet = queryRadios(node.name);
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.error('Looks like you have a radio button with a name attribute containing invalid CSS selector characters and need the CSS.escape polyfill: %s', err.message);
+        return false;
+      }
+    }
+    var checked = getCheckedRadio(radioSet, node.form);
+    return !checked || checked === node;
+  };
+  var isRadio = function isRadio(node) {
+    return isInput(node) && node.type === 'radio';
+  };
+  var isNonTabbableRadio = function isNonTabbableRadio(node) {
+    return isRadio(node) && !isTabbableRadio(node);
+  };
+
+  // determines if a node is ultimately attached to the window's document
+  var isNodeAttached = function isNodeAttached(node) {
+    var _nodeRoot;
+    // The root node is the shadow root if the node is in a shadow DOM; some document otherwise
+    //  (but NOT _the_ document; see second 'If' comment below for more).
+    // If rootNode is shadow root, it'll have a host, which is the element to which the shadow
+    //  is attached, and the one we need to check if it's in the document or not (because the
+    //  shadow, and all nodes it contains, is never considered in the document since shadows
+    //  behave like self-contained DOMs; but if the shadow's HOST, which is part of the document,
+    //  is hidden, or is not in the document itself but is detached, it will affect the shadow's
+    //  visibility, including all the nodes it contains). The host could be any normal node,
+    //  or a custom element (i.e. web component). Either way, that's the one that is considered
+    //  part of the document, not the shadow root, nor any of its children (i.e. the node being
+    //  tested).
+    // To further complicate things, we have to look all the way up until we find a shadow HOST
+    //  that is attached (or find none) because the node might be in nested shadows...
+    // If rootNode is not a shadow root, it won't have a host, and so rootNode should be the
+    //  document (per the docs) and while it's a Document-type object, that document does not
+    //  appear to be the same as the node's `ownerDocument` for some reason, so it's safer
+    //  to ignore the rootNode at this point, and use `node.ownerDocument`. Otherwise,
+    //  using `rootNode.contains(node)` will _always_ be true we'll get false-positives when
+    //  node is actually detached.
+    // NOTE: If `nodeRootHost` or `node` happens to be the `document` itself (which is possible
+    //  if a tabbable/focusable node was quickly added to the DOM, focused, and then removed
+    //  from the DOM as in https://github.com/focus-trap/focus-trap-react/issues/905), then
+    //  `ownerDocument` will be `null`, hence the optional chaining on it.
+    var nodeRoot = node && getRootNode(node);
+    var nodeRootHost = (_nodeRoot = nodeRoot) === null || _nodeRoot === void 0 ? void 0 : _nodeRoot.host;
+
+    // in some cases, a detached node will return itself as the root instead of a document or
+    //  shadow root object, in which case, we shouldn't try to look further up the host chain
+    var attached = false;
+    if (nodeRoot && nodeRoot !== node) {
+      var _nodeRootHost, _nodeRootHost$ownerDo, _node$ownerDocument;
+      attached = !!((_nodeRootHost = nodeRootHost) !== null && _nodeRootHost !== void 0 && (_nodeRootHost$ownerDo = _nodeRootHost.ownerDocument) !== null && _nodeRootHost$ownerDo !== void 0 && _nodeRootHost$ownerDo.contains(nodeRootHost) || node !== null && node !== void 0 && (_node$ownerDocument = node.ownerDocument) !== null && _node$ownerDocument !== void 0 && _node$ownerDocument.contains(node));
+      while (!attached && nodeRootHost) {
+        var _nodeRoot2, _nodeRootHost2, _nodeRootHost2$ownerD;
+        // since it's not attached and we have a root host, the node MUST be in a nested shadow DOM,
+        //  which means we need to get the host's host and check if that parent host is contained
+        //  in (i.e. attached to) the document
+        nodeRoot = getRootNode(nodeRootHost);
+        nodeRootHost = (_nodeRoot2 = nodeRoot) === null || _nodeRoot2 === void 0 ? void 0 : _nodeRoot2.host;
+        attached = !!((_nodeRootHost2 = nodeRootHost) !== null && _nodeRootHost2 !== void 0 && (_nodeRootHost2$ownerD = _nodeRootHost2.ownerDocument) !== null && _nodeRootHost2$ownerD !== void 0 && _nodeRootHost2$ownerD.contains(nodeRootHost));
+      }
+    }
+    return attached;
+  };
+  var isZeroArea = function isZeroArea(node) {
+    var _node$getBoundingClie = node.getBoundingClientRect(),
+      width = _node$getBoundingClie.width,
+      height = _node$getBoundingClie.height;
+    return width === 0 && height === 0;
+  };
+  var isHidden = function isHidden(node, _ref) {
+    var displayCheck = _ref.displayCheck,
+      getShadowRoot = _ref.getShadowRoot;
+    // NOTE: visibility will be `undefined` if node is detached from the document
+    //  (see notes about this further down), which means we will consider it visible
+    //  (this is legacy behavior from a very long way back)
+    // NOTE: we check this regardless of `displayCheck="none"` because this is a
+    //  _visibility_ check, not a _display_ check
+    if (getComputedStyle(node).visibility === 'hidden') {
+      return true;
+    }
+    var isDirectSummary = matches.call(node, 'details>summary:first-of-type');
+    var nodeUnderDetails = isDirectSummary ? node.parentElement : node;
+    if (matches.call(nodeUnderDetails, 'details:not([open]) *')) {
+      return true;
+    }
+    if (!displayCheck || displayCheck === 'full' || displayCheck === 'legacy-full') {
+      if (typeof getShadowRoot === 'function') {
+        // figure out if we should consider the node to be in an undisclosed shadow and use the
+        //  'non-zero-area' fallback
+        var originalNode = node;
+        while (node) {
+          var parentElement = node.parentElement;
+          var rootNode = getRootNode(node);
+          if (parentElement && !parentElement.shadowRoot && getShadowRoot(parentElement) === true // check if there's an undisclosed shadow
+          ) {
+            // node has an undisclosed shadow which means we can only treat it as a black box, so we
+            //  fall back to a non-zero-area test
+            return isZeroArea(node);
+          } else if (node.assignedSlot) {
+            // iterate up slot
+            node = node.assignedSlot;
+          } else if (!parentElement && rootNode !== node.ownerDocument) {
+            // cross shadow boundary
+            node = rootNode.host;
+          } else {
+            // iterate up normal dom
+            node = parentElement;
+          }
+        }
+        node = originalNode;
+      }
+      // else, `getShadowRoot` might be true, but all that does is enable shadow DOM support
+      //  (i.e. it does not also presume that all nodes might have undisclosed shadows); or
+      //  it might be a falsy value, which means shadow DOM support is disabled
+
+      // Since we didn't find it sitting in an undisclosed shadow (or shadows are disabled)
+      //  now we can just test to see if it would normally be visible or not, provided it's
+      //  attached to the main document.
+      // NOTE: We must consider case where node is inside a shadow DOM and given directly to
+      //  `isTabbable()` or `isFocusable()` -- regardless of `getShadowRoot` option setting.
+
+      if (isNodeAttached(node)) {
+        // this works wherever the node is: if there's at least one client rect, it's
+        //  somehow displayed; it also covers the CSS 'display: contents' case where the
+        //  node itself is hidden in place of its contents; and there's no need to search
+        //  up the hierarchy either
+        return !node.getClientRects().length;
+      }
+
+      // Else, the node isn't attached to the document, which means the `getClientRects()`
+      //  API will __always__ return zero rects (this can happen, for example, if React
+      //  is used to render nodes onto a detached tree, as confirmed in this thread:
+      //  https://github.com/facebook/react/issues/9117#issuecomment-284228870)
+      //
+      // It also means that even window.getComputedStyle(node).display will return `undefined`
+      //  because styles are only computed for nodes that are in the document.
+      //
+      // NOTE: THIS HAS BEEN THE CASE FOR YEARS. It is not new, nor is it caused by tabbable
+      //  somehow. Though it was never stated officially, anyone who has ever used tabbable
+      //  APIs on nodes in detached containers has actually implicitly used tabbable in what
+      //  was later (as of v5.2.0 on Apr 9, 2021) called `displayCheck="none"` mode -- essentially
+      //  considering __everything__ to be visible because of the innability to determine styles.
+      //
+      // v6.0.0: As of this major release, the default 'full' option __no longer treats detached
+      //  nodes as visible with the 'none' fallback.__
+      if (displayCheck !== 'legacy-full') {
+        return true; // hidden
+      }
+      // else, fallback to 'none' mode and consider the node visible
+    } else if (displayCheck === 'non-zero-area') {
+      // NOTE: Even though this tests that the node's client rect is non-zero to determine
+      //  whether it's displayed, and that a detached node will __always__ have a zero-area
+      //  client rect, we don't special-case for whether the node is attached or not. In
+      //  this mode, we do want to consider nodes that have a zero area to be hidden at all
+      //  times, and that includes attached or not.
+      return isZeroArea(node);
+    }
+
+    // visible, as far as we can tell, or per current `displayCheck=none` mode, we assume
+    //  it's visible
+    return false;
+  };
+
+  // form fields (nested) inside a disabled fieldset are not focusable/tabbable
+  //  unless they are in the _first_ <legend> element of the top-most disabled
+  //  fieldset
+  var isDisabledFromFieldset = function isDisabledFromFieldset(node) {
+    if (/^(INPUT|BUTTON|SELECT|TEXTAREA)$/.test(node.tagName)) {
+      var parentNode = node.parentElement;
+      // check if `node` is contained in a disabled <fieldset>
+      while (parentNode) {
+        if (parentNode.tagName === 'FIELDSET' && parentNode.disabled) {
+          // look for the first <legend> among the children of the disabled <fieldset>
+          for (var i = 0; i < parentNode.children.length; i++) {
+            var child = parentNode.children.item(i);
+            // when the first <legend> (in document order) is found
+            if (child.tagName === 'LEGEND') {
+              // if its parent <fieldset> is not nested in another disabled <fieldset>,
+              // return whether `node` is a descendant of its first <legend>
+              return matches.call(parentNode, 'fieldset[disabled] *') ? true : !child.contains(node);
+            }
+          }
+          // the disabled <fieldset> containing `node` has no <legend>
+          return true;
+        }
+        parentNode = parentNode.parentElement;
+      }
+    }
+
+    // else, node's tabbable/focusable state should not be affected by a fieldset's
+    //  enabled/disabled state
+    return false;
+  };
+  var isNodeMatchingSelectorFocusable = function isNodeMatchingSelectorFocusable(options, node) {
+    if (node.disabled ||
+    // we must do an inert look up to filter out any elements inside an inert ancestor
+    //  because we're limited in the type of selectors we can use in JSDom (see related
+    //  note related to `candidateSelectors`)
+    isInert(node) || isHiddenInput(node) || isHidden(node, options) ||
+    // For a details element with a summary, the summary element gets the focus
+    isDetailsWithSummary(node) || isDisabledFromFieldset(node)) {
+      return false;
+    }
+    return true;
+  };
+  var isNodeMatchingSelectorTabbable = function isNodeMatchingSelectorTabbable(options, node) {
+    if (isNonTabbableRadio(node) || getTabIndex(node) < 0 || !isNodeMatchingSelectorFocusable(options, node)) {
+      return false;
+    }
+    return true;
+  };
+  var isTabbable = function isTabbable(node, options) {
+    options = options || {};
+    if (!node) {
+      throw new Error('No node provided');
+    }
+    if (matches.call(node, candidateSelector) === false) {
+      return false;
+    }
+    return isNodeMatchingSelectorTabbable(options, node);
+  };
+  var focusableCandidateSelector = /* #__PURE__ */candidateSelectors.concat('iframe').join(',');
+  var isFocusable = function isFocusable(node, options) {
+    options = options || {};
+    if (!node) {
+      throw new Error('No node provided');
+    }
+    if (matches.call(node, focusableCandidateSelector) === false) {
+      return false;
+    }
+    return isNodeMatchingSelectorFocusable(options, node);
+  };
+  function generateStack() {
+    if (window._generate_setState_stacks) {
+      try {
+        throw new Error();
+      } catch (e) {
+        return e.stack;
+      }
+    }
+    return undefined;
+  }
+  /**
+   * Returns a function that retrieves the stack at the time this hook was called (in development mode only).
+   *
+   *
+   */
+  function useStack() {
+    {
+      const stack = F$1(generateStack, []);
+      const getStack = T$1(() => stack, []);
+      return getStack;
+    }
+  }
+
+  /**
+   * If you want a single place to put a debugger for tracking focus,
+   * here:
+   */
+  function focus(e) {
+    var _e$focus;
+    if (window.LOG_FOCUS_CHANGES === true) {
+      console.log("Focus changed to ".concat(((e === null || e === void 0 ? void 0 : e.tagName) || "").toLowerCase().padStart(6), ":"), e);
+      console.log(generateStack());
+    }
+    e === null || e === void 0 || (_e$focus = e.focus) === null || _e$focus === void 0 ? void 0 : _e$focus.call(e);
+  }
+  /**
+   * When an element unmounts, default HTML behavior is to just send focus to the body, which is wildly unhelpful. It means you lose your place in the keyboard tab order.
+   *
+   * If you still have access to the element that's unmounting, or perhaps its parent from beforehand, this will find the next suitable element to send focus to instead of the body.
+   *
+   * **Important**: This function is linear on the number of DOM nodes in your document, so it's not particularly fast. Only call it once when you need its value, not every time tab focus changed or something.
+   */
+  function findBackupFocus(unmountingElement) {
+    var _ref10, _bestCandidateAfter;
+    if (unmountingElement == null) return globalThis.document.body;
+    let document = unmountingElement.ownerDocument;
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_ELEMENT);
+    let node = walker.firstChild();
+    let bestCandidateBefore = null;
+    let bestCandidateAfter = null;
+    let w = false;
+    while (node) {
+      let pos = node.compareDocumentPosition(unmountingElement);
+      if (pos & Node.DOCUMENT_POSITION_DISCONNECTED) {
+        if (!w) console.warn("Can't focus anything near a disconnected element");
+        w = true;
+      }
+      if (pos & Node.DOCUMENT_POSITION_PRECEDING) {
+        // The unmounting element is before this element we're tree-walking.
+        // That means the next tabbable element we find is the candidate we really want.
+        if (node instanceof Element) {
+          if (isTabbable(node)) {
+            bestCandidateAfter = node;
+            break;
+          }
+        }
+      } else if (pos & Node.DOCUMENT_POSITION_FOLLOWING) {
+        // The unmounting element is after this element we're tree-walking.
+        // That means the we're getting closer and closer.
+        // If this element is tabbable, then it's even closer than any other tabbable element we've saved up to this point.
+        if (node instanceof Element) {
+          if (isTabbable(node)) {
+            bestCandidateBefore = node;
+          }
+        }
+      }
+      node = walker.nextNode();
+    }
+    return (_ref10 = (_bestCandidateAfter = bestCandidateAfter) !== null && _bestCandidateAfter !== void 0 ? _bestCandidateAfter : bestCandidateBefore) !== null && _ref10 !== void 0 ? _ref10 : document.body;
+  }
+
+  /**
+   * Runs a function the specified number of milliseconds after the component renders.
+   *
+   * @remarks This is particularly useful to function as "useEffect on a delay".
+   *
+   * @remarks
+   * {@include } {@link UseTimeoutParameters}
+   */
+  function useTimeout(_ref11) {
+    let {
+      timeout,
+      callback,
+      triggerIndex
+    } = _ref11;
+    monitorCallCount(useTimeout);
+    const stableCallback = useStableCallback(() => {
+      startTimeRef.current = null;
+      callback();
+    });
+    const getTimeout = useStableGetter(timeout);
+    // Set any time we start timeout.
+    // Unset any time the timeout completes
+    const startTimeRef = _(null);
+    const timeoutIsNull = timeout == null;
+    // Any time the triggerIndex changes (including on mount)
+    // restart the timeout.  The timeout does NOT reset
+    // when the duration or callback changes, only triggerIndex.
+    p(() => {
+      if (!timeoutIsNull) {
+        const timeout = getTimeout();
+        console.assert(timeoutIsNull == (timeout == null));
+        if (timeout != null) {
+          startTimeRef.current = +new Date();
+          const handle = setTimeout(stableCallback, timeout);
+          return () => clearTimeout(handle);
+        }
+      }
+    }, [triggerIndex, timeoutIsNull]);
+    const getElapsedTime = T$1(() => {
+      var _startTimeRef$current;
+      return +new Date() - +((_startTimeRef$current = startTimeRef.current) !== null && _startTimeRef$current !== void 0 ? _startTimeRef$current : new Date());
+    }, []);
+    const getRemainingTime = T$1(() => {
+      const timeout = getTimeout();
+      return timeout == null ? null : Math.max(0, timeout - getElapsedTime());
+    }, []);
+    return {
+      getElapsedTime,
+      getRemainingTime
+    };
+  }
+  let idIndex = 0;
+  /**
+   * Debug function that yells at you if your forgot to use the props a hook returns.
+   *
+   * @remarks Like other debug hooks, only has any effect IFF there is a global variable called `"development"` and it contains the value `"development"`.
+   *
+   * @param props - The props to return a modified copy of
+   * @param tag - Should be unique
+   * @returns A modified copy of the given props
+   */
+  function useTagProps(props, tag) {
+    {
+      const [id] = h(() => ++idIndex);
+      const propsIdTag = "data-props-".concat(tag, "-").concat(id);
+      const getStack = useStack();
+      // Don't have multiple tags of the same type on the same props, means a hook has been called twice!
+      console.assert(!(props && typeof props == "object" && tag in props));
+      useTimeout({
+        callback: () => {
+          let element = document.querySelectorAll("[".concat(propsIdTag, "]"));
+          if (element.length != 1) {
+            console.error("A hook returned props that were not properly spread to any HTMLElement:");
+            console.log(getStack());
+            /* eslint-disable no-debugger */
+            debugger;
+          }
+        },
+        timeout: 250,
+        triggerIndex: tag
+      });
+      return F$1(() => {
+        return {
+          ...props,
+          [propsIdTag]: true /*, [tag as never]: true*/
+        };
+      }, [props, tag]);
+    }
+  }
+
+  /**
    * When used in tandem with `useRovingTabIndex`, allows control of
    * the tabbable index with the arrow keys, Page Up/Page Down, or Home/End.
    *
@@ -3484,31 +3484,37 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
    */
   function useLinearNavigation(_ref12) {
     let {
-      rovingTabIndexReturn,
-      linearNavigationParameters,
+      linearNavigationParameters: {
+        getLowestIndex,
+        getHighestIndex,
+        isValidForLinearNavigation,
+        navigatePastEnd,
+        navigatePastStart,
+        onNavigateLinear,
+        arrowKeyDirection,
+        disableHomeEndKeys,
+        pageNavigationSize,
+        ...void4
+      },
+      rovingTabIndexReturn: {
+        getTabbableIndex,
+        setTabbableIndex,
+        ...void5
+      },
       paginatedChildrenParameters: {
         paginationMax,
         paginationMin,
         ...void2
       },
+      rearrangeableChildrenReturn: {
+        indexDemangler,
+        indexMangler,
+        ...void3
+      },
       ...void1
     } = _ref12;
     monitorCallCount(useLinearNavigation);
     let getPaginatedRange = useStableGetter(paginationMax == null || paginationMin == null ? null : paginationMax - paginationMin);
-    const {
-      getLowestIndex,
-      getHighestIndex,
-      indexDemangler,
-      indexMangler,
-      isValidForLinearNavigation,
-      navigatePastEnd,
-      navigatePastStart,
-      onNavigateLinear
-    } = linearNavigationParameters;
-    const {
-      getTabbableIndex,
-      setTabbableIndex
-    } = rovingTabIndexReturn;
     useEnsureStability("useLinearNavigation", onNavigateLinear, isValidForLinearNavigation, indexDemangler, indexMangler);
     const navigateAbsolute = T$1((requestedIndexMangled, searchDirection, e, fromUserInteraction, mode) => {
       var _getTabbableIndex;
@@ -3594,18 +3600,18 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     const navigateToPrev = useStableCallback((e, fromUserInteraction) => {
       return navigateRelative2(e, -1, fromUserInteraction, "single");
     });
-    const getDisableHomeEndKeys = useStableGetter(linearNavigationParameters.disableHomeEndKeys);
-    const getArrowKeyDirection = useStableGetter(linearNavigationParameters.arrowKeyDirection);
-    const getPageNavigationSize = useStableGetter(linearNavigationParameters.pageNavigationSize);
+    //const getDisableHomeEndKeys = useStableGetter(disableHomeEndKeys);
+    //const getArrowKeyDirection = useStableGetter(arrowKeyDirection);
+    //const getPageNavigationSize = useStableGetter(pageNavigationSize);
     const stableProps = _(useTagProps({
-      onKeyDown: e => {
+      onKeyDown: useStableCallback(e => {
         var _getPaginatedRange;
         // Not handled by typeahead (i.e. assume this is a keyboard shortcut)
         if (e.ctrlKey || e.metaKey) return;
         //const info = getLogicalDirectionInfo();
-        const arrowKeyDirection = getArrowKeyDirection();
-        const disableHomeEndKeys = getDisableHomeEndKeys();
-        const pageNavigationSize = getPageNavigationSize();
+        //const arrowKeyDirection = getArrowKeyDirection();
+        //const disableHomeEndKeys = getDisableHomeEndKeys();
+        //const pageNavigationSize = getPageNavigationSize();
         const allowsVerticalNavigation = arrowKeyDirection == "vertical" || arrowKeyDirection == "either";
         const allowsHorizontalNavigation = arrowKeyDirection == "horizontal" || arrowKeyDirection == "either";
         let childRange = getHighestIndex() - getLowestIndex();
@@ -3655,7 +3661,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
           e.preventDefault();
           e.stopPropagation();
         }
-      }
+      })
     }, "data-linear-navigation"));
     return {
       linearNavigationReturn: {},
@@ -4801,6 +4807,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       managedChildrenReturn,
       refElementReturn,
       paginatedChildrenParameters,
+      rearrangeableChildrenReturn,
       ...void1
     } = _ref23;
     monitorCallCount(useListNavigation);
@@ -4831,7 +4838,8 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     } = useLinearNavigation({
       rovingTabIndexReturn,
       linearNavigationParameters,
-      paginatedChildrenParameters
+      paginatedChildrenParameters,
+      rearrangeableChildrenReturn
     });
     // Merge the props while keeping them stable
     // (TODO: We run this merge logic every render but only need the first render's result because it's stable)
@@ -5085,6 +5093,10 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       managedChildrenReturn,
       refElementReturn,
       typeaheadNavigationParameters,
+      rearrangeableChildrenReturn: {
+        indexDemangler: identity,
+        indexMangler: identity
+      },
       rovingTabIndexParameters: {
         untabbableBehavior: "leave-child-focused",
         focusSelfParent: whenThisRowIsFocused,
@@ -5109,6 +5121,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
           }, event);
         }),
         disableHomeEndKeys: true,
+        pageNavigationSize: 0,
         arrowKeyDirection: "horizontal",
         ...linearNavigationParameters
       },
@@ -5257,6 +5270,210 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
   }
 
   /**
+   * Hook that allows for the **direct descendant** children of this component to be re-ordered and sorted.
+   *
+   * @remarks *This is **separate** from "managed" children, which can be any level of child needed! Sortable/rearrangeable children must be **direct descendants** of the parent that uses this hook!*
+   *
+   * It's recommended to use this in conjunction with `useListNavigation`; it takes the same `indexMangler` and `indexDemangler`
+   * functions that this hook returns. `useListNavigation` does not directly use this hook because, as mentioned,
+   * this hook imposes serious restrictions on child structure, while `useListNavigation` allows anything.
+   *
+   * Besides the prop-modifying hook that's returned, the `sort` function that's returned will
+   * sort all children according to their value from the `getValue` argument you pass in.
+   *
+   * If you want to perform some re-ordering operation that's *not* a sort, you can manually
+   * re-map each child's position using `mangleMap` and `demangleMap`, which convert between
+   * sorted and unsorted index positions.
+   *
+   * Again, unlike some other hooks, **these children must be direct descendants**. This is because
+   * the prop-modifying hook inspects the given children, then re-creates them with new `key`s.
+   * Because keys are given special treatment and a child has no way of modifying its own key
+   * there's no other time or place this can happen other than exactly within the parent component's render function.
+   *
+   * @compositeParams
+   */
+  function useRearrangeableChildren(_ref28) {
+    let {
+      rearrangeableChildrenParameters: {
+        getIndex,
+        onRearranged
+      },
+      managedChildrenReturn: {
+        getChildren
+      }
+    } = _ref28;
+    monitorCallCount(useRearrangeableChildren);
+    useEnsureStability("useRearrangeableChildren", getIndex);
+    // These are used to keep track of a mapping between unsorted index <---> sorted index.
+    // These are needed for navigation with the arrow keys.
+    const mangleMap = _(new Map());
+    const demangleMap = _(new Map());
+    const indexMangler = T$1(n => {
+      var _mangleMap$current$ge;
+      return (_mangleMap$current$ge = mangleMap.current.get(n)) !== null && _mangleMap$current$ge !== void 0 ? _mangleMap$current$ge : n;
+    }, []);
+    const indexDemangler = T$1(n => {
+      var _demangleMap$current$;
+      return (_demangleMap$current$ = demangleMap.current.get(n)) !== null && _demangleMap$current$ !== void 0 ? _demangleMap$current$ : n;
+    }, []);
+    const onRearrangedGetter = useStableGetter(onRearranged);
+    //const { setTabbableIndex } = rovingTabIndexReturn;
+    const shuffle$1 = T$1(() => {
+      const managedRows = getChildren();
+      const originalRows = managedRows._arraySlice();
+      const shuffledRows = shuffle(originalRows);
+      return rearrange(originalRows, shuffledRows);
+    }, [/* Must remain stable */]);
+    const reverse = T$1(() => {
+      const managedRows = getChildren();
+      const originalRows = managedRows._arraySlice();
+      const reversedRows = managedRows._arraySlice().reverse();
+      return rearrange(originalRows, reversedRows);
+    }, [/* Must remain stable */]);
+    // The sort function needs to be able to update whoever has all the sortable children.
+    // Because that might not be the consumer of *this* hook directly (e.g. a table uses
+    // this hook, but it's tbody that actually needs updating), we need to remotely
+    // get and set a forceUpdate function.
+    //const [getForceUpdate, setForceUpdate] = usePassiveState<null | (() => void)>(null, returnNull);
+    const [getForceUpdate, setForceUpdate] = usePassiveState(null, returnNull);
+    const rearrange = T$1((originalRows, sortedRows) => {
+      var _onRearrangedGetter, _getForceUpdate;
+      mangleMap.current.clear();
+      demangleMap.current.clear();
+      // Update our sorted <--> unsorted indices map 
+      // and rerender the whole table, basically
+      for (let indexAsSorted = 0; indexAsSorted < sortedRows.length; ++indexAsSorted) {
+        if (sortedRows[indexAsSorted]) {
+          const indexAsUnsorted = sortedRows[indexAsSorted].index;
+          mangleMap.current.set(indexAsUnsorted, indexAsSorted);
+          demangleMap.current.set(indexAsSorted, indexAsUnsorted);
+        }
+      }
+      (_onRearrangedGetter = onRearrangedGetter()) === null || _onRearrangedGetter === void 0 ? void 0 : _onRearrangedGetter();
+      (_getForceUpdate = getForceUpdate()) === null || _getForceUpdate === void 0 ? void 0 : _getForceUpdate();
+    }, []);
+    const useRearrangedChildren = T$1(function useRearrangedChildren(children) {
+      monitorCallCount(useRearrangedChildren);
+      console.assert(Array.isArray(children));
+      return children.slice().map(child => ({
+        child,
+        mangledIndex: indexMangler(getIndex(child)),
+        demangledIndex: getIndex(child)
+      })).sort((lhs, rhs) => {
+        return lhs.mangledIndex - rhs.mangledIndex;
+      }).map(_ref29 => {
+        let {
+          child,
+          mangledIndex,
+          demangledIndex
+        } = _ref29;
+        return y$1(child.type, {
+          ...child.props,
+          key: demangledIndex,
+          "data-mangled-index": mangledIndex,
+          "data-demangled-index": demangledIndex
+        });
+      });
+    }, []);
+    const toJsonArray = T$1(transform => {
+      const managedRows = getChildren();
+      return managedRows._arraySlice().map(child => {
+        if (transform) return transform(child);else return child.getSortValue();
+      });
+    }, []);
+    return {
+      rearrangeableChildrenReturn: {
+        indexMangler,
+        indexDemangler,
+        //mangleMap,
+        //demangleMap,
+        rearrange,
+        shuffle: shuffle$1,
+        reverse,
+        useRearrangedChildren,
+        toJsonArray
+      }
+    };
+  }
+  /**
+   * Hook that allows for the **direct descendant** children of this component to be re-ordered and sorted.
+   *
+   * @remarks *This is **separate** from "managed" children, which can be any level of child needed! Sortable/rearrangeable children must be **direct descendants** of the parent that uses this hook!*
+   *
+   * It's recommended to use this in conjunction with `useListNavigation`; it takes the same `indexMangler` and `indexDemangler`
+   * functions that this hook returns. `useListNavigation` does not directly use this hook because, as mentioned,
+   * this hook imposes serious restrictions on child structure, while `useListNavigation` allows anything.
+   *
+   * Besides the prop-modifying hook that's returned, the `sort` function that's returned will
+   * sort all children according to their value from the `getValue` argument you pass in.
+   *
+   * If you want to perform some re-ordering operation that's *not* a sort, you can manually
+   * re-map each child's position using `mangleMap` and `demangleMap`, which convert between
+   * sorted and unsorted index positions.
+   *
+   * Again, unlike some other hooks, **these children must be direct descendants**. This is because
+   * the prop-modifying hook inspects the given children, then re-creates them with new `key`s.
+   * Because keys are given special treatment and a child has no way of modifying its own key
+   * there's no other time or place this can happen other than exactly within the parent component's render function.
+   *
+   * @compositeParams
+   */
+  function useSortableChildren(_ref30) {
+    let {
+      rearrangeableChildrenParameters,
+      sortableChildrenParameters: {
+        compare: userCompare
+      },
+      managedChildrenReturn: {
+        getChildren
+      }
+    } = _ref30;
+    monitorCallCount(useSortableChildren);
+    const getCompare = useStableGetter(userCompare !== null && userCompare !== void 0 ? userCompare : defaultCompare);
+    const {
+      rearrangeableChildrenReturn
+    } = useRearrangeableChildren({
+      rearrangeableChildrenParameters,
+      managedChildrenReturn: {
+        getChildren
+      }
+    });
+    const {
+      rearrange
+    } = rearrangeableChildrenReturn;
+    // The actual sort function.
+    const sort = T$1(direction => {
+      const managedRows = getChildren();
+      const compare = getCompare();
+      const originalRows = managedRows._arraySlice();
+      const sortedRows = compare ? originalRows.sort((lhsRow, rhsRow) => {
+        const lhsValue = lhsRow;
+        const rhsValue = rhsRow;
+        const result = compare(lhsValue, rhsValue);
+        if (direction[0] == "d") return -result;
+        return result;
+      }) : managedRows._arraySlice();
+      return rearrange(originalRows, sortedRows);
+    }, [/* Must remain stable */]);
+    return {
+      sortableChildrenReturn: {
+        sort
+      },
+      rearrangeableChildrenReturn
+    };
+  }
+  function defaultCompare(lhs, rhs) {
+    return compare1(lhs === null || lhs === void 0 ? void 0 : lhs.getSortValue(), rhs === null || rhs === void 0 ? void 0 : rhs.getSortValue());
+    function compare1(lhs, rhs) {
+      if (lhs == null || rhs == null) {
+        if (lhs == null) return -1;
+        if (rhs == null) return 1;
+      }
+      return lhs - rhs;
+    }
+  }
+
+  /**
    * Allows a single child among all children to be the "selected" child (which can be different from the "focused" child).
    *
    * @remarks If you need multi-select instead of single-select and you're using this hook (e.g. as part of {@link useCompleteListNavigation}), you can disable the single-selection behavior either by setting the selected index to `null` or.
@@ -5265,7 +5482,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
    *
    * @compositeParams
    */
-  function useSingleSelection(_ref28) {
+  function useSingleSelection(_ref31) {
     let {
       managedChildrenReturn: {
         getChildren,
@@ -5283,7 +5500,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         ...void3
       },
       ...void4
-    } = _ref28;
+    } = _ref31;
     monitorCallCount(useSingleSelection);
     const onSelectedIndexChange = useStableCallback(onSelectedIndexChange_U !== null && onSelectedIndexChange_U !== void 0 ? onSelectedIndexChange_U : noop);
     const getSelectedAt = T$1(m => {
@@ -5343,7 +5560,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
    *
    * @compositeParams
    */
-  function useSingleSelectionChild(_ref29) {
+  function useSingleSelectionChild(_ref32) {
     var _ariaPropName$split;
     let {
       context: {
@@ -5362,7 +5579,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         ...void3
       },
       ...void4
-    } = _ref29;
+    } = _ref32;
     monitorCallCount(useSingleSelectionChild);
     useEnsureStability("useSingleSelectionChild", getSelectedIndex, onSelectedIndexChange);
     //const getUnselectable = useStableGetter(unselectable);
@@ -5410,7 +5627,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
   /**
    * Let's face it, declarative is nicer to use than imperative, so this is a shortcut.
    */
-  function useSingleSelectionDeclarative(_ref30) {
+  function useSingleSelectionDeclarative(_ref33) {
     let {
       singleSelectionReturn: {
         changeSelectedIndex
@@ -5419,7 +5636,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         selectedIndex,
         onSelectedIndexChange
       }
-    } = _ref30;
+    } = _ref33;
     p(() => {
       changeSelectedIndex(selectedIndex);
     }, [selectedIndex]);
@@ -5440,7 +5657,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
    *
    * @compositeParams
    */
-  function useGridNavigationSingleSelection(_ref31) {
+  function useGridNavigationSingleSelection(_ref34) {
     let {
       gridNavigationParameters,
       linearNavigationParameters,
@@ -5450,8 +5667,9 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       singleSelectionParameters,
       refElementReturn,
       paginatedChildrenParameters,
+      rearrangeableChildrenReturn,
       ...void2
-    } = _ref31;
+    } = _ref34;
     monitorCallCount(useGridNavigationSingleSelection);
     const {
       context: {
@@ -5472,6 +5690,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       rovingTabIndexParameters,
       typeaheadNavigationParameters,
       paginatedChildrenParameters,
+      rearrangeableChildrenReturn,
       refElementReturn
     });
     const {
@@ -5505,7 +5724,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
   /**
    * @compositeParams
    */
-  function useGridNavigationSingleSelectionRow(_ref32) {
+  function useGridNavigationSingleSelectionRow(_ref35) {
     let {
       info: mcp1,
       linearNavigationParameters,
@@ -5516,7 +5735,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       typeaheadNavigationParameters,
       context,
       ...void1
-    } = _ref32;
+    } = _ref35;
     monitorCallCount(useGridNavigationSingleSelectionRow);
     const {
       hasCurrentFocusParameters: {
@@ -5616,210 +5835,6 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
   }
 
   /**
-   * Hook that allows for the **direct descendant** children of this component to be re-ordered and sorted.
-   *
-   * @remarks *This is **separate** from "managed" children, which can be any level of child needed! Sortable/rearrangeable children must be **direct descendants** of the parent that uses this hook!*
-   *
-   * It's recommended to use this in conjunction with `useListNavigation`; it takes the same `indexMangler` and `indexDemangler`
-   * functions that this hook returns. `useListNavigation` does not directly use this hook because, as mentioned,
-   * this hook imposes serious restrictions on child structure, while `useListNavigation` allows anything.
-   *
-   * Besides the prop-modifying hook that's returned, the `sort` function that's returned will
-   * sort all children according to their value from the `getValue` argument you pass in.
-   *
-   * If you want to perform some re-ordering operation that's *not* a sort, you can manually
-   * re-map each child's position using `mangleMap` and `demangleMap`, which convert between
-   * sorted and unsorted index positions.
-   *
-   * Again, unlike some other hooks, **these children must be direct descendants**. This is because
-   * the prop-modifying hook inspects the given children, then re-creates them with new `key`s.
-   * Because keys are given special treatment and a child has no way of modifying its own key
-   * there's no other time or place this can happen other than exactly within the parent component's render function.
-   *
-   * @compositeParams
-   */
-  function useRearrangeableChildren(_ref33) {
-    let {
-      rearrangeableChildrenParameters: {
-        getIndex,
-        onRearranged
-      },
-      managedChildrenReturn: {
-        getChildren
-      }
-    } = _ref33;
-    monitorCallCount(useRearrangeableChildren);
-    useEnsureStability("useRearrangeableChildren", getIndex);
-    // These are used to keep track of a mapping between unsorted index <---> sorted index.
-    // These are needed for navigation with the arrow keys.
-    const mangleMap = _(new Map());
-    const demangleMap = _(new Map());
-    const indexMangler = T$1(n => {
-      var _mangleMap$current$ge;
-      return (_mangleMap$current$ge = mangleMap.current.get(n)) !== null && _mangleMap$current$ge !== void 0 ? _mangleMap$current$ge : n;
-    }, []);
-    const indexDemangler = T$1(n => {
-      var _demangleMap$current$;
-      return (_demangleMap$current$ = demangleMap.current.get(n)) !== null && _demangleMap$current$ !== void 0 ? _demangleMap$current$ : n;
-    }, []);
-    const onRearrangedGetter = useStableGetter(onRearranged);
-    //const { setTabbableIndex } = rovingTabIndexReturn;
-    const shuffle$1 = T$1(() => {
-      const managedRows = getChildren();
-      const originalRows = managedRows._arraySlice();
-      const shuffledRows = shuffle(originalRows);
-      return rearrange(originalRows, shuffledRows);
-    }, [/* Must remain stable */]);
-    const reverse = T$1(() => {
-      const managedRows = getChildren();
-      const originalRows = managedRows._arraySlice();
-      const reversedRows = managedRows._arraySlice().reverse();
-      return rearrange(originalRows, reversedRows);
-    }, [/* Must remain stable */]);
-    // The sort function needs to be able to update whoever has all the sortable children.
-    // Because that might not be the consumer of *this* hook directly (e.g. a table uses
-    // this hook, but it's tbody that actually needs updating), we need to remotely
-    // get and set a forceUpdate function.
-    //const [getForceUpdate, setForceUpdate] = usePassiveState<null | (() => void)>(null, returnNull);
-    const [getForceUpdate, setForceUpdate] = usePassiveState(null, returnNull);
-    const rearrange = T$1((originalRows, sortedRows) => {
-      var _onRearrangedGetter, _getForceUpdate;
-      mangleMap.current.clear();
-      demangleMap.current.clear();
-      // Update our sorted <--> unsorted indices map 
-      // and rerender the whole table, basically
-      for (let indexAsSorted = 0; indexAsSorted < sortedRows.length; ++indexAsSorted) {
-        if (sortedRows[indexAsSorted]) {
-          const indexAsUnsorted = sortedRows[indexAsSorted].index;
-          mangleMap.current.set(indexAsUnsorted, indexAsSorted);
-          demangleMap.current.set(indexAsSorted, indexAsUnsorted);
-        }
-      }
-      (_onRearrangedGetter = onRearrangedGetter()) === null || _onRearrangedGetter === void 0 ? void 0 : _onRearrangedGetter();
-      (_getForceUpdate = getForceUpdate()) === null || _getForceUpdate === void 0 ? void 0 : _getForceUpdate();
-    }, []);
-    const useRearrangedChildren = T$1(function useRearrangedChildren(children) {
-      monitorCallCount(useRearrangedChildren);
-      console.assert(Array.isArray(children));
-      return children.slice().map(child => ({
-        child,
-        mangledIndex: indexMangler(getIndex(child)),
-        demangledIndex: getIndex(child)
-      })).sort((lhs, rhs) => {
-        return lhs.mangledIndex - rhs.mangledIndex;
-      }).map(_ref34 => {
-        let {
-          child,
-          mangledIndex,
-          demangledIndex
-        } = _ref34;
-        return y$1(child.type, {
-          ...child.props,
-          key: demangledIndex,
-          "data-mangled-index": mangledIndex,
-          "data-demangled-index": demangledIndex
-        });
-      });
-    }, []);
-    const toJsonArray = T$1(transform => {
-      const managedRows = getChildren();
-      return managedRows._arraySlice().map(child => {
-        if (transform) return transform(child);else return child.getSortValue();
-      });
-    }, []);
-    return {
-      rearrangeableChildrenReturn: {
-        indexMangler,
-        indexDemangler,
-        //mangleMap,
-        //demangleMap,
-        rearrange,
-        shuffle: shuffle$1,
-        reverse,
-        useRearrangedChildren,
-        toJsonArray
-      }
-    };
-  }
-  /**
-   * Hook that allows for the **direct descendant** children of this component to be re-ordered and sorted.
-   *
-   * @remarks *This is **separate** from "managed" children, which can be any level of child needed! Sortable/rearrangeable children must be **direct descendants** of the parent that uses this hook!*
-   *
-   * It's recommended to use this in conjunction with `useListNavigation`; it takes the same `indexMangler` and `indexDemangler`
-   * functions that this hook returns. `useListNavigation` does not directly use this hook because, as mentioned,
-   * this hook imposes serious restrictions on child structure, while `useListNavigation` allows anything.
-   *
-   * Besides the prop-modifying hook that's returned, the `sort` function that's returned will
-   * sort all children according to their value from the `getValue` argument you pass in.
-   *
-   * If you want to perform some re-ordering operation that's *not* a sort, you can manually
-   * re-map each child's position using `mangleMap` and `demangleMap`, which convert between
-   * sorted and unsorted index positions.
-   *
-   * Again, unlike some other hooks, **these children must be direct descendants**. This is because
-   * the prop-modifying hook inspects the given children, then re-creates them with new `key`s.
-   * Because keys are given special treatment and a child has no way of modifying its own key
-   * there's no other time or place this can happen other than exactly within the parent component's render function.
-   *
-   * @compositeParams
-   */
-  function useSortableChildren(_ref35) {
-    let {
-      rearrangeableChildrenParameters,
-      sortableChildrenParameters: {
-        compare: userCompare
-      },
-      managedChildrenReturn: {
-        getChildren
-      }
-    } = _ref35;
-    monitorCallCount(useSortableChildren);
-    const getCompare = useStableGetter(userCompare !== null && userCompare !== void 0 ? userCompare : defaultCompare);
-    const {
-      rearrangeableChildrenReturn
-    } = useRearrangeableChildren({
-      rearrangeableChildrenParameters,
-      managedChildrenReturn: {
-        getChildren
-      }
-    });
-    const {
-      rearrange
-    } = rearrangeableChildrenReturn;
-    // The actual sort function.
-    const sort = T$1(direction => {
-      const managedRows = getChildren();
-      const compare = getCompare();
-      const originalRows = managedRows._arraySlice();
-      const sortedRows = compare ? originalRows.sort((lhsRow, rhsRow) => {
-        const lhsValue = lhsRow;
-        const rhsValue = rhsRow;
-        const result = compare(lhsValue, rhsValue);
-        if (direction[0] == "d") return -result;
-        return result;
-      }) : managedRows._arraySlice();
-      return rearrange(originalRows, sortedRows);
-    }, [/* Must remain stable */]);
-    return {
-      sortableChildrenReturn: {
-        sort
-      },
-      rearrangeableChildrenReturn
-    };
-  }
-  function defaultCompare(lhs, rhs) {
-    return compare1(lhs === null || lhs === void 0 ? void 0 : lhs.getSortValue(), rhs === null || rhs === void 0 ? void 0 : rhs.getSortValue());
-    function compare1(lhs, rhs) {
-      if (lhs == null || rhs == null) {
-        if (lhs == null) return -1;
-        if (rhs == null) return 1;
-      }
-      return lhs - rhs;
-    }
-  }
-
-  /**
    * Combines {@link useGridNavigation}, {@link useSingleSelection}, and {@link useSortableChildren}.
    *
    * @remarks This is a separate hook because {@link useSortableChildren} imposes unique requirements to the structure of your `children`.
@@ -5844,24 +5859,16 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     } = _ref36;
     monitorCallCount(useGridNavigationSingleSelectionSortable);
     const {
-      ...scr
+      rearrangeableChildrenReturn,
+      sortableChildrenReturn
     } = useSortableChildren({
       rearrangeableChildrenParameters,
       sortableChildrenParameters,
       managedChildrenReturn
     });
-    const {
-      rearrangeableChildrenReturn: {
-        indexDemangler,
-        indexMangler
-      }
-    } = scr;
     const gnr = useGridNavigationSingleSelection({
-      linearNavigationParameters: {
-        indexDemangler,
-        indexMangler,
-        ...linearNavigationParameters
-      },
+      rearrangeableChildrenReturn,
+      linearNavigationParameters,
       managedChildrenReturn,
       gridNavigationParameters,
       paginatedChildrenParameters,
@@ -5871,8 +5878,9 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       typeaheadNavigationParameters
     });
     return {
-      ...gnr,
-      ...scr
+      rearrangeableChildrenReturn,
+      sortableChildrenReturn,
+      ...gnr
     };
   }
   /**
@@ -5895,12 +5903,17 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       rovingTabIndexParameters,
       textContentParameters,
       typeaheadNavigationParameters,
+      gridNavigationSingleSelectionSortableRowParameters: {
+        getSortableColumnIndex: getSortableColumnIndexUnstable,
+        ...void5
+      },
       ...void1
     } = _ref37;
     monitorCallCount(useGridNavigationSingleSelectionSortableRow);
+    const getSortableColumnIndex = useStableCallback(getSortableColumnIndexUnstable);
     const getSortValue = T$1(() => {
       let rows = managedChildrenReturn.getChildren();
-      let columnIndex = ctxIncoming.gridNavigationRowContext.getTabbableColumn() || 0;
+      let columnIndex = getSortableColumnIndex() || 0;
       let cell = rows.getAt(columnIndex);
       return cell === null || cell === void 0 ? void 0 : cell.getSortValue();
     }, []);
@@ -6010,6 +6023,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       managedChildrenReturn,
       refElementReturn,
       paginatedChildrenParameters,
+      rearrangeableChildrenReturn,
       ...void3
     } = _ref39;
     monitorCallCount(useListNavigationSingleSelection);
@@ -6025,7 +6039,8 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       paginatedChildrenParameters,
       typeaheadNavigationParameters,
       managedChildrenReturn,
-      refElementReturn
+      refElementReturn,
+      rearrangeableChildrenReturn
     });
     const {
       context: contextSS,
@@ -6161,20 +6176,13 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       managedChildrenReturn
     });
     const {
-      indexDemangler,
-      indexMangler
-    } = rearrangeableChildrenReturn;
-    const {
       propsParent,
       propsStableParentOrChild,
       context,
       ...restLN
     } = useListNavigationSingleSelection({
-      linearNavigationParameters: {
-        ...linearNavigationParameters,
-        indexDemangler,
-        indexMangler
-      },
+      linearNavigationParameters,
+      rearrangeableChildrenReturn,
       rovingTabIndexParameters,
       typeaheadNavigationParameters,
       singleSelectionParameters,
@@ -7849,7 +7857,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       managedChildrenReturn: {
         getChildren
       },
-      linearNavigationParameters: {
+      rearrangeableChildrenReturn: {
         indexDemangler
       },
       paginatedChildrenParameters: {
@@ -8373,7 +8381,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       managedChildrenReturn,
       paginatedChildrenParameters,
       rovingTabIndexReturn,
-      linearNavigationParameters: {
+      rearrangeableChildrenReturn: {
         indexDemangler
       }
     });
@@ -8427,6 +8435,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       linearNavigationParameters,
       rovingTabIndexParameters,
       typeaheadNavigationParameters,
+      gridNavigationSingleSelectionSortableRowParameters,
       hasCurrentFocusParameters: {
         onCurrentFocusedChanged: ocfc1,
         onCurrentFocusedInnerChanged: ocfic3,
@@ -8438,7 +8447,8 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     const {
       info: infoPaginatedChild,
       paginatedChildReturn,
-      props: paginationProps
+      props: paginationProps,
+      ...void7
     } = usePaginatedChild({
       info: {
         index
@@ -8447,9 +8457,9 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     });
     const {
       info: infoStaggeredChild,
-      // { setParentIsStaggered, setStaggeredVisible },
       staggeredChildReturn,
-      props: staggeredProps
+      props: staggeredProps,
+      ...void8
     } = useStaggeredChild({
       info: {
         index
@@ -8484,9 +8494,6 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         isValidForLinearNavigation: isValidForNavigation,
         getHighestIndex: getHighestChildIndex,
         getLowestIndex: getLowestChildIndex,
-        pageNavigationSize: 0,
-        indexDemangler: identity,
-        indexMangler: identity,
         ...linearNavigationParameters
       },
       managedChildrenReturn: {
@@ -8499,7 +8506,8 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         unselectable,
         untabbable
       },
-      textContentParameters
+      textContentParameters,
+      gridNavigationSingleSelectionSortableRowParameters
     });
     const {
       linearNavigationReturn,
@@ -8547,9 +8555,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     const context = useMemoObject({
       ...contextGNR,
       ...contextMC
-      //completeGridNavigationCellContext: { excludeSpace }
     });
-
     const {
       hasCurrentFocusReturn
     } = useHasCurrentFocus({
@@ -8839,7 +8845,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       },
       rovingTabIndexReturn,
       paginatedChildrenParameters,
-      linearNavigationParameters: {
+      rearrangeableChildrenReturn: {
         indexDemangler: rearrangeableChildrenReturn.indexDemangler
       }
     });
@@ -10786,10 +10792,14 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
   const RandomWords$1 = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
   //const GridRowContext = createContext<UseGridNavigationRow<HTMLTableRowElement, HTMLTableCellElement, {}, {}, string, string>>(null!);
   //const GridCellContext = createContext<UseGridNavigationCell<HTMLTableCellElement, {}, string>>(null!);
+  const SortableColumnContext = G(null);
+  const SetSortableColumnContext = G(null);
+  const GetSortableColumnContext = G(null);
   const DemoUseGrid = x(() => {
     const [tabbableColumn, setTabbableColumn, _getTabbableColumn] = useState(null);
     const [selectedRow, setSelectedRow, _getSelectedRow] = useState(null);
     const [tabbableRow, setTabbableRow] = useState(null);
+    const [sortableColumn, setSortableColumn, getSortableColumn] = useState(null);
     const allReturnInfo = useCompleteGridNavigationDeclarative({
       rovingTabIndexParameters: {
         // If true, the entire grid is removed from the tab order
@@ -10948,17 +10958,26 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
               children: "Column 3"
             })]
           })
-        }), o$1(GridRowContext.Provider, {
-          value: context,
-          children: o$1("tbody", {
-            ...props,
-            children: useRearrangedChildren(Array.from(function* () {
-              for (let i = 0; i < 10; ++i) {
-                yield o$1(DemoUseGridRow, {
-                  index: i
-                }, i);
-              }
-            }()))
+        }), o$1(SortableColumnContext.Provider, {
+          value: sortableColumn,
+          children: o$1(GetSortableColumnContext.Provider, {
+            value: getSortableColumn,
+            children: o$1(SetSortableColumnContext.Provider, {
+              value: setSortableColumn,
+              children: o$1(GridRowContext.Provider, {
+                value: context,
+                children: o$1("tbody", {
+                  ...props,
+                  children: useRearrangedChildren(Array.from(function* () {
+                    for (let i = 0; i < 10; ++i) {
+                      yield o$1(DemoUseGridRow, {
+                        index: i
+                      }, i);
+                    }
+                  }()))
+                })
+              })
+            })
           })
         })]
       })]
@@ -10978,6 +10997,7 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
     //const getChildren = useCallback(() => { return getChildren2() }, []);
     const hidden = index === 3;
     const disabled = hidden;
+    const getSortableColumnIndex = q$1(GetSortableColumnContext);
     const contextFromParent = q$1(GridRowContext);
     const ret = useCompleteGridNavigationRow({
       context: contextFromParent,
@@ -11013,6 +11033,9 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       hasCurrentFocusParameters: {
         onCurrentFocusedChanged: null,
         onCurrentFocusedInnerChanged: null
+      },
+      gridNavigationSingleSelectionSortableRowParameters: {
+        getSortableColumnIndex
       }
     });
     const {

@@ -12,7 +12,7 @@ import { useTagProps } from "../util/use-tag-props.js";
  *
  * @hasChild {@link usePaginatedChild}
  */
-export function usePaginatedChildren({ managedChildrenReturn: { getChildren }, linearNavigationParameters: { indexDemangler }, paginatedChildrenParameters: { paginationMax, paginationMin }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex }, refElementReturn: { getElement } }) {
+export function usePaginatedChildren({ managedChildrenReturn: { getChildren }, rearrangeableChildrenReturn: { indexDemangler }, paginatedChildrenParameters: { paginationMax, paginationMin }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex }, refElementReturn: { getElement } }) {
     monitorCallCount(usePaginatedChildren);
     const [childCount, setChildCount] = useState(null);
     const parentIsPaginated = (paginationMin != null || paginationMax != null);

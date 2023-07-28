@@ -1,9 +1,9 @@
-import { ManagedChildInfo, UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
-import { returnNull, useEnsureStability, usePassiveState } from "../../preact-extensions/use-passive-state.js";
-import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
-import { Nullable, TargetedPick, createElement, useCallback, useRef } from "../../util/lib.js";
-import { VNode } from "../../util/types.js";
-import { monitorCallCount } from "../../util/use-call-count.js";
+import { ManagedChildInfo, UseManagedChildrenReturnType } from "../preact-extensions/use-managed-children.js";
+import { returnNull, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
+import { useStableGetter } from "../preact-extensions/use-stable-getter.js";
+import { Nullable, TargetedPick, createElement, useCallback, useRef } from "../util/lib.js";
+import { VNode } from "../util/types.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 
 // TODO: This actually pulls in a lot of lodash for, like, one questionably-useful import.
 import { shuffle as lodashShuffle } from "lodash-es";
@@ -58,7 +58,6 @@ export interface UseSortableChildrenParameters<M extends UseRearrangeableChildIn
 
 
 export interface UseRearrangeableChildrenReturnType<M extends UseRearrangeableChildInfo> {
-
     rearrangeableChildrenReturn: UseRearrangeableChildrenReturnTypeSelf<M>;
 }
 

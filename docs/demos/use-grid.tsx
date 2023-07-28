@@ -1,6 +1,6 @@
 import { createContext } from "preact";
 import { memo } from "preact/compat";
-import { useCallback, useContext } from "preact/hooks";
+import { StateUpdater, useCallback, useContext } from "preact/hooks";
 import { TabbableColumnInfo } from "../../dist/component-detail/keyboard-navigation/use-grid-navigation-partial.js";
 import { CompleteGridNavigationCellContext, CompleteGridNavigationRowContext, EventDetail, GetIndex, UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationRowInfo, UseCompleteGridNavigationRowReturnType, VNode, focus, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, useStableCallback, useStableGetter, useState } from "../../dist/index.js";
 
@@ -8,11 +8,16 @@ const RandomWords = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, se
 
 //const GridRowContext = createContext<UseGridNavigationRow<HTMLTableRowElement, HTMLTableCellElement, {}, {}, string, string>>(null!);
 //const GridCellContext = createContext<UseGridNavigationCell<HTMLTableCellElement, {}, string>>(null!);
+const SortableColumnContext = createContext(null as number | null);
+const SetSortableColumnContext = createContext<StateUpdater<number | null>>(null!);
+const GetSortableColumnContext = createContext<() => number | null>(null!);
+
 export const DemoUseGrid = memo(() => {
 
     const [tabbableColumn, setTabbableColumn, _getTabbableColumn] = useState<TabbableColumnInfo | null>(null);
     const [selectedRow, setSelectedRow, _getSelectedRow] = useState<number | null>(null);
     const [tabbableRow, setTabbableRow] = useState<number | null>(null);
+    const [sortableColumn, setSortableColumn, getSortableColumn] = useState(null as number | null);
 
     const allReturnInfo = useCompleteGridNavigationDeclarative<HTMLTableSectionElement, HTMLTableRowElement, HTMLTableCellElement, CustomGridInfo, CustomGridRowInfo>({
         rovingTabIndexParameters: {
@@ -159,14 +164,20 @@ export const DemoUseGrid = memo(() => {
                         <th>Column 3</th>
                     </tr>
                 </thead>
-                <GridRowContext.Provider value={context}>
-                    <tbody {...props}>{useRearrangedChildren(Array.from((function* () {
-                        for (let i = 0; i < 10; ++i) {
-                            yield <DemoUseGridRow index={i} key={i} />
-                        }
-                    })())
-                    )}</tbody>
-                </GridRowContext.Provider>
+                <SortableColumnContext.Provider value={sortableColumn}>
+                    <GetSortableColumnContext.Provider value={getSortableColumn}>
+                        <SetSortableColumnContext.Provider value={setSortableColumn}>
+                            <GridRowContext.Provider value={context}>
+                                <tbody {...props}>{useRearrangedChildren(Array.from((function* () {
+                                    for (let i = 0; i < 10; ++i) {
+                                        yield <DemoUseGridRow index={i} key={i} />
+                                    }
+                                })())
+                                )}</tbody>
+                            </GridRowContext.Provider>
+                        </SetSortableColumnContext.Provider>
+                    </GetSortableColumnContext.Provider>
+                </SortableColumnContext.Provider>
             </table>
         </div>
     );
@@ -190,6 +201,7 @@ const DemoUseGridRow = memo((({ index }: { index: number }) => {
     const hidden = (index === 3);
     const disabled = hidden;
 
+    const getSortableColumnIndex = useContext(GetSortableColumnContext);
 
 
     const contextFromParent = useContext(GridRowContext) as CompleteGridNavigationRowContext<HTMLTableRowElement, CustomGridInfo>;
@@ -202,7 +214,8 @@ const DemoUseGridRow = memo((({ index }: { index: number }) => {
         linearNavigationParameters: { navigatePastEnd: "wrap", navigatePastStart: "wrap" },
         rovingTabIndexParameters: { onTabbableIndexChange: useStableCallback((i: number | null) => { setTabbableColumn(i) }), untabbable: false, initiallyTabbedIndex: 0 },
         typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000, onNavigateTypeahead: null },
-        hasCurrentFocusParameters: { onCurrentFocusedChanged: null, onCurrentFocusedInnerChanged: null }
+        hasCurrentFocusParameters: { onCurrentFocusedChanged: null, onCurrentFocusedInnerChanged: null },
+        gridNavigationSingleSelectionSortableRowParameters: { getSortableColumnIndex },
     });
 
     const {
@@ -235,7 +248,6 @@ const DemoUseGridCell = (({ index, row, rowIsTabbable }: { index: number, row: n
 
 
     const context = useContext(GridCellContext) as CompleteGridNavigationCellContext<HTMLTableCellElement, CustomGridRowInfo>;
-
 
     const {
         props,

@@ -1,7 +1,7 @@
-import { returnNull, useEnsureStability, usePassiveState } from "../../preact-extensions/use-passive-state.js";
-import { useStableGetter } from "../../preact-extensions/use-stable-getter.js";
-import { createElement, useCallback, useRef } from "../../util/lib.js";
-import { monitorCallCount } from "../../util/use-call-count.js";
+import { returnNull, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
+import { useStableGetter } from "../preact-extensions/use-stable-getter.js";
+import { createElement, useCallback, useRef } from "../util/lib.js";
+import { monitorCallCount } from "../util/use-call-count.js";
 // TODO: This actually pulls in a lot of lodash for, like, one questionably-useful import.
 import { shuffle as lodashShuffle } from "lodash-es";
 /**

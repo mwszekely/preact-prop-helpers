@@ -2,6 +2,7 @@ import { identity } from "lodash-es";
 import { TargetedPick } from "../../util/lib.js";
 import { ElementProps, KeyboardEventType, Nullable } from "../../util/types.js";
 import { UsePaginatedChildrenParameters } from "../use-paginated-children.js";
+import { UseRearrangeableChildrenReturnType } from "../use-sortable-children.js";
 import { UseRovingTabIndexReturnType } from "./use-roving-tabindex.js";
 export { identity };
 export interface LinearNavigationResult {
@@ -15,7 +16,7 @@ export interface UseLinearNavigationReturnType<ParentOrChildElement extends Elem
     propsStable: ElementProps<ParentOrChildElement>;
 }
 /** Arguments passed to the parent `useLinearNavigation` */
-export interface UseLinearNavigationParameters<ParentOrChildElement extends Element, ChildElement extends Element> extends TargetedPick<UseRovingTabIndexReturnType<ParentOrChildElement, ChildElement>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex">, TargetedPick<UsePaginatedChildrenParameters<ParentOrChildElement, ChildElement>, "paginatedChildrenParameters", "paginationMin" | "paginationMax"> {
+export interface UseLinearNavigationParameters<ParentOrChildElement extends Element, ChildElement extends Element> extends TargetedPick<UseRovingTabIndexReturnType<ParentOrChildElement, ChildElement>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex">, TargetedPick<UseRearrangeableChildrenReturnType<any>, "rearrangeableChildrenReturn", "indexMangler" | "indexDemangler">, TargetedPick<UsePaginatedChildrenParameters<ParentOrChildElement, ChildElement>, "paginatedChildrenParameters", "paginationMin" | "paginationMax"> {
     linearNavigationParameters: UseLinearNavigationParametersSelf<ChildElement>;
 }
 export interface UseLinearNavigationParametersSelf<ChildElement extends Element> {
@@ -80,13 +81,11 @@ export interface UseLinearNavigationParametersSelf<ChildElement extends Element>
      *
      * @stable
      */
-    indexMangler: (n: number) => number;
     /**
      * @see {@link UseLinearNavigationParametersSelf.indexMangler}, which does the opposite of this.
      *
      * @stable
      */
-    indexDemangler: (n: number) => number;
     /**
      * From `useManagedChildren`. This can be higher than the *actual* highest index if you need it to be.
      *
@@ -114,7 +113,7 @@ export interface UseLinearNavigationParametersSelf<ChildElement extends Element>
  *
  * @compositeParams
  */
-export declare function useLinearNavigation<ParentOrChildElement extends Element, ChildElement extends Element>({ rovingTabIndexReturn, linearNavigationParameters, paginatedChildrenParameters: { paginationMax, paginationMin, ...void2 }, ...void1 }: UseLinearNavigationParameters<ParentOrChildElement, ChildElement>): UseLinearNavigationReturnType<ParentOrChildElement>;
+export declare function useLinearNavigation<ParentOrChildElement extends Element, ChildElement extends Element>({ linearNavigationParameters: { getLowestIndex, getHighestIndex, isValidForLinearNavigation, navigatePastEnd, navigatePastStart, onNavigateLinear, arrowKeyDirection, disableHomeEndKeys, pageNavigationSize, ...void4 }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex, ...void5 }, paginatedChildrenParameters: { paginationMax, paginationMin, ...void2 }, rearrangeableChildrenReturn: { indexDemangler, indexMangler, ...void3 }, ...void1 }: UseLinearNavigationParameters<ParentOrChildElement, ChildElement>): UseLinearNavigationReturnType<ParentOrChildElement>;
 export interface TryNavigateToIndexParameters {
     lowestChildIndex: number;
     highestChildIndex: number;

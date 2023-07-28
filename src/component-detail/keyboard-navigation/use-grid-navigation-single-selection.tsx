@@ -5,10 +5,10 @@ import { useMemoObject } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { ExtendMerge, OmitStrong } from "../../util/types.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
+import { UseSingleSelectionChildInfo, UseSingleSelectionChildInfoKeysReturnType, UseSingleSelectionChildParameters, UseSingleSelectionChildReturnType, UseSingleSelectionContext, UseSingleSelectionParameters, UseSingleSelectionReturnType, useSingleSelection, useSingleSelectionChild } from "../use-single-selection.js";
 import { GridChildCellInfo, GridChildRowInfo, UseGridNavigationCellContext, UseGridNavigationCellInfoKeysReturnType, UseGridNavigationCellParameters, UseGridNavigationCellReturnType, UseGridNavigationParameters, UseGridNavigationReturnType, UseGridNavigationRowContext, UseGridNavigationRowInfoKeysReturnType, UseGridNavigationRowParameters, UseGridNavigationRowReturnType, useGridNavigation, useGridNavigationCell, useGridNavigationRow } from "./use-grid-navigation-partial.js";
 import { UseListNavigationChildInfoKeysParameters } from "./use-list-navigation-partial.js";
 import { UseListNavigationSingleSelectionChildInfoKeysParameters } from "./use-list-navigation-single-selection.js";
-import { UseSingleSelectionChildInfo, UseSingleSelectionChildInfoKeysReturnType, UseSingleSelectionChildParameters, UseSingleSelectionChildReturnType, UseSingleSelectionContext, UseSingleSelectionParameters, UseSingleSelectionReturnType, useSingleSelection, useSingleSelectionChild } from "./use-single-selection.js";
 
 /**
  * List navigation gets single selection, so grid navigation does too.
@@ -73,6 +73,7 @@ export function useGridNavigationSingleSelection<ParentOrRowElement extends Elem
     singleSelectionParameters,
     refElementReturn,
     paginatedChildrenParameters,
+    rearrangeableChildrenReturn,
     ...void2
 }: UseGridNavigationSingleSelectionParameters<ParentOrRowElement, RowElement, GridSingleSelectChildRowInfo<RowElement>>): UseGridNavigationSingleSelectionReturnType<ParentOrRowElement, RowElement> {
     monitorCallCount(useGridNavigationSingleSelection);
@@ -92,6 +93,7 @@ export function useGridNavigationSingleSelection<ParentOrRowElement extends Elem
         rovingTabIndexParameters,
         typeaheadNavigationParameters,
         paginatedChildrenParameters,
+        rearrangeableChildrenReturn,
         refElementReturn
     });
 

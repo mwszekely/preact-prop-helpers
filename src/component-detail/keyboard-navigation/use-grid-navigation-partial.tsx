@@ -1,3 +1,4 @@
+import { identity } from "lodash-es";
 import { useMergedProps } from "../../dom-helpers/use-merged-props.js";
 import { UseGenericChildParameters, UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
 import { OnPassiveStateChange, PassiveStateUpdater, usePassiveState } from "../../preact-extensions/use-passive-state.js";
@@ -70,9 +71,9 @@ export type UseGridNavigationCellInfoKeysReturnType = UseListNavigationChildInfo
 export interface UseGridNavigationRowParameters<RowElement extends Element, CellElement extends Element, CM extends GridChildCellInfo<CellElement>> extends
     UseGenericChildParameters<UseGridNavigationRowContext, Pick<GridChildRowInfo<RowElement>, UseGridNavigationRowInfoKeysParameters>>,
     OmitStrong<UseListNavigationChildParameters<RowElement>, "info" | "context">,
-    TargetedOmit<UseListNavigationParameters<RowElement, CellElement, CM>, "linearNavigationParameters", "disableHomeEndKeys" | "onNavigateLinear" | "arrowKeyDirection">,
+    TargetedOmit<UseListNavigationParameters<RowElement, CellElement, CM>, "linearNavigationParameters", "disableHomeEndKeys" | "onNavigateLinear" | "arrowKeyDirection" | "pageNavigationSize">,
     TargetedOmit<UseListNavigationParameters<RowElement, CellElement, CM>, "rovingTabIndexParameters", "focusSelfParent" | "untabbableBehavior">,
-    OmitStrong<UseListNavigationParameters<RowElement, CellElement, CM>, "paginatedChildrenParameters" | "refElementReturn" | "rovingTabIndexParameters" | "linearNavigationParameters">,
+    OmitStrong<UseListNavigationParameters<RowElement, CellElement, CM>, "rearrangeableChildrenReturn" | "paginatedChildrenParameters" | "refElementReturn" | "rovingTabIndexParameters" | "linearNavigationParameters">,
     TargetedPick<UseManagedChildrenReturnType<CM>, "managedChildrenReturn", "getChildren"> {
 
 
@@ -275,6 +276,7 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
         managedChildrenReturn,
         refElementReturn,
         typeaheadNavigationParameters,
+        rearrangeableChildrenReturn: { indexDemangler: identity, indexMangler: identity },
         rovingTabIndexParameters: {
             untabbableBehavior: "leave-child-focused",
             focusSelfParent: whenThisRowIsFocused,
@@ -290,6 +292,7 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
                 setTabbableColumn(prev => ({ ideal: next, actual: prev?.actual ?? next }), event);
             }),
             disableHomeEndKeys: true,
+            pageNavigationSize: 0,
             arrowKeyDirection: "horizontal",
             ...linearNavigationParameters
         },

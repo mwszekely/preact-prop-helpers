@@ -1,9 +1,9 @@
 import { UseGenericChildParameters } from "../../preact-extensions/use-managed-children.js";
 import { assertEmptyObject } from "../../util/assert.js";
-import { OmitStrong, TargetedOmit } from "../../util/types.js";
+import { OmitStrong } from "../../util/types.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
+import { UseSortableChildInfo, UseSortableChildrenParameters, UseSortableChildrenReturnType, useSortableChildren } from "../use-sortable-children.js";
 import { UseListNavigationSingleSelectionChildContext, UseListNavigationSingleSelectionChildInfo, UseListNavigationSingleSelectionChildInfoKeysParameters, UseListNavigationSingleSelectionChildInfoKeysReturnType, UseListNavigationSingleSelectionChildParameters, UseListNavigationSingleSelectionChildReturnType, UseListNavigationSingleSelectionParameters, UseListNavigationSingleSelectionReturnType, useListNavigationSingleSelection, useListNavigationSingleSelectionChild } from "./use-list-navigation-single-selection.js";
-import { UseSortableChildInfo, UseSortableChildrenParameters, UseSortableChildrenReturnType, useSortableChildren } from "./use-sortable-children.js";
 
 /**
  * We're just gluing together the single selection list navigation and sortable children hooks,
@@ -24,8 +24,7 @@ export interface UseListNavigationSingleSelectionSortableChildInfo<TabbableChild
 
 }
 export interface UseListNavigationSingleSelectionSortableParameters<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationSingleSelectionSortableChildInfo<ChildElement>> extends
-    OmitStrong<UseListNavigationSingleSelectionParameters<ParentOrChildElement, ChildElement, M>, "linearNavigationParameters" | "managedChildrenReturn">,
-    TargetedOmit<UseListNavigationSingleSelectionParameters<ParentOrChildElement, ChildElement, M>, "linearNavigationParameters", "indexDemangler" | "indexMangler">,
+    OmitStrong<UseListNavigationSingleSelectionParameters<ParentOrChildElement, ChildElement, M>, "rearrangeableChildrenReturn" | "managedChildrenReturn">,
     UseSortableChildrenParameters<M> {
 
 }
@@ -68,8 +67,7 @@ export function useListNavigationSingleSelectionSortable<ParentOrChildElement ex
 }: UseListNavigationSingleSelectionSortableParameters<ParentOrChildElement, ChildElement, M>): UseListNavigationSingleSelectionSortableReturnType<ParentOrChildElement, ChildElement, M> {
     monitorCallCount(useListNavigationSingleSelectionSortable);
     const { rearrangeableChildrenReturn, sortableChildrenReturn, ...void1 } = useSortableChildren<M>({ rearrangeableChildrenParameters, sortableChildrenParameters, managedChildrenReturn });
-    const { indexDemangler, indexMangler } = rearrangeableChildrenReturn;
-    const { propsParent, propsStableParentOrChild, context, ...restLN } = useListNavigationSingleSelection<ParentOrChildElement, ChildElement>({ linearNavigationParameters: { ...linearNavigationParameters, indexDemangler, indexMangler }, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, managedChildrenReturn, refElementReturn, paginatedChildrenParameters });
+    const { propsParent, propsStableParentOrChild, context, ...restLN } = useListNavigationSingleSelection<ParentOrChildElement, ChildElement>({ linearNavigationParameters, rearrangeableChildrenReturn, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, managedChildrenReturn, refElementReturn, paginatedChildrenParameters });
 
     assertEmptyObject(void1);
     assertEmptyObject(void3);

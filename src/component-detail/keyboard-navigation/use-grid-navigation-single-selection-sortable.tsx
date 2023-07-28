@@ -1,12 +1,13 @@
 import { UseGenericChildParameters } from "../../preact-extensions/use-managed-children.js";
+import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { useCallback } from "../../util/lib.js";
-import { OmitStrong, TargetedOmit } from "../../util/types.js";
+import { OmitStrong } from "../../util/types.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
+import { UseSingleSelectionChildInfoKeysReturnType } from "../use-single-selection.js";
+import { UseSortableChildInfo, UseSortableChildrenParameters, UseSortableChildrenReturnType, useSortableChildren } from "../use-sortable-children.js";
 import { GridSingleSelectChildCellInfo, GridSingleSelectChildRowInfo, UseGridNavigationCellSingleSelectionContext, UseGridNavigationRowSingleSelectionContext, UseGridNavigationSingleSelectionCellInfoKeysParameters, UseGridNavigationSingleSelectionCellInfoKeysReturnType, UseGridNavigationSingleSelectionCellParameters, UseGridNavigationSingleSelectionCellReturnType, UseGridNavigationSingleSelectionParameters, UseGridNavigationSingleSelectionReturnType, UseGridNavigationSingleSelectionRowInfoKeysParameters, UseGridNavigationSingleSelectionRowInfoKeysReturnType, UseGridNavigationSingleSelectionRowParameters, UseGridNavigationSingleSelectionRowReturnType, useGridNavigationSingleSelection, useGridNavigationSingleSelectionCell, useGridNavigationSingleSelectionRow } from "./use-grid-navigation-single-selection.js";
 import { UseRovingTabIndexChildInfoKeysReturnType } from "./use-roving-tabindex.js";
-import { UseSingleSelectionChildInfoKeysReturnType } from "./use-single-selection.js";
-import { UseSortableChildInfo, UseSortableChildrenParameters, UseSortableChildrenReturnType, useSortableChildren } from "./use-sortable-children.js";
 
 /**
  * Like list navigation single selection sortable etc. etc. etc.
@@ -29,8 +30,8 @@ export interface GridSingleSelectSortableChildRowInfo<RowElement extends Element
 export interface GridSingleSelectSortableChildCellInfo<CellElement extends Element> extends GridSingleSelectChildCellInfo<CellElement>, UseSortableChildInfo { }
 
 export interface UseGridNavigationSingleSelectionSortableParameters<ParentOrRowElement extends Element, RowElement extends Element, RM extends GridSingleSelectSortableChildRowInfo<RowElement>> extends
-    OmitStrong<UseGridNavigationSingleSelectionParameters<ParentOrRowElement, RowElement, RM>, "linearNavigationParameters" | "managedChildrenReturn">,
-    TargetedOmit<UseGridNavigationSingleSelectionParameters<ParentOrRowElement, RowElement, RM>, "linearNavigationParameters", "indexDemangler" | "indexMangler">,
+    OmitStrong<UseGridNavigationSingleSelectionParameters<ParentOrRowElement, RowElement, RM>, "managedChildrenReturn" | "rearrangeableChildrenReturn">,
+    //TargetedOmit<UseGridNavigationSingleSelectionParameters<ParentOrRowElement, RowElement, RM>, "linearNavigationParameters", "indexDemangler" | "indexMangler">,
     UseSortableChildrenParameters<RM> { }
 
 export interface UseGridNavigationSingleSelectionSortableReturnType<ParentOrRowElement extends Element, RowElement extends Element, RM extends GridSingleSelectSortableChildRowInfo<RowElement>> extends UseGridNavigationSingleSelectionReturnType<ParentOrRowElement, RowElement>, UseSortableChildrenReturnType<RM> {
@@ -39,11 +40,20 @@ export interface UseGridNavigationSingleSelectionSortableReturnType<ParentOrRowE
 
 export interface UseGridNavigationSingleSelectionSortableRowParameters<RowElement extends Element, CellElement extends Element, RM extends GridSingleSelectSortableChildRowInfo<RowElement>, CM extends GridSingleSelectSortableChildCellInfo<CellElement>> extends
     UseGenericChildParameters<UseGridNavigationRowSingleSelectionSortableContext, Pick<RM, UseGridNavigationSingleSelectionSortableRowInfoKeysParameters>>,
-    OmitStrong<UseGridNavigationSingleSelectionRowParameters<RowElement, CellElement, CM>, "context" | "info"> { }
+    OmitStrong<UseGridNavigationSingleSelectionRowParameters<RowElement, CellElement, CM>, "context" | "info"> {
+    gridNavigationSingleSelectionSortableRowParameters: UseGridNavigationSingleSelectionSortableRowParametersSelf;
+}
 export interface UseGridNavigationSingleSelectionSortableRowReturnType<RowElement extends Element, CellElement extends Element, RM extends GridSingleSelectSortableChildRowInfo<RowElement>, CM extends GridSingleSelectSortableChildCellInfo<CellElement>> extends
     OmitStrong<UseGridNavigationSingleSelectionRowReturnType<RowElement, CellElement>, "context" | "info"> {
     info: Pick<RM, "focusSelf" | "getSortValue" | UseRovingTabIndexChildInfoKeysReturnType | UseSingleSelectionChildInfoKeysReturnType>;
     context: UseGridNavigationCellSingleSelectionContext;
+}
+
+export interface UseGridNavigationSingleSelectionSortableRowParametersSelf {
+    /**
+     * When the grid is sorted, this column of cells is chosen to sort by.
+     */
+    getSortableColumnIndex(): number | null | undefined;
 }
 
 export interface UseGridNavigationSingleSelectionSortableCellParameters<CellElement extends Element, CM extends GridSingleSelectSortableChildCellInfo<CellElement>> extends
@@ -75,10 +85,10 @@ export function useGridNavigationSingleSelectionSortable<ParentOrRowElement exte
 }: UseGridNavigationSingleSelectionSortableParameters<ParentOrRowElement, RowElement, RM>): UseGridNavigationSingleSelectionSortableReturnType<ParentOrRowElement, RowElement, RM> {
     monitorCallCount(useGridNavigationSingleSelectionSortable);
 
-    const { ...scr } = useSortableChildren<RM>({ rearrangeableChildrenParameters, sortableChildrenParameters, managedChildrenReturn });
-    const { rearrangeableChildrenReturn: { indexDemangler, indexMangler } } = scr;
+    const { rearrangeableChildrenReturn, sortableChildrenReturn } = useSortableChildren<RM>({ rearrangeableChildrenParameters, sortableChildrenParameters, managedChildrenReturn });
     const gnr = useGridNavigationSingleSelection<ParentOrRowElement, RowElement>({
-        linearNavigationParameters: { indexDemangler, indexMangler, ...linearNavigationParameters },
+        rearrangeableChildrenReturn,
+        linearNavigationParameters,
         managedChildrenReturn,
         gridNavigationParameters,
         paginatedChildrenParameters,
@@ -89,7 +99,11 @@ export function useGridNavigationSingleSelectionSortable<ParentOrRowElement exte
     });
     assertEmptyObject(void1);
 
-    return { ...gnr, ...scr, }
+    return { 
+        rearrangeableChildrenReturn,
+        sortableChildrenReturn,
+        ...gnr
+     }
 }
 
 /**
@@ -106,13 +120,16 @@ export function useGridNavigationSingleSelectionSortableRow<RowElement extends E
     rovingTabIndexParameters,
     textContentParameters,
     typeaheadNavigationParameters,
+    gridNavigationSingleSelectionSortableRowParameters: { getSortableColumnIndex: getSortableColumnIndexUnstable, ...void5 },
     ...void1
 }: UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM>): UseGridNavigationSingleSelectionSortableRowReturnType<RowElement, CellElement, RM, CM> {
     monitorCallCount(useGridNavigationSingleSelectionSortableRow);
 
+    const getSortableColumnIndex = useStableCallback(getSortableColumnIndexUnstable);
+
     const getSortValue = useCallback(() => {
         let rows = managedChildrenReturn.getChildren();
-        let columnIndex = ctxIncoming.gridNavigationRowContext.getTabbableColumn() || 0;
+        let columnIndex = getSortableColumnIndex() || 0;
         let cell = rows.getAt(columnIndex as never);
         return cell?.getSortValue();
     }, []);
@@ -146,6 +163,7 @@ export function useGridNavigationSingleSelectionSortableRow<RowElement extends E
     assertEmptyObject(void2);
     assertEmptyObject(void3);
     assertEmptyObject(void4);
+    assertEmptyObject(void5);
 
     return {
         info: { getLocallyTabbable, getSelected, selected, setLocallyTabbable, setLocalSelected, getSortValue, focusSelf },

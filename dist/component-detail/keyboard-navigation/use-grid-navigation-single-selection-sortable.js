@@ -1,8 +1,9 @@
+import { useStableCallback } from "../../preact-extensions/use-stable-callback.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { useCallback } from "../../util/lib.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
+import { useSortableChildren } from "../use-sortable-children.js";
 import { useGridNavigationSingleSelection, useGridNavigationSingleSelectionCell, useGridNavigationSingleSelectionRow } from "./use-grid-navigation-single-selection.js";
-import { useSortableChildren } from "./use-sortable-children.js";
 /**
  * Like list navigation single selection sortable etc. etc. etc.
  *
@@ -20,10 +21,10 @@ const _dummy = 0;
  */
 export function useGridNavigationSingleSelectionSortable({ rearrangeableChildrenParameters, sortableChildrenParameters, linearNavigationParameters, managedChildrenReturn, gridNavigationParameters, paginatedChildrenParameters, refElementReturn, rovingTabIndexParameters, singleSelectionParameters, typeaheadNavigationParameters, ...void1 }) {
     monitorCallCount(useGridNavigationSingleSelectionSortable);
-    const { ...scr } = useSortableChildren({ rearrangeableChildrenParameters, sortableChildrenParameters, managedChildrenReturn });
-    const { rearrangeableChildrenReturn: { indexDemangler, indexMangler } } = scr;
+    const { rearrangeableChildrenReturn, sortableChildrenReturn } = useSortableChildren({ rearrangeableChildrenParameters, sortableChildrenParameters, managedChildrenReturn });
     const gnr = useGridNavigationSingleSelection({
-        linearNavigationParameters: { indexDemangler, indexMangler, ...linearNavigationParameters },
+        rearrangeableChildrenReturn,
+        linearNavigationParameters,
         managedChildrenReturn,
         gridNavigationParameters,
         paginatedChildrenParameters,
@@ -33,18 +34,23 @@ export function useGridNavigationSingleSelectionSortable({ rearrangeableChildren
         typeaheadNavigationParameters
     });
     assertEmptyObject(void1);
-    return { ...gnr, ...scr, };
+    return {
+        rearrangeableChildrenReturn,
+        sortableChildrenReturn,
+        ...gnr
+    };
 }
 /**
  * Besides just overriding `focusSelf` for `useRovingTabIndex`, this also overrides `getSortValue` to return the sort value of the current cell.
  *
  * @compositeParams
  */
-export function useGridNavigationSingleSelectionSortableRow({ context: ctxIncoming, info: { index, unselectable, untabbable, ...void2 }, linearNavigationParameters, managedChildrenReturn, refElementReturn, rovingTabIndexParameters, textContentParameters, typeaheadNavigationParameters, ...void1 }) {
+export function useGridNavigationSingleSelectionSortableRow({ context: ctxIncoming, info: { index, unselectable, untabbable, ...void2 }, linearNavigationParameters, managedChildrenReturn, refElementReturn, rovingTabIndexParameters, textContentParameters, typeaheadNavigationParameters, gridNavigationSingleSelectionSortableRowParameters: { getSortableColumnIndex: getSortableColumnIndexUnstable, ...void5 }, ...void1 }) {
     monitorCallCount(useGridNavigationSingleSelectionSortableRow);
+    const getSortableColumnIndex = useStableCallback(getSortableColumnIndexUnstable);
     const getSortValue = useCallback(() => {
         let rows = managedChildrenReturn.getChildren();
-        let columnIndex = ctxIncoming.gridNavigationRowContext.getTabbableColumn() || 0;
+        let columnIndex = getSortableColumnIndex() || 0;
         let cell = rows.getAt(columnIndex);
         return cell?.getSortValue();
     }, []);
@@ -62,6 +68,7 @@ export function useGridNavigationSingleSelectionSortableRow({ context: ctxIncomi
     assertEmptyObject(void2);
     assertEmptyObject(void3);
     assertEmptyObject(void4);
+    assertEmptyObject(void5);
     return {
         info: { getLocallyTabbable, getSelected, selected, setLocallyTabbable, setLocalSelected, getSortValue, focusSelf },
         context: ctxOutgoing,

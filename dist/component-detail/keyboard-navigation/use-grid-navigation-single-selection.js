@@ -3,8 +3,8 @@ import { useStableCallback } from "../../preact-extensions/use-stable-callback.j
 import { useMemoObject } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
+import { useSingleSelection, useSingleSelectionChild } from "../use-single-selection.js";
 import { useGridNavigation, useGridNavigationCell, useGridNavigationRow } from "./use-grid-navigation-partial.js";
-import { useSingleSelection, useSingleSelectionChild } from "./use-single-selection.js";
 /**
  * List navigation gets single selection, so grid navigation does too.
  *
@@ -23,7 +23,7 @@ const _dummy = 0;
  *
  * @compositeParams
  */
-export function useGridNavigationSingleSelection({ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, managedChildrenReturn, typeaheadNavigationParameters, singleSelectionParameters, refElementReturn, paginatedChildrenParameters, ...void2 }) {
+export function useGridNavigationSingleSelection({ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, managedChildrenReturn, typeaheadNavigationParameters, singleSelectionParameters, refElementReturn, paginatedChildrenParameters, rearrangeableChildrenReturn, ...void2 }) {
     monitorCallCount(useGridNavigationSingleSelection);
     const { context: { gridNavigationRowContext, rovingTabIndexContext, typeaheadNavigationContext }, linearNavigationReturn, managedChildrenParameters, propsParent, propsStableParentOrChild, rovingTabIndexReturn, typeaheadNavigationReturn, } = useGridNavigation({
         gridNavigationParameters,
@@ -32,6 +32,7 @@ export function useGridNavigationSingleSelection({ gridNavigationParameters, lin
         rovingTabIndexParameters,
         typeaheadNavigationParameters,
         paginatedChildrenParameters,
+        rearrangeableChildrenReturn,
         refElementReturn
     });
     const { childrenHaveFocusParameters, context: { singleSelectionContext }, singleSelectionReturn, } = useSingleSelection({

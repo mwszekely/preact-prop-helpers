@@ -2,8 +2,8 @@ import { useStableCallback } from "../../preact-extensions/use-stable-callback.j
 import { useMemoObject } from "../../preact-extensions/use-stable-getter.js";
 import { assertEmptyObject } from "../../util/assert.js";
 import { monitorCallCount } from "../../util/use-call-count.js";
+import { useSingleSelection, useSingleSelectionChild } from "../use-single-selection.js";
 import { useListNavigation, useListNavigationChild } from "./use-list-navigation-partial.js";
-import { useSingleSelection, useSingleSelectionChild } from "./use-single-selection.js";
 /**
  * Combines {@link useListNavigation} and {@link useSingleSelection}.
  *
@@ -13,9 +13,9 @@ import { useSingleSelection, useSingleSelectionChild } from "./use-single-select
  *
  * @compositeParams
  */
-export function useListNavigationSingleSelection({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, managedChildrenReturn, refElementReturn, paginatedChildrenParameters, ...void3 }) {
+export function useListNavigationSingleSelection({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, managedChildrenReturn, refElementReturn, paginatedChildrenParameters, rearrangeableChildrenReturn, ...void3 }) {
     monitorCallCount(useListNavigationSingleSelection);
-    const { context: contextLN, propsParent, propsStableParentOrChild, rovingTabIndexReturn, ...retLN } = useListNavigation({ linearNavigationParameters, rovingTabIndexParameters, paginatedChildrenParameters, typeaheadNavigationParameters, managedChildrenReturn, refElementReturn });
+    const { context: contextLN, propsParent, propsStableParentOrChild, rovingTabIndexReturn, ...retLN } = useListNavigation({ linearNavigationParameters, rovingTabIndexParameters, paginatedChildrenParameters, typeaheadNavigationParameters, managedChildrenReturn, refElementReturn, rearrangeableChildrenReturn });
     const { context: contextSS, ...retSS } = useSingleSelection({ rovingTabIndexReturn, managedChildrenReturn, singleSelectionParameters });
     assertEmptyObject(void3);
     return {

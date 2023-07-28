@@ -1,6 +1,6 @@
-import { ManagedChildInfo, UseManagedChildrenReturnType } from "../../preact-extensions/use-managed-children.js";
-import { Nullable, TargetedPick } from "../../util/lib.js";
-import { VNode } from "../../util/types.js";
+import { ManagedChildInfo, UseManagedChildrenReturnType } from "../preact-extensions/use-managed-children.js";
+import { Nullable, TargetedPick } from "../util/lib.js";
+import { VNode } from "../util/types.js";
 export type GetIndex = (row: VNode) => (number | null | undefined);
 export type GetValid = (index: number) => boolean;
 export type GetHighestChildIndex = () => number;
