@@ -1,7 +1,8 @@
+import { UseAsyncHandlerParameters, UseAsyncHandlerReturnType } from "../dom-helpers/use-async-handler.js";
 import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
 import { OnPassiveStateChange } from "../preact-extensions/use-passive-state.js";
 import { TargetedPick } from "../util/lib.js";
-import { ElementProps, FocusEventType, KeyboardEventType, MouseEventType, Nullable, PointerEventType, TouchEventType } from "../util/types.js";
+import { ElementProps, FocusEventType, KeyboardEventType, MouseEventType, Nullable, OmitStrong, PointerEventType, TargetedOmit, TouchEventType } from "../util/types.js";
 export type PressEventReason<E extends EventTarget> = MouseEventType<E> | KeyboardEventType<E> | TouchEventType<E> | PointerEventType<E>;
 export type PressChangeEventReason<E extends EventTarget> = MouseEventType<E> | KeyboardEventType<E> | TouchEventType<E> | PointerEventType<E> | FocusEventType<E>;
 export interface UsePressParameters<E extends EventTarget> extends TargetedPick<UseRefElementReturnType<E>, "refElementReturn", "getElement"> {
@@ -91,6 +92,13 @@ export interface UsePressReturnType<E extends Element> {
  *
  */
 export declare function usePress<E extends Element>(args: UsePressParameters<E>): UsePressReturnType<E>;
+export interface UsePressAsyncParameters<E extends Element> extends OmitStrong<UsePressParameters<E>, "pressParameters">, TargetedOmit<UsePressParameters<E>, "pressParameters", "onPressSync"> {
+    asyncHandlerParameters: OmitStrong<UseAsyncHandlerParameters<PressEventReason<E>, void>, "capture">;
+}
+export interface UsePressAsyncReturnType<E extends Element> extends UsePressReturnType<E> {
+    asyncHandlerReturn: UseAsyncHandlerReturnType<PressEventReason<E>, void>;
+}
+export declare function usePressAsync<E extends Element>({ asyncHandlerParameters: { debounce, throttle, asyncHandler }, pressParameters, refElementReturn }: UsePressAsyncParameters<E>): UsePressAsyncReturnType<E>;
 /**
  * This function can be used to enable/disable button vibration pulses on an app-wide scale.
  *

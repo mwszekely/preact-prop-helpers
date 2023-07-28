@@ -328,7 +328,7 @@ export { useStaggeredChild, useStaggeredChildren } from "./component-detail/use-
 export { useCompleteGridNavigation, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow } from "./component-use/use-grid-navigation-complete.js";
 export { useCompleteListNavigation, useCompleteListNavigationChild, useCompleteListNavigationDeclarative } from "./component-use/use-list-navigation-complete.js";
 export { useModal } from "./component-use/use-modal.js";
-export { setPressVibrate, usePress } from "./component-use/use-press.js";
+export { setPressVibrate, usePress, usePressAsync } from "./component-use/use-press.js";
 export { useRandomDualIds } from "./component-use/use-random-dual-ids.js";
 export { useRandomId } from "./component-use/use-random-id.js";
 export { useAsyncHandler } from "./dom-helpers/use-async-handler.js";

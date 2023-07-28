@@ -1,4 +1,5 @@
 import { noop } from "lodash-es";
+import { useAsyncHandler } from "../dom-helpers/use-async-handler.js";
 import { returnFalse, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useState } from "../preact-extensions/use-state.js";
@@ -335,6 +336,15 @@ export function usePress(args) {
             [onfocusout]: onFocusOut,
             onClick
         },
+    };
+}
+export function usePressAsync({ asyncHandlerParameters: { debounce, throttle, asyncHandler }, pressParameters, refElementReturn }) {
+    const asyncHandlerReturn = useAsyncHandler({ asyncHandler, capture: noop, debounce, throttle });
+    const { pressReturn, props } = usePress({ pressParameters: { onPressSync: asyncHandlerReturn.syncHandler, ...pressParameters }, refElementReturn });
+    return {
+        asyncHandlerReturn,
+        pressReturn,
+        props
     };
 }
 /**

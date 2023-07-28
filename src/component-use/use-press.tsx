@@ -1,11 +1,12 @@
 import { noop } from "lodash-es";
+import { UseAsyncHandlerParameters, UseAsyncHandlerReturnType, useAsyncHandler } from "../dom-helpers/use-async-handler.js";
 import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
 import { OnPassiveStateChange, returnFalse, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useState } from "../preact-extensions/use-state.js";
 import { useTimeout } from "../timing/use-timeout.js";
 import { TargetedPick, onfocusout, useCallback } from "../util/lib.js";
-import { ElementProps, FocusEventType, KeyboardEventType, MouseEventType, Nullable, PointerEventType, TouchEventType } from "../util/types.js";
+import { ElementProps, FocusEventType, KeyboardEventType, MouseEventType, Nullable, OmitStrong, PointerEventType, TargetedOmit, TouchEventType } from "../util/types.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 
 export type PressEventReason<E extends EventTarget> = MouseEventType<E> | KeyboardEventType<E> | TouchEventType<E> | PointerEventType<E>;
@@ -462,7 +463,31 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
     };
 }
 
+export interface UsePressAsyncParameters<E extends Element> extends 
+OmitStrong<UsePressParameters<E>, "pressParameters">,
+TargetedOmit<UsePressParameters<E>, "pressParameters", "onPressSync">
+ {
+    asyncHandlerParameters: OmitStrong<UseAsyncHandlerParameters<PressEventReason<E>, void>, "capture">;
+}
 
+export interface UsePressAsyncReturnType<E extends Element> extends UsePressReturnType<E> {
+    asyncHandlerReturn: UseAsyncHandlerReturnType<PressEventReason<E>, void>;
+}
+
+export function usePressAsync<E extends Element>({
+    asyncHandlerParameters: { debounce, throttle, asyncHandler },
+    pressParameters,
+    refElementReturn
+}: UsePressAsyncParameters<E>): UsePressAsyncReturnType<E> {
+    const asyncHandlerReturn = useAsyncHandler<PressEventReason<E>, void>({ asyncHandler, capture: noop, debounce, throttle });
+    const { pressReturn, props } = usePress<E>({ pressParameters: { onPressSync: asyncHandlerReturn.syncHandler,  ...pressParameters }, refElementReturn });
+
+    return {
+        asyncHandlerReturn,
+        pressReturn,
+        props
+    }
+}
 
 
 /**

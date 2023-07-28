@@ -1028,6 +1028,289 @@ interface TryNavigateToIndexParameters {
     indexDemangler: (n: number) => number;
 }
 declare function tryNavigateToIndex({ isValid, highestChildIndex, lowestChildIndex, searchDirection, indexDemangler, indexMangler, targetDemangled }: TryNavigateToIndexParameters): LinearNavigationResult;
+type SyncFunctionType<SP extends unknown[], R> = (...args: SP) => (R | undefined);
+type AsyncFunctionType<AP extends unknown[], R> = ((...args: AP) => (R | Promise<R>));
+interface UseAsyncParameters<AP extends unknown[], SP extends unknown[] = AP> {
+    /**
+     * If provided, adds a debounce behavior *in addition* to
+     * the default "wait until resolved" throttling behavior.
+     */
+    debounce: Nullable<number>;
+    /**
+     * By default, `useAsync` will auto-throttle based on how long it takes
+     * for the operation to complete.  If you would like there to be a
+     * minimum amount of time to wait before allowing a second operation,
+     * the `throttle` parameter can be used in addition to that behavior.
+     *
+     * `throttle` *includes* the time it takes for the async operation to finish.
+     * If `throttle` is 500ms, and the async function finishes in 700ms, then
+     * another one will be run immediately. If it took 100ms, then we'd wait
+     * for the remaining 400ms until allowing a second run.
+     */
+    throttle: Nullable<number>;
+    /**
+     * When an async function is debounced due to one already running,
+     * it will run on a delay and, as a result, the original arguments
+     * that were passed to it may need to be adjusted to account for that.
+     *
+     * For example, during `onInput`, the `value` of that event isn't stored
+     * in the event itself, it's stored in the `HTMLInputElement` that raised it.
+     * So when our handler actually runs a few seconds later, it'll read the **next**
+     * `event.currentTarget.value`, instead of the one from a few seconds ago
+     * that actually raised the event!
+     *
+     * If the arguments to your handler require referencing data in the arguments
+     * that may become "stale" by the time the function actually runs (generally event
+     * handlers and other things that reference the properties of existing objects),
+     * the `capture` parameter allows you to transform the parameters you were given
+     * when the request to run was initially made into parameters that you have
+     * guaranteed will still be good by the time the handler actually runs.
+     *
+     * @nonstable
+     */
+    capture: Nullable<CaptureFunctionType<AP, SP>>;
+}
+interface UseAsyncReturnType<SP extends unknown[], R> {
+    /**
+     * When the async handler is currently executing, this is true.
+     * When it finishes, this becomes false.
+     */
+    pending: boolean;
+    /**
+     * True when we're waiting for a debounce or throttle to end (that's not due waiting for the async function to complete)
+     */
+    debouncingSync: boolean;
+    /**
+     * True when a second invocation of the handler has been called, and it's waiting until the first before it runs.
+     */
+    debouncingAsync: boolean;
+    /**
+     * The number of times the handler has run.
+     * Does not include times where it was throttled or debounced away.
+     *
+     * Useful for knowing if the handler has been called yet, or for
+     * setting a new timeout to show a spinner.
+     */
+    callCount: number;
+    /**
+     * The number of times the handler has settled
+     * (resolved or rejected), similarly to `callCount`.
+     *
+     * Useful for knowing if the handler has completed even once yet,
+     * or just for when the handler has finished
+     */
+    settleCount: number;
+    /**
+     * The number of times the handler has completed successfully,
+     * similarly to `settleCount`.
+     */
+    resolveCount: number;
+    /**
+     * The number of times the handler has failed to complete,
+     * similarly to `resolveCount`.
+     */
+    rejectCount: number;
+    /**
+     * Represents the value most recently returned from a successful handler invocation,
+     * or undefined if no handler has successfully returned yet.
+     *
+     * If the handler rejects after having succeeded previously, then
+     * `result` will still keep its value; it won't be "erased" due to the error.
+     * This means that `result` and `error` can both be populated at the same time.
+     *
+     * @see hasResult for if `result` being `undefined` means it's unfinished or the function itself returned `undefined`.
+     */
+    result: R | undefined;
+    /**
+     * True when the most recently-run handler completed successfully,
+     * also meaning that that it's returned a value that we currently have.
+     *
+     * While `pending` is true, **`hasResult` and `hasError` may be simultaneously true**,
+     * but in all other cases they're mutually exclusive.
+     */
+    hasResult: boolean;
+    /**
+     * The error the handler threw. `undefined` otherwise, though note
+     * that `undefined` is a valid thing to throw, so check `hasError` too.
+     *
+     * @see hasError
+     */
+    error: unknown;
+    /**
+     * Whether or not the most recent handler finished with an error.
+     *
+     * This is necessary because, technically, `error` can be `undefined`.
+     */
+    hasError: boolean;
+    /**
+     * What happened the last time the handler was called?
+     * * `"async"`: A `Promise` was returned, and we're about to `await` it.
+     * * `"sync"`: `undefined` was returned, so it finished immediately.
+     * * `"throw"`: An error was thrown, so it could have been either (more likely `"sync"`, though).
+     * * `null`: Nothing's happened yet.
+     */
+    invocationResult: "async" | "sync" | "throw" | null;
+    /**
+     * If you would like any currently debounced-but-eventually-pending promises to immediately be considered by cancelling their debounce timeout,
+     * you can call this function.  Normal procedure applies as if the debounced ended normally -- if there's no promise waiting in the queue,
+     * the debounced promise runs normally, otherwise, it waits its turn until the current one ends, potentially being overwritten later on
+     * if a new promise runs out *its* debounce timer before this one got a chance to run.
+     *
+     * **Quasi-stable** (don't use during render)
+     */
+    flushDebouncedPromise: () => void;
+    /**
+     * The transformed version of the async handler provided,
+     * now synchronous and/or throttled and/or debounced
+     *
+     * **Quasi-stable** (don't use during render)
+     */
+    syncHandler: SyncFunctionType<SP, void>;
+}
+/**
+ * Given an async function, returns a function that's suitable for non-async APIs,
+ * along with other information about the current run's status.
+ *
+ * @see {@link useAsyncHandler} for a version that's specialized for DOM event handlers.
+ *
+ * @remarks When called multiple times in quick succession, (i.e. before the handler has finished),
+ * this works like Lodash's `throttle` function with the `wait` option always
+ * set to however long the handler takes to complete. A second call to the sync function will be
+ * throttled until the first call has finished. The return value of the function is the result
+ * of the previous invocation, or `undefined` on the first call.
+ *
+ * The handler is only ever delayed if one is currently running, so, e.g. for iOS touch events the
+ * first call happens in the same event handler (which means things like calls to `element.focus()`
+ * will work as intended, since that fails when the event is "split up")
+ *
+ * Finally, because the sync handler may be invoked on a delay, any property references on the arguments
+ * provided might be stale by the time it's actually invoked (e.g. accessing `event.currentTarget.checked`
+ * is not stable across time because it's a "live" value -- you almost always want the value that it
+ * had at the original time the handler was called). The `capture` option allows you to save that kind of
+ * dynamic data at the time it runs; the `AP` and `SP` type parameters likewise control
+ * the parameters the async handler and sync handler expect respectively.
+ *
+ * {@include } {@link UseAsyncParameters}
+ *
+ * @param asyncHandler - The async function to make sync
+ * @param options - @see {@link UseAsyncParameters}
+ *
+ */
+declare function useAsync<AP extends unknown[], R, SP extends unknown[] = AP>(asyncHandler: Nullable<AsyncFunctionType<AP, R>>, options?: UseAsyncParameters<AP, SP>): UseAsyncReturnType<SP, R>;
+type AsyncHandler<EventType, CaptureType> = ((c: CaptureType, e: EventType) => (Promise<void> | void));
+interface UseAsyncHandlerParameters<EventType, CaptureType> extends OmitStrong<UseAsyncParameters<[
+    CaptureType,
+    EventType
+], [
+    EventType
+]>, "capture"> {
+    /**
+     * What transient information is captured by this event
+     * and presented as the first argument of the event handler?
+     *
+     * The "capture" parameter answers this question. To implement a checkbox, for example, return `target.checked`.
+     *
+     * @nonstable
+     */
+    capture: (event: EventType) => CaptureType;
+    /**
+     * The function (either async or sync) that you want to convert to a regular, sync event handler.
+     */
+    asyncHandler: Nullable<AsyncHandler<EventType, CaptureType>>;
+}
+interface UseAsyncHandlerReturnType<EventType, CaptureType> extends UseAsyncReturnType<[
+    EventType
+], void> {
+    /**
+     * The most recently captured value. In other words, represents what
+     * the current value would be if this operation were synchronous and
+     * and couldn't fail. It's useful to pretend this is the actual value
+     * for an input field, for example, so that the value doesn't "snap
+     * back" while you're waiting for the handler to finish.
+     *
+     * Something like `value={pending? currentCapture : value}` is good for checkboxes,
+     * something like `value={(pending || hasFocus)? currentCapture : value\}` for text fields.
+     *
+     * @see hasCapture
+     */
+    currentCapture: CaptureType | undefined;
+    /**
+     * The above, but stable, if you need the current capture without it being an explicit dependency.
+     * @stable
+     */
+    getCurrentCapture(): (CaptureType | undefined);
+    /**
+     * Because you're allowed to have `CaptureType` extend `undefined`,
+     * you might need this.
+     */
+    hasCapture: boolean;
+}
+/**
+ * Given an asynchronous event handler, returns a synchronous one that works on the DOM,
+ * along with some other information related to the current state.
+ * Does not modify any props.
+ *
+ * @remarks Note that because the handler you provide may be called with a delay, and
+ * because the `value` of, e.g., an `<input>` element will likely have changed by the
+ * time the delay is over, a `capture` function is necessary in order to
+ * save the relevant information from the DOM at call-time. Any other simple event data,
+ * like `mouseX` or `shiftKey` can stay on the event itself and don't
+ * need to be captured &ndash; it's never stale.
+ *
+ * The handler is automatically throttled to only run one at a time.
+ * If the handler is called, and then before it finishes, is called again,
+ * it will be put on hold until the current one finishes, at which point
+ * the second one will run.  If the handler is called a third time before
+ * the first has finished, it will *replace* the second, so only the most
+ * recently called iteration of the handler will run.
+ *
+ *
+ * You may optionally *also* specify debounce and throttle parameters that wait until the
+ * synchronous handler has not been called for the specified number of
+ * milliseconds, at which point we *actually* run the asynchronous handler
+ * according to the logic in the previous paragraph. This is in
+ * *addition* to throttling the handler, and does not replace that behavior.
+ *
+ *
+ * @example
+ * General use
+ * ```tsx
+ * const asyncHandler = async (value: number, e: Event) => {
+ *     [...] // Ex. send to a server and setState when done
+ * };
+ * const {
+ *     // A sync version of asyncHandler
+ *     syncHandler,
+ *     // True while the handler is running
+ *     pending,
+ *     // The error thrown, if any
+ *     error,
+ *     // Show this value while the operation's pending
+ *     currentCapture,
+ *     // And others, see `UseAsyncHandlerReturnType`
+ *     ...rest
+ * } = useAsyncHandler<HTMLInputElement>()({
+ *     asyncHandler,
+ *     // Pass in the capture function that saves event data
+ *     // from being stale.
+ *     capture: e => {
+ *         // `capture` can have side-effects because
+ *         // it's called exactly once per invocation
+ *         e.preventDefault();
+ *
+ *         // Save this value so that it's never stale
+ *         return e.currentTarget.valueAsNumber;
+ *     }
+ * });
+ *
+ * const onInput = pending? null : syncHandler;
+ * ```
+ *
+ * {@include } {@link UseAsyncHandlerParameters}
+ *
+ * @see useAsync A more general version of this hook that can work with any type of handler, not just DOM event handlers.
+ */
+declare function useAsyncHandler<EventType, CaptureType>({ asyncHandler, capture: originalCapture, ...restAsyncOptions }: UseAsyncHandlerParameters<EventType, CaptureType>): UseAsyncHandlerReturnType<EventType, CaptureType>;
 type PressEventReason<E extends EventTarget> = MouseEventType<E> | KeyboardEventType<E> | TouchEventType<E> | PointerEventType<E>;
 type PressChangeEventReason<E extends EventTarget> = MouseEventType<E> | KeyboardEventType<E> | TouchEventType<E> | PointerEventType<E> | FocusEventType<E>;
 interface UsePressParameters<E extends EventTarget> extends TargetedPick<UseRefElementReturnType<E>, "refElementReturn", "getElement"> {
@@ -1117,6 +1400,13 @@ interface UsePressReturnType<E extends Element> {
  *
  */
 declare function usePress<E extends Element>(args: UsePressParameters<E>): UsePressReturnType<E>;
+interface UsePressAsyncParameters<E extends Element> extends OmitStrong<UsePressParameters<E>, "pressParameters">, TargetedOmit<UsePressParameters<E>, "pressParameters", "onPressSync"> {
+    asyncHandlerParameters: OmitStrong<UseAsyncHandlerParameters<PressEventReason<E>, void>, "capture">;
+}
+interface UsePressAsyncReturnType<E extends Element> extends UsePressReturnType<E> {
+    asyncHandlerReturn: UseAsyncHandlerReturnType<PressEventReason<E>, void>;
+}
+declare function usePressAsync<E extends Element>({ asyncHandlerParameters: { debounce, throttle, asyncHandler }, pressParameters, refElementReturn }: UsePressAsyncParameters<E>): UsePressAsyncReturnType<E>;
 /**
  * This function can be used to enable/disable button vibration pulses on an app-wide scale.
  *
@@ -2293,289 +2583,6 @@ interface UseRandomDualIdsReturnType<InputElement extends Element, LabelElement 
  * @compositeParams
  */
 declare function useRandomDualIds<InputElement extends Element, LabelElement extends Element>({ randomIdInputParameters, randomIdLabelParameters }: UseRandomDualIdsParameters): UseRandomDualIdsReturnType<InputElement, LabelElement>;
-type SyncFunctionType<SP extends unknown[], R> = (...args: SP) => (R | undefined);
-type AsyncFunctionType<AP extends unknown[], R> = ((...args: AP) => (R | Promise<R>));
-interface UseAsyncParameters<AP extends unknown[], SP extends unknown[] = AP> {
-    /**
-     * If provided, adds a debounce behavior *in addition* to
-     * the default "wait until resolved" throttling behavior.
-     */
-    debounce: Nullable<number>;
-    /**
-     * By default, `useAsync` will auto-throttle based on how long it takes
-     * for the operation to complete.  If you would like there to be a
-     * minimum amount of time to wait before allowing a second operation,
-     * the `throttle` parameter can be used in addition to that behavior.
-     *
-     * `throttle` *includes* the time it takes for the async operation to finish.
-     * If `throttle` is 500ms, and the async function finishes in 700ms, then
-     * another one will be run immediately. If it took 100ms, then we'd wait
-     * for the remaining 400ms until allowing a second run.
-     */
-    throttle: Nullable<number>;
-    /**
-     * When an async function is debounced due to one already running,
-     * it will run on a delay and, as a result, the original arguments
-     * that were passed to it may need to be adjusted to account for that.
-     *
-     * For example, during `onInput`, the `value` of that event isn't stored
-     * in the event itself, it's stored in the `HTMLInputElement` that raised it.
-     * So when our handler actually runs a few seconds later, it'll read the **next**
-     * `event.currentTarget.value`, instead of the one from a few seconds ago
-     * that actually raised the event!
-     *
-     * If the arguments to your handler require referencing data in the arguments
-     * that may become "stale" by the time the function actually runs (generally event
-     * handlers and other things that reference the properties of existing objects),
-     * the `capture` parameter allows you to transform the parameters you were given
-     * when the request to run was initially made into parameters that you have
-     * guaranteed will still be good by the time the handler actually runs.
-     *
-     * @nonstable
-     */
-    capture: Nullable<CaptureFunctionType<AP, SP>>;
-}
-interface UseAsyncReturnType<SP extends unknown[], R> {
-    /**
-     * When the async handler is currently executing, this is true.
-     * When it finishes, this becomes false.
-     */
-    pending: boolean;
-    /**
-     * True when we're waiting for a debounce or throttle to end (that's not due waiting for the async function to complete)
-     */
-    debouncingSync: boolean;
-    /**
-     * True when a second invocation of the handler has been called, and it's waiting until the first before it runs.
-     */
-    debouncingAsync: boolean;
-    /**
-     * The number of times the handler has run.
-     * Does not include times where it was throttled or debounced away.
-     *
-     * Useful for knowing if the handler has been called yet, or for
-     * setting a new timeout to show a spinner.
-     */
-    callCount: number;
-    /**
-     * The number of times the handler has settled
-     * (resolved or rejected), similarly to `callCount`.
-     *
-     * Useful for knowing if the handler has completed even once yet,
-     * or just for when the handler has finished
-     */
-    settleCount: number;
-    /**
-     * The number of times the handler has completed successfully,
-     * similarly to `settleCount`.
-     */
-    resolveCount: number;
-    /**
-     * The number of times the handler has failed to complete,
-     * similarly to `resolveCount`.
-     */
-    rejectCount: number;
-    /**
-     * Represents the value most recently returned from a successful handler invocation,
-     * or undefined if no handler has successfully returned yet.
-     *
-     * If the handler rejects after having succeeded previously, then
-     * `result` will still keep its value; it won't be "erased" due to the error.
-     * This means that `result` and `error` can both be populated at the same time.
-     *
-     * @see hasResult for if `result` being `undefined` means it's unfinished or the function itself returned `undefined`.
-     */
-    result: R | undefined;
-    /**
-     * True when the most recently-run handler completed successfully,
-     * also meaning that that it's returned a value that we currently have.
-     *
-     * While `pending` is true, **`hasResult` and `hasError` may be simultaneously true**,
-     * but in all other cases they're mutually exclusive.
-     */
-    hasResult: boolean;
-    /**
-     * The error the handler threw. `undefined` otherwise, though note
-     * that `undefined` is a valid thing to throw, so check `hasError` too.
-     *
-     * @see hasError
-     */
-    error: unknown;
-    /**
-     * Whether or not the most recent handler finished with an error.
-     *
-     * This is necessary because, technically, `error` can be `undefined`.
-     */
-    hasError: boolean;
-    /**
-     * What happened the last time the handler was called?
-     * * `"async"`: A `Promise` was returned, and we're about to `await` it.
-     * * `"sync"`: `undefined` was returned, so it finished immediately.
-     * * `"throw"`: An error was thrown, so it could have been either (more likely `"sync"`, though).
-     * * `null`: Nothing's happened yet.
-     */
-    invocationResult: "async" | "sync" | "throw" | null;
-    /**
-     * If you would like any currently debounced-but-eventually-pending promises to immediately be considered by cancelling their debounce timeout,
-     * you can call this function.  Normal procedure applies as if the debounced ended normally -- if there's no promise waiting in the queue,
-     * the debounced promise runs normally, otherwise, it waits its turn until the current one ends, potentially being overwritten later on
-     * if a new promise runs out *its* debounce timer before this one got a chance to run.
-     *
-     * **Quasi-stable** (don't use during render)
-     */
-    flushDebouncedPromise: () => void;
-    /**
-     * The transformed version of the async handler provided,
-     * now synchronous and/or throttled and/or debounced
-     *
-     * **Quasi-stable** (don't use during render)
-     */
-    syncHandler: SyncFunctionType<SP, void>;
-}
-/**
- * Given an async function, returns a function that's suitable for non-async APIs,
- * along with other information about the current run's status.
- *
- * @see {@link useAsyncHandler} for a version that's specialized for DOM event handlers.
- *
- * @remarks When called multiple times in quick succession, (i.e. before the handler has finished),
- * this works like Lodash's `throttle` function with the `wait` option always
- * set to however long the handler takes to complete. A second call to the sync function will be
- * throttled until the first call has finished. The return value of the function is the result
- * of the previous invocation, or `undefined` on the first call.
- *
- * The handler is only ever delayed if one is currently running, so, e.g. for iOS touch events the
- * first call happens in the same event handler (which means things like calls to `element.focus()`
- * will work as intended, since that fails when the event is "split up")
- *
- * Finally, because the sync handler may be invoked on a delay, any property references on the arguments
- * provided might be stale by the time it's actually invoked (e.g. accessing `event.currentTarget.checked`
- * is not stable across time because it's a "live" value -- you almost always want the value that it
- * had at the original time the handler was called). The `capture` option allows you to save that kind of
- * dynamic data at the time it runs; the `AP` and `SP` type parameters likewise control
- * the parameters the async handler and sync handler expect respectively.
- *
- * {@include } {@link UseAsyncParameters}
- *
- * @param asyncHandler - The async function to make sync
- * @param options - @see {@link UseAsyncParameters}
- *
- */
-declare function useAsync<AP extends unknown[], R, SP extends unknown[] = AP>(asyncHandler: Nullable<AsyncFunctionType<AP, R>>, options?: UseAsyncParameters<AP, SP>): UseAsyncReturnType<SP, R>;
-type AsyncHandler<EventType, CaptureType> = ((c: CaptureType, e: EventType) => (Promise<void> | void));
-interface UseAsyncHandlerParameters<EventType, CaptureType> extends OmitStrong<UseAsyncParameters<[
-    CaptureType,
-    EventType
-], [
-    EventType
-]>, "capture"> {
-    /**
-     * What transient information is captured by this event
-     * and presented as the first argument of the event handler?
-     *
-     * The "capture" parameter answers this question. To implement a checkbox, for example, return `target.checked`.
-     *
-     * @nonstable
-     */
-    capture: (event: EventType) => CaptureType;
-    /**
-     * The function (either async or sync) that you want to convert to a regular, sync event handler.
-     */
-    asyncHandler: Nullable<AsyncHandler<EventType, CaptureType>>;
-}
-interface UseAsyncHandlerReturnType<EventType, CaptureType> extends UseAsyncReturnType<[
-    EventType
-], void> {
-    /**
-     * The most recently captured value. In other words, represents what
-     * the current value would be if this operation were synchronous and
-     * and couldn't fail. It's useful to pretend this is the actual value
-     * for an input field, for example, so that the value doesn't "snap
-     * back" while you're waiting for the handler to finish.
-     *
-     * Something like `value={pending? currentCapture : value}` is good for checkboxes,
-     * something like `value={(pending || hasFocus)? currentCapture : value\}` for text fields.
-     *
-     * @see hasCapture
-     */
-    currentCapture: CaptureType | undefined;
-    /**
-     * The above, but stable, if you need the current capture without it being an explicit dependency.
-     * @stable
-     */
-    getCurrentCapture(): (CaptureType | undefined);
-    /**
-     * Because you're allowed to have `CaptureType` extend `undefined`,
-     * you might need this.
-     */
-    hasCapture: boolean;
-}
-/**
- * Given an asynchronous event handler, returns a synchronous one that works on the DOM,
- * along with some other information related to the current state.
- * Does not modify any props.
- *
- * @remarks Note that because the handler you provide may be called with a delay, and
- * because the `value` of, e.g., an `<input>` element will likely have changed by the
- * time the delay is over, a `capture` function is necessary in order to
- * save the relevant information from the DOM at call-time. Any other simple event data,
- * like `mouseX` or `shiftKey` can stay on the event itself and don't
- * need to be captured &ndash; it's never stale.
- *
- * The handler is automatically throttled to only run one at a time.
- * If the handler is called, and then before it finishes, is called again,
- * it will be put on hold until the current one finishes, at which point
- * the second one will run.  If the handler is called a third time before
- * the first has finished, it will *replace* the second, so only the most
- * recently called iteration of the handler will run.
- *
- *
- * You may optionally *also* specify debounce and throttle parameters that wait until the
- * synchronous handler has not been called for the specified number of
- * milliseconds, at which point we *actually* run the asynchronous handler
- * according to the logic in the previous paragraph. This is in
- * *addition* to throttling the handler, and does not replace that behavior.
- *
- *
- * @example
- * General use
- * ```tsx
- * const asyncHandler = async (value: number, e: Event) => {
- *     [...] // Ex. send to a server and setState when done
- * };
- * const {
- *     // A sync version of asyncHandler
- *     syncHandler,
- *     // True while the handler is running
- *     pending,
- *     // The error thrown, if any
- *     error,
- *     // Show this value while the operation's pending
- *     currentCapture,
- *     // And others, see `UseAsyncHandlerReturnType`
- *     ...rest
- * } = useAsyncHandler<HTMLInputElement>()({
- *     asyncHandler,
- *     // Pass in the capture function that saves event data
- *     // from being stale.
- *     capture: e => {
- *         // `capture` can have side-effects because
- *         // it's called exactly once per invocation
- *         e.preventDefault();
- *
- *         // Save this value so that it's never stale
- *         return e.currentTarget.valueAsNumber;
- *     }
- * });
- *
- * const onInput = pending? null : syncHandler;
- * ```
- *
- * {@include } {@link UseAsyncHandlerParameters}
- *
- * @see useAsync A more general version of this hook that can work with any type of handler, not just DOM event handlers.
- */
-declare function useAsyncHandler<EventType, CaptureType>({ asyncHandler, capture: originalCapture, ...restAsyncOptions }: UseAsyncHandlerParameters<EventType, CaptureType>): UseAsyncHandlerReturnType<EventType, CaptureType>;
 declare function getDocument(element?: Node): Document;
 type P = Parameters<typeof clsx>;
 /**
@@ -3863,7 +3870,7 @@ declare function hideCallCount(hook: Function | "all"): void;
  *
  * @packageDocumentation
  */
-export { UseBackdropDismissParameters, UseBackdropDismissParametersSelf, useBackdropDismiss, UseEscapeDismissParameters, UseEscapeDismissParametersSelf, useEscapeDismiss, UseLostFocusDismissParameters, UseLostFocusDismissParametersSelf, UseLostFocusDismissReturnType, useLostFocusDismiss, GridChildCellInfo, GridChildRowInfo, TabbableColumnInfo, UseGridNavigationCellContext, UseGridNavigationCellContextSelf, UseGridNavigationCellInfoKeysParameters, UseGridNavigationCellInfoKeysReturnType, UseGridNavigationCellParameters, UseGridNavigationCellParametersSelf, UseGridNavigationCellReturnType, UseGridNavigationParameters, UseGridNavigationParametersSelf, UseGridNavigationReturnType, UseGridNavigationRowContext, UseGridNavigationRowContextSelf, UseGridNavigationRowInfoKeysParameters, UseGridNavigationRowInfoKeysReturnType, UseGridNavigationRowParameters, UseGridNavigationRowReturnType, useGridNavigation, useGridNavigationCell, useGridNavigationRow, GridSingleSelectSortableChildCellInfo, GridSingleSelectSortableChildRowInfo, UseGridNavigationCellSingleSelectionSortableContext, UseGridNavigationRowSingleSelectionSortableContext, UseGridNavigationSingleSelectionSortableCellInfoKeysParameters, UseGridNavigationSingleSelectionSortableCellInfoKeysReturnType, UseGridNavigationSingleSelectionSortableCellParameters, UseGridNavigationSingleSelectionSortableCellReturnType, UseGridNavigationSingleSelectionSortableParameters, UseGridNavigationSingleSelectionSortableReturnType, UseGridNavigationSingleSelectionSortableRowInfoKeysParameters, UseGridNavigationSingleSelectionSortableRowInfoKeysReturnType, UseGridNavigationSingleSelectionSortableRowParameters, UseGridNavigationSingleSelectionSortableRowReturnType, useGridNavigationSingleSelectionSortable, useGridNavigationSingleSelectionSortableCell, useGridNavigationSingleSelectionSortableRow, GridSingleSelectChildCellInfo, GridSingleSelectChildRowInfo, UseGridNavigationCellSingleSelectionContext, UseGridNavigationRowSingleSelectionContext, UseGridNavigationSingleSelectionCellInfoKeysParameters, UseGridNavigationSingleSelectionCellInfoKeysReturnType, UseGridNavigationSingleSelectionCellParameters, UseGridNavigationSingleSelectionCellReturnType, UseGridNavigationSingleSelectionParameters, UseGridNavigationSingleSelectionReturnType, UseGridNavigationSingleSelectionRowInfoKeysParameters, UseGridNavigationSingleSelectionRowInfoKeysReturnType, UseGridNavigationSingleSelectionRowParameters, UseGridNavigationSingleSelectionRowReturnType, useGridNavigationSingleSelection, useGridNavigationSingleSelectionCell, useGridNavigationSingleSelectionRow, LinearNavigationResult, TryNavigateToIndexParameters, UseLinearNavigationParameters, UseLinearNavigationParametersSelf, UseLinearNavigationReturnType, UseLinearNavigationReturnTypeSelf, identity, tryNavigateToIndex, useLinearNavigation, UseListNavigationChildInfo, UseListNavigationChildInfoKeysParameters, UseListNavigationChildInfoKeysReturnType, UseListNavigationChildParameters, UseListNavigationChildReturnType, UseListNavigationContext, UseListNavigationParameters, UseListNavigationReturnType, useListNavigation, useListNavigationChild, UseListNavigationSingleSelectionSortableChildContext, UseListNavigationSingleSelectionSortableChildInfo, UseListNavigationSingleSelectionSortableChildInfoKeysParameters, UseListNavigationSingleSelectionSortableChildInfoKeysReturnType, UseListNavigationSingleSelectionSortableChildParameters, UseListNavigationSingleSelectionSortableChildReturnType, UseListNavigationSingleSelectionSortableParameters, UseListNavigationSingleSelectionSortableReturnType, useListNavigationSingleSelectionSortable, useListNavigationSingleSelectionSortableChild, UseListNavigationSingleSelectionChildContext, UseListNavigationSingleSelectionChildInfo, UseListNavigationSingleSelectionChildInfoKeysParameters, UseListNavigationSingleSelectionChildInfoKeysReturnType, UseListNavigationSingleSelectionChildParameters, UseListNavigationSingleSelectionChildReturnType, UseListNavigationSingleSelectionParameters, UseListNavigationSingleSelectionReturnType, useListNavigationSingleSelection, useListNavigationSingleSelectionChild, OnTabbableIndexChange, RovingTabIndexChildContext, RovingTabIndexChildContextSelf, SetTabbableIndex, UseRovingTabIndexChildInfo, UseRovingTabIndexChildInfoKeysParameters, UseRovingTabIndexChildInfoKeysReturnType, UseRovingTabIndexChildParameters, UseRovingTabIndexChildReturnType, UseRovingTabIndexChildReturnTypeSelf, UseRovingTabIndexParameters, UseRovingTabIndexParametersSelf, UseRovingTabIndexReturnType, UseRovingTabIndexReturnTypeSelf, useRovingTabIndex, useRovingTabIndexChild, MakeSingleSelectionDeclarativeParameters, MakeSingleSelectionDeclarativeReturnType, SelectedIndexChangeEvent, SelectedIndexChangeHandler, SingleSelectionContextSelf, UseSingleSelectionChildInfo, UseSingleSelectionChildInfoKeysParameters, UseSingleSelectionChildInfoKeysReturnType, UseSingleSelectionChildParameters, UseSingleSelectionChildReturnType, UseSingleSelectionChildReturnTypeSelf, UseSingleSelectionContext, UseSingleSelectionDeclarativeParameters, UseSingleSelectionDeclarativeParametersSelf, UseSingleSelectionParameters, UseSingleSelectionParametersSelf, UseSingleSelectionReturnType, UseSingleSelectionReturnTypeSelf, useSingleSelection, useSingleSelectionChild, useSingleSelectionDeclarative, Compare, GetHighestChildIndex, GetIndex, GetValid, UseRearrangeableChildInfo, UseRearrangeableChildrenParameters, UseRearrangeableChildrenParametersSelf, UseRearrangeableChildrenReturnType, UseRearrangeableChildrenReturnTypeSelf, UseSortableChildInfo, UseSortableChildrenParameters, UseSortableChildrenParametersSelf, UseSortableChildrenReturnType, UseSortableChildrenReturnTypeSelf, defaultCompare, useRearrangeableChildren, useSortableChildren, UseTypeaheadNavigationChildInfo, UseTypeaheadNavigationChildInfoKeysParameters, UseTypeaheadNavigationChildInfoKeysReturnType, UseTypeaheadNavigationChildParameters, UseTypeaheadNavigationChildReturnType, UseTypeaheadNavigationContext, UseTypeaheadNavigationContextSelf, UseTypeaheadNavigationParameters, UseTypeaheadNavigationParametersSelf, UseTypeaheadNavigationReturnType, UseTypeaheadNavigationReturnTypeSelf, binarySearch, useTypeaheadNavigation, useTypeaheadNavigationChild, DismissListenerTypes, UseDismissParameters, UseDismissParametersSelf, UseDismissReturnType, useDismiss, UseFocusTrapParameters, UseFocusTrapParametersSelf, UseFocusTrapReturnType, findFirstFocusable, findFirstTabbable, useFocusTrap, UsePaginatedChildContext, UsePaginatedChildContextSelf, UsePaginatedChildParameters, UsePaginatedChildReturnType, UsePaginatedChildReturnTypeSelf, UsePaginatedChildrenInfo, UsePaginatedChildrenParameters, UsePaginatedChildrenParametersSelf, UsePaginatedChildrenReturnType, UsePaginatedChildrenReturnTypeSelf, usePaginatedChild, usePaginatedChildren, UseStaggeredChildContext, UseStaggeredChildContextSelf, UseStaggeredChildParameters, UseStaggeredChildReturnType, UseStaggeredChildReturnTypeSelf, UseStaggeredChildrenInfo, UseStaggeredChildrenParameters, UseStaggeredChildrenParametersSelf, UseStaggeredChildrenReturnType, UseStaggeredChildrenReturnTypeSelf, useStaggeredChild, useStaggeredChildren, CompleteGridNavigationCellContext, CompleteGridNavigationRowContext, UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationCellInfoKeysParameters, UseCompleteGridNavigationCellParameters, UseCompleteGridNavigationCellReturnType, UseCompleteGridNavigationDeclarativeParameters, UseCompleteGridNavigationDeclarativeReturnType, UseCompleteGridNavigationParameters, UseCompleteGridNavigationReturnType, UseCompleteGridNavigationRowInfo, UseCompleteGridNavigationRowInfoKeysParameters, UseCompleteGridNavigationRowParameters, UseCompleteGridNavigationRowReturnType, useCompleteGridNavigation, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, CompleteListNavigationContext, UseCompleteListNavigationChildInfo, UseCompleteListNavigationChildInfoKeysParameters, UseCompleteListNavigationChildParameters, UseCompleteListNavigationChildReturnType, UseCompleteListNavigationDeclarativeParameters, UseCompleteListNavigationDeclarativeReturnType, UseCompleteListNavigationParameters, UseCompleteListNavigationReturnType, useCompleteListNavigation, useCompleteListNavigationChild, useCompleteListNavigationDeclarative, UseModalParameters, UseModalParametersSelf, UseModalReturnType, useModal, PressChangeEventReason, PressEventReason, UsePressParameters, UsePressParametersSelf, UsePressReturnType, UsePressReturnTypeSelf, setPressVibrate, usePress, UseRandomDualIdsParameters, UseRandomDualIdsReturnType, useRandomDualIds, UseRandomIdParameters, UseRandomIdParametersSelf, UseRandomIdReturnType, UseRandomIdReturnTypeSelf, useRandomId, AsyncHandler, UseAsyncHandlerParameters, UseAsyncHandlerReturnType, useAsyncHandler, UseBlockingElementParameters, UseBlockingElementParametersSelf, getTopElement, useBlockingElement, getDocument, useDocumentClass, UseDraggableParameters, UseDraggableReturnType, useDraggable, DropFile, DropFileMetadata, DroppableFileError, UseDroppableParameters, UseDroppableReturnType, useDroppable, useGlobalHandler, useHideScroll, DangerouslyAppendHTML, DangerouslySetInnerHTML, GetAttribute, HasClass, ImperativeElement, SetAttribute, SetChildren, SetClass, SetEventHandler, SetStyle, UseImperativePropsParameters, UseImperativePropsReturnType, UseImperativePropsReturnTypeSelf, useImperativeProps, useMergedChildren, useMergedClasses, enableLoggingPropConflicts, mergeFunctions, useMergedProps, useMergedRefs, useMergedStyles, PortalChildUpdater, PushPortalChild, RemovePortalChild, UpdatePortalChild, UsePortalChildrenParameters, UsePortalChildrenReturnType, usePortalChildren, UseRefElementParameters, UseRefElementParametersSelf, UseRefElementReturnType, UseRefElementReturnTypeSelf, useRefElement, UseTextContentParameters, UseTextContentParametersSelf, UseTextContentReturnType, UseTextContentReturnTypeSelf, useTextContent, UseActiveElementParameters, UseActiveElementParametersSelf, UseActiveElementReturnType, UseActiveElementReturnTypeSelf, useActiveElement, UseChildrenHaveFocusChildParameters, UseChildrenHaveFocusChildReturnType, UseChildrenHaveFocusContext, UseChildrenHaveFocusParameters, UseChildrenHaveFocusParametersSelf, UseChildrenHaveFocusReturnType, UseChildrenHaveFocusReturnTypeSelf, useChildrenHaveFocus, useChildrenHaveFocusChild, ElementSize, UseElementSizeParameters, UseElementSizeParametersSelf, UseElementSizeReturnType, UseElementSizeReturnTypeSelf, useElementSize, UseHasCurrentFocusParameters, UseHasCurrentFocusParametersSelf, UseHasCurrentFocusReturnType, UseHasCurrentFocusReturnTypeSelf, useHasCurrentFocus, HasLastFocusReturnTypeSelf, UseHasLastFocusParameters, UseHasLastFocusParametersSelf, UseHasLastFocusReturnType, useHasLastFocus, LogicalDirectionInfo, LogicalElementSize, LogicalOrientation, PhysicalDirection, PhysicalOrientation, PhysicalSize, UseLogicalDirectionParameters, UseLogicalDirectionReturnType, useLogicalDirection, UseMediaQueryReturnType, useMediaQuery, UseMutationObserverParameters, UseMutationObserverParametersSelf, UseMutationObserverReturnType, useMutationObserver, useUrl, useAsyncEffect, UseAsyncParameters, UseAsyncReturnType, useAsync, useEffectDebug, useForceUpdate, useLayoutEffectDebug, ManagedChildInfo, ManagedChildren, OnAfterChildLayoutEffect, OnChildrenMountChange, UseChildrenFlagParameters, UseChildrenFlagReturnType, UseGenericChildParameters, UseManagedChildParameters, UseManagedChildReturnType, UseManagedChildReturnTypeSelf, UseManagedChildrenContext, UseManagedChildrenContextSelf, UseManagedChildrenParameters, UseManagedChildrenParametersSelf, UseManagedChildrenReturnType, UseManagedChildrenReturnTypeSelf, useChildrenFlag, useManagedChild, useManagedChildren, OnPassiveStateChange, PassiveStateUpdater, returnFalse, returnNull, returnTrue, returnUndefined, returnZero, runImmediately, useEnsureStability, usePassiveState, PersistentStates, getFromLocalStorage, storeToLocalStorage, usePersistentState, OnParamValueChanged, SearchParamStates, SetParamWithHistory, UseSearchParamStateParameters, useSearchParamState, useSearchParamStateDeclarative, useStableCallback, useMemoObject, useStableGetter, useState, useWhatCausedRender, ProvideBatchedAnimationFrames, UseAnimationFrameParameters, useAnimationFrame, UseIntervalParameters, useInterval, UseTimeoutParameters, useTimeout, assertEmptyObject, EnhancedEventHandler, EventDetail, TargetedEnhancedEvent, enhanceEvent, getEventDetail, findBackupFocus, focus, BuildMode, generateRandomId, generateStack, useStack, hideCallCount, monitorCallCount, CSSProperties, CompositionEventType, DragEventType, ElementProps, EventMapping$0 as EventMapping, EventType, ExtendMerge, FocusEventType, KeyboardEventType, MouseEventType, Nullable, OmitStrong, PointerEventType, TargetedOmit, TargetedPick, TouchEventType, VNode, debounceRendering, onfocusin, onfocusout, useBeforeLayoutEffect };
+export { UseBackdropDismissParameters, UseBackdropDismissParametersSelf, useBackdropDismiss, UseEscapeDismissParameters, UseEscapeDismissParametersSelf, useEscapeDismiss, UseLostFocusDismissParameters, UseLostFocusDismissParametersSelf, UseLostFocusDismissReturnType, useLostFocusDismiss, GridChildCellInfo, GridChildRowInfo, TabbableColumnInfo, UseGridNavigationCellContext, UseGridNavigationCellContextSelf, UseGridNavigationCellInfoKeysParameters, UseGridNavigationCellInfoKeysReturnType, UseGridNavigationCellParameters, UseGridNavigationCellParametersSelf, UseGridNavigationCellReturnType, UseGridNavigationParameters, UseGridNavigationParametersSelf, UseGridNavigationReturnType, UseGridNavigationRowContext, UseGridNavigationRowContextSelf, UseGridNavigationRowInfoKeysParameters, UseGridNavigationRowInfoKeysReturnType, UseGridNavigationRowParameters, UseGridNavigationRowReturnType, useGridNavigation, useGridNavigationCell, useGridNavigationRow, GridSingleSelectSortableChildCellInfo, GridSingleSelectSortableChildRowInfo, UseGridNavigationCellSingleSelectionSortableContext, UseGridNavigationRowSingleSelectionSortableContext, UseGridNavigationSingleSelectionSortableCellInfoKeysParameters, UseGridNavigationSingleSelectionSortableCellInfoKeysReturnType, UseGridNavigationSingleSelectionSortableCellParameters, UseGridNavigationSingleSelectionSortableCellReturnType, UseGridNavigationSingleSelectionSortableParameters, UseGridNavigationSingleSelectionSortableReturnType, UseGridNavigationSingleSelectionSortableRowInfoKeysParameters, UseGridNavigationSingleSelectionSortableRowInfoKeysReturnType, UseGridNavigationSingleSelectionSortableRowParameters, UseGridNavigationSingleSelectionSortableRowReturnType, useGridNavigationSingleSelectionSortable, useGridNavigationSingleSelectionSortableCell, useGridNavigationSingleSelectionSortableRow, GridSingleSelectChildCellInfo, GridSingleSelectChildRowInfo, UseGridNavigationCellSingleSelectionContext, UseGridNavigationRowSingleSelectionContext, UseGridNavigationSingleSelectionCellInfoKeysParameters, UseGridNavigationSingleSelectionCellInfoKeysReturnType, UseGridNavigationSingleSelectionCellParameters, UseGridNavigationSingleSelectionCellReturnType, UseGridNavigationSingleSelectionParameters, UseGridNavigationSingleSelectionReturnType, UseGridNavigationSingleSelectionRowInfoKeysParameters, UseGridNavigationSingleSelectionRowInfoKeysReturnType, UseGridNavigationSingleSelectionRowParameters, UseGridNavigationSingleSelectionRowReturnType, useGridNavigationSingleSelection, useGridNavigationSingleSelectionCell, useGridNavigationSingleSelectionRow, LinearNavigationResult, TryNavigateToIndexParameters, UseLinearNavigationParameters, UseLinearNavigationParametersSelf, UseLinearNavigationReturnType, UseLinearNavigationReturnTypeSelf, identity, tryNavigateToIndex, useLinearNavigation, UseListNavigationChildInfo, UseListNavigationChildInfoKeysParameters, UseListNavigationChildInfoKeysReturnType, UseListNavigationChildParameters, UseListNavigationChildReturnType, UseListNavigationContext, UseListNavigationParameters, UseListNavigationReturnType, useListNavigation, useListNavigationChild, UseListNavigationSingleSelectionSortableChildContext, UseListNavigationSingleSelectionSortableChildInfo, UseListNavigationSingleSelectionSortableChildInfoKeysParameters, UseListNavigationSingleSelectionSortableChildInfoKeysReturnType, UseListNavigationSingleSelectionSortableChildParameters, UseListNavigationSingleSelectionSortableChildReturnType, UseListNavigationSingleSelectionSortableParameters, UseListNavigationSingleSelectionSortableReturnType, useListNavigationSingleSelectionSortable, useListNavigationSingleSelectionSortableChild, UseListNavigationSingleSelectionChildContext, UseListNavigationSingleSelectionChildInfo, UseListNavigationSingleSelectionChildInfoKeysParameters, UseListNavigationSingleSelectionChildInfoKeysReturnType, UseListNavigationSingleSelectionChildParameters, UseListNavigationSingleSelectionChildReturnType, UseListNavigationSingleSelectionParameters, UseListNavigationSingleSelectionReturnType, useListNavigationSingleSelection, useListNavigationSingleSelectionChild, OnTabbableIndexChange, RovingTabIndexChildContext, RovingTabIndexChildContextSelf, SetTabbableIndex, UseRovingTabIndexChildInfo, UseRovingTabIndexChildInfoKeysParameters, UseRovingTabIndexChildInfoKeysReturnType, UseRovingTabIndexChildParameters, UseRovingTabIndexChildReturnType, UseRovingTabIndexChildReturnTypeSelf, UseRovingTabIndexParameters, UseRovingTabIndexParametersSelf, UseRovingTabIndexReturnType, UseRovingTabIndexReturnTypeSelf, useRovingTabIndex, useRovingTabIndexChild, MakeSingleSelectionDeclarativeParameters, MakeSingleSelectionDeclarativeReturnType, SelectedIndexChangeEvent, SelectedIndexChangeHandler, SingleSelectionContextSelf, UseSingleSelectionChildInfo, UseSingleSelectionChildInfoKeysParameters, UseSingleSelectionChildInfoKeysReturnType, UseSingleSelectionChildParameters, UseSingleSelectionChildReturnType, UseSingleSelectionChildReturnTypeSelf, UseSingleSelectionContext, UseSingleSelectionDeclarativeParameters, UseSingleSelectionDeclarativeParametersSelf, UseSingleSelectionParameters, UseSingleSelectionParametersSelf, UseSingleSelectionReturnType, UseSingleSelectionReturnTypeSelf, useSingleSelection, useSingleSelectionChild, useSingleSelectionDeclarative, Compare, GetHighestChildIndex, GetIndex, GetValid, UseRearrangeableChildInfo, UseRearrangeableChildrenParameters, UseRearrangeableChildrenParametersSelf, UseRearrangeableChildrenReturnType, UseRearrangeableChildrenReturnTypeSelf, UseSortableChildInfo, UseSortableChildrenParameters, UseSortableChildrenParametersSelf, UseSortableChildrenReturnType, UseSortableChildrenReturnTypeSelf, defaultCompare, useRearrangeableChildren, useSortableChildren, UseTypeaheadNavigationChildInfo, UseTypeaheadNavigationChildInfoKeysParameters, UseTypeaheadNavigationChildInfoKeysReturnType, UseTypeaheadNavigationChildParameters, UseTypeaheadNavigationChildReturnType, UseTypeaheadNavigationContext, UseTypeaheadNavigationContextSelf, UseTypeaheadNavigationParameters, UseTypeaheadNavigationParametersSelf, UseTypeaheadNavigationReturnType, UseTypeaheadNavigationReturnTypeSelf, binarySearch, useTypeaheadNavigation, useTypeaheadNavigationChild, DismissListenerTypes, UseDismissParameters, UseDismissParametersSelf, UseDismissReturnType, useDismiss, UseFocusTrapParameters, UseFocusTrapParametersSelf, UseFocusTrapReturnType, findFirstFocusable, findFirstTabbable, useFocusTrap, UsePaginatedChildContext, UsePaginatedChildContextSelf, UsePaginatedChildParameters, UsePaginatedChildReturnType, UsePaginatedChildReturnTypeSelf, UsePaginatedChildrenInfo, UsePaginatedChildrenParameters, UsePaginatedChildrenParametersSelf, UsePaginatedChildrenReturnType, UsePaginatedChildrenReturnTypeSelf, usePaginatedChild, usePaginatedChildren, UseStaggeredChildContext, UseStaggeredChildContextSelf, UseStaggeredChildParameters, UseStaggeredChildReturnType, UseStaggeredChildReturnTypeSelf, UseStaggeredChildrenInfo, UseStaggeredChildrenParameters, UseStaggeredChildrenParametersSelf, UseStaggeredChildrenReturnType, UseStaggeredChildrenReturnTypeSelf, useStaggeredChild, useStaggeredChildren, CompleteGridNavigationCellContext, CompleteGridNavigationRowContext, UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationCellInfoKeysParameters, UseCompleteGridNavigationCellParameters, UseCompleteGridNavigationCellReturnType, UseCompleteGridNavigationDeclarativeParameters, UseCompleteGridNavigationDeclarativeReturnType, UseCompleteGridNavigationParameters, UseCompleteGridNavigationReturnType, UseCompleteGridNavigationRowInfo, UseCompleteGridNavigationRowInfoKeysParameters, UseCompleteGridNavigationRowParameters, UseCompleteGridNavigationRowReturnType, useCompleteGridNavigation, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow, CompleteListNavigationContext, UseCompleteListNavigationChildInfo, UseCompleteListNavigationChildInfoKeysParameters, UseCompleteListNavigationChildParameters, UseCompleteListNavigationChildReturnType, UseCompleteListNavigationDeclarativeParameters, UseCompleteListNavigationDeclarativeReturnType, UseCompleteListNavigationParameters, UseCompleteListNavigationReturnType, useCompleteListNavigation, useCompleteListNavigationChild, useCompleteListNavigationDeclarative, UseModalParameters, UseModalParametersSelf, UseModalReturnType, useModal, PressChangeEventReason, PressEventReason, UsePressAsyncParameters, UsePressAsyncReturnType, UsePressParameters, UsePressParametersSelf, UsePressReturnType, UsePressReturnTypeSelf, setPressVibrate, usePress, usePressAsync, UseRandomDualIdsParameters, UseRandomDualIdsReturnType, useRandomDualIds, UseRandomIdParameters, UseRandomIdParametersSelf, UseRandomIdReturnType, UseRandomIdReturnTypeSelf, useRandomId, AsyncHandler, UseAsyncHandlerParameters, UseAsyncHandlerReturnType, useAsyncHandler, UseBlockingElementParameters, UseBlockingElementParametersSelf, getTopElement, useBlockingElement, getDocument, useDocumentClass, UseDraggableParameters, UseDraggableReturnType, useDraggable, DropFile, DropFileMetadata, DroppableFileError, UseDroppableParameters, UseDroppableReturnType, useDroppable, useGlobalHandler, useHideScroll, DangerouslyAppendHTML, DangerouslySetInnerHTML, GetAttribute, HasClass, ImperativeElement, SetAttribute, SetChildren, SetClass, SetEventHandler, SetStyle, UseImperativePropsParameters, UseImperativePropsReturnType, UseImperativePropsReturnTypeSelf, useImperativeProps, useMergedChildren, useMergedClasses, enableLoggingPropConflicts, mergeFunctions, useMergedProps, useMergedRefs, useMergedStyles, PortalChildUpdater, PushPortalChild, RemovePortalChild, UpdatePortalChild, UsePortalChildrenParameters, UsePortalChildrenReturnType, usePortalChildren, UseRefElementParameters, UseRefElementParametersSelf, UseRefElementReturnType, UseRefElementReturnTypeSelf, useRefElement, UseTextContentParameters, UseTextContentParametersSelf, UseTextContentReturnType, UseTextContentReturnTypeSelf, useTextContent, UseActiveElementParameters, UseActiveElementParametersSelf, UseActiveElementReturnType, UseActiveElementReturnTypeSelf, useActiveElement, UseChildrenHaveFocusChildParameters, UseChildrenHaveFocusChildReturnType, UseChildrenHaveFocusContext, UseChildrenHaveFocusParameters, UseChildrenHaveFocusParametersSelf, UseChildrenHaveFocusReturnType, UseChildrenHaveFocusReturnTypeSelf, useChildrenHaveFocus, useChildrenHaveFocusChild, ElementSize, UseElementSizeParameters, UseElementSizeParametersSelf, UseElementSizeReturnType, UseElementSizeReturnTypeSelf, useElementSize, UseHasCurrentFocusParameters, UseHasCurrentFocusParametersSelf, UseHasCurrentFocusReturnType, UseHasCurrentFocusReturnTypeSelf, useHasCurrentFocus, HasLastFocusReturnTypeSelf, UseHasLastFocusParameters, UseHasLastFocusParametersSelf, UseHasLastFocusReturnType, useHasLastFocus, LogicalDirectionInfo, LogicalElementSize, LogicalOrientation, PhysicalDirection, PhysicalOrientation, PhysicalSize, UseLogicalDirectionParameters, UseLogicalDirectionReturnType, useLogicalDirection, UseMediaQueryReturnType, useMediaQuery, UseMutationObserverParameters, UseMutationObserverParametersSelf, UseMutationObserverReturnType, useMutationObserver, useUrl, useAsyncEffect, UseAsyncParameters, UseAsyncReturnType, useAsync, useEffectDebug, useForceUpdate, useLayoutEffectDebug, ManagedChildInfo, ManagedChildren, OnAfterChildLayoutEffect, OnChildrenMountChange, UseChildrenFlagParameters, UseChildrenFlagReturnType, UseGenericChildParameters, UseManagedChildParameters, UseManagedChildReturnType, UseManagedChildReturnTypeSelf, UseManagedChildrenContext, UseManagedChildrenContextSelf, UseManagedChildrenParameters, UseManagedChildrenParametersSelf, UseManagedChildrenReturnType, UseManagedChildrenReturnTypeSelf, useChildrenFlag, useManagedChild, useManagedChildren, OnPassiveStateChange, PassiveStateUpdater, returnFalse, returnNull, returnTrue, returnUndefined, returnZero, runImmediately, useEnsureStability, usePassiveState, PersistentStates, getFromLocalStorage, storeToLocalStorage, usePersistentState, OnParamValueChanged, SearchParamStates, SetParamWithHistory, UseSearchParamStateParameters, useSearchParamState, useSearchParamStateDeclarative, useStableCallback, useMemoObject, useStableGetter, useState, useWhatCausedRender, ProvideBatchedAnimationFrames, UseAnimationFrameParameters, useAnimationFrame, UseIntervalParameters, useInterval, UseTimeoutParameters, useTimeout, assertEmptyObject, EnhancedEventHandler, EventDetail, TargetedEnhancedEvent, enhanceEvent, getEventDetail, findBackupFocus, focus, BuildMode, generateRandomId, generateStack, useStack, hideCallCount, monitorCallCount, CSSProperties, CompositionEventType, DragEventType, ElementProps, EventMapping$0 as EventMapping, EventType, ExtendMerge, FocusEventType, KeyboardEventType, MouseEventType, Nullable, OmitStrong, PointerEventType, TargetedOmit, TargetedPick, TouchEventType, VNode, debounceRendering, onfocusin, onfocusout, useBeforeLayoutEffect };
 export { EffectCallback, Inputs, MutableRef, Reducer, StateUpdater, useCallback, useContext, useDebugValue, useEffect, useId, useImperativeHandle, useLayoutEffect, useMemo, useReducer, useRef, useState as useStateBasic } from "preact/hooks";
 export { Fragment, JSX, Ref, RefCallback, RenderableProps, cloneElement, createContext, createElement } from "preact";
 export { createPortal, forwardRef, memo } from "preact/compat";

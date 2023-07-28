@@ -9241,6 +9241,377 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       propsStableSource
     };
   }
+  function isPromise(p) {
+    return p instanceof Promise;
+  }
+  const Unset = Symbol("Unset");
+  /**
+   * lodash-ish function that's like debounce + (throttle w/ async handling) combined.
+   *
+   * Requires a lot of callbacks to meaningfully turn a red function into a blue one, but you *can* do it!
+   * Note that part of this is emulating the fact that the sync handler cannot have a return value,
+   * so you'll need to use `setResolve` and the other related functions to do that in whatever way works for your specific scenario.
+   *
+   * The comments are numbered in approximate execution order for your reading pleasure (1 is near the bottom).
+   */
+  function asyncToSync(_ref61) {
+    let {
+      asyncInput,
+      onInvoke,
+      onInvoked,
+      onFinally: onFinallyAny,
+      onReject,
+      onResolve,
+      onHasError,
+      onHasResult,
+      onError,
+      onReturnValue,
+      capture,
+      onAsyncDebounce,
+      onSyncDebounce,
+      onPending,
+      throttle,
+      wait
+    } = _ref61;
+    let pending = false;
+    let syncDebouncing = false;
+    let asyncDebouncing = false;
+    let currentCapture = Unset;
+    const onFinally = () => {
+      // 8. This is run at the end of every invocation of the async handler,
+      // whether it completed or not, and whether it was async or not.
+      onFinallyAny === null || onFinallyAny === void 0 ? void 0 : onFinallyAny();
+      onPending === null || onPending === void 0 ? void 0 : onPending(pending = false);
+      let nothingElseToDo = !asyncDebouncing;
+      onAsyncDebounce === null || onAsyncDebounce === void 0 ? void 0 : onAsyncDebounce(asyncDebouncing = false);
+      if (nothingElseToDo) ;else {
+        // 9b. Another request to run the async handler came in while we were running this one.
+        // Instead of stopping, we're just going to immediately run again using the arguments that were given to us most recently.
+        // We also clear that flag, because we're handling it now. It'll be set again if the handler is called again while *this* one is running
+        console.assert(currentCapture !== Unset);
+        if (currentCapture != Unset) {
+          onSyncDebounce === null || onSyncDebounce === void 0 ? void 0 : onSyncDebounce(syncDebouncing = true);
+          syncDebounced();
+        }
+      }
+    };
+    const sync = function () {
+      // 5. We're finally running the async version of the function, so notify the caller that the return value is pending.
+      // And because the fact that we're here means the debounce/throttle period is over, we can clear that flag too.
+      onPending === null || onPending === void 0 ? void 0 : onPending(pending = true);
+      console.assert(syncDebouncing == false);
+      onHasError === null || onHasError === void 0 ? void 0 : onHasError(null);
+      onHasResult === null || onHasResult === void 0 ? void 0 : onHasResult(null);
+      let promiseOrReturn;
+      let hadSyncError = false;
+      try {
+        // 6. Run the function we were given.
+        // Because it may be sync, or it may throw before returning, we must still wrap it in a try/catch...
+        // Also important is that we preserve the async-ness (or lack thereof) on the original input function.
+        onInvoke === null || onInvoke === void 0 ? void 0 : onInvoke();
+        promiseOrReturn = asyncInput(...arguments);
+        onHasError === null || onHasError === void 0 ? void 0 : onHasError(false);
+      } catch (ex) {
+        hadSyncError = true;
+        onError === null || onError === void 0 ? void 0 : onError(ex);
+        onInvoked === null || onInvoked === void 0 ? void 0 : onInvoked("throw");
+      }
+      // 7. Either end immediately, or schedule to end when completed.
+      if (isPromise(promiseOrReturn)) {
+        onInvoked === null || onInvoked === void 0 ? void 0 : onInvoked("async");
+        promiseOrReturn.then(r => {
+          onResolve === null || onResolve === void 0 ? void 0 : onResolve();
+          onHasResult === null || onHasResult === void 0 ? void 0 : onHasResult(true);
+          onReturnValue === null || onReturnValue === void 0 ? void 0 : onReturnValue(r);
+          return r;
+        }).catch(e => {
+          onReject === null || onReject === void 0 ? void 0 : onReject();
+          onHasError === null || onHasError === void 0 ? void 0 : onHasError(true);
+          onError === null || onError === void 0 ? void 0 : onError(e);
+          return e;
+        }).finally(onFinally);
+      } else {
+        onInvoked === null || onInvoked === void 0 ? void 0 : onInvoked("sync");
+        if (!hadSyncError) {
+          onResolve === null || onResolve === void 0 ? void 0 : onResolve();
+          onHasResult === null || onHasResult === void 0 ? void 0 : onHasResult(true);
+          onHasError === null || onHasError === void 0 ? void 0 : onHasError(false);
+        } else {
+          onReject === null || onReject === void 0 ? void 0 : onReject();
+          onHasResult === null || onHasResult === void 0 ? void 0 : onHasResult(false);
+          onHasError === null || onHasError === void 0 ? void 0 : onHasError(true);
+        }
+        onReturnValue === null || onReturnValue === void 0 ? void 0 : onReturnValue(promiseOrReturn);
+        onPending === null || onPending === void 0 ? void 0 : onPending(pending = false);
+        onFinally();
+      }
+    };
+    // lodash uses "in" instead of checking for `undefined`...
+    const lodashOptions = {
+      leading: !wait,
+      trailing: true
+    };
+    if (throttle) {
+      if (wait == null || wait < throttle) wait = throttle;
+      lodashOptions.maxWait = throttle;
+    }
+    const syncDebounced = debounce(() => {
+      // 3. Instead of calling the sync version of our function directly, we allow it to be throttled/debounced (above)
+      // and now that we're done throttling/debouncing, notify anyone who cares of this fact (below).
+      onSyncDebounce === null || onSyncDebounce === void 0 ? void 0 : onSyncDebounce(syncDebouncing = false);
+      if (!pending) {
+        // 4a. If this is the first invocation, or if we're not still waiting for a previous invocation to finish its async call,
+        // then we can just go ahead and run the debounced version of our function.
+        console.assert(currentCapture != Unset);
+        sync(...currentCapture);
+      } else {
+        // 4b. If we were called while still waiting for the (or a) previous invocation to finish,
+        // then we'll need to delay this one. When that previous invocation finishes, it'll check
+        // to see if it needs to run again, and it will use these new captured arguments from step 2.
+        onAsyncDebounce === null || onAsyncDebounce === void 0 ? void 0 : onAsyncDebounce(asyncDebouncing = true);
+      }
+    }, wait || undefined, lodashOptions);
+    return {
+      syncOutput: function () {
+        var _capture;
+        for (var _len7 = arguments.length, args = new Array(_len7), _key7 = 0; _key7 < _len7; _key7++) {
+          args[_key7] = arguments[_key7];
+        }
+        // 1. Someone just called the sync version of our async function.
+        // 2. We capture the arguments in a way that won't become stale if/when the function is called with a (possibly seconds-long) delay (e.g. event.currentTarget.value on an <input> element).
+        currentCapture = (_capture = capture === null || capture === void 0 ? void 0 : capture(...args)) !== null && _capture !== void 0 ? _capture : [];
+        onSyncDebounce === null || onSyncDebounce === void 0 ? void 0 : onSyncDebounce(syncDebouncing = true);
+        syncDebounced();
+      },
+      flushSyncDebounce: () => {
+        syncDebounced.flush();
+      },
+      cancelSyncDebounce: () => {
+        syncDebounced.cancel();
+      }
+    };
+  }
+  function identityCapture() {
+    for (var _len8 = arguments.length, t = new Array(_len8), _key8 = 0; _key8 < _len8; _key8++) {
+      t[_key8] = arguments[_key8];
+    }
+    return t;
+  }
+  const AsyncFunction = async function () {}.constructor;
+  /**
+   * Given an async function, returns a function that's suitable for non-async APIs,
+   * along with other information about the current run's status.
+   *
+   * @see {@link useAsyncHandler} for a version that's specialized for DOM event handlers.
+   *
+   * @remarks When called multiple times in quick succession, (i.e. before the handler has finished),
+   * this works like Lodash's `throttle` function with the `wait` option always
+   * set to however long the handler takes to complete. A second call to the sync function will be
+   * throttled until the first call has finished. The return value of the function is the result
+   * of the previous invocation, or `undefined` on the first call.
+   *
+   * The handler is only ever delayed if one is currently running, so, e.g. for iOS touch events the
+   * first call happens in the same event handler (which means things like calls to `element.focus()`
+   * will work as intended, since that fails when the event is "split up")
+   *
+   * Finally, because the sync handler may be invoked on a delay, any property references on the arguments
+   * provided might be stale by the time it's actually invoked (e.g. accessing `event.currentTarget.checked`
+   * is not stable across time because it's a "live" value -- you almost always want the value that it
+   * had at the original time the handler was called). The `capture` option allows you to save that kind of
+   * dynamic data at the time it runs; the `AP` and `SP` type parameters likewise control
+   * the parameters the async handler and sync handler expect respectively.
+   *
+   * {@include } {@link UseAsyncParameters}
+   *
+   * @param asyncHandler - The async function to make sync
+   * @param options - @see {@link UseAsyncParameters}
+   *
+   */
+  function useAsync(asyncHandler, options) {
+    monitorCallCount(useAsync);
+    // Things related to current execution
+    // Because we can both return and throw undefined, 
+    // we need separate state to track their existence too.
+    //
+    // We keep, like, a *lot* of render-state, but it only ever triggers a re-render
+    // when we start/stop an async action.
+    const [pending, setPending, _getPending] = useState(false);
+    const [result, setResult, _getResult] = useState(undefined);
+    const [error, setError, _getError] = useState(undefined);
+    const [hasError, setHasError, _getHasError] = useState(false);
+    const [hasResult, setHasResult, _getHasResult] = useState(false);
+    const [asyncDebouncing, setAsyncDebouncing] = useState(false);
+    const [syncDebouncing, setSyncDebouncing] = useState(false);
+    const [invocationResult, setInvocationResult] = useState(asyncHandler instanceof AsyncFunction ? "async" : null);
+    // Keep track of this for the caller's sake -- we don't really care.
+    const [runCount, setRunCount] = useState(0);
+    const [settleCount, setSettleCount] = useState(0);
+    const [resolveCount, setResolveCount] = useState(0);
+    const [rejectCount, setRejectCount] = useState(0);
+    const incrementCallCount = T$1(() => {
+      setRunCount(c => c + 1);
+    }, []);
+    const incrementResolveCount = T$1(() => {
+      setResolveCount(c => c + 1);
+    }, []);
+    const incrementRejectCount = T$1(() => {
+      setRejectCount(c => c + 1);
+    }, []);
+    const incrementFinallyCount = T$1(() => {
+      setSettleCount(c => c + 1);
+    }, []);
+    /* eslint-disable prefer-const */
+    let {
+      throttle,
+      debounce,
+      capture: captureUnstable
+    } = options !== null && options !== void 0 ? options : {};
+    const captureStable = useStableCallback(captureUnstable !== null && captureUnstable !== void 0 ? captureUnstable : identityCapture);
+    const asyncHandlerStable = useStableCallback(asyncHandler !== null && asyncHandler !== void 0 ? asyncHandler : identity);
+    const {
+      flushSyncDebounce,
+      syncOutput,
+      cancelSyncDebounce
+    } = F$1(() => {
+      var _options$throttle, _options$debounce;
+      return asyncToSync({
+        asyncInput: asyncHandlerStable,
+        capture: captureStable,
+        onAsyncDebounce: setAsyncDebouncing,
+        onError: setError,
+        onPending: setPending,
+        onReturnValue: setResult,
+        onSyncDebounce: setSyncDebouncing,
+        onHasError: setHasError,
+        onHasResult: setHasResult,
+        onInvoked: setInvocationResult,
+        onInvoke: incrementCallCount,
+        onFinally: incrementFinallyCount,
+        onReject: incrementRejectCount,
+        onResolve: incrementResolveCount,
+        throttle: (_options$throttle = options === null || options === void 0 ? void 0 : options.throttle) !== null && _options$throttle !== void 0 ? _options$throttle : undefined,
+        wait: (_options$debounce = options === null || options === void 0 ? void 0 : options.debounce) !== null && _options$debounce !== void 0 ? _options$debounce : undefined
+      });
+    }, [throttle, debounce]);
+    p(() => {
+      return () => cancelSyncDebounce();
+    }, [cancelSyncDebounce]);
+    return {
+      syncHandler: syncOutput,
+      pending,
+      result,
+      error,
+      hasError: hasError || false,
+      hasResult: hasResult || false,
+      resolveCount,
+      rejectCount,
+      settleCount,
+      debouncingAsync: asyncDebouncing,
+      debouncingSync: syncDebouncing,
+      invocationResult,
+      callCount: runCount,
+      flushDebouncedPromise: flushSyncDebounce
+    };
+  }
+
+  /**
+   * Given an asynchronous event handler, returns a synchronous one that works on the DOM,
+   * along with some other information related to the current state.
+   * Does not modify any props.
+   *
+   * @remarks Note that because the handler you provide may be called with a delay, and
+   * because the `value` of, e.g., an `<input>` element will likely have changed by the
+   * time the delay is over, a `capture` function is necessary in order to
+   * save the relevant information from the DOM at call-time. Any other simple event data,
+   * like `mouseX` or `shiftKey` can stay on the event itself and don't
+   * need to be captured &ndash; it's never stale.
+   *
+   * The handler is automatically throttled to only run one at a time.
+   * If the handler is called, and then before it finishes, is called again,
+   * it will be put on hold until the current one finishes, at which point
+   * the second one will run.  If the handler is called a third time before
+   * the first has finished, it will *replace* the second, so only the most
+   * recently called iteration of the handler will run.
+   *
+   *
+   * You may optionally *also* specify debounce and throttle parameters that wait until the
+   * synchronous handler has not been called for the specified number of
+   * milliseconds, at which point we *actually* run the asynchronous handler
+   * according to the logic in the previous paragraph. This is in
+   * *addition* to throttling the handler, and does not replace that behavior.
+   *
+   *
+   * @example
+   * General use
+   * ```tsx
+   * const asyncHandler = async (value: number, e: Event) => {
+   *     [...] // Ex. send to a server and setState when done
+   * };
+   * const {
+   *     // A sync version of asyncHandler
+   *     syncHandler,
+   *     // True while the handler is running
+   *     pending,
+   *     // The error thrown, if any
+   *     error,
+   *     // Show this value while the operation's pending
+   *     currentCapture,
+   *     // And others, see `UseAsyncHandlerReturnType`
+   *     ...rest
+   * } = useAsyncHandler<HTMLInputElement>()({
+   *     asyncHandler,
+   *     // Pass in the capture function that saves event data
+   *     // from being stale.
+   *     capture: e => {
+   *         // `capture` can have side-effects because
+   *         // it's called exactly once per invocation
+   *         e.preventDefault();
+   *
+   *         // Save this value so that it's never stale
+   *         return e.currentTarget.valueAsNumber;
+   *     }
+   * });
+   *
+   * const onInput = pending? null : syncHandler;
+   * ```
+   *
+   * {@include } {@link UseAsyncHandlerParameters}
+   *
+   * @see useAsync A more general version of this hook that can work with any type of handler, not just DOM event handlers.
+   */
+  function useAsyncHandler(_ref62) {
+    let {
+      asyncHandler,
+      capture: originalCapture,
+      ...restAsyncOptions
+    } = _ref62;
+    monitorCallCount(useAsyncHandler);
+    // We need to differentiate between "nothing captured yet" and "`undefined` was captured"
+    const [currentCapture, setCurrentCapture, getCurrentCapture] = useState(undefined);
+    const [hasCapture, setHasCapture] = useState(false);
+    // Wrap around the normal `useAsync` `capture` function to also
+    // keep track of the last value the user actually input.
+    // 
+    // Without this there's no way to re-render the control with
+    // it being both controlled and also having the "correct" value,
+    // and at any rate also protects against sudden exceptions reverting
+    // your change out from under you.
+    const capture = useStableCallback(e => {
+      const captured = originalCapture(e);
+      setCurrentCapture(captured);
+      setHasCapture(true);
+      return [captured, e];
+    });
+    return {
+      getCurrentCapture,
+      currentCapture,
+      hasCapture,
+      ...useAsync(asyncHandler, {
+        capture,
+        ...restAsyncOptions
+      })
+    };
+  }
   function supportsPointerEvents() {
     return "onpointerup" in window;
   }
@@ -9582,13 +9953,13 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
    *
    * @compositeParams
    */
-  function useRandomId(_ref61) {
+  function useRandomId(_ref63) {
     let {
       randomIdParameters: {
         prefix,
         otherReferencerProp
       }
-    } = _ref61;
+    } = _ref63;
     monitorCallCount(useRandomId);
     const id = prefix + V$1();
     useEnsureStability("useRandomId", prefix, id);
@@ -9613,11 +9984,11 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
    *
    * @compositeParams
    */
-  function useRandomDualIds(_ref62) {
+  function useRandomDualIds(_ref64) {
     let {
       randomIdInputParameters,
       randomIdLabelParameters
-    } = _ref62;
+    } = _ref64;
     monitorCallCount(useRandomDualIds);
     const {
       randomIdReturn: randomIdInputReturn,
@@ -9638,377 +10009,6 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
       propsInput: useMergedProps(propsInputAsReferencer, propsInputAsSource),
       randomIdInputReturn,
       randomIdLabelReturn
-    };
-  }
-  function isPromise(p) {
-    return p instanceof Promise;
-  }
-  const Unset = Symbol("Unset");
-  /**
-   * lodash-ish function that's like debounce + (throttle w/ async handling) combined.
-   *
-   * Requires a lot of callbacks to meaningfully turn a red function into a blue one, but you *can* do it!
-   * Note that part of this is emulating the fact that the sync handler cannot have a return value,
-   * so you'll need to use `setResolve` and the other related functions to do that in whatever way works for your specific scenario.
-   *
-   * The comments are numbered in approximate execution order for your reading pleasure (1 is near the bottom).
-   */
-  function asyncToSync(_ref63) {
-    let {
-      asyncInput,
-      onInvoke,
-      onInvoked,
-      onFinally: onFinallyAny,
-      onReject,
-      onResolve,
-      onHasError,
-      onHasResult,
-      onError,
-      onReturnValue,
-      capture,
-      onAsyncDebounce,
-      onSyncDebounce,
-      onPending,
-      throttle,
-      wait
-    } = _ref63;
-    let pending = false;
-    let syncDebouncing = false;
-    let asyncDebouncing = false;
-    let currentCapture = Unset;
-    const onFinally = () => {
-      // 8. This is run at the end of every invocation of the async handler,
-      // whether it completed or not, and whether it was async or not.
-      onFinallyAny === null || onFinallyAny === void 0 ? void 0 : onFinallyAny();
-      onPending === null || onPending === void 0 ? void 0 : onPending(pending = false);
-      let nothingElseToDo = !asyncDebouncing;
-      onAsyncDebounce === null || onAsyncDebounce === void 0 ? void 0 : onAsyncDebounce(asyncDebouncing = false);
-      if (nothingElseToDo) ;else {
-        // 9b. Another request to run the async handler came in while we were running this one.
-        // Instead of stopping, we're just going to immediately run again using the arguments that were given to us most recently.
-        // We also clear that flag, because we're handling it now. It'll be set again if the handler is called again while *this* one is running
-        console.assert(currentCapture !== Unset);
-        if (currentCapture != Unset) {
-          onSyncDebounce === null || onSyncDebounce === void 0 ? void 0 : onSyncDebounce(syncDebouncing = true);
-          syncDebounced();
-        }
-      }
-    };
-    const sync = function () {
-      // 5. We're finally running the async version of the function, so notify the caller that the return value is pending.
-      // And because the fact that we're here means the debounce/throttle period is over, we can clear that flag too.
-      onPending === null || onPending === void 0 ? void 0 : onPending(pending = true);
-      console.assert(syncDebouncing == false);
-      onHasError === null || onHasError === void 0 ? void 0 : onHasError(null);
-      onHasResult === null || onHasResult === void 0 ? void 0 : onHasResult(null);
-      let promiseOrReturn;
-      let hadSyncError = false;
-      try {
-        // 6. Run the function we were given.
-        // Because it may be sync, or it may throw before returning, we must still wrap it in a try/catch...
-        // Also important is that we preserve the async-ness (or lack thereof) on the original input function.
-        onInvoke === null || onInvoke === void 0 ? void 0 : onInvoke();
-        promiseOrReturn = asyncInput(...arguments);
-        onHasError === null || onHasError === void 0 ? void 0 : onHasError(false);
-      } catch (ex) {
-        hadSyncError = true;
-        onError === null || onError === void 0 ? void 0 : onError(ex);
-        onInvoked === null || onInvoked === void 0 ? void 0 : onInvoked("throw");
-      }
-      // 7. Either end immediately, or schedule to end when completed.
-      if (isPromise(promiseOrReturn)) {
-        onInvoked === null || onInvoked === void 0 ? void 0 : onInvoked("async");
-        promiseOrReturn.then(r => {
-          onResolve === null || onResolve === void 0 ? void 0 : onResolve();
-          onHasResult === null || onHasResult === void 0 ? void 0 : onHasResult(true);
-          onReturnValue === null || onReturnValue === void 0 ? void 0 : onReturnValue(r);
-          return r;
-        }).catch(e => {
-          onReject === null || onReject === void 0 ? void 0 : onReject();
-          onHasError === null || onHasError === void 0 ? void 0 : onHasError(true);
-          onError === null || onError === void 0 ? void 0 : onError(e);
-          return e;
-        }).finally(onFinally);
-      } else {
-        onInvoked === null || onInvoked === void 0 ? void 0 : onInvoked("sync");
-        if (!hadSyncError) {
-          onResolve === null || onResolve === void 0 ? void 0 : onResolve();
-          onHasResult === null || onHasResult === void 0 ? void 0 : onHasResult(true);
-          onHasError === null || onHasError === void 0 ? void 0 : onHasError(false);
-        } else {
-          onReject === null || onReject === void 0 ? void 0 : onReject();
-          onHasResult === null || onHasResult === void 0 ? void 0 : onHasResult(false);
-          onHasError === null || onHasError === void 0 ? void 0 : onHasError(true);
-        }
-        onReturnValue === null || onReturnValue === void 0 ? void 0 : onReturnValue(promiseOrReturn);
-        onPending === null || onPending === void 0 ? void 0 : onPending(pending = false);
-        onFinally();
-      }
-    };
-    // lodash uses "in" instead of checking for `undefined`...
-    const lodashOptions = {
-      leading: !wait,
-      trailing: true
-    };
-    if (throttle) {
-      if (wait == null || wait < throttle) wait = throttle;
-      lodashOptions.maxWait = throttle;
-    }
-    const syncDebounced = debounce(() => {
-      // 3. Instead of calling the sync version of our function directly, we allow it to be throttled/debounced (above)
-      // and now that we're done throttling/debouncing, notify anyone who cares of this fact (below).
-      onSyncDebounce === null || onSyncDebounce === void 0 ? void 0 : onSyncDebounce(syncDebouncing = false);
-      if (!pending) {
-        // 4a. If this is the first invocation, or if we're not still waiting for a previous invocation to finish its async call,
-        // then we can just go ahead and run the debounced version of our function.
-        console.assert(currentCapture != Unset);
-        sync(...currentCapture);
-      } else {
-        // 4b. If we were called while still waiting for the (or a) previous invocation to finish,
-        // then we'll need to delay this one. When that previous invocation finishes, it'll check
-        // to see if it needs to run again, and it will use these new captured arguments from step 2.
-        onAsyncDebounce === null || onAsyncDebounce === void 0 ? void 0 : onAsyncDebounce(asyncDebouncing = true);
-      }
-    }, wait || undefined, lodashOptions);
-    return {
-      syncOutput: function () {
-        var _capture;
-        for (var _len7 = arguments.length, args = new Array(_len7), _key7 = 0; _key7 < _len7; _key7++) {
-          args[_key7] = arguments[_key7];
-        }
-        // 1. Someone just called the sync version of our async function.
-        // 2. We capture the arguments in a way that won't become stale if/when the function is called with a (possibly seconds-long) delay (e.g. event.currentTarget.value on an <input> element).
-        currentCapture = (_capture = capture === null || capture === void 0 ? void 0 : capture(...args)) !== null && _capture !== void 0 ? _capture : [];
-        onSyncDebounce === null || onSyncDebounce === void 0 ? void 0 : onSyncDebounce(syncDebouncing = true);
-        syncDebounced();
-      },
-      flushSyncDebounce: () => {
-        syncDebounced.flush();
-      },
-      cancelSyncDebounce: () => {
-        syncDebounced.cancel();
-      }
-    };
-  }
-  function identityCapture() {
-    for (var _len8 = arguments.length, t = new Array(_len8), _key8 = 0; _key8 < _len8; _key8++) {
-      t[_key8] = arguments[_key8];
-    }
-    return t;
-  }
-  const AsyncFunction = async function () {}.constructor;
-  /**
-   * Given an async function, returns a function that's suitable for non-async APIs,
-   * along with other information about the current run's status.
-   *
-   * @see {@link useAsyncHandler} for a version that's specialized for DOM event handlers.
-   *
-   * @remarks When called multiple times in quick succession, (i.e. before the handler has finished),
-   * this works like Lodash's `throttle` function with the `wait` option always
-   * set to however long the handler takes to complete. A second call to the sync function will be
-   * throttled until the first call has finished. The return value of the function is the result
-   * of the previous invocation, or `undefined` on the first call.
-   *
-   * The handler is only ever delayed if one is currently running, so, e.g. for iOS touch events the
-   * first call happens in the same event handler (which means things like calls to `element.focus()`
-   * will work as intended, since that fails when the event is "split up")
-   *
-   * Finally, because the sync handler may be invoked on a delay, any property references on the arguments
-   * provided might be stale by the time it's actually invoked (e.g. accessing `event.currentTarget.checked`
-   * is not stable across time because it's a "live" value -- you almost always want the value that it
-   * had at the original time the handler was called). The `capture` option allows you to save that kind of
-   * dynamic data at the time it runs; the `AP` and `SP` type parameters likewise control
-   * the parameters the async handler and sync handler expect respectively.
-   *
-   * {@include } {@link UseAsyncParameters}
-   *
-   * @param asyncHandler - The async function to make sync
-   * @param options - @see {@link UseAsyncParameters}
-   *
-   */
-  function useAsync(asyncHandler, options) {
-    monitorCallCount(useAsync);
-    // Things related to current execution
-    // Because we can both return and throw undefined, 
-    // we need separate state to track their existence too.
-    //
-    // We keep, like, a *lot* of render-state, but it only ever triggers a re-render
-    // when we start/stop an async action.
-    const [pending, setPending, _getPending] = useState(false);
-    const [result, setResult, _getResult] = useState(undefined);
-    const [error, setError, _getError] = useState(undefined);
-    const [hasError, setHasError, _getHasError] = useState(false);
-    const [hasResult, setHasResult, _getHasResult] = useState(false);
-    const [asyncDebouncing, setAsyncDebouncing] = useState(false);
-    const [syncDebouncing, setSyncDebouncing] = useState(false);
-    const [invocationResult, setInvocationResult] = useState(asyncHandler instanceof AsyncFunction ? "async" : null);
-    // Keep track of this for the caller's sake -- we don't really care.
-    const [runCount, setRunCount] = useState(0);
-    const [settleCount, setSettleCount] = useState(0);
-    const [resolveCount, setResolveCount] = useState(0);
-    const [rejectCount, setRejectCount] = useState(0);
-    const incrementCallCount = T$1(() => {
-      setRunCount(c => c + 1);
-    }, []);
-    const incrementResolveCount = T$1(() => {
-      setResolveCount(c => c + 1);
-    }, []);
-    const incrementRejectCount = T$1(() => {
-      setRejectCount(c => c + 1);
-    }, []);
-    const incrementFinallyCount = T$1(() => {
-      setSettleCount(c => c + 1);
-    }, []);
-    /* eslint-disable prefer-const */
-    let {
-      throttle,
-      debounce,
-      capture: captureUnstable
-    } = options !== null && options !== void 0 ? options : {};
-    const captureStable = useStableCallback(captureUnstable !== null && captureUnstable !== void 0 ? captureUnstable : identityCapture);
-    const asyncHandlerStable = useStableCallback(asyncHandler !== null && asyncHandler !== void 0 ? asyncHandler : identity);
-    const {
-      flushSyncDebounce,
-      syncOutput,
-      cancelSyncDebounce
-    } = F$1(() => {
-      var _options$throttle, _options$debounce;
-      return asyncToSync({
-        asyncInput: asyncHandlerStable,
-        capture: captureStable,
-        onAsyncDebounce: setAsyncDebouncing,
-        onError: setError,
-        onPending: setPending,
-        onReturnValue: setResult,
-        onSyncDebounce: setSyncDebouncing,
-        onHasError: setHasError,
-        onHasResult: setHasResult,
-        onInvoked: setInvocationResult,
-        onInvoke: incrementCallCount,
-        onFinally: incrementFinallyCount,
-        onReject: incrementRejectCount,
-        onResolve: incrementResolveCount,
-        throttle: (_options$throttle = options === null || options === void 0 ? void 0 : options.throttle) !== null && _options$throttle !== void 0 ? _options$throttle : undefined,
-        wait: (_options$debounce = options === null || options === void 0 ? void 0 : options.debounce) !== null && _options$debounce !== void 0 ? _options$debounce : undefined
-      });
-    }, [throttle, debounce]);
-    p(() => {
-      return () => cancelSyncDebounce();
-    }, [cancelSyncDebounce]);
-    return {
-      syncHandler: syncOutput,
-      pending,
-      result,
-      error,
-      hasError: hasError || false,
-      hasResult: hasResult || false,
-      resolveCount,
-      rejectCount,
-      settleCount,
-      debouncingAsync: asyncDebouncing,
-      debouncingSync: syncDebouncing,
-      invocationResult,
-      callCount: runCount,
-      flushDebouncedPromise: flushSyncDebounce
-    };
-  }
-
-  /**
-   * Given an asynchronous event handler, returns a synchronous one that works on the DOM,
-   * along with some other information related to the current state.
-   * Does not modify any props.
-   *
-   * @remarks Note that because the handler you provide may be called with a delay, and
-   * because the `value` of, e.g., an `<input>` element will likely have changed by the
-   * time the delay is over, a `capture` function is necessary in order to
-   * save the relevant information from the DOM at call-time. Any other simple event data,
-   * like `mouseX` or `shiftKey` can stay on the event itself and don't
-   * need to be captured &ndash; it's never stale.
-   *
-   * The handler is automatically throttled to only run one at a time.
-   * If the handler is called, and then before it finishes, is called again,
-   * it will be put on hold until the current one finishes, at which point
-   * the second one will run.  If the handler is called a third time before
-   * the first has finished, it will *replace* the second, so only the most
-   * recently called iteration of the handler will run.
-   *
-   *
-   * You may optionally *also* specify debounce and throttle parameters that wait until the
-   * synchronous handler has not been called for the specified number of
-   * milliseconds, at which point we *actually* run the asynchronous handler
-   * according to the logic in the previous paragraph. This is in
-   * *addition* to throttling the handler, and does not replace that behavior.
-   *
-   *
-   * @example
-   * General use
-   * ```tsx
-   * const asyncHandler = async (value: number, e: Event) => {
-   *     [...] // Ex. send to a server and setState when done
-   * };
-   * const {
-   *     // A sync version of asyncHandler
-   *     syncHandler,
-   *     // True while the handler is running
-   *     pending,
-   *     // The error thrown, if any
-   *     error,
-   *     // Show this value while the operation's pending
-   *     currentCapture,
-   *     // And others, see `UseAsyncHandlerReturnType`
-   *     ...rest
-   * } = useAsyncHandler<HTMLInputElement>()({
-   *     asyncHandler,
-   *     // Pass in the capture function that saves event data
-   *     // from being stale.
-   *     capture: e => {
-   *         // `capture` can have side-effects because
-   *         // it's called exactly once per invocation
-   *         e.preventDefault();
-   *
-   *         // Save this value so that it's never stale
-   *         return e.currentTarget.valueAsNumber;
-   *     }
-   * });
-   *
-   * const onInput = pending? null : syncHandler;
-   * ```
-   *
-   * {@include } {@link UseAsyncHandlerParameters}
-   *
-   * @see useAsync A more general version of this hook that can work with any type of handler, not just DOM event handlers.
-   */
-  function useAsyncHandler(_ref64) {
-    let {
-      asyncHandler,
-      capture: originalCapture,
-      ...restAsyncOptions
-    } = _ref64;
-    monitorCallCount(useAsyncHandler);
-    // We need to differentiate between "nothing captured yet" and "`undefined` was captured"
-    const [currentCapture, setCurrentCapture, getCurrentCapture] = useState(undefined);
-    const [hasCapture, setHasCapture] = useState(false);
-    // Wrap around the normal `useAsync` `capture` function to also
-    // keep track of the last value the user actually input.
-    // 
-    // Without this there's no way to re-render the control with
-    // it being both controlled and also having the "correct" value,
-    // and at any rate also protects against sudden exceptions reverting
-    // your change out from under you.
-    const capture = useStableCallback(e => {
-      const captured = originalCapture(e);
-      setCurrentCapture(captured);
-      setHasCapture(true);
-      return [captured, e];
-    });
-    return {
-      getCurrentCapture,
-      currentCapture,
-      hasCapture,
-      ...useAsync(asyncHandler, {
-        capture,
-        ...restAsyncOptions
-      })
     };
   }
 
