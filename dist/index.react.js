@@ -2666,9 +2666,8 @@ function useSingleSelectionChild({ context: { singleSelectionContext: { getSelec
  * Let's face it, declarative is nicer to use than imperative, so this is a shortcut.
  */
 function useSingleSelectionDeclarative({ singleSelectionReturn: { changeSelectedIndex }, singleSelectionDeclarativeParameters: { selectedIndex, onSelectedIndexChange } }) {
-    useEffect(() => {
-        changeSelectedIndex(selectedIndex);
-    }, [selectedIndex]);
+    let s = (selectedIndex ?? null);
+    useEffect(() => { changeSelectedIndex(s); }, [s]);
     return { singleSelectionParameters: { onSelectedIndexChange } };
 }
 

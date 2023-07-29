@@ -297,7 +297,7 @@ export function useSingleSelectionChild<ChildElement extends Element>({
 }
 
 export interface UseSingleSelectionDeclarativeParametersSelf extends Pick<UseSingleSelectionParameters<any, any>["singleSelectionParameters"], "onSelectedIndexChange"> {
-    selectedIndex: number | null;
+    selectedIndex: Nullable<number>;
 }
 
 export interface UseSingleSelectionDeclarativeParameters {
@@ -312,9 +312,8 @@ export type MakeSingleSelectionDeclarativeReturnType<R> = Omit<R, "singleSelecti
  * Let's face it, declarative is nicer to use than imperative, so this is a shortcut.
  */
 export function useSingleSelectionDeclarative<ParentOrChildElement extends Element, ChildElement extends Element>({ singleSelectionReturn: { changeSelectedIndex }, singleSelectionDeclarativeParameters: { selectedIndex, onSelectedIndexChange } }: UseSingleSelectionDeclarativeParameters) {
-    useEffect(() => {
-        changeSelectedIndex(selectedIndex);
-    }, [selectedIndex]);
+    let s = (selectedIndex ?? null);
+    useEffect(() => { changeSelectedIndex(s); }, [s]);
 
     return { singleSelectionParameters: { onSelectedIndexChange } satisfies Pick<UseSingleSelectionParameters<ParentOrChildElement, ChildElement>["singleSelectionParameters"], "onSelectedIndexChange"> }
 }

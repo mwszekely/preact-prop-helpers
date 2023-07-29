@@ -5637,9 +5637,10 @@ function _toPrimitive(input, hint) { if (typeof input !== "object" || input === 
         onSelectedIndexChange
       }
     } = _ref33;
+    let s = selectedIndex !== null && selectedIndex !== void 0 ? selectedIndex : null;
     p(() => {
-      changeSelectedIndex(selectedIndex);
-    }, [selectedIndex]);
+      changeSelectedIndex(s);
+    }, [s]);
     return {
       singleSelectionParameters: {
         onSelectedIndexChange

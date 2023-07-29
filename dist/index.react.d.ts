@@ -2033,7 +2033,7 @@ declare function useSingleSelection<ParentOrChildElement extends Element, ChildE
  */
 declare function useSingleSelectionChild<ChildElement extends Element>({ context: { singleSelectionContext: { getSelectedIndex, onSelectedIndexChange, ariaPropName, selectionMode, ...void1 }, ...void2 }, info: { index, unselectable, ...void3 }, ...void4 }: UseSingleSelectionChildParameters<ChildElement>): UseSingleSelectionChildReturnType<ChildElement>;
 interface UseSingleSelectionDeclarativeParametersSelf extends Pick<UseSingleSelectionParameters<any, any>["singleSelectionParameters"], "onSelectedIndexChange"> {
-    selectedIndex: number | null;
+    selectedIndex: Nullable<number>;
 }
 interface UseSingleSelectionDeclarativeParameters {
     singleSelectionDeclarativeParameters: UseSingleSelectionDeclarativeParametersSelf;

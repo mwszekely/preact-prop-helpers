@@ -26,7 +26,7 @@ export function TestBasesFocus() {
 function Impl({ tag, tabIndex, children }: { tag: string, tabIndex: number, children: string }) {
     const [focus, hasFocus] = useState(false);
     const [focusInner, hasFocusInner] = useState(false);
-    const { propsStable, refElementReturn } = useRefElement<any>({})
+    const { propsStable, refElementReturn } = useRefElement<any>({ refElementParameters: {} })
     const { hasCurrentFocusReturn: { propsStable: p2, getCurrentFocused, getCurrentFocusedInner } } = useHasCurrentFocus({
         hasCurrentFocusParameters: {
             onCurrentFocusedChanged: useStableCallback((e) => { console.log("IMPL focus", e); document.getElementById("steal-focus")?.focus(); hasFocus(e) }),
