@@ -557,7 +557,7 @@ export function useChildrenFlag<M extends ManagedChildInfo<number | string>, R>(
     // the "currently selected" (or whatever) index.  The two cases we're looking for:
     // 1. The currently selected child unmounted
     // 2. A child mounted, and it mounts with the index we're looking for
-    const reevaluateClosestFit = useStableCallback((reason: R) => {
+    const reevaluateClosestFit = useStableCallback((reason: R | undefined) => {
         const children = getChildren();
         const requestedIndex = getRequestedIndex();
         const currentIndex = getCurrentIndex();
@@ -567,7 +567,7 @@ export function useChildrenFlag<M extends ManagedChildInfo<number | string>, R>(
             console.assert(typeof requestedIndex == "number", "closestFit can only be used when each child has a numeric index, and cannot be used when children use string indices instead.");
 
             const closestFitIndex = getClosestFit(requestedIndex as number);
-            setCurrentIndex(closestFitIndex, reason);
+            setCurrentIndex(closestFitIndex, reason!);
             if (currentChild)
                 setAt(currentChild, false, closestFitIndex, currentIndex);
             if (closestFitIndex != null) {
