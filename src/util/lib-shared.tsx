@@ -3,6 +3,8 @@
 
 /** Opposite of NonNullable */
 export type Nullable<T = null> = null | undefined | T;
+/** Like `Required`, but also makes types `NonNullable` besides just required. */
+export type RequiredN<T> = { [P in keyof T]-?: NonNullable<T[P]>; };
 /** Like Omit, but with type completion */
 export type OmitStrong<T, K extends keyof T> = Omit<T, K>;
 
@@ -15,7 +17,7 @@ export type TargetedOmit<T, K extends keyof T, L extends keyof T[K]> = { [M in K
  */
 export type TargetedPick<T, K extends keyof T, L extends keyof T[K]> = { [M in K]: Pick<T[K], L> };
 /** Combines two interfaces in a way that leaves them still able to be extended (via class, another interface, etc.) */
-export type ExtendMerge<A, B> = { [K in (keyof A) | (keyof B)]: K extends keyof A? (K extends keyof B? (A[K] & B[K]) : A[K]) : K extends keyof B? B[K] : unknown }
+export type ExtendMerge<A, B> = { [K in (keyof A) | (keyof B)]: K extends keyof A ? (K extends keyof B ? (A[K] & B[K]) : A[K]) : K extends keyof B ? B[K] : unknown }
 
 
 
@@ -98,7 +100,7 @@ export const EventMapping = {
     waiting: "onWaiting",
     wheel: "onWheel",
 
-    
+
     fullscreenchange: null!,
     animationcancel: null!,
     auxclick: null!,
@@ -121,4 +123,3 @@ export const EventMapping = {
     webkitanimationstart: null!,
     webkittransitionend: null!,
 } as const;
- 

@@ -19,7 +19,7 @@ export interface UseGridNavigationCellContextSelf {
     getRowIndex: () => number;
     setTabbableRow: SetTabbableIndex;
     getTabbableColumn: () => TabbableColumnInfo;
-    setTabbableColumn: PassiveStateUpdater<TabbableColumnInfo, EventType<any, any>>;
+    setTabbableColumn: PassiveStateUpdater<TabbableColumnInfo, EventType<any, any> | undefined>;
     setTabbableCell: SetTabbableIndex;
 }
 export interface UseGridNavigationParametersSelf {
@@ -28,12 +28,12 @@ export interface UseGridNavigationParametersSelf {
      *
      * @stable
      */
-    onTabbableColumnChange: Nullable<OnPassiveStateChange<TabbableColumnInfo, EventType<any, any>>>;
+    onTabbableColumnChange: Nullable<OnPassiveStateChange<TabbableColumnInfo, EventType<any, any> | undefined>>;
 }
 export interface UseGridNavigationRowContextSelf {
     setTabbableRow: SetTabbableIndex;
     getTabbableColumn: () => TabbableColumnInfo;
-    setTabbableColumn: PassiveStateUpdater<TabbableColumnInfo, EventType<any, any>>;
+    setTabbableColumn: PassiveStateUpdater<TabbableColumnInfo, EventType<any, any> | undefined>;
 }
 export interface UseGridNavigationParameters<ParentOrChildElement extends Element, RowElement extends Element, RM extends GridChildRowInfo<RowElement>> extends OmitStrong<UseListNavigationParameters<ParentOrChildElement, RowElement, RM>, "linearNavigationParameters">, TargetedOmit<UseListNavigationParameters<ParentOrChildElement, RowElement, RM>, "linearNavigationParameters", "arrowKeyDirection"> {
     gridNavigationParameters: UseGridNavigationParametersSelf;

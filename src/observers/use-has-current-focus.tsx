@@ -13,7 +13,7 @@ export interface UseHasCurrentFocusParametersSelf<T extends Node> {
      * 
      * @stable
      */
-    onCurrentFocusedChanged: Nullable<OnPassiveStateChange<boolean, FocusEventType<T>>>;
+    onCurrentFocusedChanged: Nullable<OnPassiveStateChange<boolean, FocusEventType<T> | undefined>>;
 
     /**
      * Like `onFocusedChanged`, but also *additionally* if any child elements are focused.
@@ -22,7 +22,7 @@ export interface UseHasCurrentFocusParametersSelf<T extends Node> {
      * 
      * @stable
      */
-    onCurrentFocusedInnerChanged: Nullable<OnPassiveStateChange<boolean, FocusEventType<T>>>;
+    onCurrentFocusedInnerChanged: Nullable<OnPassiveStateChange<boolean, FocusEventType<T> | undefined>>;
 }
 
 export interface UseHasCurrentFocusParameters<T extends Node> extends TargetedPick<UseRefElementReturnType<T>, "refElementReturn", "getElement"> {
@@ -64,8 +64,8 @@ export function useHasCurrentFocus<T extends Element>(args: UseHasCurrentFocusPa
 
     useEnsureStability("useHasCurrentFocus", onCurrentFocusedChanged, onCurrentFocusedInnerChanged, getElement);
 
-    const [getFocused, setFocused] = usePassiveState<boolean, FocusEventType<T>>(onCurrentFocusedChanged, returnFalse, runImmediately);
-    const [getFocusedInner, setFocusedInner] = usePassiveState<boolean, FocusEventType<T>>(onCurrentFocusedInnerChanged, returnFalse, runImmediately);
+    const [getFocused, setFocused] = usePassiveState<boolean, FocusEventType<T> | undefined>(onCurrentFocusedChanged, returnFalse, runImmediately);
+    const [getFocusedInner, setFocusedInner] = usePassiveState<boolean, FocusEventType<T> | undefined>(onCurrentFocusedInnerChanged, returnFalse, runImmediately);
 
     const onFocusIn = useCallback((e: FocusEventType<T>) => {
         setFocusedInner(true, e);
@@ -82,8 +82,8 @@ export function useHasCurrentFocus<T extends Element>(args: UseHasCurrentFocusPa
 
     useEffect(() => {
         return () => {
-            setFocused(false);
-            setFocusedInner(false);
+            setFocused(false, undefined);
+            setFocusedInner(false, undefined);
         }
     }, []);
 
@@ -91,13 +91,6 @@ export function useHasCurrentFocus<T extends Element>(args: UseHasCurrentFocusPa
         [onfocusin]: onFocusIn,
         [onfocusout]: onFocusOut
     });
-
-    useEffect(() => {
-        return () => {
-            setFocused(false);
-            setFocusedInner(false);
-        }
-    }, []);
 
     return {
         hasCurrentFocusReturn: {

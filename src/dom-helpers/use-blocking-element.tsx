@@ -4,7 +4,7 @@ import "wicg-inert";
 import { UseActiveElementParameters, useActiveElement } from "../observers/use-active-element.js";
 import { returnNull, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
-import { useLayoutEffect } from "../util/lib.js";
+import { FocusEventType, useLayoutEffect } from "../util/lib.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 import { getDocument } from "./use-document-class.js";
 
@@ -58,17 +58,17 @@ export function useBlockingElement<E extends Element>({
 
                 if (e) {
                     if (enabled)
-                        setLastActiveWhenOpen(e as HTMLElement);
+                        setLastActiveWhenOpen(e as HTMLElement, reason);
                     else
-                        setLastActiveWhenClosed(e as HTMLElement);
+                        setLastActiveWhenClosed(e as HTMLElement, reason);
                 }
             })
         }
     })
 
     const [getTop, setTop] = usePassiveState<HTMLElement | null, never>(null, returnNull);
-    const [getLastActiveWhenClosed, setLastActiveWhenClosed] = usePassiveState<HTMLElement | null, never>(null, returnNull);
-    const [getLastActiveWhenOpen, setLastActiveWhenOpen] = usePassiveState<HTMLElement | null, never>(null, returnNull);
+    const [getLastActiveWhenClosed, setLastActiveWhenClosed] = usePassiveState<HTMLElement | null, FocusEventType<any>>(null, returnNull);
+    const [getLastActiveWhenOpen, setLastActiveWhenOpen] = usePassiveState<HTMLElement | null, FocusEventType<any>>(null, returnNull);
 
     /**
      * Push/pop the element from the blockingElements stack.

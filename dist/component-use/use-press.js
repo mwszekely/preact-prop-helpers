@@ -123,7 +123,7 @@ export function usePress(args) {
         e.stopPropagation();
         const hovering = getHovering();
         const pointerDownStartedHere = getPointerDownStartedHere();
-        setJustHandled(true);
+        setJustHandled(true, e);
         if (pointerDownStartedHere && hovering) {
             handlePress(e);
         }
@@ -167,7 +167,7 @@ export function usePress(args) {
         const hovering = getHovering();
         const pointerDownStartedHere = getPointerDownStartedHere();
         if (!excludePointer()) {
-            setJustHandled(true);
+            setJustHandled(true, e);
             if (pointerDownStartedHere && hovering) {
                 handlePress(e);
                 e.preventDefault();

@@ -238,7 +238,7 @@ export interface UseChildrenFlagReturnType<M extends ManagedChildInfo<any>, R> {
      *
      * Call this whenever a child mounts/unmounts, or whenever calling a child's isValid() would change
      */
-    reevaluateClosestFit: () => void;
+    reevaluateClosestFit: (reason: R) => void;
     /** @stable */
     getCurrentIndex: () => M["index"] | null;
 }

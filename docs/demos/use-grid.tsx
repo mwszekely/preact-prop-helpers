@@ -153,7 +153,7 @@ export const DemoUseGrid = memo(() => {
             <h2>useGridNavigationComplete</h2>
             <p>Like <code>useCompleteListNavigation</code> but for 2D navigation. Cells can span multiple columns. Rows can be filtered, sorted, and arbitrarily re-arranged.</p>
             {<div>Current row: {tabbableRow}</div>}
-            {<div>Current column: {tabbableColumn}</div>}
+            {<div>Current column: {tabbableColumn?.actual}, {tabbableColumn?.ideal}</div>}
             <table {...{ border: "2" } as {}} style={{ whiteSpace: "nowrap" }}>
 
                 <thead>

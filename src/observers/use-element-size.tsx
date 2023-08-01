@@ -100,7 +100,7 @@ export function useElementSize<E extends Element>({ elementSizeParameters: { get
 
     const { refElementReturn, ...rest } = useRefElement<E>({
         refElementParameters: {
-            onElementChange: useCallback((e: E | null, p: E | null | undefined) => { needANewObserver(e, getObserveBox?.()); onElementChange?.(e, p); }, []),
+            onElementChange: useCallback((e: E | null, p: E | null | undefined, r?: never) => { needANewObserver(e, getObserveBox?.()); onElementChange?.(e, p, r); }, []),
             onMount,
             onUnmount
         }

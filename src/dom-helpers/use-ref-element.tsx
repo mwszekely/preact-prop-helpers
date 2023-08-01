@@ -109,7 +109,7 @@ export function useRefElement<T extends EventTarget>(args: UseRefElementParamete
 
     // Let us store the actual (reference to) the element we capture
     const [getElement, setElement] = usePassiveState<T | null, never>(handler, returnNull, runImmediately);
-    const propsStable = useRef<ElementProps<T>>(useTagProps({ ref: setElement }, "data-use-ref-element"));
+    const propsStable = useRef<ElementProps<T>>(useTagProps({ ref: setElement as never }, "data-use-ref-element"));
 
     // Return both the element and the hook that modifies 
     // the props and allows us to actually find the element

@@ -62,7 +62,7 @@ export function useDismiss({ dismissParameters: { dismissActive, onDismiss, ...v
     });
     const { activeElementReturn: { getActiveElement: _getActiveElement, getLastActiveElement: _getLastActiveElement, getWindowFocused: _getWindowFocused } } = useActiveElement({
         activeElementParameters: {
-            onLastActiveElementChange: useStableCallback((a, b) => { olaec2?.(a, b); olaec1?.(a, b); }),
+            onLastActiveElementChange: useStableCallback((a, b, r) => { olaec2?.(a, b, r); olaec1?.(a, b, r); }),
             onActiveElementChange,
             onWindowFocusedChange,
             getDocument

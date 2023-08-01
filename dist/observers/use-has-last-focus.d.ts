@@ -1,4 +1,5 @@
 import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
+import { OnPassiveStateChange } from "../preact-extensions/use-passive-state.js";
 import { TargetedPick } from "../util/lib.js";
 import { Nullable } from "../util/types.js";
 import { UseActiveElementParameters, UseActiveElementReturnType } from "./use-active-element.js";
@@ -10,13 +11,13 @@ export interface UseHasLastFocusParametersSelf {
      *
      * @stable
      */
-    onLastFocusedChanged: Nullable<((focused: boolean, prevFocused: boolean | undefined) => void)>;
+    onLastFocusedChanged: Nullable<OnPassiveStateChange<boolean, UIEvent | undefined>>;
     /**
      * Combines the implications of `onFocusedChanged` and `onFocusedChanged`.
      *
      * @stable
      */
-    onLastFocusedInnerChanged: Nullable<((focused: boolean, prevFocused: boolean | undefined) => void)>;
+    onLastFocusedInnerChanged: Nullable<OnPassiveStateChange<boolean, UIEvent | undefined>>;
 }
 export interface UseHasLastFocusParameters<T extends Node> extends UseActiveElementParameters, TargetedPick<UseRefElementReturnType<T>, "refElementReturn", "getElement"> {
     hasLastFocusParameters: UseHasLastFocusParametersSelf;

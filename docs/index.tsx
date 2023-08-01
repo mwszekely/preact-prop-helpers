@@ -3,16 +3,13 @@ import { memo } from "preact/compat";
 import { useContext, useRef } from "preact/hooks";
 import { ElementSize, EventType, MouseEventType, UseChildrenHaveFocusChildParameters, UseManagedChildrenContext, UseStaggeredChildContext, UseStaggeredChildrenInfo, useAnimationFrame, useAsyncHandler, useChildrenHaveFocus, useChildrenHaveFocusChild, useDraggable, useDroppable, useElementSize, useFocusTrap, useGlobalHandler, useHasCurrentFocus, useHasLastFocus, useInterval, useManagedChild, useManagedChildren, useMergedProps, usePortalChildren, usePress, useRandomDualIds, useRefElement, useStableCallback, useStaggeredChild, useStaggeredChildren, useState } from "../dist/index.js";
 import { DemoUseGrid } from "./demos/use-grid.js";
-import { DemoUseInterval } from "./demos/use-interval.js";
-import { DemoUseModal } from "./demos/use-modal.js";
-import { DemoUseRovingTabIndex } from "./demos/use-roving-tab-index.js";
-import { DemoUseTimeout } from "./demos/use-timeout.js";
 
 import untypedJson from "./api.json";
 import { ApiBlock, ApiPackage, ApiParamBlockSectionNode, MemberIdentifier, MemberReference } from "./json-types.js";
 
 const json = untypedJson as ApiPackage;
 
+(window as any)._generate_setState_stacks = true;
 
 
 const DemoUseDroppable = () => {
@@ -569,10 +566,14 @@ const FullReference = () => {
     json.entryPoints[0].
 }*/
 
+import { options } from "preact";
+options.debounceRendering = (f) => f();
+
 const Component = () => {
 
     return <div class="flex" style={{ flexWrap: "wrap" }}>
-        <DemoPress remaining={2} />
+    <DemoUseGrid />
+       {/* <DemoPress remaining={2} />
         <input />
         <div style="display:grid;grid-template-columns:1fr 1fr">
             <DemoUseModal />
@@ -613,7 +614,7 @@ const Component = () => {
         <hr />
         <DemoUseElementSizeAnimation />
         <hr />
-        <input />
+        <input /> */}
     </div>
 }
 

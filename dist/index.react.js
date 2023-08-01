@@ -923,7 +923,7 @@ function generateStack() {
 /**
  * Returns a function that retrieves the stack at the time this hook was called (in development mode only).
  *
- *
+ * @remarks The global variable `_generate_setState_stacks` must be true, or no stack will be generated.
  */
 function useStack() {
     if (BuildMode === "development") {
@@ -1040,14 +1040,14 @@ let idIndex = 0;
 /**
  * Debug function that yells at you if your forgot to use the props a hook returns.
  *
- * @remarks Like other debug hooks, only has any effect IFF there is a global variable called `process.env.NODE_ENV` and it contains the value `"development"`.
+ * @remarks Like other debug hooks, only has any effect IFF there is a global variable called `process.env.NODE_ENV` and it contains the value `"development"`, AND there is a global variable called `_generate_useTagProps_tags` set to true, and stacks are only generated if `_generate_setState_stacks` is true..
  *
  * @param props - The props to return a modified copy of
  * @param tag - Should be unique
  * @returns A modified copy of the given props
  */
 function useTagProps(props, tag) {
-    if (BuildMode === 'development') {
+    if (BuildMode === 'development' && window._generate_useTagProps_tags) {
         const [id] = useState$1(() => ++idIndex);
         const propsIdTag = `data-props-${tag}-${id}`;
         const getStack = useStack();
@@ -1511,7 +1511,7 @@ function useChildrenFlag({ getChildren, initialIndex, closestFit, onClosestFit, 
     // the "currently selected" (or whatever) index.  The two cases we're looking for:
     // 1. The currently selected child unmounted
     // 2. A child mounted, and it mounts with the index we're looking for
-    const reevaluateClosestFit = useStableCallback(() => {
+    const reevaluateClosestFit = useStableCallback((reason) => {
         const children = getChildren();
         const requestedIndex = getRequestedIndex();
         const currentIndex = getCurrentIndex();
@@ -1519,7 +1519,7 @@ function useChildrenFlag({ getChildren, initialIndex, closestFit, onClosestFit, 
         if (requestedIndex != null && closestFit && (requestedIndex != currentIndex || currentChild == null || !isValid(currentChild))) {
             console.assert(typeof requestedIndex == "number", "closestFit can only be used when each child has a numeric index, and cannot be used when children use string indices instead.");
             const closestFitIndex = getClosestFit(requestedIndex);
-            setCurrentIndex(closestFitIndex, undefined);
+            setCurrentIndex(closestFitIndex, reason);
             if (currentChild)
                 setAt(currentChild, false, closestFitIndex, currentIndex);
             if (closestFitIndex != null) {
@@ -1533,9 +1533,11 @@ function useChildrenFlag({ getChildren, initialIndex, closestFit, onClosestFit, 
             }
         }
     });
+    const reasonRef = useRef(undefined);
     const changeIndex = useCallback((arg, reason) => {
         const children = getChildren();
         const requestedIndex = (arg instanceof Function ? arg(getRequestedIndex()) : arg);
+        reasonRef.current = reason;
         setRequestedIndex(requestedIndex, reason);
         const currentIndex = getCurrentIndex();
         if (currentIndex == requestedIndex)
@@ -1581,7 +1583,7 @@ function useChildrenFlag({ getChildren, initialIndex, closestFit, onClosestFit, 
     }, []);
     // Run once, on mount
     useLayoutEffect(() => {
-        changeIndex(initialIndex ?? null, undefined);
+        changeIndex(initialIndex ?? null, reasonRef.current);
     }, []);
     return { changeIndex, reevaluateClosestFit, getCurrentIndex };
 }
@@ -1673,7 +1675,7 @@ function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovingTabIn
             // Whether or not we're currently tabbable, make sure that when we switch from untabbable to tabbable,
             // that we know which index to switch back to.
             if (nextIndex != null)
-                setLastNonNullIndex(nextIndex);
+                setLastNonNullIndex(nextIndex, reason);
             // If we're untabbable, then any attempt to set a new index simply fails and sets it to `null`.
             if (untabbable) {
                 // Focus the parent, since it's what's in the tab order right now
@@ -1711,7 +1713,7 @@ function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovingTabIn
             }
             // TODO: Redundant?
             if (nextIndex != null)
-                setLastNonNullIndex(nextIndex);
+                setLastNonNullIndex(nextIndex, reason);
             // Finally, return the value the user requested the index be set to.
             return nextIndex ?? 0;
         }, reason);
@@ -1793,7 +1795,7 @@ function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovingTabIn
         giveParentFocusedElement: useCallback((e) => { lastFocused.current = e; }, [])
     });
     return {
-        managedChildrenParameters: { onChildrenMountChange: reevaluateClosestFit, },
+        managedChildrenParameters: { onChildrenMountChange: useCallback(() => { reevaluateClosestFit(undefined); }, [reevaluateClosestFit]), },
         rovingTabIndexReturn: { setTabbableIndex, getTabbableIndex, focusSelf },
         context: useMemoObject({ rovingTabIndexContext }),
         props: useTagProps({
@@ -1829,7 +1831,7 @@ function useRovingTabIndexChild({ info: { index, untabbable: iAmUntabbable, ...v
     monitorCallCount(useRovingTabIndexChild);
     const [tabbable, setTabbable, getTabbable] = useState(getInitiallyTabbedIndex() === index);
     useEffect(() => {
-        reevaluateClosestFit();
+        reevaluateClosestFit(undefined);
     }, [!!iAmUntabbable]);
     useEffect(() => {
         if (tabbable) {
@@ -2308,7 +2310,7 @@ refElementReturn, ...void1 }) {
             untabbable: allChildCellsAreUntabbable || rowIsUntabbableAndSoAreCells,
             initiallyTabbedIndex,
             onTabbableIndexChange: useStableCallback((v, p, r) => {
-                setTabbableColumn({ ideal: v, actual: v });
+                setTabbableColumn({ ideal: v, actual: v }, r);
                 onTabbableIndexChange?.(v, p, r);
             })
         },
@@ -2375,7 +2377,7 @@ function useGridNavigationCell({ context: { gridNavigationCellContext: { getRowI
     });
     return {
         info: infoLs,
-        props: useMergedProps(props, { onClick: () => setTabbableColumn(prev => ({ ideal: index, actual: (prev?.actual ?? index) })) }),
+        props: useMergedProps(props, { onClick: (e) => setTabbableColumn(prev => ({ ideal: index, actual: (prev?.actual ?? index) }), e) }),
         rovingTabIndexChildReturn,
         textContentReturn,
         pressParameters,
@@ -2603,7 +2605,7 @@ function useSingleSelection({ managedChildrenReturn: { getChildren, ...void1 }, 
         context: useMemoObject({
             singleSelectionContext: useMemoObject({
                 getSelectedIndex,
-                onSelectedIndexChange: onSelectedIndexChange,
+                onSelectedIndexChange,
                 ariaPropName,
                 selectionMode
             }),
@@ -2627,17 +2629,16 @@ function useSingleSelection({ managedChildrenReturn: { getChildren, ...void1 }, 
 function useSingleSelectionChild({ context: { singleSelectionContext: { getSelectedIndex, onSelectedIndexChange, ariaPropName, selectionMode, ...void1 }, ...void2 }, info: { index, unselectable, ...void3 }, ...void4 }) {
     monitorCallCount(useSingleSelectionChild);
     useEnsureStability("useSingleSelectionChild", getSelectedIndex, onSelectedIndexChange);
-    //const getUnselectable = useStableGetter(unselectable);
     const [localSelected, setLocalSelected, getLocalSelected] = useState(getSelectedIndex() == index);
     const [direction, setDirection, getDirection] = useState(getSelectedIndex() == null ? null : (getSelectedIndex() - index));
     const onCurrentFocusedInnerChanged = useStableCallback((focused, _prev, e) => {
         if (selectionMode == 'focus' && focused && !unselectable) {
-            onSelectedIndexChange?.(enhanceEvent(e, { selectedIndex: index }));
+            onSelectedIndexChange(enhanceEvent(e, { selectedIndex: index }));
         }
     });
     const onPressSync = useStableCallback((e) => {
         if (selectionMode == 'activation' && !unselectable)
-            onSelectedIndexChange?.(enhanceEvent(e, { selectedIndex: index }));
+            onSelectedIndexChange(enhanceEvent(e, { selectedIndex: index }));
     });
     const propParts = ariaPropName?.split("-") ?? [];
     return {
@@ -2659,7 +2660,7 @@ function useSingleSelectionChild({ context: { singleSelectionContext: { getSelec
             [`${propParts[0]}-${propParts[1]}`]: (localSelected ? (propParts[1] == "current" ? `${propParts[2]}` : `true`) : "false")
         }, "data-single-selection-child"),
         hasCurrentFocusParameters: { onCurrentFocusedInnerChanged },
-        pressParameters: { onPressSync: onSelectedIndexChange ? onPressSync : null }
+        pressParameters: { onPressSync }
     };
 }
 /**
@@ -2667,8 +2668,13 @@ function useSingleSelectionChild({ context: { singleSelectionContext: { getSelec
  */
 function useSingleSelectionDeclarative({ singleSelectionReturn: { changeSelectedIndex }, singleSelectionDeclarativeParameters: { selectedIndex, onSelectedIndexChange } }) {
     let s = (selectedIndex ?? null);
-    useEffect(() => { changeSelectedIndex(s); }, [s]);
-    return { singleSelectionParameters: { onSelectedIndexChange } };
+    let reasonRef = useRef(undefined);
+    useEffect(() => { changeSelectedIndex(s, reasonRef.current); }, [s]);
+    const osic = useCallback((e) => {
+        reasonRef.current = e;
+        return onSelectedIndexChange?.(e);
+    }, [onSelectedIndexChange]);
+    return { singleSelectionParameters: { onSelectedIndexChange: osic } };
 }
 
 /**
@@ -2735,7 +2741,7 @@ function useGridNavigationSingleSelectionRow({ info: mcp1, linearNavigationParam
         },
         managedChildrenParameters,
         pressParameters: { onPressSync, excludeSpace },
-        hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: useStableCallback((hasFocus, hadFocus) => { ocfic1?.(hasFocus, hadFocus); ocfic2?.(hasFocus, hadFocus); }) },
+        hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: useStableCallback((hasFocus, hadFocus, reason) => { ocfic1?.(hasFocus, hadFocus, reason); ocfic2?.(hasFocus, hadFocus, reason); }) },
         props: useMergedProps(propsGridNavigation, propsSingleSelection),
         rovingTabIndexChildReturn,
         rovingTabIndexReturn,
@@ -3157,7 +3163,7 @@ function useDismiss({ dismissParameters: { dismissActive, onDismiss, ...void3 },
     });
     useActiveElement({
         activeElementParameters: {
-            onLastActiveElementChange: useStableCallback((a, b) => { olaec2?.(a, b); olaec1?.(a, b); }),
+            onLastActiveElementChange: useStableCallback((a, b, r) => { olaec2?.(a, b, r); olaec1?.(a, b, r); }),
             onActiveElementChange,
             onWindowFocusedChange,
             getDocument
@@ -3216,9 +3222,9 @@ function useBlockingElement({ activeElementParameters: { getDocument, onActiveEl
                 onLastActiveElementChange?.(e, prev, reason);
                 if (e) {
                     if (enabled)
-                        setLastActiveWhenOpen(e);
+                        setLastActiveWhenOpen(e, reason);
                     else
-                        setLastActiveWhenClosed(e);
+                        setLastActiveWhenClosed(e, reason);
                 }
             })
         }
@@ -3614,20 +3620,14 @@ function useHasCurrentFocus(args) {
     }, []);
     useEffect(() => {
         return () => {
-            setFocused(false);
-            setFocusedInner(false);
+            setFocused(false, undefined);
+            setFocusedInner(false, undefined);
         };
     }, []);
     const propsStable = useRef({
         [onfocusin]: onFocusIn,
         [onfocusout]: onFocusOut
     });
-    useEffect(() => {
-        return () => {
-            setFocused(false);
-            setFocusedInner(false);
-        };
-    }, []);
     return {
         hasCurrentFocusReturn: {
             propsStable: propsStable.current,
@@ -3757,10 +3757,10 @@ function useCompleteGridNavigationRow({ info: { index, unselectable, untabbable,
         refElementReturn,
         hasCurrentFocusParameters: {
             onCurrentFocusedChanged: ocfc1,
-            onCurrentFocusedInnerChanged: useStableCallback((focused, prevFocused) => {
+            onCurrentFocusedInnerChanged: useStableCallback((focused, prevFocused, reason) => {
                 // Call grid navigation's focus change
-                ocfic1?.(focused, prevFocused);
-                ocfic3?.(focused, prevFocused);
+                ocfic1?.(focused, prevFocused, reason);
+                ocfic3?.(focused, prevFocused, reason);
             }),
         }
     });
@@ -3933,7 +3933,7 @@ textContentParameters, refElementParameters, hasCurrentFocusParameters: { onCurr
     if (untabbable)
         unselectable = true;
     const { refElementReturn, propsStable, ...void6 } = useRefElement({ refElementParameters });
-    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void3 }, pressParameters: { excludeSpace, onPressSync, ...void2 }, textContentReturn, singleSelectionChildReturn, info: infoFromListNav, rovingTabIndexChildReturn, propsChild, propsTabbable, ...void4 } = useListNavigationSingleSelectionChild({
+    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void3 }, pressParameters: { excludeSpace, onPressSync, ...void2 }, textContentReturn, singleSelectionChildReturn, info: infoFromListNav, rovingTabIndexChildReturn, propsChild, propsTabbable, ...void4 } = useListNavigationSingleSelectionSortableChild({
         info: { index, unselectable, untabbable },
         context: { rovingTabIndexContext, singleSelectionContext, typeaheadNavigationContext },
         refElementReturn,
@@ -4475,7 +4475,7 @@ function usePress(args) {
         e.stopPropagation();
         const hovering = getHovering();
         const pointerDownStartedHere = getPointerDownStartedHere();
-        setJustHandled(true);
+        setJustHandled(true, e);
         if (pointerDownStartedHere && hovering) {
             handlePress(e);
         }
@@ -4519,7 +4519,7 @@ function usePress(args) {
         const hovering = getHovering();
         const pointerDownStartedHere = getPointerDownStartedHere();
         if (!excludePointer()) {
-            setJustHandled(true);
+            setJustHandled(true, e);
             if (pointerDownStartedHere && hovering) {
                 handlePress(e);
                 e.preventDefault();
@@ -5287,7 +5287,7 @@ function useElementSize({ elementSizeParameters: { getObserveBox, onSizeChange }
     }, []);
     const { refElementReturn, ...rest } = useRefElement({
         refElementParameters: {
-            onElementChange: useCallback((e, p) => { needANewObserver(e, getObserveBox?.()); onElementChange?.(e, p); }, []),
+            onElementChange: useCallback((e, p, r) => { needANewObserver(e, getObserveBox?.()); onElementChange?.(e, p, r); }, []),
             onMount,
             onUnmount
         }
@@ -5334,8 +5334,8 @@ function useHasLastFocus(args) {
     });
     useEffect(() => {
         return () => {
-            setLastFocused(false);
-            setLastFocusedInner(false);
+            setLastFocused(false, undefined);
+            setLastFocusedInner(false, undefined);
         };
     }, []);
     return {
@@ -5695,7 +5695,7 @@ function useMutationObserver({ refElementParameters, mutationObserverParameters:
     }, [attributeKey, attributeOldValue, characterDataOldValue, subtree]);
     const { refElementReturn, propsStable } = useRefElement({
         refElementParameters: {
-            onElementChange: useStableCallback((e, p) => { onElementChange?.(e, p); onNeedMutationObserverReset(e); }),
+            onElementChange: useStableCallback((e, p, r) => { onElementChange?.(e, p, r); onNeedMutationObserverReset(e); }),
             ...rest
         }
     });
@@ -5722,14 +5722,14 @@ function useMutationObserver({ refElementParameters, mutationObserverParameters:
  */
 function useUrl(onUrlChange) {
     const [getUrl, setUrl] = usePassiveState(useStableCallback(onUrlChange), useCallback(() => window.location.toString(), []));
-    useGlobalHandler(window, "hashchange", e => {
-        setUrl(window.location.toString());
+    useGlobalHandler(window, "hashchange", (e) => {
+        setUrl(window.location.toString(), e);
     });
     useGlobalHandler(window, "popstate", (e) => {
         // https://developer.mozilla.org/en-US/docs/Web/API/Window/popstate_event#the_history_stack
         // TODO: If this assert never fires, it's *probably* fine??
         console.assert(window.location.toString() === document.location.toString());
-        setUrl(window.location.toString());
+        setUrl(window.location.toString(), e);
     });
     return [getUrl, useCallback((newUrlOrSetter, action) => {
             if (typeof newUrlOrSetter == "function") {
@@ -5737,11 +5737,11 @@ function useUrl(onUrlChange) {
                     let newUrl = newUrlOrSetter(prev);
                     history[`${action ?? "replace"}State`]({}, document.title, newUrl);
                     return newUrl;
-                });
+                }, undefined);
             }
             else {
                 history[`${action ?? "replace"}State`]({}, document.title, newUrlOrSetter);
-                setUrl(newUrlOrSetter);
+                setUrl(newUrlOrSetter, undefined);
             }
         }, [])];
 }

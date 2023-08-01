@@ -27,20 +27,14 @@ export function useHasCurrentFocus(args) {
     }, []);
     useEffect(() => {
         return () => {
-            setFocused(false);
-            setFocusedInner(false);
+            setFocused(false, undefined);
+            setFocusedInner(false, undefined);
         };
     }, []);
     const propsStable = useRef({
         [onfocusin]: onFocusIn,
         [onfocusout]: onFocusOut
     });
-    useEffect(() => {
-        return () => {
-            setFocused(false);
-            setFocusedInner(false);
-        };
-    }, []);
     return {
         hasCurrentFocusReturn: {
             propsStable: propsStable.current,

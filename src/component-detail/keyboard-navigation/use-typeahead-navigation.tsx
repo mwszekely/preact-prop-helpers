@@ -142,8 +142,8 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
     // and also clear it every 1000 ms since the last time it changed.
     // Next, keep a mapping of typeahead values to indices for faster searching.
     // And, for the user's sake, let them know when their typeahead can't match anything anymore
-    const [getCurrentTypeahead, setCurrentTypeahead] = usePassiveState<string | null, EventType<any, any>>(useStableCallback((currentTypeahead, prev, reason) => {
-        const handle = setTimeout(() => { setCurrentTypeahead(null, undefined!); setTypeaheadStatus("none"); }, typeaheadTimeout ?? 1000);
+    const [getCurrentTypeahead, setCurrentTypeahead] = usePassiveState<string | null, EventType<any, any> | undefined>(useStableCallback((currentTypeahead, prev, reason) => {
+        const handle = setTimeout(() => { setCurrentTypeahead(null, undefined); setTypeaheadStatus("none"); }, typeaheadTimeout ?? 1000);
         updateBasedOnTypeaheadChange(currentTypeahead, reason!);
         return () => clearTimeout(handle);
     }));
@@ -162,7 +162,7 @@ export function useTypeaheadNavigation<ParentOrChildElement extends Element, Chi
     const [nextTypeaheadChar, setNextTypeaheadChar] = useState<string | null>(null);
     useLayoutEffect(() => {
         if (nextTypeaheadChar !== null) {
-            setCurrentTypeahead(typeahead => ((typeahead ?? "") + nextTypeaheadChar), undefined!);
+            setCurrentTypeahead(typeahead => ((typeahead ?? "") + nextTypeaheadChar), undefined);
             setNextTypeaheadChar(null);
         }
     }, [nextTypeaheadChar]);

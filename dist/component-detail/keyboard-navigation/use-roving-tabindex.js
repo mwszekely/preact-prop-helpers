@@ -50,7 +50,7 @@ export function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovi
             // Whether or not we're currently tabbable, make sure that when we switch from untabbable to tabbable,
             // that we know which index to switch back to.
             if (nextIndex != null)
-                setLastNonNullIndex(nextIndex);
+                setLastNonNullIndex(nextIndex, reason);
             // If we're untabbable, then any attempt to set a new index simply fails and sets it to `null`.
             if (untabbable) {
                 // Focus the parent, since it's what's in the tab order right now
@@ -88,7 +88,7 @@ export function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovi
             }
             // TODO: Redundant?
             if (nextIndex != null)
-                setLastNonNullIndex(nextIndex);
+                setLastNonNullIndex(nextIndex, reason);
             // Finally, return the value the user requested the index be set to.
             return nextIndex ?? 0;
         }, reason);
@@ -170,7 +170,7 @@ export function useRovingTabIndex({ managedChildrenReturn: { getChildren }, rovi
         giveParentFocusedElement: useCallback((e) => { lastFocused.current = e; }, [])
     });
     return {
-        managedChildrenParameters: { onChildrenMountChange: reevaluateClosestFit, },
+        managedChildrenParameters: { onChildrenMountChange: useCallback(() => { reevaluateClosestFit(undefined); }, [reevaluateClosestFit]), },
         rovingTabIndexReturn: { setTabbableIndex, getTabbableIndex, focusSelf },
         context: useMemoObject({ rovingTabIndexContext }),
         props: useTagProps({
@@ -206,7 +206,7 @@ export function useRovingTabIndexChild({ info: { index, untabbable: iAmUntabbabl
     monitorCallCount(useRovingTabIndexChild);
     const [tabbable, setTabbable, getTabbable] = useState(getInitiallyTabbedIndex() === index);
     useEffect(() => {
-        reevaluateClosestFit();
+        reevaluateClosestFit(undefined);
     }, [!!iAmUntabbable]);
     assertEmptyObject(void2);
     assertEmptyObject(void3);

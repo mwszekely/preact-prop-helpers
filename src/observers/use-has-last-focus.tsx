@@ -1,6 +1,6 @@
 
 import { UseRefElementReturnType } from "../dom-helpers/use-ref-element.js";
-import { returnFalse, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
+import { OnPassiveStateChange, returnFalse, runImmediately, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { assertEmptyObject } from "../util/assert.js";
 import { TargetedPick, useCallback, useEffect } from "../util/lib.js";
 import { Nullable } from "../util/types.js";
@@ -15,14 +15,14 @@ export interface UseHasLastFocusParametersSelf {
      * 
      * @stable
      */
-    onLastFocusedChanged: Nullable<((focused: boolean, prevFocused: boolean | undefined) => void)>;
+    onLastFocusedChanged: Nullable<OnPassiveStateChange<boolean, UIEvent | undefined>>;
 
     /**
      * Combines the implications of `onFocusedChanged` and `onFocusedChanged`.
      * 
      * @stable
      */
-    onLastFocusedInnerChanged: Nullable<((focused: boolean, prevFocused: boolean | undefined) => void)>;
+    onLastFocusedInnerChanged: Nullable<OnPassiveStateChange<boolean, UIEvent | undefined>>;
 }
 
 
@@ -62,8 +62,8 @@ export function useHasLastFocus<T extends Node>(args: UseHasLastFocusParameters<
 
     useEnsureStability("useHasFocus", onLastFocusedChanged, onLastFocusedInnerChanged);
 
-    const [getLastFocused, setLastFocused] = usePassiveState<boolean, UIEvent>(onLastFocusedChanged, returnFalse, runImmediately);
-    const [getLastFocusedInner, setLastFocusedInner] = usePassiveState<boolean, UIEvent>(onLastFocusedInnerChanged, returnFalse, runImmediately);
+    const [getLastFocused, setLastFocused] = usePassiveState<boolean, UIEvent | undefined>(onLastFocusedChanged, returnFalse, runImmediately);
+    const [getLastFocusedInner, setLastFocusedInner] = usePassiveState<boolean, UIEvent | undefined>(onLastFocusedInnerChanged, returnFalse, runImmediately);
 
     const { activeElementReturn } = useActiveElement({
         activeElementParameters: {
@@ -81,8 +81,8 @@ export function useHasLastFocus<T extends Node>(args: UseHasLastFocusParameters<
 
     useEffect(() => {
         return () => {
-            setLastFocused(false);
-            setLastFocusedInner(false);
+            setLastFocused(false, undefined);
+            setLastFocusedInner(false, undefined);
         }
     }, []);
 

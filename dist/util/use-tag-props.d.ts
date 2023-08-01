@@ -2,7 +2,7 @@ export type TagPropPrefices = "use-ref-element" | "staggered-children-child" | "
 /**
  * Debug function that yells at you if your forgot to use the props a hook returns.
  *
- * @remarks Like other debug hooks, only has any effect IFF there is a global variable called `process.env.NODE_ENV` and it contains the value `"development"`.
+ * @remarks Like other debug hooks, only has any effect IFF there is a global variable called `process.env.NODE_ENV` and it contains the value `"development"`, AND there is a global variable called `_generate_useTagProps_tags` set to true, and stacks are only generated if `_generate_setState_stacks` is true..
  *
  * @param props - The props to return a modified copy of
  * @param tag - Should be unique

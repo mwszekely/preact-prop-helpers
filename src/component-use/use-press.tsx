@@ -214,7 +214,7 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
         const hovering = getHovering();
         const pointerDownStartedHere = getPointerDownStartedHere();
 
-        setJustHandled(true);
+        setJustHandled(true, e);
         if (pointerDownStartedHere && hovering) {
             handlePress(e);
         }
@@ -264,7 +264,7 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
         const pointerDownStartedHere = getPointerDownStartedHere();
 
         if (!excludePointer()) {
-            setJustHandled(true);
+            setJustHandled(true, e);
             if (pointerDownStartedHere && hovering) {
                 handlePress(e);
                 e.preventDefault();

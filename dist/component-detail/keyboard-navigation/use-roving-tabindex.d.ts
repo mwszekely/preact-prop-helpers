@@ -144,7 +144,7 @@ export interface RovingTabIndexChildContextSelf {
      * (This is technically the same as what's passed to onChildrenMountChange,
      * but it serves a slightly different purpose and is separate for clarity)
      */
-    reevaluateClosestFit: (requestedIndex?: number) => void;
+    reevaluateClosestFit: (reason: EventType<any, any> | undefined) => void;
 }
 export interface RovingTabIndexChildContext {
     rovingTabIndexContext: RovingTabIndexChildContextSelf;

@@ -193,7 +193,7 @@ export interface RovingTabIndexChildContextSelf {
      * (This is technically the same as what's passed to onChildrenMountChange,
      * but it serves a slightly different purpose and is separate for clarity)
      */
-    reevaluateClosestFit: (requestedIndex?: number) => void;
+    reevaluateClosestFit: (reason: EventType<any, any> | undefined) => void;
 };
 
 
@@ -291,7 +291,7 @@ export function useRovingTabIndex<ParentElement extends Element, ChildElement ex
             // Whether or not we're currently tabbable, make sure that when we switch from untabbable to tabbable,
             // that we know which index to switch back to.
             if (nextIndex != null)
-                setLastNonNullIndex(nextIndex);
+                setLastNonNullIndex(nextIndex, reason!);
 
             // If we're untabbable, then any attempt to set a new index simply fails and sets it to `null`.
             if (untabbable) {
@@ -335,11 +335,11 @@ export function useRovingTabIndex<ParentElement extends Element, ChildElement ex
 
             // TODO: Redundant?
             if (nextIndex != null)
-                setLastNonNullIndex(nextIndex);
+                setLastNonNullIndex(nextIndex, reason!);
 
             // Finally, return the value the user requested the index be set to.
             return nextIndex ?? 0;
-        }, reason);
+        }, reason!);
     });
 
     // When we switch from tabbable to non/tabbable, we really want to remember the last tabbable child.
@@ -350,9 +350,9 @@ export function useRovingTabIndex<ParentElement extends Element, ChildElement ex
     useEffect(() => {
         let shouldFocusParentAfterwards = (getElement()?.contains(document.activeElement));
         if (untabbable)
-            changeTabbableIndex(null, undefined!);
+            changeTabbableIndex(null, undefined);
         else {
-            changeTabbableIndex(getLastNonNullIndex(), undefined!);
+            changeTabbableIndex(getLastNonNullIndex(), undefined);
         }
 
         if (shouldFocusParentAfterwards) {
@@ -364,12 +364,12 @@ export function useRovingTabIndex<ParentElement extends Element, ChildElement ex
     const getTabbableAt = useCallback((child: M) => { return child.getLocallyTabbable() }, []);
     const setTabbableAt = useCallback((child: M, t: boolean) => { child.setLocallyTabbable(t); }, []);
     const isTabbableValid = useStableCallback((child: M) => { return !child.untabbable; });
-    const { changeIndex: changeTabbableIndex, getCurrentIndex: getTabbableIndex, reevaluateClosestFit } = useChildrenFlag<M, EventType<any, any>>({
+    const { changeIndex: changeTabbableIndex, getCurrentIndex: getTabbableIndex, reevaluateClosestFit } = useChildrenFlag<M, EventType<any, any> | undefined>({
         initialIndex: initiallyTabbedIndex ?? (untabbable ? null : 0),
         onIndexChange: useStableCallback((n, p, r) => {
             // Ensure that changes to `untabbable` don't affect the user-provided onTabbableIndexChange
             if ((!(n == null && untabbable)) && n != getLastNonNullIndex())
-                onTabbableIndexChange?.(n, p, r);
+                onTabbableIndexChange?.(n, p, r!);
         }),
         getChildren,
         closestFit: true,
@@ -426,7 +426,7 @@ export function useRovingTabIndex<ParentElement extends Element, ChildElement ex
     });
 
     return {
-        managedChildrenParameters: { onChildrenMountChange: reevaluateClosestFit, },
+        managedChildrenParameters: { onChildrenMountChange: useCallback(() => { reevaluateClosestFit(undefined); }, [reevaluateClosestFit]), },
         rovingTabIndexReturn: { setTabbableIndex, getTabbableIndex, focusSelf },
         context: useMemoObject({ rovingTabIndexContext }),
         props: useTagProps({
@@ -470,7 +470,7 @@ export function useRovingTabIndexChild<ChildElement extends Element>({
     const [tabbable, setTabbable, getTabbable] = useState(getInitiallyTabbedIndex() === index);
 
     useEffect(() => {
-        reevaluateClosestFit();
+        reevaluateClosestFit(undefined);
     }, [!!iAmUntabbable]);
 
     assertEmptyObject(void2);

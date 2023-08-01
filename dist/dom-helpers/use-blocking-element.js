@@ -29,9 +29,9 @@ export function useBlockingElement({ activeElementParameters: { getDocument, onA
                 onLastActiveElementChange?.(e, prev, reason);
                 if (e) {
                     if (enabled)
-                        setLastActiveWhenOpen(e);
+                        setLastActiveWhenOpen(e, reason);
                     else
-                        setLastActiveWhenClosed(e);
+                        setLastActiveWhenClosed(e, reason);
                 }
             })
         }

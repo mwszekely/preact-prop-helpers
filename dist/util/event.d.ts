@@ -5,7 +5,7 @@
  *
  * Get that extra information from the [EventDetail] symbol.
  */
-import { EventType } from "./lib.js";
+import { EventType, Nullable } from "./lib.js";
 export declare const EventDetail: unique symbol;
 export type EventDetail = typeof EventDetail;
 export type EnhancedEventHandler<E extends Event, Detail> = (e: TargetedEnhancedEvent<E, Detail>) => void;
@@ -13,5 +13,5 @@ export type TargetedEnhancedEvent<E extends Event, Detail> = E & {
     [EventDetail]: Detail;
 };
 export declare function getEventDetail<Detail>(e: TargetedEnhancedEvent<any, Detail>): Detail;
-export declare function enhanceEvent<E extends Event | EventType<any, any>, Detail extends object>(e: E, detail: Detail): TargetedEnhancedEvent<E & Event, Detail>;
+export declare function enhanceEvent<E extends Event | EventType<any, any>, Detail extends object>(e: Nullable<E>, detail: Detail): TargetedEnhancedEvent<E & Event, Detail>;
 //# sourceMappingURL=event.d.ts.map

@@ -1,5 +1,9 @@
 /** Opposite of NonNullable */
 export type Nullable<T = null> = null | undefined | T;
+/** Like `Required`, but also makes types `NonNullable` besides just required. */
+export type RequiredN<T> = {
+    [P in keyof T]-?: NonNullable<T[P]>;
+};
 /** Like Omit, but with type completion */
 export type OmitStrong<T, K extends keyof T> = Omit<T, K>;
 /** "**Pick**, then **omit**". Given an object, omits everything but the given props in the given sub-object, including other sub-objects. */

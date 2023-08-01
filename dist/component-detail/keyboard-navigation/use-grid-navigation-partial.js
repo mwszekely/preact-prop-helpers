@@ -125,7 +125,7 @@ refElementReturn, ...void1 }) {
             untabbable: allChildCellsAreUntabbable || rowIsUntabbableAndSoAreCells,
             initiallyTabbedIndex,
             onTabbableIndexChange: useStableCallback((v, p, r) => {
-                setTabbableColumn({ ideal: v, actual: v });
+                setTabbableColumn({ ideal: v, actual: v }, r);
                 onTabbableIndexChange?.(v, p, r);
             })
         },
@@ -205,7 +205,7 @@ export function useGridNavigationCell({ context: { gridNavigationCellContext: { 
     assertEmptyObject(void7);
     return {
         info: infoLs,
-        props: useMergedProps(props, { onClick: () => setTabbableColumn(prev => ({ ideal: index, actual: (prev?.actual ?? index) })) }),
+        props: useMergedProps(props, { onClick: (e) => setTabbableColumn(prev => ({ ideal: index, actual: (prev?.actual ?? index) }), e) }),
         rovingTabIndexChildReturn,
         textContentReturn,
         pressParameters,

@@ -6,14 +6,14 @@ let idIndex = 0;
 /**
  * Debug function that yells at you if your forgot to use the props a hook returns.
  *
- * @remarks Like other debug hooks, only has any effect IFF there is a global variable called `process.env.NODE_ENV` and it contains the value `"development"`.
+ * @remarks Like other debug hooks, only has any effect IFF there is a global variable called `process.env.NODE_ENV` and it contains the value `"development"`, AND there is a global variable called `_generate_useTagProps_tags` set to true, and stacks are only generated if `_generate_setState_stacks` is true..
  *
  * @param props - The props to return a modified copy of
  * @param tag - Should be unique
  * @returns A modified copy of the given props
  */
 export function useTagProps(props, tag) {
-    if (BuildMode === 'development') {
+    if (BuildMode === 'development' && window._generate_useTagProps_tags) {
         const [id] = useState(() => ++idIndex);
         const propsIdTag = `data-props-${tag}-${id}`;
         const getStack = useStack();

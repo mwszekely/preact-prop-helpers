@@ -7,6 +7,10 @@ import { CaptureFunctionType } from "async-to-sync";
 import { clsx } from "clsx";
 /** Opposite of NonNullable */
 type Nullable<T = null> = null | undefined | T;
+/** Like `Required`, but also makes types `NonNullable` besides just required. */
+type RequiredN<T> = {
+    [P in keyof T]-?: NonNullable<T[P]>;
+};
 /** Like Omit, but with type completion */
 type OmitStrong<T, K extends keyof T> = Omit<T, K>;
 /** "**Pick**, then **omit**". Given an object, omits everything but the given props in the given sub-object, including other sub-objects. */
@@ -53,9 +57,17 @@ declare const EventMapping$0: {
     [K in keyof HTMLElementEventMap]: (keyof JSX.IntrinsicElements["div"] & `on${string}`);
 };
 /** Takes a new value or a function that updates a value, unlike `OnPassiveStateChange` which reacts to those updates */
-type PassiveStateUpdater<S, R> = ((value: S | ((prevState: S | undefined) => S), reason?: R) => void); //[R] extends [never]? ((value: S | ((prevState: S | undefined) => S), reason?: R) => void) : ((value: S | ((prevState: S | undefined) => S), reason: R) => void);
+type PassiveStateUpdater<S, R> = [
+    R
+] extends [
+    never
+] ? ((value: S | ((prevState: S | undefined) => S), reason?: R) => void) : ((value: S | ((prevState: S | undefined) => S), reason: R) => void);
 /** Responds to a change in a value, unlike `PassiveStateUpdater` which causes the updates */
-type OnPassiveStateChange<S, R> = ((value: S, prevValue: S | undefined, reason?: R) => (void | (() => void))); //[R] extends [never]? ((value: S, prevValue: S | undefined, reason?: R) => (void | (() => void))) : ((value: S, prevValue: S | undefined, reason: R) => (void | (() => void)));
+type OnPassiveStateChange<S, R> = [
+    R
+] extends [
+    never
+] ? ((value: S, prevValue: S | undefined, reason?: R) => (void | (() => void))) : ((value: S, prevValue: S | undefined, reason: R) => (void | (() => void)));
 /**
  * Debug hook. Given a value or set of values, emits a console error if any of them change from one render to the next.
  *
@@ -560,7 +572,7 @@ interface UseChildrenFlagReturnType<M extends ManagedChildInfo<any>, R> {
      *
      * Call this whenever a child mounts/unmounts, or whenever calling a child's isValid() would change
      */
-    reevaluateClosestFit: () => void;
+    reevaluateClosestFit: (reason: R) => void;
     /** @stable */
     getCurrentIndex: () => M["index"] | null;
 }
@@ -587,7 +599,7 @@ interface UseHasCurrentFocusParametersSelf<T extends Node> {
      *
      * @stable
      */
-    onCurrentFocusedChanged: Nullable<OnPassiveStateChange<boolean, FocusEventType<T>>>;
+    onCurrentFocusedChanged: Nullable<OnPassiveStateChange<boolean, FocusEventType<T> | undefined>>;
     /**
      * Like `onFocusedChanged`, but also *additionally* if any child elements are focused.
      *
@@ -595,7 +607,7 @@ interface UseHasCurrentFocusParametersSelf<T extends Node> {
      *
      * @stable
      */
-    onCurrentFocusedInnerChanged: Nullable<OnPassiveStateChange<boolean, FocusEventType<T>>>;
+    onCurrentFocusedInnerChanged: Nullable<OnPassiveStateChange<boolean, FocusEventType<T> | undefined>>;
 }
 interface UseHasCurrentFocusParameters<T extends Node> extends TargetedPick<UseRefElementReturnType<T>, "refElementReturn", "getElement"> {
     hasCurrentFocusParameters: UseHasCurrentFocusParametersSelf<T>;
@@ -767,7 +779,7 @@ interface RovingTabIndexChildContextSelf {
      * (This is technically the same as what's passed to onChildrenMountChange,
      * but it serves a slightly different purpose and is separate for clarity)
      */
-    reevaluateClosestFit: (requestedIndex?: number) => void;
+    reevaluateClosestFit: (reason: EventType<any, any> | undefined) => void;
 }
 interface RovingTabIndexChildContext {
     rovingTabIndexContext: RovingTabIndexChildContextSelf;
@@ -1757,7 +1769,7 @@ interface UseGridNavigationCellContextSelf {
     getRowIndex: () => number;
     setTabbableRow: SetTabbableIndex; //(u: Parameters<StateUpdater<number | null>>[0], fromUserInteraction: boolean) => void;
     getTabbableColumn: () => TabbableColumnInfo;
-    setTabbableColumn: PassiveStateUpdater<TabbableColumnInfo, EventType<any, any>>;
+    setTabbableColumn: PassiveStateUpdater<TabbableColumnInfo, EventType<any, any> | undefined>;
     setTabbableCell: SetTabbableIndex; //(updater: Parameters<StateUpdater<number | null>>[0], fromUserInteraction: boolean) => void;
 }
 interface UseGridNavigationParametersSelf {
@@ -1766,12 +1778,12 @@ interface UseGridNavigationParametersSelf {
      *
      * @stable
      */
-    onTabbableColumnChange: Nullable<OnPassiveStateChange<TabbableColumnInfo, EventType<any, any>>>;
+    onTabbableColumnChange: Nullable<OnPassiveStateChange<TabbableColumnInfo, EventType<any, any> | undefined>>;
 }
 interface UseGridNavigationRowContextSelf {
     setTabbableRow: SetTabbableIndex;
     getTabbableColumn: () => TabbableColumnInfo;
-    setTabbableColumn: PassiveStateUpdater<TabbableColumnInfo, EventType<any, any>>;
+    setTabbableColumn: PassiveStateUpdater<TabbableColumnInfo, EventType<any, any> | undefined>;
 }
 interface UseGridNavigationParameters<ParentOrChildElement extends Element, RowElement extends Element, RM extends GridChildRowInfo<RowElement>> extends OmitStrong<UseListNavigationParameters<ParentOrChildElement, RowElement, RM>, "linearNavigationParameters">, TargetedOmit<UseListNavigationParameters<ParentOrChildElement, RowElement, RM>, "linearNavigationParameters", "arrowKeyDirection"> {
     gridNavigationParameters: UseGridNavigationParametersSelf;
@@ -1854,7 +1866,7 @@ interface UseChildrenHaveFocusParametersSelf<T extends Element> {
      *
      * @stable
      */
-    onCompositeFocusChange: null | OnPassiveStateChange<boolean, FocusEventType<T>>;
+    onCompositeFocusChange: null | OnPassiveStateChange<boolean, FocusEventType<T> | undefined>;
 }
 interface UseChildrenHaveFocusParameters<T extends Element> {
     childrenHaveFocusParameters: UseChildrenHaveFocusParametersSelf<T>;
@@ -1872,7 +1884,7 @@ interface UseChildrenHaveFocusReturnType<T extends Element> {
 interface UseChildrenHaveFocusContext<T extends Element> {
     childrenHaveFocusChildContext: {
         /** @stable */
-        setFocusCount: PassiveStateUpdater<number, FocusEventType<T>>;
+        setFocusCount: PassiveStateUpdater<number, FocusEventType<T> | undefined>;
     };
 }
 interface UseChildrenHaveFocusChildParameters<T extends Element> {
@@ -1901,7 +1913,7 @@ type TargetedEnhancedEvent<E extends Event, Detail> = E & {
     [EventDetail]: Detail;
 };
 declare function getEventDetail<Detail>(e: TargetedEnhancedEvent<any, Detail>): Detail;
-declare function enhanceEvent<E extends Event | EventType<any, any>, Detail extends object>(e: E, detail: Detail): TargetedEnhancedEvent<E & Event, Detail>;
+declare function enhanceEvent<E extends Event | EventType<any, any>, Detail extends object>(e: Nullable<E>, detail: Detail): TargetedEnhancedEvent<E & Event, Detail>;
 /** Anything that's selectable must be tabbable, so we DO use rovingTabIndex instead of just managedChildren */
 interface UseSingleSelectionChildInfo<E extends Element> extends UseRovingTabIndexChildInfo<E> {
     selected: boolean;
@@ -1968,7 +1980,7 @@ interface UseSingleSelectionReturnTypeSelf {
      *
      * @stable
      */
-    changeSelectedIndex: PassiveStateUpdater<number | null, Event>;
+    changeSelectedIndex: PassiveStateUpdater<number | null, SelectedIndexChangeEvent>;
     /**
      * @stable
      */
@@ -2010,7 +2022,7 @@ interface UseSingleSelectionReturnType<ChildElement extends Element> extends Tar
     singleSelectionReturn: UseSingleSelectionReturnTypeSelf;
     context: UseSingleSelectionContext;
 }
-interface SingleSelectionContextSelf extends Pick<UseSingleSelectionParametersSelf, "ariaPropName" | "selectionMode" | "onSelectedIndexChange"> {
+interface SingleSelectionContextSelf extends RequiredN<Pick<UseSingleSelectionParametersSelf, "selectionMode" | "onSelectedIndexChange">>, Pick<UseSingleSelectionParametersSelf, "ariaPropName"> {
     getSelectedIndex(): number | null;
 }
 interface UseSingleSelectionContext {
@@ -2032,12 +2044,12 @@ declare function useSingleSelection<ParentOrChildElement extends Element, ChildE
  * @compositeParams
  */
 declare function useSingleSelectionChild<ChildElement extends Element>({ context: { singleSelectionContext: { getSelectedIndex, onSelectedIndexChange, ariaPropName, selectionMode, ...void1 }, ...void2 }, info: { index, unselectable, ...void3 }, ...void4 }: UseSingleSelectionChildParameters<ChildElement>): UseSingleSelectionChildReturnType<ChildElement>;
-interface UseSingleSelectionDeclarativeParametersSelf extends Pick<UseSingleSelectionParameters<any, any>["singleSelectionParameters"], "onSelectedIndexChange"> {
+interface UseSingleSelectionDeclarativeParametersSelf extends Pick<UseSingleSelectionParametersSelf, "onSelectedIndexChange"> {
     selectedIndex: Nullable<number>;
 }
 interface UseSingleSelectionDeclarativeParameters {
     singleSelectionDeclarativeParameters: UseSingleSelectionDeclarativeParametersSelf;
-    singleSelectionReturn: Pick<UseSingleSelectionReturnType<any>["singleSelectionReturn"], "changeSelectedIndex">;
+    singleSelectionReturn: Pick<UseSingleSelectionReturnTypeSelf, "changeSelectedIndex">;
 }
 type MakeSingleSelectionDeclarativeParameters<P> = Omit<P, "singleSelectionParameters"> & UseSingleSelectionDeclarativeParameters & {
     singleSelectionParameters: Pick<UseSingleSelectionParameters<any, any>["singleSelectionParameters"], "ariaPropName" | "selectionMode">;
@@ -2048,7 +2060,7 @@ type MakeSingleSelectionDeclarativeReturnType<R> = Omit<R, "singleSelectionRetur
  */
 declare function useSingleSelectionDeclarative<ParentOrChildElement extends Element, ChildElement extends Element>({ singleSelectionReturn: { changeSelectedIndex }, singleSelectionDeclarativeParameters: { selectedIndex, onSelectedIndexChange } }: UseSingleSelectionDeclarativeParameters): {
     singleSelectionParameters: {
-        onSelectedIndexChange: Nullable<SelectedIndexChangeHandler>;
+        onSelectedIndexChange: SelectedIndexChangeHandler;
     };
 };
 interface UseListNavigationSingleSelectionChildInfo<TabbableChildElement extends Element> extends UseListNavigationChildInfo<TabbableChildElement>, UseSingleSelectionChildInfo<TabbableChildElement> {
@@ -2990,13 +3002,13 @@ interface UseHasLastFocusParametersSelf {
      *
      * @stable
      */
-    onLastFocusedChanged: Nullable<((focused: boolean, prevFocused: boolean | undefined) => void)>;
+    onLastFocusedChanged: Nullable<OnPassiveStateChange<boolean, UIEvent | undefined>>;
     /**
      * Combines the implications of `onFocusedChanged` and `onFocusedChanged`.
      *
      * @stable
      */
-    onLastFocusedInnerChanged: Nullable<((focused: boolean, prevFocused: boolean | undefined) => void)>;
+    onLastFocusedInnerChanged: Nullable<OnPassiveStateChange<boolean, UIEvent | undefined>>;
 }
 interface UseHasLastFocusParameters<T extends Node> extends UseActiveElementParameters, TargetedPick<UseRefElementReturnType<T>, "refElementReturn", "getElement"> {
     hasLastFocusParameters: UseHasLastFocusParametersSelf;
@@ -3560,7 +3572,7 @@ declare function generateStack(): string | undefined;
 /**
  * Returns a function that retrieves the stack at the time this hook was called (in development mode only).
  *
- *
+ * @remarks The global variable `_generate_setState_stacks` must be true, or no stack will be generated.
  */
 declare function useStack(): () => string | undefined;
 /**

@@ -96,7 +96,7 @@ export function useMutationObserver<E extends Element>({
 
     const { refElementReturn, propsStable } = useRefElement<E>({
         refElementParameters: {
-            onElementChange: useStableCallback((e: E | null, p: E | null | undefined) => { onElementChange?.(e, p); onNeedMutationObserverReset(e); }),
+            onElementChange: useStableCallback((e: E | null, p: E | null | undefined, r) => { onElementChange?.(e, p, r); onNeedMutationObserverReset(e); }),
             ...rest
         }
     });

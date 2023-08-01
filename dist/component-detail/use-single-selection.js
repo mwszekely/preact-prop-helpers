@@ -6,7 +6,7 @@ import { useMemoObject } from "../preact-extensions/use-stable-getter.js";
 import { useState } from "../preact-extensions/use-state.js";
 import { assertEmptyObject } from "../util/assert.js";
 import { enhanceEvent } from "../util/event.js";
-import { useCallback, useEffect } from "../util/lib.js";
+import { useCallback, useEffect, useRef } from "../util/lib.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 import { useTagProps } from "../util/use-tag-props.js";
 /**
@@ -57,7 +57,7 @@ export function useSingleSelection({ managedChildrenReturn: { getChildren, ...vo
         context: useMemoObject({
             singleSelectionContext: useMemoObject({
                 getSelectedIndex,
-                onSelectedIndexChange: onSelectedIndexChange,
+                onSelectedIndexChange,
                 ariaPropName,
                 selectionMode
             }),
@@ -85,17 +85,16 @@ export function useSingleSelectionChild({ context: { singleSelectionContext: { g
     assertEmptyObject(void3);
     assertEmptyObject(void4);
     useEnsureStability("useSingleSelectionChild", getSelectedIndex, onSelectedIndexChange);
-    //const getUnselectable = useStableGetter(unselectable);
     const [localSelected, setLocalSelected, getLocalSelected] = useState(getSelectedIndex() == index);
     const [direction, setDirection, getDirection] = useState(getSelectedIndex() == null ? null : (getSelectedIndex() - index));
     const onCurrentFocusedInnerChanged = useStableCallback((focused, _prev, e) => {
         if (selectionMode == 'focus' && focused && !unselectable) {
-            onSelectedIndexChange?.(enhanceEvent(e, { selectedIndex: index }));
+            onSelectedIndexChange(enhanceEvent(e, { selectedIndex: index }));
         }
     });
     const onPressSync = useStableCallback((e) => {
         if (selectionMode == 'activation' && !unselectable)
-            onSelectedIndexChange?.(enhanceEvent(e, { selectedIndex: index }));
+            onSelectedIndexChange(enhanceEvent(e, { selectedIndex: index }));
     });
     const propParts = ariaPropName?.split("-") ?? [];
     return {
@@ -117,7 +116,7 @@ export function useSingleSelectionChild({ context: { singleSelectionContext: { g
             [`${propParts[0]}-${propParts[1]}`]: (localSelected ? (propParts[1] == "current" ? `${propParts[2]}` : `true`) : "false")
         }, "data-single-selection-child"),
         hasCurrentFocusParameters: { onCurrentFocusedInnerChanged },
-        pressParameters: { onPressSync: onSelectedIndexChange ? onPressSync : null }
+        pressParameters: { onPressSync }
     };
 }
 /**
@@ -125,7 +124,12 @@ export function useSingleSelectionChild({ context: { singleSelectionContext: { g
  */
 export function useSingleSelectionDeclarative({ singleSelectionReturn: { changeSelectedIndex }, singleSelectionDeclarativeParameters: { selectedIndex, onSelectedIndexChange } }) {
     let s = (selectedIndex ?? null);
-    useEffect(() => { changeSelectedIndex(s); }, [s]);
-    return { singleSelectionParameters: { onSelectedIndexChange } };
+    let reasonRef = useRef(undefined);
+    useEffect(() => { changeSelectedIndex(s, reasonRef.current); }, [s]);
+    const osic = useCallback((e) => {
+        reasonRef.current = e;
+        return onSelectedIndexChange?.(e);
+    }, [onSelectedIndexChange]);
+    return { singleSelectionParameters: { onSelectedIndexChange: osic } };
 }
 //# sourceMappingURL=use-single-selection.js.map

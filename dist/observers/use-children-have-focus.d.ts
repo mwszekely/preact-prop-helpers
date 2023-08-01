@@ -7,7 +7,7 @@ export interface UseChildrenHaveFocusParametersSelf<T extends Element> {
      *
      * @stable
      */
-    onCompositeFocusChange: null | OnPassiveStateChange<boolean, FocusEventType<T>>;
+    onCompositeFocusChange: null | OnPassiveStateChange<boolean, FocusEventType<T> | undefined>;
 }
 export interface UseChildrenHaveFocusParameters<T extends Element> {
     childrenHaveFocusParameters: UseChildrenHaveFocusParametersSelf<T>;
@@ -25,7 +25,7 @@ export interface UseChildrenHaveFocusReturnType<T extends Element> {
 export interface UseChildrenHaveFocusContext<T extends Element> {
     childrenHaveFocusChildContext: {
         /** @stable */
-        setFocusCount: PassiveStateUpdater<number, FocusEventType<T>>;
+        setFocusCount: PassiveStateUpdater<number, FocusEventType<T> | undefined>;
     };
 }
 export interface UseChildrenHaveFocusChildParameters<T extends Element> {

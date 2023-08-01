@@ -87,7 +87,7 @@ export function useGridNavigationSingleSelectionRow({ info: mcp1, linearNavigati
         },
         managedChildrenParameters,
         pressParameters: { onPressSync, excludeSpace },
-        hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: useStableCallback((hasFocus, hadFocus) => { ocfic1?.(hasFocus, hadFocus); ocfic2?.(hasFocus, hadFocus); }) },
+        hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: useStableCallback((hasFocus, hadFocus, reason) => { ocfic1?.(hasFocus, hadFocus, reason); ocfic2?.(hasFocus, hadFocus, reason); }) },
         props: useMergedProps(propsGridNavigation, propsSingleSelection),
         rovingTabIndexChildReturn,
         rovingTabIndexReturn,

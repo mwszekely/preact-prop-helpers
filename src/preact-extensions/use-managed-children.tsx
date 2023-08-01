@@ -502,7 +502,7 @@ export interface UseChildrenFlagReturnType<M extends ManagedChildInfo<any>, R> {
      * 
      * Call this whenever a child mounts/unmounts, or whenever calling a child's isValid() would change
      */
-    reevaluateClosestFit: () => void;
+    reevaluateClosestFit: (reason: R) => void;
     /** @stable */
     getCurrentIndex: () => M["index"] | null;
 }
@@ -557,7 +557,7 @@ export function useChildrenFlag<M extends ManagedChildInfo<number | string>, R>(
     // the "currently selected" (or whatever) index.  The two cases we're looking for:
     // 1. The currently selected child unmounted
     // 2. A child mounted, and it mounts with the index we're looking for
-    const reevaluateClosestFit = useStableCallback(() => {
+    const reevaluateClosestFit = useStableCallback((reason: R) => {
         const children = getChildren();
         const requestedIndex = getRequestedIndex();
         const currentIndex = getCurrentIndex();
@@ -567,7 +567,7 @@ export function useChildrenFlag<M extends ManagedChildInfo<number | string>, R>(
             console.assert(typeof requestedIndex == "number", "closestFit can only be used when each child has a numeric index, and cannot be used when children use string indices instead.");
 
             const closestFitIndex = getClosestFit(requestedIndex as number);
-            setCurrentIndex(closestFitIndex, undefined!);
+            setCurrentIndex(closestFitIndex, reason);
             if (currentChild)
                 setAt(currentChild, false, closestFitIndex, currentIndex);
             if (closestFitIndex != null) {
@@ -584,13 +584,13 @@ export function useChildrenFlag<M extends ManagedChildInfo<number | string>, R>(
     });
 
 
-
+    const reasonRef = useRef<R | undefined>(undefined);
 
     const changeIndex = useCallback<PassiveStateUpdater<M["index"] | null, R>>((arg: Parameters<PassiveStateUpdater<M["index"] | null, R>>[0], reason: Parameters<PassiveStateUpdater<M["index"] | null, R>>[1]) => {
         const children = getChildren();
         const requestedIndex = (arg instanceof Function ? arg(getRequestedIndex()) : arg) as M["index"];
-
-        setRequestedIndex(requestedIndex, reason as R);
+        reasonRef.current = reason;
+        setRequestedIndex(requestedIndex, reason as never);
         const currentIndex = getCurrentIndex();
         if (currentIndex == requestedIndex)
             return requestedIndex;
@@ -599,7 +599,7 @@ export function useChildrenFlag<M extends ManagedChildInfo<number | string>, R>(
         const oldMatchingChild = (currentIndex == null ? null : children.getAt(currentIndex));
         if (requestedIndex == null) {
             // Easy case
-            setCurrentIndex(null, reason as R);
+            setCurrentIndex(null, reason as never);
             if (oldMatchingChild)
                 setAt(oldMatchingChild, false, requestedIndex, currentIndex);
             return null;
@@ -607,7 +607,7 @@ export function useChildrenFlag<M extends ManagedChildInfo<number | string>, R>(
         else {
             const childIsValid = (newMatchingChild && isValid(newMatchingChild));
             if (childIsValid || !closestFit) {
-                setCurrentIndex(requestedIndex, reason as R);
+                setCurrentIndex(requestedIndex, reason as never);
                 if (oldMatchingChild)
                     setAt(oldMatchingChild, false, requestedIndex, currentIndex);
                 if (newMatchingChild)
@@ -619,7 +619,7 @@ export function useChildrenFlag<M extends ManagedChildInfo<number | string>, R>(
                 console.assert(typeof requestedIndex == "number", "closestFit can only be used when each child has a numeric index, and cannot be used when children use string indices instead.");
 
                 const closestFitIndex = getClosestFit(requestedIndex as number);
-                setCurrentIndex(closestFitIndex, reason as R);
+                setCurrentIndex(closestFitIndex, reason as never);
                 if (closestFitIndex != null) {
                     newMatchingChild = children.getAt(closestFitIndex)!;
                     console.assert(newMatchingChild != null, "Internal logic???");
@@ -639,7 +639,7 @@ export function useChildrenFlag<M extends ManagedChildInfo<number | string>, R>(
 
     // Run once, on mount
     useLayoutEffect(() => {
-        changeIndex(initialIndex ?? null, undefined);
+        changeIndex(initialIndex ?? null, reasonRef.current!);
     }, [])
 
     return { changeIndex, reevaluateClosestFit, getCurrentIndex };

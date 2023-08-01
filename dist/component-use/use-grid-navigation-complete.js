@@ -136,10 +136,10 @@ export function useCompleteGridNavigationRow({ info: { index, unselectable, unta
         refElementReturn,
         hasCurrentFocusParameters: {
             onCurrentFocusedChanged: ocfc1,
-            onCurrentFocusedInnerChanged: useStableCallback((focused, prevFocused) => {
+            onCurrentFocusedInnerChanged: useStableCallback((focused, prevFocused, reason) => {
                 // Call grid navigation's focus change
-                ocfic1?.(focused, prevFocused);
-                ocfic3?.(focused, prevFocused);
+                ocfic1?.(focused, prevFocused, reason);
+                ocfic3?.(focused, prevFocused, reason);
             }),
         }
     });

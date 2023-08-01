@@ -61,7 +61,7 @@ export function useMutationObserver({ refElementParameters, mutationObserverPara
     }, [attributeKey, attributeOldValue, characterDataOldValue, subtree]);
     const { refElementReturn, propsStable } = useRefElement({
         refElementParameters: {
-            onElementChange: useStableCallback((e, p) => { onElementChange?.(e, p); onNeedMutationObserverReset(e); }),
+            onElementChange: useStableCallback((e, p, r) => { onElementChange?.(e, p, r); onNeedMutationObserverReset(e); }),
             ...rest
         }
     });

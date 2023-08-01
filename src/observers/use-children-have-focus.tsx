@@ -12,7 +12,7 @@ export interface UseChildrenHaveFocusParametersSelf<T extends Element> {
      * 
      * @stable
      */
-    onCompositeFocusChange: null | OnPassiveStateChange<boolean, FocusEventType<T>>;
+    onCompositeFocusChange: null | OnPassiveStateChange<boolean, FocusEventType<T> | undefined>;
 }
 
 
@@ -36,7 +36,7 @@ export interface UseChildrenHaveFocusReturnType<T extends Element> {
 export interface UseChildrenHaveFocusContext<T extends Element> {
     childrenHaveFocusChildContext: {
         /** @stable */
-        setFocusCount: PassiveStateUpdater<number, FocusEventType<T>>;
+        setFocusCount: PassiveStateUpdater<number, FocusEventType<T> | undefined>;
     }
 }
 
@@ -63,15 +63,15 @@ export function useChildrenHaveFocus<ChildElement extends Element>(args: UseChil
 
     const { childrenHaveFocusParameters: { onCompositeFocusChange } } = args;
 
-    const [getAnyFocused, setAnyFocused] = usePassiveState<boolean, FocusEventType<ChildElement>>(onCompositeFocusChange, returnFalse, runImmediately);
-    const [_getFocusCount, setFocusCount] = usePassiveState<number, FocusEventType<ChildElement>>(useStableCallback<OnPassiveStateChange<number, FocusEventType<ChildElement>>>((anyFocused, anyPreviouslyFocused, e) => {
+    const [getAnyFocused, setAnyFocused] = usePassiveState<boolean, FocusEventType<ChildElement> | undefined>(onCompositeFocusChange, returnFalse, runImmediately);
+    const [_getFocusCount, setFocusCount] = usePassiveState<number, FocusEventType<ChildElement> | undefined>(useStableCallback<OnPassiveStateChange<number, FocusEventType<ChildElement> | undefined>>((anyFocused, anyPreviouslyFocused, e) => {
         console.assert(anyFocused >= 0 && anyFocused <= 1);
         setAnyFocused(!!(anyFocused && !anyPreviouslyFocused), e);
     }));
 
     return {
         childrenHaveFocusReturn: { getAnyFocused },
-        context: useMemoObject({ childrenHaveFocusChildContext: useMemoObject({ setFocusCount }) }),
+        context: useMemoObject<UseChildrenHaveFocusContext<ChildElement>>({ childrenHaveFocusChildContext: useMemoObject<UseChildrenHaveFocusContext<ChildElement>["childrenHaveFocusChildContext"]>({ setFocusCount }) }),
     }
 }
 

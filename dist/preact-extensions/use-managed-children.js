@@ -256,7 +256,7 @@ export function useChildrenFlag({ getChildren, initialIndex, closestFit, onClose
     // the "currently selected" (or whatever) index.  The two cases we're looking for:
     // 1. The currently selected child unmounted
     // 2. A child mounted, and it mounts with the index we're looking for
-    const reevaluateClosestFit = useStableCallback(() => {
+    const reevaluateClosestFit = useStableCallback((reason) => {
         const children = getChildren();
         const requestedIndex = getRequestedIndex();
         const currentIndex = getCurrentIndex();
@@ -264,7 +264,7 @@ export function useChildrenFlag({ getChildren, initialIndex, closestFit, onClose
         if (requestedIndex != null && closestFit && (requestedIndex != currentIndex || currentChild == null || !isValid(currentChild))) {
             console.assert(typeof requestedIndex == "number", "closestFit can only be used when each child has a numeric index, and cannot be used when children use string indices instead.");
             const closestFitIndex = getClosestFit(requestedIndex);
-            setCurrentIndex(closestFitIndex, undefined);
+            setCurrentIndex(closestFitIndex, reason);
             if (currentChild)
                 setAt(currentChild, false, closestFitIndex, currentIndex);
             if (closestFitIndex != null) {
@@ -278,9 +278,11 @@ export function useChildrenFlag({ getChildren, initialIndex, closestFit, onClose
             }
         }
     });
+    const reasonRef = useRef(undefined);
     const changeIndex = useCallback((arg, reason) => {
         const children = getChildren();
         const requestedIndex = (arg instanceof Function ? arg(getRequestedIndex()) : arg);
+        reasonRef.current = reason;
         setRequestedIndex(requestedIndex, reason);
         const currentIndex = getCurrentIndex();
         if (currentIndex == requestedIndex)
@@ -326,7 +328,7 @@ export function useChildrenFlag({ getChildren, initialIndex, closestFit, onClose
     }, []);
     // Run once, on mount
     useLayoutEffect(() => {
-        changeIndex(initialIndex ?? null, undefined);
+        changeIndex(initialIndex ?? null, reasonRef.current);
     }, []);
     return { changeIndex, reevaluateClosestFit, getCurrentIndex };
 }

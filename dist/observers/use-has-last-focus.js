@@ -32,8 +32,8 @@ export function useHasLastFocus(args) {
     });
     useEffect(() => {
         return () => {
-            setLastFocused(false);
-            setLastFocusedInner(false);
+            setLastFocused(false, undefined);
+            setLastFocusedInner(false, undefined);
         };
     }, []);
     return {

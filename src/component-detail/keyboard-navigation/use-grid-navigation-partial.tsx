@@ -29,7 +29,7 @@ export interface UseGridNavigationCellContextSelf {
     getRowIndex: () => number;
     setTabbableRow: SetTabbableIndex; //(u: Parameters<StateUpdater<number | null>>[0], fromUserInteraction: boolean) => void;
     getTabbableColumn: () => TabbableColumnInfo;
-    setTabbableColumn: PassiveStateUpdater<TabbableColumnInfo, EventType<any, any>>;
+    setTabbableColumn: PassiveStateUpdater<TabbableColumnInfo, EventType<any, any> | undefined>;
     setTabbableCell: SetTabbableIndex; //(updater: Parameters<StateUpdater<number | null>>[0], fromUserInteraction: boolean) => void;
 }
 
@@ -39,13 +39,13 @@ export interface UseGridNavigationParametersSelf {
      * 
      * @stable
      */
-    onTabbableColumnChange: Nullable<OnPassiveStateChange<TabbableColumnInfo, EventType<any, any>>>;
+    onTabbableColumnChange: Nullable<OnPassiveStateChange<TabbableColumnInfo, EventType<any, any> | undefined>>;
 }
 
 export interface UseGridNavigationRowContextSelf {
     setTabbableRow: SetTabbableIndex;
     getTabbableColumn: () => TabbableColumnInfo;
-    setTabbableColumn: PassiveStateUpdater<TabbableColumnInfo, EventType<any, any>>;
+    setTabbableColumn: PassiveStateUpdater<TabbableColumnInfo, EventType<any, any> | undefined>;
 }
 
 export interface UseGridNavigationParameters<ParentOrChildElement extends Element, RowElement extends Element, RM extends GridChildRowInfo<RowElement>> extends
@@ -141,7 +141,7 @@ export function useGridNavigation<ParentOrRowElement extends Element, RowElement
 }: UseGridNavigationParameters<ParentOrRowElement, RowElement, GridChildRowInfo<RowElement>>): UseGridNavigationReturnType<ParentOrRowElement, RowElement> {
     monitorCallCount(useGridNavigation);
 
-    const [getTabbableColumn, setTabbableColumn] = usePassiveState<TabbableColumnInfo, EventType<any, any>>(onTabbableColumnChange, useStableCallback(() => {
+    const [getTabbableColumn, setTabbableColumn] = usePassiveState<TabbableColumnInfo, EventType<any, any> | undefined>(onTabbableColumnChange, useStableCallback(() => {
         let t = (listNavigationParameters.rovingTabIndexParameters.initiallyTabbedIndex ?? 0);
         return { actual: t, ideal: t }
     }));
@@ -283,7 +283,7 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
             untabbable: allChildCellsAreUntabbable || rowIsUntabbableAndSoAreCells,
             initiallyTabbedIndex,
             onTabbableIndexChange: useStableCallback((v, p, r) => {
-                setTabbableColumn({ ideal: v, actual: v });
+                setTabbableColumn({ ideal: v, actual: v }, r);
                 onTabbableIndexChange?.(v, p, r);
             })
         },
@@ -406,7 +406,7 @@ export function useGridNavigationCell<CellElement extends Element>({
 
     return {
         info: infoLs,
-        props: useMergedProps(props, { onClick: () => setTabbableColumn(prev => ({ ideal: index, actual: (prev?.actual ?? index) })) }),
+        props: useMergedProps(props, { onClick: (e) => setTabbableColumn(prev => ({ ideal: index, actual: (prev?.actual ?? index) }), e) }),
         rovingTabIndexChildReturn,
         textContentReturn,
         pressParameters,

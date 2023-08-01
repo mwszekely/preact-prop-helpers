@@ -14,7 +14,7 @@ export function generateStack() {
 /**
  * Returns a function that retrieves the stack at the time this hook was called (in development mode only).
  *
- *
+ * @remarks The global variable `_generate_setState_stacks` must be true, or no stack will be generated.
  */
 export function useStack() {
     if (BuildMode === "development") {
