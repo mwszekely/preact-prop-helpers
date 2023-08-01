@@ -1299,7 +1299,7 @@
   const EventDetail = Symbol("event-detail");
   function enhanceEvent(e, detail) {
     const event = e !== null && e !== void 0 ? e : {};
-    event[EventDetail] = detail;
+    Object.assign(event[EventDetail], detail);
     return event;
   }
 

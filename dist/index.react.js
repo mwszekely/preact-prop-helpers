@@ -537,7 +537,7 @@ const EventDetail = Symbol("event-detail");
 function getEventDetail(e) { return e[EventDetail]; }
 function enhanceEvent(e, detail) {
     const event = (e ?? {});
-    event[EventDetail] = detail;
+    Object.assign(event[EventDetail], detail);
     return event;
 }
 
