@@ -61,13 +61,13 @@ type PassiveStateUpdater<S, R> = [
     R
 ] extends [
     never
-] ? ((value: S | ((prevState: S | undefined) => S), reason?: R) => void) : ((value: S | ((prevState: S | undefined) => S), reason: R) => void);
+] ? ((value: S | ((prevState: S | undefined) => S), reason?: R) => void) : ((value: S | ((prevState: S | undefined) => S), reason: R | undefined) => void);
 /** Responds to a change in a value, unlike `PassiveStateUpdater` which causes the updates */
 type OnPassiveStateChange<S, R> = [
     R
 ] extends [
     never
-] ? ((value: S, prevValue: S | undefined, reason?: R) => (void | (() => void))) : ((value: S, prevValue: S | undefined, reason: R) => (void | (() => void)));
+] ? ((value: S, prevValue: S | undefined, reason?: R) => (void | (() => void))) : ((value: S, prevValue: S | undefined, reason: R | undefined) => (void | (() => void)));
 /**
  * Debug hook. Given a value or set of values, emits a console error if any of them change from one render to the next.
  *

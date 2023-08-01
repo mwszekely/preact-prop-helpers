@@ -1,9 +1,9 @@
 import { debounceRendering } from "../util/lib.js";
 import { Nullable } from "../util/types.js";
 /** Takes a new value or a function that updates a value, unlike `OnPassiveStateChange` which reacts to those updates */
-export type PassiveStateUpdater<S, R> = [R] extends [never] ? ((value: S | ((prevState: S | undefined) => S), reason?: R) => void) : ((value: S | ((prevState: S | undefined) => S), reason: R) => void);
+export type PassiveStateUpdater<S, R> = [R] extends [never] ? ((value: S | ((prevState: S | undefined) => S), reason?: R) => void) : ((value: S | ((prevState: S | undefined) => S), reason: R | undefined) => void);
 /** Responds to a change in a value, unlike `PassiveStateUpdater` which causes the updates */
-export type OnPassiveStateChange<S, R> = [R] extends [never] ? ((value: S, prevValue: S | undefined, reason?: R) => (void | (() => void))) : ((value: S, prevValue: S | undefined, reason: R) => (void | (() => void)));
+export type OnPassiveStateChange<S, R> = [R] extends [never] ? ((value: S, prevValue: S | undefined, reason?: R) => (void | (() => void))) : ((value: S, prevValue: S | undefined, reason: R | undefined) => (void | (() => void)));
 /**
  * Debug hook. Given a value or set of values, emits a console error if any of them change from one render to the next.
  *
