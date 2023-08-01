@@ -1298,7 +1298,9 @@
    */
   const EventDetail = Symbol("event-detail");
   function enhanceEvent(e, detail) {
+    var _event$EventDetail;
     const event = e !== null && e !== void 0 ? e : {};
+    (_event$EventDetail = event[EventDetail]) !== null && _event$EventDetail !== void 0 ? _event$EventDetail : event[EventDetail] = {};
     Object.assign(event[EventDetail], detail);
     return event;
   }

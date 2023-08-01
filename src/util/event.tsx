@@ -18,6 +18,7 @@ export function getEventDetail<Detail>(e: TargetedEnhancedEvent<any, Detail>): D
 
 export function enhanceEvent<E extends Event | EventType<any, any>, Detail extends object>(e: Nullable<E>, detail: Detail): TargetedEnhancedEvent<E & Event, Detail> {
     const event = (e as TargetedEnhancedEvent<E & Event, Detail> ?? {});
+    event[EventDetail] ??= {} as Partial<Detail> as Detail;
     Object.assign(event[EventDetail], detail);
     return event;
 }

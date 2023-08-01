@@ -9,6 +9,7 @@ export const EventDetail = Symbol("event-detail");
 export function getEventDetail(e) { return e[EventDetail]; }
 export function enhanceEvent(e, detail) {
     const event = (e ?? {});
+    event[EventDetail] ??= {};
     Object.assign(event[EventDetail], detail);
     return event;
 }
