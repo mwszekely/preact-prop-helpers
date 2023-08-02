@@ -50,17 +50,20 @@ const DemoUseDraggable = () => {
 
 const ChildrenHaveFocusContext = createContext<UseChildrenHaveFocusChildParameters<HTMLDivElement>["context"]>(null!);
 const DemoUseChildrenHaveFocus = () => {
+    const [animate, setAnimate] = useState(false);
     const [maxChildCount, setMaxChildCount] = useState(10);
     const [minChildCount, setMinChildCount] = useState(5);
     const [currentChildCount, setCurrentChildCount] = useState(minChildCount);
     useInterval({
         callback: () => {
-            if (currentChildCount == minChildCount)
-                setCurrentChildCount(maxChildCount);
-            else
-                setCurrentChildCount(currentChildCount - 1);
-            //let newChildCount = Math.round(Math.random() * (maxChildCount - minChildCount)) + minChildCount
-            //setCurrentChildCount(newChildCount);
+            if (animate) {
+                if (currentChildCount == minChildCount)
+                    setCurrentChildCount(maxChildCount);
+                else
+                    setCurrentChildCount(currentChildCount - 1);
+                //let newChildCount = Math.round(Math.random() * (maxChildCount - minChildCount)) + minChildCount
+                //setCurrentChildCount(newChildCount);
+            }
         },
         interval: 1000
     });
@@ -75,6 +78,7 @@ const DemoUseChildrenHaveFocus = () => {
             <div><label><input type="number" min={0} value={minChildCount} onInput={e => { e.preventDefault(); setMinChildCount(e.currentTarget.valueAsNumber) }} /> Min # of children</label></div>
             <div><label><input type="number" min={minChildCount} value={maxChildCount} onInput={e => { e.preventDefault(); setMaxChildCount(e.currentTarget.valueAsNumber) }} /> Max # of children</label></div>
             <div>Current # of children: {currentChildCount}</div>
+            <label><input type="checkbox" onInput={e => setAnimate(e.currentTarget.checked)} /> Mount &amp; unmount children on a cycle</label>
             <ChildrenHaveFocusContext.Provider value={context}>
                 <div>Any children focused: {anyFocused.toString()}</div>
                 <div>{Array.from((function* () {
@@ -567,13 +571,16 @@ const FullReference = () => {
 }*/
 
 import { options } from "preact";
+import { DemoUseInterval } from "./demos/use-interval.js";
+import { DemoUseModal } from "./demos/use-modal.js";
+import { DemoUseRovingTabIndex } from "./demos/use-roving-tab-index.js";
+import { DemoUseTimeout } from "./demos/use-timeout.js";
 options.debounceRendering = (f) => f();
 
 const Component = () => {
 
     return <div class="flex" style={{ flexWrap: "wrap" }}>
-    <DemoUseGrid />
-       {/* <DemoPress remaining={2} />
+        <DemoPress remaining={2} />
         <input />
         <div style="display:grid;grid-template-columns:1fr 1fr">
             <DemoUseModal />
@@ -614,7 +621,7 @@ const Component = () => {
         <hr />
         <DemoUseElementSizeAnimation />
         <hr />
-        <input /> */}
+        <input />
     </div>
 }
 

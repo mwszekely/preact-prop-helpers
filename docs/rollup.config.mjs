@@ -30,6 +30,7 @@ export default {
         name: "bundle",
         sourcemap: true,
     },
+    external: ["process"],
     treeshake: "recommended",
     plugins: [
         typescript(),
