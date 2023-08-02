@@ -2638,7 +2638,9 @@ function useSingleSelectionChild({ context: { singleSelectionContext: { getSelec
         }
     });
     const onPressSync = useStableCallback((e) => {
-        if (selectionMode == 'activation' && !unselectable)
+        // We allow press events for selectionMode == 'focus' because
+        // press generally causes a focus anyway (except when it doesn't, iOS Safari...)
+        if (selectionMode != 'disabled' && !unselectable)
             onSelectedIndexChange(enhanceEvent(e, { selectedIndex: index }));
     });
     const propParts = ariaPropName?.split("-") ?? [];

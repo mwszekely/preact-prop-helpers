@@ -67,12 +67,22 @@ export interface UseSingleSelectionParametersSelf {
     onSelectedIndexChange: Nullable<SelectedIndexChangeHandler>; // ((index: number | null, reason: Event | undefined) => void);
 
 
+    /**
+     * What causes a child to become selected?
+     * 
+     * In general, `"focus"` is preferred (and also implies `"activation"` for iOS devices that may or may not focus anything ever),
+     * especially when the change can be seen immediately and there is no consequence for doing so, like with tabs and sometimes radio buttons too.
+     * 
+     * When this is `"disabled"`, all single-selection behavior is turned off, allowing for multi-selection, no selection.
+     */
     selectionMode: "focus" | "activation" | "disabled";
 
     /**
      * What property will be used to mark this item as selected.
      * 
      * **IMPORTANT**: The `aria-current` options should be used with caution as they are semantically very different from the usual selection cases.
+     * 
+     * This is ignored if `selectionMode` is set to `"disabled"`.
      */
     ariaPropName: Nullable<`aria-${"pressed" | "selected" | "checked" | `current-${"page" | "step" | "date" | "time" | "location" | "true"}`}`>;
 
@@ -267,7 +277,9 @@ export function useSingleSelectionChild<ChildElement extends Element>({
     });
 
     const onPressSync = useStableCallback((e: PressEventReason<any>) => {
-        if (selectionMode == 'activation' && !unselectable)
+        // We allow press events for selectionMode == 'focus' because
+        // press generally causes a focus anyway (except when it doesn't, iOS Safari...)
+        if (selectionMode != 'disabled' && !unselectable)
             onSelectedIndexChange(enhanceEvent(e, { selectedIndex: index }));
     });
 
