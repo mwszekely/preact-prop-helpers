@@ -2053,7 +2053,7 @@ declare function useMultiSelection<ParentOrChildElement extends Element, ChildEl
  */
 declare function useMultiSelectionChild<E extends Element>({ info: { index, ...void4 }, multiSelectionChildParameters: { initiallyMultiSelected, onMultiSelectChange, multiSelectionDisabled, ...void1 }, context: { multiSelectionContext: { notifyParentOfChildSelectChange, multiSelectionAriaPropName, multiSelectionMode, doContiguousSelection, changeAllChildren, getCtrlKeyDown, getShiftKeyDown, getAnyFocused, ...void5 }, ...void3 }, ...void2 }: UseMultiSelectionChildParameters<E, UseMultiSelectionChildInfo<E>>): UseMultiSelectionChildReturnType<E, UseMultiSelectionChildInfo<E>>;
 interface UseMultiSelectionChildDeclarativeReturnType<E extends Element, M extends UseMultiSelectionChildInfo<E>> extends TargetedPick<UseMultiSelectionChildParameters<E, M>, "multiSelectionChildParameters", "onMultiSelectChange"> {
-    info: Pick<UseMultiSelectionChildInfo<E>, "setSelectedFromParent">;
+    info: Pick<M, "setSelectedFromParent">;
 }
 interface UseMultiSelectionChildDeclarativeParameters<E extends Element, M extends UseMultiSelectionChildInfo<E>> extends TargetedPick<UseMultiSelectionChildReturnType<E, M>, "multiSelectionChildReturn", "changeMultiSelected"> {
     multiSelectionChildDeclarativeParameters: {
@@ -2082,7 +2082,6 @@ interface UseSingleSelectionChildInfo<E extends Element> extends UseRovingTabInd
      */
     setLocalSingleSelected(selected: boolean, direction: number | null): void;
 }
-//export interface UseSingleSelectionChildInfo<ChildElement extends Element> extends UseRovingTabIndexChildInfo<ChildElement> {}
 type SelectedIndexChangeHandler = EnhancedEventHandler<Event, {
     selectedIndex: number;
 }>;
@@ -2234,7 +2233,7 @@ interface UseSelectionParameters<ParentOrChildElement extends Element, ChildElem
 interface UseSelectionReturnType<ParentElement extends Element, ChildElement extends Element> extends UseSingleSelectionReturnType<ChildElement>, UseMultiSelectionReturnType<ParentElement, ChildElement> {
     context: UseSelectionContext;
 }
-interface UseSelectionChildParameters<ChildElement extends Element, M extends UseSelectionChildInfo<ChildElement>> extends UseGenericChildParameters<UseSelectionContext, Pick<UseSelectionChildInfo<ChildElement>, UseSelectionChildInfoKeysParameters>>, OmitStrong<UseSingleSelectionChildParameters<ChildElement, M>, "info" | "context">, OmitStrong<UseMultiSelectionChildParameters<ChildElement, M>, "info" | "context"> {
+interface UseSelectionChildParameters<ChildElement extends Element, M extends UseSelectionChildInfo<ChildElement>> extends UseGenericChildParameters<UseSelectionContext, Pick<M, UseSelectionChildInfoKeysParameters>>, OmitStrong<UseSingleSelectionChildParameters<ChildElement, M>, "info" | "context">, OmitStrong<UseMultiSelectionChildParameters<ChildElement, M>, "info" | "context"> {
 }
 interface UseSelectionChildReturnType<ChildElement extends Element, M extends UseSelectionChildInfo<ChildElement>> extends ExtendMerge<UseSingleSelectionChildReturnType<ChildElement, M>, UseMultiSelectionChildReturnType<ChildElement, M>> {
 }

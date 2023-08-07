@@ -26,7 +26,7 @@ export interface UseSelectionReturnType<ParentElement extends Element, ChildElem
 }
 
 export interface UseSelectionChildParameters<ChildElement extends Element, M extends UseSelectionChildInfo<ChildElement>> extends
-    UseGenericChildParameters<UseSelectionContext, Pick<UseSelectionChildInfo<ChildElement>, UseSelectionChildInfoKeysParameters>>,
+    UseGenericChildParameters<UseSelectionContext, Pick<M, UseSelectionChildInfoKeysParameters>>,
     OmitStrong<UseSingleSelectionChildParameters<ChildElement, M>, "info" | "context">,
     OmitStrong<UseMultiSelectionChildParameters<ChildElement, M>, "info" | "context"> {
 }

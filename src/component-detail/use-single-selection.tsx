@@ -39,8 +39,6 @@ export interface UseSingleSelectionChildInfo<E extends Element> extends UseRovin
     //unselectable: boolean;
 }
 
-//export interface UseSingleSelectionChildInfo<ChildElement extends Element> extends UseRovingTabIndexChildInfo<ChildElement> {}
-
 export type SelectedIndexChangeHandler = EnhancedEventHandler<Event, { selectedIndex: number }>;
 export type SelectedIndexChangeEvent = TargetedEnhancedEvent<Event, { selectedIndex: number }>;
 

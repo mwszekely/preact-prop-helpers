@@ -500,7 +500,7 @@ export function useMultiSelectionChild<E extends Element>({
 
 export interface UseMultiSelectionChildDeclarativeReturnType<E extends Element, M extends UseMultiSelectionChildInfo<E>> extends
     TargetedPick<UseMultiSelectionChildParameters<E, M>, "multiSelectionChildParameters", "onMultiSelectChange"> {
-    info: Pick<UseMultiSelectionChildInfo<E>, "setSelectedFromParent">;
+    info: Pick<M, "setSelectedFromParent">;
 }
 
 export interface UseMultiSelectionChildDeclarativeParameters<E extends Element, M extends UseMultiSelectionChildInfo<E>> extends

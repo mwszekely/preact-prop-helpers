@@ -13,7 +13,7 @@ export interface UseSelectionParameters<ParentOrChildElement extends Element, Ch
 export interface UseSelectionReturnType<ParentElement extends Element, ChildElement extends Element> extends UseSingleSelectionReturnType<ChildElement>, UseMultiSelectionReturnType<ParentElement, ChildElement> {
     context: UseSelectionContext;
 }
-export interface UseSelectionChildParameters<ChildElement extends Element, M extends UseSelectionChildInfo<ChildElement>> extends UseGenericChildParameters<UseSelectionContext, Pick<UseSelectionChildInfo<ChildElement>, UseSelectionChildInfoKeysParameters>>, OmitStrong<UseSingleSelectionChildParameters<ChildElement, M>, "info" | "context">, OmitStrong<UseMultiSelectionChildParameters<ChildElement, M>, "info" | "context"> {
+export interface UseSelectionChildParameters<ChildElement extends Element, M extends UseSelectionChildInfo<ChildElement>> extends UseGenericChildParameters<UseSelectionContext, Pick<M, UseSelectionChildInfoKeysParameters>>, OmitStrong<UseSingleSelectionChildParameters<ChildElement, M>, "info" | "context">, OmitStrong<UseMultiSelectionChildParameters<ChildElement, M>, "info" | "context"> {
 }
 export interface UseSelectionChildReturnType<ChildElement extends Element, M extends UseSelectionChildInfo<ChildElement>> extends ExtendMerge<UseSingleSelectionChildReturnType<ChildElement, M>, UseMultiSelectionChildReturnType<ChildElement, M>> {
 }
