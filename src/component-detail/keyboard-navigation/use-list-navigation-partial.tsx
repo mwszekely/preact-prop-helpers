@@ -62,8 +62,7 @@ export interface UseListNavigationReturnType<ParentOrChildElement extends Elemen
     OmitStrong<UseRovingTabIndexReturnType<ParentOrChildElement, ChildElement>, "props">,
     OmitStrong<UseTypeaheadNavigationReturnType<ParentOrChildElement>, "propsStable">,
     OmitStrong<UseLinearNavigationReturnType<ParentOrChildElement>, "propsStable"> {
-    propsStableParentOrChild: ElementProps<ParentOrChildElement>;
-    propsParent: ElementProps<ParentOrChildElement>;
+    props: ElementProps<ParentOrChildElement>;
     context: UseListNavigationContext;
 }
 
@@ -129,8 +128,7 @@ export function useListNavigation<ParentOrChildElement extends Element, ChildEle
             ...contextTypeahead
         }),
         linearNavigationReturn,
-        propsStableParentOrChild: propsStable.current,
-        propsParent: propsRTI
+        props: useMergedProps(propsStableLN, propsStableTN, propsRTI)
     }
 }
 

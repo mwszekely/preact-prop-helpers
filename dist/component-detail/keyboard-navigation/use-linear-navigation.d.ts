@@ -25,7 +25,7 @@ export interface UseLinearNavigationParametersSelf<ChildElement extends Element>
      *
      * @stable
      */
-    onNavigateLinear: Nullable<(newIndex: number | null, event: KeyboardEventType<ChildElement>) => void>;
+    onNavigateLinear: Nullable<(newIndex: number, event: KeyboardEventType<ChildElement>) => void>;
     /**
      * Must return true if the child at this index can be navigated to, e.g. `(i) => !getChildren(i)?.hidden`.
      *

@@ -81,7 +81,7 @@ export interface UseGridNavigationRowParameters<RowElement extends Element, Cell
 
 export interface UseGridNavigationRowReturnType<RowElement extends Element, CellElement extends Element> extends
     UseListNavigationChildReturnType<RowElement>,
-    OmitStrong<UseListNavigationReturnType<RowElement, CellElement>, "rovingTabIndexReturn" | "propsStableParentOrChild" | "propsParent" | "context">,
+    OmitStrong<UseListNavigationReturnType<RowElement, CellElement>, "rovingTabIndexReturn" | "context">,
     TargetedOmit<UseListNavigationReturnType<RowElement, CellElement>, "rovingTabIndexReturn", "focusSelf"> {
     context: UseGridNavigationCellContext;
     info: Pick<GridChildRowInfo<RowElement>, UseGridNavigationRowInfoKeysReturnType>;
@@ -152,8 +152,7 @@ export function useGridNavigation<ParentOrRowElement extends Element, RowElement
         typeaheadNavigationReturn,
         managedChildrenParameters,
         context: { rovingTabIndexContext, typeaheadNavigationContext },
-        propsParent,
-        propsStableParentOrChild,
+        props,
         ...void1
     } = useListNavigation<ParentOrRowElement, RowElement>({
         linearNavigationParameters: { arrowKeyDirection: "vertical", ...linearNavigationParameters },
@@ -171,8 +170,7 @@ export function useGridNavigation<ParentOrRowElement extends Element, RowElement
     })
 
     return {
-        propsParent,
-        propsStableParentOrChild,
+        props,
         managedChildrenParameters,
         context: useMemoObject<UseGridNavigationRowContext>({
             gridNavigationRowContext,
@@ -264,8 +262,7 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
     const allChildCellsAreUntabbable = !rovingTabIndexChildReturn.tabbable;
 
     const {
-        propsStableParentOrChild: propsLN,
-        propsParent: propsLN2,
+        props: propsLN,
         context: contextULN,
         linearNavigationReturn,
         managedChildrenParameters,
@@ -322,8 +319,8 @@ export function useGridNavigationRow<RowElement extends Element, CellElement ext
     // TODO: propsLN2 (awful name) is just the tabIndex=0 or -1 from rovingTabIndex, which flips around when `untabbable` flips.
     // We can ignore it here, because our tabIndex is entirely controlled by our own list navigation,
     // but it shouldn't just be ignored wholesale like this.
-    propsLN2.tabIndex = propsLN.tabIndex ?? propsLNC.tabIndex;
-    const props = useMergedProps(propsLN, propsLN2, propsLNC, {
+    propsLN.tabIndex = propsLN.tabIndex ?? propsLNC.tabIndex;
+    const props = useMergedProps(propsLN, propsLNC, {
         // Ensure that if the browser focuses the row for whatever reason, we transfer the focus to a child cell.
         onFocus: useStableCallback(e => whenThisRowIsFocused(e.currentTarget))
     });

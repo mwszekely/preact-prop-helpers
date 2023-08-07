@@ -307,6 +307,7 @@ export function useChildrenFlag({ getChildren, initialIndex, closestFit, onClose
                 return requestedIndex;
             }
             else {
+                console.assert(closestFit);
                 console.assert(typeof requestedIndex == "number", "closestFit can only be used when each child has a numeric index, and cannot be used when children use string indices instead.");
                 const closestFitIndex = getClosestFit(requestedIndex);
                 setCurrentIndex(closestFitIndex, reason);

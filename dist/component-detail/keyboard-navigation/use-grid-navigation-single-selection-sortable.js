@@ -45,7 +45,7 @@ export function useGridNavigationSingleSelectionSortable({ rearrangeableChildren
  *
  * @compositeParams
  */
-export function useGridNavigationSingleSelectionSortableRow({ context: ctxIncoming, info: { index, unselectable, untabbable, ...void2 }, linearNavigationParameters, managedChildrenReturn, refElementReturn, rovingTabIndexParameters, textContentParameters, typeaheadNavigationParameters, gridNavigationSingleSelectionSortableRowParameters: { getSortableColumnIndex: getSortableColumnIndexUnstable, ...void5 }, ...void1 }) {
+export function useGridNavigationSingleSelectionSortableRow({ context: ctxIncoming, info: { index, untabbable, ...void2 }, linearNavigationParameters, managedChildrenReturn, refElementReturn, rovingTabIndexParameters, textContentParameters, typeaheadNavigationParameters, gridNavigationSingleSelectionSortableRowParameters: { getSortableColumnIndex: getSortableColumnIndexUnstable, ...void5 }, ...void1 }) {
     monitorCallCount(useGridNavigationSingleSelectionSortableRow);
     const getSortableColumnIndex = useStableCallback(getSortableColumnIndexUnstable);
     const getSortValue = useCallback(() => {
@@ -54,9 +54,9 @@ export function useGridNavigationSingleSelectionSortableRow({ context: ctxIncomi
         let cell = rows.getAt(columnIndex);
         return cell?.getSortValue();
     }, []);
-    const { info: { getLocallyTabbable, getSelected, selected, setLocalSelected, setLocallyTabbable, focusSelf, ...void4 }, context: ctxOutgoing, hasCurrentFocusParameters, linearNavigationReturn, managedChildrenParameters, pressParameters, props, rovingTabIndexChildReturn, rovingTabIndexReturn, singleSelectionChildReturn, textContentReturn, typeaheadNavigationReturn, ...void3 } = useGridNavigationSingleSelectionRow({
+    const { info: { getLocallyTabbable, getSingleSelected, singleSelected, setLocalSingleSelected, setLocallyTabbable, focusSelf, ...void4 }, context: ctxOutgoing, hasCurrentFocusParameters, linearNavigationReturn, managedChildrenParameters, pressParameters, props, rovingTabIndexChildReturn, rovingTabIndexReturn, singleSelectionChildReturn, textContentReturn, typeaheadNavigationReturn, ...void3 } = useGridNavigationSingleSelectionRow({
         context: ctxIncoming,
-        info: { index, unselectable, untabbable },
+        info: { index, untabbable },
         linearNavigationParameters,
         managedChildrenReturn,
         refElementReturn,
@@ -70,7 +70,7 @@ export function useGridNavigationSingleSelectionSortableRow({ context: ctxIncomi
     assertEmptyObject(void4);
     assertEmptyObject(void5);
     return {
-        info: { getLocallyTabbable, getSelected, selected, setLocallyTabbable, setLocalSelected, getSortValue, focusSelf },
+        info: { getLocallyTabbable, getSingleSelected, singleSelected, setLocallyTabbable, setLocalSingleSelected, getSortValue, focusSelf },
         context: ctxOutgoing,
         hasCurrentFocusParameters,
         linearNavigationReturn,

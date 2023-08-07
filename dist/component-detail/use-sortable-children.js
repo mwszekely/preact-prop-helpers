@@ -1,4 +1,5 @@
-import { returnNull, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
+import { useForceUpdate } from "../preact-extensions/use-force-update.js";
+import { useEnsureStability } from "../preact-extensions/use-passive-state.js";
 import { useStableGetter } from "../preact-extensions/use-stable-getter.js";
 import { createElement, useCallback, useRef } from "../util/lib.js";
 import { monitorCallCount } from "../util/use-call-count.js";
@@ -55,7 +56,8 @@ export function useRearrangeableChildren({ rearrangeableChildrenParameters: { ge
     // this hook, but it's tbody that actually needs updating), we need to remotely
     // get and set a forceUpdate function.
     //const [getForceUpdate, setForceUpdate] = usePassiveState<null | (() => void)>(null, returnNull);
-    const [getForceUpdate, setForceUpdate] = usePassiveState(null, returnNull);
+    //const [getForceUpdate, setForceUpdate] = usePassiveState<null | (() => void), never>(null, returnNull);
+    const forceUpdateRef = useRef(null);
     const rearrange = useCallback((originalRows, sortedRows) => {
         mangleMap.current.clear();
         demangleMap.current.clear();
@@ -69,11 +71,14 @@ export function useRearrangeableChildren({ rearrangeableChildrenParameters: { ge
             }
         }
         onRearrangedGetter()?.();
-        getForceUpdate()?.();
+        forceUpdateRef.current?.();
     }, []);
     const useRearrangedChildren = useCallback(function useRearrangedChildren(children) {
         monitorCallCount(useRearrangedChildren);
         console.assert(Array.isArray(children));
+        const forceUpdate = useForceUpdate();
+        console.assert(forceUpdateRef.current == null || forceUpdateRef.current == forceUpdate);
+        forceUpdateRef.current = forceUpdate; // TODO: Mutation during render? I mean, not really -- it's always the same value...right?
         return children
             .slice()
             .map(child => ({ child, mangledIndex: indexMangler(getIndex(child)), demangledIndex: getIndex(child) }))

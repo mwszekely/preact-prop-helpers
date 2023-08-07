@@ -41,7 +41,7 @@ export interface UseLinearNavigationParametersSelf<ChildElement extends Element>
      * 
      * @stable
      */
-    onNavigateLinear: Nullable<(newIndex: number | null, event: KeyboardEventType<ChildElement>) => void>;
+    onNavigateLinear: Nullable<(newIndex: number, event: KeyboardEventType<ChildElement>) => void>;
 
     /**
      * Must return true if the child at this index can be navigated to, e.g. `(i) => !getChildren(i)?.hidden`.
@@ -222,7 +222,7 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
         }
         else {
             setTabbableIndex(valueDemangled, e, fromUserInteraction);
-            onNavigateLinear?.(valueDemangled, e as KeyboardEventType<ChildElement>);
+            onNavigateLinear?.(valueDemangled!, e as KeyboardEventType<ChildElement>);
             return "stop";
         }
     }, []);
@@ -256,13 +256,9 @@ export function useLinearNavigation<ParentOrChildElement extends Element, ChildE
     const stableProps = useRef<ElementProps<ParentOrChildElement>>(useTagProps({
         onKeyDown: useStableCallback((e) => {
             // Not handled by typeahead (i.e. assume this is a keyboard shortcut)
-            if (e.ctrlKey || e.metaKey)
+            // TODO: ctrlKey was here too, but multi-selection uses that when in focus-selection mode.
+            if (e.metaKey)
                 return;
-
-            //const info = getLogicalDirectionInfo();
-            //const arrowKeyDirection = getArrowKeyDirection();
-            //const disableHomeEndKeys = getDisableHomeEndKeys();
-            //const pageNavigationSize = getPageNavigationSize();
 
             const allowsVerticalNavigation = (arrowKeyDirection == "vertical" || arrowKeyDirection == "either");
             const allowsHorizontalNavigation = (arrowKeyDirection == "horizontal" || arrowKeyDirection == "either");

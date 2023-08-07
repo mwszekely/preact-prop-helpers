@@ -33,10 +33,10 @@ export function useListNavigationSingleSelection({ linearNavigationParameters, r
 /**
  * @compositeParams
  */
-export function useListNavigationSingleSelectionChild({ info: { index, untabbable, unselectable, ...void2 }, context, refElementReturn, textContentParameters, ...void1 }) {
+export function useListNavigationSingleSelectionChild({ info: { index, untabbable, ...void2 }, context, refElementReturn, textContentParameters, ...void1 }) {
     monitorCallCount(useListNavigationSingleSelectionChild);
     const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ...void3 }, info: infoSS, singleSelectionChildReturn, props: propsSS, pressParameters: { onPressSync }, ...void9 } = useSingleSelectionChild({
-        info: { index, unselectable },
+        info: { index, untabbable },
         context,
     });
     const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void6 }, pressParameters: { excludeSpace }, rovingTabIndexChildReturn, textContentReturn, props: propsLN, info: infoLN, ...void8 } = useListNavigationChild({

@@ -32,5 +32,5 @@ export declare function useListNavigationSingleSelection<ParentOrChildElement ex
 /**
  * @compositeParams
  */
-export declare function useListNavigationSingleSelectionChild<ChildElement extends Element>({ info: { index, untabbable, unselectable, ...void2 }, context, refElementReturn, textContentParameters, ...void1 }: UseListNavigationSingleSelectionChildParameters<ChildElement>): UseListNavigationSingleSelectionChildReturnType<ChildElement>;
+export declare function useListNavigationSingleSelectionChild<ChildElement extends Element>({ info: { index, untabbable, ...void2 }, context, refElementReturn, textContentParameters, ...void1 }: UseListNavigationSingleSelectionChildParameters<ChildElement>): UseListNavigationSingleSelectionChildReturnType<ChildElement>;
 //# sourceMappingURL=use-list-navigation-single-selection.d.ts.map

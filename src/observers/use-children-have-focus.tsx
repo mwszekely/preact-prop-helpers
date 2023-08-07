@@ -1,4 +1,4 @@
-import { OnPassiveStateChange, PassiveStateUpdater, returnFalse, runImmediately, usePassiveState } from "../preact-extensions/use-passive-state.js";
+import { OnPassiveStateChange, PassiveStateUpdater, returnFalse, returnZero, runImmediately, usePassiveState } from "../preact-extensions/use-passive-state.js";
 import { useStableCallback } from "../preact-extensions/use-stable-callback.js";
 import { useMemoObject } from "../preact-extensions/use-stable-getter.js";
 import { FocusEventType, TargetedPick } from "../util/types.js";
@@ -67,7 +67,7 @@ export function useChildrenHaveFocus<ChildElement extends Element>(args: UseChil
     const [_getFocusCount, setFocusCount] = usePassiveState<number, FocusEventType<ChildElement> | undefined>(useStableCallback<OnPassiveStateChange<number, FocusEventType<ChildElement> | undefined>>((anyFocused, anyPreviouslyFocused, e) => {
         console.assert(anyFocused >= 0 && anyFocused <= 1);
         setAnyFocused(!!(anyFocused && !anyPreviouslyFocused), e);
-    }));
+    }), returnZero, setTimeout);    // setTimeout is used for the debounce to be somewhat generous with timing, and to guard against the default being runImmediately...
 
     return {
         childrenHaveFocusReturn: { getAnyFocused },

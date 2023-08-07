@@ -114,12 +114,9 @@ export function useLinearNavigation({ linearNavigationParameters: { getLowestInd
     const stableProps = useRef(useTagProps({
         onKeyDown: useStableCallback((e) => {
             // Not handled by typeahead (i.e. assume this is a keyboard shortcut)
-            if (e.ctrlKey || e.metaKey)
+            // TODO: ctrlKey was here too, but multi-selection uses that when in focus-selection mode.
+            if (e.metaKey)
                 return;
-            //const info = getLogicalDirectionInfo();
-            //const arrowKeyDirection = getArrowKeyDirection();
-            //const disableHomeEndKeys = getDisableHomeEndKeys();
-            //const pageNavigationSize = getPageNavigationSize();
             const allowsVerticalNavigation = (arrowKeyDirection == "vertical" || arrowKeyDirection == "either");
             const allowsHorizontalNavigation = (arrowKeyDirection == "horizontal" || arrowKeyDirection == "either");
             let childRange = (getHighestIndex() - getLowestIndex());

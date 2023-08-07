@@ -13,147 +13,155 @@
  * As a full example:
  *
  * ```typescript
- *    // Short, abbreviated version:
- *    const { ...returnType } = useCompleteGridNavigationDeclarative({ ...params });
+ *      // Short, abbreviated version:
+ *      const { ...returnType } = useCompleteGridNavigationDeclarative({ ...params });
  *
- *    // Entirely complete, fully spelt-out version:
- *    const returnType = useCompleteGridNavigationDeclarative<HTMLTableSectionElement, HTMLTableRowElement, HTMLTableCellElement, CustomGridInfo, CustomGridRowInfo>({
- *        // `useRovingTabIndex` is a separate hook that you can call with these same parameters:
- *        rovingTabIndexParameters: {
- *            // If true, the entire grid is removed from the tab order
- *            untabbable: false,
- *            // A function provided by you that is only called when no children are tabbable
- *            focusSelfParent: focus,
- *            // This can be used to track when the user navigates between rows for any reason
- *            onTabbableIndexChange: setTabbableRow,
- *        },
- *        // `useSingleSelection` is a separate hook that you can call with these parameters:
- *        singleSelectionParameters: {
- *            // When a child is selected, it is indicated with this ARIA attribute:
- *            ariaPropName: "aria-checked",
- *            // Are children selected when they are activated (e.g. clicked), or focused (e.g. tabbed to)?
- *            selectionMode: "focus"
- *        },
- *        // (etc. etc.)
- *        typeaheadNavigationParameters: {
- *            // Determines how children are searched for (`Intl.Collator`)
- *            collator: null,
- *            // Whether typeahead behavior is disabled
- *            noTypeahead: false,
- *            // How long a period of no input is required before typeahead clears itself
- *            typeaheadTimeout: 1000,
- *            // This can be used to track when the user navigates between rows via typeahead
- *            onNavigateTypeahead: null
- *        },
- *        linearNavigationParameters: {
- *            // Is navigating to the first/last row with Home/End disabled?
- *            disableHomeEndKeys: false,
- *            // What happens when you press Up on the first row?
- *            navigatePastStart: "wrap",
- *            // What happens when you press Down on the last row?
- *            navigatePastEnd: "wrap",
- *            // How far do Page Up/Down jump?
- *            pageNavigationSize: 0.1,
- *            // This can be used to track when the user navigates between rows with the arrow keys
- *            onNavigateLinear: null
- *        },
- *        singleSelectionDeclarativeParameters: {
- *            // Which child is currently selected?
- *            selectedIndex: selectedRow,
- *            // What happens when the user selects a child?
- *            onSelectedIndexChange: (e) => setSelectedRow(e[EventDetail].selectedIndex)
- *        },
- *        gridNavigationParameters: {
- *            // This can be used by you to track which 0-indexed column is currently the one with focus.
- *            onTabbableColumnChange: setTabbableColumn
- *        },
- *        rearrangeableChildrenParameters: {
- *            // This must return a VNode's 0-based index from its props
- *            getIndex: useCallback<GetIndex>((a: VNode) => a.props.index, [])
- *        },
- *        sortableChildrenParameters: {
- *            // Controls how rows compare against each other
- *            compare: useCallback((rhs: CustomGridInfo, lhs: CustomGridInfo) => { return lhs.index - rhs.index }, [])
- *        },
- *        paginatedChildrenParameters: {
- *            // Controls the current pagination range
- *            paginationMin: null,
- *            paginationMax: null
- *        },
- *        staggeredChildrenParameters: {
- *            // Controls whether children appear staggered as CPU time permits
- *            staggered: false
- *        }
- *    });
+ *      // Entirely complete, fully spelt-out version:
+ *     const allReturnInfo = useCompleteGridNavigationDeclarative<HTMLTableSectionElement, HTMLTableRowElement, HTMLTableCellElement, CustomGridInfo, CustomGridRowInfo>({
+ *         // `useRovingTabIndex` is a separate hook that you can call with these same parameters:
+ *         rovingTabIndexParameters: {
+ *             // If true, the entire grid is removed from the tab order
+ *             untabbable: false,
+ *             // A function provided by you that is only called when no children are tabbable
+ *             focusSelfParent: focus,
+ *             // This can be used to track when the user navigates between rows for any reason
+ *             onTabbableIndexChange: setTabbableRow,
+ *         },
+ *         // `useSingleSelection` is a separate hook that you can call with these parameters:
+ *         typeaheadNavigationParameters: {
+ *             // Determines how children are searched for (`Intl.Collator`)
+ *             collator: null,
+ *             // Whether typeahead behavior is disabled
+ *             noTypeahead: false,
+ *             // How long a period of no input is required before typeahead clears itself
+ *             typeaheadTimeout: 1000,
+ *             // This can be used to track when the user navigates between rows via typeahead
+ *             onNavigateTypeahead: null
+ *         },
+ *         // (etc. etc.)
+ *         linearNavigationParameters: {
+ *             // Is navigating to the first/last row with Home/End disabled?
+ *             disableHomeEndKeys: false,
+ *             // What happens when you press Up on the first row?
+ *             navigatePastStart: "wrap",
+ *             // What happens when you press Down on the last row?
+ *             navigatePastEnd: "wrap",
+ *             // How far do Page Up/Down jump?
+ *             pageNavigationSize: 0.1,
+ *             // This can be used to track when the user navigates between rows with the arrow keys
+ *             onNavigateLinear: null
+ *         },
+ *         singleSelectionParameters: {
+ *             // When a child is selected, it is indicated with this ARIA attribute:
+ *             singleSelectionAriaPropName: "aria-checked",
+ *             // Are children selected when they are activated (e.g. clicked), or focused (e.g. tabbed to)?
+ *             singleSelectionMode: "focus"
+ *         },
+ *         multiSelectionParameters: {
+ *             // Single- and multi- selection are not exclusive, and when so should be indicated via different attributes.
+ *             multiSelectionAriaPropName: "aria-selected",
+ *             // singleSelectionMode but for multi-selection
+ *             multiSelectionMode: "activation",
+ *             // Callback when any child changes with information about % of children checked, etc.
+ *             onSelectionChange: null
+ *         },
+ *         singleSelectionDeclarativeParameters: {
+ *             // Which child is currently selected?
+ *             selectedIndex: selectedRow,
+ *             // What happens when the user selects a child?
+ *             onSelectedIndexChange: (e) => setSelectedRow(e[EventDetail].selectedIndex)
+ *         },
+ *         gridNavigationParameters: {
+ *             // This can be used by you to track which 0-indexed column is currently the one with focus.
+ *             onTabbableColumnChange: setTabbableColumn
+ *         },
+ *         rearrangeableChildrenParameters: {
+ *             // This must return a VNode's 0-based index from its props
+ *             getIndex: useCallback<GetIndex>((a: VNode) => a.props.index, [])
+ *         },
+ *         sortableChildrenParameters: {
+ *             // Controls how rows compare against each other
+ *             compare: useCallback((rhs: CustomGridInfo, lhs: CustomGridInfo) => { return lhs.index - rhs.index }, [])
+ *         },
+ *         paginatedChildrenParameters: {
+ *             // Controls the current pagination range
+ *             paginationMin: null,
+ *             paginationMax: null
+ *         },
+ *         staggeredChildrenParameters: {
+ *             // Controls whether children appear staggered as CPU time permits
+ *             staggered: false
+ *         },
+ *         refElementParameters: {}
+ *     });
  *
- *    // Those were the parameters, these are the return types:
- *    const {
- *        // Spread these props to the HTMLElement that will implement this grid behavior
- *        props,
- *        // The child row will useContext this, so provide it to them.
- *        context,
- *        // This is what `useRovingTabIndex` returned; use it for whatever you need:
- *        rovingTabIndexReturn: {
- *            // Call to focus the grid, which focuses the current row, which focuses its current cell.
- *            focusSelf,
- *            // Returns the index of the row that is tabbable to
- *            getTabbableIndex,
- *            // Changes which row is currently tabbable
- *            setTabbableIndex
- *        },
- *        // This is what `useSingleSelection` returned; use it for whatever you need:
- *        singleSelectionReturn: {
- *            // Largely internal use only (since `selectedIndex` is a prop you pass in for the declarative version)
- *            getSelectedIndex,
- *        },
- *        // (etc. etc.)
- *        typeaheadNavigationReturn: {
- *            // Returns the current value the user has typed for typeahead (cannot be used during render)
- *            getCurrentTypeahead,
- *            // Whether the user's typeahead is invalid/valid/nonexistent.
- *            typeaheadStatus
- *        },
- *        singleSelectionReturn: {
- *            // Largely internal use only (since `selectedIndex` is a prop you pass in for the declarative version)
- *            getSelectedIndex,
- *        },
- *        rearrangeableChildrenReturn: {
- *            // You must call this hook on your array of children to implement the sorting behavior
- *            useRearrangedChildren,
- *            // Largely internal use only
- *            indexDemangler,
- *            // Largely internal use only
- *            indexMangler,
- *            // Largely internal use only, but if you implement a custom sorting algorithm, call this to finalize the rearrangement.
- *            rearrange,
- *            // Reverses all children
- *            reverse,
- *            // Shuffles all children
- *            shuffle
- *        },
- *        sortableChildrenReturn: {
- *            // A table header button would probably call this function to sort all the table rows.
- *            sort
- *        },
- *        linearNavigationReturn: { },
- *        managedChildrenReturn: {
- *            // Returns metadata about each row
- *            getChildren
- *        },
- *        paginatedChildrenReturn: {
- *            // Largely internal use only
- *            refreshPagination
- *        },
- *        staggeredChildrenReturn: {
- *            // When the staggering behavior is currently hiding one or more children, this is true.
- *            stillStaggering
- *        },
- *        childrenHaveFocusReturn: {
- *            // Returns true if any row in this grid is focused
- *            getAnyFocused
- *        },
+ *     // Those were the parameters, these are the return types:
+ *     const {
+ *         // Spread these props to the HTMLElement that will implement this grid behavior
+ *         props,
+ *         // The child row will useContext this, so provide it to them.
+ *         context,
+ *         // This is what `useRovingTabIndex` returned; use it for whatever you need:
+ *         rovingTabIndexReturn: {
+ *             // Call to focus the grid, which focuses the current row, which focuses its current cell.
+ *             focusSelf,
+ *             // Returns the index of the row that is tabbable to
+ *             getTabbableIndex,
+ *             // Changes which row is currently tabbable
+ *             setTabbableIndex
+ *         },
+ *         // This is what `useTypeaheadNavigation` returned; use it for whatever you need:
+ *         typeaheadNavigationReturn: {
+ *             // Returns the current value the user has typed for typeahead (cannot be used during render)
+ *             getCurrentTypeahead,
+ *             // Whether the user's typeahead is invalid/valid/nonexistent.
+ *             typeaheadStatus
+ *         },
+ *         // (etc. etc.)
+ *         singleSelectionReturn: {
+ *             // Largely convenience only (since the caller likely already knows the selected index, but just in case)
+ *             getSingleSelectedIndex,
+ *         },
+ *         multiSelectionReturn: {
+ *             // Nothing, actually
+ *         },
+ *         rearrangeableChildrenReturn: {
+ *             // You must call this hook on your array of children to implement the sorting behavior
+ *             useRearrangedChildren,
+ *             // Largely internal use only
+ *             indexDemangler,
+ *             // Largely internal use only
+ *             indexMangler,
+ *             // Largely internal use only, but if you implement a custom sorting algorithm, call this to finalize the rearrangement.
+ *             rearrange,
+ *             // Reverses all children
+ *             reverse,
+ *             // Shuffles all children
+ *             shuffle
+ *         },
+ *         sortableChildrenReturn: {
+ *             // A table header button would probably call this function to sort all the table rows.
+ *             sort
+ *         },
+ *         linearNavigationReturn: { },
+ *         managedChildrenReturn: {
+ *             // Returns metadata about each row
+ *             getChildren
+ *         },
+ *         paginatedChildrenReturn: {
+ *             // Largely internal use only
+ *             refreshPagination
+ *         },
+ *         staggeredChildrenReturn: {
+ *             // When the staggering behavior is currently hiding one or more children, this is true.
+ *             stillStaggering
+ *         },
+ *         childrenHaveFocusReturn: {
+ *             // Returns true if any row in this grid is focused
+ *             getAnyFocused
+ *         },
  *
- *    } = allReturnInfo;
+ *     } = allReturnInfo;
  * ```
  *
  * ## A note on stability
@@ -236,7 +244,9 @@
  * {@include } {@link useRovingTabIndex}
  * {@include } {@link useLinearNavigation}
  * {@include } {@link useTypeaheadNavigation}
+ * {@include } {@link useSelection}
  * {@include } {@link useSingleSelection}
+ * {@include } {@link useMultiSelection}
  * {@include } {@link useRearrangeableChildren}
  * {@include } {@link useSortableChildren}
  * {@include } {@link usePaginatedChildren}
@@ -327,6 +337,7 @@ import { Ref } from 'preact';
 import { RefCallback } from 'preact';
 import { RefObject } from 'preact';
 import { RenderableProps } from 'preact';
+import { SelectedIndexChangeHandler as SelectedIndexChangeHandler_2 } from './use-single-selection.js';
 import { StateUpdater } from 'preact/hooks';
 import { useCallback } from 'preact/hooks';
 import { useContext } from 'preact/hooks';
@@ -336,6 +347,7 @@ import { useId } from 'preact/hooks';
 import { useImperativeHandle } from 'preact/hooks';
 import { useLayoutEffect } from 'preact/hooks';
 import { useMemo } from 'preact/hooks';
+import { UseMultiSelectionChildDeclarativeReturnType as UseMultiSelectionChildDeclarativeReturnType_2 } from './use-multi-selection.js';
 import { useReducer } from 'preact/hooks';
 import { useRef } from 'preact/hooks';
 import { useState as useStateBasic } from 'preact/hooks';
@@ -384,13 +396,13 @@ export { cloneElement }
 
 export declare type Compare<M extends UseRearrangeableChildInfo> = (lhs: M, rhs: M) => number;
 
-export declare interface CompleteGridNavigationCellContext<ChildElement extends Element, CM extends UseCompleteGridNavigationCellInfo<ChildElement>> extends UseManagedChildrenContext<CM>, UseTypeaheadNavigationContext, RovingTabIndexChildContext, UseGridNavigationCellSingleSelectionSortableContext {
+export declare interface CompleteGridNavigationCellContext<ChildElement extends Element, CM extends UseCompleteGridNavigationCellInfo<ChildElement>> extends UseManagedChildrenContext<CM>, UseTypeaheadNavigationContext, RovingTabIndexChildContext, UseGridNavigationCellSelectionSortableContext {
 }
 
-export declare interface CompleteGridNavigationRowContext<RowElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>> extends UseManagedChildrenContext<RM>, UsePaginatedChildContext, UseStaggeredChildContext, UseChildrenHaveFocusContext<RowElement>, UseTypeaheadNavigationContext, UseSingleSelectionContext, RovingTabIndexChildContext, UseGridNavigationRowContext {
+export declare interface CompleteGridNavigationRowContext<RowElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>> extends UseManagedChildrenContext<RM>, UsePaginatedChildContext, UseStaggeredChildContext, UseChildrenHaveFocusContext<RowElement>, UseTypeaheadNavigationContext, UseSelectionContext, RovingTabIndexChildContext, UseGridNavigationRowContext {
 }
 
-export declare interface CompleteListNavigationContext<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends UseManagedChildrenContext<M>, UsePaginatedChildContext, UseStaggeredChildContext, UseChildrenHaveFocusContext<ChildElement>, UseTypeaheadNavigationContext, UseSingleSelectionContext, RovingTabIndexChildContext {
+export declare interface CompleteListNavigationContext<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends UseManagedChildrenContext<M>, UsePaginatedChildContext, UseStaggeredChildContext, UseChildrenHaveFocusContext<ChildElement>, UseTypeaheadNavigationContext, UseSelectionContext, RovingTabIndexChildContext {
 }
 
 export declare type CompositionEventType<E extends EventTarget> = JSX.TargetedCompositionEvent<E>;
@@ -467,7 +479,7 @@ export declare function enableLoggingPropConflicts(log2: typeof console["log"]):
 
 export declare type EnhancedEventHandler<E extends Event, Detail> = (e: TargetedEnhancedEvent<E, Detail>) => void;
 
-export declare function enhanceEvent<E extends Event | EventType<any, any>, Detail extends object>(e: E, detail: Detail): TargetedEnhancedEvent<E & Event, Detail>;
+export declare function enhanceEvent<E extends Event | EventType<any, any> | TargetedEnhancedEvent<any, any>, Detail extends object>(e: Nullable<E>, detail: Detail): TargetedEnhancedEvent<E & Event, Detail>;
 
 export declare const EventDetail: unique symbol;
 
@@ -576,16 +588,16 @@ export declare interface GridChildCellInfo<CellElement extends Element> extends 
 export declare interface GridChildRowInfo<RowElement extends Element> extends UseListNavigationChildInfo<RowElement> {
 }
 
-export declare interface GridSingleSelectChildCellInfo<CellElement extends Element> extends GridChildCellInfo<CellElement> {
+export declare interface GridSelectChildCellInfo<CellElement extends Element> extends GridChildCellInfo<CellElement> {
 }
 
-export declare interface GridSingleSelectChildRowInfo<RowElement extends Element> extends GridChildRowInfo<RowElement>, UseSingleSelectionChildInfo<RowElement> {
+export declare interface GridSelectChildRowInfo<RowElement extends Element> extends GridChildRowInfo<RowElement>, UseSelectionChildInfo<RowElement> {
 }
 
-export declare interface GridSingleSelectSortableChildCellInfo<CellElement extends Element> extends GridSingleSelectChildCellInfo<CellElement>, UseSortableChildInfo {
+export declare interface GridSelectSortableChildCellInfo<CellElement extends Element> extends GridSelectChildCellInfo<CellElement>, UseSortableChildInfo {
 }
 
-export declare interface GridSingleSelectSortableChildRowInfo<RowElement extends Element> extends GridSingleSelectChildRowInfo<RowElement>, UseSortableChildInfo {
+export declare interface GridSelectSortableChildRowInfo<RowElement extends Element> extends GridSelectChildRowInfo<RowElement>, UseSortableChildInfo {
 }
 
 export declare type HasClass = UseImperativePropsReturnTypeSelf<any>["hasClass"];
@@ -722,11 +734,21 @@ export declare interface LogicalElementSize {
 
 export declare type LogicalOrientation = "inline" | "block";
 
-export declare type MakeSingleSelectionDeclarativeParameters<P> = Omit<P, "singleSelectionParameters"> & UseSingleSelectionDeclarativeParameters & {
-    singleSelectionParameters: Pick<UseSingleSelectionParameters<any, any>["singleSelectionParameters"], "ariaPropName" | "selectionMode">;
-};
+export declare type MakeMultiSelectionChildDeclarativeParameters<P extends UseMultiSelectionChildParameters<any, any>> = OmitStrong<P, "multiSelectionChildParameters"> & UseMultiSelectionChildDeclarativeParameters<any, any> & TargetedPick<UseMultiSelectionChildParameters<any, any>, "multiSelectionChildParameters", never>;
 
-export declare type MakeSingleSelectionDeclarativeReturnType<R> = Omit<R, "singleSelectionReturn">;
+export declare type MakeMultiSelectionChildDeclarativeReturnType<R extends UseMultiSelectionChildReturnType<any, any>> = OmitStrong<R, "multiSelectionChildReturn"> & TargetedOmit<UseMultiSelectionChildReturnType<any, any>, "multiSelectionChildReturn", "changeMultiSelected">;
+
+export declare type MakeSelectionDeclarativeChildParameters<P extends UseMultiSelectionChildParameters<any, any>> = MakeMultiSelectionChildDeclarativeParameters<P>;
+
+export declare type MakeSelectionDeclarativeChildReturnType<R extends UseMultiSelectionChildReturnType<any, any>> = MakeMultiSelectionChildDeclarativeReturnType<R>;
+
+export declare type MakeSelectionDeclarativeParameters<P> = MakeSingleSelectionDeclarativeParameters<P>;
+
+export declare type MakeSelectionDeclarativeReturnType<R> = MakeSingleSelectionDeclarativeReturnType<R>;
+
+export declare type MakeSingleSelectionDeclarativeParameters<P> = Omit<P, "singleSelectionParameters"> & UseSingleSelectionDeclarativeParameters<any> & TargetedPick<UseSingleSelectionParameters<any, any, any>, "singleSelectionParameters", "singleSelectionAriaPropName" | "singleSelectionMode">;
+
+export declare type MakeSingleSelectionDeclarativeReturnType<R> = Omit<R, "singleSelectionReturn"> & TargetedOmit<UseSingleSelectionReturnType<any>, "singleSelectionReturn", "changeSingleSelectedIndex">;
 
 /**
  * Information that children and parents use to communicate with each other.
@@ -807,6 +829,19 @@ export declare function monitorCallCount(hook: Function): void;
 
 export declare type MouseEventType<E extends EventTarget> = JSX.TargetedMouseEvent<E>;
 
+export declare type MultiSelectChildChangeEvent = TargetedEnhancedEvent<Event, {
+    multiSelected: boolean;
+}>;
+
+export declare type MultiSelectChildChangeHandler = EnhancedEventHandler<Event, {
+    multiSelected: boolean;
+}>;
+
+export declare type MultiSelectionChangeEvent = TargetedEnhancedEvent<EventType<any, any>, {
+    selectedPercent: number;
+    selectedIndices: Set<number>;
+}>;
+
 export { MutableRef }
 
 /** Opposite of NonNullable */
@@ -826,7 +861,7 @@ export declare const onfocusout = "onfocusout";
 export declare type OnParamValueChanged<T> = OnPassiveStateChange<T, never>;
 
 /** Responds to a change in a value, unlike `PassiveStateUpdater` which causes the updates */
-export declare type OnPassiveStateChange<S, R> = ((value: S, prevValue: S | undefined, reason?: R) => (void | (() => void)));
+export declare type OnPassiveStateChange<S, R> = ((value: S, prevValue: S | undefined, reason?: R | undefined) => (void | (() => void)));
 
 export declare type OnTabbableIndexChange = (tabbableIndex: number | null) => void;
 
@@ -835,7 +870,7 @@ declare type P = Parameters<typeof clsx>;
 declare type Parameters2<T extends (EventListenerObject | ((...args: any) => any))> = T extends EventListenerObject ? Parameters<T["handleEvent"]> : T extends (...args: infer P) => any ? P : never;
 
 /** Takes a new value or a function that updates a value, unlike `OnPassiveStateChange` which reacts to those updates */
-export declare type PassiveStateUpdater<S, R> = ((value: S | ((prevState: S | undefined) => S), reason?: R) => void);
+export declare type PassiveStateUpdater<S, R> = ((value: S | ((prevState: S | undefined) => S), reason?: R | undefined) => void);
 
 /**
  * All types allowed by `usePersistentState`.
@@ -888,6 +923,11 @@ export declare type RemovePortalChild = UsePortalChildrenReturnType["removeChild
 
 export { RenderableProps }
 
+/** Like `Required`, but also makes types `NonNullable` besides just required. */
+declare type RequiredN<T> = {
+    [P in keyof T]-?: NonNullable<T[P]>;
+};
+
 export declare function returnFalse(): boolean;
 
 export declare function returnNull(): null;
@@ -914,7 +954,7 @@ export declare interface RovingTabIndexChildContextSelf {
      * (This is technically the same as what's passed to onChildrenMountChange,
      * but it serves a slightly different purpose and is separate for clarity)
      */
-    reevaluateClosestFit: (requestedIndex?: number) => void;
+    reevaluateClosestFit: (reason: EventType<any, any> | undefined) => void;
 }
 
 /**
@@ -969,8 +1009,8 @@ export declare type SetStyle = UseImperativePropsReturnTypeSelf<any>["setStyle"]
 
 export declare type SetTabbableIndex = (updater: Parameters<PassiveStateUpdater<number | null, EventType<any, any>>>[0], reason: EventType<any, any> | undefined, fromUserInteraction: boolean) => void;
 
-export declare interface SingleSelectionContextSelf extends Pick<UseSingleSelectionParametersSelf, "ariaPropName" | "selectionMode" | "onSelectedIndexChange"> {
-    getSelectedIndex(): number | null;
+export declare interface SingleSelectionContextSelf extends RequiredN<Pick<UseSingleSelectionParametersSelf, "singleSelectionMode" | "onSingleSelectedIndexChange">>, Pick<UseSingleSelectionParametersSelf, "singleSelectionAriaPropName"> {
+    getSingleSelectedIndex(): number | null;
 }
 
 declare type Stable<T> = T;
@@ -988,8 +1028,8 @@ export declare interface TabbableColumnInfo {
     ideal: number | null;
 }
 
-export declare type TargetedEnhancedEvent<E extends Event, Detail> = E & {
-    [EventDetail]: Detail;
+export declare type TargetedEnhancedEvent<E extends Event | TargetedEnhancedEvent<any, any>, Detail> = E & {
+    [EventDetail]: Detail & (E extends TargetedEnhancedEvent<any, infer D> ? D : {});
 };
 
 /** "**Pick**, then **omit**". Given an object, omits everything but the given props in the given sub-object, including other sub-objects. */
@@ -1558,7 +1598,7 @@ export declare interface UseChildrenFlagReturnType<M extends ManagedChildInfo<an
      *
      * Call this whenever a child mounts/unmounts, or whenever calling a child's isValid() would change
      */
-    reevaluateClosestFit: () => void;
+    reevaluateClosestFit: (reason: R) => void;
     /** @stable */
     getCurrentIndex: () => M["index"] | null;
 }
@@ -1591,7 +1631,7 @@ export declare interface UseChildrenHaveFocusChildReturnType<E extends Element> 
 export declare interface UseChildrenHaveFocusContext<T extends Element> {
     childrenHaveFocusChildContext: {
         /** @stable */
-        setFocusCount: PassiveStateUpdater<number, FocusEventType<T>>;
+        setFocusCount: PassiveStateUpdater<number, FocusEventType<T> | undefined>;
     };
 }
 
@@ -1605,7 +1645,7 @@ export declare interface UseChildrenHaveFocusParametersSelf<T extends Element> {
      *
      * @stable
      */
-    onCompositeFocusChange: null | OnPassiveStateChange<boolean, FocusEventType<T>>;
+    onCompositeFocusChange: null | OnPassiveStateChange<boolean, FocusEventType<T> | undefined>;
 }
 
 export declare interface UseChildrenHaveFocusReturnType<T extends Element> {
@@ -1626,37 +1666,37 @@ export declare interface UseChildrenHaveFocusReturnTypeSelf {
  * @hasChild {@link useCompleteGridNavigationRow}
  * @hasChild {@link useCompleteGridNavigationCell}
  */
-export declare function useCompleteGridNavigation<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>>({ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, typeaheadNavigationParameters, sortableChildrenParameters, rearrangeableChildrenParameters, paginatedChildrenParameters, staggeredChildrenParameters, refElementParameters, ...void1 }: UseCompleteGridNavigationParameters<ParentOrRowElement, RowElement, RM>): UseCompleteGridNavigationReturnType<ParentOrRowElement, RowElement, RM>;
+export declare function useCompleteGridNavigation<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>>({ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, multiSelectionParameters, typeaheadNavigationParameters, sortableChildrenParameters, rearrangeableChildrenParameters, paginatedChildrenParameters, staggeredChildrenParameters, refElementParameters, ...void1 }: UseCompleteGridNavigationParameters<ParentOrRowElement, RowElement, RM>): UseCompleteGridNavigationReturnType<ParentOrRowElement, RowElement, RM>;
 
 /**
  * @compositeParams
  */
 export declare function useCompleteGridNavigationCell<CellElement extends Element, CM extends UseCompleteGridNavigationCellInfo<CellElement>>({ gridNavigationCellParameters, context, textContentParameters, info: { focusSelf, index, untabbable, getSortValue, ...customUserInfo }, ...void1 }: UseCompleteGridNavigationCellParameters<CellElement, CM>): UseCompleteGridNavigationCellReturnType<CellElement, CM>;
 
-export declare interface UseCompleteGridNavigationCellInfo<CellElement extends Element> extends GridSingleSelectSortableChildCellInfo<CellElement>, ManagedChildInfo<number> {
+export declare interface UseCompleteGridNavigationCellInfo<CellElement extends Element> extends GridSelectSortableChildCellInfo<CellElement>, ManagedChildInfo<number> {
 }
 
-export declare type UseCompleteGridNavigationCellInfoKeysParameters<M extends UseCompleteGridNavigationCellInfo<any>> = Exclude<keyof M, keyof UseCompleteGridNavigationCellInfo<any>> | UseGridNavigationSingleSelectionSortableCellInfoKeysParameters | "getSortValue" | "focusSelf";
+export declare type UseCompleteGridNavigationCellInfoKeysParameters<M extends UseCompleteGridNavigationCellInfo<any>> = Exclude<keyof M, keyof UseCompleteGridNavigationCellInfo<any>> | UseGridNavigationSelectionSortableCellInfoKeysParameters | "getSortValue" | "focusSelf";
 
-export declare interface UseCompleteGridNavigationCellParameters<CellElement extends Element, CM extends UseCompleteGridNavigationCellInfo<CellElement>> extends UseGenericChildParameters<CompleteGridNavigationCellContext<CellElement, CM>, Pick<CM, UseCompleteGridNavigationCellInfoKeysParameters<CM>>>, OmitStrong<UseGridNavigationSingleSelectionSortableCellParameters<CellElement, CM>, "info" | "context" | "refElementReturn"> {
+export declare interface UseCompleteGridNavigationCellParameters<CellElement extends Element, CM extends UseCompleteGridNavigationCellInfo<CellElement>> extends UseGenericChildParameters<CompleteGridNavigationCellContext<CellElement, CM>, Pick<CM, UseCompleteGridNavigationCellInfoKeysParameters<CM>>>, OmitStrong<UseGridNavigationSelectionSortableCellParameters<CellElement, CM>, "info" | "context" | "refElementReturn"> {
 }
 
-export declare interface UseCompleteGridNavigationCellReturnType<CellElement extends Element, CM extends UseCompleteGridNavigationCellInfo<CellElement>> extends OmitStrong<UseGridNavigationSingleSelectionSortableCellReturnType<CellElement>, "hasCurrentFocusParameters" | "info">, OmitStrong<UseRefElementReturnType<CellElement>, "propsStable">, UseHasCurrentFocusReturnType<CellElement>, UseManagedChildReturnType<CM> {
+export declare interface UseCompleteGridNavigationCellReturnType<CellElement extends Element, CM extends UseCompleteGridNavigationCellInfo<CellElement>> extends OmitStrong<UseGridNavigationSelectionSortableCellReturnType<CellElement>, "hasCurrentFocusParameters" | "info">, OmitStrong<UseRefElementReturnType<CellElement>, "propsStable">, UseHasCurrentFocusReturnType<CellElement>, UseManagedChildReturnType<CM> {
     props: ElementProps<CellElement>;
 }
 
-export declare function useCompleteGridNavigationDeclarative<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>, CM extends UseCompleteGridNavigationCellInfo<CellElement>>({ gridNavigationParameters, linearNavigationParameters, paginatedChildrenParameters, rearrangeableChildrenParameters, rovingTabIndexParameters, singleSelectionDeclarativeParameters, sortableChildrenParameters, staggeredChildrenParameters, typeaheadNavigationParameters, singleSelectionParameters, refElementParameters, ...void1 }: UseCompleteGridNavigationDeclarativeParameters<ParentOrRowElement, RowElement, RM>): UseCompleteGridNavigationDeclarativeReturnType<ParentOrRowElement, RowElement, CellElement, RM, CM>;
+export declare function useCompleteGridNavigationDeclarative<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>, CM extends UseCompleteGridNavigationCellInfo<CellElement>>({ gridNavigationParameters, linearNavigationParameters, paginatedChildrenParameters, rearrangeableChildrenParameters, rovingTabIndexParameters, singleSelectionDeclarativeParameters, multiSelectionParameters, sortableChildrenParameters, staggeredChildrenParameters, typeaheadNavigationParameters, singleSelectionParameters, refElementParameters, ...void1 }: UseCompleteGridNavigationDeclarativeParameters<ParentOrRowElement, RowElement, RM>): UseCompleteGridNavigationDeclarativeReturnType<ParentOrRowElement, RowElement, CellElement, RM, CM>;
 
-export declare interface UseCompleteGridNavigationDeclarativeParameters<ParentOrRowElement extends Element, RowElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>> extends OmitStrong<MakeSingleSelectionDeclarativeParameters<UseCompleteGridNavigationParameters<ParentOrRowElement, RowElement, RM>>, "singleSelectionReturn"> {
+export declare interface UseCompleteGridNavigationDeclarativeParameters<ParentOrRowElement extends Element, RowElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>> extends OmitStrong<MakeSelectionDeclarativeParameters<UseCompleteGridNavigationParameters<ParentOrRowElement, RowElement, RM>>, "singleSelectionReturn"> {
 }
 
-export declare interface UseCompleteGridNavigationDeclarativeReturnType<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>, CM extends UseCompleteGridNavigationCellInfo<CellElement>> extends TargetedOmit<UseCompleteGridNavigationReturnType<ParentOrRowElement, RowElement, RM>, "singleSelectionReturn", "changeSelectedIndex">, OmitStrong<UseCompleteGridNavigationReturnType<ParentOrRowElement, RowElement, RM>, "singleSelectionReturn"> {
+export declare interface UseCompleteGridNavigationDeclarativeReturnType<ParentOrRowElement extends Element, RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>, CM extends UseCompleteGridNavigationCellInfo<CellElement>> extends TargetedOmit<UseCompleteGridNavigationReturnType<ParentOrRowElement, RowElement, RM>, "singleSelectionReturn", "changeSingleSelectedIndex">, TargetedOmit<UseCompleteGridNavigationReturnType<ParentOrRowElement, RowElement, RM>, "multiSelectionReturn", never>, OmitStrong<UseCompleteGridNavigationReturnType<ParentOrRowElement, RowElement, RM>, "singleSelectionReturn" | "multiSelectionReturn"> {
 }
 
-export declare interface UseCompleteGridNavigationParameters<ParentOrRowElement extends Element, RowElement extends Element, M extends UseCompleteGridNavigationRowInfo<RowElement>> extends OmitStrong<UseGridNavigationSingleSelectionSortableParameters<ParentOrRowElement, RowElement, M>, "refElementReturn" | "managedChildrenReturn" | "linearNavigationParameters" | "typeaheadNavigationParameters" | "rearrangeableChildrenParameters" | "rovingTabIndexParameters">, TargetedOmit<UseGridNavigationSingleSelectionSortableParameters<ParentOrRowElement, RowElement, M>, "linearNavigationParameters", "getLowestIndex" | "getHighestIndex" | "isValidForLinearNavigation">, TargetedOmit<UseGridNavigationSingleSelectionSortableParameters<ParentOrRowElement, RowElement, M>, "typeaheadNavigationParameters", "isValidForTypeaheadNavigation">, TargetedOmit<UseGridNavigationSingleSelectionSortableParameters<ParentOrRowElement, RowElement, M>, "rearrangeableChildrenParameters", "onRearranged">, TargetedOmit<UseGridNavigationSingleSelectionSortableParameters<ParentOrRowElement, RowElement, M>, "rovingTabIndexParameters", "initiallyTabbedIndex" | "untabbableBehavior">, Pick<UseRefElementParameters<ParentOrRowElement>, "refElementParameters">, Pick<UsePaginatedChildrenParameters<ParentOrRowElement, RowElement>, "paginatedChildrenParameters">, Pick<UseStaggeredChildrenParameters, "staggeredChildrenParameters"> {
+export declare interface UseCompleteGridNavigationParameters<ParentOrRowElement extends Element, RowElement extends Element, M extends UseCompleteGridNavigationRowInfo<RowElement>> extends OmitStrong<UseGridNavigationSelectionSortableParameters<ParentOrRowElement, RowElement, M>, "refElementReturn" | "managedChildrenReturn" | "linearNavigationParameters" | "typeaheadNavigationParameters" | "rearrangeableChildrenParameters" | "rovingTabIndexParameters" | "childrenHaveFocusReturn">, TargetedOmit<UseGridNavigationSelectionSortableParameters<ParentOrRowElement, RowElement, M>, "linearNavigationParameters", "getLowestIndex" | "getHighestIndex" | "isValidForLinearNavigation">, TargetedOmit<UseGridNavigationSelectionSortableParameters<ParentOrRowElement, RowElement, M>, "typeaheadNavigationParameters", "isValidForTypeaheadNavigation">, TargetedOmit<UseGridNavigationSelectionSortableParameters<ParentOrRowElement, RowElement, M>, "rearrangeableChildrenParameters", "onRearranged">, TargetedOmit<UseGridNavigationSelectionSortableParameters<ParentOrRowElement, RowElement, M>, "rovingTabIndexParameters", "untabbableBehavior">, Pick<UseRefElementParameters<ParentOrRowElement>, "refElementParameters">, Pick<UsePaginatedChildrenParameters<ParentOrRowElement, RowElement>, "paginatedChildrenParameters">, Pick<UseStaggeredChildrenParameters, "staggeredChildrenParameters"> {
 }
 
-export declare interface UseCompleteGridNavigationReturnType<ParentOrRowElement extends Element, RowElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>> extends Pick<UsePaginatedChildrenReturnType, "paginatedChildrenReturn">, Pick<UseStaggeredChildrenReturnType, "staggeredChildrenReturn">, Pick<UseManagedChildrenReturnType<RM>, "managedChildrenReturn">, Pick<UseChildrenHaveFocusReturnType<RowElement>, "childrenHaveFocusReturn">, OmitStrong<UseGridNavigationSingleSelectionSortableReturnType<ParentOrRowElement, RowElement, RM>, "propsStableParentOrChild" | "propsParent" | "context" | "childrenHaveFocusParameters" | "managedChildrenParameters"> {
+export declare interface UseCompleteGridNavigationReturnType<ParentOrRowElement extends Element, RowElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>> extends OmitStrong<UseGridNavigationSelectionSortableReturnType<ParentOrRowElement, RowElement, RM>, "props" | "context" | "childrenHaveFocusParameters" | "managedChildrenParameters">, Pick<UsePaginatedChildrenReturnType, "paginatedChildrenReturn">, Pick<UseStaggeredChildrenReturnType, "staggeredChildrenReturn">, Pick<UseManagedChildrenReturnType<RM>, "managedChildrenReturn">, Pick<UseChildrenHaveFocusReturnType<RowElement>, "childrenHaveFocusReturn"> {
     context: CompleteGridNavigationRowContext<RowElement, RM>;
     props: ElementProps<ParentOrRowElement>;
 }
@@ -1664,17 +1704,17 @@ export declare interface UseCompleteGridNavigationReturnType<ParentOrRowElement 
 /**
  * @compositeParams
  */
-export declare function useCompleteGridNavigationRow<RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>, CM extends UseCompleteGridNavigationCellInfo<CellElement>>({ info: { index, unselectable, untabbable, ...customUserInfo }, context: contextIncomingForRowAsChildOfTable, textContentParameters, linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, hasCurrentFocusParameters: { onCurrentFocusedChanged: ocfc1, onCurrentFocusedInnerChanged: ocfic3, ...void5 }, ...void1 }: UseCompleteGridNavigationRowParameters<RowElement, CellElement, RM, CM>): UseCompleteGridNavigationRowReturnType<RowElement, CellElement, RM, CM>;
+export declare function useCompleteGridNavigationRow<RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>, CM extends UseCompleteGridNavigationCellInfo<CellElement>>({ info: { index, untabbable, ...customUserInfo }, context: contextIncomingForRowAsChildOfTable, textContentParameters, linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, gridNavigationSelectionSortableRowParameters, hasCurrentFocusParameters: { onCurrentFocusedChanged: ocfc1, onCurrentFocusedInnerChanged: ocfic3, ...void5 }, singleSelectionChildParameters, multiSelectionChildParameters, ...void1 }: UseCompleteGridNavigationRowParameters<RowElement, CellElement, RM, CM>): UseCompleteGridNavigationRowReturnType<RowElement, CellElement, RM, CM>;
 
-export declare interface UseCompleteGridNavigationRowInfo<RowElement extends Element> extends GridSingleSelectSortableChildRowInfo<RowElement>, UsePaginatedChildrenInfo<RowElement>, UseStaggeredChildrenInfo, ManagedChildInfo<number> {
+export declare interface UseCompleteGridNavigationRowInfo<RowElement extends Element> extends GridSelectSortableChildRowInfo<RowElement>, UsePaginatedChildrenInfo<RowElement>, UseStaggeredChildrenInfo, ManagedChildInfo<number> {
 }
 
-export declare type UseCompleteGridNavigationRowInfoKeysParameters<M extends UseCompleteGridNavigationRowInfo<any>> = Exclude<keyof M, keyof UseCompleteGridNavigationRowInfo<any>> | UseGridNavigationSingleSelectionSortableRowInfoKeysParameters;
+export declare type UseCompleteGridNavigationRowInfoKeysParameters<M extends UseCompleteGridNavigationRowInfo<any>> = Exclude<keyof M, keyof UseCompleteGridNavigationRowInfo<any>> | UseGridNavigationSelectionSortableRowInfoKeysParameters;
 
-export declare interface UseCompleteGridNavigationRowParameters<RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>, CM extends UseCompleteGridNavigationCellInfo<CellElement>> extends UseGenericChildParameters<CompleteGridNavigationRowContext<RowElement, RM>, Pick<RM, UseCompleteGridNavigationRowInfoKeysParameters<RM>>>, OmitStrong<UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM>, "info" | "context" | "textContentParameters" | "managedChildrenReturn" | "refElementReturn" | "linearNavigationParameters" | "typeaheadNavigationParameters">, Pick<UseHasCurrentFocusParameters<RowElement>, "hasCurrentFocusParameters">, TargetedOmit<UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM>, "textContentParameters", never>, TargetedOmit<UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM>, "linearNavigationParameters", "getLowestIndex" | "getHighestIndex" | "pageNavigationSize" | "isValidForLinearNavigation" | "indexMangler" | "indexDemangler">, TargetedOmit<UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM>, "typeaheadNavigationParameters", "isValidForTypeaheadNavigation"> {
+export declare interface UseCompleteGridNavigationRowParameters<RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>, CM extends UseCompleteGridNavigationCellInfo<CellElement>> extends UseGenericChildParameters<CompleteGridNavigationRowContext<RowElement, RM>, Pick<RM, UseCompleteGridNavigationRowInfoKeysParameters<RM>>>, OmitStrong<UseGridNavigationSelectionSortableRowParameters<RowElement, CellElement, RM, CM>, "info" | "context" | "textContentParameters" | "managedChildrenReturn" | "refElementReturn" | "linearNavigationParameters" | "typeaheadNavigationParameters">, TargetedOmit<UseGridNavigationSelectionSortableRowParameters<RowElement, CellElement, RM, CM>, "textContentParameters", never>, TargetedOmit<UseGridNavigationSelectionSortableRowParameters<RowElement, CellElement, RM, CM>, "linearNavigationParameters", "getLowestIndex" | "getHighestIndex" | "isValidForLinearNavigation">, TargetedOmit<UseGridNavigationSelectionSortableRowParameters<RowElement, CellElement, RM, CM>, "typeaheadNavigationParameters", "isValidForTypeaheadNavigation">, OmitStrong<UseHasCurrentFocusParameters<RowElement>, "refElementReturn"> {
 }
 
-export declare interface UseCompleteGridNavigationRowReturnType<RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>, CM extends UseCompleteGridNavigationCellInfo<CellElement>> extends OmitStrong<UseGridNavigationSingleSelectionSortableRowReturnType<RowElement, CellElement, RM, CM>, "hasCurrentFocusParameters" | "managedChildrenParameters" | "info" | "textContentReturn">, Pick<UseManagedChildrenReturnType<CM>, "managedChildrenReturn">, Pick<UseHasCurrentFocusReturnType<RowElement>, "hasCurrentFocusReturn">, Pick<UseManagedChildReturnType<RM>, "managedChildReturn">, Pick<UsePaginatedChildReturnType<RowElement>, "paginatedChildReturn">, Pick<UseStaggeredChildReturnType<RowElement>, "staggeredChildReturn">, Pick<UseGridNavigationSingleSelectionSortableRowReturnType<RowElement, CellElement, RM, CM>, "textContentReturn"> {
+export declare interface UseCompleteGridNavigationRowReturnType<RowElement extends Element, CellElement extends Element, RM extends UseCompleteGridNavigationRowInfo<RowElement>, CM extends UseCompleteGridNavigationCellInfo<CellElement>> extends OmitStrong<UseGridNavigationSelectionSortableRowReturnType<RowElement, CellElement, RM, CM>, "hasCurrentFocusParameters" | "managedChildrenParameters" | "info">, Pick<UseManagedChildrenReturnType<CM>, "managedChildrenReturn">, Pick<UseHasCurrentFocusReturnType<RowElement>, "hasCurrentFocusReturn">, Pick<UseManagedChildReturnType<RM>, "managedChildReturn">, Pick<UsePaginatedChildReturnType<RowElement>, "paginatedChildReturn">, Pick<UseStaggeredChildReturnType<RowElement>, "staggeredChildReturn"> {
     context: CompleteGridNavigationCellContext<CellElement, CM>;
 }
 
@@ -1688,24 +1728,32 @@ export declare interface UseCompleteGridNavigationRowReturnType<RowElement exten
  *
  * @compositeParams
  */
-export declare function useCompleteListNavigation<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>>({ linearNavigationParameters, rearrangeableChildrenParameters, sortableChildrenParameters, typeaheadNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, paginatedChildrenParameters, staggeredChildrenParameters, refElementParameters, ...void1 }: UseCompleteListNavigationParameters<ParentElement, ChildElement, M>): UseCompleteListNavigationReturnType<ParentElement, ChildElement, M>;
+export declare function useCompleteListNavigation<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>>({ linearNavigationParameters, rearrangeableChildrenParameters, sortableChildrenParameters, typeaheadNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, multiSelectionParameters, paginatedChildrenParameters, staggeredChildrenParameters, refElementParameters, ...void1 }: UseCompleteListNavigationParameters<ParentElement, ChildElement, M>): UseCompleteListNavigationReturnType<ParentElement, ChildElement, M>;
 
 /**
  *
  * @compositeParams
  */
-export declare function useCompleteListNavigationChild<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>>({ info: { index, focusSelf, unselectable, untabbable, getSortValue, ...customUserInfo }, // The "...info" is empty if M is the same as UCLNCI<ChildElement>.
-    textContentParameters, refElementParameters, hasCurrentFocusParameters: { onCurrentFocusedChanged, onCurrentFocusedInnerChanged: ocfic3, ...void7 }, context: { managedChildContext, rovingTabIndexContext, paginatedChildContext, staggeredChildContext, singleSelectionContext, typeaheadNavigationContext, childrenHaveFocusChildContext, ...void5 }, ...void1 }: UseCompleteListNavigationChildParameters<ChildElement, M>): UseCompleteListNavigationChildReturnType<ChildElement, M>;
+export declare function useCompleteListNavigationChild<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>>({ info: { index, focusSelf, untabbable, getSortValue, ...customUserInfo }, // The "...info" is empty if M is the same as UCLNCI<ChildElement>.
+    textContentParameters, refElementParameters, hasCurrentFocusParameters: { onCurrentFocusedChanged, onCurrentFocusedInnerChanged: ocfic3, ...void7 }, singleSelectionChildParameters, multiSelectionChildParameters, context: { managedChildContext, rovingTabIndexContext, paginatedChildContext, staggeredChildContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext, childrenHaveFocusChildContext, ...void5 }, ...void1 }: UseCompleteListNavigationChildParameters<ChildElement, M>): UseCompleteListNavigationChildReturnType<ChildElement, M>;
 
-export declare interface UseCompleteListNavigationChildInfo<ChildElement extends Element> extends UseListNavigationSingleSelectionSortableChildInfo<ChildElement>, UsePaginatedChildrenInfo<ChildElement>, UseStaggeredChildrenInfo, ManagedChildInfo<number> {
+export declare function useCompleteListNavigationChildDeclarative<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>>({ multiSelectionChildParameters, multiSelectionChildDeclarativeParameters: { multiSelected, onMultiSelectedChange }, ...rest }: UseCompleteListNavigationChildDeclarativeParameters<ChildElement, M>): UseCompleteListNavigationChildDeclarativeReturnType<ChildElement, M>;
+
+export declare interface UseCompleteListNavigationChildDeclarativeParameters<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends OmitStrong<MakeSelectionDeclarativeChildParameters<UseCompleteListNavigationChildParameters<ChildElement, M>>, "multiSelectionChildParameters" | "multiSelectionChildReturn">, TargetedOmit<UseSelectionChildParameters<ChildElement, M>, "multiSelectionChildParameters", "initiallyMultiSelected" | "onMultiSelectChange"> {
 }
 
-export declare type UseCompleteListNavigationChildInfoKeysParameters<M extends UseCompleteListNavigationChildInfo<any>> = Exclude<keyof M, keyof UseCompleteListNavigationChildInfo<any>> | UseListNavigationSingleSelectionSortableChildInfoKeysParameters | "getSortValue" | "focusSelf";
-
-export declare interface UseCompleteListNavigationChildParameters<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends UseGenericChildParameters<CompleteListNavigationContext<ChildElement, M>, Pick<M, UseCompleteListNavigationChildInfoKeysParameters<M>>>, OmitStrong<UseListNavigationSingleSelectionSortableChildParameters<ChildElement>, "context" | "info" | "refElementReturn">, Pick<UseRefElementParameters<ChildElement>, "refElementParameters">, Pick<UseHasCurrentFocusParameters<ChildElement>, "hasCurrentFocusParameters"> {
+export declare interface UseCompleteListNavigationChildDeclarativeReturnType<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends TargetedOmit<UseCompleteListNavigationChildReturnType<ChildElement, M>, "singleSelectionChildReturn", never>, TargetedOmit<UseCompleteListNavigationChildReturnType<ChildElement, M>, "multiSelectionChildReturn", "changeMultiSelected">, OmitStrong<UseCompleteListNavigationChildReturnType<ChildElement, M>, "singleSelectionChildReturn" | "multiSelectionChildReturn"> {
 }
 
-export declare interface UseCompleteListNavigationChildReturnType<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends OmitStrong<UseListNavigationSingleSelectionSortableChildReturnType<ChildElement>, "info" | "propsChild" | "propsTabbable" | "hasCurrentFocusParameters" | "pressParameters">, OmitStrong<UsePaginatedChildReturnType<ChildElement>, "info" | "props">, OmitStrong<UseStaggeredChildReturnType<ChildElement>, "info" | "props">, OmitStrong<UseRefElementReturnType<ChildElement>, "propsStable">, UseHasCurrentFocusReturnType<ChildElement>, UseManagedChildReturnType<M>, TargetedPick<UsePressParameters<any>, "pressParameters", "onPressSync" | "excludeSpace"> {
+export declare interface UseCompleteListNavigationChildInfo<ChildElement extends Element> extends UseListNavigationSelectionSortableChildInfo<ChildElement>, UsePaginatedChildrenInfo<ChildElement>, UseStaggeredChildrenInfo, ManagedChildInfo<number> {
+}
+
+export declare type UseCompleteListNavigationChildInfoKeysParameters<M extends UseCompleteListNavigationChildInfo<any>> = Exclude<keyof M, keyof UseCompleteListNavigationChildInfo<any>> | UseListNavigationSelectionSortableChildInfoKeysParameters | "getSortValue" | "focusSelf";
+
+export declare interface UseCompleteListNavigationChildParameters<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends UseGenericChildParameters<CompleteListNavigationContext<ChildElement, M>, Pick<M, UseCompleteListNavigationChildInfoKeysParameters<M>>>, OmitStrong<UseListNavigationSelectionSortableChildParameters<ChildElement, M>, "context" | "info" | "refElementReturn">, Pick<UseRefElementParameters<ChildElement>, "refElementParameters">, Pick<UseHasCurrentFocusParameters<ChildElement>, "hasCurrentFocusParameters"> {
+}
+
+export declare interface UseCompleteListNavigationChildReturnType<ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends OmitStrong<UseListNavigationSelectionSortableChildReturnType<ChildElement, M>, "info" | "propsChild" | "propsTabbable" | "hasCurrentFocusParameters" | "pressParameters">, OmitStrong<UsePaginatedChildReturnType<ChildElement>, "info" | "props">, OmitStrong<UseStaggeredChildReturnType<ChildElement>, "info" | "props">, OmitStrong<UseRefElementReturnType<ChildElement>, "propsStable">, UseHasCurrentFocusReturnType<ChildElement>, UseManagedChildReturnType<M>, TargetedPick<UsePressParameters<any>, "pressParameters", "onPressSync" | "excludeSpace"> {
     /**
      * These props should be passed to whichever element is tabbable.
      * This may be the same element as `propsChild`, in which case `useMergedProps` is recommended.
@@ -1723,18 +1771,18 @@ export declare interface UseCompleteListNavigationChildReturnType<ChildElement e
     propsChild: ElementProps<any>;
 }
 
-export declare function useCompleteListNavigationDeclarative<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>>({ linearNavigationParameters, paginatedChildrenParameters, rearrangeableChildrenParameters, rovingTabIndexParameters, singleSelectionDeclarativeParameters, sortableChildrenParameters, staggeredChildrenParameters, typeaheadNavigationParameters, singleSelectionParameters, refElementParameters, ...void1 }: UseCompleteListNavigationDeclarativeParameters<ParentElement, ChildElement, M>): UseCompleteListNavigationDeclarativeReturnType<ParentElement, ChildElement, M>;
+export declare function useCompleteListNavigationDeclarative<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>>({ singleSelectionParameters, singleSelectionDeclarativeParameters, ...rest }: UseCompleteListNavigationDeclarativeParameters<ParentElement, ChildElement, M>): UseCompleteListNavigationDeclarativeReturnType<ParentElement, ChildElement, M>;
 
-export declare interface UseCompleteListNavigationDeclarativeParameters<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends OmitStrong<MakeSingleSelectionDeclarativeParameters<UseCompleteListNavigationParameters<ParentElement, ChildElement, M>>, "singleSelectionParameters" | "singleSelectionReturn">, TargetedOmit<UseSingleSelectionParameters<ParentElement, ChildElement>, "singleSelectionParameters", "initiallySelectedIndex" | "onSelectedIndexChange"> {
+export declare interface UseCompleteListNavigationDeclarativeParameters<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends OmitStrong<MakeSelectionDeclarativeParameters<UseCompleteListNavigationParameters<ParentElement, ChildElement, M>>, "singleSelectionParameters" | "singleSelectionReturn">, TargetedOmit<UseSelectionParameters<ParentElement, ChildElement, M>, "singleSelectionParameters", "initiallySingleSelectedIndex" | "onSingleSelectedIndexChange"> {
 }
 
-export declare interface UseCompleteListNavigationDeclarativeReturnType<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends TargetedOmit<UseCompleteListNavigationReturnType<ParentElement, ChildElement, M>, "singleSelectionReturn", "changeSelectedIndex">, OmitStrong<UseCompleteListNavigationReturnType<ParentElement, ChildElement, M>, "singleSelectionReturn"> {
+export declare interface UseCompleteListNavigationDeclarativeReturnType<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends TargetedOmit<UseCompleteListNavigationReturnType<ParentElement, ChildElement, M>, "singleSelectionReturn", "changeSingleSelectedIndex">, TargetedOmit<UseCompleteListNavigationReturnType<ParentElement, ChildElement, M>, "multiSelectionReturn", never>, OmitStrong<UseCompleteListNavigationReturnType<ParentElement, ChildElement, M>, "singleSelectionReturn" | "multiSelectionReturn"> {
 }
 
-export declare interface UseCompleteListNavigationParameters<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends Pick<UseListNavigationSingleSelectionSortableParameters<ParentElement, ChildElement, M>, "singleSelectionParameters" | "sortableChildrenParameters">, Pick<UsePaginatedChildrenParameters<ParentElement, ChildElement>, "paginatedChildrenParameters">, Pick<UseStaggeredChildrenParameters, "staggeredChildrenParameters">, Pick<UseRefElementParameters<ParentElement>, "refElementParameters">, TargetedOmit<UseListNavigationSingleSelectionSortableParameters<ParentElement, ChildElement, M>, "linearNavigationParameters", "getLowestIndex" | "getHighestIndex" | "isValidForLinearNavigation">, TargetedOmit<UseListNavigationSingleSelectionSortableParameters<ParentElement, ChildElement, M>, "typeaheadNavigationParameters", "isValidForTypeaheadNavigation">, TargetedOmit<UseListNavigationSingleSelectionSortableParameters<ParentElement, ChildElement, M>, "rearrangeableChildrenParameters", "onRearranged">, TargetedOmit<UseListNavigationSingleSelectionSortableParameters<ParentElement, ChildElement, M>, "rovingTabIndexParameters", "initiallyTabbedIndex" | "untabbableBehavior"> {
+export declare interface UseCompleteListNavigationParameters<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends Pick<UseListNavigationSelectionSortableParameters<ParentElement, ChildElement, M>, "singleSelectionParameters" | "multiSelectionParameters" | "sortableChildrenParameters">, Pick<UsePaginatedChildrenParameters<ParentElement, ChildElement>, "paginatedChildrenParameters">, Pick<UseStaggeredChildrenParameters, "staggeredChildrenParameters">, Pick<UseRefElementParameters<ParentElement>, "refElementParameters">, TargetedOmit<UseListNavigationSelectionSortableParameters<ParentElement, ChildElement, M>, "linearNavigationParameters", "getLowestIndex" | "getHighestIndex" | "isValidForLinearNavigation">, TargetedOmit<UseListNavigationSelectionSortableParameters<ParentElement, ChildElement, M>, "typeaheadNavigationParameters", "isValidForTypeaheadNavigation">, TargetedOmit<UseListNavigationSelectionSortableParameters<ParentElement, ChildElement, M>, "rearrangeableChildrenParameters", "onRearranged">, TargetedOmit<UseListNavigationSelectionSortableParameters<ParentElement, ChildElement, M>, "rovingTabIndexParameters", "untabbableBehavior"> {
 }
 
-export declare interface UseCompleteListNavigationReturnType<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends Pick<UsePaginatedChildrenReturnType, "paginatedChildrenReturn">, Pick<UseStaggeredChildrenReturnType, "staggeredChildrenReturn">, Pick<UseManagedChildrenReturnType<M>, "managedChildrenReturn">, Pick<UseChildrenHaveFocusReturnType<ChildElement>, "childrenHaveFocusReturn">, OmitStrong<UseListNavigationSingleSelectionSortableReturnType<ParentElement, ChildElement, M>, "propsStableParentOrChild" | "propsParent" | "context" | "childrenHaveFocusParameters" | "managedChildrenParameters"> {
+export declare interface UseCompleteListNavigationReturnType<ParentElement extends Element, ChildElement extends Element, M extends UseCompleteListNavigationChildInfo<ChildElement>> extends Pick<UsePaginatedChildrenReturnType, "paginatedChildrenReturn">, Pick<UseStaggeredChildrenReturnType, "staggeredChildrenReturn">, Pick<UseManagedChildrenReturnType<M>, "managedChildrenReturn">, Pick<UseChildrenHaveFocusReturnType<ChildElement>, "childrenHaveFocusReturn">, OmitStrong<UseListNavigationSelectionSortableReturnType<ParentElement, ChildElement, M>, "context" | "childrenHaveFocusParameters" | "managedChildrenParameters"> {
     props: ElementProps<ParentElement>;
     context: CompleteListNavigationContext<ChildElement, M>;
 }
@@ -2131,7 +2179,7 @@ export declare interface UseGridNavigationCellContextSelf {
     getRowIndex: () => number;
     setTabbableRow: SetTabbableIndex;
     getTabbableColumn: () => TabbableColumnInfo;
-    setTabbableColumn: PassiveStateUpdater<TabbableColumnInfo, EventType<any, any>>;
+    setTabbableColumn: PassiveStateUpdater<TabbableColumnInfo, EventType<any, any> | undefined>;
     setTabbableCell: SetTabbableIndex;
 }
 
@@ -2156,10 +2204,10 @@ export declare interface UseGridNavigationCellReturnType<CellElement extends Ele
     info: Pick<GridChildCellInfo<CellElement>, UseGridNavigationCellInfoKeysReturnType>;
 }
 
-export declare interface UseGridNavigationCellSingleSelectionContext extends UseGridNavigationCellContext, UseSingleSelectionContext {
+export declare interface UseGridNavigationCellSelectionContext extends UseGridNavigationCellContext {
 }
 
-export declare interface UseGridNavigationCellSingleSelectionSortableContext extends UseGridNavigationCellSingleSelectionContext {
+export declare interface UseGridNavigationCellSelectionSortableContext extends UseGridNavigationCellSelectionContext {
 }
 
 export declare interface UseGridNavigationParameters<ParentOrChildElement extends Element, RowElement extends Element, RM extends GridChildRowInfo<RowElement>> extends OmitStrong<UseListNavigationParameters<ParentOrChildElement, RowElement, RM>, "linearNavigationParameters">, TargetedOmit<UseListNavigationParameters<ParentOrChildElement, RowElement, RM>, "linearNavigationParameters", "arrowKeyDirection"> {
@@ -2172,7 +2220,7 @@ export declare interface UseGridNavigationParametersSelf {
      *
      * @stable
      */
-    onTabbableColumnChange: Nullable<OnPassiveStateChange<TabbableColumnInfo, EventType<any, any>>>;
+    onTabbableColumnChange: Nullable<OnPassiveStateChange<TabbableColumnInfo, EventType<any, any> | undefined>>;
 }
 
 export declare interface UseGridNavigationReturnType<ParentOrRowElement extends Element, RowElement extends Element> extends OmitStrong<UseListNavigationReturnType<ParentOrRowElement, RowElement>, "context"> {
@@ -2196,112 +2244,112 @@ export declare interface UseGridNavigationRowContext extends UseListNavigationCo
 export declare interface UseGridNavigationRowContextSelf {
     setTabbableRow: SetTabbableIndex;
     getTabbableColumn: () => TabbableColumnInfo;
-    setTabbableColumn: PassiveStateUpdater<TabbableColumnInfo, EventType<any, any>>;
+    setTabbableColumn: PassiveStateUpdater<TabbableColumnInfo, EventType<any, any> | undefined>;
 }
 
 export declare type UseGridNavigationRowInfoKeysParameters = UseListNavigationChildInfoKeysParameters;
 
 export declare type UseGridNavigationRowInfoKeysReturnType = UseListNavigationChildInfoKeysReturnType | "focusSelf";
 
-export declare interface UseGridNavigationRowParameters<RowElement extends Element, CellElement extends Element, CM extends GridChildCellInfo<CellElement>> extends UseGenericChildParameters<UseGridNavigationRowContext, Pick<GridChildRowInfo<RowElement>, UseGridNavigationRowInfoKeysParameters>>, OmitStrong<UseListNavigationChildParameters<RowElement>, "info" | "context">, TargetedOmit<UseListNavigationParameters<RowElement, CellElement, CM>, "linearNavigationParameters", "disableHomeEndKeys" | "onNavigateLinear" | "arrowKeyDirection">, TargetedOmit<UseListNavigationParameters<RowElement, CellElement, CM>, "rovingTabIndexParameters", "focusSelfParent" | "untabbableBehavior">, OmitStrong<UseListNavigationParameters<RowElement, CellElement, CM>, "paginatedChildrenParameters" | "refElementReturn" | "rovingTabIndexParameters" | "linearNavigationParameters">, TargetedPick<UseManagedChildrenReturnType<CM>, "managedChildrenReturn", "getChildren"> {
+export declare interface UseGridNavigationRowParameters<RowElement extends Element, CellElement extends Element, CM extends GridChildCellInfo<CellElement>> extends UseGenericChildParameters<UseGridNavigationRowContext, Pick<GridChildRowInfo<RowElement>, UseGridNavigationRowInfoKeysParameters>>, OmitStrong<UseListNavigationChildParameters<RowElement>, "info" | "context">, TargetedOmit<UseListNavigationParameters<RowElement, CellElement, CM>, "linearNavigationParameters", "disableHomeEndKeys" | "onNavigateLinear" | "arrowKeyDirection" | "pageNavigationSize">, TargetedOmit<UseListNavigationParameters<RowElement, CellElement, CM>, "rovingTabIndexParameters", "focusSelfParent" | "untabbableBehavior">, OmitStrong<UseListNavigationParameters<RowElement, CellElement, CM>, "rearrangeableChildrenReturn" | "paginatedChildrenParameters" | "refElementReturn" | "rovingTabIndexParameters" | "linearNavigationParameters">, TargetedPick<UseManagedChildrenReturnType<CM>, "managedChildrenReturn", "getChildren"> {
 }
 
-export declare interface UseGridNavigationRowReturnType<RowElement extends Element, CellElement extends Element> extends UseListNavigationChildReturnType<RowElement>, OmitStrong<UseListNavigationReturnType<RowElement, CellElement>, "rovingTabIndexReturn" | "propsStableParentOrChild" | "propsParent" | "context">, TargetedOmit<UseListNavigationReturnType<RowElement, CellElement>, "rovingTabIndexReturn", "focusSelf"> {
+export declare interface UseGridNavigationRowReturnType<RowElement extends Element, CellElement extends Element> extends UseListNavigationChildReturnType<RowElement>, OmitStrong<UseListNavigationReturnType<RowElement, CellElement>, "rovingTabIndexReturn" | "context">, TargetedOmit<UseListNavigationReturnType<RowElement, CellElement>, "rovingTabIndexReturn", "focusSelf"> {
     context: UseGridNavigationCellContext;
     info: Pick<GridChildRowInfo<RowElement>, UseGridNavigationRowInfoKeysReturnType>;
 }
 
-export declare interface UseGridNavigationRowSingleSelectionContext extends UseGridNavigationRowContext, UseSingleSelectionContext {
+export declare interface UseGridNavigationRowSelectionContext extends UseGridNavigationRowContext, UseSelectionContext {
 }
 
-export declare interface UseGridNavigationRowSingleSelectionSortableContext extends UseGridNavigationRowSingleSelectionContext {
+export declare interface UseGridNavigationRowSelectionSortableContext extends UseGridNavigationRowSelectionContext {
 }
 
 /**
- * Combines {@link useGridNavigation} and {@link useSingleSelection}.
+ * Combines {@link useGridNavigation} and {@link useSelection}.
  *
- * @remarks The single-selection behavior is optional, if you decide you need multi-selection instead within the same component.
+ * @remarks The -selection behavior is optional, if you decide you need multi-selection instead within the same component.
  *
- * @hasChild {@link useGridNavigationSingleSelectionRow}
- * @hasChild {@link useGridNavigationSingleSelectionCell}
+ * @hasChild {@link useGridNavigationSelectionRow}
+ * @hasChild {@link useGridNavigationSelectionCell}
  *
  * @compositeParams
  */
-export declare function useGridNavigationSingleSelection<ParentOrRowElement extends Element, RowElement extends Element>({ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, managedChildrenReturn, typeaheadNavigationParameters, singleSelectionParameters, refElementReturn, paginatedChildrenParameters, ...void2 }: UseGridNavigationSingleSelectionParameters<ParentOrRowElement, RowElement, GridSingleSelectChildRowInfo<RowElement>>): UseGridNavigationSingleSelectionReturnType<ParentOrRowElement, RowElement>;
-
-/**
- * @compositeParams
- */
-export declare function useGridNavigationSingleSelectionCell<CellElement extends Element>(p: UseGridNavigationSingleSelectionCellParameters<CellElement>): UseGridNavigationSingleSelectionCellReturnType<CellElement>;
-
-export declare type UseGridNavigationSingleSelectionCellInfoKeysParameters = UseListNavigationChildInfoKeysParameters;
-
-export declare type UseGridNavigationSingleSelectionCellInfoKeysReturnType = UseGridNavigationCellInfoKeysReturnType;
-
-export declare interface UseGridNavigationSingleSelectionCellParameters<CellElement extends Element> extends UseGenericChildParameters<UseGridNavigationCellSingleSelectionContext, Pick<GridSingleSelectChildCellInfo<CellElement>, UseGridNavigationSingleSelectionCellInfoKeysParameters>>, OmitStrong<UseGridNavigationCellParameters<CellElement>, "context" | "info"> {
-    info: Pick<GridSingleSelectChildCellInfo<CellElement>, UseGridNavigationSingleSelectionCellInfoKeysParameters>;
-}
-
-export declare interface UseGridNavigationSingleSelectionCellReturnType<CellElement extends Element> extends UseGridNavigationCellReturnType<CellElement> {
-    info: Pick<GridSingleSelectChildCellInfo<CellElement>, UseGridNavigationSingleSelectionCellInfoKeysReturnType>;
-}
-
-export declare interface UseGridNavigationSingleSelectionParameters<ParentOrRowElement extends Element, RowElement extends Element, RM extends GridSingleSelectChildRowInfo<RowElement>> extends ExtendMerge<UseGridNavigationParameters<ParentOrRowElement, RowElement, RM>, OmitStrong<UseSingleSelectionParameters<ParentOrRowElement, RowElement>, "rovingTabIndexReturn">> {
-}
-
-export declare interface UseGridNavigationSingleSelectionReturnType<ParentOrRowElement extends Element, RowElement extends Element> extends ExtendMerge<UseGridNavigationReturnType<ParentOrRowElement, RowElement>, UseSingleSelectionReturnType<RowElement>> {
-    context: UseGridNavigationRowSingleSelectionContext;
-}
+export declare function useGridNavigationSelection<ParentOrRowElement extends Element, RowElement extends Element>({ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, managedChildrenReturn, typeaheadNavigationParameters, singleSelectionParameters, multiSelectionParameters, refElementReturn, paginatedChildrenParameters, rearrangeableChildrenReturn, childrenHaveFocusReturn, ...void2 }: UseGridNavigationSelectionParameters<ParentOrRowElement, RowElement, GridSelectChildRowInfo<RowElement>>): UseGridNavigationSelectionReturnType<ParentOrRowElement, RowElement>;
 
 /**
  * @compositeParams
  */
-export declare function useGridNavigationSingleSelectionRow<RowElement extends Element, CellElement extends Element>({ info: mcp1, linearNavigationParameters, managedChildrenReturn, refElementReturn, rovingTabIndexParameters, textContentParameters, typeaheadNavigationParameters, context, ...void1 }: UseGridNavigationSingleSelectionRowParameters<RowElement, CellElement, GridSingleSelectChildCellInfo<CellElement>>): UseGridNavigationSingleSelectionRowReturnType<RowElement, CellElement>;
+export declare function useGridNavigationSelectionCell<CellElement extends Element>(p: UseGridNavigationSelectionCellParameters<CellElement>): UseGridNavigationSelectionCellReturnType<CellElement>;
 
-export declare type UseGridNavigationSingleSelectionRowInfoKeysParameters = UseListNavigationSingleSelectionChildInfoKeysParameters;
+export declare type UseGridNavigationSelectionCellInfoKeysParameters = UseListNavigationChildInfoKeysParameters;
 
-export declare type UseGridNavigationSingleSelectionRowInfoKeysReturnType = UseGridNavigationRowInfoKeysReturnType | UseSingleSelectionChildInfoKeysReturnType;
+export declare type UseGridNavigationSelectionCellInfoKeysReturnType = UseGridNavigationCellInfoKeysReturnType;
 
-export declare interface UseGridNavigationSingleSelectionRowParameters<RowElement extends Element, CellElement extends Element, CM extends GridSingleSelectChildCellInfo<CellElement>> extends UseGenericChildParameters<UseGridNavigationRowSingleSelectionContext, Pick<GridSingleSelectChildRowInfo<RowElement>, UseGridNavigationSingleSelectionRowInfoKeysParameters>>, OmitStrong<UseGridNavigationRowParameters<RowElement, CellElement, CM>, "info" | "context">, OmitStrong<UseSingleSelectionChildParameters<RowElement>, "info" | "context"> {
-    info: Pick<GridSingleSelectChildRowInfo<RowElement>, UseGridNavigationSingleSelectionRowInfoKeysParameters>;
+export declare interface UseGridNavigationSelectionCellParameters<CellElement extends Element> extends UseGenericChildParameters<UseGridNavigationCellSelectionContext, Pick<GridSelectChildCellInfo<CellElement>, UseGridNavigationSelectionCellInfoKeysParameters>>, OmitStrong<UseGridNavigationCellParameters<CellElement>, "context" | "info"> {
+    info: Pick<GridSelectChildCellInfo<CellElement>, UseGridNavigationSelectionCellInfoKeysParameters>;
 }
 
-export declare interface UseGridNavigationSingleSelectionRowReturnType<RowElement extends Element, CellElement extends Element> extends OmitStrong<ExtendMerge<UseGridNavigationRowReturnType<RowElement, CellElement>, UseSingleSelectionChildReturnType<RowElement>>, "context" | "info"> {
-    context: UseGridNavigationCellSingleSelectionContext;
-    info: Pick<GridSingleSelectChildRowInfo<RowElement>, UseGridNavigationSingleSelectionRowInfoKeysReturnType>;
+export declare interface UseGridNavigationSelectionCellReturnType<CellElement extends Element> extends UseGridNavigationCellReturnType<CellElement> {
+    info: Pick<GridSelectChildCellInfo<CellElement>, UseGridNavigationSelectionCellInfoKeysReturnType>;
+}
+
+export declare interface UseGridNavigationSelectionParameters<ParentOrRowElement extends Element, RowElement extends Element, RM extends GridSelectChildRowInfo<RowElement>> extends OmitStrong<UseGridNavigationParameters<ParentOrRowElement, RowElement, RM>, "rovingTabIndexParameters">, TargetedOmit<UseGridNavigationParameters<ParentOrRowElement, RowElement, RM>, "rovingTabIndexParameters", "initiallyTabbedIndex">, OmitStrong<UseSelectionParameters<ParentOrRowElement, RowElement, RM>, "rovingTabIndexReturn"> {
+}
+
+export declare interface UseGridNavigationSelectionReturnType<ParentOrRowElement extends Element, RowElement extends Element> extends UseGridNavigationReturnType<ParentOrRowElement, RowElement>, OmitStrong<UseSelectionReturnType<ParentOrRowElement, RowElement>, "propsStable"> {
+    context: UseGridNavigationRowSelectionContext;
 }
 
 /**
- * Combines {@link useGridNavigation}, {@link useSingleSelection}, and {@link useSortableChildren}.
+ * @compositeParams
+ */
+export declare function useGridNavigationSelectionRow<RowElement extends Element, CellElement extends Element>({ info: mcp1, linearNavigationParameters, managedChildrenReturn, refElementReturn, rovingTabIndexParameters, textContentParameters, typeaheadNavigationParameters, context, singleSelectionChildParameters, multiSelectionChildParameters, ...void1 }: UseGridNavigationSelectionRowParameters<RowElement, CellElement, GridSelectChildRowInfo<RowElement>, GridSelectChildCellInfo<CellElement>>): UseGridNavigationSelectionRowReturnType<RowElement, CellElement, GridSelectChildRowInfo<RowElement>>;
+
+export declare type UseGridNavigationSelectionRowInfoKeysParameters = UseListNavigationSelectionChildInfoKeysParameters;
+
+export declare type UseGridNavigationSelectionRowInfoKeysReturnType = UseGridNavigationRowInfoKeysReturnType | UseSelectionChildInfoKeysReturnType;
+
+export declare interface UseGridNavigationSelectionRowParameters<RowElement extends Element, CellElement extends Element, RM extends GridSelectChildRowInfo<RowElement>, CM extends GridSelectChildCellInfo<CellElement>> extends UseGenericChildParameters<UseGridNavigationRowSelectionContext, Pick<GridSelectChildRowInfo<RowElement>, UseGridNavigationSelectionRowInfoKeysParameters>>, OmitStrong<UseGridNavigationRowParameters<RowElement, CellElement, CM>, "info" | "context">, OmitStrong<UseSelectionChildParameters<RowElement, RM>, "info" | "context"> {
+    info: Pick<GridSelectChildRowInfo<RowElement>, UseGridNavigationSelectionRowInfoKeysParameters>;
+}
+
+export declare interface UseGridNavigationSelectionRowReturnType<RowElement extends Element, CellElement extends Element, RM extends GridSelectChildRowInfo<RowElement>> extends ExtendMerge<OmitStrong<UseGridNavigationRowReturnType<RowElement, CellElement>, "context" | "info">, OmitStrong<UseSelectionChildReturnType<RowElement, RM>, "info">> {
+    context: UseGridNavigationCellSelectionContext;
+    info: Pick<GridSelectChildRowInfo<RowElement>, UseGridNavigationSelectionRowInfoKeysReturnType>;
+}
+
+/**
+ * Combines {@link useGridNavigation}, {@link useSelection}, and {@link useSortableChildren}.
  *
  * @remarks This is a separate hook because {@link useSortableChildren} imposes unique requirements to the structure of your `children`.
  *
- * @hasChild {@link useGridNavigationSingleSelectionSortableRow}
+ * @hasChild {@link useGridNavigationSelectionSortableRow}
  *
  * @compositeParams
  */
-export declare function useGridNavigationSingleSelectionSortable<ParentOrRowElement extends Element, RowElement extends Element, RM extends GridSingleSelectSortableChildRowInfo<RowElement>>({ rearrangeableChildrenParameters, sortableChildrenParameters, linearNavigationParameters, managedChildrenReturn, gridNavigationParameters, paginatedChildrenParameters, refElementReturn, rovingTabIndexParameters, singleSelectionParameters, typeaheadNavigationParameters, ...void1 }: UseGridNavigationSingleSelectionSortableParameters<ParentOrRowElement, RowElement, RM>): UseGridNavigationSingleSelectionSortableReturnType<ParentOrRowElement, RowElement, RM>;
+export declare function useGridNavigationSelectionSortable<ParentOrRowElement extends Element, RowElement extends Element, RM extends GridSelectSortableChildRowInfo<RowElement>>({ rearrangeableChildrenParameters, sortableChildrenParameters, linearNavigationParameters, managedChildrenReturn, gridNavigationParameters, paginatedChildrenParameters, refElementReturn, rovingTabIndexParameters, singleSelectionParameters, multiSelectionParameters, typeaheadNavigationParameters, childrenHaveFocusReturn, ...void1 }: UseGridNavigationSelectionSortableParameters<ParentOrRowElement, RowElement, RM>): UseGridNavigationSelectionSortableReturnType<ParentOrRowElement, RowElement, RM>;
 
 /**
  * @compositeParams
  */
-export declare function useGridNavigationSingleSelectionSortableCell<CellElement extends Element>({ context, gridNavigationCellParameters, info: { index, untabbable, ...void2 }, refElementReturn, textContentParameters, ...void1 }: UseGridNavigationSingleSelectionSortableCellParameters<CellElement, GridSingleSelectSortableChildCellInfo<CellElement>>): UseGridNavigationSingleSelectionSortableCellReturnType<CellElement>;
+export declare function useGridNavigationSelectionSortableCell<CellElement extends Element>({ context, gridNavigationCellParameters, info: { index, untabbable, ...void2 }, refElementReturn, textContentParameters, ...void1 }: UseGridNavigationSelectionSortableCellParameters<CellElement, GridSelectSortableChildCellInfo<CellElement>>): UseGridNavigationSelectionSortableCellReturnType<CellElement>;
 
-export declare type UseGridNavigationSingleSelectionSortableCellInfoKeysParameters = UseGridNavigationSingleSelectionCellInfoKeysParameters;
+export declare type UseGridNavigationSelectionSortableCellInfoKeysParameters = UseGridNavigationSelectionCellInfoKeysParameters;
 
-export declare type UseGridNavigationSingleSelectionSortableCellInfoKeysReturnType = UseGridNavigationSingleSelectionCellInfoKeysReturnType;
+export declare type UseGridNavigationSelectionSortableCellInfoKeysReturnType = UseGridNavigationSelectionCellInfoKeysReturnType;
 
-export declare interface UseGridNavigationSingleSelectionSortableCellParameters<CellElement extends Element, CM extends GridSingleSelectSortableChildCellInfo<CellElement>> extends UseGenericChildParameters<UseGridNavigationCellSingleSelectionSortableContext, Pick<CM, UseGridNavigationSingleSelectionSortableCellInfoKeysParameters>>, OmitStrong<UseGridNavigationSingleSelectionCellParameters<CellElement>, "context" | "info"> {
+export declare interface UseGridNavigationSelectionSortableCellParameters<CellElement extends Element, CM extends GridSelectSortableChildCellInfo<CellElement>> extends UseGenericChildParameters<UseGridNavigationCellSelectionSortableContext, Pick<CM, UseGridNavigationSelectionSortableCellInfoKeysParameters>>, OmitStrong<UseGridNavigationSelectionCellParameters<CellElement>, "context" | "info"> {
 }
 
-export declare interface UseGridNavigationSingleSelectionSortableCellReturnType<CellElement extends Element> extends UseGridNavigationSingleSelectionCellReturnType<CellElement> {
+export declare interface UseGridNavigationSelectionSortableCellReturnType<CellElement extends Element> extends UseGridNavigationSelectionCellReturnType<CellElement> {
 }
 
-export declare interface UseGridNavigationSingleSelectionSortableParameters<ParentOrRowElement extends Element, RowElement extends Element, RM extends GridSingleSelectSortableChildRowInfo<RowElement>> extends OmitStrong<UseGridNavigationSingleSelectionParameters<ParentOrRowElement, RowElement, RM>, "linearNavigationParameters" | "managedChildrenReturn">, TargetedOmit<UseGridNavigationSingleSelectionParameters<ParentOrRowElement, RowElement, RM>, "linearNavigationParameters", "indexDemangler" | "indexMangler">, UseSortableChildrenParameters<RM> {
+export declare interface UseGridNavigationSelectionSortableParameters<ParentOrRowElement extends Element, RowElement extends Element, RM extends GridSelectSortableChildRowInfo<RowElement>> extends OmitStrong<UseGridNavigationSelectionParameters<ParentOrRowElement, RowElement, RM>, "managedChildrenReturn" | "rearrangeableChildrenReturn">, UseSortableChildrenParameters<RM> {
 }
 
-export declare interface UseGridNavigationSingleSelectionSortableReturnType<ParentOrRowElement extends Element, RowElement extends Element, RM extends GridSingleSelectSortableChildRowInfo<RowElement>> extends UseGridNavigationSingleSelectionReturnType<ParentOrRowElement, RowElement>, UseSortableChildrenReturnType<RM> {
-    context: UseGridNavigationRowSingleSelectionContext;
+export declare interface UseGridNavigationSelectionSortableReturnType<ParentOrRowElement extends Element, RowElement extends Element, RM extends GridSelectSortableChildRowInfo<RowElement>> extends UseGridNavigationSelectionReturnType<ParentOrRowElement, RowElement>, UseSortableChildrenReturnType<RM> {
+    context: UseGridNavigationRowSelectionContext;
 }
 
 /**
@@ -2309,18 +2357,26 @@ export declare interface UseGridNavigationSingleSelectionSortableReturnType<Pare
  *
  * @compositeParams
  */
-export declare function useGridNavigationSingleSelectionSortableRow<RowElement extends Element, CellElement extends Element, RM extends GridSingleSelectSortableChildRowInfo<RowElement>, CM extends GridSingleSelectSortableChildCellInfo<CellElement>>({ context: ctxIncoming, info: { index, unselectable, untabbable, ...void2 }, linearNavigationParameters, managedChildrenReturn, refElementReturn, rovingTabIndexParameters, textContentParameters, typeaheadNavigationParameters, ...void1 }: UseGridNavigationSingleSelectionSortableRowParameters<RowElement, CellElement, RM, CM>): UseGridNavigationSingleSelectionSortableRowReturnType<RowElement, CellElement, RM, CM>;
+export declare function useGridNavigationSelectionSortableRow<RowElement extends Element, CellElement extends Element, RM extends GridSelectSortableChildRowInfo<RowElement>, CM extends GridSelectSortableChildCellInfo<CellElement>>({ context: ctxIncoming, info: { index, untabbable, ...void2 }, linearNavigationParameters, managedChildrenReturn, refElementReturn, rovingTabIndexParameters, textContentParameters, typeaheadNavigationParameters, gridNavigationSelectionSortableRowParameters: { getSortableColumnIndex: getSortableColumnIndexUnstable, ...void5 }, singleSelectionChildParameters, multiSelectionChildParameters, ...void1 }: UseGridNavigationSelectionSortableRowParameters<RowElement, CellElement, RM, CM>): UseGridNavigationSelectionSortableRowReturnType<RowElement, CellElement, RM, CM>;
 
-export declare type UseGridNavigationSingleSelectionSortableRowInfoKeysParameters = UseGridNavigationSingleSelectionRowInfoKeysParameters;
+export declare type UseGridNavigationSelectionSortableRowInfoKeysParameters = UseGridNavigationSelectionRowInfoKeysParameters;
 
-export declare type UseGridNavigationSingleSelectionSortableRowInfoKeysReturnType = UseGridNavigationSingleSelectionRowInfoKeysReturnType;
+export declare type UseGridNavigationSelectionSortableRowInfoKeysReturnType = UseGridNavigationSelectionRowInfoKeysReturnType;
 
-export declare interface UseGridNavigationSingleSelectionSortableRowParameters<RowElement extends Element, CellElement extends Element, RM extends GridSingleSelectSortableChildRowInfo<RowElement>, CM extends GridSingleSelectSortableChildCellInfo<CellElement>> extends UseGenericChildParameters<UseGridNavigationRowSingleSelectionSortableContext, Pick<RM, UseGridNavigationSingleSelectionSortableRowInfoKeysParameters>>, OmitStrong<UseGridNavigationSingleSelectionRowParameters<RowElement, CellElement, CM>, "context" | "info"> {
+export declare interface UseGridNavigationSelectionSortableRowParameters<RowElement extends Element, CellElement extends Element, RM extends GridSelectSortableChildRowInfo<RowElement>, CM extends GridSelectSortableChildCellInfo<CellElement>> extends UseGenericChildParameters<UseGridNavigationRowSelectionSortableContext, Pick<RM, UseGridNavigationSelectionSortableRowInfoKeysParameters>>, OmitStrong<UseGridNavigationSelectionRowParameters<RowElement, CellElement, RM, CM>, "context" | "info"> {
+    gridNavigationSelectionSortableRowParameters: UseGridNavigationSelectionSortableRowParametersSelf;
 }
 
-export declare interface UseGridNavigationSingleSelectionSortableRowReturnType<RowElement extends Element, CellElement extends Element, RM extends GridSingleSelectSortableChildRowInfo<RowElement>, CM extends GridSingleSelectSortableChildCellInfo<CellElement>> extends OmitStrong<UseGridNavigationSingleSelectionRowReturnType<RowElement, CellElement>, "context" | "info"> {
-    info: Pick<RM, "focusSelf" | "getSortValue" | UseRovingTabIndexChildInfoKeysReturnType | UseSingleSelectionChildInfoKeysReturnType>;
-    context: UseGridNavigationCellSingleSelectionContext;
+export declare interface UseGridNavigationSelectionSortableRowParametersSelf {
+    /**
+     * When the grid is sorted, this column of cells is chosen to sort by.
+     */
+    getSortableColumnIndex(): number | null | undefined;
+}
+
+export declare interface UseGridNavigationSelectionSortableRowReturnType<RowElement extends Element, CellElement extends Element, RM extends GridSelectSortableChildRowInfo<RowElement>, CM extends GridSelectSortableChildCellInfo<CellElement>> extends OmitStrong<UseGridNavigationSelectionRowReturnType<RowElement, CellElement, RM>, "context" | "info"> {
+    info: Pick<RM, "focusSelf" | "getSortValue" | UseRovingTabIndexChildInfoKeysReturnType | UseSelectionChildInfoKeysReturnType>;
+    context: UseGridNavigationCellSelectionContext;
 }
 
 /**
@@ -2344,7 +2400,7 @@ export declare interface UseHasCurrentFocusParametersSelf<T extends Node> {
      *
      * @stable
      */
-    onCurrentFocusedChanged: Nullable<OnPassiveStateChange<boolean, FocusEventType<T>>>;
+    onCurrentFocusedChanged: Nullable<OnPassiveStateChange<boolean, FocusEventType<T> | undefined>>;
     /**
      * Like `onFocusedChanged`, but also *additionally* if any child elements are focused.
      *
@@ -2352,7 +2408,7 @@ export declare interface UseHasCurrentFocusParametersSelf<T extends Node> {
      *
      * @stable
      */
-    onCurrentFocusedInnerChanged: Nullable<OnPassiveStateChange<boolean, FocusEventType<T>>>;
+    onCurrentFocusedInnerChanged: Nullable<OnPassiveStateChange<boolean, FocusEventType<T> | undefined>>;
 }
 
 export declare interface UseHasCurrentFocusReturnType<E extends Element> {
@@ -2391,13 +2447,13 @@ export declare interface UseHasLastFocusParametersSelf {
      *
      * @stable
      */
-    onLastFocusedChanged: Nullable<((focused: boolean, prevFocused: boolean | undefined) => void)>;
+    onLastFocusedChanged: Nullable<OnPassiveStateChange<boolean, UIEvent | undefined>>;
     /**
      * Combines the implications of `onFocusedChanged` and `onFocusedChanged`.
      *
      * @stable
      */
-    onLastFocusedInnerChanged: Nullable<((focused: boolean, prevFocused: boolean | undefined) => void)>;
+    onLastFocusedInnerChanged: Nullable<OnPassiveStateChange<boolean, UIEvent | undefined>>;
 }
 
 export declare interface UseHasLastFocusReturnType extends UseActiveElementReturnType {
@@ -2506,10 +2562,10 @@ export declare function useLayoutEffectDebug<I extends Inputs>(effect: (prev: I 
  *
  * @compositeParams
  */
-export declare function useLinearNavigation<ParentOrChildElement extends Element, ChildElement extends Element>({ rovingTabIndexReturn, linearNavigationParameters, paginatedChildrenParameters: { paginationMax, paginationMin, ...void2 }, ...void1 }: UseLinearNavigationParameters<ParentOrChildElement, ChildElement>): UseLinearNavigationReturnType<ParentOrChildElement>;
+export declare function useLinearNavigation<ParentOrChildElement extends Element, ChildElement extends Element>({ linearNavigationParameters: { getLowestIndex, getHighestIndex, isValidForLinearNavigation, navigatePastEnd, navigatePastStart, onNavigateLinear, arrowKeyDirection, disableHomeEndKeys, pageNavigationSize, ...void4 }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex, ...void5 }, paginatedChildrenParameters: { paginationMax, paginationMin, ...void2 }, rearrangeableChildrenReturn: { indexDemangler, indexMangler, ...void3 }, ...void1 }: UseLinearNavigationParameters<ParentOrChildElement, ChildElement>): UseLinearNavigationReturnType<ParentOrChildElement>;
 
 /** Arguments passed to the parent `useLinearNavigation` */
-export declare interface UseLinearNavigationParameters<ParentOrChildElement extends Element, ChildElement extends Element> extends TargetedPick<UseRovingTabIndexReturnType<ParentOrChildElement, ChildElement>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex">, TargetedPick<UsePaginatedChildrenParameters<ParentOrChildElement, ChildElement>, "paginatedChildrenParameters", "paginationMin" | "paginationMax"> {
+export declare interface UseLinearNavigationParameters<ParentOrChildElement extends Element, ChildElement extends Element> extends TargetedPick<UseRovingTabIndexReturnType<ParentOrChildElement, ChildElement>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex">, TargetedPick<UseRearrangeableChildrenReturnType<any>, "rearrangeableChildrenReturn", "indexMangler" | "indexDemangler">, TargetedPick<UsePaginatedChildrenParameters<ParentOrChildElement, ChildElement>, "paginatedChildrenParameters", "paginationMin" | "paginationMax"> {
     linearNavigationParameters: UseLinearNavigationParametersSelf<ChildElement>;
 }
 
@@ -2519,7 +2575,7 @@ export declare interface UseLinearNavigationParametersSelf<ChildElement extends 
      *
      * @stable
      */
-    onNavigateLinear: Nullable<(newIndex: number | null, event: KeyboardEventType<ChildElement>) => void>;
+    onNavigateLinear: Nullable<(newIndex: number, event: KeyboardEventType<ChildElement>) => void>;
     /**
      * Must return true if the child at this index can be navigated to, e.g. `(i) => !getChildren(i)?.hidden`.
      *
@@ -2575,13 +2631,11 @@ export declare interface UseLinearNavigationParametersSelf<ChildElement extends 
      *
      * @stable
      */
-    indexMangler: (n: number) => number;
     /**
      * @see {@link UseLinearNavigationParametersSelf.indexMangler}, which does the opposite of this.
      *
      * @stable
      */
-    indexDemangler: (n: number) => number;
     /**
      * From `useManagedChildren`. This can be higher than the *actual* highest index if you need it to be.
      *
@@ -2618,7 +2672,7 @@ export declare interface UseLinearNavigationReturnTypeSelf {
  *
  * @hasChild {@link useListNavigationChild}
  */
-export declare function useListNavigation<ParentOrChildElement extends Element, ChildElement extends Element>({ linearNavigationParameters, typeaheadNavigationParameters, rovingTabIndexParameters, managedChildrenReturn, refElementReturn, paginatedChildrenParameters, ...void1 }: UseListNavigationParameters<ParentOrChildElement, ChildElement, UseListNavigationChildInfo<ChildElement>>): UseListNavigationReturnType<ParentOrChildElement, ChildElement>;
+export declare function useListNavigation<ParentOrChildElement extends Element, ChildElement extends Element>({ linearNavigationParameters, typeaheadNavigationParameters, rovingTabIndexParameters, managedChildrenReturn, refElementReturn, paginatedChildrenParameters, rearrangeableChildrenReturn, ...void1 }: UseListNavigationParameters<ParentOrChildElement, ChildElement, UseListNavigationChildInfo<ChildElement>>): UseListNavigationReturnType<ParentOrChildElement, ChildElement>;
 
 /**
  * @compositeParams
@@ -2647,87 +2701,87 @@ export declare interface UseListNavigationParameters<ParentOrChildElement extend
 }
 
 export declare interface UseListNavigationReturnType<ParentOrChildElement extends Element, ChildElement extends Element> extends OmitStrong<UseRovingTabIndexReturnType<ParentOrChildElement, ChildElement>, "props">, OmitStrong<UseTypeaheadNavigationReturnType<ParentOrChildElement>, "propsStable">, OmitStrong<UseLinearNavigationReturnType<ParentOrChildElement>, "propsStable"> {
-    propsStableParentOrChild: ElementProps<ParentOrChildElement>;
-    propsParent: ElementProps<ParentOrChildElement>;
+    props: ElementProps<ParentOrChildElement>;
     context: UseListNavigationContext;
 }
 
 /**
- * Combines {@link useListNavigation} and {@link useSingleSelection}.
+ * Combines {@link useListNavigation} and {@link useSelection}.
  *
- * @remarks The single-selection behavior is optional, if you decide you need multi-selection instead within the same component.
+ * @remarks The -selection behavior is optional, if you decide you need multi-selection instead within the same component.
  *
- * @hasChild {@link useListNavigationSingleSelectionChild}
+ * @hasChild {@link useListNavigationSelectionChild}
  *
  * @compositeParams
  */
-export declare function useListNavigationSingleSelection<ParentOrChildElement extends Element, ChildElement extends Element>({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, managedChildrenReturn, refElementReturn, paginatedChildrenParameters, ...void3 }: UseListNavigationSingleSelectionParameters<ParentOrChildElement, ChildElement, UseListNavigationSingleSelectionChildInfo<ChildElement>>): UseListNavigationSingleSelectionReturnType<ParentOrChildElement, ChildElement>;
+export declare function useListNavigationSelection<ParentOrChildElement extends Element, ChildElement extends Element>({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, multiSelectionParameters, managedChildrenReturn, refElementReturn, paginatedChildrenParameters, rearrangeableChildrenReturn, childrenHaveFocusReturn, ...void3 }: UseListNavigationSelectionParameters<ParentOrChildElement, ChildElement, UseListNavigationSelectionChildInfo<ChildElement>>): UseListNavigationSelectionReturnType<ParentOrChildElement, ChildElement>;
 
 /**
  * @compositeParams
  */
-export declare function useListNavigationSingleSelectionChild<ChildElement extends Element>({ info: { index, untabbable, unselectable, ...void2 }, context, refElementReturn, textContentParameters, ...void1 }: UseListNavigationSingleSelectionChildParameters<ChildElement>): UseListNavigationSingleSelectionChildReturnType<ChildElement>;
+export declare function useListNavigationSelectionChild<ChildElement extends Element>({ info: { index, untabbable, ...void2 }, context, refElementReturn, textContentParameters, singleSelectionChildParameters, multiSelectionChildParameters, ...void1 }: UseListNavigationSelectionChildParameters<ChildElement, UseListNavigationSelectionChildInfo<ChildElement>>): UseListNavigationSelectionChildReturnType<ChildElement, UseListNavigationSelectionChildInfo<ChildElement>>;
 
-export declare interface UseListNavigationSingleSelectionChildContext extends UseListNavigationContext, UseSingleSelectionContext {
+export declare interface UseListNavigationSelectionChildContext extends UseListNavigationContext, UseSelectionContext {
 }
 
-export declare interface UseListNavigationSingleSelectionChildInfo<TabbableChildElement extends Element> extends UseListNavigationChildInfo<TabbableChildElement>, UseSingleSelectionChildInfo<TabbableChildElement> {
+export declare interface UseListNavigationSelectionChildInfo<TabbableChildElement extends Element> extends UseListNavigationChildInfo<TabbableChildElement>, UseSelectionChildInfo<TabbableChildElement> {
 }
 
-export declare type UseListNavigationSingleSelectionChildInfoKeysParameters = UseListNavigationChildInfoKeysParameters | UseSingleSelectionChildInfoKeysParameters;
+export declare type UseListNavigationSelectionChildInfoKeysParameters = UseListNavigationChildInfoKeysParameters | UseSelectionChildInfoKeysParameters;
 
-export declare type UseListNavigationSingleSelectionChildInfoKeysReturnType = UseListNavigationChildInfoKeysReturnType | UseSingleSelectionChildInfoKeysReturnType;
+export declare type UseListNavigationSelectionChildInfoKeysReturnType = UseListNavigationChildInfoKeysReturnType | UseSelectionChildInfoKeysReturnType;
 
-export declare interface UseListNavigationSingleSelectionChildParameters<ChildElement extends Element> extends UseGenericChildParameters<UseListNavigationSingleSelectionChildContext, Pick<UseListNavigationSingleSelectionChildInfo<ChildElement>, UseListNavigationSingleSelectionChildInfoKeysParameters>>, OmitStrong<UseListNavigationChildParameters<ChildElement>, "context" | "info">, OmitStrong<UseSingleSelectionChildParameters<ChildElement>, "context" | "info"> {
+export declare interface UseListNavigationSelectionChildParameters<ChildElement extends Element, M extends UseListNavigationSelectionChildInfo<ChildElement>> extends UseGenericChildParameters<UseListNavigationSelectionChildContext, Pick<UseListNavigationSelectionChildInfo<ChildElement>, UseListNavigationSelectionChildInfoKeysParameters>>, OmitStrong<UseListNavigationChildParameters<ChildElement>, "context" | "info">, OmitStrong<UseSelectionChildParameters<ChildElement, M>, "context" | "info"> {
 }
 
-export declare interface UseListNavigationSingleSelectionChildReturnType<ChildElement extends Element> extends OmitStrong<ExtendMerge<UseListNavigationChildReturnType<ChildElement>, UseSingleSelectionChildReturnType<ChildElement>>, "props"> {
+export declare interface UseListNavigationSelectionChildReturnType<ChildElement extends Element, M extends UseListNavigationSelectionChildInfo<ChildElement>> extends OmitStrong<ExtendMerge<UseListNavigationChildReturnType<ChildElement>, UseSelectionChildReturnType<ChildElement, M>>, "props"> {
     propsTabbable: ElementProps<any>;
     propsChild: ElementProps<any>;
 }
 
-export declare interface UseListNavigationSingleSelectionParameters<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationSingleSelectionChildInfo<ChildElement>> extends ExtendMerge<UseListNavigationParameters<ParentOrChildElement, ChildElement, M>, OmitStrong<UseSingleSelectionParameters<ParentOrChildElement, ChildElement>, "rovingTabIndexReturn">> {
+export declare interface UseListNavigationSelectionParameters<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationSelectionChildInfo<ChildElement>> extends OmitStrong<UseListNavigationParameters<ParentOrChildElement, ChildElement, M>, "rovingTabIndexParameters">, TargetedOmit<UseListNavigationParameters<ParentOrChildElement, ChildElement, M>, "rovingTabIndexParameters", "initiallyTabbedIndex">, OmitStrong<UseSelectionParameters<ParentOrChildElement, ChildElement, M>, "rovingTabIndexReturn"> {
 }
 
-export declare interface UseListNavigationSingleSelectionReturnType<ParentOrChildElement extends Element, ChildElement extends Element> extends ExtendMerge<UseListNavigationReturnType<ParentOrChildElement, ChildElement>, UseSingleSelectionReturnType<ChildElement>> {
-    context: UseListNavigationSingleSelectionChildContext;
+export declare interface UseListNavigationSelectionReturnType<ParentOrChildElement extends Element, ChildElement extends Element> extends OmitStrong<UseListNavigationReturnType<ParentOrChildElement, ChildElement>, "props">, OmitStrong<UseSelectionReturnType<ParentOrChildElement, ChildElement>, "propsStable"> {
+    context: UseListNavigationSelectionChildContext;
+    props: ElementProps<ParentOrChildElement>;
 }
 
 /**
- * Combines {@link useListNavigation}, {@link useSingleSelection}, and {@link useSortableChildren}.
+ * Combines {@link useListNavigation}, {@link useSelection}, and {@link useSortableChildren}.
  *
  * @remarks This is a separate hook because {@link useSortableChildren} imposes unique requirements to the structure of your `children`.
  *
- * @hasChild {@link useListNavigationSingleSelectionSortableChild}
+ * @hasChild {@link useListNavigationSelectionSortableChild}
  *
  * @compositeParams
  */
-export declare function useListNavigationSingleSelectionSortable<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationSingleSelectionSortableChildInfo<ChildElement>>({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, managedChildrenReturn, rearrangeableChildrenParameters, sortableChildrenParameters, refElementReturn, paginatedChildrenParameters, ...void3 }: UseListNavigationSingleSelectionSortableParameters<ParentOrChildElement, ChildElement, M>): UseListNavigationSingleSelectionSortableReturnType<ParentOrChildElement, ChildElement, M>;
+export declare function useListNavigationSelectionSortable<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationSelectionSortableChildInfo<ChildElement>>({ linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, singleSelectionParameters, multiSelectionParameters, managedChildrenReturn, rearrangeableChildrenParameters, sortableChildrenParameters, refElementReturn, paginatedChildrenParameters, childrenHaveFocusReturn, ...void3 }: UseListNavigationSelectionSortableParameters<ParentOrChildElement, ChildElement, M>): UseListNavigationSelectionSortableReturnType<ParentOrChildElement, ChildElement, M>;
 
 /**
  * @compositeParams
  */
-export declare function useListNavigationSingleSelectionSortableChild<ChildElement extends Element>({ info, context, refElementReturn, textContentParameters, ...void1 }: UseListNavigationSingleSelectionSortableChildParameters<ChildElement>): UseListNavigationSingleSelectionSortableChildReturnType<ChildElement>;
+export declare function useListNavigationSelectionSortableChild<ChildElement extends Element>({ info, context, refElementReturn, textContentParameters, singleSelectionChildParameters, multiSelectionChildParameters, ...void1 }: UseListNavigationSelectionSortableChildParameters<ChildElement, UseListNavigationSelectionSortableChildInfo<ChildElement>>): UseListNavigationSelectionSortableChildReturnType<ChildElement, UseListNavigationSelectionSortableChildInfo<ChildElement>>;
 
-export declare type UseListNavigationSingleSelectionSortableChildContext = UseListNavigationSingleSelectionChildContext;
+export declare type UseListNavigationSelectionSortableChildContext = UseListNavigationSelectionChildContext;
 
-export declare interface UseListNavigationSingleSelectionSortableChildInfo<TabbableChildElement extends Element> extends UseListNavigationSingleSelectionChildInfo<TabbableChildElement>, UseSortableChildInfo {
+export declare interface UseListNavigationSelectionSortableChildInfo<TabbableChildElement extends Element> extends UseListNavigationSelectionChildInfo<TabbableChildElement>, UseSortableChildInfo {
 }
 
-export declare type UseListNavigationSingleSelectionSortableChildInfoKeysParameters = UseListNavigationSingleSelectionChildInfoKeysParameters;
+export declare type UseListNavigationSelectionSortableChildInfoKeysParameters = UseListNavigationSelectionChildInfoKeysParameters;
 
-export declare type UseListNavigationSingleSelectionSortableChildInfoKeysReturnType = UseListNavigationSingleSelectionChildInfoKeysReturnType;
+export declare type UseListNavigationSelectionSortableChildInfoKeysReturnType = UseListNavigationSelectionChildInfoKeysReturnType;
 
-export declare interface UseListNavigationSingleSelectionSortableChildParameters<ChildElement extends Element> extends UseGenericChildParameters<UseListNavigationSingleSelectionSortableChildContext, Pick<UseListNavigationSingleSelectionSortableChildInfo<ChildElement>, UseListNavigationSingleSelectionSortableChildInfoKeysParameters>>, UseListNavigationSingleSelectionChildParameters<ChildElement> {
+export declare interface UseListNavigationSelectionSortableChildParameters<ChildElement extends Element, M extends UseListNavigationSelectionSortableChildInfo<ChildElement>> extends UseGenericChildParameters<UseListNavigationSelectionSortableChildContext, Pick<UseListNavigationSelectionSortableChildInfo<ChildElement>, UseListNavigationSelectionSortableChildInfoKeysParameters>>, UseListNavigationSelectionChildParameters<ChildElement, M> {
 }
 
-export declare interface UseListNavigationSingleSelectionSortableChildReturnType<ChildElement extends Element> extends UseListNavigationSingleSelectionChildReturnType<ChildElement> {
+export declare interface UseListNavigationSelectionSortableChildReturnType<ChildElement extends Element, M extends UseListNavigationSelectionSortableChildInfo<ChildElement>> extends UseListNavigationSelectionChildReturnType<ChildElement, M> {
 }
 
-export declare interface UseListNavigationSingleSelectionSortableParameters<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationSingleSelectionSortableChildInfo<ChildElement>> extends OmitStrong<UseListNavigationSingleSelectionParameters<ParentOrChildElement, ChildElement, M>, "linearNavigationParameters" | "managedChildrenReturn">, TargetedOmit<UseListNavigationSingleSelectionParameters<ParentOrChildElement, ChildElement, M>, "linearNavigationParameters", "indexDemangler" | "indexMangler">, UseSortableChildrenParameters<M> {
+export declare interface UseListNavigationSelectionSortableParameters<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationSelectionSortableChildInfo<ChildElement>> extends OmitStrong<UseListNavigationSelectionParameters<ParentOrChildElement, ChildElement, M>, "rearrangeableChildrenReturn" | "managedChildrenReturn">, UseSortableChildrenParameters<M> {
 }
 
-export declare interface UseListNavigationSingleSelectionSortableReturnType<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationSingleSelectionSortableChildInfo<ChildElement>> extends UseListNavigationSingleSelectionReturnType<ParentOrChildElement, ChildElement>, UseSortableChildrenReturnType<M> {
+export declare interface UseListNavigationSelectionSortableReturnType<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseListNavigationSelectionSortableChildInfo<ChildElement>> extends UseListNavigationSelectionReturnType<ParentOrChildElement, ChildElement>, UseSortableChildrenReturnType<M> {
 }
 
 /**
@@ -3040,6 +3094,175 @@ export declare interface UseModalReturnType<FocusContainerElement extends Elemen
 }
 
 /**
+ * Allows a parent to track the changes made to multi-selection children.
+ *
+ * @remarks Beyond just giving each child the ability to track its own selected state, the parent can change all children at once.
+ * Pressing <kbd>Ctrl</kbd>+<kbd>A</kbd> will select all children, for example.
+ *
+ * This is not exclusive with {@link useSingleSelection}, you can use both at once if you have a use case for it.
+ *
+ * @compositeParams
+ *
+ * @hasChild {@link useMultiSelectionChild}
+ */
+export declare function useMultiSelection<ParentOrChildElement extends Element, ChildElement extends Element>({ multiSelectionParameters: { onSelectionChange, multiSelectionAriaPropName, multiSelectionMode, ...void3 }, managedChildrenReturn: { getChildren, ...void1 }, childrenHaveFocusReturn: { getAnyFocused, ...void4 }, ...void2 }: UseMultiSelectionParameters<UseMultiSelectionChildInfo<any>>): UseMultiSelectionReturnType<ParentOrChildElement, ChildElement>;
+
+/**
+ *
+ * @compositeParams
+ */
+export declare function useMultiSelectionChild<E extends Element>({ info: { index, ...void4 }, multiSelectionChildParameters: { initiallyMultiSelected, onMultiSelectChange, multiSelectionDisabled, ...void1 }, context: { multiSelectionContext: { notifyParentOfChildSelectChange, multiSelectionAriaPropName, multiSelectionMode, doContiguousSelection, changeAllChildren, getCtrlKeyDown, getShiftKeyDown, getAnyFocused, ...void5 }, ...void3 }, ...void2 }: UseMultiSelectionChildParameters<E, UseMultiSelectionChildInfo<E>>): UseMultiSelectionChildReturnType<E, UseMultiSelectionChildInfo<E>>;
+
+/**
+ *
+ * @compositeParams
+ */
+export declare function useMultiSelectionChildDeclarative<E extends Element>({ multiSelectionChildDeclarativeParameters: { onMultiSelectedChange, multiSelected, ...void3 }, multiSelectionChildReturn: { changeMultiSelected, ...void2 }, ...void1 }: UseMultiSelectionChildDeclarativeParameters<E, UseMultiSelectionChildInfo<E>>): UseMultiSelectionChildDeclarativeReturnType<E, UseMultiSelectionChildInfo<E>>;
+
+export declare interface UseMultiSelectionChildDeclarativeParameters<E extends Element, M extends UseMultiSelectionChildInfo<E>> extends TargetedPick<UseMultiSelectionChildReturnType<E, M>, "multiSelectionChildReturn", "changeMultiSelected"> {
+    multiSelectionChildDeclarativeParameters: {
+        multiSelected: boolean;
+        onMultiSelectedChange: Nullable<(e: MultiSelectChildChangeEvent) => void>;
+    };
+}
+
+export declare interface UseMultiSelectionChildDeclarativeReturnType<E extends Element, M extends UseMultiSelectionChildInfo<E>> extends TargetedPick<UseMultiSelectionChildParameters<E, M>, "multiSelectionChildParameters", "onMultiSelectChange"> {
+    info: Pick<UseMultiSelectionChildInfo<E>, "setSelectedFromParent">;
+}
+
+export declare interface UseMultiSelectionChildInfo<E extends Element> extends UseRovingTabIndexChildInfo<E> {
+    /**
+     * When the parent changes all children (generally because of CTRL+A, focus-selection mode, etc.)
+     * it needs to change all the child checkboxes at once.
+     * It calls this function to do so.
+     *
+     * TODO: This should be a promise because
+     * 1) It might take time for a child to change its state
+     * 2) It might be impossible for a child to change itself, which is neatly represented as a rejected promise.
+     *
+     * But that propagates all the way to linear navigation, which is sync...
+     * (and for good reasons, cause navigation shouldn't be slowed down by sending data to a server or something)
+     */
+    setSelectedFromParent(event: EventType<any, any>, selected: boolean): void;
+    getMultiSelected(): boolean;
+    getMultiSelectionDisabled(): boolean;
+}
+
+export declare type UseMultiSelectionChildInfoKeysParameters = "index";
+
+export declare type UseMultiSelectionChildInfoKeysReturnType = "setSelectedFromParent" | "getMultiSelected" | "getMultiSelectionDisabled";
+
+export declare interface UseMultiSelectionChildParameters<E extends Element, M extends UseMultiSelectionChildInfo<E>> extends UseGenericChildParameters<UseMultiSelectionContext, Pick<M, UseMultiSelectionChildInfoKeysParameters>> {
+    multiSelectionChildParameters: UseMultiSelectionChildParametersSelf<E>;
+    context: UseMultiSelectionContext;
+}
+
+export declare interface UseMultiSelectionChildParametersSelf<E extends Element> {
+    /**
+     * Called when the child is requesting to change whether it's selected or not (generally because the user clicked it)
+     *
+     * @remarks To comply with the child's request, you should either:
+     *
+     * ```md-literal
+     * * Change the `selected` parameter to true (probably by calling `setState` somewhere) if this is declaratively controlled (most cases).
+     * * Call `changeSelected`, if this is imperatively controlled.
+     * ```
+     */
+    onMultiSelectChange: Nullable<(e: MultiSelectChildChangeEvent) => void>;
+    initiallyMultiSelected: boolean;
+    /** When true, this child cannot be selected via multi-select, either by focusing it or by clicking it. */
+    multiSelectionDisabled: boolean;
+}
+
+export declare interface UseMultiSelectionChildReturnType<E extends Element, M extends UseMultiSelectionChildInfo<E>> extends TargetedPick<UsePressParameters<any>, "pressParameters", "onPressSync">, TargetedPick<UseHasCurrentFocusParameters<any>, "hasCurrentFocusParameters", "onCurrentFocusedInnerChanged"> {
+    multiSelectionChildReturn: UseMultiSelectionChildReturnTypeSelf;
+    props: ElementProps<E>;
+    info: Pick<M, UseMultiSelectionChildInfoKeysReturnType>;
+}
+
+export declare interface UseMultiSelectionChildReturnTypeSelf extends Pick<Required<UseMultiSelectionContextSelf>, "multiSelectionMode"> {
+    /**
+     * @stable
+     */
+    changeMultiSelected(event: EventType<any, any>, selected: boolean): void;
+    /**
+     * Indicates that this child is selected, according to itself.
+     */
+    multiSelected: boolean;
+    /**
+     * @stable
+     */
+    getMultiSelected(): boolean;
+}
+
+export declare interface UseMultiSelectionContext {
+    multiSelectionContext: UseMultiSelectionContextSelf;
+}
+
+export declare interface UseMultiSelectionContextSelf extends Pick<UseMultiSelectionParametersSelf, "multiSelectionAriaPropName" | "multiSelectionMode"> {
+    notifyParentOfChildSelectChange(event: EventType<any, any>, childIndex: number, selected: boolean | undefined, previous: boolean | undefined): void;
+    /**
+     * When the user presses Shift+Space or Ctrl+Space (depending on selectionMode),
+     * all the items since the last selected item are toggled,
+     * so the child in question needs to be able to track that.
+     */
+    doContiguousSelection(event: EventType<any, any>, endIndex: number): void;
+    /**
+     * Mostly used for when focus-mode selects something (because by default it deselects everything else)
+     */
+    changeAllChildren: (event: EventType<any, any>, shouldBeSelected: (index: number) => boolean) => void;
+    getCtrlKeyDown(): boolean;
+    getShiftKeyDown(): boolean;
+    getAnyFocused(): boolean;
+}
+
+export declare interface UseMultiSelectionParameters<M extends UseMultiSelectionChildInfo<any>> extends TargetedPick<UseChildrenHaveFocusReturnType<any>, "childrenHaveFocusReturn", "getAnyFocused">, TargetedPick<UseManagedChildrenReturnType<M>, "managedChildrenReturn", "getChildren"> {
+    multiSelectionParameters: UseMultiSelectionParametersSelf;
+}
+
+export declare interface UseMultiSelectionParametersSelf {
+    onSelectionChange: Nullable<(e: MultiSelectionChangeEvent) => void>;
+    /**
+     * What causes a child to become selected?
+     *
+     * @remarks **`"focus"`** is **strongly** discouraged, even though it behaves like a native HTML element (e.g. like `<select size=10>`).
+     *
+     * Notably, in `"focus"` mode, it can be difficult to tell the difference between multi-select and single-select unless you already know that this is a multi-select control.
+     *
+     * Keyboard controls in `"activation"` mode don't differ strongly from the usual conventions of "navigate to a thing, press Space to activate it".
+     * However, because the `"focus"` mode controls are extremely unintuitive, all controls are documented here:
+     *
+     * ```md-literal
+     *
+     * * In either mode, navigation/selection has the usual keyboard controls (arrow keys, space/enter, page up/down, home/end, mouse clicks, pointer events, etc.)
+     * * In either mode, <kbd>Ctrl</kbd>+<kbd>A</kbd> will select all items.
+     * * In either mode, holding <kbd>Shift</kbd> while changing selection will extend the current selection to include the new item and any items in between.
+     * * Exclusive to `"focus"` mode:
+     *     * Navigating to a new item will automatically select it.
+     *         * To navigate **without** selecting a new item, hold <kbd>Ctrl</kbd>.
+     *             * Any item navigated to in this way can be selected by pressing <kbd>Space</kbd>/<kbd>Enter</kbd> as usual, but...
+     *     * Selecting a new item (whether via navigation or pressing <kbd>Space</kbd> or <kbd>Enter</kbd>) will **deselect all other items** unless <kbd>Ctrl</kbd> is held.
+     * ```
+     */
+    multiSelectionMode: "focus" | "activation" | "disabled";
+    /**
+     * What property will be used to mark this item as selected.
+     *
+     * TODO: No compelling use-case for aria-current in multi-select? Just in case: | `current-${"page" | "step" | "date" | "time" | "location" | "true"}`
+     */
+    multiSelectionAriaPropName: Nullable<`aria-${"pressed" | "selected" | "checked"}`>;
+}
+
+export declare interface UseMultiSelectionReturnType<ParentElement extends Element, ChildElement extends Element> extends TargetedPick<UseChildrenHaveFocusParameters<ChildElement>, "childrenHaveFocusParameters", "onCompositeFocusChange"> {
+    context: UseMultiSelectionContext;
+    multiSelectionReturn: UseMultiSelectionReturnTypeSelf;
+    propsStable: ElementProps<ParentElement>;
+}
+
+export declare interface UseMultiSelectionReturnTypeSelf {
+}
+
+/**
  * Effectively just a wrapper around a `MutationObserver`.
  *
  * @compositeParams
@@ -3105,14 +3328,14 @@ export declare interface UsePaginatedChildParameters {
  *
  * @hasChild {@link usePaginatedChild}
  */
-export declare function usePaginatedChildren<ParentElement extends Element, TabbableChildElement extends Element, M extends UsePaginatedChildrenInfo<TabbableChildElement>>({ managedChildrenReturn: { getChildren }, linearNavigationParameters: { indexDemangler }, paginatedChildrenParameters: { paginationMax, paginationMin }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex }, refElementReturn: { getElement } }: UsePaginatedChildrenParameters<ParentElement, TabbableChildElement>): UsePaginatedChildrenReturnType;
+export declare function usePaginatedChildren<ParentElement extends Element, TabbableChildElement extends Element, M extends UsePaginatedChildrenInfo<TabbableChildElement>>({ managedChildrenReturn: { getChildren }, rearrangeableChildrenReturn: { indexDemangler }, paginatedChildrenParameters: { paginationMax, paginationMin }, rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex }, refElementReturn: { getElement } }: UsePaginatedChildrenParameters<ParentElement, TabbableChildElement>): UsePaginatedChildrenReturnType;
 
 export declare interface UsePaginatedChildrenInfo<TabbableChildElement extends Element> extends UseRovingTabIndexChildInfo<TabbableChildElement> {
     setPaginationVisible(visible: boolean): void;
     setChildCountIfPaginated(count: number): void;
 }
 
-export declare interface UsePaginatedChildrenParameters<ParentElement extends Element, TabbableChildElement extends Element> extends Pick<UseManagedChildrenReturnType<UsePaginatedChildrenInfo<TabbableChildElement>>, "managedChildrenReturn">, TargetedPick<UseLinearNavigationParameters<any, TabbableChildElement>, "linearNavigationParameters", "indexDemangler">, TargetedPick<UseRovingTabIndexReturnType<any, TabbableChildElement>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex">, TargetedPick<UseRefElementReturnType<ParentElement>, "refElementReturn", "getElement"> {
+export declare interface UsePaginatedChildrenParameters<ParentElement extends Element, TabbableChildElement extends Element> extends Pick<UseManagedChildrenReturnType<UsePaginatedChildrenInfo<TabbableChildElement>>, "managedChildrenReturn">, TargetedPick<UseLinearNavigationParameters<any, TabbableChildElement>, "rearrangeableChildrenReturn", "indexDemangler">, TargetedPick<UseRovingTabIndexReturnType<any, TabbableChildElement>, "rovingTabIndexReturn", "getTabbableIndex" | "setTabbableIndex">, TargetedPick<UseRefElementReturnType<ParentElement>, "refElementReturn", "getElement"> {
     paginatedChildrenParameters: UsePaginatedChildrenParametersSelf;
 }
 
@@ -3259,6 +3482,16 @@ export declare interface UsePortalChildrenReturnType {
  *
  */
 export declare function usePress<E extends Element>(args: UsePressParameters<E>): UsePressReturnType<E>;
+
+export declare function usePressAsync<E extends Element>({ asyncHandlerParameters: { debounce, throttle, asyncHandler }, pressParameters, refElementReturn }: UsePressAsyncParameters<E>): UsePressAsyncReturnType<E>;
+
+export declare interface UsePressAsyncParameters<E extends Element> extends OmitStrong<UsePressParameters<E>, "pressParameters">, TargetedOmit<UsePressParameters<E>, "pressParameters", "onPressSync"> {
+    asyncHandlerParameters: OmitStrong<UseAsyncHandlerParameters<PressEventReason<E>, void>, "capture">;
+}
+
+export declare interface UsePressAsyncReturnType<E extends Element> extends UsePressReturnType<E> {
+    asyncHandlerReturn: UseAsyncHandlerReturnType<PressEventReason<E>, void>;
+}
 
 export declare interface UsePressParameters<E extends EventTarget> extends TargetedPick<UseRefElementReturnType<E>, "refElementReturn", "getElement"> {
     pressParameters: UsePressParametersSelf<E>;
@@ -3786,6 +4019,70 @@ export declare interface UseSearchParamStateParameters<Key extends keyof SearchP
 }
 
 /**
+ * Allows the children of this component to be selected, either with a `singleSelectedIndex` prop on the parent, or via each child's individual `multiSelected` prop.
+ *
+ * @remarks Single-selection and multi-selection are not mutually exclusive, though the cases where you would want both are uncommon.
+ *
+ * Most of the time, you'll want to pick and choose one mode to work with:
+ *
+ * ```md-literal
+ * * Single-selection is controlled by the parent -- it receives a `singleSelectedIndex` parameter that represents the currently selected child and handles all the logic related to coordinating the deselection of the old child.
+ * * Multi-selection is controlled by each individual child -- they have a `multiSelected` parameter that can be optionally reported back to the parent (so it can show the % of all children selected, or similar)
+ * ```
+ *
+ * @see {@link useSingleSelection}
+ * @see {@link useMultiSelection}
+ *
+ * @compositeParams
+ *
+ * @hasChild {@link useSelectionChild}
+ */
+export declare function useSelection<ParentOrChildElement extends Element, ChildElement extends Element>({ managedChildrenReturn, multiSelectionParameters, childrenHaveFocusReturn, rovingTabIndexReturn, singleSelectionParameters }: UseSelectionParameters<ParentOrChildElement, ChildElement, UseSelectionChildInfo<ChildElement>>): UseSelectionReturnType<ParentOrChildElement, ChildElement>;
+
+/**
+ *
+ * @compositeParams
+ */
+export declare function useSelectionChild<ChildElement extends Element>({ context, info: { index, untabbable, ...void2 }, singleSelectionChildParameters, multiSelectionChildParameters, ...void3 }: UseSelectionChildParameters<ChildElement, UseSelectionChildInfo<ChildElement>>): UseSelectionChildReturnType<ChildElement, UseSelectionChildInfo<ChildElement>>;
+
+export declare function useSelectionChildDeclarative<ChildElement extends Element>(args: UseSelectionChildDeclarativeParameters<ChildElement, UseSelectionChildInfo<ChildElement>>): UseMultiSelectionChildDeclarativeReturnType_2<Element, UseMultiSelectionChildInfo<Element>>;
+
+export declare interface UseSelectionChildDeclarativeParameters<ChildElement extends Element, M extends UseSelectionChildInfo<ChildElement>> extends UseMultiSelectionChildDeclarativeParameters<ChildElement, M> {
+}
+
+export declare interface UseSelectionChildInfo<E extends Element> extends UseSingleSelectionChildInfo<E>, UseMultiSelectionChildInfo<E> {
+}
+
+export declare type UseSelectionChildInfoKeysParameters = UseSingleSelectionChildInfoKeysParameters | UseMultiSelectionChildInfoKeysParameters;
+
+export declare type UseSelectionChildInfoKeysReturnType = UseSingleSelectionChildInfoKeysReturnType | UseMultiSelectionChildInfoKeysReturnType;
+
+export declare interface UseSelectionChildParameters<ChildElement extends Element, M extends UseSelectionChildInfo<ChildElement>> extends UseGenericChildParameters<UseSelectionContext, Pick<UseSelectionChildInfo<ChildElement>, UseSelectionChildInfoKeysParameters>>, OmitStrong<UseSingleSelectionChildParameters<ChildElement, M>, "info" | "context">, OmitStrong<UseMultiSelectionChildParameters<ChildElement, M>, "info" | "context"> {
+}
+
+export declare interface UseSelectionChildReturnType<ChildElement extends Element, M extends UseSelectionChildInfo<ChildElement>> extends ExtendMerge<UseSingleSelectionChildReturnType<ChildElement, M>, UseMultiSelectionChildReturnType<ChildElement, M>> {
+}
+
+export declare interface UseSelectionContext extends UseSingleSelectionContext, UseMultiSelectionContext {
+}
+
+export declare function useSelectionDeclarative<ChildElement extends Element>(args: UseSelectionDeclarativeParameters<ChildElement>): {
+    singleSelectionParameters: {
+        onSingleSelectedIndexChange: SelectedIndexChangeHandler_2;
+    };
+};
+
+export declare interface UseSelectionDeclarativeParameters<ChildElement extends Element> extends UseSingleSelectionDeclarativeParameters<ChildElement> {
+}
+
+export declare interface UseSelectionParameters<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseSelectionChildInfo<ChildElement>> extends UseSingleSelectionParameters<ParentOrChildElement, ChildElement, M>, UseMultiSelectionParameters<M> {
+}
+
+export declare interface UseSelectionReturnType<ParentElement extends Element, ChildElement extends Element> extends UseSingleSelectionReturnType<ChildElement>, UseMultiSelectionReturnType<ParentElement, ChildElement> {
+    context: UseSelectionContext;
+}
+
+/**
  * Allows a single child among all children to be the "selected" child (which can be different from the "focused" child).
  *
  * @remarks If you need multi-select instead of single-select and you're using this hook (e.g. as part of {@link useCompleteListNavigation}), you can disable the single-selection behavior either by setting the selected index to `null` or.
@@ -3794,19 +4091,19 @@ export declare interface UseSearchParamStateParameters<Key extends keyof SearchP
  *
  * @compositeParams
  */
-export declare function useSingleSelection<ParentOrChildElement extends Element, ChildElement extends Element>({ managedChildrenReturn: { getChildren, ...void1 }, rovingTabIndexReturn: { setTabbableIndex, ...void2 }, singleSelectionParameters: { onSelectedIndexChange: onSelectedIndexChange_U, initiallySelectedIndex, ariaPropName, selectionMode, ...void3 }, ...void4 }: UseSingleSelectionParameters<ParentOrChildElement, ChildElement>): UseSingleSelectionReturnType<ChildElement>;
+export declare function useSingleSelection<ParentOrChildElement extends Element, ChildElement extends Element>({ managedChildrenReturn: { getChildren, ...void1 }, rovingTabIndexReturn: { setTabbableIndex, ...void2 }, singleSelectionParameters: { onSingleSelectedIndexChange: onSelectedIndexChange_U, initiallySingleSelectedIndex, singleSelectionAriaPropName, singleSelectionMode, ...void3 }, ...void4 }: UseSingleSelectionParameters<ParentOrChildElement, ChildElement, UseSingleSelectionChildInfo<ChildElement>>): UseSingleSelectionReturnType<ChildElement>;
 
 /**
  *
  *
  * @compositeParams
  */
-export declare function useSingleSelectionChild<ChildElement extends Element>({ context: { singleSelectionContext: { getSelectedIndex, onSelectedIndexChange, ariaPropName, selectionMode, ...void1 }, ...void2 }, info: { index, unselectable, ...void3 }, ...void4 }: UseSingleSelectionChildParameters<ChildElement>): UseSingleSelectionChildReturnType<ChildElement>;
+export declare function useSingleSelectionChild<ChildElement extends Element>({ singleSelectionChildParameters: { singleSelectionDisabled, ...void5 }, context: { singleSelectionContext: { getSingleSelectedIndex, onSingleSelectedIndexChange, singleSelectionAriaPropName: ariaPropName, singleSelectionMode, ...void1 }, ...void2 }, info: { index, untabbable, ...void3 }, ...void4 }: UseSingleSelectionChildParameters<ChildElement, UseSingleSelectionChildInfo<ChildElement>>): UseSingleSelectionChildReturnType<ChildElement, UseSingleSelectionChildInfo<ChildElement>>;
 
 /** Anything that's selectable must be tabbable, so we DO use rovingTabIndex instead of just managedChildren */
 export declare interface UseSingleSelectionChildInfo<E extends Element> extends UseRovingTabIndexChildInfo<E> {
-    selected: boolean;
-    getSelected(): boolean;
+    singleSelected: boolean;
+    getSingleSelected(): boolean;
     /**
      * The parent calls this to change the child's local state.
      *
@@ -3815,35 +4112,35 @@ export declare interface UseSingleSelectionChildInfo<E extends Element> extends 
      * @param selected - This is the selected child (out of all of them)
      * @param direction - How far to the `selectedIndex` this child is
      */
-    setLocalSelected(selected: boolean, direction: number | null): void;
-    /**
-     * This is similar to `untabbable` for `useRovingTabIndex`, but for selection.
-     *
-     * Disables selecting this child. Being `untabbable` must imply being `unselectable`, but you can of course have something that's unselectable but not untabbable.
-     */
-    unselectable: boolean;
+    setLocalSingleSelected(selected: boolean, direction: number | null): void;
 }
 
-export declare type UseSingleSelectionChildInfoKeysParameters = "index" | "unselectable";
+export declare type UseSingleSelectionChildInfoKeysParameters = "index" | "untabbable";
 
-export declare type UseSingleSelectionChildInfoKeysReturnType = "getSelected" | "setLocalSelected" | "selected";
+export declare type UseSingleSelectionChildInfoKeysReturnType = "getSingleSelected" | "setLocalSingleSelected" | "singleSelected";
 
-export declare interface UseSingleSelectionChildParameters<E extends Element> extends UseGenericChildParameters<UseSingleSelectionContext, Pick<UseSingleSelectionChildInfo<E>, UseSingleSelectionChildInfoKeysParameters>> {
+export declare interface UseSingleSelectionChildParameters<E extends Element, M extends UseSingleSelectionChildInfo<E>> extends UseGenericChildParameters<UseSingleSelectionContext, Pick<M, UseSingleSelectionChildInfoKeysParameters>> {
+    singleSelectionChildParameters: UseSingleSelectionChildParametersSelf;
 }
 
-export declare interface UseSingleSelectionChildReturnType<E extends Element> extends UseChildrenHaveFocusChildReturnType<E>, TargetedPick<UsePressParameters<any>, "pressParameters", "onPressSync"> {
+export declare interface UseSingleSelectionChildParametersSelf {
+    /** When true, this child cannot be selected via single-select, either by focusing it or by clicking it. */
+    singleSelectionDisabled: boolean;
+}
+
+export declare interface UseSingleSelectionChildReturnType<E extends Element, M extends UseSingleSelectionChildInfo<E>> extends UseChildrenHaveFocusChildReturnType<E>, TargetedPick<UsePressParameters<any>, "pressParameters", "onPressSync"> {
     props: ElementProps<E>;
-    info: Pick<UseSingleSelectionChildInfo<E>, UseSingleSelectionChildInfoKeysReturnType>;
+    info: Pick<M, UseSingleSelectionChildInfoKeysReturnType>;
     singleSelectionChildReturn: UseSingleSelectionChildReturnTypeSelf;
 }
 
-export declare interface UseSingleSelectionChildReturnTypeSelf {
+export declare interface UseSingleSelectionChildReturnTypeSelf extends Pick<Required<SingleSelectionContextSelf>, "singleSelectionMode"> {
     /**
      * Is this child currently the selected child among all its siblings?
      */
-    selected: boolean;
+    singleSelected: boolean;
     /** @stable */
-    getSelected(): boolean;
+    getSingleSelected(): boolean;
     /**
      * Any time `selected` changes to or from being visible, this will represent the direction and magnitude of the change.
      *
@@ -3851,9 +4148,9 @@ export declare interface UseSingleSelectionChildReturnTypeSelf {
      *
      * This useful for things like animations or transitions.
      */
-    selectedOffset: Nullable<number>;
+    singleSelectedOffset: Nullable<number>;
     /** @stable */
-    getSelectedOffset: () => (number | null);
+    getSingleSelectedOffset: () => (number | null);
 }
 
 export declare interface UseSingleSelectionContext {
@@ -3863,22 +4160,21 @@ export declare interface UseSingleSelectionContext {
 /**
  * Let's face it, declarative is nicer to use than imperative, so this is a shortcut.
  */
-export declare function useSingleSelectionDeclarative<ParentOrChildElement extends Element, ChildElement extends Element>({ singleSelectionReturn: { changeSelectedIndex }, singleSelectionDeclarativeParameters: { selectedIndex, onSelectedIndexChange } }: UseSingleSelectionDeclarativeParameters): {
+export declare function useSingleSelectionDeclarative<ParentOrChildElement extends Element, ChildElement extends Element>({ singleSelectionReturn: { changeSingleSelectedIndex }, singleSelectionDeclarativeParameters: { singleSelectedIndex, onSingleSelectedIndexChange } }: UseSingleSelectionDeclarativeParameters<ChildElement>): {
     singleSelectionParameters: {
-        onSelectedIndexChange: Nullable<SelectedIndexChangeHandler>;
+        onSingleSelectedIndexChange: SelectedIndexChangeHandler;
     };
 };
 
-export declare interface UseSingleSelectionDeclarativeParameters {
+export declare interface UseSingleSelectionDeclarativeParameters<ChildElement extends Element> extends TargetedPick<UseSingleSelectionReturnType<ChildElement>, "singleSelectionReturn", "changeSingleSelectedIndex"> {
     singleSelectionDeclarativeParameters: UseSingleSelectionDeclarativeParametersSelf;
-    singleSelectionReturn: Pick<UseSingleSelectionReturnType<any>["singleSelectionReturn"], "changeSelectedIndex">;
 }
 
-export declare interface UseSingleSelectionDeclarativeParametersSelf extends Pick<UseSingleSelectionParameters<any, any>["singleSelectionParameters"], "onSelectedIndexChange"> {
-    selectedIndex: number | null;
+export declare interface UseSingleSelectionDeclarativeParametersSelf extends Pick<UseSingleSelectionParametersSelf, "onSingleSelectedIndexChange"> {
+    singleSelectedIndex: Nullable<number>;
 }
 
-export declare interface UseSingleSelectionParameters<ParentOrChildElement extends Element, ChildElement extends Element> extends TargetedPick<UseManagedChildrenReturnType<UseSingleSelectionChildInfo<ChildElement>>, "managedChildrenReturn", "getChildren">, TargetedPick<UseRovingTabIndexReturnType<ParentOrChildElement, ChildElement>, "rovingTabIndexReturn", "setTabbableIndex"> {
+export declare interface UseSingleSelectionParameters<ParentOrChildElement extends Element, ChildElement extends Element, M extends UseSingleSelectionChildInfo<ChildElement>> extends TargetedPick<UseManagedChildrenReturnType<M>, "managedChildrenReturn", "getChildren">, TargetedPick<UseRovingTabIndexReturnType<ParentOrChildElement, ChildElement>, "rovingTabIndexReturn", "setTabbableIndex"> {
     singleSelectionParameters: UseSingleSelectionParametersSelf;
 }
 
@@ -3887,7 +4183,7 @@ export declare interface UseSingleSelectionParametersSelf {
      * This is imperative, as opposed to declarative,
      * to save on re-rendering the parent whenever the selected index changes.
      */
-    initiallySelectedIndex: Nullable<number>;
+    initiallySingleSelectedIndex: Nullable<number>;
     /**
      * Called when a child is selected (via a press or other method).
      *
@@ -3901,14 +4197,24 @@ export declare interface UseSingleSelectionParametersSelf {
      *
      * @nonstable
      */
-    onSelectedIndexChange: Nullable<SelectedIndexChangeHandler>;
-    selectionMode: "focus" | "activation" | "disabled";
+    onSingleSelectedIndexChange: Nullable<SelectedIndexChangeHandler>;
+    /**
+     * What causes a child to become selected?
+     *
+     * In general, `"focus"` is preferred (and also implies `"activation"` for iOS devices that may or may not focus anything ever),
+     * especially when the change can be seen immediately and there is no consequence for doing so, like with tabs and sometimes radio buttons too.
+     *
+     * When this is `"disabled"`, all single-selection behavior is turned off, allowing for multi-selection, or no selection.
+     */
+    singleSelectionMode: "focus" | "activation" | "disabled";
     /**
      * What property will be used to mark this item as selected.
      *
      * **IMPORTANT**: The `aria-current` options should be used with caution as they are semantically very different from the usual selection cases.
+     *
+     * This is ignored if `selectionMode` is set to `"disabled"`.
      */
-    ariaPropName: Nullable<`aria-${"pressed" | "selected" | "checked" | `current-${"page" | "step" | "date" | "time" | "location" | "true"}`}`>;
+    singleSelectionAriaPropName: Nullable<`aria-${"pressed" | "selected" | "checked" | `current-${"page" | "step" | "date" | "time" | "location" | "true"}`}`>;
 }
 
 export declare interface UseSingleSelectionReturnType<ChildElement extends Element> extends TargetedPick<UseChildrenHaveFocusParameters<ChildElement>, "childrenHaveFocusParameters", "onCompositeFocusChange"> {
@@ -3927,11 +4233,11 @@ export declare interface UseSingleSelectionReturnTypeSelf {
      *
      * @stable
      */
-    changeSelectedIndex: PassiveStateUpdater<number | null, Event>;
+    changeSingleSelectedIndex: PassiveStateUpdater<number | null, SelectedIndexChangeEvent>;
     /**
      * @stable
      */
-    getSelectedIndex(): number | null;
+    getSingleSelectedIndex(): number | null;
 }
 
 export declare interface UseSortableChildInfo extends UseRearrangeableChildInfo {
@@ -4020,7 +4326,7 @@ export declare function useStableGetter<T>(value: T): () => T;
 /**
  * Returns a function that retrieves the stack at the time this hook was called (in development mode only).
  *
- *
+ * @remarks The global variable `_generate_setState_stacks` must be true, or no stack will be generated.
  */
 export declare function useStack(): () => string | undefined;
 

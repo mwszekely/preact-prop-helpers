@@ -1,6 +1,6 @@
 import { createContext } from "preact";
 import { memo, useCallback, useContext } from "preact/compat";
-import { CompleteListNavigationContext, EventDetail, GetIndex, UseCompleteListNavigationChildInfo, UseCompleteListNavigationDeclarativeReturnType, VNode, focus, useCompleteListNavigationChild, useCompleteListNavigationDeclarative, useMergedProps, usePress, useStableCallback, useState } from "../../dist/index.js";
+import { CompleteListNavigationContext, EventDetail, GetIndex, MultiSelectionChangeEvent, UseCompleteListNavigationChildInfo, UseCompleteListNavigationDeclarativeReturnType, VNode, focus, useCompleteListNavigationChildDeclarative, useCompleteListNavigationDeclarative, useMergedProps, usePress, useStableCallback, useState } from "../../dist/index.js";
 
 const RandomWords = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".split(" ");
 
@@ -8,13 +8,17 @@ function _getDocument() {
     return window.document;
 }
 
-const SelectionModeContext = createContext<"activation" | "focus">("activation");
+const SingleSelectionModeContext = createContext<"activation" | "focus" | "disabled">("focus");
+const MultiSelectionModeContext = createContext<"activation" | "focus" | "disabled">("activation");
 const UntabbableContext = createContext(false);
 const ListNavigationSingleSelectionChildContext = createContext<CompleteListNavigationContext<HTMLLIElement, CustomInfoType>>(null!)
 export const DemoUseRovingTabIndex = memo(() => {
 
+    const [multiSelectPercent, setMultiSelectPercent] = useState(0);
+
     const [selectedIndex, setSelectedIndex] = useState(null as number | null);
-    const [selectionMode, setSelectionMode] = useState("activation" as "focus" | "activation");
+    const [singleSelectionMode, setSingleSelectionMode] = useState("focus" as "focus" | "activation" | "disabled");
+    const [multiSelectionMode, setMultiSelectionMode] = useState("activation" as "focus" | "activation" | "disabled");
     const [count, setCount] = useState(10);
     let [min, setMin] = useState<number | null>(null);
     let [max, setMax] = useState<number | null>(null);
@@ -26,6 +30,10 @@ export const DemoUseRovingTabIndex = memo(() => {
         max = null!;
 
     const untabbable = false;
+
+    const onSelectionChange = (e: MultiSelectionChangeEvent) => {
+        setMultiSelectPercent(e[EventDetail].selectedPercent)
+    }
 
     const r: UseCompleteListNavigationDeclarativeReturnType<HTMLOListElement, HTMLLIElement, CustomInfoType> = useCompleteListNavigationDeclarative<HTMLOListElement, HTMLLIElement, CustomInfoType>({
         rovingTabIndexParameters: { onTabbableIndexChange: null, untabbable, focusSelfParent: focus },
@@ -39,7 +47,8 @@ export const DemoUseRovingTabIndex = memo(() => {
         paginatedChildrenParameters: { paginationMin: min, paginationMax: max },
         sortableChildrenParameters: { compare: useCallback((rhs: CustomInfoType, lhs: CustomInfoType) => { return lhs.index - rhs.index }, []) },
         staggeredChildrenParameters: { staggered },
-        singleSelectionParameters: { ariaPropName: "aria-selected", selectionMode }
+        singleSelectionParameters: { singleSelectionAriaPropName: "aria-selected", singleSelectionMode },
+        multiSelectionParameters: { multiSelectionAriaPropName: "aria-checked", onSelectionChange, multiSelectionMode }
     });
 
 
@@ -95,18 +104,28 @@ export const DemoUseRovingTabIndex = memo(() => {
             <label>Pagination window starts at: <input type="number" value={min ?? undefined} min={0} max={max ?? undefined} onInput={e => { e.preventDefault(); setMin(e.currentTarget.valueAsNumber); }} /></label>
             <label>Pagination window ends at: <input type="number" value={max ?? undefined} min={min ?? undefined} max={count} onInput={e => { e.preventDefault(); setMax(e.currentTarget.valueAsNumber); }} /></label>
             <label>Stagger delay: <input type="checkbox" checked={staggered} onInput={e => { e.preventDefault(); setStaggered(e.currentTarget.checked); }} /></label>
-            <label>Selection mode:
-                <label><input name="rti-demo-selection-mode" type="radio" checked={selectionMode == 'focus'} onInput={e => { e.preventDefault(); setSelectionMode("focus"); }} /> On focus</label>
-                <label><input name="rti-demo-selection-mode" type="radio" checked={selectionMode == 'activation'} onInput={e => { e.preventDefault(); setSelectionMode("activation"); }} /> On activation (click, tap, Enter, Space, etc.)</label>
+            <label>Single-Selection mode:
+                <label><input name="rti-demo-single-selection-mode" type="radio" checked={singleSelectionMode == 'disabled'} onInput={e => { e.preventDefault(); setSingleSelectionMode("disabled"); }} /> Off</label>
+                <label><input name="rti-demo-single-selection-mode" type="radio" checked={singleSelectionMode == 'focus'} onInput={e => { e.preventDefault(); setSingleSelectionMode("focus"); }} /> On focus</label>
+                <label><input name="rti-demo-single-selection-mode" type="radio" checked={singleSelectionMode == 'activation'} onInput={e => { e.preventDefault(); setSingleSelectionMode("activation"); }} /> On activation (click, tap, Enter, Space, etc.)</label>
+            </label>
+            <label>Multi-Selection mode:
+                <label><input name="rti-demo-multi-selection-mode" type="radio" checked={multiSelectionMode == 'disabled'} onInput={e => { e.preventDefault(); setMultiSelectionMode("disabled"); }} /> Off</label>
+                <label><input name="rti-demo-multi-selection-mode" type="radio" checked={multiSelectionMode == 'focus'} onInput={e => { e.preventDefault(); setMultiSelectionMode("focus"); }} /> On focus</label>
+                <label><input name="rti-demo-multi-selection-mode" type="radio" checked={multiSelectionMode == 'activation'} onInput={e => { e.preventDefault(); setMultiSelectionMode("activation"); }} /> On activation (click, tap, Enter, Space, etc.)</label>
             </label>
 
-            <UntabbableContext.Provider value={untabbable}>
-                <SelectionModeContext.Provider value={selectionMode}>
-                    <ListNavigationSingleSelectionChildContext.Provider value={context}>
-                        <ol start={0} {...props}>{useRearrangedChildren(jsxChildren)}</ol>
-                    </ListNavigationSingleSelectionChildContext.Provider></SelectionModeContext.Provider>
-            </UntabbableContext.Provider>
             {<div>Typeahead status: {typeaheadStatus}</div>}
+            {<div>Multi-select: {Math.round(multiSelectPercent * 100 * 10) / 10}%</div>}
+            <UntabbableContext.Provider value={untabbable}>
+                <SingleSelectionModeContext.Provider value={singleSelectionMode}>
+                    <MultiSelectionModeContext.Provider value={multiSelectionMode}>
+                        <ListNavigationSingleSelectionChildContext.Provider value={context}>
+                            <ol start={0} {...props}>{useRearrangedChildren(jsxChildren)}</ol>
+                        </ListNavigationSingleSelectionChildContext.Provider>
+                    </MultiSelectionModeContext.Provider>
+                </SingleSelectionModeContext.Provider>
+            </UntabbableContext.Provider>
         </div>
     );
 })
@@ -125,6 +144,9 @@ const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
     if (index == 8) {
         disabled = hidden = true;
     }
+
+    const [multiSelected, setMultiSelected] = useState(false);
+
     const [randomWord] = useState(() => RandomWords[index]);
     const context = useContext(ListNavigationSingleSelectionChildContext) as CompleteListNavigationContext<HTMLLIElement, CustomInfoType>;
     const focusSelf = useCallback((e: HTMLElement) => { e.focus() }, []);
@@ -138,22 +160,28 @@ const DemoUseRovingTabIndexChild = memo((({ index }: { index: number }) => {
         propsTabbable,
         textContentReturn,
         rovingTabIndexChildReturn: { tabbable },
-        singleSelectionChildReturn: { selected, selectedOffset },
+        singleSelectionChildReturn: { singleSelected, getSingleSelected, singleSelectedOffset, getSingleSelectedOffset },
+        multiSelectionChildReturn: { getMultiSelected },
         paginatedChildReturn: { hideBecausePaginated },
         staggeredChildReturn: { hideBecauseStaggered },
         pressParameters: { onPressSync, excludeSpace },
         refElementReturn
-    } = useCompleteListNavigationChild<HTMLLIElement, CustomInfoType>({
-        info: { index, focusSelf, foo: "bar", untabbable: hidden, unselectable: disabled, getSortValue },
+    } = useCompleteListNavigationChildDeclarative<HTMLLIElement, CustomInfoType>({
+        info: { index, focusSelf, foo: "bar", untabbable: hidden, getSortValue },
         context,
         textContentParameters: { getText: useCallback((e) => { return e?.textContent ?? "" }, []) },
         hasCurrentFocusParameters: { onCurrentFocusedChanged: null, onCurrentFocusedInnerChanged: null },
-        refElementParameters: { onElementChange: null, onMount: null, onUnmount: null }
+        refElementParameters: { onElementChange: null, onMount: null, onUnmount: null },
+        multiSelectionChildParameters: { multiSelectionDisabled: disabled },
+        singleSelectionChildParameters: { singleSelectionDisabled: disabled },
+        multiSelectionChildDeclarativeParameters: { multiSelected, onMultiSelectedChange: e => setMultiSelected(e[EventDetail].multiSelected) }
     });
 
     const { pressReturn, props: p2 } = usePress<HTMLLIElement>({ pressParameters: { focusSelf, onPressSync, excludeSpace, allowRepeatPresses: false, excludeEnter: null, excludePointer: null, longPressThreshold: null, onPressingChange: null }, refElementReturn })
 
-    const text = `${randomWord} This is item #${index} (offset: ${selectedOffset}) ${hidden ? " (hidden)" : ""}${disabled ? " (disabled)" : ""}${selected ? " (selected)" : " (not selected)"} (${tabbable ? "Tabbable" : "Not tabbable"})`;
+    let s = (singleSelected && multiSelected ? " (single- & multi- selected)" : singleSelected ? " (single-selected)" : multiSelected ? " (multi-selected)" : "");
+
+    const text = `${randomWord} This is item #${index} (offset: ${singleSelected}) ${hidden ? " (hidden)" : ""}${disabled ? " (disabled)" : ""}${s} (${tabbable ? "Tabbable" : "Not tabbable"})`;
 
     return (
         <li {...useMergedProps(propsChild, propsTabbable, p2)} style={{ opacity: hideBecausePaginated ? 0.25 : 1, transform: `translateX(${hideBecauseStaggered ? "50%" : "0%"})` }}>{text}<input {...useMergedProps(propsTabbable, { type: "number" }) as any} style={{ width: "5ch" }} /></li>

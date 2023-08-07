@@ -76,8 +76,7 @@ export function useListNavigation({ linearNavigationParameters, typeaheadNavigat
             ...contextTypeahead
         }),
         linearNavigationReturn,
-        propsStableParentOrChild: propsStable.current,
-        propsParent: propsRTI
+        props: useMergedProps(propsStableLN, propsStableTN, propsRTI)
     };
 }
 /**

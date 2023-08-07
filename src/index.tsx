@@ -13,147 +13,155 @@
  * As a full example: 
  * 
  * ```typescript
- *    // Short, abbreviated version:
- *    const { ...returnType } = useCompleteGridNavigationDeclarative({ ...params });
+ *      // Short, abbreviated version:
+ *      const { ...returnType } = useCompleteGridNavigationDeclarative({ ...params });
  * 
- *    // Entirely complete, fully spelt-out version:
- *    const returnType = useCompleteGridNavigationDeclarative<HTMLTableSectionElement, HTMLTableRowElement, HTMLTableCellElement, CustomGridInfo, CustomGridRowInfo>({
- *        // `useRovingTabIndex` is a separate hook that you can call with these same parameters:
- *        rovingTabIndexParameters: {
- *            // If true, the entire grid is removed from the tab order
- *            untabbable: false,
- *            // A function provided by you that is only called when no children are tabbable
- *            focusSelfParent: focus,
- *            // This can be used to track when the user navigates between rows for any reason
- *            onTabbableIndexChange: setTabbableRow,
- *        },
- *        // `useSingleSelection` is a separate hook that you can call with these parameters:
- *        singleSelectionParameters: {
- *            // When a child is selected, it is indicated with this ARIA attribute:
- *            ariaPropName: "aria-checked",
- *            // Are children selected when they are activated (e.g. clicked), or focused (e.g. tabbed to)?
- *            selectionMode: "focus"
- *        },
- *        // (etc. etc.)
- *        typeaheadNavigationParameters: {
- *            // Determines how children are searched for (`Intl.Collator`)
- *            collator: null,
- *            // Whether typeahead behavior is disabled
- *            noTypeahead: false,
- *            // How long a period of no input is required before typeahead clears itself
- *            typeaheadTimeout: 1000,
- *            // This can be used to track when the user navigates between rows via typeahead
- *            onNavigateTypeahead: null
- *        },
- *        linearNavigationParameters: {
- *            // Is navigating to the first/last row with Home/End disabled?
- *            disableHomeEndKeys: false,
- *            // What happens when you press Up on the first row?
- *            navigatePastStart: "wrap",
- *            // What happens when you press Down on the last row?
- *            navigatePastEnd: "wrap",
- *            // How far do Page Up/Down jump?
- *            pageNavigationSize: 0.1,
- *            // This can be used to track when the user navigates between rows with the arrow keys
- *            onNavigateLinear: null
- *        },
- *        singleSelectionDeclarativeParameters: {
- *            // Which child is currently selected?
- *            selectedIndex: selectedRow,
- *            // What happens when the user selects a child?
- *            onSelectedIndexChange: (e) => setSelectedRow(e[EventDetail].selectedIndex)
- *        },
- *        gridNavigationParameters: {
- *            // This can be used by you to track which 0-indexed column is currently the one with focus.
- *            onTabbableColumnChange: setTabbableColumn
- *        },
- *        rearrangeableChildrenParameters: {
- *            // This must return a VNode's 0-based index from its props
- *            getIndex: useCallback<GetIndex>((a: VNode) => a.props.index, [])
- *        },
- *        sortableChildrenParameters: {
- *            // Controls how rows compare against each other
- *            compare: useCallback((rhs: CustomGridInfo, lhs: CustomGridInfo) => { return lhs.index - rhs.index }, [])
- *        },
- *        paginatedChildrenParameters: {
- *            // Controls the current pagination range
- *            paginationMin: null,
- *            paginationMax: null
- *        },
- *        staggeredChildrenParameters: {
- *            // Controls whether children appear staggered as CPU time permits
- *            staggered: false
- *        }
- *    });
+ *      // Entirely complete, fully spelt-out version:
+ *     const allReturnInfo = useCompleteGridNavigationDeclarative<HTMLTableSectionElement, HTMLTableRowElement, HTMLTableCellElement, CustomGridInfo, CustomGridRowInfo>({
+ *         // `useRovingTabIndex` is a separate hook that you can call with these same parameters:
+ *         rovingTabIndexParameters: {
+ *             // If true, the entire grid is removed from the tab order
+ *             untabbable: false,
+ *             // A function provided by you that is only called when no children are tabbable
+ *             focusSelfParent: focus,
+ *             // This can be used to track when the user navigates between rows for any reason
+ *             onTabbableIndexChange: setTabbableRow,
+ *         },
+ *         // `useSingleSelection` is a separate hook that you can call with these parameters:
+ *         typeaheadNavigationParameters: {
+ *             // Determines how children are searched for (`Intl.Collator`)
+ *             collator: null,
+ *             // Whether typeahead behavior is disabled
+ *             noTypeahead: false,
+ *             // How long a period of no input is required before typeahead clears itself
+ *             typeaheadTimeout: 1000,
+ *             // This can be used to track when the user navigates between rows via typeahead
+ *             onNavigateTypeahead: null
+ *         },
+ *         // (etc. etc.)
+ *         linearNavigationParameters: {
+ *             // Is navigating to the first/last row with Home/End disabled?
+ *             disableHomeEndKeys: false,
+ *             // What happens when you press Up on the first row?
+ *             navigatePastStart: "wrap",
+ *             // What happens when you press Down on the last row?
+ *             navigatePastEnd: "wrap",
+ *             // How far do Page Up/Down jump?
+ *             pageNavigationSize: 0.1,
+ *             // This can be used to track when the user navigates between rows with the arrow keys
+ *             onNavigateLinear: null
+ *         },
+ *         singleSelectionParameters: {
+ *             // When a child is selected, it is indicated with this ARIA attribute:
+ *             singleSelectionAriaPropName: "aria-checked",
+ *             // Are children selected when they are activated (e.g. clicked), or focused (e.g. tabbed to)?
+ *             singleSelectionMode: "focus"
+ *         },
+ *         multiSelectionParameters: {
+ *             // Single- and multi- selection are not exclusive, and when so should be indicated via different attributes.
+ *             multiSelectionAriaPropName: "aria-selected",
+ *             // singleSelectionMode but for multi-selection
+ *             multiSelectionMode: "activation",
+ *             // Callback when any child changes with information about % of children checked, etc.
+ *             onSelectionChange: null
+ *         },
+ *         singleSelectionDeclarativeParameters: {
+ *             // Which child is currently selected?
+ *             selectedIndex: selectedRow,
+ *             // What happens when the user selects a child?
+ *             onSelectedIndexChange: (e) => setSelectedRow(e[EventDetail].selectedIndex)
+ *         },
+ *         gridNavigationParameters: {
+ *             // This can be used by you to track which 0-indexed column is currently the one with focus.
+ *             onTabbableColumnChange: setTabbableColumn
+ *         },
+ *         rearrangeableChildrenParameters: {
+ *             // This must return a VNode's 0-based index from its props
+ *             getIndex: useCallback<GetIndex>((a: VNode) => a.props.index, [])
+ *         },
+ *         sortableChildrenParameters: {
+ *             // Controls how rows compare against each other
+ *             compare: useCallback((rhs: CustomGridInfo, lhs: CustomGridInfo) => { return lhs.index - rhs.index }, [])
+ *         },
+ *         paginatedChildrenParameters: {
+ *             // Controls the current pagination range
+ *             paginationMin: null,
+ *             paginationMax: null
+ *         },
+ *         staggeredChildrenParameters: {
+ *             // Controls whether children appear staggered as CPU time permits
+ *             staggered: false
+ *         },
+ *         refElementParameters: {}
+ *     });
+ *     
+ *     // Those were the parameters, these are the return types:
+ *     const {
+ *         // Spread these props to the HTMLElement that will implement this grid behavior
+ *         props,
+ *         // The child row will useContext this, so provide it to them.
+ *         context,
+ *         // This is what `useRovingTabIndex` returned; use it for whatever you need:
+ *         rovingTabIndexReturn: {
+ *             // Call to focus the grid, which focuses the current row, which focuses its current cell.
+ *             focusSelf,
+ *             // Returns the index of the row that is tabbable to
+ *             getTabbableIndex,
+ *             // Changes which row is currently tabbable
+ *             setTabbableIndex
+ *         },
+ *         // This is what `useTypeaheadNavigation` returned; use it for whatever you need:
+ *         typeaheadNavigationReturn: {
+ *             // Returns the current value the user has typed for typeahead (cannot be used during render)
+ *             getCurrentTypeahead,
+ *             // Whether the user's typeahead is invalid/valid/nonexistent.
+ *             typeaheadStatus
+ *         },
+ *         // (etc. etc.)
+ *         singleSelectionReturn: {
+ *             // Largely convenience only (since the caller likely already knows the selected index, but just in case)
+ *             getSingleSelectedIndex,
+ *         },
+ *         multiSelectionReturn: {
+ *             // Nothing, actually
+ *         },
+ *         rearrangeableChildrenReturn: {
+ *             // You must call this hook on your array of children to implement the sorting behavior
+ *             useRearrangedChildren,
+ *             // Largely internal use only
+ *             indexDemangler,
+ *             // Largely internal use only
+ *             indexMangler,
+ *             // Largely internal use only, but if you implement a custom sorting algorithm, call this to finalize the rearrangement. 
+ *             rearrange,
+ *             // Reverses all children 
+ *             reverse,
+ *             // Shuffles all children
+ *             shuffle
+ *         },
+ *         sortableChildrenReturn: {
+ *             // A table header button would probably call this function to sort all the table rows.
+ *             sort
+ *         },
+ *         linearNavigationReturn: { },
+ *         managedChildrenReturn: {
+ *             // Returns metadata about each row
+ *             getChildren
+ *         },
+ *         paginatedChildrenReturn: {
+ *             // Largely internal use only
+ *             refreshPagination
+ *         },
+ *         staggeredChildrenReturn: {
+ *             // When the staggering behavior is currently hiding one or more children, this is true.
+ *             stillStaggering
+ *         },
+ *         childrenHaveFocusReturn: {
+ *             // Returns true if any row in this grid is focused
+ *             getAnyFocused
+ *         },
  *
- *    // Those were the parameters, these are the return types:
- *    const {
- *        // Spread these props to the HTMLElement that will implement this grid behavior
- *        props,
- *        // The child row will useContext this, so provide it to them.
- *        context,
- *        // This is what `useRovingTabIndex` returned; use it for whatever you need:
- *        rovingTabIndexReturn: {
- *            // Call to focus the grid, which focuses the current row, which focuses its current cell.
- *            focusSelf,
- *            // Returns the index of the row that is tabbable to
- *            getTabbableIndex,
- *            // Changes which row is currently tabbable
- *            setTabbableIndex
- *        },
- *        // This is what `useSingleSelection` returned; use it for whatever you need:
- *        singleSelectionReturn: {
- *            // Largely internal use only (since `selectedIndex` is a prop you pass in for the declarative version)
- *            getSelectedIndex,
- *        },
- *        // (etc. etc.)
- *        typeaheadNavigationReturn: {
- *            // Returns the current value the user has typed for typeahead (cannot be used during render)
- *            getCurrentTypeahead,
- *            // Whether the user's typeahead is invalid/valid/nonexistent.
- *            typeaheadStatus
- *        },
- *        singleSelectionReturn: {
- *            // Largely internal use only (since `selectedIndex` is a prop you pass in for the declarative version)
- *            getSelectedIndex,
- *        },
- *        rearrangeableChildrenReturn: {
- *            // You must call this hook on your array of children to implement the sorting behavior
- *            useRearrangedChildren,
- *            // Largely internal use only
- *            indexDemangler,
- *            // Largely internal use only
- *            indexMangler,
- *            // Largely internal use only, but if you implement a custom sorting algorithm, call this to finalize the rearrangement. 
- *            rearrange,
- *            // Reverses all children 
- *            reverse,
- *            // Shuffles all children
- *            shuffle
- *        },
- *        sortableChildrenReturn: {
- *            // A table header button would probably call this function to sort all the table rows.
- *            sort
- *        },
- *        linearNavigationReturn: { },
- *        managedChildrenReturn: {
- *            // Returns metadata about each row
- *            getChildren
- *        },
- *        paginatedChildrenReturn: {
- *            // Largely internal use only
- *            refreshPagination
- *        },
- *        staggeredChildrenReturn: {
- *            // When the staggering behavior is currently hiding one or more children, this is true.
- *            stillStaggering
- *        },
- *        childrenHaveFocusReturn: {
- *            // Returns true if any row in this grid is focused
- *            getAnyFocused
- *        },
- *
- *    } = allReturnInfo;
+ *     } = allReturnInfo;
  * ```
  * 
  * ## A note on stability
@@ -236,7 +244,9 @@
  * {@include } {@link useRovingTabIndex}
  * {@include } {@link useLinearNavigation}
  * {@include } {@link useTypeaheadNavigation}
+ * {@include } {@link useSelection}
  * {@include } {@link useSingleSelection}
+ * {@include } {@link useMultiSelection}
  * {@include } {@link useRearrangeableChildren}
  * {@include } {@link useSortableChildren}
  * {@include } {@link usePaginatedChildren}
@@ -312,22 +322,24 @@ export { UseBackdropDismissParameters, UseBackdropDismissParametersSelf, useBack
 export { UseEscapeDismissParameters, UseEscapeDismissParametersSelf, useEscapeDismiss } from "./component-detail/dismissal/use-escape-dismiss.js";
 export { UseLostFocusDismissParameters, UseLostFocusDismissParametersSelf, UseLostFocusDismissReturnType, useLostFocusDismiss } from "./component-detail/dismissal/use-lost-focus-dismiss.js";
 export { GridChildCellInfo, GridChildRowInfo, TabbableColumnInfo, UseGridNavigationCellContext, UseGridNavigationCellContextSelf, UseGridNavigationCellInfoKeysParameters, UseGridNavigationCellInfoKeysReturnType, UseGridNavigationCellParameters, UseGridNavigationCellParametersSelf, UseGridNavigationCellReturnType, UseGridNavigationParameters, UseGridNavigationParametersSelf, UseGridNavigationReturnType, UseGridNavigationRowContext, UseGridNavigationRowContextSelf, UseGridNavigationRowInfoKeysParameters, UseGridNavigationRowInfoKeysReturnType, UseGridNavigationRowParameters, UseGridNavigationRowReturnType, useGridNavigation, useGridNavigationCell, useGridNavigationRow } from "./component-detail/keyboard-navigation/use-grid-navigation-partial.js";
-export { GridSingleSelectSortableChildCellInfo, GridSingleSelectSortableChildRowInfo, UseGridNavigationCellSingleSelectionSortableContext, UseGridNavigationRowSingleSelectionSortableContext, UseGridNavigationSingleSelectionSortableCellInfoKeysParameters, UseGridNavigationSingleSelectionSortableCellInfoKeysReturnType, UseGridNavigationSingleSelectionSortableCellParameters, UseGridNavigationSingleSelectionSortableCellReturnType, UseGridNavigationSingleSelectionSortableParameters, UseGridNavigationSingleSelectionSortableReturnType, UseGridNavigationSingleSelectionSortableRowInfoKeysParameters, UseGridNavigationSingleSelectionSortableRowInfoKeysReturnType, UseGridNavigationSingleSelectionSortableRowParameters, UseGridNavigationSingleSelectionSortableRowReturnType, useGridNavigationSingleSelectionSortable, useGridNavigationSingleSelectionSortableCell, useGridNavigationSingleSelectionSortableRow } from "./component-detail/keyboard-navigation/use-grid-navigation-single-selection-sortable.js";
-export { GridSingleSelectChildCellInfo, GridSingleSelectChildRowInfo, UseGridNavigationCellSingleSelectionContext, UseGridNavigationRowSingleSelectionContext, UseGridNavigationSingleSelectionCellInfoKeysParameters, UseGridNavigationSingleSelectionCellInfoKeysReturnType, UseGridNavigationSingleSelectionCellParameters, UseGridNavigationSingleSelectionCellReturnType, UseGridNavigationSingleSelectionParameters, UseGridNavigationSingleSelectionReturnType, UseGridNavigationSingleSelectionRowInfoKeysParameters, UseGridNavigationSingleSelectionRowInfoKeysReturnType, UseGridNavigationSingleSelectionRowParameters, UseGridNavigationSingleSelectionRowReturnType, useGridNavigationSingleSelection, useGridNavigationSingleSelectionCell, useGridNavigationSingleSelectionRow } from "./component-detail/keyboard-navigation/use-grid-navigation-single-selection.js";
+export { GridSelectSortableChildCellInfo, GridSelectSortableChildRowInfo, UseGridNavigationCellSelectionSortableContext, UseGridNavigationRowSelectionSortableContext, UseGridNavigationSelectionSortableCellInfoKeysParameters, UseGridNavigationSelectionSortableCellInfoKeysReturnType, UseGridNavigationSelectionSortableCellParameters, UseGridNavigationSelectionSortableCellReturnType, UseGridNavigationSelectionSortableParameters, UseGridNavigationSelectionSortableReturnType, UseGridNavigationSelectionSortableRowInfoKeysParameters, UseGridNavigationSelectionSortableRowInfoKeysReturnType, UseGridNavigationSelectionSortableRowParameters, UseGridNavigationSelectionSortableRowParametersSelf, UseGridNavigationSelectionSortableRowReturnType, useGridNavigationSelectionSortable, useGridNavigationSelectionSortableCell, useGridNavigationSelectionSortableRow } from "./component-detail/keyboard-navigation/use-grid-navigation-selection-sortable.js";
+export { GridSelectChildCellInfo, GridSelectChildRowInfo, UseGridNavigationCellSelectionContext, UseGridNavigationRowSelectionContext, UseGridNavigationSelectionCellInfoKeysParameters, UseGridNavigationSelectionCellInfoKeysReturnType, UseGridNavigationSelectionCellParameters, UseGridNavigationSelectionCellReturnType, UseGridNavigationSelectionParameters, UseGridNavigationSelectionReturnType, UseGridNavigationSelectionRowInfoKeysParameters, UseGridNavigationSelectionRowInfoKeysReturnType, UseGridNavigationSelectionRowParameters, UseGridNavigationSelectionRowReturnType, useGridNavigationSelection, useGridNavigationSelectionCell, useGridNavigationSelectionRow } from "./component-detail/keyboard-navigation/use-grid-navigation-selection.js";
 export { LinearNavigationResult, TryNavigateToIndexParameters, UseLinearNavigationParameters, UseLinearNavigationParametersSelf, UseLinearNavigationReturnType, UseLinearNavigationReturnTypeSelf, identity, tryNavigateToIndex, useLinearNavigation } from "./component-detail/keyboard-navigation/use-linear-navigation.js";
 export { UseListNavigationChildInfo, UseListNavigationChildInfoKeysParameters, UseListNavigationChildInfoKeysReturnType, UseListNavigationChildParameters, UseListNavigationChildReturnType, UseListNavigationContext, UseListNavigationParameters, UseListNavigationReturnType, useListNavigation, useListNavigationChild } from "./component-detail/keyboard-navigation/use-list-navigation-partial.js";
-export { UseListNavigationSingleSelectionSortableChildContext, UseListNavigationSingleSelectionSortableChildInfo, UseListNavigationSingleSelectionSortableChildInfoKeysParameters, UseListNavigationSingleSelectionSortableChildInfoKeysReturnType, UseListNavigationSingleSelectionSortableChildParameters, UseListNavigationSingleSelectionSortableChildReturnType, UseListNavigationSingleSelectionSortableParameters, UseListNavigationSingleSelectionSortableReturnType, useListNavigationSingleSelectionSortable, useListNavigationSingleSelectionSortableChild } from "./component-detail/keyboard-navigation/use-list-navigation-single-selection-sortable.js";
-export { UseListNavigationSingleSelectionChildContext, UseListNavigationSingleSelectionChildInfo, UseListNavigationSingleSelectionChildInfoKeysParameters, UseListNavigationSingleSelectionChildInfoKeysReturnType, UseListNavigationSingleSelectionChildParameters, UseListNavigationSingleSelectionChildReturnType, UseListNavigationSingleSelectionParameters, UseListNavigationSingleSelectionReturnType, useListNavigationSingleSelection, useListNavigationSingleSelectionChild } from "./component-detail/keyboard-navigation/use-list-navigation-single-selection.js";
+export { UseListNavigationSelectionSortableChildContext, UseListNavigationSelectionSortableChildInfo, UseListNavigationSelectionSortableChildInfoKeysParameters, UseListNavigationSelectionSortableChildInfoKeysReturnType, UseListNavigationSelectionSortableChildParameters, UseListNavigationSelectionSortableChildReturnType, UseListNavigationSelectionSortableParameters, UseListNavigationSelectionSortableReturnType, useListNavigationSelectionSortable, useListNavigationSelectionSortableChild } from "./component-detail/keyboard-navigation/use-list-navigation-selection-sortable.js";
+export { UseListNavigationSelectionChildContext, UseListNavigationSelectionChildInfo, UseListNavigationSelectionChildInfoKeysParameters, UseListNavigationSelectionChildInfoKeysReturnType, UseListNavigationSelectionChildParameters, UseListNavigationSelectionChildReturnType, UseListNavigationSelectionParameters, UseListNavigationSelectionReturnType, useListNavigationSelection, useListNavigationSelectionChild } from "./component-detail/keyboard-navigation/use-list-navigation-selection.js";
 export { OnTabbableIndexChange, RovingTabIndexChildContext, RovingTabIndexChildContextSelf, SetTabbableIndex, UseRovingTabIndexChildInfo, UseRovingTabIndexChildInfoKeysParameters, UseRovingTabIndexChildInfoKeysReturnType, UseRovingTabIndexChildParameters, UseRovingTabIndexChildReturnType, UseRovingTabIndexChildReturnTypeSelf, UseRovingTabIndexParameters, UseRovingTabIndexParametersSelf, UseRovingTabIndexReturnType, UseRovingTabIndexReturnTypeSelf, useRovingTabIndex, useRovingTabIndexChild } from "./component-detail/keyboard-navigation/use-roving-tabindex.js";
 export { UseTypeaheadNavigationChildInfo, UseTypeaheadNavigationChildInfoKeysParameters, UseTypeaheadNavigationChildInfoKeysReturnType, UseTypeaheadNavigationChildParameters, UseTypeaheadNavigationChildReturnType, UseTypeaheadNavigationContext, UseTypeaheadNavigationContextSelf, UseTypeaheadNavigationParameters, UseTypeaheadNavigationParametersSelf, UseTypeaheadNavigationReturnType, UseTypeaheadNavigationReturnTypeSelf, binarySearch, useTypeaheadNavigation, useTypeaheadNavigationChild } from "./component-detail/keyboard-navigation/use-typeahead-navigation.js";
 export { DismissListenerTypes, UseDismissParameters, UseDismissParametersSelf, UseDismissReturnType, useDismiss } from "./component-detail/use-dismiss.js";
 export { UseFocusTrapParameters, UseFocusTrapParametersSelf, UseFocusTrapReturnType, findFirstFocusable, findFirstTabbable, useFocusTrap } from "./component-detail/use-focus-trap.js";
+export { MakeMultiSelectionChildDeclarativeParameters, MakeMultiSelectionChildDeclarativeReturnType, MultiSelectChildChangeEvent, MultiSelectChildChangeHandler, MultiSelectionChangeEvent, UseMultiSelectionChildDeclarativeParameters, UseMultiSelectionChildDeclarativeReturnType, UseMultiSelectionChildInfo, UseMultiSelectionChildInfoKeysParameters, UseMultiSelectionChildInfoKeysReturnType, UseMultiSelectionChildParameters, UseMultiSelectionChildParametersSelf, UseMultiSelectionChildReturnType, UseMultiSelectionChildReturnTypeSelf, UseMultiSelectionContext, UseMultiSelectionContextSelf, UseMultiSelectionParameters, UseMultiSelectionParametersSelf, UseMultiSelectionReturnType, UseMultiSelectionReturnTypeSelf, useMultiSelection, useMultiSelectionChild, useMultiSelectionChildDeclarative } from "./component-detail/use-multi-selection.js";
 export { UsePaginatedChildContext, UsePaginatedChildContextSelf, UsePaginatedChildParameters, UsePaginatedChildReturnType, UsePaginatedChildReturnTypeSelf, UsePaginatedChildrenInfo, UsePaginatedChildrenParameters, UsePaginatedChildrenParametersSelf, UsePaginatedChildrenReturnType, UsePaginatedChildrenReturnTypeSelf, usePaginatedChild, usePaginatedChildren } from "./component-detail/use-paginated-children.js";
-export { MakeSingleSelectionDeclarativeParameters, MakeSingleSelectionDeclarativeReturnType, SelectedIndexChangeEvent, SelectedIndexChangeHandler, SingleSelectionContextSelf, UseSingleSelectionChildInfo, UseSingleSelectionChildInfoKeysParameters, UseSingleSelectionChildInfoKeysReturnType, UseSingleSelectionChildParameters, UseSingleSelectionChildReturnType, UseSingleSelectionChildReturnTypeSelf, UseSingleSelectionContext, UseSingleSelectionDeclarativeParameters, UseSingleSelectionDeclarativeParametersSelf, UseSingleSelectionParameters, UseSingleSelectionParametersSelf, UseSingleSelectionReturnType, UseSingleSelectionReturnTypeSelf, useSingleSelection, useSingleSelectionChild, useSingleSelectionDeclarative } from "./component-detail/use-single-selection.js";
+export { MakeSelectionDeclarativeChildParameters, MakeSelectionDeclarativeChildReturnType, MakeSelectionDeclarativeParameters, MakeSelectionDeclarativeReturnType, UseSelectionChildDeclarativeParameters, UseSelectionChildInfo, UseSelectionChildInfoKeysParameters, UseSelectionChildInfoKeysReturnType, UseSelectionChildParameters, UseSelectionChildReturnType, UseSelectionContext, UseSelectionDeclarativeParameters, UseSelectionParameters, UseSelectionReturnType, useSelection, useSelectionChild, useSelectionChildDeclarative, useSelectionDeclarative } from "./component-detail/use-selection.js";
+export { MakeSingleSelectionDeclarativeParameters, MakeSingleSelectionDeclarativeReturnType, SelectedIndexChangeEvent, SelectedIndexChangeHandler, SingleSelectionContextSelf, UseSingleSelectionChildInfo, UseSingleSelectionChildInfoKeysParameters, UseSingleSelectionChildInfoKeysReturnType, UseSingleSelectionChildParameters, UseSingleSelectionChildParametersSelf, UseSingleSelectionChildReturnType, UseSingleSelectionChildReturnTypeSelf, UseSingleSelectionContext, UseSingleSelectionDeclarativeParameters, UseSingleSelectionDeclarativeParametersSelf, UseSingleSelectionParameters, UseSingleSelectionParametersSelf, UseSingleSelectionReturnType, UseSingleSelectionReturnTypeSelf, useSingleSelection, useSingleSelectionChild, useSingleSelectionDeclarative } from "./component-detail/use-single-selection.js";
 export { Compare, GetHighestChildIndex, GetIndex, GetValid, UseRearrangeableChildInfo, UseRearrangeableChildrenParameters, UseRearrangeableChildrenParametersSelf, UseRearrangeableChildrenReturnType, UseRearrangeableChildrenReturnTypeSelf, UseSortableChildInfo, UseSortableChildrenParameters, UseSortableChildrenParametersSelf, UseSortableChildrenReturnType, UseSortableChildrenReturnTypeSelf, defaultCompare, useRearrangeableChildren, useSortableChildren } from "./component-detail/use-sortable-children.js";
 export { UseStaggeredChildContext, UseStaggeredChildContextSelf, UseStaggeredChildParameters, UseStaggeredChildReturnType, UseStaggeredChildReturnTypeSelf, UseStaggeredChildrenInfo, UseStaggeredChildrenParameters, UseStaggeredChildrenParametersSelf, UseStaggeredChildrenReturnType, UseStaggeredChildrenReturnTypeSelf, useStaggeredChild, useStaggeredChildren } from "./component-detail/use-staggered-children.js";
 export { CompleteGridNavigationCellContext, CompleteGridNavigationRowContext, UseCompleteGridNavigationCellInfo, UseCompleteGridNavigationCellInfoKeysParameters, UseCompleteGridNavigationCellParameters, UseCompleteGridNavigationCellReturnType, UseCompleteGridNavigationDeclarativeParameters, UseCompleteGridNavigationDeclarativeReturnType, UseCompleteGridNavigationParameters, UseCompleteGridNavigationReturnType, UseCompleteGridNavigationRowInfo, UseCompleteGridNavigationRowInfoKeysParameters, UseCompleteGridNavigationRowParameters, UseCompleteGridNavigationRowReturnType, useCompleteGridNavigation, useCompleteGridNavigationCell, useCompleteGridNavigationDeclarative, useCompleteGridNavigationRow } from "./component-use/use-grid-navigation-complete.js";
-export { CompleteListNavigationContext, UseCompleteListNavigationChildInfo, UseCompleteListNavigationChildInfoKeysParameters, UseCompleteListNavigationChildParameters, UseCompleteListNavigationChildReturnType, UseCompleteListNavigationDeclarativeParameters, UseCompleteListNavigationDeclarativeReturnType, UseCompleteListNavigationParameters, UseCompleteListNavigationReturnType, useCompleteListNavigation, useCompleteListNavigationChild, useCompleteListNavigationDeclarative } from "./component-use/use-list-navigation-complete.js";
+export { CompleteListNavigationContext, UseCompleteListNavigationChildDeclarativeParameters, UseCompleteListNavigationChildDeclarativeReturnType, UseCompleteListNavigationChildInfo, UseCompleteListNavigationChildInfoKeysParameters, UseCompleteListNavigationChildParameters, UseCompleteListNavigationChildReturnType, UseCompleteListNavigationDeclarativeParameters, UseCompleteListNavigationDeclarativeReturnType, UseCompleteListNavigationParameters, UseCompleteListNavigationReturnType, useCompleteListNavigation, useCompleteListNavigationChild, useCompleteListNavigationChildDeclarative, useCompleteListNavigationDeclarative } from "./component-use/use-list-navigation-complete.js";
 export { UseModalParameters, UseModalParametersSelf, UseModalReturnType, useModal } from "./component-use/use-modal.js";
 export { PressChangeEventReason, PressEventReason, UsePressAsyncParameters, UsePressAsyncReturnType, UsePressParameters, UsePressParametersSelf, UsePressReturnType, UsePressReturnTypeSelf, setPressVibrate, usePress, usePressAsync } from "./component-use/use-press.js";
 export { UseRandomDualIdsParameters, UseRandomDualIdsReturnType, useRandomDualIds } from "./component-use/use-random-dual-ids.js";

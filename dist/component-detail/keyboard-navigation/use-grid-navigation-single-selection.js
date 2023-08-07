@@ -63,7 +63,7 @@ export function useGridNavigationSingleSelection({ gridNavigationParameters, lin
  */
 export function useGridNavigationSingleSelectionRow({ info: mcp1, linearNavigationParameters, managedChildrenReturn, refElementReturn, rovingTabIndexParameters, textContentParameters, typeaheadNavigationParameters, context, ...void1 }) {
     monitorCallCount(useGridNavigationSingleSelectionRow);
-    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void6 }, info: { getSelected, selected, setLocalSelected, ...void8 }, props: propsSingleSelection, singleSelectionChildReturn, pressParameters: { onPressSync, ...void4 }, ...void2 } = useSingleSelectionChild({ info: mcp1, context });
+    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void6 }, info: { getSingleSelected, singleSelected, setLocalSingleSelected, ...void8 }, props: propsSingleSelection, singleSelectionChildReturn, pressParameters: { onPressSync, ...void4 }, ...void2 } = useSingleSelectionChild({ info: mcp1, context });
     const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic2, ...void7 }, info: { focusSelf, getLocallyTabbable, setLocallyTabbable, ...void9 }, props: propsGridNavigation, linearNavigationReturn, managedChildrenParameters, pressParameters: { excludeSpace, ...void5 }, rovingTabIndexChildReturn, rovingTabIndexReturn, textContentReturn, typeaheadNavigationReturn, context: contextGridNavigation, ...void3 } = useGridNavigationRow({ context, linearNavigationParameters, info: mcp1, managedChildrenReturn, refElementReturn, rovingTabIndexParameters, textContentParameters, typeaheadNavigationParameters });
     assertEmptyObject(void1);
     assertEmptyObject(void2);
@@ -79,10 +79,10 @@ export function useGridNavigationSingleSelectionRow({ info: mcp1, linearNavigati
         linearNavigationReturn,
         info: {
             getLocallyTabbable,
-            getSelected,
-            selected,
+            getSingleSelected,
+            singleSelected,
             setLocallyTabbable,
-            setLocalSelected,
+            setLocalSingleSelected,
             focusSelf
         },
         managedChildrenParameters,

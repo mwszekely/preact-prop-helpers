@@ -1,5 +1,6 @@
+import { useForceUpdate } from "../preact-extensions/use-force-update.js";
 import { ManagedChildInfo, UseManagedChildrenReturnType } from "../preact-extensions/use-managed-children.js";
-import { returnNull, useEnsureStability, usePassiveState } from "../preact-extensions/use-passive-state.js";
+import { useEnsureStability } from "../preact-extensions/use-passive-state.js";
 import { useStableGetter } from "../preact-extensions/use-stable-getter.js";
 import { Nullable, TargetedPick, createElement, useCallback, useRef } from "../util/lib.js";
 import { VNode } from "../util/types.js";
@@ -199,7 +200,8 @@ export function useRearrangeableChildren<M extends UseSortableChildInfo>({
     // this hook, but it's tbody that actually needs updating), we need to remotely
     // get and set a forceUpdate function.
     //const [getForceUpdate, setForceUpdate] = usePassiveState<null | (() => void)>(null, returnNull);
-    const [getForceUpdate, setForceUpdate] = usePassiveState<null | (() => void), never>(null, returnNull);
+    //const [getForceUpdate, setForceUpdate] = usePassiveState<null | (() => void), never>(null, returnNull);
+    const forceUpdateRef = useRef<null | (() => void)>(null);
 
     const rearrange = useCallback((originalRows: M[], sortedRows: M[]) => {
 
@@ -218,13 +220,17 @@ export function useRearrangeableChildren<M extends UseSortableChildInfo>({
         }
 
         onRearrangedGetter()?.();
-        getForceUpdate()?.();
+        forceUpdateRef.current?.();
     }, []);
 
     const useRearrangedChildren = useCallback(function useRearrangedChildren(children: VNode[]) {
         monitorCallCount(useRearrangedChildren);
 
         console.assert(Array.isArray(children));
+
+        const forceUpdate = useForceUpdate();
+        console.assert(forceUpdateRef.current == null || forceUpdateRef.current == forceUpdate);
+        forceUpdateRef.current = forceUpdate;    // TODO: Mutation during render? I mean, not really -- it's always the same value...right?
 
         return (children as VNode[])
             .slice()

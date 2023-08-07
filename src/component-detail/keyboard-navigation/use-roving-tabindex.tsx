@@ -436,13 +436,11 @@ export function useRovingTabIndex<ParentElement extends Element, ChildElement ex
             // focus the child because focus wasn't within the list). 
             // It's also just consistent. 
             tabIndex: untabbable ? 0 : -1,
-            // TODO: When a hidden child is clicked, some browsers focus the parent, just because it's got a role and a tabindex.
-            // But this won't work to avoid that, because it messes with grid navigation
+            // When a hidden child is clicked, some browsers focus the parent, just because it's got a role and a tabindex.
             onFocus: useStableCallback((e: FocusEventType<ParentElement>) => {
                 const parentElement = getElement();
                 console.assert(!!parentElement);
                 if (e.target == getElement()) {
-                    debugger;
                     if (!untabbable) {
                         focusSelf(false, e);
                     }

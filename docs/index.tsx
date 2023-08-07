@@ -2,7 +2,6 @@ import { createContext, render } from "preact";
 import { memo } from "preact/compat";
 import { useContext, useRef } from "preact/hooks";
 import { ElementSize, EventType, MouseEventType, UseChildrenHaveFocusChildParameters, UseManagedChildrenContext, UseStaggeredChildContext, UseStaggeredChildrenInfo, useAnimationFrame, useAsyncHandler, useChildrenHaveFocus, useChildrenHaveFocusChild, useDraggable, useDroppable, useElementSize, useFocusTrap, useGlobalHandler, useHasCurrentFocus, useHasLastFocus, useInterval, useManagedChild, useManagedChildren, useMergedProps, usePortalChildren, usePress, useRandomDualIds, useRefElement, useStableCallback, useStaggeredChild, useStaggeredChildren, useState } from "../dist/index.js";
-import { DemoUseGrid } from "./demos/use-grid.js";
 
 import untypedJson from "./api.json";
 import { ApiBlock, ApiPackage, ApiParamBlockSectionNode, MemberIdentifier, MemberReference } from "./json-types.js";
@@ -571,7 +570,7 @@ const FullReference = () => {
 }*/
 
 import { options } from "preact";
-import { DemoUseInterval } from "./demos/use-interval.js";
+import { DemoUseGrid } from "./demos/use-grid.js";
 import { DemoUseModal } from "./demos/use-modal.js";
 import { DemoUseRovingTabIndex } from "./demos/use-roving-tab-index.js";
 import { DemoUseTimeout } from "./demos/use-timeout.js";
@@ -601,8 +600,8 @@ const Component = () => {
         <hr />
         <DemoUseTimeout />
         <hr />
-        <DemoUseInterval />
-        <hr />
+        {/*<DemoUseInterval />
+        <hr />*/}
         <DemoStaggered />
         <hr />
         <DemoUseRovingTabIndex />
@@ -619,9 +618,9 @@ const Component = () => {
         <hr />
         <DemoUseDraggable />
         <hr />
-        <DemoUseElementSizeAnimation />
+        {/*<DemoUseElementSizeAnimation />
         <hr />
-        <input />
+<input />*/}
     </div>
 }
 

@@ -19,7 +19,9 @@ export const DemoUseGrid = memo(() => {
     const [tabbableRow, setTabbableRow] = useState<number | null>(null);
     const [sortableColumn, setSortableColumn, getSortableColumn] = useState(null as number | null);
 
+    // Entirely complete, fully spelt-out version:
     const allReturnInfo = useCompleteGridNavigationDeclarative<HTMLTableSectionElement, HTMLTableRowElement, HTMLTableCellElement, CustomGridInfo, CustomGridRowInfo>({
+        // `useRovingTabIndex` is a separate hook that you can call with these same parameters:
         rovingTabIndexParameters: {
             // If true, the entire grid is removed from the tab order
             untabbable: false,
@@ -28,6 +30,7 @@ export const DemoUseGrid = memo(() => {
             // This can be used to track when the user navigates between rows for any reason
             onTabbableIndexChange: setTabbableRow,
         },
+        // `useSingleSelection` is a separate hook that you can call with these parameters:
         typeaheadNavigationParameters: {
             // Determines how children are searched for (`Intl.Collator`)
             collator: null,
@@ -38,6 +41,7 @@ export const DemoUseGrid = memo(() => {
             // This can be used to track when the user navigates between rows via typeahead
             onNavigateTypeahead: null
         },
+        // (etc. etc.)
         linearNavigationParameters: {
             // Is navigating to the first/last row with Home/End disabled?
             disableHomeEndKeys: false,
@@ -52,9 +56,17 @@ export const DemoUseGrid = memo(() => {
         },
         singleSelectionParameters: {
             // When a child is selected, it is indicated with this ARIA attribute:
-            ariaPropName: "aria-checked",
+            singleSelectionAriaPropName: "aria-checked",
             // Are children selected when they are activated (e.g. clicked), or focused (e.g. tabbed to)?
-            selectionMode: "focus"
+            singleSelectionMode: "focus"
+        },
+        multiSelectionParameters: {
+            // Single- and multi- selection are not exclusive, and when so should be indicated via different attributes.
+            multiSelectionAriaPropName: "aria-selected",
+            // singleSelectionMode but for multi-selection
+            multiSelectionMode: "activation",
+            // Callback when any child changes with information about % of children checked, etc.
+            onSelectionChange: null
         },
         singleSelectionDeclarativeParameters: {
             // Which child is currently selected?
@@ -86,11 +98,13 @@ export const DemoUseGrid = memo(() => {
         refElementParameters: {}
     });
 
+    // Those were the parameters, these are the return types:
     const {
         // Spread these props to the HTMLElement that will implement this grid behavior
         props,
         // The child row will useContext this, so provide it to them.
         context,
+        // This is what `useRovingTabIndex` returned; use it for whatever you need:
         rovingTabIndexReturn: {
             // Call to focus the grid, which focuses the current row, which focuses its current cell.
             focusSelf,
@@ -99,15 +113,20 @@ export const DemoUseGrid = memo(() => {
             // Changes which row is currently tabbable
             setTabbableIndex
         },
+        // This is what `useTypeaheadNavigation` returned; use it for whatever you need:
         typeaheadNavigationReturn: {
             // Returns the current value the user has typed for typeahead (cannot be used during render)
             getCurrentTypeahead,
             // Whether the user's typeahead is invalid/valid/nonexistent.
             typeaheadStatus
         },
+        // (etc. etc.)
         singleSelectionReturn: {
-            // Largely internal use only (since `selectedIndex` is a prop you pass in for the declarative version)
-            getSelectedIndex,
+            // Largely convenience only (since the caller likely already knows the selected index, but just in case)
+            getSingleSelectedIndex,
+        },
+        multiSelectionReturn: {
+            // Nothing, actually
         },
         rearrangeableChildrenReturn: {
             // You must call this hook on your array of children to implement the sorting behavior
@@ -153,7 +172,7 @@ export const DemoUseGrid = memo(() => {
             <h2>useGridNavigationComplete</h2>
             <p>Like <code>useCompleteListNavigation</code> but for 2D navigation. Cells can span multiple columns. Rows can be filtered, sorted, and arbitrarily re-arranged.</p>
             {<div>Current row: {tabbableRow}</div>}
-            {<div>Current column: {tabbableColumn?.actual}, {tabbableColumn?.ideal}</div>}
+            {<div>Current column: {tabbableColumn?.actual}{tabbableColumn?.ideal != tabbableColumn?.actual? ` (wanted: ${tabbableColumn?.ideal})` : ""}</div>}
             <table {...{ border: "2" } as {}} style={{ whiteSpace: "nowrap" }}>
 
                 <thead>
@@ -208,14 +227,16 @@ const DemoUseGridRow = memo((({ index }: { index: number }) => {
     const ret: UseCompleteGridNavigationRowReturnType<HTMLTableRowElement, HTMLTableCellElement, CustomGridInfo, CustomGridRowInfo> = useCompleteGridNavigationRow<HTMLTableRowElement, HTMLTableCellElement, CustomGridInfo, CustomGridRowInfo>({
 
         context: contextFromParent,
-        info: { index, foo: "bar", unselectable: disabled, untabbable: hidden },
+        info: { index, foo: "bar", untabbable: hidden },
         textContentParameters: { getText: useCallback((e: Element | null) => { return e?.textContent ?? "" }, []) },
 
         linearNavigationParameters: { navigatePastEnd: "wrap", navigatePastStart: "wrap" },
         rovingTabIndexParameters: { onTabbableIndexChange: useStableCallback((i: number | null) => { setTabbableColumn(i) }), untabbable: false, initiallyTabbedIndex: 0 },
         typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000, onNavigateTypeahead: null },
         hasCurrentFocusParameters: { onCurrentFocusedChanged: null, onCurrentFocusedInnerChanged: null },
-        gridNavigationSingleSelectionSortableRowParameters: { getSortableColumnIndex },
+        gridNavigationSelectionSortableRowParameters: { getSortableColumnIndex },
+        singleSelectionChildParameters: { singleSelectionDisabled: false },
+        multiSelectionChildParameters: { initiallyMultiSelected: false, onMultiSelectChange: null, multiSelectionDisabled: false }
     });
 
     const {

@@ -1,6 +1,6 @@
-import { useListNavigationSingleSelectionSortable, useListNavigationSingleSelectionSortableChild } from "../component-detail/keyboard-navigation/use-list-navigation-single-selection-sortable.js";
+import { useListNavigationSelectionSortable, useListNavigationSelectionSortableChild } from "../component-detail/keyboard-navigation/use-list-navigation-selection-sortable.js";
 import { usePaginatedChild, usePaginatedChildren } from "../component-detail/use-paginated-children.js";
-import { useSingleSelectionDeclarative } from "../component-detail/use-single-selection.js";
+import { useSelectionChildDeclarative, useSelectionDeclarative } from "../component-detail/use-selection.js";
 import { useStaggeredChild, useStaggeredChildren } from "../component-detail/use-staggered-children.js";
 import { useMergedProps } from "../dom-helpers/use-merged-props.js";
 import { useRefElement } from "../dom-helpers/use-ref-element.js";
@@ -22,9 +22,9 @@ import { monitorCallCount } from "../util/use-call-count.js";
  *
  * @compositeParams
  */
-export function useCompleteListNavigation({ linearNavigationParameters, rearrangeableChildrenParameters, sortableChildrenParameters, typeaheadNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, paginatedChildrenParameters, staggeredChildrenParameters, refElementParameters, ...void1 }) {
+export function useCompleteListNavigation({ linearNavigationParameters, rearrangeableChildrenParameters, sortableChildrenParameters, typeaheadNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, multiSelectionParameters, paginatedChildrenParameters, staggeredChildrenParameters, refElementParameters, ...void1 }) {
     monitorCallCount(useCompleteListNavigation);
-    const { initiallySelectedIndex } = singleSelectionParameters;
+    const { initiallySingleSelectedIndex } = singleSelectionParameters;
     const getChildren = useCallback(() => managedChildrenReturn.getChildren(), []);
     const getLowestIndex = useCallback(() => getChildren().getLowestIndex(), []);
     const getHighestIndex = useCallback(() => getChildren().getHighestIndex(), []);
@@ -37,19 +37,21 @@ export function useCompleteListNavigation({ linearNavigationParameters, rearrang
         return true;
     }, []);
     const { propsStable: propsRef, refElementReturn } = useRefElement({ refElementParameters });
-    const { childrenHaveFocusParameters, managedChildrenParameters: { onChildrenMountChange, ...mcp1 }, context: { rovingTabIndexContext, singleSelectionContext, typeaheadNavigationContext }, linearNavigationReturn, rovingTabIndexReturn, singleSelectionReturn, typeaheadNavigationReturn, rearrangeableChildrenReturn, sortableChildrenReturn, propsParent, propsStableParentOrChild, ...void2 } = useListNavigationSingleSelectionSortable({
+    const { childrenHaveFocusParameters, managedChildrenParameters: { onChildrenMountChange, ...mcp1 }, context: { rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext }, linearNavigationReturn, rovingTabIndexReturn, singleSelectionReturn, multiSelectionReturn, typeaheadNavigationReturn, rearrangeableChildrenReturn, sortableChildrenReturn, props, ...void2 } = useListNavigationSelectionSortable({
         managedChildrenReturn: { getChildren },
         linearNavigationParameters: { getLowestIndex, getHighestIndex, isValidForLinearNavigation: isValidForNavigation, ...linearNavigationParameters },
         typeaheadNavigationParameters: { isValidForTypeaheadNavigation: isValidForNavigation, ...typeaheadNavigationParameters },
-        rovingTabIndexParameters: { initiallyTabbedIndex: initiallySelectedIndex, untabbableBehavior: "focus-parent", ...rovingTabIndexParameters },
+        rovingTabIndexParameters: { untabbableBehavior: "focus-parent", ...rovingTabIndexParameters },
         singleSelectionParameters,
+        multiSelectionParameters,
         rearrangeableChildrenParameters: {
             onRearranged: useStableCallback(() => { refreshPagination(paginatedChildrenParameters.paginationMin, paginatedChildrenParameters.paginationMax); }),
             ...rearrangeableChildrenParameters
         },
         paginatedChildrenParameters,
         refElementReturn,
-        sortableChildrenParameters
+        sortableChildrenParameters,
+        childrenHaveFocusReturn: { getAnyFocused: useStableCallback(() => childrenHaveFocusReturn.getAnyFocused()) }
     });
     const { context: { childrenHaveFocusChildContext }, childrenHaveFocusReturn } = useChildrenHaveFocus({ childrenHaveFocusParameters });
     const { paginatedChildrenReturn, paginatedChildrenReturn: { refreshPagination }, managedChildrenParameters: mcp2, context: { paginatedChildContext } } = usePaginatedChildren({ refElementReturn, managedChildrenReturn: { getChildren: useStableCallback(() => managedChildrenReturn.getChildren()) }, rovingTabIndexReturn, paginatedChildrenParameters, rearrangeableChildrenReturn: { indexDemangler: rearrangeableChildrenReturn.indexDemangler } });
@@ -68,14 +70,15 @@ export function useCompleteListNavigation({ linearNavigationParameters, rearrang
         paginatedChildContext,
         rovingTabIndexContext,
         singleSelectionContext,
+        multiSelectionContext,
         staggeredChildContext,
-        typeaheadNavigationContext
+        typeaheadNavigationContext,
     }));
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     return {
         context,
-        props: useMergedProps(propsParent, propsRef, propsStableParentOrChild),
+        props: useMergedProps(props, propsRef),
         managedChildrenReturn,
         rearrangeableChildrenReturn,
         staggeredChildrenReturn,
@@ -84,6 +87,7 @@ export function useCompleteListNavigation({ linearNavigationParameters, rearrang
         linearNavigationReturn,
         rovingTabIndexReturn,
         singleSelectionReturn,
+        multiSelectionReturn,
         typeaheadNavigationReturn,
         childrenHaveFocusReturn
     };
@@ -92,23 +96,20 @@ export function useCompleteListNavigation({ linearNavigationParameters, rearrang
  *
  * @compositeParams
  */
-export function useCompleteListNavigationChild({ info: { index, focusSelf, unselectable, untabbable, getSortValue, ...customUserInfo }, // The "...info" is empty if M is the same as UCLNCI<ChildElement>.
-textContentParameters, refElementParameters, hasCurrentFocusParameters: { onCurrentFocusedChanged, onCurrentFocusedInnerChanged: ocfic3, ...void7 }, context: { managedChildContext, rovingTabIndexContext, paginatedChildContext, staggeredChildContext, singleSelectionContext, typeaheadNavigationContext, childrenHaveFocusChildContext, ...void5 }, ...void1 }) {
+export function useCompleteListNavigationChild({ info: { index, focusSelf, untabbable, getSortValue, ...customUserInfo }, // The "...info" is empty if M is the same as UCLNCI<ChildElement>.
+textContentParameters, refElementParameters, hasCurrentFocusParameters: { onCurrentFocusedChanged, onCurrentFocusedInnerChanged: ocfic3, ...void7 }, singleSelectionChildParameters, multiSelectionChildParameters, context: { managedChildContext, rovingTabIndexContext, paginatedChildContext, staggeredChildContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext, childrenHaveFocusChildContext, ...void5 }, ...void1 }) {
     monitorCallCount(useCompleteListNavigationChild);
     const { info: infoFromPaginated, paginatedChildReturn, paginatedChildReturn: { hideBecausePaginated }, props: paginationProps } = usePaginatedChild({ info: { index }, context: { paginatedChildContext } });
     const { info: infoFromStaggered, staggeredChildReturn, staggeredChildReturn: { hideBecauseStaggered }, props: staggeredProps } = useStaggeredChild({ info: { index }, context: { staggeredChildContext } });
     // TODO: uPC and pSC can't exactly return `{ info: { untabbable: false } }`, or can they...? 
     // (Really it's more about *should* they -- I don't like this hook doing more than just calling sub-hooks, but where else does this logic take place if not here?)
     untabbable ||= (hideBecausePaginated || hideBecauseStaggered);
-    unselectable ||= (hideBecausePaginated || hideBecauseStaggered);
-    // TODO: I feel like this needs stronger justification. It's probably correct but why is it here of all places?
-    // I.E. shouldn't it be in useListNavigationSingleSelection?
-    if (untabbable)
-        unselectable = true;
     const { refElementReturn, propsStable, ...void6 } = useRefElement({ refElementParameters });
-    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void3 }, pressParameters: { excludeSpace, onPressSync, ...void2 }, textContentReturn, singleSelectionChildReturn, info: infoFromListNav, rovingTabIndexChildReturn, propsChild, propsTabbable, ...void4 } = useListNavigationSingleSelectionSortableChild({
-        info: { index, unselectable, untabbable },
-        context: { rovingTabIndexContext, singleSelectionContext, typeaheadNavigationContext },
+    const { hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void3 }, pressParameters: { excludeSpace, onPressSync, ...void2 }, textContentReturn, singleSelectionChildReturn, multiSelectionChildReturn, info: infoFromListNav, rovingTabIndexChildReturn, propsChild, propsTabbable, ...void4 } = useListNavigationSelectionSortableChild({
+        info: { index, untabbable },
+        context: { rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext },
+        singleSelectionChildParameters,
+        multiSelectionChildParameters,
         refElementReturn,
         textContentParameters
     });
@@ -117,7 +118,6 @@ textContentParameters, refElementParameters, hasCurrentFocusParameters: { onCurr
         focusSelf,
         getElement: refElementReturn.getElement,
         getSortValue,
-        unselectable,
         untabbable,
         ...infoFromStaggered,
         ...infoFromPaginated,
@@ -155,6 +155,7 @@ textContentParameters, refElementParameters, hasCurrentFocusParameters: { onCurr
         textContentReturn,
         refElementReturn,
         singleSelectionChildReturn,
+        multiSelectionChildReturn,
         hasCurrentFocusReturn,
         managedChildReturn,
         paginatedChildReturn,
@@ -162,26 +163,37 @@ textContentParameters, refElementParameters, hasCurrentFocusParameters: { onCurr
         rovingTabIndexChildReturn
     };
 }
-export function useCompleteListNavigationDeclarative({ linearNavigationParameters, paginatedChildrenParameters, rearrangeableChildrenParameters, rovingTabIndexParameters, singleSelectionDeclarativeParameters, sortableChildrenParameters, staggeredChildrenParameters, typeaheadNavigationParameters, singleSelectionParameters, refElementParameters, ...void1 }) {
+export function useCompleteListNavigationDeclarative({ singleSelectionParameters, singleSelectionDeclarativeParameters, ...rest }) {
     const ret = useCompleteListNavigation({
-        linearNavigationParameters,
-        paginatedChildrenParameters,
-        rearrangeableChildrenParameters,
-        rovingTabIndexParameters,
-        refElementParameters,
         singleSelectionParameters: {
-            initiallySelectedIndex: singleSelectionDeclarativeParameters.selectedIndex,
+            initiallySingleSelectedIndex: singleSelectionDeclarativeParameters.singleSelectedIndex,
             // Needs to be a (stable) callback because of declaration order
-            onSelectedIndexChange: useStableCallback((...e) => onSelectedIndexChange?.(...e)),
+            onSingleSelectedIndexChange: useStableCallback((...e) => onSingleSelectedIndexChange?.(...e)),
             ...singleSelectionParameters
         },
-        sortableChildrenParameters,
-        staggeredChildrenParameters,
-        typeaheadNavigationParameters
+        ...rest
     });
-    const { singleSelectionParameters: { onSelectedIndexChange } } = useSingleSelectionDeclarative({ singleSelectionDeclarativeParameters, singleSelectionReturn: ret.singleSelectionReturn });
-    const { singleSelectionReturn: { getSelectedIndex }, ...ret2 } = ret;
-    assertEmptyObject(void1);
-    return { ...ret2, singleSelectionReturn: { getSelectedIndex } };
+    const { singleSelectionParameters: { onSingleSelectedIndexChange, ...void3 }, ...void2 } = useSelectionDeclarative({ singleSelectionDeclarativeParameters, singleSelectionReturn: ret.singleSelectionReturn });
+    const { singleSelectionReturn: { getSingleSelectedIndex }, ...ret2 } = ret;
+    assertEmptyObject(void2);
+    assertEmptyObject(void3);
+    return { ...ret2, singleSelectionReturn: { getSingleSelectedIndex } };
+}
+export function useCompleteListNavigationChildDeclarative({ multiSelectionChildParameters, multiSelectionChildDeclarativeParameters: { multiSelected, onMultiSelectedChange }, ...rest }) {
+    const ret = useCompleteListNavigationChild({
+        multiSelectionChildParameters: {
+            initiallyMultiSelected: multiSelected,
+            onMultiSelectChange: useStableCallback((e) => { onMultiSelectChange(e); }),
+            ...multiSelectionChildParameters
+        },
+        ...rest
+    });
+    const { multiSelectionChildParameters: { onMultiSelectChange }, info, ...void2 } = useSelectionChildDeclarative({
+        multiSelectionChildDeclarativeParameters: { onMultiSelectedChange, multiSelected },
+        multiSelectionChildReturn: ret.multiSelectionChildReturn
+    });
+    const { multiSelectionChildReturn, ...ret2 } = ret;
+    assertEmptyObject(void2);
+    return { ...ret2, multiSelectionChildReturn };
 }
 //# sourceMappingURL=use-list-navigation-complete.js.map

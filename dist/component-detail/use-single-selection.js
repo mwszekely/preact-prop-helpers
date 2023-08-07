@@ -6,6 +6,7 @@ import { useMemoObject } from "../preact-extensions/use-stable-getter.js";
 import { useState } from "../preact-extensions/use-state.js";
 import { assertEmptyObject } from "../util/assert.js";
 import { enhanceEvent } from "../util/event.js";
+import { focus } from "../util/focus.js";
 import { useCallback, useEffect, useRef } from "../util/lib.js";
 import { monitorCallCount } from "../util/use-call-count.js";
 import { useTagProps } from "../util/use-tag-props.js";
@@ -18,14 +19,14 @@ import { useTagProps } from "../util/use-tag-props.js";
  *
  * @compositeParams
  */
-export function useSingleSelection({ managedChildrenReturn: { getChildren, ...void1 }, rovingTabIndexReturn: { setTabbableIndex, ...void2 }, singleSelectionParameters: { onSelectedIndexChange: onSelectedIndexChange_U, initiallySelectedIndex, ariaPropName, selectionMode, ...void3 }, ...void4 }) {
+export function useSingleSelection({ managedChildrenReturn: { getChildren, ...void1 }, rovingTabIndexReturn: { setTabbableIndex, ...void2 }, singleSelectionParameters: { onSingleSelectedIndexChange: onSelectedIndexChange_U, initiallySingleSelectedIndex, singleSelectionAriaPropName, singleSelectionMode, ...void3 }, ...void4 }) {
     monitorCallCount(useSingleSelection);
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     assertEmptyObject(void3);
     assertEmptyObject(void4);
-    const onSelectedIndexChange = useStableCallback(onSelectedIndexChange_U ?? noop);
-    const getSelectedAt = useCallback((m) => { return m.getSelected(); }, []);
+    const onSingleSelectedIndexChange = useStableCallback(onSelectedIndexChange_U ?? noop);
+    const getSelectedAt = useCallback((m) => { return m.getSingleSelected(); }, []);
     const setSelectedAt = useCallback((m, t, newSelectedIndex, prevSelectedIndex) => {
         if (m.untabbable) {
             console.assert(false);
@@ -36,13 +37,13 @@ export function useSingleSelection({ managedChildrenReturn: { getChildren, ...vo
             console.assert(t == false);
         if (t)
             console.assert(newSelectedIndex === m.index);
-        m.setLocalSelected(t, direction);
+        m.setLocalSingleSelected(t, direction);
     }, []);
-    const isSelectedValid = useCallback((m) => { return !m.unselectable; }, []);
-    const { changeIndex: changeSelectedIndex, getCurrentIndex: getSelectedIndex } = useChildrenFlag({
+    const isSelectedValid = useCallback((m) => { return !m.untabbable; }, []);
+    const { changeIndex: changeSingleSelectedIndex, getCurrentIndex: getSingleSelectedIndex } = useChildrenFlag({
         getChildren,
         onIndexChange: null,
-        initialIndex: initiallySelectedIndex,
+        initialIndex: initiallySingleSelectedIndex,
         getAt: getSelectedAt,
         setAt: setSelectedAt,
         isValid: isSelectedValid,
@@ -51,21 +52,21 @@ export function useSingleSelection({ managedChildrenReturn: { getChildren, ...vo
     });
     return {
         singleSelectionReturn: useMemoObject({
-            getSelectedIndex,
-            changeSelectedIndex
+            getSingleSelectedIndex,
+            changeSingleSelectedIndex
         }),
         context: useMemoObject({
             singleSelectionContext: useMemoObject({
-                getSelectedIndex,
-                onSelectedIndexChange,
-                ariaPropName,
-                selectionMode
+                getSingleSelectedIndex,
+                onSingleSelectedIndexChange,
+                singleSelectionAriaPropName,
+                singleSelectionMode
             }),
         }),
         childrenHaveFocusParameters: {
             onCompositeFocusChange: useStableCallback((anyFocused, prev, reason) => {
                 if (!anyFocused) {
-                    const selectedIndex = getSelectedIndex();
+                    const selectedIndex = getSingleSelectedIndex();
                     if (selectedIndex != null)
                         setTabbableIndex(selectedIndex, reason, false);
                 }
@@ -78,43 +79,50 @@ export function useSingleSelection({ managedChildrenReturn: { getChildren, ...vo
  *
  * @compositeParams
  */
-export function useSingleSelectionChild({ context: { singleSelectionContext: { getSelectedIndex, onSelectedIndexChange, ariaPropName, selectionMode, ...void1 }, ...void2 }, info: { index, unselectable, ...void3 }, ...void4 }) {
+export function useSingleSelectionChild({ singleSelectionChildParameters: { singleSelectionDisabled, ...void5 }, context: { singleSelectionContext: { getSingleSelectedIndex, onSingleSelectedIndexChange, singleSelectionAriaPropName: ariaPropName, singleSelectionMode, ...void1 }, ...void2 }, info: { index, untabbable, ...void3 }, ...void4 }) {
     monitorCallCount(useSingleSelectionChild);
     assertEmptyObject(void1);
     assertEmptyObject(void2);
     assertEmptyObject(void3);
     assertEmptyObject(void4);
-    useEnsureStability("useSingleSelectionChild", getSelectedIndex, onSelectedIndexChange);
-    const [localSelected, setLocalSelected, getLocalSelected] = useState(getSelectedIndex() == index);
-    const [direction, setDirection, getDirection] = useState(getSelectedIndex() == null ? null : (getSelectedIndex() - index));
+    assertEmptyObject(void5);
+    useEnsureStability("useSingleSelectionChild", getSingleSelectedIndex, onSingleSelectedIndexChange);
+    const [localSelected, setLocalSelected, getLocalSelected] = useState(getSingleSelectedIndex() == index);
+    const [direction, setDirection, getDirection] = useState(getSingleSelectedIndex() == null ? null : (getSingleSelectedIndex() - index));
     const onCurrentFocusedInnerChanged = useStableCallback((focused, _prev, e) => {
-        if (selectionMode == 'focus' && focused && !unselectable) {
-            onSelectedIndexChange(enhanceEvent(e, { selectedIndex: index }));
+        if (!singleSelectionDisabled && singleSelectionMode == 'focus' && focused && !untabbable) {
+            onSingleSelectedIndexChange(enhanceEvent(e, { selectedIndex: index }));
         }
     });
     const onPressSync = useStableCallback((e) => {
         // We allow press events for selectionMode == 'focus' because
         // press generally causes a focus anyway (except when it doesn't, iOS Safari...)
-        if (selectionMode != 'disabled' && !unselectable)
-            onSelectedIndexChange(enhanceEvent(e, { selectedIndex: index }));
+        if (!singleSelectionDisabled && !untabbable) {
+            if (singleSelectionMode == 'activation')
+                onSingleSelectedIndexChange(enhanceEvent(e, { selectedIndex: index }));
+        }
+        else {
+            focus(e.currentTarget);
+        }
     });
     const propParts = ariaPropName?.split("-") ?? [];
     return {
         info: {
-            setLocalSelected: useStableCallback((selected, direction) => {
+            setLocalSingleSelected: useStableCallback((selected, direction) => {
                 setLocalSelected(selected);
                 setDirection(direction);
             }),
-            getSelected: getLocalSelected,
-            selected: localSelected,
+            getSingleSelected: getLocalSelected,
+            singleSelected: localSelected,
         },
         singleSelectionChildReturn: {
-            selected: localSelected,
-            getSelected: getLocalSelected,
-            selectedOffset: direction,
-            getSelectedOffset: getDirection,
+            singleSelected: localSelected,
+            getSingleSelected: getLocalSelected,
+            singleSelectedOffset: direction,
+            singleSelectionMode,
+            getSingleSelectedOffset: getDirection
         },
-        props: useTagProps(ariaPropName == null || selectionMode == "disabled" ? {} : {
+        props: useTagProps(ariaPropName == null || singleSelectionMode == "disabled" ? {} : {
             [`${propParts[0]}-${propParts[1]}`]: (localSelected ? (propParts[1] == "current" ? `${propParts[2]}` : `true`) : "false")
         }, "data-single-selection-child"),
         hasCurrentFocusParameters: { onCurrentFocusedInnerChanged },
@@ -124,14 +132,14 @@ export function useSingleSelectionChild({ context: { singleSelectionContext: { g
 /**
  * Let's face it, declarative is nicer to use than imperative, so this is a shortcut.
  */
-export function useSingleSelectionDeclarative({ singleSelectionReturn: { changeSelectedIndex }, singleSelectionDeclarativeParameters: { selectedIndex, onSelectedIndexChange } }) {
-    let s = (selectedIndex ?? null);
+export function useSingleSelectionDeclarative({ singleSelectionReturn: { changeSingleSelectedIndex }, singleSelectionDeclarativeParameters: { singleSelectedIndex, onSingleSelectedIndexChange } }) {
+    let s = (singleSelectedIndex ?? null);
     let reasonRef = useRef(undefined);
-    useEffect(() => { changeSelectedIndex(s, reasonRef.current); }, [s]);
+    useEffect(() => { changeSingleSelectedIndex(s, reasonRef.current); }, [s]);
     const osic = useCallback((e) => {
         reasonRef.current = e;
-        return onSelectedIndexChange?.(e);
-    }, [onSelectedIndexChange]);
-    return { singleSelectionParameters: { onSelectedIndexChange: osic } };
+        return onSingleSelectedIndexChange?.(e);
+    }, [onSingleSelectedIndexChange]);
+    return { singleSelectionParameters: { onSingleSelectedIndexChange: osic } };
 }
 //# sourceMappingURL=use-single-selection.js.map

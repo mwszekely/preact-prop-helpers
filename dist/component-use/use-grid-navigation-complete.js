@@ -1,6 +1,6 @@
-import { useGridNavigationSingleSelectionSortable, useGridNavigationSingleSelectionSortableCell, useGridNavigationSingleSelectionSortableRow } from "../component-detail/keyboard-navigation/use-grid-navigation-single-selection-sortable.js";
+import { useGridNavigationSelectionSortable, useGridNavigationSelectionSortableCell, useGridNavigationSelectionSortableRow } from "../component-detail/keyboard-navigation/use-grid-navigation-selection-sortable.js";
 import { usePaginatedChild, usePaginatedChildren } from "../component-detail/use-paginated-children.js";
-import { useSingleSelectionDeclarative } from "../component-detail/use-single-selection.js";
+import { useSelectionDeclarative } from "../component-detail/use-selection.js";
 import { useStaggeredChild, useStaggeredChildren } from "../component-detail/use-staggered-children.js";
 import { useMergedProps } from "../dom-helpers/use-merged-props.js";
 import { useRefElement } from "../dom-helpers/use-ref-element.js";
@@ -20,7 +20,7 @@ import { monitorCallCount } from "../util/use-call-count.js";
  * @hasChild {@link useCompleteGridNavigationRow}
  * @hasChild {@link useCompleteGridNavigationCell}
  */
-export function useCompleteGridNavigation({ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, typeaheadNavigationParameters, sortableChildrenParameters, rearrangeableChildrenParameters, paginatedChildrenParameters, staggeredChildrenParameters, refElementParameters, ...void1 }) {
+export function useCompleteGridNavigation({ gridNavigationParameters, linearNavigationParameters, rovingTabIndexParameters, singleSelectionParameters, multiSelectionParameters, typeaheadNavigationParameters, sortableChildrenParameters, rearrangeableChildrenParameters, paginatedChildrenParameters, staggeredChildrenParameters, refElementParameters, ...void1 }) {
     monitorCallCount(useCompleteGridNavigation);
     assertEmptyObject(void1);
     const getChildren = useCallback(() => managedChildrenReturn.getChildren(), []);
@@ -35,12 +35,13 @@ export function useCompleteGridNavigation({ gridNavigationParameters, linearNavi
         return true;
     }, []);
     const { refElementReturn, propsStable, ...void2 } = useRefElement({ refElementParameters });
-    const { childrenHaveFocusParameters, managedChildrenParameters, context: { gridNavigationRowContext, rovingTabIndexContext, singleSelectionContext, typeaheadNavigationContext }, rearrangeableChildrenReturn, propsParent, propsStableParentOrChild, rovingTabIndexReturn, linearNavigationReturn, singleSelectionReturn, sortableChildrenReturn, typeaheadNavigationReturn, ...void3 } = useGridNavigationSingleSelectionSortable({
+    const { childrenHaveFocusParameters, managedChildrenParameters, context: { gridNavigationRowContext, rovingTabIndexContext, singleSelectionContext, multiSelectionContext, typeaheadNavigationContext }, rearrangeableChildrenReturn, props, rovingTabIndexReturn, linearNavigationReturn, singleSelectionReturn, multiSelectionReturn, sortableChildrenReturn, typeaheadNavigationReturn, ...void3 } = useGridNavigationSelectionSortable({
         gridNavigationParameters,
         linearNavigationParameters: { getLowestIndex: getLowestChildIndex, getHighestIndex: getHighestChildIndex, isValidForLinearNavigation: isValidForNavigation, ...linearNavigationParameters },
         managedChildrenReturn: { getChildren },
-        rovingTabIndexParameters: { initiallyTabbedIndex: singleSelectionParameters.initiallySelectedIndex, untabbableBehavior: "focus-parent", ...rovingTabIndexParameters },
+        rovingTabIndexParameters: { untabbableBehavior: "focus-parent", ...rovingTabIndexParameters },
         singleSelectionParameters,
+        multiSelectionParameters,
         typeaheadNavigationParameters: { isValidForTypeaheadNavigation: isValidForNavigation, ...typeaheadNavigationParameters },
         paginatedChildrenParameters,
         refElementReturn,
@@ -48,6 +49,7 @@ export function useCompleteGridNavigation({ gridNavigationParameters, linearNavi
             onRearranged: useStableCallback(() => { refreshPagination(paginatedChildrenParameters.paginationMin, paginatedChildrenParameters.paginationMax); }),
             ...rearrangeableChildrenParameters
         },
+        childrenHaveFocusReturn: { getAnyFocused: useStableCallback(() => childrenHaveFocusReturn.getAnyFocused()) },
         sortableChildrenParameters
     });
     const { indexDemangler } = rearrangeableChildrenReturn;
@@ -58,6 +60,7 @@ export function useCompleteGridNavigation({ gridNavigationParameters, linearNavi
     const { context: { staggeredChildContext }, staggeredChildrenReturn } = useStaggeredChildren({ managedChildrenReturn, staggeredChildrenParameters });
     const context = useMemoObject({
         singleSelectionContext,
+        multiSelectionContext,
         managedChildContext,
         rovingTabIndexContext,
         typeaheadNavigationContext,
@@ -71,7 +74,7 @@ export function useCompleteGridNavigation({ gridNavigationParameters, linearNavi
     assertEmptyObject(void3);
     return {
         context,
-        props: useMergedProps(propsParent, propsStable, propsStableParentOrChild),
+        props: useMergedProps(props, propsStable),
         managedChildrenReturn,
         rearrangeableChildrenReturn,
         staggeredChildrenReturn,
@@ -80,6 +83,7 @@ export function useCompleteGridNavigation({ gridNavigationParameters, linearNavi
         paginatedChildrenReturn,
         linearNavigationReturn,
         singleSelectionReturn,
+        multiSelectionReturn,
         sortableChildrenReturn,
         typeaheadNavigationReturn
     };
@@ -87,12 +91,11 @@ export function useCompleteGridNavigation({ gridNavigationParameters, linearNavi
 /**
  * @compositeParams
  */
-export function useCompleteGridNavigationRow({ info: { index, unselectable, untabbable, ...customUserInfo }, context: contextIncomingForRowAsChildOfTable, textContentParameters, linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, gridNavigationSingleSelectionSortableRowParameters, hasCurrentFocusParameters: { onCurrentFocusedChanged: ocfc1, onCurrentFocusedInnerChanged: ocfic3, ...void5 }, ...void1 }) {
+export function useCompleteGridNavigationRow({ info: { index, untabbable, ...customUserInfo }, context: contextIncomingForRowAsChildOfTable, textContentParameters, linearNavigationParameters, rovingTabIndexParameters, typeaheadNavigationParameters, gridNavigationSelectionSortableRowParameters, hasCurrentFocusParameters: { onCurrentFocusedChanged: ocfc1, onCurrentFocusedInnerChanged: ocfic3, ...void5 }, singleSelectionChildParameters, multiSelectionChildParameters, ...void1 }) {
     monitorCallCount(useCompleteGridNavigationRow);
     const { info: infoPaginatedChild, paginatedChildReturn, props: paginationProps, ...void7 } = usePaginatedChild({ info: { index }, context: contextIncomingForRowAsChildOfTable });
     const { info: infoStaggeredChild, staggeredChildReturn, props: staggeredProps, ...void8 } = useStaggeredChild({ info: { index }, context: contextIncomingForRowAsChildOfTable });
     untabbable ||= (paginatedChildReturn.hideBecausePaginated || staggeredChildReturn.hideBecauseStaggered);
-    unselectable ||= untabbable;
     const getChildren = useCallback(() => managedChildrenReturn.getChildren(), []);
     const getHighestChildIndex = useCallback(() => getChildren().getHighestIndex(), []);
     const getLowestChildIndex = useCallback(() => getChildren().getLowestIndex(), []);
@@ -105,23 +108,24 @@ export function useCompleteGridNavigationRow({ info: { index, unselectable, unta
         return true;
     }, []);
     const { refElementReturn, propsStable, ...void6 } = useRefElement({ refElementParameters: {} });
-    const r = useGridNavigationSingleSelectionSortableRow({
+    const r = useGridNavigationSelectionSortableRow({
         rovingTabIndexParameters,
         typeaheadNavigationParameters: { isValidForTypeaheadNavigation: isValidForNavigation, ...typeaheadNavigationParameters },
         linearNavigationParameters: { isValidForLinearNavigation: isValidForNavigation, getHighestIndex: getHighestChildIndex, getLowestIndex: getLowestChildIndex, ...linearNavigationParameters },
         managedChildrenReturn: { getChildren },
         refElementReturn,
         context: contextIncomingForRowAsChildOfTable,
-        info: { index, unselectable, untabbable },
+        info: { index, untabbable },
         textContentParameters,
-        gridNavigationSingleSelectionSortableRowParameters,
+        gridNavigationSelectionSortableRowParameters,
+        singleSelectionChildParameters,
+        multiSelectionChildParameters
     });
-    const { linearNavigationReturn, managedChildrenParameters, pressParameters, rovingTabIndexChildReturn, rovingTabIndexReturn, singleSelectionChildReturn, textContentReturn, typeaheadNavigationReturn, context: contextGNR, info: infoRowReturn, props: p3, hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void3 }, ...void2 } = r;
+    const { linearNavigationReturn, managedChildrenParameters, pressParameters, rovingTabIndexChildReturn, rovingTabIndexReturn, singleSelectionChildReturn, multiSelectionChildReturn, textContentReturn, typeaheadNavigationReturn, context: contextGNR, info: infoRowReturn, props: p3, hasCurrentFocusParameters: { onCurrentFocusedInnerChanged: ocfic1, ...void3 }, ...void2 } = r;
     const { context: contextMC, managedChildrenReturn } = useManagedChildren({ managedChildrenParameters });
     const completeInfo = {
         getElement: refElementReturn.getElement,
         index,
-        unselectable,
         untabbable,
         ...infoRowReturn,
         ...infoPaginatedChild,
@@ -164,6 +168,7 @@ export function useCompleteGridNavigationRow({ info: { index, unselectable, unta
         rovingTabIndexChildReturn,
         rovingTabIndexReturn,
         singleSelectionChildReturn,
+        multiSelectionChildReturn,
         textContentReturn,
         typeaheadNavigationReturn,
         props,
@@ -175,7 +180,7 @@ export function useCompleteGridNavigationRow({ info: { index, unselectable, unta
 export function useCompleteGridNavigationCell({ gridNavigationCellParameters, context, textContentParameters, info: { focusSelf, index, untabbable, getSortValue, ...customUserInfo }, ...void1 }) {
     monitorCallCount(useCompleteGridNavigationCell);
     const { refElementReturn, propsStable } = useRefElement({ refElementParameters: {} });
-    const { hasCurrentFocusParameters, rovingTabIndexChildReturn, textContentReturn, pressParameters: { excludeSpace: es1 }, props: propsRti, info: info2, ...void2 } = useGridNavigationSingleSelectionSortableCell({
+    const { hasCurrentFocusParameters, rovingTabIndexChildReturn, textContentReturn, pressParameters: { excludeSpace: es1 }, props: propsRti, info: info2, ...void2 } = useGridNavigationSelectionSortableCell({
         gridNavigationCellParameters,
         info: { index, untabbable },
         context,
@@ -212,22 +217,26 @@ export function useCompleteGridNavigationCell({ gridNavigationCellParameters, co
         textContentReturn
     };
 }
-export function useCompleteGridNavigationDeclarative({ gridNavigationParameters, linearNavigationParameters, paginatedChildrenParameters, rearrangeableChildrenParameters, rovingTabIndexParameters, singleSelectionDeclarativeParameters, sortableChildrenParameters, staggeredChildrenParameters, typeaheadNavigationParameters, singleSelectionParameters, refElementParameters, ...void1 }) {
+export function useCompleteGridNavigationDeclarative({ gridNavigationParameters, linearNavigationParameters, paginatedChildrenParameters, rearrangeableChildrenParameters, rovingTabIndexParameters, singleSelectionDeclarativeParameters, multiSelectionParameters, sortableChildrenParameters, staggeredChildrenParameters, typeaheadNavigationParameters, singleSelectionParameters, refElementParameters, ...void1 }) {
     const ret = useCompleteGridNavigation({
         linearNavigationParameters,
         paginatedChildrenParameters,
         rearrangeableChildrenParameters,
         rovingTabIndexParameters,
-        singleSelectionParameters: { initiallySelectedIndex: singleSelectionDeclarativeParameters.selectedIndex, onSelectedIndexChange: useStableCallback((...e) => onSelectedIndexChange?.(...e)), ...singleSelectionParameters },
+        singleSelectionParameters: { initiallySingleSelectedIndex: singleSelectionDeclarativeParameters.singleSelectedIndex, onSingleSelectedIndexChange: useStableCallback((...e) => onSingleSelectedIndexChange?.(...e)), ...singleSelectionParameters },
+        multiSelectionParameters,
         sortableChildrenParameters,
         staggeredChildrenParameters,
         refElementParameters,
         typeaheadNavigationParameters,
         gridNavigationParameters,
     });
-    const { singleSelectionParameters: { onSelectedIndexChange } } = useSingleSelectionDeclarative({ singleSelectionDeclarativeParameters, singleSelectionReturn: ret.singleSelectionReturn });
-    const { singleSelectionReturn: { getSelectedIndex }, ...ret2 } = ret;
+    const { singleSelectionParameters: { onSingleSelectedIndexChange } } = useSelectionDeclarative({
+        singleSelectionDeclarativeParameters,
+        singleSelectionReturn: ret.singleSelectionReturn
+    });
+    const { singleSelectionReturn: { getSingleSelectedIndex }, ...ret2 } = ret;
     assertEmptyObject(void1);
-    return { ...ret2, singleSelectionReturn: { getSelectedIndex } };
+    return { ...ret2, singleSelectionReturn: { getSingleSelectedIndex } };
 }
 //# sourceMappingURL=use-grid-navigation-complete.js.map
