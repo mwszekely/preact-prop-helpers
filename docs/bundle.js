@@ -800,7 +800,7 @@
   // ../dist/util/mode.js
   globalThis.process ??= {};
   globalThis.process.env ??= {};
-  globalThis.process.env.NODE_ENV ??= "production";
+  globalThis.process.env.NODE_ENV = "development";
   var Se = "development";
 
   // ../dist/util/use-call-count.js
