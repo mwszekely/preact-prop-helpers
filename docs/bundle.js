@@ -1414,8 +1414,8 @@
   // ../dist/util/mode.js
   globalThis.process ??= {};
   globalThis.process.env ??= {};
-  globalThis.process.env.NODE_ENV ||= "production";
-  var Ee = "development";
+  globalThis.process.env.NODE_ENV = globalThis.process.env.NODE_ENV || "production";
+  var Ee = globalThis.process.env.NODE_ENV;
 
   // ../dist/util/use-call-count.js
   window.requestIdleCallback ??= (e) => setTimeout(() => {

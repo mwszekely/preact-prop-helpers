@@ -3773,10 +3773,10 @@ type BuildMode = "production" | "development";
 /**
  * Controls other development hooks by checking the value of a global variable called `process.env.NODE_ENV`.
  *
- * @remarks Bundlers like Rollup will actually noop-out development code if `process.env.NODE_ENV !== "development"`
+ * @remarks Bundlers like Rollup will actually no-op out development code if `process.env.NODE_ENV !== "development"`
  * (which, of course, covers the default case where `process.env.NODE_ENV` just doesn't exist).
  */
-declare const BuildMode: string;
+declare const BuildMode: "production" | "development";
 /**
  * Returns a randomly-generated ID with an optional prefix.
  * Note that if the prefix is *explicitly* set to "", then

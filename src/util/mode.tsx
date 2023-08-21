@@ -10,14 +10,14 @@ declare global {
 // (i.e. in a way that doesn't throw an error but has isDevMode be a constant)
 (globalThis as any)["process"] ??= {};
 (globalThis as any)["process"]["env"] ??= {};
-(globalThis as any)["process"]["env"]["NODE_ENV"] ||= "production";
+(globalThis as any)["process"]["env"]["NODE_ENV"] = ((globalThis as any)["process"]["env"]["NODE_ENV"] || "production");
 
 export type BuildMode = "production" | "development";
 
 /**
  * Controls other development hooks by checking the value of a global variable called `process.env.NODE_ENV`.
  * 
- * @remarks Bundlers like Rollup will actually noop-out development code if `process.env.NODE_ENV !== "development"` 
+ * @remarks Bundlers like Rollup will actually no-op out development code if `process.env.NODE_ENV !== "development"` 
  * (which, of course, covers the default case where `process.env.NODE_ENV` just doesn't exist).
  */
-export const BuildMode = (process.env!.NODE_ENV === 'development')? "development" : "production";
+export const BuildMode = (globalThis as any)["process"]["env"]["NODE_ENV"] as "production" | "development";

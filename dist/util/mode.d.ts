@@ -9,8 +9,8 @@ export type BuildMode = "production" | "development";
 /**
  * Controls other development hooks by checking the value of a global variable called `process.env.NODE_ENV`.
  *
- * @remarks Bundlers like Rollup will actually noop-out development code if `process.env.NODE_ENV !== "development"`
+ * @remarks Bundlers like Rollup will actually no-op out development code if `process.env.NODE_ENV !== "development"`
  * (which, of course, covers the default case where `process.env.NODE_ENV` just doesn't exist).
  */
-export declare const BuildMode: string;
+export declare const BuildMode: "production" | "development";
 //# sourceMappingURL=mode.d.ts.map
