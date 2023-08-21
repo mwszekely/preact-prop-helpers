@@ -3769,7 +3769,6 @@ declare global {
         } | undefined;
     };
 }
-type BuildMode = "production" | "development";
 /**
  * Controls other development hooks by checking the value of a global variable called `process.env.NODE_ENV`.
  *
@@ -3777,6 +3776,7 @@ type BuildMode = "production" | "development";
  * (which, of course, covers the default case where `process.env.NODE_ENV` just doesn't exist).
  */
 declare const BuildMode: "production" | "development";
+type BuildMode = "production" | "development";
 /**
  * Returns a randomly-generated ID with an optional prefix.
  * Note that if the prefix is *explicitly* set to "", then

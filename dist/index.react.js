@@ -129,14 +129,13 @@ const EventMapping = {
 // (i.e. in a way that doesn't throw an error but has isDevMode be a constant)
 globalThis["process"] ??= {};
 globalThis["process"]["env"] ??= {};
-globalThis["process"]["env"]["NODE_ENV"] = (globalThis["process"]["env"]["NODE_ENV"] || "production");
 /**
  * Controls other development hooks by checking the value of a global variable called `process.env.NODE_ENV`.
  *
  * @remarks Bundlers like Rollup will actually no-op out development code if `process.env.NODE_ENV !== "development"`
  * (which, of course, covers the default case where `process.env.NODE_ENV` just doesn't exist).
  */
-const BuildMode = globalThis["process"]["env"]["NODE_ENV"];
+const BuildMode = globalThis["process"]["env"]["NODE_ENV"] = (globalThis["process"]["env"]["NODE_ENV"] || "production");
 
 // TODO: This shouldn't be in every build, I don't think it's in core-js? I think?
 // And it's extremely small anyway and basically does nothing.
