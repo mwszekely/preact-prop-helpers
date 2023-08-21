@@ -1,0 +1,34 @@
+{
+    "compress": {
+      "global_defs": {
+        "process.env.NODE_ENV": "production",
+        "process.env.BABEL_ENV": "production",
+        "process.env.NODE_DEBUG": false,
+        "process.env.RUNNER_DEBUG": "0"
+      },
+      "ecma": "2018",
+      "toplevel": true,
+      "hoist_vars": false,
+      "hoist_funs": true,
+      "pure_getters": true,
+      "unsafe": true,
+      "unsafe_arrows": true,
+      "unsafe_comps": true,
+      "unsafe_Function": true,
+      "unsafe_math": true,
+      "unsafe_symbols": true,
+      "unsafe_methods": true,
+      "unsafe_proto": true,
+      "unsafe_regexp": true,
+      "unsafe_undefined": true,
+      "passes": 3
+    },
+    "parse": {
+      "ecma": 2020
+    },
+    "mangle": true,
+    "format": {
+      "beautify": false,
+      "comments": false
+    }
+  }

@@ -136,7 +136,7 @@ test("Untabbability works", async ({ page, listNav, shared: { run, install } }) 
 });
 
 test("Selection", async ({ page, listNav, shared: { run, install } }) => {
-    await run("ListNav", "setSelectionMode", "activation");
+    await run("ListNav", "setSingleSelectionMode", "activation");
 
     // Before we install the onSelectedIndexChange handler, there should be no way to activate the list.
     await listNav.list.locator(`li:nth-child(${1})`).click({ force: true });

@@ -17,8 +17,8 @@ export interface ListNavConstants {
     setPagination(size: [number, number] | null): Promise<void>;
     setArrowKeyDirection(direction: "horizontal" | "vertical"): Promise<void>;
     setNavigatePastStartEnd(op: "wrap" | "passthrough"): Promise<void>;
-    setAriaPropName(ariaPropName: UseSingleSelectionParameters<any, any>["singleSelectionParameters"]["ariaPropName"]): Promise<void>;
-    setSelectionMode(ariaPropName: UseSingleSelectionParameters<any, any>["singleSelectionParameters"]["selectionMode"]): Promise<void>;
+    setSingleSelectionAriaPropName(ariaPropName: UseSingleSelectionParameters<any, any, any>["singleSelectionParameters"]["singleSelectionAriaPropName"]): Promise<void>;
+    setSingleSelectionMode(ariaPropName: UseSingleSelectionParameters<any, any, any>["singleSelectionParameters"]["singleSelectionMode"]): Promise<void>;
     setStaggered(staggered: boolean): Promise<void>;
     setCollator(id: string): Promise<void>;
     setNoTypeahead(noTypeahead: boolean): Promise<void>;
@@ -36,23 +36,23 @@ export function TestBasesListNav() {
     const [disableHomeEndKeys] = useTestSyncState("ListNav", "setDisableHomeEndKeys", false, fromStringBoolean);
     const [pageNavigationSize] = useTestSyncState("ListNav", "setPageNavigationSize", 0.1, fromStringNumber);
     const [navigatePastStartEnd] = useTestSyncState("ListNav", "setNavigatePastStartEnd", "wrap", fromStringString);
-    const [ariaPropName] = useTestSyncState("ListNav", "setAriaPropName", "aria-selected", fromStringString);
+    const [singleSelectionAriaPropName] = useTestSyncState("ListNav", "setSingleSelectionAriaPropName", "aria-selected", fromStringString);
     const [untabbable, setUntabbable] = useTestSyncState("ListNav", "setUntabbable", false, fromStringBoolean);
     const [staggered] = useTestSyncState("ListNav", "setStaggered", false, fromStringBoolean);
     const [collatorId] = useTestSyncState("ListNav", "setCollator", "", fromStringString);
     const [noTypeahead] = useTestSyncState("ListNav", "setNoTypeahead", false, fromStringBoolean);
     const [typeaheadTimeout] = useTestSyncState("ListNav", "setTypeaheadTimeout", 1000, fromStringNumber);
-    const [selectionMode] = useTestSyncState("ListNav", "setSelectionMode", "activation", fromStringString);
+    const [singleSelectionMode] = useTestSyncState("ListNav", "setSingleSelectionMode", "activation", fromStringString);
     const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
-    const a = { untabbable, staggered, collatorId, noTypeahead, typeaheadTimeout, selectionMode }
+    const a = { untabbable, staggered, collatorId, noTypeahead, typeaheadTimeout, singleSelectionMode }
 
     installTestingHandler("ListNav", "setSelectedIndex", setSelectedIndex);
     if (!mounted)
         return <ol />;
 
     return (
-        <TestBasesListNavImpl selectedIndex={selectedIndex} childCount={childCount} collatorId={collatorId} disableHomeEndKeys={disableHomeEndKeys} navigatePastStartEnd={navigatePastStartEnd} noTypeahead={noTypeahead} pageNavigationSize={pageNavigationSize} pagination={pagination} selectionMode={selectionMode} staggered={staggered} typeaheadTimeout={typeaheadTimeout} untabbable={untabbable} arrowKeyDirection={arrowKeyDirection} ariaPropName={ariaPropName} />
+        <TestBasesListNavImpl singleSelectedIndex={selectedIndex} childCount={childCount} collatorId={collatorId} disableHomeEndKeys={disableHomeEndKeys} navigatePastStartEnd={navigatePastStartEnd} noTypeahead={noTypeahead} pageNavigationSize={pageNavigationSize} pagination={pagination} singleSelectionMode={singleSelectionMode} staggered={staggered} typeaheadTimeout={typeaheadTimeout} untabbable={untabbable} arrowKeyDirection={arrowKeyDirection} singleSelectionAriaPropName={singleSelectionAriaPropName} />
     );
 }
 
@@ -63,14 +63,14 @@ interface TestBasesListNavImplProps {
     disableHomeEndKeys: boolean;
     pageNavigationSize: number;
     navigatePastStartEnd: "wrap" | "passthrough";
-    ariaPropName: Nullable<"aria-pressed" | "aria-selected" | "aria-checked" | "aria-current-page" | "aria-current-step" | "aria-current-date" | "aria-current-time" | "aria-current-location" | "aria-current-true">;
+    singleSelectionAriaPropName: Nullable<"aria-pressed" | "aria-selected" | "aria-checked" | "aria-current-page" | "aria-current-step" | "aria-current-date" | "aria-current-time" | "aria-current-location" | "aria-current-true">;
     untabbable: boolean;
     staggered: boolean;
     collatorId: string;
     noTypeahead: boolean;
     typeaheadTimeout: number;
-    selectionMode: "focus" | "activation" | "disabled";
-    selectedIndex: number | null;
+    singleSelectionMode: "focus" | "activation" | "disabled";
+    singleSelectedIndex: number | null;
 }
 
 const globalLogEnabled = false;
@@ -91,7 +91,7 @@ function useOnRender(id: string) {
     return { props: useMergedProps(props, propsStable) }
 }
 
-function TestBasesListNavImpl({ ariaPropName, selectedIndex, arrowKeyDirection, childCount, collatorId, disableHomeEndKeys, navigatePastStartEnd, noTypeahead, pageNavigationSize, pagination, selectionMode, staggered, typeaheadTimeout, untabbable }: TestBasesListNavImplProps) {
+function TestBasesListNavImpl({ singleSelectionAriaPropName, singleSelectedIndex, arrowKeyDirection, childCount, collatorId, disableHomeEndKeys, navigatePastStartEnd, noTypeahead, pageNavigationSize, pagination, singleSelectionMode, staggered, typeaheadTimeout, untabbable }: TestBasesListNavImplProps) {
 
     console.log(pagination);
 
@@ -105,7 +105,7 @@ function TestBasesListNavImpl({ ariaPropName, selectedIndex, arrowKeyDirection, 
         props,
         rearrangeableChildrenReturn: { indexDemangler, indexMangler, rearrange, reverse, shuffle, toJsonArray, useRearrangedChildren },
         rovingTabIndexReturn: { focusSelf, getTabbableIndex, setTabbableIndex },
-        singleSelectionReturn: { getSelectedIndex },
+        singleSelectionReturn: { getSingleSelectedIndex },
         sortableChildrenReturn: { sort },
         staggeredChildrenReturn: { stillStaggering },
         typeaheadNavigationReturn: { getCurrentTypeahead, typeaheadStatus },
@@ -113,14 +113,15 @@ function TestBasesListNavImpl({ ariaPropName, selectedIndex, arrowKeyDirection, 
         linearNavigationParameters: { arrowKeyDirection, disableHomeEndKeys, navigatePastEnd: navigatePastStartEnd, navigatePastStart: navigatePastStartEnd, pageNavigationSize, onNavigateLinear: null },
         rearrangeableChildrenParameters: { getIndex: useCallback(info => info.props.index, []) },
         rovingTabIndexParameters: { untabbable, onTabbableIndexChange: null, focusSelfParent: focus },
-        singleSelectionParameters: { ariaPropName, selectionMode },
+        singleSelectionParameters: { singleSelectionAriaPropName, singleSelectionMode },
         singleSelectionDeclarativeParameters: {
-            selectedIndex,
-            onSelectedIndexChange: useStableCallback((e) => {
+            singleSelectedIndex,
+            onSingleSelectedIndexChange: useStableCallback((e) => {
                 const f = getTestingHandler("ListNav", "onSelectedIndexChange");
                 f?.(e[EventDetail].selectedIndex);
             }, [])
         },
+        multiSelectionParameters: { multiSelectionAriaPropName: "aria-pressed", multiSelectionMode: "disabled", onSelectionChange: null, },
         sortableChildrenParameters: { compare: useCallback<Compare<UseCompleteListNavigationChildInfo<HTMLLIElement>>>((lhs, rhs) => { return (lhs.getSortValue() as number) - (rhs.getSortValue() as number) }, []) },
         staggeredChildrenParameters: { staggered },
         paginatedChildrenParameters: { paginationMin: pagination?.[0], paginationMax: pagination?.[1] },
@@ -179,22 +180,23 @@ function TestBasesListNavChild({ index }: { index: number }) {
         propsTabbable,
         refElementReturn,
         rovingTabIndexChildReturn: { getTabbable, tabbable },
-        singleSelectionChildReturn: { getSelected, getSelectedOffset, selected, selectedOffset },
+        singleSelectionChildReturn: { getSingleSelected, getSingleSelectedOffset, singleSelected, singleSelectedOffset },
         staggeredChildReturn: { hideBecauseStaggered, parentIsStaggered },
         textContentReturn: { },
         pressParameters: { onPressSync, excludeSpace }
     } = useCompleteListNavigationChild<HTMLLIElement, UseCompleteListNavigationChildInfo<HTMLLIElement>>({
         context: useContext(Context),
         info: {
-            unselectable: disabled,
             focusSelf,
             untabbable: hidden,
             index,
-            getSortValue: getTextContent
+            getSortValue: getTextContent,
         },
         textContentParameters: { getText: getTextContent },
         hasCurrentFocusParameters: { onCurrentFocusedChanged: null, onCurrentFocusedInnerChanged: null },
-        refElementParameters: {}
+        refElementParameters: {},
+        multiSelectionChildParameters: { multiSelectionDisabled: disabled, initiallyMultiSelected: false, onMultiSelectChange: null },
+        singleSelectionChildParameters: { singleSelectionDisabled: disabled }
     });
     const { pressReturn: { getIsPressing, longPress, pressing }, props: propsPressStable } = usePress({
         pressParameters: {
@@ -219,8 +221,8 @@ function TestBasesListNavChild({ index }: { index: number }) {
                 data-parent-is-paginated={parentIsPaginated}
                 data-tabbable={tabbable}
                 data-hide-because-staggered={hideBecauseStaggered}
-                data-selected={selected}
-                data-selected-offset={selectedOffset}
+                data-selected={singleSelected}
+                data-selected-offset={singleSelectedOffset}
                 data-parent-is-staggered={parentIsStaggered}
                 {...useMergedProps(propsChild, propsTabbable, propsPressStable, p1, p2)}>{(hideBecausePaginated || hideBecauseStaggered) ? "" : textContent}{hidden && " (hidden)"}{disabled && " (disabled)"}</li>
         </>

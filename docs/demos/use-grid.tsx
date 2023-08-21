@@ -21,7 +21,7 @@ export const DemoUseGrid = memo(() => {
 
     // Entirely complete, fully spelt-out version:
     const allReturnInfo = useCompleteGridNavigationDeclarative<HTMLTableSectionElement, HTMLTableRowElement, HTMLTableCellElement, CustomGridInfo, CustomGridRowInfo>({
-        // `useRovingTabIndex` is a separate hook that you can call with these same parameters:
+        // `useRovingTabIndex` is a separate hook that you could call with these same parameters:
         rovingTabIndexParameters: {
             // If true, the entire grid is removed from the tab order
             untabbable: false,
@@ -30,7 +30,7 @@ export const DemoUseGrid = memo(() => {
             // This can be used to track when the user navigates between rows for any reason
             onTabbableIndexChange: setTabbableRow,
         },
-        // `useSingleSelection` is a separate hook that you can call with these parameters:
+        // `useSingleSelection` is a separate hook that you could call with these parameters:
         typeaheadNavigationParameters: {
             // Determines how children are searched for (`Intl.Collator`)
             collator: null,
@@ -70,9 +70,9 @@ export const DemoUseGrid = memo(() => {
         },
         singleSelectionDeclarativeParameters: {
             // Which child is currently selected?
-            selectedIndex: selectedRow,
+            singleSelectedIndex: selectedRow,
             // What happens when the user selects a child?
-            onSelectedIndexChange: (e) => setSelectedRow(e[EventDetail].selectedIndex)
+            onSingleSelectedIndexChange: (e) => setSelectedRow(e[EventDetail].selectedIndex)
         },
         gridNavigationParameters: {
             // This can be used by you to track which 0-indexed column is currently the one with focus.

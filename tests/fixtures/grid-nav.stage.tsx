@@ -9,7 +9,7 @@ import { DefaultChildCount, DisabledIndex, HiddenIndex, MissingIndex, WithColSpa
 
 export interface GridNavConstants {
     setMounted(mounted: boolean): void;
-    setSelectedIndex(index: number | null): void;
+    setSingleSelectedIndex(index: number | null): void;
     setChildCount(count: number): Promise<void>;
     setUntabbable(untabbable: boolean): Promise<void>;
     setDisableHomeEndKeys(disabled: boolean): Promise<void>;
@@ -17,8 +17,8 @@ export interface GridNavConstants {
     setPagination(size: [number, number] | null): Promise<void>;
     setArrowKeyDirection(direction: "horizontal" | "vertical"): Promise<void>;
     setNavigatePastStartEnd(op: "wrap" | "passthrough"): Promise<void>;
-    setAriaPropName(ariaPropName: UseSingleSelectionParameters<any, any>["singleSelectionParameters"]["ariaPropName"]): Promise<void>;
-    setSelectionMode(ariaPropName: UseSingleSelectionParameters<any, any>["singleSelectionParameters"]["selectionMode"]): Promise<void>;
+    setSingleSelectionAriaPropName(ariaPropName: UseSingleSelectionParameters<any, any, any>["singleSelectionParameters"]["singleSelectionAriaPropName"]): Promise<void>;
+    setSingleSelectionMode(ariaPropName: UseSingleSelectionParameters<any, any, any>["singleSelectionParameters"]["singleSelectionMode"]): Promise<void>;
     setStaggered(staggered: boolean): Promise<void>;
     setCollator(id: string): Promise<void>;
     setNoTypeahead(noTypeahead: boolean): Promise<void>;
@@ -37,24 +37,24 @@ export function TestBasesGridNav() {
     const [disableHomeEndKeys] = useTestSyncState("GridNav", "setDisableHomeEndKeys", false, fromStringBoolean);
     const [pageNavigationSize] = useTestSyncState("GridNav", "setPageNavigationSize", 0.1, fromStringNumber);
     const [navigatePastStartEnd] = useTestSyncState("GridNav", "setNavigatePastStartEnd", "wrap", fromStringString);
-    const [ariaPropName] = useTestSyncState("GridNav", "setAriaPropName", "aria-selected", fromStringString);
+    const [singleSelectionAriaPropName] = useTestSyncState("GridNav", "setSingleSelectionAriaPropName", "aria-selected", fromStringString);
     const [untabbable, setUntabbable] = useTestSyncState("GridNav", "setUntabbable", false, fromStringBoolean);
     const [staggered] = useTestSyncState("GridNav", "setStaggered", false, fromStringBoolean);
     const [collatorId] = useTestSyncState("GridNav", "setCollator", "", fromStringString);
     const [noTypeahead] = useTestSyncState("GridNav", "setNoTypeahead", false, fromStringBoolean);
     const [typeaheadTimeout] = useTestSyncState("GridNav", "setTypeaheadTimeout", 1000, fromStringNumber);
-    const [selectionMode] = useTestSyncState("GridNav", "setSelectionMode", "activation", fromStringString);
-    const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+    const [singleSelectionMode] = useTestSyncState("GridNav", "setSingleSelectionMode", "activation", fromStringString);
+    const [singleSelectedIndex, setSingleSelectedIndex] = useState<number | null>(null);
     console.log(pagination);
 
-    const a = { untabbable, staggered, collatorId, noTypeahead, typeaheadTimeout, selectionMode }
+    const a = { untabbable, staggered, collatorId, noTypeahead, typeaheadTimeout, singleSelectionMode }
 
-    installTestingHandler("GridNav", "setSelectedIndex", setSelectedIndex);
+    installTestingHandler("GridNav", "setSingleSelectedIndex", setSingleSelectedIndex);
     if (!mounted)
         return <div />;
 
     return (
-        <TestBasesGridNavImpl selectedIndex={selectedIndex} childCount={childCount} collatorId={collatorId} disableHomeEndKeys={disableHomeEndKeys} navigatePastStartEnd={navigatePastStartEnd} noTypeahead={noTypeahead} pageNavigationSize={pageNavigationSize} pagination={pagination} selectionMode={selectionMode} staggered={staggered} typeaheadTimeout={typeaheadTimeout} untabbable={untabbable} arrowKeyDirection={arrowKeyDirection} ariaPropName={ariaPropName} />
+        <TestBasesGridNavImpl singleSelectedIndex={singleSelectedIndex} childCount={childCount} collatorId={collatorId} disableHomeEndKeys={disableHomeEndKeys} navigatePastStartEnd={navigatePastStartEnd} noTypeahead={noTypeahead} pageNavigationSize={pageNavigationSize} pagination={pagination} singleSelectionMode={singleSelectionMode} staggered={staggered} typeaheadTimeout={typeaheadTimeout} untabbable={untabbable} arrowKeyDirection={arrowKeyDirection} singleSelectionAriaPropName={singleSelectionAriaPropName} />
     );
 }
 
@@ -65,14 +65,14 @@ interface TestBasesGridNavImplProps {
     disableHomeEndKeys: boolean;
     pageNavigationSize: number;
     navigatePastStartEnd: "wrap" | "passthrough";
-    ariaPropName: Nullable<"aria-pressed" | "aria-selected" | "aria-checked" | "aria-current-page" | "aria-current-step" | "aria-current-date" | "aria-current-time" | "aria-current-location" | "aria-current-true">;
+    singleSelectionAriaPropName: Nullable<"aria-pressed" | "aria-selected" | "aria-checked" | "aria-current-page" | "aria-current-step" | "aria-current-date" | "aria-current-time" | "aria-current-location" | "aria-current-true">;
     untabbable: boolean;
     staggered: boolean;
     collatorId: string;
     noTypeahead: boolean;
     typeaheadTimeout: number;
-    selectionMode: "focus" | "activation" | "disabled";
-    selectedIndex: number | null;
+    singleSelectionMode: "focus" | "activation" | "disabled";
+    singleSelectedIndex: number | null;
 }
 
 function useOnRender(id: string) {
@@ -89,7 +89,7 @@ function useOnRender(id: string) {
     return { props: useMergedProps(props, propsStable) }
 }
 
-function TestBasesGridNavImpl({ ariaPropName, selectedIndex, arrowKeyDirection, childCount, collatorId, disableHomeEndKeys, navigatePastStartEnd, noTypeahead, pageNavigationSize, pagination, selectionMode, staggered, typeaheadTimeout, untabbable }: TestBasesGridNavImplProps) {
+function TestBasesGridNavImpl({ singleSelectionAriaPropName, singleSelectedIndex, arrowKeyDirection, childCount, collatorId, disableHomeEndKeys, navigatePastStartEnd, noTypeahead, pageNavigationSize, pagination, singleSelectionMode, staggered, typeaheadTimeout, untabbable }: TestBasesGridNavImplProps) {
 
     console.log(pagination);
 
@@ -104,7 +104,7 @@ function TestBasesGridNavImpl({ ariaPropName, selectedIndex, arrowKeyDirection, 
         props,
         rearrangeableChildrenReturn: { indexDemangler, indexMangler, rearrange, reverse, shuffle, toJsonArray, useRearrangedChildren },
         rovingTabIndexReturn: { focusSelf, getTabbableIndex, setTabbableIndex },
-        singleSelectionReturn: { getSelectedIndex },
+        singleSelectionReturn: { getSingleSelectedIndex },
         sortableChildrenReturn: { sort },
         staggeredChildrenReturn: { stillStaggering },
         typeaheadNavigationReturn: { getCurrentTypeahead, typeaheadStatus }
@@ -113,15 +113,16 @@ function TestBasesGridNavImpl({ ariaPropName, selectedIndex, arrowKeyDirection, 
         gridNavigationParameters: { onTabbableColumnChange: null },
         rearrangeableChildrenParameters: { getIndex: useCallback(info => info.props.index, []) },
         rovingTabIndexParameters: { untabbable, onTabbableIndexChange: null, focusSelfParent: focus },
-        singleSelectionParameters: { ariaPropName, selectionMode },
+        singleSelectionParameters: { singleSelectionAriaPropName, singleSelectionMode },
         refElementParameters: {},
         singleSelectionDeclarativeParameters: {
-            selectedIndex,
-            onSelectedIndexChange: useStableCallback((e) => {
+            singleSelectedIndex,
+            onSingleSelectedIndexChange: useStableCallback((e) => {
                 const f = getTestingHandler("GridNav", "onSelectedIndexChange");
                 f?.(e[EventDetail].selectedIndex);
             }, [])
         },
+        multiSelectionParameters: { multiSelectionAriaPropName: "aria-checked", multiSelectionMode: "disabled", onSelectionChange: null },
         sortableChildrenParameters: { compare: useCallback<Compare<UseCompleteGridNavigationRowInfo<HTMLDivElement>>>((lhs, rhs) => { return (lhs.getSortValue() as number) - (rhs.getSortValue() as number) }, []) },
         staggeredChildrenParameters: { staggered },
         paginatedChildrenParameters: { paginationMin: pagination?.[0], paginationMax: pagination?.[1] },
@@ -182,17 +183,18 @@ function TestBaseGridNavRow({ index }: { index: number }) {
         rovingTabIndexReturn: { getTabbableIndex, setTabbableIndex },
         typeaheadNavigationReturn: { getCurrentTypeahead, typeaheadStatus },
         rovingTabIndexChildReturn: { getTabbable, tabbable },
-        singleSelectionChildReturn: { getSelected, getSelectedOffset, selected, selectedOffset },
+        singleSelectionChildReturn: { getSingleSelected, getSingleSelectedOffset, singleSelected, singleSelectedOffset },
         staggeredChildReturn: { hideBecauseStaggered, parentIsStaggered },
         textContentReturn: { },
     } = useCompleteGridNavigationRow<HTMLTableRowElement, HTMLTableCellElement, UseCompleteGridNavigationRowInfo<HTMLTableRowElement>, UseCompleteGridNavigationCellInfo<HTMLTableCellElement>>({
         context: useContext(RowContext),
         info: {
-            unselectable: disabled,
             untabbable: hidden,
             index,
         },
-        gridNavigationSingleSelectionSortableRowParameters: { getSortableColumnIndex: returnZero },
+        gridNavigationSelectionSortableRowParameters: { getSortableColumnIndex: returnZero },
+        multiSelectionChildParameters: { initiallyMultiSelected: false, multiSelectionDisabled: true, onMultiSelectChange: null },
+        singleSelectionChildParameters: { singleSelectionDisabled: disabled },
         linearNavigationParameters: { navigatePastEnd: "wrap", navigatePastStart: "wrap" },
         rovingTabIndexParameters: { initiallyTabbedIndex: 0, untabbable: false, onTabbableIndexChange: null },
         typeaheadNavigationParameters: { collator: null, noTypeahead: false, typeaheadTimeout: 1000, onNavigateTypeahead: null },
@@ -217,8 +219,8 @@ function TestBaseGridNavRow({ index }: { index: number }) {
                         "data-parent-is-paginated": parentIsPaginated,
                         "data-tabbable": tabbable,
                         "data-hide-because-staggered": hideBecauseStaggered,
-                        "data-selected": selected,
-                        "data-selected-offset": selectedOffset,
+                        "data-selected": singleSelected,
+                        "data-selected-offset": singleSelectedOffset,
                         "data-parent-is-staggered": parentIsStaggered,
                     } as {},
                     {

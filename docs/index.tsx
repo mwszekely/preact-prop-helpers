@@ -3,13 +3,13 @@ import { memo } from "preact/compat";
 import { useContext, useRef } from "preact/hooks";
 import { ElementSize, EventType, MouseEventType, UseChildrenHaveFocusChildParameters, UseManagedChildrenContext, UseStaggeredChildContext, UseStaggeredChildrenInfo, useAnimationFrame, useAsyncHandler, useChildrenHaveFocus, useChildrenHaveFocusChild, useDraggable, useDroppable, useElementSize, useFocusTrap, useGlobalHandler, useHasCurrentFocus, useHasLastFocus, useInterval, useManagedChild, useManagedChildren, useMergedProps, usePortalChildren, usePress, useRandomDualIds, useRefElement, useStableCallback, useStaggeredChild, useStaggeredChildren, useState } from "../dist/index.js";
 
-import untypedJson from "./api.json";
-import { ApiBlock, ApiPackage, ApiParamBlockSectionNode, MemberIdentifier, MemberReference } from "./json-types.js";
-
-const json = untypedJson as ApiPackage;
+import { options } from "preact";
+import { DemoUseGrid } from "./demos/use-grid.js";
+import { DemoUseModal } from "./demos/use-modal.js";
+import { DemoUseRovingTabIndex } from "./demos/use-roving-tab-index.js";
+import { DemoUseTimeout } from "./demos/use-timeout.js";
 
 (window as any)._generate_setState_stacks = true;
-
 
 const DemoUseDroppable = () => {
     const { droppedFiles, droppedStrings, filesForConsideration, stringsForConsideration, propsStable: props, dropError } = useDroppable<HTMLDivElement>({ effect: "copy" });
@@ -528,52 +528,7 @@ const DemoStaggeredChild = memo(({ index }: { index: number }) => {
     )
 })
 
-const RenderApiBlock = (node: ApiBlock["content"]["nodes"][number] & { omitSoftBreaks?: boolean }) => {
-    switch (node.kind) {
-        case "Paragraph": return <p>{node.nodes.map(node => {
-            return <RenderApiBlockInner {...node} />
-        })}</p>
-        case "FencedCode":
-            return <span class={`fenced-code fenced-code-lang-${node.language}`}>{node.code}</span>
-    }
-}
 
-const RenderApiBlockInner = (node: ApiParamBlockSectionNode & { omitSoftBreaks?: boolean }) => {
-    switch (node.kind) {
-        case "PlainText": return <>{node.text}</>;
-        case "CodeSpan": return <span class="code-span">{node.code}</span>;
-        case "FencedCode": return <span class={`fenced-code fenced-code-lang-${node.language}`}>{node.code}</span>;
-        case "ErrorText": return <span class="error-text"><span class="error-text-message">{node.errorMessage}</span><span class="error-location">{node.errorLocation}</span></span>;
-        case "LinkTag": return <span class="link-tag">{node.codeDestination.memberReferences.map(ref => <RenderMemberReference {...ref} />)}</span>;
-        case "SoftBreak": return node.omitSoftBreaks ? null : <br />;
-    }
-}
-
-const RenderMemberReference = ({ hasDot, kind, memberIdentifier }: MemberReference) => {
-
-    return (
-        <>
-            {hasDot ? "." : ""}
-            <RenderMemberIdentifier {...memberIdentifier} />
-        </>
-    )
-}
-
-const RenderMemberIdentifier = ({ hasQuotes, identifier, kind }: MemberIdentifier) => {
-    return (
-        <>{hasQuotes ? "\"" : ""}{identifier}{hasQuotes ? "\"" : ""}</>
-    )
-}
-/*
-const FullReference = () => {
-    json.entryPoints[0].
-}*/
-
-import { options } from "preact";
-import { DemoUseGrid } from "./demos/use-grid.js";
-import { DemoUseModal } from "./demos/use-modal.js";
-import { DemoUseRovingTabIndex } from "./demos/use-roving-tab-index.js";
-import { DemoUseTimeout } from "./demos/use-timeout.js";
 options.debounceRendering = (f) => f();
 
 const Component = () => {

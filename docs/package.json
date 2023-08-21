@@ -3,7 +3,8 @@
     "version": "0.0.1",
     "type": "module",
     "description": "Demo page for preact-prop-helpers",
-    "main": "index.tsx",
+    "source": "index.tsx",
+    "main": "bundle.js",
     "packageManager": "pnpm@8.6.11",
     "browserslist": "defaults",
     "scripts": {
@@ -15,5 +16,8 @@
     "license": "ISC",
     "devDependencies": {
         "esbuild": "^0.18.18"
+    },
+    "dependencies": {
+        "preact": "^10.16.0"
     }
 }

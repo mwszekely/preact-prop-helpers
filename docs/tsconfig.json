@@ -8,6 +8,7 @@
     "jsxImportSource": "preact",
     "exactOptionalPropertyTypes": false,      /* TODO: Need better DOM types (e.g. need <div className={undefined} />) */
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    "noEmit": true,
     
     "strict": true,                           /* Enable all strict type-checking options. */
     "moduleResolution": "nodenext",            /* Specify module resolution strategy: 'node' (Node.js) or 'classic' (TypeScript pre-1.6). */
