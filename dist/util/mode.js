@@ -2,7 +2,7 @@
 // (i.e. in a way that doesn't throw an error but has isDevMode be a constant)
 globalThis["process"] ??= {};
 globalThis["process"]["env"] ??= {};
-globalThis["process"]["env"]["NODE_ENV"] = (process.env.NODE_ENV || "production");
+globalThis["process"]["env"]["NODE_ENV"] ||= "production";
 /**
  * Controls other development hooks by checking the value of a global variable called `process.env.NODE_ENV`.
  *

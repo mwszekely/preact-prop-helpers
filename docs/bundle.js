@@ -1414,7 +1414,7 @@
   // ../dist/util/mode.js
   globalThis.process ??= {};
   globalThis.process.env ??= {};
-  globalThis.process.env.NODE_ENV = "development";
+  globalThis.process.env.NODE_ENV ||= "production";
   var Ee = "development";
 
   // ../dist/util/use-call-count.js

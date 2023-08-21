@@ -10,7 +10,7 @@ declare global {
 // (i.e. in a way that doesn't throw an error but has isDevMode be a constant)
 (globalThis as any)["process"] ??= {};
 (globalThis as any)["process"]["env"] ??= {};
-(globalThis as any)["process"]["env"]["NODE_ENV"] = (process.env!.NODE_ENV || "production");
+(globalThis as any)["process"]["env"]["NODE_ENV"] ||= "production";
 
 export type BuildMode = "production" | "development";
 
