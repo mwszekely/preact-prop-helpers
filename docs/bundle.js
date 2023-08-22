@@ -4404,8 +4404,9 @@
           "stopImmediatePropagation" in F && F.stopImmediatePropagation(), F.stopPropagation();
         else if (
           // Ignore the click events that were *just* handled with pointerup
-          v() == !1 && // Ignore stray click events that were't fired SPECIFICALLY on this element
-          F.target == q
+          v() == !1 && // Ignore stray click events that were't fired ON OR WITHIN on this element
+          // ("on or within" because sometimes a button's got a label that's a different element than the button)
+          F.target && q?.contains(F.target)
         ) {
           debugger;
           console.log("onclick was fired and will be handled as it doesn't look like it came from a pointer event", F), C(!0, F), requestAnimationFrame(() => {
