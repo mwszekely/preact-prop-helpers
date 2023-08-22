@@ -106,18 +106,37 @@ function supportsPointerEvents() {
 // ...at the end of the day, globals are the best way to coordinate this simple state between disparate components.
 // But TODO because it doesn't work well it this library is used multiple times on the same page.
 let justHandledManualClickEvent = false;
-let manualClickTimeout = null as number | null;
+let manualClickTimeout1 = null as number | null;
+let manualClickTimeout2 = null as number | null;
 function onHandledManualClickEvent() {
     
     pressLog("manual-click");
     justHandledManualClickEvent = true;
-    if (manualClickTimeout != null) clearTimeout(manualClickTimeout);
+    if (manualClickTimeout1 != null) clearTimeout(manualClickTimeout1);
+    if (manualClickTimeout2 != null) clearTimeout(manualClickTimeout2);
 
     // The timeout is somewhat generous here because when the "emulated" click event finally comes along
     // (i.e. after all the pointer events have finished) it will also clear this. 
     // This is mostly as a backup safety net.
-    manualClickTimeout = setTimeout(() => { pressLog("manual-click clear"); justHandledManualClickEvent = false; }, 100)
+    manualClickTimeout1 = setTimeout(() => { 
+        pressLog("manual-click halfway"); 
+        // This is split into two halves for task-ordering reasons.
+        // Namely we'd like one of these to be scheduled **after** some amount of heavy work was scheduled
+        // Because the task queue is FIFO at **scheduling** time, not at the **scheduled** time.
+        manualClickTimeout2 = setTimeout(() => { 
+            pressLog("manual-click clear"); 
+            justHandledManualClickEvent = false; 
+        }, 75);
+    }, 75)
 }
+
+document.addEventListener("click", (e) => {
+    if (justHandledManualClickEvent) {
+        justHandledManualClickEvent = false;
+        e.preventDefault();
+        e.stopPropagation();
+    }
+}, { capture: true });
 
 /**
  * Adds the necessary event handlers to create a "press"-like event for

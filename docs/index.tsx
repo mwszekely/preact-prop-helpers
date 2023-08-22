@@ -394,7 +394,23 @@ function DemoPress({ remaining }: { remaining: number }) {
     const [count, setCount] = useState<number>(0);
     const { refElementReturn, propsStable: p1 } = useRefElement<HTMLDivElement>({ refElementParameters: {} })
     const { props: p2, pressReturn: { pressing, longPress } } = usePress<HTMLDivElement>({
-        pressParameters: { focusSelf: e => { e.focus() }, longPressThreshold: 1000, onPressSync: () => { setCount((c: number) => ++c) }, allowRepeatPresses: false, excludeEnter: null, excludePointer: null, excludeSpace: null, onPressingChange: null },
+        pressParameters: { 
+            focusSelf: e => { e.focus() }, 
+            longPressThreshold: 1000, 
+            onPressSync: () => { 
+                setTimeout(() => {
+                    let startTime = +(new Date());
+                    let endTime = new Date(startTime + 2000);
+                    while (+(new Date()) < +endTime);
+                    setCount((c: number) => ++c);
+                 });
+                setCount((c: number) => ++c);
+             }, 
+            allowRepeatPresses: false, 
+            excludeEnter: null, 
+            excludePointer: null, 
+            excludeSpace: null, 
+            onPressingChange: null },
         refElementReturn
     })
     return (
