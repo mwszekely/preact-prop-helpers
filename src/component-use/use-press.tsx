@@ -16,6 +16,11 @@ export interface UsePressParameters<E extends EventTarget> extends TargetedPick<
     pressParameters: UsePressParametersSelf<E>;
 }
 
+function pressLog(...args: any[]) {
+    if ((window as any).__log_press_events)
+        console.log(...args)
+}
+
 export interface UsePressParametersSelf<E extends EventTarget> {
     /**  */
     onPressingChange: Nullable<OnPassiveStateChange<boolean, PressChangeEventReason<E>>>;
@@ -103,9 +108,11 @@ function supportsPointerEvents() {
 let justHandledManualClickEvent = false;
 let manualClickTimeout = null as number | null;
 function onHandledManualClickEvent() {
+    
+    pressLog("manual-click");
     justHandledManualClickEvent = true;
     if (manualClickTimeout != null) clearTimeout(manualClickTimeout);
-    manualClickTimeout = setTimeout(() => { justHandledManualClickEvent = false; }, 5)
+    manualClickTimeout = setTimeout(() => { pressLog("manual-click clear"); justHandledManualClickEvent = false; }, 5)
 }
 
 /**
@@ -196,6 +203,7 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
             focusSelf(element);
     });
     const onTouchMove = useCallback((e: TouchEventType<E>) => {
+        pressLog("touchmove", e);
         e.preventDefault();
         e.stopPropagation();
         const element = getElement();
@@ -217,6 +225,7 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
         setHovering(hoveringAtAnyPoint);
     }, []);
     const onTouchEnd = useCallback((e: TouchEventType<E>) => {
+        pressLog("touchend", e);
         e.preventDefault();
         e.stopPropagation();
         const hovering = getHovering();
@@ -233,6 +242,7 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
     }, []);
 
     const onPointerDown = useStableCallback((e: PointerEventType<E>) => {
+        pressLog("pointerdown", e);
         if (!excludePointer()) {
             if ((e.buttons & 1)) {
                 e.preventDefault();
@@ -249,6 +259,7 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
         }
     });
     const onPointerMove = useStableCallback((e: PointerEventType<E>) => {
+        pressLog("pointermove", e);
         let listeningForPress = getPointerDownStartedHere();
         // If we're hovering over this element and not holding down the mouse button (or whatever other primary button)
         // then we're definitely not in a press anymore (if we could we'd just wait for onPointerUp, but it could happen outside this element)
@@ -268,6 +279,7 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
 
     })
     const onPointerUp = useCallback((e: PointerEventType<E>) => {
+        pressLog("pointerup", e);
         const hovering = getHovering();
         const pointerDownStartedHere = getPointerDownStartedHere();
 
@@ -287,9 +299,11 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
 
     }, []);
     const onPointerEnter = useCallback((_e: PointerEventType<E>) => {
+        pressLog("pointerenter", _e);
         setHovering(true);
     }, [])
     const onPointerLeave = useCallback((_e: PointerEventType<E>) => {
+        pressLog("pointerleave", _e);
         setHovering(false);
         setLongPress(false);
     }, []);
@@ -316,6 +330,7 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
 
 
     const handlePress = useStableCallback<NonNullable<typeof onPressSync>>((e) => {
+        pressLog("handlepress", e);
         setWaitingForSpaceUp(false);
         setHovering(false);
         setPointerDownStartedHere(false);
@@ -369,6 +384,7 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
 
 
     const onKeyDown = useStableCallback((e: KeyboardEventType<E>) => {
+        pressLog("keydown", e);
         if (onPressSync) {
             if (e.key == " " && !excludeSpace()) {
                 // We don't actually activate it on a space keydown
@@ -389,6 +405,7 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
     })
 
     const onKeyUp = useStableCallback((e: KeyboardEventType<E>) => {
+        pressLog("keyup", e);
         const waitingForSpaceUp = getWaitingForSpaceUp();
         if (waitingForSpaceUp && e.key == " " && !excludeSpace()) {
             handlePress(e);
@@ -397,6 +414,7 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
     })
 
     const onClick = useStableCallback((e: MouseEventType<E>) => {
+        pressLog("click", e);
         // We should rarely get here. Most of the events do `preventDefault` which stops click from being called,
         // but we can still get here if the actual `click()` member is called, for example, and we need to react appropriately.
         const element = getElement();
@@ -433,6 +451,7 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
 
 
     const onFocusOut = useStableCallback((e: FocusEventType<E>) => {
+        pressLog("focusout", e);
         setWaitingForSpaceUp(false);
         setIsPressing(false, e);
     })

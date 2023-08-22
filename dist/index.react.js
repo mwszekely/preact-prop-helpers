@@ -4765,6 +4765,10 @@ function useAsyncHandler({ asyncHandler, capture: originalCapture, ...restAsyncO
     };
 }
 
+function pressLog(...args) {
+    if (window.__log_press_events)
+        console.log(...args);
+}
 function supportsPointerEvents() {
     return ("onpointerup" in window);
 }
@@ -4783,10 +4787,11 @@ function supportsPointerEvents() {
 let justHandledManualClickEvent = false;
 let manualClickTimeout = null;
 function onHandledManualClickEvent() {
+    pressLog("manual-click");
     justHandledManualClickEvent = true;
     if (manualClickTimeout != null)
         clearTimeout(manualClickTimeout);
-    manualClickTimeout = setTimeout(() => { justHandledManualClickEvent = false; }, 5);
+    manualClickTimeout = setTimeout(() => { pressLog("manual-click clear"); justHandledManualClickEvent = false; }, 5);
 }
 /**
  * Adds the necessary event handlers to create a "press"-like event for
@@ -4865,6 +4870,7 @@ function usePress(args) {
             focusSelf(element);
     });
     const onTouchMove = useCallback((e) => {
+        pressLog("touchmove", e);
         e.preventDefault();
         e.stopPropagation();
         const element = getElement();
@@ -4886,6 +4892,7 @@ function usePress(args) {
         setHovering(hoveringAtAnyPoint);
     }, []);
     const onTouchEnd = useCallback((e) => {
+        pressLog("touchend", e);
         e.preventDefault();
         e.stopPropagation();
         const hovering = getHovering();
@@ -4900,6 +4907,7 @@ function usePress(args) {
         setIsPressing(false, e);
     }, []);
     const onPointerDown = useStableCallback((e) => {
+        pressLog("pointerdown", e);
         if (!excludePointer()) {
             if ((e.buttons & 1)) {
                 e.preventDefault();
@@ -4915,6 +4923,7 @@ function usePress(args) {
         }
     });
     const onPointerMove = useStableCallback((e) => {
+        pressLog("pointermove", e);
         let listeningForPress = getPointerDownStartedHere();
         // If we're hovering over this element and not holding down the mouse button (or whatever other primary button)
         // then we're definitely not in a press anymore (if we could we'd just wait for onPointerUp, but it could happen outside this element)
@@ -4931,6 +4940,7 @@ function usePress(args) {
         }
     });
     const onPointerUp = useCallback((e) => {
+        pressLog("pointerup", e);
         const hovering = getHovering();
         const pointerDownStartedHere = getPointerDownStartedHere();
         if (!excludePointer()) {
@@ -4948,9 +4958,11 @@ function usePress(args) {
         setIsPressing(false, e);
     }, []);
     const onPointerEnter = useCallback((_e) => {
+        pressLog("pointerenter", _e);
         setHovering(true);
     }, []);
     const onPointerLeave = useCallback((_e) => {
+        pressLog("pointerleave", _e);
         setHovering(false);
         setLongPress(false);
     }, []);
@@ -4971,6 +4983,7 @@ function usePress(args) {
         triggerIndex: longPress ? true : (pointerDownStartedHere && getHovering())
     });
     const handlePress = useStableCallback((e) => {
+        pressLog("handlepress", e);
         setWaitingForSpaceUp(false);
         setHovering(false);
         setPointerDownStartedHere(false);
@@ -5016,6 +5029,7 @@ function usePress(args) {
         }
     });
     const onKeyDown = useStableCallback((e) => {
+        pressLog("keydown", e);
         if (onPressSync) {
             if (e.key == " " && !excludeSpace()) {
                 // We don't actually activate it on a space keydown
@@ -5034,6 +5048,7 @@ function usePress(args) {
         }
     });
     const onKeyUp = useStableCallback((e) => {
+        pressLog("keyup", e);
         const waitingForSpaceUp = getWaitingForSpaceUp();
         if (waitingForSpaceUp && e.key == " " && !excludeSpace()) {
             handlePress(e);
@@ -5041,6 +5056,7 @@ function usePress(args) {
         }
     });
     const onClick = useStableCallback((e) => {
+        pressLog("click", e);
         // We should rarely get here. Most of the events do `preventDefault` which stops click from being called,
         // but we can still get here if the actual `click()` member is called, for example, and we need to react appropriately.
         const element = getElement();
@@ -5073,6 +5089,7 @@ function usePress(args) {
         }
     });
     const onFocusOut = useStableCallback((e) => {
+        pressLog("focusout", e);
         setWaitingForSpaceUp(false);
         setIsPressing(false, e);
     });
