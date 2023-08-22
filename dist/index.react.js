@@ -4791,7 +4791,10 @@ function onHandledManualClickEvent() {
     justHandledManualClickEvent = true;
     if (manualClickTimeout != null)
         clearTimeout(manualClickTimeout);
-    manualClickTimeout = setTimeout(() => { pressLog("manual-click clear"); justHandledManualClickEvent = false; }, 5);
+    // The timeout is somewhat generous here because when the "emulated" click event finally comes along
+    // (i.e. after all the pointer events have finished) it will also clear this. 
+    // This is mostly as a backup safety net.
+    manualClickTimeout = setTimeout(() => { pressLog("manual-click clear"); justHandledManualClickEvent = false; }, 100);
 }
 /**
  * Adds the necessary event handlers to create a "press"-like event for
@@ -5068,7 +5071,12 @@ function usePress(args) {
             }
             else {
                 // Listen for "programmatic" click events.
-                if (
+                if (justHandledManualClickEvent) {
+                    // This is probably the click event after the end of all the pointerdownupleavemoveenter soup.
+                    // Clear the flag a little early.
+                    justHandledManualClickEvent = false;
+                }
+                else if (
                 // Ignore the click events that were *just* handled with pointerup
                 !justHandledManualClickEvent &&
                     // Ignore stray click events that were't fired ON OR WITHIN on this element
