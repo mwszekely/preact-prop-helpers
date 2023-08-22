@@ -4940,11 +4940,14 @@ function usePress(args) {
         setIsPressing(false, e);
     }, []);
     const onPointerEnter = useCallback((_e) => {
-        setHovering(true);
+        if (_e.pointerType != 'touch')
+            setHovering(true);
     }, []);
     const onPointerLeave = useCallback((_e) => {
-        setHovering(false);
-        setLongPress(false);
+        if (_e.pointerType != 'touch') {
+            setHovering(false);
+            setLongPress(false);
+        }
     }, []);
     useTimeout({
         callback: () => {

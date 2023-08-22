@@ -279,11 +279,14 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
 
     }, []);
     const onPointerEnter = useCallback((_e: PointerEventType<E>) => {
-        setHovering(true);
+        if (_e.pointerType != 'touch')
+            setHovering(true);
     }, [])
     const onPointerLeave = useCallback((_e: PointerEventType<E>) => {
-        setHovering(false);
-        setLongPress(false);
+        if (_e.pointerType != 'touch') {
+            setHovering(false);
+            setLongPress(false);
+        }
     }, []);
 
     useTimeout({
@@ -463,10 +466,9 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
     };
 }
 
-export interface UsePressAsyncParameters<E extends Element> extends 
-OmitStrong<UsePressParameters<E>, "pressParameters">,
-TargetedOmit<UsePressParameters<E>, "pressParameters", "onPressSync">
- {
+export interface UsePressAsyncParameters<E extends Element> extends
+    OmitStrong<UsePressParameters<E>, "pressParameters">,
+    TargetedOmit<UsePressParameters<E>, "pressParameters", "onPressSync"> {
     asyncHandlerParameters: OmitStrong<UseAsyncHandlerParameters<PressEventReason<E>, void>, "capture">;
 }
 
@@ -480,7 +482,7 @@ export function usePressAsync<E extends Element>({
     refElementReturn
 }: UsePressAsyncParameters<E>): UsePressAsyncReturnType<E> {
     const asyncHandlerReturn = useAsyncHandler<PressEventReason<E>, void>({ asyncHandler, capture: noop, debounce, throttle });
-    const { pressReturn, props } = usePress<E>({ pressParameters: { onPressSync: asyncHandlerReturn.syncHandler,  ...pressParameters }, refElementReturn });
+    const { pressReturn, props } = usePress<E>({ pressParameters: { onPressSync: asyncHandlerReturn.syncHandler, ...pressParameters }, refElementReturn });
 
     return {
         asyncHandlerReturn,
