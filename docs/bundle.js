@@ -4369,9 +4369,9 @@
       let q = M(), K = w();
       d() || (b(!0, F), K && q && (ae(F), F.preventDefault(), F.stopPropagation())), I(!1), y(!1), L(!1), _(!1), C(!1, F);
     }, []), Z = R((F) => {
-      F.pointerType != "touch" && y(!0);
+      y(!0);
     }, []), se = R((F) => {
-      F.pointerType != "touch" && (y(!1), _(!1));
+      y(!1), _(!1);
     }, []);
     je({
       callback: () => {

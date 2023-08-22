@@ -279,18 +279,11 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
 
     }, []);
     const onPointerEnter = useCallback((_e: PointerEventType<E>) => {
-        if (_e.pointerType != 'touch')
-            setHovering(true);
+        setHovering(true);
     }, [])
     const onPointerLeave = useCallback((_e: PointerEventType<E>) => {
-        // TODO: This is necessary to prevent Firefox on mobile devices from needing
-        // to double-tap to activate SOME press components. Probably something to do with :hover...
-        // This seems like the best fix for now, since "leave" for a pointer means both 
-        // "no longer hovering" AND "no longer touching", and we can't determine which.
-        if (_e.pointerType != 'touch') {
-            setHovering(false);
-            setLongPress(false);
-        }
+        setHovering(false);
+        setLongPress(false);
     }, []);
 
     useTimeout({
