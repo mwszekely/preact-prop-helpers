@@ -4415,8 +4415,11 @@
         else if (qe)
           qe = !1;
         else if (console.assert(qe == !1, "Logic???"), L.target && B?.contains(L.target)) {
-          debugger;
-          console.log("onclick was fired and will be handled as it doesn't look like it came from a pointer event", L), console.assert(qe == !1, "Logic???"), C(!0, L), requestAnimationFrame(() => {
+          if (!N()) {
+            debugger;
+            console.log("onclick was fired and will be handled as it doesn't look like it came from a pointer event", L), console.assert(qe == !1, "Logic???");
+          }
+          C(!0, L), requestAnimationFrame(() => {
             C(!1, L);
           }), Y(L);
         }
@@ -5756,12 +5759,7 @@
         },
         longPressThreshold: 1e3,
         onPressSync: () => {
-          setTimeout(() => {
-            let m = +/* @__PURE__ */ new Date(), f = new Date(m + 2e3);
-            for (; +/* @__PURE__ */ new Date() < +f; )
-              ;
-            n((s) => ++s);
-          }), n((m) => ++m);
+          n((m) => ++m);
         },
         allowRepeatPresses: !1,
         excludeEnter: null,

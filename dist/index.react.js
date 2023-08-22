@@ -5102,12 +5102,15 @@ function usePress(args) {
                     // Ignore stray click events that were't fired ON OR WITHIN on this element
                     // ("on or within" because sometimes a button's got a label that's a different element than the button)
                     if ((e.target && element?.contains(e.target))) {
-                        // Intentional, for now. Programmatic clicks shouldn't happen in most cases.
-                        // TODO: Remove this when I'm confident stray clicks won't be handled.
-                        /* eslint-disable no-debugger */
-                        debugger;
-                        console.log("onclick was fired and will be handled as it doesn't look like it came from a pointer event", e);
-                        console.assert(justHandledManualClickEvent == false, "Logic???");
+                        if (getHovering()) ;
+                        else {
+                            // Intentional, for now. Programmatic clicks shouldn't happen in most cases.
+                            // TODO: Remove this when I'm confident stray clicks won't be handled.
+                            /* eslint-disable no-debugger */
+                            debugger;
+                            console.log("onclick was fired and will be handled as it doesn't look like it came from a pointer event", e);
+                            console.assert(justHandledManualClickEvent == false, "Logic???");
+                        }
                         setIsPressing(true, e);
                         requestAnimationFrame(() => {
                             setIsPressing(false, e);

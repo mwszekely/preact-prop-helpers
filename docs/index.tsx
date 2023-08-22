@@ -398,12 +398,12 @@ function DemoPress({ remaining }: { remaining: number }) {
             focusSelf: e => { e.focus() }, 
             longPressThreshold: 1000, 
             onPressSync: () => { 
-                setTimeout(() => {
+                /*setTimeout(() => {
                     let startTime = +(new Date());
                     let endTime = new Date(startTime + 2000);
                     while (+(new Date()) < +endTime);
                     setCount((c: number) => ++c);
-                 });
+                 });*/
                 setCount((c: number) => ++c);
              }, 
             allowRepeatPresses: false, 
