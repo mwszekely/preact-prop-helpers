@@ -466,6 +466,7 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
                     /* eslint-disable no-debugger */
                     debugger;
                     console.log("onclick was fired and will be handled as it doesn't look like it came from a pointer event", e);
+                    console.assert(justHandledManualClickEvent === false, "Logic???");
 
                     setIsPressing(true, e);
                     requestAnimationFrame(() => {
