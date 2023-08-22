@@ -88,6 +88,26 @@ function supportsPointerEvents() {
     return ("onpointerup" in window);
 }
 
+// All our checking for pointerdown and up doesn't mean anything if it's
+// a programmatic onClick event, which could come from any non-user source.
+// We want to handle those just like GUI clicks, but we don't want to double-up on press events.
+// So if we handle a press from pointerup, we ignore any subsequent click events, at least for a tick.
+//
+// Also, this is global to handle the following situation:
+// A button is tapped
+// Some heavy rendering-logic is done and the page jumps around
+// Now there's a new button underneath the user's finger
+// And it receives a click event just cause.
+// ...at the end of the day, globals are the best way to coordinate this simple state between disparate components.
+// But TODO because it doesn't work well it this library is used multiple times on the same page.
+let justHandledManualClickEvent = false;
+let manualClickTimeout = null as number | null;
+function onHandledManualClickEvent() {
+    justHandledManualClickEvent = true;
+    if (manualClickTimeout != null) clearTimeout(manualClickTimeout);
+    manualClickTimeout = setTimeout(() => { justHandledManualClickEvent = false; }, 5)
+}
+
 /**
  * Adds the necessary event handlers to create a "press"-like event for
  * any element, whether it's a native &lt;button&gt; or regular &lt;div&gt;,
@@ -158,18 +178,6 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
      * 
      */
 
-    // All our checking for pointerdown and up doesn't mean anything if it's
-    // a programmatic onClick event, which could come from any non-user source.
-    // We want to handle those just like GUI clicks, but we don't want to double-up on press events.
-    // So if we handle a press from pointerup, we ignore any subsequent click events, at least for a tick.
-    const [getJustHandled, setJustHandled] = usePassiveState<boolean, PressEventReason<E>>(useStableCallback((justHandled, _p, reason) => {
-        if (justHandled) {
-            const h = setTimeout(() => {
-                setJustHandled(false, reason);
-            }, 1);
-            return clearTimeout(h);
-        }
-    }), returnFalse);
 
     const [longPress, setLongPress] = useState(null as boolean | null);
     const [waitingForSpaceUp, setWaitingForSpaceUp, getWaitingForSpaceUp] = useState(false);
@@ -214,8 +222,8 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
         const hovering = getHovering();
         const pointerDownStartedHere = getPointerDownStartedHere();
 
-        setJustHandled(true, e);
         if (pointerDownStartedHere && hovering) {
+            onHandledManualClickEvent();
             handlePress(e);
         }
         setWaitingForSpaceUp(false);
@@ -264,8 +272,8 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
         const pointerDownStartedHere = getPointerDownStartedHere();
 
         if (!excludePointer()) {
-            setJustHandled(true, e);
             if (pointerDownStartedHere && hovering) {
+                onHandledManualClickEvent();
                 handlePress(e);
                 e.preventDefault();
                 e.stopPropagation();
@@ -389,10 +397,10 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
     })
 
     const onClick = useStableCallback((e: MouseEventType<E>) => {
+        // We should rarely get here. Most of the events do `preventDefault` which stops click from being called,
+        // but we can still get here if the actual `click()` member is called, for example, and we need to react appropriately.
         const element = getElement();
         if (onPressSync) {
-            //e.preventDefault();
-
             if (e.detail > 1) {
                 if ("stopImmediatePropagation" in e)
                     (e as never as Event).stopImmediatePropagation();
@@ -402,7 +410,7 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
                 // Listen for "programmatic" click events.
                 if (
                     // Ignore the click events that were *just* handled with pointerup
-                    getJustHandled() == false &&
+                    !justHandledManualClickEvent &&
                     // Ignore stray click events that were't fired ON OR WITHIN on this element
                     // ("on or within" because sometimes a button's got a label that's a different element than the button)
                     (e.target && element?.contains(e.target as Node))
