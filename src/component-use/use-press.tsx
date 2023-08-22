@@ -109,7 +109,7 @@ let justHandledManualClickEvent = false;
 let manualClickTimeout1 = null as number | null;
 let manualClickTimeout2 = null as number | null;
 function onHandledManualClickEvent() {
-    
+
     pressLog("manual-click");
     justHandledManualClickEvent = true;
     if (manualClickTimeout1 != null) clearTimeout(manualClickTimeout1);
@@ -118,14 +118,14 @@ function onHandledManualClickEvent() {
     // The timeout is somewhat generous here because when the "emulated" click event finally comes along
     // (i.e. after all the pointer events have finished) it will also clear this. 
     // This is mostly as a backup safety net.
-    manualClickTimeout1 = setTimeout(() => { 
-        pressLog("manual-click halfway"); 
+    manualClickTimeout1 = setTimeout(() => {
+        pressLog("manual-click halfway");
         // This is split into two halves for task-ordering reasons.
         // Namely we'd like one of these to be scheduled **after** some amount of heavy work was scheduled
         // Because the task queue is FIFO at **scheduling** time, not at the **scheduled** time.
-        manualClickTimeout2 = setTimeout(() => { 
-            pressLog("manual-click clear"); 
-            justHandledManualClickEvent = false; 
+        manualClickTimeout2 = setTimeout(() => {
+            pressLog("manual-click clear");
+            justHandledManualClickEvent = false;
         }, 75);
     }, 75)
 }
@@ -454,25 +454,27 @@ export function usePress<E extends Element>(args: UsePressParameters<E>): UsePre
                     // Clear the flag a little early.
                     justHandledManualClickEvent = false;
                 }
-                else if (
-                    // Ignore the click events that were *just* handled with pointerup
-                    !justHandledManualClickEvent &&
+                else {
+                    console.assert(justHandledManualClickEvent == false, "Logic???");
+                    
                     // Ignore stray click events that were't fired ON OR WITHIN on this element
                     // ("on or within" because sometimes a button's got a label that's a different element than the button)
-                    (e.target && element?.contains(e.target as Node))
-                ) {
-                    // Intentional, for now. Programmatic clicks shouldn't happen in most cases.
-                    // TODO: Remove this when I'm confident stray clicks won't be handled.
-                    /* eslint-disable no-debugger */
-                    debugger;
-                    console.log("onclick was fired and will be handled as it doesn't look like it came from a pointer event", e);
-                    console.assert(justHandledManualClickEvent === false, "Logic???");
+                    if ((e.target && element?.contains(e.target as Node))) {
 
-                    setIsPressing(true, e);
-                    requestAnimationFrame(() => {
-                        setIsPressing(false, e);
-                    });
-                    handlePress(e);
+
+                        // Intentional, for now. Programmatic clicks shouldn't happen in most cases.
+                        // TODO: Remove this when I'm confident stray clicks won't be handled.
+                        /* eslint-disable no-debugger */
+                        debugger;
+                        console.log("onclick was fired and will be handled as it doesn't look like it came from a pointer event", e);
+                        console.assert(justHandledManualClickEvent == false, "Logic???");
+
+                        setIsPressing(true, e);
+                        requestAnimationFrame(() => {
+                            setIsPressing(false, e);
+                        });
+                        handlePress(e);
+                    }
                 }
             }
         }

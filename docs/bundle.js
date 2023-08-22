@@ -4414,14 +4414,9 @@
           "stopImmediatePropagation" in L && L.stopImmediatePropagation(), L.stopPropagation();
         else if (qe)
           qe = !1;
-        else if (
-          // Ignore the click events that were *just* handled with pointerup
-          !qe && // Ignore stray click events that were't fired ON OR WITHIN on this element
-          // ("on or within" because sometimes a button's got a label that's a different element than the button)
-          L.target && B?.contains(L.target)
-        ) {
+        else if (console.assert(qe == !1, "Logic???"), L.target && B?.contains(L.target)) {
           debugger;
-          console.log("onclick was fired and will be handled as it doesn't look like it came from a pointer event", L), console.assert(qe === !1, "Logic???"), C(!0, L), requestAnimationFrame(() => {
+          console.log("onclick was fired and will be handled as it doesn't look like it came from a pointer event", L), console.assert(qe == !1, "Logic???"), C(!0, L), requestAnimationFrame(() => {
             C(!1, L);
           }), Y(L);
         }
