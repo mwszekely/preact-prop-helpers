@@ -4944,6 +4944,10 @@ function usePress(args) {
             setHovering(true);
     }, []);
     const onPointerLeave = useCallback((_e) => {
+        // TODO: This is necessary to prevent Firefox on mobile devices from needing
+        // to double-tap to activate SOME press components. Probably something to do with :hover...
+        // This seems like the best fix for now, since "leave" for a pointer means both 
+        // "no longer hovering" AND "no longer touching", and we can't determine which.
         if (_e.pointerType != 'touch') {
             setHovering(false);
             setLongPress(false);
@@ -5038,7 +5042,7 @@ function usePress(args) {
     const onClick = useStableCallback((e) => {
         const element = getElement();
         if (onPressSync) {
-            e.preventDefault();
+            //e.preventDefault();
             if (e.detail > 1) {
                 if ("stopImmediatePropagation" in e)
                     e.stopImmediatePropagation();
@@ -5050,12 +5054,7 @@ function usePress(args) {
                 // Ignore the click events that were *just* handled with pointerup
                 getJustHandled() == false &&
                     // Ignore stray click events that were't fired SPECIFICALLY on this element
-                    e.target == element &&
-                    // Ignore click events that were fired on a radio that just became checked
-                    // (Whenever the `checked` property is changed, all browsers fire a `click` event, no matter the reason for the change,
-                    // but since everything's declarative and *we* were the reason for the change, 
-                    // this will always be a duplicate event related to whatever we just did.)
-                    element?.tagName == 'input' && element.type == 'radio' && element.checked) {
+                    e.target == element) {
                     // Intentional, for now. Programmatic clicks shouldn't happen in most cases.
                     // TODO: Remove this when I'm confident stray clicks won't be handled.
                     /* eslint-disable no-debugger */
@@ -5064,7 +5063,6 @@ function usePress(args) {
                     setIsPressing(true, e);
                     requestAnimationFrame(() => {
                         setIsPressing(false, e);
-                        handlePress(e);
                     });
                     handlePress(e);
                 }
