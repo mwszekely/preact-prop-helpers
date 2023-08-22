@@ -4805,12 +4805,14 @@ function onHandledManualClickEvent() {
         manualClickTimeout2 = setTimeout(() => {
             pressLog("manual-click clear");
             justHandledManualClickEvent = false;
-        }, 75);
-    }, 75);
+        }, 50);
+    }, 200);
 }
 document.addEventListener("click", (e) => {
     if (justHandledManualClickEvent) {
         justHandledManualClickEvent = false;
+        manualClickTimeout1 != null && clearTimeout(manualClickTimeout1);
+        manualClickTimeout2 != null && clearTimeout(manualClickTimeout2);
         e.preventDefault();
         e.stopPropagation();
     }
