@@ -489,7 +489,7 @@ export function useMultiSelectionChild<E extends Element>({
         hasCurrentFocusParameters: {
             onCurrentFocusedInnerChanged
         },
-        props: { [multiSelectionAriaPropName || "aria-selected"]: localSelected ? "true" : "false" },
+        props: { [multiSelectionAriaPropName || "aria-selected"]: multiSelectionMode == "disabled"? undefined : (localSelected ? "true" : "false") },
         info: {
             getMultiSelected: getLocalSelected,
             setSelectedFromParent,
