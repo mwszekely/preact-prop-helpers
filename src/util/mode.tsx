@@ -17,6 +17,6 @@ declare global {
  * @remarks Bundlers like Rollup will actually no-op out development code if `process.env.NODE_ENV !== "development"` 
  * (which, of course, covers the default case where `process.env.NODE_ENV` just doesn't exist).
  */
-export const BuildMode = (globalThis as any)["process"]["env"]["NODE_ENV"] = ((globalThis as any)["process"]["env"]["NODE_ENV"] || "production") as "production" | "development";
-
+export const BuildMode = process.env!.NODE_ENV || "production" as "production" | "development";
+process.env!.NODE_ENV = BuildMode;
 export type BuildMode = "production" | "development";

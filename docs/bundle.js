@@ -1473,7 +1473,8 @@
   // ../dist/util/mode.js
   globalThis["process"] ??= {};
   globalThis["process"]["env"] ??= {};
-  var BuildMode = globalThis["process"]["env"]["NODE_ENV"] = globalThis["process"]["env"]["NODE_ENV"] || "production";
+  var BuildMode = "development";
+  process.env.NODE_ENV = BuildMode;
 
   // ../dist/util/use-call-count.js
   window.requestIdleCallback ??= (callback) => {
